@@ -1285,6 +1285,15 @@ InitializeMpServiceData (
   UINTN                     GdtTableStepSize;
 
   //
+  // Initialize mSmmMpSyncData
+  //
+  mSmmMpSyncDataSize = sizeof (SMM_DISPATCHER_MP_SYNC_DATA) +
+                       (sizeof (SMM_CPU_DATA_BLOCK) + sizeof (BOOLEAN)) * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+  mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA*) AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
+  ASSERT (mSmmMpSyncData != NULL);
+  InitializeMpSyncData ();
+
+  //
   // Initialize physical address mask
   // NOTE: Physical memory above virtual address limit is not supported !!!
   //
@@ -1323,15 +1332,6 @@ InitializeMpServiceData (
       Cr3
       );
   }
-
-  //
-  // Initialize mSmmMpSyncData
-  //
-  mSmmMpSyncDataSize = sizeof (SMM_DISPATCHER_MP_SYNC_DATA) +
-                       (sizeof (SMM_CPU_DATA_BLOCK) + sizeof (BOOLEAN)) * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
-  mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA*) AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
-  ASSERT (mSmmMpSyncData != NULL);
-  InitializeMpSyncData ();
 
   //
   // Record current MTRR settings
