@@ -246,7 +246,7 @@ SmmReadSaveState (
     // the pseudo register value for EFI_SMM_SAVE_STATE_REGISTER_PROCESSOR_ID is returned in Buffer.
     // Otherwise, EFI_NOT_FOUND is returned.
     //
-    if (mSmmMpSyncData->CpuData[CpuIndex].Present) {
+    if (*(mSmmMpSyncData->CpuData[CpuIndex].Present)) {
       *(UINT64 *)Buffer = gSmmCpuPrivate->ProcessorInfo[CpuIndex].ProcessorId;
       return EFI_SUCCESS;
     } else {
@@ -254,7 +254,7 @@ SmmReadSaveState (
     }
   }
 
-  if (!mSmmMpSyncData->CpuData[CpuIndex].Present) {
+  if (!(*(mSmmMpSyncData->CpuData[CpuIndex].Present))) {
     return EFI_INVALID_PARAMETER;
   }
 
