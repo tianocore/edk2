@@ -21,6 +21,8 @@ UINT64                                      gSmiMtrrs[MTRR_NUMBER_OF_FIXED_MTRR 
 UINT64                                      gPhyMask;
 SMM_DISPATCHER_MP_SYNC_DATA                 *mSmmMpSyncData = NULL;
 UINTN                                       mSmmMpSyncDataSize;
+SMM_CPU_SEMAPHORES                          mSmmCpuSemaphores;
+UINTN                                       mSemaphoreSize;
 
 /**
   Performs an atomic compare exchange operation to get semaphore.
@@ -1193,6 +1195,48 @@ Exit:
   AsmWriteCr2 (Cr2);
 }
 
+/**
+  Allocate buffer for all semaphores and spin locks.
+
+**/
+VOID
+InitializeSmmCpuSemaphores (
+  VOID
+  )
+{
+  UINTN                      ProcessorCount;
+  UINTN                      TotalSize;
+  UINTN                      GlobalSemaphoresSize;
+  UINTN                      SemaphoreSize;
+  UINTN                      Pages;
+  UINTN                      *SemaphoreBlock;
+  UINTN                      SemaphoreAddr;
+
+  SemaphoreSize   = GetSpinLockProperties ();
+  ProcessorCount = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+  GlobalSemaphoresSize = (sizeof (SMM_CPU_SEMAPHORE_GLOBAL) / sizeof (VOID *)) * SemaphoreSize;
+  TotalSize = GlobalSemaphoresSize;
+  DEBUG((EFI_D_INFO, "One Semaphore Size    = 0x%x\n", SemaphoreSize));
+  DEBUG((EFI_D_INFO, "Total Semaphores Size = 0x%x\n", TotalSize));
+  Pages = EFI_SIZE_TO_PAGES (TotalSize);
+  SemaphoreBlock = AllocatePages (Pages);
+  ASSERT (SemaphoreBlock != NULL);
+  ZeroMem (SemaphoreBlock, TotalSize);
+
+  SemaphoreAddr = (UINTN)SemaphoreBlock;
+  mSmmCpuSemaphores.SemaphoreGlobal.Counter       = (UINT32 *)SemaphoreAddr;
+  SemaphoreAddr += SemaphoreSize;
+  mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm     = (BOOLEAN *)SemaphoreAddr;
+  SemaphoreAddr += SemaphoreSize;
+  mSmmCpuSemaphores.SemaphoreGlobal.AllCpusInSync = (BOOLEAN *)SemaphoreAddr;
+  SemaphoreAddr += SemaphoreSize;
+  mSmmCpuSemaphores.SemaphoreGlobal.PFLock        = (SPIN_LOCK *)SemaphoreAddr;
+  SemaphoreAddr += SemaphoreSize;
+  mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock
+                                                  = (SPIN_LOCK *)SemaphoreAddr;
+
+  mSemaphoreSize = SemaphoreSize;
+}
 
 /**
   Initialize un-cacheable data.
@@ -1215,6 +1259,8 @@ InitializeMpSyncData (
       mSmmMpSyncData->BspIndex = (UINT32)-1;
     }
     mSmmMpSyncData->EffectiveSyncMode = (SMM_CPU_SYNC_MODE) PcdGet8 (PcdCpuSmmSyncMode);
+
+    InitializeSmmCpuSemaphores ();
   }
 }
 

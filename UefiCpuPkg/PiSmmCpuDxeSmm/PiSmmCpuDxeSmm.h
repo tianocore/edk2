@@ -354,6 +354,25 @@ typedef struct {
   UINT64                            MtrrBaseMaskPtr;        // Offset 0x58
 } PROCESSOR_SMM_DESCRIPTOR;
 
+
+///
+/// All global semaphores' pointer
+///
+typedef struct {
+  volatile UINT32      *Counter;
+  volatile BOOLEAN     *InsideSmm;
+  volatile BOOLEAN     *AllCpusInSync;
+  SPIN_LOCK            *PFLock;
+  SPIN_LOCK            *CodeAccessCheckLock;
+} SMM_CPU_SEMAPHORE_GLOBAL;
+
+///
+/// All semaphores' information
+///
+typedef struct {
+  SMM_CPU_SEMAPHORE_GLOBAL          SemaphoreGlobal;
+} SMM_CPU_SEMAPHORES;
+
 extern IA32_DESCRIPTOR                     gcSmiGdtr;
 extern IA32_DESCRIPTOR                     gcSmiIdtr;
 extern VOID                                *gcSmiIdtrPtr;
