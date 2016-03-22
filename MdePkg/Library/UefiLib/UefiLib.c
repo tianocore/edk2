@@ -1545,3 +1545,22 @@ GetBestLanguage (
   return NULL;
 }
 
+/**
+  An empty function to pass error checking of CreateEventEx ().
+
+  This empty function ensures that EVT_NOTIFY_SIGNAL_ALL is error
+  checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
+
+  @param  Event                 Event whose notification function is being invoked.
+  @param  Context               The pointer to the notification function's context,
+                                which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+InternalEmptyFunction (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+}
