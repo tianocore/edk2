@@ -1164,27 +1164,6 @@ Returns:
 
 
 /**
-  Empty callback function executed when the EndOfDxe event group is signaled.
-
-  We only need this function because we'd like to signal EndOfDxe, and for that
-  we need to create an event, with a callback function.
-
-  @param[in] Event    Event whose notification function is being invoked.
-  @param[in] Context  The pointer to the notification function's context, which
-                      is implementation-dependent.
-**/
-STATIC
-VOID
-EFIAPI
-OnEndOfDxe (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
-  )
-{
-}
-
-
-/**
   Save the S3 boot script.
 
   Note that we trigger DxeSmmReadyToLock here -- otherwise the script wouldn't
@@ -1259,7 +1238,6 @@ Returns:
 {
   EFI_STATUS                         Status;
   EFI_BOOT_MODE                      BootMode;
-  EFI_EVENT                          EndOfDxeEvent;
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
 
@@ -1273,13 +1251,7 @@ Returns:
   // installed after PCI enumeration completes, we must not trigger the S3 save
   // earlier, hence we can't signal End-of-Dxe earlier.
   //
-  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL, TPL_CALLBACK, OnEndOfDxe,
-                  NULL /* NotifyContext */, &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent);
-  if (!EFI_ERROR (Status)) {
-    gBS->SignalEvent (EndOfDxeEvent);
-    gBS->CloseEvent (EndOfDxeEvent);
-  }
+  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
   if (QemuFwCfgS3Enabled ()) {
     //
