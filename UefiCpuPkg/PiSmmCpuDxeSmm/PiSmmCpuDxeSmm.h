@@ -295,11 +295,11 @@ SmmRelocationSemaphoreComplete (
 /// The type of SMM CPU Information
 ///
 typedef struct {
-  SPIN_LOCK                         Busy;
+  SPIN_LOCK                         *Busy;
   volatile EFI_AP_PROCEDURE         Procedure;
   volatile VOID                     *Parameter;
-  volatile UINT32                   Run;
-  volatile BOOLEAN                  Present;
+  volatile UINT32                   *Run;
+  volatile BOOLEAN                  *Present;
 } SMM_CPU_DATA_BLOCK;
 
 typedef enum {

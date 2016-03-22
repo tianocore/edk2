@@ -123,7 +123,7 @@ WaitForAllAPs (
 
   BspIndex = mSmmMpSyncData->BspIndex;
   while (NumberOfAPs-- > 0) {
-    WaitForSemaphore (&mSmmMpSyncData->CpuData[BspIndex].Run);
+    WaitForSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
   }
 }
 
@@ -142,8 +142,8 @@ ReleaseAllAPs (
 
   BspIndex = mSmmMpSyncData->BspIndex;
   for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-    if (Index != BspIndex && mSmmMpSyncData->CpuData[Index].Present) {
-      ReleaseSemaphore (&mSmmMpSyncData->CpuData[Index].Run);
+    if (Index != BspIndex && *(mSmmMpSyncData->CpuData[Index].Present)) {
+      ReleaseSemaphore (mSmmMpSyncData->CpuData[Index].Run);
     }
   }
 }
@@ -175,7 +175,7 @@ AllCpusInSmmWithExceptions (
   CpuData = mSmmMpSyncData->CpuData;
   ProcessorInfo = gSmmCpuPrivate->ProcessorInfo;
   for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-    if (!CpuData[Index].Present && ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
+    if (!(*(CpuData[Index].Present)) && ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
       if (((Exceptions & ARRIVAL_EXCEPTION_DELAYED) != 0) && SmmCpuFeaturesGetSmmRegister (Index, SmmRegSmmDelayed) != 0) {
         continue;
       }
@@ -251,7 +251,7 @@ SmmWaitForApArrival (
     // Send SMI IPIs to bring outside processors in
     //
     for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-      if (!mSmmMpSyncData->CpuData[Index].Present && gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
+      if (!(*(mSmmMpSyncData->CpuData[Index].Present)) && gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId != INVALID_APIC_ID) {
         SendSmiIpi ((UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId);
       }
     }
@@ -333,7 +333,7 @@ BSPHandler (
   //
   // Mark this processor's presence
   //
-  mSmmMpSyncData->CpuData[CpuIndex].Present = TRUE;
+  *(mSmmMpSyncData->CpuData[CpuIndex].Present) = TRUE;
 
   //
   // Clear platform top level SMI status bit before calling SMI handlers. If
@@ -412,7 +412,7 @@ BSPHandler (
   //
   // The BUSY lock is initialized to Acquired state
   //
-  AcquireSpinLockOrFail (&mSmmMpSyncData->CpuData[CpuIndex].Busy);
+  AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy);
 
   //
   // Perform the pre tasks
@@ -428,9 +428,9 @@ BSPHandler (
   // Make sure all APs have completed their pending none-block tasks
   //
   for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-    if (Index != CpuIndex && mSmmMpSyncData->CpuData[Index].Present) {
-      AcquireSpinLock (&mSmmMpSyncData->CpuData[Index].Busy);
-      ReleaseSpinLock (&mSmmMpSyncData->CpuData[Index].Busy);;
+    if (Index != CpuIndex && *(mSmmMpSyncData->CpuData[Index].Present)) {
+      AcquireSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
+      ReleaseSpinLock (mSmmMpSyncData->CpuData[Index].Busy);
     }
   }
 
@@ -457,7 +457,7 @@ BSPHandler (
     while (TRUE) {
       PresentCount = 0;
       for (Index = mMaxNumberOfCpus; Index-- > 0;) {
-        if (mSmmMpSyncData->CpuData[Index].Present) {
+        if (*(mSmmMpSyncData->CpuData[Index].Present)) {
           PresentCount ++;
         }
       }
@@ -515,7 +515,7 @@ BSPHandler (
   //
   // Clear the Present flag of BSP
   //
-  mSmmMpSyncData->CpuData[CpuIndex].Present = FALSE;
+  *(mSmmMpSyncData->CpuData[CpuIndex].Present) = FALSE;
 
   //
   // Gather APs to exit SMM synchronously. Note the Present flag is cleared by now but
@@ -617,20 +617,20 @@ APHandler (
   //
   // Mark this processor's presence
   //
-  mSmmMpSyncData->CpuData[CpuIndex].Present = TRUE;
+  *(mSmmMpSyncData->CpuData[CpuIndex].Present) = TRUE;
 
   if (SyncMode == SmmCpuSyncModeTradition || SmmCpuFeaturesNeedConfigureMtrrs()) {
     //
     // Notify BSP of arrival at this point
     //
-    ReleaseSemaphore (&mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs()) {
     //
     // Wait for the signal from BSP to backup MTRRs
     //
-    WaitForSemaphore (&mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Backup OS MTRRs
@@ -640,12 +640,12 @@ APHandler (
     //
     // Signal BSP the completion of this AP
     //
-    ReleaseSemaphore (&mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
 
     //
     // Wait for BSP's signal to program MTRRs
     //
-    WaitForSemaphore (&mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Replace OS MTRRs with SMI MTRRs
@@ -655,14 +655,14 @@ APHandler (
     //
     // Signal BSP the completion of this AP
     //
-    ReleaseSemaphore (&mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
   }
 
   while (TRUE) {
     //
     // Wait for something to happen
     //
-    WaitForSemaphore (&mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Check if BSP wants to exit SMM
@@ -675,7 +675,7 @@ APHandler (
     // BUSY should be acquired by SmmStartupThisAp()
     //
     ASSERT (
-      !AcquireSpinLockOrFail (&mSmmMpSyncData->CpuData[CpuIndex].Busy)
+      !AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)
       );
 
     //
@@ -688,19 +688,19 @@ APHandler (
     //
     // Release BUSY
     //
-    ReleaseSpinLock (&mSmmMpSyncData->CpuData[CpuIndex].Busy);
+    ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs()) {
     //
     // Notify BSP the readiness of this AP to program MTRRs
     //
-    ReleaseSemaphore (&mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
 
     //
     // Wait for the signal from BSP to program MTRRs
     //
-    WaitForSemaphore (&mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Restore OS MTRRs
@@ -712,22 +712,22 @@ APHandler (
   //
   // Notify BSP the readiness of this AP to Reset states/semaphore for this processor
   //
-  ReleaseSemaphore (&mSmmMpSyncData->CpuData[BspIndex].Run);
+  ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
 
   //
   // Wait for the signal from BSP to Reset states/semaphore for this processor
   //
-  WaitForSemaphore (&mSmmMpSyncData->CpuData[CpuIndex].Run);
+  WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
   //
   // Reset states/semaphore for this processor
   //
-  mSmmMpSyncData->CpuData[CpuIndex].Present = FALSE;
+  *(mSmmMpSyncData->CpuData[CpuIndex].Present) = FALSE;
 
   //
   // Notify BSP the readiness of this AP to exit SMM
   //
-  ReleaseSemaphore (&mSmmMpSyncData->CpuData[BspIndex].Run);
+  ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
 
 }
 
@@ -928,19 +928,19 @@ SmmStartupThisAp (
 {
   if (CpuIndex >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus ||
       CpuIndex == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu ||
-      !mSmmMpSyncData->CpuData[CpuIndex].Present ||
+      !(*(mSmmMpSyncData->CpuData[CpuIndex].Present)) ||
       gSmmCpuPrivate->Operation[CpuIndex] == SmmCpuRemove ||
-      !AcquireSpinLockOrFail (&mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
+      !AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
     return EFI_INVALID_PARAMETER;
   }
 
   mSmmMpSyncData->CpuData[CpuIndex].Procedure = Procedure;
   mSmmMpSyncData->CpuData[CpuIndex].Parameter = ProcArguments;
-  ReleaseSemaphore (&mSmmMpSyncData->CpuData[CpuIndex].Run);
+  ReleaseSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
   if (FeaturePcdGet (PcdCpuSmmBlockStartupThisAp)) {
-    AcquireSpinLock (&mSmmMpSyncData->CpuData[CpuIndex].Busy);
-    ReleaseSpinLock (&mSmmMpSyncData->CpuData[CpuIndex].Busy);
+    AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
+    ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
   }
   return EFI_SUCCESS;
 }
@@ -1079,7 +1079,7 @@ SmiRendezvous (
       // E.g., with Relaxed AP flow, SmmStartupThisAp() may be called immediately
       // after AP's present flag is detected.
       //
-      InitializeSpinLock (&mSmmMpSyncData->CpuData[CpuIndex].Busy);
+      InitializeSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
     }
 
     //
@@ -1169,7 +1169,7 @@ SmiRendezvous (
       }
     }
 
-    ASSERT (mSmmMpSyncData->CpuData[CpuIndex].Run == 0);
+    ASSERT (*mSmmMpSyncData->CpuData[CpuIndex].Run == 0);
 
     //
     // Wait for BSP's signal to exit SMI
@@ -1205,6 +1205,7 @@ InitializeSmmCpuSemaphores (
   VOID
   )
 {
+  UINTN                      CpuIndex;
   UINTN                      ProcessorCount;
   UINTN                      TotalSize;
   UINTN                      GlobalSemaphoresSize;
@@ -1250,6 +1251,15 @@ InitializeSmmCpuSemaphores (
   mSmmMpSyncData->AllCpusInSync = mSmmCpuSemaphores.SemaphoreGlobal.AllCpusInSync;
   mPFLock                       = mSmmCpuSemaphores.SemaphoreGlobal.PFLock;
   mConfigSmmCodeAccessCheckLock = mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock;
+
+  for (CpuIndex = 0; CpuIndex < ProcessorCount; CpuIndex ++) {
+    mSmmMpSyncData->CpuData[CpuIndex].Busy    =
+      (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Busy + SemaphoreSize * CpuIndex);
+    mSmmMpSyncData->CpuData[CpuIndex].Run     =
+      (UINT32 *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Run + SemaphoreSize * CpuIndex);
+    mSmmMpSyncData->CpuData[CpuIndex].Present =
+      (BOOLEAN *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Present + SemaphoreSize * CpuIndex);
+  }
 
   mSemaphoreSize = SemaphoreSize;
 }
