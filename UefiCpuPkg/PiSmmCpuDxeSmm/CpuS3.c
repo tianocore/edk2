@@ -57,7 +57,7 @@ VOID                         *mGdtForAp = NULL;
 VOID                         *mIdtForAp = NULL;
 VOID                         *mMachineCheckHandlerForAp = NULL;
 MP_MSR_LOCK                  *mMsrSpinLocks = NULL;
-UINTN                        mMsrSpinLockCount = MSR_SPIN_LOCK_INIT_NUM;
+UINTN                        mMsrSpinLockCount;
 UINTN                        mMsrCount = 0;
 
 /**
@@ -76,7 +76,7 @@ GetMsrSpinLockByIndex (
   UINTN     Index;
   for (Index = 0; Index < mMsrCount; Index++) {
     if (MsrIndex == mMsrSpinLocks[Index].MsrIndex) {
-      return &mMsrSpinLocks[Index].SpinLock;
+      return mMsrSpinLocks[Index].SpinLock;
     }
   }
   return NULL;
@@ -93,30 +93,52 @@ InitMsrSpinLockByIndex (
   IN UINT32      MsrIndex
   )
 {
+  UINTN    MsrSpinLockCount;
   UINTN    NewMsrSpinLockCount;
+  UINTN    Index;
+  UINTN    AddedSize;
 
   if (mMsrSpinLocks == NULL) {
-    mMsrSpinLocks = (MP_MSR_LOCK *) AllocatePool (sizeof (MP_MSR_LOCK) * mMsrSpinLockCount);
+    MsrSpinLockCount = mSmmCpuSemaphores.SemaphoreMsr.AvailableCounter;
+    mMsrSpinLocks = (MP_MSR_LOCK *) AllocatePool (sizeof (MP_MSR_LOCK) * MsrSpinLockCount);
     ASSERT (mMsrSpinLocks != NULL);
+    for (Index = 0; Index < MsrSpinLockCount; Index++) {
+      mMsrSpinLocks[Index].SpinLock =
+       (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreMsr.Msr + Index * mSemaphoreSize);
+      mMsrSpinLocks[Index].MsrIndex = (UINT32)-1;
+    }
+    mMsrSpinLockCount = MsrSpinLockCount;
+    mSmmCpuSemaphores.SemaphoreMsr.AvailableCounter = 0;
   }
   if (GetMsrSpinLockByIndex (MsrIndex) == NULL) {
     //
     // Initialize spin lock for MSR programming
     //
     mMsrSpinLocks[mMsrCount].MsrIndex = MsrIndex;
-    InitializeSpinLock (&mMsrSpinLocks[mMsrCount].SpinLock);
+    InitializeSpinLock (mMsrSpinLocks[mMsrCount].SpinLock);
     mMsrCount ++;
     if (mMsrCount == mMsrSpinLockCount) {
       //
       // If MSR spin lock buffer is full, enlarge it
       //
-      NewMsrSpinLockCount = mMsrSpinLockCount + MSR_SPIN_LOCK_INIT_NUM;
+      AddedSize = SIZE_4KB;
+      mSmmCpuSemaphores.SemaphoreMsr.Msr =
+                        AllocatePages (EFI_SIZE_TO_PAGES(AddedSize));
+      ASSERT (mSmmCpuSemaphores.SemaphoreMsr.Msr != NULL);
+      NewMsrSpinLockCount = mMsrSpinLockCount + AddedSize / mSemaphoreSize;
       mMsrSpinLocks = ReallocatePool (
                         sizeof (MP_MSR_LOCK) * mMsrSpinLockCount,
                         sizeof (MP_MSR_LOCK) * NewMsrSpinLockCount,
                         mMsrSpinLocks
                         );
+      ASSERT (mMsrSpinLocks != NULL);
       mMsrSpinLockCount = NewMsrSpinLockCount;
+      for (Index = mMsrCount; Index < mMsrSpinLockCount; Index++) {
+        mMsrSpinLocks[Index].SpinLock =
+                 (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreMsr.Msr +
+                 (Index - mMsrCount)  * mSemaphoreSize);
+        mMsrSpinLocks[Index].MsrIndex = (UINT32)-1;
+      }
     }
   }
 }
