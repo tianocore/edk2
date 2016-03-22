@@ -323,6 +323,8 @@ typedef struct {
   volatile BOOLEAN              *CandidateBsp;
 } SMM_DISPATCHER_MP_SYNC_DATA;
 
+#define MSR_SPIN_LOCK_INIT_NUM 15
+
 typedef struct {
   SPIN_LOCK    SpinLock;
   UINT32       MsrIndex;
@@ -375,6 +377,13 @@ typedef struct {
   volatile BOOLEAN                  *Present;
 } SMM_CPU_SEMAPHORE_CPU;
 
+///
+/// All MSRs semaphores' pointer and counter
+///
+typedef struct {
+  SPIN_LOCK            *Msr;
+  UINTN                AvailableCounter;
+} SMM_CPU_SEMAPHORE_MSR;
 
 ///
 /// All semaphores' information
@@ -382,6 +391,7 @@ typedef struct {
 typedef struct {
   SMM_CPU_SEMAPHORE_GLOBAL          SemaphoreGlobal;
   SMM_CPU_SEMAPHORE_CPU             SemaphoreCpu;
+  SMM_CPU_SEMAPHORE_MSR             SemaphoreMsr;
 } SMM_CPU_SEMAPHORES;
 
 extern IA32_DESCRIPTOR                     gcSmiGdtr;
