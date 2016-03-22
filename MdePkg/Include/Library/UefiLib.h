@@ -223,6 +223,24 @@ EfiNamedEventSignal (
   IN CONST EFI_GUID  *Name
   );
 
+/**
+  Signals an event group by placing a new event in the group temporarily and
+  signaling it.
+
+  @param[in] EventGroup          Supplies the unique identifier of the event
+                                 group to signal.
+
+  @retval EFI_SUCCESS            The event group was signaled successfully.
+  @retval EFI_INVALID_PARAMETER  EventGroup is NULL.
+  @return                        Error codes that report problems about event
+                                 creation or signaling.
+**/
+EFI_STATUS
+EFIAPI
+EfiEventGroupSignal (
+  IN CONST EFI_GUID *EventGroup
+  );
+
 /** 
   Returns the current TPL.
 
