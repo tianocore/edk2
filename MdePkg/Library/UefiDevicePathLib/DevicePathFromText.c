@@ -1903,6 +1903,34 @@ DevPathFromTextSd (
 }
 
 /**
+  Converts a text device path node to EMMC (Embedded MMC) device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created EMMC device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextEmmc (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16            *SlotNumberStr;
+  EMMC_DEVICE_PATH  *Emmc;
+
+  SlotNumberStr = GetNextParamStr (&TextDeviceNode);
+  Emmc          = (EMMC_DEVICE_PATH *) CreateDeviceNode (
+                                       MESSAGING_DEVICE_PATH,
+                                       MSG_EMMC_DP,
+                                       (UINT16) sizeof (EMMC_DEVICE_PATH)
+                                       );
+
+  Emmc->SlotNumber = (UINT8) Strtoi (SlotNumberStr);
+
+  return (EFI_DEVICE_PATH_PROTOCOL *) Emmc;
+}
+
+/**
   Converts a text device path node to Debug Port device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3501,6 +3529,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"NVMe",                    DevPathFromTextNVMe                    },
   {L"UFS",                     DevPathFromTextUfs                     },
   {L"SD",                      DevPathFromTextSd                      },
+  {L"Emmc",                    DevPathFromTextEmmc                    },
   {L"DebugPort",               DevPathFromTextDebugPort               },
   {L"MAC",                     DevPathFromTextMAC                     },
   {L"IPv4",                    DevPathFromTextIPv4                    },

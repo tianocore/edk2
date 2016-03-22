@@ -855,6 +855,15 @@ typedef struct {
 } SD_DEVICE_PATH;
 
 ///
+/// EMMC (Embedded MMC) Device Path SubType.
+///
+#define MSG_EMMC_DP                 0x1D
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  UINT8                           SlotNumber;
+} EMMC_DEVICE_PATH;
+
+///
 /// iSCSI Device Path SubType
 ///
 #define MSG_ISCSI_DP              0x13
@@ -1239,6 +1248,7 @@ typedef union {
   WIFI_DEVICE_PATH                           WiFi;
   UFS_DEVICE_PATH                            Ufs;
   SD_DEVICE_PATH                             Sd;
+  EMMC_DEVICE_PATH                           Emmc;
   HARDDRIVE_DEVICE_PATH                      HardDrive;
   CDROM_DEVICE_PATH                          CD;
 
@@ -1295,6 +1305,7 @@ typedef union {
   WIFI_DEVICE_PATH                           *WiFi;
   UFS_DEVICE_PATH                            *Ufs;
   SD_DEVICE_PATH                             *Sd;
+  EMMC_DEVICE_PATH                           *Emmc;
   HARDDRIVE_DEVICE_PATH                      *HardDrive;
   CDROM_DEVICE_PATH                          *CD;
 
