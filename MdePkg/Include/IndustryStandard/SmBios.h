@@ -51,6 +51,53 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define SMBIOS_3_0_TABLE_MAX_LENGTH 0xFFFFFFFF
 
+//
+// SMBIOS type macros which is according to SMBIOS 2.7 specification.
+//
+#define SMBIOS_TYPE_BIOS_INFORMATION                     0
+#define SMBIOS_TYPE_SYSTEM_INFORMATION                   1
+#define SMBIOS_TYPE_BASEBOARD_INFORMATION                2
+#define SMBIOS_TYPE_SYSTEM_ENCLOSURE                     3
+#define SMBIOS_TYPE_PROCESSOR_INFORMATION                4
+#define SMBIOS_TYPE_MEMORY_CONTROLLER_INFORMATION        5
+#define SMBIOS_TYPE_MEMORY_MODULE_INFORMATON             6
+#define SMBIOS_TYPE_CACHE_INFORMATION                    7
+#define SMBIOS_TYPE_PORT_CONNECTOR_INFORMATION           8
+#define SMBIOS_TYPE_SYSTEM_SLOTS                         9
+#define SMBIOS_TYPE_ONBOARD_DEVICE_INFORMATION           10
+#define SMBIOS_TYPE_OEM_STRINGS                          11
+#define SMBIOS_TYPE_SYSTEM_CONFIGURATION_OPTIONS         12
+#define SMBIOS_TYPE_BIOS_LANGUAGE_INFORMATION            13
+#define SMBIOS_TYPE_GROUP_ASSOCIATIONS                   14
+#define SMBIOS_TYPE_SYSTEM_EVENT_LOG                     15
+#define SMBIOS_TYPE_PHYSICAL_MEMORY_ARRAY                16
+#define SMBIOS_TYPE_MEMORY_DEVICE                        17
+#define SMBIOS_TYPE_32BIT_MEMORY_ERROR_INFORMATION       18
+#define SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS          19
+#define SMBIOS_TYPE_MEMORY_DEVICE_MAPPED_ADDRESS         20
+#define SMBIOS_TYPE_BUILT_IN_POINTING_DEVICE             21
+#define SMBIOS_TYPE_PORTABLE_BATTERY                     22
+#define SMBIOS_TYPE_SYSTEM_RESET                         23
+#define SMBIOS_TYPE_HARDWARE_SECURITY                    24
+#define SMBIOS_TYPE_SYSTEM_POWER_CONTROLS                25
+#define SMBIOS_TYPE_VOLTAGE_PROBE                        26
+#define SMBIOS_TYPE_COOLING_DEVICE                       27
+#define SMBIOS_TYPE_TEMPERATURE_PROBE                    28
+#define SMBIOS_TYPE_ELECTRICAL_CURRENT_PROBE             29
+#define SMBIOS_TYPE_OUT_OF_BAND_REMOTE_ACCESS            30
+#define SMBIOS_TYPE_BOOT_INTEGRITY_SERVICE               31
+#define SMBIOS_TYPE_SYSTEM_BOOT_INFORMATION              32
+#define SMBIOS_TYPE_64BIT_MEMORY_ERROR_INFORMATION       33
+#define SMBIOS_TYPE_MANAGEMENT_DEVICE                    34
+#define SMBIOS_TYPE_MANAGEMENT_DEVICE_COMPONENT          35
+#define SMBIOS_TYPE_MANAGEMENT_DEVICE_THRESHOLD_DATA     36
+#define SMBIOS_TYPE_MEMORY_CHANNEL                       37
+#define SMBIOS_TYPE_IPMI_DEVICE_INFORMATION              38
+#define SMBIOS_TYPE_SYSTEM_POWER_SUPPLY                  39
+#define SMBIOS_TYPE_ADDITIONAL_INFORMATION               40
+#define SMBIOS_TYPE_ONBOARD_DEVICES_EXTENDED_INFORMATION 41
+#define SMBIOS_TYPE_MANAGEMENT_CONTROLLER_HOST_INTERFACE 42
+
 ///
 /// Inactive type is added from SMBIOS 2.2. Reference SMBIOS 2.6, chapter 3.3.43.
 /// Upper-level software that interprets the SMBIOS structure-table should bypass an 
@@ -63,6 +110,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// The end-of-table indicator is used in the last physical structure in a table
 ///
 #define SMBIOS_TYPE_END_OF_TABLE     0x007F
+
+#define SMBIOS_OEM_BEGIN             128
+#define SMBIOS_OEM_END               255
+
+///
+/// Types 0 through 127 (7Fh) are reserved for and defined by this
+/// specification. Types 128 through 256 (80h to FFh) are available for system- and OEM-specific information.  
+///
+typedef UINT8  SMBIOS_TYPE;
+
+///
+/// Specifies the structure's handle, a unique 16-bit number in the range 0 to 0FFFEh (for version
+/// 2.0) or 0 to 0FEFFh (for version 2.1 and later). The handle can be used with the Get SMBIOS
+/// Structure function to retrieve a specific structure; the handle numbers are not required to be
+/// contiguous. For v2.1 and later, handle values in the range 0FF00h to 0FFFFh are reserved for
+/// use by this specification.
+/// If the system configuration changes, a previously assigned handle might no longer exist.
+/// However once a handle has been assigned by the BIOS, the BIOS cannot re-assign that handle
+/// number to another structure.
+///
+typedef UINT16 SMBIOS_HANDLE;
 
 ///
 /// Smbios Table Entry Point Structure.
@@ -102,13 +170,21 @@ typedef struct {
 /// The Smbios structure header.
 ///
 typedef struct {
-  UINT8   Type;
-  UINT8   Length;
-  UINT16  Handle;
+  SMBIOS_TYPE    Type;
+  UINT8          Length;
+  SMBIOS_HANDLE  Handle;
 } SMBIOS_STRUCTURE;
 
 ///
-/// String Number for a Null terminated string, 00h stands for no string available.
+/// Text strings associated with a given SMBIOS structure are returned in the dmiStrucBuffer, appended directly after
+/// the formatted portion of the structure. This method of returning string information eliminates the need for
+/// application software to deal with pointers embedded in the SMBIOS structure. Each string is terminated with a null
+/// (00h) BYTE and the set of strings is terminated with an additional null (00h) BYTE. When the formatted portion of
+/// a SMBIOS structure references a string, it does so by specifying a non-zero string number within the structure's
+/// string-set. For example, if a string field contains 02h, it references the second string following the formatted portion
+/// of the SMBIOS structure. If a string field references no string, a null (0) is placed in that string field. If the
+/// formatted portion of the structure contains string-reference fields and all the string fields are set to 0 (no string
+/// references), the formatted section of the structure is followed by two null (00h) BYTES.
 ///
 typedef UINT8 SMBIOS_TABLE_STRING;
 
