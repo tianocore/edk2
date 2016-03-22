@@ -20,7 +20,6 @@
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
-#include <Library/UefiLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleFileSystem.h>
