@@ -282,6 +282,49 @@ EfiNamedEventSignal (
   return Status;
 }
 
+/**
+  Signals an event group by placing a new event in the group temporarily and
+  signaling it.
+
+  @param[in] EventGroup          Supplies the unique identifier of the event
+                                 group to signal.
+
+  @retval EFI_SUCCESS            The event group was signaled successfully.
+  @retval EFI_INVALID_PARAMETER  EventGroup is NULL.
+  @return                        Error codes that report problems about event
+                                 creation or signaling.
+**/
+EFI_STATUS
+EFIAPI
+EfiEventGroupSignal (
+  IN CONST EFI_GUID *EventGroup
+  )
+{
+  EFI_STATUS Status;
+  EFI_EVENT  Event;
+
+  if (EventGroup == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  InternalEmptyFunction,
+                  NULL,
+                  EventGroup,
+                  &Event
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gBS->SignalEvent (Event);
+  gBS->CloseEvent (Event);
+
+  return Status;
+}
+
 /** 
   Returns the current TPL.
 
