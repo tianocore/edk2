@@ -658,6 +658,8 @@ class PcdReport(object):
     #
     def __init__(self, Wa):
         self.AllPcds = {}
+        self.UnusedPcds = {}
+        self.ConditionalPcds = {}
         self.MaxLen = 0
         if Wa.FdfProfile:
             self.FdfPcdSet = Wa.FdfProfile.PcdDict
@@ -676,6 +678,63 @@ class PcdReport(object):
                     PcdList.append(Pcd)
                 if len(Pcd.TokenCName) > self.MaxLen:
                     self.MaxLen = len(Pcd.TokenCName)
+            #
+            # Collect the PCD defined in DSC/FDF file, but not used in module
+            #
+            UnusedPcdFullList = []
+            for item in Pa.Platform.Pcds:
+                Pcd = Pa.Platform.Pcds[item]
+                if not Pcd.Type:
+                    PcdTypeFlag = False
+                    for package in Pa.PackageList:
+                        for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
+                            if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, T) in package.Pcds:
+                                Pcd.Type = T
+                                PcdTypeFlag = True
+                                if not Pcd.DatumType:
+                                    Pcd.DatumType = package.Pcds[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName, T)].DatumType
+                                break
+                        if PcdTypeFlag:
+                            break
+                if not Pcd.DatumType:
+                    PcdType = Pcd.Type
+                    # Try to remove Hii and Vpd suffix
+                    if PcdType.startswith("DynamicEx"):
+                        PcdType = "DynamicEx"
+                    elif PcdType.startswith("Dynamic"):
+                        PcdType = "Dynamic"
+                    for package in Pa.PackageList:
+                        if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, PcdType) in package.Pcds:
+                            Pcd.DatumType = package.Pcds[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName, PcdType)].DatumType
+                            break
+
+                PcdList = self.AllPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(Pcd.Type, [])
+                if Pcd not in PcdList and Pcd not in UnusedPcdFullList:
+                    UnusedPcdFullList.append(Pcd)
+                if len(Pcd.TokenCName) > self.MaxLen:
+                    self.MaxLen = len(Pcd.TokenCName)
+
+            if GlobalData.gConditionalPcds:
+                for PcdItem in GlobalData.gConditionalPcds:
+                    if '.' in PcdItem:
+                        (TokenSpaceGuidCName, TokenCName) = PcdItem.split('.')
+                        if (TokenCName, TokenSpaceGuidCName) in Pa.Platform.Pcds.keys():
+                            Pcd = Pa.Platform.Pcds[(TokenCName, TokenSpaceGuidCName)]
+                            PcdList = self.ConditionalPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(Pcd.Type, [])
+                            if Pcd not in PcdList:
+                                PcdList.append(Pcd)
+
+            UnusedPcdList = []
+            if UnusedPcdFullList:
+                for Pcd in UnusedPcdFullList:
+                    if Pcd.TokenSpaceGuidCName + '.' + Pcd.TokenCName in GlobalData.gConditionalPcds:
+                        continue
+                    UnusedPcdList.append(Pcd)
+
+            for Pcd in UnusedPcdList:
+                PcdList = self.UnusedPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(Pcd.Type, [])
+                if Pcd not in PcdList:
+                    PcdList.append(Pcd)
 
             for Module in Pa.Platform.Modules.values():
                 #
@@ -709,6 +768,13 @@ class PcdReport(object):
                 if DscDefaultValue:
                     self.DscPcdDefault[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
+    def GenerateReport(self, File, ModulePcdSet):
+        if self.ConditionalPcds:
+            self.GenerateReportDetail(File, ModulePcdSet, 1)
+        if self.UnusedPcds:
+            self.GenerateReportDetail(File, ModulePcdSet, 2)
+        self.GenerateReportDetail(File, ModulePcdSet)
+
     ##
     # Generate report for PCD information
     #
@@ -719,39 +785,52 @@ class PcdReport(object):
     # @param File            The file object for report
     # @param ModulePcdSet    Set of all PCDs referenced by module or None for
     #                        platform PCD report
+    # @param ReportySubType  0 means platform/module PCD report, 1 means Conditional
+    #                        directives section report, 2 means Unused Pcds section report
     # @param DscOverridePcds Module DSC override PCDs set
     #
-    def GenerateReport(self, File, ModulePcdSet):
+    def GenerateReportDetail(self, File, ModulePcdSet, ReportSubType = 0):
+        PcdDict = self.AllPcds
+        if ReportSubType == 1:
+            PcdDict = self.ConditionalPcds
+        elif ReportSubType == 2:
+            PcdDict = self.UnusedPcds
+
         if ModulePcdSet == None:
-            #
-            # For platform global PCD section
-            #
             FileWrite(File, gSectionStart)
-            FileWrite(File, "Platform Configuration Database Report")
+            if ReportSubType == 1:
+                FileWrite(File, "Conditional Directives used by the build system")
+            elif ReportSubType == 2:
+                FileWrite(File, "PCDs not used by modules or in conditional directives")
+            else:
+                FileWrite(File, "Platform Configuration Database Report")
+
             FileWrite(File, "  *B  - PCD override in the build option")
             FileWrite(File, "  *P  - Platform scoped PCD override in DSC file")
             FileWrite(File, "  *F  - Platform scoped PCD override in FDF file")
-            FileWrite(File, "  *M  - Module scoped PCD override")
+            if not ReportSubType:
+                FileWrite(File, "  *M  - Module scoped PCD override")
             FileWrite(File, gSectionSep)
         else:
-            #
-            # For module PCD sub-section
-            #
-            FileWrite(File, gSubSectionStart)
-            FileWrite(File, TAB_BRG_PCD)
-            FileWrite(File, gSubSectionSep)
+            if not ReportSubType:
+                #
+                # For module PCD sub-section
+                #
+                FileWrite(File, gSubSectionStart)
+                FileWrite(File, TAB_BRG_PCD)
+                FileWrite(File, gSubSectionSep)
 
-        for Key in self.AllPcds:
+        for Key in PcdDict:
             #
             # Group PCD by their token space GUID C Name
             #
             First = True
-            for Type in self.AllPcds[Key]:
+            for Type in PcdDict[Key]:
                 #
                 # Group PCD by their usage type
                 #
                 TypeName, DecType = gPcdTypeMap.get(Type, ("", Type))
-                for Pcd in self.AllPcds[Key][Type]:
+                for Pcd in PcdDict[Key][Type]:
                     #
                     # Get PCD default value and their override relationship
                     #
@@ -869,7 +948,8 @@ class PcdReport(object):
         if ModulePcdSet == None:
             FileWrite(File, gSectionEnd)
         else:
-            FileWrite(File, gSubSectionEnd)
+            if not ReportSubType:
+                FileWrite(File, gSubSectionEnd)
 
 
 
