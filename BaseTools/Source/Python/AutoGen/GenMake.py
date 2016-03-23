@@ -477,6 +477,17 @@ cleanlib:
             # EdkII modules always use "_ModuleEntryPoint" as entry point
             ImageEntryPoint = "_ModuleEntryPoint"
 
+        for k, v in self._AutoGenObject.Module.Defines.iteritems():
+            if k not in self._AutoGenObject.Macros.keys():
+                self._AutoGenObject.Macros[k] = v
+
+        if 'MODULE_ENTRY_POINT' not in self._AutoGenObject.Macros.keys():
+            self._AutoGenObject.Macros['MODULE_ENTRY_POINT'] = ModuleEntryPoint
+        if 'ARCH_ENTRY_POINT' not in self._AutoGenObject.Macros.keys():
+            self._AutoGenObject.Macros['ARCH_ENTRY_POINT'] = ArchEntryPoint
+        if 'IMAGE_ENTRY_POINT' not in self._AutoGenObject.Macros.keys():
+            self._AutoGenObject.Macros['IMAGE_ENTRY_POINT'] = ImageEntryPoint
+
         # tools definitions
         ToolsDef = []
         IncPrefix = self._INC_FLAG_[self._AutoGenObject.ToolChainFamily]
@@ -504,10 +515,20 @@ cleanlib:
             RespFileListContent = ''
             for Resp in RespDict.keys():
                 RespFile = os.path.join(self._AutoGenObject.OutputDir, str(Resp).lower() + '.txt')
-                SaveFileOnChange(RespFile, RespDict[Resp], False)
-                ToolsDef.append("%s = %s" % (Resp, '@' + RespFile))
+                StrList = RespDict[Resp].split(' ')
+                UnexpandMacro = []
+                NewStr = []
+                for Str in StrList:
+                    if '$' in Str:
+                        UnexpandMacro.append(Str)
+                    else:
+                        NewStr.append(Str)
+                UnexpandMacroStr = ' '.join(UnexpandMacro)
+                NewRespStr = ' '.join(NewStr)
+                SaveFileOnChange(RespFile, NewRespStr, False)
+                ToolsDef.append("%s = %s" % (Resp, UnexpandMacroStr + ' @' + RespFile))
                 RespFileListContent += '@' + RespFile + os.linesep
-                RespFileListContent += RespDict[Resp] + os.linesep
+                RespFileListContent += NewRespStr + os.linesep
             SaveFileOnChange(RespFileList, RespFileListContent, False)
         else:
             if os.path.exists(RespFileList):
@@ -678,6 +699,10 @@ cleanlib:
                             for item in SingleCommandList[1:]:
                                 if FlagDict[Tool]['Macro'] in item:
                                     Str = self._AutoGenObject._BuildOption[Tool]['FLAGS']
+                                    for Option in self._AutoGenObject.BuildOption.keys():
+                                        for Attr in self._AutoGenObject.BuildOption[Option]:
+                                            if Str.find(Option + '_' + Attr) != -1:
+                                                Str = Str.replace('$(' + Option + '_' + Attr + ')', self._AutoGenObject.BuildOption[Option][Attr])
                                     while(Str.find('$(') != -1):
                                         for macro in self._AutoGenObject.Macros.keys():
                                             MacroName = '$('+ macro + ')'
@@ -685,7 +710,7 @@ cleanlib:
                                                 Str = Str.replace(MacroName, self._AutoGenObject.Macros[macro])
                                                 break
                                         else:
-                                            EdkLogger.error("build", AUTOGEN_ERROR, "Not supported macro is found in make command : %s" % Str, ExtraData="[%s]" % str(self._AutoGenObject))
+                                            break
                                     SingleCommandLength += len(Str)
                                 elif '$(INC)' in item:
                                     SingleCommandLength += self._AutoGenObject.IncludePathLength + len(IncPrefix) * len(self._AutoGenObject._IncludePathList)
@@ -702,8 +727,7 @@ cleanlib:
                                                 Str = Str.replace(MacroName, self._AutoGenObject.Macros[macro])
                                                 break
                                         else:
-                                            EdkLogger.error("build", AUTOGEN_ERROR, "Not supported macro is found in make command : %s" % Str, ExtraData="[%s]" % str(self._AutoGenObject))
-
+                                            break
                                     SingleCommandLength += len(Str)
 
                             if SingleCommandLength > GlobalData.gCommandMaxLength:
@@ -717,6 +741,10 @@ cleanlib:
                         Value = self._AutoGenObject.BuildOption[Flag]['FLAGS']
                         for inc in self._AutoGenObject._IncludePathList:
                             Value += ' ' + IncPrefix + inc
+                        for Option in self._AutoGenObject.BuildOption.keys():
+                            for Attr in self._AutoGenObject.BuildOption[Option]:
+                                if Value.find(Option + '_' + Attr) != -1:
+                                    Value = Value.replace('$(' + Option + '_' + Attr + ')', self._AutoGenObject.BuildOption[Option][Attr])
                         while (Value.find('$(') != -1):
                             for macro in self._AutoGenObject.Macros.keys():
                                 MacroName = '$('+ macro + ')'
@@ -724,7 +752,7 @@ cleanlib:
                                     Value = Value.replace(MacroName, self._AutoGenObject.Macros[macro])
                                     break
                             else:
-                                EdkLogger.error("build", AUTOGEN_ERROR, "Not supported macro is found in make command : %s" % Str, ExtraData="[%s]" % str(self._AutoGenObject))
+                                break
                         RespDict[Key] = Value
                         for Target in BuildTargets:
                             for i, SingleCommand in enumerate(BuildTargets[Target].Commands):
