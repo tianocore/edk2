@@ -1,7 +1,7 @@
 /** @file
   Internal library implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1232,7 +1232,7 @@ PciScanBus (
             //
             // Reserve the larger one between the actual occupied bus number and padded bus number
             //
-            Status = PciAllocateBusNumber (PciDevice, StartBusNumber, (UINT8) (BusRange), &PaddedSubBus);
+            Status = PciAllocateBusNumber (PciDevice, SecondBus, (UINT8) (BusRange), &PaddedSubBus);
             if (EFI_ERROR (Status)) {
               return Status;
             }
