@@ -15,7 +15,7 @@
 
 #langdef en-US  "English"
 
-#string STR_FORM_SET_TITLE             #language en-US "RAM Disk Configutation"
+#string STR_FORM_SET_TITLE             #language en-US "RAM Disk Configuration"
 #string STR_FORM_SET_TITLE_HELP        #language en-US "Press <Enter> to add/remove RAM disks."
 
 #string STR_MAIN_FORM_TITLE            #language en-US "RAM Disk HII Main Screen"
