@@ -78,3 +78,6 @@ gFdfParser = None
 gTempInfs = []
 
 BuildOptionPcd = []
+
+# Pcd name for the Pcd which used in the Conditional directives
+gConditionalPcds = []
