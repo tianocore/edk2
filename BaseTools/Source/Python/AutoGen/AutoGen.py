@@ -2480,6 +2480,12 @@ class ModuleAutoGen(AutoGen):
             self._Macro["DEBUG_DIR"             ] = self.DebugDir
             self._Macro["DEST_DIR_OUTPUT"       ] = self.OutputDir
             self._Macro["DEST_DIR_DEBUG"        ] = self.DebugDir
+            self._Macro["PLATFORM_NAME"         ] = self.PlatformInfo.Name
+            self._Macro["PLATFORM_GUID"         ] = self.PlatformInfo.Guid
+            self._Macro["PLATFORM_VERSION"      ] = self.PlatformInfo.Version
+            self._Macro["PLATFORM_RELATIVE_DIR" ] = self.PlatformInfo.SourceDir
+            self._Macro["PLATFORM_DIR"          ] = mws.join(self.WorkspaceDir, self.PlatformInfo.SourceDir)
+            self._Macro["PLATFORM_OUTPUT_DIR"   ] = self.PlatformInfo.OutputDir
         return self._Macro
 
     ## Return the module build data object
