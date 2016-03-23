@@ -1,0 +1,23 @@
+// /** @file
+// SdMmcPciHcDxe driver is used to manage those host controllers which comply with SD
+// Host Controller Simplified Specifiction version 3.0.
+//
+// It will produce EFI_SD_MMC_PASS_THRU_PROTOCOL to allow sending SD/MMC/eMMC cmds
+// to specified devices from upper layer.
+//
+// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution. The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "SD/MMC Pci Host Controller driver to manage SD/MMC host controllers"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver follows the UEFI driver model and produces SD/MMC Pass Thru protocol for upper layer bus driver."
+

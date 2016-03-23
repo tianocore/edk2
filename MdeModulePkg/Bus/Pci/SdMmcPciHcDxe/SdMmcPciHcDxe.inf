@@ -1,0 +1,72 @@
+## @file
+#  SdMmcPciHcDxe driver is used to manage those host controllers which comply with SD
+#  Host Controller Simplified Specifiction version 3.0.
+#
+#  It will produce EFI_SD_MMC_PASS_THRU_PROTOCOL to allow sending SD/MMC/eMMC cmds
+#  to specified devices from upper layer.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SdMmcPciHcDxe
+  MODULE_UNI_FILE                = SdMmcPciHcDxe.uni
+  FILE_GUID                      = 8E325979-3FE1-4927-AAE2-8F5C4BD2AF0D
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeSdMmcPciHcDxe
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+#  DRIVER_BINDING                =  gSdMmcPciHcDxeDriverBinding
+#  COMPONENT_NAME                =  gSdMmcPciHcDxeComponentName
+#  COMPONENT_NAME2               =  gSdMmcPciHcDxeComponentName2
+#
+#
+
+[Sources]
+  SdMmcPciHcDxe.h
+  SdMmcPciHcDxe.c
+  EmmcDevice.c
+  SdDevice.c
+  SdMmcPciHci.h
+  SdMmcPciHci.c
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiSdMmcPassThruProtocolGuid                 ## BY_START
+
+# [Event]
+# EVENT_TYPE_PERIODIC_TIMER ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SdMmcPciHcDxeExtra.uni

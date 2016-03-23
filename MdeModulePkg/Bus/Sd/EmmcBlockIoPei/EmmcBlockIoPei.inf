@@ -1,0 +1,62 @@
+## @file
+# Description file for the Embedded MMC (eMMC) Peim driver.
+#
+# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmmcBlockIoPei
+  MODULE_UNI_FILE                = EmmcBlockIoPei.uni
+  FILE_GUID                      = 7F06A90F-AE0D-4887-82C0-FEC7F4F68B29
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeEmmcBlockIoPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  EmmcBlockIoPei.c
+  EmmcBlockIoPei.h
+  EmmcHci.c
+  EmmcHci.h
+  EmmcHcMem.c
+  EmmcHcMem.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  BaseMemoryLib
+  PeimEntryPoint
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
+  gEfiPeiVirtualBlockIo2PpiGuid                 ## PRODUCES
+  gEdkiiPeiSdMmcHostControllerPpiGuid           ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEdkiiPeiSdMmcHostControllerPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EmmcBlockIoPeiExtra.uni
+

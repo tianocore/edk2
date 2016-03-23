@@ -1,0 +1,56 @@
+## @file
+#  Component Description File For SD/MMC Pci Host Controller Pei Module.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SdMmcPciHcPei
+  MODULE_UNI_FILE                = SdMmcPciHcPei.uni
+  FILE_GUID                      = 1BB737EF-427A-4144-8B3B-B76EF38515E6
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeSdMmcHcPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  SdMmcPciHcPei.c
+  SdMmcPciHcPei.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PciLib
+  DebugLib
+  PeiServicesLib
+  MemoryAllocationLib
+  PeimEntryPoint
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcPciHostControllerMmioBase   ## CONSUMES
+
+[Ppis]
+  gEdkiiPeiSdMmcHostControllerPpiGuid         ## PRODUCES
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SdMmcPciHcPeiExtra.uni

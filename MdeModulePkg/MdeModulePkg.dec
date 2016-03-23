@@ -388,6 +388,9 @@
   ## Include/Ppi/IpmiPpi.h
   gPeiIpmiPpiGuid               =  { 0xa9731431, 0xd968, 0x4277, { 0xb7, 0x52, 0xa3, 0xa9, 0xa6, 0xae, 0x18, 0x98 }}
 
+  ## Include/Ppi/SdMmcHostController.h
+  gEdkiiPeiSdMmcHostControllerPpiGuid = { 0xb30dfeed, 0x947f, 0x4396, { 0xb1, 0x5a, 0xdf, 0xbd, 0xb9, 0x16, 0xdc, 0x24 }}
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
@@ -1494,6 +1497,12 @@
   #   FALSE - Not to set NX for stack.<BR>
   # @Prompt Set NX for stack.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
+
+  ## This PCD specifies the PCI-based SD/MMC host controller mmio base address.
+  # Define the mmio base address of the pci-based SD/MMC host controller. If there are multiple SD/MMC
+  # host controllers, their mmio base addresses are calculated one by one from this base address.
+  # @Prompt Mmio base address of pci-based SD/MMC host controller.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcPciHostControllerMmioBase|0xd0000000|UINT32|0x30001043
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

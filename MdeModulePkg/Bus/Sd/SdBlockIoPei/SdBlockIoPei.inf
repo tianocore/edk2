@@ -1,0 +1,62 @@
+## @file
+# Description file for the SD memory card Peim driver.
+#
+# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SdBlockIoPei
+  MODULE_UNI_FILE                = SdBlockIoPei.uni
+  FILE_GUID                      = 17851FBF-45C4-4ff7-A2A0-C3B12D63C27E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeSdBlockIoPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  SdBlockIoPei.c
+  SdBlockIoPei.h
+  SdHci.c
+  SdHci.h
+  SdHcMem.c
+  SdHcMem.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  BaseMemoryLib
+  PeimEntryPoint
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
+  gEfiPeiVirtualBlockIo2PpiGuid                 ## PRODUCES
+  gEdkiiPeiSdMmcHostControllerPpiGuid           ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEdkiiPeiSdMmcHostControllerPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SdBlockIoPeiExtra.uni
+
