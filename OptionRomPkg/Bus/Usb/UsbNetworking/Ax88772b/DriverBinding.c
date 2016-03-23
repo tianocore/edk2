@@ -14,6 +14,13 @@
 
 #include "Ax88772.h"
 
+ASIX_DONGLE ASIX_DONGLES[] = {
+  { 0x05AC, 0x1402, FLAG_TYPE_AX88772 }, // Apple USB Ethernet Adapter
+  // ASIX 88772B
+  { 0x0B95, 0x772B, FLAG_TYPE_AX88772B | FLAG_EEPROM_MAC },
+  { 0x0000, 0x0000, FLAG_NONE }   // END - Do not remove
+};
+
 /**
   Verify the controller type
 
@@ -36,6 +43,8 @@ DriverSupported (
   EFI_USB_DEVICE_DESCRIPTOR Device;
   EFI_USB_IO_PROTOCOL * pUsbIo;
   EFI_STATUS Status;
+  UINT32 Index;
+
   //
   //  Connect to the USB stack
   //
@@ -60,19 +69,17 @@ DriverSupported (
     else {
       //
       //  Validate the adapter
-      //   
-      if ( VENDOR_ID == Device.IdVendor ) {
-
-        if (PRODUCT_ID == Device.IdProduct) {
-            DEBUG ((EFI_D_INFO, "Found the AX88772B\r\n"));
+      //
+      for (Index = 0; ASIX_DONGLES[Index].VendorId != 0; Index++) {
+        if (ASIX_DONGLES[Index].VendorId == Device.IdVendor &&
+            ASIX_DONGLES[Index].ProductId == Device.IdProduct) {
+              DEBUG ((EFI_D_INFO, "Found the AX88772B\r\n"));
+              break;
         }
-		    else  {
-			     Status = EFI_UNSUPPORTED;
-		    }
       }
-	    else {
-		      Status = EFI_UNSUPPORTED;
-       }   
+
+      if (ASIX_DONGLES[Index].VendorId == 0)
+         Status = EFI_UNSUPPORTED;
     }
    
     //
