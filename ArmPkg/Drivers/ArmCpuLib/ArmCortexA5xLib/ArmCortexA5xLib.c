@@ -40,12 +40,15 @@ ArmCpuSetup (
   }
 
   //
-  // If CPU is CortexA57 r0p0 apply Errata: 806969
+  // If CPU is CortexA57 r0p0 apply Errata workarounds
   //
   if ((ArmReadMidr () & ((ARM_CPU_TYPE_MASK << 4) | ARM_CPU_REV_MASK)) ==
                          ((ARM_CPU_TYPE_A57 << 4) | ARM_CPU_REV(0,0))) {
-    // DisableLoadStoreWB
-    ArmSetCpuActlrBit (1ULL << 49);
+
+    // Errata 806969: DisableLoadStoreWB (1ULL << 49)
+    // Errata 813420: Execute Data Cache clean as Data Cache clean/invalidate  (1ULL << 44)
+    // Errata 814670: disable DMB nullification (1ULL << 58)
+    ArmSetCpuActlrBit ( (1ULL << 49) | (1ULL << 44) | (1ULL << 58) );
   }
 }
 
