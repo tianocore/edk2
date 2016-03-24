@@ -62,7 +62,7 @@
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1|UINT32|0x00000038
 
   # Stack for CPU Cores in Secure Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT32|0x00000005
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecStackBase|0|UINT64|0x00000005
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecPrimaryStackSize|0x10000|UINT32|0x00000036
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecSecondaryStackSize|0x1000|UINT32|0x00000006
 
@@ -188,13 +188,13 @@
 
 [PcdsFixedAtBuild.ARM]
   # Stack for CPU Cores in Secure Monitor Mode
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT64|0x00000007
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x1000|UINT32|0x00000008
 
 [PcdsFixedAtBuild.AARCH64]
   # The Secure World is only running in EL3. Only one set of stacks is needed for AArch64.
   # The Secure stacks are described by PcdCPUCoresSecStackBase, PcdCPUCoreSecPrimaryStackSize
   # and PcdCPUCoreSecSecondaryStackSize
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT32|0x00000007
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresSecMonStackBase|0|UINT64|0x00000007
   gArmPlatformTokenSpaceGuid.PcdCPUCoreSecMonStackSize|0x0|UINT32|0x00000008
 

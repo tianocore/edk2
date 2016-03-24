@@ -29,8 +29,8 @@
 #include "PrePi.h"
 #include "LzmaDecompress.h"
 
-#define IS_XIP() (((UINT32)FixedPcdGet32 (PcdFdBaseAddress) > mSystemMemoryEnd) || \
-                  ((FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet64 (PcdSystemMemoryBase)))
+#define IS_XIP() (((UINT64)FixedPcdGet64 (PcdFdBaseAddress) > mSystemMemoryEnd) || \
+                  ((FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet64 (PcdSystemMemoryBase)))
 
 EFI_STATUS
 EFIAPI
@@ -86,8 +86,8 @@ PrePiMain (
 
   // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
   ASSERT (IS_XIP() ||
-          ((FixedPcdGet32 (PcdFdBaseAddress) >= FixedPcdGet64 (PcdSystemMemoryBase)) &&
-           ((UINT32)(FixedPcdGet32 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (UINT32)mSystemMemoryEnd)));
+          ((FixedPcdGet64 (PcdFdBaseAddress) >= FixedPcdGet64 (PcdSystemMemoryBase)) &&
+           ((UINT64)(FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= (UINT64)mSystemMemoryEnd)));
 
   // Initialize the architecture specific bits
   ArchInitialize ();

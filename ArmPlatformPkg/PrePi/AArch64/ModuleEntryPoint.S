@@ -49,8 +49,8 @@ _SystemMemoryEndInit:
   cmp   x1, #0
   bne   _SetupStackPosition
 
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryBase), x1)
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemorySize), x2)
+  LoadConstantToReg (FixedPcdGet64(PcdSystemMemoryBase), x1)
+  LoadConstantToReg (FixedPcdGet64(PcdSystemMemorySize), x2)
   sub   x2, x2, #1
   add   x1, x1, x2
   // Update the global variable
@@ -61,7 +61,7 @@ _SetupStackPosition:
   // r1 = SystemMemoryTop
 
   // Calculate Top of the Firmware Device
-  LoadConstantToReg (FixedPcdGet32(PcdFdBaseAddress), x2)
+  LoadConstantToReg (FixedPcdGet64(PcdFdBaseAddress), x2)
   LoadConstantToReg (FixedPcdGet32(PcdFdSize), x3)
   sub   x3, x3, #1
   add   x3, x3, x2      // x3 = FdTop = PcdFdBaseAddress + PcdFdSize

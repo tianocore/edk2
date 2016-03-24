@@ -60,7 +60,7 @@ ASM_PFX(MainEntryPoint):
   bl    ASM_PFX(ArmPlatformIsPrimaryCore)
 
   // Get the top of the primary stacks (and the base of the secondary stacks)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoresStackBase), x1)
+  LoadConstantToReg (FixedPcdGet64(PcdCPUCoresStackBase), x1)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
   add   x1, x1, x2
 
