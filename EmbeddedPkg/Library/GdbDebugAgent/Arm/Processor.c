@@ -481,7 +481,7 @@ InFiqCrack (
   IN UINT32 PC
   )
 {
-  UINT32 VectorBase = PcdGet32 (PcdCpuVectorBaseAddress);
+  UINT64 VectorBase = PcdGet64 (PcdCpuVectorBaseAddress);
   UINT32 Length     = (UINTN)ExceptionHandlersEnd - (UINTN)ExceptionHandlersStart;
 
   if ((PC >= VectorBase) && (PC <= (VectorBase + Length))) {
@@ -626,7 +626,7 @@ InitializeDebugAgent (
   UINTN                Offset;
   UINTN                Length;
   BOOLEAN              IrqEnabled;
-  UINT32               *VectorBase;
+  UINT64               *VectorBase;
 
 
   //
@@ -644,7 +644,7 @@ InitializeDebugAgent (
   //
   // Reserve space for the exception handlers
   //
-  VectorBase = (UINT32 *)(UINTN)PcdGet32 (PcdCpuVectorBaseAddress);
+  VectorBase = (UINT64 *)(UINTN)PcdGet64 (PcdCpuVectorBaseAddress);
 
 
   // Copy our assembly code into the page that contains the exception vectors.
@@ -657,7 +657,7 @@ InitializeDebugAgent (
   *(UINTN *) (((UINT8 *)VectorBase) + Offset) = (UINTN)AsmCommonExceptionEntry;
 
   // Flush Caches since we updated executable stuff
-  InvalidateInstructionCacheRange ((VOID *)PcdGet32(PcdCpuVectorBaseAddress), Length);
+  InvalidateInstructionCacheRange ((VOID *)PcdGet64(PcdCpuVectorBaseAddress), Length);
 
   // setup a timer so gdb can break in via ctrl-c
   DebugAgentTimerIntialize ();

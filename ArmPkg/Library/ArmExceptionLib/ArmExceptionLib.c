@@ -103,7 +103,7 @@ InitializeCpuExceptionHandlers(
   // if we are requested to copy exceptin handlers to another location
   if (gArmRelocateVectorTable) {
 
-    VectorBase = PcdGet32(PcdCpuVectorBaseAddress);
+    VectorBase = PcdGet64(PcdCpuVectorBaseAddress);
     Status = CopyExceptionHandlers(VectorBase);
 
   }
@@ -118,7 +118,7 @@ InitializeCpuExceptionHandlers(
     // for encapsulated FVs.
     ASSERT(((UINTN)ExceptionHandlersStart & gExceptionVectorAlignmentMask) == 0);
 
-    // We do not copy the Exception Table at PcdGet32(PcdCpuVectorBaseAddress). We just set Vector
+    // We do not copy the Exception Table at PcdGet64(PcdCpuVectorBaseAddress). We just set Vector
     // Base Address to point into CpuDxe code.
     VectorBase = (UINTN)ExceptionHandlersStart;
 

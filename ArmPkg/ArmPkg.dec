@@ -60,7 +60,7 @@
   # On ARM Architecture with the Security Extension, the address for the
   # Vector Table can be mapped anywhere in the memory map. It means we can
   # point the Exception Vector Table to its location in CpuDxe.
-  # By default we copy the Vector Table at  PcdGet32(PcdCpuVectorBaseAddress)
+  # By default we copy the Vector Table at  PcdGet64(PcdCpuVectorBaseAddress)
   gArmTokenSpaceGuid.PcdRelocateVectorTable|TRUE|BOOLEAN|0x00000022
   # Set this PCD to TRUE if the Exception Vector is changed to add debugger support before
   # it has been configured by the CPU DXE
@@ -90,7 +90,7 @@
   # This PCD will free the unallocated buffers if their size reach this threshold.
   # We set the default value to 512MB.
   gArmTokenSpaceGuid.PcdArmFreeUncachedMemorySizeThreshold|0x20000000|UINT64|0x00000003
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT32|0x00000004
+  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT64|0x00000004
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
 
   #
