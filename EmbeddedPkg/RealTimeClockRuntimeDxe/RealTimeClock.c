@@ -139,7 +139,10 @@ InitializeRealTimeClock (
 {
   EFI_STATUS  Status;
 
-  LibRtcInitialize (ImageHandle, SystemTable);
+  Status = LibRtcInitialize (ImageHandle, SystemTable);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   SystemTable->RuntimeServices->GetTime       = GetTime;
   SystemTable->RuntimeServices->SetTime       = SetTime;
