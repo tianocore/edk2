@@ -759,7 +759,6 @@ FileBufferRefresh (
 
   UINTN                   StartRow;
   UINTN                   EndRow;
-  UINTN                   FStartRow;
   UINTN                   Tmp;
 
   Orig                  = MainEditor.ColorAttributes;
@@ -832,8 +831,6 @@ FileBufferRefresh (
         EndRow    = Tmp;
       }
 
-      FStartRow = StartRow;
-
       StartRow  = 2 + StartRow - FileBuffer.LowVisibleRange.Row;
       EndRow    = 2 + EndRow - FileBuffer.LowVisibleRange.Row;
 
@@ -841,7 +838,6 @@ FileBufferRefresh (
       //
       // not mouse selection actions
       //
-      FStartRow = FileBuffer.LowVisibleRange.Row;
       StartRow  = 2;
       EndRow    = (MainEditor.ScreenSize.Row - 1);
     }
