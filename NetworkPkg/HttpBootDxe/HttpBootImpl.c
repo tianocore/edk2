@@ -431,7 +431,7 @@ HttpBootDxeLoadFile (
     // 2. The required boot FilePath is different with the one we produced in the device path
     // protocol.
     //
-    if ((UsingIpv6 != Private->UsingIpv6) || !IsDevicePathEnd(FilePath)) {
+    if ((UsingIpv6 != Private->UsingIpv6) || ((Private->FilePathUri != NULL) && (AsciiStrCmp (Private->BootFileUri, Private->FilePathUri) != 0))) {
       Status = HttpBootStop (Private);
       if (!EFI_ERROR (Status)) {
         Status = HttpBootStart (Private, UsingIpv6, FilePath);
