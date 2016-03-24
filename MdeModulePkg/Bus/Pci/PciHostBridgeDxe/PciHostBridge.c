@@ -628,7 +628,6 @@ NotifyPhase (
   PCI_ROOT_BRIDGE_INSTANCE              *RootBridge;
   LIST_ENTRY                            *Link;
   EFI_PHYSICAL_ADDRESS                  BaseAddress;
-  UINT64                                AddrLen;
   UINTN                                 BitsOfAlignment;
   UINT64                                Alignment;
   EFI_STATUS                            Status;
@@ -735,7 +734,6 @@ NotifyPhase (
 
           ASSERT (Index < TypeMax);
           ResNodeHandled[Index] = TRUE;
-          AddrLen = RootBridge->ResAllocNode[Index].Length;
           Alignment = RootBridge->ResAllocNode[Index].Alignment;
           BitsOfAlignment = LowBitSet64 (Alignment + 1);
           BaseAddress = MAX_UINT64;
@@ -1110,9 +1108,6 @@ SetBusNumbers (
   PCI_ROOT_BRIDGE_INSTANCE  *RootBridge;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
   EFI_ACPI_END_TAG_DESCRIPTOR       *End;
-  UINTN                     BusStart;
-  UINTN                     BusEnd;
-  UINTN                     BusLen;
 
   if (Configuration == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1138,9 +1133,6 @@ SetBusNumbers (
        ) {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
-      BusStart  = (UINTN) Descriptor->AddrRangeMin;
-      BusLen    = (UINTN) Descriptor->AddrLen;
-      BusEnd    = BusStart + BusLen - 1;
 
       if (Descriptor->AddrLen == 0) {
         return EFI_INVALID_PARAMETER;
