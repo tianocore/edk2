@@ -251,8 +251,8 @@ HttpBootParseDhcp6Packet (
   Option = Options[HTTP_BOOT_DHCP6_IDX_VENDOR_CLASS];
 
   if (Option != NULL &&
-      NTOHS(Option->OpLen) >= 10 &&
-      CompareMem (Option->Data, DEFAULT_CLASS_ID_DATA, 10) == 0) {
+      NTOHS(Option->OpLen) >= 16 &&
+      CompareMem ((Option->Data + 6), DEFAULT_CLASS_ID_DATA, 10) == 0) {
       IsHttpOffer = TRUE;
   }
 
