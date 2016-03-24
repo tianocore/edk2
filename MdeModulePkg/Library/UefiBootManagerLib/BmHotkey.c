@@ -458,6 +458,9 @@ BmGetActiveConsoleIn (
   EFI_STATUS                            Status;
   EFI_HANDLE                            *Handles;
 
+  Handles = NULL;
+  *Count  = 0;
+
   if (gST->ConsoleInHandle != NULL) {
     Status = gBS->OpenProtocol (
                     gST->ConsoleInHandle,
@@ -479,10 +482,6 @@ BmGetActiveConsoleIn (
                     Count,
                     &Handles
                     );
-  }
-  if (EFI_ERROR (Status)) {
-    Handles = NULL;
-    *Count  = 0;
   }
 
   return Handles;
