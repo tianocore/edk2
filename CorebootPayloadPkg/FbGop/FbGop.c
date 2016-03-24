@@ -434,7 +434,6 @@ FbGopChildHandleInstall (
   FB_VIDEO_DEV            *FbGopPrivate;
   PCI_TYPE00               Pci;
   ACPI_ADR_DEVICE_PATH     AcpiDeviceNode;
-  BOOLEAN                  ProtocolInstalled;
 
   //
   // Allocate the private device structure for video device
@@ -559,8 +558,6 @@ FbGopChildHandleInstall (
     //goto Done;    
   }
 
-  ProtocolInstalled = FALSE;
-  
   //
   // Creat child handle and install Graphics Output Protocol,EDID Discovered/Active Protocol
   //
@@ -590,7 +587,6 @@ FbGopChildHandleInstall (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
-    ProtocolInstalled = TRUE;
   }
   
 Done:
@@ -765,16 +761,15 @@ HasChildHandle (
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  *OpenInfoBuffer;
   UINTN                                EntryCount;
   BOOLEAN                              HasChild;
-  EFI_STATUS                           Status;
 
   EntryCount = 0;
   HasChild   = FALSE;
-  Status = gBS->OpenProtocolInformation (
-                  Controller,
-                  &gEfiPciIoProtocolGuid,
-                  &OpenInfoBuffer,
-                  &EntryCount
-                  );
+  gBS->OpenProtocolInformation (
+         Controller,
+         &gEfiPciIoProtocolGuid,
+         &OpenInfoBuffer,
+         &EntryCount
+         );
   for (Index = 0; Index < EntryCount; Index++) {
     if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
       HasChild = TRUE;
