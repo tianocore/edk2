@@ -57,11 +57,11 @@
   TcgPpVendorLib
 
 [Protocols]
-  gEfiTcgProtocolGuid                   ## CONSUMES
-  gEdkiiVariableLockProtocolGuid        ## CONSUMES
+  gEfiTcgProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid        ## SOMETIMES_CONSUMES
 
 [Guids]
-  ## CONSUMES           ## HII
+  ## SOMETIMES_CONSUMES ## HII
   ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
   ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
   ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresenceFlags"
