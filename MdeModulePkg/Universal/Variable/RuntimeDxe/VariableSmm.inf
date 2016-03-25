@@ -86,14 +86,14 @@
   gEdkiiSmmVarCheckProtocolGuid                 ## PRODUCES
 
 [Guids]
-  ## PRODUCES             ## GUID # Signature of Variable store header
-  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
   ## SOMETIMES_CONSUMES   ## HOB
   ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiAuthenticatedVariableGuid
 
-  ## PRODUCES             ## GUID # Signature of Variable store header
-  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
   ## SOMETIMES_CONSUMES   ## HOB
   ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiVariableGuid
@@ -104,13 +104,16 @@
   ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
   gEfiGlobalVariableGuid
 
-  gEfiMemoryOverwriteControlDataGuid            ## CONSUMES   ## Variable:L"MemoryOverwriteRequestControl"
-  gEfiMemoryOverwriteRequestControlLockGuid     ## PRODUCES   ## Variable:L"MemoryOverwriteRequestControlLock"
+  gEfiMemoryOverwriteControlDataGuid            ## SOMETIMES_CONSUMES   ## Variable:L"MemoryOverwriteRequestControl"
+  gEfiMemoryOverwriteRequestControlLockGuid     ## SOMETIMES_PRODUCES   ## Variable:L"MemoryOverwriteRequestControlLock"
 
   gSmmVariableWriteGuid                         ## PRODUCES             ## GUID # Install protocol
   gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
   gEdkiiFaultTolerantWriteGuid                  ## SOMETIMES_CONSUMES   ## HOB
-  gEdkiiVarErrorFlagGuid                        ## CONSUMES             ## GUID
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"VarErrorFlag"
+  ## SOMETIMES_PRODUCES   ## Variable:L"VarErrorFlag"
+  gEdkiiVarErrorFlagGuid
   gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
 
 [Pcd]
