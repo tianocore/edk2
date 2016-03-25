@@ -73,9 +73,9 @@
   UefiHiiServicesLib
 
 [Guids]
-  gShellVariableGuid                                      ## CONSUMES ## GUID
-  gShellMapGuid                                           ## CONSUMES ## GUID
-  gShellAliasGuid                                         ## CONSUMES ## GUID
+  gShellVariableGuid                                      ## SOMETIMES_CONSUMES ## GUID
+  gShellAliasGuid                                         ## SOMETIMES_CONSUMES ## GUID
+  gShellAliasGuid                                         ## SOMETIMES_PRODUCES ## GUID
 
 [Protocols]
   gEfiShellProtocolGuid                                   ## PRODUCES
@@ -89,9 +89,9 @@
   gEfiSimpleTextInputExProtocolGuid                       ## CONSUMES
   gEfiSimpleTextInProtocolGuid                            ## CONSUMES
   gEfiSimpleTextOutProtocolGuid                           ## CONSUMES
-  gEfiSimpleFileSystemProtocolGuid                        ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
   gEfiLoadedImageProtocolGuid                             ## CONSUMES
-  gEfiComponentName2ProtocolGuid                          ## CONSUMES
+  gEfiComponentName2ProtocolGuid                          ## SOMETIMES_CONSUMES
   gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
   gEfiDevicePathProtocolGuid                              ## CONSUMES
   gEfiHiiPackageListProtocolGuid                          ## SOMETIMES_PRODUCES

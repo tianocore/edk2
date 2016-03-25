@@ -52,7 +52,7 @@
   SortLib
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid                        ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
 
   # shell 2.0
   gEfiShellProtocolGuid                                   ## SOMETIMES_CONSUMES
@@ -62,18 +62,18 @@
   gEfiShellEnvironment2Guid                               ## SOMETIMES_CONSUMES
   gEfiShellInterfaceGuid                                  ## SOMETIMES_CONSUMES
 
-  gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
-  gEfiDevicePathToTextProtocolGuid                        ## CONSUMES
-  gEfiBusSpecificDriverOverrideProtocolGuid               ## CONSUMES
-  gEfiDevicePathUtilitiesProtocolGuid                     ## CONSUMES
-  gEfiDevicePathFromTextProtocolGuid                      ## CONSUMES
-  gEfiPlatformDriverOverrideProtocolGuid                  ## CONSUMES
-  gEfiSimpleTextInProtocolGuid                            ## CONSUMES
-  gEfiPlatformToDriverConfigurationProtocolGuid           ## CONSUMES
-  gEfiDriverSupportedEfiVersionProtocolGuid               ## CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid                       ## UNDEFINED
+  gEfiDevicePathToTextProtocolGuid                        ## UNDEFINED
+  gEfiBusSpecificDriverOverrideProtocolGuid               ## UNDEFINED
+  gEfiDevicePathUtilitiesProtocolGuid                     ## UNDEFINED
+  gEfiDevicePathFromTextProtocolGuid                      ## UNDEFINED
+  gEfiPlatformDriverOverrideProtocolGuid                  ## UNDEFINED
+  gEfiSimpleTextInProtocolGuid                            ## UNDEFINED
+  gEfiPlatformToDriverConfigurationProtocolGuid           ## UNDEFINED
+  gEfiDriverSupportedEfiVersionProtocolGuid               ## UNDEFINED
   gEfiLoadedImageProtocolGuid                             ## CONSUMES
   gEfiDevicePathProtocolGuid                              ## CONSUMES
-  gEfiLoadedImageDevicePathProtocolGuid                   ## CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid                   ## UNDEFINED
   gEfiSimpleTextOutProtocolGuid                           ## UNDEFINED
   gEfiSimplePointerProtocolGuid                           ## UNDEFINED
   gEfiAbsolutePointerProtocolGuid                         ## UNDEFINED
@@ -293,7 +293,7 @@
   gEfiRestProtocolGuid                                    ## UNDEFINED
 
 [Guids]
-  gEfiFileInfoGuid                                        ## CONSUMES ## GUID
+  gEfiFileInfoGuid                                        ## UNDEFINED
   gEfiShellEnvironment2ExtGuid                            ## CONSUMES ## GUID
   gEfiPcAnsiGuid                                          ## UNDEFINED
   gEfiVT100Guid                                           ## UNDEFINED

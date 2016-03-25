@@ -56,7 +56,7 @@
   gEfiUsbIoProtocolGuid                                   ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiSasDevicePathGuid                                   ## CONSUMES ## GUID
+  gEfiSasDevicePathGuid                                   ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## CONSUMES
