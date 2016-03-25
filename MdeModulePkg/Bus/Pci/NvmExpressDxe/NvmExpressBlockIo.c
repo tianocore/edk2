@@ -127,7 +127,10 @@ WriteSectors (
 
   CommandPacket.NvmeCmd->Cdw10 = (UINT32)Lba;
   CommandPacket.NvmeCmd->Cdw11 = (UINT32)RShiftU64(Lba, 32);
-  CommandPacket.NvmeCmd->Cdw12 = (Blocks - 1) & 0xFFFF;
+  //
+  // Set Force Unit Access bit (bit 30) to use write-through behaviour
+  //
+  CommandPacket.NvmeCmd->Cdw12 = ((Blocks - 1) & 0xFFFF) | BIT30;
 
   CommandPacket.MetadataBuffer = NULL;
   CommandPacket.MetadataLength = 0;
