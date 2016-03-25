@@ -61,13 +61,13 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask  ## CONSUMES
 
 [Protocols]
-  gEfiDriverHealthProtocolGuid                    ## CONSUMES
-  gEfiDriverFamilyOverrideProtocolGuid            ## CONSUMES
-  gEfiHiiConfigAccessProtocolGuid                 ## CONSUMES
+  gEfiDriverHealthProtocolGuid                    ## UNDEFINED
+  gEfiDriverFamilyOverrideProtocolGuid            ## UNDEFINED
+  gEfiHiiConfigAccessProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiHiiDatabaseProtocolGuid                     ## CONSUMES
 
 [Guids]
-  gEfiGlobalVariableGuid                          ## CONSUMES ## GUID
+  gEfiGlobalVariableGuid                          ## SOMETIMES_CONSUMES ## GUID
   gEfiConsoleInDeviceGuid                         ## CONSUMES ## GUID
   gEfiConsoleOutDeviceGuid                        ## CONSUMES ## GUID
   gShellDriver1HiiGuid                            ## PRODUCES ## HII

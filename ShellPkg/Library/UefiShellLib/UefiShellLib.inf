@@ -50,7 +50,7 @@
   SortLib
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
 
   # shell 2.0
   gEfiShellProtocolGuid                         ## SOMETIMES_CONSUMES
@@ -61,8 +61,8 @@
   gEfiShellInterfaceGuid                        ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiFileInfoGuid                              ## CONSUMES ## GUID
-  gEfiShellEnvironment2ExtGuid                  ## CONSUMES ## GUID
+  gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
+  gEfiShellEnvironment2ExtGuid                  ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize     ## CONSUMES

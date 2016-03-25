@@ -72,13 +72,13 @@
   gEfiShellParametersProtocolGuid                         ## CONSUMES
   gEfiDevicePathProtocolGuid                              ## CONSUMES
   gEfiLoadedImageProtocolGuid                             ## CONSUMES
-  gEfiSimpleFileSystemProtocolGuid                        ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
 
 [Pcd.common]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize    ## CONSUMES
 
 [Guids]
-  gEfiFileSystemInfoGuid                                  ## CONSUMES ## GUID
+  gEfiFileSystemInfoGuid                                  ## SOMETIMES_CONSUMES ## GUID
   gEfiFileInfoGuid                                        ## UNDEFINED
   gShellLevel2HiiGuid                                     ## SOMETIMES_CONSUMES ## HII
