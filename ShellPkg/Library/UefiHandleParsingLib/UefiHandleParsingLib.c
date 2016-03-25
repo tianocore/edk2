@@ -668,7 +668,7 @@ AdapterInformationDumpInformation (
       if (TempStr == NULL) {
         goto ERROR_EXIT;
       }
-      TempRetVal = CatSPrint (RetVal, TempStr, (GuidIndex + 1), InfoTypesBuffer[GuidIndex]);
+      TempRetVal = CatSPrint (RetVal, TempStr, (GuidIndex + 1), &InfoTypesBuffer[GuidIndex]);
       SHELL_FREE_NON_NULL (RetVal);
       RetVal = TempRetVal;
       SHELL_FREE_NON_NULL (TempStr);
