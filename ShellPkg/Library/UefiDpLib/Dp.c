@@ -386,6 +386,9 @@ ShellCommandRunDp (
   }
 
 Done:
+  if (ParamPackage != NULL) {
+    ShellCommandLineFreeVarList (ParamPackage);
+  }
   SHELL_FREE_NON_NULL (StringPtr);
   if (CustomCumulativeData != NULL) {
     SHELL_FREE_NON_NULL (CustomCumulativeData->Name);
