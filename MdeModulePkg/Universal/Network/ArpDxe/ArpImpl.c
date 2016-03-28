@@ -1,7 +1,7 @@
 /** @file
   The implementation of the ARP protocol.
   
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -112,14 +112,27 @@ ArpOnFrameRcvdDpc (
   // Status is EFI_SUCCESS, process the received frame.
   //
   RxData = RxToken->Packet.RxData;
-  Head   = (ARP_HEAD *) RxData->PacketData;
+  //
+  // Sanity check.
+  //
+  if (RxData->DataLength < sizeof (ARP_HEAD)) {
+    //
+    // Restart the receiving if packet size is not correct.
+    //
+    goto RESTART_RECEIVE;
+  }
 
   //
   // Convert the byte order of the multi-byte fields.
   //
+  Head   = (ARP_HEAD *) RxData->PacketData;
   Head->HwType    = NTOHS (Head->HwType);
   Head->ProtoType = NTOHS (Head->ProtoType);
   Head->OpCode    = NTOHS (Head->OpCode);
+
+  if (RxData->DataLength < (sizeof (ARP_HEAD) + 2 * Head->HwAddrLen + 2 * Head->ProtoAddrLen)) {
+    goto RESTART_RECEIVE;
+  }
 
   if ((Head->HwType != ArpService->SnpMode.IfType) ||
     (Head->HwAddrLen != ArpService->SnpMode.HwAddressSize) ||

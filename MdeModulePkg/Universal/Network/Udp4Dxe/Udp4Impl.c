@@ -1,7 +1,7 @@
 /** @file
   The implementation of the Udp4 protocol.
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016 Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1608,6 +1608,11 @@ Udp4Demultiplex (
   EFI_UDP4_SESSION_DATA  *Udp4Session;
   UINTN                  Enqueued;
 
+  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+    NetbufFree (Packet);
+    return;
+  }
+
   //
   // Get the datagram header from the packet buffer.
   //
@@ -1629,6 +1634,7 @@ Udp4Demultiplex (
       //
       // Wrong checksum.
       //
+      NetbufFree (Packet);
       return;
     }
   }
@@ -1797,6 +1803,11 @@ Udp4IcmpHandler (
   LIST_ENTRY             *Entry;
   UDP4_INSTANCE_DATA     *Instance;
 
+  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+    NetbufFree (Packet);
+    return;
+  }
+  
   Udp4Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp4Header != NULL);
 

@@ -1,7 +1,7 @@
 /** @file
   Help functions to access UDP service, it is used by both the DHCP and MTFTP.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -215,6 +215,12 @@ UdpIoOnDgramRcvdDpc (
   // Build a NET_BUF from the UDP receive data, then deliver it up.
   //
   if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
+    if (((EFI_UDP4_RECEIVE_DATA *) RxData)->DataLength == 0) {
+      //
+      // Discard zero length data payload packet.
+      //
+      goto Resume;
+    }
 
     Netbuf = NetbufFromExt (
                (NET_FRAGMENT *)((EFI_UDP4_RECEIVE_DATA *) RxData)->FragmentTable,
@@ -252,6 +258,12 @@ UdpIoOnDgramRcvdDpc (
     EndPoint.LocalAddr.Addr[0]  = NTOHL (EndPoint.LocalAddr.Addr[0]);
     EndPoint.RemoteAddr.Addr[0] = NTOHL (EndPoint.RemoteAddr.Addr[0]);
   } else {
+    if (((EFI_UDP6_RECEIVE_DATA *) RxData)->DataLength == 0) {
+      //
+      // Discard zero length data payload packet.
+      //
+      goto Resume;
+    }
 
     Netbuf = NetbufFromExt (
                (NET_FRAGMENT *)((EFI_UDP6_RECEIVE_DATA *) RxData)->FragmentTable,
@@ -291,6 +303,15 @@ UdpIoOnDgramRcvdDpc (
   }
 
   RxToken->CallBack (Netbuf, &EndPoint, EFI_SUCCESS, RxToken->Context);
+
+Resume:
+  if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
+    gBS->SignalEvent (((EFI_UDP4_RECEIVE_DATA *) RxData)->RecycleSignal);
+    RxToken->UdpIo->Protocol.Udp4->Receive (RxToken->UdpIo->Protocol.Udp4, &RxToken->Token.Udp4);
+  } else {
+    gBS->SignalEvent (((EFI_UDP6_RECEIVE_DATA *) RxData)->RecycleSignal);
+    RxToken->UdpIo->Protocol.Udp6->Receive (RxToken->UdpIo->Protocol.Udp6, &RxToken->Token.Udp6);
+  }
 }
 
 /**
