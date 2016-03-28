@@ -2731,8 +2731,6 @@ class FdfParser:
             if FileName == '}':
                 self.__UndoToken()
                 raise Warning("expected Filename value", self.FileName, self.CurrentLineNumber)
-            elif not os.path.isfile(FileName):
-                raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
 
             self.__VerifyFile(FileName)
             File = PathClass(NormPath(FileName), GenFdsGlobalVariable.WorkSpaceDir)
