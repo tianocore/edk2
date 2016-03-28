@@ -526,6 +526,9 @@ Done:
   SafeFreePool (StringPtr);
   SafeFreePool (mPrintTokenBuffer);
 
+  if (ParamPackage != NULL) {
+    ShellCommandLineFreeVarList (ParamPackage);
+  }
   if (CustomCumulativeData != NULL) {
     SafeFreePool (CustomCumulativeData->Name);
   }
