@@ -1,7 +1,7 @@
 /** @file
   Udp6 driver's whole implementation.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016 Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1598,6 +1598,11 @@ Udp6Demultiplex (
   EFI_UDP6_SESSION_DATA  *Udp6Session;
   UINTN                  Enqueued;
 
+  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+    NetbufFree (Packet);
+    return;
+  }
+  
   //
   // Get the datagram header from the packet buffer.
   //
@@ -1619,6 +1624,7 @@ Udp6Demultiplex (
       //
       // Wrong checksum.
       //
+      NetbufFree (Packet);
       return;
     }
   }
@@ -1834,6 +1840,11 @@ Udp6IcmpHandler (
   LIST_ENTRY             *Entry;
   UDP6_INSTANCE_DATA     *Instance;
 
+  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+    NetbufFree (Packet);
+    return;
+  }
+  
   Udp6Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp6Header != NULL);
 

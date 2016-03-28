@@ -2,7 +2,7 @@
   Dhcp6 internal functions implementation.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016 Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2825,6 +2825,10 @@ Dhcp6ReceivePacket (
 
   if (EFI_ERROR (IoStatus)) {
     return ;
+  }
+
+  if (Udp6Wrap->TotalSize < sizeof (EFI_DHCP6_HEADER)) {
+    goto ON_CONTINUE;
   }
 
   //

@@ -1615,6 +1615,10 @@ DnsOnPacketReceived (
   }
 
   ASSERT (Packet != NULL);
+
+  if (Packet->TotalSize <= sizeof (DNS_HEADER)) {
+    goto ON_EXIT;
+  }
   
   RcvString = NetbufGetByte (Packet, 0, NULL);
   ASSERT (RcvString != NULL);
@@ -1624,15 +1628,15 @@ DnsOnPacketReceived (
   //
   ParseDnsResponse (Instance, RcvString, &Completed);
 
-  ON_EXIT:
+ON_EXIT:
 
-    if (Packet != NULL) {
-      NetbufFree (Packet);
-    }
+  if (Packet != NULL) {
+    NetbufFree (Packet);
+  }
 
-    if (!Completed) {
-      UdpIoRecvDatagram (Instance->UdpIo, DnsOnPacketReceived, Instance, 0);
-    }
+  if (!Completed) {
+    UdpIoRecvDatagram (Instance->UdpIo, DnsOnPacketReceived, Instance, 0);
+  }
 }
 
 /**
