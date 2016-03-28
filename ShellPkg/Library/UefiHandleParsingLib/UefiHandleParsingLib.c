@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
@@ -1042,27 +1042,27 @@ FirmwareManagementDumpInformation (
       } else {
         AttributeSettingStr = CatSPrint (NULL, L"(");
 
-        if (AttributeSetting & IMAGE_ATTRIBUTE_IMAGE_UPDATABLE) {
+        if ((AttributeSetting & IMAGE_ATTRIBUTE_IMAGE_UPDATABLE) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_IMAGE_UPDATABLE");
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
-        if (AttributeSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) {
+        if ((AttributeSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_RESET_REQUIRED");
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
-        if (AttributeSetting & IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED) {
+        if ((AttributeSetting & IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED");
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
-        if (AttributeSetting & IMAGE_ATTRIBUTE_IN_USE) {
+        if ((AttributeSetting & IMAGE_ATTRIBUTE_IN_USE) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_IN_USE");
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
         }
-        if (AttributeSetting & IMAGE_ATTRIBUTE_UEFI_IMAGE) {
+        if ((AttributeSetting & IMAGE_ATTRIBUTE_UEFI_IMAGE) != 0x0) {
           TempRetVal = CatSPrint (AttributeSettingStr, L" IMAGE_ATTRIBUTE_UEFI_IMAGE");
           SHELL_FREE_NON_NULL (AttributeSettingStr);
           AttributeSettingStr = TempRetVal;
@@ -1198,7 +1198,7 @@ ENDLOOP:
   //
   // Check if ImageId with duplicate value was found
   //
-  if (Found == TRUE) {
+  if (Found) {
     TempStr = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_FMP_IMAGEID_NON_UNIQUE), NULL);
     if (TempStr == NULL) {
       goto ERROR_EXIT;
