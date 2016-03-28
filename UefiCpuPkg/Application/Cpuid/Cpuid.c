@@ -594,6 +594,7 @@ CpuidStructuredExtendedFeatureFlags (
       Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax, Ebx.Uint32, Ecx.Uint32, 0);
       PRINT_BIT_FIELD (Ebx, FSGSBASE);
       PRINT_BIT_FIELD (Ebx, IA32_TSC_ADJUST);
+      PRINT_BIT_FIELD (Ebx, SGX);
       PRINT_BIT_FIELD (Ebx, BMI1);
       PRINT_BIT_FIELD (Ebx, HLE);
       PRINT_BIT_FIELD (Ebx, AVX2);
@@ -919,6 +920,121 @@ CpuidPlatformQosEnforcementMainLeaf (
   PRINT_BIT_FIELD (Ebx, L3CacheQosEnforcement);
 
   CpuidPlatformQosEnforcementResidSubLeaf ();
+}
+
+/**
+  Display Sub-Leaf 0 Enumeration of Intel SGX Capabilities.
+
+**/
+VOID
+CpuidEnumerationOfIntelSgxCapabilities0SubLeaf (
+  VOID
+  )
+{
+  CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EAX  Eax;
+  UINT32                                       Ebx;
+  CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EDX  Edx;
+
+  AsmCpuidEx (
+    CPUID_INTEL_SGX, CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF,
+    &Eax.Uint32, &Ebx, NULL, &Edx.Uint32
+    );
+  Print (L"CPUID_INTEL_SGX (Leaf %08x, Sub-Leaf %08x)\n", CPUID_INTEL_SGX, CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF);
+  Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax.Uint32, Ebx, 0, Edx.Uint32);
+  PRINT_BIT_FIELD (Eax, SGX1);
+  PRINT_BIT_FIELD (Eax, SGX2);
+  PRINT_BIT_FIELD (Edx, MaxEnclaveSize_Not64);
+  PRINT_BIT_FIELD (Edx, MaxEnclaveSize_64);
+}
+
+/**
+  Display Sub-Leaf 1 Enumeration of Intel SGX Capabilities.
+
+**/
+VOID
+CpuidEnumerationOfIntelSgxCapabilities1SubLeaf (
+  VOID
+  )
+{
+  UINT32                                       Eax;
+  UINT32                                       Ebx;
+  UINT32                                       Ecx;
+  UINT32                                       Edx;
+
+  AsmCpuidEx (
+    CPUID_INTEL_SGX, CPUID_INTEL_SGX_CAPABILITIES_1_SUB_LEAF,
+    &Eax, &Ebx, &Ecx, &Edx
+    );
+  Print (L"CPUID_INTEL_SGX (Leaf %08x, Sub-Leaf %08x)\n", CPUID_INTEL_SGX, CPUID_INTEL_SGX_CAPABILITIES_1_SUB_LEAF);
+  Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax, Ebx, Ecx, Edx);
+}
+
+/**
+  Display Sub-Leaf Index 2 or Higher Enumeration of Intel SGX Resources.
+
+**/
+VOID
+CpuidEnumerationOfIntelSgxResourcesSubLeaf (
+  VOID
+  )
+{
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EAX  Eax;
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EBX  Ebx;
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_ECX  Ecx;
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EDX  Edx;
+  UINT32                                               SubLeaf;
+ 
+  SubLeaf = CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF;
+  do {
+    AsmCpuidEx (
+      CPUID_INTEL_SGX, SubLeaf,
+      &Eax.Uint32, &Ebx.Uint32, &Ecx.Uint32, &Edx.Uint32
+      );
+    if (Eax.Bits.SubLeafType == 0x1) {
+      Print (L"CPUID_INTEL_SGX (Leaf %08x, Sub-Leaf %08x)\n", CPUID_INTEL_SGX, SubLeaf);
+      Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax.Uint32, Ebx.Uint32, Ecx.Uint32, Edx.Uint32);
+      PRINT_BIT_FIELD (Eax, SubLeafType);
+      PRINT_BIT_FIELD (Eax, LowAddressOfEpcSection);
+      PRINT_BIT_FIELD (Ebx, HighAddressOfEpcSection);
+      PRINT_BIT_FIELD (Ecx, EpcSection);
+      PRINT_BIT_FIELD (Ecx, LowSizeOfEpcSection);
+      PRINT_BIT_FIELD (Edx, HighSizeOfEpcSection);
+    }
+    SubLeaf++;
+  } while (Eax.Bits.SubLeafType == 0x1);
+}
+
+/**
+  Display Intel SGX Resource Enumeration.
+
+**/
+VOID
+CpuidEnumerationOfIntelSgx (
+  VOID
+  )
+{
+  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_EBX  Ebx;
+
+  if (CPUID_INTEL_SGX > gMaximumBasicFunction) {
+    return;
+  }
+
+  AsmCpuidEx (
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
+    NULL, &Ebx.Uint32, NULL, NULL
+    );
+  if (Ebx.Bits.SGX != 1) {
+    //
+    // Only if CPUID.(EAX=07H, ECX=0H):EBX.SGX = 1, the processor has support
+    // for Intel SGX.
+    //
+    return;
+  }
+  
+  CpuidEnumerationOfIntelSgxCapabilities0SubLeaf ();
+  CpuidEnumerationOfIntelSgxCapabilities1SubLeaf ();
+  CpuidEnumerationOfIntelSgxResourcesSubLeaf ();
 }
 
 /**
@@ -1334,6 +1450,7 @@ UefiMain (
   CpuidPlatformQosMonitoringEnumerationSubLeaf ();
   CpuidPlatformQosMonitoringCapabilitySubLeaf ();
   CpuidPlatformQosEnforcementMainLeaf ();
+  CpuidEnumerationOfIntelSgx ();
   CpuidIntelProcessorTraceMainLeaf ();
   CpuidTimeStampCounter ();
   CpuidProcessorFrequency ();
