@@ -1304,7 +1304,11 @@ typedef union {
     /// [Bit 1] IA32_TSC_ADJUST MSR is supported if 1.
     ///
     UINT32  IA32_TSC_ADJUST:1;
-    UINT32  Reserved1:1;
+    ///
+    /// [Bit 2] Intel SGX is supported if 1. See section 37.7 "DISCOVERING SUPPORT
+    /// FOR INTEL(R) SGX AND ENABLING ENCLAVE INSTRUCTIONS".
+    ///
+    UINT32  SGX:1;
     ///
     /// [Bit 3] If 1 indicates the processor supports the first group of advanced
     /// bit manipulation extensions (ANDN, BEXTR, BLSI, BLSMSK, BLSR, TZCNT)
@@ -2253,6 +2257,281 @@ typedef union {
   ///
   UINT32  Uint32;
 } CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_EDX;
+
+
+/**
+  Intel SGX resource capability and configuration.
+  See Section 37.7.2 "Intel(R) SGX Resource Enumeration Leaves".
+
+  If CPUID.(EAX=07H, ECX=0H):EBX.SGX = 1, the processor also supports querying
+  CPUID with EAX=12H on Intel SGX resource capability and configuration.
+
+  @param   EAX  CPUID_INTEL_SGX (0x12)
+  @param   ECX  CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF (0x00).
+                CPUID_INTEL_SGX_CAPABILITIES_1_SUB_LEAF (0x01).
+                CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF (0x02).
+                Sub leafs 2..n based on the sub-leaf-type encoding (returned in EAX[3:0])
+                until the sub-leaf type is invalid.
+
+**/
+#define CPUID_INTEL_SGX                                  0x12
+
+/**
+  Sub-Leaf 0 Enumeration of Intel SGX Capabilities.
+  Enumerates Intel SGX capability, including enclave instruction opcode support.
+
+  @param   EAX  CPUID_INTEL_SGX (0x12)
+  @param   ECX  CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF (0x00)
+
+  @retval  EAX  The format of Sub-Leaf 0 Enumeration of Intel SGX Capabilities is
+                described by the type CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EAX.
+  @retval  EBX  MISCSELECT: Reports the bit vector of supported extended features
+                that can be written to the MISC region of the SSA.
+  @retval  ECX  Reserved.
+  @retval  EDX  The format of Sub-Leaf 0 Enumeration of Intel SGX Capabilities is
+                described by the type CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EDX.
+
+  <b>Example usage</b>
+  @code
+  CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EAX  Eax;
+  UINT32                                       Ebx;
+  CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EDX  Edx;
+
+  AsmCpuidEx (
+    CPUID_INTEL_SGX, CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF,
+    &Eax.Uint32, &Ebx, NULL, &Edx.Uint32
+    );
+  @endcode
+**/
+#define CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF          0x00
+
+/**
+  Sub-Leaf 0 Enumeration of Intel SGX Capabilities EAX for CPUID leaf #CPUID_INTEL_SGX,
+  sub-leaf #CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] If 1, indicates leaf functions of SGX1 instruction are supported.
+    ///
+    UINT32  SGX1:1;
+    ///
+    /// [Bit 1] If 1, indicates leaf functions of SGX2 instruction are supported.
+    ///
+    UINT32  SGX2:1;
+    UINT32  Reserved:30;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EAX;
+
+/**
+  Sub-Leaf 0 Enumeration of Intel SGX Capabilities EDX for CPUID leaf #CPUID_INTEL_SGX,
+  sub-leaf #CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 7:0] The maximum supported enclave size is 2^(EDX[7:0]) bytes
+    /// when not in 64-bit mode.
+    ///
+    UINT32  MaxEnclaveSize_Not64:8;
+    ///
+    /// [Bit 15:8] The maximum supported enclave size is 2^(EDX[15:8]) bytes
+    /// when operating in 64-bit mode.
+    ///
+    UINT32  MaxEnclaveSize_64:8;
+    UINT32  Reserved:16;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_SGX_CAPABILITIES_0_SUB_LEAF_EDX;
+
+
+/**
+  Sub-Leaf 1 Enumeration of Intel SGX Capabilities.
+  Enumerates Intel SGX capability of processor state configuration and enclave
+  configuration in the SECS structure.
+
+  @param   EAX  CPUID_INTEL_SGX (0x12)
+  @param   ECX  CPUID_INTEL_SGX_CAPABILITIES_1_SUB_LEAF (0x01)
+
+  @retval  EAX  Report the valid bits of SECS.ATTRIBUTES[31:0] that software can
+                set with ECREATE. SECS.ATTRIBUTES[n] can be set to 1 using ECREATE
+                only if EAX[n] is 1, where n < 32.
+  @retval  EBX  Report the valid bits of SECS.ATTRIBUTES[63:32] that software can
+                set with ECREATE. SECS.ATTRIBUTES[n+32] can be set to 1 using ECREATE
+                only if EBX[n] is 1, where n < 32.
+  @retval  ECX  Report the valid bits of SECS.ATTRIBUTES[95:64] that software can
+                set with ECREATE. SECS.ATTRIBUTES[n+64] can be set to 1 using ECREATE
+                only if ECX[n] is 1, where n < 32.
+  @retval  EDX  Report the valid bits of SECS.ATTRIBUTES[127:96] that software can
+                set with ECREATE. SECS.ATTRIBUTES[n+96] can be set to 1 using ECREATE
+                only if EDX[n] is 1, where n < 32.
+
+  <b>Example usage</b>
+  @code
+  UINT32  Eax;
+  UINT32  Ebx;
+  UINT32  Ecx;
+  UINT32  Edx;
+
+  AsmCpuidEx (
+    CPUID_INTEL_SGX, CPUID_INTEL_SGX_CAPABILITIES_1_SUB_LEAF,
+    &Eax, &Ebx, &Ecx, &Edx
+    );
+  @endcode
+**/
+#define CPUID_INTEL_SGX_CAPABILITIES_1_SUB_LEAF          0x01
+
+
+/**
+  Sub-Leaf Index 2 or Higher Enumeration of Intel SGX Resources.
+  Enumerates available EPC resources.
+
+  @param   EAX  CPUID_INTEL_SGX (0x12)
+  @param   ECX  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF (0x02)
+
+  @retval  EAX  The format of Sub-Leaf Index 2 or Higher Enumeration of Intel SGX
+                Resources is described by the type
+                CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EAX.
+  @retval  EBX  The format of Sub-Leaf Index 2 or Higher Enumeration of Intel SGX
+                Resources is described by the type
+                CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EBX.
+  @retval  EDX  The format of Sub-Leaf Index 2 or Higher Enumeration of Intel SGX
+                Resources is described by the type
+                CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_ECX.
+  @retval  EDX  The format of Sub-Leaf Index 2 or Higher Enumeration of Intel SGX
+                Resources is described by the type
+                CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EDX.
+
+  <b>Example usage</b>
+  @code
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EAX  Eax;
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EBX  Ebx;
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_ECX  Ecx;
+  CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EDX  Edx;
+
+  AsmCpuidEx (
+    CPUID_INTEL_SGX, CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF,
+    &Eax.Uint32, &Ebx.Uint32, &Ecx.Uint32, &Edx.Uint32
+    );
+  @endcode
+**/
+#define CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF  0x02
+
+/**
+  Sub-Leaf Index 2 or Higher Enumeration of Intel SGX Resources EAX for CPUID
+  leaf #CPUID_INTEL_SGX, sub-leaf #CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 3:0] Sub-leaf-type encoding.
+    /// 0000b: This sub-leaf is invalid, EBX:EAX and EDX:ECX report 0.
+    /// 0001b: This sub-leaf provides information on the Enclave Page Cache (EPC)
+    ///        in EBX:EAX and EDX:ECX.
+    /// All other encoding are reserved.
+    ///
+    UINT32  SubLeafType:4;
+    UINT32  Reserved:8;
+    ///
+    /// [Bit 31:12] If EAX[3:0] = 0001b, these are bits 31:12 of the physical address of
+    /// the base of the EPC section.
+    ///
+    UINT32  LowAddressOfEpcSection:20;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EAX;
+
+/**
+  Sub-Leaf Index 2 or Higher Enumeration of Intel SGX Resources EBX for CPUID
+  leaf #CPUID_INTEL_SGX, sub-leaf #CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 19:0] If EAX[3:0] = 0001b, these are bits 51:32 of the physical address of
+    /// the base of the EPC section.
+    ///
+    UINT32  HighAddressOfEpcSection:20;
+    UINT32  Reserved:12;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EBX;
+
+/**
+  Sub-Leaf Index 2 or Higher Enumeration of Intel SGX Resources ECX for CPUID
+  leaf #CPUID_INTEL_SGX, sub-leaf #CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 3:0] The EPC section encoding.
+    /// 0000b: Not valid.
+    /// 0001b: The EPC section is confidentiality, integrity and replay protected.
+    /// All other encoding are reserved.
+    ///
+    UINT32  EpcSection:4;
+    UINT32  Reserved:8;
+    ///
+    /// [Bit 31:12] If EAX[3:0] = 0001b, these are bits 31:12 of the size of the
+    /// corresponding EPC section within the Processor Reserved Memory.
+    ///
+    UINT32  LowSizeOfEpcSection:20;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_ECX;
+
+/**
+  Sub-Leaf Index 2 or Higher Enumeration of Intel SGX Resources EDX for CPUID
+  leaf #CPUID_INTEL_SGX, sub-leaf #CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 19:0] If EAX[3:0] = 0001b, these are bits 51:32 of the size of the
+    /// corresponding EPC section within the Processor Reserved Memory.
+    ///
+    UINT32  HighSizeOfEpcSection:20;
+    UINT32  Reserved:12;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EDX;
 
 
 /**
