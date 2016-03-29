@@ -2,6 +2,7 @@
   The realization of EFI_RAM_DISK_PROTOCOL.
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -50,7 +51,7 @@ RamDiskInitDeviceNode (
     );
   WriteUnaligned64 (
     (UINT64 *) &(RamDiskDevNode->EndingAddr[0]),
-    (UINT64) PrivateData->StartingAddr + PrivateData->Size
+    (UINT64) PrivateData->StartingAddr + PrivateData->Size - 1
     );
   CopyGuid (&RamDiskDevNode->TypeGuid, &PrivateData->TypeGuid);
   RamDiskDevNode->Instance = PrivateData->InstanceNumber;
@@ -305,7 +306,7 @@ RamDiskUnregister (
       // and type guid.
       //
       if ((StartingAddr == PrivateData->StartingAddr) &&
-          (EndingAddr == PrivateData->StartingAddr + PrivateData->Size) &&
+          (EndingAddr == PrivateData->StartingAddr + PrivateData->Size - 1) &&
           (CompareGuid (&RamDiskDevNode->TypeGuid, &PrivateData->TypeGuid))) {
         //
         // Uninstall the EFI_DEVICE_PATH_PROTOCOL & EFI_BLOCK_IO(2)_PROTOCOL

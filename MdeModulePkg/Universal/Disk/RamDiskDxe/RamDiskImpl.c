@@ -566,7 +566,7 @@ UpdateMainForm (
       L"  RAM Disk %d: [0x%lx, 0x%lx]\n",
       Index,
       PrivateData->StartingAddr,
-      PrivateData->StartingAddr + PrivateData->Size
+      PrivateData->StartingAddr + PrivateData->Size - 1
       );
 
     StringId = HiiSetString (ConfigPrivate->HiiHandle, 0, RamDiskStr, NULL);
