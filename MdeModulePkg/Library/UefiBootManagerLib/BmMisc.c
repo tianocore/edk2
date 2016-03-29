@@ -124,14 +124,18 @@ BmMatchDevicePaths (
   This routine adjust the memory information for different memory type and 
   save them into the variables for next boot. It resets the system when
   memory information is updated and the current boot option belongs to
-  boot category instead of application category.
+  boot category instead of application category. It doesn't count the
+  reserved memory occupied by RAM Disk.
 
-  @param Boot  TRUE if current boot option belongs to boot category instead of
-               application category.
+  @param Boot               TRUE if current boot option belongs to boot
+                            category instead of application category.
+  @param RamDiskSizeInPages Reserved memory size in pages occupied by
+                            RAM Disk.
 **/
 VOID
 BmSetMemoryTypeInformationVariable (
-  IN BOOLEAN                    Boot
+  IN BOOLEAN                    Boot,
+  IN UINTN                      RamDiskSizeInPages
   )
 {
   EFI_STATUS                   Status;
@@ -222,6 +226,13 @@ BmSetMemoryTypeInformationVariable (
     }
     if (CurrentMemoryTypeInformation[Index1].Type == EfiMaxMemoryType) {
       continue;
+    }
+
+    //
+    // Do not count the reserved memory occupied by RAM Disk.
+    //
+    if (CurrentMemoryTypeInformation[Index1].Type == EfiReservedMemoryType) {
+      CurrentMemoryTypeInformation[Index1].NumberOfPages -= RamDiskSizeInPages;
     }
 
     //

@@ -1567,6 +1567,7 @@ EfiBootManagerBoot (
   UINTN                     FileSize;
   EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
   EFI_EVENT                 LegacyBootEvent;
+  UINTN                     RamDiskSizeInPages;
 
   if (BootOption == NULL) {
     return;
@@ -1701,8 +1702,10 @@ EfiBootManagerBoot (
   // 6. Adjust the different type memory page number just before booting
   //    and save the updated info into the variable for next boot to use
   //
+  BmGetRamDiskMemoryInfo (RamDiskDevicePath, &RamDiskSizeInPages);
   BmSetMemoryTypeInformationVariable (
-    (BOOLEAN) ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_BOOT)
+    (BOOLEAN) ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_BOOT),
+    RamDiskSizeInPages
     );
 
   DEBUG_CODE_BEGIN();
