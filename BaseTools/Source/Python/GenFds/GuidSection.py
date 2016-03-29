@@ -1,7 +1,7 @@
 ## @file
 # process GUIDed section generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -268,6 +268,10 @@ class GuidSection(GuidSectionClassObject) :
                 if Target + '_' + ToolChain + '_' + Arch not in self.KeyStringList:
                     self.KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
 
+        if GenFdsGlobalVariable.GuidToolDefinition:
+            if self.NameGuid in GenFdsGlobalVariable.GuidToolDefinition.keys():
+                return GenFdsGlobalVariable.GuidToolDefinition[self.NameGuid]
+
         ToolDefinition = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDictionary
         ToolPathTmp = None
         ToolOption = None
@@ -298,7 +302,7 @@ class GuidSection(GuidSectionClassObject) :
                         if ToolPathTmp != ToolPath:
                             EdkLogger.error("GenFds", GENFDS_ERROR, "Don't know which tool to use, %s or %s ?" % (ToolPathTmp, ToolPath))
 
-
+        GenFdsGlobalVariable.GuidToolDefinition[self.NameGuid] = (ToolPathTmp, ToolOption)
         return ToolPathTmp, ToolOption
 
 
