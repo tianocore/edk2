@@ -31,6 +31,9 @@ MEDIA_RAM_DISK_DEVICE_PATH  mRamDiskDeviceNodeTemplate = {
   }
 };
 
+BOOLEAN  mRamDiskSsdtTableKeyValid = FALSE;
+UINTN    mRamDiskSsdtTableKey;
+
 
 /**
   Initialize the RAM disk device node.
@@ -55,6 +58,486 @@ RamDiskInitDeviceNode (
     );
   CopyGuid (&RamDiskDevNode->TypeGuid, &PrivateData->TypeGuid);
   RamDiskDevNode->Instance = PrivateData->InstanceNumber;
+}
+
+
+/**
+  Initialize and publish NVDIMM root device SSDT in ACPI table.
+
+  @retval EFI_SUCCESS        The NVDIMM root device SSDT is published.
+  @retval Others             The NVDIMM root device SSDT is not published.
+
+**/
+EFI_STATUS
+RamDiskPublishSsdt (
+  VOID
+  )
+{
+  EFI_STATUS                     Status;
+  EFI_ACPI_DESCRIPTION_HEADER    *Table;
+  UINTN                          TableSize;
+
+  Status = GetSectionFromFv (
+             &gEfiCallerIdGuid,
+             EFI_SECTION_RAW,
+             1,
+             (VOID **) &Table,
+             &TableSize
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  ASSERT (Table->OemTableId == SIGNATURE_64 ('R', 'a', 'm', 'D', 'i', 's', 'k', ' '));
+
+  Status = mAcpiTableProtocol->InstallAcpiTable (
+                                 mAcpiTableProtocol,
+                                 Table,
+                                 TableSize,
+                                 &mRamDiskSsdtTableKey
+                                 );
+  ASSERT_EFI_ERROR (Status);
+
+  if (!EFI_ERROR (Status)) {
+    mRamDiskSsdtTableKeyValid = TRUE;
+  } else {
+    mRamDiskSsdtTableKeyValid = FALSE;
+  }
+
+  FreePool (Table);
+
+  return Status;
+}
+
+
+/**
+  Publish the RAM disk NVDIMM Firmware Interface Table (NFIT) to the ACPI
+  table.
+
+  @param[in] PrivateData          Points to RAM disk private data.
+
+  @retval EFI_SUCCESS             The RAM disk NFIT has been published.
+  @retval others                  The RAM disk NFIT has not been published.
+
+**/
+EFI_STATUS
+RamDiskPublishNfit (
+  IN RAM_DISK_PRIVATE_DATA        *PrivateData
+  )
+{
+  EFI_STATUS                                    Status;
+  EFI_MEMORY_DESCRIPTOR                         *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR                         *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR                         *MemoryMapEnd;
+  UINTN                                         TableIndex;
+  VOID                                          *TableHeader;
+  EFI_ACPI_TABLE_VERSION                        TableVersion;
+  UINTN                                         TableKey;
+  EFI_ACPI_DESCRIPTION_HEADER                   *NfitHeader;
+  EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE
+                                                *SpaRange;
+  VOID                                          *Nfit;
+  UINT32                                        NfitLen;
+  UINTN                                         MemoryMapSize;
+  UINTN                                         MapKey;
+  UINTN                                         DescriptorSize;
+  UINT32                                        DescriptorVersion;
+  UINT64                                        CurrentData;
+  UINT8                                         Checksum;
+  BOOLEAN                                       MemoryFound;
+
+  //
+  // Get the EFI memory map.
+  //
+  MemoryMapSize = 0;
+  MemoryMap     = NULL;
+  MemoryFound   = FALSE;
+
+  Status = gBS->GetMemoryMap (
+                  &MemoryMapSize,
+                  MemoryMap,
+                  &MapKey,
+                  &DescriptorSize,
+                  &DescriptorVersion
+                  );
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  do {
+    MemoryMap = (EFI_MEMORY_DESCRIPTOR *) AllocatePool (MemoryMapSize);
+    ASSERT (MemoryMap != NULL);
+    Status = gBS->GetMemoryMap (
+                    &MemoryMapSize,
+                    MemoryMap,
+                    &MapKey,
+                    &DescriptorSize,
+                    &DescriptorVersion
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (MemoryMap);
+    }
+  } while (Status == EFI_BUFFER_TOO_SMALL);
+  ASSERT_EFI_ERROR (Status);
+
+  MemoryMapEntry = MemoryMap;
+  MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + MemoryMapSize);
+  while ((UINTN) MemoryMapEntry < (UINTN) MemoryMapEnd) {
+    if ((MemoryMapEntry->Type == EfiReservedMemoryType) &&
+        (MemoryMapEntry->PhysicalStart <= PrivateData->StartingAddr) &&
+        (MemoryMapEntry->PhysicalStart +
+         MultU64x32 (MemoryMapEntry->NumberOfPages, EFI_PAGE_SIZE)
+         >= PrivateData->StartingAddr + PrivateData->Size)) {
+      MemoryFound = TRUE;
+      DEBUG ((
+        EFI_D_INFO,
+        "RamDiskPublishNfit: RAM disk with reserved meomry type, will publish to NFIT.\n"
+        ));
+      break;
+    }
+    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  }
+  FreePool (MemoryMap);
+
+  if (!MemoryFound) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Determine whether there is a NFIT already in the ACPI table.
+  //
+  Status = EFI_SUCCESS;
+  TableIndex = 0;
+
+  while (!EFI_ERROR (Status)) {
+    Status = mAcpiSdtProtocol->GetAcpiTable (
+                                 TableIndex,
+                                 (EFI_ACPI_SDT_HEADER **)&TableHeader,
+                                 &TableVersion,
+                                 &TableKey
+                                 );
+    if (!EFI_ERROR (Status)) {
+      TableIndex++;
+
+      if (((EFI_ACPI_SDT_HEADER *)TableHeader)->Signature ==
+          EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE_STRUCTURE_SIGNATURE) {
+        break;
+      }
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // A NFIT is already in the ACPI table.
+    //
+    DEBUG ((
+      EFI_D_INFO,
+      "RamDiskPublishNfit: A NFIT is already exist in the ACPI Table.\n"
+      ));
+
+    NfitHeader = (EFI_ACPI_DESCRIPTION_HEADER *)TableHeader;
+    NfitLen    = NfitHeader->Length + sizeof (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE);
+    Nfit       = AllocateZeroPool (NfitLen);
+    if (Nfit == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    CopyMem (Nfit, TableHeader, NfitHeader->Length);
+
+    //
+    // Update the NFIT head pointer.
+    //
+    NfitHeader = (EFI_ACPI_DESCRIPTION_HEADER *)Nfit;
+
+    //
+    // Uninstall the origin NFIT from the ACPI table.
+    //
+    Status = mAcpiTableProtocol->UninstallAcpiTable (
+                                   mAcpiTableProtocol,
+                                   TableKey
+                                   );
+    ASSERT_EFI_ERROR (Status);
+
+    if (EFI_ERROR (Status)) {
+      FreePool (Nfit);
+      return Status;
+    }
+
+    //
+    // Append the System Physical Address (SPA) Range Structure at the end
+    // of the origin NFIT.
+    //
+    SpaRange   = (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE *)
+                 ((UINT8 *)Nfit + NfitHeader->Length);
+
+    //
+    // Update the length field of the NFIT
+    //
+    NfitHeader->Length   = NfitLen;
+
+    //
+    // The checksum will be updated after the new contents are appended.
+    //
+    NfitHeader->Checksum = 0;
+  } else {
+    //
+    // Assumption is made that if no NFIT is in the ACPI table, there is no
+    // NVDIMM root device in the \SB scope.
+    // Therefore, a NVDIMM root device will be reported via Secondary System
+    // Description Table (SSDT).
+    //
+    Status = RamDiskPublishSsdt ();
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // No NFIT is in the ACPI table, we will create one here.
+    //
+    DEBUG ((
+      EFI_D_INFO,
+      "RamDiskPublishNfit: No NFIT is in the ACPI Table, will create one.\n"
+      ));
+
+    NfitLen = sizeof (EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE) +
+              sizeof (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE);
+    Nfit    = AllocateZeroPool (NfitLen);
+    if (Nfit == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    SpaRange = (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE *)
+               ((UINT8 *)Nfit + sizeof (EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE));
+
+    NfitHeader                  = (EFI_ACPI_DESCRIPTION_HEADER *)Nfit;
+    NfitHeader->Signature       = EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE_STRUCTURE_SIGNATURE;
+    NfitHeader->Length          = NfitLen;
+    NfitHeader->Revision        = EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE_REVISION;
+    NfitHeader->Checksum        = 0;
+    NfitHeader->OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
+    NfitHeader->CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
+    NfitHeader->CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);
+    CurrentData                 = PcdGet64 (PcdAcpiDefaultOemTableId);
+    CopyMem (NfitHeader->OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (NfitHeader->OemId));
+    CopyMem (&NfitHeader->OemTableId, &CurrentData, sizeof (UINT64));
+  }
+
+  //
+  // Fill in the content of the SPA Range Structure.
+  //
+  SpaRange->Type   = EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE_TYPE;
+  SpaRange->Length = sizeof (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE);
+  SpaRange->SystemPhysicalAddressRangeBase   = PrivateData->StartingAddr;
+  SpaRange->SystemPhysicalAddressRangeLength = PrivateData->Size;
+  CopyGuid (&SpaRange->AddressRangeTypeGUID, &PrivateData->TypeGuid);
+
+  Checksum             = CalculateCheckSum8((UINT8 *)Nfit, NfitHeader->Length);
+  NfitHeader->Checksum = Checksum;
+
+  //
+  // Publish the NFIT to the ACPI table.
+  // Note, since the NFIT might be modified by other driver, therefore, we
+  // do not track the returning TableKey from the InstallAcpiTable().
+  //
+  Status = mAcpiTableProtocol->InstallAcpiTable (
+                                 mAcpiTableProtocol,
+                                 Nfit,
+                                 NfitHeader->Length,
+                                 &TableKey
+                                 );
+  ASSERT_EFI_ERROR (Status);
+
+  FreePool (Nfit);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  PrivateData->InNfit = TRUE;
+
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Unpublish the RAM disk NVDIMM Firmware Interface Table (NFIT) from the
+  ACPI table.
+
+  @param[in] PrivateData          Points to RAM disk private data.
+
+  @retval EFI_SUCCESS             The RAM disk NFIT has been unpublished.
+  @retval others                  The RAM disk NFIT has not been unpublished.
+
+**/
+EFI_STATUS
+RamDiskUnpublishNfit (
+  IN RAM_DISK_PRIVATE_DATA        *PrivateData
+  )
+{
+  EFI_STATUS                                    Status;
+  UINTN                                         TableIndex;
+  VOID                                          *TableHeader;
+  EFI_ACPI_TABLE_VERSION                        TableVersion;
+  UINTN                                         TableKey;
+  EFI_ACPI_DESCRIPTION_HEADER                   *NewNfitHeader;
+  EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE
+                                                *SpaRange;
+  VOID                                          *NewNfit;
+  VOID                                          *NewNfitPtr;
+  EFI_ACPI_6_1_NFIT_STRUCTURE_HEADER            *NfitStructHeader;
+  UINT32                                        NewNfitLen;
+  UINT32                                        RemainLen;
+  UINT8                                         Checksum;
+
+  //
+  // Find the NFIT in the ACPI table.
+  //
+  Status = EFI_SUCCESS;
+  TableIndex = 0;
+
+  while (!EFI_ERROR (Status)) {
+    Status = mAcpiSdtProtocol->GetAcpiTable (
+                                 TableIndex,
+                                 (EFI_ACPI_SDT_HEADER **)&TableHeader,
+                                 &TableVersion,
+                                 &TableKey
+                                 );
+    if (!EFI_ERROR (Status)) {
+      TableIndex++;
+
+      if (((EFI_ACPI_SDT_HEADER *)TableHeader)->Signature ==
+          EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE_STRUCTURE_SIGNATURE) {
+        break;
+      }
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    //
+    // No NFIT is found in the ACPI table.
+    //
+    return EFI_NOT_FOUND;
+  }
+
+  NewNfitLen    = ((EFI_ACPI_DESCRIPTION_HEADER *)TableHeader)->Length -
+                  sizeof (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE);
+
+  //
+  // After removing this RAM disk from the NFIT, if no other structure is in
+  // the NFIT, we just remove the NFIT and the SSDT which is used to report
+  // the NVDIMM root device.
+  //
+  if (NewNfitLen == sizeof (EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE)) {
+    //
+    // Remove the NFIT.
+    //
+    Status = mAcpiTableProtocol->UninstallAcpiTable (
+                                   mAcpiTableProtocol,
+                                   TableKey
+                                   );
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Remove the SSDT which is used by RamDiskDxe driver to report the NVDIMM
+    // root device.
+    // We do not care the return status since this SSDT might already be
+    // uninstalled by other drivers to update the information of the NVDIMM
+    // root device.
+    //
+    if (mRamDiskSsdtTableKeyValid) {
+      mRamDiskSsdtTableKeyValid = FALSE;
+
+      mAcpiTableProtocol->UninstallAcpiTable (
+                            mAcpiTableProtocol,
+                            mRamDiskSsdtTableKey
+                            );
+    }
+
+    return EFI_SUCCESS;
+  }
+
+  NewNfit = AllocateZeroPool (NewNfitLen);
+  if (NewNfit == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Get a copy of the old NFIT header content.
+  //
+  CopyMem (NewNfit, TableHeader, sizeof (EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE));
+  NewNfitHeader           = (EFI_ACPI_DESCRIPTION_HEADER *)NewNfit;
+  NewNfitHeader->Length   = NewNfitLen;
+  NewNfitHeader->Checksum = 0;
+
+  //
+  // Copy the content of required NFIT structures.
+  //
+  NewNfitPtr       = (UINT8 *)NewNfit + sizeof (EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE);
+  RemainLen        = NewNfitLen - sizeof (EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE);
+  NfitStructHeader = (EFI_ACPI_6_1_NFIT_STRUCTURE_HEADER *)
+                     ((UINT8 *)TableHeader + sizeof (EFI_ACPI_6_1_NVDIMM_FIRMWARE_INTERFACE_TABLE));
+  while (RemainLen > 0) {
+    if ((NfitStructHeader->Type == EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE_TYPE) &&
+        (NfitStructHeader->Length == sizeof (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE))) {
+      SpaRange = (EFI_ACPI_6_1_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE *)NfitStructHeader;
+
+      if ((SpaRange->SystemPhysicalAddressRangeBase == PrivateData->StartingAddr) &&
+          (SpaRange->SystemPhysicalAddressRangeLength == PrivateData->Size) &&
+          (CompareGuid (&SpaRange->AddressRangeTypeGUID, &PrivateData->TypeGuid))) {
+        //
+        // Skip the SPA Range Structure for the RAM disk to be unpublished
+        // from NFIT.
+        //
+        NfitStructHeader = (EFI_ACPI_6_1_NFIT_STRUCTURE_HEADER *)
+                           ((UINT8 *)NfitStructHeader + NfitStructHeader->Length);
+        continue;
+      }
+    }
+
+    //
+    // Copy the content of origin NFIT.
+    //
+    CopyMem (NewNfitPtr, NfitStructHeader, NfitStructHeader->Length);
+    NewNfitPtr = (UINT8 *)NewNfitPtr + NfitStructHeader->Length;
+
+    //
+    // Move to the header of next NFIT structure.
+    //
+    RemainLen       -= NfitStructHeader->Length;
+    NfitStructHeader = (EFI_ACPI_6_1_NFIT_STRUCTURE_HEADER *)
+                       ((UINT8 *)NfitStructHeader + NfitStructHeader->Length);
+  }
+
+  Checksum                = CalculateCheckSum8((UINT8 *)NewNfit, NewNfitHeader->Length);
+  NewNfitHeader->Checksum = Checksum;
+
+  Status = mAcpiTableProtocol->UninstallAcpiTable (
+                                 mAcpiTableProtocol,
+                                 TableKey
+                                 );
+  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    FreePool (NewNfit);
+    return Status;
+  }
+
+  //
+  // Publish the NFIT to the ACPI table.
+  // Note, since the NFIT might be modified by other driver, therefore, we
+  // do not track the returning TableKey from the InstallAcpiTable().
+  //
+  Status = mAcpiTableProtocol->InstallAcpiTable (
+                                 mAcpiTableProtocol,
+                                 NewNfit,
+                                 NewNfitLen,
+                                 &TableKey
+                                 );
+  ASSERT_EFI_ERROR (Status);
+
+  FreePool (NewNfit);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return EFI_SUCCESS;
 }
 
 
@@ -217,6 +700,10 @@ RamDiskRegister (
 
   FreePool (RamDiskDevNode);
 
+  if ((mAcpiTableProtocol != NULL) && (mAcpiSdtProtocol != NULL)) {
+    RamDiskPublishNfit (PrivateData);
+  }
+
   return EFI_SUCCESS;
 
 ErrorExit:
@@ -308,6 +795,13 @@ RamDiskUnregister (
       if ((StartingAddr == PrivateData->StartingAddr) &&
           (EndingAddr == PrivateData->StartingAddr + PrivateData->Size - 1) &&
           (CompareGuid (&RamDiskDevNode->TypeGuid, &PrivateData->TypeGuid))) {
+        //
+        // Remove the content for this RAM disk in NFIT.
+        //
+        if (PrivateData->InNfit) {
+          RamDiskUnpublishNfit (PrivateData);
+        }
+
         //
         // Uninstall the EFI_DEVICE_PATH_PROTOCOL & EFI_BLOCK_IO(2)_PROTOCOL
         //

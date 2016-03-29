@@ -34,6 +34,77 @@ EFI_RAM_DISK_PROTOCOL  mRamDiskProtocol = {
 LIST_ENTRY  RegisteredRamDisks;
 UINTN       ListEntryNum;
 
+//
+// Pointers to the EFI_ACPI_TABLE_PROTOCOL and EFI_ACPI_SDT_PROTOCOL.
+//
+EFI_ACPI_TABLE_PROTOCOL  *mAcpiTableProtocol = NULL;
+EFI_ACPI_SDT_PROTOCOL    *mAcpiSdtProtocol   = NULL;
+
+
+/**
+  Check whether EFI_ACPI_TABLE_PROTOCOL and EFI_ACPI_SDT_PROTOCOL are produced.
+  If both protocols are produced, publish all the reserved memory type RAM
+  disks to the NVDIMM Firmware Interface Table (NFIT).
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    The pointer to the notification function's context,
+                        which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+RamDiskAcpiCheck (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+  )
+{
+  EFI_STATUS                 Status;
+  LIST_ENTRY                 *Entry;
+  RAM_DISK_PRIVATE_DATA      *PrivateData;
+
+  gBS->CloseEvent (Event);
+
+  //
+  // Locate the EFI_ACPI_TABLE_PROTOCOL.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiAcpiTableProtocolGuid,
+                  NULL,
+                  (VOID **)&mAcpiTableProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      EFI_D_INFO,
+      "RamDiskAcpiCheck: Cannot locate the EFI ACPI Table Protocol,",
+      "unable to publish RAM disks to NFIT.\n"
+      ));
+    return;
+  }
+
+  //
+  // Locate the EFI_ACPI_SDT_PROTOCOL.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiAcpiSdtProtocolGuid,
+                  NULL,
+                  (VOID **)&mAcpiSdtProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      EFI_D_INFO,
+      "RamDiskAcpiCheck: Cannot locate the EFI ACPI Sdt Protocol,",
+      "unable to publish RAM disks to NFIT.\n"
+      ));
+    mAcpiTableProtocol = NULL;
+    return;
+  }
+
+  EFI_LIST_FOR_EACH (Entry, &RegisteredRamDisks) {
+    PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
+    RamDiskPublishNfit (PrivateData);
+  }
+}
+
 
 /**
   The entry point for RamDiskDxe driver.
@@ -58,6 +129,7 @@ RamDiskDxeEntryPoint (
   EFI_STATUS                      Status;
   RAM_DISK_CONFIG_PRIVATE_DATA    *ConfigPrivate;
   VOID                            *DummyInterface;
+  EFI_EVENT                       Event;
 
   //
   // If already started, return.
@@ -108,6 +180,14 @@ RamDiskDxeEntryPoint (
   // Initialize the list of registered RAM disks maintained by the driver
   //
   InitializeListHead (&RegisteredRamDisks);
+
+  Status = EfiCreateEventReadyToBootEx (
+             TPL_CALLBACK,
+             RamDiskAcpiCheck,
+             NULL,
+             &Event
+             );
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 

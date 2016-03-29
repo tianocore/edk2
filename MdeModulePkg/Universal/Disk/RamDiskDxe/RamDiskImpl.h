@@ -28,14 +28,19 @@
 #include <Library/FileExplorerLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Protocol/RamDisk.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/BlockIo2.h>
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/SimpleFileSystem.h>
+#include <Protocol/AcpiTable.h>
+#include <Protocol/AcpiSystemDescriptionTable.h>
 #include <Guid/MdeModuleHii.h>
 #include <Guid/RamDiskHii.h>
 #include <Guid/FileInfo.h>
+#include <IndustryStandard/Acpi61.h>
 
 #include "RamDiskNVData.h"
 
@@ -69,6 +74,12 @@ extern  LIST_ENTRY                RegisteredRamDisks;
 extern  UINTN                     ListEntryNum;
 
 //
+// Pointers to the EFI_ACPI_TABLE_PROTOCOL and EFI_ACPI_SDT_PROTOCOL.
+//
+extern  EFI_ACPI_TABLE_PROTOCOL   *mAcpiTableProtocol;
+extern  EFI_ACPI_SDT_PROTOCOL     *mAcpiSdtProtocol;
+
+//
 // RAM Disk create method.
 //
 typedef enum _RAM_DISK_CREATE_METHOD {
@@ -96,6 +107,7 @@ typedef struct {
   EFI_GUID                        TypeGuid;
   UINT16                          InstanceNumber;
   RAM_DISK_CREATE_METHOD          CreateMethod;
+  BOOLEAN                         InNfit;
 
   LIST_ENTRY                      ThisInstance;
 } RAM_DISK_PRIVATE_DATA;
@@ -628,6 +640,22 @@ OpenFileByDevicePath(
   OUT EFI_FILE_HANDLE                       *FileHandle,
   IN UINT64                                 OpenMode,
   IN UINT64                                 Attributes
+  );
+
+
+/**
+  Publish the RAM disk NVDIMM Firmware Interface Table (NFIT) to the ACPI
+  table.
+
+  @param[in] PrivateData          Points to RAM disk private data.
+
+  @retval EFI_SUCCESS             The RAM disk NFIT has been published.
+  @retval others                  The RAM disk NFIT has not been published.
+
+**/
+EFI_STATUS
+RamDiskPublishNfit (
+  IN RAM_DISK_PRIVATE_DATA        *PrivateData
   );
 
 #endif

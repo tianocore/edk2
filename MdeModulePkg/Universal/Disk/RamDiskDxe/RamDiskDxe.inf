@@ -39,6 +39,7 @@
   RamDiskHii.vfr
   RamDiskHiiStrings.uni
   RamDiskNVData.h
+  RamDisk.asl
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -57,6 +58,8 @@
   FileExplorerLib
   DevicePathLib
   PrintLib
+  PcdLib
+  DxeServicesLib
 
 [Guids]
   gEfiIfrTianoGuid                               ## PRODUCES            ## GUID  # HII opcode
@@ -73,6 +76,15 @@
   gEfiBlockIoProtocolGuid                        ## PRODUCES
   gEfiBlockIo2ProtocolGuid                       ## PRODUCES
   gEfiSimpleFileSystemProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiAcpiTableProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiAcpiSdtProtocolGuid                        ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiHiiConfigRoutingProtocolGuid  AND
