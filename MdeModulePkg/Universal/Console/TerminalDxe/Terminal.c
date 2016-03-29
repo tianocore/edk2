@@ -806,7 +806,7 @@ TerminalDriverBindingStart (
     Status = TerminalDevice->SerialIo->SetAttributes (
                                         TerminalDevice->SerialIo,
                                         Mode->BaudRate,
-                                        0, // the device's default FIFO depth
+                                        Mode->ReceiveFifoDepth,
                                         (UINT32) SerialInTimeOut,
                                         (EFI_PARITY_TYPE) (Mode->Parity),
                                         (UINT8) Mode->DataBits,
