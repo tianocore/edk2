@@ -43,6 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverHealth.h>
 #include <Protocol/FormBrowser2.h>
 #include <Protocol/VariableLock.h>
+#include <Protocol/RamDisk.h>
 
 #include <Guid/ZeroGuid.h>
 #include <Guid/MemoryTypeInformation.h>

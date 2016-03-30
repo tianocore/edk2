@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "InternalBm.h"
 
+EFI_RAM_DISK_PROTOCOL                        *mRamDisk                  = NULL;
+
 EFI_BOOT_MANAGER_REFRESH_LEGACY_BOOT_OPTION  mBmRefreshLegacyBootOption = NULL;
 EFI_BOOT_MANAGER_LEGACY_BOOT                 mBmLegacyBoot              = NULL;
 
@@ -1095,6 +1097,7 @@ BmMatchHttpBootDevicePath (
   @param LoadFileHandle The handle of LoadFile instance.
   @param FullPath       Return the full device path pointing to the load option.
   @param FileSize       Return the size of the load option.
+  @param RamDiskHandle  Return the RAM Disk handle.
 
   @return  The load option buffer.
 **/
@@ -1102,7 +1105,8 @@ VOID *
 BmGetFileBufferFromLoadFileSystem (
   IN  EFI_HANDLE                      LoadFileHandle,
   OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
-  OUT UINTN                           *FileSize
+  OUT UINTN                           *FileSize,
+  OUT EFI_HANDLE                      *RamDiskHandle
   )
 {
   EFI_STATUS                      Status;
@@ -1140,13 +1144,127 @@ BmGetFileBufferFromLoadFileSystem (
     FreePool (Handles);
   }
 
-  if (Index != HandleCount) {
+  if (Index == HandleCount) {
+    Handle = NULL;
+  }
+
+  *RamDiskHandle = Handle;
+
+  if (Handle != NULL) {
     return BmExpandMediaDevicePath (DevicePathFromHandle (Handle), FullPath, FileSize);
   } else {
     return NULL;
   }
 }
 
+
+/**
+  Return the RAM Disk device path created by LoadFile.
+
+  @param FilePath  The source file path.
+
+  @return Callee-to-free RAM Disk device path
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+BmGetRamDiskDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL *FilePath
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_DEVICE_PATH_PROTOCOL    *RamDiskDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    *Node;
+  EFI_HANDLE                  Handle;
+
+  Node = FilePath;
+  Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);
+  if (!EFI_ERROR (Status) &&
+      (DevicePathType (Node) == MEDIA_DEVICE_PATH) &&
+      (DevicePathSubType (Node) == MEDIA_RAM_DISK_DP)
+      ) {
+
+    //
+    // Construct the device path pointing to RAM Disk
+    //
+    Node = NextDevicePathNode (Node);
+    RamDiskDevicePath = DuplicateDevicePath (FilePath);
+    ASSERT (RamDiskDevicePath != NULL);
+    SetDevicePathEndNode ((VOID *) ((UINTN) RamDiskDevicePath + ((UINTN) Node - (UINTN) FilePath)));
+    return RamDiskDevicePath;
+  }
+
+  return NULL;
+}
+
+/**
+  Return the buffer and buffer size occupied by the RAM Disk.
+
+  @param RamDiskDevicePath  RAM Disk device path.
+  @param RamDiskSizeInPages Return RAM Disk size in pages.
+
+  @retval RAM Disk buffer.
+**/
+VOID *
+BmGetRamDiskMemoryInfo (
+  IN EFI_DEVICE_PATH_PROTOCOL *RamDiskDevicePath,
+  OUT UINTN                   *RamDiskSizeInPages
+  )
+{
+
+  EFI_STATUS                  Status;
+  EFI_HANDLE                  Handle;
+  UINT64                      StartingAddr;
+  UINT64                      EndingAddr;
+
+  ASSERT (RamDiskDevicePath != NULL);
+
+  *RamDiskSizeInPages = 0;
+
+  //
+  // Get the buffer occupied by RAM Disk.
+  //
+  Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &RamDiskDevicePath, &Handle);
+  ASSERT_EFI_ERROR (Status);
+  ASSERT ((DevicePathType (RamDiskDevicePath) == MEDIA_DEVICE_PATH) &&
+          (DevicePathSubType (RamDiskDevicePath) == MEDIA_RAM_DISK_DP));
+  StartingAddr = ReadUnaligned64 ((UINT64 *) ((MEDIA_RAM_DISK_DEVICE_PATH *) RamDiskDevicePath)->StartingAddr);
+  EndingAddr   = ReadUnaligned64 ((UINT64 *) ((MEDIA_RAM_DISK_DEVICE_PATH *) RamDiskDevicePath)->EndingAddr);
+  *RamDiskSizeInPages = EFI_SIZE_TO_PAGES ((UINTN) (EndingAddr - StartingAddr + 1));
+  return (VOID *) (UINTN) StartingAddr;
+}
+
+/**
+  Destroy the RAM Disk.
+
+  The destroy operation includes to call RamDisk.Unregister to
+  unregister the RAM DISK from RAM DISK driver, free the memory
+  allocated for the RAM Disk.
+
+  @param RamDiskDevicePath    RAM Disk device path.
+**/
+VOID
+BmDestroyRamDisk (
+  IN EFI_DEVICE_PATH_PROTOCOL *RamDiskDevicePath
+  )
+{
+  EFI_STATUS                  Status;
+  VOID                        *RamDiskBuffer;
+  UINTN                       RamDiskSizeInPages;
+
+  ASSERT (RamDiskDevicePath != NULL);
+
+  RamDiskBuffer = BmGetRamDiskMemoryInfo (RamDiskDevicePath, &RamDiskSizeInPages);
+
+  //
+  // Destroy RAM Disk.
+  //
+  if (mRamDisk == NULL) {
+    Status = gBS->LocateProtocol (&gEfiRamDiskProtocolGuid, NULL, (VOID *) &mRamDisk);
+    ASSERT_EFI_ERROR (Status);
+  }
+  Status = mRamDisk->Unregister (RamDiskDevicePath);
+  ASSERT_EFI_ERROR (Status);
+  FreePages (RamDiskBuffer, RamDiskSizeInPages);
+}
 
 /**
   Get the file buffer from the specified Load File instance.
@@ -1160,7 +1278,7 @@ BmGetFileBufferFromLoadFileSystem (
 **/
 VOID *
 BmGetFileBufferFromLoadFile (
-  EFI_HANDLE                          LoadFileHandle,
+  IN  EFI_HANDLE                      LoadFileHandle,
   IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath,
   OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
   OUT UINTN                           *FileSize
@@ -1170,6 +1288,7 @@ BmGetFileBufferFromLoadFile (
   EFI_LOAD_FILE_PROTOCOL              *LoadFile;
   VOID                                *FileBuffer;
   BOOLEAN                             LoadFileSystem;
+  EFI_HANDLE                          RamDiskHandle;
   UINTN                               BufferSize;
 
   *FileSize = 0;
@@ -1208,7 +1327,13 @@ BmGetFileBufferFromLoadFile (
   }
 
   if (LoadFileSystem) {
-    FileBuffer = BmGetFileBufferFromLoadFileSystem (LoadFileHandle, FullPath, FileSize);
+    FileBuffer = BmGetFileBufferFromLoadFileSystem (LoadFileHandle, FullPath, FileSize, &RamDiskHandle);
+    if (FileBuffer == NULL) {
+      //
+      // If there is no bootable executable in the populated
+      //
+      BmDestroyRamDisk (DevicePathFromHandle (RamDiskHandle));
+    }
   } else {
     *FileSize = BufferSize;
     *FullPath = DuplicateDevicePath (DevicePathFromHandle (LoadFileHandle));
@@ -1436,6 +1561,7 @@ EfiBootManagerBoot (
   UINTN                     OriginalOptionNumber;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
   EFI_DEVICE_PATH_PROTOCOL  *Node;
+  EFI_DEVICE_PATH_PROTOCOL  *RamDiskDevicePath;
   EFI_HANDLE                FvHandle;
   VOID                      *FileBuffer;
   UINTN                     FileSize;
@@ -1516,10 +1642,14 @@ EfiBootManagerBoot (
   //
   // 5. Load EFI boot option to ImageHandle
   //
-  ImageHandle = NULL;
+  ImageHandle       = NULL;
+  RamDiskDevicePath = NULL;
   if (DevicePathType (BootOption->FilePath) != BBS_DEVICE_PATH) {
     Status     = EFI_NOT_FOUND;
     FileBuffer = BmGetLoadOptionBuffer (BootOption->FilePath, &FilePath, &FileSize);
+    if (FileBuffer != NULL) {
+      RamDiskDevicePath = BmGetRamDiskDevicePath (FilePath);
+    }
     DEBUG_CODE (
       if (FileBuffer != NULL && CompareMem (BootOption->FilePath, FilePath, GetDevicePathSize (FilePath)) != 0) {
         DEBUG ((EFI_D_INFO, "[Bds] DevicePath expand: "));
@@ -1556,6 +1686,13 @@ EfiBootManagerBoot (
         (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR)
         );
       BootOption->Status = Status;
+      //
+      // Destroy the RAM disk
+      //
+      if (RamDiskDevicePath != NULL) {
+        BmDestroyRamDisk (RamDiskDevicePath);
+        FreePool (RamDiskDevicePath);
+      }
       return;
     }
   }
@@ -1650,6 +1787,14 @@ EfiBootManagerBoot (
       );
   }
   PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
+
+  //
+  // Destroy the RAM disk
+  //
+  if (RamDiskDevicePath != NULL) {
+    BmDestroyRamDisk (RamDiskDevicePath);
+    FreePool (RamDiskDevicePath);
+  }
 
   //
   // Clear the Watchdog Timer after the image returns
