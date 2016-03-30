@@ -404,7 +404,9 @@ typedef struct {
   RX_PKT * pFirstFill;
   UINTN   PktCntInQueue;
   UINT8 * pBulkInBuff;
- 
+
+  INT32 Flags;
+
 } NIC_DEVICE;
 
 #define DEV_FROM_SIMPLE_NETWORK(a)  CR (a, NIC_DEVICE, SimpleNetwork, DEV_SIGNATURE)  ///< Locate NIC_DEVICE from Simple Network Protocol
