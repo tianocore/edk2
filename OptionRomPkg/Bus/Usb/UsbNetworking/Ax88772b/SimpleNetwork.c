@@ -700,10 +700,8 @@ SN_ReceiveFilters (
   EFI_SIMPLE_NETWORK_MODE * pMode;
   EFI_STATUS Status = EFI_SUCCESS;   
   EFI_TPL TplPrevious; 
-  NIC_DEVICE * pNicDevice;
 
   TplPrevious = gBS->RaiseTPL(TPL_CALLBACK);
-  pNicDevice = DEV_FROM_SIMPLE_NETWORK ( pSimpleNetwork );
   pMode = pSimpleNetwork->Mode;
 
   if (pSimpleNetwork == NULL) {
