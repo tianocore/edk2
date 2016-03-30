@@ -4,7 +4,7 @@
   It produces BlockIo, BlockIo2 and StorageSecurity protocols to allow upper layer
   access the EMMC device.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -246,7 +246,6 @@ DiscoverAllPartitions (
   )
 {
   EFI_STATUS                        Status;
-  EFI_SD_MMC_PASS_THRU_PROTOCOL     *PassThru;
   EMMC_PARTITION                    *Partition;
   EMMC_CSD                          *Csd;
   EMMC_CID                          *Cid;
@@ -258,7 +257,6 @@ DiscoverAllPartitions (
   UINT32                            SecCount;
   UINT32                            GpSizeMult;
 
-  PassThru = Device->Private->PassThru;
   Slot     = Device->Slot;
 
   Status = EmmcSendStatus (Device, Slot + 1, &DevStatus);
