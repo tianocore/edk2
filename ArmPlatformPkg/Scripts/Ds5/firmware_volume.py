@@ -138,11 +138,10 @@ class EfiSectionPE64:
 
     def get_debug_filepath(self):
         # Offset from dos hdr to PE file hdr (EFI_IMAGE_NT_HEADERS64)
-        #file_header_offset = self.ec.getMemoryService().readMemory32(self.base_pe64 + 0x3C)
-        file_header_offset = 0x0
+        file_header_offset = self.ec.getMemoryService().readMemory32(self.base_pe64 + 0x3C)
 
         # Offset to debug dir in PE hdrs
-        debug_dir_entry_rva = self.ec.getMemoryService().readMemory32(self.base_pe64 + file_header_offset + 0x138)
+        debug_dir_entry_rva = self.ec.getMemoryService().readMemory32(self.base_pe64 + file_header_offset + 0xB8)
         if debug_dir_entry_rva == 0:
             raise Exception("EfiFileSectionPE64","No Debug Directory")
 
