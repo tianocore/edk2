@@ -23,6 +23,7 @@ gEcpSource = "EdkCompatibilityPkg"
 gOptions = None
 gCaseInsensitive = False
 gAllFiles = None
+gCommand = None
 
 gGlobalDefines = {}
 gPlatformDefines = {}

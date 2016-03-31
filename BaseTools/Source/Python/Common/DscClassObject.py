@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of DSC file
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -98,11 +98,10 @@ class Dsc(DscObject):
         self.UserExtensions = ''
         self.WorkspaceDir = WorkspaceDir
         self.IsToDatabase = IsToDatabase
-
-        self.Cur = Database.Cur
-        self.TblFile = Database.TblFile
-        self.TblDsc = Database.TblDsc
-
+        if Database:
+            self.Cur = Database.Cur
+            self.TblFile = Database.TblFile
+            self.TblDsc = Database.TblDsc
 
         self.KeyList = [
             TAB_SKUIDS, TAB_LIBRARIES, TAB_LIBRARY_CLASSES, TAB_BUILD_OPTIONS, TAB_PCDS_FIXED_AT_BUILD_NULL, \
@@ -252,6 +251,12 @@ class Dsc(DscObject):
             Fdf = PlatformFlashDefinitionFileClass()
             Fdf.FilePath = NormPath(QueryDefinesItem(self.TblDsc, TAB_DSC_DEFINES_FLASH_DEFINITION, Arch, self.FileID)[0])
             self.Platform.FlashDefinitionFile = Fdf
+            Prebuild = BuildScriptClass()
+            Prebuild.FilePath = NormPath(QueryDefinesItem(self.TblDsc, TAB_DSC_PREBUILD, Arch, self.FileID)[0])
+            self.Platform.Prebuild = Prebuild
+            Postbuild = BuildScriptClass()
+            Postbuild.FilePath = NormPath(QueryDefinesItem(self.TblDsc, TAB_DSC_POSTBUILD, Arch, self.FileID)[0])
+            self.Platform.Postbuild = Postbuild
 
     ## GenBuildOptions
     #
