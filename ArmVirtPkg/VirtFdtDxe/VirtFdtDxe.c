@@ -317,9 +317,6 @@ InitializeVirtFdtDxe (
     return EFI_NOT_FOUND;
   }
 
-  Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
-  ASSERT_EFI_ERROR (Status);
-
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, DeviceTreeBase));
 
   RtcNode = -1;
@@ -571,39 +568,47 @@ InitializeVirtFdtDxe (
     }
   }
 
-  //
-  // UEFI takes ownership of the RTC hardware, and exposes its functionality
-  // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
-  // need to disable it in the device tree to prevent the OS from attaching its
-  // device driver as well.
-  //
-  if ((RtcNode != -1) &&
-      fdt_setprop_string (DeviceTreeBase, RtcNode, "status",
-        "disabled") != 0) {
-    DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
-  }
+  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
+    //
+    // Only install the FDT as a configuration table if we want to leave it up
+    // to the OS to decide whether it prefers ACPI over DT.
+    //
+    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
+    ASSERT_EFI_ERROR (Status);
 
-  if (HavePci) {
     //
-    // Set the /chosen/linux,pci-probe-only property to 1, so that the PCI
-    // setup we will perform in the firmware is honored by the Linux OS,
-    // rather than torn down and done from scratch. This is generally a more
-    // sensible approach, and aligns with what ACPI based OSes do in general.
+    // UEFI takes ownership of the RTC hardware, and exposes its functionality
+    // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
+    // need to disable it in the device tree to prevent the OS from attaching its
+    // device driver as well.
     //
-    // In case we are exposing an emulated VGA PCI device to the guest, which
-    // may subsequently get exposed via the Graphics Output protocol and
-    // driven as an efifb by Linux, we need this setting to prevent the
-    // framebuffer from becoming unresponsive.
-    //
-    Node = fdt_path_offset (DeviceTreeBase, "/chosen");
-    if (Node < 0) {
-      Node = fdt_add_subnode (DeviceTreeBase, 0, "/chosen");
+    if ((RtcNode != -1) &&
+        fdt_setprop_string (DeviceTreeBase, RtcNode, "status",
+          "disabled") != 0) {
+      DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
     }
-    if (Node < 0 ||
-        fdt_setprop_u32 (DeviceTreeBase, Node, "linux,pci-probe-only", 1) < 0) {
-      DEBUG ((EFI_D_WARN, "Failed to set /chosen/linux,pci-probe-only property\n"));
+
+    if (HavePci) {
+      //
+      // Set the /chosen/linux,pci-probe-only property to 1, so that the PCI
+      // setup we will perform in the firmware is honored by the Linux OS,
+      // rather than torn down and done from scratch. This is generally a more
+      // sensible approach, and aligns with what ACPI based OSes do in general.
+      //
+      // In case we are exposing an emulated VGA PCI device to the guest, which
+      // may subsequently get exposed via the Graphics Output protocol and
+      // driven as an efifb by Linux, we need this setting to prevent the
+      // framebuffer from becoming unresponsive.
+      //
+      Node = fdt_path_offset (DeviceTreeBase, "/chosen");
+      if (Node < 0) {
+        Node = fdt_add_subnode (DeviceTreeBase, 0, "/chosen");
+      }
+      if (Node < 0 ||
+          fdt_setprop_u32 (DeviceTreeBase, Node, "linux,pci-probe-only", 1) < 0) {
+        DEBUG ((EFI_D_WARN, "Failed to set /chosen/linux,pci-probe-only property\n"));
+      }
     }
   }
-
   return EFI_SUCCESS;
 }

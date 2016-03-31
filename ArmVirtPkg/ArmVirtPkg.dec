@@ -98,3 +98,12 @@
   # The default is to turn off the kludge; DSC's can selectively enable it.
   #
   gArmVirtTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|FALSE|BOOLEAN|0x00000006
+
+  #
+  # Pure ACPI boot
+  #
+  # Inhibit installation of the FDT as a configuration table if this feature
+  # PCD is TRUE. Otherwise, the OS is presented with both a DT and an ACPI
+  # description of the platform, and it is up to the OS to choose.
+  #
+  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot|FALSE|BOOLEAN|0x0000000a

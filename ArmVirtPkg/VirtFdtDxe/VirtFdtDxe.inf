@@ -73,6 +73,9 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
 
+[FeaturePcd]
+  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot
+
 [Protocols]
   gEfiDevicePathProtocolGuid
 
