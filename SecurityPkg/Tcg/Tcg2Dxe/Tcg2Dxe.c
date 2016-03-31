@@ -1482,7 +1482,7 @@ SetupEventLog (
   UINT32                          DigestListBinSize;
   UINT32                          EventSize;
   TCG_EfiSpecIDEventStruct        *TcgEfiSpecIdEventStruct;
-  UINT8                           TempBuf[sizeof(TCG_EfiSpecIDEventStruct) + (HASH_COUNT * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8)];
+  UINT8                           TempBuf[sizeof(TCG_EfiSpecIDEventStruct) + sizeof(UINT32) + (HASH_COUNT * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8)];
   TCG_PCR_EVENT_HDR               FirstPcrEvent;
   TCG_EfiSpecIdEventAlgorithmSize *DigestSize;
   TCG_EfiSpecIdEventAlgorithmSize *TempDigestSize;
