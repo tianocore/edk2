@@ -34,6 +34,7 @@
   # -D FLAG=VALUE
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
+  DEFINE PURE_ACPI_BOOT_ENABLE   = FALSE
 
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
@@ -98,6 +99,10 @@
 
   # Activate KVM workaround for now.
   gArmVirtTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|TRUE
+
+!if $(PURE_ACPI_BOOT_ENABLE) == TRUE
+  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot|TRUE
+!endif
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1
