@@ -410,23 +410,6 @@ BmCharToUint (
   IN CHAR16                           Char
   );
 
-
-/**
-  Get the file buffer from the file system produced by Load File instance.
-
-  @param LoadFileHandle The handle of LoadFile instance.
-  @param FullPath       Return the full device path pointing to the load option.
-  @param FileSize       Return the size of the load option.
-
-  @return  The load option buffer.
-**/
-VOID *
-BmGetFileBufferFromLoadFileFileSystem (
-  IN  EFI_HANDLE                      LoadFileHandle,
-  OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
-  OUT UINTN                           *FileSize
-  );
-
 /**
   Return the boot description for the controller.
 
@@ -450,5 +433,23 @@ VOID
 BmMakeBootOptionDescriptionUnique (
   EFI_BOOT_MANAGER_LOAD_OPTION         *BootOptions,
   UINTN                                BootOptionCount
+  );
+
+/**
+  Get the file buffer from the specified Load File instance.
+
+  @param LoadFileHandle The specified Load File instance.
+  @param FilePath       The file path which will pass to LoadFile().
+  @param FullPath       Return the full device path pointing to the load option.
+  @param FileSize       Return the size of the load option.
+
+  @return  The load option buffer or NULL if fails.
+**/
+VOID *
+BmGetFileBufferFromLoadFile (
+  EFI_HANDLE                          LoadFileHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
+  OUT UINTN                           *FileSize
   );
 #endif // _INTERNAL_BM_H_

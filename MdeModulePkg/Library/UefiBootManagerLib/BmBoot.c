@@ -688,7 +688,6 @@ BmExpandUriDevicePath (
   UINTN                           Index;
   UINTN                           HandleCount;
   EFI_HANDLE                      *Handles;
-  EFI_LOAD_FILE_PROTOCOL          *LoadFile;
   VOID                            *FileBuffer;
 
   EfiBootManagerConnectAll ();
@@ -698,37 +697,10 @@ BmExpandUriDevicePath (
     Handles = NULL;
   }
 
-  FileBuffer = NULL;
-
   for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->HandleProtocol (Handles[Index], &gEfiLoadFileProtocolGuid, (VOID *) &LoadFile);
-    ASSERT_EFI_ERROR (Status);
-
-    FileBuffer = NULL;
-    Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, FileSize, FileBuffer);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      FileBuffer = AllocatePool (*FileSize);
-      if (FileBuffer == NULL) {
-        break;
-      }
-      Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, FileSize, FileBuffer);
-    }
-
-    if (!EFI_ERROR (Status)) {
-      //
-      // LoadFile() returns a file buffer mapping to a file system.
-      //
-      if (Status == EFI_WARN_FILE_SYSTEM) {
-        return BmGetFileBufferFromLoadFileFileSystem (Handles[Index], FullPath, FileSize);
-      }
-
-      ASSERT (Status == EFI_SUCCESS);
-      *FullPath = DuplicateDevicePath (DevicePathFromHandle (Handles[Index]));
-      break;
-    }
-
+    FileBuffer = BmGetFileBufferFromLoadFile (Handles[Index], FilePath, FullPath, FileSize);
     if (FileBuffer != NULL) {
-      FreePool (FileBuffer);
+      break;
     }
   }
 
@@ -1127,7 +1099,7 @@ BmMatchHttpBootDevicePath (
   @return  The load option buffer.
 **/
 VOID *
-BmGetFileBufferFromLoadFileFileSystem (
+BmGetFileBufferFromLoadFileSystem (
   IN  EFI_HANDLE                      LoadFileHandle,
   OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
   OUT UINTN                           *FileSize
@@ -1175,8 +1147,78 @@ BmGetFileBufferFromLoadFileFileSystem (
   }
 }
 
+
 /**
-  Get the file buffer from Load File instance.
+  Get the file buffer from the specified Load File instance.
+
+  @param LoadFileHandle The specified Load File instance.
+  @param FilePath       The file path which will pass to LoadFile().
+  @param FullPath       Return the full device path pointing to the load option.
+  @param FileSize       Return the size of the load option.
+
+  @return  The load option buffer or NULL if fails.
+**/
+VOID *
+BmGetFileBufferFromLoadFile (
+  EFI_HANDLE                          LoadFileHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
+  OUT UINTN                           *FileSize
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_LOAD_FILE_PROTOCOL              *LoadFile;
+  VOID                                *FileBuffer;
+  BOOLEAN                             LoadFileSystem;
+  UINTN                               BufferSize;
+
+  *FileSize = 0;
+
+  Status = gBS->OpenProtocol (
+                  LoadFileHandle,
+                  &gEfiLoadFileProtocolGuid,
+                  (VOID **) &LoadFile,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  FileBuffer = NULL;
+  BufferSize = 0;
+  Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
+  if ((Status != EFI_WARN_FILE_SYSTEM) && (Status != EFI_BUFFER_TOO_SMALL)) {
+    return NULL;
+  }
+
+  LoadFileSystem = (BOOLEAN) (Status == EFI_WARN_FILE_SYSTEM);
+  FileBuffer = LoadFileSystem ? AllocateReservedPages (EFI_SIZE_TO_PAGES (BufferSize)) : AllocatePool (BufferSize);
+  if (FileBuffer == NULL) {
+    return NULL;
+  }
+
+  Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
+  if (EFI_ERROR (Status)) {
+    if (LoadFileSystem) {
+      FreePages (FileBuffer, EFI_SIZE_TO_PAGES (BufferSize));
+    } else {
+      FreePool (FileBuffer);
+    }
+    return NULL;
+  }
+
+  if (LoadFileSystem) {
+    FileBuffer = BmGetFileBufferFromLoadFileSystem (LoadFileHandle, FullPath, FileSize);
+  } else {
+    *FileSize = BufferSize;
+    *FullPath = DuplicateDevicePath (DevicePathFromHandle (LoadFileHandle));
+  }
+
+  return FileBuffer;
+}
+
+/**
+  Get the file buffer from all the Load File instances.
 
   @param FilePath    The media device path pointing to a LoadFile instance.
   @param FullPath    Return the full device path pointing to the load option.
@@ -1185,7 +1227,7 @@ BmGetFileBufferFromLoadFileFileSystem (
   @return  The load option buffer.
 **/
 VOID *
-BmGetFileBufferFromLoadFile (
+BmGetFileBufferFromLoadFiles (
   IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath,
   OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
   OUT UINTN                           *FileSize
@@ -1193,13 +1235,10 @@ BmGetFileBufferFromLoadFile (
 {
   EFI_STATUS                      Status;
   EFI_HANDLE                      Handle;
-  VOID                            *FileBuffer;
   EFI_HANDLE                      *Handles;
   UINTN                           HandleCount;
   UINTN                           Index;
   EFI_DEVICE_PATH_PROTOCOL        *Node;
-  EFI_LOAD_FILE_PROTOCOL          *LoadFile;
-  UINTN                           BufferSize;
 
   //
   // Get file buffer from load file instance.
@@ -1244,41 +1283,7 @@ BmGetFileBufferFromLoadFile (
     return NULL;
   }
 
-  Status = gBS->HandleProtocol (Handle, &gEfiLoadFileProtocolGuid, (VOID **) &LoadFile);
-  ASSERT_EFI_ERROR (Status);
-
-  BufferSize = 0;
-  FileBuffer = NULL;
-  Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    FileBuffer = AllocatePool (BufferSize);
-    if (FileBuffer != NULL) {
-      Status = EFI_SUCCESS;
-    }
-  }
-
-  if (!EFI_ERROR (Status)) {
-    Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
-  }
-
-  if (!EFI_ERROR (Status)) {
-    //
-    // LoadFile() returns a file buffer mapping to a file system.
-    //
-    if (Status == EFI_WARN_FILE_SYSTEM) {
-      return BmGetFileBufferFromLoadFileFileSystem (Handle, FullPath, FileSize);
-    }
-
-    ASSERT (Status == EFI_SUCCESS);
-    //
-    // LoadFile () may cause the device path of the Handle be updated.
-    //
-    *FullPath = DuplicateDevicePath (DevicePathFromHandle (Handle));
-    *FileSize = BufferSize;
-    return FileBuffer;
-  } else {
-    return NULL;
-  }
+  return BmGetFileBufferFromLoadFile (Handle, FilePath, FullPath, FileSize);
 }
 
 /**
@@ -1394,7 +1399,7 @@ BmGetLoadOptionBuffer (
     return FileBuffer;
   }
 
-  return BmGetFileBufferFromLoadFile (FilePath, FullPath, FileSize);
+  return BmGetFileBufferFromLoadFiles (FilePath, FullPath, FileSize);
 }
 
 /**
