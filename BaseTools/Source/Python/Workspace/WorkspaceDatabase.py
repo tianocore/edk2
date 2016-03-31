@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -137,6 +137,8 @@ class DscBuildData(PlatformBuildClassObject):
         self._PcdInfoFlag       = None
         self._VarCheckFlag = None
         self._FlashDefinition   = None
+        self._Prebuild          = None
+        self._Postbuild         = None
         self._BuildNumber       = None
         self._MakefileName      = None
         self._BsBaseAddress     = None
@@ -227,6 +229,10 @@ class DscBuildData(PlatformBuildClassObject):
                 if ErrorCode != 0:
                     EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=Record[-1],
                                     ExtraData=ErrorInfo)
+            elif Name == TAB_DSC_PREBUILD:
+                self._Prebuild = PathClass(NormPath(Record[2], self._Macros), GlobalData.gWorkspace)
+            elif Name == TAB_DSC_POSTBUILD:
+                self._Postbuild = PathClass(NormPath(Record[2], self._Macros), GlobalData.gWorkspace)
             elif Name == TAB_DSC_DEFINES_SUPPORTED_ARCHITECTURES:
                 self._SupArchList = GetSplitValueList(Record[2], TAB_VALUE_SPLIT)
             elif Name == TAB_DSC_DEFINES_BUILD_TARGETS:
@@ -398,6 +404,22 @@ class DscBuildData(PlatformBuildClassObject):
             if self._FlashDefinition == None:
                 self._FlashDefinition = ''
         return self._FlashDefinition
+
+    def _GetPrebuild(self):
+        if self._Prebuild == None:
+            if self._Header == None:
+                self._GetHeaderInfo()
+            if self._Prebuild == None:
+                self._Prebuild = ''
+        return self._Prebuild
+
+    def _GetPostbuild(self):
+        if self._Postbuild == None:
+            if self._Header == None:
+                self._GetHeaderInfo()
+            if self._Postbuild == None:
+                self._Postbuild = ''
+        return self._Postbuild
 
     ## Retrieve FLASH_DEFINITION
     def _GetBuildNumber(self):
@@ -1207,6 +1229,8 @@ class DscBuildData(PlatformBuildClassObject):
     PcdInfoFlag         = property(_GetPcdInfoFlag)
     VarCheckFlag = property(_GetVarCheckFlag)
     FlashDefinition     = property(_GetFdfFile)
+    Prebuild            = property(_GetPrebuild)
+    Postbuild           = property(_GetPostbuild)
     BuildNumber         = property(_GetBuildNumber)
     MakefileName        = property(_GetMakefileName)
     BsBaseAddress       = property(_GetBsBaseAddress)
@@ -2978,6 +3002,13 @@ determine whether database file is out of date!\n")
             if Platform != None:
                 PlatformList.append(Platform)
         return PlatformList
+
+    def _MapPlatform(self, Dscfile):
+        try:
+            Platform = self.BuildObject[PathClass(Dscfile), 'COMMON']
+        except:
+            Platform = None
+        return Platform
 
     PlatformList = property(_GetPlatformList)
 

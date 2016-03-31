@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define a class object to describe a platform
 #
-# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -80,6 +80,24 @@ class PlatformHeaderClass(IdentificationClass, CommonHeaderClass, DefineClass):
 # @var FilePath:   To store value for FilePath
 #
 class PlatformFlashDefinitionFileClass(object):
+    def __init__(self):
+        self.Id = ''
+        self.UiName = ''
+        self.Preferred = False
+        self.FilePath = ''
+
+## BuildScriptClass
+#
+# This class defined PREBUILD/POSTBUILD item used in platform file
+#
+# @param object:   Inherited from object class
+#
+# @var Id:         To store value for Id
+# @var UiName:     To store value for UiName
+# @var Preferred:  To store value for Preferred
+# @var FilePath:   To store value for FilePath
+#
+class BuildScriptClass(object):
     def __init__(self):
         self.Id = ''
         self.UiName = ''
@@ -401,6 +419,10 @@ class PlatformModuleClasses(IncludeStatementClass):
 #                                   PlatformModuleClasses
 # @var FlashDefinitionFile:         To store value for FlashDefinitionFile, it is a structure as
 #                                   PlatformFlashDefinitionFileClass
+# @var Prebuild:                    To store value for PREBUILD, it is a structure as
+#                                   BuildScriptClass
+# @var Postbuild:                   To store value for POSTBUILD, it is a structure as
+#                                   BuildScriptClass
 # @var BuildOptions:                To store value for BuildOptions, it is a structure as
 #                                   PlatformBuildOptionClasses
 # @var DynamicPcdBuildDefinitions:  To store value for DynamicPcdBuildDefinitions, it is a list structure as
@@ -418,6 +440,8 @@ class PlatformClass(object):
         self.LibraryClasses = PlatformLibraryClasses()
         self.Modules = PlatformModuleClasses()
         self.FlashDefinitionFile = PlatformFlashDefinitionFileClass()
+        self.Prebuild = BuildScriptClass()
+        self.Postbuild = BuildScriptClass()
         self.BuildOptions = PlatformBuildOptionClasses()
         self.DynamicPcdBuildDefinitions = []
         self.Fdf = []

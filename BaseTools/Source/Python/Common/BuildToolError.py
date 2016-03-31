@@ -1,7 +1,7 @@
 ## @file
 # Standardized Error Hanlding infrastructures.
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -78,6 +78,8 @@ BUILD_ERROR = 0xF002
 GENFDS_ERROR = 0xF003
 ECC_ERROR = 0xF004
 EOT_ERROR = 0xF005
+PREBUILD_ERROR = 0xF007
+POSTBUILD_ERROR = 0xF008
 DDC_ERROR = 0xF009
 WARNING_AS_ERROR = 0xF006
 MIGRATION_ERROR = 0xF010

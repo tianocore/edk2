@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse meta files
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -831,7 +831,9 @@ class DscParser(MetaFileParser):
         "ISO_LANGUAGES",
         "TIME_STAMP_FILE",
         "VPD_TOOL_GUID",
-        "FIX_LOAD_TOP_MEMORY_ADDRESS"
+        "FIX_LOAD_TOP_MEMORY_ADDRESS",
+        "PREBUILD",
+        "POSTBUILD"
     ]
 
     SubSectionDefineKeywords = [
