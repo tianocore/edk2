@@ -1,7 +1,7 @@
 /** @file
   function declarations for shell environment functions.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,11 @@
 
 #define INIT_NAME_BUFFER_SIZE  128
 #define INIT_DATA_BUFFER_SIZE  1024
+
+//
+// The list is used to cache the environment variables.
+//
+ENV_VAR_LIST                   gShellEnvVarList;
 
 /**
   Reports whether an environment variable is Volatile or Non-Volatile.
@@ -379,3 +384,176 @@ SetEnvironmentVariables(
   //
   return (SetEnvironmentVariableList(&VarList->Link));
 }
+
+/**
+  Find an environment variable in the gShellEnvVarList.
+
+  @param Key        The name of the environment variable.
+  @param Value      The value of the environment variable, the buffer
+                    shoule be freed by the caller.
+  @param ValueSize  The size in bytes of the environment variable
+                    including the tailing CHAR_NELL.
+  @param Atts       The attributes of the variable.
+
+  @retval EFI_SUCCESS       The command executed successfully.
+  @retval EFI_NOT_FOUND     The environment variable is not found in
+                            gShellEnvVarList.
+
+**/
+EFI_STATUS
+ShellFindEnvVarInList (
+  IN  CONST CHAR16    *Key,
+  OUT CHAR16          **Value,
+  OUT UINTN           *ValueSize,
+  OUT UINT32          *Atts OPTIONAL
+  )
+{
+  ENV_VAR_LIST      *Node;
+  
+  if (Key == NULL || Value == NULL || ValueSize == NULL) {
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  for ( Node = (ENV_VAR_LIST*)GetFirstNode(&gShellEnvVarList.Link)
+      ; !IsNull(&gShellEnvVarList.Link, &Node->Link)
+      ; Node = (ENV_VAR_LIST*)GetNextNode(&gShellEnvVarList.Link, &Node->Link)
+     ){
+    if (Node->Key != NULL && StrCmp(Key, Node->Key) == 0) {
+      *Value      = AllocateCopyPool(StrSize(Node->Val), Node->Val);
+      *ValueSize  = StrSize(Node->Val);
+      if (Atts != NULL) {
+        *Atts = Node->Atts;
+      }
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Add an environment variable into gShellEnvVarList.
+
+  @param Key        The name of the environment variable.
+  @param Value      The value of environment variable.
+  @param ValueSize  The size in bytes of the environment variable
+                    including the tailing CHAR_NULL
+  @param Atts       The attributes of the variable.
+
+**/
+VOID
+ShellAddEnvVarToList (
+  IN CONST CHAR16     *Key,
+  IN CONST CHAR16     *Value,
+  IN UINTN            ValueSize,
+  IN UINT32           Atts
+  )
+{
+  ENV_VAR_LIST      *Node;
+  
+  if (Key == NULL || Value == NULL || ValueSize == 0) {
+    return;
+  }
+
+  //
+  // Update the variable value if it exists in gShellEnvVarList.
+  //
+  for ( Node = (ENV_VAR_LIST*)GetFirstNode(&gShellEnvVarList.Link)
+      ; !IsNull(&gShellEnvVarList.Link, &Node->Link)
+      ; Node = (ENV_VAR_LIST*)GetNextNode(&gShellEnvVarList.Link, &Node->Link)
+     ){
+    if (Node->Key != NULL && StrCmp(Key, Node->Key) == 0) {
+      Node->Atts = Atts;
+      SHELL_FREE_NON_NULL(Node->Val);
+      Node->Val  = AllocateZeroPool (ValueSize);
+      ASSERT (Node->Val != NULL);
+      CopyMem(Node->Val, Value, ValueSize);
+      return;
+    }
+  }
+
+  //
+  // If the environment varialbe key doesn't exist in list just insert
+  // a new node.
+  //
+  Node = (ENV_VAR_LIST*)AllocateZeroPool (sizeof(ENV_VAR_LIST));
+  ASSERT (Node != NULL);
+  Node->Key = AllocateCopyPool(StrSize(Key), Key);
+  ASSERT (Node->Key != NULL);
+  Node->Val = AllocateCopyPool(ValueSize, Value);
+  ASSERT (Node->Val != NULL);
+  Node->Atts = Atts;
+  InsertTailList(&gShellEnvVarList.Link, &Node->Link);
+
+  return;
+}
+
+/**
+  Remove a specified environment variable in gShellEnvVarList.
+
+  @param Key        The name of the environment variable.
+  
+  @retval EFI_SUCCESS       The command executed successfully.
+  @retval EFI_NOT_FOUND     The environment variable is not found in
+                            gShellEnvVarList.
+**/
+EFI_STATUS
+ShellRemvoeEnvVarFromList (
+  IN CONST CHAR16           *Key
+  )
+{
+  ENV_VAR_LIST      *Node;
+
+  if (Key == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for ( Node = (ENV_VAR_LIST*)GetFirstNode(&gShellEnvVarList.Link)
+      ; !IsNull(&gShellEnvVarList.Link, &Node->Link)
+      ; Node = (ENV_VAR_LIST*)GetNextNode(&gShellEnvVarList.Link, &Node->Link)
+     ){
+    if (Node->Key != NULL && StrCmp(Key, Node->Key) == 0) {
+      SHELL_FREE_NON_NULL(Node->Key);
+      SHELL_FREE_NON_NULL(Node->Val);
+      RemoveEntryList(&Node->Link);
+      SHELL_FREE_NON_NULL(Node);
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Initialize the gShellEnvVarList and cache all Shell-Guid-based environment
+  variables.
+  
+**/
+EFI_STATUS
+ShellInitEnvVarList (
+  VOID
+  )
+{
+  EFI_STATUS    Status;
+
+  InitializeListHead(&gShellEnvVarList.Link);
+  Status = GetEnvironmentVariableList (&gShellEnvVarList.Link);
+
+  return Status;
+}
+
+/**
+  Destructe the gShellEnvVarList.
+
+**/
+VOID
+ShellFreeEnvVarList (
+  VOID
+  )
+{
+  FreeEnvironmentVariableList (&gShellEnvVarList.Link);
+  InitializeListHead(&gShellEnvVarList.Link);
+
+  return;
+}
+

@@ -6,7 +6,7 @@
 //#include <Library/UefiRuntimeServicesTableLib.h>
 
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,12 @@ typedef struct {
   CHAR16      *Val;
   UINT32      Atts;
 } ENV_VAR_LIST;
+
+//
+// The list is used to cache the environment variables.
+//
+extern ENV_VAR_LIST    gShellEnvVarList;
+
 
 /**
   Reports whether an environment variable is Volatile or Non-Volatile
@@ -204,6 +210,80 @@ VOID
 EFIAPI
 FreeEnvironmentVariableList(
   IN LIST_ENTRY *List
+  );
+
+/**
+  Find an environment variable in the gShellEnvVarList.
+
+  @param Key        The name of the environment variable.
+  @param Value      The value of the environment variable, the buffer
+                    shoule be freed by the caller.
+  @param ValueSize  The size in bytes of the environment variable
+                    including the tailing CHAR_NULL.
+  @param Atts       The attributes of the variable.
+
+  @retval EFI_SUCCESS       The command executed successfully.
+  @retval EFI_NOT_FOUND     The environment variable is not found in
+                            gShellEnvVarList.
+
+**/
+EFI_STATUS
+ShellFindEnvVarInList (
+  IN  CONST CHAR16    *Key,
+  OUT CHAR16          **Value,
+  OUT UINTN           *ValueSize,
+  OUT UINT32          *Atts OPTIONAL
+  );
+
+/**
+  Add an environment variable into gShellEnvVarList.
+
+  @param Key        The name of the environment variable.
+  @param Value      The value of environment variable.
+  @param ValueSize  The size in bytes of the environment variable
+                    including the tailing CHAR_NELL
+  @param Atts       The attributes of the variable.
+
+**/
+VOID
+ShellAddEnvVarToList (
+  IN CONST CHAR16     *Key,
+  IN CONST CHAR16     *Value,
+  IN UINTN            ValueSize,
+  IN UINT32           Atts
+  );
+
+/**
+  Remove a specified environment variable in gShellEnvVarList.
+
+  @param Key        The name of the environment variable.
+
+  @retval EFI_SUCCESS       The command executed successfully.
+  @retval EFI_NOT_FOUND     The environment variable is not found in
+                            gShellEnvVarList.
+**/
+EFI_STATUS
+ShellRemvoeEnvVarFromList (
+  IN CONST CHAR16           *Key
+  );
+
+/**
+  Initialize the gShellEnvVarList and cache all Shell-Guid-based environment 
+  variables.
+  
+**/
+EFI_STATUS
+ShellInitEnvVarList (
+  VOID
+  );
+
+/**
+  Destructe the gShellEnvVarList.
+
+**/
+VOID
+ShellFreeEnvVarList (
+  VOID
   );
 
 #endif //_SHELL_ENVIRONMENT_VARIABLE_HEADER_
