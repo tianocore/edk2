@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1792,7 +1792,6 @@ PciParseBar (
       PciIoDevice->PciBar[BarIndex].BarType = (PCI_BAR_TYPE) 0;
     }
 
-    PciIoDevice->PciBar[BarIndex].Prefetchable  = FALSE;
     PciIoDevice->PciBar[BarIndex].BaseAddress   = OriginalValue & Mask;
 
   } else {

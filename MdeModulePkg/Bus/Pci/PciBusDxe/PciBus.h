@@ -1,7 +1,7 @@
 /** @file
   Header files and data structures needed by PCI Bus module.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -102,8 +102,6 @@ struct _PCI_BAR {
   UINT64        Length;
   UINT64        Alignment;
   PCI_BAR_TYPE  BarType;
-  BOOLEAN       Prefetchable;
-  UINT8         MemType;
   UINT16        Offset;
 };
 
