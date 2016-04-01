@@ -975,3 +975,6 @@
                                                                                      "TRUE  - Use the optimized timing for best PS2 detection performance.<BR>\n"
                                                                                      "FALSE - Use the normal timing to detect PS2.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSdMmcPciHostControllerMmioBase_PROMPT  #language en-US "Mmio base address of pci-based SD/MMC host controller"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSdMmcPciHostControllerMmioBase_HELP  #language en-US "This PCD specifies the PCI-based SD/MMC host controller mmio base address. Define the mmio base address of the pci-based SD/MMC host controller. If there are multiple SD/MMC host controllers, their mmio base addresses are calculated one by one from this base address.<BR>"
