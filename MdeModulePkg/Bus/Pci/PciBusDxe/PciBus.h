@@ -307,7 +307,7 @@ struct _PCI_IO_DEVICE {
 //
 // Global Variables
 //
-extern EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL *gEfiIncompatiblePciDeviceSupport;
+extern EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL *gIncompatiblePciDeviceSupport;
 extern EFI_DRIVER_BINDING_PROTOCOL                  gPciBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL                  gPciBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL                 gPciBusComponentName2;

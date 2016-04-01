@@ -1344,7 +1344,7 @@ UpdatePciInfo (
   Configuration = NULL;
   Status        = EFI_SUCCESS;
 
-  if (gEfiIncompatiblePciDeviceSupport == NULL) {
+  if (gIncompatiblePciDeviceSupport == NULL) {
     //
     // It can only be supported after the Incompatible PCI Device
     // Support Protocol has been installed
@@ -1352,7 +1352,7 @@ UpdatePciInfo (
     Status = gBS->LocateProtocol (
                     &gEfiIncompatiblePciDeviceSupportProtocolGuid,
                     NULL,
-                    (VOID **) &gEfiIncompatiblePciDeviceSupport
+                    (VOID **) &gIncompatiblePciDeviceSupport
                     );
   }
   if (Status == EFI_SUCCESS) {
@@ -1360,15 +1360,15 @@ UpdatePciInfo (
       // Check whether the device belongs to incompatible devices from protocol or not
       // If it is , then get its special requirement in the ACPI table
       //
-      Status = gEfiIncompatiblePciDeviceSupport->CheckDevice (
-                                                   gEfiIncompatiblePciDeviceSupport,
-                                                   PciIoDevice->Pci.Hdr.VendorId,
-                                                   PciIoDevice->Pci.Hdr.DeviceId,
-                                                   PciIoDevice->Pci.Hdr.RevisionID,
-                                                   PciIoDevice->Pci.Device.SubsystemVendorID,
-                                                   PciIoDevice->Pci.Device.SubsystemID,
-                                                   &Configuration
-                                                   );
+      Status = gIncompatiblePciDeviceSupport->CheckDevice (
+                                                gIncompatiblePciDeviceSupport,
+                                                PciIoDevice->Pci.Hdr.VendorId,
+                                                PciIoDevice->Pci.Hdr.DeviceId,
+                                                PciIoDevice->Pci.Hdr.RevisionID,
+                                                PciIoDevice->Pci.Device.SubsystemVendorID,
+                                                PciIoDevice->Pci.Device.SubsystemID,
+                                                &Configuration
+                                                );
 
   }
 
