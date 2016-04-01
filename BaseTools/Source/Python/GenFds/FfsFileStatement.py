@@ -45,6 +45,7 @@ class FileStatement (FileStatementClassObject) :
         self.CurrentLineContent = None
         self.FileName = None
         self.InfFileName = None
+        self.SubAlignment = None
 
     ## GenFfs() method
     #
@@ -94,8 +95,10 @@ class FileStatement (FileStatementClassObject) :
 
         elif self.FileName != None:
             if hasattr(self, 'FvFileType') and self.FvFileType == 'RAW':
-                if isinstance(self.FileName, list) and isinstance(self.Alignment, list) and len(self.FileName) == len(self.Alignment):
+                if isinstance(self.FileName, list) and isinstance(self.SubAlignment, list) and len(self.FileName) == len(self.SubAlignment):
                     FileContent = ''
+                    MaxAlignIndex = 0
+                    MaxAlignValue = 1
                     for Index, File in enumerate(self.FileName):
                         try:
                             f = open(File, 'r+b')
@@ -103,9 +106,12 @@ class FileStatement (FileStatementClassObject) :
                             GenFdsGlobalVariable.ErrorLogger("Error opening RAW file %s." % (File))
                         Content = f.read()
                         f.close()
-                        AlignValue = self.Alignment[Index]
-                        if AlignValue == None:
-                            AlignValue = 1
+                        AlignValue = 1
+                        if self.SubAlignment[Index] != None:
+                            AlignValue = GenFdsGlobalVariable.GetAlignment(self.SubAlignment[Index])
+                        if AlignValue > MaxAlignValue:
+                            MaxAlignIndex = Index
+                            MaxAlignValue = AlignValue
                         FileContent += Content
                         if len(FileContent) % AlignValue != 0:
                             Size = AlignValue - len(FileContent) % AlignValue
@@ -116,10 +122,14 @@ class FileStatement (FileStatementClassObject) :
                         OutputRAWFile = os.path.join(GenFdsGlobalVariable.FfsDir, self.NameGuid, self.NameGuid + '.raw')
                         SaveFileOnChange(OutputRAWFile, FileContent, True)
                         self.FileName = OutputRAWFile
-                        if max(self.Alignment):
-                            self.Alignment = str(max(self.Alignment))
-                        else:
-                            self.Alignment = None
+                        self.SubAlignment = self.SubAlignment[MaxAlignIndex]
+
+                if self.Alignment and self.SubAlignment:
+                    if GenFdsGlobalVariable.GetAlignment (self.Alignment) < GenFdsGlobalVariable.GetAlignment (self.SubAlignment):
+                        self.Alignment = self.SubAlignment
+                elif self.SubAlignment:
+                    self.Alignment = self.SubAlignment
+
             self.FileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)
             #Replace $(SAPCE) with real space
             self.FileName = self.FileName.replace('$(SPACE)', ' ')

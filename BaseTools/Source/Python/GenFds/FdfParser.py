@@ -2716,14 +2716,13 @@ class FdfParser:
     #
     def __GetRAWData(self, FfsFileObj, MacroDict = {}):
         FfsFileObj.FileName = []
-        FfsFileObj.Alignment = []
-        AlignDict = {"Auto":1, "8":8, "16":16, "32":32, "64":64, "128":128, "512":512, "1K":1024, "4K":4096, "32K":32768, "64K":65536}
+        FfsFileObj.SubAlignment = []
         while True:
             AlignValue = None
             if self.__GetAlignment():
                 if self.__Token not in ("Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K" ,"64K"):
                     raise Warning("Incorrect alignment '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-                AlignValue = AlignValue = AlignDict[self.__Token]
+                AlignValue = self.__Token
             if not self.__GetNextToken():
                 raise Warning("expected Filename value", self.FileName, self.CurrentLineNumber)
 
@@ -2735,14 +2734,14 @@ class FdfParser:
             self.__VerifyFile(FileName)
             File = PathClass(NormPath(FileName), GenFdsGlobalVariable.WorkSpaceDir)
             FfsFileObj.FileName.append(File.Path)
-            FfsFileObj.Alignment.append(AlignValue)
+            FfsFileObj.SubAlignment.append(AlignValue)
 
             if self.__IsToken( "}"):
                 self.__UndoToken()
                 break
 
-        if len(FfsFileObj.Alignment) == 1:
-            FfsFileObj.Alignment = FfsFileObj.Alignment[0]
+        if len(FfsFileObj.SubAlignment) == 1:
+            FfsFileObj.SubAlignment = FfsFileObj.SubAlignment[0]
         if len(FfsFileObj.FileName) == 1:
             FfsFileObj.FileName = FfsFileObj.FileName[0]
 
