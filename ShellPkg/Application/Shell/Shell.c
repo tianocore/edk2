@@ -445,6 +445,8 @@ UefiMain (
     Status = CommandInit();
     ASSERT_EFI_ERROR(Status);
 
+    Status = ShellInitEnvVarList ();
+
     //
     // Check the command line
     //
@@ -701,6 +703,8 @@ FreeResources:
     FreePool(ShellInfoObject.ConsoleInfo);
     DEBUG_CODE(ShellInfoObject.ConsoleInfo = NULL;);
   }
+
+  ShellFreeEnvVarList ();
 
   if (ShellCommandGetExit()) {
     return ((EFI_STATUS)ShellCommandGetExitCode());
