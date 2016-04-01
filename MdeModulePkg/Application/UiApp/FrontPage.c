@@ -856,7 +856,6 @@ UpdateFrontPageStrings (
   UINT8                             StrIndex;
   CHAR16                            *NewString;
   CHAR16                            *FirmwareVersionString;
-  BOOLEAN                           Find[5];
   EFI_STATUS                        Status;
   EFI_STRING_ID                     TokenToUpdate;
   EFI_SMBIOS_HANDLE                 SmbiosHandle;
@@ -866,8 +865,11 @@ UpdateFrontPageStrings (
   SMBIOS_TABLE_TYPE4                *Type4Record;
   SMBIOS_TABLE_TYPE19               *Type19Record;
   EFI_SMBIOS_TABLE_HEADER           *Record;
+  UINT64                            InstalledMemory;
+  BOOLEAN                           FoundCpu;
 
-  ZeroMem (Find, sizeof (Find));
+  InstalledMemory = 0;
+  FoundCpu = 0;
 
   //
   // Update Front Page strings
@@ -877,85 +879,77 @@ UpdateFrontPageStrings (
                   NULL,
                   (VOID **) &Smbios
                   );
-  if (EFI_ERROR (Status)) {
-    return ;
+  if (!EFI_ERROR (Status)) {
+    SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
+    Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
+    while (!EFI_ERROR(Status)) {
+      if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
+        Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
+        StrIndex = Type0Record->BiosVersion;
+        GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length), StrIndex, &NewString);
+        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
+        FirmwareVersionString = (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString);
+        if (*FirmwareVersionString != 0x0000 ) {
+          FreePool (NewString);
+          NewString = (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString);
+          HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        } else {
+          HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+          FreePool (NewString);
+        }
+      }
+
+      if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
+        Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
+        StrIndex = Type1Record->ProductName;
+        GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length), StrIndex, &NewString);
+        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
+        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        FreePool (NewString);
+      }
+
+      if ((Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) && !FoundCpu) {
+        Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
+        //
+        // The information in the record should be only valid when the CPU Socket is populated.
+        //
+        if ((Type4Record->Status & SMBIOS_TYPE4_CPU_SOCKET_POPULATED) == SMBIOS_TYPE4_CPU_SOCKET_POPULATED) {
+          StrIndex = Type4Record->ProcessorVersion;
+          GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type4Record + Type4Record->Hdr.Length), StrIndex, &NewString);
+          TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
+          HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+          FreePool (NewString);
+
+          ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
+          TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
+          HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+          FreePool (NewString);
+
+          FoundCpu = TRUE;
+        }
+      }
+
+      if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
+        Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
+        if (Type19Record->StartingAddress != 0xFFFFFFFF ) {
+          InstalledMemory += RShiftU64(Type19Record->EndingAddress -
+                                       Type19Record->StartingAddress + 1, 10);
+        } else {
+          InstalledMemory += RShiftU64(Type19Record->ExtendedEndingAddress -
+                                       Type19Record->ExtendedStartingAddress + 1, 20);
+        }
+      }
+
+      Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
+    }
+
+    // now update the total installed RAM size
+    ConvertMemorySizeToString ((UINT32)InstalledMemory, &NewString );
+    TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE);
+    HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+    FreePool (NewString);
   }
 
-  SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
-  do {
-    Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
-    if (EFI_ERROR(Status)) {
-      break;
-    }
-
-    if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
-      Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
-      StrIndex = Type0Record->BiosVersion;
-      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length), StrIndex, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
-      FirmwareVersionString = (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString);
-      if (*FirmwareVersionString != 0x0000 ) {
-        FreePool (NewString);
-        NewString = (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      } else {
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-      }
-      Find[0] = TRUE;
-    }  
-
-    if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
-      Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
-      StrIndex = Type1Record->ProductName;
-      GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length), StrIndex, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[1] = TRUE;
-    }
-
-    if ((Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) && !Find[2]) {
-      Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
-      //
-      // The information in the record should be only valid when the CPU Socket is populated. 
-      //
-      if ((Type4Record->Status & SMBIOS_TYPE4_CPU_SOCKET_POPULATED) == SMBIOS_TYPE4_CPU_SOCKET_POPULATED) {
-        StrIndex = Type4Record->ProcessorVersion;
-        GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type4Record + Type4Record->Hdr.Length), StrIndex, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-        Find[2] = TRUE;
-      }
-    }    
-
-    if ((Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) && !Find[3]) {
-      Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
-      //
-      // The information in the record should be only valid when the CPU Socket is populated. 
-      //
-      if ((Type4Record->Status & SMBIOS_TYPE4_CPU_SOCKET_POPULATED) == SMBIOS_TYPE4_CPU_SOCKET_POPULATED) {
-        ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-        FreePool (NewString);
-        Find[3] = TRUE;
-      }
-    } 
-
-    if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
-      Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
-      ConvertMemorySizeToString (
-        (UINT32)(RShiftU64((Type19Record->EndingAddress - Type19Record->StartingAddress + 1), 10)),
-        &NewString
-        );
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[4] = TRUE;  
-    }
-  } while ( !(Find[0] && Find[1] && Find[2] && Find[3] && Find[4]));
   return ;
 }
 
