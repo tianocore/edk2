@@ -1,7 +1,7 @@
 /** @file
   Helper functions for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1195,7 +1195,9 @@ KeyboardHandler (
       // Handle repeat key
       //
       KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, CurKeyCodeBuffer[Index]);
-      ASSERT (KeyDescriptor != NULL);
+      if (KeyDescriptor == NULL) {
+        continue;
+      }
 
       if (KeyDescriptor->Modifier == EFI_NUM_LOCK_MODIFIER || KeyDescriptor->Modifier == EFI_CAPS_LOCK_MODIFIER) {
         //
@@ -1272,8 +1274,9 @@ USBParseKey (
     Dequeue (&UsbKeyboardDevice->UsbKeyQueue, &UsbKey, sizeof (UsbKey));
 
     KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, UsbKey.KeyCode);
-    ASSERT (KeyDescriptor != NULL);
-
+    if (KeyDescriptor == NULL) {
+      continue;
+    }
     if (!UsbKey.Down) {
       //
       // Key is released.
@@ -1513,7 +1516,9 @@ UsbKeyCodeToEfiInputKey (
   // KeyCode must in the range of  [0x4, 0x65] or [0xe0, 0xe7].
   //
   KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, KeyCode);
-  ASSERT (KeyDescriptor != NULL);
+  if (KeyDescriptor == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
 
   if (KeyDescriptor->Modifier == EFI_NS_KEY_MODIFIER) {
     //
