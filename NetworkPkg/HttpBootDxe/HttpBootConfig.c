@@ -554,6 +554,10 @@ HttpBootFormCallback (
     // Get user input URI string
     //
     Uri = HiiGetString (CallbackInfo->RegisteredHandle, Value->string, NULL);
+    ASSERT (Uri != NULL);
+    if (Uri == NULL) {
+      return EFI_UNSUPPORTED;
+    }
 
     //
     // Convert the scheme to all lower case.
