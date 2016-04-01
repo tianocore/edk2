@@ -1416,6 +1416,38 @@ UpdatePciInfo (
         //
         if (CheckBarType (PciIoDevice, (UINT8) BarIndex, PciBarTypeMem)) {
           SetFlag = TRUE;
+
+          //
+          // Ignored if granularity is 0.
+          // Ignored if PCI BAR is I/O or 32-bit memory.
+          // If PCI BAR is 64-bit memory and granularity is 32, then
+          // the PCI BAR resource is allocated below 4GB.
+          // If PCI BAR is 64-bit memory and granularity is 64, then
+          // the PCI BAR resource is allocated above 4GB.
+          //
+          if (PciIoDevice->PciBar[BarIndex].BarType == PciBarTypeMem64) {
+            switch (Ptr->AddrSpaceGranularity) {
+            case 32:
+              PciIoDevice->PciBar[BarIndex].BarType = PciBarTypeMem32;
+            case 64:
+              PciIoDevice->PciBar[BarIndex].BarTypeFixed = TRUE;
+              break;
+            default:
+              break;
+            }
+          }
+
+          if (PciIoDevice->PciBar[BarIndex].BarType == PciBarTypePMem64) {
+            switch (Ptr->AddrSpaceGranularity) {
+            case 32:
+              PciIoDevice->PciBar[BarIndex].BarType = PciBarTypePMem32;
+            case 64:
+              PciIoDevice->PciBar[BarIndex].BarTypeFixed = TRUE;
+              break;
+            default:
+              break;
+            }
+          }
         }
         break;
 
@@ -1760,6 +1792,7 @@ PciParseBar (
     return Offset + 4;
   }
 
+  PciIoDevice->PciBar[BarIndex].BarTypeFixed = FALSE;
   PciIoDevice->PciBar[BarIndex].Offset = (UINT8) Offset;
   if ((Value & 0x01) != 0) {
     //

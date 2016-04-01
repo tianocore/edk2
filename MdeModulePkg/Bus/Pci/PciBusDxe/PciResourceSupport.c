@@ -1072,7 +1072,9 @@ DegradeResource (
           ResourceNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
           NextChildNodeLink = ChildNodeLink->ForwardLink;
 
-          if (ResourceNode->PciDev == PciIoDevice) {
+          if ((ResourceNode->PciDev == PciIoDevice) &&
+              (ResourceNode->Virtual || !PciIoDevice->PciBar[ResourceNode->Bar].BarTypeFixed)
+              ) {
             RemoveEntryList (ChildNodeLink);
             InsertResourceNode (Mem32Node, ResourceNode);
           }
@@ -1086,7 +1088,9 @@ DegradeResource (
           ResourceNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
           NextChildNodeLink = ChildNodeLink->ForwardLink;
 
-          if (ResourceNode->PciDev == PciIoDevice) {
+          if ((ResourceNode->PciDev == PciIoDevice) &&
+              (ResourceNode->Virtual || !PciIoDevice->PciBar[ResourceNode->Bar].BarTypeFixed)
+              ) {
             RemoveEntryList (ChildNodeLink);
             InsertResourceNode (PMem32Node, ResourceNode);
           }
