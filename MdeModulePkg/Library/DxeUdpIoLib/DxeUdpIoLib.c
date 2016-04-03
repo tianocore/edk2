@@ -303,6 +303,7 @@ UdpIoOnDgramRcvdDpc (
   }
 
   RxToken->CallBack (Netbuf, &EndPoint, EFI_SUCCESS, RxToken->Context);
+  return;
 
 Resume:
   if (RxToken->UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
