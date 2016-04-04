@@ -2,7 +2,7 @@
   Load option library functions which relate with creating and processing load options.
 
 Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -775,15 +775,20 @@ BmValidateOption (
   @retval FALSE The variable name is NOT valid.
 **/
 BOOLEAN
-BmIsValidLoadOptionVariableName (
+EFIAPI
+EfiBootManagerIsValidLoadOptionVariableName (
   IN CHAR16                             *VariableName,
-  OUT EFI_BOOT_MANAGER_LOAD_OPTION_TYPE *OptionType,
-  OUT UINT16                            *OptionNumber
+  OUT EFI_BOOT_MANAGER_LOAD_OPTION_TYPE *OptionType   OPTIONAL,
+  OUT UINT16                            *OptionNumber OPTIONAL
   )
 {
   UINTN                             VariableNameLen;
   UINTN                             Index;
   UINTN                             Uint;
+
+  if (VariableName == NULL) {
+    return FALSE;
+  }
 
   VariableNameLen = StrLen (VariableName);
 
@@ -803,14 +808,19 @@ BmIsValidLoadOptionVariableName (
     return FALSE;
   }
 
-  *OptionType = (EFI_BOOT_MANAGER_LOAD_OPTION_TYPE) Index;
-  *OptionNumber = 0;
-  for (Index = VariableNameLen - 4; Index < VariableNameLen; Index++) {
-    Uint = BmCharToUint (VariableName[Index]);
-    if (Uint == -1) {
-      break;
-    } else {
-      *OptionNumber = (UINT16) Uint + *OptionNumber * 0x10;
+  if (OptionType != NULL) {
+    *OptionType = (EFI_BOOT_MANAGER_LOAD_OPTION_TYPE) Index;
+  }
+
+  if (OptionNumber != NULL) {
+    *OptionNumber = 0;
+    for (Index = VariableNameLen - 4; Index < VariableNameLen; Index++) {
+      Uint = BmCharToUint (VariableName[Index]);
+      if (Uint == -1) {
+        break;
+      } else {
+        *OptionNumber = (UINT16) Uint + *OptionNumber * 0x10;
+      }
     }
   }
 
@@ -853,7 +863,7 @@ EfiBootManagerVariableToLoadOptionEx (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!BmIsValidLoadOptionVariableName (VariableName, &OptionType, &OptionNumber)) {
+  if (!EfiBootManagerIsValidLoadOptionVariableName (VariableName, &OptionType, &OptionNumber)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -979,7 +989,7 @@ BmCollectLoadOptions (
 
   if (CompareGuid (Guid, Param->Guid) && (
       Param->OptionType == LoadOptionTypePlatformRecovery &&
-      BmIsValidLoadOptionVariableName (Name, &OptionType, &OptionNumber) &&
+      EfiBootManagerIsValidLoadOptionVariableName (Name, &OptionType, &OptionNumber) &&
       OptionType == LoadOptionTypePlatformRecovery
      )) {
     Status = EfiBootManagerVariableToLoadOptionEx (Name, Guid, &Option);

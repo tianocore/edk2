@@ -2,7 +2,7 @@
   Provide Boot Manager related library APIs.
 
 Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -731,4 +731,25 @@ EFIAPI
 EfiBootManagerProcessLoadOption (
   EFI_BOOT_MANAGER_LOAD_OPTION       *LoadOption
   );
+
+/**
+  Check whether the VariableName is a valid load option variable name
+  and return the load option type and option number.
+
+  @param VariableName The name of the load option variable.
+  @param OptionType   Return the load option type.
+  @param OptionNumber Return the load option number.
+
+  @retval TRUE  The variable name is valid; The load option type and
+                load option number are returned.
+  @retval FALSE The variable name is NOT valid.
+**/
+BOOLEAN
+EFIAPI
+EfiBootManagerIsValidLoadOptionVariableName (
+  IN CHAR16                             *VariableName,
+  OUT EFI_BOOT_MANAGER_LOAD_OPTION_TYPE *OptionType   OPTIONAL,
+  OUT UINT16                            *OptionNumber OPTIONAL
+  );
+
 #endif
