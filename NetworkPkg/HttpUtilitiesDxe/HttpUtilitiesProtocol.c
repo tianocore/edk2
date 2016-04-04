@@ -207,11 +207,6 @@ HttpUtilitiesBuild (
   StrLength = sizeof("\r\n") - 1;
   *NewMessageSize += StrLength;
 
-  //
-  // Final 0 for end flag
-  //
-  *NewMessageSize += 1; 
-
   *NewMessage = AllocateZeroPool (*NewMessageSize);
   if (*NewMessage == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -243,9 +238,7 @@ HttpUtilitiesBuild (
   CopyMem (NewMessagePtr, "\r\n", StrLength);
   NewMessagePtr += StrLength;
 
-  *NewMessagePtr = 0;
-
-  ASSERT (*NewMessageSize == (UINTN)NewMessagePtr - (UINTN)(*NewMessage) + 1);
+  ASSERT (*NewMessageSize == (UINTN)NewMessagePtr - (UINTN)(*NewMessage));
 
   //
   // Free allocated buffer 

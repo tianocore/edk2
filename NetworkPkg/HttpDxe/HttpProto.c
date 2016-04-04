@@ -1462,8 +1462,9 @@ HttpTcpTransmit (
 {
   HTTP_TOKEN_WRAP           *ValueInItem;
   EFI_STATUS                Status;
-  CHAR8                     *RequestStr;
+  CHAR8                     *RequestMsg;
   CHAR8                     *Url;
+  UINTN                     RequestMsgSize;
 
   ValueInItem = (HTTP_TOKEN_WRAP *) Item->Value;
   if (ValueInItem->TcpWrap.IsTxDone) {
@@ -1483,10 +1484,11 @@ HttpTcpTransmit (
   //
   // Create request message.
   //
-  Status = HttpGenRequestString (
+  Status = HttpGenRequestMessage (
                  ValueInItem->HttpToken->Message,
                  Url,
-                 &RequestStr
+                 &RequestMsg,
+                 &RequestMsgSize
                  );
   FreePool (Url);
 
@@ -1500,10 +1502,10 @@ HttpTcpTransmit (
   Status = HttpTransmitTcp (
              ValueInItem->HttpInstance,
              ValueInItem,
-             (UINT8*) RequestStr,
-             AsciiStrLen (RequestStr)
+             (UINT8*) RequestMsg,
+             RequestMsgSize
              );
-  FreePool (RequestStr);
+  FreePool (RequestMsg);
   return Status;
 }
 

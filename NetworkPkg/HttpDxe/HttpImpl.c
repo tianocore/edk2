@@ -240,12 +240,13 @@ EfiHttpRequest (
   HTTP_PROTOCOL                 *HttpInstance;
   BOOLEAN                       Configure;
   BOOLEAN                       ReConfigure;
-  CHAR8                         *RequestStr;
+  CHAR8                         *RequestMsg;
   CHAR8                         *Url;
   UINTN                         UrlLen;
   CHAR16                        *HostNameStr;
   HTTP_TOKEN_WRAP               *Wrap;
   CHAR8                         *FileUrl;
+  UINTN                         RequestMsgSize;
   
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -314,7 +315,7 @@ EfiHttpRequest (
     goto Error1;
   }
 
-  RequestStr = NULL;
+  RequestMsg = NULL;
   HostName   = NULL;
   Status     = HttpUrlGetHostName (Url, UrlParser, &HostName);
   if (EFI_ERROR (Status)) {
@@ -498,7 +499,7 @@ EfiHttpRequest (
     }
   }
 
-  Status = HttpGenRequestString (HttpMsg, FileUrl, &RequestStr);
+  Status = HttpGenRequestMessage (HttpMsg, FileUrl, &RequestMsg, &RequestMsgSize);
 
   if (EFI_ERROR (Status)) {
     goto Error3;
@@ -515,8 +516,8 @@ EfiHttpRequest (
   Status = HttpTransmitTcp (
              HttpInstance,
              Wrap,
-             (UINT8*) RequestStr,
-             AsciiStrLen (RequestStr)
+             (UINT8*) RequestMsg,
+             RequestMsgSize
              );
   if (EFI_ERROR (Status)) {
     goto Error5;    
@@ -534,8 +535,8 @@ Error5:
     NetMapRemoveTail (&HttpInstance->TxTokens, NULL);
 
 Error4:
-  if (RequestStr != NULL) {
-    FreePool (RequestStr);
+  if (RequestMsg != NULL) {
+    FreePool (RequestMsg);
   }  
 
 Error3:
