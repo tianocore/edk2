@@ -1630,12 +1630,20 @@ HttpFreeHeaderFields (
 }
 
 /**
-  Generate HTTP request string.
+  Generate HTTP request message.
 
-  @param[in]   Message            Pointer to storage containing HTTP message data.
+  This function will allocate memory for the whole HTTP message and generate a
+  well formatted HTTP Request message in it, include the Request-Line, header
+  fields and also the message body. It is the caller's responsibility to free
+  the buffer returned in *RequestMsg.
+
+  @param[in]   Message            Pointer to the EFI_HTTP_MESSAGE structure which
+                                  contains the required information to generate
+                                  the HTTP request message.
   @param[in]   Url                The URL of a remote host.
-  @param[out]  RequestString      Pointer to the created HTTP request string.
+  @param[out]  RequestMsg         Pointer to the created HTTP request message.
                                   NULL if any error occured.
+  @param[out]  RequestMsgSize     Size of the RequestMsg (in bytes).
 
   @return EFI_SUCCESS             If HTTP request string was created successfully
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
@@ -1644,10 +1652,11 @@ HttpFreeHeaderFields (
 **/
 EFI_STATUS
 EFIAPI
-HttpGenRequestString (
+HttpGenRequestMessage (
   IN     CONST EFI_HTTP_MESSAGE        *Message,
   IN     CONST CHAR8                   *Url,
-     OUT CHAR8                         **Request
+     OUT CHAR8                         **RequestMsg,
+     OUT UINTN                         *RequestMsgSize
   )
 {
   EFI_STATUS                       Status;
@@ -1664,7 +1673,7 @@ HttpGenRequestString (
 
   ASSERT (Message != NULL);
 
-  *Request = NULL;
+  *RequestMsg = NULL;
   MsgSize = 0;
   Success = FALSE;
   HttpHdr = NULL;
@@ -1727,13 +1736,13 @@ HttpGenRequestString (
             AsciiStrLen (HTTP_VERSION_CRLF_STR) + HttpHdrSize;
 
 
-  *Request = AllocateZeroPool (MsgSize);
-  if (*Request == NULL) {
+  *RequestMsg = AllocateZeroPool (MsgSize);
+  if (*RequestMsg == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
 
-  RequestPtr = *Request;
+  RequestPtr = *RequestMsg;
   //
   // Construct header request
   //
@@ -1793,18 +1802,26 @@ HttpGenRequestString (
   RequestPtr += HttpHdrSize;
 
   //
+  // Construct body
+  //
+  if (Message->Body != NULL) {
+    CopyMem (RequestPtr, Message->Body, Message->BodyLength);
+    RequestPtr += Message->BodyLength;
+  }
+
+  //
   // Done
   //
-  *RequestPtr = 0;
+  (*RequestMsgSize) = (UINTN)(RequestPtr) - (UINTN)(*RequestMsg);
   Success     = TRUE;
 
 Exit:
 
   if (!Success) {
-    if (*Request != NULL) {
-      FreePool (*Request);
+    if (*RequestMsg != NULL) {
+      FreePool (*RequestMsg);
     }
-    *Request = NULL;
+    *RequestMsg = NULL;
     return Status;
   }
 

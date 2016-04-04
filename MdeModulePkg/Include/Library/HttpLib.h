@@ -417,12 +417,20 @@ HttpFreeHeaderFields (
   );
 
 /**
-  Generate HTTP request string.
+  Generate HTTP request message.
 
-  @param[in]   Message            Pointer to storage containing HTTP message data.
+  This function will allocate memory for the whole HTTP message and generate a
+  well formatted HTTP Request message in it, include the Request-Line, header
+  fields and also the message body. It is the caller's responsibility to free
+  the buffer returned in *RequestMsg.
+
+  @param[in]   Message            Pointer to the EFI_HTTP_MESSAGE structure which
+                                  contains the required information to generate
+                                  the HTTP request message.
   @param[in]   Url                The URL of a remote host.
-  @param[out]  RequestString      Pointer to the created HTTP request string.
+  @param[out]  RequestMsg         Pointer to the created HTTP request message.
                                   NULL if any error occured.
+  @param[out]  RequestMsgSize     Size of the RequestMsg (in bytes).
 
   @return EFI_SUCCESS             If HTTP request string was created successfully
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
@@ -431,10 +439,11 @@ HttpFreeHeaderFields (
 **/
 EFI_STATUS
 EFIAPI
-HttpGenRequestString (
+HttpGenRequestMessage (
   IN     CONST EFI_HTTP_MESSAGE        *Message,
   IN     CONST CHAR8                   *Url,
-     OUT CHAR8                         **RequestString
+     OUT CHAR8                         **RequestMsg,
+     OUT UINTN                         *RequestMsgSize
   );
 
 /**
