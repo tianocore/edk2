@@ -1071,8 +1071,6 @@ ActivateLBR (
   if ((DebugCtl & MSR_DEBUG_CTL_LBR) != 0) {
     return ;
   }
-  AsmWriteMsr64 (MSR_LER_FROM_LIP, 0);
-  AsmWriteMsr64 (MSR_LER_TO_LIP, 0);
   DebugCtl |= MSR_DEBUG_CTL_LBR;
   AsmWriteMsr64 (MSR_DEBUG_CTL, DebugCtl);
 }

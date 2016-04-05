@@ -1,7 +1,7 @@
 /** @file
 SMM profile internal header file.
 
-Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -66,9 +66,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define   MSR_DEBUG_CTL_TR           0x40
 #define   MSR_DEBUG_CTL_BTS          0x80
 #define   MSR_DEBUG_CTL_BTINT        0x100
-#define MSR_LASTBRANCH_TOS           0x1C9
-#define MSR_LER_FROM_LIP             0x1DD
-#define MSR_LER_TO_LIP               0x1DE
 #define MSR_DS_AREA                  0x600
 
 typedef struct {
