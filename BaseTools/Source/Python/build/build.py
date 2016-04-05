@@ -1941,7 +1941,7 @@ def MyOptionParser():
     Parser.add_option("--conf", action="store", type="string", dest="ConfDirectory", help="Specify the customized Conf directory.")
     Parser.add_option("--check-usage", action="store_true", dest="CheckUsage", default=False, help="Check usage content of entries listed in INF file.")
     Parser.add_option("--ignore-sources", action="store_true", dest="IgnoreSources", default=False, help="Focus to a binary build and ignore all source files")
-    Parser.add_option("--pcd", action="append", dest="OptionPcd", help="Set PCD value by command line. Format: 'PcdName=Value' ")
+    Parser.add_option("--pcd", action="append", dest="OptionPcd", help="Set PCD value by command line. Format: \"PcdName=Value\" ")
     Parser.add_option("-l", "--cmd-len", action="store", type="int", dest="CommandLength", help="Specify the maximum line length of build command. Default is 4096.")
 
     (Opt, Args) = Parser.parse_args()
