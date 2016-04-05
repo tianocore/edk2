@@ -352,6 +352,8 @@ class WorkspaceAutoGen(AutoGen):
             PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
             if GlobalData.BuildOptionPcd:
                 for i, pcd in enumerate(GlobalData.BuildOptionPcd):
+                    if type(pcd) is tuple:
+                        continue
                     (pcdname, pcdvalue) = pcd.split('=')
                     if not pcdvalue:
                         EdkLogger.error('build', AUTOGEN_ERROR, "No Value specified for the PCD %s." % (pcdname))
