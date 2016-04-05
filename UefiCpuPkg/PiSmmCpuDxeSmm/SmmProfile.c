@@ -966,10 +966,9 @@ CheckFeatureSupported (
       //    BTINT bits in the MSR_DEBUGCTLA MSR.
       // 2. The IA32_DS_AREA MSR can be programmed to point to the DS save area.
       //
-      if ((AsmMsrBitFieldRead64 (MSR_IA32_MISC_ENABLE, 11, 11) == 0) &&
-          (AsmMsrBitFieldRead64 (MSR_IA32_MISC_ENABLE, 12, 12) == 0)) {
+      if (AsmMsrBitFieldRead64 (MSR_IA32_MISC_ENABLE, 11, 11) == 1) {
         //
-        // BTS facilities is supported.
+        // BTS facilities is not supported if MSR_IA32_MISC_ENABLE BIT11 is set.
         //
         mBtsSupported = FALSE;
       }
