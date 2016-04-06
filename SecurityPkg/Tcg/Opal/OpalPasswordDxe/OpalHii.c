@@ -435,12 +435,12 @@ GetDiskNameStringId(
 EFI_STATUS
 EFIAPI
 DriverCallback(
-  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL*   This,
+  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL    *This,
   EFI_BROWSER_ACTION                      Action,
   EFI_QUESTION_ID                         QuestionId,
   UINT8                                   Type,
-  EFI_IFR_TYPE_VALUE*                     Value,
-  EFI_BROWSER_ACTION_REQUEST*             ActionRequest
+  EFI_IFR_TYPE_VALUE                      *Value,
+  EFI_BROWSER_ACTION_REQUEST              *ActionRequest
   )
 {
   HII_KEY    HiiKey;
@@ -448,6 +448,8 @@ DriverCallback(
 
   if (ActionRequest != NULL) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+  } else {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -644,14 +646,13 @@ HiiPsidRevert(
 
   UnicodeStrToAsciiStr(gHiiConfiguration.Psid, (CHAR8*)Psid.Psid);
 
-  OpalDisk = HiiGetOpalDiskCB(gHiiConfiguration.SelectedDiskIndex);
-
-  ZeroMem(&Session, sizeof(Session));
-  Session.Sscp = OpalDisk->Sscp;
-  Session.MediaId = OpalDisk->MediaId;
-  Session.OpalBaseComId = OpalDisk->OpalBaseComId;
-
+  OpalDisk = HiiGetOpalDiskCB (gHiiConfiguration.SelectedDiskIndex);
   if (OpalDisk != NULL) {
+    ZeroMem(&Session, sizeof(Session));
+    Session.Sscp = OpalDisk->Sscp;
+    Session.MediaId = OpalDisk->MediaId;
+    Session.OpalBaseComId = OpalDisk->OpalBaseComId;
+
     Ret = OpalSupportPsidRevert(&Session, Psid.Psid, (UINT32)sizeof(Psid.Psid), OpalDisk->OpalDevicePath);
   }
 
