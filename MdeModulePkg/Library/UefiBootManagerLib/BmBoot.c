@@ -1702,7 +1702,11 @@ EfiBootManagerBoot (
   // 6. Adjust the different type memory page number just before booting
   //    and save the updated info into the variable for next boot to use
   //
-  BmGetRamDiskMemoryInfo (RamDiskDevicePath, &RamDiskSizeInPages);
+  if (RamDiskDevicePath == NULL) {
+    RamDiskSizeInPages = 0;
+  } else {
+    BmGetRamDiskMemoryInfo (RamDiskDevicePath, &RamDiskSizeInPages);
+  }
   BmSetMemoryTypeInformationVariable (
     (BOOLEAN) ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_BOOT),
     RamDiskSizeInPages
