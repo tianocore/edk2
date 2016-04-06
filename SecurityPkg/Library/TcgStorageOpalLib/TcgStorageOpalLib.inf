@@ -45,6 +45,3 @@
 
 [Protocols]
   gEfiStorageSecurityCommandProtocolGuid                         ## CONSUMES
-
-[BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = /Od /GL-
