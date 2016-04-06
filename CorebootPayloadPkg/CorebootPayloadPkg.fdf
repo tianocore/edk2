@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for coreboot. 
 #
-# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -138,11 +138,7 @@ INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
 INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 
-!if $(ARCH) == IA32
-INF RuleOverride = BINARY USE = IA32 FatBinPkg/EnhancedFatDxe/Fat.inf
-!else
-INF RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
-!endif
+INF FatPkg/EnhancedFatDxe/Fat.inf
 
 #
 # Usb Support

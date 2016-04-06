@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for coreboot. 
 #
-# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -326,6 +326,7 @@
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  FatPkg/EnhancedFatDxe/Fat.inf
   DuetPkg/SataControllerDxe/SataControllerDxe.inf  
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf 
