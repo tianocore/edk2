@@ -626,6 +626,7 @@ OpalSavePasswordToSmm (
   @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
 **/
 EFI_STATUS
+EFIAPI
 SmmOpalPasswordHandler (
   IN     EFI_HANDLE                 DispatchHandle,
   IN     CONST VOID                 *RegisterContext,
