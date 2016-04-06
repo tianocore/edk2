@@ -1,7 +1,7 @@
 ## @file
 # This is DUET FDF file with UEFI HII features enabled
 #
-# Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -108,8 +108,7 @@ INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF  DuetPkg/BiosVideoThunkDxe/BiosVideo.inf
 
-  # Binary INF file to support toggle among different CPU architectures.
-INF  RuleOverride=BINARY FatBinPkg/EnhancedFatDxe/Fat.inf
+INF  FatPkg/EnhancedFatDxe/Fat.inf
 
 FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
