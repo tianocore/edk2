@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <uefi.h>
+#include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseMemoryLib.h>

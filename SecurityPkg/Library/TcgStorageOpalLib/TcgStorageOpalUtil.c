@@ -11,7 +11,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-#include <uefi.h>
+#include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TcgStorageOpalLib.h>
@@ -853,8 +853,9 @@ OpalUtilDetermineOwnership(
   TCG_RESULT       Ret;
   OPAL_OWNER_SHIP  Owner;
 
-  NULL_CHECK(Session);
-  NULL_CHECK(Msid);
+  if ((Session == NULL) || (Msid == NULL)) {
+    return OpalOwnershipUnknown;
+  }
 
   Owner = OpalOwnershipUnknown;
   //
