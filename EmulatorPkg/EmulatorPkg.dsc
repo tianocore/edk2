@@ -373,9 +373,7 @@
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
 
-!if $(BUILD_FAT)
   FatPkg/EnhancedFatDxe/Fat.inf
-!endif
 
 !ifndef $(USE_OLD_SHELL)
   ShellPkg/Application/Shell/Shell.inf {
