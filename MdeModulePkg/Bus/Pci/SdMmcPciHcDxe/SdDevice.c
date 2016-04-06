@@ -1,7 +1,7 @@
 /** @file
   This file provides some helper functions which are specific for SD card device.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -464,7 +464,9 @@ SdCardSelect (
 
   SdMmcCmdBlk.CommandIndex = SD_SELECT_DESELECT_CARD;
   SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAc;
-  SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1b;
+  if (Rca != 0) {
+    SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1b;
+  }
   SdMmcCmdBlk.CommandArgument = (UINT32)Rca << 16;
 
   Status = SdMmcPassThruPassThru (PassThru, Slot, &Packet, NULL);
