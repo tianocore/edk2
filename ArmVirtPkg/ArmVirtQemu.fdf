@@ -258,9 +258,6 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  APRIORI PEI {
-    INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-  }
   INF ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
   INF MdeModulePkg/Core/Pei/PeiMain.inf
   INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
