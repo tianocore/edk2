@@ -1,7 +1,7 @@
 #/** @file
 # FDF file of Platform.
 #
-# Copyright (c) 2008  - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 #                                                                                  
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.  
@@ -614,9 +614,8 @@ INF PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 #
 # FAT file system
 #
-FILE DRIVER = 961578FE-B6B7-44c3-AF35-6BC705CD2B1F {
-    SECTION PE32 = FatBinPkg/EnhancedFatDxe/$(EDK_DXE_ARCHITECTURE)/Fat.efi
-  }
+INF FatPkg/EnhancedFatDxe/Fat.inf
+
 #
 # UEFI Shell
 #
