@@ -38,6 +38,13 @@
     GicDistHwId, GicDistBase, GicDistVector, EFI_ACPI_RESERVED_DWORD \
   }
 
+#define EFI_ACPI_6_0_GIC_DISTRIBUTOR_INIT(GicDistHwId, GicDistBase, GicDistVector, GicVersion) \
+  { \
+    EFI_ACPI_6_0_GICD, sizeof (EFI_ACPI_6_0_GIC_DISTRIBUTOR_STRUCTURE), EFI_ACPI_RESERVED_WORD, \
+    GicDistHwId, GicDistBase, GicDistVector, GicVersion, \
+    {EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE} \
+  }
+
 // Note the parking protocol is configured by UEFI if required
 #define EFI_ACPI_5_0_GIC_STRUCTURE_INIT(GicId, AcpiCpuId, Flags, PmuIrq, GicBase) \
   { \
