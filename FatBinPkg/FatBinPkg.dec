@@ -1,5 +1,5 @@
 ## @file
-# This package provides binary device drivers to support the FAT32 file system. This package is separated from other packages because it uses a different license. 
+# This package provides binary device drivers to support the FAT32 file system.
 #
 # This package provides FAT drivers which are not licensed under BSD.
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
