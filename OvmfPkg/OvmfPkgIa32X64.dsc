@@ -53,7 +53,7 @@
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
-  
+
 ################################################################################
 #
 # SKU Identification section - list of all SKU IDs supported by this Platform.
@@ -615,6 +615,7 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
   OvmfPkg/SataControllerDxe/SataControllerDxe.inf

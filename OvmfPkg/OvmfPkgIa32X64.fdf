@@ -275,7 +275,7 @@ INF  RuleOverride=ACPITABLE OvmfPkg/AcpiTables/AcpiTables.inf
 INF  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
 INF  MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
 
-INF  RuleOverride = BINARY USE = X64 FatBinPkg/EnhancedFatDxe/Fat.inf
+INF  FatPkg/EnhancedFatDxe/Fat.inf
 
 !ifndef $(USE_OLD_SHELL)
 INF  ShellPkg/Application/Shell/Shell.inf
