@@ -626,7 +626,7 @@ OpalUtilRevert(
   // Try to revert with admin1
   //
   Ret = OpalAdminRevert(Session, KeepUserData, &MethodStatus);
-  if (Ret != TcgResultSuccess || MethodStatus == TCG_METHOD_STATUS_CODE_SUCCESS) {
+  if (Ret != TcgResultSuccess || MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
     //
     // Device ends the session on successful revert, so only call OpalEndSession when fail.
     //
