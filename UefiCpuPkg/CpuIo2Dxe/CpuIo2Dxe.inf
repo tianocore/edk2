@@ -30,7 +30,18 @@
 [Sources]
   CpuIo2Dxe.c
   CpuIo2Dxe.h
+  IoFifo.h
   
+[Sources.IA32]
+  Ia32/IoFifo.nasm | GCC
+  Ia32/IoFifo.asm  | MSFT
+  Ia32/IoFifo.asm  | INTEL
+
+[Sources.X64]
+  X64/IoFifo.nasm  | GCC
+  X64/IoFifo.asm   | MSFT
+  X64/IoFifo.asm   | INTEL
+
 [Packages]
   MdePkg/MdePkg.dec
 
