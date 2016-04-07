@@ -1,7 +1,7 @@
 /**@file
   Platform PEI driver
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
 
   This program and the accompanying materials
@@ -576,6 +576,8 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS    Status;
+
   DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
@@ -585,6 +587,8 @@ InitializePlatform (
   if (QemuFwCfgS3Enabled ()) {
     DEBUG ((EFI_D_INFO, "S3 support was detected on QEMU\n"));
     mS3Supported = TRUE;
+    Status = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
+    ASSERT_EFI_ERROR (Status);
   }
 
   S3Verification ();

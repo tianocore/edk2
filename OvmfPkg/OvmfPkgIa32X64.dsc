@@ -463,6 +463,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0
