@@ -1504,6 +1504,12 @@
   # @Prompt Mmio base address of pci-based SD/MMC host controller.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcPciHostControllerMmioBase|0xd0000000|UINT32|0x30001043
 
+  ## Indicates if ACPI S3 will be enabled.<BR><BR>
+  #   TRUE  - ACPI S3 will be enabled.<BR>
+  #   FALSE - ACPI S3 will be disabled.<BR>
+  # @Prompt ACPI S3 Enable.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|TRUE|BOOLEAN|0x01100000
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.

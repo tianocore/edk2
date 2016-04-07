@@ -325,6 +325,12 @@
                                                                                   "TRUE  - to set NX for stack.<BR>"
                                                                                   "FALSE - Not to set NX for stack.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiS3Enable_PROMPT  #language en-US "ACPI S3 Enable"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiS3Enable_HELP  #language en-US "Indicates if ACPI S3 will be enabled.<BR><BR>"
+                                                                                  "TRUE  - ACPI S3 will be enabled.<BR>"
+                                                                                  "FALSE - ACPI S3 will be disabled.<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVarCheckVfrDriverGuidArray_PROMPT  #language en-US "Driver guid array of VFR drivers for VarCheckHiiBin generation"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVarCheckVfrDriverGuidArray_HELP  #language en-US "This PCD to include the driver guid of VFR drivers for VarCheckHiiBin generation.<BR><BR>"
