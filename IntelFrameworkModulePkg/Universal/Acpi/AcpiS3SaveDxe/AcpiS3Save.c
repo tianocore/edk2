@@ -605,8 +605,8 @@ S3Ready (
   @param ImageHandle   A handle for the image that is initializing this driver
   @param SystemTable   A pointer to the EFI system table
 
-  @retval EFI_SUCCESS:              Driver initialized successfully
-  @retval EFI_LOAD_ERROR:           Failed to Initialize or has been loaded
+  @retval EFI_SUCCESS               Driver initialized successfully
+  @retval EFI_UNSUPPORTED           Do not support ACPI S3
   @retval EFI_OUT_OF_RESOURCES      Could not allocate needed resources
 
 **/
@@ -618,6 +618,10 @@ InstallAcpiS3Save (
   )
 {
   EFI_STATUS        Status;
+
+  if (!PcdGetBool (PcdAcpiS3Enable)) {
+    return EFI_UNSUPPORTED;
+  }
 
   if (!FeaturePcdGet(PcdPlatformCsmSupport)) {
     //
