@@ -1,7 +1,7 @@
 /** @file
   Implementation for S3 SMM Boot Script Saver state driver.
 
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -905,7 +905,10 @@ InitializeSmmS3SaveState (
   )
 {
   EFI_HANDLE   Handle;
-  
+
+  if (!PcdGetBool (PcdAcpiS3Enable)) {
+    return EFI_UNSUPPORTED;
+  }
 
   Handle  = NULL;
   return  gSmst->SmmInstallProtocolInterface (
