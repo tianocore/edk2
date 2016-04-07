@@ -102,7 +102,6 @@ HiiSetCurrentConfiguration(
                   &DataSize,
                   &OpalExtraInfo
                   );
-  DEBUG ((DEBUG_INFO, "GetVariable for OpalExtraInfo @ HiiSetCurrentConfiguration, Status: %r\n", Status));
   if (!EFI_ERROR (Status)) {
     gHiiConfiguration.EnableBlockSid = OpalExtraInfo.EnableBlockSid;
   }
@@ -1096,8 +1095,6 @@ HiiPasswordEntered(
   UnicodeStrToAsciiStr(UniStr, Password);
   gBS->FreePool(UniStr);
 
-  DEBUG ((DEBUG_INFO, "Password: '%s'\n", Password));
-
   if (gHiiConfiguration.SelectedAction == HII_KEY_ID_GOTO_UNLOCK) {
     Status = HiiUnlock (OpalDisk, Password, PassLength);
   } else if (gHiiConfiguration.SelectedAction == HII_KEY_ID_GOTO_SECURE_ERASE) {
@@ -1136,8 +1133,6 @@ HiiSetBlockSid (
 
   Status = EFI_SUCCESS;
 
-  DEBUG ((DEBUG_INFO, "HiiSetBlockSid(enable: %x)\n", Enable));
-
   OpalExtraInfo.EnableBlockSid = Enable;
   DataSize = sizeof (OPAL_EXTRA_INFO_VAR);
   Status = gRT->SetVariable (
@@ -1147,7 +1142,6 @@ HiiSetBlockSid (
                  DataSize,
                  &OpalExtraInfo
                  );
-  DEBUG ((DEBUG_INFO, "SetVariable, Status: %r\n", Status));
 
   return Status;
 }
@@ -1178,7 +1172,6 @@ RouteConfig(
   EFI_STRING                              *Progress
   )
 {
-  DEBUG ((DEBUG_INFO,  "RouteConfig( )\n"));
   if (Configuration == NULL || Progress == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
@@ -1223,8 +1216,6 @@ ExtractConfig(
 {
   EFI_STATUS                              Status;
 
-  DEBUG ((DEBUG_INFO,  "ExtractConfig( )\n"));
-
   //
   // Check for valid parameters
   //
@@ -1258,7 +1249,6 @@ OpalHiiSetBrowserData (
   VOID
   )
 {
-  DEBUG ((DEBUG_INFO,  "OpalHiiSetBrowserData( )\n"));
   HiiSetBrowserData(
       &gHiiSetupVariableGuid,
       (CHAR16*)L"OpalHiiConfig",
@@ -1279,7 +1269,6 @@ OpalHiiGetBrowserData (
   VOID
   )
 {
-  DEBUG ((DEBUG_INFO,  "OpalHiiGetBrowserData( )\n"));
   HiiGetBrowserData(
       &gHiiSetupVariableGuid,
       (CHAR16*)L"OpalHiiConfig",
@@ -1307,8 +1296,6 @@ HiiSetFormString(
   UINT32                    Len;
   UINT32                    UniSize;
   CHAR16*                   UniStr;
-
-  DEBUG ((DEBUG_INFO,  "HiiSetFormString( )\n"));
 
   //
   // Determine the Length of the sting
