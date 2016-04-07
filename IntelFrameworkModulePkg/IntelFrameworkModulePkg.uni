@@ -4,7 +4,7 @@
 // This package contains the definitions and module implementation
 // which follows Intel EFI Framework Specification.
 //
-// Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -78,10 +78,6 @@
 #string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdS3AcpiReservedMemorySize_PROMPT  #language en-US "Reserved S3 Boot ACPI Memory Size"
 
 #string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdS3AcpiReservedMemorySize_HELP  #language en-US "Specify memory size with page number for a pre-allocated reserved memory to be used by PEI in S3 phase. The default size 32K. When changing the value make sure the memory size is large enough to meet PEI requirement in the S3 phase."
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdS3BootScriptStackSize_PROMPT  #language en-US "Reserved S3 Boot Script Stack ACPI Memory Size"
-
-#string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdS3BootScriptStackSize_HELP  #language en-US "Specify memory size for boot script executor stack usage in S3 phase. The default size 32K. When changing the value make sure the memory size is large enough to meet boot script executor requirement in the S3 phase."
 
 #string STR_gEfiIntelFrameworkModulePkgTokenSpaceGuid_PcdEndOpromShadowAddress_PROMPT  #language en-US "Top Address of Shadowed Legacy OpROM"
 

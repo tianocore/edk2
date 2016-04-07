@@ -1,7 +1,7 @@
 /** @file
   This is an implementation of the AcpiVariable platform field for ECP platform.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -43,7 +43,6 @@ typedef struct {
 #include <Protocol/FrameworkMpService.h>
 #include <Protocol/VariableLock.h>
 #include <Guid/AcpiVariableCompatibility.h>
-#include <Guid/AcpiS3Context.h>
 
 GLOBAL_REMOVE_IF_UNREFERENCED
 ACPI_VARIABLE_SET_COMPATIBILITY               *mAcpiVariableSetCompatibility = NULL;
@@ -68,11 +67,10 @@ AllocateMemoryBelow4G (
 /**
   Hook point for AcpiVariableThunkPlatform for S3Ready.
 
-  @param AcpiS3Context   ACPI s3 context
 **/
 VOID
 S3ReadyThunkPlatform (
-  IN ACPI_S3_CONTEXT      *AcpiS3Context
+  VOID
   )
 {
   EFI_PHYSICAL_ADDRESS                          AcpiMemoryBase;

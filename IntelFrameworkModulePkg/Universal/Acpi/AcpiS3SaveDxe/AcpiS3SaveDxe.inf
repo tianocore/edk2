@@ -48,15 +48,9 @@
   BaseMemoryLib
   HobLib
   UefiLib
-  LockBoxLib
   DebugLib
-  DxeServicesLib
 
 [Guids]
-  gEfiAcpiVariableGuid                          ## PRODUCES  ## UNDEFINED # LockBox Save Data.
-  gEfiAcpiS3ContextGuid                         ## PRODUCES  ## UNDEFINED # LockBox Save Data.
-  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
-  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
   ## SOMETIMES_CONSUMES ## Variable:L"AcpiGlobalVariable"
   ## SOMETIMES_PRODUCES ## Variable:L"AcpiGlobalVariable"
   gEfiAcpiVariableCompatiblityGuid
@@ -71,12 +65,9 @@
 [FeaturePcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport          ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode                 ## CONSUMES
 
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize    ## SOMETIMES_CONSUMES
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize       ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                           ## CONSUMES
 
 [Depex]

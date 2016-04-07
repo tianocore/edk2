@@ -4,7 +4,7 @@
 # This package contains the definitions and module implementation
 # which follows Intel EFI Framework Specification.
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -247,12 +247,6 @@
   #  is large enough to meet PEI requirement in the S3 phase.
   # @Prompt Reserved S3 Boot ACPI Memory Size
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize|0x8000|UINT32|0x30000006
-
-  ## Specify memory size for boot script executor stack usage in S3 phase.
-  #  The default size 32K. When changing the value make sure the memory size is large enough 
-  #  to meet boot script executor requirement in the S3 phase.
-  # @Prompt Reserved S3 Boot Script Stack ACPI Memory Size
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize|0x8000|UINT32|0x30000007
 
   ## Specify the end of address below 1MB for the OPROM.
   #  The last shadowed OpROM should not exceed this address.
