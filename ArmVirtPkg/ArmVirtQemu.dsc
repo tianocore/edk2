@@ -390,15 +390,3 @@
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
-
-[Components.ARM]
-  #
-  # The ARM/Linux kernel has no built in EFI boot stub (yet), so we still need
-  # an intermediate OS loader. Add the LinuxLoader UEFI application so we can
-  # invoke it from the shell.
-  #
-  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
-  ArmPkg/Application/LinuxLoader/LinuxLoader.inf {
-    <LibraryClasses>
-      BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
-  }
