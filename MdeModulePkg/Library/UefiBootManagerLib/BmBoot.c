@@ -699,6 +699,7 @@ BmExpandUriDevicePath (
     Handles = NULL;
   }
 
+  FileBuffer = NULL;
   for (Index = 0; Index < HandleCount; Index++) {
     FileBuffer = BmGetFileBufferFromLoadFile (Handles[Index], FilePath, FullPath, FileSize);
     if (FileBuffer != NULL) {
