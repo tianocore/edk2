@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/QemuFwCfgLib.h>
+#include <Protocol/LockBox.h>
 #include <LockBoxLib.h>
 
 /**
@@ -115,5 +117,30 @@ LockBoxDxeLibInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  return LockBoxLibInitialize ();
+  EFI_STATUS    Status;
+  VOID          *Interface;
+
+  Status = LockBoxLibInitialize ();
+  if (!EFI_ERROR (Status)) {
+    if (QemuFwCfgS3Enabled ()) {
+      //
+      // When S3 enabled, the first driver run with this library linked will
+      // have this library constructor to install LockBox protocol on the
+      // ImageHandle. As other drivers may have gEfiLockBoxProtocolGuid
+      // dependency, the first driver should run before them.
+      //
+      Status = gBS->LocateProtocol (&gEfiLockBoxProtocolGuid, NULL, &Interface);
+      if (EFI_ERROR (Status)) {
+        Status = gBS->InstallProtocolInterface (
+                        &ImageHandle,
+                        &gEfiLockBoxProtocolGuid,
+                        EFI_NATIVE_INTERFACE,
+                        NULL
+                        );
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+  }
+
+  return Status;
 }

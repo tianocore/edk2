@@ -6,7 +6,7 @@
   End-of-Dxe event.
 
 Copyright (c) 2014-2015, Red Hat, Inc.<BR>
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -28,12 +28,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/LockBoxLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
-#include <Library/QemuFwCfgLib.h>
 #include <Guid/AcpiVariableCompatibility.h>
 #include <Guid/AcpiS3Context.h>
 #include <Guid/Acpi.h>
 #include <Guid/EventGroup.h>
-#include <Protocol/LockBox.h>
 #include <IndustryStandard/Acpi.h>
 
 EFI_GUID              mAcpiS3IdtrProfileGuid = {
@@ -536,15 +534,6 @@ InstallEndOfDxeCallback (
 
   if (!QemuFwCfgS3Enabled()) {
     return EFI_LOAD_ERROR;
-  }
-
-  if (!FeaturePcdGet (PcdSmmSmramRequire)) {
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &ImageHandle,
-                    &gEfiLockBoxProtocolGuid, NULL,
-                    NULL
-                    );
-    ASSERT_EFI_ERROR (Status);
   }
 
   Status = gBS->CreateEventEx (

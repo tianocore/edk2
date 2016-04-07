@@ -1,7 +1,7 @@
 ## @file
 # AcpiS3Save module installs EndOfDxe callback to prepare S3 boot data.
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,6 @@
   MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
-  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -49,7 +48,6 @@
   LockBoxLib
   DebugLib
   DxeServicesLib
-  QemuFwCfgLib
 
 [Guids]
   gEfiAcpiVariableGuid                          # ALWAYS_CONSUMED
@@ -59,7 +57,6 @@
   gEfiEndOfDxeEventGroupGuid                    ## CONSUMES  ## Event
 
 [Protocols]
-  gEfiLockBoxProtocolGuid                       # PROTOCOL SOMETIMES_PRODUCED
   gEfiLegacyBiosProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
   gEfiLegacyRegion2ProtocolGuid                 # PROTOCOL SOMETIMES_CONSUMED
   gFrameworkEfiMpServiceProtocolGuid            # PROTOCOL SOMETIMES_CONSUMED
@@ -71,7 +68,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize    ## CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
-  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire                            ## CONSUMES
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
