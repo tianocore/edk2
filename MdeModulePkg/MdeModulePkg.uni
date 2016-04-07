@@ -331,6 +331,10 @@
                                                                                   "TRUE  - ACPI S3 will be enabled.<BR>"
                                                                                   "FALSE - ACPI S3 will be disabled.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdS3BootScriptStackSize_PROMPT  #language en-US "Reserved S3 Boot Script Stack ACPI Memory Size"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdS3BootScriptStackSize_HELP  #language en-US "Specify memory size for boot script executor stack usage in S3 phase. The default size 32K. When changing the value make sure the memory size is large enough to meet boot script executor requirement in the S3 phase."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVarCheckVfrDriverGuidArray_PROMPT  #language en-US "Driver guid array of VFR drivers for VarCheckHiiBin generation"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVarCheckVfrDriverGuidArray_HELP  #language en-US "This PCD to include the driver guid of VFR drivers for VarCheckHiiBin generation.<BR><BR>"

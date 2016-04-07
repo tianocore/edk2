@@ -34,7 +34,7 @@
 [Sources]
   S3SaveState.c
   InternalS3SaveState.h
-
+  AcpiS3ContextSave.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -48,13 +48,27 @@
   BaseLib
   S3BootScriptLib
   PcdLib
+  HobLib
+  LockBoxLib
+
+[Guids]
+  gEfiAcpiVariableGuid                       ## PRODUCES  ## UNDEFINED # LockBox Save Data.
+  gEfiAcpiS3ContextGuid                      ## PRODUCES  ## UNDEFINED # LockBox Save Data.
+  gEfiAcpi20TableGuid                        ## SOMETIMES_CONSUMES  ## SystemTable
+  gEfiAcpi10TableGuid                        ## SOMETIMES_CONSUMES  ## SystemTable
+  gEfiEndOfDxeEventGroupGuid                 ## CONSUMES  ## Event
 
 [Protocols]
   gEfiS3SaveStateProtocolGuid                ## PRODUCES
+  gEfiLockBoxProtocolGuid
 
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode   ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable           ## CONSUMES
 
 [Depex]
   TRUE

@@ -906,10 +906,22 @@ InitializeS3SaveState (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
+  EFI_STATUS    Status;
+  EFI_EVENT     EndOfDxeEvent;
 
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
   }
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  AcpiS3ContextSaveOnEndOfDxe,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   return  gBS->InstallProtocolInterface (
                   &mHandle,

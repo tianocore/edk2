@@ -28,6 +28,22 @@
 #include <Library/SmbusLib.h>
 #include <Library/PcdLib.h>
 #include <IndustryStandard/SmBus.h>
+#include <Guid/EventGroup.h>
+
+/**
+  Callback function executed when the EndOfDxe event group is signaled.
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    The pointer to the notification function's context, which
+                        is implementation-dependent.
+**/
+VOID
+EFIAPI
+AcpiS3ContextSaveOnEndOfDxe (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
 /**
   Adds a record into S3 boot script table.
 
