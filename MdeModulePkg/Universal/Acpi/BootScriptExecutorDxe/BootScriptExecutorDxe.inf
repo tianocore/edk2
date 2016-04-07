@@ -4,7 +4,7 @@
 # This is a standalone Boot Script Executor. Standalone means it does not
 # depends on any PEI or DXE service.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -82,6 +82,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                ## CONSUMES
 
 [Depex]
   gEfiLockBoxProtocolGuid

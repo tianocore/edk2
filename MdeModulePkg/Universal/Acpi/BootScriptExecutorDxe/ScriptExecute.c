@@ -4,7 +4,7 @@
   This driver is dispatched by Dxe core and the driver will reload itself to ACPI reserved memory
   in the entry point. The functionality is to interpret and restore the S3 boot script
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -402,6 +402,10 @@ BootScriptExecutorEntryPoint (
   VOID                                          *Registration;
   UINT32                                        RegEax;
   UINT32                                        RegEdx;
+
+  if (!PcdGetBool (PcdAcpiS3Enable)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Test if the gEfiCallerIdGuid of this image is already installed. if not, the entry
