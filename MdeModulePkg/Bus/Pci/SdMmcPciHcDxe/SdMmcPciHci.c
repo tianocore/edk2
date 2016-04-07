@@ -584,6 +584,20 @@ SdMmcHcCardDetect (
   UINT32                    PresentState;
 
   //
+  // Check Present State Register to see if there is a card presented.
+  //
+  Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((PresentState & BIT16) != 0) {
+    *MediaPresent = TRUE;
+  } else {
+    *MediaPresent = FALSE;
+  }
+
+  //
   // Check Normal Interrupt Status Register
   //
   Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_NOR_INT_STS, TRUE, sizeof (Data), &Data);
@@ -601,19 +615,6 @@ SdMmcHcCardDetect (
       return Status;
     }
 
-    //
-    // Check Present State Register to see if there is a card presented.
-    //
-    Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    if ((PresentState & BIT16) != 0) {
-      *MediaPresent = TRUE;
-    } else {
-      *MediaPresent = FALSE;
-    }
     return EFI_MEDIA_CHANGED;
   }
 

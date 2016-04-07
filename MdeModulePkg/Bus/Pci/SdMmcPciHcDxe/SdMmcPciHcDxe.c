@@ -4,7 +4,7 @@
 
   It would expose EFI_SD_MMC_PASS_THRU_PROTOCOL for upper layer use.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -613,7 +613,9 @@ SdMmcPciHcDriverBindingStart (
     // Check whether there is a SD/MMC card attached
     //
     Status = SdMmcHcCardDetect (PciIo, Slot, &MediaPresent);
-    if ((Status == EFI_MEDIA_CHANGED) && (MediaPresent == FALSE)) {
+    if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
+      continue;
+    } else if (MediaPresent == FALSE) {
       DEBUG ((EFI_D_ERROR, "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n", Slot));
       continue;
     }
