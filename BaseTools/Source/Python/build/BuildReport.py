@@ -24,6 +24,9 @@ import traceback
 import sys
 import time
 import struct
+import hashlib
+import subprocess
+import threading
 from datetime import datetime
 from StringIO import StringIO
 from Common import EdkLogger
@@ -33,6 +36,7 @@ from Common.Misc import GuidStructureStringToGuidString
 from Common.InfClassObject import gComponentType2ModuleType
 from Common.BuildToolError import FILE_WRITE_FAILURE
 from Common.BuildToolError import CODE_ERROR
+from Common.BuildToolError import COMMAND_FAILURE
 from Common.DataType import TAB_LINE_BREAK
 from Common.DataType import TAB_DEPEX
 from Common.DataType import TAB_SLASH
@@ -528,6 +532,7 @@ class ModuleReport(object):
         self.FileGuid = M.Guid
         self.Size = 0
         self.BuildTimeStamp = None
+        self.Hash = 0
         self.DriverType = ""
         if not M.IsLibrary:
             ModuleType = M.ModuleType
@@ -599,12 +604,46 @@ class ModuleReport(object):
             except IOError:
                 EdkLogger.warn(None, "Fail to read report file", FwReportFileName)
 
+        if "HASH" in ReportType:
+            OutputDir = os.path.join(self._BuildDir, "OUTPUT")
+            DefaultEFIfile = os.path.join(OutputDir, self.ModuleName + ".efi")
+            if os.path.isfile(DefaultEFIfile):
+                Tempfile = os.path.join(OutputDir, self.ModuleName + "_hash.tmp")
+                # rebase the efi image since its base address may not zero
+                cmd = ["GenFw", "--rebase", str(0), "-o", Tempfile, DefaultEFIfile]
+                try:
+                    PopenObject = subprocess.Popen(' '.join(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                except Exception, X:
+                    EdkLogger.error("GenFw", COMMAND_FAILURE, ExtraData="%s: %s" % (str(X), cmd[0]))
+                EndOfProcedure = threading.Event()
+                EndOfProcedure.clear()
+                if PopenObject.stderr:
+                    StdErrThread = threading.Thread(target=ReadMessage, args=(PopenObject.stderr, EdkLogger.quiet, EndOfProcedure))
+                    StdErrThread.setName("STDERR-Redirector")
+                    StdErrThread.setDaemon(False)
+                    StdErrThread.start()
+                # waiting for program exit
+                PopenObject.wait()
+                if PopenObject.stderr:
+                    StdErrThread.join()
+                if PopenObject.returncode != 0:
+                    EdkLogger.error("GenFw", COMMAND_FAILURE, "Failed to generate firmware hash image for %s" % (DefaultEFIfile))
+                if os.path.isfile(Tempfile):
+                    self.Hash = hashlib.sha1()
+                    buf = open(Tempfile, 'rb').read()
+                    if self.Hash.update(buf):
+                        self.Hash = self.Hash.update(buf)
+                    self.Hash = self.Hash.hexdigest()
+                    os.remove(Tempfile)
+
         FileWrite(File, "Module Summary")
         FileWrite(File, "Module Name:          %s" % self.ModuleName)
         FileWrite(File, "Module INF Path:      %s" % self.ModuleInfPath)
         FileWrite(File, "File GUID:            %s" % self.FileGuid)
         if self.Size:
             FileWrite(File, "Size:                 0x%X (%.2fK)" % (self.Size, self.Size / 1024.0))
+        if self.Hash:
+            FileWrite(File, "SHA1 HASH:            %s *%s" % (self.Hash, self.ModuleName + ".efi"))
         if self.BuildTimeStamp:
             FileWrite(File, "Build Time Stamp:     %s" % self.BuildTimeStamp)
         if self.DriverType:
@@ -638,6 +677,18 @@ class ModuleReport(object):
             GlobalPredictionReport.GenerateReport(File, self.FileGuid)
 
         FileWrite(File, gSectionEnd)
+
+def ReadMessage(From, To, ExitFlag):
+    while True:
+        # read one line a time
+        Line = From.readline()
+        # empty string means "end"
+        if Line != None and Line != "":
+            To(Line.rstrip())
+        else:
+            break
+        if ExitFlag.isSet():
+            break
 
 ##
 # Reports platform and module PCD information
@@ -1667,7 +1718,7 @@ class BuildReport(object):
                     if ReportTypeItem not in self.ReportType:
                         self.ReportType.append(ReportTypeItem)
             else:
-                self.ReportType = ["PCD", "LIBRARY", "BUILD_FLAGS", "DEPEX", "FLASH", "FIXED_ADDRESS"]
+                self.ReportType = ["PCD", "LIBRARY", "BUILD_FLAGS", "DEPEX", "HASH", "FLASH", "FIXED_ADDRESS"]
     ##
     # Adds platform report to the list
     #
