@@ -212,6 +212,7 @@
   # Platform Driver
   #
   ArmVirtPkg/VirtFdtDxe/VirtFdtDxe.inf
+  ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
 
   #
   # FAT filesystem + GPT/MBR partitioning
