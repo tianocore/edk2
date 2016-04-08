@@ -1,7 +1,7 @@
 /** @file
   The file for AHCI mode of ATA host controller.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1484,7 +1484,7 @@ AhciReset (
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
+  @param  PortMultiplier      The port multiplier port number.
   @param  AtaStatusBlock      A pointer to EFI_ATA_STATUS_BLOCK data structure.
 
   @retval EFI_SUCCESS     Successfully get the return status of S.M.A.R.T command execution.
@@ -1582,7 +1582,7 @@ AhciAtaSmartReturnStatusCheck (
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
+  @param  PortMultiplier      The port multiplier port number.
   @param  IdentifyData        A pointer to data buffer which is used to contain IDENTIFY data.
   @param  AtaStatusBlock      A pointer to EFI_ATA_STATUS_BLOCK data structure.
 
@@ -1698,7 +1698,7 @@ AhciAtaSmartSupport (
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
+  @param  PortMultiplier      The port multiplier port number.
   @param  Buffer              The data buffer to store IDENTIFY PACKET data.
 
   @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
@@ -1756,7 +1756,7 @@ AhciIdentify (
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
+  @param  PortMultiplier      The port multiplier port number.
   @param  Buffer              The data buffer to store IDENTIFY PACKET data.
 
   @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
@@ -1814,7 +1814,7 @@ AhciIdentifyPacket (
   @param  PciIo               The PCI IO protocol instance.
   @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
   @param  Port                The number of port.
-  @param  PortMultiplier      The timeout value of stop.
+  @param  PortMultiplier      The port multiplier port number.
   @param  Feature             The data to send Feature register.
   @param  FeatureSpecificData The specific data for SET FEATURE cmd.
 
