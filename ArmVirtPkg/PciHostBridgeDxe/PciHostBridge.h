@@ -24,6 +24,7 @@
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/Metronome.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/FdtClient.h>
 
 
 #include <Library/BaseLib.h>

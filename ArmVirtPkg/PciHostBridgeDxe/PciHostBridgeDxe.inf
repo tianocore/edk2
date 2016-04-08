@@ -22,8 +22,8 @@
   ENTRY_POINT                    = InitializePciHostBridge
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
@@ -50,20 +50,16 @@
   gEfiPciRootBridgeIoProtocolGuid                       ## PRODUCES
   gEfiMetronomeArchProtocolGuid                         ## CONSUMES
   gEfiDevicePathProtocolGuid                            ## PRODUCES
+  gFdtClientProtocolGuid                                ## CONSUMES
 
 [Pcd]
-  gArmPlatformTokenSpaceGuid.PcdPciBusMin
-  gArmPlatformTokenSpaceGuid.PcdPciBusMax
-  gArmPlatformTokenSpaceGuid.PcdPciIoBase
-  gArmPlatformTokenSpaceGuid.PcdPciIoSize
-  gArmPlatformTokenSpaceGuid.PcdPciIoTranslation
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
 
 [FeaturePcd]
   gArmVirtTokenSpaceGuid.PcdKludgeMapPciMmioAsCached
+  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot
 
 [depex]
   gEfiMetronomeArchProtocolGuid AND
-  gEfiCpuArchProtocolGuid
+  gEfiCpuArchProtocolGuid AND
+  gFdtClientProtocolGuid

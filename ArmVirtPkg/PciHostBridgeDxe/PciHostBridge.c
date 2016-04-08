@@ -79,6 +79,230 @@ PCI_HOST_BRIDGE_INSTANCE mPciHostBridgeInstanceTemplate = {
 // Implementation
 //
 
+STATIC
+VOID
+SetLinuxPciProbeOnlyProperty (
+  IN FDT_CLIENT_PROTOCOL         *FdtClient
+  )
+{
+  INT32         Node;
+  UINT32        Tmp;
+  EFI_STATUS    Status;
+
+  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
+    //
+    // Set the /chosen/linux,pci-probe-only property to 1, so that the PCI
+    // setup we will perform in the firmware is honored by the Linux OS,
+    // rather than torn down and done from scratch. This is generally a more
+    // sensible approach, and aligns with what ACPI based OSes do typically.
+    //
+    // In case we are exposing an emulated VGA PCI device to the guest, which
+    // may subsequently get exposed via the Graphics Output protocol and
+    // driven as an efifb by Linux, we need this setting to prevent the
+    // framebuffer from becoming unresponsive.
+    //
+    Status = FdtClient->GetOrInsertChosenNode (FdtClient, &Node);
+
+    if (!EFI_ERROR (Status)) {
+      Tmp = SwapBytes32 (1);
+      Status = FdtClient->SetNodeProperty (FdtClient, Node,
+                            "linux,pci-probe-only", &Tmp, sizeof (Tmp));
+    }
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN,
+        "Failed to set /chosen/linux,pci-probe-only property\n"));
+    }
+  }
+}
+
+//
+// We expect the "ranges" property of "pci-host-ecam-generic" to consist of
+// records like this.
+//
+#pragma pack (1)
+typedef struct {
+  UINT32 Type;
+  UINT64 ChildBase;
+  UINT64 CpuBase;
+  UINT64 Size;
+} DTB_PCI_HOST_RANGE_RECORD;
+#pragma pack ()
+
+#define DTB_PCI_HOST_RANGE_RELOCATABLE  BIT31
+#define DTB_PCI_HOST_RANGE_PREFETCHABLE BIT30
+#define DTB_PCI_HOST_RANGE_ALIASED      BIT29
+#define DTB_PCI_HOST_RANGE_MMIO32       BIT25
+#define DTB_PCI_HOST_RANGE_MMIO64       (BIT25 | BIT24)
+#define DTB_PCI_HOST_RANGE_IO           BIT24
+#define DTB_PCI_HOST_RANGE_TYPEMASK     (BIT31 | BIT30 | BIT29 | BIT25 | BIT24)
+
+STATIC
+EFI_STATUS
+ProcessPciHost (
+  OUT  UINT64    *IoBase,
+  OUT  UINT64    *IoSize,
+  OUT  UINT64    *IoTranslation,
+  OUT  UINT64    *MmioBase,
+  OUT  UINT64    *MmioSize,
+  OUT  UINT64    *MmioTranslation,
+  OUT  UINT32    *BusMin,
+  OUT  UINT32    *BusMax
+  )
+{
+  FDT_CLIENT_PROTOCOL         *FdtClient;
+  INT32                       Node;
+  UINT64                      ConfigBase, ConfigSize;
+  CONST VOID                  *Prop;
+  UINT32                      Len;
+  UINT32                      RecordIdx;
+  EFI_STATUS                  Status;
+
+  //
+  // The following output arguments are initialized only in
+  // order to suppress '-Werror=maybe-uninitialized' warnings
+  // *incorrectly* emitted by some gcc versions.
+  //
+  *IoBase = 0;
+  *IoTranslation = 0;
+  *MmioBase = 0;
+  *MmioTranslation = 0;
+  *BusMin = 0;
+  *BusMax = 0;
+
+  //
+  // *IoSize and *MmioSize are initialized to zero because the logic below
+  // requires it. However, since they are also affected by the issue reported
+  // above, they are initialized early.
+  //
+  *IoSize = 0;
+  *MmioSize = 0;
+
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
+                  (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = FdtClient->FindCompatibleNode (FdtClient, "pci-host-ecam-generic",
+                        &Node);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_INFO,
+      "%a: No 'pci-host-ecam-generic' compatible DT node found\n",
+      __FUNCTION__));
+    return EFI_NOT_FOUND;
+  }
+
+  DEBUG_CODE (
+    INT32 Tmp;
+
+    //
+    // A DT can legally describe multiple PCI host bridges, but we are not
+    // equipped to deal with that. So assert that there is only one.
+    //
+    Status = FdtClient->FindNextCompatibleNode (FdtClient,
+                          "pci-host-ecam-generic", Node, &Tmp);
+    ASSERT (Status == EFI_NOT_FOUND);
+  );
+
+  Status = FdtClient->GetNodeProperty (FdtClient, Node, "reg", &Prop, &Len);
+  if (EFI_ERROR (Status) || Len != 2 * sizeof (UINT64)) {
+    DEBUG ((EFI_D_ERROR, "%a: 'reg' property not found or invalid\n",
+      __FUNCTION__));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // Fetch the ECAM window.
+  //
+  ConfigBase = SwapBytes64 (((CONST UINT64 *)Prop)[0]);
+  ConfigSize = SwapBytes64 (((CONST UINT64 *)Prop)[1]);
+
+  //
+  // Fetch the bus range (note: inclusive).
+  //
+  Status = FdtClient->GetNodeProperty (FdtClient, Node, "bus-range", &Prop,
+                        &Len);
+  if (EFI_ERROR (Status) || Len != 2 * sizeof (UINT32)) {
+    DEBUG ((EFI_D_ERROR, "%a: 'bus-range' not found or invalid\n",
+      __FUNCTION__));
+    return EFI_PROTOCOL_ERROR;
+  }
+  *BusMin = SwapBytes32 (((CONST UINT32 *)Prop)[0]);
+  *BusMax = SwapBytes32 (((CONST UINT32 *)Prop)[1]);
+
+  //
+  // Sanity check: the config space must accommodate all 4K register bytes of
+  // all 8 functions of all 32 devices of all buses.
+  //
+  if (*BusMax < *BusMin || *BusMax - *BusMin == MAX_UINT32 ||
+      DivU64x32 (ConfigSize, SIZE_4KB * 8 * 32) < *BusMax - *BusMin + 1) {
+    DEBUG ((EFI_D_ERROR, "%a: invalid 'bus-range' and/or 'reg'\n",
+      __FUNCTION__));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // Iterate over "ranges".
+  //
+  Status = FdtClient->GetNodeProperty (FdtClient, Node, "ranges", &Prop, &Len);
+  if (EFI_ERROR (Status) || Len == 0 ||
+      Len % sizeof (DTB_PCI_HOST_RANGE_RECORD) != 0) {
+    DEBUG ((EFI_D_ERROR, "%a: 'ranges' not found or invalid\n", __FUNCTION__));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  for (RecordIdx = 0; RecordIdx < Len / sizeof (DTB_PCI_HOST_RANGE_RECORD);
+       ++RecordIdx) {
+    CONST DTB_PCI_HOST_RANGE_RECORD *Record;
+
+    Record = (CONST DTB_PCI_HOST_RANGE_RECORD *)Prop + RecordIdx;
+    switch (SwapBytes32 (Record->Type) & DTB_PCI_HOST_RANGE_TYPEMASK) {
+    case DTB_PCI_HOST_RANGE_IO:
+      *IoBase = SwapBytes64 (Record->ChildBase);
+      *IoSize = SwapBytes64 (Record->Size);
+      *IoTranslation = SwapBytes64 (Record->CpuBase) - *IoBase;
+      break;
+
+    case DTB_PCI_HOST_RANGE_MMIO32:
+      *MmioBase = SwapBytes64 (Record->ChildBase);
+      *MmioSize = SwapBytes64 (Record->Size);
+      *MmioTranslation = SwapBytes64 (Record->CpuBase) - *MmioBase;
+
+      if (*MmioBase > MAX_UINT32 || *MmioSize > MAX_UINT32 ||
+          *MmioBase + *MmioSize > SIZE_4GB) {
+        DEBUG ((EFI_D_ERROR, "%a: MMIO32 space invalid\n", __FUNCTION__));
+        return EFI_PROTOCOL_ERROR;
+      }
+
+      if (*MmioTranslation != 0) {
+        DEBUG ((EFI_D_ERROR, "%a: unsupported nonzero MMIO32 translation "
+          "0x%Lx\n", __FUNCTION__, *MmioTranslation));
+        return EFI_UNSUPPORTED;
+      }
+
+      break;
+    }
+  }
+  if (*IoSize == 0 || *MmioSize == 0) {
+    DEBUG ((EFI_D_ERROR, "%a: %a space empty\n", __FUNCTION__,
+      (*IoSize == 0) ? "IO" : "MMIO32"));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // The dynamic PCD PcdPciExpressBaseAddress should have already been set,
+  // and should match the value we found in the DT node.
+  //
+  ASSERT (PcdGet64 (PcdPciExpressBaseAddress) == ConfigBase);
+
+  SetLinuxPciProbeOnlyProperty (FdtClient);
+
+  DEBUG ((EFI_D_INFO, "%a: Config[0x%Lx+0x%Lx) Bus[0x%x..0x%x] "
+    "Io[0x%Lx+0x%Lx)@0x%Lx Mem[0x%Lx+0x%Lx)@0x%Lx\n", __FUNCTION__, ConfigBase,
+    ConfigSize, *BusMin, *BusMax, *IoBase, *IoSize, *IoTranslation, *MmioBase,
+    *MmioSize, *MmioTranslation));
+  return EFI_SUCCESS;
+}
+
+
 /**
   Entry point of this driver
 
@@ -103,25 +327,32 @@ InitializePciHostBridge (
   UINTN                       Loop2;
   PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE    *PrivateData;
+  UINT64                      IoBase, IoSize, IoTranslation;
+  UINT64                      MmioBase, MmioSize, MmioTranslation;
+  UINT32                      BusMin, BusMax;
 
   if (PcdGet64 (PcdPciExpressBaseAddress) == 0) {
     DEBUG ((EFI_D_INFO, "%a: PCI host bridge not present\n", __FUNCTION__));
     return EFI_ABORTED;
   }
 
+  Status = ProcessPciHost (&IoBase, &IoSize, &IoTranslation, &MmioBase,
+             &MmioSize, &MmioTranslation, &BusMin, &BusMax);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   mDriverImageHandle = ImageHandle;
 
-  mResAperture[0][0].BusBase  = PcdGet32 (PcdPciBusMin);
-  mResAperture[0][0].BusLimit = PcdGet32 (PcdPciBusMax);
+  mResAperture[0][0].BusBase  = BusMin;
+  mResAperture[0][0].BusLimit = BusMax;
 
-  mResAperture[0][0].MemBase  = PcdGet32 (PcdPciMmio32Base);
-  mResAperture[0][0].MemLimit = (UINT64)PcdGet32 (PcdPciMmio32Base) +
-                                PcdGet32 (PcdPciMmio32Size) - 1;
+  mResAperture[0][0].MemBase  = MmioBase;
+  mResAperture[0][0].MemLimit = MmioBase + MmioSize - 1;
 
-  mResAperture[0][0].IoBase        = PcdGet64 (PcdPciIoBase);
-  mResAperture[0][0].IoLimit       = PcdGet64 (PcdPciIoBase) +
-                                     PcdGet64 (PcdPciIoSize) - 1;
-  mResAperture[0][0].IoTranslation = PcdGet64 (PcdPciIoTranslation);
+  mResAperture[0][0].IoBase        = IoBase;
+  mResAperture[0][0].IoLimit       = IoBase + IoSize - 1;
+  mResAperture[0][0].IoTranslation = IoTranslation;
 
   //
   // Add IO and MMIO memory space, so that resources can be allocated in the
@@ -129,8 +360,8 @@ InitializePciHostBridge (
   //
   Status = gDS->AddIoSpace (
                   EfiGcdIoTypeIo,
-                  PcdGet64 (PcdPciIoBase),
-                  PcdGet64 (PcdPciIoSize)
+                  IoBase,
+                  IoSize
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -139,8 +370,8 @@ InitializePciHostBridge (
 
   Status = gDS->AddMemorySpace (
                   EfiGcdMemoryTypeMemoryMappedIo,
-                  PcdGet32 (PcdPciMmio32Base),
-                  PcdGet32 (PcdPciMmio32Size),
+                  MmioBase,
+                  MmioSize,
                   MmioAttributes
                   );
   if (EFI_ERROR (Status)) {
@@ -149,8 +380,8 @@ InitializePciHostBridge (
   }
 
   Status = gDS->SetMemorySpaceAttributes (
-                  PcdGet32 (PcdPciMmio32Base),
-                  PcdGet32 (PcdPciMmio32Size),
+                  MmioBase,
+                  MmioSize,
                   MmioAttributes
                   );
   if (EFI_ERROR (Status)) {
