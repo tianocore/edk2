@@ -33,6 +33,7 @@
   PciExpressLib.c
 
 [Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
@@ -40,6 +41,7 @@
   PcdLib
   DebugLib
   IoLib
+  PciPcdProducerLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress  ## CONSUMES

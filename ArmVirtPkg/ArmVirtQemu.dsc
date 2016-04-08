@@ -66,6 +66,7 @@
 !if $(SECURE_BOOT_ENABLE) == TRUE
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
 !endif
+  PciPcdProducerLib|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -219,7 +220,10 @@
   gArmPlatformTokenSpaceGuid.PcdPciIoTranslation|0x0
   gArmPlatformTokenSpaceGuid.PcdPciMmio32Base|0x0
   gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x0
+
+  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
+  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
 
   #
   # Set video resolution for boot options and for text setup.
