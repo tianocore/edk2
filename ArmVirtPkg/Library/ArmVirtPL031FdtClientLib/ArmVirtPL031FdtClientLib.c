@@ -1,0 +1,82 @@
+/** @file
+  FDT client library for ARM's PL031 RTC driver
+
+  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include <Uefi.h>
+
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <Protocol/FdtClient.h>
+
+RETURN_STATUS
+EFIAPI
+ArmVirtPL031FdtClientLibConstructor (
+  VOID
+  )
+{
+  EFI_STATUS                    Status;
+  FDT_CLIENT_PROTOCOL           *FdtClient;
+  INT32                         Node;
+  CONST UINT64                  *Reg;
+  UINT32                        RegSize;
+  UINT64                        RegBase;
+
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
+                  (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = FdtClient->FindCompatibleNode (FdtClient, "arm,pl031", &Node);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_WARN, "%a: No 'arm,pl031' compatible DT node found\n",
+      __FUNCTION__));
+    return EFI_SUCCESS;
+  }
+
+  Status = FdtClient->GetNodeProperty (FdtClient, Node, "reg",
+                        (CONST VOID **)&Reg, &RegSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_WARN,
+      "%a: No 'reg' property found in 'arm,pl031' compatible DT node\n",
+      __FUNCTION__));
+    return EFI_SUCCESS;
+  }
+
+  ASSERT (RegSize == 16);
+
+  RegBase = SwapBytes64 (Reg[0]);
+  ASSERT (RegBase < MAX_UINT32);
+
+  PcdSet32 (PcdPL031RtcBase, (UINT32)RegBase);
+
+  DEBUG ((EFI_D_INFO, "Found PL031 RTC @ 0x%Lx\n", RegBase));
+
+  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
+    //
+    // UEFI takes ownership of the RTC hardware, and exposes its functionality
+    // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
+    // need to disable it in the device tree to prevent the OS from attaching
+    // its device driver as well.
+    //
+    Status = FdtClient->SetNodeProperty (FdtClient, Node, "status",
+                          "disabled", sizeof ("disabled"));
+    if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
+    }
+  }
+
+  return EFI_SUCCESS;
+}
