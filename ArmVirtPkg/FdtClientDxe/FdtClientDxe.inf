@@ -43,6 +43,10 @@
 
 [Guids]
   gFdtHobGuid
+  gFdtTableGuid
+
+[FeaturePcd]
+  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot
 
 [Depex]
   TRUE

@@ -28,7 +28,6 @@
 #include <libfdt.h>
 #include <Library/XenIoMmioLib.h>
 
-#include <Guid/Fdt.h>
 #include <Guid/VirtioMmioTransport.h>
 #include <Guid/FdtHob.h>
 
@@ -213,15 +212,6 @@ InitializeVirtFdtDxe (
     default:
       break;
     }
-  }
-
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    //
-    // Only install the FDT as a configuration table if we want to leave it up
-    // to the OS to decide whether it prefers ACPI over DT.
-    //
-    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
-    ASSERT_EFI_ERROR (Status);
   }
 
   return EFI_SUCCESS;

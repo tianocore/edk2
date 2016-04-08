@@ -45,12 +45,8 @@
   XenIoMmioLib
 
 [Guids]
-  gFdtTableGuid
   gVirtioMmioTransportGuid
   gFdtHobGuid
-
-[FeaturePcd]
-  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot
 
 [Protocols]
   gEfiDevicePathProtocolGuid

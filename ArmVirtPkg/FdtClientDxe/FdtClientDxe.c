@@ -20,6 +20,7 @@
 #include <Library/HobLib.h>
 #include <libfdt.h>
 
+#include <Guid/Fdt.h>
 #include <Guid/FdtHob.h>
 
 #include <Protocol/FdtClient.h>
@@ -234,6 +235,7 @@ InitializeFdtClientDxe (
 {
   VOID              *Hob;
   VOID              *DeviceTreeBase;
+  EFI_STATUS        Status;
 
   Hob = GetFirstGuidHob (&gFdtHobGuid);
   if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
@@ -250,6 +252,15 @@ InitializeFdtClientDxe (
   mDeviceTreeBase = DeviceTreeBase;
 
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
+
+  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
+    //
+    // Only install the FDT as a configuration table if we want to leave it up
+    // to the OS to decide whether it prefers ACPI over DT.
+    //
+    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return gBS->InstallProtocolInterface (&ImageHandle, &gFdtClientProtocolGuid,
                 EFI_NATIVE_INTERFACE, &mFdtClientProtocol);
