@@ -1,7 +1,7 @@
 /** @file
   The functions and routines to handle the route caches and route table.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -135,7 +135,7 @@ Ip6FindRouteEntry (
 
   RtEntry = NULL;
 
-  for (Index = IP6_PREFIX_NUM - 1; Index >= 0; Index--) {
+  for (Index = IP6_PREFIX_MAX; Index >= 0; Index--) {
     NET_LIST_FOR_EACH (Entry, &RtTable->RouteArea[Index]) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_ENTRY, Link);
 
@@ -300,7 +300,7 @@ Ip6BuildEfiRouteTable (
   //
   Count = 0;
 
-  for (Index = IP6_PREFIX_NUM - 1; Index >= 0; Index--) {
+  for (Index = IP6_PREFIX_MAX; Index >= 0; Index--) {
 
     NET_LIST_FOR_EACH (Entry, &(RouteTable->RouteArea[Index])) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_ENTRY, Link);
@@ -346,7 +346,7 @@ Ip6CreateRouteTable (
   RtTable->RefCnt   = 1;
   RtTable->TotalNum = 0;
 
-  for (Index = 0; Index < IP6_PREFIX_NUM; Index++) {
+  for (Index = 0; Index <= IP6_PREFIX_MAX; Index++) {
     InitializeListHead (&RtTable->RouteArea[Index]);
   }
 
@@ -385,7 +385,7 @@ Ip6CleanRouteTable (
   //
   // Free all the route table entry and its route cache.
   //
-  for (Index = 0; Index < IP6_PREFIX_NUM; Index++) {
+  for (Index = 0; Index <= IP6_PREFIX_MAX; Index++) {
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &RtTable->RouteArea[Index]) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_ENTRY, Link);
       RemoveEntryList (Entry);

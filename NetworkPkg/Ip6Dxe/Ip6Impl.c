@@ -2,7 +2,7 @@
   Implementation of EFI_IP6_PROTOCOL protocol interfaces.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -842,7 +842,7 @@ EfiIp6Routes (
   EFI_TPL                   OldTpl;
   IP6_SERVICE               *IpSb;
 
-  if ((This == NULL) || (PrefixLength >= IP6_PREFIX_NUM)) {
+  if ((This == NULL) || (PrefixLength > IP6_PREFIX_MAX)) {
     return EFI_INVALID_PARAMETER;
   }
 
