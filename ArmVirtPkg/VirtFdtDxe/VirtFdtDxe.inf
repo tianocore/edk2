@@ -51,15 +51,6 @@
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
-  gArmPlatformTokenSpaceGuid.PcdPciBusMin
-  gArmPlatformTokenSpaceGuid.PcdPciBusMax
-  gArmPlatformTokenSpaceGuid.PcdPciIoBase
-  gArmPlatformTokenSpaceGuid.PcdPciIoSize
-  gArmPlatformTokenSpaceGuid.PcdPciIoTranslation
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
 
 [FeaturePcd]
   gArmVirtTokenSpaceGuid.PcdPureAcpiBoot

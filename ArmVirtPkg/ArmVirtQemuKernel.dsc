@@ -198,14 +198,6 @@
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
 
-  gArmPlatformTokenSpaceGuid.PcdPciBusMin|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciBusMax|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciIoBase|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciIoSize|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciIoTranslation|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0
-
   # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
   # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
@@ -346,13 +338,19 @@
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
-  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf
+  OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
 
   #
   # PCI support
   #
   ArmVirtPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
-  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf
 

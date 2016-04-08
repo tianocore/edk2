@@ -114,9 +114,6 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress|0x0
 
 [PcdsDynamicDefault.common]
-  ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
-  #  enumeration to complete before installing ACPI tables.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
 
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
@@ -132,15 +129,6 @@
 
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
-
-  gArmPlatformTokenSpaceGuid.PcdPciBusMin|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciBusMax|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciIoBase|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciIoSize|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciIoTranslation|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base|0x0
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x0
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 

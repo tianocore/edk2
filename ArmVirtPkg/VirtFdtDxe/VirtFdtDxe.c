@@ -45,7 +45,6 @@ typedef enum {
   PropertyTypeRtc,
   PropertyTypeVirtio,
   PropertyTypeUart,
-  PropertyTypePciHost,
   PropertyTypeXen,
 } PROPERTY_TYPE;
 
@@ -58,7 +57,6 @@ STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypeRtc,     "arm,pl031"             },
   { PropertyTypeVirtio,  "virtio,mmio"           },
   { PropertyTypeUart,    "arm,pl011"             },
-  { PropertyTypePciHost, "pci-host-ecam-generic" },
   { PropertyTypeXen,     "xen,xen"               },
   { PropertyTypeUnknown, ""                      }
 };
@@ -88,176 +86,6 @@ GetTypeFromNode (
   return PropertyTypeUnknown;
 }
 
-//
-// We expect the "ranges" property of "pci-host-ecam-generic" to consist of
-// records like this.
-//
-#pragma pack (1)
-typedef struct {
-  UINT32 Type;
-  UINT64 ChildBase;
-  UINT64 CpuBase;
-  UINT64 Size;
-} DTB_PCI_HOST_RANGE_RECORD;
-#pragma pack ()
-
-#define DTB_PCI_HOST_RANGE_RELOCATABLE  BIT31
-#define DTB_PCI_HOST_RANGE_PREFETCHABLE BIT30
-#define DTB_PCI_HOST_RANGE_ALIASED      BIT29
-#define DTB_PCI_HOST_RANGE_MMIO32       BIT25
-#define DTB_PCI_HOST_RANGE_MMIO64       (BIT25 | BIT24)
-#define DTB_PCI_HOST_RANGE_IO           BIT24
-#define DTB_PCI_HOST_RANGE_TYPEMASK     (BIT31 | BIT30 | BIT29 | BIT25 | BIT24)
-
-/**
-  Process the device tree node describing the generic PCI host controller.
-
-  param[in] DeviceTreeBase  Pointer to the device tree.
-
-  param[in] Node            Offset of the device tree node whose "compatible"
-                            property is "pci-host-ecam-generic".
-
-  param[in] RegProp         Pointer to the "reg" property of Node. The caller
-                            is responsible for ensuring that the size of the
-                            property is 4 UINT32 cells.
-
-  @retval EFI_SUCCESS         Parsing successful, properties parsed from Node
-                              have been stored in dynamic PCDs.
-
-  @retval EFI_PROTOCOL_ERROR  Parsing failed. PCDs are left unchanged.
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-ProcessPciHost (
-  IN CONST VOID *DeviceTreeBase,
-  IN INT32      Node,
-  IN CONST VOID *RegProp
-  )
-{
-  UINT64     ConfigBase, ConfigSize;
-  CONST VOID *Prop;
-  INT32      Len;
-  UINT32     BusMin, BusMax;
-  UINT32     RecordIdx;
-  UINT64     IoBase, IoSize, IoTranslation;
-  UINT64     MmioBase, MmioSize, MmioTranslation;
-
-  //
-  // Fetch the ECAM window.
-  //
-  ConfigBase = fdt64_to_cpu (((CONST UINT64 *)RegProp)[0]);
-  ConfigSize = fdt64_to_cpu (((CONST UINT64 *)RegProp)[1]);
-
-  //
-  // Fetch the bus range (note: inclusive).
-  //
-  Prop = fdt_getprop (DeviceTreeBase, Node, "bus-range", &Len);
-  if (Prop == NULL || Len != 2 * sizeof(UINT32)) {
-    DEBUG ((EFI_D_ERROR, "%a: 'bus-range' not found or invalid\n",
-      __FUNCTION__));
-    return EFI_PROTOCOL_ERROR;
-  }
-  BusMin = fdt32_to_cpu (((CONST UINT32 *)Prop)[0]);
-  BusMax = fdt32_to_cpu (((CONST UINT32 *)Prop)[1]);
-
-  //
-  // Sanity check: the config space must accommodate all 4K register bytes of
-  // all 8 functions of all 32 devices of all buses.
-  //
-  if (BusMax < BusMin || BusMax - BusMin == MAX_UINT32 ||
-      DivU64x32 (ConfigSize, SIZE_4KB * 8 * 32) < BusMax - BusMin + 1) {
-    DEBUG ((EFI_D_ERROR, "%a: invalid 'bus-range' and/or 'reg'\n",
-      __FUNCTION__));
-    return EFI_PROTOCOL_ERROR;
-  }
-
-  //
-  // Iterate over "ranges".
-  //
-  Prop = fdt_getprop (DeviceTreeBase, Node, "ranges", &Len);
-  if (Prop == NULL || Len == 0 ||
-      Len % sizeof (DTB_PCI_HOST_RANGE_RECORD) != 0) {
-    DEBUG ((EFI_D_ERROR, "%a: 'ranges' not found or invalid\n", __FUNCTION__));
-    return EFI_PROTOCOL_ERROR;
-  }
-
-  //
-  // IoBase, IoTranslation, MmioBase and MmioTranslation are initialized only
-  // in order to suppress '-Werror=maybe-uninitialized' warnings *incorrectly*
-  // emitted by some gcc versions.
-  //
-  IoBase = 0;
-  IoTranslation = 0;
-  MmioBase = 0;
-  MmioTranslation = 0;
-
-  //
-  // IoSize and MmioSize are initialized to zero because the logic below
-  // requires it.
-  //
-  IoSize = 0;
-  MmioSize = 0;
-  for (RecordIdx = 0; RecordIdx < Len / sizeof (DTB_PCI_HOST_RANGE_RECORD);
-       ++RecordIdx) {
-    CONST DTB_PCI_HOST_RANGE_RECORD *Record;
-
-    Record = (CONST DTB_PCI_HOST_RANGE_RECORD *)Prop + RecordIdx;
-    switch (fdt32_to_cpu (Record->Type) & DTB_PCI_HOST_RANGE_TYPEMASK) {
-    case DTB_PCI_HOST_RANGE_IO:
-      IoBase = fdt64_to_cpu (Record->ChildBase);
-      IoSize = fdt64_to_cpu (Record->Size);
-      IoTranslation = fdt64_to_cpu (Record->CpuBase) - IoBase;
-      break;
-
-    case DTB_PCI_HOST_RANGE_MMIO32:
-      MmioBase = fdt64_to_cpu (Record->ChildBase);
-      MmioSize = fdt64_to_cpu (Record->Size);
-      MmioTranslation = fdt64_to_cpu (Record->CpuBase) - MmioBase;
-
-      if (MmioBase > MAX_UINT32 || MmioSize > MAX_UINT32 ||
-          MmioBase + MmioSize > SIZE_4GB) {
-        DEBUG ((EFI_D_ERROR, "%a: MMIO32 space invalid\n", __FUNCTION__));
-        return EFI_PROTOCOL_ERROR;
-      }
-
-      if (MmioTranslation != 0) {
-        DEBUG ((EFI_D_ERROR, "%a: unsupported nonzero MMIO32 translation "
-          "0x%Lx\n", __FUNCTION__, MmioTranslation));
-        return EFI_UNSUPPORTED;
-      }
-
-      break;
-    }
-  }
-  if (IoSize == 0 || MmioSize == 0) {
-    DEBUG ((EFI_D_ERROR, "%a: %a space empty\n", __FUNCTION__,
-      (IoSize == 0) ? "IO" : "MMIO32"));
-    return EFI_PROTOCOL_ERROR;
-  }
-
-  PcdSet64 (PcdPciExpressBaseAddress, ConfigBase);
-
-  PcdSet32 (PcdPciBusMin, BusMin);
-  PcdSet32 (PcdPciBusMax, BusMax);
-
-  PcdSet64 (PcdPciIoBase,        IoBase);
-  PcdSet64 (PcdPciIoSize,        IoSize);
-  PcdSet64 (PcdPciIoTranslation, IoTranslation);
-
-  PcdSet32 (PcdPciMmio32Base, (UINT32)MmioBase);
-  PcdSet32 (PcdPciMmio32Size, (UINT32)MmioSize);
-
-  PcdSetBool (PcdPciDisableBusEnumeration, FALSE);
-
-  DEBUG ((EFI_D_INFO, "%a: Config[0x%Lx+0x%Lx) Bus[0x%x..0x%x] "
-    "Io[0x%Lx+0x%Lx)@0x%Lx Mem[0x%Lx+0x%Lx)@0x%Lx\n", __FUNCTION__, ConfigBase,
-    ConfigSize, BusMin, BusMax, IoBase, IoSize, IoTranslation, MmioBase,
-    MmioSize, MmioTranslation));
-  return EFI_SUCCESS;
-}
-
-
 EFI_STATUS
 EFIAPI
 InitializeVirtFdtDxe (
@@ -277,7 +105,6 @@ InitializeVirtFdtDxe (
   VIRTIO_TRANSPORT_DEVICE_PATH   *DevicePath;
   EFI_HANDLE                     Handle;
   UINT64                         RegBase;
-  BOOLEAN                        HavePci;
 
   Hob = GetFirstGuidHob(&gFdtHobGuid);
   if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
@@ -293,7 +120,6 @@ InitializeVirtFdtDxe (
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, DeviceTreeBase));
 
   RtcNode = -1;
-  HavePci = FALSE;
   //
   // Now enumerate the nodes and install peripherals that we are interested in,
   // i.e., GIC, RTC and virtio MMIO nodes
@@ -323,13 +149,6 @@ InitializeVirtFdtDxe (
     ASSERT (RegProp != NULL);
 
     switch (PropType) {
-    case PropertyTypePciHost:
-      ASSERT (Len == 2 * sizeof (UINT64));
-      Status = ProcessPciHost (DeviceTreeBase, Node, RegProp);
-      ASSERT_EFI_ERROR (Status);
-      HavePci = TRUE;
-      break;
-
     case PropertyTypeVirtio:
       ASSERT (Len == 16);
       //
@@ -432,28 +251,6 @@ InitializeVirtFdtDxe (
         fdt_setprop_string (DeviceTreeBase, RtcNode, "status",
           "disabled") != 0) {
       DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
-    }
-
-    if (HavePci) {
-      //
-      // Set the /chosen/linux,pci-probe-only property to 1, so that the PCI
-      // setup we will perform in the firmware is honored by the Linux OS,
-      // rather than torn down and done from scratch. This is generally a more
-      // sensible approach, and aligns with what ACPI based OSes do in general.
-      //
-      // In case we are exposing an emulated VGA PCI device to the guest, which
-      // may subsequently get exposed via the Graphics Output protocol and
-      // driven as an efifb by Linux, we need this setting to prevent the
-      // framebuffer from becoming unresponsive.
-      //
-      Node = fdt_path_offset (DeviceTreeBase, "/chosen");
-      if (Node < 0) {
-        Node = fdt_add_subnode (DeviceTreeBase, 0, "/chosen");
-      }
-      if (Node < 0 ||
-          fdt_setprop_u32 (DeviceTreeBase, Node, "linux,pci-probe-only", 1) < 0) {
-        DEBUG ((EFI_D_WARN, "Failed to set /chosen/linux,pci-probe-only property\n"));
-      }
     }
   }
   return EFI_SUCCESS;
