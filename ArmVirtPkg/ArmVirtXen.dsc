@@ -146,8 +146,6 @@
   gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress|0x0
   gArmVirtTokenSpaceGuid.PcdFwCfgDmaAddress|0x0
 
-  gArmVirtTokenSpaceGuid.PcdArmPsciMethod|0
-
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
 ################################################################################

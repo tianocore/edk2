@@ -46,7 +46,6 @@ typedef enum {
   PropertyTypeVirtio,
   PropertyTypeUart,
   PropertyTypeTimer,
-  PropertyTypePsci,
   PropertyTypeFwCfg,
   PropertyTypePciHost,
   PropertyTypeXen,
@@ -63,7 +62,6 @@ STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypeUart,    "arm,pl011"             },
   { PropertyTypeTimer,   "arm,armv7-timer"       },
   { PropertyTypeTimer,   "arm,armv8-timer"       },
-  { PropertyTypePsci,    "arm,psci-0.2"          },
   { PropertyTypeFwCfg,   "qemu,fw-cfg-mmio"      },
   { PropertyTypePciHost, "pci-host-ecam-generic" },
   { PropertyTypeXen,     "xen,xen"               },
@@ -292,7 +290,6 @@ InitializeVirtFdtDxe (
   UINT64                         RegBase;
   CONST INTERRUPT_PROPERTY       *InterruptProp;
   INT32                          SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
-  CONST CHAR8                    *PsciMethod;
   UINT64                         FwCfgSelectorAddress;
   UINT64                         FwCfgSelectorSize;
   UINT64                         FwCfgDataAddress;
@@ -342,8 +339,7 @@ InitializeVirtFdtDxe (
     // TODO use #cells root properties instead
     //
     RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
-    ASSERT ((RegProp != NULL) || (PropType == PropertyTypeTimer) ||
-      (PropType == PropertyTypePsci));
+    ASSERT ((RegProp != NULL) || (PropType == PropertyTypeTimer));
 
     switch (PropType) {
     case PropertyTypePciHost:
@@ -477,19 +473,6 @@ InitializeVirtFdtDxe (
       PcdSet32 (PcdArmArchTimerIntrNum, IntrNum);
       PcdSet32 (PcdArmArchTimerVirtIntrNum, VirtIntrNum);
       PcdSet32 (PcdArmArchTimerHypIntrNum, HypIntrNum);
-      break;
-
-    case PropertyTypePsci:
-      PsciMethod = fdt_getprop (DeviceTreeBase, Node, "method", &Len);
-
-      if (PsciMethod && AsciiStrnCmp (PsciMethod, "hvc", 3) == 0) {
-        PcdSet32 (PcdArmPsciMethod, 1);
-      } else if (PsciMethod && AsciiStrnCmp (PsciMethod, "smc", 3) == 0) {
-        PcdSet32 (PcdArmPsciMethod, 2);
-      } else {
-        DEBUG ((EFI_D_ERROR, "%a: Unknown PSCI method \"%a\"\n", __FUNCTION__,
-          PsciMethod));
-      }
       break;
 
     case PropertyTypeXen:

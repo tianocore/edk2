@@ -50,7 +50,6 @@
   gFdtHobGuid
 
 [Pcd]
-  gArmVirtTokenSpaceGuid.PcdArmPsciMethod
   gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress
   gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress
   gArmVirtTokenSpaceGuid.PcdFwCfgDmaAddress
