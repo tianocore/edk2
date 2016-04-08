@@ -42,7 +42,6 @@ typedef struct {
 
 typedef enum {
   PropertyTypeUnknown,
-  PropertyTypeRtc,
   PropertyTypeVirtio,
   PropertyTypeUart,
   PropertyTypeXen,
@@ -54,7 +53,6 @@ typedef struct {
 } PROPERTY;
 
 STATIC CONST PROPERTY CompatibleProperties[] = {
-  { PropertyTypeRtc,     "arm,pl031"             },
   { PropertyTypeVirtio,  "virtio,mmio"           },
   { PropertyTypeUart,    "arm,pl011"             },
   { PropertyTypeXen,     "xen,xen"               },
@@ -96,7 +94,6 @@ InitializeVirtFdtDxe (
   VOID                           *Hob;
   VOID                           *DeviceTreeBase;
   INT32                          Node, Prev;
-  INT32                          RtcNode;
   EFI_STATUS                     Status;
   CONST CHAR8                    *Type;
   INT32                          Len;
@@ -119,7 +116,6 @@ InitializeVirtFdtDxe (
 
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, DeviceTreeBase));
 
-  RtcNode = -1;
   //
   // Now enumerate the nodes and install peripherals that we are interested in,
   // i.e., GIC, RTC and virtio MMIO nodes
@@ -196,18 +192,6 @@ InitializeVirtFdtDxe (
       }
       break;
 
-    case PropertyTypeRtc:
-      ASSERT (Len == 16);
-
-      RegBase = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
-      ASSERT (RegBase < MAX_UINT32);
-
-      PcdSet32 (PcdPL031RtcBase, (UINT32)RegBase);
-
-      DEBUG ((EFI_D_INFO, "Found PL031 RTC @ 0x%Lx\n", RegBase));
-      RtcNode = Node;
-      break;
-
     case PropertyTypeXen:
       ASSERT (Len == 16);
 
@@ -240,18 +224,7 @@ InitializeVirtFdtDxe (
     //
     Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
     ASSERT_EFI_ERROR (Status);
-
-    //
-    // UEFI takes ownership of the RTC hardware, and exposes its functionality
-    // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
-    // need to disable it in the device tree to prevent the OS from attaching its
-    // device driver as well.
-    //
-    if ((RtcNode != -1) &&
-        fdt_setprop_string (DeviceTreeBase, RtcNode, "status",
-          "disabled") != 0) {
-      DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
-    }
   }
+
   return EFI_SUCCESS;
 }

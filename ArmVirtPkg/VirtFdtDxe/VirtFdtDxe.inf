@@ -49,9 +49,6 @@
   gVirtioMmioTransportGuid
   gFdtHobGuid
 
-[Pcd]
-  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
-
 [FeaturePcd]
   gArmVirtTokenSpaceGuid.PcdPureAcpiBoot
 
