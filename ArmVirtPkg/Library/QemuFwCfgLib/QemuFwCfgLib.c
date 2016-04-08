@@ -14,12 +14,16 @@
   WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
+#include <Uefi.h>
+
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
-#include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <Protocol/FdtClient.h>
 
 STATIC UINTN mFwCfgSelectorAddress;
 STATIC UINTN mFwCfgDataAddress;
@@ -115,8 +119,70 @@ QemuFwCfgInitialize (
   VOID
   )
 {
-  mFwCfgSelectorAddress = (UINTN)PcdGet64 (PcdFwCfgSelectorAddress);
-  mFwCfgDataAddress     = (UINTN)PcdGet64 (PcdFwCfgDataAddress);
+  EFI_STATUS                    Status;
+  FDT_CLIENT_PROTOCOL           *FdtClient;
+  CONST UINT64                  *Reg;
+  UINT32                        RegElemSize, RegSize;
+  UINT64                        FwCfgSelectorAddress;
+  UINT64                        FwCfgSelectorSize;
+  UINT64                        FwCfgDataAddress;
+  UINT64                        FwCfgDataSize;
+  UINT64                        FwCfgDmaAddress;
+  UINT64                        FwCfgDmaSize;
+
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
+                  (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = FdtClient->FindCompatibleNodeReg (FdtClient, "qemu,fw-cfg-mmio",
+                         (CONST VOID **)&Reg, &RegElemSize, &RegSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_WARN,
+      "%a: No 'qemu,fw-cfg-mmio' compatible DT node found (Status == %r)\n",
+      __FUNCTION__, Status));
+    return EFI_SUCCESS;
+  }
+
+  ASSERT (RegElemSize == sizeof (UINT64));
+  ASSERT (RegSize == 2 * sizeof (UINT64));
+
+  FwCfgDataAddress     = SwapBytes64 (Reg[0]);
+  FwCfgDataSize        = 8;
+  FwCfgSelectorAddress = FwCfgDataAddress + FwCfgDataSize;
+  FwCfgSelectorSize    = 2;
+
+  //
+  // The following ASSERT()s express
+  //
+  //   Address + Size - 1 <= MAX_UINTN
+  //
+  // for both registers, that is, that the last byte in each MMIO range is
+  // expressible as a MAX_UINTN. The form below is mathematically
+  // equivalent, and it also prevents any unsigned overflow before the
+  // comparison.
+  //
+  ASSERT (FwCfgSelectorAddress <= MAX_UINTN - FwCfgSelectorSize + 1);
+  ASSERT (FwCfgDataAddress     <= MAX_UINTN - FwCfgDataSize     + 1);
+
+  mFwCfgSelectorAddress = FwCfgSelectorAddress;
+  mFwCfgDataAddress     = FwCfgDataAddress;
+
+  DEBUG ((EFI_D_INFO, "Found FwCfg @ 0x%Lx/0x%Lx\n", FwCfgSelectorAddress,
+    FwCfgDataAddress));
+
+  if (SwapBytes64 (Reg[1]) >= 0x18) {
+    FwCfgDmaAddress = FwCfgDataAddress + 0x10;
+    FwCfgDmaSize    = 0x08;
+
+    //
+    // See explanation above.
+    //
+    ASSERT (FwCfgDmaAddress <= MAX_UINTN - FwCfgDmaSize + 1);
+
+    DEBUG ((EFI_D_INFO, "Found FwCfg DMA @ 0x%Lx\n", FwCfgDmaAddress));
+  } else {
+    FwCfgDmaAddress = 0;
+  }
 
   if (InternalQemuFwCfgIsAvailable ()) {
     UINT32 Signature;
@@ -128,13 +194,13 @@ QemuFwCfgInitialize (
       // For DMA support, we require the DTB to advertise the register, and the
       // feature bitmap (which we read without DMA) to confirm the feature.
       //
-      if (PcdGet64 (PcdFwCfgDmaAddress) != 0) {
+      if (FwCfgDmaAddress != 0) {
         UINT32 Features;
 
         QemuFwCfgSelectItem (QemuFwCfgItemInterfaceVersion);
         Features = QemuFwCfgRead32 ();
         if ((Features & BIT1) != 0) {
-          mFwCfgDmaAddress = PcdGet64 (PcdFwCfgDmaAddress);
+          mFwCfgDmaAddress = FwCfgDmaAddress;
           InternalQemuFwCfgReadBytes = DmaReadBytes;
         }
       }
