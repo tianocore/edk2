@@ -195,7 +195,7 @@
   #
   # Platform Driver
   #
-  ArmVirtPkg/VirtFdtDxe/VirtFdtDxe.inf
+  ArmVirtPkg/XenioFdtDxe/XenioFdtDxe.inf
   ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
 
   #
