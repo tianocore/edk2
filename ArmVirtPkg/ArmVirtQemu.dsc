@@ -313,7 +313,10 @@
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
-  ArmPkg/Drivers/TimerDxe/TimerDxe.inf
+  ArmPkg/Drivers/TimerDxe/TimerDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/ArmVirtTimerFdtClientLib/ArmVirtTimerFdtClientLib.inf
+  }
 !if $(SECURE_BOOT_ENABLE) == TRUE
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashAuthenticatedDxe.inf
 !else
