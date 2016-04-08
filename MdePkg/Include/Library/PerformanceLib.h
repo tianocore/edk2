@@ -1,7 +1,7 @@
 /** @file
   Provides services to log the execution times and retrieve them later.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -168,7 +168,7 @@ StartPerformanceMeasurementEx (
 /**
   Fills in the end time of a performance measurement.
 
-  Looks up the record that matches Handle, Token, Module and Identifier.
+  Looks up the record that matches Handle, Token and Module.
   If the record can not be found then return RETURN_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then TimeStamp is added to the record as the end time.
