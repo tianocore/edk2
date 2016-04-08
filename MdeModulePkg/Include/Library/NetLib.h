@@ -52,6 +52,9 @@ typedef UINT16          TCP_PORTNO;
 #define  IP4_MASK_NUM          33
 #define  IP6_PREFIX_NUM        129
 
+#define  IP4_MASK_MAX          32 
+#define  IP6_PREFIX_MAX        128
+
 #define  IP6_HOP_BY_HOP        0
 #define  IP6_DESTINATION       60
 #define  IP6_ROUTING           43
@@ -230,7 +233,7 @@ typedef struct {
 #define IP4_IS_MULTICAST(Ip)              (((Ip) & 0xF0000000) == 0xE0000000)
 #define IP4_IS_LOCAL_BROADCAST(Ip)        ((Ip) == 0xFFFFFFFF)
 #define IP4_NET_EQUAL(Ip1, Ip2, NetMask)  (((Ip1) & (NetMask)) == ((Ip2) & (NetMask)))
-#define IP4_IS_VALID_NETMASK(Ip)          (NetGetMaskLength (Ip) != IP4_MASK_NUM)
+#define IP4_IS_VALID_NETMASK(Ip)          (NetGetMaskLength (Ip) != (IP4_MASK_MAX + 1))
 
 #define IP6_IS_MULTICAST(Ip6)             (((Ip6)->Addr[0]) == 0xFF)
 

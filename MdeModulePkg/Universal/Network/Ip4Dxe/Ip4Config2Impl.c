@@ -416,7 +416,7 @@ Ip4Config2BuildDefaultRouteTable (
   //
   Count = 0;
 
-  for (Index = IP4_MASK_NUM - 1; Index >= 0; Index--) {
+  for (Index = IP4_MASK_MAX; Index >= 0; Index--) {
 
     NET_LIST_FOR_EACH (Entry, &(IpSb->DefaultRouteTable->RouteArea[Index])) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_ENTRY, Link);

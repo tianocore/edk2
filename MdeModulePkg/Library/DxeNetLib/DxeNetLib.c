@@ -565,7 +565,7 @@ NetGetMaskLength (
 {
   INTN                      Index;
 
-  for (Index = 0; Index < IP4_MASK_NUM; Index++) {
+  for (Index = 0; Index <= IP4_MASK_MAX; Index++) {
     if (NetMask == gIp4AllMasks[Index]) {
       break;
     }
@@ -794,7 +794,7 @@ NetIp6IsNetEqual (
   UINT8 Bit;
   UINT8 Mask;
 
-  ASSERT ((Ip1 != NULL) && (Ip2 != NULL) && (PrefixLength < IP6_PREFIX_NUM));
+  ASSERT ((Ip1 != NULL) && (Ip2 != NULL) && (PrefixLength <= IP6_PREFIX_MAX));
 
   if (PrefixLength == 0) {
     return TRUE;
@@ -3115,7 +3115,7 @@ NetLibStrToIp6andPrefix (
     while (*PrefixStr != '\0') {
       if (NET_IS_DIGIT (*PrefixStr)) {
         Length = (UINT8) (Length * 10 + (*PrefixStr - '0'));
-        if (Length >= IP6_PREFIX_NUM) {
+        if (Length > IP6_PREFIX_MAX) {
           goto Exit;
         }
       } else {

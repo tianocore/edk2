@@ -838,7 +838,7 @@ Ip4StationAddressValid (
   //
   // Only support the continuous net masks
   //
-  if ((Len = NetGetMaskLength (Netmask)) == IP4_MASK_NUM) {
+  if ((Len = NetGetMaskLength (Netmask)) == (IP4_MASK_MAX + 1)) {
     return FALSE;
   }
 

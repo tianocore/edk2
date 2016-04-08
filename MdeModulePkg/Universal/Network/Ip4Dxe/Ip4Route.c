@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -204,7 +204,7 @@ Ip4CreateRouteTable (
   RtTable->RefCnt   = 1;
   RtTable->TotalNum = 0;
 
-  for (Index = 0; Index < IP4_MASK_NUM; Index++) {
+  for (Index = 0; Index <= IP4_MASK_MAX; Index++) {
     InitializeListHead (&(RtTable->RouteArea[Index]));
   }
 
@@ -241,7 +241,7 @@ Ip4FreeRouteTable (
   //
   // Free all the route table entry and its route cache.
   //
-  for (Index = 0; Index < IP4_MASK_NUM; Index++) {
+  for (Index = 0; Index <= IP4_MASK_MAX; Index++) {
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &(RtTable->RouteArea[Index])) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_ENTRY, Link);
 
@@ -469,7 +469,7 @@ Ip4FindRouteEntry (
 
   RtEntry = NULL;
 
-  for (Index = IP4_MASK_NUM - 1; Index >= 0; Index--) {
+  for (Index = IP4_MASK_MAX; Index >= 0; Index--) {
     for (Table = RtTable; Table != NULL; Table = Table->Next) {
       NET_LIST_FOR_EACH (Entry, &Table->RouteArea[Index]) {
         RtEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_ENTRY, Link);
@@ -641,7 +641,7 @@ Ip4BuildEfiRouteTable (
   //
   Count = 0;
 
-  for (Index = IP4_MASK_NUM - 1; Index >= 0; Index--) {
+  for (Index = IP4_MASK_MAX; Index >= 0; Index--) {
     for (RtTable = IpInstance->RouteTable; RtTable != NULL; RtTable = RtTable->Next) {
       NET_LIST_FOR_EACH (Entry, &(RtTable->RouteArea[Index])) {
         RtEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_ENTRY, Link);
