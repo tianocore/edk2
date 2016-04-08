@@ -27,14 +27,24 @@
   ArmVirtGicArchLib.c
 
 [LibraryClasses]
-  PcdLib
-  DebugLib
   ArmGicLib
+  BaseLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
 
 [Packages]
-  MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
 
 [Pcd]
-  gArmVirtTokenSpaceGuid.PcdArmGicRevision
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+
+[Depex]
+  gFdtClientProtocolGuid

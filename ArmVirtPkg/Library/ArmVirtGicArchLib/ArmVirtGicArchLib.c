@@ -1,7 +1,7 @@
 /** @file
   ArmGicArchLib library class implementation for DT based virt platforms
 
-  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,11 +14,16 @@
 **/
 
 #include <Base.h>
+#include <Uefi.h>
 
 #include <Library/ArmGicLib.h>
 #include <Library/ArmGicArchLib.h>
-#include <Library/PcdLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <Protocol/FdtClient.h>
 
 STATIC ARM_GIC_ARCH_REVISION        mGicArchRevision;
 
@@ -28,11 +33,61 @@ ArmVirtGicArchLibConstructor (
   VOID
   )
 {
-  UINT32  IccSre;
+  UINT32                IccSre;
+  FDT_CLIENT_PROTOCOL   *FdtClient;
+  CONST UINT64          *Reg;
+  UINT32                RegElemSize, RegSize;
+  UINTN                 GicRevision;
+  EFI_STATUS            Status;
+  UINT64                DistBase, CpuBase, RedistBase;
 
-  switch (PcdGet32 (PcdArmGicRevision)) {
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
+                  (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
+
+  GicRevision = 2;
+  Status = FdtClient->FindCompatibleNodeReg (FdtClient, "arm,cortex-a15-gic",
+                        (CONST VOID **)&Reg, &RegElemSize, &RegSize);
+  if (Status == EFI_NOT_FOUND) {
+    GicRevision = 3;
+    Status = FdtClient->FindCompatibleNodeReg (FdtClient, "arm,gic-v3",
+                          (CONST VOID **)&Reg, &RegElemSize, &RegSize);
+  }
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  switch (GicRevision) {
 
   case 3:
+    //
+    // The GIC v3 DT binding describes a series of at least 3 physical (base
+    // addresses, size) pairs: the distributor interface (GICD), at least one
+    // redistributor region (GICR) containing dedicated redistributor
+    // interfaces for all individual CPUs, and the CPU interface (GICC).
+    // Under virtualization, we assume that the first redistributor region
+    // listed covers the boot CPU. Also, our GICv3 driver only supports the
+    // system register CPU interface, so we can safely ignore the MMIO version
+    // which is listed after the sequence of redistributor interfaces.
+    // This means we are only interested in the first two memory regions
+    // supplied, and ignore everything else.
+    //
+    ASSERT (RegSize >= 32);
+
+    // RegProp[0..1] == { GICD base, GICD size }
+    DistBase = SwapBytes64 (Reg[0]);
+    ASSERT (DistBase < MAX_UINT32);
+
+    // RegProp[2..3] == { GICR base, GICR size }
+    RedistBase = SwapBytes64 (Reg[2]);
+    ASSERT (RedistBase < MAX_UINT32);
+
+    PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
+    PcdSet32 (PcdGicRedistributorsBase, (UINT32)RedistBase);
+
+    DEBUG ((EFI_D_INFO, "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
+      DistBase, RedistBase));
+
     //
     // The default implementation of ArmGicArchLib is responsible for enabling
     // the system register interface on the GICv3 if one is found. So let's do
@@ -55,6 +110,18 @@ ArmVirtGicArchLibConstructor (
     break;
 
   case 2:
+    ASSERT (RegSize == 32);
+
+    DistBase = SwapBytes64 (Reg[0]);
+    CpuBase  = SwapBytes64 (Reg[2]);
+    ASSERT (DistBase < MAX_UINT32);
+    ASSERT (CpuBase < MAX_UINT32);
+
+    PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
+    PcdSet32 (PcdGicInterruptInterfaceBase, (UINT32)CpuBase);
+
+    DEBUG ((EFI_D_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
+
     mGicArchRevision = ARM_GIC_ARCH_REVISION_2;
     break;
 
