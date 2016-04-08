@@ -26,8 +26,11 @@
 #include <Library/EfiResetSystemLib.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/ArmHvcLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
+
+#include <Protocol/FdtClient.h>
 
 STATIC UINT32 mArmPsciMethod;
 
@@ -37,8 +40,30 @@ ArmPsciResetSystemLibConstructor (
   VOID
   )
 {
-  mArmPsciMethod = PcdGet32 (PcdArmPsciMethod);
-  return RETURN_SUCCESS;
+  EFI_STATUS            Status;
+  FDT_CLIENT_PROTOCOL   *FdtClient;
+  CONST VOID            *Prop;
+
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
+                  (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = FdtClient->FindCompatibleNodeProperty (FdtClient, "arm,psci-0.2",
+                        "method", &Prop, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (AsciiStrnCmp (Prop, "hvc", 3) == 0) {
+    mArmPsciMethod = 1;
+  } else if (AsciiStrnCmp (Prop, "smc", 3) == 0) {
+    mArmPsciMethod = 2;
+  } else {
+    DEBUG ((EFI_D_ERROR, "%a: Unknown PSCI method \"%a\"\n", __FUNCTION__,
+      Prop));
+    return EFI_NOT_FOUND;
+  }
+  return EFI_SUCCESS;
 }
 
 /**

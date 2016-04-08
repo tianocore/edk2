@@ -20,7 +20,7 @@
   FILE_GUID                      = c81d76ed-66fa-44a3-ac4a-f163120187a9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EfiResetSystemLib
+  LIBRARY_CLASS                  = EfiResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = ArmPsciResetSystemLibConstructor
 
 [Sources]
@@ -33,10 +33,14 @@
   EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
-  DebugLib
-  BaseLib
   ArmSmcLib
   ArmHvcLib
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
 
-[Pcd]
-  gArmVirtTokenSpaceGuid.PcdArmPsciMethod
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
+
+[Depex]
+  gFdtClientProtocolGuid
