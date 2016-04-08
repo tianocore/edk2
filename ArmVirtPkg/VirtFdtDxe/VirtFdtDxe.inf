@@ -50,9 +50,6 @@
   gFdtHobGuid
 
 [Pcd]
-  gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress
-  gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress
-  gArmVirtTokenSpaceGuid.PcdFwCfgDmaAddress
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
   gArmPlatformTokenSpaceGuid.PcdPciBusMin
   gArmPlatformTokenSpaceGuid.PcdPciBusMax

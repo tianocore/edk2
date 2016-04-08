@@ -45,7 +45,6 @@ typedef enum {
   PropertyTypeRtc,
   PropertyTypeVirtio,
   PropertyTypeUart,
-  PropertyTypeFwCfg,
   PropertyTypePciHost,
   PropertyTypeXen,
 } PROPERTY_TYPE;
@@ -59,7 +58,6 @@ STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypeRtc,     "arm,pl031"             },
   { PropertyTypeVirtio,  "virtio,mmio"           },
   { PropertyTypeUart,    "arm,pl011"             },
-  { PropertyTypeFwCfg,   "qemu,fw-cfg-mmio"      },
   { PropertyTypePciHost, "pci-host-ecam-generic" },
   { PropertyTypeXen,     "xen,xen"               },
   { PropertyTypeUnknown, ""                      }
@@ -279,12 +277,6 @@ InitializeVirtFdtDxe (
   VIRTIO_TRANSPORT_DEVICE_PATH   *DevicePath;
   EFI_HANDLE                     Handle;
   UINT64                         RegBase;
-  UINT64                         FwCfgSelectorAddress;
-  UINT64                         FwCfgSelectorSize;
-  UINT64                         FwCfgDataAddress;
-  UINT64                         FwCfgDataSize;
-  UINT64                         FwCfgDmaAddress;
-  UINT64                         FwCfgDmaSize;
   BOOLEAN                        HavePci;
 
   Hob = GetFirstGuidHob(&gFdtHobGuid);
@@ -336,47 +328,6 @@ InitializeVirtFdtDxe (
       Status = ProcessPciHost (DeviceTreeBase, Node, RegProp);
       ASSERT_EFI_ERROR (Status);
       HavePci = TRUE;
-      break;
-
-    case PropertyTypeFwCfg:
-      ASSERT (Len == 2 * sizeof (UINT64));
-
-      FwCfgDataAddress     = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
-      FwCfgDataSize        = 8;
-      FwCfgSelectorAddress = FwCfgDataAddress + FwCfgDataSize;
-      FwCfgSelectorSize    = 2;
-
-      //
-      // The following ASSERT()s express
-      //
-      //   Address + Size - 1 <= MAX_UINTN
-      //
-      // for both registers, that is, that the last byte in each MMIO range is
-      // expressible as a MAX_UINTN. The form below is mathematically
-      // equivalent, and it also prevents any unsigned overflow before the
-      // comparison.
-      //
-      ASSERT (FwCfgSelectorAddress <= MAX_UINTN - FwCfgSelectorSize + 1);
-      ASSERT (FwCfgDataAddress     <= MAX_UINTN - FwCfgDataSize     + 1);
-
-      PcdSet64 (PcdFwCfgSelectorAddress, FwCfgSelectorAddress);
-      PcdSet64 (PcdFwCfgDataAddress,     FwCfgDataAddress);
-
-      DEBUG ((EFI_D_INFO, "Found FwCfg @ 0x%Lx/0x%Lx\n", FwCfgSelectorAddress,
-        FwCfgDataAddress));
-
-      if (fdt64_to_cpu (((UINT64 *)RegProp)[1]) >= 0x18) {
-        FwCfgDmaAddress = FwCfgDataAddress + 0x10;
-        FwCfgDmaSize    = 0x08;
-
-        //
-        // See explanation above.
-        //
-        ASSERT (FwCfgDmaAddress <= MAX_UINTN - FwCfgDmaSize + 1);
-
-        PcdSet64 (PcdFwCfgDmaAddress, FwCfgDmaAddress);
-        DEBUG ((EFI_D_INFO, "Found FwCfg DMA @ 0x%Lx\n", FwCfgDmaAddress));
-      }
       break;
 
     case PropertyTypeVirtio:

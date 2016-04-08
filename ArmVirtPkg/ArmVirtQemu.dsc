@@ -221,10 +221,6 @@
   gArmPlatformTokenSpaceGuid.PcdPciMmio32Size|0x0
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x0
 
-  gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress|0x0
-  gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress|0x0
-  gArmVirtTokenSpaceGuid.PcdFwCfgDmaAddress|0x0
-
   #
   # Set video resolution for boot options and for text setup.
   # PlatformDxe can set the former at runtime.
