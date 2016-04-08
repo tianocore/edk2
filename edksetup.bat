@@ -1,7 +1,7 @@
 @REM @file
 @REM   Windows batch file to setup a WORKSPACE environment
 @REM
-@REM Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 @REM This program and the accompanying materials
 @REM are licensed and made available under the terms and conditions of the BSD License
 @REM which accompanies this distribution.  The full text of the license may be found at
@@ -100,21 +100,23 @@ shift
 :no_nt32
 
 if /I "%1"=="NewBuild" shift
-if exist %WORKSPACE%\BaseTools (
-  set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
-) else (
-  if defined PACKAGES_PATH (
-    for %%i IN (%PACKAGES_PATH%) DO (
-      if exist %%~fi\BaseTools (
-        set EDK_TOOLS_PATH=%%~fi\BaseTools
-        goto checkBaseTools
-      )
-    )
+if not defined EDK_TOOLS_PATH (
+  if exist %WORKSPACE%\BaseTools (
+    set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
   ) else (
-    echo.
-    echo !!! ERROR !!! Cannot find BaseTools !!!
-    echo. 
-    goto BadBaseTools
+    if defined PACKAGES_PATH (
+      for %%i IN (%PACKAGES_PATH%) DO (
+        if exist %%~fi\BaseTools (
+          set EDK_TOOLS_PATH=%%~fi\BaseTools
+          goto checkBaseTools
+        )
+      )
+    ) else (
+      echo.
+      echo !!! ERROR !!! Cannot find BaseTools !!!
+      echo. 
+      goto BadBaseTools
+    )
   )
 )
 if exist %EDK_TOOLS_PATH%\Source set BASE_TOOLS_PATH=%EDK_TOOLS_PATH%
