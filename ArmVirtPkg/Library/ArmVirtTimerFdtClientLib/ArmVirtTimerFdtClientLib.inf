@@ -1,0 +1,49 @@
+#/** @file
+#  FDT client library for ARM's TimerDxe
+#
+#  Copyright (c) 2016, Linaro Ltd. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmVirtTimerFdtClientLib
+  FILE_GUID                      = 77EA80CA-2EFB-4AB4-8567-230D968F6B37
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmVirtTimerFdtClientLib|DXE_DRIVER
+  CONSTRUCTOR                    = ArmVirtTimerFdtClientLibConstructor
+
+[Sources]
+  ArmVirtTimerFdtClientLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
+
+[Depex]
+  gFdtClientProtocolGuid
