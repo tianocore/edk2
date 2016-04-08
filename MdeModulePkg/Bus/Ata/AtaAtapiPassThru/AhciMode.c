@@ -2513,7 +2513,7 @@ AhciModeInitialization (
       //
       // Found a ATA or ATAPI device, add it into the device list.
       //
-      CreateNewDeviceInfo (Instance, Port, 0, DeviceType, &Buffer);
+      CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, &Buffer);
       if (DeviceType == EfiIdeHarddisk) {
         REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
       }

@@ -1,7 +1,7 @@
 /** @file
   Header file for ATA/ATAPI PASS THRU driver.
 
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -437,7 +437,7 @@ AtaAtapiPassThruStop (
   @param[in]  Instance            A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
   @param[in]  Port                The port number of the ATA device to send the command.
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
-                                  If there is no port multiplier, then specify 0.
+                                  If there is no port multiplier, then specify 0xFFFF.
   @param[in]  DeviceType          The device type of the ATA device.
 
   @retval     The pointer to the data structure of the device info to access.
@@ -459,7 +459,7 @@ SearchDeviceInfoList (
   @param[in]  Instance            A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
   @param[in]  Port                The port number of the ATA device to send the command.
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
-                                  If there is no port multiplier, then specify 0.
+                                  If there is no port multiplier, then specify 0xFFFF.
   @param[in]  DeviceType          The device type of the ATA device.
   @param[in]  IdentifyData        The data buffer to store the output of the IDENTIFY cmd.
 
@@ -544,7 +544,7 @@ AsyncNonBlockingTransferRoutine (
   @param[in]      This               A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
   @param[in]      Port               The port number of the ATA device to send the command.
   @param[in]      PortMultiplierPort The port multiplier port number of the ATA device to send the command.
-                                     If there is no port multiplier, then specify 0.
+                                     If there is no port multiplier, then specify 0xFFFF.
   @param[in, out] Packet             A pointer to the ATA command to send to the ATA device specified by Port
                                      and PortMultiplierPort.
   @param[in]      Event              If non-blocking I/O is not supported then Event is ignored, and blocking
@@ -681,7 +681,7 @@ AtaPassThruGetNextDevice (
                                      device path node is to be allocated and built.
   @param[in]      PortMultiplierPort The port multiplier port number of the ATA device for which a
                                      device path node is to be allocated and built. If there is no
-                                     port multiplier, then specify 0.
+                                     port multiplier, then specify 0xFFFF.
   @param[in, out] DevicePath         A pointer to a single device path node that describes the ATA
                                      device specified by Port and PortMultiplierPort. This function
                                      is responsible for allocating the buffer DevicePath with the
@@ -802,7 +802,7 @@ AtaPassThruResetPort (
   @param[in] This                A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
   @param[in] Port                Port represents the port number of the ATA device to be reset.
   @param[in] PortMultiplierPort  The port multiplier port number of the ATA device to reset.
-                                 If there is no port multiplier, then specify 0.
+                                 If there is no port multiplier, then specify 0xFFFF.
   @retval EFI_SUCCESS            The ATA device specified by Port and PortMultiplierPort was reset.
   @retval EFI_UNSUPPORTED        The ATA controller does not support a device reset operation.
   @retval EFI_INVALID_PARAMETER  Port or PortMultiplierPort are invalid.
