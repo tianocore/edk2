@@ -1,7 +1,7 @@
 /** @file
 The module to produce Usb Bus PPI.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -702,7 +702,7 @@ PeiConfigureUsbDevice (
     return Status;
   }
 
-  if ((DeviceDescriptor.BcdUSB == 0x0300) && (DeviceDescriptor.MaxPacketSize0 == 9)) {
+  if ((DeviceDescriptor.BcdUSB >= 0x0300) && (DeviceDescriptor.MaxPacketSize0 == 9)) {
     PeiUsbDevice->MaxPacketSize0 = 1 << 9;
   } else {
     PeiUsbDevice->MaxPacketSize0 = DeviceDescriptor.MaxPacketSize0;

@@ -1,7 +1,7 @@
 /** @file
   The XHCI controller driver.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -955,7 +955,7 @@ XhcControlTransfer (
         // Store a copy of device scriptor as hub device need this info to configure endpoint.
         //
         CopyMem (&Xhc->UsbDevContext[SlotId].DevDesc, Data, *DataLength);
-        if (Xhc->UsbDevContext[SlotId].DevDesc.BcdUSB == 0x0300) {
+        if (Xhc->UsbDevContext[SlotId].DevDesc.BcdUSB >= 0x0300) {
           //
           // If it's a usb3.0 device, then its max packet size is a 2^n.
           //

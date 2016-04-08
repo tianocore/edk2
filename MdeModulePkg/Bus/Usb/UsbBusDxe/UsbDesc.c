@@ -2,7 +2,7 @@
 
     Manage Usb Descriptor List
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -539,7 +539,7 @@ UsbGetMaxPacketSize0 (
     Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_DEVICE, 0, 0, &DevDesc, 8);
 
     if (!EFI_ERROR (Status)) {
-      if ((DevDesc.BcdUSB == 0x0300) && (DevDesc.MaxPacketSize0 == 9)) {
+      if ((DevDesc.BcdUSB >= 0x0300) && (DevDesc.MaxPacketSize0 == 9)) {
         UsbDev->MaxPacket0 = 1 << 9;
         return EFI_SUCCESS;
       }
