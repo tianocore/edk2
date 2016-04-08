@@ -1,7 +1,7 @@
 ## @file
-#  Device tree enumeration DXE driver for ARM Virtual Machines
+#  Virtio FDT client protocol driver for virtio,mmio DT node
 #
-#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2016, Linaro Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials are
 #  licensed and made available under the terms and conditions of the BSD License
@@ -15,41 +15,37 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = VirtFdtDxe
-  FILE_GUID                      = 9AD7DCB4-E6EC-472E-96BF-81C219A3F77E
+  BASE_NAME                      = VirtioFdtDxe
+  FILE_GUID                      = 0049858F-8CA7-4CCD-918B-D952CBF32975
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
-  ENTRY_POINT                    = InitializeVirtFdtDxe
+  ENTRY_POINT                    = InitializeVirtioFdtDxe
 
 [Sources]
-  VirtFdtDxe.c
+  VirtioFdtDxe.c
 
 [Packages]
-  MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
-  ArmPkg/ArmPkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
-  PcdLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
   UefiDriverEntryPoint
-  DxeServicesLib
-  FdtLib
   VirtioMmioDeviceLib
-  HobLib
-  XenIoMmioLib
 
 [Guids]
   gVirtioMmioTransportGuid
-  gFdtHobGuid
 
 [Protocols]
-  gEfiDevicePathProtocolGuid
+  gEfiDevicePathProtocolGuid                            ## PRODUCES
+  gFdtClientProtocolGuid                                ## CONSUMES
 
 [Depex]
-  TRUE
+  gFdtClientProtocolGuid

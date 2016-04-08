@@ -300,7 +300,7 @@
   #
   # Platform Driver
   #
-  ArmVirtPkg/VirtFdtDxe/VirtFdtDxe.inf
+  ArmVirtPkg/VirtioFdtDxe/VirtioFdtDxe.inf
   ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
