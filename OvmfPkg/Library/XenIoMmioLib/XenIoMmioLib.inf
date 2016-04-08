@@ -30,6 +30,7 @@
 
 [LibraryClasses]
   BaseMemoryLib
+  MemoryAllocationLib
 
 [Guids]
   gXenBusRootDeviceGuid
