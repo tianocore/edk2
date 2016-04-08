@@ -17,12 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "SmmProfileInternal.h"
 
-///
-/// MSR Register Index
-///
-#define MSR_IA32_MISC_ENABLE                  0x1A0
-#define   B_XD_DISABLE_BIT                    BIT34
-
 //
 // External functions
 //

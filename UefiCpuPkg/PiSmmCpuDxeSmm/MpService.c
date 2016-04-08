@@ -1013,13 +1013,14 @@ SmiRendezvous (
   IN      UINTN                     CpuIndex
   )
 {
-  EFI_STATUS        Status;
-  BOOLEAN           ValidSmi;
-  BOOLEAN           IsBsp;
-  BOOLEAN           BspInProgress;
-  UINTN             Index;
-  UINTN             Cr2;
-  BOOLEAN           XdDisableFlag;
+  EFI_STATUS                     Status;
+  BOOLEAN                        ValidSmi;
+  BOOLEAN                        IsBsp;
+  BOOLEAN                        BspInProgress;
+  UINTN                          Index;
+  UINTN                          Cr2;
+  BOOLEAN                        XdDisableFlag;
+  MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
 
   //
   // Save Cr2 because Page Fault exception in SMM may override its value
@@ -1083,9 +1084,11 @@ SmiRendezvous (
     //
     XdDisableFlag = FALSE;
     if (mXdSupported) {
-      if ((AsmReadMsr64 (MSR_IA32_MISC_ENABLE) & B_XD_DISABLE_BIT) != 0) {
+      MiscEnableMsr.Uint64 = AsmReadMsr64 (MSR_IA32_MISC_ENABLE);
+      if (MiscEnableMsr.Bits.XD == 1) {
         XdDisableFlag = TRUE;
-        AsmMsrAnd64 (MSR_IA32_MISC_ENABLE, ~B_XD_DISABLE_BIT);
+        MiscEnableMsr.Bits.XD = 0;
+        AsmWriteMsr64 (MSR_IA32_MISC_ENABLE, MiscEnableMsr.Uint64);
       }
       ActivateXd ();
     }
@@ -1176,7 +1179,9 @@ SmiRendezvous (
     // Restore XD
     //
     if (XdDisableFlag) {
-      AsmMsrOr64 (MSR_IA32_MISC_ENABLE, B_XD_DISABLE_BIT);
+      MiscEnableMsr.Uint64 = AsmReadMsr64 (MSR_IA32_MISC_ENABLE);
+      MiscEnableMsr.Bits.XD = 1;
+      AsmWriteMsr64 (MSR_IA32_MISC_ENABLE, MiscEnableMsr.Uint64);
     }
   }
 

@@ -934,8 +934,9 @@ CheckFeatureSupported (
   IN OUT VOID   *Buffer
   )
 {
-  UINT32                 RegEax;
-  UINT32                 RegEdx;
+  UINT32                         RegEax;
+  UINT32                         RegEdx;
+  MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
 
   if (mXdSupported) {
     AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
@@ -966,9 +967,10 @@ CheckFeatureSupported (
       //    BTINT bits in the MSR_DEBUGCTLA MSR.
       // 2. The IA32_DS_AREA MSR can be programmed to point to the DS save area.
       //
-      if (AsmMsrBitFieldRead64 (MSR_IA32_MISC_ENABLE, 11, 11) == 1) {
+      MiscEnableMsr.Uint64 = AsmReadMsr64 (MSR_IA32_MISC_ENABLE);
+      if (MiscEnableMsr.Bits.BTS == 1) {
         //
-        // BTS facilities is not supported if MSR_IA32_MISC_ENABLE BIT11 is set.
+        // BTS facilities is not supported if MSR_IA32_MISC_ENABLE.BTS bit is set.
         //
         mBtsSupported = FALSE;
       }
