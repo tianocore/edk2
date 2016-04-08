@@ -52,7 +52,7 @@ typedef struct {
 // as we would in a strict power-of-2 sequence
 //
 STATIC CONST UINT16 mPoolSizeTable[] = {
-  64, 128, 192, 320, 512, 832, 1344, 2176, 3520, 5696, 9216, 14912, 24128
+  128, 256, 384, 640, 1024, 1664, 2688, 4352, 7040, 11392, 18432, 29824
 };
 
 #define SIZE_TO_LIST(a)   (GetPoolIndexFromSize (a))
