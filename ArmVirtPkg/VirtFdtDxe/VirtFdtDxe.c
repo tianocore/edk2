@@ -43,7 +43,6 @@ typedef struct {
 typedef enum {
   PropertyTypeUnknown,
   PropertyTypeVirtio,
-  PropertyTypeUart,
   PropertyTypeXen,
 } PROPERTY_TYPE;
 
@@ -54,7 +53,6 @@ typedef struct {
 
 STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypeVirtio,  "virtio,mmio"           },
-  { PropertyTypeUart,    "arm,pl011"             },
   { PropertyTypeXen,     "xen,xen"               },
   { PropertyTypeUnknown, ""                      }
 };
