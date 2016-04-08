@@ -54,10 +54,6 @@
   gArmVirtTokenSpaceGuid.PcdFwCfgSelectorAddress
   gArmVirtTokenSpaceGuid.PcdFwCfgDataAddress
   gArmVirtTokenSpaceGuid.PcdFwCfgDmaAddress
-  gArmVirtTokenSpaceGuid.PcdArmGicRevision
-  gArmTokenSpaceGuid.PcdGicDistributorBase
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum

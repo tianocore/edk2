@@ -42,7 +42,6 @@ typedef struct {
 
 typedef enum {
   PropertyTypeUnknown,
-  PropertyTypeGic,
   PropertyTypeRtc,
   PropertyTypeVirtio,
   PropertyTypeUart,
@@ -50,7 +49,6 @@ typedef enum {
   PropertyTypePsci,
   PropertyTypeFwCfg,
   PropertyTypePciHost,
-  PropertyTypeGicV3,
   PropertyTypeXen,
 } PROPERTY_TYPE;
 
@@ -60,7 +58,6 @@ typedef struct {
 } PROPERTY;
 
 STATIC CONST PROPERTY CompatibleProperties[] = {
-  { PropertyTypeGic,     "arm,cortex-a15-gic"    },
   { PropertyTypeRtc,     "arm,pl031"             },
   { PropertyTypeVirtio,  "virtio,mmio"           },
   { PropertyTypeUart,    "arm,pl011"             },
@@ -69,7 +66,6 @@ STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypePsci,    "arm,psci-0.2"          },
   { PropertyTypeFwCfg,   "qemu,fw-cfg-mmio"      },
   { PropertyTypePciHost, "pci-host-ecam-generic" },
-  { PropertyTypeGicV3,   "arm,gic-v3"            },
   { PropertyTypeXen,     "xen,xen"               },
   { PropertyTypeUnknown, ""                      }
 };
@@ -294,7 +290,6 @@ InitializeVirtFdtDxe (
   VIRTIO_TRANSPORT_DEVICE_PATH   *DevicePath;
   EFI_HANDLE                     Handle;
   UINT64                         RegBase;
-  UINT64                         DistBase, CpuBase, RedistBase;
   CONST INTERRUPT_PROPERTY       *InterruptProp;
   INT32                          SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
   CONST CHAR8                    *PsciMethod;
@@ -444,52 +439,6 @@ InitializeVirtFdtDxe (
         ASSERT_EFI_ERROR (Status);
         FreePool (DevicePath);
       }
-      break;
-
-    case PropertyTypeGic:
-      ASSERT (Len == 32);
-
-      DistBase = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
-      CpuBase  = fdt64_to_cpu (((UINT64 *)RegProp)[2]);
-      ASSERT (DistBase < MAX_UINT32);
-      ASSERT (CpuBase < MAX_UINT32);
-
-      PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
-      PcdSet32 (PcdGicInterruptInterfaceBase, (UINT32)CpuBase);
-      PcdSet32 (PcdArmGicRevision, 2);
-
-      DEBUG ((EFI_D_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
-      break;
-
-    case PropertyTypeGicV3:
-      //
-      // The GIC v3 DT binding describes a series of at least 3 physical (base
-      // addresses, size) pairs: the distributor interface (GICD), at least one
-      // redistributor region (GICR) containing dedicated redistributor
-      // interfaces for all individual CPUs, and the CPU interface (GICC).
-      // Under virtualization, we assume that the first redistributor region
-      // listed covers the boot CPU. Also, our GICv3 driver only supports the
-      // system register CPU interface, so we can safely ignore the MMIO version
-      // which is listed after the sequence of redistributor interfaces.
-      // This means we are only interested in the first two memory regions
-      // supplied, and ignore everything else.
-      //
-      ASSERT (Len >= 32);
-
-      // RegProp[0..1] == { GICD base, GICD size }
-      DistBase = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
-      ASSERT (DistBase < MAX_UINT32);
-
-      // RegProp[2..3] == { GICR base, GICR size }
-      RedistBase = fdt64_to_cpu (((UINT64 *)RegProp)[2]);
-      ASSERT (RedistBase < MAX_UINT32);
-
-      PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
-      PcdSet32 (PcdGicRedistributorsBase, (UINT32)RedistBase);
-      PcdSet32 (PcdArmGicRevision, 3);
-
-      DEBUG ((EFI_D_INFO, "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
-        DistBase, RedistBase));
       break;
 
     case PropertyTypeRtc:
