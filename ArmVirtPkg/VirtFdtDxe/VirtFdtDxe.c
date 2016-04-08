@@ -45,7 +45,6 @@ typedef enum {
   PropertyTypeRtc,
   PropertyTypeVirtio,
   PropertyTypeUart,
-  PropertyTypeTimer,
   PropertyTypeFwCfg,
   PropertyTypePciHost,
   PropertyTypeXen,
@@ -60,19 +59,11 @@ STATIC CONST PROPERTY CompatibleProperties[] = {
   { PropertyTypeRtc,     "arm,pl031"             },
   { PropertyTypeVirtio,  "virtio,mmio"           },
   { PropertyTypeUart,    "arm,pl011"             },
-  { PropertyTypeTimer,   "arm,armv7-timer"       },
-  { PropertyTypeTimer,   "arm,armv8-timer"       },
   { PropertyTypeFwCfg,   "qemu,fw-cfg-mmio"      },
   { PropertyTypePciHost, "pci-host-ecam-generic" },
   { PropertyTypeXen,     "xen,xen"               },
   { PropertyTypeUnknown, ""                      }
 };
-
-typedef struct {
-  UINT32  Type;
-  UINT32  Number;
-  UINT32  Flags;
-} INTERRUPT_PROPERTY;
 
 STATIC
 PROPERTY_TYPE
@@ -288,8 +279,6 @@ InitializeVirtFdtDxe (
   VIRTIO_TRANSPORT_DEVICE_PATH   *DevicePath;
   EFI_HANDLE                     Handle;
   UINT64                         RegBase;
-  CONST INTERRUPT_PROPERTY       *InterruptProp;
-  INT32                          SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
   UINT64                         FwCfgSelectorAddress;
   UINT64                         FwCfgSelectorSize;
   UINT64                         FwCfgDataAddress;
@@ -339,7 +328,7 @@ InitializeVirtFdtDxe (
     // TODO use #cells root properties instead
     //
     RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
-    ASSERT ((RegProp != NULL) || (PropType == PropertyTypeTimer));
+    ASSERT (RegProp != NULL);
 
     switch (PropType) {
     case PropertyTypePciHost:
@@ -447,32 +436,6 @@ InitializeVirtFdtDxe (
 
       DEBUG ((EFI_D_INFO, "Found PL031 RTC @ 0x%Lx\n", RegBase));
       RtcNode = Node;
-      break;
-
-    case PropertyTypeTimer:
-      //
-      // - interrupts : Interrupt list for secure, non-secure, virtual and
-      //  hypervisor timers, in that order.
-      //
-      InterruptProp = fdt_getprop (DeviceTreeBase, Node, "interrupts", &Len);
-      ASSERT (Len == 36 || Len == 48);
-
-      SecIntrNum = fdt32_to_cpu (InterruptProp[0].Number)
-                   + (InterruptProp[0].Type ? 16 : 0);
-      IntrNum = fdt32_to_cpu (InterruptProp[1].Number)
-                + (InterruptProp[1].Type ? 16 : 0);
-      VirtIntrNum = fdt32_to_cpu (InterruptProp[2].Number)
-                    + (InterruptProp[2].Type ? 16 : 0);
-      HypIntrNum = Len < 48 ? 0 : fdt32_to_cpu (InterruptProp[3].Number)
-                                  + (InterruptProp[3].Type ? 16 : 0);
-
-      DEBUG ((EFI_D_INFO, "Found Timer interrupts %d, %d, %d, %d\n",
-        SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum));
-
-      PcdSet32 (PcdArmArchTimerSecIntrNum, SecIntrNum);
-      PcdSet32 (PcdArmArchTimerIntrNum, IntrNum);
-      PcdSet32 (PcdArmArchTimerVirtIntrNum, VirtIntrNum);
-      PcdSet32 (PcdArmArchTimerHypIntrNum, HypIntrNum);
       break;
 
     case PropertyTypeXen:
