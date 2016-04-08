@@ -10,7 +10,7 @@
   This library is mainly used by DxeCore to start performance logging to ensure that
   Performance Protocol is installed at the very beginning of DXE phase.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -110,8 +110,7 @@ InternalSearchForGaugeEntry (
     if (GaugeEntryExArray[Index2].EndTimeStamp == 0 &&
         (GaugeEntryExArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
         AsciiStrnCmp (GaugeEntryExArray[Index2].Token, Token, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
-        AsciiStrnCmp (GaugeEntryExArray[Index2].Module, Module, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
-        (GaugeEntryExArray[Index2].Identifier == Identifier)) {
+        AsciiStrnCmp (GaugeEntryExArray[Index2].Module, Module, DXE_PERFORMANCE_STRING_LENGTH) == 0) {
       Index = Index2;
       break;
     }
@@ -216,7 +215,7 @@ StartGaugeEx (
   for the first matching record that contains a zero end time and fills in a valid end time.
 
   Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, Module and Identifier and has an end time value of zero.
+  for the first record that matches Handle, Token and Module and has an end time value of zero.
   If the record can not be found then return EFI_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then the end time in the record is filled in with the value specified by TimeStamp.
@@ -578,7 +577,7 @@ StartPerformanceMeasurementEx (
   for the first matching record that contains a zero end time and fills in a valid end time.
 
   Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, Module and Identifier and has an end time value of zero.
+  for the first record that matches Handle, Token and Module and has an end time value of zero.
   If the record can not be found then return RETURN_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then the end time in the record is filled in with the value specified by TimeStamp.

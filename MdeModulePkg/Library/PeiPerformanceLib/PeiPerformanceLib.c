@@ -7,7 +7,7 @@
   number of performance logging entry is specified by PcdMaxPeiPerformanceLogEntries or 
   PcdMaxPeiPerformanceLogEntries16.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -140,8 +140,7 @@ InternalSearchForLogEntry (
     if (LogEntryArray[Index2].EndTimeStamp == 0 &&
         (LogEntryArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
         AsciiStrnCmp (LogEntryArray[Index2].Token, Token, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-        AsciiStrnCmp (LogEntryArray[Index2].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-        (PeiPerformanceIdArray[Index2] == Identifier)) {
+        AsciiStrnCmp (LogEntryArray[Index2].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0) {
       Index = Index2;
       break;
     }
@@ -222,7 +221,7 @@ StartPerformanceMeasurementEx (
 /**
   Fills in the end time of a performance measurement.
 
-  Looks up the record that matches Handle, Token, Module and Identifier.
+  Looks up the record that matches Handle, Token and Module.
   If the record can not be found then return RETURN_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then TimeStamp is added to the record as the end time.
