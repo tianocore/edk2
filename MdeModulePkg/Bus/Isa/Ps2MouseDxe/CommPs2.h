@@ -266,7 +266,7 @@ PS2MouseGetPacket (
 **/
 EFI_STATUS
 PS2MouseRead (
-  OUT VOID                                *Buffer,
+  OUT UINT8                               *Buffer,
   IN OUT UINTN                            *BufSize,
   IN  UINTN                               State
   );
