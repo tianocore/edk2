@@ -112,6 +112,7 @@ CoreAllocatePoolI (
   Caller must have the memory lock held
 
   @param  Buffer                 The allocated pool entry to free
+  @param  PoolType               Pointer to pool type
 
   @retval EFI_INVALID_PARAMETER  Buffer not valid
   @retval EFI_SUCCESS            Buffer successfully freed.
@@ -119,7 +120,8 @@ CoreAllocatePoolI (
 **/
 EFI_STATUS
 CoreFreePoolI (
-  IN VOID       *Buffer
+  IN VOID               *Buffer,
+  OUT EFI_MEMORY_TYPE   *PoolType OPTIONAL
   );
 
 

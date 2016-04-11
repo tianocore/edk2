@@ -459,6 +459,7 @@ Done:
   Frees pool.
 
   @param  Buffer                 The allocated pool entry to free
+  @param  PoolType               Pointer to pool type
 
   @retval EFI_INVALID_PARAMETER  Buffer is not a valid value.
   @retval EFI_SUCCESS            Pool successfully freed.
@@ -467,7 +468,8 @@ Done:
 EFI_STATUS
 EFIAPI
 CoreInternalFreePool (
-  IN VOID        *Buffer
+  IN VOID               *Buffer,
+  OUT EFI_MEMORY_TYPE   *PoolType OPTIONAL
   )
 {
   EFI_STATUS Status;
@@ -477,7 +479,7 @@ CoreInternalFreePool (
   }
 
   CoreAcquireMemoryLock ();
-  Status = CoreFreePoolI (Buffer);
+  Status = CoreFreePoolI (Buffer, PoolType);
   CoreReleaseMemoryLock ();
   return Status;
 }
@@ -497,9 +499,10 @@ CoreFreePool (
   IN VOID  *Buffer
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS        Status;
+  EFI_MEMORY_TYPE   PoolType;
 
-  Status = CoreInternalFreePool (Buffer);
+  Status = CoreInternalFreePool (Buffer, &PoolType);
   if (!EFI_ERROR (Status)) {
     CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePool, (EFI_MEMORY_TYPE) 0, 0, Buffer);
   }
@@ -511,6 +514,7 @@ CoreFreePool (
   Caller must have the memory lock held
 
   @param  Buffer                 The allocated pool entry to free
+  @param  PoolType               Pointer to pool type
 
   @retval EFI_INVALID_PARAMETER  Buffer not valid
   @retval EFI_SUCCESS            Buffer successfully freed.
@@ -518,7 +522,8 @@ CoreFreePool (
 **/
 EFI_STATUS
 CoreFreePoolI (
-  IN VOID       *Buffer
+  IN VOID               *Buffer,
+  OUT EFI_MEMORY_TYPE   *PoolType OPTIONAL
   )
 {
   POOL        *Pool;
@@ -581,6 +586,10 @@ CoreFreePoolI (
     Granularity = EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT;
   } else {
     Granularity = DEFAULT_PAGE_ALLOCATION;
+  }
+
+  if (PoolType != NULL) {
+    *PoolType = Head->Type;
   }
 
   //
@@ -667,7 +676,7 @@ CoreFreePoolI (
   //
   if (((UINT32) Pool->MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) && Pool->Used == 0) {
     RemoveEntryList (&Pool->Link);
-    CoreFreePoolI (Pool);
+    CoreFreePoolI (Pool, NULL);
   }
 
   return EFI_SUCCESS;
