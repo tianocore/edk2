@@ -589,10 +589,10 @@
 
 
   ## This PCD specifies whether PS2 keyboard does a extended verification during start.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification|FALSE
 
   ## This PCD specifies whether PS2 mouse does a extended verification during start.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification|FALSE
 
 !if $(VARIABLE_INFO_ENABLE) == TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|TRUE
