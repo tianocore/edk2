@@ -4,7 +4,7 @@
 # Ps2 Keyboard Driver for UEFI. The keyboard type implemented follows IBM
 # compatible PS2 protocol using Scan Code Set 1.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -43,7 +43,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
@@ -67,10 +67,10 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
 
 [FeaturePcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification   ## CONSUMES
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection             ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFastPS2Detection             ## SOMETIMES_CONSUMES
 
 #
 # [Event]
