@@ -493,6 +493,10 @@
   gIpmiProtocolGuid    = { 0xdbc6381f, 0x5554, 0x4d14, { 0x8f, 0xfd, 0x76, 0xd7, 0x87, 0xb8, 0xac, 0xbf } }
   gSmmIpmiProtocolGuid = { 0x5169af60, 0x8c5a, 0x4243, { 0xb3, 0xe9, 0x56, 0xc5, 0x6d, 0x18, 0xee, 0x26 } }
 
+  ## PS/2 policy protocol abstracts the specific platform initialization and setting.
+  #  Include/Protocol/Ps2Policy.h
+  gEfiPs2PolicyProtocolGuid = { 0x4DF19259, 0xDC71, 0x4D46, { 0xBE, 0xF1, 0x35, 0x7B, 0xB5, 0x78, 0xC4, 0x18 } }
+
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
@@ -1530,6 +1534,13 @@
   #  to meet boot script executor requirement in the S3 phase.
   # @Prompt Reserved S3 Boot Script Stack ACPI Memory Size
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize|0x8000|UINT32|0x02000000
+
+  ## Indicates if to use the optimized timing for best PS2 detection performance.
+  #  Note this PCD could be set to TRUE for best boot performance and set to FALSE for best device compatibility.<BR><BR>
+  #   TRUE  - Use the optimized timing for best PS2 detection performance.<BR>
+  #   FALSE - Use the normal timing to detect PS2.<BR>
+  # @Prompt Enable fast PS2 detection
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFastPS2Detection|FALSE|BOOLEAN|0x30001044
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
