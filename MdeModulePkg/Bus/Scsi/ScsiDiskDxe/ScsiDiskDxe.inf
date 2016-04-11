@@ -3,7 +3,7 @@
 #  It detects the SCSI disk media and installs Block I/O and Block I/O2 Protocol on
 #  the device handle.
 #  
-#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -57,6 +57,7 @@
   gEfiDiskInfoProtocolGuid                      ## BY_START
   gEfiBlockIoProtocolGuid                       ## BY_START
   gEfiBlockIo2ProtocolGuid                      ## BY_START
+  gEfiEraseBlockProtocolGuid                    ## BY_START
   gEfiScsiIoProtocolGuid                        ## TO_START
   gEfiScsiPassThruProtocolGuid                  ## TO_START
   gEfiExtScsiPassThruProtocolGuid               ## TO_START

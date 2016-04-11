@@ -230,22 +230,27 @@ ScsiDiskDriverBindingStart (
     return Status;
   }
 
-  ScsiDiskDevice->Signature            = SCSI_DISK_DEV_SIGNATURE;
-  ScsiDiskDevice->ScsiIo               = ScsiIo;
-  ScsiDiskDevice->BlkIo.Revision       = EFI_BLOCK_IO_PROTOCOL_REVISION3;
-  ScsiDiskDevice->BlkIo.Media          = &ScsiDiskDevice->BlkIoMedia;
-  ScsiDiskDevice->BlkIo.Media->IoAlign = ScsiIo->IoAlign;
-  ScsiDiskDevice->BlkIo.Reset          = ScsiDiskReset;
-  ScsiDiskDevice->BlkIo.ReadBlocks     = ScsiDiskReadBlocks;
-  ScsiDiskDevice->BlkIo.WriteBlocks    = ScsiDiskWriteBlocks;
-  ScsiDiskDevice->BlkIo.FlushBlocks    = ScsiDiskFlushBlocks;
-  ScsiDiskDevice->BlkIo2.Media         = &ScsiDiskDevice->BlkIoMedia;
-  ScsiDiskDevice->BlkIo2.Reset         = ScsiDiskResetEx;
-  ScsiDiskDevice->BlkIo2.ReadBlocksEx  = ScsiDiskReadBlocksEx;
-  ScsiDiskDevice->BlkIo2.WriteBlocksEx = ScsiDiskWriteBlocksEx;
-  ScsiDiskDevice->BlkIo2.FlushBlocksEx = ScsiDiskFlushBlocksEx;
-  ScsiDiskDevice->Handle               = Controller;
-  InitializeListHead (&ScsiDiskDevice->BlkIo2Queue);
+  ScsiDiskDevice->Signature                         = SCSI_DISK_DEV_SIGNATURE;
+  ScsiDiskDevice->ScsiIo                            = ScsiIo;
+  ScsiDiskDevice->BlkIo.Revision                    = EFI_BLOCK_IO_PROTOCOL_REVISION3;
+  ScsiDiskDevice->BlkIo.Media                       = &ScsiDiskDevice->BlkIoMedia;
+  ScsiDiskDevice->BlkIo.Media->IoAlign              = ScsiIo->IoAlign;
+  ScsiDiskDevice->BlkIo.Reset                       = ScsiDiskReset;
+  ScsiDiskDevice->BlkIo.ReadBlocks                  = ScsiDiskReadBlocks;
+  ScsiDiskDevice->BlkIo.WriteBlocks                 = ScsiDiskWriteBlocks;
+  ScsiDiskDevice->BlkIo.FlushBlocks                 = ScsiDiskFlushBlocks;
+  ScsiDiskDevice->BlkIo2.Media                      = &ScsiDiskDevice->BlkIoMedia;
+  ScsiDiskDevice->BlkIo2.Reset                      = ScsiDiskResetEx;
+  ScsiDiskDevice->BlkIo2.ReadBlocksEx               = ScsiDiskReadBlocksEx;
+  ScsiDiskDevice->BlkIo2.WriteBlocksEx              = ScsiDiskWriteBlocksEx;
+  ScsiDiskDevice->BlkIo2.FlushBlocksEx              = ScsiDiskFlushBlocksEx;
+  ScsiDiskDevice->EraseBlock.Revision               = EFI_ERASE_BLOCK_PROTOCOL_REVISION;
+  ScsiDiskDevice->EraseBlock.EraseLengthGranularity = 1;
+  ScsiDiskDevice->EraseBlock.EraseBlocks            = ScsiDiskEraseBlocks;
+  ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt           = 1;
+  ScsiDiskDevice->BlockLimitsVpdSupported           = FALSE;
+  ScsiDiskDevice->Handle                            = Controller;
+  InitializeListHead (&ScsiDiskDevice->AsyncTaskQueue);
 
   ScsiIo->GetDeviceType (ScsiIo, &(ScsiDiskDevice->DeviceType));
   switch (ScsiDiskDevice->DeviceType) {
@@ -323,6 +328,17 @@ ScsiDiskDriverBindingStart (
                       NULL
                       );
       if (!EFI_ERROR(Status)) {
+        if (DetermineInstallEraseBlock(ScsiDiskDevice, Controller)) {
+          Status = gBS->InstallProtocolInterface (
+                          &Controller,
+                          &gEfiEraseBlockProtocolGuid,
+                          EFI_NATIVE_INTERFACE,
+                          &ScsiDiskDevice->EraseBlock
+                          );
+          if (EFI_ERROR(Status)) {
+            DEBUG ((EFI_D_ERROR, "ScsiDisk: Failed to install the Erase Block Protocol! Status = %r\n", Status));
+          }
+        }
         ScsiDiskDevice->ControllerNameTable = NULL;
         AddUnicodeString2 (
           "eng",
@@ -384,9 +400,10 @@ ScsiDiskDriverBindingStop (
   IN  EFI_HANDLE                      *ChildHandleBuffer   OPTIONAL
   )
 {
-  EFI_BLOCK_IO_PROTOCOL *BlkIo;
-  SCSI_DISK_DEV         *ScsiDiskDevice;
-  EFI_STATUS            Status;
+  EFI_BLOCK_IO_PROTOCOL      *BlkIo;
+  EFI_ERASE_BLOCK_PROTOCOL   *EraseBlock;
+  SCSI_DISK_DEV              *ScsiDiskDevice;
+  EFI_STATUS                 Status;
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -405,7 +422,30 @@ ScsiDiskDriverBindingStop (
   //
   // Wait for the BlockIo2 requests queue to become empty
   //
-  while (!IsListEmpty (&ScsiDiskDevice->BlkIo2Queue));
+  while (!IsListEmpty (&ScsiDiskDevice->AsyncTaskQueue));
+
+  //
+  // If Erase Block Protocol is installed, then uninstall this protocol.
+  //
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiEraseBlockProtocolGuid,
+                  (VOID **) &EraseBlock,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->UninstallProtocolInterface (
+                    Controller,
+                    &gEfiEraseBlockProtocolGuid,
+                    &ScsiDiskDevice->EraseBlock
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
 
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   Controller,
@@ -550,6 +590,14 @@ ScsiDiskReadBlocks (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
+      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
       Status = EFI_MEDIA_CHANGED;
       goto Done;
     }
@@ -674,6 +722,14 @@ ScsiDiskWriteBlocks (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
+      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
       Status = EFI_MEDIA_CHANGED;
       goto Done;
     }
@@ -888,6 +944,14 @@ ScsiDiskReadBlocksEx (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
+      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
       Status = EFI_MEDIA_CHANGED;
       goto Done;
     }
@@ -1039,6 +1103,14 @@ ScsiDiskWriteBlocksEx (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
+      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
       Status = EFI_MEDIA_CHANGED;
       goto Done;
     }
@@ -1180,6 +1252,14 @@ ScsiDiskFlushBlocksEx (
              &ScsiDiskDevice->BlkIo2,
              &ScsiDiskDevice->BlkIo2
              );
+      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
       Status = EFI_MEDIA_CHANGED;
       goto Done;
     }
@@ -1200,7 +1280,7 @@ ScsiDiskFlushBlocksEx (
   //
   // Wait for the BlockIo2 requests queue to become empty
   //
-  while (!IsListEmpty (&ScsiDiskDevice->BlkIo2Queue));
+  while (!IsListEmpty (&ScsiDiskDevice->AsyncTaskQueue));
 
   Status = EFI_SUCCESS;
 
@@ -1210,6 +1290,404 @@ ScsiDiskFlushBlocksEx (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Token->TransactionStatus = EFI_SUCCESS;
     gBS->SignalEvent (Token->Event);
+  }
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+  return Status;
+}
+
+
+/**
+  Internal helper notify function which process the result of an asynchronous
+  SCSI UNMAP Command and signal the event passed from EraseBlocks.
+
+  @param  Event    The instance of EFI_EVENT.
+  @param  Context  The parameter passed in.
+
+**/
+VOID
+EFIAPI
+ScsiDiskAsyncUnmapNotify (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  SCSI_ERASEBLK_REQUEST            *EraseBlkReq;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET  *CommandPacket;
+  EFI_ERASE_BLOCK_TOKEN            *Token;
+  EFI_STATUS                       Status;
+
+  gBS->CloseEvent (Event);
+
+  EraseBlkReq              = (SCSI_ERASEBLK_REQUEST *) Context;
+  CommandPacket            = &EraseBlkReq->CommandPacket;
+  Token                    = EraseBlkReq->Token;
+  Token->TransactionStatus = EFI_SUCCESS;
+
+  Status = CheckHostAdapterStatus (CommandPacket->HostAdapterStatus);
+  if (EFI_ERROR(Status)) {
+    DEBUG ((
+      EFI_D_ERROR,
+      "ScsiDiskAsyncUnmapNotify: Host adapter indicating error status 0x%x.\n",
+      CommandPacket->HostAdapterStatus
+      ));
+
+    Token->TransactionStatus = Status;
+    goto Done;
+  }
+
+  Status = CheckTargetStatus (CommandPacket->TargetStatus);
+  if (EFI_ERROR(Status)) {
+    DEBUG ((
+      EFI_D_ERROR,
+      "ScsiDiskAsyncUnmapNotify: Target indicating error status 0x%x.\n",
+      CommandPacket->HostAdapterStatus
+      ));
+
+    Token->TransactionStatus = Status;
+    goto Done;
+  }
+
+Done:
+  RemoveEntryList (&EraseBlkReq->Link);
+  FreePool (CommandPacket->OutDataBuffer);
+  FreePool (EraseBlkReq->CommandPacket.Cdb);
+  FreePool (EraseBlkReq);
+
+  gBS->SignalEvent (Token->Event);
+}
+
+/**
+  Require the device server to cause one or more LBAs to be unmapped.
+
+  @param  ScsiDiskDevice         The pointer of ScsiDiskDevice.
+  @param  Lba                    The start block number.
+  @param  Blocks                 Total block number to be unmapped.
+  @param  Token                  The pointer to the token associated with the
+                                 non-blocking erase block request.
+
+  @retval EFI_SUCCESS            Target blocks have been successfully unmapped.
+  @retval EFI_DEVICE_ERROR       Fail to unmap the target blocks.
+
+**/
+EFI_STATUS
+ScsiDiskUnmap (
+  IN SCSI_DISK_DEV                 *ScsiDiskDevice,
+  IN UINT64                        Lba,
+  IN UINTN                         Blocks,
+  IN EFI_ERASE_BLOCK_TOKEN         *Token            OPTIONAL
+  )
+{
+  EFI_SCSI_IO_PROTOCOL             *ScsiIo;
+  SCSI_ERASEBLK_REQUEST            *EraseBlkReq;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET  *CommandPacket;
+  EFI_SCSI_DISK_UNMAP_BLOCK_DESP   *BlkDespPtr;
+  EFI_STATUS                       Status;
+  EFI_STATUS                       ReturnStatus;
+  UINT8                            *Cdb;
+  UINT32                           MaxLbaCnt;
+  UINT32                           MaxBlkDespCnt;
+  UINT32                           BlkDespCnt;
+  UINT16                           UnmapParamListLen;
+  VOID                             *UnmapParamList;
+  EFI_EVENT                        AsyncUnmapEvent;
+  EFI_TPL                          OldTpl;
+
+  ScsiIo          = ScsiDiskDevice->ScsiIo;
+  MaxLbaCnt       = ScsiDiskDevice->UnmapInfo.MaxLbaCnt;
+  MaxBlkDespCnt   = ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt;
+  EraseBlkReq     = NULL;
+  UnmapParamList  = NULL;
+  AsyncUnmapEvent = NULL;
+  ReturnStatus    = EFI_SUCCESS;
+
+  if (Blocks / (UINTN) MaxLbaCnt > MaxBlkDespCnt) {
+    ReturnStatus = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  EraseBlkReq = AllocateZeroPool (sizeof (SCSI_ERASEBLK_REQUEST));
+  if (EraseBlkReq == NULL) {
+    ReturnStatus = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  EraseBlkReq->CommandPacket.Cdb = AllocateZeroPool (0xA);
+  if (EraseBlkReq->CommandPacket.Cdb == NULL) {
+    ReturnStatus = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  BlkDespCnt        = (UINT32) ((Blocks - 1) / MaxLbaCnt + 1);
+  UnmapParamListLen = (UINT16) (sizeof (EFI_SCSI_DISK_UNMAP_PARAM_LIST_HEADER)
+                      + BlkDespCnt * sizeof (EFI_SCSI_DISK_UNMAP_BLOCK_DESP));
+  UnmapParamList    = AllocateZeroPool (UnmapParamListLen);
+  if (UnmapParamList == NULL) {
+    ReturnStatus = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  *((UINT16 *)UnmapParamList)     = SwapBytes16 (UnmapParamListLen - 2);
+  *((UINT16 *)UnmapParamList + 1) = SwapBytes16 (UnmapParamListLen - sizeof (EFI_SCSI_DISK_UNMAP_PARAM_LIST_HEADER));
+
+  BlkDespPtr = (EFI_SCSI_DISK_UNMAP_BLOCK_DESP *)((UINT8 *)UnmapParamList + sizeof (EFI_SCSI_DISK_UNMAP_PARAM_LIST_HEADER));
+  while (Blocks > 0) {
+    if (Blocks > MaxLbaCnt) {
+      *(UINT64 *)(&BlkDespPtr->Lba)      = SwapBytes64 (Lba);
+      *(UINT32 *)(&BlkDespPtr->BlockNum) = SwapBytes32 (MaxLbaCnt);
+      Blocks -= MaxLbaCnt;
+      Lba    += MaxLbaCnt;
+    } else {
+      *(UINT64 *)(&BlkDespPtr->Lba)      = SwapBytes64 (Lba);
+      *(UINT32 *)(&BlkDespPtr->BlockNum) = SwapBytes32 ((UINT32) Blocks);
+      Blocks = 0;
+    }
+
+    BlkDespPtr++;
+  }
+
+  CommandPacket                    = &EraseBlkReq->CommandPacket;
+  CommandPacket->Timeout           = SCSI_DISK_TIMEOUT;
+  CommandPacket->OutDataBuffer     = UnmapParamList;
+  CommandPacket->OutTransferLength = UnmapParamListLen;
+  CommandPacket->CdbLength         = 0xA;
+  CommandPacket->DataDirection     = EFI_SCSI_DATA_OUT;
+  //
+  // Fill Cdb for UNMAP Command
+  //
+  Cdb    = CommandPacket->Cdb;
+  Cdb[0] = EFI_SCSI_OP_UNMAP;
+  WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 (UnmapParamListLen));
+
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    //
+    // Non-blocking UNMAP request
+    //
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_NOTIFY,
+                    ScsiDiskAsyncUnmapNotify,
+                    EraseBlkReq,
+                    &AsyncUnmapEvent
+                    );
+    if (EFI_ERROR(Status)) {
+      ReturnStatus = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    InsertTailList (&ScsiDiskDevice->AsyncTaskQueue, &EraseBlkReq->Link);
+    gBS->RestoreTPL (OldTpl);
+
+    EraseBlkReq->Token = Token;
+
+    Status = ScsiIo->ExecuteScsiCommand (
+                       ScsiIo,
+                       CommandPacket,
+                       AsyncUnmapEvent
+                       );
+    if (EFI_ERROR(Status)) {
+      ReturnStatus = EFI_DEVICE_ERROR;
+
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+      RemoveEntryList (&EraseBlkReq->Link);
+      gBS->RestoreTPL (OldTpl);
+
+      goto Done;
+    } else {
+      //
+      // Directly return if the non-blocking UNMAP request is queued.
+      //
+      return EFI_SUCCESS;
+    }
+  } else {
+    //
+    // Blocking UNMAP request
+    //
+    Status = ScsiIo->ExecuteScsiCommand (
+                       ScsiIo,
+                       CommandPacket,
+                       NULL
+                       );
+    if (EFI_ERROR(Status)) {
+      ReturnStatus = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+  }
+
+  //
+  // Only blocking UNMAP request will reach here.
+  //
+  Status = CheckHostAdapterStatus (CommandPacket->HostAdapterStatus);
+  if (EFI_ERROR(Status)) {
+    DEBUG ((
+      EFI_D_ERROR,
+      "ScsiDiskUnmap: Host adapter indicating error status 0x%x.\n",
+      CommandPacket->HostAdapterStatus
+      ));
+
+    ReturnStatus = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  Status = CheckTargetStatus (CommandPacket->TargetStatus);
+  if (EFI_ERROR(Status)) {
+    DEBUG ((
+      EFI_D_ERROR,
+      "ScsiDiskUnmap: Target indicating error status 0x%x.\n",
+      CommandPacket->HostAdapterStatus
+      ));
+
+    ReturnStatus = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+Done:
+  if (EraseBlkReq != NULL) {
+    if (EraseBlkReq->CommandPacket.Cdb != NULL) {
+      FreePool (EraseBlkReq->CommandPacket.Cdb);
+    }
+    FreePool (EraseBlkReq);
+  }
+
+  if (UnmapParamList != NULL) {
+    FreePool (UnmapParamList);
+  }
+
+  if (AsyncUnmapEvent != NULL) {
+    gBS->CloseEvent (AsyncUnmapEvent);
+  }
+
+  return ReturnStatus;
+}
+
+/**
+  Erase a specified number of device blocks.
+
+  @param[in]       This           Indicates a pointer to the calling context.
+  @param[in]       MediaId        The media ID that the erase request is for.
+  @param[in]       Lba            The starting logical block address to be
+                                  erased. The caller is responsible for erasing
+                                  only legitimate locations.
+  @param[in, out]  Token          A pointer to the token associated with the
+                                  transaction.
+  @param[in]       Size           The size in bytes to be erased. This must be
+                                  a multiple of the physical block size of the
+                                  device.
+
+  @retval EFI_SUCCESS             The erase request was queued if Event is not
+                                  NULL. The data was erased correctly to the
+                                  device if the Event is NULL.to the device.
+  @retval EFI_WRITE_PROTECTED     The device cannot be erased due to write
+                                  protection.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting
+                                  to perform the erase operation.
+  @retval EFI_INVALID_PARAMETER   The erase request contains LBAs that are not
+                                  valid.
+  @retval EFI_NO_MEDIA            There is no media in the device.
+  @retval EFI_MEDIA_CHANGED       The MediaId is not for the current media.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskEraseBlocks (
+  IN     EFI_ERASE_BLOCK_PROTOCOL      *This,
+  IN     UINT32                        MediaId,
+  IN     EFI_LBA                       Lba,
+  IN OUT EFI_ERASE_BLOCK_TOKEN         *Token,
+  IN     UINTN                         Size
+  )
+{
+  SCSI_DISK_DEV       *ScsiDiskDevice;
+  EFI_BLOCK_IO_MEDIA  *Media;
+  EFI_STATUS          Status;
+  UINTN               BlockSize;
+  UINTN               NumberOfBlocks;
+  BOOLEAN             MediaChange;
+  EFI_TPL             OldTpl;
+
+  MediaChange    = FALSE;
+  OldTpl         = gBS->RaiseTPL (TPL_CALLBACK);
+  ScsiDiskDevice = SCSI_DISK_DEV_FROM_ERASEBLK (This);
+
+  if (!IS_DEVICE_FIXED(ScsiDiskDevice)) {
+    Status = ScsiDiskDetectMedia (ScsiDiskDevice, FALSE, &MediaChange);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
+    }
+
+    if (MediaChange) {
+      gBS->ReinstallProtocolInterface (
+            ScsiDiskDevice->Handle,
+            &gEfiBlockIoProtocolGuid,
+            &ScsiDiskDevice->BlkIo,
+            &ScsiDiskDevice->BlkIo
+            );
+      gBS->ReinstallProtocolInterface (
+             ScsiDiskDevice->Handle,
+             &gEfiBlockIo2ProtocolGuid,
+             &ScsiDiskDevice->BlkIo2,
+             &ScsiDiskDevice->BlkIo2
+             );
+      if (DetermineInstallEraseBlock(ScsiDiskDevice, ScsiDiskDevice->Handle)) {
+        gBS->ReinstallProtocolInterface (
+               ScsiDiskDevice->Handle,
+               &gEfiEraseBlockProtocolGuid,
+               &ScsiDiskDevice->EraseBlock,
+               &ScsiDiskDevice->EraseBlock
+               );
+      }
+      Status = EFI_MEDIA_CHANGED;
+      goto Done;
+    }
+  }
+  //
+  // Get the intrinsic block size
+  //
+  Media = ScsiDiskDevice->BlkIo.Media;
+
+  if (!(Media->MediaPresent)) {
+    Status = EFI_NO_MEDIA;
+    goto Done;
+  }
+
+  if (MediaId != Media->MediaId) {
+    Status = EFI_MEDIA_CHANGED;
+    goto Done;
+  }
+
+  if (Media->ReadOnly) {
+    Status = EFI_WRITE_PROTECTED;
+    goto Done;
+  }
+
+  if (Size == 0) {
+    if ((Token != NULL) && (Token->Event != NULL)) {
+      Token->TransactionStatus = EFI_SUCCESS;
+      gBS->SignalEvent (Token->Event);
+    }
+    Status = EFI_SUCCESS;
+    goto Done;
+  }
+
+  BlockSize = Media->BlockSize;
+  if ((Size % BlockSize) != 0) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  NumberOfBlocks = Size / BlockSize;
+  if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Status = ScsiDiskUnmap (ScsiDiskDevice, Lba, NumberOfBlocks, Token);
+  } else {
+    Status = ScsiDiskUnmap (ScsiDiskDevice, Lba, NumberOfBlocks, NULL);
   }
 
 Done:
@@ -1565,6 +2043,39 @@ ScsiDiskInquiryDevice (
             ScsiDiskDevice->BlkIo.Media->OptimalTransferLengthGranularity = 
               (BlockLimits->OptimalTransferLengthGranularity2 << 8) |
                BlockLimits->OptimalTransferLengthGranularity1;
+
+            ScsiDiskDevice->UnmapInfo.MaxLbaCnt =
+              (BlockLimits->MaximumUnmapLbaCount4 << 24) |
+              (BlockLimits->MaximumUnmapLbaCount3 << 16) |
+              (BlockLimits->MaximumUnmapLbaCount2 << 8)  |
+              BlockLimits->MaximumUnmapLbaCount1;
+            ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt =
+              (BlockLimits->MaximumUnmapBlockDescriptorCount4 << 24) |
+              (BlockLimits->MaximumUnmapBlockDescriptorCount3 << 16) |
+              (BlockLimits->MaximumUnmapBlockDescriptorCount2 << 8)  |
+              BlockLimits->MaximumUnmapBlockDescriptorCount1;
+            ScsiDiskDevice->EraseBlock.EraseLengthGranularity =
+              (BlockLimits->OptimalUnmapGranularity4 << 24) |
+              (BlockLimits->OptimalUnmapGranularity3 << 16) |
+              (BlockLimits->OptimalUnmapGranularity2 << 8)  |
+              BlockLimits->OptimalUnmapGranularity1;
+            if (BlockLimits->UnmapGranularityAlignmentValid != 0) {
+              ScsiDiskDevice->UnmapInfo.GranularityAlignment =
+                (BlockLimits->UnmapGranularityAlignment4 << 24) |
+                (BlockLimits->UnmapGranularityAlignment3 << 16) |
+                (BlockLimits->UnmapGranularityAlignment2 << 8)  |
+                BlockLimits->UnmapGranularityAlignment1;
+            }
+
+            if (ScsiDiskDevice->EraseBlock.EraseLengthGranularity == 0) {
+              //
+              // A value of 0 indicates that the optimal unmap granularity is
+              // not reported.
+              //
+              ScsiDiskDevice->EraseBlock.EraseLengthGranularity = 1;
+            }
+
+            ScsiDiskDevice->BlockLimitsVpdSupported = TRUE;
           }
 
           FreeAlignedBuffer (BlockLimits, sizeof (EFI_SCSI_BLOCK_LIMITS_VPD_PAGE));
@@ -2254,6 +2765,9 @@ GetMediaInfo (
                                               Capacity10->BlockSize0;
     ScsiDiskDevice->BlkIo.Media->LowestAlignedLba               = 0;
     ScsiDiskDevice->BlkIo.Media->LogicalBlocksPerPhysicalBlock  = 0;
+    if (!ScsiDiskDevice->BlockLimitsVpdSupported) {
+      ScsiDiskDevice->UnmapInfo.MaxLbaCnt = (UINT32) ScsiDiskDevice->BlkIo.Media->LastBlock;
+    }
   } else {
     Ptr = (UINT8*)&ScsiDiskDevice->BlkIo.Media->LastBlock;
     *Ptr++ = Capacity16->LastLba0;
@@ -2273,6 +2787,13 @@ GetMediaInfo (
     ScsiDiskDevice->BlkIo.Media->LowestAlignedLba = (Capacity16->LowestAlignLogic2 << 8) |
                                                      Capacity16->LowestAlignLogic1;
     ScsiDiskDevice->BlkIo.Media->LogicalBlocksPerPhysicalBlock  = (1 << Capacity16->LogicPerPhysical);
+    if (!ScsiDiskDevice->BlockLimitsVpdSupported) {
+      if (ScsiDiskDevice->BlkIo.Media->LastBlock > (UINT32) -1) {
+        ScsiDiskDevice->UnmapInfo.MaxLbaCnt = (UINT32) -1;
+      } else {
+        ScsiDiskDevice->UnmapInfo.MaxLbaCnt = (UINT32) ScsiDiskDevice->BlkIo.Media->LastBlock;
+      }
+    }
   }
 
   ScsiDiskDevice->BlkIo.Media->MediaPresent = TRUE;
@@ -2668,7 +3189,7 @@ ScsiDiskAsyncReadSectors (
   BlkIo2Req->Token  = Token;
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  InsertTailList (&ScsiDiskDevice->BlkIo2Queue, &BlkIo2Req->Link);
+  InsertTailList (&ScsiDiskDevice->AsyncTaskQueue, &BlkIo2Req->Link);
   gBS->RestoreTPL (OldTpl);
 
   InitializeListHead (&BlkIo2Req->ScsiRWQueue);
@@ -2885,7 +3406,7 @@ ScsiDiskAsyncWriteSectors (
   BlkIo2Req->Token  = Token;
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  InsertTailList (&ScsiDiskDevice->BlkIo2Queue, &BlkIo2Req->Link);
+  InsertTailList (&ScsiDiskDevice->AsyncTaskQueue, &BlkIo2Req->Link);
   gBS->RestoreTPL (OldTpl);
 
   InitializeListHead (&BlkIo2Req->ScsiRWQueue);
@@ -4792,6 +5313,139 @@ GetParentProtocol (
   gBS->FreePool (HandleBuffer);
   return NULL;
 } 
+
+/**
+  Determine if EFI Erase Block Protocol should be produced.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+  @param   ChildHandle       Handle of device.
+
+  @retval  TRUE    Should produce EFI Erase Block Protocol.
+  @retval  FALSE   Should not produce EFI Erase Block Protocol.
+
+**/
+BOOLEAN
+DetermineInstallEraseBlock (
+  IN  SCSI_DISK_DEV          *ScsiDiskDevice,
+  IN  EFI_HANDLE             ChildHandle
+  )
+{
+  UINT8                           HostAdapterStatus;
+  UINT8                           TargetStatus;
+  EFI_STATUS                      CommandStatus;
+  EFI_STATUS                      Status;
+  BOOLEAN                         UfsDevice;
+  BOOLEAN                         RetVal;
+  EFI_DEVICE_PATH_PROTOCOL        *DevicePathNode;
+  UINT8                           SenseDataLength;
+  UINT32                          DataLength16;
+  EFI_SCSI_DISK_CAPACITY_DATA16   *CapacityData16;
+
+  UfsDevice      = FALSE;
+  RetVal         = TRUE;
+  CapacityData16 = NULL;
+
+  Status = gBS->HandleProtocol (
+                  ChildHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **) &DevicePathNode
+                  );
+  //
+  // Device Path protocol must be installed on the device handle.
+  //
+  ASSERT_EFI_ERROR (Status);
+
+  while (!IsDevicePathEndType (DevicePathNode)) {
+    //
+    // For now, only support Erase Block Protocol on UFS devices.
+    //
+    if ((DevicePathNode->Type == MESSAGING_DEVICE_PATH) &&
+        (DevicePathNode->SubType == MSG_UFS_DP)) {
+      UfsDevice = TRUE;
+      break;
+    }
+
+    DevicePathNode = NextDevicePathNode (DevicePathNode);
+  }
+  if (!UfsDevice) {
+    RetVal = FALSE;
+    goto Done;
+  }
+
+  //
+  // Check whether the erase functionality is enabled on the UFS device.
+  //
+  CapacityData16 = AllocateAlignedBuffer (ScsiDiskDevice, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
+  if (CapacityData16 == NULL) {
+    RetVal = FALSE;
+    goto Done;
+  }
+
+  SenseDataLength = 0;
+  DataLength16    = sizeof (EFI_SCSI_DISK_CAPACITY_DATA16);
+  ZeroMem (CapacityData16, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
+
+  CommandStatus = ScsiReadCapacity16Command (
+                    ScsiDiskDevice->ScsiIo,
+                    SCSI_DISK_TIMEOUT,
+                    NULL,
+                    &SenseDataLength,
+                    &HostAdapterStatus,
+                    &TargetStatus,
+                    (VOID *) CapacityData16,
+                    &DataLength16,
+                    FALSE
+                    );
+
+  if (CommandStatus == EFI_SUCCESS) {
+    //
+    // Universal Flash Storage (UFS) Version 2.0
+    // Section 11.3.9.2
+    // Bits TPE and TPRZ should both be set to enable the erase feature on UFS.
+    //
+    if (((CapacityData16->LowestAlignLogic2 & BIT7) == 0) ||
+        ((CapacityData16->LowestAlignLogic2 & BIT6) == 0)) {
+      DEBUG ((
+        EFI_D_VERBOSE,
+        "ScsiDisk EraseBlock: Either TPE or TPRZ is not set: 0x%x.\n",
+        CapacityData16->LowestAlignLogic2
+        ));
+
+      RetVal = FALSE;
+      goto Done;
+    }
+  } else {
+    DEBUG ((
+      EFI_D_VERBOSE,
+      "ScsiDisk EraseBlock: ReadCapacity16 failed with status %r.\n",
+      CommandStatus
+      ));
+
+    RetVal = FALSE;
+    goto Done;
+  }
+
+  //
+  // Check whether the UFS device server implements the UNMAP command.
+  //
+  if ((ScsiDiskDevice->UnmapInfo.MaxLbaCnt == 0) ||
+      (ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt == 0)) {
+    DEBUG ((
+      EFI_D_VERBOSE,
+      "ScsiDisk EraseBlock: The device server does not implement the UNMAP command.\n"
+      ));
+
+    RetVal = FALSE;
+    goto Done;
+  }
+
+Done:
+  if (CapacityData16 != NULL) {
+    FreeAlignedBuffer (CapacityData16, sizeof (EFI_SCSI_DISK_CAPACITY_DATA16));
+  }
+
+  return RetVal;
+}
 
 /**
   Provides inquiry information for the controller type.

@@ -1,7 +1,7 @@
 /** @file
   Header file for SCSI Disk Driver.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/ComponentName.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/BlockIo2.h>
+#include <Protocol/EraseBlock.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/ScsiPassThru.h>
@@ -43,6 +44,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define IS_DEVICE_FIXED(a)        (a)->FixedDevice ? 1 : 0
 
+typedef struct {
+  UINT32                    MaxLbaCnt;
+  UINT32                    MaxBlkDespCnt;
+  UINT32                    GranularityAlignment;
+} SCSI_UNMAP_PARAM_INFO;
+
 #define SCSI_DISK_DEV_SIGNATURE SIGNATURE_32 ('s', 'c', 'd', 'k')
 
 typedef struct {
@@ -53,6 +60,7 @@ typedef struct {
   EFI_BLOCK_IO_PROTOCOL     BlkIo;
   EFI_BLOCK_IO2_PROTOCOL    BlkIo2;
   EFI_BLOCK_IO_MEDIA        BlkIoMedia;
+  EFI_ERASE_BLOCK_PROTOCOL  EraseBlock;
   EFI_SCSI_IO_PROTOCOL      *ScsiIo;
   UINT8                     DeviceType;
   BOOLEAN                   FixedDevice;
@@ -72,6 +80,12 @@ typedef struct {
   UINT32                    Channel;
   UINT32                    Device;
   ATAPI_IDENTIFY_DATA       IdentifyData;
+
+  //
+  // Scsi UNMAP command parameters information
+  //
+  SCSI_UNMAP_PARAM_INFO     UnmapInfo;
+  BOOLEAN                   BlockLimitsVpdSupported;
   
   //
   // The flag indicates if 16-byte command can be used
@@ -79,13 +93,14 @@ typedef struct {
   BOOLEAN                   Cdb16Byte;
 
   //
-  // The queue for BlockIo2 requests
+  // The queue for asynchronous task requests
   //
-  LIST_ENTRY                BlkIo2Queue;
+  LIST_ENTRY                AsyncTaskQueue;
 } SCSI_DISK_DEV;
 
 #define SCSI_DISK_DEV_FROM_BLKIO(a)  CR (a, SCSI_DISK_DEV, BlkIo, SCSI_DISK_DEV_SIGNATURE)
 #define SCSI_DISK_DEV_FROM_BLKIO2(a)  CR (a, SCSI_DISK_DEV, BlkIo2, SCSI_DISK_DEV_SIGNATURE)
+#define SCSI_DISK_DEV_FROM_ERASEBLK(a)  CR (a, SCSI_DISK_DEV, EraseBlock, SCSI_DISK_DEV_SIGNATURE)
 
 #define SCSI_DISK_DEV_FROM_DISKINFO(a) CR (a, SCSI_DISK_DEV, DiskInfo, SCSI_DISK_DEV_SIGNATURE)
 
@@ -135,6 +150,17 @@ typedef struct {
 
   LIST_ENTRY                           Link;
 } SCSI_ASYNC_RW_REQUEST;
+
+//
+// Private data structure for an EraseBlock request
+//
+typedef struct {
+  EFI_ERASE_BLOCK_TOKEN                *Token;
+
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET      CommandPacket;
+
+  LIST_ENTRY                           Link;
+} SCSI_ERASEBLK_REQUEST;
 
 //
 // Global Variables
@@ -578,6 +604,43 @@ EFIAPI
 ScsiDiskFlushBlocksEx (
   IN     EFI_BLOCK_IO2_PROTOCOL  *This,
   IN OUT EFI_BLOCK_IO2_TOKEN     *Token
+  );
+
+/**
+  Erase a specified number of device blocks.
+
+  @param[in]       This           Indicates a pointer to the calling context.
+  @param[in]       MediaId        The media ID that the erase request is for.
+  @param[in]       Lba            The starting logical block address to be
+                                  erased. The caller is responsible for erasing
+                                  only legitimate locations.
+  @param[in, out]  Token          A pointer to the token associated with the
+                                  transaction.
+  @param[in]       Size           The size in bytes to be erased. This must be
+                                  a multiple of the physical block size of the
+                                  device.
+
+  @retval EFI_SUCCESS             The erase request was queued if Event is not
+                                  NULL. The data was erased correctly to the
+                                  device if the Event is NULL.to the device.
+  @retval EFI_WRITE_PROTECTED     The device cannot be erased due to write
+                                  protection.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting
+                                  to perform the erase operation.
+  @retval EFI_INVALID_PARAMETER   The erase request contains LBAs that are not
+                                  valid.
+  @retval EFI_NO_MEDIA            There is no media in the device.
+  @retval EFI_MEDIA_CHANGED       The MediaId is not for the current media.
+
+**/
+EFI_STATUS
+EFIAPI
+ScsiDiskEraseBlocks (
+  IN     EFI_ERASE_BLOCK_PROTOCOL      *This,
+  IN     UINT32                        MediaId,
+  IN     EFI_LBA                       Lba,
+  IN OUT EFI_ERASE_BLOCK_TOKEN         *Token,
+  IN     UINTN                         Size
   );
 
 
@@ -1353,6 +1416,22 @@ EFIAPI
 GetParentProtocol (
   IN  EFI_GUID                          *ProtocolGuid,
   IN  EFI_HANDLE                        ChildHandle
+  );
+
+/**
+  Determine if EFI Erase Block Protocol should be produced.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+  @param   ChildHandle       Handle of device.
+
+  @retval  TRUE    Should produce EFI Erase Block Protocol.
+  @retval  FALSE   Should not produce EFI Erase Block Protocol.
+
+**/
+BOOLEAN
+DetermineInstallEraseBlock (
+  IN  SCSI_DISK_DEV          *ScsiDiskDevice,
+  IN  EFI_HANDLE             ChildHandle
   );
 
 #endif
