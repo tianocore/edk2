@@ -1,7 +1,7 @@
 /** @file
   Support for SCSI-2 standard
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -72,6 +72,7 @@
 #define EFI_SCSI_OP_WRITE_VERIFY    0x2e
 #define EFI_SCSI_OP_WRITE_LONG      0x3f
 #define EFI_SCSI_OP_WRITE_SAME      0x41
+#define EFI_SCSI_OP_UNMAP           0x42
 
 //
 // Additional commands for Sequential Access Devices
@@ -234,9 +235,11 @@ typedef struct {
   UINT8 Peripheral_Type : 5;
   UINT8 Peripheral_Qualifier : 3;
   UINT8 PageCode;
-  UINT8 Reserved_2;
-  UINT8 PageLength;
-  UINT8 Reserved_4_5[2];
+  UINT8 PageLength2;
+  UINT8 PageLength1;
+  UINT8 WriteSameNonZero : 1;
+  UINT8 Reserved_4 : 7;
+  UINT8 MaximumCompareAndWriteLength;
   UINT8 OptimalTransferLengthGranularity2;
   UINT8 OptimalTransferLengthGranularity1;
   UINT8 MaximumTransferLength4;
@@ -251,6 +254,47 @@ typedef struct {
   UINT8 MaximumPrefetchXdreadXdwriteTransferLength3;
   UINT8 MaximumPrefetchXdreadXdwriteTransferLength2;
   UINT8 MaximumPrefetchXdreadXdwriteTransferLength1;
+  UINT8 MaximumUnmapLbaCount4;
+  UINT8 MaximumUnmapLbaCount3;
+  UINT8 MaximumUnmapLbaCount2;
+  UINT8 MaximumUnmapLbaCount1;
+  UINT8 MaximumUnmapBlockDescriptorCount4;
+  UINT8 MaximumUnmapBlockDescriptorCount3;
+  UINT8 MaximumUnmapBlockDescriptorCount2;
+  UINT8 MaximumUnmapBlockDescriptorCount1;
+  UINT8 OptimalUnmapGranularity4;
+  UINT8 OptimalUnmapGranularity3;
+  UINT8 OptimalUnmapGranularity2;
+  UINT8 OptimalUnmapGranularity1;
+  UINT8 UnmapGranularityAlignment4 : 7;
+  UINT8 UnmapGranularityAlignmentValid : 1;
+  UINT8 UnmapGranularityAlignment3;
+  UINT8 UnmapGranularityAlignment2;
+  UINT8 UnmapGranularityAlignment1;
+  UINT8 MaximumWriteSameLength4;
+  UINT8 MaximumWriteSameLength3;
+  UINT8 MaximumWriteSameLength2;
+  UINT8 MaximumWriteSameLength1;
+  UINT8 MaximumAtomicTransferLength4;
+  UINT8 MaximumAtomicTransferLength3;
+  UINT8 MaximumAtomicTransferLength2;
+  UINT8 MaximumAtomicTransferLength1;
+  UINT8 AtomicAlignment4;
+  UINT8 AtomicAlignment3;
+  UINT8 AtomicAlignment2;
+  UINT8 AtomicAlignment1;
+  UINT8 AtomicTransferLengthGranularity4;
+  UINT8 AtomicTransferLengthGranularity3;
+  UINT8 AtomicTransferLengthGranularity2;
+  UINT8 AtomicTransferLengthGranularity1;
+  UINT8 MaximumAtomicTransferLengthWithAtomicBoundary4;
+  UINT8 MaximumAtomicTransferLengthWithAtomicBoundary3;
+  UINT8 MaximumAtomicTransferLengthWithAtomicBoundary2;
+  UINT8 MaximumAtomicTransferLengthWithAtomicBoundary1;
+  UINT8 MaximumAtomicBoundarySize4;
+  UINT8 MaximumAtomicBoundarySize3;
+  UINT8 MaximumAtomicBoundarySize2;
+  UINT8 MaximumAtomicBoundarySize1;
 } EFI_SCSI_BLOCK_LIMITS_VPD_PAGE;
 
 ///
@@ -306,6 +350,18 @@ typedef struct {
   UINT8 LowestAlignLogic1;    
   UINT8 Reserved[16];  
 } EFI_SCSI_DISK_CAPACITY_DATA16;
+
+typedef struct {
+  UINT16 DataLen;
+  UINT16 BlkDespDataLen;
+  UINT8  Reserved[4];
+} EFI_SCSI_DISK_UNMAP_PARAM_LIST_HEADER;
+
+typedef struct {
+  UINT64 Lba;
+  UINT32 BlockNum;
+  UINT8  Reserved[4];
+} EFI_SCSI_DISK_UNMAP_BLOCK_DESP;
 
 
 #pragma pack()
