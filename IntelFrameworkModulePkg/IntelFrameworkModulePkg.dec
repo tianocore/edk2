@@ -91,10 +91,6 @@
   #  Include/Protocol/IsaAcpi.h
   gEfiIsaAcpiProtocolGuid        = { 0x64a892dc, 0x5561, 0x4536, { 0x92, 0xc7, 0x79, 0x9b, 0xfc, 0x18, 0x33, 0x55 }}
 
-  ## PS/2 policy protocol abstracts the specific platform initialization and setting.
-  #  Include/Protocol/Ps2Policy.h
-  gEfiPs2PolicyProtocolGuid      = { 0x4DF19259, 0xDC71, 0x4D46, { 0xBE, 0xF1, 0x35, 0x7B, 0xB5, 0x78, 0xC4, 0x18 }}
-
   ## OEM Badging Protocol defines the interface to get the OEM badging image with the dispaly attribute.
   #  Include/Protocol/OEMBadging.h
   gEfiOEMBadgingProtocolGuid     = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}
@@ -134,26 +130,11 @@
   # @Prompt Turn on Legacy Support in S3 Boot
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport|TRUE|BOOLEAN|0x00010044
 
-  ## Indicates if PS2 keyboard does a extended verification during start.
-  #  Extended verification will take some performance. It can be set to FALSE for boot performance.<BR><BR>
-  #   TRUE  - Turn on PS2 keyboard extended verification.<BR>
-  #   FALSE - Turn off PS2 keyboard extended verification.<BR>
-  # @Prompt Turn on PS2 Keyboard Extended Verification
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification|TRUE|BOOLEAN|0x00010045
-
   ## Indicates if Framework Acpi Support protocol is installed.<BR><BR>  
   #   TRUE  - Install Framework Acpi Support protocol.<BR>
   #   FALSE - Doesn't install Framework Acpi Support protocol.<BR>
   # @Prompt Enable Framework Acpi Support
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdInstallAcpiSupportProtocol|TRUE|BOOLEAN|0x00010046
-
-
-  ## Indicates if PS2 mouse does a extended verification during start.
-  #  Extended verification will take some performance. It can be set to FALSE for boot performance.<BR><BR>
-  #   TRUE  - Turn on PS2 mouse extended verification. <BR>
-  #   FALSE - Turn off PS2 mouse extended verification. <BR>
-  # @Prompt Turn on PS2 Mouse Extended Verification
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification|TRUE|BOOLEAN|0x00010047
 
   ## Indicates if only Boot logo is showed and all message output is disabled in BDS.<BR><BR>
   #   TRUE  - Only Boot Logo is showed in boot.<BR>
@@ -265,13 +246,6 @@
   # @Prompt High PMM (Post Memory Manager) Size
   # @Expression 0x80000001 | (gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize & 0x1000) == 0
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize|0x400000|UINT32|0x3000000a
-
-  ## Indicates if to use the optimized timing for best PS2 detection performance.
-  #  Note this PCD could be set to TRUE for best boot performance and set to FALSE for best device compatibility.<BR><BR>
-  #   TRUE  - Use the optimized timing for best PS2 detection performance.<BR>
-  #   FALSE - Use the normal timing to detect PS2.<BR>
-  # @Prompt Enable fast PS2 detection
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection|FALSE|BOOLEAN|0x3000000b
 
 [UserExtensions.TianoCore."ExtraFiles"]
   IntelFrameworkModulePkgExtra.uni
