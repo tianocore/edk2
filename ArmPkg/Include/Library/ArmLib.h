@@ -613,4 +613,10 @@ ArmClearMemoryRegionReadOnly (
   IN  UINT64                    Length
   );
 
+VOID
+ArmReplaceLiveTranslationEntry (
+  IN  UINT64  *Entry,
+  IN  UINT64  Value
+  );
+
 #endif // __ARM_LIB__

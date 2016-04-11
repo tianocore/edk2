@@ -17,9 +17,10 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AArch64Lib
   FILE_GUID                      = ef20ddf5-b334-47b3-94cf-52ff44c29138
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmLib
+  CONSTRUCTOR                    = AArch64LibConstructor
 
 [Sources.AARCH64]
   AArch64Lib.c
@@ -31,6 +32,7 @@
 
   ../Common/AArch64/ArmLibSupport.S
   ../Common/ArmLib.c
+  AArch64LibConstructor.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -38,6 +40,7 @@
 
 [LibraryClasses]
   MemoryAllocationLib
+  CacheMaintenanceLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid
