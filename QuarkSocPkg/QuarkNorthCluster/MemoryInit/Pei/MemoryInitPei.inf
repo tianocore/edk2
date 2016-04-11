@@ -74,3 +74,7 @@
 
 [Depex]
   TRUE
+
+[BuildOptions]
+  # /Oi option to use the intrinsic memset function in source code.
+  MSFT:*_*_*_CC_FLAGS = /Oi
