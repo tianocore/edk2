@@ -2,7 +2,7 @@
   The implementation for Ping shell command.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -195,6 +195,10 @@ STATIC CONST SHELL_PARAM_ITEM    PingParamList[] = {
   },
   {
     L"-n",
+    TypeValue
+  },
+  {
+    L"-s",
     TypeValue
   },
   {
@@ -1512,7 +1516,11 @@ ShellCommandRunPing (
   //
   // Parse the paramter of source ip address.
   //
-  ValueStr = ShellCommandLineGetValue (ParamPackage, L"-_s");
+  ValueStr = ShellCommandLineGetValue (ParamPackage, L"-s");
+  if (ValueStr == NULL) {
+    ValueStr = ShellCommandLineGetValue (ParamPackage, L"-_s");
+  }
+  
   if (ValueStr != NULL) {
     mSrcString = ValueStr;
     if (IpChoice == PING_IP_CHOICE_IP6) {

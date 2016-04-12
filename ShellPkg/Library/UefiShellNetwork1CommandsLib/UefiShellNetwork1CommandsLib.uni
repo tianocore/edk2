@@ -1,7 +1,7 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved. <BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -88,24 +88,23 @@
 #string STR_IFCONFIG_INFO_IP_ADDR_BODY        #language en-US    "%d.%d.%d.%d\n"
 
 #string STR_GET_HELP_PING         #language en-US ""
-".TH ping 0 "Pings the target host with an IPv4 or IPv6 stack."\r\n"
+".TH ping 0 "Ping the target host with an IPv4 stack."\r\n"
 ".SH NAME\r\n"
-"Pings the target host with an IPv4 or IPv6 stack.\r\n"
+"Ping the target host with an IPv4 stack.\r\n"
 ".SH SYNOPSIS\r\n"
 " \r\n"
-"PING [-_ip6] [-_s SourceIp] [-n count] [-l size] TargetIp\r\n"
+"PING [-n count] [-l size] [-s SourceIp] TargetIp\r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
 "  -n       - Specifies the number of echo request datagrams to be sent.\r\n"
 "  -l       - Specifies the size of the data buffer in the echo request datagram.\r\n"
-"  -_ip6    - Specifies the IPv6 stack usage mode (Default is IPv4 stack).\r\n"
-"  -_s      - Specifies the source adapter as IPv4 or IPv6 address.\r\n"
-"  SourceIp - Specifies the IPv4 or IPv6 address of the source machine.\r\n"
-"  TargetIp - Specifies the IPv4 or IPv6 address of the target machine.\r\n"
+"  -s       - Specifies the source adapter as IPv4 address.\r\n"
+"  SourceIp - Specifies the IPv4 address of the source machine.\r\n"
+"  TargetIp - Specifies the IPv4 address of the target machine.\r\n"
 ".SH DESCRIPTION\r\n"
 " \r\n"
 "NOTES:\r\n"
-"  1. This command uses the ICMPv4 or ICMPv6 ECHO_REQUEST datagram to elicit an\r\n"
+"  1. This command uses the ICMPv4 ECHO_REQUEST datagram to elicit an\r\n"
 "     ECHO_REPLY from a host.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
@@ -117,10 +116,7 @@
 "    fs0:\> ping -n 20 202.120.100.1\r\n"
 " \r\n"
 "  * To ping the target host by specifying the source adapter as IPv4 address:\r\n"
-"    fs0:\> ping -_s 202.120.100.12 202.120.100.1\r\n"
-" \r\n"
-"  * To ping the target host by specifying the IPv6 stack usage mode:\r\n"
-"    fs0:\> ping -_ip6 2000:bbbb::8\r\n"
+"    fs0:\> ping -s 202.120.100.12 202.120.100.1\r\n"
 ".SH RETURNVALUES\r\n"
 " \r\n"
 "RETURN VALUES:\r\n"
