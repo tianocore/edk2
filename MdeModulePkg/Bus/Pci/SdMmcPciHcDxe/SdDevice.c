@@ -1123,7 +1123,7 @@ SdCardIdentification (
 
       SdMmcHcInitClockFreq (PciIo, Slot, Private->Capability[Slot]);
 
-      gBS->Stall (1);
+      gBS->Stall (1000);
 
       SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
       if (((PresentState >> 20) & 0xF) != 0xF) {

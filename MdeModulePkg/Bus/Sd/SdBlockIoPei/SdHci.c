@@ -2832,7 +2832,7 @@ SdPeimIdentification (
 
       SdPeimHcInitClockFreq (Slot->SdHcBase);
 
-      MicroSecondDelay (1);
+      MicroSecondDelay (1000);
 
       SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
       if (((PresentState >> 20) & 0xF) != 0xF) {
