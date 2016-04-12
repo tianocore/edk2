@@ -275,6 +275,13 @@ SdMmcPciHcEnumerateDevice (
       if ((Status == EFI_MEDIA_CHANGED) && (MediaPresent == TRUE)) {
         DEBUG ((EFI_D_INFO, "SdMmcPciHcEnumerateDevice: device connected at slot %d of pci %p\n", Slot, Private->PciIo));
         //
+        // Reset the specified slot of the SD/MMC Pci Host Controller
+        //
+        Status = SdMmcHcReset (Private->PciIo, Slot);
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+        //
         // Reinitialize slot and restart identification process for the new attached device
         //
         Status = SdMmcHcInitHost (Private->PciIo, Slot, Private->Capability[Slot]);
