@@ -1,7 +1,7 @@
 ##  @file
 #  Display Performance Application, Module information file.
 #
-# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,11 @@
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializeDp
+  
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -57,12 +62,14 @@
   PrintLib
   UefiLib
   HiiLib
+  UefiHiiServicesLib
   PcdLib
   DevicePathLib
   DxeServicesLib
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiHiiPackageListProtocolGuid                          ## CONSUMES
   gEfiDriverBindingProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiComponentName2ProtocolGuid                          ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid                   ## SOMETIMES_CONSUMES

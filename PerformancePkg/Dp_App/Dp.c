@@ -13,7 +13,7 @@
   Dp uses this information to group records in different ways.  It also uses
   timer information to calculate elapsed time for each measurement.
  
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -25,12 +25,14 @@
 **/
 
 #include <Library/UefiApplicationEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/ShellLib.h>
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TimerLib.h>
 #include <Library/UefiLib.h>
+#include <Library/UefiHiiServicesLib.h>
 #include <Library/HiiLib.h>
 #include <Library/PcdLib.h>
 
@@ -40,6 +42,16 @@
 #include "Dp.h"
 #include "Literals.h"
 #include "DpInternal.h"
+
+//
+// String token ID of help message text.
+// Shell supports to find help message in the resource section of an application image if
+// .MAN file is not found. This global variable is added to make build tool recognizes
+// that the help string is consumed by user and then build tool will add the string into
+// the resource section. Thus the application can use '-?' option to show help message in
+// Shell.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mDpStrEngHelpTokenId = STRING_TOKEN (STR_DP_HELP_INFORMATION);
 
 //
 /// Module-Global Variables
@@ -217,17 +229,18 @@ InitializeDp (
   EFI_STRING                StringPtr;
   UINTN                     Number2Display;
 
-  EFI_STATUS                Status;
-  BOOLEAN                   SummaryMode;
-  BOOLEAN                   VerboseMode;
-  BOOLEAN                   AllMode;
-  BOOLEAN                   RawMode;
-  BOOLEAN                   TraceMode;
-  BOOLEAN                   ProfileMode;
-  BOOLEAN                   ExcludeMode;
-  BOOLEAN                   CumulativeMode;
-  CONST CHAR16              *CustomCumulativeToken;
-  PERF_CUM_DATA             *CustomCumulativeData;
+  EFI_STATUS                    Status;
+  BOOLEAN                       SummaryMode;
+  BOOLEAN                       VerboseMode;
+  BOOLEAN                       AllMode;
+  BOOLEAN                       RawMode;
+  BOOLEAN                       TraceMode;
+  BOOLEAN                       ProfileMode;
+  BOOLEAN                       ExcludeMode;
+  BOOLEAN                       CumulativeMode;
+  CONST CHAR16                  *CustomCumulativeToken;
+  PERF_CUM_DATA                 *CustomCumulativeData;
+  EFI_HII_PACKAGE_LIST_HEADER   *PackageList;
 
   EFI_STRING                StringDpOptionQh;
   EFI_STRING                StringDpOptionLh;
@@ -277,10 +290,35 @@ InitializeDp (
   //
   Ticker  = GetPerformanceCounter ();
 
-  // Register our string package with HII and return the handle to it.
   //
-  gHiiHandle = HiiAddPackages (&gEfiCallerIdGuid, ImageHandle, DPStrings, NULL);
+  // Retrieve HII package list from ImageHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ImageHandle,
+                  &gEfiHiiPackageListProtocolGuid,
+                  (VOID **) &PackageList,
+                  ImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Publish HII package list to HII Database.
+  //
+  Status = gHiiDatabase->NewPackageList (
+                          gHiiDatabase,
+                          PackageList,
+                          NULL,
+                          &gHiiHandle
+                          );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
   ASSERT (gHiiHandle != NULL);
+  
 
   // Initial the command list
   //
