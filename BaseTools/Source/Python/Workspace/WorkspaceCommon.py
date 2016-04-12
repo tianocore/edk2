@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by workspace
 #
-# Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@
 from Common.Misc import sdict
 from Common.DataType import SUP_MODULE_USER_DEFINED
 from BuildClassObject import LibraryClassObject
+import Common.GlobalData as GlobalData
 
 ## Get all packages from platform for specified arch, target and toolchain
 #
@@ -47,7 +48,15 @@ def GetDeclaredPcd(Platform, BuildDatabase, Arch, Target, Toolchain):
     DecPcds = {}
     for Pkg in PkgList:
         for Pcd in Pkg.Pcds:
-            DecPcds[Pcd[0], Pcd[1]] = Pkg.Pcds[Pcd]
+            PcdCName = Pcd[0]
+            PcdTokenName = Pcd[1]
+            if GlobalData.MixedPcd:
+                for PcdItem in GlobalData.MixedPcd.keys():
+                    if (PcdCName, PcdTokenName) in GlobalData.MixedPcd[PcdItem]:
+                        PcdCName = PcdItem[0]
+                        break
+            if (PcdCName, PcdTokenName) not in DecPcds.keys():
+                DecPcds[PcdCName, PcdTokenName] = Pkg.Pcds[Pcd]
     return DecPcds
 
 ## Get all dependent libraries for a module

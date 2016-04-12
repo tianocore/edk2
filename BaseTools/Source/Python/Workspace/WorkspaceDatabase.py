@@ -2563,6 +2563,7 @@ class InfBuildData(ModuleBuildClassObject):
 
         # resolve PCD type, value, datum info, etc. by getting its definition from package
         for PcdCName, TokenSpaceGuid in PcdList:
+            PcdRealName = PcdCName
             Setting, LineNo = PcdDict[self._Arch, self.Platform, PcdCName, TokenSpaceGuid]
             if Setting == None:
                 continue
@@ -2584,6 +2585,27 @@ class InfBuildData(ModuleBuildClassObject):
                 # Patch PCD: TokenSpace.PcdCName|Value|Offset
                 Pcd.Offset = ValueList[1]
 
+            if (PcdRealName, TokenSpaceGuid) in GlobalData.MixedPcd:
+                for Package in self.Packages:
+                    for key in Package.Pcds:
+                        if (Package.Pcds[key].TokenCName, Package.Pcds[key].TokenSpaceGuidCName) == (PcdRealName, TokenSpaceGuid):
+                            for item in GlobalData.MixedPcd[(PcdRealName, TokenSpaceGuid)]:
+                                Pcd_Type = item[0].split('_')[-1]
+                                if Pcd_Type == Package.Pcds[key].Type:
+                                    Value = Package.Pcds[key]
+                                    Value.TokenCName = Package.Pcds[key].TokenCName + '_' + Pcd_Type
+                                    if len(key) == 2:
+                                        newkey = (Value.TokenCName, key[1])
+                                    elif len(key) == 3:
+                                        newkey = (Value.TokenCName, key[1], key[2])
+                                    del Package.Pcds[key]
+                                    Package.Pcds[newkey] = Value
+                                    break
+                                else:
+                                    pass
+                        else:
+                            pass
+
             # get necessary info from package declaring this PCD
             for Package in self.Packages:
                 #
@@ -2597,11 +2619,32 @@ class InfBuildData(ModuleBuildClassObject):
                 if Type == MODEL_PCD_DYNAMIC:
                     Pcd.Pending = True
                     for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
-                        if (PcdCName, TokenSpaceGuid, T) in Package.Pcds:
-                            PcdType = T
+                        if (PcdRealName, TokenSpaceGuid) in GlobalData.MixedPcd:
+                            for item in GlobalData.MixedPcd[(PcdRealName, TokenSpaceGuid)]:
+                                if str(item[0]).endswith(T) and (item[0], item[1], T) in Package.Pcds:
+                                    PcdType = T
+                                    PcdCName = item[0]
+                                    break
+                                else:
+                                    pass
                             break
+                        else:
+                            if (PcdRealName, TokenSpaceGuid, T) in Package.Pcds:
+                                PcdType = T
+                                break
+
                 else:
                     Pcd.Pending = False
+                    if (PcdRealName, TokenSpaceGuid) in GlobalData.MixedPcd:
+                        for item in GlobalData.MixedPcd[(PcdRealName, TokenSpaceGuid)]:
+                            Pcd_Type = item[0].split('_')[-1]
+                            if Pcd_Type == PcdType:
+                                PcdCName = item[0]
+                                break
+                            else:
+                                pass
+                    else:
+                        pass
 
                 if (PcdCName, TokenSpaceGuid, PcdType) in Package.Pcds:
                     PcdInPackage = Package.Pcds[PcdCName, TokenSpaceGuid, PcdType]
@@ -2615,7 +2658,7 @@ class InfBuildData(ModuleBuildClassObject):
                         EdkLogger.error(
                                 'build',
                                 FORMAT_INVALID,
-                                "No TokenValue for PCD [%s.%s] in [%s]!" % (TokenSpaceGuid, PcdCName, str(Package)),
+                                "No TokenValue for PCD [%s.%s] in [%s]!" % (TokenSpaceGuid, PcdRealName, str(Package)),
                                 File=self.MetaFile, Line=LineNo,
                                 ExtraData=None
                                 )                        
@@ -2628,7 +2671,7 @@ class InfBuildData(ModuleBuildClassObject):
                             EdkLogger.error(
                                     'build',
                                     FORMAT_INVALID,
-                                    "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid:" % (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
+                                    "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid:" % (Pcd.TokenValue, TokenSpaceGuid, PcdRealName, str(Package)),
                                     File=self.MetaFile, Line=LineNo,
                                     ExtraData=None
                                     )
@@ -2643,7 +2686,7 @@ class InfBuildData(ModuleBuildClassObject):
                                 EdkLogger.error(
                                             'build',
                                             FORMAT_INVALID,
-                                            "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, as a decimal it should between: 0 - 4294967295!" % (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
+                                            "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, as a decimal it should between: 0 - 4294967295!" % (Pcd.TokenValue, TokenSpaceGuid, PcdRealName, str(Package)),
                                             File=self.MetaFile, Line=LineNo,
                                             ExtraData=None
                                             )
@@ -2651,7 +2694,7 @@ class InfBuildData(ModuleBuildClassObject):
                             EdkLogger.error(
                                         'build',
                                         FORMAT_INVALID,
-                                        "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, it should be hexadecimal or decimal!" % (Pcd.TokenValue, TokenSpaceGuid, PcdCName, str(Package)),
+                                        "The format of TokenValue [%s] of PCD [%s.%s] in [%s] is invalid, it should be hexadecimal or decimal!" % (Pcd.TokenValue, TokenSpaceGuid, PcdRealName, str(Package)),
                                         File=self.MetaFile, Line=LineNo,
                                         ExtraData=None
                                         )
@@ -2666,7 +2709,7 @@ class InfBuildData(ModuleBuildClassObject):
                 EdkLogger.error(
                             'build',
                             FORMAT_INVALID,
-                            "PCD [%s.%s] in [%s] is not found in dependent packages:" % (TokenSpaceGuid, PcdCName, self.MetaFile),
+                            "PCD [%s.%s] in [%s] is not found in dependent packages:" % (TokenSpaceGuid, PcdRealName, self.MetaFile),
                             File=self.MetaFile, Line=LineNo,
                             ExtraData="\t%s" % '\n\t'.join([str(P) for P in self.Packages])
                             )

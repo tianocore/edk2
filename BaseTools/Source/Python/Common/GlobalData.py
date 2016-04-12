@@ -80,5 +80,10 @@ gTempInfs = []
 
 BuildOptionPcd = []
 
+#
+# Mixed PCD name dict
+#
+MixedPcd = {}
+
 # Pcd name for the Pcd which used in the Conditional directives
 gConditionalPcds = []

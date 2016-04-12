@@ -413,6 +413,129 @@ class WorkspaceAutoGen(AutoGen):
                     if (TokenCName, TokenSpaceGuidCName) in PcdSet:
                         PcdSet[(TokenCName, TokenSpaceGuidCName)] = NewValue
 
+            SourcePcdDict = {'DynamicEx':[], 'PatchableInModule':[],'Dynamic':[],'FixedAtBuild':[]}
+            BinaryPcdDict = {'DynamicEx':[], 'PatchableInModule':[]}
+            SourcePcdDict_Keys = SourcePcdDict.keys()
+            BinaryPcdDict_Keys = BinaryPcdDict.keys()
+
+            # generate the SourcePcdDict and BinaryPcdDict
+            for BuildData in PGen.BuildDatabase._CACHE_.values():
+                if BuildData.Arch != Arch:
+                    continue
+                if BuildData.MetaFile.Ext == '.inf':
+                    for key in BuildData.Pcds:
+                        if BuildData.Pcds[key].Pending:
+                            if key in Platform.Pcds:
+                                PcdInPlatform = Platform.Pcds[key]
+                                if PcdInPlatform.Type not in [None, '']:
+                                    BuildData.Pcds[key].Type = PcdInPlatform.Type
+
+                            if BuildData.MetaFile in Platform.Modules:
+                                PlatformModule = Platform.Modules[str(BuildData.MetaFile)]
+                                if key in PlatformModule.Pcds:
+                                    PcdInPlatform = PlatformModule.Pcds[key]
+                                    if PcdInPlatform.Type not in [None, '']:
+                                        BuildData.Pcds[key].Type = PcdInPlatform.Type
+
+                        if 'DynamicEx' in BuildData.Pcds[key].Type:
+                            if BuildData.IsBinaryModule:
+                                if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in BinaryPcdDict['DynamicEx']:
+                                    BinaryPcdDict['DynamicEx'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                            else:
+                                if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['DynamicEx']:
+                                    SourcePcdDict['DynamicEx'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+
+                        elif 'PatchableInModule' in BuildData.Pcds[key].Type:
+                            if BuildData.MetaFile.Ext == '.inf':
+                                if BuildData.IsBinaryModule:
+                                    if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in BinaryPcdDict['PatchableInModule']:
+                                        BinaryPcdDict['PatchableInModule'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                else:
+                                    if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['PatchableInModule']:
+                                        SourcePcdDict['PatchableInModule'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+
+                        elif 'Dynamic' in BuildData.Pcds[key].Type:
+                            if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['Dynamic']:
+                                SourcePcdDict['Dynamic'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                        elif 'FixedAtBuild' in BuildData.Pcds[key].Type:
+                            if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['FixedAtBuild']:
+                                SourcePcdDict['FixedAtBuild'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                else:
+                    pass
+
+            #
+            # intersection the BinaryPCD for Mixed PCD
+            #
+            for i in BinaryPcdDict_Keys:
+                for j in BinaryPcdDict_Keys:
+                    if i != j:
+                        IntersectionList = list(set(BinaryPcdDict[i]).intersection(set(BinaryPcdDict[j])))
+                        for item in IntersectionList:
+                            NewPcd1 = (item[0] + '_' + i, item[1])
+                            NewPcd2 = (item[0] + '_' + j, item[1])
+                            if item not in GlobalData.MixedPcd:
+                                GlobalData.MixedPcd[item] = [NewPcd1, NewPcd2]
+                            else:
+                                if NewPcd1 not in GlobalData.MixedPcd[item]:
+                                    GlobalData.MixedPcd[item].append(NewPcd1)
+                                if NewPcd2 not in GlobalData.MixedPcd[item]:
+                                    GlobalData.MixedPcd[item].append(NewPcd2)
+                    else:
+                        pass
+
+            #
+            # intersection the SourcePCD and BinaryPCD for Mixed PCD
+            #
+            for i in SourcePcdDict_Keys:
+                for j in BinaryPcdDict_Keys:
+                    if i != j:
+                        IntersectionList = list(set(SourcePcdDict[i]).intersection(set(BinaryPcdDict[j])))
+                        for item in IntersectionList:
+                            NewPcd1 = (item[0] + '_' + i, item[1])
+                            NewPcd2 = (item[0] + '_' + j, item[1])
+                            if item not in GlobalData.MixedPcd:
+                                GlobalData.MixedPcd[item] = [NewPcd1, NewPcd2]
+                            else:
+                                if NewPcd1 not in GlobalData.MixedPcd[item]:
+                                    GlobalData.MixedPcd[item].append(NewPcd1)
+                                if NewPcd2 not in GlobalData.MixedPcd[item]:
+                                    GlobalData.MixedPcd[item].append(NewPcd2)
+                    else:
+                        pass
+
+            for BuildData in PGen.BuildDatabase._CACHE_.values():
+                if BuildData.Arch != Arch:
+                    continue
+                for key in BuildData.Pcds:
+                    for SinglePcd in GlobalData.MixedPcd:
+                        if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) == SinglePcd:
+                            for item in GlobalData.MixedPcd[SinglePcd]:
+                                Pcd_Type = item[0].split('_')[-1]
+                                if (Pcd_Type == BuildData.Pcds[key].Type) or (Pcd_Type == TAB_PCDS_DYNAMIC_EX and BuildData.Pcds[key].Type in GenC.gDynamicExPcd) or \
+                                   (Pcd_Type == TAB_PCDS_DYNAMIC and BuildData.Pcds[key].Type in GenC.gDynamicPcd):
+                                    Value = BuildData.Pcds[key]
+                                    Value.TokenCName = BuildData.Pcds[key].TokenCName + '_' + Pcd_Type
+                                    if len(key) == 2:
+                                        newkey = (Value.TokenCName, key[1])
+                                    elif len(key) == 3:
+                                        newkey = (Value.TokenCName, key[1], key[2])
+                                    del BuildData.Pcds[key]
+                                    BuildData.Pcds[newkey] = Value
+                                    break
+                                else:
+                                    pass
+                            break
+                        else:
+                            pass
+
+            # handle the mixed pcd in FDF file
+            for key in PcdSet:
+                if key in GlobalData.MixedPcd:
+                    Value = PcdSet[key]
+                    del PcdSet[key]
+                    for item in GlobalData.MixedPcd[key]:
+                        PcdSet[item] = Value
+
             #Collect package set information from INF of FDF
             PkgSet = set()
             for Inf in ModuleList:
@@ -770,17 +893,23 @@ class WorkspaceAutoGen(AutoGen):
                         SameTokenValuePcdList.sort(lambda x, y: cmp("%s.%s" % (x.TokenSpaceGuidCName, x.TokenCName), "%s.%s" % (y.TokenSpaceGuidCName, y.TokenCName)))
                         SameTokenValuePcdListCount = 0
                         while (SameTokenValuePcdListCount < len(SameTokenValuePcdList) - 1):
+                            Flag = False
                             TemListItem = SameTokenValuePcdList[SameTokenValuePcdListCount]
                             TemListItemNext = SameTokenValuePcdList[SameTokenValuePcdListCount + 1]
 
                             if (TemListItem.TokenSpaceGuidCName == TemListItemNext.TokenSpaceGuidCName) and (TemListItem.TokenCName != TemListItemNext.TokenCName):
-                                EdkLogger.error(
-                                            'build',
-                                            FORMAT_INVALID,
-                                            "The TokenValue [%s] of PCD [%s.%s] is conflict with: [%s.%s] in %s"\
-                                            % (TemListItem.TokenValue, TemListItem.TokenSpaceGuidCName, TemListItem.TokenCName, TemListItemNext.TokenSpaceGuidCName, TemListItemNext.TokenCName, Package),
-                                            ExtraData=None
-                                            )
+                                for PcdItem in GlobalData.MixedPcd:
+                                    if (TemListItem.TokenCName, TemListItem.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem] or \
+                                        (TemListItemNext.TokenCName, TemListItemNext.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                                        Flag = True
+                                if not Flag:
+                                    EdkLogger.error(
+                                                'build',
+                                                FORMAT_INVALID,
+                                                "The TokenValue [%s] of PCD [%s.%s] is conflict with: [%s.%s] in %s"\
+                                                % (TemListItem.TokenValue, TemListItem.TokenSpaceGuidCName, TemListItem.TokenCName, TemListItemNext.TokenSpaceGuidCName, TemListItemNext.TokenCName, Package),
+                                                ExtraData=None
+                                                )
                             SameTokenValuePcdListCount += 1
                         Count += SameTokenValuePcdListCount
                     Count += 1
@@ -1054,6 +1183,28 @@ class PlatformAutoGen(AutoGen):
                             Sku = PlatformPcd.SkuInfoList[PlatformPcd.SkuInfoList.keys()[0]]
                             Sku.DefaultValue = PcdItem[2]
                         break
+
+        for key in self.Platform.Pcds:
+            for SinglePcd in GlobalData.MixedPcd:
+                if (self.Platform.Pcds[key].TokenCName, self.Platform.Pcds[key].TokenSpaceGuidCName) == SinglePcd:
+                    for item in GlobalData.MixedPcd[SinglePcd]:
+                        Pcd_Type = item[0].split('_')[-1]
+                        if (Pcd_Type == self.Platform.Pcds[key].Type) or (Pcd_Type == TAB_PCDS_DYNAMIC_EX and self.Platform.Pcds[key].Type in GenC.gDynamicExPcd) or \
+                           (Pcd_Type == TAB_PCDS_DYNAMIC and self.Platform.Pcds[key].Type in GenC.gDynamicPcd):
+                            Value = self.Platform.Pcds[key]
+                            Value.TokenCName = self.Platform.Pcds[key].TokenCName + '_' + Pcd_Type
+                            if len(key) == 2:
+                                newkey = (Value.TokenCName, key[1])
+                            elif len(key) == 3:
+                                newkey = (Value.TokenCName, key[1], key[2])
+                            del self.Platform.Pcds[key]
+                            self.Platform.Pcds[newkey] = Value
+                            break
+                        else:
+                            pass
+                    break
+                else:
+                    pass
 
         # for gathering error information
         NoDatumTypePcdList = set()
@@ -1931,7 +2082,17 @@ class PlatformAutoGen(AutoGen):
         # at this point, ToPcd.Type has the type found from dependent
         # package
         #
+        TokenCName = ToPcd.TokenCName
+        for PcdItem in GlobalData.MixedPcd:
+            if (ToPcd.TokenCName, ToPcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                TokenCName = PcdItem[0]
+                break
         if FromPcd != None:
+            if GlobalData.BuildOptionPcd:
+                for pcd in GlobalData.BuildOptionPcd:
+                    if (FromPcd.TokenSpaceGuidCName, FromPcd.TokenCName) == (pcd[0], pcd[1]):
+                        FromPcd.DefaultValue = pcd[2]
+                        break
             if ToPcd.Pending and FromPcd.Type not in [None, '']:
                 ToPcd.Type = FromPcd.Type
             elif (ToPcd.Type not in [None, '']) and (FromPcd.Type not in [None, ''])\
@@ -1942,7 +2103,7 @@ class PlatformAutoGen(AutoGen):
                 and ToPcd.Type != FromPcd.Type:
                 EdkLogger.error("build", OPTION_CONFLICT, "Mismatched PCD type",
                                 ExtraData="%s.%s is defined as [%s] in module %s, but as [%s] in platform."\
-                                          % (ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName,
+                                          % (ToPcd.TokenSpaceGuidCName, TokenCName,
                                              ToPcd.Type, Module, FromPcd.Type),
                                           File=self.MetaFile)
 
@@ -1963,14 +2124,14 @@ class PlatformAutoGen(AutoGen):
             IsValid, Cause = CheckPcdDatum(ToPcd.DatumType, ToPcd.DefaultValue)
             if not IsValid:
                 EdkLogger.error('build', FORMAT_INVALID, Cause, File=self.MetaFile,
-                                ExtraData="%s.%s" % (ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName))
+                                ExtraData="%s.%s" % (ToPcd.TokenSpaceGuidCName, TokenCName))
             ToPcd.validateranges = FromPcd.validateranges
             ToPcd.validlists = FromPcd.validlists
             ToPcd.expressions = FromPcd.expressions
 
         if ToPcd.DatumType == "VOID*" and ToPcd.MaxDatumSize in ['', None]:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \
-                            % (ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName))
+                            % (ToPcd.TokenSpaceGuidCName, TokenCName))
             Value = ToPcd.DefaultValue
             if Value in [None, '']:
                 ToPcd.MaxDatumSize = '1'
@@ -3572,9 +3733,14 @@ class ModuleAutoGen(AutoGen):
                         )
         if PatchList:
             for PatchPcd in PatchList:
-                if PatchPcd[0] not in PatchablePcds:
+                if PatchPcd[0] in PatchablePcds:
+                    key = PatchPcd[0]
+                elif PatchPcd[0] + '_PatchableInModule' in PatchablePcds:
+                    key = PatchPcd[0] + '_PatchableInModule'
+                else:
                     continue
-                Pcd = PatchablePcds[PatchPcd[0]]
+                Pcd = PatchablePcds[key]
+                TokenCName = PatchPcd[0]
                 PcdValue = ''
                 if Pcd.DatumType != 'VOID*':
                     HexFormat = '0x%02x'
@@ -3588,7 +3754,7 @@ class ModuleAutoGen(AutoGen):
                 else:
                     if Pcd.MaxDatumSize == None or Pcd.MaxDatumSize == '':
                         EdkLogger.error("build", AUTOGEN_ERROR,
-                                        "Unknown [MaxDatumSize] of PCD [%s.%s]" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                                        "Unknown [MaxDatumSize] of PCD [%s.%s]" % (Pcd.TokenSpaceGuidCName, TokenCName)
                                         )
                     ArraySize = int(Pcd.MaxDatumSize, 0)
                     PcdValue = Pcd.DefaultValue
@@ -3612,7 +3778,7 @@ class ModuleAutoGen(AutoGen):
                             ArraySize = ArraySize / 2
                         if ArraySize < (len(PcdValue) + 1):
                             EdkLogger.error("build", AUTOGEN_ERROR,
-                                            "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                                            "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName)
                                             )
                         if ArraySize > len(PcdValue) + 1:
                             NewValue = NewValue + Padding * (ArraySize - len(PcdValue) - 1)
@@ -3622,10 +3788,10 @@ class ModuleAutoGen(AutoGen):
                         PcdValue += '}'
                     else:
                         EdkLogger.error("build", AUTOGEN_ERROR,
-                                        "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                                        "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName)
                                         )
                 PcdItem = '%s.%s|%s|0x%X' % \
-                    (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, PcdValue, PatchPcd[1])
+                    (Pcd.TokenSpaceGuidCName, TokenCName, PcdValue, PatchPcd[1])
                 PcdComments = ''
                 if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) in self._PcdComments:
                     PcdComments = '\n  '.join(self._PcdComments[Pcd.TokenSpaceGuidCName, Pcd.TokenCName])
@@ -3639,6 +3805,11 @@ class ModuleAutoGen(AutoGen):
             PcdCommentList = []
             HiiInfo = ''
             SkuId = ''
+            TokenCName = Pcd.TokenCName
+            for PcdItem in GlobalData.MixedPcd:
+                if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                    TokenCName = PcdItem[0]
+                    break
             if Pcd.Type == TAB_PCDS_DYNAMIC_EX_HII:
                 for SkuName in Pcd.SkuInfoList:
                     SkuInfo = Pcd.SkuInfoList[SkuName]
@@ -3669,7 +3840,7 @@ class ModuleAutoGen(AutoGen):
                 else:
                     PcdCommentList.append('## UNDEFINED ' + HiiInfo)
             PcdComments = '\n  '.join(PcdCommentList)
-            PcdEntry = Pcd.TokenSpaceGuidCName + '.' + Pcd.TokenCName
+            PcdEntry = Pcd.TokenSpaceGuidCName + '.' + TokenCName
             if PcdComments:
                 PcdEntry = PcdComments + '\n  ' + PcdEntry
             AsBuiltInfDict['pcd_item'] += [PcdEntry]

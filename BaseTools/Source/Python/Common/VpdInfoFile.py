@@ -20,6 +20,7 @@ import re
 import Common.EdkLogger as EdkLogger
 import Common.BuildToolError as BuildToolError
 import subprocess
+import Common.GlobalData as GlobalData
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.Misc import SaveFileOnChange
 
@@ -131,12 +132,16 @@ class VpdInfoFile:
         Pcds.sort()
         for Pcd in Pcds:
             i = 0
+            PcdTokenCName = Pcd.TokenCName
+            for PcdItem in GlobalData.MixedPcd:
+                if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                    PcdTokenCName = PcdItem[0]
             for Offset in self._VpdArray[Pcd]:
                 PcdValue = str(Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[i]].DefaultValue).strip()
                 if PcdValue == "" :
                     PcdValue  = Pcd.DefaultValue
 
-                Content += "%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, str(Pcd.SkuInfoList.keys()[i]),str(Offset).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue)
+                Content += "%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, PcdTokenCName, str(Pcd.SkuInfoList.keys()[i]),str(Offset).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue)
                 i += 1
 
         return SaveFileOnChange(FilePath, Content, False)
@@ -174,8 +179,12 @@ class VpdInfoFile:
             Found = False
             
             for VpdObject in self._VpdArray.keys():
-                for sku in VpdObject.SkuInfoList.keys(): 
-                    if VpdObject.TokenSpaceGuidCName == TokenSpaceName and VpdObject.TokenCName == PcdTokenName.strip() and sku == SkuId:
+                VpdObjectTokenCName = VpdObject.TokenCName
+                for PcdItem in GlobalData.MixedPcd:
+                    if (VpdObject.TokenCName, VpdObject.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                        VpdObjectTokenCName = PcdItem[0]
+                for sku in VpdObject.SkuInfoList.keys():
+                    if VpdObject.TokenSpaceGuidCName == TokenSpaceName and VpdObjectTokenCName == PcdTokenName.strip() and sku == SkuId:
                         if self._VpdArray[VpdObject][VpdObject.SkuInfoList.keys().index(sku)] == "*":
                             if Offset == "*":
                                 EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "The offset of %s has not been fixed up by third-party BPDG tool." % PcdName)                              

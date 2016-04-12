@@ -1141,9 +1141,13 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         CName = Pcd.TokenCName
         TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
 
+        for PcdItem in GlobalData.MixedPcd:
+            if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                CName = PcdItem[0]
+
         if GlobalData.BuildOptionPcd:
             for PcdItem in GlobalData.BuildOptionPcd:
-                if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (PcdItem[0], PcdItem[1]):
+                if (Pcd.TokenSpaceGuidCName, CName) == (PcdItem[0], PcdItem[1]):
                     Pcd.DefaultValue = PcdItem[2]
                     break
 
@@ -1461,11 +1465,6 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
         if Pcd.Phase != Phase:
             continue
-        if GlobalData.BuildOptionPcd:
-            for PcdItem in GlobalData.BuildOptionPcd:
-                if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (PcdItem[0], PcdItem[1]):
-                    Pcd.DefaultValue = PcdItem[2]
-                    break
 
         TokenSpaceGuid = GuidStructureStringToGuidValueName(Pcd.TokenSpaceGuidValue) #(Platform.PackageList, TokenSpaceGuidCName))
         GeneratedTokenNumber = Platform.PcdTokenNumber[CName, TokenSpaceGuidCName] - 1
@@ -1475,6 +1474,17 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
         if len(Pcd.SkuInfoList) > 1:
             Dict['PCD_ORDER_TOKEN_NUMBER_MAP'][GeneratedTokenNumber] = SkuEnablePcdIndex
             SkuEnablePcdIndex += 1
+
+        for PcdItem in GlobalData.MixedPcd:
+            if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                CName = PcdItem[0]
+
+        if GlobalData.BuildOptionPcd:
+            for PcdItem in GlobalData.BuildOptionPcd:
+                if (Pcd.TokenSpaceGuidCName, CName) == (PcdItem[0], PcdItem[1]):
+                    Pcd.DefaultValue = PcdItem[2]
+                    break
+
         EdkLogger.debug(EdkLogger.DEBUG_1, "PCD = %s.%s" % (CName, TokenSpaceGuidCName))
         EdkLogger.debug(EdkLogger.DEBUG_1, "phase = %s" % Phase)
         EdkLogger.debug(EdkLogger.DEBUG_1, "GeneratedTokenNumber = %s" % str(GeneratedTokenNumber))
