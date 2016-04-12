@@ -600,11 +600,11 @@ MergeDefaultString (
     if (StringPtr == NULL) {
       StringPtrEnd   = StrStr (StringPtrDefault + 1, L"&GUID");
       SizeAltCfgResp = StrSize (*AltCfgResp);
-      TotalSize = SizeAltCfgResp + StrSize (StringPtrDefault);
       if (StringPtrEnd == NULL) {
         //
         // No more default string is found.
         //
+        TotalSize = SizeAltCfgResp + StrSize (StringPtrDefault);
         *AltCfgResp    = (EFI_STRING) ReallocatePool (
                                      SizeAltCfgResp,
                                      TotalSize,
@@ -619,6 +619,7 @@ MergeDefaultString (
       } else {
         TempChar = *StringPtrEnd;
         *StringPtrEnd = L'\0';
+        TotalSize = SizeAltCfgResp + StrSize (StringPtrDefault);
         *AltCfgResp = (EFI_STRING) ReallocatePool (
                                      SizeAltCfgResp,
                                      TotalSize,
