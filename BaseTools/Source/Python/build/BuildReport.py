@@ -1676,6 +1676,14 @@ class PlatformReport(object):
         FileWrite(File, "Build Duration:       %s" % BuildDuration)
         FileWrite(File, "Report Content:       %s" % ", ".join(ReportType))
 
+        if GlobalData.MixedPcd:
+            FileWrite(File, gSectionStart)
+            FileWrite(File, "The following PCDs use different access methods:")
+            FileWrite(File, gSectionSep)
+            for PcdItem in GlobalData.MixedPcd:
+                FileWrite(File, "%s.%s" % (str(PcdItem[1]), str(PcdItem[0])))
+            FileWrite(File, gSectionEnd)
+
         if not self._IsModuleBuild:
             if "PCD" in ReportType:
                 self.PcdReport.GenerateReport(File, None)
