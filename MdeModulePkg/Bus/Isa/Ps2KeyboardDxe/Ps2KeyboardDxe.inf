@@ -21,7 +21,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Ps2KeyboardDxe
   MODULE_UNI_FILE                = Ps2KeyboardDxe.uni
-  FILE_GUID                      = 3DC82376-637B-40a6-A8FC-A565417F2C38
+  FILE_GUID                      = C4D1F932-821F-4744-BF06-6D30F7730F8D
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializePs2Keyboard
