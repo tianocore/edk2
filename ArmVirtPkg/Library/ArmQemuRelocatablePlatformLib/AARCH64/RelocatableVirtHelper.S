@@ -82,8 +82,8 @@ ASM_PFX(ArmPlatformPeiBootAction):
   // encountered. Since we are calling a C function, use the window at the
   // beginning of the FD image as a temp stack.
   //
-  adr   x1, PcdGet64 (PcdSystemMemorySize)
-  adr   x2, PcdGet64 (PcdSystemMemoryBase)
+  adr   x1, PcdGet64 (PcdSystemMemoryBase)
+  adr   x2, PcdGet64 (PcdSystemMemorySize)
   mov   sp, x7
   bl    FindMemnode
   cbz   x0, .Lout
