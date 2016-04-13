@@ -953,3 +953,25 @@
                                                                                         "TRUE  - Export HII data and configuration data.<BR>\n"
                                                                                         "FALSE - Does not export HII data and configuration.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPs2KbdExtendedVerification_PROMPT  #language en-US "Turn on PS2 Keyboard Extended Verification"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPs2KbdExtendedVerification_HELP  #language en-US "Indicates if PS2 keyboard does a extended verification during start.\n"
+                                                                                               "Add this PCD mainly consider the use case of simulator. This PCD maybe set to FALSE for\n"
+                                                                                               "Extended verification will take some performance. It can be set to FALSE for boot performance.<BR><BR>\n"
+                                                                                               "TRUE  - Turn on PS2 keyboard extended verification.<BR>\n"
+                                                                                               "FALSE - Turn off PS2 keyboard extended verification.<BR>"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPs2MouseExtendedVerification_PROMPT  #language en-US "Turn on PS2 Mouse Extended Verification"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPs2MouseExtendedVerification_HELP  #language en-US "Indicates if PS2 mouse does a extended verification during start.\n"
+                                                                                                 "Extended verification will take some performance. It can be set to FALSE for boot performance.<BR><BR>\n"
+                                                                                                 "TRUE  - Turn on PS2 mouse extended verification. <BR>\n"
+                                                                                                 "FALSE - Turn off PS2 mouse extended verification. <BR>"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFastPS2Detection_PROMPT  #language en-US "Enable fast PS2 detection"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFastPS2Detection_HELP  #language en-US "Indicates if to use the optimized timing for best PS2 detection performance.\n"
+                                                                                     "Note this PCD could be set to TRUE for best boot performance and set to FALSE for best device compatibility.<BR><BR>\n"
+                                                                                     "TRUE  - Use the optimized timing for best PS2 detection performance.<BR>\n"
+                                                                                     "FALSE - Use the normal timing to detect PS2.<BR>"
+
