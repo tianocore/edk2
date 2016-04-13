@@ -12,7 +12,7 @@
   DxeImageVerificationHandler(), HashPeImageByType(), HashPeImage() function will accept
   untrusted PE/COFF image and validate its data structure within this image buffer before use.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1336,6 +1336,10 @@ IsForbiddenByDbx (
   for (Index = 0; Index < CertNumber; Index++) {
     CertSize = (UINTN) ReadUnaligned32 ((UINT32 *)CertPtr);
     Cert     = (UINT8 *)CertPtr + sizeof (UINT32);
+    //
+    // Advance CertPtr to the next cert in image signer's cert list
+    //
+    CertPtr = CertPtr + sizeof (UINT32) + CertSize;
 
     if (IsCertHashFoundInDatabase (Cert, CertSize, (EFI_SIGNATURE_LIST *)Data, DataSize, &RevocationTime)) {
       //
@@ -1344,11 +1348,14 @@ IsForbiddenByDbx (
       IsForbidden = TRUE;
       if (PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime)) {
         IsForbidden = FALSE;
+        //
+        // Pass DBT check. Continue to check other certs in image signer's cert list against DBX, DBT
+        //
+        continue;
       }
       goto Done;
     }
 
-    CertPtr = CertPtr + sizeof (UINT32) + CertSize;
   }
 
 Done:
