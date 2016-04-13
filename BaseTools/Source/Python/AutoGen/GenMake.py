@@ -233,7 +233,7 @@ PLATFORM_NAME = ${platform_name}
 PLATFORM_GUID = ${platform_guid}
 PLATFORM_VERSION = ${platform_version}
 PLATFORM_RELATIVE_DIR = ${platform_relative_directory}
-PLATFORM_DIR = $(WORKSPACE)${separator}${platform_relative_directory}
+PLATFORM_DIR = ${platform_dir}
 PLATFORM_OUTPUT_DIR = ${platform_output_directory}
 
 #
@@ -612,6 +612,7 @@ cleanlib:
             "platform_version"          : self.PlatformInfo.Version,
             "platform_relative_directory": self.PlatformInfo.SourceDir,
             "platform_output_directory" : self.PlatformInfo.OutputDir,
+            "platform_dir"              : self._AutoGenObject.Macros["PLATFORM_DIR"],
 
             "module_name"               : self._AutoGenObject.Name,
             "module_guid"               : self._AutoGenObject.Guid,
@@ -989,7 +990,7 @@ PLATFORM_NAME = ${platform_name}
 PLATFORM_GUID = ${platform_guid}
 PLATFORM_VERSION = ${platform_version}
 PLATFORM_RELATIVE_DIR = ${platform_relative_directory}
-PLATFORM_DIR = $(WORKSPACE)${separator}${platform_relative_directory}
+PLATFORM_DIR = $(platform_dir)
 PLATFORM_OUTPUT_DIR = ${platform_output_directory}
 
 #
@@ -1119,6 +1120,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
             "platform_version"          : self.PlatformInfo.Version,
             "platform_relative_directory": self.PlatformInfo.SourceDir,
             "platform_output_directory" : self.PlatformInfo.OutputDir,
+            "platform_dir"              : self._AutoGenObject.Macros["PLATFORM_DIR"],
 
             "module_name"               : self._AutoGenObject.Name,
             "module_guid"               : self._AutoGenObject.Guid,
@@ -1171,7 +1173,7 @@ PLATFORM_NAME = ${platform_name}
 PLATFORM_GUID = ${platform_guid}
 PLATFORM_VERSION = ${platform_version}
 PLATFORM_FILE = ${platform_file}
-PLATFORM_DIR = $(WORKSPACE)${separator}${platform_relative_directory}
+PLATFORM_DIR = $(platform_dir)
 PLATFORM_OUTPUT_DIR = ${platform_output_directory}
 
 #
@@ -1313,6 +1315,7 @@ cleanlib:
             "platform_relative_directory": PlatformInfo.SourceDir,
             "platform_output_directory" : PlatformInfo.OutputDir,
             "platform_build_directory"  : PlatformInfo.BuildDir,
+            "platform_dir"              : self._AutoGenObject.Macros["PLATFORM_DIR"],
 
             "toolchain_tag"             : PlatformInfo.ToolChain,
             "build_target"              : PlatformInfo.BuildTarget,
