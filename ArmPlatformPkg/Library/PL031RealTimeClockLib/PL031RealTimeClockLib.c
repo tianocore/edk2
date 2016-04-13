@@ -650,12 +650,6 @@ LibRtcInitialize (
     return Status;
   }
 
-  // Setup the setters and getters
-  gRT->GetTime       = LibGetTime;
-  gRT->SetTime       = LibSetTime;
-  gRT->GetWakeupTime = LibGetWakeupTime;
-  gRT->SetWakeupTime = LibSetWakeupTime;
-
   mRT = gRT;
 
   // Install the protocol
