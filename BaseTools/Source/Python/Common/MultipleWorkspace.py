@@ -4,7 +4,7 @@
 # This file is required to make Python interpreter treat the directory
 # as containing package.
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -128,12 +128,17 @@ class MultipleWorkspace(object):
     @classmethod
     def handleWsMacro(cls, PathStr):
         if TAB_WORKSPACE in PathStr:
-            Path = PathStr.replace(TAB_WORKSPACE, cls.WORKSPACE).strip()
-            if not os.path.exists(Path):
-                for Pkg in cls.PACKAGES_PATH:
-                    Path = PathStr.replace(TAB_WORKSPACE, Pkg).strip()
-                    if os.path.exists(Path):
-                        return Path
+            PathList = PathStr.split()
+            if PathList:
+                for i, str in enumerate(PathList):
+                    if str.find(TAB_WORKSPACE) != -1:
+                        MacroStartPos = str.find(TAB_WORKSPACE)
+                        MacroEndPos = str.find(')', MacroStartPos)
+                        Substr = str[MacroEndPos+1:]
+                        if Substr.startswith('/') or Substr.startswith('\\'):
+                            Substr = Substr[1:]
+                        PathList[i] = str[0:MacroStartPos] + os.path.normpath(cls.join(cls.WORKSPACE, Substr))
+            PathStr = ' '.join(PathList)
         return PathStr
     
     ## getPkgPath()
