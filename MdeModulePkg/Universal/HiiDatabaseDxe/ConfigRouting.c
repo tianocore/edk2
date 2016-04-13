@@ -510,6 +510,477 @@ Exit:
 }
 
 /**
+ To find the BlockName in the string with same value.
+
+  @param  String                 Pointer to a Null-terminated Unicode string.
+  @param  BlockName              Pointer to a Null-terminated Unicode string to search for.
+  @param  Buffer                 Pointer to the value correspond to the BlockName.
+  @param  Found                  The Block whether has been found.
+  @param  BufferLen              The length of the buffer.
+
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary structures.
+  @retval EFI_SUCCESS            The function finishes successfully.
+
+**/
+EFI_STATUS
+FindSameBlockElement(
+  IN  EFI_STRING   String,
+  IN  EFI_STRING   BlockName,
+  IN  UINT8        *Buffer,
+  OUT BOOLEAN      *Found,
+  IN  UINTN        BufferLen
+  )
+{
+  EFI_STRING   BlockPtr;
+  UINTN        Length;
+  UINT8        *TempBuffer;
+  EFI_STATUS   Status;
+
+  TempBuffer = NULL;
+  *Found = FALSE;
+  BlockPtr = StrStr (String, BlockName);
+
+  while (BlockPtr != NULL) {
+    BlockPtr += StrLen (BlockName);
+    Status = GetValueOfNumber (BlockPtr, &TempBuffer, &Length);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    ASSERT (TempBuffer != NULL);
+    if ((BufferLen == Length) && (0 == CompareMem (Buffer, TempBuffer, Length))) {
+      *Found = TRUE;
+      return EFI_SUCCESS;
+    } else {
+      FreePool (TempBuffer);
+      TempBuffer = NULL;
+      BlockPtr = StrStr (BlockPtr + 1, BlockName);
+    }
+  }
+  return EFI_SUCCESS;
+}
+
+/**
+  Compare the <AltResp> in ConfigAltResp and DefaultAltCfgResp, if the <AltResp>
+  in DefaultAltCfgResp but not in ConfigAltResp,add it to the ConfigAltResp.
+
+  @param  DefaultAltCfgResp      Pointer to a null-terminated Unicode string in
+                                 <MultiConfigAltResp> format. The default value
+                                 string may contain more than one ConfigAltResp
+                                 string for the different varstore buffer.
+  @param  ConfigAltResp          Pointer to a null-terminated Unicode string in
+                                 <ConfigAltResp> format.
+  @param  AltConfigHdr           Pointer to a Unicode string in <AltConfigHdr> format.
+  @param  ConfigAltRespChanged   Whether the ConfigAltResp has been changed.
+
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary structures.
+  @retval EFI_SUCCESS            The function finishes  successfully.
+
+**/
+EFI_STATUS
+CompareBlockElementDefault (
+  IN      EFI_STRING  DefaultAltCfgResp,
+  IN OUT  EFI_STRING  *ConfigAltResp,
+  IN      EFI_STRING  AltConfigHdr,
+  IN OUT  BOOLEAN     *ConfigAltRespChanged
+)
+{
+  EFI_STATUS    Status;
+  EFI_STRING    BlockPtr;
+  EFI_STRING    BlockPtrStart;
+  EFI_STRING    StringPtr;
+  EFI_STRING    AppendString;
+  EFI_STRING    AltConfigHdrPtr;
+  UINT8         *TempBuffer;
+  UINTN         OffsetLength;
+  UINTN         AppendSize;
+  UINTN         TotalSize;
+  BOOLEAN       FoundOffset;
+
+  AppendString = NULL;
+  TempBuffer   = NULL;
+  //
+  // Make BlockPtr point to the first <BlockConfig> with AltConfigHdr in DefaultAltCfgResp.
+  //
+  AltConfigHdrPtr = StrStr (DefaultAltCfgResp, AltConfigHdr);
+  ASSERT (AltConfigHdrPtr != NULL);
+  BlockPtr = StrStr (AltConfigHdrPtr, L"&OFFSET=");
+  //
+  // Make StringPtr point to the AltConfigHdr in ConfigAltResp.
+  //
+  StringPtr = StrStr (*ConfigAltResp, AltConfigHdr);
+  ASSERT (StringPtr != NULL);
+
+  while (BlockPtr != NULL) {
+    //
+    // Find the "&OFFSET=<Number>" block and get the value of the Number with AltConfigHdr in DefaultAltCfgResp.
+    //
+    BlockPtrStart = BlockPtr;
+    BlockPtr += StrLen (L"&OFFSET=");
+    Status = GetValueOfNumber (BlockPtr, &TempBuffer, &OffsetLength);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+    //
+    // To find the same "&OFFSET=<Number>" block in ConfigAltResp.
+    //
+    Status = FindSameBlockElement (StringPtr, L"&OFFSET=", TempBuffer, &FoundOffset, OffsetLength);
+    if (TempBuffer != NULL) {
+      FreePool (TempBuffer);
+      TempBuffer = NULL;
+    }
+    if (EFI_ERROR (Status)) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+    if (!FoundOffset) {
+      //
+      // Don't find the same "&OFFSET=<Number>" block in ConfigAltResp.
+      // Calculate the size of <BlockConfig>.
+      // <BlockConfig>::='OFFSET='<Number>'&WIDTH='<Number>'&VALUE='<Number>.
+      //
+      BlockPtr = StrStr (BlockPtr + 1, L"&OFFSET=");
+      if (BlockPtr != NULL) {
+        AppendSize = (BlockPtr - BlockPtrStart) * sizeof (CHAR16);
+      } else {
+        AppendSize = StrSize (BlockPtrStart);
+      }
+      //
+      // Copy the <BlockConfig> to AppendString.
+      //
+      if (AppendString == NULL) {
+        AppendString = (EFI_STRING) AllocateZeroPool (AppendSize + sizeof (CHAR16));
+        StrnCatS (AppendString, AppendSize / sizeof (CHAR16) + 1, BlockPtrStart, AppendSize / sizeof (CHAR16));
+      } else {
+        TotalSize = StrSize (AppendString) + AppendSize + sizeof (CHAR16);
+        AppendString = (EFI_STRING) ReallocatePool (
+                                      StrSize (AppendString),
+                                      TotalSize,
+                                      AppendString
+                                      );
+        if (AppendString == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Exit;
+        }
+        StrnCatS (AppendString, TotalSize / sizeof (CHAR16), BlockPtrStart, AppendSize / sizeof (CHAR16));
+      }
+    } else {
+      //
+      // To find next "&OFFSET=<Number>" block with AltConfigHdr in DefaultAltCfgResp.
+      //
+      BlockPtr = StrStr (BlockPtr + 1, L"&OFFSET=");
+    }
+  }
+
+  if (AppendString != NULL) {
+    //
+    // Reallocate ConfigAltResp to copy the AppendString.
+    //
+    TotalSize = StrSize (*ConfigAltResp) + StrSize (AppendString) + sizeof (CHAR16);
+    *ConfigAltResp = (EFI_STRING) ReallocatePool (
+                                    StrSize (*ConfigAltResp),
+                                    TotalSize,
+                                    *ConfigAltResp
+                                    );
+    if (*ConfigAltResp == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+    StrCatS (*ConfigAltResp, TotalSize / sizeof (CHAR16), AppendString);
+    *ConfigAltRespChanged = TRUE;
+  }
+
+  Status = EFI_SUCCESS;
+
+Exit:
+  if (AppendString != NULL) {
+    FreePool (AppendString);
+  }
+
+  return Status;
+}
+
+/**
+  Compare the <AltResp> in ConfigAltResp and DefaultAltCfgResp, if the <AltResp>
+  in DefaultAltCfgResp but not in ConfigAltResp,add it to the ConfigAltResp.
+
+  @param  DefaultAltCfgResp      Pointer to a null-terminated Unicode string in
+                                 <MultiConfigAltResp> format. The default value
+                                 string may contain more than one ConfigAltResp
+                                 string for the different varstore buffer.
+  @param  ConfigAltResp          Pointer to a null-terminated Unicode string in
+                                 <ConfigAltResp> format.
+  @param  AltConfigHdr           Pointer to a Unicode string in <AltConfigHdr> format.
+  @param  ConfigAltRespChanged   Whether the ConfigAltResp has been changed.
+
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary structures.
+  @retval EFI_SUCCESS            The function finishes  successfully.
+
+**/
+EFI_STATUS
+CompareNameElementDefault (
+  IN     EFI_STRING  DefaultAltCfgResp,
+  IN OUT EFI_STRING  *ConfigAltResp,
+  IN     EFI_STRING  AltConfigHdr,
+  IN OUT BOOLEAN     *ConfigAltRespChanged
+)
+{
+  EFI_STATUS    Status;
+  EFI_STRING    NvConfigPtr;
+  EFI_STRING    NvConfigStart;
+  EFI_STRING    NvConfigValuePtr;
+  EFI_STRING    StringPtr;
+  EFI_STRING    NvConfigExist;
+  EFI_STRING    AppendString;
+  CHAR16        TempChar;
+  UINTN         AppendSize;
+  UINTN         TotalSize;
+
+  AppendString = NULL;
+  NvConfigExist = NULL;
+  //
+  // Make NvConfigPtr point to the first <NvConfig> with AltConfigHdr in DefaultAltCfgResp.
+  //
+  NvConfigPtr = StrStr (DefaultAltCfgResp, AltConfigHdr);
+  ASSERT (NvConfigPtr != NULL);
+  NvConfigPtr = StrStr (NvConfigPtr + StrLen(AltConfigHdr),L"&");
+  //
+  // Make StringPtr point to the first <NvConfig> with AltConfigHdr in ConfigAltResp.
+  //
+  StringPtr = StrStr (*ConfigAltResp, AltConfigHdr);
+  ASSERT (StringPtr != NULL);
+  StringPtr = StrStr (StringPtr + StrLen (AltConfigHdr), L"&");
+  ASSERT (StringPtr != NULL);
+
+  while (NvConfigPtr != NULL) {
+    //
+    // <NvConfig> ::= <Label>'='<String> | <Label>'='<Number>.
+    // Get the <Label> with AltConfigHdr in DefaultAltCfgResp.
+    //
+    NvConfigStart = NvConfigPtr;
+    NvConfigValuePtr = StrStr (NvConfigPtr + 1, L"=");
+    ASSERT (NvConfigValuePtr != NULL);
+    TempChar = *NvConfigValuePtr;
+    *NvConfigValuePtr = L'\0';
+    //
+    // Get the <Label> with AltConfigHdr in ConfigAltResp.
+    //
+    NvConfigExist = StrStr (StringPtr, NvConfigPtr);
+    if (NvConfigExist == NULL) {
+      //
+      // Don't find same <Label> in ConfigAltResp.
+      // Calculate the size of <NvConfig>.
+      //
+      *NvConfigValuePtr = TempChar;
+      NvConfigPtr = StrStr (NvConfigPtr + 1, L"&");
+      if (NvConfigPtr != NULL) {
+        AppendSize = (NvConfigPtr - NvConfigStart) * sizeof (CHAR16);
+      } else {
+        AppendSize = StrSize (NvConfigStart);
+      }
+      //
+      // Copy the <NvConfig> to AppendString.
+      //
+      if (AppendString == NULL) {
+        AppendString = (EFI_STRING) AllocateZeroPool (AppendSize + sizeof (CHAR16));
+        StrnCatS (AppendString, AppendSize / sizeof (CHAR16) + 1, NvConfigStart, AppendSize / sizeof (CHAR16));
+      } else {
+         TotalSize = StrSize (AppendString) + AppendSize + sizeof (CHAR16);
+         AppendString = (EFI_STRING) ReallocatePool (
+                                       StrSize (AppendString),
+                                       TotalSize,
+                                       AppendString
+                                       );
+        if (AppendString == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Exit;
+        }
+        StrnCatS (AppendString, TotalSize / sizeof (CHAR16), NvConfigStart, AppendSize / sizeof (CHAR16));
+      }
+    } else {
+      //
+      // To find next <Label> in DefaultAltCfgResp.
+      //
+      *NvConfigValuePtr = TempChar;
+      NvConfigPtr = StrStr (NvConfigPtr + 1, L"&");
+    }
+  }
+  if (AppendString != NULL) {
+    //
+    // Reallocate ConfigAltResp to copy the AppendString.
+    //
+    TotalSize = StrSize (*ConfigAltResp) + StrSize (AppendString) + sizeof (CHAR16);
+    *ConfigAltResp = (EFI_STRING) ReallocatePool (
+                                    StrSize (*ConfigAltResp),
+                                    StrSize (*ConfigAltResp) + StrSize (AppendString) + sizeof (CHAR16),
+                                    *ConfigAltResp
+                                    );
+    if (*ConfigAltResp == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+    StrCatS (*ConfigAltResp, TotalSize / sizeof (CHAR16), AppendString);
+    *ConfigAltRespChanged = TRUE;
+  }
+  Status = EFI_SUCCESS;
+
+Exit:
+  if (AppendString != NULL) {
+    FreePool (AppendString);
+  }
+  return Status;
+}
+
+/**
+  Compare the <AltResp> in AltCfgResp and DefaultAltCfgResp, if the <AltResp>
+  in DefaultAltCfgResp but not in AltCfgResp,add it to the AltCfgResp.
+
+  @param  AltCfgResp             Pointer to a null-terminated Unicode string in
+                                 <ConfigAltResp> format.
+  @param  DefaultAltCfgResp      Pointer to a null-terminated Unicode string in
+                                 <MultiConfigAltResp> format. The default value
+                                 string may contain more than one ConfigAltResp
+                                 string for the different varstore buffer.
+  @param  AltConfigHdr           Pointer to a Unicode string in <AltConfigHdr> format.
+
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary
+                                 structures.
+  @retval EFI_SUCCESS            The function finishes  successfully.
+
+**/
+EFI_STATUS
+CompareAndMergeDefaultString (
+  IN OUT EFI_STRING  *AltCfgResp,
+  IN     EFI_STRING  DefaultAltCfgResp,
+  IN     EFI_STRING  AltConfigHdr
+  )
+{
+  EFI_STATUS     Status;
+  EFI_STRING     AltCfgRespBackup;
+  EFI_STRING     AltConfigHdrPtr;
+  EFI_STRING     AltConfigHdrPtrNext;
+  EFI_STRING     ConfigAltResp;
+  EFI_STRING     StringPtr;
+  EFI_STRING     StringPtrNext;
+  EFI_STRING     BlockPtr;
+  UINTN          ReallocateSize;
+  CHAR16         TempChar;
+  CHAR16         TempCharA;
+  BOOLEAN        ConfigAltRespChanged;
+
+  Status = EFI_OUT_OF_RESOURCES;
+  BlockPtr             = NULL;
+  AltConfigHdrPtrNext  = NULL;
+  StringPtrNext        = NULL;
+  ConfigAltResp        = NULL;
+  AltCfgRespBackup     = NULL;
+  ConfigAltRespChanged = FALSE;
+
+  //
+  //To find the <AltResp> with AltConfigHdr in DefaultAltCfgResp, ignore other <AltResp> which follow it.
+  //
+  AltConfigHdrPtr = StrStr (DefaultAltCfgResp, AltConfigHdr);
+  ASSERT (AltConfigHdrPtr != NULL);
+  AltConfigHdrPtrNext = StrStr (AltConfigHdrPtr + 1, L"&GUID");
+  if (AltConfigHdrPtrNext != NULL) {
+    TempChar = *AltConfigHdrPtrNext;
+    *AltConfigHdrPtrNext = L'\0';
+  }
+  //
+  // To find the <AltResp> with AltConfigHdr in AltCfgResp, ignore other <AltResp> which follow it.
+  //
+  StringPtr = StrStr (*AltCfgResp, AltConfigHdr);
+  StringPtrNext = StrStr (StringPtr + 1, L"&GUID");
+  if (StringPtrNext != NULL) {
+    TempCharA = *StringPtrNext;
+    *StringPtrNext = L'\0';
+  }
+  //
+  // Copy the content of <ConfigAltResp> which contain current AltConfigHdr in AltCfgResp.
+  //
+  ConfigAltResp = AllocateCopyPool (StrSize (*AltCfgResp), *AltCfgResp);
+  if (ConfigAltResp == NULL) {
+    goto Exit;
+  }
+  //
+  // To find the <ConfigBody> with AltConfigHdr in DefaultAltCfgResp.
+  //
+  BlockPtr = StrStr (AltConfigHdrPtr, L"&OFFSET=");
+  if (BlockPtr != NULL) {
+    //
+    // <BlockConfig>::='OFFSET='<Number>'&WIDTH='<Number>'&VALUE='<Number> style.
+    // Call function CompareBlockElementDefault to compare the <BlockConfig> in DefaultAltCfgResp and ConfigAltResp.
+    // The ConfigAltResp which may contain the new <BlockConfig> get from DefaultAltCfgResp.
+    //
+    Status = CompareBlockElementDefault (DefaultAltCfgResp, &ConfigAltResp, AltConfigHdr, &ConfigAltRespChanged);
+    if (EFI_ERROR(Status)) {
+      goto Exit;
+    }
+  } else {
+    //
+    // <NvConfig> ::= <Label>'='<String> | <Label>'='<Number> style.
+    // Call function CompareNameElementDefault to compare the <NvConfig> in DefaultAltCfgResp and ConfigAltResp.
+    // The ConfigAltResp which may contain the new <NvConfig> get from DefaultAltCfgResp.
+    //
+    Status = CompareNameElementDefault (DefaultAltCfgResp, &ConfigAltResp, AltConfigHdr, &ConfigAltRespChanged);
+    if (EFI_ERROR(Status)) {
+      goto Exit;
+    }
+  }
+  //
+  // Restore the AltCfgResp.
+  //
+  if (StringPtrNext != NULL) {
+    *StringPtrNext = TempCharA;
+  }
+
+  //
+  // If the ConfigAltResp has no change,no need to update the content in AltCfgResp.
+  //
+  if (ConfigAltRespChanged == FALSE) {
+    Status = EFI_SUCCESS;
+    goto Exit;
+  }
+  //
+  // ConfigAltResp has been changed, need to update the content in AltCfgResp.
+  //
+  if (StringPtrNext != NULL) {
+    ReallocateSize = StrSize (ConfigAltResp) + StrSize (StringPtrNext) + sizeof (CHAR16);
+  } else {
+    ReallocateSize = StrSize (ConfigAltResp) + sizeof (CHAR16);
+  }
+
+  AltCfgRespBackup = (EFI_STRING) AllocateZeroPool (ReallocateSize);
+  if (AltCfgRespBackup == NULL) {
+    goto Exit;
+  }
+
+  StrCatS (AltCfgRespBackup, ReallocateSize / sizeof (CHAR16), ConfigAltResp);
+  if (StringPtrNext != NULL) {
+    StrCatS (AltCfgRespBackup, ReallocateSize / sizeof (CHAR16), StringPtrNext);
+  }
+
+  FreePool (*AltCfgResp);
+  *AltCfgResp = AltCfgRespBackup;
+
+  Status = EFI_SUCCESS;
+
+Exit:
+  if (ConfigAltResp != NULL) {
+    FreePool(ConfigAltResp);
+  }
+  //
+  // Restore the DefaultAltCfgResp.
+  //
+  if ( AltConfigHdrPtrNext != NULL) {
+    *AltConfigHdrPtrNext = TempChar;
+    AltConfigHdrPtrNext = NULL;
+  }
+
+  return Status;
+}
+
+/**
   This function merges DefaultAltCfgResp string into AltCfgResp string for
   the missing AltCfgId in AltCfgResq.
 
@@ -632,6 +1103,13 @@ MergeDefaultString (
         StrCatS (*AltCfgResp, TotalSize / sizeof (CHAR16), StringPtrDefault);
         *StringPtrEnd = TempChar;
       }
+    } else {
+      //
+      // The AltCfgResp contains <AltCfgResp>.
+      // If the <ConfigElement> in <AltCfgResp> in the DefaultAltCfgResp but not in the
+      // related <AltCfgResp> in AltCfgResp, merge it to AltCfgResp. else no need to merge.
+      //
+      CompareAndMergeDefaultString (AltCfgResp, DefaultAltCfgResp, AltConfigHdr);
     }
     
     //
@@ -3802,6 +4280,8 @@ HiiConfigRoutingExtractConfig (
   EFI_HII_CONFIG_ACCESS_PROTOCOL      *ConfigAccess;
   EFI_STRING                          AccessProgress;
   EFI_STRING                          AccessResults;
+  EFI_STRING                          AccessProgressBackup;
+  EFI_STRING                          AccessResultsBackup;
   EFI_STRING                          DefaultResults;
   BOOLEAN                             FirstElement;
   BOOLEAN                             IfrDataParsedFlag;
@@ -3809,6 +4289,9 @@ HiiConfigRoutingExtractConfig (
   EFI_IFR_VARSTORE_EFI                *EfiVarStoreInfo;
   EFI_STRING                          ErrorPtr;
   UINTN                               DevicePathSize;
+  UINTN                               ConigStringSize;
+  UINTN                               ConigStringSizeNewsize;
+  EFI_STRING                          ConfigStringPtr;
 
   if (This == NULL || Progress == NULL || Results == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3827,6 +4310,8 @@ HiiConfigRoutingExtractConfig (
   Status         = EFI_SUCCESS;
   AccessResults  = NULL;
   AccessProgress = NULL;
+  AccessResultsBackup  = NULL;
+  AccessProgressBackup = NULL;
   DevicePath     = NULL;
   IfrDataParsedFlag = FALSE;
   IsEfiVarStore     = FALSE;
@@ -3976,6 +4461,62 @@ HiiConfigRoutingExtractConfig (
       //
       Status = GetConfigRespFromEfiVarStore(This, EfiVarStoreInfo, ConfigRequest, &AccessResults, &AccessProgress);
       FreePool (EfiVarStoreInfo);
+      if (EFI_ERROR (Status)) {
+        //
+        // AccessProgress indicates the parsing progress on <ConfigRequest>.
+        // Map it to the progress on <MultiConfigRequest> then return it.
+        //
+        *Progress = StrStr (StringPtr, AccessProgress);
+        goto Done;
+      }
+
+      //
+      // For EfiVarstore, call corresponding ConfigAccess protocol to get the AltCfgResp from driver.
+      //
+      Status = gBS->HandleProtocol (
+                      DriverHandle,
+                      &gEfiHiiConfigAccessProtocolGuid,
+                      (VOID **) &ConfigAccess
+                      );
+      if (EFI_ERROR (Status)) {
+        //
+        // The driver has EfiVarStore, may not install ConfigAccess protocol.
+        // So ignore the error status in this case.
+        //
+        Status = EFI_SUCCESS;
+      } else {
+        Status = ConfigAccess->ExtractConfig (
+                                 ConfigAccess,
+                                 ConfigRequest,
+                                 &AccessProgressBackup,
+                                 &AccessResultsBackup
+                                 );
+        if (!EFI_ERROR(Status)) {
+          //
+          //Merge the AltCfgResp in AccessResultsBackup to AccessResults
+          //
+          if ((AccessResultsBackup != NULL) && (StrStr (AccessResultsBackup, L"&ALTCFG=") != NULL)) {
+            ConigStringSize = StrSize (AccessResults);
+            ConfigStringPtr = StrStr (AccessResultsBackup, L"&GUID=");
+            ConigStringSizeNewsize = StrSize (ConfigStringPtr) + ConigStringSize + sizeof (CHAR16);
+            AccessResults = (EFI_STRING) ReallocatePool (
+                                         ConigStringSize,
+                                         ConigStringSizeNewsize,
+                                         AccessResults);
+            StrCatS (AccessResults, ConigStringSizeNewsize / sizeof (CHAR16), ConfigStringPtr);
+          }
+        } else {
+          //
+          // In the ExtractConfig function of some driver may not support EfiVarStore,
+          // may return error status, just ignore the error status in this case.
+          //
+          Status = EFI_SUCCESS;
+        }
+        if (AccessResultsBackup != NULL) {
+          FreePool (AccessResultsBackup);
+          AccessResultsBackup = NULL;
+        }
+      }
     } else {
       //
       // Call corresponding ConfigAccess protocol to extract settings
