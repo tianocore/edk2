@@ -441,19 +441,7 @@ InitSecureBootVariables (
   SecureBootEnable = SECURE_BOOT_DISABLE;
   Status = AuthServiceInternalFindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID **)&Data, &DataSize);
   if (!EFI_ERROR(Status)) {
-    if (!IsPkPresent) {
-      //
-      // PK is cleared in runtime. "SecureBootMode" is not updated before reboot
-      // Delete "SecureBootMode"
-      //
-      Status = AuthServiceInternalUpdateVariable (
-                 EFI_SECURE_BOOT_ENABLE_NAME,
-                 &gEfiSecureBootEnableDisableGuid,
-                 &SecureBootEnable,
-                 0,
-                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
-                 );
-    } else {
+    if (IsPkPresent) {
       SecureBootEnable = *Data;
     }
   } else if ((SecureBootMode == SecureBootModeTypeUserMode) || (SecureBootMode == SecureBootModeTypeDeployedMode)) {
