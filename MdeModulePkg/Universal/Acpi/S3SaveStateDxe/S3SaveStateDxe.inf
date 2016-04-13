@@ -60,7 +60,7 @@
 
 [Protocols]
   gEfiS3SaveStateProtocolGuid                ## PRODUCES
-  gEfiLockBoxProtocolGuid
+  gEfiLockBoxProtocolGuid                    ## CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode   ## CONSUMES
