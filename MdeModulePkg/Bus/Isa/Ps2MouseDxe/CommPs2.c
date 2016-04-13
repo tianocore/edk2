@@ -343,7 +343,6 @@ PS2MouseGetPacket (
   BOOLEAN     RButton;
 
   KeyboardEnable  = FALSE;
-  Count           = 1;
   State           = PS2_READ_BYTE_ONE;
 
   //
@@ -357,6 +356,7 @@ PS2MouseGetPacket (
       // Read mouse first byte data, if failed, immediately return
       //
       KbcDisableAux ();
+      Count  = 1;
       Status = PS2MouseRead (&Data, &Count, State);
       if (EFI_ERROR (Status)) {
         KbcEnableAux ();
