@@ -1383,13 +1383,6 @@ Returns:
   }
 
   //
-  // No available section header is found.
-  //
-  if (Index == ImgHdr->Pe32.FileHeader.NumberOfSections) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
   // BaseAddress is set to section header.
   //
   return EFI_SUCCESS;
