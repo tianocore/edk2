@@ -131,13 +131,16 @@ class MultipleWorkspace(object):
             PathList = PathStr.split()
             if PathList:
                 for i, str in enumerate(PathList):
-                    if str.find(TAB_WORKSPACE) != -1:
-                        MacroStartPos = str.find(TAB_WORKSPACE)
-                        MacroEndPos = str.find(')', MacroStartPos)
-                        Substr = str[MacroEndPos+1:]
-                        if Substr.startswith('/') or Substr.startswith('\\'):
-                            Substr = Substr[1:]
-                        PathList[i] = str[0:MacroStartPos] + os.path.normpath(cls.join(cls.WORKSPACE, Substr))
+                    MacroStartPos = str.find(TAB_WORKSPACE)
+                    if MacroStartPos != -1:
+                        Substr = str[MacroStartPos:]
+                        Path = Substr.replace(TAB_WORKSPACE, cls.WORKSPACE).strip()
+                        if not os.path.exists(Path):
+                            for Pkg in cls.PACKAGES_PATH:
+                                Path = Substr.replace(TAB_WORKSPACE, Pkg).strip()
+                                if os.path.exists(Path):
+                                    break
+                        PathList[i] = str[0:MacroStartPos] + Path
             PathStr = ' '.join(PathList)
         return PathStr
     
