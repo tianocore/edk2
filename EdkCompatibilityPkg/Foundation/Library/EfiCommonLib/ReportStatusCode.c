@@ -332,8 +332,8 @@ Returns:
   // The first 12 * UINTN bytes of the string are really an 
   // arguement stack to support varargs on the Format string.
   //
-#if (defined (EFIARM) || defined (EFIAARCH64) || defined(__APPLE__))
-  // It is not legal C code to case VA_LIST to a pointer. VA_LIST can 
+#if (defined (EFIARM) || defined (EFIAARCH64) || defined (__APPLE__))
+  // It is not legal C code to cast VA_LIST to a pointer. VA_LIST can 
   // be a structure. 
   return FALSE;
 #else
