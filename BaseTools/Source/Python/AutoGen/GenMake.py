@@ -990,7 +990,7 @@ PLATFORM_NAME = ${platform_name}
 PLATFORM_GUID = ${platform_guid}
 PLATFORM_VERSION = ${platform_version}
 PLATFORM_RELATIVE_DIR = ${platform_relative_directory}
-PLATFORM_DIR = $(platform_dir)
+PLATFORM_DIR = ${platform_dir}
 PLATFORM_OUTPUT_DIR = ${platform_output_directory}
 
 #
@@ -1173,7 +1173,7 @@ PLATFORM_NAME = ${platform_name}
 PLATFORM_GUID = ${platform_guid}
 PLATFORM_VERSION = ${platform_version}
 PLATFORM_FILE = ${platform_file}
-PLATFORM_DIR = $(platform_dir)
+PLATFORM_DIR = ${platform_dir}
 PLATFORM_OUTPUT_DIR = ${platform_output_directory}
 
 #
