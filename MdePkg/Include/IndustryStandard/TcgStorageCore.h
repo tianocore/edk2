@@ -261,6 +261,10 @@ ATA 8 Rev6a Table 68 7.57.6.2
 
 #define TCG_RESERVED_COMID 0x0000
 
+// Defined in TCG Storage Feature Set:Block SID Authentication spec,
+// ComId used for BlockSid command is hardcode 0x0005.
+#define TCG_BLOCKSID_COMID 0x0005
+
 #pragma pack(1)
 typedef struct {
   UINT8   Reserved[6];
