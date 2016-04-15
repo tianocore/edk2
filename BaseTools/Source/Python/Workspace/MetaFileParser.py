@@ -915,6 +915,8 @@ class DscParser(MetaFileParser):
             elif Line[0] == '!':
                 self._DirectiveParser()
                 continue
+            if Line[0] == TAB_OPTION_START and not self._InSubsection:
+                EdkLogger.error("Parser", FILE_READ_FAILURE, "Missing the '{' before %s in Line %s" % (Line, Index+1),ExtraData=self.MetaFile)
 
             if self._InSubsection:
                 SectionType = self._SubsectionType

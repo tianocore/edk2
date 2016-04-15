@@ -920,6 +920,9 @@ class Build():
 
     def InitPreBuild(self):
         self.LoadConfiguration()
+        ErrorCode, ErrorInfo = self.PlatformFile.Validate(".dsc", False)
+        if ErrorCode != 0:
+            EdkLogger.error("build", ErrorCode, ExtraData=ErrorInfo)
         if self.BuildTargetList:
             GlobalData.gGlobalDefines['TARGET'] = self.BuildTargetList[0]
         if self.ArchList:
