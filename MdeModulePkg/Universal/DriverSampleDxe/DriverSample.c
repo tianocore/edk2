@@ -69,6 +69,48 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath1 = {
 };
 
 /**
+  Set value of a data element in an Array by its Index.
+
+  @param  Array                  The data array.
+  @param  Type                   Type of the data in this array.
+  @param  Index                  Zero based index for data in this array.
+  @param  Value                  The value to be set.
+
+**/
+VOID
+SetArrayData (
+  IN VOID                     *Array,
+  IN UINT8                    Type,
+  IN UINTN                    Index,
+  IN UINT64                   Value
+  )
+{
+
+  ASSERT (Array != NULL);
+
+  switch (Type) {
+  case EFI_IFR_TYPE_NUM_SIZE_8:
+    *(((UINT8 *) Array) + Index) = (UINT8) Value;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_16:
+    *(((UINT16 *) Array) + Index) = (UINT16) Value;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_32:
+    *(((UINT32 *) Array) + Index) = (UINT32) Value;
+    break;
+
+  case EFI_IFR_TYPE_NUM_SIZE_64:
+    *(((UINT64 *) Array) + Index) = (UINT64) Value;
+    break;
+
+  default:
+    break;
+  }
+}
+
+/**
   Add empty function for event process function.
 
   @param Event    The Event need to be process
@@ -1283,7 +1325,9 @@ DriverCallback (
   EFI_STRING                      Results;
   UINT32                          ProgressErr;
   CHAR16                          *TmpStr;
-  
+  UINTN                           Index;
+  UINT64                          BufferValue;
+
   if (((Value == NULL) && (Action != EFI_BROWSER_ACTION_FORM_OPEN) && (Action != EFI_BROWSER_ACTION_FORM_CLOSE))||
     (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1293,6 +1337,7 @@ DriverCallback (
   FormId = 0;
   ProgressErr = 0;
   Status = EFI_SUCCESS;
+  BufferValue = 3;
   PrivateData = DRIVER_SAMPLE_PRIVATE_FROM_THIS (This);
 
   switch (Action) {
@@ -1468,6 +1513,12 @@ DriverCallback (
       switch (QuestionId) {
       case 0x1240:
         Value->u8 = DEFAULT_CLASS_STANDARD_VALUE;
+      break;
+
+      case 0x1252:
+        for (Index = 0; Index < 3; Index ++) {
+          SetArrayData (Value, EFI_IFR_TYPE_NUM_SIZE_8, Index, BufferValue--);
+        }
       break;
 
       default:

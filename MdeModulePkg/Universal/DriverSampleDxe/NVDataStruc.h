@@ -69,6 +69,7 @@ typedef struct {
   EFI_HII_TIME  Time;
   UINT8   RefreshGuidCount;
   UINT8   Match2;
+  UINT8   GetDefaultValueFromCallBackForOrderedList[3];
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //
