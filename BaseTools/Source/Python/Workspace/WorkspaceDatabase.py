@@ -3012,10 +3012,9 @@ determine whether database file is out of date!\n")
         return PlatformList
 
     def _MapPlatform(self, Dscfile):
-        try:
-            Platform = self.BuildObject[PathClass(Dscfile), 'COMMON']
-        except:
-            Platform = None
+        Platform = self.BuildObject[PathClass(Dscfile), 'COMMON']
+        if Platform == None:
+            EdkLogger.error('build', PARSER_ERROR, "Failed to parser DSC file: %s" % Dscfile)
         return Platform
 
     PlatformList = property(_GetPlatformList)
