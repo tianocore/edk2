@@ -162,7 +162,7 @@ ProcessAsyncTaskList (
   Link   = GetFirstNode (&Private->Queue);
   if (!IsNull (&Private->Queue, Link)) {
     Trb = SD_MMC_HC_TRB_FROM_THIS (Link);
-    if (Private->Slot[Trb->Slot].MediaPresent == FALSE) {
+    if (!Private->Slot[Trb->Slot].MediaPresent) {
       Status = EFI_NO_MEDIA;
       goto Done;
     }
@@ -244,7 +244,7 @@ SdMmcPciHcEnumerateDevice (
   for (Slot = 0; Slot < SD_MMC_HC_MAX_SLOT; Slot++) {
     if ((Private->Slot[Slot].Enable) && (Private->Slot[Slot].SlotType == RemovableSlot)) {
       Status = SdMmcHcCardDetect (Private->PciIo, Slot, &MediaPresent);
-      if ((Status == EFI_MEDIA_CHANGED) && (MediaPresent == FALSE)) {
+      if ((Status == EFI_MEDIA_CHANGED) && !MediaPresent) {
         DEBUG ((EFI_D_INFO, "SdMmcPciHcEnumerateDevice: device disconnected at slot %d of pci %p\n", Slot, Private->PciIo));
         Private->Slot[Slot].MediaPresent = FALSE;
         //
@@ -272,7 +272,7 @@ SdMmcPciHcEnumerateDevice (
               &Private->PassThru
               );
       }
-      if ((Status == EFI_MEDIA_CHANGED) && (MediaPresent == TRUE)) {
+      if ((Status == EFI_MEDIA_CHANGED) && MediaPresent) {
         DEBUG ((EFI_D_INFO, "SdMmcPciHcEnumerateDevice: device connected at slot %d of pci %p\n", Slot, Private->PciIo));
         //
         // Reset the specified slot of the SD/MMC Pci Host Controller
@@ -622,7 +622,7 @@ SdMmcPciHcDriverBindingStart (
     Status = SdMmcHcCardDetect (PciIo, Slot, &MediaPresent);
     if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
       continue;
-    } else if (MediaPresent == FALSE) {
+    } else if (!MediaPresent) {
       DEBUG ((EFI_D_ERROR, "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n", Slot));
       continue;
     }
