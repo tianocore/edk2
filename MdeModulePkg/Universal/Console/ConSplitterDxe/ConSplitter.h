@@ -1,7 +1,7 @@
 /** @file
   Private data structures for the Console Splitter driver
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -88,6 +88,7 @@ typedef struct {
   UINTN   Rows;
 } TEXT_OUT_SPLITTER_QUERY_DATA;
 
+#define KEY_STATE_VALID_EXPOSED (EFI_TOGGLE_STATE_VALID | EFI_KEY_STATE_EXPOSED)
 
 #define TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE    SIGNATURE_32 ('T', 'i', 'S', 'n')
 
@@ -128,6 +129,16 @@ typedef struct {
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  **TextInExList;
   UINTN                              TextInExListCount;
   LIST_ENTRY                         NotifyList;
+  //
+  // It will be initialized and synced between console input devices
+  // for toggle state sync.
+  //
+  EFI_KEY_TOGGLE_STATE               PhysicalKeyToggleState;
+  //
+  // It will be initialized and used to record if virtual KeyState
+  // has been required to be exposed.
+  //
+  BOOLEAN                            VirtualKeyStateExported;
 
 
   EFI_SIMPLE_POINTER_PROTOCOL        SimplePointer;
