@@ -258,7 +258,7 @@ OpalBlockSid(
                   Session->Sscp,
                   Session->MediaId,
                   TCG_OPAL_SECURITY_PROTOCOL_2,
-                  Session->OpalBaseComId,
+                  TCG_BLOCKSID_COMID,   // hardcode ComID 0x0005
                   1,
                   Buffer,
                   BUFFER_SIZE
