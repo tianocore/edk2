@@ -492,6 +492,7 @@ Error:
 
   @param[in]  Private             The EMMC driver private data structure.
   @param[in]  Slot                The slot number to check device present.
+  @param[in]  RemainingDevicePath The pointer to the remaining device path.
 
   @retval EFI_SUCCESS             Successfully to discover the device and attach
                                   SdMmcIoProtocol to it.

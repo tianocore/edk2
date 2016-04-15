@@ -4,7 +4,7 @@
   This file defines common data structures, macro definitions and some module
   internal function header files.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -460,7 +460,7 @@ EmmcGetCsd (
 
   @param[in]  Device            A pointer to the EMMC_DEVICE instance.
   @param[in]  Rca               The relative device address to use.
-  @param[out] Csd               The buffer to store the EMMC_CSD register data.
+  @param[out] Cid               The buffer to store the EMMC_CID register data.
 
   @retval EFI_SUCCESS           The request is executed successfully.
   @retval EFI_OUT_OF_RESOURCES  The request could not be executed due to a lack of resources.
