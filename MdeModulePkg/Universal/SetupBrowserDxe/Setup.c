@@ -3897,6 +3897,7 @@ GetQuestionDefault (
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
   INTN                            Action;
   CHAR16                          *NewString;
+  EFI_IFR_TYPE_VALUE              *TypeValue;
 
   Status   = EFI_NOT_FOUND;
   StrValue = NULL;
@@ -3917,6 +3918,13 @@ GetQuestionDefault (
   //  5, set flags of EFI_IFR_CHECKBOX (provide Standard and Manufacturing default) (lowest priority)
   //
   HiiValue = &Question->HiiValue;
+  TypeValue = &HiiValue->Value;
+  if (HiiValue->Type == EFI_IFR_TYPE_BUFFER && Question->BufferValue != NULL) {
+    //
+    // For orderedlist, need to pass the BufferValue to Callback function.
+    //
+    TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
+  }
 
   //
   // Get Question defaut value from call back function.
@@ -3930,7 +3938,7 @@ GetQuestionDefault (
                              Action,
                              Question->QuestionId,
                              HiiValue->Type,
-                             &HiiValue->Value,
+                             TypeValue,
                              &ActionRequest
                              );
     if (!EFI_ERROR (Status)) {
