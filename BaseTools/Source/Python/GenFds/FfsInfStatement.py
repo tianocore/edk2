@@ -2,7 +2,7 @@
 # process FFS generation from INF statement
 #
 #  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
-#  Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
+#  Copyright (c) 2014-2016 Hewlett-Packard Development Company, L.P.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -555,35 +555,11 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         InfFileKey = os.path.normpath(mws.join(GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName))
         DscArchList = []
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'IA32', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
-        if  PlatformDataBase != None:
-            if InfFileKey in PlatformDataBase.Modules:
-                DscArchList.append ('IA32')
-
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'X64', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
-        if  PlatformDataBase != None:
-            if InfFileKey in PlatformDataBase.Modules:
-                DscArchList.append ('X64')
-
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'IPF', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
-        if PlatformDataBase != None:
-            if InfFileKey in (PlatformDataBase.Modules):
-                DscArchList.append ('IPF')
-
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'ARM', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
-        if PlatformDataBase != None:
-            if InfFileKey in (PlatformDataBase.Modules):
-                DscArchList.append ('ARM')
-
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'EBC', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
-        if PlatformDataBase != None:
-            if InfFileKey in (PlatformDataBase.Modules):
-                DscArchList.append ('EBC')
-
-        PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'AARCH64', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
-        if PlatformDataBase != None:
-            if InfFileKey in (PlatformDataBase.Modules):
-                DscArchList.append ('AARCH64')
+        for Arch in GenFdsGlobalVariable.ArchList :
+            PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+            if  PlatformDataBase != None:
+                if InfFileKey in PlatformDataBase.Modules:
+                    DscArchList.append (Arch)
 
         return DscArchList
 

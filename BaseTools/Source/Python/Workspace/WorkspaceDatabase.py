@@ -2,6 +2,7 @@
 # This file is used to create a database used by build tool
 #
 # Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -543,6 +544,13 @@ class DscBuildData(PlatformBuildClassObject):
         Macros["EDK_SOURCE"] = GlobalData.gEcpSource
         for Record in RecordList:
             DuplicatedFile = False
+
+            # process only records COMMON and self.Arch
+            SectionArch = Record[3].upper()
+            if SectionArch != 'COMMON':
+                if SectionArch != self.Arch:
+                    continue
+
             ModuleFile = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
             ModuleId = Record[5]
             LineNo = Record[6]
