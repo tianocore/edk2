@@ -138,18 +138,10 @@ def main():
 
             if not os.path.exists(ActivePlatform)  :
                 EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist!")
-
-            if os.path.normcase (ActivePlatform).find(Workspace) == 0:
-                ActivePlatform = mws.relpath(ActivePlatform, Workspace)
-            if len(ActivePlatform) > 0 :
-                if ActivePlatform[0] == '\\' or ActivePlatform[0] == '/':
-                    ActivePlatform = ActivePlatform[1:]
-            else:
-                EdkLogger.error("GenFds", FILE_NOT_FOUND, "ActivePlatform doesn't exist!")
         else:
             EdkLogger.error("GenFds", OPTION_MISSING, "Missing active platform")
 
-        GenFdsGlobalVariable.ActivePlatform = PathClass(NormPath(ActivePlatform), Workspace)
+        GenFdsGlobalVariable.ActivePlatform = PathClass(NormPath(ActivePlatform))
 
         if (Options.ConfDirectory):
             # Get alternate Conf location, if it is absolute, then just use the absolute directory name
