@@ -1,6 +1,9 @@
 ## @file
 #  ACPI Table Protocol Driver
 #
+#  This driver initializes ACPI tables (Rsdp, Rsdt and Xsdt) and produces UEFI/PI 
+#  services to install/uninstall/manage ACPI tables.
+#
 #  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #  This program and the accompanying materials are
