@@ -89,6 +89,7 @@ EnablePciDecoding (
 
   for (Idx = 0; Idx < NoHandles; ++Idx) {
     EFI_PCI_IO_PROTOCOL *PciIo;
+    UINT64              Attributes;
 
     //
     // Look up PciIo on the handle and stash it
@@ -110,11 +111,22 @@ EnablePciDecoding (
     }
 
     //
+    // Retrieve supported attributes
+    //
+    Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationSupported, 0,
+                      &Attributes);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN, "%a: EfiPciIoAttributeOperationSupported: %r\n",
+        __FUNCTION__, Status));
+      goto RestoreAttributes;
+    }
+
+    //
     // Enable IO and MMIO decoding
     //
+    Attributes &= EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY;
     Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationEnable,
-                      EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY,
-                      NULL);
+                      Attributes, NULL);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_WARN, "%a: EfiPciIoAttributeOperationEnable: %r\n",
         __FUNCTION__, Status));
