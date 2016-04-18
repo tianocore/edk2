@@ -2,7 +2,7 @@
   Main file for connect shell Driver1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -452,9 +452,10 @@ ShellCommandRunConnect (
     //
     Count = (gInReconnect?0x4:0x3);
     if ((ShellCommandLineGetCount(Package) > Count)
-      ||((ShellCommandLineGetFlag(Package, L"-r") || ShellCommandLineGetFlag(Package, L"-c")) && ShellCommandLineGetCount(Package)>1)
+      ||(ShellCommandLineGetFlag(Package, L"-c") && ShellCommandLineGetCount(Package)>1)
+      ||(ShellCommandLineGetFlag(Package, L"-r") && ShellCommandLineGetCount(Package)>2)
       ||(ShellCommandLineGetFlag(Package, L"-r") && ShellCommandLineGetFlag(Package, L"-c") )
-     ){
+    ){
       //
       // error for too many parameters
       //
