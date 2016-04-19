@@ -138,12 +138,6 @@ DmaMap (
 
     // Flush the Data Cache (should not have any effect if the memory region is uncached)
     gCpu->FlushDataCache (gCpu, *DeviceAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
-
-    if ((Operation == MapOperationBusMasterRead) || (Operation == MapOperationBusMasterCommonBuffer)) {
-      // In case the buffer is used for instance to send command to a PCI controller, we must ensure the memory is uncached
-      Status = gDS->SetMemorySpaceAttributes (*DeviceAddress & ~(BASE_4KB - 1), ALIGN_VALUE (*NumberOfBytes, BASE_4KB), EFI_MEMORY_WC);
-      ASSERT_EFI_ERROR (Status);
-    }
   }
 
   Map->HostAddress   = (UINTN)HostAddress;
