@@ -102,9 +102,7 @@ DmaMap (
     }
 
     // If the mapped buffer is not an uncached buffer
-    if ( (GcdDescriptor.Attributes != EFI_MEMORY_WC) &&
-         (GcdDescriptor.Attributes != EFI_MEMORY_UC) )
-    {
+    if ((GcdDescriptor.Attributes & (EFI_MEMORY_WB | EFI_MEMORY_WT)) != 0) {
       //
       // If the buffer does not fill entire cache lines we must double buffer into
       // uncached memory. Device (PCI) address becomes uncached page.
