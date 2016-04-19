@@ -876,6 +876,8 @@ PingCreateIpInstance (
   UINTN                            HandleIndex;
   UINTN                            HandleNum;
   EFI_HANDLE                       *HandleBuffer;
+  BOOLEAN                          UnspecifiedSrc;
+  BOOLEAN                          MediaPresent;
   EFI_SERVICE_BINDING_PROTOCOL     *EfiSb;
   VOID                             *IpXCfg;
   EFI_IP6_CONFIG_DATA              Ip6Config;
@@ -886,6 +888,8 @@ PingCreateIpInstance (
   UINTN                            AddrIndex;
 
   HandleBuffer      = NULL;
+  UnspecifiedSrc    = FALSE;
+  MediaPresent      = TRUE;
   EfiSb             = NULL;
   IpXInterfaceInfo  = NULL;
   IfInfoSize        = 0;
@@ -903,36 +907,53 @@ PingCreateIpInstance (
   if (EFI_ERROR (Status) || (HandleNum == 0) || (HandleBuffer == NULL)) {
     return EFI_ABORTED;
   }
+
+  if (Private->IpChoice == PING_IP_CHOICE_IP6 ? NetIp6IsUnspecifiedAddr ((EFI_IPv6_ADDRESS*)&Private->SrcAddress) : \
+      PingNetIp4IsUnspecifiedAddr ((EFI_IPv4_ADDRESS*)&Private->SrcAddress)) {
+    //
+    // SrcAddress is unspecified. So, both connected and configured interface will be automatic selected. 
+    //
+    UnspecifiedSrc = TRUE;
+  }
+  
   //
-  // Source address is required when pinging a link-local address on multi-
-  // interfaces host.
+  // Source address is required when pinging a link-local address.
   //
   if (Private->IpChoice == PING_IP_CHOICE_IP6) {
-    if (NetIp6IsLinkLocalAddr ((EFI_IPv6_ADDRESS*)&Private->DstAddress) &&
-        NetIp6IsUnspecifiedAddr ((EFI_IPv6_ADDRESS*)&Private->SrcAddress) &&
-        (HandleNum > 1)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellNetwork1HiiHandle, L"ping", mSrcString);  
+    if (NetIp6IsLinkLocalAddr ((EFI_IPv6_ADDRESS*)&Private->DstAddress) && UnspecifiedSrc) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING_INVALID_SOURCE), gShellNetwork1HiiHandle);
       Status = EFI_INVALID_PARAMETER;
       goto ON_ERROR;
     }
   } else {
     ASSERT(Private->IpChoice == PING_IP_CHOICE_IP4);
-    if (PingNetIp4IsLinkLocalAddr ((EFI_IPv4_ADDRESS*)&Private->DstAddress) &&
-        PingNetIp4IsUnspecifiedAddr ((EFI_IPv4_ADDRESS*)&Private->SrcAddress) &&
-        (HandleNum > 1)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellNetwork1HiiHandle, L"ping", mSrcString);  
+    if (PingNetIp4IsLinkLocalAddr ((EFI_IPv4_ADDRESS*)&Private->DstAddress) && UnspecifiedSrc) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING_INVALID_SOURCE), gShellNetwork1HiiHandle); 
       Status = EFI_INVALID_PARAMETER;
       goto ON_ERROR;
     }
   }
+  
   //
   // For each ip6 protocol, check interface addresses list.
   //
   for (HandleIndex = 0; HandleIndex < HandleNum; HandleIndex++) {
-
     EfiSb             = NULL;
     IpXInterfaceInfo  = NULL;
     IfInfoSize        = 0;
+
+    if (UnspecifiedSrc) {
+      //
+      // Check media.
+      //
+      NetLibDetectMedia (HandleBuffer[HandleIndex], &MediaPresent);
+      if (!MediaPresent) {
+        //
+        // Skip this one.
+        //
+        continue;
+      }
+    }
 
     Status = gBS->HandleProtocol (
                     HandleBuffer[HandleIndex],
@@ -943,116 +964,122 @@ PingCreateIpInstance (
       goto ON_ERROR;
     }
 
-    if (Private->IpChoice == PING_IP_CHOICE_IP6?NetIp6IsUnspecifiedAddr ((EFI_IPv6_ADDRESS*)&Private->SrcAddress):PingNetIp4IsUnspecifiedAddr ((EFI_IPv4_ADDRESS*)&Private->SrcAddress)) {
-      //
-      // No need to match interface address.
-      //
-      break;
+    //
+    // Ip6config protocol and ip6 service binding protocol are installed
+    // on the same handle.
+    //
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[HandleIndex],
+                    Private->IpChoice == PING_IP_CHOICE_IP6?&gEfiIp6ConfigProtocolGuid:&gEfiIp4Config2ProtocolGuid,
+                    (VOID **) &IpXCfg
+                    );
+
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+    //
+    // Get the interface information size.
+    //
+    if (Private->IpChoice == PING_IP_CHOICE_IP6) {
+      Status = ((EFI_IP6_CONFIG_PROTOCOL*)IpXCfg)->GetData (
+                         IpXCfg,
+                         Ip6ConfigDataTypeInterfaceInfo,
+                         &IfInfoSize,
+                         NULL
+                         );
     } else {
-      //
-      // Ip6config protocol and ip6 service binding protocol are installed
-      // on the same handle.
-      //
-      Status = gBS->HandleProtocol (
-                      HandleBuffer[HandleIndex],
-                      Private->IpChoice == PING_IP_CHOICE_IP6?&gEfiIp6ConfigProtocolGuid:&gEfiIp4Config2ProtocolGuid,
-                      (VOID **) &IpXCfg
-                      );
+      Status = ((EFI_IP4_CONFIG2_PROTOCOL*)IpXCfg)->GetData (
+                         IpXCfg,
+                         Ip4Config2DataTypeInterfaceInfo,
+                         &IfInfoSize,
+                         NULL
+                         );
+    }
+    
+    //
+    // Skip the ones not in current use.
+    //
+    if (Status == EFI_NOT_STARTED) {
+      continue;
+    }
 
-      if (EFI_ERROR (Status)) {
-        goto ON_ERROR;
-      }
-      //
-      // Get the interface information size.
-      //
-      if (Private->IpChoice == PING_IP_CHOICE_IP6) {
-        Status = ((EFI_IP6_CONFIG_PROTOCOL*)IpXCfg)->GetData (
-                           IpXCfg,
-                           Ip6ConfigDataTypeInterfaceInfo,
-                           &IfInfoSize,
-                           NULL
-                           );
-      } else {
-        Status = ((EFI_IP4_CONFIG2_PROTOCOL*)IpXCfg)->GetData (
-                           IpXCfg,
-                           Ip4Config2DataTypeInterfaceInfo,
-                           &IfInfoSize,
-                           NULL
-                           );
-      }
-      
-      //
-      // Skip the ones not in current use.
-      //
-      if (Status == EFI_NOT_STARTED) {
-        continue;
-      }
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING_GETDATA), gShellNetwork1HiiHandle, Status);
+      goto ON_ERROR;
+    }
 
-      if (Status != EFI_BUFFER_TOO_SMALL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING_GETDATA), gShellNetwork1HiiHandle, Status);
-        goto ON_ERROR;
-      }
+    IpXInterfaceInfo = AllocateZeroPool (IfInfoSize);
 
-      IpXInterfaceInfo = AllocateZeroPool (IfInfoSize);
+    if (IpXInterfaceInfo == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_ERROR;
+    }
+    //
+    // Get the interface info.
+    //
+    if (Private->IpChoice == PING_IP_CHOICE_IP6) {
+      Status = ((EFI_IP6_CONFIG_PROTOCOL*)IpXCfg)->GetData (
+                         IpXCfg,
+                         Ip6ConfigDataTypeInterfaceInfo,
+                         &IfInfoSize,
+                         IpXInterfaceInfo
+                         );
+    } else {
+      Status = ((EFI_IP4_CONFIG2_PROTOCOL*)IpXCfg)->GetData (
+                         IpXCfg,
+                         Ip4Config2DataTypeInterfaceInfo,
+                         &IfInfoSize,
+                         IpXInterfaceInfo
+                         );
+    }
 
-      if (IpXInterfaceInfo == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto ON_ERROR;
-      }
-      //
-      // Get the interface info.
-      //
-      if (Private->IpChoice == PING_IP_CHOICE_IP6) {
-        Status = ((EFI_IP6_CONFIG_PROTOCOL*)IpXCfg)->GetData (
-                           IpXCfg,
-                           Ip6ConfigDataTypeInterfaceInfo,
-                           &IfInfoSize,
-                           IpXInterfaceInfo
-                           );
-      } else {
-        Status = ((EFI_IP4_CONFIG2_PROTOCOL*)IpXCfg)->GetData (
-                           IpXCfg,
-                           Ip4Config2DataTypeInterfaceInfo,
-                           &IfInfoSize,
-                           IpXInterfaceInfo
-                           );
-      }
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING_GETDATA), gShellNetwork1HiiHandle, Status);
+      goto ON_ERROR;
+    }
+    //
+    // Check whether the source address is one of the interface addresses.
+    //
+    if (Private->IpChoice == PING_IP_CHOICE_IP6) {
+      for (AddrIndex = 0; AddrIndex < ((EFI_IP6_CONFIG_INTERFACE_INFO*)IpXInterfaceInfo)->AddressInfoCount; AddrIndex++) {
+        Addr = &(((EFI_IP6_CONFIG_INTERFACE_INFO*)IpXInterfaceInfo)->AddressInfo[AddrIndex].Address);
 
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING_GETDATA), gShellNetwork1HiiHandle, Status);
-        goto ON_ERROR;
-      }
-      //
-      // Check whether the source address is one of the interface addresses.
-      //
-      if (Private->IpChoice == PING_IP_CHOICE_IP6) {
-        for (AddrIndex = 0; AddrIndex < ((EFI_IP6_CONFIG_INTERFACE_INFO*)IpXInterfaceInfo)->AddressInfoCount; AddrIndex++) {
-
-          Addr = &(((EFI_IP6_CONFIG_INTERFACE_INFO*)IpXInterfaceInfo)->AddressInfo[AddrIndex].Address);
-          if (EFI_IP6_EQUAL (&Private->SrcAddress, Addr)) {
+        if (UnspecifiedSrc) {
+          if (!NetIp6IsUnspecifiedAddr (Addr) && !NetIp6IsLinkLocalAddr (Addr)) {
             //
-            // Match a certain interface address.
+            // Select the interface automatically.
             //
+            CopyMem(&Private->SrcAddress, Addr, sizeof(Private->SrcAddress));
             break;
           }
-        }
-
-        if (AddrIndex < ((EFI_IP6_CONFIG_INTERFACE_INFO*)IpXInterfaceInfo)->AddressInfoCount) {
-          //
-          // Found a nic handle with right interface address.
-          //
-          break;
-        }
-      } else {
-        //
-        // IP4 address check
-        //
-        if (EFI_IP4_EQUAL (&Private->SrcAddress, &((EFI_IP4_CONFIG2_INTERFACE_INFO*)IpXInterfaceInfo)->StationAddress)) {
+        } else if (EFI_IP6_EQUAL (&Private->SrcAddress, Addr)) {
           //
           // Match a certain interface address.
           //
           break;
         }
+      }
+
+      if (AddrIndex < ((EFI_IP6_CONFIG_INTERFACE_INFO*)IpXInterfaceInfo)->AddressInfoCount) {
+        //
+        // Found a nic handle with right interface address.
+        //
+        break;
+      }
+    } else {
+      if (UnspecifiedSrc) {
+        if (!PingNetIp4IsUnspecifiedAddr (&((EFI_IP4_CONFIG2_INTERFACE_INFO*)IpXInterfaceInfo)->StationAddress) && 
+            !PingNetIp4IsLinkLocalAddr (&((EFI_IP4_CONFIG2_INTERFACE_INFO*)IpXInterfaceInfo)->StationAddress)) {
+          //
+          // Select the interface automatically.
+          //
+          break;
+        }
+      } else if (EFI_IP4_EQUAL (&Private->SrcAddress, &((EFI_IP4_CONFIG2_INTERFACE_INFO*)IpXInterfaceInfo)->StationAddress)) {
+        //
+        // Match a certain interface address.
+        //
+        break;
       }
     }
 

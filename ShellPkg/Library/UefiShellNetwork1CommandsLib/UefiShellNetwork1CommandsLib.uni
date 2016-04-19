@@ -44,6 +44,7 @@
 #string STR_GEN_IS_DIR            #language en-US "%H%s%N: '%H%s%N' is a directory\r\n"
 #string STR_GEN_PROTOCOL_NF       #language en-US "%H%s%N: The protocol '%H%s%N' is required and not found (%g).\r\n"
 
+#string STR_PING_INVALID_SOURCE      #language en-US "%Ping: Require source interface option\r\n"
 #string STR_PING_CONFIG              #language en-US "Config %r\r\n"
 #string STR_PING_GETMODE             #language en-US "GetModeData %r\r\n"
 #string STR_PING_GETDATA             #language en-US "GetData %r\r\n"
