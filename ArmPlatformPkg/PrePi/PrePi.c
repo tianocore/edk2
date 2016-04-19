@@ -183,8 +183,6 @@ CEntryPoint (
 {
   UINT64   StartTimeStamp;
 
-  ASSERT(!ArmIsMpCore() || (PcdGet32 (PcdCoreCount) > 1));
-
   // Initialize the platform specific controllers
   ArmPlatformInitialize (MpId);
 
