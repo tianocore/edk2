@@ -216,6 +216,8 @@ DmaAllocateBuffer (
   OUT VOID                         **HostAddress
   )
 {
+  VOID    *Allocation;
+
   if (HostAddress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -226,12 +228,18 @@ DmaAllocateBuffer (
   // We used uncached memory to keep coherency
   //
   if (MemoryType == EfiBootServicesData) {
-    *HostAddress = UncachedAllocatePages (Pages);
+    Allocation = UncachedAllocatePages (Pages);
   } else if (MemoryType == EfiRuntimeServicesData) {
-    *HostAddress = UncachedAllocateRuntimePages (Pages);
+    Allocation = UncachedAllocateRuntimePages (Pages);
   } else {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (Allocation == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  *HostAddress = Allocation;
 
   return EFI_SUCCESS;
 }
