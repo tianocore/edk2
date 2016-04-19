@@ -93,7 +93,7 @@ DmaMap (
   *Mapping = Map;
 
   if ((((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) ||
-      ((*NumberOfBytes % gCacheAlignment) != 0)) {
+      ((*NumberOfBytes & (gCacheAlignment - 1)) != 0)) {
 
     // Get the cacheability of the region
     Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
