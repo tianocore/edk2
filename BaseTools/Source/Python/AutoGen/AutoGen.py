@@ -861,6 +861,7 @@ class PlatformAutoGen(AutoGen):
     # 
     _DynaPcdList_ = []
     _NonDynaPcdList_ = []
+    _PlatformPcds = {}
     
     #
     # The priority list while override build option 
@@ -1213,8 +1214,12 @@ class PlatformAutoGen(AutoGen):
         OtherPcdArray   = []
         VpdPcdDict      = {}
         VpdFile               = VpdInfoFile.VpdInfoFile()
-        NeedProcessVpdMapFile = False                    
-        
+        NeedProcessVpdMapFile = False
+
+        for pcd in self.Platform.Pcds.keys():
+            if pcd not in self._PlatformPcds.keys():
+                self._PlatformPcds[pcd] = self.Platform.Pcds[pcd]
+
         if (self.Workspace.ArchList[-1] == self.Arch): 
             for Pcd in self._DynamicPcdList:
                 # just pick the a value to determine whether is unicode string type
@@ -1233,13 +1238,13 @@ class PlatformAutoGen(AutoGen):
                 if Pcd.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
                     VpdPcdDict[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)] = Pcd
 
-            PlatformPcds = self.Platform.Pcds.keys()
+            PlatformPcds = self._PlatformPcds.keys()
             PlatformPcds.sort()
             #
             # Add VPD type PCD into VpdFile and determine whether the VPD PCD need to be fixed up.
             #
             for PcdKey in PlatformPcds:
-                Pcd = self.Platform.Pcds[PcdKey]
+                Pcd = self._PlatformPcds[PcdKey]
                 if Pcd.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD] and \
                    PcdKey in VpdPcdDict:
                     Pcd = VpdPcdDict[PcdKey]
@@ -1281,7 +1286,7 @@ class PlatformAutoGen(AutoGen):
             # An example is PCD for signature usage.
             #            
             for DscPcd in PlatformPcds:
-                DscPcdEntry = self.Platform.Pcds[DscPcd]
+                DscPcdEntry = self._PlatformPcds[DscPcd]
                 if DscPcdEntry.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
                     if not (self.Platform.VpdToolGuid == None or self.Platform.VpdToolGuid == ''):
                         FoundFlag = False
