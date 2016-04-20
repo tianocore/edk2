@@ -251,7 +251,7 @@ Returns:
   //
   // Print Device Path
   //
-  DevPathStr = DevicePathToStr(DevicePath);
+  DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
   if (DevPathStr != NULL) {
     DEBUG((
       EFI_D_INFO,
@@ -280,7 +280,7 @@ Returns:
   //
   // Print Device Path
   //
-  DevPathStr = DevicePathToStr(DevicePath);
+  DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
   if (DevPathStr != NULL) {
     DEBUG((
       EFI_D_INFO,
@@ -991,7 +991,7 @@ ConnectRecursivelyIfPciMassStorage (
     //
     // Print Device Path
     //
-    DevPathStr = DevicePathToStr (DevicePath);
+    DevPathStr = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
     if (DevPathStr != NULL) {
       DEBUG((
         EFI_D_INFO,

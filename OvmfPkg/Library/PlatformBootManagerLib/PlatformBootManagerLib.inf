@@ -46,6 +46,7 @@
   DebugLib
   PcdLib
   UefiBootManagerLib
+  DevicePathLib
   PciLib
   NvVarsFileLib
   QemuFwCfgLib
