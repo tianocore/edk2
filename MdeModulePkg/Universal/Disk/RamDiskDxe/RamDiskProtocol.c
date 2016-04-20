@@ -694,7 +694,6 @@ RamDiskRegister (
   // Insert the newly created one to the registered RAM disk list
   //
   InsertTailList (&RegisteredRamDisks, &PrivateData->ThisInstance);
-  ListEntryNum++;
 
   gBS->ConnectController (PrivateData->Handle, NULL, NULL, TRUE);
 
@@ -829,7 +828,6 @@ RamDiskUnregister (
 
         FreePool (PrivateData->DevicePath);
         FreePool (PrivateData);
-        ListEntryNum--;
         Found = TRUE;
 
         break;

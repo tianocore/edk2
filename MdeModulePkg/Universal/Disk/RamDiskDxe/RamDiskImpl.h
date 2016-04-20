@@ -71,7 +71,6 @@
 // RamDiskDxe driver maintains a list of registered RAM disks.
 //
 extern  LIST_ENTRY                RegisteredRamDisks;
-extern  UINTN                     ListEntryNum;
 
 //
 // Pointers to the EFI_ACPI_TABLE_PROTOCOL and EFI_ACPI_SDT_PROTOCOL.
@@ -108,6 +107,8 @@ typedef struct {
   UINT16                          InstanceNumber;
   RAM_DISK_CREATE_METHOD          CreateMethod;
   BOOLEAN                         InNfit;
+  EFI_QUESTION_ID                 CheckBoxId;
+  BOOLEAN                         CheckBoxChecked;
 
   LIST_ENTRY                      ThisInstance;
 } RAM_DISK_PRIVATE_DATA;
@@ -144,8 +145,6 @@ extern RAM_DISK_CONFIG_PRIVATE_DATA    mRamDiskConfigPrivateDataTemplate;
 
 #define RAM_DISK_CONFIG_PRIVATE_DATA_SIGNATURE   SIGNATURE_32 ('R', 'C', 'F', 'G')
 #define RAM_DISK_CONFIG_PRIVATE_FROM_THIS(a)     CR (a, RAM_DISK_CONFIG_PRIVATE_DATA, ConfigAccess, RAM_DISK_CONFIG_PRIVATE_DATA_SIGNATURE)
-
-#define RAM_DISK_LIST_VAR_OFFSET                 ((UINT16) OFFSET_OF (RAM_DISK_CONFIGURATION, RamDiskList))
 
 /**
   Register a RAM disk with specified address, size and type.

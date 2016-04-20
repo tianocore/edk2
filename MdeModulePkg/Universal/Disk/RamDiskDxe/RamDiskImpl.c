@@ -193,7 +193,6 @@ UnregisterAllRamDisks (
 
       FreePool (PrivateData->DevicePath);
       FreePool (PrivateData);
-      ListEntryNum--;
     }
   }
 }
@@ -263,7 +262,7 @@ RamDiskExtractConfig (
   // Convert buffer data to <ConfigResp> by helper function BlockToConfig()
   //
   ConfigPrivate = RAM_DISK_CONFIG_PRIVATE_FROM_THIS (This);
-  BufferSize = sizeof (RAM_DISK_CONFIGURATION) + ListEntryNum;
+  BufferSize = sizeof (RAM_DISK_CONFIGURATION);
   Configuration = AllocateZeroPool (BufferSize);
   if (Configuration == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -557,8 +556,14 @@ UpdateMainForm (
 
   Index = 0;
   EFI_LIST_FOR_EACH (Entry, &RegisteredRamDisks) {
-    PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
-    String      = RamDiskStr;
+    PrivateData                  = RAM_DISK_PRIVATE_FROM_THIS (Entry);
+    PrivateData->CheckBoxId      = (EFI_QUESTION_ID)
+                                   (MAIN_CHECKBOX_QUESTION_ID_START + Index);
+    //
+    // CheckBox is unchecked by default.
+    //
+    PrivateData->CheckBoxChecked = FALSE;
+    String                       = RamDiskStr;
 
     UnicodeSPrint (
       String,
@@ -574,12 +579,12 @@ UpdateMainForm (
 
     HiiCreateCheckBoxOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (MAIN_CHECKBOX_QUESTION_ID_START + Index),
-      RAM_DISK_CONFIGURATION_VARSTORE_ID,
-      (UINT16) (RAM_DISK_LIST_VAR_OFFSET + Index),
+      PrivateData->CheckBoxId,
+      0,
+      0,
       StringId,
       STRING_TOKEN (STR_RAM_DISK_LIST_HELP),
-      0,
+      EFI_IFR_FLAG_CALLBACK,
       0,
       NULL
       );
@@ -634,7 +639,6 @@ RamDiskCallback (
   )
 {
   EFI_STATUS                      Status;
-  UINTN                           Index;
   RAM_DISK_PRIVATE_DATA           *PrivateData;
   RAM_DISK_CONFIG_PRIVATE_DATA    *ConfigPrivate;
   RAM_DISK_CONFIGURATION          *Configuration;
@@ -679,7 +683,7 @@ RamDiskCallback (
   //
   // Get Browser data
   //
-  Configuration = AllocateZeroPool (sizeof (RAM_DISK_CONFIGURATION) + ListEntryNum);
+  Configuration = AllocateZeroPool (sizeof (RAM_DISK_CONFIGURATION));
   if (Configuration == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -689,7 +693,7 @@ RamDiskCallback (
   HiiGetBrowserData (
     &gRamDiskFormSetGuid,
     mRamDiskStorageName,
-    sizeof (RAM_DISK_CONFIGURATION) + ListEntryNum,
+    sizeof (RAM_DISK_CONFIGURATION),
     (UINT8 *) Configuration
     );
 
@@ -742,11 +746,9 @@ RamDiskCallback (
       //
       // Remove the selected RAM disks
       //
-      Index = 0;
       EFI_LIST_FOR_EACH_SAFE (Entry, NextEntry, &RegisteredRamDisks) {
-        if (Configuration->RamDiskList[Index++] != 0) {
-          PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
-
+        PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
+        if (PrivateData->CheckBoxChecked) {
           RamDiskUnregister (
             (EFI_DEVICE_PATH_PROTOCOL *) PrivateData->DevicePath
             );
@@ -756,7 +758,6 @@ RamDiskCallback (
       UpdateMainForm (ConfigPrivate);
 
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-      ZeroMem (Configuration->RamDiskList, ListEntryNum);
       break;
 
     case CREATE_RAW_SUBMIT_QUESTION_ID:
@@ -781,6 +782,18 @@ RamDiskCallback (
       break;
 
     default:
+      //
+      // QuestionIds for checkboxes
+      //
+      if ((QuestionId >= MAIN_CHECKBOX_QUESTION_ID_START) &&
+          (QuestionId < CREATE_RAW_RAM_DISK_FORM_ID)) {
+        EFI_LIST_FOR_EACH (Entry, &RegisteredRamDisks) {
+          PrivateData = RAM_DISK_PRIVATE_FROM_THIS (Entry);
+          if (PrivateData->CheckBoxId == QuestionId) {
+            PrivateData->CheckBoxChecked = (BOOLEAN) (Value->u8 != 0);
+          }
+        }
+      }
       break;
     }
   }
@@ -789,7 +802,7 @@ RamDiskCallback (
     HiiSetBrowserData (
       &gRamDiskFormSetGuid,
       mRamDiskStorageName,
-      sizeof (RAM_DISK_CONFIGURATION) + ListEntryNum,
+      sizeof (RAM_DISK_CONFIGURATION),
       (UINT8 *) Configuration,
       NULL
       );

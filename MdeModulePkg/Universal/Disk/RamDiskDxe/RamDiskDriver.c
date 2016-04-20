@@ -32,7 +32,6 @@ EFI_RAM_DISK_PROTOCOL  mRamDiskProtocol = {
 // RamDiskDxe driver maintains a list of registered RAM disks.
 //
 LIST_ENTRY  RegisteredRamDisks;
-UINTN       ListEntryNum;
 
 //
 // Pointers to the EFI_ACPI_TABLE_PROTOCOL and EFI_ACPI_SDT_PROTOCOL.
