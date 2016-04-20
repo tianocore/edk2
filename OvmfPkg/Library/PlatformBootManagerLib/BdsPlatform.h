@@ -26,6 +26,7 @@ Abstract:
 
 #include <PiDxe.h>
 
+#include <IndustryStandard/Bmp.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/SmBios.h>
@@ -48,7 +49,11 @@ Abstract:
 #include <Library/NvVarsFileLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuBootOrderLib.h>
+#include <Library/DxeServicesLib.h>
 
+#include <Protocol/OEMBadging.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/BootLogo.h>
 #include <Protocol/Decompress.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/FirmwareVolume2.h>
@@ -223,6 +228,33 @@ PlatformInitializeConsole (
 **/
 EFI_STATUS
 TryRunningQemuKernel (
+  VOID
+  );
+
+/**
+  Use SystemTable Conout to stop video based Simple Text Out consoles from going
+  to the video device. Put up LogoFile on every video device that is a console.
+
+  @param[in]  LogoFile   File name of logo to display on the center of the screen.
+
+  @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo displayed.
+  @retval EFI_UNSUPPORTED Logo not found
+
+**/
+EFI_STATUS
+EnableQuietBoot (
+  IN  EFI_GUID  *LogoFile
+  );
+
+/**
+  Use SystemTable Conout to turn on video based Simple Text Out consoles. The
+  Simple Text Out screens will now be synced up with all non video output devices
+
+  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
+
+**/
+EFI_STATUS
+DisableQuietBoot (
   VOID
   );
 
