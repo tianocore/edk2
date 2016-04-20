@@ -39,7 +39,7 @@ Abstract:
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
-#include <Library/GenericBdsLib.h>
+#include <Library/UefiBootManagerLib.h>
 #include <Library/HobLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DxeServicesTableLib.h>

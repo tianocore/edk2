@@ -45,7 +45,7 @@
   BaseMemoryLib
   DebugLib
   PcdLib
-  GenericBdsLib
+  UefiBootManagerLib
   PciLib
   NvVarsFileLib
   QemuFwCfgLib
