@@ -14,7 +14,6 @@
 
 #include "BdsPlatform.h"
 #include <Guid/RootBridgesConnectedEventGroup.h>
-#include <Library/QemuBootOrderLib.h>
 
 
 //
@@ -1389,14 +1388,10 @@ Routine Description:
   // Process QEMU's -kernel command line option
   //
   TryRunningQemuKernel ();
-  BdsLibEnumerateAllBootOption (BootOptionList);
 
-  SetBootOrderFromQemu (BootOptionList);
-  //
-  // The BootOrder variable may have changed, reload the in-memory list with
-  // it.
-  //
-  BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
+  EfiBootManagerRefreshAllBootOption ();
+
+  SetBootOrderFromQemu (NULL);
 }
 
 /**
