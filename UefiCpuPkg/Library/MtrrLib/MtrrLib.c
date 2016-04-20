@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -438,7 +438,8 @@ MtrrGetVariableMtrr (
   @param[in]      MemoryCacheType  The memory type to set.
   @param[in, out] Base             The base address of memory range.
   @param[in, out] Length           The length of memory range.
-  @param[out]     ReturnMsrNum     The index of the fixed MTRR MSR to program.
+  @param[in, out] LastMsrNum       On input, the last index of the fixed MTRR MSR to program.
+                                   On return, the current index of the fixed MTRR MSR to program.
   @param[out]     ReturnClearMask  The bits to clear in the fixed MTRR MSR.
   @param[out]     ReturnOrMask     The bits to set in the fixed MTRR MSR.
 
@@ -452,7 +453,7 @@ ProgramFixedMtrr (
   IN     UINT64               MemoryCacheType,
   IN OUT UINT64               *Base,
   IN OUT UINT64               *Length,
-  OUT    UINT32               *ReturnMsrNum,
+  IN OUT UINT32               *LastMsrNum,
   OUT    UINT64               *ReturnClearMask,
   OUT    UINT64               *ReturnOrMask
   )
@@ -465,7 +466,7 @@ ProgramFixedMtrr (
   OrMask    = 0;
   ClearMask = 0;
 
-  for (MsrNum = 0; MsrNum < MTRR_NUMBER_OF_FIXED_MTRR; MsrNum++) {
+  for (MsrNum = *LastMsrNum + 1; MsrNum < MTRR_NUMBER_OF_FIXED_MTRR; MsrNum++) {
     if ((*Base >= mMtrrLibFixedMtrrTable[MsrNum].BaseAddress) &&
         (*Base <
             (
@@ -478,7 +479,7 @@ ProgramFixedMtrr (
     }
   }
 
-  if (MsrNum == MTRR_NUMBER_OF_FIXED_MTRR) {
+  if (MsrNum >= MTRR_NUMBER_OF_FIXED_MTRR) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -515,7 +516,7 @@ ProgramFixedMtrr (
     return RETURN_UNSUPPORTED;
   }
 
-  *ReturnMsrNum    = MsrNum;
+  *LastMsrNum      = MsrNum;
   *ReturnClearMask = ClearMask;
   *ReturnOrMask    = OrMask;
 
@@ -1528,6 +1529,7 @@ MtrrSetMemoryAttributeWorker (
   //
   Status = RETURN_SUCCESS;
   if (BaseAddress < BASE_1MB) {
+    MsrNum = (UINT32)-1;
     while ((BaseAddress < BASE_1MB) && (Length > 0) && Status == RETURN_SUCCESS) {
       Status = ProgramFixedMtrr (MemoryType, &BaseAddress, &Length, &MsrNum, &ClearMask, &OrMask);
       if (RETURN_ERROR (Status)) {
