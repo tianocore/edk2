@@ -1214,31 +1214,6 @@ Returns:
 }
 
 VOID
-PlatformBdsGetDriverOption (
-  IN OUT LIST_ENTRY              *BdsDriverLists
-  )
-/*++
-
-Routine Description:
-
-  Load the predefined driver option, OEM/IBV can customize this
-  to load their own drivers
-
-Arguments:
-
-  BdsDriverLists  - The header of the driver option link list.
-
-Returns:
-
-  None.
-
---*/
-{
-  DEBUG ((EFI_D_INFO, "PlatformBdsGetDriverOption\n"));
-  return;
-}
-
-VOID
 PlatformBdsDiagnostics (
   IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
   IN BOOLEAN                     QuietBoot,
@@ -1356,11 +1331,6 @@ Routine Description:
     //
     PlatformBdsRestoreNvVarsFromHardDisk ();
   }
-
-  //
-  // Load the driver option as the driver option list
-  //
-  PlatformBdsGetDriverOption (DriverOptionList);
 
   //
   // Get current Boot Mode

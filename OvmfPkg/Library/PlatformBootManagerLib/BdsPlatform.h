@@ -210,12 +210,6 @@ extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 //
 // Platform BDS Functions
 //
-
-VOID
-PlatformBdsGetDriverOption (
-  IN LIST_ENTRY               *BdsDriverLists
-  );
-
 EFI_STATUS
 BdsMemoryTest (
   EXTENDMEM_COVERAGE_LEVEL Level
