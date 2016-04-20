@@ -19,6 +19,7 @@ EFI_HII_PACKAGE_LIST_HEADER    *gRTDatabaseInfoBuffer = NULL;
 EFI_STRING                     gRTConfigRespBuffer    = NULL;
 UINTN                          gDatabaseInfoSize = 0;
 UINTN                          gConfigRespSize = 0;
+BOOLEAN                        gExportConfigResp = TRUE;
 
 /**
   This function generates a HII_DATABASE_RECORD node and adds into hii database.
@@ -739,7 +740,16 @@ RemoveFormPackages (
     PackageList->PackageListHdr.PackageLength -= Package->FormPkgHdr.Length;
     FreePool (Package->IfrData);
     FreePool (Package);
-
+    //
+    // If Hii runtime support feature is enabled,
+    // will export Hii info for runtime use after ReadyToBoot event triggered.
+    // If some driver add/update/remove packages from HiiDatabase after ReadyToBoot,
+    // will need to export the content of HiiDatabase.
+    // But if form packages removed, also need to export the ConfigResp string
+    //
+    if (gExportAfterReadyToBoot) {
+      gExportConfigResp = TRUE;
+    }
   }
 
   return EFI_SUCCESS;
@@ -2486,6 +2496,16 @@ AddPackages (
                  (UINT8) (PackageHeader.Type),
                  DatabaseRecord->Handle
                  );
+      //
+      // If Hii runtime support feature is enabled,
+      // will export Hii info for runtime use after ReadyToBoot event triggered.
+      // If some driver add/update/remove packages from HiiDatabase after ReadyToBoot,
+      // will need to export the content of HiiDatabase.
+      // But if form packages added/updated, also need to export the ConfigResp string.
+      //
+      if (gExportAfterReadyToBoot) {
+        gExportConfigResp = TRUE;
+      }
       break;
     case EFI_HII_PACKAGE_KEYBOARD_LAYOUT:
       Status = InsertKeyboardLayoutPackage (
@@ -2781,7 +2801,7 @@ ExportPackageList (
 }
 
 /**
-This is an internal function,mainly use to get and update configuration settings information.
+This function mainly use to get and update ConfigResp string.
 
 @param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
 
@@ -2790,7 +2810,7 @@ This is an internal function,mainly use to get and update configuration settings
 
 **/
 EFI_STATUS
-HiiGetConfigurationSetting(
+HiiGetConfigRespInfo(
   IN CONST EFI_HII_DATABASE_PROTOCOL        *This
   )
 {
@@ -2803,11 +2823,6 @@ HiiGetConfigurationSetting(
   ConfigSize           = 0;
 
   Private = HII_DATABASE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // Get the HiiDatabase info.
-  //
-  HiiGetDatabaseInfo(This);
 
   //
   // Get ConfigResp string
@@ -2887,6 +2902,39 @@ HiiGetDatabaseInfo(
   return EFI_SUCCESS;
 
 }
+
+/**
+This  function mainly use to get and update configuration settings information.
+
+@param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
+
+@retval EFI_SUCCESS            Get the information successfully.
+@retval EFI_OUT_OF_RESOURCES   Not enough memory to store the Configuration Setting data.
+
+**/
+EFI_STATUS
+HiiGetConfigurationSetting(
+  IN CONST EFI_HII_DATABASE_PROTOCOL        *This
+  )
+{
+  EFI_STATUS                          Status;
+
+  //
+  // Get the HiiDatabase info.
+  //
+  Status = HiiGetDatabaseInfo(This);
+
+  //
+  // Get ConfigResp string
+  //
+  if (gExportConfigResp) {
+    Status = HiiGetConfigRespInfo (This);
+    gExportConfigResp = FALSE;
+  }
+  return Status;
+
+}
+
 
 /**
   This function adds the packages in the package list to the database and returns a handle. If there is a

@@ -146,6 +146,8 @@ OnReadyToBoot (
   //
   HiiGetConfigurationSetting(&mPrivate.HiiDatabase);
   gExportAfterReadyToBoot = TRUE;
+
+  gBS->CloseEvent (Event);
 }
 
 /**
