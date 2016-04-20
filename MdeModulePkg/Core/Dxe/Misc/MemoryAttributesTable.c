@@ -174,6 +174,8 @@ InstallMemoryAttributesTable (
     }
     MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
   }
+  MemoryMap = MemoryMapStart;
+  FreePool (MemoryMap);
 
   Status = gBS->InstallConfigurationTable (&gEfiMemoryAttributesTableGuid, MemoryAttributesTable);
   ASSERT_EFI_ERROR (Status);
