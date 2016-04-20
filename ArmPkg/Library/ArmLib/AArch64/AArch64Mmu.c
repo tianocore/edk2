@@ -306,13 +306,6 @@ GetBlockEntryListFromAddress (
 
         // Convert the block entry attributes into Table descriptor attributes
         TableAttributes = TT_TABLE_AP_NO_PERMISSION;
-        if (Attributes & TT_PXN_MASK) {
-          TableAttributes = TT_TABLE_PXN;
-        }
-        // XN maps to UXN in the EL1&0 translation regime
-        if (Attributes & TT_XN_MASK) {
-          TableAttributes = TT_TABLE_XN;
-        }
         if (Attributes & TT_NS) {
           TableAttributes = TT_TABLE_NS;
         }
