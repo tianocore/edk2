@@ -236,7 +236,7 @@ Returns:
   //
   DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gPnpPs2KeyboardDeviceNode);
 
-  BdsLibUpdateConsoleVariable (VarConsoleInp, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
 
   //
   // Register COM1
@@ -263,9 +263,9 @@ Returns:
     FreePool(DevPathStr);
   }
 
-  BdsLibUpdateConsoleVariable (VarConsoleOut, DevicePath, NULL);
-  BdsLibUpdateConsoleVariable (VarConsoleInp, DevicePath, NULL);
-  BdsLibUpdateConsoleVariable (VarErrorOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 
   //
   // Register COM2
@@ -292,9 +292,9 @@ Returns:
     FreePool(DevPathStr);
   }
 
-  BdsLibUpdateConsoleVariable (VarConsoleOut, DevicePath, NULL);
-  BdsLibUpdateConsoleVariable (VarConsoleInp, DevicePath, NULL);
-  BdsLibUpdateConsoleVariable (VarErrorOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
 }
@@ -374,8 +374,8 @@ GetGopDevicePath (
         // Delete the PCI device's path that added by GetPlugInPciVgaDevicePath()
         // Add the integrity GOP device path.
         //
-        BdsLibUpdateConsoleVariable (VarConsoleOutDev, NULL, PciDevicePath);
-        BdsLibUpdateConsoleVariable (VarConsoleOutDev, TempDevicePath, NULL);
+        EfiBootManagerUpdateConsoleVariable (ConOutDev, NULL, PciDevicePath);
+        EfiBootManagerUpdateConsoleVariable (ConOutDev, TempDevicePath, NULL);
       }
     }
     gBS->FreePool (GopHandleBuffer);
@@ -424,7 +424,7 @@ Returns:
   GetGopDevicePath (DevicePath, &GopDevicePath);
   DevicePath = GopDevicePath;
 
-  BdsLibUpdateConsoleVariable (VarConsoleOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
 }
@@ -467,9 +467,9 @@ Returns:
   DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
   DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
 
-  BdsLibUpdateConsoleVariable (VarConsoleOut, DevicePath, NULL);
-  BdsLibUpdateConsoleVariable (VarConsoleInp, DevicePath, NULL);
-  BdsLibUpdateConsoleVariable (VarErrorOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
 }
@@ -731,13 +731,13 @@ Returns:
       // Update the console variable with the connect type
       //
       if ((PlatformConsole[Index].ConnectType & CONSOLE_IN) == CONSOLE_IN) {
-        BdsLibUpdateConsoleVariable (VarConsoleInp, PlatformConsole[Index].DevicePath, NULL);
+        EfiBootManagerUpdateConsoleVariable (ConIn, PlatformConsole[Index].DevicePath, NULL);
       }
       if ((PlatformConsole[Index].ConnectType & CONSOLE_OUT) == CONSOLE_OUT) {
-        BdsLibUpdateConsoleVariable (VarConsoleOut, PlatformConsole[Index].DevicePath, NULL);
+        EfiBootManagerUpdateConsoleVariable (ConOut, PlatformConsole[Index].DevicePath, NULL);
       }
       if ((PlatformConsole[Index].ConnectType & STD_ERROR) == STD_ERROR) {
-        BdsLibUpdateConsoleVariable (VarErrorOut, PlatformConsole[Index].DevicePath, NULL);
+        EfiBootManagerUpdateConsoleVariable (ErrOut, PlatformConsole[Index].DevicePath, NULL);
       }
     }
   } else {
