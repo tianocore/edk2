@@ -59,6 +59,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock

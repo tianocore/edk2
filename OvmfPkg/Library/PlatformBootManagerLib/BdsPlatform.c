@@ -166,6 +166,7 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   PlatformInitializeConsole (gPlatformConsole);
+  PcdSet16 (PcdPlatformBootTimeOut, GetFrontPageTimeoutFromQemu ());
 }
 
 
@@ -1292,8 +1293,6 @@ Routine Description:
   // it.
   //
   BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
-
-  PlatformBdsEnterFrontPage (GetFrontPageTimeoutFromQemu(), TRUE);
 }
 
 VOID

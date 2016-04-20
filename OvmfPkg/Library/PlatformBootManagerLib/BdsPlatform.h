@@ -266,12 +266,6 @@ ConvertSystemTable (
  IN OUT VOID       **Table
   );
 
-VOID
-PlatformBdsEnterFrontPage (
-  IN UINT16                 TimeoutDefault,
-  IN BOOLEAN                ConnectAllHappened
-  );
-
 /**
   Loads and boots UEFI Linux via the FwCfg interface.
 
