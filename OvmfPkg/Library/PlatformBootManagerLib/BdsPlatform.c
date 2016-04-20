@@ -1160,7 +1160,6 @@ PlatformBdsRestoreNvVarsFromHardDisk (
 
 }
 
-
 VOID
 PlatformBdsConnectSequence (
   VOID
@@ -1197,14 +1196,15 @@ Returns:
     //
     // Build the platform boot option
     //
-    BdsLibConnectDevicePath (gPlatformConnectSequence[Index]);
+    EfiBootManagerConnectDevicePath (gPlatformConnectSequence[Index], NULL);
     Index++;
   }
 
   //
   // Just use the simple policy to connect all devices
   //
-  BdsLibConnectAll ();
+  DEBUG ((EFI_D_INFO, "EfiBootManagerConnectAll\n"));
+  EfiBootManagerConnectAll ();
 
   PciAcpiInitialization ();
 
@@ -1389,9 +1389,6 @@ Routine Description:
   // Process QEMU's -kernel command line option
   //
   TryRunningQemuKernel ();
-
-  DEBUG ((EFI_D_INFO, "BdsLibConnectAll\n"));
-  BdsLibConnectAll ();
   BdsLibEnumerateAllBootOption (BootOptionList);
 
   SetBootOrderFromQemu (BootOptionList);
