@@ -32,7 +32,7 @@ VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode    = gPcAnsiTerminal;
 //
 // Predefined platform default console device path
 //
-BDS_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
+PLATFORM_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     NULL,
     0

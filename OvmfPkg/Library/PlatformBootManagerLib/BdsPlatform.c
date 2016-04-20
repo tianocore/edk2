@@ -164,6 +164,8 @@ Returns:
                   &gEfiDxeSmmReadyToLockProtocolGuid, EFI_NATIVE_INTERFACE,
                   NULL);
   ASSERT_EFI_ERROR (Status);
+
+  PlatformInitializeConsole (gPlatformConsole);
 }
 
 
@@ -669,9 +671,9 @@ DetectAndPreparePlatformPciDevicePaths (
 }
 
 
-EFI_STATUS
-PlatformBdsConnectConsole (
-  IN BDS_CONSOLE_CONNECT_ENTRY   *PlatformConsole
+VOID
+PlatformInitializeConsole (
+  IN PLATFORM_CONSOLE_CONNECT_ENTRY   *PlatformConsole
   )
 /*++
 
@@ -683,37 +685,17 @@ Routine Description:
 Arguments:
 
   PlatformConsole         - Predfined platform default console device array.
-
-Returns:
-
-  EFI_SUCCESS             - Success connect at least one ConIn and ConOut
-                            device, there must have one ConOut device is
-                            active vga device.
-
-  EFI_STATUS              - Return the status of
-                            BdsLibConnectAllDefaultConsoles ()
-
 --*/
 {
-  EFI_STATUS                         Status;
   UINTN                              Index;
   EFI_DEVICE_PATH_PROTOCOL           *VarConout;
   EFI_DEVICE_PATH_PROTOCOL           *VarConin;
-  UINTN                              DevicePathSize;
 
   //
   // Connect RootBridge
   //
-  VarConout = BdsLibGetVariableAndSize (
-                VarConsoleOut,
-                &gEfiGlobalVariableGuid,
-                &DevicePathSize
-                );
-  VarConin = BdsLibGetVariableAndSize (
-               VarConsoleInp,
-               &gEfiGlobalVariableGuid,
-               &DevicePathSize
-               );
+  GetEfiGlobalVariable2 (EFI_CON_OUT_VARIABLE_NAME, (VOID **) &VarConout, NULL);
+  GetEfiGlobalVariable2 (EFI_CON_IN_VARIABLE_NAME, (VOID **) &VarConin, NULL);
 
   if (VarConout == NULL || VarConin == NULL) {
     //
@@ -746,16 +728,6 @@ Returns:
     //
     DetectAndPreparePlatformPciDevicePaths (TRUE);
   }
-
-  //
-  // Connect the all the default console with current cosole variable
-  //
-  Status = BdsLibConnectAllDefaultConsoles ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
 }
 
 
@@ -1294,16 +1266,6 @@ Routine Description:
   // Notes: this part code can be change with the table policy
   //
   ASSERT (BootMode == BOOT_WITH_FULL_CONFIGURATION);
-  //
-  // Connect platform console
-  //
-  Status = PlatformBdsConnectConsole (gPlatformConsole);
-  if (EFI_ERROR (Status)) {
-    //
-    // Here OEM/IBV can customize with defined action
-    //
-    PlatformBdsNoConsoleAction ();
-  }
 
   //
   // Memory test and Logo show
@@ -1415,31 +1377,6 @@ Returns:
     BdsLibOutputStrings (gST->ConOut, TmpStr, Option->Description, L"\n\r", NULL);
     FreePool (TmpStr);
   }
-}
-
-EFI_STATUS
-PlatformBdsNoConsoleAction (
-  VOID
-  )
-/*++
-
-Routine Description:
-
-  This function is remained for IBV/OEM to do some platform action,
-  if there no console device can be connected.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  EFI_SUCCESS      - Direct return success now.
-
---*/
-{
-  DEBUG ((EFI_D_INFO, "PlatformBdsNoConsoleAction\n"));
-  return EFI_SUCCESS;
 }
 
 VOID
@@ -1564,25 +1501,5 @@ PlatformBootManagerWaitCallback (
   UINT16          TimeoutRemain
   )
 {
-}
-
-/**
-  Lock the ConsoleIn device in system table. All key
-  presses will be ignored until the Password is typed in. The only way to
-  disable the password is to type it in to a ConIn device.
-
-  @param  Password        Password used to lock ConIn device.
-
-  @retval EFI_SUCCESS     lock the Console In Spliter virtual handle successfully.
-  @retval EFI_UNSUPPORTED Password not found
-
-**/
-EFI_STATUS
-EFIAPI
-LockKeyboards (
-  IN  CHAR16    *Password
-  )
-{
-    return EFI_UNSUPPORTED;
 }
 

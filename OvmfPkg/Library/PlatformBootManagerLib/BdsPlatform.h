@@ -65,22 +65,12 @@ Abstract:
 
 #include <OvmfPlatforms.h>
 
-extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformDriverOption[];
 extern ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode;
 extern ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode;
 extern UART_DEVICE_PATH           gUartDeviceNode;
 extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
-//
-//
-//
-#define VarConsoleInpDev        L"ConInDev"
-#define VarConsoleInp           L"ConIn"
-#define VarConsoleOutDev        L"ConOutDev"
-#define VarConsoleOut           L"ConOut"
-#define VarErrorOutDev          L"ErrOutDev"
-#define VarErrorOut             L"ErrOut"
 
 #define PCI_DEVICE_PATH_NODE(Func, Dev) \
   { \
@@ -205,6 +195,16 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        End;
 } USB_CLASS_FORMAT_DEVICE_PATH;
 
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  UINTN                     ConnectType;
+} PLATFORM_CONSOLE_CONNECT_ENTRY;
+
+#define CONSOLE_OUT BIT0
+#define CONSOLE_IN  BIT1
+#define STD_ERROR   BIT2
+extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
+
 //
 // Platform BDS Functions
 //
@@ -239,14 +239,9 @@ ProcessCapsules (
   EFI_BOOT_MODE BootMode
   );
 
-EFI_STATUS
-PlatformBdsConnectConsole (
-  IN BDS_CONSOLE_CONNECT_ENTRY   *PlatformConsole
-  );
-
-EFI_STATUS
-PlatformBdsNoConsoleAction (
-  VOID
+VOID
+PlatformInitializeConsole (
+  IN PLATFORM_CONSOLE_CONNECT_ENTRY   *PlatformConsole
   );
 
 EFI_STATUS
