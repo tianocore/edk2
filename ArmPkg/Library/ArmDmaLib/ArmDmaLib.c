@@ -136,6 +136,23 @@ DmaMap (
   } else {
     Map->DoubleBuffer  = FALSE;
 
+    DEBUG_CODE_BEGIN ();
+
+    //
+    // The operation type check above only executes if the buffer happens to be
+    // misaligned with respect to CWG, but even if it is aligned, we should not
+    // allow arbitrary buffers to be used for creating consistent mappings.
+    // So duplicate the check here when running in DEBUG mode, just to assert
+    // that we are not trying to create a consistent mapping for cached memory.
+    //
+    Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
+    ASSERT_EFI_ERROR(Status);
+
+    ASSERT (Operation != MapOperationBusMasterCommonBuffer ||
+            (GcdDescriptor.Attributes & (EFI_MEMORY_WB | EFI_MEMORY_WT)) == 0);
+
+    DEBUG_CODE_END ();
+
     // Flush the Data Cache (should not have any effect if the memory region is uncached)
     gCpu->FlushDataCache (gCpu, *DeviceAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
   }
