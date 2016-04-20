@@ -486,18 +486,10 @@ ProgramFixedMtrr (
   //
   // We found the fixed MTRR to be programmed
   //
-  for (ByteShift = 0; ByteShift < 8; ByteShift++) {
-    if (*Base ==
-         (
-           mMtrrLibFixedMtrrTable[MsrNum].BaseAddress +
-           (ByteShift * mMtrrLibFixedMtrrTable[MsrNum].Length)
-         )
-       ) {
-      break;
-    }
-  }
+  ByteShift = ((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrNum].BaseAddress)
+               / mMtrrLibFixedMtrrTable[MsrNum].Length;
 
-  if (ByteShift == 8) {
+  if (ByteShift >= 8) {
     return RETURN_UNSUPPORTED;
   }
 
