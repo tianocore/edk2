@@ -1316,7 +1316,6 @@ Routine Description:
 
 --*/
 {
-  EFI_STATUS                         Status;
   EFI_BOOT_MODE                      BootMode;
 
   DEBUG ((EFI_D_INFO, "PlatformBootManagerAfterConsole\n"));
@@ -1335,7 +1334,7 @@ Routine Description:
   //
   // Get current Boot Mode
   //
-  Status = BdsLibGetBootMode (&BootMode);
+  BootMode = GetBootModeHob ();
   DEBUG ((EFI_D_ERROR, "Boot Mode:%x\n", BootMode));
 
   //
