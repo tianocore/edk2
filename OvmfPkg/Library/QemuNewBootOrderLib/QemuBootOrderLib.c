@@ -2,7 +2,7 @@
   Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file.
 
   Copyright (C) 2012 - 2014, Red Hat, Inc.
-  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -16,7 +16,7 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/GenericBdsLib.h>
+#include <Library/UefiBootManagerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/BaseLib.h>
@@ -253,8 +253,10 @@ typedef struct {
   LOAD_OPTION_ACTIVE attribute.
 **/
 typedef struct {
-  CONST BDS_COMMON_OPTION *BootOption; // reference only, no ownership
-  BOOLEAN                 Appended;    // has been added to a BOOT_ORDER?
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOption; // reference only, no
+                                                  //   ownership
+  BOOLEAN                            Appended;    // has been added to a
+                                                  //   BOOT_ORDER?
 } ACTIVE_OPTION;
 
 
@@ -300,7 +302,7 @@ BootOrderAppend (
   }
 
   BootOrder->Data[BootOrder->Produced++] =
-                                         ActiveOption->BootOption->BootCurrent;
+                               (UINT16) ActiveOption->BootOption->OptionNumber;
   ActiveOption->Appended = TRUE;
   return RETURN_SUCCESS;
 }
@@ -308,22 +310,25 @@ BootOrderAppend (
 
 /**
 
-  Create an array of ACTIVE_OPTION elements for a boot option list.
+  Create an array of ACTIVE_OPTION elements for a boot option array.
 
-  @param[in]  BootOptionList  A boot option list, created with
-                              BdsLibEnumerateAllBootOption().
+  @param[in]  BootOptions      A boot option array, created with
+                               EfiBootManagerRefreshAllBootOption () and
+                               EfiBootManagerGetLoadOptions ().
 
-  @param[out] ActiveOption    Pointer to the first element in the new array.
-                              The caller is responsible for freeing the array
-                              with FreePool() after use.
+  @param[in]  BootOptionCount  The number of elements in BootOptions.
 
-  @param[out] Count           Number of elements in the new array.
+  @param[out] ActiveOption     Pointer to the first element in the new array.
+                               The caller is responsible for freeing the array
+                               with FreePool() after use.
+
+  @param[out] Count            Number of elements in the new array.
 
 
   @retval RETURN_SUCCESS           The ActiveOption array has been created.
 
   @retval RETURN_NOT_FOUND         No active entry has been found in
-                                   BootOptionList.
+                                   BootOptions.
 
   @retval RETURN_OUT_OF_RESOURCES  Memory allocation failed.
 
@@ -331,11 +336,13 @@ BootOrderAppend (
 STATIC
 RETURN_STATUS
 CollectActiveOptions (
-  IN   CONST LIST_ENTRY *BootOptionList,
-  OUT  ACTIVE_OPTION    **ActiveOption,
-  OUT  UINTN            *Count
+  IN   CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions,
+  IN   UINTN                              BootOptionCount,
+  OUT  ACTIVE_OPTION                      **ActiveOption,
+  OUT  UINTN                              *Count
   )
 {
+  UINTN Index;
   UINTN ScanMode;
 
   *ActiveOption = NULL;
@@ -346,22 +353,15 @@ CollectActiveOptions (
   // - store links to active entries.
   //
   for (ScanMode = 0; ScanMode < 2; ++ScanMode) {
-    CONST LIST_ENTRY *Link;
-
-    Link = BootOptionList->ForwardLink;
     *Count = 0;
-    while (Link != BootOptionList) {
-      CONST BDS_COMMON_OPTION *Current;
-
-      Current = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
-      if (IS_LOAD_OPTION_TYPE (Current->Attribute, LOAD_OPTION_ACTIVE)) {
+    for (Index = 0; Index < BootOptionCount; Index++) {
+      if ((BootOptions[Index].Attributes & LOAD_OPTION_ACTIVE) != 0) {
         if (ScanMode == 1) {
-          (*ActiveOption)[*Count].BootOption = Current;
+          (*ActiveOption)[*Count].BootOption = &BootOptions[Index];
           (*ActiveOption)[*Count].Appended   = FALSE;
         }
         ++*Count;
       }
-      Link = Link->ForwardLink;
     }
 
     if (ScanMode == 0) {
@@ -1437,11 +1437,17 @@ BOOLEAN
 Match (
   IN  CONST CHAR16                           *Translated,
   IN  UINTN                                  TranslatedLength,
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL         *DevicePath
+  IN  EFI_DEVICE_PATH_PROTOCOL               *DevicePath
   )
 {
-  CHAR16  *Converted;
-  BOOLEAN Result;
+  CHAR16                   *Converted;
+  BOOLEAN                  Result;
+  VOID                     *FileBuffer;
+  UINTN                    FileSize;
+  EFI_DEVICE_PATH_PROTOCOL *AbsDevicePath;
+  CHAR16                   *AbsConverted;
+  BOOLEAN                  Shortform;
+  EFI_DEVICE_PATH_PROTOCOL *Node;
 
   Converted = ConvertDevicePathToText (
                 DevicePath,
@@ -1452,24 +1458,57 @@ Match (
     return FALSE;
   }
 
-  //
-  // Attempt to expand any relative UEFI device path starting with HD() to an
-  // absolute device path first. The logic imitates BdsLibBootViaBootOption().
-  // We don't have to free the absolute device path,
-  // BdsExpandPartitionPartialDevicePathToFull() has internal caching.
-  //
   Result = FALSE;
-  if (DevicePathType (DevicePath) == MEDIA_DEVICE_PATH &&
-      DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP) {
-    EFI_DEVICE_PATH_PROTOCOL *AbsDevicePath;
-    CHAR16                   *AbsConverted;
+  Shortform = FALSE;
+  //
+  // Expand the short-form device path to full device path
+  //
+  if ((DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+      (DevicePathSubType (DevicePath) == MEDIA_HARDDRIVE_DP)) {
+    //
+    // Harddrive shortform device path
+    //
+    Shortform = TRUE;
+  } else if ((DevicePathType (DevicePath) == MEDIA_DEVICE_PATH) &&
+             (DevicePathSubType (DevicePath) == MEDIA_FILEPATH_DP)) {
+    //
+    // File-path shortform device path
+    //
+    Shortform = TRUE;
+  } else if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+             (DevicePathSubType (DevicePath) == MSG_URI_DP)) {
+    //
+    // URI shortform device path
+    //
+    Shortform = TRUE;
+  } else {
+    for ( Node = DevicePath
+        ; !IsDevicePathEnd (Node)
+        ; Node = NextDevicePathNode (Node)
+        ) {
+      if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) &&
+          ((DevicePathSubType (Node) == MSG_USB_CLASS_DP) ||
+           (DevicePathSubType (Node) == MSG_USB_WWID_DP))) {
+        Shortform = TRUE;
+        break;
+      }
+    }
+  }
 
-    AbsDevicePath = BdsExpandPartitionPartialDevicePathToFull (
-                      (HARDDRIVE_DEVICE_PATH *) DevicePath);
-    if (AbsDevicePath == NULL) {
+  //
+  // Attempt to expand any relative UEFI device path to
+  // an absolute device path first.
+  //
+  if (Shortform) {
+    FileBuffer = EfiBootManagerGetLoadOptionBuffer (
+                   DevicePath, &AbsDevicePath, &FileSize
+                   );
+    if (FileBuffer == NULL) {
       goto Exit;
     }
+    FreePool (FileBuffer);
     AbsConverted = ConvertDevicePathToText (AbsDevicePath, FALSE, FALSE);
+    FreePool (AbsDevicePath);
     if (AbsConverted == NULL) {
       goto Exit;
     }
@@ -1538,11 +1577,11 @@ BootOrderComplete (
   Idx = 0;
   while (!RETURN_ERROR (Status) && Idx < ActiveCount) {
     if (!ActiveOption[Idx].Appended) {
-      CONST BDS_COMMON_OPTION        *Current;
-      CONST EFI_DEVICE_PATH_PROTOCOL *FirstNode;
+      CONST EFI_BOOT_MANAGER_LOAD_OPTION *Current;
+      CONST EFI_DEVICE_PATH_PROTOCOL     *FirstNode;
 
       Current = ActiveOption[Idx].BootOption;
-      FirstNode = Current->DevicePath;
+      FirstNode = Current->FilePath;
       if (FirstNode != NULL) {
         CHAR16        *Converted;
         STATIC CHAR16 ConvFallBack[] = L"<unable to convert>";
@@ -1635,7 +1674,7 @@ PruneBootVariables (
       CHAR16 VariableName[9];
 
       UnicodeSPrintAsciiFormat (VariableName, sizeof VariableName, "Boot%04x",
-        ActiveOption[Idx].BootOption->BootCurrent);
+        ActiveOption[Idx].BootOption->OptionNumber);
 
       //
       // "The space consumed by the deleted variable may not be available until
@@ -1699,6 +1738,17 @@ SetBootOrderFromQemu (
 
   UINTN                            TranslatedSize;
   CHAR16                           Translated[TRANSLATION_OUTPUT_SIZE];
+  EFI_BOOT_MANAGER_LOAD_OPTION     *BootOptions;
+  UINTN                            BootOptionCount;
+
+  //
+  // The QemuBootOrderLib is linked by OvmfPkg and ArmVirtPkg.
+  // OvmfPkg was changed to use the new BDS @ MdeModulePkg, so boot options
+  // are no longer stored in linked list.
+  // But we don't change the QemuBootOrderLib class interface because
+  // ArmVirtPkg are still using old BDS @ IntelFrameworkModulePkg.
+  //
+  ASSERT (BootOptionList == NULL);
 
   Status = QemuFwCfgFindFile ("bootorder", &FwCfgItem, &FwCfgSize);
   if (Status != RETURN_SUCCESS) {
@@ -1736,9 +1786,19 @@ SetBootOrderFromQemu (
     goto ErrorFreeFwCfg;
   }
 
-  Status = CollectActiveOptions (BootOptionList, &ActiveOption, &ActiveCount);
-  if (RETURN_ERROR (Status)) {
+  BootOptions = EfiBootManagerGetLoadOptions (
+                  &BootOptionCount, LoadOptionTypeBoot
+                  );
+  if (BootOptions == NULL) {
+    Status = RETURN_NOT_FOUND;
     goto ErrorFreeBootOrder;
+  }
+
+  Status = CollectActiveOptions (
+             BootOptions, BootOptionCount, &ActiveOption, &ActiveCount
+             );
+  if (RETURN_ERROR (Status)) {
+    goto ErrorFreeBootOptions;
   }
 
   if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
@@ -1770,7 +1830,7 @@ SetBootOrderFromQemu (
         if (Match (
               Translated,
               TranslatedSize, // contains length, not size, in CHAR16's here
-              ActiveOption[Idx].BootOption->DevicePath
+              ActiveOption[Idx].BootOption->FilePath
               )
             ) {
           //
@@ -1830,6 +1890,9 @@ ErrorFreeExtraPciRoots:
 
 ErrorFreeActiveOption:
   FreePool (ActiveOption);
+
+ErrorFreeBootOptions:
+  EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
 
 ErrorFreeBootOrder:
   FreePool (BootOrder.Data);
