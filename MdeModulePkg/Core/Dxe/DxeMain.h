@@ -276,6 +276,8 @@ extern EFI_RUNTIME_SERVICES                     *gDxeCoreRT;
 extern EFI_DXE_SERVICES                         *gDxeCoreDS;
 extern EFI_HANDLE                               gDxeCoreImageHandle;
 
+extern BOOLEAN                                  gMemoryMapTerminated;
+
 extern EFI_DECOMPRESS_PROTOCOL                  gEfiDecompress;
 
 extern EFI_RUNTIME_ARCH_PROTOCOL                *gRuntime;
@@ -2856,6 +2858,16 @@ VOID
 EFIAPI
 CoreInitializeMemoryAttributesTable (
   VOID
+  );
+
+/**
+  Install MemoryAttributesTable on memory allocation.
+
+  @param[in] MemoryType EFI memory type.
+**/
+VOID
+InstallMemoryAttributesTableOnMemoryAllocation (
+  IN EFI_MEMORY_TYPE    MemoryType
   );
 
 /**
