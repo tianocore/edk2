@@ -38,13 +38,14 @@ from Common.Misc import DirCache, PathClass
 from Common.Misc import SaveFileOnChange
 from Common.Misc import ClearDuplicatedInf
 from Common.Misc import GuidStructureStringToGuidString
+from Common.Misc import CheckPcdDatum
 from Common.BuildVersion import gBUILD_VERSION
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ## Version and Copyright
 versionNumber = "1.0" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + versionNumber
-__copyright__ = "Copyright (c) 2007 - 2014, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2016, Intel Corporation  All rights reserved."
 
 ## Tool entrance method
 #
@@ -266,6 +267,14 @@ def main():
                 EdkLogger.error("GenFds", OPTION_VALUE_INVALID,
                                 "No such a Capsule in FDF file: %s" % Options.uiCapName)
 
+        GenFdsGlobalVariable.WorkSpace = BuildWorkSpace
+        if ArchList != None:
+            GenFdsGlobalVariable.ArchList = ArchList
+
+        if Options.OptionPcd:
+            GlobalData.BuildOptionPcd = Options.OptionPcd
+            CheckBuildOptionPcd()
+
         """Modify images from build output if the feature of loading driver at fixed address is on."""
         if GenFdsGlobalVariable.FixedLoadAddress:
             GenFds.PreprocessImage(BuildWorkSpace, GenFdsGlobalVariable.ActivePlatform)
@@ -308,6 +317,79 @@ def SingleCheckCallback(option, opt_str, value, parser):
         gParamCheck.append(option)
     else:
         parser.error("Option %s only allows one instance in command line!" % option)
+
+def CheckBuildOptionPcd():
+    for Arch in GenFdsGlobalVariable.ArchList:
+        PkgList  = GenFdsGlobalVariable.WorkSpace.GetPackageList(GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag)
+        for i, pcd in enumerate(GlobalData.BuildOptionPcd):
+            if type(pcd) is tuple:
+                continue
+            (pcdname, pcdvalue) = pcd.split('=')
+            if not pcdvalue:
+                EdkLogger.error('GenFds', OPTION_MISSING, "No Value specified for the PCD %s." % (pcdname))
+            if '.' in pcdname:
+                (TokenSpaceGuidCName, TokenCName) = pcdname.split('.')
+                HasTokenSpace = True
+            else:
+                TokenCName = pcdname
+                TokenSpaceGuidCName = ''
+                HasTokenSpace = False
+            TokenSpaceGuidCNameList = []
+            FoundFlag = False
+            PcdDatumType = ''
+            NewValue = ''
+            for package in PkgList:
+                for key in package.Pcds:
+                    PcdItem = package.Pcds[key]
+                    if HasTokenSpace:
+                        if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
+                            PcdDatumType = PcdItem.DatumType
+                            NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                            FoundFlag = True
+                    else:
+                        if PcdItem.TokenCName == TokenCName:
+                            if not PcdItem.TokenSpaceGuidCName in TokenSpaceGuidCNameList:
+                                if len (TokenSpaceGuidCNameList) < 1:
+                                    TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
+                                    PcdDatumType = PcdItem.DatumType
+                                    TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
+                                    NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                                    FoundFlag = True
+                                else:
+                                    EdkLogger.error(
+                                            'GenFds',
+                                            PCD_VALIDATION_INFO_ERROR,
+                                            "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, PcdItem.TokenSpaceGuidCName, TokenSpaceGuidCNameList[0])
+                                            )
+
+            GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, NewValue)
+
+def BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
+    if PcdDatumType == 'VOID*':
+        if Value.startswith('L'):
+            if not Value[1]:
+                EdkLogger.error('GenFds', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
+            Value = Value[0] + '"' + Value[1:] + '"'
+        elif Value.startswith('B'):
+            if not Value[1]:
+                EdkLogger.error('GenFds', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
+            Value = Value[1:]
+        else:
+            if not Value[0]:
+                EdkLogger.error('GenFds', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
+            Value = '"' + Value + '"'
+
+    IsValid, Cause = CheckPcdDatum(PcdDatumType, Value)
+    if not IsValid:
+        EdkLogger.error('build', FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
+    if PcdDatumType == 'BOOLEAN':
+        Value = Value.upper()
+        if Value == 'TRUE' or Value == '1':
+            Value = '1'
+        elif Value == 'FALSE' or Value == '0':
+            Value = '0'
+    return  Value
+
         
 ## Parse command line options
 #
@@ -341,6 +423,7 @@ def myOptionParser():
     Parser.add_option("-s", "--specifyaddress", dest="FixedAddress", action="store_true", type=None, help="Specify driver load address.")
     Parser.add_option("--conf", action="store", type="string", dest="ConfDirectory", help="Specify the customized Conf directory.")
     Parser.add_option("--ignore-sources", action="store_true", dest="IgnoreSources", default=False, help="Focus to a binary build and ignore all source files")
+    Parser.add_option("--pcd", action="append", dest="OptionPcd", help="Set PCD value by command line. Format: \"PcdName=Value\" ")
 
     (Options, args) = Parser.parse_args()
     return Options

@@ -285,8 +285,6 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.FfsDir = os.path.join(GenFdsGlobalVariable.FvDir, 'Ffs')
         if not os.path.exists(GenFdsGlobalVariable.FfsDir) :
             os.makedirs(GenFdsGlobalVariable.FfsDir)
-        if ArchList != None:
-            GenFdsGlobalVariable.ArchList = ArchList
 
         T_CHAR_LF = '\n'
         #

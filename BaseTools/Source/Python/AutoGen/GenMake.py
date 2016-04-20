@@ -1427,6 +1427,11 @@ class TopLevelMakefile(BuildFile):
         if GlobalData.gIgnoreSource:
             ExtraOption += " --ignore-sources"
 
+        if GlobalData.BuildOptionPcd:
+            for index, option in enumerate(GlobalData.gCommand):
+                if "--pcd" == option and GlobalData.gCommand[index+1]:
+                    ExtraOption += " --pcd " + GlobalData.gCommand[index+1]
+
         MakefileName = self._FILE_NAME_[self._FileType]
         SubBuildCommandList = []
         for A in PlatformInfo.ArchList:
