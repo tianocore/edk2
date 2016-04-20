@@ -1,7 +1,7 @@
 /** @file
   Platform BDS customizations.
 
-  Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -107,7 +107,7 @@ SaveS3BootScript (
 //
 VOID
 EFIAPI
-PlatformBdsInit (
+PlatformBootManagerBeforeConsole (
   VOID
   )
 /*++
@@ -128,7 +128,7 @@ Returns:
   EFI_HANDLE Handle;
   EFI_STATUS Status;
 
-  DEBUG ((EFI_D_INFO, "PlatformBdsInit\n"));
+  DEBUG ((EFI_D_INFO, "PlatformBootManagerBeforeConsole\n"));
   InstallDevicePathCallback ();
 
   VisitAllInstancesOfProtocol (&gEfiPciRootBridgeIoProtocolGuid,
@@ -1249,11 +1249,8 @@ SaveS3BootScript (
 
 VOID
 EFIAPI
-PlatformBdsPolicyBehavior (
-  IN OUT LIST_ENTRY                  *DriverOptionList,
-  IN OUT LIST_ENTRY                  *BootOptionList,
-  IN PROCESS_CAPSULES                ProcessCapsules,
-  IN BASEM_MEMORY_TEST               BaseMemoryTest
+PlatformBootManagerAfterConsole (
+  VOID
   )
 /*++
 
@@ -1263,26 +1260,12 @@ Routine Description:
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 
-Arguments:
-
-  DriverOptionList - The header of the driver option link list
-
-  BootOptionList   - The header of the boot option link list
-
-  ProcessCapsules  - A pointer to ProcessCapsules()
-
-  BaseMemoryTest   - A pointer to BaseMemoryTest()
-
-Returns:
-
-  None.
-
 --*/
 {
   EFI_STATUS                         Status;
   EFI_BOOT_MODE                      BootMode;
 
-  DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
+  DEBUG ((EFI_D_INFO, "PlatformBootManagerAfterConsole\n"));
 
   if (PcdGetBool (PcdOvmfFlashVariablesEnable)) {
     DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior: not restoring NvVars "
@@ -1568,6 +1551,19 @@ InstallDevicePathCallback (
                           NULL,
                           &mEfiDevPathNotifyReg
                           );
+}
+
+/**
+  This function is called each second during the boot manager waits the timeout.
+
+  @param TimeoutRemain  The remaining timeout.
+**/
+VOID
+EFIAPI
+PlatformBootManagerWaitCallback (
+  UINT16          TimeoutRemain
+  )
+{
 }
 
 /**
