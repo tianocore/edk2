@@ -60,6 +60,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock
@@ -69,6 +70,7 @@
   gEfiPciRootBridgeIoProtocolGuid
   gEfiS3SaveStateProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
   gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
