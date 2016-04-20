@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from INF statement
 #
-#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2014-2016 Hewlett-Packard Development Company, L.P.<BR>
 #
 #  This program and the accompanying materials
@@ -43,6 +43,7 @@ from AutoGen.GenDepex import DependencyExpression
 from PatchPcdValue.PatchPcdValue import PatchBinaryFile
 from Common.LongFilePathSupport import CopyLongFilePath
 from Common.LongFilePathSupport import OpenLongFilePath as open
+import Common.GlobalData as GlobalData
 
 ## generate FFS from INF
 #
@@ -260,7 +261,16 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 DefaultValue = FdfPcdDict[PcdKey]
                 FdfOverride = True
 
-            if not DscOverride and not FdfOverride:
+            # Override Patchable PCD value by the value from Build Option
+            BuildOptionOverride = False
+            if GlobalData.BuildOptionPcd:
+                for pcd in GlobalData.BuildOptionPcd:
+                    if PcdKey == (pcd[1], pcd[0]):
+                        DefaultValue = pcd[2]
+                        BuildOptionOverride = True
+                        break
+
+            if not DscOverride and not FdfOverride and not BuildOptionOverride:
                 continue
             # Check value, if value are equal, no need to patch
             if Pcd.DatumType == "VOID*":
