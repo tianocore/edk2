@@ -68,7 +68,6 @@ Abstract:
 #include <OvmfPlatforms.h>
 
 extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
-extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformDriverOption[];
 extern ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode;
 extern ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode;
 extern UART_DEVICE_PATH           gUartDeviceNode;
@@ -210,51 +209,10 @@ extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 //
 // Platform BDS Functions
 //
-EFI_STATUS
-PlatformBdsShowProgress (
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleBackground,
-  CHAR16                        *Title,
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL ProgressColor,
-  UINTN                         Progress,
-  UINTN                         PreviousValue
-  );
-
-VOID
-PlatformBdsConnectSequence (
-  VOID
-  );
-
-EFI_STATUS
-ProcessCapsules (
-  EFI_BOOT_MODE BootMode
-  );
 
 VOID
 PlatformInitializeConsole (
   IN PLATFORM_CONSOLE_CONNECT_ENTRY   *PlatformConsole
-  );
-
-EFI_STATUS
-ConvertMpsTable (
-  IN OUT  VOID     **Table
-  );
-
-EFI_STATUS
-ConvertSmbiosTable (
-  IN OUT VOID       **Table
-  );
-
-EFI_STATUS
-ConvertAcpiTable (
- IN      UINTN      TableLen,
- IN OUT  VOID       **Table
-  );
-
-EFI_STATUS
-ConvertSystemTable (
- IN     EFI_GUID   *TableGuid,
- IN OUT VOID       **Table
   );
 
 /**

@@ -2,7 +2,7 @@
   Defined the platform specific device path which will be used by
   platform Bbd to perform the platform policy connect.
 
-  Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,11 +14,6 @@
 **/
 
 #include "BdsPlatform.h"
-
-//
-// Predefined platform default time out value
-//
-UINT16                      gPlatformBootTimeOutDefault = 5;
 
 ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
 ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode = gPnp16550ComPort;
@@ -38,11 +33,6 @@ PLATFORM_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
     0
   }
 };
-
-//
-// Predefined platform specific driver option
-//
-EFI_DEVICE_PATH_PROTOCOL    *gPlatformDriverOption[] = { NULL };
 
 //
 // Predefined platform connect sequence
