@@ -874,6 +874,8 @@ CompareAndMergeDefaultString (
   StringPtrNext        = NULL;
   ConfigAltResp        = NULL;
   AltCfgRespBackup     = NULL;
+  TempChar             = L'\0';
+  TempCharA            = L'\0';
   ConfigAltRespChanged = FALSE;
 
   //
