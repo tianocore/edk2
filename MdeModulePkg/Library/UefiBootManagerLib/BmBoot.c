@@ -586,7 +586,7 @@ BmExpandUsbDevicePath (
 
   for (Index = 0; (Index < HandleCount) && (FileBuffer == NULL); Index++) {
     FullDevicePath = AppendDevicePath (DevicePathFromHandle (Handles[Index]), RemainingDevicePath);
-    FileBuffer = BmGetLoadOptionBuffer (FullDevicePath, FullPath, FileSize);
+    FileBuffer = EfiBootManagerGetLoadOptionBuffer (FullDevicePath, FullPath, FileSize);
     FreePool (FullDevicePath);
   }
 
@@ -851,7 +851,7 @@ BmExpandPartitionDevicePath (
         Status = EfiBootManagerConnectDevicePath (Instance, NULL);
         if (!EFI_ERROR (Status)) {
           TempDevicePath = AppendDevicePath (Instance, NextDevicePathNode (FilePath));
-          FileBuffer = BmGetLoadOptionBuffer (TempDevicePath, FullPath, FileSize);
+          FileBuffer = EfiBootManagerGetLoadOptionBuffer (TempDevicePath, FullPath, FileSize);
           FreePool (TempDevicePath);
 
           if (FileBuffer != NULL) {
@@ -911,7 +911,7 @@ BmExpandPartitionDevicePath (
       // Find the matched partition device path
       //
       TempDevicePath = AppendDevicePath (BlockIoDevicePath, NextDevicePathNode (FilePath));
-      FileBuffer = BmGetLoadOptionBuffer (TempDevicePath, FullPath, FileSize);
+      FileBuffer = EfiBootManagerGetLoadOptionBuffer (TempDevicePath, FullPath, FileSize);
       FreePool (TempDevicePath);
 
       if (FileBuffer != NULL) {
@@ -1425,7 +1425,8 @@ BmGetFileBufferFromLoadFiles (
   @return The load option buffer. Caller is responsible to free the memory.
 **/
 VOID *
-BmGetLoadOptionBuffer (
+EFIAPI
+EfiBootManagerGetLoadOptionBuffer (
   IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
   OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
   OUT UINTN                             *FileSize
@@ -1648,7 +1649,7 @@ EfiBootManagerBoot (
   RamDiskDevicePath = NULL;
   if (DevicePathType (BootOption->FilePath) != BBS_DEVICE_PATH) {
     Status     = EFI_NOT_FOUND;
-    FileBuffer = BmGetLoadOptionBuffer (BootOption->FilePath, &FilePath, &FileSize);
+    FileBuffer = EfiBootManagerGetLoadOptionBuffer (BootOption->FilePath, &FilePath, &FileSize);
     if (FileBuffer != NULL) {
       RamDiskDevicePath = BmGetRamDiskDevicePath (FilePath);
     }

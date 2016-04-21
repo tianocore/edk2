@@ -1281,7 +1281,7 @@ EfiBootManagerProcessLoadOption (
     mBmLoadOptionName[LoadOption->OptionType], LoadOption->OptionNumber
     ));
   ImageHandle = NULL;
-  FileBuffer = BmGetLoadOptionBuffer (LoadOption->FilePath, &FilePath, &FileSize);
+  FileBuffer = EfiBootManagerGetLoadOptionBuffer (LoadOption->FilePath, &FilePath, &FileSize);
   DEBUG_CODE (
     if (FileBuffer != NULL && CompareMem (LoadOption->FilePath, FilePath, GetDevicePathSize (FilePath)) != 0) {
       DEBUG ((EFI_D_INFO, "[Bds] DevicePath expand: "));

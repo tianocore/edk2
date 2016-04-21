@@ -311,25 +311,6 @@ BmSetVariableAndReportStatusCodeOnError (
   );
 
 /**
-  Get the load option by its device path.
-
-  @param FilePath  The device path pointing to a load option.
-                   It could be a short-form device path.
-  @param FullPath  Return the full device path of the load option after
-                   short-form device path expanding.
-                   Caller is responsible to free it.
-  @param FileSize  Return the load option size.
-
-  @return The load option buffer. Caller is responsible to free the memory.
-**/
-VOID *
-BmGetLoadOptionBuffer (
-  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
-  OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
-  OUT UINTN                             *FileSize
-  );
-
-/**
   Return whether the PE header of the load option is valid or not.
 
   @param[in] Type       The load option type.
