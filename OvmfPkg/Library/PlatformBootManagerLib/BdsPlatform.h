@@ -152,54 +152,7 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
 #define PCI_SUBCLASS_SERIAL    0x00
 #define PCI_IF_16550           0x02
 #define IS_PCI_16550SERIAL(_p)           IS_CLASS3 (_p, PCI_CLASS_SCC, PCI_SUBCLASS_SERIAL, PCI_IF_16550)
-
-#define EFI_SYSTEM_TABLE_MAX_ADDRESS 0xFFFFFFFF
-#define SYS_TABLE_PAD(ptr) (((~ptr) +1) & 0x07 )
-
 #define IS_PCI_ISA_PDECODE(_p)        IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE, 0)
-
-typedef struct {
-  ACPI_HID_DEVICE_PATH      PciRootBridge;
-  PCI_DEVICE_PATH           IsaBridge;
-  ACPI_HID_DEVICE_PATH      Keyboard;
-  EFI_DEVICE_PATH_PROTOCOL  End;
-} PLATFORM_DUMMY_ISA_KEYBOARD_DEVICE_PATH;
-
-typedef struct {
-  ACPI_HID_DEVICE_PATH      PciRootBridge;
-  PCI_DEVICE_PATH           IsaBridge;
-  ACPI_HID_DEVICE_PATH      IsaSerial;
-  UART_DEVICE_PATH          Uart;
-  VENDOR_DEVICE_PATH        TerminalType;
-  EFI_DEVICE_PATH_PROTOCOL  End;
-} PLATFORM_DUMMY_ISA_SERIAL_DEVICE_PATH;
-
-typedef struct {
-  ACPI_HID_DEVICE_PATH      PciRootBridge;
-  PCI_DEVICE_PATH           VgaDevice;
-  EFI_DEVICE_PATH_PROTOCOL  End;
-} PLATFORM_DUMMY_PCI_VGA_DEVICE_PATH;
-
-typedef struct {
-  ACPI_HID_DEVICE_PATH      PciRootBridge;
-  PCI_DEVICE_PATH           PciBridge;
-  PCI_DEVICE_PATH           SerialDevice;
-  UART_DEVICE_PATH          Uart;
-  VENDOR_DEVICE_PATH        TerminalType;
-  EFI_DEVICE_PATH_PROTOCOL  End;
-} PLATFORM_DUMMY_PCI_SERIAL_DEVICE_PATH;
-
-//
-// the short form device path for Usb keyboard
-//
-#define CLASS_HID           3
-#define SUBCLASS_BOOT       1
-#define PROTOCOL_KEYBOARD   1
-
-typedef struct {
-  USB_CLASS_DEVICE_PATH           UsbClass;
-  EFI_DEVICE_PATH_PROTOCOL        End;
-} USB_CLASS_FORMAT_DEVICE_PATH;
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
