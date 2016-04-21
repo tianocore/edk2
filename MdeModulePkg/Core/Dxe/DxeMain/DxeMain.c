@@ -291,19 +291,6 @@ DxeMain (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Report DXE Core image information to the PE/COFF Extra Action Library
-  //
-  ZeroMem (&ImageContext, sizeof (ImageContext));
-  ImageContext.ImageAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)gDxeCoreLoadedImage->ImageBase;
-  ImageContext.PdbPointer     = PeCoffLoaderGetPdbPointer ((VOID*)(UINTN)ImageContext.ImageAddress);
-  ImageContext.SizeOfHeaders  = PeCoffGetSizeOfHeaders ((VOID*)(UINTN)ImageContext.ImageAddress);
-  Status = PeCoffLoaderGetEntryPoint ((VOID*)(UINTN)ImageContext.ImageAddress, &EntryPoint);
-  if (Status == EFI_SUCCESS) {
-    ImageContext.EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)EntryPoint;
-  }
-  PeCoffLoaderRelocateImageExtraAction (&ImageContext);
-
-  //
   // Initialize the Global Coherency Domain Services
   //
   Status = CoreInitializeGcdServices (&HobStart, MemoryBaseAddress, MemoryLength);
@@ -315,6 +302,19 @@ DxeMain (
   ProcessLibraryConstructorList (gDxeCoreImageHandle, gDxeCoreST);
   PERF_END   (NULL,"PEI", NULL, 0) ;
   PERF_START (NULL,"DXE", NULL, 0) ;
+
+  //
+  // Report DXE Core image information to the PE/COFF Extra Action Library
+  //
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.ImageAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)gDxeCoreLoadedImage->ImageBase;
+  ImageContext.PdbPointer     = PeCoffLoaderGetPdbPointer ((VOID*)(UINTN)ImageContext.ImageAddress);
+  ImageContext.SizeOfHeaders  = PeCoffGetSizeOfHeaders ((VOID*)(UINTN)ImageContext.ImageAddress);
+  Status = PeCoffLoaderGetEntryPoint ((VOID*)(UINTN)ImageContext.ImageAddress, &EntryPoint);
+  if (Status == EFI_SUCCESS) {
+    ImageContext.EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)EntryPoint;
+  }
+  PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 
   //
   // Install the DXE Services Table into the EFI System Tables's Configuration Table
