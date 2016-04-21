@@ -20,6 +20,9 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 
+#define OR_SEED      0x01010101
+#define CLEAR_SEED   0xFFFFFFFF
+
 //
 // Context to save and restore when MTRRs are programmed
 //
@@ -460,11 +463,12 @@ ProgramFixedMtrr (
 {
   UINT32  MsrNum;
   UINT32  ByteShift;
-  UINT64  OrMask;
-  UINT64  ClearMask;
+  UINT32  OrMask[2];
+  UINT32  ClearMask[2];
+  UINT64  SubLength;
 
-  OrMask    = 0;
-  ClearMask = 0;
+  *(UINT64 *)OrMask    = 0;
+  *(UINT64 *)ClearMask = 0;
 
   for (MsrNum = *LastMsrNum + 1; MsrNum < MTRR_NUMBER_OF_FIXED_MTRR; MsrNum++) {
     if ((*Base >= mMtrrLibFixedMtrrTable[MsrNum].BaseAddress) &&
@@ -493,24 +497,27 @@ ProgramFixedMtrr (
     return RETURN_UNSUPPORTED;
   }
 
-  for (
-        ;
-        ((ByteShift < 8) && (*Length >= mMtrrLibFixedMtrrTable[MsrNum].Length));
-        ByteShift++
-      ) {
-    OrMask |= LShiftU64 ((UINT64) MemoryCacheType, (UINT32) (ByteShift * 8));
-    ClearMask |= LShiftU64 ((UINT64) 0xFF, (UINT32) (ByteShift * 8));
-    *Length -= mMtrrLibFixedMtrrTable[MsrNum].Length;
-    *Base += mMtrrLibFixedMtrrTable[MsrNum].Length;
+  if (ByteShift < 4) {
+    OrMask[0]    = OR_SEED * (UINT32)MemoryCacheType;
+    ClearMask[0] = CLEAR_SEED;
+    OrMask[1]    = (OR_SEED * (UINT32)MemoryCacheType) >> ((4 - ByteShift) * 8);
+    ClearMask[1] = CLEAR_SEED >> ((4 - ByteShift) * 8);
+  } else {
+    OrMask[0]    = (OR_SEED * (UINT32)MemoryCacheType) >> ((8 - ByteShift) * 8);
+    ClearMask[0] = CLEAR_SEED >> ((8 - ByteShift) * 8);
   }
 
-  if (ByteShift < 8 && (*Length != 0)) {
+  SubLength = mMtrrLibFixedMtrrTable[MsrNum].Length * (8 - ByteShift);
+  if (*Length < SubLength) {
     return RETURN_UNSUPPORTED;
   }
 
+  *Length -= SubLength;
+  *Base   += SubLength;
+
   *LastMsrNum      = MsrNum;
-  *ReturnClearMask = ClearMask;
-  *ReturnOrMask    = OrMask;
+  *ReturnClearMask = *(UINT64 *)ClearMask;
+  *ReturnOrMask    = *(UINT64 *)OrMask;
 
   return RETURN_SUCCESS;
 }
