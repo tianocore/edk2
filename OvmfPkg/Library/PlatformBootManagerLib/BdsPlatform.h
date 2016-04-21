@@ -211,11 +211,6 @@ extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 // Platform BDS Functions
 //
 EFI_STATUS
-BdsMemoryTest (
-  EXTENDMEM_COVERAGE_LEVEL Level
-  );
-
-EFI_STATUS
 PlatformBdsShowProgress (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleForeground,
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL TitleBackground,

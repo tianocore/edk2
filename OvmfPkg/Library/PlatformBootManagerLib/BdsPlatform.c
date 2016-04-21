@@ -1213,62 +1213,6 @@ Returns:
   gST->ConOut->ClearScreen (gST->ConOut);
 }
 
-VOID
-PlatformBdsDiagnostics (
-  IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
-  IN BOOLEAN                     QuietBoot,
-  IN BASEM_MEMORY_TEST           BaseMemoryTest
-  )
-/*++
-
-Routine Description:
-
-  Perform the platform diagnostic, such like test memory. OEM/IBV also
-  can customize this fuction to support specific platform diagnostic.
-
-Arguments:
-
-  MemoryTestLevel  - The memory test intensive level
-
-  QuietBoot        - Indicate if need to enable the quiet boot
-
-  BaseMemoryTest   - A pointer to BaseMemoryTest()
-
-Returns:
-
-  None.
-
---*/
-{
-  EFI_STATUS  Status;
-
-  DEBUG ((EFI_D_INFO, "PlatformBdsDiagnostics\n"));
-
-  //
-  // Here we can decide if we need to show
-  // the diagnostics screen
-  // Notes: this quiet boot code should be remove
-  // from the graphic lib
-  //
-  if (QuietBoot) {
-    EnableQuietBoot (PcdGetPtr(PcdLogoFile));
-    //
-    // Perform system diagnostic
-    //
-    Status = BaseMemoryTest (MemoryTestLevel);
-    if (EFI_ERROR (Status)) {
-      DisableQuietBoot ();
-    }
-
-    return ;
-  }
-  //
-  // Perform system diagnostic
-  //
-  Status = BaseMemoryTest (MemoryTestLevel);
-}
-
-
 /**
   Save the S3 boot script.
 
@@ -1344,9 +1288,9 @@ Routine Description:
   ASSERT (BootMode == BOOT_WITH_FULL_CONFIGURATION);
 
   //
-  // Memory test and Logo show
+  // Logo show
   //
-  PlatformBdsDiagnostics (IGNORE, TRUE, BaseMemoryTest);
+  EnableQuietBoot (PcdGetPtr (PcdLogoFile));
 
   //
   // Perform some platform specific connect sequence
