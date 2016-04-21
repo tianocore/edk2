@@ -2370,6 +2370,7 @@ PCI_CONFIG_SPACE  *mConfigSpace = NULL;
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-s", TypeValue},
   {L"-i", TypeFlag},
+  {L"-_e", TypeFlag},
   {NULL, TypeMax}
   };
 
