@@ -1,7 +1,7 @@
 /**@file
   Xen Platform PEI support
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2011, Andrei Warkentin <andreiw@motorola.com>
 
   This program and the accompanying materials
@@ -189,11 +189,7 @@ XenPublishRamRegions (
         continue;
       }
 
-      if (Entry->BaseAddr >= BASE_4GB) {
-        AddUntestedMemoryBaseSizeHob (Entry->BaseAddr, Entry->Length);
-      } else {
-        AddMemoryBaseSizeHob (Entry->BaseAddr, Entry->Length);
-      }
+      AddMemoryBaseSizeHob (Entry->BaseAddr, Entry->Length);
 
       MtrrSetMemoryAttribute (Entry->BaseAddr, Entry->Length, CacheWriteBack);
     }
