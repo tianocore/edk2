@@ -6,7 +6,7 @@
   all SMRAM range via SMM_ACCESS2_PROTOCOL, including the range for firmware (like SMM Core
   and SMM driver) and/or specific dedicated hardware.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,6 +28,11 @@
 #include <Library/SmmServicesTableLib.h>
 #include <Library/HobLib.h>
 #include <Protocol/SmmAccess2.h>
+#include <Protocol/SmmReadyToLock.h>
+#include <Protocol/SmmEndOfDxe.h>
+
+#define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
+  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
 
 EFI_SMRAM_DESCRIPTOR *mSmmMemLibInternalSmramRanges;
 UINTN                mSmmMemLibInternalSmramCount;
@@ -36,6 +41,15 @@ UINTN                mSmmMemLibInternalSmramCount;
 // Maximum support address used to check input buffer
 //
 EFI_PHYSICAL_ADDRESS  mSmmMemLibInternalMaximumSupportAddress = 0;
+
+UINTN                 mMemoryMapEntryCount;
+EFI_MEMORY_DESCRIPTOR *mMemoryMap;
+UINTN                 mDescriptorSize;
+
+VOID                  *mRegistrationEndOfDxe;
+VOID                  *mRegistrationReadyToLock;
+
+BOOLEAN               mSmmReadyToLock = FALSE;
 
 /**
   Calculate and save the maximum support address.
@@ -137,6 +151,34 @@ SmmIsBufferOutsideSmmValid (
     }
   }
 
+  //
+  // Check override for Valid Communication Region
+  //
+  if (mSmmReadyToLock) {
+    EFI_MEMORY_DESCRIPTOR          *MemoryMap;
+    BOOLEAN                        InValidCommunicationRegion;
+    
+    InValidCommunicationRegion = FALSE;
+    MemoryMap = mMemoryMap;
+    for (Index = 0; Index < mMemoryMapEntryCount; Index++) {
+      if ((Buffer >= MemoryMap->PhysicalStart) &&
+          (Buffer + Length <= MemoryMap->PhysicalStart + LShiftU64 (MemoryMap->NumberOfPages, EFI_PAGE_SHIFT))) {
+        InValidCommunicationRegion = TRUE;
+      }
+      MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mDescriptorSize);
+    }
+
+    if (!InValidCommunicationRegion) {
+      DEBUG ((
+        EFI_D_ERROR,
+        "SmmIsBufferOutsideSmmValid: Not in ValidCommunicationRegion: Buffer (0x%lx) - Length (0x%lx), ",
+        Buffer,
+        Length
+        ));
+      ASSERT (FALSE);
+      return FALSE;
+    }
+  }
   return TRUE;
 }
 
@@ -277,6 +319,128 @@ SmmSetMem (
 }
 
 /**
+  Notification for SMM EndOfDxe protocol.
+
+  @param[in] Protocol   Points to the protocol's unique identifier.
+  @param[in] Interface  Points to the interface instance.
+  @param[in] Handle     The handle on which the interface was installed.
+
+  @retval EFI_SUCCESS   Notification runs successfully.
+**/
+EFI_STATUS
+EFIAPI
+SmmLibInternalEndOfDxeNotify (
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 MapKey;
+  UINTN                 MemoryMapSize;
+  EFI_MEMORY_DESCRIPTOR *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR *MemoryMapStart;
+  EFI_MEMORY_DESCRIPTOR *SmmMemoryMapStart;
+  UINTN                 MemoryMapEntryCount;
+  UINTN                 DescriptorSize;
+  UINT32                DescriptorVersion;
+  UINTN                 Index;
+
+  MemoryMapSize = 0;
+  MemoryMap = NULL;
+  Status = gBS->GetMemoryMap (
+             &MemoryMapSize,
+             MemoryMap,
+             &MapKey,
+             &DescriptorSize,
+             &DescriptorVersion
+             );
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+
+  do {
+    Status = gBS->AllocatePool (EfiBootServicesData, MemoryMapSize, (VOID **)&MemoryMap);
+    ASSERT (MemoryMap != NULL);
+  
+    Status = gBS->GetMemoryMap (
+               &MemoryMapSize,
+               MemoryMap,
+               &MapKey,
+               &DescriptorSize,
+               &DescriptorVersion
+               );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePool (MemoryMap);
+    }
+  } while (Status == EFI_BUFFER_TOO_SMALL);
+
+  //
+  // Get Count
+  //
+  mDescriptorSize = DescriptorSize;
+  MemoryMapEntryCount = MemoryMapSize/DescriptorSize;
+  MemoryMapStart = MemoryMap;
+  mMemoryMapEntryCount = 0;
+  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
+    switch (MemoryMap->Type) {
+    case EfiReservedMemoryType:
+    case EfiRuntimeServicesCode:
+    case EfiRuntimeServicesData:
+    case EfiACPIMemoryNVS:
+      mMemoryMapEntryCount++;
+      break;
+    }
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
+  }
+  MemoryMap = MemoryMapStart;
+  
+  //
+  // Get Data
+  //
+  mMemoryMap = AllocatePool (mMemoryMapEntryCount*DescriptorSize);
+  ASSERT (mMemoryMap != NULL);
+  SmmMemoryMapStart = mMemoryMap;
+  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
+    switch (MemoryMap->Type) {
+    case EfiReservedMemoryType:
+    case EfiRuntimeServicesCode:
+    case EfiRuntimeServicesData:
+    case EfiACPIMemoryNVS:
+      CopyMem (mMemoryMap, MemoryMap, DescriptorSize);
+      mMemoryMap = NEXT_MEMORY_DESCRIPTOR(mMemoryMap, DescriptorSize);
+      break;
+    }
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
+  }
+  mMemoryMap = SmmMemoryMapStart;
+  MemoryMap = MemoryMapStart;
+  
+  gBS->FreePool (MemoryMap);
+
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Notification for SMM ReadyToLock protocol.
+
+  @param[in] Protocol   Points to the protocol's unique identifier.
+  @param[in] Interface  Points to the interface instance.
+  @param[in] Handle     The handle on which the interface was installed.
+
+  @retval EFI_SUCCESS   Notification runs successfully.
+**/
+EFI_STATUS
+EFIAPI
+SmmLibInternalReadyToLockNotify (
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
+  )
+{
+  mSmmReadyToLock = TRUE;
+  return EFI_SUCCESS;
+}
+/**
   The constructor function initializes the Smm Mem library
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
@@ -319,6 +483,18 @@ SmmMemLibConstructor (
   //
   SmmMemLibInternalCalculateMaximumSupportAddress ();
 
+  //
+  // Register EndOfDxe to get UEFI memory map
+  //
+  Status = gSmst->SmmRegisterProtocolNotify (&gEfiSmmEndOfDxeProtocolGuid, SmmLibInternalEndOfDxeNotify, &mRegistrationEndOfDxe);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register ready to lock so that we can know when to check valid SMRAM region
+  //
+  Status = gSmst->SmmRegisterProtocolNotify (&gEfiSmmReadyToLockProtocolGuid, SmmLibInternalReadyToLockNotify, &mRegistrationReadyToLock);
+  ASSERT_EFI_ERROR (Status);
+
   return EFI_SUCCESS;
 }
 
@@ -339,5 +515,7 @@ SmmMemLibDestructor (
 {
   FreePool (mSmmMemLibInternalSmramRanges);
 
+  gSmst->SmmRegisterProtocolNotify (&gEfiSmmEndOfDxeProtocolGuid, NULL, &mRegistrationEndOfDxe);
+  gSmst->SmmRegisterProtocolNotify (&gEfiSmmReadyToLockProtocolGuid, NULL, &mRegistrationReadyToLock);
   return EFI_SUCCESS;
 }
