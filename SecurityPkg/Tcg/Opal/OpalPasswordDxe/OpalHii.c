@@ -464,14 +464,16 @@ DriverCallback(
 
       case HII_KEY_ID_ENTER_PASSWORD:
         return HiiPasswordEntered(Value->string);
-
-      case HII_KEY_ID_BLOCKSID:
-        return HiiSetBlockSid(Value->b);
     }
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (HiiKeyId) {
       case HII_KEY_ID_ENTER_PSID:
         HiiPsidRevert();
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+        return EFI_SUCCESS;
+
+      case HII_KEY_ID_BLOCKSID:
+        HiiSetBlockSid(Value->b);
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
         return EFI_SUCCESS;
     }
@@ -561,7 +563,6 @@ HiiPopulateDiskInfoForm(
         gHiiConfiguration.SelectedDiskAvailableActions |= (AvailActions.UserPass == 1) ? HII_ACTION_SET_USER_PWD : HII_ACTION_NONE;
         gHiiConfiguration.SelectedDiskAvailableActions |= (AvailActions.SecureErase == 1) ? HII_ACTION_SECURE_ERASE : HII_ACTION_NONE;
         gHiiConfiguration.SelectedDiskAvailableActions |= (AvailActions.DisableUser == 1) ? HII_ACTION_DISABLE_USER : HII_ACTION_NONE;
-        gHiiConfiguration.SelectedDiskAvailableActions |= HII_ACTION_ENABLE_BLOCKSID;
 
         HiiSetFormString (STRING_TOKEN(STR_DISK_INFO_PSID_REVERT), "PSID Revert to factory default and Disable");
 
