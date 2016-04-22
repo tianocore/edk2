@@ -1,7 +1,7 @@
 /** @file
   Memory profile data structure.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -237,13 +237,15 @@ struct _EDKII_MEMORY_PROFILE_PROTOCOL {
 //
 // SMRAM profile command
 //
-#define SMRAM_PROFILE_COMMAND_GET_PROFILE_INFO         0x1
-#define SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA         0x2
+#define SMRAM_PROFILE_COMMAND_GET_PROFILE_INFO           0x1
+#define SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA           0x2
 //
 // Below 2 commands are now used by ECP only and only valid before SmmReadyToLock
 //
-#define SMRAM_PROFILE_COMMAND_REGISTER_IMAGE           0x3
-#define SMRAM_PROFILE_COMMAND_UNREGISTER_IMAGE         0x4
+#define SMRAM_PROFILE_COMMAND_REGISTER_IMAGE             0x3
+#define SMRAM_PROFILE_COMMAND_UNREGISTER_IMAGE           0x4
+
+#define SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA_BY_OFFSET 0x5
 
 typedef struct {
   UINT32                            Command;
@@ -261,6 +263,21 @@ typedef struct {
   UINT64                            ProfileSize;
   PHYSICAL_ADDRESS                  ProfileBuffer;
 } SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA;
+
+typedef struct {
+  SMRAM_PROFILE_PARAMETER_HEADER    Header;
+  //
+  // On input, profile buffer size.
+  // On output, actual profile data size copied.
+  //
+  UINT64                            ProfileSize;
+  PHYSICAL_ADDRESS                  ProfileBuffer;
+  //
+  // On input, profile buffer offset to copy.
+  // On output, next time profile buffer offset to copy.
+  //
+  UINT64                            ProfileOffset;
+} SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET;
 
 typedef struct {
   SMRAM_PROFILE_PARAMETER_HEADER    Header;
