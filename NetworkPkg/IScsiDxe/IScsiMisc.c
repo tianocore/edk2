@@ -859,7 +859,7 @@ IScsiCreateDriverData (
 
   @param[in]              Private The iSCSI driver data.
 
-  @retval EFI_SUCCES      The clean operation is successful.
+  @retval EFI_SUCCESS     The clean operation is successful.
   @retval Others          Other errors as indicated.
 
 **/
@@ -869,6 +869,8 @@ IScsiCleanDriverData (
   )
 {
   EFI_STATUS            Status;
+
+  Status = EFI_SUCCESS;
 
   if (Private->DevicePath != NULL) {
     Status = gBS->UninstallProtocolInterface (
