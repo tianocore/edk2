@@ -1,8 +1,9 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  (C) Copyright 2013-2016 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2013-2016 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -151,6 +152,7 @@
 #include <Library/HiiLib.h>
 #include <Library/ShellLib.h>
 #include <Library/SortLib.h>
+#include <Library/ShellCommandLib.h>
 
 #define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V1   1
 #define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V2   2
