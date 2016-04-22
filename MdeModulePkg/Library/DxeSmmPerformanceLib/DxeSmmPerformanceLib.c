@@ -32,12 +32,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/SmmCommunication.h>
 
+#include <Guid/PiSmmCommunicationRegionTable.h>
+#include <Library/UefiLib.h>
+
 #define SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE (OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)  + sizeof (SMM_PERF_COMMUNICATE))
 //
 // The cached performance protocol interface.
 //
 EFI_SMM_COMMUNICATION_PROTOCOL  *mSmmCommunication = NULL;
-UINT8                           mSmmPerformanceBuffer[SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE];
+UINT8                           *mSmmPerformanceBuffer;
 GAUGE_DATA_ENTRY                *mGaugeData = NULL;
 UINTN                           mGaugeNumberOfEntries = 0;
 GAUGE_DATA_ENTRY_EX             *mGaugeDataEx = NULL;
@@ -226,11 +229,18 @@ GAUGE_DATA_ENTRY *
 EFIAPI
 GetAllSmmGaugeData (VOID)
 {
-  EFI_STATUS                  Status;
-  EFI_SMM_COMMUNICATE_HEADER  *SmmCommBufferHeader;
-  SMM_PERF_COMMUNICATE        *SmmPerfCommData;
-  UINTN                       CommSize;
-  UINTN                       DataSize;
+  EFI_STATUS                                Status;
+  EFI_SMM_COMMUNICATE_HEADER                *SmmCommBufferHeader;
+  SMM_PERF_COMMUNICATE                      *SmmPerfCommData;
+  UINTN                                     CommSize;
+  UINTN                                     DataSize;
+  EDKII_PI_SMM_COMMUNICATION_REGION_TABLE   *PiSmmCommunicationRegionTable;
+  UINT32                                    Index;
+  EFI_MEMORY_DESCRIPTOR                     *Entry;
+  UINT8                                     *Buffer;
+  UINTN                                     Size;
+  UINTN                                     NumberOfEntries;
+  UINTN                                     EntriesGot;
 
   if (mGaugeData != NULL) {
     return mGaugeData;
@@ -240,6 +250,28 @@ GetAllSmmGaugeData (VOID)
   if (EFI_ERROR (Status)) {
     return NULL;
   }
+
+  Status = EfiGetSystemConfigurationTable (
+             &gEdkiiPiSmmCommunicationRegionTableGuid,
+             (VOID **) &PiSmmCommunicationRegionTable
+             );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  ASSERT (PiSmmCommunicationRegionTable != NULL);
+  Entry = (EFI_MEMORY_DESCRIPTOR *) (PiSmmCommunicationRegionTable + 1);
+  Size = 0;
+  for (Index = 0; Index < PiSmmCommunicationRegionTable->NumberOfEntries; Index++) {
+    if (Entry->Type == EfiConventionalMemory) {
+      Size = EFI_PAGES_TO_SIZE ((UINTN) Entry->NumberOfPages);
+      if (Size >= (SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE + sizeof (GAUGE_DATA_ENTRY))) {
+        break;
+      }
+    }
+    Entry = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) Entry + PiSmmCommunicationRegionTable->DescriptorSize);
+  }
+  ASSERT (Index < PiSmmCommunicationRegionTable->NumberOfEntries);
+  mSmmPerformanceBuffer = (UINT8 *) (UINTN) Entry->PhysicalStart;
 
   //
   // Initialize communicate buffer 
@@ -262,24 +294,37 @@ GetAllSmmGaugeData (VOID)
   }
 
   mGaugeNumberOfEntries = SmmPerfCommData->NumberOfEntries;
-  
+
+  Buffer = mSmmPerformanceBuffer + SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE;
+  NumberOfEntries = (Size - SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE) / sizeof (GAUGE_DATA_ENTRY);
   DataSize = mGaugeNumberOfEntries * sizeof(GAUGE_DATA_ENTRY);
   mGaugeData = AllocateZeroPool(DataSize);
   ASSERT (mGaugeData != NULL);
-  
+
   //
   // Get all SMM gauge data
   //  
   SmmPerfCommData->Function = SMM_PERF_FUNCTION_GET_GAUGE_DATA;
-  SmmPerfCommData->LogEntryKey = 0;
-  SmmPerfCommData->NumberOfEntries = mGaugeNumberOfEntries;
-  SmmPerfCommData->GaugeData = mGaugeData;
-  Status = mSmmCommunication->Communicate (mSmmCommunication, mSmmPerformanceBuffer, &CommSize);
-  if (EFI_ERROR (Status) || EFI_ERROR (SmmPerfCommData->ReturnStatus)) {
-    FreePool (mGaugeData);
-    mGaugeData = NULL;
-    mGaugeNumberOfEntries = 0;
-  }
+  SmmPerfCommData->GaugeData = (GAUGE_DATA_ENTRY *) Buffer;
+  EntriesGot = 0;
+  do {
+    SmmPerfCommData->LogEntryKey = EntriesGot;
+    if ((mGaugeNumberOfEntries - EntriesGot) >= NumberOfEntries) {
+      SmmPerfCommData->NumberOfEntries = NumberOfEntries;
+    } else {
+      SmmPerfCommData->NumberOfEntries = mGaugeNumberOfEntries - EntriesGot;
+    }
+    Status = mSmmCommunication->Communicate (mSmmCommunication, mSmmPerformanceBuffer, &CommSize);
+    if (EFI_ERROR (Status) || EFI_ERROR (SmmPerfCommData->ReturnStatus)) {
+      FreePool (mGaugeData);
+      mGaugeData = NULL;
+      mGaugeNumberOfEntries = 0;
+      return NULL;
+    } else {
+      CopyMem (&mGaugeData[EntriesGot], Buffer, SmmPerfCommData->NumberOfEntries * sizeof (GAUGE_DATA_ENTRY));
+    }
+    EntriesGot += SmmPerfCommData->NumberOfEntries;
+  } while (EntriesGot < mGaugeNumberOfEntries);
 
   return mGaugeData;
 }
@@ -296,11 +341,18 @@ GAUGE_DATA_ENTRY_EX *
 EFIAPI
 GetAllSmmGaugeDataEx (VOID)
 {
-  EFI_STATUS                  Status;
-  EFI_SMM_COMMUNICATE_HEADER  *SmmCommBufferHeader;
-  SMM_PERF_COMMUNICATE_EX     *SmmPerfCommData;
-  UINTN                       CommSize;
-  UINTN                       DataSize;
+  EFI_STATUS                                Status;
+  EFI_SMM_COMMUNICATE_HEADER                *SmmCommBufferHeader;
+  SMM_PERF_COMMUNICATE_EX                   *SmmPerfCommData;
+  UINTN                                     CommSize;
+  UINTN                                     DataSize;
+  EDKII_PI_SMM_COMMUNICATION_REGION_TABLE   *PiSmmCommunicationRegionTable;
+  UINT32                                    Index;
+  EFI_MEMORY_DESCRIPTOR                     *Entry;
+  UINT8                                     *Buffer;
+  UINTN                                     Size;
+  UINTN                                     NumberOfEntries;
+  UINTN                                     EntriesGot;
 
   if (mGaugeDataEx != NULL) {
     return mGaugeDataEx;
@@ -311,6 +363,27 @@ GetAllSmmGaugeDataEx (VOID)
     return NULL;
   }
 
+  Status = EfiGetSystemConfigurationTable (
+             &gEdkiiPiSmmCommunicationRegionTableGuid,
+             (VOID **) &PiSmmCommunicationRegionTable
+             );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  ASSERT (PiSmmCommunicationRegionTable != NULL);
+  Entry = (EFI_MEMORY_DESCRIPTOR *) (PiSmmCommunicationRegionTable + 1);
+  Size = 0;
+  for (Index = 0; Index < PiSmmCommunicationRegionTable->NumberOfEntries; Index++) {
+    if (Entry->Type == EfiConventionalMemory) {
+      Size = EFI_PAGES_TO_SIZE ((UINTN) Entry->NumberOfPages);
+      if (Size >= (SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE + sizeof (GAUGE_DATA_ENTRY_EX))) {
+        break;
+      }
+    }
+    Entry = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) Entry + PiSmmCommunicationRegionTable->DescriptorSize);
+  }
+  ASSERT (Index < PiSmmCommunicationRegionTable->NumberOfEntries);
+  mSmmPerformanceBuffer = (UINT8 *) (UINTN) Entry->PhysicalStart;
   //
   // Initialize communicate buffer 
   //
@@ -332,25 +405,38 @@ GetAllSmmGaugeDataEx (VOID)
   }
 
   mGaugeNumberOfEntriesEx = SmmPerfCommData->NumberOfEntries;
-  
+
+  Buffer = mSmmPerformanceBuffer + SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE;
+  NumberOfEntries = (Size - SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE) / sizeof (GAUGE_DATA_ENTRY_EX);
   DataSize = mGaugeNumberOfEntriesEx * sizeof(GAUGE_DATA_ENTRY_EX);
   mGaugeDataEx = AllocateZeroPool(DataSize);
   ASSERT (mGaugeDataEx != NULL);
-  
+
   //
   // Get all SMM gauge data
   //  
   SmmPerfCommData->Function = SMM_PERF_FUNCTION_GET_GAUGE_DATA;
-  SmmPerfCommData->LogEntryKey = 0;
-  SmmPerfCommData->NumberOfEntries = mGaugeNumberOfEntriesEx;
-  SmmPerfCommData->GaugeDataEx = mGaugeDataEx;
-  Status = mSmmCommunication->Communicate (mSmmCommunication, mSmmPerformanceBuffer, &CommSize);
-  if (EFI_ERROR (Status) || EFI_ERROR (SmmPerfCommData->ReturnStatus)) {
-    FreePool (mGaugeDataEx);
-    mGaugeDataEx = NULL;
-    mGaugeNumberOfEntriesEx = 0;
-  }
- 
+  SmmPerfCommData->GaugeDataEx = (GAUGE_DATA_ENTRY_EX *) Buffer;
+  EntriesGot = 0;
+  do {
+    SmmPerfCommData->LogEntryKey = EntriesGot;
+    if ((mGaugeNumberOfEntriesEx - EntriesGot) >= NumberOfEntries) {
+      SmmPerfCommData->NumberOfEntries = NumberOfEntries;
+    } else {
+      SmmPerfCommData->NumberOfEntries = mGaugeNumberOfEntriesEx - EntriesGot;
+    }
+    Status = mSmmCommunication->Communicate (mSmmCommunication, mSmmPerformanceBuffer, &CommSize);
+    if (EFI_ERROR (Status) || EFI_ERROR (SmmPerfCommData->ReturnStatus)) {
+      FreePool (mGaugeDataEx);
+      mGaugeDataEx = NULL;
+      mGaugeNumberOfEntriesEx = 0;
+      return NULL;
+    } else {
+      CopyMem (&mGaugeDataEx[EntriesGot], Buffer, SmmPerfCommData->NumberOfEntries * sizeof (GAUGE_DATA_ENTRY_EX));
+    }
+    EntriesGot += SmmPerfCommData->NumberOfEntries;
+  } while (EntriesGot < mGaugeNumberOfEntriesEx);
+
   return mGaugeDataEx;
 }
 
