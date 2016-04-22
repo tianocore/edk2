@@ -11,7 +11,7 @@
 
   FpdtSmiHandler() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -210,6 +210,7 @@ FpdtSmiHandler (
 {
   EFI_STATUS                   Status;
   SMM_BOOT_RECORD_COMMUNICATE  *SmmCommData;
+  UINTN                        BootRecordOffset;
   UINTN                        BootRecordSize;
   VOID                         *BootRecordData;
   UINTN                        TempCommBufferSize;
@@ -238,36 +239,44 @@ FpdtSmiHandler (
 
   switch (SmmCommData->Function) {
     case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE :
-       SmmCommData->BootRecordSize = mBootRecordSize;
-       break;
+      SmmCommData->BootRecordSize = mBootRecordSize;
+      break;
 
     case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA :
-       BootRecordData = SmmCommData->BootRecordData;
-       BootRecordSize = SmmCommData->BootRecordSize;
-       if (BootRecordData == NULL || BootRecordSize < mBootRecordSize) {
-         Status = EFI_INVALID_PARAMETER;
-         break;
-       } 
+      Status = EFI_UNSUPPORTED;
+      break;
 
-       //
-       // Sanity check
-       //
-       SmmCommData->BootRecordSize = mBootRecordSize;
-       if (!SmmIsBufferOutsideSmmValid ((UINTN)BootRecordData, mBootRecordSize)) {
-         DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM Data buffer in SMRAM or overflow!\n"));
-         Status = EFI_ACCESS_DENIED;
-         break;
-       }
-
-       CopyMem (
-         (UINT8*)BootRecordData, 
-         mBootRecordBuffer, 
-         mBootRecordSize
-         );
-       break;
+    case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET :
+      BootRecordOffset = SmmCommData->BootRecordOffset;
+      BootRecordData   = SmmCommData->BootRecordData;
+      BootRecordSize   = SmmCommData->BootRecordSize;
+      if (BootRecordData == NULL || BootRecordOffset >= mBootRecordSize) {
+        Status = EFI_INVALID_PARAMETER;
+        break;
+      }
+      
+      //
+      // Sanity check
+      //
+      if (BootRecordSize > mBootRecordSize - BootRecordOffset) {
+        BootRecordSize = mBootRecordSize - BootRecordOffset;
+      }
+      SmmCommData->BootRecordSize = BootRecordSize;
+      if (!SmmIsBufferOutsideSmmValid ((UINTN)BootRecordData, BootRecordSize)) {
+        DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM Data buffer in SMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        break;
+      }
+      
+      CopyMem (
+       (UINT8*)BootRecordData, 
+       mBootRecordBuffer + BootRecordOffset, 
+       BootRecordSize
+       );
+      break;
 
     default:
-       Status = EFI_UNSUPPORTED;
+      Status = EFI_UNSUPPORTED;
   }
 
   SmmCommData->ReturnStatus = Status;
