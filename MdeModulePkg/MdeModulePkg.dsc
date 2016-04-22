@@ -422,6 +422,7 @@
   MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceSmm.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmmDxe.inf
+  MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
 
 [Components.X64]
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
