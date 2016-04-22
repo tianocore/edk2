@@ -2,6 +2,7 @@
   Provides interface to shell internal functions for shell commands.
 
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,6 +44,7 @@
 #include <Library/ShellLib.h>
 #include <Library/HiiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 
 typedef struct{
   LIST_ENTRY                  Link;

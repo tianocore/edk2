@@ -4,8 +4,9 @@
   This library is for use ONLY by shell commands linked into the shell application.
   This library will not funciton if it is used for UEFI Shell 2.0 Applications.
 
-  (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -701,4 +702,21 @@ DumpHex (
   IN VOID         *UserData
   );
 
+/**
+  Dump HEX data into buffer.
+   
+  @param[in] Buffer     HEX data to be dumped in Buffer.
+  @param[in] Indent     How many spaces to indent the output.
+  @param[in] Offset     The offset of the printing.
+  @param[in] DataSize   The size in bytes of UserData.
+  @param[in] UserData   The data to print out.
+**/
+CHAR16*
+CatSDumpHex (
+  IN CHAR16  *Buffer,
+  IN UINTN   Indent,
+  IN UINTN   Offset,
+  IN UINTN   DataSize,
+  IN VOID    *UserData
+  );
 #endif //_SHELL_COMMAND_LIB_

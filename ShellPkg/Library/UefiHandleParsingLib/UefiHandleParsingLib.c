@@ -244,11 +244,15 @@ GraphicsOutputProtocolDumpInformation(
   IN CONST BOOLEAN    Verbose
   )
 {
-  EFI_GRAPHICS_OUTPUT_PROTOCOL      *GraphicsOutput;
-  EFI_STATUS                        Status;
-  CHAR16                            *RetVal;
-  CHAR16                            *Temp;
-  CHAR16                            *Fmt;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
+  EFI_STATUS                            Status;
+  CHAR16                                *RetVal;
+  CHAR16                                *Temp;
+  CHAR16                                *Fmt;
+  CHAR16                                *TempRetVal;
+  UINTN                                 GopInfoSize;
+  UINT32                                Mode;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GopInfo;
 
   if (!Verbose) {
     return (CatSPrint(NULL, L"GraphicsOutput"));
@@ -295,9 +299,172 @@ GraphicsOutputProtocolDumpInformation(
              GraphicsOutput->Mode->Info->PixelFormat!=PixelBitMask?0:GraphicsOutput->Mode->Info->PixelInformation.BlueMask
              );
 
+  SHELL_FREE_NON_NULL (Temp);
+  
+  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_GOP_RES_LIST_MAIN), NULL);
+
+  TempRetVal = CatSPrint (RetVal, Temp);
+  SHELL_FREE_NON_NULL (RetVal);
+  RetVal = TempRetVal;
+  SHELL_FREE_NON_NULL (Temp);
+
+  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_GOP_RES_LIST_ENTRY), NULL);
+
+  for (Mode = 0; Mode < GraphicsOutput->Mode->MaxMode; Mode++) {
+    Status = GraphicsOutput->QueryMode (
+                               GraphicsOutput,
+                               Mode,
+                               &GopInfoSize,
+                               &GopInfo
+                               );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    TempRetVal = CatSPrint (
+                   RetVal,
+                   Temp,
+                   Mode,
+                   GopInfo->HorizontalResolution,
+                   GopInfo->VerticalResolution
+                   );
+
+    SHELL_FREE_NON_NULL (GopInfo);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+  }
+
   SHELL_FREE_NON_NULL(Temp);
   SHELL_FREE_NON_NULL(Fmt);
 
+  return RetVal;
+}
+
+/**
+  Function to dump information about EDID Discovered Protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has LoadedImage installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+EdidDiscoveredProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_EDID_DISCOVERED_PROTOCOL          *EdidDiscovered;
+  EFI_STATUS                            Status;
+  CHAR16                                *RetVal;
+  CHAR16                                *Temp;
+  CHAR16                                *TempRetVal;
+
+  if (!Verbose) {
+    return (CatSPrint(NULL, L"EDIDDiscovered"));
+  }
+
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiEdidDiscoveredProtocolGuid,
+                  (VOID**)&EdidDiscovered,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_DISCOVERED_MAIN), NULL);
+  if (Temp == NULL) {
+    return NULL;
+  }
+
+  RetVal = CatSPrint (NULL, Temp, EdidDiscovered->SizeOfEdid);
+  SHELL_FREE_NON_NULL (Temp);
+
+  if(EdidDiscovered->SizeOfEdid != 0) {
+    Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_DISCOVERED_DATA), NULL);
+    if (Temp == NULL) {
+      SHELL_FREE_NON_NULL (RetVal);
+      return NULL;
+    }
+    TempRetVal = CatSPrint (RetVal, Temp);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+
+    TempRetVal = CatSDumpHex (RetVal, 7, 0, EdidDiscovered->SizeOfEdid, EdidDiscovered->Edid);
+    RetVal = TempRetVal;
+  }
+  return RetVal;
+}
+
+/**
+  Function to dump information about EDID Active Protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has LoadedImage installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+EdidActiveProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_EDID_ACTIVE_PROTOCOL  *EdidActive;
+  EFI_STATUS                Status;
+  CHAR16                    *RetVal;
+  CHAR16                    *Temp;
+  CHAR16                    *TempRetVal;
+
+  if (!Verbose) {
+    return (CatSPrint(NULL, L"EDIDActive"));
+  }
+
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiEdidActiveProtocolGuid,
+                  (VOID**)&EdidActive,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_ACTIVE_MAIN), NULL);
+  if (Temp == NULL) {
+    return NULL;
+  }
+
+  RetVal = CatSPrint (NULL, Temp, EdidActive->SizeOfEdid);
+  SHELL_FREE_NON_NULL (Temp);
+
+  if(EdidActive->SizeOfEdid != 0) {
+    Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_ACTIVE_DATA), NULL);
+    if (Temp == NULL) {
+      SHELL_FREE_NON_NULL (RetVal);
+      return NULL;
+    }
+    TempRetVal = CatSPrint (RetVal, Temp);
+    SHELL_FREE_NON_NULL (RetVal);
+    RetVal = TempRetVal;
+
+    TempRetVal = CatSDumpHex (RetVal, 7, 0, EdidActive->SizeOfEdid, EdidActive->Edid);
+    RetVal = TempRetVal;
+  }
   return RetVal;
 }
 
@@ -1294,8 +1461,8 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_ABS_POINTER),           &gEfiAbsolutePointerProtocolGuid,                 NULL},
   {STRING_TOKEN(STR_SERIAL_IO),             &gEfiSerialIoProtocolGuid,                        NULL},
   {STRING_TOKEN(STR_GRAPHICS_OUTPUT),       &gEfiGraphicsOutputProtocolGuid,                  GraphicsOutputProtocolDumpInformation},
-  {STRING_TOKEN(STR_EDID_DISCOVERED),       &gEfiEdidDiscoveredProtocolGuid,                  NULL},
-  {STRING_TOKEN(STR_EDID_ACTIVE),           &gEfiEdidActiveProtocolGuid,                      NULL},
+  {STRING_TOKEN(STR_EDID_DISCOVERED),       &gEfiEdidDiscoveredProtocolGuid,                  EdidDiscoveredProtocolDumpInformation},
+  {STRING_TOKEN(STR_EDID_ACTIVE),           &gEfiEdidActiveProtocolGuid,                      EdidActiveProtocolDumpInformation},
   {STRING_TOKEN(STR_EDID_OVERRIDE),         &gEfiEdidOverrideProtocolGuid,                    NULL},
   {STRING_TOKEN(STR_CON_IN),                &gEfiConsoleInDeviceGuid,                         NULL},
   {STRING_TOKEN(STR_CON_OUT),               &gEfiConsoleOutDeviceGuid,                        NULL},
