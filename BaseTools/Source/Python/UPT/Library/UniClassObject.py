@@ -1,7 +1,7 @@
 ## @file
 # Collect all defined strings in multiple uni files.
 #
-# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -328,6 +328,8 @@ class UniFileClassObject(object):
         Lang = distutils.util.split_quoted((Line.split(u"//")[0]))
         if len(Lang) != 3:
             try:
+                FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').read()
+            except UnicodeError, Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').read()
             except UnicodeError, Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').read()
@@ -430,11 +432,13 @@ class UniFileClassObject(object):
         #
         # Check file header of the Uni file
         #
-        if not CheckUTF16FileHeader(File.Path):
-            EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
-                            ExtraData='The file %s is either invalid UTF-16LE or it is missing the BOM.' % File.Path)
+#         if not CheckUTF16FileHeader(File.Path):
+#             EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+#                             ExtraData='The file %s is either invalid UTF-16LE or it is missing the BOM.' % File.Path)
 
         try:
+            FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').read()
+        except UnicodeError, Xstr:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
@@ -1046,6 +1050,8 @@ class UniFileClassObject(object):
                              ToolError.FILE_NOT_FOUND,
                              ExtraData=FilaPath)
         try:
+            FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_8').read()
+        except UnicodeError, Xstr:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16_le').readlines()
