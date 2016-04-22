@@ -505,7 +505,7 @@ CoreFreePool (
 
   Status = CoreInternalFreePool (Buffer, &PoolType);
   if (!EFI_ERROR (Status)) {
-    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePool, (EFI_MEMORY_TYPE) 0, 0, Buffer);
+    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePool, PoolType, 0, Buffer);
     InstallMemoryAttributesTableOnMemoryAllocation (PoolType);
   }
   return Status;

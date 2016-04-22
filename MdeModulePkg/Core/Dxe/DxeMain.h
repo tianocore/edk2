@@ -2821,7 +2821,7 @@ BOOLEAN
 CoreUpdateProfile (
   IN EFI_PHYSICAL_ADDRESS   CallerAddress,
   IN MEMORY_PROFILE_ACTION  Action,
-  IN EFI_MEMORY_TYPE        MemoryType, // Valid for AllocatePages/AllocatePool
+  IN EFI_MEMORY_TYPE        MemoryType,
   IN UINTN                  Size,       // Valid for AllocatePages/FreePages/AllocatePool
   IN VOID                   *Buffer
   );

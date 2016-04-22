@@ -1105,7 +1105,7 @@ BOOLEAN
 CoreUpdateProfile (
   IN PHYSICAL_ADDRESS       CallerAddress,
   IN MEMORY_PROFILE_ACTION  Action,
-  IN EFI_MEMORY_TYPE        MemoryType, // Valid for AllocatePages/AllocatePool
+  IN EFI_MEMORY_TYPE        MemoryType,
   IN UINTN                  Size,       // Valid for AllocatePages/FreePages/AllocatePool
   IN VOID                   *Buffer
   )
@@ -1121,15 +1121,10 @@ CoreUpdateProfile (
   }
 
   //
-  // Free operations have no memory type information, so skip the check.
+  // Only record limited MemoryType.
   //
-  if ((Action == MemoryProfileActionAllocatePages) || (Action == MemoryProfileActionAllocatePool)) {
-    //
-    // Only record limited MemoryType.
-    //
-    if (!CoreNeedRecordProfile (MemoryType)) {
-      return FALSE;
-    }
+  if (!CoreNeedRecordProfile (MemoryType)) {
+    return FALSE;
   }
 
   ContextData = GetMemoryProfileContext ();
