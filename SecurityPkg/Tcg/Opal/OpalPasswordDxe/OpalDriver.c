@@ -388,13 +388,10 @@ ReadyToBootCallback (
 {
   EFI_STATUS          Status;
   OPAL_DRIVER_DEVICE* Itr;
-  UINT8               Count;
   TCG_RESULT          Result;
   OPAL_EXTRA_INFO_VAR OpalExtraInfo;
   UINTN               DataSize;
   OPAL_SESSION        Session;
-
-  Count = 0;
 
   gBS->CloseEvent (Event);
 
@@ -415,21 +412,21 @@ ReadyToBootCallback (
     // Send BlockSID command to each Opal disk
     //
     Itr = mOpalDriver.DeviceList;
-    Count = 0;
     while (Itr != NULL) {
-      ZeroMem(&Session, sizeof(Session));
-      Session.Sscp = Itr->OpalDisk.Sscp;
-      Session.MediaId = Itr->OpalDisk.MediaId;
-      Session.OpalBaseComId = Itr->OpalDisk.OpalBaseComId;
+      if (Itr->OpalDisk.SupportedAttributes.BlockSid) {
+        ZeroMem(&Session, sizeof(Session));
+        Session.Sscp = Itr->OpalDisk.Sscp;
+        Session.MediaId = Itr->OpalDisk.MediaId;
+        Session.OpalBaseComId = Itr->OpalDisk.OpalBaseComId;
 
-      Result = OpalBlockSid (&Session, TRUE);  // HardwareReset must always be TRUE
-      if (Result != TcgResultSuccess) {
-        DEBUG ((DEBUG_ERROR, "OpalBlockSid fail\n"));
-        break;
+        Result = OpalBlockSid (&Session, TRUE);  // HardwareReset must always be TRUE
+        if (Result != TcgResultSuccess) {
+          DEBUG ((DEBUG_ERROR, "OpalBlockSid fail\n"));
+          break;
+        }
       }
 
       Itr = Itr->Next;
-      Count++;
     }
   }
 }
