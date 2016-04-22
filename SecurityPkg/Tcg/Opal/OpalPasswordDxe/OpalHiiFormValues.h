@@ -55,7 +55,6 @@ typedef struct {
 #define HII_ACTION_REVERT                                      0x0080
 #define HII_ACTION_DISABLE_FEATURE                             0x0100
 #define HII_ACTION_ENABLE_FEATURE                              0x0200
-#define HII_ACTION_ENABLE_BLOCKSID                             0x0400
 
 /* Flags for diskActionAvailableFields */
 #define HII_FIELD_PASSWORD                      0x0001
