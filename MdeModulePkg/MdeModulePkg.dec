@@ -3,7 +3,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -280,6 +280,9 @@
   #  Include/Guid/LzmaDecompress.h
   gLzmaCustomDecompressGuid      = { 0xEE4E5898, 0x3914, 0x4259, { 0x9D, 0x6E, 0xDC, 0x7B, 0xD7, 0x94, 0x03, 0xCF }}
   gLzmaF86CustomDecompressGuid     = { 0xD42AE6BD, 0x1352, 0x4bfb, { 0x90, 0x9A, 0xCA, 0x72, 0xA6, 0xEA, 0xE8, 0x89 }}
+
+  ## Include/Guid/PiSmmCommunicationRegionTable.h
+  gEdkiiPiSmmCommunicationRegionTableGuid = { 0x4e28ca50, 0xd582, 0x44ac, {0xa1, 0x1f, 0xe3, 0xd5, 0x65, 0x26, 0xdb, 0x34}}
 
 [Ppis]
   ## Include/Ppi/AtaController.h
