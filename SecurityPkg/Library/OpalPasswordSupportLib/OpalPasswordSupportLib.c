@@ -401,8 +401,36 @@ OpalInitCommunicateBuffer (
   EFI_SMM_COMMUNICATE_HEADER                *SmmCommunicateHeader;
   OPAL_SMM_COMMUNICATE_HEADER               *SmmFunctionHeader;
   VOID                                      *Buffer;
+  EDKII_PI_SMM_COMMUNICATION_REGION_TABLE   *SmmCommRegionTable;
+  EFI_MEMORY_DESCRIPTOR                     *SmmCommMemRegion;
+  UINTN                                     Index;
+  UINTN                                     Size;
+  EFI_STATUS                                Status;
 
-  Buffer = AllocateZeroPool (DataSize + OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + OFFSET_OF (OPAL_SMM_COMMUNICATE_HEADER, Data));
+  Buffer = NULL;
+  Status = EfiGetSystemConfigurationTable (
+             &gEdkiiPiSmmCommunicationRegionTableGuid,
+             (VOID **) &SmmCommRegionTable
+             );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  ASSERT (SmmCommRegionTable != NULL);
+  SmmCommMemRegion = (EFI_MEMORY_DESCRIPTOR *) (SmmCommRegionTable + 1);
+  Size = 0;
+  for (Index = 0; Index < SmmCommRegionTable->NumberOfEntries; Index++) {
+    if (SmmCommMemRegion->Type == EfiConventionalMemory) {
+      Size = EFI_PAGES_TO_SIZE ((UINTN) SmmCommMemRegion->NumberOfPages);
+      if (Size >= (DataSize + OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + OFFSET_OF (OPAL_SMM_COMMUNICATE_HEADER, Data))) {
+        break;
+      }
+    }
+    SmmCommMemRegion = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) SmmCommMemRegion + SmmCommRegionTable->DescriptorSize);
+  }
+  ASSERT (Index < SmmCommRegionTable->NumberOfEntries);
+
+  Buffer = (VOID*)(UINTN)SmmCommMemRegion->PhysicalStart;
   ASSERT (Buffer != NULL);
 
   SmmCommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *) Buffer;
@@ -513,8 +541,6 @@ OpalSupportSendPasword(
 
 EXIT:
   ZeroMem(Parameter, Length);
-  FreePool(Buffer);
-
   return Status;
 }
 
