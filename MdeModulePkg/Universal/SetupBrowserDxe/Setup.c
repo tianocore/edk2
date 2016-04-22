@@ -2848,6 +2848,108 @@ FindQuestionFromProgress (
 }
 
 /**
+  Base on the return Progress string to get the SyncConfigRequest and RestoreConfigRequest
+  for form and formset.
+
+  @param  Storage                 Storage which has this Progress string.
+  @param  ConfigRequest           The ConfigRequest string.
+  @param  Progress                The Progress string which has the first fail string.
+  @param  RestoreConfigRequest    Return the RestoreConfigRequest string.
+  @param  SyncConfigRequest       Return the SyncConfigRequest string.
+
+**/
+VOID
+GetSyncRestoreConfigRequest(
+  IN  BROWSER_STORAGE   *Storage,
+  IN  EFI_STRING        ConfigRequest,
+  IN  EFI_STRING        Progress,
+  OUT EFI_STRING        *RestoreConfigRequest,
+  OUT EFI_STRING        *SyncConfigRequest
+  )
+{
+  EFI_STRING    EndStr;
+  EFI_STRING    ConfigHdrEndStr;
+  EFI_STRING    ElementStr;
+  UINTN         TotalSize;
+  UINTN         RestoreEleSize;
+  UINTN         SyncSize;
+
+  ASSERT ((*Progress == L'&') || (*Progress == L'G'));
+  //
+  // If the Progress starts with ConfigHdr, means the failure is in the first name / value pair.
+  // Need to restore all the fields in the ConfigRequest.
+  //
+  if (*Progress == L'G') {
+    *RestoreConfigRequest = AllocateCopyPool (StrSize (ConfigRequest), ConfigRequest);
+    ASSERT (*RestoreConfigRequest != NULL);
+    return;
+  }
+
+  //
+  // Find the first fail "NAME" or "OFFSET=0x####&WIDTH=0x####" string.
+  //
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    //
+    // For Name/Value type, the data is "&Fred=16&George=16&Ron=12" formset,
+    // here, just keep the "Fred" string.
+    //
+    EndStr = StrStr (Progress, L"=");
+    ASSERT (EndStr != NULL);
+    *EndStr = L'\0';
+    //
+    // Find the ConfigHdr in ConfigRequest.
+    //
+    ConfigHdrEndStr = StrStr (ConfigRequest, L"PATH=");
+    ASSERT (ConfigHdrEndStr != NULL);
+    while (*ConfigHdrEndStr != L'&') {
+      ConfigHdrEndStr++;
+    }
+  } else {
+    //
+    // For Buffer type, the data is "OFFSET=0x####&WIDTH=0x####&VALUE=0x####",
+    // here, just keep the "OFFSET=0x####&WIDTH=0x####" string.
+    //
+    EndStr = StrStr (Progress, L"&VALUE=");
+    ASSERT (EndStr != NULL);
+    *EndStr = L'\0';
+    //
+    // Find the ConfigHdr in ConfigRequest.
+    //
+    ConfigHdrEndStr = StrStr (ConfigRequest, L"&OFFSET=");
+  }
+  //
+  // Find the first fail pair in the ConfigRequest.
+  //
+  ElementStr = StrStr (ConfigRequest, Progress);
+  ASSERT (ElementStr != NULL);
+  //
+  // To get the RestoreConfigRequest.
+  //
+  RestoreEleSize = StrSize (ElementStr);
+  TotalSize = (ConfigHdrEndStr - ConfigRequest) * sizeof (CHAR16) + RestoreEleSize + sizeof (CHAR16);
+  *RestoreConfigRequest = AllocateZeroPool (TotalSize);
+  ASSERT (*RestoreConfigRequest != NULL);
+  StrnCpyS (*RestoreConfigRequest, TotalSize / sizeof (CHAR16), ConfigRequest, ConfigHdrEndStr - ConfigRequest);
+  StrCatS (*RestoreConfigRequest, TotalSize / sizeof (CHAR16), ElementStr);
+  //
+  // To get the SyncConfigRequest.
+  //
+  SyncSize = StrSize (ConfigRequest) - RestoreEleSize + sizeof (CHAR16);
+  *SyncConfigRequest = AllocateZeroPool (SyncSize);
+  ASSERT (*SyncConfigRequest != NULL);
+  StrnCpyS (*SyncConfigRequest, SyncSize / sizeof (CHAR16), ConfigRequest, SyncSize / sizeof (CHAR16) - 1);
+
+  //
+  // restore the Progress string to the original format.
+  //
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    *EndStr = L'=';
+  } else {
+    *EndStr = L'&';
+  }
+}
+
+/**
   Popup an save error info and get user input.
 
   @param  TitleId                The form title id.
@@ -3126,6 +3228,10 @@ SubmitForForm (
     FreePool (ConfigResp);
 
     if (EFI_ERROR (Status)) {
+      //
+      // Submit fail, to get the RestoreConfigRequest and SyncConfigRequest.
+      //
+      GetSyncRestoreConfigRequest (ConfigInfo->Storage, ConfigInfo->ConfigRequest, Progress, &ConfigInfo->RestoreConfigRequest, &ConfigInfo->SyncConfigRequest);
       InsertTailList (&gBrowserSaveFailFormSetList, &ConfigInfo->SaveFailLink);
       continue;
     }
@@ -3145,8 +3251,18 @@ SubmitForForm (
       while (!IsNull (&gBrowserSaveFailFormSetList, Link)) {
         ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_SAVE_FAIL_LINK (Link);
         Link = GetNextNode (&gBrowserSaveFailFormSetList, Link);
-
-        SynchronizeStorage(ConfigInfo->Storage, ConfigInfo->ConfigRequest, FALSE);
+        //
+        // Process the submit fail question, base on the RestoreConfigRequest to restore the EditBuffer
+        // base on the SyncConfigRequest to Sync the buffer.
+        //
+        SynchronizeStorage (ConfigInfo->Storage, ConfigInfo->RestoreConfigRequest, FALSE);
+        FreePool (ConfigInfo->RestoreConfigRequest);
+        ConfigInfo->RestoreConfigRequest = NULL;
+        if (ConfigInfo->SyncConfigRequest != NULL) {
+          SynchronizeStorage(ConfigInfo->Storage, ConfigInfo->SyncConfigRequest, TRUE);
+          FreePool (ConfigInfo->SyncConfigRequest);
+          ConfigInfo->SyncConfigRequest = NULL;
+        }
 
         Status = EFI_SUCCESS;
       }
@@ -3269,6 +3385,10 @@ SubmitForFormSet (
                                       &Progress
                                       );
     if (EFI_ERROR (Status)) {
+      //
+      // Submit fail, to get the RestoreConfigRequest and SyncConfigRequest.
+      //
+      GetSyncRestoreConfigRequest (FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, Progress, &FormSetStorage->RestoreConfigRequest, &FormSetStorage->SyncConfigRequest);
       InsertTailList (&FormSet->SaveFailStorageListHead, &FormSetStorage->SaveFailLink);
       if (!HasInserted) {
         //
@@ -3310,8 +3430,18 @@ SubmitForFormSet (
           FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (Link);
           Storage        = FormSetStorage->BrowserStorage;
           Link = GetNextNode (&FormSet->SaveFailStorageListHead, Link);
-
-          SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
+          //
+          // Process the submit fail question, base on the RestoreConfigRequest to restore the EditBuffer
+          // base on the SyncConfigRequest to Sync the buffer.
+          //
+          SynchronizeStorage (FormSetStorage->BrowserStorage, FormSetStorage->RestoreConfigRequest, FALSE);
+          FreePool (FormSetStorage->RestoreConfigRequest);
+          FormSetStorage->RestoreConfigRequest = NULL;
+          if (FormSetStorage->SyncConfigRequest != NULL) {
+            SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->SyncConfigRequest, TRUE);
+            FreePool (FormSetStorage->SyncConfigRequest);
+            FormSetStorage->SyncConfigRequest = NULL;
+          }
 
           Status = EFI_SUCCESS;
         }
@@ -3445,8 +3575,18 @@ SubmitForSystem (
         while (!IsNull (&LocalFormSet->SaveFailStorageListHead, StorageLink)) {
           FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (StorageLink);
           StorageLink = GetNextNode (&LocalFormSet->SaveFailStorageListHead, StorageLink);
-
-          SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
+          //
+          // Process the submit fail question, base on the RestoreConfigRequest to restore the EditBuffer
+          // base on the SyncConfigRequest to Sync the buffer.
+          //
+          SynchronizeStorage (FormSetStorage->BrowserStorage, FormSetStorage->RestoreConfigRequest, FALSE);
+          FreePool (FormSetStorage->RestoreConfigRequest);
+          FormSetStorage->RestoreConfigRequest = NULL;
+          if ( FormSetStorage->SyncConfigRequest != NULL) {
+            SynchronizeStorage (FormSetStorage->BrowserStorage, FormSetStorage->SyncConfigRequest, TRUE);
+            FreePool (FormSetStorage->SyncConfigRequest);
+            FormSetStorage->SyncConfigRequest = NULL;
+          }
         }
       }
 
