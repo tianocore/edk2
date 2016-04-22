@@ -663,6 +663,8 @@ Ping6CreateIpInstance (
   UINTN                            HandleIndex;
   UINTN                            HandleNum;
   EFI_HANDLE                       *HandleBuffer;
+  BOOLEAN                          UnspecifiedSrc;
+  BOOLEAN                          MediaPresent;
   EFI_SERVICE_BINDING_PROTOCOL     *Ip6Sb;
   EFI_IP6_CONFIG_PROTOCOL          *Ip6Cfg;
   EFI_IP6_CONFIG_DATA              Ip6Config;
@@ -671,10 +673,12 @@ Ping6CreateIpInstance (
   EFI_IPv6_ADDRESS                 *Addr;
   UINTN                            AddrIndex;
 
-  HandleBuffer = NULL;
-  Ip6Sb        = NULL;
-  IfInfo       = NULL;
-  IfInfoSize   = 0;
+  HandleBuffer      = NULL;
+  UnspecifiedSrc    = FALSE;
+  MediaPresent      = TRUE;
+  Ip6Sb             = NULL;
+  IfInfo            = NULL;
+  IfInfoSize        = 0;
 
   //
   // Locate all the handles with ip6 service binding protocol.
@@ -689,17 +693,23 @@ Ping6CreateIpInstance (
   if (EFI_ERROR (Status) || (HandleNum == 0)) {
     return EFI_ABORTED;
   }
+
+  if (NetIp6IsUnspecifiedAddr (&Private->SrcAddress)) {
+    //
+    // SrcAddress is unspecified. So, both connected and configured interface will be automatic selected. 
+    //
+    UnspecifiedSrc = TRUE;
+  }
+  
   //
-  // Source address is required when pinging a link-local address on multi-
-  // interfaces host.
+  // Source address is required when pinging a link-local address.
   //
-  if (NetIp6IsLinkLocalAddr (&Private->DstAddress) &&
-      NetIp6IsUnspecifiedAddr (&Private->SrcAddress) &&
-      (HandleNum > 1)) {
+  if (NetIp6IsLinkLocalAddr (&Private->DstAddress) && UnspecifiedSrc) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_INVALID_SOURCE), gShellNetwork2HiiHandle);
     Status = EFI_INVALID_PARAMETER;
     goto ON_ERROR;
   }
+  
   //
   // For each ip6 protocol, check interface addresses list.
   //
@@ -708,6 +718,19 @@ Ping6CreateIpInstance (
     Ip6Sb      = NULL;
     IfInfo     = NULL;
     IfInfoSize = 0;
+
+    if (UnspecifiedSrc) {
+      //
+      // Check media.
+      //
+      NetLibDetectMedia (HandleBuffer[HandleIndex], &MediaPresent);
+      if (!MediaPresent) {
+        //
+        // Skip this one.
+        //
+        continue;
+      }
+    }
 
     Status = gBS->HandleProtocol (
                     HandleBuffer[HandleIndex],
@@ -718,80 +741,81 @@ Ping6CreateIpInstance (
       goto ON_ERROR;
     }
 
-    if (NetIp6IsUnspecifiedAddr (&Private->SrcAddress)) {
-      //
-      // No need to match interface address.
-      //
-      break;
-    } else {
-      //
-      // Ip6config protocol and ip6 service binding protocol are installed
-      // on the same handle.
-      //
-      Status = gBS->HandleProtocol (
-                      HandleBuffer[HandleIndex],
-                      &gEfiIp6ConfigProtocolGuid,
-                      (VOID **) &Ip6Cfg
-                      );
+    //
+    // Ip6config protocol and ip6 service binding protocol are installed
+    // on the same handle.
+    //
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[HandleIndex],
+                    &gEfiIp6ConfigProtocolGuid,
+                    (VOID **) &Ip6Cfg
+                    );
 
-      if (EFI_ERROR (Status)) {
-        goto ON_ERROR;
-      }
-      //
-      // Get the interface information size.
-      //
-      Status = Ip6Cfg->GetData (
-                         Ip6Cfg,
-                         Ip6ConfigDataTypeInterfaceInfo,
-                         &IfInfoSize,
-                         NULL
-                         );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
+    //
+    // Get the interface information size.
+    //
+    Status = Ip6Cfg->GetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeInterfaceInfo,
+                       &IfInfoSize,
+                       NULL
+                       );
 
-      if (Status != EFI_BUFFER_TOO_SMALL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
-        goto ON_ERROR;
-      }
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      goto ON_ERROR;
+    }
 
-      IfInfo = AllocateZeroPool (IfInfoSize);
+    IfInfo = AllocateZeroPool (IfInfoSize);
 
-      if (IfInfo == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto ON_ERROR;
-      }
-      //
-      // Get the interface info.
-      //
-      Status = Ip6Cfg->GetData (
-                         Ip6Cfg,
-                         Ip6ConfigDataTypeInterfaceInfo,
-                         &IfInfoSize,
-                         IfInfo
-                         );
+    if (IfInfo == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_ERROR;
+    }
+    //
+    // Get the interface info.
+    //
+    Status = Ip6Cfg->GetData (
+                       Ip6Cfg,
+                       Ip6ConfigDataTypeInterfaceInfo,
+                       &IfInfoSize,
+                       IfInfo
+                       );
 
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
-        goto ON_ERROR;
-      }
-      //
-      // Check whether the source address is one of the interface addresses.
-      //
-      for (AddrIndex = 0; AddrIndex < IfInfo->AddressInfoCount; AddrIndex++) {
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      goto ON_ERROR;
+    }
+    //
+    // Check whether the source address is one of the interface addresses.
+    //
+    for (AddrIndex = 0; AddrIndex < IfInfo->AddressInfoCount; AddrIndex++) {
+      Addr = &(IfInfo->AddressInfo[AddrIndex].Address);
 
-        Addr = &(IfInfo->AddressInfo[AddrIndex].Address);
-        if (EFI_IP6_EQUAL (&Private->SrcAddress, Addr)) {
+      if (UnspecifiedSrc) {
+        if (!NetIp6IsUnspecifiedAddr (Addr) && !NetIp6IsLinkLocalAddr (Addr)) {
           //
-          // Match a certain interface address.
+          // Select the interface automatically.
           //
+          CopyMem(&Private->SrcAddress, Addr, sizeof(Private->SrcAddress));
           break;
         }
-      }
-
-      if (AddrIndex < IfInfo->AddressInfoCount) {
+      } else if (EFI_IP6_EQUAL (&Private->SrcAddress, Addr)) {
         //
-        // Found a nic handle with right interface address.
+        // Match a certain interface address.
         //
         break;
-      }
+      } 
+    }
+
+    if (AddrIndex < IfInfo->AddressInfoCount) {
+      //
+      // Found a nic handle with right interface address.
+      //
+      break;
     }
 
     FreePool (IfInfo);
