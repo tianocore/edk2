@@ -1,7 +1,7 @@
 /** @file
   Support routines for SMRAM profile.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1256,11 +1256,17 @@ SmramProfileGetDataSize (
   Copy SMRAM profile data.
 
   @param ProfileBuffer  The buffer to hold SMRAM profile data.
+  @param ProfileSize    On input, profile buffer size.
+                        On output, actual profile data size copied.
+  @param ProfileOffset  On input, profile buffer offset to copy.
+                        On output, next time profile buffer offset to copy.
 
 **/
 VOID
 SmramProfileCopyData (
-  IN VOID   *ProfileBuffer
+  OUT VOID      *ProfileBuffer,
+  IN OUT UINT64 *ProfileSize,
+  IN OUT UINT64 *ProfileOffset
   )
 {
   MEMORY_PROFILE_CONTEXT           *Context;
@@ -1283,15 +1289,28 @@ SmramProfileCopyData (
   MEMORY_PROFILE_FREE_MEMORY      *FreeMemory;
   MEMORY_PROFILE_MEMORY_RANGE     *MemoryRange;
   MEMORY_PROFILE_DESCRIPTOR       *MemoryProfileDescriptor;
+  UINT64                          Offset;
+  UINT64                          RemainingSize;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
     return ;
   }
 
-  Context = ProfileBuffer;
-  CopyMem (Context, &ContextData->Context, sizeof (MEMORY_PROFILE_CONTEXT));
-  DriverInfo = (MEMORY_PROFILE_DRIVER_INFO *) (Context + 1);
+  RemainingSize = *ProfileSize;
+  Offset = 0;
+
+  if (*ProfileOffset < sizeof (MEMORY_PROFILE_CONTEXT)) {
+    if (RemainingSize >= sizeof (MEMORY_PROFILE_CONTEXT)) {
+      Context = ProfileBuffer;
+      CopyMem (Context, &ContextData->Context, sizeof (MEMORY_PROFILE_CONTEXT));
+      RemainingSize -= sizeof (MEMORY_PROFILE_CONTEXT);
+      ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_CONTEXT);
+    } else {
+      goto Done;
+    }
+  }
+  Offset += sizeof (MEMORY_PROFILE_CONTEXT);
 
   DriverInfoList = ContextData->DriverInfoList;
   for (DriverLink = DriverInfoList->ForwardLink;
@@ -1303,8 +1322,17 @@ SmramProfileCopyData (
                        Link,
                        MEMORY_PROFILE_DRIVER_INFO_SIGNATURE
                        );
-    CopyMem (DriverInfo, &DriverInfoData->DriverInfo, sizeof (MEMORY_PROFILE_DRIVER_INFO));
-    AllocInfo = (MEMORY_PROFILE_ALLOC_INFO *) (DriverInfo + 1);
+    if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DRIVER_INFO))) {
+      if (RemainingSize >= sizeof (MEMORY_PROFILE_DRIVER_INFO)) {
+        DriverInfo = ProfileBuffer;
+        CopyMem (DriverInfo, &DriverInfoData->DriverInfo, sizeof (MEMORY_PROFILE_DRIVER_INFO));
+        RemainingSize -= sizeof (MEMORY_PROFILE_DRIVER_INFO);
+        ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DRIVER_INFO);
+      } else {
+        goto Done;
+      }
+    }
+    Offset += sizeof (MEMORY_PROFILE_DRIVER_INFO);
 
     AllocInfoList = DriverInfoData->AllocInfoList;
     for (AllocLink = AllocInfoList->ForwardLink;
@@ -1316,30 +1344,73 @@ SmramProfileCopyData (
                         Link,
                         MEMORY_PROFILE_ALLOC_INFO_SIGNATURE
                         );
-      CopyMem (AllocInfo, &AllocInfoData->AllocInfo, sizeof (MEMORY_PROFILE_ALLOC_INFO));
-      AllocInfo += 1;
+      if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_ALLOC_INFO))) {
+        if (RemainingSize >= sizeof (MEMORY_PROFILE_ALLOC_INFO)) {
+          AllocInfo = ProfileBuffer;
+          CopyMem (AllocInfo, &AllocInfoData->AllocInfo, sizeof (MEMORY_PROFILE_ALLOC_INFO));
+          RemainingSize -= sizeof (MEMORY_PROFILE_ALLOC_INFO);
+          ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_ALLOC_INFO);
+        } else {
+          goto Done;
+        }
+      }
+      Offset += sizeof (MEMORY_PROFILE_ALLOC_INFO);
     }
-
-    DriverInfo = (MEMORY_PROFILE_DRIVER_INFO *) ((UINTN) (DriverInfo + 1) + sizeof (MEMORY_PROFILE_ALLOC_INFO) * (UINTN) DriverInfo->AllocRecordCount);
   }
 
 
-  FreeMemory = (MEMORY_PROFILE_FREE_MEMORY *) DriverInfo;
-  CopyMem (FreeMemory, &mSmramFreeMemory, sizeof (MEMORY_PROFILE_FREE_MEMORY));
-  MemoryProfileDescriptor = (MEMORY_PROFILE_DESCRIPTOR *) (FreeMemory + 1);
-  Index = 0;
+  if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_FREE_MEMORY))) {
+    if (RemainingSize >= sizeof (MEMORY_PROFILE_FREE_MEMORY)) {
+      FreeMemory = ProfileBuffer;
+      CopyMem (FreeMemory, &mSmramFreeMemory, sizeof (MEMORY_PROFILE_FREE_MEMORY));
+      Index = 0;
+      FreePageList = &mSmmMemoryMap;
+      for (Node = FreePageList->BackLink;
+           Node != FreePageList;
+           Node = Node->BackLink) {
+        Index++;
+      }
+      for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
+        FreePoolList = &mSmmPoolLists[MAX_POOL_INDEX - PoolListIndex - 1];
+        for (Node = FreePoolList->BackLink;
+             Node != FreePoolList;
+             Node = Node->BackLink) {
+          Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
+          if (Pool->Header.Available) {
+            Index++;
+          }
+        }
+      }
+      FreeMemory->FreeMemoryEntryCount = Index;
+
+      RemainingSize -= sizeof (MEMORY_PROFILE_FREE_MEMORY);
+      ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_FREE_MEMORY);
+    } else {
+      goto Done;
+    }
+  }
+  Offset += sizeof (MEMORY_PROFILE_FREE_MEMORY);
   FreePageList = &mSmmMemoryMap;
   for (Node = FreePageList->BackLink;
        Node != FreePageList;
        Node = Node->BackLink) {
-    Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
-    MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
-    MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
-    MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
-    MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pages;
-    MemoryProfileDescriptor->Size = EFI_PAGES_TO_SIZE (Pages->NumberOfPages);
-    MemoryProfileDescriptor++;
-    Index++;
+    if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
+      if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
+        Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
+        MemoryProfileDescriptor = ProfileBuffer;
+        MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
+        MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
+        MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pages;
+        MemoryProfileDescriptor->Size = EFI_PAGES_TO_SIZE (Pages->NumberOfPages);
+
+        RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
+      } else {
+        goto Done;
+      }
+    }
+    Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
   }
   for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
     FreePoolList = &mSmmPoolLists[MAX_POOL_INDEX - PoolListIndex - 1];
@@ -1348,32 +1419,69 @@ SmramProfileCopyData (
          Node = Node->BackLink) {
       Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
       if (Pool->Header.Available) {
-        MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
-        MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
-        MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
-        MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pool;
-        MemoryProfileDescriptor->Size = Pool->Header.Size;
-        MemoryProfileDescriptor++;
-        Index++;
+        if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
+          if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
+            MemoryProfileDescriptor = ProfileBuffer;
+            MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
+            MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
+            MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
+            MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pool;
+            MemoryProfileDescriptor->Size = Pool->Header.Size;
+
+            RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
+            ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
+          } else {
+            goto Done;
+          }
+        }
+        Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
       }
     }
   }
-  FreeMemory->FreeMemoryEntryCount = Index;
 
-  MemoryRange = (MEMORY_PROFILE_MEMORY_RANGE *) MemoryProfileDescriptor;
-  MemoryRange->Header.Signature = MEMORY_PROFILE_MEMORY_RANGE_SIGNATURE;
-  MemoryRange->Header.Length = sizeof (MEMORY_PROFILE_MEMORY_RANGE);
-  MemoryRange->Header.Revision = MEMORY_PROFILE_MEMORY_RANGE_REVISION;
-  MemoryRange->MemoryRangeCount = (UINT32) mFullSmramRangeCount;
-  MemoryProfileDescriptor = (MEMORY_PROFILE_DESCRIPTOR *) (MemoryRange + 1);
-  for (Index = 0; Index < mFullSmramRangeCount; Index++) {
-    MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
-    MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
-    MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
-    MemoryProfileDescriptor->Address = mFullSmramRanges[Index].PhysicalStart;
-    MemoryProfileDescriptor->Size = mFullSmramRanges[Index].PhysicalSize;
-    MemoryProfileDescriptor++; 
+  if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_MEMORY_RANGE))) {
+    if (RemainingSize >= sizeof (MEMORY_PROFILE_MEMORY_RANGE)) {
+      MemoryRange = ProfileBuffer;
+      MemoryRange->Header.Signature = MEMORY_PROFILE_MEMORY_RANGE_SIGNATURE;
+      MemoryRange->Header.Length = sizeof (MEMORY_PROFILE_MEMORY_RANGE);
+      MemoryRange->Header.Revision = MEMORY_PROFILE_MEMORY_RANGE_REVISION;
+      MemoryRange->MemoryRangeCount = (UINT32) mFullSmramRangeCount;
+
+      RemainingSize -= sizeof (MEMORY_PROFILE_MEMORY_RANGE);
+      ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_MEMORY_RANGE);
+    } else {
+      goto Done;
+    }
   }
+  Offset += sizeof (MEMORY_PROFILE_MEMORY_RANGE);
+  for (Index = 0; Index < mFullSmramRangeCount; Index++) {
+    if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
+      if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
+        MemoryProfileDescriptor = ProfileBuffer;
+        MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
+        MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
+        MemoryProfileDescriptor->Address = mFullSmramRanges[Index].PhysicalStart;
+        MemoryProfileDescriptor->Size = mFullSmramRanges[Index].PhysicalSize;
+
+        RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
+        ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
+      } else {
+        goto Done;
+      }
+    }
+    Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
+  }
+
+Done:
+  //
+  // On output, actual profile data size copied.
+  //
+  *ProfileSize -= RemainingSize;
+  //
+  // On output, next time profile buffer offset to copy.
+  //
+  *ProfileOffset = Offset;
 }
 
 /**
@@ -1416,6 +1524,7 @@ SmramProfileHandlerGetData (
   )
 {
   UINT64                                    ProfileSize;
+  UINT64                                    ProfileOffset;
   SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA  SmramProfileGetData;
   MEMORY_PROFILE_CONTEXT_DATA               *ContextData;
   BOOLEAN                                   SmramProfileRecordingStatus;
@@ -1449,9 +1558,53 @@ SmramProfileHandlerGetData (
     goto Done;
   }
 
+  ProfileOffset = 0;
+  SmramProfileCopyData ((VOID *) (UINTN) SmramProfileGetData.ProfileBuffer, &ProfileSize, &ProfileOffset);
   SmramProfileParameterGetData->ProfileSize = ProfileSize;
-  SmramProfileCopyData ((VOID *) (UINTN) SmramProfileGetData.ProfileBuffer);
   SmramProfileParameterGetData->Header.ReturnStatus = 0;
+
+Done:
+  mSmramProfileRecordingStatus = SmramProfileRecordingStatus;
+}
+
+/**
+  SMRAM profile handler to get profile data by offset.
+
+  @param SmramProfileParameterGetDataByOffset   The parameter of SMM profile get data by offset.
+
+**/
+VOID
+SmramProfileHandlerGetDataByOffset (
+  IN SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET     *SmramProfileParameterGetDataByOffset
+  )
+{
+  SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET    SmramProfileGetDataByOffset;
+  MEMORY_PROFILE_CONTEXT_DATA                           *ContextData;
+  BOOLEAN                                               SmramProfileRecordingStatus;
+
+  ContextData = GetSmramProfileContext ();
+  if (ContextData == NULL) {
+    return ;
+  }
+
+  SmramProfileRecordingStatus = mSmramProfileRecordingStatus;
+  mSmramProfileRecordingStatus = FALSE;
+
+
+  CopyMem (&SmramProfileGetDataByOffset, SmramProfileParameterGetDataByOffset, sizeof (SmramProfileGetDataByOffset));
+
+  //
+  // Sanity check
+  //
+  if (!SmmIsBufferOutsideSmmValid ((UINTN) SmramProfileGetDataByOffset.ProfileBuffer, (UINTN) SmramProfileGetDataByOffset.ProfileSize)) {
+    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetDataByOffset: SMM ProfileBuffer in SMRAM or overflow!\n"));
+    SmramProfileParameterGetDataByOffset->Header.ReturnStatus = (UINT64) (INT64) (INTN) EFI_ACCESS_DENIED;
+    goto Done;
+  }
+
+  SmramProfileCopyData ((VOID *) (UINTN) SmramProfileGetDataByOffset.ProfileBuffer, &SmramProfileGetDataByOffset.ProfileSize, &SmramProfileGetDataByOffset.ProfileOffset);
+  CopyMem (SmramProfileParameterGetDataByOffset, &SmramProfileGetDataByOffset, sizeof (SmramProfileGetDataByOffset));
+  SmramProfileParameterGetDataByOffset->Header.ReturnStatus = 0;
 
 Done:
   mSmramProfileRecordingStatus = SmramProfileRecordingStatus;
@@ -1591,6 +1744,14 @@ SmramProfileHandler (
       return EFI_SUCCESS;
     }
     SmramProfileHandlerGetData ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA *) (UINTN) CommBuffer);
+    break;
+  case SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA_BY_OFFSET:
+    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetDataByOffset\n"));
+    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET)) {
+      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+      return EFI_SUCCESS;
+    }
+    SmramProfileHandlerGetDataByOffset ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET *) (UINTN) CommBuffer);
     break;
   case SMRAM_PROFILE_COMMAND_REGISTER_IMAGE:
     DEBUG ((EFI_D_ERROR, "SmramProfileHandlerRegisterImage\n"));
