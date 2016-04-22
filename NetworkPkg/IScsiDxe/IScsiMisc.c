@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for iSCSI driver.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -857,10 +857,13 @@ IScsiCreateDriverData (
 /**
   Clean the iSCSI driver data.
 
-  @param[in]  Private The iSCSI driver data.
+  @param[in]              Private The iSCSI driver data.
+
+  @retval EFI_SUCCES      The clean operation is successful.
+  @retval Others          Other errors as indicated.
 
 **/
-VOID
+EFI_STATUS
 IScsiCleanDriverData (
   IN ISCSI_DRIVER_DATA  *Private
   )
@@ -868,11 +871,14 @@ IScsiCleanDriverData (
   EFI_STATUS            Status;
 
   if (Private->DevicePath != NULL) {
-    gBS->UninstallProtocolInterface (
-           Private->ExtScsiPassThruHandle,
-           &gEfiDevicePathProtocolGuid,
-           Private->DevicePath
-           );
+    Status = gBS->UninstallProtocolInterface (
+                    Private->ExtScsiPassThruHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    Private->DevicePath
+                    );
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
+    }
 
     FreePool (Private->DevicePath);
   }
@@ -888,9 +894,12 @@ IScsiCleanDriverData (
     }
   }
 
+EXIT:
+
   gBS->CloseEvent (Private->ExitBootServiceEvent);
 
   FreePool (Private);
+  return Status;
 }
 
 /**

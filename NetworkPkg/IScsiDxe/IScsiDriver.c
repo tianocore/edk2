@@ -1,7 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -323,7 +323,9 @@ IScsiSupported (
   @retval EFI_INVALID_PARAMETER Any input parameter is invalid.
   @retval EFI_NOT_FOUND         There is no sufficient information to establish
                                 the iScsi session.
-  @retval EFI_DEVICE_ERROR      Failed to get TCP connection device path.                              
+  @retval EFI_DEVICE_ERROR      Failed to get TCP connection device path.
+  @retval EFI_ACCESS_DENIED     The protocol could not be removed from the Handle
+                                because its interfaces are being used.
 
 **/
 EFI_STATUS
@@ -863,7 +865,10 @@ IScsiStart (
           IScsiSessionAbort (ExistPrivate->Session);
         }
 
-        IScsiCleanDriverData (ExistPrivate);
+        Status = IScsiCleanDriverData (ExistPrivate);
+        if (EFI_ERROR (Status)) {
+          goto ON_ERROR;
+        }
       }
     } else {
       //
@@ -963,6 +968,9 @@ ON_ERROR:
   
   @retval EFI_SUCCESS           The device was stopped.
   @retval EFI_DEVICE_ERROR      The device could not be stopped due to a device error.
+  @retval EFI_INVALID_PARAMETER Child handle is NULL.
+  @retval EFI_ACCESS_DENIED     The protocol could not be removed from the Handle
+                                because its interfaces are being used.
 
 **/
 EFI_STATUS
@@ -1105,7 +1113,11 @@ IScsiStop (
     IScsiSessionAbort (Private->Session);
   }
 
-  IScsiCleanDriverData (Private);
+  Status = IScsiCleanDriverData (Private);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   return EFI_SUCCESS;
 }
