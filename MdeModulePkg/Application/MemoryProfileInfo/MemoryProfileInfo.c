@@ -1,6 +1,6 @@
 /** @file
   
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -11,6 +11,7 @@
 
 **/
 
+#include <Base.h>
 #include <Uefi.h>
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
@@ -30,6 +31,7 @@
 
 #include <Guid/ZeroGuid.h>
 #include <Guid/MemoryProfile.h>
+#include <Guid/PiSmmCommunicationRegionTable.h>
 
 CHAR16 *mActionString[] = {
   L"Unknown",
@@ -635,10 +637,17 @@ GetSmramProfileData (
   UINT8                                         *CommBuffer;
   EFI_SMM_COMMUNICATE_HEADER                    *CommHeader;
   SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO      *CommGetProfileInfo;
-  SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA      *CommGetProfileData;
-  UINT64                                        ProfileSize;
-  PHYSICAL_ADDRESS                              ProfileBuffer;
+  SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET *CommGetProfileData;
+  UINTN                                         ProfileSize;
+  VOID                                          *ProfileBuffer;
   EFI_SMM_COMMUNICATION_PROTOCOL                *SmmCommunication;
+  UINTN                                         MinimalSizeNeeded;
+  EDKII_PI_SMM_COMMUNICATION_REGION_TABLE       *PiSmmCommunicationRegionTable;
+  UINT32                                        Index;
+  EFI_MEMORY_DESCRIPTOR                         *Entry;
+  VOID                                          *Buffer;
+  UINTN                                         Size;
+  UINTN                                         Offset;
 
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &SmmCommunication);
   if (EFI_ERROR (Status)) {
@@ -646,13 +655,39 @@ GetSmramProfileData (
     return Status;
   }
 
-  CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA);
-  CommBuffer = AllocateZeroPool (CommSize);
-  if (CommBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    Print (L"SmramProfile: AllocateZeroPool (0x%x) for comm buffer - %r\n", CommSize, Status);
+  MinimalSizeNeeded = sizeof (EFI_GUID) +
+                      sizeof (UINTN) +
+                      MAX (sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO),
+                           sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET));
+  MinimalSizeNeeded += MAX (sizeof (MEMORY_PROFILE_CONTEXT),
+                            MAX (sizeof (MEMORY_PROFILE_DRIVER_INFO),
+                                 MAX (sizeof (MEMORY_PROFILE_ALLOC_INFO),
+                                      MAX (sizeof (MEMORY_PROFILE_DESCRIPTOR),
+                                           MAX (sizeof (MEMORY_PROFILE_FREE_MEMORY),
+                                                sizeof (MEMORY_PROFILE_MEMORY_RANGE))))));
+
+  Status = EfiGetSystemConfigurationTable (
+             &gEdkiiPiSmmCommunicationRegionTableGuid,
+             (VOID **) &PiSmmCommunicationRegionTable
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "SmramProfile: Get PiSmmCommunicationRegionTable - %r\n", Status));
     return Status;
   }
+  ASSERT (PiSmmCommunicationRegionTable != NULL);
+  Entry = (EFI_MEMORY_DESCRIPTOR *) (PiSmmCommunicationRegionTable + 1);
+  Size = 0;
+  for (Index = 0; Index < PiSmmCommunicationRegionTable->NumberOfEntries; Index++) {
+    if (Entry->Type == EfiConventionalMemory) {
+      Size = EFI_PAGES_TO_SIZE ((UINTN) Entry->NumberOfPages);
+      if (Size >= MinimalSizeNeeded) {
+        break;
+      }
+    }
+    Entry = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) Entry + PiSmmCommunicationRegionTable->DescriptorSize);
+  }
+  ASSERT (Index < PiSmmCommunicationRegionTable->NumberOfEntries);
+  CommBuffer = (UINT8 *) (UINTN) Entry->PhysicalStart;
 
   //
   // Get Size
@@ -670,7 +705,6 @@ GetSmramProfileData (
   CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
   Status = SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
   if (EFI_ERROR (Status)) {
-    FreePool (CommBuffer);
     DEBUG ((EFI_D_ERROR, "SmramProfile: SmmCommunication - %r\n", Status));
     return Status;
   }
@@ -680,49 +714,58 @@ GetSmramProfileData (
     return EFI_SUCCESS;
   }
 
-  ProfileSize = CommGetProfileInfo->ProfileSize;
+  ProfileSize = (UINTN) CommGetProfileInfo->ProfileSize;
 
   //
   // Get Data
   //
-  ProfileBuffer = (PHYSICAL_ADDRESS) (UINTN) AllocateZeroPool ((UINTN) ProfileSize);
+  ProfileBuffer = AllocateZeroPool (ProfileSize);
   if (ProfileBuffer == 0) {
-    FreePool (CommBuffer);
     Status = EFI_OUT_OF_RESOURCES;
-    Print (L"SmramProfile: AllocateZeroPool (0x%x) for profile buffer - %r\n", (UINTN) ProfileSize, Status);
+    Print (L"SmramProfile: AllocateZeroPool (0x%x) for profile buffer - %r\n", ProfileSize, Status);
     return Status;
   }
 
   CommHeader = (EFI_SMM_COMMUNICATE_HEADER *) &CommBuffer[0];
   CopyMem (&CommHeader->HeaderGuid, &gEdkiiMemoryProfileGuid, sizeof(gEdkiiMemoryProfileGuid));
-  CommHeader->MessageLength = sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA);
+  CommHeader->MessageLength = sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET);
 
-  CommGetProfileData = (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA *) &CommBuffer[OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)];
-  CommGetProfileData->Header.Command      = SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA;
+  CommGetProfileData = (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET *) &CommBuffer[OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)];
+  CommGetProfileData->Header.Command      = SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA_BY_OFFSET;
   CommGetProfileData->Header.DataLength   = sizeof (*CommGetProfileData);
   CommGetProfileData->Header.ReturnStatus = (UINT64)-1;
-  CommGetProfileData->ProfileSize         = ProfileSize;
-  CommGetProfileData->ProfileBuffer       = ProfileBuffer;
 
   CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
-  Status = SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
-  ASSERT_EFI_ERROR (Status);
+  Buffer = (UINT8 *) CommHeader + CommSize;
+  Size -= CommSize;
 
-  if (CommGetProfileData->Header.ReturnStatus != 0) {
-    FreePool ((VOID *) (UINTN) CommGetProfileData->ProfileBuffer);
-    FreePool (CommBuffer);
-    Print (L"GetProfileData - 0x%x\n", CommGetProfileData->Header.ReturnStatus);
-    return EFI_SUCCESS;
+  CommGetProfileData->ProfileBuffer       = (PHYSICAL_ADDRESS) (UINTN) Buffer;
+  CommGetProfileData->ProfileOffset       = 0;
+  while (CommGetProfileData->ProfileOffset < ProfileSize) {
+    Offset = (UINTN) CommGetProfileData->ProfileOffset;
+    if (Size <= (ProfileSize - CommGetProfileData->ProfileOffset)) {
+      CommGetProfileData->ProfileSize = (UINT64) Size;
+    } else {
+      CommGetProfileData->ProfileSize = (UINT64) (ProfileSize - CommGetProfileData->ProfileOffset);
+    }
+    Status = SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
+    ASSERT_EFI_ERROR (Status);
+
+    if (CommGetProfileData->Header.ReturnStatus != 0) {
+      FreePool (ProfileBuffer);
+      Print (L"GetProfileData - 0x%x\n", CommGetProfileData->Header.ReturnStatus);
+      return EFI_SUCCESS;
+    }
+    CopyMem ((UINT8 *) ProfileBuffer + Offset, (VOID *) (UINTN) CommGetProfileData->ProfileBuffer, (UINTN) CommGetProfileData->ProfileSize);
   }
 
 
-  Print (L"SmramProfileSize - 0x%x\n", CommGetProfileData->ProfileSize);
+  Print (L"SmramProfileSize - 0x%x\n", ProfileSize);
   Print (L"======= SmramProfile begin =======\n");
-  DumpMemoryProfile (CommGetProfileData->ProfileBuffer, CommGetProfileData->ProfileSize);
+  DumpMemoryProfile ((PHYSICAL_ADDRESS) (UINTN) ProfileBuffer, ProfileSize);
   Print (L"======= SmramProfile end =======\n\n\n");
 
-  FreePool ((VOID *) (UINTN) CommGetProfileData->ProfileBuffer);
-  FreePool (CommBuffer);
+  FreePool (ProfileBuffer);
 
   return EFI_SUCCESS;
 }
