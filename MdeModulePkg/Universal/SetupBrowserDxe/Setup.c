@@ -3919,7 +3919,7 @@ GetQuestionDefault (
   //
   HiiValue = &Question->HiiValue;
   TypeValue = &HiiValue->Value;
-  if (HiiValue->Type == EFI_IFR_TYPE_BUFFER && Question->BufferValue != NULL) {
+  if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
     //
     // For orderedlist, need to pass the BufferValue to Callback function.
     //
