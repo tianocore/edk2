@@ -1,7 +1,7 @@
 /** @file
   ACPI Firmware Performance Data Table (FPDT) implementation specific definitions.
 
-  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -116,14 +116,16 @@ typedef struct {
 //
 // Log BOOT RECORD from SMM driver on boot time.
 //
-#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE          1
-#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA          2
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE           1
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA           2
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET 3
 
 typedef struct {
   UINTN             Function;
   EFI_STATUS        ReturnStatus;
   UINTN             BootRecordSize;
   VOID              *BootRecordData;
+  UINTN             BootRecordOffset;
 } SMM_BOOT_RECORD_COMMUNICATE;
 
 extern EFI_GUID gEfiFirmwarePerformanceGuid;
