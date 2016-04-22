@@ -1,0 +1,62 @@
+## @file
+# A driver allocates common SMM communication buffer in EfiReservedMemoryType.
+#
+# This driver allocates common SMM communication buffer in EfiReservedMemoryType,
+# then it publishes the information to EFI configuration table with
+# gEdkiiPiSmmCommunicationRegionTableGuid.
+# Any other driver or application can get the table and know the common
+# communication buffer.
+#
+# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmCommunicationBufferDxe
+  MODULE_UNI_FILE                = SmmCommunicationBufferDxe.uni
+  FILE_GUID                      = 8FAAD0A7-02B4-432F-8F5C-B880965D8B41
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmmCommunicationBufferEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmCommunicationBufferDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  HobLib
+  DebugLib
+  PcdLib
+
+[Guids]
+  gEdkiiPiSmmCommunicationRegionTableGuid     ## PRODUCES   ## SystemTable
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SmmCommunicationBufferExtraDxe.uni
