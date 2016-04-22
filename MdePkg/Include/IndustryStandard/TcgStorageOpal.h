@@ -173,6 +173,7 @@ typedef union {
   OPAL_SSCV2_FEATURE_DESCRIPTOR            OpalSscV2;
   OPAL_SSCLITE_FEATURE_DESCRIPTOR          OpalSscLite;
   PYRITE_SSC_FEATURE_DESCRIPTOR            PyriteSsc;
+  TCG_BLOCK_SID_FEATURE_DESCRIPTOR         BlockSid;
 } OPAL_LEVEL0_FEATURE_DESCRIPTOR;
 
 #pragma pack()

@@ -228,6 +228,7 @@ typedef enum {
 #define TCG_FEATURE_OPAL_SSC_V2_0_0     (UINT16)0x0203
 #define TCG_FEATURE_OPAL_SSC_LITE       (UINT16)0x0301
 #define TCG_FEATURE_PYRITE_SSC          (UINT16)0x0302
+#define TCG_FEATURE_BLOCK_SID           (UINT16)0x0402
 
 // ACE Expression values
 #define TCG_ACE_EXPRESSION_AND 0x0
@@ -301,6 +302,17 @@ typedef struct {
   UINT8                                Reserved : 2;
   UINT8                                Reserved515[11];
 } TCG_LOCKING_FEATURE_DESCRIPTOR;
+
+typedef struct {
+  TCG_LEVEL0_FEATURE_DESCRIPTOR_HEADER Header;
+  UINT8                                SIDValueState : 1;
+  UINT8                                SIDBlockedState : 1;
+  UINT8                                Reserved4 : 6;
+  UINT8                                HardwareReset : 1;
+  UINT8                                Reserved5 : 7;
+  UINT8                                Reserved615[10];
+} TCG_BLOCK_SID_FEATURE_DESCRIPTOR;
+
 
 typedef struct {
   TCG_LEVEL0_FEATURE_DESCRIPTOR_HEADER Header;
