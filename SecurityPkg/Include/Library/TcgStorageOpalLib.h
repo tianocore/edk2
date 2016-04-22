@@ -76,6 +76,12 @@ typedef struct {
     //  1 - The initial C_PIN_SID PIN value is equal to the C_PIN_MSID PIN value
     //
     UINT32 CpinUponRevert : 1;
+
+    //
+    // Media encryption supported (0 - not supported, 1 - supported)
+    //
+    UINT32 BlockSid : 1;
+
 } OPAL_DISK_SUPPORT_ATTRIBUTE;
 
 //

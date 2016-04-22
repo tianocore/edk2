@@ -1515,6 +1515,12 @@ OpalGetSupportedAttributesInfo(
     SupportedAttributes->MediaEncryption = Feat->Locking.MediaEncryption;
   }
 
+  Size = 0;
+  Feat = (OPAL_LEVEL0_FEATURE_DESCRIPTOR*) TcgGetFeature (DiscoveryHeader, TCG_FEATURE_BLOCK_SID, &Size);
+  if (Feat != NULL && Size >= sizeof (TCG_BLOCK_SID_FEATURE_DESCRIPTOR)) {
+    SupportedAttributes->BlockSid = TRUE;
+  }
+
   DEBUG ((DEBUG_INFO, "Base COMID 0x%04X \n", *OpalBaseComId));
 
 
