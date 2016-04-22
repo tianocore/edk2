@@ -1115,7 +1115,7 @@ class PlatformAutoGen(AutoGen):
     ## Generate Fds Command
     def _GenFdsCommand(self):
         return self.Workspace.GenFdsCommand
-		
+
     ## Create makefile for the platform and mdoules in it
     #
     #   @param      CreateModuleMakeFile    Flag indicating if the makefile for
@@ -3666,34 +3666,29 @@ class ModuleAutoGen(AutoGen):
             AsBuiltInfDict['pcd_is_driver_string'] += [DriverType]
 
         if 'UEFI_SPECIFICATION_VERSION' in self.Specification:
-          AsBuiltInfDict['module_uefi_specification_version'] += [self.Specification['UEFI_SPECIFICATION_VERSION']]
+            AsBuiltInfDict['module_uefi_specification_version'] += [self.Specification['UEFI_SPECIFICATION_VERSION']]
         if 'PI_SPECIFICATION_VERSION' in self.Specification:
-          AsBuiltInfDict['module_pi_specification_version'] += [self.Specification['PI_SPECIFICATION_VERSION']]
+            AsBuiltInfDict['module_pi_specification_version'] += [self.Specification['PI_SPECIFICATION_VERSION']]
 
         OutputDir = self.OutputDir.replace('\\', '/').strip('/')
-        if self.ModuleType in ['BASE', 'USER_DEFINED']:
-          for Item in self.CodaTargetList:
+
+        for Item in self.CodaTargetList:
             File = Item.Target.Path.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
             if Item.Target.Ext.lower() == '.aml':
-              AsBuiltInfDict['binary_item'] += ['ASL|' + File]
+                AsBuiltInfDict['binary_item'] += ['ASL|' + File]
             elif Item.Target.Ext.lower() == '.acpi':
-              AsBuiltInfDict['binary_item'] += ['ACPI|' + File]
+                AsBuiltInfDict['binary_item'] += ['ACPI|' + File]
+            elif Item.Target.Ext.lower() == '.efi':
+                AsBuiltInfDict['binary_item'] += ['PE32|' + self.Name + '.efi']
             else:
-              AsBuiltInfDict['binary_item'] += ['BIN|' + File]
-        else:
-          for Item in self.CodaTargetList:
-            File = Item.Target.Path.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
-            if Item.Target.Ext.lower() == '.efi':
-              AsBuiltInfDict['binary_item'] += ['PE32|' + self.Name + '.efi']
-            else:
-              AsBuiltInfDict['binary_item'] += ['BIN|' + File]
-          if self.DepexGenerated:
+                AsBuiltInfDict['binary_item'] += ['BIN|' + File]
+        if self.DepexGenerated:
             if self.ModuleType in ['PEIM']:
-              AsBuiltInfDict['binary_item'] += ['PEI_DEPEX|' + self.Name + '.depex']
+                AsBuiltInfDict['binary_item'] += ['PEI_DEPEX|' + self.Name + '.depex']
             if self.ModuleType in ['DXE_DRIVER', 'DXE_RUNTIME_DRIVER', 'DXE_SAL_DRIVER', 'UEFI_DRIVER']:
-              AsBuiltInfDict['binary_item'] += ['DXE_DEPEX|' + self.Name + '.depex']
+                AsBuiltInfDict['binary_item'] += ['DXE_DEPEX|' + self.Name + '.depex']
             if self.ModuleType in ['DXE_SMM_DRIVER']:
-              AsBuiltInfDict['binary_item'] += ['SMM_DEPEX|' + self.Name + '.depex']
+                AsBuiltInfDict['binary_item'] += ['SMM_DEPEX|' + self.Name + '.depex']
 
         Bin = self._GenOffsetBin()
         if Bin:
@@ -3845,8 +3840,8 @@ class ModuleAutoGen(AutoGen):
                 PcdEntry = PcdComments + '\n  ' + PcdEntry
             AsBuiltInfDict['pcd_item'] += [PcdEntry]
         for Item in self.BuildOption:
-          if 'FLAGS' in self.BuildOption[Item]:
-            AsBuiltInfDict['flags_item'] += ['%s:%s_%s_%s_%s_FLAGS = %s' % (self.ToolChainFamily, self.BuildTarget, self.ToolChain, self.Arch, Item, self.BuildOption[Item]['FLAGS'].strip())]
+            if 'FLAGS' in self.BuildOption[Item]:
+                AsBuiltInfDict['flags_item'] += ['%s:%s_%s_%s_%s_FLAGS = %s' % (self.ToolChainFamily, self.BuildTarget, self.ToolChain, self.Arch, Item, self.BuildOption[Item]['FLAGS'].strip())]
 
         # Generated LibraryClasses section in comments.
         for Library in self.LibraryAutoGenList:
