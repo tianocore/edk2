@@ -5,7 +5,7 @@
   for Firmware Basic Boot Performance Record and other boot performance records, 
   and install FPDT to ACPI table.
 
-  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,6 +28,7 @@
 #include <Guid/FirmwarePerformance.h>
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
+#include <Guid/PiSmmCommunicationRegionTable.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -337,6 +338,12 @@ InstallFirmwarePerformanceDataTable (
   UINT8                         *BootPerformanceData; 
   EFI_SMM_COMMUNICATION_PROTOCOL  *Communication;
   FIRMWARE_PERFORMANCE_VARIABLE PerformanceVariable;
+  EDKII_PI_SMM_COMMUNICATION_REGION_TABLE *SmmCommRegionTable;
+  EFI_MEMORY_DESCRIPTOR         *SmmCommMemRegion;
+  UINTN                         Index;
+  VOID                          *SmmBootRecordData;
+  UINTN                         SmmBootRecordDataSize;
+  UINTN                         ReservedMemSize;
 
   //
   // Get AcpiTable Protocol.
@@ -351,40 +358,74 @@ InstallFirmwarePerformanceDataTable (
   //
   SmmBootRecordCommBuffer = NULL;
   SmmCommData             = NULL;
+  SmmBootRecordData       = NULL;
+  SmmBootRecordDataSize   = 0;
+  ReservedMemSize         = 0;
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &Communication);
   if (!EFI_ERROR (Status)) {
     //
     // Initialize communicate buffer 
+    // Get the prepared Reserved Memory Range
     //
-    SmmBootRecordCommBuffer = AllocateZeroPool (SMM_BOOT_RECORD_COMM_SIZE);
-    ASSERT (SmmBootRecordCommBuffer != NULL);
-    SmmCommBufferHeader = (EFI_SMM_COMMUNICATE_HEADER*)SmmBootRecordCommBuffer;
-    SmmCommData = (SMM_BOOT_RECORD_COMMUNICATE*)SmmCommBufferHeader->Data;
-    ZeroMem((UINT8*)SmmCommData, sizeof(SMM_BOOT_RECORD_COMMUNICATE));
-
-    CopyGuid (&SmmCommBufferHeader->HeaderGuid, &gEfiFirmwarePerformanceGuid);
-    SmmCommBufferHeader->MessageLength = sizeof(SMM_BOOT_RECORD_COMMUNICATE);
-    CommSize = SMM_BOOT_RECORD_COMM_SIZE;
-  
-    //
-    // Get the size of boot records.
-    //
-    SmmCommData->Function       = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE;
-    SmmCommData->BootRecordData = NULL;
-    Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
-    ASSERT_EFI_ERROR (Status);
-  
-    if (!EFI_ERROR (SmmCommData->ReturnStatus) && SmmCommData->BootRecordSize != 0) {
+    Status = EfiGetSystemConfigurationTable (
+              &gEdkiiPiSmmCommunicationRegionTableGuid, 
+              (VOID **) &SmmCommRegionTable
+              );
+    if (!EFI_ERROR (Status)) {
+      ASSERT (SmmCommRegionTable != NULL);
+      SmmCommMemRegion = (EFI_MEMORY_DESCRIPTOR *) (SmmCommRegionTable + 1);
+      for (Index = 0; Index < SmmCommRegionTable->NumberOfEntries; Index ++) {
+        if (SmmCommMemRegion->Type == EfiConventionalMemory) {
+          break;
+        }
+        SmmCommMemRegion = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) SmmCommMemRegion + SmmCommRegionTable->DescriptorSize);
+      }
+      ASSERT (Index < SmmCommRegionTable->NumberOfEntries);
+      ASSERT (SmmCommMemRegion->PhysicalStart > 0);
+      ASSERT (SmmCommMemRegion->NumberOfPages > 0);
+      ReservedMemSize = (UINTN) SmmCommMemRegion->NumberOfPages * EFI_PAGE_SIZE;
+    
       //
-      // Get all boot records
+      // Check enough reserved memory space
       //
-      SmmCommData->Function       = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA;
-      SmmCommData->BootRecordData = AllocateZeroPool(SmmCommData->BootRecordSize);
-      ASSERT (SmmCommData->BootRecordData != NULL);
+      if (ReservedMemSize > SMM_BOOT_RECORD_COMM_SIZE) {
+        SmmBootRecordCommBuffer = (VOID *) (UINTN) SmmCommMemRegion->PhysicalStart;
+        SmmCommBufferHeader = (EFI_SMM_COMMUNICATE_HEADER*)SmmBootRecordCommBuffer;
+        SmmCommData = (SMM_BOOT_RECORD_COMMUNICATE*)SmmCommBufferHeader->Data;
+        ZeroMem((UINT8*)SmmCommData, sizeof(SMM_BOOT_RECORD_COMMUNICATE));
+    
+        CopyGuid (&SmmCommBufferHeader->HeaderGuid, &gEfiFirmwarePerformanceGuid);
+        SmmCommBufferHeader->MessageLength = sizeof(SMM_BOOT_RECORD_COMMUNICATE);
+        CommSize = SMM_BOOT_RECORD_COMM_SIZE;
       
-      Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
-      ASSERT_EFI_ERROR (Status);
-      ASSERT_EFI_ERROR(SmmCommData->ReturnStatus);
+        //
+        // Get the size of boot records.
+        //
+        SmmCommData->Function       = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE;
+        SmmCommData->BootRecordData = NULL;
+        Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
+        ASSERT_EFI_ERROR (Status);
+      
+        if (!EFI_ERROR (SmmCommData->ReturnStatus) && SmmCommData->BootRecordSize != 0) {
+          //
+          // Get all boot records
+          //
+          SmmCommData->Function       = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET;
+          SmmBootRecordDataSize       = SmmCommData->BootRecordSize;
+          SmmBootRecordData           = AllocateZeroPool(SmmBootRecordDataSize);
+          ASSERT (SmmBootRecordData  != NULL);
+          SmmCommData->BootRecordOffset = 0;
+          SmmCommData->BootRecordData   = (VOID *) ((UINTN) SmmCommMemRegion->PhysicalStart + SMM_BOOT_RECORD_COMM_SIZE);
+          SmmCommData->BootRecordSize   = ReservedMemSize - SMM_BOOT_RECORD_COMM_SIZE;
+          while (SmmCommData->BootRecordOffset < SmmBootRecordDataSize) {
+            Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
+            ASSERT_EFI_ERROR (Status);
+            ASSERT_EFI_ERROR(SmmCommData->ReturnStatus);
+            CopyMem ((UINT8 *) SmmBootRecordData + SmmCommData->BootRecordOffset, SmmCommData->BootRecordData, SmmCommData->BootRecordSize);
+            SmmCommData->BootRecordOffset = SmmCommData->BootRecordOffset + SmmCommData->BootRecordSize;
+          }
+        }
+      }
     }
   }
 
@@ -394,7 +435,7 @@ InstallFirmwarePerformanceDataTable (
   //
   BootPerformanceDataSize = sizeof (BOOT_PERFORMANCE_TABLE) + mBootRecordSize + PcdGet32 (PcdExtFpdtBootRecordPadSize);
   if (SmmCommData != NULL) {
-    BootPerformanceDataSize += SmmCommData->BootRecordSize;
+    BootPerformanceDataSize += SmmBootRecordDataSize;
   }
 
   //
@@ -430,14 +471,12 @@ InstallFirmwarePerformanceDataTable (
   DEBUG ((EFI_D_INFO, "FPDT: ACPI Boot Performance Table address = 0x%x\n", mAcpiBootPerformanceTable));
 
   if (mAcpiBootPerformanceTable == NULL) {
-    if (SmmCommData != NULL && SmmCommData->BootRecordData != NULL) {
-      FreePool (SmmCommData->BootRecordData);
-    }
-    if (SmmBootRecordCommBuffer != NULL) {
-      FreePool (SmmBootRecordCommBuffer);
+    if (SmmCommData != NULL && SmmBootRecordData != NULL) {
+      FreePool (SmmBootRecordData);
     }
     if (mAcpiS3PerformanceTable != NULL) {
       FreePages (mAcpiS3PerformanceTable, EFI_SIZE_TO_PAGES (sizeof (S3_PERFORMANCE_TABLE)));
+      mAcpiS3PerformanceTable = NULL;
     }
     return EFI_OUT_OF_RESOURCES;
   }
@@ -457,17 +496,14 @@ InstallFirmwarePerformanceDataTable (
   CopyMem (BootPerformanceData, mBootRecordBuffer, mBootRecordSize);
   mAcpiBootPerformanceTable->Header.Length += mBootRecordSize;
   BootPerformanceData = BootPerformanceData + mBootRecordSize;
-  if (SmmCommData != NULL && SmmCommData->BootRecordData != NULL) {
+  if (SmmCommData != NULL && SmmBootRecordData != NULL) {
     //
     // Fill Boot records from SMM drivers.
     //
-    CopyMem (BootPerformanceData, SmmCommData->BootRecordData, SmmCommData->BootRecordSize);
-    FreePool (SmmCommData->BootRecordData);
-    mAcpiBootPerformanceTable->Header.Length = (UINT32) (mAcpiBootPerformanceTable->Header.Length + SmmCommData->BootRecordSize);
-    BootPerformanceData = BootPerformanceData + SmmCommData->BootRecordSize;
-  }
-  if (SmmBootRecordCommBuffer != NULL) {
-    FreePool (SmmBootRecordCommBuffer);
+    CopyMem (BootPerformanceData, SmmBootRecordData, SmmBootRecordDataSize);
+    FreePool (SmmBootRecordData);
+    mAcpiBootPerformanceTable->Header.Length = (UINT32) (mAcpiBootPerformanceTable->Header.Length + SmmBootRecordDataSize);
+    BootPerformanceData = BootPerformanceData + SmmBootRecordDataSize;
   }
 
   //
