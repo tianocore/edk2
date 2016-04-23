@@ -40,7 +40,7 @@ GicV3EnableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
 {
-  if (Source > mGicNumInterrupts) {
+  if (Source >= mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -67,7 +67,7 @@ GicV3DisableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
 {
-  if (Source > mGicNumInterrupts) {
+  if (Source >= mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -96,7 +96,7 @@ GicV3GetInterruptSourceState (
   IN BOOLEAN                            *InterruptState
   )
 {
-  if (Source > mGicNumInterrupts) {
+  if (Source >= mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -124,7 +124,7 @@ GicV3EndOfInterrupt (
   IN HARDWARE_INTERRUPT_SOURCE          Source
   )
 {
-  if (Source > mGicNumInterrupts) {
+  if (Source >= mGicNumInterrupts) {
     ASSERT(FALSE);
     return EFI_UNSUPPORTED;
   }
