@@ -1441,6 +1441,7 @@ InternalShellExecuteDevicePath(
   }
 
   InitializeListHead(&OrigEnvs);
+  ZeroMem(&ShellParamsProtocol, sizeof(EFI_SHELL_PARAMETERS_PROTOCOL));
 
   NewHandle = NULL;
   
@@ -1483,6 +1484,20 @@ InternalShellExecuteDevicePath(
     EFI_OPEN_PROTOCOL_GET_PROTOCOL);
 
   if (!EFI_ERROR(Status)) {
+    //
+    // If the image is not an app abort it.
+    //
+    if (LoadedImage->ImageCodeType != EfiLoaderCode){
+      ShellPrintHiiEx(
+        -1, 
+        -1, 
+        NULL,
+        STRING_TOKEN (STR_SHELL_IMAGE_NOT_APP),
+        ShellInfoObject.HiiHandle
+      );
+      goto UnloadImage;
+    }
+
     ASSERT(LoadedImage->LoadOptionsSize == 0);
     if (NewCmdLine != NULL) {
       LoadedImage->LoadOptionsSize  = (UINT32)StrSize(NewCmdLine);
