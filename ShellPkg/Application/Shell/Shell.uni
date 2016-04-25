@@ -1,7 +1,7 @@
 // *++
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved. <BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -52,3 +52,6 @@
 #string STR_VER_OUTPUT_MAIN_UEFI      #language en-US "UEFI v%d.%02d (%s, 0x%08x)\r\n"
 
 #string STR_SHELL_NO_IN_EX            #language en-US "No SimpleTextInputEx was found. CTRL-based features are not usable.\r\n"
+
+#string STR_SHELL_IMAGE_NOT_APP       #language en-US "The image is not an application.\r\n"
+
