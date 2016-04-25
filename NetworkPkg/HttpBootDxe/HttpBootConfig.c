@@ -79,9 +79,9 @@ HttpBootAddBootOption (
   }
 
   //
-  // Only accept http and https URI.
+  // Only accept empty URI, or http and https URI.
   //
-  if ((StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 7) != 0)) {
+  if ((StrLen (Uri) != 0) && (StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 8) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
   
@@ -577,9 +577,10 @@ HttpBootFormCallback (
     HiiSetString (CallbackInfo->RegisteredHandle, Value->string, Uri, NULL);
 
     //
-    // We only accept http and https, pop up a message box for unsupported URI.
+    // The URI should be either an empty string (for corporate environment) ,or http(s) for home environment.
+    // Pop up a message box for other unsupported URI.
     //
-    if ((StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 7) != 0)) {
+    if ((StrLen (Uri) != 0) && (StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 8) != 0)) {
       CreatePopUp (
         EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
         &Key,

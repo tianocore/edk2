@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Macros used for an IPv4 or an IPv6 address.
 //
-#define URI_STR_MIN_SIZE             8
+#define URI_STR_MIN_SIZE             0
 #define URI_STR_MAX_SIZE             255
 
 #define DESCRIPTION_STR_MIN_SIZE     6
