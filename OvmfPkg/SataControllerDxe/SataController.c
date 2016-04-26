@@ -570,6 +570,8 @@ SataControllerStop (
   EFI_STATUS                        Status;
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeInit;
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *SataPrivateData;
+  EFI_PCI_IO_PROTOCOL               *PciIo;
+  UINT64                            OriginalPciAttributes;
 
   //
   // Open the produced protocol
@@ -588,6 +590,9 @@ SataControllerStop (
 
   SataPrivateData = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (IdeInit);
   ASSERT (SataPrivateData != NULL);
+
+  PciIo                 = SataPrivateData->PciIo;
+  OriginalPciAttributes = SataPrivateData->OriginalPciAttributes;
 
   //
   // Uninstall the IDE Controller Init Protocol from this instance
@@ -616,12 +621,12 @@ SataControllerStop (
   //
   // Restore original PCI attributes
   //
-  SataPrivateData->PciIo->Attributes (
-                            SataPrivateData->PciIo,
-                            EfiPciIoAttributeOperationSet,
-                            SataPrivateData->OriginalPciAttributes,
-                            NULL
-                            );
+  PciIo->Attributes (
+           PciIo,
+           EfiPciIoAttributeOperationSet,
+           OriginalPciAttributes,
+           NULL
+           );
 
   //
   // Close protocols opened by Sata Controller driver
