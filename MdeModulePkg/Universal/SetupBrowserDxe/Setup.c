@@ -3182,6 +3182,9 @@ SubmitForForm (
   EFI_STRING              Progress;
   BROWSER_STORAGE         *Storage;
   FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
+  BOOLEAN                 SubmitFormFail;
+
+  SubmitFormFail = FALSE;
 
   if (!IsNvUpdateRequiredForForm (Form)) {
     return EFI_SUCCESS;
@@ -3231,6 +3234,7 @@ SubmitForForm (
       //
       // Submit fail, to get the RestoreConfigRequest and SyncConfigRequest.
       //
+      SubmitFormFail = TRUE;
       GetSyncRestoreConfigRequest (ConfigInfo->Storage, ConfigInfo->ConfigRequest, Progress, &ConfigInfo->RestoreConfigRequest, &ConfigInfo->SyncConfigRequest);
       InsertTailList (&gBrowserSaveFailFormSetList, &ConfigInfo->SaveFailLink);
       continue;
@@ -3288,7 +3292,9 @@ SubmitForForm (
   //
   // 6 Call callback with Submitted type to inform the driver.
   //
-  SubmitCallback (FormSet, Form);
+  if (!SubmitFormFail) {
+    SubmitCallback (FormSet, Form);
+  }
 
   return Status;
 }
@@ -3324,8 +3330,10 @@ SubmitForFormSet (
   FORM_BROWSER_FORM       *Form;
   BOOLEAN                 HasInserted;
   FORM_BROWSER_STATEMENT  *Question;
+  BOOLEAN                 SubmitFormSetFail;
 
   HasInserted = FALSE;
+  SubmitFormSetFail = FALSE;
 
   if (!IsNvUpdateRequiredForFormSet (FormSet)) {
     return EFI_SUCCESS;
@@ -3388,6 +3396,7 @@ SubmitForFormSet (
       //
       // Submit fail, to get the RestoreConfigRequest and SyncConfigRequest.
       //
+      SubmitFormSetFail = TRUE;
       GetSyncRestoreConfigRequest (FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, Progress, &FormSetStorage->RestoreConfigRequest, &FormSetStorage->SyncConfigRequest);
       InsertTailList (&FormSet->SaveFailStorageListHead, &FormSetStorage->SaveFailLink);
       if (!HasInserted) {
@@ -3481,7 +3490,9 @@ SubmitForFormSet (
   //
   // 6. Call callback with Submitted type to inform the driver.
   //
-  SubmitCallback (FormSet, NULL);
+  if (!SubmitFormSetFail) {
+    SubmitCallback (FormSet, NULL);
+  }
 
   return Status;
 }
