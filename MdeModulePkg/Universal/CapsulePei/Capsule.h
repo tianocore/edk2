@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -119,10 +119,8 @@ typedef union {
 typedef
 EFI_STATUS
 (*COALESCE_ENTRY) (
-  IN EFI_PEI_SERVICES                **PeiServices,
-  IN EFI_CAPSULE_BLOCK_DESCRIPTOR    *BlockList,
-  IN OUT VOID                        **MemoryBase,
-  IN OUT UINTN                       *MemorySize
+  SWITCH_32_TO_64_CONTEXT       *EntrypointContext,
+  SWITCH_64_TO_32_CONTEXT       *ReturnContext
   );
 
 #endif

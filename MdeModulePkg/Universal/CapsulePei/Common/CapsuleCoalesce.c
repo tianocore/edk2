@@ -10,7 +10,7 @@
   into memory.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1034,7 +1034,7 @@ CapsuleDataCoalesce (
   PrivateData.CapsuleNumber       = (UINT64) CapsuleNumber;
   PrivateData.CapsuleOffset[0]    = 0;
   //
-  // NOTE: Only data in sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) is valid, CapsuleOffset field is unitialized at this moment.
+  // NOTE: Only data in sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) is valid, CapsuleOffset field is uninitialized at this moment.
   // The code sets partial length here for Descriptor.Length check, but later it will use full length to reserve those PrivateData region.
   //
   PrivateDataDesc[0].Union.DataBlock  = (EFI_PHYSICAL_ADDRESS) (UINTN) &PrivateData;
@@ -1042,12 +1042,12 @@ CapsuleDataCoalesce (
   PrivateDataDesc[1].Union.DataBlock  = (EFI_PHYSICAL_ADDRESS) (UINTN) BlockList;
   PrivateDataDesc[1].Length           = 0;
   //
-  // Add PrivateDataDesc[0] in beginning beginning, as it is new descriptor. PrivateDataDesc[1] is NOT needed.
+  // Add PrivateDataDesc[0] in beginning, as it is new descriptor. PrivateDataDesc[1] is NOT needed.
   // In addition, one NULL terminator is added in the end. See RelocateBlockDescriptors().
   //
   NumDescriptors  += 2;
   //
-  // Sandity check
+  // Sanity check
   //
   if (CapsuleSize >= (MAX_ADDRESS - (sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64) + sizeof(UINT64)))) {
     DEBUG ((EFI_D_ERROR, "ERROR: CapsuleSize - 0x%x\n", CapsuleSize));
@@ -1059,7 +1059,7 @@ CapsuleDataCoalesce (
   CapsuleSize     += sizeof (EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64) + sizeof(UINT64);
   BlockList        = PrivateDataDesc;
   //
-  // Sandity check
+  // Sanity check
   //
   if (NumDescriptors >= (MAX_ADDRESS / sizeof(EFI_CAPSULE_BLOCK_DESCRIPTOR))) {
     DEBUG ((EFI_D_ERROR, "ERROR: NumDescriptors - 0x%x\n", NumDescriptors));
@@ -1067,7 +1067,7 @@ CapsuleDataCoalesce (
   }
   DescriptorsSize  = NumDescriptors * sizeof (EFI_CAPSULE_BLOCK_DESCRIPTOR);
   //
-  // Sandity check
+  // Sanity check
   //
   if (DescriptorsSize >= (MAX_ADDRESS - CapsuleSize)) {
     DEBUG ((EFI_D_ERROR, "ERROR: DescriptorsSize - 0x%lx, CapsuleSize - 0x%lx\n", (UINT64)DescriptorsSize, (UINT64)CapsuleSize));

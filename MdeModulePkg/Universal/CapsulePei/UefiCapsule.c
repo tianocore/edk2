@@ -1,7 +1,7 @@
 /** @file
   Capsule update PEIM for UEFI2.0
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1006,7 +1006,7 @@ CreateState (
   CopyMem ((VOID *) (UINTN) NewBuffer, (VOID *) (UINTN) ((UINT8 *)PrivateData + sizeof(EFI_CAPSULE_PEIM_PRIVATE_DATA) + (CapsuleNumber - 1) * sizeof(UINT64)), Size);
   //
   // Check for test data pattern. If it is the test pattern, then we'll
-  // test it ans still create the HOB so that it can be used to verify
+  // test it and still create the HOB so that it can be used to verify
   // that capsules don't get corrupted all the way into BDS. BDS will
   // still try to turn it into a firmware volume, but will think it's
   // corrupted so nothing will happen.
