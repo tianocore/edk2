@@ -2,7 +2,7 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
-  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -101,13 +101,11 @@ struct _NVME_CONTROLLER_PRIVATE_DATA {
   NVME_ADMIN_CONTROLLER_DATA          *ControllerData;
 
   //
-  // 6 x 4kB aligned buffers will be carved out of this buffer.
+  // 4 x 4kB aligned buffers will be carved out of this buffer.
   // 1st 4kB boundary is the start of the admin submission queue.
-  // 2nd 4kB boundary is the start of the I/O submission queue #1.
-  // 3rd 4kB boundary is the start of the admin completion queue.
-  // 4th 4kB boundary is the start of the I/O completion queue #1.
-  // 5th 4kB boundary is the start of the first PRP list page.
-  // 6th 4kB boundary is the start of the second PRP list page.
+  // 2nd 4kB boundary is the start of the admin completion queue.
+  // 3rd 4kB boundary is the start of I/O submission queue #1.
+  // 4th 4kB boundary is the start of I/O completion queue #1.
   //
   UINT8                               *Buffer;
   UINT8                               *BufferPciAddr;
