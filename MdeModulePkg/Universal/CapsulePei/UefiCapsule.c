@@ -354,6 +354,7 @@ Thunk32To64 (
   @param  LongModeBuffer            The context of long mode.
   @param  CoalesceEntry             Entry of coalesce image.
   @param  BlockListAddr             Address of block list.
+  @param  MemoryResource            Pointer to the buffer of memory resource descriptor.
   @param  MemoryBase                Base of memory range.
   @param  MemorySize                Size of memory range.
 
@@ -366,6 +367,7 @@ ModeSwitch (
   IN EFI_CAPSULE_LONG_MODE_BUFFER   *LongModeBuffer,
   IN COALESCE_ENTRY                 CoalesceEntry,
   IN EFI_PHYSICAL_ADDRESS           BlockListAddr,
+  IN MEMORY_RESOURCE_DESCRIPTOR     *MemoryResource,
   IN OUT VOID                       **MemoryBase,
   IN OUT UINTN                      *MemorySize
   )
@@ -429,6 +431,7 @@ ModeSwitch (
   Context.StackBufferLength     = LongModeBuffer->StackSize;
   Context.EntryPoint            = (EFI_PHYSICAL_ADDRESS)(UINTN)CoalesceEntry;
   Context.BlockListAddr         = BlockListAddr;
+  Context.MemoryResource        = (EFI_PHYSICAL_ADDRESS)(UINTN)MemoryResource;
   Context.MemoryBase64Ptr       = (EFI_PHYSICAL_ADDRESS)(UINTN)&MemoryBase64;
   Context.MemorySize64Ptr       = (EFI_PHYSICAL_ADDRESS)(UINTN)&MemorySize64;
   Context.Page1GSupport         = Page1GSupport;
@@ -559,6 +562,133 @@ GetLongModeContext (
   return Status;
 }
 #endif
+
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+/**
+  Get physical address bits.
+
+  @return Physical address bits.
+
+**/
+UINT8
+GetPhysicalAddressBits (
+  VOID
+  )
+{
+  UINT32                        RegEax;
+  UINT8                         PhysicalAddressBits;
+  VOID                          *Hob;
+
+  //
+  // Get physical address bits supported.
+  //
+  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+  if (Hob != NULL) {
+    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+  } else {
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000008) {
+      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+      PhysicalAddressBits = (UINT8) RegEax;
+    } else {
+      PhysicalAddressBits = 36;
+    }
+  }
+
+  //
+  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
+  //
+  ASSERT (PhysicalAddressBits <= 52);
+  if (PhysicalAddressBits > 48) {
+    PhysicalAddressBits = 48;
+  }
+
+  return PhysicalAddressBits;
+}
+#endif
+
+/**
+  Build memory resource descriptor from resource descriptor in HOB list.
+
+  @return Pointer to the buffer of memory resource descriptor.
+          NULL if no memory resource descriptor reported in HOB list
+          before capsule Coalesce.
+
+**/
+MEMORY_RESOURCE_DESCRIPTOR *
+BuildMemoryResourceDescriptor (
+  VOID
+  )
+{
+  EFI_PEI_HOB_POINTERS          Hob;
+  UINTN                         Index;
+  EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceDescriptor;
+  MEMORY_RESOURCE_DESCRIPTOR    *MemoryResource;
+  EFI_STATUS                    Status;
+
+  //
+  // Get the count of memory resource descriptor.
+  //
+  Index = 0;
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *) Hob.Raw;
+    if (ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+      Index++;
+    }
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  if (Index == 0) {
+    DEBUG ((EFI_D_INFO | EFI_D_WARN, "No memory resource descriptor reported in HOB list before capsule Coalesce\n"));
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+    //
+    // Allocate memory to hold memory resource descriptor,
+    // include extra one NULL terminate memory resource descriptor.
+    //
+    Status = PeiServicesAllocatePool ((1 + 1) * sizeof (MEMORY_RESOURCE_DESCRIPTOR), (VOID **) &MemoryResource);
+    ASSERT_EFI_ERROR (Status);
+    ZeroMem (MemoryResource, (1 + 1) * sizeof (MEMORY_RESOURCE_DESCRIPTOR));
+  
+    MemoryResource[0].PhysicalStart = 0;
+    MemoryResource[0].ResourceLength = LShiftU64 (1, GetPhysicalAddressBits ());
+    DEBUG ((EFI_D_INFO, "MemoryResource[0x0] - Start(0x%0lx) Length(0x%0lx)\n",
+                        MemoryResource[0x0].PhysicalStart, MemoryResource[0x0].ResourceLength));
+    return MemoryResource;
+#else
+    return NULL;
+#endif
+  }
+
+  //
+  // Allocate memory to hold memory resource descriptor,
+  // include extra one NULL terminate memory resource descriptor.
+  //
+  Status = PeiServicesAllocatePool ((Index + 1) * sizeof (MEMORY_RESOURCE_DESCRIPTOR), (VOID **) &MemoryResource);
+  ASSERT_EFI_ERROR (Status);
+  ZeroMem (MemoryResource, (Index + 1) * sizeof (MEMORY_RESOURCE_DESCRIPTOR));
+
+  //
+  // Get the content of memory resource descriptor.
+  //
+  Index = 0;
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *) Hob.Raw;
+    if (ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+      DEBUG ((EFI_D_INFO, "MemoryResource[0x%x] - Start(0x%0lx) Length(0x%0lx)\n",
+                          Index, ResourceDescriptor->PhysicalStart, ResourceDescriptor->ResourceLength));
+      MemoryResource[Index].PhysicalStart = ResourceDescriptor->PhysicalStart;
+      MemoryResource[Index].ResourceLength = ResourceDescriptor->ResourceLength;
+      Index++;
+    }
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  return MemoryResource;
+}
 
 /**
   Checks for the presence of capsule descriptors.
@@ -711,6 +841,7 @@ CapsuleCoalesce (
   EFI_BOOT_MODE                        BootMode;
   EFI_PEI_READ_ONLY_VARIABLE2_PPI      *PPIVariableServices;
   EFI_PHYSICAL_ADDRESS                 *VariableArrayAddress;
+  MEMORY_RESOURCE_DESCRIPTOR           *MemoryResource;
 #ifdef MDE_CPU_IA32
   UINT16                               CoalesceImageMachineType;
   EFI_PHYSICAL_ADDRESS                 CoalesceImageEntryPoint;
@@ -800,6 +931,8 @@ CapsuleCoalesce (
     goto Done;
   }
 
+  MemoryResource = BuildMemoryResourceDescriptor ();
+
 #ifdef MDE_CPU_IA32
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     //
@@ -825,18 +958,18 @@ CapsuleCoalesce (
     }
     ASSERT (CoalesceImageEntryPoint != 0);
     CoalesceEntry = (COALESCE_ENTRY) (UINTN) CoalesceImageEntryPoint;
-    Status = ModeSwitch (&LongModeBuffer, CoalesceEntry, (EFI_PHYSICAL_ADDRESS)(UINTN)VariableArrayAddress, MemoryBase, MemorySize);
+    Status = ModeSwitch (&LongModeBuffer, CoalesceEntry, (EFI_PHYSICAL_ADDRESS)(UINTN)VariableArrayAddress, MemoryResource, MemoryBase, MemorySize);
   } else {
     //
     // Capsule is processed in IA32 mode.
     //
-    Status = CapsuleDataCoalesce (PeiServices, (EFI_PHYSICAL_ADDRESS *)(UINTN)VariableArrayAddress, MemoryBase, MemorySize);
+    Status = CapsuleDataCoalesce (PeiServices, (EFI_PHYSICAL_ADDRESS *)(UINTN)VariableArrayAddress, MemoryResource, MemoryBase, MemorySize);
   }
 #else
   //
   // Process capsule directly.
   //
-  Status = CapsuleDataCoalesce (PeiServices, (EFI_PHYSICAL_ADDRESS *)(UINTN)VariableArrayAddress, MemoryBase, MemorySize);
+  Status = CapsuleDataCoalesce (PeiServices, (EFI_PHYSICAL_ADDRESS *)(UINTN)VariableArrayAddress, MemoryResource, MemoryBase, MemorySize);
 #endif
   
   DEBUG ((EFI_D_INFO, "Capsule Coalesce Status = %r!\n", Status));
