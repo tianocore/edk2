@@ -74,6 +74,8 @@ EnumerateNvmeDevNamespace (
   UINT32                                Lbads;
   UINT32                                Flbas;
   UINT32                                LbaFmtIdx;
+  UINT8                                 Sn[21];
+  UINT8                                 Mn[41];
 
   NewDevicePathNode = NULL;
   DevicePath        = NULL;
@@ -265,7 +267,11 @@ EnumerateNvmeDevNamespace (
     //
     // Build controller name for Component Name (2) protocol.
     //
-    UnicodeSPrintAsciiFormat (Device->ModelName, sizeof (Device->ModelName), "%a-%a-%x", Private->ControllerData->Sn, Private->ControllerData->Mn, NamespaceData->Eui64);
+    CopyMem (Sn, Private->ControllerData->Sn, sizeof (Private->ControllerData->Sn));
+    Sn[20] = 0;
+    CopyMem (Mn, Private->ControllerData->Mn, sizeof (Private->ControllerData->Mn));
+    Mn[40] = 0;
+    UnicodeSPrintAsciiFormat (Device->ModelName, sizeof (Device->ModelName), "%a-%a-%x", Sn, Mn, NamespaceData->Eui64);
 
     AddUnicodeString2 (
       "eng",

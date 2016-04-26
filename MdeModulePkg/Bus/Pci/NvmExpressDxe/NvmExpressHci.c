@@ -785,7 +785,8 @@ NvmeControllerInit (
   NVME_AQA                        Aqa;
   NVME_ASQ                        Asq;
   NVME_ACQ                        Acq;
-
+  UINT8                           Sn[21];
+  UINT8                           Mn[41];
   //
   // Save original PCI attributes and enable this controller.
   //
@@ -943,13 +944,15 @@ NvmeControllerInit (
   //
   // Dump NvmExpress Identify Controller Data
   //
-  Private->ControllerData->Sn[19] = 0;
-  Private->ControllerData->Mn[39] = 0;
+  CopyMem (Sn, Private->ControllerData->Sn, sizeof (Private->ControllerData->Sn));
+  Sn[20] = 0;
+  CopyMem (Mn, Private->ControllerData->Mn, sizeof (Private->ControllerData->Mn));
+  Mn[40] = 0;
   DEBUG ((EFI_D_INFO, " == NVME IDENTIFY CONTROLLER DATA ==\n"));
   DEBUG ((EFI_D_INFO, "    PCI VID   : 0x%x\n", Private->ControllerData->Vid));
   DEBUG ((EFI_D_INFO, "    PCI SSVID : 0x%x\n", Private->ControllerData->Ssvid));
-  DEBUG ((EFI_D_INFO, "    SN        : %a\n",   (CHAR8 *)(Private->ControllerData->Sn)));
-  DEBUG ((EFI_D_INFO, "    MN        : %a\n",   (CHAR8 *)(Private->ControllerData->Mn)));
+  DEBUG ((EFI_D_INFO, "    SN        : %a\n",   Sn));
+  DEBUG ((EFI_D_INFO, "    MN        : %a\n",   Mn));
   DEBUG ((EFI_D_INFO, "    FR        : 0x%x\n", *((UINT64*)Private->ControllerData->Fr)));
   DEBUG ((EFI_D_INFO, "    RAB       : 0x%x\n", Private->ControllerData->Rab));
   DEBUG ((EFI_D_INFO, "    IEEE      : 0x%x\n", *(UINT32*)Private->ControllerData->Ieee_oui));
