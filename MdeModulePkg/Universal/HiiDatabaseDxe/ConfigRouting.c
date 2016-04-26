@@ -939,7 +939,7 @@ CompareAndMergeDefaultString (
   //
   // If the ConfigAltResp has no change,no need to update the content in AltCfgResp.
   //
-  if (ConfigAltRespChanged == FALSE) {
+  if (!ConfigAltRespChanged) {
     Status = EFI_SUCCESS;
     goto Exit;
   }
