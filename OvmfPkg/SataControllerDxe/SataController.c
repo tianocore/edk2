@@ -602,18 +602,16 @@ SataControllerStop (
     return Status;
   }
 
-  if (SataPrivateData != NULL) {
-    if (SataPrivateData->DisqualifiedModes != NULL) {
-      FreePool (SataPrivateData->DisqualifiedModes);
-    }
-    if (SataPrivateData->IdentifyData != NULL) {
-      FreePool (SataPrivateData->IdentifyData);
-    }
-    if (SataPrivateData->IdentifyValid != NULL) {
-      FreePool (SataPrivateData->IdentifyValid);
-    }
-    FreePool (SataPrivateData);
+  if (SataPrivateData->DisqualifiedModes != NULL) {
+    FreePool (SataPrivateData->DisqualifiedModes);
   }
+  if (SataPrivateData->IdentifyData != NULL) {
+    FreePool (SataPrivateData->IdentifyData);
+  }
+  if (SataPrivateData->IdentifyValid != NULL) {
+    FreePool (SataPrivateData->IdentifyValid);
+  }
+  FreePool (SataPrivateData);
 
   //
   // Restore original PCI attributes
