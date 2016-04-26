@@ -176,6 +176,7 @@ EfiHttpConfigure (
         sizeof (HttpInstance->IPv4Node)
         );
     }
+    
     //
     // Creat Tcp child
     //
@@ -897,7 +898,35 @@ HttpResponseWorker (
     HttpInstance->EndofHeader = &EndofHeader;
     HttpInstance->HttpHeaders = &HttpHeaders;
 
-    Status = HttpTcpReceiveHeader (HttpInstance, &SizeofHeaders, &BufferSize);
+
+    if (HttpInstance->TimeoutEvent == NULL) {
+      //
+      // Create TimeoutEvent for response
+      //
+      Status = gBS->CreateEvent (
+                      EVT_TIMER,
+                      TPL_CALLBACK,
+                      NULL,
+                      NULL,
+                      &HttpInstance->TimeoutEvent
+                      );
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
+    }
+
+    //
+    // Start the timer, and wait Timeout seconds to receive the header packet.
+    //
+    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_RESPONSE_TIMEOUT * TICKS_PER_SECOND);
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+
+    Status = HttpTcpReceiveHeader (HttpInstance, &SizeofHeaders, &BufferSize, HttpInstance->TimeoutEvent);
+
+    gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
+
     if (EFI_ERROR (Status)) {
       goto Error;
     }
@@ -1098,10 +1127,37 @@ HttpResponseWorker (
 
   ASSERT (HttpInstance->MsgParser != NULL);
 
+  if (HttpInstance->TimeoutEvent == NULL) {
+    //
+    // Create TimeoutEvent for response
+    //
+    Status = gBS->CreateEvent (
+                    EVT_TIMER,
+                    TPL_CALLBACK,
+                    NULL,
+                    NULL,
+                    &HttpInstance->TimeoutEvent
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+  }
+
+  //
+  // Start the timer, and wait Timeout seconds to receive the body packet.
+  //
+  Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_RESPONSE_TIMEOUT * TICKS_PER_SECOND);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
   //
   // We still need receive more data when there is no cache data and MsgParser is not NULL;
   //
-  Status = HttpTcpReceiveBody (Wrap, HttpMsg);
+  Status = HttpTcpReceiveBody (Wrap, HttpMsg, HttpInstance->TimeoutEvent);
+
+  gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
+
   if (EFI_ERROR (Status)) {
     goto Error;
   }

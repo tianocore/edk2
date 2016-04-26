@@ -47,6 +47,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HTTP_BUFFER_SIZE_DEAULT      65535
 #define HTTP_MAX_SYN_BACK_LOG        5
 #define HTTP_CONNECTION_TIMEOUT      60
+#define HTTP_RESPONSE_TIMEOUT        5
 #define HTTP_DATA_RETRIES            12
 #define HTTP_FIN_TIMEOUT             2
 #define HTTP_KEEP_ALIVE_PROBES       6
@@ -93,6 +94,8 @@ typedef struct _HTTP_PROTOCOL {
 
   UINTN                         StatusCode;
 
+  EFI_EVENT                     TimeoutEvent;
+
   EFI_HANDLE                    Tcp4ChildHandle;
   EFI_TCP4_PROTOCOL             *Tcp4;
   EFI_TCP4_CONFIG_DATA          Tcp4CfgData;
@@ -116,9 +119,7 @@ typedef struct _HTTP_PROTOCOL {
   EFI_TCP6_CLOSE_TOKEN          Tcp6CloseToken;
   BOOLEAN                       IsTcp6CloseDone;
   EFI_IPv6_ADDRESS              RemoteIpv6Addr;
-
-
-  
+ 
   //
   // Rx4Token or Rx6Token used for receiving HTTP header.
   //
@@ -504,6 +505,7 @@ HttpTcpReceive (
   @param[in]       HttpInstance    The HTTP instance private data.
   @param[in, out]  SizeofHeaders   The HTTP header length.
   @param[in, out]  BufferSize      The size of buffer to cacahe the header message.
+  @param[in]       Timeout         The time to wait for receiving the header packet.
 
   @retval EFI_SUCCESS              The HTTP header is received.                          
   @retval Others                   Other errors as indicated.
@@ -513,7 +515,8 @@ EFI_STATUS
 HttpTcpReceiveHeader (
   IN  HTTP_PROTOCOL         *HttpInstance,
   IN  OUT UINTN             *SizeofHeaders,
-  IN  OUT UINTN             *BufferSize
+  IN  OUT UINTN             *BufferSize,
+  IN  EFI_EVENT             Timeout
   );
 
 /**
@@ -521,6 +524,7 @@ HttpTcpReceiveHeader (
 
   @param[in]  Wrap               The HTTP token's wrap data.
   @param[in]  HttpMsg            The HTTP message data.
+  @param[in]  Timeout            The time to wait for receiving the body packet.
 
   @retval EFI_SUCCESS            The HTTP body is received.                          
   @retval Others                 Other error as indicated.
@@ -529,7 +533,8 @@ HttpTcpReceiveHeader (
 EFI_STATUS
 HttpTcpReceiveBody (
   IN  HTTP_TOKEN_WRAP       *Wrap,
-  IN  EFI_HTTP_MESSAGE      *HttpMsg
+  IN  EFI_HTTP_MESSAGE      *HttpMsg,
+  IN  EFI_EVENT             Timeout
   );
 
 /**

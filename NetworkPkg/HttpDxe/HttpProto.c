@@ -815,6 +815,11 @@ HttpCleanProtocol (
   
   HttpCloseTcpConnCloseEvent (HttpInstance);
 
+  if (HttpInstance->TimeoutEvent != NULL) {
+    gBS->CloseEvent (HttpInstance->TimeoutEvent);
+    HttpInstance->TimeoutEvent = NULL;
+  }
+
   if (HttpInstance->CacheBody != NULL) {
     FreePool (HttpInstance->CacheBody);
     HttpInstance->CacheBody = NULL;
@@ -1541,6 +1546,7 @@ HttpTcpReceive (
   @param[in]       HttpInstance     The HTTP instance private data.
   @param[in, out]  SizeofHeaders    The HTTP header length.
   @param[in, out]  BufferSize       The size of buffer to cacahe the header message.
+  @param[in]       Timeout          The time to wait for receiving the header packet.
   
   @retval EFI_SUCCESS               The HTTP header is received.                          
   @retval Others                    Other errors as indicated.
@@ -1550,7 +1556,8 @@ EFI_STATUS
 HttpTcpReceiveHeader (
   IN  HTTP_PROTOCOL         *HttpInstance,
   IN  OUT UINTN             *SizeofHeaders,
-  IN  OUT UINTN             *BufferSize
+  IN  OUT UINTN             *BufferSize,
+  IN  EFI_EVENT             Timeout
   )
 {
   EFI_STATUS                    Status;
@@ -1599,9 +1606,14 @@ HttpTcpReceiveHeader (
         return Status;
       }
       
-      while (!HttpInstance->IsRxDone) {
-       Tcp4->Poll (Tcp4);
-      }    
+      while (!HttpInstance->IsRxDone && ((Timeout == NULL) || EFI_ERROR (gBS->CheckEvent (Timeout)))) {
+        Tcp4->Poll (Tcp4);
+      }
+
+      if (!HttpInstance->IsRxDone) {
+        gBS->CloseEvent (Rx4Token->CompletionToken.Event);
+        Rx4Token->CompletionToken.Status = EFI_TIMEOUT;
+      }
   
       Status = Rx4Token->CompletionToken.Status;
       if (EFI_ERROR (Status)) {
@@ -1660,9 +1672,14 @@ HttpTcpReceiveHeader (
         return Status;
       }
       
-      while (!HttpInstance->IsRxDone) {
-       Tcp6->Poll (Tcp6);
-      }    
+      while (!HttpInstance->IsRxDone && ((Timeout == NULL) || EFI_ERROR (gBS->CheckEvent (Timeout)))) {
+        Tcp6->Poll (Tcp6);
+      }
+
+      if (!HttpInstance->IsRxDone) {
+        gBS->CloseEvent (Rx6Token->CompletionToken.Event);
+        Rx6Token->CompletionToken.Status = EFI_TIMEOUT;
+      }
   
       Status = Rx6Token->CompletionToken.Status;
       if (EFI_ERROR (Status)) {
@@ -1715,6 +1732,7 @@ HttpTcpReceiveHeader (
 
   @param[in]  Wrap               The HTTP token's wrap data.
   @param[in]  HttpMsg            The HTTP message data.
+  @param[in]  Timeout            The time to wait for receiving the body packet.
 
   @retval EFI_SUCCESS            The HTTP body is received.                          
   @retval Others                 Other error as indicated.
@@ -1723,7 +1741,8 @@ HttpTcpReceiveHeader (
 EFI_STATUS
 HttpTcpReceiveBody (
   IN  HTTP_TOKEN_WRAP       *Wrap,
-  IN  EFI_HTTP_MESSAGE      *HttpMsg
+  IN  EFI_HTTP_MESSAGE      *HttpMsg,
+  IN  EFI_EVENT             Timeout
   )
 {
   EFI_STATUS                Status;
@@ -1738,7 +1757,6 @@ HttpTcpReceiveBody (
   Tcp6 = HttpInstance->Tcp6;
   Rx4Token       = NULL;
   Rx6Token       = NULL;
-
   
   if (HttpInstance->LocalAddressIsIPv6) {
     ASSERT (Tcp6 != NULL);
@@ -1758,7 +1776,17 @@ HttpTcpReceiveBody (
       DEBUG ((EFI_D_ERROR, "Tcp6 receive failed: %r\n", Status));
       return Status;
     }
-      
+
+    while (!Wrap->TcpWrap.IsRxDone && ((Timeout == NULL) || EFI_ERROR (gBS->CheckEvent (Timeout)))) {
+      Tcp6->Poll (Tcp6);
+    }
+
+    if (!Wrap->TcpWrap.IsRxDone) {
+      gBS->CloseEvent (Rx6Token->CompletionToken.Event);
+      Rx6Token->CompletionToken.Status = EFI_TIMEOUT;
+      Wrap->HttpToken->Status = Rx6Token->CompletionToken.Status;
+      gBS->SignalEvent (Wrap->HttpToken->Event);
+    }
   } else {
     Rx4Token = &Wrap->TcpWrap.Rx4Token;
     Rx4Token->Packet.RxData->DataLength = (UINT32) HttpMsg->BodyLength;
@@ -1770,6 +1798,17 @@ HttpTcpReceiveBody (
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "Tcp4 receive failed: %r\n", Status));
       return Status;
+    }
+
+    while (!Wrap->TcpWrap.IsRxDone && ((Timeout == NULL) || EFI_ERROR (gBS->CheckEvent (Timeout)))) {
+      Tcp4->Poll (Tcp4);
+    }
+
+    if (!Wrap->TcpWrap.IsRxDone) {
+      gBS->CloseEvent (Rx4Token->CompletionToken.Event);
+      Rx4Token->CompletionToken.Status = EFI_TIMEOUT;
+      Wrap->HttpToken->Status = Rx4Token->CompletionToken.Status;
+      gBS->SignalEvent (Wrap->HttpToken->Event);
     }
   }
 
