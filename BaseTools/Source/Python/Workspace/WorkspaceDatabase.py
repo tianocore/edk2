@@ -545,12 +545,6 @@ class DscBuildData(PlatformBuildClassObject):
         for Record in RecordList:
             DuplicatedFile = False
 
-            # process only records COMMON and self.Arch
-            SectionArch = Record[3].upper()
-            if SectionArch != 'COMMON':
-                if SectionArch != self.Arch:
-                    continue
-
             ModuleFile = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
             ModuleId = Record[5]
             LineNo = Record[6]
@@ -2859,6 +2853,7 @@ class WorkspaceDatabase(object):
             MetaFile = self._FILE_PARSER_[FileType](
                                 FilePath, 
                                 FileType, 
+                                Arch,
                                 MetaFileStorage(self.WorkspaceDb.Cur, FilePath, FileType)
                                 )
             # alwasy do post-process, in case of macros change
