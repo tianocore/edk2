@@ -125,6 +125,9 @@ Returns:
 
 --*/
 {
+  EFI_HANDLE Handle;
+  EFI_STATUS Status;
+
   DEBUG ((EFI_D_INFO, "PlatformBdsInit\n"));
   InstallDevicePathCallback ();
 
@@ -147,11 +150,20 @@ Returns:
 
   if (QemuFwCfgS3Enabled ()) {
     //
-    // Save the boot script too. Note that this requires/includes emitting the
-    // DxeSmmReadyToLock event, which in turn locks down SMM.
+    // Save the boot script too. Note that this will require us to emit the
+    // DxeSmmReadyToLock event just below, which in turn locks down SMM.
     //
     SaveS3BootScript ();
   }
+
+  //
+  // Prevent further changes to LockBoxes or SMRAM.
+  //
+  Handle = NULL;
+  Status = gBS->InstallProtocolInterface (&Handle,
+                  &gEfiDxeSmmReadyToLockProtocolGuid, EFI_NATIVE_INTERFACE,
+                  NULL);
+  ASSERT_EFI_ERROR (Status);
 }
 
 
@@ -1206,10 +1218,8 @@ Returns:
 /**
   Save the S3 boot script.
 
-  Note that we trigger DxeSmmReadyToLock here -- otherwise the script wouldn't
-  be saved actually. Triggering this protocol installation event in turn locks
-  down SMM, so no further changes to LockBoxes or SMRAM are possible
-  afterwards.
+  Note that DxeSmmReadyToLock must be signaled after this function returns;
+  otherwise the script wouldn't be saved actually.
 **/
 STATIC
 VOID
@@ -1219,7 +1229,6 @@ SaveS3BootScript (
 {
   EFI_STATUS                 Status;
   EFI_S3_SAVE_STATE_PROTOCOL *BootScript;
-  EFI_HANDLE                 Handle;
   STATIC CONST UINT8         Info[] = { 0xDE, 0xAD, 0xBE, 0xEF };
 
   Status = gBS->LocateProtocol (&gEfiS3SaveStateProtocolGuid, NULL,
@@ -1234,12 +1243,6 @@ SaveS3BootScript (
   Status = BootScript->Write(BootScript, EFI_BOOT_SCRIPT_INFORMATION_OPCODE,
                          (UINT32) sizeof Info,
                          (EFI_PHYSICAL_ADDRESS)(UINTN) &Info);
-  ASSERT_EFI_ERROR (Status);
-
-  Handle = NULL;
-  Status = gBS->InstallProtocolInterface (&Handle,
-                  &gEfiDxeSmmReadyToLockProtocolGuid, EFI_NATIVE_INTERFACE,
-                  NULL);
   ASSERT_EFI_ERROR (Status);
 }
 
