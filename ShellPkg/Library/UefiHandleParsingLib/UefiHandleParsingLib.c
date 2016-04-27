@@ -348,7 +348,7 @@ GraphicsOutputProtocolDumpInformation(
   @param[in] TheHandle      The handle that has LoadedImage installed.
   @param[in] Verbose        TRUE for additional information, FALSE otherwise.
 
-  @retval A poitner to a string containing the information.
+  @retval A pointer to a string containing the information.
 **/
 CHAR16*
 EFIAPI
@@ -364,7 +364,7 @@ EdidDiscoveredProtocolDumpInformation (
   CHAR16                                *TempRetVal;
 
   if (!Verbose) {
-    return (CatSPrint(NULL, L"EDIDDiscovered"));
+    return (CatSPrint (NULL, L"EDIDDiscovered"));
   }
 
   Status = gBS->OpenProtocol (
@@ -380,7 +380,7 @@ EdidDiscoveredProtocolDumpInformation (
     return NULL;
   }
 
-  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_DISCOVERED_MAIN), NULL);
+  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_EDID_DISCOVERED_MAIN), NULL);
   if (Temp == NULL) {
     return NULL;
   }
@@ -388,8 +388,8 @@ EdidDiscoveredProtocolDumpInformation (
   RetVal = CatSPrint (NULL, Temp, EdidDiscovered->SizeOfEdid);
   SHELL_FREE_NON_NULL (Temp);
 
-  if(EdidDiscovered->SizeOfEdid != 0) {
-    Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_DISCOVERED_DATA), NULL);
+  if (EdidDiscovered->SizeOfEdid != 0) {
+    Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_EDID_DISCOVERED_DATA), NULL);
     if (Temp == NULL) {
       SHELL_FREE_NON_NULL (RetVal);
       return NULL;
@@ -412,7 +412,7 @@ EdidDiscoveredProtocolDumpInformation (
   @param[in] TheHandle      The handle that has LoadedImage installed.
   @param[in] Verbose        TRUE for additional information, FALSE otherwise.
 
-  @retval A poitner to a string containing the information.
+  @retval A pointer to a string containing the information.
 **/
 CHAR16*
 EFIAPI
@@ -428,7 +428,7 @@ EdidActiveProtocolDumpInformation (
   CHAR16                    *TempRetVal;
 
   if (!Verbose) {
-    return (CatSPrint(NULL, L"EDIDActive"));
+    return (CatSPrint (NULL, L"EDIDActive"));
   }
 
   Status = gBS->OpenProtocol (
@@ -444,7 +444,7 @@ EdidActiveProtocolDumpInformation (
     return NULL;
   }
 
-  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_ACTIVE_MAIN), NULL);
+  Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_EDID_ACTIVE_MAIN), NULL);
   if (Temp == NULL) {
     return NULL;
   }
@@ -452,8 +452,8 @@ EdidActiveProtocolDumpInformation (
   RetVal = CatSPrint (NULL, Temp, EdidActive->SizeOfEdid);
   SHELL_FREE_NON_NULL (Temp);
 
-  if(EdidActive->SizeOfEdid != 0) {
-    Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_EDID_ACTIVE_DATA), NULL);
+  if (EdidActive->SizeOfEdid != 0) {
+    Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_EDID_ACTIVE_DATA), NULL);
     if (Temp == NULL) {
       SHELL_FREE_NON_NULL (RetVal);
       return NULL;
