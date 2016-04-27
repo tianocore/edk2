@@ -88,6 +88,20 @@ InstallDevicePathCallback (
   VOID
   );
 
+EFI_STATUS
+EFIAPI
+ConnectRootBridge (
+  IN EFI_HANDLE  RootBridgeHandle,
+  IN VOID        *Instance,
+  IN VOID        *Context
+  );
+
+STATIC
+VOID
+SaveS3BootScript (
+  VOID
+  );
+
 //
 // BDS Platform Functions
 //
@@ -113,6 +127,31 @@ Returns:
 {
   DEBUG ((EFI_D_INFO, "PlatformBdsInit\n"));
   InstallDevicePathCallback ();
+
+  VisitAllInstancesOfProtocol (&gEfiPciRootBridgeIoProtocolGuid,
+    ConnectRootBridge, NULL);
+
+  //
+  // Signal the ACPI platform driver that it can download QEMU ACPI tables.
+  //
+  EfiEventGroupSignal (&gRootBridgesConnectedEventGroupGuid);
+
+  //
+  // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
+  // the preparation of S3 system information. That logic has a hard dependency
+  // on the presence of the FACS ACPI table. Since our ACPI tables are only
+  // installed after PCI enumeration completes, we must not trigger the S3 save
+  // earlier, hence we can't signal End-of-Dxe earlier.
+  //
+  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
+
+  if (QemuFwCfgS3Enabled ()) {
+    //
+    // Save the boot script too. Note that this requires/includes emitting the
+    // DxeSmmReadyToLock event, which in turn locks down SMM.
+    //
+    SaveS3BootScript ();
+  }
 }
 
 
@@ -1241,31 +1280,6 @@ Returns:
   EFI_BOOT_MODE                      BootMode;
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
-
-  VisitAllInstancesOfProtocol (&gEfiPciRootBridgeIoProtocolGuid,
-    ConnectRootBridge, NULL);
-
-  //
-  // Signal the ACPI platform driver that it can download QEMU ACPI tables.
-  //
-  EfiEventGroupSignal (&gRootBridgesConnectedEventGroupGuid);
-
-  //
-  // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
-  // the preparation of S3 system information. That logic has a hard dependency
-  // on the presence of the FACS ACPI table. Since our ACPI tables are only
-  // installed after PCI enumeration completes, we must not trigger the S3 save
-  // earlier, hence we can't signal End-of-Dxe earlier.
-  //
-  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
-
-  if (QemuFwCfgS3Enabled ()) {
-    //
-    // Save the boot script too. Note that this requires/includes emitting the
-    // DxeSmmReadyToLock event, which in turn locks down SMM.
-    //
-    SaveS3BootScript ();
-  }
 
   if (PcdGetBool (PcdOvmfFlashVariablesEnable)) {
     DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior: not restoring NvVars "
