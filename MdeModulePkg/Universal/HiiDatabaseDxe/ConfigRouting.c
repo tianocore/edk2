@@ -549,6 +549,8 @@ FindSameBlockElement(
     ASSERT (TempBuffer != NULL);
     if ((BufferLen == Length) && (0 == CompareMem (Buffer, TempBuffer, Length))) {
       *Found = TRUE;
+      FreePool (TempBuffer);
+      TempBuffer = NULL;
       return EFI_SUCCESS;
     } else {
       FreePool (TempBuffer);
@@ -1887,6 +1889,9 @@ IsThisPackageList (
       if (IsThisVarstore((VOID *)&IfrVarStore->Guid, VarStoreName, ConfigHdr)) {
         FindVarstore = TRUE;
         goto Done;
+      } else {
+        FreePool (VarStoreName);
+        VarStoreName = NULL;
       }
       break;
 
@@ -1901,6 +1906,9 @@ IsThisPackageList (
       if (IsThisVarstore (&IfrEfiVarStore->Guid, VarStoreName, ConfigHdr)) {
         FindVarstore = TRUE;
         goto Done;
+      } else {
+        FreePool (VarStoreName);
+        VarStoreName = NULL;
       }
       break;
 
@@ -2094,6 +2102,7 @@ ParseIfrData (
   FirstOneOfOption = FALSE;
   VarStoreId       = 0;
   FirstOrderedList = FALSE;
+  VarStoreName     = NULL;
   ZeroMem (&DefaultData, sizeof (IFR_DEFAULT_DATA));
 
   //
@@ -2151,6 +2160,9 @@ ParseIfrData (
         VarStorageData->Name       = VarStoreName;
         VarStorageData->Type       = EFI_HII_VARSTORE_BUFFER;
         VarStoreId                 = IfrVarStore->VarStoreId;
+      } else {
+        FreePool (VarStoreName);
+        VarStoreName = NULL;
       }
       break;
 
@@ -2189,6 +2201,9 @@ ParseIfrData (
         VarStorageData->Name       = VarStoreName;
         VarStorageData->Type       = EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER;
         VarStoreId                 = IfrEfiVarStore->VarStoreId;
+      } else {
+        FreePool (VarStoreName);
+        VarStoreName = NULL;
       }
       break;
 
@@ -3014,7 +3029,7 @@ GetBlockElement (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-
+      FreePool (TmpBuffer);
       StringPtr += Length;
       if (*StringPtr != 0 && *StringPtr != L'&') {
         goto Done;
@@ -3867,6 +3882,10 @@ Done:
         FreePool (DefaultValueData);
       }
       FreePool (BlockData);
+    }
+    if (VarStorageData ->Name != NULL) {
+      FreePool (VarStorageData ->Name);
+      VarStorageData ->Name = NULL;
     }
     FreePool (VarStorageData);
   }
