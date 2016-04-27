@@ -682,33 +682,39 @@ NvmeCreateIoCompletionQueue (
   EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
   NVME_ADMIN_CRIOCQ                        CrIoCq;
+  UINT32                                   Index;
 
-  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
-  ZeroMem (&CrIoCq, sizeof(NVME_ADMIN_CRIOCQ));
+  for (Index = 1; Index < NVME_MAX_QUEUES; Index++) {
+    ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+    ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+    ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+    ZeroMem (&CrIoCq, sizeof(NVME_ADMIN_CRIOCQ));
 
-  CommandPacket.NvmeCmd        = &Command;
-  CommandPacket.NvmeCompletion = &Completion;
+    CommandPacket.NvmeCmd        = &Command;
+    CommandPacket.NvmeCompletion = &Completion;
 
-  Command.Cdw0.Opcode = NVME_ADMIN_CRIOCQ_CMD;
-  CommandPacket.TransferBuffer = Private->CqBufferPciAddr[1];
-  CommandPacket.TransferLength = EFI_PAGE_SIZE;
-  CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
+    Command.Cdw0.Opcode = NVME_ADMIN_CRIOCQ_CMD;
+    CommandPacket.TransferBuffer = Private->CqBufferPciAddr[Index];
+    CommandPacket.TransferLength = EFI_PAGE_SIZE;
+    CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
+    CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
-  CrIoCq.Qid   = NVME_IO_QUEUE;
-  CrIoCq.Qsize = NVME_CCQ_SIZE;
-  CrIoCq.Pc    = 1;
-  CopyMem (&CommandPacket.NvmeCmd->Cdw10, &CrIoCq, sizeof (NVME_ADMIN_CRIOCQ));
-  CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
+    CrIoCq.Qid   = Index;
+    CrIoCq.Qsize = (Index == 1) ? NVME_CCQ_SIZE : NVME_ASYNC_CCQ_SIZE;
+    CrIoCq.Pc    = 1;
+    CopyMem (&CommandPacket.NvmeCmd->Cdw10, &CrIoCq, sizeof (NVME_ADMIN_CRIOCQ));
+    CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
 
-  Status = Private->Passthru.PassThru (
-                               &Private->Passthru,
-                               0,
-                               &CommandPacket,
-                               NULL
-                               );
+    Status = Private->Passthru.PassThru (
+                                 &Private->Passthru,
+                                 0,
+                                 &CommandPacket,
+                                 NULL
+                                 );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+  }
 
   return Status;
 }
@@ -732,35 +738,41 @@ NvmeCreateIoSubmissionQueue (
   EFI_NVM_EXPRESS_COMPLETION               Completion;
   EFI_STATUS                               Status;
   NVME_ADMIN_CRIOSQ                        CrIoSq;
+  UINT32                                   Index;
 
-  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
-  ZeroMem (&CrIoSq, sizeof(NVME_ADMIN_CRIOSQ));
+  for (Index = 1; Index < NVME_MAX_QUEUES; Index++) {
+    ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+    ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
+    ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+    ZeroMem (&CrIoSq, sizeof(NVME_ADMIN_CRIOSQ));
 
-  CommandPacket.NvmeCmd        = &Command;
-  CommandPacket.NvmeCompletion = &Completion;
+    CommandPacket.NvmeCmd        = &Command;
+    CommandPacket.NvmeCompletion = &Completion;
 
-  Command.Cdw0.Opcode = NVME_ADMIN_CRIOSQ_CMD;
-  CommandPacket.TransferBuffer = Private->SqBufferPciAddr[1];
-  CommandPacket.TransferLength = EFI_PAGE_SIZE;
-  CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
+    Command.Cdw0.Opcode = NVME_ADMIN_CRIOSQ_CMD;
+    CommandPacket.TransferBuffer = Private->SqBufferPciAddr[Index];
+    CommandPacket.TransferLength = EFI_PAGE_SIZE;
+    CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
+    CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
-  CrIoSq.Qid   = NVME_IO_QUEUE;
-  CrIoSq.Qsize = NVME_CSQ_SIZE;
-  CrIoSq.Pc    = 1;
-  CrIoSq.Cqid  = NVME_IO_QUEUE;
-  CrIoSq.Qprio = 0;
-  CopyMem (&CommandPacket.NvmeCmd->Cdw10, &CrIoSq, sizeof (NVME_ADMIN_CRIOSQ));
-  CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
+    CrIoSq.Qid   = Index;
+    CrIoSq.Qsize = (Index == 1) ? NVME_CSQ_SIZE : NVME_ASYNC_CSQ_SIZE;
+    CrIoSq.Pc    = 1;
+    CrIoSq.Cqid  = Index;
+    CrIoSq.Qprio = 0;
+    CopyMem (&CommandPacket.NvmeCmd->Cdw10, &CrIoSq, sizeof (NVME_ADMIN_CRIOSQ));
+    CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
 
-  Status = Private->Passthru.PassThru (
-                               &Private->Passthru,
-                               0,
-                               &CommandPacket,
-                               NULL
-                               );
+    Status = Private->Passthru.PassThru (
+                                 &Private->Passthru,
+                                 0,
+                                 &CommandPacket,
+                                 NULL
+                                 );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+  }
 
   return Status;
 }
@@ -844,12 +856,17 @@ NvmeControllerInit (
 
   Private->Cid[0] = 0;
   Private->Cid[1] = 0;
+  Private->Cid[2] = 0;
   Private->Pt[0]  = 0;
   Private->Pt[1]  = 0;
+  Private->Pt[2]  = 0;
   Private->SqTdbl[0].Sqt = 0;
   Private->SqTdbl[1].Sqt = 0;
+  Private->SqTdbl[2].Sqt = 0;
   Private->CqHdbl[0].Cqh = 0;
   Private->CqHdbl[1].Cqh = 0;
+  Private->CqHdbl[2].Cqh = 0;
+  Private->AsyncSqHead   = 0;
 
   Status = NvmeDisableController (Private);
 
@@ -878,7 +895,7 @@ NvmeControllerInit (
   //
   // Address of I/O submission & completion queue.
   //
-  ZeroMem (Private->Buffer, EFI_PAGES_TO_SIZE (4));
+  ZeroMem (Private->Buffer, EFI_PAGES_TO_SIZE (6));
   Private->SqBuffer[0]        = (NVME_SQ *)(UINTN)(Private->Buffer);
   Private->SqBufferPciAddr[0] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr);
   Private->CqBuffer[0]        = (NVME_CQ *)(UINTN)(Private->Buffer + 1 * EFI_PAGE_SIZE);
@@ -887,14 +904,20 @@ NvmeControllerInit (
   Private->SqBufferPciAddr[1] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 2 * EFI_PAGE_SIZE);
   Private->CqBuffer[1]        = (NVME_CQ *)(UINTN)(Private->Buffer + 3 * EFI_PAGE_SIZE);
   Private->CqBufferPciAddr[1] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 3 * EFI_PAGE_SIZE);
+  Private->SqBuffer[2]        = (NVME_SQ *)(UINTN)(Private->Buffer + 4 * EFI_PAGE_SIZE);
+  Private->SqBufferPciAddr[2] = (NVME_SQ *)(UINTN)(Private->BufferPciAddr + 4 * EFI_PAGE_SIZE);
+  Private->CqBuffer[2]        = (NVME_CQ *)(UINTN)(Private->Buffer + 5 * EFI_PAGE_SIZE);
+  Private->CqBufferPciAddr[2] = (NVME_CQ *)(UINTN)(Private->BufferPciAddr + 5 * EFI_PAGE_SIZE);
 
   DEBUG ((EFI_D_INFO, "Private->Buffer = [%016X]\n", (UINT64)(UINTN)Private->Buffer));
-  DEBUG ((EFI_D_INFO, "Admin Submission Queue size (Aqa.Asqs) = [%08X]\n", Aqa.Asqs));
-  DEBUG ((EFI_D_INFO, "Admin Completion Queue size (Aqa.Acqs) = [%08X]\n", Aqa.Acqs));
-  DEBUG ((EFI_D_INFO, "Admin Submission Queue (SqBuffer[0]) = [%016X]\n", Private->SqBuffer[0]));
-  DEBUG ((EFI_D_INFO, "Admin Completion Queue (CqBuffer[0]) = [%016X]\n", Private->CqBuffer[0]));
-  DEBUG ((EFI_D_INFO, "I/O   Submission Queue (SqBuffer[1]) = [%016X]\n", Private->SqBuffer[1]));
-  DEBUG ((EFI_D_INFO, "I/O   Completion Queue (CqBuffer[1]) = [%016X]\n", Private->CqBuffer[1]));
+  DEBUG ((EFI_D_INFO, "Admin     Submission Queue size (Aqa.Asqs) = [%08X]\n", Aqa.Asqs));
+  DEBUG ((EFI_D_INFO, "Admin     Completion Queue size (Aqa.Acqs) = [%08X]\n", Aqa.Acqs));
+  DEBUG ((EFI_D_INFO, "Admin     Submission Queue (SqBuffer[0]) = [%016X]\n", Private->SqBuffer[0]));
+  DEBUG ((EFI_D_INFO, "Admin     Completion Queue (CqBuffer[0]) = [%016X]\n", Private->CqBuffer[0]));
+  DEBUG ((EFI_D_INFO, "Sync  I/O Submission Queue (SqBuffer[1]) = [%016X]\n", Private->SqBuffer[1]));
+  DEBUG ((EFI_D_INFO, "Sync  I/O Completion Queue (CqBuffer[1]) = [%016X]\n", Private->CqBuffer[1]));
+  DEBUG ((EFI_D_INFO, "Async I/O Submission Queue (SqBuffer[2]) = [%016X]\n", Private->SqBuffer[2]));
+  DEBUG ((EFI_D_INFO, "Async I/O Completion Queue (CqBuffer[2]) = [%016X]\n", Private->CqBuffer[2]));
 
   //
   // Program admin queue attributes.
@@ -971,7 +994,8 @@ NvmeControllerInit (
   DEBUG ((EFI_D_INFO, "    NN        : 0x%x\n", Private->ControllerData->Nn));
 
   //
-  // Create one I/O completion queue.
+  // Create two I/O completion queues.
+  // One for blocking I/O, one for non-blocking I/O.
   //
   Status = NvmeCreateIoCompletionQueue (Private);
   if (EFI_ERROR(Status)) {
@@ -979,7 +1003,8 @@ NvmeControllerInit (
   }
 
   //
-  // Create one I/O Submission queue.
+  // Create two I/O Submission queues.
+  // One for blocking I/O, one for non-blocking I/O.
   //
   Status = NvmeCreateIoSubmissionQueue (Private);
   if (EFI_ERROR(Status)) {

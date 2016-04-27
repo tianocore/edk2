@@ -362,7 +362,7 @@ NvmExpressPassThru (
   EFI_PCI_IO_PROTOCOL           *PciIo;
   NVME_SQ                       *Sq;
   NVME_CQ                       *Cq;
-  UINT8                         QueueType;
+  UINT16                        QueueId;
   UINT32                        Bytes;
   UINT16                        Offset;
   EFI_EVENT                     TimerEvent;
@@ -376,6 +376,8 @@ NvmExpressPassThru (
   VOID                          *PrpListHost;
   UINTN                         PrpListNo;
   UINT32                        Data;
+  NVME_PASS_THRU_ASYNC_REQ      *AsyncRequest;
+  EFI_TPL                       OldTpl;
 
   //
   // check the data fields in Packet parameter.
@@ -403,9 +405,25 @@ NvmExpressPassThru (
   TimerEvent  = NULL;
   Status      = EFI_SUCCESS;
 
-  QueueType = Packet->QueueType;
-  Sq  = Private->SqBuffer[QueueType] + Private->SqTdbl[QueueType].Sqt;
-  Cq  = Private->CqBuffer[QueueType] + Private->CqHdbl[QueueType].Cqh;
+  if (Packet->QueueType == NVME_ADMIN_QUEUE) {
+    QueueId = 0;
+  } else {
+    if (Event == NULL) {
+      QueueId = 1;
+    } else {
+      QueueId = 2;
+
+      //
+      // Submission queue full check.
+      //
+      if ((Private->SqTdbl[QueueId].Sqt + 1) % (NVME_ASYNC_CSQ_SIZE + 1) ==
+          Private->AsyncSqHead) {
+        return EFI_NOT_READY;
+      }
+    }
+  }
+  Sq  = Private->SqBuffer[QueueId] + Private->SqTdbl[QueueId].Sqt;
+  Cq  = Private->CqBuffer[QueueId] + Private->CqHdbl[QueueId].Cqh;
 
   if (Packet->NvmeCmd->Nsid != NamespaceId) {
     return EFI_INVALID_PARAMETER;
@@ -414,7 +432,7 @@ NvmExpressPassThru (
   ZeroMem (Sq, sizeof (NVME_SQ));
   Sq->Opc  = (UINT8)Packet->NvmeCmd->Cdw0.Opcode;
   Sq->Fuse = (UINT8)Packet->NvmeCmd->Cdw0.FusedOperation;
-  Sq->Cid  = Private->Cid[QueueType]++;
+  Sq->Cid  = Private->Cid[QueueId]++;
   Sq->Nsid = Packet->NvmeCmd->Nsid;
 
   //
@@ -528,16 +546,44 @@ NvmExpressPassThru (
   //
   // Ring the submission queue doorbell.
   //
-  Private->SqTdbl[QueueType].Sqt ^= 1;
-  Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[QueueType]);
+  if (Event != NULL) {
+    Private->SqTdbl[QueueId].Sqt =
+      (Private->SqTdbl[QueueId].Sqt + 1) % (NVME_ASYNC_CSQ_SIZE + 1);
+  } else {
+    Private->SqTdbl[QueueId].Sqt ^= 1;
+  }
+  Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[QueueId]);
   PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
-               NVME_SQTDBL_OFFSET(QueueType, Private->Cap.Dstrd),
+               NVME_SQTDBL_OFFSET(QueueId, Private->Cap.Dstrd),
                1,
                &Data
                );
+
+  //
+  // For non-blocking requests, return directly if the command is placed
+  // in the submission queue.
+  //
+  if (Event != NULL) {
+    AsyncRequest = AllocateZeroPool (sizeof (NVME_PASS_THRU_ASYNC_REQ));
+    if (AsyncRequest == NULL) {
+      Status = EFI_DEVICE_ERROR;
+      goto EXIT;
+    }
+
+    AsyncRequest->Signature     = NVME_PASS_THRU_ASYNC_REQ_SIG;
+    AsyncRequest->Packet        = Packet;
+    AsyncRequest->CommandId     = Sq->Cid;
+    AsyncRequest->CallerEvent   = Event;
+
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    InsertTailList (&Private->AsyncPassThruQueue, &AsyncRequest->Link);
+    gBS->RestoreTPL (OldTpl);
+
+    return EFI_SUCCESS;
+  }
 
   Status = gBS->CreateEvent (
                   EVT_TIMER,
@@ -561,7 +607,7 @@ NvmExpressPassThru (
   //
   Status = EFI_TIMEOUT;
   while (EFI_ERROR (gBS->CheckEvent (TimerEvent))) {
-    if (Cq->Pt != Private->Pt[QueueType]) {
+    if (Cq->Pt != Private->Pt[QueueId]) {
       Status = EFI_SUCCESS;
       break;
     }
@@ -589,16 +635,16 @@ NvmExpressPassThru (
     }
   }
 
-  if ((Private->CqHdbl[QueueType].Cqh ^= 1) == 0) {
-    Private->Pt[QueueType] ^= 1;
+  if ((Private->CqHdbl[QueueId].Cqh ^= 1) == 0) {
+    Private->Pt[QueueId] ^= 1;
   }
 
-  Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueType]);
+  Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
   PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
-               NVME_CQHDBL_OFFSET(QueueType, Private->Cap.Dstrd),
+               NVME_CQHDBL_OFFSET(QueueId, Private->Cap.Dstrd),
                1,
                &Data
                );
