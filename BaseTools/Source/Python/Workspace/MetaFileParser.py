@@ -2,7 +2,7 @@
 # This file is used to parse meta files
 #
 # Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
+# (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -144,14 +144,15 @@ class MetaFileParser(object):
     #
     #   @param      FilePath        The path of platform description file
     #   @param      FileType        The raw data of DSC file
+    #   @param      Arch            Default Arch value for filtering sections
     #   @param      Table           Database used to retrieve module/package information
-    #   @param      Macros          Macros used for replacement in file
     #   @param      Owner           Owner ID (for sub-section parsing)
     #   @param      From            ID from which the data comes (for !INCLUDE directive)
     #
-    def __init__(self, FilePath, FileType, Table, Owner= -1, From= -1):
+    def __init__(self, FilePath, FileType, Arch, Table, Owner= -1, From= -1):
         self._Table = Table
         self._RawTable = Table
+        self._Arch = Arch
         self._FileType = FileType
         self.MetaFile = FilePath
         self._FileDir = self.MetaFile.Dir
@@ -211,6 +212,15 @@ class MetaFileParser(object):
     def _SetFinished(self, Value):
         self._Finished = Value
 
+    ## Remove records that do not match given Filter Arch
+    def _FilterRecordList(self, RecordList, FilterArch):
+        NewRecordList = []
+        for Record in RecordList:
+            Arch = Record[3]
+            if Arch == 'COMMON' or Arch == FilterArch:
+                NewRecordList.append(Record)
+        return NewRecordList
+
     ## Use [] style to query data in table, just for readability
     #
     #   DataInfo = [data_type, scope1(arch), scope2(platform/moduletype)]
@@ -230,13 +240,13 @@ class MetaFileParser(object):
 
         # No specific ARCH or Platform given, use raw data
         if self._RawTable and (len(DataInfo) == 1 or DataInfo[1] == None):
-            return self._RawTable.Query(*DataInfo)
+            return self._FilterRecordList(self._RawTable.Query(*DataInfo), self._Arch)
 
         # Do post-process if necessary
         if not self._PostProcessed:
             self._PostProcess()
 
-        return self._Table.Query(*DataInfo)
+        return self._FilterRecordList(self._Table.Query(*DataInfo), DataInfo[1])
 
     ## Data parser for the common format in different type of file
     #
@@ -490,14 +500,14 @@ class InfParser(MetaFileParser):
     #
     #   @param      FilePath        The path of module description file
     #   @param      FileType        The raw data of DSC file
+    #   @param      Arch            Default Arch value for filtering sections
     #   @param      Table           Database used to retrieve module/package information
-    #   @param      Macros          Macros used for replacement in file
     #
-    def __init__(self, FilePath, FileType, Table):
+    def __init__(self, FilePath, FileType, Arch, Table):
         # prevent re-initialization
         if hasattr(self, "_Table"):
             return
-        MetaFileParser.__init__(self, FilePath, FileType, Table)
+        MetaFileParser.__init__(self, FilePath, FileType, Arch, Table)
         self.PcdsDict = {}
 
     ## Parser starter
@@ -848,16 +858,16 @@ class DscParser(MetaFileParser):
     #
     #   @param      FilePath        The path of platform description file
     #   @param      FileType        The raw data of DSC file
+    #   @param      Arch            Default Arch value for filtering sections
     #   @param      Table           Database used to retrieve module/package information
-    #   @param      Macros          Macros used for replacement in file
     #   @param      Owner           Owner ID (for sub-section parsing)
     #   @param      From            ID from which the data comes (for !INCLUDE directive)
     #
-    def __init__(self, FilePath, FileType, Table, Owner= -1, From= -1):
+    def __init__(self, FilePath, FileType, Arch, Table, Owner= -1, From= -1):
         # prevent re-initialization
         if hasattr(self, "_Table"):
             return
-        MetaFileParser.__init__(self, FilePath, FileType, Table, Owner, From)
+        MetaFileParser.__init__(self, FilePath, FileType, Arch, Table, Owner, From)
         self._Version = 0x00010005  # Only EDK2 dsc file is supported
         # to store conditional directive evaluation result
         self._DirectiveStack = []
@@ -1481,7 +1491,7 @@ class DscParser(MetaFileParser):
 
             IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, False)
             Owner = self._Content[self._ContentIndex - 1][0]
-            Parser = DscParser(IncludedFile1, self._FileType, IncludedFileTable,
+            Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
                                Owner=Owner, From=Owner)
 
             # Does not allow lower level included file to include upper level included file
@@ -1614,14 +1624,14 @@ class DecParser(MetaFileParser):
     #
     #   @param      FilePath        The path of platform description file
     #   @param      FileType        The raw data of DSC file
+    #   @param      Arch            Default Arch value for filtering sections
     #   @param      Table           Database used to retrieve module/package information
-    #   @param      Macros          Macros used for replacement in file
     #
-    def __init__(self, FilePath, FileType, Table):
+    def __init__(self, FilePath, FileType, Arch, Table):
         # prevent re-initialization
         if hasattr(self, "_Table"):
             return
-        MetaFileParser.__init__(self, FilePath, FileType, Table, -1)
+        MetaFileParser.__init__(self, FilePath, FileType, Arch, Table, -1)
         self._Comments = []
         self._Version = 0x00010005  # Only EDK2 dec file is supported
         self._AllPCDs = [] # Only for check duplicate PCD
