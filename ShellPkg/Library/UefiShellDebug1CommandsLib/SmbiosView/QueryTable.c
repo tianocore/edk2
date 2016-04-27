@@ -3,6 +3,7 @@
   And give a interface of query a string out of a table.
 
   Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2303,6 +2304,26 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     0x19,
     L"  FBD2"
+  },
+  {
+    0x1A,
+    L"  DDR4"
+  },
+  {
+    0x1B,
+    L"  LPDDR"
+  },
+  {
+    0x1C,
+    L"  LPDDR2"
+  },
+  {
+    0x1D,
+    L"  LPDDR3"
+  },
+  {
+    0x1E,
+    L"  LPDDR4"
   }
 };
 
