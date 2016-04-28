@@ -2,6 +2,7 @@
   Implement TPM1.2 NV storage related command.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved. <BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -199,8 +200,9 @@ Tpm12NvWriteValue (
 {
   EFI_STATUS              Status;
   TPM_CMD_NV_WRITE_VALUE  Command;
+  UINT32                  CommandLength;
   TPM_RSP_COMMAND_HDR     Response;
-  UINT32                  Length;
+  UINT32                  ResponseLength;
 
   if (DataSize > sizeof (Command.Data)) {
     return EFI_UNSUPPORTED;
@@ -210,14 +212,15 @@ Tpm12NvWriteValue (
   // send Tpm command TPM_ORD_NV_WriteValue
   //
   Command.Hdr.tag       = SwapBytes16 (TPM_TAG_RQU_COMMAND);
-  Command.Hdr.paramSize = SwapBytes32 (sizeof (Command) - sizeof(Command.Data) + DataSize);
+  CommandLength = sizeof (Command) - sizeof(Command.Data) + DataSize;
+  Command.Hdr.paramSize = SwapBytes32 (CommandLength);
   Command.Hdr.ordinal   = SwapBytes32 (TPM_ORD_NV_WriteValue);
   Command.NvIndex       = SwapBytes32 (NvIndex);
   Command.Offset        = SwapBytes32 (Offset);
   Command.DataSize      = SwapBytes32 (DataSize);
   CopyMem (Command.Data, Data, DataSize);
-  Length = sizeof (Response);
-  Status = Tpm12SubmitCommand (Command.Hdr.paramSize, (UINT8 *)&Command, &Length, (UINT8 *)&Response);
+  ResponseLength = sizeof (Response);
+  Status = Tpm12SubmitCommand (CommandLength, (UINT8 *)&Command, &ResponseLength, (UINT8 *)&Response);
   if (EFI_ERROR (Status)) {
     return Status;
   }
