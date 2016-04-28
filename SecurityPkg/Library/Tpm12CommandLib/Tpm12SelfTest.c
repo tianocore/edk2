@@ -2,6 +2,7 @@
   Implement TPM1.2 NV Self Test related commands.
 
 Copyright (c) 2016, Intel Corporation. All rights reserved. <BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,5 +43,6 @@ Tpm12ContinueSelfTest (
   Command.tag       = SwapBytes16 (TPM_TAG_RQU_COMMAND);
   Command.paramSize = SwapBytes32 (sizeof (Command));
   Command.ordinal   = SwapBytes32 (TPM_ORD_ContinueSelfTest);
+  Length = sizeof (Response);
   return Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length, (UINT8 *)&Response);
 }
