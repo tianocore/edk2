@@ -5,7 +5,7 @@
   and variable storage region headers that has been moved to
   VariableFormat.h.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,6 @@ extern EFI_GUID gEfiSecureBootEnableDisableGuid;
 extern EFI_GUID gEfiCertDbGuid;
 extern EFI_GUID gEfiCustomModeEnableGuid;
 extern EFI_GUID gEfiVendorKeysNvGuid;
-extern EFI_GUID gEdkiiSecureBootModeGuid;
 
 ///
 /// "SecureBootEnable" variable for the Secure Boot feature enable/disable.
