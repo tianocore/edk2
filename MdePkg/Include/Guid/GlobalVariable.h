@@ -1,7 +1,7 @@
 /** @file
   GUID for EFI (NVRAM) Variables.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -125,20 +125,6 @@ extern EFI_GUID gEfiGlobalVariableGuid;
 /// Its attribute is BS+RT.
 ///
 #define EFI_SETUP_MODE_NAME                         L"SetupMode"
-///
-/// Whether the system is operating in audit mode (1) or not (0).
-/// All other values are reserved. Should be treated as read-only except when DeployedMode is 0.
-/// Always becomes read-only after ExitBootServices() is called.
-/// Its attribute is BS+RT.
-///
-#define EFI_AUDIT_MODE_NAME                         L"AuditMode"
-///
-/// Whether the system is operating in deployed mode (1) or not (0).
-/// All other values are reserved. Should be treated as read-only when its value is 1.
-/// Always becomes read-only after ExitBootServices() is called.
-/// Its attribute is BS+RT.
-///
-#define EFI_DEPLOYED_MODE_NAME                      L"DeployedMode"
 ///
 /// The Key Exchange Key Signature Database.
 /// Its attribute is NV+BS+RT+AT.
