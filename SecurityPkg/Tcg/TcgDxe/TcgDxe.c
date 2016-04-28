@@ -9,6 +9,7 @@ buffer overflow, integer overflow.
 TcgDxePassThroughToTpm() will receive untrusted input and do basic validation.
 
 Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -102,8 +103,8 @@ EFI_TCG_SERVER_ACPI_TABLE           mTcgServerAcpiTemplate = {
   0,                          // Reserved
   0,                          // Log Area Max Length
   (EFI_PHYSICAL_ADDRESS) (SIZE_4GB - 1), // Log Area Start Address
-  0x0100,                     // TCG Specification revision 1.0
-  2,                          // Device Flags
+  0x0120,                     // TCG Specification revision 1.2
+  0,                          // Device Flags
   0,                          // Interrupt Flags
   0,                          // GPE
   {0},                        // Reserved 3 bytes
@@ -353,9 +354,9 @@ TcgDxeHashAll (
       }
       *HashedDataLen = sizeof (TPM_DIGEST);
 
-	  if (*HashedDataResult == NULL) {
-	  	*HashedDataResult = AllocatePool ((UINTN) *HashedDataLen);
-	  } 
+      if (*HashedDataResult == NULL) {
+        *HashedDataResult = AllocatePool ((UINTN) *HashedDataLen);
+      } 
 
       return TpmCommHashAll (
                HashData,
