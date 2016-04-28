@@ -3435,9 +3435,8 @@ class FdfParser:
             raise Warning("expected File name", self.FileName, self.CurrentLineNumber)
         
         AnyFileName = self.__Token
-        AnyFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(AnyFileName)
-        if not os.path.exists(AnyFileName):
-            raise Warning("File %s not exists"%AnyFileName, self.FileName, self.CurrentLineNumber)
+        self.__VerifyFile(AnyFileName)
+
         return AnyFileName
 
     ## __GetAnyFileStatement() method
