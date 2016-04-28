@@ -1307,15 +1307,12 @@ ConstructAcpiResourceRequestor (
     //
     // If there is no resource request
     //
-    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
+    Configuration = AllocateZeroPool (sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
     if (Configuration == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    Ptr               = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) (Configuration);
-    Ptr->Desc         = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-
-    PtrEnd            = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Ptr + 1);
+    PtrEnd            = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Configuration);
     PtrEnd->Desc      = ACPI_END_TAG_DESCRIPTOR;
     PtrEnd->Checksum  = 0;
   }
