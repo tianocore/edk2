@@ -56,7 +56,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_HIDE_SECURE_BOOT                  0x100c
 #define KEY_VALUE_SAVE_AND_EXIT_DBT           0x100d
 #define KEY_VALUE_NO_SAVE_AND_EXIT_DBT        0x100e
-#define KEY_TRANS_SECURE_BOOT_MODE            0x100f
 
 #define KEY_SECURE_BOOT_OPTION                0x1100
 #define KEY_SECURE_BOOT_PK_OPTION             0x1101
@@ -108,10 +107,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SECURE_BOOT_GUID_SIZE                 36
 #define SECURE_BOOT_GUID_STORAGE_SIZE         37
 
-#define SECURE_BOOT_MODE_USER_MODE            0
-#define SECURE_BOOT_MODE_SETUP_MODE           1
-#define SECURE_BOOT_MODE_AUDIT_MODE           2
-#define SECURE_BOOT_MODE_DEPLOYED_MODE        3
 
 //
 // Nv Data structure referenced by IFR
@@ -122,8 +117,6 @@ typedef struct {
   CHAR16  SignatureGuid[SECURE_BOOT_GUID_STORAGE_SIZE];
   BOOLEAN PhysicalPresent;     // If a Physical Present User
   UINT8   SecureBootMode;      // Secure Boot Mode: Standard Or Custom
-  UINT8   CurSecureBootMode;   // Current SecureBoot Mode SetupMode/UserMode/AuditMode/DeployedMode
-  UINT8   TransSecureBootMode; // Trans Next SecureBoot Mode
   BOOLEAN DeletePk;
   BOOLEAN HasPk;               // If Pk is existed it is true
   BOOLEAN AlwaysRevocation;    // If the certificate is always revoked. Revocation time is hidden

@@ -26,10 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_SECURE_BOOT_PROMPT             #language en-US "Attempt Secure Boot"
 #string STR_SECURE_BOOT_HELP               #language en-US "Enable/Disable the Secure Boot feature after platform reset"
 
-#string STR_CUR_SECURE_BOOT_MODE_PROMPT    #language en-US "Current Secure Boot Mode"
-#string STR_CUR_SECURE_BOOT_MODE_HELP      #language en-US "Current Secure Boot Mode: SetupMode/AuditMode/UserMode/DeployedMode."
-#string STR_CUR_SECURE_BOOT_MODE_CONTENT   #language en-US " "
-
 #string STR_SECURE_BOOT_ENROLL_SIGNATURE   #language en-US "Enroll Signature"
 #string STR_SECURE_BOOT_DELETE_SIGNATURE   #language en-US "Delete Signature"
 
@@ -60,11 +56,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #string STR_FILE_EXPLORER_TITLE            #language en-US  "File Explorer"
 
-#string STR_SECURE_BOOT_MODE_PROMPT        #language en-US "Customize Secure Boot"
-#string STR_SECURE_BOOT_MODE_HELP          #language en-US "Customize Secure Boot: Standard/Customized. Secure Boot Policy variables can be configured without authentication in customized option"
+#string STR_SECURE_BOOT_MODE_PROMPT        #language en-US "Secure Boot Mode"
+#string STR_SECURE_BOOT_MODE_HELP          #language en-US "Secure Boot Mode: Custom Mode or Standard Mode"
 
-#string STR_STANDARD_MODE                  #language en-US "Standard"
-#string STR_CUSTOM_MODE                    #language en-US "Customized"
+#string STR_STANDARD_MODE                  #language en-US "Standard Mode"
+#string STR_CUSTOM_MODE                    #language en-US "Custom Mode"
 
 #string STR_SECURE_BOOT_OPTION             #language en-US "Custom Secure Boot Options"
 #string STR_SECURE_BOOT_OPTION_HELP        #language en-US "Enter into Custom Secure Boot Options Form"
@@ -111,11 +107,3 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_CERT_TYPE_X509_SHA256_GUID            #language en-US "X509_SHA256_GUID"
 #string STR_CERT_TYPE_X509_SHA384_GUID            #language en-US "X509_SHA384_GUID"
 #string STR_CERT_TYPE_X509_SHA512_GUID            #language en-US "X509_SHA512_GUID"
-
-#string STR_TRANS_SECURE_BOOT_MODE_PROMPT         #language en-US "Secure Boot Mode Transition"
-#string STR_TRANS_SECURE_BOOT_MODE_HELP           #language en-US "Secure Boot Mode Transition: SetupMode/UserMode/AuditMode/DeployedMode"
-
-#string STR_USER_MODE                   #language en-US "User Mode"
-#string STR_SETUP_MODE                  #language en-US "Setup Mode"
-#string STR_AUDIT_MODE                  #language en-US "Audit Mode"
-#string STR_DEPLOYED_MODE               #language en-US "Deployed Mode"

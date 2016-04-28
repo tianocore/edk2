@@ -33,14 +33,6 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    //
-    // Display current secure boot mode(one of SetupMode/AuditMode/UserMode/DeployedMode)
-    //
-    text
-      help   = STRING_TOKEN(STR_CUR_SECURE_BOOT_MODE_HELP),
-      text   = STRING_TOKEN(STR_CUR_SECURE_BOOT_MODE_PROMPT),
-        text   = STRING_TOKEN(STR_CUR_SECURE_BOOT_MODE_CONTENT);
-
     text
       help   = STRING_TOKEN(STR_SECURE_BOOT_STATE_HELP),
       text   = STRING_TOKEN(STR_SECURE_BOOT_STATE_PROMPT),
@@ -71,7 +63,7 @@ formset
     endoneof;
 
     //
-    // Display PK include page
+    // Display of 'Current Secure Boot Mode'
     //
     suppressif questionref(SecureBootMode) == SECURE_BOOT_MODE_STANDARD;
     grayoutif NOT ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 1;
@@ -90,33 +82,6 @@ formset
   //
   form formid = FORMID_SECURE_BOOT_OPTION_FORM,
     title  = STRING_TOKEN(STR_SECURE_BOOT_OPTION_TITLE);
-
-    subtitle text = STRING_TOKEN(STR_NULL);
-
-    //
-    // Display of SetupMode/UserMode/AuditMode/DeployedMode transition
-    //
-    oneof name   = TransSecureBootMode,
-            questionid = KEY_TRANS_SECURE_BOOT_MODE,
-            prompt = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_PROMPT),
-            help   = STRING_TOKEN(STR_TRANS_SECURE_BOOT_MODE_HELP),
-            flags  = INTERACTIVE | NUMERIC_SIZE_1,
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE 
-              OR (ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE AND
-                  ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 0);
-            option text = STRING_TOKEN(STR_USER_MODE),     value = SECURE_BOOT_MODE_USER_MODE,   flags = 0;
-      endif
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE;
-            option text = STRING_TOKEN(STR_SETUP_MODE),    value = SECURE_BOOT_MODE_SETUP_MODE,  flags = 0;
-      endif
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE;
-            option text = STRING_TOKEN(STR_AUDIT_MODE),    value = SECURE_BOOT_MODE_AUDIT_MODE,  flags = 0;
-      endif
-      suppressif ideqval SECUREBOOT_CONFIGURATION.CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE;
-            option text = STRING_TOKEN(STR_DEPLOYED_MODE), value = SECURE_BOOT_MODE_DEPLOYED_MODE,  flags = 0;
-      endif
-
-    endoneof;
 
     subtitle text = STRING_TOKEN(STR_NULL);
 

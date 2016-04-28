@@ -49,8 +49,6 @@ HII_VENDOR_DEVICE_PATH          mSecureBootHiiVendorDevicePath = {
 
 
 BOOLEAN mIsEnterSecureBootForm = FALSE;
-BOOLEAN mIsSelectedSecureBootModeForm = FALSE;
-BOOLEAN mIsSecureBootModeChanged = FALSE;
 
 //
 // OID ASN.1 Value for Hash Algorithms
@@ -2833,256 +2831,6 @@ ON_EXIT:
 }
 
 /**
-  Perform secure boot mode transition from User Mode by setting AuditMode 
-  or DeployedMode variable.
-
-  @param[in]  NewMode          New secure boot mode.
-
-  @retval   EFI_SUCCESS        Secure Boot mode transition is successful.
-**/
-EFI_STATUS
-TransitionFromUserMode(
-  IN  UINT8 NewMode
-  )
-{
-  UINT8      Data;
-  EFI_STATUS Status;
-
-  if (NewMode == SECURE_BOOT_MODE_AUDIT_MODE) {
-    Data = 1;
-    Status = gRT->SetVariable(
-                    EFI_AUDIT_MODE_NAME,
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    sizeof(UINT8),
-                    &Data
-                    );
-    return Status;
-  } else if (NewMode == SECURE_BOOT_MODE_DEPLOYED_MODE) {
-    Data = 1;
-    Status = gRT->SetVariable(
-                    EFI_DEPLOYED_MODE_NAME,
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    sizeof(UINT8),
-                    &Data
-                    );
-    return Status;
-  }
-
-  //
-  // Other case do nothing here. May Goto enroll PK page.
-  //
-  return EFI_SUCCESS;
-}
-
-/**
-  Perform secure boot mode transition from Setup Mode by setting AuditMode 
-  variable.
-
-  @param[in]  NewMode          New secure boot mode.
-
-  @retval   EFI_SUCCESS        Secure Boot mode transition is successful.
-**/
-EFI_STATUS
-TransitionFromSetupMode(
-  IN UINT8 NewMode
-  )
-{
-  UINT8      Data;
-  EFI_STATUS Status;
-
-  Status = EFI_INVALID_PARAMETER;
-
-  if (NewMode == SECURE_BOOT_MODE_AUDIT_MODE) {
-    Data = 1;
-    Status = gRT->SetVariable(
-                    EFI_AUDIT_MODE_NAME,
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    sizeof(UINT8),
-                    &Data
-                    );
-    return Status;
-  }
-
-  //
-  // Other case do nothing here. May Goto enroll PK page.
-  //
-  return EFI_SUCCESS;
-}
-
-/**
-  Perform secure boot mode transition from Audit Mode. Nothing is done here,
-  should goto enroll PK page.
-
-  @param[in]  NewMode          New secure boot mode.
-
-  @retval   EFI_SUCCESS        Secure Boot mode transition is successful.
-**/
-EFI_STATUS
-TransitionFromAuditMode(
-  IN UINT8 NewMode
-  )
-{
-  //
-  // Other case do nothing here. Should Goto enroll PK page.
-  //
-  return EFI_SUCCESS;
-}
-
-/**
-   Perform secure boot mode transition from Deployed Mode by setting Deployed Mode
-   variable to 0.
-
-  @param[in]  NewMode          New secure boot mode.
-
-  @retval   EFI_SUCCESS        Secure Boot mode transition is successful.
-**/
-EFI_STATUS
-TransitionFromDeployedMode(
-  IN UINT8 NewMode
-  )
-{
-  UINT8      Data;
-  EFI_STATUS Status;
-
-  //
-  // Platform specific logic. when physical presence,  Allow to set DeployedMode =:0
-  // to switch back to UserMode
-  //
-  if (NewMode == SECURE_BOOT_MODE_USER_MODE) {
-    Data = 0;
-    Status = gRT->SetVariable(
-                    EFI_DEPLOYED_MODE_NAME,
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    sizeof(UINT8),
-                    &Data
-                    );
-    DEBUG((EFI_D_INFO, "DeployedMode Status %x\n", Status));
-    return Status;
-  }
-  return EFI_SUCCESS;
-}
-
-/**
-   Perform main secure boot mode transition.
-
-  @param[in]  CurMode          New secure boot mode.
-  @param[in]  NewMode          New secure boot mode.
-
-  @retval   EFI_SUCCESS        Secure Boot mode transition is successful.
-**/
-EFI_STATUS
-SecureBootModeTransition(
-  IN  UINT8  CurMode,
-  IN  UINT8  NewMode
-  )
-{
-  EFI_STATUS                         Status;
-
-  //
-  // Set platform to be customized mode to ensure platform specific mode switch sucess
-  //
-  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // SecureBootMode transition
-  //
-  switch (CurMode) {
-    case SECURE_BOOT_MODE_USER_MODE:
-      Status = TransitionFromUserMode(NewMode);
-      break;
-
-    case SECURE_BOOT_MODE_SETUP_MODE:
-      Status = TransitionFromSetupMode(NewMode);
-      break;
-
-    case SECURE_BOOT_MODE_AUDIT_MODE:
-      Status = TransitionFromAuditMode(NewMode);
-      break;
-
-    case SECURE_BOOT_MODE_DEPLOYED_MODE:
-      Status = TransitionFromDeployedMode(NewMode);
-      break;
-
-    default:
-      Status = EFI_INVALID_PARAMETER;
-      ASSERT(FALSE);
-  }
-
-  return Status;
-}
-
-/**
-   Get current secure boot mode by retrieve data from SetupMode/AuditMode/DeployedMode.
-
-  @param[out]  SecureBootMode                Current secure boot mode.
-
-**/
-VOID
-ExtractSecureBootModeFromVariable(
-  OUT UINT8      *SecureBootMode
-  )
-{
-  UINT8     *SetupMode;
-  UINT8     *AuditMode;
-  UINT8     *DeployedMode;
-
-  SetupMode        = NULL;
-  AuditMode        = NULL;
-  DeployedMode     = NULL;
-
-  //
-  // Get AuditMode/DeployedMode from variable
-  //
-  GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SetupMode, NULL);
-  GetVariable2 (EFI_AUDIT_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&AuditMode, NULL);
-  GetVariable2 (EFI_DEPLOYED_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&DeployedMode, NULL);
-  if (SetupMode != NULL && AuditMode != NULL && DeployedMode != NULL) {
-    if (*SetupMode == 0 && *AuditMode == 0 && *DeployedMode == 0) {
-      //
-      // User Mode
-      //
-      *SecureBootMode = SECURE_BOOT_MODE_USER_MODE;
-    } else if (*SetupMode == 1 && *AuditMode == 0 && *DeployedMode == 0) {
-      //
-      // Setup Mode
-      //
-      *SecureBootMode = SECURE_BOOT_MODE_SETUP_MODE;
-    } else if (*SetupMode == 1 && *AuditMode == 1 && *DeployedMode == 0) {
-      //
-      // Audit Mode
-      //
-      *SecureBootMode = SECURE_BOOT_MODE_AUDIT_MODE;
-    } else if (*SetupMode == 0 && *AuditMode == 0 && *DeployedMode == 1) {
-      //
-      // Deployed Mode
-      //
-      *SecureBootMode = SECURE_BOOT_MODE_DEPLOYED_MODE;
-    } else {
-      ASSERT(FALSE);
-    }
-  }else {
-    ASSERT(FALSE);
-  }
-
-  if (SetupMode != NULL) {
-    FreePool (SetupMode);
-  }
-  if (DeployedMode != NULL) {
-    FreePool (DeployedMode);
-  }
-  if (AuditMode != NULL) {
-    FreePool (AuditMode);
-  }
-}
-
-/**
 
   Update SecureBoot strings based on new Secure Boot Mode State. String includes STR_SECURE_BOOT_STATE_CONTENT
  and STR_CUR_SECURE_BOOT_MODE_CONTENT.
@@ -3098,7 +2846,6 @@ UpdateSecureBootString(
   IN SECUREBOOT_CONFIG_PRIVATE_DATA  *Private
   )
 {
-  UINT8       CurSecureBootMode;
   UINT8       *SecureBoot;
 
   SecureBoot = NULL;
@@ -3115,20 +2862,6 @@ UpdateSecureBootString(
     HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Enabled", NULL);
   } else {
     HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_SECURE_BOOT_STATE_CONTENT), L"Disabled", NULL);
-  }
-  //
-  // Get current secure boot mode.
-  //
-  ExtractSecureBootModeFromVariable(&CurSecureBootMode);
-  
-  if (CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE) {
-    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"UserMode", NULL);
-  } else if (CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE) {
-    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"SetupMode", NULL);
-  } else if (CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE) {
-    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"AuditMode", NULL);
-  } else if (CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE) {
-    HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_CUR_SECURE_BOOT_MODE_CONTENT), L"DeployedMode", NULL);
   }
 
   FreePool(SecureBoot);
@@ -3148,10 +2881,12 @@ SecureBootExtractConfigFromVariable (
   )
 {
   UINT8     *SecureBootEnable;
+  UINT8     *SetupMode;
   UINT8     *SecureBootMode;
   EFI_TIME  CurrTime;
 
   SecureBootEnable = NULL;
+  SetupMode        = NULL;
   SecureBootMode   = NULL;
 
   //
@@ -3178,24 +2913,10 @@ SecureBootExtractConfigFromVariable (
   }
 
   //
-  // Get the SecureBootMode from CustomMode variable.
-  //
-  GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootMode, NULL);
-  if (SecureBootMode == NULL) {
-    ConfigData->SecureBootMode = STANDARD_SECURE_BOOT_MODE;
-  } else {
-    ConfigData->SecureBootMode = *(SecureBootMode);
-  }
-
-  //
-  // Extact current Secure Boot Mode
-  //
-  ExtractSecureBootModeFromVariable(&ConfigData->CurSecureBootMode);
-
-  //
   // If there is no PK then the Delete Pk button will be gray.
   //
-  if (ConfigData->CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE || ConfigData->CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE) {
+  GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SetupMode, NULL);
+  if (SetupMode == NULL || (*SetupMode) == SETUP_MODE) {
     ConfigData->HasPk = FALSE;
   } else  {
     ConfigData->HasPk = TRUE;
@@ -3212,7 +2933,7 @@ SecureBootExtractConfigFromVariable (
   //
   // Fix Pk, SecureBootEnable inconsistence
   //
-  if (ConfigData->CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE || ConfigData->CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE) {
+  if ((*SetupMode) == USER_MODE) {
     ConfigData->HideSecureBoot = FALSE;
     if ((SecureBootEnable != NULL) && (*SecureBootEnable == SECURE_BOOT_ENABLE)) {
       ConfigData->AttemptSecureBoot = TRUE;
@@ -3221,10 +2942,22 @@ SecureBootExtractConfigFromVariable (
     ConfigData->HideSecureBoot = TRUE;
   }
 
+  //
+  // Get the SecureBootMode from CustomMode variable.
+  //
+  GetVariable2 (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid, (VOID**)&SecureBootMode, NULL);
+  if (SecureBootMode == NULL) {
+    ConfigData->SecureBootMode = STANDARD_SECURE_BOOT_MODE;
+  } else {
+    ConfigData->SecureBootMode = *(SecureBootMode);
+  }
+
   if (SecureBootEnable != NULL) {
     FreePool (SecureBootEnable);
   }
-
+  if (SetupMode != NULL) {
+    FreePool (SetupMode);
+  }
   if (SecureBootMode != NULL) {
     FreePool (SecureBootMode);
   }
@@ -3458,18 +3191,20 @@ SecureBootCallback (
   UINT8                           *SecureBootEnable;
   UINT8                           *Pk;
   UINT8                           *SecureBootMode;
+  UINT8                           *SetupMode;
   CHAR16                          PromptString[100];
-  UINT8                           CurSecureBootMode;
   EFI_DEVICE_PATH_PROTOCOL        *File;
 
   Status           = EFI_SUCCESS;
   SecureBootEnable = NULL;
   SecureBootMode   = NULL;
+  SetupMode        = NULL;
   File             = NULL;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   Private = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
 
   gSecureBootPrivateData = Private;
@@ -3493,13 +3228,6 @@ SecureBootCallback (
       Status = UpdateSecureBootString(Private);
       SecureBootExtractConfigFromVariable (IfrNvData);
       mIsEnterSecureBootForm = TRUE;
-    } else if (QuestionId == KEY_TRANS_SECURE_BOOT_MODE){
-      //
-      // Secure Boot Policy variable changes after transition. Re-sync CurSecureBootMode
-      //
-      ExtractSecureBootModeFromVariable(&IfrNvData->CurSecureBootMode);
-      mIsSelectedSecureBootModeForm = TRUE;
-      mIsSecureBootModeChanged = FALSE;
     }
     goto EXIT;
   }
@@ -3511,12 +3239,7 @@ SecureBootCallback (
         Value->u8 = SECURE_BOOT_MODE_STANDARD;
         Status = EFI_SUCCESS;
       }
-    } else if (QuestionId == KEY_TRANS_SECURE_BOOT_MODE) {
-      if (mIsSelectedSecureBootModeForm) {
-        Value->u8 = IfrNvData->CurSecureBootMode;
-        Status = EFI_SUCCESS;
-      }
-    }
+    } 
     goto EXIT;
   }
 
@@ -3770,57 +3493,6 @@ SecureBootCallback (
           );
       }
       break;
-    case KEY_TRANS_SECURE_BOOT_MODE:
-      //
-      // Pop up to alert user want to change secure boot mode 
-      //
-      if ((IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE && 
-           (Value->u8 == SECURE_BOOT_MODE_AUDIT_MODE || Value->u8 == SECURE_BOOT_MODE_DEPLOYED_MODE))
-        ||(IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE && 
-           Value->u8 == SECURE_BOOT_MODE_AUDIT_MODE)
-        ||(IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE && 
-          Value->u8 == SECURE_BOOT_MODE_USER_MODE && IfrNvData->PhysicalPresent == 1)){
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Are you sure you want to switch secure boot mode?",
-          L"Press 'Y' to switch secure boot mode, 'N' to discard change and return",
-          NULL
-          );
-        if (Key.UnicodeChar != 'y' && Key.UnicodeChar != 'Y') {
-          //
-          // If not 'Y'/''y' restore to defualt secure boot mode
-          //
-          Value->u8 = IfrNvData->CurSecureBootMode;
-          goto EXIT;
-        }
-      } else if ((IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_SETUP_MODE && Value->u8 == SECURE_BOOT_MODE_USER_MODE)
-               ||(IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE && Value->u8 == SECURE_BOOT_MODE_SETUP_MODE)
-               ||(IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_AUDIT_MODE && Value->u8 == SECURE_BOOT_MODE_DEPLOYED_MODE)
-               ||(IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE && Value->u8 == SECURE_BOOT_MODE_SETUP_MODE)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Secure boot mode transition requires PK change",
-          L"Please go to link below to update PK",
-          NULL
-          );
-      } else {
-        Status = EFI_INVALID_PARAMETER;
-        goto EXIT;
-      }
-
-      Status = SecureBootModeTransition(IfrNvData->CurSecureBootMode, Value->u8);
-      //
-      // Secure Boot Policy variable may change after transition. Re-sync CurSecureBootMode
-      //
-      ExtractSecureBootModeFromVariable(&CurSecureBootMode);
-      if (IfrNvData->CurSecureBootMode != CurSecureBootMode) {
-        IfrNvData->CurSecureBootMode = CurSecureBootMode;
-        mIsSecureBootModeChanged = TRUE;
-      }
-      break;
-
     default:
       if ((QuestionId >= OPTION_DEL_KEK_QUESTION_ID) &&
                  (QuestionId < (OPTION_DEL_KEK_QUESTION_ID + OPTION_CONFIG_RANGE))) {
@@ -3889,13 +3561,6 @@ SecureBootCallback (
     case KEY_SECURE_BOOT_MODE:
       mIsEnterSecureBootForm = FALSE;
       break;
-    case KEY_TRANS_SECURE_BOOT_MODE:
-      mIsSelectedSecureBootModeForm = FALSE;
-      if (mIsSecureBootModeChanged) {
-        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_RESET;
-      }
-      mIsSecureBootModeChanged = FALSE;
-      break;
     case KEY_SECURE_BOOT_KEK_GUID:
     case KEY_SECURE_BOOT_SIGNATURE_GUID_DB:
     case KEY_SECURE_BOOT_SIGNATURE_GUID_DBX:
@@ -3914,7 +3579,8 @@ SecureBootCallback (
       break;
 
     case KEY_SECURE_BOOT_DELETE_PK:
-      if (IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_USER_MODE || IfrNvData->CurSecureBootMode == SECURE_BOOT_MODE_DEPLOYED_MODE) {
+      GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SetupMode, NULL);
+      if (SetupMode == NULL || (*SetupMode) == SETUP_MODE) {
         IfrNvData->DeletePk = TRUE;
         IfrNvData->HasPk    = FALSE;
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
@@ -3922,6 +3588,9 @@ SecureBootCallback (
         IfrNvData->DeletePk = FALSE;
         IfrNvData->HasPk    = TRUE;
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+      }
+      if (SetupMode != NULL) {
+        FreePool (SetupMode);
       }
       break;
     default:
