@@ -302,13 +302,25 @@ GraphicsOutputProtocolDumpInformation(
   SHELL_FREE_NON_NULL (Temp);
   
   Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_GOP_RES_LIST_MAIN), NULL);
+  if (Temp == NULL) {
+    SHELL_FREE_NON_NULL (RetVal);
+    goto EXIT;
+  }
 
   TempRetVal = CatSPrint (RetVal, Temp);
   SHELL_FREE_NON_NULL (RetVal);
+  if (TempRetVal == NULL) {
+    goto EXIT;
+  }
   RetVal = TempRetVal;
   SHELL_FREE_NON_NULL (Temp);
 
   Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_GOP_RES_LIST_ENTRY), NULL);
+  if (Temp == NULL) {
+    SHELL_FREE_NON_NULL (RetVal);
+    goto EXIT;
+  }
+
 
   for (Mode = 0; Mode < GraphicsOutput->Mode->MaxMode; Mode++) {
     Status = GraphicsOutput->QueryMode (
@@ -334,6 +346,8 @@ GraphicsOutputProtocolDumpInformation(
     RetVal = TempRetVal;
   }
 
+
+EXIT:
   SHELL_FREE_NON_NULL(Temp);
   SHELL_FREE_NON_NULL(Fmt);
 
