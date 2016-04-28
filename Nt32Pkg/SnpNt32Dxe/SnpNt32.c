@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,6 +44,9 @@ SNPNT32_GLOBAL_DATA         gSnpNt32GlobalData = {
     0,
     EfiLockUninitialized
   },                          //  Lock
+  NULL,                       //  RecycledTxBuf
+  0,                          //  RecycledTxBufCount
+  32,                         //  MaxRecycledTxBuf
   //
   //  Private functions
   //
@@ -861,9 +864,20 @@ SnpNt32GetStatus (
   OUT VOID                       **TxBuffer
   )
 {
+  SNPNT32_INSTANCE_DATA *Instance;
+  SNPNT32_GLOBAL_DATA   *GlobalData;
+
+  Instance    = SNP_NT32_INSTANCE_DATA_FROM_SNP_THIS (This);
+
+  GlobalData  = Instance->GlobalData;
 
   if (TxBuffer != NULL) {
-    *((UINT8 **) TxBuffer) = (UINT8 *)(UINTN) 1;
+    if (GlobalData->RecycledTxBufCount != 0) {
+      GlobalData->RecycledTxBufCount --;
+      *((UINT8 **) TxBuffer)    = (UINT8 *) (UINTN)GlobalData->RecycledTxBuf[GlobalData->RecycledTxBufCount];
+    } else {
+      *((UINT8 **) TxBuffer)    = NULL;
+    }
   }
 
   if (InterruptStatus != NULL) {
@@ -918,6 +932,7 @@ SnpNt32Transmit (
   SNPNT32_INSTANCE_DATA *Instance;
   SNPNT32_GLOBAL_DATA   *GlobalData;
   INT32                 ReturnValue;
+  UINT64                *Tmp;
 
   Instance    = SNP_NT32_INSTANCE_DATA_FROM_SNP_THIS (This);
 
@@ -945,6 +960,24 @@ SnpNt32Transmit (
 
   if (ReturnValue < 0) {
     return EFI_DEVICE_ERROR;
+  } else {
+    if ((GlobalData->MaxRecycledTxBuf + SNP_TX_BUFFER_INCREASEMENT) >= SNP_MAX_TX_BUFFER_NUM) {
+      return EFI_NOT_READY;
+    }
+
+    if (GlobalData->RecycledTxBufCount < GlobalData->MaxRecycledTxBuf) {
+      GlobalData->RecycledTxBuf[GlobalData->RecycledTxBufCount] = (UINT64) Buffer;
+      GlobalData->RecycledTxBufCount ++;
+    } else {
+      Tmp = AllocatePool (sizeof (UINT64) * (GlobalData->MaxRecycledTxBuf + SNP_TX_BUFFER_INCREASEMENT));
+      if (Tmp == NULL) {
+        return EFI_DEVICE_ERROR;
+      }
+      CopyMem (Tmp, GlobalData->RecycledTxBuf, sizeof (UINT64) * GlobalData->RecycledTxBufCount);
+      FreePool (GlobalData->RecycledTxBuf);
+      GlobalData->RecycledTxBuf    =  Tmp;
+      GlobalData->MaxRecycledTxBuf += SNP_TX_BUFFER_INCREASEMENT;
+    }
   }
 
   return EFI_SUCCESS;
@@ -1082,6 +1115,11 @@ SnpNt32InitializeGlobalData (
 
   InitializeListHead (&This->InstanceList);
   EfiInitializeLock (&This->Lock, TPL_CALLBACK);
+
+  This->RecycledTxBuf = AllocatePool (sizeof (UINT64) * This->MaxRecycledTxBuf);
+  if (This->RecycledTxBuf == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   //  Get the WinNT thunk

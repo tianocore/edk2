@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,6 +57,12 @@ typedef struct _NT_NET_INTERFACE_INFO {
 
 #define MAX_INTERFACE_INFO_NUMBER 16
 #define MAX_FILE_NAME_LENGTH      280
+
+#define SNP_MAX_TX_BUFFER_NUM         65536
+#define SNP_TX_BUFFER_INCREASEMENT    32
+
+
+
 
 //
 //  Functions in Net Library
@@ -153,6 +159,20 @@ struct _SNPNT32_GLOBAL_DATA {
   NT_NET_UTILITY_TABLE              NtNetUtilityTable;
 
   EFI_LOCK                          Lock;
+
+  //
+  // Array of the recycled transmit buffer address.
+  //
+  UINT64                            *RecycledTxBuf;
+
+  //
+  // Current number of recycled buffer pointers in RecycledTxBuf.
+  //
+  UINT32                             RecycledTxBufCount;
+
+  // The maximum number of recycled buffer pointers in RecycledTxBuf.
+  //
+  UINT32                             MaxRecycledTxBuf;
 
   //
   //  Private functions
