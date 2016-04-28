@@ -1,7 +1,7 @@
 /** @file
   Implementation functions and structures for var check uefi library.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -419,28 +419,6 @@ UEFI_DEFINED_VARIABLE_ENTRY mGlobalVariableList[] = {
     {
       VAR_CHECK_VARIABLE_PROPERTY_REVISION,
       VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
-      VARIABLE_ATTRIBUTE_BS_RT,
-      sizeof (UINT8),
-      sizeof (UINT8)
-    },
-    NULL
-  },
-  {
-    EFI_AUDIT_MODE_NAME,
-    {
-      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
-      0,
-      VARIABLE_ATTRIBUTE_BS_RT,
-      sizeof (UINT8),
-      sizeof (UINT8)
-    },
-    NULL
-  },
-  {
-    EFI_DEPLOYED_MODE_NAME,
-    {
-      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
-      0,
       VARIABLE_ATTRIBUTE_BS_RT,
       sizeof (UINT8),
       sizeof (UINT8)
