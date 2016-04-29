@@ -1032,26 +1032,27 @@ EmmcPeimCreateTrb (
     goto Error;
   }
 
-  if ((Trb->DataLen % Trb->BlockSize) != 0) {
-    if (Trb->DataLen < Trb->BlockSize) {
-      Trb->BlockSize = (UINT16)Trb->DataLen;
-    }
+  if (Trb->DataLen < Trb->BlockSize) {
+    Trb->BlockSize = (UINT16)Trb->DataLen;
   }
 
-  if (Trb->DataLen == 0) {
-    Trb->Mode = EmmcNoData;
-  } else if (Capability.Adma2 != 0) {
-    Trb->Mode = EmmcAdmaMode;
-    Status = BuildAdmaDescTable (Trb);
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
-  } else if (Capability.Sdma != 0) {
-    Trb->Mode = EmmcSdmaMode;
-  } else {
+  if (Packet->EmmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK) {
     Trb->Mode = EmmcPioMode;
+  } else {
+    if (Trb->DataLen == 0) {
+      Trb->Mode = EmmcNoData;
+    } else if (Capability.Adma2 != 0) {
+      Trb->Mode = EmmcAdmaMode;
+      Status = BuildAdmaDescTable (Trb);
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
+    } else if (Capability.Sdma != 0) {
+      Trb->Mode = EmmcSdmaMode;
+    } else {
+      Trb->Mode = EmmcPioMode;
+    }
   }
-
   return Trb;
 
 Error:
@@ -1111,9 +1112,6 @@ EmmcPeimCheckTrbEnv (
     // the Present State register to be 0
     //
     PresentState = BIT0 | BIT1;
-    if (Packet->EmmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK) {
-      PresentState = BIT0;
-    }
   } else {
     //
     // Wait Command Inhibit (CMD) in the Present State register
@@ -1273,7 +1271,14 @@ EmmcPeimExecTrb (
     return Status;
   }
 
-  BlkCount = (UINT16)(Trb->DataLen / Trb->BlockSize);
+  BlkCount = 0;
+  if (Trb->Mode != EmmcNoData) {
+    //
+    // Calcuate Block Count.
+    //
+    BlkCount = (UINT16)(Trb->DataLen / Trb->BlockSize);
+  }
+
   Status   = EmmcPeimHcRwMmio (Bar + EMMC_HC_BLK_COUNT, FALSE, sizeof (BlkCount), &BlkCount);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1293,7 +1298,7 @@ EmmcPeimExecTrb (
     if (Trb->Read) {
       TransMode |= BIT4;
     }
-    if (BlkCount != 0) {
+    if (BlkCount > 1) {
       TransMode |= BIT5 | BIT1;
     }
   }
@@ -1365,6 +1370,7 @@ EmmcPeimCheckTrbResult (
   UINT32                              SdmaAddr;
   UINT8                               Index;
   UINT8                               SwReset;
+  UINT32                              PioLength;
 
   SwReset = 0;
   Packet  = Trb->Packet;
@@ -1497,8 +1503,26 @@ EmmcPeimCheckTrbResult (
   }
 
   if (Packet->EmmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK) {
-    Status = EFI_SUCCESS;
-    goto Done;
+    //
+    // When performing tuning procedure (Execute Tuning is set to 1) through PIO mode,
+    // wait Buffer Read Ready bit of Normal Interrupt Status Register to be 1.
+    // Refer to SD Host Controller Simplified Specification 3.0 figure 2-29 for details.
+    //
+    if ((IntStatus & BIT5) == BIT5) {
+      //
+      // Clear Buffer Read Ready interrupt at first.
+      //
+      IntStatus = BIT5;
+      EmmcPeimHcRwMmio (Bar + EMMC_HC_NOR_INT_STS, FALSE, sizeof (IntStatus), &IntStatus);
+      //
+      // Read data out from Buffer Port register
+      //
+      for (PioLength = 0; PioLength < Trb->DataLen; PioLength += 4) {
+        EmmcPeimHcRwMmio (Bar + EMMC_HC_BUF_DAT_PORT, TRUE, 4, (UINT8*)Trb->Data + PioLength);
+      }
+      Status = EFI_SUCCESS;
+      goto Done;
+    }
   }
 
   Status = EFI_NOT_READY;

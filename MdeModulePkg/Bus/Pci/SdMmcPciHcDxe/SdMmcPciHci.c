@@ -1265,48 +1265,53 @@ SdMmcCreateTrb (
     goto Error;
   }
 
-  if (Trb->Read) {
-    Flag = EfiPciIoOperationBusMasterWrite;
-  } else {
-    Flag = EfiPciIoOperationBusMasterRead;
+  if (Trb->DataLen < Trb->BlockSize) {
+    Trb->BlockSize = (UINT16)Trb->DataLen;
   }
 
-  PciIo = Private->PciIo;
-  if (Trb->DataLen != 0) {
-    MapLength = Trb->DataLen;
-    Status = PciIo->Map (
-                      PciIo,
-                      Flag,
-                      Trb->Data,
-                      &MapLength,
-                      &Trb->DataPhy,
-                      &Trb->DataMap
-                      );
-    if (EFI_ERROR (Status) || (Trb->DataLen != MapLength)) {
-      Status = EFI_BAD_BUFFER_SIZE;
-      goto Error;
-    }
-  }
-
-  if ((Trb->DataLen % Trb->BlockSize) != 0) {
-    if (Trb->DataLen < Trb->BlockSize) {
-      Trb->BlockSize = (UINT16)Trb->DataLen;
-    }
-  }
-
-  if (Trb->DataLen == 0) {
-    Trb->Mode = SdMmcNoData;
-  } else if (Private->Capability[Slot].Adma2 != 0) {
-    Trb->Mode = SdMmcAdmaMode;
-    Status = BuildAdmaDescTable (Trb);
-    if (EFI_ERROR (Status)) {
-      PciIo->Unmap (PciIo, Trb->DataMap);
-      goto Error;
-    }
-  } else if (Private->Capability[Slot].Sdma != 0) {
-    Trb->Mode = SdMmcSdmaMode;
-  } else {
+  if (((Private->Slot[Trb->Slot].CardType == EmmcCardType) &&
+       (Packet->SdMmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK)) ||
+      ((Private->Slot[Trb->Slot].CardType == SdCardType) &&
+       (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_TUNING_BLOCK))) {
     Trb->Mode = SdMmcPioMode;
+  } else {
+    if (Trb->Read) {
+      Flag = EfiPciIoOperationBusMasterWrite;
+    } else {
+      Flag = EfiPciIoOperationBusMasterRead;
+    }
+
+    PciIo = Private->PciIo;
+    if (Trb->DataLen != 0) {
+      MapLength = Trb->DataLen;
+      Status = PciIo->Map (
+                        PciIo,
+                        Flag,
+                        Trb->Data,
+                        &MapLength,
+                        &Trb->DataPhy,
+                        &Trb->DataMap
+                        );
+      if (EFI_ERROR (Status) || (Trb->DataLen != MapLength)) {
+        Status = EFI_BAD_BUFFER_SIZE;
+        goto Error;
+      }
+    }
+
+    if (Trb->DataLen == 0) {
+      Trb->Mode = SdMmcNoData;
+    } else if (Private->Capability[Slot].Adma2 != 0) {
+      Trb->Mode = SdMmcAdmaMode;
+      Status = BuildAdmaDescTable (Trb);
+      if (EFI_ERROR (Status)) {
+        PciIo->Unmap (PciIo, Trb->DataMap);
+        goto Error;
+      }
+    } else if (Private->Capability[Slot].Sdma != 0) {
+      Trb->Mode = SdMmcSdmaMode;
+    } else {
+      Trb->Mode = SdMmcPioMode;
+    }
   }
 
   if (Event != NULL) {
@@ -1392,15 +1397,6 @@ SdMmcCheckTrbEnv (
     // the Present State register to be 0
     //
     PresentState = BIT0 | BIT1;
-    //
-    // For Send Tuning Block cmd, just wait for Command Inhibit (CMD) to be 0
-    //
-    if (((Private->Slot[Trb->Slot].CardType == EmmcCardType) &&
-         (Packet->SdMmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK)) ||
-        ((Private->Slot[Trb->Slot].CardType == SdCardType) &&
-         (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_TUNING_BLOCK))) {
-      PresentState = BIT0;
-    }
   } else {
     //
     // Wait Command Inhibit (CMD) in the Present State register
@@ -1565,7 +1561,13 @@ SdMmcExecTrb (
     return Status;
   }
 
-  BlkCount = (UINT16)(Trb->DataLen / Trb->BlockSize);
+  BlkCount = 0;
+  if (Trb->Mode != SdMmcNoData) {
+    //
+    // Calcuate Block Count.
+    //
+    BlkCount = (UINT16)(Trb->DataLen / Trb->BlockSize);
+  }
   Status   = SdMmcHcRwMmio (PciIo, Trb->Slot, SD_MMC_HC_BLK_COUNT, FALSE, sizeof (BlkCount), &BlkCount);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1585,7 +1587,7 @@ SdMmcExecTrb (
     if (Trb->Read) {
       TransMode |= BIT4;
     }
-    if (BlkCount != 0) {
+    if (BlkCount > 1) {
       TransMode |= BIT5 | BIT1;
     }
     //
@@ -1665,6 +1667,7 @@ SdMmcCheckTrbResult (
   UINT32                              SdmaAddr;
   UINT8                               Index;
   UINT8                               SwReset;
+  UINT32                              PioLength;
 
   SwReset = 0;
   Packet  = Trb->Packet;
@@ -1814,12 +1817,25 @@ SdMmcCheckTrbResult (
       ((Private->Slot[Trb->Slot].CardType == SdCardType) &&
        (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_TUNING_BLOCK))) {
     //
-    // While performing tuning procedure (Execute Tuning is set to 1),
-    // Transfer Completeis not set to 1
-    // Refer to SD Host Controller Simplified Specification 3.0 table 2-23 for details.
+    // When performing tuning procedure (Execute Tuning is set to 1) through PIO mode,
+    // wait Buffer Read Ready bit of Normal Interrupt Status Register to be 1.
+    // Refer to SD Host Controller Simplified Specification 3.0 figure 2-29 for details.
     //
-    Status = EFI_SUCCESS;
-    goto Done;
+    if ((IntStatus & BIT5) == BIT5) {
+      //
+      // Clear Buffer Read Ready interrupt at first.
+      //
+      IntStatus = BIT5;
+      SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_NOR_INT_STS, FALSE, sizeof (IntStatus), &IntStatus);
+      //
+      // Read data out from Buffer Port register
+      //
+      for (PioLength = 0; PioLength < Trb->DataLen; PioLength += 4) {
+        SdMmcHcRwMmio (Private->PciIo, Trb->Slot, SD_MMC_HC_BUF_DAT_PORT, TRUE, 4, (UINT8*)Trb->Data + PioLength);
+      }
+      Status = EFI_SUCCESS;
+      goto Done;
+    }
   }
 
   Status = EFI_NOT_READY;
