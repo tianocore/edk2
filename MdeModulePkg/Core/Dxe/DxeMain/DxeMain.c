@@ -315,6 +315,8 @@ DxeMain (
   if (Status == EFI_SUCCESS) {
     ImageContext.EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)EntryPoint;
   }
+  ImageContext.Handle         = (VOID *)(UINTN)gDxeCoreLoadedImage->ImageBase;
+  ImageContext.ImageRead      = PeCoffLoaderImageReadFromMemory;
   PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 
   //
