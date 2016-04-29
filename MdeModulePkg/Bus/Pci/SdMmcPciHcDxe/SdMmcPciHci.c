@@ -706,9 +706,14 @@ SdMmcHcClockSupply (
   ASSERT (Capability.BaseClkFreq != 0);
 
   BaseClkFreq = Capability.BaseClkFreq;
-  if ((ClockFreq > (BaseClkFreq * 1000)) || (ClockFreq == 0)) {
+  if (ClockFreq == 0) {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (ClockFreq > (BaseClkFreq * 1000)) {
+    ClockFreq = BaseClkFreq * 1000;
+  }
+
   //
   // Calculate the divisor of base frequency.
   //
