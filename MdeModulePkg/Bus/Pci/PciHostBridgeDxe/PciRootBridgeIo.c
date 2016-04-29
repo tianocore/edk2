@@ -170,7 +170,8 @@ CreateRootBridge (
   CopyMem (&RootBridge->Io, &Bridge->Io, sizeof (PCI_ROOT_BRIDGE_APERTURE));
   CopyMem (&RootBridge->Mem, &Bridge->Mem, sizeof (PCI_ROOT_BRIDGE_APERTURE));
   CopyMem (&RootBridge->MemAbove4G, &Bridge->MemAbove4G, sizeof (PCI_ROOT_BRIDGE_APERTURE));
-
+  CopyMem (&RootBridge->PMem, &Bridge->PMem, sizeof (PCI_ROOT_BRIDGE_APERTURE));
+  CopyMem (&RootBridge->PMemAbove4G, &Bridge->PMemAbove4G, sizeof (PCI_ROOT_BRIDGE_APERTURE));
 
   for (Index = TypeIo; Index < TypeMax; Index++) {
     RootBridge->ResAllocNode[Index].Type   = Index;
