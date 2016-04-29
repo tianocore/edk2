@@ -1,6 +1,6 @@
 /** @file
   Support routines for PxeBc.
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,13 +32,15 @@ PxeBcCommonNotify (
 
 /**
   This function initialize(or configure) the Udp4Write instance.
-  
+
   @param  Udp4       Pointer to the EFI_UDP4_PROTOCOL instance.
   @param  StationIp  Pointer to the station ip address.
   @param  SubnetMask Pointer to the subnetmask of the station ip address.
   @param  Gateway    Pointer to the gateway ip address.
   @param  SrcPort    Pointer to the srouce port of the station.
-  
+  @param  TTL        The time to live field of the IP header. 
+  @param  ToS        The type of service field of the IP header.
+
   @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
   @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
                                 RARP, etc.) is not finished yet.
@@ -53,7 +55,7 @@ PxeBcCommonNotify (
   @retval EFI_DEVICE_ERROR      An unexpected network or system error occurred and this instance
                                 was not opened.
   @retval Others                Please examine the function Udp4->Routes(Udp4, FALSE, &mZeroIp4Addr, &mZeroIp4Addr, Gateway) returns.
-  
+
 **/
 EFI_STATUS
 PxeBcConfigureUdpWriteInstance (
@@ -61,7 +63,9 @@ PxeBcConfigureUdpWriteInstance (
   IN EFI_IPv4_ADDRESS   *StationIp,
   IN EFI_IPv4_ADDRESS   *SubnetMask,
   IN EFI_IPv4_ADDRESS   *Gateway,
-  IN OUT UINT16         *SrcPort
+  IN OUT UINT16         *SrcPort,
+  IN     UINT8          TTL,
+  IN     UINT8          ToS
   );
 /**
   Convert number to ASCII value.
