@@ -58,10 +58,10 @@
   gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceSize
 
 [Pcd]
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
-  gArmPlatformTokenSpaceGuid.PcdPciMmio64Base
-  gArmPlatformTokenSpaceGuid.PcdPciMmio64Size
+  gArmTokenSpaceGuid.PcdPciMmio32Base
+  gArmTokenSpaceGuid.PcdPciMmio32Size
+  gArmTokenSpaceGuid.PcdPciMmio64Base
+  gArmTokenSpaceGuid.PcdPciMmio64Size
 
 [Ppis]
   gArmMpCoreInfoPpiGuid

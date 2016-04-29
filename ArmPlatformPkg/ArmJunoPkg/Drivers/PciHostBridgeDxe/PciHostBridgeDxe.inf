@@ -58,14 +58,14 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
 
-  gArmPlatformTokenSpaceGuid.PcdPciBusMin
-  gArmPlatformTokenSpaceGuid.PcdPciBusMax
-  gArmPlatformTokenSpaceGuid.PcdPciIoBase
-  gArmPlatformTokenSpaceGuid.PcdPciIoSize
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Base
-  gArmPlatformTokenSpaceGuid.PcdPciMmio32Size
-  gArmPlatformTokenSpaceGuid.PcdPciMmio64Base
-  gArmPlatformTokenSpaceGuid.PcdPciMmio64Size
+  gArmTokenSpaceGuid.PcdPciBusMin
+  gArmTokenSpaceGuid.PcdPciBusMax
+  gArmTokenSpaceGuid.PcdPciIoBase
+  gArmTokenSpaceGuid.PcdPciIoSize
+  gArmTokenSpaceGuid.PcdPciMmio32Base
+  gArmTokenSpaceGuid.PcdPciMmio32Size
+  gArmTokenSpaceGuid.PcdPciMmio64Base
+  gArmTokenSpaceGuid.PcdPciMmio64Size
 
   gArmJunoTokenSpaceGuid.PcdPcieControlBaseAddress
   gArmJunoTokenSpaceGuid.PcdPcieRootPortBaseAddress

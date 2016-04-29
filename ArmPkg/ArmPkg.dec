@@ -255,3 +255,65 @@
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT32|0x0000000E
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
   gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
+
+  #
+  # Bases, sizes and translation offsets of IO and MMIO spaces, respectively.
+  # Note that "IO" is just another MMIO range that simulates IO space; there
+  # are no special instructions to access it.
+  #
+  # The base addresses PcdPciIoBase, PcdPciMmio32Base and PcdPciMmio64Base are
+  # specific to their containing address spaces. In order to get the physical
+  # address for the CPU, for a given access, the respective translation value
+  # has to be added.
+  #
+  # The translations always have to be initialized like this, using UINT64:
+  #
+  #   UINT64 IoCpuBase;     // mapping target in 64-bit cpu-physical space
+  #   UINT64 Mmio32CpuBase; // mapping target in 64-bit cpu-physical space
+  #   UINT64 Mmio64CpuBase; // mapping target in 64-bit cpu-physical space
+  #
+  #   PcdPciIoTranslation     = IoCpuBase     - PcdPciIoBase;
+  #   PcdPciMmio32Translation = Mmio32CpuBase - (UINT64)PcdPciMmio32Base;
+  #   PcdPciMmio64Translation = Mmio64CpuBase - PcdPciMmio64Base;
+  #
+  # because (a) the target address space (ie. the cpu-physical space) is
+  # 64-bit, and (b) the translation values are meant as offsets for *modular*
+  # arithmetic.
+  #
+  # Accordingly, the translation itself needs to be implemented as:
+  #
+  #   UINT64 UntranslatedIoAddress;     // input parameter
+  #   UINT32 UntranslatedMmio32Address; // input parameter
+  #   UINT64 UntranslatedMmio64Address; // input parameter
+  #
+  #   UINT64 TranslatedIoAddress;       // output parameter
+  #   UINT64 TranslatedMmio32Address;   // output parameter
+  #   UINT64 TranslatedMmio64Address;   // output parameter
+  #
+  #   TranslatedIoAddress     = UntranslatedIoAddress +
+  #                             PcdPciIoTranslation;
+  #   TranslatedMmio32Address = (UINT64)UntranslatedMmio32Address +
+  #                             PcdPciMmio32Translation;
+  #   TranslatedMmio64Address = UntranslatedMmio64Address +
+  #                             PcdPciMmio64Translation;
+  #
+  #  The modular arithmetic performed in UINT64 ensures that the translation
+  #  works correctly regardless of the relation between IoCpuBase and
+  #  PcdPciIoBase, Mmio32CpuBase and PcdPciMmio32Base, and Mmio64CpuBase and
+  #  PcdPciMmio64Base.
+  #
+  gArmTokenSpaceGuid.PcdPciIoBase|0x0|UINT64|0x00000050
+  gArmTokenSpaceGuid.PcdPciIoSize|0x0|UINT64|0x00000051
+  gArmTokenSpaceGuid.PcdPciIoTranslation|0x0|UINT64|0x00000052
+  gArmTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT32|0x00000053
+  gArmTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT32|0x00000054
+  gArmTokenSpaceGuid.PcdPciMmio32Translation|0x0|UINT64|0x00000055
+  gArmTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x00000056
+  gArmTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x00000057
+  gArmTokenSpaceGuid.PcdPciMmio64Translation|0x0|UINT64|0x00000058
+
+  #
+  # Inclusive range of allowed PCI buses.
+  #
+  gArmTokenSpaceGuid.PcdPciBusMin|0x0|UINT32|0x00000059
+  gArmTokenSpaceGuid.PcdPciBusMax|0x0|UINT32|0x0000005A

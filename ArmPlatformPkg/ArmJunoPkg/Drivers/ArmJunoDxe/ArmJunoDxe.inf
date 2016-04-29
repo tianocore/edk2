@@ -80,8 +80,8 @@
 
   # PCI Root complex specific PCDs
   gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceBaseAddress
-  gArmPlatformTokenSpaceGuid.PcdPciBusMin
-  gArmPlatformTokenSpaceGuid.PcdPciBusMax
+  gArmTokenSpaceGuid.PcdPciBusMin
+  gArmTokenSpaceGuid.PcdPciBusMax
 
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths
