@@ -38,6 +38,8 @@ typedef struct {
                                                   ///< Extended (4096-byte) Configuration Space.
                                                   ///< When TRUE, the root bridge supports
                                                   ///< 256-byte Configuration Space only.
+  BOOLEAN                  ResourceAssigned;      ///< Resource assignment status of the root bridge.
+                                                  ///< Set to TRUE if Bus/IO/MMIO resources for root bridge have been assigned.
   UINT64                   AllocationAttributes;  ///< Allocation attributes.
                                                   ///< Refer to EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM and
                                                   ///< EFI_PCI_HOST_BRIDGE_MEM64_DECODE used by GetAllocAttributes()
