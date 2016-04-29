@@ -1,7 +1,7 @@
 /** @file
   Support functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -489,6 +489,8 @@ PxeBcIcmp6ErrorUpdate (
   @param[in, out]  SrcPort              The pointer to the source port.
   @param[in]       DoNotFragment        If TRUE, fragment is not enabled.
                                         Otherwise, fragment is enabled.
+  @param[in]       TTL                  The time to live field of the IP header. 
+  @param[in]       ToS                  The type of service field of the IP header.
 
   @retval          EFI_SUCCESS          Successfully configured this instance.
   @retval          Others               Failed to configure this instance.
@@ -501,7 +503,9 @@ PxeBcConfigUdp4Write (
   IN     EFI_IPv4_ADDRESS   *SubnetMask,
   IN     EFI_IPv4_ADDRESS   *Gateway,
   IN OUT UINT16             *SrcPort,
-  IN     BOOLEAN            DoNotFragment
+  IN     BOOLEAN            DoNotFragment,
+  IN     UINT8              TTL,
+  IN     UINT8              ToS
   )
 {
   EFI_UDP4_CONFIG_DATA  Udp4CfgData;
@@ -511,8 +515,8 @@ PxeBcConfigUdp4Write (
 
   Udp4CfgData.TransmitTimeout    = PXEBC_DEFAULT_LIFETIME;
   Udp4CfgData.ReceiveTimeout     = PXEBC_DEFAULT_LIFETIME;
-  Udp4CfgData.TypeOfService      = DEFAULT_ToS;
-  Udp4CfgData.TimeToLive         = DEFAULT_TTL;
+  Udp4CfgData.TypeOfService      = ToS;
+  Udp4CfgData.TimeToLive         = TTL;
   Udp4CfgData.AllowDuplicatePort = TRUE;
   Udp4CfgData.DoNotFragment      = DoNotFragment;
 

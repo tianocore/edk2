@@ -1,7 +1,7 @@
 /** @file
   Support functions declaration for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -128,13 +128,15 @@ PxeBcIcmp6ErrorUpdate (
 /**
   This function is to configure a UDPv4 instance for UdpWrite.
 
-  @param[in]       Udp4                 Pointer to EFI_UDP4_PROTOCOL.
-  @param[in]       StationIp            Pointer to the station address.
-  @param[in]       SubnetMask           Pointer to the subnet mask.
-  @param[in]       Gateway              Pointer to the gateway address.
-  @param[in, out]  SrcPort              Pointer to the source port.
-  @param[in]       DoNotFragment        The flag of DoNotFragment bit in the IPv4
-                                        packet.
+  @param[in]       Udp4                 The pointer to EFI_UDP4_PROTOCOL.
+  @param[in]       StationIp            The pointer to the station address.
+  @param[in]       SubnetMask           The pointer to the subnet mask.
+  @param[in]       Gateway              The pointer to the gateway address.
+  @param[in, out]  SrcPort              The pointer to the source port.
+  @param[in]       DoNotFragment        If TRUE, fragment is not enabled.
+                                        Otherwise, fragment is enabled.
+  @param[in]       TTL                  The time to live field of the IP header. 
+  @param[in]       ToS                  The type of service field of the IP header.
 
   @retval          EFI_SUCCESS          Successfully configured this instance.
   @retval          Others               Failed to configure this instance.
@@ -147,7 +149,9 @@ PxeBcConfigUdp4Write (
   IN     EFI_IPv4_ADDRESS   *SubnetMask,
   IN     EFI_IPv4_ADDRESS   *Gateway,
   IN OUT UINT16             *SrcPort,
-  IN     BOOLEAN            DoNotFragment
+  IN     BOOLEAN            DoNotFragment,
+  IN     UINT8              TTL,
+  IN     UINT8              ToS
   );
 
 
