@@ -83,6 +83,7 @@ typedef struct {
   BOOLEAN                           Enable;
   EFI_SD_MMC_SLOT_TYPE              SlotType;
   BOOLEAN                           MediaPresent;
+  BOOLEAN                           Initialized;
   SD_MMC_CARD_TYPE                  CardType;
 } SD_MMC_HC_SLOT;
 
