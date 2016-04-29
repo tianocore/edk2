@@ -95,25 +95,25 @@ CreateRootBridge (
   //
   // Make sure Mem and MemAbove4G apertures are valid
   //
-  if (Bridge->Mem.Base < Bridge->Mem.Limit) {
+  if (Bridge->Mem.Base <= Bridge->Mem.Limit) {
     ASSERT (Bridge->Mem.Limit < SIZE_4GB);
     if (Bridge->Mem.Limit >= SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->MemAbove4G.Base < Bridge->MemAbove4G.Limit) {
+  if (Bridge->MemAbove4G.Base <= Bridge->MemAbove4G.Limit) {
     ASSERT (Bridge->MemAbove4G.Base >= SIZE_4GB);
     if (Bridge->MemAbove4G.Base < SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->PMem.Base < Bridge->PMem.Limit) {
+  if (Bridge->PMem.Base <= Bridge->PMem.Limit) {
     ASSERT (Bridge->PMem.Limit < SIZE_4GB);
     if (Bridge->PMem.Limit >= SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->PMemAbove4G.Base < Bridge->PMemAbove4G.Limit) {
+  if (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit) {
     ASSERT (Bridge->PMemAbove4G.Base >= SIZE_4GB);
     if (Bridge->PMemAbove4G.Base < SIZE_4GB) {
       return NULL;
@@ -126,10 +126,10 @@ CreateRootBridge (
     // support separate windows for Non-prefetchable and Prefetchable
     // memory.
     //
-    ASSERT (Bridge->PMem.Base >= Bridge->PMem.Limit);
-    ASSERT (Bridge->PMemAbove4G.Base >= Bridge->PMemAbove4G.Limit);
-    if ((Bridge->PMem.Base < Bridge->PMem.Limit) ||
-        (Bridge->PMemAbove4G.Base < Bridge->PMemAbove4G.Limit)
+    ASSERT (Bridge->PMem.Base > Bridge->PMem.Limit);
+    ASSERT (Bridge->PMemAbove4G.Base > Bridge->PMemAbove4G.Limit);
+    if ((Bridge->PMem.Base <= Bridge->PMem.Limit) ||
+        (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit)
         ) {
       return NULL;
     }
@@ -140,10 +140,10 @@ CreateRootBridge (
     // If this bit is not set, then the PCI Root Bridge does not support
     // 64 bit memory windows.
     //
-    ASSERT (Bridge->MemAbove4G.Base >= Bridge->MemAbove4G.Limit);
-    ASSERT (Bridge->PMemAbove4G.Base >= Bridge->PMemAbove4G.Limit);
-    if ((Bridge->MemAbove4G.Base < Bridge->MemAbove4G.Limit) ||
-        (Bridge->PMemAbove4G.Base < Bridge->PMemAbove4G.Limit)
+    ASSERT (Bridge->MemAbove4G.Base > Bridge->MemAbove4G.Limit);
+    ASSERT (Bridge->PMemAbove4G.Base > Bridge->PMemAbove4G.Limit);
+    if ((Bridge->MemAbove4G.Base <= Bridge->MemAbove4G.Limit) ||
+        (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit)
         ) {
       return NULL;
     }

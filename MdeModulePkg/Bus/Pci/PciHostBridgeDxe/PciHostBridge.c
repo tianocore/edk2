@@ -393,7 +393,7 @@ InitializePciHostBridge (
       continue;
     }
 
-    if (RootBridges[Index].Io.Limit > RootBridges[Index].Io.Base) {
+    if (RootBridges[Index].Io.Base <= RootBridges[Index].Io.Limit) {
       Status = AddIoSpace (
                  RootBridges[Index].Io.Base,
                  RootBridges[Index].Io.Limit - RootBridges[Index].Io.Base + 1
@@ -413,7 +413,7 @@ InitializePciHostBridge (
     MemApertures[3] = &RootBridges[Index].PMemAbove4G;
 
     for (MemApertureIndex = 0; MemApertureIndex < sizeof (MemApertures) / sizeof (MemApertures[0]); MemApertureIndex++) {
-      if (MemApertures[MemApertureIndex]->Limit > MemApertures[MemApertureIndex]->Base) {
+      if (MemApertures[MemApertureIndex]->Base <= MemApertures[MemApertureIndex]->Limit) {
         Status = AddMemoryMappedIoSpace (
                    MemApertures[MemApertureIndex]->Base,
                    MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
