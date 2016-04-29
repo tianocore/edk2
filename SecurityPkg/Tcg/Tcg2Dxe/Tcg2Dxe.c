@@ -2,6 +2,7 @@
   This module implements Tcg2 Protocol.
   
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -332,14 +333,14 @@ Tcg2GetCapability (
   IN OUT EFI_TCG2_BOOT_SERVICE_CAPABILITY *ProtocolCapability
   )
 {
-  DEBUG ((EFI_D_INFO, "Tcg2GetCapability ...\n"));
+  DEBUG ((DEBUG_VERBOSE, "Tcg2GetCapability ...\n"));
 
   if ((This == NULL) || (ProtocolCapability == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
   
-  DEBUG ((EFI_D_INFO, "Size - 0x%x\n", ProtocolCapability->Size));
-  DEBUG ((EFI_D_INFO, " 1.1 - 0x%x, 1.0 - 0x%x\n", sizeof(EFI_TCG2_BOOT_SERVICE_CAPABILITY), sizeof(TREE_BOOT_SERVICE_CAPABILITY_1_0)));
+  DEBUG ((DEBUG_VERBOSE, "Size - 0x%x\n", ProtocolCapability->Size));
+  DEBUG ((DEBUG_VERBOSE, " 1.1 - 0x%x, 1.0 - 0x%x\n", sizeof(EFI_TCG2_BOOT_SERVICE_CAPABILITY), sizeof(TREE_BOOT_SERVICE_CAPABILITY_1_0)));
 
   if (ProtocolCapability->Size < mTcgDxeData.BsCap.Size) {
     //
@@ -363,7 +364,7 @@ Tcg2GetCapability (
   }
 
   CopyMem (ProtocolCapability, &mTcgDxeData.BsCap, mTcgDxeData.BsCap.Size);
-  DEBUG ((EFI_D_INFO, "Tcg2GetCapability - %r\n", EFI_SUCCESS));
+  DEBUG ((DEBUG_VERBOSE, "Tcg2GetCapability - %r\n", EFI_SUCCESS));
   return EFI_SUCCESS;
 }
 
@@ -1237,7 +1238,7 @@ Tcg2HashLogExtendEvent (
   TCG_PCR_EVENT_HDR  NewEventHdr;
   TPML_DIGEST_VALUES DigestList;
 
-  DEBUG ((EFI_D_INFO, "Tcg2HashLogExtendEvent ...\n"));
+  DEBUG ((DEBUG_VERBOSE, "Tcg2HashLogExtendEvent ...\n"));
 
   if ((This == NULL) || (DataToHash == 0) || (Event == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1287,7 +1288,7 @@ Tcg2HashLogExtendEvent (
                Event->Event
                );
   }
-  DEBUG ((EFI_D_INFO, "Tcg2HashLogExtendEvent - %r\n", Status));
+  DEBUG ((DEBUG_VERBOSE, "Tcg2HashLogExtendEvent - %r\n", Status));
   return Status;
 }
 
