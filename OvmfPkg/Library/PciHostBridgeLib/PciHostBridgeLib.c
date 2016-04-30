@@ -125,11 +125,11 @@ InitRootBridge (
   RootBus->DmaAbove4G = FALSE;
 
   RootBus->AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
-  RootBus->PMem.Base            = 0;
+  RootBus->PMem.Base            = MAX_UINT64;
   RootBus->PMem.Limit           = 0;
-  RootBus->PMemAbove4G.Base     = 0;
+  RootBus->PMemAbove4G.Base     = MAX_UINT64;
   RootBus->PMemAbove4G.Limit    = 0;
-  RootBus->MemAbove4G.Base      = 0;
+  RootBus->MemAbove4G.Base      = MAX_UINT64;
   RootBus->MemAbove4G.Limit     = 0;
 
   if (PcdGet64 (PcdPciMmio64Size) > 0) {
