@@ -184,25 +184,6 @@ DumpStatistics( void )
 }
 
 /**
-  Initialize the cumulative data.
-
-**/
-VOID
-InitCumulativeData (
-  VOID
-  )
-{
-  UINTN                             Index;
-
-  for (Index = 0; Index < NumCum; ++Index) {
-    CumData[Index].Count = 0;
-    CumData[Index].MinDur = PERF_MAXDUR;
-    CumData[Index].MaxDur = 0;
-    CumData[Index].Duration = 0;
-  }
-}
-
-/**
   Dump performance data.
   
   @param[in]  ImageHandle     The image handle.
