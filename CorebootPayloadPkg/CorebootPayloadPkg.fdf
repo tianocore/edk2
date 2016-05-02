@@ -1,16 +1,16 @@
 ## @file
 # Coreboot Payload Package
 #
-# Provides drivers and definitions to create uefi payload for coreboot. 
+# Provides drivers and definitions to create uefi payload for coreboot.
 #
 # Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
-# This program and the accompanying materials are licensed and made available under 
-# the terms and conditions of the BSD License that accompanies this distribution.  
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
-# http://opensource.org/licenses/bsd-license.php.                                                                          
-# 
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+# http://opensource.org/licenses/bsd-license.php.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
@@ -93,25 +93,25 @@ INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf  
-INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf 
+INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 INF MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
 
 INF UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 INF MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
-INF PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf 
+INF PcAtChipsetPkg/8259InterruptControllerDxe/8259.inf
 INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
-INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf 
+INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
-INF CorebootModulePkg/CbSupportDxe/CbSupportDxe.inf 
+INF CorebootModulePkg/CbSupportDxe/CbSupportDxe.inf
 
 INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 #
 # PCI Support
 #
 INF DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
-INF DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf 
+INF DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
 
 #
 # ISA Support
@@ -132,7 +132,7 @@ INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-INF DuetPkg/SataControllerDxe/SataControllerDxe.inf  
+INF DuetPkg/SataControllerDxe/SataControllerDxe.inf
 INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
 INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
@@ -170,7 +170,7 @@ FILE FREEFORM    = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
 }
 
 #
-# Framebuffer Gop 
+# Framebuffer Gop
 #
 INF CorebootPayloadPkg/FbGop/FbGop.inf
 
@@ -271,4 +271,3 @@ INF CorebootPayloadPkg/FbGop/FbGop.inf
   FILE RAW = $(NAMED_GUID) {
     RAW RAW                |.raw
   }
-
