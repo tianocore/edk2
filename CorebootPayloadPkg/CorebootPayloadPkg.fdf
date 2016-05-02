@@ -110,8 +110,8 @@ INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 #
 # PCI Support
 #
-INF DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
-INF DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
+INF CorebootModulePkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
+INF CorebootModulePkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
 
 #
 # ISA Support
@@ -132,7 +132,7 @@ INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
-INF DuetPkg/SataControllerDxe/SataControllerDxe.inf
+INF CorebootModulePkg/SataControllerDxe/SataControllerDxe.inf
 INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
 INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf

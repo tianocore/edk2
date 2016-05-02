@@ -317,8 +317,8 @@
   #
   # PCI Support
   #
-  DuetPkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
-  DuetPkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
+  CorebootModulePkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
+  CorebootModulePkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
 
   #
   # SCSI/ATA/IDE/DISK Support
@@ -327,7 +327,7 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   FatPkg/EnhancedFatDxe/Fat.inf
-  DuetPkg/SataControllerDxe/SataControllerDxe.inf
+  CorebootModulePkg/SataControllerDxe/SataControllerDxe.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
