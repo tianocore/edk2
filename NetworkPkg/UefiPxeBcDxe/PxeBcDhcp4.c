@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -460,9 +460,11 @@ PxeBcParseDhcp4Packet (
   BOOLEAN                        IsProxyOffer;
   BOOLEAN                        IsPxeOffer;
   UINT8                          *Ptr8;
+  BOOLEAN                        FileFieldOverloaded;
 
   IsProxyOffer = FALSE;
   IsPxeOffer   = FALSE;
+  FileFieldOverloaded = FALSE;
 
   ZeroMem (Cache4->OptList, sizeof (Cache4->OptList));
   ZeroMem (&Cache4->VendorOpt, sizeof (Cache4->VendorOpt));
@@ -488,6 +490,7 @@ PxeBcParseDhcp4Packet (
   Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
   if (Option != NULL) {
     if ((Option->Data[0] & PXEBC_DHCP4_OVERLOAD_FILE) != 0) {
+      FileFieldOverloaded = TRUE;
       for (Index = 0; Index < PXEBC_DHCP4_TAG_INDEX_MAX; Index++) {
         if (Options[Index] == NULL) {
           Options[Index] = PxeBcParseDhcp4Options (
@@ -550,7 +553,7 @@ PxeBcParseDhcp4Packet (
     if (*(Ptr8 - 1) != '\0') {
       *Ptr8 = '\0';
     }
-  } else if (Offer->Dhcp4.Header.BootFileName[0] != 0) {
+  } else if (!FileFieldOverloaded && Offer->Dhcp4.Header.BootFileName[0] != 0) {
     //
     // If the bootfile is not present and bootfilename is present in DHCPv4 packet, just parse it.
     // Do not count dhcp option header here, or else will destroy the serverhostname.
