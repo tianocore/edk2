@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -432,9 +432,19 @@ class UniFileClassObject(object):
             Line = Line.replace(u"\\'", u"'") 
             Line = Line.replace(BACK_SLASH_PLACEHOLDER, u'\\')
 
-#           if Line.find(u'\\x'):
-#               hex = Line[Line.find(u'\\x') + 2 : Line.find(u'\\x') + 6]
-#               hex = "u'\\u" + hex + "'"
+            StartPos = Line.find(u'\\x')
+            while (StartPos != -1):
+                EndPos = Line.find(u'\\', StartPos + 1, StartPos + 7)
+                if EndPos != -1 and EndPos - StartPos == 6 :
+                    if re.match('[a-fA-F0-9]{4}', Line[StartPos + 2 : EndPos], re.UNICODE):
+                        EndStr = Line[EndPos: ]
+                        UniStr = ('\u' + (Line[StartPos + 2 : EndPos])).decode('unicode_escape')
+                        if EndStr.startswith(u'\\x') and len(EndStr) >= 7:
+                            if EndStr[6] == u'\\' and re.match('[a-fA-F0-9]{4}', EndStr[2 : 6], re.UNICODE):
+                                Line = Line[0 : StartPos] + UniStr + EndStr
+                        else:
+                            Line = Line[0 : StartPos] + UniStr + EndStr[1:]
+                StartPos = Line.find(u'\\x', StartPos)
 
             IncList = gIncludePattern.findall(Line)
             if len(IncList) == 1:
