@@ -259,11 +259,13 @@ HttpBootParseDhcp4Packet (
   EFI_STATUS                     Status;
   HTTP_BOOT_OFFER_TYPE           OfferType;
   EFI_IPv4_ADDRESS               IpAddr;
+  BOOLEAN                        FileFieldOverloaded;
   
   IsDnsOffer     = FALSE;
   IpExpressedUri = FALSE;
   IsProxyOffer   = FALSE;
   IsHttpOffer    = FALSE;
+  FileFieldOverloaded = FALSE;
 
   ZeroMem (Cache4->OptList, sizeof (Cache4->OptList));
 
@@ -288,6 +290,7 @@ HttpBootParseDhcp4Packet (
   Option = Options[HTTP_BOOT_DHCP4_TAG_INDEX_OVERLOAD];
   if (Option != NULL) {
     if ((Option->Data[0] & HTTP_BOOT_DHCP4_OVERLOAD_FILE) != 0) {
+      FileFieldOverloaded = TRUE;
       for (Index = 0; Index < HTTP_BOOT_DHCP4_TAG_INDEX_MAX; Index++) {
         if (Options[Index] == NULL) {
           Options[Index] = HttpBootParseDhcp4Options (
@@ -351,7 +354,7 @@ HttpBootParseDhcp4Packet (
     if (*(Ptr8 - 1) != '\0') {
       *Ptr8 = '\0';
     }
-  } else if (Offer->Dhcp4.Header.BootFileName[0] != 0) {
+  } else if (!FileFieldOverloaded && Offer->Dhcp4.Header.BootFileName[0] != 0) {
     //
     // If the bootfile is not present and bootfilename is present in DHCPv4 packet, just parse it.
     // Do not count dhcp option header here, or else will destroy the serverhostname.
