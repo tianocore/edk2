@@ -1493,7 +1493,44 @@ ScsiDiskInquiryDevice (
       if (!EFI_ERROR (Status)) {
         PageLength = (SupportedVpdPages->PageLength2 << 8)
                    |  SupportedVpdPages->PageLength1;
+
+        //
+        // Sanity checks for coping with broken devices
+        //
+        if (PageLength > sizeof SupportedVpdPages->SupportedVpdPageList) {
+          DEBUG ((EFI_D_WARN,
+            "%a: invalid PageLength (%u) in Supported VPD Pages page\n",
+            __FUNCTION__, (UINT32)PageLength));
+          PageLength = 0;
+        }
+
+        if ((PageLength > 0) &&
+            (SupportedVpdPages->SupportedVpdPageList[0] !=
+             EFI_SCSI_PAGE_CODE_SUPPORTED_VPD)) {
+          DEBUG ((EFI_D_WARN,
+            "%a: Supported VPD Pages page doesn't start with code 0x%02x\n",
+            __FUNCTION__, EFI_SCSI_PAGE_CODE_SUPPORTED_VPD));
+          PageLength = 0;
+        }
+
+        //
+        // Locate the code for the Block Limits VPD page
+        //
         for (Index = 0; Index < PageLength; Index++) {
+          //
+          // Sanity check
+          //
+          if ((Index > 0) &&
+              (SupportedVpdPages->SupportedVpdPageList[Index] <=
+               SupportedVpdPages->SupportedVpdPageList[Index - 1])) {
+            DEBUG ((EFI_D_WARN,
+              "%a: non-ascending code in Supported VPD Pages page @ %u\n",
+              __FUNCTION__, Index));
+            Index = 0;
+            PageLength = 0;
+            break;
+          }
+
           if (SupportedVpdPages->SupportedVpdPageList[Index] == EFI_SCSI_PAGE_CODE_BLOCK_LIMITS_VPD) {
             break;
           }
