@@ -554,12 +554,12 @@ SimpleNetworkDriverStart (
 
   switch (InitStatFlags & PXE_STATFLAGS_CABLE_DETECT_MASK) {
   case PXE_STATFLAGS_CABLE_DETECT_SUPPORTED:
-    Snp->Mode.MediaPresentSupported = TRUE;
+    Snp->CableDetectSupported = TRUE;
     break;
 
   case PXE_STATFLAGS_CABLE_DETECT_NOT_SUPPORTED:
   default:
-    Snp->Mode.MediaPresentSupported = FALSE;
+    Snp->CableDetectSupported = FALSE;
   }
 
   switch (InitStatFlags & PXE_STATFLAGS_GET_STATUS_NO_MEDIA_MASK) {
@@ -570,6 +570,10 @@ SimpleNetworkDriverStart (
   case PXE_STATFLAGS_GET_STATUS_NO_MEDIA_NOT_SUPPORTED:
   default:
     Snp->MediaStatusSupported = FALSE;
+  }
+
+  if (Snp->CableDetectSupported || Snp->MediaStatusSupported) {
+    Snp->Mode.MediaPresentSupported = TRUE;
   }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_STATION_ADDR_SETTABLE) != 0) {

@@ -130,9 +130,17 @@ typedef struct {
 
   //
   // Whether UNDI support reporting media status from GET_STATUS command,
-  // i.e. PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED
+  // i.e. PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED or
+  //      PXE_STATFLAGS_GET_STATUS_NO_MEDIA_NOT_SUPPORTED
   //
   BOOLEAN                MediaStatusSupported;
+
+  //
+  // Whether UNDI support cable detect for INITIALIZE command,
+  // i.e. PXE_STATFLAGS_CABLE_DETECT_SUPPORTED or
+  //      PXE_STATFLAGS_CABLE_DETECT_NOT_SUPPORTED
+  //
+  BOOLEAN                CableDetectSupported;
 
   //
   // Array of the recycled transmit buffer address from UNDI.
@@ -231,6 +239,30 @@ PxeShutdown (
 EFI_STATUS
 PxeGetStnAddr (
   SNP_DRIVER *Snp
+  );
+
+/**
+  Call undi to get the status of the interrupts, get the list of recycled transmit
+  buffers that completed transmitting. The recycled transmit buffer address will
+  be saved into Snp->RecycledTxBuf. This function will also update the MediaPresent
+  field of EFI_SIMPLE_NETWORK_MODE if UNDI support it.
+
+  @param[in]   Snp                     Pointer to snp driver structure.
+  @param[out]  InterruptStatusPtr      A non null pointer to contain the interrupt
+                                       status.
+  @param[in]   GetTransmittedBuf       Set to TRUE to retrieve the recycled transmit
+                                       buffer address.
+
+  @retval      EFI_SUCCESS             The status of the network interface was retrieved.
+  @retval      EFI_DEVICE_ERROR        The command could not be sent to the network
+                                       interface.
+
+**/
+EFI_STATUS
+PxeGetStatus (
+  IN     SNP_DRIVER *Snp,
+     OUT UINT32     *InterruptStatusPtr,
+  IN     BOOLEAN    GetTransmittedBuf
   );
 
 /**

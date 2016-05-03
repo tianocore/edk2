@@ -18,24 +18,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Call undi to get the status of the interrupts, get the list of recycled transmit
   buffers that completed transmitting. The recycled transmit buffer address will
-  be saved into Snp->RecycledTxBuf.
+  be saved into Snp->RecycledTxBuf. This function will also update the MediaPresent
+  field of EFI_SIMPLE_NETWORK_MODE if UNDI support it.
 
-  @param  Snp                     Pointer to snp driver structure.
-  @param  InterruptStatusPtr      A non null pointer to contain the interrupt
-                                  status.
-  @param  GetTransmittedBuf       Set to TRUE to retrieve the recycled transmit
-                                  buffer address.
+  @param[in]   Snp                     Pointer to snp driver structure.
+  @param[out]  InterruptStatusPtr      A non null pointer to contain the interrupt
+                                       status.
+  @param[in]   GetTransmittedBuf       Set to TRUE to retrieve the recycled transmit
+                                       buffer address.
 
-  @retval EFI_SUCCESS         The status of the network interface was retrieved.
-  @retval EFI_DEVICE_ERROR    The command could not be sent to the network
-                              interface.
+  @retval      EFI_SUCCESS             The status of the network interface was retrieved.
+  @retval      EFI_DEVICE_ERROR        The command could not be sent to the network
+                                       interface.
 
 **/
 EFI_STATUS
 PxeGetStatus (
-  SNP_DRIVER *Snp,
-  UINT32     *InterruptStatusPtr,
-  BOOLEAN    GetTransmittedBuf
+  IN     SNP_DRIVER *Snp,
+     OUT UINT32     *InterruptStatusPtr,
+  IN     BOOLEAN    GetTransmittedBuf
   )
 {
   PXE_DB_GET_STATUS *Db;

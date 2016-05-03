@@ -229,7 +229,10 @@ SnpUndi32Initialize (
   //
   Snp->TxRxBufferSize = (UINT32) (Snp->InitInfo.MemoryRequired + ExtraRxBufferSize + ExtraTxBufferSize);
 
-  if (Snp->Mode.MediaPresentSupported) {
+  //
+  // If UNDI support cable detect for INITIALIZE command, try it first.
+  //
+  if (Snp->CableDetectSupported) {
     if (PxeInit (Snp, PXE_OPFLAGS_INITIALIZE_DETECT_CABLE) == EFI_SUCCESS) {
       Snp->Mode.MediaPresent = TRUE;
       goto ON_EXIT;
@@ -242,6 +245,14 @@ SnpUndi32Initialize (
 
   if (EFI_ERROR (EfiStatus)) {
     gBS->CloseEvent (Snp->Snp.WaitForPacket);
+    goto ON_EXIT;
+  }
+
+  //
+  // Try to update the MediaPresent field of EFI_SIMPLE_NETWORK_MODE if the UNDI support it.
+  //
+  if (Snp->MediaStatusSupported) {
+    PxeGetStatus (Snp, NULL, FALSE);
   }
 
 ON_EXIT:
