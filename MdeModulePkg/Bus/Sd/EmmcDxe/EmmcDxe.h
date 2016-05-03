@@ -25,6 +25,7 @@
 #include <Protocol/BlockIo.h>
 #include <Protocol/BlockIo2.h>
 #include <Protocol/StorageSecurityCommand.h>
+#include <Protocol/EraseBlock.h>
 
 #include <Protocol/DevicePath.h>
 
@@ -56,6 +57,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL     gEmmcDxeComponentName2;
 
 #define EMMC_PARTITION_DATA_FROM_SSP(a) \
     CR(a, EMMC_PARTITION, StorageSecurity, EMMC_PARTITION_SIGNATURE)
+
+#define EMMC_PARTITION_DATA_FROM_ERASEBLK(a) \
+    CR(a, EMMC_PARTITION, EraseBlock, EMMC_PARTITION_SIGNATURE)
 
 //
 // Take 2.5 seconds as generic time out value, 1 microsecond as unit.
@@ -97,6 +101,7 @@ typedef struct {
   EFI_BLOCK_IO2_PROTOCOL                BlockIo2;
   EFI_BLOCK_IO_MEDIA                    BlockMedia;
   EFI_STORAGE_SECURITY_COMMAND_PROTOCOL StorageSecurity;
+  EFI_ERASE_BLOCK_PROTOCOL              EraseBlock;
 
   LIST_ENTRY                            Queue;
 

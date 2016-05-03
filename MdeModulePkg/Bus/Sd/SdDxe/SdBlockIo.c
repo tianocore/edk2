@@ -970,4 +970,390 @@ SdFlushBlocksEx (
   return EFI_SUCCESS;
 }
 
+/**
+  Set the erase start address through sync or async I/O request.
+
+  @param[in]  Device            A pointer to the SD_DEVICE instance.
+  @param[in]  StartLba          The starting logical block address to be erased.
+  @param[in]  Token             A pointer to the token associated with the transaction.
+  @param[in]  IsEnd             A boolean to show whether it's the last cmd in a series of cmds.
+                                This parameter is only meaningful in async I/O request.
+
+  @retval EFI_SUCCESS           The request is executed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be executed due to a lack of resources.
+  @retval Others                The request could not be executed successfully.
+
+**/
+EFI_STATUS
+SdEraseBlockStart (
+  IN  SD_DEVICE                 *Device,
+  IN  EFI_LBA                   StartLba,
+  IN  EFI_BLOCK_IO2_TOKEN       *Token,
+  IN  BOOLEAN                   IsEnd
+  )
+{
+  EFI_STATUS                           Status;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL        *PassThru;
+  SD_REQUEST                           *EraseBlockStart;
+  EFI_TPL                              OldTpl;
+
+  EraseBlockStart = NULL;
+  PassThru        = Device->Private->PassThru;
+
+  EraseBlockStart = AllocateZeroPool (sizeof (SD_REQUEST));
+  if (EraseBlockStart == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+
+  EraseBlockStart->Signature = SD_REQUEST_SIGNATURE;
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  InsertTailList (&Device->Queue, &EraseBlockStart->Link);
+  gBS->RestoreTPL (OldTpl);
+  EraseBlockStart->Packet.SdMmcCmdBlk    = &EraseBlockStart->SdMmcCmdBlk;
+  EraseBlockStart->Packet.SdMmcStatusBlk = &EraseBlockStart->SdMmcStatusBlk;
+  EraseBlockStart->Packet.Timeout        = SD_GENERIC_TIMEOUT;
+
+  EraseBlockStart->SdMmcCmdBlk.CommandIndex = SD_ERASE_WR_BLK_START;
+  EraseBlockStart->SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAc;
+  EraseBlockStart->SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1;
+
+  if (Device->SectorAddressing) {
+    EraseBlockStart->SdMmcCmdBlk.CommandArgument = (UINT32)StartLba;
+  } else {
+    EraseBlockStart->SdMmcCmdBlk.CommandArgument = (UINT32)MultU64x32 (StartLba, Device->BlockMedia.BlockSize);
+  }
+
+  EraseBlockStart->IsEnd = IsEnd;
+  EraseBlockStart->Token = Token;
+
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    AsyncIoCallback,
+                    EraseBlockStart,
+                    &EraseBlockStart->Event
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+  } else {
+    EraseBlockStart->Event = NULL;
+  }
+
+  Status = PassThru->PassThru (PassThru, Device->Slot, &EraseBlockStart->Packet, EraseBlockStart->Event);
+
+Error:
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    //
+    // For asynchronous operation, only free request and event in error case.
+    // The request and event will be freed in asynchronous callback for success case.
+    //
+    if (EFI_ERROR (Status) && (EraseBlockStart != NULL)) {
+      RemoveEntryList (&EraseBlockStart->Link);
+      if (EraseBlockStart->Event != NULL) {
+        gBS->CloseEvent (EraseBlockStart->Event);
+      }
+      FreePool (EraseBlockStart);
+    }
+  } else {
+    //
+    // For synchronous operation, free request whatever the execution result is.
+    //
+    if (EraseBlockStart != NULL) {
+      RemoveEntryList (&EraseBlockStart->Link);
+      FreePool (EraseBlockStart);
+    }
+  }
+
+  return Status;
+}
+
+/**
+  Set the erase end address through sync or async I/O request.
+
+  @param[in]  Device            A pointer to the SD_DEVICE instance.
+  @param[in]  EndLba            The ending logical block address to be erased.
+  @param[in]  Token             A pointer to the token associated with the transaction.
+  @param[in]  IsEnd             A boolean to show whether it's the last cmd in a series of cmds.
+                                This parameter is only meaningful in async I/O request.
+
+  @retval EFI_SUCCESS           The request is executed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be executed due to a lack of resources.
+  @retval Others                The request could not be executed successfully.
+
+**/
+EFI_STATUS
+SdEraseBlockEnd (
+  IN  SD_DEVICE                 *Device,
+  IN  EFI_LBA                   EndLba,
+  IN  EFI_BLOCK_IO2_TOKEN       *Token,
+  IN  BOOLEAN                   IsEnd
+  )
+{
+  EFI_STATUS                           Status;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL        *PassThru;
+  SD_REQUEST                           *EraseBlockEnd;
+  EFI_TPL                              OldTpl;
+
+  EraseBlockEnd = NULL;
+  PassThru      = Device->Private->PassThru;
+
+  EraseBlockEnd = AllocateZeroPool (sizeof (SD_REQUEST));
+  if (EraseBlockEnd == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+
+  EraseBlockEnd->Signature = SD_REQUEST_SIGNATURE;
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  InsertTailList (&Device->Queue, &EraseBlockEnd->Link);
+  gBS->RestoreTPL (OldTpl);
+  EraseBlockEnd->Packet.SdMmcCmdBlk    = &EraseBlockEnd->SdMmcCmdBlk;
+  EraseBlockEnd->Packet.SdMmcStatusBlk = &EraseBlockEnd->SdMmcStatusBlk;
+  EraseBlockEnd->Packet.Timeout        = SD_GENERIC_TIMEOUT;
+
+  EraseBlockEnd->SdMmcCmdBlk.CommandIndex = SD_ERASE_WR_BLK_END;
+  EraseBlockEnd->SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAc;
+  EraseBlockEnd->SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1;
+
+  if (Device->SectorAddressing) {
+    EraseBlockEnd->SdMmcCmdBlk.CommandArgument = (UINT32)EndLba;
+  } else {
+    EraseBlockEnd->SdMmcCmdBlk.CommandArgument = (UINT32)MultU64x32 (EndLba, Device->BlockMedia.BlockSize);
+  }
+
+  EraseBlockEnd->IsEnd = IsEnd;
+  EraseBlockEnd->Token = Token;
+
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    AsyncIoCallback,
+                    EraseBlockEnd,
+                    &EraseBlockEnd->Event
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+  } else {
+    EraseBlockEnd->Event = NULL;
+  }
+
+  Status = PassThru->PassThru (PassThru, Device->Slot, &EraseBlockEnd->Packet, EraseBlockEnd->Event);
+
+Error:
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    //
+    // For asynchronous operation, only free request and event in error case.
+    // The request and event will be freed in asynchronous callback for success case.
+    //
+    if (EFI_ERROR (Status) && (EraseBlockEnd != NULL)) {
+      RemoveEntryList (&EraseBlockEnd->Link);
+      if (EraseBlockEnd->Event != NULL) {
+        gBS->CloseEvent (EraseBlockEnd->Event);
+      }
+      FreePool (EraseBlockEnd);
+    }
+  } else {
+    //
+    // For synchronous operation, free request whatever the execution result is.
+    //
+    if (EraseBlockEnd != NULL) {
+      RemoveEntryList (&EraseBlockEnd->Link);
+      FreePool (EraseBlockEnd);
+    }
+  }
+
+  return Status;
+}
+
+/**
+  Erase specified blocks through sync or async I/O request.
+
+  @param[in]  Device            A pointer to the SD_DEVICE instance.
+  @param[in]  Token             A pointer to the token associated with the transaction.
+  @param[in]  IsEnd             A boolean to show whether it's the last cmd in a series of cmds.
+                                This parameter is only meaningful in async I/O request.
+
+  @retval EFI_SUCCESS           The request is executed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be executed due to a lack of resources.
+  @retval Others                The request could not be executed successfully.
+
+**/
+EFI_STATUS
+SdEraseBlock (
+  IN  SD_DEVICE                 *Device,
+  IN  EFI_BLOCK_IO2_TOKEN       *Token,
+  IN  BOOLEAN                   IsEnd
+  )
+{
+  EFI_STATUS                           Status;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL        *PassThru;
+  SD_REQUEST                           *EraseBlock;
+  EFI_TPL                              OldTpl;
+
+  EraseBlock = NULL;
+  PassThru   = Device->Private->PassThru;
+
+  EraseBlock = AllocateZeroPool (sizeof (SD_REQUEST));
+  if (EraseBlock == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Error;
+  }
+
+  EraseBlock->Signature = SD_REQUEST_SIGNATURE;
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  InsertTailList (&Device->Queue, &EraseBlock->Link);
+  gBS->RestoreTPL (OldTpl);
+  EraseBlock->Packet.SdMmcCmdBlk    = &EraseBlock->SdMmcCmdBlk;
+  EraseBlock->Packet.SdMmcStatusBlk = &EraseBlock->SdMmcStatusBlk;
+  EraseBlock->Packet.Timeout        = SD_GENERIC_TIMEOUT;
+
+  EraseBlock->SdMmcCmdBlk.CommandIndex = SD_ERASE;
+  EraseBlock->SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAc;
+  EraseBlock->SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1b;
+
+  EraseBlock->IsEnd = IsEnd;
+  EraseBlock->Token = Token;
+
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    AsyncIoCallback,
+                    EraseBlock,
+                    &EraseBlock->Event
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+  } else {
+    EraseBlock->Event = NULL;
+  }
+
+  Status = PassThru->PassThru (PassThru, Device->Slot, &EraseBlock->Packet, EraseBlock->Event);
+
+Error:
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    //
+    // For asynchronous operation, only free request and event in error case.
+    // The request and event will be freed in asynchronous callback for success case.
+    //
+    if (EFI_ERROR (Status) && (EraseBlock != NULL)) {
+      RemoveEntryList (&EraseBlock->Link);
+      if (EraseBlock->Event != NULL) {
+        gBS->CloseEvent (EraseBlock->Event);
+      }
+      FreePool (EraseBlock);
+    }
+  } else {
+    //
+    // For synchronous operation, free request whatever the execution result is.
+    //
+    if (EraseBlock != NULL) {
+      RemoveEntryList (&EraseBlock->Link);
+      FreePool (EraseBlock);
+    }
+  }
+
+  return Status;
+}
+
+/**
+  Erase a specified number of device blocks.
+
+  @param[in]       This           Indicates a pointer to the calling context.
+  @param[in]       MediaId        The media ID that the erase request is for.
+  @param[in]       Lba            The starting logical block address to be
+                                  erased. The caller is responsible for erasing
+                                  only legitimate locations.
+  @param[in, out]  Token          A pointer to the token associated with the
+                                  transaction.
+  @param[in]       Size           The size in bytes to be erased. This must be
+                                  a multiple of the physical block size of the
+                                  device.
+
+  @retval EFI_SUCCESS             The erase request was queued if Event is not
+                                  NULL. The data was erased correctly to the
+                                  device if the Event is NULL.to the device.
+  @retval EFI_WRITE_PROTECTED     The device cannot be erased due to write
+                                  protection.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting
+                                  to perform the erase operation.
+  @retval EFI_INVALID_PARAMETER   The erase request contains LBAs that are not
+                                  valid.
+  @retval EFI_NO_MEDIA            There is no media in the device.
+  @retval EFI_MEDIA_CHANGED       The MediaId is not for the current media.
+
+**/
+EFI_STATUS
+EFIAPI
+SdEraseBlocks (
+  IN     EFI_ERASE_BLOCK_PROTOCOL      *This,
+  IN     UINT32                        MediaId,
+  IN     EFI_LBA                       Lba,
+  IN OUT EFI_ERASE_BLOCK_TOKEN         *Token,
+  IN     UINTN                         Size
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_BLOCK_IO_MEDIA                    *Media;
+  UINTN                                 BlockSize;
+  UINTN                                 BlockNum;
+  EFI_LBA                               LastLba;
+  SD_DEVICE                             *Device;
+
+  Status = EFI_SUCCESS;
+  Device = SD_DEVICE_DATA_FROM_ERASEBLK (This);
+  Media  = &Device->BlockMedia;
+
+  if (MediaId != Media->MediaId) {
+    return EFI_MEDIA_CHANGED;
+  }
+
+  if (Media->ReadOnly) {
+    return EFI_WRITE_PROTECTED;
+  }
+
+  //
+  // Check parameters.
+  //
+  BlockSize = Media->BlockSize;
+  if ((Size % BlockSize) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  BlockNum  = Size / BlockSize;
+  if ((Lba + BlockNum - 1) > Media->LastBlock) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Token != NULL) && (Token->Event != NULL)) {
+    Token->TransactionStatus = EFI_SUCCESS;
+  }
+
+  LastLba = Lba + BlockNum - 1;
+
+  Status = SdEraseBlockStart (Device, Lba, (EFI_BLOCK_IO2_TOKEN*)Token, FALSE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = SdEraseBlockEnd (Device, LastLba, (EFI_BLOCK_IO2_TOKEN*)Token, FALSE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = SdEraseBlock (Device, (EFI_BLOCK_IO2_TOKEN*)Token, TRUE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  DEBUG ((EFI_D_ERROR, "SdEraseBlocks(): Lba 0x%x BlkNo 0x%x Event %p with %r\n", Lba, BlockNum, Token->Event, Status));
+
+  return Status;
+}
 

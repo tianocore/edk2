@@ -68,6 +68,11 @@ EMMC_PARTITION mEmmcPartitionTemplate = {
     EmmcSecurityProtocolIn,
     EmmcSecurityProtocolOut
   },
+  {                            // EraseBlock
+    EFI_ERASE_BLOCK_PROTOCOL_REVISION,
+    1,
+    EmmcEraseBlocks
+  },
   {
     NULL,
     NULL
@@ -369,6 +374,16 @@ DiscoverAllPartitions (
       Partition->Enable = TRUE;
       Partition->BlockMedia.LastBlock = DivU64x32 (Capacity, Partition->BlockMedia.BlockSize) - 1;
     }
+
+    if ((ExtCsd->EraseGroupDef & BIT0) == 0) {
+      if (Csd->WriteBlLen < 9) {
+        Partition->EraseBlock.EraseLengthGranularity = 1;
+      } else {
+        Partition->EraseBlock.EraseLengthGranularity = (Csd->EraseGrpMult + 1) * (Csd->EraseGrpSize + 1) * (1 << (Csd->WriteBlLen - 9));
+      }
+    } else {
+      Partition->EraseBlock.EraseLengthGranularity = 1024 * ExtCsd->HcEraseGrpSize;
+    }
   }
 
   return EFI_SUCCESS;
@@ -438,8 +453,30 @@ InstallProtocolOnPartition (
                     &Partition->BlockIo2,
                     NULL
                     );
-   if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
       goto Error;
+    }
+
+    if (Partition->PartitionType != EmmcPartitionRPMB) {
+      Status = gBS->InstallProtocolInterface (
+                      &Partition->Handle,
+                      &gEfiEraseBlockProtocolGuid,
+                      EFI_NATIVE_INTERFACE,
+                      &Partition->EraseBlock
+                      );
+      if (EFI_ERROR (Status)) {
+        gBS->UninstallMultipleProtocolInterfaces (
+               &Partition->Handle,
+               &gEfiDevicePathProtocolGuid,
+               Partition->DevicePath,
+               &gEfiBlockIoProtocolGuid,
+               &Partition->BlockIo,
+               &gEfiBlockIo2ProtocolGuid,
+               &Partition->BlockIo2,
+               NULL
+               );
+        goto Error;
+      }
     }
 
     if (((Partition->PartitionType == EmmcPartitionUserData) ||
@@ -461,6 +498,8 @@ InstallProtocolOnPartition (
                &Partition->BlockIo,
                &gEfiBlockIo2ProtocolGuid,
                &Partition->BlockIo2,
+               &gEfiEraseBlockProtocolGuid,
+               &Partition->EraseBlock,
                NULL
                );
         goto Error;
@@ -954,6 +993,7 @@ EmmcDxeDriverBindingStop (
   EFI_BLOCK_IO_PROTOCOL                  *BlockIo;
   EFI_BLOCK_IO2_PROTOCOL                 *BlockIo2;
   EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *StorageSecurity;
+  EFI_ERASE_BLOCK_PROTOCOL               *EraseBlock;
   LIST_ENTRY                             *Link;
   LIST_ENTRY                             *NextLink;
   EMMC_REQUEST                           *Request;
@@ -1093,6 +1133,38 @@ EmmcDxeDriverBindingStop (
              EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
              );
       continue;
+    }
+
+    //
+    // If Erase Block Protocol is installed, then uninstall this protocol.
+    //
+    Status = gBS->OpenProtocol (
+                    ChildHandleBuffer[Index],
+                    &gEfiEraseBlockProtocolGuid,
+                    (VOID **) &EraseBlock,
+                    This->DriverBindingHandle,
+                    Controller,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->UninstallProtocolInterface (
+                      ChildHandleBuffer[Index],
+                      &gEfiEraseBlockProtocolGuid,
+                      &Partition->EraseBlock
+                      );
+      if (EFI_ERROR (Status)) {
+        gBS->OpenProtocol (
+          Controller,
+          &gEfiSdMmcPassThruProtocolGuid,
+          (VOID **) &Partition->Device->Private->PassThru,
+          This->DriverBindingHandle,
+          ChildHandleBuffer[Index],
+          EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+          );
+        AllChildrenStopped = FALSE;
+        continue;
+      }
     }
 
     //

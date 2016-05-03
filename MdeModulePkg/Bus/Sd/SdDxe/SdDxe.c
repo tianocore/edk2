@@ -64,6 +64,11 @@ SD_DEVICE mSdDeviceTemplate = {
     0,                         // IoAlign
     0                          // LastBlock
   },
+  {                            // EraseBlock
+    EFI_ERASE_BLOCK_PROTOCOL_REVISION,
+    1,
+    SdEraseBlocks
+  },
   {                            // Queue
     NULL,
     NULL
@@ -247,6 +252,12 @@ DiscoverUserArea (
   Device->BlockMedia.LogicalPartition = FALSE;
   Device->BlockMedia.LastBlock        = DivU64x32 (Capacity, Device->BlockMedia.BlockSize) - 1;
 
+  if (Csd->EraseBlkEn) {
+    Device->EraseBlock.EraseLengthGranularity = 1;
+  } else {
+    Device->EraseBlock.EraseLengthGranularity = (Csd->SectorSize + 1) * (1 << (Csd->WriteBlLen - 9));
+  }
+
   return Status;
 }
 
@@ -369,6 +380,8 @@ DiscoverSdDevice (
                   &Device->BlockIo,
                   &gEfiBlockIo2ProtocolGuid,
                   &Device->BlockIo2,
+                  &gEfiEraseBlockProtocolGuid,
+                  &Device->EraseBlock,
                   NULL
                   );
 
@@ -825,6 +838,8 @@ SdDxeDriverBindingStop (
                     &Device->BlockIo,
                     &gEfiBlockIo2ProtocolGuid,
                     &Device->BlockIo2,
+                    &gEfiEraseBlockProtocolGuid,
+                    &Device->EraseBlock,
                     NULL
                     );
     if (EFI_ERROR (Status)) {

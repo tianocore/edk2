@@ -4,7 +4,7 @@
   This file defines common data structures, macro definitions and some module
   internal function header files.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -215,6 +215,43 @@ EFIAPI
 SdFlushBlocksEx (
   IN     EFI_BLOCK_IO2_PROTOCOL  *This,
   IN OUT EFI_BLOCK_IO2_TOKEN     *Token
+  );
+
+/**
+  Erase a specified number of device blocks.
+
+  @param[in]       This           Indicates a pointer to the calling context.
+  @param[in]       MediaId        The media ID that the erase request is for.
+  @param[in]       Lba            The starting logical block address to be
+                                  erased. The caller is responsible for erasing
+                                  only legitimate locations.
+  @param[in, out]  Token          A pointer to the token associated with the
+                                  transaction.
+  @param[in]       Size           The size in bytes to be erased. This must be
+                                  a multiple of the physical block size of the
+                                  device.
+
+  @retval EFI_SUCCESS             The erase request was queued if Event is not
+                                  NULL. The data was erased correctly to the
+                                  device if the Event is NULL.to the device.
+  @retval EFI_WRITE_PROTECTED     The device cannot be erased due to write
+                                  protection.
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting
+                                  to perform the erase operation.
+  @retval EFI_INVALID_PARAMETER   The erase request contains LBAs that are not
+                                  valid.
+  @retval EFI_NO_MEDIA            There is no media in the device.
+  @retval EFI_MEDIA_CHANGED       The MediaId is not for the current media.
+
+**/
+EFI_STATUS
+EFIAPI
+SdEraseBlocks (
+  IN     EFI_ERASE_BLOCK_PROTOCOL      *This,
+  IN     UINT32                        MediaId,
+  IN     EFI_LBA                       Lba,
+  IN OUT EFI_ERASE_BLOCK_TOKEN         *Token,
+  IN     UINTN                         Size
   );
 
 #endif
