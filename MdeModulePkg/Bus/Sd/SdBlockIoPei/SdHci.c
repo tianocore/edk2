@@ -2523,15 +2523,25 @@ SdPeimTuningClock (
       return Status;
     }
 
-    if ((HostCtrl2 & (BIT6 | BIT7)) == BIT7) {
+    if ((HostCtrl2 & (BIT6 | BIT7)) == 0) {
       break;
+    }
+
+    if ((HostCtrl2 & (BIT6 | BIT7)) == BIT7) {
+      return EFI_SUCCESS;
     }
   } while (++Retry < 40);
 
-  if (Retry == 40) {
-    Status = EFI_TIMEOUT;
+  DEBUG ((EFI_D_ERROR, "SdPeimTuningClock: Send tuning block fails at %d times with HostCtrl2 %02x\n", Retry, HostCtrl2));
+  //
+  // Abort the tuning procedure and reset the tuning circuit.
+  //
+  HostCtrl2 = (UINT8)~(BIT6 | BIT7);
+  Status = SdPeimHcAndMmio (Slot->SdHcBase + SD_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
-  return Status;
+  return EFI_DEVICE_ERROR;
 }
 
 /**
