@@ -254,6 +254,7 @@ SdPeimHcInitHost (
   @param[in]  DriveStrength The value for drive length group.
   @param[in]  PowerLimit    The value for power limit group.
   @param[in]  Mode          Switch or check function.
+  @param[out] SwitchResp    The return switch function status.
 
   @retval EFI_SUCCESS       The operation is done correctly.
   @retval Others            The operation fails.
@@ -261,12 +262,13 @@ SdPeimHcInitHost (
 **/
 EFI_STATUS
 SdPeimSwitch (
-  IN SD_PEIM_HC_SLOT        *Slot,
-  IN UINT8                  AccessMode,
-  IN UINT8                  CommandSystem,
-  IN UINT8                  DriveStrength,
-  IN UINT8                  PowerLimit,
-  IN BOOLEAN                Mode
+  IN     SD_PEIM_HC_SLOT              *Slot,
+  IN     UINT8                        AccessMode,
+  IN     UINT8                        CommandSystem,
+  IN     UINT8                        DriveStrength,
+  IN     UINT8                        PowerLimit,
+  IN     BOOLEAN                      Mode,
+     OUT UINT8                        *SwitchResp
   );
 
 /**

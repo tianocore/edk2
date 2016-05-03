@@ -2192,6 +2192,7 @@ SdPeimSetBusWidth (
   @param[in]  DriveStrength The value for drive length group.
   @param[in]  PowerLimit    The value for power limit group.
   @param[in]  Mode          Switch or check function.
+  @param[out] SwitchResp    The return switch function status.
 
   @retval EFI_SUCCESS       The operation is done correctly.
   @retval Others            The operation fails.
@@ -2199,12 +2200,13 @@ SdPeimSetBusWidth (
 **/
 EFI_STATUS
 SdPeimSwitch (
-  IN SD_PEIM_HC_SLOT        *Slot,
-  IN UINT8                  AccessMode,
-  IN UINT8                  CommandSystem,
-  IN UINT8                  DriveStrength,
-  IN UINT8                  PowerLimit,
-  IN BOOLEAN                Mode
+  IN     SD_PEIM_HC_SLOT              *Slot,
+  IN     UINT8                        AccessMode,
+  IN     UINT8                        CommandSystem,
+  IN     UINT8                        DriveStrength,
+  IN     UINT8                        PowerLimit,
+  IN     BOOLEAN                      Mode,
+     OUT UINT8                        *SwitchResp
   )
 {
   SD_COMMAND_BLOCK                    SdCmdBlk;
@@ -2212,7 +2214,6 @@ SdPeimSwitch (
   SD_COMMAND_PACKET                   Packet;
   EFI_STATUS                          Status;
   UINT32                              ModeValue;
-  UINT8                               Data[64];
 
   ZeroMem (&SdCmdBlk, sizeof (SdCmdBlk));
   ZeroMem (&SdStatusBlk, sizeof (SdStatusBlk));
@@ -2230,8 +2231,8 @@ SdPeimSwitch (
   SdCmdBlk.CommandArgument = (AccessMode & 0xF) | ((PowerLimit & 0xF) << 4) | \
                              ((DriveStrength & 0xF) << 8) | ((DriveStrength & 0xF) << 12) | \
                              ModeValue;
-  Packet.InDataBuffer     = Data;
-  Packet.InTransferLength = sizeof (Data);
+  Packet.InDataBuffer     = SwitchResp;
+  Packet.InTransferLength = 64;
 
   Status = SdPeimExecCmd (Slot, &Packet);
 
@@ -2617,6 +2618,7 @@ SdPeimSetBusMode (
   UINT8                        AccessMode;
   UINT8                        HostCtrl1;
   UINT8                        HostCtrl2;
+  UINT8                        SwitchResp[64];
 
   Status = SdPeimGetCsd (Slot, Rca, &Slot->Csd);
   if (EFI_ERROR (Status)) {
@@ -2643,31 +2645,45 @@ SdPeimSetBusMode (
   }
 
   //
-  // Calculate supported bus speed/bus width/clock frequency.
+  // Get the supported bus speed from SWITCH cmd return data group #1.
+  //
+  Status = SdPeimSwitch (Slot, 0xF, 0xF, 0xF, 0xF, FALSE, SwitchResp);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  //
+  // Calculate supported bus speed/bus width/clock frequency by host and device capability.
   //
   ClockFreq = 0;
-  if (S18a && (Capability.Sdr104 != 0)) {
+  if (S18a && (Capability.Sdr104 != 0) && ((SwitchResp[13] & BIT3) != 0)) {
     ClockFreq = 208;
     AccessMode = 3;
-  } else if (S18a && (Capability.Sdr50 != 0)) {
+  } else if (S18a && (Capability.Sdr50 != 0) && ((SwitchResp[13] & BIT2) != 0)) {
     ClockFreq = 100;
     AccessMode = 2;
-  } else if (S18a && (Capability.Ddr50 != 0)) {
+  } else if (S18a && (Capability.Ddr50 != 0) && ((SwitchResp[13] & BIT4) != 0)) {
     ClockFreq = 50;
     AccessMode = 4;
-  } else {
+  } else if ((SwitchResp[13] & BIT1) != 0) {
     ClockFreq = 50;
     AccessMode = 1;
+  } else {
+    ClockFreq = 25;
+    AccessMode = 0;
   }
 
-  DEBUG ((EFI_D_INFO, "AccessMode %d ClockFreq %d BusWidth %d\n", AccessMode, ClockFreq, BusWidth));
+  DEBUG ((EFI_D_INFO, "SdPeimSetBusMode: AccessMode %d ClockFreq %d BusWidth %d\n", AccessMode, ClockFreq, BusWidth));
 
-  Status = SdPeimSwitch (Slot, AccessMode, 0, 0, 0, TRUE);
+  Status = SdPeimSwitch (Slot, AccessMode, 0xF, 0xF, 0xF, TRUE, SwitchResp);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimSwitch fails with %r\n", Status));
     return Status;
   }
 
+  if ((SwitchResp[16] & 0xF) != AccessMode) {
+    DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimSwitch to AccessMode %d ClockFreq %d BusWidth %d fails! The Switch response is 0x%1x\n", AccessMode, ClockFreq, BusWidth, SwitchResp[16] & 0xF));
+    return EFI_DEVICE_ERROR;
+  }
   //
   // Set to Hight Speed timing
   //
