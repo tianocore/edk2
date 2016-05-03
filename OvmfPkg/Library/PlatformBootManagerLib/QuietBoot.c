@@ -361,6 +361,8 @@ EnableQuietBoot (
   NewHeight = 0;
   NewWidth = 0;
   Instance = 0;
+  Height = 0;
+  Width = 0;
   while (1) {
     ImageData = NULL;
     ImageSize = 0;
