@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "HttpBootDxe.h"
+#include <Library/UefiBootManagerLib.h>
 
 CHAR16  mHttpBootConfigStorageName[]     = L"HTTP_BOOT_CONFIG_IFR_NVDATA";
 
@@ -36,31 +37,18 @@ HttpBootAddBootOption (
   IN   CHAR16                   *Uri
   )
 {
-  EFI_DEV_PATH               *Node;
-  EFI_DEVICE_PATH_PROTOCOL   *TmpDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL   *NewDevicePath;
-  UINTN                      Length;
-  CHAR8                      AsciiUri[URI_STR_MAX_SIZE];
-  CHAR16                     *CurrentOrder;
-  EFI_STATUS                 Status;
-  UINTN                      OrderCount;
-  UINTN                      TargetLocation;
-  BOOLEAN                    Found;
-  UINT8                      *TempByteBuffer;
-  UINT8                      *TempByteStart;
-  UINTN                      DescSize;
-  UINTN                      FilePathSize;
-  CHAR16                     OptionStr[10];
-  UINT16                     *NewOrder;
-  UINTN                      Index;
+  EFI_DEV_PATH                      *Node;
+  EFI_DEVICE_PATH_PROTOCOL          *TmpDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL          *NewDevicePath;
+  UINTN                             Length;
+  CHAR8                             AsciiUri[URI_STR_MAX_SIZE];
+  EFI_STATUS                        Status;
+  UINTN                             Index;
+  EFI_BOOT_MANAGER_LOAD_OPTION      NewOption;
 
-  NewOrder      = NULL;
-  TempByteStart = NULL;
   NewDevicePath = NULL;
-  NewOrder      = NULL;
   Node          = NULL;
   TmpDevicePath = NULL;
-  CurrentOrder  = NULL;
 
   if (StrLen (Description) == 0) {
     return EFI_INVALID_PARAMETER;
@@ -137,105 +125,29 @@ HttpBootAddBootOption (
   }
 
   //
-  // Get current "BootOrder" variable and find a free target.
+  // Add a new load option.
   //
-  Length = 0;
-  Status = GetVariable2 (
-             L"BootOrder",
-             &gEfiGlobalVariableGuid,
-             (VOID **)&CurrentOrder,
-             &Length 
-             );
-  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
-    goto ON_EXIT;
-  }
-  OrderCount = Length / sizeof (UINT16);
-  Found = FALSE;
-  for (TargetLocation=0; TargetLocation < 0xFFFF; TargetLocation++) {
-    Found = TRUE;
-    for (Index = 0; Index < OrderCount; Index++) {
-      if (CurrentOrder[Index] == TargetLocation) {
-        Found = FALSE;
-        break;
-      }
-    }
-    if (Found) {
-      break;
-    }
-  }
-
-  if (TargetLocation == 0xFFFF) {
-    DEBUG ((EFI_D_ERROR, "Could not find unused target index.\n"));
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  } else {
-    DEBUG ((EFI_D_INFO, "TargetIndex = %04x.\n", TargetLocation));
-  }
-  
-  //
-  // Construct and set the "Boot####" variable
-  //
-  DescSize = StrSize(Description);
-  FilePathSize = GetDevicePathSize (NewDevicePath);
-  TempByteBuffer = AllocateZeroPool(sizeof(EFI_LOAD_OPTION) + DescSize + FilePathSize);
-  if (TempByteBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
-  TempByteStart = TempByteBuffer;
-  *((UINT32 *) TempByteBuffer) = LOAD_OPTION_ACTIVE;      // Attributes
-  TempByteBuffer += sizeof (UINT32);
-
-  *((UINT16 *) TempByteBuffer) = (UINT16)FilePathSize;    // FilePathListLength
-  TempByteBuffer += sizeof (UINT16);
-
-  CopyMem (TempByteBuffer, Description, DescSize);
-  TempByteBuffer += DescSize;
-  CopyMem (TempByteBuffer, NewDevicePath, FilePathSize);
-
-  UnicodeSPrint (OptionStr, sizeof(OptionStr), L"%s%04x", L"Boot", TargetLocation);
-  Status = gRT->SetVariable (
-                  OptionStr,
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  sizeof(UINT32) + sizeof(UINT16) + DescSize + FilePathSize,
-                  TempByteStart
-                  );
+  Status = EfiBootManagerInitializeLoadOption (
+                 &NewOption,
+                 LoadOptionNumberUnassigned,
+                 LoadOptionTypeBoot,
+                 LOAD_OPTION_ACTIVE,
+                 Description,
+                 NewDevicePath,
+                 NULL,
+                 0
+                 );
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
 
-  //
-  // Insert into the order list and set "BootOrder" variable
-  //
-  NewOrder = AllocateZeroPool ((OrderCount + 1) * sizeof (UINT16));
-  if (NewOrder == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
+  Status = EfiBootManagerAddLoadOptionVariable (&NewOption, (UINTN) -1);
+  if (EFI_ERROR (Status)) {
+    EfiBootManagerFreeLoadOption (&NewOption);
   }
-  CopyMem(NewOrder, CurrentOrder, OrderCount * sizeof(UINT16));
-  NewOrder[OrderCount] = (UINT16) TargetLocation;
-  Status = gRT->SetVariable (
-                  L"BootOrder",
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  ((OrderCount + 1) * sizeof (UINT16)),
-                  NewOrder
-                  );
-  
 
 ON_EXIT:
 
-  if (CurrentOrder != NULL) {
-    FreePool (CurrentOrder);
-  }
-  if (NewOrder != NULL) {
-    FreePool (NewOrder);
-  }
-  if (TempByteStart != NULL) {
-    FreePool (TempByteStart);
-  }
   if (NewDevicePath != NULL) {
     FreePool (NewDevicePath);
   }
