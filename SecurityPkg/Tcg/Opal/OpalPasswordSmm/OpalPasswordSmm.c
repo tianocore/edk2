@@ -180,12 +180,14 @@ ExtractDeviceInfoFromDevicePath (
   TRUE means that the device is partially or fully locked.
   This will perform a Level 0 Discovery and parse the locking feature descriptor
 
-  @param[in]      OpalDev        Opal object to determine if locked
+  @param[in]      OpalDev             Opal object to determine if locked
+  @param[out]     BlockSidSupported   Whether device support BlockSid feature.
 
 **/
 BOOLEAN
 IsOpalDeviceLocked(
-  OPAL_SMM_DEVICE    *OpalDev
+  OPAL_SMM_DEVICE    *OpalDev,
+  BOOLEAN            *BlockSidSupported
   )
 {
   OPAL_SESSION                   Session;
@@ -203,7 +205,8 @@ IsOpalDeviceLocked(
   }
 
   OpalDev->OpalBaseComId = OpalBaseComId;
-  Session.OpalBaseComId = OpalBaseComId;
+  Session.OpalBaseComId  = OpalBaseComId;
+  *BlockSidSupported     = SupportedAttributes.BlockSid == 1 ? TRUE : FALSE;
 
   Ret = OpalGetLockingInfo(&Session, &LockingFeature);
   if (Ret != TcgResultSuccess) {
@@ -346,6 +349,7 @@ SmmUnlockOpalPassword (
   UINTN                          MemoryBase;
   UINTN                          MemoryLength;
   OPAL_SESSION                   Session;
+  BOOLEAN                        BlockSidSupport;
 
   ZeroMem (StorePcieConfDataList, sizeof (StorePcieConfDataList));
   Status = EFI_DEVICE_ERROR;
@@ -431,13 +435,14 @@ SmmUnlockOpalPassword (
     }
 
     Status = EFI_DEVICE_ERROR;
-    if (IsOpalDeviceLocked(OpalDev)) {
+    BlockSidSupport = FALSE;
+    if (IsOpalDeviceLocked (OpalDev, &BlockSidSupport)) {
       ZeroMem(&Session, sizeof(Session));
       Session.Sscp = &OpalDev->Sscp;
       Session.MediaId = 0;
       Session.OpalBaseComId = OpalDev->OpalBaseComId;
 
-      if (mSendBlockSID) {
+      if (mSendBlockSID && BlockSidSupport) {
         Result = OpalBlockSid (&Session, TRUE);
         if (Result != TcgResultSuccess) {
           break;
