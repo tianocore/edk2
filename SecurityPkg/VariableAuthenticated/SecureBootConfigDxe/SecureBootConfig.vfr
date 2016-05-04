@@ -41,7 +41,7 @@ formset
     //
     // Display of Check Box: Attempt Secure Boot
     //
-    grayoutif ideqval SECUREBOOT_CONFIGURATION.HideSecureBoot == 1;
+    grayoutif ideqval SECUREBOOT_CONFIGURATION.HideSecureBoot == 1 OR NOT ideqval SECUREBOOT_CONFIGURATION.PhysicalPresent == 1;
     checkbox varid = SECUREBOOT_CONFIGURATION.AttemptSecureBoot,
           questionid = KEY_SECURE_BOOT_ENABLE,
           prompt = STRING_TOKEN(STR_SECURE_BOOT_PROMPT),
