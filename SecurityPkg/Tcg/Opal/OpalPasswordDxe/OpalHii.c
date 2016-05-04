@@ -108,43 +108,6 @@ HiiSetCurrentConfiguration(
 }
 
 /**
-  Check that all required protocols for HII are available.
-
-  @retval  EFI_SUCCESS        All required protocols are installed.
-  @retval  EFI_NOT_FOUND      One or more protocol are not installed.
-**/
-EFI_STATUS
-HiiCheckForRequiredProtocols (
-  VOID
-  )
-{
-  VOID*       TempProtocol;
-  EFI_STATUS  Status;
-
-  Status = gBS->LocateProtocol(&gEfiHiiStringProtocolGuid, NULL, (VOID**)&TempProtocol );
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
-
-  Status = gBS->LocateProtocol(&gEfiHiiDatabaseProtocolGuid, NULL, (VOID**)&TempProtocol );
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
-
-  Status = gBS->LocateProtocol(&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID**)&TempProtocol );
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
-
-  Status = gBS->LocateProtocol(&gEfiFormBrowser2ProtocolGuid, NULL, (VOID**)&TempProtocol );
-  if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   Install the HII related resources.
 
   @retval  EFI_SUCCESS        Install all the resources success.
@@ -157,15 +120,6 @@ HiiInstall(
 {
   EFI_STATUS                   Status;
   EFI_HANDLE                   DriverHandle;
-
-  //
-  // Check that all required protocols are available for HII.
-  // If not, fail the install
-  //
-  Status = HiiCheckForRequiredProtocols();
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
 
   //
   // Clear the global configuration.
