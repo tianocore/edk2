@@ -136,6 +136,7 @@ EnumerateNvmeDevNamespace (
     Device->Media.LogicalPartition = FALSE;
     Device->Media.ReadOnly       = FALSE;
     Device->Media.WriteCaching   = FALSE;
+    Device->Media.IoAlign        = Private->PassThruMode.IoAlign;
 
     Flbas     = NamespaceData->Flbas;
     LbaFmtIdx = Flbas & 0xF;
