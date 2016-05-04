@@ -24,10 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 OPAL_DRIVER mOpalDriver;
 
-// flag to track hii installation
-BOOLEAN gHiiInstalled = FALSE;
-
-
 #define MAX_PASSWORD_SIZE        32
 #define MAX_PASSWORD_TRY_COUNT   5
 
@@ -732,6 +728,11 @@ EfiDriverEntryPoint(
                   &ReadyToBootEvent
                   );
 
+  //
+  // Install Hii packages.
+  //
+  HiiInstall();
+
   return Status;
 }
 
@@ -964,14 +965,6 @@ OpalEfiDriverBindingStart(
   }
 
   AddDeviceToTail(Dev);
-
-  //
-  // Install Hii if it hasn't already been installed
-  //
-  if (!gHiiInstalled) {
-    HiiInstall();
-    gHiiInstalled = TRUE;
-  }
 
   //
   // check if device is locked and prompt for password
