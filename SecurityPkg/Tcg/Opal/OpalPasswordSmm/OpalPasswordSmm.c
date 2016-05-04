@@ -442,16 +442,16 @@ SmmUnlockOpalPassword (
       Session.MediaId = 0;
       Session.OpalBaseComId = OpalDev->OpalBaseComId;
 
-      if (mSendBlockSID && BlockSidSupport) {
-        Result = OpalBlockSid (&Session, TRUE);
-        if (Result != TcgResultSuccess) {
-          break;
-        }
-      }
-
       Result = OpalSupportUnlock (&Session, OpalDev->Password, OpalDev->PasswordLength, NULL);
       if (Result == TcgResultSuccess) {
         Status = EFI_SUCCESS;
+      }
+    }
+
+    if (mSendBlockSID && BlockSidSupport) {
+      Result = OpalBlockSid (&Session, TRUE);
+      if (Result != TcgResultSuccess) {
+        break;
       }
     }
 
