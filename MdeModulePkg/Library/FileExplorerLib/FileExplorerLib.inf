@@ -47,6 +47,7 @@
   BaseMemoryLib
   DebugLib
   HiiLib
+  UefiHiiServicesLib
 
 [Guids]
   gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
