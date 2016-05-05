@@ -1,7 +1,7 @@
 /** @file
 PlatformHelperLib function prototype definitions.
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013 - 2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -104,42 +104,6 @@ VOID
 EFIAPI
 PlatformFlashLockPolicy (
   IN CONST BOOLEAN                        PreBootPolicy
-  );
-
-/**
-  Erase and Write to platform flash.
-
-  Routine accesses one flash block at a time, each access consists
-  of an erase followed by a write of FLASH_BLOCK_SIZE. One or both
-  of DoErase & DoWrite params must be TRUE.
-
-  Limitations:-
-    CpuWriteAddress must be aligned to FLASH_BLOCK_SIZE.
-    DataSize must be a multiple of FLASH_BLOCK_SIZE.
-
-  @param   Smst                   If != NULL then InSmm and use to locate
-                                  SpiProtocol.
-  @param   CpuWriteAddress        Address in CPU memory map of flash region.
-  @param   Data                   The buffer containing the data to be written.
-  @param   DataSize               Amount of data to write.
-  @param   DoErase                Earse each block.
-  @param   DoWrite                Write to each block.
-
-  @retval  EFI_SUCCESS            Operation successful.
-  @retval  EFI_NOT_READY          Required resources not setup.
-  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
-  @retval  Others                 Unexpected error happened.
-
-**/
-EFI_STATUS
-EFIAPI
-PlatformFlashEraseWrite (
-  IN  VOID                              *Smst,
-  IN  UINTN                             CpuWriteAddress,
-  IN  UINT8                             *Data,
-  IN  UINTN                             DataSize,
-  IN  BOOLEAN                           DoErase,
-  IN  BOOLEAN                           DoWrite
   );
 
 /** Check if System booted with recovery Boot Stage1 image.
