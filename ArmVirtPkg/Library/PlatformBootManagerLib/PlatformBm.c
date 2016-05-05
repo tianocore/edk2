@@ -329,14 +329,14 @@ AddOutput (
     return;
   }
 
-  Status = BdsLibUpdateConsoleVariable (L"ConOut", DevicePath, NULL);
+  Status = EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "%a: %s: adding to ConOut: %r\n", __FUNCTION__,
       ReportText, Status));
     return;
   }
 
-  Status = BdsLibUpdateConsoleVariable (L"ErrOut", DevicePath, NULL);
+  Status = EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "%a: %s: adding to ErrOut: %r\n", __FUNCTION__,
       ReportText, Status));
@@ -393,7 +393,7 @@ PlatformBootManagerAfterConsole (
   //
   // Add the hardcoded short-form USB keyboard device path to ConIn.
   //
-  BdsLibUpdateConsoleVariable (L"ConIn",
+  EfiBootManagerUpdateConsoleVariable (ConIn,
     (EFI_DEVICE_PATH_PROTOCOL *)&mUsbKeyboard, NULL);
 
   //
@@ -401,11 +401,11 @@ PlatformBootManagerAfterConsole (
   //
   CopyGuid (&mSerialConsole.TermType.Guid,
     PcdGetPtr (PcdTerminalTypeGuidBuffer));
-  BdsLibUpdateConsoleVariable (L"ConIn",
+  EfiBootManagerUpdateConsoleVariable (ConIn,
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
-  BdsLibUpdateConsoleVariable (L"ConOut",
+  EfiBootManagerUpdateConsoleVariable (ConOut,
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
-  BdsLibUpdateConsoleVariable (L"ErrOut",
+  EfiBootManagerUpdateConsoleVariable (ErrOut,
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
 
   //
