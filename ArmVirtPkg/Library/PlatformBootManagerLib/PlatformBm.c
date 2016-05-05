@@ -122,32 +122,6 @@ STATIC PLATFORM_USB_KEYBOARD mUsbKeyboard = {
   }
 };
 
-//
-// BDS Platform Functions
-//
-/**
-  Do the platform init, can be customized by OEM/IBV
-  Possible things that can be done in PlatformBootManagerBeforeConsole:
-  > Update console variable: 1. include hot-plug devices;
-  >                          2. Clear ConIn and add SOL for AMT
-  > Register new Driver#### or Boot####
-  > Register new Key####: e.g.: F12
-  > Signal ReadyToLock event
-  > Authentication action: 1. connect Auth devices;
-  >                        2. Identify auto logon user.
-**/
-VOID
-EFIAPI
-PlatformBootManagerBeforeConsole (
-  VOID
-  )
-{
-  //
-  // Signal EndOfDxe PI Event
-  //
-  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
-}
-
 
 /**
   Check if the handle satisfies a particular condition.
@@ -349,23 +323,31 @@ AddOutput (
 }
 
 
+//
+// BDS Platform Functions
+//
 /**
-  Do the platform specific action after the console is ready
-  Possible things that can be done in PlatformBootManagerAfterConsole:
-  > Console post action:
-    > Dynamically switch output mode from 100x31 to 80x25 for certain senarino
-    > Signal console ready platform customized event
-  > Run diagnostics like memory testing
-  > Connect certain devices
-  > Dispatch aditional option roms
-  > Special boot: e.g.: USB boot, enter UI
+  Do the platform init, can be customized by OEM/IBV
+  Possible things that can be done in PlatformBootManagerBeforeConsole:
+  > Update console variable: 1. include hot-plug devices;
+  >                          2. Clear ConIn and add SOL for AMT
+  > Register new Driver#### or Boot####
+  > Register new Key####: e.g.: F12
+  > Signal ReadyToLock event
+  > Authentication action: 1. connect Auth devices;
+  >                        2. Identify auto logon user.
 **/
 VOID
 EFIAPI
-PlatformBootManagerAfterConsole (
+PlatformBootManagerBeforeConsole (
   VOID
   )
 {
+  //
+  // Signal EndOfDxe PI Event
+  //
+  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
+
   //
   // Locate the PCI root bridges and make the PCI bus driver connect each,
   // non-recursively. This will produce a number of child handles with PciIo on
@@ -408,12 +390,25 @@ PlatformBootManagerAfterConsole (
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
   EfiBootManagerUpdateConsoleVariable (ErrOut,
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
+}
 
-  //
-  // Connect the consoles based on the above variables.
-  //
-  BdsLibConnectAllDefaultConsoles ();
-
+/**
+  Do the platform specific action after the console is ready
+  Possible things that can be done in PlatformBootManagerAfterConsole:
+  > Console post action:
+    > Dynamically switch output mode from 100x31 to 80x25 for certain senarino
+    > Signal console ready platform customized event
+  > Run diagnostics like memory testing
+  > Connect certain devices
+  > Dispatch aditional option roms
+  > Special boot: e.g.: USB boot, enter UI
+**/
+VOID
+EFIAPI
+PlatformBootManagerAfterConsole (
+  VOID
+  )
+{
   //
   // Show the splash screen.
   //
