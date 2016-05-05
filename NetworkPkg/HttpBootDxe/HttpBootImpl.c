@@ -2,6 +2,7 @@
   The implementation of EFI_LOAD_FILE_PROTOCOL for UEFI HTTP boot.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -271,7 +272,7 @@ HttpBootLoadFile (
                TRUE,
                &Private->BootFileSize,
                NULL,
-               ImageType
+               &Private->ImageType
                );
     if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
       //
@@ -283,7 +284,7 @@ HttpBootLoadFile (
                  FALSE,
                  &Private->BootFileSize,
                  NULL,
-                 ImageType
+                 &Private->ImageType
                  );
       if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
         return Status;
@@ -293,6 +294,7 @@ HttpBootLoadFile (
 
   if (*BufferSize < Private->BootFileSize) {
     *BufferSize = Private->BootFileSize;
+    *ImageType = Private->ImageType;
     return EFI_BUFFER_TOO_SMALL;
   }
 
