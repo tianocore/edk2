@@ -3,7 +3,7 @@
 
   Copyright (C) 2015-2016, Red Hat, Inc.
   Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
-  Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -22,6 +22,7 @@
 #include <Library/UefiBootManagerLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/GraphicsOutput.h>
+#include <Protocol/LoadedImage.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Guid/EventGroup.h>
@@ -322,6 +323,114 @@ AddOutput (
     ReportText));
 }
 
+STATIC
+VOID
+PlatformRegisterFvBootOption (
+  EFI_GUID                         *FileGuid,
+  CHAR16                           *Description,
+  UINT32                           Attributes
+  )
+{
+  EFI_STATUS                        Status;
+  INTN                              OptionIndex;
+  EFI_BOOT_MANAGER_LOAD_OPTION      NewOption;
+  EFI_BOOT_MANAGER_LOAD_OPTION      *BootOptions;
+  UINTN                             BootOptionCount;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FileNode;
+  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+
+  Status = gBS->HandleProtocol (
+                  gImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **) &LoadedImage
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  EfiInitializeFwVolDevicepathNode (&FileNode, FileGuid);
+  DevicePath = DevicePathFromHandle (LoadedImage->DeviceHandle);
+  ASSERT (DevicePath != NULL);
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
+                 );
+  ASSERT (DevicePath != NULL);
+
+  Status = EfiBootManagerInitializeLoadOption (
+             &NewOption,
+             LoadOptionNumberUnassigned,
+             LoadOptionTypeBoot,
+             Attributes,
+             Description,
+             DevicePath,
+             NULL,
+             0
+             );
+  ASSERT_EFI_ERROR (Status);
+  FreePool (DevicePath);
+
+  BootOptions = EfiBootManagerGetLoadOptions (
+                  &BootOptionCount, LoadOptionTypeBoot
+                  );
+
+  OptionIndex = EfiBootManagerFindLoadOption (
+                  &NewOption, BootOptions, BootOptionCount
+                  );
+
+  if (OptionIndex == -1) {
+    Status = EfiBootManagerAddLoadOptionVariable (&NewOption, MAX_UINTN);
+    ASSERT_EFI_ERROR (Status);
+  }
+  EfiBootManagerFreeLoadOption (&NewOption);
+  EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
+}
+
+
+STATIC
+VOID
+PlatformRegisterOptionsAndKeys (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_INPUT_KEY                Enter;
+  EFI_INPUT_KEY                F2;
+  EFI_INPUT_KEY                Esc;
+  EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
+
+  //
+  // Register ENTER as CONTINUE key
+  //
+  Enter.ScanCode    = SCAN_NULL;
+  Enter.UnicodeChar = CHAR_CARRIAGE_RETURN;
+  Status = EfiBootManagerRegisterContinueKeyOption (0, &Enter, NULL);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Map F2 and ESC to Boot Manager Menu
+  //
+  F2.ScanCode     = SCAN_F2;
+  F2.UnicodeChar  = CHAR_NULL;
+  Esc.ScanCode    = SCAN_ESC;
+  Esc.UnicodeChar = CHAR_NULL;
+  Status = EfiBootManagerGetBootManagerMenu (&BootOption);
+  ASSERT_EFI_ERROR (Status);
+  Status = EfiBootManagerAddKeyOptionVariable (
+             NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL
+             );
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  Status = EfiBootManagerAddKeyOptionVariable (
+             NULL, (UINT16) BootOption.OptionNumber, 0, &Esc, NULL
+             );
+  ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+  //
+  // Register UEFI Shell
+  //
+  PlatformRegisterFvBootOption (
+    PcdGetPtr (PcdShellFile), L"EFI Internal Shell", LOAD_OPTION_ACTIVE
+    );
+}
+
 
 //
 // BDS Platform Functions
@@ -395,6 +504,11 @@ PlatformBootManagerBeforeConsole (
   // Set the front page timeout from the QEMU configuration.
   //
   PcdSet16 (PcdPlatformBootTimeOut, GetFrontPageTimeoutFromQemu ());
+
+  //
+  // Register platform-specific boot options and keyboard shortcuts.
+  //
+  PlatformRegisterOptionsAndKeys ();
 }
 
 /**
