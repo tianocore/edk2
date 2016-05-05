@@ -546,13 +546,12 @@ PlatformBootManagerAfterConsole (
   //
   TryRunningQemuKernel ();
 
-  BdsLibEnumerateAllBootOption (BootOptionList);
-  SetBootOrderFromQemu (BootOptionList);
   //
-  // The BootOrder variable may have changed, reload the in-memory list with
-  // it.
+  // Enumerate all possible boot options, then filter and reorder them based on
+  // the QEMU configuration.
   //
-  BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
+  EfiBootManagerRefreshAllBootOption ();
+  SetBootOrderFromQemu (NULL);
 }
 
 /**
