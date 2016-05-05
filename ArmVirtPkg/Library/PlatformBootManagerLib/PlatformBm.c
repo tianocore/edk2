@@ -390,6 +390,11 @@ PlatformBootManagerBeforeConsole (
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
   EfiBootManagerUpdateConsoleVariable (ErrOut,
     (EFI_DEVICE_PATH_PROTOCOL *)&mSerialConsole, NULL);
+
+  //
+  // Set the front page timeout from the QEMU configuration.
+  //
+  PcdSet16 (PcdPlatformBootTimeOut, GetFrontPageTimeoutFromQemu ());
 }
 
 /**
@@ -434,8 +439,6 @@ PlatformBootManagerAfterConsole (
   // it.
   //
   BdsLibBuildOptionFromVar (BootOptionList, L"BootOrder");
-
-  PlatformBdsEnterFrontPage (GetFrontPageTimeoutFromQemu(), TRUE);
 }
 
 /**

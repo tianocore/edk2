@@ -26,12 +26,6 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-VOID
-PlatformBdsEnterFrontPage (
-  IN UINT16                 TimeoutDefault,
-  IN BOOLEAN                ConnectAllHappened
-  );
-
 /**
   Download the kernel, the initial ramdisk, and the kernel command line from
   QEMU's fw_cfg. Construct a minimal SimpleFileSystem that contains the two

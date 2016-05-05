@@ -65,6 +65,7 @@
 
 [Pcd]
   gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
 
 [Guids]
   gEfiFileInfoGuid

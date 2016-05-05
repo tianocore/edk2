@@ -128,7 +128,6 @@
 !else
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|1
 !endif
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
 
   #
   # ARM Virtual Architectural Timer -- fetch frequency from QEMU (TCG) or KVM
@@ -179,6 +178,8 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
 
 [PcdsDynamicDefault.common]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
+
   ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
