@@ -536,7 +536,7 @@ PlatformBootManagerAfterConsole (
   //
   // Connect the rest of the devices.
   //
-  BdsLibConnectAll ();
+  EfiBootManagerConnectAll ();
 
   //
   // Process QEMU's -kernel command line option. Note that the kernel booted
