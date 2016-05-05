@@ -33,6 +33,7 @@
 [Sources]
   PlatformBm.c
   QemuKernel.c
+  QuietBoot.c
 
 [Packages]
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
@@ -46,6 +47,7 @@
   BaseMemoryLib
   DebugLib
   DevicePathLib
+  DxeServicesLib
   MemoryAllocationLib
   PcdLib
   PrintLib
@@ -55,6 +57,10 @@
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
+
+[FeaturePcd]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootlogoOnlyEnable
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [FixedPcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
@@ -79,5 +85,6 @@
   gEfiDevicePathProtocolGuid
   gEfiGraphicsOutputProtocolGuid
   gEfiLoadedImageProtocolGuid
+  gEfiOEMBadgingProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
