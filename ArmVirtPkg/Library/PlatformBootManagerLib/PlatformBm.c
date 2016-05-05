@@ -18,7 +18,6 @@
 #include <IndustryStandard/Pci22.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
-#include <Library/PlatformBdsLib.h>
 #include <Library/QemuBootOrderLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/GraphicsOutput.h>
@@ -126,13 +125,19 @@ STATIC PLATFORM_USB_KEYBOARD mUsbKeyboard = {
 // BDS Platform Functions
 //
 /**
-  Platform Bds init. Include the platform firmware vendor, revision
-  and so crc check.
-
+  Do the platform init, can be customized by OEM/IBV
+  Possible things that can be done in PlatformBootManagerBeforeConsole:
+  > Update console variable: 1. include hot-plug devices;
+  >                          2. Clear ConIn and add SOL for AMT
+  > Register new Driver#### or Boot####
+  > Register new Key####: e.g.: F12
+  > Signal ReadyToLock event
+  > Authentication action: 1. connect Auth devices;
+  >                        2. Identify auto logon user.
 **/
 VOID
 EFIAPI
-PlatformBdsInit (
+PlatformBootManagerBeforeConsole (
   VOID
   )
 {
@@ -344,23 +349,20 @@ AddOutput (
 
 
 /**
-  The function will execute with as the platform policy, current policy
-  is driven by boot mode. IBV/OEM can customize this code for their specific
-  policy action.
-
-  @param  DriverOptionList        The header of the driver option link list
-  @param  BootOptionList          The header of the boot option link list
-  @param  ProcessCapsules         A pointer to ProcessCapsules()
-  @param  BaseMemoryTest          A pointer to BaseMemoryTest()
-
+  Do the platform specific action after the console is ready
+  Possible things that can be done in PlatformBootManagerAfterConsole:
+  > Console post action:
+    > Dynamically switch output mode from 100x31 to 80x25 for certain senarino
+    > Signal console ready platform customized event
+  > Run diagnostics like memory testing
+  > Connect certain devices
+  > Dispatch aditional option roms
+  > Special boot: e.g.: USB boot, enter UI
 **/
 VOID
 EFIAPI
-PlatformBdsPolicyBehavior (
-  IN LIST_ENTRY                      *DriverOptionList,
-  IN LIST_ENTRY                      *BootOptionList,
-  IN PROCESS_CAPSULES                ProcessCapsules,
-  IN BASEM_MEMORY_TEST               BaseMemoryTest
+PlatformBootManagerAfterConsole (
+  VOID
   )
 {
   //
@@ -488,4 +490,18 @@ PlatformBdsLockNonUpdatableFlash (
   )
 {
   return;
+}
+
+/**
+  This function is called each second during the boot manager waits the
+  timeout.
+
+  @param TimeoutRemain  The remaining timeout.
+**/
+VOID
+EFIAPI
+PlatformBootManagerWaitCallback (
+  UINT16          TimeoutRemain
+  )
+{
 }
