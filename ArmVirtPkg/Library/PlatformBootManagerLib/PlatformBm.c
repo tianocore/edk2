@@ -19,6 +19,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 #include <Library/QemuBootOrderLib.h>
+#include <Library/UefiBootManagerLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/PciIo.h>
