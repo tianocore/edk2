@@ -1681,61 +1681,92 @@ HttpGenRequestMessage (
   HttpUtilitiesProtocol = NULL;
 
   //
-  // Locate the HTTP_UTILITIES protocol.
+  // 1. If we have a Request, we cannot have a NULL Url
+  // 2. If we have a Request, HeaderCount can not be non-zero
+  // 3. If we do not have a Request, HeaderCount should be zero
+  // 4. If we do not have Request and Headers, we need at least a message-body
   //
-  Status = gBS->LocateProtocol (
-                  &gEfiHttpUtilitiesProtocolGuid,
-                  NULL,
-                  (VOID **)&HttpUtilitiesProtocol
-                  );
+  if ((Message->Data.Request != NULL && Url == NULL) ||
+      (Message->Data.Request != NULL && Message->HeaderCount == 0) ||
+      (Message->Data.Request == NULL && Message->HeaderCount != 0) ||
+      (Message->Data.Request == NULL && Message->HeaderCount == 0 && Message->BodyLength == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,"Failed to locate Http Utilities protocol. Status = %r.\n", Status));
-    return Status;
+  if (Message->HeaderCount != 0) {
+    //
+    // Locate the HTTP_UTILITIES protocol.
+    //
+    Status = gBS->LocateProtocol (
+                    &gEfiHttpUtilitiesProtocolGuid,
+                    NULL,
+                    (VOID **)&HttpUtilitiesProtocol
+                    );
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR,"Failed to locate Http Utilities protocol. Status = %r.\n", Status));
+      return Status;
+    }
+
+    //
+    // Build AppendList to send into HttpUtilitiesBuild
+    //
+    AppendList = AllocateZeroPool (sizeof (EFI_HTTP_HEADER *) * (Message->HeaderCount));
+    if (AppendList == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    for(Index = 0; Index < Message->HeaderCount; Index++){
+      AppendList[Index] = &Message->Headers[Index];
+    }
+
+    //
+    // Build raw HTTP Headers
+    //
+    Status = HttpUtilitiesProtocol->Build (
+                HttpUtilitiesProtocol,
+                0,
+                NULL,
+                0,
+                NULL,
+                Message->HeaderCount,
+                AppendList,
+                &HttpHdrSize,
+                &HttpHdr
+                );
+
+    if (AppendList != NULL) {
+      FreePool (AppendList);
+    }
+
+    if (EFI_ERROR (Status) || HttpHdr == NULL){
+      return Status;
+    }
   }
 
   //
-  // Build AppendList to send into HttpUtilitiesBuild
+  // If we have headers to be sent, account for it.
   //
-  AppendList = AllocateZeroPool (sizeof (EFI_HTTP_HEADER *) * (Message->HeaderCount));
-  if (AppendList == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  for(Index = 0; Index < Message->HeaderCount; Index++){
-    AppendList[Index] = &Message->Headers[Index];
+  if (Message->HeaderCount != 0) {
+    MsgSize = HttpHdrSize;
   }
 
   //
-  // Build raw HTTP Headers
+  // If we have a request line, account for the fields.
   //
-  Status = HttpUtilitiesProtocol->Build (
-              HttpUtilitiesProtocol,
-              0,
-              NULL,
-              0,
-              NULL,
-              Message->HeaderCount,
-              AppendList,
-              &HttpHdrSize,
-              &HttpHdr
-              );
-
-  if (AppendList != NULL) {
-    FreePool (AppendList);
+  if (Message->Data.Request != NULL) {
+    MsgSize += HTTP_METHOD_MAXIMUM_LEN + AsciiStrLen (HTTP_VERSION_CRLF_STR) + AsciiStrLen (Url);
   }
 
-  if (EFI_ERROR (Status) || HttpHdr == NULL){
-    return Status;
-  }
 
   //
-  // Calculate HTTP message length.
+  // If we have a message body to be sent, account for it.
   //
-  MsgSize = Message->BodyLength + HTTP_METHOD_MAXIMUM_LEN + AsciiStrLen (Url) +
-            AsciiStrLen (HTTP_VERSION_CRLF_STR) + HttpHdrSize;
+  MsgSize += Message->BodyLength;
 
-
+  //
+  // memory for the string that needs to be sent to TCP
+  //
   *RequestMsg = AllocateZeroPool (MsgSize);
   if (*RequestMsg == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -1746,60 +1777,64 @@ HttpGenRequestMessage (
   //
   // Construct header request
   //
-  switch (Message->Data.Request->Method) {
-  case HttpMethodGet:
-    StrLength = sizeof (HTTP_METHOD_GET) - 1;
-    CopyMem (RequestPtr, HTTP_METHOD_GET, StrLength);
+  if (Message->Data.Request != NULL) {
+    switch (Message->Data.Request->Method) {
+    case HttpMethodGet:
+      StrLength = sizeof (HTTP_METHOD_GET) - 1;
+      CopyMem (RequestPtr, HTTP_METHOD_GET, StrLength);
+      RequestPtr += StrLength;
+      break;
+    case HttpMethodPut:
+      StrLength = sizeof (HTTP_METHOD_PUT) - 1;
+      CopyMem (RequestPtr, HTTP_METHOD_PUT, StrLength);
+      RequestPtr += StrLength;
+      break;
+    case HttpMethodPatch:
+      StrLength = sizeof (HTTP_METHOD_PATCH) - 1;
+      CopyMem (RequestPtr, HTTP_METHOD_PATCH, StrLength);
+      RequestPtr += StrLength;
+      break;
+    case HttpMethodPost:
+      StrLength = sizeof (HTTP_METHOD_POST) - 1;
+      CopyMem (RequestPtr, HTTP_METHOD_POST, StrLength);
+      RequestPtr += StrLength;
+      break;
+    case HttpMethodHead:
+      StrLength = sizeof (HTTP_METHOD_HEAD) - 1;
+      CopyMem (RequestPtr, HTTP_METHOD_HEAD, StrLength);
+      RequestPtr += StrLength;
+      break;
+    case HttpMethodDelete:
+      StrLength = sizeof (HTTP_METHOD_DELETE) - 1;
+      CopyMem (RequestPtr, HTTP_METHOD_DELETE, StrLength);
+      RequestPtr += StrLength;
+      break;
+    default:
+      ASSERT (FALSE);
+      Status = EFI_INVALID_PARAMETER;
+      goto Exit;
+    }
+
+    StrLength = AsciiStrLen(EMPTY_SPACE);
+    CopyMem (RequestPtr, EMPTY_SPACE, StrLength);
     RequestPtr += StrLength;
-    break;
-  case HttpMethodPut:
-    StrLength = sizeof (HTTP_METHOD_PUT) - 1;
-    CopyMem (RequestPtr, HTTP_METHOD_PUT, StrLength);
+
+    StrLength = AsciiStrLen (Url);
+    CopyMem (RequestPtr, Url, StrLength);
     RequestPtr += StrLength;
-    break;
-  case HttpMethodPatch:
-    StrLength = sizeof (HTTP_METHOD_PATCH) - 1;
-    CopyMem (RequestPtr, HTTP_METHOD_PATCH, StrLength);
+
+    StrLength = sizeof (HTTP_VERSION_CRLF_STR) - 1;
+    CopyMem (RequestPtr, HTTP_VERSION_CRLF_STR, StrLength);
     RequestPtr += StrLength;
-    break;
-  case HttpMethodPost:
-    StrLength = sizeof (HTTP_METHOD_POST) - 1;
-    CopyMem (RequestPtr, HTTP_METHOD_POST, StrLength);
-    RequestPtr += StrLength;
-    break;
-  case HttpMethodHead:
-    StrLength = sizeof (HTTP_METHOD_HEAD) - 1;
-    CopyMem (RequestPtr, HTTP_METHOD_HEAD, StrLength);
-    RequestPtr += StrLength;
-    break;
-  case HttpMethodDelete:
-    StrLength = sizeof (HTTP_METHOD_DELETE) - 1;
-    CopyMem (RequestPtr, HTTP_METHOD_DELETE, StrLength);
-    RequestPtr += StrLength;
-    break;
-  default:
-    ASSERT (FALSE);
-    Status = EFI_INVALID_PARAMETER;
-    goto Exit;
+
+    if (HttpHdr != NULL) {
+      //
+      // Construct header
+      //
+      CopyMem (RequestPtr, HttpHdr, HttpHdrSize);
+      RequestPtr += HttpHdrSize;
+    }
   }
-
-  StrLength = AsciiStrLen(EMPTY_SPACE);
-  CopyMem (RequestPtr, EMPTY_SPACE, StrLength);
-  RequestPtr += StrLength;
-
-  StrLength = AsciiStrLen (Url);
-  CopyMem (RequestPtr, Url, StrLength);
-  RequestPtr += StrLength;
-
-  StrLength = sizeof (HTTP_VERSION_CRLF_STR) - 1;
-  CopyMem (RequestPtr, HTTP_VERSION_CRLF_STR, StrLength);
-  RequestPtr += StrLength;
-
-  //
-  // Construct header
-  //
-  CopyMem (RequestPtr, HttpHdr, HttpHdrSize);
-  RequestPtr += HttpHdrSize;
 
   //
   // Construct body
