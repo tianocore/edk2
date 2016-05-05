@@ -34,6 +34,11 @@
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
   #
+  # CPU options
+  #
+  DEFINE MAX_LOGICAL_PROCESSORS  = 64
+
+  #
   # Serial port set up
   #
   DEFINE BAUD_RATE                        = 115200
@@ -280,6 +285,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|$(UART_DEFAULT_STOP_BITS)
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|$(DEFAULT_TERMINAL_TYPE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|$(PCI_SERIAL_PARAMETERS)
+
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(MAX_LOGICAL_PROCESSORS)
 
 ################################################################################
 #
