@@ -33,7 +33,14 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
+  #
+  # Shell options: [BUILD_SHELL, FULL_BIN, MIN_BIN, NONE, UEFI]
+  #
+  DEFINE SHELL_TYPE              = FULL_BIN
+
 [BuildOptions]
+  GCC:DEBUG_*_*_CC_FLAGS         = -Og -flto
+  GCC:DEBUG_*_*_DLINK_FLAGS      = -flto
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
@@ -363,3 +370,71 @@
   # Framebuffer Gop
   #
   CorebootPayloadPkg/FbGop/FbGop.inf
+
+  #------------------------------
+  #  Build the shell
+  #------------------------------
+
+!if $(SHELL_TYPE) == BUILD_SHELL
+
+[PcdsFixedAtBuild]
+  ## This flag is used to control initialization of the shell library
+  #  This should be FALSE for compiling the shell application itself only.
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+
+  #
+  # Shell Lib
+  #
+[LibraryClasses]
+  BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+
+[Components.X64]
+  ShellPkg/Application/Shell/Shell.inf {
+
+    #------------------------------
+    #  Basic commands
+    #------------------------------
+
+    <LibraryClasses>
+      NULL|ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellLevel3CommandsLib/UefiShellLevel3CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
+
+    #------------------------------
+    #  Networking commands
+    #------------------------------
+
+    <LibraryClasses>
+      NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellTftpCommandLib/UefiShellTftpCommandLib.inf
+
+    #------------------------------
+    #  Performance command
+    #------------------------------
+
+    <LibraryClasses>
+      NULL|ShellPkg/Library/UefiDpLib/UefiDpLib.inf
+
+    #------------------------------
+    #  Support libraries
+    #------------------------------
+
+    <LibraryClasses>
+      DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+      FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+      HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
+      NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+      ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+      ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
+      ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+      SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+  }
+
+!endif

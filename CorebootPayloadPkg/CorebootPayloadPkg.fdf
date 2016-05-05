@@ -153,16 +153,32 @@ INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 #
 # Shell
 #
-#!if $(ARCH) == IA32
-#INF  RuleOverride = BINARY USE = IA32 ShellBinPkg/UefiShell/UefiShell.inf
-#!else
-#INF  RuleOverride = BINARY USE = X64 ShellBinPkg/UefiShell/UefiShell.inf
-#!endif
-#
+!if $(SHELL_TYPE) == BUILD_SHELL
+INF  ShellPkg/Application/Shell/Shell.inf
+!endif
+
+!if $(SHELL_TYPE) == FULL_BIN
 !if $(ARCH) == IA32
 INF  RuleOverride = BINARY USE = IA32 EdkShellBinPkg/FullShell/FullShell.inf
 !else
 INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
+!endif
+!endif
+
+!if $(SHELL_TYPE) == MIN_BIN
+!if $(ARCH) == IA32
+INF  RuleOverride = BINARY USE = IA32 ShellBinPkg/MinUefiShell/MinUefiShell.inf
+!else
+INF  RuleOverride = BINARY USE = X64 ShellBinPkg/MinUefiShell/MinUefiShell.inf
+!endif
+!endif
+
+!if $(SHELL_TYPE) == UEFI_BIN
+!if $(ARCH) == IA32
+INF  RuleOverride = BINARY USE = IA32 ShellBinPkg/UefiShell/UefiShell.inf
+!else
+INF  RuleOverride = BINARY USE = X64 ShellBinPkg/UefiShell/UefiShell.inf
+!endif
 !endif
 
 FILE FREEFORM    = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
