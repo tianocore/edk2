@@ -556,56 +556,6 @@ PlatformBootManagerAfterConsole (
 }
 
 /**
-  Hook point after a boot attempt succeeds. We don't expect a boot option to
-  return, so the UEFI 2.0 specification defines that you will default to an
-  interactive mode and stop processing the BootOrder list in this case. This
-  is also a platform implementation and can be customized by IBV/OEM.
-
-  @param  Option                  Pointer to Boot Option that succeeded to boot.
-
-**/
-VOID
-EFIAPI
-PlatformBdsBootSuccess (
-  IN  BDS_COMMON_OPTION *Option
-  )
-{
-}
-
-/**
-  Hook point after a boot attempt fails.
-
-  @param  Option                  Pointer to Boot Option that failed to boot.
-  @param  Status                  Status returned from failed boot.
-  @param  ExitData                Exit data returned from failed boot.
-  @param  ExitDataSize            Exit data size returned from failed boot.
-
-**/
-VOID
-EFIAPI
-PlatformBdsBootFail (
-  IN  BDS_COMMON_OPTION  *Option,
-  IN  EFI_STATUS         Status,
-  IN  CHAR16             *ExitData,
-  IN  UINTN              ExitDataSize
-  )
-{
-}
-
-/**
-  This function locks platform flash that is not allowed to be updated during normal boot path.
-  The flash layout is platform specific.
-**/
-VOID
-EFIAPI
-PlatformBdsLockNonUpdatableFlash (
-  VOID
-  )
-{
-  return;
-}
-
-/**
   This function is called each second during the boot manager waits the
   timeout.
 
