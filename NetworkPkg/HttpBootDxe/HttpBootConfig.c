@@ -142,9 +142,7 @@ HttpBootAddBootOption (
   }
 
   Status = EfiBootManagerAddLoadOptionVariable (&NewOption, (UINTN) -1);
-  if (EFI_ERROR (Status)) {
-    EfiBootManagerFreeLoadOption (&NewOption);
-  }
+  EfiBootManagerFreeLoadOption (&NewOption);
 
 ON_EXIT:
 
