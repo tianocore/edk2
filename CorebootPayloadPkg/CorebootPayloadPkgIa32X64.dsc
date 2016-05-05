@@ -34,6 +34,40 @@
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
   #
+  # Serial port set up
+  #
+  DEFINE BAUD_RATE                        = 115200
+  DEFINE SERIAL_CLOCK_RATE                = 1843200
+  DEFINE SERIAL_LINE_CONTROL              = 3 # 8-bits, no parity
+  DEFINE SERIAL_HARDWARE_FLOW_CONTROL     = FALSE
+  DEFINE SERIAL_DETECT_CABLE              = FALSE
+  DEFINE SERIAL_FIFO_CONTROL              = 7 # Enable FIFO
+  DEFINE SERIAL_EXTENDED_TX_FIFO_SIZE     = 16
+  DEFINE UART_DEFAULT_BAUD_RATE           = $(BAUD_RATE)
+  DEFINE UART_DEFAULT_DATA_BITS           = 8
+  DEFINE UART_DEFAULT_PARITY              = 1
+  DEFINE UART_DEFAULT_STOP_BITS           = 1
+  DEFINE DEFAULT_TERMINAL_TYPE            = 0
+
+  #
+  #  typedef struct {
+  #    UINT16  VendorId;          ///< Vendor ID to match the PCI device.  The value 0xFFFF terminates the list of entries.
+  #    UINT16  DeviceId;          ///< Device ID to match the PCI device
+  #    UINT32  ClockRate;         ///< UART clock rate.  Set to 0 for default clock rate of 1843200 Hz
+  #    UINT64  Offset;            ///< The byte offset into to the BAR
+  #    UINT8   BarIndex;          ///< Which BAR to get the UART base address
+  #    UINT8   RegisterStride;    ///< UART register stride in bytes.  Set to 0 for default register stride of 1 byte.
+  #    UINT16  ReceiveFifoDepth;  ///< UART receive FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
+  #    UINT16  TransmitFifoDepth; ///< UART transmit FIFO depth in bytes. Set to 0 for a default FIFO depth of 16 bytes.
+  #    UINT8   Reserved[2];
+  #  } PCI_SERIAL_PARAMETER;
+  #
+  # Vendor 0000 Device 0000 Prog Interface 1, BAR #0, Offset 0, Stride = 1, Clock 1843200 (0x1c2000)
+  #
+  #                                           [Vendor]   [Device]  [----ClockRate---]  [------------Offset-----------] [Bar] [Stride] [RxFifo] [TxFifo]   [Rsvd]   [Vendor]
+  DEFINE PCI_SERIAL_PARAMETERS            = {0x00,0x00, 0x00,0x00, 0x0,0x20,0x1c,0x00, 0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0, 0x00,    0x01, 0x0,0x0, 0x0,0x0, 0x0,0x0, 0xff,0xff}
+
+  #
   # Shell options: [BUILD_SHELL, FULL_BIN, MIN_BIN, NONE, UEFI]
   #
   DEFINE SHELL_TYPE              = FULL_BIN
@@ -206,13 +240,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
 [PcdsFixedAtBuild]
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x7
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
-!if $(SOURCE_DEBUG_ENABLE)
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
-!else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
-!endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x10000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
@@ -225,8 +252,39 @@
 !endif
 
 [PcdsPatchableInModule.common]
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x7
+
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
+!if $(SOURCE_DEBUG_ENABLE)
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+!else
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
+!endif
+
+  #
+  # The following parameters are set by Library/PlatformHookLib
+  #
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x3f8
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate|$(BAUD_RATE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
+
+  #
+  # Enable these parameters to be set on the command line
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|$(SERIAL_CLOCK_RATE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialLineControl|$(SERIAL_LINE_CONTROL)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|$(SERIAL_HARDWARE_FLOW_CONTROL)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable|$(SERIAL_DETECT_CABLE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl|$(SERIAL_FIFO_CONTROL)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize|$(SERIAL_EXTENDED_TX_FIFO_SIZE)
+
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|$(UART_DEFAULT_BAUD_RATE)
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|$(UART_DEFAULT_DATA_BITS)
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|$(UART_DEFAULT_PARITY)
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|$(UART_DEFAULT_STOP_BITS)
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|$(DEFAULT_TERMINAL_TYPE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|$(PCI_SERIAL_PARAMETERS)
 
 ################################################################################
 #
