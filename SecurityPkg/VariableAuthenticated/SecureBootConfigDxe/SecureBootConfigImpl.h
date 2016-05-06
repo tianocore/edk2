@@ -102,43 +102,6 @@ extern  EFI_IFR_GUID_LABEL         *mEndLabel;
 #define HASHALG_MAX                            0x00000005
 
 
-#define SECUREBOOT_MENU_OPTION_SIGNATURE   SIGNATURE_32 ('S', 'b', 'M', 'u')
-#define SECUREBOOT_MENU_ENTRY_SIGNATURE    SIGNATURE_32 ('S', 'b', 'M', 'r')
-
-typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL  Header;
-  EFI_GUID                  Guid;
-  UINT8                     VendorDefinedData[1];
-} VENDOR_DEVICE_PATH_WITH_DATA;
-
-typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL  Header;
-  UINT16                    NetworkProtocol;
-  UINT16                    LoginOption;
-  UINT64                    Lun;
-  UINT16                    TargetPortalGroupTag;
-  CHAR16                    TargetName[1];
-} ISCSI_DEVICE_PATH_WITH_NAME;
-
-typedef struct {
-  CHAR16  *Str;
-  UINTN   Len;
-  UINTN   Maxlen;
-} POOL_PRINT;
-
-typedef
-VOID
-(*DEV_PATH_FUNCTION) (
-  IN OUT POOL_PRINT       *Str,
-  IN VOID                 *DevPath
-  );
-
-typedef struct {
-  UINT8             Type;
-  UINT8             SubType;
-  DEV_PATH_FUNCTION Function;
-} DEVICE_PATH_STRING_TABLE;
-
 typedef struct {
   UINTN             Signature;
   LIST_ENTRY        Head;
