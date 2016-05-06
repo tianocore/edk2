@@ -297,7 +297,7 @@ SnpInitialize (
   }
 
   // Read the PM register
-  PmConf = MmioRead32 (LAN9118_PMT_CTRL);
+  PmConf = Lan9118MmioRead32 (LAN9118_PMT_CTRL);
 
   // MPTCTRL_WOL_EN: Allow Wake-On-Lan to detect wake up frames or magic packets
   // MPTCTRL_ED_EN:  Allow energy detection to allow lowest power consumption mode
@@ -306,7 +306,7 @@ SnpInitialize (
   PmConf |= (MPTCTRL_WOL_EN | MPTCTRL_ED_EN | MPTCTRL_PME_EN);
 
   // Write the current configuration to the register
-  MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
+  Lan9118MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
   gBS->Stall (LAN9118_STALL);
   gBS->Stall (LAN9118_STALL);
 
@@ -359,7 +359,7 @@ SnpInitialize (
   }
 
   // Now acknowledge all interrupts
-  MmioWrite32 (LAN9118_INT_STS, ~0);
+  Lan9118MmioWrite32 (LAN9118_INT_STS, ~0);
 
   // Declare the driver as initialized
   Snp->Mode->State = EfiSimpleNetworkInitialized;
@@ -422,7 +422,7 @@ SnpReset (
   }
 
   // Read the PM register
-  PmConf = MmioRead32 (LAN9118_PMT_CTRL);
+  PmConf = Lan9118MmioRead32 (LAN9118_PMT_CTRL);
 
   // MPTCTRL_WOL_EN: Allow Wake-On-Lan to detect wake up frames or magic packets
   // MPTCTRL_ED_EN:  Allow energy detection to allow lowest power consumption mode
@@ -430,7 +430,7 @@ SnpReset (
   PmConf |= (MPTCTRL_WOL_EN | MPTCTRL_ED_EN | MPTCTRL_PME_EN);
 
   // Write the current configuration to the register
-  MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
+  Lan9118MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
   gBS->Stall (LAN9118_STALL);
 
   // Reactivate the LEDs
@@ -441,11 +441,11 @@ SnpReset (
 
   // Check that a buffer size was specified in SnpInitialize
   if (gTxBuffer != 0) {
-    HwConf = MmioRead32 (LAN9118_HW_CFG);        // Read the HW register
+    HwConf = Lan9118MmioRead32 (LAN9118_HW_CFG);        // Read the HW register
     HwConf &= ~HW_CFG_TX_FIFO_SIZE_MASK;         // Clear buffer bits first
     HwConf |= HW_CFG_TX_FIFO_SIZE(gTxBuffer);    // assign size chosen in SnpInitialize
 
-    MmioWrite32 (LAN9118_HW_CFG, HwConf);        // Write the conf
+    Lan9118MmioWrite32 (LAN9118_HW_CFG, HwConf);        // Write the conf
     gBS->Stall (LAN9118_STALL);
   }
 
@@ -454,7 +454,7 @@ SnpReset (
   StartTx (START_TX_MAC | START_TX_CFG | START_TX_CLEAR, Snp);
 
   // Now acknowledge all interrupts
-  MmioWrite32 (LAN9118_INT_STS, ~0);
+  Lan9118MmioWrite32 (LAN9118_INT_STS, ~0);
 
   return EFI_SUCCESS;
 }
@@ -996,12 +996,12 @@ SnpGetStatus (
   // consumer of SNP does not call GetStatus.)
   // TODO will we lose TxStatuses if this happens? Maybe in SnpTransmit we
   // should check for it and dump the TX Status FIFO.
-  FifoInt = MmioRead32 (LAN9118_FIFO_INT);
+  FifoInt = Lan9118MmioRead32 (LAN9118_FIFO_INT);
 
   // Clear the TX Status FIFO Overflow
   if ((FifoInt & INSTS_TXSO) == 0) {
     FifoInt |= INSTS_TXSO;
-    MmioWrite32 (LAN9118_FIFO_INT, FifoInt);
+    Lan9118MmioWrite32 (LAN9118_FIFO_INT, FifoInt);
   }
 
   // Read interrupt status if IrqStat is not NULL
@@ -1009,30 +1009,30 @@ SnpGetStatus (
     *IrqStat = 0;
 
     // Check for receive interrupt
-    if (MmioRead32 (LAN9118_INT_STS) & INSTS_RSFL) { // Data moved from rx FIFO
+    if (Lan9118MmioRead32 (LAN9118_INT_STS) & INSTS_RSFL) { // Data moved from rx FIFO
       *IrqStat |= EFI_SIMPLE_NETWORK_RECEIVE_INTERRUPT;
-      MmioWrite32 (LAN9118_INT_STS,INSTS_RSFL);
+      Lan9118MmioWrite32 (LAN9118_INT_STS,INSTS_RSFL);
     }
 
     // Check for transmit interrupt
-    if (MmioRead32 (LAN9118_INT_STS) & INSTS_TSFL) {
+    if (Lan9118MmioRead32 (LAN9118_INT_STS) & INSTS_TSFL) {
       *IrqStat |= EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
-      MmioWrite32 (LAN9118_INT_STS,INSTS_TSFL);
+      Lan9118MmioWrite32 (LAN9118_INT_STS,INSTS_TSFL);
     }
 
     // Check for software interrupt
-    if (MmioRead32 (LAN9118_INT_STS) & INSTS_SW_INT) {
+    if (Lan9118MmioRead32 (LAN9118_INT_STS) & INSTS_SW_INT) {
       *IrqStat |= EFI_SIMPLE_NETWORK_SOFTWARE_INTERRUPT;
-      MmioWrite32 (LAN9118_INT_STS,INSTS_SW_INT);
+      Lan9118MmioWrite32 (LAN9118_INT_STS,INSTS_SW_INT);
     }
   }
 
   // Check Status of transmitted packets
   // (We ignore TXSTATUS_NO_CA has it might happen in Full Duplex)
 
-  NumTxStatusEntries = MmioRead32(LAN9118_TX_FIFO_INF) & TXFIFOINF_TXSUSED_MASK;
+  NumTxStatusEntries = Lan9118MmioRead32(LAN9118_TX_FIFO_INF) & TXFIFOINF_TXSUSED_MASK;
   if (NumTxStatusEntries > 0) {
-    TxStatus = MmioRead32 (LAN9118_TX_STATUS);
+    TxStatus = Lan9118MmioRead32 (LAN9118_TX_STATUS);
     PacketTag = TxStatus >> 16;
     TxStatus = TxStatus & 0xFFFF;
     if ((TxStatus & TXSTATUS_ES) && (TxStatus != (TXSTATUS_ES | TXSTATUS_NO_CA))) {
@@ -1063,7 +1063,7 @@ SnpGetStatus (
   }
 
   // Check for a TX Error interrupt
-  Interrupts = MmioRead32 (LAN9118_INT_STS);
+  Interrupts = Lan9118MmioRead32 (LAN9118_INT_STS);
   if (Interrupts & INSTS_TXE) {
     DEBUG ((EFI_D_ERROR, "LAN9118: Transmitter error. Restarting..."));
 
@@ -1221,25 +1221,25 @@ SnpTransmit (
     CommandB = TX_CMD_B_PACKET_TAG (PacketTag) | TX_CMD_B_PACKET_LENGTH (BuffSize);
 
     // Write the commands first
-    MmioWrite32 (LAN9118_TX_DATA, CommandA);
-    MmioWrite32 (LAN9118_TX_DATA, CommandB);
+    Lan9118MmioWrite32 (LAN9118_TX_DATA, CommandA);
+    Lan9118MmioWrite32 (LAN9118_TX_DATA, CommandB);
 
     // Write the destination address
-    MmioWrite32 (LAN9118_TX_DATA,
+    Lan9118MmioWrite32 (LAN9118_TX_DATA,
                (DstAddr->Addr[0]) |
                (DstAddr->Addr[1] << 8) |
                (DstAddr->Addr[2] << 16) |
                (DstAddr->Addr[3] << 24)
                );
 
-    MmioWrite32 (LAN9118_TX_DATA,
+    Lan9118MmioWrite32 (LAN9118_TX_DATA,
                (DstAddr->Addr[4]) |
                (DstAddr->Addr[5] << 8) |
                (SrcAddr->Addr[0] << 16) | // Write the Source Address
                (SrcAddr->Addr[1] << 24)
                );
 
-    MmioWrite32 (LAN9118_TX_DATA,
+    Lan9118MmioWrite32 (LAN9118_TX_DATA,
                (SrcAddr->Addr[2]) |
                (SrcAddr->Addr[3] << 8) |
                (SrcAddr->Addr[4] << 16) |
@@ -1247,18 +1247,18 @@ SnpTransmit (
                );
 
     // Write the Protocol
-    MmioWrite32 (LAN9118_TX_DATA, (UINT32)(HTONS (LocalProtocol)));
+    Lan9118MmioWrite32 (LAN9118_TX_DATA, (UINT32)(HTONS (LocalProtocol)));
 
     // Next buffer is the payload
     CommandA = TX_CMD_A_LAST_SEGMENT | TX_CMD_A_BUFF_SIZE (BuffSize - HdrSize) | TX_CMD_A_COMPLETION_INT | TX_CMD_A_DATA_START_OFFSET (2); // 2 bytes beginning offset
 
     // Write the commands
-    MmioWrite32 (LAN9118_TX_DATA, CommandA);
-    MmioWrite32 (LAN9118_TX_DATA, CommandB);
+    Lan9118MmioWrite32 (LAN9118_TX_DATA, CommandA);
+    Lan9118MmioWrite32 (LAN9118_TX_DATA, CommandB);
 
     // Write the payload
     for (Count = 0; Count < ((BuffSize + 3) >> 2) - 3; Count++) {
-      MmioWrite32 (LAN9118_TX_DATA, LocalData[Count + 3]);
+      Lan9118MmioWrite32 (LAN9118_TX_DATA, LocalData[Count + 3]);
     }
   } else {
     // Format pointer
@@ -1269,12 +1269,12 @@ SnpTransmit (
     CommandB = TX_CMD_B_PACKET_TAG (PacketTag) | TX_CMD_B_PACKET_LENGTH (BuffSize);
 
     // Write the commands first
-    MmioWrite32 (LAN9118_TX_DATA, CommandA);
-    MmioWrite32 (LAN9118_TX_DATA, CommandB);
+    Lan9118MmioWrite32 (LAN9118_TX_DATA, CommandA);
+    Lan9118MmioWrite32 (LAN9118_TX_DATA, CommandB);
 
     // Write all the data
     for (Count = 0; Count < ((BuffSize + 3) >> 2); Count++) {
-      MmioWrite32 (LAN9118_TX_DATA, LocalData[Count]);
+      Lan9118MmioWrite32 (LAN9118_TX_DATA, LocalData[Count]);
     }
   }
 
@@ -1362,13 +1362,13 @@ SnpReceive (
   // explain those errors has been found so far and everything seems to
   // work perfectly when they are just ignored.
   //
-  IntSts = MmioRead32 (LAN9118_INT_STS);
+  IntSts = Lan9118MmioRead32 (LAN9118_INT_STS);
   if ((IntSts & INSTS_RXE) && (!(IntSts & INSTS_RSFF))) {
-    MmioWrite32 (LAN9118_INT_STS, INSTS_RXE);
+    Lan9118MmioWrite32 (LAN9118_INT_STS, INSTS_RXE);
   }
 
   // Count dropped frames
-  DroppedFrames = MmioRead32 (LAN9118_RX_DROP);
+  DroppedFrames = Lan9118MmioRead32 (LAN9118_RX_DROP);
   LanDriver->Stats.RxDroppedFrames += DroppedFrames;
 
   NumPackets = RxStatusUsedSpace (0, Snp) / 4;
@@ -1377,7 +1377,7 @@ SnpReceive (
   }
 
   // Read Rx Status (only if not empty)
-  RxFifoStatus = MmioRead32 (LAN9118_RX_STATUS);
+  RxFifoStatus = Lan9118MmioRead32 (LAN9118_RX_STATUS);
   LanDriver->Stats.RxTotalFrames += 1;
 
   // First check for errors
@@ -1450,13 +1450,13 @@ SnpReceive (
 
   // Set the amount of data to be transfered out of FIFO for THIS packet
   // This can be used to trigger an interrupt, and status can be checked
-  RxCfgValue = MmioRead32 (LAN9118_RX_CFG);
+  RxCfgValue = Lan9118MmioRead32 (LAN9118_RX_CFG);
   RxCfgValue &= ~(RXCFG_RX_DMA_CNT_MASK);
   RxCfgValue |= RXCFG_RX_DMA_CNT (ReadLimit);
 
   // Set end alignment to 4-bytes
   RxCfgValue &= ~(RXCFG_RX_END_ALIGN_MASK);
-  MmioWrite32 (LAN9118_RX_CFG, RxCfgValue);
+  Lan9118MmioWrite32 (LAN9118_RX_CFG, RxCfgValue);
 
   // Update buffer size
   *BuffSize = PLength; // -4 bytes may be needed: Received in buffer as
@@ -1471,7 +1471,7 @@ SnpReceive (
 
   // Read Rx Packet
   for (Count = 0; Count < ReadLimit; Count++) {
-    RawData[Count] = MmioRead32 (LAN9118_RX_DATA);
+    RawData[Count] = Lan9118MmioRead32 (LAN9118_RX_DATA);
   }
 
   // Get the destination address
@@ -1502,7 +1502,7 @@ SnpReceive (
   }
 
   // Check for Rx errors (worst possible error)
-  if (MmioRead32 (LAN9118_INT_STS) & INSTS_RXE) {
+  if (Lan9118MmioRead32 (LAN9118_INT_STS) & INSTS_RXE) {
     DEBUG ((EFI_D_WARN, "Warning: Receiver Error. Restarting...\n"));
 
     // Software reset, the RXE interrupt is cleared by the reset.

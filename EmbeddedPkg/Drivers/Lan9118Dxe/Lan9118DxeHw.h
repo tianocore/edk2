@@ -158,8 +158,8 @@
 #define TXSTATUS_PTAG_MASK                    (0xFFFF0000)              // Mask for Unique ID of packets (So we know who the packets are for)
 
 // ID_REV register bits
-#define IDREV_ID                              ((MmioRead32(LAN9118_ID_REV) & 0xFFFF0000) >> 16)
-#define IDREV_REV                             (MmioRead32(LAN9118_ID_REV) & 0x0000FFFF)
+#define IDREV_ID                              ((Lan9118MmioRead32(LAN9118_ID_REV) & 0xFFFF0000) >> 16)
+#define IDREV_REV                             (Lan9118MmioRead32(LAN9118_ID_REV) & 0x0000FFFF)
 
 // Interrupt Config Register bits
 #define IRQCFG_IRQ_TYPE                       BIT0                    // IRQ Buffer type
