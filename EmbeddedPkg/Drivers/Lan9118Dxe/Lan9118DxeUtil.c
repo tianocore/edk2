@@ -115,6 +115,54 @@ IndirectMACRead32 (
   return MmioRead32 (LAN9118_MAC_CSR_DATA);
 }
 
+/*
+ * LAN9118 chips have special restrictions on some back-to-back Write/Read or
+ * Read/Read pairs of accesses. After a read or write that changes the state of
+ * the device, there is a period in which stale values may be returned in
+ * response to a read. This period is dependent on the registers accessed.
+ *
+ * We must delay prior reads by this period. This can either be achieved by
+ * timer-based delays, or by performing dummy reads of the BYTE_TEST register,
+ * for which the recommended number of reads is described in the LAN9118 data
+ * sheet. This is required in addition to any memory barriers.
+ *
+ * This function performs a number of dummy reads of the BYTE_TEST register, as
+ * a building block for the above.
+ */
+VOID
+WaitDummyReads (
+  UINTN Count
+  )
+{
+       while (Count--)
+         MmioRead32(LAN9118_BYTE_TEST);
+}
+
+UINT32
+Lan9118RawMmioRead32(
+  UINTN Address,
+  UINTN Delay
+  )
+{
+  UINT32 Value;
+
+  Value = MmioRead32(Address);
+  WaitDummyReads(Delay);
+  return Value;
+}
+
+UINT32
+Lan9118RawMmioWrite32(
+  UINTN Address,
+  UINT32 Value,
+  UINTN Delay
+  )
+{
+  MmioWrite32(Address, Value);
+  WaitDummyReads(Delay);
+  return Value;
+}
+
 // Function to write to MAC indirect registers
 UINT32
 IndirectMACWrite32 (
