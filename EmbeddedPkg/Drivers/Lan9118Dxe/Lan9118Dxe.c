@@ -307,8 +307,6 @@ SnpInitialize (
 
   // Write the current configuration to the register
   Lan9118MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
-  gBS->Stall (LAN9118_STALL);
-  gBS->Stall (LAN9118_STALL);
 
   // Configure GPIO and HW
   Status = ConfigureHardware (HW_CONF_USE_LEDS, Snp);
@@ -431,7 +429,6 @@ SnpReset (
 
   // Write the current configuration to the register
   Lan9118MmioWrite32 (LAN9118_PMT_CTRL, PmConf);
-  gBS->Stall (LAN9118_STALL);
 
   // Reactivate the LEDs
   Status = ConfigureHardware (HW_CONF_USE_LEDS, Snp);
@@ -446,7 +443,6 @@ SnpReset (
     HwConf |= HW_CFG_TX_FIFO_SIZE(gTxBuffer);    // assign size chosen in SnpInitialize
 
     Lan9118MmioWrite32 (LAN9118_HW_CFG, HwConf);        // Write the conf
-    gBS->Stall (LAN9118_STALL);
   }
 
   // Enable the receiver and transmitter and clear their contents
@@ -701,7 +697,6 @@ SnpReceiveFilters (
   // Write the options to the MAC_CSR
   //
   IndirectMACWrite32 (INDIRECT_MAC_INDEX_CR, MacCSRValue);
-  gBS->Stall (LAN9118_STALL);
 
   //
   // If we have to retrieve something, start packet reception.
