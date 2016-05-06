@@ -248,151 +248,185 @@ EfiHttpRequest (
   HTTP_TOKEN_WRAP               *Wrap;
   CHAR8                         *FileUrl;
   UINTN                         RequestMsgSize;
-  
+
+  //
+  // Initializations
+  //
+  Url = NULL;
+  HostName = NULL;
+  RequestMsg = NULL;
+  HostNameStr = NULL;
+  Wrap = NULL;
+  FileUrl = NULL;
+
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   HttpMsg = Token->Message;
-  if ((HttpMsg == NULL) || (HttpMsg->Headers == NULL)) {
+  if (HttpMsg == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Current implementation does not support POST/PUT method.
-  // If future version supports these two methods, Request could be NULL for a special case that to send large amounts
-  // of data. For this case, the implementation need check whether previous call to Request() has been completed or not.
-  // 
-  //
   Request = HttpMsg->Data.Request;
-  if ((Request == NULL) || (Request->Url == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   //
-  // Only support GET and HEAD method in current implementation.
+  // Only support GET, HEAD, PUT and POST method in current implementation.
   //
-  if ((Request->Method != HttpMethodGet) && (Request->Method != HttpMethodHead)) {
+  if ((Request != NULL) && (Request->Method != HttpMethodGet) &&
+      (Request->Method != HttpMethodHead) && (Request->Method != HttpMethodPut) && (Request->Method != HttpMethodPost)) {
     return EFI_UNSUPPORTED;
   }
 
   HttpInstance = HTTP_INSTANCE_FROM_PROTOCOL (This);
   ASSERT (HttpInstance != NULL);
 
+  //
+  // Capture the method into HttpInstance.
+  //
+  if (Request != NULL) {
+    HttpInstance->Method = Request->Method;
+  }
+
   if (HttpInstance->State < HTTP_STATE_HTTP_CONFIGED) {
     return EFI_NOT_STARTED;
   }
 
-  //
-  // Check whether the token already existed.
-  //
-  if (EFI_ERROR (NetMapIterate (&HttpInstance->TxTokens, HttpTokenExist, Token))) {
-    return EFI_ACCESS_DENIED;   
-  }  
-
-  HostName    = NULL;
-  Wrap        = NULL;
-  HostNameStr = NULL;
-
-  //
-  // Parse the URI of the remote host.
-  //
-  Url = HttpInstance->Url;
-  UrlLen = StrLen (Request->Url) + 1;
-  if (UrlLen > HTTP_URL_BUFFER_LEN) {
-    Url = AllocateZeroPool (UrlLen);
-    if (Url == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+  if (Request == NULL) {
+    //
+    // Request would be NULL only for PUT/POST operation (in the current implementation)
+    //
+    if ((HttpInstance->Method != HttpMethodPut) && (HttpInstance->Method != HttpMethodPost)) {
+      return EFI_INVALID_PARAMETER;
     }
-    FreePool (HttpInstance->Url);
-    HttpInstance->Url = Url;    
-  } 
 
-
-  UnicodeStrToAsciiStr (Request->Url, Url);
-  UrlParser = NULL;
-  Status = HttpParseUrl (Url, (UINT32) AsciiStrLen (Url), FALSE, &UrlParser);
-  if (EFI_ERROR (Status)) {
-    goto Error1;
-  }
-
-  RequestMsg = NULL;
-  HostName   = NULL;
-  Status     = HttpUrlGetHostName (Url, UrlParser, &HostName);
-  if (EFI_ERROR (Status)) {
-    goto Error1;
-  }
-
-  Status = HttpUrlGetPort (Url, UrlParser, &RemotePort);
-  if (EFI_ERROR (Status)) {
-    RemotePort = HTTP_DEFAULT_PORT;
-  }
-  //
-  // If Configure is TRUE, it indicates the first time to call Request();
-  // If ReConfigure is TRUE, it indicates the request URL is not same
-  // with the previous call to Request();
-  //
-  Configure   = TRUE;
-  ReConfigure = TRUE;  
-
-  if (HttpInstance->RemoteHost == NULL) {
     //
-    // Request() is called the first time. 
+    // For PUT/POST, we need to have the TCP already configured. Bail out if it is not!
     //
+    if (HttpInstance->State < HTTP_STATE_TCP_CONFIGED) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // We need to have the Message Body for sending the HTTP message across in these cases.
+    //
+    if (HttpMsg->Body == NULL || HttpMsg->BodyLength == 0) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Use existing TCP instance to transmit the packet.
+    //
+    Configure   = FALSE;
     ReConfigure = FALSE;
   } else {
-    if ((HttpInstance->RemotePort == RemotePort) &&
+    //
+    // Check whether the token already existed.
+    //
+    if (EFI_ERROR (NetMapIterate (&HttpInstance->TxTokens, HttpTokenExist, Token))) {
+      return EFI_ACCESS_DENIED;
+    }
+
+    //
+    // Parse the URI of the remote host.
+    //
+    Url = HttpInstance->Url;
+    UrlLen = StrLen (Request->Url) + 1;
+    if (UrlLen > HTTP_URL_BUFFER_LEN) {
+      Url = AllocateZeroPool (UrlLen);
+      if (Url == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      FreePool (HttpInstance->Url);
+      HttpInstance->Url = Url;
+    }
+
+
+    UnicodeStrToAsciiStr (Request->Url, Url);
+    UrlParser = NULL;
+    Status = HttpParseUrl (Url, (UINT32) AsciiStrLen (Url), FALSE, &UrlParser);
+    if (EFI_ERROR (Status)) {
+      goto Error1;
+    }
+
+    HostName   = NULL;
+    Status     = HttpUrlGetHostName (Url, UrlParser, &HostName);
+    if (EFI_ERROR (Status)) {
+     goto Error1;
+    }
+
+    Status = HttpUrlGetPort (Url, UrlParser, &RemotePort);
+    if (EFI_ERROR (Status)) {
+      RemotePort = HTTP_DEFAULT_PORT;
+    }
+    //
+    // If Configure is TRUE, it indicates the first time to call Request();
+    // If ReConfigure is TRUE, it indicates the request URL is not same
+    // with the previous call to Request();
+    //
+    Configure   = TRUE;
+    ReConfigure = TRUE;
+
+    if (HttpInstance->RemoteHost == NULL) {
+      //
+      // Request() is called the first time.
+      //
+      ReConfigure = FALSE;
+    } else {
+      if ((HttpInstance->RemotePort == RemotePort) &&
         (AsciiStrCmp (HttpInstance->RemoteHost, HostName) == 0)) {
-      //
-      // Host Name and port number of the request URL are the same with previous call to Request().
-      // Check whether previous TCP packet sent out.
-      //
-      if (EFI_ERROR (NetMapIterate (&HttpInstance->TxTokens, HttpTcpNotReady, NULL))) {
         //
-        // Wrap the HTTP token in HTTP_TOKEN_WRAP
+        // Host Name and port number of the request URL are the same with previous call to Request().
+        // Check whether previous TCP packet sent out.
         //
-        Wrap = AllocateZeroPool (sizeof (HTTP_TOKEN_WRAP));
-        if (Wrap == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Error1;
+
+        if (EFI_ERROR (NetMapIterate (&HttpInstance->TxTokens, HttpTcpNotReady, NULL))) {
+          //
+          // Wrap the HTTP token in HTTP_TOKEN_WRAP
+          //
+          Wrap = AllocateZeroPool (sizeof (HTTP_TOKEN_WRAP));
+          if (Wrap == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+            goto Error1;
+          }
+
+          Wrap->HttpToken    = Token;
+          Wrap->HttpInstance = HttpInstance;
+
+          Status = HttpCreateTcpTxEvent (Wrap);
+          if (EFI_ERROR (Status)) {
+            goto Error1;
+          }
+
+          Status = NetMapInsertTail (&HttpInstance->TxTokens, Token, Wrap);
+          if (EFI_ERROR (Status)) {
+            goto Error1;
+          }
+
+          Wrap->TcpWrap.Method = Request->Method;
+
+          FreePool (HostName);
+
+          //
+          // Queue the HTTP token and return.
+          //
+          return EFI_SUCCESS;
+        } else {
+          //
+          // Use existing TCP instance to transmit the packet.
+          //
+          Configure   = FALSE;
+          ReConfigure = FALSE;
         }
-
-        Wrap->HttpToken    = Token;
-        Wrap->HttpInstance = HttpInstance;
-
-        Status = HttpCreateTcpTxEvent (Wrap);
-        if (EFI_ERROR (Status)) {
-          goto Error1;
-        }
-
-        Status = NetMapInsertTail (&HttpInstance->TxTokens, Token, Wrap);
-        if (EFI_ERROR (Status)) {
-          goto Error1;
-        }
-
-        Wrap->TcpWrap.Method = Request->Method;
-
-        FreePool (HostName);
-        
-        //
-        // Queue the HTTP token and return.
-        //
-        return EFI_SUCCESS;
       } else {
         //
-        // Use existing TCP instance to transmit the packet.
+        // Need close existing TCP instance and create a new TCP instance for data transmit.
         //
-        Configure   = FALSE;
-        ReConfigure = FALSE;
-      }
-    } else {
-      //
-      // Need close existing TCP instance and create a new TCP instance for data transmit.
-      //
-      if (HttpInstance->RemoteHost != NULL) {
-        FreePool (HttpInstance->RemoteHost);
-        HttpInstance->RemoteHost = NULL;
-        HttpInstance->RemotePort = 0;
+        if (HttpInstance->RemoteHost != NULL) {
+          FreePool (HttpInstance->RemoteHost);
+          HttpInstance->RemoteHost = NULL;
+          HttpInstance->RemotePort = 0;
+        }
       }
     }
   } 
@@ -461,7 +495,9 @@ EfiHttpRequest (
 
   Wrap->HttpToken      = Token;
   Wrap->HttpInstance   = HttpInstance;
-  Wrap->TcpWrap.Method = Request->Method;
+  if (Request != NULL) {
+    Wrap->TcpWrap.Method = Request->Method;
+  }
 
   Status = HttpInitTcp (HttpInstance, Wrap, Configure);
   if (EFI_ERROR (Status)) {
@@ -482,7 +518,7 @@ EfiHttpRequest (
   // Create request message.
   //
   FileUrl = Url;
-  if (*FileUrl != '/') {
+  if (Url != NULL && *FileUrl != '/') {
     //
     // Convert the absolute-URI to the absolute-path
     //
@@ -506,9 +542,17 @@ EfiHttpRequest (
     goto Error3;
   }
 
-  Status = NetMapInsertTail (&HttpInstance->TxTokens, Token, Wrap);
-  if (EFI_ERROR (Status)) {
-    goto Error4;
+  //
+  // Every request we insert a TxToken and a response call would remove the TxToken.
+  // In cases of PUT/POST, after an initial request-response pair, we would do a
+  // continuous request without a response call. So, in such cases, where Request
+  // structure is NULL, we would not insert a TxToken.
+  //
+  if (Request != NULL) {
+    Status = NetMapInsertTail (&HttpInstance->TxTokens, Token, Wrap);
+    if (EFI_ERROR (Status)) {
+      goto Error4;
+    }
   }
 
   //
@@ -533,7 +577,13 @@ EfiHttpRequest (
   return EFI_SUCCESS;
 
 Error5:
-    NetMapRemoveTail (&HttpInstance->TxTokens, NULL);
+    //
+    // We would have inserted a TxToken only if Request structure is not NULL.
+    // Hence check before we do a remove in this error case.
+    //
+    if (Request != NULL) {
+      NetMapRemoveTail (&HttpInstance->TxTokens, NULL);
+    }
 
 Error4:
   if (RequestMsg != NULL) {
@@ -970,97 +1020,122 @@ HttpResponseWorker (
       goto Error;
     }
 
+    //
+    // We could have response with just a HTTP message and no headers. For Example,
+    // "100 Continue". In such cases, we would not want to unnecessarily call a Parse
+    // method. A "\r\n" following Tmp string again would indicate an end. Compare and
+    // set SizeofHeaders to 0.
+    //
     Tmp = Tmp + AsciiStrLen (HTTP_CRLF_STR);
-    SizeofHeaders = SizeofHeaders - (Tmp - HttpHeaders);
-    HeaderTmp = AllocateZeroPool (SizeofHeaders);
-    if (HeaderTmp == NULL) {
-      goto Error;
+    if (CompareMem (Tmp, HTTP_CRLF_STR, AsciiStrLen (HTTP_CRLF_STR)) == 0) {
+      SizeofHeaders = 0;
+    } else {
+      SizeofHeaders = SizeofHeaders - (Tmp - HttpHeaders);
     }
 
-    CopyMem (HeaderTmp, Tmp, SizeofHeaders);
-    FreePool (HttpHeaders);
-    HttpHeaders = HeaderTmp;
-
-    //
-    // Check whether the EFI_HTTP_UTILITIES_PROTOCOL is available.
-    //
-    if (mHttpUtilities == NULL) {
-      Status = EFI_NOT_READY;
-      goto Error;
-    }
-    
-    //
-    // Parse the HTTP header into array of key/value pairs.
-    //
-    Status = mHttpUtilities->Parse (
-                               mHttpUtilities, 
-                               HttpHeaders, 
-                               SizeofHeaders, 
-                               &HttpMsg->Headers, 
-                               &HttpMsg->HeaderCount
-                               );
-    if (EFI_ERROR (Status)) {
-      goto Error;
-    }
-
-    FreePool (HttpHeaders);
-    HttpHeaders = NULL;
-    
     HttpMsg->Data.Response->StatusCode = HttpMappingToStatusCode (StatusCode);
     HttpInstance->StatusCode = StatusCode;
-    //
-    // Init message-body parser by header information.  
-    //
+
     Status = EFI_NOT_READY;
     ValueInItem = NULL;
-    NetMapRemoveHead (&HttpInstance->TxTokens, (VOID**) &ValueInItem);
-    if (ValueInItem == NULL)  {
-      goto Error;
-    }
 
     //
-    // The first Tx Token not transmitted yet, insert back and return error.
+    // In cases of PUT/POST, after an initial request-response pair, we would do a
+    // continuous request without a response call. So, we would not do an insert of
+    // TxToken. After we have sent the complete file, we will call a response to get
+    // a final response from server. In such a case, we would not have any TxTokens.
+    // Hence, check that case before doing a NetMapRemoveHead.
     //
-    if (!ValueInItem->TcpWrap.IsTxDone) {
-      goto Error2;
+    if (!NetMapIsEmpty (&HttpInstance->TxTokens)) {
+      NetMapRemoveHead (&HttpInstance->TxTokens, (VOID**) &ValueInItem);
+      if (ValueInItem == NULL)  {
+        goto Error;
+      }
+
+      //
+      // The first Tx Token not transmitted yet, insert back and return error.
+      //
+      if (!ValueInItem->TcpWrap.IsTxDone) {
+        goto Error2;
+      }
     }
 
-    Status = HttpInitMsgParser (
-               ValueInItem->TcpWrap.Method,
-               HttpMsg->Data.Response->StatusCode,
-               HttpMsg->HeaderCount,
-               HttpMsg->Headers,
-               HttpBodyParserCallback,
-               (VOID *) ValueInItem,
-               &HttpInstance->MsgParser
-               );
-    if (EFI_ERROR (Status)) {       
-      goto Error2;
-    }
+    if (SizeofHeaders != 0) {
+      HeaderTmp = AllocateZeroPool (SizeofHeaders);
+      if (HeaderTmp == NULL) {
+        goto Error;
+      }
 
-    //
-    // Check whether we received a complete HTTP message.
-    //
-    if (HttpInstance->CacheBody != NULL) {
-      Status = HttpParseMessageBody (HttpInstance->MsgParser, HttpInstance->CacheLen, HttpInstance->CacheBody);
+      CopyMem (HeaderTmp, Tmp, SizeofHeaders);
+      FreePool (HttpHeaders);
+      HttpHeaders = HeaderTmp;
+
+      //
+      // Check whether the EFI_HTTP_UTILITIES_PROTOCOL is available.
+      //
+      if (mHttpUtilities == NULL) {
+        Status = EFI_NOT_READY;
+        goto Error;
+      }
+
+      //
+      // Parse the HTTP header into array of key/value pairs.
+      //
+      Status = mHttpUtilities->Parse (
+                                 mHttpUtilities,
+                                 HttpHeaders,
+                                 SizeofHeaders,
+                                 &HttpMsg->Headers,
+                                 &HttpMsg->HeaderCount
+                                 );
+      if (EFI_ERROR (Status)) {
+        goto Error;
+      }
+
+      FreePool (HttpHeaders);
+      HttpHeaders = NULL;
+
+
+      //
+      // Init message-body parser by header information.
+      //
+      Status = HttpInitMsgParser (
+                 HttpInstance->Method,
+                 HttpMsg->Data.Response->StatusCode,
+                 HttpMsg->HeaderCount,
+                 HttpMsg->Headers,
+                 HttpBodyParserCallback,
+                 (VOID *) ValueInItem,
+                 &HttpInstance->MsgParser
+                 );
       if (EFI_ERROR (Status)) {
         goto Error2;
       }
 
-      if (HttpIsMessageComplete (HttpInstance->MsgParser)) {
-        //
-        // Free the MsgParse since we already have a full HTTP message.
-        //
-        HttpFreeMsgParser (HttpInstance->MsgParser);
-        HttpInstance->MsgParser = NULL;
+      //
+      // Check whether we received a complete HTTP message.
+      //
+      if (HttpInstance->CacheBody != NULL) {
+        Status = HttpParseMessageBody (HttpInstance->MsgParser, HttpInstance->CacheLen, HttpInstance->CacheBody);
+        if (EFI_ERROR (Status)) {
+          goto Error2;
+        }
+
+        if (HttpIsMessageComplete (HttpInstance->MsgParser)) {
+          //
+          // Free the MsgParse since we already have a full HTTP message.
+          //
+          HttpFreeMsgParser (HttpInstance->MsgParser);
+          HttpInstance->MsgParser = NULL;
+        }
       }
     }
 
-    if ((HttpMsg->Body == NULL) || (HttpMsg->BodyLength == 0)) {    
+    if ((HttpMsg->Body == NULL) || (HttpMsg->BodyLength == 0)) {
       Status = EFI_SUCCESS;
       goto Exit;
     }
-  }  
+  }
 
   //
   // Receive the response body.

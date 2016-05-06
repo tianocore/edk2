@@ -91,6 +91,7 @@ typedef struct _HTTP_PROTOCOL {
   LIST_ENTRY                    Link;   // Link to all HTTP instance from the service.
   BOOLEAN                       InDestroy;
   INTN                          State;
+  EFI_HTTP_METHOD               Method;
 
   UINTN                         StatusCode;
 
