@@ -119,13 +119,9 @@ def main():
 
         if (Options.BuildTarget):
             GenFdsGlobalVariable.TargetName = Options.BuildTarget
-        else:
-            EdkLogger.error("GenFds", OPTION_MISSING, "Missing build target")
 
         if (Options.ToolChain):
             GenFdsGlobalVariable.ToolChainTag = Options.ToolChain
-        else:
-            EdkLogger.error("GenFds", OPTION_MISSING, "Missing tool chain tag")
 
         if (Options.activePlatform):
             ActivePlatform = Options.activePlatform
@@ -161,7 +157,23 @@ def main():
         GenFdsGlobalVariable.ConfDir = ConfDirectoryPath
         BuildConfigurationFile = os.path.normpath(os.path.join(ConfDirectoryPath, "target.txt"))
         if os.path.isfile(BuildConfigurationFile) == True:
-            TargetTxtClassObject.TargetTxtClassObject(BuildConfigurationFile)
+            TargetTxt = TargetTxtClassObject.TargetTxtClassObject()
+            TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
+            # if no build target given in command line, get it from target.txt
+            if not GenFdsGlobalVariable.TargetName:
+                BuildTargetList = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET]
+                if len(BuildTargetList) != 1:
+                    EdkLogger.error("GenFds", OPTION_VALUE_INVALID, ExtraData="Only allows one instance for Target.")
+                GenFdsGlobalVariable.TargetName = BuildTargetList[0]
+
+            # if no tool chain given in command line, get it from target.txt
+            if not GenFdsGlobalVariable.ToolChainTag:
+                ToolChainList = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_TAG]
+                if ToolChainList == None or len(ToolChainList) == 0:
+                    EdkLogger.error("GenFds", RESOURCE_NOT_AVAILABLE, ExtraData="No toolchain given. Don't know how to build.")
+                if len(ToolChainList) != 1:
+                    EdkLogger.error("GenFds", OPTION_VALUE_INVALID, ExtraData="Only allows one instance for ToolChain.")
+                GenFdsGlobalVariable.ToolChainTag = ToolChainList[0]
         else:
             EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=BuildConfigurationFile)
 
@@ -176,6 +188,8 @@ def main():
                     Pair = Pair[:-1]
                 List = Pair.split('=')
                 if len(List) == 2:
+                    if not List[1].strip():
+                        EdkLogger.error("GenFds", OPTION_VALUE_INVALID, ExtraData="No Value given for Macro %s" %List[0])
                     if List[0].strip() == "EFI_SOURCE":
                         GlobalData.gEfiSource = List[1].strip()
                         GlobalData.gGlobalDefines["EFI_SOURCE"] = GlobalData.gEfiSource
@@ -191,6 +205,14 @@ def main():
                 else:
                     GlobalData.gCommandLineDefines[List[0].strip()] = "TRUE"
         os.environ["WORKSPACE"] = Workspace
+
+        # Use the -t and -b option as gGlobalDefines's TOOLCHAIN and TARGET if they are not defined
+        if "TARGET" not in GlobalData.gGlobalDefines.keys():
+            GlobalData.gGlobalDefines["TARGET"] = GenFdsGlobalVariable.TargetName
+        if "TOOLCHAIN" not in GlobalData.gGlobalDefines.keys():
+            GlobalData.gGlobalDefines["TOOLCHAIN"] = GenFdsGlobalVariable.ToolChainTag
+        if "TOOL_CHAIN_TAG" not in GlobalData.gGlobalDefines.keys():
+            GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = GenFdsGlobalVariable.ToolChainTag
 
         """call Workspace build create database"""
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
