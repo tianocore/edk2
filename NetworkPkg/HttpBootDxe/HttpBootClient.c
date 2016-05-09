@@ -1074,6 +1074,8 @@ HttpBootGetBootFile (
 
   if (*BufferSize < ContentLength) {
     Status = EFI_BUFFER_TOO_SMALL;
+  } else {
+    Status = EFI_SUCCESS;
   }
   *BufferSize = ContentLength;
 
@@ -1089,7 +1091,7 @@ HttpBootGetBootFile (
     HttpFreeMsgParser (Parser);
   }
 
-  return EFI_SUCCESS;
+  return Status;
   
 ERROR_6:
   if (Parser != NULL) {
