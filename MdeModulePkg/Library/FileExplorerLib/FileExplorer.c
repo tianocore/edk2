@@ -775,7 +775,9 @@ LibFindFileSystem (
                                              MenuEntry->DisplayString,
                                              NULL
                                              );
-      FreePool (Info);
+
+      if (Info != NULL)
+        FreePool (Info);
 
       OptionNumber++;
       InsertTailList (&gFileExplorerPrivate.FsOptionMenu->Head, &MenuEntry->Link);
