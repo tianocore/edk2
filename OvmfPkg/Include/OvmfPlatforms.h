@@ -31,6 +31,7 @@
 // Values we program into the PM base address registers
 //
 #define PIIX4_PMBA_VALUE  0xB000
+#define ICH9_PMBASE_VALUE 0x0600
 
 //
 // Common bits in same-purpose registers
