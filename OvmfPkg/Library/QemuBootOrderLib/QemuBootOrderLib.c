@@ -786,11 +786,11 @@ TranslatePciOfwNodes (
     //
     // UEFI device path:
     //
-    //   PciRoot(0x0)/Pci(0x1F,0x2)/Sata(0x1,0x0,0x0)
-    //                                   ^   ^   ^
-    //                                   |   |   LUN (always 0 on Q35)
+    //   PciRoot(0x0)/Pci(0x1F,0x2)/Sata(0x1,0xFFFF,0x0)
+    //                                   ^   ^      ^
+    //                                   |   |      LUN (always 0 on Q35)
     //                                   |   port multiplier port number,
-    //                                   |   always 0 on Q35
+    //                                   |   always 0xFFFF on Q35
     //                                   channel (port) number
     //
     UINT64 Channel;
@@ -805,7 +805,7 @@ TranslatePciOfwNodes (
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x%x)%s/Pci(0x%Lx,0x%Lx)/Sata(0x%Lx,0x0,0x0)",
+      "PciRoot(0x%x)%s/Pci(0x%Lx,0x%Lx)/Sata(0x%Lx,0xFFFF,0x0)",
       PciRoot,
       Bridges,
       PciDevFun[0],
