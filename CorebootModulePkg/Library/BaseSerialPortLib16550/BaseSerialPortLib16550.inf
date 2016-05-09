@@ -33,7 +33,7 @@
 
 [Sources]
   BaseSerialPortLib16550.c
-  
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl  ## CONSUMES
