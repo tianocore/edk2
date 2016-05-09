@@ -70,7 +70,7 @@ AcpiTimerLibConstructor (
     // If the Power Management Base Address is not programmed,
     // then program it now.
     //
-    PciAndThenOr32 (Pmba, (UINT32) ~0xFFC0, PIIX4_PMBA_VALUE);
+    PciAndThenOr32 (Pmba, ~(UINT32)PIIX4_PMBA_MASK, PIIX4_PMBA_VALUE);
 
     //
     // Enable PMBA I/O port decodes
