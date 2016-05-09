@@ -15,7 +15,6 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PciLib.h>
-#include <Library/PcdLib.h>
 #include <OvmfPlatforms.h>
 
 //
@@ -69,9 +68,9 @@ AcpiTimerLibConstructor (
   if ((PciRead8 (AcpiCtlReg) & AcpiEnBit) == 0) {
     //
     // If the Power Management Base Address is not programmed,
-    // then program the Power Management Base Address from a PCD.
+    // then program it now.
     //
-    PciAndThenOr32 (Pmba, (UINT32) ~0xFFC0, PcdGet16 (PcdAcpiPmBaseAddress));
+    PciAndThenOr32 (Pmba, (UINT32) ~0xFFC0, PIIX4_PMBA_VALUE);
 
     //
     // Enable PMBA I/O port decodes

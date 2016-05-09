@@ -31,9 +31,6 @@
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
-[Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdAcpiPmBaseAddress
-
 [LibraryClasses]
   BaseLib
   PciLib

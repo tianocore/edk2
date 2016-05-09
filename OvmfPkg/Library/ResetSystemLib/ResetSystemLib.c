@@ -17,8 +17,9 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
-#include <Library/PcdLib.h>
 #include <Library/TimerLib.h>
+
+#include <OvmfPlatforms.h>
 
 VOID
 AcpiPmControl (
@@ -27,8 +28,8 @@ AcpiPmControl (
 {
   ASSERT (SuspendType < 6);
 
-  IoBitFieldWrite16  (PcdGet16 (PcdAcpiPmBaseAddress) + 4, 10, 13, (UINT16) SuspendType);
-  IoOr16 (PcdGet16 (PcdAcpiPmBaseAddress) + 4, BIT13);
+  IoBitFieldWrite16 (PIIX4_PMBA_VALUE + 4, 10, 13, (UINT16) SuspendType);
+  IoOr16 (PIIX4_PMBA_VALUE + 4, BIT13);
   CpuDeadLoop ();
 }
 

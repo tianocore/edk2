@@ -37,6 +37,3 @@
   DebugLib
   IoLib
   TimerLib
-
-[Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdAcpiPmBaseAddress
