@@ -156,6 +156,12 @@ MemMapInitialization (
   VOID
   )
 {
+  UINT64 PciIoBase;
+  UINT64 PciIoSize;
+
+  PciIoBase = 0xC000;
+  PciIoSize = 0x4000;
+
   //
   // Create Memory Type Information HOB
   //
@@ -163,17 +169,6 @@ MemMapInitialization (
     &gEfiMemoryTypeInformationGuid,
     mDefaultMemoryTypeInformation,
     sizeof(mDefaultMemoryTypeInformation)
-    );
-
-  //
-  // Add PCI IO Port space available for PCI resource allocations.
-  //
-  BuildResourceDescriptorHob (
-    EFI_RESOURCE_IO,
-    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-    EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
-    PcdGet64 (PcdPciIoBase),
-    PcdGet64 (PcdPciIoSize)
     );
 
   //
@@ -250,6 +245,19 @@ MemMapInitialization (
     }
     AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
   }
+
+  //
+  // Add PCI IO Port space available for PCI resource allocations.
+  //
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_IO,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED,
+    PciIoBase,
+    PciIoSize
+    );
+  PcdSet64 (PcdPciIoBase, PciIoBase);
+  PcdSet64 (PcdPciIoSize, PciIoSize);
 }
 
 EFI_STATUS
