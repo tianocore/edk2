@@ -244,6 +244,16 @@ MemMapInitialization (
         EfiReservedMemoryType);
     }
     AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
+
+    //
+    // On Q35, the IO Port space is available for PCI resource allocations from
+    // 0x6000 up.
+    //
+    if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+      PciIoBase = 0x6000;
+      PciIoSize = 0xA000;
+      ASSERT ((ICH9_PMBASE_VALUE & 0xF000) < PciIoBase);
+    }
   }
 
   //
