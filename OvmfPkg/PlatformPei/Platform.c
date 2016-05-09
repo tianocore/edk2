@@ -363,6 +363,8 @@ MiscInitialization (
 {
   UINTN  PmCmd;
   UINTN  Pmba;
+  UINT32 PmbaAndVal;
+  UINT32 PmbaOrVal;
   UINTN  AcpiCtlReg;
   UINT8  AcpiEnBit;
 
@@ -385,12 +387,16 @@ MiscInitialization (
     case INTEL_82441_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_PIIX4 (PCI_COMMAND_OFFSET);
       Pmba       = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
+      PmbaAndVal = ~(UINT32)PIIX4_PMBA_MASK;
+      PmbaOrVal  = PIIX4_PMBA_VALUE;
       AcpiCtlReg = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMREGMISC);
       AcpiEnBit  = PIIX4_PMREGMISC_PMIOSE;
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       PmCmd      = POWER_MGMT_REGISTER_Q35 (PCI_COMMAND_OFFSET);
       Pmba       = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
+      PmbaAndVal = ~(UINT32)ICH9_PMBASE_MASK;
+      PmbaOrVal  = ICH9_PMBASE_VALUE;
       AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (ICH9_ACPI_CNTL);
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
@@ -412,7 +418,7 @@ MiscInitialization (
     // The PEI phase should be exited with fully accessibe ACPI PM IO space:
     // 1. set PMBA
     //
-    PciAndThenOr32 (Pmba, ~(UINT32)PIIX4_PMBA_MASK, PIIX4_PMBA_VALUE);
+    PciAndThenOr32 (Pmba, PmbaAndVal, PmbaOrVal);
 
     //
     // 2. set PCICMD/IOSE

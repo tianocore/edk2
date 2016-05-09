@@ -18,6 +18,7 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
+#include <OvmfPlatforms.h>
 
 #include <OvmfPlatforms.h>
 
@@ -26,10 +27,27 @@ AcpiPmControl (
   UINTN SuspendType
   )
 {
+  UINT16 AcpiPmBaseAddress;
+  UINT16 HostBridgeDevId;
+
   ASSERT (SuspendType < 6);
 
-  IoBitFieldWrite16 (PIIX4_PMBA_VALUE + 4, 10, 13, (UINT16) SuspendType);
-  IoOr16 (PIIX4_PMBA_VALUE + 4, BIT13);
+  AcpiPmBaseAddress = 0;
+  HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+  switch (HostBridgeDevId) {
+  case INTEL_82441_DEVICE_ID:
+    AcpiPmBaseAddress = PIIX4_PMBA_VALUE;
+    break;
+  case INTEL_Q35_MCH_DEVICE_ID:
+    AcpiPmBaseAddress = ICH9_PMBASE_VALUE;
+    break;
+  default:
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  IoBitFieldWrite16 (AcpiPmBaseAddress + 4, 10, 13, (UINT16) SuspendType);
+  IoOr16 (AcpiPmBaseAddress + 4, BIT13);
   CpuDeadLoop ();
 }
 
