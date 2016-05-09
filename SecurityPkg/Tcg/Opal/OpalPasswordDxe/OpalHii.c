@@ -30,6 +30,8 @@ extern UINT8  OpalPasswordFormBin[];
 //
 extern UINT8  OpalPasswordDxeStrings[];
 
+CHAR16  OpalPasswordStorageName[] = L"OpalHiiConfig";
+
 EFI_HII_CONFIG_ACCESS_PROTOCOL gHiiConfigAccessProtocol;
 
 //
@@ -1145,6 +1147,13 @@ RouteConfig(
     return (EFI_INVALID_PARAMETER);
   }
 
+  *Progress = Configuration;
+  if (!HiiIsConfigHdrMatch (Configuration, &gHiiSetupVariableGuid, OpalPasswordStorageName)) {
+    return EFI_NOT_FOUND;
+  }
+
+  *Progress = Configuration + StrLen (Configuration);
+
   return EFI_SUCCESS;
 }
 
@@ -1190,6 +1199,12 @@ ExtractConfig(
   //
   if (Progress == NULL || Results == NULL) {
     return (EFI_INVALID_PARAMETER);
+  }
+
+  *Progress = Request;
+  if ((Request != NULL) &&
+    !HiiIsConfigHdrMatch (Request, &gHiiSetupVariableGuid, OpalPasswordStorageName)) {
+    return EFI_NOT_FOUND;
   }
 
   //
