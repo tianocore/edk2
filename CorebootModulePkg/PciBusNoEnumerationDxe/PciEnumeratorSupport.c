@@ -2,18 +2,18 @@
 
 Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
   PciEnumeratorSupport.c
-  
+
 Abstract:
 
   PCI Bus Driver
@@ -24,17 +24,17 @@ Revision History
 
 #include "PciBus.h"
 
-EFI_STATUS 
+EFI_STATUS
 InitializePPB (
-  IN PCI_IO_DEVICE *PciIoDevice 
+  IN PCI_IO_DEVICE *PciIoDevice
 );
 
-EFI_STATUS 
+EFI_STATUS
 InitializeP2C (
-  IN PCI_IO_DEVICE *PciIoDevice 
+  IN PCI_IO_DEVICE *PciIoDevice
 );
 
-PCI_IO_DEVICE* 
+PCI_IO_DEVICE*
 CreatePciIoDevice (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   IN PCI_TYPE00                       *Pci,
@@ -72,12 +72,12 @@ PciSearchDevice (
 );
 
 
-EFI_STATUS 
+EFI_STATUS
 DetermineDeviceAttribute (
   IN PCI_IO_DEVICE                      *PciIoDevice
 );
 
-EFI_STATUS 
+EFI_STATUS
 BarExisted (
   IN PCI_IO_DEVICE *PciIoDevice,
   IN UINTN         Offset,
@@ -90,10 +90,10 @@ BarExisted (
 EFI_DEVICE_PATH_PROTOCOL*
 CreatePciDevicePath(
   IN  EFI_DEVICE_PATH_PROTOCOL *ParentDevicePath,
-  IN  PCI_IO_DEVICE            *PciIoDevice 
+  IN  PCI_IO_DEVICE            *PciIoDevice
 );
 
-PCI_IO_DEVICE* 
+PCI_IO_DEVICE*
 GatherDeviceInfo (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   IN PCI_TYPE00                       *Pci,
@@ -102,7 +102,7 @@ GatherDeviceInfo (
   UINT8                               Func
 );
 
-PCI_IO_DEVICE* 
+PCI_IO_DEVICE*
 GatherPPBInfo (
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo,
   IN PCI_TYPE00                       *Pci,
@@ -255,7 +255,7 @@ Returns:
           if (EFI_ERROR (Status)) {
             return Status;
           }
-              
+
           //
           // If the PCI bridge is initialized then enumerate the next level bus
           //
@@ -368,15 +368,15 @@ Returns:
   if (!PciIoDevice) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Create a device path for this PCI device and store it into its private data
   //
   CreatePciDevicePath(
     Bridge->DevicePath,
-    PciIoDevice 
+    PciIoDevice
     );
-  
+
   //
   // Detect this function has option rom
   //
@@ -389,8 +389,8 @@ Returns:
     }
 
     ResetPowerManagementFeature (PciIoDevice);
-    
-  } 
+
+  }
   else {
     PciRomGetRomResourceFromPciOptionRomTable (
       &gPciBusDriverBinding,
@@ -399,7 +399,7 @@ Returns:
       );
   }
 
- 
+
   //
   // Insert it into a global tree for future reference
   //
@@ -509,7 +509,7 @@ Returns:
   if (!PciIoDevice) {
     return NULL;
   }
-  
+
   if (gFullEnumeration) {
     PciDisableCommandRegister (PciIoDevice, EFI_PCI_COMMAND_BITS_OWNED);
 
@@ -593,7 +593,7 @@ Returns:
 --*/
 {
   PCI_IO_DEVICE         *PciIoDevice;
-  
+
   PciIoDevice = CreatePciIoDevice (
                   PciRootBridgeIo,
                   Pci,
@@ -619,7 +619,7 @@ Returns:
   // P2C only has one bar that is in 0x10
   //
   PciParseBar(PciIoDevice, 0x10, 0);
-  
+
   PciIoDevice->Decodes = EFI_BRIDGE_MEM32_DECODE_SUPPORTED  |
                          EFI_BRIDGE_PMEM32_DECODE_SUPPORTED |
                          EFI_BRIDGE_IO32_DECODE_SUPPORTED;
@@ -742,7 +742,7 @@ DetermineDeviceAttribute (
 /*++
 
 Routine Description:
- 
+
   Determine the related attributes of all devices under a Root Bridge
 
 Arguments:
@@ -799,7 +799,7 @@ Returns:
 
   PciReadCommandRegister(PciIoDevice, &Command);
 
-  
+
   if (Command & EFI_PCI_COMMAND_IO_SPACE) {
     PciIoDevice->Attributes |= EFI_PCI_IO_ATTRIBUTE_IO;
   }
@@ -812,7 +812,7 @@ Returns:
     PciIoDevice->Attributes |= EFI_PCI_IO_ATTRIBUTE_BUS_MASTER;
   }
 
-  if (IS_PCI_BRIDGE (&(PciIoDevice->Pci)) || 
+  if (IS_PCI_BRIDGE (&(PciIoDevice->Pci)) ||
       IS_CARDBUS_BRIDGE (&(PciIoDevice->Pci))){
 
     //
@@ -825,12 +825,12 @@ Returns:
     //
     // Determine whether the ISA bit is set
     // If ISA Enable on Bridge is set, the PPB
-    // will block forwarding 0x100-0x3ff for each 1KB in the 
+    // will block forwarding 0x100-0x3ff for each 1KB in the
     // first 64KB I/O range.
     //
     if ((BridgeControl & EFI_PCI_BRIDGE_CONTROL_ISA) != 0) {
       PciIoDevice->Attributes |= EFI_PCI_IO_ATTRIBUTE_ISA_IO;
-    } 
+    }
 
     //
     // Determine whether the VGA bit is set
@@ -844,13 +844,13 @@ Returns:
     }
 
     //
-    // if the palette snoop bit is set, then the brige is set to 
+    // if the palette snoop bit is set, then the brige is set to
     // decode palette IO write
     //
     if (Command & EFI_PCI_COMMAND_VGA_PALETTE_SNOOP) {
       PciIoDevice->Attributes |= EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO;
     }
-  } 
+  }
 
   return EFI_SUCCESS;
 }
@@ -997,7 +997,7 @@ Returns:
       //
       // Fix the length to support some spefic 64 bit BAR
       //
-      Value |= ((UINT32)(-1) << HighBitSet32 (Value)); 
+      Value |= ((UINT32)(-1) << HighBitSet32 (Value));
 
       //
       // Calculate the size of 64bit bar
@@ -1021,7 +1021,7 @@ Returns:
       break;
     }
   }
-  
+
   //
   // Check the length again so as to keep compatible with some special bars
   //
@@ -1030,7 +1030,7 @@ Returns:
     PciIoDevice->PciBar[BarIndex].BaseAddress = 0;
     PciIoDevice->PciBar[BarIndex].Alignment   = 0;
   }
-  
+
   //
   // Increment number of bar
   //
@@ -1220,7 +1220,7 @@ PciEnumeratorLight (
 
 Routine Description:
 
-  This routine is used to enumerate entire pci bus system 
+  This routine is used to enumerate entire pci bus system
   in a given platform
 
 Arguments:
@@ -1255,11 +1255,11 @@ Returns:
   // Open the IO Abstraction(s) needed to perform the supported test
   //
   Status = gBS->OpenProtocol (
-                  Controller      ,   
-                  &gEfiDevicePathProtocolGuid,  
+                  Controller      ,
+                  &gEfiDevicePathProtocolGuid,
                   (VOID **)&ParentDevicePath,
-                  gPciBusDriverBinding.DriverBindingHandle,     
-                  Controller,   
+                  gPciBusDriverBinding.DriverBindingHandle,
+                  Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status) && Status != EFI_ALREADY_STARTED) {
@@ -1282,7 +1282,7 @@ Returns:
   }
 
   //
-  // Load all EFI Drivers from all PCI Option ROMs behind the PCI Root Bridge 
+  // Load all EFI Drivers from all PCI Option ROMs behind the PCI Root Bridge
   //
   Status = PciRomLoadEfiDriversFromOptionRomTable (&gPciBusDriverBinding, PciRootBridgeIo);
 
@@ -1353,9 +1353,9 @@ Arguments:
   MinBus          - The min bus.
   MaxBus          - The max bus.
   BusRange        - The bus range.
-  
+
 Returns:
-  
+
   Status Code.
 
 --*/
