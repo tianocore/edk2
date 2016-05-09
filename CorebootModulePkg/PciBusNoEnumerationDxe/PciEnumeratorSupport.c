@@ -227,6 +227,15 @@ Returns:
       if (!EFI_ERROR (Status)) {
 
         //
+        // Skip non-bridge devices which are not enabled
+        //
+        if (((Pci.Hdr.Command & (EFI_PCI_COMMAND_IO_SPACE
+                                  | EFI_PCI_COMMAND_MEMORY_SPACE)) == 0)
+          && (!(IS_PCI_BRIDGE (&Pci) || IS_CARDBUS_BRIDGE (&Pci)))) {
+          continue;
+        }
+
+        //
         // Collect all the information about the PCI device discovered
         //
         Status = PciSearchDevice (
