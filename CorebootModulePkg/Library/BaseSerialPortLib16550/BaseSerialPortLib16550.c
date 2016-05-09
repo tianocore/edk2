@@ -554,9 +554,10 @@ SerialPortInitialize (
   SerialPortWriteRegister (SerialRegisterBase, R_UART_FCR, (UINT8)(PcdGet8 (PcdSerialFifoControl) & (B_UART_FCR_FIFOE | B_UART_FCR_FIFO64)));
 
   //
-  // Put Modem Control Register(MCR) into its reset state of 0x00.
+  // Set RTS and DTR in Modem Control Register(MCR)
   //
-  SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, 0x00);
+  SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR,
+                   EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY);
 
   return RETURN_SUCCESS;
 }
