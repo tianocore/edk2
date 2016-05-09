@@ -34,6 +34,8 @@ STATIC CHAR8 *gExceptionTypeString[] = {
   "SError"
 };
 
+STATIC BOOLEAN mRecursiveException;
+
 CHAR8 *
 GetImageName (
   IN  UINTN  FaultAddress,
@@ -134,6 +136,14 @@ DefaultExceptionHandler (
 {
   CHAR8  Buffer[100];
   UINTN  CharCount;
+  INT32  Offset;
+
+  if (mRecursiveException) {
+    CharCount = AsciiSPrint (Buffer, sizeof (Buffer),"\nRecursive exception occurred while dumping the CPU state\n");
+    SerialPortWrite ((UINT8 *) Buffer, CharCount);
+    CpuDeadLoop ();
+  }
+  mRecursiveException = TRUE;
 
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
@@ -182,6 +192,17 @@ DefaultExceptionHandler (
 
   DescribeExceptionSyndrome (SystemContext.SystemContextAArch64->ESR);
   ASSERT (FALSE):
+
+  DEBUG ((EFI_D_ERROR, "\nStack dump:\n"));
+  for (Offset = -256; Offset < 256; Offset += 32) {
+    DEBUG  ((EFI_D_ERROR, "%c %013lx: %016lx %016lx %016lx %016lx\n",
+      Offset == 0 ? '>' : ' ',
+      SystemContext.SystemContextAArch64->SP + Offset,
+      *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset),
+      *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 8),
+      *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 16),
+      *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 24)));
+  }
 
   CpuDeadLoop ();
 }
