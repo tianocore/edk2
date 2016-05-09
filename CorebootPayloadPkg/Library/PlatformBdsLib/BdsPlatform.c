@@ -78,6 +78,10 @@ PlatformBdsInit (
   VOID
   )
 {
+  gUartDeviceNode.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
+  gUartDeviceNode.DataBits = PcdGet8 (PcdUartDefaultDataBits);
+  gUartDeviceNode.Parity   = PcdGet8 (PcdUartDefaultParity);
+  gUartDeviceNode.StopBits = PcdGet8 (PcdUartDefaultStopBits);
 }
 
 
@@ -786,6 +790,7 @@ PlatformBdsPolicyBehavior (
 
   DEBUG ((EFI_D_INFO, "PlatformBdsPolicyBehavior\n"));
   
+  PlatformBdsInit();
   ConnectRootBridge ();
 
   //

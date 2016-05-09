@@ -45,6 +45,12 @@
   DebugLib
   PcdLib
   GenericBdsLib
+  PlatformHookLib
+
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits

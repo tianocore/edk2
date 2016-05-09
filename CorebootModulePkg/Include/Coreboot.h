@@ -80,7 +80,7 @@ struct imd_root {
   UINT32 max_entries;
   UINT32 num_entries;
   UINT32 flags;
-  UINT32 entry_align;        
+  UINT32 entry_align;
   UINT32 max_offset;
   struct imd_entry entries[0];
 };
@@ -165,6 +165,21 @@ struct cb_serial {
   UINT32 type;
   UINT32 baseaddr;
   UINT32 baud;
+  UINT32 regwidth;
+
+  // Crystal or input frequency to the chip containing the UART.
+  // Provide the board specific details to allow the payload to
+  // initialize the chip containing the UART and make independent
+  // decisions as to which dividers to select and their values
+  // to eventually arrive at the desired console baud-rate.
+  UINT32 input_hertz;
+
+  // UART PCI address: bus, device, function
+  // 1 << 31 - Valid bit, PCI UART in use
+  // Bus << 20
+  // Device << 15
+  // Function << 12
+  UINT32 uart_pci_addr;
 };
 
 #define CB_TAG_CONSOLE       0x00010

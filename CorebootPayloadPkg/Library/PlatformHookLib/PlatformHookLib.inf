@@ -19,6 +19,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformHookLib
+  CONSTRUCTOR                    = PlatformHookSerialPortInitialize
 
 [Sources]
   PlatformHookLib.c
@@ -26,6 +27,7 @@
 [LibraryClasses]
   CbParseLib
   PcdLib
+  PciLib
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -33,6 +35,10 @@
   CorebootModulePkg/CorebootModulePkg.dec
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio       ## PRODUCES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase  ## PRODUCES
-
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio         ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase    ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate        ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride  ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate       ## PRODUCES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters   ## PRODUCES
