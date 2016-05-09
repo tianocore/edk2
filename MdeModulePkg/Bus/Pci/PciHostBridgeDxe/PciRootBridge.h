@@ -90,15 +90,13 @@ typedef struct {
   Construct the Pci Root Bridge instance.
 
   @param Bridge            The root bridge instance.
-  @param HostBridgeHandle  Handle to the HostBridge.
 
   @return The pointer to PCI_ROOT_BRIDGE_INSTANCE just created
           or NULL if creation fails.
 **/
 PCI_ROOT_BRIDGE_INSTANCE *
 CreateRootBridge (
-  IN PCI_ROOT_BRIDGE       *Bridge,
-  IN EFI_HANDLE            HostBridgeHandle
+  IN PCI_ROOT_BRIDGE       *Bridge
   );
 
 //
