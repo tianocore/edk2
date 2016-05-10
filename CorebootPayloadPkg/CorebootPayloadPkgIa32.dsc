@@ -160,7 +160,7 @@
   #
   TimerLib|CorebootPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   ResetSystemLib|CorebootPayloadPkg/Library/ResetSystemLib/ResetSystemLib.inf
-  SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+  SerialPortLib|CorebootModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
   PlatformHookLib|CorebootPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
   PlatformBdsLib|CorebootPayloadPkg/Library/PlatformBdsLib/PlatformBdsLib.inf
 
