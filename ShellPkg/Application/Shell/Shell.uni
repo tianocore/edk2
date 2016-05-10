@@ -40,6 +40,7 @@
 #string STR_SHELL_CRLF                #language en-US "\r\n"
 
 #string STR_SHELL_ERROR               #language en-US  "%NCommand Error Status: %r\r\n"
+#string STR_SHELL_ERROR_SCRIPT        #language en-US  "%NScript Error Status: %r (line number %d)\r\n"
 
 #string STR_SHELL_INVALID_MAPPING     #language en-US "%N'%B%s%N' is not a valid mapping.\r\n"
 #string STR_SHELL_INVALID_SPLIT       #language en-US "Invalid use of pipe (%B|%N).\r\n"
