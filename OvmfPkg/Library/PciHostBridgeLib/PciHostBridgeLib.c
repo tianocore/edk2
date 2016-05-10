@@ -28,6 +28,7 @@
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include "PciHostBridge.h"
 
 
 #pragma pack(1)
@@ -113,7 +114,6 @@ STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
 
   @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
 **/
-STATIC
 EFI_STATUS
 InitRootBridge (
   IN  UINT64                   Supports,
@@ -216,6 +216,10 @@ PciHostBridgeGetRootBridges (
   PCI_ROOT_BRIDGE_APERTURE Io;
   PCI_ROOT_BRIDGE_APERTURE Mem;
   PCI_ROOT_BRIDGE_APERTURE MemAbove4G;
+
+  if (PcdGetBool (PcdPciDisableBusEnumeration)) {
+    return ScanForRootBridges (Count);
+  }
 
   Attributes = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
     EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
