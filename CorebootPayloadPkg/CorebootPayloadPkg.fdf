@@ -155,7 +155,7 @@ INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 # Shell
 #
 !if $(SHELL_TYPE) == BUILD_SHELL
-INF  ShellPkg/Application/Shell/Shell.inf
+INF ShellPkg/Application/Shell/Shell.inf
 !endif
 
 !if $(SHELL_TYPE) == FULL_BIN
