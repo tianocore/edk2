@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase a meta file table
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -218,7 +218,7 @@ class PackageTable(MetaFileTable):
     #
     def Query(self, Model, Arch=None):
         ConditionString = "Model=%s AND Enabled>=0" % Model
-        ValueString = "Value1,Value2,Value3,Scope1,ID,StartLine"
+        ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
 
         if Arch != None and Arch != 'COMMON':
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch

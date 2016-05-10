@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -794,13 +794,18 @@ def GetRelPath(Path1, Path2):
 #
 #   @param      CName           The CName of the GUID
 #   @param      PackageList     List of packages looking-up in
+#   @param      Inffile         The driver file
 #
 #   @retval     GuidValue   if the CName is found in any given package
 #   @retval     None        if the CName is not found in all given packages
 #
-def GuidValue(CName, PackageList):
+def GuidValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        if CName in P.Guids:
+        GuidKeys = P.Guids.keys()
+        if Inffile and P._PrivateGuids:
+            if not Inffile.startswith(P.MetaFile.Dir):
+                GuidKeys = (dict.fromkeys(x for x in P.Guids if x not in P._PrivateGuids)).keys()
+        if CName in GuidKeys:
             return P.Guids[CName]
     return None
 
@@ -808,13 +813,18 @@ def GuidValue(CName, PackageList):
 #
 #   @param      CName           The CName of the GUID
 #   @param      PackageList     List of packages looking-up in
+#   @param      Inffile         The driver file
 #
 #   @retval     GuidValue   if the CName is found in any given package
 #   @retval     None        if the CName is not found in all given packages
 #
-def ProtocolValue(CName, PackageList):
+def ProtocolValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        if CName in P.Protocols:
+        ProtocolKeys = P.Protocols.keys()
+        if Inffile and P._PrivateProtocols:
+            if not Inffile.startswith(P.MetaFile.Dir):
+                ProtocolKeys = (dict.fromkeys(x for x in P.Protocols if x not in P._PrivateProtocols)).keys()
+        if CName in ProtocolKeys:
             return P.Protocols[CName]
     return None
 
@@ -822,13 +832,18 @@ def ProtocolValue(CName, PackageList):
 #
 #   @param      CName           The CName of the GUID
 #   @param      PackageList     List of packages looking-up in
+#   @param      Inffile         The driver file
 #
 #   @retval     GuidValue   if the CName is found in any given package
 #   @retval     None        if the CName is not found in all given packages
 #
-def PpiValue(CName, PackageList):
+def PpiValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        if CName in P.Ppis:
+        PpiKeys = P.Ppis.keys()
+        if Inffile and P._PrivatePpis:
+            if not Inffile.startswith(P.MetaFile.Dir):
+                PpiKeys = (dict.fromkeys(x for x in P.Ppis if x not in P._PrivatePpis)).keys()
+        if CName in PpiKeys:
             return P.Ppis[CName]
     return None
 

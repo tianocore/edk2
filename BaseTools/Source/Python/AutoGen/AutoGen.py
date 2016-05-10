@@ -2174,7 +2174,7 @@ class PlatformAutoGen(AutoGen):
             for SkuId in PcdInModule.SkuInfoList:
                 Sku = PcdInModule.SkuInfoList[SkuId]
                 if Sku.VariableGuid == '': continue
-                Sku.VariableGuidValue = GuidValue(Sku.VariableGuid, self.PackageList)
+                Sku.VariableGuidValue = GuidValue(Sku.VariableGuid, self.PackageList, self.MetaFile.Path)
                 if Sku.VariableGuidValue == None:
                     PackageList = "\n\t".join([str(P) for P in self.PackageList])
                     EdkLogger.error(
@@ -3395,7 +3395,11 @@ class ModuleAutoGen(AutoGen):
                 PackageDir = mws.join(self.WorkspaceDir, Package.MetaFile.Dir)
                 if PackageDir not in self._IncludePathList:
                     self._IncludePathList.append(PackageDir)
-                for Inc in Package.Includes:
+                IncludesList = Package.Includes
+                if Package._PrivateIncludes:
+                    if not self.MetaFile.Path.startswith(PackageDir):
+                        IncludesList = list(set(Package.Includes).difference(set(Package._PrivateIncludes)))
+                for Inc in IncludesList:
                     if Inc not in self._IncludePathList:
                         self._IncludePathList.append(str(Inc))
         return self._IncludePathList
@@ -3462,7 +3466,7 @@ class ModuleAutoGen(AutoGen):
             for SkuName in Pcd.SkuInfoList:
                 SkuInfo = Pcd.SkuInfoList[SkuName]
                 Name = ConvertStringToByteArray(SkuInfo.VariableName)
-                Value = GuidValue(SkuInfo.VariableGuid, self.PlatformInfo.PackageList)
+                Value = GuidValue(SkuInfo.VariableGuid, self.PlatformInfo.PackageList, self.MetaFile.Path)
                 if not Value:
                     continue
                 Guid = GuidStructureStringToGuidString(Value)

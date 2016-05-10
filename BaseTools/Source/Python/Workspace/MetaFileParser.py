@@ -1722,6 +1722,7 @@ class DecParser(MetaFileParser):
         self._SectionName = ''
         self._SectionType = []
         ArchList = set()
+        PrivateList = set()
         Line = self._CurrentLine.replace("%s%s" % (TAB_COMMA_SPLIT, TAB_SPACE_SPLIT), TAB_COMMA_SPLIT)
         for Item in Line[1:-1].split(TAB_COMMA_SPLIT):
             if Item == '':
@@ -1757,14 +1758,25 @@ class DecParser(MetaFileParser):
             # S2 may be Platform or ModuleType
             if len(ItemList) > 2:
                 S2 = ItemList[2].upper()
+                # only Includes, GUIDs, PPIs, Protocols section have Private tag
+                if self._SectionName in [TAB_INCLUDES.upper(), TAB_GUIDS.upper(), TAB_PROTOCOLS.upper(), TAB_PPIS.upper()]:
+                    if S2 != 'PRIVATE':
+                        EdkLogger.error("Parser", FORMAT_INVALID, 'Please use keyword "Private" as section tag modifier.',
+                                        File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
             else:
                 S2 = 'COMMON'
+            PrivateList.add(S2)
             if [S1, S2, self.DataType[self._SectionName]] not in self._Scope:
                 self._Scope.append([S1, S2, self.DataType[self._SectionName]])
 
         # 'COMMON' must not be used with specific ARCHs at the same section
         if 'COMMON' in ArchList and len(ArchList) > 1:
             EdkLogger.error('Parser', FORMAT_INVALID, "'common' ARCH must not be used with specific ARCHs",
+                            File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
+
+        # It is not permissible to mix section tags without the Private attribute with section tags with the Private attribute
+        if 'COMMON' in PrivateList and len(PrivateList) > 1:
+            EdkLogger.error('Parser', FORMAT_INVALID, "Can't mix section tags without the Private attribute with section tags with the Private attribute",
                             File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
 
     ## [guids], [ppis] and [protocols] section parser
