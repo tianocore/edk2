@@ -927,7 +927,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
     if (*MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
       DEBUG ((DEBUG_INFO, "Update ACE for GLOBALRANGE_GENKEY failed\n"));
       //
-      // TODO do we want to disable user1 if all permissions are not granted
+      // Disable user1 if all permissions are not granted.
       //
       return TcgResultFailure;
     }
