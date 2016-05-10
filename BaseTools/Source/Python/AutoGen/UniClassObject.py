@@ -444,7 +444,7 @@ class UniFileClassObject(object):
                                 Line = Line[0 : StartPos] + UniStr + EndStr
                         else:
                             Line = Line[0 : StartPos] + UniStr + EndStr[1:]
-                StartPos = Line.find(u'\\x', StartPos)
+                StartPos = Line.find(u'\\x', StartPos + 1)
 
             IncList = gIncludePattern.findall(Line)
             if len(IncList) == 1:
