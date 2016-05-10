@@ -2933,7 +2933,7 @@ SecureBootExtractConfigFromVariable (
   //
   // Fix Pk, SecureBootEnable inconsistence
   //
-  if ((*SetupMode) == USER_MODE) {
+  if ((SetupMode != NULL) && (*SetupMode) == USER_MODE) {
     ConfigData->HideSecureBoot = FALSE;
     if ((SecureBootEnable != NULL) && (*SecureBootEnable == SECURE_BOOT_ENABLE)) {
       ConfigData->AttemptSecureBoot = TRUE;
