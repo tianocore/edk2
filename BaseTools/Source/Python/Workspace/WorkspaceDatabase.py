@@ -1328,6 +1328,10 @@ class DecBuildData(PackageBuildClassObject):
         self._LibraryClasses    = None
         self._Pcds              = None
         self.__Macros           = None
+        self._PrivateProtocols  = None
+        self._PrivatePpis       = None
+        self._PrivateGuids      = None
+        self._PrivateIncludes   = None
 
     ## Get current effective macros
     def _GetMacros(self):
@@ -1402,21 +1406,30 @@ class DecBuildData(PackageBuildClassObject):
             # protocol defition for given ARCH
             #
             ProtocolDict = tdict(True)
+            PrivateProtocolDict = tdict(True)
             NameList = []
+            PrivateNameList = []
             # find out all protocol definitions for specific and 'common' arch
             RecordList = self._RawData[MODEL_EFI_PROTOCOL, self._Arch]
-            for Name, Guid, Dummy, Arch, ID, LineNo in RecordList:
+            for Name, Guid, Dummy, Arch, PrivateFlag, ID, LineNo in RecordList:
+                if PrivateFlag == 'PRIVATE':
+                    if Name not in PrivateNameList:
+                        PrivateNameList.append(Name)
+                        PrivateProtocolDict[Arch, Name] = Guid
                 if Name not in NameList:
                     NameList.append(Name)
                 ProtocolDict[Arch, Name] = Guid
             # use sdict to keep the order
             self._Protocols = sdict()
+            self._PrivateProtocols = sdict()
             for Name in NameList:
                 #
                 # limit the ARCH to self._Arch, if no self._Arch found, tdict
                 # will automatically turn to 'common' ARCH for trying
                 #
                 self._Protocols[Name] = ProtocolDict[self._Arch, Name]
+            for Name in PrivateNameList:
+                self._PrivateProtocols[Name] = PrivateProtocolDict[self._Arch, Name]
         return self._Protocols
 
     ## Retrieve PPI definitions (name/value pairs)
@@ -1427,21 +1440,30 @@ class DecBuildData(PackageBuildClassObject):
             # PPI defition for given ARCH
             #
             PpiDict = tdict(True)
+            PrivatePpiDict = tdict(True)
             NameList = []
+            PrivateNameList = []
             # find out all PPI definitions for specific arch and 'common' arch
             RecordList = self._RawData[MODEL_EFI_PPI, self._Arch]
-            for Name, Guid, Dummy, Arch, ID, LineNo in RecordList:
+            for Name, Guid, Dummy, Arch, PrivateFlag, ID, LineNo in RecordList:
+                if PrivateFlag == 'PRIVATE':
+                    if Name not in PrivateNameList:
+                        PrivateNameList.append(Name)
+                        PrivatePpiDict[Arch, Name] = Guid
                 if Name not in NameList:
                     NameList.append(Name)
                 PpiDict[Arch, Name] = Guid
             # use sdict to keep the order
             self._Ppis = sdict()
+            self._PrivatePpis = sdict()
             for Name in NameList:
                 #
                 # limit the ARCH to self._Arch, if no self._Arch found, tdict
                 # will automatically turn to 'common' ARCH for trying
                 #
                 self._Ppis[Name] = PpiDict[self._Arch, Name]
+            for Name in PrivateNameList:
+                self._PrivatePpis[Name] = PrivatePpiDict[self._Arch, Name]
         return self._Ppis
 
     ## Retrieve GUID definitions (name/value pairs)
@@ -1452,27 +1474,37 @@ class DecBuildData(PackageBuildClassObject):
             # GUID defition for given ARCH
             #
             GuidDict = tdict(True)
+            PrivateGuidDict = tdict(True)
             NameList = []
+            PrivateNameList = []
             # find out all protocol definitions for specific and 'common' arch
             RecordList = self._RawData[MODEL_EFI_GUID, self._Arch]
-            for Name, Guid, Dummy, Arch, ID, LineNo in RecordList:
+            for Name, Guid, Dummy, Arch, PrivateFlag, ID, LineNo in RecordList:
+                if PrivateFlag == 'PRIVATE':
+                    if Name not in PrivateNameList:
+                        PrivateNameList.append(Name)
+                        PrivateGuidDict[Arch, Name] = Guid
                 if Name not in NameList:
                     NameList.append(Name)
                 GuidDict[Arch, Name] = Guid
             # use sdict to keep the order
             self._Guids = sdict()
+            self._PrivateGuids = sdict()
             for Name in NameList:
                 #
                 # limit the ARCH to self._Arch, if no self._Arch found, tdict
                 # will automatically turn to 'common' ARCH for trying
                 #
                 self._Guids[Name] = GuidDict[self._Arch, Name]
+            for Name in PrivateNameList:
+                self._PrivateGuids[Name] = PrivateGuidDict[self._Arch, Name]
         return self._Guids
 
     ## Retrieve public include paths declared in this package
     def _GetInclude(self):
         if self._Includes == None:
             self._Includes = []
+            self._PrivateIncludes = []
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch]
             Macros = self._Macros
             Macros["EDK_SOURCE"] = GlobalData.gEcpSource
@@ -1487,6 +1519,9 @@ class DecBuildData(PackageBuildClassObject):
                 # avoid duplicate include path
                 if File not in self._Includes:
                     self._Includes.append(File)
+                if Record[4] == 'PRIVATE':
+                    if File not in self._PrivateIncludes:
+                        self._PrivateIncludes.append(File)
         return self._Includes
 
     ## Retrieve library class declarations (not used in build at present)
@@ -1500,7 +1535,7 @@ class DecBuildData(PackageBuildClassObject):
             LibraryClassSet = set()
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch]
             Macros = self._Macros
-            for LibraryClass, File, Dummy, Arch, ID, LineNo in RecordList:
+            for LibraryClass, File, Dummy, Arch, PrivateFlag, ID, LineNo in RecordList:
                 File = PathClass(NormPath(File, Macros), self._PackageDir, Arch=self._Arch)
                 # check the file validation
                 ErrorCode, ErrorInfo = File.Validate()
@@ -1536,7 +1571,7 @@ class DecBuildData(PackageBuildClassObject):
         PcdSet = set()
         # find out all PCDs of the 'type'
         RecordList = self._RawData[Type, self._Arch]
-        for TokenSpaceGuid, PcdCName, Setting, Arch, Dummy1, Dummy2 in RecordList:
+        for TokenSpaceGuid, PcdCName, Setting, Arch, PrivateFlag, Dummy1, Dummy2 in RecordList:
             PcdDict[Arch, PcdCName, TokenSpaceGuid] = Setting
             PcdSet.add((PcdCName, TokenSpaceGuid))
 
@@ -2275,7 +2310,7 @@ class InfBuildData(ModuleBuildClassObject):
             RecordList = self._RawData[MODEL_EFI_PROTOCOL, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
-                Value = ProtocolValue(CName, self.Packages)
+                Value = ProtocolValue(CName, self.Packages, self.MetaFile.Path)
                 if Value == None:
                     PackageList = "\n\t".join([str(P) for P in self.Packages])
                     EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
@@ -2300,7 +2335,7 @@ class InfBuildData(ModuleBuildClassObject):
             RecordList = self._RawData[MODEL_EFI_PPI, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
-                Value = PpiValue(CName, self.Packages)
+                Value = PpiValue(CName, self.Packages, self.MetaFile.Path)
                 if Value == None:
                     PackageList = "\n\t".join([str(P) for P in self.Packages])
                     EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
@@ -2325,7 +2360,7 @@ class InfBuildData(ModuleBuildClassObject):
             RecordList = self._RawData[MODEL_EFI_GUID, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
-                Value = GuidValue(CName, self.Packages)
+                Value = GuidValue(CName, self.Packages, self.MetaFile.Path)
                 if Value == None:
                     PackageList = "\n\t".join([str(P) for P in self.Packages])
                     EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
@@ -2494,11 +2529,11 @@ class InfBuildData(ModuleBuildClassObject):
                         DepexList.append(Module.Guid)
                     else:
                         # get the GUID value now
-                        Value = ProtocolValue(Token, self.Packages)
+                        Value = ProtocolValue(Token, self.Packages, self.MetaFile.Path)
                         if Value == None:
-                            Value = PpiValue(Token, self.Packages)
+                            Value = PpiValue(Token, self.Packages, self.MetaFile.Path)
                             if Value == None:
-                                Value = GuidValue(Token, self.Packages)
+                                Value = GuidValue(Token, self.Packages, self.MetaFile.Path)
                         if Value == None:
                             PackageList = "\n\t".join([str(P) for P in self.Packages])
                             EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
@@ -2541,7 +2576,7 @@ class InfBuildData(ModuleBuildClassObject):
             PcdList.append((PcdCName, TokenSpaceGuid))
             # get the guid value
             if TokenSpaceGuid not in self.Guids:
-                Value = GuidValue(TokenSpaceGuid, self.Packages)
+                Value = GuidValue(TokenSpaceGuid, self.Packages, self.MetaFile.Path)
                 if Value == None:
                     PackageList = "\n\t".join([str(P) for P in self.Packages])
                     EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
