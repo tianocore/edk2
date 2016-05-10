@@ -142,6 +142,13 @@ INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
 #
+# SD/eMMC Support
+#
+INF MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
+INF MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
+INF MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
+
+#
 # Usb Support
 #
 INF MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
