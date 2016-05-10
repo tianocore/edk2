@@ -4100,6 +4100,7 @@ GetQuestionDefault (
 
         ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Question->StorageWidth);
         if (StrLen (NewString) * sizeof (CHAR16) <= Question->StorageWidth) {
+          ZeroMem (Question->BufferValue, Question->StorageWidth);
           CopyMem (Question->BufferValue, NewString, StrSize (NewString));
         } else {
           CopyMem (Question->BufferValue, NewString, Question->StorageWidth);
@@ -4170,6 +4171,7 @@ GetQuestionDefault (
             return EFI_NOT_FOUND;
           }
           if (Question->StorageWidth > StrSize (StrValue)) {
+            ZeroMem (Question->BufferValue, Question->StorageWidth);
             CopyMem (Question->BufferValue, StrValue, StrSize (StrValue));
           } else {
             CopyMem (Question->BufferValue, StrValue, Question->StorageWidth);

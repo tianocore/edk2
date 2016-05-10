@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -2044,6 +2044,7 @@ ProcessCallBackFunction (
 
         ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
         if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
+          ZeroMem (Statement->BufferValue, Statement->StorageWidth);
           CopyMem (Statement->BufferValue, NewString, StrSize (NewString));
         } else {
           CopyMem (Statement->BufferValue, NewString, Statement->StorageWidth);
@@ -2293,6 +2294,7 @@ ProcessRetrieveForQuestion (
 
     ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
     if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
+      ZeroMem (Statement->BufferValue, Statement->StorageWidth);
       CopyMem (Statement->BufferValue, NewString, StrSize (NewString));
     } else {
       CopyMem (Statement->BufferValue, NewString, Statement->StorageWidth);
