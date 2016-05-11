@@ -678,9 +678,9 @@ InitializeUsbMouseDevice (
   // Let the cursor's starting position is in the center of the screen.
   //
   UsbMouseAbsolutePointerDev->State.CurrentX =
-    (UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxX + UsbMouseAbsolutePointerDev->Mode.AbsoluteMinX) / 2;
+    DivU64x32 (UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxX + UsbMouseAbsolutePointerDev->Mode.AbsoluteMinX, 2);
   UsbMouseAbsolutePointerDev->State.CurrentY =
-    (UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxY + UsbMouseAbsolutePointerDev->Mode.AbsoluteMinY) / 2;
+    DivU64x32 (UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxY + UsbMouseAbsolutePointerDev->Mode.AbsoluteMinY, 2);
 
   //
   // Set boot protocol for the USB mouse.
@@ -942,9 +942,9 @@ UsbMouseAbsolutePointerReset (
   // Let the cursor's starting position is in the center of the screen.
   //
   UsbMouseAbsolutePointerDevice->State.CurrentX =
-    (UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxX + UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinX) / 2;
+    DivU64x32 (UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxX + UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinX, 2);
   UsbMouseAbsolutePointerDevice->State.CurrentY =
-    (UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxY + UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinY) / 2;
+    DivU64x32 (UsbMouseAbsolutePointerDevice->Mode.AbsoluteMaxY + UsbMouseAbsolutePointerDevice->Mode.AbsoluteMinY, 2);
 
   UsbMouseAbsolutePointerDevice->StateChanged = FALSE;
 
