@@ -1,7 +1,7 @@
 /** @file
   SerialIo implementation for PCI or SIO UARTs.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -442,27 +442,6 @@ SerialReceiveTransmit (
   return EFI_SUCCESS;
 }
 
-/**
-  Flush the serial hardware transmit FIFO and shift register.
-
-  @param SerialDevice  The device to flush.
-**/
-VOID
-SerialFlushTransmitFifo (
-  SERIAL_DEV  *SerialDevice
-  )
-{
-  SERIAL_PORT_LSR  Lsr;
-
-  //
-  // Wait for the serial port to be ready, to make sure both the transmit FIFO
-  // and shift register empty.
-  //
-  do {
-    Lsr.Data = READ_LSR (SerialDevice);
-  } while (Lsr.Bits.Temt == 0);
-}
-
 //
 // Interface Functions
 //
@@ -502,8 +481,6 @@ SerialReset (
     );
 
   Tpl = gBS->RaiseTPL (TPL_NOTIFY);
-
-  SerialFlushTransmitFifo (SerialDevice);
 
   //
   // Make sure DLAB is 0.
@@ -682,8 +659,6 @@ SerialSetAttributes (
   }
 
   Tpl = gBS->RaiseTPL (TPL_NOTIFY);
-
-  SerialFlushTransmitFifo (SerialDevice);
 
   //
   // Put serial port on Divisor Latch Mode

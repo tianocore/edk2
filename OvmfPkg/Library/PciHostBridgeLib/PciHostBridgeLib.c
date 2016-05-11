@@ -28,6 +28,7 @@
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include "PciHostBridge.h"
 
 
 #pragma pack(1)
@@ -70,13 +71,20 @@ OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
   }
 };
 
+STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
 
 /**
   Initialize a PCI_ROOT_BRIDGE structure.
 
-  param[in]  RootBusNumber     The bus number to store in RootBus.
+  @param[in]  Supports         Supported attributes.
 
-  param[in]  MaxSubBusNumber   The inclusive maximum bus number that can be
+  @param[in]  Attributes       Initial attributes.
+
+  @param[in]  AllocAttributes  Allocation attributes.
+
+  @param[in]  RootBusNumber    The bus number to store in RootBus.
+
+  @param[in]  MaxSubBusNumber  The inclusive maximum bus number that can be
                                assigned to any subordinate bus found behind any
                                PCI bridge hanging off this root bus.
 
@@ -85,7 +93,17 @@ OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
                                RootBusNumber equals MaxSubBusNumber, then the
                                root bus has no room for subordinate buses.
 
-  param[out] RootBus           The PCI_ROOT_BRIDGE structure (allocated by the
+  @param[in]  Io               IO aperture.
+
+  @param[in]  Mem              MMIO aperture.
+
+  @param[in]  MemAbove4G       MMIO aperture above 4G.
+
+  @param[in]  PMem             Prefetchable MMIO aperture.
+
+  @param[in]  PMemAbove4G      Prefetchable MMIO aperture above 4G.
+
+  @param[out] RootBus          The PCI_ROOT_BRIDGE structure (allocated by the
                                caller) that should be filled in by this
                                function.
 
@@ -96,12 +114,19 @@ OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
 
   @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
 **/
-STATIC
 EFI_STATUS
 InitRootBridge (
-  IN  UINT8           RootBusNumber,
-  IN  UINT8           MaxSubBusNumber,
-  OUT PCI_ROOT_BRIDGE *RootBus
+  IN  UINT64                   Supports,
+  IN  UINT64                   Attributes,
+  IN  UINT64                   AllocAttributes,
+  IN  UINT8                    RootBusNumber,
+  IN  UINT8                    MaxSubBusNumber,
+  IN  PCI_ROOT_BRIDGE_APERTURE *Io,
+  IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
+  IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
+  IN  PCI_ROOT_BRIDGE_APERTURE *PMem,
+  IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G,
+  OUT PCI_ROOT_BRIDGE          *RootBus
   )
 {
   OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH *DevicePath;
@@ -113,39 +138,19 @@ InitRootBridge (
 
   RootBus->Segment = 0;
 
-  RootBus->Supports   = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
-                        EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
-                        EFI_PCI_ATTRIBUTE_ISA_IO_16 |
-                        EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
-                        EFI_PCI_ATTRIBUTE_VGA_MEMORY |
-                        EFI_PCI_ATTRIBUTE_VGA_IO_16  |
-                        EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
-  RootBus->Attributes = RootBus->Supports;
+  RootBus->Supports   = Supports;
+  RootBus->Attributes = Attributes;
 
   RootBus->DmaAbove4G = FALSE;
 
-  RootBus->AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
-  RootBus->PMem.Base            = 0;
-  RootBus->PMem.Limit           = 0;
-  RootBus->PMemAbove4G.Base     = 0;
-  RootBus->PMemAbove4G.Limit    = 0;
-  RootBus->MemAbove4G.Base      = 0;
-  RootBus->MemAbove4G.Limit     = 0;
-
-  if (PcdGet64 (PcdPciMmio64Size) > 0) {
-    RootBus->AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
-    RootBus->MemAbove4G.Base       = PcdGet64 (PcdPciMmio64Base);
-    RootBus->MemAbove4G.Limit      = PcdGet64 (PcdPciMmio64Base) +
-                                     (PcdGet64 (PcdPciMmio64Size) - 1);
-  }
-
+  RootBus->AllocationAttributes = AllocAttributes;
   RootBus->Bus.Base  = RootBusNumber;
   RootBus->Bus.Limit = MaxSubBusNumber;
-  RootBus->Io.Base   = PcdGet64 (PcdPciIoBase);
-  RootBus->Io.Limit  = PcdGet64 (PcdPciIoBase) + (PcdGet64 (PcdPciIoSize) - 1);
-  RootBus->Mem.Base  = PcdGet64 (PcdPciMmio32Base);
-  RootBus->Mem.Limit = PcdGet64 (PcdPciMmio32Base) +
-                       (PcdGet64 (PcdPciMmio32Size) - 1);
+  CopyMem (&RootBus->Io, Io, sizeof (*Io));
+  CopyMem (&RootBus->Mem, Mem, sizeof (*Mem));
+  CopyMem (&RootBus->MemAbove4G, MemAbove4G, sizeof (*MemAbove4G));
+  CopyMem (&RootBus->PMem, PMem, sizeof (*PMem));
+  CopyMem (&RootBus->PMemAbove4G, PMemAbove4G, sizeof (*PMemAbove4G));
 
   RootBus->NoExtendedConfigSpace = (PcdGet16 (PcdOvmfHostBridgePciDevId) !=
                                     INTEL_Q35_MCH_DEVICE_ID);
@@ -206,6 +211,38 @@ PciHostBridgeGetRootBridges (
   UINTN                Initialized;
   UINTN                LastRootBridgeNumber;
   UINTN                RootBridgeNumber;
+  UINT64               Attributes;
+  UINT64               AllocationAttributes;
+  PCI_ROOT_BRIDGE_APERTURE Io;
+  PCI_ROOT_BRIDGE_APERTURE Mem;
+  PCI_ROOT_BRIDGE_APERTURE MemAbove4G;
+
+  if (PcdGetBool (PcdPciDisableBusEnumeration)) {
+    return ScanForRootBridges (Count);
+  }
+
+  Attributes = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
+    EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
+    EFI_PCI_ATTRIBUTE_ISA_IO_16 |
+    EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO |
+    EFI_PCI_ATTRIBUTE_VGA_MEMORY |
+    EFI_PCI_ATTRIBUTE_VGA_IO_16 |
+    EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
+
+  AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM;
+  if (PcdGet64 (PcdPciMmio64Size) > 0) {
+    AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
+    MemAbove4G.Base = PcdGet64 (PcdPciMmio64Base);
+    MemAbove4G.Limit = PcdGet64 (PcdPciMmio64Base) +
+                       PcdGet64 (PcdPciMmio64Size) - 1;
+  } else {
+    CopyMem (&MemAbove4G, &mNonExistAperture, sizeof (mNonExistAperture));
+  }
+
+  Io.Base = PcdGet64 (PcdPciIoBase);
+  Io.Limit = PcdGet64 (PcdPciIoBase) + (PcdGet64 (PcdPciIoSize) - 1);
+  Mem.Base = PcdGet64 (PcdPciMmio32Base);
+  Mem.Limit = PcdGet64 (PcdPciMmio32Base) + (PcdGet64 (PcdPciMmio32Size) - 1);
 
   *Count = 0;
 
@@ -266,8 +303,19 @@ PciHostBridgeGetRootBridges (
       // because now we know how big a bus number range *that* one has, for any
       // subordinate buses that might exist behind PCI bridges hanging off it.
       //
-      Status = InitRootBridge ((UINT8)LastRootBridgeNumber,
-                 (UINT8)(RootBridgeNumber - 1), &Bridges[Initialized]);
+      Status = InitRootBridge (
+        Attributes,
+        Attributes,
+        AllocationAttributes,
+        (UINT8) LastRootBridgeNumber,
+        (UINT8) (RootBridgeNumber - 1),
+        &Io,
+        &Mem,
+        &MemAbove4G,
+        &mNonExistAperture,
+        &mNonExistAperture,
+        &Bridges[Initialized]
+        );
       if (EFI_ERROR (Status)) {
         goto FreeBridges;
       }
@@ -280,8 +328,19 @@ PciHostBridgeGetRootBridges (
   // Install the last root bus (which might be the only, ie. main, root bus, if
   // we've found no extra root buses).
   //
-  Status = InitRootBridge ((UINT8)LastRootBridgeNumber, PCI_MAX_BUS,
-             &Bridges[Initialized]);
+  Status = InitRootBridge (
+    Attributes,
+    Attributes,
+    AllocationAttributes,
+    (UINT8) LastRootBridgeNumber,
+    PCI_MAX_BUS,
+    &Io,
+    &Mem,
+    &MemAbove4G,
+    &mNonExistAperture,
+    &mNonExistAperture,
+    &Bridges[Initialized]
+    );
   if (EFI_ERROR (Status)) {
     goto FreeBridges;
   }

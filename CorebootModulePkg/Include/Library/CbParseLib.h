@@ -30,7 +30,7 @@ CbParseMemoryInfo (
   IN UINT64*    pLowMemorySize,
   IN UINT64*    pHighMemorySize
   );
-  
+
 /**
   Acquire the coreboot memory table with the given table id
 
@@ -45,11 +45,11 @@ CbParseMemoryInfo (
 **/
 RETURN_STATUS
 CbParseCbMemTable (
-  IN UINT32     TableId, 
+  IN UINT32     TableId,
   IN VOID**     pMemTable,
   IN UINT32*    pMemTableSize
   );
-  
+
 /**
   Acquire the acpi table from coreboot
 
@@ -66,7 +66,7 @@ CbParseAcpiTable (
   IN VOID**     pMemTable,
   IN UINT32*    pMemTableSize
   );
-  
+
 /**
   Acquire the smbios table from coreboot
 
@@ -83,7 +83,7 @@ CbParseSmbiosTable (
   IN VOID**     pMemTable,
   IN UINT32*    pMemTableSize
   );
-  
+
 /**
   Find the required fadt information
 
@@ -107,13 +107,16 @@ CbParseFadtInfo (
   IN UINTN*     pPmEvtReg,
   IN UINTN*     pPmGpeEnReg
   );
-  
+
 /**
   Find the serial port information
 
   @param  pRegBase           Pointer to the base address of serial port registers
   @param  pRegAccessType     Pointer to the access type of serial port registers
+  @param  pRegWidth          Pointer to the register width in bytes
   @param  pBaudrate          Pointer to the serial port baudrate
+  @param  pInputHertz        Pointer to the input clock frequency
+  @param  pUartPciAddr       Pointer to the UART PCI bus, dev and func address
 
   @retval RETURN_SUCCESS     Successfully find the serial port information.
   @retval RETURN_NOT_FOUND   Failed to find the serial port information .
@@ -121,9 +124,12 @@ CbParseFadtInfo (
 **/
 RETURN_STATUS
 CbParseSerialInfo (
-  IN UINT32*     pRegBase,
-  IN UINT32*     pRegAccessType,
-  IN UINT32*     pBaudrate
+  OUT UINT32     *pRegBase,
+  OUT UINT32     *pRegAccessType,
+  OUT UINT32     *pRegWidth,
+  OUT UINT32     *pBaudrate,
+  OUT UINT32     *pInputHertz,
+  OUT UINT32     *pUartPciAddr
   );
 
 /**
@@ -141,7 +147,7 @@ CbParseGetCbHeader (
   IN UINTN  Level,
   IN VOID** HeaderPtr
   );
-  
+
 /**
   Find the video frame buffer information
 

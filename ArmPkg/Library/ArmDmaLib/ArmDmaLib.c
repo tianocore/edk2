@@ -93,7 +93,7 @@ DmaMap (
   *Mapping = Map;
 
   if ((((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) ||
-      ((*NumberOfBytes % gCacheAlignment) != 0)) {
+      ((*NumberOfBytes & (gCacheAlignment - 1)) != 0)) {
 
     // Get the cacheability of the region
     Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
@@ -102,9 +102,19 @@ DmaMap (
     }
 
     // If the mapped buffer is not an uncached buffer
-    if ( (GcdDescriptor.Attributes != EFI_MEMORY_WC) &&
-         (GcdDescriptor.Attributes != EFI_MEMORY_UC) )
-    {
+    if ((GcdDescriptor.Attributes & (EFI_MEMORY_WB | EFI_MEMORY_WT)) != 0) {
+      //
+      // Operations of type MapOperationBusMasterCommonBuffer are only allowed
+      // on uncached buffers.
+      //
+      if (Operation == MapOperationBusMasterCommonBuffer) {
+        DEBUG ((EFI_D_ERROR,
+          "%a: Operation type 'MapOperationBusMasterCommonBuffer' is only supported\n"
+          "on memory regions that were allocated using DmaAllocateBuffer ()\n",
+          __FUNCTION__));
+        return EFI_UNSUPPORTED;
+      }
+
       //
       // If the buffer does not fill entire cache lines we must double buffer into
       // uncached memory. Device (PCI) address becomes uncached page.
@@ -115,7 +125,7 @@ DmaMap (
         return Status;
       }
 
-      if ((Operation == MapOperationBusMasterRead) || (Operation == MapOperationBusMasterCommonBuffer)) {
+      if (Operation == MapOperationBusMasterRead) {
         CopyMem (Buffer, HostAddress, *NumberOfBytes);
       }
 
@@ -126,14 +136,25 @@ DmaMap (
   } else {
     Map->DoubleBuffer  = FALSE;
 
+    DEBUG_CODE_BEGIN ();
+
+    //
+    // The operation type check above only executes if the buffer happens to be
+    // misaligned with respect to CWG, but even if it is aligned, we should not
+    // allow arbitrary buffers to be used for creating consistent mappings.
+    // So duplicate the check here when running in DEBUG mode, just to assert
+    // that we are not trying to create a consistent mapping for cached memory.
+    //
+    Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
+    ASSERT_EFI_ERROR(Status);
+
+    ASSERT (Operation != MapOperationBusMasterCommonBuffer ||
+            (GcdDescriptor.Attributes & (EFI_MEMORY_WB | EFI_MEMORY_WT)) == 0);
+
+    DEBUG_CODE_END ();
+
     // Flush the Data Cache (should not have any effect if the memory region is uncached)
     gCpu->FlushDataCache (gCpu, *DeviceAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
-
-    if ((Operation == MapOperationBusMasterRead) || (Operation == MapOperationBusMasterCommonBuffer)) {
-      // In case the buffer is used for instance to send command to a PCI controller, we must ensure the memory is uncached
-      Status = gDS->SetMemorySpaceAttributes (*DeviceAddress & ~(BASE_4KB - 1), ALIGN_VALUE (*NumberOfBytes, BASE_4KB), EFI_MEMORY_WC);
-      ASSERT_EFI_ERROR (Status);
-    }
   }
 
   Map->HostAddress   = (UINTN)HostAddress;
@@ -153,6 +174,8 @@ DmaMap (
 
   @retval EFI_SUCCESS           The range was unmapped.
   @retval EFI_DEVICE_ERROR      The data was not committed to the target system memory.
+  @retval EFI_INVALID_PARAMETER An inconsistency was detected between the mapping type
+                                and the DoubleBuffer field
 
 **/
 EFI_STATUS
@@ -162,6 +185,7 @@ DmaUnmap (
   )
 {
   MAP_INFO_INSTANCE *Map;
+  EFI_STATUS        Status;
 
   if (Mapping == NULL) {
     ASSERT (FALSE);
@@ -170,8 +194,13 @@ DmaUnmap (
 
   Map = (MAP_INFO_INSTANCE *)Mapping;
 
+  Status = EFI_SUCCESS;
   if (Map->DoubleBuffer) {
-    if ((Map->Operation == MapOperationBusMasterWrite) || (Map->Operation == MapOperationBusMasterCommonBuffer)) {
+    ASSERT (Map->Operation != MapOperationBusMasterCommonBuffer);
+
+    if (Map->Operation == MapOperationBusMasterCommonBuffer) {
+      Status = EFI_INVALID_PARAMETER;
+    } else if (Map->Operation == MapOperationBusMasterWrite) {
       CopyMem ((VOID *)(UINTN)Map->HostAddress, (VOID *)(UINTN)Map->DeviceAddress, Map->NumberOfBytes);
     }
 
@@ -188,7 +217,7 @@ DmaUnmap (
 
   FreePool (Map);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -216,6 +245,8 @@ DmaAllocateBuffer (
   OUT VOID                         **HostAddress
   )
 {
+  VOID    *Allocation;
+
   if (HostAddress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -226,12 +257,18 @@ DmaAllocateBuffer (
   // We used uncached memory to keep coherency
   //
   if (MemoryType == EfiBootServicesData) {
-    *HostAddress = UncachedAllocatePages (Pages);
+    Allocation = UncachedAllocatePages (Pages);
   } else if (MemoryType == EfiRuntimeServicesData) {
-    *HostAddress = UncachedAllocateRuntimePages (Pages);
+    Allocation = UncachedAllocateRuntimePages (Pages);
   } else {
     return EFI_INVALID_PARAMETER;
   }
+
+  if (Allocation == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  *HostAddress = Allocation;
 
   return EFI_SUCCESS;
 }

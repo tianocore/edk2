@@ -59,20 +59,19 @@ UINT8 mOutStride[] = {
   Construct the Pci Root Bridge instance.
 
   @param Bridge            The root bridge instance.
-  @param HostBridgeHandle  Handle to the HostBridge.
 
   @return The pointer to PCI_ROOT_BRIDGE_INSTANCE just created
           or NULL if creation fails.
 **/
 PCI_ROOT_BRIDGE_INSTANCE *
 CreateRootBridge (
-  IN PCI_ROOT_BRIDGE       *Bridge,
-  IN EFI_HANDLE            HostBridgeHandle
+  IN PCI_ROOT_BRIDGE       *Bridge
   )
 {
   PCI_ROOT_BRIDGE_INSTANCE *RootBridge;
   PCI_RESOURCE_TYPE        Index;
   CHAR16                   *DevicePathStr;
+  PCI_ROOT_BRIDGE_APERTURE *Aperture;
 
   DevicePathStr = NULL;
 
@@ -95,57 +94,62 @@ CreateRootBridge (
   //
   // Make sure Mem and MemAbove4G apertures are valid
   //
-  if (Bridge->Mem.Base < Bridge->Mem.Limit) {
+  if (Bridge->Mem.Base <= Bridge->Mem.Limit) {
     ASSERT (Bridge->Mem.Limit < SIZE_4GB);
     if (Bridge->Mem.Limit >= SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->MemAbove4G.Base < Bridge->MemAbove4G.Limit) {
+  if (Bridge->MemAbove4G.Base <= Bridge->MemAbove4G.Limit) {
     ASSERT (Bridge->MemAbove4G.Base >= SIZE_4GB);
     if (Bridge->MemAbove4G.Base < SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->PMem.Base < Bridge->PMem.Limit) {
+  if (Bridge->PMem.Base <= Bridge->PMem.Limit) {
     ASSERT (Bridge->PMem.Limit < SIZE_4GB);
     if (Bridge->PMem.Limit >= SIZE_4GB) {
       return NULL;
     }
   }
-  if (Bridge->PMemAbove4G.Base < Bridge->PMemAbove4G.Limit) {
+  if (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit) {
     ASSERT (Bridge->PMemAbove4G.Base >= SIZE_4GB);
     if (Bridge->PMemAbove4G.Base < SIZE_4GB) {
       return NULL;
     }
   }
 
-  if ((Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0) {
-    //
-    // If this bit is set, then the PCI Root Bridge does not
-    // support separate windows for Non-prefetchable and Prefetchable
-    // memory.
-    //
-    ASSERT (Bridge->PMem.Base >= Bridge->PMem.Limit);
-    ASSERT (Bridge->PMemAbove4G.Base >= Bridge->PMemAbove4G.Limit);
-    if ((Bridge->PMem.Base < Bridge->PMem.Limit) ||
-        (Bridge->PMemAbove4G.Base < Bridge->PMemAbove4G.Limit)
-        ) {
-      return NULL;
+  //
+  // Ignore AllocationAttributes when resources were already assigned.
+  //
+  if (!Bridge->ResourceAssigned) {
+    if ((Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0) {
+      //
+      // If this bit is set, then the PCI Root Bridge does not
+      // support separate windows for Non-prefetchable and Prefetchable
+      // memory.
+      //
+      ASSERT (Bridge->PMem.Base > Bridge->PMem.Limit);
+      ASSERT (Bridge->PMemAbove4G.Base > Bridge->PMemAbove4G.Limit);
+      if ((Bridge->PMem.Base <= Bridge->PMem.Limit) ||
+          (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit)
+          ) {
+        return NULL;
+      }
     }
-  }
 
-  if ((Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_MEM64_DECODE) == 0) {
-    //
-    // If this bit is not set, then the PCI Root Bridge does not support
-    // 64 bit memory windows.
-    //
-    ASSERT (Bridge->MemAbove4G.Base >= Bridge->MemAbove4G.Limit);
-    ASSERT (Bridge->PMemAbove4G.Base >= Bridge->PMemAbove4G.Limit);
-    if ((Bridge->MemAbove4G.Base < Bridge->MemAbove4G.Limit) ||
-        (Bridge->PMemAbove4G.Base < Bridge->PMemAbove4G.Limit)
-        ) {
-      return NULL;
+    if ((Bridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_MEM64_DECODE) == 0) {
+      //
+      // If this bit is not set, then the PCI Root Bridge does not support
+      // 64 bit memory windows.
+      //
+      ASSERT (Bridge->MemAbove4G.Base > Bridge->MemAbove4G.Limit);
+      ASSERT (Bridge->PMemAbove4G.Base > Bridge->PMemAbove4G.Limit);
+      if ((Bridge->MemAbove4G.Base <= Bridge->MemAbove4G.Limit) ||
+          (Bridge->PMemAbove4G.Base <= Bridge->PMemAbove4G.Limit)
+          ) {
+        return NULL;
+      }
     }
   }
 
@@ -170,17 +174,46 @@ CreateRootBridge (
   CopyMem (&RootBridge->Io, &Bridge->Io, sizeof (PCI_ROOT_BRIDGE_APERTURE));
   CopyMem (&RootBridge->Mem, &Bridge->Mem, sizeof (PCI_ROOT_BRIDGE_APERTURE));
   CopyMem (&RootBridge->MemAbove4G, &Bridge->MemAbove4G, sizeof (PCI_ROOT_BRIDGE_APERTURE));
-
+  CopyMem (&RootBridge->PMem, &Bridge->PMem, sizeof (PCI_ROOT_BRIDGE_APERTURE));
+  CopyMem (&RootBridge->PMemAbove4G, &Bridge->PMemAbove4G, sizeof (PCI_ROOT_BRIDGE_APERTURE));
 
   for (Index = TypeIo; Index < TypeMax; Index++) {
-    RootBridge->ResAllocNode[Index].Type   = Index;
-    RootBridge->ResAllocNode[Index].Base   = 0;
-    RootBridge->ResAllocNode[Index].Length = 0;
-    RootBridge->ResAllocNode[Index].Status = ResNone;
+    switch (Index) {
+    case TypeBus:
+      Aperture = &RootBridge->Bus;
+      break;
+    case TypeIo:
+      Aperture = &RootBridge->Io;
+      break;
+    case TypeMem32:
+      Aperture = &RootBridge->Mem;
+      break;
+    case TypeMem64:
+      Aperture = &RootBridge->MemAbove4G;
+      break;
+    case TypePMem32:
+      Aperture = &RootBridge->PMem;
+      break;
+    case TypePMem64:
+      Aperture = &RootBridge->PMemAbove4G;
+      break;
+    default:
+      ASSERT (FALSE);
+      break;
+    }
+    RootBridge->ResAllocNode[Index].Type     = Index;
+    if (Bridge->ResourceAssigned && (Aperture->Limit >= Aperture->Base)) {
+      RootBridge->ResAllocNode[Index].Base   = Aperture->Base;
+      RootBridge->ResAllocNode[Index].Length = Aperture->Limit - Aperture->Base + 1;
+      RootBridge->ResAllocNode[Index].Status = ResAllocated;
+    } else {
+      RootBridge->ResAllocNode[Index].Base   = 0;
+      RootBridge->ResAllocNode[Index].Length = 0;
+      RootBridge->ResAllocNode[Index].Status = ResNone;
+    }
   }
 
   RootBridge->RootBridgeIo.SegmentNumber  = Bridge->Segment;
-  RootBridge->RootBridgeIo.ParentHandle   = HostBridgeHandle;
   RootBridge->RootBridgeIo.PollMem        = RootBridgeIoPollMem;
   RootBridge->RootBridgeIo.PollIo         = RootBridgeIoPollIo;
   RootBridge->RootBridgeIo.Mem.Read       = RootBridgeIoMemRead;

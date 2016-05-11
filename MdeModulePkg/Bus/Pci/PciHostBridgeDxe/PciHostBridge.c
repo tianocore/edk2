@@ -338,6 +338,8 @@ InitializePciHostBridge (
   UINTN                       Index;
   PCI_ROOT_BRIDGE_APERTURE    *MemApertures[4];
   UINTN                       MemApertureIndex;
+  BOOLEAN                     ResourceAssigned;
+  LIST_ENTRY                  *Link;
 
   RootBridges = PciHostBridgeGetRootBridges (&RootBridgeCount);
   if ((RootBridges == NULL) || (RootBridgeCount == 0)) {
@@ -358,27 +360,7 @@ InitializePciHostBridge (
   HostBridge->Signature        = PCI_HOST_BRIDGE_SIGNATURE;
   HostBridge->CanRestarted     = TRUE;
   InitializeListHead (&HostBridge->RootBridges);
-
-  HostBridge->ResAlloc.NotifyPhase          = NotifyPhase;
-  HostBridge->ResAlloc.GetNextRootBridge    = GetNextRootBridge;
-  HostBridge->ResAlloc.GetAllocAttributes   = GetAttributes;
-  HostBridge->ResAlloc.StartBusEnumeration  = StartBusEnumeration;
-  HostBridge->ResAlloc.SetBusNumbers        = SetBusNumbers;
-  HostBridge->ResAlloc.SubmitResources      = SubmitResources;
-  HostBridge->ResAlloc.GetProposedResources = GetProposedResources;
-  HostBridge->ResAlloc.PreprocessController = PreprocessController;
-
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &HostBridge->Handle,
-                  &gEfiPciHostBridgeResourceAllocationProtocolGuid, &HostBridge->ResAlloc,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR (Status)) {
-    FreePool (HostBridge);
-    PciHostBridgeFreeRootBridges (RootBridges, RootBridgeCount);
-    return Status;
-  }
+  ResourceAssigned             = FALSE;
 
   //
   // Create Root Bridge Device Handle in this Host Bridge
@@ -387,18 +369,39 @@ InitializePciHostBridge (
     //
     // Create Root Bridge Handle Instance
     //
-    RootBridge = CreateRootBridge (&RootBridges[Index], HostBridge->Handle);
+    RootBridge = CreateRootBridge (&RootBridges[Index]);
     ASSERT (RootBridge != NULL);
     if (RootBridge == NULL) {
       continue;
     }
 
-    if (RootBridges[Index].Io.Limit > RootBridges[Index].Io.Base) {
+    //
+    // Make sure all root bridges share the same ResourceAssigned value.
+    //
+    if (Index == 0) {
+      ResourceAssigned = RootBridges[Index].ResourceAssigned;
+    } else {
+      ASSERT (ResourceAssigned == RootBridges[Index].ResourceAssigned);
+    }
+
+    if (RootBridges[Index].Io.Base <= RootBridges[Index].Io.Limit) {
       Status = AddIoSpace (
                  RootBridges[Index].Io.Base,
                  RootBridges[Index].Io.Limit - RootBridges[Index].Io.Base + 1
                  );
       ASSERT_EFI_ERROR (Status);
+      if (ResourceAssigned) {
+        Status = gDS->AllocateIoSpace (
+                        EfiGcdAllocateAddress,
+                        EfiGcdIoTypeIo,
+                        0,
+                        RootBridges[Index].Io.Limit - RootBridges[Index].Io.Base + 1,
+                        &RootBridges[Index].Io.Base,
+                        gImageHandle,
+                        NULL
+                        );
+        ASSERT_EFI_ERROR (Status);
+      }
     }
 
     //
@@ -413,7 +416,7 @@ InitializePciHostBridge (
     MemApertures[3] = &RootBridges[Index].PMemAbove4G;
 
     for (MemApertureIndex = 0; MemApertureIndex < sizeof (MemApertures) / sizeof (MemApertures[0]); MemApertureIndex++) {
-      if (MemApertures[MemApertureIndex]->Limit > MemApertures[MemApertureIndex]->Base) {
+      if (MemApertures[MemApertureIndex]->Base <= MemApertures[MemApertureIndex]->Limit) {
         Status = AddMemoryMappedIoSpace (
                    MemApertures[MemApertureIndex]->Base,
                    MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
@@ -428,11 +431,55 @@ InitializePciHostBridge (
         if (EFI_ERROR (Status)) {
           DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC to MMIO aperture - %r.\n", Status));
         }
+        if (ResourceAssigned) {
+          Status = gDS->AllocateMemorySpace (
+                          EfiGcdAllocateAddress,
+                          EfiGcdMemoryTypeMemoryMappedIo,
+                          0,
+                          MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
+                          &MemApertures[MemApertureIndex]->Base,
+                          gImageHandle,
+                          NULL
+                          );
+          ASSERT_EFI_ERROR (Status);
+        }
       }
     }
     //
     // Insert Root Bridge Handle Instance
     //
+    InsertTailList (&HostBridge->RootBridges, &RootBridge->Link);
+  }
+
+  //
+  // When resources were assigned, it's not needed to expose
+  // PciHostBridgeResourceAllocation protocol.
+  //
+  if (!ResourceAssigned) {
+    HostBridge->ResAlloc.NotifyPhase = NotifyPhase;
+    HostBridge->ResAlloc.GetNextRootBridge = GetNextRootBridge;
+    HostBridge->ResAlloc.GetAllocAttributes = GetAttributes;
+    HostBridge->ResAlloc.StartBusEnumeration = StartBusEnumeration;
+    HostBridge->ResAlloc.SetBusNumbers = SetBusNumbers;
+    HostBridge->ResAlloc.SubmitResources = SubmitResources;
+    HostBridge->ResAlloc.GetProposedResources = GetProposedResources;
+    HostBridge->ResAlloc.PreprocessController = PreprocessController;
+
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &HostBridge->Handle,
+                    &gEfiPciHostBridgeResourceAllocationProtocolGuid, &HostBridge->ResAlloc,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  for (Link = GetFirstNode (&HostBridge->RootBridges)
+       ; !IsNull (&HostBridge->RootBridges, Link)
+       ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+       ) {
+    RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
+    RootBridge->RootBridgeIo.ParentHandle = HostBridge->Handle;
+
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &RootBridge->Handle,
                     &gEfiDevicePathProtocolGuid, RootBridge->DevicePath,
@@ -440,7 +487,6 @@ InitializePciHostBridge (
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
-    InsertTailList (&HostBridge->RootBridges, &RootBridge->Link);
   }
   PciHostBridgeFreeRootBridges (RootBridges, RootBridgeCount);
   return Status;

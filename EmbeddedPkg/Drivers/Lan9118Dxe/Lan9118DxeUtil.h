@@ -38,6 +38,23 @@ GenEtherCrc32 (
   IN    UINT32 AddrLen
   );
 
+UINT32
+Lan9118RawMmioRead32(
+  UINTN Address,
+  UINTN Delay
+  );
+#define Lan9118MmioRead32(a) \
+	Lan9118RawMmioRead32(a, a ## _RD_DELAY)
+
+UINT32
+Lan9118RawMmioWrite32(
+  UINTN Address,
+  UINT32 Value,
+  UINTN Delay
+  );
+#define Lan9118MmioWrite32(a, v) \
+	Lan9118RawMmioWrite32(a, v, a ## _WR_DELAY)
+
 /* ------------------ MAC CSR Access ------------------- */
 
 // Read from MAC indirect registers

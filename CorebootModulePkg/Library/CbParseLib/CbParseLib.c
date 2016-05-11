@@ -33,7 +33,7 @@
   @return          the UNIT64 value after convertion.
 
 **/
-UINT64 
+UINT64
 cb_unpack64 (
   IN struct cbuint64 val
   )
@@ -469,12 +469,12 @@ CbParseFadtInfo (
         }
         DEBUG ((EFI_D_INFO, "Reset Value 0x%x\n", Fadt->ResetValue));
 
-        if (pPmEvtReg != NULL) {   
+        if (pPmEvtReg != NULL) {
           *pPmEvtReg = Fadt->Pm1aEvtBlk;
           DEBUG ((EFI_D_INFO, "PmEvt Reg 0x%x\n", Fadt->Pm1aEvtBlk));
         }
 
-        if (pPmGpeEnReg != NULL) {   
+        if (pPmGpeEnReg != NULL) {
           *pPmGpeEnReg = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
           DEBUG ((EFI_D_INFO, "PmGpeEn Reg 0x%x\n", *pPmGpeEnReg));
         }
@@ -519,15 +519,15 @@ CbParseFadtInfo (
           *pResetValue = Fadt->ResetValue;
         DEBUG ((EFI_D_ERROR, "Reset Value 0x%x\n", Fadt->ResetValue));
 
-        if (pPmEvtReg != NULL) {   
+        if (pPmEvtReg != NULL) {
           *pPmEvtReg = Fadt->Pm1aEvtBlk;
            DEBUG ((EFI_D_INFO, "PmEvt Reg 0x%x\n", Fadt->Pm1aEvtBlk));
         }
 
-        if (pPmGpeEnReg != NULL) {   
+        if (pPmGpeEnReg != NULL) {
           *pPmGpeEnReg = Fadt->Gpe0Blk + Fadt->Gpe0BlkLen / 2;
           DEBUG ((EFI_D_INFO, "PmGpeEn Reg 0x%x\n", *pPmGpeEnReg));
-        }        
+        }
         return RETURN_SUCCESS;
       }
     }
@@ -541,7 +541,10 @@ CbParseFadtInfo (
 
   @param  pRegBase           Pointer to the base address of serial port registers
   @param  pRegAccessType     Pointer to the access type of serial port registers
+  @param  pRegWidth          Pointer to the register width in bytes
   @param  pBaudrate          Pointer to the serial port baudrate
+  @param  pInputHertz        Pointer to the input clock frequency
+  @param  pUartPciAddr       Pointer to the UART PCI bus, dev and func address
 
   @retval RETURN_SUCCESS     Successfully find the serial port information.
   @retval RETURN_NOT_FOUND   Failed to find the serial port information .
@@ -551,7 +554,10 @@ RETURN_STATUS
 CbParseSerialInfo (
   OUT UINT32      *pRegBase,
   OUT UINT32      *pRegAccessType,
-  OUT UINT32      *pBaudrate
+  OUT UINT32      *pRegWidth,
+  OUT UINT32      *pBaudrate,
+  OUT UINT32      *pInputHertz,
+  OUT UINT32      *pUartPciAddr
   )
 {
   struct cb_serial    *CbSerial;
@@ -569,12 +575,24 @@ CbParseSerialInfo (
     *pRegBase = CbSerial->baseaddr;
   }
 
+  if (pRegWidth != NULL) {
+    *pRegWidth = CbSerial->regwidth;
+  }
+
   if (pRegAccessType != NULL) {
     *pRegAccessType = CbSerial->type;
   }
 
   if (pBaudrate != NULL) {
     *pBaudrate = CbSerial->baud;
+  }
+
+  if (pInputHertz != NULL) {
+    *pInputHertz = CbSerial->input_hertz;
+  }
+
+  if (pUartPciAddr != NULL) {
+    *pUartPciAddr = CbSerial->uart_pci_addr;
   }
 
   return RETURN_SUCCESS;
