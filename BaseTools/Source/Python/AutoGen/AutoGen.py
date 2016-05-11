@@ -2812,17 +2812,18 @@ class ModuleAutoGen(AutoGen):
             for DepexExpresion in DepexExpresionList:
                 for key in DepexExpresion.keys():
                     Arch, ModuleType = key
+                    DepexExpr = [x for x in DepexExpresion[key] if not str(x).startswith('#')]
                     # the type of build module is USER_DEFINED.
                     # All different DEPEX section tags would be copied into the As Built INF file
                     # and there would be separate DEPEX section tags
                     if self.ModuleType.upper() == SUP_MODULE_USER_DEFINED:
                         if (Arch.upper() == self.Arch.upper()) and (ModuleType.upper() != TAB_ARCH_COMMON):
-                            DepexList.append({(Arch, ModuleType): DepexExpresion[key][:]})
+                            DepexList.append({(Arch, ModuleType): DepexExpr})
                     else:
                         if Arch.upper() == TAB_ARCH_COMMON or \
                           (Arch.upper() == self.Arch.upper() and \
                           ModuleType.upper() in [TAB_ARCH_COMMON, self.ModuleType.upper()]):
-                            DepexList.append({(Arch, ModuleType): DepexExpresion[key][:]})
+                            DepexList.append({(Arch, ModuleType): DepexExpr})
         
         #the type of build module is USER_DEFINED.
         if self.ModuleType.upper() == SUP_MODULE_USER_DEFINED:
