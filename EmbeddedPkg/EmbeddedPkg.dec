@@ -147,6 +147,9 @@
   gEmbeddedTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x0|UINT32|0x00000025
   gEmbeddedTokenSpaceGuid.PcdLan9118DefaultMacAddress|0x0|UINT64|0x00000026
   gEmbeddedTokenSpaceGuid.PcdLan9118DefaultNegotiationTimeout|4000|UINT32|0x00000027
+  # The default feature mask below disables full duplex negotiation, since full
+  # duplex operation is suspected to be broken in the driver.
+  gEmbeddedTokenSpaceGuid.PcdLan9118NegotiationFeatureMask|0xFFFFFEBF|UINT32|0x00000028
 
   #
   # Android FastBoot

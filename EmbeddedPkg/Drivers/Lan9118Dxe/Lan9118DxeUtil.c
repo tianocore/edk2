@@ -648,6 +648,7 @@ AutoNegotiate (
     Features &= ~(PHYANA_PAUSE_OP_MASK);
     Features |= 3 << 10;
   }
+  Features &= FixedPcdGet32 (PcdLan9118NegotiationFeatureMask);
 
   // Write the features
   IndirectPHYWrite32 (PHY_INDEX_AUTO_NEG_ADVERT, Features);
