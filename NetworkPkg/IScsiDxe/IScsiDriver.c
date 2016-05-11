@@ -865,10 +865,22 @@ IScsiStart (
           IScsiSessionAbort (ExistPrivate->Session);
         }
 
-        Status = IScsiCleanDriverData (ExistPrivate);
-        if (EFI_ERROR (Status)) {
-          goto ON_ERROR;
+        if (ExistPrivate->DevicePath != NULL) {
+          Status = gBS->UninstallProtocolInterface (
+                          ExistPrivate->ExtScsiPassThruHandle,
+                          &gEfiDevicePathProtocolGuid,
+                          ExistPrivate->DevicePath
+                          );
+          if (EFI_ERROR (Status)) {
+            goto ON_ERROR;
+          }
+
+          FreePool (ExistPrivate->DevicePath);
         }
+
+        gBS->CloseEvent (ExistPrivate->ExitBootServiceEvent);
+        FreePool (ExistPrivate);
+
       }
     } else {
       //
