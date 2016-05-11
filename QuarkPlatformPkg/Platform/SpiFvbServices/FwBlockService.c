@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -590,9 +590,6 @@ Returns:
 --*/
 {
   EFI_STATUS  Status;
-  UINTN       NumBytes;
-
-  NumBytes = LbaLength;
 
   WriteAddress -= (PcdGet32 (PcdFlashAreaBaseAddress));
   if (mInSmmMode == 0 ) { // !(EfiInManagementInterrupt ())) {
@@ -1638,7 +1635,6 @@ Returns:
   VOID                                *FirmwareVolumeHobList;
   UINT32                              BufferSize;
   EFI_FV_BLOCK_MAP_ENTRY              *PtrBlockMapEntry;
-  UINTN                               LbaAddress;
   BOOLEAN                             WriteEnabled;
   BOOLEAN                             WriteLocked;
   EFI_HANDLE                          FwbHandle;
@@ -1882,7 +1878,6 @@ Returns:
     FwhInstance->WriteEnabled             = WriteEnabled;
     EfiInitializeLock (&(FwhInstance->FvbDevLock), TPL_HIGH_LEVEL);
 
-    LbaAddress  = (UINTN) FwhInstance->FvWriteBase[0];
     NumOfBlocks = 0;
     WriteLocked = FALSE;
 

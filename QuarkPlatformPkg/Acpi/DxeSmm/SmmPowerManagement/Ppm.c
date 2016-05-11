@@ -2,7 +2,7 @@
 
 Processor power management initialization code.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -79,7 +79,6 @@ PpmPatchFadtTable (
   EFI_ACPI_TABLE_VERSION        Version;
   UINTN                         Index;
   UINTN                         Handle;
-  EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE  *FadtPointer;
 
   //
   // Scan all the acpi tables to find FADT 2.0
@@ -106,9 +105,7 @@ PpmPatchFadtTable (
   ASSERT (Table != NULL);
   CopyMem (Table, CurrentTable, CurrentTable->Length);
 
-  FadtPointer = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE*) Table;
-
-    //
+  //
   // Update the ACPI table and recalculate checksum
   //
   Status = mAcpiTable->UninstallAcpiTable (mAcpiTable, Handle);
@@ -322,7 +319,6 @@ PpmLoadAndPatchPMTables (
   UINTN                         TableHandle;
   UINT32                        FvStatus;
   UINTN                         Size;
-   EFI_ACPI_TABLE_VERSION       Version;
 
     Status = LocateSupportProtocol (&gEfiFirmwareVolume2ProtocolGuid, (VOID**)&FwVol, 1);
     if (EFI_ERROR (Status)) {
@@ -348,14 +344,6 @@ PpmLoadAndPatchPMTables (
                       );
 
     if (!EFI_ERROR(Status)) {
-        Version = EFI_ACPI_TABLE_VERSION_1_0B | EFI_ACPI_TABLE_VERSION_2_0 | EFI_ACPI_TABLE_VERSION_3_0;
-
-      if(((EFI_ACPI_DESCRIPTION_HEADER*) CurrentTable)->OemTableId == SIGNATURE_64 ('C', 'p', 'u', '0', 'I', 's', 't', 0)) {
-          Version = EFI_ACPI_TABLE_VERSION_NONE;
-      } else if(((EFI_ACPI_DESCRIPTION_HEADER*) CurrentTable)->OemTableId == SIGNATURE_64 ('C', 'p', 'u', '1', 'I', 's', 't', 0)) {
-          Version = EFI_ACPI_TABLE_VERSION_NONE;
-      }
-
       SsdtTableUpdate ((EFI_ACPI_DESCRIPTION_HEADER *) CurrentTable);
 
       //

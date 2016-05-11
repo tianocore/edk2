@@ -1,7 +1,7 @@
 /** @file
 Implementation of Helper routines for PEI enviroment.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -63,7 +63,6 @@ PlatformFindFvFileRawDataSection (
   EFI_SECTION_TYPE                  SearchType;
   EFI_FV_INFO                       VolumeInfo;
   EFI_FV_FILE_INFO                  FileInfo;
-  CONST EFI_PEI_SERVICES            **PeiServices;
 
   if (FileNameGuid == NULL || SectionData == NULL || SectionDataSize == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -71,7 +70,6 @@ PlatformFindFvFileRawDataSection (
   *SectionData = NULL;
   *SectionDataSize = 0;
 
-  PeiServices = GetPeiServicesTablePointer ();
   SearchType = EFI_SECTION_RAW;
   for (Instance = 0; !EFI_ERROR((PeiServicesFfsFindNextVolume (Instance, &VolumeHandle))); Instance++) {
     if (FvNameGuid != NULL) {
