@@ -4,6 +4,7 @@
   internal application and drivers as well as all add-in card option-ROM drivers
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -209,6 +210,7 @@ typedef struct _EFI_HII_FONT_PACKAGE_HDR {
 #define EFI_HII_GIBT_GLYPHS               0x11
 #define EFI_HII_GIBT_GLYPH_DEFAULT        0x12
 #define EFI_HII_GIBT_GLYPHS_DEFAULT       0x13
+#define EFI_HII_GIBT_GLYPH_VARIABILITY    0x14
 #define EFI_HII_GIBT_DUPLICATE            0x20
 #define EFI_HII_GIBT_SKIP2                0x21
 #define EFI_HII_GIBT_SKIP1                0x22
@@ -280,6 +282,13 @@ typedef struct _EFI_HII_GIBT_GLYPHS_DEFAULT_BLOCK {
   UINT16                 Count;
   UINT8                  BitmapData[1];
 } EFI_HII_GIBT_GLYPHS_DEFAULT_BLOCK;
+
+typedef struct _EFI_HII_GIBT_VARIABILITY_BLOCK {
+  EFI_HII_GLYPH_BLOCK    Header;
+  EFI_HII_GLYPH_INFO     Cell;
+  UINT8                  GlyphPackInBits;
+  UINT8                  BitmapData [1];
+} EFI_HII_GIBT_VARIABILITY_BLOCK;
 
 typedef struct _EFI_HII_GIBT_SKIP1_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
@@ -489,6 +498,7 @@ typedef struct _EFI_HII_IMAGE_BLOCK {
 #define EFI_HII_IIBT_IMAGE_24BIT       0x16
 #define EFI_HII_IIBT_IMAGE_24BIT_TRANS 0x17
 #define EFI_HII_IIBT_IMAGE_JPEG        0x18
+#define EFI_HII_IIBT_IMAGE_PNG         0x19
 #define EFI_HII_IIBT_DUPLICATE         0x20
 #define EFI_HII_IIBT_SKIP2             0x21
 #define EFI_HII_IIBT_SKIP1             0x22
@@ -608,6 +618,12 @@ typedef struct _EFI_HII_IIBT_JPEG_BLOCK {
   UINT32                       Size;
   UINT8                        Data[1];
 } EFI_HII_IIBT_JPEG_BLOCK;
+
+typedef struct _EFI_HII_IIBT_PNG_BLOCK {
+  EFI_HII_IMAGE_BLOCK          Header;
+  UINT32                       Size;
+  UINT8                        Data[1];
+} EFI_HII_IIBT_PNG_BLOCK;
 
 typedef struct _EFI_HII_IIBT_SKIP1_BLOCK {
   EFI_HII_IMAGE_BLOCK          Header;
