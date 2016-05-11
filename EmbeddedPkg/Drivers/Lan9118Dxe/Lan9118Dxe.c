@@ -1055,6 +1055,8 @@ SnpGetStatus (
       LanDriver->Stats.TxTotalFrames += 1;
       *TxBuff = LanDriver->TxRing[PacketTag % LAN9118_TX_RING_NUM_ENTRIES];
     }
+  } else if (TxBuff != NULL) {
+    *TxBuff = NULL;
   }
 
   // Check for a TX Error interrupt
