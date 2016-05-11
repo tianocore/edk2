@@ -263,6 +263,7 @@ OpalDriverRequestPassword (
   EFI_INPUT_KEY       Key;
   OPAL_SESSION        Session;
   BOOLEAN             PressEsc;
+  BOOLEAN             Locked;
 
   if (Dev == NULL) {
     return;
@@ -277,33 +278,61 @@ OpalDriverRequestPassword (
     Session.MediaId = Dev->OpalDisk.MediaId;
     Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
+    Locked = OpalDeviceLocked (&Dev->OpalDisk.SupportedAttributes, &Dev->OpalDisk.LockingFeature);
+
     while (Count < MAX_PASSWORD_TRY_COUNT) {
       Password = OpalDriverPopUpHddPassword (Dev, &PressEsc);
       if (PressEsc) {
-        //
-        // User not input password and press ESC, keep device in lock status and continue boot.
-        //
-        do {
-          CreatePopUp (
-                  EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-                  &Key,
-                  L"Confirm: Not unlock device and continue boot?.",
-                  L"Press ENTER to confirm, Press Esc to input password",
-                  NULL
-                  );
-        } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+        if (Locked) {
+          //
+          // Current device in the lock status and
+          // User not input password and press ESC,
+          // keep device in lock status and continue boot.
+          //
+          do {
+            CreatePopUp (
+                    EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+                    &Key,
+                    L"Press ENTER to skip password, Press ESC to input password",
+                    NULL
+                    );
+          } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
 
-        if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
-          gST->ConOut->ClearScreen(gST->ConOut);
-          //
-          // Keep lock and continue boot.
-          //
-          return;
+          if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+            gST->ConOut->ClearScreen(gST->ConOut);
+            //
+            // Keep lock and continue boot.
+            //
+            return;
+          } else {
+            //
+            // Let user input password again.
+            //
+            continue;
+          }
         } else {
           //
-          // Let user input password again.
+          // Current device in the unlock status and
+          // User not input password and press ESC,
+          // Shutdown the device.
           //
-          continue;
+          do {
+            CreatePopUp (
+                    EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+                    &Key,
+                    L"Press ENTER to shutdown, Press ESC to input password",
+                    NULL
+                    );
+          } while ((Key.ScanCode != SCAN_ESC) && (Key.UnicodeChar != CHAR_CARRIAGE_RETURN));
+
+          if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+            gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+          } else {
+            //
+            // Let user input password again.
+            //
+            continue;
+          }
         }
       }
 
@@ -313,7 +342,7 @@ OpalDriverRequestPassword (
       }
       PasswordLen = (UINT32) AsciiStrLen(Password);
 
-      if (OpalDeviceLocked (&Dev->OpalDisk.SupportedAttributes, &Dev->OpalDisk.LockingFeature)) {
+      if (Locked) {
         Ret = OpalSupportUnlock(&Session, Password, PasswordLen, Dev->OpalDevicePath);
       } else {
         Ret = OpalSupportLock(&Session, Password, PasswordLen, Dev->OpalDevicePath);
@@ -349,12 +378,13 @@ OpalDriverRequestPassword (
         CreatePopUp (
                 EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
                 &Key,
-                L"Opal password retry count is expired. Keep lock and continue boot.",
-                L"Press ENTER to continue",
+                L"Opal password retry count exceeds the limit. Must shutdown!",
+                L"Press ENTER to shutdown",
                 NULL
                 );
       } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
-      gST->ConOut->ClearScreen(gST->ConOut);
+
+      gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
     }
   }
 }
