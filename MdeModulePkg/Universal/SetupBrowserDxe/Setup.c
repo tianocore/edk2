@@ -3228,7 +3228,6 @@ SubmitForForm (
                                       ConfigResp,
                                       &Progress
                                       );
-    FreePool (ConfigResp);
 
     if (EFI_ERROR (Status)) {
       //
@@ -3237,9 +3236,11 @@ SubmitForForm (
       SubmitFormFail = TRUE;
       GetSyncRestoreConfigRequest (ConfigInfo->Storage, ConfigInfo->ConfigRequest, Progress, &ConfigInfo->RestoreConfigRequest, &ConfigInfo->SyncConfigRequest);
       InsertTailList (&gBrowserSaveFailFormSetList, &ConfigInfo->SaveFailLink);
+      FreePool (ConfigResp);
       continue;
     }
 
+    FreePool (ConfigResp);
     //
     // 3. Config success, update storage shadow Buffer, only update the data belong to this form.
     //
