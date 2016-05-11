@@ -570,6 +570,16 @@ class FfsInfStatement(FfsInfStatementClassObject):
             if  PlatformDataBase != None:
                 if InfFileKey in PlatformDataBase.Modules:
                     DscArchList.append (Arch)
+                else:
+                    #
+                    # BaseTools support build same module more than once, the module path with FILE_GUID overridden has
+                    # the file name FILE_GUIDmodule.inf, then PlatformDataBase.Modules use FILE_GUIDmodule.inf as key,
+                    # but the path (self.MetaFile.Path) is the real path
+                    #
+                    for key in PlatformDataBase.Modules.keys():
+                        if InfFileKey == str((PlatformDataBase.Modules[key]).MetaFile.Path):
+                            DscArchList.append (Arch)
+                            break
 
         return DscArchList
 
