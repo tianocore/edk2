@@ -1089,7 +1089,6 @@ RetriveRequiredMemorySize (
   OUT     UINTN                             *Size
   )
 {
-  EFI_STATUS                     Status;
   EFI_PEI_HOB_POINTERS           Hob;
   EFI_MEMORY_TYPE_INFORMATION    *MemoryData;
   UINT8                          Index;
@@ -1099,7 +1098,7 @@ RetriveRequiredMemorySize (
   TempPageNum = 0;
   Index       = 0;
 
-  Status      = PeiServicesGetHobList ((VOID **)&Hob.Raw);
+  PeiServicesGetHobList ((VOID **)&Hob.Raw);
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION &&
         CompareGuid (&Hob.Guid->Name, &gEfiMemoryTypeInformationGuid)
@@ -1171,7 +1170,6 @@ GetMemoryMap (
   PEI_MEMORY_RANGE_SMRAM            SmramMask;
   PEI_MEMORY_RANGE_SMRAM            TsegMask;
   UINT32                            BlockNum;
-  UINT8                             EsmramcRegister;
   UINT8                             ExtendedMemoryIndex;
   UINT32                            Register;
 
@@ -1194,7 +1192,6 @@ GetMemoryMap (
   //
   // Generate Memory ranges for the memory map.
   //
-  EsmramcRegister = 0;
   MemorySize = 0;
 
   RowLength = TotalMemorySize;

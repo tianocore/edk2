@@ -1,7 +1,7 @@
 /** @file
 Update the _PRT and _PRW method for pci devices
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -261,9 +261,7 @@ SdtGetNameStringSize (
 {
   UINTN                 SegCount;
   UINTN                 Length;
-  UINT8                 *Name;
 
-  Name = Buffer;
   Length = 0;
 
   //

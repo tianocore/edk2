@@ -2,7 +2,7 @@
 boot information boot time changes.
 SMBIOS type 11.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -38,9 +38,6 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscOemString)
   STRING_REF               TokenToGet;
   EFI_SMBIOS_HANDLE        SmbiosHandle;
   SMBIOS_TABLE_TYPE11      *SmbiosRecord;
-  EFI_MISC_OEM_STRING      *ForType11InputData;
-
-  ForType11InputData = (EFI_MISC_OEM_STRING *)RecordData;
 
   //
   // First check for invalid parameters.

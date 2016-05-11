@@ -2,7 +2,7 @@
 This driver parses the mSmbiosMiscDataTable structure and reports
 any generated data.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -190,7 +190,6 @@ MISC_SMBIOS_TABLE_FUNCTION(NumberOfInstallableLanguages)
   CHAR8                                     CurrentLang[SMBIOS_STRING_MAX_LENGTH + 1];
   CHAR8                                     *OptionalStrStart;
   UINT16                                    Offset;
-  BOOLEAN                                   LangMatch;
   EFI_STATUS                                Status;
   EFI_SMBIOS_HANDLE                         SmbiosHandle;
   SMBIOS_TABLE_TYPE13                       *SmbiosRecord;
@@ -210,9 +209,8 @@ MISC_SMBIOS_TABLE_FUNCTION(NumberOfInstallableLanguages)
   //
   // Try to check if current langcode matches with the langcodes in installed languages
   //
-  LangMatch = FALSE;
   ZeroMem(CurrentLang, SMBIOS_STRING_MAX_LENGTH + 1);
-  LangMatch = CurrentLanguageMatch (mHiiHandle, &Offset, CurrentLang);
+  CurrentLanguageMatch (mHiiHandle, &Offset, CurrentLang);
   LangStrLen = AsciiStrLen(CurrentLang);
 
   //

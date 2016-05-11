@@ -2,7 +2,7 @@
 Install Platform EFI_PEI_RECOVERY_MODULE_PPI and Implementation of
 EFI_PEI_LOAD_RECOVERY_CAPSULE service.
 
-Copyright (c) 2013 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -137,26 +137,21 @@ Returns:
   UINTN                                 NumberRecoveryCapsules;
   UINTN                                 RecoveryCapsuleSize;
   EFI_GUID                              DeviceId;
-  BOOLEAN                               ImageFound;
   EFI_PHYSICAL_ADDRESS                  Address;
   VOID                                  *Buffer;
   EFI_CAPSULE_HEADER                    *CapsuleHeader;
   EFI_PEI_HOB_POINTERS                  Hob;
-  EFI_PEI_HOB_POINTERS                  HobOld;
   BOOLEAN                               HobUpdate;
   EFI_FIRMWARE_VOLUME_HEADER            *FvHeader;
   UINTN                                 Index;
-  EFI_STATUS                            AuthStatus;
   EFI_GUID                              mEfiCapsuleHeaderGuid = QUARK_CAPSULE_GUID;
 
   Index = 0;
 
   Status                  = EFI_SUCCESS;
-  AuthStatus              = EFI_SUCCESS;
   HobUpdate               = FALSE;
 
   ProviderAvailable       = TRUE;
-  ImageFound              = FALSE;
   NumberOfImageProviders  = 0;
 
   DeviceRecoveryModule    = NULL;
@@ -284,7 +279,6 @@ Returns:
     //
     Buffer  = (VOID *)((UINT8 *) Buffer);
     Status      = PeiServicesGetHobList ((VOID **)&Hob.Raw);
-    HobOld.Raw  = Hob.Raw;
     while (!END_OF_HOB_LIST (Hob)) {
       if (Hob.Header->HobType == EFI_HOB_TYPE_FV) {
         DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Hob FV Length: %x\n", Hob.FirmwareVolume->Length));

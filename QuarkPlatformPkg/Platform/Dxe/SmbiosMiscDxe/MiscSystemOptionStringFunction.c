@@ -2,7 +2,7 @@
 BIOS system option string boot time changes.
 SMBIOS type 12.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -40,9 +40,6 @@ MISC_SMBIOS_TABLE_FUNCTION(SystemOptionString)
   STRING_REF                        TokenToGet;
   EFI_SMBIOS_HANDLE                 SmbiosHandle;
   SMBIOS_TABLE_TYPE12               *SmbiosRecord;
-  EFI_MISC_SYSTEM_OPTION_STRING     *ForType12InputData;
-
-  ForType12InputData = (EFI_MISC_SYSTEM_OPTION_STRING *)RecordData;
 
   //
   // First check for invalid parameters.
