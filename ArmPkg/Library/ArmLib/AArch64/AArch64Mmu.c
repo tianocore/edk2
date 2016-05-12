@@ -26,6 +26,8 @@
 // We use this index definition to define an invalid block entry
 #define TT_ATTR_INDX_INVALID    ((UINT32)~0)
 
+INT32 HaveMmuRoutines = 1;
+
 STATIC
 UINT64
 ArmMemoryAttributeToPageAttribute (
