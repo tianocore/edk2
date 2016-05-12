@@ -2,7 +2,7 @@
 
 The SD host controller driver model and HC protocol routines.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -244,6 +244,7 @@ GetErrorReason (
   @return EFI_SUCCESS
 **/
 EFI_STATUS
+EFIAPI
 SetHighSpeedMode (
   IN  EFI_SD_HOST_IO_PROTOCOL    *This,
   IN  BOOLEAN                    Enable
