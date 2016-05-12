@@ -159,6 +159,11 @@ INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 #
+# OHCI Support
+#
+INF QuarkSocPkg/QuarkSouthCluster/Usb/Ohci/Dxe/OhciDxe.inf
+
+#
 # Shell
 #
 !if $(SHELL_TYPE) == BUILD_SHELL

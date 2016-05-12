@@ -431,6 +431,11 @@
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
+  # OHCI support
+  #
+  QuarkSocPkg/QuarkSouthCluster/Usb/Ohci/Dxe/OhciDxe.inf
+
+  #
   # ISA Support
   #
   CorebootModulePkg/SerialDxe/SerialDxe.inf
