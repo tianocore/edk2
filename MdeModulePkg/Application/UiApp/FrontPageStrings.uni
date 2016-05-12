@@ -1,16 +1,16 @@
 ///** @file
-//  
+//
 //  String definitions for BdsPlatform formset.
-//  
+//
 //  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
 //  http://opensource.org/licenses/bsd-license.php
-//  
+//
 //  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-//  
+//
 //**/
 
 /=#
@@ -52,8 +52,6 @@
                                        #language fr-FR  "Choisir la Langue"
 #string STR_LANGUAGE_SELECT_HELP       #language en-US  "This is the option one adjusts to change the language for the current system"
                                        #language fr-FR  "Ceci est l'option que celui ajuste changer la langue pour le système actuel"
-#string STR_TIME_OUT_PROMPT            #language en-US  "Boot process will continue in %d seconds"
-                                       #language fr-FR  "Le procédé de botte continuera dans %d secondes"
 #string STR_MISSING_STRING             #language en-US  "Missing String"
                                        #language fr-FR  "Missing String"
 #string STR_EMPTY_STRING               #language en-US  ""
@@ -62,5 +60,13 @@
                                        #language fr-FR  "Reset"
 #string STR_RESET_STRING_HELP          #language en-US  "Reset the current setting."
                                        #language fr-FR  "Reset the current setting."
-#string STR_INTEL_COPYRIGHT            #language en-US  "Copyright (c) 2006-2015, Intel Corporation"
-                                       #language fr-FR  "Copyright (c) 2006-2015, Intel Corporation"
+#string STR_CUSTOMIZE_BANNER_LINE4_LEFT  #language en-US  ""
+                                         #language fr-FR  ""
+#string STR_CUSTOMIZE_BANNER_LINE4_RIGHT #language en-US  ""
+                                         #language fr-FR  ""
+#string STR_CUSTOMIZE_BANNER_LINE5_LEFT  #language en-US  ""
+                                         #language fr-FR  ""
+#string STR_CUSTOMIZE_BANNER_LINE5_RIGHT #language en-US  ""
+                                         #language fr-FR  ""
+#string STR_NULL_STRING                #language en-US  " "
+                                       #language fr-FR  " "

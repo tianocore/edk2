@@ -65,4 +65,13 @@ UninitializeStringSupport (
   VOID
   );
 
+/**
+  Routine to export glyphs to the HII database.  This is in addition to whatever is defined in the Graphics Console driver.
+
+**/
+EFI_HII_HANDLE
+ExportFonts (
+  VOID
+  );
+
 #endif // _STRING_H_

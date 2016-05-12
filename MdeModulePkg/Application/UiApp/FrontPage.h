@@ -41,12 +41,7 @@ extern BOOLEAN  gConnectAllHappened;
 //
 #define FRONT_PAGE_FORM_ID             0x1000
 
-#define FRONT_PAGE_KEY_OFFSET          0x4000
-#define FRONT_PAGE_KEY_CONTINUE        0x1000
-#define FRONT_PAGE_KEY_LANGUAGE        0x1234
-
-#define LABEL_SELECT_LANGUAGE          0x1000
-#define LABEL_PLATFORM_INFORMATION     0x1001
+#define LABEL_FRANTPAGE_INFORMATION    0x1000
 #define LABEL_END                      0xffff
 
 #define FRONT_PAGE_FORMSET_GUID \

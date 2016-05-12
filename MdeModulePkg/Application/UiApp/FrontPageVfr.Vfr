@@ -17,11 +17,7 @@
 
 #define FRONT_PAGE_FORM_ID             0x1000
 
-#define FRONT_PAGE_KEY_CONTINUE        0x1000
-#define FRONT_PAGE_KEY_LANGUAGE        0x1234
-
-#define LABEL_SELECT_LANGUAGE          0x1000
-#define LABEL_PLATFORM_INFORMATION     0x1001
+#define LABEL_FRANTPAGE_INFORMATION    0x1000
 #define LABEL_END                      0xffff
 
 formset
@@ -58,51 +54,27 @@ formset
       line  3,
       align right;
 
-//    banner
-//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_0_LEFT),
-//      line  0,
-//      align left;
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE4_LEFT),
+      line  4,
+      align left;
 
-//    banner
-//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_0_RIGHT),
-//      line  0,
-//      align right;
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE4_RIGHT),
+      line  4,
+      align right;
 
-//    banner
-//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_1_LEFT),
-//      line  1,
-//      align left;
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE5_LEFT),
+      line  5,
+      align left;
 
-//    banner
-//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_1_RIGHT),
-//      line  1,
-//      align right;
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE5_RIGHT),
+      line  5,
+      align right;
 
-//    banner
-//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_2_LEFT),
-//      line  2,
-//      align left;
-
-//    banner
-//      title = STRING_TOKEN(STR_FRONT_PAGE_BANNER_3_LEFT),
-//      line  3,
-//      align left;
-
-
-    text
-      help    = STRING_TOKEN(STR_CONTINUE_HELP),
-      text    = STRING_TOKEN(STR_CONTINUE_PROMPT),
-      flags   = INTERACTIVE,
-      key     = FRONT_PAGE_KEY_CONTINUE;
-
-    label LABEL_SELECT_LANGUAGE;
-    //
-    // This is where we will dynamically add a OneOf type op-code to select
-    // Languages from the currently available choices
-    //
-    label LABEL_END;
-
-    label LABEL_PLATFORM_INFORMATION;
+    label LABEL_FRANTPAGE_INFORMATION;
     //
     // This is where we will dynamically add a Action type op-code to show 
     // the platform information.

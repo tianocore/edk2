@@ -29,14 +29,16 @@
 
 [Sources]
   FrontPage.h
-  Language.h
   String.h
   Ui.h
   FrontPageVfr.Vfr
   FrontPageStrings.uni
   FrontPage.c
   String.c
-  Language.c
+  FrontPageCustomizedUi.c
+  FrontPageCustomizedUiSupport.c
+  FrontPageCustomizedUi.h
+  FrontPageCustomizedUiSupport.h
 
 [Packages]
   MdePkg/MdePkg.dec
