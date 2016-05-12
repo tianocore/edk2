@@ -27,77 +27,14 @@ formset
 
   form formid = FORM_MAIN_ID,
        title = STRING_TOKEN(STR_FORM_MAIN_TITLE);
-
-    goto FORM_BOOT_SETUP_ID,
-         prompt = STRING_TOKEN(STR_FORM_BOOT_SETUP_TITLE),
-         help = STRING_TOKEN(STR_FORM_BOOT_SETUP_HELP),
-         flags = INTERACTIVE,
-         key = FORM_BOOT_SETUP_ID;
-
-    subtitle text = STRING_TOKEN(STR_NULL_STRING);
-
-    goto FORM_DRIVER_SETUP_ID,
-         prompt = STRING_TOKEN(STR_FORM_DRIVER_SETUP_TITLE),
-         help = STRING_TOKEN(STR_FORM_DRIVER_SETUP_HELP),
-         flags = INTERACTIVE,
-         key = FORM_DRIVER_SETUP_ID;
-
-    subtitle text = STRING_TOKEN(STR_NULL_STRING);
-
-    goto FORM_CON_MAIN_ID,
-         prompt = STRING_TOKEN(STR_FORM_CON_MAIN_TITLE),
-         help = STRING_TOKEN(STR_FORM_CON_MAIN_HELP),
-         flags = INTERACTIVE,
-         key = FORM_CON_MAIN_ID;
-
-    subtitle text = STRING_TOKEN(STR_NULL_STRING);
-
-    goto FORM_MAIN_ID,
-         prompt = STRING_TOKEN(STR_BOOT_FROM_FILE),
-         help = STRING_TOKEN(STR_BOOT_FROM_FILE_HELP),
-         flags = INTERACTIVE,
-         key = KEY_VALUE_BOOT_FROM_FILE;
-
-    subtitle text = STRING_TOKEN(STR_NULL_STRING);
-
-//    label FORM_MAIN_ID;
-
-    goto FORM_BOOT_NEXT_ID,
-         prompt = STRING_TOKEN(STR_FORM_BOOT_NEXT_TITLE),
-         help = STRING_TOKEN(STR_FORM_BOOT_NEXT_HELP),
-         flags = INTERACTIVE,
-         key = FORM_BOOT_NEXT_ID;
-
-    goto FORM_TIME_OUT_ID,
-         prompt = STRING_TOKEN(STR_FORM_TIME_OUT_TITLE),
-         help = STRING_TOKEN(STR_FORM_TIME_OUT_HELP),
-         flags = INTERACTIVE,
-         key = FORM_TIME_OUT_ID;
-
-    subtitle text = STRING_TOKEN(STR_NULL_STRING);
-
-    text
-         help   = STRING_TOKEN(STR_RESET),
-         text   = STRING_TOKEN(STR_RESET),
-         flags  = INTERACTIVE,
-         key    = FORM_RESET;
          
-    label LABEL_BMM_PLATFORM_INFORMATION;
+    label LABEL_FORM_MAIN_START;
     //
     // This is where we will dynamically add a Action type op-code to show 
     // the platform information.
     //
-    
-    //
-    // This is where we will dynamically add a Action type op-code to show 
-    // the advanced menu.
-    //
-    
-    //
-    // This is where we will dynamically add a Action type op-code to show 
-    // the intel test menu.
-    //
-    label LABEL_END; 
+    label LABEL_FORM_MAIN_END;
+
   endform;
 
   form formid = FORM_BOOT_SETUP_ID,
@@ -212,34 +149,6 @@ formset
        label FORM_BOOT_CHG_ID;
        label LABEL_END;
 
-  endform;
-
-  form formid = FORM_BOOT_NEXT_ID,
-       title = STRING_TOKEN(STR_FORM_BOOT_NEXT_TITLE);
-
-       label FORM_BOOT_NEXT_ID;
-       label LABEL_END;
-  endform;
-
-  form formid = FORM_TIME_OUT_ID,
-       title = STRING_TOKEN(STR_FORM_TIME_OUT_TITLE);
-
-       label FORM_TIME_OUT_ID;
-       label LABEL_END;
-  endform;
-
-  form formid = FORM_MEMORY_CHECK_ID,
-       title = STRING_TOKEN(STR_FORM_MEMORY_CHECK_TITLE);
-
-       label FORM_MEMORY_CHECK_ID;
-       label LABEL_END;
-  endform;
-
-  form formid = FORM_UEFI_OPTIMIZED_BOOT_ID,
-       title = STRING_TOKEN(STR_FORM_UEFI_OPTIMIZED_BOOT_TITLE);
-
-       label FORM_UEFI_OPTIMIZED_BOOT_ID;
-       label LABEL_END;
   endform;
 
   form formid = FORM_DRV_ADD_ID,

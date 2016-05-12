@@ -39,6 +39,10 @@
   Variable.c
   UpdatePage.c
   BmLib.c
+  BootMaintenanceManagerCustomizedUi.c
+  BootMaintenanceManagerCustomizedUi.h
+  BootMaintenanceManagerCustomizedUiSupport.c
+  BootMaintenanceManagerCustomizedUiSupport.h
 
 [Packages]
   MdePkg/MdePkg.dec

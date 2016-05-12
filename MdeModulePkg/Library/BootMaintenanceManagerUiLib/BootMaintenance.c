@@ -924,16 +924,6 @@ BootMaintCallback (
           UpdateDrvDelPage (Private);
           break;
 
-        case FORM_BOOT_NEXT_ID:
-          CleanUpPage (FORM_BOOT_NEXT_ID, Private);
-          UpdateBootNextPage (Private);
-          break;
-
-        case FORM_TIME_OUT_ID:
-          CleanUpPage (FORM_TIME_OUT_ID, Private);
-          UpdateTimeOutPage (Private);
-          break;
-
         case FORM_CON_IN_ID:
         case FORM_CON_OUT_ID:
         case FORM_CON_ERR_ID:
@@ -1122,42 +1112,20 @@ DiscardChangeHandler (
 }
 
 /**
-  Create dynamic code for BMM.
 
-  @param  BmmCallbackInfo        The BMM context data.
+  Update the menus in the BMM page.
 
 **/
 VOID
-InitializeDrivers(
-  IN BMM_CALLBACK_DATA        *BmmCallbackInfo
+CustomizeMenus (
+  VOID
   )
 {
-  EFI_HII_HANDLE              HiiHandle;
   VOID                        *StartOpCodeHandle;
   VOID                        *EndOpCodeHandle;
-  EFI_IFR_GUID_LABEL          *StartLabel;
-  EFI_IFR_GUID_LABEL          *EndLabel;
-  UINTN                       Index;    
-  EFI_STRING                  String;
-  EFI_STRING_ID               Token;
-  EFI_STRING_ID               TokenHelp;  
-  EFI_HII_HANDLE              *HiiHandles;
-  EFI_GUID                    FormSetGuid;
-  CHAR16                      *DevicePathStr;
-  EFI_STRING_ID               DevicePathId;
-  EFI_IFR_FORM_SET            *Buffer;      
-  UINTN                       BufferSize;   
-  UINT8                       ClassGuidNum; 
-  EFI_GUID                    *ClassGuid;   
-  UINTN                       TempSize;
-  UINT8                       *Ptr;
-  EFI_STATUS                  Status;
+  EFI_IFR_GUID_LABEL          *StartGuidLabel;
+  EFI_IFR_GUID_LABEL          *EndGuidLabel;
 
-  TempSize =0;
-  BufferSize = 0;
-  Buffer = NULL;
-
-  HiiHandle = BmmCallbackInfo->BmmHiiHandle;
   //
   // Allocate space for creation of UpdateData Buffer
   //
@@ -1166,104 +1134,29 @@ InitializeDrivers(
 
   EndOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (EndOpCodeHandle != NULL);
-
   //
   // Create Hii Extend Label OpCode as the start opcode
   //
-  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  StartLabel->Number       = LABEL_BMM_PLATFORM_INFORMATION;
-
+  StartGuidLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartGuidLabel->Number       = LABEL_FORM_MAIN_START;
   //
   // Create Hii Extend Label OpCode as the end opcode
   //
-  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  EndLabel->Number       = LABEL_END;
+  EndGuidLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndGuidLabel->Number       = LABEL_FORM_MAIN_END;
 
   //
-  // Get all the Hii handles
+  //Updata Front Page form
   //
-  HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
+  UiCustomizeBMMPage (
+    mBmmCallbackInfo->BmmHiiHandle,
+    StartOpCodeHandle
+    );
 
-  //
-  // Search for formset of each class type
-  //
-  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    Status = HiiGetFormSetFromHiiHandle(HiiHandles[Index], &Buffer,&BufferSize);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
-    Ptr = (UINT8 *)Buffer;
-    while(TempSize < BufferSize)  {
-      TempSize += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
-
-      if (((EFI_IFR_OP_HEADER *) Ptr)->Length <= OFFSET_OF (EFI_IFR_FORM_SET, Flags)){
-        Ptr += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
-        continue;
-      }
-
-      //
-      // Find FormSet OpCode
-      //
-      ClassGuidNum = (UINT8) (((EFI_IFR_FORM_SET *)Ptr)->Flags & 0x3);
-      ClassGuid = (EFI_GUID *) (VOID *)(Ptr + sizeof (EFI_IFR_FORM_SET));
-      while (ClassGuidNum-- > 0) {
-        if (CompareGuid (&gEfiIfrBootMaintenanceGuid, ClassGuid) == 0){
-          ClassGuid ++;
-          continue;
-        }
-
-        String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->FormSetTitle, NULL);
-        if (String == NULL) {
-          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
-          ASSERT (String != NULL);
-        }
-        Token = HiiSetString (HiiHandle, 0, String, NULL);
-        FreePool (String);
-
-        String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->Help, NULL);
-        if (String == NULL) {
-          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
-          ASSERT (String != NULL);
-        }
-        TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
-        FreePool (String);
-
-        FormSetGuid = ((EFI_IFR_FORM_SET *)Ptr)->Guid;
-
-        DevicePathStr = BmmExtractDevicePathFromHiiHandle(HiiHandles[Index]);
-        DevicePathId  = 0;
-        if (DevicePathStr != NULL){
-          DevicePathId = HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
-          FreePool (DevicePathStr);
-        }
-         HiiCreateGotoExOpCode (
-           StartOpCodeHandle,
-           0,
-           Token,
-           TokenHelp,
-           0,
-           (EFI_QUESTION_ID) (Index + FRONT_PAGE_KEY_OFFSET),
-           0,
-           &FormSetGuid,
-           DevicePathId
-         );
-        break;
-      }
-      Ptr += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
-    }
-
-    FreePool(Buffer);
-    Buffer = NULL;
-    TempSize = 0;
-    BufferSize = 0;
-  } 
-  
   HiiUpdateForm (
-    HiiHandle,
+    mBmmCallbackInfo->BmmHiiHandle,
     &mBootMaintGuid,
     FORM_MAIN_ID,
     StartOpCodeHandle,
@@ -1271,8 +1164,7 @@ InitializeDrivers(
     );
 
   HiiFreeOpCodeHandle (StartOpCodeHandle);
-  HiiFreeOpCodeHandle (EndOpCodeHandle);  
-  FreePool (HiiHandles);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
 }
 
 /**
@@ -1292,8 +1184,6 @@ InitializeBmmConfig (
   UINT16          Index;
 
   ASSERT (CallbackData != NULL);
-
-  InitializeDrivers (CallbackData);
 
   //
   // Initialize data which located in BMM main page
@@ -1331,6 +1221,11 @@ InitializeBmmConfig (
   GetTerminalAttribute (CallbackData);
 
   CallbackData->BmmFakeNvData.ForceReconnect = TRUE;
+
+  //
+  // Update the menus.
+  //
+  CustomizeMenus ();
 
   //
   // Backup Initialize BMM configuartion data to BmmOldFakeNVData

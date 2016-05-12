@@ -45,8 +45,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FORM_BOOT_ADD_DESCRIPTION_ID         0x101F
 #define FORM_DRIVER_ADD_FILE_DESCRIPTION_ID  0x1020
 #define FORM_CON_MODE_ID                     0x1021
-#define FORM_MEMORY_CHECK_ID                 0x1022
-#define FORM_UEFI_OPTIMIZED_BOOT_ID          0x1023
 #define FORM_BOOT_FROM_FILE_ID               0x1024
 
 
@@ -85,9 +83,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // End Label
 //
+#define LABEL_FORM_MAIN_START                0xfffc
+#define LABEL_FORM_MAIN_END                  0xfffd
+
 #define LABEL_BMM_PLATFORM_INFORMATION       0xfffe
 #define LABEL_END                            0xffff
 #define MAX_MENU_NUMBER                      100
+
 
 ///
 /// This is the structure that will be used to store the
