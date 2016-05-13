@@ -1,0 +1,103 @@
+;; @file
+;  Reset Vector Data structure
+;  This structure is located at 0xFFFFFFC0
+;
+; Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+; This program and the accompanying materials
+; are licensed and made available under the terms and conditions of the BSD License
+; which accompanies this distribution.  The full text of the license may be found at
+; http://opensource.org/licenses/bsd-license.php.
+;
+; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+;
+;;
+
+BITS    16
+
+
+;
+; The layout of this file is fixed. The build tool makes assumption of the layout.
+;
+
+ORG     0x0
+;
+; Reserved
+;
+ReservedData:         DD 0eeeeeeeeh, 0eeeeeeeeh
+
+ ;  ORG     0x10
+ TIMES 0x10-($-$$) DB 0
+;
+; This is located at 0xFFFFFFD0h
+;
+    mov     di, "AP"
+    jmp     ApStartup
+
+ ;   ORG     0x20
+
+ TIMES 0x20-($-$$) DB 0
+
+; Pointer to the entry point of the PEI core
+; It is located at 0xFFFFFFE0, and is fixed up by some build tool
+; So if the value 8..1 appears in the final FD image, tool failure occurs.
+;
+PeiCoreEntryPoint:       DD      0x12345678
+
+;
+; This is the handler for all kinds of exceptions. Since it's for debugging
+; purpose only, nothing except a deadloop would be done here. Developers could
+; analyze the cause of the exception if a debugger had been attached.
+;
+InterruptHandler:
+    jmp     $
+    iret
+
+  ;  ORG     0x30
+ TIMES 0x30-($-$$) DB 0
+;
+; For IA32, the reset vector must be at 0xFFFFFFF0, i.e., 4G-16 byte
+; Execution starts here upon power-on/platform-reset.
+;
+ResetHandler:
+    nop
+    nop
+
+ApStartup:
+    ;
+    ; Jmp Rel16 instruction
+    ; Use machine code directly in case of the assembler optimization
+    ; SEC entry point relatvie address will be fixed up by some build tool.
+    ;
+    ; Typically, SEC entry point is the function _ModuleEntryPoint() defined in
+    ; SecEntry.asm
+    ;
+    DB      0x0e9
+    DW      -3
+
+  ; ORG     0x38
+
+ TIMES 0x38-($-$$) DB 0
+;
+; Ap reset vector segment address is at 0xFFFFFFF8
+; This will be fixed up by some build tool,
+; so if the value 1..8 appears in the final FD image,
+; tool failure occurs
+;
+ApSegAddress:    dd      0x12345678
+
+ ;   ORG     0x3c
+ TIMES 0x3c-($-$$) DB 0
+;
+; BFV Base is at 0xFFFFFFFC
+; This will be fixed up by some build tool,
+; so if the value 1..8 appears in the final FD image,
+; tool failure occurs.
+;
+BfvBase:     DD      0x12345678
+
+;
+; Nothing can go here, otherwise the layout of this file would change.
+;
+
+   ; END

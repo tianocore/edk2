@@ -1,0 +1,77 @@
+## @file
+# Provides drivers and definitions to support fsp in EDKII bios.
+#
+# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License that accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = IntelFsp2WrapperPkg
+  PACKAGE_GUID                   = FAFE06D4-7245-42D7-9FD2-E5D5E36AB0A0
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Provide FSP API related function.
+  FspWrapperApiLib|Include/Library/FspWrapperApiLib.h
+  FspWrapperApiTestLib|Include/Library/FspWrapperApiTestLib.h
+
+  ##  @libraryclass  Provide FSP hob process related function.
+  FspWrapperHobProcessLib|Include/Library/FspWrapperHobProcessLib.h
+
+  ##  @libraryclass  Provide FSP platform related function.
+  FspWrapperPlatformLib|Include/Library/FspWrapperPlatformLib.h
+
+[Guids]
+  #
+  # GUID defined in package
+  #
+  gFspWrapperTokenSpaceGuid             = { 0xa34cf082, 0xf50, 0x4f0d,  { 0x89, 0x8a, 0x3d, 0x39, 0x30, 0x2b, 0xc5, 0x1e } }
+  gFspApiPerformanceGuid                = { 0xc9122295, 0x56ed, 0x4d4e, { 0x06, 0xa6, 0x50, 0x8d, 0x89, 0x4d, 0x3e, 0x40 } }
+  gFspHobGuid                           = { 0x6d86fb36, 0xba90, 0x472c, { 0xb5, 0x83, 0x3f, 0xbe, 0xd3, 0xfb, 0x20, 0x9a } }
+
+[Ppis]
+  gFspSiliconInitDonePpiGuid            = { 0x4eb6e09c, 0xd256, 0x4e1e, { 0xb5, 0x0a, 0x87, 0x4b, 0xd2, 0x84, 0xb3, 0xde } }
+  gTopOfTemporaryRamPpiGuid             = { 0x2f3962b2, 0x57c5, 0x44ec, { 0x9e, 0xfc, 0xa6, 0x9f, 0xd3, 0x02, 0x03, 0x2b } }
+
+[Protocols]
+  gAddPerfRecordProtocolGuid            = { 0xc4a58d6d, 0x3677, 0x49cb, { 0xa0, 0x0a, 0x94, 0x70, 0x76, 0x5f, 0xb5, 0x5e } }
+
+################################################################################
+#
+# PCD Declarations section - list of all PCDs Declared by this Package
+#                            Only this package should be providing the
+#                            declaration, other packages should not.
+#
+################################################################################
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Provides the memory mapped base address of the BIOS CodeCache Flash Device.
+  gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheAddress|0xFFE00000|UINT32|0x10000001
+  ## Provides the size of the BIOS Flash Device.
+  gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00200000|UINT32|0x10000002
+
+  ## Indicates the base address of the first Microcode Patch in the Microcode Region
+  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x10000005
+  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x10000006
+  ## Indicates the offset of the Cpu Microcode.
+  gFspWrapperTokenSpaceGuid.PcdFlashMicrocodeOffset|0x90|UINT32|0x10000007
+
+  ## Indicate the PEI memory size platform want to report
+  gFspWrapperTokenSpaceGuid.PcdPeiMinMemSize|0x1800000|UINT32|0x40000004
+  ## Indicate the PEI memory size platform want to report
+  gFspWrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize|0x3000000|UINT32|0x40000005
+
+  ## This is the base address of FSP-T/M/S
+  gFspWrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
+  gFspWrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00000301
+  gFspWrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00000302

@@ -1,0 +1,189 @@
+/** @file
+
+  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include <PiPei.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+#include <Library/HobLib.h>
+#include <Library/PeiServicesLib.h>
+#include <Library/FspCommonLib.h>
+#include <FspGlobalData.h>
+#include <FspEas.h>
+
+/**
+  Get system memory resource descriptor by owner.
+
+  @param[in] OwnerGuid   resource owner guid
+**/
+EFI_HOB_RESOURCE_DESCRIPTOR *
+EFIAPI
+FspGetResourceDescriptorByOwner (
+  IN EFI_GUID   *OwnerGuid
+  )
+{
+  EFI_PEI_HOB_POINTERS    Hob;
+
+  //
+  // Get the HOB list for processing
+  //
+  Hob.Raw = GetHobList ();
+
+  //
+  // Collect memory ranges
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) && \
+          (CompareGuid (&Hob.ResourceDescriptor->Owner, OwnerGuid))) {
+        return  Hob.ResourceDescriptor;                     
+      }
+    }
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+  
+  return NULL;
+}
+
+/**
+  Get system memory from HOB.
+
+  @param[in,out] LowMemoryLength   less than 4G memory length
+  @param[in,out] HighMemoryLength  greater than 4G memory length
+**/
+VOID
+EFIAPI
+FspGetSystemMemorySize (
+  IN OUT UINT64              *LowMemoryLength,
+  IN OUT UINT64              *HighMemoryLength
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_BOOT_MODE               BootMode;
+  EFI_RESOURCE_ATTRIBUTE_TYPE ResourceAttribute;
+  EFI_PEI_HOB_POINTERS        Hob;
+
+  ResourceAttribute = (
+                       EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                       EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                       EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+                       EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+                       EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+                       EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
+                       );
+
+  Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  if (BootMode != BOOT_ON_S3_RESUME) {
+    ResourceAttribute |= EFI_RESOURCE_ATTRIBUTE_TESTED;
+  }
+
+  *HighMemoryLength = 0;
+  *LowMemoryLength  = SIZE_1MB;
+  //
+  // Get the HOB list for processing
+  //
+  Hob.Raw = GetHobList ();
+
+  //
+  // Collect memory ranges
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) ||
+          ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) &&
+           (Hob.ResourceDescriptor->ResourceAttribute == ResourceAttribute))) {
+        //
+        // Need memory above 1MB to be collected here
+        //
+        if (Hob.ResourceDescriptor->PhysicalStart >= BASE_1MB &&
+            Hob.ResourceDescriptor->PhysicalStart < (EFI_PHYSICAL_ADDRESS) BASE_4GB) {
+          *LowMemoryLength += (UINT64) (Hob.ResourceDescriptor->ResourceLength);
+        } else if (Hob.ResourceDescriptor->PhysicalStart >= (EFI_PHYSICAL_ADDRESS) BASE_4GB) {
+          *HighMemoryLength += (UINT64) (Hob.ResourceDescriptor->ResourceLength);
+        }
+      }
+    }
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+}
+
+/**
+  Migrate BootLoader data before destroying CAR.
+
+**/
+VOID
+EFIAPI
+FspMigrateTemporaryMemory (
+  VOID
+ )
+{
+  UINT32                    BootLoaderTempRamStart;
+  UINT32                    BootLoaderTempRamEnd;
+  UINT32                    BootLoaderTempRamSize;
+  UINT32                    OffsetGap;
+  UINT32                    FspParamPtr;
+  VOID                      *BootLoaderTempRamHob;
+  UINT32                    MemoryInitUpdPtr;
+  VOID                      *PlatformDataPtr;
+
+  //
+  // Get the temporary memory range used by the BootLoader
+  //
+  BootLoaderTempRamStart = GetFspCarBase ();
+  BootLoaderTempRamSize  = GetFspCarSize () - PcdGet32(PcdFspTemporaryRamSize);
+
+  BootLoaderTempRamEnd   = BootLoaderTempRamStart +  BootLoaderTempRamSize;
+
+  //
+  // Build a Boot Loader Temporary Memory GUID HOB
+  //
+  BootLoaderTempRamHob = (VOID *)AllocatePages (EFI_SIZE_TO_PAGES (BootLoaderTempRamSize));
+  ASSERT(BootLoaderTempRamHob != NULL);
+
+  DEBUG ((DEBUG_INFO, "FSP_BOOT_LOADER_TEMPORARY_MEMORY_HOB\n"));
+  DEBUG ((DEBUG_INFO, "FspBootLoaderTemporaryMemory Base : %x\n", BootLoaderTempRamStart));
+  DEBUG ((DEBUG_INFO, "FspBootLoaderTemporaryMemory Size : %x\n", BootLoaderTempRamSize));
+
+  CopyMem (BootLoaderTempRamHob, (VOID *)BootLoaderTempRamStart, BootLoaderTempRamSize);
+  OffsetGap = (UINT32)BootLoaderTempRamHob - BootLoaderTempRamStart;
+
+  //
+  // Fix the FspMemoryinit Parameter Pointers to the new location.
+  //
+  FspParamPtr = GetFspApiParameter ();
+  if ((VOID *)FspParamPtr != NULL && FspParamPtr >= BootLoaderTempRamStart && 
+      FspParamPtr < BootLoaderTempRamEnd) {
+    SetFspApiParameter (FspParamPtr + OffsetGap);
+  }
+
+  //
+  // Update UPD pointer in FSP Global Data
+  //
+  MemoryInitUpdPtr = (UINT32)((UINT32 *)GetFspMemoryInitUpdDataPointer ());
+  if (MemoryInitUpdPtr >= BootLoaderTempRamStart && MemoryInitUpdPtr < BootLoaderTempRamEnd) {
+    SetFspMemoryInitUpdDataPointer ((VOID *)(MemoryInitUpdPtr + OffsetGap));
+  }
+
+  //
+  // Update Platform data pointer in FSP Global Data
+  //
+  PlatformDataPtr = GetFspPlatformDataPointer ();
+  if (((UINT32)PlatformDataPtr >= BootLoaderTempRamStart) &&
+      ((UINT32)PlatformDataPtr <  BootLoaderTempRamEnd)) {
+    SetFspPlatformDataPointer ((UINT8 *)PlatformDataPtr + OffsetGap);
+  }
+}
