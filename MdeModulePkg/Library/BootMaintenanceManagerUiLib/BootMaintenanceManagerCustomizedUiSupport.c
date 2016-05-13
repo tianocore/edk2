@@ -42,7 +42,6 @@ BmmCreateBootNextMenu(
   )
 {
   BM_MENU_ENTRY   *NewMenuEntry;
-  BM_LOAD_CONTEXT *NewLoadContext;
   UINTN           NumberOfOptions;
   UINT16          Index;
   VOID            *OptionsOpCodeHandle;
@@ -59,7 +58,6 @@ BmmCreateBootNextMenu(
 
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
-    NewLoadContext  = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
 
     StringBuffer = HiiGetString (HiiHandle, NewMenuEntry->DisplayStringToken, NULL);
     ASSERT (StringBuffer != NULL);
