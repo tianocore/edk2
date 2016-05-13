@@ -1,0 +1,50 @@
+## @file
+# Instance of FspPlatformLib
+#
+#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseFspPlatformLib
+  FILE_GUID                      = B6380BFB-7140-4C52-AC42-8C966C9A3F34
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspPlatformLib
+
+[Sources]
+  FspPlatformMemory.c
+  FspPlatformNotify.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  FspCommonLib
+  PerformanceLib
+  ReportStatusCodeLib
+
+[Pcd]
+  gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress    ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase            ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize            ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize         ## CONSUMES
+
+[Guids]
+  gFspPerformanceDataGuid                                   ## CONSUMES ## GUID
+  gFspEventEndOfFirmwareGuid                                ## PRODUCES ## GUID
+
+[FixedPcd]
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPatchEntry        ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPerfEntry         ## CONSUMES

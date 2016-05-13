@@ -1,0 +1,77 @@
+## @file
+# FSP-M wrapper PEI Module
+#
+# This PEIM initialize FSP.
+# This will be invoked only once. It will call FspMemoryInit API,
+# register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
+# notify to call FspSiliconInit API.
+#
+#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = FspmWrapperPeim
+  FILE_GUID                      = 9FAAD0FF-0E0C-4885-A738-BAB4E4FA1E66
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = FspmWrapperPeimEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  HobLib
+  FspWrapperPlatformLib
+  FspWrapperHobProcessLib
+  DebugAgentLib
+  UefiCpuLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  PerformanceLib
+  TimerLib
+  FspWrapperApiLib
+  FspWrapperApiTestLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+
+[Pcd]
+  gFspWrapperTokenSpaceGuid.PcdFspmBaseAddress                ## CONSUMES
+
+[Sources]
+  FspmWrapperPeim.c
+
+[Ppis]
+  gTopOfTemporaryRamPpiGuid             ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid             ## PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid        ## PRODUCES
+
+[Guids]
+  gFspHobGuid                           ## PRODUCES ## HOB
+  gFspApiPerformanceGuid                ## CONSUMES ## GUID
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid
