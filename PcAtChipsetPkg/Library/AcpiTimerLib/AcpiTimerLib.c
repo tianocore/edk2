@@ -89,7 +89,7 @@ AcpiTimerLibConstructor (
   //
   // If ACPI I/O space is not enabled yet, program ACPI I/O base address and enable it.
   //
-  if ((PciRead8 (PCI_LIB_ADDRESS (Bus, Device, Function, EnableRegister) & EnableMask) != EnableMask)) {
+  if ((PciRead8 (PCI_LIB_ADDRESS (Bus, Device, Function, EnableRegister)) & EnableMask) != EnableMask) {
     PciWrite16 (
       PCI_LIB_ADDRESS (Bus, Device, Function, PcdGet16 (PcdAcpiIoPciBarRegisterOffset)),
       PcdGet16 (PcdAcpiIoPortBaseAddress)
