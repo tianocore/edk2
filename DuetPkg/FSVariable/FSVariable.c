@@ -1337,6 +1337,10 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  if (VariableName[0] == 0) {
+    return EFI_NOT_FOUND;
+  }
+
   //
   // Find existing variable
   //
