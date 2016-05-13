@@ -26,7 +26,7 @@ typedef struct {
   BOOLEAN         EmptyLineAfter;
 } UI_HII_DRIVER_INSTANCE;
 
-UI_HII_DRIVER_INSTANCE       *gHiiDriverList;
+STATIC UI_HII_DRIVER_INSTANCE       *gHiiDriverList;
 
 
 /**
