@@ -2849,6 +2849,10 @@ VariableServiceGetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (VariableName[0] == 0) {
+    return EFI_NOT_FOUND;
+  }
+
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
