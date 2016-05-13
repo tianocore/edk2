@@ -402,7 +402,6 @@
   #
   CorebootModulePkg/PciRootBridgeNoEnumerationDxe/PciRootBridgeNoEnumeration.inf
   CorebootModulePkg/PciBusNoEnumerationDxe/PciBusNoEnumeration.inf
-  CorebootModulePkg/PciSioSerialDxe/PciSioSerialDxe.inf
 
   #
   # SCSI/ATA/IDE/DISK Support
@@ -442,7 +441,7 @@
   #
   # ISA Support
   #
-  CorebootModulePkg/SerialDxe/SerialDxe.inf
+  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
   #
   # Console Support
