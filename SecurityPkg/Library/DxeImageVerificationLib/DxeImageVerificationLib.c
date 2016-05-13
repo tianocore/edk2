@@ -13,6 +13,7 @@
   untrusted PE/COFF image and validate its data structure within this image buffer before use.
 
 Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -70,6 +71,8 @@ HASH_TABLE mHash[] = {
   { L"SHA384", 48, &mHashOidValue[23], 9, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Final},
   { L"SHA512", 64, &mHashOidValue[32], 9, Sha512GetContextSize, Sha512Init, Sha512Update, Sha512Final}
 };
+
+EFI_STRING mHashTypeStr;
 
 /**
   SecureBoot Hook for processing image verification.
@@ -340,6 +343,7 @@ HashPeImage (
     return FALSE;
   }
 
+  mHashTypeStr = mHash[HashAlg].Name;
   CtxSize   = mHash[HashAlg].GetContextSize();
 
   HashCtx = AllocatePool (CtxSize);
@@ -1303,6 +1307,7 @@ IsForbiddenByDbx (
                         );
         if (IsForbidden) {
           SecureBootHook (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, CertData);
+          DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature is forbidden by DBX.\n"));
           goto Done;
         }
 
@@ -1361,6 +1366,7 @@ IsForbiddenByDbx (
         //
         continue;
       }
+      DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature failed the timestamp check.\n"));
       goto Done;
     }
 
@@ -1476,9 +1482,12 @@ IsAllowedByDb (
 
             if (IsCertHashFoundInDatabase (RootCert, RootCertSize, (EFI_SIGNATURE_LIST *)DbxData, DbxDataSize, &RevocationTime)) {
               //
-              // Check the timestamp signature and signing time to determine if the image can be trusted.
+              // Check the timestamp signature and signing time to determine if the RootCert can be trusted.
               //
               VerifyStatus = PassTimestampCheck (AuthData, AuthDataSize, &RevocationTime);
+              if (!VerifyStatus) {
+                DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed and signature is accepted by DB, but its root cert failed the timestamp check.\n"));
+              }
             }
 
             goto Done;
@@ -1679,6 +1688,7 @@ DxeImageVerificationHandler (
     //
     // The information can't be got from the invalid PeImage
     //
+    DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: PeImage invalid. Cannot retrieve image information.\n"));
     goto Done;
   }
 
@@ -1702,6 +1712,7 @@ DxeImageVerificationHandler (
     //
     // It is not a valid Pe/Coff file.
     //
+    DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Not a valid PE/COFF image.\n"));
     goto Done;
   }
 
@@ -1747,6 +1758,7 @@ DxeImageVerificationHandler (
     // and not be reflected in the security data base "dbx".
     //
     if (!HashPeImage (HASHALG_SHA256)) {
+      DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Failed to hash this image using %s.\n", mHashTypeStr));
       goto Done;
     }
 
@@ -1754,6 +1766,7 @@ DxeImageVerificationHandler (
       //
       // Image Hash is in forbidden database (DBX).
       //
+      DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is not signed and %s hash of image is forbidden by DBX.\n", mHashTypeStr));
       goto Done;
     }
 
@@ -1767,6 +1780,7 @@ DxeImageVerificationHandler (
     //
     // Image Hash is not found in both forbidden and allowed database.
     //
+    DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is not signed and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
     goto Done;
   }
 
@@ -1846,11 +1860,14 @@ DxeImageVerificationHandler (
     //
     if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE1, mImageDigest, &mCertType, mImageDigestSize)) {
       Action = EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND;
+      DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but %s hash of image is found in DBX.\n", mHashTypeStr));
       VerifyStatus = EFI_ACCESS_DENIED;
       break;
     } else if (EFI_ERROR (VerifyStatus)) {
       if (IsSignatureFoundInDatabase (EFI_IMAGE_SECURITY_DATABASE, mImageDigest, &mCertType, mImageDigestSize)) {
         VerifyStatus = EFI_SUCCESS;
+      } else {
+        DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
       }
     }
   }
