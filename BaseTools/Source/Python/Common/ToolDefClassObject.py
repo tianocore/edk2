@@ -53,7 +53,7 @@ class ToolDefClassObject(object):
 
     ## LoadToolDefFile
     #
-    # Load target.txt file and parse it, return a set structure to store keys and values
+    # Load target.txt file and parse it
     #
     # @param Filename:  Input value for full path of tools_def.txt
     #
