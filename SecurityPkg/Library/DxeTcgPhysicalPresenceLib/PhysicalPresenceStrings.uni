@@ -2,6 +2,7 @@
   String definitions for TPM 1.2 physical presence confirm text.
 
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -42,7 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string TPM_NO_PPI_MAINTAIN           #language en-US    "maintain"
 #string TPM_NO_PPI_INFO               #language en-US    "to approve future Operating System requests "
 
-#string TPM_WARNING_MAINTAIN          #language en-US    "WARNING: Allowing changes to the TPM’s firmware may affect the operation of the TPM and may erase information stored on the TPM.\nYou may lose all created keys and access to data encrypted by these keys.\n\n"
+#string TPM_WARNING_MAINTAIN          #language en-US    "WARNING: Allowing changes to the TPM's firmware may affect the operation of the TPM and may erase information stored on the TPM.\nYou may lose all created keys and access to data encrypted by these keys.\n\n"
 #string TPM_WARNING                   #language en-US    "WARNING: Doing so might prevent security applications that rely on the TPM from functioning as expected\n\n"
 #string TPM_WARNING_CLEAR             #language en-US    "WARNING: Clearing erases information stored on the TPM. You will lose all created keys and access to data encrypted by these keys. "
 #string TPM_WARNING_CLEAR_CONT        #language en-US    "Take ownership as soon as possible after this step.\n\n"
