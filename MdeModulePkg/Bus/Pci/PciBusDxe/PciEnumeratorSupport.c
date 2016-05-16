@@ -165,6 +165,14 @@ PciPciDeviceInfoCollector (
           }
 
           //
+          // Ensure secondary bus number is greater than the primary bus number to avoid
+          // any potential dead loop when PcdPciDisableBusEnumeration is set to TRUE
+          //
+          if (SecBus <= StartBusNumber) {
+            break;
+          }
+
+          //
           // Get resource padding for PPB
           //
           GetResourcePaddingPpb (PciIoDevice);
