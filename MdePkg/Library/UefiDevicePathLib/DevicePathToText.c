@@ -42,6 +42,7 @@ UefiDevicePathLibCatPrint (
 
   VA_START (Args, Fmt);
   Count = SPrintLength (Fmt, Args);
+  VA_END(Args);
 
   if ((Str->Count + (Count + 1)) * sizeof (CHAR16) > Str->Capacity) {
     Str->Capacity = (Str->Count + (Count + 1) * 2) * sizeof (CHAR16);
@@ -52,6 +53,7 @@ UefiDevicePathLibCatPrint (
                  );
     ASSERT (Str->Str != NULL);
   }
+  VA_START (Args, Fmt);
   UnicodeVSPrint (&Str->Str[Str->Count], Str->Capacity - Str->Count * sizeof (CHAR16), Fmt, Args);
   Str->Count += Count;
   
