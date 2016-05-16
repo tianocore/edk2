@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM2 device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -431,8 +431,8 @@ MeasureFvImage (
   //
   // Add new FV into the measured FV list.
   //
-  ASSERT (mMeasuredBaseFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
-  if (mMeasuredBaseFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+  ASSERT (mMeasuredBaseFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported));
+  if (mMeasuredBaseFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported)) {
     mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobBase   = FvBase;
     mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobLength = FvLength;
     mMeasuredBaseFvIndex++;
@@ -543,8 +543,8 @@ FirmwareVolmeInfoPpiNotifyCallback (
   //
   if (Fv->ParentFvName != NULL || Fv->ParentFileName != NULL ) {
     
-    ASSERT (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported));
-    if (mMeasuredChildFvIndex < FixedPcdGet32 (PcdPeiCoreMaxFvSupported)) {
+    ASSERT (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported));
+    if (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported)) {
       //
       // Check whether FV is in the measured child FV list.
       //
