@@ -758,7 +758,7 @@ SplitTable (
 **/
 EFI_STATUS
 EFIAPI
-CoreGetMemoryMapPropertiesTable (
+CoreGetMemoryMapWithSeparatedImageSection (
   IN OUT UINTN                  *MemoryMapSize,
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
   OUT UINTN                     *MapKey,
@@ -1364,7 +1364,7 @@ InstallPropertiesTable (
       return ;
     }
 
-    gBS->GetMemoryMap = CoreGetMemoryMapPropertiesTable;
+    gBS->GetMemoryMap = CoreGetMemoryMapWithSeparatedImageSection;
     gBS->Hdr.CRC32 = 0;
     gBS->CalculateCrc32 ((UINT8 *)gBS, gBS->Hdr.HeaderSize, &gBS->Hdr.CRC32);
 

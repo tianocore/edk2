@@ -62,7 +62,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 EFIAPI
-CoreGetMemoryMapPropertiesTable (
+CoreGetMemoryMapWithSeparatedImageSection (
   IN OUT UINTN                  *MemoryMapSize,
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
   OUT UINTN                     *MapKey,
@@ -120,7 +120,7 @@ InstallMemoryAttributesTable (
 
   MemoryMapSize = 0;
   MemoryMap = NULL;
-  Status = CoreGetMemoryMapPropertiesTable (
+  Status = CoreGetMemoryMapWithSeparatedImageSection (
              &MemoryMapSize,
              MemoryMap,
              &MapKey,
@@ -133,7 +133,7 @@ InstallMemoryAttributesTable (
     MemoryMap = AllocatePool (MemoryMapSize);
     ASSERT (MemoryMap != NULL);
 
-    Status = CoreGetMemoryMapPropertiesTable (
+    Status = CoreGetMemoryMapWithSeparatedImageSection (
                &MemoryMapSize,
                MemoryMap,
                &MapKey,
