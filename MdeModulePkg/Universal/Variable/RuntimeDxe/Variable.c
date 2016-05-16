@@ -1771,6 +1771,7 @@ CheckRemainingSpaceForConsistencyInternal (
     TotalNeededSize += VariableEntry->VariableSize;
     VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   }
+  VA_END  (Args);
 
   if (RemainingVariableStorageSize >= TotalNeededSize) {
     //
@@ -1823,6 +1824,7 @@ CheckRemainingSpaceForConsistencyInternal (
     RemainingVariableStorageSize -= VariableEntry->VariableSize;
     VariableEntry = VA_ARG (Args, VARIABLE_ENTRY_CONSISTENCY *);
   }
+  VA_END  (Args);
 
   return TRUE;
 }
