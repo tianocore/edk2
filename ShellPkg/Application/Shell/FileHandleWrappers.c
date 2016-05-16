@@ -422,6 +422,12 @@ FileInterfaceStdInRead(
     gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
     Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
     if (EFI_ERROR (Status)) {
+
+      if (Status == EFI_NOT_READY)
+        continue;
+
+      ZeroMem (CurrentString, MaxStr * sizeof(CHAR16));
+      StringLen = 0;
       break;
     }
 
