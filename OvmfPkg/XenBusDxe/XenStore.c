@@ -1319,8 +1319,11 @@ XenStoreVSPrint (
   CHAR8 *Buf;
   XENSTORE_STATUS Status;
   UINTN BufSize;
+  VA_LIST Marker2;
 
-  BufSize = SPrintLengthAsciiFormat (FormatString, Marker) + 1;
+  VA_COPY (Marker2, Marker);
+  BufSize = SPrintLengthAsciiFormat (FormatString, Marker2) + 1;
+  VA_END (Marker2);
   Buf = AllocateZeroPool (BufSize);
   AsciiVSPrint (Buf, BufSize, FormatString, Marker);
   Status = XenStoreWrite (Transaction, DirectoryPath, Node, Buf);
