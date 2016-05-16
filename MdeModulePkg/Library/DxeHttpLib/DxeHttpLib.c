@@ -1673,11 +1673,13 @@ HttpGenRequestMessage (
 
   ASSERT (Message != NULL);
 
-  *RequestMsg = NULL;
-  MsgSize = 0;
-  Success = FALSE;
-  HttpHdr = NULL;
-  AppendList = NULL;
+  *RequestMsg           = NULL;
+  Status                = EFI_SUCCESS;
+  HttpHdrSize           = 0;
+  MsgSize               = 0;
+  Success               = FALSE;
+  HttpHdr               = NULL;
+  AppendList            = NULL;
   HttpUtilitiesProtocol = NULL;
 
   //
