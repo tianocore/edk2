@@ -26,12 +26,11 @@
 
   Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
   OpenFirmware device paths therein to UEFI device path fragments. Match the
-  translated fragments against BootOptionList, and rewrite the BootOrder NvVar
-  so that it corresponds to the order described in fw_cfg.
+  translated fragments against the current list of boot options, and rewrite
+  the BootOrder NvVar so that it corresponds to the order described in fw_cfg.
 
-  @param[in] BootOptionList  A boot option list, created with
-                             BdsLibEnumerateAllBootOption ().
-
+  Platform BDS should call this function after EfiBootManagerConnectAll () and
+  EfiBootManagerRefreshAllBootOption () return.
 
   @retval RETURN_SUCCESS            BootOrder NvVar rewritten.
 
@@ -51,7 +50,7 @@
 **/
 RETURN_STATUS
 SetBootOrderFromQemu (
-  IN  CONST LIST_ENTRY *BootOptionList
+  VOID
   );
 
 

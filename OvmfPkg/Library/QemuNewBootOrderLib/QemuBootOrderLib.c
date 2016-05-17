@@ -1696,12 +1696,11 @@ PruneBootVariables (
 
   Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
   OpenFirmware device paths therein to UEFI device path fragments. Match the
-  translated fragments against BootOptionList, and rewrite the BootOrder NvVar
-  so that it corresponds to the order described in fw_cfg.
+  translated fragments against the current list of boot options, and rewrite
+  the BootOrder NvVar so that it corresponds to the order described in fw_cfg.
 
-  @param[in] BootOptionList  A boot option list, created with
-                             BdsLibEnumerateAllBootOption ().
-
+  Platform BDS should call this function after EfiBootManagerConnectAll () and
+  EfiBootManagerRefreshAllBootOption () return.
 
   @retval RETURN_SUCCESS            BootOrder NvVar rewritten.
 
@@ -1721,7 +1720,7 @@ PruneBootVariables (
 **/
 RETURN_STATUS
 SetBootOrderFromQemu (
-  IN  CONST LIST_ENTRY *BootOptionList
+  VOID
   )
 {
   RETURN_STATUS                    Status;
@@ -1740,15 +1739,6 @@ SetBootOrderFromQemu (
   CHAR16                           Translated[TRANSLATION_OUTPUT_SIZE];
   EFI_BOOT_MANAGER_LOAD_OPTION     *BootOptions;
   UINTN                            BootOptionCount;
-
-  //
-  // The QemuBootOrderLib is linked by OvmfPkg and ArmVirtPkg.
-  // OvmfPkg was changed to use the new BDS @ MdeModulePkg, so boot options
-  // are no longer stored in linked list.
-  // But we don't change the QemuBootOrderLib class interface because
-  // ArmVirtPkg are still using old BDS @ IntelFrameworkModulePkg.
-  //
-  ASSERT (BootOptionList == NULL);
 
   Status = QemuFwCfgFindFile ("bootorder", &FwCfgItem, &FwCfgSize);
   if (Status != RETURN_SUCCESS) {

@@ -551,7 +551,7 @@ PlatformBootManagerAfterConsole (
   // the QEMU configuration.
   //
   EfiBootManagerRefreshAllBootOption ();
-  SetBootOrderFromQemu (NULL);
+  SetBootOrderFromQemu ();
 }
 
 /**

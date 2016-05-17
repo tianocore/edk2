@@ -1305,7 +1305,7 @@ Routine Description:
     PcdGetPtr (PcdShellFile), L"EFI Internal Shell", LOAD_OPTION_ACTIVE
     );
 
-  SetBootOrderFromQemu (NULL);
+  SetBootOrderFromQemu ();
 }
 
 /**
