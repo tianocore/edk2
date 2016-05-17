@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 0 2011,Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -389,7 +389,7 @@ EmuGopSimpleTextInExReadKeyStrokeEx (
     return EFI_INVALID_PARAMETER;
   }
 
-  Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_THIS (This);
+  Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
   if (Private->EmuGraphicsWindow == NULL) {
     return EFI_NOT_READY;
   }
@@ -442,7 +442,7 @@ EmuGopSimpleTextInExSetState (
   EFI_STATUS        Status;
   EFI_TPL           OldTpl;
 
-  Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_THIS (This);
+  Private = GOP_PRIVATE_DATA_FROM_TEXT_IN_EX_THIS (This);
   if (Private->EmuGraphicsWindow == NULL) {
     return EFI_NOT_READY;
   }
