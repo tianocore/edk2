@@ -195,11 +195,13 @@ UiSupportLibCallbackHandler (
     // Do nothing for other UEFI Action. Only do call back when data is changed.
     //
     *Status = EFI_UNSUPPORTED;
+    return TRUE;
   }
 
   if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if ((Value == NULL) || (ActionRequest == NULL)) {
       *Status = EFI_INVALID_PARAMETER;
+      return TRUE;
     }
 
     *Status = EFI_SUCCESS;
