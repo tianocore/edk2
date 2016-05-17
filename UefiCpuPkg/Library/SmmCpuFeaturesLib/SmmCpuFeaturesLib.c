@@ -1,7 +1,7 @@
 /** @file
 The CPU specific programming for PiSmmCpuDxeSmm module.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -245,9 +245,26 @@ SmmCpuFeaturesInitializeProcessor (
   // is protected and the normal mode code execution will fail.
   //
   if (mSmrrSupported) {
-    AsmWriteMsr64 (mSmrrPhysBaseMsr, CpuHotPlugData->SmrrBase | MTRR_CACHE_WRITE_BACK);
-    AsmWriteMsr64 (mSmrrPhysMaskMsr, (~(CpuHotPlugData->SmrrSize - 1) & EFI_MSR_SMRR_MASK));
-    mSmrrEnabled[CpuIndex] = FALSE;
+    //
+    // SMRR size cannot be less than 4-KBytes
+    // SMRR size must be of length 2^n
+    // SMRR base alignment cannot be less than SMRR length
+    //
+    if ((CpuHotPlugData->SmrrSize < SIZE_4KB) ||
+        (CpuHotPlugData->SmrrSize != GetPowerOfTwo32 (CpuHotPlugData->SmrrSize)) ||
+        ((CpuHotPlugData->SmrrBase & ~(CpuHotPlugData->SmrrSize - 1)) != CpuHotPlugData->SmrrBase)) {
+      //
+      // Print message and halt if CPU is Monarch
+      //
+      if (IsMonarch) {
+        DEBUG ((EFI_D_ERROR, "SMM Base/Size does not meet alignment/size requirement!\n"));
+        CpuDeadLoop ();
+      }
+    } else {
+      AsmWriteMsr64 (mSmrrPhysBaseMsr, CpuHotPlugData->SmrrBase | MTRR_CACHE_WRITE_BACK);
+      AsmWriteMsr64 (mSmrrPhysMaskMsr, (~(CpuHotPlugData->SmrrSize - 1) & EFI_MSR_SMRR_MASK));
+      mSmrrEnabled[CpuIndex] = FALSE;
+    }
   }
 
   //
