@@ -2,7 +2,7 @@
   Pei Core Firmware File System service routines.
   
 Copyright (c) 2015 HP Development Company, L.P.
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -545,7 +545,8 @@ FirmwareVolmeInfoPpiNotifyCallback (
   EFI_PEI_FILE_HANDLE                   FileHandle;
   VOID                                  *DepexData;
   BOOLEAN                               IsFvInfo2;
-  
+  UINTN                                 CurFvCount;
+
   Status       = EFI_SUCCESS;
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
@@ -610,10 +611,11 @@ FirmwareVolmeInfoPpiNotifyCallback (
     PrivateData->Fv[PrivateData->FvCount].FvPpi    = FvPpi;
     PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
     PrivateData->Fv[PrivateData->FvCount].AuthenticationStatus = FvInfo2Ppi.AuthenticationStatus;
+    CurFvCount = PrivateData->FvCount;
     DEBUG ((
       EFI_D_INFO, 
       "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n", 
-      (UINT32) PrivateData->FvCount, 
+      (UINT32) CurFvCount,
       (VOID *) FvInfo2Ppi.FvInfo, 
       FvInfo2Ppi.FvInfoSize,
       FvHandle
@@ -647,8 +649,8 @@ FirmwareVolmeInfoPpiNotifyCallback (
           }
         }
         
-        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, PrivateData->FvCount - 1, FvHandle));
-        ProcessFvFile (PrivateData, &PrivateData->Fv[PrivateData->FvCount - 1], FileHandle);
+        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
+        ProcessFvFile (PrivateData, &PrivateData->Fv[CurFvCount], FileHandle);
       }
     } while (FileHandle != NULL);
   } else {
@@ -2216,7 +2218,8 @@ ThirdPartyFvPpiNotifyCallback (
   UINTN                        FvIndex;
   EFI_PEI_FILE_HANDLE          FileHandle;
   VOID                         *DepexData;  
-  
+  UINTN                        CurFvCount;
+
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   FvPpi = (EFI_PEI_FIRMWARE_VOLUME_PPI*) Ppi;
   
@@ -2264,10 +2267,11 @@ ThirdPartyFvPpiNotifyCallback (
     PrivateData->Fv[PrivateData->FvCount].FvPpi    = FvPpi;
     PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
     PrivateData->Fv[PrivateData->FvCount].AuthenticationStatus = AuthenticationStatus;
+    CurFvCount = PrivateData->FvCount;
     DEBUG ((
       EFI_D_INFO, 
       "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n", 
-      (UINT32) PrivateData->FvCount, 
+      (UINT32) CurFvCount,
       (VOID *) FvInfo, 
       FvInfoSize,
       FvHandle
@@ -2301,8 +2305,8 @@ ThirdPartyFvPpiNotifyCallback (
           }
         }
         
-        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, PrivateData->FvCount - 1, FvHandle));
-        ProcessFvFile (PrivateData, &PrivateData->Fv[PrivateData->FvCount - 1], FileHandle);
+        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
+        ProcessFvFile (PrivateData, &PrivateData->Fv[CurFvCount], FileHandle);
       }
     } while (FileHandle != NULL);
   } while (TRUE);
