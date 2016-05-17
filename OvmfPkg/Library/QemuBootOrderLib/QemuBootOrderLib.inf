@@ -17,7 +17,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = QemuNewBootOrderLib
+  BASE_NAME                      = QemuBootOrderLib
   FILE_GUID                      = 1D677A58-C753-4AF1-B552-EFE142DF8F57
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
