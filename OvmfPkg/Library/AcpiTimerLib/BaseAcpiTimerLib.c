@@ -63,8 +63,6 @@ AcpiTimerLibConstructor (
       return RETURN_UNSUPPORTED;
   }
 
-  mAcpiTimerIoAddr = (PciRead32 (Pmba) & ~PMBA_RTE) + ACPI_TIMER_OFFSET;
-
   //
   // Check to see if the Power Management Base Address is already enabled
   //
@@ -81,6 +79,7 @@ AcpiTimerLibConstructor (
     PciOr8 (AcpiCtlReg, AcpiEnBit);
   }
 
+  mAcpiTimerIoAddr = (PciRead32 (Pmba) & ~PMBA_RTE) + ACPI_TIMER_OFFSET;
   return RETURN_SUCCESS;
 }
 
