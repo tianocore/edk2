@@ -982,6 +982,14 @@ UiEntry (
   EFI_BOOT_LOGO_PROTOCOL        *BootLogo;
 
   //
+  // Enter Setup page.
+  //
+  REPORT_STATUS_CODE (
+    EFI_PROGRESS_CODE,
+    (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_PC_USER_SETUP)
+    );
+
+  //
   // Indicate if the connect all has been performed before.
   //
   if (ConnectAllHappened) {
