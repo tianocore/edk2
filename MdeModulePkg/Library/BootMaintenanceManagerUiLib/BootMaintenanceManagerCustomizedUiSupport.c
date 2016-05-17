@@ -42,52 +42,61 @@ BmmCreateBootNextMenu(
   )
 {
   BM_MENU_ENTRY   *NewMenuEntry;
-  UINTN           NumberOfOptions;
+  BM_LOAD_CONTEXT *NewLoadContext;
   UINT16          Index;
   VOID            *OptionsOpCodeHandle;
-  CHAR16          *StringBuffer;
-  EFI_STRING_ID   OptionId;
+  UINT32          BootNextIndex;
 
-  NumberOfOptions = BootOptionMenu.MenuNumber;
-  if (NumberOfOptions == 0) {
+  if (BootOptionMenu.MenuNumber == 0) {
     return;
   }
+
+  BootNextIndex = NONE_BOOTNEXT_VALUE;
 
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
   for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry    = BOpt_GetMenuEntry (&BootOptionMenu, Index);
+    NewLoadContext  = (BM_LOAD_CONTEXT *) NewMenuEntry->VariableContext;
 
-    StringBuffer = HiiGetString (HiiHandle, NewMenuEntry->DisplayStringToken, NULL);
-    ASSERT (StringBuffer != NULL);
-    OptionId = HiiSetString (HiiHandle, 0, StringBuffer, NULL);
-    FreePool (StringBuffer);
-
-    HiiCreateOneOfOptionOpCode (
-      OptionsOpCodeHandle,
-      OptionId,
-      0,
-      EFI_IFR_TYPE_NUM_SIZE_16,
-      Index
-      );
+    if (NewLoadContext->IsBootNext) {
+      HiiCreateOneOfOptionOpCode (
+        OptionsOpCodeHandle,
+        NewMenuEntry->DisplayStringToken,
+        EFI_IFR_OPTION_DEFAULT,
+        EFI_IFR_TYPE_NUM_SIZE_32,
+        Index
+        );
+      BootNextIndex = Index;
+    } else {
+      HiiCreateOneOfOptionOpCode (
+        OptionsOpCodeHandle,
+        NewMenuEntry->DisplayStringToken,
+        0,
+        EFI_IFR_TYPE_NUM_SIZE_32,
+        Index
+        );
+    }
   }
 
-  StringBuffer = HiiGetString (HiiHandle, STRING_TOKEN (STR_NONE), NULL);
-  ASSERT (StringBuffer != NULL);
-  OptionId = HiiSetString (HiiHandle, 0, StringBuffer, NULL);
-  FreePool (StringBuffer);
-
-  //
-  // Set no Boot Next Value as default.
-  //
-  HiiCreateOneOfOptionOpCode (
-    OptionsOpCodeHandle,
-    OptionId,
-    EFI_IFR_OPTION_DEFAULT,
-    EFI_IFR_TYPE_NUM_SIZE_16,
-    Index
-    );
+  if (BootNextIndex == NONE_BOOTNEXT_VALUE) {
+    HiiCreateOneOfOptionOpCode (
+      OptionsOpCodeHandle,
+      STRING_TOKEN (STR_NONE),
+      EFI_IFR_OPTION_DEFAULT,
+      EFI_IFR_TYPE_NUM_SIZE_32,
+      NONE_BOOTNEXT_VALUE
+      );
+  } else {
+    HiiCreateOneOfOptionOpCode (
+      OptionsOpCodeHandle,
+      STRING_TOKEN (STR_NONE),
+      0,
+      EFI_IFR_TYPE_NUM_SIZE_32,
+      NONE_BOOTNEXT_VALUE
+      );
+  }
 
   HiiCreateOneOfOpCode (
     StartOpCodeHandle,
@@ -97,7 +106,7 @@ BmmCreateBootNextMenu(
     STRING_TOKEN (STR_BOOT_NEXT),
     STRING_TOKEN (STR_BOOT_NEXT_HELP),
     0,
-    EFI_IFR_NUMERIC_SIZE_2,
+    EFI_IFR_NUMERIC_SIZE_4,
     OptionsOpCodeHandle,
     NULL
     );
