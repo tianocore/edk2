@@ -37,7 +37,6 @@
   DEFINE NETWORK_IP6_ENABLE      = FALSE
   DEFINE HTTP_BOOT_ENABLE        = FALSE
   DEFINE SMM_REQUIRE             = FALSE
-  DEFINE USE_OLD_BDS             = FALSE
 
 [BuildOptions]
   GCC:*_UNIXGCC_*_CC_FLAGS             = -DMDEPKG_NDEBUG
@@ -82,11 +81,7 @@
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
-!if $(USE_OLD_BDS) == TRUE
-  GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
-!else
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
-!endif
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
@@ -287,13 +282,8 @@
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
-!if $(USE_OLD_BDS) == TRUE
-  PlatformBdsLib|OvmfPkg/Library/PlatformBdsLib/PlatformBdsLib.inf
-  QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
-!else
   PlatformBootManagerLib|OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   QemuBootOrderLib|OvmfPkg/Library/QemuNewBootOrderLib/QemuBootOrderLib.inf
-!endif
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
 !if $(SMM_REQUIRE) == TRUE
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
@@ -576,14 +566,6 @@
   PcAtChipsetPkg/KbcResetDxe/Reset.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
-!if $(USE_OLD_BDS) == TRUE
-  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
-    <LibraryClasses>
-!ifdef $(CSM_ENABLE)
-      NULL|OvmfPkg/Csm/CsmSupportLib/CsmSupportLib.inf
-!endif
-  }
-!else
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
 !ifdef $(CSM_ENABLE)
@@ -601,7 +583,6 @@
       NULL|IntelFrameworkModulePkg/Library/LegacyBootMaintUiLib/LegacyBootMaintUiLib.inf
 !endif
   }
-!endif
   OvmfPkg/BlockMmioToBlockIoDxe/BlockIo.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf
