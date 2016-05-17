@@ -134,6 +134,7 @@ CbDxeEntryPoint (
   EFI_HOB_GUID_TYPE  *GuidHob;
   SYSTEM_TABLE_INFO  *pSystemTableInfo;
   ACPI_BOARD_INFO    *pAcpiBoardInfo;
+  FRAME_BUFFER_INFO  *FbInfo;
 
   Status = EFI_SUCCESS;
   //
@@ -182,6 +183,21 @@ CbDxeEntryPoint (
 
   mPmCtrlReg = (UINTN)pAcpiBoardInfo->PmCtrlRegBase;
   DEBUG ((EFI_D_ERROR, "PmCtrlReg at 0x%lx\n", (UINT64)mPmCtrlReg));
+
+  //
+  // Find the frame buffer information and update PCDs
+  //
+  GuidHob = GetFirstGuidHob (&gUefiFrameBufferInfoGuid);
+  ASSERT (GuidHob != NULL);
+  FbInfo  = (FRAME_BUFFER_INFO *)GET_GUID_HOB_DATA (GuidHob);
+  Status = PcdSet32S (PcdVideoHorizontalResolution, FbInfo->HorizontalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdVideoVerticalResolution, FbInfo->VerticalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdSetupVideoHorizontalResolution, FbInfo->HorizontalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdSetupVideoVerticalResolution, FbInfo->VerticalResolution);
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Register callback on the ready to boot event

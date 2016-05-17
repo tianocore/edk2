@@ -49,11 +49,18 @@
   IoLib
   HobLib
 
-[Guids]  
+[Guids]
   gEfiAcpiTableGuid
   gEfiSmbiosTableGuid
   gUefiSystemTableInfoGuid
   gUefiAcpiBoardInfoGuid
+  gUefiFrameBufferInfoGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
 
 [Depex]
   TRUE
