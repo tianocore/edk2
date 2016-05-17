@@ -290,11 +290,11 @@ If you must use UNIXGCC, then you can override the build options for
 particular libraries and modules in the .dsc to re-enable debugging
 selectively. For example:
   [Components]
-  OvmfPkg/Library/PlatformBdsLib/PlatformBdsLib.inf {
+  OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf {
     <BuildOptions>
       GCC:*_*_*_CC_FLAGS             = -UMDEPKG_NDEBUG
   }
-  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <BuildOptions>
       GCC:*_*_*_CC_FLAGS             = -UMDEPKG_NDEBUG
   }
