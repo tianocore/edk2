@@ -22,6 +22,11 @@ from Dictionary import *
 from BuildToolError import *
 from TargetTxtClassObject import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.Misc import PathClass
+from Common.String import NormPath
+import Common.GlobalData as GlobalData
+from Common import GlobalData
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 ##
 # Static variables used for pattern
@@ -58,6 +63,27 @@ class ToolDefClassObject(object):
     # @param Filename:  Input value for full path of tools_def.txt
     #
     def LoadToolDefFile(self, FileName):
+        # set multiple workspace
+        PackagesPath = os.getenv("PACKAGES_PATH")
+        mws.setWs(GlobalData.gWorkspace, PackagesPath)
+
+        self.ToolsDefTxtDatabase = {
+            TAB_TOD_DEFINES_TARGET          :   [],
+            TAB_TOD_DEFINES_TOOL_CHAIN_TAG  :   [],
+            TAB_TOD_DEFINES_TARGET_ARCH     :   [],
+            TAB_TOD_DEFINES_COMMAND_TYPE    :   []
+        }
+
+        self.IncludeToolDefFile(FileName)
+
+
+    ## IncludeToolDefFile
+    #
+    # Load target.txt file and parse it as if it's contents were inside the main file
+    #
+    # @param Filename:  Input value for full path of tools_def.txt
+    #
+    def IncludeToolDefFile(self, FileName):
         FileContent = []
         if os.path.isfile(FileName):
             try:
@@ -68,17 +94,48 @@ class ToolDefClassObject(object):
         else:
             EdkLogger.error("tools_def.txt parser", FILE_NOT_FOUND, ExtraData=FileName)
 
-        self.ToolsDefTxtDatabase = {
-            TAB_TOD_DEFINES_TARGET          :   [],
-            TAB_TOD_DEFINES_TOOL_CHAIN_TAG  :   [],
-            TAB_TOD_DEFINES_TARGET_ARCH     :   [],
-            TAB_TOD_DEFINES_COMMAND_TYPE    :   []
-        }
-
         for Index in range(len(FileContent)):
             Line = FileContent[Index].strip()
             if Line == "" or Line[0] == '#':
                 continue
+
+            if Line.startswith("!include"):
+                IncFile = Line[8:].strip()
+                Done, IncFile = self.ExpandMacros(IncFile)
+                if not Done:
+                    EdkLogger.error("tools_def.txt parser", ATTRIBUTE_NOT_AVAILABLE,
+                                    "Macro or Environment has not been defined",
+                                ExtraData=IncFile[4:-1], File=FileName, Line=Index+1)
+                IncFile = NormPath(IncFile)
+
+                if not os.path.isabs(IncFile):
+                    #
+                    # try WORKSPACE
+                    #
+                    IncFileTmp = PathClass(IncFile, GlobalData.gWorkspace)
+                    ErrorCode = IncFileTmp.Validate()[0]
+                    if ErrorCode != 0:
+                        #
+                        # try PACKAGES_PATH
+                        #
+                        IncFileTmp = mws.join(GlobalData.gWorkspace, IncFile)
+                        if not os.path.exists(IncFileTmp):
+                            #
+                            # try directory of current file
+                            #
+                            IncFileTmp = PathClass(IncFile, os.path.dirname(FileName))
+                            ErrorCode = IncFileTmp.Validate()[0]
+                            if ErrorCode != 0:
+                                EdkLogger.error("tools_def.txt parser", FILE_NOT_FOUND, ExtraData=IncFile)
+
+                    if type(IncFileTmp) is PathClass:
+                        IncFile = IncFileTmp.Path
+                    else:
+                        IncFile = IncFileTmp
+
+                self.IncludeToolDefFile(IncFile)
+                continue
+
             NameValuePair = Line.split("=", 1)
             if len(NameValuePair) != 2:
                 EdkLogger.warn("tools_def.txt parser", "Line %d: not correct assignment statement, skipped" % (Index + 1))
