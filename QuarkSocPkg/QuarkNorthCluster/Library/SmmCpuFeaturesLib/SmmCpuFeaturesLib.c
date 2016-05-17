@@ -1,7 +1,7 @@
 /** @file
 The Quark CPU specific programming for PiSmmCpuDxeSmm module.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiSmm.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Register/SmramSaveStateMap.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/QNCAccessLib.h>
 
 #define  EFI_MSR_SMRR_PHYS_MASK_VALID          BIT11
@@ -60,6 +62,18 @@ SmmCpuFeaturesInitializeProcessor (
   //
   CpuState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
   CpuState->x86.SMBASE = CpuHotPlugData->SmBase[CpuIndex];
+
+  //
+  // SMRR size cannot be less than 4-KBytes
+  // SMRR size must be of length 2^n
+  // SMRR base alignment cannot be less than SMRR length
+  //
+  if ((CpuHotPlugData->SmrrSize < SIZE_4KB) ||
+      (CpuHotPlugData->SmrrSize != GetPowerOfTwo32 (CpuHotPlugData->SmrrSize)) ||
+      ((CpuHotPlugData->SmrrBase & ~(CpuHotPlugData->SmrrSize - 1)) != CpuHotPlugData->SmrrBase)) {
+    DEBUG ((EFI_D_ERROR, "SMM Base/Size does not meet alignment/size requirement!\n"));
+    CpuDeadLoop ();
+  }
 
   //
   // Use QNC to initialize SMRR on Quark
