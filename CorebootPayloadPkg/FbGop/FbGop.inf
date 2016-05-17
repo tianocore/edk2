@@ -68,6 +68,3 @@
   gEfiEdidDiscoveredProtocolGuid
   gEfiEdidActiveProtocolGuid
   
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution  
