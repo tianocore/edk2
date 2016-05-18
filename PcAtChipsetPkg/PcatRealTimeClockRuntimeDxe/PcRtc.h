@@ -1,7 +1,7 @@
 /** @file
   Header file for real time clock driver.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -357,6 +357,16 @@ DayValid (
 BOOLEAN
 IsLeapYear (
   IN EFI_TIME   *Time
+  );
+
+/**
+  Get the century RTC address from the ACPI FADT table.
+
+  @return  The century RTC address or 0 if not found.
+**/
+UINT8
+GetCenturyRtcAddress (
+  VOID
   );
 
 /**
