@@ -1239,20 +1239,13 @@ ScanTableInSDT (
 }
 
 /**
-  Notification function of ACPI Table change.
+  Get the century RTC address from the ACPI FADT table.
 
-  This is a notification function registered on ACPI Table change event.
-  It saves the Century address stored in ACPI FADT table.
-
-  @param  Event        Event whose notification function is being invoked.
-  @param  Context      Pointer to the notification function's context.
-
+  @return  The century RTC address or 0 if not found.
 **/
-VOID
-EFIAPI
-PcRtcAcpiTableChangeCallback (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+UINT8
+GetCenturyRtcAddress (
+  VOID
   )
 {
   EFI_STATUS                                    Status;
@@ -1260,8 +1253,6 @@ PcRtcAcpiTableChangeCallback (
   EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
   EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
   EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
-  EFI_TIME                                      Time;
-  UINT8                                         Century;
 
   Status = EfiGetSystemConfigurationTable (&gEfiAcpiTableGuid, (VOID **) &Rsdp);
   if (EFI_ERROR (Status)) {
@@ -1269,7 +1260,7 @@ PcRtcAcpiTableChangeCallback (
   }
 
   if (EFI_ERROR (Status)) {
-    return;
+    return 0;
   }
 
   ASSERT (Rsdp != NULL);
@@ -1292,10 +1283,39 @@ PcRtcAcpiTableChangeCallback (
   }
 
   if ((Fadt != NULL) &&
-      (Fadt->Century > RTC_ADDRESS_REGISTER_D) && (Fadt->Century < 0x80) &&
-      (mModuleGlobal.CenturyRtcAddress != Fadt->Century)
+      (Fadt->Century > RTC_ADDRESS_REGISTER_D) && (Fadt->Century < 0x80)
       ) {
-    mModuleGlobal.CenturyRtcAddress = Fadt->Century;
+    return Fadt->Century;
+  } else {
+    return 0;
+  }
+}
+
+/**
+  Notification function of ACPI Table change.
+
+  This is a notification function registered on ACPI Table change event.
+  It saves the Century address stored in ACPI FADT table.
+
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context.
+
+**/
+VOID
+EFIAPI
+PcRtcAcpiTableChangeCallback (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  EFI_STATUS          Status;
+  EFI_TIME            Time;
+  UINT8               CenturyRtcAddress;
+  UINT8               Century;
+
+  CenturyRtcAddress = GetCenturyRtcAddress ();
+  if ((CenturyRtcAddress != 0) && (mModuleGlobal.CenturyRtcAddress != CenturyRtcAddress)) {
+    mModuleGlobal.CenturyRtcAddress = CenturyRtcAddress;
     Status = PcRtcGetTime (&Time, NULL, &mModuleGlobal);
     if (!EFI_ERROR (Status)) {
       Century = (UINT8) (Time.Year / 100);
