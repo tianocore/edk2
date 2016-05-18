@@ -1143,8 +1143,7 @@ GetTerminalAttribute (
 
 **/
 EFI_STATUS
-EFIAPI
-BmmBdsSetConsoleMode (
+BmmSetConsoleMode (
   BOOLEAN  IsSetupMode
   );
 

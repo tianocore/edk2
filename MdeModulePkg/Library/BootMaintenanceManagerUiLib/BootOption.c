@@ -881,9 +881,9 @@ BootFromFile (
   //
   gST->ConOut->ClearScreen (gST->ConOut);
 
-  BmmBdsSetConsoleMode (FALSE);
+  BmmSetConsoleMode (FALSE);
   EfiBootManagerBoot (&BootOption);
-  BmmBdsSetConsoleMode (TRUE);
+  BmmSetConsoleMode (TRUE);
 
   FreePool(FileName);
 
