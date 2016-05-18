@@ -1,7 +1,7 @@
 /** @file
   PI PEI master include file. This file should match the PI spec.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -12,7 +12,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
   @par Revision Reference:
-  PI Version 1.4.
+  PI Version 1.4a.
 
 **/
 
@@ -73,6 +73,7 @@ EFI_STATUS
   @param  Ppi              Address of the PPI that was installed.
 
   @return Status of the notification.
+          The status code returned from this function is ignored.
 **/
 typedef
 EFI_STATUS
