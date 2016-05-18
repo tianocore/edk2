@@ -1,7 +1,7 @@
 /** @file
-  This driver will report some MMIO/IO resources to dxe core, extract smbios and acpi 
+  This driver will report some MMIO/IO resources to dxe core, extract smbios and acpi
   tables from coreboot and install.
-  
+
   Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -37,7 +37,7 @@ CbReserveResourceInGcd (
   IN EFI_HANDLE            ImageHandle
   )
 {
-	EFI_STATUS               Status;
+  EFI_STATUS               Status;
 
   if (IsMMIO) {
     Status = gDS->AddMemorySpace (
@@ -103,21 +103,21 @@ OnReadyToBoot (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   )
-{	
-	//
-	// Enable SCI
-	//
-	IoOr16 (mPmCtrlReg, BIT0);
-	
-	DEBUG ((EFI_D_ERROR, "Enable SCI bit at 0x%lx before boot\n", (UINT64)mPmCtrlReg));	
+{
+  //
+  // Enable SCI
+  //
+  IoOr16 (mPmCtrlReg, BIT0);
+
+  DEBUG ((EFI_D_ERROR, "Enable SCI bit at 0x%lx before boot\n", (UINT64)mPmCtrlReg));
 }
 
 /**
   Main entry for the Coreboot Support DXE module.
-  
+
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -128,66 +128,66 @@ CbDxeEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-{  
-	EFI_STATUS Status;
-	EFI_EVENT  ReadyToBootEvent;
-	EFI_HOB_GUID_TYPE  *GuidHob;
-	SYSTEM_TABLE_INFO  *pSystemTableInfo;
-	ACPI_BOARD_INFO    *pAcpiBoardInfo;
-	
-	Status = EFI_SUCCESS;
-	//
-	// Report MMIO/IO Resources
-	//
-	Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEE00000, SIZE_1MB, 0, SystemTable); // LAPIC 
-	ASSERT_EFI_ERROR (Status);
-	
-	Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEC00000, SIZE_4KB, 0, SystemTable); // IOAPIC 
-	ASSERT_EFI_ERROR (Status);
-	
-	Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFED00000, SIZE_1KB, 0, SystemTable); // HPET 
-	ASSERT_EFI_ERROR (Status);
-	
-	//
-	// Find the system table information guid hob
-	//
-	GuidHob = GetFirstGuidHob (&gUefiSystemTableInfoGuid);
-	ASSERT (GuidHob != NULL);
+{
+  EFI_STATUS Status;
+  EFI_EVENT  ReadyToBootEvent;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  SYSTEM_TABLE_INFO  *pSystemTableInfo;
+  ACPI_BOARD_INFO    *pAcpiBoardInfo;
+
+  Status = EFI_SUCCESS;
+  //
+  // Report MMIO/IO Resources
+  //
+  Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEE00000, SIZE_1MB, 0, SystemTable); // LAPIC
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEC00000, SIZE_4KB, 0, SystemTable); // IOAPIC
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFED00000, SIZE_1KB, 0, SystemTable); // HPET
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Find the system table information guid hob
+  //
+  GuidHob = GetFirstGuidHob (&gUefiSystemTableInfoGuid);
+  ASSERT (GuidHob != NULL);
   pSystemTableInfo = (SYSTEM_TABLE_INFO *)GET_GUID_HOB_DATA (GuidHob);
-	
-	//
-	// Install Acpi Table
-	//
-	if (pSystemTableInfo->AcpiTableBase != 0 && pSystemTableInfo->AcpiTableSize != 0) {		
-		DEBUG ((EFI_D_ERROR, "Install Acpi Table at 0x%lx, length 0x%x\n", pSystemTableInfo->AcpiTableBase, pSystemTableInfo->AcpiTableSize));	
-		Status = gBS->InstallConfigurationTable (&gEfiAcpiTableGuid, (VOID *)(UINTN)pSystemTableInfo->AcpiTableBase);
-		ASSERT_EFI_ERROR (Status);
-	}
-	
-	//
-	// Install Smbios Table
-	//
-	if (pSystemTableInfo->SmbiosTableBase != 0 && pSystemTableInfo->SmbiosTableSize != 0) {			
-		DEBUG ((EFI_D_ERROR, "Install Smbios Table at 0x%lx, length 0x%x\n", pSystemTableInfo->SmbiosTableBase, pSystemTableInfo->SmbiosTableSize));	
-		Status = gBS->InstallConfigurationTable (&gEfiSmbiosTableGuid, (VOID *)(UINTN)pSystemTableInfo->SmbiosTableBase);
-		ASSERT_EFI_ERROR (Status);
-	}
-	
-	//
-	// Find the acpi board information guid hob
-	//
-	GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
-	ASSERT (GuidHob != NULL);
-  pAcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob); 
-  
+
+  //
+  // Install Acpi Table
+  //
+  if (pSystemTableInfo->AcpiTableBase != 0 && pSystemTableInfo->AcpiTableSize != 0) {
+    DEBUG ((EFI_D_ERROR, "Install Acpi Table at 0x%lx, length 0x%x\n", pSystemTableInfo->AcpiTableBase, pSystemTableInfo->AcpiTableSize));
+    Status = gBS->InstallConfigurationTable (&gEfiAcpiTableGuid, (VOID *)(UINTN)pSystemTableInfo->AcpiTableBase);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Install Smbios Table
+  //
+  if (pSystemTableInfo->SmbiosTableBase != 0 && pSystemTableInfo->SmbiosTableSize != 0) {
+    DEBUG ((EFI_D_ERROR, "Install Smbios Table at 0x%lx, length 0x%x\n", pSystemTableInfo->SmbiosTableBase, pSystemTableInfo->SmbiosTableSize));
+    Status = gBS->InstallConfigurationTable (&gEfiSmbiosTableGuid, (VOID *)(UINTN)pSystemTableInfo->SmbiosTableBase);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Find the acpi board information guid hob
+  //
+  GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
+  ASSERT (GuidHob != NULL);
+  pAcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
+
   mPmCtrlReg = (UINTN)pAcpiBoardInfo->PmCtrlRegBase;
-	DEBUG ((EFI_D_ERROR, "PmCtrlReg at 0x%lx\n", (UINT64)mPmCtrlReg));	
-	 
-	//
-	// Register callback on the ready to boot event 
-	// in order to enable SCI
-	// 	
-	ReadyToBootEvent = NULL;
+  DEBUG ((EFI_D_ERROR, "PmCtrlReg at 0x%lx\n", (UINT64)mPmCtrlReg));
+
+  //
+  // Register callback on the ready to boot event
+  // in order to enable SCI
+  //
+  ReadyToBootEvent = NULL;
   Status = EfiCreateEventReadyToBootEx (
                     TPL_CALLBACK,
                     OnReadyToBoot,
@@ -195,7 +195,7 @@ CbDxeEntryPoint (
                     &ReadyToBootEvent
                     );
   ASSERT_EFI_ERROR (Status);
-  
+
   return EFI_SUCCESS;
 }
 
