@@ -91,8 +91,7 @@ BOOT_MANAGER_CALLBACK_DATA  gBootManagerPrivate = {
 
 **/
 EFI_STATUS
-EFIAPI
-BmBdsSetConsoleMode (
+BmSetConsoleMode (
   BOOLEAN  IsSetupMode
   )
 {
@@ -788,9 +787,9 @@ BootManagerCallback (
   //
   // parse the selected option
   //
-  BmBdsSetConsoleMode (FALSE);
+  BmSetConsoleMode (FALSE);
   EfiBootManagerBoot (&BootOption[QuestionId - 1]);
-  BmBdsSetConsoleMode (TRUE);
+  BmSetConsoleMode (TRUE);
 
   if (EFI_ERROR (BootOption[QuestionId - 1].Status)) {
     gST->ConOut->OutputString (
