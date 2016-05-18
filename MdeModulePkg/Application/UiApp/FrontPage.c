@@ -662,8 +662,7 @@ UpdateFrontPageBannerStrings (
 
 **/
 EFI_STATUS
-EFIAPI
-BdsSetConsoleMode (
+UiSetConsoleMode (
   BOOLEAN  IsSetupMode
   )
 {
@@ -955,9 +954,9 @@ InitializeUserInterface (
 
   InitializeStringSupport ();
 
-  BdsSetConsoleMode (TRUE);
+  UiSetConsoleMode (TRUE);
   UiEntry (FALSE);
-  BdsSetConsoleMode (FALSE);
+  UiSetConsoleMode (FALSE);
 
   UninitializeStringSupport ();
   HiiRemovePackages (HiiHandle);
