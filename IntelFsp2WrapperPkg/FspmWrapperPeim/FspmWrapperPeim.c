@@ -73,7 +73,7 @@ PeiFspMemoryInit (
   SourceData = (UINTN *)((UINTN)FspmHeaderPtr->ImageBase + (UINTN)FspmHeaderPtr->CfgRegionOffset);
   CopyMem (FspmUpdDataPtr, SourceData, (UINTN)FspmHeaderPtr->CfgRegionSize);
 
-  DEBUG ((DEBUG_INFO, "FspWrapperPlatformInitPreMem enter\n"));
+  DEBUG ((DEBUG_INFO, "UpdateFspmUpdData enter\n"));
   UpdateFspmUpdData ((VOID *)FspmUpdDataPtr);
   DEBUG ((DEBUG_INFO, "  NvsBufferPtr        - 0x%x\n", FspmUpdDataPtr->FspmArchUpd.NvsBufferPtr));
   DEBUG ((DEBUG_INFO, "  StackBase           - 0x%x\n", FspmUpdDataPtr->FspmArchUpd.StackBase));
