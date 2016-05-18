@@ -110,6 +110,12 @@ def CheckEnvVariable():
     # set multiple workspace
     PackagesPath = os.getenv("PACKAGES_PATH")
     mws.setWs(WorkspaceDir, PackagesPath)
+    if mws.PACKAGES_PATH:
+        for Path in mws.PACKAGES_PATH:
+            if not os.path.exists(Path):
+                EdkLogger.error("build", FILE_NOT_FOUND, "One Path in PACKAGES_PATH doesn't exist", ExtraData="%s" % Path)
+            elif ' ' in Path:
+                EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in PACKAGES_PATH", ExtraData=Path)
 
     #
     # Check EFI_SOURCE (Edk build convention). EDK_SOURCE will always point to ECP
