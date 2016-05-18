@@ -102,3 +102,5 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn          ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution      ## CONSUMES

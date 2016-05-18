@@ -30,6 +30,8 @@ UINT32    mBmmSetupTextModeRow            = 0;
 UINT32    mBmmSetupHorizontalResolution   = 0;
 UINT32    mBmmSetupVerticalResolution     = 0;
 
+BOOLEAN   mBmmModeInitialized             = FALSE;
+
 EFI_DEVICE_PATH_PROTOCOL  EndDevicePath[] = {
   {
     END_DEVICE_PATH_TYPE,
@@ -1278,6 +1280,77 @@ FreeAllMenu (
 }
 
 /**
+  Initial the boot mode related parameters.
+
+**/
+VOID
+BmmInitialBootModeInfo (
+  VOID
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *SimpleTextOut;
+  UINTN                              BootTextColumn;
+  UINTN                              BootTextRow;
+
+  if (mBmmModeInitialized) {
+    return;
+  }
+
+  //
+  // After the console is ready, get current video resolution
+  // and text mode before launching setup at first time.
+  //
+  Status = gBS->HandleProtocol (
+                  gST->ConsoleOutHandle,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  (VOID**)&GraphicsOutput
+                  );
+  if (EFI_ERROR (Status)) {
+    GraphicsOutput = NULL;
+  }
+
+  Status = gBS->HandleProtocol (
+                  gST->ConsoleOutHandle,
+                  &gEfiSimpleTextOutProtocolGuid,
+                  (VOID**)&SimpleTextOut
+                  );
+  if (EFI_ERROR (Status)) {
+    SimpleTextOut = NULL;
+  }
+
+  if (GraphicsOutput != NULL) {
+    //
+    // Get current video resolution and text mode.
+    //
+    mBmmBootHorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
+    mBmmBootVerticalResolution   = GraphicsOutput->Mode->Info->VerticalResolution;
+  }
+
+  if (SimpleTextOut != NULL) {
+    Status = SimpleTextOut->QueryMode (
+                              SimpleTextOut,
+                              SimpleTextOut->Mode->Mode,
+                              &BootTextColumn,
+                              &BootTextRow
+                              );
+    mBmmBootTextModeColumn = (UINT32)BootTextColumn;
+    mBmmBootTextModeRow    = (UINT32)BootTextRow;
+  }
+
+  //
+  // Get user defined text mode for setup.
+  //
+  mBmmSetupHorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
+  mBmmSetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);
+  mBmmSetupTextModeColumn       = PcdGet32 (PcdSetupConOutColumn);
+  mBmmSetupTextModeRow          = PcdGet32 (PcdSetupConOutRow);
+
+  mBmmModeInitialized           = TRUE;
+}
+
+/**
 
   Install Boot Maintenance Manager Menu driver.
 
@@ -1364,6 +1437,8 @@ BootMaintenanceManagerUiLibConstructor (
   // Update boot maintenance manager page 
   //
   InitializeBmmConfig(mBmmCallbackInfo);
+
+  BmmInitialBootModeInfo();
 
   return EFI_SUCCESS;
 }
