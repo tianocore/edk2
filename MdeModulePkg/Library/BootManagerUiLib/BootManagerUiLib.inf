@@ -64,4 +64,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution           ## CONSUMES
-
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn                 ## CONSUMES ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow                    ## CONSUMES ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution      ## CONSUMES

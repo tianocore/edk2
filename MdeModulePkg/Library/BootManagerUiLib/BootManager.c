@@ -31,6 +31,8 @@ UINT32    mBmSetupTextModeRow            = 0;
 UINT32    mBmSetupHorizontalResolution   = 0;
 UINT32    mBmSetupVerticalResolution     = 0;
 
+BOOLEAN   mBmModeInitialized             = FALSE;
+
 CHAR16             *mDeviceTypeStr[] = {
   L"Legacy BEV",
   L"Legacy Floppy",
@@ -650,6 +652,77 @@ BootManagerRouteConfig (
 }
 
 /**
+  Initial the boot mode related parameters.
+
+**/
+VOID
+BmInitialBootModeInfo (
+  VOID
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *SimpleTextOut;
+  UINTN                              BootTextColumn;
+  UINTN                              BootTextRow;
+
+  if (mBmModeInitialized) {
+    return;
+  }
+
+  //
+  // After the console is ready, get current video resolution
+  // and text mode before launching setup at first time.
+  //
+  Status = gBS->HandleProtocol (
+                  gST->ConsoleOutHandle,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  (VOID**)&GraphicsOutput
+                  );
+  if (EFI_ERROR (Status)) {
+    GraphicsOutput = NULL;
+  }
+
+  Status = gBS->HandleProtocol (
+                  gST->ConsoleOutHandle,
+                  &gEfiSimpleTextOutProtocolGuid,
+                  (VOID**)&SimpleTextOut
+                  );
+  if (EFI_ERROR (Status)) {
+    SimpleTextOut = NULL;
+  }
+
+  if (GraphicsOutput != NULL) {
+    //
+    // Get current video resolution and text mode.
+    //
+    mBmBootHorizontalResolution = GraphicsOutput->Mode->Info->HorizontalResolution;
+    mBmBootVerticalResolution   = GraphicsOutput->Mode->Info->VerticalResolution;
+  }
+
+  if (SimpleTextOut != NULL) {
+    Status = SimpleTextOut->QueryMode (
+                              SimpleTextOut,
+                              SimpleTextOut->Mode->Mode,
+                              &BootTextColumn,
+                              &BootTextRow
+                              );
+    mBmBootTextModeColumn = (UINT32)BootTextColumn;
+    mBmBootTextModeRow    = (UINT32)BootTextRow;
+  }
+
+  //
+  // Get user defined text mode for setup.
+  //
+  mBmSetupHorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
+  mBmSetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);
+  mBmSetupTextModeColumn       = PcdGet32 (PcdSetupConOutColumn);
+  mBmSetupTextModeRow          = PcdGet32 (PcdSetupConOutRow);
+
+  mBmModeInitialized           = TRUE;
+}
+
+/**
   This call back function is registered with Boot Manager formset.
   When user selects a boot option, this call back function will
   be triggered. The boot option is saved for later processing.
@@ -778,6 +851,7 @@ BootManagerUiLibConstructor (
                                     );
   ASSERT (gBootManagerPrivate.HiiHandle != NULL);
 
+  BmInitialBootModeInfo ();
 
   return EFI_SUCCESS;
 }
