@@ -52,4 +52,5 @@
 
 [Depex]
   gEfiCpuIo2ProtocolGuid AND
-  gEfiMetronomeArchProtocolGuid
+  gEfiMetronomeArchProtocolGuid AND
+  gEfiCpuArchProtocolGuid
