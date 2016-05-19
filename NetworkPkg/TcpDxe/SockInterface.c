@@ -724,11 +724,7 @@ SockRcv (
   }
 
   if (RcvdBytes != 0) {
-    Status = SockProcessRcvToken (Sock, RcvToken);
-
-    if (EFI_ERROR (Status)) {
-      goto Exit;
-    }
+    SockProcessRcvToken (Sock, RcvToken);
 
     Status = Sock->ProtoHandler (Sock, SOCK_CONSUMED, NULL);
   } else {
