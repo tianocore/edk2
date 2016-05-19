@@ -342,6 +342,7 @@ UefiMain (
   UINTN                           Size;
   EFI_HANDLE                      ConInHandle;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *OldConIn;
+  SPLIT_LIST                      *Split;
 
   if (PcdGet8(PcdShellSupportLevel) > 3) {
     return (EFI_UNSUPPORTED);
@@ -675,7 +676,17 @@ FreeResources:
   }
 
   if (!IsListEmpty(&ShellInfoObject.SplitList.Link)){
-    ASSERT(FALSE); ///@todo finish this de-allocation.
+    ASSERT(FALSE); ///@todo finish this de-allocation (free SplitStdIn/Out when needed).
+
+    for ( Split = (SPLIT_LIST*)GetFirstNode (&ShellInfoObject.SplitList.Link)
+        ; !IsNull (&ShellInfoObject.SplitList.Link, &Split->Link)
+        ; Split = (SPLIT_LIST *)GetNextNode (&ShellInfoObject.SplitList.Link, &Split->Link)
+     ) {
+      RemoveEntryList (&Split->Link);
+      FreePool (Split);
+    }
+
+    DEBUG_CODE (InitializeListHead (&ShellInfoObject.SplitList.Link););
   }
 
   if (ShellInfoObject.ShellInitSettings.FileName != NULL) {
@@ -1743,11 +1754,12 @@ RunSplitCommand(
   //
   // Note that the original StdIn is now the StdOut...
   //
-  if (Split->SplitStdOut != NULL && Split->SplitStdOut != StdIn) {
+  if (Split->SplitStdOut != NULL) {
     ShellInfoObject.NewEfiShellProtocol->CloseFile(ConvertShellHandleToEfiFileProtocol(Split->SplitStdOut));
   }
   if (Split->SplitStdIn != NULL) {
     ShellInfoObject.NewEfiShellProtocol->CloseFile(ConvertShellHandleToEfiFileProtocol(Split->SplitStdIn));
+    FreePool (Split->SplitStdIn);
   }
 
   FreePool(Split);
