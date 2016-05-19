@@ -2,7 +2,7 @@
     Help functions used by PCD DXE driver.
 
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1370,6 +1370,84 @@ ExSetWorker (
 }
 
 /**
+  Get variable size and data from HII-type PCDs.
+
+  @param[in]  VariableGuid   Guid of variable which stored value of a HII-type PCD.
+  @param[in]  VariableName   Unicode name of variable which stored value of a HII-type PCD.
+  @param[out] VariableSize   Pointer to variable size got from HII-type PCDs.
+  @param[out] VariableData   Pointer to variable data got from HII-type PCDs.
+
+**/
+VOID
+GetVariableSizeAndDataFromHiiPcd (
+  IN EFI_GUID               *VariableGuid,
+  IN UINT16                 *VariableName,
+  OUT UINTN                 *VariableSize,
+  OUT VOID                  *VariableData OPTIONAL
+  )
+{
+  BOOLEAN                   IsPeiDb;
+  PCD_DATABASE_INIT         *Database;
+  UINTN                     TokenNumber;
+  UINT32                    LocalTokenNumber;
+  UINTN                     Offset;
+  EFI_GUID                  *GuidTable;
+  UINT8                     *StringTable;
+  VARIABLE_HEAD             *VariableHead;
+  EFI_GUID                  *Guid;
+  UINT16                    *Name;
+  UINTN                     PcdDataSize;
+  UINTN                     Size;
+  UINT8                     *VaraiableDefaultBuffer;
+  STRING_HEAD               StringTableIdx;
+
+  *VariableSize = 0;
+
+  //
+  // Go through PCD database to find out DynamicHii PCDs.
+  //
+  for (TokenNumber = 1; TokenNumber <= mPcdTotalTokenCount; TokenNumber++) {
+    IsPeiDb = (BOOLEAN) ((TokenNumber + 1 < mPeiLocalTokenCount + 1) ? TRUE : FALSE);
+    Database = IsPeiDb ? mPcdDatabase.PeiDb: mPcdDatabase.DxeDb;
+    LocalTokenNumber = GetLocalTokenNumber (IsPeiDb, TokenNumber);
+    if ((LocalTokenNumber & PCD_TYPE_HII) != 0) {
+      //
+      // Get the Variable Guid and Name pointer.
+      //
+      Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+      VariableHead = (VARIABLE_HEAD *) ((UINT8 *) Database + Offset);
+      StringTable = (UINT8 *) ((UINT8 *) Database + Database->StringTableOffset);
+      GuidTable = (EFI_GUID *) ((UINT8 *) Database + Database->GuidTableOffset);
+      Guid = GuidTable + VariableHead->GuidTableIndex;
+      Name = (UINT16*) (StringTable + VariableHead->StringIndex);
+      if (CompareGuid (VariableGuid, Guid) && (StrCmp (VariableName, Name) == 0)) {
+        //
+        // It is the matched DynamicHii PCD.
+        //
+        PcdDataSize = DxePcdGetSize (TokenNumber);
+        Size = VariableHead->Offset + PcdDataSize;
+        if (Size > *VariableSize) {
+          *VariableSize = Size;
+        }
+        if (VariableData != NULL) {
+          if ((LocalTokenNumber & PCD_TYPE_ALL_SET) == (PCD_TYPE_HII|PCD_TYPE_STRING)) {
+            //
+            // If a HII type PCD's datum type is VOID*, the DefaultValueOffset is the index of
+            // string array in string table.
+            //
+            StringTableIdx = *(STRING_HEAD *) ((UINT8 *) Database + VariableHead->DefaultValueOffset);
+            VaraiableDefaultBuffer = (UINT8 *) (StringTable + StringTableIdx);
+          } else {
+            VaraiableDefaultBuffer = (UINT8 *) Database + VariableHead->DefaultValueOffset;
+          }
+          CopyMem ((UINT8 *) VariableData + VariableHead->Offset, VaraiableDefaultBuffer, PcdDataSize);
+        }
+      }
+    }
+  }
+}
+
+/**
   Set value for HII-type PCD.
 
   A HII-type PCD's value is stored in a variable. Setting/Getting the value of 
@@ -1457,12 +1535,18 @@ SetHiiVariable (
     //
     // If variable does not exist, a new variable need to be created.
     //
-    
-    Size = Offset + DataSize;
-    
+
+    //
+    // Get size, allocate buffer and get data.
+    //
+    GetVariableSizeAndDataFromHiiPcd (VariableGuid, VariableName, &Size, NULL);
     Buffer = AllocateZeroPool (Size);
     ASSERT (Buffer != NULL);
-    
+    GetVariableSizeAndDataFromHiiPcd (VariableGuid, VariableName, &Size, Buffer);
+
+    //
+    // Update buffer.
+    //
     CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
 
     if (SetAttributes == 0) {
