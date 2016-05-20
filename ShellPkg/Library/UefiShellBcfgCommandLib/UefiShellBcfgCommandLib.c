@@ -310,6 +310,7 @@ BcfgAdd(
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
   CHAR16                    *Str;
   UINT8                     *TempByteBuffer;
@@ -462,9 +463,9 @@ BcfgAdd(
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_FILE_DP), gShellBcfgHiiHandle, L"bcfg", Arg->FullName);  
           ShellStatus = SHELL_UNSUPPORTED;
         } else {
-/*
           if (UsePath) {
-            DevPath = DevicePath;
+            DevPath     = DevicePath;
+            ShellStatus = SHELL_INVALID_PARAMETER;
             while (!IsDevicePathEnd(DevPath)) {
               if ((DevicePathType(DevPath) == MEDIA_DEVICE_PATH) &&
                 (DevicePathSubType(DevPath) == MEDIA_HARDDRIVE_DP)) {
@@ -472,24 +473,15 @@ BcfgAdd(
                 //
                 // If we find it use it instead
                 //
-                DevicePath = DevPath;
+                ShellStatus = SHELL_SUCCESS;
+                FilePath    = DuplicateDevicePath (DevPath);
                 break;
               }
               DevPath = NextDevicePathNode(DevPath);
             }
-            //
-            // append the file
-            //
-            for(StringWalker=Arg->FullName; *StringWalker != CHAR_NULL && *StringWalker != ':'; StringWalker++);
-            FileNode = FileDevicePath(NULL, StringWalker+1);
-            FilePath = AppendDevicePath(DevicePath, FileNode);
-            FreePool(FileNode);
           } else {
-*/
             FilePath = DuplicateDevicePath(DevicePath);
-/*
           }
-*/
           FreePool(DevicePath);
         }
       }
