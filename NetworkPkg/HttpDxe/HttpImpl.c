@@ -1237,6 +1237,7 @@ HttpResponseWorker (
     goto Error;
   }
 
+  FreePool (Wrap);
   return Status;
 
 Exit:

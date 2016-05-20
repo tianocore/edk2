@@ -152,7 +152,6 @@ HttpTcpReceiveNotifyDpc (
     if (EFI_ERROR (Wrap->TcpWrap.Rx6Token.CompletionToken.Status)) {
       Wrap->HttpToken->Status = Wrap->TcpWrap.Rx6Token.CompletionToken.Status;
       gBS->SignalEvent (Wrap->HttpToken->Event);
-      FreePool (Wrap);
       return ;
     }
 
@@ -162,7 +161,6 @@ HttpTcpReceiveNotifyDpc (
     if (EFI_ERROR (Wrap->TcpWrap.Rx4Token.CompletionToken.Status)) {
       Wrap->HttpToken->Status = Wrap->TcpWrap.Rx4Token.CompletionToken.Status;
       gBS->SignalEvent (Wrap->HttpToken->Event);
-      FreePool (Wrap);
       return ;
     }
   }
@@ -234,8 +232,6 @@ HttpTcpReceiveNotifyDpc (
   // Check pending RxTokens and receive the HTTP message.
   //
   NetMapIterate (&Wrap->HttpInstance->RxTokens, HttpTcpReceive, NULL);
-  
-  FreePool (Wrap);
 }
 
 /**
