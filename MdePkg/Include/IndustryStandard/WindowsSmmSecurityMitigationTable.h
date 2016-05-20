@@ -1,6 +1,6 @@
 /** @file
   Defines Windows SMM Security Mitigation Table
-  @ http://download.microsoft.com/download/1/8/A/18A21244-EB67-4538-BAA2-1A54E0E490B6/WSMT.docx
+  @ https://msdn.microsoft.com/windows/hardware/drivers/bringup/acpi-system-description-tables#wsmt
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials 
