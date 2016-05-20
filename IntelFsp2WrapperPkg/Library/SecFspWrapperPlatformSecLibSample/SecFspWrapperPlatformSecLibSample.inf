@@ -78,12 +78,12 @@
   gTopOfTemporaryRamPpiGuid               ## PRODUCES
 
 [Pcd]
-  gFspWrapperTokenSpaceGuid.PcdFsptBaseAddress                  ## CONSUMES
-  gFspWrapperTokenSpaceGuid.PcdFspmBaseAddress                  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress              ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress              ## CONSUMES
 
 [FixedPcd]
-  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress         ## CONSUMES
-  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize      ## CONSUMES
-  gFspWrapperTokenSpaceGuid.PcdFlashMicrocodeOffset             ## CONSUMES
-  gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheAddress            ## CONSUMES
-  gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheSize               ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress     ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashMicrocodeOffset         ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheAddress        ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheSize           ## CONSUMES

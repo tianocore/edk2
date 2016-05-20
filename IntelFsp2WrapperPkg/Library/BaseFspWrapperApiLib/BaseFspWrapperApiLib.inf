@@ -67,5 +67,5 @@
   gFspHeaderFileGuid            ## CONSUMES ## GUID
 
 [Pcd]
-  gFspWrapperTokenSpaceGuid.PcdFspmBaseAddress          ## CONSUMES
-  gFspWrapperTokenSpaceGuid.PcdFspsBaseAddress          ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress  ## CONSUMES

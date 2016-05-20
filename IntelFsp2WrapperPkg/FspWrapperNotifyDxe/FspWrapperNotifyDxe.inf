@@ -60,7 +60,7 @@
   gFspHobGuid                                       ## CONSUMES ## HOB
 
 [Pcd]
-  gFspWrapperTokenSpaceGuid.PcdFspsBaseAddress              ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress  ## CONSUMES
 
 [Depex]
   TRUE

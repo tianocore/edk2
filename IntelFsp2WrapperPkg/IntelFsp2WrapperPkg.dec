@@ -36,7 +36,7 @@
   #
   # GUID defined in package
   #
-  gFspWrapperTokenSpaceGuid             = { 0xa34cf082, 0xf50, 0x4f0d,  { 0x89, 0x8a, 0x3d, 0x39, 0x30, 0x2b, 0xc5, 0x1e } }
+  gIntelFsp2WrapperTokenSpaceGuid       = { 0xa34cf082, 0xf50, 0x4f0d,  { 0x89, 0x8a, 0x3d, 0x39, 0x30, 0x2b, 0xc5, 0x1e } }
   gFspApiPerformanceGuid                = { 0xc9122295, 0x56ed, 0x4d4e, { 0x06, 0xa6, 0x50, 0x8d, 0x89, 0x4d, 0x3e, 0x40 } }
   gFspHobGuid                           = { 0x6d86fb36, 0xba90, 0x472c, { 0xb5, 0x83, 0x3f, 0xbe, 0xd3, 0xfb, 0x20, 0x9a } }
 
@@ -56,22 +56,22 @@
 ################################################################################
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Provides the memory mapped base address of the BIOS CodeCache Flash Device.
-  gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheAddress|0xFFE00000|UINT32|0x10000001
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheAddress|0xFFE00000|UINT32|0x10000001
   ## Provides the size of the BIOS Flash Device.
-  gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00200000|UINT32|0x10000002
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00200000|UINT32|0x10000002
 
   ## Indicates the base address of the first Microcode Patch in the Microcode Region
-  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x10000005
-  gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x10000006
+  gIntelFsp2WrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x10000005
+  gIntelFsp2WrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x10000006
   ## Indicates the offset of the Cpu Microcode.
-  gFspWrapperTokenSpaceGuid.PcdFlashMicrocodeOffset|0x90|UINT32|0x10000007
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashMicrocodeOffset|0x90|UINT32|0x10000007
 
   ## Indicate the PEI memory size platform want to report
-  gFspWrapperTokenSpaceGuid.PcdPeiMinMemSize|0x1800000|UINT32|0x40000004
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiMinMemSize|0x1800000|UINT32|0x40000004
   ## Indicate the PEI memory size platform want to report
-  gFspWrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize|0x3000000|UINT32|0x40000005
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize|0x3000000|UINT32|0x40000005
 
   ## This is the base address of FSP-T/M/S
-  gFspWrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
-  gFspWrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00000301
-  gFspWrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00000302
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00000301
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00000302
