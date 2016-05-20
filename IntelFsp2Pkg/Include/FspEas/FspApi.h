@@ -17,6 +17,9 @@
 #define _FSP_API_H_
 
 #pragma pack(1)
+///
+/// FSP_UPD_HEADER Configuration.
+///
 typedef struct {
   ///
   /// UPD Region Signature. This signature will be
@@ -33,6 +36,9 @@ typedef struct {
   UINT8                       Reserved[23];
 } FSP_UPD_HEADER;
 
+///
+/// FSPM_ARCH_UPD Configuration.
+///
 typedef struct {
   ///
   /// Revision of the structure. For FSP v2.0 value is 1.
@@ -66,19 +72,43 @@ typedef struct {
   UINT8                       Reserved1[8];
 } FSPM_ARCH_UPD;
 
+///
+/// FSPT_UPD_COMMON Configuration.
+///
 typedef struct {
+  ///
+  /// FSP_UPD_HEADER Configuration.
+  ///
   FSP_UPD_HEADER              FspUpdHeader;
 } FSPT_UPD_COMMON;
 
+///
+/// FSPM_UPD_COMMON Configuration.
+///
 typedef struct {
+  ///
+  /// FSP_UPD_HEADER Configuration.
+  ///
   FSP_UPD_HEADER              FspUpdHeader;
+  ///
+  /// FSPM_ARCH_UPD Configuration.
+  ///
   FSPM_ARCH_UPD               FspmArchUpd;
 } FSPM_UPD_COMMON;
 
+///
+/// FSPS_UPD_COMMON Configuration.
+///
 typedef struct {
+  ///
+  /// FSP_UPD_HEADER Configuration.
+  ///
   FSP_UPD_HEADER              FspUpdHeader;
 } FSPS_UPD_COMMON;
 
+///
+/// Enumeration of FSP_INIT_PHASE for NOTIFY_PHASE.
+///
 typedef enum {
   ///
   /// This stage is notified when the bootloader completes the
@@ -99,6 +129,9 @@ typedef enum {
   EnumInitPhaseEndOfFirmware       = 0xF0
 } FSP_INIT_PHASE;
 
+///
+/// Definition of NOTIFY_PHASE_PARAMS.
+///
 typedef struct {
   ///
   /// Notification phase used for NotifyPhase API
