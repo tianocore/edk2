@@ -154,7 +154,7 @@ class Section (SectionClassObject):
                 Tuple = os.walk(FfsInf.EfiOutputPath)
                 for Dirpath, Dirnames, Filenames in Tuple:
                     for F in Filenames:
-                        if os.path.splitext(F)[1] in (Suffix):
+                        if os.path.splitext(F)[1] == Suffix:
                             FullName = os.path.join(Dirpath, F)
                             if os.path.getmtime(FullName) > os.path.getmtime(Makefile):
                                 FileList.append(FullName)
