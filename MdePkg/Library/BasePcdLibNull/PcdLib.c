@@ -1,7 +1,7 @@
 /** @file
   A emptry template implementation of PCD Library.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,8 +26,6 @@
 
   @param[in]  SkuId The SKU value that will be used when the PCD service will retrieve and 
                     set values associated with a PCD token.
-                    
-  If SkuId >= 0x100, then ASSERT().                  
 
   @return Return the SKU ID that just be set.
 
@@ -1464,8 +1462,6 @@ LibPcdGetInfoEx (
 
 /**
   Retrieve the currently set SKU Id.
-
-  If the sku id got >= PCD_MAX_SKU_ID, then ASSERT().
 
   @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
             default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU

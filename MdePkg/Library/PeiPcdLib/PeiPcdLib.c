@@ -1,7 +1,7 @@
 /** @file
 Implementation of PcdLib class library for PEI phase.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -124,7 +124,6 @@ GetPiPcdInfoPpiPointer (
   This function provides a means by which SKU support can be established in the PCD infrastructure.
 
   Sets the current SKU in the PCD database to the value specified by SkuId.  SkuId is returned.
-  If SkuId >= PCD_MAX_SKU_ID, then ASSERT(). 
 
   @param  SkuId   The SKU value that will be used when the PCD service retrieves 
                   and sets values associated with a PCD token.
@@ -138,9 +137,6 @@ LibPcdSetSku (
   IN UINTN   SkuId
   )
 {
-
-  ASSERT (SkuId < PCD_MAX_SKU_ID);
-
   GetPiPcdPpiPointer()->SetSku (SkuId);
   
   return SkuId;
@@ -1615,8 +1611,6 @@ LibPcdGetInfoEx (
 /**
   Retrieve the currently set SKU Id.
 
-  If the sku id got >= PCD_MAX_SKU_ID, then ASSERT().
-
   @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
             default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU
             Id is returned.
@@ -1627,10 +1621,5 @@ LibPcdGetSku (
   VOID
   )
 {
-  UINTN SkuId;
-
-  SkuId = GetPiPcdInfoPpiPointer()->GetSku ();
-  ASSERT (SkuId < PCD_MAX_SKU_ID);
-
-  return SkuId;
+  return GetPiPcdInfoPpiPointer()->GetSku ();
 }
