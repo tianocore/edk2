@@ -1,9 +1,9 @@
 /** @file
   PCD DXE driver manage all PCD entry initialized in PEI phase and DXE phase, and
   produce the implementation of native PCD protocol and EFI_PCD_PROTOCOL defined in
-  PI 1.2 Vol3.
+  PI 1.4a Vol3.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -252,7 +252,7 @@ DxeGetPcdInfoGetSku (
   or multiple values, where each value is associated with a specific SKU Id. Items with multiple, 
   SKU-specific values are called SKU enabled. 
   
-  The SKU Id of zero is reserved as a default. The valid SkuId range is 1 to 255.  
+  The SKU Id of zero is reserved as a default.
   For tokens that are not SKU enabled, the system ignores any set SKU Id and works with the 
   single value for that token. For SKU-enabled tokens, the system will use the SKU Id set by the 
   last call to SetSku(). If no SKU Id is set or the currently set SKU Id isn't valid for the specified token, 
