@@ -935,8 +935,8 @@ DownloadFile (
   Mtftp4Token.CheckPacket = CheckPacket;
   Mtftp4Token.Context     = (VOID*)TftpContext;
   if (BlockSize != MTFTP_DEFAULT_BLKSIZE) {
-    ReqOpt.OptionStr = "blksize";
-    AsciiSPrint (OptBuf, sizeof (OptBuf), "%d", BlockSize);
+    ReqOpt.OptionStr = (UINT8 *) "blksize";
+    AsciiSPrint ((CHAR8 *)OptBuf, sizeof (OptBuf), "%d", BlockSize);
     ReqOpt.ValueStr  = OptBuf;
 
     Mtftp4Token.OptionCount = 1;
