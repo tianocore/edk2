@@ -64,8 +64,8 @@
   PeiServicesTablePointerLib
 
 [Pcd]
-  gFspWrapperTokenSpaceGuid.PcdPeiMinMemSize              ## CONSUMES
-  gFspWrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize      ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiMinMemSize          ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize  ## CONSUMES
 
 [Guids]
   gFspReservedMemoryResourceHobGuid                       ## CONSUMES ## HOB

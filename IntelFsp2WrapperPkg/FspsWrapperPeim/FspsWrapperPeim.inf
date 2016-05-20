@@ -66,7 +66,7 @@
   gEfiPeiMemoryDiscoveredPpiGuid        ## PRODUCES
 
 [Pcd]
-  gFspWrapperTokenSpaceGuid.PcdFspsBaseAddress                ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress  ## CONSUMES
 
 [Guids]
   gFspHobGuid                           ## CONSUMES ## HOB
