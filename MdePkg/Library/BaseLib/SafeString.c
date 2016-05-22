@@ -106,6 +106,8 @@ InternalSafeStringNoAsciiStrOverlap (
 /**
   Returns the length of a Null-terminated Unicode string.
 
+  This function is similar as strlen_s defined in C11.
+
   If String is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  String   A pointer to a Null-terminated Unicode string.
@@ -151,9 +153,13 @@ StrnLenS (
   Copies the string pointed to by Source (including the terminating null char)
   to the array pointed to by Destination.
 
+  This function is similar as strcpy_s defined in C11.
+
   If Destination is not aligned on a 16-bit boundary, then ASSERT().
   If Source is not aligned on a 16-bit boundary, then ASSERT().
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Unicode string.
   @param  DestMax                  The maximum number of Destination Unicode
@@ -229,9 +235,13 @@ StrCpyS (
   Source to the array pointed to by Destination. If no null char is copied from
   Source, then Destination[Length] is always set to null.
 
+  This function is similar as strncpy_s defined in C11.
+
   If Length > 0 and Destination is not aligned on a 16-bit boundary, then ASSERT().
   If Length > 0 and Source is not aligned on a 16-bit boundary, then ASSERT().
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Unicode string.
   @param  DestMax                  The maximum number of Destination Unicode
@@ -318,9 +328,13 @@ StrnCpyS (
   Appends a copy of the string pointed to by Source (including the terminating
   null char) to the end of the string pointed to by Destination.
 
+  This function is similar as strcat_s defined in C11.
+
   If Destination is not aligned on a 16-bit boundary, then ASSERT().
   If Source is not aligned on a 16-bit boundary, then ASSERT().
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Unicode string.
   @param  DestMax                  The maximum number of Destination Unicode
@@ -415,9 +429,13 @@ StrCatS (
   copied from Source, then Destination[StrLen(Destination) + Length] is always
   set to null.
 
+  This function is similar as strncat_s defined in C11.
+
   If Destination is not aligned on a 16-bit boundary, then ASSERT().
   If Source is not aligned on a 16-bit boundary, then ASSERT().
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Unicode string.
   @param  DestMax                  The maximum number of Destination Unicode
@@ -520,6 +538,8 @@ StrnCatS (
 /**
   Returns the length of a Null-terminated Ascii string.
 
+  This function is similar as strlen_s defined in C11.
+
   @param  String   A pointer to a Null-terminated Ascii string.
   @param  MaxSize  The maximum number of Destination Ascii
                    char, including terminating null char.
@@ -561,7 +581,11 @@ AsciiStrnLenS (
   Copies the string pointed to by Source (including the terminating null char)
   to the array pointed to by Destination.
 
+  This function is similar as strcpy_s defined in C11.
+
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Ascii string.
   @param  DestMax                  The maximum number of Destination Ascii
@@ -634,7 +658,11 @@ AsciiStrCpyS (
   Source to the array pointed to by Destination. If no null char is copied from
   Source, then Destination[Length] is always set to null.
 
+  This function is similar as strncpy_s defined in C11.
+
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Ascii string.
   @param  DestMax                  The maximum number of Destination Ascii
@@ -718,7 +746,11 @@ AsciiStrnCpyS (
   Appends a copy of the string pointed to by Source (including the terminating
   null char) to the end of the string pointed to by Destination.
 
+  This function is similar as strcat_s defined in C11.
+
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Ascii string.
   @param  DestMax                  The maximum number of Destination Ascii
@@ -810,7 +842,11 @@ AsciiStrCatS (
   copied from Source, then Destination[StrLen(Destination) + Length] is always
   set to null.
 
+  This function is similar as strncat_s defined in C11.
+
   If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
 
   @param  Destination              A pointer to a Null-terminated Ascii string.
   @param  DestMax                  The maximum number of Destination Ascii
