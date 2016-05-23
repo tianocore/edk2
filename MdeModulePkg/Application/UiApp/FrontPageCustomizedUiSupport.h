@@ -21,8 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]    HiiHandle           The hii handle for the Uiapp driver.
   @param[in]    StartOpCodeHandle   The opcode handle to save the new opcode.
 
-  @retval   EFI_SUCCESS         Search the driver success
-
 **/
 VOID
 UiCreateContinueMenu (
@@ -35,8 +33,6 @@ UiCreateContinueMenu (
 
   @param    HiiHandle           The hii handle for the Uiapp driver.
   @param    StartOpCodeHandle   The opcode handle to save the new opcode.
-
-  @retval   EFI_SUCCESS         Search the driver success
 
 **/
 VOID
@@ -51,8 +47,6 @@ UiCreateEmptyLine (
   @param[in]    HiiHandle           The hii handle for the Uiapp driver.
   @param[in]    StartOpCodeHandle   The opcode handle to save the new opcode.
 
-  @retval   EFI_SUCCESS         Search the driver success
-
 **/
 VOID
 UiCreateLanguageMenu (
@@ -65,8 +59,6 @@ UiCreateLanguageMenu (
 
   @param[in]    HiiHandle           The hii handle for the Uiapp driver.
   @param[in]    StartOpCodeHandle   The opcode handle to save the new opcode.
-
-  @retval   EFI_SUCCESS         Search the driver success
 
 **/
 VOID
@@ -99,8 +91,8 @@ BOOLEAN
 
   @param    HiiHandle           The hii handle for the Uiapp driver.
   @param    ClassGuid           The class guid for the driver which is the target.
+  @param    SpecialHandlerFn      The pointer to the specail handler function, if any.
   @param    StartOpCodeHandle   The opcode handle to save the new opcode.
-  @param    SpecialHandler      The pointer to the specail handler function, if any.
 
   @retval   EFI_SUCCESS         Search the driver success
 

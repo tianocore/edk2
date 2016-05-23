@@ -32,7 +32,8 @@ STATIC UI_HII_DRIVER_INSTANCE       *gHiiDriverList;
 /**
   Create the dynamic item to allow user to set the "BootNext" vaule.
 
-  @param CallbackData    The BMM context data.
+  @param[in]    HiiHandle           The hii handle for the Uiapp driver.
+  @param[in]    StartOpCodeHandle   The opcode handle to save the new opcode.
 
 **/
 VOID
@@ -120,10 +121,6 @@ BmmCreateBootNextMenu(
 
   @param[in]    HiiHandle           The hii handle for the Uiapp driver.
   @param[in]    StartOpCodeHandle   The opcode handle to save the new opcode.
-  @param[in]    PromptId            The Prompt string id.
-  @param[in]    HelpId              The help string id.
-  @param[in]    FormId              The Form id for the dest form.
-  @param[in]    QuestionId          The question id for this goto question.
 
 **/
 VOID
@@ -222,10 +219,6 @@ BmmCreateComOptionMenu (
 
   @param[in]    HiiHandle           The hii handle for the Uiapp driver.
   @param[in]    StartOpCodeHandle   The opcode handle to save the new opcode.
-  @param[in]    PromptId            The Prompt string id.
-  @param[in]    HelpId              The help string id.
-  @param[in]    FormId              The Form id for the dest form.
-  @param[in]    QuestionId          The question id for this goto question.
 
 **/
 VOID
@@ -363,8 +356,8 @@ IsRequiredDriver (
 
   @param    HiiHandle           The hii handle for the Uiapp driver.
   @param    ClassGuid           The class guid for the driver which is the target.
+  @param    SpecialHandlerFn    The pointer to the specail handler function, if any.
   @param    StartOpCodeHandle   The opcode handle to save the new opcode.
-  @param    SpecialHandler      The pointer to the specail handler function, if any.
 
   @retval   EFI_SUCCESS         Search the driver success
 
