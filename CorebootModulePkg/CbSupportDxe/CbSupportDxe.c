@@ -188,16 +188,17 @@ CbDxeEntryPoint (
   // Find the frame buffer information and update PCDs
   //
   GuidHob = GetFirstGuidHob (&gUefiFrameBufferInfoGuid);
-  ASSERT (GuidHob != NULL);
-  FbInfo  = (FRAME_BUFFER_INFO *)GET_GUID_HOB_DATA (GuidHob);
-  Status = PcdSet32S (PcdVideoHorizontalResolution, FbInfo->HorizontalResolution);
-  ASSERT_EFI_ERROR (Status);
-  Status = PcdSet32S (PcdVideoVerticalResolution, FbInfo->VerticalResolution);
-  ASSERT_EFI_ERROR (Status);
-  Status = PcdSet32S (PcdSetupVideoHorizontalResolution, FbInfo->HorizontalResolution);
-  ASSERT_EFI_ERROR (Status);
-  Status = PcdSet32S (PcdSetupVideoVerticalResolution, FbInfo->VerticalResolution);
-  ASSERT_EFI_ERROR (Status);
+  if (GuidHob != NULL) {
+    FbInfo  = (FRAME_BUFFER_INFO *)GET_GUID_HOB_DATA (GuidHob);
+    Status = PcdSet32S (PcdVideoHorizontalResolution, FbInfo->HorizontalResolution);
+    ASSERT_EFI_ERROR (Status);
+    Status = PcdSet32S (PcdVideoVerticalResolution, FbInfo->VerticalResolution);
+    ASSERT_EFI_ERROR (Status);
+    Status = PcdSet32S (PcdSetupVideoHorizontalResolution, FbInfo->HorizontalResolution);
+    ASSERT_EFI_ERROR (Status);
+    Status = PcdSet32S (PcdSetupVideoVerticalResolution, FbInfo->VerticalResolution);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Register callback on the ready to boot event
