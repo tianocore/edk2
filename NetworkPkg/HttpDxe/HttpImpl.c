@@ -253,6 +253,7 @@ EfiHttpRequest (
   // Initializations
   //
   Url = NULL;
+  UrlParser = NULL;
   HostName = NULL;
   RequestMsg = NULL;
   HostNameStr = NULL;
@@ -1063,7 +1064,7 @@ HttpResponseWorker (
     if (SizeofHeaders != 0) {
       HeaderTmp = AllocateZeroPool (SizeofHeaders);
       if (HeaderTmp == NULL) {
-        goto Error;
+        goto Error2;
       }
 
       CopyMem (HeaderTmp, Tmp, SizeofHeaders);
@@ -1075,7 +1076,7 @@ HttpResponseWorker (
       //
       if (mHttpUtilities == NULL) {
         Status = EFI_NOT_READY;
-        goto Error;
+        goto Error2;
       }
 
       //
@@ -1089,7 +1090,7 @@ HttpResponseWorker (
                                  &HttpMsg->HeaderCount
                                  );
       if (EFI_ERROR (Status)) {
-        goto Error;
+        goto Error2;
       }
 
       FreePool (HttpHeaders);
@@ -1214,7 +1215,7 @@ HttpResponseWorker (
                     &HttpInstance->TimeoutEvent
                     );
     if (EFI_ERROR (Status)) {
-      goto Error;
+      goto Error2;
     }
   }
 
@@ -1223,7 +1224,7 @@ HttpResponseWorker (
   //
   Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_RESPONSE_TIMEOUT * TICKS_PER_SECOND);
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto Error2;
   }
 
   //
@@ -1234,7 +1235,7 @@ HttpResponseWorker (
   gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
 
   if (EFI_ERROR (Status)) {
-    goto Error;
+    goto Error2;
   }
 
   FreePool (Wrap);
@@ -1258,7 +1259,9 @@ Exit:
   return Status;
 
 Error2:
-  NetMapInsertHead (&HttpInstance->TxTokens, ValueInItem->HttpToken, ValueInItem);
+  if (ValueInItem != NULL) {
+    NetMapInsertHead (&HttpInstance->TxTokens, ValueInItem->HttpToken, ValueInItem);
+  }
 
 Error:
   HttpTcpTokenCleanup (Wrap);
