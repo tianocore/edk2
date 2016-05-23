@@ -1,7 +1,7 @@
 /** @file
   SMM IPL that produces SMM related runtime protocols and load the SMM Core into SMRAM
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -38,6 +38,7 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeLib.h>
 #include <Library/PcdLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #include "PiSmmCorePrivateData.h"
 
@@ -163,6 +164,20 @@ SmmIplGuidedEventNotify (
   );
 
 /**
+  Event notification that is fired when EndOfDxe Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+SmmIplEndOfDxeEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+/**
   Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
 
   This is a notification function registered on EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
@@ -243,6 +258,7 @@ EFI_SMM_CONTROL2_PROTOCOL  *mSmmControl2;
 EFI_SMM_ACCESS2_PROTOCOL   *mSmmAccess;
 EFI_SMRAM_DESCRIPTOR       *mCurrentSmramRange;
 BOOLEAN                    mSmmLocked = FALSE;
+BOOLEAN                    mEndOfDxe  = FALSE;
 EFI_PHYSICAL_ADDRESS       mSmramCacheBase;
 UINT64                     mSmramCacheSize;
 
@@ -270,6 +286,10 @@ SMM_IPL_EVENT_NOTIFICATION  mSmmIplEvents[] = {
   // SMM End Of Dxe Protocol will be found if it is already in the handle database.
   //
   { FALSE, TRUE,  &gEfiEndOfDxeEventGroupGuid,        SmmIplGuidedEventNotify,           &gEfiEndOfDxeEventGroupGuid,        TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on EndOfDxe event.  This is used to set EndOfDxe event signaled flag.
+  //
+  { FALSE, TRUE,  &gEfiEndOfDxeEventGroupGuid,        SmmIplEndOfDxeEventNotify,         &gEfiEndOfDxeEventGroupGuid,        TPL_CALLBACK, NULL },
   //
   // Declare event notification on the DXE Dispatch Event Group.  This event is signaled by the DXE Core
   // each time the DXE Core dispatcher has completed its work.  When this event is signalled, the SMM Core
@@ -557,6 +577,23 @@ SmmIplGuidedEventNotify (
 }
 
 /**
+  Event notification that is fired when EndOfDxe Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+SmmIplEndOfDxeEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  mEndOfDxe = TRUE;
+}
+
+/**
   Event notification that is fired when DxeDispatch Event Group is signaled.
 
   @param  Event                 The Event that is being processed, not used.
@@ -709,6 +746,15 @@ SmmIplReadyToLockEventNotify (
     // Print a warning on debug builds.
     //
     DEBUG ((DEBUG_WARN, "SMM IPL!  DXE SMM Ready To Lock Protocol not installed before Ready To Boot signal\n"));
+  }
+
+  if (!mEndOfDxe) {
+    DEBUG ((DEBUG_ERROR, "EndOfDxe Event must be signaled before DxeSmmReadyToLock Protocol installation!\n"));
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED,
+      (EFI_SOFTWARE_SMM_DRIVER | EFI_SW_EC_ILLEGAL_SOFTWARE_STATE)
+      );
+    ASSERT (FALSE);
   }
 
   //
