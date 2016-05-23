@@ -199,6 +199,7 @@ CreateRootBridge (
       break;
     default:
       ASSERT (FALSE);
+      Aperture = NULL;
       break;
     }
     RootBridge->ResAllocNode[Index].Type     = Index;
