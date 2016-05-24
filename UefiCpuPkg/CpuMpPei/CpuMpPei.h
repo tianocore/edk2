@@ -1,7 +1,7 @@
 /** @file
   Definitions to install Multiple Processor PPI.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
 #include <Ppi/EndOfPeiPhase.h>
+#include <Ppi/VectorHandoffInfo.h>
 
 #include <Register/Cpuid.h>
 #include <Register/LocalApic.h>
@@ -39,6 +40,7 @@
 #include <Library/TimerLib.h>
 #include <Library/UefiCpuLib.h>
 #include <Library/CpuLib.h>
+#include <Library/CpuExceptionHandlerLib.h>
 
 #include "Microcode.h"
 
