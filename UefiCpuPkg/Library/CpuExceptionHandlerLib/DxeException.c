@@ -83,20 +83,22 @@ InitializeCpuInterruptHandlers (
   UINTN                              Index;
   UINTN                              InterruptEntry;
   UINT8                              *InterruptEntryCode;
+  RESERVED_VECTORS_DATA              *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER          *ExternalInterruptHandler;
 
-  mReservedVectors = AllocatePool (sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM);
-  ASSERT (mReservedVectors != NULL);
-  SetMem ((VOID *) mReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
+  ReservedVectors = AllocatePool (sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM);
+  ASSERT (ReservedVectors != NULL);
+  SetMem ((VOID *) ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
   if (VectorInfo != NULL) {
-    Status = ReadAndVerifyVectorInfo (VectorInfo, mReservedVectors, CPU_INTERRUPT_NUM);
+    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, CPU_INTERRUPT_NUM);
     if (EFI_ERROR (Status)) {
-      FreePool (mReservedVectors);
+      FreePool (ReservedVectors);
       return EFI_INVALID_PARAMETER;
     }
   }
   InitializeSpinLock (&mDisplayMessageSpinLock);
-  mExternalInterruptHandler = AllocateZeroPool (sizeof (EFI_CPU_INTERRUPT_HANDLER) * CPU_INTERRUPT_NUM);
-  ASSERT (mExternalInterruptHandler != NULL);
+  ExternalInterruptHandler = AllocateZeroPool (sizeof (EFI_CPU_INTERRUPT_HANDLER) * CPU_INTERRUPT_NUM);
+  ASSERT (ExternalInterruptHandler != NULL);
 
   //
   // Read IDT descriptor and calculate IDT size
@@ -130,7 +132,12 @@ InitializeCpuInterruptHandlers (
   }
 
   TemplateMap.ExceptionStart = (UINTN) InterruptEntryCode;
-  UpdateIdtTable (IdtTable, &TemplateMap, CPU_INTERRUPT_NUM);
+  mExceptionHandlerData.IdtEntryCount            = CPU_INTERRUPT_NUM;
+  mExceptionHandlerData.ReservedVectors          = ReservedVectors;
+  mExceptionHandlerData.ExternalInterruptHandler = ExternalInterruptHandler;
+  InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
+
+  UpdateIdtTable (IdtTable, &TemplateMap, &mExceptionHandlerData);
 
   //
   // Load Interrupt Descriptor Table
