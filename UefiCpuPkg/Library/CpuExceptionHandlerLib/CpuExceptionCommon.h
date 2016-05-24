@@ -1,7 +1,7 @@
 /** @file
   Common header file for CPU Exception Handler Library.
 
-  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,13 @@ typedef struct {
   UINTN ExceptionStubHeaderSize;
   UINTN HookAfterStubHeaderStart;
 } EXCEPTION_HANDLER_TEMPLATE_MAP;
+
+typedef struct {
+  UINTN                       IdtEntryCount;
+  SPIN_LOCK                   DisplayMessageSpinLock;
+  RESERVED_VECTORS_DATA       *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER   *ExternalInterruptHandler;
+} EXCEPTION_HANDLER_DATA;
 
 extern CONST UINT32                mErrorCodeFlag;
 extern CONST UINTN                 mImageAlignSize;
