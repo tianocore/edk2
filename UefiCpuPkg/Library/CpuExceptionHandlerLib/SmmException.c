@@ -17,8 +17,18 @@
 
 CONST UINTN   mDoFarReturnFlag   = 1; 
 
-extern RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
-extern EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+//
+// Spin lock for CPU information display
+//
+SPIN_LOCK        mDisplayMessageSpinLock;
+
+//
+// Image align size for DXE/SMM
+//
+CONST UINTN      mImageAlignSize = SIZE_4KB;
+
+RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
+EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
 EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
 /**
   Common exception handler.
