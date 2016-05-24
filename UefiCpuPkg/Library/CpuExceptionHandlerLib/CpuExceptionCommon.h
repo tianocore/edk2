@@ -134,7 +134,8 @@ DumpCpuContent (
 /**
   Internal worker function to initialize exception handler.
 
-  @param[in]  VectorInfo    Pointer to reserved vector list.
+  @param[in]      VectorInfo            Pointer to reserved vector list.
+  @param[in, out] ExceptionHandlerData  Pointer to exception handler data.
   
   @retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized 
                                 with default exception handlers.
@@ -144,7 +145,8 @@ DumpCpuContent (
 **/
 EFI_STATUS
 InitializeCpuExceptionHandlersWorker (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL,
+  IN OUT EXCEPTION_HANDLER_DATA    *ExceptionHandlerData
   );
 
 /**
