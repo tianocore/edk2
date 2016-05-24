@@ -201,7 +201,8 @@ UpdateIdtTable (
 /**
   Internal worker function to initialize exception handler.
 
-  @param[in]  VectorInfo    Pointer to reserved vector list.
+  @param[in]      VectorInfo            Pointer to reserved vector list.
+  @param[in, out] ExceptionHandlerData  Pointer to exception handler data.
   
   @retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized 
                                 with default exception handlers.
@@ -211,7 +212,8 @@ UpdateIdtTable (
 **/
 EFI_STATUS
 InitializeCpuExceptionHandlersWorker (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL,
+  IN OUT EXCEPTION_HANDLER_DATA    *ExceptionHandlerData
   )
 {
   EFI_STATUS                       Status;
@@ -219,11 +221,12 @@ InitializeCpuExceptionHandlersWorker (
   UINTN                            IdtEntryCount;
   EXCEPTION_HANDLER_TEMPLATE_MAP   TemplateMap;
   IA32_IDT_GATE_DESCRIPTOR         *IdtTable;
+  RESERVED_VECTORS_DATA            *ReservedVectors;
 
-  mReservedVectors = mReservedVectorsData;
-  SetMem ((VOID *) mReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
+  ReservedVectors = ExceptionHandlerData->ReservedVectors;
+  SetMem ((VOID *) ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
   if (VectorInfo != NULL) {
-    Status = ReadAndVerifyVectorInfo (VectorInfo, mReservedVectors, CPU_EXCEPTION_NUM);
+    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, CPU_EXCEPTION_NUM);
     if (EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
     }

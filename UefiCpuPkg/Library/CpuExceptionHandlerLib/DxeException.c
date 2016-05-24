@@ -21,6 +21,8 @@ CONST UINTN    mDoFarReturnFlag  = 0;
 
 extern SPIN_LOCK                   mDisplayMessageSpinLock;
 extern EFI_CPU_INTERRUPT_HANDLER   *mExternalInterruptHandler;
+extern RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
+extern EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
 EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
 
 /**
@@ -45,7 +47,10 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   )
 {
-  return InitializeCpuExceptionHandlersWorker (VectorInfo);
+  mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
+  mExceptionHandlerData.ExternalInterruptHandler = mExternalInterruptHandlerTable;
+  InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
+  return InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);
 }
 
 /**

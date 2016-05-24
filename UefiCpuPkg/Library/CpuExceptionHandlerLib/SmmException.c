@@ -17,6 +17,8 @@
 
 CONST UINTN   mDoFarReturnFlag   = 1; 
 
+extern RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
+extern EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
 EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
 /**
   Initializes all CPU exceptions entries and provides the default exception handlers.
@@ -40,7 +42,10 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   )
 {
-  return InitializeCpuExceptionHandlersWorker (VectorInfo);
+  mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
+  mExceptionHandlerData.ExternalInterruptHandler = mExternalInterruptHandlerTable;
+  InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
+  return InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);
 }
 
 /**
