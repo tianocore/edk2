@@ -127,47 +127,50 @@ CommonExceptionHandler (
 /**
   Internal worker function to update IDT entries accordling to vector attributes.
 
-  @param[in] IdtTable       Pointer to IDT table.
-  @param[in] TemplateMap    Pointer to a buffer where the address map is returned.
-  @param[in] IdtEntryCount  IDT entries number to be updated.
+  @param[in] IdtTable              Pointer to IDT table.
+  @param[in] TemplateMap           Pointer to a buffer where the address map is
+                                   returned.
+  @param[in] ExceptionHandlerData  Pointer to exception handler data.
 
 **/
 VOID
 UpdateIdtTable (
   IN IA32_IDT_GATE_DESCRIPTOR        *IdtTable,
   IN EXCEPTION_HANDLER_TEMPLATE_MAP  *TemplateMap,
-  IN UINTN                           IdtEntryCount
+  IN EXCEPTION_HANDLER_DATA          *ExceptionHandlerData
   )
 {
   UINT16                             CodeSegment;
   UINTN                              Index;
   UINTN                              InterruptHandler;
+  RESERVED_VECTORS_DATA              *ReservedVectors;
 
+  ReservedVectors = ExceptionHandlerData->ReservedVectors;
   //
   // Use current CS as the segment selector of interrupt gate in IDT
   //
   CodeSegment = AsmReadCs ();
 
-  for (Index = 0; Index < IdtEntryCount; Index ++) {
+  for (Index = 0; Index < ExceptionHandlerData->IdtEntryCount; Index ++) {
     IdtTable[Index].Bits.Selector = CodeSegment;
     //
     // Check reserved vectors attributes
     //
-    switch (mReservedVectors[Index].Attribute) {
+    switch (ReservedVectors[Index].Attribute) {
     case EFI_VECTOR_HANDOFF_DO_NOT_HOOK:
       //
       // Keep original IDT entry
       //
       continue;
     case EFI_VECTOR_HANDOFF_HOOK_AFTER:
-      InitializeSpinLock (&mReservedVectors[Index].SpinLock);
+      InitializeSpinLock (&ReservedVectors[Index].SpinLock);
       CopyMem (
-        (VOID *) mReservedVectors[Index].HookAfterStubHeaderCode,
+        (VOID *) ReservedVectors[Index].HookAfterStubHeaderCode,
         (VOID *) TemplateMap->HookAfterStubHeaderStart,
         TemplateMap->ExceptionStubHeaderSize
         );
       AsmVectorNumFixup (
-        (VOID *) mReservedVectors[Index].HookAfterStubHeaderCode,
+        (VOID *) ReservedVectors[Index].HookAfterStubHeaderCode,
         (UINT8) Index,
         (VOID *) TemplateMap->HookAfterStubHeaderStart
         );
@@ -178,7 +181,7 @@ UpdateIdtTable (
       //
       // Save original IDT handler address
       //
-      mReservedVectors[Index].ExceptonHandler = ArchGetIdtHandler (&IdtTable[Index]);
+      ReservedVectors[Index].ExceptonHandler = ArchGetIdtHandler (&IdtTable[Index]);
       //
       // Go on the following code
       //
@@ -195,7 +198,7 @@ UpdateIdtTable (
   //
   // Save Interrupt number to global variable used for RegisterCpuInterruptHandler ()
   //
-  mEnabledInterruptNum = IdtEntryCount;
+  mEnabledInterruptNum = ExceptionHandlerData->IdtEntryCount;
 }
 
 /**
@@ -249,7 +252,9 @@ InitializeCpuExceptionHandlersWorker (
   IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtDescriptor.Base;
   AsmGetTemplateAddressMap (&TemplateMap);
   ASSERT (TemplateMap.ExceptionStubHeaderSize <= HOOKAFTER_STUB_SIZE);
-  UpdateIdtTable (IdtTable, &TemplateMap, IdtEntryCount);
+
+  ExceptionHandlerData->IdtEntryCount = IdtEntryCount;
+  UpdateIdtTable (IdtTable, &TemplateMap, ExceptionHandlerData);
   mEnabledInterruptNum = IdtEntryCount;
   return EFI_SUCCESS;
 }

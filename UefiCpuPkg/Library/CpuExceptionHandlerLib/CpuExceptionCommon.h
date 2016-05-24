@@ -174,16 +174,17 @@ RegisterCpuInterruptHandlerWorker (
 /**
   Internal worker function to update IDT entries accordling to vector attributes.
 
-  @param[in] IdtTable       Pointer to IDT table.
-  @param[in] TemplateMap    Pointer to a buffer where the address map is returned.
-  @param[in] IdtEntryCount  IDT entries number to be updated.
+  @param[in] IdtTable              Pointer to IDT table.
+  @param[in] TemplateMap           Pointer to a buffer where the address map is
+                                   returned.
+  @param[in] ExceptionHandlerData  Pointer to exception handler data.
 
 **/
 VOID
 UpdateIdtTable (
   IN IA32_IDT_GATE_DESCRIPTOR        *IdtTable,
   IN EXCEPTION_HANDLER_TEMPLATE_MAP  *TemplateMap,
-  IN UINTN                           IdtEntryCount
+  IN EXCEPTION_HANDLER_DATA          *ExceptionHandlerData
   );
 
 /**
