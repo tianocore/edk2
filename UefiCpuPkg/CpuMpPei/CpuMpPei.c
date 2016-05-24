@@ -852,13 +852,30 @@ CpuMpPeimInit (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS           Status;
-  PEI_CPU_MP_DATA      *PeiCpuMpData;
+  EFI_STATUS                       Status;
+  PEI_CPU_MP_DATA                 *PeiCpuMpData;
+  EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
+  EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
 
   //
   // Load new GDT table on BSP
   //
   AsmInitializeGdt (&mGdt);
+  //
+  // Get Vector Hand-off Info PPI
+  //
+  VectorInfo = NULL;
+  Status = PeiServicesLocatePpi (
+             &gEfiVectorHandoffInfoPpiGuid,
+             0,
+             NULL,
+             (VOID **)&VectorHandoffInfoPpi
+             );
+  if (Status == EFI_SUCCESS) {
+    VectorInfo = VectorHandoffInfoPpi->Info;
+  }
+  Status = InitializeCpuExceptionHandlers (VectorInfo);
+  ASSERT_EFI_ERROR (Status);
   //
   // Get wakeup buffer and copy AP reset code in it
   //
