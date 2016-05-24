@@ -19,11 +19,26 @@
 
 CONST UINTN    mDoFarReturnFlag  = 0;
 
-extern SPIN_LOCK                   mDisplayMessageSpinLock;
 extern EFI_CPU_INTERRUPT_HANDLER   *mExternalInterruptHandler;
 extern RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
 extern EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
 EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
+
+/**
+  Common exception handler.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+**/
+VOID
+EFIAPI
+CommonExceptionHandler (
+  IN EFI_EXCEPTION_TYPE          ExceptionType, 
+  IN EFI_SYSTEM_CONTEXT          SystemContext
+  )
+{
+  CommonExceptionHandlerWorker (ExceptionType, SystemContext, &mExceptionHandlerData);
+}
 
 /**
   Initializes all CPU exceptions entries and provides the default exception handlers.
@@ -96,7 +111,7 @@ InitializeCpuInterruptHandlers (
       return EFI_INVALID_PARAMETER;
     }
   }
-  InitializeSpinLock (&mDisplayMessageSpinLock);
+
   ExternalInterruptHandler = AllocateZeroPool (sizeof (EFI_CPU_INTERRUPT_HANDLER) * CPU_INTERRUPT_NUM);
   ASSERT (ExternalInterruptHandler != NULL);
 

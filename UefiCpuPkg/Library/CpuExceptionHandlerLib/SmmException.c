@@ -21,6 +21,22 @@ extern RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
 extern EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
 EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
 /**
+  Common exception handler.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+**/
+VOID
+EFIAPI
+CommonExceptionHandler (
+  IN EFI_EXCEPTION_TYPE          ExceptionType, 
+  IN EFI_SYSTEM_CONTEXT          SystemContext
+  )
+{
+  CommonExceptionHandlerWorker (ExceptionType, SystemContext, &mExceptionHandlerData);
+}
+
+/**
   Initializes all CPU exceptions entries and provides the default exception handlers.
   
   Caller should try to get an array of interrupt and/or exception vectors that are in use and need to

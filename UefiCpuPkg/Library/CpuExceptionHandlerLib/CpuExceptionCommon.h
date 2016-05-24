@@ -261,5 +261,19 @@ GetExceptionNameStr (
   IN EFI_EXCEPTION_TYPE          ExceptionType
   );
 
+/**
+  Internal worker function for common exception handler.
+
+  @param ExceptionType         Exception type.
+  @param SystemContext         Pointer to EFI_SYSTEM_CONTEXT.
+  @param ExceptionHandlerData  Pointer to exception handler data.
+**/
+VOID
+CommonExceptionHandlerWorker (
+  IN EFI_EXCEPTION_TYPE          ExceptionType, 
+  IN EFI_SYSTEM_CONTEXT          SystemContext,
+  IN EXCEPTION_HANDLER_DATA      *ExceptionHandlerData
+  );
+
 #endif
 
