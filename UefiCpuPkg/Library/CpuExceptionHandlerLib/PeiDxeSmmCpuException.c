@@ -1,7 +1,7 @@
 /** @file
-  CPU Exception Library provides DXE/SMM CPU common exception handler.
+  CPU Exception Library provides PEI/DXE/SMM CPU common exception handler.
 
-Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
