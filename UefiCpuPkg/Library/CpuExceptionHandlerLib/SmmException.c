@@ -103,5 +103,5 @@ RegisterCpuInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
   )
 {
-  return RegisterCpuInterruptHandlerWorker (InterruptType, InterruptHandler);
+  return RegisterCpuInterruptHandlerWorker (InterruptType, InterruptHandler, &mExceptionHandlerData);
 }
