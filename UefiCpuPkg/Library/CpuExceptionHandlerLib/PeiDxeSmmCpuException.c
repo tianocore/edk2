@@ -15,17 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "CpuExceptionCommon.h"
 #include <Library/DebugLib.h>
 
-
-//
-// Image align size for DXE/SMM
-//
-CONST UINTN      mImageAlignSize = SIZE_4KB;
-
-RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
-EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
-EFI_CPU_INTERRUPT_HANDLER   *mExternalInterruptHandler = NULL;
-UINTN                       mEnabledInterruptNum = 0;
-
 /**
   Internal worker function for common exception handler.
 
@@ -196,11 +185,6 @@ UpdateIdtTable (
       break;
     }
   }
- 
-  //
-  // Save Interrupt number to global variable used for RegisterCpuInterruptHandler ()
-  //
-  mEnabledInterruptNum = ExceptionHandlerData->IdtEntryCount;
 }
 
 /**
@@ -237,7 +221,6 @@ InitializeCpuExceptionHandlersWorker (
     }
   }
 
-  mExternalInterruptHandler = mExternalInterruptHandlerTable;
   //
   // Read IDT descriptor and calculate IDT size
   //
@@ -256,7 +239,7 @@ InitializeCpuExceptionHandlersWorker (
 
   ExceptionHandlerData->IdtEntryCount = IdtEntryCount;
   UpdateIdtTable (IdtTable, &TemplateMap, ExceptionHandlerData);
-  mEnabledInterruptNum = IdtEntryCount;
+
   return EFI_SUCCESS;
 }
 

@@ -19,9 +19,15 @@
 
 CONST UINTN    mDoFarReturnFlag  = 0;
 
-extern EFI_CPU_INTERRUPT_HANDLER   *mExternalInterruptHandler;
-extern RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
-extern EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+//
+// Image align size for DXE/SMM
+//
+CONST UINTN      mImageAlignSize = SIZE_4KB;
+
+RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
+EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+UINTN                       mEnabledInterruptNum = 0;
+
 EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
 
 /**
