@@ -152,10 +152,11 @@ InitializeCpuExceptionHandlersWorker (
 /**
   Registers a function to be called from the processor interrupt handler.
 
-  @param[in]  InterruptType     Defines which interrupt or exception to hook.
-  @param[in]  InterruptHandler  A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
-                                when a processor interrupt occurs. If this parameter is NULL, then the handler
-                                will be uninstalled.
+  @param[in]  InterruptType        Defines which interrupt or exception to hook.
+  @param[in]  InterruptHandler     A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
+                                   when a processor interrupt occurs. If this parameter is NULL, then the handler
+                                   will be uninstalled
+  @param[in] ExceptionHandlerData  Pointer to exception handler data.
 
   @retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
   @retval EFI_ALREADY_STARTED   InterruptHandler is not NULL, and a handler for InterruptType was
@@ -168,7 +169,8 @@ InitializeCpuExceptionHandlersWorker (
 EFI_STATUS
 RegisterCpuInterruptHandlerWorker (
   IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler,
+  IN EXCEPTION_HANDLER_DATA        *ExceptionHandlerData
   );
 
 /**

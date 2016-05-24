@@ -262,10 +262,11 @@ InitializeCpuExceptionHandlersWorker (
 /**
   Registers a function to be called from the processor interrupt handler.
 
-  @param[in]  InterruptType     Defines which interrupt or exception to hook.
-  @param[in]  InterruptHandler  A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
-                                when a processor interrupt occurs. If this parameter is NULL, then the handler
-                                will be uninstalled.
+  @param[in]  InterruptType        Defines which interrupt or exception to hook.
+  @param[in]  InterruptHandler     A pointer to a function of type EFI_CPU_INTERRUPT_HANDLER that is called
+                                   when a processor interrupt occurs. If this parameter is NULL, then the handler
+                                   will be uninstalled
+  @param[in] ExceptionHandlerData  Pointer to exception handler data.
 
   @retval EFI_SUCCESS           The handler for the processor interrupt was successfully installed or uninstalled.
   @retval EFI_ALREADY_STARTED   InterruptHandler is not NULL, and a handler for InterruptType was
@@ -278,23 +279,32 @@ InitializeCpuExceptionHandlersWorker (
 EFI_STATUS
 RegisterCpuInterruptHandlerWorker (
   IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler,
+  IN EXCEPTION_HANDLER_DATA        *ExceptionHandlerData
   )
 {
-  if (InterruptType < 0 || InterruptType >= (EFI_EXCEPTION_TYPE)mEnabledInterruptNum ||
-      mReservedVectors[InterruptType].Attribute == EFI_VECTOR_HANDOFF_DO_NOT_HOOK) {
+  UINTN                          EnabledInterruptNum;
+  RESERVED_VECTORS_DATA          *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER      *ExternalInterruptHandler;
+
+  EnabledInterruptNum      = ExceptionHandlerData->IdtEntryCount;
+  ReservedVectors          = ExceptionHandlerData->ReservedVectors;
+  ExternalInterruptHandler = ExceptionHandlerData->ExternalInterruptHandler;
+
+  if (InterruptType < 0 || InterruptType >= (EFI_EXCEPTION_TYPE)EnabledInterruptNum ||
+      ReservedVectors[InterruptType].Attribute == EFI_VECTOR_HANDOFF_DO_NOT_HOOK) {
     return EFI_UNSUPPORTED;
   }
 
-  if (InterruptHandler == NULL && mExternalInterruptHandler[InterruptType] == NULL) {
+  if (InterruptHandler == NULL && ExternalInterruptHandler[InterruptType] == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (InterruptHandler != NULL && mExternalInterruptHandler[InterruptType] != NULL) {
+  if (InterruptHandler != NULL && ExternalInterruptHandler[InterruptType] != NULL) {
     return EFI_ALREADY_STARTED;
   }
 
-  mExternalInterruptHandler[InterruptType] = InterruptHandler;
+  ExternalInterruptHandler[InterruptType] = InterruptHandler;
   return EFI_SUCCESS;
 }
 
