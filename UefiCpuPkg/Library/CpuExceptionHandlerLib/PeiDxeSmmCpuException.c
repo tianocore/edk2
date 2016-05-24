@@ -15,10 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "CpuExceptionCommon.h"
 #include <Library/DebugLib.h>
 
-//
-// Spinlock for CPU information display
-//
-SPIN_LOCK        mDisplayMessageSpinLock;
 
 //
 // Image align size for DXE/SMM
@@ -31,49 +27,54 @@ EFI_CPU_INTERRUPT_HANDLER   *mExternalInterruptHandler = NULL;
 UINTN                       mEnabledInterruptNum = 0;
 
 /**
-  Common exception handler.
+  Internal worker function for common exception handler.
 
-  @param ExceptionType  Exception type.
-  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+  @param ExceptionType         Exception type.
+  @param SystemContext         Pointer to EFI_SYSTEM_CONTEXT.
+  @param ExceptionHandlerData  Pointer to exception handler data.
 **/
 VOID
-EFIAPI
-CommonExceptionHandler (
+CommonExceptionHandlerWorker (
   IN EFI_EXCEPTION_TYPE          ExceptionType, 
-  IN EFI_SYSTEM_CONTEXT          SystemContext
+  IN EFI_SYSTEM_CONTEXT          SystemContext,
+  IN EXCEPTION_HANDLER_DATA      *ExceptionHandlerData
   )
 {
   EXCEPTION_HANDLER_CONTEXT      *ExceptionHandlerContext;
+  RESERVED_VECTORS_DATA          *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER      *ExternalInterruptHandler;
 
-  ExceptionHandlerContext = (EXCEPTION_HANDLER_CONTEXT *) (UINTN) (SystemContext.SystemContextIa32);
+  ExceptionHandlerContext  = (EXCEPTION_HANDLER_CONTEXT *) (UINTN) (SystemContext.SystemContextIa32);
+  ReservedVectors          = ExceptionHandlerData->ReservedVectors;
+  ExternalInterruptHandler = ExceptionHandlerData->ExternalInterruptHandler;
 
-  switch (mReservedVectors[ExceptionType].Attribute) {
+  switch (ReservedVectors[ExceptionType].Attribute) {
   case EFI_VECTOR_HANDOFF_HOOK_BEFORE:
     //
     // Need to jmp to old IDT handler after this exception handler
     //
     ExceptionHandlerContext->ExceptionDataFlag = (mErrorCodeFlag & (1 << ExceptionType)) ? TRUE : FALSE;
-    ExceptionHandlerContext->OldIdtHandler     = mReservedVectors[ExceptionType].ExceptonHandler;
+    ExceptionHandlerContext->OldIdtHandler     = ReservedVectors[ExceptionType].ExceptonHandler;
     break;
   case EFI_VECTOR_HANDOFF_HOOK_AFTER:
     while (TRUE) {
       //
       // If if anyone has gotten SPIN_LOCK for owner running hook after
       //
-      if (AcquireSpinLockOrFail (&mReservedVectors[ExceptionType].SpinLock)) {
+      if (AcquireSpinLockOrFail (&ReservedVectors[ExceptionType].SpinLock)) {
         //
         // Need to execute old IDT handler before running this exception handler
         //
-        mReservedVectors[ExceptionType].ApicId = GetApicId ();
+        ReservedVectors[ExceptionType].ApicId = GetApicId ();
         ArchSaveExceptionContext (ExceptionType, SystemContext);
         ExceptionHandlerContext->ExceptionDataFlag = (mErrorCodeFlag & (1 << ExceptionType)) ? TRUE : FALSE;
-        ExceptionHandlerContext->OldIdtHandler     = mReservedVectors[ExceptionType].ExceptonHandler;
+        ExceptionHandlerContext->OldIdtHandler     = ReservedVectors[ExceptionType].ExceptonHandler;
         return;
       }
       //
       // If failed to acquire SPIN_LOCK, check if it was locked by processor itself
       //
-      if (mReservedVectors[ExceptionType].ApicId == GetApicId ()) {
+      if (ReservedVectors[ExceptionType].ApicId == GetApicId ()) {
         //
         // Old IDT handler has been executed, then retore CPU exception content to
         // run new exception handler.
@@ -82,7 +83,7 @@ CommonExceptionHandler (
         //
         // Rlease spin lock for ApicId
         //
-        ReleaseSpinLock (&mReservedVectors[ExceptionType].SpinLock);
+        ReleaseSpinLock (&ReservedVectors[ExceptionType].SpinLock);
         break;
       }
       CpuPause ();
@@ -98,13 +99,14 @@ CommonExceptionHandler (
     break;
   }
   
-  if (mExternalInterruptHandler[ExceptionType] != NULL) {
-    (mExternalInterruptHandler[ExceptionType]) (ExceptionType, SystemContext);
+  if (ExternalInterruptHandler != NULL &&
+      ExternalInterruptHandler[ExceptionType] != NULL) {
+    (ExternalInterruptHandler[ExceptionType]) (ExceptionType, SystemContext);
   } else if (ExceptionType < CPU_EXCEPTION_NUM) {
     //
     // Get Spinlock to display CPU information
     //
-    while (!AcquireSpinLockOrFail (&mDisplayMessageSpinLock)) {
+    while (!AcquireSpinLockOrFail (&ExceptionHandlerData->DisplayMessageSpinLock)) {
       CpuPause ();
     }
     //
@@ -114,11 +116,11 @@ CommonExceptionHandler (
     //
     // Release Spinlock of output message
     //
-    ReleaseSpinLock (&mDisplayMessageSpinLock);
+    ReleaseSpinLock (&ExceptionHandlerData->DisplayMessageSpinLock);
     //
     // Enter a dead loop if needn't to execute old IDT handler further
     //
-    if (mReservedVectors[ExceptionType].Attribute != EFI_VECTOR_HANDOFF_HOOK_BEFORE) {
+    if (ReservedVectors[ExceptionType].Attribute != EFI_VECTOR_HANDOFF_HOOK_BEFORE) {
       CpuDeadLoop ();
     }
   }
@@ -234,7 +236,6 @@ InitializeCpuExceptionHandlersWorker (
       return EFI_INVALID_PARAMETER;
     }
   }
-  InitializeSpinLock (&mDisplayMessageSpinLock);
 
   mExternalInterruptHandler = mExternalInterruptHandlerTable;
   //
