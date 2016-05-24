@@ -31,6 +31,11 @@
 
 #include "ArchInterruptDefs.h"
 
+#define CPU_EXCEPTION_HANDLER_LIB_HOB_GUID \
+  { \
+    0xb21d9148, 0x9211, 0x4d8f, { 0xad, 0xd3, 0x66, 0xb1, 0x89, 0xc9, 0x2c, 0x83 } \
+  }
+
 //
 // Record exception handler information
 //
