@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -697,11 +697,7 @@ SockRcv (
   }
 
   if (RcvdBytes != 0) {
-    Status = SockProcessRcvToken (Sock, RcvToken);
-
-    if (EFI_ERROR (Status)) {
-      goto Exit;
-    }
+    SockProcessRcvToken (Sock, RcvToken);
 
     Status = Sock->ProtoHandler (Sock, SOCK_CONSUMED, NULL);
   } else {
