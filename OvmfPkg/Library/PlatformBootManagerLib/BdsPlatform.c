@@ -1200,11 +1200,6 @@ Returns:
   EfiBootManagerConnectAll ();
 
   PciAcpiInitialization ();
-
-  //
-  // Clear the logo after all devices are connected.
-  //
-  gST->ConOut->ClearScreen (gST->ConOut);
 }
 
 /**
