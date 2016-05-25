@@ -341,7 +341,6 @@ EFI_STATUS
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
-                                  HttpConfigData is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is FALSE and
                                   HttpConfigData->IPv4Node is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is TRUE and
