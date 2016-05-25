@@ -16,6 +16,7 @@
 **/
 
 #include <IndustryStandard/Pci22.h>
+#include <Library/BootLogoLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
 #include <Library/QemuBootOrderLib.h>
@@ -531,7 +532,13 @@ PlatformBootManagerAfterConsole (
   //
   // Show the splash screen.
   //
-  EnableQuietBoot (PcdGetPtr (PcdLogoFile));
+  BootLogoEnableLogo (
+    ImageFormatBmp,                          // ImageFormat
+    PcdGetPtr (PcdLogoFile),                 // Logo
+    EdkiiPlatformLogoDisplayAttributeCenter, // Attribute
+    0,                                       // OffsetX
+    0                                        // OffsetY
+    );
 
   //
   // Connect the rest of the devices.

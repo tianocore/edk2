@@ -48,33 +48,4 @@ TryRunningQemuKernel (
   VOID
   );
 
-/**
-  Use SystemTable Conout to stop video based Simple Text Out consoles from
-  going to the video device. Put up LogoFile on every video device that is a
-  console.
-
-  @param[in]  LogoFile   File name of logo to display on the center of the
-                         screen.
-
-  @retval EFI_SUCCESS     ConsoleControl has been flipped to graphics and logo
-                          displayed.
-  @retval EFI_UNSUPPORTED Logo not found
-**/
-EFI_STATUS
-EnableQuietBoot (
-  IN  EFI_GUID  *LogoFile
-  );
-
-/**
-  Use SystemTable Conout to turn on video based Simple Text Out consoles. The
-  Simple Text Out screens will now be synced up with all non video output
-  devices
-
-  @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.
-**/
-EFI_STATUS
-DisableQuietBoot (
-  VOID
-  );
-
 #endif // _PLATFORM_BM_H_
