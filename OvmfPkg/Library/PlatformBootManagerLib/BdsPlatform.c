@@ -1284,7 +1284,13 @@ Routine Description:
   //
   // Logo show
   //
-  EnableQuietBoot (PcdGetPtr (PcdLogoFile));
+  BootLogoEnableLogo (
+    ImageFormatBmp,                          // ImageFormat
+    PcdGetPtr (PcdLogoFile),                 // Logo
+    EdkiiPlatformLogoDisplayAttributeCenter, // Attribute
+    0,                                       // OffsetX
+    0                                        // OffsetY
+    );
 
   //
   // Perform some platform specific connect sequence
