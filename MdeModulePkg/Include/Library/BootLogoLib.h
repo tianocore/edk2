@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _BOOT_LOGO_LIB_H_
 
 #include <Protocol/PlatformLogo.h>
+#include <Protocol/GraphicsOutput.h>
 
 /**
   Show LOGO on all consoles.
