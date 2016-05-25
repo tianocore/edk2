@@ -684,6 +684,8 @@ NvmeCreateIoCompletionQueue (
   NVME_ADMIN_CRIOCQ                        CrIoCq;
   UINT32                                   Index;
 
+  Status = EFI_SUCCESS;
+
   for (Index = 1; Index < NVME_MAX_QUEUES; Index++) {
     ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
     ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
@@ -739,6 +741,8 @@ NvmeCreateIoSubmissionQueue (
   EFI_STATUS                               Status;
   NVME_ADMIN_CRIOSQ                        CrIoSq;
   UINT32                                   Index;
+
+  Status = EFI_SUCCESS;
 
   for (Index = 1; Index < NVME_MAX_QUEUES; Index++) {
     ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
