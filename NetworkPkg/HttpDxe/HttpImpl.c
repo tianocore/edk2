@@ -114,7 +114,6 @@ EfiHttpGetModeData (
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
-                                  HttpConfigData is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is FALSE and
                                   HttpConfigData->IPv4Node is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is TRUE and
@@ -141,9 +140,9 @@ EfiHttpConfigure (
   // Check input parameters.
   //
   if (This == NULL ||
-      HttpConfigData == NULL ||
-     ((HttpConfigData->LocalAddressIsIPv6 && HttpConfigData->AccessPoint.IPv6Node == NULL) ||
-     (!HttpConfigData->LocalAddressIsIPv6 && HttpConfigData->AccessPoint.IPv4Node == NULL))) {
+      (HttpConfigData != NULL && 
+       ((HttpConfigData->LocalAddressIsIPv6 && HttpConfigData->AccessPoint.IPv6Node == NULL) ||
+        (!HttpConfigData->LocalAddressIsIPv6 && HttpConfigData->AccessPoint.IPv4Node == NULL)))) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -254,6 +253,7 @@ EfiHttpRequest (
   //
   Url = NULL;
   UrlParser = NULL;
+  RemotePort = 0;
   HostName = NULL;
   RequestMsg = NULL;
   HostNameStr = NULL;
@@ -908,6 +908,7 @@ HttpResponseWorker (
   SizeofHeaders             = 0;
   BufferSize                = 0;
   EndofHeader               = NULL;
+  ValueInItem               = NULL;
  
   if (HttpMsg->Data.Response != NULL) {
     //
