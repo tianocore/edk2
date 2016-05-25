@@ -329,13 +329,7 @@ HiiSelectDiskAction (
 
     case HII_KEY_ID_GOTO_REVERT:
       gHiiConfiguration.AvailableFields |= HII_FIELD_PASSWORD;
-      if (OpalDisk->SupportedAttributes.PyriteSsc != 1) {
-        //
-        // According to current Pyrite SSC Spec 1.00, there is no parameter for RevertSP method.
-        // So issue RevertSP method without any parameter by suppress KeepUserData option.
-        //
-        gHiiConfiguration.AvailableFields |= HII_FIELD_KEEP_USER_DATA;
-      }
+      gHiiConfiguration.AvailableFields |= HII_FIELD_KEEP_USER_DATA;
       if (AvailActions.RevertKeepDataForced) {
         gHiiConfiguration.AvailableFields |= HII_FIELD_KEEP_USER_DATA_FORCED;
       }
@@ -573,14 +567,6 @@ HiiPopulateDiskInfoForm(
         // Default initialize keep user Data to be true
         //
         gHiiConfiguration.KeepUserData = 1;
-        if (OpalDisk->SupportedAttributes.PyriteSsc == 1) {
-          //
-          // According to current Pyrite SSC Spec 1.00, there is no parameter for RevertSP method.
-          // So issue RevertSP method without any parameter by set default value to FALSE.
-          //
-          gHiiConfiguration.KeepUserData = 0;
-        }
-
       }
     }
   }
@@ -1073,8 +1059,15 @@ HiiPasswordEntered(
   } else if (gHiiConfiguration.SelectedAction == HII_KEY_ID_GOTO_DISABLE_USER) {
     Status = HiiDisableUser (OpalDisk, Password, PassLength);
   } else if (gHiiConfiguration.SelectedAction == HII_KEY_ID_GOTO_REVERT) {
-    DEBUG ((DEBUG_INFO, "gHiiConfiguration.KeepUserData %u\n", gHiiConfiguration.KeepUserData));
-    Status = HiiRevert(OpalDisk, Password, PassLength, gHiiConfiguration.KeepUserData);
+    if (OpalDisk->SupportedAttributes.PyriteSsc == 1 && OpalDisk->LockingFeature.MediaEncryption == 0) {
+      //
+      // For pyrite type device which also not supports media encryption, it not accept "Keep User Data" parameter.
+      // So here hardcode a FALSE for this case.
+      //
+      Status = HiiRevert(OpalDisk, Password, PassLength, FALSE);
+    } else {
+      Status = HiiRevert(OpalDisk, Password, PassLength, gHiiConfiguration.KeepUserData);
+    }
   } else {
     Status = HiiSetPassword(OpalDisk, Password, PassLength);
   }
