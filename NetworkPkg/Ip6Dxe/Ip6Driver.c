@@ -149,6 +149,22 @@ Ip6CleanService (
   EFI_IPv6_ADDRESS          AllNodes;
   IP6_NEIGHBOR_ENTRY        *NeighborCache;
 
+  IpSb->State     = IP6_SERVICE_DESTROY;
+
+  if (IpSb->Timer != NULL) {
+    gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
+    gBS->CloseEvent (IpSb->Timer);
+
+    IpSb->Timer = NULL;
+  }
+
+  if (IpSb->FasterTimer != NULL) {
+    gBS->SetTimer (IpSb->FasterTimer, TimerCancel, 0);
+    gBS->CloseEvent (IpSb->FasterTimer);
+
+    IpSb->FasterTimer = NULL;
+  }
+
   Ip6ConfigCleanInstance (&IpSb->Ip6ConfigInstance);
 
   if (!IpSb->LinkLocalDadFail) {
@@ -214,19 +230,6 @@ Ip6CleanService (
     gBS->CloseEvent (IpSb->RecvRequest.MnpToken.Event);
   }
 
-  if (IpSb->Timer != NULL) {
-    gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
-    gBS->CloseEvent (IpSb->Timer);
-
-    IpSb->Timer = NULL;
-  }
-
-  if (IpSb->FasterTimer != NULL) {
-    gBS->SetTimer (IpSb->FasterTimer, TimerCancel, 0);
-    gBS->CloseEvent (IpSb->FasterTimer);
-
-    IpSb->FasterTimer = NULL;
-  }
   //
   // Free the Neighbor Discovery resources
   //
@@ -759,8 +762,6 @@ Ip6DriverBindingStop (
                );
   } else if (IsListEmpty (&IpSb->Children)) {
     State           = IpSb->State;
-    IpSb->State     = IP6_SERVICE_DESTROY;
-
     Status = Ip6CleanService (IpSb);
     if (EFI_ERROR (Status)) {
       IpSb->State = State;
