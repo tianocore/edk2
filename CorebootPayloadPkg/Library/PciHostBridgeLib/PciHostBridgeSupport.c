@@ -193,6 +193,7 @@ PcatPciRootBridgeParseBars (
   UINT32                            UpperValue;
   UINT64                            Mask;
   UINTN                             Offset;
+  UINTN                             LowBit;
   UINT64                            Base;
   UINT64                            Length;
   UINT64                            Limit;
@@ -262,7 +263,10 @@ PcatPciRootBridgeParseBars (
 
           Base = Base | LShiftU64 ((UINT64) OriginalUpperValue, 32);
           Length = Length | LShiftU64 ((UINT64) UpperValue, 32);
-          Length = (~Length) + 1;
+          if (Length != 0) {
+            LowBit = LowBitSet64 (Length);
+            Length = LShiftU64 (1ULL, LowBit);
+          }
 
           if ((Value & BIT3) == BIT3) {
             MemAperture = PMemAbove4G;
