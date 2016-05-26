@@ -302,6 +302,11 @@ IterateVariablesCallbackSetSystemVariable (
             "failed with EFI_SECURITY_VIOLATION, ignoring\n", __FUNCTION__,
             VariableName));
     Status = EFI_SUCCESS;
+  } else if (Status == EFI_WRITE_PROTECTED) {
+    DEBUG ((DEBUG_WARN, "%a: setting ReadOnly variable \"%s\" "
+            "failed with EFI_WRITE_PROTECTED, ignoring\n", __FUNCTION__,
+            VariableName));
+    Status = EFI_SUCCESS;
   }
   return Status;
 }
