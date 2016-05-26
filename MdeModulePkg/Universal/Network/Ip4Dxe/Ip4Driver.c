@@ -393,6 +393,15 @@ Ip4CleanService (
 {
   EFI_STATUS                Status;
 
+  IpSb->State     = IP4_SERVICE_DESTROY;
+
+  if (IpSb->Timer != NULL) {
+    gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
+    gBS->CloseEvent (IpSb->Timer);
+
+    IpSb->Timer = NULL;
+  }
+
   if (IpSb->DefaultInterface != NULL) {
     Status = Ip4FreeInterface (IpSb->DefaultInterface, NULL);
 
@@ -430,13 +439,6 @@ Ip4CleanService (
       );
 
     IpSb->MnpChildHandle = NULL;
-  }
-
-  if (IpSb->Timer != NULL) {
-    gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
-    gBS->CloseEvent (IpSb->Timer);
-
-    IpSb->Timer = NULL;
   }
 
   if (IpSb->ReconfigEvent != NULL) {
@@ -750,8 +752,6 @@ Ip4DriverBindingStop (
 
   } else if (IsListEmpty (&IpSb->Children)) {
     State           = IpSb->State;
-    IpSb->State     = IP4_SERVICE_DESTROY;
-
     //
     // OK, clean other resources then uninstall the service binding protocol.
     //
