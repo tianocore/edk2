@@ -76,6 +76,32 @@ class ToolDefClassObject(object):
 
         self.IncludeToolDefFile(FileName)
 
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET]))
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG]))
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET_ARCH] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET_ARCH]))
+
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE]))
+
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET].sort()
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG].sort()
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET_ARCH].sort()
+        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE].sort()
+
+        KeyList = [TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG, TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE]
+        for Index in range(3, -1, -1):
+            for Key in dict(self.ToolsDefTxtDictionary):
+                List = Key.split('_')
+                if List[Index] == '*':
+                    for String in self.ToolsDefTxtDatabase[KeyList[Index]]:
+                        List[Index] = String
+                        NewKey = '%s_%s_%s_%s_%s' % tuple(List)
+                        if NewKey not in self.ToolsDefTxtDictionary:
+                            self.ToolsDefTxtDictionary[NewKey] = self.ToolsDefTxtDictionary[Key]
+                        continue
+                    del self.ToolsDefTxtDictionary[Key]
+                elif List[Index] not in self.ToolsDefTxtDatabase[KeyList[Index]]:
+                    del self.ToolsDefTxtDictionary[Key]
+
 
     ## IncludeToolDefFile
     #
@@ -200,31 +226,6 @@ class ToolDefClassObject(object):
                        or List[1] not in self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY]:
                         EdkLogger.verbose("Line %d: The family is not specified, but BuildRuleFamily is specified for the tool chain: %s" % ((Index + 1), Name))
                     self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY][List[1]] = Value
-
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET]))
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG]))
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET_ARCH] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET_ARCH]))
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE] = list(set(self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE]))
-
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET].sort()
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG].sort()
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TARGET_ARCH].sort()
-        self.ToolsDefTxtDatabase[TAB_TOD_DEFINES_COMMAND_TYPE].sort()
-
-        KeyList = [TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG, TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE]
-        for Index in range(3, -1, -1):
-            for Key in dict(self.ToolsDefTxtDictionary):
-                List = Key.split('_')
-                if List[Index] == '*':
-                    for String in self.ToolsDefTxtDatabase[KeyList[Index]]:
-                        List[Index] = String
-                        NewKey = '%s_%s_%s_%s_%s' % tuple(List)
-                        if NewKey not in self.ToolsDefTxtDictionary:
-                            self.ToolsDefTxtDictionary[NewKey] = self.ToolsDefTxtDictionary[Key]
-                        continue
-                    del self.ToolsDefTxtDictionary[Key]
-                elif List[Index] not in self.ToolsDefTxtDatabase[KeyList[Index]]:
-                    del self.ToolsDefTxtDictionary[Key]
 
     ## ExpandMacros
     #
