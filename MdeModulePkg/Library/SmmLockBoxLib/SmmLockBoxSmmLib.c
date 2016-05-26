@@ -30,6 +30,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 SMM_LOCK_BOX_CONTEXT mSmmLockBoxContext;
 LIST_ENTRY           mLockBoxQueue = INITIALIZE_LIST_HEAD_VARIABLE (mLockBoxQueue);
 
+BOOLEAN              mSmmConfigurationTableInstalled = FALSE;
+
 /**
   This function return SmmLockBox context from SMST.
 
@@ -114,12 +116,49 @@ SmmLockBoxSmmConstructor (
                     sizeof(mSmmLockBoxContext)
                     );
   ASSERT_EFI_ERROR (Status);
+  mSmmConfigurationTableInstalled = TRUE;
 
   DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxContext - %x\n", (UINTN)&mSmmLockBoxContext));
   DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib LockBoxDataAddress - %x\n", (UINTN)&mLockBoxQueue));
   DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Exit\n"));
 
   return Status;
+}
+
+/**
+  Destructor for SmmLockBox library.
+  This is used to uninstall SmmLockBoxCommunication configuration table
+  if it has been installed in Constructor.
+
+  @param[in] ImageHandle    Image handle of this driver.
+  @param[in] SystemTable    A Pointer to the EFI System Table.
+
+  @retval EFI_SUCEESS       The destructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmLockBoxSmmDestructor (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+{
+  EFI_STATUS            Status;
+
+  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmDestructor in %a module\n", gEfiCallerBaseName));
+
+  if (mSmmConfigurationTableInstalled) {
+    Status = gSmst->SmmInstallConfigurationTable (
+                      gSmst,
+                      &gEfiSmmLockBoxCommunicationGuid,
+                      NULL,
+                      0
+                      );
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib uninstall SmmLockBoxCommunication configuration table\n"));
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
