@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -3136,7 +3136,7 @@ EvaluateExpression (
         case EFI_HII_VARSTORE_NAME_VALUE:
           if (OpCode->ValueType != EFI_IFR_TYPE_STRING) {
             NameValue = AllocateZeroPool ((OpCode->ValueWidth * 2 + 1) * sizeof (CHAR16));
-            ASSERT (Value != NULL);
+            ASSERT (NameValue != NULL);
             //
             // Convert Buffer to Hex String
             //
