@@ -201,8 +201,10 @@ RamDiskPublishNfit (
   //
   // Determine whether there is a NFIT already in the ACPI table.
   //
-  Status = EFI_SUCCESS;
-  TableIndex = 0;
+  Status      = EFI_SUCCESS;
+  TableIndex  = 0;
+  TableKey    = 0;
+  TableHeader = NULL;
 
   while (!EFI_ERROR (Status)) {
     Status = mAcpiSdtProtocol->GetAcpiTable (
@@ -386,8 +388,10 @@ RamDiskUnpublishNfit (
   //
   // Find the NFIT in the ACPI table.
   //
-  Status = EFI_SUCCESS;
-  TableIndex = 0;
+  Status      = EFI_SUCCESS;
+  TableIndex  = 0;
+  TableKey    = 0;
+  TableHeader = NULL;
 
   while (!EFI_ERROR (Status)) {
     Status = mAcpiSdtProtocol->GetAcpiTable (
