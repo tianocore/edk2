@@ -1616,6 +1616,7 @@ ProcessUserInput (
         DeleteString(Statement->HiiValue.Value.string, gCurrentSelection->FormSet->HiiHandle);
         Statement->HiiValue.Value.string = UserInput->InputValue.Value.string;
         CopyMem (Statement->BufferValue, UserInput->InputValue.Buffer, (UINTN) UserInput->InputValue.BufferLen);
+        ZeroMem (UserInput->InputValue.Buffer, (UINTN) UserInput->InputValue.BufferLen);
         FreePool (UserInput->InputValue.Buffer);
         //
         // Two password match, send it to Configuration Driver

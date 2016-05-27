@@ -907,7 +907,8 @@ PasswordProcess (
 
     Status = EFI_INVALID_PARAMETER;
   }
-  
+  ZeroMem (TempString, (Maximum + 1) * sizeof (CHAR16));
+  ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
   FreePool (TempString);
   FreePool (StringPtr);
 
