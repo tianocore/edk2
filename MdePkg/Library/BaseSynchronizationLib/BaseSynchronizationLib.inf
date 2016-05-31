@@ -71,6 +71,7 @@
   X64/InterlockedIncrement.c | MSFT 
   SynchronizationMsc.c | MSFT 
 
+  X64/InterlockedDecrement.nasm| INTEL
   X64/InterlockedDecrement.asm | INTEL 
   X64/InterlockedIncrement.asm | INTEL 
   Synchronization.c | INTEL 
