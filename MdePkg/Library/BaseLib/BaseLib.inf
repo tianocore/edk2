@@ -307,6 +307,7 @@
   Ia32/LRotU64.asm | INTEL 
   Ia32/LongJump.nasm| INTEL
   Ia32/LongJump.asm | INTEL 
+  Ia32/Invd.nasm| INTEL
   Ia32/Invd.asm | INTEL 
   Ia32/FxRestore.asm | INTEL 
   Ia32/FxSave.asm | INTEL 
