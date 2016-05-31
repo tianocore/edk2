@@ -517,6 +517,7 @@
   X64/WriteIdtr.asm | MSFT
   X64/ReadIdtr.nasm| MSFT
   X64/ReadIdtr.asm | MSFT
+  X64/WriteGdtr.nasm| MSFT
   X64/WriteGdtr.asm | MSFT
   X64/ReadGdtr.asm | MSFT
   X64/ReadTr.asm | MSFT
@@ -625,6 +626,7 @@
   X64/WriteIdtr.asm | INTEL
   X64/ReadIdtr.nasm| INTEL
   X64/ReadIdtr.asm | INTEL
+  X64/WriteGdtr.nasm| INTEL
   X64/WriteGdtr.asm | INTEL
   X64/ReadGdtr.asm | INTEL
   X64/ReadTr.asm | INTEL
