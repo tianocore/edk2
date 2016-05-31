@@ -291,6 +291,7 @@
   Ia32/ReadCr2.asm | INTEL 
   Ia32/ReadCr0.nasm| INTEL
   Ia32/ReadCr0.asm | INTEL 
+  Ia32/Mwait.nasm| INTEL
   Ia32/Mwait.asm | INTEL 
   Ia32/Monitor.asm | INTEL 
   Ia32/ModU64x32.asm | INTEL 
@@ -334,6 +335,7 @@
   Ia32/EnablePaging64.S | GCC 
   Ia32/DisablePaging32.S | GCC 
   Ia32/EnablePaging32.S | GCC 
+  Ia32/Mwait.nasm| GCC
   Ia32/Mwait.S | GCC 
   Ia32/Monitor.S | GCC 
   Ia32/CpuIdEx.S | GCC 
