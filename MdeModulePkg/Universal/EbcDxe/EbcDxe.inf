@@ -45,6 +45,7 @@
 
 [Sources.X64]
   X64/EbcSupport.c
+  X64/EbcLowLevel.nasm
   X64/EbcLowLevel.S
   X64/EbcLowLevel.asm
 
