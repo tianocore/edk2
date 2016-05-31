@@ -38,6 +38,7 @@
 
 [Sources.X64]
   X64/SetIdtEntry.c  
+  X64/S3Asm.nasm
   X64/S3Asm.asm
   X64/S3Asm.S
   
