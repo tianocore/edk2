@@ -463,6 +463,7 @@
   X64/Invd.asm | MSFT
   X64/Wbinvd.nasm| MSFT
   X64/Wbinvd.asm | MSFT
+  X64/DisablePaging64.nasm| MSFT
   X64/DisablePaging64.asm | MSFT
   X64/Mwait.asm | MSFT
   X64/Monitor.asm | MSFT
@@ -544,6 +545,7 @@
   X64/Invd.asm | INTEL
   X64/Wbinvd.nasm| INTEL
   X64/Wbinvd.asm | INTEL
+  X64/DisablePaging64.nasm| INTEL
   X64/DisablePaging64.asm | INTEL
   X64/Mwait.asm | INTEL
   X64/Monitor.asm | INTEL
@@ -634,6 +636,7 @@
   X64/LongJump.S | GCC 
   X64/EnableDisableInterrupts.nasm| GCC
   X64/EnableDisableInterrupts.S | GCC 
+  X64/DisablePaging64.nasm| GCC
   X64/DisablePaging64.S | GCC 
   X64/CpuId.nasm| GCC
   X64/CpuId.S | GCC 
