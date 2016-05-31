@@ -336,6 +336,7 @@
   Ia32/CpuIdEx.asm | INTEL 
   Ia32/CpuId.nasm| INTEL
   Ia32/CpuId.asm | INTEL 
+  Ia32/CpuBreakpoint.nasm| INTEL
   Ia32/CpuBreakpoint.asm | INTEL 
   Ia32/ARShiftU64.asm | INTEL 
   Ia32/Thunk16.nasm | INTEL
