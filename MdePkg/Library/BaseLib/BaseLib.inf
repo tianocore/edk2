@@ -511,6 +511,7 @@
   X64/FxSave.asm | MSFT
   X64/WriteLdtr.nasm| MSFT
   X64/WriteLdtr.asm | MSFT
+  X64/ReadLdtr.nasm| MSFT
   X64/ReadLdtr.asm | MSFT
   X64/WriteIdtr.asm | MSFT
   X64/ReadIdtr.asm | MSFT
@@ -616,6 +617,7 @@
   X64/FxSave.asm | INTEL
   X64/WriteLdtr.nasm| INTEL
   X64/WriteLdtr.asm | INTEL
+  X64/ReadLdtr.nasm| INTEL
   X64/ReadLdtr.asm | INTEL
   X64/WriteIdtr.asm | INTEL
   X64/ReadIdtr.asm | INTEL
