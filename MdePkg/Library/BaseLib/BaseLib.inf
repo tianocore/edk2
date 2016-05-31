@@ -332,6 +332,7 @@
   Ia32/DisableInterrupts.asm | INTEL 
   Ia32/CpuPause.nasm| INTEL
   Ia32/CpuPause.asm | INTEL 
+  Ia32/CpuIdEx.nasm| INTEL
   Ia32/CpuIdEx.asm | INTEL 
   Ia32/CpuId.asm | INTEL 
   Ia32/CpuBreakpoint.asm | INTEL 
@@ -359,6 +360,7 @@
   Ia32/Mwait.S | GCC 
   Ia32/Monitor.nasm| GCC
   Ia32/Monitor.S | GCC 
+  Ia32/CpuIdEx.nasm| GCC
   Ia32/CpuIdEx.S | GCC 
   Ia32/CpuId.S | GCC 
   Ia32/LongJump.nasm| GCC
