@@ -279,6 +279,7 @@
   Ia32/ReadDr3.asm | INTEL 
   Ia32/ReadDr2.nasm| INTEL
   Ia32/ReadDr2.asm | INTEL 
+  Ia32/ReadDr1.nasm| INTEL
   Ia32/ReadDr1.asm | INTEL 
   Ia32/ReadDr0.asm | INTEL 
   Ia32/ReadCr4.asm | INTEL 
