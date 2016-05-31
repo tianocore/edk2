@@ -297,6 +297,7 @@
   Ia32/Monitor.asm | INTEL 
   Ia32/ModU64x32.nasm| INTEL
   Ia32/ModU64x32.asm | INTEL 
+  Ia32/MultU64x64.nasm| INTEL
   Ia32/MultU64x64.asm | INTEL 
   Ia32/MultU64x32.asm | INTEL 
   Ia32/LShiftU64.asm | INTEL 
@@ -354,6 +355,7 @@
   Ia32/ModU64x32.nasm| GCC
   Ia32/ModU64x32.S | GCC 
   Ia32/DivU64x32.S | GCC 
+  Ia32/MultU64x64.nasm| GCC
   Ia32/MultU64x64.S | GCC 
   Ia32/MultU64x32.S | GCC 
   Ia32/RRotU64.nasm| GCC
