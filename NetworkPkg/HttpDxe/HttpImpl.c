@@ -462,7 +462,6 @@ EfiHttpRequest (
       }
     }
 
-
     //
     // Save the RemotePort and RemoteHost.
     //
@@ -578,13 +577,13 @@ EfiHttpRequest (
   return EFI_SUCCESS;
 
 Error5:
-    //
-    // We would have inserted a TxToken only if Request structure is not NULL.
-    // Hence check before we do a remove in this error case.
-    //
-    if (Request != NULL) {
-      NetMapRemoveTail (&HttpInstance->TxTokens, NULL);
-    }
+  //
+  // We would have inserted a TxToken only if Request structure is not NULL.
+  // Hence check before we do a remove in this error case.
+  //
+  if (Request != NULL) {
+    NetMapRemoveTail (&HttpInstance->TxTokens, NULL);
+  }
 
 Error4:
   if (RequestMsg != NULL) {
@@ -606,7 +605,6 @@ Error2:
   }
 
 Error1:
-
   if (HostName != NULL) {
     FreePool (HostName);
   }
@@ -640,7 +638,6 @@ HttpCancelTokens (
   IN VOID                   *Context
   )
 {
-
   EFI_HTTP_TOKEN            *Token;
   HTTP_TOKEN_WRAP           *Wrap;
   HTTP_PROTOCOL             *HttpInstance;
@@ -658,41 +655,32 @@ HttpCancelTokens (
   Wrap = (HTTP_TOKEN_WRAP *) Item->Value;
   ASSERT (Wrap != NULL);
   HttpInstance = Wrap->HttpInstance;
-
-  //
-  // Free resources.
-  //
-  NetMapRemoveItem (Map, Item, NULL); 
   
   if (!HttpInstance->LocalAddressIsIPv6) {
-    if (Wrap->TcpWrap.Tx4Token.CompletionToken.Event != NULL) {
-      gBS->CloseEvent (Wrap->TcpWrap.Tx4Token.CompletionToken.Event);
-    }
-    
     if (Wrap->TcpWrap.Rx4Token.CompletionToken.Event != NULL) {
-      gBS->CloseEvent (Wrap->TcpWrap.Rx4Token.CompletionToken.Event);
-    }
-    
-    if (Wrap->TcpWrap.Rx4Token.Packet.RxData->FragmentTable[0].FragmentBuffer != NULL) {
-      FreePool (Wrap->TcpWrap.Rx4Token.Packet.RxData->FragmentTable[0].FragmentBuffer);
-    }
+      //
+      // Cancle the Token before close its Event.
+      //
+      HttpInstance->Tcp4->Cancel (HttpInstance->Tcp4, &Wrap->TcpWrap.Rx4Token.CompletionToken);
 
+      //
+      // Dispatch the DPC queued by the NotifyFunction of the canceled token's events.
+      //
+      DispatchDpc ();
+    }
   } else {
-    if (Wrap->TcpWrap.Tx6Token.CompletionToken.Event != NULL) {
-      gBS->CloseEvent (Wrap->TcpWrap.Tx6Token.CompletionToken.Event);
-    }
-
     if (Wrap->TcpWrap.Rx6Token.CompletionToken.Event != NULL) {
-      gBS->CloseEvent (Wrap->TcpWrap.Rx6Token.CompletionToken.Event);
-    }
+      //
+      // Cancle the Token before close its Event.
+      //
+      HttpInstance->Tcp6->Cancel (HttpInstance->Tcp6, &Wrap->TcpWrap.Rx6Token.CompletionToken);
 
-    if (Wrap->TcpWrap.Rx6Token.Packet.RxData->FragmentTable[0].FragmentBuffer != NULL) {
-      FreePool (Wrap->TcpWrap.Rx6Token.Packet.RxData->FragmentTable[0].FragmentBuffer);
+      //
+      // Dispatch the DPC queued by the NotifyFunction of the canceled token's events.
+      //
+      DispatchDpc ();
     }
   }
-
-
-  FreePool (Wrap);
 
   //
   // If only one item is to be cancel, return EFI_ABORTED to stop
@@ -1009,6 +997,7 @@ HttpResponseWorker (
     //
     StatusCodeStr = HttpHeaders + AsciiStrLen (HTTP_VERSION_STR) + 1;
     if (StatusCodeStr == NULL) {
+      Status = EFI_NOT_READY;
       goto Error;
     }
 
@@ -1019,6 +1008,7 @@ HttpResponseWorker (
     //
     Tmp = AsciiStrStr (HttpHeaders, HTTP_CRLF_STR);
     if (Tmp == NULL) {
+      Status = EFI_NOT_READY;
       goto Error;
     }
 
@@ -1065,6 +1055,7 @@ HttpResponseWorker (
     if (SizeofHeaders != 0) {
       HeaderTmp = AllocateZeroPool (SizeofHeaders);
       if (HeaderTmp == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
         goto Error2;
       }
 
@@ -1204,42 +1195,14 @@ HttpResponseWorker (
 
   ASSERT (HttpInstance->MsgParser != NULL);
 
-  if (HttpInstance->TimeoutEvent == NULL) {
-    //
-    // Create TimeoutEvent for response
-    //
-    Status = gBS->CreateEvent (
-                    EVT_TIMER,
-                    TPL_CALLBACK,
-                    NULL,
-                    NULL,
-                    &HttpInstance->TimeoutEvent
-                    );
-    if (EFI_ERROR (Status)) {
-      goto Error2;
-    }
-  }
-
-  //
-  // Start the timer, and wait Timeout seconds to receive the body packet.
-  //
-  Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_RESPONSE_TIMEOUT * TICKS_PER_SECOND);
-  if (EFI_ERROR (Status)) {
-    goto Error2;
-  }
-
   //
   // We still need receive more data when there is no cache data and MsgParser is not NULL;
   //
-  Status = HttpTcpReceiveBody (Wrap, HttpMsg, HttpInstance->TimeoutEvent);
-
-  gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
-
+  Status = HttpTcpReceiveBody (Wrap, HttpMsg);
   if (EFI_ERROR (Status)) {
     goto Error2;
   }
 
-  FreePool (Wrap);
   return Status;
 
 Exit:
@@ -1265,6 +1228,11 @@ Error2:
   }
 
 Error:
+  Item = NetMapFindKey (&Wrap->HttpInstance->RxTokens, Wrap->HttpToken);
+  if (Item != NULL) {
+    NetMapRemoveItem (&Wrap->HttpInstance->RxTokens, Item, NULL);
+  }
+  
   HttpTcpTokenCleanup (Wrap);
   
   if (HttpHeaders != NULL) {

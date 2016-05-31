@@ -525,7 +525,6 @@ HttpTcpReceiveHeader (
 
   @param[in]  Wrap               The HTTP token's wrap data.
   @param[in]  HttpMsg            The HTTP message data.
-  @param[in]  Timeout            The time to wait for receiving the body packet.
 
   @retval EFI_SUCCESS            The HTTP body is received.                          
   @retval Others                 Other error as indicated.
@@ -534,8 +533,7 @@ HttpTcpReceiveHeader (
 EFI_STATUS
 HttpTcpReceiveBody (
   IN  HTTP_TOKEN_WRAP       *Wrap,
-  IN  EFI_HTTP_MESSAGE      *HttpMsg,
-  IN  EFI_EVENT             Timeout
+  IN  EFI_HTTP_MESSAGE      *HttpMsg
   );
 
 /**
