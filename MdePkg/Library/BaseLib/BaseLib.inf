@@ -158,6 +158,7 @@
   Ia32/ARShiftU64.c | MSFT 
   Ia32/Thunk16.nasm | MSFT
   Ia32/Thunk16.asm | MSFT
+  Ia32/EnablePaging64.nasm| MSFT
   Ia32/EnablePaging64.asm | MSFT
   Ia32/EnableCache.c | MSFT
   Ia32/DisableCache.c | MSFT
@@ -254,6 +255,7 @@
   Ia32/ARShiftU64.asm | INTEL 
   Ia32/Thunk16.nasm | INTEL
   Ia32/Thunk16.asm | INTEL
+  Ia32/EnablePaging64.nasm| INTEL
   Ia32/EnablePaging64.asm | INTEL
   Ia32/EnableCache.asm | INTEL
   Ia32/DisableCache.asm | INTEL
@@ -263,6 +265,7 @@
   Ia32/Thunk16.nasm | GCC 
   Ia32/Thunk16.S | XCODE 
   Ia32/EnableDisableInterrupts.S | GCC 
+  Ia32/EnablePaging64.nasm| GCC
   Ia32/EnablePaging64.S | GCC 
   Ia32/DisablePaging32.S | GCC 
   Ia32/EnablePaging32.S | GCC 
