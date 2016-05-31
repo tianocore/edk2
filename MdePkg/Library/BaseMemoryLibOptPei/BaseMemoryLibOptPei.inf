@@ -40,6 +40,7 @@
   Ia32/ScanMem32.S
   Ia32/ScanMem16.nasm
   Ia32/ScanMem16.S
+  Ia32/ScanMem8.nasm
   Ia32/ScanMem8.S
   Ia32/CompareMem.S
   Ia32/ZeroMem.S
@@ -54,6 +55,7 @@
   Ia32/ScanMem32.asm
   Ia32/ScanMem16.nasm
   Ia32/ScanMem16.asm
+  Ia32/ScanMem8.nasm
   Ia32/ScanMem8.asm
   Ia32/CompareMem.asm
   Ia32/ZeroMem.asm
