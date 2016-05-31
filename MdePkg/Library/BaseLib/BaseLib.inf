@@ -211,6 +211,7 @@
   Ia32/WriteCr3.asm | INTEL 
   Ia32/WriteCr2.nasm| INTEL
   Ia32/WriteCr2.asm | INTEL 
+  Ia32/WriteCr0.nasm| INTEL
   Ia32/WriteCr0.asm | INTEL 
   Ia32/WriteMsr64.asm | INTEL 
   Ia32/SwapBytes64.asm | INTEL 
