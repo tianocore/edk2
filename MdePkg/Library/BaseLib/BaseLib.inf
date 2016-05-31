@@ -237,6 +237,7 @@
   Ia32/ReadTr.asm | INTEL 
   Ia32/ReadSs.nasm| INTEL
   Ia32/ReadSs.asm | INTEL 
+  Ia32/ReadGs.nasm| INTEL
   Ia32/ReadGs.asm | INTEL 
   Ia32/ReadFs.asm | INTEL 
   Ia32/ReadEs.asm | INTEL 
