@@ -315,6 +315,7 @@
   Ia32/FxSave.asm | INTEL 
   Ia32/FlushCacheLine.nasm| INTEL
   Ia32/FlushCacheLine.asm | INTEL 
+  Ia32/EnablePaging32.nasm| INTEL
   Ia32/EnablePaging32.asm | INTEL 
   Ia32/EnableInterrupts.asm | INTEL 
   Ia32/EnableDisableInterrupts.asm | INTEL 
@@ -345,6 +346,7 @@
   Ia32/EnablePaging64.nasm| GCC
   Ia32/EnablePaging64.S | GCC 
   Ia32/DisablePaging32.S | GCC 
+  Ia32/EnablePaging32.nasm| GCC
   Ia32/EnablePaging32.S | GCC 
   Ia32/Mwait.nasm| GCC
   Ia32/Mwait.S | GCC 
