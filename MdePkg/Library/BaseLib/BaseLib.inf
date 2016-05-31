@@ -475,6 +475,7 @@
   X64/ReadTsc.asm | MSFT
   X64/WriteMm7.nasm| MSFT
   X64/WriteMm7.asm | MSFT
+  X64/WriteMm6.nasm| MSFT
   X64/WriteMm6.asm | MSFT
   X64/WriteMm5.asm | MSFT
   X64/WriteMm4.asm | MSFT
@@ -562,6 +563,7 @@
   X64/ReadTsc.asm | INTEL
   X64/WriteMm7.nasm| INTEL
   X64/WriteMm7.asm | INTEL
+  X64/WriteMm6.nasm| INTEL
   X64/WriteMm6.asm | INTEL
   X64/WriteMm5.asm | INTEL
   X64/WriteMm4.asm | INTEL
