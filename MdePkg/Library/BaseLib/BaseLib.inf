@@ -301,6 +301,7 @@
   Ia32/MultU64x64.asm | INTEL 
   Ia32/MultU64x32.nasm| INTEL
   Ia32/MultU64x32.asm | INTEL 
+  Ia32/LShiftU64.nasm| INTEL
   Ia32/LShiftU64.asm | INTEL 
   Ia32/LRotU64.asm | INTEL 
   Ia32/LongJump.asm | INTEL 
@@ -366,6 +367,7 @@
   Ia32/ARShiftU64.S | GCC 
   Ia32/RShiftU64.nasm| GCC
   Ia32/RShiftU64.S | GCC 
+  Ia32/LShiftU64.nasm| GCC
   Ia32/LShiftU64.S | GCC 
   Ia32/EnableCache.S | GCC
   Ia32/DisableCache.S | GCC
