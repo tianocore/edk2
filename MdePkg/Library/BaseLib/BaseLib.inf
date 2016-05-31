@@ -219,6 +219,7 @@
   Ia32/SwapBytes64.asm | INTEL 
   Ia32/SetJump.nasm| INTEL
   Ia32/SetJump.asm | INTEL 
+  Ia32/RRotU64.nasm| INTEL
   Ia32/RRotU64.asm | INTEL 
   Ia32/RShiftU64.asm | INTEL 
   Ia32/ReadPmc.asm | INTEL 
@@ -314,6 +315,7 @@
   Ia32/DivU64x32.S | GCC 
   Ia32/MultU64x64.S | GCC 
   Ia32/MultU64x32.S | GCC 
+  Ia32/RRotU64.nasm| GCC
   Ia32/RRotU64.S | GCC 
   Ia32/LRotU64.S | GCC 
   Ia32/ARShiftU64.S | GCC 
