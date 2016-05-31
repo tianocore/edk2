@@ -107,6 +107,7 @@
   X64/CompareMem.nasm
   X64/CompareMem.asm
   X64/CompareMem.S
+  X64/ZeroMem.nasm
   X64/ZeroMem.asm
   X64/ZeroMem.S
   X64/SetMem64.asm
