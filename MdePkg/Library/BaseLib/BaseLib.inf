@@ -497,6 +497,7 @@
   X64/ReadMm5.asm | MSFT
   X64/ReadMm4.nasm| MSFT
   X64/ReadMm4.asm | MSFT
+  X64/ReadMm3.nasm| MSFT
   X64/ReadMm3.asm | MSFT
   X64/ReadMm2.asm | MSFT
   X64/ReadMm1.asm | MSFT
@@ -595,6 +596,7 @@
   X64/ReadMm5.asm | INTEL
   X64/ReadMm4.nasm| INTEL
   X64/ReadMm4.asm | INTEL
+  X64/ReadMm3.nasm| INTEL
   X64/ReadMm3.asm | INTEL
   X64/ReadMm2.asm | INTEL
   X64/ReadMm1.asm | INTEL
