@@ -346,6 +346,7 @@
   Ia32/EnablePaging64.asm | INTEL
   Ia32/EnableCache.nasm| INTEL
   Ia32/EnableCache.asm | INTEL
+  Ia32/DisableCache.nasm| INTEL
   Ia32/DisableCache.asm | INTEL
   Ia32/RdRand.nasm| INTEL
   Ia32/RdRand.asm | INTEL
@@ -398,6 +399,7 @@
   Ia32/LShiftU64.S | GCC 
   Ia32/EnableCache.nasm| GCC
   Ia32/EnableCache.S | GCC
+  Ia32/DisableCache.nasm| GCC
   Ia32/DisableCache.S | GCC
   Ia32/RdRand.nasm| GCC
   Ia32/RdRand.S | GCC
