@@ -162,6 +162,7 @@
   Ia32/EnablePaging64.asm | MSFT
   Ia32/EnableCache.c | MSFT
   Ia32/DisableCache.c | MSFT
+  Ia32/RdRand.nasm| MSFT
   Ia32/RdRand.asm | MSFT
 
   Ia32/Wbinvd.asm | INTEL 
@@ -259,6 +260,7 @@
   Ia32/EnablePaging64.asm | INTEL
   Ia32/EnableCache.asm | INTEL
   Ia32/DisableCache.asm | INTEL
+  Ia32/RdRand.nasm| INTEL
   Ia32/RdRand.asm | INTEL
 
   Ia32/GccInline.c | GCC
@@ -290,6 +292,7 @@
   Ia32/LShiftU64.S | GCC 
   Ia32/EnableCache.S | GCC
   Ia32/DisableCache.S | GCC
+  Ia32/RdRand.nasm| GCC
   Ia32/RdRand.S | GCC
 
   Ia32/DivS64x64Remainder.c
