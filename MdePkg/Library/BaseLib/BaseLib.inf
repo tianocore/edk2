@@ -221,6 +221,7 @@
   Ia32/SetJump.asm | INTEL 
   Ia32/RRotU64.nasm| INTEL
   Ia32/RRotU64.asm | INTEL 
+  Ia32/RShiftU64.nasm| INTEL
   Ia32/RShiftU64.asm | INTEL 
   Ia32/ReadPmc.asm | INTEL 
   Ia32/ReadTsc.asm | INTEL 
@@ -319,6 +320,7 @@
   Ia32/RRotU64.S | GCC 
   Ia32/LRotU64.S | GCC 
   Ia32/ARShiftU64.S | GCC 
+  Ia32/RShiftU64.nasm| GCC
   Ia32/RShiftU64.S | GCC 
   Ia32/LShiftU64.S | GCC 
   Ia32/EnableCache.S | GCC
