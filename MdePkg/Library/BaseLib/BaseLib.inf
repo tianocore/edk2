@@ -303,6 +303,7 @@
   Ia32/MultU64x32.asm | INTEL 
   Ia32/LShiftU64.nasm| INTEL
   Ia32/LShiftU64.asm | INTEL 
+  Ia32/LRotU64.nasm| INTEL
   Ia32/LRotU64.asm | INTEL 
   Ia32/LongJump.asm | INTEL 
   Ia32/Invd.asm | INTEL 
@@ -363,6 +364,7 @@
   Ia32/MultU64x32.S | GCC 
   Ia32/RRotU64.nasm| GCC
   Ia32/RRotU64.S | GCC 
+  Ia32/LRotU64.nasm| GCC
   Ia32/LRotU64.S | GCC 
   Ia32/ARShiftU64.S | GCC 
   Ia32/RShiftU64.nasm| GCC
