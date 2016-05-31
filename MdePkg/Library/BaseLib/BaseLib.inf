@@ -169,6 +169,7 @@
   Ia32/Wbinvd.asm | INTEL 
   Ia32/WriteMm7.nasm| INTEL
   Ia32/WriteMm7.asm | INTEL 
+  Ia32/WriteMm6.nasm| INTEL
   Ia32/WriteMm6.asm | INTEL 
   Ia32/WriteMm5.asm | INTEL 
   Ia32/WriteMm4.asm | INTEL 
