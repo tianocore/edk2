@@ -113,6 +113,7 @@
   X64/SetMem64.nasm
   X64/SetMem64.asm
   X64/SetMem64.S
+  X64/SetMem32.nasm
   X64/SetMem32.asm
   X64/SetMem32.S
   X64/SetMem16.asm
