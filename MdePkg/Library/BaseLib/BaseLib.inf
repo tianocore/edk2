@@ -455,6 +455,7 @@
   X64/EnableDisableInterrupts.asm | MSFT
   X64/DisableInterrupts.nasm| MSFT
   X64/DisableInterrupts.asm | MSFT
+  X64/EnableInterrupts.nasm| MSFT
   X64/EnableInterrupts.asm | MSFT
   X64/FlushCacheLine.asm | MSFT
   X64/Invd.asm | MSFT
@@ -532,6 +533,7 @@
   X64/EnableDisableInterrupts.asm | INTEL
   X64/DisableInterrupts.nasm| INTEL
   X64/DisableInterrupts.asm | INTEL
+  X64/EnableInterrupts.nasm| INTEL
   X64/EnableInterrupts.asm | INTEL
   X64/FlushCacheLine.asm | INTEL
   X64/Invd.asm | INTEL
