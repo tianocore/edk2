@@ -563,6 +563,7 @@
   X64/ReadDr3.asm | MSFT
   X64/ReadDr2.nasm| MSFT
   X64/ReadDr2.asm | MSFT
+  X64/ReadDr1.nasm| MSFT
   X64/ReadDr1.asm | MSFT
   X64/ReadDr0.asm | MSFT
   X64/WriteCr4.asm | MSFT
@@ -694,6 +695,7 @@
   X64/ReadDr3.asm | INTEL
   X64/ReadDr2.nasm| INTEL
   X64/ReadDr2.asm | INTEL
+  X64/ReadDr1.nasm| INTEL
   X64/ReadDr1.asm | INTEL
   X64/ReadDr0.asm | INTEL
   X64/WriteCr4.asm | INTEL
