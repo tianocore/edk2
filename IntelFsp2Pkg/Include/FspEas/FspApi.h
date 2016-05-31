@@ -16,6 +16,20 @@
 #ifndef _FSP_API_H_
 #define _FSP_API_H_
 
+///
+/// FSP Reset Status code
+/// These are defined in FSP EAS v2.0 section 11.2.2 - OEM Status Code
+/// @{
+#define FSP_STATUS_RESET_REQUIRED_COLD         0x40000001
+#define FSP_STATUS_RESET_REQUIRED_WARM         0x40000002
+#define FSP_STATUS_RESET_REQUIRED_3            0x40000003
+#define FSP_STATUS_RESET_REQUIRED_4            0x40000004
+#define FSP_STATUS_RESET_REQUIRED_5            0x40000005
+#define FSP_STATUS_RESET_REQUIRED_6            0x40000006
+#define FSP_STATUS_RESET_REQUIRED_7            0x40000007
+#define FSP_STATUS_RESET_REQUIRED_8            0x40000008
+/// @}
+
 #pragma pack(1)
 ///
 /// FSP_UPD_HEADER Configuration.
