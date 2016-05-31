@@ -62,6 +62,7 @@
   
   X64/InterlockedCompareExchange64.nasm| INTEL
   X64/InterlockedCompareExchange64.asm | INTEL
+  X64/InterlockedCompareExchange32.nasm| INTEL
   X64/InterlockedCompareExchange32.asm | INTEL
   X64/InterlockedCompareExchange16.asm | INTEL
   
