@@ -586,6 +586,7 @@
   X64/ReadEflags.nasm| MSFT
   X64/ReadEflags.asm | MSFT
 
+  X64/CpuBreakpoint.nasm| INTEL
   X64/CpuBreakpoint.asm | INTEL 
   X64/WriteMsr64.asm | INTEL 
   X64/ReadMsr64.asm | INTEL 
