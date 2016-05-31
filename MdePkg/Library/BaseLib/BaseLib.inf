@@ -269,6 +269,7 @@
   Ia32/ReadEflags.asm | INTEL 
   Ia32/ReadDr7.nasm| INTEL
   Ia32/ReadDr7.asm | INTEL 
+  Ia32/ReadDr6.nasm| INTEL
   Ia32/ReadDr6.asm | INTEL 
   Ia32/ReadDr5.asm | INTEL 
   Ia32/ReadDr4.asm | INTEL 
