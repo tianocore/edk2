@@ -311,6 +311,7 @@
   Ia32/Invd.asm | INTEL 
   Ia32/FxRestore.nasm| INTEL
   Ia32/FxRestore.asm | INTEL 
+  Ia32/FxSave.nasm| INTEL
   Ia32/FxSave.asm | INTEL 
   Ia32/FlushCacheLine.asm | INTEL 
   Ia32/EnablePaging32.asm | INTEL 
