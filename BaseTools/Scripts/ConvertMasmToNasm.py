@@ -768,7 +768,8 @@ class ConvertInfFile(CommonUtils):
                 src = self.mo.group(1)
                 srcExt = self.mo.group(2)
                 dst = os.path.splitext(src)[0] + '.nasm'
-                if src not in srcToDst:
+                fullDst = os.path.join(self.dir, dst)
+                if src not in srcToDst and not os.path.exists(fullDst):
                     srcToDst[src] = dst
                     srcToDst['order'].append(src)
         return srcToDst
