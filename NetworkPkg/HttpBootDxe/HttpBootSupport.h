@@ -196,6 +196,8 @@ typedef struct {
 
   BOOLEAN                   IsTxDone;
   BOOLEAN                   IsRxDone;
+
+  EFI_EVENT                 TimeoutEvent;
 } HTTP_IO;
 
 //

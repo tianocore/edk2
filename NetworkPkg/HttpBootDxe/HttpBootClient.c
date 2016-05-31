@@ -1008,7 +1008,10 @@ HttpBootGetBootFile (
                    FALSE,
                    &ResponseBody
                    );
-        if (EFI_ERROR (Status)) {
+        if (EFI_ERROR (Status) || EFI_ERROR (ResponseBody.Status)) {
+          if (EFI_ERROR (ResponseBody.Status)) {
+            Status = ResponseBody.Status;
+          }
           goto ERROR_6;
         }
         ReceivedSize += ResponseBody.BodyLength;
@@ -1045,7 +1048,10 @@ HttpBootGetBootFile (
                    FALSE,
                    &ResponseBody
                    );
-        if (EFI_ERROR (Status)) {
+        if (EFI_ERROR (Status) || EFI_ERROR (ResponseBody.Status)) {
+          if (EFI_ERROR (ResponseBody.Status)) {
+            Status = ResponseBody.Status;
+          }
           goto ERROR_6;
         }
 

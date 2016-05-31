@@ -754,6 +754,21 @@ HttpIoCreateIo (
   HttpIo->RspToken.Event = Event;
   HttpIo->RspToken.Message = &HttpIo->RspMessage;
 
+  //
+  // Create TimeoutEvent for response
+  //
+  Status = gBS->CreateEvent (
+                  EVT_TIMER,
+                  TPL_CALLBACK,
+                  NULL,
+                  NULL,
+                  &Event
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+  HttpIo->TimeoutEvent = Event;
+
   return EFI_SUCCESS;
   
 ON_ERROR:
@@ -786,6 +801,11 @@ HttpIoDestroyIo (
   }
 
   Event = HttpIo->RspToken.Event;
+  if (Event != NULL) {
+    gBS->CloseEvent (Event);
+  }
+
+  Event = HttpIo->TimeoutEvent;
   if (Event != NULL) {
     gBS->CloseEvent (Event);
   }
@@ -903,6 +923,14 @@ HttpIoRecvResponse (
   }
 
   //
+  // Start the timer, and wait Timeout seconds to receive the header packet.
+  //
+  Status = gBS->SetTimer (HttpIo->TimeoutEvent, TimerRelative, HTTP_BOOT_RESPONSE_TIMEOUT * TICKS_PER_MS);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // Queue the response token to HTTP instances.
   //
   HttpIo->RspToken.Status  = EFI_NOT_READY;
@@ -924,14 +952,30 @@ HttpIoRecvResponse (
                    );
   
   if (EFI_ERROR (Status)) {
+    gBS->SetTimer (HttpIo->TimeoutEvent, TimerCancel, 0);
     return Status;
   }
 
   //
   // Poll the network until receive finish.
   //
-  while (!HttpIo->IsRxDone) {
+  while (!HttpIo->IsRxDone && ((HttpIo->TimeoutEvent == NULL) || EFI_ERROR (gBS->CheckEvent (HttpIo->TimeoutEvent)))) {
     Http->Poll (Http);
+  }
+
+  gBS->SetTimer (HttpIo->TimeoutEvent, TimerCancel, 0);
+
+  if (!HttpIo->IsRxDone) {
+    //
+    // Timeout occurs, cancel the response token.
+    //
+    Http->Cancel (Http, &HttpIo->RspToken);
+   
+    Status = EFI_TIMEOUT;
+    
+    return Status;
+  } else {
+    HttpIo->IsRxDone = FALSE;
   }
 
   //

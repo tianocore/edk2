@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __EFI_HTTP_BOOT_HTTP_H__
 
 #define HTTP_BOOT_REQUEST_TIMEOUT            5000      // 5 seconds in uints of millisecond.
+#define HTTP_BOOT_RESPONSE_TIMEOUT           5000      // 5 seconds in uints of millisecond.
 #define HTTP_BOOT_BLOCK_SIZE                 1500
 
 
