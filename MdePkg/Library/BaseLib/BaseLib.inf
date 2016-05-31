@@ -437,6 +437,7 @@
   X64/LongJump.asm
   X64/SetJump.nasm
   X64/SetJump.asm
+  X64/SwitchStack.nasm
   X64/SwitchStack.asm
   X64/EnableCache.asm
   X64/DisableCache.asm
@@ -607,6 +608,7 @@
   X86DisablePaging32.c
   X64/GccInline.c | GCC
   X64/Thunk16.S | XCODE 
+  X64/SwitchStack.nasm| GCC
   X64/SwitchStack.S | GCC 
   X64/SetJump.nasm| GCC
   X64/SetJump.S | GCC 
