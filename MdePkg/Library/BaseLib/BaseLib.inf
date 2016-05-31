@@ -588,6 +588,7 @@
 
   X64/CpuBreakpoint.nasm| INTEL
   X64/CpuBreakpoint.asm | INTEL 
+  X64/WriteMsr64.nasm| INTEL
   X64/WriteMsr64.asm | INTEL 
   X64/ReadMsr64.asm | INTEL 
   X64/RdRand.nasm| INTEL
