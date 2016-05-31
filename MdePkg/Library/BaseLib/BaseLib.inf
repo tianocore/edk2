@@ -325,6 +325,7 @@
   Ia32/DivU64x64Remainder.asm | INTEL 
   Ia32/DivU64x32Remainder.nasm| INTEL
   Ia32/DivU64x32Remainder.asm | INTEL 
+  Ia32/DivU64x32.nasm| INTEL
   Ia32/DivU64x32.asm | INTEL 
   Ia32/DisablePaging32.asm | INTEL 
   Ia32/DisableInterrupts.asm | INTEL 
@@ -370,6 +371,7 @@
   Ia32/DivU64x32Remainder.S | GCC 
   Ia32/ModU64x32.nasm| GCC
   Ia32/ModU64x32.S | GCC 
+  Ia32/DivU64x32.nasm| GCC
   Ia32/DivU64x32.S | GCC 
   Ia32/MultU64x64.nasm| GCC
   Ia32/MultU64x64.S | GCC 
