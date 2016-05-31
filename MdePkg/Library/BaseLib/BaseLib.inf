@@ -217,6 +217,7 @@
   Ia32/WriteMsr64.asm | INTEL 
   Ia32/SwapBytes64.nasm| INTEL
   Ia32/SwapBytes64.asm | INTEL 
+  Ia32/SetJump.nasm| INTEL
   Ia32/SetJump.asm | INTEL 
   Ia32/RRotU64.asm | INTEL 
   Ia32/RShiftU64.asm | INTEL 
@@ -302,6 +303,7 @@
   Ia32/CpuIdEx.S | GCC 
   Ia32/CpuId.S | GCC 
   Ia32/LongJump.S | GCC 
+  Ia32/SetJump.nasm| GCC
   Ia32/SetJump.S | GCC 
   Ia32/SwapBytes64.nasm| GCC
   Ia32/SwapBytes64.S | GCC 
