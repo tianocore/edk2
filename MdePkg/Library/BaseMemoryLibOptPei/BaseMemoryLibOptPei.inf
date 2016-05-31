@@ -50,6 +50,7 @@
   Ia32/SetMem64.S
   Ia32/SetMem32.nasm
   Ia32/SetMem32.S
+  Ia32/SetMem16.nasm
   Ia32/SetMem16.S
   Ia32/SetMem.S
   Ia32/CopyMem.S
@@ -69,6 +70,7 @@
   Ia32/SetMem64.asm
   Ia32/SetMem32.nasm
   Ia32/SetMem32.asm
+  Ia32/SetMem16.nasm
   Ia32/SetMem16.asm
   Ia32/SetMem.asm
   Ia32/CopyMem.asm
