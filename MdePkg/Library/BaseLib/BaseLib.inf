@@ -145,6 +145,7 @@
   Ia32/EnablePaging32.c | MSFT 
   Ia32/EnableInterrupts.c | MSFT 
   Ia32/EnableDisableInterrupts.c | MSFT 
+  Ia32/DivU64x64Remainder.nasm| MSFT
   Ia32/DivU64x64Remainder.asm | MSFT 
   Ia32/DivU64x32Remainder.c | MSFT 
   Ia32/DivU64x32.c | MSFT 
@@ -240,6 +241,7 @@
   Ia32/EnablePaging32.asm | INTEL 
   Ia32/EnableInterrupts.asm | INTEL 
   Ia32/EnableDisableInterrupts.asm | INTEL 
+  Ia32/DivU64x64Remainder.nasm| INTEL
   Ia32/DivU64x64Remainder.asm | INTEL 
   Ia32/DivU64x32Remainder.asm | INTEL 
   Ia32/DivU64x32.asm | INTEL 
@@ -271,6 +273,7 @@
   Ia32/LongJump.S | GCC 
   Ia32/SetJump.S | GCC 
   Ia32/SwapBytes64.S | GCC 
+  Ia32/DivU64x64Remainder.nasm| GCC
   Ia32/DivU64x64Remainder.S | GCC 
   Ia32/DivU64x32Remainder.S | GCC 
   Ia32/ModU64x32.S | GCC 
