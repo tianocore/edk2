@@ -38,6 +38,7 @@
 
   Ia32/CpuSleep.nasm| INTEL
   Ia32/CpuSleep.asm | INTEL 
+  Ia32/CpuFlushTlb.nasm| INTEL
   Ia32/CpuFlushTlb.asm | INTEL 
 
   Ia32/CpuSleepGcc.c | GCC 
