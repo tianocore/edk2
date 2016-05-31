@@ -479,6 +479,7 @@
   X64/WriteMm6.asm | MSFT
   X64/WriteMm5.nasm| MSFT
   X64/WriteMm5.asm | MSFT
+  X64/WriteMm4.nasm| MSFT
   X64/WriteMm4.asm | MSFT
   X64/WriteMm3.asm | MSFT
   X64/WriteMm2.asm | MSFT
@@ -568,6 +569,7 @@
   X64/WriteMm6.asm | INTEL
   X64/WriteMm5.nasm| INTEL
   X64/WriteMm5.asm | INTEL
+  X64/WriteMm4.nasm| INTEL
   X64/WriteMm4.asm | INTEL
   X64/WriteMm3.asm | INTEL
   X64/WriteMm2.asm | INTEL
