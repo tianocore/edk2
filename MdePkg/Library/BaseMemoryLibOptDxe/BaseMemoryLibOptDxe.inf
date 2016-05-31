@@ -92,6 +92,7 @@
   MemLibGuid.c
 
 [Sources.X64]
+  X64/ScanMem64.nasm
   X64/ScanMem64.asm
   X64/ScanMem64.S
   X64/ScanMem32.asm
