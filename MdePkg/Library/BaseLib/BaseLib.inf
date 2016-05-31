@@ -439,6 +439,7 @@
   X64/SetJump.asm
   X64/SwitchStack.nasm
   X64/SwitchStack.asm
+  X64/EnableCache.nasm
   X64/EnableCache.asm
   X64/DisableCache.asm
 
@@ -620,6 +621,7 @@
   X64/CpuId.S | GCC 
   X64/CpuIdEx.nasm| GCC
   X64/CpuIdEx.S | GCC 
+  X64/EnableCache.nasm| GCC
   X64/EnableCache.S | GCC
   X64/DisableCache.S | GCC
   X64/RdRand.S | GCC
