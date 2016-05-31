@@ -47,6 +47,7 @@
 [Sources.Ia32]
   Ia32/ScanMem64.nasm
   Ia32/ScanMem64.S
+  Ia32/ScanMem32.nasm
   Ia32/ScanMem32.S
   Ia32/ScanMem16.S
   Ia32/ScanMem8.S
@@ -59,6 +60,7 @@
   Ia32/CopyMem.S
   Ia32/ScanMem64.nasm
   Ia32/ScanMem64.asm
+  Ia32/ScanMem32.nasm
   Ia32/ScanMem32.asm
   Ia32/ScanMem16.asm
   Ia32/ScanMem8.asm
