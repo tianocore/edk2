@@ -165,6 +165,7 @@
   Ia32/RdRand.nasm| MSFT
   Ia32/RdRand.asm | MSFT
 
+  Ia32/Wbinvd.nasm| INTEL
   Ia32/Wbinvd.asm | INTEL 
   Ia32/WriteMm7.asm | INTEL 
   Ia32/WriteMm6.asm | INTEL 
