@@ -251,6 +251,7 @@
   Ia32/ReadMsr64.asm | INTEL 
   Ia32/ReadMm7.nasm| INTEL
   Ia32/ReadMm7.asm | INTEL 
+  Ia32/ReadMm6.nasm| INTEL
   Ia32/ReadMm6.asm | INTEL 
   Ia32/ReadMm5.asm | INTEL 
   Ia32/ReadMm4.asm | INTEL 
