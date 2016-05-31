@@ -36,6 +36,7 @@
   Ia32/CpuSleep.c | MSFT 
   Ia32/CpuFlushTlb.c | MSFT 
 
+  Ia32/CpuSleep.nasm| INTEL
   Ia32/CpuSleep.asm | INTEL 
   Ia32/CpuFlushTlb.asm | INTEL 
 
