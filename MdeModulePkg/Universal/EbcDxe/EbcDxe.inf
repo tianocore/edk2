@@ -39,6 +39,7 @@
 
 [Sources.Ia32]
   Ia32/EbcSupport.c
+  Ia32/EbcLowLevel.nasm
   Ia32/EbcLowLevel.S
   Ia32/EbcLowLevel.asm
 
