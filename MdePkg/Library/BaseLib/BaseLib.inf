@@ -547,6 +547,7 @@
   X64/WriteDr3.asm | MSFT
   X64/WriteDr2.nasm| MSFT
   X64/WriteDr2.asm | MSFT
+  X64/WriteDr1.nasm| MSFT
   X64/WriteDr1.asm | MSFT
   X64/WriteDr0.asm | MSFT
   X64/ReadDr7.asm | MSFT
@@ -670,6 +671,7 @@
   X64/WriteDr3.asm | INTEL
   X64/WriteDr2.nasm| INTEL
   X64/WriteDr2.asm | INTEL
+  X64/WriteDr1.nasm| INTEL
   X64/WriteDr1.asm | INTEL
   X64/WriteDr0.asm | INTEL
   X64/ReadDr7.asm | INTEL
