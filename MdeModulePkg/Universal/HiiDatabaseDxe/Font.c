@@ -1613,6 +1613,7 @@ HiiStringToImage (
   UINTN                               StrLength;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL       *RowBufferPtr;
   HII_GLOBAL_FONT_INFO                *GlobalFont;
+  UINT32                              PreInitBkgnd;
 
   //
   // Check incoming parameters.
@@ -2048,6 +2049,11 @@ HiiStringToImage (
           Status = EFI_OUT_OF_RESOURCES;
           goto Exit;
         }
+        //
+        // Initialize the background color.
+        //
+        PreInitBkgnd = Background.Blue | Background.Green << 8 | Background.Red << 16;
+        SetMem32 (BltBuffer,RowInfo[RowIndex].LineWidth * RowInfo[RowIndex].LineHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL),PreInitBkgnd);
         //
         // Set BufferPtr to Origin by adding baseline to the starting position.
         //
