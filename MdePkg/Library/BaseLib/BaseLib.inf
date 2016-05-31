@@ -195,6 +195,7 @@
   Ia32/WriteDr6.asm | INTEL 
   Ia32/WriteDr5.nasm| INTEL
   Ia32/WriteDr5.asm | INTEL 
+  Ia32/WriteDr4.nasm| INTEL
   Ia32/WriteDr4.asm | INTEL 
   Ia32/WriteDr3.asm | INTEL 
   Ia32/WriteDr2.asm | INTEL 
