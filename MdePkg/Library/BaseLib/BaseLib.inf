@@ -334,6 +334,7 @@
   Ia32/CpuPause.asm | INTEL 
   Ia32/CpuIdEx.nasm| INTEL
   Ia32/CpuIdEx.asm | INTEL 
+  Ia32/CpuId.nasm| INTEL
   Ia32/CpuId.asm | INTEL 
   Ia32/CpuBreakpoint.asm | INTEL 
   Ia32/ARShiftU64.asm | INTEL 
@@ -362,6 +363,7 @@
   Ia32/Monitor.S | GCC 
   Ia32/CpuIdEx.nasm| GCC
   Ia32/CpuIdEx.S | GCC 
+  Ia32/CpuId.nasm| GCC
   Ia32/CpuId.S | GCC 
   Ia32/LongJump.nasm| GCC
   Ia32/LongJump.S | GCC 
