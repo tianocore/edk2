@@ -704,10 +704,6 @@ FindGlyphBlock (
       (UINT8 *) FontPackage->FontPkgHdr + 3 * sizeof (UINT32),
       sizeof (EFI_HII_GLYPH_INFO)
       );
-    BaseLine = (UINT16) (LocalCell.Height + LocalCell.OffsetY);
-    if (MinOffsetY > LocalCell.OffsetY) {
-      MinOffsetY = LocalCell.OffsetY;
-    }
   }
 
   BlockPtr    = FontPackage->GlyphBlock;
