@@ -338,6 +338,7 @@
   Ia32/CpuId.asm | INTEL 
   Ia32/CpuBreakpoint.nasm| INTEL
   Ia32/CpuBreakpoint.asm | INTEL 
+  Ia32/ARShiftU64.nasm| INTEL
   Ia32/ARShiftU64.asm | INTEL 
   Ia32/Thunk16.nasm | INTEL
   Ia32/Thunk16.asm | INTEL
@@ -388,6 +389,7 @@
   Ia32/RRotU64.S | GCC 
   Ia32/LRotU64.nasm| GCC
   Ia32/LRotU64.S | GCC 
+  Ia32/ARShiftU64.nasm| GCC
   Ia32/ARShiftU64.S | GCC 
   Ia32/RShiftU64.nasm| GCC
   Ia32/RShiftU64.S | GCC 
