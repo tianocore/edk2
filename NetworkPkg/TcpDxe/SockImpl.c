@@ -1,7 +1,7 @@
 /** @file
   Implementation of the Socket.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -572,6 +572,71 @@ SockWakeRcvToken (
     FreePool (SockToken);
     RcvdBytes -= TokenRcvdBytes;
   }
+}
+
+/**
+  Cancel the tokens in the specific token list.
+
+  @param[in]       Token                 Pointer to the Token. If NULL, all tokens 
+                                         in SpecifiedTokenList will be canceled.  
+  @param[in, out]  SpecifiedTokenList    Pointer to the token list to be checked.
+  
+  @retval EFI_SUCCESS          Cancel the tokens in the specific token listsuccessfully.
+  @retval EFI_NOT_FOUND        The Token is not found in SpecifiedTokenList.
+  
+**/
+EFI_STATUS
+SockCancelToken (
+  IN     SOCK_COMPLETION_TOKEN  *Token,
+  IN OUT LIST_ENTRY             *SpecifiedTokenList
+  )
+{
+  EFI_STATUS     Status;
+  LIST_ENTRY     *Entry;
+  LIST_ENTRY     *Next;
+  SOCK_TOKEN     *SockToken;
+
+  Status    = EFI_SUCCESS;
+  Entry     = NULL;
+  Next      = NULL;
+  SockToken = NULL;
+
+  if (IsListEmpty (SpecifiedTokenList) && Token != NULL) {
+    return EFI_NOT_FOUND;
+  }
+  
+  //
+  // Iterate through the SpecifiedTokenList.
+  //
+  Entry = SpecifiedTokenList->ForwardLink;
+  while (Entry != SpecifiedTokenList) {
+    SockToken = NET_LIST_USER_STRUCT (Entry, SOCK_TOKEN, TokenList);
+    
+    if (Token == NULL) {
+      SIGNAL_TOKEN (SockToken->Token, EFI_ABORTED);
+      RemoveEntryList (&SockToken->TokenList);
+      FreePool (SockToken);
+      
+      Entry = SpecifiedTokenList->ForwardLink;
+      Status = EFI_SUCCESS;
+    } else {
+      if (Token == (VOID *) SockToken->Token) {
+        SIGNAL_TOKEN (Token, EFI_ABORTED);
+        RemoveEntryList (&(SockToken->TokenList));
+        FreePool (SockToken);
+        
+        return EFI_SUCCESS;
+      }
+
+      Status = EFI_NOT_FOUND;
+      
+      Entry = Entry->ForwardLink;
+    } 
+  }
+
+  ASSERT (IsListEmpty (SpecifiedTokenList) || Token != NULL);
+  
+  return Status;
 }
 
 /**

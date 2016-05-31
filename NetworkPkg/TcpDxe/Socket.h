@@ -1,7 +1,7 @@
 /** @file
   Common head file for TCP socket.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -862,6 +862,24 @@ SockClose (
   IN OUT SOCKET  *Sock,
   IN     VOID    *Token,
   IN     BOOLEAN OnAbort
+  );
+
+/**
+  Abort the socket associated connection, listen, transmission or receive request.
+
+  @param[in, out]  Sock        Pointer to the socket to abort.
+  @param[in]       Token       Pointer to a token that has been issued by
+                               Connect(), Accept(), Transmit() or Receive(). If
+                               NULL, all pending tokens issued by the four
+                               functions listed above will be aborted.
+
+  @retval EFI_UNSUPPORTED      The operation is not supported in the current
+                               implementation.
+**/
+EFI_STATUS
+SockCancel (
+  IN OUT SOCKET  *Sock,
+  IN     VOID    *Token
   );
 
 /**

@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -875,6 +875,96 @@ Exit:
   EfiReleaseLock (&(Sock->Lock));
   return Status;
 }
+
+/**
+  Abort the socket associated connection, listen, transmission or receive request.
+
+  @param[in, out]  Sock        Pointer to the socket to abort.
+  @param[in]       Token       Pointer to a token that has been issued by
+                               Connect(), Accept(), Transmit() or Receive(). If
+                               NULL, all pending tokens issued by the four
+                               functions listed above will be aborted.
+
+  @retval EFI_UNSUPPORTED      The operation is not supported in the current
+                               implementation.
+**/
+EFI_STATUS
+SockCancel (
+  IN OUT SOCKET  *Sock,
+  IN     VOID    *Token
+  ) 
+{
+  EFI_STATUS     Status;
+
+  Status    = EFI_SUCCESS;
+
+  ASSERT (SockStream == Sock->Type);
+
+  Status = EfiAcquireLockOrFail (&(Sock->Lock));
+  if (EFI_ERROR (Status)) {
+    DEBUG (
+      (EFI_D_ERROR,
+      "SockCancel: Get the access for socket failed with %r",
+      Status)
+      );
+
+    return EFI_ACCESS_DENIED;
+  }
+
+  if (SOCK_IS_UNCONFIGURED (Sock)) {
+    Status = EFI_NOT_STARTED;
+    goto Exit;
+  }
+  
+  //
+  // 1. Check ConnectionToken.
+  //
+  if (Token == NULL || (SOCK_COMPLETION_TOKEN *) Token == Sock->ConnectionToken) {
+    if (Sock->ConnectionToken != NULL) {
+      SIGNAL_TOKEN (Sock->ConnectionToken, EFI_ABORTED);
+      Sock->ConnectionToken = NULL;
+    }
+
+    if (Token != NULL) {
+      Status = EFI_SUCCESS;
+      goto Exit;
+    }
+  }
+
+  //
+  // 2. Check ListenTokenList.
+  //
+  Status = SockCancelToken (Token, &Sock->ListenTokenList);
+  if (Token != NULL && !EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  //
+  // 3. Check RcvTokenList.
+  //
+  Status = SockCancelToken (Token, &Sock->RcvTokenList);
+  if (Token != NULL && !EFI_ERROR (Status)) {
+    goto Exit;
+  }
+  
+  //
+  // 4. Check SndTokenList.
+  //
+  Status = SockCancelToken (Token, &Sock->SndTokenList);
+  if (Token != NULL && !EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  //
+  // 5. Check ProcessingSndTokenList.
+  //
+  Status = SockCancelToken (Token, &Sock->ProcessingSndTokenList);
+  
+Exit:
+  EfiReleaseLock (&(Sock->Lock));
+  return Status;
+}
+
 
 /**
   Get the mode data of the low layer protocol.

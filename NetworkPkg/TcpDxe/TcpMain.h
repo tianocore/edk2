@@ -2,7 +2,7 @@
   Declaration of protocol interfaces in EFI_TCP4_PROTOCOL and EFI_TCP6_PROTOCOL.
   It is the common head file for all Tcp*.c in TCP driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -359,14 +359,25 @@ Tcp4Close (
 /**
   Abort an asynchronous connection, listen, transmission or receive request.
 
-  @param[in]  This                 Pointer to the EFI_TCP4_PROTOCOL instance.
-  @param[in]  Token                Pointer to a token that has been issued by
-                                   Connect(), Accept(), Transmit() or Receive(). If
-                                   NULL, all pending tokens issued by the above four
-                                   functions will be aborted.
+  @param  This  The pointer to the EFI_TCP4_PROTOCOL instance.
+  @param  Token The pointer to a token that has been issued by
+                EFI_TCP4_PROTOCOL.Connect(),
+                EFI_TCP4_PROTOCOL.Accept(),
+                EFI_TCP4_PROTOCOL.Transmit() or
+                EFI_TCP4_PROTOCOL.Receive(). If NULL, all pending
+                tokens issued by above four functions will be aborted. Type
+                EFI_TCP4_COMPLETION_TOKEN is defined in
+                EFI_TCP4_PROTOCOL.Connect().
 
-  @retval EFI_UNSUPPORTED          The operation is not supported in the current
-                                   implementation.
+  @retval  EFI_SUCCESS             The asynchronous I/O request is aborted and Token->Event
+                                   is signaled.
+  @retval  EFI_INVALID_PARAMETER   This is NULL.
+  @retval  EFI_NOT_STARTED         This instance hasn't been configured.
+  @retval  EFI_NO_MAPPING          When using the default address, configuration
+                                   (DHCP, BOOTP,RARP, etc.) hasn't finished yet.
+  @retval  EFI_NOT_FOUND           The asynchronous I/O request isn't found in the
+                                   transmission or receive queue. It has either
+                                   completed or wasn't issued by Transmit() and Receive().
 
 **/
 EFI_STATUS
@@ -730,7 +741,13 @@ Tcp6Close (
                                  EFI_TCP6_COMPLETION_TOKEN is defined in
                                  EFI_TCP_PROTOCOL.Connect().
 
-  @retval EFI_UNSUPPORTED        The implementation does not support this function.
+  @retval EFI_SUCCESS            The asynchronous I/O request is aborted and Token->Event
+                                 is signaled.
+  @retval EFI_INVALID_PARAMETER  This is NULL.
+  @retval EFI_NOT_STARTED        This instance hasn't been configured.
+  @retval EFI_NOT_FOUND          The asynchronous I/O request isn't found in the transmission or
+                                 receive queue. It has either completed or wasn't issued by
+                                 Transmit() and Receive().
 
 **/
 EFI_STATUS
