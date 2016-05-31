@@ -98,6 +98,7 @@
 [Sources.X64]
   X64/ZeroMem.nasm
   X64/ZeroMem.asm
+  X64/ScanMem64.nasm
   X64/ScanMem64.asm
   X64/ScanMem32.asm
   X64/ScanMem16.asm
@@ -108,6 +109,7 @@
   X64/SetMem16.asm
   X64/SetMem.asm
   X64/CopyMem.asm
+  X64/ScanMem64.nasm
   X64/ScanMem64.S
   X64/ScanMem32.S
   X64/ScanMem16.S
