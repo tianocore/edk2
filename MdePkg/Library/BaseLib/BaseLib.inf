@@ -313,6 +313,7 @@
   Ia32/FxRestore.asm | INTEL 
   Ia32/FxSave.nasm| INTEL
   Ia32/FxSave.asm | INTEL 
+  Ia32/FlushCacheLine.nasm| INTEL
   Ia32/FlushCacheLine.asm | INTEL 
   Ia32/EnablePaging32.asm | INTEL 
   Ia32/EnableInterrupts.asm | INTEL 
