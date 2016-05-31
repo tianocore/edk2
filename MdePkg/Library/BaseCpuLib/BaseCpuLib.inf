@@ -47,8 +47,10 @@
 [Sources.X64]
   X64/CpuFlushTlb.nasm
   X64/CpuFlushTlb.asm 
+  X64/CpuSleep.nasm
   X64/CpuSleep.asm
 
+  X64/CpuSleep.nasm| GCC
   X64/CpuSleep.S | GCC 
   X64/CpuFlushTlb.nasm| GCC
   X64/CpuFlushTlb.S | GCC 
