@@ -73,6 +73,7 @@
 
   X64/InterlockedDecrement.nasm| INTEL
   X64/InterlockedDecrement.asm | INTEL 
+  X64/InterlockedIncrement.nasm| INTEL
   X64/InterlockedIncrement.asm | INTEL 
   Synchronization.c | INTEL 
 
