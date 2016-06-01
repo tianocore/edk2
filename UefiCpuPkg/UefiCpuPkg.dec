@@ -85,11 +85,11 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp|FALSE|BOOLEAN|0x32132108
 
   ## Indicates if SMM Stack Guard will be enabled.
-  #  If enabled, stack overflow in SMM can be caught which eases debugging.<BR><BR>
+  #  If enabled, stack overflow in SMM can be caught, preventing chaotic consequences.<BR><BR>
   #   TRUE  - SMM Stack Guard will be enabled.<BR>
   #   FALSE - SMM Stack Guard will be disabled.<BR>
   # @Prompt Enable SMM Stack Guard.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard|FALSE|BOOLEAN|0x1000001C
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard|TRUE|BOOLEAN|0x1000001C
 
   ## Indicates if BSP election in SMM will be enabled.
   #  If enabled, a BSP will be dynamically elected among all processors in each SMI.
