@@ -4,7 +4,7 @@
   This service is the primary handoff state into the PEI Foundation.
   This service abstracts platform-specific information for many CPU's.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -14,7 +14,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  This PPI is defined in PI Version 1.4.
+  This PPI is introduced from PI Version 1.4.
 
 **/
 
@@ -74,7 +74,7 @@ EFI_STATUS
 ///
 /// This service abstracts platform-specific information for many CPU's.
 /// It is the multi-processor equivalent of PlatformInformation for
-/// implementations that synchronize all CPU's in the SEC phase.
+/// implementations that synchronize some, if not all CPU's in the SEC phase.
 ///
 struct _EFI_SEC_PLATFORM_INFORMATION2_PPI {
   EFI_SEC_PLATFORM_INFORMATION2  PlatformInformation2;
