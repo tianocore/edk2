@@ -13,6 +13,7 @@
 **/
 
 #include "BdsPlatform.h"
+#include <Guid/XenInfo.h>
 #include <Guid/RootBridgesConnectedEventGroup.h>
 
 
@@ -1037,6 +1038,37 @@ PciAcpiInitialization (
   IoOr16 ((PciRead32 (Pmba) & ~BIT0) + 4, BIT0);
 }
 
+/**
+  This function detects if OVMF is running on Xen.
+
+**/
+STATIC
+BOOLEAN
+XenDetected (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE         *GuidHob;
+  STATIC INTN               FoundHob = -1;
+
+  if (FoundHob == 0) {
+    return FALSE;
+  } else if (FoundHob == 1) {
+    return TRUE;
+  }
+
+  //
+  // See if a XenInfo HOB is available
+  //
+  GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
+  if (GuidHob == NULL) {
+    FoundHob = 0;
+    return FALSE;
+  }
+
+  FoundHob = 1;
+  return TRUE;
+}
 
 EFI_STATUS
 EFIAPI
@@ -1050,7 +1082,11 @@ ConnectRecursivelyIfPciMassStorage (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   CHAR16                    *DevPathStr;
 
-  if (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE)) {
+  //
+  // Recognize PCI Mass Storage, and Xen PCI devices
+  //
+  if (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE) ||
+      (XenDetected() && IS_CLASS2 (PciHeader, 0xFF, 0x80))) {
     DevicePath = NULL;
     Status = gBS->HandleProtocol (
                     Handle,
@@ -1068,7 +1104,8 @@ ConnectRecursivelyIfPciMassStorage (
     if (DevPathStr != NULL) {
       DEBUG((
         EFI_D_INFO,
-        "Found Mass Storage device: %s\n",
+        "Found %s device: %s\n",
+        IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE) ? L"Mass Storage" : L"Xen",
         DevPathStr
         ));
       FreePool(DevPathStr);
