@@ -1,8 +1,8 @@
 /** @file
-  Common definitions in the Platform Initialization Specification version 1.4
+  Common definitions in the Platform Initialization Specification version 1.4a
   VOLUME 4 System Management Mode Core Interface version.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -60,15 +60,15 @@ EFI_STATUS
   );
 
 /**
-  The SmmStartupThisAp() lets the caller to get one distinct application processor
-  (AP) in the enabled processor pool to execute a caller-provided code stream
-  while in SMM. It runs the given code on this processor and reports the status.
-  It must be noted that the supplied code stream will be run only on an enabled 
-  processor which has also entered SMM. 
+  This service lets the caller to get one distinct application processor (AP) to execute
+  a caller-provided code stream while in SMM.
 
-  @param[in]     Procedure       A pointer to the code stream to be run on the designated AP of the system.
-  @param[in]     CpuNumber       The zero-based index of the processor number of the AP on which the code stream is supposed to run.
-  @param[in,out] ProcArguments   Allow the caller to pass a list of parameters to the code that is run by the AP.
+  @param[in]     Procedure       A pointer to the code stream to be run on the designated
+                                 AP of the system.
+  @param[in]     CpuNumber       The zero-based index of the processor number of the AP
+                                 on which the code stream is supposed to run.
+  @param[in,out] ProcArguments   Allows the caller to pass a list of parameters to the code
+                                 that is run by the AP.
 
   @retval EFI_SUCCESS            The call was successful and the return parameters are valid.
   @retval EFI_INVALID_PARAMETER  The input arguments are out of range.
