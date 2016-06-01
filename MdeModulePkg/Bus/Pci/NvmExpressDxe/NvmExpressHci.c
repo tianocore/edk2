@@ -683,6 +683,7 @@ NvmeCreateIoCompletionQueue (
   EFI_STATUS                               Status;
   NVME_ADMIN_CRIOCQ                        CrIoCq;
   UINT32                                   Index;
+  UINT16                                   QueueSize;
 
   Status = EFI_SUCCESS;
 
@@ -701,8 +702,18 @@ NvmeCreateIoCompletionQueue (
     CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
     CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
+    if (Index == 1) {
+      QueueSize = NVME_CCQ_SIZE;
+    } else {
+      if (Private->Cap.Mqes > NVME_ASYNC_CCQ_SIZE) {
+        QueueSize = NVME_ASYNC_CCQ_SIZE;
+      } else {
+        QueueSize = Private->Cap.Mqes;
+      }
+    }
+
     CrIoCq.Qid   = Index;
-    CrIoCq.Qsize = (Index == 1) ? NVME_CCQ_SIZE : NVME_ASYNC_CCQ_SIZE;
+    CrIoCq.Qsize = QueueSize;
     CrIoCq.Pc    = 1;
     CopyMem (&CommandPacket.NvmeCmd->Cdw10, &CrIoCq, sizeof (NVME_ADMIN_CRIOCQ));
     CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
@@ -741,6 +752,7 @@ NvmeCreateIoSubmissionQueue (
   EFI_STATUS                               Status;
   NVME_ADMIN_CRIOSQ                        CrIoSq;
   UINT32                                   Index;
+  UINT16                                   QueueSize;
 
   Status = EFI_SUCCESS;
 
@@ -759,8 +771,18 @@ NvmeCreateIoSubmissionQueue (
     CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
     CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
 
+    if (Index == 1) {
+      QueueSize = NVME_CSQ_SIZE;
+    } else {
+      if (Private->Cap.Mqes > NVME_ASYNC_CSQ_SIZE) {
+        QueueSize = NVME_ASYNC_CSQ_SIZE;
+      } else {
+        QueueSize = Private->Cap.Mqes;
+      }
+    }
+
     CrIoSq.Qid   = Index;
-    CrIoSq.Qsize = (Index == 1) ? NVME_CSQ_SIZE : NVME_ASYNC_CSQ_SIZE;
+    CrIoSq.Qsize = QueueSize;
     CrIoSq.Pc    = 1;
     CrIoSq.Cqid  = Index;
     CrIoSq.Qprio = 0;
