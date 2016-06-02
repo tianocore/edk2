@@ -300,6 +300,14 @@ HttpBootDhcp6ExtractUriInfo (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Register the IPv6 gateway address to the network device.
+  //
+  Status = HttpBootSetIp6Gateway (Private);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
   
   //
   // Configure the default DNS server if server assigned.
@@ -356,15 +364,7 @@ HttpBootDhcp6ExtractUriInfo (
     }  
   } 
   
-  CopyMem (&Private->ServerIp.v6, &IpAddr, sizeof (EFI_IPv6_ADDRESS));  
-    
-  //
-  // register the IPv6 gateway address to the network device.
-  //
-  Status = HttpBootSetIp6Gateway (Private);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  CopyMem (&Private->ServerIp.v6, &IpAddr, sizeof (EFI_IPv6_ADDRESS));
   
   //
   // Extract the port from URL, and use default HTTP port 80 if not provided.
