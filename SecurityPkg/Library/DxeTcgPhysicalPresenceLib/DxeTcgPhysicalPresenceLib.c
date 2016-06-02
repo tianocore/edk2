@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 #include <Guid/PhysicalPresenceData.h>
 #include <Library/TcgPpVendorLib.h>
+#include <Library/TcgPhysicalPresenceStorageLib.h>
 
 #define CONFIRM_BUFFER_SIZE         4096
 
@@ -1172,7 +1173,12 @@ TcgPhysicalPresenceLibProcessRequest (
   EFI_TCG_PROTOCOL                  *TcgProtocol;
   EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
   EFI_PHYSICAL_PRESENCE_FLAGS       PpiFlags;
-  
+
+  //
+  // Process the storage related action first.
+  //
+  TcgPhysicalPresenceStorageLibProcessRequest();
+
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
   if (EFI_ERROR (Status)) {
     return ;
@@ -1317,7 +1323,16 @@ TcgPhysicalPresenceLibNeedUserConfirm(
   BOOLEAN                      CmdEnable;
   EFI_TCG_PROTOCOL             *TcgProtocol;
   EFI_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
-  
+
+  //
+  // Process the storage related action first.
+  // If confirm need user confirm, just return TRUE.
+  // else continue check other actions.
+  //
+  if (TcgPhysicalPresenceStorageLibNeedUserConfirm()) {
+    return TRUE;
+  }
+
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
   if (EFI_ERROR (Status)) {
     return FALSE;

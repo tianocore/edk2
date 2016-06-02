@@ -55,6 +55,7 @@
   PrintLib
   HiiLib
   TcgPpVendorLib
+  TcgPhysicalPresenceStorageLib
 
 [Protocols]
   gEfiTcgProtocolGuid                   ## SOMETIMES_CONSUMES
