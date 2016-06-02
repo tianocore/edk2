@@ -34,7 +34,6 @@ Revision History:
 
 #pragma pack(1)
 typedef struct {
-  UINT16  WhatIsThePassword[20];
   UINT16  WhatIsThePassword2[20];
   UINT16  MyStringData[40];
   UINT16  PasswordClearText[20];
