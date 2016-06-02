@@ -55,6 +55,7 @@
   HobLib
   Tpm2CommandLib
   Tcg2PpVendorLib
+  TcgPhysicalPresenceStorageLib
 
 [Protocols]
   gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES

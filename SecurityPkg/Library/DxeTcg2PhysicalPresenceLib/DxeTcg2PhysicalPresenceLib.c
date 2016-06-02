@@ -37,6 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Library/Tcg2PpVendorLib.h>
+#include <Library/TcgPhysicalPresenceStorageLib.h>
 
 #define CONFIRM_BUFFER_SIZE         4096
 
@@ -790,6 +791,11 @@ Tcg2PhysicalPresenceLibProcessRequest (
   EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
 
+  //
+  // Process the storage related action first.
+  //
+  TcgPhysicalPresenceStorageLibProcessRequest();
+
   Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
   if (EFI_ERROR (Status)) {
     return ;
@@ -909,6 +915,15 @@ Tcg2PhysicalPresenceLibNeedUserConfirm(
   BOOLEAN                           RequestConfirmed;
   EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
+
+  //
+  // Process the storage related action first.
+  // If confirm need user confirm, just return TRUE.
+  // else continue check other actions.
+  //
+  if (TcgPhysicalPresenceStorageLibNeedUserConfirm()) {
+    return TRUE;
+  }
 
   Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
   if (EFI_ERROR (Status)) {
@@ -1045,9 +1060,9 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
   UINTN                             DataSize;
   EFI_TCG2_PHYSICAL_PRESENCE        PpData;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  Flags;
-  
+
   DEBUG ((EFI_D_INFO, "[TPM2] SubmitRequestToPreOSFunction, Request = %x, %x\n", OperationRequest, RequestParameter));
-  
+
   //
   // Get the Physical Presence variable
   //
@@ -1064,8 +1079,10 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
     return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
   }
 
-  if ((OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
-      (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) ) {
+  if (((OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
+       (OperationRequest < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN)) ||
+      ((OperationRequest > TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE) &&
+       (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION))) {
     //
     // This command requires UI to prompt user for Auth data.
     //
