@@ -54,9 +54,21 @@
 #string STR_DISK_INFO_REVERT                     #language en-US "Admin Revert to factory default and Disable"
 #string STR_DISK_INFO_DISABLE_USER               #language en-US "Disable User"
 #string STR_DISK_INFO_ENABLE_FEATURE             #language en-US "Enable Feature"
-#string STR_DISK_INFO_ENABLE_BLOCKSID            #language en-US "Enable BlockSID"
-#string STR_ENABLED                              #language en-US "Enabled"
-#string STR_DISABLED                             #language en-US "Disabled"
+#string STR_DISK_INFO_ENABLE_BLOCKSID            #language en-US "TCG Storage Action"
+#string STR_ENABLED                              #language en-US "Enable BlockSID"
+#string STR_DISABLED                             #language en-US "Disable BlockSID"
+
+#string STR_NONE                                 #language en-US "None"
+#string STR_DISK_INFO_ENABLE_BLOCKSID_TRUE       #language en-US "Require physical presence when remote enable BlockSID"
+#string STR_DISK_INFO_ENABLE_BLOCKSID_FALSE      #language en-US "Not require physical presence when remote enable BlockSID"
+#string STR_DISK_INFO_DISABLE_BLOCKSID_TRUE      #language en-US "Require physical presence when remote disable BlockSID"
+#string STR_DISK_INFO_DISABLE_BLOCKSID_FALSE     #language en-US "Not require physical presence when remote disable BlockSID"
+
+#string STR_BLOCKSID_STATUS_HELP                 #language en-US "BlockSID action change status"
+#string STR_BLOCKSID_STATUS                      #language en-US "Current BlockSID Status:"
+#string STR_BLOCKSID_STATUS1                     #language en-US ""
+#string STR_BLOCKSID_STATUS2                     #language en-US ""
+#string STR_BLOCKSID_STATUS3                     #language en-US ""
 
 #string STR_DISK_INFO_GOTO_LOCK_HELP             #language en-US "Lock the disk"
 #string STR_DISK_INFO_GOTO_UNLOCK_HELP           #language en-US "Unlock the disk"
@@ -66,7 +78,7 @@
 #string STR_DISK_INFO_GOTO_PSID_REVERT_HELP      #language en-US "Revert the disk to factory defaults"
 #string STR_DISK_INFO_GOTO_DISABLE_USER_HELP     #language en-US "Disable User"
 #string STR_DISK_INFO_GOTO_ENABLE_FEATURE_HELP   #language en-US "Enable Feature"
-#string STR_DISK_INFO_GOTO_ENABLE_BLOCKSID_HELP  #language en-US "Enable to send BlockSID command"
+#string STR_DISK_INFO_GOTO_ENABLE_BLOCKSID_HELP  #language en-US "Change BlockSID actions, includes enable or disable BlockSID, Require or not require physical presence when remote enable or disable BlockSID"
 
 /////////////////////////////////   DISK ACTION MENU FORM   /////////////////////////////////
 #string STR_DISK_ACTION_LBL                     #language en-US " "

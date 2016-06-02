@@ -417,28 +417,15 @@ ReadyToBootCallback (
   IN VOID             *Context
   )
 {
-  EFI_STATUS          Status;
-  OPAL_DRIVER_DEVICE* Itr;
-  TCG_RESULT          Result;
-  OPAL_EXTRA_INFO_VAR OpalExtraInfo;
-  UINTN               DataSize;
-  OPAL_SESSION        Session;
+  OPAL_DRIVER_DEVICE                         *Itr;
+  TCG_RESULT                                 Result;
+  OPAL_SESSION                               Session;
+  UINT32                                     PpStorageFlag;
 
   gBS->CloseEvent (Event);
 
-  DataSize = sizeof (OPAL_EXTRA_INFO_VAR);
-  Status = gRT->GetVariable (
-                  OPAL_EXTRA_INFO_VAR_NAME,
-                  &gOpalExtraInfoVariableGuid,
-                  NULL,
-                  &DataSize,
-                  &OpalExtraInfo
-                  );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  if (OpalExtraInfo.EnableBlockSid == TRUE) {
+  PpStorageFlag = Tcg2PhysicalPresenceLibGetManagementFlags ();
+  if ((PpStorageFlag & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID) != 0) {
     //
     // Send BlockSID command to each Opal disk
     //
