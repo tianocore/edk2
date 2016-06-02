@@ -493,6 +493,8 @@ Dns4HostNameToIp (
   //
   Status = DoDnsQuery (Instance, Packet);
   if (EFI_ERROR (Status)) {
+    Dns4RemoveTokenEntry (&Instance->Dns4TxTokens, TokenEntry);
+
     if (TokenEntry != NULL) {
       FreePool (TokenEntry);
     }
@@ -675,6 +677,8 @@ Dns4GeneralLookUp (
   //
   Status = DoDnsQuery (Instance, Packet);
   if (EFI_ERROR (Status)) {
+    Dns4RemoveTokenEntry (&Instance->Dns4TxTokens, TokenEntry);
+
     if (TokenEntry != NULL) {
       FreePool (TokenEntry);
     }
@@ -1303,6 +1307,8 @@ Dns6HostNameToIp (
   //
   Status = DoDnsQuery (Instance, Packet);
   if (EFI_ERROR (Status)) {
+    Dns6RemoveTokenEntry (&Instance->Dns6TxTokens, TokenEntry);
+    
     if (TokenEntry != NULL) {
       FreePool (TokenEntry);
     }
@@ -1488,6 +1494,8 @@ Dns6GeneralLookUp (
   //
   Status = DoDnsQuery (Instance, Packet);
   if (EFI_ERROR (Status)) {
+    Dns6RemoveTokenEntry (&Instance->Dns6TxTokens, TokenEntry);
+
     if (TokenEntry != NULL) {
       FreePool (TokenEntry);
     }
