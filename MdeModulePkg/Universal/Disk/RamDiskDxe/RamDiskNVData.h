@@ -2,6 +2,7 @@
   Header file for NV data structure definition.
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,12 +30,21 @@
 #define CREATE_RAW_SIZE_QUESTION_ID         0x2001
 #define CREATE_RAW_SUBMIT_QUESTION_ID       0x2002
 #define CREATE_RAW_DISCARD_QUESTION_ID      0x2003
+#define CREATE_RAW_MEMORY_TYPE_QUESTION_ID  0x2004
+
+#define RAM_DISK_BOOT_SERVICE_DATA_MEMORY   0x00
+#define RAM_DISK_RESERVED_MEMORY            0x01
+#define RAM_DISK_MEMORY_TYPE_MAX            0x02
 
 typedef struct {
   //
   // The size of the RAM disk to be created.
   //
   UINT64                          Size;
+  //
+  // Selected RAM Disk Memory Type
+  //
+  UINT8                           MemType;
 } RAM_DISK_CONFIGURATION;
 
 #endif

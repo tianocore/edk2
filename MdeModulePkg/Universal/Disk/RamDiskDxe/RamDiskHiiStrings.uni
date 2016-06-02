@@ -2,7 +2,7 @@
 // String definitions for RamDiskDxe driver form.
 //
 // Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-//
+// (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -35,6 +35,11 @@
 
 #string STR_SIZE_PROMPT                #language en-US "Size (Hex):"
 #string STR_SIZE_HELP                  #language en-US "The valid RAM disk size should be multiples of the RAM disk block size."
+
+#string STR_MEMORY_TYPE_PROMPT                #language en-US "Disk Memory Type:"
+#string STR_MEMORY_TYPE_HELP                  #language en-US "Specifies type of memory to use from available memory pool in system to create a disk."
+#string STR_RAM_DISK_BOOT_SERVICE_DATA_MEMORY #language en-US "Boot Service Data"
+#string STR_RAM_DISK_RESERVED_MEMORY          #language en-US "Reserved"
 
 #string STR_CREATE_AND_EXIT_HELP       #language en-US "Create a new RAM disk with the given starting and ending address."
 #string STR_CREATE_AND_EXIT_PROMPT     #language en-US "Create & Exit"
