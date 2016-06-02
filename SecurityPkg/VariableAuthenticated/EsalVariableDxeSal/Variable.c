@@ -1,7 +1,7 @@
 /** @file
   The implementation of Extended SAL variable services.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -1661,7 +1661,7 @@ AutoUpdateLangVariable(
       FreePool (Global->PlatformLangCodes[VirtualMode]);
     }
     Global->PlatformLangCodes[VirtualMode] = AllocateRuntimeCopyPool (DataSize, Data);
-    ASSERT (mVariableModuleGlobal->PlatformLangCodes[VirtualMode] != NULL);
+    ASSERT (Global->PlatformLangCodes[VirtualMode] != NULL);
 
     //
     // PlatformLang holds a single language from PlatformLangCodes, 
