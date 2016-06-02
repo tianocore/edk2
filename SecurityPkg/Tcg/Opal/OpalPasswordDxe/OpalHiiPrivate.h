@@ -211,15 +211,15 @@ HiiPasswordEntered(
 /**
   Update block sid info.
 
-  @param      Enable         Enable/disable BlockSid.
+  @param      PpRequest      Input the Pp Request.
 
   @retval  EFI_SUCCESS       Do the required action success.
   @retval  Others            Other error occur.
 
 **/
 EFI_STATUS
-HiiSetBlockSid (
-  BOOLEAN          Enable
+HiiSetBlockSidAction (
+  UINT32          PpRequest
   );
 
 /**
