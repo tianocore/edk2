@@ -90,23 +90,63 @@ HiiSetCurrentConfiguration(
   VOID
   )
 {
-  EFI_STATUS                            Status;
-  OPAL_EXTRA_INFO_VAR                   OpalExtraInfo;
-  UINTN                                 DataSize;
+  UINT32                                       PpStorageFlag;
+  EFI_STRING                                   NewString;
 
   gHiiConfiguration.NumDisks = GetDeviceCount();
 
-  DataSize = sizeof (OPAL_EXTRA_INFO_VAR);
-  Status = gRT->GetVariable (
-                  OPAL_EXTRA_INFO_VAR_NAME,
-                  &gOpalExtraInfoVariableGuid,
-                  NULL,
-                  &DataSize,
-                  &OpalExtraInfo
-                  );
-  if (!EFI_ERROR (Status)) {
-    gHiiConfiguration.EnableBlockSid = OpalExtraInfo.EnableBlockSid;
+  //
+  // Update the BlockSID status string.
+  //
+  PpStorageFlag = Tcg2PhysicalPresenceLibGetManagementFlags ();
+
+  if ((PpStorageFlag & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID) != 0) {
+    NewString = HiiGetString (gHiiPackageListHandle, STRING_TOKEN(STR_ENABLED), NULL);
+    if (NewString == NULL) {
+      DEBUG ((DEBUG_INFO,  "HiiSetCurrentConfiguration: HiiGetString( ) failed\n"));
+      return;
+    }
+  } else {
+    NewString = HiiGetString (gHiiPackageListHandle, STRING_TOKEN(STR_DISABLED), NULL);
+    if (NewString == NULL) {
+      DEBUG ((DEBUG_INFO,  "HiiSetCurrentConfiguration: HiiGetString( ) failed\n"));
+      return;
+    }
   }
+  HiiSetString(gHiiPackageListHandle, STRING_TOKEN(STR_BLOCKSID_STATUS1), NewString, NULL);
+  FreePool (NewString);
+
+  if ((PpStorageFlag & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) != 0) {
+    NewString = HiiGetString (gHiiPackageListHandle, STRING_TOKEN(STR_DISK_INFO_ENABLE_BLOCKSID_TRUE), NULL);
+    if (NewString == NULL) {
+      DEBUG ((DEBUG_INFO,  "HiiSetCurrentConfiguration: HiiGetString( ) failed\n"));
+      return;
+    }
+  } else {
+    NewString = HiiGetString (gHiiPackageListHandle, STRING_TOKEN(STR_DISK_INFO_ENABLE_BLOCKSID_FALSE), NULL);
+    if (NewString == NULL) {
+      DEBUG ((DEBUG_INFO,  "HiiSetCurrentConfiguration: HiiGetString( ) failed\n"));
+      return;
+    }
+  }
+  HiiSetString(gHiiPackageListHandle, STRING_TOKEN(STR_BLOCKSID_STATUS2), NewString, NULL);
+  FreePool (NewString);
+
+  if ((PpStorageFlag & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) != 0) {
+    NewString = HiiGetString (gHiiPackageListHandle, STRING_TOKEN(STR_DISK_INFO_DISABLE_BLOCKSID_TRUE), NULL);
+    if (NewString == NULL) {
+      DEBUG ((DEBUG_INFO,  "HiiSetCurrentConfiguration: HiiGetString( ) failed\n"));
+      return;
+    }
+  } else {
+    NewString = HiiGetString (gHiiPackageListHandle, STRING_TOKEN(STR_DISK_INFO_DISABLE_BLOCKSID_FALSE), NULL);
+    if (NewString == NULL) {
+      DEBUG ((DEBUG_INFO,  "HiiSetCurrentConfiguration: HiiGetString( ) failed\n"));
+      return;
+    }
+  }
+  HiiSetString(gHiiPackageListHandle, STRING_TOKEN(STR_BLOCKSID_STATUS3), NewString, NULL);
+  FreePool (NewString);
 }
 
 /**
@@ -400,6 +440,7 @@ DriverCallback(
 {
   HII_KEY    HiiKey;
   UINT8      HiiKeyId;
+  UINT32     PpRequest;
 
   if (ActionRequest != NULL) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
@@ -468,9 +509,47 @@ DriverCallback(
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (HiiKeyId) {
       case HII_KEY_ID_BLOCKSID:
-        HiiSetBlockSid(Value->b);
+        switch (Value->u8) {
+          case 0:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_NO_ACTION;
+            break;
+
+          case 1:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID;
+            break;
+
+          case 2:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID;
+            break;
+
+          case 3:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE;
+            break;
+
+          case 4:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE;
+            break;
+
+          case 5:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE;
+            break;
+
+          case 6:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE;
+            break;
+
+          default:
+            PpRequest = TCG2_PHYSICAL_PRESENCE_NO_ACTION;
+            DEBUG ((DEBUG_ERROR, "Invalid value input!\n"));
+            break;
+        }
+        HiiSetBlockSidAction(PpRequest);
+
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
         return EFI_SUCCESS;
+
+      default:
+        break;
     }
   }
 
@@ -1104,25 +1183,23 @@ HiiPasswordEntered(
 
 **/
 EFI_STATUS
-HiiSetBlockSid (
-  BOOLEAN          Enable
+HiiSetBlockSidAction (
+  IN UINT32          PpRequest
   )
 {
-  EFI_STATUS                            Status;
-  OPAL_EXTRA_INFO_VAR                   OpalExtraInfo;
-  UINTN                                 DataSize;
+  UINT32                           ReturnCode;
+  EFI_STATUS                       Status;
 
-  Status = EFI_SUCCESS;
-
-  OpalExtraInfo.EnableBlockSid = Enable;
-  DataSize = sizeof (OPAL_EXTRA_INFO_VAR);
-  Status = gRT->SetVariable (
-                 OPAL_EXTRA_INFO_VAR_NAME,
-                 &gOpalExtraInfoVariableGuid,
-                 EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                 DataSize,
-                 &OpalExtraInfo
-                 );
+  ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (PpRequest, 0);
+  if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
+    Status = EFI_SUCCESS;
+  } else if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE) {
+    Status = EFI_OUT_OF_RESOURCES;
+  } else if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED) {
+    Status = EFI_UNSUPPORTED;
+  } else {
+    Status = EFI_DEVICE_ERROR;
+  }
 
   return Status;
 }
