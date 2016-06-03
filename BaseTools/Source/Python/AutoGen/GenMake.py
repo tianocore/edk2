@@ -488,6 +488,11 @@ cleanlib:
         if 'IMAGE_ENTRY_POINT' not in self._AutoGenObject.Macros.keys():
             self._AutoGenObject.Macros['IMAGE_ENTRY_POINT'] = ImageEntryPoint
 
+        PCI_COMPRESS_Flag = False
+        for k, v in self._AutoGenObject.Module.Defines.iteritems():
+            if 'PCI_COMPRESS' == k and 'TRUE' == v:
+                PCI_COMPRESS_Flag = True
+
         # tools definitions
         ToolsDef = []
         IncPrefix = self._INC_FLAG_[self._AutoGenObject.ToolChainFamily]
@@ -505,6 +510,14 @@ cleanlib:
                     # Remove duplicated include path, if any
                     if Attr == "FLAGS":
                         Value = RemoveDupOption(Value, IncPrefix, self._AutoGenObject.IncludePathList)
+                        if Tool == "OPTROM" and PCI_COMPRESS_Flag:
+                            ValueList = Value.split()
+                            if ValueList:
+                                for i, v in enumerate(ValueList):
+                                    if '-e' == v:
+                                        ValueList[i] = '-ec'
+                                Value = ' '.join(ValueList)
+
                     ToolsDef.append("%s_%s = %s" % (Tool, Attr, Value))
             ToolsDef.append("")
 
