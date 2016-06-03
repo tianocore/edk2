@@ -1,8 +1,9 @@
 /** @file
   Library functions which relates with driver health.
 
-(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -439,6 +440,8 @@ BmRepairAllControllers (
   BOOLEAN                             RebootRequired;
   EFI_HII_HANDLE                      *HiiHandles;
   EFI_FORM_BROWSER2_PROTOCOL          *FormBrowser2;
+  UINT32                              MaxRepairCount;
+  UINT32                              RepairCount;
 
   //
   // Configure PcdDriverHealthConfigureForm to ZeroGuid to disable driver health check.
@@ -449,6 +452,9 @@ BmRepairAllControllers (
 
   Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &FormBrowser2);
   ASSERT_EFI_ERROR (Status);
+
+  MaxRepairCount = PcdGet32 (PcdMaxRepairCount);
+  RepairCount = 0;
 
   do {
     RepairRequired        = FALSE;
@@ -512,7 +518,8 @@ BmRepairAllControllers (
     }
   
     EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
-  } while (RepairRequired || ConfigurationRequired);
+    RepairCount++;
+  } while ((RepairRequired || ConfigurationRequired) && ((MaxRepairCount == 0) || (RepairCount < MaxRepairCount)));
 
   RebootRequired    = FALSE;
   ReconnectRequired = FALSE;
