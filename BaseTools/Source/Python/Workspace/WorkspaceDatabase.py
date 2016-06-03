@@ -1930,8 +1930,12 @@ class InfBuildData(ModuleBuildClassObject):
                 if self._ModuleType == SUP_MODULE_SMM_CORE:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.MetaFile)
             if self._Defs and 'PCI_DEVICE_ID' in self._Defs and 'PCI_VENDOR_ID' in self._Defs \
-               and 'PCI_CLASS_CODE' in self._Defs:
+               and 'PCI_CLASS_CODE' in self._Defs and 'PCI_REVISION' in self._Defs:
                 self._BuildType = 'UEFI_OPTIONROM'
+                if 'PCI_COMPRESS' in self._Defs:
+                    if self._Defs['PCI_COMPRESS'] not in ('TRUE', 'FALSE'):
+                        EdkLogger.error("build", FORMAT_INVALID, "Expected TRUE/FALSE for PCI_COMPRESS: %s" %self.MetaFile)
+
             elif self._Defs and 'UEFI_HII_RESOURCE_SECTION' in self._Defs \
                and self._Defs['UEFI_HII_RESOURCE_SECTION'] == 'TRUE':
                 self._BuildType = 'UEFI_HII'
