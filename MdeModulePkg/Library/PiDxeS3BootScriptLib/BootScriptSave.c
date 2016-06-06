@@ -443,10 +443,6 @@ S3BootScriptLibInitialize (
   BOOLEAN                        InSmm;
   EFI_PHYSICAL_ADDRESS           Buffer;
 
-  if (!PcdGetBool (PcdAcpiS3Enable)) {
-    return RETURN_SUCCESS;
-  }
-
   S3TablePtr = (SCRIPT_TABLE_PRIVATE_DATA*)(UINTN)PcdGet64(PcdS3BootScriptTablePrivateDataPtr);
   //
   // The Boot script private data is not be initialized. create it
