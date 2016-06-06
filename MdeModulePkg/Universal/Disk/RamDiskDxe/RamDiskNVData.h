@@ -18,8 +18,6 @@
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/RamDiskHii.h>
 
-#define RAM_DISK_CONFIGURATION_VARSTORE_ID  0x0001
-
 #define MAIN_FORM_ID                        0x1000
 #define MAIN_GOTO_FILE_EXPLORER_ID          0x1001
 #define MAIN_REMOVE_RD_QUESTION_ID          0x1002

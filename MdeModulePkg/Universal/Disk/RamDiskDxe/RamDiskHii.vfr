@@ -20,11 +20,6 @@ formset
   help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
   classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
 
-  varstore RAM_DISK_CONFIGURATION,
-    varid = RAM_DISK_CONFIGURATION_VARSTORE_ID,
-    name  = RAM_DISK_CONFIGURATION,
-    guid  = RAM_DISK_FORM_SET_GUID;
-
   //
   // Form #1 "Main Form - Add/Remove/Show RAM Disks"
   //
@@ -65,11 +60,11 @@ formset
 
     subtitle text = STRING_TOKEN(STR_RAM_DISK_NULL_STRING);
 
-    numeric varid   = RAM_DISK_CONFIGURATION.Size,
+    numeric
       questionid = CREATE_RAW_SIZE_QUESTION_ID,
       prompt  = STRING_TOKEN(STR_SIZE_PROMPT),
       help    = STRING_TOKEN(STR_SIZE_HELP),
-      flags   = DISPLAY_UINT_HEX | INTERACTIVE,
+      flags   = NUMERIC_SIZE_8 | DISPLAY_UINT_HEX | INTERACTIVE,
       minimum = 1,
       maximum = 0xFFFFFFFFFFFFFFFF,
     endnumeric;

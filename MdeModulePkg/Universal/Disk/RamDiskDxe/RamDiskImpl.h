@@ -136,6 +136,8 @@ typedef struct {
 typedef struct {
   UINTN                           Signature;
 
+  RAM_DISK_CONFIGURATION          ConfigStore;
+
   EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
   EFI_HANDLE                      DriverHandle;
   EFI_HII_HANDLE                  HiiHandle;
