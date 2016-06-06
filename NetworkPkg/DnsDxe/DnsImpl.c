@@ -1043,6 +1043,7 @@ AddDns6ServerIp (
   @param  TokensMap       All DNS transmittal Tokens entry.  
   @param  Identification  Identification for queried packet.  
   @param  Type            Type for queried packet.
+  @param  Class           Class for queried packet.
   @param  Item            Return corresponding Token entry.
 
   @retval TRUE            The response is valid.
@@ -1054,6 +1055,7 @@ IsValidDnsResponse (
   IN     NET_MAP      *TokensMap,
   IN     UINT16       Identification,
   IN     UINT16       Type,
+  IN     UINT16       Class,
      OUT NET_MAP_ITEM **Item
   )
 {
@@ -1077,17 +1079,16 @@ IsValidDnsResponse (
       DnsHeader = (DNS_HEADER *) TxString;
       QueryName = (CHAR8 *) (TxString + sizeof (*DnsHeader));
       QuerySection = (DNS_QUERY_SECTION *) (QueryName + AsciiStrLen (QueryName) + 1);
-
-      DnsHeader->Identification = NTOHS (DnsHeader->Identification);
-      QuerySection->Type = NTOHS (QuerySection->Type);
         
-      if (DnsHeader->Identification == Identification && QuerySection->Type == Type) {
+      if (NTOHS (DnsHeader->Identification) == Identification &&
+          NTOHS (QuerySection->Type) == Type && 
+          NTOHS (QuerySection->Class) == Class) {
         return TRUE;
       }
     } 
   }
   
-  *Item =NULL;
+  *Item = NULL;
   
   return FALSE;
 }
@@ -1195,7 +1196,13 @@ ParseDnsResponse (
   // Check DnsResponse Validity, if so, also get a valid NET_MAP_ITEM.
   //
   if (Instance->Service->IpVersion == IP_VERSION_4) {
-    if (!IsValidDnsResponse (&Instance->Dns4TxTokens, DnsHeader->Identification, QuerySection->Type, &Item)) {
+    if (!IsValidDnsResponse (
+           &Instance->Dns4TxTokens, 
+           DnsHeader->Identification, 
+           QuerySection->Type,
+           QuerySection->Class,
+           &Item
+           )) {
       *Completed = FALSE;
       Status = EFI_ABORTED;
       goto ON_EXIT;
@@ -1203,7 +1210,13 @@ ParseDnsResponse (
     ASSERT (Item != NULL);
     Dns4TokenEntry = (DNS4_TOKEN_ENTRY *) (Item->Key);
   } else {
-    if (!IsValidDnsResponse (&Instance->Dns6TxTokens, DnsHeader->Identification, QuerySection->Type, &Item)) {
+    if (!IsValidDnsResponse (
+           &Instance->Dns6TxTokens, 
+           DnsHeader->Identification, 
+           QuerySection->Type,
+           QuerySection->Class,
+           &Item
+           )) {
       *Completed = FALSE;
       Status = EFI_ABORTED;
       goto ON_EXIT;
@@ -1216,7 +1229,7 @@ ParseDnsResponse (
   // Continue Check Some Errors.
   //
   if (DnsHeader->Flags.Bits.RCode != DNS_FLAGS_RCODE_NO_ERROR || DnsHeader->AnswersNum < 1 || \
-      DnsHeader->Flags.Bits.QR != DNS_FLAGS_QR_RESPONSE || QuerySection->Class != DNS_CLASS_INET) {
+      DnsHeader->Flags.Bits.QR != DNS_FLAGS_QR_RESPONSE) {
       Status = EFI_ABORTED;
       goto ON_EXIT;
   }

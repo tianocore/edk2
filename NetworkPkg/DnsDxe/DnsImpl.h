@@ -561,6 +561,7 @@ AddDns6ServerIp (
   @param  TokensMap       All DNS transmittal Tokens entry.  
   @param  Identification  Identification for queried packet.  
   @param  Type            Type for queried packet.
+  @param  Class           Class for queried packet.
   @param  Item            Return corresponding Token entry.
 
   @retval TRUE            The response is valid.
@@ -572,6 +573,7 @@ IsValidDnsResponse (
   IN     NET_MAP      *TokensMap,
   IN     UINT16       Identification,
   IN     UINT16       Type,
+  IN     UINT16       Class,
      OUT NET_MAP_ITEM **Item
   );
 
