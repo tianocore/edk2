@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_GUID   mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
 
-BOOLEAN   gConnectAllHappened = FALSE;
 BOOLEAN   mFeaturerSwitch = TRUE;
 BOOLEAN   mResetRequired  = FALSE;
 
@@ -990,9 +989,10 @@ UiEntry (
 
   //
   // Indicate if the connect all has been performed before.
+  // If has not been performed before, do here.
   //
-  if (ConnectAllHappened) {
-    gConnectAllHappened = TRUE;
+  if (!ConnectAllHappened) {
+    EfiBootManagerConnectAll ();
   }
 
   //
