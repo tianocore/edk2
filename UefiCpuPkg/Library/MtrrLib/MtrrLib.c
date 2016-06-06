@@ -20,8 +20,8 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 
-#define OR_SEED      0x01010101
-#define CLEAR_SEED   0xFFFFFFFF
+#define OR_SEED      0x0101010101010101ull
+#define CLEAR_SEED   0xFFFFFFFFFFFFFFFFull
 
 //
 // Context to save and restore when MTRRs are programmed
@@ -462,14 +462,15 @@ ProgramFixedMtrr (
   )
 {
   UINT32  MsrNum;
-  UINT32  ByteShift;
-  UINT32  OrMask[2];
-  UINT32  ClearMask[2];
+  UINT32  LeftByteShift;
+  UINT32  RightByteShift;
+  UINT64  OrMask;
+  UINT64  ClearMask;
   UINT64  SubLength;
 
-  *(UINT64 *)OrMask    = 0;
-  *(UINT64 *)ClearMask = 0;
-
+  //
+  // Find the fixed MTRR index to be programmed
+  //
   for (MsrNum = *LastMsrNum + 1; MsrNum < MTRR_NUMBER_OF_FIXED_MTRR; MsrNum++) {
     if ((*Base >= mMtrrLibFixedMtrrTable[MsrNum].BaseAddress) &&
         (*Base <
@@ -488,36 +489,60 @@ ProgramFixedMtrr (
   }
 
   //
-  // We found the fixed MTRR to be programmed
+  // Find the begin offset in fixed MTRR and calculate byte offset of left shift
   //
-  ByteShift = ((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrNum].BaseAddress)
+  LeftByteShift = ((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrNum].BaseAddress)
                / mMtrrLibFixedMtrrTable[MsrNum].Length;
 
-  if (ByteShift >= 8) {
+  if (LeftByteShift >= 8) {
     return RETURN_UNSUPPORTED;
   }
 
-  if (ByteShift < 4) {
-    OrMask[0]    = OR_SEED * (UINT32)MemoryCacheType;
-    ClearMask[0] = CLEAR_SEED;
-    OrMask[1]    = (OR_SEED * (UINT32)MemoryCacheType) >> ((4 - ByteShift) * 8);
-    ClearMask[1] = CLEAR_SEED >> ((4 - ByteShift) * 8);
+  //
+  // Find the end offset in fixed MTRR and calculate byte offset of right shift
+  //
+  SubLength = mMtrrLibFixedMtrrTable[MsrNum].Length * (8 - LeftByteShift);
+  if (*Length >= SubLength) {
+    RightByteShift = 0;
   } else {
-    OrMask[0]    = (OR_SEED * (UINT32)MemoryCacheType) >> ((8 - ByteShift) * 8);
-    ClearMask[0] = CLEAR_SEED >> ((8 - ByteShift) * 8);
+    RightByteShift = 8 - LeftByteShift -
+                (UINT32)(*Length) / mMtrrLibFixedMtrrTable[MsrNum].Length;
+    if ((LeftByteShift >= 8) ||
+        (((UINT32)(*Length) % mMtrrLibFixedMtrrTable[MsrNum].Length) != 0)
+        ) {
+      return RETURN_UNSUPPORTED;
+    }
+    //
+    // Update SubLength by actual length
+    //
+    SubLength = *Length;
   }
 
-  SubLength = mMtrrLibFixedMtrrTable[MsrNum].Length * (8 - ByteShift);
-  if (*Length < SubLength) {
-    return RETURN_UNSUPPORTED;
+  ClearMask = CLEAR_SEED;
+  OrMask    = MultU64x32 (OR_SEED, (UINT32)MemoryCacheType);
+
+  if (LeftByteShift != 0) {
+    //
+    // Clear the low bits by LeftByteShift
+    //
+    ClearMask &= LShiftU64 (ClearMask, LeftByteShift * 8);
+    OrMask    &= LShiftU64 (OrMask, LeftByteShift * 8);
+  }
+
+  if (RightByteShift != 0) {
+    //
+    // Clear the high bits by RightByteShift
+    //
+    ClearMask &= RShiftU64 (ClearMask, RightByteShift * 8);
+    OrMask    &= RShiftU64 (OrMask, RightByteShift * 8);
   }
 
   *Length -= SubLength;
   *Base   += SubLength;
 
   *LastMsrNum      = MsrNum;
-  *ReturnClearMask = *(UINT64 *)ClearMask;
-  *ReturnOrMask    = *(UINT64 *)OrMask;
+  *ReturnClearMask = ClearMask;
+  *ReturnOrMask    = OrMask;
 
   return RETURN_SUCCESS;
 }
