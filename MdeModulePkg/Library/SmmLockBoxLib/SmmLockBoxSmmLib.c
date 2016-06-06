@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -73,7 +73,7 @@ InternalGetSmmLockBoxContext (
 **/
 EFI_STATUS
 EFIAPI
-SmmLockBoxSmmConstructuor (
+SmmLockBoxSmmConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -81,7 +81,7 @@ SmmLockBoxSmmConstructuor (
   EFI_STATUS           Status;
   SMM_LOCK_BOX_CONTEXT *SmmLockBoxContext;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructuor - Enter\n"));
+  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Enter\n"));
 
   //
   // Check if gEfiSmmLockBoxCommunicationGuid is installed by someone
@@ -93,7 +93,7 @@ SmmLockBoxSmmConstructuor (
     // No need to install again, just return.
     //
     DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxContext - already installed\n"));
-    DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructuor - Exit\n"));
+    DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Exit\n"));
     return EFI_SUCCESS;
   }
 
@@ -117,7 +117,7 @@ SmmLockBoxSmmConstructuor (
 
   DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxContext - %x\n", (UINTN)&mSmmLockBoxContext));
   DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib LockBoxDataAddress - %x\n", (UINTN)&mLockBoxQueue));
-  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructuor - Exit\n"));
+  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Exit\n"));
 
   return Status;
 }
