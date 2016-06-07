@@ -267,6 +267,7 @@ Tpm12TisTpmCommand (
   UINT32                            TpmOutSize;
   UINT16                            Data16;
   UINT32                            Data32;
+  UINT16                            RspTag;
 
   DEBUG_CODE (
     UINTN  DebugSize;
@@ -364,11 +365,12 @@ Tpm12TisTpmCommand (
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
   //
-  // Check the reponse data header (tag,parasize and returncode )
+  // Check the response data header (tag, parasize and returncode)
   //
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
-  if (SwapBytes16 (Data16) != TPM_TAG_RSP_COMMAND) {
-    DEBUG ((EFI_D_ERROR, "TPM12: TPM_ST_RSP error - %x\n", TPM_TAG_RSP_COMMAND));
+  RspTag = SwapBytes16 (Data16);
+  if (RspTag != TPM_TAG_RSP_COMMAND && RspTag != TPM_TAG_RSP_AUTH1_COMMAND && RspTag != TPM_TAG_RSP_AUTH2_COMMAND) {
+    DEBUG ((EFI_D_ERROR, "TPM12: Response tag error - current tag value is %x\n", RspTag));
     Status = EFI_UNSUPPORTED;
     goto Exit;
   }
