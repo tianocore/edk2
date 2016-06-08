@@ -2,15 +2,15 @@
 # FDF file of Platform.
 #
 # Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
-#                                                                                  
+#
 # This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.  
-# The full text of the license may be found at                                     
-# http://opensource.org/licenses/bsd-license.php.                                  
-#                                                                                  
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-#                                                                                  
+# the terms and conditions of the BSD License that accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
 #
 #**/
 
@@ -22,7 +22,7 @@ DEFINE FLASH_NUM_BLOCKS = 0x400           #The number of blocks in 4Mb FLASH Dev
 DEFINE FLASH_AREA_BASE_ADDRESS                                = 0xFF800000
 DEFINE FLASH_AREA_SIZE                                        = 0x00800000
 
-DEFINE FLASH_REGION_VLVMICROCODE_OFFSET                       = 0x00000000 
+DEFINE FLASH_REGION_VLVMICROCODE_OFFSET                       = 0x00000000
 DEFINE FLASH_REGION_VLVMICROCODE_SIZE                         = 0x00040000
 DEFINE FLASH_REGION_VLVMICROCODE_BASE                         = 0xFFC00000
 
@@ -52,7 +52,7 @@ DEFINE FLASH_REGION_FVMAIN_SIZE                               = 0x00196000
 
 DEFINE FLASH_REGION_FV_RECOVERY2_OFFSET                       = 0x00396000
 DEFINE FLASH_REGION_FV_RECOVERY2_SIZE                         = 0x0002C000
- 
+
 DEFINE FLASH_REGION_FV_RECOVERY_OFFSET                        = 0x003C2000
 DEFINE FLASH_REGION_FV_RECOVERY_SIZE                          = 0x0003E000
 
@@ -109,9 +109,9 @@ SET gPlatformModuleTokenSpaceGuid.PcdFlashAreaSize                   = $(FLASH_A
 # Fv Size can be adjusted; FVMAIN_COMPACT can be reduced to 0x120000, and FV_RECOVERY can be enlarged to 0x80000
 #
 ################################################################################
-# Since the Fce tool don't have gcc version, we can't handle default variable in Linux, 
+# Since the Fce tool don't have gcc version, we can't handle default variable in Linux,
 # so we hardcode the default value of variable here.
-# Please note that we MUST update the binary once the default value is changed. 
+# Please note that we MUST update the binary once the default value is changed.
 
 #
   # CPU Microcodes
