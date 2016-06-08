@@ -53,6 +53,9 @@
   Ia32/SecEntry.S
   Ia32/PeiCoreEntry.S
   Ia32/Stack.S
+  Ia32/SecEntry.nasm
+  Ia32/PeiCoreEntry.nasm
+  Ia32/Stack.nasm
 
 ################################################################################
 #
