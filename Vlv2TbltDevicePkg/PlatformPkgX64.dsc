@@ -614,7 +614,7 @@
 # $(FLASH_AREA_SIZE)
   gFspWrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00800000
 # $(FLASH_REGION_FSPBIN_BASE)
-  gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase|0xFFDB0000
+  gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase|0xFFCC0000
 !endif
 
 !if $(PERFORMANCE_ENABLE) == TRUE
