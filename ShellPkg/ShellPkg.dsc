@@ -1,7 +1,7 @@
 ##  @file
 # Shell Package
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -99,7 +99,6 @@
 
   ShellPkg/Library/UefiDpLib/UefiDpLib.inf {
     <LibraryClasses>
-      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
       PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
       DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   }

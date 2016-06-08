@@ -1,7 +1,7 @@
 /** @file
   Trace reporting for the Dp utility.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,7 +17,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/TimerLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/PrintLib.h>
@@ -386,12 +385,10 @@ DumpRawTrace(
 /** 
   Gather and print Major Phase metrics.
   
-  @param[in]    Ticker      The timer value for the END of Shell phase
-  
 **/
 VOID
 ProcessPhases(
-  IN UINT64            Ticker
+  VOID
   )
 {
   MEASUREMENT_RECORD        Measurement;
@@ -400,7 +397,6 @@ ProcessPhases(
   UINT64                    PeiTime;
   UINT64                    DxeTime;
   UINT64                    BdsTime;
-  UINT64                    ShellTime;
   UINT64                    ElapsedTime;
   UINT64                    Duration;
   UINT64                    Total;
@@ -413,7 +409,6 @@ ProcessPhases(
   PeiTime         = 0;
   DxeTime         = 0;
   BdsTime         = 0;
-  ShellTime       = 0;   
   //
   // Get Execution Phase Statistics
   //
@@ -434,9 +429,6 @@ ProcessPhases(
                           &Measurement.EndTimeStamp,
                           &Measurement.Identifier)) != 0)
   {
-    if (AsciiStrnCmp (Measurement.Token, ALit_SHELL, PERF_TOKEN_LENGTH) == 0) {
-      Measurement.EndTimeStamp = Ticker;
-    }
     if (Measurement.EndTimeStamp == 0) { // Skip "incomplete" records
       continue;
     }
@@ -454,8 +446,6 @@ ProcessPhases(
       DxeTime      = Duration;
     } else if (AsciiStrnCmp (Measurement.Token, ALit_BDS, PERF_TOKEN_LENGTH) == 0) {
       BdsTime      = Duration;
-    } else if (AsciiStrnCmp (Measurement.Token, ALit_SHELL, PERF_TOKEN_LENGTH) == 0) {
-      ShellTime    = Duration;
     }
   }
 
@@ -508,17 +498,6 @@ ProcessPhases(
                     (UINT32)TimerInfo.Frequency
                     );
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_BDSTO), gDpHiiHandle, ALit_BdsTO, ElapsedTime);
-  }
-
-  // print SHELL phase duration time
-  //
-  if (ShellTime > 0) {
-    ElapsedTime = DivU64x32 (
-                    ShellTime,
-                    (UINT32)TimerInfo.Frequency
-                    );
-    Total += ElapsedTime;
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), gDpHiiHandle, ALit_SHELL, ElapsedTime);
   }
 
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TOTAL_DURATION), gDpHiiHandle, Total);

@@ -13,7 +13,7 @@
   Dp uses this information to group records in different ways.  It also uses
   timer information to calculate elapsed time for each measurement.
  
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -25,16 +25,10 @@
 **/
 
 #include "UefiDpLib.h"
-#include <Guid/GlobalVariable.h>
-#include <Library/PrintLib.h>
-#include <Library/HandleParsingLib.h>
-#include <Library/DevicePathLib.h>
-
 #include <Library/ShellLib.h>
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
-#include <Library/TimerLib.h>
 #include <Library/UefiLib.h>
 
 #include <Guid/Performance.h>
@@ -153,8 +147,7 @@ ShellCommandRunDp (
   CONST CHAR16              *CmdLineArg;
   EFI_STATUS                Status;
 
-  UINT64                    Freq;
-  UINT64                    Ticker;
+  PERFORMANCE_PROPERTY      *PerformanceProperty;
   UINTN                     Number2Display;
 
   EFI_STRING                StringPtr;
@@ -182,11 +175,6 @@ ShellCommandRunDp (
   CumulativeMode = FALSE;
   CustomCumulativeData = NULL;
   ShellStatus = SHELL_SUCCESS;
-
-  // Get DP's entry time as soon as possible.
-  // This is used as the Shell-Phase end time.
-  //
-  Ticker  = GetPerformanceCounter ();
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -283,10 +271,15 @@ ShellCommandRunDp (
   //    StartCount = Value loaded into the counter when it starts counting
   //      EndCount = Value counter counts to before it needs to be reset
   //
-  Freq = GetPerformanceCounterProperties (&TimerInfo.StartCount, &TimerInfo.EndCount);
+  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, &PerformanceProperty);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PERF_PROPERTY_NOT_FOUND), gDpHiiHandle);
+    goto Done;
+  }
 
-  // Convert the Frequency from Hz to KHz
-  TimerInfo.Frequency = (UINT32)DivU64x32 (Freq, 1000);
+  TimerInfo.Frequency  = (UINT32)DivU64x32 (PerformanceProperty->Frequency, 1000);
+  TimerInfo.StartCount = PerformanceProperty->TimerStartValue;
+  TimerInfo.EndCount   = PerformanceProperty->TimerEndValue;
 
   // Determine in which direction the performance counter counts.
   TimerInfo.CountUp = (BOOLEAN) (TimerInfo.EndCount >= TimerInfo.StartCount);
@@ -362,7 +355,7 @@ ShellCommandRunDp (
   } else {
     //------------- Begin Cooked Mode Processing
     if (TraceMode) {
-      ProcessPhases ( Ticker );
+      ProcessPhases ();
       if ( ! SummaryMode) {
         Status = ProcessHandles ( ExcludeMode);
         if (Status == EFI_ABORTED) {

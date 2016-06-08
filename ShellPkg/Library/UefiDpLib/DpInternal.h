@@ -6,7 +6,7 @@
   Dp application.  In addition to global data, function declarations for
   DpUtilities.c, DpTrace.c, and DpProfile.c are included here.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -236,12 +236,10 @@ DumpRawTrace(
 /** 
   Gather and print Major Phase metrics.
   
-  @param[in]    Ticker      The timer value for the END of Shell phase
-  
 **/
 VOID
 ProcessPhases(
-  IN UINT64 Ticker
+  VOID
   );
 
 
