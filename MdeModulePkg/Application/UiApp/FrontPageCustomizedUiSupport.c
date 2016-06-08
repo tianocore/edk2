@@ -55,7 +55,7 @@ typedef struct {
 CHAR8                        *gLanguageString;
 EFI_STRING_ID                *gLanguageToken;
 UI_HII_DRIVER_INSTANCE       *gHiiDriverList;
-EFI_HII_HANDLE               gHiiHandle;
+extern EFI_HII_HANDLE        gStringPackHandle;
 
 
 /**
@@ -589,7 +589,7 @@ UiListThirdPartyDrivers (
 
     String = HiiGetString (HiiHandles[Index], Token, NULL);
     if (String == NULL) {
-      String = HiiGetString (gHiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+      String = HiiGetString (gStringPackHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
       ASSERT (String != NULL);
     } else if (SpecialHandlerFn != NULL) {
       //
@@ -607,7 +607,7 @@ UiListThirdPartyDrivers (
 
     String = HiiGetString (HiiHandles[Index], TokenHelp, NULL);
     if (String == NULL) {
-      String = HiiGetString (gHiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+      String = HiiGetString (gStringPackHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
       ASSERT (String != NULL);
     }
     DriverListPtr[Count].HelpId = HiiSetString (HiiHandle, 0, String, NULL);
