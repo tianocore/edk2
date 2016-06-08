@@ -1,7 +1,7 @@
 ## @file
 #  Instance of BaseFspDebugLib
 #
-#  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,8 +28,9 @@
   DebugLib.c
 
 [Sources.Ia32]
-  Ia32/FspDebug.asm | MSFT
-  Ia32/FspDebug.s | GCC
+  Ia32/FspDebug.nasm
+  Ia32/FspDebug.asm
+  Ia32/FspDebug.s
 
 [Packages]
   MdePkg/MdePkg.dec
