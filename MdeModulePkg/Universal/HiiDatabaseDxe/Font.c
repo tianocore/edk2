@@ -839,6 +839,14 @@ FindGlyphBlock (
       if (EFI_ERROR (Status)) {
         return Status;
       }
+      if (CharValue == (CHAR16) (-1)) {
+        if (BaseLine < DefaultCell.Height + DefaultCell.OffsetY) {
+          BaseLine = (UINT16) (DefaultCell.Height + DefaultCell.OffsetY);
+        }
+        if (MinOffsetY > DefaultCell.OffsetY) {
+          MinOffsetY = DefaultCell.OffsetY;
+        }
+      }
       BufferLen = BITMAP_LEN_1_BIT (DefaultCell.Width, DefaultCell.Height);
 
       if (CharCurrent == CharValue) {
@@ -860,6 +868,14 @@ FindGlyphBlock (
       Status = GetCell (CharCurrent, &FontPackage->GlyphInfoList, &DefaultCell);
       if (EFI_ERROR (Status)) {
         return Status;
+      }
+      if (CharValue == (CHAR16) (-1)) {
+        if (BaseLine < DefaultCell.Height + DefaultCell.OffsetY) {
+          BaseLine = (UINT16) (DefaultCell.Height + DefaultCell.OffsetY);
+        }
+        if (MinOffsetY > DefaultCell.OffsetY) {
+          MinOffsetY = DefaultCell.OffsetY;
+        }
       }
       BufferLen = BITMAP_LEN_1_BIT (DefaultCell.Width, DefaultCell.Height);
       BlockPtr += sizeof (EFI_HII_GIBT_GLYPHS_DEFAULT_BLOCK) - sizeof (UINT8);
