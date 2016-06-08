@@ -1,5 +1,5 @@
 // /** @file
-// Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -725,6 +725,9 @@
 #string STR_RTC_BATTERY_PRESENT                        #language en-US "Present"
 #string STR_RTC_BATTERY_NOT_PRESENT                    #language en-US "Not Present"
 #string STR_RTC_BATTERY_HELP                           #language en-US "RTC Battery is Present or Not Present"
+
+#string STR_LPE_REPORTED_BY_DSDT_PROMPT                #language en-US  "LPE Audio Reported By DSDT"
+#string STR_LPE_REPORTED_BY_DSDT_HELP                  #language en-US  "Recommended solution is to keep option disabled and expose LPE Audio device with an EFI application that updates the SSDT"
 
 //
 // PCI Express

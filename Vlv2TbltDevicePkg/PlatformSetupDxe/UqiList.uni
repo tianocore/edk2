@@ -1,6 +1,6 @@
 // /** @file
 //
-// Copyright (c) 2013 - 2015 Intel Corporation. All rights reserved
+// Copyright (c) 2013 - 2016 Intel Corporation. All rights reserved
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -453,4 +453,6 @@
 #string STR_RTC_BATTERY_NOT_PRESENT                     #language uqi  "\x0182"
 #string STR_RTC_BATTERY_PRESENT                         #language uqi  "\x0183"
 #string STR_RTC_BATTERY_HELP                            #language uqi  "\x0184"
+#string STR_LPE_REPORTED_BY_DSDT_PROMPT                 #language uqi  "\x0185"
+#string STR_LPE_REPORTED_BY_DSDT_HELP                   #language uqi  "\x0186"
 
