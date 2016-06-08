@@ -676,8 +676,11 @@ Ip4ConfigProtocol (
     // Use the default address. Check the state.
     //
     if (IpSb->State == IP4_SERVICE_UNSTARTED) {
-      Status = EFI_NO_MAPPING;
-      goto ON_ERROR;
+      Status = Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
+
+      if (EFI_ERROR (Status)) {
+        goto ON_ERROR;
+      }
     }
 
     IpIf = IpSb->DefaultInterface;
