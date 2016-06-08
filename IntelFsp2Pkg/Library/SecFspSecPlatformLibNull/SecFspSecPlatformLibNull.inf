@@ -42,9 +42,11 @@
 
 [Sources.IA32]
   Ia32/Flat32.asm
+  Ia32/Flat32.nasm
   Ia32/Flat32.s
   Ia32/SecCarInit.asm
   Ia32/SecCarInit.s
+  Ia32/SecCarInit.nasm
 
 ################################################################################
 #
