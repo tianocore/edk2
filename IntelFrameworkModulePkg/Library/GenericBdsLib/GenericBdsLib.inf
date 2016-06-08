@@ -96,7 +96,7 @@
   ## SOMETIMES_PRODUCES ## Variable:L"BootNext"    # The number of next boot option
   gEfiGlobalVariableGuid
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
-  gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" # The ACPI address of performance data
+  gPerformanceProtocolGuid                      ## SOMETIMES_CONSUMES ## Variable:L"PerfDataMemAddr" # The ACPI address of performance data
   gLastEnumLangGuid                             ## SOMETIMES_PRODUCES ## Variable:L"LastEnumLang" # Platform language at last time enumeration.
   gHdBootDevicePathVariablGuid                  ## SOMETIMES_PRODUCES ## Variable:L"HDDP" # The device path of Boot file on Hard device.
   gBdsLibStringPackageGuid                      ## CONSUMES ## HII # HII String PackageList Guid

@@ -157,6 +157,7 @@
   gEfiFmpCapsuleGuid                            ## SOMETIMES_CONSUMES ## GUID # FMP Capsule
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
   gEfiUartDevicePathGuid                        ## SOMETIMES_CONSUMES ## GUID (Identify the device path for UARD device)
+  gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
