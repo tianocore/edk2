@@ -82,7 +82,7 @@
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
   gEfiFileInfoGuid                              ## CONSUMES ## GUID
-  gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
+  gPerformanceProtocolGuid                      ## SOMETIMES_CONSUMES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
   gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_CONSUMES ## GUID
   gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_CONSUMES ## GUID
