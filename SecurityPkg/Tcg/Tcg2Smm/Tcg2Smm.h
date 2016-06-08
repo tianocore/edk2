@@ -87,4 +87,10 @@ typedef struct {
 #define MOR_REQUEST_SUCCESS                                        0
 #define MOR_REQUEST_GENERAL_FAILURE                                1
 
+//
+// Physical Presence Interface Version supported by Platform
+//
+#define PHYSICAL_PRESENCE_VERSION_TAG                              "$PV"
+#define PHYSICAL_PRESENCE_VERSION_SIZE                             4
+
 #endif  // __TCG_SMM_H__
