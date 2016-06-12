@@ -34,59 +34,60 @@ ASM_PFX(AsmTransferControl):
     shrd  ebx, ecx, 20
     and   ecx, 0xf
     mov   bx, cx
-    mov   [@jmp_addr], ebx
+    mov   [@jmp_addr + 1], ebx
     retf
+BITS 16
 .0:
-    DB    0xb8, 0x30, 0      ; mov ax, 30h as selector
-    mov   ds, eax
-    mov   es, eax
-    mov   fs, eax
-    mov   gs, eax
-    mov   ss, eax
-    mov   rax, cr0
-    mov   rbx, cr4
-    DB    0x66
-    and   eax, ((~ 0x80000001) & 0xffffffff)
-    and   bl, ~ (1 << 5)
-    mov   cr0, rax
-    DB    0x66
-    mov   ecx, 0xc0000080
-    rdmsr
-    and   ah, ~ 1
-    wrmsr
-    mov   cr4, rbx
-    DB    0xea              ; jmp far @jmp_addr
-@jmp_addr: DD 0
-
-global ASM_PFX(AsmTransferControl32)
-ASM_PFX(AsmTransferControl32):
-    ; S3WakingVector    :DWORD
-    ; AcpiLowMemoryBase :DWORD
-    push  rbp
-    mov   ebp, esp
-    DB    0x8d, 0x5          ;  lea   eax, AsmTransferControl16
-ASM_PFX(AsmFixAddress16): DD 0
-    push  0x28               ; CS
-    push  rax
-    retf
-
-global ASM_PFX(AsmTransferControl16)
-ASM_PFX(AsmTransferControl16):
-    DB    0xb8, 0x30, 0      ; mov ax, 30h as selector
+    mov ax, 0x30
     mov   ds, ax
     mov   es, ax
     mov   fs, ax
     mov   gs, ax
     mov   ss, ax
-    mov   rax, cr0          ; Get control register 0
-    DB    0x66
-    DB    0x83, 0xe0, 0xfe   ; and    eax, 0fffffffeh  ; Clear PE bit (bit #0)
-    DB    0xf, 0x22, 0xc0    ; mov    cr0, eax         ; Activate real mode
+    mov   eax, cr0
+    mov   ebx, cr4
+    and   eax, ((~ 0x80000001) & 0xffffffff)
+    and   bl, ~ (1 << 5)
+    mov   cr0, eax
+    mov   ecx, 0xc0000080
+    rdmsr
+    and   ah, ~ 1
+    wrmsr
+    mov   cr4, ebx
+@jmp_addr:
+    jmp   0x0:0x0
+
+global ASM_PFX(AsmTransferControl32)
+ASM_PFX(AsmTransferControl32):
+BITS 32
+    ; S3WakingVector    :DWORD
+    ; AcpiLowMemoryBase :DWORD
+    push  ebp
+    mov   ebp, esp
+    DB    0x8d, 0x5          ;  lea   eax, AsmTransferControl16
+ASM_PFX(AsmFixAddress16): DD 0
+    push  0x28               ; CS
+    push  eax
+    retf
+
+global ASM_PFX(AsmTransferControl16)
+ASM_PFX(AsmTransferControl16):
+BITS 16
+    mov   ax, 0x30
+o32 mov   ds, eax
+o32 mov   es, eax
+o32 mov   fs, eax
+o32 mov   gs, eax
+o32 mov   ss, eax
+    mov   eax, cr0          ; Get control register 0
+    and   eax, 0fffffffeh  ; Clear PE bit (bit #0)
+    mov   cr0, eax         ; Activate real mode
     DB    0xea              ; jmp far AsmJmpAddr32
 ASM_PFX(AsmJmpAddr32): DD 0
 
 global ASM_PFX(PageFaultHandlerHook)
 ASM_PFX(PageFaultHandlerHook):
+BITS 64
     push    rax                         ; save all volatile registers
     push    rcx
     push    rdx
@@ -128,7 +129,7 @@ ASM_PFX(PageFaultHandlerHook):
     pop     rcx
     pop     rax                         ; restore all volatile registers
     jnz     .1
-    jmp     ASM_PFX(mOriginalHandler)
+    jmp     qword [ASM_PFX(mOriginalHandler)]
 .1:
     add     rsp, 0x8                    ; skip error code for PF
     iretq
