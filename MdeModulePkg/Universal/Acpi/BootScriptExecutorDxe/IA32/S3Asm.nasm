@@ -39,21 +39,22 @@ ASM_PFX(AsmTransferControl):
     shrd  ebx, ecx, 20
     and   ecx, 0xf
     mov   bx, cx
-    mov   [@jmp_addr], ebx
+    mov   [@jmp_addr + 1], ebx
     retf
+
+BITS 16
 .0:
-    DB    0xb8, 0x30, 0      ; mov ax, 30h as selector
-    mov   ds, ax
-    mov   es, ax
-    mov   fs, ax
-    mov   gs, ax
-    mov   ss, ax
+    mov   ax, 0x30
+o32 mov   ds, eax
+o32 mov   es, eax
+o32 mov   fs, eax
+o32 mov   gs, eax
+o32 mov   ss, eax
     mov   eax, cr0          ; Get control register 0
-    DB    0x66
-    DB    0x83, 0xe0, 0xfe   ; and    eax, 0fffffffeh  ; Clear PE bit (bit #0)
-    DB    0xf, 0x22, 0xc0    ; mov    cr0, eax         ; Activate real mode
-    DB    0xea              ; jmp far @jmp_addr
-@jmp_addr: DD 0
+    and   eax, 0x0fffffffe  ; Clear PE bit (bit #0)
+    mov   cr0, eax          ; Activate real mode
+@jmp_addr:
+    jmp  0x0:0x0
 
 global ASM_PFX(AsmTransferControl32)
 ASM_PFX(AsmTransferControl32):
