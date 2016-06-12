@@ -49,8 +49,7 @@ LegacyBiosBuildSioDataFromIsaIo (
   UINTN                               EntryCount;
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfoBuffer;
   EFI_BLOCK_IO_PROTOCOL               *BlockIo;
-
-
+  EFI_SERIAL_IO_PROTOCOL              *SerialIo;
 
   //
   // Get the list of ISA controllers in the system
@@ -137,10 +136,16 @@ LegacyBiosBuildSioDataFromIsaIo (
         // We want resource for legacy even if no 32-bit driver installed
         //
         for (ChildIndex = 0; ChildIndex < EntryCount; ChildIndex++) {
-          SioSerial           = &SioPtr->Serial[ResourceList->Device.UID];
-          SioSerial->Address  = (UINT16) IoResource->StartRange;
-          SioSerial->Irq      = (UINT8) InterruptResource->StartRange;
-          SioSerial->Mode     = DEVICE_SERIAL_MODE_NORMAL | DEVICE_SERIAL_MODE_DUPLEX_HALF;
+          if ((OpenInfoBuffer[ChildIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
+            Status = gBS->HandleProtocol (OpenInfoBuffer[ChildIndex].AgentHandle, &gEfiSerialIoProtocolGuid, (VOID **) &SerialIo);
+            if (!EFI_ERROR (Status)) {
+              SioSerial           = &SioPtr->Serial[ResourceList->Device.UID];
+              SioSerial->Address  = (UINT16) IoResource->StartRange;
+              SioSerial->Irq      = (UINT8) InterruptResource->StartRange;
+              SioSerial->Mode     = DEVICE_SERIAL_MODE_NORMAL | DEVICE_SERIAL_MODE_DUPLEX_HALF;
+              break;
+            }
+          }
         }
 
         FreePool (OpenInfoBuffer);
