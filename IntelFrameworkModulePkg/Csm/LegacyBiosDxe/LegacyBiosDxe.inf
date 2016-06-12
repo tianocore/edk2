@@ -134,6 +134,7 @@
   gEfiLegacyRegion2ProtocolGuid                 ## CONSUMES
   gEfiLegacyBiosProtocolGuid                    ## PRODUCES
   gEfiSerialIoProtocolGuid                      ## CONSUMES
+  gEfiSioProtocolGuid                           ## CONSUMES
 
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion  ## CONSUMES
