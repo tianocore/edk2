@@ -10,7 +10,7 @@
   This library is mainly used by DxeCore to start performance logging to ensure that
   Performance Protocol is installed at the very beginning of DXE phase.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -60,6 +60,8 @@ PERFORMANCE_EX_PROTOCOL mPerformanceExInterface = {
   EndGaugeEx,
   GetGaugeEx
   };
+
+PERFORMANCE_PROPERTY  mPerformanceProperty;
 
 /**
   Searches in the gauge array with keyword Handle, Token, Module and Identifier.
@@ -502,6 +504,8 @@ DxeCorePerformanceLibConstructor (
   )
 {
   EFI_STATUS                Status;
+  PERFORMANCE_PROPERTY      *PerformanceProperty;
+
 
   if (!PerformanceMeasurementEnabled ()) {
     //
@@ -531,7 +535,22 @@ DxeCorePerformanceLibConstructor (
 
   InternalGetPeiPerformance ();
 
-  return Status;
+  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, &PerformanceProperty);
+  if (EFI_ERROR (Status)) {
+    //
+    // Install configuration table for performance property.
+    //
+    mPerformanceProperty.Revision  = PERFORMANCE_PROPERTY_REVISION;
+    mPerformanceProperty.Reserved  = 0;
+    mPerformanceProperty.Frequency = GetPerformanceCounterProperties (
+                                       &mPerformanceProperty.TimerStartValue,
+                                       &mPerformanceProperty.TimerEndValue
+                                       );
+    Status = gBS->InstallConfigurationTable (&gPerformanceProtocolGuid, &mPerformanceProperty);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

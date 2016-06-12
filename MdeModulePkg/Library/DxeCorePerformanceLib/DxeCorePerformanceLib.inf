@@ -56,11 +56,13 @@
   BaseLib
   HobLib
   DebugLib
+  UefiLib
 
 
 [Guids]
   ## SOMETIMES_CONSUMES   ## HOB
   ## PRODUCES             ## UNDEFINED # Install protocol
+  ## PRODUCES             ## SystemTable
   gPerformanceProtocolGuid
   ## SOMETIMES_CONSUMES   ## HOB
   ## PRODUCES             ## UNDEFINED # Install protocol

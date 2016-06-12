@@ -4,7 +4,7 @@
   * performance protocol interfaces.
   * performance variables.  
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -17,6 +17,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __PERFORMANCE_DATA_H__
 #define __PERFORMANCE_DATA_H__
+
+#define PERFORMANCE_PROPERTY_REVISION 0x1
+
+typedef struct {
+  UINT32                Revision;
+  UINT32                Reserved;
+  UINT64                Frequency;
+  UINT64                TimerStartValue;
+  UINT64                TimerEndValue;
+} PERFORMANCE_PROPERTY;
 
 //
 // PEI_PERFORMANCE_STRING_SIZE must be a multiple of 8.
