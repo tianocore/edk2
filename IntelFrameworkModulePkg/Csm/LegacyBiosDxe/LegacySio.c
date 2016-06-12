@@ -23,7 +23,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  SioPtr       Pointer to SIO data.
 
-  @retval EFI_SUCCESS  It should always work.
+  @retval EFI_SUCCESS   When SIO data is got successfully.
+  @retval EFI_NOT_FOUND When ISA IO interface is absent.
 
 **/
 EFI_STATUS
@@ -62,7 +63,7 @@ LegacyBiosBuildSioDataFromIsaIo (
                   &HandleBuffer
                   );
   if (EFI_ERROR (Status)) {
-    return EFI_SUCCESS;
+    return EFI_NOT_FOUND;
   }
   //
   // Collect legacy information from each of the ISA controllers in the system
