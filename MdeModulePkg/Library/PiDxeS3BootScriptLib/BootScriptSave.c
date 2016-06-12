@@ -624,7 +624,7 @@ S3BootScriptLibDeinitialize (
     Status = PcdSet64S (PcdS3BootScriptTablePrivateDataPtr, 0);
     ASSERT_EFI_ERROR (Status);
   }
-  if (mS3BootScriptTableSmmAllocated) {
+  if ((mSmst != NULL) && mS3BootScriptTableSmmAllocated) {
     Status = mSmst->SmmFreePool (mS3BootScriptTableSmmPtr);
     ASSERT_EFI_ERROR (Status);
     Status = PcdSet64S (PcdS3BootScriptTablePrivateSmmDataPtr, 0);
