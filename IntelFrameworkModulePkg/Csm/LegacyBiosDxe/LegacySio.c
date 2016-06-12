@@ -33,9 +33,9 @@ LegacyBiosBuildSioDataFromIsaIo (
   )
 {
   EFI_STATUS                          Status;
-  DEVICE_PRODUCER_SERIAL              *Sio1Ptr;
-  DEVICE_PRODUCER_PARALLEL            *Sio2Ptr;
-  DEVICE_PRODUCER_FLOPPY              *Sio3Ptr;
+  DEVICE_PRODUCER_SERIAL              *SioSerial;
+  DEVICE_PRODUCER_PARALLEL            *SioParallel;
+  DEVICE_PRODUCER_FLOPPY              *SioFloppy;
   UINTN                               HandleCount;
   EFI_HANDLE                          *HandleBuffer;
   UINTN                               Index;
@@ -137,10 +137,10 @@ LegacyBiosBuildSioDataFromIsaIo (
         // We want resource for legacy even if no 32-bit driver installed
         //
         for (ChildIndex = 0; ChildIndex < EntryCount; ChildIndex++) {
-          Sio1Ptr           = &SioPtr->Serial[ResourceList->Device.UID];
-          Sio1Ptr->Address  = (UINT16) IoResource->StartRange;
-          Sio1Ptr->Irq      = (UINT8) InterruptResource->StartRange;
-          Sio1Ptr->Mode     = DEVICE_SERIAL_MODE_NORMAL | DEVICE_SERIAL_MODE_DUPLEX_HALF;
+          SioSerial           = &SioPtr->Serial[ResourceList->Device.UID];
+          SioSerial->Address  = (UINT16) IoResource->StartRange;
+          SioSerial->Irq      = (UINT8) InterruptResource->StartRange;
+          SioSerial->Mode     = DEVICE_SERIAL_MODE_NORMAL | DEVICE_SERIAL_MODE_DUPLEX_HALF;
         }
 
         FreePool (OpenInfoBuffer);
@@ -158,11 +158,11 @@ LegacyBiosBuildSioDataFromIsaIo (
           InterruptResource != NULL &&
           DmaResource != NULL
           ) {
-        Sio2Ptr           = &SioPtr->Parallel[ResourceList->Device.UID];
-        Sio2Ptr->Address  = (UINT16) IoResource->StartRange;
-        Sio2Ptr->Irq      = (UINT8) InterruptResource->StartRange;
-        Sio2Ptr->Dma      = (UINT8) DmaResource->StartRange;
-        Sio2Ptr->Mode     = DEVICE_PARALLEL_MODE_MODE_OUTPUT_ONLY;
+        SioParallel           = &SioPtr->Parallel[ResourceList->Device.UID];
+        SioParallel->Address  = (UINT16) IoResource->StartRange;
+        SioParallel->Irq      = (UINT8) InterruptResource->StartRange;
+        SioParallel->Dma      = (UINT8) DmaResource->StartRange;
+        SioParallel->Mode     = DEVICE_PARALLEL_MODE_MODE_OUTPUT_ONLY;
       }
     }
     //
@@ -172,11 +172,11 @@ LegacyBiosBuildSioDataFromIsaIo (
       if (IoResource != NULL && InterruptResource != NULL && DmaResource != NULL) {
         Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiBlockIoProtocolGuid, (VOID **) &BlockIo);
         if (!EFI_ERROR (Status)) {
-          Sio3Ptr           = &SioPtr->Floppy;
-          Sio3Ptr->Address  = (UINT16) IoResource->StartRange;
-          Sio3Ptr->Irq      = (UINT8) InterruptResource->StartRange;
-          Sio3Ptr->Dma      = (UINT8) DmaResource->StartRange;
-          Sio3Ptr->NumberOfFloppy++;
+          SioFloppy           = &SioPtr->Floppy;
+          SioFloppy->Address  = (UINT16) IoResource->StartRange;
+          SioFloppy->Irq      = (UINT8) InterruptResource->StartRange;
+          SioFloppy->Dma      = (UINT8) DmaResource->StartRange;
+          SioFloppy->NumberOfFloppy++;
         }
       }
     }
