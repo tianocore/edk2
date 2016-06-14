@@ -698,7 +698,7 @@
 
   ## This PCD specifies whether to use the optimized timing for best PS2 detection performance.
   #  Note this PCD could be set to TRUE for best boot performance and set to FALSE for best device compatibility.
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdFastPS2Detection|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFastPS2Detection|TRUE
 
   #######################################################################################################
   #
