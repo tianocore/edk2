@@ -43,12 +43,14 @@
 [Sources.Ia32]
   IA32/InterruptTable.S
   IA32/InterruptTable.asm
+  IA32/InterruptTable.nasm
   Thunk.c
   LegacyBootSupport.c
   LegacyBbs.c
   LegacySio.c
 
 [Sources.X64]
+  X64/InterruptTable.nasm
   X64/InterruptTable.asm
   X64/InterruptTable.S
   Thunk.c
