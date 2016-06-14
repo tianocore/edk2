@@ -42,49 +42,44 @@ extern ASM_PFX(InitializeFloatingPointUnits)
 ;-------------------------------------------------------------------------------------
 ;RendezvousFunnelProc (&WakeUpBuffer,MemAddress);
 
+BITS 16
 global ASM_PFX(RendezvousFunnelProc)
 ASM_PFX(RendezvousFunnelProc):
 RendezvousFunnelProcStart:
 
 ; At this point CS = 0x(vv00) and ip= 0x0.
 
-        db 0x8c,  0xc8                 ; mov        ax,  cs
-        db 0x8e,  0xd8                 ; mov        ds,  ax
-        db 0x8e,  0xc0                 ; mov        es,  ax
-        db 0x8e,  0xd0                 ; mov        ss,  ax
-        db 0x33,  0xc0                 ; xor        ax,  ax
-        db 0x8e,  0xe0                 ; mov        fs,  ax
-        db 0x8e,  0xe8                 ; mov        gs,  ax
+        mov        ax,  cs
+        mov        ds,  ax
+        mov        es,  ax
+        mov        ss,  ax
+        xor        ax,  ax
+        mov        fs,  ax
+        mov        gs,  ax
 
 flat32Start:
 
-        db 0xBE
-        dw BufferStart                ; mov        si, BufferStart
-        db 0x66,  0x8B, 0x14             ; mov        edx,dword ptr [si]          ; EDX is keeping the start address of wakeup buffer
+        mov        si, BufferStart
+        mov        edx,dword [si]          ; EDX is keeping the start address of wakeup buffer
 
-        db 0xBE
-        dw GdtrProfile                ; mov        si, GdtrProfile
-        db 0x66                        ; db         66h
-        db 0x2E,  0xF, 0x1, 0x14        ; lgdt       fword ptr cs:[si]
+        mov        si, GdtrProfile
+o32     lgdt       [cs:si]
 
-        db 0xBE
-        dw IdtrProfile                ; mov        si, IdtrProfile
-        db 0x66                        ; db         66h
-        db 0x2E,  0xF, 0x1, 0x1C        ; lidt       fword ptr cs:[si]
+        mov        si, IdtrProfile
+o32     lidt       [cs:si]
 
-        db 0x33,  0xC0                 ; xor        ax,  ax
-        db 0x8E,  0xD8                 ; mov        ds,  ax
+        xor        ax,  ax
+        mov        ds,  ax
 
-        db 0xF,  0x20, 0xC0            ; mov        eax, cr0                    ; Get control register 0
-        db 0x66,  0x83, 0xC8, 0x1       ; or         eax, 000000001h             ; Set PE bit (bit #0)
-        db 0xF,  0x22, 0xC0            ; mov        cr0, eax
+        mov        eax, cr0                    ; Get control register 0
+        or         eax, 0x000000001            ; Set PE bit (bit #0)
+        mov        cr0, eax
 
 FLAT32_JUMP:
 
-        db 0x66,  0x67, 0xEA            ; far jump
-        dd 0x0                         ; 32-bit offset
-        dw 0x20                        ; 16-bit selector
+a32     jmp   dword 0x20:0x0
 
+BITS 32
 PMODE_ENTRY:                         ; protected mode entry point
 
         mov         ax,  0x8
