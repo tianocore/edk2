@@ -45,86 +45,78 @@ extern ASM_PFX(InitializeFloatingPointUnits)
 DEFAULT REL
 SECTION .text
 
+BITS 16
 global ASM_PFX(RendezvousFunnelProc)
 ASM_PFX(RendezvousFunnelProc):
 RendezvousFunnelProcStart:
 
 ; At this point CS = 0x(vv00) and ip= 0x0.
 
-        db 0x8c,  0xc8                 ; mov        ax,  cs
-        db 0x8e,  0xd8                 ; mov        ds,  ax
-        db 0x8e,  0xc0                 ; mov        es,  ax
-        db 0x8e,  0xd0                 ; mov        ss,  ax
-        db 0x33,  0xc0                 ; xor        ax,  ax
-        db 0x8e,  0xe0                 ; mov        fs,  ax
-        db 0x8e,  0xe8                 ; mov        gs,  ax
+        mov        ax,  cs
+        mov        ds,  ax
+        mov        es,  ax
+        mov        ss,  ax
+        xor        ax,  ax
+        mov        fs,  ax
+        mov        gs,  ax
 
 flat32Start:
 
-        db 0xBE
-        dw BufferStartLocation        ; mov        si, BufferStartLocation
-        db 0x66,  0x8B, 0x14             ; mov        edx,dword ptr [si]          ; EDX is keeping the start address of wakeup buffer
+        mov        si, BufferStartLocation
+        mov        edx,dword [si]          ; EDX is keeping the start address of wakeup buffer
 
-        db 0xBE
-        dw Cr3OffsetLocation          ; mov        si, Cr3Location
-        db 0x66,  0x8B, 0xC             ; mov        ecx,dword ptr [si]          ; ECX is keeping the value of CR3
+        mov        si, Cr3OffsetLocation
+        mov        ecx,dword [si]          ; ECX is keeping the value of CR3
 
-        db 0xBE
-        dw GdtrLocation               ; mov        si, GdtrProfile
-        db 0x66                        ; db         66h
-        db 0x2E,  0xF, 0x1, 0x14        ; lgdt       fword ptr cs:[si]
+        mov        si, GdtrLocation
+o32     lgdt       [cs:si]
 
-        db 0xBE
-        dw IdtrLocation               ; mov        si, IdtrProfile
-        db 0x66                        ; db         66h
-        db 0x2E,  0xF, 0x1, 0x1C        ; lidt       fword ptr cs:[si]
+        mov        si, IdtrLocation
+o32     lidt       [cs:si]
 
-        db 0x33,  0xC0                 ; xor        ax,  ax
-        db 0x8E,  0xD8                 ; mov        ds,  ax
+        xor        ax,  ax
+        mov        ds,  ax
 
-        db 0xF,  0x20, 0xC0            ; mov        eax, cr0                    ; Get control register 0
-        db 0x66,  0x83, 0xC8, 0x1       ; or         eax, 000000001h             ; Set PE bit (bit #0)
-        db 0xF,  0x22, 0xC0            ; mov        cr0, eax
+        mov        eax, cr0                    ; Get control register 0
+        or         eax, 0x000000001            ; Set PE bit (bit #0)
+        mov        cr0, eax
 
 FLAT32_JUMP:
 
-        db 0x66,  0x67, 0xEA            ; far jump
-        dd 0x0                         ; 32-bit offset
-        dw 0x20                        ; 16-bit selector
+a32     jmp   dword 0x20:0x0
 
+BITS 32
 PMODE_ENTRY:                         ; protected mode entry point
 
-        db 0x66,  0xB8, 0x18,  0x0      ; mov        ax,  18h
-        db 0x66,  0x8E,  0xD8           ; mov        ds,  ax
-        db 0x66,  0x8E,  0xC0           ; mov        es,  ax
-        db 0x66,  0x8E,  0xE0           ; mov        fs,  ax
-        db 0x66,  0x8E,  0xE8           ; mov        gs,  ax
-        db 0x66,  0x8E,  0xD0           ; mov        ss,  ax                     ; Flat mode setup.
+        mov        ax,  0x18
+o16     mov        ds,  ax
+o16     mov        es,  ax
+o16     mov        fs,  ax
+o16     mov        gs,  ax
+o16     mov        ss,  ax                     ; Flat mode setup.
 
-        db 0xF,  0x20,  0xE0           ; mov        eax, cr4
-        db 0xF,  0xBA, 0xE8, 0x5      ; bts        eax, 5
-        db 0xF,  0x22,  0xE0           ; mov        cr4, eax
+        mov        eax, cr4
+        bts        eax, 5
+        mov        cr4, eax
 
-        db 0xF,  0x22,  0xD9           ; mov        cr3, ecx
+        mov        cr3, ecx
 
-        db 0x8B,  0xF2                 ; mov        esi, edx                    ; Save wakeup buffer address
+        mov        esi, edx                    ; Save wakeup buffer address
 
-        db 0xB9
-        dd 0xC0000080                 ; mov        ecx, 0c0000080h             ; EFER MSR number.
-        db 0xF,  0x32                  ; rdmsr                                  ; Read EFER.
-        db 0xF,  0xBA, 0xE8, 0x8      ; bts        eax, 8                      ; Set LME=1.
-        db 0xF,  0x30                  ; wrmsr                                  ; Write EFER.
+        mov        ecx, 0xc0000080             ; EFER MSR number.
+        rdmsr                                  ; Read EFER.
+        bts        eax, 8                      ; Set LME=1.
+        wrmsr                                  ; Write EFER.
 
-        db 0xF,  0x20,  0xC0           ; mov        eax, cr0                    ; Read CR0.
-        db 0xF,  0xBA, 0xE8, 0x1F      ; bts        eax, 31                     ; Set PG=1.
-        db 0xF,  0x22,  0xC0           ; mov        cr0, eax                    ; Write CR0.
+        mov        eax, cr0                    ; Read CR0.
+        bts        eax, 31                     ; Set PG=1.
+        mov        cr0, eax                    ; Write CR0.
 
 LONG_JUMP:
 
-        db 0x67,  0xEA                 ; far jump
-        dd 0x0                         ; 32-bit offset
-        dw 0x38                        ; 16-bit selector
+a16     jmp   dword 0x38:0x0
 
+BITS 64
 LongModeStart:
 
         mov         ax,  0x30
