@@ -1,7 +1,7 @@
 ## @file
 #  Simple CPU driver installs CPU Architecture Protocol.
 #
-#  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -56,20 +56,18 @@
   CpuMp.h
 
 [Sources.IA32]
-  Ia32/CpuAsm.asm | MSFT
-  Ia32/CpuAsm.asm | INTEL
-  Ia32/CpuAsm.S   | GCC
-  Ia32/MpAsm.asm  | MSFT
-  Ia32/MpAsm.asm  | INTEL
-  Ia32/MpAsm.nasm | GCC
+  Ia32/CpuAsm.asm
+  Ia32/CpuAsm.nasm
+  Ia32/CpuAsm.S
+  Ia32/MpAsm.asm
+  Ia32/MpAsm.nasm
 
 [Sources.X64]
-  X64/CpuAsm.asm | MSFT
-  X64/CpuAsm.asm | INTEL
-  X64/CpuAsm.S   | GCC
-  X64/MpAsm.asm  | MSFT
-  X64/MpAsm.asm  | INTEL
-  X64/MpAsm.nasm | GCC
+  X64/CpuAsm.asm
+  X64/CpuAsm.nasm
+  X64/CpuAsm.S
+  X64/MpAsm.asm
+  X64/MpAsm.nasm
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
