@@ -593,12 +593,10 @@ SockCancelToken (
 {
   EFI_STATUS     Status;
   LIST_ENTRY     *Entry;
-  LIST_ENTRY     *Next;
   SOCK_TOKEN     *SockToken;
 
   Status    = EFI_SUCCESS;
   Entry     = NULL;
-  Next      = NULL;
   SockToken = NULL;
 
   if (IsListEmpty (SpecifiedTokenList) && Token != NULL) {
