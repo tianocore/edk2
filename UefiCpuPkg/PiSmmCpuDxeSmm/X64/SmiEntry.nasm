@@ -1,0 +1,177 @@
+;------------------------------------------------------------------------------ ;
+; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; This program and the accompanying materials
+; are licensed and made available under the terms and conditions of the BSD License
+; which accompanies this distribution.  The full text of the license may be found at
+; http://opensource.org/licenses/bsd-license.php.
+;
+; THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+;
+; Module Name:
+;
+;   SmiEntry.nasm
+;
+; Abstract:
+;
+;   Code template of the SMI handler for a particular processor
+;
+;-------------------------------------------------------------------------------
+
+;
+; Variables referrenced by C code
+;
+
+;
+; Constants relating to PROCESSOR_SMM_DESCRIPTOR
+;
+%define DSC_OFFSET 0xfb00
+%define DSC_GDTPTR 0x30
+%define DSC_GDTSIZ 0x38
+%define DSC_CS 14
+%define DSC_DS 16
+%define DSC_SS 18
+%define DSC_OTHERSEG 20
+;
+; Constants relating to CPU State Save Area
+;
+%define SSM_DR6 0xffd0
+%define SSM_DR7 0xffc8
+
+%define PROTECT_MODE_CS 0x8
+%define PROTECT_MODE_DS 0x20
+%define LONG_MODE_CS 0x38
+%define TSS_SEGMENT 0x40
+%define GDT_SIZE 0x50
+
+extern ASM_PFX(SmiRendezvous)
+extern ASM_PFX(gSmiHandlerIdtr)
+extern ASM_PFX(CpuSmmDebugEntry)
+extern ASM_PFX(CpuSmmDebugExit)
+
+global ASM_PFX(gSmbase)
+global ASM_PFX(gSmiStack)
+global ASM_PFX(gSmiCr3)
+global ASM_PFX(gcSmiHandlerTemplate)
+global ASM_PFX(gcSmiHandlerSize)
+
+    DEFAULT REL
+    SECTION .text
+
+BITS 16
+ASM_PFX(gcSmiHandlerTemplate):
+_SmiEntryPoint:
+    mov     bx, _GdtDesc - _SmiEntryPoint + 0x8000
+    mov     ax,[cs:DSC_OFFSET + DSC_GDTSIZ]
+    dec     ax
+    mov     [cs:bx], ax
+    mov     eax, [cs:DSC_OFFSET + DSC_GDTPTR]
+    mov     [cs:bx + 2], eax
+o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
+    mov     ax, PROTECT_MODE_CS
+    mov     [cs:bx-0x2],ax    
+    DB      0x66, 0xbf                   ; mov edi, SMBASE
+ASM_PFX(gSmbase): DD 0
+    lea     eax, [edi + (@ProtectedMode - _SmiEntryPoint) + 0x8000]
+    mov     [cs:bx-0x6],eax
+    mov     ebx, cr0
+    and     ebx, 0x9ffafff3
+    or      ebx, 0x23
+    mov     cr0, ebx
+    jmp     dword 0x0:0x0
+_GdtDesc:   
+    DW 0
+    DD 0
+
+BITS 32
+@ProtectedMode:
+    mov     ax, PROTECT_MODE_DS
+o16 mov     ds, ax
+o16 mov     es, ax
+o16 mov     fs, ax
+o16 mov     gs, ax
+o16 mov     ss, ax
+    DB      0xbc                   ; mov esp, imm32
+ASM_PFX(gSmiStack): DD 0
+    jmp     ProtFlatMode
+
+BITS 64
+ProtFlatMode:
+    DB      0xb8                        ; mov eax, offset gSmiCr3
+ASM_PFX(gSmiCr3): DD 0
+    mov     cr3, rax
+    mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
+    mov     cr4, rax                    ; in PreModifyMtrrs() to flush TLB.
+; Load TSS
+    sub     esp, 8                      ; reserve room in stack
+    sgdt    [rsp]
+    mov     eax, [rsp + 2]              ; eax = GDT base
+    add     esp, 8
+    mov     dl, 0x89
+    mov     [rax + TSS_SEGMENT + 5], dl ; clear busy flag
+    mov     eax, TSS_SEGMENT
+    ltr     ax
+
+; Switch into @LongMode
+    push    LONG_MODE_CS                ; push cs hardcore here
+    call    Base                       ; push reture address for retf later
+Base:
+    add     dword [rsp], @LongMode - Base; offset for far retf, seg is the 1st arg
+    mov     ecx, 0xc0000080
+    rdmsr
+    or      ah, 1
+    wrmsr
+    mov     rbx, cr0
+    or      ebx, 080010000h            ; enable paging + WP
+    mov     cr0, rbx
+    retf
+@LongMode:                              ; long mode (64-bit code) starts here
+    mov     rax, ASM_PFX(gSmiHandlerIdtr)
+    lidt    [rax]
+    lea     ebx, [rdi + DSC_OFFSET]
+    mov     ax, [rbx + DSC_DS]
+    mov     ds, eax
+    mov     ax, [rbx + DSC_OTHERSEG]
+    mov     es, eax
+    mov     fs, eax
+    mov     gs, eax
+    mov     ax, [rbx + DSC_SS]
+    mov     ss, eax
+;   jmp     _SmiHandler                 ; instruction is not needed
+
+_SmiHandler:
+    mov     rbx, [rsp]                  ; rbx <- CpuIndex
+
+    ;
+    ; Save FP registers
+    ;
+    sub     rsp, 0x208
+    DB      0x48                         ; FXSAVE64
+    fxsave  [rsp]
+
+    add     rsp, -0x20
+
+    mov     rcx, rbx
+    mov     rax, CpuSmmDebugEntry
+    call    rax
+    
+    mov     rcx, rbx
+    mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
+    call    rax
+    
+    mov     rcx, rbx
+    mov     rax, CpuSmmDebugExit
+    call    rax
+    
+    add     rsp, 0x20
+
+    ;
+    ; Restore FP registers
+    ;
+    DB      0x48                         ; FXRSTOR64
+    fxrstor [rsp]
+
+    rsm
+
+gcSmiHandlerSize    DW      $ - _SmiEntryPoint
+
