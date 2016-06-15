@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2873,7 +2873,7 @@ DevPathFromTextWiFi (
       DataLen     = 32;
     }
 
-    UnicodeStrToAsciiStr (SSIdStr, AsciiStr);
+    UnicodeStrToAsciiStrS (SSIdStr, AsciiStr, sizeof (AsciiStr));
     CopyMem (WiFiDp->SSId, AsciiStr, DataLen);
   }
 
