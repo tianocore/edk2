@@ -56,6 +56,7 @@ CHAR8                        *gLanguageString;
 EFI_STRING_ID                *gLanguageToken;
 UI_HII_DRIVER_INSTANCE       *gHiiDriverList;
 extern EFI_HII_HANDLE        gStringPackHandle;
+UINT8                        gCurrentLanguageIndex;
 
 
 /**
@@ -130,6 +131,7 @@ LanguageChangeHandler (
     GetNextLanguage (&LangCode, Lang);
 
     if (Index == Value->u8) {
+      gCurrentLanguageIndex = Value->u8;
       break;
     }
 
@@ -188,6 +190,16 @@ UiSupportLibCallbackHandler (
       QuestionId != FRONT_PAGE_KEY_RESET &&
       QuestionId != FRONT_PAGE_KEY_LANGUAGE) {
     return FALSE;
+  }
+
+  if (Action == EFI_BROWSER_ACTION_RETRIEVE) {
+    if (QuestionId == FRONT_PAGE_KEY_LANGUAGE) {
+      Value->u8 = gCurrentLanguageIndex;
+      *Status = EFI_SUCCESS;
+    } else {
+      *Status = EFI_UNSUPPORTED;
+    }
+    return TRUE;
   }
 
   if (Action != EFI_BROWSER_ACTION_CHANGED) {
@@ -347,6 +359,7 @@ UiCreateLanguageMenu (
         EFI_IFR_NUMERIC_SIZE_1,
         (UINT8) OptionCount
         );
+      gCurrentLanguageIndex = (UINT8) OptionCount;
     } else {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
