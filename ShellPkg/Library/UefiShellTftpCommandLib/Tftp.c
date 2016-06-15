@@ -272,6 +272,7 @@ ShellCommandRunTftp (
   CONST CHAR16            *ValueStr;
   CONST CHAR16            *RemoteFilePath;
   CHAR8                   *AsciiRemoteFilePath;
+  UINTN                   FilePathSize;
   CONST CHAR16            *Walker;
   CONST CHAR16            *LocalFilePath;
   EFI_MTFTP4_CONFIG_DATA  Mtftp4ConfigData;
@@ -358,14 +359,13 @@ ShellCommandRunTftp (
 
   RemoteFilePath = ShellCommandLineGetRawValue (CheckPackage, 2);
   ASSERT(RemoteFilePath != NULL);
-  AsciiRemoteFilePath = AllocatePool (
-                          (StrLen (RemoteFilePath) + 1) * sizeof (CHAR8)
-                          );
+  FilePathSize = StrLen (RemoteFilePath) + 1;
+  AsciiRemoteFilePath = AllocatePool (FilePathSize);
   if (AsciiRemoteFilePath == NULL) {
     ShellStatus = SHELL_OUT_OF_RESOURCES;
     goto Error;
   }
-  UnicodeStrToAsciiStr (RemoteFilePath, AsciiRemoteFilePath);
+  UnicodeStrToAsciiStrS (RemoteFilePath, AsciiRemoteFilePath, FilePathSize);
 
   if (ParamCount == 4) {
     LocalFilePath = ShellCommandLineGetRawValue (CheckPackage, 3);
