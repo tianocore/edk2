@@ -32,6 +32,8 @@ STATIC CONST UINT32 mInvalidControlBits = EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE;
 /**
 
   Initialise the serial port to the specified settings.
+  The serial port is re-configured only if the specified settings
+  are different from the current settings.
   All unspecified settings will be set to the default values.
 
   @param  UartBase                The base address of the serial device.
@@ -191,6 +193,26 @@ PL011UartInitializePort (
     Integer = Divisor >> FRACTION_PART_SIZE_IN_BITS;
     Fractional = Divisor & FRACTION_PART_MASK;
   }
+
+  //
+  // If PL011 is already initialized, check the current settings
+  // and re-initialize only if the settings are different.
+  //
+  if (((MmioRead32 (UartBase + UARTCR) & PL011_UARTCR_UARTEN) != 0) &&
+       (MmioRead32 (UartBase + UARTLCR_H) == LineControl) &&
+       (MmioRead32 (UartBase + UARTIBRD) == Integer) &&
+       (MmioRead32 (UartBase + UARTFBRD) == Fractional)) {
+    // Nothing to do - already initialized with correct attributes
+    return RETURN_SUCCESS;
+  }
+
+  // Wait for the end of transmission
+  while ((MmioRead32 (UartBase + UARTFR) & PL011_UARTFR_TXFE) == 0);
+
+  // Disable UART: "The UARTLCR_H, UARTIBRD, and UARTFBRD registers must not be changed
+  // when the UART is enabled"
+  MmioWrite32 (UartBase + UARTCR, 0);
+
   // Set Baud Rate Registers
   MmioWrite32 (UartBase + UARTIBRD, Integer);
   MmioWrite32 (UartBase + UARTFBRD, Fractional);
