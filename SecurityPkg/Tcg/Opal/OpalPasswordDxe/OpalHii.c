@@ -600,7 +600,7 @@ HiiPsidRevert(
 
   OpalHiiGetBrowserData();
 
-  UnicodeStrToAsciiStr(gHiiConfiguration.Psid, (CHAR8*)Psid.Psid);
+  UnicodeStrToAsciiStrS (gHiiConfiguration.Psid, (CHAR8*)Psid.Psid, PSID_CHARACTER_LENGTH);
 
   OpalDisk = HiiGetOpalDiskCB (gHiiConfiguration.SelectedDiskIndex);
   if (OpalDisk != NULL) {
@@ -1049,7 +1049,7 @@ HiiPasswordEntered(
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  UnicodeStrToAsciiStr(UniStr, Password);
+  UnicodeStrToAsciiStrS (UniStr, Password, sizeof (Password));
   gBS->FreePool(UniStr);
 
   if (gHiiConfiguration.SelectedAction == HII_KEY_ID_GOTO_UNLOCK) {
@@ -1288,7 +1288,7 @@ HiiSetFormString(
   //
   // Copy into unicode string, then copy into string id
   //
-  AsciiStrToUnicodeStr( SrcAsciiStr, UniStr );
+  AsciiStrToUnicodeStrS ( SrcAsciiStr, UniStr, Len + 1);
 
   //
   // Update the string in the form

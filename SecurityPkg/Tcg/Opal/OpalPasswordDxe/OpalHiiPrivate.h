@@ -53,7 +53,7 @@ typedef struct {
 * The type indicates the structure of the PSID authority
 */
 typedef struct {
-    UINT8 Psid[32];
+    UINT8 Psid[PSID_CHARACTER_LENGTH];
 } TCG_PSID;
 
 /**
