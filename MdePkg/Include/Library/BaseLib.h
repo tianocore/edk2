@@ -984,7 +984,11 @@ StrHexToUint64 (
   IN      CONST CHAR16             *String
   );
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Convert a Null-terminated Unicode string to a Null-terminated
   ASCII string and returns the ASCII string.
 
@@ -1023,6 +1027,8 @@ UnicodeStrToAsciiStr (
   IN      CONST CHAR16              *Source,
   OUT     CHAR8                     *Destination
   );
+
+#endif
 
 /**
   Convert a Null-terminated Unicode string to a Null-terminated
@@ -1575,8 +1581,11 @@ AsciiStrHexToUint64 (
   IN      CONST CHAR8                *String
   );
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Convert one Null-terminated ASCII string to a Null-terminated
   Unicode string and returns the Unicode string.
 
@@ -1609,6 +1618,8 @@ AsciiStrToUnicodeStr (
   IN      CONST CHAR8               *Source,
   OUT     CHAR16                    *Destination
   );
+
+#endif
 
 /**
   Convert one Null-terminated ASCII string to a Null-terminated
