@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for HttpDxe driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1489,6 +1489,7 @@ HttpTcpTransmit (
   EFI_STATUS                Status;
   CHAR8                     *RequestMsg;
   CHAR8                     *Url;
+  UINTN                     UrlSize;
   UINTN                     RequestMsgSize;
 
   ValueInItem = (HTTP_TOKEN_WRAP *) Item->Value;
@@ -1499,12 +1500,13 @@ HttpTcpTransmit (
   //
   // Parse the URI of the remote host.
   //
-  Url = AllocatePool (StrLen (ValueInItem->HttpToken->Message->Data.Request->Url) + 1);
+  UrlSize = StrLen (ValueInItem->HttpToken->Message->Data.Request->Url) + 1;
+  Url = AllocatePool (UrlSize);
   if (Url == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  UnicodeStrToAsciiStr (ValueInItem->HttpToken->Message->Data.Request->Url, Url);
+  UnicodeStrToAsciiStrS (ValueInItem->HttpToken->Message->Data.Request->Url, Url, UrlSize);
 
   //
   // Create request message.

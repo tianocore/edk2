@@ -271,7 +271,7 @@ CreateSpdEntry (
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"--name");
   if (ValueStr != NULL) {
-    UnicodeStrToAsciiStr (ValueStr, (CHAR8 *) (*Data)->Name);
+    UnicodeStrToAsciiStrS (ValueStr, (CHAR8 *) (*Data)->Name, sizeof ((*Data)->Name));
     *Mask |= NAME;
   }
 
@@ -785,7 +785,7 @@ CreateSadEntry (
     (*Data)->AlgoInfo.EspAlgoInfo.EncKeyLength = EncKeyLength;
     AsciiStr = AllocateZeroPool (EncKeyLength + 1);
     ASSERT (AsciiStr != NULL);
-    UnicodeStrToAsciiStr (ValueStr, AsciiStr);
+    UnicodeStrToAsciiStrS (ValueStr, AsciiStr, EncKeyLength + 1);
     CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.EncKey,  AsciiStr, EncKeyLength);
     FreePool (AsciiStr);
     *Mask |= ENCRYPT_KEY;
@@ -815,7 +815,7 @@ CreateSadEntry (
     (*Data)->AlgoInfo.EspAlgoInfo.AuthKeyLength = AuthKeyLength;
     AsciiStr = AllocateZeroPool (AuthKeyLength + 1);
     ASSERT (AsciiStr != NULL);
-    UnicodeStrToAsciiStr (ValueStr, AsciiStr);
+    UnicodeStrToAsciiStrS (ValueStr, AsciiStr, AuthKeyLength + 1);
     CopyMem ((*Data)->AlgoInfo.EspAlgoInfo.AuthKey, AsciiStr, AuthKeyLength);
     FreePool (AsciiStr);
     *Mask |= AUTH_KEY;

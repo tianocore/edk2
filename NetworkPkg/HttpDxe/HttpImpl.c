@@ -236,6 +236,7 @@ EfiHttpRequest (
   VOID                          *UrlParser;
   EFI_STATUS                    Status;
   CHAR8                         *HostName;
+  UINTN                         HostNameSize;
   UINT16                        RemotePort;
   HTTP_PROTOCOL                 *HttpInstance;
   BOOLEAN                       Configure;
@@ -343,7 +344,7 @@ EfiHttpRequest (
     }
 
 
-    UnicodeStrToAsciiStr (Request->Url, Url);
+    UnicodeStrToAsciiStrS (Request->Url, Url, UrlLen);
     UrlParser = NULL;
     Status = HttpParseUrl (Url, (UINT32) AsciiStrLen (Url), FALSE, &UrlParser);
     if (EFI_ERROR (Status)) {
@@ -443,13 +444,14 @@ EfiHttpRequest (
     }
 
     if (EFI_ERROR (Status)) {
-      HostNameStr = AllocateZeroPool ((AsciiStrLen (HostName) + 1) * sizeof (CHAR16));
+      HostNameSize = AsciiStrSize (HostName);
+      HostNameStr = AllocateZeroPool (HostNameSize * sizeof (CHAR16));
       if (HostNameStr == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Error1;
       }
       
-      AsciiStrToUnicodeStr (HostName, HostNameStr);
+      AsciiStrToUnicodeStrS (HostName, HostNameStr, HostNameSize);
       if (!HttpInstance->LocalAddressIsIPv6) {
         Status = HttpDns4 (HttpInstance, HostNameStr, &HttpInstance->RemoteAddr);
       } else {

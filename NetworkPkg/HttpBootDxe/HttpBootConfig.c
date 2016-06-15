@@ -104,7 +104,7 @@ HttpBootAddBootOption (
   //
   // Update the URI node with the input boot file URI.
   //
-  UnicodeStrToAsciiStr (Uri, AsciiUri);
+  UnicodeStrToAsciiStrS (Uri, AsciiUri, sizeof (AsciiUri));
   Length = sizeof (EFI_DEVICE_PATH_PROTOCOL) + AsciiStrSize (AsciiUri);
   Node = AllocatePool (Length);
   if (Node == NULL) {
