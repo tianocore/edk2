@@ -13,7 +13,7 @@
   Dp uses this information to group records in different ways.  It also uses
   timer information to calculate elapsed time for each measurement.
  
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -168,6 +168,7 @@ ShellCommandRunDp (
   BOOLEAN                   CumulativeMode;
   CONST CHAR16              *CustomCumulativeToken;
   PERF_CUM_DATA             *CustomCumulativeData;
+  UINTN                     NameSize;
   SHELL_STATUS              ShellStatus;
 
   StringPtr   = NULL;
@@ -263,8 +264,9 @@ ShellCommandRunDp (
     CustomCumulativeData->MaxDur = 0;
     CustomCumulativeData->Count  = 0;
     CustomCumulativeData->Duration = 0;
-    CustomCumulativeData->Name   = AllocateZeroPool (StrLen (CustomCumulativeToken) + 1);
-    UnicodeStrToAsciiStr (CustomCumulativeToken, CustomCumulativeData->Name);
+    NameSize = StrLen (CustomCumulativeToken) + 1;
+    CustomCumulativeData->Name   = AllocateZeroPool (NameSize);
+    UnicodeStrToAsciiStrS (CustomCumulativeToken, CustomCumulativeData->Name, NameSize);
   }
 
   //
