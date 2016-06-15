@@ -37,6 +37,5 @@
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
 
-  gArmPlatformTokenSpaceGuid.PL011UartClkInHz
   gArmPlatformTokenSpaceGuid.PL011UartInteger
   gArmPlatformTokenSpaceGuid.PL011UartFractional

@@ -50,13 +50,14 @@ SerialPortInitialize (
   StopBits = (EFI_STOP_BITS_TYPE) FixedPcdGet8 (PcdUartDefaultStopBits);
 
   return PL011UartInitializePort (
-      (UINTN)FixedPcdGet64 (PcdSerialRegisterBase),
-      &BaudRate,
-      &ReceiveFifoDepth,
-      &Parity,
-      &DataBits,
-      &StopBits
-      );
+           (UINTN)FixedPcdGet64 (PcdSerialRegisterBase),
+           FixedPcdGet32 (PL011UartClkInHz),
+           &BaudRate,
+           &ReceiveFifoDepth,
+           &Parity,
+           &DataBits,
+           &StopBits
+           );
 }
 
 /**
@@ -158,13 +159,14 @@ SerialPortSetAttributes (
   )
 {
   return PL011UartInitializePort (
-    (UINTN)FixedPcdGet64 (PcdSerialRegisterBase),
-    BaudRate,
-    ReceiveFifoDepth,
-    Parity,
-    DataBits,
-    StopBits
-    );
+           (UINTN)FixedPcdGet64 (PcdSerialRegisterBase),
+           FixedPcdGet32 (PL011UartClkInHz),
+           BaudRate,
+           ReceiveFifoDepth,
+           Parity,
+           DataBits,
+           StopBits
+           );
 }
 
 /**

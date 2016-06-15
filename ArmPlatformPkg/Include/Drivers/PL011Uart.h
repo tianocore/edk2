@@ -89,26 +89,28 @@
 #define PL011_UARTPID2_VER(X)     (((X) >> 4) & 0xF)
 #define PL011_VER_R1P4            0x2
 
-/*
+/**
 
   Initialise the serial port to the specified settings.
   All unspecified settings will be set to the default values.
 
-  @param  UartBase                The base address of the serial device.
-  @param  BaudRate                The baud rate of the serial device. If the
+  @param[in]  UartBase            The base address of the serial device.
+  @param[in]  UartClkInHz         The clock in Hz for the serial device.
+                                  Ignored if the PCD PL011UartInteger is not 0
+  @param[in out] BaudRate         The baud rate of the serial device. If the
                                   baud rate is not supported, the speed will be
                                   reduced to the nearest supported one and the
                                   variable's value will be updated accordingly.
-  @param  ReceiveFifoDepth        The number of characters the device will
+  @param[in out] ReceiveFifoDepth The number of characters the device will
                                   buffer on input.  Value of 0 will use the
                                   device's default FIFO depth.
-  @param  Parity                  If applicable, this is the EFI_PARITY_TYPE
+  @param[in out]  Parity          If applicable, this is the EFI_PARITY_TYPE
                                   that is computed or checked as each character
                                   is transmitted or received. If the device
                                   does not support parity, the value is the
                                   default parity value.
-  @param  DataBits                The number of data bits in each character.
-  @param  StopBits                If applicable, the EFI_STOP_BITS_TYPE number
+  @param[in out]  DataBits        The number of data bits in each character.
+  @param[in out]  StopBits        If applicable, the EFI_STOP_BITS_TYPE number
                                   of stop bits per character.
                                   If the device does not support stop bits, the
                                   value is the default stop bit value.
@@ -123,6 +125,7 @@ RETURN_STATUS
 EFIAPI
 PL011UartInitializePort (
   IN     UINTN               UartBase,
+  IN     UINT32              UartClkInHz,
   IN OUT UINT64              *BaudRate,
   IN OUT UINT32              *ReceiveFifoDepth,
   IN OUT EFI_PARITY_TYPE     *Parity,

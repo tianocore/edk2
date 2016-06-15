@@ -35,6 +35,8 @@ STATIC CONST UINT32 mInvalidControlBits = EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE;
   All unspecified settings will be set to the default values.
 
   @param  UartBase                The base address of the serial device.
+  @param  UartClkInHz             The clock in Hz for the serial device.
+                                  Ignored if the PCD PL011UartInteger is not 0
   @param  BaudRate                The baud rate of the serial device. If the
                                   baud rate is not supported, the speed will be
                                   reduced to the nearest supported one and the
@@ -63,6 +65,7 @@ RETURN_STATUS
 EFIAPI
 PL011UartInitializePort (
   IN     UINTN               UartBase,
+  IN     UINT32              UartClkInHz,
   IN OUT UINT64              *BaudRate,
   IN OUT UINT32              *ReceiveFifoDepth,
   IN OUT EFI_PARITY_TYPE     *Parity,
@@ -72,6 +75,8 @@ PL011UartInitializePort (
 {
   UINT32      LineControl;
   UINT32      Divisor;
+  UINT32      Integer;
+  UINT32      Fractional;
 
   // The PL011 supports a buffer of 1, 16 or 32 chars. Therefore we can accept
   // 1 char buffer as the minimum FIFO size. Because everything can be rounded
@@ -168,19 +173,27 @@ PL011UartInitializePort (
 
   // If PL011 Integer value has been defined then always ignore the BAUD rate
   if (FixedPcdGet32 (PL011UartInteger) != 0) {
-      MmioWrite32 (UartBase + UARTIBRD, FixedPcdGet32 (PL011UartInteger));
-      MmioWrite32 (UartBase + UARTFBRD, FixedPcdGet32 (PL011UartFractional));
+    Integer = FixedPcdGet32 (PL011UartInteger);
+    Fractional = FixedPcdGet32 (PL011UartFractional);
   } else {
     // If BAUD rate is zero then replace it with the system default value
     if (*BaudRate == 0) {
       *BaudRate = FixedPcdGet32 (PcdSerialBaudRate);
-      ASSERT (*BaudRate != 0);
+      if (*BaudRate == 0) {
+        return RETURN_INVALID_PARAMETER;
+      }
+    }
+    if (0 == UartClkInHz) {
+      return RETURN_INVALID_PARAMETER;
     }
 
-    Divisor = (FixedPcdGet32 (PL011UartClkInHz) * 4) / *BaudRate;
-    MmioWrite32 (UartBase + UARTIBRD, Divisor >> FRACTION_PART_SIZE_IN_BITS);
-    MmioWrite32 (UartBase + UARTFBRD, Divisor & FRACTION_PART_MASK);
+    Divisor = (UartClkInHz * 4) / *BaudRate;
+    Integer = Divisor >> FRACTION_PART_SIZE_IN_BITS;
+    Fractional = Divisor & FRACTION_PART_MASK;
   }
+  // Set Baud Rate Registers
+  MmioWrite32 (UartBase + UARTIBRD, Integer);
+  MmioWrite32 (UartBase + UARTFBRD, Fractional);
 
   // No parity, 1 stop, no fifo, 8 data bits
   MmioWrite32 (UartBase + UARTLCR_H, LineControl);
