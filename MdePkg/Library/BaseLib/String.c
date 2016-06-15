@@ -1000,7 +1000,11 @@ InternalAsciiIsHexaDecimalDigitCharacter (
     (Char >= 'a' && Char <= 'f'));
 }
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Convert a Null-terminated Unicode string to a Null-terminated
   ASCII string and returns the ASCII string.
 
@@ -1077,8 +1081,6 @@ UnicodeStrToAsciiStr (
 
   return ReturnValue;
 }
-
-#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
   [ATTENTION] This function will be deprecated for security reason.
@@ -1986,8 +1988,11 @@ AsciiStrHexToUint64 (
   return Result;
 }
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Convert one Null-terminated ASCII string to a Null-terminated
   Unicode string and returns the Unicode string.
 
@@ -2053,6 +2058,8 @@ AsciiStrToUnicodeStr (
 
   return ReturnValue;
 }
+
+#endif
 
 /**
   Converts an 8-bit value to an 8-bit BCD value.
