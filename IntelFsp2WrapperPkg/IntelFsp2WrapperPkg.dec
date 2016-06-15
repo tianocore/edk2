@@ -74,4 +74,7 @@
   ## This is the base address of FSP-T/M/S
   gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00000301
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00000302
+
+[PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
+  
