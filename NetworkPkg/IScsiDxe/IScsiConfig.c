@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to iSCSI.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -390,7 +390,11 @@ IScsiConvertAttemptConfigDataToIfrNvData (
     IScsiIpToStr (&Ip, TRUE, IfrNvData->TargetIp);
   }
 
-  AsciiStrToUnicodeStr (SessionConfigData->TargetName, IfrNvData->TargetName);
+  AsciiStrToUnicodeStrS (
+    SessionConfigData->TargetName,
+    IfrNvData->TargetName,
+    sizeof (IfrNvData->TargetName) / sizeof (IfrNvData->TargetName[0])
+    );
   IScsiLunToUnicodeStr (SessionConfigData->BootLun, IfrNvData->BootLun);
   IScsiConvertIsIdToString (IfrNvData->IsId, SessionConfigData->IsId);
 
@@ -405,16 +409,36 @@ IScsiConvertAttemptConfigDataToIfrNvData (
   if (IfrNvData->AuthenticationType == ISCSI_AUTH_TYPE_CHAP) {
     AuthConfigData      = &Attempt->AuthConfigData.CHAP;
     IfrNvData->CHAPType = AuthConfigData->CHAPType;
-    AsciiStrToUnicodeStr (AuthConfigData->CHAPName, IfrNvData->CHAPName);
-    AsciiStrToUnicodeStr (AuthConfigData->CHAPSecret, IfrNvData->CHAPSecret);
-    AsciiStrToUnicodeStr (AuthConfigData->ReverseCHAPName, IfrNvData->ReverseCHAPName);
-    AsciiStrToUnicodeStr (AuthConfigData->ReverseCHAPSecret, IfrNvData->ReverseCHAPSecret);
+    AsciiStrToUnicodeStrS (
+      AuthConfigData->CHAPName,
+      IfrNvData->CHAPName,
+      sizeof (IfrNvData->CHAPName) / sizeof (IfrNvData->CHAPName[0])
+      );
+    AsciiStrToUnicodeStrS (
+      AuthConfigData->CHAPSecret,
+      IfrNvData->CHAPSecret,
+      sizeof (IfrNvData->CHAPSecret) / sizeof (IfrNvData->CHAPSecret[0])
+      );
+    AsciiStrToUnicodeStrS (
+      AuthConfigData->ReverseCHAPName,
+      IfrNvData->ReverseCHAPName,
+      sizeof (IfrNvData->ReverseCHAPName) / sizeof (IfrNvData->ReverseCHAPName[0])
+      );
+    AsciiStrToUnicodeStrS (
+      AuthConfigData->ReverseCHAPSecret,
+      IfrNvData->ReverseCHAPSecret,
+      sizeof (IfrNvData->ReverseCHAPSecret) / sizeof (IfrNvData->ReverseCHAPSecret[0])
+      );
   }
 
   //
   // Other parameters.
   //
-  AsciiStrToUnicodeStr (Attempt->AttemptName, IfrNvData->AttemptName);
+  AsciiStrToUnicodeStrS (
+    Attempt->AttemptName,
+    IfrNvData->AttemptName,
+    sizeof (IfrNvData->AttemptName) / sizeof (IfrNvData->AttemptName[0])
+    );
 }
 
 /**
@@ -603,12 +627,12 @@ IScsiConvertIfrNvDataToAttemptConfigData (
         return EFI_OUT_OF_RESOURCES;
       }      
       
-      AsciiStrToUnicodeStr (Attempt->AttemptName, AttemptName1);
+      AsciiStrToUnicodeStrS (Attempt->AttemptName, AttemptName1, ATTEMPT_NAME_MAX_SIZE);
       if (StrLen (AttemptName1) > ATTEMPT_NAME_SIZE) {
         CopyMem (&AttemptName1[ATTEMPT_NAME_SIZE], L"...", 4 * sizeof (CHAR16));
       }
 
-      AsciiStrToUnicodeStr (SameNicAttempt->AttemptName, AttemptName2);
+      AsciiStrToUnicodeStrS (SameNicAttempt->AttemptName, AttemptName2, ATTEMPT_NAME_MAX_SIZE);
       if (StrLen (AttemptName2) > ATTEMPT_NAME_SIZE) {
         CopyMem (&AttemptName2[ATTEMPT_NAME_SIZE], L"...", 4 * sizeof (CHAR16));
       }
@@ -663,7 +687,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  AsciiStrToUnicodeStr (Attempt->MacString, MacString);
+  AsciiStrToUnicodeStrS (Attempt->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
 
   UnicodeSPrint (
     mPrivate->PortString,
@@ -1087,7 +1111,7 @@ IScsiConfigUpdateAttempt (
   NET_LIST_FOR_EACH (Entry, &mPrivate->AttemptConfigs) {
     AttemptConfigData = NET_LIST_USER_STRUCT (Entry, ISCSI_ATTEMPT_CONFIG_NVDATA, Link);
 
-    AsciiStrToUnicodeStr (AttemptConfigData->AttemptName, AttemptName);
+    AsciiStrToUnicodeStrS (AttemptConfigData->AttemptName, AttemptName, sizeof (AttemptName) / sizeof (AttemptName[0]));
     UnicodeSPrint (mPrivate->PortString, (UINTN) 128, L"Attempt %s", AttemptName);
     AttemptConfigData->AttemptTitleToken = HiiSetString (
                                              mCallbackInfo->RegisteredHandle,
@@ -1216,7 +1240,7 @@ IScsiConfigDeleteAttempts (
       mPrivate->SinglePathCount--;
     }
 
-    AsciiStrToUnicodeStr (AttemptConfigData->MacString, MacString);
+    AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
 
     UnicodeSPrint (
       mPrivate->PortString,
@@ -1730,7 +1754,7 @@ IScsiConfigProcessDefault (
       MacString
       );
 
-    UnicodeStrToAsciiStr (MacString, AttemptConfigData->MacString);
+    UnicodeStrToAsciiStrS (MacString, AttemptConfigData->MacString, sizeof (AttemptConfigData->MacString));
     AttemptConfigData->NicIndex = NicIndex;
 
     //
@@ -1773,7 +1797,7 @@ IScsiConfigProcessDefault (
       L"%d",
       (UINTN) AttemptConfigData->AttemptConfigIndex
       );
-    UnicodeStrToAsciiStr (mPrivate->PortString, AttemptConfigData->AttemptName);
+    UnicodeStrToAsciiStrS (mPrivate->PortString, AttemptConfigData->AttemptName, sizeof (AttemptConfigData->AttemptName));
 
     //
     // Save the created Attempt temporarily. If user does not save the attempt
@@ -1942,7 +1966,11 @@ IScsiFormExtractConfig (
   if (EFI_ERROR (Status)) {
     IfrNvData->InitiatorName[0] = L'\0';
   } else {
-    AsciiStrToUnicodeStr (InitiatorName, IfrNvData->InitiatorName);
+    AsciiStrToUnicodeStrS (
+      InitiatorName,
+      IfrNvData->InitiatorName,
+      sizeof (IfrNvData->InitiatorName) / sizeof (IfrNvData->InitiatorName[0])
+      );
   }
 
   //
@@ -2210,7 +2238,7 @@ IScsiFormCallback (
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {  
     switch (QuestionId) {
     case KEY_INITIATOR_NAME:
-      UnicodeStrToAsciiStr (IfrNvData->InitiatorName, IScsiName);
+      UnicodeStrToAsciiStrS (IfrNvData->InitiatorName, IScsiName, ISCSI_NAME_MAX_SIZE);
       BufferSize  = AsciiStrSize (IScsiName);
 
       Status      = gIScsiInitiatorName.Set (&gIScsiInitiatorName, &BufferSize, IScsiName);
@@ -2237,7 +2265,7 @@ IScsiFormCallback (
           );
       }
 
-      UnicodeStrToAsciiStr (IfrNvData->AttemptName, Private->Current->AttemptName);
+      UnicodeStrToAsciiStrS (IfrNvData->AttemptName, Private->Current->AttemptName, sizeof (Private->Current->AttemptName));
 
       IScsiConfigUpdateAttempt ();
 
@@ -2366,7 +2394,7 @@ IScsiFormCallback (
       break;
 
     case KEY_TARGET_IP:
-      UnicodeStrToAsciiStr (IfrNvData->TargetIp, IpString);
+      UnicodeStrToAsciiStrS (IfrNvData->TargetIp, IpString, sizeof (IpString));
       Status = IScsiAsciiStrToIp (IpString, IfrNvData->IpMode, &HostIp);
       if (EFI_ERROR (Status) || !IpIsUnicast (&HostIp, IfrNvData->IpMode)) {
         CreatePopUp (
@@ -2383,7 +2411,7 @@ IScsiFormCallback (
       break;
 
     case KEY_TARGET_NAME:
-      UnicodeStrToAsciiStr (IfrNvData->TargetName, IScsiName);
+      UnicodeStrToAsciiStrS (IfrNvData->TargetName, IScsiName, ISCSI_NAME_MAX_SIZE);
       Status = IScsiNormalizeName (IScsiName, AsciiStrLen (IScsiName));
       if (EFI_ERROR (Status)) {
         CreatePopUp (
@@ -2406,7 +2434,7 @@ IScsiFormCallback (
       break;
 
     case KEY_BOOT_LUN:
-      UnicodeStrToAsciiStr (IfrNvData->BootLun, LunString);
+      UnicodeStrToAsciiStrS (IfrNvData->BootLun, LunString, sizeof (LunString));
       Status = IScsiAsciiStrToLun (LunString, (UINT8 *) &Lun);
       if (EFI_ERROR (Status)) {
         CreatePopUp (
@@ -2433,30 +2461,34 @@ IScsiFormCallback (
       break;
 
     case KEY_CHAP_NAME:
-      UnicodeStrToAsciiStr (
+      UnicodeStrToAsciiStrS (
         IfrNvData->CHAPName,
-        Private->Current->AuthConfigData.CHAP.CHAPName
+        Private->Current->AuthConfigData.CHAP.CHAPName,
+        sizeof (Private->Current->AuthConfigData.CHAP.CHAPName)
         );
       break;
 
     case KEY_CHAP_SECRET:
-      UnicodeStrToAsciiStr (
+      UnicodeStrToAsciiStrS (
         IfrNvData->CHAPSecret,
-        Private->Current->AuthConfigData.CHAP.CHAPSecret
+        Private->Current->AuthConfigData.CHAP.CHAPSecret,
+        sizeof (Private->Current->AuthConfigData.CHAP.CHAPSecret)
         );
       break;
 
     case KEY_REVERSE_CHAP_NAME:
-      UnicodeStrToAsciiStr (
+      UnicodeStrToAsciiStrS (
         IfrNvData->ReverseCHAPName,
-        Private->Current->AuthConfigData.CHAP.ReverseCHAPName
+        Private->Current->AuthConfigData.CHAP.ReverseCHAPName,
+        sizeof (Private->Current->AuthConfigData.CHAP.ReverseCHAPName)
         );
       break;
 
     case KEY_REVERSE_CHAP_SECRET:
-      UnicodeStrToAsciiStr (
+      UnicodeStrToAsciiStrS (
         IfrNvData->ReverseCHAPSecret,
-        Private->Current->AuthConfigData.CHAP.ReverseCHAPSecret
+        Private->Current->AuthConfigData.CHAP.ReverseCHAPSecret,
+        sizeof (Private->Current->AuthConfigData.CHAP.ReverseCHAPSecret)
         );
       break;
 

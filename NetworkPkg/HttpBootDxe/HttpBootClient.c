@@ -244,6 +244,7 @@ HttpBootDhcp6ExtractUriInfo (
   EFI_DHCP6_PACKET_OPTION         *Option;
   EFI_IPv6_ADDRESS                IpAddr;
   CHAR8                           *HostName;
+  UINTN                           HostNameSize;
   CHAR16                          *HostNameStr;
   EFI_STATUS                      Status;
 
@@ -313,14 +314,15 @@ HttpBootDhcp6ExtractUriInfo (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    
-    HostNameStr = AllocateZeroPool ((AsciiStrLen (HostName) + 1) * sizeof (CHAR16));
+
+    HostNameSize = AsciiStrSize (HostName);
+    HostNameStr = AllocateZeroPool (HostNameSize * sizeof (CHAR16));
     if (HostNameStr == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Error;
     }
     
-    AsciiStrToUnicodeStr (HostName, HostNameStr);
+    AsciiStrToUnicodeStrS (HostName, HostNameStr, HostNameSize);
     Status = HttpBootDns (Private, HostNameStr, &IpAddr);
     FreePool (HostNameStr);
     if (EFI_ERROR (Status)) {
@@ -728,6 +730,7 @@ HttpBootGetBootFile (
   UINTN                      ContentLength;
   HTTP_BOOT_CACHE_CONTENT    *Cache;
   UINT8                      *Block;
+  UINTN                      UrlSize;
   CHAR16                     *Url;
   BOOLEAN                    IdentityMode;
   UINTN                      ReceivedSize;
@@ -746,11 +749,12 @@ HttpBootGetBootFile (
   //
   // First, check whether we already cached the requested Uri.
   //
-  Url = AllocatePool ((AsciiStrLen (Private->BootFileUri) + 1) * sizeof (CHAR16));
+  UrlSize = AsciiStrSize (Private->BootFileUri);
+  Url = AllocatePool (UrlSize * sizeof (CHAR16));
   if (Url == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  AsciiStrToUnicodeStr (Private->BootFileUri, Url);
+  AsciiStrToUnicodeStrS (Private->BootFileUri, Url, UrlSize);
   if (!HeaderOnly) {
     Status = HttpBootGetFileFromCache (Private, Url, BufferSize, Buffer);
     if (Status != EFI_NOT_FOUND) {
@@ -848,11 +852,6 @@ HttpBootGetBootFile (
   }
   RequestData->Method = HeaderOnly ? HttpMethodHead : HttpMethodGet;
   RequestData->Url = Url;
-  if (RequestData->Url == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ERROR_4;
-  }
-  AsciiStrToUnicodeStr (Private->BootFileUri, RequestData->Url);
 
   //
   // 2.3 Record the request info in a temp cache item.

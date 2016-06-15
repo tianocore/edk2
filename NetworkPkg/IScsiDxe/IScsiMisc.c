@@ -1095,7 +1095,7 @@ IScsiGetConfigData (
           //
           // Refresh the state of this attempt to NVR.
           //
-          AsciiStrToUnicodeStr (AttemptTmp->MacString, MacString);
+          AsciiStrToUnicodeStrS (AttemptTmp->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
           UnicodeSPrint (
             mPrivate->PortString,
             (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
@@ -1134,7 +1134,7 @@ IScsiGetConfigData (
         //
         // Refresh the state of this attempt to NVR.
         //
-        AsciiStrToUnicodeStr (AttemptTmp->MacString, MacString);
+        AsciiStrToUnicodeStrS (AttemptTmp->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
         UnicodeSPrint (
           mPrivate->PortString,
           (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
@@ -1225,7 +1225,7 @@ IScsiGetConfigData (
       //
       // Refresh the state of this attempt to NVR.
       //
-      AsciiStrToUnicodeStr (AttemptConfigData->MacString, MacString);
+      AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
       UnicodeSPrint (
         mPrivate->PortString,
         (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
