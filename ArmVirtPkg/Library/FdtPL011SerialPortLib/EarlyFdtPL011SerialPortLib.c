@@ -112,7 +112,13 @@ SerialPortGetBaseAddress (
 
         Status = PL011UartInitializePort (
                    UartBase,
-                   &BaudRate, &ReceiveFifoDepth, &Parity, &DataBits, &StopBits);
+                   FixedPcdGet32 (PL011UartClkInHz),
+                   &BaudRate,
+                   &ReceiveFifoDepth,
+                   &Parity,
+                   &DataBits,
+                   &StopBits
+                   );
         if (!EFI_ERROR (Status)) {
           return UartBase;
         }

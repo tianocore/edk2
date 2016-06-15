@@ -81,8 +81,14 @@ FdtPL011SerialPortLibInitialize (
   StopBits = (EFI_STOP_BITS_TYPE) PcdGet8 (PcdUartDefaultStopBits);
 
   return PL011UartInitializePort (
-           mSerialBaseAddress, &BaudRate, &ReceiveFifoDepth,
-           &Parity, &DataBits, &StopBits);
+           mSerialBaseAddress,
+           FixedPcdGet32 (PL011UartClkInHz),
+           &BaudRate,
+           &ReceiveFifoDepth,
+           &Parity,
+           &DataBits,
+           &StopBits
+           );
 }
 
 /**
