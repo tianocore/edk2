@@ -3,7 +3,7 @@
   and manage the legacy boot option, all legacy boot option is getting from
   the legacy BBS table.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -183,7 +183,7 @@ LegacyBmBuildLegacyDevNameString (
     //
     CopyMem (StringBufferA, StringDesc, LEGACY_BM_BOOT_DESCRIPTION_LENGTH);
     StringBufferA[LEGACY_BM_BOOT_DESCRIPTION_LENGTH] = 0;
-    AsciiStrToUnicodeStr (StringBufferA, StringBufferU);
+    AsciiStrToUnicodeStrS (StringBufferA, StringBufferU, sizeof (StringBufferU) / sizeof (StringBufferU[0]));
     Fmt   = L"%s";
     Type  = StringBufferU;
   }
@@ -537,7 +537,7 @@ LegacyBmCreateLegacyBootOption (
   //
   // Create the BBS device path with description string
   //
-  UnicodeStrToAsciiStr (Description, HelpString);
+  UnicodeStrToAsciiStrS (Description, HelpString, sizeof (HelpString));
   StringLen = AsciiStrLen (HelpString);
   DevicePath = AllocatePool (sizeof (BBS_BBS_DEVICE_PATH) + StringLen + END_DEVICE_PATH_LENGTH);
   ASSERT (DevicePath != NULL);
