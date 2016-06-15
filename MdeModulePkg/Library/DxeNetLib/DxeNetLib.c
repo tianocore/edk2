@@ -2976,18 +2976,20 @@ NetLibStrToIp4 (
   )
 {
   CHAR8                          *Ip4Str;
+  UINTN                          StringSize;
   EFI_STATUS                     Status;
 
   if ((String == NULL) || (Ip4Address == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Ip4Str = (CHAR8 *) AllocatePool ((StrLen (String) + 1) * sizeof (CHAR8));
+  StringSize = StrLen (String) + 1;
+  Ip4Str = (CHAR8 *) AllocatePool (StringSize * sizeof (CHAR8));
   if (Ip4Str == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  UnicodeStrToAsciiStr (String, Ip4Str);
+  UnicodeStrToAsciiStrS (String, Ip4Str, StringSize);
 
   Status = NetLibAsciiStrToIp4 (Ip4Str, Ip4Address);
 
@@ -3017,18 +3019,20 @@ NetLibStrToIp6 (
   )
 {
   CHAR8                          *Ip6Str;
+  UINTN                          StringSize;
   EFI_STATUS                     Status;
 
   if ((String == NULL) || (Ip6Address == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Ip6Str = (CHAR8 *) AllocatePool ((StrLen (String) + 1) * sizeof (CHAR8));
+  StringSize = StrLen (String) + 1;
+  Ip6Str = (CHAR8 *) AllocatePool (StringSize * sizeof (CHAR8));
   if (Ip6Str == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  UnicodeStrToAsciiStr (String, Ip6Str);
+  UnicodeStrToAsciiStrS (String, Ip6Str, StringSize);
 
   Status = NetLibAsciiStrToIp6 (Ip6Str, Ip6Address);
 
@@ -3060,6 +3064,7 @@ NetLibStrToIp6andPrefix (
   )
 {
   CHAR8                          *Ip6Str;
+  UINTN                          StringSize;
   CHAR8                          *PrefixStr;
   CHAR8                          *TempStr;
   EFI_STATUS                     Status;
@@ -3069,12 +3074,13 @@ NetLibStrToIp6andPrefix (
     return EFI_INVALID_PARAMETER;
   }
 
-  Ip6Str = (CHAR8 *) AllocatePool ((StrLen (String) + 1) * sizeof (CHAR8));
+  StringSize = StrLen (String) + 1;
+  Ip6Str = (CHAR8 *) AllocatePool (StringSize * sizeof (CHAR8));
   if (Ip6Str == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  UnicodeStrToAsciiStr (String, Ip6Str);
+  UnicodeStrToAsciiStrS (String, Ip6Str, StringSize);
 
   //
   // Get the sub string describing prefix length.

@@ -175,6 +175,7 @@ InitializeLanguage (
   EFI_STATUS                  Status;
   CHAR8                       *LangCode;
   CHAR8                       *Lang;
+  UINTN                       LangSize;
   CHAR8                       *CurrentLang;
   UINTN                       OptionCount;
   CHAR16                      *StringBuffer;
@@ -272,9 +273,10 @@ InitializeLanguage (
       }
 
       if (EFI_ERROR (Status)) {
-        StringBuffer = AllocatePool (AsciiStrSize (Lang) * sizeof (CHAR16));
+        LangSize = AsciiStrSize (Lang);
+        StringBuffer = AllocatePool (LangSize * sizeof (CHAR16));
         ASSERT (StringBuffer != NULL);
-        AsciiStrToUnicodeStr (Lang, StringBuffer);
+        AsciiStrToUnicodeStrS (Lang, StringBuffer, LangSize);
       }
 
       ASSERT (StringBuffer != NULL);
@@ -734,7 +736,7 @@ GetOptionalStringByIndex (
     *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
   } else {
     *String = AllocatePool (StrSize * sizeof (CHAR16));
-    AsciiStrToUnicodeStr (OptionalStrStart, *String);
+    AsciiStrToUnicodeStrS (OptionalStrStart, *String, StrSize);
   }
 
   return EFI_SUCCESS;
