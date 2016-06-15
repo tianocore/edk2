@@ -73,20 +73,19 @@ PL011UartInitializePort (
   UINT32      LineControl;
   UINT32      Divisor;
 
-  LineControl = 0;
-
   // The PL011 supports a buffer of 1, 16 or 32 chars. Therefore we can accept
   // 1 char buffer as the minimum FIFO size. Because everything can be rounded
   // down, there is no maximum FIFO size.
   if ((*ReceiveFifoDepth == 0) || (*ReceiveFifoDepth >= 32)) {
     // Enable FIFO
-    LineControl |= PL011_UARTLCR_H_FEN;
+    LineControl = PL011_UARTLCR_H_FEN;
     if (PL011_UARTPID2_VER (MmioRead32 (UartBase + UARTPID2)) > PL011_VER_R1P4)
       *ReceiveFifoDepth = 32;
     else
       *ReceiveFifoDepth = 16;
   } else {
-    ASSERT (*ReceiveFifoDepth < 32);
+    // Disable FIFO
+    LineControl = 0;
     // Nothing else to do. 1 byte FIFO is default.
     *ReceiveFifoDepth = 1;
   }
