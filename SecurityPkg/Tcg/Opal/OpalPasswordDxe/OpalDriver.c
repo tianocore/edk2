@@ -239,7 +239,7 @@ OpalDriverPopUpHddPassword (
     return NULL;
   }
 
-  UnicodeStrToAsciiStr(Unicode, Ascii);
+  UnicodeStrToAsciiStrS (Unicode, Ascii, MAX_PASSWORD_SIZE + 1);
 
   return Ascii;
 }
@@ -616,7 +616,7 @@ OpalDriverGetDeviceNameByProtocol(
         ASSERT (Dev->Name16 != NULL);
         StrCpyS (Dev->Name16, StrLength, DevName);
         Dev->NameZ = (CHAR8*)AllocateZeroPool(StrLength);
-        UnicodeStrToAsciiStr(DevName, Dev->NameZ);
+        UnicodeStrToAsciiStrS (DevName, Dev->NameZ, StrLength);
 
         //
         // Retrieve bridge BDF info and port number or namespace depending on type
