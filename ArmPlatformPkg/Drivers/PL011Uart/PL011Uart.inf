@@ -2,7 +2,7 @@
 #
 #  Component description file for PL011Uart module
 #
-#  Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2016, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -34,7 +34,7 @@
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
-[Pcd]
+[FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
 
   gArmPlatformTokenSpaceGuid.PL011UartClkInHz

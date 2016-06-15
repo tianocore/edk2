@@ -168,17 +168,17 @@ PL011UartInitializePort (
   //
 
   // If PL011 Integer value has been defined then always ignore the BAUD rate
-  if (PcdGet32 (PL011UartInteger) != 0) {
-      MmioWrite32 (UartBase + UARTIBRD, PcdGet32 (PL011UartInteger));
-      MmioWrite32 (UartBase + UARTFBRD, PcdGet32 (PL011UartFractional));
+  if (FixedPcdGet32 (PL011UartInteger) != 0) {
+      MmioWrite32 (UartBase + UARTIBRD, FixedPcdGet32 (PL011UartInteger));
+      MmioWrite32 (UartBase + UARTFBRD, FixedPcdGet32 (PL011UartFractional));
   } else {
     // If BAUD rate is zero then replace it with the system default value
     if (*BaudRate == 0) {
-      *BaudRate = PcdGet32 (PcdSerialBaudRate);
+      *BaudRate = FixedPcdGet32 (PcdSerialBaudRate);
       ASSERT (*BaudRate != 0);
     }
 
-    Divisor = (PcdGet32 (PL011UartClkInHz) * 4) / *BaudRate;
+    Divisor = (FixedPcdGet32 (PL011UartClkInHz) * 4) / *BaudRate;
     MmioWrite32 (UartBase + UARTIBRD, Divisor >> FRACTION_PART_SIZE_IN_BITS);
     MmioWrite32 (UartBase + UARTFBRD, Divisor & FRACTION_PART_MASK);
   }
