@@ -231,7 +231,7 @@ GetEmmcModelName (
   String[sizeof (Cid->OemId) + sizeof (Cid->ProductName)] = ' ';
   CopyMem (String + sizeof (Cid->OemId) + sizeof (Cid->ProductName) + 1, Cid->ProductSerialNumber, sizeof (Cid->ProductSerialNumber));
 
-  AsciiStrToUnicodeStr (String, Device->ModelName);
+  AsciiStrToUnicodeStrS (String, Device->ModelName, sizeof (Device->ModelName) / sizeof (Device->ModelName[0]));
 
   return EFI_SUCCESS;
 }

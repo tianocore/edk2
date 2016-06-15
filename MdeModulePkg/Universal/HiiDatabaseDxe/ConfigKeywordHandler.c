@@ -178,6 +178,7 @@ ExtractNameSpace (
   )
 {
   CHAR16    *TmpPtr;
+  UINTN     NameSpaceSize;
 
   ASSERT (NameSpace != NULL);
 
@@ -218,11 +219,12 @@ ExtractNameSpace (
   // Input NameSpace is unicode string. The language in String package is ascii string.
   // Here will convert the unicode string to ascii and save it.
   //
-  *NameSpace = AllocatePool (StrLen (String) + 1);
+  NameSpaceSize = StrLen (String) + 1;
+  *NameSpace = AllocatePool (NameSpaceSize);
   if (*NameSpace == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr (String, *NameSpace);
+  UnicodeStrToAsciiStrS (String, *NameSpace, NameSpaceSize);
 
   if (TmpPtr != NULL) {
     *TmpPtr = L'&'; 
@@ -779,6 +781,7 @@ GetStringIdFromString (
   UINTN                                StringSize;
   CHAR16                               *String;
   CHAR8                                *AsciiKeywordValue;
+  UINTN                                KeywordValueSize;
   EFI_STATUS                           Status;
 
   ASSERT (StringPackage != NULL && KeywordValue != NULL && StringId != NULL);
@@ -794,11 +797,12 @@ GetStringIdFromString (
   //
   // Make a ascii keyword value for later use.
   //
-  AsciiKeywordValue = AllocatePool (StrLen (KeywordValue) + 1);
+  KeywordValueSize = StrLen (KeywordValue) + 1;
+  AsciiKeywordValue = AllocatePool (KeywordValueSize);
   if (AsciiKeywordValue == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr(KeywordValue, AsciiKeywordValue);
+  UnicodeStrToAsciiStrS (KeywordValue, AsciiKeywordValue, KeywordValueSize);
 
   while (*BlockHdr != EFI_HII_SIBT_END) {
     switch (*BlockHdr) {
@@ -1065,11 +1069,12 @@ GetNextStringId (
       StringTextPtr = BlockHdr + Offset;
       
       if (FindString) {
-        *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+        StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+        *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
         if (*KeywordValue == NULL) {
           return 0;
         }
-        AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+        AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
         return CurrentStringId;
       } else if (CurrentStringId == StringId) {
         FindString = TRUE;
@@ -1084,11 +1089,12 @@ GetNextStringId (
       StringTextPtr = BlockHdr + Offset;
       
       if (FindString) {
-        *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+        StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+        *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
         if (*KeywordValue == NULL) {
           return 0;
         }
-        AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+        AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
         return CurrentStringId;
       } else if (CurrentStringId == StringId) {
         FindString = TRUE;
@@ -1105,11 +1111,12 @@ GetNextStringId (
 
       for (Index = 0; Index < StringCount; Index++) {
         if (FindString) {
-          *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+          StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+          *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
           if (*KeywordValue == NULL) {
             return 0;
           }
-          AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+          AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
           return CurrentStringId;
         } else if (CurrentStringId == StringId) {
           FindString = TRUE;
@@ -1132,11 +1139,12 @@ GetNextStringId (
 
       for (Index = 0; Index < StringCount; Index++) {
         if (FindString) {
-          *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+          StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+          *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
           if (*KeywordValue == NULL) {
             return 0;
           }
-          AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+          AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
           return CurrentStringId;
         } else if (CurrentStringId == StringId) {
           FindString = TRUE;
@@ -1670,6 +1678,7 @@ ConstructConfigHdr (
   UINT8                     *Buffer;
   CHAR16                    *Name;
   CHAR8                     *AsciiName;
+  UINTN                     NameSize;
   EFI_GUID                  *Guid;
   UINTN                     MaxLen;
 
@@ -1699,9 +1708,10 @@ ConstructConfigHdr (
   }
 
   if (AsciiName != NULL) {
-    Name = AllocateZeroPool (AsciiStrSize (AsciiName) * 2);
+    NameSize = AsciiStrSize (AsciiName);
+    Name = AllocateZeroPool (NameSize * sizeof (CHAR16));
     ASSERT (Name != NULL);
-    AsciiStrToUnicodeStr(AsciiName, Name);
+    AsciiStrToUnicodeStrS (AsciiName, Name, NameSize);
   } else {
     Name = NULL;
   }
@@ -2375,6 +2385,7 @@ GenerateKeywordResp (
   CHAR16    *RespStr;
   CHAR16    *PathHdr;
   CHAR16    *UnicodeNameSpace;
+  UINTN     NameSpaceLength;
 
   ASSERT ((NameSpace != NULL) && (DevicePath != NULL) && (KeywordData != NULL) && (ValueStr != NULL) && (KeywordResp != NULL));
 
@@ -2385,12 +2396,13 @@ GenerateKeywordResp (
   // 1.1 NameSpaceId size.
   // 'NAMESPACE='<String>
   //
-  RespStrLen = 10 + AsciiStrLen (NameSpace);
-  UnicodeNameSpace = AllocatePool ((AsciiStrLen (NameSpace) + 1) * sizeof (CHAR16));
+  NameSpaceLength = AsciiStrLen (NameSpace);
+  RespStrLen = 10 + NameSpaceLength;
+  UnicodeNameSpace = AllocatePool ((NameSpaceLength + 1) * sizeof (CHAR16));
   if (UnicodeNameSpace == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  AsciiStrToUnicodeStr(NameSpace, UnicodeNameSpace);
+  AsciiStrToUnicodeStrS (NameSpace, UnicodeNameSpace, NameSpaceLength + 1);
 
   //
   // 1.2 PathHdr size.

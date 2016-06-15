@@ -259,6 +259,7 @@ UiCreateLanguageMenu (
 {
   CHAR8                       *LangCode;
   CHAR8                       *Lang;
+  UINTN                       LangSize;
   CHAR8                       *CurrentLang;
   UINTN                       OptionCount;
   CHAR16                      *StringBuffer;
@@ -328,9 +329,10 @@ UiCreateLanguageMenu (
       }
 
       if (EFI_ERROR (Status)) {
-        StringBuffer = AllocatePool (AsciiStrSize (Lang) * sizeof (CHAR16));
+        LangSize = AsciiStrSize (Lang);
+        StringBuffer = AllocatePool (LangSize * sizeof (CHAR16));
         ASSERT (StringBuffer != NULL);
-        AsciiStrToUnicodeStr (Lang, StringBuffer);
+        AsciiStrToUnicodeStrS (Lang, StringBuffer, LangSize);
       }
 
       ASSERT (StringBuffer != NULL);

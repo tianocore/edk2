@@ -215,7 +215,7 @@ BmGetDescriptionFromDiskInfo (
       StrPtr = (CHAR8 *) (&InquiryData.Reserved_5_95[VENDOR_IDENTIFICATION_OFFSET]);
       Temp = StrPtr[VENDOR_IDENTIFICATION_LENGTH];
       StrPtr[VENDOR_IDENTIFICATION_LENGTH] = '\0';
-      AsciiStrToUnicodeStr (StrPtr, Description);
+      AsciiStrToUnicodeStrS (StrPtr, Description, VENDOR_IDENTIFICATION_LENGTH + 1);
       StrPtr[VENDOR_IDENTIFICATION_LENGTH] = Temp;
 
       //
@@ -225,7 +225,7 @@ BmGetDescriptionFromDiskInfo (
 
       StrPtr = (CHAR8 *) (&InquiryData.Reserved_5_95[PRODUCT_IDENTIFICATION_OFFSET]);
       StrPtr[PRODUCT_IDENTIFICATION_LENGTH] = '\0';
-      AsciiStrToUnicodeStr (StrPtr, Description + VENDOR_IDENTIFICATION_LENGTH + 1);
+      AsciiStrToUnicodeStrS (StrPtr, Description + VENDOR_IDENTIFICATION_LENGTH + 1, PRODUCT_IDENTIFICATION_LENGTH + 1);
 
       BmEliminateExtraSpaces (Description);
     }

@@ -1604,6 +1604,7 @@ GetVarStoreType (
   UINTN                    PackageOffset;
   EFI_IFR_OP_HEADER        *IfrOpHdr;
   CHAR16                   *VarStoreName;
+  UINTN                    NameSize;
   EFI_STRING               GuidStr;
   EFI_STRING               NameStr;
   EFI_STRING               TempStr;
@@ -1658,12 +1659,13 @@ GetVarStoreType (
         continue;
       }
 
-      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
+      NameSize = AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name);
+      VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
       if (VarStoreName == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      AsciiStrToUnicodeStr ((CHAR8 *) IfrEfiVarStore->Name, VarStoreName);
+      AsciiStrToUnicodeStrS ((CHAR8 *) IfrEfiVarStore->Name, VarStoreName, NameSize);
 
       GenerateSubStr (L"GUID=", sizeof (EFI_GUID), (VOID *) &IfrEfiVarStore->Guid, 1, &GuidStr);
       GenerateSubStr (L"NAME=", StrLen (VarStoreName) * sizeof (CHAR16), (VOID *) VarStoreName, 2, &NameStr);
@@ -1836,6 +1838,7 @@ IsThisPackageList (
   UINTN                    PackageOffset;
   EFI_IFR_OP_HEADER        *IfrOpHdr;
   CHAR16                   *VarStoreName;
+  UINTN                    NameSize;
   UINT8                    *HiiFormPackage;
   UINTN                    PackageSize;
   EFI_IFR_VARSTORE_EFI     *IfrEfiVarStore;
@@ -1880,11 +1883,12 @@ IsThisPackageList (
     case EFI_IFR_VARSTORE_OP:
       IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpHdr;
 
-      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrVarStore->Name) * sizeof (CHAR16));
+      NameSize = AsciiStrSize ((CHAR8 *)IfrVarStore->Name);
+      VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
       if (VarStoreName == NULL) {
         goto Done;
       }
-      AsciiStrToUnicodeStr ((CHAR8 *)IfrVarStore->Name, VarStoreName);
+      AsciiStrToUnicodeStrS ((CHAR8 *)IfrVarStore->Name, VarStoreName, NameSize);
 
       if (IsThisVarstore((VOID *)&IfrVarStore->Guid, VarStoreName, ConfigHdr)) {
         FindVarstore = TRUE;
@@ -1897,11 +1901,12 @@ IsThisPackageList (
 
     case EFI_IFR_VARSTORE_EFI_OP:
       IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpHdr;
-      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
+      NameSize = AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name);
+      VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
       if (VarStoreName == NULL) {
         goto Done;
       }
-      AsciiStrToUnicodeStr ((CHAR8 *)IfrEfiVarStore->Name, VarStoreName);
+      AsciiStrToUnicodeStrS ((CHAR8 *)IfrEfiVarStore->Name, VarStoreName, NameSize);
 
       if (IsThisVarstore (&IfrEfiVarStore->Guid, VarStoreName, ConfigHdr)) {
         FindVarstore = TRUE;
@@ -2086,6 +2091,7 @@ ParseIfrData (
   IFR_DEFAULT_DATA         *DefaultDataPtr;
   IFR_BLOCK_DATA           *BlockData;
   CHAR16                   *VarStoreName;
+  UINTN                    NameSize;
   UINT16                   VarWidth;
   UINT16                   VarDefaultId;
   BOOLEAN                  FirstOneOfOption;
@@ -2144,12 +2150,13 @@ ParseIfrData (
 
       IfrVarStore = (EFI_IFR_VARSTORE *) IfrOpHdr;
 
-      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrVarStore->Name) * sizeof (CHAR16));
+      NameSize = AsciiStrSize ((CHAR8 *)IfrVarStore->Name);
+      VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
       if (VarStoreName == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      AsciiStrToUnicodeStr ((CHAR8 *)IfrVarStore->Name, VarStoreName);
+      AsciiStrToUnicodeStrS ((CHAR8 *)IfrVarStore->Name, VarStoreName, NameSize);
 
       if (IsThisVarstore((VOID *)&IfrVarStore->Guid, VarStoreName, ConfigHdr)) {
         //
@@ -2185,12 +2192,13 @@ ParseIfrData (
         break;
       }
 
-      VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
+      NameSize = AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name);
+      VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
       if (VarStoreName == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
-      AsciiStrToUnicodeStr ((CHAR8 *)IfrEfiVarStore->Name, VarStoreName);
+      AsciiStrToUnicodeStrS ((CHAR8 *)IfrEfiVarStore->Name, VarStoreName, NameSize);
 
       if (IsThisVarstore (&IfrEfiVarStore->Guid, VarStoreName, ConfigHdr)) {
         //
@@ -3966,6 +3974,7 @@ GetConfigRespFromEfiVarStore (
 {
   EFI_STATUS Status;
   EFI_STRING VarStoreName;
+  UINTN      NameSize;
   UINT8      *VarStore;
   UINTN      BufferSize;
 
@@ -3974,13 +3983,14 @@ GetConfigRespFromEfiVarStore (
   VarStore        = NULL;
   VarStoreName    = NULL;
   *AccessProgress = Request;
-  
-  VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)EfiVarStoreInfo->Name) * sizeof (CHAR16));
+
+  NameSize = AsciiStrSize ((CHAR8 *)EfiVarStoreInfo->Name);
+  VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
   if (VarStoreName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  AsciiStrToUnicodeStr ((CHAR8 *) EfiVarStoreInfo->Name, VarStoreName);
+  AsciiStrToUnicodeStrS ((CHAR8 *) EfiVarStoreInfo->Name, VarStoreName, NameSize);
    
   
   Status = gRT->GetVariable (VarStoreName, &EfiVarStoreInfo->Guid, NULL, &BufferSize, NULL);
@@ -4041,6 +4051,7 @@ RouteConfigRespForEfiVarStore (
 {
   EFI_STATUS Status;
   EFI_STRING VarStoreName;
+  UINTN      NameSize;
   UINT8      *VarStore;
   UINTN      BufferSize;
   UINTN      BlockSize;
@@ -4050,12 +4061,13 @@ RouteConfigRespForEfiVarStore (
   VarStore     = NULL;
   VarStoreName = NULL;
 
-  VarStoreName = AllocateZeroPool (AsciiStrSize ((CHAR8 *)EfiVarStoreInfo->Name) * sizeof (CHAR16));
+  NameSize = AsciiStrSize ((CHAR8 *)EfiVarStoreInfo->Name);
+  VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
   if (VarStoreName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  AsciiStrToUnicodeStr ((CHAR8 *) EfiVarStoreInfo->Name, VarStoreName);
+  AsciiStrToUnicodeStrS ((CHAR8 *) EfiVarStoreInfo->Name, VarStoreName, NameSize);
       
   Status = gRT->GetVariable (VarStoreName, &EfiVarStoreInfo->Guid, NULL, &BufferSize, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
