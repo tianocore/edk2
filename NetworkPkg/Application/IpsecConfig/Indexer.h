@@ -2,7 +2,7 @@
   The internal structure and function declaration to construct ENTRY_INDEXER in
   IpSecConfig application.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -18,8 +18,8 @@
 #define _INDEXER_H_
 
 typedef struct {
-  UINT8    *Name;
-  UINTN    Index;    // Used only if Name is NULL.
+  UINT8    Name[MAX_PEERID_LEN];
+  UINTN    Index;    // Used only if Name buffer is filled with zero.
 } SPD_ENTRY_INDEXER;
 
 typedef struct {

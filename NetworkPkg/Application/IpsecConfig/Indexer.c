@@ -1,7 +1,7 @@
 /** @file
   The implementation of construct ENTRY_INDEXER in IpSecConfig application.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -44,17 +44,19 @@ ConstructSpdIndexer (
   } else if (ShellCommandLineGetFlag (ParamPackage, L"-e")) {
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-e");
   } else {
-    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
   }
 
-  ASSERT (ValueStr != NULL);
-
+  if (ValueStr == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  
   Value64 = StrToUInteger (ValueStr, &Status);
   if (!EFI_ERROR (Status)) {
     Indexer->Index = (UINTN) Value64;
-    Indexer->Name  = NULL;
+    ZeroMem (Indexer->Name, MAX_PEERID_LEN);
   } else {
-    UnicodeStrToAsciiStr (ValueStr, (CHAR8 *) Indexer->Name);
+    UnicodeStrToAsciiStrS (ValueStr, (CHAR8 *) Indexer->Name, MAX_PEERID_LEN);
   }
 
   return EFI_SUCCESS;
@@ -89,10 +91,12 @@ ConstructSadIndexer (
   } else if (ShellCommandLineGetFlag (ParamPackage, L"-e")) {
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-e");
   } else {
-    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
   }
 
-  ASSERT (ValueStr != NULL);
+  if (ValueStr == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Value64 = StrToUInteger (ValueStr, &Status);
   if (!EFI_ERROR (Status)) {
@@ -187,10 +191,12 @@ ConstructPadIndexer (
   } else if (ShellCommandLineGetFlag (ParamPackage, L"-e")) {
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-e");
   } else {
-    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
   }
 
-  ASSERT (ValueStr != NULL);
+  if (ValueStr == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Value64 = StrToUInteger (ValueStr, &Status);
 
