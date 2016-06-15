@@ -221,6 +221,7 @@ InitializeDp (
   BOOLEAN                       CumulativeMode;
   CONST CHAR16                  *CustomCumulativeToken;
   PERF_CUM_DATA                 *CustomCumulativeData;
+  UINTN                         NameSize;
   EFI_HII_PACKAGE_LIST_HEADER   *PackageList;
 
   EFI_STRING                StringDpOptionQh;
@@ -392,8 +393,9 @@ InitializeDp (
     CustomCumulativeData->MaxDur = 0;
     CustomCumulativeData->Count  = 0;
     CustomCumulativeData->Duration = 0;
-    CustomCumulativeData->Name   = AllocateZeroPool (StrLen (CustomCumulativeToken) + 1);
-    UnicodeStrToAsciiStr (CustomCumulativeToken, CustomCumulativeData->Name);
+    NameSize = StrLen (CustomCumulativeToken) + 1;
+    CustomCumulativeData->Name   = AllocateZeroPool (NameSize);
+    UnicodeStrToAsciiStrS (CustomCumulativeToken, CustomCumulativeData->Name, NameSize);
   }
 
 /****************************************************************************

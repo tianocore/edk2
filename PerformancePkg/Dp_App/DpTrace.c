@@ -1,7 +1,7 @@
 /** @file
   Trace reporting for the Dp utility.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -220,8 +220,8 @@ DumpAllTrace(
       ++Count;    // Count the number of records printed
 
       // If Handle is non-zero, see if we can determine a name for the driver
-      AsciiStrToUnicodeStr (Measurement.Module, mGaugeString); // Use Module by default
-      AsciiStrToUnicodeStr (Measurement.Token, mUnicodeToken);
+      AsciiStrToUnicodeStrS (Measurement.Module, mGaugeString, sizeof (mGaugeString) / sizeof (mGaugeString[0])); // Use Module by default
+      AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, sizeof (mUnicodeToken) / sizeof (mUnicodeToken[0]));
       if (Measurement.Handle != NULL) {
         // See if the Handle is in the HandleBuffer
         for (TIndex = 0; TIndex < HandleCount; TIndex++) {
@@ -594,7 +594,7 @@ ProcessHandles(
         continue;
       }
       mGaugeString[0] = 0;    // Empty driver name by default
-      AsciiStrToUnicodeStr (Measurement.Token, mUnicodeToken);
+      AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, sizeof (mUnicodeToken) / sizeof (mUnicodeToken[0]));
       // See if the Handle is in the HandleBuffer
       for (Index = 0; Index < HandleCount; Index++) {
         if (Measurement.Handle == HandleBuffer[Index]) {
@@ -777,8 +777,8 @@ ProcessGlobal(
                           &Measurement.EndTimeStamp,
                           &Measurement.Identifier)) != 0)
   {
-    AsciiStrToUnicodeStr (Measurement.Module, mGaugeString);
-    AsciiStrToUnicodeStr (Measurement.Token, mUnicodeToken);
+    AsciiStrToUnicodeStrS (Measurement.Module, mGaugeString, sizeof (mGaugeString) / sizeof (mGaugeString[0]));
+    AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, sizeof (mUnicodeToken) / sizeof (mUnicodeToken[0]));
     mGaugeString[25] = 0;
     mUnicodeToken[31] = 0;
     if ( ! ( IsPhase( &Measurement)  ||
