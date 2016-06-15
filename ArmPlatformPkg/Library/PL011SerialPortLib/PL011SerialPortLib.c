@@ -2,7 +2,7 @@
   Serial I/O Port library functions with no library constructor/destructor
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2012 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2012 - 2016, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -44,14 +44,19 @@ SerialPortInitialize (
   EFI_STOP_BITS_TYPE  StopBits;
 
   BaudRate = (UINTN)PcdGet64 (PcdUartDefaultBaudRate);
-  ReceiveFifoDepth = 0; // Use the default value for Fifo depth
+  ReceiveFifoDepth = 0;         // Use default FIFO depth
   Parity = (EFI_PARITY_TYPE)PcdGet8 (PcdUartDefaultParity);
   DataBits = PcdGet8 (PcdUartDefaultDataBits);
   StopBits = (EFI_STOP_BITS_TYPE) PcdGet8 (PcdUartDefaultStopBits);
 
   return PL011UartInitializePort (
       (UINTN)PcdGet64 (PcdSerialRegisterBase),
-      &BaudRate, &ReceiveFifoDepth, &Parity, &DataBits, &StopBits);
+      &BaudRate,
+      &ReceiveFifoDepth,
+      &Parity,
+      &DataBits,
+      &StopBits
+      );
 }
 
 /**
@@ -113,24 +118,32 @@ SerialPortPoll (
 /**
   Set new attributes to PL011.
 
-  @param  BaudRate                The baud rate of the serial device. If the baud rate is not supported,
-                                  the speed will be reduced down to the nearest supported one and the
-                                  variable's value will be updated accordingly.
-  @param  ReceiveFifoDepth        The number of characters the device will buffer on input. If the specified
-                                  value is not supported, the variable's value will be reduced down to the
-                                  nearest supported one.
-  @param  Timeout                 If applicable, the number of microseconds the device will wait
-                                  before timing out a Read or a Write operation.
-  @param  Parity                  If applicable, this is the EFI_PARITY_TYPE that is computed or checked
-                                  as each character is transmitted or received. If the device does not
-                                  support parity, the value is the default parity value.
+  @param  BaudRate                The baud rate of the serial device. If the
+                                  baud rate is not supported, the speed will
+                                  be reduced down to the nearest supported one
+                                  and the variable's value will be updated
+                                  accordingly.
+  @param  ReceiveFifoDepth        The number of characters the device will
+                                  buffer on input. If the specified value is
+                                  not supported, the variable's value will
+                                  be reduced down to the nearest supported one.
+  @param  Timeout                 If applicable, the number of microseconds the
+                                  device will wait before timing out a Read or
+                                  a Write operation.
+  @param  Parity                  If applicable, this is the EFI_PARITY_TYPE
+                                  that is computed or checked as each character
+                                  is transmitted or received. If the device
+                                  does not support parity, the value is the
+                                  default parity value.
   @param  DataBits                The number of data bits in each character
-  @param  StopBits                If applicable, the EFI_STOP_BITS_TYPE number of stop bits per character.
-                                  If the device does not support stop bits, the value is the default stop
-                                  bit value.
+  @param  StopBits                If applicable, the EFI_STOP_BITS_TYPE number
+                                  of stop bits per character. If the device
+                                  does not support stop bits, the value is the
+                                  default stop bit value.
 
-  @retval EFI_SUCCESS             All attributes were set correctly on the serial device.
-  @retval EFI_INVALID_PARAMETERS  One or more of the attributes has an unsupported value.
+  @retval EFI_SUCCESS             All attributes were set correctly.
+  @retval EFI_INVALID_PARAMETERS  One or more attributes has an unsupported
+                                  value.
 
 **/
 RETURN_STATUS
@@ -145,12 +158,13 @@ SerialPortSetAttributes (
   )
 {
   return PL011UartInitializePort (
-        (UINTN)PcdGet64 (PcdSerialRegisterBase),
-        BaudRate,
-        ReceiveFifoDepth,
-        Parity,
-        DataBits,
-        StopBits);
+    (UINTN)PcdGet64 (PcdSerialRegisterBase),
+    BaudRate,
+    ReceiveFifoDepth,
+    Parity,
+    DataBits,
+    StopBits
+    );
 }
 
 /**
@@ -175,8 +189,8 @@ SerialPortSetAttributes (
                          disable the hardware flow control based on CTS (Clear
                          To Send) and RTS (Ready To Send) control signals.
 
-  @retval  RETURN_SUCCESS      The new control bits were set on the serial device.
-  @retval  RETURN_UNSUPPORTED  The serial device does not support this operation.
+  @retval  RETURN_SUCCESS      The new control bits were set on the device.
+  @retval  RETURN_UNSUPPORTED  The device does not support this operation.
 
 **/
 RETURN_STATUS
@@ -194,26 +208,30 @@ SerialPortSetControl (
 
   @param[out]  Control  Status of the control bits on a serial device :
 
-                        . EFI_SERIAL_DATA_CLEAR_TO_SEND, EFI_SERIAL_DATA_SET_READY,
-                          EFI_SERIAL_RING_INDICATE, EFI_SERIAL_CARRIER_DETECT,
-                          EFI_SERIAL_REQUEST_TO_SEND, EFI_SERIAL_DATA_TERMINAL_READY
-                          are all related to the DTE (Data Terminal Equipment) and
-                          DCE (Data Communication Equipment) modes of operation of
-                          the serial device.
-                        . EFI_SERIAL_INPUT_BUFFER_EMPTY : equal to one if the receive
-                          buffer is empty, 0 otherwise.
-                        . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the transmit
-                          buffer is empty, 0 otherwise.
-                        . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if the
-                          hardware loopback is enabled (the output feeds the receive
-                          buffer), 0 otherwise.
-                        . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one if a
-                          loopback is accomplished by software, 0 otherwise.
-                        . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : equal to one if the
-                          hardware flow control based on CTS (Clear To Send) and RTS
-                          (Ready To Send) control signals is enabled, 0 otherwise.
+                        . EFI_SERIAL_DATA_CLEAR_TO_SEND,
+                          EFI_SERIAL_DATA_SET_READY,
+                          EFI_SERIAL_RING_INDICATE,
+                          EFI_SERIAL_CARRIER_DETECT,
+                          EFI_SERIAL_REQUEST_TO_SEND,
+                          EFI_SERIAL_DATA_TERMINAL_READY
+                          are all related to the DTE (Data Terminal Equipment)
+                          and DCE (Data Communication Equipment) modes of
+                          operation of the serial device.
+                        . EFI_SERIAL_INPUT_BUFFER_EMPTY : equal to one if the
+                          receive buffer is empty, 0 otherwise.
+                        . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the
+                          transmit buffer is empty, 0 otherwise.
+                        . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if
+                          the hardware loopback is enabled (the output feeds
+                          the receive buffer), 0 otherwise.
+                        . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one
+                          if a loopback is accomplished by software, else 0.
+                        . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : equal to
+                          one if the hardware flow control based on CTS (Clear
+                          To Send) and RTS (Ready To Send) control signals is
+                          enabled, 0 otherwise.
 
-  @retval RETURN_SUCCESS  The control bits were read from the serial device.
+  @retval RETURN_SUCCESS  The control bits were read from the device.
 
 **/
 RETURN_STATUS

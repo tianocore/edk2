@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2016, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -91,15 +91,38 @@
 
 /*
 
-  Programmed hardware of Serial port.
+  Initialise the serial port to the specified settings.
+  All unspecified settings will be set to the default values.
 
-  @return    Always return EFI_UNSUPPORTED.
+  @param  UartBase                The base address of the serial device.
+  @param  BaudRate                The baud rate of the serial device. If the
+                                  baud rate is not supported, the speed will be
+                                  reduced to the nearest supported one and the
+                                  variable's value will be updated accordingly.
+  @param  ReceiveFifoDepth        The number of characters the device will
+                                  buffer on input.  Value of 0 will use the
+                                  device's default FIFO depth.
+  @param  Parity                  If applicable, this is the EFI_PARITY_TYPE
+                                  that is computed or checked as each character
+                                  is transmitted or received. If the device
+                                  does not support parity, the value is the
+                                  default parity value.
+  @param  DataBits                The number of data bits in each character.
+  @param  StopBits                If applicable, the EFI_STOP_BITS_TYPE number
+                                  of stop bits per character.
+                                  If the device does not support stop bits, the
+                                  value is the default stop bit value.
+
+  @retval RETURN_SUCCESS            All attributes were set correctly on the
+                                    serial device.
+  @retval RETURN_INVALID_PARAMETER  One or more of the attributes has an
+                                    unsupported value.
 
 **/
 RETURN_STATUS
 EFIAPI
 PL011UartInitializePort (
-  IN OUT UINTN               UartBase,
+  IN     UINTN               UartBase,
   IN OUT UINT64              *BaudRate,
   IN OUT UINT32              *ReceiveFifoDepth,
   IN OUT EFI_PARITY_TYPE     *Parity,
@@ -130,8 +153,8 @@ PL011UartInitializePort (
                           disable the hardware flow control based on CTS (Clear
                           To Send) and RTS (Ready To Send) control signals.
 
-  @retval  RETURN_SUCCESS      The new control bits were set on the serial device.
-  @retval  RETURN_UNSUPPORTED  The serial device does not support this operation.
+  @retval  RETURN_SUCCESS      The new control bits were set on the device.
+  @retval  RETURN_UNSUPPORTED  The device does not support this operation.
 
 **/
 RETURN_STATUS
@@ -148,25 +171,28 @@ PL011UartSetControl (
   @param[in]   UartBase  UART registers base address
   @param[out]  Control   Status of the control bits on a serial device :
 
-                         . EFI_SERIAL_DATA_CLEAR_TO_SEND, EFI_SERIAL_DATA_SET_READY,
-                           EFI_SERIAL_RING_INDICATE, EFI_SERIAL_CARRIER_DETECT,
-                           EFI_SERIAL_REQUEST_TO_SEND, EFI_SERIAL_DATA_TERMINAL_READY
-                           are all related to the DTE (Data Terminal Equipment) and
-                           DCE (Data Communication Equipment) modes of operation of
-                           the serial device.
-                         . EFI_SERIAL_INPUT_BUFFER_EMPTY : equal to one if the receive
-                           buffer is empty, 0 otherwise.
-                         . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the transmit
-                           buffer is empty, 0 otherwise.
-                         . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if the
-                           hardware loopback is enabled (the ouput feeds the receive
-                           buffer), 0 otherwise.
-                         . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one if a
-                           loopback is accomplished by software, 0 otherwise.
-                         . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : equal to one if the
-                           hardware flow control based on CTS (Clear To Send) and RTS
-                           (Ready To Send) control signals is enabled, 0 otherwise.
-
+                         . EFI_SERIAL_DATA_CLEAR_TO_SEND,
+                           EFI_SERIAL_DATA_SET_READY,
+                           EFI_SERIAL_RING_INDICATE,
+                           EFI_SERIAL_CARRIER_DETECT,
+                           EFI_SERIAL_REQUEST_TO_SEND,
+                           EFI_SERIAL_DATA_TERMINAL_READY
+                           are all related to the DTE (Data Terminal Equipment)
+                           and DCE (Data Communication Equipment) modes of
+                           operation of the serial device.
+                         . EFI_SERIAL_INPUT_BUFFER_EMPTY : equal to one if the
+                           receive buffer is empty, 0 otherwise.
+                         . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the
+                           transmit buffer is empty, 0 otherwise.
+                         . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if
+                           the hardware loopback is enabled (the ouput feeds the
+                           receive buffer), 0 otherwise.
+                         . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one if
+                           a loopback is accomplished by software, 0 otherwise.
+                         . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : equal to
+                           one if the hardware flow control based on CTS (Clear
+                           To Send) and RTS (Ready To Send) control signals is
+                           enabled, 0 otherwise.
 
   @retval RETURN_SUCCESS  The control bits were read from the serial device.
 

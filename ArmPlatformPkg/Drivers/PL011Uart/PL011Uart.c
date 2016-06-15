@@ -2,7 +2,7 @@
   Serial I/O Port library functions with no library constructor/destructor
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -20,24 +20,49 @@
 
 #include <Drivers/PL011Uart.h>
 
+#define FRACTION_PART_SIZE_IN_BITS  6
+#define FRACTION_PART_MASK          ((1 << FRACTION_PART_SIZE_IN_BITS) - 1)
+
 //
 // EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE is the only
 // control bit that is not supported.
 //
 STATIC CONST UINT32 mInvalidControlBits = EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE;
 
-/*
+/**
 
   Initialise the serial port to the specified settings.
   All unspecified settings will be set to the default values.
 
-  @return    Always return EFI_SUCCESS or EFI_INVALID_PARAMETER.
+  @param  UartBase                The base address of the serial device.
+  @param  BaudRate                The baud rate of the serial device. If the
+                                  baud rate is not supported, the speed will be
+                                  reduced to the nearest supported one and the
+                                  variable's value will be updated accordingly.
+  @param  ReceiveFifoDepth        The number of characters the device will
+                                  buffer on input.  Value of 0 will use the
+                                  device's default FIFO depth.
+  @param  Parity                  If applicable, this is the EFI_PARITY_TYPE
+                                  that is computed or checked as each character
+                                  is transmitted or received. If the device
+                                  does not support parity, the value is the
+                                  default parity value.
+  @param  DataBits                The number of data bits in each character.
+  @param  StopBits                If applicable, the EFI_STOP_BITS_TYPE number
+                                  of stop bits per character.
+                                  If the device does not support stop bits, the
+                                  value is the default stop bit value.
+
+  @retval RETURN_SUCCESS            All attributes were set correctly on the
+                                    serial device.
+  @retval RETURN_INVALID_PARAMETER  One or more of the attributes has an
+                                    unsupported value.
 
 **/
 RETURN_STATUS
 EFIAPI
 PL011UartInitializePort (
-  IN OUT UINTN               UartBase,
+  IN     UINTN               UartBase,
   IN OUT UINT64              *BaudRate,
   IN OUT UINT32              *ReceiveFifoDepth,
   IN OUT EFI_PARITY_TYPE     *Parity,
@@ -51,9 +76,10 @@ PL011UartInitializePort (
   LineControl = 0;
 
   // The PL011 supports a buffer of 1, 16 or 32 chars. Therefore we can accept
-  // 1 char buffer as the minimum fifo size. Because everything can be rounded down,
-  // there is no maximum fifo size.
+  // 1 char buffer as the minimum FIFO size. Because everything can be rounded
+  // down, there is no maximum FIFO size.
   if ((*ReceiveFifoDepth == 0) || (*ReceiveFifoDepth >= 32)) {
+    // Enable FIFO
     LineControl |= PL011_UARTLCR_H_FEN;
     if (PL011_UARTPID2_VER (MmioRead32 (UartBase + UARTPID2)) > PL011_VER_R1P4)
       *ReceiveFifoDepth = 32;
@@ -61,7 +87,7 @@ PL011UartInitializePort (
       *ReceiveFifoDepth = 16;
   } else {
     ASSERT (*ReceiveFifoDepth < 32);
-    // Nothing else to do. 1 byte fifo is default.
+    // Nothing else to do. 1 byte FIFO is default.
     *ReceiveFifoDepth = 1;
   }
 
@@ -81,7 +107,9 @@ PL011UartInitializePort (
     LineControl |= PL011_UARTLCR_H_PEN;
     break;
   case MarkParity:
-    LineControl |= (PL011_UARTLCR_H_PEN | PL011_UARTLCR_H_SPS | PL011_UARTLCR_H_EPS);
+    LineControl |= (  PL011_UARTLCR_H_PEN \
+                    | PL011_UARTLCR_H_SPS \
+                    | PL011_UARTLCR_H_EPS);
     break;
   case SpaceParity:
     LineControl |= (PL011_UARTLCR_H_PEN | PL011_UARTLCR_H_SPS);
@@ -125,7 +153,7 @@ PL011UartInitializePort (
     LineControl |= PL011_UARTLCR_H_STP2;
     break;
   case OneFiveStopBits:
-    // Only 1 or 2 stops bits are supported
+    // Only 1 or 2 stop bits are supported
   default:
     return RETURN_INVALID_PARAMETER;
   }
@@ -139,7 +167,7 @@ PL011UartInitializePort (
   // Baud Rate
   //
 
-  // If PL011 Integral value has been defined then always ignore the BAUD rate
+  // If PL011 Integer value has been defined then always ignore the BAUD rate
   if (PcdGet32 (PL011UartInteger) != 0) {
       MmioWrite32 (UartBase + UARTIBRD, PcdGet32 (PL011UartInteger));
       MmioWrite32 (UartBase + UARTFBRD, PcdGet32 (PL011UartFractional));
@@ -151,8 +179,8 @@ PL011UartInitializePort (
     }
 
     Divisor = (PcdGet32 (PL011UartClkInHz) * 4) / *BaudRate;
-    MmioWrite32 (UartBase + UARTIBRD, Divisor >> 6);
-    MmioWrite32 (UartBase + UARTFBRD, Divisor & 0x3F);
+    MmioWrite32 (UartBase + UARTIBRD, Divisor >> FRACTION_PART_SIZE_IN_BITS);
+    MmioWrite32 (UartBase + UARTFBRD, Divisor & FRACTION_PART_MASK);
   }
 
   // No parity, 1 stop, no fifo, 8 data bits
@@ -161,8 +189,9 @@ PL011UartInitializePort (
   // Clear any pending errors
   MmioWrite32 (UartBase + UARTECR, 0);
 
-  // Enable tx, rx, and uart overall
-  MmioWrite32 (UartBase + UARTCR, PL011_UARTCR_RXE | PL011_UARTCR_TXE | PL011_UARTCR_UARTEN);
+  // Enable Tx, Rx, and UART overall
+  MmioWrite32 (UartBase + UARTCR,
+               PL011_UARTCR_RXE | PL011_UARTCR_TXE | PL011_UARTCR_UARTEN);
 
   return RETURN_SUCCESS;
 }
@@ -190,8 +219,8 @@ PL011UartInitializePort (
                           disable the hardware flow control based on CTS (Clear
                           To Send) and RTS (Ready To Send) control signals.
 
-  @retval  RETURN_SUCCESS      The new control bits were set on the serial device.
-  @retval  RETURN_UNSUPPORTED  The serial device does not support this operation.
+  @retval  RETURN_SUCCESS      The new control bits were set on the device.
+  @retval  RETURN_UNSUPPORTED  The device does not support this operation.
 
 **/
 RETURN_STATUS
@@ -245,24 +274,28 @@ PL011UartSetControl (
   @param[in]   UartBase  UART registers base address
   @param[out]  Control   Status of the control bits on a serial device :
 
-                         . EFI_SERIAL_DATA_CLEAR_TO_SEND, EFI_SERIAL_DATA_SET_READY,
-                           EFI_SERIAL_RING_INDICATE, EFI_SERIAL_CARRIER_DETECT,
-                           EFI_SERIAL_REQUEST_TO_SEND, EFI_SERIAL_DATA_TERMINAL_READY
-                           are all related to the DTE (Data Terminal Equipment) and
-                           DCE (Data Communication Equipment) modes of operation of
-                           the serial device.
-                         . EFI_SERIAL_INPUT_BUFFER_EMPTY : equal to one if the receive
-                           buffer is empty, 0 otherwise.
-                         . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the transmit
-                           buffer is empty, 0 otherwise.
-                         . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if the
-                           hardware loopback is enabled (the ouput feeds the receive
-                           buffer), 0 otherwise.
-                         . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one if a
-                           loopback is accomplished by software, 0 otherwise.
-                         . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : equal to one if the
-                           hardware flow control based on CTS (Clear To Send) and RTS
-                           (Ready To Send) control signals is enabled, 0 otherwise.
+                         . EFI_SERIAL_DATA_CLEAR_TO_SEND,
+                           EFI_SERIAL_DATA_SET_READY,
+                           EFI_SERIAL_RING_INDICATE,
+                           EFI_SERIAL_CARRIER_DETECT,
+                           EFI_SERIAL_REQUEST_TO_SEND,
+                           EFI_SERIAL_DATA_TERMINAL_READY
+                           are all related to the DTE (Data Terminal Equipment)
+                           and DCE (Data Communication Equipment) modes of
+                           operation of the serial device.
+                         . EFI_SERIAL_INPUT_BUFFER_EMPTY : equal to one if the
+                           receive buffer is empty, 0 otherwise.
+                         . EFI_SERIAL_OUTPUT_BUFFER_EMPTY : equal to one if the
+                           transmit buffer is empty, 0 otherwise.
+                         . EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE : equal to one if
+                           the hardware loopback is enabled (the ouput feeds the
+                           receive buffer), 0 otherwise.
+                         . EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE : equal to one if
+                           a loopback is accomplished by software, 0 otherwise.
+                         . EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE : equal to
+                           one if the hardware flow control based on CTS (Clear
+                           To Send) and RTS (Ready To Send) control signals is
+                           enabled, 0 otherwise.
 
   @retval RETURN_SUCCESS  The control bits were read from the serial device.
 
