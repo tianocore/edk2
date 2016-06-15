@@ -1,7 +1,7 @@
 /** @file
   The implementation of match policy entry function in IpSecConfig application.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -63,7 +63,7 @@ MatchSpdEntry (
   BOOLEAN    Match;
 
   Match = FALSE;
-  if (Indexer->Name != NULL) {
+  if (!IsMemoryZero (Indexer->Name, MAX_PEERID_LEN)) {
     if ((Data->Name != NULL) && (AsciiStrCmp ((CHAR8 *) Indexer->Name, (CHAR8 *) Data->Name) == 0)) {
       Match = TRUE;
     }
