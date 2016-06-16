@@ -753,6 +753,7 @@ DevicePathProtocolDumpInformation(
   CHAR16                            *Temp;
   CHAR16                            *Temp2;
   EFI_STATUS                        Status;
+  UINTN                             Size;
   Temp = NULL;
 
   Status = gBS->OpenProtocol(TheHandle, &gEfiDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
@@ -765,7 +766,9 @@ DevicePathProtocolDumpInformation(
   }
   if (!Verbose && Temp != NULL && StrLen(Temp) > 30) {
     Temp2 = NULL;
-    Temp2 = StrnCatGrow(&Temp2, NULL, Temp+(StrLen(Temp) - 30), 30);
+    Size  = 0;
+    Temp2 = StrnCatGrow(&Temp2, &Size, L"..", 0);
+    Temp2 = StrnCatGrow(&Temp2, &Size, Temp+(StrLen(Temp) - 28), 0);
     FreePool(Temp);
     Temp = Temp2;
   }
