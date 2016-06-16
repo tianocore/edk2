@@ -81,7 +81,7 @@
   PeiServicesTablePointerLib
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmLib
+  ArmMmuLib
 
 [Ppis]
   gEfiDxeIplPpiGuid                 ## PRODUCES

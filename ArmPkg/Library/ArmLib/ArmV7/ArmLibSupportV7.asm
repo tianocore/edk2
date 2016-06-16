@@ -30,12 +30,6 @@
   movne   R0, #0
   bx      LR
 
- RVCT_ASM_EXPORT ArmHasMpExtensions
-  mrc     p15,0,R0,c0,c0,5
-  // Get Multiprocessing extension (bit31)
-  lsr     R0, R0, #31
-  bx      LR
-
  RVCT_ASM_EXPORT ArmEnableAsynchronousAbort
   cpsie   a
   isb

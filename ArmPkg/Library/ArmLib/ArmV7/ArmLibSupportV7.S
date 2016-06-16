@@ -45,12 +45,6 @@ ASM_PFX(ArmIsMpCore):
   movne   R0, #0
   bx      LR
 
-ASM_PFX(ArmHasMpExtensions):
-  mrc     p15,0,R0,c0,c0,5
-  // Get Multiprocessing extension (bit31)
-  lsr     R0, R0, #31
-  bx      LR
-
 ASM_PFX(ArmEnableAsynchronousAbort):
   cpsie   a
   isb

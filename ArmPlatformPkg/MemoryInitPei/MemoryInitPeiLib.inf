@@ -33,7 +33,7 @@
 [LibraryClasses]
   DebugLib
   HobLib
-  ArmLib
+  ArmMmuLib
   ArmPlatformLib
 
 [Guids]

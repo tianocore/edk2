@@ -29,7 +29,6 @@
   ../Common/ArmLib.c
 
   AArch64Lib.c
-  AArch64Mmu.c
 
   AArch64ArchTimer.c
   AArch64ArchTimerSupport.S

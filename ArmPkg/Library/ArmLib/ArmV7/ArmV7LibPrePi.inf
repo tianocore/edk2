@@ -33,7 +33,6 @@
   ArmV7Support.asm  | RVCT
 
   ArmV7Lib.c
-  ArmV7Mmu.c
 
   ArmV7ArchTimer.c
   ArmV7ArchTimerSupport.S    | GCC

@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 
-#include <Library/ArmLib.h>
+#include <Library/ArmMmuLib.h>
 
 /**
    Transfers control to DxeCore.

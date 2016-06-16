@@ -36,17 +36,5 @@ ArmV7AllDataCachesOperation (
   IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
   );
 
-UINTN
-EFIAPI
-ArmReadIdMmfr0 (
-  VOID
-  );
-
-BOOLEAN
-EFIAPI
-ArmHasMpExtensions (
-  VOID
-  );
-
 #endif // __ARM_V7_LIB_H__
 

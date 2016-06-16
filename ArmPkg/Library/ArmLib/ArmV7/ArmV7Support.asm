@@ -295,8 +295,4 @@ Finished
   mrc    p15, 0, r0, c0, c1, 1     ; Read ID_PFR1 Register
   bx     lr
 
- RVCT_ASM_EXPORT ArmReadIdMmfr0
-  mrc    p15, 0, r0, c0, c1, 4     ; Read ID_MMFR0 Register
-  bx     lr
-
  END

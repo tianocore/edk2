@@ -45,6 +45,7 @@
 
 [LibraryClasses]
   ArmLib
+  ArmMmuLib
   BaseMemoryLib
   CacheMaintenanceLib
   CpuLib

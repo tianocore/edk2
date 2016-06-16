@@ -371,14 +371,6 @@ ArmGetTTBR0BaseAddress (
   VOID
   );
 
-RETURN_STATUS
-EFIAPI
-ArmConfigureMmu (
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable,
-  OUT VOID                         **TranslationTableBase OPTIONAL,
-  OUT UINTN                         *TranslationTableSize  OPTIONAL
-  );
-
 BOOLEAN
 EFIAPI
 ArmMmuEnabled (
@@ -593,36 +585,6 @@ VOID
 EFIAPI
 ArmUnsetCpuActlrBit (
   IN  UINTN    Bits
-  );
-
-RETURN_STATUS
-ArmSetMemoryRegionNoExec (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
-  );
-
-RETURN_STATUS
-ArmClearMemoryRegionNoExec (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
-  );
-
-RETURN_STATUS
-ArmSetMemoryRegionReadOnly (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
-  );
-
-RETURN_STATUS
-ArmClearMemoryRegionReadOnly (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
-  );
-
-VOID
-ArmReplaceLiveTranslationEntry (
-  IN  UINT64  *Entry,
-  IN  UINT64  Value
   );
 
 #endif // __ARM_LIB__
