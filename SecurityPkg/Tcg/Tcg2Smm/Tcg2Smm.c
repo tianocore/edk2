@@ -284,8 +284,8 @@ UpdatePPVersion (
   for (DataPtr  = (UINT8 *)(Table + 1);
        DataPtr <= (UINT8 *) ((UINT8 *) Table + Table->Length - PHYSICAL_PRESENCE_VERSION_SIZE);
        DataPtr += 1) {
-    if (AsciiStrCmp(DataPtr,  PHYSICAL_PRESENCE_VERSION_TAG) == 0) {
-      Status = AsciiStrCpyS(DataPtr, PHYSICAL_PRESENCE_VERSION_SIZE, PPVer);
+    if (AsciiStrCmp((CHAR8 *)DataPtr,  PHYSICAL_PRESENCE_VERSION_TAG) == 0) {
+      Status = AsciiStrCpyS((CHAR8 *)DataPtr, PHYSICAL_PRESENCE_VERSION_SIZE, PPVer);
       DEBUG((EFI_D_INFO, "TPM2 Physical Presence Interface Version update status 0x%x\n", Status));
       return Status;
     }
