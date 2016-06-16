@@ -300,7 +300,7 @@ GraphicsOutputProtocolDumpInformation(
              );
 
   SHELL_FREE_NON_NULL (Temp);
-  
+
   Temp = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN (STR_GOP_RES_LIST_MAIN), NULL);
   if (Temp == NULL) {
     SHELL_FREE_NON_NULL (RetVal);
@@ -980,7 +980,7 @@ AdapterInformationDumpInformation (
                          RetVal,
                          TempStr,
                          ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *)InformationBlock)->Ipv6Support
-                         );   
+                         );
           SHELL_FREE_NON_NULL (RetVal);
           RetVal = TempRetVal;
         } else {
@@ -2975,7 +2975,7 @@ GetHandleListByProtocolList (
   }
 
   //
-  // No handles were found... 
+  // No handles were found...
   //
   if (TotalSize == sizeof(EFI_HANDLE)) {
     return (NULL);
@@ -3013,13 +3013,3 @@ GetHandleListByProtocolList (
 
   return (HandleList);
 }
-
-
-
-
-
-
-
-
-
-
