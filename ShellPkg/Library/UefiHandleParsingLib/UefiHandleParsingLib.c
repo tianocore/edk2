@@ -731,6 +731,42 @@ DriverEfiVersionProtocolDumpInformation(
   UnicodeSPrint(RetVal, VersionStringSize, L"0x%08x", DriverEfiVersion->FirmwareVersion);
   return (RetVal);
 }
+/**
+  Function to convert device path to string.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] DevPath        Pointer to device path instance.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+  @param[in] Length         Maximum allowed text length of the device path.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+ConvertDevicePathToShortText(
+  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevPath,
+  IN CONST BOOLEAN                  Verbose,
+  IN CONST UINTN                    Length
+  )
+{
+  CHAR16                            *Temp;
+  CHAR16                            *Temp2;
+  UINTN                             Size;
+
+  //
+  // I cannot decide whether to allow shortcuts here (the second BOOLEAN on the next line)
+  //
+  Temp = ConvertDevicePathToText(DevPath, TRUE, TRUE);
+  if (!Verbose && Temp != NULL && StrLen(Temp) > Length) {
+    Temp2 = NULL;
+    Size  = 0;
+    Temp2 = StrnCatGrow(&Temp2, &Size, L"..", 0);
+    Temp2 = StrnCatGrow(&Temp2, &Size, Temp+(StrLen(Temp) - (Length - 2)), 0);
+    FreePool(Temp);
+    Temp = Temp2;
+  }
+  return (Temp);
+}
 
 /**
   Function to dump information about DevicePath protocol.
@@ -740,7 +776,7 @@ DriverEfiVersionProtocolDumpInformation(
   @param[in] TheHandle      The handle that has the protocol installed.
   @param[in] Verbose        TRUE for additional information, FALSE otherwise.
 
-  @retval A poitner to a string containing the information.
+  @retval A pointer to a string containing the information.
 **/
 CHAR16*
 EFIAPI
@@ -751,26 +787,43 @@ DevicePathProtocolDumpInformation(
 {
   EFI_DEVICE_PATH_PROTOCOL          *DevPath;
   CHAR16                            *Temp;
-  CHAR16                            *Temp2;
   EFI_STATUS                        Status;
-  UINTN                             Size;
   Temp = NULL;
 
   Status = gBS->OpenProtocol(TheHandle, &gEfiDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
   if (!EFI_ERROR(Status)) {
-    //
-    // I cannot decide whether to allow shortcuts here (the second BOOLEAN on the next line)
-    //
-    Temp = ConvertDevicePathToText(DevPath, TRUE, TRUE);
+    Temp = ConvertDevicePathToShortText (DevPath, Verbose, 30);
     gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
   }
-  if (!Verbose && Temp != NULL && StrLen(Temp) > 30) {
-    Temp2 = NULL;
-    Size  = 0;
-    Temp2 = StrnCatGrow(&Temp2, &Size, L"..", 0);
-    Temp2 = StrnCatGrow(&Temp2, &Size, Temp+(StrLen(Temp) - 28), 0);
-    FreePool(Temp);
-    Temp = Temp2;
+  return (Temp);
+}
+
+/**
+  Function to dump information about LoadedImageDevicePath protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+LoadedImageDevicePathProtocolDumpInformation(
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
+  CHAR16                            *Temp;
+  EFI_STATUS                        Status;
+  Temp = NULL;
+
+  Status = gBS->OpenProtocol(TheHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (!EFI_ERROR(Status)) {
+    Temp = ConvertDevicePathToShortText (DevPath, Verbose, 30);
+    gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
   }
   return (Temp);
 }
@@ -1454,7 +1507,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringListNT[] = {
 STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_LOADED_IMAGE),          &gEfiLoadedImageProtocolGuid,                     LoadedImageProtocolDumpInformation},
   {STRING_TOKEN(STR_DEVICE_PATH),           &gEfiDevicePathProtocolGuid,                      DevicePathProtocolDumpInformation},
-  {STRING_TOKEN(STR_IMAGE_PATH),            &gEfiLoadedImageDevicePathProtocolGuid,           DevicePathProtocolDumpInformation},
+  {STRING_TOKEN(STR_IMAGE_PATH),            &gEfiLoadedImageDevicePathProtocolGuid,           LoadedImageDevicePathProtocolDumpInformation},
   {STRING_TOKEN(STR_DEVICE_PATH_UTIL),      &gEfiDevicePathUtilitiesProtocolGuid,             NULL},
   {STRING_TOKEN(STR_DEVICE_PATH_TXT),       &gEfiDevicePathToTextProtocolGuid,                NULL},
   {STRING_TOKEN(STR_DEVICE_PATH_FTXT),      &gEfiDevicePathFromTextProtocolGuid,              NULL},
