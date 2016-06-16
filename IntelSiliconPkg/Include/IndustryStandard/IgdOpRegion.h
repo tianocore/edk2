@@ -117,3 +117,10 @@ typedef struct {
 typedef struct {
   INTEL_IGD_OPREGION_HEADER Header; ///< OpRegion header
   INTEL_IGD_OPREGION_MBOX1  MBox1;  ///< Mailbox 1: Public ACPI Methods
+  INTEL_IGD_OPREGION_MBOX2  MBox2;  ///< Mailbox 2: Software SCI Inteface
+  INTEL_IGD_OPREGION_MBOX3  MBox3;  ///< Mailbox 3: BIOS/Driver Communication
+  INTEL_IGD_OPREGION_VBT    VBT;    ///< VBT: Video BIOS Table (OEM customizable data)
+} IGD_IGD_OPREGION_STRUCTURE;
+#pragma pack()
+
+#endif
