@@ -201,3 +201,7 @@
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2FinalLogAreaLen_HELP  #language en-US "This PCD defines length(in bytes) of the TCG2 Final event log area."
 
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_PROMPT  #language en-US "Version of Physical Presence interface supported by platform."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_HELP  #language en-US "Null-terminated string of the Version of Physical Presence interface supported by platform."
+
