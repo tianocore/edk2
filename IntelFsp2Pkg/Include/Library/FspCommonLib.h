@@ -234,13 +234,13 @@ GetFspInfoHeaderFromApiContext (
   );
 
 /**
-  This function gets the VPD data pointer.
+  This function gets the CfgRegion data pointer.
 
-  @return VpdDataRgnPtr   VPD data pointer.
+  @return CfgRegion data pointer.
 **/
 VOID *
 EFIAPI
-GetFspVpdDataPointer (
+GetFspCfgRegionDataPointer (
   VOID
   );
 
