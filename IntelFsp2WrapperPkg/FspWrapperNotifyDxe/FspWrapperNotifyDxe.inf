@@ -49,6 +49,7 @@
   DxeServicesLib
   PerformanceLib
   HobLib
+  FspWrapperPlatformLib
 
 [Protocols]
   gEfiPciEnumerationCompleteProtocolGuid            ## CONSUMES

@@ -88,6 +88,15 @@ PeiFspMemoryInit (
   PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, TimeStampCounterStart, 0xD000);
   PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0xD07F);
   DEBUG ((DEBUG_INFO, "Total time spent executing FspMemoryInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
+
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FspMemoryInitApi requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
+
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "ERROR - Failed to execute FspMemoryInitApi(), Status = %r\n", Status));
   }
