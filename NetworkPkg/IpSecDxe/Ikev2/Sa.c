@@ -2,7 +2,7 @@
   The operations for IKEv2 SA.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -102,7 +102,9 @@ Ikev2InitPskGenerator (
   // 1. Allocate IKE packet
   //
   IkePacket = IkePacketAlloc ();
-  ASSERT (IkePacket != NULL);
+  if (IkePacket == NULL) {
+    goto CheckError;
+  }
 
   //
   // 1.a Fill the IkePacket->Hdr
@@ -176,7 +178,9 @@ Ikev2InitPskGenerator (
   if ((IkeSaSession->SessionCommon.IsInitiator) && (IkeSaSession->NCookie == NULL)) {
     IkeSaSession->NiBlkSize = IKE_NONCE_SIZE;
     IkeSaSession->NiBlock   = IkeGenerateNonce (IKE_NONCE_SIZE);
-    ASSERT (IkeSaSession->NiBlock != NULL);
+    if (IkeSaSession->NiBlock == NULL) {
+      goto CheckError;
+    }
   }
 
   if (IkeSaSession->SessionCommon.IsInitiator) {
@@ -298,7 +302,11 @@ Ikev2InitPskParser (
   //
   NonceSize   = NoncePayload->PayloadSize - sizeof (IKEV2_COMMON_PAYLOAD_HEADER);
   NonceBuffer = (UINT8 *) AllocatePool (NonceSize);
-  ASSERT (NonceBuffer != NULL);
+  if (NonceBuffer == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto CheckError;
+  }
+  
   CopyMem (
     NonceBuffer,
     NoncePayload->PayloadBuf + sizeof (IKEV2_COMMON_PAYLOAD_HEADER),
@@ -444,7 +452,9 @@ Ikev2AuthPskGenerator (
   // 1. Allocate IKE Packet
   //
   IkePacket= IkePacketAlloc ();
-  ASSERT (IkePacket != NULL);
+  if (IkePacket == NULL) {
+    return NULL;
+  }
 
   //
   // 1.a Fill the IkePacket Header.
@@ -745,7 +755,10 @@ Ikev2AuthPskParser (
     //
     if (ChildSaSession->IkeSaSession->Spd == NULL) {
       ChildSaSession->IkeSaSession->Spd = ChildSaSession->Spd;
-      Ikev2ChildSaSessionSpdSelectorCreate (ChildSaSession);
+      Status = Ikev2ChildSaSessionSpdSelectorCreate (ChildSaSession);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
   } else {
     //
@@ -930,7 +943,9 @@ Ikev2AuthCertGenerator (
   // 1. Allocate IKE Packet
   //
   IkePacket= IkePacketAlloc ();
-  ASSERT (IkePacket != NULL);
+  if (IkePacket == NULL) {
+    return NULL;
+  }
 
   //
   // 1.a Fill the IkePacket Header.
@@ -1280,7 +1295,10 @@ Ikev2AuthCertParser (
     //
     if (ChildSaSession->IkeSaSession->Spd == NULL) {
       ChildSaSession->IkeSaSession->Spd = ChildSaSession->Spd;
-      Ikev2ChildSaSessionSpdSelectorCreate (ChildSaSession);
+      Status = Ikev2ChildSaSessionSpdSelectorCreate (ChildSaSession);
+      if (EFI_ERROR (Status)) {
+        goto Exit;
+      }
     }
   } else {
     //
@@ -1360,17 +1378,27 @@ Ikev2GenerateSaDhPublicKey (
   IKEV2_SESSION_KEYS *IkeKeys;
 
   IkeSaSession->IkeKeys = AllocateZeroPool (sizeof (IKEV2_SESSION_KEYS));
-  ASSERT (IkeSaSession->IkeKeys != NULL);
+  if (IkeSaSession->IkeKeys == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
   IkeKeys = IkeSaSession->IkeKeys;
   IkeKeys->DhBuffer = AllocateZeroPool (sizeof (IKEV2_DH_BUFFER));
-  ASSERT (IkeKeys->DhBuffer != NULL);
+  if (IkeKeys->DhBuffer == NULL) {
+    FreePool (IkeSaSession->IkeKeys);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Init DH with the certain DH Group Description.
   //
   IkeKeys->DhBuffer->GxSize   = OakleyModpGroup[(UINT8)IkeSaSession->SessionCommon.PreferDhGroup].Size >> 3;
   IkeKeys->DhBuffer->GxBuffer = AllocateZeroPool (IkeKeys->DhBuffer->GxSize);
-  ASSERT (IkeKeys->DhBuffer->GxBuffer != NULL);
+  if (IkeKeys->DhBuffer->GxBuffer == NULL) {
+    FreePool (IkeKeys->DhBuffer);
+    FreePool (IkeSaSession->IkeKeys);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Get X PublicKey
@@ -1385,6 +1413,13 @@ Ikev2GenerateSaDhPublicKey (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Error CPLKeyManGetKeyParam X public key error Status = %r\n", Status));
+    
+    FreePool (IkeKeys->DhBuffer->GxBuffer);
+    
+    FreePool (IkeKeys->DhBuffer);
+    
+    FreePool (IkeSaSession->IkeKeys);
+    
     return Status;
   }
 
@@ -1422,7 +1457,9 @@ Ikev2GenerateSaDhComputeKey (
   PubKeySize          = KePayload->PayloadSize - sizeof (IKEV2_KEY_EXCHANGE);
   DhBuffer->GxySize   = DhBuffer->GxSize;
   DhBuffer->GxyBuffer = AllocateZeroPool (DhBuffer->GxySize);
-  ASSERT (DhBuffer->GxyBuffer != NULL);
+  if (DhBuffer->GxyBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Get GxyBuf
@@ -1436,6 +1473,9 @@ Ikev2GenerateSaDhComputeKey (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Error CPLKeyManGetKeyParam Y session key error Status = %r\n", Status));
+
+    FreePool (DhBuffer->GxyBuffer);
+    
     return Status;
   }
 
@@ -1444,7 +1484,12 @@ Ikev2GenerateSaDhComputeKey (
   //
   DhBuffer->GySize   = PubKeySize;
   DhBuffer->GyBuffer = AllocateZeroPool (DhBuffer->GySize);
-  ASSERT (DhBuffer->GyBuffer != NULL);
+  if (DhBuffer->GyBuffer == NULL) {
+    FreePool (DhBuffer->GxyBuffer);
+    
+    return Status;
+  }
+  
   CopyMem (DhBuffer->GyBuffer, PubKey, DhBuffer->GySize);
 
   IPSEC_DUMP_BUF ("DH Public Key (g^y) Dump", DhBuffer->GyBuffer, DhBuffer->GySize);
@@ -1524,7 +1569,10 @@ Ikev2GenerateSaKeys (
   //
   KeyBufferSize = IkeSaSession->NiBlkSize + IkeSaSession->NrBlkSize;
   KeyBuffer     = AllocateZeroPool (KeyBufferSize);
-  ASSERT (KeyBuffer != NULL);
+  if (KeyBuffer == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
 
   CopyMem (KeyBuffer, IkeSaSession->NiBlock, IkeSaSession->NiBlkSize);
   CopyMem (KeyBuffer + IkeSaSession->NiBlkSize, IkeSaSession->NrBlock, IkeSaSession->NrBlkSize);

@@ -1,7 +1,7 @@
 /** @file
   Common interfaces to call Security library.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -968,7 +968,10 @@ IpSecCryptoIoGetPublicKeyFromCert (
   RsaGetKey (RsaContext, RsaKeyN, NULL, PublicKeyLen);
  
   *PublicKey = AllocateZeroPool (*PublicKeyLen);
-  ASSERT (*PublicKey != NULL);
+  if (*PublicKey == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto EXIT;
+  }
 
   if (!RsaGetKey (RsaContext, RsaKeyN, *PublicKey, PublicKeyLen)) {
     Status = EFI_INVALID_PARAMETER;

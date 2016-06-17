@@ -2151,7 +2151,10 @@ IpSecGetVariable (
   VariableNameLength  = StrLen (VariableName);
   VariableNameISize   = (VariableNameLength + 5) * sizeof (CHAR16);
   VariableNameI       = AllocateZeroPool (VariableNameISize);
-  ASSERT (VariableNameI != NULL);
+  if (VariableNameI == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
   
   //
   // Construct the varible name of ipsecconfig meta data.

@@ -2,7 +2,7 @@
   The interfaces of IKE/Child session operations and payload related operations 
   used by IKE Exchange Process.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1119,9 +1119,12 @@ Ikev2SaGenerateKey (
   than the one in ChildSaSession->Spd, especially for the tunnel mode.
     
   @param[in, out]  ChildSaSession  Pointer to IKEV2_CHILD_SA_SESSION related to.
+
+  @retval EFI_SUCCESS            The operation complete successfully.
+  @retval EFI_OUT_OF_RESOURCES   If the required resource can't be allocated.
   
 **/
-VOID
+EFI_STATUS
 Ikev2ChildSaSessionSpdSelectorCreate (
   IN OUT IKEV2_CHILD_SA_SESSION *ChildSaSession
   );

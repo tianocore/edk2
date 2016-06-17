@@ -2,7 +2,7 @@
   The implementation of IPsec.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1190,9 +1190,6 @@ IpSecTunnelInboundPacket (
                                      on return.
   @param[in]      FragmentCount      The number of fragments.
 
-  @retval EFI_SUCCESS              The operation was successful.
-  @retval EFI_OUT_OF_RESOURCES     The required system resources can't be allocated.
-
 **/
 UINT8 *
 IpSecTunnelOutboundPacket (
@@ -1220,7 +1217,10 @@ IpSecTunnelOutboundPacket (
 
   if (IpVersion == IP_VERSION_4) {
     InnerHead = AllocateZeroPool (sizeof (IP4_HEAD) + *OptionsLength);
-    ASSERT (InnerHead != NULL);
+    if (InnerHead == NULL) {
+      return NULL;
+    }
+    
     CopyMem (
       InnerHead,
       IpHead,
@@ -1233,7 +1233,10 @@ IpSecTunnelOutboundPacket (
       );
   } else {
     InnerHead = AllocateZeroPool (sizeof (EFI_IP6_HEADER) + *OptionsLength);
-    ASSERT (InnerHead != NULL);
+    if (InnerHead == NULL) {
+      return NULL;
+    }
+    
     CopyMem (
       InnerHead,
       IpHead,
@@ -1264,7 +1267,11 @@ IpSecTunnelOutboundPacket (
              IpSecOnRecyclePacket,
              NULL
              );
-  ASSERT (Packet != NULL);
+  if (Packet == NULL) {
+    FreePool (InnerHead);
+    return NULL;
+  }
+  
   //
   // 3. Check the Last Header, if it is TCP, UDP or ICMP recalcualate its pesudo
   //    CheckSum.
