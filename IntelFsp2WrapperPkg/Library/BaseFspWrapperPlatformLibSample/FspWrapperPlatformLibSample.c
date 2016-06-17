@@ -81,3 +81,23 @@ GetS3MemoryInfo (
 {
   return EFI_UNSUPPORTED;
 }
+
+/**
+  Perform platform related reset in FSP wrapper.
+
+  This function will reset the system with requested ResetType.
+
+  @param[in] FspStatusResetType  The type of reset the platform has to perform.
+**/
+VOID
+EFIAPI
+CallFspWrapperResetSystem (
+  IN UINT32    FspStatusResetType
+  )
+{
+  //
+  // Perform reset according to the type.
+  //
+
+  CpuDeadLoop();
+}

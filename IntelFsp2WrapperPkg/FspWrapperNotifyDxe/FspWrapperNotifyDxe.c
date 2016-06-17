@@ -22,6 +22,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiLib.h>
 #include <Library/FspWrapperApiLib.h>
+#include <Library/FspWrapperPlatformLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/HobLib.h>
 
@@ -93,6 +94,15 @@ OnPciEnumerationComplete (
   PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x6000);
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
   PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x607F);
+
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FSP NotifyPhase AfterPciEnumeration requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
+
   if (Status != EFI_SUCCESS) {
     DEBUG((DEBUG_ERROR, "FSP NotifyPhase AfterPciEnumeration failed, status: 0x%x\n", Status));
   } else {
@@ -130,6 +140,15 @@ OnReadyToBoot (
   PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x4000);
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
   PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x407F);
+
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FSP NotifyPhase ReadyToBoot requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
+
   if (Status != EFI_SUCCESS) {
     DEBUG((DEBUG_ERROR, "FSP NotifyPhase ReadyToBoot failed, status: 0x%x\n", Status));
   } else {
@@ -179,6 +198,15 @@ OnEndOfFirmware (
   PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x2000);
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
   PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x207F);
+
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FSP NotifyPhase EndOfFirmware requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
+
   if (Status != EFI_SUCCESS) {
     DEBUG((DEBUG_ERROR, "FSP NotifyPhase EndOfFirmware failed, status: 0x%x\n", Status));
   } else {

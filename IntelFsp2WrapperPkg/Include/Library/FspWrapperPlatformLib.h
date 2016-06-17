@@ -70,4 +70,17 @@ GetS3MemoryInfo (
   OUT EFI_PHYSICAL_ADDRESS *S3PeiMemBase
   );
 
+/**
+  Perform platform related reset in FSP wrapper.
+
+  This function will reset the system with requested ResetType.
+
+  @param[in] FspStatusResetType  The type of reset the platform has to perform.
+**/
+VOID
+EFIAPI
+CallFspWrapperResetSystem (
+  IN UINT32    FspStatusResetType
+  );
+
 #endif

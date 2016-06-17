@@ -94,13 +94,37 @@ S3EndOfPeiNotify(
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
   DEBUG((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration status: 0x%x\n", Status));
 
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase AfterPciEnumeration requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
+
   NotifyPhaseParams.Phase = EnumInitPhaseReadyToBoot;
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
   DEBUG((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot status: 0x%x\n", Status));
 
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase ReadyToBoot requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
+
   NotifyPhaseParams.Phase = EnumInitPhaseEndOfFirmware;
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
   DEBUG((DEBUG_INFO, "FSP S3NotifyPhase EndOfFirmware status: 0x%x\n", Status));
+
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FSP S3NotifyPhase EndOfFirmware requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
 
   return EFI_SUCCESS;
 }
@@ -229,6 +253,15 @@ PeiMemoryDiscoveredNotify (
   Status = CallFspSiliconInit ((VOID *)FspsUpdDataPtr);
   PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x907F);
   DEBUG ((DEBUG_INFO, "Total time spent executing FspSiliconInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
+
+  //
+  // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
+  //
+  if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
+    DEBUG((DEBUG_INFO, "FspSiliconInitApi requested reset 0x%x\n", Status));
+    CallFspWrapperResetSystem ((UINT32)Status);
+  }
+
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "ERROR - Failed to execute FspSiliconInitApi(), Status = %r\n", Status));
   }
