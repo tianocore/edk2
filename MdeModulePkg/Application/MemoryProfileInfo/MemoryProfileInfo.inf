@@ -46,9 +46,8 @@
   UefiLib
   MemoryAllocationLib
   DxeServicesLib
-  PeCoffGetEntryPointLib
   PrintLib
-  
+
 [Guids]
   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
   ## SOMETIMES_CONSUMES   ## GUID # SmiHandlerRegister
