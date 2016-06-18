@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by SmmCore module.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -42,6 +42,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
@@ -885,16 +886,27 @@ SmramProfileInit (
   );
 
 /**
+  Install SMRAM profile protocol.
+
+**/
+VOID
+SmramProfileInstallProtocol (
+  VOID
+  );
+
+/**
   Register SMM image to SMRAM profile.
 
   @param DriverEntry    SMM image info.
   @param RegisterToDxe  Register image to DXE.
 
-  @retval TRUE          Register success.
-  @retval FALSE         Register fail.
+  @return EFI_SUCCESS           Register successfully.
+  @return EFI_UNSUPPORTED       Memory profile unsupported,
+                                or memory profile for the image is not required.
+  @return EFI_OUT_OF_RESOURCES  No enough resource for this register.
 
 **/
-BOOLEAN
+EFI_STATUS
 RegisterSmramProfileImage (
   IN EFI_SMM_DRIVER_ENTRY   *DriverEntry,
   IN BOOLEAN                RegisterToDxe
@@ -906,11 +918,13 @@ RegisterSmramProfileImage (
   @param DriverEntry        SMM image info.
   @param UnregisterToDxe    Unregister image from DXE.
 
-  @retval TRUE              Unregister success.
-  @retval FALSE             Unregister fail.
+  @return EFI_SUCCESS           Unregister successfully.
+  @return EFI_UNSUPPORTED       Memory profile unsupported,
+                                or memory profile for the image is not required.
+  @return EFI_NOT_FOUND         The image is not found.
 
 **/
-BOOLEAN
+EFI_STATUS
 UnregisterSmramProfileImage (
   IN EFI_SMM_DRIVER_ENTRY   *DriverEntry,
   IN BOOLEAN                UnregisterToDxe
@@ -922,20 +936,31 @@ UnregisterSmramProfileImage (
   @param CallerAddress  Address of caller who call Allocate or Free.
   @param Action         This Allocate or Free action.
   @param MemoryType     Memory type.
+                        EfiMaxMemoryType means the MemoryType is unknown.
   @param Size           Buffer size.
   @param Buffer         Buffer address.
+  @param ActionString   String for memory profile action.
+                        Only needed for user defined allocate action.
 
-  @retval TRUE          Profile udpate success.
-  @retval FALSE         Profile update fail.
+  @return EFI_SUCCESS           Memory profile is updated.
+  @return EFI_UNSUPPORTED       Memory profile is unsupported,
+                                or memory profile for the image is not required,
+                                or memory profile for the memory type is not required.
+  @return EFI_ACCESS_DENIED     It is during memory profile data getting.
+  @return EFI_ABORTED           Memory profile recording is not enabled.
+  @return EFI_OUT_OF_RESOURCES  No enough resource to update memory profile for allocate action.
+  @return EFI_NOT_FOUND         No matched allocate info found for free action.
 
 **/
-BOOLEAN
+EFI_STATUS
+EFIAPI
 SmmCoreUpdateProfile (
-  IN EFI_PHYSICAL_ADDRESS CallerAddress,
-  IN MEMORY_PROFILE_ACTION Action,
-  IN EFI_MEMORY_TYPE      MemoryType, // Valid for AllocatePages/AllocatePool
-  IN UINTN                Size,       // Valid for AllocatePages/FreePages/AllocatePool
-  IN VOID                 *Buffer
+  IN PHYSICAL_ADDRESS       CallerAddress,
+  IN MEMORY_PROFILE_ACTION  Action,
+  IN EFI_MEMORY_TYPE        MemoryType, // Valid for AllocatePages/AllocatePool
+  IN UINTN                  Size,       // Valid for AllocatePages/FreePages/AllocatePool
+  IN VOID                   *Buffer,
+  IN CHAR8                  *ActionString OPTIONAL
   );
 
 /**
