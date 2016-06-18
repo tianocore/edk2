@@ -433,6 +433,7 @@
   MdeModulePkg/Universal/StatusCodeHandler/Smm/StatusCodeHandlerSmm.inf
   MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf
   MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
+  MdeModulePkg/Library/SmmMemoryAllocationProfileLib/SmmMemoryAllocationProfileLib.inf
   MdeModulePkg/Library/SmmCorePerformanceLib/SmmCorePerformanceLib.inf
   MdeModulePkg/Library/SmmPerformanceLib/SmmPerformanceLib.inf
   MdeModulePkg/Library/DxeSmmPerformanceLib/DxeSmmPerformanceLib.inf
