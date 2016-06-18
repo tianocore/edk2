@@ -153,6 +153,10 @@
   #
   PciHostBridgeLib|Include/Library/PciHostBridgeLib.h
 
+  ## @libraryclass  Provides services to record memory profile of multilevel caller.
+  #
+  MemoryProfileLib|Include/Library/MemoryProfileLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
