@@ -85,6 +85,116 @@ VERIFY_SIZE_OF (CHAR16, 2);
 #endif
 
 //
+// Should be used in combination with NORETURN to avoid 'noreturn' returns
+// warnings.
+//
+#ifndef UNREACHABLE
+  #ifdef __GNUC__
+    ///
+    /// Signal compilers and analyzers that this call is not reachable.  It is
+    /// up to the compiler to remove any code past that point.
+    ///
+    #define UNREACHABLE()  __builtin_unreachable ()
+  #elif defined (__has_feature)
+    #if __has_builtin (__builtin_unreachable)
+      ///
+      /// Signal compilers and analyzers that this call is not reachable.  It is
+      /// up to the compiler to remove any code past that point.
+      ///
+      #define UNREACHABLE()  __builtin_unreachable ()
+    #endif
+  #endif
+
+  #ifndef UNREACHABLE
+    ///
+    /// Signal compilers and analyzers that this call is not reachable.  It is
+    /// up to the compiler to remove any code past that point.
+    ///
+    #define UNREACHABLE()
+  #endif
+#endif
+
+//
+// Signaling compilers and analyzers that a certain function cannot return may
+// remove all following code and thus lead to better optimization and less
+// false positives.
+//
+#ifndef NORETURN
+  #if defined (__GNUC__) || defined (__clang__)
+    ///
+    /// Signal compilers and analyzers that the function cannot return.
+    /// It is up to the compiler to remove any code past a call to functions
+    /// flagged with this attribute.
+    ///
+    #define NORETURN  __attribute__((noreturn))
+  #elif defined(_MSC_EXTENSIONS) && !defined(MDE_CPU_EBC)
+    ///
+    /// Signal compilers and analyzers that the function cannot return.
+    /// It is up to the compiler to remove any code past a call to functions
+    /// flagged with this attribute.
+    ///
+    #define NORETURN  __declspec(noreturn)
+  #else
+    ///
+    /// Signal compilers and analyzers that the function cannot return.
+    /// It is up to the compiler to remove any code past a call to functions
+    /// flagged with this attribute.
+    ///
+    #define NORETURN
+  #endif
+#endif
+
+//
+// Should be used in combination with ANALYZER_NORETURN to avoid 'noreturn'
+// returns warnings.
+//
+#ifndef ANALYZER_UNREACHABLE
+  #ifdef __clang_analyzer__
+    #if __has_builtin (__builtin_unreachable)
+      ///
+      /// Signal the analyzer that this call is not reachable.
+      /// This excludes compilers.
+      ///
+      #define ANALYZER_UNREACHABLE()  __builtin_unreachable ()
+    #endif
+  #endif
+
+  #ifndef ANALYZER_UNREACHABLE
+    ///
+    /// Signal the analyzer that this call is not reachable.
+    /// This excludes compilers.
+    ///
+    #define ANALYZER_UNREACHABLE()
+  #endif
+#endif
+
+//
+// Static Analyzers may issue errors about potential NULL-dereferences when
+// dereferencing a pointer, that has been checked before, outside of a
+// NULL-check.  This may lead to false positives, such as when using ASSERT()
+// for verification.
+//
+#ifndef ANALYZER_NORETURN
+  #ifdef __has_feature
+    #if __has_feature (attribute_analyzer_noreturn)
+      ///
+      /// Signal analyzers that the function cannot return.
+      /// This excludes compilers.
+      ///
+      #define ANALYZER_NORETURN  __attribute__((analyzer_noreturn))
+    #endif
+  #endif
+
+  #ifndef ANALYZER_NORETURN
+    ///
+    /// Signal the analyzer that the function cannot return.
+    /// This excludes compilers.
+    ///
+    #define ANALYZER_NORETURN
+  #endif
+#endif
+
+//
 // For symbol name in assembly code, an extra "_" is sometimes necessary
 //
 
