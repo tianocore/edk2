@@ -291,6 +291,7 @@ DebugPrintLevelEnabled (
       if (DebugAssertEnabled ()) {  \
         if (!(Expression)) {        \
           _ASSERT (Expression);     \
+          ANALYZER_UNREACHABLE ();  \
         }                           \
       }                             \
     } while (FALSE)
