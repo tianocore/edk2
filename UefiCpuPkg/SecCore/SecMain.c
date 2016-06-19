@@ -49,6 +49,7 @@ UINT64  mIdtEntryTemplate = 0xffff8e000010ffe4ULL;
 
 **/
 VOID
+NORETURN
 EFIAPI
 SecStartupPhase2(
   IN VOID                     *Context
@@ -167,6 +168,7 @@ SecStartup (
 
 **/
 VOID
+NORETURN
 EFIAPI
 SecStartupPhase2(
   IN VOID                     *Context
@@ -252,7 +254,7 @@ SecStartupPhase2(
   //
   // Should not come here.
   //
-  return;
+  UNREACHABLE ();
 }
 
 /**
