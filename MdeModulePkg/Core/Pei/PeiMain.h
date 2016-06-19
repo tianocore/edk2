@@ -315,6 +315,7 @@ typedef struct {
 
 **/
 VOID
+NORETURN
 EFIAPI
 PeiCore (
   IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData,
