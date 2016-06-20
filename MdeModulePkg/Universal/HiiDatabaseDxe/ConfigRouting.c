@@ -4060,6 +4060,7 @@ RouteConfigRespForEfiVarStore (
   BufferSize   = 0;
   VarStore     = NULL;
   VarStoreName = NULL;
+  *Result = RequestResp;
 
   NameSize = AsciiStrSize ((CHAR8 *)EfiVarStoreInfo->Name);
   VarStoreName = AllocateZeroPool (NameSize * sizeof (CHAR16));
@@ -4071,6 +4072,7 @@ RouteConfigRespForEfiVarStore (
       
   Status = gRT->GetVariable (VarStoreName, &EfiVarStoreInfo->Guid, NULL, &BufferSize, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_ERROR, "The variable does not exist!"));
     goto Done;
   }
 
@@ -4089,6 +4091,7 @@ RouteConfigRespForEfiVarStore (
 
   Status = gRT->SetVariable (VarStoreName, &EfiVarStoreInfo->Guid, EfiVarStoreInfo->Attributes, BufferSize, VarStore);
   if (EFI_ERROR (Status)) {
+    *Result = RequestResp;
     goto Done;
   }
 
