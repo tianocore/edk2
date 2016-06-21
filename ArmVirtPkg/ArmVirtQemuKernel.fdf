@@ -91,6 +91,7 @@ DATA = {
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FVMAIN_COMPACT
 
+!include VarStore.fdf.inc
 
 ################################################################################
 #
