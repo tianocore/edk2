@@ -136,11 +136,7 @@ READ_LOCK_STATUS   = TRUE
 
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashAuthenticatedDxe.inf
-!else
   INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
-!endif
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   #

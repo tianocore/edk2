@@ -294,11 +294,7 @@
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmVirtTimerFdtClientLib/ArmVirtTimerFdtClientLib.inf
   }
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashAuthenticatedDxe.inf
-!else
   ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
-!endif
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   #
