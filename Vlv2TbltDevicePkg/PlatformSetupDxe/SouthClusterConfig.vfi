@@ -1,15 +1,24 @@
-//
+// /** @file
 //
 // Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
-//                                                                                  
-// This program and the accompanying materials are licensed and made available under
-// the terms and conditions of the BSD License that accompanies this distribution.  
-// The full text of the license may be found at                                     
-// http://opensource.org/licenses/bsd-license.php.                                  
-//                                                                                  
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-//                                                                                  
+//
+
+// This program and the accompanying materials are licensed and made available under
+
+// the terms and conditions of the BSD License that accompanies this distribution.
+
+// The full text of the license may be found at
+
+// http://opensource.org/licenses/bsd-license.php.
+
+//
+
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+//
+
 //
 //
 //
@@ -26,7 +35,7 @@
 //  Rev   Date<MM/DD/YYYY>    Name    Description
 //  ------------------------------------------------------------------------------
 
-// --*/
+// **/
 
 //
 // South Cluster Configuration Form
@@ -203,41 +212,41 @@ form formid = USB_OPTIONS_FORM_ID,
   //XHCI support
   //
   grayoutif ideqval Setup.UsbAutoMode == 0x1;
-  	grayoutif ideqval Setup.PchUsb20 == 0x1;
-    	oneof   varid   = Setup.UsbXhciSupport,
-    	  questionid  = 0x123B,
-      	prompt      = STRING_TOKEN(STR_USB_XHCI_SUPPORT_PROMPT),
-      	help        = STRING_TOKEN(STR_USB_XHCI_SUPPORT_HELP),
-      	flags       = INTERACTIVE,
-      	option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
-      	option text = STRING_TOKEN(STR_DISABLE), value = 0, flags =  RESET_REQUIRED;
-    	endoneof;
+    grayoutif ideqval Setup.PchUsb20 == 0x1;
+      oneof   varid   = Setup.UsbXhciSupport,
+        questionid  = 0x123B,
+        prompt      = STRING_TOKEN(STR_USB_XHCI_SUPPORT_PROMPT),
+        help        = STRING_TOKEN(STR_USB_XHCI_SUPPORT_HELP),
+        flags       = INTERACTIVE,
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags =  RESET_REQUIRED;
+      endoneof;
 
       suppressif ideqval Setup.UsbXhciSupport == 0x0;
-      	oneof   varid   = Setup.Hsic0,
-        	prompt      = STRING_TOKEN(STR_USB_HSIC_0_PROMPT),
-        	help        = STRING_TOKEN(STR_USB_HSIC_0_HELP),
-        	option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
-        	option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
-      	endoneof;
-    	endif;
+        oneof   varid   = Setup.Hsic0,
+          prompt      = STRING_TOKEN(STR_USB_HSIC_0_PROMPT),
+          help        = STRING_TOKEN(STR_USB_HSIC_0_HELP),
+          option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
+          option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+        endoneof;
+      endif;
 
-    	oneof varid   = Setup.PchUsb30Mode,
-      	prompt      = STRING_TOKEN(STR_PCH_USB30_MODE_PROMPT),
-      	help        = STRING_TOKEN(STR_PCH_USB30_MODE_HELP),
-      	option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = DEFAULT | MANUFACTURING |RESET_REQUIRED;
-      	option text = STRING_TOKEN(STR_DISABLE), value = 0, flags =  RESET_REQUIRED;
-    	endoneof;
+      oneof varid   = Setup.PchUsb30Mode,
+        prompt      = STRING_TOKEN(STR_PCH_USB30_MODE_PROMPT),
+        help        = STRING_TOKEN(STR_PCH_USB30_MODE_HELP),
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = DEFAULT | MANUFACTURING |RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags =  RESET_REQUIRED;
+      endoneof;
 
-	oneof   varid   = Setup.UsbXhciLpmSupport,
-      	prompt      = STRING_TOKEN(STR_USB_XHCI_LPM_SUPPORT_PROMPT),
-      	help        = STRING_TOKEN(STR_USB_XHCI_LPM_SUPPORT_HELP),
+  oneof   varid   = Setup.UsbXhciLpmSupport,
+        prompt      = STRING_TOKEN(STR_USB_XHCI_LPM_SUPPORT_PROMPT),
+        help        = STRING_TOKEN(STR_USB_XHCI_LPM_SUPPORT_HELP),
 
-      	option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
-      	option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
 
-    	endoneof;
-  	endif;
+      endoneof;
+    endif;
   endif;
 
   subtitle text = STRING_TOKEN(STR_NULL_STRING);
@@ -924,3 +933,4 @@ form formid = MISC_OPTIONS_FORM_ID,
   endoneof;
 
 endform;
+

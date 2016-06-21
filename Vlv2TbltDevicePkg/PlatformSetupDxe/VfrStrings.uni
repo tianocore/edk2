@@ -1,10 +1,10 @@
-//
+// /** @file
 // Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
 // http://opensource.org/licenses/bsd-license.php
-// 
+//
 // THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
@@ -19,7 +19,7 @@
 //
 // Revision History:
 //
-// --*/
+// **/
 
 //
 // NOTE: for SETUP engine spacing, the following character spaces denote how much room in each section you have.
@@ -227,9 +227,9 @@
 #string STR_PROCESSOR_VERSION_STRING                    #language en-US "Type"
 #string STR_PROCESSOR_VERSION_VALUE                     #language en-US "N/A"
 
-#string STR_PROCESSOR_SKU_HELP				#language en-US "Displays the Processor SKU Type."
-#string STR_PROCESSOR_SKU_STRING			#language en-US "SKU Type"
-#string STR_PROCESSOR_SKU_VALUE				#language en-US "N/A"
+#string STR_PROCESSOR_SKU_HELP        #language en-US "Displays the Processor SKU Type."
+#string STR_PROCESSOR_SKU_STRING      #language en-US "SKU Type"
+#string STR_PROCESSOR_SKU_VALUE        #language en-US "N/A"
 
 #string STR_PROCESSOR_SPEED_STRING                      #language en-US "Speed"
 #string STR_PROCESSOR_SPEED_VALUE                       #language en-US "N/A"
@@ -910,8 +910,8 @@
 #string STR_RF_KILL_PHYSICAL                           #language en-US  "Physical Switch"
 
 #string STR_WLAN_PRESENCE_FORM_TITLE                   #language en-US  "WLAN Card Presence"
-#string STR_WLAN_NGFF_CARD	                       #language en-US  "NGFF Card Inserted"
-#string STR_WLAN_NGFF_HELP	                       #language en-US  "Set 'YES' If NGFF Card is Inserted"
+#string STR_WLAN_NGFF_CARD                         #language en-US  "NGFF Card Inserted"
+#string STR_WLAN_NGFF_HELP                         #language en-US  "Set 'YES' If NGFF Card is Inserted"
 #string STR_WLAN_UHPAM_CARD                            #language en-US  "UHPAM Card Inserted"
 #string STR_WLAN_UHPAM_HELP                            #language en-US  "Set 'YES' If UHPAM Card is Inserted"
 
@@ -1256,8 +1256,8 @@
 #string STR_CRITICAL_BATTERY_LIMIT_PROMPT              #language en-US "Critical Battery Limit"
 #string STR_CRITICAL_BATTERY_LIMIT_HELP                #language en-US "Limit in percentage below which the system is not allowed to boot.
 
-#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_PROMPT		#language en-US "Critical Battery Limit Feature"
-#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_HELP			#language en-US "Enable or Disable Critical Battery Limit Feature."
+#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_PROMPT    #language en-US "Critical Battery Limit Feature"
+#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_HELP      #language en-US "Enable or Disable Critical Battery Limit Feature."
 
 #string STR_ULPMC_FW_LOCK_PROMPT                       #language en-US "ULPMC Firmware Lock"
 #string STR_ULPMC_FW_LOCK_HELP                         #language en-US "Enable or Disable Lock ULPMC Firmware Update."
@@ -1349,7 +1349,7 @@
 
 // SD card DDR50 and SD25
 #string STR_SCC_SD_SDR25_PROMPT                       #language en-US "SDR25 Capability Support for SDCard"
-#string STR_SCC_SD_SDR25_HELP                         #language en-US "Disable/Enable SDR25 Capability in SD Card controller; 
+#string STR_SCC_SD_SDR25_HELP                         #language en-US "Disable/Enable SDR25 Capability in SD Card controller;
 #string STR_SCC_SD_DDR50_PROMPT                       #language en-US "DDR50 Capability Support for SDCard"
 #string STR_SCC_SD_DDR50_HELP                         #language en-US "Disable/Enable DDR50 Capability in SD Card controller;
 
@@ -1417,3 +1417,4 @@
 #string STR_EM1_CAP_OR_VOLTAGE_HELP                    #language en-US "Use Voltage or Capacity to decide boot flow"
 #string STR_EM1_BOOT_ON_INVALID_BAT_PROMPT             #language en-US "Boot on invalid battery"
 #string STR_EM1_BOOT_ON_INVALID_BAT_HELP               #language en-US "Allow to boot from invalid battery"
+

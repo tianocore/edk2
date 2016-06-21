@@ -348,6 +348,6 @@ Field(GNVS,AnyAcc,Lock,Preserve)
   EDPV,     8,      //(792) Check for eDP display device
   DIDX,     32,     //(793) Device ID for eDP device
   IOT,      8,      //(794) MinnowBoard Max JP1 is configured for MSFT IOT project.
-  BATT,     8,      //(795) The Flag of RTC Battery Prensent.  
+  BATT,     8,      //(795) The Flag of RTC Battery Prensent.
 }
 

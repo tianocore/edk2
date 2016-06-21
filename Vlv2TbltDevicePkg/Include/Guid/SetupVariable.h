@@ -1,22 +1,22 @@
-/*++
+/** @file
 
   Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
-                                                                                   
+
 
   This program and the accompanying materials are licensed and made available under
 
-  the terms and conditions of the BSD License that accompanies this distribution.  
+  the terms and conditions of the BSD License that accompanies this distribution.
 
-  The full text of the license may be found at                                     
+  The full text of the license may be found at
 
-  http://opensource.org/licenses/bsd-license.php.                                  
+  http://opensource.org/licenses/bsd-license.php.
 
-                                                                                   
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
 
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-                                                                                   
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
 
 
 
@@ -28,8 +28,8 @@ Abstract:
 
     Driver configuration include file
 
- 
---*/
+
+**/
 
 #ifndef _SETUP_VARIABLE_H
 #define _SETUP_VARIABLE_H
@@ -63,7 +63,7 @@ Abstract:
      0x6936b3bd, 0x4350, 0x46d9, 0x89, 0x40, 0x1f, 0xa2, 0x9, 0x61, 0xae, 0xb1 \
   }
 
-//  
+//
 // {21FEE8DB-0D29-477e-B5A9-96EB343BA99C}
 //
 #define ADDITIONAL_SYSTEM_INFO_GUID\
@@ -89,7 +89,7 @@ Abstract:
 
 #pragma pack(1)
 
-// NOTE: When you add anything to this structure, 
+// NOTE: When you add anything to this structure,
 //   you MUST add it to the very bottom!!!!
 //   You must make sure the structure size is able to divide by 32!
 typedef struct {
@@ -116,7 +116,7 @@ typedef struct {
   UINT8         ParallelLockHide;
 
   UINT8         ParallelMode;
-  UINT8         ParallelModeLockHide;  
+  UINT8         ParallelModeLockHide;
 
   UINT8         AllUsb;
   UINT8         UsbPortsLockHide;
@@ -184,31 +184,31 @@ typedef struct {
   // Hard Drive Boot Order
   //
   UINT8         HardDriveBootOrder[8];
-  UINT8         HardDriveBootOrderLockHide;  
+  UINT8         HardDriveBootOrderLockHide;
 
   //
   // CD Drive Boot Order
   //
   UINT8         CdDriveBootOrder[4];
-  UINT8         CdDriveBootOrderLockHide;  
+  UINT8         CdDriveBootOrderLockHide;
 
   //
   // FDD Drive Boot Order
   //
   UINT8         FddDriveBootOrder[4];
-  UINT8         FddDriveBootOrderLockHide;  
+  UINT8         FddDriveBootOrderLockHide;
 
   //
   // Drive Boot Order
   //
   UINT8         DriveBootOrder[16];
-  UINT8         DriveBootOrderLockHide;  
+  UINT8         DriveBootOrderLockHide;
 
   //
   // Boot Menu Type
   //
   UINT8         BootMenuType;
-  UINT8         BootMenuTypeLockHide;  
+  UINT8         BootMenuTypeLockHide;
 
   //
   // Boot from Removable Devices
@@ -357,31 +357,31 @@ typedef struct {
   // ACPI Suspend State
   //
   UINT8         AcpiSuspendState;
-  UINT8         AcpiSuspendStateLockHide;  
+  UINT8         AcpiSuspendStateLockHide;
 
   //
   // PCI Latency Timer
   //
   UINT8         PciLatency;
-  UINT8         PciLatencyLockHide;  
+  UINT8         PciLatencyLockHide;
 
   //
   // Fan Control
   //
   UINT8         FanControl;
-  UINT8         FanControlLockHide;  
+  UINT8         FanControlLockHide;
 
   //
   // CPU Fan Control
   //
   UINT8         CpuFanControl;
-  UINT8         CpuFanControlLockHide;  
+  UINT8         CpuFanControlLockHide;
 
   //
   // Lowest Fan Speed
   //
   UINT8         LowestFanSpeed;
-  UINT8         LowestFanSpeedLockHide;  
+  UINT8         LowestFanSpeedLockHide;
 
   //
   // Processor (CPU)
@@ -390,46 +390,46 @@ typedef struct {
 
   UINT8         CpuidMaxValue;
   UINT8         CpuidMaxValueLockHide;
-  
+
   UINT8         ExecuteDisableBit;
-  UINT8         ExecuteDisableBitLockHide;  
+  UINT8         ExecuteDisableBitLockHide;
 
   //
   // EIST or GV3 setup option
   //
-  UINT8         ProcessorEistEnable;            
+  UINT8         ProcessorEistEnable;
   UINT8         ProcessorEistEnableLockHide;
 
   //
   // C1E Enable
   //
   UINT8         ProcessorC1eEnable;
-  UINT8         ProcessorC1eEnableLockHide;  
+  UINT8         ProcessorC1eEnableLockHide;
 
   //
   // Enabling CPU C-States of processor
   //
-  UINT8         ProcessorCcxEnable;               
+  UINT8         ProcessorCcxEnable;
   UINT8         ProcessorCcxEnableLockHide;
-  
+
   //
   // Package C-State Limit
   //
   UINT8         PackageCState;
   UINT8         PackageCStateLockHide;
-  
+
   //
   // Enable/Disable NHM C3(ACPI C2) report to OS
   //
   UINT8         OSC2Report;
   UINT8         OSC2ReportLockHide;
-  
+
   //
   // Enable/Disable NHM C6(ACPI C3) report to OS
   //
   UINT8         C6Enable;
   UINT8         C6EnableLockHide;
-  
+
   //
   // Enable/Disable NHM C7(ACPI C3) report to OS
   //
@@ -443,233 +443,233 @@ typedef struct {
   UINT8         ProcessorEistPsdFuncLockHide;
 
   //
-  // 
+  //
   //
   UINT8         CPU00;
   UINT8         CPU01;
 
   //
-  // 
+  //
   //
   UINT8         CPU02;
   UINT8         CPU03;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU04;
   UINT8         CPU05;
 
   //
-  // 
+  //
   //
   UINT8         CPU06;
   UINT8         CPU07;
 
   //
-  // 
+  //
   //
   UINT8         CPU08;
   UINT8         CPU09;
 
   //
-  // 
+  //
   //
   UINT8         CPU10;
-  UINT8         CPU11;  
+  UINT8         CPU11;
 
   //
-  // 
+  //
   //
   UINT8         CPU12;
   UINT8         CPU13;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU14;
   UINT8         CPU15;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU16;
   UINT8         CPU17;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU18;
-  UINT8         CPU19;  
-  
+  UINT8         CPU19;
+
   //
-  // 
+  //
   //
   UINT8         CPU20;
   UINT8         CPU21;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU22;
   UINT8         CPU23;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU24;
   UINT8         CPU25;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU26;
   UINT8         CPU27;
 
   //
-  // 
+  //
   //
   UINT8         CPU28;
   UINT8         CPU29;
 
   //
-  // 
+  //
   //
   UINT8         CPU30;
   UINT8         CPU31;
 
   //
-  // 
+  //
   //
   UINT8         CPU32;
   UINT8         CPU33;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU34;
   UINT8         CPU35;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU36;
   UINT8         CPU37;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU38;
   UINT8         CPU39;
-  
+
   //
-  // 
+  //
   //
   UINT16        CPU40;
-  UINT8         CPU41;  
-  
+  UINT8         CPU41;
+
   //
-  // 
+  //
   //
   UINT8         CPU42;
   UINT8         CPU43;
-  
+
   //
-  // 
+  //
   //
   UINT16        CPU44;
-  UINT8         CPU45;  
-  
+  UINT8         CPU45;
+
   //
-  // 
+  //
   //
   UINT8         CPU46;
   UINT8         CPU47;
-  
+
   //
-  // 
+  //
   //
   UINT8         CPU48;
   UINT8         CPU49;
 
   //
-  // 
-  // 
+  //
+  //
   UINT8         CPU50;
   UINT8         CPU51;
 
   //
-  // 
+  //
   //
   UINT8         CPU52;
   UINT8         CPU53;
-    
+
   //
-  // 
+  //
   //
   UINT8         CPU54;
   UINT8         CPU55;
 
   //
-  // 
+  //
   //
   UINT8         CPU56;
   UINT8         CPU57;
 
   //
-  // 
+  //
   //
   UINT8         CPU58;
   UINT8         CPU59;
 
   //
-  // 
+  //
   //
   UINT8         CPU60;
   UINT8         CPU61;
 
   //
-  // 
+  //
   //
   UINT8         CPU62;
   UINT8         CPU63;
 
   //
-  // 
-  //  
+  //
+  //
   UINT8         CPU64;
   UINT8         CPU65;
 
   //
-  // 
+  //
   //
   UINT8         CPU66;
   UINT8         CPU67;
 
   //
-  // 
+  //
   //
   UINT16        CPU68;
   UINT8         CPU69;
 
   //
-  // 
+  //
   //
   UINT16        CPU70;
 
   //
-  // 
+  //
   //
   UINT8         CPU71;
 
   //
-  // 
+  //
   //
   UINT8         MEM00;
   UINT8         MEM01;
 
   //
-  // 
+  //
   //
   UINT8         MEM02;
   UINT8         MEM03;
@@ -695,35 +695,35 @@ typedef struct {
   UINT8         MEM16;
   UINT8         MEM17;
 
-  UINT16        MEM18; 
+  UINT16        MEM18;
   UINT8         MEM19;
 
-  UINT8         MEM20; 
+  UINT8         MEM20;
   UINT8         MEM21;
 
-  UINT8         MEM22; 
+  UINT8         MEM22;
   UINT8         MEM23;
 
-  UINT8         MEM24; 
+  UINT8         MEM24;
   UINT8         MEM25;
 
-  UINT8         MEM26; 
+  UINT8         MEM26;
   UINT8         MEM27;
 
-  UINT8         MEM28; 
+  UINT8         MEM28;
   UINT8         MEM29;
 
-  UINT8         MEM30; 
+  UINT8         MEM30;
   UINT8         MEM31;
 
-  UINT8         MEM32; 
+  UINT8         MEM32;
   UINT8         MEM33;
 
   UINT8         MEM34;
   UINT8         MEM35;
 
   //
-  // 
+  //
   //
   UINT8         MEM36;
   UINT8         MEM37;
@@ -731,7 +731,7 @@ typedef struct {
   UINT8         MEM39;
 
   //
-  // 
+  //
   //
   UINT8         MEM40;
   UINT8         MEM41;
@@ -757,7 +757,7 @@ typedef struct {
   //
   // TPM Enable/Disable
   //
-  UINT8         ETpm; 
+  UINT8         ETpm;
 
   //
   // TPM question  0 = Disabled, 1 = Enabled
@@ -774,7 +774,7 @@ typedef struct {
   // Mode selection for Secondary SATA Controller (0=IDE, 1=RAID)
   //
   UINT8         ExtSataMode;
-  UINT8         ExtSataModeLockHide;  
+  UINT8         ExtSataModeLockHide;
 
   //
   // LT Technology 0/1 -> Disable/Enable
@@ -795,8 +795,8 @@ typedef struct {
   UINT8         FlrCapabilityLockHide;
 
   // VT-d Option
-  UINT8         VTdSupport;  
-  UINT8         VTdSupportLockHide;  
+  UINT8         VTdSupport;
+  UINT8         VTdSupportLockHide;
 
   UINT8         InterruptRemap;
   UINT8         InterruptRemapLockHide;
@@ -824,10 +824,10 @@ typedef struct {
   // Discrete SATA Type (Ide, Raid, Ahci)
   //
   UINT8         ExtSataMode2;
-  UINT8         ExtSataMode2LockHide;  
+  UINT8         ExtSataMode2LockHide;
 
   UINT8         ProcessorReserve00;
-  UINT8         ProcessorReserve01;  
+  UINT8         ProcessorReserve01;
 
   //
   // IGD Aperture Size question
@@ -872,8 +872,8 @@ typedef struct {
   // SATA Controller question  0 = Disabled, 1 = Enabled
   //
   UINT8         Sata;
-  UINT8         SataLockHide;  
-  
+  UINT8         SataLockHide;
+
   //
   // PS2 port
   //
@@ -905,7 +905,7 @@ typedef struct {
   UINT8         BootDisplayDevice2LockHide;
 
   //
-  // Flat Panel 
+  // Flat Panel
   //
   UINT8         EdpInterfaceType;
   UINT8         EdpInterfaceTypeLockHide;
@@ -915,7 +915,7 @@ typedef struct {
 
   UINT8         ColorDepth;
   UINT8         ColorDepthLockHide;
-  
+
   UINT8         EdidConfiguration;
   UINT8         EdidConfigurationLockHide;
 
@@ -930,7 +930,7 @@ typedef struct {
 
   UINT8         Serial3;
   UINT8         Serial3LockHide;
-  
+
   UINT8         Serial4;
   UINT8         Serial4LockHide;
 
@@ -1055,7 +1055,7 @@ typedef struct {
   UINT8         Cstates;
   UINT8         EnableC4;
   UINT8         EnableC6;
-  
+
   UINT8          FastBoot;
   UINT8          EfiNetworkSupport;
   UINT8          PxeRom;
@@ -1084,7 +1084,7 @@ typedef struct {
   UINT8           PassiveTc1Value;
   UINT8           PassiveTc2Value;
   UINT8           PassiveTspValue;
-  UINT8           DisableActiveTripPoints; 
+  UINT8           DisableActiveTripPoints;
   UINT8           CriticalThermalTripPoint;
   UINT8           IchPciExp[4];
   UINT8           DeepStandby;
@@ -1135,7 +1135,7 @@ typedef struct {
   //
   // LPSS Configuration
   //
-  UINT8           LpssPciModeEnabled;  
+  UINT8           LpssPciModeEnabled;
   //Scc
   UINT8           LpsseMMCEnabled;
   UINT8           LpssSdioEnabled;
@@ -1148,7 +1148,7 @@ typedef struct {
   UINT8           LpsseMMC45HS200Enabled;
   UINT8           LpsseMMC45RetuneTimerValue;
   UINT8           eMMCBootMode;
-  
+
   //LPSS2
   UINT8           LpssDma1Enabled;
   UINT8           LpssI2C0Enabled;
@@ -1174,7 +1174,7 @@ typedef struct {
   UINT8   IgdDvmt50PreAlloc;
   UINT8   IgdDvmt50TotalAlloc;
   UINT8   IgdTurboEnabled;
-  
+
   //
   // Usb Config
   //
@@ -1189,7 +1189,7 @@ typedef struct {
   UINT8   PchUsbRmh;
   UINT8   PchUsbOtg;
   UINT8   PchUsbVbusOn;       //OTG VBUS control
-  UINT8   PchFSAOn;       //FSA control  
+  UINT8   PchFSAOn;       //FSA control
   UINT8   EhciPllCfgEnable;
 
 
@@ -1201,10 +1201,10 @@ typedef struct {
   UINT8   ISCT01;
   UINT8   ISCT02;
   UINT8   ISCT03;
-  UINT8	  ISCT04;
-  UINT8	  ISCT05;
-  UINT8	  ISCT06;
-  UINT8	  ISCT07;
+  UINT8    ISCT04;
+  UINT8    ISCT05;
+  UINT8    ISCT06;
+  UINT8    ISCT07;
   //
   // Azalia Configuration
   //
@@ -1227,49 +1227,49 @@ typedef struct {
   UINT8   SEC05;
   UINT8   SEC06;
   UINT8   SEC07;
-  
+
   UINT8   HdmiCodecPortB;
   UINT8   HdmiCodecPortC;
   UINT8   HdmiCodecPortD;
   UINT8   LidStatus;
   UINT8   Reserved00;
-  UINT8   Reserved01; 
-  UINT16  Reserved02; 
-  UINT16  Reserved03; 
+  UINT8   Reserved01;
+  UINT16  Reserved02;
+  UINT16  Reserved03;
   UINT16  Reserved04;
   UINT16  Reserved05;
-  UINT16  Reserved06;   
-  UINT16  Reserved07;    
-  UINT16  Reserved08;  
-  UINT16  Reserved09; 
-  UINT16  Reserved0A; 
-  UINT16  Reserved0B; 
-  UINT16  Reserved0C; 
+  UINT16  Reserved06;
+  UINT16  Reserved07;
+  UINT16  Reserved08;
+  UINT16  Reserved09;
+  UINT16  Reserved0A;
+  UINT16  Reserved0B;
+  UINT16  Reserved0C;
   UINT16  Reserved0D;
   UINT8   Reserved0E;
-  UINT8   Reserved0F; 
+  UINT8   Reserved0F;
   UINT32  Reserved10;
-  UINT32  Reserved11; 
-  UINT32  Reserved12; 
-  UINT32  Reserved13; 
-  UINT32  Reserved14;  
+  UINT32  Reserved11;
+  UINT32  Reserved12;
+  UINT32  Reserved13;
+  UINT32  Reserved14;
   UINT8   Reserved15;
   UINT8   Reserved16;
   UINT8   Reserved17;
   UINT8   Reserved18;
   UINT8   Reserved19;
   UINT8   Reserved1A;
-  UINT8   Reserved1B;    
+  UINT8   Reserved1B;
   UINT8   Reserved1C;
   UINT8   Reserved1D;
   UINT8   Reserved1E;
   UINT8   Reserved1F;
-  UINT8   Reserved20;	
+  UINT8   Reserved20;
   UINT8   PmicEnable;
   UINT8   IdleReserve;
   UINT8   TSEGSizeSel;
   UINT8   ACPIMemDbg;
-  UINT8	  ExISupport;
+  UINT8    ExISupport;
   UINT8   BatteryChargingSolution;                 //0-non ULPMC 1-ULPMC
   UINT8   PnpSettings;
   UINT8   CfioPnpSettings;
@@ -1349,3 +1349,4 @@ extern EFI_GUID gEfiSetupVariableGuid;
 #define SETUP_DATA SYSTEM_CONFIGURATION
 
 #endif // #ifndef _SETUP_VARIABLE
+

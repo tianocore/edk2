@@ -1,26 +1,26 @@
-// *++
+// /** @file
 //
 // Copyright (c) 2013 - 2015 Intel Corporation. All rights reserved
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
 // http://opensource.org/licenses/bsd-license.php
-// 
+//
 // THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
-// 
+//
 // Module Name:
 //
 //   UqiList.uni
-// 
+//
 // Abstract:
 //
 //   UQI (Universal Question Identifier) allocation for setup options.
 //
 //   This file should define UQIs in the following range only: [0x0000...0x7FFF]
 //
-// --*/
+// **/
 
 /=#
 
@@ -363,7 +363,7 @@
 #string STR_MEASURED_BOOT_ENABLE_HELP                   #language uqi  "\x012F"
 #string STR_PTT_PROMPT                                  #language uqi  "\x0130"
 #string STR_CHECK_SHA256_HASH_MASTER_BOOT_CODES         #language uqi  "\x0131"
-#string STR_USB_XHCI_LPM_SUPPORT_PROMPT			#language uqi  "\x0132"
+#string STR_USB_XHCI_LPM_SUPPORT_PROMPT      #language uqi  "\x0132"
 
 #string STR_VIRTUAL_KB_PROMPT                           #language uqi  "\x0135"
 #string STR_VIRTUAL_KB_HELP                             #language uqi  "\x0136"
@@ -388,7 +388,7 @@
 #string STR_CODEC262_DISABLED_PROMPT                    #language uqi  "\x0149"
 #string STR_CODEC262_DISABLED_HELP                      #language uqi  "\x014A"
 
-//SD CARD SDR25 and DDR50 
+//SD CARD SDR25 and DDR50
 #string STR_SCC_SD_SDR25_PROMPT                         #language uqi  "\x014B"
 #string STR_SCC_SD_SDR25_HELP                           #language uqi  "\x014C"
 #string STR_SCC_SD_DDR50_PROMPT                         #language uqi  "\x014D"
@@ -424,10 +424,10 @@
 #string STR_DROIDBOOT_PROMPT                            #language uqi  "\x0167"
 #string STR_ANDROIDBOOT_PROMPT                          #language uqi  "\x0168"
 
-#string STR_CRITICAL_BATTERY_LIMIT_PROMPT		#language uqi  "\x0169"		
-#string STR_CRITICAL_BATTERY_LIMIT_HELP			#language uqi  "\x016A"
-#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_PROMPT	#language uqi  "\x016B"
-#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_HELP		#language uqi  "\x016C"
+#string STR_CRITICAL_BATTERY_LIMIT_PROMPT    #language uqi  "\x0169"
+#string STR_CRITICAL_BATTERY_LIMIT_HELP      #language uqi  "\x016A"
+#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_PROMPT  #language uqi  "\x016B"
+#string STR_CRITICAL_BATTERY_LIMIT_FEATURE_HELP    #language uqi  "\x016C"
 #string STR_WINDOWS7                                    #language uqi  "\x016D"
 #string STR_LPSSDEVHIDE_PROMPT                          #language uqi  "\x016E"
 #string STR_EM1_IAAPPSRUN_PROMPT                        #language uqi  "\x016F"
@@ -439,9 +439,9 @@
 #string STR_USB_HSIC_0_HELP                             #language uqi  "\x0174"
 #string STR_LEGACYUSBBOOTING_PROMPT                     #language uqi  "\x0175"
 #string STR_STR_LEGACYUSBBOOTING_HELP                   #language uqi  "\x0176"
-#string STR_LWINDOWS7                   				#language uqi  "\x0177"
-#string STR_WEC7		                      			#language uqi  "\x0178"
-#string STR_LINUX		                        		#language uqi  "\x0179"
+#string STR_LWINDOWS7                           #language uqi  "\x0177"
+#string STR_WEC7                                #language uqi  "\x0178"
+#string STR_LINUX                                #language uqi  "\x0179"
 #string STR_WARNING_POPUP                               #language uqi  "\x017A"
 #string STR_LPSS_HSUART1_FLOWCONTROL_PROMPT             #language uqi  "\x017B"
 #string STR_LPSS_HSUART2_FLOWCONTROL_PROMPT             #language uqi  "\x017C"
@@ -453,3 +453,4 @@
 #string STR_RTC_BATTERY_NOT_PRESENT                     #language uqi  "\x0182"
 #string STR_RTC_BATTERY_PRESENT                         #language uqi  "\x0183"
 #string STR_RTC_BATTERY_HELP                            #language uqi  "\x0184"
+

@@ -683,3 +683,4 @@ scope (\_SB.PCI0)
   }   // Device(SEC0)
 
 } // End scope (\_SB.PCI0)
+

@@ -1,23 +1,23 @@
-/*++
+/** @file
 
   Copyright (c) 2004  - 2015, Intel Corporation. All rights reserved.<BR>
-                                                                                   
+
 
   This program and the accompanying materials are licensed and made available under
 
-  the terms and conditions of the BSD License that accompanies this distribution.  
+  the terms and conditions of the BSD License that accompanies this distribution.
 
-  The full text of the license may be found at                                     
+  The full text of the license may be found at
 
-  http://opensource.org/licenses/bsd-license.php.                                  
+  http://opensource.org/licenses/bsd-license.php.
 
-                                                                                   
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
 
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 
-                                                                                   
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+
 
 
 
@@ -97,8 +97,8 @@ typedef struct {
   // Thermal Policy Values
   //
   UINT8       EnableThermalOffset;                        // 18 ThermalOffset for KSC
-  UINT8       Reserved1;                 				  // 19
-  UINT8       Reserved2;               					  // 20
+  UINT8       Reserved1;                           // 19
+  UINT8       Reserved2;                           // 20
   UINT8       PassiveThermalTripPoint;                    // 21
   UINT8       PassiveTc1Value;                            // 22
   UINT8       PassiveTc2Value;                            // 23
@@ -146,7 +146,7 @@ typedef struct {
   UINT8       OnboardCom;             // 55   Onboard COM Port
   UINT8       OnboardComCir;          // 56   Onboard COM CIR Port
 
-  UINT8       WPCN381U;           	  // 57
+  UINT8       WPCN381U;               // 57
   UINT8       NPCE791x;               // 58
   UINT8       Reserved5[1];           // 59
 
@@ -297,7 +297,7 @@ typedef struct {
   UINT32      LPEBar1;                      // 339~342  LPE Bar1
 
   UINT32      LPEBar2;                      // 343~346  LPE Bar2
-  UINT8		    AcSetup;                      // 347 For Ac Powered Config option - IST applet
+  UINT8        AcSetup;                      // 347 For Ac Powered Config option - IST applet
   UINT8       BatterySetup;                 // 348 For Battery Powered Config option - IST applet
   UINT8       PlatformFlavor;               // 349 0:unknown 1: Mobile; 2: desktop
   UINT8       Reserved113[1];                // 350
@@ -307,7 +307,7 @@ typedef struct {
   UINT8       PmicEnable;                   // 353 PMIC enable
 
   UINT8       LpeEnable;                    // 354 LPE enable
-  UINT32      ISPAddr;                      // 355 ISP Base address 
+  UINT32      ISPAddr;                      // 355 ISP Base address
   UINT8       ISPDevSel;                    // 359 ISP device enabled selection 0: Disabled; 1: PCI Device 2; 2: PCI Device 3
 
   //
@@ -389,50 +389,50 @@ typedef struct {
   UINT32      SDCardLen;                   // 626
   UINT32      SDCard1Addr;                 // 630
   UINT32      SDCard1Len;                  // 636
-  UINT32	    MipiHsiAddr;                 // 640 MIPI-HSI
-  UINT32	    MipiHsiLen;                  // 644
-  UINT32	    MipiHsi1Addr;                // 648
-  UINT32	    MipiHsi1Len;                 // 652
+  UINT32      MipiHsiAddr;                 // 640 MIPI-HSI
+  UINT32      MipiHsiLen;                  // 644
+  UINT32      MipiHsi1Addr;                // 648
+  UINT32      MipiHsi1Len;                 // 652
 
   UINT8       SdCardRemovable;                   // 656 reserve offset upto 658
   UINT8       HideLPSSDevices;                   // 657 Hide unsupported LPSS devices when in ACPI mode
   UINT8       ReservedO;                         // 658 OS Selection
-  UINT8       Reserved00;                        // 659 
-  UINT8       Reserved01;                        // 660  
-  UINT8       Reserved02;                   // 661  
-  UINT8       Reserved03;                   // 662  
-  UINT8       Reserved04;                   // 663  
-  UINT8       Reserved05;                   // 664  
-  UINT8       Reserved06;                   // 665  
-  UINT8       Reserved07;                       // 666 
-  UINT8       Reserved08;                 // 667  
-  UINT8       Reserved09;                     // 668  
-  UINT8       Reserved0A;                     // 669  
-  UINT32      Reserved0B;       // 670 
-  UINT32      Reserved0C;        // 674 
-  UINT32      Reserved0D;   // 678 
-  UINT32      Reserved0E;    // 682 
-  UINT32      Reserved0F;   // 686 
-  UINT32      Reserved10;    // 690 
-  UINT32      Reserved11;   // 694 
-  UINT32      Reserved12;    // 698 
-  UINT32      Reserved13;   // 702 
-  UINT32      Reserved14;    // 706 
-  UINT32      Reserved15;   // 710 
-  UINT32      Reserved16;    // 714 
-  UINT8       Reserved17;   
-  UINT32      Reserved18;     
-  UINT32      Reserved19;         
-  UINT32      Reserved1A;        
-  UINT32      Reserved1B;           
-  UINT32      Reserved1C;  
-  UINT8       Reserved1D; 
-  UINT32      Reserved1E; 
-  UINT32      Reserved1F;  
-  UINT32      Reserved20; 
-  UINT32      Reserved21;   
-  UINT32      Reserved22;   
-  UINT8       Reserved23; 
+  UINT8       Reserved00;                        // 659
+  UINT8       Reserved01;                        // 660
+  UINT8       Reserved02;                   // 661
+  UINT8       Reserved03;                   // 662
+  UINT8       Reserved04;                   // 663
+  UINT8       Reserved05;                   // 664
+  UINT8       Reserved06;                   // 665
+  UINT8       Reserved07;                       // 666
+  UINT8       Reserved08;                 // 667
+  UINT8       Reserved09;                     // 668
+  UINT8       Reserved0A;                     // 669
+  UINT32      Reserved0B;       // 670
+  UINT32      Reserved0C;        // 674
+  UINT32      Reserved0D;   // 678
+  UINT32      Reserved0E;    // 682
+  UINT32      Reserved0F;   // 686
+  UINT32      Reserved10;    // 690
+  UINT32      Reserved11;   // 694
+  UINT32      Reserved12;    // 698
+  UINT32      Reserved13;   // 702
+  UINT32      Reserved14;    // 706
+  UINT32      Reserved15;   // 710
+  UINT32      Reserved16;    // 714
+  UINT8       Reserved17;
+  UINT32      Reserved18;
+  UINT32      Reserved19;
+  UINT32      Reserved1A;
+  UINT32      Reserved1B;
+  UINT32      Reserved1C;
+  UINT8       Reserved1D;
+  UINT32      Reserved1E;
+  UINT32      Reserved1F;
+  UINT32      Reserved20;
+  UINT32      Reserved21;
+  UINT32      Reserved22;
+  UINT8       Reserved23;
   UINT8       BatteryChargingSolution;           // 761 0-non ULPMC 1-ULPMC
 
   //
@@ -463,8 +463,8 @@ typedef struct {
 
   UINT8       SocStepping;                       // 786 Soc Stepping infomation
   UINT8       AmbientTripPointChange;            // 787 DPTF: Controls whether _ATI changes other participant's trip point(enabled/disabled)
-  UINT8       UtsEnable;                         // 788 Uart Test eanble 0 - disable 1 - enable 
-  UINT8 	  DptfReserve;		   // 789  
+  UINT8       UtsEnable;                         // 788 Uart Test eanble 0 - disable 1 - enable
+  UINT8     DptfReserve;       // 789
 
   UINT8       SarEnable;                          // 790
   UINT8       PssDeveice;                        // 791 PSS Deveice: 0 - None, 1 - Monzax 2K, 2 - Monzax 8K
@@ -483,3 +483,4 @@ typedef struct _EFI_GLOBAL_NVS_AREA_PROTOCOL {
 } EFI_GLOBAL_NVS_AREA_PROTOCOL;
 
 #endif
+
