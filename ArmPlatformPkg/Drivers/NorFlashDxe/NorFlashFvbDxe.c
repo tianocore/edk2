@@ -111,7 +111,7 @@ InitializeFvAndVariableStoreHeaders (
   // VARIABLE_STORE_HEADER
   //
   VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINTN)Headers + FirmwareVolumeHeader->HeaderLength);
-  CopyGuid (&VariableStoreHeader->Signature, mNorFlashVariableGuid);
+  CopyGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid);
   VariableStoreHeader->Size = PcdGet32(PcdFlashNvStorageVariableSize) - FirmwareVolumeHeader->HeaderLength;
   VariableStoreHeader->Format            = VARIABLE_STORE_FORMATTED;
   VariableStoreHeader->State             = VARIABLE_STORE_HEALTHY;
@@ -181,7 +181,8 @@ ValidateFvHeader (
   VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINTN)FwVolHeader + FwVolHeader->HeaderLength);
 
   // Check the Variable Store Guid
-  if (!CompareGuid (&VariableStoreHeader->Signature, mNorFlashVariableGuid)) {
+  if (!CompareGuid (&VariableStoreHeader->Signature, &gEfiVariableGuid) &&
+      !CompareGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid)) {
     DEBUG ((EFI_D_INFO, "%a: Variable Store Guid non-compatible\n",
       __FUNCTION__));
     return EFI_NOT_FOUND;

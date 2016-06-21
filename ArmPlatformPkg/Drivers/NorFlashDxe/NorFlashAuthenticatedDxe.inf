@@ -28,7 +28,6 @@
   NorFlashDxe.c
   NorFlashFvbDxe.c
   NorFlashBlockIoDxe.c
-  NorFlashAuthenticatedVariableDep.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -50,6 +49,7 @@
 
 [Guids]
   gEfiSystemNvDataFvGuid
+  gEfiVariableGuid
   gEfiAuthenticatedVariableGuid
   gEfiEventVirtualAddressChangeGuid
 

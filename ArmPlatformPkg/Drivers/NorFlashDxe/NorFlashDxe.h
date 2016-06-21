@@ -152,8 +152,6 @@ struct _NOR_FLASH_INSTANCE {
   NOR_FLASH_DEVICE_PATH               DevicePath;
 };
 
-extern CONST EFI_GUID* CONST          mNorFlashVariableGuid;
-
 EFI_STATUS
 NorFlashReadCfiData (
   IN  UINTN                   DeviceBaseAddress,
