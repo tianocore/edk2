@@ -3,15 +3,24 @@
 #
 # This package provides platform specific modules.
 # Copyright (c) 2009  - 2015, Intel Corporation. All rights reserved.<BR>
-#                                                                                  
-# This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.  
-# The full text of the license may be found at                                     
-# http://opensource.org/licenses/bsd-license.php.                                  
-#                                                                                  
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-#                                                                                  
+#
+
+# This program and the accompanying materials are licensed and made available under
+
+# the terms and conditions of the BSD License that accompanies this distribution.
+
+# The full text of the license may be found at
+
+# http://opensource.org/licenses/bsd-license.php.
+
+#
+
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+#
+
 #
 #
 #**/
@@ -206,3 +215,4 @@
   gEfiEsrtTableGuid              = { 0xb122a263, 0x3661, 0x4f68, { 0x99, 0x29, 0x78, 0xf8, 0xb0, 0xd6, 0x21, 0x80 } }
   gEfiCapsuleCrashLogVarGuid     = { 0xf3ff1468, 0x04ba, 0x4966, { 0x9f, 0xb2, 0xe4, 0xa7, 0x90, 0x05, 0x46, 0x50 } }
   gEfiCapsuleCrashGuid           = { 0x0e1d2972, 0x65af, 0x4ac1, { 0xbf, 0xa3, 0xce, 0xf4, 0xab, 0x0c, 0x38, 0xfe } }
+

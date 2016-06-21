@@ -1,15 +1,15 @@
-#/*++
+## @file
 #
 #  Copyright (c)  1999  - 2015, Intel Corporation. All rights reserved
-#                                                                                  
+#
 # This program and the accompanying materials are licensed and made available under
-# the terms and conditions of the BSD License that accompanies this distribution.  
-# The full text of the license may be found at                                     
-# http://opensource.org/licenses/bsd-license.php.                                  
-#                                                                                  
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-#                                                                                  
+# the terms and conditions of the BSD License that accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php.
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
 #
 #  Module Name:
 #
@@ -24,7 +24,7 @@
 #  R01     <04/22/2011>       LB     Update code for SIO83627UHG support.
 #  ------------------------------------------------------------------------------
 #
-#--*/
+##
 
 [defines]
   INF_VERSION                    = 0x00010005
@@ -141,7 +141,7 @@
   gPlatformModuleTokenSpaceGuid.PcdFlashFvRecoveryBase
   gPlatformModuleTokenSpaceGuid.PcdFlashFvRecoverySize
   gFspWrapperTokenSpaceGuid.PcdFlashFvFspBase
-  
+
 
 [Depex]
   gEfiPciRootBridgeIoProtocolGuid     AND
