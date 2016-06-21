@@ -542,14 +542,13 @@ INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET
   #
 INF MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
 INF MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PiSmmCpuDxeSmm.inf
+INF UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
 
 INF UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
 INF MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PiSmmCommunicationSmm.inf
+INF UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
 INF $(PLATFORM_PACKAGE)/SmmSwDispatch2OnSmmSwDispatchThunk/SmmSwDispatch2OnSmmSwDispatchThunk.inf
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PowerManagement2.inf
-# INF Vlv2DeviceRefCodePkg/ValleyView2Soc/CPU/Dts/Smm/DigitalThermalSensor.inf
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/DigitalThermalSensor.inf
   #
   # ACPI
