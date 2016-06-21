@@ -273,7 +273,9 @@ HttpBootFormExtractConfig (
     ConfigRequestHdr = HiiConstructConfigHdr (&gHttpBootConfigGuid, mHttpBootConfigStorageName, CallbackInfo->ChildHandle);
     Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
+    if (ConfigRequest == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);
@@ -464,7 +466,6 @@ HttpBootFormCallback (
     // Get user input URI string
     //
     Uri = HiiGetString (CallbackInfo->RegisteredHandle, Value->string, NULL);
-    ASSERT (Uri != NULL);
     if (Uri == NULL) {
       return EFI_UNSUPPORTED;
     }

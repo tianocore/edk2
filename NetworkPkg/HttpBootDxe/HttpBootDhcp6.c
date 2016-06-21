@@ -401,6 +401,7 @@ HttpBootCacheDhcp6Offer (
   @retval EFI_NOT_READY         Only used in the Dhcp6Selecting state. The EFI DHCPv6 Protocol
                                 driver will continue to wait for more packets.
   @retval EFI_ABORTED           Told the EFI DHCPv6 Protocol driver to abort the current process.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources.
 
 **/
 EFI_STATUS
@@ -451,7 +452,9 @@ HttpBootDhcp6CallBack (
        ASSERT (NewPacket != NULL);
        SelectAd   = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp6.Packet.Offer;
        *NewPacket = AllocateZeroPool (SelectAd->Size);
-       ASSERT (*NewPacket != NULL);
+       if (*NewPacket == NULL) {
+         return EFI_OUT_OF_RESOURCES;
+       }
        CopyMem (*NewPacket, SelectAd, SelectAd->Size);
      }
      break;

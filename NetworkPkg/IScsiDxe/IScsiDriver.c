@@ -323,6 +323,7 @@ IScsiSupported (
   @retval EFI_INVALID_PARAMETER Any input parameter is invalid.
   @retval EFI_NOT_FOUND         There is no sufficient information to establish
                                 the iScsi session.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
   @retval EFI_DEVICE_ERROR      Failed to get TCP connection device path.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the Handle
                                 because its interfaces are being used.

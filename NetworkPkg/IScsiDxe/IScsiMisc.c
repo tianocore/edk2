@@ -1006,6 +1006,7 @@ IScsiDhcpIsConfigured (
 
   @retval EFI_SUCCESS            The configuration data is retrieved.
   @retval EFI_NOT_FOUND          This iSCSI driver is not configured yet.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
 
 **/
 EFI_STATUS
@@ -1292,7 +1293,9 @@ IScsiGetConfigData (
                                                  mPrivate->PortString,
                                                  NULL
                                                  );
-    ASSERT (AttemptConfigData->AttemptTitleHelpToken != 0);
+    if (AttemptConfigData->AttemptTitleHelpToken == 0) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     //
     // Record the attempt in global link list.
