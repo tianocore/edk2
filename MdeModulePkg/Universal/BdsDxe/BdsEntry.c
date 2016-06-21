@@ -6,7 +6,7 @@
   to enter BDS phase.
 
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -923,9 +923,10 @@ BdsEntry (
       if (!EFI_ERROR (Status)) {
         EfiBootManagerBoot (&LoadOption);
         EfiBootManagerFreeLoadOption (&LoadOption);
-        if (LoadOption.Status == EFI_SUCCESS) {
+        if ((LoadOption.Status == EFI_SUCCESS) && (LoadOption.OptionNumber != BootManagerMenu.OptionNumber)) {
           //
           // Boot to Boot Manager Menu upon EFI_SUCCESS
+          // Exception: Do not boot again when the BootNext points to Boot Manager Menu.
           //
           EfiBootManagerBoot (&BootManagerMenu);
         }
