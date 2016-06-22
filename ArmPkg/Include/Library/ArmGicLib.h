@@ -47,8 +47,9 @@
 // GICv3 specific registers
 #define ARM_GICD_IROUTER        0x6100 // Interrupt Routing Registers
 
-// the Affinity Routing Enable (ARE) bit in GICD_CTLR
-#define ARM_GIC_ICDDCR_ARE      (1 << 4)
+// GICD_CTLR bits
+#define ARM_GIC_ICDDCR_ARE      (1 << 4) // Affinity Routing Enable (ARE)
+#define ARM_GIC_ICDDCR_DS       (1 << 6) // Disable Security (DS)
 
 //
 // GIC Redistributor

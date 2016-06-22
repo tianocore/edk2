@@ -297,6 +297,22 @@ GicV3DxeInitialize (
     MpId = ArmReadMpidr ();
     CpuTarget = MpId & (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2 | ARM_CORE_AFF3);
 
+    if ((MmioRead32 (mGicDistributorBase + ARM_GIC_ICDDCR) & ARM_GIC_ICDDCR_DS) != 0) {
+      //
+      // If the Disable Security (DS) control bit is set, we are dealing with a
+      // GIC that has only one security state. In this case, let's assume we are
+      // executing in non-secure state (which is appropriate for DXE modules)
+      // and that no other firmware has performed any configuration on the GIC.
+      // This means we need to reconfigure all interrupts to non-secure Group 1
+      // first.
+      //
+      MmioWrite32 (mGicRedistributorsBase + ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDISR, 0xffffffff);
+
+      for (Index = 32; Index < mGicNumInterrupts; Index += 32) {
+        MmioWrite32 (mGicDistributorBase + ARM_GIC_ICDISR + Index / 8, 0xffffffff);
+      }
+    }
+
     // Route the SPIs to the primary CPU. SPIs start at the INTID 32
     for (Index = 0; Index < (mGicNumInterrupts - 32); Index++) {
       MmioWrite32 (mGicDistributorBase + ARM_GICD_IROUTER + (Index * 8), CpuTarget | ARM_GICD_IROUTER_IRM);
