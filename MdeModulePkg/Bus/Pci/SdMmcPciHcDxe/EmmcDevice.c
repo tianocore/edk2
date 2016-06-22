@@ -51,6 +51,8 @@ EmmcReset (
   SdMmcCmdBlk.ResponseType = 0;
   SdMmcCmdBlk.CommandArgument = 0;
 
+  gBS->Stall (1000);
+
   Status = SdMmcPassThruPassThru (PassThru, Slot, &Packet, NULL);
 
   return Status;
