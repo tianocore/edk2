@@ -800,7 +800,7 @@ SdDxeDriverBindingStop (
     //
     // Free all on-going async tasks.
     //
-    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     for (Link = GetFirstNode (&Device->Queue);
          !IsNull (&Device->Queue, Link);
          Link = NextLink) {

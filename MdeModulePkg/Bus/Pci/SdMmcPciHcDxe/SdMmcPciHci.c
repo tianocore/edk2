@@ -1315,7 +1315,7 @@ SdMmcCreateTrb (
   }
 
   if (Event != NULL) {
-    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     InsertTailList (&Private->Queue, &Trb->TrbList);
     gBS->RestoreTPL (OldTpl);
   }

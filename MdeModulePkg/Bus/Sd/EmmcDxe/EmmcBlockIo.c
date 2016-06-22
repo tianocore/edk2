@@ -339,7 +339,7 @@ EmmcSetExtCsd (
   }
 
   SetExtCsdReq->Signature = EMMC_REQUEST_SIGNATURE;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&Partition->Queue, &SetExtCsdReq->Link);
   gBS->RestoreTPL (OldTpl);
   SetExtCsdReq->Packet.SdMmcCmdBlk    = &SetExtCsdReq->SdMmcCmdBlk;
@@ -361,7 +361,7 @@ EmmcSetExtCsd (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
+                    TPL_NOTIFY,
                     AsyncIoCallback,
                     SetExtCsdReq,
                     &SetExtCsdReq->Event
@@ -382,7 +382,7 @@ Error:
     // The request and event will be freed in asynchronous callback for success case.
     //
     if (EFI_ERROR (Status) && (SetExtCsdReq != NULL)) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&SetExtCsdReq->Link);
       gBS->RestoreTPL (OldTpl);
       if (SetExtCsdReq->Event != NULL) {
@@ -395,7 +395,7 @@ Error:
     // For synchronous operation, free request whatever the execution result is.
     //
     if (SetExtCsdReq != NULL) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&SetExtCsdReq->Link);
       gBS->RestoreTPL (OldTpl);
       FreePool (SetExtCsdReq);
@@ -445,7 +445,7 @@ EmmcSetBlkCount (
   }
 
   SetBlkCntReq->Signature = EMMC_REQUEST_SIGNATURE;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&Partition->Queue, &SetBlkCntReq->Link);
   gBS->RestoreTPL (OldTpl);
   SetBlkCntReq->Packet.SdMmcCmdBlk    = &SetBlkCntReq->SdMmcCmdBlk;
@@ -463,7 +463,7 @@ EmmcSetBlkCount (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
+                    TPL_NOTIFY,
                     AsyncIoCallback,
                     SetBlkCntReq,
                     &SetBlkCntReq->Event
@@ -484,7 +484,7 @@ Error:
     // The request and event will be freed in asynchronous callback for success case.
     //
     if (EFI_ERROR (Status) && (SetBlkCntReq != NULL)) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&SetBlkCntReq->Link);
       gBS->RestoreTPL (OldTpl);
       if (SetBlkCntReq->Event != NULL) {
@@ -497,7 +497,7 @@ Error:
     // For synchronous operation, free request whatever the execution result is.
     //
     if (SetBlkCntReq != NULL) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&SetBlkCntReq->Link);
       gBS->RestoreTPL (OldTpl);
       FreePool (SetBlkCntReq);
@@ -562,7 +562,7 @@ EmmcProtocolInOut (
   }
 
   ProtocolReq->Signature = EMMC_REQUEST_SIGNATURE;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&Partition->Queue, &ProtocolReq->Link);
   gBS->RestoreTPL (OldTpl);
   ProtocolReq->Packet.SdMmcCmdBlk    = &ProtocolReq->SdMmcCmdBlk;
@@ -596,7 +596,7 @@ EmmcProtocolInOut (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
+                    TPL_NOTIFY,
                     AsyncIoCallback,
                     ProtocolReq,
                     &ProtocolReq->Event
@@ -617,7 +617,7 @@ Error:
     // The request and event will be freed in asynchronous callback for success case.
     //
     if (EFI_ERROR (Status) && (ProtocolReq != NULL)) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&ProtocolReq->Link);
       gBS->RestoreTPL (OldTpl);
       if (ProtocolReq->Event != NULL) {
@@ -630,7 +630,7 @@ Error:
     // For synchronous operation, free request whatever the execution result is.
     //
     if (ProtocolReq != NULL) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&ProtocolReq->Link);
       gBS->RestoreTPL (OldTpl);
       FreePool (ProtocolReq);
@@ -688,7 +688,7 @@ EmmcRwMultiBlocks (
   }
 
   RwMultiBlkReq->Signature = EMMC_REQUEST_SIGNATURE;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&Partition->Queue, &RwMultiBlkReq->Link);
   gBS->RestoreTPL (OldTpl);
   RwMultiBlkReq->Packet.SdMmcCmdBlk    = &RwMultiBlkReq->SdMmcCmdBlk;
@@ -730,7 +730,7 @@ EmmcRwMultiBlocks (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
+                    TPL_NOTIFY,
                     AsyncIoCallback,
                     RwMultiBlkReq,
                     &RwMultiBlkReq->Event
@@ -751,7 +751,7 @@ Error:
     // The request and event will be freed in asynchronous callback for success case.
     //
     if (EFI_ERROR (Status) && (RwMultiBlkReq != NULL)) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&RwMultiBlkReq->Link);
       gBS->RestoreTPL (OldTpl);
       if (RwMultiBlkReq->Event != NULL) {
@@ -764,7 +764,7 @@ Error:
     // For synchronous operation, free request whatever the execution result is.
     //
     if (RwMultiBlkReq != NULL) {
-      OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&RwMultiBlkReq->Link);
       gBS->RestoreTPL (OldTpl);
       FreePool (RwMultiBlkReq);
@@ -901,7 +901,7 @@ EmmcReadWrite (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    DEBUG ((EFI_D_INFO, "Emmc%a(): Lba 0x%x BlkNo 0x%x Event %p with %r\n", IsRead ? "Read" : "Write", Lba, BlockNum, Token->Event, Status));
+    DEBUG ((EFI_D_INFO, "Emmc%a(): Part %d Lba 0x%x BlkNo 0x%x Event %p with %r\n", IsRead ? "Read " : "Write", Partition->PartitionType, Lba, BlockNum, Token ? Token->Event : NULL, Status));
 
     Lba   += BlockNum;
     Buffer = (UINT8*)Buffer + BufferSize;
@@ -1069,7 +1069,7 @@ EmmcResetEx (
 
   Partition = EMMC_PARTITION_DATA_FROM_BLKIO2 (This);
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   for (Link = GetFirstNode (&Partition->Queue);
        !IsNull (&Partition->Queue, Link);
        Link = NextLink) {
@@ -1629,7 +1629,7 @@ EmmcEraseBlockStart (
   }
 
   EraseBlockStart->Signature = EMMC_REQUEST_SIGNATURE;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&Partition->Queue, &EraseBlockStart->Link);
   gBS->RestoreTPL (OldTpl);
   EraseBlockStart->Packet.SdMmcCmdBlk    = &EraseBlockStart->SdMmcCmdBlk;
@@ -1652,7 +1652,7 @@ EmmcEraseBlockStart (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
+                    TPL_NOTIFY,
                     AsyncIoCallback,
                     EraseBlockStart,
                     &EraseBlockStart->Event
@@ -1673,7 +1673,9 @@ Error:
     // The request and event will be freed in asynchronous callback for success case.
     //
     if (EFI_ERROR (Status) && (EraseBlockStart != NULL)) {
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&EraseBlockStart->Link);
+      gBS->RestoreTPL (OldTpl);
       if (EraseBlockStart->Event != NULL) {
         gBS->CloseEvent (EraseBlockStart->Event);
       }
@@ -1684,7 +1686,9 @@ Error:
     // For synchronous operation, free request whatever the execution result is.
     //
     if (EraseBlockStart != NULL) {
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&EraseBlockStart->Link);
+      gBS->RestoreTPL (OldTpl);
       FreePool (EraseBlockStart);
     }
   }
@@ -1732,7 +1736,7 @@ EmmcEraseBlockEnd (
   }
 
   EraseBlockEnd->Signature = EMMC_REQUEST_SIGNATURE;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&Partition->Queue, &EraseBlockEnd->Link);
   gBS->RestoreTPL (OldTpl);
   EraseBlockEnd->Packet.SdMmcCmdBlk    = &EraseBlockEnd->SdMmcCmdBlk;
@@ -1755,7 +1759,7 @@ EmmcEraseBlockEnd (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
+                    TPL_NOTIFY,
                     AsyncIoCallback,
                     EraseBlockEnd,
                     &EraseBlockEnd->Event
@@ -1776,7 +1780,9 @@ Error:
     // The request and event will be freed in asynchronous callback for success case.
     //
     if (EFI_ERROR (Status) && (EraseBlockEnd != NULL)) {
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&EraseBlockEnd->Link);
+      gBS->RestoreTPL (OldTpl);
       if (EraseBlockEnd->Event != NULL) {
         gBS->CloseEvent (EraseBlockEnd->Event);
       }
@@ -1787,7 +1793,9 @@ Error:
     // For synchronous operation, free request whatever the execution result is.
     //
     if (EraseBlockEnd != NULL) {
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&EraseBlockEnd->Link);
+      gBS->RestoreTPL (OldTpl);
       FreePool (EraseBlockEnd);
     }
   }
@@ -1833,7 +1841,7 @@ EmmcEraseBlock (
   }
 
   EraseBlock->Signature = EMMC_REQUEST_SIGNATURE;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   InsertTailList (&Partition->Queue, &EraseBlock->Link);
   gBS->RestoreTPL (OldTpl);
   EraseBlock->Packet.SdMmcCmdBlk    = &EraseBlock->SdMmcCmdBlk;
@@ -1850,7 +1858,7 @@ EmmcEraseBlock (
   if ((Token != NULL) && (Token->Event != NULL)) {
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
+                    TPL_NOTIFY,
                     AsyncIoCallback,
                     EraseBlock,
                     &EraseBlock->Event
@@ -1871,7 +1879,9 @@ Error:
     // The request and event will be freed in asynchronous callback for success case.
     //
     if (EFI_ERROR (Status) && (EraseBlock != NULL)) {
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&EraseBlock->Link);
+      gBS->RestoreTPL (OldTpl);
       if (EraseBlock->Event != NULL) {
         gBS->CloseEvent (EraseBlock->Event);
       }
@@ -1882,7 +1892,9 @@ Error:
     // For synchronous operation, free request whatever the execution result is.
     //
     if (EraseBlock != NULL) {
+      OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
       RemoveEntryList (&EraseBlock->Link);
+      gBS->RestoreTPL (OldTpl);
       FreePool (EraseBlock);
     }
   }
