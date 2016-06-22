@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,8 @@
 
 
 #include <Uefi.h>
+
+#include <IndustryStandard/Dhcp.h>
 
 #include <Protocol/Dhcp6.h>
 #include <Protocol/Udp6.h>
@@ -50,66 +52,6 @@ typedef struct _DHCP6_INSTANCE DHCP6_INSTANCE;
 #define DHCP6_SERVICE_SIGNATURE   SIGNATURE_32 ('D', 'H', '6', 'S')
 #define DHCP6_INSTANCE_SIGNATURE  SIGNATURE_32 ('D', 'H', '6', 'I')
 
-//
-// Transmit parameters of solicit message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_SOL_MAX_DELAY       1
-#define DHCP6_SOL_IRT             1
-#define DHCP6_SOL_MRC             0
-#define DHCP6_SOL_MRT             120
-#define DHCP6_SOL_MRD             0
-//
-// Transmit parameters of request message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_REQ_IRT             1
-#define DHCP6_REQ_MRC             10
-#define DHCP6_REQ_MRT             30
-#define DHCP6_REQ_MRD             0
-//
-// Transmit parameters of confirm message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_CNF_MAX_DELAY       1
-#define DHCP6_CNF_IRT             1
-#define DHCP6_CNF_MRC             0
-#define DHCP6_CNF_MRT             4
-#define DHCP6_CNF_MRD             10
-//
-// Transmit parameters of renew message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_REN_IRT             10
-#define DHCP6_REN_MRC             0
-#define DHCP6_REN_MRT             600
-#define DHCP6_REN_MRD             0
-//
-// Transmit parameters of rebind message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_REB_IRT             10
-#define DHCP6_REB_MRC             0
-#define DHCP6_REB_MRT             600
-#define DHCP6_REB_MRD             0
-//
-// Transmit parameters of information request message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_INF_MAX_DELAY       1
-#define DHCP6_INF_IRT             1
-#define DHCP6_INF_MRC             0
-#define DHCP6_INF_MRT             120
-#define DHCP6_INF_MRD             0
-//
-// Transmit parameters of release message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_REL_IRT             1
-#define DHCP6_REL_MRC             5
-#define DHCP6_REL_MRT             0
-#define DHCP6_REL_MRD             0
-//
-// Transmit parameters of decline message, refers to section-5.5 of rfc-3315.
-//
-#define DHCP6_DEC_IRT             1
-#define DHCP6_DEC_MRC             5
-#define DHCP6_DEC_MRT             0
-#define DHCP6_DEC_MRD             0
-
 #define DHCP6_PACKET_ALL          0
 #define DHCP6_PACKET_STATEFUL     1
 #define DHCP6_PACKET_STATELESS    2
@@ -125,70 +67,6 @@ typedef struct _DHCP6_INSTANCE DHCP6_INSTANCE;
 extern EFI_IPv6_ADDRESS           mAllDhcpRelayAndServersAddress;
 extern EFI_IPv6_ADDRESS           mAllDhcpServersAddress;
 extern EFI_DHCP6_PROTOCOL         gDhcp6ProtocolTemplate;
-
-//
-// Enumeration of Dhcp6 message type, refers to section-5.3 of rfc-3315.
-//
-typedef enum {
-  Dhcp6MsgSolicit               = 1,
-  Dhcp6MsgAdvertise             = 2,
-  Dhcp6MsgRequest               = 3,
-  Dhcp6MsgConfirm               = 4,
-  Dhcp6MsgRenew                 = 5,
-  Dhcp6MsgRebind                = 6,
-  Dhcp6MsgReply                 = 7,
-  Dhcp6MsgRelease               = 8,
-  Dhcp6MsgDecline               = 9,
-  Dhcp6MsgReconfigure           = 10,
-  Dhcp6MsgInfoRequest           = 11
-} DHCP6_MSG_TYPE;
-
-//
-// Enumeration of option code in Dhcp6 packet, refers to section-24.3 of rfc-3315.
-//
-typedef enum {
-  Dhcp6OptClientId              = 1,
-  Dhcp6OptServerId              = 2,
-  Dhcp6OptIana                  = 3,
-  Dhcp6OptIata                  = 4,
-  Dhcp6OptIaAddr                = 5,
-  Dhcp6OptRequestOption         = 6,
-  Dhcp6OptPreference            = 7,
-  Dhcp6OptElapsedTime           = 8,
-  Dhcp6OptReplayMessage         = 9,
-  Dhcp6OptAuthentication        = 11,
-  Dhcp6OptServerUnicast         = 12,
-  Dhcp6OptStatusCode            = 13,
-  Dhcp6OptRapidCommit           = 14,
-  Dhcp6OptUserClass             = 15,
-  Dhcp6OptVendorClass           = 16,
-  Dhcp6OptVendorInfo            = 17,
-  Dhcp6OptInterfaceId           = 18,
-  Dhcp6OptReconfigMessage       = 19,
-  Dhcp6OptReconfigureAccept     = 20
-} DHCP6_OPT_CODE;
-
-//
-// Enumeration of status code recorded by IANA, refers to section-24.4 of rfc-3315.
-//
-typedef enum {
-  Dhcp6StsSuccess               = 0,
-  Dhcp6StsUnspecFail            = 1,
-  Dhcp6StsNoAddrsAvail          = 2,
-  Dhcp6StsNoBinding             = 3,
-  Dhcp6StsNotOnLink             = 4,
-  Dhcp6StsUseMulticast          = 5
-} DHCP6_STS_CODE;
-
-//
-// Enumeration of Duid type recorded by IANA, refers to section-24.5 of rfc-3315.
-//
-typedef enum {
-  Dhcp6DuidTypeLlt              = 1,
-  Dhcp6DuidTypeEn               = 2,
-  Dhcp6DuidTypeLl               = 3,
-  Dhcp6DuidTypeUuid             = 4
-} DHCP6_DUID_TYPE;
 
 //
 // Control block for each IA.

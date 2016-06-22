@@ -219,9 +219,9 @@ Ip6ConfigStartStatefulAutoConfig (
   // with DNS SERVERS.
   //
   Oro                         = (EFI_DHCP6_PACKET_OPTION *) OptBuf;
-  Oro->OpCode                 = HTONS (IP6_CONFIG_DHCP6_OPTION_ORO);
+  Oro->OpCode                 = HTONS (DHCP6_OPT_ORO);
   Oro->OpLen                  = HTONS (2);
-  *((UINT16 *) &Oro->Data[0]) = HTONS (IP6_CONFIG_DHCP6_OPTION_DNS_SERVERS);
+  *((UINT16 *) &Oro->Data[0]) = HTONS (DHCP6_OPT_DNS_SERVERS);
   OptList[0]                  = Oro;
 
   Status                      = EFI_SUCCESS;
@@ -1508,7 +1508,7 @@ Ip6ConfigParseDhcpReply (
     CopyMem (&OpCode, &OptList[Index]->OpCode, sizeof (OpCode));
     OpCode = NTOHS (OpCode);
 
-    if (OpCode == IP6_CONFIG_DHCP6_OPTION_DNS_SERVERS) {
+    if (OpCode == DHCP6_OPT_DNS_SERVERS) {
       CopyMem (&Length, &OptList[Index]->OpLen, sizeof (Length));
       Length = NTOHS (Length);
 

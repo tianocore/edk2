@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv6 for HTTP boot driver.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -41,20 +41,20 @@ HttpBootBuildDhcp6Options (
   //
   // Append client option request option
   //
-  OptList[Index]->OpCode     = HTONS (HTTP_BOOT_DHCP6_OPT_ORO);
+  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ORO);
   OptList[Index]->OpLen      = HTONS (8);
   OptEnt.Oro                 = (HTTP_BOOT_DHCP6_OPTION_ORO *) OptList[Index]->Data;
-  OptEnt.Oro->OpCode[0]      = HTONS(HTTP_BOOT_DHCP6_OPT_BOOT_FILE_URL);
-  OptEnt.Oro->OpCode[1]      = HTONS(HTTP_BOOT_DHCP6_OPT_BOOT_FILE_PARAM);
-  OptEnt.Oro->OpCode[2]      = HTONS(HTTP_BOOT_DHCP6_OPT_DNS_SERVERS);
-  OptEnt.Oro->OpCode[3]      = HTONS(HTTP_BOOT_DHCP6_OPT_VENDOR_CLASS);
+  OptEnt.Oro->OpCode[0]      = HTONS(DHCP6_OPT_BOOT_FILE_URL);
+  OptEnt.Oro->OpCode[1]      = HTONS(DHCP6_OPT_BOOT_FILE_PARAM);
+  OptEnt.Oro->OpCode[2]      = HTONS(DHCP6_OPT_DNS_SERVERS);
+  OptEnt.Oro->OpCode[3]      = HTONS(DHCP6_OPT_VENDOR_CLASS);
   Index++;
   OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
   //
   // Append client network device interface option
   //
-  OptList[Index]->OpCode     = HTONS (HTTP_BOOT_DHCP6_OPT_UNDI);
+  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_UNDI);
   OptList[Index]->OpLen      = HTONS ((UINT16)3);
   OptEnt.Undi                = (HTTP_BOOT_DHCP6_OPTION_UNDI *) OptList[Index]->Data;
 
@@ -74,7 +74,7 @@ HttpBootBuildDhcp6Options (
   //
   // Append client system architecture option
   //
-  OptList[Index]->OpCode     = HTONS (HTTP_BOOT_DHCP6_OPT_ARCH);
+  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ARCH);
   OptList[Index]->OpLen      = HTONS ((UINT16) sizeof (HTTP_BOOT_DHCP6_OPTION_ARCH));
   OptEnt.Arch                = (HTTP_BOOT_DHCP6_OPTION_ARCH *) OptList[Index]->Data;
   Value                      = HTONS (EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE);
@@ -85,7 +85,7 @@ HttpBootBuildDhcp6Options (
   //
   // Append vendor class identify option.
   //
-  OptList[Index]->OpCode       = HTONS (HTTP_BOOT_DHCP6_OPT_VENDOR_CLASS);
+  OptList[Index]->OpCode       = HTONS (DHCP6_OPT_VENDOR_CLASS);
   OptList[Index]->OpLen        = HTONS ((UINT16) sizeof (HTTP_BOOT_DHCP6_OPTION_VENDOR_CLASS));
   OptEnt.VendorClass           = (HTTP_BOOT_DHCP6_OPTION_VENDOR_CLASS *) OptList[Index]->Data;
   OptEnt.VendorClass->Vendor   = HTONL (HTTP_BOOT_DHCP6_ENTERPRISE_NUM);
@@ -211,18 +211,18 @@ HttpBootParseDhcp6Packet (
   //
   while (Offset < Length) {
 
-    if (NTOHS (Option->OpCode) == HTTP_BOOT_DHCP6_OPT_IA_NA) {
+    if (NTOHS (Option->OpCode) == DHCP6_OPT_IA_NA) {
       Options[HTTP_BOOT_DHCP6_IDX_IA_NA] = Option;
-    } else if (NTOHS (Option->OpCode) == HTTP_BOOT_DHCP6_OPT_BOOT_FILE_URL) {
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_BOOT_FILE_URL) {
       //
       // The server sends this option to inform the client about an URL to a boot file.
       //
       Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL] = Option;
-    } else if (NTOHS (Option->OpCode) == HTTP_BOOT_DHCP6_OPT_BOOT_FILE_PARAM) {
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_BOOT_FILE_PARAM) {
       Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_PARAM] = Option;
-    } else if (NTOHS (Option->OpCode) == HTTP_BOOT_DHCP6_OPT_VENDOR_CLASS) {
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_VENDOR_CLASS) {
       Options[HTTP_BOOT_DHCP6_IDX_VENDOR_CLASS] = Option;
-    } else if (NTOHS (Option->OpCode) == HTTP_BOOT_DHCP6_OPT_DNS_SERVERS) {
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_DNS_SERVERS) {
       Options[HTTP_BOOT_DHCP6_IDX_DNS_SERVER] = Option;
     }
 
@@ -238,7 +238,7 @@ HttpBootParseDhcp6Packet (
     Option = HttpBootParseDhcp6Options (
                Option->Data + 12,
                NTOHS (Option->OpLen),
-               HTTP_BOOT_DHCP6_OPT_STATUS_CODE
+               DHCP6_OPT_STATUS_CODE
                );
     if ((Option != NULL && Option->Data[0] == 0) || (Option == NULL)) {
       IsProxyOffer = FALSE;

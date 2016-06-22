@@ -24,47 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HTTP_BOOT_DHCP4_MSG_TYPE_REQUEST       3
 #define HTTP_BOOT_DHCP4_MAGIC                  0x63538263 // network byte order
 
-//
-// Dhcp Options
-//
-#define HTTP_BOOT_DHCP4_TAG_PAD                0    // Pad Option
-#define HTTP_BOOT_DHCP4_TAG_EOP                255  // End Option
-#define HTTP_BOOT_DHCP4_TAG_NETMASK            1    // Subnet Mask
-#define HTTP_BOOT_DHCP4_TAG_TIME_OFFSET        2    // Time Offset from UTC
-#define HTTP_BOOT_DHCP4_TAG_ROUTER             3    // Router option,
-#define HTTP_BOOT_DHCP4_TAG_TIME_SERVER        4    // Time Server
-#define HTTP_BOOT_DHCP4_TAG_NAME_SERVER        5    // Name Server
-#define HTTP_BOOT_DHCP4_TAG_DNS_SERVER         6    // Domain Name Server
-#define HTTP_BOOT_DHCP4_TAG_HOSTNAME           12   // Host Name
-#define HTTP_BOOT_DHCP4_TAG_BOOTFILE_LEN       13   // Boot File Size
-#define HTTP_BOOT_DHCP4_TAG_DUMP               14   // Merit Dump File
-#define HTTP_BOOT_DHCP4_TAG_DOMAINNAME         15   // Domain Name
-#define HTTP_BOOT_DHCP4_TAG_ROOTPATH           17   // Root path
-#define HTTP_BOOT_DHCP4_TAG_EXTEND_PATH        18   // Extensions Path
-#define HTTP_BOOT_DHCP4_TAG_EMTU               22   // Maximum Datagram Reassembly Size
-#define HTTP_BOOT_DHCP4_TAG_TTL                23   // Default IP Time-to-live
-#define HTTP_BOOT_DHCP4_TAG_BROADCAST          28   // Broadcast Address
-#define HTTP_BOOT_DHCP4_TAG_NIS_DOMAIN         40   // Network Information Service Domain
-#define HTTP_BOOT_DHCP4_TAG_NIS_SERVER         41   // Network Information Servers
-#define HTTP_BOOT_DHCP4_TAG_NTP_SERVER         42   // Network Time Protocol Servers
-#define HTTP_BOOT_DHCP4_TAG_VENDOR             43   // Vendor Specific Information
-#define HTTP_BOOT_DHCP4_TAG_REQUEST_IP         50   // Requested IP Address
-#define HTTP_BOOT_DHCP4_TAG_LEASE              51   // IP Address Lease Time
-#define HTTP_BOOT_DHCP4_TAG_OVERLOAD           52   // Option Overload
-#define HTTP_BOOT_DHCP4_TAG_MSG_TYPE           53   // DHCP Message Type
-#define HTTP_BOOT_DHCP4_TAG_SERVER_ID          54   // Server Identifier
-#define HTTP_BOOT_DHCP4_TAG_PARA_LIST          55   // Parameter Request List
-#define HTTP_BOOT_DHCP4_TAG_MAXMSG             57   // Maximum DHCP Message Size
-#define HTTP_BOOT_DHCP4_TAG_T1                 58   // Renewal (T1) Time Value
-#define HTTP_BOOT_DHCP4_TAG_T2                 59   // Rebinding (T2) Time Value
-#define HTTP_BOOT_DHCP4_TAG_CLASS_ID           60   // Vendor class identifier
-#define HTTP_BOOT_DHCP4_TAG_CLIENT_ID          61   // Client-identifier
-#define HTTP_BOOT_DHCP4_TAG_TFTP               66   // TFTP server name
-#define HTTP_BOOT_DHCP4_TAG_BOOTFILE           67   // Bootfile name
-#define HTTP_BOOT_DHCP4_TAG_ARCH               93
-#define HTTP_BOOT_DHCP4_TAG_UNDI               94
-#define HTTP_BOOT_DHCP4_TAG_UUID               97
-
 #define HTTP_BOOT_DHCP4_OVERLOAD_FILE          1
 #define HTTP_BOOT_DHCP4_OVERLOAD_SERVER_NAME   2
 
@@ -75,15 +34,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// http://www.ietf.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xml
 ///
 #if defined (MDE_CPU_IA32)
-#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    0x000F
+#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_IA32
 #elif defined (MDE_CPU_X64)
-#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    0x0010
+#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_X64
 #elif defined (MDE_CPU_ARM)
-#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    0x0012
+#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_ARM
 #elif defined (MDE_CPU_AARCH64)
-#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    0x0013
+#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_AARCH64
 #elif defined (MDE_CPU_EBC)
-#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    0x0011
+#define EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE    HTTP_CLIENT_ARCH_EBC
 #endif
 
 /// DHCP offer types among HTTP boot.

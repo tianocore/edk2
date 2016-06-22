@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv6 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -25,29 +25,6 @@
 #define PXEBC_DHCP6_S_PORT                547
 #define PXEBC_DHCP6_C_PORT                546
 
-#define PXEBC_DHCP6_OPT_CLIENT_ID         1
-#define PXEBC_DHCP6_OPT_SERVER_ID         2
-#define PXEBC_DHCP6_OPT_IA_NA             3
-#define PXEBC_DHCP6_OPT_IA_TA             4
-#define PXEBC_DHCP6_OPT_IAADDR            5
-#define PXEBC_DHCP6_OPT_ORO               6
-#define PXEBC_DHCP6_OPT_PREFERENCE        7
-#define PXEBC_DHCP6_OPT_ELAPSED_TIME      8
-#define PXEBC_DHCP6_OPT_REPLAY_MSG        9
-#define PXEBC_DHCP6_OPT_AUTH              11
-#define PXEBC_DHCP6_OPT_UNICAST           12
-#define PXEBC_DHCP6_OPT_STATUS_CODE       13
-#define PXEBC_DHCP6_OPT_RAPID_COMMIT      14
-#define PXEBC_DHCP6_OPT_USER_CLASS        15
-#define PXEBC_DHCP6_OPT_VENDOR_CLASS      16
-#define PXEBC_DHCP6_OPT_VENDOR_OPTS       17
-#define PXEBC_DHCP6_OPT_INTERFACE_ID      18
-#define PXEBC_DHCP6_OPT_RECONFIG_MSG      19
-#define PXEBC_DHCP6_OPT_RECONFIG_ACCEPT   20
-#define PXEBC_DHCP6_OPT_BOOT_FILE_URL     59    // Assigned by IANA, RFC 5970
-#define PXEBC_DHCP6_OPT_BOOT_FILE_PARAM   60    // Assigned by IANA, RFC 5970
-#define PXEBC_DHCP6_OPT_ARCH              61    // Assigned by IANA, RFC 5970
-#define PXEBC_DHCP6_OPT_UNDI              62    // Assigned by IANA, RFC 5970
 #define PXEBC_DHCP6_ENTERPRISE_NUM        343   // TODO: IANA TBD: temporarily using Intel's
 #define PXEBC_DHCP6_MAX_BOOT_FILE_SIZE    65535 //   It's a limitation of bit length, 65535*512 bytes.
 

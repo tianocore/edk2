@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP4 related configuration routines.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -240,7 +240,7 @@ IScsiDhcpSelectOffer (
   }
 
   for (Index = 0; Index < OptionCount; Index++) {
-    if (OptionList[Index]->OpCode != DHCP4_TAG_ROOT_PATH) {
+    if (OptionList[Index]->OpCode != DHCP4_TAG_ROOTPATH) {
       continue;
     }
 
@@ -326,7 +326,7 @@ IScsiParseDhcpAck (
     //
     // Get DNS server addresses and DHCP server address from this offer.
     //
-    if (OptionList[Index]->OpCode == DHCP4_TAG_DNS) {
+    if (OptionList[Index]->OpCode == DHCP4_TAG_DNS_SERVER) {
 
       if (((OptionList[Index]->Length & 0x3) != 0) || (OptionList[Index]->Length == 0)) {
         Status = EFI_INVALID_PARAMETER;
@@ -440,8 +440,8 @@ IScsiDoDhcp (
   ParaList->Length  = (UINT8) (NvData->TargetInfoFromDhcp ? 4 : 3);
   ParaList->Data[0] = DHCP4_TAG_NETMASK;
   ParaList->Data[1] = DHCP4_TAG_ROUTER;
-  ParaList->Data[2] = DHCP4_TAG_DNS;
-  ParaList->Data[3] = DHCP4_TAG_ROOT_PATH;
+  ParaList->Data[2] = DHCP4_TAG_DNS_SERVER;
+  ParaList->Data[3] = DHCP4_TAG_ROOTPATH;
 
   ZeroMem (&Dhcp4ConfigData, sizeof (EFI_DHCP4_CONFIG_DATA));
   Dhcp4ConfigData.OptionCount = 1;

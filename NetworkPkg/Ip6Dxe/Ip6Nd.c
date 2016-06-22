@@ -853,9 +853,9 @@ Ip6OnDADFinished (
         // with DNS SERVERS.
         //
         Oro         = (EFI_DHCP6_PACKET_OPTION *) OptBuf;
-        Oro->OpCode = HTONS (IP6_CONFIG_DHCP6_OPTION_ORO);
+        Oro->OpCode = HTONS (DHCP6_OPT_ORO);
         Oro->OpLen  = HTONS (2);
-        *((UINT16 *) &Oro->Data[0]) = HTONS (IP6_CONFIG_DHCP6_OPTION_DNS_SERVERS);
+        *((UINT16 *) &Oro->Data[0]) = HTONS (DHCP6_OPT_DNS_SERVERS);
 
         InfoReqReXmit.Irt = 4;
         InfoReqReXmit.Mrc = 64;

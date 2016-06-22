@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_IP6_PROTOCOL protocol interfaces and type definitions.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
@@ -18,6 +18,8 @@
 #define __EFI_IP6_IMPL_H__
 
 #include <Uefi.h>
+
+#include <IndustryStandard/Dhcp.h>
 
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/ManagedNetwork.h>

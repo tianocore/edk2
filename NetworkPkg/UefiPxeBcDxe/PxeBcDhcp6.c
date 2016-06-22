@@ -92,18 +92,18 @@ PxeBcBuildDhcp6Options (
   //
   // Append client option request option
   //
-  OptList[Index]->OpCode     = HTONS (PXEBC_DHCP6_OPT_ORO);
+  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ORO);
   OptList[Index]->OpLen      = HTONS (4);
   OptEnt.Oro                 = (PXEBC_DHCP6_OPTION_ORO *) OptList[Index]->Data;
-  OptEnt.Oro->OpCode[0]      = HTONS(PXEBC_DHCP6_OPT_BOOT_FILE_URL);
-  OptEnt.Oro->OpCode[1]      = HTONS(PXEBC_DHCP6_OPT_BOOT_FILE_PARAM);
+  OptEnt.Oro->OpCode[0]      = HTONS(DHCP6_OPT_BOOT_FILE_URL);
+  OptEnt.Oro->OpCode[1]      = HTONS(DHCP6_OPT_BOOT_FILE_PARAM);
   Index++;
   OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
   //
   // Append client network device interface option
   //
-  OptList[Index]->OpCode     = HTONS (PXEBC_DHCP6_OPT_UNDI);
+  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_UNDI);
   OptList[Index]->OpLen      = HTONS ((UINT16)3);
   OptEnt.Undi                = (PXEBC_DHCP6_OPTION_UNDI *) OptList[Index]->Data;
 
@@ -123,7 +123,7 @@ PxeBcBuildDhcp6Options (
   //
   // Append client system architecture option
   //
-  OptList[Index]->OpCode     = HTONS (PXEBC_DHCP6_OPT_ARCH);
+  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ARCH);
   OptList[Index]->OpLen      = HTONS ((UINT16) sizeof (PXEBC_DHCP6_OPTION_ARCH));
   OptEnt.Arch                = (PXEBC_DHCP6_OPTION_ARCH *) OptList[Index]->Data;
   Value                      = HTONS (EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE);
@@ -134,7 +134,7 @@ PxeBcBuildDhcp6Options (
   //
   // Append vendor class option to store the PXE class identifier.
   //
-  OptList[Index]->OpCode       = HTONS (PXEBC_DHCP6_OPT_VENDOR_CLASS);
+  OptList[Index]->OpCode       = HTONS (DHCP6_OPT_VENDOR_CLASS);
   OptList[Index]->OpLen        = HTONS ((UINT16) sizeof (PXEBC_DHCP6_OPTION_VENDOR_CLASS));
   OptEnt.VendorClass           = (PXEBC_DHCP6_OPTION_VENDOR_CLASS *) OptList[Index]->Data;
   OptEnt.VendorClass->Vendor   = HTONL (PXEBC_DHCP6_ENTERPRISE_NUM);
@@ -471,16 +471,16 @@ PxeBcParseDhcp6Packet (
   //
   while (Offset < Length) {
 
-    if (NTOHS (Option->OpCode) == PXEBC_DHCP6_OPT_IA_NA) {
+    if (NTOHS (Option->OpCode) == DHCP6_OPT_IA_NA) {
       Options[PXEBC_DHCP6_IDX_IA_NA] = Option;
-    } else if (NTOHS (Option->OpCode) == PXEBC_DHCP6_OPT_BOOT_FILE_URL) {
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_BOOT_FILE_URL) {
       //
       // The server sends this option to inform the client about an URL to a boot file.
       //
       Options[PXEBC_DHCP6_IDX_BOOT_FILE_URL] = Option;
-    } else if (NTOHS (Option->OpCode) == PXEBC_DHCP6_OPT_BOOT_FILE_PARAM) {
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_BOOT_FILE_PARAM) {
       Options[PXEBC_DHCP6_IDX_BOOT_FILE_PARAM] = Option;
-    } else if (NTOHS (Option->OpCode) == PXEBC_DHCP6_OPT_VENDOR_CLASS) {
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_VENDOR_CLASS) {
       Options[PXEBC_DHCP6_IDX_VENDOR_CLASS] = Option;
     }
 
@@ -497,7 +497,7 @@ PxeBcParseDhcp6Packet (
     Option = PxeBcParseDhcp6Options (
                Option->Data + 12,
                NTOHS (Option->OpLen),
-               PXEBC_DHCP6_OPT_STATUS_CODE
+               DHCP6_OPT_STATUS_CODE
                );
     if ((Option != NULL && Option->Data[0] == 0) || (Option == NULL)) {
       IsProxyOffer = FALSE;
@@ -713,7 +713,7 @@ PxeBcRequestBootService (
   Option = PxeBcDhcp6SeekOption (
              ProxyOffer->Dhcp6.Option,
              ProxyOffer->Length - 4,
-             PXEBC_DHCP6_OPT_SERVER_ID
+             DHCP6_OPT_SERVER_ID
              );
   if (Option == NULL) {
     return EFI_NOT_FOUND;
@@ -732,7 +732,7 @@ PxeBcRequestBootService (
     OpLen  = NTOHS (((EFI_DHCP6_PACKET_OPTION *) RequestOpt)->OpLen);
     if (OpCode != EFI_DHCP6_IA_TYPE_NA &&
         OpCode != EFI_DHCP6_IA_TYPE_TA &&
-        OpCode != PXEBC_DHCP6_OPT_SERVER_ID
+        OpCode != DHCP6_OPT_SERVER_ID
         ) {
       //
       // Copy all the options except IA option and Server ID
@@ -751,7 +751,7 @@ PxeBcRequestBootService (
   Option = PxeBcDhcp6SeekOption (
              Discover->DhcpOptions,
              (UINT32)(RequestLen - 4),
-             PXEBC_DHCP6_OPT_ELAPSED_TIME
+             DHCP6_OPT_ELAPSED_TIME
              );
   if (Option != NULL) {
     CalcElapsedTime (Private);

@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi.h>
 
 #include <IndustryStandard/Http11.h>
+#include <IndustryStandard/Dhcp.h>
 
 //
 // Libraries

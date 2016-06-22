@@ -19,13 +19,13 @@
 // This is a map from the interested DHCP4 option tags' index to the tag value.
 //
 UINT8 mInterestedDhcp4Tags[PXEBC_DHCP4_TAG_INDEX_MAX] = {
-  PXEBC_DHCP4_TAG_BOOTFILE_LEN,
-  PXEBC_DHCP4_TAG_VENDOR,
-  PXEBC_DHCP4_TAG_OVERLOAD,
-  PXEBC_DHCP4_TAG_MSG_TYPE,
-  PXEBC_DHCP4_TAG_SERVER_ID,
-  PXEBC_DHCP4_TAG_CLASS_ID,
-  PXEBC_DHCP4_TAG_BOOTFILE
+  DHCP4_TAG_BOOTFILE_LEN,
+  DHCP4_TAG_VENDOR,
+  DHCP4_TAG_OVERLOAD,
+  DHCP4_TAG_MSG_TYPE,
+  DHCP4_TAG_SERVER_ID,
+  DHCP4_TAG_VENDOR_CLASS_ID,
+  DHCP4_TAG_BOOTFILE
 };
 
 //
@@ -58,7 +58,7 @@ PxeBcParseDhcp4Options (
   Option  = (EFI_DHCP4_PACKET_OPTION *) Buffer;
   Offset  = 0;
 
-  while (Offset < Length && Option->OpCode != PXEBC_DHCP4_TAG_EOP) {
+  while (Offset < Length && Option->OpCode != DHCP4_TAG_EOP) {
 
     if (Option->OpCode == OptTag) {
       //
@@ -70,7 +70,7 @@ PxeBcParseDhcp4Options (
     //
     // Skip the current option to the next.
     //
-    if (Option->OpCode == PXEBC_DHCP4_TAG_PAD) {
+    if (Option->OpCode == DHCP4_TAG_PAD) {
       Offset++;
     } else {
       Offset += Option->Length + 2;
@@ -108,7 +108,7 @@ PxeBcParseVendorOptions (
 
   ASSERT (PxeOption != NULL);
 
-  while ((Offset < VendorOptionLen) && (PxeOption->OpCode != PXEBC_DHCP4_TAG_EOP)) {
+  while ((Offset < VendorOptionLen) && (PxeOption->OpCode != DHCP4_TAG_EOP)) {
     //
     // Parse all the interesting PXE vendor options one by one.
     //
@@ -201,7 +201,7 @@ PxeBcParseVendorOptions (
     //
     // Continue to the next option.
     //
-    if (PxeOption->OpCode == PXEBC_DHCP4_TAG_PAD) {
+    if (PxeOption->OpCode == DHCP4_TAG_PAD) {
       Offset++;
     } else {
       Offset = (UINT8) (Offset + PxeOption->Length + 2);
@@ -243,7 +243,7 @@ PxeBcBuildDhcp4Options (
     //
     // Append message type.
     //
-    OptList[Index]->OpCode  = PXEBC_DHCP4_TAG_MSG_TYPE;
+    OptList[Index]->OpCode  = DHCP4_TAG_MSG_TYPE;
     OptList[Index]->Length  = 1;
     OptEnt.Mesg             = (PXEBC_DHCP4_OPTION_MESG *) OptList[Index]->Data;
     OptEnt.Mesg->Type       = PXEBC_DHCP4_MSG_TYPE_REQUEST;
@@ -253,7 +253,7 @@ PxeBcBuildDhcp4Options (
     //
     // Append max message size.
     //
-    OptList[Index]->OpCode  = PXEBC_DHCP4_TAG_MAXMSG;
+    OptList[Index]->OpCode  = DHCP4_TAG_MAXMSG;
     OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE);
     OptEnt.MaxMesgSize      = (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE *) OptList[Index]->Data;
     Value                   = NTOHS (PXEBC_DHCP4_PACKET_MAX_SIZE - 8);
@@ -265,36 +265,36 @@ PxeBcBuildDhcp4Options (
   //
   // Append parameter request list option.
   //
-  OptList[Index]->OpCode    = PXEBC_DHCP4_TAG_PARA_LIST;
+  OptList[Index]->OpCode    = DHCP4_TAG_PARA_LIST;
   OptList[Index]->Length    = 35;
   OptEnt.Para               = (PXEBC_DHCP4_OPTION_PARA *) OptList[Index]->Data;
-  OptEnt.Para->ParaList[0]  = PXEBC_DHCP4_TAG_NETMASK;
-  OptEnt.Para->ParaList[1]  = PXEBC_DHCP4_TAG_TIME_OFFSET;
-  OptEnt.Para->ParaList[2]  = PXEBC_DHCP4_TAG_ROUTER;
-  OptEnt.Para->ParaList[3]  = PXEBC_DHCP4_TAG_TIME_SERVER;
-  OptEnt.Para->ParaList[4]  = PXEBC_DHCP4_TAG_NAME_SERVER;
-  OptEnt.Para->ParaList[5]  = PXEBC_DHCP4_TAG_DNS_SERVER;
-  OptEnt.Para->ParaList[6]  = PXEBC_DHCP4_TAG_HOSTNAME;
-  OptEnt.Para->ParaList[7]  = PXEBC_DHCP4_TAG_BOOTFILE_LEN;
-  OptEnt.Para->ParaList[8]  = PXEBC_DHCP4_TAG_DOMAINNAME;
-  OptEnt.Para->ParaList[9]  = PXEBC_DHCP4_TAG_ROOTPATH;
-  OptEnt.Para->ParaList[10] = PXEBC_DHCP4_TAG_EXTEND_PATH;
-  OptEnt.Para->ParaList[11] = PXEBC_DHCP4_TAG_EMTU;
-  OptEnt.Para->ParaList[12] = PXEBC_DHCP4_TAG_TTL;
-  OptEnt.Para->ParaList[13] = PXEBC_DHCP4_TAG_BROADCAST;
-  OptEnt.Para->ParaList[14] = PXEBC_DHCP4_TAG_NIS_DOMAIN;
-  OptEnt.Para->ParaList[15] = PXEBC_DHCP4_TAG_NIS_SERVER;
-  OptEnt.Para->ParaList[16] = PXEBC_DHCP4_TAG_NTP_SERVER;
-  OptEnt.Para->ParaList[17] = PXEBC_DHCP4_TAG_VENDOR;
-  OptEnt.Para->ParaList[18] = PXEBC_DHCP4_TAG_REQUEST_IP;
-  OptEnt.Para->ParaList[19] = PXEBC_DHCP4_TAG_LEASE;
-  OptEnt.Para->ParaList[20] = PXEBC_DHCP4_TAG_SERVER_ID;
-  OptEnt.Para->ParaList[21] = PXEBC_DHCP4_TAG_T1;
-  OptEnt.Para->ParaList[22] = PXEBC_DHCP4_TAG_T2;
-  OptEnt.Para->ParaList[23] = PXEBC_DHCP4_TAG_CLASS_ID;
-  OptEnt.Para->ParaList[24] = PXEBC_DHCP4_TAG_TFTP;
-  OptEnt.Para->ParaList[25] = PXEBC_DHCP4_TAG_BOOTFILE;
-  OptEnt.Para->ParaList[26] = PXEBC_PXE_DHCP4_TAG_UUID;
+  OptEnt.Para->ParaList[0]  = DHCP4_TAG_NETMASK;
+  OptEnt.Para->ParaList[1]  = DHCP4_TAG_TIME_OFFSET;
+  OptEnt.Para->ParaList[2]  = DHCP4_TAG_ROUTER;
+  OptEnt.Para->ParaList[3]  = DHCP4_TAG_TIME_SERVER;
+  OptEnt.Para->ParaList[4]  = DHCP4_TAG_NAME_SERVER;
+  OptEnt.Para->ParaList[5]  = DHCP4_TAG_DNS_SERVER;
+  OptEnt.Para->ParaList[6]  = DHCP4_TAG_HOSTNAME;
+  OptEnt.Para->ParaList[7]  = DHCP4_TAG_BOOTFILE_LEN;
+  OptEnt.Para->ParaList[8]  = DHCP4_TAG_DOMAINNAME;
+  OptEnt.Para->ParaList[9]  = DHCP4_TAG_ROOTPATH;
+  OptEnt.Para->ParaList[10] = DHCP4_TAG_EXTEND_PATH;
+  OptEnt.Para->ParaList[11] = DHCP4_TAG_EMTU;
+  OptEnt.Para->ParaList[12] = DHCP4_TAG_TTL;
+  OptEnt.Para->ParaList[13] = DHCP4_TAG_BROADCAST;
+  OptEnt.Para->ParaList[14] = DHCP4_TAG_NIS_DOMAIN;
+  OptEnt.Para->ParaList[15] = DHCP4_TAG_NIS_SERVER;
+  OptEnt.Para->ParaList[16] = DHCP4_TAG_NTP_SERVER;
+  OptEnt.Para->ParaList[17] = DHCP4_TAG_VENDOR;
+  OptEnt.Para->ParaList[18] = DHCP4_TAG_REQUEST_IP;
+  OptEnt.Para->ParaList[19] = DHCP4_TAG_LEASE;
+  OptEnt.Para->ParaList[20] = DHCP4_TAG_SERVER_ID;
+  OptEnt.Para->ParaList[21] = DHCP4_TAG_T1;
+  OptEnt.Para->ParaList[22] = DHCP4_TAG_T2;
+  OptEnt.Para->ParaList[23] = DHCP4_TAG_VENDOR_CLASS_ID;
+  OptEnt.Para->ParaList[24] = DHCP4_TAG_TFTP;
+  OptEnt.Para->ParaList[25] = DHCP4_TAG_BOOTFILE;
+  OptEnt.Para->ParaList[26] = DHCP4_TAG_UUID;
   OptEnt.Para->ParaList[27] = 0x80;
   OptEnt.Para->ParaList[28] = 0x81;
   OptEnt.Para->ParaList[29] = 0x82;
@@ -309,7 +309,7 @@ PxeBcBuildDhcp4Options (
   //
   // Append UUID/Guid-based client identifier option
   //
-  OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_UUID;
+  OptList[Index]->OpCode  = DHCP4_TAG_UUID;
   OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_UUID);
   OptEnt.Uuid             = (PXEBC_DHCP4_OPTION_UUID *) OptList[Index]->Data;
   OptEnt.Uuid->Type       = 0;
@@ -326,7 +326,7 @@ PxeBcBuildDhcp4Options (
   //
   // Append client network device interface option
   //
-  OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_UNDI;
+  OptList[Index]->OpCode  = DHCP4_TAG_UNDI;
   OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_UNDI);
   OptEnt.Undi             = (PXEBC_DHCP4_OPTION_UNDI *) OptList[Index]->Data;
 
@@ -346,7 +346,7 @@ PxeBcBuildDhcp4Options (
   //
   // Append client system architecture option
   //
-  OptList[Index]->OpCode  = PXEBC_PXE_DHCP4_TAG_ARCH;
+  OptList[Index]->OpCode  = DHCP4_TAG_ARCH;
   OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_ARCH);
   OptEnt.Arch             = (PXEBC_DHCP4_OPTION_ARCH *) OptList[Index]->Data;
   Value                   = HTONS (EFI_PXE_CLIENT_SYSTEM_ARCHITECTURE);
@@ -357,7 +357,7 @@ PxeBcBuildDhcp4Options (
   //
   // Append vendor class identify option
   //
-  OptList[Index]->OpCode  = PXEBC_DHCP4_TAG_CLASS_ID;
+  OptList[Index]->OpCode  = DHCP4_TAG_VENDOR_CLASS_ID;
   OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_CLID);
   OptEnt.Clid             = (PXEBC_DHCP4_OPTION_CLID *) OptList[Index]->Data;
   CopyMem (
@@ -414,7 +414,7 @@ PxeBcSeedDhcp4Packet (
   CopyMem (Header->ClientHwAddr, &Mode.CurrentAddress, Header->HwAddrLen);
 
   Seed->Dhcp4.Magik     = PXEBC_DHCP4_MAGIC;
-  Seed->Dhcp4.Option[0] = PXEBC_DHCP4_TAG_EOP;
+  Seed->Dhcp4.Option[0] = DHCP4_TAG_EOP;
 }
 
 
@@ -1180,7 +1180,7 @@ PxeBcDhcp4CallBack (
   MaxMsgSize = PxeBcParseDhcp4Options (
                  Packet->Dhcp4.Option,
                  GET_OPTION_BUFFER_LEN (Packet),
-                 PXEBC_DHCP4_TAG_MAXMSG
+                 DHCP4_TAG_MAXMSG
                  );
   if (MaxMsgSize != NULL) {
     Value = HTONS (PXEBC_DHCP4_PACKET_MAX_SIZE - 8);
@@ -1356,14 +1356,14 @@ PxeBcDhcp4Discover (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    OptList[OptCount]->OpCode     = PXEBC_DHCP4_TAG_VENDOR;
+    OptList[OptCount]->OpCode     = DHCP4_TAG_VENDOR;
     OptList[OptCount]->Length     = (UINT8) (VendorOptLen - 2);
     PxeOpt                        = (EFI_DHCP4_PACKET_OPTION *) OptList[OptCount]->Data;
     PxeOpt->OpCode                = PXEBC_VENDOR_TAG_BOOT_ITEM;
     PxeOpt->Length                = (UINT8) sizeof (PXEBC_OPTION_BOOT_ITEM);
     PxeBootItem                   = (PXEBC_OPTION_BOOT_ITEM *) PxeOpt->Data;
     PxeBootItem->Type             = HTONS (Type);
-    PxeOpt->Data[PxeOpt->Length]  = PXEBC_DHCP4_TAG_EOP;
+    PxeOpt->Data[PxeOpt->Length]  = DHCP4_TAG_EOP;
 
     if (Layer != NULL) {
       PxeBootItem->Layer          = HTONS (*Layer);

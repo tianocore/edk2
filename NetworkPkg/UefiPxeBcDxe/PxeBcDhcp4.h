@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with DHCPv4 for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -28,46 +28,6 @@
 #define PXEBC_DHCP4_MSG_TYPE_REQUEST       3
 #define PXEBC_DHCP4_MAGIC                  0x63538263 // network byte order
 
-//
-// Dhcp Options
-//
-#define PXEBC_DHCP4_TAG_PAD                0    // Pad Option
-#define PXEBC_DHCP4_TAG_EOP                255  // End Option
-#define PXEBC_DHCP4_TAG_NETMASK            1    // Subnet Mask
-#define PXEBC_DHCP4_TAG_TIME_OFFSET        2    // Time Offset from UTC
-#define PXEBC_DHCP4_TAG_ROUTER             3    // Router option,
-#define PXEBC_DHCP4_TAG_TIME_SERVER        4    // Time Server
-#define PXEBC_DHCP4_TAG_NAME_SERVER        5    // Name Server
-#define PXEBC_DHCP4_TAG_DNS_SERVER         6    // Domain Name Server
-#define PXEBC_DHCP4_TAG_HOSTNAME           12   // Host Name
-#define PXEBC_DHCP4_TAG_BOOTFILE_LEN       13   // Boot File Size
-#define PXEBC_DHCP4_TAG_DUMP               14   // Merit Dump File
-#define PXEBC_DHCP4_TAG_DOMAINNAME         15   // Domain Name
-#define PXEBC_DHCP4_TAG_ROOTPATH           17   // Root path
-#define PXEBC_DHCP4_TAG_EXTEND_PATH        18   // Extensions Path
-#define PXEBC_DHCP4_TAG_EMTU               22   // Maximum Datagram Reassembly Size
-#define PXEBC_DHCP4_TAG_TTL                23   // Default IP Time-to-live
-#define PXEBC_DHCP4_TAG_BROADCAST          28   // Broadcast Address
-#define PXEBC_DHCP4_TAG_NIS_DOMAIN         40   // Network Information Service Domain
-#define PXEBC_DHCP4_TAG_NIS_SERVER         41   // Network Information Servers
-#define PXEBC_DHCP4_TAG_NTP_SERVER         42   // Network Time Protocol Servers
-#define PXEBC_DHCP4_TAG_VENDOR             43   // Vendor Specific Information
-#define PXEBC_DHCP4_TAG_REQUEST_IP         50   // Requested IP Address
-#define PXEBC_DHCP4_TAG_LEASE              51   // IP Address Lease Time
-#define PXEBC_DHCP4_TAG_OVERLOAD           52   // Option Overload
-#define PXEBC_DHCP4_TAG_MSG_TYPE           53   // DHCP Message Type
-#define PXEBC_DHCP4_TAG_SERVER_ID          54   // Server Identifier
-#define PXEBC_DHCP4_TAG_PARA_LIST          55   // Parameter Request List
-#define PXEBC_DHCP4_TAG_MAXMSG             57   // Maximum DHCP Message Size
-#define PXEBC_DHCP4_TAG_T1                 58   // Renewal (T1) Time Value
-#define PXEBC_DHCP4_TAG_T2                 59   // Rebinding (T2) Time Value
-#define PXEBC_DHCP4_TAG_CLASS_ID           60   // Vendor class identifier
-#define PXEBC_DHCP4_TAG_CLIENT_ID          61   // Client-identifier
-#define PXEBC_DHCP4_TAG_TFTP               66   // TFTP server name
-#define PXEBC_DHCP4_TAG_BOOTFILE           67   // Bootfile name
-#define PXEBC_PXE_DHCP4_TAG_ARCH           93
-#define PXEBC_PXE_DHCP4_TAG_UNDI           94
-#define PXEBC_PXE_DHCP4_TAG_UUID           97
 //
 // Sub-Options in Dhcp Vendor Option
 //

@@ -18,13 +18,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // This is a map from the interested DHCP4 option tags' index to the tag value.
 //
 UINT8 mInterestedDhcp4Tags[HTTP_BOOT_DHCP4_TAG_INDEX_MAX] = {
-  HTTP_BOOT_DHCP4_TAG_BOOTFILE_LEN,
-  HTTP_BOOT_DHCP4_TAG_OVERLOAD,
-  HTTP_BOOT_DHCP4_TAG_MSG_TYPE,
-  HTTP_BOOT_DHCP4_TAG_SERVER_ID,
-  HTTP_BOOT_DHCP4_TAG_CLASS_ID,
-  HTTP_BOOT_DHCP4_TAG_BOOTFILE,
-  HTTP_BOOT_DHCP4_TAG_DNS_SERVER
+  DHCP4_TAG_BOOTFILE_LEN,
+  DHCP4_TAG_OVERLOAD,
+  DHCP4_TAG_MSG_TYPE,
+  DHCP4_TAG_SERVER_ID,
+  DHCP4_TAG_VENDOR_CLASS_ID,
+  DHCP4_TAG_BOOTFILE,
+  DHCP4_TAG_DNS_SERVER
 };
 
 //
@@ -59,42 +59,42 @@ HttpBootBuildDhcp4Options (
   //
   // Append parameter request list option.
   //
-  OptList[Index]->OpCode    = HTTP_BOOT_DHCP4_TAG_PARA_LIST;
+  OptList[Index]->OpCode    = DHCP4_TAG_PARA_LIST;
   OptList[Index]->Length    = 27;
   OptEnt.Para               = (HTTP_BOOT_DHCP4_OPTION_PARA *) OptList[Index]->Data;
-  OptEnt.Para->ParaList[0]  = HTTP_BOOT_DHCP4_TAG_NETMASK;
-  OptEnt.Para->ParaList[1]  = HTTP_BOOT_DHCP4_TAG_TIME_OFFSET;
-  OptEnt.Para->ParaList[2]  = HTTP_BOOT_DHCP4_TAG_ROUTER;
-  OptEnt.Para->ParaList[3]  = HTTP_BOOT_DHCP4_TAG_TIME_SERVER;
-  OptEnt.Para->ParaList[4]  = HTTP_BOOT_DHCP4_TAG_NAME_SERVER;
-  OptEnt.Para->ParaList[5]  = HTTP_BOOT_DHCP4_TAG_DNS_SERVER;
-  OptEnt.Para->ParaList[6]  = HTTP_BOOT_DHCP4_TAG_HOSTNAME;
-  OptEnt.Para->ParaList[7]  = HTTP_BOOT_DHCP4_TAG_BOOTFILE_LEN;
-  OptEnt.Para->ParaList[8]  = HTTP_BOOT_DHCP4_TAG_DOMAINNAME;
-  OptEnt.Para->ParaList[9]  = HTTP_BOOT_DHCP4_TAG_ROOTPATH;
-  OptEnt.Para->ParaList[10] = HTTP_BOOT_DHCP4_TAG_EXTEND_PATH;
-  OptEnt.Para->ParaList[11] = HTTP_BOOT_DHCP4_TAG_EMTU;
-  OptEnt.Para->ParaList[12] = HTTP_BOOT_DHCP4_TAG_TTL;
-  OptEnt.Para->ParaList[13] = HTTP_BOOT_DHCP4_TAG_BROADCAST;
-  OptEnt.Para->ParaList[14] = HTTP_BOOT_DHCP4_TAG_NIS_DOMAIN;
-  OptEnt.Para->ParaList[15] = HTTP_BOOT_DHCP4_TAG_NIS_SERVER;
-  OptEnt.Para->ParaList[16] = HTTP_BOOT_DHCP4_TAG_NTP_SERVER;
-  OptEnt.Para->ParaList[17] = HTTP_BOOT_DHCP4_TAG_VENDOR;
-  OptEnt.Para->ParaList[18] = HTTP_BOOT_DHCP4_TAG_REQUEST_IP;
-  OptEnt.Para->ParaList[19] = HTTP_BOOT_DHCP4_TAG_LEASE;
-  OptEnt.Para->ParaList[20] = HTTP_BOOT_DHCP4_TAG_SERVER_ID;
-  OptEnt.Para->ParaList[21] = HTTP_BOOT_DHCP4_TAG_T1;
-  OptEnt.Para->ParaList[22] = HTTP_BOOT_DHCP4_TAG_T2;
-  OptEnt.Para->ParaList[23] = HTTP_BOOT_DHCP4_TAG_CLASS_ID;
-  OptEnt.Para->ParaList[25] = HTTP_BOOT_DHCP4_TAG_BOOTFILE;
-  OptEnt.Para->ParaList[26] = HTTP_BOOT_DHCP4_TAG_UUID;
+  OptEnt.Para->ParaList[0]  = DHCP4_TAG_NETMASK;
+  OptEnt.Para->ParaList[1]  = DHCP4_TAG_TIME_OFFSET;
+  OptEnt.Para->ParaList[2]  = DHCP4_TAG_ROUTER;
+  OptEnt.Para->ParaList[3]  = DHCP4_TAG_TIME_SERVER;
+  OptEnt.Para->ParaList[4]  = DHCP4_TAG_NAME_SERVER;
+  OptEnt.Para->ParaList[5]  = DHCP4_TAG_DNS_SERVER;
+  OptEnt.Para->ParaList[6]  = DHCP4_TAG_HOSTNAME;
+  OptEnt.Para->ParaList[7]  = DHCP4_TAG_BOOTFILE_LEN;
+  OptEnt.Para->ParaList[8]  = DHCP4_TAG_DOMAINNAME;
+  OptEnt.Para->ParaList[9]  = DHCP4_TAG_ROOTPATH;
+  OptEnt.Para->ParaList[10] = DHCP4_TAG_EXTEND_PATH;
+  OptEnt.Para->ParaList[11] = DHCP4_TAG_EMTU;
+  OptEnt.Para->ParaList[12] = DHCP4_TAG_TTL;
+  OptEnt.Para->ParaList[13] = DHCP4_TAG_BROADCAST;
+  OptEnt.Para->ParaList[14] = DHCP4_TAG_NIS_DOMAIN;
+  OptEnt.Para->ParaList[15] = DHCP4_TAG_NIS_SERVER;
+  OptEnt.Para->ParaList[16] = DHCP4_TAG_NTP_SERVER;
+  OptEnt.Para->ParaList[17] = DHCP4_TAG_VENDOR;
+  OptEnt.Para->ParaList[18] = DHCP4_TAG_REQUEST_IP;
+  OptEnt.Para->ParaList[19] = DHCP4_TAG_LEASE;
+  OptEnt.Para->ParaList[20] = DHCP4_TAG_SERVER_ID;
+  OptEnt.Para->ParaList[21] = DHCP4_TAG_T1;
+  OptEnt.Para->ParaList[22] = DHCP4_TAG_T2;
+  OptEnt.Para->ParaList[23] = DHCP4_TAG_VENDOR_CLASS_ID;
+  OptEnt.Para->ParaList[25] = DHCP4_TAG_BOOTFILE;
+  OptEnt.Para->ParaList[26] = DHCP4_TAG_UUID;
   Index++;
   OptList[Index]            = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
 
   //
   // Append UUID/Guid-based client identifier option
   //
-  OptList[Index]->OpCode  = HTTP_BOOT_DHCP4_TAG_UUID;
+  OptList[Index]->OpCode  = DHCP4_TAG_UUID;
   OptList[Index]->Length  = (UINT8) sizeof (HTTP_BOOT_DHCP4_OPTION_UUID);
   OptEnt.Uuid             = (HTTP_BOOT_DHCP4_OPTION_UUID *) OptList[Index]->Data;
   OptEnt.Uuid->Type       = 0;
@@ -110,7 +110,7 @@ HttpBootBuildDhcp4Options (
   //
   // Append client network device interface option
   //
-  OptList[Index]->OpCode  = HTTP_BOOT_DHCP4_TAG_UNDI;
+  OptList[Index]->OpCode  = DHCP4_TAG_UNDI;
   OptList[Index]->Length  = (UINT8) sizeof (HTTP_BOOT_DHCP4_OPTION_UNDI);
   OptEnt.Undi             = (HTTP_BOOT_DHCP4_OPTION_UNDI *) OptList[Index]->Data;
 
@@ -130,7 +130,7 @@ HttpBootBuildDhcp4Options (
   //
   // Append client system architecture option
   //
-  OptList[Index]->OpCode  = HTTP_BOOT_DHCP4_TAG_ARCH;
+  OptList[Index]->OpCode  = DHCP4_TAG_ARCH;
   OptList[Index]->Length  = (UINT8) sizeof (HTTP_BOOT_DHCP4_OPTION_ARCH);
   OptEnt.Arch             = (HTTP_BOOT_DHCP4_OPTION_ARCH *) OptList[Index]->Data;
   Value                   = HTONS (EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE);
@@ -141,7 +141,7 @@ HttpBootBuildDhcp4Options (
   //
   // Append vendor class identify option
   //
-  OptList[Index]->OpCode  = HTTP_BOOT_DHCP4_TAG_CLASS_ID;
+  OptList[Index]->OpCode  = DHCP4_TAG_VENDOR_CLASS_ID;
   OptList[Index]->Length  = (UINT8) sizeof (HTTP_BOOT_DHCP4_OPTION_CLID);
   OptEnt.Clid             = (HTTP_BOOT_DHCP4_OPTION_CLID *) OptList[Index]->Data;
   CopyMem (
@@ -190,7 +190,7 @@ HttpBootParseDhcp4Options (
   Option  = (EFI_DHCP4_PACKET_OPTION *) Buffer;
   Offset  = 0;
 
-  while (Offset < Length && Option->OpCode != HTTP_BOOT_DHCP4_TAG_EOP) {
+  while (Offset < Length && Option->OpCode != DHCP4_TAG_EOP) {
 
     if (Option->OpCode == OptTag) {
       //
@@ -202,7 +202,7 @@ HttpBootParseDhcp4Options (
     //
     // Skip the current option to the next.
     //
-    if (Option->OpCode == HTTP_BOOT_DHCP4_TAG_PAD) {
+    if (Option->OpCode == DHCP4_TAG_PAD) {
       Offset++;
     } else {
       Offset += Option->Length + 2;
@@ -607,7 +607,7 @@ HttpBootDhcp4CallBack (
   MaxMsgSize = HttpBootParseDhcp4Options (
                  Packet->Dhcp4.Option,
                  GET_OPTION_BUFFER_LEN (Packet),
-                 HTTP_BOOT_DHCP4_TAG_MAXMSG
+                 DHCP4_TAG_MAXMSG
                  );
   if (MaxMsgSize != NULL) {
     Value = HTONS (HTTP_BOOT_DHCP4_PACKET_MAX_SIZE);

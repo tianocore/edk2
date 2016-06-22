@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP6 related configuration routines.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -303,7 +303,7 @@ IScsiDhcp6ParseReply (
       // The server sends this option to inform the client about an URL to a boot file.
       //
       BootFileOpt = OptionList[Index];
-    } else if (OptionList[Index]->OpCode == DHCP6_OPT_BOOT_FILE_PARA) {
+    } else if (OptionList[Index]->OpCode == DHCP6_OPT_BOOT_FILE_PARAM) {
       //
       // The server sends this option to inform the client about DHCP6 server address.
       //
@@ -434,11 +434,11 @@ IScsiDoDhcp6 (
   // Ask the server to reply with DNS and Boot File URL options by info request.
   // All members in EFI_DHCP6_PACKET_OPTION are in network order.
   //
-  Oro->OpCode  = HTONS (DHCP6_OPT_REQUEST_OPTION);
+  Oro->OpCode  = HTONS (DHCP6_OPT_ORO);
   Oro->OpLen   = HTONS (2 * 3);
   Oro->Data[1] = DHCP6_OPT_DNS_SERVERS;
   Oro->Data[3] = DHCP6_OPT_BOOT_FILE_URL;
-  Oro->Data[5] = DHCP6_OPT_BOOT_FILE_PARA;
+  Oro->Data[5] = DHCP6_OPT_BOOT_FILE_PARAM;
 
   InfoReqReXmit.Irt = 4;
   InfoReqReXmit.Mrc = 1;
