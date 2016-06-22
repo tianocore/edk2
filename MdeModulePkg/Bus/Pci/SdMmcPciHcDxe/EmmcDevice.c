@@ -1079,7 +1079,7 @@ EmmcSetBusMode (
     //
     // Execute High Speed timing switch procedure
     //
-    Status = EmmcSwitchToHighSpeed (PciIo, PassThru, Slot, Rca, ClockFreq, BusWidth, IsDdr);
+    Status = EmmcSwitchToHighSpeed (PciIo, PassThru, Slot, Rca, ClockFreq, IsDdr, BusWidth);
   }
 
   DEBUG ((EFI_D_INFO, "EmmcSetBusMode: Switch to %a %r\n", (HsTiming == 3) ? "HS400" : ((HsTiming == 2) ? "HS200" : "HighSpeed"), Status));

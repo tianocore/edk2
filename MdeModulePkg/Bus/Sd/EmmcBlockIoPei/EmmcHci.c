@@ -2805,7 +2805,7 @@ EmmcPeimSetBusMode (
     //
     // Execute High Speed timing switch procedure
     //
-    Status = EmmcPeimSwitchToHighSpeed (Slot, Rca, ClockFreq, BusWidth, IsDdr);
+    Status = EmmcPeimSwitchToHighSpeed (Slot, Rca, ClockFreq, IsDdr, BusWidth);
   }
 
   return Status;
