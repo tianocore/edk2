@@ -874,7 +874,7 @@ Ip4Config2OnDhcp4Complete (
       //
       // Look for DNS Server opcode (6).
       //
-      if (OptionList[Index]->OpCode == DHCP_TAG_DNS_SERVER) {
+      if (OptionList[Index]->OpCode == DHCP4_TAG_DNS_SERVER) {
         if (((OptionList[Index]->Length & 0x3) != 0) || (OptionList[Index]->Length == 0)) {
           break;
         }
@@ -992,11 +992,11 @@ Ip4StartAutoConfig (
   // DHCP configuration to avoid problems if some DHCP client
   // yields the control of this DHCP service to us.
   //
-  ParaList.Head.OpCode             = DHCP_TAG_PARA_LIST;
+  ParaList.Head.OpCode             = DHCP4_TAG_PARA_LIST;
   ParaList.Head.Length             = 3;
-  ParaList.Head.Data[0]            = DHCP_TAG_NETMASK;
-  ParaList.Route                   = DHCP_TAG_ROUTER;
-  ParaList.Dns                     = DHCP_TAG_DNS_SERVER;
+  ParaList.Head.Data[0]            = DHCP4_TAG_NETMASK;
+  ParaList.Route                   = DHCP4_TAG_ROUTER;
+  ParaList.Dns                     = DHCP4_TAG_DNS_SERVER;
   OptionList[0]                    = &ParaList.Head;
   Dhcp4Mode.ConfigData.OptionCount = 1;
   Dhcp4Mode.ConfigData.OptionList  = OptionList;

@@ -1,7 +1,7 @@
 /** @file
   Ip4 internal functions and type defintions.
   
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 This program and the accompanying materials
@@ -27,6 +27,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Dhcp4.h>
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiConfigAccess.h>
+
+#include <IndustryStandard/Dhcp.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>

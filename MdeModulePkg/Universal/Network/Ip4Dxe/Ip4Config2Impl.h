@@ -25,11 +25,6 @@
 #define DATA_ATTRIB_SIZE_FIXED              0x1
 #define DATA_ATTRIB_VOLATILE                0x2
 
-#define DHCP_TAG_PARA_LIST             55
-#define DHCP_TAG_NETMASK               1
-#define DHCP_TAG_ROUTER                3
-#define DHCP_TAG_DNS_SERVER            6
-
 #define DATA_ATTRIB_SET(Attrib, Bits)       (BOOLEAN)((Attrib) & (Bits))
 #define SET_DATA_ATTRIB(Attrib, Bits)       ((Attrib) |= (Bits))
 
@@ -202,7 +197,7 @@ struct _IP4_CONFIG2_INSTANCE {
 
 //
 // Configure the DHCP to request the routers and netmask
-// from server. The DHCP_TAG_NETMASK is included in Head.
+// from server. The DHCP4_TAG_NETMASK is included in Head.
 //
 #pragma pack(1)
 typedef struct {

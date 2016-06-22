@@ -1,7 +1,7 @@
 /** @file
   Function to validate, parse, process the DHCP options.
   
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,91 +20,91 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// DHCP_OPTION_FORMAT structure.
 ///
 DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
-  {DHCP_TAG_NETMASK,        DHCP_OPTION_IP,     1, 1  , TRUE},
-  {DHCP_TAG_TIME_OFFSET,    DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP_TAG_ROUTER,         DHCP_OPTION_IP,     1, -1 , TRUE},
-  {DHCP_TAG_TIME_SERVER,    DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_NAME_SERVER,    DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_DNS_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_LOG_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_COOKIE_SERVER,  DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_LPR_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_IMPRESS_SERVER, DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_RL_SERVER,      DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_HOSTNAME,       DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_BOOTFILE_LEN,   DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP_TAG_DUMP,           DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_DOMAINNAME,     DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_SWAP_SERVER,    DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP_TAG_ROOTPATH,       DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_EXTEND_PATH,    DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_NETMASK,        DHCP_OPTION_IP,     1, 1  , TRUE},
+  {DHCP4_TAG_TIME_OFFSET,    DHCP_OPTION_INT32,  1, 1  , FALSE},
+  {DHCP4_TAG_ROUTER,         DHCP_OPTION_IP,     1, -1 , TRUE},
+  {DHCP4_TAG_TIME_SERVER,    DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_NAME_SERVER,    DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_DNS_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_LOG_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_COOKIE_SERVER,  DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_LPR_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_IMPRESS_SERVER, DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_RL_SERVER,      DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_HOSTNAME,       DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_BOOTFILE_LEN,   DHCP_OPTION_INT16,  1, 1  , FALSE},
+  {DHCP4_TAG_DUMP,           DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_DOMAINNAME,     DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_SWAP_SERVER,    DHCP_OPTION_IP,     1, 1  , FALSE},
+  {DHCP4_TAG_ROOTPATH,       DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_EXTEND_PATH,    DHCP_OPTION_INT8,   1, -1 , FALSE},
 
-  {DHCP_TAG_IPFORWARD,      DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP_TAG_NONLOCAL_SRR,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP_TAG_POLICY_SRR,     DHCP_OPTION_IPPAIR, 1, -1 , FALSE},
-  {DHCP_TAG_EMTU,           DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP_TAG_TTL,            DHCP_OPTION_INT8,   1, 1  , FALSE},
-  {DHCP_TAG_PATHMTU_AGE,    DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP_TAG_PATHMTU_PLATEAU,DHCP_OPTION_INT16,  1, -1 , FALSE},
+  {DHCP4_TAG_IPFORWARD,      DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_NONLOCAL_SRR,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_POLICY_SRR,     DHCP_OPTION_IPPAIR, 1, -1 , FALSE},
+  {DHCP4_TAG_EMTU,           DHCP_OPTION_INT16,  1, 1  , FALSE},
+  {DHCP4_TAG_TTL,            DHCP_OPTION_INT8,   1, 1  , FALSE},
+  {DHCP4_TAG_PATHMTU_AGE,    DHCP_OPTION_INT32,  1, 1  , FALSE},
+  {DHCP4_TAG_PATHMTU_PLATEAU,DHCP_OPTION_INT16,  1, -1 , FALSE},
 
-  {DHCP_TAG_IFMTU,          DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP_TAG_SUBNET_LOCAL,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP_TAG_BROADCAST,      DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP_TAG_DISCOVER_MASK,  DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP_TAG_SUPPLY_MASK,    DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP_TAG_DISCOVER_ROUTE, DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP_TAG_ROUTER_SOLICIT, DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP_TAG_STATIC_ROUTE,   DHCP_OPTION_IPPAIR, 1, -1 , FALSE},
+  {DHCP4_TAG_IFMTU,          DHCP_OPTION_INT16,  1, 1  , FALSE},
+  {DHCP4_TAG_SUBNET_LOCAL,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_BROADCAST,      DHCP_OPTION_IP,     1, 1  , FALSE},
+  {DHCP4_TAG_DISCOVER_MASK,  DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_SUPPLY_MASK,    DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_DISCOVER_ROUTE, DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_ROUTER_SOLICIT, DHCP_OPTION_IP,     1, 1  , FALSE},
+  {DHCP4_TAG_STATIC_ROUTE,   DHCP_OPTION_IPPAIR, 1, -1 , FALSE},
 
-  {DHCP_TAG_TRAILER,        DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP_TAG_ARPAGE,         DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP_TAG_ETHER_ENCAP,    DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_TRAILER,        DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_ARPAGE,         DHCP_OPTION_INT32,  1, 1  , FALSE},
+  {DHCP4_TAG_ETHER_ENCAP,    DHCP_OPTION_SWITCH, 1, 1  , FALSE},
 
-  {DHCP_TAG_TCP_TTL,        DHCP_OPTION_INT8,   1, 1  , FALSE},
-  {DHCP_TAG_KEEP_INTERVAL,  DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP_TAG_KEEP_GARBAGE,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  {DHCP4_TAG_TCP_TTL,        DHCP_OPTION_INT8,   1, 1  , FALSE},
+  {DHCP4_TAG_KEEP_INTERVAL,  DHCP_OPTION_INT32,  1, 1  , FALSE},
+  {DHCP4_TAG_KEEP_GARBAGE,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
 
-  {DHCP_TAG_NIS_DOMAIN,     DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_NIS_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_NTP_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_VENDOR,         DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_NBNS,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_NBDD,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_NBTYPE,         DHCP_OPTION_INT8,   1, 1  , FALSE},
-  {DHCP_TAG_NBSCOPE,        DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_XFONT,          DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_XDM,            DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_NIS_DOMAIN,     DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_NIS_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_NTP_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_VENDOR,         DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_NBNS,           DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_NBDD,           DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_NBTYPE,         DHCP_OPTION_INT8,   1, 1  , FALSE},
+  {DHCP4_TAG_NBSCOPE,        DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_XFONT,          DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_XDM,            DHCP_OPTION_IP,     1, -1 , FALSE},
 
-  {DHCP_TAG_REQUEST_IP,     DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP_TAG_LEASE,          DHCP_OPTION_INT32,  1, 1  , TRUE},
-  {DHCP_TAG_OVERLOAD,       DHCP_OPTION_INT8,   1, 1  , TRUE},
-  {DHCP_TAG_TYPE,           DHCP_OPTION_INT8,   1, 1  , TRUE},
-  {DHCP_TAG_SERVER_ID,      DHCP_OPTION_IP,     1, 1  , TRUE},
-  {DHCP_TAG_PARA_LIST,      DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_MESSAGE,        DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_MAXMSG,         DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP_TAG_T1,             DHCP_OPTION_INT32,  1, 1  , TRUE},
-  {DHCP_TAG_T2,             DHCP_OPTION_INT32,  1, 1  , TRUE},
-  {DHCP_TAG_VENDOR_CLASS,   DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_CLIENT_ID,      DHCP_OPTION_INT8,   2, -1 , FALSE},
+  {DHCP4_TAG_REQUEST_IP,     DHCP_OPTION_IP,     1, 1  , FALSE},
+  {DHCP4_TAG_LEASE,          DHCP_OPTION_INT32,  1, 1  , TRUE},
+  {DHCP4_TAG_OVERLOAD,       DHCP_OPTION_INT8,   1, 1  , TRUE},
+  {DHCP4_TAG_MSG_TYPE,       DHCP_OPTION_INT8,   1, 1  , TRUE},
+  {DHCP4_TAG_SERVER_ID,      DHCP_OPTION_IP,     1, 1  , TRUE},
+  {DHCP4_TAG_PARA_LIST,      DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_MESSAGE,        DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_MAXMSG,         DHCP_OPTION_INT16,  1, 1  , FALSE},
+  {DHCP4_TAG_T1,             DHCP_OPTION_INT32,  1, 1  , TRUE},
+  {DHCP4_TAG_T2,             DHCP_OPTION_INT32,  1, 1  , TRUE},
+  {DHCP4_TAG_VENDOR_CLASS_ID,DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_CLIENT_ID,      DHCP_OPTION_INT8,   2, -1 , FALSE},
 
-  {DHCP_TAG_NISPLUS,        DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_NISPLUS_SERVER, DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_NISPLUS,        DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_NISPLUS_SERVER, DHCP_OPTION_IP,     1, -1 , FALSE},
 
-  {DHCP_TAG_TFTP,           DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP_TAG_BOOTFILE,       DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_TFTP,           DHCP_OPTION_INT8,   1, -1 , FALSE},
+  {DHCP4_TAG_BOOTFILE,       DHCP_OPTION_INT8,   1, -1 , FALSE},
 
-  {DHCP_TAG_MOBILEIP,       DHCP_OPTION_IP,     0, -1 , FALSE},
-  {DHCP_TAG_SMTP,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_POP3,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_NNTP,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_WWW,            DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_FINGER,         DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_IRC,            DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_STTALK,         DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP_TAG_STDA,           DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_MOBILEIP,       DHCP_OPTION_IP,     0, -1 , FALSE},
+  {DHCP4_TAG_SMTP,           DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_POP3,           DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_NNTP,           DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_WWW,            DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_FINGER,         DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_IRC,            DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_STTALK,         DHCP_OPTION_IP,     1, -1 , FALSE},
+  {DHCP4_TAG_STDA,           DHCP_OPTION_IP,     1, -1 , FALSE},
 
-  {DHCP_TAG_CLASSLESS_ROUTE,DHCP_OPTION_INT8,   5, -1 , FALSE},
+  {DHCP4_TAG_CLASSLESS_ROUTE,DHCP_OPTION_INT8,   5, -1 , FALSE},
 };
 
 
@@ -248,22 +248,22 @@ DhcpGetParameter (
   )
 {
   switch (Tag) {
-  case DHCP_TAG_NETMASK:
+  case DHCP4_TAG_NETMASK:
     Para->NetMask = NetGetUint32 (Data);
     break;
 
-  case DHCP_TAG_ROUTER:
+  case DHCP4_TAG_ROUTER:
     //
     // Return the first router to consumer which is the preferred one
     //
     Para->Router = NetGetUint32 (Data);
     break;
 
-  case DHCP_TAG_LEASE:
+  case DHCP4_TAG_LEASE:
     Para->Lease = NetGetUint32 (Data);
     break;
 
-  case DHCP_TAG_OVERLOAD:
+  case DHCP4_TAG_OVERLOAD:
     Para->Overload = *Data;
 
     if ((Para->Overload < 1) || (Para->Overload > 3)) {
@@ -271,7 +271,7 @@ DhcpGetParameter (
     }
     break;
 
-  case DHCP_TAG_TYPE:
+  case DHCP4_TAG_MSG_TYPE:
     Para->DhcpType = *Data;
 
     if ((Para->DhcpType < 1) || (Para->DhcpType > 9)) {
@@ -279,15 +279,15 @@ DhcpGetParameter (
     }
     break;
 
-  case DHCP_TAG_SERVER_ID:
+  case DHCP4_TAG_SERVER_ID:
     Para->ServerId = NetGetUint32 (Data);
     break;
 
-  case DHCP_TAG_T1:
+  case DHCP4_TAG_T1:
     Para->T1 = NetGetUint32 (Data);
     break;
 
-  case DHCP_TAG_T2:
+  case DHCP4_TAG_T2:
     Para->T2 = NetGetUint32 (Data);
     break;
   }
@@ -299,13 +299,13 @@ DhcpGetParameter (
 /**
   Inspect all the options in a single buffer. DHCP options may be contained
   in several buffers, such as the BOOTP options filed, boot file or server
-  name. Each option buffer is required to end with DHCP_TAG_EOP.
+  name. Each option buffer is required to end with DHCP4_TAG_EOP.
 
   @param[in]  Buffer                 The buffer which contains DHCP options
   @param[in]  BufLen                 The length of the buffer
   @param[in]  Check                  The callback function for each option found
   @param[in]  Context                The opaque parameter for the Check
-  @param[out] Overload               Variable to save the value of DHCP_TAG_OVERLOAD
+  @param[out] Overload               Variable to save the value of DHCP4_TAG_OVERLOAD
                                      option.
 
   @retval EFI_SUCCESS            All the options are valid
@@ -330,10 +330,10 @@ DhcpIterateBufferOptions (
   while (Cur < BufLen) {
     Tag = Buffer[Cur];
 
-    if (Tag == DHCP_TAG_PAD) {
+    if (Tag == DHCP4_TAG_PAD) {
       Cur++;
       continue;
-    } else if (Tag == DHCP_TAG_EOP) {
+    } else if (Tag == DHCP4_TAG_EOP) {
       return EFI_SUCCESS;
     }
 
@@ -349,7 +349,7 @@ DhcpIterateBufferOptions (
       return EFI_INVALID_PARAMETER;
     }
 
-    if ((Tag == DHCP_TAG_OVERLOAD) && (Overload != NULL)) {
+    if ((Tag == DHCP4_TAG_OVERLOAD) && (Overload != NULL)) {
       if (Len != 1) {
         return EFI_INVALID_PARAMETER;
       }
@@ -879,7 +879,7 @@ DhcpBuild (
     }
   }
 
-  *(Buf++)        = DHCP_TAG_EOP;
+  *(Buf++)        = DHCP4_TAG_EOP;
   Packet->Length  = sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)
                       + (UINT32) (Buf - Packet->Dhcp4.Option);
 
