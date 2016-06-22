@@ -142,7 +142,7 @@ Ip4Config2OnPolicyChanged (
   IpSb->DefaultRouteTable = RouteTable;
   Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
 
-  if (IpSb->State == IP4_SERVICE_CONFIGED) {
+  if (IpSb->State == IP4_SERVICE_CONFIGED || IpSb->State == IP4_SERVICE_STARTED) {
     IpSb->State = IP4_SERVICE_UNSTARTED;
   }
 
