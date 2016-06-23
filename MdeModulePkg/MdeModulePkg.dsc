@@ -261,6 +261,7 @@
   MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   MdeModulePkg/Library/UefiMemoryAllocationProfileLib/UefiMemoryAllocationProfileLib.inf
   MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
+  MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationProfileLib.inf
   MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
   MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
   MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
