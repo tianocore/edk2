@@ -1,0 +1,23 @@
+// /** @file
+// Memory Allocation/Profile Library instance dedicated to SMM Core.
+//
+// The implementation borrows the SMM Core Memory Allocation/Profile services as the primitive
+// for memory allocation/profile instead of using SMM System Table servces or SMM memory profile protocol in an indirect way.
+// It is assumed that this library instance must be linked with SMM Cre in this package.
+//
+// Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution. The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Memory Allocation/Profile Library instance dedicated to SMM Core"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The implementation borrows the SMM Core Memory Allocation/Profile services as the primitive for memory allocation/profile instead of using SMM System Table services or SMM memory profile protocol in an indirect way. This library is only intended to be linked with the SMM Core that resides in this same package."
+

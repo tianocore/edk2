@@ -1,5 +1,6 @@
 /** @file
-  Support routines for memory allocation routines based on SMM Core internal functions.
+  Support routines for memory allocation routines based on SMM Core internal functions,
+  with memory profile support.
   
   The PI System Management Mode Core Interface Specification only allows the use
   of EfiRuntimeServicesCode and EfiRuntimeServicesData memory types for memory 
@@ -10,7 +11,7 @@
   In addition, allocation for the Reserved memory types are not supported and will 
   always return NULL.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -23,12 +24,13 @@
 
 #include <PiSmm.h>
 
-#include <Protocol/SmmAccess2.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include "PiSmmCoreMemoryAllocationServices.h"
+
+#include <Library/MemoryProfileLib.h>
 
 EFI_SMRAM_DESCRIPTOR  *mSmmCoreMemoryAllocLibSmramRanges    = NULL;
 UINTN                 mSmmCoreMemoryAllocLibSmramRangeCount = 0;
@@ -111,7 +113,20 @@ AllocatePages (
   IN UINTN  Pages
   )
 {
-  return InternalAllocatePages (EfiRuntimeServicesData, Pages);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocatePages (EfiRuntimeServicesData, Pages);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_PAGES,
+      EfiRuntimeServicesData,
+      Buffer,
+      EFI_PAGES_TO_SIZE(Pages),
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -133,7 +148,20 @@ AllocateRuntimePages (
   IN UINTN  Pages
   )
 {
-  return InternalAllocatePages (EfiRuntimeServicesData, Pages);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocatePages (EfiRuntimeServicesData, Pages);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_PAGES,
+      EfiRuntimeServicesData,
+      Buffer,
+      EFI_PAGES_TO_SIZE(Pages),
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -312,7 +340,20 @@ AllocateAlignedPages (
   IN UINTN  Alignment
   )
 {
-  return InternalAllocateAlignedPages (EfiRuntimeServicesData, Pages, Alignment);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocateAlignedPages (EfiRuntimeServicesData, Pages, Alignment);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_PAGES,
+      EfiRuntimeServicesData,
+      Buffer,
+      EFI_PAGES_TO_SIZE(Pages),
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -340,7 +381,20 @@ AllocateAlignedRuntimePages (
   IN UINTN  Alignment
   )
 {
-  return InternalAllocateAlignedPages (EfiRuntimeServicesData, Pages, Alignment);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocateAlignedPages (EfiRuntimeServicesData, Pages, Alignment);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_RUNTIME_PAGES,
+      EfiRuntimeServicesData,
+      Buffer,
+      EFI_PAGES_TO_SIZE(Pages),
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -463,7 +517,20 @@ AllocatePool (
   IN UINTN  AllocationSize
   )
 {
-  return InternalAllocatePool (EfiRuntimeServicesData, AllocationSize);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocatePool (EfiRuntimeServicesData, AllocationSize);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_POOL,
+      EfiRuntimeServicesData,
+      Buffer,
+      AllocationSize,
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -484,7 +551,20 @@ AllocateRuntimePool (
   IN UINTN  AllocationSize
   )
 {
-  return InternalAllocatePool (EfiRuntimeServicesData, AllocationSize);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocatePool (EfiRuntimeServicesData, AllocationSize);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_POOL,
+      EfiRuntimeServicesData,
+      Buffer,
+      AllocationSize,
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -556,7 +636,20 @@ AllocateZeroPool (
   IN UINTN  AllocationSize
   )
 {
-  return InternalAllocateZeroPool (EfiRuntimeServicesData, AllocationSize);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocateZeroPool (EfiRuntimeServicesData, AllocationSize);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ZERO_POOL,
+      EfiRuntimeServicesData,
+      Buffer,
+      AllocationSize,
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -578,7 +671,20 @@ AllocateRuntimeZeroPool (
   IN UINTN  AllocationSize
   )
 {
-  return InternalAllocateZeroPool (EfiRuntimeServicesData, AllocationSize);
+  VOID  *Buffer;
+
+  Buffer = InternalAllocateZeroPool (EfiRuntimeServicesData, AllocationSize);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_ZERO_POOL,
+      EfiRuntimeServicesData,
+      Buffer,
+      AllocationSize,
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -663,7 +769,20 @@ AllocateCopyPool (
   IN CONST VOID  *Buffer
   )
 {
-  return InternalAllocateCopyPool (EfiRuntimeServicesData, AllocationSize, Buffer);
+  VOID  *NewBuffer;
+
+  NewBuffer = InternalAllocateCopyPool (EfiRuntimeServicesData, AllocationSize, Buffer);
+  if (NewBuffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_COPY_POOL,
+      EfiRuntimeServicesData,
+      NewBuffer,
+      AllocationSize,
+      NULL
+      );
+  }
+  return NewBuffer;
 }
 
 /**
@@ -690,7 +809,20 @@ AllocateRuntimeCopyPool (
   IN CONST VOID  *Buffer
   )
 {
-  return InternalAllocateCopyPool (EfiRuntimeServicesData, AllocationSize, Buffer);
+  VOID  *NewBuffer;
+
+  NewBuffer = InternalAllocateCopyPool (EfiRuntimeServicesData, AllocationSize, Buffer);
+  if (NewBuffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_COPY_POOL,
+      EfiRuntimeServicesData,
+      NewBuffer,
+      AllocationSize,
+      NULL
+      );
+  }
+  return NewBuffer;
 }
 
 /**
@@ -789,7 +921,20 @@ ReallocatePool (
   IN VOID   *OldBuffer  OPTIONAL
   )
 {
-  return InternalReallocatePool (EfiRuntimeServicesData, OldSize, NewSize, OldBuffer);
+  VOID  *Buffer;
+
+  Buffer = InternalReallocatePool (EfiRuntimeServicesData, OldSize, NewSize, OldBuffer);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_REALLOCATE_POOL,
+      EfiRuntimeServicesData,
+      Buffer,
+      NewSize,
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
@@ -821,7 +966,20 @@ ReallocateRuntimePool (
   IN VOID   *OldBuffer  OPTIONAL
   )
 {
-  return InternalReallocatePool (EfiRuntimeServicesData, OldSize, NewSize, OldBuffer);
+  VOID  *Buffer;
+
+  Buffer = InternalReallocatePool (EfiRuntimeServicesData, OldSize, NewSize, OldBuffer);
+  if (Buffer != NULL) {
+    MemoryProfileLibRecord (
+      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RUNTIME_POOL,
+      EfiRuntimeServicesData,
+      Buffer,
+      NewSize,
+      NULL
+      );
+  }
+  return Buffer;
 }
 
 /**
