@@ -173,5 +173,13 @@
   # @Prompt ACPI IO Port Base Address Mask
   gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddressMask     |0xFFFE|UINT16|0x00000018
 
+  ## Reset Control Register address in I/O space.
+  # @Prompt Reset Control Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdResetControlRegister|0x64|UINT64|0x00000019
+
+  ## 8bit Reset Control Register value for cold reset.
+  # @Prompt Reset Control Register value for cold reset
+  gPcAtChipsetPkgTokenSpaceGuid.PcdResetControlValueColdReset|0xFE|UINT8|0x0000001A
+
 [UserExtensions.TianoCore."ExtraFiles"]
   PcAtChipsetPkgExtra.uni

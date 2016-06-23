@@ -141,3 +141,18 @@
 
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_ERR_80000001  #language en-US "Invalid value provided."
 
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlRegister_PROMPT
+#language en-US
+"Reset Control Register address"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlRegister_HELP
+#language en-US
+"Reset Control Register address in I/O space."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlValueColdReset_PROMPT
+#language en-US
+"Reset Control Register value for cold reset"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlValueColdReset_HELP
+#language en-US
+"8bit Reset Control Register value for cold reset."
