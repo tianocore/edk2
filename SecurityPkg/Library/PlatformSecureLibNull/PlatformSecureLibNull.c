@@ -4,7 +4,7 @@
   related features during platform enabling and development. It should be replaced
   by a platform-specific method(e.g. Button pressed) in a real platform for product.
 
-Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -14,6 +14,8 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+
+BOOLEAN       mUserPhysicalPresence      = FALSE;
 
 /**
 
@@ -38,5 +40,28 @@ UserPhysicalPresent (
   VOID
   )
 {
-  return TRUE;
+  return mUserPhysicalPresence;  
+}
+
+
+/**
+  Save user physical presence state from a PCD to mUserPhysicalPresence.
+
+  @param  ImageHandle   ImageHandle of the loaded driver.
+  @param  SystemTable   Pointer to the EFI System Table.
+
+  @retval  EFI_SUCCESS          PcdUserPhysicalPresence is got successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+PlatformSecureLibNullConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+
+  mUserPhysicalPresence = PcdGetBool(PcdUserPhysicalPresence);
+
+  return EFI_SUCCESS;
 }
