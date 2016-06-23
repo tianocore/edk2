@@ -414,6 +414,12 @@
   # @Prompt Length(in bytes) of the TCG2 Final event log area.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2FinalLogAreaLen|0x8000|UINT32|0x00010018
 
+  ## Indicate whether a physical presence user exist.
+  # When it is configured to Dynamic or DynamicEx, it can be set through detection using 
+  # a platform-specific method (e.g. Button pressed) in a actual platform in early boot phase.<BR><BR>
+  # @Prompt A physical presence user status
+  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE|BOOLEAN|0x00010019
+
 [PcdsDynamic, PcdsDynamicEx]
 
   ## This PCD indicates Hash mask for TPM 2.0.<BR><BR>

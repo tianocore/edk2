@@ -205,3 +205,12 @@
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_HELP  #language en-US "Null-terminated string of the Version of Physical Presence interface supported by platform."
 
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdUserPhysicalPresence_PROMPT
+#language en-US
+"A physical presence user status"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdUserPhysicalPresence_HELP
+#language en-US
+"Indicate whether a physical presence user exist. "
+"When it is configured to Dynamic or DynamicEx, it can be set through detection using "
+"a platform-specific method (e.g. Button pressed) in a actual platform in early boot phase.<BR><BR>"
