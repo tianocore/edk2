@@ -309,4 +309,15 @@ GetFspCarSize (
   VOID
   );
 
+/**
+  This function updates the return status of the FSP API with requested reset type and returns to Boot Loader.
+
+  @param[in] FspResetType     Reset type that needs to returned as API return status
+
+**/
+VOID
+EFIAPI
+FspApiReturnStatusReset (
+  IN UINT32   FspResetType
+  );
 #endif
