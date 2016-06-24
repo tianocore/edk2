@@ -1,7 +1,7 @@
 /** @file
   IKE Packet related operation.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -195,6 +195,9 @@ IkeNetbufFromPacket (
   LIST_ENTRY    *PacketEntry;
   LIST_ENTRY    *Entry;
   IKE_PAYLOAD   *IkePayload;
+  EFI_STATUS    RetStatus;
+
+  RetStatus = EFI_SUCCESS;
 
   if (!IkePacket->IsEncoded) {
     IkePacket->IsEncoded = TRUE;
@@ -203,10 +206,14 @@ IkeNetbufFromPacket (
     // Encryption payloads if needed
     //
     if (((IKEV2_SESSION_COMMON *) SessionCommon)->IkeVer == 2) {
-      Ikev2EncodePacket ((IKEV2_SESSION_COMMON *) SessionCommon, IkePacket, IkeType);
+      RetStatus = Ikev2EncodePacket ((IKEV2_SESSION_COMMON *) SessionCommon, IkePacket, IkeType);
+      if (EFI_ERROR (RetStatus)) {
+        return NULL;
+      }
+      
     } else {
       //
-      //If IKEv1 support, check it here.
+      // If IKEv1 support, check it here.
       //
       return NULL;
     }
