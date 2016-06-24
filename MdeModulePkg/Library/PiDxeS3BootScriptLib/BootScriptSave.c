@@ -130,7 +130,7 @@ VOID                             *mRegistrationSmmLegacyBoot = NULL;
 VOID                             *mRegistrationSmmReadyToLock = NULL;
 BOOLEAN                          mS3BootScriptTableAllocated = FALSE;
 BOOLEAN                          mS3BootScriptTableSmmAllocated = FALSE;
-EFI_SMM_SYSTEM_TABLE2            *mSmst = NULL;
+EFI_SMM_SYSTEM_TABLE2            *mBootScriptSmst = NULL;
 
 /**
   This is an internal function to add a terminate node the entry, recalculate the table 
@@ -493,7 +493,7 @@ S3BootScriptLibInitialize (
   //
   // Good, we are in SMM
   //
-  Status = SmmBase2->GetSmstLocation (SmmBase2, &mSmst);
+  Status = SmmBase2->GetSmstLocation (SmmBase2, &mBootScriptSmst);
   if (EFI_ERROR (Status)) {
     return RETURN_SUCCESS;
   }
@@ -503,11 +503,11 @@ S3BootScriptLibInitialize (
   // The Boot script private data in SMM is not be initialized. create it
   //
   if (S3TableSmmPtr == 0) {
-    Status = mSmst->SmmAllocatePool (
-                     EfiRuntimeServicesData,
-                     sizeof(SCRIPT_TABLE_PRIVATE_DATA),
-                     (VOID **) &S3TableSmmPtr
-                     );
+    Status = mBootScriptSmst->SmmAllocatePool (
+                                EfiRuntimeServicesData,
+                                sizeof(SCRIPT_TABLE_PRIVATE_DATA),
+                                (VOID **) &S3TableSmmPtr
+                                );
     ASSERT_EFI_ERROR (Status);
     mS3BootScriptTableSmmAllocated = TRUE;
 
@@ -518,18 +518,18 @@ S3BootScriptLibInitialize (
     //
     // Register SmmExitBootServices and SmmLegacyBoot notification.
     //
-    Status = mSmst->SmmRegisterProtocolNotify (
-                     &gEdkiiSmmExitBootServicesProtocolGuid,
-                     S3BootScriptSmmAtRuntimeCallBack,
-                     &mRegistrationSmmExitBootServices
-                     );
+    Status = mBootScriptSmst->SmmRegisterProtocolNotify (
+                                &gEdkiiSmmExitBootServicesProtocolGuid,
+                                S3BootScriptSmmAtRuntimeCallBack,
+                                &mRegistrationSmmExitBootServices
+                                );
     ASSERT_EFI_ERROR (Status);
 
-    Status = mSmst->SmmRegisterProtocolNotify (
-                     &gEdkiiSmmLegacyBootProtocolGuid,
-                     S3BootScriptSmmAtRuntimeCallBack,
-                     &mRegistrationSmmLegacyBoot
-                     );
+    Status = mBootScriptSmst->SmmRegisterProtocolNotify (
+                                &gEdkiiSmmLegacyBootProtocolGuid,
+                                S3BootScriptSmmAtRuntimeCallBack,
+                                &mRegistrationSmmLegacyBoot
+                                );
     ASSERT_EFI_ERROR (Status);
   }
   mS3BootScriptTableSmmPtr = S3TableSmmPtr;
@@ -537,11 +537,11 @@ S3BootScriptLibInitialize (
   //
   // Register SmmReadyToLock notification.
   //
-  Status = mSmst->SmmRegisterProtocolNotify (
-                   &gEfiSmmReadyToLockProtocolGuid,
-                   S3BootScriptSmmEventCallBack,
-                   &mRegistrationSmmReadyToLock
-                   );
+  Status = mBootScriptSmst->SmmRegisterProtocolNotify (
+                              &gEfiSmmReadyToLockProtocolGuid,
+                              S3BootScriptSmmEventCallBack,
+                              &mRegistrationSmmReadyToLock
+                              );
   ASSERT_EFI_ERROR (Status);
 
   return RETURN_SUCCESS;
@@ -579,38 +579,38 @@ S3BootScriptLibDeinitialize (
     ASSERT_EFI_ERROR (Status);
   }
 
-  if (mSmst != NULL) {
+  if (mBootScriptSmst != NULL) {
     if (mRegistrationSmmExitBootServices != NULL) {
       //
       // Unregister SmmExitBootServices notification.
       //
-      Status = mSmst->SmmRegisterProtocolNotify (
-                       &gEdkiiSmmExitBootServicesProtocolGuid,
-                       NULL,
-                       &mRegistrationSmmExitBootServices
-                       );
+      Status = mBootScriptSmst->SmmRegisterProtocolNotify (
+                                  &gEdkiiSmmExitBootServicesProtocolGuid,
+                                  NULL,
+                                  &mRegistrationSmmExitBootServices
+                                  );
       ASSERT_EFI_ERROR (Status);
     }
     if (mRegistrationSmmLegacyBoot != NULL) {
       //
       // Unregister SmmLegacyBoot notification.
       //
-      Status = mSmst->SmmRegisterProtocolNotify (
-                       &gEdkiiSmmLegacyBootProtocolGuid,
-                       NULL,
-                       &mRegistrationSmmLegacyBoot
-                       );
+      Status = mBootScriptSmst->SmmRegisterProtocolNotify (
+                                  &gEdkiiSmmLegacyBootProtocolGuid,
+                                  NULL,
+                                  &mRegistrationSmmLegacyBoot
+                                  );
       ASSERT_EFI_ERROR (Status);
     }
     if (mRegistrationSmmReadyToLock != NULL) {
       //
       // Unregister SmmReadyToLock notification.
       //
-      Status = mSmst->SmmRegisterProtocolNotify (
-                       &gEfiSmmReadyToLockProtocolGuid,
-                       NULL,
-                       &mRegistrationSmmReadyToLock
-                       );
+      Status = mBootScriptSmst->SmmRegisterProtocolNotify (
+                                  &gEfiSmmReadyToLockProtocolGuid,
+                                  NULL,
+                                  &mRegistrationSmmReadyToLock
+                                  );
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -624,8 +624,8 @@ S3BootScriptLibDeinitialize (
     Status = PcdSet64S (PcdS3BootScriptTablePrivateDataPtr, 0);
     ASSERT_EFI_ERROR (Status);
   }
-  if ((mSmst != NULL) && mS3BootScriptTableSmmAllocated) {
-    Status = mSmst->SmmFreePool (mS3BootScriptTableSmmPtr);
+  if ((mBootScriptSmst != NULL) && mS3BootScriptTableSmmAllocated) {
+    Status = mBootScriptSmst->SmmFreePool (mS3BootScriptTableSmmPtr);
     ASSERT_EFI_ERROR (Status);
     Status = PcdSet64S (PcdS3BootScriptTablePrivateSmmDataPtr, 0);
     ASSERT_EFI_ERROR (Status);
