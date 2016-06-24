@@ -445,6 +445,13 @@ Ikev2AuthPskGenerator (
   IkeSaSession   = (IKEV2_SA_SESSION *) SaSession;
   ChildSaSession = IKEV2_CHILD_SA_SESSION_BY_IKE_SA (GetFirstNode (&IkeSaSession->ChildSaSessionList));
 
+  IkePacket      = NULL;
+  IdPayload      = NULL;
+  AuthPayload    = NULL;
+  SaPayload      = NULL;
+  TsiPayload     = NULL;
+  TsrPayload     = NULL;
+  NotifyPayload  = NULL;
   CpPayload      = NULL;
   NotifyPayload  = NULL;
   
@@ -488,6 +495,9 @@ Ikev2AuthPskGenerator (
                 &IkeSaSession->SessionCommon,
                 IKEV2_PAYLOAD_TYPE_AUTH
                 );
+  if (IdPayload == NULL) {
+    goto CheckError;
+  }
 
   //
   // 3. Generate Auth Payload
@@ -522,6 +532,14 @@ Ikev2AuthPskGenerator (
                     IKEV2_CFG_ATTR_INTERNAL_IP6_ADDRESS
                     );
     }
+
+     if (CpPayload == NULL) {
+      goto CheckError;
+    }
+  }
+
+  if (AuthPayload == NULL) {
+    goto CheckError;
   }
 
   //
@@ -532,6 +550,9 @@ Ikev2AuthPskGenerator (
                 IKEV2_PAYLOAD_TYPE_TS_INIT,
                 IkeSessionTypeChildSa
                 );
+  if (SaPayload == NULL) {
+    goto CheckError;
+  }
 
   if (IkeSaSession->Spd->Data->ProcessingPolicy->Mode == EfiIPsecTransport) {
     //
@@ -562,6 +583,9 @@ Ikev2AuthPskGenerator (
                       NULL,
                       0
                       );
+    if (NotifyPayload == NULL) {
+      goto CheckError;
+    }
   } else {
     //
     // Generate Tsr for Tunnel mode.
@@ -578,6 +602,10 @@ Ikev2AuthPskGenerator (
                    );
   }
 
+  if (TsiPayload == NULL || TsrPayload == NULL) {
+    goto CheckError;
+  }
+
   IKE_PACKET_APPEND_PAYLOAD (IkePacket, IdPayload);
   IKE_PACKET_APPEND_PAYLOAD (IkePacket, AuthPayload);
   if (IkeSaSession->Spd->Data->ProcessingPolicy->Mode == EfiIPsecTunnel) {
@@ -591,6 +619,41 @@ Ikev2AuthPskGenerator (
   }
 
   return IkePacket;
+
+CheckError:
+  if (IkePacket != NULL) {
+    IkePacketFree (IkePacket);
+  }
+  
+  if (IdPayload != NULL) {
+    IkePayloadFree (IdPayload);
+  }
+
+  if (AuthPayload != NULL) {
+    IkePayloadFree (AuthPayload);
+  }
+  
+  if (CpPayload != NULL) {
+    IkePayloadFree (CpPayload);
+  }
+
+  if (SaPayload != NULL) {
+    IkePayloadFree (SaPayload);
+  }
+  
+  if (TsiPayload != NULL) {
+    IkePayloadFree (TsiPayload);
+  }
+  
+  if (TsrPayload != NULL) {
+    IkePayloadFree (TsrPayload);
+  }
+  
+  if (NotifyPayload != NULL) {
+    IkePayloadFree (NotifyPayload);
+  }
+  
+  return NULL; 
 }
 
 /**
@@ -800,7 +863,11 @@ Ikev2AuthPskParser (
   //
   // 5. Generate keymats for IPsec protocol.
   //
-  Ikev2GenerateChildSaKeys (ChildSaSession, NULL);
+  Status = Ikev2GenerateChildSaKeys (ChildSaSession, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
   if (IkeSaSession->SessionCommon.IsInitiator) {
     //
     // 6. Change the state of IkeSaSession
@@ -934,7 +1001,13 @@ Ikev2AuthCertGenerator (
   IkeSaSession   = (IKEV2_SA_SESSION *) SaSession;
   ChildSaSession = IKEV2_CHILD_SA_SESSION_BY_IKE_SA (GetFirstNode (&IkeSaSession->ChildSaSessionList));
 
+  IkePacket      = NULL;
+  IdPayload      = NULL;
+  AuthPayload    = NULL;
   CpPayload      = NULL;
+  SaPayload      = NULL;
+  TsiPayload     = NULL;
+  TsrPayload     = NULL;
   NotifyPayload  = NULL;
   CertPayload    = NULL;
   CertReqPayload = NULL;
@@ -981,6 +1054,9 @@ Ikev2AuthCertGenerator (
                 (UINT8 *)PcdGetPtr (PcdIpsecUefiCertificate),
                 PcdGet32 (PcdIpsecUefiCertificateSize)
                 );
+  if (IdPayload == NULL) {
+    goto CheckError;
+  }
 
   //
   // 3. Generate Certificate Payload
@@ -993,6 +1069,10 @@ Ikev2AuthCertGenerator (
                   IKEV2_CERT_ENCODEING_X509_CERT_SIGN,
                   FALSE
                   );
+  if (CertPayload == NULL) {
+    goto CheckError;
+  }
+  
   if (IkeSaSession->SessionCommon.IsInitiator) {
     CertReqPayload = Ikev2GenerateCertificatePayload (
                        IkeSaSession,
@@ -1002,6 +1082,9 @@ Ikev2AuthCertGenerator (
                        IKEV2_CERT_ENCODEING_HASH_AND_URL_OF_X509_CERT,
                        TRUE
                        );
+    if (CertReqPayload == NULL) {
+      goto CheckError;
+    } 
   }
 
   //
@@ -1044,7 +1127,15 @@ Ikev2AuthCertGenerator (
                     IKEV2_CFG_ATTR_INTERNAL_IP6_ADDRESS
                     );
     }
+    
+    if (CpPayload == NULL) {
+      goto CheckError;
+    } 
   }
+
+  if (AuthPayload == NULL) {
+    goto CheckError;
+  }  
 
   //
   // 5. Generate SA Payload according to the Sa Data in ChildSaSession
@@ -1054,6 +1145,9 @@ Ikev2AuthCertGenerator (
                 IKEV2_PAYLOAD_TYPE_TS_INIT,
                 IkeSessionTypeChildSa
                 );
+  if (SaPayload == NULL) {
+    goto CheckError;
+  }
 
   if (IkeSaSession->Spd->Data->ProcessingPolicy->Mode == EfiIPsecTransport) {
     //
@@ -1084,6 +1178,9 @@ Ikev2AuthCertGenerator (
                       NULL,
                       0
                       );
+    if (NotifyPayload == NULL) {
+      goto CheckError;
+    }
   } else {
     //
     // Generate Tsr for Tunnel mode.
@@ -1098,6 +1195,10 @@ Ikev2AuthCertGenerator (
                    IKEV2_PAYLOAD_TYPE_NONE,
                    FALSE
                    );
+  }
+
+  if (TsiPayload == NULL || TsrPayload == NULL) {
+    goto CheckError;
   }
 
   IKE_PACKET_APPEND_PAYLOAD (IkePacket, IdPayload);
@@ -1117,6 +1218,49 @@ Ikev2AuthCertGenerator (
   }
 
   return IkePacket;
+
+CheckError:
+  if (IkePacket != NULL) {
+    IkePacketFree (IkePacket);
+  }
+  
+  if (IdPayload != NULL) {
+    IkePayloadFree (IdPayload);
+  }
+
+  if (CertPayload != NULL) {
+    IkePayloadFree (CertPayload);
+  }
+  
+  if (CertReqPayload != NULL) {
+    IkePayloadFree (CertReqPayload);
+  }
+
+  if (AuthPayload != NULL) {
+    IkePayloadFree (AuthPayload);
+  }
+
+  if (CpPayload != NULL) {
+    IkePayloadFree (CpPayload);
+  }
+  
+  if (SaPayload != NULL) {
+    IkePayloadFree (SaPayload);
+  }
+  
+  if (TsiPayload != NULL) {
+    IkePayloadFree (TsiPayload);
+  }
+  
+  if (TsrPayload != NULL) {
+    IkePayloadFree (TsrPayload);
+  }
+  
+  if (NotifyPayload != NULL) {
+    IkePayloadFree (NotifyPayload);
+  }
+  
+  return NULL; 
 }
 
 /**
@@ -1340,7 +1484,11 @@ Ikev2AuthCertParser (
   //
   // 5. Generat keymats for IPsec protocol.
   //
-  Ikev2GenerateChildSaKeys (ChildSaSession, NULL);
+  Status = Ikev2GenerateChildSaKeys (ChildSaSession, NULL);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+  
   if (IkeSaSession->SessionCommon.IsInitiator) {
     //
     // 6. Change the state of IkeSaSession
@@ -1541,7 +1689,10 @@ Ikev2GenerateSaKeys (
   //
   // Generate Gxy
   //
-  Ikev2GenerateSaDhComputeKey (IkeSaSession->IkeKeys->DhBuffer, KePayload);
+  Status = Ikev2GenerateSaDhComputeKey (IkeSaSession->IkeKeys->DhBuffer, KePayload);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
 
   //
   // Get the key length of Authenticaion, Encryption, PRF, and Integrity.
@@ -1843,7 +1994,11 @@ Ikev2GenerateChildSaKeys (
     //
     // Generate Gxy 
     //
-    Ikev2GenerateSaDhComputeKey (ChildSaSession->DhBuffer, KePayload);
+    Status = Ikev2GenerateSaDhComputeKey (ChildSaSession->DhBuffer, KePayload);
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+    
     Fragments[0].Data     = ChildSaSession->DhBuffer->GxyBuffer;
     Fragments[0].DataSize = ChildSaSession->DhBuffer->GxySize;
   }

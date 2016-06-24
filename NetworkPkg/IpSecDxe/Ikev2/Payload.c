@@ -2558,6 +2558,9 @@ Ikev2EncodePacket (
     // Encrypt all payload and transfer IKE packet header from Host order to Network order.
     //
     Status = Ikev2EncryptPacket (SessionCommon, IkePacket);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   } else {
     //
     // Fill in the lenght into IkePacket header and transfer Host order to Network order.

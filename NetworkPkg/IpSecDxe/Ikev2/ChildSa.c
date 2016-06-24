@@ -1,7 +1,7 @@
 /** @file
   The operations for Child SA.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -39,17 +39,20 @@ Ikev2CreateChildGenerator (
   IKE_PACKET              *IkePacket;
   IKE_PAYLOAD             *NotifyPayload;
   UINT32                  *MessageId;
+
+  NotifyPayload   = NULL;
+  MessageId       = NULL;
   
   ChildSaSession  = (IKEV2_CHILD_SA_SESSION *) SaSession;
-  IkePacket       = IkePacketAlloc();
-  MessageId       = NULL;
-
-  if (IkePacket == NULL) {
-    return NULL;
-  }
   if (ChildSaSession == NULL) {
     return NULL;
   }
+    
+  IkePacket       = IkePacketAlloc();
+  if (IkePacket == NULL) {
+    return NULL;
+  }
+
 
   if (Context != NULL) {
     MessageId = (UINT32 *) Context;
@@ -113,6 +116,10 @@ Ikev2CreateChildGenerator (
                     NULL,
                     0
                     );
+  if (NotifyPayload == NULL) { 
+    IkePacketFree (IkePacket);
+    return NULL;
+  }
                         
   IKE_PACKET_APPEND_PAYLOAD (IkePacket, NotifyPayload);
   //
