@@ -875,7 +875,7 @@ GetStringIdFromString (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-      
+      ASSERT (String != NULL);
       if (StrCmp(KeywordValue, String) == 0) {
         *StringId = CurrentStringId;
         goto Done;
@@ -895,7 +895,7 @@ GetStringIdFromString (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-      
+      ASSERT (String != NULL);
       if (StrCmp(KeywordValue, String) == 0) {
         *StringId = CurrentStringId;
         goto Done;
@@ -914,7 +914,7 @@ GetStringIdFromString (
         if (EFI_ERROR (Status)) {
           goto Done;
         }
-
+        ASSERT (String != NULL);
         BlockSize += StringSize;
         if (StrCmp(KeywordValue, String) == 0) {
           *StringId = CurrentStringId;
@@ -939,7 +939,7 @@ GetStringIdFromString (
         if (EFI_ERROR (Status)) {
           goto Done;
         }
-
+        ASSERT (String != NULL);
         BlockSize += StringSize;
         if (StrCmp(KeywordValue, String) == 0) {
           *StringId = CurrentStringId;
