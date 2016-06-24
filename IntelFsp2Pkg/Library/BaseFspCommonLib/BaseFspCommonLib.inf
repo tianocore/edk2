@@ -28,6 +28,7 @@
 
 [LibraryClasses]
   BaseMemoryLib
+  FspSwitchStackLib
 
 [Pcd]
   gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress      ## CONSUMES
