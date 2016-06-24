@@ -97,7 +97,7 @@ DestoryOneOfOptionMap (
   Initialize Statement header members.
 
   @param  OpCodeData             Pointer of the raw OpCode data.
-  @param  FormSet                Pointer of the current FormSe.
+  @param  FormSet                Pointer of the current FormSet.
   @param  Form                   Pointer of the current Form.
 
   @return The Statement.
