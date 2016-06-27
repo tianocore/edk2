@@ -1205,7 +1205,6 @@ InitializeSmmCpuSemaphores (
   VOID
   )
 {
-  UINTN                      CpuIndex;
   UINTN                      ProcessorCount;
   UINTN                      TotalSize;
   UINTN                      GlobalSemaphoresSize;
@@ -1240,7 +1239,6 @@ InitializeSmmCpuSemaphores (
   SemaphoreAddr += SemaphoreSize;
   mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock
                                                   = (SPIN_LOCK *)SemaphoreAddr;
-
   SemaphoreAddr = (UINTN)SemaphoreBlock + GlobalSemaphoresSize;
   mSmmCpuSemaphores.SemaphoreCpu.Busy    = (SPIN_LOCK *)SemaphoreAddr;
   SemaphoreAddr += ProcessorCount * SemaphoreSize;
@@ -1254,20 +1252,8 @@ InitializeSmmCpuSemaphores (
         ((UINTN)SemaphoreBlock + Pages * SIZE_4KB - SemaphoreAddr) / SemaphoreSize;
   ASSERT (mSmmCpuSemaphores.SemaphoreMsr.AvailableCounter >= MSR_SPIN_LOCK_INIT_NUM);
 
-  mSmmMpSyncData->Counter       = mSmmCpuSemaphores.SemaphoreGlobal.Counter;
-  mSmmMpSyncData->InsideSmm     = mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm;
-  mSmmMpSyncData->AllCpusInSync = mSmmCpuSemaphores.SemaphoreGlobal.AllCpusInSync;
   mPFLock                       = mSmmCpuSemaphores.SemaphoreGlobal.PFLock;
   mConfigSmmCodeAccessCheckLock = mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock;
-
-  for (CpuIndex = 0; CpuIndex < ProcessorCount; CpuIndex ++) {
-    mSmmMpSyncData->CpuData[CpuIndex].Busy    =
-      (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Busy + SemaphoreSize * CpuIndex);
-    mSmmMpSyncData->CpuData[CpuIndex].Run     =
-      (UINT32 *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Run + SemaphoreSize * CpuIndex);
-    mSmmMpSyncData->CpuData[CpuIndex].Present =
-      (BOOLEAN *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Present + SemaphoreSize * CpuIndex);
-  }
 
   mSemaphoreSize = SemaphoreSize;
 }
@@ -1282,8 +1268,10 @@ InitializeMpSyncData (
   VOID
   )
 {
+  UINTN                      CpuIndex;
+
   if (mSmmMpSyncData != NULL) {
-    ZeroMem (mSmmMpSyncData, mSmmMpSyncDataSize);
+    mSmmMpSyncData->SwitchBsp = FALSE;
     mSmmMpSyncData->CpuData = (SMM_CPU_DATA_BLOCK *)((UINT8 *)mSmmMpSyncData + sizeof (SMM_DISPATCHER_MP_SYNC_DATA));
     mSmmMpSyncData->CandidateBsp = (BOOLEAN *)(mSmmMpSyncData->CpuData + gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
     if (FeaturePcdGet (PcdCpuSmmEnableBspElection)) {
@@ -1294,7 +1282,23 @@ InitializeMpSyncData (
     }
     mSmmMpSyncData->EffectiveSyncMode = (SMM_CPU_SYNC_MODE) PcdGet8 (PcdCpuSmmSyncMode);
 
-    InitializeSmmCpuSemaphores ();
+    mSmmMpSyncData->Counter       = mSmmCpuSemaphores.SemaphoreGlobal.Counter;
+    mSmmMpSyncData->InsideSmm     = mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm;
+    mSmmMpSyncData->AllCpusInSync = mSmmCpuSemaphores.SemaphoreGlobal.AllCpusInSync;
+    ASSERT (mSmmMpSyncData->Counter != NULL && mSmmMpSyncData->InsideSmm != NULL &&
+            mSmmMpSyncData->AllCpusInSync != NULL);
+    *mSmmMpSyncData->Counter       = 0;
+    *mSmmMpSyncData->InsideSmm     = FALSE;
+    *mSmmMpSyncData->AllCpusInSync = FALSE;
+
+    for (CpuIndex = 0; CpuIndex < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; CpuIndex ++) {
+      mSmmMpSyncData->CpuData[CpuIndex].Busy    =
+        (SPIN_LOCK *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Busy + mSemaphoreSize * CpuIndex);
+      mSmmMpSyncData->CpuData[CpuIndex].Run     =
+        (UINT32 *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Run + mSemaphoreSize * CpuIndex);
+      mSmmMpSyncData->CpuData[CpuIndex].Present =
+        (BOOLEAN *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Present + mSemaphoreSize * CpuIndex);
+    }
   }
 }
 
@@ -1317,6 +1321,11 @@ InitializeMpServiceData (
   PROCESSOR_SMM_DESCRIPTOR  *Psd;
   UINT8                     *GdtTssTables;
   UINTN                     GdtTableStepSize;
+
+  //
+  // Allocate memory for all locks and semaphores
+  //
+  InitializeSmmCpuSemaphores ();
 
   //
   // Initialize mSmmMpSyncData
