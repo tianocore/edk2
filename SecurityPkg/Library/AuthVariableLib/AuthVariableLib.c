@@ -35,6 +35,7 @@ UINT8    *mCertDbStore;
 UINT32   mMaxCertDbSize;
 UINT32   mPlatformMode;
 UINT8    mVendorKeyState;
+BOOLEAN  mUserPhysicalPresent;
 
 EFI_GUID mSignatureSupport[] = {EFI_CERT_SHA1_GUID, EFI_CERT_SHA256_GUID, EFI_CERT_RSA2048_GUID, EFI_CERT_X509_GUID};
 
@@ -434,6 +435,12 @@ AuthVariableLibInitialize (
   mAuthVarAddressPointer[9] = (VOID **) &(mAuthVarLibContextIn->AtRuntime),
   AuthVarLibContextOut->AddressPointer = mAuthVarAddressPointer;
   AuthVarLibContextOut->AddressPointerCount = sizeof (mAuthVarAddressPointer) / sizeof (mAuthVarAddressPointer[0]);
+
+  //
+  // Cache UserPhysicalPresent State. 
+  // Platform should report PhysicalPresent before this point
+  //
+  mUserPhysicalPresent = UserPhysicalPresent();
 
   return Status;
 }
