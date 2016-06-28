@@ -218,7 +218,7 @@ MadtTableInitialize (
   //ASSERT (NumberOfCPUs <= 2 && NumberOfCPUs > 0);
   MadtSize = GetAcutalMadtTableSize (&MadtConfigData, NumberOfCPUs);
   Madt = (EFI_ACPI_2_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER *)AllocateZeroPool (MadtSize);
-  ASSERT_EFI_ERROR (Madt);
+  ASSERT (Madt != NULL);
   //
   // Initialize MADT Header information
   //
