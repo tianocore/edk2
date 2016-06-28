@@ -49,7 +49,7 @@ GetPlatformInfoHob (
   //
   // PlatformInfo PEIM should provide this HOB data, if not ASSERT and return error.
   //
-  ASSERT_EFI_ERROR (*PlatformInfoHob != NULL);
+  ASSERT (*PlatformInfoHob != NULL);
   if (!(*PlatformInfoHob)) {
     return EFI_NOT_FOUND;
   }
