@@ -384,7 +384,7 @@ Ikev2InitPskParser (
     // 5. Generate Nr_b
     //
     IkeSaSession->NrBlock   = IkeGenerateNonce (IKE_NONCE_SIZE);
-    ASSERT_EFI_ERROR (IkeSaSession->NrBlock != NULL);
+    ASSERT (IkeSaSession->NrBlock != NULL);
     IkeSaSession->NrBlkSize = IKE_NONCE_SIZE;
 
     //
