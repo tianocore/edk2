@@ -48,6 +48,7 @@
   BaseMemoryLib
   UefiRuntimeServicesTableLib
   MemoryAllocationLib
+  UefiLib
 
 [Guids]
   gSmmPerformanceProtocolGuid           ## SOMETIMES_PRODUCES   ## UNDEFINED # Used to do smm communication
