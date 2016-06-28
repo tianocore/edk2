@@ -153,7 +153,7 @@ ExportPackageLists (
                            &Size,
                            PackageListHdr
                            );
-  ASSERT_EFI_ERROR (Status != EFI_BUFFER_TOO_SMALL);
+  ASSERT (Status != EFI_BUFFER_TOO_SMALL);
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
     PackageListHdr = AllocateZeroPool (Size);
