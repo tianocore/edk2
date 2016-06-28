@@ -505,7 +505,11 @@ HttpBootDxeLoadFile (
       Status = EFI_WARN_FILE_SYSTEM;
     }
   }
-  
+
+  //
+  // Stop the HTTP Boot service after the boot image is downloaded.
+  //
+  HttpBootStop (Private);
   return Status;
 }
 
