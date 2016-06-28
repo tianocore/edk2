@@ -991,8 +991,11 @@ ShellCommandRunElse (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS  Status;
   SCRIPT_FILE *CurrentScriptFile;
-  ASSERT_EFI_ERROR(CommandInit());
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
 
   if (gEfiShellParametersProtocol->Argc > 1) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"if");  
@@ -1066,8 +1069,11 @@ ShellCommandRunEndIf (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS  Status;
   SCRIPT_FILE *CurrentScriptFile;
-  ASSERT_EFI_ERROR(CommandInit());
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
 
   if (gEfiShellParametersProtocol->Argc > 1) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"if");  
