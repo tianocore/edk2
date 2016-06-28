@@ -494,7 +494,7 @@ HiiGetSecondaryLanguages (
   UnicodeStrToAsciiStr (PrimaryLanguage, PrimaryLang639);
 
   PrimaryLang4646 = ConvertLanguagesIso639ToRfc4646 (PrimaryLang639);
-  ASSERT_EFI_ERROR (PrimaryLang4646 != NULL);
+  ASSERT (PrimaryLang4646 != NULL);
 
   SecLangCodes4646 = HiiGetSupportedSecondaryLanguages (UefiHiiHandle, PrimaryLang4646);
 
