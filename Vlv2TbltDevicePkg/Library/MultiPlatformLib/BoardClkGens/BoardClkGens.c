@@ -69,10 +69,10 @@ ConfigureClockGenerator (
   //
   // Verify input arguments
   //
-  ASSERT_EFI_ERROR (ConfigurationTableLength >= 6);
-  ASSERT_EFI_ERROR (ConfigurationTableLength <= MAX_CLOCK_GENERATOR_BUFFER_LENGTH);
-  ASSERT_EFI_ERROR (ClockType < ClockGeneratorMax);
-  ASSERT_EFI_ERROR (ConfigurationTable != NULL);
+  ASSERT (ConfigurationTableLength >= 6);
+  ASSERT (ConfigurationTableLength <= MAX_CLOCK_GENERATOR_BUFFER_LENGTH);
+  ASSERT (ClockType < ClockGeneratorMax);
+  ASSERT (ConfigurationTable != NULL);
 
   //
   // Read the clock generator

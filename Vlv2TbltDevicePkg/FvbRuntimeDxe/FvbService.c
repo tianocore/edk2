@@ -154,7 +154,7 @@ FvbGetVolumeAttributes (
 {
   EFI_FW_VOL_INSTANCE *    FwInstance = NULL;
   FwInstance = GetFvbInstance(Instance);
-  ASSERT_EFI_ERROR (FwInstance != NULL);
+  ASSERT (FwInstance != NULL);
 
   if ( FwInstance != NULL ) {
     return FwInstance->VolumeHeader.Attributes;
@@ -208,7 +208,7 @@ FvbGetLbaAddress (
   StartLba  = 0;
   Offset    = 0;
   BlockMap  = &(FwhInstance->VolumeHeader.BlockMap[0]);
-  ASSERT_EFI_ERROR (BlockMap != NULL);
+  ASSERT (BlockMap != NULL);
 
   //
   // Parse the blockmap of the FV to find which map entry the Lba belongs to.
@@ -512,7 +512,7 @@ FvbSetVolumeAttributes (
   FwhInstance = GetFvbInstance (Instance);
 
   AttribPtr     = (EFI_FVB_ATTRIBUTES_2 *) & (FwhInstance->VolumeHeader.Attributes);
-  ASSERT_EFI_ERROR (AttribPtr != NULL);
+  ASSERT (AttribPtr != NULL);
 
   if ( AttribPtr != NULL) {
     OldAttributes = *AttribPtr;
