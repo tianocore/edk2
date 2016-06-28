@@ -2,13 +2,14 @@
   Runtime memory status code worker.
 
   Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
-                                                                                            
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -18,8 +19,9 @@ RUNTIME_MEMORY_STATUSCODE_HEADER  *mRtMemoryStatusCodeTable;
 
 /**
   Initialize runtime memory status code table as initialization for runtime memory status code worker
- 
+
   @retval EFI_SUCCESS  Runtime memory status code table successfully initialized.
+  @retval others       Errors from gBS->InstallConfigurationTable().
 
 **/
 EFI_STATUS
@@ -27,6 +29,8 @@ RtMemoryStatusCodeInitializeWorker (
   VOID
   )
 {
+  EFI_STATUS                        Status;
+
   //
   // Allocate runtime memory status code pool.
   //
@@ -40,15 +44,16 @@ RtMemoryStatusCodeInitializeWorker (
   mRtMemoryStatusCodeTable->NumberOfRecords  = 0;
   mRtMemoryStatusCodeTable->MaxRecordsNumber = 
     (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
+  Status = gBS->InstallConfigurationTable (&gMemoryStatusCodeRecordGuid, mRtMemoryStatusCodeTable);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 
 /**
   Report status code into runtime memory. If the runtime pool is full, roll back to the 
   first record and overwrite it.
- 
+
   @param  CodeType                Indicates the type of status code being reported.
   @param  Value                   Describes the current status of a hardware or software entity.
                                   This included information about the class and subclass that is used to
@@ -59,7 +64,7 @@ RtMemoryStatusCodeInitializeWorker (
                                   This parameter allows the status code driver to apply different rules to
                                   different callers.
   @param  Data                    This optional parameter may be used to pass additional data.
- 
+
   @retval EFI_SUCCESS             Status code successfully recorded in runtime memory status code table.
 
 **/

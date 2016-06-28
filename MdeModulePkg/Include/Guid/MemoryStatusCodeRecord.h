@@ -2,13 +2,14 @@
   GUID used to identify status code records HOB that originate from the PEI status code.    
   
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -54,6 +55,25 @@ typedef struct {
   ///
   UINT32  MaxRecordsNumber;
 } MEMORY_STATUSCODE_PACKET_HEADER;
+
+///
+/// A header structure that is followed by an array of records that contain the 
+/// parameters passed into the ReportStatusCode() service in the DXE Services Table.
+///
+typedef struct {
+  ///
+  /// The index pointing to the last recored being stored.
+  ///
+  UINT32   RecordIndex;
+  ///
+  /// The number of records being stored.
+  ///
+  UINT32   NumberOfRecords;
+  ///
+  /// The maximum number of records that can be stored.
+  ///
+  UINT32   MaxRecordsNumber;
+} RUNTIME_MEMORY_STATUSCODE_HEADER;
 
 ///
 /// A structure that contains the parameters passed into the ReportStatusCode() 
