@@ -366,6 +366,7 @@ typedef struct {
   volatile BOOLEAN     *AllCpusInSync;
   SPIN_LOCK            *PFLock;
   SPIN_LOCK            *CodeAccessCheckLock;
+  SPIN_LOCK            *MemoryMappedLock;
 } SMM_CPU_SEMAPHORE_GLOBAL;
 
 ///
@@ -413,6 +414,7 @@ extern SMM_CPU_SEMAPHORES                  mSmmCpuSemaphores;
 extern UINTN                               mSemaphoreSize;
 extern SPIN_LOCK                           *mPFLock;
 extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
+extern SPIN_LOCK                           *mMemoryMappedLock;
 
 /**
   Create 4G PageTable in SMRAM.

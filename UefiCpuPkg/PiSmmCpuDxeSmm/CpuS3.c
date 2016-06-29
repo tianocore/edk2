@@ -34,6 +34,11 @@ typedef struct {
   UINTN LongJumpOffset;
 } MP_ASSEMBLY_ADDRESS_MAP;
 
+//
+// Spin lock used to serialize MemoryMapped operation
+//
+SPIN_LOCK                *mMemoryMappedLock = NULL;
+
 /**
   Get starting address and size of the rendezvous entry for APs.
   Information for fixing a jump instruction in the code is also returned.
@@ -282,6 +287,19 @@ SetProcessorRegister (
           );
         ReleaseSpinLock (MsrSpinLock);
       }
+      break;
+    //
+    // MemoryMapped operations
+    //
+    case MemoryMapped:
+      AcquireSpinLock (mMemoryMappedLock);
+      MmioBitFieldWrite32 (
+        RegisterTableEntry->Index,
+        RegisterTableEntry->ValidBitStart,
+        RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
+        (UINT32)RegisterTableEntry->Value
+        );
+      ReleaseSpinLock (mMemoryMappedLock);
       break;
     //
     // Enable or disable cache

@@ -485,6 +485,8 @@ SmmRestoreCpu (
 
   DEBUG ((EFI_D_INFO, "SmmRestoreCpu()\n"));
 
+  InitializeSpinLock (mMemoryMappedLock);
+
   //
   // See if there is enough context to resume PEI Phase
   //
