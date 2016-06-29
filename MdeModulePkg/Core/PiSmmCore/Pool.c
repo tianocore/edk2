@@ -67,7 +67,7 @@ SmmInitializeMemoryServices (
       }
 
       if (SmramRanges[Index].CpuStart >= BASE_1MB) {
-        if ((SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize) <= BASE_4GB) {
+        if ((SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize - 1) <= MAX_ADDRESS) {
           if (SmramRanges[Index].PhysicalSize >= MaxSize) {
             MaxSize = SmramRanges[Index].PhysicalSize;
             CurrentSmramRangesIndex = Index;

@@ -1556,7 +1556,7 @@ SmmIplEntry (
     }
 
     if (gSmmCorePrivate->SmramRanges[Index].CpuStart >= BASE_1MB) {
-      if ((gSmmCorePrivate->SmramRanges[Index].CpuStart + gSmmCorePrivate->SmramRanges[Index].PhysicalSize) <= BASE_4GB) {
+      if ((gSmmCorePrivate->SmramRanges[Index].CpuStart + gSmmCorePrivate->SmramRanges[Index].PhysicalSize - 1) <= MAX_ADDRESS) {
         if (gSmmCorePrivate->SmramRanges[Index].PhysicalSize >= MaxSize) {
           MaxSize = gSmmCorePrivate->SmramRanges[Index].PhysicalSize;
           mCurrentSmramRange = &gSmmCorePrivate->SmramRanges[Index];
