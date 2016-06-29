@@ -733,6 +733,12 @@
   gEfiDiskInfoUfsInterfaceGuid   = { 0x4b3029cc, 0x6b98, 0x47fb, { 0xbc, 0x96, 0x76, 0xdc, 0xb8, 0x4, 0x41, 0xf0 }}
 
   #
+  # GUID defined in PI1.5
+  #
+  ## Include/Guid/GraphicsInfoHob.h
+  gEfiGraphicsDeviceInfoHobGuid     = { 0xe5cb2ac9, 0xd35d, 0x4430, { 0x93, 0x6e, 0x1d, 0xe3, 0x32, 0x47, 0x8d, 0xe7 }}
+
+  #
   # GUID defined in Windows UEFI Firmware Update Platform doc
   #
   ## Include/IndustryStandard/WindowsUxCapsule.h
