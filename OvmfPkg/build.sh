@@ -83,6 +83,13 @@ case `uname` in
   Linux*)
     gcc_version=$(gcc -v 2>&1 | tail -1 | awk '{print $3}')
     case $gcc_version in
+      4.[3210].*|3.*|2.*)
+        echo "gcc version $gcc_version is unsupported"
+        exit 1
+        ;;
+      4.4.*)
+        TARGET_TOOLS=GCC44
+        ;;
       4.5.*)
         TARGET_TOOLS=GCC45
         ;;
@@ -99,7 +106,8 @@ case `uname` in
         TARGET_TOOLS=GCC49
         ;;
       *)
-        TARGET_TOOLS=GCC44
+        # assume the latest, we cant keep up with gcc releases
+        TARGET_TOOLS=GCC49
         ;;
     esac
 esac
