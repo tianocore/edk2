@@ -63,6 +63,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA mMemoryProfileContext 
 };
 GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA *mMemoryProfileContextPtr = NULL;
 
+EFI_LOCK mMemoryProfileLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 BOOLEAN mMemoryProfileGettingStatus = FALSE;
 BOOLEAN mMemoryProfileRecordingEnable = MEMORY_PROFILE_RECORDING_DISABLE;
 EFI_DEVICE_PATH_PROTOCOL *mMemoryProfileDriverPath;
@@ -216,6 +217,28 @@ EDKII_MEMORY_PROFILE_PROTOCOL mProfileProtocol = {
   ProfileProtocolSetRecordingState,
   ProfileProtocolRecord,
 };
+
+/**
+  Acquire lock on mMemoryProfileLock.
+**/
+VOID
+CoreAcquireMemoryProfileLock (
+  VOID
+  )
+{
+  CoreAcquireLock (&mMemoryProfileLock);
+}
+
+/**
+  Release lock on mMemoryProfileLock.
+**/
+VOID
+CoreReleaseMemoryProfileLock (
+  VOID
+  )
+{
+  CoreReleaseLock (&mMemoryProfileLock);
+}
 
 /**
   Return memory profile context.
@@ -1383,6 +1406,7 @@ CoreUpdateProfile (
     return EFI_UNSUPPORTED;
   }
 
+  CoreAcquireMemoryProfileLock ();
   switch (BasicAction) {
     case MemoryProfileActionAllocatePages:
       Status = CoreUpdateProfileAllocate (CallerAddress, Action, MemoryType, Size, Buffer, ActionString);
@@ -1401,6 +1425,8 @@ CoreUpdateProfile (
       Status = EFI_UNSUPPORTED;
       break;
   }
+  CoreReleaseMemoryProfileLock ();
+
   return Status;
 }
 
