@@ -3,7 +3,7 @@
   this utility will print out the statistics information. You can use console 
   redirection to capture the data.
   
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -26,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/SmmVariableCommon.h>
+#include <Guid/PiSmmCommunicationRegionTable.h>
 #include <Protocol/SmmCommunication.h>
 #include <Protocol/SmmVariable.h>
 
@@ -72,8 +73,8 @@ GetVariableStatisticsData (
 
 /**
 
-  This function get and print the variable statistics data from SMM variable driver. 
-                     
+  This function get and print the variable statistics data from SMM variable driver.
+
   @retval EFI_SUCCESS               Print the statistics information successfully.
   @retval EFI_NOT_FOUND             Not found the statistics information.
 
@@ -90,7 +91,11 @@ PrintInfoFromSmm (
   UINTN                                          CommSize;
   SMM_VARIABLE_COMMUNICATE_HEADER                *FunctionHeader;
   EFI_SMM_VARIABLE_PROTOCOL                      *Smmvariable;
-  
+  EDKII_PI_SMM_COMMUNICATION_REGION_TABLE        *PiSmmCommunicationRegionTable;
+  UINT32                                         Index;
+  EFI_MEMORY_DESCRIPTOR                          *Entry;
+  UINTN                                          Size;
+  UINTN                                          MaxSize;
 
   Status = gBS->LocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **) &Smmvariable);
   if (EFI_ERROR (Status)) {
@@ -100,30 +105,47 @@ PrintInfoFromSmm (
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &mSmmCommunication);
   if (EFI_ERROR (Status)) {
     return Status;
-  }  
+  }
 
-  CommSize  = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
-  RealCommSize = CommSize;
-  CommBuffer = AllocateZeroPool (CommSize);
+  CommBuffer = NULL;
+  Status = EfiGetSystemConfigurationTable (
+             &gEdkiiPiSmmCommunicationRegionTableGuid,
+             (VOID **) &PiSmmCommunicationRegionTable
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  ASSERT (PiSmmCommunicationRegionTable != NULL);
+  Entry = (EFI_MEMORY_DESCRIPTOR *) (PiSmmCommunicationRegionTable + 1);
+  Size = 0;
+  MaxSize = 0;
+  for (Index = 0; Index < PiSmmCommunicationRegionTable->NumberOfEntries; Index++) {
+    if (Entry->Type == EfiConventionalMemory) {
+      Size = EFI_PAGES_TO_SIZE ((UINTN) Entry->NumberOfPages);
+      if (Size > (SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (VARIABLE_INFO_ENTRY))) {
+        if (Size > MaxSize) {
+          MaxSize = Size;
+          RealCommSize = MaxSize;
+          CommBuffer = (EFI_SMM_COMMUNICATE_HEADER *) (UINTN) Entry->PhysicalStart;
+        }
+      }
+    }
+    Entry = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) Entry + PiSmmCommunicationRegionTable->DescriptorSize);
+  }
   ASSERT (CommBuffer != NULL);
-  
+  ZeroMem (CommBuffer, RealCommSize);
+
   Print (L"Non-Volatile SMM Variables:\n");
   do {
+    CommSize = RealCommSize;
     Status = GetVariableStatisticsData (CommBuffer, &CommSize);
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      FreePool (CommBuffer);
-      CommBuffer = AllocateZeroPool (CommSize);
-      ASSERT (CommBuffer != NULL);
-      RealCommSize = CommSize;
-      Status = GetVariableStatisticsData (CommBuffer, &CommSize);
+      Print (L"The generic SMM communication buffer provided by SmmCommunicationRegionTable is too small\n");
+      return Status;
     }
 
-    if (EFI_ERROR (Status) || (CommSize <= SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE)) { 
+    if (EFI_ERROR (Status) || (CommSize <= SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE)) {
       break;
-    }
-
-    if (CommSize < RealCommSize) {
-      CommSize = RealCommSize;
     }
 
     FunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *) CommBuffer->Data;
@@ -131,8 +153,8 @@ PrintInfoFromSmm (
 
     if (!VariableInfo->Volatile) {
       Print (
-          L"%g R%03d(%03d) W%03d D%03d:%s\n", 
-          &VariableInfo->VendorGuid,  
+          L"%g R%03d(%03d) W%03d D%03d:%s\n",
+          &VariableInfo->VendorGuid,
           VariableInfo->ReadCount,
           VariableInfo->CacheCount,
           VariableInfo->WriteCount,
@@ -141,25 +163,19 @@ PrintInfoFromSmm (
           );
     }
   } while (TRUE);
-  
+
   Print (L"Volatile SMM Variables:\n");
-  ZeroMem (CommBuffer, CommSize);
+  ZeroMem (CommBuffer, RealCommSize);
   do {
+    CommSize = RealCommSize;
     Status = GetVariableStatisticsData (CommBuffer, &CommSize);
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      FreePool (CommBuffer);
-      CommBuffer = AllocateZeroPool (CommSize);
-      ASSERT (CommBuffer != NULL);
-      RealCommSize = CommSize;
-      Status = GetVariableStatisticsData (CommBuffer, &CommSize);
+      Print (L"The generic SMM communication buffer provided by SmmCommunicationRegionTable is too small\n");
+      return Status;
     }
 
-    if (EFI_ERROR (Status) || (CommSize <= SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE)) { 
+    if (EFI_ERROR (Status) || (CommSize <= SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE)) {
       break;
-    }
-
-    if (CommSize < RealCommSize) {
-      CommSize = RealCommSize;
     }
 
     FunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *) CommBuffer->Data;
@@ -167,8 +183,8 @@ PrintInfoFromSmm (
 
     if (VariableInfo->Volatile) {
       Print (
-          L"%g R%03d(%03d) W%03d D%03d:%s\n", 
-          &VariableInfo->VendorGuid,  
+          L"%g R%03d(%03d) W%03d D%03d:%s\n",
+          &VariableInfo->VendorGuid,
           VariableInfo->ReadCount,
           VariableInfo->CacheCount,
           VariableInfo->WriteCount,
@@ -178,7 +194,6 @@ PrintInfoFromSmm (
     }
   } while (TRUE);
 
-  FreePool (CommBuffer);  
   return Status;
 }
 
