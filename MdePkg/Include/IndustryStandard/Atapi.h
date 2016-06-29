@@ -2,7 +2,7 @@
   This file contains just some basic definitions that are needed by drivers
   that dealing with ATA/ATAPI interface.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -502,7 +502,7 @@ typedef union {
 #define ATA_CMD_READ_CAPACITY                           0x25   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_READ_10                                 0x28   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_WRITE_10                                0x2A   ///< defined in ATAPI Removable Rewritable Media Devcies
-#define ATA_CMD_SEEK                                    0x2B   ///< defined in ATAPI Removable Rewritable Media Devcies
+#define ATA_CMD_ATAPI_SEEK                              0x2B   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_WRITE_AND_VERIFY                        0x2E   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_VERIFY                                  0x2F   ///< defined in ATAPI Removable Rewritable Media Devcies
 #define ATA_CMD_READ_12                                 0xA8   ///< defined in ATAPI Removable Rewritable Media Devcies
