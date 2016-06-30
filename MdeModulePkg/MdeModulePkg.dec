@@ -153,6 +153,10 @@
   #
   MemoryProfileLib|Include/Library/MemoryProfileLib.h
 
+  ##  @libraryclass  Provides an interface for performing UEFI Graphics Output Protocol Video blt operations.
+  ##
+  FrameBufferBltLib|Include/Library/FrameBufferBltLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
