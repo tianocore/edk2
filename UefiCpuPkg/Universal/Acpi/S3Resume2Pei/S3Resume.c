@@ -4,7 +4,7 @@
   This module will excute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -822,7 +822,13 @@ S3ResumeExecuteBootScript (
     // Make sure the newly allcated IDT align with 16-bytes
     // 
     IdtBuffer = AllocatePages (EFI_SIZE_TO_PAGES((IdtDescriptor->Limit + 1) + 16));
-    ASSERT (IdtBuffer != NULL);
+    if (IdtBuffer == NULL) {
+      REPORT_STATUS_CODE (
+        EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+        (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_RESUME_FAILED)
+        );
+      ASSERT (FALSE);
+    }
     //
     // Additional 16 bytes allocated to save IA32 IDT descriptor and Pei Service Table Pointer
     // IA32 IDT descriptor will be used to setup IA32 IDT table for 32-bit Framework Boot Script code
@@ -852,7 +858,13 @@ S3ResumeExecuteBootScript (
   // Prepare data for return back
   //
   PeiS3ResumeState = AllocatePool (sizeof(*PeiS3ResumeState));
-  ASSERT (PeiS3ResumeState != NULL);
+  if (PeiS3ResumeState == NULL) {
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+      (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_RESUME_FAILED)
+      );
+    ASSERT (FALSE);
+  }
   DEBUG (( EFI_D_ERROR, "PeiS3ResumeState - %x\r\n", PeiS3ResumeState));
   PeiS3ResumeState->ReturnCs           = 0x10;
   PeiS3ResumeState->ReturnEntryPoint   = (EFI_PHYSICAL_ADDRESS)(UINTN)S3ResumeBootOs;
