@@ -1,7 +1,7 @@
 ///** @file
 //  Boot Maintenance Utility Formset
 //
-//  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -27,6 +27,17 @@ formset
 
   form formid = FORM_MAIN_ID,
        title = STRING_TOKEN(STR_FORM_MAIN_TITLE);
+       //
+       // Add this invisible text in order to indicate enter Boot Maintenance Manager form.
+       // To trigger the form open action.
+       //
+       suppressif TRUE;
+          text
+              help  = STRING_TOKEN(STR_NONE),
+              text  = STRING_TOKEN(STR_NONE),
+              flags = INTERACTIVE,
+              key   = KEY_VALUE_TRIGGER_FORM_OPEN_ACTION;
+       endif;
          
     label LABEL_FORM_MAIN_START;
     //

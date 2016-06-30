@@ -84,6 +84,7 @@ BMM_CALLBACK_DATA  gBootMaintenancePrivate = {
 
 BMM_CALLBACK_DATA *mBmmCallbackInfo = &gBootMaintenancePrivate;
 BOOLEAN  mAllMenuInit               = FALSE;
+BOOLEAN  mFirstEnterBMMForm         = FALSE;
 
 /**
   Init all memu.
@@ -102,6 +103,16 @@ InitAllMenu (
 **/
 VOID
 FreeAllMenu (
+  VOID
+  );
+
+/**
+
+  Update the menus in the BMM page.
+
+**/
+VOID
+CustomizeMenus (
   VOID
   );
 
@@ -874,14 +885,33 @@ BootMaintCallback (
   UINTN             Index;
   EFI_DEVICE_PATH_PROTOCOL * File;
 
-  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
+  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED && Action != EFI_BROWSER_ACTION_FORM_OPEN) {
     //
-    // Do nothing for other UEFI Action. Only do call back when data is changed.
+    // Do nothing for other UEFI Action. Only do call back when data is changed or the form is open.
     //
     return EFI_UNSUPPORTED;
   }
 
   Private        = BMM_CALLBACK_DATA_FROM_THIS (This);
+
+  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
+    if (QuestionId == KEY_VALUE_TRIGGER_FORM_OPEN_ACTION) {
+      if (!mFirstEnterBMMForm) {
+        //
+        // BMMUiLib depends on LegacyUi library to show legacy menus.
+        // If we want to show Legacy menus correctly in BMM page,
+        // we must do it after the LegacyUi library has already been initialized.
+        // Opening the BMM form is the appropriate time that the LegacyUi library has already been initialized.
+        // So we do the tasks which are related to legacy menus here.
+        // 1. Update the menus (including legacy munu) show in BootMiantenanceManager page.
+        // 2. Re-scan the BootOption menus (including the legacy boot option).
+        //
+        CustomizeMenus ();
+        BOpt_GetBootOptions (Private);
+        mFirstEnterBMMForm = TRUE;
+      }
+    }
+  }
   //
   // Retrive uncommitted data from Form Browser
   //
@@ -1225,11 +1255,6 @@ InitializeBmmConfig (
   GetTerminalAttribute (CallbackData);
 
   CallbackData->BmmFakeNvData.ForceReconnect = TRUE;
-
-  //
-  // Update the menus.
-  //
-  CustomizeMenus ();
 
   //
   // Backup Initialize BMM configuartion data to BmmOldFakeNVData
