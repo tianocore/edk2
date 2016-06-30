@@ -489,7 +489,7 @@ PxeBcIcmp6ErrorUpdate (
   @param[in, out]  SrcPort              The pointer to the source port.
   @param[in]       DoNotFragment        If TRUE, fragment is not enabled.
                                         Otherwise, fragment is enabled.
-  @param[in]       TTL                  The time to live field of the IP header. 
+  @param[in]       Ttl                  The time to live field of the IP header. 
   @param[in]       ToS                  The type of service field of the IP header.
 
   @retval          EFI_SUCCESS          Successfully configured this instance.
@@ -504,7 +504,7 @@ PxeBcConfigUdp4Write (
   IN     EFI_IPv4_ADDRESS   *Gateway,
   IN OUT UINT16             *SrcPort,
   IN     BOOLEAN            DoNotFragment,
-  IN     UINT8              TTL,
+  IN     UINT8              Ttl,
   IN     UINT8              ToS
   )
 {
@@ -516,7 +516,7 @@ PxeBcConfigUdp4Write (
   Udp4CfgData.TransmitTimeout    = PXEBC_DEFAULT_LIFETIME;
   Udp4CfgData.ReceiveTimeout     = PXEBC_DEFAULT_LIFETIME;
   Udp4CfgData.TypeOfService      = ToS;
-  Udp4CfgData.TimeToLive         = TTL;
+  Udp4CfgData.TimeToLive         = Ttl;
   Udp4CfgData.AllowDuplicatePort = TRUE;
   Udp4CfgData.DoNotFragment      = DoNotFragment;
 
