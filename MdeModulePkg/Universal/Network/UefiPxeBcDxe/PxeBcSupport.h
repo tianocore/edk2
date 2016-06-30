@@ -38,7 +38,7 @@ PxeBcCommonNotify (
   @param  SubnetMask Pointer to the subnetmask of the station ip address.
   @param  Gateway    Pointer to the gateway ip address.
   @param  SrcPort    Pointer to the srouce port of the station.
-  @param  TTL        The time to live field of the IP header. 
+  @param  Ttl        The time to live field of the IP header. 
   @param  ToS        The type of service field of the IP header.
 
   @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
@@ -64,7 +64,7 @@ PxeBcConfigureUdpWriteInstance (
   IN EFI_IPv4_ADDRESS   *SubnetMask,
   IN EFI_IPv4_ADDRESS   *Gateway,
   IN OUT UINT16         *SrcPort,
-  IN     UINT8          TTL,
+  IN     UINT8          Ttl,
   IN     UINT8          ToS
   );
 /**
