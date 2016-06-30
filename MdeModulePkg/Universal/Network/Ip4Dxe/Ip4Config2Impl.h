@@ -27,6 +27,7 @@
 
 #define DATA_ATTRIB_SET(Attrib, Bits)       (BOOLEAN)((Attrib) & (Bits))
 #define SET_DATA_ATTRIB(Attrib, Bits)       ((Attrib) |= (Bits))
+#define REMOVE_DATA_ATTRIB(Attrib, Bits)    ((Attrib) &= (~Bits))
 
 typedef struct _IP4_CONFIG2_INSTANCE IP4_CONFIG2_INSTANCE;
 

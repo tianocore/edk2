@@ -1060,7 +1060,6 @@ Ip4Config2GetIfInfo (
   IN VOID                 *Data      OPTIONAL
   )
 {
-
   IP4_SERVICE                    *IpSb;
   UINTN                          Length;
   IP4_CONFIG2_DATA_ITEM          *Item;
@@ -1179,6 +1178,7 @@ Ip4Config2SetPolicy (
       DataItem->Data.Ptr = NULL;
       DataItem->DataSize = 0;
       DataItem->Status   = EFI_NOT_FOUND;
+      SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_VOLATILE);
       NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
     } else {
       //
@@ -1459,8 +1459,18 @@ Ip4Config2SetDnsServer (
   IN VOID                 *Data
   )
 {
+  IP4_CONFIG2_DATA_ITEM *Item;
+
+  Item = NULL;
+
   if (Instance->Policy != Ip4Config2PolicyStatic) {
     return EFI_WRITE_PROTECTED;
+  }
+
+  Item = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
+
+  if (DATA_ATTRIB_SET (Item->Attribute, DATA_ATTRIB_VOLATILE)) {
+    REMOVE_DATA_ATTRIB (Item->Attribute, DATA_ATTRIB_VOLATILE);
   }
 
   return Ip4Config2SetDnsServerWorker (Instance, DataSize, Data);

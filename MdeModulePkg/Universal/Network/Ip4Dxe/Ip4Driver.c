@@ -598,6 +598,10 @@ Ip4DriverBindingStart (
       if (EFI_ERROR(Status)) {
         goto UNINSTALL_PROTOCOL;
       }
+      
+      if (Index == Ip4Config2DataTypePolicy && (*(DataItem->Data.Policy) == Ip4Config2PolicyDhcp)) {
+        break;
+      } 
     }
   }
  
