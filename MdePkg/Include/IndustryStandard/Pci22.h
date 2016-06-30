@@ -635,6 +635,7 @@ typedef union {
 #define EFI_PCI_CAPABILITY_ID_SLOTID  0x04
 #define EFI_PCI_CAPABILITY_ID_MSI     0x05
 #define EFI_PCI_CAPABILITY_ID_HOTPLUG 0x06
+#define EFI_PCI_CAPABILITY_ID_SHPC    0x0C
 
 ///
 /// Capabilities List Header
