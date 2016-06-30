@@ -68,6 +68,11 @@ PeiFspMemoryInit (
   // Copy default FSP-M UPD data from Flash
   //
   FspmHeaderPtr = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspmBaseAddress));
+  DEBUG ((DEBUG_INFO, "FspmHeaderPtr - 0x%x\n", FspmHeaderPtr));
+  if (FspmHeaderPtr == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
+
   FspmUpdDataPtr = (FSPM_UPD_COMMON *)AllocateZeroPool ((UINTN)FspmHeaderPtr->CfgRegionSize);
   ASSERT (FspmUpdDataPtr != NULL);
   SourceData = (UINTN *)((UINTN)FspmHeaderPtr->ImageBase + (UINTN)FspmHeaderPtr->CfgRegionOffset);
