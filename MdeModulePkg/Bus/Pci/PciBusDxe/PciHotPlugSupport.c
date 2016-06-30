@@ -300,7 +300,7 @@ IsSHPC (
   Offset = 0;
   Status = LocateCapabilityRegBlock (
             PciIoDevice,
-            EFI_PCI_CAPABILITY_ID_HOTPLUG,
+            EFI_PCI_CAPABILITY_ID_SHPC,
             &Offset,
             NULL
             );
