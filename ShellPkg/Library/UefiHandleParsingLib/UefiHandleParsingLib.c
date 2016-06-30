@@ -2460,10 +2460,6 @@ ParseHandleDatabaseByRelationshipWithType (
         (*HandleType)[HandleIndex] |= (UINTN)HR_COMPONENT_NAME_HANDLE;
       } else if (CompareGuid (ProtocolGuidArray[ProtocolIndex], &gEfiDevicePathProtocolGuid)          ) {
         (*HandleType)[HandleIndex] |= (UINTN)HR_DEVICE_HANDLE;
-      } else {
-        DEBUG_CODE_BEGIN();
-        ASSERT((*HandleType)[HandleIndex] == (*HandleType)[HandleIndex]);
-        DEBUG_CODE_END();
       }
       //
       // Retrieve the list of agents that have opened each protocol
