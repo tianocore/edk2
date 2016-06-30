@@ -177,6 +177,27 @@ IsSHPC (
   );
 
 /**
+  Check whether PciIoDevice supports PCIe hotplug.
+
+  This is equivalent to the following condition:
+  - the device is either a PCIe switch downstream port or a root port,
+  - and the device has the SlotImplemented bit set in its PCIe capability
+    register,
+  - and the device has the HotPlugCapable bit set in its slot capabilities
+    register.
+
+  @param[in] PciIoDevice  The device being checked.
+
+  @retval TRUE   PciIoDevice is a PCIe port that accepts a hotplugged device.
+  @retval FALSE  Otherwise.
+
+**/
+BOOLEAN
+SupportsPcieHotplug (
+  IN PCI_IO_DEVICE                      *PciIoDevice
+  );
+
+/**
   Get resource padding if the specified PCI bridge is a hot plug bus.
 
   @param PciIoDevice    PCI bridge instance.
