@@ -826,7 +826,7 @@ Ping6CreateIpInstance (
   //
 
   if (HandleIndex == HandleNum) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_SOURCE_NOT_FOUND), gShellNetwork2HiiHandle, mIp6SrcString);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_CONFIGD_NIC_NF), gShellNetwork2HiiHandle);
     Status = EFI_NOT_FOUND;
     goto ON_ERROR;
   }
