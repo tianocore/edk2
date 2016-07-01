@@ -209,8 +209,5 @@ MicrocodeDetect (
                 loaded microcode signature [0x%08x]\n", CurrentRevision, LatestRevision));
       ReleaseSpinLock(&PeiCpuMpData->MpLock);
     }
-    MicrocodeInfo.Load = TRUE;
-  } else {
-    MicrocodeInfo.Load = FALSE;
   }
 }

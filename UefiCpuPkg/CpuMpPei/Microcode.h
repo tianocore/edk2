@@ -25,7 +25,6 @@ typedef struct {
   VOID     *MicrocodeData;
   UINTN    MicrocodeSize;
   UINT32   ProcessorId;
-  BOOLEAN  Load;
 } MICROCODE_INFO;
 
 //
