@@ -78,7 +78,7 @@ InitPagesForPFHandler (
   //
   Address = NULL;
   Address = AllocatePages (MAX_PF_PAGE_COUNT);
-  ASSERT_EFI_ERROR (Address != NULL);
+  ASSERT (Address != NULL);
 
   mPFPageBuffer =  (UINT64)(UINTN) Address;
   mPFPageIndex = 0;

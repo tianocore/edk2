@@ -1034,7 +1034,7 @@ InstallS3Memory (
   // memory above 1MB. So Memory Callback can set cache for the system memory
   // correctly on S3 boot path, just like it does on Normal boot path.
   //
-  ASSERT_EFI_ERROR ((S3MemoryRangeData->SystemMemoryLength - 0x100000) > 0);
+  ASSERT ((S3MemoryRangeData->SystemMemoryLength - 0x100000) > 0);
   BuildResourceDescriptorHob (
             EFI_RESOURCE_SYSTEM_MEMORY,
             (

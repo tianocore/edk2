@@ -238,6 +238,7 @@ SdMmcPciHcEnumerateDevice (
   LIST_ENTRY                          *Link;
   LIST_ENTRY                          *NextLink;
   SD_MMC_HC_TRB                       *Trb;
+  EFI_TPL                             OldTpl;
 
   Private = (SD_MMC_HC_PRIVATE_DATA*)Context;
 
@@ -251,6 +252,7 @@ SdMmcPciHcEnumerateDevice (
         //
         // Signal all async task events at the slot with EFI_NO_MEDIA status.
         //
+        OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
         for (Link = GetFirstNode (&Private->Queue);
              !IsNull (&Private->Queue, Link);
              Link = NextLink) {
@@ -263,6 +265,7 @@ SdMmcPciHcEnumerateDevice (
             SdMmcFreeTrb (Trb);
           }
         }
+        gBS->RestoreTPL (OldTpl);
         //
         // Notify the upper layer the connect state change through ReinstallProtocolInterface.
         //
@@ -665,7 +668,7 @@ SdMmcPciHcDriverBindingStart (
   //
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  TPL_NOTIFY,
                   ProcessAsyncTaskList,
                   Private,
                   &Private->TimerEvent
@@ -961,7 +964,7 @@ SdMmcPassThruPassThru (
   // Wait async I/O list is empty before execute sync I/O operation.
   //
   while (TRUE) {
-    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     if (IsListEmpty (&Private->Queue)) {
       gBS->RestoreTPL (OldTpl);
       break;
@@ -1273,7 +1276,7 @@ SdMmcPassThruResetDevice (
   //
   // Free all async I/O requests in the queue
   //
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   for (Link = GetFirstNode (&Private->Queue);
        !IsNull (&Private->Queue, Link);

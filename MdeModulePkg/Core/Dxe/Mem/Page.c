@@ -1335,7 +1335,14 @@ CoreAllocatePages (
 
   Status = CoreInternalAllocatePages (Type, MemoryType, NumberOfPages, Memory);
   if (!EFI_ERROR (Status)) {
-    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionAllocatePages, MemoryType, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) *Memory);
+    CoreUpdateProfile (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
+      MemoryProfileActionAllocatePages,
+      MemoryType,
+      EFI_PAGES_TO_SIZE (NumberOfPages),
+      (VOID *) (UINTN) *Memory,
+      NULL
+      );
     InstallMemoryAttributesTableOnMemoryAllocation (MemoryType);
   }
   return Status;
@@ -1444,7 +1451,14 @@ CoreFreePages (
 
   Status = CoreInternalFreePages (Memory, NumberOfPages, &MemoryType);
   if (!EFI_ERROR (Status)) {
-    CoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePages, MemoryType, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) Memory);
+    CoreUpdateProfile (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
+      MemoryProfileActionFreePages,
+      MemoryType,
+      EFI_PAGES_TO_SIZE (NumberOfPages),
+      (VOID *) (UINTN) Memory,
+      NULL
+      );
     InstallMemoryAttributesTableOnMemoryAllocation (MemoryType);
   }
   return Status;

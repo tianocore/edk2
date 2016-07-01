@@ -680,7 +680,7 @@ AcpiPlatformEntryPoint (
   // Init Pci Device PRT PRW information structure from PCD
   //
   mConfigData = (PCI_DEVICE_SETTING *)AllocateZeroPool (sizeof (PCI_DEVICE_SETTING));
-  ASSERT_EFI_ERROR (mConfigData);
+  ASSERT (mConfigData != NULL);
   InitPciDeviceInfoStructure (mConfigData);
   //
   // Get the Acpi SDT protocol for manipulation on acpi table

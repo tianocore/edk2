@@ -1,7 +1,7 @@
 /** @file
   SMM Memory page management functions.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -226,7 +226,14 @@ SmmAllocatePages (
 
   Status = SmmInternalAllocatePages (Type, MemoryType, NumberOfPages, Memory);
   if (!EFI_ERROR (Status)) {
-    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionAllocatePages, MemoryType, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) *Memory);
+    SmmCoreUpdateProfile (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
+      MemoryProfileActionAllocatePages,
+      MemoryType,
+      EFI_PAGES_TO_SIZE (NumberOfPages),
+      (VOID *) (UINTN) *Memory,
+      NULL
+      );
   }
   return Status;
 }
@@ -344,7 +351,14 @@ SmmFreePages (
 
   Status = SmmInternalFreePages (Memory, NumberOfPages);
   if (!EFI_ERROR (Status)) {
-    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePages, 0, EFI_PAGES_TO_SIZE (NumberOfPages), (VOID *) (UINTN) Memory);
+    SmmCoreUpdateProfile (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
+      MemoryProfileActionFreePages,
+      EfiMaxMemoryType,
+      EFI_PAGES_TO_SIZE (NumberOfPages),
+      (VOID *) (UINTN) Memory,
+      NULL
+      );
   }
   return Status;
 }

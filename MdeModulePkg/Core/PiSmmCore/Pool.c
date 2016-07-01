@@ -1,7 +1,7 @@
 /** @file
   SMM Memory pool management functions.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -67,7 +67,7 @@ SmmInitializeMemoryServices (
       }
 
       if (SmramRanges[Index].CpuStart >= BASE_1MB) {
-        if ((SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize) <= BASE_4GB) {
+        if ((SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize - 1) <= MAX_ADDRESS) {
           if (SmramRanges[Index].PhysicalSize >= MaxSize) {
             MaxSize = SmramRanges[Index].PhysicalSize;
             CurrentSmramRangesIndex = Index;
@@ -260,7 +260,14 @@ SmmAllocatePool (
 
   Status = SmmInternalAllocatePool (PoolType, Size, Buffer);
   if (!EFI_ERROR (Status)) {
-    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionAllocatePool, PoolType, Size, *Buffer);
+    SmmCoreUpdateProfile (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
+      MemoryProfileActionAllocatePool,
+      PoolType,
+      Size,
+      *Buffer,
+      NULL
+      );
   }
   return Status;
 }
@@ -319,7 +326,14 @@ SmmFreePool (
 
   Status = SmmInternalFreePool (Buffer);
   if (!EFI_ERROR (Status)) {
-    SmmCoreUpdateProfile ((EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0), MemoryProfileActionFreePool, 0, 0, Buffer);
+    SmmCoreUpdateProfile (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
+      MemoryProfileActionFreePool,
+      EfiMaxMemoryType,
+      0,
+      Buffer,
+      NULL
+      );
   }
   return Status;
 }

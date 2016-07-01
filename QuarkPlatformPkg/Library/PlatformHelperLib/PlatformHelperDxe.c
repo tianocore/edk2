@@ -174,7 +174,7 @@ PlatformFlashLockConfig (
   //
 
   SpiProtocol = LocateSpiProtocol (NULL);  // This routine will not be called in SMM.
-  ASSERT_EFI_ERROR (SpiProtocol != NULL);
+  ASSERT (SpiProtocol != NULL);
   if (SpiProtocol != NULL) {
     Status = SpiProtocol->Lock (SpiProtocol);
 

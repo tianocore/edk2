@@ -266,7 +266,8 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMemoryProfilePropertyMask_HELP  #language en-US "The mask is used to control memory profile behavior.<BR><BR>\n"
                                                                                            "BIT0 - Enable UEFI memory profile.<BR>\n"
-                                                                                           "BIT1 - Enable SMRAM profile.<BR>"
+                                                                                           "BIT1 - Enable SMRAM profile.<BR>\n"
+                                                                                           "BIT7 - Disable recording at the start.<BR>"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMemoryProfileMemoryType_PROMPT  #language en-US "Memory profile memory type"
 
@@ -291,6 +292,20 @@
                                                                                    " OEM Reserved               0x40000000<BR>\n"
                                                                                    " OS Reserved                0x80000000<BR>\n"
                                                                                    "e.g. Reserved+ACPINvs+ACPIReclaim+RuntimeCode+RuntimeData are needed, 0x661 should be used.<BR>\n"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMemoryProfileDriverPath_PROMPT  #language en-US "Memory profile driver path"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMemoryProfileDriverPath_HELP  #language en-US "This PCD is to control which drivers need memory profile data.<BR><BR>\n"
+                                                                                   "For example:<BR>\n"
+                                                                                   "One image only (Shell):<BR>\n"
+                                                                                   "    Header                    GUID<BR>\n"
+                                                                                   "    {0x04, 0x06, 0x14, 0x00,  0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1,<BR>\n"
+                                                                                   "     0x7F, 0xFF, 0x04, 0x00}<BR>\n"
+                                                                                   "Two or more images (Shell + WinNtSimpleFileSystem):<BR>\n"
+                                                                                   "    {0x04, 0x06, 0x14, 0x00,  0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1,<BR>\n"
+                                                                                   "     0x7F, 0x01, 0x04, 0x00,<BR>\n"
+                                                                                   "     0x04, 0x06, 0x14, 0x00,  0x8B, 0xE1, 0x25, 0x9C, 0xBA, 0x76, 0xDA, 0x43, 0xA1, 0x32, 0xDB, 0xB0, 0x99, 0x7C, 0xEF, 0xEF,<BR>\n"
+                                                                                   "     0x7F, 0xFF, 0x04, 0x00}<BR>\n"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialClockRate_PROMPT  #language en-US "Serial Port Clock Rate"
 

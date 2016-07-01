@@ -2,10 +2,10 @@
 // Memory Allocation Library instance dedicated to SMM Core.
 //
 // The implementation borrows the SMM Core Memory Allocation services as the primitive
-// for memory allocation instead of using SMM System Table servces in an indirect way.
+// for memory allocation instead of using SMM System Table services in an indirect way.
 // It is assumed that this library instance must be linked with SMM Cre in this package.
 //
-// Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License

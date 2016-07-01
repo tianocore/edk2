@@ -893,10 +893,10 @@ TreeSubmitCommand (
     return EFI_UNSUPPORTED;
   }
 
-  if (InputParameterBlockSize >= mTcgDxeData.BsCap.MaxCommandSize) {
+  if (InputParameterBlockSize > mTcgDxeData.BsCap.MaxCommandSize) {
     return EFI_INVALID_PARAMETER;
   }
-  if (OutputParameterBlockSize >= mTcgDxeData.BsCap.MaxResponseSize) {
+  if (OutputParameterBlockSize > mTcgDxeData.BsCap.MaxResponseSize) {
     return EFI_INVALID_PARAMETER;
   }
 

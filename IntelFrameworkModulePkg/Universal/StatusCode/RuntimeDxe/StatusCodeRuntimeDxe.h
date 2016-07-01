@@ -53,15 +53,6 @@ typedef struct {
 } DATAHUB_STATUSCODE_RECORD;
 
 
-//
-// Runtime memory status code worker definition
-//
-typedef struct {
-  UINT32   RecordIndex;
-  UINT32   NumberOfRecords;
-  UINT32   MaxRecordsNumber;
-} RUNTIME_MEMORY_STATUSCODE_HEADER;
-
 extern RUNTIME_MEMORY_STATUSCODE_HEADER  *mRtMemoryStatusCodeTable;
 
 /**

@@ -104,6 +104,7 @@ PrintInfoFromSmm (
   }
 
   CommBuffer = NULL;
+  RealCommSize = 0;
   Status = EfiGetSystemConfigurationTable (
              &gEdkiiPiSmmCommunicationRegionTableGuid,
              (VOID **) &PiSmmCommunicationRegionTable

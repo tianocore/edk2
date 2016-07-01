@@ -241,6 +241,11 @@ PeiMemoryDiscoveredNotify (
   // Copy default FSP-S UPD data from Flash
   //
   FspsHeaderPtr = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspsBaseAddress));
+  DEBUG ((DEBUG_INFO, "FspsHeaderPtr - 0x%x\n", FspsHeaderPtr));
+  if (FspsHeaderPtr == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
+
   FspsUpdDataPtr = (FSPS_UPD_COMMON *)AllocateZeroPool ((UINTN)FspsHeaderPtr->CfgRegionSize);
   ASSERT (FspsUpdDataPtr != NULL);
   SourceData = (UINTN *)((UINTN)FspsHeaderPtr->ImageBase + (UINTN)FspsHeaderPtr->CfgRegionOffset);
