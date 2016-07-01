@@ -5,8 +5,9 @@
   After DxeCore finish DXE phase, gEfiBdsArchProtocolGuid->BdsEntry will be invoked
   to enter BDS phase.
 
-(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -273,7 +274,7 @@ BOOLEAN
 BootBootOptions (
   IN EFI_BOOT_MANAGER_LOAD_OPTION    *BootOptions,
   IN UINTN                           BootOptionCount,
-  IN EFI_BOOT_MANAGER_LOAD_OPTION    *BootManagerMenu
+  IN EFI_BOOT_MANAGER_LOAD_OPTION    *BootManagerMenu OPTIONAL
   )
 {
   UINTN                              Index;
@@ -312,7 +313,7 @@ BootBootOptions (
     // interactive mode, the boot manager will stop processing the BootOrder variable and
     // present a boot manager menu to the user.
     //
-    if (BootOptions[Index].Status == EFI_SUCCESS) {
+    if ((BootManagerMenu != NULL) && (BootOptions[Index].Status == EFI_SUCCESS)) {
       EfiBootManagerBoot (BootManagerMenu);
       break;
     }
@@ -425,22 +426,32 @@ BdsFormalizeConsoleVariable (
   
   Item 3 is used to solve case when OS corrupts OsIndications. Here simply delete this NV variable.
 
+  Create a boot option for BootManagerMenu if it hasn't been created yet
+
 **/
 VOID 
 BdsFormalizeOSIndicationVariable (
   VOID
   )
 {
-  EFI_STATUS Status;
-  UINT64     OsIndicationSupport;
-  UINT64     OsIndication;
-  UINTN      DataSize;
-  UINT32     Attributes;
+  EFI_STATUS                      Status;
+  UINT64                          OsIndicationSupport;
+  UINT64                          OsIndication;
+  UINTN                           DataSize;
+  UINT32                          Attributes;
+  EFI_BOOT_MANAGER_LOAD_OPTION    BootManagerMenu;
 
   //
   // OS indicater support variable
   //
-  OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+  Status = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
+  if (Status != EFI_NOT_FOUND) {
+    OsIndicationSupport = EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+    EfiBootManagerFreeLoadOption (&BootManagerMenu);
+  } else {
+    OsIndicationSupport = EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY;
+  }
+
   Status = gRT->SetVariable (
                   EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME,
                   &gEfiGlobalVariableGuid,
@@ -601,6 +612,7 @@ BdsEntry (
   BOOLEAN                         PlatformRecovery;
   BOOLEAN                         BootSuccess;
   EFI_DEVICE_PATH_PROTOCOL        *FilePath;
+  EFI_STATUS                      BootManagerMenuStatus;
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
@@ -851,9 +863,9 @@ BdsEntry (
   );
 
   //
-  // BootManagerMenu always contains the correct information even call fails.
+  // BootManagerMenu doesn't contain the correct information when return status is EFI_NOT_FOUND.
   //
-  EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
+  BootManagerMenuStatus = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
 
   BootFwUi         = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0);
   PlatformRecovery = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY) != 0);
@@ -878,7 +890,7 @@ BdsEntry (
   //
   // Launch Boot Manager Menu directly when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
   //
-  if (BootFwUi) {
+  if (BootFwUi && (BootManagerMenuStatus != EFI_NOT_FOUND)) {
     //
     // Follow generic rule, Call BdsDxeOnConnectConInCallBack to connect ConIn before enter UI
     //
@@ -923,7 +935,9 @@ BdsEntry (
       if (!EFI_ERROR (Status)) {
         EfiBootManagerBoot (&LoadOption);
         EfiBootManagerFreeLoadOption (&LoadOption);
-        if ((LoadOption.Status == EFI_SUCCESS) && (LoadOption.OptionNumber != BootManagerMenu.OptionNumber)) {
+        if ((LoadOption.Status == EFI_SUCCESS) && 
+            (BootManagerMenuStatus != EFI_NOT_FOUND) &&
+            (LoadOption.OptionNumber != BootManagerMenu.OptionNumber)) {
           //
           // Boot to Boot Manager Menu upon EFI_SUCCESS
           // Exception: Do not boot again when the BootNext points to Boot Manager Menu.
@@ -938,12 +952,14 @@ BdsEntry (
       // Retry to boot if any of the boot succeeds
       //
       LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeBoot);
-      BootSuccess = BootBootOptions (LoadOptions, LoadOptionCount, &BootManagerMenu);
+      BootSuccess = BootBootOptions (LoadOptions, LoadOptionCount, (BootManagerMenuStatus != EFI_NOT_FOUND) ? &BootManagerMenu : NULL);
       EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
     } while (BootSuccess);
   }
 
-  EfiBootManagerFreeLoadOption (&BootManagerMenu);
+  if (BootManagerMenuStatus != EFI_NOT_FOUND) {
+    EfiBootManagerFreeLoadOption (&BootManagerMenu);
+  }
 
   if (!BootSuccess) {
     LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);

@@ -418,12 +418,16 @@ EfiBootManagerBoot (
   );
 
 /**
-  Return the Boot Manager Menu.
- 
+  Return the boot option corresponding to the Boot Manager Menu.
+  It may automatically create one if the boot option hasn't been created yet.
+
   @param BootOption    Return the Boot Manager Menu.
 
   @retval EFI_SUCCESS   The Boot Manager Menu is successfully returned.
-  @retval EFI_NOT_FOUND The Boot Manager Menu is not found.
+  @retval EFI_NOT_FOUND The Boot Manager Menu cannot be found.
+  @retval others        Return status of gRT->SetVariable (). BootOption still points
+                        to the Boot Manager Menu even the Status is not EFI_SUCCESS
+                        and EFI_NOT_FOUND.
 **/
 EFI_STATUS
 EFIAPI

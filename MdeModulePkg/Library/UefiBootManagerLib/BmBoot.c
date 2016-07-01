@@ -2,7 +2,7 @@
   Library functions which relates with booting.
 
 Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2159,7 +2159,7 @@ EfiBootManagerRefreshAllBootOption (
 }
 
 /**
-  This function is called to create the boot option for the Boot Manager Menu.
+  This function is called to get or create the boot option for the Boot Manager Menu.
 
   The Boot Manager Menu is shown after successfully booting a boot option.
   Assume the BootManagerMenuFile is in the same FV as the module links to this library.
@@ -2167,8 +2167,10 @@ EfiBootManagerRefreshAllBootOption (
   @param  BootOption    Return the boot option of the Boot Manager Menu
 
   @retval EFI_SUCCESS   Successfully register the Boot Manager Menu.
-  @retval Status        Return status of gRT->SetVariable (). BootOption still points
-                        to the Boot Manager Menu even the Status is not EFI_SUCCESS.
+  @retval EFI_NOT_FOUND The Boot Manager Menu cannot be found.
+  @retval others        Return status of gRT->SetVariable (). BootOption still points
+                        to the Boot Manager Menu even the Status is not EFI_SUCCESS
+                        and EFI_NOT_FOUND.
 **/
 EFI_STATUS
 BmRegisterBootManagerMenu (
@@ -2181,7 +2183,28 @@ BmRegisterBootManagerMenu (
   EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
   EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
+  VOID                               *Data;
+  UINTN                              DataSize;
 
+  Data = NULL;
+  Status = GetSectionFromFv (
+             PcdGetPtr (PcdBootManagerMenuFile),
+             EFI_SECTION_PE32,
+             0,
+             (VOID **) &Data,
+             &DataSize
+             );
+  if (Data != NULL) {
+    FreePool (Data);
+  }
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_WARN, "[Bds]BootManagerMenu FFS section can not be found, skip its boot option registration\n"));
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Get BootManagerMenu application's description from EFI User Interface Section.
+  //
   Status = GetSectionFromFv (
              PcdGetPtr (PcdBootManagerMenuFile),
              EFI_SECTION_USER_INTERFACE,
@@ -2237,12 +2260,14 @@ BmRegisterBootManagerMenu (
 /**
   Return the boot option corresponding to the Boot Manager Menu.
   It may automatically create one if the boot option hasn't been created yet.
-  
+
   @param BootOption    Return the Boot Manager Menu.
 
   @retval EFI_SUCCESS   The Boot Manager Menu is successfully returned.
-  @retval Status        Return status of gRT->SetVariable (). BootOption still points
-                        to the Boot Manager Menu even the Status is not EFI_SUCCESS.
+  @retval EFI_NOT_FOUND The Boot Manager Menu cannot be found.
+  @retval others        Return status of gRT->SetVariable (). BootOption still points
+                        to the Boot Manager Menu even the Status is not EFI_SUCCESS
+                        and EFI_NOT_FOUND.
 **/
 EFI_STATUS
 EFIAPI
