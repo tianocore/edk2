@@ -62,6 +62,15 @@ InitializeExceptions (
     Status = Cpu->EnableInterrupt (Cpu);
   }
 
+  //
+  // On a DEBUG build, unmask SErrors so they are delivered right away rather
+  // than when the OS unmasks them. This gives us a better chance of figuring
+  // out the cause.
+  //
+  DEBUG_CODE (
+    ArmEnableAsynchronousAbort ();
+  );
+
   return Status;
 }
 
