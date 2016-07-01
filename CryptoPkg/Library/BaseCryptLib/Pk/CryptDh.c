@@ -245,7 +245,11 @@ DhGenerateKey (
   RetVal = (BOOLEAN) DH_generate_key (DhContext);
   if (RetVal) {
     Size = BN_num_bytes (Dh->pub_key);
-    if ((Size > 0) && (*PublicKeySize < (UINTN) Size)) {
+    if (Size <= 0) {
+      *PublicKeySize = 0;
+      return FALSE;
+    }    
+    if (*PublicKeySize < (UINTN) Size) {
       *PublicKeySize = Size;
       return FALSE;
     }
