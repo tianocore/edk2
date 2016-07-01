@@ -302,7 +302,7 @@ ApCFunction (
       // Sync BSP's Mtrr table to all wakeup APs and load microcode on APs.
       //
       MtrrSetAllMtrrs (&PeiCpuMpData->MtrrTable);
-      MicrocodeDetect ();
+      MicrocodeDetect (PeiCpuMpData);
       PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
     } else {
       //
@@ -624,7 +624,7 @@ CountProcessorNumber (
   //
   // Load Microcode on BSP
   //
-  MicrocodeDetect ();
+  MicrocodeDetect (PeiCpuMpData);
   //
   // Store BSP's MTRR setting
   //
