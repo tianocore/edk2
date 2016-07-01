@@ -36,10 +36,11 @@ GetCurrentMicrocodeSignature (
 /**
   Detect whether specified processor can find matching microcode patch and load it.
 
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
 **/
 VOID
 MicrocodeDetect (
-  VOID
+  IN PEI_CPU_MP_DATA            *PeiCpuMpData
   )
 {
   UINT64                                  MicrocodePatchAddress;
@@ -187,25 +188,29 @@ MicrocodeDetect (
     MicrocodeEntryPoint = (EFI_CPU_MICROCODE_HEADER *) (((UINTN) MicrocodeEntryPoint) + TotalSize);
   } while (((UINTN) MicrocodeEntryPoint < MicrocodeEnd));
 
-  if (LatestRevision > 0) {
+  if (LatestRevision > CurrentRevision) {
     //
     // BIOS only authenticate updates that contain a numerically larger revision
     // than the currently loaded revision, where Current Signature < New Update
     // Revision. A processor with no loaded update is considered to have a
     // revision equal to zero.
     //
-    if (LatestRevision > GetCurrentMicrocodeSignature ()) {
-      AsmWriteMsr64 (
-        EFI_MSR_IA32_BIOS_UPDT_TRIG,
-        (UINT64) (UINTN) MicrocodeInfo.MicrocodeData
-        );
-      //
-      // Get and verify new microcode signature
-      //
-      ASSERT (LatestRevision == GetCurrentMicrocodeSignature ());
-      MicrocodeInfo.Load = TRUE;
-    } else {
-      MicrocodeInfo.Load = FALSE;
+    AsmWriteMsr64 (
+      EFI_MSR_IA32_BIOS_UPDT_TRIG,
+      (UINT64) (UINTN) MicrocodeInfo.MicrocodeData
+      );
+    //
+    // Get and check new microcode signature
+    //
+    CurrentRevision = GetCurrentMicrocodeSignature ();
+    if (CurrentRevision != LatestRevision) {
+      AcquireSpinLock(&PeiCpuMpData->MpLock);
+      DEBUG ((EFI_D_ERROR, "Updated microcode signature [0x%08x] does not match \
+                loaded microcode signature [0x%08x]\n", CurrentRevision, LatestRevision));
+      ReleaseSpinLock(&PeiCpuMpData->MpLock);
     }
+    MicrocodeInfo.Load = TRUE;
+  } else {
+    MicrocodeInfo.Load = FALSE;
   }
 }

@@ -321,4 +321,14 @@ SecPlatformInformation2 (
      OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
   );
 
+/**
+  Detect whether specified processor can find matching microcode patch and load it.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+MicrocodeDetect (
+  IN PEI_CPU_MP_DATA            *PeiCpuMpData
+  );
+
 #endif
