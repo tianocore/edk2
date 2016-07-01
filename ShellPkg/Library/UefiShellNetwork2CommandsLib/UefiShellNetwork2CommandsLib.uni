@@ -31,7 +31,7 @@
 #string STR_PING6_IP6_CONFIG               #language en-US  "%Ping6: The process of Ip6 Configure %r\r\n"
 #string STR_PING6_IP6CFG_GETDATA           #language en-US  "%Ping6: Get data of the interface information %r\r\n"
 #string STR_PING6_SEND_REQUEST             #language en-US  "Echo request sequence %d fails.\r\n"
-#string STR_PING6_SOURCE_NOT_FOUND         #language en-US  "Source %s not found.\r\n"
+#string STR_PING6_CONFIGD_NIC_NF           #language en-US  "%Ping6: No configured interfaces were found.\r\n"
 #string STR_PING6_NOSOURCE_INDOMAIN        #language en-US  "No sources in %s's multicast domain.\r\n"
 #string STR_PING6_START                    #language en-US  "Ping %s %d data bytes\r\n"
 #string STR_PING6_TIMEOUT                  #language en-US  "Echo request sequence %d timeout.\r\n"
