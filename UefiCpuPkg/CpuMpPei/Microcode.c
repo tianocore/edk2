@@ -53,6 +53,7 @@ MicrocodeDetect (
   UINTN                                   Index;
   UINT8                                   PlatformId;
   UINT32                                  RegEax;
+  UINT32                                  CurrentRevision;
   UINT32                                  LatestRevision;
   UINTN                                   TotalSize;
   UINT32                                  CheckSum32;
@@ -65,6 +66,14 @@ MicrocodeDetect (
   if (MicrocodePatchRegionSize == 0) {
     //
     // There is no microcode patches
+    //
+    return;
+  }
+
+  CurrentRevision = GetCurrentMicrocodeSignature ();
+  if (CurrentRevision != 0) {
+    //
+    // Skip loading microcode if it has been loaded successfully
     //
     return;
   }
