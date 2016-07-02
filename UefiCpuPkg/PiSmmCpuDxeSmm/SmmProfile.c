@@ -32,7 +32,7 @@ UINTN                     mMsrDsAreaSize   = SMM_PROFILE_DTS_SIZE;
 //
 // The flag indicates if execute-disable is supported by processor.
 //
-BOOLEAN                   mXdSupported     = FALSE;
+BOOLEAN                   mXdSupported     = TRUE;
 
 //
 // The flag indicates if execute-disable is enabled on processor.
@@ -42,7 +42,7 @@ BOOLEAN                   mXdEnabled       = FALSE;
 //
 // The flag indicates if BTS is supported by processor.
 //
-BOOLEAN                   mBtsSupported     = FALSE;
+BOOLEAN                   mBtsSupported     = TRUE;
 
 //
 // The flag indicates if SMM profile starts to record data.

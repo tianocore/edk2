@@ -355,6 +355,13 @@ SmmInitHandler (
         &mCpuHotPlugData
         );
 
+      if (!mSmmS3Flag) {
+        //
+        // Check XD and BTS features on each processor on normal boot
+        //
+        CheckFeatureSupported (NULL);
+      }
+
       if (mIsBsp) {
         //
         // BSP rebase is already done above.
@@ -1190,11 +1197,6 @@ PiCpuSmmEntry (
       SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_32;
     }
   }
-
-  //
-  // Check XD and BTS features
-  //
-  CheckProcessorFeature ();
 
   //
   // Initialize SMM Profile feature
