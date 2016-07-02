@@ -97,6 +97,11 @@ UINTN mNumberOfCpus = 1;
 BOOLEAN mSmmReadyToLock = FALSE;
 
 //
+// S3 boot flag
+//
+BOOLEAN mSmmS3Flag = FALSE;
+
+//
 // Global used to cache PCD for SMM Code Access Check enable
 //
 BOOLEAN                  mSmmCodeAccessCheckEnable = FALSE;
@@ -484,6 +489,8 @@ SmmRestoreCpu (
   EFI_STATUS                    Status;
 
   DEBUG ((EFI_D_INFO, "SmmRestoreCpu()\n"));
+
+  mSmmS3Flag = TRUE;
 
   InitializeSpinLock (mMemoryMappedLock);
 
