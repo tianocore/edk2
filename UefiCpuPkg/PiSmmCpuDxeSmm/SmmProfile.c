@@ -925,13 +925,10 @@ InitSmmProfileInternal (
 /**
   Check if XD feature is supported by a processor.
 
-  @param[in,out] Buffer  The pointer to private data buffer.
-
 **/
 VOID
-EFIAPI
 CheckFeatureSupported (
-  IN OUT VOID   *Buffer
+  VOID
   )
 {
   UINT32                         RegEax;
@@ -975,48 +972,6 @@ CheckFeatureSupported (
         mBtsSupported = FALSE;
       }
     }
-  }
-}
-
-/**
-  Check if XD and BTS features are supported by all processors.
-
-**/
-VOID
-CheckProcessorFeature (
-  VOID
-  )
-{
-  EFI_STATUS                        Status;
-  EFI_MP_SERVICES_PROTOCOL          *MpServices;
-
-  Status = gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpServices);
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // First detect if XD and BTS are supported
-  //
-  mXdSupported  = TRUE;
-  mBtsSupported = TRUE;
-
-  //
-  // Check if XD and BTS are supported on all processors.
-  //
-  CheckFeatureSupported (NULL);
-
-  //
-  //Check on other processors if BSP supports this
-  //
-  if (mXdSupported || mBtsSupported) {
-    MpServices->StartupAllAPs (
-                  MpServices,
-                  CheckFeatureSupported,
-                  TRUE,
-                  NULL,
-                  0,
-                  NULL,
-                  NULL
-                  );
   }
 }
 

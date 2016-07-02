@@ -359,7 +359,7 @@ SmmInitHandler (
         //
         // Check XD and BTS features on each processor on normal boot
         //
-        CheckFeatureSupported (NULL);
+        CheckFeatureSupported ();
       }
 
       if (mIsBsp) {
