@@ -19,7 +19,7 @@ import re
 import sys
 from optparse import OptionParser
 
-versionNumber = "1.0"
+versionNumber = "1.1"
 __copyright__ = "Copyright (c) 2016, Intel Corporation. All rights reserved."
 
 class Symbols:
@@ -72,7 +72,7 @@ class Symbols:
         linefile.close()
 
         # 000113ca T AllocatePool	c:\home\edk-ii\MdePkg\Library\UefiMemoryAllocationLib\MemoryAllocationLib.c:399
-        patchLineFileMatchString = "([0-9a-fA-F]{8})\s+[T|D|t|d]\s+(\w+)\s*((?:[a-zA-Z]:)?[\w+\-./_a-zA-Z0-9\\\\]*):?([0-9]*)"
+        patchLineFileMatchString = "([0-9a-fA-F]*)\s+[T|D|t|d]\s+(\w+)\s*((?:[a-zA-Z]:)?[\w+\-./_a-zA-Z0-9\\\\]*):?([0-9]*)"
 
         for reportLine in reportLines:
             #print "check - " + reportLine
