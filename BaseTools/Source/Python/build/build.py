@@ -786,6 +786,7 @@ class Build():
             self.Db = WorkspaceDatabase(GlobalData.gDatabasePath, self.Reparse)
         self.BuildDatabase = self.Db.BuildObject
         self.Platform = None
+        self.ToolChainFamily = None
         self.LoadFixAddress = 0
         self.UniFlag        = BuildOptions.Flag
         self.BuildModules = []
@@ -878,6 +879,17 @@ class Build():
         else:
             self.ToolChainList = NewToolChainList
 
+        ToolChainFamily = []
+        ToolDefinition = self.ToolDef.ToolsDefTxtDatabase
+        for Tool in self.ToolChainList:
+            if TAB_TOD_DEFINES_FAMILY not in ToolDefinition or Tool not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
+               or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][Tool]:
+                EdkLogger.warn("No tool chain family found in configuration for %s. Default to MSFT." % Tool)
+                ToolChainFamily.append("MSFT")
+            else:
+                ToolChainFamily.append(ToolDefinition[TAB_TOD_DEFINES_FAMILY][Tool])
+        self.ToolChainFamily = ToolChainFamily
+
         if self.ThreadNumber == None:
             self.ThreadNumber = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER]
             if self.ThreadNumber == '':
@@ -936,6 +948,8 @@ class Build():
         if self.ToolChainList:
             GlobalData.gGlobalDefines['TOOLCHAIN'] = self.ToolChainList[0]
             GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = self.ToolChainList[0]
+        if self.ToolChainFamily:
+            GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[0]
         if 'PREBUILD' in GlobalData.gCommandLineDefines.keys():
             self.Prebuild   = GlobalData.gCommandLineDefines.get('PREBUILD')
         else:
@@ -1599,9 +1613,12 @@ class Build():
         SaveFileOnChange(self.PlatformBuildPath, '# DO NOT EDIT \n# FILE auto-generated\n', False)
         for BuildTarget in self.BuildTargetList:
             GlobalData.gGlobalDefines['TARGET'] = BuildTarget
+            index = 0
             for ToolChain in self.ToolChainList:
                 GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
                 GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
+                GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[index]
+                index += 1
                 Wa = WorkspaceAutoGen(
                         self.WorkspaceDir,
                         self.PlatformFile,
@@ -1679,9 +1696,12 @@ class Build():
     def _BuildModule(self):
         for BuildTarget in self.BuildTargetList:
             GlobalData.gGlobalDefines['TARGET'] = BuildTarget
+            index = 0
             for ToolChain in self.ToolChainList:
                 GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
                 GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
+                GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[index]
+                index += 1
                 #
                 # module build needs platform build information, so get platform
                 # AutoGen first
@@ -1773,9 +1793,12 @@ class Build():
         SaveFileOnChange(self.PlatformBuildPath, '# DO NOT EDIT \n# FILE auto-generated\n', False)
         for BuildTarget in self.BuildTargetList:
             GlobalData.gGlobalDefines['TARGET'] = BuildTarget
+            index = 0
             for ToolChain in self.ToolChainList:
                 GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
                 GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
+                GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[index]
+                index += 1
                 Wa = WorkspaceAutoGen(
                         self.WorkspaceDir,
                         self.PlatformFile,
