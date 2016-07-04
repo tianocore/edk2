@@ -15,7 +15,7 @@
     2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -67,6 +67,7 @@ Split2MPageTo4K (
   PAGE_TABLE_4K_ENTRY                   *PageTableEntry;
 
   PageTableEntry = AllocatePages (1);
+  ASSERT (PageTableEntry != NULL);
   //
   // Fill in 2M page entry.
   //
@@ -111,6 +112,7 @@ Split1GPageTo2M (
   PAGE_TABLE_ENTRY                      *PageDirectoryEntry;
 
   PageDirectoryEntry = AllocatePages (1);
+  ASSERT (PageDirectoryEntry != NULL);
   //
   // Fill in 1G page entry.
   //
