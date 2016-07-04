@@ -205,7 +205,7 @@ GetShortPdbFileName (
     StartIndex = 0;
     for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++);
     for (IndexPdb = 0; PdbFileName[IndexPdb] != 0; IndexPdb++) {
-      if (PdbFileName[IndexPdb] == '\\') {
+      if ((PdbFileName[IndexPdb] == '\\') || (PdbFileName[IndexPdb] == '/')) {
         StartIndex = IndexPdb + 1;
       }
 
