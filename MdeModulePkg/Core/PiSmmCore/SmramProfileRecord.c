@@ -1403,6 +1403,9 @@ SmmCoreUpdateProfileFree (
       }
     }
 
+    ASSERT (DriverInfoData != NULL);
+    ASSERT (AllocInfoData != NULL);
+
     Found = TRUE;
 
     Context = &ContextData->Context;
