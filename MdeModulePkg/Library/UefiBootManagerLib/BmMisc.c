@@ -130,13 +130,10 @@ BmMatchDevicePaths (
 
   @param Boot               TRUE if current boot option belongs to boot
                             category instead of application category.
-  @param RamDiskSizeInPages Reserved memory size in pages occupied by
-                            RAM Disk.
 **/
 VOID
 BmSetMemoryTypeInformationVariable (
-  IN BOOLEAN                    Boot,
-  IN UINTN                      RamDiskSizeInPages
+  IN BOOLEAN                    Boot
   )
 {
   EFI_STATUS                   Status;
@@ -227,14 +224,6 @@ BmSetMemoryTypeInformationVariable (
     }
     if (CurrentMemoryTypeInformation[Index1].Type == EfiMaxMemoryType) {
       continue;
-    }
-
-    //
-    // Do not count the reserved memory occupied by RAM Disk.
-    //
-    if ((CurrentMemoryTypeInformation[Index1].Type == EfiReservedMemoryType) &&
-        (CurrentMemoryTypeInformation[Index1].NumberOfPages > ((UINT32) RamDiskSizeInPages))) {
-      CurrentMemoryTypeInformation[Index1].NumberOfPages -= (UINT32) RamDiskSizeInPages;
     }
 
     //

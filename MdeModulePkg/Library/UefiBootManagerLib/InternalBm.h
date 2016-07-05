@@ -207,13 +207,10 @@ BmWriteBootToOsPerformanceData (
 
   @param Boot               TRUE if current boot option belongs to boot
                             category instead of application category.
-  @param RamDiskSizeInPages Reserved memory size in pages occupied by
-                            RAM Disk.
 **/
 VOID
 BmSetMemoryTypeInformationVariable (
-  IN BOOLEAN                    Boot,
-  IN UINTN                      RamDiskSizeInPages
+  IN BOOLEAN                    Boot
   );
 
 /**

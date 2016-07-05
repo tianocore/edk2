@@ -1569,7 +1569,6 @@ EfiBootManagerBoot (
   UINTN                     FileSize;
   EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
   EFI_EVENT                 LegacyBootEvent;
-  UINTN                     RamDiskSizeInPages;
 
   if (BootOption == NULL) {
     return;
@@ -1643,8 +1642,24 @@ EfiBootManagerBoot (
   PERF_START_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
 
   //
-  // 5. Load EFI boot option to ImageHandle
+  // 5. Adjust the different type memory page number just before booting
+  //    and save the updated info into the variable for next boot to use
   //
+  BmSetMemoryTypeInformationVariable (
+    (BOOLEAN) ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_BOOT)
+  );
+
+  //
+  // 6. Load EFI boot option to ImageHandle
+  //
+  DEBUG_CODE_BEGIN ();
+  if (BootOption->Description == NULL) {
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "[Bds]Booting from unknown device path\n"));
+  } else {
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "[Bds]Booting %s\n", BootOption->Description));
+  }
+  DEBUG_CODE_END ();
+
   ImageHandle       = NULL;
   RamDiskDevicePath = NULL;
   if (DevicePathType (BootOption->FilePath) != BBS_DEVICE_PATH) {
@@ -1699,28 +1714,6 @@ EfiBootManagerBoot (
       return;
     }
   }
-
-  //
-  // 6. Adjust the different type memory page number just before booting
-  //    and save the updated info into the variable for next boot to use
-  //
-  if (RamDiskDevicePath == NULL) {
-    RamDiskSizeInPages = 0;
-  } else {
-    BmGetRamDiskMemoryInfo (RamDiskDevicePath, &RamDiskSizeInPages);
-  }
-  BmSetMemoryTypeInformationVariable (
-    (BOOLEAN) ((BootOption->Attributes & LOAD_OPTION_CATEGORY) == LOAD_OPTION_CATEGORY_BOOT),
-    RamDiskSizeInPages
-    );
-
-  DEBUG_CODE_BEGIN();
-    if (BootOption->Description == NULL) {
-      DEBUG ((DEBUG_INFO | DEBUG_LOAD, "[Bds]Booting from unknown device path\n"));
-    } else {
-      DEBUG ((DEBUG_INFO | DEBUG_LOAD, "[Bds]Booting %s\n", BootOption->Description));
-    }
-  DEBUG_CODE_END();
 
   //
   // Check to see if we should legacy BOOT. If yes then do the legacy boot
