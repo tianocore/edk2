@@ -1675,7 +1675,7 @@ PxeBcSelectBootPrompt (
   Status = gBS->SetTimer (
                   TimeoutEvent,
                   TimerRelative,
-                  Timeout * TICKS_PER_SECOND
+                  MultU64x32 (Timeout, TICKS_PER_SECOND)
                   );
 
   if (EFI_ERROR (Status)) {
