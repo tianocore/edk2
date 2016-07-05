@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -465,10 +465,19 @@ HiiGetFormSetFromHiiHandle(
 
       if (FormSetBuffer != NULL){
         TempBuffer = AllocateCopyPool (TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length, FormSetBuffer);
-        CopyMem (TempBuffer + TempSize,  OpCodeData, ((EFI_IFR_OP_HEADER *) OpCodeData)->Length);
         FreePool(FormSetBuffer);
+        FormSetBuffer = NULL;
+        if (TempBuffer == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
+        }
+        CopyMem (TempBuffer + TempSize,  OpCodeData, ((EFI_IFR_OP_HEADER *) OpCodeData)->Length);
       } else {
         TempBuffer = AllocateCopyPool (TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length, OpCodeData);
+        if (TempBuffer == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
+        }
       }
       TempSize += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
       FormSetBuffer = TempBuffer;
@@ -480,6 +489,7 @@ HiiGetFormSetFromHiiHandle(
       break;
     }
   }
+Done:
   FreePool (HiiPackageList);
 
   *BufferSize = TempSize;
