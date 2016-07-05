@@ -1,7 +1,7 @@
 /** @file
   Implements filebuffer interface functions.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -257,71 +257,6 @@ MoveLine (
 }
 
 /**
-  Decide if a point is in the already selected area.
-
-  @param[in] MouseRow     The row of the point to test.
-  @param[in] MouseCol     The col of the point to test.
-
-  @retval TRUE      The point is in the selected area.
-  @retval FALSE     The point is not in the selected area.
-**/
-BOOLEAN
-FileBufferIsInSelectedArea (
-  IN UINTN MouseRow,
-  IN UINTN MouseCol
-  )
-{
-  UINTN FRow;
-  UINTN RowStart;
-  UINTN RowEnd;
-  UINTN ColStart;
-  UINTN ColEnd;
-  UINTN MouseColStart;
-  UINTN MouseColEnd;
-
-  //
-  // judge mouse position whether is in selected area
-  //
-  //
-  // not select
-  //
-  if (MainEditor.SelectStart == 0 || MainEditor.SelectEnd == 0) {
-    return FALSE;
-  }
-  //
-  // calculate the select area
-  //
-  RowStart  = (MainEditor.SelectStart - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-  RowEnd    = (MainEditor.SelectEnd - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-
-  ColStart  = (MainEditor.SelectStart - 1) % SHELL_EDIT_MAX_LINE_SIZE + 1;
-  ColEnd    = (MainEditor.SelectEnd - 1) % SHELL_EDIT_MAX_LINE_SIZE + 1;
-
-  FRow      = FileBuffer.LowVisibleRange.Row + MouseRow - 2;
-  if (FRow < RowStart || FRow > RowEnd) {
-    return FALSE;
-  }
-
-  if (FRow > RowStart) {
-    ColStart = 1;
-  }
-
-  if (FRow < RowEnd) {
-    ColEnd = SHELL_EDIT_MAX_LINE_SIZE;
-  }
-
-  MouseColStart = ColStart;
-
-  MouseColEnd = ColEnd;
-
-  if (MouseCol < MouseColStart || MouseCol > MouseColEnd) {
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
   Function to update the 'screen' to display the mouse position.
 
   @retval EFI_SUCCESS           The backup operation was successful.
@@ -376,29 +311,6 @@ FileBufferRestoreMousePosition (
 
       FColumn       = FileBuffer.LowVisibleRange.Column + FileBufferBackupVar.MousePosition.Column - 1;
 
-      if (FRow <= FileBuffer.NumLines) {
-        CurrentLine = FileBuffer.CurrentLine;
-        Line        = MoveLine (FRow - FileBuffer.FilePosition.Row);
-        FileBuffer.CurrentLine = CurrentLine;
-      }
-
-      //
-      // if in selected area,
-      // so do not need to refresh mouse
-      //
-      if (!FileBufferIsInSelectedArea (
-            FileBufferBackupVar.MousePosition.Row,
-            FileBufferBackupVar.MousePosition.Column
-            ) ||
-          (Line == NULL || FColumn > Line->Size)
-      ) {
-        gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
-      } else {
-        gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
-      }
-
-      Line = NULL;
-
       HasCharacter  = TRUE;
       if (FRow > FileBuffer.NumLines) {
         HasCharacter = FALSE;
@@ -431,15 +343,8 @@ FileBufferRestoreMousePosition (
       //
       // set the new mouse position
       //
-      if (!FileBufferIsInSelectedArea (
-            FileBuffer.MousePosition.Row,
-            FileBuffer.MousePosition.Column
-            )
-      ) {
-        gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
-      } else {
-        gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
-      }
+      gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
+
       //
       // clear the old mouse position
       //
@@ -567,25 +472,18 @@ FileBufferCleanup (
 
 }
 
-
 /**
-  Print Line on Row
+  Print a line specified by Line on a row specified by Row of the screen.
 
-  @param[in] Line     The lline to print.
-  @param[in] Row      The row on screen ( begin from 1 ).
-  @param[in] FRow     The FRow.
-  @param[in] Orig     The original color.
-  @param[in] New      The color to print with.
+  @param[in] Line               The line to print.
+  @param[in] Row                The row on the screen to print onto (begin from 1).
 
-  @retval EFI_SUCCESS The operation was successful.
+  @retval EFI_SUCCESS           The printing was successful.
 **/
 EFI_STATUS
 FileBufferPrintLine (
-  IN CONST EFI_EDITOR_LINE        *Line,
-  IN CONST  UINTN                 Row,
-  IN CONST  UINTN                 FRow,
-  IN EFI_EDITOR_COLOR_UNION       Orig,
-  IN EFI_EDITOR_COLOR_UNION       New
+  IN CONST EFI_EDITOR_LINE  *Line,
+  IN CONST UINTN            Row
   )
 {
 
@@ -593,42 +491,7 @@ FileBufferPrintLine (
   UINTN   Limit;
   CHAR16  *PrintLine;
   CHAR16  *PrintLine2;
-  CHAR16  *TempString;
-  UINTN   BufLen;
-  BOOLEAN Selected;
-  UINTN   RowStart;
-  UINTN   RowEnd;
-  UINTN   ColStart;
-  UINTN   ColEnd;
-
-  ColStart    = 0;
-  ColEnd      = 0;
-  Selected    = FALSE;
-  TempString  = NULL;
-
-  //
-  // print the selected area in opposite color
-  //
-  if (MainEditor.SelectStart != 0 && MainEditor.SelectEnd != 0) {
-    RowStart  = (MainEditor.SelectStart - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-    RowEnd    = (MainEditor.SelectEnd - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-
-    ColStart  = (MainEditor.SelectStart - 1) % SHELL_EDIT_MAX_LINE_SIZE + 1;
-    ColEnd    = (MainEditor.SelectEnd - 1) % SHELL_EDIT_MAX_LINE_SIZE + 1;
-
-    if (FRow >= RowStart && FRow <= RowEnd) {
-      Selected = TRUE;
-    }
-
-    if (FRow > RowStart) {
-      ColStart = 1;
-    }
-
-    if (FRow < RowEnd) {
-      ColEnd = Line->Size + 1;
-    }
-
-  }
+  UINTN   BufLen; 
 
   //
   // print start from correct character
@@ -656,64 +519,15 @@ FileBufferPrintLine (
 
   ShellCopySearchAndReplace(PrintLine, PrintLine2, BufLen * 2, L"%", L"^%", FALSE, FALSE);
 
-  if (!Selected) {
-    ShellPrintEx (
-      0,
-      (INT32)Row - 1,
-      L"%s",
-      PrintLine2
-      );
-  } else {
-    //
-    // If the current line is selected.
-    //
-    if (ColStart != 1) {
-      gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
-      TempString = AllocateCopyPool ((ColStart - 1) * sizeof(CHAR16), PrintLine2);
-      ASSERT (TempString != NULL);
-      ShellPrintEx (
-        0,
-        (INT32)Row - 1,
-        L"%s",
-        TempString
-      );
-      FreePool (TempString);
-    }
-
-    gST->ConOut->SetAttribute (gST->ConOut, New.Data & 0x7F);
-    TempString = AllocateCopyPool (
-                  (ColEnd - ColStart + 1)  * sizeof(CHAR16),
-                  PrintLine2 + ColStart - 1
-                  );
-    ASSERT (TempString != NULL);
-    ShellPrintEx (
-      (INT32)ColStart - 1,
-      (INT32)Row - 1,
-      L"%s",
-      TempString
-      );
-    FreePool (TempString);
-
-    if (ColEnd != SHELL_EDIT_MAX_LINE_SIZE) {
-      gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
-      TempString = AllocateCopyPool (
-                    (SHELL_EDIT_MAX_LINE_SIZE - ColEnd + 1)  * sizeof(CHAR16),
-                    PrintLine2 + ColEnd - 1
-                    );
-      ASSERT (TempString != NULL);
-      ShellPrintEx (
-        (INT32)ColEnd - 1,
-        (INT32)Row - 1,
-        L"%s",
-        TempString
-      );
-      FreePool (TempString);
-    }
-  }
+  ShellPrintEx (
+    0,
+    (INT32)Row - 1,
+    L"%s",
+    PrintLine2
+    );
 
   FreePool (PrintLine);
   FreePool (PrintLine2);
-  gST->ConOut->SetAttribute (gST->ConOut, Orig.Data & 0x7F);
 
   return EFI_SUCCESS;
 }
@@ -754,17 +568,6 @@ FileBufferRefresh (
   LIST_ENTRY  *Link;
   EFI_EDITOR_LINE *Line;
   UINTN           Row;
-  EFI_EDITOR_COLOR_UNION Orig;
-  EFI_EDITOR_COLOR_UNION New;
-
-  UINTN                   StartRow;
-  UINTN                   EndRow;
-  UINTN                   Tmp;
-
-  Orig                  = MainEditor.ColorAttributes;
-  New.Data              = 0;
-  New.Colors.Foreground = Orig.Colors.Background;
-  New.Colors.Background = Orig.Colors.Foreground;
 
   //
   // if it's the first time after editor launch, so should refresh
@@ -776,10 +579,13 @@ FileBufferRefresh (
     //
     if (!FileBufferNeedRefresh &&
         !FileBufferOnlyLineNeedRefresh &&
-        FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row
+        FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row &&
+        FileBufferBackupVar.LowVisibleRange.Column == FileBuffer.LowVisibleRange.Column
         ) {
+
       FileBufferRestoreMousePosition ();
       FileBufferRestorePosition ();
+
       return EFI_SUCCESS;
     }
   }
@@ -790,57 +596,19 @@ FileBufferRefresh (
   // only need to refresh current line
   //
   if (FileBufferOnlyLineNeedRefresh &&
-      FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row
+      FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row &&
+      FileBufferBackupVar.LowVisibleRange.Column == FileBuffer.LowVisibleRange.Column
       ) {
 
     EditorClearLine (FileBuffer.DisplayPosition.Row, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row);
     FileBufferPrintLine (
       FileBuffer.CurrentLine,
-      FileBuffer.DisplayPosition.Row,
-      FileBuffer.FilePosition.Row,
-      Orig,
-      New
+      FileBuffer.DisplayPosition.Row
       );
   } else {
     //
     // the whole edit area need refresh
     //
-    if (EditorMouseAction && MainEditor.SelectStart != 0 && MainEditor.SelectEnd != 0) {
-      if (MainEditor.SelectStart != MainEditorBackupVar.SelectStart) {
-        if (MainEditor.SelectStart >= MainEditorBackupVar.SelectStart && MainEditorBackupVar.SelectStart != 0) {
-          StartRow = (MainEditorBackupVar.SelectStart - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-        } else {
-          StartRow = (MainEditor.SelectStart - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-        }
-      } else {
-        StartRow = (MainEditor.SelectStart - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-      }
-
-      if (MainEditor.SelectEnd <= MainEditorBackupVar.SelectEnd) {
-        EndRow = (MainEditorBackupVar.SelectEnd - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-      } else {
-        EndRow = (MainEditor.SelectEnd - 1) / SHELL_EDIT_MAX_LINE_SIZE + 1;
-      }
-
-      //
-      // swap
-      //
-      if (StartRow > EndRow) {
-        Tmp       = StartRow;
-        StartRow  = EndRow;
-        EndRow    = Tmp;
-      }
-
-      StartRow  = 2 + StartRow - FileBuffer.LowVisibleRange.Row;
-      EndRow    = 2 + EndRow - FileBuffer.LowVisibleRange.Row;
-
-    } else {
-      //
-      // not mouse selection actions
-      //
-      StartRow  = 2;
-      EndRow    = (MainEditor.ScreenSize.Row - 1);
-    }
 
     //
     // no line
@@ -870,20 +638,15 @@ FileBufferRefresh (
       //
       // print line at row
       //
-      FileBufferPrintLine (Line,
-        Row,
-        FileBuffer.LowVisibleRange.Row + Row - 2,
-        Orig,
-        New
-        );
+      FileBufferPrintLine (Line, Row);
 
       Link = Link->ForwardLink;
       Row++;
-    } while (Link != FileBuffer.ListHead && Row <= EndRow);
+    } while (Link != FileBuffer.ListHead && Row <= (MainEditor.ScreenSize.Row - 1));
     //
     // while not file end and not screen full
     //
-    while (Row <= EndRow) {
+    while (Row <= (MainEditor.ScreenSize.Row - 1)) {
       EditorClearLine (Row, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row);
       Row++;
     }
@@ -3604,41 +3367,5 @@ FileBufferSetModified (
   )
 {
   FileBuffer.FileModified = TRUE;
-}
-
-
-/**
-  Get the size of the open buffer.
-
-  @retval The size in bytes.
-**/
-UINTN
-FileBufferGetTotalSize (
-  VOID
-  )
-{
-  UINTN             Size;
-
-  EFI_EDITOR_LINE   *Line;
-
-  //
-  // calculate the total size of whole line list's buffer
-  //
-  if (FileBuffer.Lines == NULL) {
-    return 0;
-  }
-
-  Line = CR (
-          FileBuffer.ListHead->BackLink,
-          EFI_EDITOR_LINE,
-          Link,
-          LINE_LIST_SIGNATURE
-          );
-  //
-  // one line at most 0x50
-  //
-  Size = SHELL_EDIT_MAX_LINE_SIZE * (FileBuffer.NumLines - 1) + Line->Size;
-
-  return Size;
 }
 
