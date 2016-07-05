@@ -379,6 +379,7 @@ ExtractFileNameFromDevicePath (
   String = UiDevicePathToStr(DevicePath);
   MatchString = String;
   LastMatch   = String;
+  FileName    = NULL;
 
   while(MatchString != NULL){
     LastMatch   = MatchString + 1;
@@ -387,7 +388,9 @@ ExtractFileNameFromDevicePath (
 
   Length = StrLen(LastMatch);
   FileName = AllocateCopyPool ((Length + 1) * sizeof(CHAR16), LastMatch);
-  *(FileName + Length) = 0;
+  if (FileName != NULL) {
+    *(FileName + Length) = 0;
+  }
 
   FreePool(String);
 

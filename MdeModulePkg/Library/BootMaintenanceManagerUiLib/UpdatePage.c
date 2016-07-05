@@ -1,7 +1,7 @@
 /** @file
 Dynamically update the pages.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1020,16 +1020,18 @@ UpdateOptionPage(
   CHAR16                *String;
   EFI_STRING_ID         StringToken;
 
+  String = NULL;
+
   if (DevicePath != NULL){
     String = ExtractFileNameFromDevicePath(DevicePath);
-    StringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, String, NULL);
-    FreePool(String);
-  } else {
+  }
+  if (String == NULL) {
     String = HiiGetString (CallbackData->BmmHiiHandle, STRING_TOKEN (STR_NULL_STRING), NULL);
     ASSERT (String != NULL);
-    StringToken =  HiiSetString (CallbackData->BmmHiiHandle, 0, String, NULL);
-    FreePool (String);
   }
+
+  StringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, String, NULL);
+  FreePool (String);
 
   if(FormId == FORM_BOOT_ADD_ID){
     if (!CallbackData->BmmFakeNvData.BootOptionChanged) {

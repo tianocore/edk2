@@ -865,29 +865,33 @@ BootFromFile (
   EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
   CHAR16                       *FileName;
 
+  FileName = NULL;
+
   FileName = ExtractFileNameFromDevicePath(FilePath);
-  EfiBootManagerInitializeLoadOption (
-    &BootOption,
-    0,
-    LoadOptionTypeBoot,
-    LOAD_OPTION_ACTIVE,
-    FileName,
-    FilePath,
-    NULL,
-    0
-    );
-  //
-  // Since current no boot from removable media directly is allowed */
-  //
-  gST->ConOut->ClearScreen (gST->ConOut);
+  if (FileName != NULL) {
+    EfiBootManagerInitializeLoadOption (
+      &BootOption,
+      0,
+      LoadOptionTypeBoot,
+      LOAD_OPTION_ACTIVE,
+      FileName,
+      FilePath,
+      NULL,
+      0
+      );
+    //
+    // Since current no boot from removable media directly is allowed */
+    //
+    gST->ConOut->ClearScreen (gST->ConOut);
 
-  BmmSetConsoleMode (FALSE);
-  EfiBootManagerBoot (&BootOption);
-  BmmSetConsoleMode (TRUE);
+    BmmSetConsoleMode (FALSE);
+    EfiBootManagerBoot (&BootOption);
+    BmmSetConsoleMode (TRUE);
 
-  FreePool(FileName);
+    FreePool(FileName);
 
-  EfiBootManagerFreeLoadOption (&BootOption);
+    EfiBootManagerFreeLoadOption (&BootOption);
+  }
 
   return FALSE;
 }
