@@ -61,6 +61,15 @@
     GsivId, GicRBase, Mpidr                                                          \
   }
 
+#define EFI_ACPI_6_0_GICC_STRUCTURE_INIT(GicId, AcpiCpuUid, Mpidr, Flags, PmuIrq,    \
+    GicBase, GicVBase, GicHBase, GsivId, GicRBase, Efficiency)                       \
+  {                                                                                  \
+    EFI_ACPI_6_0_GIC, sizeof (EFI_ACPI_6_0_GIC_STRUCTURE), EFI_ACPI_RESERVED_WORD,   \
+    GicId, AcpiCpuUid, Flags, 0, PmuIrq, 0, GicBase, GicVBase, GicHBase,             \
+    GsivId, GicRBase, Mpidr, Efficiency,                                             \
+    {EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE}         \
+  }
+
 #define EFI_ACPI_6_0_GIC_MSI_FRAME_INIT(GicMsiFrameId, PhysicalBaseAddress, Flags, SPICount, SPIBase) \
   { \
     EFI_ACPI_6_0_GIC_MSI_FRAME, sizeof (EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE), EFI_ACPI_RESERVED_WORD, \
