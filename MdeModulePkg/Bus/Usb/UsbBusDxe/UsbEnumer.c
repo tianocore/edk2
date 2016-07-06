@@ -643,6 +643,7 @@ UsbFindChild (
 
   @param  HubIf                 The HUB that has the device connected.
   @param  Port                  The port index of the hub (started with zero).
+  @param  ResetIsNeeded         The boolean to control whether skip the reset of the port.
 
   @retval EFI_SUCCESS           The device is enumerated (added or removed).
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for the device.
@@ -652,7 +653,8 @@ UsbFindChild (
 EFI_STATUS
 UsbEnumerateNewDev (
   IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port
+  IN UINT8                Port,
+  IN BOOLEAN              ResetIsNeeded
   )
 {
   USB_BUS                 *Bus;
@@ -677,15 +679,17 @@ UsbEnumerateNewDev (
   // and the hub is a EHCI root hub, ResetPort will release
   // the device to its companion UHCI and return an error.
   //
-  Status = HubApi->ResetPort (HubIf, Port);
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: failed to reset port %d - %r\n", Port, Status));
-
-    return Status;
+  if (ResetIsNeeded) {
+    Status = HubApi->ResetPort (HubIf, Port);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: failed to reset port %d - %r\n", Port, Status));
+  
+      return Status;
+    }
+    DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: hub port %d is reset\n", Port));
+  } else {
+    DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: hub port %d reset is skipped\n", Port));
   }
-
-  DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: hub port %d is reset\n", Port));
 
   Child = UsbCreateDevice (HubIf, Port);
 
@@ -964,7 +968,11 @@ UsbEnumeratePort (
     // Now, new device connected, enumerate and configure the device 
     //
     DEBUG (( EFI_D_INFO, "UsbEnumeratePort: new device connected at port %d\n", Port));
-    Status = UsbEnumerateNewDev (HubIf, Port);
+    if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
+      Status = UsbEnumerateNewDev (HubIf, Port, FALSE);
+    } else {
+      Status = UsbEnumerateNewDev (HubIf, Port, TRUE);
+    }
   
   } else {
     DEBUG (( EFI_D_INFO, "UsbEnumeratePort: device disconnected event on port %d\n", Port));

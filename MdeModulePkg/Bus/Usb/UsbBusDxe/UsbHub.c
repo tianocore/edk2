@@ -2,7 +2,7 @@
 
     Unified interface for RootHub and Hub.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR> 
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR> 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -968,15 +968,6 @@ UsbHubResetPort (
   UINTN                   Index;
   EFI_STATUS              Status;
 
-  Status = UsbHubGetPortStatus (HubIf, Port, &PortState);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  } else if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
-    DEBUG (( EFI_D_INFO, "UsbHubResetPort: skip reset on hub %p port %d\n", HubIf, Port));
-    return EFI_SUCCESS;
-  }
-
   Status  = UsbHubSetPortFeature (HubIf, Port, (EFI_USB_PORT_FEATURE) USB_HUB_PORT_RESET);
 
   if (EFI_ERROR (Status)) {
@@ -1281,15 +1272,6 @@ UsbRootHubResetPort (
   // should be handled in the EHCI driver.
   //
   Bus     = RootIf->Device->Bus;
-
-  Status = UsbHcGetRootHubPortStatus (Bus, Port, &PortState);
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  } else if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
-    DEBUG (( EFI_D_INFO, "UsbRootHubResetPort: skip reset on root port %d\n", Port));
-    return EFI_SUCCESS;
-  }
 
   Status  = UsbHcSetRootHubPortFeature (Bus, Port, EfiUsbPortReset);
 
