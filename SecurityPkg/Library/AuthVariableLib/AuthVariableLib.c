@@ -256,19 +256,7 @@ AuthVariableLibInitialize (
   SecureBootEnable = SECURE_BOOT_DISABLE;
   Status = AuthServiceInternalFindVariable (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID **) &Data, &DataSize);
   if (!EFI_ERROR (Status)) {
-    if (mPlatformMode == SETUP_MODE){
-      //
-      // PK is cleared in runtime. "SecureBootMode" is not updated before reboot
-      // Delete "SecureBootMode" in SetupMode
-      //
-      Status = AuthServiceInternalUpdateVariable (
-                 EFI_SECURE_BOOT_ENABLE_NAME,
-                 &gEfiSecureBootEnableDisableGuid,
-                 &SecureBootEnable,
-                 0,
-                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
-                 );
-    } else {
+    if (mPlatformMode == USER_MODE){
       SecureBootEnable = *(UINT8 *) Data;
     }
   } else if (mPlatformMode == USER_MODE) {

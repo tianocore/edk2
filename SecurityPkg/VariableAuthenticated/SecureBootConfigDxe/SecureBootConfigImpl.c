@@ -2841,20 +2841,6 @@ SecureBootExtractConfigFromVariable (
   ConfigData->RevocationTime.Minute = CurrTime.Minute;
   ConfigData->RevocationTime.Second = 0;
 
-  //
-  // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
-  // Checkbox.
-  //
-  ConfigData->AttemptSecureBoot = FALSE;
-  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
-  if (SecureBootEnable == NULL) {
-    ConfigData->HideSecureBoot = TRUE;
-  } else {
-    ConfigData->HideSecureBoot = FALSE;
-    if ((*SecureBootEnable) == SECURE_BOOT_ENABLE) {
-      ConfigData->AttemptSecureBoot = TRUE;
-    }
-  }
 
   //
   // If it is Physical Presence User, set the PhysicalPresent to true.
@@ -2873,6 +2859,26 @@ SecureBootExtractConfigFromVariable (
     ConfigData->HasPk = FALSE;
   } else  {
     ConfigData->HasPk = TRUE;
+  }
+
+  //
+  // Check SecureBootEnable & Pk status, fix the inconsistence. 
+  // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
+  // Checkbox.
+  //
+  ConfigData->AttemptSecureBoot = FALSE;
+  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);  
+
+  //
+  // Fix Pk, SecureBootEnable inconsistence
+  //
+  if ((SetupMode != NULL) && (*SetupMode) == USER_MODE) {
+    ConfigData->HideSecureBoot = FALSE;
+    if ((SecureBootEnable != NULL) && (*SecureBootEnable == SECURE_BOOT_ENABLE)) {
+      ConfigData->AttemptSecureBoot = TRUE;
+    }
+  } else {
+    ConfigData->HideSecureBoot = TRUE;
   }
 
   //
@@ -3050,7 +3056,6 @@ SecureBootRouteConfig (
        OUT EFI_STRING                          *Progress
   )
 {
-  UINT8                      *SecureBootEnable;
   SECUREBOOT_CONFIGURATION   IfrNvData;
   UINTN                      BufferSize;
   EFI_STATUS                 Status;
@@ -3087,10 +3092,7 @@ SecureBootRouteConfig (
   //
   // Store Buffer Storage back to EFI variable if needed
   //
-  SecureBootEnable = NULL;
-  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
-  if (NULL != SecureBootEnable) {
-    FreePool (SecureBootEnable);
+  if (!IfrNvData.HideSecureBoot) {
     Status = SaveSecureBootVariable (IfrNvData.AttemptSecureBoot);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -3141,6 +3143,7 @@ SecureBootCallback (
   SECUREBOOT_CONFIGURATION        *IfrNvData;
   UINT16                          LabelId;
   UINT8                           *SecureBootEnable;
+  UINT8                           *Pk;
   UINT8                           *SecureBootMode;
   UINT8                           *SetupMode;
   CHAR16                          PromptString[100];
@@ -3552,11 +3555,11 @@ SecureBootCallback (
     }
   } else if (Action == EFI_BROWSER_ACTION_DEFAULT_STANDARD) {
     if (QuestionId == KEY_HIDE_SECURE_BOOT) {
-      GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
-      if (SecureBootEnable == NULL) {
+      GetVariable2 (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid, (VOID**)&Pk, NULL);
+      if (Pk == NULL) {
         IfrNvData->HideSecureBoot = TRUE;
       } else {
-        FreePool (SecureBootEnable);
+        FreePool (Pk);
         IfrNvData->HideSecureBoot = FALSE;
       }
       Value->b = IfrNvData->HideSecureBoot;
