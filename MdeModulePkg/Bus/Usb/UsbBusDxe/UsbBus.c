@@ -2,7 +2,7 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -975,9 +975,6 @@ UsbBusBuildProtocol (
       UsbBus->MaxDevices = 256;
     }
   }
-
-  UsbHcReset (UsbBus, EFI_USB_HC_RESET_GLOBAL);
-  UsbHcSetState (UsbBus, EfiUsbHcStateOperational);
 
   //
   // Install an EFI_USB_BUS_PROTOCOL to host controller to identify it.
