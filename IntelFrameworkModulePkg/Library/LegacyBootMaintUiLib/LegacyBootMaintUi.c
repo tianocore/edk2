@@ -19,6 +19,7 @@ LEGACY_BOOT_OPTION_CALLBACK_DATA  *mLegacyBootOptionPrivate;
 EFI_GUID  mLegacyBootOptionGuid     = LEGACY_BOOT_OPTION_FORMSET_GUID;
 CHAR16    mLegacyBootStorageName[]  = L"LegacyBootData";
 BBS_TYPE  mBbsType[] = {BBS_FLOPPY, BBS_HARDDISK, BBS_CDROM, BBS_EMBED_NETWORK, BBS_BEV_DEVICE, BBS_UNKNOWN};
+BOOLEAN   mFirstEnterLegacyForm = FALSE;
 
 
 ///
@@ -95,6 +96,26 @@ HII_VENDOR_DEVICE_PATH  mLegacyBootOptionHiiVendorDevicePath = {
   }
 };
 
+/**
+
+  Build the LegacyFDMenu LegacyHDMenu LegacyCDMenu according to LegacyBios.GetBbsInfo().
+
+**/
+VOID
+GetLegacyOptions (
+  VOID
+  );
+
+
+/**
+
+  Base on the L"LegacyDevOrder" variable to build the current order data.
+
+**/
+VOID
+GetLegacyOptionsOrder (
+  VOID
+  );
 
 /**
   Re-order the Boot Option according to the DevOrder.
@@ -1094,15 +1115,30 @@ LegacyBootOptionCallback (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  if (Action != EFI_BROWSER_ACTION_CHANGED && Action != EFI_BROWSER_ACTION_CHANGING) {
+  if (Action != EFI_BROWSER_ACTION_CHANGED && Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_FORM_OPEN) {
     //
-    // Do nothing for other UEFI Action. Only do call back when data is changed.
+    // Do nothing for other UEFI Action. Only do call back when data is changed or the form is open.
     //
     return EFI_UNSUPPORTED;
   }
 
   if ((Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
+    if (QuestionId == FORM_FLOPPY_BOOT_ID) {
+      if (!mFirstEnterLegacyForm) {
+        //
+        // The leagcyBootMaintUiLib depends on the LegacyBootManagerLib to realize its functionality.
+        // We need to do the leagcy boot options related actions after the LegacyBootManagerLib has been initialized.
+        // Opening the legacy menus is the appropriate time that the LegacyBootManagerLib has already been initialized.
+        //
+        mFirstEnterLegacyForm = TRUE;
+        GetLegacyOptions ();
+        GetLegacyOptionsOrder ();
+      }
+    }
   }
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
@@ -1426,10 +1462,6 @@ LegacyBootMaintUiLibConstructor (
     ASSERT (LegacyBootOptionData->HiiHandle != NULL);
 
     mLegacyBootOptionPrivate = LegacyBootOptionData;
-
-    GetLegacyOptions ();
-
-    GetLegacyOptionsOrder();
   }
 
   return EFI_SUCCESS;
