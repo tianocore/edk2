@@ -3,6 +3,7 @@
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -134,6 +135,7 @@ typedef struct _PING_PRIVATE_DATA {
   UINT8                       SrcAddress[MAX(sizeof(EFI_IPv6_ADDRESS)        , sizeof(EFI_IPv4_ADDRESS)          )];
   UINT8                       DstAddress[MAX(sizeof(EFI_IPv6_ADDRESS)        , sizeof(EFI_IPv4_ADDRESS)          )];
   PING_IPX_COMPLETION_TOKEN   RxToken;
+  UINT16                      FailedCount;
 } PING_PRIVATE_DATA;
 
 /**
@@ -809,6 +811,9 @@ Ping6OnTimerRoutine (
       RemoveEntryList (&TxInfo->Link);
       PingDestroyTxInfo (TxInfo, Private->IpChoice);
 
+      Private->RxCount++;
+      Private->FailedCount++;
+
       if (IsListEmpty (&Private->TxList) && (Private->TxCount == Private->SendNum)) {
         //
         // All the left icmp6 echo request in the list timeout.
@@ -1392,13 +1397,13 @@ ON_STAT:
       STRING_TOKEN (STR_PING_STAT),
       gShellNetwork1HiiHandle,
       Private->TxCount,
-      Private->RxCount,
-      (100 * (Private->TxCount - Private->RxCount)) / Private->TxCount,
+      (Private->RxCount - Private->FailedCount),
+      (100 - ((100 * (Private->RxCount - Private->FailedCount)) / Private->TxCount)),
       Private->RttSum
       );
   }
 
-  if (Private->RxCount != 0) {
+  if (Private->RxCount > Private->FailedCount) {
     ShellPrintHiiEx (
       -1,
       -1,
@@ -1407,7 +1412,7 @@ ON_STAT:
       gShellNetwork1HiiHandle,
       Private->RttMin,
       Private->RttMax,
-      DivU64x64Remainder (Private->RttSum, Private->RxCount, NULL)
+      DivU64x64Remainder (Private->RttSum, (Private->RxCount - Private->FailedCount), NULL)
       );
   }
 
