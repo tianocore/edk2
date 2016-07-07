@@ -374,7 +374,7 @@ ShellCommandRunDrvDiag (
             || (ShellCommandLineGetFlag(Package, L"-m"))
            ){
       //
-      // Run the apropriate test
+      // Run the appropriate test
       //
       if        (ShellCommandLineGetFlag(Package, L"-s")) {
         Mode =   TestModeStandard;
