@@ -20,6 +20,19 @@
 #include <Library/PcdLib.h>
 
 /**
+ *
+ * Return whether the Source interrupt index refers to a shared interrupt (SPI)
+ */
+STATIC
+BOOLEAN
+SourceIsSpi (
+  IN UINTN  Source
+  )
+{
+  return Source >= 32 && Source < 1020;
+}
+
+/**
  * Return the base address of the GIC redistributor for the current CPU
  *
  * @param Revision  GIC Revision. The GIC redistributor might have a different
@@ -183,7 +196,9 @@ ArmGicEnableInterrupt (
   RegShift = Source % 32;
 
   Revision = ArmGicGetSupportedArchRevision ();
-  if ((Revision == ARM_GIC_ARCH_REVISION_2) || FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
+      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
+      SourceIsSpi (Source)) {
     // Write set-enable register
     MmioWrite32 (GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset), 1 << RegShift);
   } else {
@@ -216,7 +231,9 @@ ArmGicDisableInterrupt (
   RegShift = Source % 32;
 
   Revision = ArmGicGetSupportedArchRevision ();
-  if ((Revision == ARM_GIC_ARCH_REVISION_2) || FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
+      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
+      SourceIsSpi (Source)) {
     // Write clear-enable register
     MmioWrite32 (GicDistributorBase + ARM_GIC_ICDICER + (4 * RegOffset), 1 << RegShift);
   } else {
@@ -249,7 +266,9 @@ ArmGicIsInterruptEnabled (
   RegShift = Source % 32;
 
   Revision = ArmGicGetSupportedArchRevision ();
-  if ((Revision == ARM_GIC_ARCH_REVISION_2) || FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
+      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
+      SourceIsSpi (Source)) {
     Interrupts = ((MmioRead32 (GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)) & (1 << RegShift)) != 0);
   } else {
     GicCpuRedistributorBase = GicGetCpuRedistributorBase (GicRedistributorBase, Revision);
