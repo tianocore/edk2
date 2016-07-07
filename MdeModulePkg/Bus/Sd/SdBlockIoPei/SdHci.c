@@ -2647,6 +2647,7 @@ SdPeimSetBusMode (
   //
   // Get the supported bus speed from SWITCH cmd return data group #1.
   //
+  ZeroMem (SwitchResp, sizeof (SwitchResp));
   Status = SdPeimSwitch (Slot, 0xF, 0xF, 0xF, 0xF, FALSE, SwitchResp);
   if (EFI_ERROR (Status)) {
     return Status;
