@@ -404,7 +404,29 @@ QemuInitializeRam (
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
   UpperMemorySize = GetSystemMemorySizeAbove4gb ();
 
-  if (mBootMode != BOOT_ON_S3_RESUME) {
+  if (mBootMode == BOOT_ON_S3_RESUME) {
+    //
+    // Create the following memory HOB as an exception on the S3 boot path.
+    //
+    // Normally we'd create memory HOBs only on the normal boot path. However,
+    // CpuMpPei specifically needs such a low-memory HOB on the S3 path as
+    // well, for "borrowing" a subset of it temporarily, for the AP startup
+    // vector.
+    //
+    // CpuMpPei saves the original contents of the borrowed area in permanent
+    // PEI RAM, in a backup buffer allocated with the normal PEI services.
+    // CpuMpPei restores the original contents ("returns" the borrowed area) at
+    // End-of-PEI. End-of-PEI in turn is emitted by S3Resume2Pei before
+    // transfering control to the OS's wakeup vector in the FACS.
+    //
+    // We expect any other PEIMs that "borrow" memory similarly to CpuMpPei to
+    // restore the original contents. Furthermore, we expect all such PEIMs
+    // (CpuMpPei included) to claim the borrowed areas by producing memory
+    // allocation HOBs, and to honor preexistent memory allocation HOBs when
+    // looking for an area to borrow.
+    //
+    AddMemoryRangeHob (0, BASE_512KB + BASE_128KB);
+  } else {
     //
     // Create memory HOBs
     //
