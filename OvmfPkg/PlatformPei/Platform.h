@@ -73,6 +73,11 @@ PeiFvInitialization (
   VOID
   );
 
+VOID
+InstallFeatureControlCallback (
+  VOID
+  );
+
 EFI_STATUS
 InitializeXen (
   VOID

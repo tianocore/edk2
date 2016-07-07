@@ -612,6 +612,7 @@ InitializePlatform (
   }
 
   MiscInitialization ();
+  InstallFeatureControlCallback ();
 
   return EFI_SUCCESS;
 }
