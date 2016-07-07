@@ -263,6 +263,7 @@ BuildDriverInfo (
   if (EFI_ERROR (Status)) {
     return NULL;
   }
+  ASSERT (DriverInfoData != NULL);
 
   ZeroMem (DriverInfoData, sizeof (*DriverInfoData));
 
