@@ -24,8 +24,6 @@
   FspSwitchStackLib.c
 
 [Sources.IA32]
-  Ia32/Stack.asm
-  Ia32/Stack.s
   Ia32/Stack.nasm
 
 [Packages]
