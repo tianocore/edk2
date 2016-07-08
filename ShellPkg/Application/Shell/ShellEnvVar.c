@@ -26,20 +26,23 @@ ENV_VAR_LIST                   gShellEnvVarList;
   Reports whether an environment variable is Volatile or Non-Volatile.
 
   @param EnvVarName             The name of the environment variable in question
+  @param Volatile               Return TRUE if the environment variable is volatile
 
-  @retval TRUE                  This environment variable is Volatile
-  @retval FALSE                 This environment variable is NON-Volatile
+  @retval EFI_SUCCESS           The volatile attribute is returned successfully
+  @retval others                Some errors happened.
 **/
-BOOLEAN
-EFIAPI
+EFI_STATUS
 IsVolatileEnv (
-  IN CONST CHAR16 *EnvVarName
+  IN CONST CHAR16 *EnvVarName,
+  OUT BOOLEAN     *Volatile
   )
 {
   EFI_STATUS  Status;
   UINTN       Size;
   VOID        *Buffer;
   UINT32      Attribs;
+
+  ASSERT (Volatile != NULL);
 
   Size = 0;
   Buffer = NULL;
@@ -54,7 +57,9 @@ IsVolatileEnv (
                             Buffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Buffer = AllocateZeroPool(Size);
-    ASSERT(Buffer != NULL);
+    if (Buffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     Status = gRT->GetVariable((CHAR16*)EnvVarName,
                               &gShellVariableGuid,
                               &Attribs,
@@ -66,21 +71,18 @@ IsVolatileEnv (
   // not found means volatile
   //
   if (Status == EFI_NOT_FOUND) {
-    return (TRUE);
+    *Volatile = TRUE;
+    return EFI_SUCCESS;
   }
-  ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // check for the Non Volatile bit
   //
-  if ((Attribs & EFI_VARIABLE_NON_VOLATILE) == EFI_VARIABLE_NON_VOLATILE) {
-    return (FALSE);
-  }
-
-  //
-  // everything else is volatile
-  //
-  return (TRUE);
+  *Volatile = !(BOOLEAN) ((Attribs & EFI_VARIABLE_NON_VOLATILE) == EFI_VARIABLE_NON_VOLATILE);
+  return EFI_SUCCESS;
 }
 
 /**

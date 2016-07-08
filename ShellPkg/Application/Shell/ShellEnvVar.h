@@ -34,19 +34,18 @@ extern ENV_VAR_LIST    gShellEnvVarList;
 
 
 /**
-  Reports whether an environment variable is Volatile or Non-Volatile
-
-  This will use the Runtime Services call GetVariable to to search for the variable.
+  Reports whether an environment variable is Volatile or Non-Volatile.
 
   @param EnvVarName             The name of the environment variable in question
+  @param Volatile               Return TRUE if the environment variable is volatile
 
-  @retval TRUE                  This environment variable is Volatile
-  @retval FALSE                 This environment variable is NON-Volatile
+  @retval EFI_SUCCESS           The volatile attribute is returned successfully
+  @retval others                Some errors happened.
 **/
-BOOLEAN
-EFIAPI
+EFI_STATUS
 IsVolatileEnv (
-  IN CONST CHAR16 *EnvVarName
+  IN CONST CHAR16 *EnvVarName,
+  OUT BOOLEAN     *Volatile
   );
 
 /**

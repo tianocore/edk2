@@ -1129,13 +1129,18 @@ EfiShellCreateFile(
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_STATUS                Status;
+  BOOLEAN                   Volatile;
 
   //
   // Is this for an environment variable
   // do we start with >v
   //
   if (StrStr(FileName, L">v") == FileName) {
-    if (!IsVolatileEnv(FileName+2)) {
+    Status = IsVolatileEnv (FileName + 2, &Volatile);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if (!Volatile) {
       return (EFI_INVALID_PARAMETER);
     }
     *FileHandle = CreateFileInterfaceEnv(FileName+2);
@@ -1245,6 +1250,7 @@ EfiShellOpenFileByName(
 {
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
   EFI_STATUS                      Status;
+  BOOLEAN                         Volatile;
 
   *FileHandle = NULL;
 
@@ -1304,7 +1310,11 @@ EfiShellOpenFileByName(
   // do we start with >v
   //
   if (StrStr(FileName, L">v") == FileName) {
-    if (!IsVolatileEnv(FileName+2) &&
+    Status = IsVolatileEnv (FileName + 2, &Volatile);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    if (!Volatile &&
         ((OpenMode & EFI_FILE_MODE_WRITE) != 0)) {
       return (EFI_INVALID_PARAMETER);
     }
