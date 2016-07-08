@@ -11,7 +11,7 @@
     synchronous requests and EFI_BLOCK_IO_PROTOCOL for now.
 
   Copyright (C) 2012, Red Hat, Inc.
-  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -890,7 +890,7 @@ VirtioBlkExitBoot (
 
   After we've pronounced support for a specific device in
   DriverBindingSupported(), we start managing said device (passed in by the
-  Driver Exeuction Environment) with the following service.
+  Driver Execution Environment) with the following service.
 
   See DriverBindingSupported() for specification references.
 
@@ -905,7 +905,7 @@ VirtioBlkExitBoot (
 
   @retval EFI_SUCCESS           Driver instance has been created and
                                 initialized  for the virtio-blk device, it
-                                is now accessibla via EFI_BLOCK_IO_PROTOCOL.
+                                is now accessible via EFI_BLOCK_IO_PROTOCOL.
 
   @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
 

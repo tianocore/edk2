@@ -96,7 +96,7 @@ VirtioBlkDriverBindingSupported (
 
   After we've pronounced support for a specific device in
   DriverBindingSupported(), we start managing said device (passed in by the
-  Driver Exeuction Environment) with the following service.
+  Driver Execution Environment) with the following service.
 
   See DriverBindingSupported() for specification references.
 
@@ -111,7 +111,7 @@ VirtioBlkDriverBindingSupported (
 
   @retval EFI_SUCCESS           Driver instance has been created and
                                 initialized  for the virtio-blk device, it
-                                is now accessibla via EFI_BLOCK_IO_PROTOCOL.
+                                is now accessible via EFI_BLOCK_IO_PROTOCOL.
 
   @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
 

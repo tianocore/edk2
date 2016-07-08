@@ -3,7 +3,7 @@
   This driver produces Virtio Device Protocol instances for Virtio PCI devices.
 
   Copyright (C) 2012, Red Hat, Inc.
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (C) 2013, ARM Ltd.
 
   This program and the accompanying materials are licensed and made available
@@ -393,7 +393,7 @@ VirtioPciUninit (
 
   After we've pronounced support for a specific device in
   DriverBindingSupported(), we start managing said device (passed in by the
-  Driver Exeuction Environment) with the following service.
+  Driver Execution Environment) with the following service.
 
   See DriverBindingSupported() for specification references.
 
