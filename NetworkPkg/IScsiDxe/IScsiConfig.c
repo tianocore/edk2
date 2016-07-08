@@ -687,7 +687,7 @@ IScsiConvertIfrNvDataToAttemptConfigData (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  AsciiStrToUnicodeStrS (Attempt->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
+  AsciiStrToUnicodeStrS (Attempt->MacString, MacString, ISCSI_MAX_MAC_STRING_LEN);
 
   UnicodeSPrint (
     mPrivate->PortString,
