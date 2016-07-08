@@ -424,12 +424,6 @@ PlatformRegisterOptionsAndKeys (
              NULL, (UINT16) BootOption.OptionNumber, 0, &Esc, NULL
              );
   ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
-  //
-  // Register UEFI Shell
-  //
-  PlatformRegisterFvBootOption (
-    PcdGetPtr (PcdShellFile), L"EFI Internal Shell", LOAD_OPTION_ACTIVE
-    );
 }
 
 
@@ -558,6 +552,14 @@ PlatformBootManagerAfterConsole (
   // the QEMU configuration.
   //
   EfiBootManagerRefreshAllBootOption ();
+
+  //
+  // Register UEFI Shell
+  //
+  PlatformRegisterFvBootOption (
+    PcdGetPtr (PcdShellFile), L"EFI Internal Shell", LOAD_OPTION_ACTIVE
+    );
+
   SetBootOrderFromQemu ();
 }
 
