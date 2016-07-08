@@ -1,7 +1,7 @@
 /** @file
   Provides the Simple Network functions.
 
-  Copyright (c) 2011 - 2013, Intel Corporation
+  Copyright (c) 2011 - 2016, Intel Corporation
   All rights reserved. This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -233,7 +233,7 @@ SN_GetStatus (
 
   @retval EFI_SUCCESS           This operation was successful.
   @retval EFI_NOT_STARTED       The network interface was not started.
-  @retval EFI_OUT_OF_RESORUCES  There was not enough memory for the transmit and receive buffers
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory for the transmit and receive buffers
   @retval EFI_INVALID_PARAMETER pSimpleNetwork parameter was NULL or did not point to a valid
                                 EFI_SIMPLE_NETWORK_PROTOCOL structure.
   @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
