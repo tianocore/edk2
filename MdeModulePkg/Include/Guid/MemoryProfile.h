@@ -146,13 +146,12 @@ typedef struct {
   MEMORY_PROFILE_COMMON_HEADER  Header;
   PHYSICAL_ADDRESS              CallerAddress;
   UINT32                        SequenceId;
-  UINT8                         Reserved[4];
+  UINT8                         Reserved[2];
+  UINT16                        ActionStringOffset;
   MEMORY_PROFILE_ACTION         Action;
   EFI_MEMORY_TYPE               MemoryType;
   PHYSICAL_ADDRESS              Buffer;
   UINT64                        Size;
-  UINT16                        ActionStringOffset;
-  UINT8                         Reserved2[6];
 //CHAR8                         ActionString[];
 } MEMORY_PROFILE_ALLOC_INFO;
 
