@@ -45,8 +45,6 @@
 
 [Sources.X64]
   X64/DispatchExecute.c
-  X64/Thunk64To32.asm
-  X64/Thunk64To32.S
   X64/Thunk64To32.nasm
 
 ################################################################################
