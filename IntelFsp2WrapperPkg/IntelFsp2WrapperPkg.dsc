@@ -75,10 +75,17 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
 
 [Components.Ia32]
+  IntelFsp2WrapperPkg/Library/BaseFspWrapperApiTestLibNull/BaseFspWrapperApiTestLibNull.inf
+  IntelFsp2WrapperPkg/Library/SecFspWrapperPlatformSecLibSample/SecFspWrapperPlatformSecLibSample.inf
+  IntelFsp2WrapperPkg/Library/PeiFspWrapperHobProcessLibSample/PeiFspWrapperHobProcessLibSample.inf
+  IntelFsp2WrapperPkg/Library/PeiFspWrapperApiTestLib/PeiFspWrapperApiTestLib.inf
+
   IntelFsp2WrapperPkg/FspmWrapperPeim/FspmWrapperPeim.inf
   IntelFsp2WrapperPkg/FspsWrapperPeim/FspsWrapperPeim.inf
 
 [Components.IA32, Components.X64]
+  IntelFsp2WrapperPkg/Library/BaseFspWrapperApiLib/BaseFspWrapperApiLib.inf
+  IntelFsp2WrapperPkg/Library/BaseFspWrapperPlatformLibSample/BaseFspWrapperPlatformLibSample.inf
   IntelFsp2WrapperPkg/FspWrapperNotifyDxe/FspWrapperNotifyDxe.inf
 
 [PcdsFixedAtBuild.common]
