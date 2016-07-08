@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -17,9 +17,9 @@ Abstract:
 
   This implements a status code listener that logs status codes into the data
   hub.  This is only active during non-runtime DXE.
-  The status codes are recorded in a extensiable buffer, and a event is signalled 
+  The status codes are recorded in a extensible buffer, and a event is signalled
   to log them to the data hub. The recorder is the producer of the status code in
-  buffer and the event notify function the consummer.
+  buffer and the event notify function the consumer.
 
 --*/
 

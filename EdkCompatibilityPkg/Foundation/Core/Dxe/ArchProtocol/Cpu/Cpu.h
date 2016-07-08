@@ -1,6 +1,6 @@
 /*++ 
 
-Copyright (c) 2004, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -87,7 +87,7 @@ Returns:
 
   EFI_SUCCESS       -  The address range from Start to Start+Length was flushed from 
                        the processor's data cache.
-  EFI_UNSUPPORTEDT  -  The processor does not support the cache flush type specified 
+  EFI_UNSUPPORTED   -  The processor does not support the cache flush type specified
                        by FlushType.
   EFI_DEVICE_ERROR  -  The address range from Start to Start+Length could not be flushed 
                        from the processor's data cache.
