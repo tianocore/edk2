@@ -65,6 +65,8 @@
   IntelFsp2Pkg/Library/BaseFspDebugLibSerialPort/BaseFspDebugLibSerialPort.inf
   IntelFsp2Pkg/Library/BaseFspPlatformLib/BaseFspPlatformLib.inf
   IntelFsp2Pkg/Library/BaseFspSwitchStackLib/BaseFspSwitchStackLib.inf
+  IntelFsp2Pkg/Library/BaseDebugDeviceLibNull/BaseDebugDeviceLibNull.inf
+  IntelFsp2Pkg/Library/SecFspSecPlatformLibNull/SecFspSecPlatformLibNull.inf
 
   IntelFsp2Pkg/FspSecCore/FspSecCoreT.inf
   IntelFsp2Pkg/FspSecCore/FspSecCoreM.inf
