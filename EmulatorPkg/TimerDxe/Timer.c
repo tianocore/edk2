@@ -5,7 +5,7 @@
   timer service.  In the future, the Thread creation should possibly be
   abstracted by the CPU architectural protocol
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -276,7 +276,7 @@ Returns:
 
   EFI_SUCCESS       - The soft timer interrupt was generated.
 
-  EFI_UNSUPPORTEDT  - The platform does not support the generation of soft timer interrupts.
+  EFI_UNSUPPORTED   - The platform does not support the generation of soft timer interrupts.
 
 **/
 {
