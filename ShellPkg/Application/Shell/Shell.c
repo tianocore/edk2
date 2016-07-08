@@ -1319,7 +1319,7 @@ DoShellPrompt (
 **/
 VOID*
 EFIAPI
-AddBufferToFreeList(
+AddBufferToFreeList (
   VOID *Buffer
   )
 {
@@ -1329,10 +1329,13 @@ AddBufferToFreeList(
     return (NULL);
   }
 
-  BufferListEntry = AllocateZeroPool(sizeof(BUFFER_LIST));
-  ASSERT(BufferListEntry != NULL);
+  BufferListEntry = AllocateZeroPool (sizeof (BUFFER_LIST));
+  if (BufferListEntry == NULL) {
+    return NULL;
+  }
+
   BufferListEntry->Buffer = Buffer;
-  InsertTailList(&ShellInfoObject.BufferToFreeList.Link, &BufferListEntry->Link);
+  InsertTailList (&ShellInfoObject.BufferToFreeList.Link, &BufferListEntry->Link);
   return (Buffer);
 }
 
@@ -1391,9 +1394,15 @@ AddLineToCommandHistory(
 
 
   Node = AllocateZeroPool(sizeof(BUFFER_LIST));
-  ASSERT(Node != NULL);
-  Node->Buffer = AllocateCopyPool(StrSize(Buffer), Buffer);
-  ASSERT(Node->Buffer != NULL);
+  if (Node == NULL) {
+    return;
+  }
+
+  Node->Buffer = AllocateCopyPool (StrSize (Buffer), Buffer);
+  if (Node->Buffer == NULL) {
+    FreePool (Node);
+    return;
+  }
 
   for ( Walker = (BUFFER_LIST*)GetFirstNode(&ShellInfoObject.ViewingSettings.CommandHistory.Link)
       ; !IsNull(&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Walker->Link)
@@ -1721,7 +1730,9 @@ RunSplitCommand(
   // make a SPLIT_LIST item and add to list
   //
   Split = AllocateZeroPool(sizeof(SPLIT_LIST));
-  ASSERT(Split != NULL);
+  if (Split == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   Split->SplitStdIn   = StdIn;
   Split->SplitStdOut  = ConvertEfiFileProtocolToShellHandle(CreateFileInterfaceMem(Unicode), NULL);
   ASSERT(Split->SplitStdOut != NULL);
