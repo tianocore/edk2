@@ -736,6 +736,7 @@ UpdateStdInStdOutStdErr(
   UINTN             Size;
   SPLIT_LIST        *Split;
   CHAR16            *FirstLocation;
+  BOOLEAN           Volatile;
 
   OutUnicode      = TRUE;
   InUnicode       = TRUE;
@@ -1111,8 +1112,8 @@ UpdateStdInStdOutStdErr(
       //
       // Check for no volatile environment variables
       //
-      ||(StdErrVarName  != NULL && !IsVolatileEnv(StdErrVarName))
-      ||(StdOutVarName  != NULL && !IsVolatileEnv(StdOutVarName))
+      ||(StdErrVarName  != NULL && !EFI_ERROR (IsVolatileEnv (StdErrVarName, &Volatile)) && !Volatile)
+      ||(StdOutVarName  != NULL && !EFI_ERROR (IsVolatileEnv (StdOutVarName, &Volatile)) && !Volatile)
       //
       // Cant redirect during a reconnect operation.
       //
