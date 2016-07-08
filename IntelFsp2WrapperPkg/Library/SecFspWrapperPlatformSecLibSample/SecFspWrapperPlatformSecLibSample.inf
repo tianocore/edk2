@@ -46,13 +46,7 @@
   PlatformInit.c
 
 [Sources.IA32]
-  Ia32/SecEntry.asm
-  Ia32/PeiCoreEntry.asm
-  Ia32/Stack.asm
   Ia32/Fsp.h
-  Ia32/SecEntry.S
-  Ia32/PeiCoreEntry.S
-  Ia32/Stack.S
   Ia32/SecEntry.nasm
   Ia32/PeiCoreEntry.nasm
   Ia32/Stack.nasm
