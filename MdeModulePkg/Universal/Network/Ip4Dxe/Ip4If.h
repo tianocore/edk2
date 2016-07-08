@@ -1,7 +1,7 @@
 /** @file
   Definition for IP4 pesudo interface structure.
   
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -144,7 +144,7 @@ struct _IP4_INTERFACE {
 
   //
   // IP address and subnet mask of the interface. It also contains
-  // the subnet/net broadcast address for quick access. The fileds
+  // the subnet/net broadcast address for quick access. The fields
   // are invalid if (Configured == FALSE)
   //
   IP4_ADDR                      Ip;

@@ -1,7 +1,7 @@
 /** @file
   TCP output process routines.
     
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -486,7 +486,7 @@ TcpGetSegmentSndQue (
 
   //
   // If SYN is set and out of the range, clear the flag.
-  // Becuase the sequence of the first byte is SEG.SEQ+1,
+  // Because the sequence of the first byte is SEG.SEQ+1,
   // adjust Offset by -1. If SYN is in the range, copy
   // one byte less.
   //

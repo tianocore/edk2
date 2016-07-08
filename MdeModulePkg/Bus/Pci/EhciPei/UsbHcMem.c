@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -462,7 +462,7 @@ UsbHcFreeMem (
       Bit   = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) % 8;
 
       //
-      // reset associated bits in bit arry
+      // reset associated bits in bit array
       //
       for (Count = 0; Count < (AllocSize / USBHC_MEM_UNIT); Count++) {
         ASSERT (USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));

@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -428,7 +428,7 @@ MnpDriverBindingStop (
 
   @retval EFI_SUCCES                 The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER      ChildHandle is NULL.
-  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to
+  @retval EFI_OUT_OF_RESOURCES       There are not enough resources available to
                                      create the child.
   @retval Others                     The child handle was not created.
 

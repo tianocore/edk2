@@ -1,7 +1,7 @@
 /** @file
   Core image handling services to load and unload PeImage.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -258,11 +258,11 @@ CoreReadImageFile (
   return EFI_SUCCESS;
 }
 /**
-  To check memory usage bit map arry to figure out if the memory range the image will be loaded in is available or not. If 
-  memory range is avaliable, the function will mark the correponding bits to 1 which indicates the memory range is used.
+  To check memory usage bit map array to figure out if the memory range the image will be loaded in is available or not. If
+  memory range is available, the function will mark the corresponding bits to 1 which indicates the memory range is used.
   The function is only invoked when load modules at fixed address feature is enabled. 
   
-  @param  ImageBase                The base addres the image will be loaded at.
+  @param  ImageBase                The base address the image will be loaded at.
   @param  ImageSize                The size of the image
   
   @retval EFI_SUCCESS              The memory range the image will be loaded in is available
@@ -332,13 +332,13 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
 }
 /**
 
-  Get the fixed loadding address from image header assigned by build tool. This function only be called
+  Get the fixed loading address from image header assigned by build tool. This function only be called
   when Loading module at Fixed address feature enabled.
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.
   @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
-  @retval EFI_NOT_FOUND             The image has no assigned fixed loadding address.
+  @retval EFI_NOT_FOUND             The image has no assigned fixed loading address.
 
 **/
 EFI_STATUS
@@ -400,7 +400,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
        // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header
        // that doesn't point to code section in image header, as well as ImageBase field of image header. And there is an 
        // assumption that when the feature is enabled, if a module is assigned a loading address by tools, PointerToRelocations  
-       // & PointerToLineNumbers fields should NOT be Zero, or else, these 2 fileds should be set to Zero
+       // & PointerToLineNumbers fields should NOT be Zero, or else, these 2 fields should be set to Zero
        //
        ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
        if (ValueInSectionHeader != 0) {
@@ -413,7 +413,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
          	 ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)(INTN)ImageContext->ImageAddress;
          }
          //
-         // Check if the memory range is avaliable.
+         // Check if the memory range is available.
          //
          Status = CheckAndMarkFixLoadingMemoryUsageBitMap (ImageContext->ImageAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
        }

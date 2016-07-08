@@ -522,7 +522,7 @@ PciHostBridgeResourceAllocator (
       }
 
       //
-      // Based on the all the resource tree, contruct ACPI resource node to
+      // Based on the all the resource tree, construct ACPI resource node to
       // submit the resource aperture to pci host bridge protocol
       //
       Status = ConstructAcpiResourceRequestor (

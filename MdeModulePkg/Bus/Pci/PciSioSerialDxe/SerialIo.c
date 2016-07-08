@@ -286,7 +286,7 @@ SerialFifoRemove (
 }
 
 /**
-  Reads and writes all avaliable data.
+  Reads and writes all available data.
 
   @param SerialDevice           The device to transmit.
 

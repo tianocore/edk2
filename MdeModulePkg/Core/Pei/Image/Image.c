@@ -139,12 +139,12 @@ GetImageReadFunction (
   return EFI_SUCCESS;
 }
 /**
-  To check memory usage bit map arry to figure out if the memory range the image will be loaded in is available or not. If 
-  memory range is avaliable, the function will mark the correponding bits to 1 which indicates the memory range is used.
+  To check memory usage bit map array to figure out if the memory range the image will be loaded in is available or not. If
+  memory range is available, the function will mark the corresponding bits to 1 which indicates the memory range is used.
   The function is only invoked when load modules at fixed address feature is enabled. 
   
   @param  Private                  Pointer to the private data passed in from caller
-  @param  ImageBase                The base addres the image will be loaded at.
+  @param  ImageBase                The base address the image will be loaded at.
   @param  ImageSize                The size of the image
   
   @retval EFI_SUCCESS              The memory range the image will be loaded in is available
@@ -207,7 +207,7 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
 }
 /**
 
-  Get the fixed loadding address from image header assigned by build tool. This function only be called
+  Get the fixed loading address from image header assigned by build tool. This function only be called
   when Loading module at Fixed address feature enabled.
 
   @param ImageContext              Pointer to the image context structure that describes the PE/COFF
@@ -215,7 +215,7 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
   @param Private                    Pointer to the private data passed in from caller
 
   @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
-  @retval EFI_NOT_FOUND             The image has no assigned fixed loadding address.
+  @retval EFI_NOT_FOUND             The image has no assigned fixed loading address.
 
 **/
 EFI_STATUS
@@ -228,14 +228,14 @@ GetPeCoffImageFixLoadingAssignedAddress(
    EFI_STATUS                         Status;
    EFI_IMAGE_SECTION_HEADER           SectionHeader;
    EFI_IMAGE_OPTIONAL_HEADER_UNION    *ImgHdr;
-   EFI_PHYSICAL_ADDRESS               FixLoaddingAddress;
+   EFI_PHYSICAL_ADDRESS               FixLoadingAddress;
    UINT16                             Index;
    UINTN                              Size;
    UINT16                             NumberOfSections;
    UINT64                             ValueInSectionHeader;
  
 
-   FixLoaddingAddress = 0;
+   FixLoadingAddress = 0;
    Status = EFI_NOT_FOUND;
 
    //
@@ -244,7 +244,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
    ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
    if (ImageContext->IsTeImage) {
      //
-     // for TE image, the fix loadding address is saved in first section header that doesn't point
+     // for TE image, the fix loading address is saved in first section header that doesn't point
      // to code section.
      //
      SectionHeaderOffset = sizeof (EFI_TE_IMAGE_HEADER);
@@ -286,7 +286,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
        // for XIP PEIM, ImageBase field holds the image base address running on the Flash. And PointerToRelocations & PointerToLineNumbers
        // hold the image base address when it is shadow to the memory. And there is an assumption that when the feature is enabled, if a
        // module is assigned a loading address by tools, PointerToRelocations & PointerToLineNumbers fields should NOT be Zero, or
-       // else, these 2 fileds should be set to Zero
+       // else, these 2 fields should be set to Zero
        //
        ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
        if (ValueInSectionHeader != 0) {
@@ -296,32 +296,32 @@ GetPeCoffImageFixLoadingAssignedAddress(
          if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) > 0) {
            //
            // When LMFA feature is configured as Load Module at Fixed Absolute Address mode, PointerToRelocations & PointerToLineNumbers field
-           // hold the absolute address of image base runing in memory
+           // hold the absolute address of image base running in memory
            //
-           FixLoaddingAddress = ValueInSectionHeader;
+           FixLoadingAddress = ValueInSectionHeader;
          } else {
            //
            // When LMFA feature is configured as Load Module at Fixed offset mode, PointerToRelocations & PointerToLineNumbers field
            // hold the offset relative to a platform-specific top address.
            //
-           FixLoaddingAddress = (EFI_PHYSICAL_ADDRESS)(Private->LoadModuleAtFixAddressTopAddress + (INT64)ValueInSectionHeader);
+           FixLoadingAddress = (EFI_PHYSICAL_ADDRESS)(Private->LoadModuleAtFixAddressTopAddress + (INT64)ValueInSectionHeader);
          }
          //
-         // Check if the memory range is avaliable.
+         // Check if the memory range is available.
          //
-         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (Private, FixLoaddingAddress, (UINT32) ImageContext->ImageSize);
+         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (Private, FixLoadingAddress, (UINT32) ImageContext->ImageSize);
          if (!EFI_ERROR(Status)) {
            //
-           // The assigned address is valid. Return the specified loadding address
+           // The assigned address is valid. Return the specified loading address
            //
-           ImageContext->ImageAddress = FixLoaddingAddress;
+           ImageContext->ImageAddress = FixLoadingAddress;
          }
        }
        break;
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status= %r \n", (VOID *)(UINTN)FixLoaddingAddress, Status));
+   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status= %r \n", (VOID *)(UINTN)FixLoadingAddress, Status));
    return Status;
 }
 /**

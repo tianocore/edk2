@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -2516,7 +2516,7 @@ ConSplitterGetIntersectionBetweenConOutAndStrErr (
 
   //
   // Find the intersection of the two set of modes. If they actually intersect, the
-  // correponding entry in the map table is set to 1.
+  // corresponding entry in the map table is set to 1.
   //
   Mode = 0;
   while (Mode < ConOutMaxMode) {

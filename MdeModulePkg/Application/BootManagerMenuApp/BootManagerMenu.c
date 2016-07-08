@@ -1,7 +1,7 @@
 /** @file
   The application to show the Boot Manager Menu.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -738,7 +738,7 @@ BdsSetConsoleMode (
 
   if (IsSetupMode) {
     //
-    // The requried resolution and text mode is setup mode.
+    // The required resolution and text mode is setup mode.
     //
     NewHorizontalResolution = mSetupHorizontalResolution;
     NewVerticalResolution   = mSetupVerticalResolution;
@@ -794,7 +794,7 @@ BdsSetConsoleMode (
             return EFI_SUCCESS;
           } else {
             //
-            // If current text mode is different from requried text mode.  Set new video mode
+            // If current text mode is different from required text mode.  Set new video mode
             //
             for (Index = 0; Index < MaxTextMode; Index++) {
               Status = SimpleTextOut->QueryMode (SimpleTextOut, Index, &CurrentColumn, &CurrentRow);
@@ -819,7 +819,7 @@ BdsSetConsoleMode (
             }
             if (Index == MaxTextMode) {
               //
-              // If requried text mode is not supported, return error.
+              // If required text mode is not supported, return error.
               //
               FreePool (Info);
               return EFI_UNSUPPORTED;

@@ -2,7 +2,7 @@
 
   Routine procedures for memory allocate/free.
 
-Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -534,7 +534,7 @@ UsbHcFreeMem (
       Bit   = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) % 8;
 
       //
-      // reset associated bits in bit arry
+      // reset associated bits in bit array
       //
       for (Count = 0; Count < (AllocSize / USBHC_MEM_UNIT); Count++) {
         ASSERT (USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));

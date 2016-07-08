@@ -2430,7 +2430,7 @@ OpenSectionStream (
                                 non-null on input, then the buffer is caller
                                 allocated.  If Buffer is NULL, then the buffer
                                 is callee allocated.  In either case, the
-                                requried buffer size is returned in *BufferSize.
+                                required buffer size is returned in *BufferSize.
   @param  BufferSize            On input, indicates the size of *Buffer if
                                 *Buffer is non-null on input.  On output,
                                 indicates the required size (allocated size if

@@ -883,7 +883,7 @@ MnpReceivePacket (
 
     if (MnpDeviceData->RxNbufCache == NULL) {
       //
-      // No availabe buffer in the buffer pool.
+      // No available buffer in the buffer pool.
       //
       return EFI_DEVICE_ERROR;
     }

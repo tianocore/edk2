@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -424,7 +424,7 @@ EmmcPeimFreeMem (
       Bit   = ((ToFree - Block->Buf) / EMMC_PEIM_MEM_UNIT) % 8;
 
       //
-      // reset associated bits in bit arry
+      // reset associated bits in bit array
       //
       for (Count = 0; Count < (AllocSize / EMMC_PEIM_MEM_UNIT); Count++) {
         ASSERT (EMMC_PEIM_MEM_BIT_IS_SET (Block->Bits[Byte], Bit));

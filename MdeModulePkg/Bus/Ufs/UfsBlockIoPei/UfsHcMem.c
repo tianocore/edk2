@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -424,7 +424,7 @@ UfsPeimFreeMem (
       Bit   = ((ToFree - Block->Buf) / UFS_PEIM_MEM_UNIT) % 8;
 
       //
-      // reset associated bits in bit arry
+      // reset associated bits in bit array
       //
       for (Count = 0; Count < (AllocSize / UFS_PEIM_MEM_UNIT); Count++) {
         ASSERT (UFS_PEIM_MEM_BIT_IS_SET (Block->Bits[Byte], Bit));

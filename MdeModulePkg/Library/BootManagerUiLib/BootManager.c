@@ -143,7 +143,7 @@ BmSetConsoleMode (
 
   if (IsSetupMode) {
     //
-    // The requried resolution and text mode is setup mode.
+    // The required resolution and text mode is setup mode.
     //
     NewHorizontalResolution = mBmSetupHorizontalResolution;
     NewVerticalResolution   = mBmSetupVerticalResolution;
@@ -199,7 +199,7 @@ BmSetConsoleMode (
             return EFI_SUCCESS;
           } else {
             //
-            // If current text mode is different from requried text mode.  Set new video mode
+            // If current text mode is different from required text mode.  Set new video mode
             //
             for (Index = 0; Index < MaxTextMode; Index++) {
               Status = SimpleTextOut->QueryMode (SimpleTextOut, Index, &CurrentColumn, &CurrentRow);
@@ -224,7 +224,7 @@ BmSetConsoleMode (
             }
             if (Index == MaxTextMode) {
               //
-              // If requried text mode is not supported, return error.
+              // If required text mode is not supported, return error.
               //
               FreePool (Info);
               return EFI_UNSUPPORTED;

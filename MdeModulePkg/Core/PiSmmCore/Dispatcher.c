@@ -28,7 +28,7 @@
   Depex - Dependency Expresion.
 
   Copyright (c) 2014, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -126,17 +126,17 @@ EFI_SECURITY2_ARCH_PROTOCOL *mSecurity2 = NULL;
 
 //
 // The global variable is defined for Loading modules at fixed address feature to track the SMM code
-// memory range usage. It is a bit mapped array in which every bit indicates the correspoding 
+// memory range usage. It is a bit mapped array in which every bit indicates the corresponding
 // memory page available or not. 
 //
 GLOBAL_REMOVE_IF_UNREFERENCED    UINT64                *mSmmCodeMemoryRangeUsageBitMap=NULL;
 
 /**
-  To check memory usage bit map array to figure out if the memory range in which the image will be loaded is available or not. If 
-  memory range is avaliable, the function will mark the correponding bits to 1 which indicates the memory range is used.
+  To check memory usage bit map array to figure out if the memory range in which the image will be loaded is available or not. If
+  memory range is available, the function will mark the corresponding bits to 1 which indicates the memory range is used.
   The function is only invoked when load modules at fixed address feature is enabled. 
   
-  @param  ImageBase                The base addres the image will be loaded at.
+  @param  ImageBase                The base address the image will be loaded at.
   @param  ImageSize                The size of the image
   
   @retval EFI_SUCCESS              The memory range the image will be loaded in is available
@@ -203,13 +203,13 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
    return  EFI_SUCCESS;   
 }
 /**
-  Get the fixed loadding address from image header assigned by build tool. This function only be called 
+  Get the fixed loading address from image header assigned by build tool. This function only be called
   when Loading module at Fixed address feature enabled.
   
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.
   @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
-  @retval EFI_NOT_FOUND             The image has no assigned fixed loadding address.
+  @retval EFI_NOT_FOUND             The image has no assigned fixed loading address.
 
 **/
 EFI_STATUS
@@ -217,82 +217,82 @@ GetPeCoffImageFixLoadingAssignedAddress(
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-	 UINTN                              SectionHeaderOffset;
-	 EFI_STATUS                         Status;
-	 EFI_IMAGE_SECTION_HEADER           SectionHeader;
-	 EFI_IMAGE_OPTIONAL_HEADER_UNION    *ImgHdr;
-	 EFI_PHYSICAL_ADDRESS               FixLoaddingAddress;
-	 UINT16                             Index;
-	 UINTN                              Size; 
-	 UINT16                             NumberOfSections;
-	 UINT64                             ValueInSectionHeader;
-	 
-	 FixLoaddingAddress = 0;
-	 Status = EFI_NOT_FOUND;
-	
-	 //
-   // Get PeHeader pointer
-   //
-   ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
-	 SectionHeaderOffset = (UINTN)(
+  UINTN                              SectionHeaderOffset;
+  EFI_STATUS                         Status;
+  EFI_IMAGE_SECTION_HEADER           SectionHeader;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION    *ImgHdr;
+  EFI_PHYSICAL_ADDRESS               FixLoadingAddress;
+  UINT16                             Index;
+  UINTN                              Size;
+  UINT16                             NumberOfSections;
+  UINT64                             ValueInSectionHeader;
+
+  FixLoadingAddress = 0;
+  Status = EFI_NOT_FOUND;
+
+  //
+  // Get PeHeader pointer
+  //
+  ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
+  SectionHeaderOffset = (UINTN)(
                                  ImageContext->PeCoffHeaderOffset +
                                  sizeof (UINT32) +
                                  sizeof (EFI_IMAGE_FILE_HEADER) +
                                  ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
                                  );
-   NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
-     
-   //
-   // Get base address from the first section header that doesn't point to code section.
-   //
-   for (Index = 0; Index < NumberOfSections; Index++) {
-     //
-     // Read section header from file
-     //
-     Size = sizeof (EFI_IMAGE_SECTION_HEADER);
-     Status = ImageContext->ImageRead (
+  NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
+
+  //
+  // Get base address from the first section header that doesn't point to code section.
+  //
+  for (Index = 0; Index < NumberOfSections; Index++) {
+    //
+    // Read section header from file
+    //
+    Size = sizeof (EFI_IMAGE_SECTION_HEADER);
+    Status = ImageContext->ImageRead (
                               ImageContext->Handle,
                               SectionHeaderOffset,
                               &Size,
                               &SectionHeader
                               );
-     if (EFI_ERROR (Status)) {
-       return Status;
-     }
-     
-     Status = EFI_NOT_FOUND;
-     
-     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
-       //
-       // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header 
-       // that doesn't point to code section in image header.So there is an assumption that when the feature is enabled,
-       // if a module with a loading address assigned by tools, the PointerToRelocations & PointerToLineNumbers fields
-       // should not be Zero, or else, these 2 fileds should be set to Zero
-       //
-       ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
-       if (ValueInSectionHeader != 0) {
-         //
-         // Found first section header that doesn't point to code section in which uild tool saves the
-         // offset to SMRAM base as image base in PointerToRelocations & PointerToLineNumbers fields
-         //      
-         FixLoaddingAddress = (EFI_PHYSICAL_ADDRESS)(gLoadModuleAtFixAddressSmramBase + (INT64)ValueInSectionHeader);
-         //
-         // Check if the memory range is avaliable.
-         //
-         Status = CheckAndMarkFixLoadingMemoryUsageBitMap (FixLoaddingAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
-         if (!EFI_ERROR(Status)) {
-           //
-           // The assigned address is valid. Return the specified loadding address
-           //
-           ImageContext->ImageAddress = FixLoaddingAddress;
-         }
-       }
-       break;     
-     }
-     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);     
-   }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r\n", FixLoaddingAddress, Status));
-   return Status;
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = EFI_NOT_FOUND;
+
+    if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
+      //
+      // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header
+      // that doesn't point to code section in image header.So there is an assumption that when the feature is enabled,
+      // if a module with a loading address assigned by tools, the PointerToRelocations & PointerToLineNumbers fields
+      // should not be Zero, or else, these 2 fields should be set to Zero
+      //
+      ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
+      if (ValueInSectionHeader != 0) {
+        //
+        // Found first section header that doesn't point to code section in which build tool saves the
+        // offset to SMRAM base as image base in PointerToRelocations & PointerToLineNumbers fields
+        //
+        FixLoadingAddress = (EFI_PHYSICAL_ADDRESS)(gLoadModuleAtFixAddressSmramBase + (INT64)ValueInSectionHeader);
+        //
+        // Check if the memory range is available.
+        //
+        Status = CheckAndMarkFixLoadingMemoryUsageBitMap (FixLoadingAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
+        if (!EFI_ERROR(Status)) {
+          //
+          // The assigned address is valid. Return the specified loading address
+          //
+          ImageContext->ImageAddress = FixLoadingAddress;
+        }
+      }
+      break;
+    }
+    SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
+  }
+  DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r\n", FixLoadingAddress, Status));
+  return Status;
 }
 /**
   Loads an EFI image into SMRAM.

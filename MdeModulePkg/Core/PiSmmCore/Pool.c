@@ -47,7 +47,7 @@ SmmInitializeMemoryServices (
   }
   CurrentSmramRangesIndex = 0;
   //
-  // If Loadding Module At fixed Address feature is enabled, cache the SMRAM base here
+  // If Loading Module At fixed Address feature is enabled, cache the SMRAM base here
   //
   if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
     //
