@@ -199,10 +199,10 @@ Udp6DeliverDgram (
   );
 
 /**
-  This function demultiplexes the received udp datagram to the apropriate instances.
+  This function demultiplexes the received udp datagram to the appropriate instances.
 
   @param[in]  Udp6Service        Pointer to the udp service context data.
-  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA abstrated from
+  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA abstracted from
                                  the received datagram.
   @param[in]  Packet             Pointer to the buffer containing the received udp
                                  datagram.
@@ -1579,7 +1579,7 @@ Udp6DeliverDgram (
   This function demultiplexes the received udp datagram to the appropriate instances.
 
   @param[in]  Udp6Service        Pointer to the udp service context data.
-  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA abstrated from
+  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA abstracted from
                                  the received datagram.
   @param[in]  Packet             Pointer to the buffer containing the received udp
                                  datagram.
