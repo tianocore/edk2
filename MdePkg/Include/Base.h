@@ -1146,7 +1146,7 @@ typedef UINTN RETURN_STATUS;
 #if defined(_MSC_EXTENSIONS) && !defined (__INTEL_COMPILER) && !defined (MDE_CPU_EBC)
   #pragma intrinsic(_ReturnAddress)
   /**
-    Get the return address of the calling funcation.
+    Get the return address of the calling function.
 
     Based on intrinsic function _ReturnAddress that provides the address of
     the instruction in the calling function that will be executed after
@@ -1154,27 +1154,27 @@ typedef UINTN RETURN_STATUS;
 
     @param L    Return Level.
 
-    @return The return address of the calling funcation or 0 if L != 0.
+    @return The return address of the calling function or 0 if L != 0.
 
   **/
   #define RETURN_ADDRESS(L)     ((L == 0) ? _ReturnAddress() : (VOID *) 0)
 #elif defined(__GNUC__)
   void * __builtin_return_address (unsigned int level);
   /**
-    Get the return address of the calling funcation.
+    Get the return address of the calling function.
 
     Based on built-in Function __builtin_return_address that returns
     the return address of the current function, or of one of its callers.
 
     @param L    Return Level.
 
-    @return The return address of the calling funcation.
+    @return The return address of the calling function.
 
   **/
   #define RETURN_ADDRESS(L)     __builtin_return_address (L)
 #else
   /**
-    Get the return address of the calling funcation.
+    Get the return address of the calling function.
 
     @param L    Return Level.
 
