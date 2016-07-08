@@ -1007,9 +1007,6 @@ NvmePassThru (
     Sq->Payload.Raw.Cdw15 = Packet->NvmeCmd->Cdw15;
   }
 
-#if (EN_NVME_VERBOSE_DBINFO == ON)
-  //DumpMem (Sq, sizeof (NVME_SQ));
-#endif
   ///
   /// Ring the submission queue doorbell.
   ///
@@ -1383,9 +1380,6 @@ NvmeSecuritySendReceive (
   // Actions for sending security command
   //
   if (SendCommand) {
-#if (EN_NVME_VERBOSE_DBINFO == ON)
-    //DumpMem (TransferBuffer, TransferLength);
-#endif
     CopyMem (SecBuff, TransferBuffer, TransferLength);
   }
 
@@ -1427,9 +1421,6 @@ NvmeSecuritySendReceive (
   //
   if (!SendCommand) {
     CopyMem (TransferBuffer, SecBuff, TransferLength);
-#if (EN_NVME_VERBOSE_DBINFO == ON)
-    //DumpMem (TransferBuffer, TransferLength);
-#endif
   }
 
   return Status;
