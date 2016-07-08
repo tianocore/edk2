@@ -29,8 +29,6 @@
 
 [Sources.Ia32]
   Ia32/FspDebug.nasm
-  Ia32/FspDebug.asm
-  Ia32/FspDebug.s
 
 [Packages]
   MdePkg/MdePkg.dec
