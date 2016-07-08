@@ -72,6 +72,7 @@
   gEfiS3SaveStateProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
   gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
   gEfiXenInfoGuid
