@@ -1,7 +1,7 @@
 /** @file
   This is service binding for Hash driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -30,7 +30,7 @@ EFI_SERVICE_BINDING_PROTOCOL    mHash2ServiceBindingProtocol = {
 
   @retval EFI_SUCCES                 The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER      ChildHandle is NULL.
-  @retval EFI_OUT_OF_RESOURCES       There are not enough resources availabe to
+  @retval EFI_OUT_OF_RESOURCES       There are not enough resources available to
                                      create the child.
   @retval Others                     The child handle was not created.
 
