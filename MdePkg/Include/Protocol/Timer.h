@@ -3,7 +3,7 @@
 
   This code is used to provide the timer tick for the DXE core.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -150,7 +150,7 @@ EFI_STATUS
   @param  This                  The EFI_TIMER_ARCH_PROTOCOL instance.
 
   @retval EFI_SUCCESS           The soft timer interrupt was generated.
-  @retval EFI_UNSUPPORTEDT      The platform does not support the generation of soft timer interrupts.
+  @retval EFI_UNSUPPORTED       The platform does not support the generation of soft timer interrupts.
 
 **/
 typedef 
