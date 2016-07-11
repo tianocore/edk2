@@ -1942,7 +1942,7 @@ class FdfParser:
             raise Warning("expected FV name", self.FileName, self.CurrentLineNumber)
 
         RegionObj.RegionType = "FV"
-        RegionObj.RegionDataList.append(self.__Token)
+        RegionObj.RegionDataList.append((self.__Token).upper())
 
         while self.__IsKeyword( "FV"):
 
@@ -1952,7 +1952,7 @@ class FdfParser:
             if not self.__GetNextToken():
                 raise Warning("expected FV name", self.FileName, self.CurrentLineNumber)
 
-            RegionObj.RegionDataList.append(self.__Token)
+            RegionObj.RegionDataList.append((self.__Token).upper())
 
     ## __GetRegionCapType() method
     #
