@@ -39,6 +39,25 @@ class Region(RegionClassObject):
         RegionClassObject.__init__(self)
 
 
+    ## PadBuffer()
+    #
+    #   Add padding bytes to the Buffer
+    #
+    #   @param Buffer         The buffer the generated region data will be put
+    #                         in
+    #   @param ErasePolarity  Flash erase polarity
+    #   @param Size           Number of padding bytes requested
+    #
+
+    def PadBuffer(self, Buffer, ErasePolarity, Size):
+        if Size > 0:
+            if (ErasePolarity == '1') :
+                PadData = 0xFF
+            else:
+                PadData = 0
+            for i in range(0, Size):
+                Buffer.write(pack('B', PadData))
+
     ## AddToBuffer()
     #
     #   Add region data to the Buffer
@@ -135,13 +154,7 @@ class Region(RegionClassObject):
             #
             # Pad the left buffer
             #
-            if Size > 0:
-                if (ErasePolarity == '1') :
-                    PadData = 0xFF
-                else :
-                    PadData = 0
-                for i in range(0, Size):
-                    Buffer.write(pack('B', PadData))
+            self.PadBuffer(Buffer, ErasePolarity, Size)
 
         if self.RegionType == 'CAPSULE':
             #
@@ -194,13 +207,7 @@ class Region(RegionClassObject):
             #
             # Pad the left buffer
             #
-            if Size > 0:
-                if (ErasePolarity == '1') :
-                    PadData = 0xFF
-                else :
-                    PadData = 0
-                for i in range(0, Size):
-                    Buffer.write(pack('B', PadData))
+            self.PadBuffer(Buffer, ErasePolarity, Size)
 
         if self.RegionType in ('FILE', 'INF'):
             for RegionData in self.RegionDataList:
@@ -232,13 +239,7 @@ class Region(RegionClassObject):
             #
             # Pad the left buffer
             #
-            if Size > 0:
-                if (ErasePolarity == '1') :
-                    PadData = 0xFF
-                else :
-                    PadData = 0
-                for i in range(0, Size):
-                    Buffer.write(pack('B', PadData))
+            self.PadBuffer(Buffer, ErasePolarity, Size)
 
         if self.RegionType == 'DATA' :
             GenFdsGlobalVariable.InfLogger('   Region Name = DATA')
@@ -255,22 +256,11 @@ class Region(RegionClassObject):
             #
             # Pad the left buffer
             #
-            if Size > 0:
-                if (ErasePolarity == '1') :
-                    PadData = 0xFF
-                else :
-                    PadData = 0
-                for i in range(0, Size):
-                    Buffer.write(pack('B', PadData))
+            self.PadBuffer(Buffer, ErasePolarity, Size)
 
         if self.RegionType == None:
             GenFdsGlobalVariable.InfLogger('   Region Name = None')
-            if (ErasePolarity == '1') :
-                PadData = 0xFF
-            else :
-                PadData = 0
-            for i in range(0, Size):
-                Buffer.write(pack('B', PadData))
+            self.PadBuffer(Buffer, ErasePolarity, Size)
 
     def GetFvAlignValue(self, Str):
         AlignValue = 1
