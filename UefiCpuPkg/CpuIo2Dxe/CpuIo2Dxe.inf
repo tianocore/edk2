@@ -1,7 +1,7 @@
 ## @file
 #  Produces the CPU I/O 2 Protocol by using the services of the I/O Library.
 #
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -33,14 +33,12 @@
   IoFifo.h
   
 [Sources.IA32]
-  Ia32/IoFifo.nasm | GCC
-  Ia32/IoFifo.asm  | MSFT
-  Ia32/IoFifo.asm  | INTEL
+  Ia32/IoFifo.nasm
+  Ia32/IoFifo.asm
 
 [Sources.X64]
-  X64/IoFifo.nasm  | GCC
-  X64/IoFifo.asm   | MSFT
-  X64/IoFifo.asm   | INTEL
+  X64/IoFifo.nasm
+  X64/IoFifo.asm
 
 [Packages]
   MdePkg/MdePkg.dec
