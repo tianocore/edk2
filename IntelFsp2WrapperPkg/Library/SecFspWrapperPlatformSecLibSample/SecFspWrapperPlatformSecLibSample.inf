@@ -23,7 +23,7 @@
   FILE_GUID                      = 8F1AC44A-CE7E-4E29-95BB-92E321BB1573
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = FspWrapperPlatformSecLib
+  LIBRARY_CLASS                  = PlatformSecLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -68,6 +68,8 @@
 [LibraryClasses]
   LocalApicLib
   SerialPortLib
+  DebugLib
+  BaseMemoryLib
 
 [Ppis]
   gEfiSecPlatformInformationPpiGuid       ## CONSUMES

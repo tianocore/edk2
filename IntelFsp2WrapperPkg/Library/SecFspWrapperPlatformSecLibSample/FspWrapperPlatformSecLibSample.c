@@ -18,6 +18,8 @@
 #include <Ppi/SecPerformance.h>
 
 #include <Library/LocalApicLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
 
 /**
   This interface conveys state information out of the Security (SEC) phase into PEI.
