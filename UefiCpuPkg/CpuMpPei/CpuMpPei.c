@@ -455,6 +455,8 @@ WakeUpAP (
   ExchangeInfo->PmodeOffset        = PeiCpuMpData->AddressMap.PModeEntryOffset;
   ExchangeInfo->LmodeOffset        = PeiCpuMpData->AddressMap.LModeEntryOffset;
   ExchangeInfo->Cr3                = AsmReadCr3 ();
+  ExchangeInfo->CodeSegment        = AsmReadCs ();
+  ExchangeInfo->DataSegment        = AsmReadDs ();
   ExchangeInfo->CFunction          = (UINTN) ApCFunction;
   ExchangeInfo->NumApsExecuting    = 0;
   ExchangeInfo->PeiCpuMpData       = PeiCpuMpData;

@@ -119,6 +119,8 @@ typedef struct {
   UINTN                 BufferStart;
   UINTN                 PmodeOffset;
   UINTN                 NumApsExecuting;
+  UINTN                 CodeSegment;
+  UINTN                 DataSegment;
   UINTN                 LmodeOffset;
   UINTN                 Cr3;
   PEI_CPU_MP_DATA       *PeiCpuMpData;
