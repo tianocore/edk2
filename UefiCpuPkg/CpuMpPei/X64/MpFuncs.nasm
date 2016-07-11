@@ -280,30 +280,3 @@ OtherLoaded:
     pop        rax
 
     ret
-
-global ASM_PFX(AsmInitializeGdt)
-ASM_PFX(AsmInitializeGdt):
-    push       rbp
-    mov        rbp, rsp
-
-    lgdt       [rcx]  ; update the GDTR
-
-    sub        rsp, 0x10
-    mov        rax, ASM_PFX(SetCodeSelectorFarJump)
-    mov        [rsp], rax
-    mov        rdx, LONG_MODE_CS
-    mov        [rsp + 4], dx    ; get new CS
-    jmp        far dword [rsp]  ; far jump with new CS
-ASM_PFX(SetCodeSelectorFarJump):
-    add        rsp, 0x10
-
-    mov        rax, LONG_MODE_DS          ; get new DS
-    mov        ds, ax
-    mov        es, ax
-    mov        fs, ax
-    mov        gs, ax
-    mov        ss, ax
-
-    pop        rbp
-
-  ret

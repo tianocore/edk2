@@ -18,9 +18,6 @@
 ;
 ;-------------------------------------------------------------------------------
 
-PROTECT_MODE_CS               equ        10h
-PROTECT_MODE_DS               equ        18h
-
 VacantFlag                    equ        00h
 NotVacantFlag                 equ        0ffh
 

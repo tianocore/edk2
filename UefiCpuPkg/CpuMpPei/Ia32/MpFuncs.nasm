@@ -228,28 +228,3 @@ OtherLoaded:
 
     popad
     ret
-
-global ASM_PFX(AsmInitializeGdt)
-ASM_PFX(AsmInitializeGdt):
-  push         ebp
-  mov          ebp, esp
-  pushad
-  mov          edi, [ebp + 8]      ; Load GDT register
-
-  lgdt         [edi]      ; and update the GDTR
-
-  push         PROTECT_MODE_CS
-  mov          eax, ASM_PFX(SetCodeSelectorFarJump)
-  push         eax
-  retf
-ASM_PFX(SetCodeSelectorFarJump):
-  mov          ax, PROTECT_MODE_DS ; Update the Base for the new selectors, too
-  mov          ds, ax
-  mov          es, ax
-  mov          fs, ax
-  mov          gs, ax
-  mov          ss, ax
-
-  popad
-  pop          ebp
-  ret

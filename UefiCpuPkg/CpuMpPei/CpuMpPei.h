@@ -85,25 +85,6 @@ typedef struct _PEI_CPU_MP_DATA  PEI_CPU_MP_DATA;
 
 #pragma pack(1)
 
-typedef union {
-  struct {
-    UINT32  LimitLow    : 16;
-    UINT32  BaseLow     : 16;
-    UINT32  BaseMid     : 8;
-    UINT32  Type        : 4;
-    UINT32  System      : 1;
-    UINT32  Dpl         : 2;
-    UINT32  Present     : 1;
-    UINT32  LimitHigh   : 4;
-    UINT32  Software    : 1;
-    UINT32  Reserved    : 1;
-    UINT32  DefaultSize : 1;
-    UINT32  Granularity : 1;
-    UINT32  BaseHigh    : 8;
-  } Bits;
-  UINT64  Uint64;
-} IA32_GDT;
-
 //
 // MP CPU exchange information for AP reset code
 // This structure is required to be packed because fixed field offsets
