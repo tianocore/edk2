@@ -248,31 +248,4 @@ OtherLoaded:
     ret
 AsmExchangeRole   ENDP
 
-AsmInitializeGdt   PROC  near C  PUBLIC
-  push         ebp
-  mov          ebp, esp
-  pushad
-  mov          edi, [ebp + 8]      ; Load GDT register
-
-  mov          ax,cs               ; Get the selector data from our code image
-  mov          es,ax
-  lgdt         FWORD PTR es:[edi]  ; and update the GDTR
-
-  push         PROTECT_MODE_CS
-  lea          eax, SetCodeSelectorFarJump
-  push         eax
-  retf
-SetCodeSelectorFarJump:
-  mov          ax, PROTECT_MODE_DS ; Update the Base for the new selectors, too
-  mov          ds, ax
-  mov          es, ax
-  mov          fs, ax
-  mov          gs, ax
-  mov          ss, ax
-
-  popad
-  pop          ebp
-  ret
-AsmInitializeGdt  ENDP
-
 END
