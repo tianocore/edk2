@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -35,37 +35,30 @@ RendezvousFunnelProcStart::
 ; Save BIST information to ebp firstly
     db 66h,  08bh, 0e8h               ; mov        ebp, eax    ; save BIST information
 
-    db 8ch,0c8h                       ; mov        ax,cs
-    db 8eh,0d8h                       ; mov        ds,ax
-    db 8eh,0c0h                       ; mov        es,ax
-    db 8eh,0d0h                       ; mov        ss,ax
-    db 33h,0c0h                       ; xor        ax,ax
-    db 8eh,0e0h                       ; mov        fs,ax
-    db 8eh,0e8h                       ; mov        gs,ax
+    db 8ch,0c8h                       ; mov        ax, cs
+    db 8eh,0d8h                       ; mov        ds, ax
+    db 8eh,0c0h                       ; mov        es, ax
+    db 8eh,0d0h                       ; mov        ss, ax
+    db 33h,0c0h                       ; xor        ax, ax
+    db 8eh,0e0h                       ; mov        fs, ax
+    db 8eh,0e8h                       ; mov        gs, ax
 
     db 0BEh                           ; opcode of mov si, mem16
     dw BufferStartLocation            ; mov        si, BufferStartLocation
-    db 66h,  8Bh, 1Ch                 ; mov        ebx,dword ptr [si]
+    db 66h,  8Bh, 1Ch                 ; mov        ebx, dword ptr [si]
 
-    db 0BFh                           ; opcode of mov di, mem16
-    dw PmodeOffsetLocation            ; mov        di, PmodeOffsetLocation
-    db 66h,  8Bh, 05h                 ; mov        eax,dword ptr [di]
-    db 8Bh,  0F8h                     ; mov        di, ax
-    db 83h,  0EFh,06h                 ; sub        di, 06h
-    db 66h,  03h, 0C3h                ; add        eax, ebx
-    db 66h,  89h, 05h                 ; mov        dword ptr [di],eax
-
-    db 0BFh                           ; opcode of mov di, mem16
-    dw LmodeOffsetLocation            ; mov        di, LmodeOffsetLocation
-    db 66h,  8Bh, 05h                 ; mov        eax,dword ptr [di]
-    db 8Bh,  0F8h                     ; mov        di, ax
-    db 83h,  0EFh,06h                 ; sub        di, 06h
-    db 66h,  03h, 0C3h                ; add        eax, ebx
-    db 66h,  89h, 05h                 ; mov        dword ptr [di],eax
-
-    db 0BEh
-    dw Cr3Location                    ; mov        si, Cr3Location
-    db 66h,  8Bh, 0Ch                 ; mov        ecx,dword ptr [si]     ; ECX is keeping the value of CR3
+    db 0BFh                           ; opcode of mov di, mem16                         
+    dw LmodeOffsetLocation            ; mov        di,  LmodeOffsetLocation
+    db 66h, 8Bh, 05h                  ; mov        eax, [di]
+    db 0BFh                           ; opcode of mov di, mem16  
+    dw CodeSegmentLocation            ; mov        di,  CodeSegmentLocation
+    db 66h, 8Bh, 15h                  ; mov        edx, [di]
+    db 89h, 0C7h                      ; mov        di,  ax
+    db 83h, 0EFh, 02h                 ; sub        di,  02h  
+    db 89h, 15h                       ; mov        [di], dx        ; Patch long mode CS
+    db 83h, 0EFh, 04h                 ; sub        di,  04h
+    db 66h, 01h, 0D8h                 ; add        eax, ebx
+    db 66h, 89h, 05h                  ; mov        [di], eax       ; Patch address
 
     db 0BEh                           ; opcode of mov si, mem16
     dw GdtrLocation                   ; mov        si, GdtrLocation
@@ -77,48 +70,44 @@ RendezvousFunnelProcStart::
     db 66h                            ; db         66h
     db 2Eh,0Fh, 01h, 1Ch              ; lidt       fword ptr cs:[si]
 
-    db 33h,  0C0h                     ; xor        ax,  ax
-    db 8Eh,  0D8h                     ; mov        ds,  ax
+    db 0BFh                           ; opcode of mov di, mem16  
+    dw DataSegmentLocation            ; mov        di,  DataSegmentLocation
+    db 66h, 8Bh, 3Dh                  ; mov        edi, [di]           ; Save long mode DS in edi
 
-    db 0Fh,  20h, 0C0h                ; mov        eax, cr0               ;Get control register 0
-    db 66h,  83h, 0C8h, 03h           ; or         eax, 000000003h        ;Set PE bit (bit #0) & MP
-    db 0Fh,  22h, 0C0h                ; mov        cr0, eax
+    db 0BEh
+    dw Cr3Location                    ; mov        si, Cr3Location
+    db 66h,  8Bh, 0Ch                 ; mov        ecx, dword ptr [si]  ; ECX is keeping the value of CR3
 
-    db 66h,  67h, 0EAh                ; far jump
-    dd 0h                             ; 32-bit offset
-    dw PROTECT_MODE_CS                ; 16-bit selector
+    db 31h, 0C0h                      ; xor        ax,  ax
+    db 8Eh, 0D8h                      ; mov        ds,  ax             ; Clear data segment
 
-Flat32Start::                         ; protected mode entry point
-    mov        ax, PROTECT_MODE_DS
-    mov        ds, ax
-    mov        es, ax
-    mov        fs, ax
-    mov        gs, ax
-    mov        ss, ax
+    db 0Fh, 20h, 0C0h                 ; mov        eax, cr0            ; Get control register 0
+    db 66h, 83h, 0C8h, 03h            ; or         eax, 000000003h     ; Set PE bit (bit #0) & MP
+    db 0Fh, 22h, 0C0h                 ; mov        cr0, eax
 
-    db 0Fh,  20h,  0E0h           ; mov        eax, cr4
-    db 0Fh,  0BAh, 0E8h, 05h      ; bts        eax, 5
-    db 0Fh,  22h,  0E0h           ; mov        cr4, eax
+    db 0Fh, 20h, 0E0h             ; mov        eax, cr4
+    db 66h, 0Fh, 0BAh, 0E8h, 05h  ; bts        eax, 5
+    db 0Fh, 22h, 0E0h             ; mov        cr4, eax
 
     db 0Fh,  22h,  0D9h           ; mov        cr3, ecx
 
-    db 0B9h
+    db 66h,  0B9h
     dd 0C0000080h                 ; mov        ecx, 0c0000080h     ; EFER MSR number.
     db 0Fh,  32h                  ; rdmsr                          ; Read EFER.
-    db 0Fh,  0BAh, 0E8h, 08h      ; bts        eax, 8              ; Set LME=1.
+    db 66h,  0Fh,  0BAh, 0E8h, 08h; bts        eax, 8              ; Set LME=1.
     db 0Fh,  30h                  ; wrmsr                          ; Write EFER.
 
     db 0Fh,  20h,  0C0h           ; mov        eax, cr0            ; Read CR0.
-    db 0Fh,  0BAh, 0E8h, 1Fh      ; bts        eax, 31             ; Set PG=1.
+    db 66h,  0Fh,  0BAh, 0E8h, 1Fh; bts        eax, 31             ; Set PG=1.
     db 0Fh,  22h,  0C0h           ; mov        cr0, eax            ; Write CR0.
 
 LONG_JUMP:
-    db 67h,  0EAh                 ; far jump
+    db 66h,  0EAh                 ; far jump
     dd 0h                         ; 32-bit offset
-    dw LONG_MODE_CS               ; 16-bit selector
+    dw 0h                         ; 16-bit selector
 
 LongModeStart::
-    mov        ax,  LONG_MODE_DS
+    mov        eax, edi
     mov        ds,  ax
     mov        es,  ax
     mov        ss,  ax
@@ -187,7 +176,7 @@ RendezvousFunnelProcEnd::
 AsmGetAddressMap   PROC
     mov        rax, offset RendezvousFunnelProcStart
     mov        qword ptr [rcx], rax
-    mov        qword ptr [rcx +  8h], Flat32Start - RendezvousFunnelProcStart
+    mov        qword ptr [rcx +  8h], 0
     mov        qword ptr [rcx + 10h], LongModeStart - RendezvousFunnelProcStart
     mov        qword ptr [rcx + 18h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
     ret
