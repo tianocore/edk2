@@ -464,7 +464,7 @@ WakeUpAP (
   //
   // Get the BSP's data of GDT and IDT
   //
-  CopyMem ((VOID *)&ExchangeInfo->GdtrProfile, &mGdt, sizeof(mGdt));
+  AsmReadGdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->GdtrProfile);
   AsmReadIdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->IdtrProfile);
 
   if (PeiCpuMpData->ApLoopMode == ApInMwaitLoop) {
@@ -859,10 +859,6 @@ CpuMpPeimInit (
   EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
 
-  //
-  // Load new GDT table on BSP
-  //
-  AsmInitializeGdt (&mGdt);
   //
   // Get Vector Hand-off Info PPI
   //
