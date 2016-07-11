@@ -18,6 +18,7 @@
 from struct import *
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 import StringIO
+import string
 from CommonDataClass.FdfClass import RegionClassObject
 import Common.LongFilePathOs as os
 from stat import *
@@ -52,11 +53,11 @@ class Region(RegionClassObject):
     def PadBuffer(self, Buffer, ErasePolarity, Size):
         if Size > 0:
             if (ErasePolarity == '1') :
-                PadData = 0xFF
+                PadByte = pack('B', 0xFF)
             else:
-                PadData = 0
-            for i in range(0, Size):
-                Buffer.write(pack('B', PadData))
+                PadByte = pack('B', 0)
+            PadData = string.join(PadByte for i in xrange(0, Size))
+            Buffer.write(PadData)
 
     ## AddToBuffer()
     #
