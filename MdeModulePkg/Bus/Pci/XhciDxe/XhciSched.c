@@ -1009,7 +1009,11 @@ IsAsyncIntTrb (
         return TRUE;
       }
       CheckedTrb++;
-      if ((UINTN)CheckedTrb >= ((UINTN) CheckedUrb->Ring->RingSeg0 + sizeof (TRB_TEMPLATE) * CheckedUrb->Ring->TrbNumber)) {
+      //
+      // If the checked TRB is the link TRB at the end of the transfer ring,
+      // recircle it to the head of the ring.
+      //
+      if (CheckedTrb->Type == TRB_TYPE_LINK) {
         CheckedTrb = (TRB_TEMPLATE*) CheckedUrb->Ring->RingSeg0;
       }
     }
