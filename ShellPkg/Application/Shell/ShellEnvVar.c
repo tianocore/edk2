@@ -442,8 +442,11 @@ ShellFindEnvVarInList (
                     including the tailing CHAR_NULL
   @param Atts       The attributes of the variable.
 
+  @retval EFI_SUCCESS  The environment variable was added to list successfully.
+  @retval others       Some errors happened.
+
 **/
-VOID
+EFI_STATUS
 ShellAddEnvVarToList (
   IN CONST CHAR16     *Key,
   IN CONST CHAR16     *Value,
@@ -452,9 +455,16 @@ ShellAddEnvVarToList (
   )
 {
   ENV_VAR_LIST      *Node;
+  CHAR16            *LocalKey;
+  CHAR16            *LocalValue;
   
   if (Key == NULL || Value == NULL || ValueSize == 0) {
-    return;
+    return EFI_INVALID_PARAMETER;
+  }
+
+  LocalValue = AllocateCopyPool (ValueSize, Value);
+  if (LocalValue == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   //
@@ -467,10 +477,8 @@ ShellAddEnvVarToList (
     if (Node->Key != NULL && StrCmp(Key, Node->Key) == 0) {
       Node->Atts = Atts;
       SHELL_FREE_NON_NULL(Node->Val);
-      Node->Val  = AllocateZeroPool (ValueSize);
-      ASSERT (Node->Val != NULL);
-      CopyMem(Node->Val, Value, ValueSize);
-      return;
+      Node->Val  = LocalValue;
+      return EFI_SUCCESS;
     }
   }
 
@@ -478,16 +486,23 @@ ShellAddEnvVarToList (
   // If the environment varialbe key doesn't exist in list just insert
   // a new node.
   //
+  LocalKey = AllocateCopyPool (StrSize(Key), Key);
+  if (LocalKey == NULL) {
+    FreePool (LocalValue);
+    return EFI_OUT_OF_RESOURCES;
+  }
   Node = (ENV_VAR_LIST*)AllocateZeroPool (sizeof(ENV_VAR_LIST));
-  ASSERT (Node != NULL);
-  Node->Key = AllocateCopyPool(StrSize(Key), Key);
-  ASSERT (Node->Key != NULL);
-  Node->Val = AllocateCopyPool(ValueSize, Value);
-  ASSERT (Node->Val != NULL);
+  if (Node == NULL) {
+    FreePool (LocalKey);
+    FreePool (LocalValue);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  Node->Key = LocalKey;
+  Node->Val = LocalValue;
   Node->Atts = Atts;
   InsertTailList(&gShellEnvVarList.Link, &Node->Link);
 
-  return;
+  return EFI_SUCCESS;
 }
 
 /**

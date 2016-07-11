@@ -240,11 +240,14 @@ ShellFindEnvVarInList (
   @param Key        The name of the environment variable.
   @param Value      The value of environment variable.
   @param ValueSize  The size in bytes of the environment variable
-                    including the tailing CHAR_NELL
+                    including the tailing CHAR_NULL
   @param Atts       The attributes of the variable.
 
+  @retval EFI_SUCCESS  The environment variable was added to list successfully.
+  @retval others       Some errors happened.
+
 **/
-VOID
+EFI_STATUS
 ShellAddEnvVarToList (
   IN CONST CHAR16     *Key,
   IN CONST CHAR16     *Value,
