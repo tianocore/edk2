@@ -2852,36 +2852,28 @@ InternalEfiShellSetEnv(
   )
 {
   EFI_STATUS      Status;
-  UINT32          Atts;
 
-  Atts = 0x0;
-  
   if (Value == NULL || StrLen(Value) == 0) {
     Status = SHELL_DELETE_ENVIRONMENT_VARIABLE(Name);
     if (!EFI_ERROR(Status)) {
       ShellRemvoeEnvVarFromList(Name);
     }
-    return Status;
   } else {
     SHELL_DELETE_ENVIRONMENT_VARIABLE(Name);
-    if (Volatile) {
-      Status = SHELL_SET_ENVIRONMENT_VARIABLE_V(Name, StrSize(Value), Value);
-      if (!EFI_ERROR(Status)) {
-        Atts   &= ~EFI_VARIABLE_NON_VOLATILE;
-        Atts   |= EFI_VARIABLE_BOOTSERVICE_ACCESS;
-        ShellAddEnvVarToList(Name, Value, StrSize(Value), Atts);
+    Status = ShellAddEnvVarToList(
+               Name, Value, StrSize(Value),
+               EFI_VARIABLE_BOOTSERVICE_ACCESS | (Volatile ? 0 : EFI_VARIABLE_NON_VOLATILE)
+               );
+    if (!EFI_ERROR (Status)) {
+      Status = Volatile
+             ? SHELL_SET_ENVIRONMENT_VARIABLE_V(Name, StrSize(Value), Value)
+             : SHELL_SET_ENVIRONMENT_VARIABLE_NV(Name, StrSize(Value), Value);
+      if (EFI_ERROR (Status)) {
+        ShellRemvoeEnvVarFromList(Name);
       }
-      return Status;
-    } else {
-      Status = SHELL_SET_ENVIRONMENT_VARIABLE_NV(Name, StrSize(Value), Value);
-      if (!EFI_ERROR(Status)) {
-        Atts   |= EFI_VARIABLE_NON_VOLATILE;
-        Atts   |= EFI_VARIABLE_BOOTSERVICE_ACCESS;
-        ShellAddEnvVarToList(Name, Value, StrSize(Value), Atts);
-      } 
-      return Status;
     }
   }
+  return Status;
 }
 
 /**
