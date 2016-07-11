@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,9 @@ IdtrLocation                  equ        LockLocation + 2Ah
 BufferStartLocation           equ        LockLocation + 34h
 PmodeOffsetLocation           equ        LockLocation + 3Ch
 NumApsExecutingLoction        equ        LockLocation + 44h
-LmodeOffsetLocation           equ        LockLocation + 4Ch
-Cr3Location                   equ        LockLocation + 54h
+CodeSegmentLocation           equ        LockLocation + 4Ch
+DataSegmentLocation           equ        LockLocation + 54h
+LmodeOffsetLocation           equ        LockLocation + 5Ch
+Cr3Location                   equ        LockLocation + 64h
 
 ;-------------------------------------------------------------------------------
