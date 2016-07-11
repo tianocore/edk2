@@ -14,14 +14,11 @@
 
 #include <PiPei.h>
 
-#include <Ppi/TemporaryRamDone.h>
-
-#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/DebugAgentLib.h>
-#include <Library/FspPlatformInfoLib.h>
-#include <Library/FspApiLib.h>
+#include <Library/FspWrapperApiLib.h>
+#include <Library/FspWrapperPlatformLib.h>
+#include <Guid/FspHeaderFile.h>
 
 /**
 This interface disables temporary memory in SEC Phase.
@@ -43,8 +40,8 @@ SecPlatformDisableTemporaryMemory (
 
   DEBUG((DEBUG_INFO, "SecPlatformDisableTemporaryMemory enter\n"));
 
-  TempRamExitParam = GetTempRamExitParam ();
-  Status = CallTempRamExit (FspHeader, TempRamExitParam);
+  TempRamExitParam = UpdateTempRamExitParam ();
+  Status = CallTempRamExit (TempRamExitParam);
   DEBUG((DEBUG_INFO, "TempRamExit status: 0x%x\n", Status));
   ASSERT_EFI_ERROR(Status);
 
