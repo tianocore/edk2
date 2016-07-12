@@ -75,34 +75,48 @@ RamDiskPublishSsdt (
 {
   EFI_STATUS                     Status;
   EFI_ACPI_DESCRIPTION_HEADER    *Table;
+  UINTN                          SectionInstance;
   UINTN                          TableSize;
 
-  Status = GetSectionFromFv (
-             &gEfiCallerIdGuid,
-             EFI_SECTION_RAW,
-             1,
-             (VOID **) &Table,
-             &TableSize
-             );
-  ASSERT_EFI_ERROR (Status);
+  Status          = EFI_SUCCESS;
+  SectionInstance = 0;
 
-  ASSERT (Table->OemTableId == SIGNATURE_64 ('R', 'a', 'm', 'D', 'i', 's', 'k', ' '));
+  //
+  // Scan all the EFI raw section instances in FV to find the NVDIMM root
+  // device SSDT.
+  //
+  while (TRUE) {
+    Status = GetSectionFromFv (
+               &gEfiCallerIdGuid,
+               EFI_SECTION_RAW,
+               SectionInstance,
+               (VOID **) &Table,
+               &TableSize
+               );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
 
-  Status = mAcpiTableProtocol->InstallAcpiTable (
-                                 mAcpiTableProtocol,
-                                 Table,
-                                 TableSize,
-                                 &mRamDiskSsdtTableKey
-                                 );
-  ASSERT_EFI_ERROR (Status);
+    if (Table->OemTableId == SIGNATURE_64 ('R', 'a', 'm', 'D', 'i', 's', 'k', ' ')) {
+      Status = mAcpiTableProtocol->InstallAcpiTable (
+                                     mAcpiTableProtocol,
+                                     Table,
+                                     TableSize,
+                                     &mRamDiskSsdtTableKey
+                                     );
+      ASSERT_EFI_ERROR (Status);
 
-  if (!EFI_ERROR (Status)) {
-    mRamDiskSsdtTableKeyValid = TRUE;
-  } else {
-    mRamDiskSsdtTableKeyValid = FALSE;
+      if (!EFI_ERROR (Status)) {
+        mRamDiskSsdtTableKeyValid = TRUE;
+      }
+
+      FreePool (Table);
+      return Status;
+    } else {
+      FreePool (Table);
+      SectionInstance++;
+    }
   }
-
-  FreePool (Table);
 
   return Status;
 }
