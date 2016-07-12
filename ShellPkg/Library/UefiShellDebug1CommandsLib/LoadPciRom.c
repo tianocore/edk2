@@ -2,7 +2,7 @@
   Main file for LoadPciRom shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -147,7 +147,11 @@ ShellCommandRunLoadPciRom (
           }
           SourceSize  = (UINTN) Node->Info->FileSize;
           File1Buffer = AllocateZeroPool (SourceSize);
-          ASSERT(File1Buffer != NULL);
+          if (File1Buffer == NULL) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"loadpcirom");
+            ShellStatus = SHELL_OUT_OF_RESOURCES;
+            continue;
+          }
           Status = gEfiShellProtocol->ReadFile(Node->Handle, &SourceSize, File1Buffer);
           if (EFI_ERROR(Status)) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_READ_FAIL), gShellDebug1HiiHandle, L"loadpcirom", Node->FullName);  
