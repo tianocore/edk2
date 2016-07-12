@@ -55,6 +55,10 @@ InternalGetSpinLockProperties (
     }
   }
 
+  if (CacheLineSize < 32) {
+    CacheLineSize = 32;
+  }
+
   return CacheLineSize;
 }
 
