@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
@@ -546,9 +546,14 @@ ShellCommandRegisterCommandName (
   // allocate memory for new struct
   //
   Node = AllocateZeroPool(sizeof(SHELL_COMMAND_INTERNAL_LIST_ENTRY));
-  ASSERT(Node != NULL);
+  if (Node == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
   Node->CommandString = AllocateCopyPool(StrSize(CommandString), CommandString);
-  ASSERT(Node->CommandString != NULL);
+  if (Node->CommandString == NULL) {
+    FreePool (Node);
+    return RETURN_OUT_OF_RESOURCES;
+  }
 
   Node->GetManFileName  = GetManFileName;
   Node->CommandHandler  = CommandHandler;
@@ -807,11 +812,20 @@ ShellCommandRegisterAlias (
   // allocate memory for new struct
   //
   Node = AllocateZeroPool(sizeof(ALIAS_LIST));
-  ASSERT(Node != NULL);
+  if (Node == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
   Node->CommandString = AllocateCopyPool(StrSize(Command), Command);
+  if (Node->CommandString == NULL) {
+    FreePool (Node);
+    return RETURN_OUT_OF_RESOURCES;
+  }
   Node->Alias = AllocateCopyPool(StrSize(Alias), Alias);
-  ASSERT(Node->CommandString != NULL);
-  ASSERT(Node->Alias != NULL);
+  if (Node->Alias == NULL) {
+    FreePool (Node->CommandString);
+    FreePool (Node);
+    return RETURN_OUT_OF_RESOURCES;
+  }
 
   InsertHeadList (&mAliasList.Link, &Node->Link);
 
@@ -1303,7 +1317,10 @@ ShellCommandCreateInitialMappingsAndPaths(
     // Get all Device Paths
     //
     DevicePathList = AllocateZeroPool(sizeof(EFI_DEVICE_PATH_PROTOCOL*) * Count);
-    ASSERT(DevicePathList != NULL);
+    if (DevicePathList == NULL) {
+      SHELL_FREE_NON_NULL (HandleList);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     for (Count = 0 ; HandleList[Count] != NULL ; Count++) {
       DevicePathList[Count] = DevicePathFromHandle(HandleList[Count]);
@@ -1360,7 +1377,10 @@ ShellCommandCreateInitialMappingsAndPaths(
     // Get all Device Paths
     //
     DevicePathList = AllocateZeroPool(sizeof(EFI_DEVICE_PATH_PROTOCOL*) * Count);
-    ASSERT(DevicePathList != NULL);
+    if (DevicePathList == NULL) {
+      SHELL_FREE_NON_NULL (HandleList);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     for (Count = 0 ; HandleList[Count] != NULL ; Count++) {
       DevicePathList[Count] = DevicePathFromHandle(HandleList[Count]);
