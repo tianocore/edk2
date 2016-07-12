@@ -2,7 +2,7 @@
   Main file for BCFG command.
 
   (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -553,33 +553,34 @@ BcfgAdd(
     if (EFI_ERROR(Status)) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellBcfgHiiHandle, L"bcfg", OptionStr);  
     } else {
-      NewOrder = AllocateZeroPool((OrderCount+1)*sizeof(NewOrder[0]));
-      ASSERT(NewOrder != NULL);
-      CopyMem(NewOrder, CurrentOrder, (OrderCount)*sizeof(NewOrder[0]));
+      NewOrder = AllocateZeroPool ((OrderCount + 1) * sizeof (NewOrder[0]));
+      if (NewOrder != NULL) {
+        CopyMem (NewOrder, CurrentOrder, (OrderCount) * sizeof (NewOrder[0]));
 
-      //
-      // Insert target into order list
-      //
-      for (Index=OrderCount; Index > Position; Index--) {
-        NewOrder[Index] = NewOrder[Index-1];
-      }
+        //
+        // Insert target into order list
+        //
+        for (Index = OrderCount; Index > Position; Index--) {
+          NewOrder[Index] = NewOrder[Index - 1];
+        }
 
-      NewOrder[Position] = (UINT16) TargetLocation;
-      Status = gRT->SetVariable (
-        Target == BcfgTargetBootOrder?L"BootOrder":L"DriverOrder",
-        &gEfiGlobalVariableGuid,
-        EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS|EFI_VARIABLE_RUNTIME_ACCESS,
-        (OrderCount+1) * sizeof(UINT16),
-        NewOrder
-       );
+        NewOrder[Position] = (UINT16) TargetLocation;
+        Status = gRT->SetVariable (
+          Target == BcfgTargetBootOrder ? L"BootOrder" : L"DriverOrder",
+          &gEfiGlobalVariableGuid,
+          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+          (OrderCount + 1) * sizeof (UINT16),
+          NewOrder
+        );
 
-      FreePool(NewOrder);
+        FreePool (NewOrder);
 
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_BCFG_WRITE_FAIL), gShellBcfgHiiHandle, L"bcfg", Target == BcfgTargetBootOrder?L"BootOrder":L"DriverOrder");  
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Print (L"bcfg: Add %s as %x\n", OptionStr, Position);
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_WRITE_FAIL), gShellBcfgHiiHandle, L"bcfg", Target == BcfgTargetBootOrder ? L"BootOrder" : L"DriverOrder");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          Print (L"bcfg: Add %s as %x\n", OptionStr, Position);
+        }
       }
     }
   }
