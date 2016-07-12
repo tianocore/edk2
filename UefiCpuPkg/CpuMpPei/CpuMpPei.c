@@ -428,8 +428,7 @@ WakeUpAP (
   ExchangeInfo->StackStart         = PeiCpuMpData->Buffer;
   ExchangeInfo->StackSize          = PeiCpuMpData->CpuApStackSize;
   ExchangeInfo->BufferStart        = PeiCpuMpData->WakeupBuffer;
-  ExchangeInfo->PmodeOffset        = PeiCpuMpData->AddressMap.PModeEntryOffset;
-  ExchangeInfo->LmodeOffset        = PeiCpuMpData->AddressMap.LModeEntryOffset;
+  ExchangeInfo->ModeOffset         = PeiCpuMpData->AddressMap.ModeEntryOffset;
   ExchangeInfo->Cr3                = AsmReadCr3 ();
   ExchangeInfo->CodeSegment        = AsmReadCs ();
   ExchangeInfo->DataSegment        = AsmReadDs ();

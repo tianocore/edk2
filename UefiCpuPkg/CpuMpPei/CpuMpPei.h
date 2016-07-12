@@ -66,8 +66,7 @@ typedef enum {
 //
 typedef struct {
   UINT8             *RendezvousFunnelAddress;
-  UINTN             PModeEntryOffset;
-  UINTN             LModeEntryOffset;
+  UINTN             ModeEntryOffset;
   UINTN             RendezvousFunnelSize;
 } MP_ASSEMBLY_ADDRESS_MAP;
 
@@ -98,11 +97,10 @@ typedef struct {
   IA32_DESCRIPTOR       GdtrProfile;
   IA32_DESCRIPTOR       IdtrProfile;
   UINTN                 BufferStart;
-  UINTN                 PmodeOffset;
+  UINTN                 ModeOffset;
   UINTN                 NumApsExecuting;
   UINTN                 CodeSegment;
   UINTN                 DataSegment;
-  UINTN                 LmodeOffset;
   UINTN                 Cr3;
   PEI_CPU_MP_DATA       *PeiCpuMpData;
 } MP_CPU_EXCHANGE_INFO;

@@ -32,11 +32,10 @@ ApProcedureLocation           equ        LockLocation + 18h
 GdtrLocation                  equ        LockLocation + 20h
 IdtrLocation                  equ        LockLocation + 2Ah
 BufferStartLocation           equ        LockLocation + 34h
-PmodeOffsetLocation           equ        LockLocation + 3Ch
+ModeOffsetLocation            equ        LockLocation + 3Ch
 NumApsExecutingLoction        equ        LockLocation + 44h
 CodeSegmentLocation           equ        LockLocation + 4Ch
 DataSegmentLocation           equ        LockLocation + 54h
-LmodeOffsetLocation           equ        LockLocation + 5Ch
-Cr3Location                   equ        LockLocation + 64h
+Cr3Location                   equ        LockLocation + 5Ch
 
 ;-------------------------------------------------------------------------------
