@@ -1,7 +1,7 @@
 /** @file
   Implements filebuffer interface functions.
 
-  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -505,29 +505,28 @@ FileBufferPrintLine (
 
   BufLen = (MainEditor.ScreenSize.Column + 1) * sizeof (CHAR16);
   PrintLine = AllocatePool (BufLen);
-  ASSERT (PrintLine != NULL);
+  if (PrintLine != NULL) {
+    StrnCpyS (PrintLine, BufLen/sizeof(CHAR16), Buffer, MIN(Limit, MainEditor.ScreenSize.Column));
+    for (; Limit < MainEditor.ScreenSize.Column; Limit++) {
+      PrintLine[Limit] = L' ';
+    }
 
-  StrnCpyS (PrintLine, BufLen/sizeof(CHAR16), Buffer, MIN(Limit, MainEditor.ScreenSize.Column));
-  for (; Limit < MainEditor.ScreenSize.Column; Limit++) {
-    PrintLine[Limit] = L' ';
+    PrintLine[MainEditor.ScreenSize.Column] = CHAR_NULL;
+
+    PrintLine2 = AllocatePool (BufLen * 2);
+    if (PrintLine2 != NULL) {
+      ShellCopySearchAndReplace(PrintLine, PrintLine2, BufLen * 2, L"%", L"^%", FALSE, FALSE);
+
+      ShellPrintEx (
+        0,
+        (INT32)Row - 1,
+        L"%s",
+        PrintLine2
+        );
+      FreePool (PrintLine2);
+    }
+    FreePool (PrintLine);
   }
-
-  PrintLine[MainEditor.ScreenSize.Column] = CHAR_NULL;
-
-  PrintLine2 = AllocatePool (BufLen * 2);
-  ASSERT (PrintLine2 != NULL);
-
-  ShellCopySearchAndReplace(PrintLine, PrintLine2, BufLen * 2, L"%", L"^%", FALSE, FALSE);
-
-  ShellPrintEx (
-    0,
-    (INT32)Row - 1,
-    L"%s",
-    PrintLine2
-    );
-
-  FreePool (PrintLine);
-  FreePool (PrintLine2);
 
   return EFI_SUCCESS;
 }
