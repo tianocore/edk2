@@ -2103,8 +2103,6 @@ MtrrSetAllMtrrs (
 
   PostMtrrChangeEnableCache (&MtrrContext);
 
-  MtrrDebugPrintAllMtrrs ();
-
   return MtrrSetting;
 }
 
