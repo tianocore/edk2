@@ -2,7 +2,7 @@
   Main file for EfiDecompress shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -119,14 +119,18 @@ ShellCommandRunEfiDecompress (
           InSize = (UINTN)Temp64Bit;
           ASSERT_EFI_ERROR(Status);
           InBuffer = AllocateZeroPool(InSize);
-          ASSERT(InBuffer != NULL);
-          Status = gEfiShellProtocol->ReadFile(InFileHandle, &InSize, InBuffer);
-          ASSERT_EFI_ERROR(Status);
+          if (InBuffer == NULL) {
+            Status = EFI_OUT_OF_RESOURCES;
+          } else {
+            Status = gEfiShellProtocol->ReadFile (InFileHandle, &InSize, InBuffer);
+            ASSERT_EFI_ERROR (Status);
 
-          Status = gBS->LocateProtocol(&gEfiDecompressProtocolGuid, NULL, (VOID**)&Decompress);
-          ASSERT_EFI_ERROR(Status);
+            Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID**) &Decompress);
+            ASSERT_EFI_ERROR (Status);
 
-          Status = Decompress->GetInfo(Decompress, InBuffer, (UINT32)InSize, &OutSize, &ScratchSize);
+            Status = Decompress->GetInfo (Decompress, InBuffer, (UINT32) InSize, &OutSize, &ScratchSize);
+          }
+
           if (EFI_ERROR(Status) || OutSize == 0) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_EFI_DECOMPRESS_NOPE), gShellDebug1HiiHandle, InFileName);
             ShellStatus = SHELL_NOT_FOUND;
@@ -138,25 +142,25 @@ ShellCommandRunEfiDecompress (
             } else {
               OutBuffer = AllocateZeroPool(OutSize);
               ScratchBuffer = AllocateZeroPool(ScratchSize);
-              ASSERT(OutBuffer != NULL);
-              ASSERT(ScratchBuffer != NULL);
-
-              Status = Decompress->Decompress(Decompress, InBuffer, (UINT32)InSize, OutBuffer, OutSize, ScratchBuffer, ScratchSize);
-              ASSERT_EFI_ERROR(Status);
-
-              if (EFI_ERROR(Status)) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
-                ShellStatus = SHELL_DEVICE_ERROR;
+              if (OutBuffer == NULL || ScratchBuffer == NULL) {
+                Status = EFI_OUT_OF_RESOURCES;
               } else {
-                OutSizeTemp = OutSize;
-                Status = gEfiShellProtocol->WriteFile(OutFileHandle, &OutSizeTemp, OutBuffer);
-                OutSize = (UINT32)OutSizeTemp;
-                if (EFI_ERROR(Status)) {
-                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"efidecompress", OutFileName, Status);  
-                  ShellStatus = SHELL_DEVICE_ERROR;
-                }
+                Status = Decompress->Decompress (Decompress, InBuffer, (UINT32) InSize, OutBuffer, OutSize, ScratchBuffer, ScratchSize);
               }
-            } 
+            }
+          }
+
+          if (EFI_ERROR (Status)) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
+            ShellStatus = ((Status == EFI_OUT_OF_RESOURCES) ? SHELL_OUT_OF_RESOURCES : SHELL_DEVICE_ERROR);
+          } else {
+            OutSizeTemp = OutSize;
+            Status = gEfiShellProtocol->WriteFile (OutFileHandle, &OutSizeTemp, OutBuffer);
+            OutSize = (UINT32) OutSizeTemp;
+            if (EFI_ERROR (Status)) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"efidecompress", OutFileName, Status);
+              ShellStatus = SHELL_DEVICE_ERROR;
+            }
           }
         }
       }
