@@ -32,7 +32,7 @@ TcpSeqAcceptable (
   IN TCP_SEG *Seg
   )
 {
-  return (TCP_SEQ_LEQ (Tcb->RcvWl2, Seg->End) &&
+  return (TCP_SEQ_LEQ (Tcb->RcvNxt, Seg->End) &&
           TCP_SEQ_LT (Seg->Seq, Tcb->RcvWl2 + Tcb->RcvWnd));
 }
 
