@@ -74,7 +74,7 @@ InitializeHighMemDxe (
         CurBase = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
         CurSize = fdt64_to_cpu (((UINT64 *)RegProp)[1]);
 
-        if (FixedPcdGet64 (PcdSystemMemoryBase) != CurBase) {
+        if (PcdGet64 (PcdSystemMemoryBase) != CurBase) {
           Status = gDS->AddMemorySpace (
                           EfiGcdMemoryTypeSystemMemory,
                           CurBase, CurSize,

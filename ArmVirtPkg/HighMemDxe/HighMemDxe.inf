@@ -45,7 +45,7 @@
 [Guids]
   gFdtHobGuid
 
-[FixedPcd]
+[Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
 
 [Depex]
