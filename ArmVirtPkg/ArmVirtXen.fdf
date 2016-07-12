@@ -104,6 +104,7 @@ FV = FVMAIN_COMPACT
 ################################################################################
 
 [FV.FvMain]
+FvNameGuid         = 4d2d8743-6337-4c3f-a1d9-7cc7efd283db
 BlockSize          = 0x40
 NumBlocks          = 0         # This FV gets compressed so make it just big enough
 FvAlignment        = 16        # FV alignment and FV attributes setting.
