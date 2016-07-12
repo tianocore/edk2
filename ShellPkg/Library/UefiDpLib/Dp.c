@@ -259,13 +259,19 @@ ShellCommandRunDp (
   CustomCumulativeToken = ShellCommandLineGetValue (ParamPackage, L"-c");
   if (CustomCumulativeToken != NULL) {
     CustomCumulativeData = AllocateZeroPool (sizeof (PERF_CUM_DATA));
-    ASSERT (CustomCumulativeData != NULL);
+    if (CustomCumulativeData == NULL) {
+      return SHELL_OUT_OF_RESOURCES;
+    }
     CustomCumulativeData->MinDur = 0;
     CustomCumulativeData->MaxDur = 0;
     CustomCumulativeData->Count  = 0;
     CustomCumulativeData->Duration = 0;
     NameSize = StrLen (CustomCumulativeToken) + 1;
     CustomCumulativeData->Name   = AllocateZeroPool (NameSize);
+    if (CustomCumulativeData->Name == NULL) {
+      FreePool (CustomCumulativeData);
+      return SHELL_OUT_OF_RESOURCES;
+    }
     UnicodeStrToAsciiStrS (CustomCumulativeToken, CustomCumulativeData->Name, NameSize);
   }
 
