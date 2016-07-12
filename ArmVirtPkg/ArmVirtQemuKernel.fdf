@@ -128,6 +128,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF ArmVirtPkg/VirtioFdtDxe/VirtioFdtDxe.inf
   INF ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
+  INF ArmVirtPkg/HighMemDxe/HighMemDxe.inf
 
   #
   # PI DXE Drivers producing Architectural Protocols (EFI Services)
@@ -175,6 +176,7 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   INF OvmfPkg/VirtioNetDxe/VirtioNet.inf
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader)
