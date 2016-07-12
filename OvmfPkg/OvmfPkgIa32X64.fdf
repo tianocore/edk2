@@ -98,6 +98,7 @@ FV = DXEFV
 ################################################################################
 
 [FV.SECFV]
+FvNameGuid         = 763BED0D-DE9F-48F5-81F1-3E90E1B1A015
 BlockSize          = 0x1000
 FvAlignment        = 16
 ERASE_POLARITY     = 1
@@ -128,6 +129,7 @@ INF  RuleOverride=RESET_VECTOR OvmfPkg/ResetVector/ResetVector.inf
 
 ################################################################################
 [FV.PEIFV]
+FvNameGuid         = 6938079B-B503-4E3D-9D24-B28337A25806
 BlockSize          = 0x10000
 FvAlignment        = 16
 ERASE_POLARITY     = 1
@@ -166,6 +168,7 @@ INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 ################################################################################
 
 [FV.DXEFV]
+FvNameGuid         = 7CB8BDC9-F8EB-4F34-AAEA-3EE4AF6516A1
 BlockSize          = 0x10000
 FvAlignment        = 16
 ERASE_POLARITY     = 1
@@ -379,6 +382,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
+FvNameGuid         = 48DB5E17-707C-472D-91CD-1613E7EF51B0
 FvAlignment        = 16
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
