@@ -39,6 +39,9 @@ Module Name:
 
 UINT8 mPhysMemAddressWidth;
 
+STATIC UINT32 mS3AcpiReservedMemoryBase;
+STATIC UINT32 mS3AcpiReservedMemorySize;
+
 UINT32
 GetSystemMemorySizeBelow4gb (
   VOID
@@ -335,18 +338,31 @@ PublishPeiMemory (
   UINT64                      LowerMemorySize;
   UINT32                      PeiMemoryCap;
 
-  if (mBootMode == BOOT_ON_S3_RESUME) {
-    MemoryBase = PcdGet32 (PcdS3AcpiReservedMemoryBase);
-    MemorySize = PcdGet32 (PcdS3AcpiReservedMemorySize);
-  } else {
-    LowerMemorySize = GetSystemMemorySizeBelow4gb ();
-    if (FeaturePcdGet (PcdSmmSmramRequire)) {
-      //
-      // TSEG is chipped from the end of low RAM
-      //
-      LowerMemorySize -= FixedPcdGet8 (PcdQ35TsegMbytes) * SIZE_1MB;
-    }
+  LowerMemorySize = GetSystemMemorySizeBelow4gb ();
+  if (FeaturePcdGet (PcdSmmSmramRequire)) {
+    //
+    // TSEG is chipped from the end of low RAM
+    //
+    LowerMemorySize -= FixedPcdGet8 (PcdQ35TsegMbytes) * SIZE_1MB;
+  }
 
+  //
+  // If S3 is supported, then the S3 permanent PEI memory is placed next,
+  // downwards. Its size is primarily dictated by CpuMpPei. The formula below
+  // is an approximation.
+  //
+  if (mS3Supported) {
+    mS3AcpiReservedMemorySize = SIZE_512KB +
+      PcdGet32 (PcdCpuMaxLogicalProcessorNumber) *
+      PcdGet32 (PcdCpuApStackSize);
+    mS3AcpiReservedMemoryBase = LowerMemorySize - mS3AcpiReservedMemorySize;
+    LowerMemorySize = mS3AcpiReservedMemoryBase;
+  }
+
+  if (mBootMode == BOOT_ON_S3_RESUME) {
+    MemoryBase = mS3AcpiReservedMemoryBase;
+    MemorySize = mS3AcpiReservedMemorySize;
+  } else {
     PeiMemoryCap = GetPeiMemoryCap ();
     DEBUG ((EFI_D_INFO, "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
       __FUNCTION__, mPhysMemAddressWidth, PeiMemoryCap >> 10));
@@ -514,8 +530,8 @@ InitializeRamRegions (
     // This is the memory range that will be used for PEI on S3 resume
     //
     BuildMemoryAllocationHob (
-      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdS3AcpiReservedMemoryBase),
-      (UINT64)(UINTN) PcdGet32 (PcdS3AcpiReservedMemorySize),
+      mS3AcpiReservedMemoryBase,
+      mS3AcpiReservedMemorySize,
       EfiACPIMemoryNVS
       );
 
