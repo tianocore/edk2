@@ -48,7 +48,7 @@ RendezvousFunnelProcStart::
     db 66h,  8Bh, 1Ch                 ; mov        ebx, dword ptr [si]
 
     db 0BFh                           ; opcode of mov di, mem16                         
-    dw LmodeOffsetLocation            ; mov        di,  LmodeOffsetLocation
+    dw ModeOffsetLocation             ; mov        di,  ModeOffsetLocation
     db 66h, 8Bh, 05h                  ; mov        eax, [di]
     db 0BFh                           ; opcode of mov di, mem16  
     dw CodeSegmentLocation            ; mov        di,  CodeSegmentLocation
@@ -176,9 +176,8 @@ RendezvousFunnelProcEnd::
 AsmGetAddressMap   PROC
     mov        rax, offset RendezvousFunnelProcStart
     mov        qword ptr [rcx], rax
-    mov        qword ptr [rcx +  8h], 0
-    mov        qword ptr [rcx + 10h], LongModeStart - RendezvousFunnelProcStart
-    mov        qword ptr [rcx + 18h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+    mov        qword ptr [rcx +  8h], LongModeStart - RendezvousFunnelProcStart
+    mov        qword ptr [rcx + 10h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
     ret
 AsmGetAddressMap   ENDP
 

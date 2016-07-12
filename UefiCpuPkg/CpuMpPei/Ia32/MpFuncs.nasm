@@ -48,7 +48,7 @@ BITS 16
     mov        si,  BufferStartLocation
     mov        ebx, [si]
 
-    mov        si,  PmodeOffsetLocation
+    mov        si,  ModeOffsetLocation
     mov        eax, [si]
     mov        si,  CodeSegmentLocation
     mov        edx, [si]
@@ -149,8 +149,7 @@ ASM_PFX(AsmGetAddressMap):
     mov        ebx,  [ebp + 24h]
     mov        dword [ebx], RendezvousFunnelProcStart
     mov        dword [ebx +  4h], Flat32Start - RendezvousFunnelProcStart
-    mov        dword [ebx +  8h], 0
-    mov        dword [ebx + 0ch], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+    mov        dword [ebx +  8h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
 
     popad
     ret
