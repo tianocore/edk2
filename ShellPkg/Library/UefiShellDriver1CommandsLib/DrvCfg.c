@@ -2,7 +2,7 @@
   Main file for DrvCfg shell Driver1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -57,8 +57,11 @@ FindHiiHandleViaDevPath(
   Status = HiiDb->ListPackageLists(HiiDb, EFI_HII_PACKAGE_DEVICE_PATH, NULL, &HandleBufferSize, HandleBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HandleBuffer = AllocateZeroPool(HandleBufferSize);
-    ASSERT (HandleBuffer != NULL);
-    Status = HiiDb->ListPackageLists(HiiDb, EFI_HII_PACKAGE_DEVICE_PATH, NULL, &HandleBufferSize, HandleBuffer);
+    if (HandleBuffer == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+    } else {
+      Status = HiiDb->ListPackageLists (HiiDb, EFI_HII_PACKAGE_DEVICE_PATH, NULL, &HandleBufferSize, HandleBuffer);
+    }
   }
   if (EFI_ERROR(Status)) {
     SHELL_FREE_NON_NULL(HandleBuffer);
@@ -75,8 +78,12 @@ FindHiiHandleViaDevPath(
     Status = HiiDb->ExportPackageLists(HiiDb, HandleBuffer[LoopVariable], &MainBufferSize, MainBuffer);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       MainBuffer = AllocateZeroPool(MainBufferSize);
-      ASSERT (MainBuffer != NULL);
-      Status = HiiDb->ExportPackageLists(HiiDb, HandleBuffer[LoopVariable], &MainBufferSize, MainBuffer);
+      if (MainBuffer != NULL) {
+        Status = HiiDb->ExportPackageLists (HiiDb, HandleBuffer[LoopVariable], &MainBufferSize, MainBuffer);
+      }
+    }
+    if (EFI_ERROR (Status)) {
+      continue;
     }
     //
     // Enumerate through the block of returned memory.
