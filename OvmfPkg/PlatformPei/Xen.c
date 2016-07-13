@@ -171,6 +171,7 @@ XenPublishRamRegions (
   //
   // Parse RAM in E820 map
   //
+  E820EntriesCount = 0;
   Status = XenGetE820Map (&E820Map, &E820EntriesCount);
 
   ASSERT_EFI_ERROR (Status);
