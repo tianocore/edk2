@@ -2,7 +2,7 @@
   Main file for cp shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -229,7 +229,10 @@ CopySingleFile(
       // copy data between files
       //
       Buffer = AllocateZeroPool(ReadSize);
-      ASSERT(Buffer != NULL);
+      if (Buffer == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, CmdName);
+        return SHELL_OUT_OF_RESOURCES;
+      }
       while (ReadSize == PcdGet32(PcdShellFileOperationSize) && !EFI_ERROR(Status)) {
         Status = ShellReadFile(SourceHandle, &ReadSize, Buffer);
         if (!EFI_ERROR(Status)) {
@@ -717,10 +720,14 @@ ShellCommandRunCp (
             ShellStatus = SHELL_NOT_FOUND;
           } else  {
             FullCwd = AllocateZeroPool(StrSize(Cwd) + sizeof(CHAR16));
-            ASSERT (FullCwd != NULL);
-            StrCpyS(FullCwd, StrSize(Cwd)/sizeof(CHAR16)+1, Cwd);
-            ShellStatus = ProcessValidateAndCopyFiles(FileList, FullCwd, SilentMode, RecursiveMode);
-            FreePool(FullCwd);
+            if (FullCwd == NULL) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cp");
+              ShellStatus = SHELL_OUT_OF_RESOURCES;
+            } else {
+              StrCpyS (FullCwd, StrSize (Cwd) / sizeof (CHAR16) + 1, Cwd);
+              ShellStatus = ProcessValidateAndCopyFiles (FileList, FullCwd, SilentMode, RecursiveMode);
+              FreePool (FullCwd);
+            }
           }
         }
 
