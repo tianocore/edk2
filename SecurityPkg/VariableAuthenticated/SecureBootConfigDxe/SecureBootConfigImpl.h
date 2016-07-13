@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PlatformSecureLib.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/FileExplorerLib.h>
+#include <Library/PeCoffLib.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/AuthenticatedVariableFormat.h>

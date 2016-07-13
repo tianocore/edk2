@@ -1610,6 +1610,54 @@ ON_EXIT:
 }
 
 /**
+  Reads contents of a PE/COFF image in memory buffer.
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will make sure the PE/COFF image content
+  read is within the image buffer.
+
+  @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
+  @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
+  @param  ReadSize        On input, the size in bytes of the requested read operation.
+                          On output, the number of bytes actually read.
+  @param  Buffer          Output buffer that contains the data read from the PE/COFF image.
+
+  @retval EFI_SUCCESS     The specified portion of the PE/COFF image was read and the size
+**/
+EFI_STATUS
+EFIAPI
+SecureBootConfigImageRead (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+{
+  UINTN               EndPosition;
+
+  if (FileHandle == NULL || ReadSize == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MAX_ADDRESS - FileOffset < *ReadSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  EndPosition = FileOffset + *ReadSize;
+  if (EndPosition > mImageSize) {
+    *ReadSize = (UINT32)(mImageSize - FileOffset);
+  }
+
+  if (FileOffset >= mImageSize) {
+    *ReadSize = 0;
+  }
+
+  CopyMem (Buffer, (UINT8 *)((UINTN) FileHandle + FileOffset), *ReadSize);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Load PE/COFF image information into internal buffer and check its validity.
 
   @retval   EFI_SUCCESS         Successful
@@ -1625,9 +1673,28 @@ LoadPeImage (
   EFI_IMAGE_DOS_HEADER                  *DosHdr;
   EFI_IMAGE_NT_HEADERS32                *NtHeader32;
   EFI_IMAGE_NT_HEADERS64                *NtHeader64;
+  PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
+  EFI_STATUS                            Status;
 
   NtHeader32 = NULL;
   NtHeader64 = NULL;
+
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle    = (VOID *) mImageBase;
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) SecureBootConfigImageRead;
+
+  //
+  // Get information about the image being loaded
+  //
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    //
+    // The information can't be got from the invalid PeImage
+    //
+    DEBUG ((DEBUG_INFO, "SecureBootConfigDxe: PeImage invalid. \n"));
+    return Status;
+  }
+
   //
   // Read the Dos header
   //
@@ -1688,6 +1755,9 @@ LoadPeImage (
 /**
   Calculate hash of Pe/Coff image based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A
+
+  Notes: PE/COFF image has been checked by BasePeCoffLib PeCoffLoaderGetImageInfo() in 
+  the function LoadPeImage ().
 
   @param[in]    HashAlg   Hash algorithm type.
 
