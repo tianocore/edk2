@@ -57,6 +57,7 @@
   HiiLib
   PlatformSecureLib
   DevicePathLib
+  PeCoffLib
 
 [Guids]
   ## SOMETIMES_CONSUMES      ## Variable:L"CustomMode"
