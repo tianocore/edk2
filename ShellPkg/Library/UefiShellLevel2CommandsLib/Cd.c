@@ -2,7 +2,7 @@
   Main file for attrib shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -125,12 +125,16 @@ ShellCommandRunCd (
           } else {
             CwdSize = StrSize(Directory) + sizeof(CHAR16);
             Cwd = AllocateZeroPool(CwdSize);
-            ASSERT(Cwd!=NULL);
-            StrCpyS(Cwd, StrSize(Directory)/sizeof(CHAR16)+1, Directory);
-            StrCatS(Cwd, StrSize(Directory)/sizeof(CHAR16)+1, L"\\");
-            Drive = GetFullyQualifiedPath(Cwd);
-            PathRemoveLastItem(Drive);
-            FreePool(Cwd);
+            if (Cwd == NULL) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cd");
+              ShellStatus = SHELL_OUT_OF_RESOURCES;
+            } else {
+              StrCpyS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, Directory);
+              StrCatS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, L"\\");
+              Drive = GetFullyQualifiedPath (Cwd);
+              PathRemoveLastItem (Drive);
+              FreePool (Cwd);
+            }
           }
           if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
             //
@@ -153,12 +157,16 @@ ShellCommandRunCd (
           } else {
             CwdSize = StrSize(Directory) + sizeof(CHAR16);
             Cwd = AllocateZeroPool(CwdSize);
-            ASSERT(Cwd!=NULL);
-            StrCpyS(Cwd, StrSize(Directory)/sizeof(CHAR16)+1, Directory);
-            StrCatS(Cwd, StrSize(Directory)/sizeof(CHAR16)+1, L"\\");
-            Drive = GetFullyQualifiedPath(Cwd);
-            while (PathRemoveLastItem(Drive));
-            FreePool(Cwd);
+            if (Cwd == NULL) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cd");
+              ShellStatus = SHELL_OUT_OF_RESOURCES;
+            } else {
+              StrCpyS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, Directory);
+              StrCatS (Cwd, StrSize (Directory) / sizeof (CHAR16) + 1, L"\\");
+              Drive = GetFullyQualifiedPath (Cwd);
+              while (PathRemoveLastItem (Drive));
+              FreePool (Cwd);
+            }
           }
           if (ShellStatus == SHELL_SUCCESS && Drive != NULL) {
             //
