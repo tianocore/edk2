@@ -1,4 +1,4 @@
-cd openssl-1.0.2g
+cd openssl-1.0.2h
 copy ..\opensslconf.h           crypto
 if not exist include\openssl mkdir include\openssl
 copy e_os2.h                    include\openssl
