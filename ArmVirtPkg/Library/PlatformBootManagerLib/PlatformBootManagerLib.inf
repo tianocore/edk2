@@ -78,6 +78,7 @@
 
 [Protocols]
   gEfiDevicePathProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
   gEfiGraphicsOutputProtocolGuid
   gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
