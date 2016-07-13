@@ -15,7 +15,7 @@
   TcgMeasureGptTable() function will receive untrusted GPT partition table, and parse
   partition data carefully.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -278,6 +278,9 @@ TcgMeasureGptTable (
   Caution: This function may receive untrusted input.
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
+
+  Notes: PE/COFF image has been checked by BasePeCoffLib PeCoffLoaderGetImageInfo() in 
+  its caller function DxeTpmMeasureBootHandler().
 
   @param[in] TcgProtocol    Pointer to the located TCG protocol instance.
   @param[in] ImageAddress   Start address of image buffer.
