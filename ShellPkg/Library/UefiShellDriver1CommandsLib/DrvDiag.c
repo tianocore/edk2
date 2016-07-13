@@ -2,7 +2,7 @@
   Main file for DrvDiag shell Driver1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -94,7 +94,9 @@ DoDiagnostics (
 
   if (DriverHandle != NULL) {
     DriverHandleList = AllocateZeroPool(2*sizeof(EFI_HANDLE));
-    ASSERT(DriverHandleList!=NULL);
+    if (DriverHandleList == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     DriverHandleList[0] = DriverHandle;
     DriverHandleListCount = 1;
   } else {
@@ -109,7 +111,10 @@ DoDiagnostics (
 
   if (ControllerHandle != NULL) {
     ControllerHandleList = AllocateZeroPool(2*sizeof(EFI_HANDLE));
-    ASSERT(ControllerHandleList!=NULL);
+    if (ControllerHandleList == NULL) {
+      SHELL_FREE_NON_NULL (DriverHandleList);
+      return EFI_OUT_OF_RESOURCES;
+    }
     ControllerHandleList[0] = ControllerHandle;
     ControllerHandleListCount = 1;
   } else {
@@ -118,7 +123,11 @@ DoDiagnostics (
 
   if (ChildHandle != NULL) {
     ChildHandleList = AllocateZeroPool(2*sizeof(EFI_HANDLE));
-    ASSERT(ChildHandleList!=NULL);
+    if (ChildHandleList != NULL) {
+      SHELL_FREE_NON_NULL (ControllerHandleList);
+      SHELL_FREE_NON_NULL (DriverHandleList);
+      return EFI_OUT_OF_RESOURCES;
+    }
     ChildHandleList[0] = ChildHandle;
     ChildHandleListCount = 1;
   } else if (AllChilds) {
