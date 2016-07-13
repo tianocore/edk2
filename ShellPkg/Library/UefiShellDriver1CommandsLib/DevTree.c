@@ -2,7 +2,7 @@
   Main file for DevTree shell Driver1 function.
 
   (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -57,7 +57,8 @@ DoDevTreeForHandle(
   ChildHandleBuffer   = NULL;
   ChildCount          = 0;
 
-  ASSERT(TheHandle    != NULL);
+  ASSERT (TheHandle != NULL);
+  ASSERT (HiiString != NULL);
   
   if (ShellGetExecutionBreakFlag()) {
     ShellStatus = SHELL_ABORTED;
@@ -91,10 +92,10 @@ DoDevTreeForHandle(
     return SHELL_SUCCESS;
   }
 
-  FormatString        = AllocateZeroPool(StrSize(HiiString) + (10)*sizeof(FormatString[0]));
-
-  ASSERT(HiiString    != NULL);
-  ASSERT(FormatString != NULL);
+  FormatString = AllocateZeroPool(StrSize(HiiString) + (10)*sizeof(FormatString[0]));
+  if (FormatString == NULL) {
+    return SHELL_OUT_OF_RESOURCES;
+  }
 
   //
   // we generate the format string on the fly so that we can control the
