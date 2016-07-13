@@ -38,15 +38,6 @@ FspGetSystemMemorySize (
   IN OUT UINT64              *HighMemoryLength
   );
 
-/**
-  Migrate BootLoader data before destroying CAR.
-
-**/
-VOID
-EFIAPI
-FspMigrateTemporaryMemory (
-  VOID
-  );
 
 /**
   Set a new stack frame for the continuation function.
