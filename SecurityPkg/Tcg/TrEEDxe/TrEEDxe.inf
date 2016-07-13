@@ -58,6 +58,7 @@
   HashLib
   PerformanceLib
   ReportStatusCodeLib
+  PeCoffLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"
