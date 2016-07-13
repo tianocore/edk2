@@ -275,10 +275,13 @@ GetImageType (
 /**
   Calculate hash of Pe/Coff image based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A
-
+  
   Caution: This function may receive untrusted input.
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
+
+  Notes: PE/COFF image has been checked by BasePeCoffLib PeCoffLoaderGetImageInfo() in 
+  its caller function DxeImageVerificationHandler().
 
   @param[in]    HashAlg   Hash algorithm type.
 
