@@ -6,7 +6,7 @@
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -29,6 +29,56 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/Tpm2CommandLib.h>
 #include <Library/HashLib.h>
 
+UINTN  mTcg2DxeImageSize = 0;
+
+/**
+  Reads contents of a PE/COFF image in memory buffer.
+
+  Caution: This function may receive untrusted input.
+  PE/COFF image is external input, so this function will make sure the PE/COFF image content
+  read is within the image buffer.
+
+  @param  FileHandle      Pointer to the file handle to read the PE/COFF image.
+  @param  FileOffset      Offset into the PE/COFF image to begin the read operation.
+  @param  ReadSize        On input, the size in bytes of the requested read operation.
+                          On output, the number of bytes actually read.
+  @param  Buffer          Output buffer that contains the data read from the PE/COFF image.
+
+  @retval EFI_SUCCESS     The specified portion of the PE/COFF image was read and the size
+**/
+EFI_STATUS
+EFIAPI
+Tcg2DxeImageRead (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+{
+  UINTN               EndPosition;
+
+  if (FileHandle == NULL || ReadSize == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MAX_ADDRESS - FileOffset < *ReadSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  EndPosition = FileOffset + *ReadSize;
+  if (EndPosition > mTcg2DxeImageSize) {
+    *ReadSize = (UINT32)(mTcg2DxeImageSize - FileOffset);
+  }
+
+  if (FileOffset >= mTcg2DxeImageSize) {
+    *ReadSize = 0;
+  }
+
+  CopyMem (Buffer, (UINT8 *)((UINTN) FileHandle + FileOffset), *ReadSize);
+
+  return EFI_SUCCESS;
+}
+
 /**
   Measure PE image into TPM log based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A.
@@ -36,6 +86,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Caution: This function may receive untrusted input.
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
+
+  Notes: PE/COFF image is checked by BasePeCoffLib PeCoffLoaderGetImageInfo().
 
   @param[in]  PCRIndex       TPM PCR index
   @param[in]  ImageAddress   Start address of image buffer.
@@ -69,6 +121,7 @@ MeasurePeImageAndExtend (
   UINT32                               NumberOfRvaAndSizes;
   UINT32                               CertSize;
   HASH_HANDLE                          HashHandle;
+  PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
 
   HashHandle = 0xFFFFFFFF; // Know bad value
 
@@ -78,6 +131,23 @@ MeasurePeImageAndExtend (
   //
   // Check PE/COFF image
   //
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle    = (VOID *) (UINTN) ImageAddress;
+  mTcg2DxeImageSize      = ImageSize;
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE) Tcg2DxeImageRead;
+
+  //
+  // Get information about the image being loaded
+  //
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    //
+    // The information can't be got from the invalid PeImage
+    //
+    DEBUG ((DEBUG_INFO, "Tcg2Dxe: PeImage invalid. Cannot retrieve image information.\n"));
+    goto Finish;
+  }
+
   DosHdr = (EFI_IMAGE_DOS_HEADER *) (UINTN) ImageAddress;
   PeCoffHeaderOffset = 0;
   if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {

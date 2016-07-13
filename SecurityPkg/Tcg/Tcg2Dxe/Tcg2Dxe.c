@@ -127,6 +127,8 @@ EFI_HANDLE mImageHandle;
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
 
+  Notes: PE/COFF image is checked by BasePeCoffLib PeCoffLoaderGetImageInfo().
+
   @param[in]  PCRIndex       TPM PCR index
   @param[in]  ImageAddress   Start address of image buffer.
   @param[in]  ImageSize      Image size
