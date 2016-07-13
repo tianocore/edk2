@@ -155,6 +155,26 @@ VAR_CHECK_ITEM  mIfConfig6SetCheckList[] = {
 };
 
 /**
+  Free the ARG_LIST.
+
+  @param List Pointer to ARG_LIST to free.
+**/
+VOID
+IfConfig6FreeArgList (
+  ARG_LIST       *List
+)
+{
+  ARG_LIST       *Next;
+  while (List->Next != NULL) {
+    Next = List->Next;
+    FreePool (List);
+    List = Next;
+  }
+
+  FreePool (List);
+}
+
+/**
   Split a string with specified separator and save the substring to a list.
 
   @param[in]    String       The pointer of the input string.
@@ -181,15 +201,19 @@ IfConfig6SplitStrToList (
   //
   // Copy the CONST string to a local copy.
   //
-  Str     = AllocateCopyPool (StrSize (String), String);
-  ASSERT (Str != NULL);
+  Str = AllocateCopyPool (StrSize (String), String);
+  if (Str == NULL) {
+    return NULL;
+  }
   ArgStr  = Str;
 
   //
   // init a node for the list head.
   //
   ArgNode = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
-  ASSERT (ArgNode != NULL);
+  if (ArgNode == NULL) {
+    return NULL;
+  }
   ArgList = ArgNode;
 
   //
@@ -201,7 +225,14 @@ IfConfig6SplitStrToList (
       ArgNode->Arg  = ArgStr;
       ArgStr        = Str + 1;
       ArgNode->Next = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
-      ASSERT (ArgNode->Next != NULL);
+      if (ArgNode->Next == NULL) {
+        //
+        // Free the local copy of string stored in the first node
+        //
+        FreePool (ArgList->Arg);
+        IfConfig6FreeArgList (ArgList);
+        return NULL;
+      }
       ArgNode = ArgNode->Next;
     }
 
@@ -1668,8 +1699,6 @@ IfConfig6Cleanup (
   LIST_ENTRY                *Entry;
   LIST_ENTRY                *NextEntry;
   IFCONFIG6_INTERFACE_CB    *IfCb;
-  ARG_LIST                  *ArgNode;
-  ARG_LIST                  *ArgHead;
 
   ASSERT (Private != NULL);
 
@@ -1677,15 +1706,7 @@ IfConfig6Cleanup (
   // Clean the list which save the set config Args.
   //
   if (Private->VarArg != NULL) {
-    ArgHead = Private->VarArg;
-
-    while (ArgHead->Next != NULL) {
-      ArgNode = ArgHead->Next;
-      FreePool (ArgHead);
-      ArgHead = ArgNode;
-    }
-
-    FreePool (ArgHead);
+    IfConfig6FreeArgList (Private->VarArg);
   }
 
   if (Private->IfName != NULL)
@@ -1799,8 +1820,12 @@ ShellCommandRunIfconfig6 (
     Private->OpCode = IfConfig6OpList;
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-l");
     if (ValueStr != NULL) {
-      Str             = AllocateCopyPool (StrSize (ValueStr), ValueStr);
-      ASSERT (Str != NULL);
+      Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
+      if (Str == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        goto ON_EXIT;
+      }
       Private->IfName = Str;
     }
   }
@@ -1811,8 +1836,12 @@ ShellCommandRunIfconfig6 (
     Private->OpCode = IfConfig6OpClear;
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-r");
     if (ValueStr != NULL) {
-      Str             = AllocateCopyPool (StrSize (ValueStr), ValueStr);
-      ASSERT (Str != NULL);
+      Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
+      if (Str == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        goto ON_EXIT;
+      }
       Private->IfName = Str;
     }
   }
@@ -1830,8 +1859,12 @@ ShellCommandRunIfconfig6 (
     //
     // To split the configuration into multi-section.
     //
-    ArgList         = IfConfig6SplitStrToList (ValueStr, L' ');
-    ASSERT (ArgList != NULL);
+    ArgList = IfConfig6SplitStrToList (ValueStr, L' ');
+    if (ArgList == NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
 
     Private->OpCode = IfConfig6OpSet;
     Private->IfName = ArgList->Arg;

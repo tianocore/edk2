@@ -24,6 +24,7 @@
 #langdef   en-US "english"
 
 #string STR_GEN_ERR_AD                     #language en-US  "%H%s%N: Access denied.\r\n"
+#string STR_GEN_OUT_MEM                    #language en-US  "%H%s%N: Memory allocation was not successful.\r\n"
 
 #string STR_PING6_INVALID_IP               #language en-US  "%Ping6: Invalid IP6 address, %s\r\n"
 #string STR_PING6_INVALID_INPUT            #language en-US  "%Ping6: Invalid input, please type 'Ping6 -?'for help\r\n"
