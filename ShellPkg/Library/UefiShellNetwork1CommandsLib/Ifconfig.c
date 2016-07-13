@@ -130,6 +130,26 @@ VAR_CHECK_ITEM  mSetCheckList[] = {
 STATIC CONST CHAR16 PermanentString[10] = L"PERMANENT";
 
 /**
+  Free the ARG_LIST.
+
+  @param List Pointer to ARG_LIST to free.
+**/
+VOID
+FreeArgList (
+  ARG_LIST       *List
+)
+{
+  ARG_LIST       *Next;
+  while (List->Next != NULL) {
+    Next = List->Next;
+    FreePool (List);
+    List = Next;
+  }
+
+  FreePool (List);
+}
+
+/**
   Split a string with specified separator and save the substring to a list.
 
   @param[in]    String       The pointer of the input string.
@@ -157,14 +177,18 @@ SplitStrToList (
   // Copy the CONST string to a local copy.
   //
   Str = AllocateCopyPool (StrSize (String), String);
-  ASSERT (Str != NULL);
+  if (Str == NULL) {
+    return NULL;
+  }
   ArgStr  = Str;
 
   //
   // init a node for the list head.
   //
   ArgNode = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
-  ASSERT (ArgNode != NULL);
+  if (ArgNode == NULL) {
+    return NULL;
+  }
   ArgList = ArgNode;
 
   //
@@ -176,7 +200,14 @@ SplitStrToList (
       ArgNode->Arg  = ArgStr;
       ArgStr        = Str + 1;
       ArgNode->Next = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
-      ASSERT (ArgNode->Next != NULL);
+      if (ArgNode->Next == NULL) {
+        //
+        // Free the local copy of string stored in the first node
+        //
+        FreePool (ArgList->Arg);
+        FreeArgList (ArgList);
+        return NULL;
+      }
       ArgNode = ArgNode->Next;
     }
 
@@ -1083,7 +1114,11 @@ IfConfigSetInterfaceInfo (
       }
 
       Dns   = AllocatePool (Index * sizeof (EFI_IPv4_ADDRESS));
-      ASSERT(Dns != NULL);
+      if (Dns == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork1HiiHandle, L"ifconfig");
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        goto ON_EXIT;
+      }
       Tmp   = VarArg;
       Index = 0;
       while (Tmp != NULL) {
@@ -1193,8 +1228,6 @@ IfConfigCleanup (
   LIST_ENTRY                *Entry;
   LIST_ENTRY                *NextEntry;
   IFCONFIG_INTERFACE_CB     *IfCb;
-  ARG_LIST                  *ArgNode;
-  ARG_LIST                  *ArgHead;
 
   ASSERT (Private != NULL);
 
@@ -1202,15 +1235,7 @@ IfConfigCleanup (
   // Clean the list which save the set config Args.
   //
   if (Private->VarArg != NULL) {
-    ArgHead = Private->VarArg;
-
-    while (ArgHead->Next != NULL) {
-      ArgNode = ArgHead->Next;
-      FreePool (ArgHead);
-      ArgHead = ArgNode;
-    }
-
-    FreePool (ArgHead);
+    FreeArgList (Private->VarArg);
   }
 
   if (Private->IfName != NULL) {
@@ -1325,11 +1350,15 @@ ShellCommandRunIfconfig (
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-l");
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
-      ASSERT (Str != NULL);
+      if (Str == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork1HiiHandle, L"ifconfig");
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        goto ON_EXIT;
+      }
       Private->IfName = Str;
     }
   }
-  
+
   //
   // To get interface name for the clear option.
   //
@@ -1338,7 +1367,11 @@ ShellCommandRunIfconfig (
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-r");
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
-      ASSERT (Str != NULL);
+      if (Str == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork1HiiHandle, L"ifconfig");
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        goto ON_EXIT;
+      }
       Private->IfName = Str;
     }
   }
@@ -1357,8 +1390,12 @@ ShellCommandRunIfconfig (
     //
     // To split the configuration into multi-section.
     //
-    ArgList         = SplitStrToList (ValueStr, L' ');
-    ASSERT (ArgList != NULL);
+    ArgList = SplitStrToList (ValueStr, L' ');
+    if (ArgList == NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork1HiiHandle, L"ifconfig");
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
 
     Private->OpCode = IfConfigOpSet;
     Private->IfName = ArgList->Arg;
