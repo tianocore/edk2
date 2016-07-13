@@ -59,6 +59,7 @@
   PerformanceLib
   ReportStatusCodeLib
   Tcg2PhysicalPresenceLib
+  PeCoffLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"
