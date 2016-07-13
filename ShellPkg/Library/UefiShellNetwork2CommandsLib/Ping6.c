@@ -961,7 +961,11 @@ ShellPing6 (
   ShellStatus = SHELL_SUCCESS;
   Private = AllocateZeroPool (sizeof (PING6_PRIVATE_DATA));
 
-  ASSERT (Private != NULL);
+  if (Private == NULL) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"Ping6");
+    ShellStatus = SHELL_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
 
   Private->ImageHandle = ImageHandle;
   Private->SendNum     = SendNumber;
