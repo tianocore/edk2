@@ -254,7 +254,7 @@ index d5a5514..bede55c 100644
          goto err;
  
 diff --git a/crypto/bn/bn_prime.c b/crypto/bn/bn_prime.c
-index 1d25687..e933ead 100644
+index 1d25687..ad641c3 100644
 --- a/crypto/bn/bn_prime.c
 +++ b/crypto/bn/bn_prime.c
 @@ -131,7 +131,7 @@
@@ -277,7 +277,7 @@ index 1d25687..e933ead 100644
  
 +    mods = OPENSSL_malloc(sizeof(*mods) * NUMPRIMES);
 +    if (mods == NULL)
-+	    goto err;
++        goto err;
      ctx = BN_CTX_new();
      if (ctx == NULL)
          goto err;
@@ -311,7 +311,7 @@ index 1d25687..e933ead 100644
  
   again:
 diff --git a/crypto/conf/conf.h b/crypto/conf/conf.h
-index 8d926d5..41cf38e 100644
+index 8d926d5..c29e97d 100644
 --- a/crypto/conf/conf.h
 +++ b/crypto/conf/conf.h
 @@ -118,8 +118,10 @@ typedef void conf_finish_func (CONF_IMODULE *md);
@@ -329,9 +329,9 @@ index 8d926d5..41cf38e 100644
  long CONF_get_number(LHASH_OF(CONF_VALUE) *conf, const char *group,
                       const char *name);
  void CONF_free(LHASH_OF(CONF_VALUE) *conf);
-+#ifndef OPENSSL_NO_FP_API
++# ifndef OPENSSL_NO_FP_API
  int CONF_dump_fp(LHASH_OF(CONF_VALUE) *conf, FILE *out);
-+#endif
++# endif
  int CONF_dump_bio(LHASH_OF(CONF_VALUE) *conf, BIO *out);
  
  void OPENSSL_config(const char *config_name);
@@ -349,9 +349,9 @@ index 8d926d5..41cf38e 100644
  char *NCONF_get_string(const CONF *conf, const char *group, const char *name);
  int NCONF_get_number_e(const CONF *conf, const char *group, const char *name,
                         long *result);
-+#ifndef OPENSSL_NO_FP_API
++# ifndef OPENSSL_NO_FP_API
  int NCONF_dump_fp(const CONF *conf, FILE *out);
-+#endif
++# endif
  int NCONF_dump_bio(const CONF *conf, BIO *out);
  
  # if 0                          /* The following function has no error
@@ -359,10 +359,10 @@ index 8d926d5..41cf38e 100644
  
  int CONF_modules_load(const CONF *cnf, const char *appname,
                        unsigned long flags);
-+#ifndef OPENSSL_NO_STDIO
++# ifndef OPENSSL_NO_STDIO
  int CONF_modules_load_file(const char *filename, const char *appname,
                             unsigned long flags);
-+#endif
++# endif
  void CONF_modules_unload(int all);
  void CONF_modules_finish(void);
  void CONF_modules_free(void);
@@ -684,10 +684,10 @@ index a5bd901..6488879 100644
  /* BEGIN ERROR CODES */
  /*
 diff --git a/crypto/dh/dh_kdf.c b/crypto/dh/dh_kdf.c
-index a882cb2..4eddb9a 100644
+index a882cb2..aace5fb 100644
 --- a/crypto/dh/dh_kdf.c
 +++ b/crypto/dh/dh_kdf.c
-@@ -51,13 +51,18 @@
+@@ -51,6 +51,9 @@
   * ====================================================================
   */
  
@@ -697,22 +697,21 @@ index a882cb2..4eddb9a 100644
  #include <string.h>
  #include <openssl/dh.h>
  #include <openssl/evp.h>
- #include <openssl/asn1.h>
+@@ -58,6 +61,7 @@
  #include <openssl/cms.h>
  
-+
  /* Key derivation from X9.42/RFC2631 */
 +/* Uses CMS functions, hence the #ifdef wrapper. */
  
  #define DH_KDF_MAX      (1L << 30)
  
-@@ -185,3 +190,4 @@ int DH_KDF_X9_42(unsigned char *out, size_t outlen,
+@@ -185,3 +189,4 @@ int DH_KDF_X9_42(unsigned char *out, size_t outlen,
      EVP_MD_CTX_cleanup(&mctx);
      return rv;
  }
 +#endif
 diff --git a/crypto/dh/dh_pmeth.c b/crypto/dh/dh_pmeth.c
-index b58e3fa..c6288f6 100644
+index b58e3fa..926be98 100644
 --- a/crypto/dh/dh_pmeth.c
 +++ b/crypto/dh/dh_pmeth.c
 @@ -207,7 +207,11 @@ static int pkey_dh_ctrl(EVP_PKEY_CTX *ctx, int type, int p1, void *p2)
@@ -727,7 +726,7 @@ index b58e3fa..c6288f6 100644
              return -2;
          dctx->kdf_type = p1;
          return 1;
-@@ -448,7 +452,10 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
+@@ -448,7 +452,9 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
              return ret;
          *keylen = ret;
          return 1;
@@ -735,11 +734,10 @@ index b58e3fa..c6288f6 100644
 +    }
 +#ifndef OPENSSL_NO_CMS
 +    else if (dctx->kdf_type == EVP_PKEY_DH_KDF_X9_42) {
-+
          unsigned char *Z = NULL;
          size_t Zlen = 0;
          if (!dctx->kdf_outlen || !dctx->kdf_oid)
-@@ -479,7 +486,8 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
+@@ -479,7 +485,8 @@ static int pkey_dh_derive(EVP_PKEY_CTX *ctx, unsigned char *key,
          }
          return ret;
      }
@@ -945,7 +943,7 @@ index 7a1c85d..7162c0f 100644
  #undef BN_LLONG
  
 diff --git a/crypto/pem/pem.h b/crypto/pem/pem.h
-index d3b23fc..87b0b6a 100644
+index d3b23fc..5df6ffd 100644
 --- a/crypto/pem/pem.h
 +++ b/crypto/pem/pem.h
 @@ -324,6 +324,7 @@ int PEM_write_bio_##name(BIO *bp, type *x, const EVP_CIPHER *enc, \
@@ -980,17 +978,16 @@ index d3b23fc..87b0b6a 100644
  int i2d_PKCS8PrivateKey_fp(FILE *fp, EVP_PKEY *x, const EVP_CIPHER *enc,
                             char *kstr, int klen,
                             pem_password_cb *cb, void *u);
-@@ -510,7 +514,7 @@ EVP_PKEY *d2i_PKCS8PrivateKey_fp(FILE *fp, EVP_PKEY **x, pem_password_cb *cb,
+@@ -510,6 +514,7 @@ EVP_PKEY *d2i_PKCS8PrivateKey_fp(FILE *fp, EVP_PKEY **x, pem_password_cb *cb,
  int PEM_write_PKCS8PrivateKey(FILE *fp, EVP_PKEY *x, const EVP_CIPHER *enc,
                                char *kstr, int klen, pem_password_cb *cd,
                                void *u);
--
 +#endif
+ 
  EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x);
  int PEM_write_bio_Parameters(BIO *bp, EVP_PKEY *x);
- 
 diff --git a/crypto/pem/pem_lib.c b/crypto/pem/pem_lib.c
-index a29821a..5525efd 100644
+index fe881d6..e25cc68 100644
 --- a/crypto/pem/pem_lib.c
 +++ b/crypto/pem/pem_lib.c
 @@ -84,7 +84,7 @@ int pem_check_suffix(const char *pem_str, const char *suffix);
@@ -1003,38 +1000,35 @@ index a29821a..5525efd 100644
       * We should not ever call the default callback routine from windows.
       */
 diff --git a/crypto/pem/pem_pk8.c b/crypto/pem/pem_pk8.c
-index 5747c73..fe465cc 100644
+index 5747c73..9edca4d 100644
 --- a/crypto/pem/pem_pk8.c
 +++ b/crypto/pem/pem_pk8.c
-@@ -69,10 +69,12 @@
+@@ -69,9 +69,11 @@
  static int do_pk8pkey(BIO *bp, EVP_PKEY *x, int isder,
                        int nid, const EVP_CIPHER *enc,
                        char *kstr, int klen, pem_password_cb *cb, void *u);
-+
 +#ifndef OPENSSL_NO_FP_API
  static int do_pk8pkey_fp(FILE *bp, EVP_PKEY *x, int isder,
                           int nid, const EVP_CIPHER *enc,
                           char *kstr, int klen, pem_password_cb *cb, void *u);
--
 +#endif
+ 
  /*
   * These functions write a private key in PKCS#8 format: it is a "drop in"
-  * replacement for PEM_write_bio_PrivateKey() and friends. As usual if 'enc'
 diff --git a/crypto/pkcs7/pk7_smime.c b/crypto/pkcs7/pk7_smime.c
-index dc9b484..0bc3d43 100644
+index dc9b484..e75c4b2 100644
 --- a/crypto/pkcs7/pk7_smime.c
 +++ b/crypto/pkcs7/pk7_smime.c
-@@ -64,6 +64,9 @@
+@@ -64,6 +64,8 @@
  #include <openssl/x509.h>
  #include <openssl/x509v3.h>
  
-+
 +#define BUFFERSIZE 4096
 +
  static int pkcs7_copy_existing_digest(PKCS7 *p7, PKCS7_SIGNER_INFO *si);
  
  PKCS7 *PKCS7_sign(X509 *signcert, EVP_PKEY *pkey, STACK_OF(X509) *certs,
-@@ -254,7 +257,7 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -254,7 +256,7 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
      STACK_OF(PKCS7_SIGNER_INFO) *sinfos;
      PKCS7_SIGNER_INFO *si;
      X509_STORE_CTX cert_ctx;
@@ -1043,7 +1037,7 @@ index dc9b484..0bc3d43 100644
      int i, j = 0, k, ret = 0;
      BIO *p7bio = NULL;
      BIO *tmpin = NULL, *tmpout = NULL;
-@@ -373,8 +376,12 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -373,8 +375,12 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
          tmpout = out;
  
      /* We now have to 'read' from p7bio to calculate digests etc. */
@@ -1057,7 +1051,7 @@ index dc9b484..0bc3d43 100644
          if (i <= 0)
              break;
          if (tmpout)
-@@ -405,6 +412,7 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
+@@ -405,6 +411,7 @@ int PKCS7_verify(PKCS7 *p7, STACK_OF(X509) *certs, X509_STORE *store,
      ret = 1;
  
   err:
@@ -1065,7 +1059,7 @@ index dc9b484..0bc3d43 100644
      if (tmpin == indata) {
          if (indata)
              BIO_pop(p7bio);
-@@ -523,7 +531,7 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
+@@ -523,7 +530,7 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
  {
      BIO *tmpmem;
      int ret, i;
@@ -1074,7 +1068,7 @@ index dc9b484..0bc3d43 100644
  
      if (!p7) {
          PKCS7err(PKCS7_F_PKCS7_DECRYPT, PKCS7_R_INVALID_NULL_POINTER);
-@@ -567,24 +575,29 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
+@@ -567,24 +574,30 @@ int PKCS7_decrypt(PKCS7 *p7, EVP_PKEY *pkey, X509 *cert, BIO *data, int flags)
          }
          BIO_free_all(bread);
          return ret;
@@ -1116,6 +1110,7 @@ index dc9b484..0bc3d43 100644
 -        BIO_free_all(tmpmem);
 -        return ret;
      }
++
 +err:
 +    OPENSSL_free(buf);
 +    BIO_free_all(tmpmem);
@@ -1222,20 +1217,19 @@ index 4e06218..ddead3d 100644
  const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
      {
 diff --git a/crypto/srp/srp.h b/crypto/srp/srp.h
-index 028892a..713fc54 100644
+index 028892a..4ed4bfe 100644
 --- a/crypto/srp/srp.h
 +++ b/crypto/srp/srp.h
-@@ -119,8 +119,9 @@ DECLARE_STACK_OF(SRP_gN)
+@@ -119,7 +119,9 @@ DECLARE_STACK_OF(SRP_gN)
  
  SRP_VBASE *SRP_VBASE_new(char *seed_key);
  int SRP_VBASE_free(SRP_VBASE *vb);
 +#ifndef OPENSSL_NO_STDIO
  int SRP_VBASE_init(SRP_VBASE *vb, char *verifier_file);
--
 +#endif
+ 
  /* This method ignores the configured seed and fails for an unknown user. */
  SRP_user_pwd *SRP_VBASE_get_by_user(SRP_VBASE *vb, char *username);
- /* NOTE: unlike in SRP_VBASE_get_by_user, caller owns the returned pointer.*/
 diff --git a/crypto/srp/srp_vfy.c b/crypto/srp/srp_vfy.c
 index 26ad3e0..6be4cf2 100644
 --- a/crypto/srp/srp_vfy.c
@@ -1950,7 +1944,7 @@ index f6b3ff2..1dcbe36 100755
  		     SEED,-
  		     SHA,-
 diff --git a/ssl/d1_both.c b/ssl/d1_both.c
-index d1fc716..d5f661a 100644
+index 5d26c94..ee3f49b 100644
 --- a/ssl/d1_both.c
 +++ b/ssl/d1_both.c
 @@ -1053,7 +1053,7 @@ int dtls1_send_change_cipher_spec(SSL *s, int a, int b)
@@ -2002,15 +1996,14 @@ index 35cc27c..a1f5335 100644
          } else {
              ret->sid_ctx_length = os.length;
 diff --git a/ssl/ssl_cert.c b/ssl/ssl_cert.c
-index a73f866..d534c0a 100644
+index f48ebae..ac4f08c 100644
 --- a/ssl/ssl_cert.c
 +++ b/ssl/ssl_cert.c
-@@ -855,12 +855,13 @@ int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
+@@ -857,12 +857,12 @@ int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
      return (add_client_CA(&(ctx->client_CA), x));
  }
  
 +#ifndef OPENSSL_NO_STDIO
-+
  static int xname_cmp(const X509_NAME *const *a, const X509_NAME *const *b)
  {
      return (X509_NAME_cmp(*a, *b));
@@ -2020,7 +2013,7 @@ index a73f866..d534c0a 100644
  /**
   * Load CA certs from a file into a ::STACK. Note that it is somewhat misnamed;
   * it doesn't really have anything to do with clients (except that a common use
-@@ -928,7 +929,6 @@ STACK_OF(X509_NAME) *SSL_load_client_CA_file(const char *file)
+@@ -930,7 +930,6 @@ STACK_OF(X509_NAME) *SSL_load_client_CA_file(const char *file)
          ERR_clear_error();
      return (ret);
  }
@@ -2028,7 +2021,7 @@ index a73f866..d534c0a 100644
  
  /**
   * Add a file of certs to a stack.
-@@ -1048,6 +1048,7 @@ int SSL_add_dir_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
+@@ -1050,6 +1049,7 @@ int SSL_add_dir_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
      CRYPTO_w_unlock(CRYPTO_LOCK_READDIR);
      return ret;
  }
@@ -2108,7 +2101,7 @@ index baa3b59..1ee3f02 100644
  if ($? == 0)
  	{
 diff --git a/util/libeay.num b/util/libeay.num
-index e5b3c6e..8d4185c 100755
+index 2094ab3..992abb2 100755
 --- a/util/libeay.num
 +++ b/util/libeay.num
 @@ -4370,7 +4370,7 @@ DH_compute_key_padded                   4732	EXIST::FUNCTION:DH
@@ -2121,7 +2114,7 @@ index e5b3c6e..8d4185c 100755
  EVP_des_ede3_wrap                       4737	EXIST::FUNCTION:DES
  RSA_OAEP_PARAMS_it                      4738	EXIST:!EXPORT_VAR_AS_FUNCTION:VARIABLE:RSA
 diff --git a/util/mkdef.pl b/util/mkdef.pl
-index c57c7f7..d4c3386 100755
+index b9b159a..9841498 100755
 --- a/util/mkdef.pl
 +++ b/util/mkdef.pl
 @@ -97,6 +97,8 @@ my @known_algorithms = ( "RC2", "RC4", "RC5", "IDEA", "DES", "BF",
@@ -2133,7 +2126,7 @@ index c57c7f7..d4c3386 100755
  			 # RFC3779
  			 "RFC3779",
  			 # TLS
-@@ -142,7 +144,7 @@ my $no_md2; my $no_md4; my $no_md5; my $no_sha; my $no_ripemd; my $no_mdc2;
+@@ -144,7 +146,7 @@ my $no_md2; my $no_md4; my $no_md5; my $no_sha; my $no_ripemd; my $no_mdc2;
  my $no_rsa; my $no_dsa; my $no_dh; my $no_hmac=0; my $no_aes; my $no_krb5;
  my $no_ec; my $no_ecdsa; my $no_ecdh; my $no_engine; my $no_hw;
  my $no_fp_api; my $no_static_engine=1; my $no_gmp; my $no_deprecated;
@@ -2141,8 +2134,8 @@ index c57c7f7..d4c3386 100755
 +my $no_sct; my $no_rfc3779; my $no_psk; my $no_tlsext; my $no_cms; my $no_capieng;
  my $no_jpake; my $no_srp; my $no_ssl2; my $no_ec2m; my $no_nistp_gcc; 
  my $no_nextprotoneg; my $no_sctp; my $no_srtp; my $no_ssl_trace;
- my $no_unit_test; my $no_ssl3_method;
-@@ -233,6 +235,7 @@ foreach (@ARGV, split(/ /, $options))
+ my $no_unit_test; my $no_ssl3_method; my $no_ssl2_method;
+@@ -235,6 +237,7 @@ foreach (@ARGV, split(/ /, $options))
  	elsif (/^no-engine$/)	{ $no_engine=1; }
  	elsif (/^no-hw$/)	{ $no_hw=1; }
  	elsif (/^no-gmp$/)	{ $no_gmp=1; }
@@ -2150,7 +2143,7 @@ index c57c7f7..d4c3386 100755
  	elsif (/^no-rfc3779$/)	{ $no_rfc3779=1; }
  	elsif (/^no-tlsext$/)	{ $no_tlsext=1; }
  	elsif (/^no-cms$/)	{ $no_cms=1; }
-@@ -1206,6 +1209,7 @@ sub is_valid
+@@ -1209,6 +1212,7 @@ sub is_valid
  			if ($keyword eq "FP_API" && $no_fp_api) { return 0; }
  			if ($keyword eq "STATIC_ENGINE" && $no_static_engine) { return 0; }
  			if ($keyword eq "GMP" && $no_gmp) { return 0; }
