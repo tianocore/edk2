@@ -736,11 +736,15 @@ ShellCommandRunMv (
             //
             CwdSize = StrSize(ShellGetCurrentDir(NULL)) + sizeof(CHAR16);
             Cwd = AllocateZeroPool(CwdSize);
-            ASSERT (Cwd != NULL);
-            StrCpyS(Cwd, CwdSize/sizeof(CHAR16), ShellGetCurrentDir(NULL));
-            StrCatS(Cwd, CwdSize/sizeof(CHAR16), L"\\");
-            ShellStatus = ValidateAndMoveFiles(FileList, &Response, Cwd);
-            FreePool(Cwd);
+            if (Cwd == NULL) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"mv");
+              ShellStatus = SHELL_OUT_OF_RESOURCES;
+            } else {
+              StrCpyS (Cwd, CwdSize / sizeof (CHAR16), ShellGetCurrentDir (NULL));
+              StrCatS (Cwd, CwdSize / sizeof (CHAR16), L"\\");
+              ShellStatus = ValidateAndMoveFiles (FileList, &Response, Cwd);
+              FreePool (Cwd);
+            }
           }
         }
 
