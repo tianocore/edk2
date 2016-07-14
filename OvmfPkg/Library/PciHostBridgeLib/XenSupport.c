@@ -30,7 +30,7 @@
 STATIC
 VOID
 PcatPciRootBridgeBarExisted (
-  IN  UINT64                         Address,
+  IN  UINTN                          Address,
   OUT UINT32                         *OriginalValue,
   OUT UINT32                         *Value
   )
@@ -180,7 +180,7 @@ ScanForRootBridges (
   UINT8      Device;
   UINT8      Function;
   UINTN      NumberOfDevices;
-  UINT64     Address;
+  UINTN      Address;
   PCI_TYPE01 Pci;
   UINT64     Attributes;
   UINT64     Base;
