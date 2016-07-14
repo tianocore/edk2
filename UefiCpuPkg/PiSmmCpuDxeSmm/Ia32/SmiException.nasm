@@ -733,5 +733,3 @@ ASM_PFX(InitializeIDTSmmStackGuard):
     mov     [ebx + 4], eax
     pop     ebx
     ret
-
-    END

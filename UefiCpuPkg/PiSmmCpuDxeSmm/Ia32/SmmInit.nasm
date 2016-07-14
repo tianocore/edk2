@@ -85,4 +85,3 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
     mov     byte [eax], 1
     pop     eax
     jmp     [ASM_PFX(mSmmRelocationOriginalAddress)]
-    END
