@@ -1057,6 +1057,7 @@ IfConfig6ShowInterfaceInfo (
   }
 
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_BREAK), gShellNetwork2HiiHandle);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
 
   return SHELL_SUCCESS;
 }
@@ -1065,6 +1066,7 @@ IfConfig6ShowInterfaceInfo (
   The clean process of the IfConfig6 application.
 
   @param[in]   IfList    The pointer of IfList(interface list).
+  @param[in]   IfName    The pointer of interface name.
 
   @retval SHELL_SUCCESS  The IfConfig6 clean processed successfully.
   @retval others         The IfConfig6 clean process failed.
@@ -1072,7 +1074,8 @@ IfConfig6ShowInterfaceInfo (
 **/
 SHELL_STATUS
 IfConfig6ClearInterfaceInfo (
-  IN LIST_ENTRY    *IfList
+  IN LIST_ENTRY    *IfList,
+  IN CHAR16        *IfName
   )
 {
   EFI_STATUS                Status;
@@ -1081,7 +1084,6 @@ IfConfig6ClearInterfaceInfo (
   IFCONFIG6_INTERFACE_CB    *IfCb;
   EFI_IP6_CONFIG_POLICY     Policy;
 
-  Policy = Ip6ConfigPolicyAutomatic;
   Entry  = IfList->ForwardLink;
   Status = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
@@ -1091,11 +1093,30 @@ IfConfig6ClearInterfaceInfo (
   }
 
   //
-  // Go through the interface list.
+  // Go through the interface list.If the interface name is specified, then
+  // need to refresh the configuration.
   //
   while (Entry != IfList) {
 
     IfCb = BASE_CR (Entry, IFCONFIG6_INTERFACE_CB, Link);
+
+    if ((IfName != NULL) && (StrCmp (IfName, IfCb->IfInfo->Name) == 0)) {
+      Policy = Ip6ConfigPolicyManual;
+
+      Status = IfCb->IfCfg->SetData (
+                              IfCb->IfCfg,
+                              Ip6ConfigDataTypePolicy,
+                              sizeof (EFI_IP6_CONFIG_POLICY),
+                              &Policy
+                              );
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork2HiiHandle, L"ifconfig6");
+        ShellStatus = SHELL_ACCESS_DENIED;
+        break;
+      }
+    }
+
+    Policy = Ip6ConfigPolicyAutomatic;
 
     Status = IfCb->IfCfg->SetData (
                             IfCb->IfCfg,
@@ -1105,6 +1126,7 @@ IfConfig6ClearInterfaceInfo (
                             );
 
     if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork2HiiHandle, L"ifconfig6");
       ShellStatus = SHELL_ACCESS_DENIED;
       break;
     }
@@ -1616,7 +1638,7 @@ IfConfig6 (
     break;
 
   case IfConfig6OpClear:
-    ShellStatus = IfConfig6ClearInterfaceInfo (&Private->IfList);
+    ShellStatus = IfConfig6ClearInterfaceInfo (&Private->IfList, Private->IfName);
     break;
 
   case IfConfig6OpSet:
