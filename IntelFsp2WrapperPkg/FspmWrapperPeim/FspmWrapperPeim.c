@@ -36,7 +36,6 @@
 #include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/MemoryDiscovered.h>
 #include <Ppi/SecPlatformInformation.h>
-#include <Library/PlatformSecLib.h>
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
 
