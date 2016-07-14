@@ -89,10 +89,11 @@ VERIFY_SIZE_OF (CHAR16, 2);
 // warnings.
 //
 #ifndef UNREACHABLE
-  #ifdef __GNUC__
+  #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 4)
     ///
     /// Signal compilers and analyzers that this call is not reachable.  It is
     /// up to the compiler to remove any code past that point.
+    /// Not implemented by GCC 4.4 or earlier.
     ///
     #define UNREACHABLE()  __builtin_unreachable ()
   #elif defined (__has_feature)
