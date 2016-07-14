@@ -335,7 +335,7 @@ PublishPeiMemory (
   EFI_STATUS                  Status;
   EFI_PHYSICAL_ADDRESS        MemoryBase;
   UINT64                      MemorySize;
-  UINT64                      LowerMemorySize;
+  UINT32                      LowerMemorySize;
   UINT32                      PeiMemoryCap;
 
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
