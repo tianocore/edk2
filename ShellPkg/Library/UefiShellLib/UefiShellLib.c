@@ -2976,13 +2976,14 @@ ShellPrintHiiEx(
   CHAR16            *HiiFormatString;
   EFI_STATUS        RetVal;
 
+  RetVal = EFI_DEVICE_ERROR;
+
   VA_START (Marker, HiiFormatHandle);
   HiiFormatString = HiiGetString(HiiFormatHandle, HiiFormatStringId, Language);
-  ASSERT(HiiFormatString != NULL);
-
-  RetVal = InternalShellPrintWorker(Col, Row, HiiFormatString, Marker);
-
-  SHELL_FREE_NON_NULL(HiiFormatString);
+  if (HiiFormatString != NULL) {
+    RetVal = InternalShellPrintWorker (Col, Row, HiiFormatString, Marker);
+    SHELL_FREE_NON_NULL (HiiFormatString);
+  }
   VA_END(Marker);
 
   return (RetVal);
