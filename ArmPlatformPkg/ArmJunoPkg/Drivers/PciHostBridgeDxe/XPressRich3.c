@@ -84,7 +84,7 @@ HWPciRbInit (
   PCIE_ROOTPORT_WRITE32 (PCIE_PCI_IDS + PCIE_PCI_IDS_CLASSCODE_OFFSET, ((PLDA_BRIDGE_CCR << 8) | PCI_BRIDGE_REVISION_ID));
 
   //
-  // PCIE Window 0 -> AXI4 Slave 0 Address Translations
+  // PCIE Window 0 -> AXI4 Master 0 Address Translations
   //
   TranslationTable = VEXPRESS_ATR_PCIE_WIN0;
 
@@ -101,7 +101,7 @@ HWPciRbInit (
       ARM_JUNO_EXTRA_SYSTEM_MEMORY_SZ, PCI_ATR_TRSLID_AXIMEMORY);
 
   //
-  // PCIE Window 0 -> AXI4 Slave 0 Address Translations
+  // AXI4 Slave 1 -> PCIE Window 0 Address Translations
   //
   TranslationTable = VEXPRESS_ATR_AXI4_SLV1;
 
