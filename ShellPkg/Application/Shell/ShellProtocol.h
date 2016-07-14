@@ -3,7 +3,7 @@
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -49,7 +49,7 @@ CreatePopulateInstallShellProtocol (
   );
 
 /**
-  Opposite of CreatePopulateInstallShellProtocol.  
+  Opposite of CreatePopulateInstallShellProtocol.
 
   Free all memory and restore the system to the state it was in before calling
   CreatePopulateInstallShellProtocol.
@@ -59,8 +59,19 @@ CreatePopulateInstallShellProtocol (
   @retval EFI_SUCCESS       The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 CleanUpShellProtocol (
+  IN OUT EFI_SHELL_PROTOCOL  *NewShell
+  );
+
+/**
+  Cleanup the shell environment.
+
+  @param[in, out] NewShell   The pointer to the new shell protocol structure.
+
+  @retval EFI_SUCCESS       The operation was successful.
+**/
+EFI_STATUS
+CleanUpShellEnvironment (
   IN OUT EFI_SHELL_PROTOCOL  *NewShell
   );
 
