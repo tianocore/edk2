@@ -708,7 +708,9 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #
 # Other Supported Tools
 # =====================
-#   NASM 2.07 or later                 http://www.nasm.us/
+#   NASM -- http://www.nasm.us/
+#   - NASM 2.10 or later for use with the GCC toolchain family
+#   - NASM 2.12.01 or later for use with all other toolchain families
 #
 ####################################################################################
 ####################################################################################
