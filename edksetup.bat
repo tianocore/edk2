@@ -125,6 +125,7 @@ if exist %EDK_TOOLS_PATH%\Source set BASE_TOOLS_PATH=%EDK_TOOLS_PATH%
 IF NOT EXIST "%EDK_TOOLS_PATH%\toolsetup.bat" goto BadBaseTools
 call %EDK_TOOLS_PATH%\toolsetup.bat %*
 if /I "%1"=="Reconfig" shift
+goto check_NASM
 goto check_cygwin
 
 :BadBaseTools
@@ -140,6 +141,15 @@ goto check_cygwin
   @echo The setup script, toolsetup.bat must reside in this folder.
   @echo.
   goto end
+
+:check_NASM
+if not defined NASM_PREFIX (
+    @echo.
+    @echo !!! WARNING !!! NASM_PREFIX environment variable is not set
+    @if exist "C:\nasm\nasm.exe" @set "NASM_PREFIX=C:\nasm\"
+    @if exist "C:\nasm\nasm.exe" @echo   Found nasm.exe, setting the environment variable to C:\nasm\
+    @if not exist "C:\nasm\nasm.exe" echo   Attempting to build modules that require NASM will fail.
+)
 
 :check_cygwin
 if defined CYGWIN_HOME (
