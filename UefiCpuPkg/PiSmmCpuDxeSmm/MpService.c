@@ -1276,7 +1276,11 @@ InitializeMpSyncData (
   UINTN                      CpuIndex;
 
   if (mSmmMpSyncData != NULL) {
-    mSmmMpSyncData->SwitchBsp = FALSE;
+    //
+    // mSmmMpSyncDataSize includes one structure of SMM_DISPATCHER_MP_SYNC_DATA, one
+    // CpuData array of SMM_CPU_DATA_BLOCK and one CandidateBsp array of BOOLEAN.
+    //
+    ZeroMem (mSmmMpSyncData, mSmmMpSyncDataSize);
     mSmmMpSyncData->CpuData = (SMM_CPU_DATA_BLOCK *)((UINT8 *)mSmmMpSyncData + sizeof (SMM_DISPATCHER_MP_SYNC_DATA));
     mSmmMpSyncData->CandidateBsp = (BOOLEAN *)(mSmmMpSyncData->CpuData + gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
     if (FeaturePcdGet (PcdCpuSmmEnableBspElection)) {
