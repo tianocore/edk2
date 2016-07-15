@@ -747,7 +747,7 @@ UpdateFrontPageStrings (
     SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
     Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
     while (!EFI_ERROR(Status)) {
-      if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
+      if (Record->Type == SMBIOS_TYPE_BIOS_INFORMATION) {
         Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
         StrIndex = Type0Record->BiosVersion;
         GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length), StrIndex, &NewString);
@@ -756,7 +756,7 @@ UpdateFrontPageStrings (
         FreePool (NewString);
       }
 
-      if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
+      if (Record->Type == SMBIOS_TYPE_SYSTEM_INFORMATION) {
         Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
         StrIndex = Type1Record->ProductName;
         GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length), StrIndex, &NewString);
@@ -765,7 +765,7 @@ UpdateFrontPageStrings (
         FreePool (NewString);
       }
 
-      if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
+      if (Record->Type == SMBIOS_TYPE_PROCESSOR_INFORMATION) {
         Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
         StrIndex = Type4Record->ProcessorVersion;
         GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type4Record + Type4Record->Hdr.Length), StrIndex, &NewString);
@@ -774,7 +774,7 @@ UpdateFrontPageStrings (
         FreePool (NewString);
       }
 
-      if (Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) {
+      if (Record->Type == SMBIOS_TYPE_PROCESSOR_INFORMATION) {
         Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
         ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
         TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
@@ -782,7 +782,7 @@ UpdateFrontPageStrings (
         FreePool (NewString);
       }
 
-      if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
+      if ( Record->Type == SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
         Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
         if (Type19Record->StartingAddress != 0xFFFFFFFF ) {
           InstalledMemory += RShiftU64(Type19Record->EndingAddress -
