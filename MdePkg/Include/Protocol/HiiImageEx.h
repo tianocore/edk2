@@ -225,7 +225,7 @@ EFI_STATUS
   IN CONST  EFI_HII_IMAGE_EX_PROTOCOL       *This,
   IN        EFI_HII_HANDLE                  PackageList,
   IN        EFI_IMAGE_ID                    ImageId,
-  OUT       EFI_IMAGE_INPUT                 *Image
+  OUT       EFI_IMAGE_OUTPUT                *Image
   );
 
 ///
