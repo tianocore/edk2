@@ -579,7 +579,7 @@ UpdateFrontPageBannerStrings (
   SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
   Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
   while (!EFI_ERROR(Status)) {
-    if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
+    if (Record->Type == SMBIOS_TYPE_BIOS_INFORMATION) {
       Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
       StrIndex = Type0Record->BiosVersion;
       GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length), StrIndex, &NewString);
@@ -597,7 +597,7 @@ UpdateFrontPageBannerStrings (
       }
     }
 
-    if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
+    if (Record->Type == SMBIOS_TYPE_SYSTEM_INFORMATION) {
       Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
       StrIndex = Type1Record->ProductName;
       GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length), StrIndex, &NewString);
@@ -606,7 +606,7 @@ UpdateFrontPageBannerStrings (
       FreePool (NewString);
     }
 
-    if ((Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) && !FoundCpu) {
+    if ((Record->Type == SMBIOS_TYPE_PROCESSOR_INFORMATION) && !FoundCpu) {
       Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
       //
       // The information in the record should be only valid when the CPU Socket is populated.
@@ -627,7 +627,7 @@ UpdateFrontPageBannerStrings (
       }
     }
 
-    if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
+    if ( Record->Type == SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
       Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
       if (Type19Record->StartingAddress != 0xFFFFFFFF ) {
         InstalledMemory += RShiftU64(Type19Record->EndingAddress -
