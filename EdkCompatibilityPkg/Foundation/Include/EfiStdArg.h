@@ -93,6 +93,30 @@ Abstract:
 #define VA_COPY(Dest, Start)          __va_copy (Dest, Start)
 
 #elif defined(__GNUC__) && !defined(NO_BUILTIN_VA_FUNCS)
+
+#if defined(MDE_CPU_X64) && !defined(NO_MSABI_VA_FUNCS)
+//
+// X64 only. Use MS ABI version of GCC built-in macros for variable argument lists.
+//
+///
+/// Both GCC and LLVM 3.8 for X64 support new variable argument intrinsics for Microsoft ABI
+///
+
+///
+/// Variable used to traverse the list of arguments. This type can vary by
+/// implementation and could be an array or structure.
+///
+typedef __builtin_ms_va_list VA_LIST;
+
+#define VA_START(Marker, Parameter)  __builtin_ms_va_start (Marker, Parameter)
+
+#define VA_ARG(Marker, TYPE)         ((sizeof (TYPE) < sizeof (UINTN)) ? (TYPE)(__builtin_va_arg (Marker, UINTN)) : (TYPE)(__builtin_va_arg (Marker, TYPE)))
+
+#define VA_END(Marker)               __builtin_ms_va_end (Marker)
+
+#define VA_COPY(Dest, Start)         __builtin_ms_va_copy (Dest, Start)
+
+#else
 //
 // Use GCC built-in macros for variable argument lists.
 //
@@ -110,6 +134,8 @@ typedef __builtin_va_list VA_LIST;
 #define VA_END(Marker)               __builtin_va_end (Marker)
 
 #define VA_COPY(Dest, Start)         __builtin_va_copy (Dest, Start)
+
+#endif
 
 #else
 
