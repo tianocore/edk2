@@ -589,7 +589,7 @@ struct _LIST_ENTRY {
 
 #define VA_COPY(Dest, Start)          __va_copy (Dest, Start)
 
-#elif defined(__GNUC__) && !defined(NO_BUILTIN_VA_FUNCS)
+#elif defined(__GNUC__)
 
 #if defined(MDE_CPU_X64) && !defined(NO_MSABI_VA_FUNCS)
 //
