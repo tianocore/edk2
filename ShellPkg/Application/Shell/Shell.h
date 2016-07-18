@@ -371,24 +371,6 @@ RunScriptFile (
   );
 
 /**
-  Return the pointer to the first occurrence of any character from a list of characters.
-
-  @param[in] String           the string to parse
-  @param[in] CharacterList    the list of character to look for
-  @param[in] EscapeCharacter  An escape character to skip
-
-  @return the location of the first character in the string
-  @retval CHAR_NULL no instance of any character in CharacterList was found in String
-**/
-CONST CHAR16*
-EFIAPI
-FindFirstCharacter(
-  IN CONST CHAR16 *String,
-  IN CONST CHAR16 *CharacterList,
-  IN CONST CHAR16 EscapeCharacter
-  );
-
-/**
   Cleans off leading and trailing spaces and tabs.
 
   @param[in] String pointer to the string to trim them off.
