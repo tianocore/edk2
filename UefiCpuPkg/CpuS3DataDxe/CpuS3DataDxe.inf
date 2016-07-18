@@ -41,6 +41,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
@@ -60,6 +61,7 @@
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress  ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable ## CONSUMES
 
 [Depex]
   gEfiMpServiceProtocolGuid

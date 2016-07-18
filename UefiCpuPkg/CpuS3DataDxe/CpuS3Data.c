@@ -133,6 +133,7 @@ CpuS3DataOnEndOfDxe (
    @param[in] SystemTable  A pointer to the EFI System Table.
 
    @retval EFI_SUCCESS     The entry point is executed successfully.
+   @retval EFI_UNSUPPORTED Do not support ACPI S3.
    @retval other           Some error occurs when executing this entry point.
 
 **/
@@ -159,6 +160,10 @@ CpuS3DataInitialize (
   VOID                       *Gdt;
   VOID                       *Idt;
   EFI_EVENT                  Event;
+
+  if (!PcdGetBool (PcdAcpiS3Enable)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Allocate ACPI NVS memory below 4G memory for use on ACPI S3 resume.
