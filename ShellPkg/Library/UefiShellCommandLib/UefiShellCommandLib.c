@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
@@ -1767,7 +1767,7 @@ DumpHex (
 
 /**
   Dump HEX data into buffer.
-   
+
   @param[in] Buffer     HEX data to be dumped in Buffer.
   @param[in] Indent     How many spaces to indent the output.
   @param[in] Offset     The offset of the printing.
