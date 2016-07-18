@@ -4,7 +4,7 @@
   This library is for use ONLY by shell commands linked into the shell application.
   This library will not funciton if it is used for UEFI Shell 2.0 Applications.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
@@ -704,7 +704,7 @@ DumpHex (
 
 /**
   Dump HEX data into buffer.
-   
+
   @param[in] Buffer     HEX data to be dumped in Buffer.
   @param[in] Indent     How many spaces to indent the output.
   @param[in] Offset     The offset of the printing.
