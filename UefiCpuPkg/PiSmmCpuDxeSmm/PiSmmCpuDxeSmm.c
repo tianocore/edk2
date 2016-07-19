@@ -83,11 +83,6 @@ UINTN mSmmStackArrayBase;
 UINTN mSmmStackArrayEnd;
 UINTN mSmmStackSize;
 
-//
-// Pointer to structure used during S3 Resume
-//
-SMM_S3_RESUME_STATE *mSmmS3ResumeState = NULL;
-
 UINTN mMaxNumberOfCpus = 1;
 UINTN mNumberOfCpus = 1;
 
@@ -95,11 +90,6 @@ UINTN mNumberOfCpus = 1;
 // SMM ready to lock flag
 //
 BOOLEAN mSmmReadyToLock = FALSE;
-
-//
-// S3 boot flag
-//
-BOOLEAN mSmmS3Flag = FALSE;
 
 //
 // Global used to cache PCD for SMM Code Access Check enable
@@ -479,184 +469,6 @@ SmmRelocateBases (
 }
 
 /**
-  Perform SMM initialization for all processors in the S3 boot path.
-
-  For a native platform, MP initialization in the S3 boot path is also performed in this function.
-**/
-VOID
-EFIAPI
-SmmRestoreCpu (
-  VOID
-  )
-{
-  SMM_S3_RESUME_STATE           *SmmS3ResumeState;
-  IA32_DESCRIPTOR               Ia32Idtr;
-  IA32_DESCRIPTOR               X64Idtr;
-  IA32_IDT_GATE_DESCRIPTOR      IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
-  EFI_STATUS                    Status;
-
-  DEBUG ((EFI_D_INFO, "SmmRestoreCpu()\n"));
-
-  mSmmS3Flag = TRUE;
-
-  InitializeSpinLock (mMemoryMappedLock);
-
-  //
-  // See if there is enough context to resume PEI Phase
-  //
-  if (mSmmS3ResumeState == NULL) {
-    DEBUG ((EFI_D_ERROR, "No context to return to PEI Phase\n"));
-    CpuDeadLoop ();
-  }
-
-  SmmS3ResumeState = mSmmS3ResumeState;
-  ASSERT (SmmS3ResumeState != NULL);
-
-  if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) {
-    //
-    // Save the IA32 IDT Descriptor
-    //
-    AsmReadIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);
-
-    //
-    // Setup X64 IDT table
-    //
-    ZeroMem (IdtEntryTable, sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32);
-    X64Idtr.Base = (UINTN) IdtEntryTable;
-    X64Idtr.Limit = (UINT16) (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32 - 1);
-    AsmWriteIdtr ((IA32_DESCRIPTOR *) &X64Idtr);
-
-    //
-    // Setup the default exception handler
-    //
-    Status = InitializeCpuExceptionHandlers (NULL);
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Initialize Debug Agent to support source level debug
-    //
-    InitializeDebugAgent (DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64, (VOID *)&Ia32Idtr, NULL);
-  }
-
-  //
-  // Skip initialization if mAcpiCpuData is not valid
-  //
-  if (mAcpiCpuData.NumberOfCpus > 0) {
-    //
-    // First time microcode load and restore MTRRs
-    //
-    EarlyInitializeCpu ();
-  }
-
-  //
-  // Restore SMBASE for BSP and all APs
-  //
-  SmmRelocateBases ();
-
-  //
-  // Skip initialization if mAcpiCpuData is not valid
-  //
-  if (mAcpiCpuData.NumberOfCpus > 0) {
-    //
-    // Restore MSRs for BSP and all APs
-    //
-    InitializeCpu ();
-  }
-
-  //
-  // Set a flag to restore SMM configuration in S3 path.
-  //
-  mRestoreSmmConfigurationInS3 = TRUE;
-
-  DEBUG (( EFI_D_INFO, "SMM S3 Return CS                = %x\n", SmmS3ResumeState->ReturnCs));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Entry Point       = %x\n", SmmS3ResumeState->ReturnEntryPoint));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Context1          = %x\n", SmmS3ResumeState->ReturnContext1));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Context2          = %x\n", SmmS3ResumeState->ReturnContext2));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
-
-  //
-  // If SMM is in 32-bit mode, then use SwitchStack() to resume PEI Phase
-  //
-  if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
-    DEBUG ((EFI_D_INFO, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
-
-    SwitchStack (
-      (SWITCH_STACK_ENTRY_POINT)(UINTN)SmmS3ResumeState->ReturnEntryPoint,
-      (VOID *)(UINTN)SmmS3ResumeState->ReturnContext1,
-      (VOID *)(UINTN)SmmS3ResumeState->ReturnContext2,
-      (VOID *)(UINTN)SmmS3ResumeState->ReturnStackPointer
-      );
-  }
-
-  //
-  // If SMM is in 64-bit mode, then use AsmDisablePaging64() to resume PEI Phase
-  //
-  if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) {
-    DEBUG ((EFI_D_INFO, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
-    //
-    // Disable interrupt of Debug timer, since new IDT table is for IA32 and will not work in long mode.
-    //
-    SaveAndSetDebugTimerInterrupt (FALSE);
-    //
-    // Restore IA32 IDT table
-    //
-    AsmWriteIdtr ((IA32_DESCRIPTOR *) &Ia32Idtr);
-    AsmDisablePaging64 (
-      SmmS3ResumeState->ReturnCs,
-      (UINT32)SmmS3ResumeState->ReturnEntryPoint,
-      (UINT32)SmmS3ResumeState->ReturnContext1,
-      (UINT32)SmmS3ResumeState->ReturnContext2,
-      (UINT32)SmmS3ResumeState->ReturnStackPointer
-      );
-  }
-
-  //
-  // Can not resume PEI Phase
-  //
-  DEBUG ((EFI_D_ERROR, "No context to return to PEI Phase\n"));
-  CpuDeadLoop ();
-}
-
-/**
-  Copy register table from ACPI NVS memory into SMRAM.
-
-  @param[in] DestinationRegisterTableList  Points to destination register table.
-  @param[in] SourceRegisterTableList       Points to source register table.
-  @param[in] NumberOfCpus                  Number of CPUs.
-
-**/
-VOID
-CopyRegisterTable (
-  IN CPU_REGISTER_TABLE         *DestinationRegisterTableList,
-  IN CPU_REGISTER_TABLE         *SourceRegisterTableList,
-  IN UINT32                     NumberOfCpus
-  )
-{
-  UINTN                      Index;
-  UINTN                      Index1;
-  CPU_REGISTER_TABLE_ENTRY   *RegisterTableEntry;
-
-  CopyMem (DestinationRegisterTableList, SourceRegisterTableList, NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
-  for (Index = 0; Index < NumberOfCpus; Index++) {
-    DestinationRegisterTableList[Index].RegisterTableEntry = AllocatePool (DestinationRegisterTableList[Index].AllocatedSize);
-    ASSERT (DestinationRegisterTableList[Index].RegisterTableEntry != NULL);
-    CopyMem (DestinationRegisterTableList[Index].RegisterTableEntry, SourceRegisterTableList[Index].RegisterTableEntry, DestinationRegisterTableList[Index].AllocatedSize);
-    //
-    // Go though all MSRs in register table to initialize MSR spin lock
-    //
-    RegisterTableEntry = DestinationRegisterTableList[Index].RegisterTableEntry;
-    for (Index1 = 0; Index1 < DestinationRegisterTableList[Index].TableLength; Index1++, RegisterTableEntry++) {
-      if ((RegisterTableEntry->RegisterType == Msr) && (RegisterTableEntry->ValidBitLength < 64)) {
-        //
-        // Initialize MSR spin lock only for those MSRs need bit field writing
-        //
-        InitMsrSpinLockByIndex (RegisterTableEntry->Index);
-      }
-    }
-  }
-}
-
-/**
   SMM Ready To Lock event notification handler.
 
   The CPU S3 data is copied to SMRAM for security and mSmmReadyToLock is set to
@@ -676,77 +488,8 @@ SmmReadyToLockEventNotify (
   IN EFI_HANDLE      Handle
   )
 {
-  ACPI_CPU_DATA              *AcpiCpuData;
-  IA32_DESCRIPTOR            *Gdtr;
-  IA32_DESCRIPTOR            *Idtr;
+  GetAcpiCpuData ();
 
-  //
-  // Prevent use of mAcpiCpuData by initialize NumberOfCpus to 0
-  //
-  mAcpiCpuData.NumberOfCpus = 0;
-
-  //
-  // If PcdCpuS3DataAddress was never set, then do not copy CPU S3 Data into SMRAM
-  //
-  AcpiCpuData = (ACPI_CPU_DATA *)(UINTN)PcdGet64 (PcdCpuS3DataAddress);
-  if (AcpiCpuData == 0) {
-    goto Done;
-  }
-
-  //
-  // For a native platform, copy the CPU S3 data into SMRAM for use on CPU S3 Resume.
-  //
-  CopyMem (&mAcpiCpuData, AcpiCpuData, sizeof (mAcpiCpuData));
-
-  mAcpiCpuData.MtrrTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (sizeof (MTRR_SETTINGS));
-  ASSERT (mAcpiCpuData.MtrrTable != 0);
-
-  CopyMem ((VOID *)(UINTN)mAcpiCpuData.MtrrTable, (VOID *)(UINTN)AcpiCpuData->MtrrTable, sizeof (MTRR_SETTINGS));
-
-  mAcpiCpuData.GdtrProfile = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (sizeof (IA32_DESCRIPTOR));
-  ASSERT (mAcpiCpuData.GdtrProfile != 0);
-
-  CopyMem ((VOID *)(UINTN)mAcpiCpuData.GdtrProfile, (VOID *)(UINTN)AcpiCpuData->GdtrProfile, sizeof (IA32_DESCRIPTOR));
-
-  mAcpiCpuData.IdtrProfile = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (sizeof (IA32_DESCRIPTOR));
-  ASSERT (mAcpiCpuData.IdtrProfile != 0);
-
-  CopyMem ((VOID *)(UINTN)mAcpiCpuData.IdtrProfile, (VOID *)(UINTN)AcpiCpuData->IdtrProfile, sizeof (IA32_DESCRIPTOR));
-
-  mAcpiCpuData.PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
-  ASSERT (mAcpiCpuData.PreSmmInitRegisterTable != 0);
-
-  CopyRegisterTable (
-    (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.PreSmmInitRegisterTable,
-    (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->PreSmmInitRegisterTable,
-    mAcpiCpuData.NumberOfCpus
-    );
-
-  mAcpiCpuData.RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
-  ASSERT (mAcpiCpuData.RegisterTable != 0);
-
-  CopyRegisterTable (
-    (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.RegisterTable,
-    (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->RegisterTable,
-    mAcpiCpuData.NumberOfCpus
-    );
-
-  //
-  // Copy AP's GDT, IDT and Machine Check handler into SMRAM.
-  //
-  Gdtr = (IA32_DESCRIPTOR *)(UINTN)mAcpiCpuData.GdtrProfile;
-  Idtr = (IA32_DESCRIPTOR *)(UINTN)mAcpiCpuData.IdtrProfile;
-
-  mGdtForAp = AllocatePool ((Gdtr->Limit + 1) + (Idtr->Limit + 1) +  mAcpiCpuData.ApMachineCheckHandlerSize);
-  ASSERT (mGdtForAp != NULL);
-  mIdtForAp = (VOID *) ((UINTN)mGdtForAp + (Gdtr->Limit + 1));
-  mMachineCheckHandlerForAp = (VOID *) ((UINTN)mIdtForAp + (Idtr->Limit + 1));
-
-  CopyMem (mGdtForAp, (VOID *)Gdtr->Base, Gdtr->Limit + 1);
-  CopyMem (mIdtForAp, (VOID *)Idtr->Base, Idtr->Limit + 1);
-  CopyMem (mMachineCheckHandlerForAp, (VOID *)(UINTN)mAcpiCpuData.ApMachineCheckHandlerBase, mAcpiCpuData.ApMachineCheckHandlerSize);
-
-Done:
   //
   // Set SMM ready to lock flag and return
   //
@@ -780,9 +523,6 @@ PiCpuSmmEntry (
   UINTN                      TileCodeSize;
   UINTN                      TileDataSize;
   UINTN                      TileSize;
-  VOID                       *GuidHob;
-  EFI_SMRAM_DESCRIPTOR       *SmramDescriptor;
-  SMM_S3_RESUME_STATE        *SmmS3ResumeState;
   UINT8                      *Stacks;
   VOID                       *Registration;
   UINT32                     RegEax;
@@ -1165,48 +905,12 @@ PiCpuSmmEntry (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
-  if (GuidHob != NULL) {
-    SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
-
-    DEBUG ((EFI_D_INFO, "SMM S3 SMRAM Structure = %x\n", SmramDescriptor));
-    DEBUG ((EFI_D_INFO, "SMM S3 Structure = %x\n", SmramDescriptor->CpuStart));
-
-    SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
-    ZeroMem (SmmS3ResumeState, sizeof (SMM_S3_RESUME_STATE));
-
-    mSmmS3ResumeState = SmmS3ResumeState;
-    SmmS3ResumeState->Smst = (EFI_PHYSICAL_ADDRESS)(UINTN)gSmst;
-
-    SmmS3ResumeState->SmmS3ResumeEntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)SmmRestoreCpu;
-
-    SmmS3ResumeState->SmmS3StackSize = SIZE_32KB;
-    SmmS3ResumeState->SmmS3StackBase = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)SmmS3ResumeState->SmmS3StackSize));
-    if (SmmS3ResumeState->SmmS3StackBase == 0) {
-      SmmS3ResumeState->SmmS3StackSize = 0;
-    }
-
-    SmmS3ResumeState->SmmS3Cr0 = gSmmCr0;
-    SmmS3ResumeState->SmmS3Cr3 = Cr3;
-    SmmS3ResumeState->SmmS3Cr4 = gSmmCr4;
-
-    if (sizeof (UINTN) == sizeof (UINT64)) {
-      SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_64;
-    }
-    if (sizeof (UINTN) == sizeof (UINT32)) {
-      SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_32;
-    }
-  }
-
   //
   // Initialize SMM Profile feature
   //
   InitSmmProfile (Cr3);
 
-  //
-  // Patch SmmS3ResumeState->SmmS3Cr3
-  //
-  InitSmmS3Cr3 ();
+  InitSmmS3ResumeState (Cr3);
 
   DEBUG ((EFI_D_INFO, "SMM CPU Module exit from SMRAM with EFI_SUCCESS\n"));
 
@@ -1503,26 +1207,5 @@ PerformPreTasks (
   VOID
   )
 {
-  //
-  // Restore SMM Configuration in S3 boot path.
-  //
-  if (mRestoreSmmConfigurationInS3) {
-    //
-    // Need make sure gSmst is correct because below function may use them.
-    //
-    gSmst->SmmStartupThisAp      = gSmmCpuPrivate->SmmCoreEntryContext.SmmStartupThisAp;
-    gSmst->CurrentlyExecutingCpu = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
-    gSmst->NumberOfCpus          = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
-    gSmst->CpuSaveStateSize      = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveStateSize;
-    gSmst->CpuSaveState          = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveState;
-
-    //
-    // Configure SMM Code Access Check feature if available.
-    //
-    ConfigSmmCodeAccessCheck ();
-
-    SmmCpuFeaturesCompleteSmmReadyToLock ();
-
-    mRestoreSmmConfigurationInS3 = FALSE;
-  }
+  RestoreSmmConfigurationInS3 ();
 }

@@ -149,7 +149,6 @@ extern SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate;
 extern CPU_HOT_PLUG_DATA      mCpuHotPlugData;
 extern UINTN                  mMaxNumberOfCpus;
 extern UINTN                  mNumberOfCpus;
-extern BOOLEAN                mRestoreSmmConfigurationInS3;
 extern EFI_SMM_CPU_PROTOCOL   mSmmCpu;
 
 ///
@@ -400,11 +399,7 @@ extern IA32_DESCRIPTOR                     gcSmiIdtr;
 extern VOID                                *gcSmiIdtrPtr;
 extern CONST PROCESSOR_SMM_DESCRIPTOR      gcPsd;
 extern UINT64                              gPhyMask;
-extern ACPI_CPU_DATA                       mAcpiCpuData;
 extern SMM_DISPATCHER_MP_SYNC_DATA         *mSmmMpSyncData;
-extern VOID                                *mGdtForAp;
-extern VOID                                *mIdtForAp;
-extern VOID                                *mMachineCheckHandlerForAp;
 extern UINTN                               mSmmStackArrayBase;
 extern UINTN                               mSmmStackArrayEnd;
 extern UINTN                               mSmmStackSize;
@@ -597,26 +592,14 @@ FindSmramInfo (
   );
 
 /**
-  The function is invoked before SMBASE relocation in S3 path to restores CPU status.
+  Relocate SmmBases for each processor.
 
-  The function is invoked before SMBASE relocation in S3 path. It does first time microcode load
-  and restores MTRRs for both BSP and APs.
-
-**/
-VOID
-EarlyInitializeCpu (
-  VOID
-  );
-
-/**
-  The function is invoked after SMBASE relocation in S3 path to restores CPU status.
-
-  The function is invoked after SMBASE relocation in S3 path. It restores configuration according to
-  data saved by normal boot path for both BSP and APs.
+  Execute on first boot and all S3 resumes
 
 **/
 VOID
-InitializeCpu (
+EFIAPI
+SmmRelocateBases (
   VOID
   );
 
@@ -795,6 +778,42 @@ DumpModuleInfoByIp (
 VOID *
 AllocatePageTableMemory (
   IN UINTN           Pages
+  );
+
+
+//
+// S3 related global variable and function prototype.
+//
+
+extern BOOLEAN                mSmmS3Flag;
+
+/**
+  Initialize SMM S3 resume state structure used during S3 Resume.
+
+  @param[in] Cr3    The base address of the page tables to use in SMM.
+
+**/
+VOID
+InitSmmS3ResumeState (
+  IN UINT32  Cr3
+  );
+
+/**
+  Get ACPI CPU data.
+
+**/
+VOID
+GetAcpiCpuData (
+  VOID
+  );
+
+/**
+  Restore SMM Configuration in S3 boot path.
+
+**/
+VOID
+RestoreSmmConfigurationInS3 (
+  VOID
   );
 
 #endif
