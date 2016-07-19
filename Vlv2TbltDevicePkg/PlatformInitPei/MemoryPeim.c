@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -222,8 +222,10 @@ SetPeiCacheMode (
   MtrrSetting.MtrrDefType |=  3 <<10;
 
   MtrrSetAllMtrrs(&MtrrSetting);
-
-
+  //
+  // Dump MTRR Setting
+  //
+  MtrrDebugPrintAllMtrrs ();
 
   return EFI_SUCCESS;
 }
