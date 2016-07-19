@@ -1,6 +1,10 @@
 /** @file
   MTRR setting library
 
+  @par Note: 
+    Most of services in this library instance are suggested to be invoked by BSP only,
+    except for MtrrSetAllMtrrs() which is used to sync BSP's MTRR setting to APs.
+
   Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
