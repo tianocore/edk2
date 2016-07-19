@@ -52,6 +52,7 @@ ShellCommandRunEfiDecompress (
   InFileName          = NULL;
   OutFileName         = NULL;
   OutSize             = 0;
+  ScratchSize         = 0;
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
   OutBuffer           = NULL;
@@ -59,6 +60,7 @@ ShellCommandRunEfiDecompress (
   ScratchBuffer       = NULL;
   InFileHandle        = NULL;
   OutFileHandle       = NULL;
+  Decompress          = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
