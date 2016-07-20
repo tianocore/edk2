@@ -36,6 +36,16 @@
 #include <Library/HobLib.h>
 
 //
+// AP loop state when APs are in idle state
+// It's value is the same with PcdCpuApLoopMode
+//
+typedef enum {
+  ApInHltLoop   = 1,
+  ApInMwaitLoop = 2,
+  ApInRunLoop   = 3
+} AP_LOOP_MODE;
+
+//
 // AP reset code information including code address and size,
 // this structure will be shared be C code and assembly code.
 // It is natural aligned by design.

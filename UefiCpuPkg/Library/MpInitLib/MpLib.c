@@ -16,6 +16,65 @@
 
 
 /**
+  Detect whether Mwait-monitor feature is supported.
+
+  @retval TRUE    Mwait-monitor feature is supported.
+  @retval FALSE   Mwait-monitor feature is not supported.
+**/
+BOOLEAN
+IsMwaitSupport (
+  VOID
+  )
+{
+  CPUID_VERSION_INFO_ECX        VersionInfoEcx;
+
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, &VersionInfoEcx.Uint32, NULL);
+  return (VersionInfoEcx.Bits.MONITOR == 1) ? TRUE : FALSE;
+}
+
+/**
+  Get AP loop mode.
+
+  @param[out] MonitorFilterSize  Returns the largest monitor-line size in bytes.
+
+  @return The AP loop mode.
+**/
+UINT8
+GetApLoopMode (
+  OUT UINT32     *MonitorFilterSize
+  )
+{
+  UINT8                         ApLoopMode;
+  CPUID_MONITOR_MWAIT_EBX       MonitorMwaitEbx;
+
+  ASSERT (MonitorFilterSize != NULL);
+
+  ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
+  ASSERT (ApLoopMode >= ApInHltLoop && ApLoopMode <= ApInRunLoop);
+  if (ApLoopMode == ApInMwaitLoop) {
+    if (!IsMwaitSupport ()) {
+      //
+      // If processor does not support MONITOR/MWAIT feature,
+      // force AP in Hlt-loop mode
+      //
+      ApLoopMode = ApInHltLoop;
+    }
+  }
+
+  if (ApLoopMode != ApInMwaitLoop) {
+    *MonitorFilterSize = sizeof (UINT32);
+  } else {
+    //
+    // CPUID.[EAX=05H]:EBX.BIT0-15: Largest monitor-line size in bytes
+    // CPUID.[EAX=05H].EDX: C-states supported using MWAIT
+    //
+    AsmCpuid (CPUID_MONITOR_MWAIT, NULL, &MonitorMwaitEbx.Uint32, NULL, NULL);
+    *MonitorFilterSize = MonitorMwaitEbx.Bits.LargestMonitorLineSize;
+  }
+
+  return ApLoopMode;
+}
+/**
   MP Initialize Library initialization.
 
   This service will allocate AP reset vector and wakeup all APs to do APs
@@ -35,10 +94,14 @@ MpInitLibInitialize (
   )
 {
   MP_ASSEMBLY_ADDRESS_MAP  AddressMap;
+  UINT32                   MonitorFilterSize;
+  UINT8                    ApLoopMode;
   UINTN                    ApResetVectorSize;
 
   AsmGetAddressMap (&AddressMap);
   ApResetVectorSize = AddressMap.RendezvousFunnelSize + sizeof (MP_CPU_EXCHANGE_INFO);
+  ApLoopMode  = GetApLoopMode (&MonitorFilterSize);
+
   return EFI_SUCCESS;
 }
 
