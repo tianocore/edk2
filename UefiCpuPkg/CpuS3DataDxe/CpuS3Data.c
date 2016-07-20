@@ -9,7 +9,7 @@ number of CPUs reported by the MP Services Protocol, so this module does not
 support hot plug CPUs.  This module can be copied into a CPU specific package
 and customized if these additional features are required.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2015, Red Hat, Inc.
 
 This program and the accompanying materials
@@ -84,20 +84,36 @@ AllocateAcpiNvsMemoryBelow4G (
 /**
   Callback function executed when the EndOfDxe event group is signaled.
 
-  We delay saving the MTRR settings until BDS signals EndOfDxe.
+  We delay allocating StartupVector and saving the MTRR settings until BDS signals EndOfDxe.
 
   @param[in]  Event    Event whose notification function is being invoked.
   @param[out] Context  Pointer to the MTRR_SETTINGS buffer to fill in.
 **/
 VOID
 EFIAPI
-SaveMtrrsOnEndOfDxe (
+CpuS3DataOnEndOfDxe (
   IN  EFI_EVENT  Event,
   OUT VOID       *Context
   )
 {
+  EFI_STATUS         Status;
+  ACPI_CPU_DATA_EX   *AcpiCpuDataEx;
+
+  AcpiCpuDataEx = (ACPI_CPU_DATA_EX *) Context;
+  //
+  // Allocate a 4KB reserved page below 1MB
+  //
+  AcpiCpuDataEx->AcpiCpuData.StartupVector = BASE_1MB - 1;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
+                  1,
+                  &AcpiCpuDataEx->AcpiCpuData.StartupVector
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   DEBUG ((EFI_D_VERBOSE, "%a\n", __FUNCTION__));
-  MtrrGetAllMtrrs (Context);
+  MtrrGetAllMtrrs (&AcpiCpuDataEx->MtrrTable);
 
   //
   // Close event, so it will not be invoked again.
@@ -158,18 +174,6 @@ CpuS3DataInitialize (
                   &gEfiMpServiceProtocolGuid,
                   NULL,
                   (VOID **)&MpServices
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Allocate a 4KB reserved page below 1MB
-  //
-  AcpiCpuData->StartupVector = BASE_1MB - 1;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  1,
-                  &AcpiCpuData->StartupVector
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -255,13 +259,13 @@ CpuS3DataInitialize (
 
   //
   // Register EFI_END_OF_DXE_EVENT_GROUP_GUID event.
-  // The notification function saves MTRRs for ACPI_CPU_DATA
+  // The notification function allocates StartupVector and saves MTRRs for ACPI_CPU_DATA
   //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
-                  SaveMtrrsOnEndOfDxe,
-                  &AcpiCpuDataEx->MtrrTable,
+                  CpuS3DataOnEndOfDxe,
+                  AcpiCpuData,
                   &gEfiEndOfDxeEventGroupGuid,
                   &Event
                   );
