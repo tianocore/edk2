@@ -283,6 +283,25 @@ FreeResetVector (
   );
 
 /**
+  This function will be called by BSP to wakeup AP.
+
+  @param[in] CpuMpData          Pointer to CPU MP Data
+  @param[in] Broadcast          TRUE:  Send broadcast IPI to all APs
+                                FALSE: Send IPI to AP by ApicId
+  @param[in] ProcessorNumber    The handle number of specified processor
+  @param[in] Procedure          The function to be invoked by AP
+  @param[in] ProcedureArgument  The argument to be passed into AP function
+**/
+VOID
+WakeUpAP (
+  IN CPU_MP_DATA               *CpuMpData,
+  IN BOOLEAN                   Broadcast,
+  IN UINTN                     ProcessorNumber,
+  IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
+  IN VOID                      *ProcedureArgument      OPTIONAL
+  );
+
+/**
   Initialize global data for MP support.
 
   @param[in] CpuMpData  The pointer to CPU MP Data structure.

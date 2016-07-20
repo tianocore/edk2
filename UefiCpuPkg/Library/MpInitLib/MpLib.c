@@ -448,6 +448,29 @@ ApWakeupFunction (
 }
 
 /**
+  Wait for AP wakeup and write AP start-up signal till AP is waken up.
+
+  @param[in] ApStartupSignalBuffer  Pointer to AP wakeup signal
+**/
+VOID
+WaitApWakeup (
+  IN volatile UINT32        *ApStartupSignalBuffer
+  )
+{
+  //
+  // If AP is waken up, StartupApSignal should be cleared.
+  // Otherwise, write StartupApSignal again till AP waken up.
+  //
+  while (InterlockedCompareExchange32 (
+          (UINT32 *) ApStartupSignalBuffer,
+          WAKEUP_AP_SIGNAL,
+          WAKEUP_AP_SIGNAL
+          ) != 0) {
+    CpuPause ();
+  }
+}
+
+/**
   This function will fill the exchange info structure.
 
   @param[in] CpuMpData          Pointer to CPU MP Data
@@ -483,6 +506,104 @@ FillExchangeInfoData (
   //
   AsmReadGdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->GdtrProfile);
   AsmReadIdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->IdtrProfile);
+}
+
+/**
+  This function will be called by BSP to wakeup AP.
+
+  @param[in] CpuMpData          Pointer to CPU MP Data
+  @param[in] Broadcast          TRUE:  Send broadcast IPI to all APs
+                                FALSE: Send IPI to AP by ApicId
+  @param[in] ProcessorNumber    The handle number of specified processor
+  @param[in] Procedure          The function to be invoked by AP
+  @param[in] ProcedureArgument  The argument to be passed into AP function
+**/
+VOID
+WakeUpAP (
+  IN CPU_MP_DATA               *CpuMpData,
+  IN BOOLEAN                   Broadcast,
+  IN UINTN                     ProcessorNumber,
+  IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
+  IN VOID                      *ProcedureArgument      OPTIONAL
+  )
+{
+  volatile MP_CPU_EXCHANGE_INFO    *ExchangeInfo;
+  UINTN                            Index;
+  CPU_AP_DATA                      *CpuData;
+  BOOLEAN                          ResetVectorRequired;
+
+  CpuMpData->FinishedCount = 0;
+  ResetVectorRequired = FALSE;
+
+  if (CpuMpData->ApLoopMode == ApInHltLoop ||
+      CpuMpData->InitFlag   != ApInitDone) {
+    ResetVectorRequired = TRUE;
+    AllocateResetVector (CpuMpData);
+    FillExchangeInfoData (CpuMpData);
+  } else if (CpuMpData->ApLoopMode == ApInMwaitLoop) {
+    //
+    // Get AP target C-state each time when waking up AP,
+    // for it maybe updated by platform again
+    //
+    CpuMpData->ApTargetCState = PcdGet8 (PcdCpuApTargetCstate);
+  }
+
+  ExchangeInfo = CpuMpData->MpCpuExchangeInfo;
+
+  if (Broadcast) {
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      if (Index != CpuMpData->BspNumber) {
+        CpuData = &CpuMpData->CpuData[Index];
+        CpuData->ApFunction         = (UINTN) Procedure;
+        CpuData->ApFunctionArgument = (UINTN) ProcedureArgument;
+        SetApState (CpuData, CpuStateReady);
+        if (CpuMpData->InitFlag != ApInitConfig) {
+          *(UINT32 *) CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
+        }
+      }
+    }
+    if (ResetVectorRequired) {
+      //
+      // Wakeup all APs
+      //
+      SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
+    }
+    if (CpuMpData->InitFlag != ApInitConfig) {
+      //
+      // Wait all APs waken up if this is not the 1st broadcast of SIPI
+      //
+      for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+        CpuData = &CpuMpData->CpuData[Index];
+        if (Index != CpuMpData->BspNumber) {
+          WaitApWakeup (CpuData->StartupApSignal);
+        }
+      }
+    }
+  } else {
+    CpuData = &CpuMpData->CpuData[ProcessorNumber];
+    CpuData->ApFunction         = (UINTN) Procedure;
+    CpuData->ApFunctionArgument = (UINTN) ProcedureArgument;
+    SetApState (CpuData, CpuStateReady);
+    //
+    // Wakeup specified AP
+    //
+    ASSERT (CpuMpData->InitFlag != ApInitConfig);
+    *(UINT32 *) CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
+    if (ResetVectorRequired) {
+      SendInitSipiSipi (
+        CpuData->ApicId,
+        (UINT32) ExchangeInfo->BufferStart
+        );
+    }
+    //
+    // Wait specified AP waken up
+    //
+    WaitApWakeup (CpuData->StartupApSignal);
+  }
+
+  if (ResetVectorRequired) {
+    FreeResetVector (CpuMpData);
+  }
 }
 
 /**
