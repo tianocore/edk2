@@ -956,6 +956,7 @@ MpInitLibWhoAmI (
 {
   return EFI_UNSUPPORTED;
 }
+
 /**
   Retrieves the number of logical processor in the platform and the number of
   those logical processors that are enabled on this boot. This service may only
@@ -983,8 +984,44 @@ MpInitLibGetNumberOfProcessors (
   OUT UINTN                     *NumberOfEnabledProcessors OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  CPU_MP_DATA             *CpuMpData;
+  UINTN                   CallerNumber;
+  UINTN                   ProcessorNumber;
+  UINTN                   EnabledProcessorNumber;
+  UINTN                   Index;
+
+  CpuMpData = GetCpuMpData ();
+
+  if ((NumberOfProcessors == NULL) && (NumberOfEnabledProcessors == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether caller processor is BSP
+  //
+  MpInitLibWhoAmI (&CallerNumber);
+  if (CallerNumber != CpuMpData->BspNumber) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  ProcessorNumber        = CpuMpData->CpuCount;
+  EnabledProcessorNumber = 0;
+  for (Index = 0; Index < ProcessorNumber; Index++) {
+    if (GetApState (&CpuMpData->CpuData[Index]) != CpuStateDisabled) {
+      EnabledProcessorNumber ++;
+    }
+  }
+
+  if (NumberOfProcessors != NULL) {
+    *NumberOfProcessors = ProcessorNumber;
+  }
+  if (NumberOfEnabledProcessors != NULL) {
+    *NumberOfEnabledProcessors = EnabledProcessorNumber;
+  }
+
+  return EFI_SUCCESS;
 }
+
 
 /**
   Get pointer to CPU MP Data structure from GUIDed HOB.
