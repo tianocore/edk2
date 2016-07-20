@@ -174,6 +174,59 @@ GetApLoopMode (
 
   return ApLoopMode;
 }
+
+/**
+  Do sync on APs.
+
+  @param[in, out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+ApInitializeSync (
+  IN OUT VOID  *Buffer
+  )
+{
+  CPU_MP_DATA  *CpuMpData;
+
+  CpuMpData = (CPU_MP_DATA *) Buffer;
+  //
+  // Sync BSP's MTRR table to AP
+  //
+  MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
+  //
+  // Load microcode on AP
+  //
+  MicrocodeDetect (CpuMpData);
+}
+
+/**
+  Find the current Processor number by APIC ID.
+
+  @param[in] CpuMpData         Pointer to PEI CPU MP Data
+  @param[in] ProcessorNumber   Return the pocessor number found
+
+  @retval EFI_SUCCESS          ProcessorNumber is found and returned.
+  @retval EFI_NOT_FOUND        ProcessorNumber is not found.
+**/
+EFI_STATUS
+GetProcessorNumber (
+  IN CPU_MP_DATA               *CpuMpData,
+  OUT UINTN                    *ProcessorNumber
+  )
+{
+  UINTN                   TotalProcessorNumber;
+  UINTN                   Index;
+
+  TotalProcessorNumber = CpuMpData->CpuCount;
+  for (Index = 0; Index < TotalProcessorNumber; Index ++) {
+    if (CpuMpData->CpuData[Index].ApicId == GetApicId ()) {
+      *ProcessorNumber = Index;
+      return EFI_SUCCESS;
+    }
+  }
+  return EFI_NOT_FOUND;
+}
+
 /*
   Initialize CPU AP Data when AP is wakeup at the first time.
 
@@ -206,6 +259,151 @@ InitializeApData (
 
   InitializeSpinLock(&CpuMpData->CpuData[ProcessorNumber].ApLock);
   SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+}
+
+/**
+  This function will be called from AP reset code if BSP uses WakeUpAP.
+
+  @param[in] ExchangeInfo     Pointer to the MP exchange info buffer
+  @param[in] NumApsExecuting  Number of current executing AP
+**/
+VOID
+EFIAPI
+ApWakeupFunction (
+  IN MP_CPU_EXCHANGE_INFO      *ExchangeInfo,
+  IN UINTN                     NumApsExecuting
+  )
+{
+  CPU_MP_DATA                *CpuMpData;
+  UINTN                      ProcessorNumber;
+  EFI_AP_PROCEDURE           Procedure;
+  VOID                       *Parameter;
+  UINT32                     BistData;
+  volatile UINT32            *ApStartupSignalBuffer;
+
+  //
+  // AP finished assembly code and begin to execute C code
+  //
+  CpuMpData = ExchangeInfo->CpuMpData;
+
+  ProgramVirtualWireMode (); 
+
+  while (TRUE) {
+    if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // Add CPU number
+      //
+      InterlockedIncrement ((UINT32 *) &CpuMpData->CpuCount);
+      ProcessorNumber = NumApsExecuting;
+      //
+      // This is first time AP wakeup, get BIST information from AP stack
+      //
+      BistData = *(UINT32 *) (CpuMpData->Buffer + ProcessorNumber * CpuMpData->CpuApStackSize - sizeof (UINTN));
+      //
+      // Do some AP initialize sync
+      //
+      ApInitializeSync (CpuMpData);
+      //
+      // Sync BSP's Control registers to APs
+      //
+      RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+      InitializeApData (CpuMpData, ProcessorNumber, BistData);
+      ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
+    } else {
+      //
+      // Execute AP function if AP is ready
+      //
+      GetProcessorNumber (CpuMpData, &ProcessorNumber);
+      //
+      // Clear AP start-up signal when AP waken up
+      //
+      ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
+      InterlockedCompareExchange32 (
+        (UINT32 *) ApStartupSignalBuffer,
+        WAKEUP_AP_SIGNAL,
+        0
+        );
+      if (CpuMpData->ApLoopMode == ApInHltLoop) {
+        //
+        // Restore AP's volatile registers saved
+        //
+        RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+      }
+
+      if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
+        Procedure = (EFI_AP_PROCEDURE)CpuMpData->CpuData[ProcessorNumber].ApFunction;
+        Parameter = (VOID *) CpuMpData->CpuData[ProcessorNumber].ApFunctionArgument;
+        if (Procedure != NULL) {
+          SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateBusy);
+          //
+          // Invoke AP function here
+          //
+          Procedure (Parameter);
+          //
+          // Re-get the CPU APICID and Initial APICID
+          //
+          CpuMpData->CpuData[ProcessorNumber].ApicId        = GetApicId ();
+          CpuMpData->CpuData[ProcessorNumber].InitialApicId = GetInitialApicId ();
+        }
+        SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateFinished);
+      }
+    }
+
+    //
+    // AP finished executing C code
+    //
+    InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
+
+    //
+    // Place AP is specified loop mode
+    //
+    if (CpuMpData->ApLoopMode == ApInHltLoop) {
+      //
+      // Save AP volatile registers
+      //
+      SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
+      //
+      // Place AP in HLT-loop
+      //
+      while (TRUE) {
+        DisableInterrupts ();
+        CpuSleep ();
+        CpuPause ();
+      }
+    }
+    while (TRUE) {
+      DisableInterrupts ();
+      if (CpuMpData->ApLoopMode == ApInMwaitLoop) {
+        //
+        // Place AP in MWAIT-loop
+        //
+        AsmMonitor ((UINTN) ApStartupSignalBuffer, 0, 0);
+        if (*ApStartupSignalBuffer != WAKEUP_AP_SIGNAL) {
+          //
+          // Check AP start-up signal again.
+          // If AP start-up signal is not set, place AP into
+          // the specified C-state
+          //
+          AsmMwait (CpuMpData->ApTargetCState << 4, 0);
+        }
+      } else if (CpuMpData->ApLoopMode == ApInRunLoop) {
+        //
+        // Place AP in Run-loop
+        //
+        CpuPause ();
+      } else {
+        ASSERT (FALSE);
+      }
+
+      //
+      // If AP start-up signal is written, AP is waken up
+      // otherwise place AP in loop again
+      //
+      if (*ApStartupSignalBuffer == WAKEUP_AP_SIGNAL) {
+        break;
+      }
+    }
+  }
 }
 
 /**

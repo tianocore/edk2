@@ -35,6 +35,8 @@
 #include <Library/MtrrLib.h>
 #include <Library/HobLib.h>
 
+#define WAKEUP_AP_SIGNAL SIGNATURE_32 ('S', 'T', 'A', 'P')
+
 #define CPU_INIT_MP_LIB_HOB_GUID \
   { \
     0x58eb6a19, 0x3699, 0x4c68, { 0xa8, 0x36, 0xda, 0xcd, 0x8e, 0xdc, 0xad, 0x4a } \
