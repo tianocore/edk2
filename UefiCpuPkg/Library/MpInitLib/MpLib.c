@@ -17,6 +17,47 @@
 EFI_GUID mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 
 /**
+  The function will check if BSP Execute Disable is enabled.
+  DxeIpl may have enabled Execute Disable for BSP,
+  APs need to get the status and sync up the settings.
+
+  @retval TRUE      BSP Execute Disable is enabled.
+  @retval FALSE     BSP Execute Disable is not enabled.
+**/
+BOOLEAN
+IsBspExecuteDisableEnabled (
+  VOID
+  )
+{
+  UINT32                      Eax;
+  CPUID_EXTENDED_CPU_SIG_EDX  Edx;
+  MSR_IA32_EFER_REGISTER      EferMsr;
+  BOOLEAN                     Enabled;
+
+  Enabled = FALSE;
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &Eax, NULL, NULL, NULL);
+  if (Eax >= CPUID_EXTENDED_CPU_SIG) {
+    AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &Edx.Uint32);
+    //
+    // CPUID 0x80000001
+    // Bit 20: Execute Disable Bit available.
+    //
+    if (Edx.Bits.NX != 0) {
+      EferMsr.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
+      //
+      // MSR 0xC0000080
+      // Bit 11: Execute Disable Bit enable.
+      //
+      if (EferMsr.Bits.NXE != 0) {
+        Enabled = TRUE;
+      }
+    }
+  }
+
+  return Enabled;
+}
+
+/**
   Get the Application Processors state.
 
   @param[in]  CpuData    The pointer to CPU_AP_DATA of specified AP
@@ -404,6 +445,44 @@ ApWakeupFunction (
       }
     }
   }
+}
+
+/**
+  This function will fill the exchange info structure.
+
+  @param[in] CpuMpData          Pointer to CPU MP Data
+
+**/
+VOID
+FillExchangeInfoData (
+  IN CPU_MP_DATA               *CpuMpData
+  )
+{
+  volatile MP_CPU_EXCHANGE_INFO    *ExchangeInfo;
+
+  ExchangeInfo                  = CpuMpData->MpCpuExchangeInfo;
+  ExchangeInfo->Lock            = 0;
+  ExchangeInfo->StackStart      = CpuMpData->Buffer;
+  ExchangeInfo->StackSize       = CpuMpData->CpuApStackSize;
+  ExchangeInfo->BufferStart     = CpuMpData->WakeupBuffer;
+  ExchangeInfo->ModeOffset      = CpuMpData->AddressMap.ModeEntryOffset;
+
+  ExchangeInfo->CodeSegment     = AsmReadCs ();
+  ExchangeInfo->DataSegment     = AsmReadDs ();
+
+  ExchangeInfo->Cr3             = AsmReadCr3 ();
+
+  ExchangeInfo->CFunction       = (UINTN) ApWakeupFunction;
+  ExchangeInfo->NumApsExecuting = 0;
+  ExchangeInfo->CpuMpData       = CpuMpData;
+
+  ExchangeInfo->EnableExecuteDisable = IsBspExecuteDisableEnabled ();
+
+  //
+  // Get the BSP's data of GDT and IDT
+  //
+  AsmReadGdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->GdtrProfile);
+  AsmReadIdtr ((IA32_DESCRIPTOR *) &ExchangeInfo->IdtrProfile);
 }
 
 /**
