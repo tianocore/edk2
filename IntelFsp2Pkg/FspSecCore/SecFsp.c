@@ -76,7 +76,7 @@ SecGetPlatformData (
   //
   // Pointer to the size field
   //
-  TopOfCar = FspPlatformData->CarBase + FspPlatformData->CarSize;
+  TopOfCar = PcdGet32(PcdTemporaryRamBase) + PcdGet32(PcdTemporaryRamSize);
   StackPtr = (UINT32 *)(TopOfCar - sizeof (UINT32));
 
   if (*(StackPtr - 1) == FSP_MCUD_SIGNATURE) {
@@ -140,8 +140,6 @@ FspGlobalDataInit (
   PeiFspData->CoreStack            = BootLoaderStack;
   PeiFspData->PerfIdx              = 2;
   PeiFspData->PerfSig              = FSP_PERFORMANCE_DATA_SIGNATURE;
-  PeiFspData->PlatformData.CarBase = AsmReadMsr32 (0x200) & ~(0x6);
-  PeiFspData->PlatformData.CarSize = ~(AsmReadMsr32(0x201) & ~(0x800)) + 1;
 
   SetFspMeasurePoint (FSP_PERF_ID_API_FSP_MEMORY_INIT_ENTRY);
 

@@ -505,48 +505,6 @@ SetPhaseStatusCode (
 }
 
 /**
-  This function gets FSP CAR base.
-
-**/
-UINT32
-EFIAPI
-GetFspCarBase (
-  VOID
-  )
-{
-  FSP_GLOBAL_DATA  *FspData;
-  UINT32           CarBase;
-
-  FspData  = GetFspGlobalDataPointer ();
-  CarBase = FspData->PlatformData.CarBase;
-  if (CarBase == 0) {
-    CarBase = PcdGet32(PcdTemporaryRamBase);
-  }
-  return CarBase;
-}
-
-/**
-  This function gets FSP CAR size.
-
-**/
-UINT32
-EFIAPI
-GetFspCarSize (
-  VOID
-  )
-{
-  FSP_GLOBAL_DATA  *FspData;
-  UINT32           CarSize;
-
-  FspData  = GetFspGlobalDataPointer ();
-  CarSize = FspData->PlatformData.CarSize;
-  if (FspData->PlatformData.CarBase == 0) {
-    CarSize = PcdGet32(PcdTemporaryRamSize);
-  }
-  return CarSize;
-}
-
-/**
   This function updates the return status of the FSP API with requested reset type and returns to Boot Loader.
 
   @param[in] FspResetType     Reset type that needs to returned as API return status
