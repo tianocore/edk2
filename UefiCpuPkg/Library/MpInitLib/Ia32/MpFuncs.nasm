@@ -204,6 +204,8 @@ ASM_PFX(AsmGetAddressMap):
     mov        dword [ebx], RendezvousFunnelProcStart
     mov        dword [ebx +  4h], Flat32Start - RendezvousFunnelProcStart
     mov        dword [ebx +  8h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+    mov        dword [ebx + 0Ch], AsmRelocateApLoopStart
+    mov        dword [ebx + 10h], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
 
     popad
     ret

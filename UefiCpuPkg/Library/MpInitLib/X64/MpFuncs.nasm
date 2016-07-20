@@ -239,6 +239,9 @@ ASM_PFX(AsmGetAddressMap):
     mov        qword [rcx], rax
     mov        qword [rcx +  8h], LongModeStart - RendezvousFunnelProcStart
     mov        qword [rcx + 10h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+    mov        rax, ASM_PFX(AsmRelocateApLoop)
+    mov        qword [rcx + 18h], rax
+    mov        qword [rcx + 20h], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
     ret
 
 ;-------------------------------------------------------------------------------------

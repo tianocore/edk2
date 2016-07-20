@@ -35,6 +35,18 @@
 #include <Library/MtrrLib.h>
 #include <Library/HobLib.h>
 
+//
+// AP reset code information including code address and size,
+// this structure will be shared be C code and assembly code.
+// It is natural aligned by design.
+//
+typedef struct {
+  UINT8             *RendezvousFunnelAddress;
+  UINTN             ModeEntryOffset;
+  UINTN             RendezvousFunnelSize;
+  UINT8             *RelocateApLoopFuncAddress;
+  UINTN             RelocateApLoopFuncSize;
+} MP_ASSEMBLY_ADDRESS_MAP;
 
 #pragma pack(1)
 
@@ -81,5 +93,18 @@ VOID
   IN UINTN                   ApTargetCState,
   IN UINTN                   PmCodeSegment
   );
+
+/**
+  Assembly code to get starting address and size of the rendezvous entry for APs.
+  Information for fixing a jump instruction in the code is also returned.
+
+  @param[out] AddressMap  Output buffer for address map information.
+**/
+VOID
+EFIAPI
+AsmGetAddressMap (
+  OUT MP_ASSEMBLY_ADDRESS_MAP    *AddressMap
+  );
+
 #endif
 
