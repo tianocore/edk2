@@ -268,6 +268,42 @@ GetProcessorNumber (
   return EFI_NOT_FOUND;
 }
 
+/**
+  This function will get CPU count in the system.
+
+  @param[in] CpuMpData        Pointer to PEI CPU MP Data
+
+  @return  CPU count detected
+**/
+UINTN
+CollectProcessorCount (
+  IN CPU_MP_DATA         *CpuMpData
+  )
+{
+  //
+  // Send 1st broadcast IPI to APs to wakeup APs
+  //
+  CpuMpData->InitFlag     = ApInitConfig;
+  CpuMpData->X2ApicEnable = FALSE;
+  WakeUpAP (CpuMpData, TRUE, 0, NULL, NULL);
+  //
+  // Wait for AP task to complete and then exit.
+  //
+  MicroSecondDelay (PcdGet32(PcdCpuApInitTimeOutInMicroSeconds));
+  CpuMpData->InitFlag = ApInitDone;
+  ASSERT (CpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  //
+  // Wait for all APs finished the initialization
+  //
+  while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
+    CpuPause ();
+  }
+
+  DEBUG ((DEBUG_INFO, "MpInitLib: Find %d processors in system.\n", CpuMpData->CpuCount));
+
+  return CpuMpData->CpuCount;
+}
+
 /*
   Initialize CPU AP Data when AP is wakeup at the first time.
 
@@ -704,6 +740,10 @@ MpInitLibInitialize (
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
 
+  //
+  // Wakeup all APs and calculate the processor count in system
+  //
+  CollectProcessorCount (CpuMpData);
   //
   // Initialize global data for MP support
   //
