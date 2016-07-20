@@ -1,7 +1,7 @@
 /** @file
   Implementation of Multiple Processor PPI services.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -729,9 +729,9 @@ PeiSwitchBSP (
   IN  BOOLEAN                  EnableOldBSP
   )
 {
-  PEI_CPU_MP_DATA         *PeiCpuMpData;
-  UINTN                   CallerNumber;
-  MSR_IA32_APIC_BASE      ApicBaseMsr;
+  PEI_CPU_MP_DATA              *PeiCpuMpData;
+  UINTN                        CallerNumber;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   PeiCpuMpData = GetMpHobData ();
   if (PeiCpuMpData == NULL) {
@@ -774,9 +774,9 @@ PeiSwitchBSP (
   //
   // Clear the BSP bit of MSR_IA32_APIC_BASE
   //
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
-  ApicBaseMsr.Bits.Bsp = 0;
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Bits.BSP = 0;
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
 
   PeiCpuMpData->BSPInfo.State = CPU_SWITCH_STATE_IDLE;
   PeiCpuMpData->APInfo.State  = CPU_SWITCH_STATE_IDLE;
@@ -805,9 +805,9 @@ PeiSwitchBSP (
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
   //
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
-  ApicBaseMsr.Bits.Bsp = 1;
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Bits.BSP = 1;
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
   //
   // Set old BSP enable state
   //

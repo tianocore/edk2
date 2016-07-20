@@ -4,7 +4,7 @@
   This local APIC library instance supports x2APIC capable processors
   which have xAPIC and x2APIC modes.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,7 @@
 **/
 
 #include <Register/Cpuid.h>
+#include <Register/Msr.h>
 #include <Register/LocalApic.h>
 
 #include <Library/BaseLib.h>
@@ -68,7 +69,7 @@ GetLocalApicBaseAddress (
   VOID
   )
 {
-  MSR_IA32_APIC_BASE  ApicBaseMsr;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   if (!LocalApicBaseAddressMsrSupported ()) {
     //
@@ -78,10 +79,10 @@ GetLocalApicBaseAddress (
     return PcdGet32 (PcdCpuLocalApicBaseAddress);
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
   
-  return (UINTN)(LShiftU64 ((UINT64) ApicBaseMsr.Bits.ApicBaseHigh, 32)) +
-           (((UINTN)ApicBaseMsr.Bits.ApicBaseLow) << 12);
+  return (UINTN)(LShiftU64 ((UINT64) ApicBaseMsr.Bits.ApicBaseHi, 32)) +
+           (((UINTN)ApicBaseMsr.Bits.ApicBase) << 12);
 }
 
 /**
@@ -98,7 +99,7 @@ SetLocalApicBaseAddress (
   IN UINTN                BaseAddress
   )
 {
-  MSR_IA32_APIC_BASE  ApicBaseMsr;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
 
@@ -109,12 +110,12 @@ SetLocalApicBaseAddress (
     return;
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
 
-  ApicBaseMsr.Bits.ApicBaseLow  = (UINT32) (BaseAddress >> 12);
-  ApicBaseMsr.Bits.ApicBaseHigh = (UINT32) (RShiftU64((UINT64) BaseAddress, 32));
+  ApicBaseMsr.Bits.ApicBase   = (UINT32) (BaseAddress >> 12);
+  ApicBaseMsr.Bits.ApicBaseHi = (UINT32) (RShiftU64((UINT64) BaseAddress, 32));
 
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
 }
 
 /**
@@ -301,7 +302,7 @@ GetApicMode (
   VOID
   )
 {
-  MSR_IA32_APIC_BASE  ApicBaseMsr;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   if (!LocalApicBaseAddressMsrSupported ()) {
     //
@@ -310,12 +311,12 @@ GetApicMode (
     return LOCAL_APIC_MODE_XAPIC;
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
   //
   // Local APIC should have been enabled
   //
-  ASSERT (ApicBaseMsr.Bits.En != 0);
-  if (ApicBaseMsr.Bits.Extd != 0) {
+  ASSERT (ApicBaseMsr.Bits.EN != 0);
+  if (ApicBaseMsr.Bits.EXTD != 0) {
     return LOCAL_APIC_MODE_X2APIC;
   } else {
     return LOCAL_APIC_MODE_XAPIC;
@@ -339,8 +340,8 @@ SetApicMode (
   IN UINTN  ApicMode
   )
 {
-  UINTN               CurrentMode;
-  MSR_IA32_APIC_BASE  ApicBaseMsr;
+  UINTN                        CurrentMode;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   if (!LocalApicBaseAddressMsrSupported ()) {
     //
@@ -355,9 +356,9 @@ SetApicMode (
       case LOCAL_APIC_MODE_XAPIC:
         break;
       case LOCAL_APIC_MODE_X2APIC:
-        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
-        ApicBaseMsr.Bits.Extd = 1;
-        AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+        ApicBaseMsr.Bits.EXTD = 1;
+        AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
         break;
       default:
         ASSERT (FALSE);
@@ -369,12 +370,12 @@ SetApicMode (
         //  Transition from x2APIC mode to xAPIC mode is a two-step process:
         //    x2APIC -> Local APIC disabled -> xAPIC
         //
-        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
-        ApicBaseMsr.Bits.Extd = 0;
-        ApicBaseMsr.Bits.En = 0;
-        AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
-        ApicBaseMsr.Bits.En = 1;
-        AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+        ApicBaseMsr.Bits.EXTD = 0;
+        ApicBaseMsr.Bits.EN = 0;
+        AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+        ApicBaseMsr.Bits.EN = 1;
+        AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
         break;
       case LOCAL_APIC_MODE_X2APIC:
         break;

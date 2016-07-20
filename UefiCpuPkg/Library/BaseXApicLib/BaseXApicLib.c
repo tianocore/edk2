@@ -3,7 +3,7 @@
 
   This local APIC library instance supports xAPIC mode only.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@
 **/
 
 #include <Register/Cpuid.h>
+#include <Register/Msr.h>
 #include <Register/LocalApic.h>
 
 #include <Library/BaseLib.h>
@@ -67,7 +68,7 @@ GetLocalApicBaseAddress (
   VOID
   )
 {
-  MSR_IA32_APIC_BASE  ApicBaseMsr;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   if (!LocalApicBaseAddressMsrSupported ()) {
     //
@@ -77,10 +78,10 @@ GetLocalApicBaseAddress (
     return PcdGet32 (PcdCpuLocalApicBaseAddress);
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
   
-  return (UINTN)(LShiftU64 ((UINT64) ApicBaseMsr.Bits.ApicBaseHigh, 32)) +
-           (((UINTN)ApicBaseMsr.Bits.ApicBaseLow) << 12);
+  return (UINTN)(LShiftU64 ((UINT64) ApicBaseMsr.Bits.ApicBaseHi, 32)) +
+           (((UINTN)ApicBaseMsr.Bits.ApicBase) << 12);
 }
 
 /**
@@ -97,7 +98,7 @@ SetLocalApicBaseAddress (
   IN UINTN                BaseAddress
   )
 {
-  MSR_IA32_APIC_BASE  ApicBaseMsr;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
 
@@ -108,12 +109,12 @@ SetLocalApicBaseAddress (
     return;
   }
 
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
 
-  ApicBaseMsr.Bits.ApicBaseLow  = (UINT32) (BaseAddress >> 12);
-  ApicBaseMsr.Bits.ApicBaseHigh = (UINT32) (RShiftU64((UINT64) BaseAddress, 32));
+  ApicBaseMsr.Bits.ApicBase   = (UINT32) (BaseAddress >> 12);
+  ApicBaseMsr.Bits.ApicBaseHi = (UINT32) (RShiftU64((UINT64) BaseAddress, 32));
 
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE_ADDRESS, ApicBaseMsr.Uint64);
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
 }
 
 /**
@@ -246,18 +247,18 @@ GetApicMode (
 {
   DEBUG_CODE (
     {
-      MSR_IA32_APIC_BASE  ApicBaseMsr;
+      MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
       //
       // Check to see if the CPU supports the APIC Base Address MSR 
       //
       if (LocalApicBaseAddressMsrSupported ()) {
-        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE_ADDRESS);
+        ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
         //
         // Local APIC should have been enabled
         //
-        ASSERT (ApicBaseMsr.Bits.En != 0);
-        ASSERT (ApicBaseMsr.Bits.Extd == 0);
+        ASSERT (ApicBaseMsr.Bits.EN != 0);
+        ASSERT (ApicBaseMsr.Bits.EXTD == 0);
       }
     }
   );

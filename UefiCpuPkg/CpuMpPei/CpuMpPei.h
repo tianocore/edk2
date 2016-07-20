@@ -25,6 +25,7 @@
 
 #include <Register/Cpuid.h>
 #include <Register/LocalApic.h>
+#include <Register/Msr.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>

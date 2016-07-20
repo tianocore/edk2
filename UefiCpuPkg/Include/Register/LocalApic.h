@@ -1,7 +1,7 @@
 /** @file
   IA32 Local APIC Definitions.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,11 +14,6 @@
 
 #ifndef __LOCAL_APIC_H__
 #define __LOCAL_APIC_H__
-
-//
-// Definitions for IA32 architectural MSRs
-//
-#define MSR_IA32_APIC_BASE_ADDRESS              0x1B
 
 //
 // Definition for Local APIC registers and related values
@@ -52,19 +47,6 @@
 #define LOCAL_APIC_DESTINATION_SHORTHAND_SELF               1
 #define LOCAL_APIC_DESTINATION_SHORTHAND_ALL_INCLUDING_SELF 2
 #define LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF 3
-
-typedef union {
-  struct {
-    UINT32  Reserved0:8;     ///< Reserved.
-    UINT32  Bsp:1;           ///< Processor is BSP.
-    UINT32  Reserved1:1;     ///< Reserved.
-    UINT32  Extd:1;          ///< Enable x2APIC mode.
-    UINT32  En:1;            ///< xAPIC global enable/disable.
-    UINT32  ApicBaseLow:20;  ///< APIC Base physical address. The actual field width depends on physical address width.
-    UINT32  ApicBaseHigh:32;
-  } Bits;
-  UINT64    Uint64;
-} MSR_IA32_APIC_BASE;
 
 //
 // Local APIC Version Register.
