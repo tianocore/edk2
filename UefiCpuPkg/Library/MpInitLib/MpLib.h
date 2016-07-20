@@ -55,6 +55,17 @@ typedef enum {
 } AP_INIT_STATE;
 
 //
+// AP state
+//
+typedef enum {
+  CpuStateIdle,
+  CpuStateReady,
+  CpuStateBusy,
+  CpuStateFinished,
+  CpuStateDisabled
+} CPU_STATE;
+
+//
 // AP related data
 //
 typedef struct {
@@ -66,6 +77,7 @@ typedef struct {
   UINT32                         ApicId;
   UINT32                         Health;
   BOOLEAN                        CpuHealthy;
+  volatile CPU_STATE             State;
   BOOLEAN                        Waiting;
   BOOLEAN                        *Finished;
   UINT64                         ExpectedTime;

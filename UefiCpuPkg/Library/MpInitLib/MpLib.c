@@ -14,6 +14,37 @@
 
 #include "MpLib.h"
 
+/**
+  Get the Application Processors state.
+
+  @param[in]  CpuData    The pointer to CPU_AP_DATA of specified AP
+
+  @return  The AP status
+**/
+CPU_STATE
+GetApState (
+  IN  CPU_AP_DATA     *CpuData
+  )
+{
+  return CpuData->State;
+}
+
+/**
+  Set the Application Processors state.
+
+  @param[in]   CpuData    The pointer to CPU_AP_DATA of specified AP
+  @param[in]   State      The AP status
+**/
+VOID
+SetApState (
+  IN  CPU_AP_DATA     *CpuData,
+  IN  CPU_STATE       State
+  )
+{
+  AcquireSpinLock (&CpuData->ApLock);
+  CpuData->State = State;
+  ReleaseSpinLock (&CpuData->ApLock);
+}
 
 /**
   Detect whether Mwait-monitor feature is supported.
@@ -74,6 +105,40 @@ GetApLoopMode (
 
   return ApLoopMode;
 }
+/*
+  Initialize CPU AP Data when AP is wakeup at the first time.
+
+  @param[in, out] CpuMpData        Pointer to PEI CPU MP Data
+  @param[in]      ProcessorNumber  The handle number of processor
+  @param[in]      BistData         Processor BIST data
+
+**/
+VOID
+InitializeApData (
+  IN OUT CPU_MP_DATA      *CpuMpData,
+  IN     UINTN            ProcessorNumber,
+  IN     UINT32           BistData
+  )
+{
+  CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
+  CpuMpData->CpuData[ProcessorNumber].Health     = BistData;
+  CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
+  CpuMpData->CpuData[ProcessorNumber].ApicId     = GetApicId ();
+  CpuMpData->CpuData[ProcessorNumber].InitialApicId = GetInitialApicId ();
+  if (CpuMpData->CpuData[ProcessorNumber].InitialApicId >= 0xFF) {
+    //
+    // Set x2APIC mode if there are any logical processor reporting
+    // an Initial APIC ID of 255 or greater.
+    //
+    AcquireSpinLock(&CpuMpData->MpLock);
+    CpuMpData->X2ApicEnable = TRUE;
+    ReleaseSpinLock(&CpuMpData->MpLock);
+  }
+
+  InitializeSpinLock(&CpuMpData->CpuData[ProcessorNumber].ApLock);
+  SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+}
+
 /**
   MP Initialize Library initialization.
 
@@ -103,6 +168,7 @@ MpInitLibInitialize (
   CPU_MP_DATA              *CpuMpData;
   UINT8                    ApLoopMode;
   UINT8                    *MonitorBuffer;
+  UINTN                    Index;
   UINTN                    ApResetVectorSize;
   UINTN                    BackupBufferAddr;
   MaxLogicalProcessorNumber = PcdGet32(PcdCpuMaxLogicalProcessorNumber);
@@ -138,6 +204,10 @@ MpInitLibInitialize (
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock(&CpuMpData->MpLock);
   //
+  // Set BSP basic information
+  //
+  InitializeApData (CpuMpData, 0, 0);
+  //
   // Save assembly code information
   //
   CopyMem (&CpuMpData->AddressMap, &AddressMap, sizeof (MP_ASSEMBLY_ADDRESS_MAP));
@@ -147,6 +217,12 @@ MpInitLibInitialize (
   CpuMpData->ApLoopMode = ApLoopMode;
   DEBUG ((DEBUG_INFO, "AP Loop Mode is %d\n", CpuMpData->ApLoopMode));
   //
+  // Set up APs wakeup signal buffer
+  //
+  for (Index = 0; Index < MaxLogicalProcessorNumber; Index++) {
+    CpuMpData->CpuData[Index].StartupApSignal =
+      (UINT32 *)(MonitorBuffer + MonitorFilterSize * Index);
+  }
   // Store BSP's MTRR setting
   //
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
