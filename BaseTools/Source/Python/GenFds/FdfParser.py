@@ -231,6 +231,7 @@ class FileProfile :
 
         self.PcdDict = {}
         self.InfList = []
+        self.InfDict = {'ArchTBD':[]}
         # ECC will use this Dict and List information
         self.PcdFileLineDict = {}
         self.InfFileLineList = []
@@ -2472,6 +2473,13 @@ class FdfParser:
             self.Profile.InfList.append(ffsInf.InfFileName)
             FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
             self.Profile.InfFileLineList.append(FileLineTuple)
+            if ffsInf.UseArch:
+                if ffsInf.UseArch not in self.Profile.InfDict:
+                    self.Profile.InfDict[ffsInf.UseArch] = [ffsInf.InfFileName]
+                else:
+                    self.Profile.InfDict[ffsInf.UseArch].append(ffsInf.InfFileName)
+            else:
+                self.Profile.InfDict['ArchTBD'].append(ffsInf.InfFileName)
 
         if self.__IsToken('|'):
             if self.__IsKeyword('RELOCS_STRIPPED'):
@@ -4351,6 +4359,13 @@ class FdfParser:
             self.Profile.InfList.append(ffsInf.InfFileName)
             FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
             self.Profile.InfFileLineList.append(FileLineTuple)
+            if ffsInf.UseArch:
+                if ffsInf.UseArch not in self.Profile.InfDict:
+                    self.Profile.InfDict[ffsInf.UseArch] = [ffsInf.InfFileName]
+                else:
+                    self.Profile.InfDict[ffsInf.UseArch].append(ffsInf.InfFileName)
+            else:
+                self.Profile.InfDict['ArchTBD'].append(ffsInf.InfFileName)
 
         
         self.__GetOptRomOverrides (ffsInf)

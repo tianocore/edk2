@@ -329,6 +329,34 @@ class WorkspaceAutoGen(AutoGen):
                 if fvname.upper() not in self.FdfProfile.FvDict:
                     EdkLogger.error("build", OPTION_VALUE_INVALID,
                                     "No such an FV in FDF file: %s" % fvname)
+
+            for key in self.FdfProfile.InfDict:
+                if key == 'ArchTBD':
+                    Platform_cache = {}
+                    for Arch in self.ArchList:
+                        Platform_cache[Arch] = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
+                    for Inf in self.FdfProfile.InfDict[key]:
+                        ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
+                        for Arch in self.ArchList:
+                            if ModuleFile in Platform_cache[Arch].Modules:
+                                break
+                        else:
+                            ModuleData = self.BuildDatabase[ModuleFile, Arch, Target, Toolchain]
+                            if not ModuleData.IsBinaryModule:
+                                EdkLogger.error('build', PARSER_ERROR, "Module %s NOT found in DSC file; Is it really a binary module?" % ModuleFile)
+
+                else:
+                    for Arch in self.ArchList:
+                        if Arch == key:
+                            Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
+                            for Inf in self.FdfProfile.InfDict[key]:
+                                ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
+                                if ModuleFile in Platform.Modules:
+                                    continue
+                                ModuleData = self.BuildDatabase[ModuleFile, Arch, Target, Toolchain]
+                                if not ModuleData.IsBinaryModule:
+                                    EdkLogger.error('build', PARSER_ERROR, "Module %s NOT found in DSC file; Is it really a binary module?" % ModuleFile)
+
         else:
             PcdSet = {}
             ModuleList = []
