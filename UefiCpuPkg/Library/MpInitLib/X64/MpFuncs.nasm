@@ -177,6 +177,60 @@ CProcedureInvoke:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment);
+;-------------------------------------------------------------------------------------
+global ASM_PFX(AsmRelocateApLoop)
+ASM_PFX(AsmRelocateApLoop):
+AsmRelocateApLoopStart:
+    push       rcx
+    push       rdx
+
+    lea        rsi, [PmEntry]    ; rsi <- The start address of transition code
+
+    push       r8
+    push       rsi
+    DB         0x48
+    retf
+BITS 32
+PmEntry:
+    mov        eax, cr0
+    btr        eax, 31           ; Clear CR0.PG
+    mov        cr0, eax          ; Disable paging and caches
+
+    mov        ebx, edx          ; Save EntryPoint to rbx, for rdmsr will overwrite rdx
+    mov        ecx, 0xc0000080
+    rdmsr
+    and        ah, ~ 1           ; Clear LME
+    wrmsr
+    mov        eax, cr4
+    and        al, ~ (1 << 5)    ; Clear PAE
+    mov        cr4, eax
+
+    pop        edx
+    add        esp, 4
+    pop        ecx,
+    add        esp, 4
+    cmp        cl, 1              ; Check mwait-monitor support
+    jnz        HltLoop
+    mov        ebx, edx           ; Save C-State to ebx
+MwaitLoop:
+    mov        eax, esp           ; Set Monitor Address
+    xor        ecx, ecx           ; ecx = 0
+    xor        edx, edx           ; edx = 0
+    monitor
+    shl        ebx, 4
+    mov        eax, ebx           ; Mwait Cx, Target C-State per eax[7:4]
+    mwait
+    jmp        MwaitLoop
+HltLoop:
+    cli
+    hlt
+    jmp        HltLoop
+    ret
+BITS 64
+AsmRelocateApLoopEnd:
+
+;-------------------------------------------------------------------------------------
 ;  AsmGetAddressMap (&AddressMap);
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmGetAddressMap)

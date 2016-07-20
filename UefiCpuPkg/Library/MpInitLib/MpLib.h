@@ -60,5 +60,26 @@ typedef struct {
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
+/**
+  Assembly code to place AP into safe loop mode.
+
+  Place AP into targeted C-State if MONITOR is supported, otherwise
+  place AP into hlt state.
+  Place AP in protected mode if the current is long mode. Due to AP maybe
+  wakeup by some hardware event. It could avoid accessing page table that
+  may not available during booting to OS.
+
+  @param[in] MwaitSupport    TRUE indicates MONITOR is supported.
+                             FALSE indicates MONITOR is not supported.
+  @param[in] ApTargetCState  Target C-State value.
+  @param[in] PmCodeSegment   Protected mode code segment value.
+**/
+typedef
+VOID
+(EFIAPI * ASM_RELOCATE_AP_LOOP) (
+  IN BOOLEAN                 MwaitSupport,
+  IN UINTN                   ApTargetCState,
+  IN UINTN                   PmCodeSegment
+  );
 #endif
 
