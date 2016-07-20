@@ -765,6 +765,8 @@ MpInitLibInitialize (
   VOID
   )
 {
+  CPU_MP_DATA              *OldCpuMpData;
+  CPU_INFO_IN_HOB          *CpuInfoInHob;
   UINT32                   MaxLogicalProcessorNumber;
   UINT32                   ApStackSize;
   MP_ASSEMBLY_ADDRESS_MAP  AddressMap;
@@ -778,7 +780,13 @@ MpInitLibInitialize (
   UINTN                    Index;
   UINTN                    ApResetVectorSize;
   UINTN                    BackupBufferAddr;
-  MaxLogicalProcessorNumber = PcdGet32(PcdCpuMaxLogicalProcessorNumber);
+
+  OldCpuMpData = GetCpuMpDataFromGuidedHob ();
+  if (OldCpuMpData == NULL) {
+    MaxLogicalProcessorNumber = PcdGet32(PcdCpuMaxLogicalProcessorNumber);
+  } else {
+    MaxLogicalProcessorNumber = OldCpuMpData->CpuCount;
+  }
 
   AsmGetAddressMap (&AddressMap);
   ApResetVectorSize = AddressMap.RendezvousFunnelSize + sizeof (MP_CPU_EXCHANGE_INFO);
@@ -843,11 +851,52 @@ MpInitLibInitialize (
   //
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
+  if (OldCpuMpData == NULL) {
+    //
+    // Wakeup all APs and calculate the processor count in system
+    //
+    CollectProcessorCount (CpuMpData);
+  } else {
+    //
+    // APs have been wakeup before, just get the CPU Information
+    // from HOB
+    //
+    CpuMpData->CpuCount  = OldCpuMpData->CpuCount;
+    CpuMpData->BspNumber = OldCpuMpData->BspNumber;
+    CpuMpData->InitFlag  = ApInitReconfig;
+    CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) OldCpuMpData->CpuInfoInHob;
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      InitializeSpinLock(&CpuMpData->CpuData[Index].ApLock);
+      CpuMpData->CpuData[Index].ApicId        = CpuInfoInHob[Index].ApicId;
+      CpuMpData->CpuData[Index].InitialApicId = CpuInfoInHob[Index].InitialApicId;
+      if (CpuMpData->CpuData[Index].InitialApicId >= 255) {
+        CpuMpData->X2ApicEnable = TRUE;
+      }
+      CpuMpData->CpuData[Index].Health     = CpuInfoInHob[Index].Health;
+      CpuMpData->CpuData[Index].CpuHealthy = (CpuMpData->CpuData[Index].Health == 0)? TRUE:FALSE;
+      CpuMpData->CpuData[Index].ApFunction = 0;
+      CopyMem (
+        &CpuMpData->CpuData[Index].VolatileRegisters,
+        &CpuMpData->CpuData[0].VolatileRegisters,
+        sizeof (CPU_VOLATILE_REGISTERS)
+        );
+    }
+    //
+    // Wakeup APs to do some AP initialize sync
+    //
+    WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData);
+    //
+    // Wait for all APs finished initialization
+    //
+    while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
+      CpuPause ();
+    }
+    CpuMpData->InitFlag = ApInitDone;
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+    }
+  }
 
-  //
-  // Wakeup all APs and calculate the processor count in system
-  //
-  CollectProcessorCount (CpuMpData);
   //
   // Initialize global data for MP support
   //
@@ -936,6 +985,7 @@ MpInitLibGetNumberOfProcessors (
 {
   return EFI_UNSUPPORTED;
 }
+
 /**
   Get pointer to CPU MP Data structure from GUIDed HOB.
 
