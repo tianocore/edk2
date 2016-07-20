@@ -47,6 +47,73 @@ SetApState (
 }
 
 /**
+  Save the volatile registers required to be restored following INIT IPI.
+
+  @param[out]  VolatileRegisters    Returns buffer saved the volatile resisters
+**/
+VOID
+SaveVolatileRegisters (
+  OUT CPU_VOLATILE_REGISTERS    *VolatileRegisters
+  )
+{
+  CPUID_VERSION_INFO_EDX        VersionInfoEdx;
+
+  VolatileRegisters->Cr0 = AsmReadCr0 ();
+  VolatileRegisters->Cr3 = AsmReadCr3 ();
+  VolatileRegisters->Cr4 = AsmReadCr4 ();
+
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
+  if (VersionInfoEdx.Bits.DE != 0) {
+    //
+    // If processor supports Debugging Extensions feature
+    // by CPUID.[EAX=01H]:EDX.BIT2
+    //
+    VolatileRegisters->Dr0 = AsmReadDr0 ();
+    VolatileRegisters->Dr1 = AsmReadDr1 ();
+    VolatileRegisters->Dr2 = AsmReadDr2 ();
+    VolatileRegisters->Dr3 = AsmReadDr3 ();
+    VolatileRegisters->Dr6 = AsmReadDr6 ();
+    VolatileRegisters->Dr7 = AsmReadDr7 ();
+  }
+}
+
+/**
+  Restore the volatile registers following INIT IPI.
+
+  @param[in]  VolatileRegisters   Pointer to volatile resisters
+  @param[in]  IsRestoreDr         TRUE:  Restore DRx if supported
+                                  FALSE: Do not restore DRx
+**/
+VOID
+RestoreVolatileRegisters (
+  IN CPU_VOLATILE_REGISTERS    *VolatileRegisters,
+  IN BOOLEAN                   IsRestoreDr
+  )
+{
+  CPUID_VERSION_INFO_EDX        VersionInfoEdx;
+
+  AsmWriteCr0 (VolatileRegisters->Cr0);
+  AsmWriteCr3 (VolatileRegisters->Cr3);
+  AsmWriteCr4 (VolatileRegisters->Cr4);
+
+  if (IsRestoreDr) {
+    AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
+    if (VersionInfoEdx.Bits.DE != 0) {
+      //
+      // If processor supports Debugging Extensions feature
+      // by CPUID.[EAX=01H]:EDX.BIT2
+      //
+      AsmWriteDr0 (VolatileRegisters->Dr0);
+      AsmWriteDr1 (VolatileRegisters->Dr1);
+      AsmWriteDr2 (VolatileRegisters->Dr2);
+      AsmWriteDr3 (VolatileRegisters->Dr3);
+      AsmWriteDr6 (VolatileRegisters->Dr6);
+      AsmWriteDr7 (VolatileRegisters->Dr7);
+    }
+  }
+}
+
+/**
   Detect whether Mwait-monitor feature is supported.
 
   @retval TRUE    Mwait-monitor feature is supported.
@@ -203,6 +270,10 @@ MpInitLibInitialize (
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock(&CpuMpData->MpLock);
+  //
+  // Save BSP's Control registers to APs
+  //
+  SaveVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters);
   //
   // Set BSP basic information
   //

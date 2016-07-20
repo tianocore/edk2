@@ -66,6 +66,21 @@ typedef enum {
 } CPU_STATE;
 
 //
+// CPU volatile registers around INIT-SIPI-SIPI
+//
+typedef struct {
+  UINTN                          Cr0;
+  UINTN                          Cr3;
+  UINTN                          Cr4;
+  UINTN                          Dr0;
+  UINTN                          Dr1;
+  UINTN                          Dr2;
+  UINTN                          Dr3;
+  UINTN                          Dr6;
+  UINTN                          Dr7;
+} CPU_VOLATILE_REGISTERS;
+
+//
 // AP related data
 //
 typedef struct {
@@ -78,6 +93,7 @@ typedef struct {
   UINT32                         Health;
   BOOLEAN                        CpuHealthy;
   volatile CPU_STATE             State;
+  CPU_VOLATILE_REGISTERS         VolatileRegisters;
   BOOLEAN                        Waiting;
   BOOLEAN                        *Finished;
   UINT64                         ExpectedTime;
