@@ -46,6 +46,47 @@ typedef enum {
 } AP_LOOP_MODE;
 
 //
+// AP initialization state during APs wakeup
+//
+typedef enum {
+  ApInitConfig   = 1,
+  ApInitReconfig = 2,
+  ApInitDone     = 3
+} AP_INIT_STATE;
+
+//
+// AP related data
+//
+typedef struct {
+  SPIN_LOCK                      ApLock;
+  volatile UINT32                *StartupApSignal;
+  volatile UINTN                 ApFunction;
+  volatile UINTN                 ApFunctionArgument;
+  UINT32                         InitialApicId;
+  UINT32                         ApicId;
+  UINT32                         Health;
+  BOOLEAN                        CpuHealthy;
+  BOOLEAN                        Waiting;
+  BOOLEAN                        *Finished;
+  UINT64                         ExpectedTime;
+  UINT64                         CurrentTime;
+  UINT64                         TotalTime;
+  EFI_EVENT                      WaitEvent;
+} CPU_AP_DATA;
+
+//
+// Basic CPU information saved in Guided HOB.
+// Because the contents will be shard between PEI and DXE,
+// we need to make sure the each fields offset same in different
+// architecture.
+//
+typedef struct {
+  UINT32                         InitialApicId;
+  UINT32                         ApicId;
+  UINT32                         Health;
+} CPU_INFO_IN_HOB;
+
+//
 // AP reset code information including code address and size,
 // this structure will be shared be C code and assembly code.
 // It is natural aligned by design.
@@ -57,6 +98,8 @@ typedef struct {
   UINT8             *RelocateApLoopFuncAddress;
   UINTN             RelocateApLoopFuncSize;
 } MP_ASSEMBLY_ADDRESS_MAP;
+
+typedef struct _CPU_MP_DATA  CPU_MP_DATA;
 
 #pragma pack(1)
 
@@ -79,9 +122,54 @@ typedef struct {
   UINTN                 DataSegment;
   UINTN                 EnableExecuteDisable;
   UINTN                 Cr3;
+  CPU_MP_DATA           *CpuMpData;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
+
+//
+// CPU MP Data save in memory
+//
+struct _CPU_MP_DATA {
+  UINT64                         CpuInfoInHob;
+  UINT32                         CpuCount;
+  UINT32                         BspNumber;
+  //
+  // The above fields data will be passed from PEI to DXE
+  // Please make sure the fields offset same in the different
+  // architecture.
+  //
+  SPIN_LOCK                      MpLock;
+  UINTN                          Buffer;
+  UINTN                          CpuApStackSize;
+  MP_ASSEMBLY_ADDRESS_MAP        AddressMap;
+  UINTN                          WakeupBuffer;
+  UINTN                          BackupBuffer;
+  UINTN                          BackupBufferSize;
+  BOOLEAN                        EndOfPeiFlag;
+
+  volatile UINT32                StartCount;
+  volatile UINT32                FinishedCount;
+  volatile UINT32                RunningCount;
+  BOOLEAN                        SingleThread;
+  EFI_AP_PROCEDURE               Procedure;
+  VOID                           *ProcArguments;
+  BOOLEAN                        *Finished;
+  UINT64                         ExpectedTime;
+  UINT64                         CurrentTime;
+  UINT64                         TotalTime;
+  EFI_EVENT                      WaitEvent;
+  UINTN                          **FailedCpuList;
+
+  AP_INIT_STATE                  InitFlag;
+  BOOLEAN                        X2ApicEnable;
+  MTRR_SETTINGS                  MtrrTable;
+  UINT8                          ApLoopMode;
+  UINT8                          ApTargetCState;
+  UINT16                         PmCodeSegment;
+  CPU_AP_DATA                    *CpuData;
+  volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
+};
 /**
   Assembly code to place AP into safe loop mode.
 

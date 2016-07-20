@@ -93,14 +93,63 @@ MpInitLibInitialize (
   VOID
   )
 {
+  UINT32                   MaxLogicalProcessorNumber;
+  UINT32                   ApStackSize;
   MP_ASSEMBLY_ADDRESS_MAP  AddressMap;
+  UINTN                    BufferSize;
   UINT32                   MonitorFilterSize;
+  VOID                     *MpBuffer;
+  UINTN                    Buffer;
+  CPU_MP_DATA              *CpuMpData;
   UINT8                    ApLoopMode;
+  UINT8                    *MonitorBuffer;
   UINTN                    ApResetVectorSize;
+  UINTN                    BackupBufferAddr;
+  MaxLogicalProcessorNumber = PcdGet32(PcdCpuMaxLogicalProcessorNumber);
 
   AsmGetAddressMap (&AddressMap);
   ApResetVectorSize = AddressMap.RendezvousFunnelSize + sizeof (MP_CPU_EXCHANGE_INFO);
+  ApStackSize = PcdGet32(PcdCpuApStackSize);
   ApLoopMode  = GetApLoopMode (&MonitorFilterSize);
+
+  BufferSize  = ApStackSize * MaxLogicalProcessorNumber;
+  BufferSize += MonitorFilterSize * MaxLogicalProcessorNumber;
+  BufferSize += sizeof (CPU_MP_DATA);
+  BufferSize += ApResetVectorSize;
+  BufferSize += (sizeof (CPU_AP_DATA) + sizeof (CPU_INFO_IN_HOB))* MaxLogicalProcessorNumber;
+  MpBuffer    = AllocatePages (EFI_SIZE_TO_PAGES (BufferSize));
+  ASSERT (MpBuffer != NULL);
+  ZeroMem (MpBuffer, BufferSize);
+  Buffer = (UINTN) MpBuffer;
+
+  MonitorBuffer    = (UINT8 *) (Buffer + ApStackSize * MaxLogicalProcessorNumber);
+  BackupBufferAddr = (UINTN) MonitorBuffer + MonitorFilterSize * MaxLogicalProcessorNumber;
+  CpuMpData = (CPU_MP_DATA *) (BackupBufferAddr + ApResetVectorSize);
+  CpuMpData->Buffer           = Buffer;
+  CpuMpData->CpuApStackSize   = ApStackSize;
+  CpuMpData->BackupBuffer     = BackupBufferAddr;
+  CpuMpData->BackupBufferSize = ApResetVectorSize;
+  CpuMpData->EndOfPeiFlag     = FALSE;
+  CpuMpData->WakeupBuffer     = (UINTN) -1;
+  CpuMpData->CpuCount         = 1;
+  CpuMpData->BspNumber        = 0;
+  CpuMpData->WaitEvent        = NULL;
+  CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
+  CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
+  InitializeSpinLock(&CpuMpData->MpLock);
+  //
+  // Save assembly code information
+  //
+  CopyMem (&CpuMpData->AddressMap, &AddressMap, sizeof (MP_ASSEMBLY_ADDRESS_MAP));
+  //
+  // Finally set AP loop mode
+  //
+  CpuMpData->ApLoopMode = ApLoopMode;
+  DEBUG ((DEBUG_INFO, "AP Loop Mode is %d\n", CpuMpData->ApLoopMode));
+  //
+  // Store BSP's MTRR setting
+  //
+  MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
   return EFI_SUCCESS;
 }
