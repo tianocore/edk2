@@ -39,6 +39,7 @@
   DxeMpLib.c
   MpLib.c
   MpLib.h
+  Microcode.c
 
 [Packages]
   MdePkg/MdePkg.dec

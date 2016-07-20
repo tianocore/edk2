@@ -232,5 +232,15 @@ AsmGetAddressMap (
   OUT MP_ASSEMBLY_ADDRESS_MAP    *AddressMap
   );
 
+/**
+  Detect whether specified processor can find matching microcode patch and load it.
+
+  @param[in] PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+MicrocodeDetect (
+  IN CPU_MP_DATA             *CpuMpData
+  );
+
 #endif
 

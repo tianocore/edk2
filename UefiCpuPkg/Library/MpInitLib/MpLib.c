@@ -294,6 +294,11 @@ MpInitLibInitialize (
     CpuMpData->CpuData[Index].StartupApSignal =
       (UINT32 *)(MonitorBuffer + MonitorFilterSize * Index);
   }
+  //
+  // Load Microcode on BSP
+  //
+  MicrocodeDetect (CpuMpData);
+  //
   // Store BSP's MTRR setting
   //
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
