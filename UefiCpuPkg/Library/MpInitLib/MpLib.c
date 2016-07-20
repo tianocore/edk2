@@ -217,6 +217,20 @@ GetApLoopMode (
 }
 
 /**
+  Enable x2APIC mode on APs.
+
+  @param[in, out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+ApFuncEnableX2Apic (
+  IN OUT VOID  *Buffer
+  )
+{
+  SetApicMode (LOCAL_APIC_MODE_X2APIC);
+}
+
+/**
   Do sync on APs.
 
   @param[in, out] Buffer  Pointer to private data buffer.
@@ -299,6 +313,24 @@ CollectProcessorCount (
     CpuPause ();
   }
 
+  if (CpuMpData->X2ApicEnable) {
+    DEBUG ((DEBUG_INFO, "Force x2APIC mode!\n"));
+    //
+    // Wakeup all APs to enable x2APIC mode
+    //
+    WakeUpAP (CpuMpData, TRUE, 0, ApFuncEnableX2Apic, NULL);
+    //
+    // Wait for all known APs finished
+    //
+    while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
+      CpuPause ();
+    }
+    //
+    // Enable x2APIC on BSP
+    //
+    SetApicMode (LOCAL_APIC_MODE_X2APIC);
+  }
+  DEBUG ((DEBUG_INFO, "APIC MODE is %d\n", GetApicMode ()));
   DEBUG ((DEBUG_INFO, "MpInitLib: Find %d processors in system.\n", CpuMpData->CpuCount));
 
   return CpuMpData->CpuCount;
