@@ -34,8 +34,6 @@ typedef struct  {
    UINT32             MicrocodeRegionSize;
    UINT32             CodeRegionBase;
    UINT32             CodeRegionSize;
-   UINT32             CarBase;
-   UINT32             CarSize;
 } FSP_PLAT_DATA;
 
 #define FSP_GLOBAL_DATA_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'D')

@@ -290,26 +290,6 @@ SetPhaseStatusCode (
   );
 
 /**
-  This function gets FSP CAR base.
-
-**/
-UINT32
-EFIAPI
-GetFspCarBase (
-  VOID
-  );
-
-/**
-  This function gets FSP CAR size.
-
-**/
-UINT32
-EFIAPI
-GetFspCarSize (
-  VOID
-  );
-
-/**
   This function updates the return status of the FSP API with requested reset type and returns to Boot Loader.
 
   @param[in] FspResetType     Reset type that needs to returned as API return status
