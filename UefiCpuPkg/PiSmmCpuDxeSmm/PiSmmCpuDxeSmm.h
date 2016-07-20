@@ -816,4 +816,13 @@ RestoreSmmConfigurationInS3 (
   VOID
   );
 
+/**
+  Get ACPI S3 enable flag.
+
+**/
+VOID
+GetAcpiS3EnableFlag (
+  VOID
+  );
+
 #endif

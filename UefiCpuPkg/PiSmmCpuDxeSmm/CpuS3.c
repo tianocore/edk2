@@ -75,6 +75,8 @@ BOOLEAN                      mSmmS3Flag = FALSE;
 //
 SMM_S3_RESUME_STATE          *mSmmS3ResumeState = NULL;
 
+BOOLEAN                      mAcpiS3Enable = TRUE;
+
 /**
   Get MSR spin lock by MSR index.
 
@@ -548,6 +550,10 @@ RestoreSmmConfigurationInS3 (
   VOID
   )
 {
+  if (!mAcpiS3Enable) {
+    return;
+  }
+
   //
   // Restore SMM Configuration in S3 boot path.
   //
@@ -726,6 +732,10 @@ InitSmmS3ResumeState (
   EFI_SMRAM_DESCRIPTOR       *SmramDescriptor;
   SMM_S3_RESUME_STATE        *SmmS3ResumeState;
 
+  if (!mAcpiS3Enable) {
+    return;
+  }
+
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   if (GuidHob != NULL) {
     SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
@@ -817,6 +827,10 @@ GetAcpiCpuData (
   IA32_DESCRIPTOR            *Gdtr;
   IA32_DESCRIPTOR            *Idtr;
 
+  if (!mAcpiS3Enable) {
+    return;
+  }
+
   //
   // Prevent use of mAcpiCpuData by initialize NumberOfCpus to 0
   //
@@ -882,4 +896,16 @@ GetAcpiCpuData (
   CopyMem (mGdtForAp, (VOID *)Gdtr->Base, Gdtr->Limit + 1);
   CopyMem (mIdtForAp, (VOID *)Idtr->Base, Idtr->Limit + 1);
   CopyMem (mMachineCheckHandlerForAp, (VOID *)(UINTN)mAcpiCpuData.ApMachineCheckHandlerBase, mAcpiCpuData.ApMachineCheckHandlerSize);
+}
+
+/**
+  Get ACPI S3 enable flag.
+
+**/
+VOID
+GetAcpiS3EnableFlag (
+  VOID
+  )
+{
+  mAcpiS3Enable = PcdGetBool (PcdAcpiS3Enable);
 }
