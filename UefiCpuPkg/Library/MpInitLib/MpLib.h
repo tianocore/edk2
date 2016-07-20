@@ -36,5 +36,29 @@
 #include <Library/HobLib.h>
 
 
+#pragma pack(1)
+
+//
+// MP CPU exchange information for AP reset code
+// This structure is required to be packed because fixed field offsets
+// into this structure are used in assembly code in this module
+//
+typedef struct {
+  UINTN                 Lock;
+  UINTN                 StackStart;
+  UINTN                 StackSize;
+  UINTN                 CFunction;
+  IA32_DESCRIPTOR       GdtrProfile;
+  IA32_DESCRIPTOR       IdtrProfile;
+  UINTN                 BufferStart;
+  UINTN                 ModeOffset;
+  UINTN                 NumApsExecuting;
+  UINTN                 CodeSegment;
+  UINTN                 DataSegment;
+  UINTN                 Cr3;
+  PEI_CPU_MP_DATA       *PeiCpuMpData;
+} MP_CPU_EXCHANGE_INFO;
+
+#pragma pack()
 #endif
 
