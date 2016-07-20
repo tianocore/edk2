@@ -1,7 +1,7 @@
 /** @file
   Common operation of the IKE
   
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -18,10 +18,52 @@
 #include "IpSecConfigImpl.h"
 #include "IpSecDebug.h"
 
-//
-// Initial the SPI
-//
-UINT32            mNextSpi  = IKE_SPI_BASE;
+/**
+  Check whether the new generated Spi has existed.
+
+  @param[in]   IkeSaSession   Pointer to the Child SA Session.
+  @param[in]   SpiValue       SPI Value.
+
+  @retval  TRUE    This SpiValue has existed in the Child SA Session
+  @retval  FALSE   This SpiValue doesn't exist in the Child SA Session.
+  
+**/
+BOOLEAN
+IkeSpiValueExisted (
+  IN IKEV2_SA_SESSION      *IkeSaSession,
+  IN UINT32                SpiValue
+  )
+{
+  LIST_ENTRY              *Entry;
+  LIST_ENTRY              *Next;
+  IKEV2_CHILD_SA_SESSION  *SaSession;
+
+  Entry     = NULL;
+  Next      = NULL;
+  SaSession = NULL; 
+    
+  //
+  // Check whether the SPI value has existed in ChildSaEstablishSessionList.
+  //
+  NET_LIST_FOR_EACH_SAFE (Entry, Next, &IkeSaSession->ChildSaEstablishSessionList) {
+    SaSession= IKEV2_CHILD_SA_SESSION_BY_IKE_SA (Entry);
+    if (SaSession->LocalPeerSpi == SpiValue) {
+      return TRUE;
+    }
+  }
+
+  //
+  // Check whether the SPI value has existed in ChildSaSessionList.
+  //
+  NET_LIST_FOR_EACH_SAFE (Entry, Next, &IkeSaSession->ChildSaSessionList) {
+    SaSession= IKEV2_CHILD_SA_SESSION_BY_IKE_SA (Entry);
+    if (SaSession->LocalPeerSpi == SpiValue) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
 
 /**
   Call Crypto Lib to generate a random value with eight-octet length.
@@ -158,19 +200,53 @@ IkePayloadFree (
 
 /**
   Generate an new SPI.
-
-  @return a SPI in 4 bytes.
+  
+  @param[in]      IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA 
+                                 Session.
+  @param[in out]  SpiValue       Pointer to the new generated SPI value. 
+                              
+  @retval EFI_SUCCESS         The operation performs successfully.
+  @retval Otherwise           The operation is failed.
 
 **/
-UINT32
+EFI_STATUS
 IkeGenerateSpi (
-  VOID
+  IN  IKEV2_SA_SESSION         *IkeSaSession,
+  OUT UINT32                   *SpiValue
   )
 {
-  //
-  // TODO: should generate SPI randomly to avoid security issue
-  //
-  return mNextSpi++;
+  EFI_STATUS   Status;
+
+  Status = EFI_SUCCESS;
+ 
+  while (TRUE) {
+    //
+    // Generate SPI randomly
+    //
+    Status = IpSecCryptoIoGenerateRandomBytes ((UINT8 *)SpiValue, sizeof (UINT32));
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    //
+    // The set of SPI values in the range 1 through 255 are reserved by the 
+    // Internet Assigned Numbers Authority (IANA) for future use; a reserved 
+    // SPI value will not normally be assigned by IANA unless the use of the 
+    // assigned SPI value is specified in an RFC.
+    //
+    if (*SpiValue < IKE_SPI_BASE) {
+      *SpiValue += IKE_SPI_BASE; 
+    }
+
+    //
+    // Check whether the new generated SPI has existed.
+    //
+    if (!IkeSpiValueExisted (IkeSaSession, *SpiValue)) {
+      break;
+    }
+  }
+  
+  return Status;
 }
 
 /**

@@ -525,7 +525,16 @@ Ikev2ChildSaSessionAlloc (
   ChildSaSession->Signature          = IKEV2_CHILD_SA_SESSION_SIGNATURE;
   ChildSaSession->IkeSaSession       = IkeSaSession;
   ChildSaSession->MessageId          = IkeSaSession->MessageId;
-  ChildSaSession->LocalPeerSpi       = IkeGenerateSpi ();
+
+  //
+  // Generate an new SPI.
+  //
+  Status = IkeGenerateSpi (IkeSaSession, &(ChildSaSession->LocalPeerSpi));
+  if (EFI_ERROR (Status)) {
+    FreePool (ChildSaSession);
+    return NULL;
+  }
+  
   ChildSaCommon                      = &ChildSaSession->SessionCommon;
   ChildSaCommon->UdpService          = UdpService;
   ChildSaCommon->Private             = IkeSaSession->SessionCommon.Private;
