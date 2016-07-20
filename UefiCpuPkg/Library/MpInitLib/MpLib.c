@@ -217,6 +217,73 @@ GetApLoopMode (
 }
 
 /**
+  Sort the APIC ID of all processors.
+
+  This function sorts the APIC ID of all processors so that processor number is
+  assigned in the ascending order of APIC ID which eases MP debugging.
+
+  @param[in] CpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+SortApicId (
+  IN CPU_MP_DATA   *CpuMpData
+  )
+{
+  UINTN             Index1;
+  UINTN             Index2;
+  UINTN             Index3;
+  UINT32            ApicId;
+  CPU_AP_DATA       CpuData;
+  UINT32            ApCount;
+  CPU_INFO_IN_HOB   *CpuInfoInHob;
+
+  ApCount = CpuMpData->CpuCount - 1;
+
+  if (ApCount != 0) {
+    for (Index1 = 0; Index1 < ApCount; Index1++) {
+      Index3 = Index1;
+      //
+      // Sort key is the hardware default APIC ID
+      //
+      ApicId = CpuMpData->CpuData[Index1].ApicId;
+      for (Index2 = Index1 + 1; Index2 <= ApCount; Index2++) {
+        if (ApicId > CpuMpData->CpuData[Index2].ApicId) {
+          Index3 = Index2;
+          ApicId = CpuMpData->CpuData[Index2].ApicId;
+        }
+      }
+      if (Index3 != Index1) {
+        CopyMem (&CpuData, &CpuMpData->CpuData[Index3], sizeof (CPU_AP_DATA));
+        CopyMem (
+          &CpuMpData->CpuData[Index3],
+          &CpuMpData->CpuData[Index1],
+          sizeof (CPU_AP_DATA)
+          );
+        CopyMem (&CpuMpData->CpuData[Index1], &CpuData, sizeof (CPU_AP_DATA));
+      }
+    }
+
+    //
+    // Get the processor number for the BSP
+    //
+    ApicId = GetInitialApicId ();
+    for (Index1 = 0; Index1 < CpuMpData->CpuCount; Index1++) {
+      if (CpuMpData->CpuData[Index1].ApicId == ApicId) {
+        CpuMpData->BspNumber = (UINT32) Index1;
+        break;
+      }
+    }
+
+    CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
+    for (Index1 = 0; Index1 < CpuMpData->CpuCount; Index1++) {
+      CpuInfoInHob[Index1].InitialApicId = CpuMpData->CpuData[Index1].InitialApicId;
+      CpuInfoInHob[Index1].ApicId        = CpuMpData->CpuData[Index1].ApicId;
+      CpuInfoInHob[Index1].Health        = CpuMpData->CpuData[Index1].Health;
+    }
+  }
+}
+
+/**
   Enable x2APIC mode on APs.
 
   @param[in, out] Buffer  Pointer to private data buffer.
@@ -331,6 +398,11 @@ CollectProcessorCount (
     SetApicMode (LOCAL_APIC_MODE_X2APIC);
   }
   DEBUG ((DEBUG_INFO, "APIC MODE is %d\n", GetApicMode ()));
+  //
+  // Sort BSP/Aps by CPU APIC ID in ascending order
+  //
+  SortApicId (CpuMpData);
+
   DEBUG ((DEBUG_INFO, "MpInitLib: Find %d processors in system.\n", CpuMpData->CpuCount));
 
   return CpuMpData->CpuCount;
