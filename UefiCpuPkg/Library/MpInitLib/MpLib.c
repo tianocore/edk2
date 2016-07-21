@@ -1239,6 +1239,62 @@ SwitchBSPWorker (
 }
 
 /**
+  Worker function to let the caller enable or disable an AP from this point onward.
+  This service may only be called from the BSP.
+
+  @param[in] ProcessorNumber   The handle number of AP.
+  @param[in] EnableAP          Specifies the new state for the processor for
+                               enabled, FALSE for disabled.
+  @param[in] HealthFlag        If not NULL, a pointer to a value that specifies
+                               the new health status of the AP.
+
+  @retval EFI_SUCCESS          The specified AP was enabled or disabled successfully.
+  @retval others               Failed to Enable/Disable AP.
+
+**/
+EFI_STATUS
+EnableDisableApWorker (
+  IN  UINTN                     ProcessorNumber,
+  IN  BOOLEAN                   EnableAP,
+  IN  UINT32                    *HealthFlag OPTIONAL
+  )
+{
+  CPU_MP_DATA               *CpuMpData;
+  UINTN                     CallerNumber;
+
+  CpuMpData = GetCpuMpData ();
+
+  //
+  // Check whether caller processor is BSP
+  //
+  MpInitLibWhoAmI (&CallerNumber);
+  if (CallerNumber != CpuMpData->BspNumber) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (ProcessorNumber == CpuMpData->BspNumber) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ProcessorNumber >= CpuMpData->CpuCount) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (!EnableAP) {
+    SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateDisabled);
+  } else {
+    SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+  }
+
+  if (HealthFlag != NULL) {
+    CpuMpData->CpuData[ProcessorNumber].CpuHealthy =
+          (BOOLEAN) ((*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT) != 0);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   This return the handle number for the calling processor.  This service may be
   called from the BSP and APs.
 

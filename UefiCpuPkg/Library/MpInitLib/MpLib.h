@@ -365,6 +365,27 @@ SwitchBSPWorker (
   );
 
 /**
+  Worker function to let the caller enable or disable an AP from this point onward.
+  This service may only be called from the BSP.
+
+  @param[in] ProcessorNumber   The handle number of AP.
+  @param[in] EnableAP          Specifies the new state for the processor for
+                               enabled, FALSE for disabled.
+  @param[in] HealthFlag        If not NULL, a pointer to a value that specifies
+                               the new health status of the AP.
+
+  @retval EFI_SUCCESS          The specified AP was enabled or disabled successfully.
+  @retval others               Failed to Enable/Disable AP.
+
+**/
+EFI_STATUS
+EnableDisableApWorker (
+  IN  UINTN                     ProcessorNumber,
+  IN  BOOLEAN                   EnableAP,
+  IN  UINT32                    *HealthFlag OPTIONAL
+  );
+
+/**
   Get pointer to CPU MP Data structure from GUIDed HOB.
 
   @return  The pointer to CPU MP Data structure.
