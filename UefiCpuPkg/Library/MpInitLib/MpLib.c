@@ -1126,7 +1126,15 @@ MpInitLibWhoAmI (
   OUT UINTN                    *ProcessorNumber
   )
 {
-  return EFI_UNSUPPORTED;
+  CPU_MP_DATA           *CpuMpData;
+
+  if (ProcessorNumber == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CpuMpData = GetCpuMpData ();
+
+  return GetProcessorNumber (CpuMpData, ProcessorNumber);
 }
 
 /**
