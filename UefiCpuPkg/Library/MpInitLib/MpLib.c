@@ -184,6 +184,26 @@ ExtractProcessorLocation (
 }
 
 /**
+  Worker function for SwitchBSP().
+
+  Worker function for SwitchBSP(), assigned to the AP which is intended
+  to become BSP.
+
+  @param[in] Buffer   Pointer to CPU MP Data
+**/
+VOID
+EFIAPI
+FutureBSPProc (
+  IN  VOID            *Buffer
+  )
+{
+  CPU_MP_DATA         *DataInHob;
+
+  DataInHob = (CPU_MP_DATA *) Buffer;
+  AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
+}
+
+/**
   Get the Application Processors state.
 
   @param[in]  CpuData    The pointer to CPU_AP_DATA of specified AP
@@ -646,11 +666,20 @@ ApWakeupFunction (
           // Invoke AP function here
           //
           Procedure (Parameter);
-          //
-          // Re-get the CPU APICID and Initial APICID
-          //
-          CpuMpData->CpuData[ProcessorNumber].ApicId        = GetApicId ();
-          CpuMpData->CpuData[ProcessorNumber].InitialApicId = GetInitialApicId ();
+          if (CpuMpData->SwitchBspFlag) {
+            //
+            // Re-get the processor number due to BSP/AP maybe exchange in AP function
+            //
+            GetProcessorNumber (CpuMpData, &ProcessorNumber);
+            CpuMpData->CpuData[ProcessorNumber].ApFunction = 0;
+            CpuMpData->CpuData[ProcessorNumber].ApFunctionArgument = 0;
+          } else {
+            //
+            // Re-get the CPU APICID and Initial APICID
+            //
+            CpuMpData->CpuData[ProcessorNumber].ApicId        = GetApicId ();
+            CpuMpData->CpuData[ProcessorNumber].InitialApicId = GetInitialApicId ();
+          }
         }
         SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateFinished);
       }
@@ -941,6 +970,7 @@ MpInitLibInitialize (
   CpuMpData->CpuCount         = 1;
   CpuMpData->BspNumber        = 0;
   CpuMpData->WaitEvent        = NULL;
+  CpuMpData->SwitchBspFlag    = FALSE;
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock(&CpuMpData->MpLock);
@@ -1103,6 +1133,110 @@ MpInitLibGetProcessorInfo (
   return EFI_SUCCESS;
 }
 
+/**
+  Worker function to switch the requested AP to be the BSP from that point onward.
+
+  @param[in] ProcessorNumber   The handle number of AP that is to become the new BSP.
+  @param[in] EnableOldBSP      If TRUE, then the old BSP will be listed as an
+                               enabled AP. Otherwise, it will be disabled.
+
+  @retval EFI_SUCCESS          BSP successfully switched.
+  @retval others               Failed to switch BSP. 
+
+**/
+EFI_STATUS
+SwitchBSPWorker (
+  IN UINTN                     ProcessorNumber,
+  IN BOOLEAN                   EnableOldBSP
+  )
+{
+  CPU_MP_DATA                  *CpuMpData;
+  UINTN                        CallerNumber;
+  CPU_STATE                    State;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
+
+  CpuMpData = GetCpuMpData ();
+
+  //
+  // Check whether caller processor is BSP
+  //
+  MpInitLibWhoAmI (&CallerNumber);
+  if (CallerNumber != CpuMpData->BspNumber) {
+    return EFI_SUCCESS;
+  }
+
+  if (ProcessorNumber >= CpuMpData->CpuCount) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Check whether specified AP is disabled
+  //
+  State = GetApState (&CpuMpData->CpuData[ProcessorNumber]);
+  if (State == CpuStateDisabled) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether ProcessorNumber specifies the current BSP
+  //
+  if (ProcessorNumber == CpuMpData->BspNumber) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether specified AP is busy
+  //
+  if (State == CpuStateBusy) {
+    return EFI_NOT_READY;
+  }
+
+  CpuMpData->BSPInfo.State = CPU_SWITCH_STATE_IDLE;
+  CpuMpData->APInfo.State  = CPU_SWITCH_STATE_IDLE;
+  CpuMpData->SwitchBspFlag = TRUE;
+
+  //
+  // Clear the BSP bit of MSR_IA32_APIC_BASE
+  //
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Bits.BSP = 0;
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+
+  //
+  // Need to wakeUp AP (future BSP).
+  //
+  WakeUpAP (CpuMpData, FALSE, ProcessorNumber, FutureBSPProc, CpuMpData);
+
+  AsmExchangeRole (&CpuMpData->BSPInfo, &CpuMpData->APInfo);
+
+  //
+  // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
+  //
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  ApicBaseMsr.Bits.BSP = 1;
+  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+
+  //
+  // Wait for old BSP finished AP task
+  //
+  while (GetApState (&CpuMpData->CpuData[CallerNumber]) != CpuStateFinished) {
+    CpuPause ();
+  }
+
+  CpuMpData->SwitchBspFlag = FALSE;
+  //
+  // Set old BSP enable state
+  //
+  if (!EnableOldBSP) {
+    SetApState (&CpuMpData->CpuData[CallerNumber], CpuStateDisabled);
+  }
+  //
+  // Save new BSP number
+  //
+  CpuMpData->BspNumber = (UINT32) ProcessorNumber;
+
+  return EFI_SUCCESS;
+}
 
 /**
   This return the handle number for the calling processor.  This service may be

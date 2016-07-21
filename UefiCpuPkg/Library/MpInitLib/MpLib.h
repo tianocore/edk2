@@ -43,6 +43,23 @@
   }
 
 //
+//  The MP data for switch BSP
+//
+#define CPU_SWITCH_STATE_IDLE   0
+#define CPU_SWITCH_STATE_STORED 1
+#define CPU_SWITCH_STATE_LOADED 2
+
+//
+// CPU exchange information for switch BSP
+//
+typedef struct {
+  UINT8             State;        // offset 0
+  UINTN             StackPointer; // offset 4 / 8
+  IA32_DESCRIPTOR   Gdtr;         // offset 8 / 16
+  IA32_DESCRIPTOR   Idtr;         // offset 14 / 26
+} CPU_EXCHANGE_ROLE_INFO;
+
+//
 // AP loop state when APs are in idle state
 // It's value is the same with PcdCpuApLoopMode
 //
@@ -198,6 +215,9 @@ struct _CPU_MP_DATA {
 
   AP_INIT_STATE                  InitFlag;
   BOOLEAN                        X2ApicEnable;
+  BOOLEAN                        SwitchBspFlag;
+  CPU_EXCHANGE_ROLE_INFO         BSPInfo;
+  CPU_EXCHANGE_ROLE_INFO         APInfo;
   MTRR_SETTINGS                  MtrrTable;
   UINT8                          ApLoopMode;
   UINT8                          ApTargetCState;
@@ -240,6 +260,22 @@ VOID
 EFIAPI
 AsmGetAddressMap (
   OUT MP_ASSEMBLY_ADDRESS_MAP    *AddressMap
+  );
+
+/**
+  This function is called by both the BSP and the AP which is to become the BSP to
+  Exchange execution context including stack between them. After return from this
+  function, the BSP becomes AP and the AP becomes the BSP.
+
+  @param[in] MyInfo      Pointer to buffer holding the exchanging information for the executing processor.
+  @param[in] OthersInfo  Pointer to buffer holding the exchanging information for the peer.
+
+**/
+VOID
+EFIAPI
+AsmExchangeRole (
+  IN CPU_EXCHANGE_ROLE_INFO    *MyInfo,
+  IN CPU_EXCHANGE_ROLE_INFO    *OthersInfo
   );
 
 /**
@@ -309,6 +345,23 @@ WakeUpAP (
 VOID
 InitMpGlobalData (
   IN CPU_MP_DATA               *CpuMpData
+  );
+
+/**
+  Worker function to switch the requested AP to be the BSP from that point onward.
+
+  @param[in] ProcessorNumber   The handle number of AP that is to become the new BSP.
+  @param[in] EnableOldBSP      If TRUE, then the old BSP will be listed as an
+                               enabled AP. Otherwise, it will be disabled.
+
+  @retval EFI_SUCCESS          BSP successfully switched.
+  @retval others               Failed to switch BSP. 
+
+**/
+EFI_STATUS
+SwitchBSPWorker (
+  IN UINTN                     ProcessorNumber,
+  IN BOOLEAN                   EnableOldBSP
   );
 
 /**

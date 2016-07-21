@@ -563,7 +563,7 @@ MpInitLibSwitchBSP (
   IN  BOOLEAN                  EnableOldBSP
   )
 {
-  return EFI_UNSUPPORTED;
+  return SwitchBSPWorker (ProcessorNumber, EnableOldBSP);
 }
 
 /**

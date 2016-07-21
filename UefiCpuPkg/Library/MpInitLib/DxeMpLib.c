@@ -389,7 +389,31 @@ MpInitLibSwitchBSP (
   IN BOOLEAN                   EnableOldBSP
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS            Status;
+  BOOLEAN               OldInterruptState;
+
+  //
+  // Before send both BSP and AP to a procedure to exchange their roles,
+  // interrupt must be disabled. This is because during the exchange role
+  // process, 2 CPU may use 1 stack. If interrupt happens, the stack will
+  // be corrupted, since interrupt return address will be pushed to stack
+  // by hardware.
+  //
+  OldInterruptState = SaveAndDisableInterrupts ();
+
+  //
+  // Mask LINT0 & LINT1 for the old BSP
+  //
+  DisableLvtInterrupts ();
+
+  Status = SwitchBSPWorker (ProcessorNumber, EnableOldBSP);
+
+  //
+  // Restore interrupt state.
+  //
+  SetInterruptState (OldInterruptState);
+
+  return Status;
 }
 
 /**
