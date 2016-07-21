@@ -348,6 +348,47 @@ InitMpGlobalData (
   );
 
 /**
+  Worker function to execute a caller provided function on all enabled APs.
+
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled APs of the system.
+  @param[in]  SingleThread            If TRUE, then all the enabled APs execute
+                                      the function specified by Procedure one by
+                                      one, in ascending order of processor handle
+                                      number.  If FALSE, then all the enabled APs
+                                      execute the function specified by Procedure
+                                      simultaneously.
+  @param[in]  WaitEvent               The event created by the caller with CreateEvent()
+                                      service.
+  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+                                      APs to return from Procedure, either for
+                                      blocking or non-blocking mode.
+  @param[in]  ProcedureArgument       The parameter passed into Procedure for
+                                      all APs.
+  @param[out] FailedCpuList           If all APs finish successfully, then its
+                                      content is set to NULL. If not all APs
+                                      finish before timeout expires, then its
+                                      content is set to address of the buffer
+                                      holding handle numbers of the failed APs.
+
+  @retval EFI_SUCCESS             In blocking mode, all APs have finished before
+                                  the timeout expired.
+  @retval EFI_SUCCESS             In non-blocking mode, function has been dispatched
+                                  to all enabled APs.
+  @retval others                  Failed to Startup all APs.
+
+**/
+EFI_STATUS
+StartupAllAPsWorker (
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  BOOLEAN                   SingleThread,
+  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL,
+  OUT UINTN                     **FailedCpuList         OPTIONAL
+  );
+
+/**
   Worker function to let the caller get one enabled AP to execute a caller-provided
   function.
 

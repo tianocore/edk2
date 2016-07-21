@@ -1720,6 +1720,164 @@ MpInitLibGetNumberOfProcessors (
 
 
 /**
+  Worker function to execute a caller provided function on all enabled APs.
+
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled APs of the system.
+  @param[in]  SingleThread            If TRUE, then all the enabled APs execute
+                                      the function specified by Procedure one by
+                                      one, in ascending order of processor handle
+                                      number.  If FALSE, then all the enabled APs
+                                      execute the function specified by Procedure
+                                      simultaneously.
+  @param[in]  WaitEvent               The event created by the caller with CreateEvent()
+                                      service.
+  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+                                      APs to return from Procedure, either for
+                                      blocking or non-blocking mode.
+  @param[in]  ProcedureArgument       The parameter passed into Procedure for
+                                      all APs.
+  @param[out] FailedCpuList           If all APs finish successfully, then its
+                                      content is set to NULL. If not all APs
+                                      finish before timeout expires, then its
+                                      content is set to address of the buffer
+                                      holding handle numbers of the failed APs.
+
+  @retval EFI_SUCCESS             In blocking mode, all APs have finished before
+                                  the timeout expired.
+  @retval EFI_SUCCESS             In non-blocking mode, function has been dispatched
+                                  to all enabled APs.
+  @retval others                  Failed to Startup all APs.
+
+**/
+EFI_STATUS
+StartupAllAPsWorker (
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  BOOLEAN                   SingleThread,
+  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL,
+  OUT UINTN                     **FailedCpuList         OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  CPU_MP_DATA             *CpuMpData;
+  UINTN                   ProcessorCount;
+  UINTN                   ProcessorNumber;
+  UINTN                   CallerNumber;
+  CPU_AP_DATA             *CpuData;
+  BOOLEAN                 HasEnabledAp;
+  CPU_STATE               ApState;
+
+  CpuMpData = GetCpuMpData ();
+
+  if (FailedCpuList != NULL) {
+    *FailedCpuList = NULL;
+  }
+
+  if (CpuMpData->CpuCount == 1) {
+    return EFI_NOT_STARTED;
+  }
+
+  if (Procedure == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether caller processor is BSP
+  //
+  MpInitLibWhoAmI (&CallerNumber);
+  if (CallerNumber != CpuMpData->BspNumber) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Update AP state
+  //
+  CheckAndUpdateApsStatus ();
+
+  ProcessorCount = CpuMpData->CpuCount;
+  HasEnabledAp   = FALSE;
+  //
+  // Check whether all enabled APs are idle.
+  // If any enabled AP is not idle, return EFI_NOT_READY.
+  //
+  for (ProcessorNumber = 0; ProcessorNumber < ProcessorCount; ProcessorNumber++) {
+    CpuData = &CpuMpData->CpuData[ProcessorNumber];
+    if (ProcessorNumber != CpuMpData->BspNumber) {
+      ApState = GetApState (CpuData);
+      if (ApState != CpuStateDisabled) {
+        HasEnabledAp = TRUE;
+        if (ApState != CpuStateIdle) {
+          //
+          // If any enabled APs are busy, return EFI_NOT_READY.
+          //
+          return EFI_NOT_READY;
+        }
+      }
+    }
+  }
+
+  if (!HasEnabledAp) {
+    //
+    // If no enabled AP exists, return EFI_NOT_STARTED.
+    //
+    return EFI_NOT_STARTED;
+  }
+
+  CpuMpData->StartCount = 0;
+  for (ProcessorNumber = 0; ProcessorNumber < ProcessorCount; ProcessorNumber++) {
+    CpuData = &CpuMpData->CpuData[ProcessorNumber];
+    CpuData->Waiting = FALSE;
+    if (ProcessorNumber != CpuMpData->BspNumber) {
+      if (CpuData->State == CpuStateIdle) {
+        //
+        // Mark this processor as responsible for current calling.
+        //
+        CpuData->Waiting = TRUE;
+        CpuMpData->StartCount++;
+      }
+    }
+  }
+
+  CpuMpData->Procedure     = Procedure;
+  CpuMpData->ProcArguments = ProcedureArgument;
+  CpuMpData->SingleThread  = SingleThread;
+  CpuMpData->FinishedCount = 0;
+  CpuMpData->RunningCount  = 0;
+  CpuMpData->FailedCpuList = FailedCpuList;
+  CpuMpData->ExpectedTime  = CalculateTimeout (
+                               TimeoutInMicroseconds,
+                               &CpuMpData->CurrentTime
+                               );
+  CpuMpData->TotalTime     = 0;
+  CpuMpData->WaitEvent     = WaitEvent;
+
+  if (!SingleThread) {
+    WakeUpAP (CpuMpData, TRUE, 0, Procedure, ProcedureArgument);
+  } else {
+    for (ProcessorNumber = 0; ProcessorNumber < ProcessorCount; ProcessorNumber++) {
+      if (ProcessorNumber == CallerNumber) {
+        continue;
+      }
+      if (CpuMpData->CpuData[ProcessorNumber].Waiting) {
+        WakeUpAP (CpuMpData, FALSE, ProcessorNumber, Procedure, ProcedureArgument);
+        break;
+      }
+    }
+  }
+
+  Status = EFI_SUCCESS;
+  if (WaitEvent == NULL) {
+    do {
+      Status = CheckAllAPs ();
+    } while (Status == EFI_NOT_READY);
+  }
+
+  return Status;
+}
+
+/**
   Worker function to let the caller get one enabled AP to execute a caller-provided
   function.
 
