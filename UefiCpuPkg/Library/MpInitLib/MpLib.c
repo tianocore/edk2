@@ -902,6 +902,332 @@ WakeUpAP (
 }
 
 /**
+  Calculate timeout value and return the current performance counter value.
+
+  Calculate the number of performance counter ticks required for a timeout.
+  If TimeoutInMicroseconds is 0, return value is also 0, which is recognized
+  as infinity.
+
+  @param[in]  TimeoutInMicroseconds   Timeout value in microseconds.
+  @param[out] CurrentTime             Returns the current value of the performance counter.
+
+  @return Expected time stamp counter for timeout.
+          If TimeoutInMicroseconds is 0, return value is also 0, which is recognized
+          as infinity.
+
+**/
+UINT64
+CalculateTimeout (
+  IN  UINTN   TimeoutInMicroseconds,
+  OUT UINT64  *CurrentTime
+  )
+{
+  //
+  // Read the current value of the performance counter
+  //
+  *CurrentTime = GetPerformanceCounter ();
+
+  //
+  // If TimeoutInMicroseconds is 0, return value is also 0, which is recognized
+  // as infinity.
+  //
+  if (TimeoutInMicroseconds == 0) {
+    return 0;
+  }
+
+  //
+  // GetPerformanceCounterProperties () returns the timestamp counter's frequency
+  // in Hz. So multiply the return value with TimeoutInMicroseconds and then divide
+  // it by 1,000,000, to get the number of ticks for the timeout value.
+  //
+  return DivU64x32 (
+           MultU64x64 (
+             GetPerformanceCounterProperties (NULL, NULL),
+             TimeoutInMicroseconds
+             ),
+           1000000
+           );
+}
+
+/**
+  Checks whether timeout expires.
+
+  Check whether the number of elapsed performance counter ticks required for
+  a timeout condition has been reached.
+  If Timeout is zero, which means infinity, return value is always FALSE.
+
+  @param[in, out]  PreviousTime   On input,  the value of the performance counter
+                                  when it was last read.
+                                  On output, the current value of the performance
+                                  counter
+  @param[in]       TotalTime      The total amount of elapsed time in performance
+                                  counter ticks.
+  @param[in]       Timeout        The number of performance counter ticks required
+                                  to reach a timeout condition.
+
+  @retval TRUE                    A timeout condition has been reached.
+  @retval FALSE                   A timeout condition has not been reached.
+
+**/
+BOOLEAN
+CheckTimeout (
+  IN OUT UINT64  *PreviousTime,
+  IN     UINT64  *TotalTime,
+  IN     UINT64  Timeout
+  )
+{
+  UINT64  Start;
+  UINT64  End;
+  UINT64  CurrentTime;
+  INT64   Delta;
+  INT64   Cycle;
+
+  if (Timeout == 0) {
+    return FALSE;
+  }
+  GetPerformanceCounterProperties (&Start, &End);
+  Cycle = End - Start;
+  if (Cycle < 0) {
+    Cycle = -Cycle;
+  }
+  Cycle++;
+  CurrentTime = GetPerformanceCounter();
+  Delta = (INT64) (CurrentTime - *PreviousTime);
+  if (Start > End) {
+    Delta = -Delta;
+  }
+  if (Delta < 0) {
+    Delta += Cycle;
+  }
+  *TotalTime += Delta;
+  *PreviousTime = CurrentTime;
+  if (*TotalTime > Timeout) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+  Reset an AP to Idle state.
+
+  Any task being executed by the AP will be aborted and the AP
+  will be waiting for a new task in Wait-For-SIPI state.
+
+  @param[in] ProcessorNumber  The handle number of processor.
+**/
+VOID
+ResetProcessorToIdleState (
+  IN UINTN                     ProcessorNumber
+  )
+{
+  CPU_MP_DATA           *CpuMpData;
+
+  CpuMpData = GetCpuMpData ();
+
+  WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL);
+
+  SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+}
+
+/**
+  Searches for the next waiting AP.
+
+  Search for the next AP that is put in waiting state by single-threaded StartupAllAPs().
+
+  @param[out]  NextProcessorNumber  Pointer to the processor number of the next waiting AP.
+
+  @retval EFI_SUCCESS          The next waiting AP has been found.
+  @retval EFI_NOT_FOUND        No waiting AP exists.
+
+**/
+EFI_STATUS
+GetNextWaitingProcessorNumber (
+  OUT UINTN                    *NextProcessorNumber
+  )
+{
+  UINTN           ProcessorNumber;
+  CPU_MP_DATA     *CpuMpData;
+
+  CpuMpData = GetCpuMpData ();
+
+  for (ProcessorNumber = 0; ProcessorNumber < CpuMpData->CpuCount; ProcessorNumber++) {
+    if (CpuMpData->CpuData[ProcessorNumber].Waiting) {
+      *NextProcessorNumber = ProcessorNumber;
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/** Checks status of specified AP.
+
+  This function checks whether the specified AP has finished the task assigned
+  by StartupThisAP(), and whether timeout expires.
+
+  @param[in]  ProcessorNumber       The handle number of processor.
+
+  @retval EFI_SUCCESS           Specified AP has finished task assigned by StartupThisAPs().
+  @retval EFI_TIMEOUT           The timeout expires.
+  @retval EFI_NOT_READY         Specified AP has not finished task and timeout has not expired.
+**/
+EFI_STATUS
+CheckThisAP (
+  IN UINTN        ProcessorNumber
+  )
+{
+  CPU_MP_DATA     *CpuMpData;
+  CPU_AP_DATA     *CpuData;
+
+  CpuMpData = GetCpuMpData ();
+  CpuData   = &CpuMpData->CpuData[ProcessorNumber];
+
+  //
+  //  Check the CPU state of AP. If it is CpuStateFinished, then the AP has finished its task.
+  //  Only BSP and corresponding AP access this unit of CPU Data. This means the AP will not modify the
+  //  value of state after setting the it to CpuStateFinished, so BSP can safely make use of its value.
+  //
+  //
+  // If the AP finishes for StartupThisAP(), return EFI_SUCCESS.
+  //
+  if (GetApState(CpuData) == CpuStateFinished) {
+    if (CpuData->Finished != NULL) {
+      *(CpuData->Finished) = TRUE;
+    }
+    SetApState (CpuData, CpuStateIdle);
+    return EFI_SUCCESS;
+  } else {
+    //
+    // If timeout expires for StartupThisAP(), report timeout.
+    //
+    if (CheckTimeout (&CpuData->CurrentTime, &CpuData->TotalTime, CpuData->ExpectedTime)) {
+      if (CpuData->Finished != NULL) {
+        *(CpuData->Finished) = FALSE;
+      }
+      //
+      // Reset failed AP to idle state
+      //
+      ResetProcessorToIdleState (ProcessorNumber);
+
+      return EFI_TIMEOUT;
+    }
+  }
+  return EFI_NOT_READY;
+}
+
+/**
+  Checks status of all APs.
+
+  This function checks whether all APs have finished task assigned by StartupAllAPs(),
+  and whether timeout expires.
+
+  @retval EFI_SUCCESS           All APs have finished task assigned by StartupAllAPs().
+  @retval EFI_TIMEOUT           The timeout expires.
+  @retval EFI_NOT_READY         APs have not finished task and timeout has not expired.
+**/
+EFI_STATUS
+CheckAllAPs (
+  VOID
+  )
+{
+  UINTN           ProcessorNumber;
+  UINTN           NextProcessorNumber;
+  UINTN           ListIndex;
+  EFI_STATUS      Status;
+  CPU_MP_DATA     *CpuMpData;
+  CPU_AP_DATA     *CpuData;
+
+  CpuMpData = GetCpuMpData ();
+
+  NextProcessorNumber = 0;
+
+  //
+  // Go through all APs that are responsible for the StartupAllAPs().
+  //
+  for (ProcessorNumber = 0; ProcessorNumber < CpuMpData->CpuCount; ProcessorNumber++) {
+    if (!CpuMpData->CpuData[ProcessorNumber].Waiting) {
+      continue;
+    }
+
+    CpuData = &CpuMpData->CpuData[ProcessorNumber];
+    //
+    // Check the CPU state of AP. If it is CpuStateFinished, then the AP has finished its task.
+    // Only BSP and corresponding AP access this unit of CPU Data. This means the AP will not modify the
+    // value of state after setting the it to CpuStateFinished, so BSP can safely make use of its value.
+    //
+    if (GetApState(CpuData) == CpuStateFinished) {
+      CpuMpData->RunningCount ++;
+      CpuMpData->CpuData[ProcessorNumber].Waiting = FALSE;
+      SetApState(CpuData, CpuStateIdle);
+
+      //
+      // If in Single Thread mode, then search for the next waiting AP for execution.
+      //
+      if (CpuMpData->SingleThread) {
+        Status = GetNextWaitingProcessorNumber (&NextProcessorNumber);
+
+        if (!EFI_ERROR (Status)) {
+          WakeUpAP (
+            CpuMpData,
+            FALSE,
+            (UINT32) NextProcessorNumber,
+            CpuMpData->Procedure,
+            CpuMpData->ProcArguments
+            );
+         }
+      }
+    }
+  }
+
+  //
+  // If all APs finish, return EFI_SUCCESS.
+  //
+  if (CpuMpData->RunningCount == CpuMpData->StartCount) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // If timeout expires, report timeout.
+  //
+  if (CheckTimeout (
+       &CpuMpData->CurrentTime,
+       &CpuMpData->TotalTime,
+       CpuMpData->ExpectedTime)
+       ) {
+    //
+    // If FailedCpuList is not NULL, record all failed APs in it.
+    //
+    if (CpuMpData->FailedCpuList != NULL) {
+      *CpuMpData->FailedCpuList =
+         AllocatePool ((CpuMpData->StartCount - CpuMpData->FinishedCount + 1) * sizeof (UINTN));
+      ASSERT (*CpuMpData->FailedCpuList != NULL);
+    }
+    ListIndex = 0;
+
+    for (ProcessorNumber = 0; ProcessorNumber < CpuMpData->CpuCount; ProcessorNumber++) {
+      //
+      // Check whether this processor is responsible for StartupAllAPs().
+      //
+      if (CpuMpData->CpuData[ProcessorNumber].Waiting) {
+        //
+        // Reset failed APs to idle state
+        //
+        ResetProcessorToIdleState (ProcessorNumber);
+        CpuMpData->CpuData[ProcessorNumber].Waiting = FALSE;
+        if (CpuMpData->FailedCpuList != NULL) {
+          (*CpuMpData->FailedCpuList)[ListIndex++] = ProcessorNumber;
+        }
+      }
+    }
+    if (CpuMpData->FailedCpuList != NULL) {
+      (*CpuMpData->FailedCpuList)[ListIndex] = END_OF_CPU_LIST;
+    }
+    return EFI_TIMEOUT;
+  }
+  return EFI_NOT_READY;
+}
+
+/**
   MP Initialize Library initialization.
 
   This service will allocate AP reset vector and wakeup all APs to do APs

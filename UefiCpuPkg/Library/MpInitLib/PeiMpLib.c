@@ -337,6 +337,17 @@ FreeResetVector (
 }
 
 /**
+  Checks APs status and updates APs status if needed.
+
+**/
+VOID
+CheckAndUpdateApsStatus (
+  VOID
+  )
+{
+}
+
+/**
   Initialize global data for MP support.
 
   @param[in] CpuMpData  The pointer to CPU MP Data structure.

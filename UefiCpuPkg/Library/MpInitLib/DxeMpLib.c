@@ -120,6 +120,43 @@ CheckAndUpdateApsStatus (
   VOID
   )
 {
+  UINTN                   ProcessorNumber;
+  EFI_STATUS              Status;
+  CPU_MP_DATA             *CpuMpData;
+
+  CpuMpData = GetCpuMpData ();
+
+  //
+  // First, check whether pending StartupAllAPs() exists.
+  //
+  if (CpuMpData->WaitEvent != NULL) {
+
+    Status = CheckAllAPs ();
+    //
+    // If all APs finish for StartupAllAPs(), signal the WaitEvent for it.
+    //
+    if (Status != EFI_NOT_READY) {
+      Status = gBS->SignalEvent (CpuMpData->WaitEvent);
+      CpuMpData->WaitEvent = NULL;
+    }
+  }
+
+  //
+  // Second, check whether pending StartupThisAPs() callings exist.
+  //
+  for (ProcessorNumber = 0; ProcessorNumber < CpuMpData->CpuCount; ProcessorNumber++) {
+
+    if (CpuMpData->CpuData[ProcessorNumber].WaitEvent == NULL) {
+      continue;
+    }
+
+    Status = CheckThisAP (ProcessorNumber);
+
+    if (Status != EFI_NOT_READY) {
+      gBS->SignalEvent (CpuMpData->CpuData[ProcessorNumber].WaitEvent);
+     CpuMpData->CpuData[ProcessorNumber].WaitEvent = NULL;
+    }
+  }
 }
 
 /**

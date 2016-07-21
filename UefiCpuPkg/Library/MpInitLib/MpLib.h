@@ -394,7 +394,47 @@ CPU_MP_DATA *
 GetCpuMpDataFromGuidedHob (
   VOID
   );
-  
+
+/** Checks status of specified AP.
+
+  This function checks whether the specified AP has finished the task assigned
+  by StartupThisAP(), and whether timeout expires.
+
+  @param[in]  ProcessorNumber       The handle number of processor.
+
+  @retval EFI_SUCCESS           Specified AP has finished task assigned by StartupThisAPs().
+  @retval EFI_TIMEOUT           The timeout expires.
+  @retval EFI_NOT_READY         Specified AP has not finished task and timeout has not expired.
+**/
+EFI_STATUS
+CheckThisAP (
+  IN UINTN        ProcessorNumber
+  );
+
+/**
+  Checks status of all APs.
+
+  This function checks whether all APs have finished task assigned by StartupAllAPs(),
+  and whether timeout expires.
+
+  @retval EFI_SUCCESS           All APs have finished task assigned by StartupAllAPs().
+  @retval EFI_TIMEOUT           The timeout expires.
+  @retval EFI_NOT_READY         APs have not finished task and timeout has not expired.
+**/
+EFI_STATUS
+CheckAllAPs (
+  VOID
+  );
+
+/**
+  Checks APs status and updates APs status if needed.
+
+**/
+VOID
+CheckAndUpdateApsStatus (
+  VOID
+  );
+
 /**
   Detect whether specified processor can find matching microcode patch and load it.
 
