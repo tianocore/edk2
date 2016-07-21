@@ -138,7 +138,11 @@ IScsiConnLogin (
   //
   // Start the timer, and wait Timeout seconds to establish the TCP connection.
   //
-  Status = gBS->SetTimer (Conn->TimeoutEvent, TimerRelative, Timeout * TICKS_PER_MS);
+  Status = gBS->SetTimer (
+                  Conn->TimeoutEvent,
+                  TimerRelative,
+                  MultU64x32 (Timeout, TICKS_PER_MS)
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
