@@ -196,6 +196,7 @@
   #
   MtrrLib|QuarkSocPkg/QuarkNorthCluster/Library/MtrrLib/MtrrLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
+  MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 
   #
   # Quark North Cluster
@@ -248,6 +249,7 @@
   TimerLib|PcAtChipsetPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   PlatformHelperLib|QuarkPlatformPkg/Library/PlatformHelperLib/PeiPlatformHelperLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
+  MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
 !if $(SECURE_BOOT_ENABLE) || $(MEASURED_BOOT_ENABLE)
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
 !endif
