@@ -128,7 +128,6 @@ extern UINT8    *mCertDbStore;
 extern UINT32   mMaxCertDbSize;
 extern UINT32   mPlatformMode;
 extern UINT8    mVendorKeyState;
-extern BOOLEAN  mUserPhysicalPresent;
 
 extern VOID     *mHashCtx;
 

@@ -931,7 +931,7 @@ ProcessVarWithPk (
   // Init state of Del. State may change due to secure check
   //
   Del = FALSE;
-  if ((InCustomMode() && mUserPhysicalPresent) || (mPlatformMode == SETUP_MODE && !IsPk)) {
+  if ((InCustomMode() && UserPhysicalPresent()) || (mPlatformMode == SETUP_MODE && !IsPk)) {
     Payload = (UINT8 *) Data + AUTHINFO2_SIZE (Data);
     PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
     if (PayloadSize == 0) {
@@ -1049,7 +1049,7 @@ ProcessVarWithKek (
   }
 
   Status = EFI_SUCCESS;
-  if (mPlatformMode == USER_MODE && !(InCustomMode() && mUserPhysicalPresent)) {
+  if (mPlatformMode == USER_MODE && !(InCustomMode() && UserPhysicalPresent())) {
     //
     // Time-based, verify against X509 Cert KEK.
     //
@@ -1204,7 +1204,7 @@ ProcessVariable (
              &OrgVariableInfo
              );
 
-  if ((!EFI_ERROR (Status)) && IsDeleteAuthVariable (OrgVariableInfo.Attributes, Data, DataSize, Attributes) && mUserPhysicalPresent) {
+  if ((!EFI_ERROR (Status)) && IsDeleteAuthVariable (OrgVariableInfo.Attributes, Data, DataSize, Attributes) && UserPhysicalPresent()) {
     //
     // Allow the delete operation of common authenticated variable at user physical presence.
     //
@@ -1222,7 +1222,7 @@ ProcessVariable (
     return Status;
   }
 
-  if (NeedPhysicallyPresent (VariableName, VendorGuid) && !mUserPhysicalPresent) {
+  if (NeedPhysicallyPresent (VariableName, VendorGuid) && !UserPhysicalPresent()) {
     //
     // This variable is protected, only physical present user could modify its value.
     //
