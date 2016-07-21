@@ -50,7 +50,7 @@ typedef struct {
 } HTTP_BOOT_DHCP6_OPTION_ARCH;
 
 typedef struct {
-  UINT8 ClassIdentifier[10];
+  UINT8 ClassIdentifier[11];
   UINT8 ArchitecturePrefix[5];
   UINT8 ArchitectureType[5];
   UINT8 Lit3[1];
