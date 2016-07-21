@@ -15,6 +15,60 @@
 #include "MpLib.h"
 
 /**
+  Get pointer to CPU MP Data structure.
+
+  @return  The pointer to CPU MP Data structure.
+**/
+CPU_MP_DATA *
+GetCpuMpData (
+  VOID
+  )
+{
+  CPU_MP_DATA      *CpuMpData;
+
+  CpuMpData = GetCpuMpDataFromGuidedHob ();
+  ASSERT (CpuMpData != NULL);
+  return CpuMpData;
+}
+
+/**
+  Save the pointer to CPU MP Data structure.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure will be saved.
+**/
+VOID
+SaveCpuMpData (
+  IN CPU_MP_DATA   *CpuMpData
+  )
+{
+  UINT64           Data64;
+  //
+  // Build location of CPU MP DATA buffer in HOB
+  //
+  Data64 = (UINT64) (UINTN) CpuMpData;
+  BuildGuidDataHob (
+    &mCpuInitMpLibHobGuid,
+    (VOID *) &Data64,
+    sizeof (UINT64)
+    );
+}
+
+
+/**
+  Initialize global data for MP support.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+InitMpGlobalData (
+  IN CPU_MP_DATA               *CpuMpData
+  )
+{
+
+  SaveCpuMpData (CpuMpData);
+}
+
+/**
   This service executes a caller provided function on all enabled APs.
 
   @param[in]  Procedure               A pointer to the function to be run on

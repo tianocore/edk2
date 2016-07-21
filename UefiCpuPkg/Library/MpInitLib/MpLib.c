@@ -14,6 +14,8 @@
 
 #include "MpLib.h"
 
+EFI_GUID mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
+
 /**
   Get the Application Processors state.
 
@@ -303,6 +305,12 @@ MpInitLibInitialize (
   //
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
+
+  //
+  // Initialize global data for MP support
+  //
+  InitMpGlobalData (CpuMpData);
+
   return EFI_SUCCESS;
 }
 
@@ -385,4 +393,26 @@ MpInitLibGetNumberOfProcessors (
   )
 {
   return EFI_UNSUPPORTED;
+}
+/**
+  Get pointer to CPU MP Data structure from GUIDed HOB.
+
+  @return  The pointer to CPU MP Data structure.
+**/
+CPU_MP_DATA *
+GetCpuMpDataFromGuidedHob (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  VOID                    *DataInHob;
+  CPU_MP_DATA             *CpuMpData;
+
+  CpuMpData = NULL;
+  GuidHob = GetFirstGuidHob (&mCpuInitMpLibHobGuid);
+  if (GuidHob != NULL) {
+    DataInHob = GET_GUID_HOB_DATA (GuidHob);
+    CpuMpData = (CPU_MP_DATA *) (*(UINTN *) DataInHob);
+  }
+  return CpuMpData;
 }

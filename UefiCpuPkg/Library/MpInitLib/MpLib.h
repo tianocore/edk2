@@ -35,6 +35,11 @@
 #include <Library/MtrrLib.h>
 #include <Library/HobLib.h>
 
+#define CPU_INIT_MP_LIB_HOB_GUID \
+  { \
+    0x58eb6a19, 0x3699, 0x4c68, { 0xa8, 0x36, 0xda, 0xcd, 0x8e, 0xdc, 0xad, 0x4a } \
+  }
+
 //
 // AP loop state when APs are in idle state
 // It's value is the same with PcdCpuApLoopMode
@@ -198,6 +203,9 @@ struct _CPU_MP_DATA {
   CPU_AP_DATA                    *CpuData;
   volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
 };
+
+extern EFI_GUID mCpuInitMpLibHobGuid;
+
 /**
   Assembly code to place AP into safe loop mode.
 
@@ -232,6 +240,46 @@ AsmGetAddressMap (
   OUT MP_ASSEMBLY_ADDRESS_MAP    *AddressMap
   );
 
+/**
+  Get the pointer to CPU MP Data structure.
+
+  @return  The pointer to CPU MP Data structure.
+**/
+CPU_MP_DATA *
+GetCpuMpData (
+  VOID
+  );
+
+/**
+  Save the pointer to CPU MP Data structure.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure will be saved.
+**/
+VOID
+SaveCpuMpData (
+  IN CPU_MP_DATA   *CpuMpData
+  );
+
+/**
+  Initialize global data for MP support.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+InitMpGlobalData (
+  IN CPU_MP_DATA               *CpuMpData
+  );
+
+/**
+  Get pointer to CPU MP Data structure from GUIDed HOB.
+
+  @return  The pointer to CPU MP Data structure.
+**/
+CPU_MP_DATA *
+GetCpuMpDataFromGuidedHob (
+  VOID
+  );
+  
 /**
   Detect whether specified processor can find matching microcode patch and load it.
 

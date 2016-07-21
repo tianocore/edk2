@@ -13,6 +13,48 @@
 **/
 
 #include "MpLib.h"
+CPU_MP_DATA      *mCpuMpData = NULL;
+
+/**
+  Get the pointer to CPU MP Data structure.
+
+  @return  The pointer to CPU MP Data structure.
+**/
+CPU_MP_DATA *
+GetCpuMpData (
+  VOID
+  )
+{
+  ASSERT (mCpuMpData != NULL);
+  return mCpuMpData;
+}
+
+/**
+  Save the pointer to CPU MP Data structure.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure will be saved.
+**/
+VOID
+SaveCpuMpData (
+  IN CPU_MP_DATA   *CpuMpData
+  )
+{
+  mCpuMpData = CpuMpData;
+}
+
+/**
+  Initialize global data for MP support.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+InitMpGlobalData (
+  IN CPU_MP_DATA               *CpuMpData
+  )
+{
+  SaveCpuMpData (CpuMpData);
+
+}
 
 /**
   This service executes a caller provided function on all enabled APs.
