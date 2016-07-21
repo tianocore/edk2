@@ -538,7 +538,18 @@ MpInitLibStartupThisAP (
   OUT BOOLEAN                   *Finished               OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  if (WaitEvent != NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  return StartupThisAPWorker (
+           Procedure,
+           ProcessorNumber,
+           NULL,
+           TimeoutInMicroseconds,
+           ProcedureArgument,
+           Finished
+           );
 }
 
 /**

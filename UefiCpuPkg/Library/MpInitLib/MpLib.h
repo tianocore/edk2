@@ -348,6 +348,39 @@ InitMpGlobalData (
   );
 
 /**
+  Worker function to let the caller get one enabled AP to execute a caller-provided
+  function.
+
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled APs of the system.
+  @param[in]  ProcessorNumber         The handle number of the AP.
+  @param[in]  WaitEvent               The event created by the caller with CreateEvent()
+                                      service.
+  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+                                      APs to return from Procedure, either for
+                                      blocking or non-blocking mode.
+  @param[in]  ProcedureArgument       The parameter passed into Procedure for
+                                      all APs.
+  @param[out] Finished                If AP returns from Procedure before the
+                                      timeout expires, its content is set to TRUE.
+                                      Otherwise, the value is set to FALSE.
+
+  @retval EFI_SUCCESS             In blocking mode, specified AP finished before
+                                  the timeout expires.
+  @retval others                  Failed to Startup AP.
+
+**/
+EFI_STATUS
+StartupThisAPWorker (
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  UINTN                     ProcessorNumber,
+  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL,
+  OUT BOOLEAN                   *Finished               OPTIONAL
+  );
+
+/**
   Worker function to switch the requested AP to be the BSP from that point onward.
 
   @param[in] ProcessorNumber   The handle number of AP that is to become the new BSP.

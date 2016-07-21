@@ -1720,6 +1720,118 @@ MpInitLibGetNumberOfProcessors (
 
 
 /**
+  Worker function to let the caller get one enabled AP to execute a caller-provided
+  function.
+
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled APs of the system.
+  @param[in]  ProcessorNumber         The handle number of the AP.
+  @param[in]  WaitEvent               The event created by the caller with CreateEvent()
+                                      service.
+  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+                                      APs to return from Procedure, either for
+                                      blocking or non-blocking mode.
+  @param[in]  ProcedureArgument       The parameter passed into Procedure for
+                                      all APs.
+  @param[out] Finished                If AP returns from Procedure before the
+                                      timeout expires, its content is set to TRUE.
+                                      Otherwise, the value is set to FALSE.
+
+  @retval EFI_SUCCESS             In blocking mode, specified AP finished before
+                                  the timeout expires.
+  @retval others                  Failed to Startup AP.
+
+**/
+EFI_STATUS
+StartupThisAPWorker (
+  IN  EFI_AP_PROCEDURE          Procedure,
+  IN  UINTN                     ProcessorNumber,
+  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
+  IN  UINTN                     TimeoutInMicroseconds,
+  IN  VOID                      *ProcedureArgument      OPTIONAL,
+  OUT BOOLEAN                   *Finished               OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  CPU_MP_DATA             *CpuMpData;
+  CPU_AP_DATA             *CpuData;
+  UINTN                   CallerNumber;
+
+  CpuMpData = GetCpuMpData ();
+
+  if (Finished != NULL) {
+    *Finished = FALSE;
+  }
+
+  //
+  // Check whether caller processor is BSP
+  //
+  MpInitLibWhoAmI (&CallerNumber);
+  if (CallerNumber != CpuMpData->BspNumber) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Check whether processor with the handle specified by ProcessorNumber exists
+  //
+  if (ProcessorNumber >= CpuMpData->CpuCount) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // Check whether specified processor is BSP
+  //
+  if (ProcessorNumber == CpuMpData->BspNumber) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check parameter Procedure
+  //
+  if (Procedure == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Update AP state
+  //
+  CheckAndUpdateApsStatus ();
+
+  //
+  // Check whether specified AP is disabled
+  //
+  if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateDisabled) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // If WaitEvent is not NULL, execute in non-blocking mode.
+  // BSP saves data for CheckAPsStatus(), and returns EFI_SUCCESS.
+  // CheckAPsStatus() will check completion and timeout periodically.
+  //
+  CpuData = &CpuMpData->CpuData[ProcessorNumber];
+  CpuData->WaitEvent    = WaitEvent;
+  CpuData->Finished     = Finished;
+  CpuData->ExpectedTime = CalculateTimeout (TimeoutInMicroseconds, &CpuData->CurrentTime);
+  CpuData->TotalTime    = 0;
+
+  WakeUpAP (CpuMpData, FALSE, ProcessorNumber, Procedure, ProcedureArgument);
+
+  //
+  // If WaitEvent is NULL, execute in blocking mode.
+  // BSP checks AP's state until it finishes or TimeoutInMicrosecsond expires.
+  //
+  Status = EFI_SUCCESS;
+  if (WaitEvent == NULL) {
+    do {
+      Status = CheckThisAP (ProcessorNumber);
+    } while (Status == EFI_NOT_READY);
+  }
+
+  return Status;
+}
+
+/**
   Get pointer to CPU MP Data structure from GUIDed HOB.
 
   @return  The pointer to CPU MP Data structure.
