@@ -123,7 +123,7 @@ DoDiagnostics (
 
   if (ChildHandle != NULL) {
     ChildHandleList = AllocateZeroPool(2*sizeof(EFI_HANDLE));
-    if (ChildHandleList != NULL) {
+    if (ChildHandleList == NULL) {
       SHELL_FREE_NON_NULL (ControllerHandleList);
       SHELL_FREE_NON_NULL (DriverHandleList);
       return EFI_OUT_OF_RESOURCES;
