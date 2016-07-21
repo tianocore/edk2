@@ -290,5 +290,25 @@ MicrocodeDetect (
   IN CPU_MP_DATA             *CpuMpData
   );
 
+/**
+  Notify function on End Of PEI PPI.
+
+  On S3 boot, this function will restore wakeup buffer data.
+  On normal boot, this function will flag wakeup buffer to be un-used type.
+
+  @param[in]  PeiServices        The pointer to the PEI Services Table.
+  @param[in]  NotifyDescriptor   Address of the notification descriptor data structure.
+  @param[in]  Ppi                Address of the PPI that was installed.
+
+  @retval EFI_SUCCESS        When everything is OK.
+**/
+EFI_STATUS
+EFIAPI
+CpuMpEndOfPeiCallback (
+  IN EFI_PEI_SERVICES             **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR    *NotifyDescriptor,
+  IN VOID                         *Ppi
+  );
+
 #endif
 
