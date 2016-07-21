@@ -58,6 +58,132 @@ IsBspExecuteDisableEnabled (
 }
 
 /**
+  Get CPU Package/Core/Thread location information.
+
+  @param[in]  InitialApicId     CPU APIC ID
+  @param[out] Location          Pointer to CPU location information
+**/
+VOID
+ExtractProcessorLocation (
+  IN  UINT32                     InitialApicId,
+  OUT EFI_CPU_PHYSICAL_LOCATION  *Location
+  )
+{
+  BOOLEAN                        TopologyLeafSupported;
+  UINTN                          ThreadBits;
+  UINTN                          CoreBits;
+  CPUID_VERSION_INFO_EBX         VersionInfoEbx;
+  CPUID_VERSION_INFO_EDX         VersionInfoEdx;
+  CPUID_CACHE_PARAMS_EAX         CacheParamsEax;
+  CPUID_EXTENDED_TOPOLOGY_EAX    ExtendedTopologyEax;
+  CPUID_EXTENDED_TOPOLOGY_EBX    ExtendedTopologyEbx;
+  CPUID_EXTENDED_TOPOLOGY_ECX    ExtendedTopologyEcx;
+  UINT32                         MaxCpuIdIndex;
+  UINT32                         SubIndex;
+  UINTN                          LevelType;
+  UINT32                         MaxLogicProcessorsPerPackage;
+  UINT32                         MaxCoresPerPackage;
+
+  //
+  // Check if the processor is capable of supporting more than one logical processor.
+  //
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
+  if (VersionInfoEdx.Bits.HTT == 0) {
+    Location->Thread  = 0;
+    Location->Core    = 0;
+    Location->Package = 0;
+    return;
+  }
+
+  ThreadBits = 0;
+  CoreBits = 0;
+
+  //
+  // Assume three-level mapping of APIC ID: Package:Core:SMT.
+  //
+
+  TopologyLeafSupported = FALSE;
+  //
+  // Get the max index of basic CPUID
+  //
+  AsmCpuid (CPUID_SIGNATURE, &MaxCpuIdIndex, NULL, NULL, NULL);
+
+  //
+  // If the extended topology enumeration leaf is available, it
+  // is the preferred mechanism for enumerating topology.
+  //
+  if (MaxCpuIdIndex >= CPUID_EXTENDED_TOPOLOGY) {
+    AsmCpuidEx (
+      CPUID_EXTENDED_TOPOLOGY,
+      0,
+      &ExtendedTopologyEax.Uint32,
+      &ExtendedTopologyEbx.Uint32,
+      &ExtendedTopologyEcx.Uint32,
+      NULL
+      );
+    //
+    // If CPUID.(EAX=0BH, ECX=0H):EBX returns zero and maximum input value for
+    // basic CPUID information is greater than 0BH, then CPUID.0BH leaf is not
+    // supported on that processor.
+    //
+    if (ExtendedTopologyEbx.Uint32 != 0) {
+      TopologyLeafSupported = TRUE;
+
+      //
+      // Sub-leaf index 0 (ECX= 0 as input) provides enumeration parameters to extract
+      // the SMT sub-field of x2APIC ID.
+      //
+      LevelType = ExtendedTopologyEcx.Bits.LevelType;
+      ASSERT (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT);
+      ThreadBits = ExtendedTopologyEax.Bits.ApicIdShift;
+
+      //
+      // Software must not assume any "level type" encoding
+      // value to be related to any sub-leaf index, except sub-leaf 0.
+      //
+      SubIndex = 1;
+      do {
+        AsmCpuidEx (
+          CPUID_EXTENDED_TOPOLOGY,
+          SubIndex,
+          &ExtendedTopologyEax.Uint32,
+          NULL,
+          &ExtendedTopologyEcx.Uint32,
+          NULL
+          );
+        LevelType = ExtendedTopologyEcx.Bits.LevelType;
+        if (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE) {
+          CoreBits = ExtendedTopologyEax.Bits.ApicIdShift - ThreadBits;
+          break;
+        }
+        SubIndex++;
+      } while (LevelType != CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_INVALID);
+    }
+  }
+
+  if (!TopologyLeafSupported) {
+    AsmCpuid (CPUID_VERSION_INFO, NULL, &VersionInfoEbx.Uint32, NULL, NULL);
+    MaxLogicProcessorsPerPackage = VersionInfoEbx.Bits.MaximumAddressableIdsForLogicalProcessors;
+    if (MaxCpuIdIndex >= CPUID_CACHE_PARAMS) {
+      AsmCpuidEx (CPUID_CACHE_PARAMS, 0, &CacheParamsEax.Uint32, NULL, NULL, NULL);
+      MaxCoresPerPackage = CacheParamsEax.Bits.MaximumAddressableIdsForLogicalProcessors + 1;
+    } else {
+      //
+      // Must be a single-core processor.
+      //
+      MaxCoresPerPackage = 1;
+    }
+
+    ThreadBits = (UINTN) (HighBitSet32 (MaxLogicProcessorsPerPackage / MaxCoresPerPackage - 1) + 1);
+    CoreBits = (UINTN) (HighBitSet32 (MaxCoresPerPackage - 1) + 1);
+  }
+
+  Location->Thread  = InitialApicId & ((1 << ThreadBits) - 1);
+  Location->Core    = (InitialApicId >> ThreadBits) & ((1 << CoreBits) - 1);
+  Location->Package = (InitialApicId >> (ThreadBits + CoreBits));
+}
+
+/**
   Get the Application Processors state.
 
   @param[in]  CpuData    The pointer to CPU_AP_DATA of specified AP
@@ -930,8 +1056,54 @@ MpInitLibGetProcessorInfo (
   OUT EFI_HEALTH_FLAGS           *HealthData  OPTIONAL
   )
 {
-  return EFI_UNSUPPORTED;
+  CPU_MP_DATA            *CpuMpData;
+  UINTN                  CallerNumber;
+
+  CpuMpData = GetCpuMpData ();
+
+  //
+  // Check whether caller processor is BSP
+  //
+  MpInitLibWhoAmI (&CallerNumber);
+  if (CallerNumber != CpuMpData->BspNumber) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (ProcessorInfoBuffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ProcessorNumber >= CpuMpData->CpuCount) {
+    return EFI_NOT_FOUND;
+  }
+
+  ProcessorInfoBuffer->ProcessorId = (UINT64) CpuMpData->CpuData[ProcessorNumber].ApicId;
+  ProcessorInfoBuffer->StatusFlag  = 0;
+  if (ProcessorNumber == CpuMpData->BspNumber) {
+    ProcessorInfoBuffer->StatusFlag |= PROCESSOR_AS_BSP_BIT;
+  }
+  if (CpuMpData->CpuData[ProcessorNumber].CpuHealthy) {
+    ProcessorInfoBuffer->StatusFlag |= PROCESSOR_HEALTH_STATUS_BIT;
+  }
+  if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateDisabled) {
+    ProcessorInfoBuffer->StatusFlag &= ~PROCESSOR_ENABLED_BIT;
+  } else {
+    ProcessorInfoBuffer->StatusFlag |= PROCESSOR_ENABLED_BIT;
+  }
+
+  //
+  // Get processor location information
+  //
+  ExtractProcessorLocation (CpuMpData->CpuData[ProcessorNumber].ApicId, &ProcessorInfoBuffer->Location);
+
+  if (HealthData != NULL) {
+    HealthData->Uint32 = CpuMpData->CpuData[ProcessorNumber].Health;
+  }
+
+  return EFI_SUCCESS;
 }
+
+
 /**
   This return the handle number for the calling processor.  This service may be
   called from the BSP and APs.
