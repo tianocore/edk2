@@ -1,7 +1,7 @@
 /** @file
   Boot functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -145,7 +145,7 @@ PxeBcSelectBootPrompt (
   Status = gBS->SetTimer (
                   TimeoutEvent,
                   TimerRelative,
-                  Timeout * TICKS_PER_SECOND
+                  MultU64x32 (Timeout, TICKS_PER_SECOND)
                   );
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
