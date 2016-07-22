@@ -33,12 +33,14 @@ EFI_PEI_PPI_DESCRIPTOR           mPeiCpuMpPpiDesc = {
   &mMpServicesPpi
 };
 
+
 /**
   Get CPU Package/Core/Thread location information.
 
   @param InitialApicId     CPU APIC ID
   @param Location          Pointer to CPU location information
 **/
+STATIC
 VOID
 ExtractProcessorLocation (
   IN  UINT32                     InitialApicId,
@@ -144,40 +146,13 @@ ExtractProcessorLocation (
 }
 
 /**
-  Find the current Processor number by APIC ID.
-
-  @param PeiCpuMpData        Pointer to PEI CPU MP Data
-  @param ProcessorNumber     Return the pocessor number found
-
-  @retval EFI_SUCCESS        ProcessorNumber is found and returned.
-  @retval EFI_NOT_FOUND      ProcessorNumber is not found.
-**/
-EFI_STATUS
-GetProcessorNumber (
-  IN PEI_CPU_MP_DATA         *PeiCpuMpData,
-  OUT UINTN                  *ProcessorNumber
-  )
-{
-  UINTN                   TotalProcessorNumber;
-  UINTN                   Index;
-
-  TotalProcessorNumber = PeiCpuMpData->CpuCount;
-  for (Index = 0; Index < TotalProcessorNumber; Index ++) {
-    if (PeiCpuMpData->CpuData[Index].ApicId == GetInitialApicId ()) {
-      *ProcessorNumber = Index;
-      return EFI_SUCCESS;
-    }
-  }
-  return EFI_NOT_FOUND;
-}
-
-/**
   Worker function for SwitchBSP().
 
   Worker function for SwitchBSP(), assigned to the AP which is intended to become BSP.
 
   @param Buffer        Pointer to CPU MP Data
 **/
+STATIC
 VOID
 EFIAPI
 FutureBSPProc (
@@ -233,41 +208,14 @@ PeiGetNumberOfProcessors (
   OUT UINTN                     *NumberOfEnabledProcessors
   )
 {
-  PEI_CPU_MP_DATA         *PeiCpuMpData;
-  UINTN                   CallerNumber;
-  UINTN                   ProcessorNumber;
-  UINTN                   EnabledProcessorNumber;
-  UINTN                   Index;
-
-  PeiCpuMpData = GetMpHobData ();
-  if (PeiCpuMpData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
   if ((NumberOfProcessors == NULL) || (NumberOfEnabledProcessors == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Check whether caller processor is BSP
-  //
-  PeiWhoAmI (PeiServices, This, &CallerNumber);
-  if (CallerNumber != PeiCpuMpData->BspNumber) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  ProcessorNumber        = PeiCpuMpData->CpuCount;
-  EnabledProcessorNumber = 0;
-  for (Index = 0; Index < ProcessorNumber; Index++) {
-    if (PeiCpuMpData->CpuData[Index].State != CpuStateDisabled) {
-      EnabledProcessorNumber ++;
-    }
-  }
-
-  *NumberOfProcessors = ProcessorNumber;
-  *NumberOfEnabledProcessors = EnabledProcessorNumber;
-
-  return EFI_SUCCESS;
+  return MpInitLibGetNumberOfProcessors (
+           NumberOfProcessors,
+           NumberOfEnabledProcessors
+           );
 }
 
 /**
@@ -305,50 +253,7 @@ PeiGetProcessorInfo (
   OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
   )
 {
-  PEI_CPU_MP_DATA         *PeiCpuMpData;
-  UINTN                   CallerNumber;
-
-  PeiCpuMpData = GetMpHobData ();
-  if (PeiCpuMpData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Check whether caller processor is BSP
-  //
-  PeiWhoAmI (PeiServices, This, &CallerNumber);
-  if (CallerNumber != PeiCpuMpData->BspNumber) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (ProcessorInfoBuffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (ProcessorNumber >= PeiCpuMpData->CpuCount) {
-    return EFI_NOT_FOUND;
-  }
-
-  ProcessorInfoBuffer->ProcessorId = (UINT64) PeiCpuMpData->CpuData[ProcessorNumber].ApicId;
-  ProcessorInfoBuffer->StatusFlag  = 0;
-  if (PeiCpuMpData->CpuData[ProcessorNumber].ApicId == GetInitialApicId()) {
-    ProcessorInfoBuffer->StatusFlag |= PROCESSOR_AS_BSP_BIT;
-  }
-  if (PeiCpuMpData->CpuData[ProcessorNumber].CpuHealthy) {
-    ProcessorInfoBuffer->StatusFlag |= PROCESSOR_HEALTH_STATUS_BIT;
-  }
-  if (PeiCpuMpData->CpuData[ProcessorNumber].State == CpuStateDisabled) {
-    ProcessorInfoBuffer->StatusFlag &= ~PROCESSOR_ENABLED_BIT;
-  } else {
-    ProcessorInfoBuffer->StatusFlag |= PROCESSOR_ENABLED_BIT;
-  }
-
-  //
-  // Get processor location information
-  //
-  ExtractProcessorLocation (PeiCpuMpData->CpuData[ProcessorNumber].ApicId, &ProcessorInfoBuffer->Location);
-
-  return EFI_SUCCESS;
+  return MpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, NULL);
 }
 
 /**
@@ -425,131 +330,14 @@ PeiStartupAllAPs (
   IN  VOID                      *ProcedureArgument      OPTIONAL
   )
 {
-  PEI_CPU_MP_DATA         *PeiCpuMpData;
-  UINTN                   ProcessorNumber;
-  UINTN                   Index;
-  UINTN                   CallerNumber;
-  BOOLEAN                 HasEnabledAp;
-  BOOLEAN                 HasEnabledIdleAp;
-  volatile UINT32         *FinishedCount;
-  EFI_STATUS              Status;
-  UINTN                   WaitCountIndex;
-  UINTN                   WaitCountNumber;
-
-  PeiCpuMpData = GetMpHobData ();
-  if (PeiCpuMpData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  if (Procedure == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Check whether caller processor is BSP
-  //
-  PeiWhoAmI (PeiServices, This, &CallerNumber);
-  if (CallerNumber != PeiCpuMpData->BspNumber) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  ProcessorNumber = PeiCpuMpData->CpuCount;
-
-  HasEnabledAp     = FALSE;
-  HasEnabledIdleAp = FALSE;
-  for (Index = 0; Index < ProcessorNumber; Index ++) {
-    if (Index == CallerNumber) {
-      //
-      // Skip BSP
-      //
-      continue;
-    }
-    if (PeiCpuMpData->CpuData[Index].State != CpuStateDisabled) {
-      HasEnabledAp = TRUE;
-      if (PeiCpuMpData->CpuData[Index].State != CpuStateBusy) {
-        HasEnabledIdleAp = TRUE;
-      }
-    }
-  }
-  if (!HasEnabledAp) {
-    //
-    // If no enabled AP exists, return EFI_NOT_STARTED.
-    //
-    return EFI_NOT_STARTED;
-  }
-  if (!HasEnabledIdleAp) {
-    //
-    // If any enabled APs are busy, return EFI_NOT_READY.
-    //
-    return EFI_NOT_READY;
-  }
-
-  if (PeiCpuMpData->EndOfPeiFlag) {
-    //
-    // Backup original data and copy AP reset vector in it
-    //
-    BackupAndPrepareWakeupBuffer(PeiCpuMpData);
-  }
-
-  WaitCountNumber = TimeoutInMicroSeconds / CPU_CHECK_AP_INTERVAL + 1;
-  WaitCountIndex = 0;
-  FinishedCount = &PeiCpuMpData->FinishedCount;
-  if (!SingleThread) {
-    WakeUpAP (PeiCpuMpData, TRUE, 0, Procedure, ProcedureArgument);
-    //
-    // Wait to finish
-    //
-    if (TimeoutInMicroSeconds == 0) {
-      while (*FinishedCount < ProcessorNumber - 1) {
-        CpuPause ();
-      }
-      Status = EFI_SUCCESS;
-    } else {
-      Status = EFI_TIMEOUT;
-      for (WaitCountIndex = 0; WaitCountIndex < WaitCountNumber; WaitCountIndex++) {
-        MicroSecondDelay (CPU_CHECK_AP_INTERVAL);
-        if (*FinishedCount >= ProcessorNumber - 1) {
-          Status = EFI_SUCCESS;
-          break;
-        }
-      }
-    }
-  } else {
-    Status = EFI_SUCCESS;
-    for (Index = 0; Index < ProcessorNumber; Index++) {
-      if (Index == CallerNumber) {
-        continue;
-      }
-      WakeUpAP (PeiCpuMpData, FALSE, Index, Procedure, ProcedureArgument);
-      //
-      // Wait to finish
-      //
-      if (TimeoutInMicroSeconds == 0) {
-        while (*FinishedCount < 1) {
-          CpuPause ();
-        }
-      } else {
-        for (WaitCountIndex = 0; WaitCountIndex < WaitCountNumber; WaitCountIndex++) {
-          MicroSecondDelay (CPU_CHECK_AP_INTERVAL);
-          if (*FinishedCount >= 1) {
-            break;
-          }
-        }
-        if (WaitCountIndex == WaitCountNumber) {
-          Status = EFI_TIMEOUT;
-        }
-      }
-    }
-  }
-
-  if (PeiCpuMpData->EndOfPeiFlag) {
-    //
-    // Restore original data
-    //
-    RestoreWakeupBuffer(PeiCpuMpData);
-  }
-
-  return Status;
+  return MpInitLibStartupAllAPs (
+           Procedure,
+           SingleThread,
+           NULL,
+           TimeoutInMicroSeconds,
+           ProcedureArgument,
+           NULL
+           );
 }
 
 /**
@@ -609,81 +397,14 @@ PeiStartupThisAP (
   IN  VOID                      *ProcedureArgument      OPTIONAL
   )
 {
-  PEI_CPU_MP_DATA         *PeiCpuMpData;
-  UINTN                   CallerNumber;
-  volatile UINT32         *FinishedCount;
-  EFI_STATUS              Status;
-  UINTN                   WaitCountIndex;
-  UINTN                   WaitCountNumber;
-
-  PeiCpuMpData = GetMpHobData ();
-  if (PeiCpuMpData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Check whether caller processor is BSP
-  //
-  PeiWhoAmI (PeiServices, This, &CallerNumber);
-  if (CallerNumber != PeiCpuMpData->BspNumber) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (ProcessorNumber >= PeiCpuMpData->CpuCount) {
-    return EFI_NOT_FOUND;
-  }
-
-  if (ProcessorNumber == PeiCpuMpData->BspNumber || Procedure == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Check whether specified AP is disabled
-  //
-  if (PeiCpuMpData->CpuData[ProcessorNumber].State == CpuStateDisabled) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (PeiCpuMpData->EndOfPeiFlag) {
-    //
-    // Backup original data and copy AP reset vector in it
-    //
-    BackupAndPrepareWakeupBuffer(PeiCpuMpData);
-  }
-
-  WaitCountNumber = TimeoutInMicroseconds / CPU_CHECK_AP_INTERVAL + 1;
-  WaitCountIndex = 0;
-  FinishedCount = &PeiCpuMpData->FinishedCount;
-
-  WakeUpAP (PeiCpuMpData, FALSE, ProcessorNumber, Procedure, ProcedureArgument);
-
-  //
-  // Wait to finish
-  //
-  if (TimeoutInMicroseconds == 0) {
-    while (*FinishedCount < 1) {
-      CpuPause() ;
-    }
-    Status = EFI_SUCCESS;
-  } else {
-    Status = EFI_TIMEOUT;
-    for (WaitCountIndex = 0; WaitCountIndex < WaitCountNumber; WaitCountIndex++) {
-      MicroSecondDelay (CPU_CHECK_AP_INTERVAL);
-      if (*FinishedCount >= 1) {
-        Status = EFI_SUCCESS;
-        break;
-      }
-    }
-  }
-
-  if (PeiCpuMpData->EndOfPeiFlag) {
-    //
-    // Backup original data and copy AP reset vector in it
-    //
-    RestoreWakeupBuffer(PeiCpuMpData);
-  }
-
-  return Status;
+  return MpInitLibStartupThisAP (
+           Procedure,
+           ProcessorNumber,
+           NULL,
+           TimeoutInMicroseconds,
+           ProcedureArgument,
+           NULL
+           );
 }
 
 /**
@@ -729,97 +450,7 @@ PeiSwitchBSP (
   IN  BOOLEAN                  EnableOldBSP
   )
 {
-  PEI_CPU_MP_DATA              *PeiCpuMpData;
-  UINTN                        CallerNumber;
-  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
-
-  PeiCpuMpData = GetMpHobData ();
-  if (PeiCpuMpData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Check whether caller processor is BSP
-  //
-  PeiWhoAmI (PeiServices, This, &CallerNumber);
-  if (CallerNumber != PeiCpuMpData->BspNumber) {
-    return EFI_SUCCESS;
-  }
-
-  if (ProcessorNumber >= PeiCpuMpData->CpuCount) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Check whether specified AP is disabled
-  //
-  if (PeiCpuMpData->CpuData[ProcessorNumber].State == CpuStateDisabled) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Check whether ProcessorNumber specifies the current BSP
-  //
-  if (ProcessorNumber == PeiCpuMpData->BspNumber) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Check whether specified AP is busy
-  //
-  if (PeiCpuMpData->CpuData[ProcessorNumber].State == CpuStateBusy) {
-    return EFI_NOT_READY;
-  }
-
-  //
-  // Clear the BSP bit of MSR_IA32_APIC_BASE
-  //
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
-  ApicBaseMsr.Bits.BSP = 0;
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
-
-  PeiCpuMpData->BSPInfo.State = CPU_SWITCH_STATE_IDLE;
-  PeiCpuMpData->APInfo.State  = CPU_SWITCH_STATE_IDLE;
-
-  if (PeiCpuMpData->EndOfPeiFlag) {
-    //
-    // Backup original data and copy AP reset vector in it
-    //
-    BackupAndPrepareWakeupBuffer(PeiCpuMpData);
-  }
-
-  //
-  // Need to wakeUp AP (future BSP).
-  //
-  WakeUpAP (PeiCpuMpData, FALSE, ProcessorNumber, FutureBSPProc, PeiCpuMpData);
-
-  AsmExchangeRole (&PeiCpuMpData->BSPInfo, &PeiCpuMpData->APInfo);
-
-  if (PeiCpuMpData->EndOfPeiFlag) {
-    //
-    // Backup original data and copy AP reset vector in it
-    //
-    RestoreWakeupBuffer(PeiCpuMpData);
-  }
-
-  //
-  // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
-  //
-  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
-  ApicBaseMsr.Bits.BSP = 1;
-  AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
-  //
-  // Set old BSP enable state
-  //
-  if (!EnableOldBSP) {
-    PeiCpuMpData->CpuData[PeiCpuMpData->BspNumber].State = CpuStateDisabled;
-  }
-  //
-  // Save new BSP number
-  //
-  PeiCpuMpData->BspNumber = (UINT32) ProcessorNumber;
-
-  return EFI_SUCCESS;
+  return MpInitLibSwitchBSP (ProcessorNumber, EnableOldBSP);
 }
 
 /**
@@ -871,41 +502,7 @@ PeiEnableDisableAP (
   IN  UINT32                    *HealthFlag OPTIONAL
   )
 {
-  PEI_CPU_MP_DATA         *PeiCpuMpData;
-  UINTN                   CallerNumber;
-
-  PeiCpuMpData = GetMpHobData ();
-  if (PeiCpuMpData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Check whether caller processor is BSP
-  //
-  PeiWhoAmI (PeiServices, This, &CallerNumber);
-  if (CallerNumber != PeiCpuMpData->BspNumber) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (ProcessorNumber == PeiCpuMpData->BspNumber) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (ProcessorNumber >= PeiCpuMpData->CpuCount) {
-    return EFI_NOT_FOUND;
-  }
-
-  if (!EnableAP) {
-    PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateDisabled;
-  } else {
-    PeiCpuMpData->CpuData[ProcessorNumber].State = CpuStateIdle;
-  }
-
-  if (HealthFlag != NULL) {
-    PeiCpuMpData->CpuData[ProcessorNumber].CpuHealthy =
-          (BOOLEAN) ((*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT) != 0);
-  }
-  return EFI_SUCCESS;
+  return MpInitLibEnableDisableAP (ProcessorNumber, EnableAP, HealthFlag);
 }
 
 /**
@@ -940,17 +537,5 @@ PeiWhoAmI (
   OUT UINTN                    *ProcessorNumber
   )
 {
-  PEI_CPU_MP_DATA         *PeiCpuMpData;
-
-  PeiCpuMpData = GetMpHobData ();
-  if (PeiCpuMpData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  if (ProcessorNumber == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return GetProcessorNumber (PeiCpuMpData, ProcessorNumber);
+  return MpInitLibWhoAmI (ProcessorNumber);
 }
-

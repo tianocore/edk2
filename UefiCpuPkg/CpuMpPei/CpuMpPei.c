@@ -28,6 +28,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mNotifyList = {
 
   @param PeiCpuMpData        Pointer to PEI CPU MP Data
 **/
+STATIC
 VOID
 SortApicId (
   IN PEI_CPU_MP_DATA   *PeiCpuMpData
@@ -84,6 +85,7 @@ SortApicId (
 
   @param Buffer  Pointer to private data buffer.
 **/
+STATIC
 VOID
 EFIAPI
 ApFuncEnableX2Apic (
@@ -100,6 +102,7 @@ ApFuncEnableX2Apic (
 
   @return The AP loop mode.
 **/
+STATIC
 UINT8
 GetApLoopMode (
   OUT UINT16     *MonitorFilterSize
@@ -170,6 +173,7 @@ GetMpHobData (
   
   @param  VolatileRegisters    Returns buffer saved the volatile resisters
 **/
+STATIC
 VOID
 SaveVolatileRegisters (
   OUT CPU_VOLATILE_REGISTERS    *VolatileRegisters
@@ -203,6 +207,7 @@ SaveVolatileRegisters (
   @param  IsRestoreDr         TRUE:  Restore DRx if supported
                               FALSE: Do not restore DRx
 **/
+STATIC
 VOID
 RestoreVolatileRegisters (
   IN CPU_VOLATILE_REGISTERS    *VolatileRegisters,
@@ -233,11 +238,41 @@ RestoreVolatileRegisters (
 }
 
 /**
+  Find the current Processor number by APIC ID.
+
+  @param PeiCpuMpData        Pointer to PEI CPU MP Data
+  @param ProcessorNumber     Return the pocessor number found
+
+  @retval EFI_SUCCESS        ProcessorNumber is found and returned.
+  @retval EFI_NOT_FOUND      ProcessorNumber is not found.
+**/
+STATIC
+EFI_STATUS
+GetProcessorNumber (
+  IN PEI_CPU_MP_DATA         *PeiCpuMpData,
+  OUT UINTN                  *ProcessorNumber
+  )
+{
+  UINTN                   TotalProcessorNumber;
+  UINTN                   Index;
+
+  TotalProcessorNumber = PeiCpuMpData->CpuCount;
+  for (Index = 0; Index < TotalProcessorNumber; Index ++) {
+    if (PeiCpuMpData->CpuData[Index].ApicId == GetInitialApicId ()) {
+      *ProcessorNumber = Index;
+      return EFI_SUCCESS;
+    }
+  }
+  return EFI_NOT_FOUND;
+}
+
+/**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param ExchangeInfo     Pointer to the MP exchange info buffer
   @param NumApsExecuting  Number of current executing AP
 **/
+STATIC
 VOID
 EFIAPI
 ApCFunction (
@@ -407,6 +442,7 @@ WriteStartupSignal (
   @param Procedure          The function to be invoked by AP
   @param ProcedureArgument  The argument to be passed into AP function
 **/
+STATIC
 VOID
 WakeUpAP (
   IN PEI_CPU_MP_DATA           *PeiCpuMpData,
@@ -487,6 +523,7 @@ WakeUpAP (
   @retval other   Return wakeup buffer address below 1MB.
   @retval -1      Cannot find free memory below 1MB.
 **/
+STATIC
 UINTN
 GetWakeupBuffer (
   IN UINTN                WakeupBufferSize
@@ -556,6 +593,7 @@ GetWakeupBuffer (
 
   @param PeiCpuMpData        Pointer to PEI CPU MP Data
 **/
+STATIC
 VOID
 BackupAndPrepareWakeupBuffer(
   IN PEI_CPU_MP_DATA         *PeiCpuMpData
@@ -578,6 +616,7 @@ BackupAndPrepareWakeupBuffer(
 
   @param PeiCpuMpData        Pointer to PEI CPU MP Data
 **/
+STATIC
 VOID
 RestoreWakeupBuffer(
   IN PEI_CPU_MP_DATA         *PeiCpuMpData
@@ -760,6 +799,7 @@ PrepareAPStartupVector (
   @retval EFI_SUCCESS        When everything is OK.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CpuMpEndOfPeiCallback (
@@ -829,8 +869,7 @@ CpuMpPeimInit (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS                       Status;
-  PEI_CPU_MP_DATA                 *PeiCpuMpData;
+  EFI_STATUS           Status;
   EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
 
@@ -849,31 +888,18 @@ CpuMpPeimInit (
   }
   Status = InitializeCpuExceptionHandlers (VectorInfo);
   ASSERT_EFI_ERROR (Status);
+  
   //
-  // Get wakeup buffer and copy AP reset code in it
+  // Wakeup APs to do initialization
   //
-  PeiCpuMpData = PrepareAPStartupVector ();
-  //
-  // Count processor number and collect processor information
-  //
-  CountProcessorNumber (PeiCpuMpData);
-  //
-  // Build location of PEI CPU MP DATA buffer in HOB
-  //
-  BuildGuidDataHob (
-    &gEfiCallerIdGuid,
-    (VOID *)&PeiCpuMpData,
-    sizeof(UINT64)
-    );
+  Status = MpInitLibInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Update and publish CPU BIST information
   //
-  CollectBistDataFromPpi (PeiServices, PeiCpuMpData);
-  //
-  // register an event for EndOfPei
-  //
-  Status  = PeiServicesNotifyPpi (&mNotifyList);
-  ASSERT_EFI_ERROR (Status);
+  CollectBistDataFromPpi (PeiServices);
+
   //
   // Install CPU MP PPI
   //

@@ -44,15 +44,18 @@ SecPlatformInformation2 (
      OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
   )
 {
-  PEI_CPU_MP_DATA                      *PeiCpuMpData;
   UINTN                                BistInformationSize;
   UINTN                                CpuIndex;
   EFI_SEC_PLATFORM_INFORMATION_CPU     *CpuInstance;
+  EFI_PROCESSOR_INFORMATION            ProcessorInfo;
+  EFI_HEALTH_FLAGS                     BistData;
+  UINTN                                NumberOfProcessors;
+  UINTN                                NumberOfEnabledProcessors;
 
-  PeiCpuMpData = GetMpHobData ();
+  MpInitLibGetNumberOfProcessors(&NumberOfProcessors, &NumberOfEnabledProcessors);
 
   BistInformationSize = sizeof (EFI_SEC_PLATFORM_INFORMATION_RECORD2) +
-                        sizeof (EFI_SEC_PLATFORM_INFORMATION_CPU) * PeiCpuMpData->CpuCount;
+                        sizeof (EFI_SEC_PLATFORM_INFORMATION_CPU) * NumberOfProcessors;
   //
   // return the information size if input buffer size is too small
   //
@@ -61,11 +64,12 @@ SecPlatformInformation2 (
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  PlatformInformationRecord2->NumberOfCpus = PeiCpuMpData->CpuCount;
+  PlatformInformationRecord2->NumberOfCpus = (UINT32)NumberOfProcessors;
   CpuInstance = PlatformInformationRecord2->CpuInstance;
-  for (CpuIndex = 0; CpuIndex < PeiCpuMpData->CpuCount; CpuIndex ++) {
-    CpuInstance[CpuIndex].CpuLocation                = PeiCpuMpData->CpuData[CpuIndex].ApicId;
-    CpuInstance[CpuIndex].InfoRecord.IA32HealthFlags = PeiCpuMpData->CpuData[CpuIndex].Health;
+  for (CpuIndex = 0; CpuIndex < NumberOfProcessors; CpuIndex ++) {
+    MpInitLibGetProcessorInfo (CpuIndex, &ProcessorInfo, &BistData);
+    CpuInstance[CpuIndex].CpuLocation = (UINT32) ProcessorInfo.ProcessorId;
+    CpuInstance[CpuIndex].InfoRecord.IA32HealthFlags = BistData;
   }
 
   return EFI_SUCCESS;
@@ -152,13 +156,11 @@ GetBistInfoFromPpi (
   or SEC Platform Information PPI.
 
   @param PeiServices         Pointer to PEI Services Table
-  @param PeiCpuMpData        Pointer to PEI CPU MP Data
 
 **/
 VOID
 CollectBistDataFromPpi (
-  IN CONST EFI_PEI_SERVICES             **PeiServices,
-  IN PEI_CPU_MP_DATA                    *PeiCpuMpData
+  IN CONST EFI_PEI_SERVICES             **PeiServices
   )
 {
   EFI_STATUS                            Status;
@@ -170,7 +172,12 @@ CollectBistDataFromPpi (
   EFI_SEC_PLATFORM_INFORMATION_CPU      BspCpuInstance;
   UINTN                                 ProcessorNumber;
   UINTN                                 CpuIndex;
-  PEI_CPU_DATA                          *CpuData;
+  EFI_PROCESSOR_INFORMATION             ProcessorInfo;
+  EFI_HEALTH_FLAGS                      BistData;
+  UINTN                                 NumberOfProcessors;
+  UINTN                                 NumberOfEnabledProcessors;
+
+  MpInitLibGetNumberOfProcessors(&NumberOfProcessors, &NumberOfEnabledProcessors);
 
   SecPlatformInformation2 = NULL;
   SecPlatformInformation  = NULL;
@@ -215,21 +222,18 @@ CollectBistDataFromPpi (
       DEBUG ((EFI_D_INFO, "Does not find any stored CPU BIST information from PPI!\n"));
     }
   }
-  for (ProcessorNumber = 0; ProcessorNumber < PeiCpuMpData->CpuCount; ProcessorNumber ++) {
-    CpuData = &PeiCpuMpData->CpuData[ProcessorNumber];
+  for (ProcessorNumber = 0; ProcessorNumber < NumberOfProcessors; ProcessorNumber ++) {
+    MpInitLibGetProcessorInfo (ProcessorNumber, &ProcessorInfo, &BistData);
     for (CpuIndex = 0; CpuIndex < NumberOfData; CpuIndex ++) {
       ASSERT (CpuInstance != NULL);
-      if (CpuData->ApicId == CpuInstance[CpuIndex].CpuLocation) {
+      if (ProcessorInfo.ProcessorId == CpuInstance[CpuIndex].CpuLocation) {
         //
         // Update processor's BIST data if it is already stored before
         //
-        CpuData->Health = CpuInstance[CpuIndex].InfoRecord.IA32HealthFlags;
+        BistData = CpuInstance[CpuIndex].InfoRecord.IA32HealthFlags;
       }
     }
-    if (CpuData->Health.Uint32 == 0) {
-      CpuData->CpuHealthy = TRUE;
-    } else {
-      CpuData->CpuHealthy = FALSE;
+    if (BistData.Uint32 != 0) {
       //
       // Report Status Code that self test is failed
       //
@@ -239,14 +243,14 @@ CollectBistDataFromPpi (
         );
     }
     DEBUG ((EFI_D_INFO, "  APICID - 0x%08x, BIST - 0x%08x\n",
-            PeiCpuMpData->CpuData[ProcessorNumber].ApicId,
-            PeiCpuMpData->CpuData[ProcessorNumber].Health.Uint32
+            ProcessorInfo.ProcessorId,
+            BistData
             ));
   }
 
-  if (SecPlatformInformation2 != NULL && NumberOfData < PeiCpuMpData->CpuCount) {
+  if (SecPlatformInformation2 != NULL && NumberOfData < NumberOfProcessors) {
     //
-    // Reinstall SecPlatformInformation2 PPI to include new BIST inforamtion
+    // Reinstall SecPlatformInformation2 PPI to include new BIST information
     //
     Status = PeiServicesReInstallPpi (
                SecInformationDescriptor,
@@ -255,9 +259,10 @@ CollectBistDataFromPpi (
     ASSERT_EFI_ERROR (Status);
   } else {
     //
-    // Install SecPlatformInformation2 PPI to include new BIST inforamtion
+    // Install SecPlatformInformation2 PPI to include new BIST information
     //
     Status = PeiServicesInstallPpi (&mPeiSecPlatformInformation2Ppi);
     ASSERT_EFI_ERROR(Status);
   }
 }
+

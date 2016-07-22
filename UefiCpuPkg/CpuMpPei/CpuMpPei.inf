@@ -67,6 +67,7 @@
   UefiCpuLib
   CpuLib
   CpuExceptionHandlerLib
+  MpInitLib
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES

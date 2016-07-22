@@ -42,6 +42,7 @@
 #include <Library/UefiCpuLib.h>
 #include <Library/CpuLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
+#include <Library/MpInitLib.h>
 
 #include "Microcode.h"
 
@@ -187,6 +188,7 @@ AsmInitializeGdt (
 
   @param PeiCpuMpData        Pointer to PEI CPU MP Data
 **/
+STATIC
 VOID
 BackupAndPrepareWakeupBuffer(
   IN PEI_CPU_MP_DATA         *PeiCpuMpData
@@ -197,6 +199,7 @@ BackupAndPrepareWakeupBuffer(
 
   @param PeiCpuMpData        Pointer to PEI CPU MP Data
 **/
+STATIC
 VOID
 RestoreWakeupBuffer(
   IN PEI_CPU_MP_DATA         *PeiCpuMpData
@@ -215,6 +218,7 @@ RestoreWakeupBuffer(
   @retval EFI_SUCCESS        When everything is OK.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CpuMpEndOfPeiCallback (
@@ -233,6 +237,7 @@ CpuMpEndOfPeiCallback (
   @param Procedure          The function to be invoked by AP
   @param ProcedureArgument  The argument to be passed into AP function
 **/
+STATIC
 VOID
 WakeUpAP (
   IN PEI_CPU_MP_DATA           *PeiCpuMpData,
@@ -261,6 +266,7 @@ GetMpHobData (
   @retval EFI_SUCCESS        ProcessorNumber is found and returned.
   @retval EFI_NOT_FOUND      ProcessorNumber is not found.
 **/
+STATIC
 EFI_STATUS
 GetProcessorNumber (
   IN PEI_CPU_MP_DATA         *PeiCpuMpData,
@@ -274,13 +280,11 @@ GetProcessorNumber (
   or SEC Platform Information PPI.
 
   @param PeiServices         Pointer to PEI Services Table
-  @param PeiCpuMpData        Pointer to PEI CPU MP Data
 
 **/
 VOID
 CollectBistDataFromPpi (
-  IN CONST EFI_PEI_SERVICES             **PeiServices,
-  IN PEI_CPU_MP_DATA                    *PeiCpuMpData
+  IN CONST EFI_PEI_SERVICES             **PeiServices
   );
 
 /**
