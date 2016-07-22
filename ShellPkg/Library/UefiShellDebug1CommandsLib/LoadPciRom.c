@@ -26,7 +26,6 @@
   @retval EFI_ABORTED     The abort mechanism was received.
 **/
 EFI_STATUS
-EFIAPI
 LoadPciRomConnectAllDriversToAllControllers (
   VOID
   );
@@ -377,98 +376,36 @@ LoadEfiDriversFromRomImage (
   @retval EFI_ABORTED     The abort mechanism was received.
 **/
 EFI_STATUS
-EFIAPI
 LoadPciRomConnectAllDriversToAllControllers (
   VOID
   )
-
 {
   EFI_STATUS  Status;
-  UINTN       AllHandleCount;
-  EFI_HANDLE  *AllHandleBuffer;
-  UINTN       Index;
   UINTN       HandleCount;
   EFI_HANDLE  *HandleBuffer;
-  UINTN       *HandleType;
-  UINTN       HandleIndex;
-  BOOLEAN     Parent;
-  BOOLEAN     Device;
+  UINTN       Index;
 
-  Status = gBS->LocateHandleBuffer(
-            AllHandles,
-            NULL,
-            NULL,
-            &AllHandleCount,
-            &AllHandleBuffer
-           );
+  Status = gBS->LocateHandleBuffer (
+                  AllHandles,
+                  NULL,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  for (Index = 0; Index < AllHandleCount; Index++) {
+  for (Index = 0; Index < HandleCount; Index++) {
     if (ShellGetExecutionBreakFlag ()) {
       Status = EFI_ABORTED;
-      goto Done;
+      break;
     }
-    //
-    // Scan the handle database
-    //
-    Status = ParseHandleDatabaseByRelationshipWithType(
-      NULL,
-      AllHandleBuffer[Index],
-      &HandleCount,
-      &HandleBuffer,
-      &HandleType
-     );
-/*
-    Status = LibScanHandleDatabase (
-              NULL,
-              NULL,
-              AllHandleBuffer[Index],
-              NULL,
-              &HandleCount,
-              &HandleBuffer,
-              &HandleType
-             );
-*/
-    if (EFI_ERROR (Status)) {
-      goto Done;
-    }
-
-    Device = TRUE;
-    if ((HandleType[Index] & HR_DRIVER_BINDING_HANDLE) != 0) {
-      Device = FALSE;
-    }
-
-    if ((HandleType[Index] & HR_IMAGE_HANDLE) != 0) {
-      Device = FALSE;
-    }
-
-    if (Device) {
-      Parent = FALSE;
-      for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
-        if ((HandleType[HandleIndex] & HR_PARENT_HANDLE) != 0) {
-          Parent = TRUE;
-        }
-      }
-
-      if (!Parent) {
-        if ((HandleType[Index] & HR_DEVICE_HANDLE) != 0) {
-          Status = gBS->ConnectController (
-                        AllHandleBuffer[Index],
-                        NULL,
-                        NULL,
-                        TRUE
-                       );
-        }
-      }
-    }
-
-    FreePool (HandleBuffer);
-    FreePool (HandleType);
+    gBS->ConnectController (HandleBuffer[Index], NULL, NULL, TRUE);
   }
 
-Done:
-  FreePool (AllHandleBuffer);
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
   return Status;
 }
