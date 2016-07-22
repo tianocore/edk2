@@ -2421,6 +2421,7 @@ ParseHandleDatabaseByRelationshipWithType (
   *HandleType = AllocateZeroPool (*HandleCount * sizeof (UINTN));
   if (*HandleType == NULL) {
     SHELL_FREE_NON_NULL (*HandleBuffer);
+    *HandleCount = 0;
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -2678,7 +2679,9 @@ ParseHandleDatabaseByRelationship (
         // Allocate a handle buffer for the number of handles that matched the attributes in Mask
         //
         *MatchingHandleBuffer = AllocateZeroPool ((*MatchingHandleCount +1)* sizeof (EFI_HANDLE));
-        if (*MatchingHandleBuffer != NULL) {
+        if (*MatchingHandleBuffer == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+        } else {
           for (HandleIndex = 0, *MatchingHandleCount = 0
                ;  HandleIndex < HandleCount
                ;  HandleIndex++
@@ -2697,7 +2700,7 @@ ParseHandleDatabaseByRelationship (
           (*MatchingHandleBuffer)[*MatchingHandleCount] = NULL;
 
           Status = EFI_SUCCESS;
-        } // *MatchingHandleBuffer != NULL (IF)
+        } // *MatchingHandleBuffer == NULL (ELSE)
       } // MacthingHandleBuffer == NULL (ELSE)
     } // *MatchingHandleCount  == 0 (ELSE)
   } // no error on ParseHandleDatabaseByRelationshipWithType
@@ -2710,6 +2713,9 @@ ParseHandleDatabaseByRelationship (
     FreePool (HandleType);
   }
 
+  ASSERT ((MatchingHandleBuffer == NULL) ||
+          (*MatchingHandleCount == 0 && *MatchingHandleBuffer == NULL) ||
+          (*MatchingHandleCount != 0 && *MatchingHandleBuffer != NULL));
   return Status;
 }
 
@@ -2801,6 +2807,9 @@ ParseHandleDatabaseForChildControllers(
   } else {
     FreePool(HandleBufferForReturn);
   }
+  ASSERT ((MatchingHandleBuffer == NULL) ||
+          (*MatchingHandleCount == 0 && *MatchingHandleBuffer == NULL) ||
+          (*MatchingHandleCount != 0 && *MatchingHandleBuffer != NULL));
 
   return (EFI_SUCCESS);
 }
