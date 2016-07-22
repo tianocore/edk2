@@ -19,8 +19,6 @@
 #include <Ppi/SecPlatformInformation2.h>
 #include <Protocol/MpService.h>
 #include <Library/SynchronizationLib.h>
-#include <Library/HobLib.h>
-#include <Library/ReportStatusCodeLib.h>
 
 /**
   Initialize Multi-processor support.

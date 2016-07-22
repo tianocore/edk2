@@ -1,5 +1,5 @@
 ## @file
-#  Simple CPU driver installs CPU Architecture Protocol.
+#  CPU driver installs CPU Architecture Protocol and CPU MP protocol.
 #
 #  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
@@ -41,10 +41,9 @@
   UefiCpuLib
   UefiLib
   CpuExceptionHandlerLib
-  TimerLib
-  SynchronizationLib
   HobLib
   ReportStatusCodeLib
+  MpInitLib
 
 [Sources]
   ApStartup.c
@@ -71,7 +70,7 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
-  gEfiMpServiceProtocolGuid                     ## SOMETIMES_PRODUCES
+  gEfiMpServiceProtocolGuid                     ## PRODUCES
 
 [Guids]
   gIdleLoopEventGuid                            ## CONSUMES           ## Event

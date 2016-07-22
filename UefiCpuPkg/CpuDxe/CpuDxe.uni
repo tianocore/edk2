@@ -1,9 +1,9 @@
 // /** @file
-// Simple CPU driver installs CPU Architecture Protocol.
+// CPU driver installs CPU Architecture Protocol and CPU MP Protocol.
 //
-// Simple CPU driver installs CPU Architecture Protocol.
+// CPU driver installs CPU Architecture Protocol and CPU MP Protocol.
 //
-// Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 // **/
 
 
-#string STR_MODULE_ABSTRACT             #language en-US "Installs CPU Architecture Protocol"
+#string STR_MODULE_ABSTRACT             #language en-US "CPU driver installs CPU Architecture Protocol and CPU MP Protocol."
 
-#string STR_MODULE_DESCRIPTION          #language en-US "Simple CPU driver installs CPU Architecture Protocol."
+#string STR_MODULE_DESCRIPTION          #language en-US "CPU driver installs CPU Architecture Protocol and CPU MP Protocol."
 

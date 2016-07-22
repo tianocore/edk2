@@ -1,7 +1,7 @@
 /** @file
-  CPU DXE Module.
+  CPU DXE Module to produce CPU MP Protocol.
 
-  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@ UINTN gPollInterval = 100; // 100 microseconds
 
 MP_SYSTEM_DATA mMpSystemData;
 EFI_HANDLE     mMpServiceHandle       = NULL;
+UINTN          mNumberOfProcessors    = 1;
 EFI_EVENT      mExitBootServicesEvent = (EFI_EVENT)NULL;
 
 VOID *mCommonStack = 0;
@@ -28,7 +29,6 @@ VOID *mTopOfApCommonStack = 0;
 VOID *mApStackStart = 0;
 
 volatile BOOLEAN mAPsAlreadyInitFinished = FALSE;
-volatile BOOLEAN mStopCheckAllAPsStatus = TRUE;
 
 EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   GetNumberOfProcessors,
@@ -102,6 +102,7 @@ IsBSP (
   @retval  CPU_STATE  the AP status
 
 **/
+STATIC
 CPU_STATE
 GetApState (
   IN  CPU_DATA_BLOCK  *CpuData
@@ -123,6 +124,7 @@ GetApState (
   @param   State      The AP status
 
 **/
+STATIC
 VOID
 SetApState (
   IN  CPU_DATA_BLOCK   *CpuData,
@@ -452,13 +454,10 @@ GetNumberOfProcessors (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!IsBSP ()) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  *NumberOfProcessors        = mMpSystemData.NumberOfProcessors;
-  *NumberOfEnabledProcessors = mMpSystemData.NumberOfEnabledProcessors;
-  return EFI_SUCCESS;
+  return MpInitLibGetNumberOfProcessors (
+           NumberOfProcessors,
+           NumberOfEnabledProcessors
+           );
 }
 
 /**
@@ -495,20 +494,7 @@ GetProcessorInfo (
   OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
   )
 {
-  if (ProcessorInfoBuffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (!IsBSP ()) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (ProcessorNumber >= mMpSystemData.NumberOfProcessors) {
-    return EFI_NOT_FOUND;
-  }
-
-  CopyMem (ProcessorInfoBuffer, &mMpSystemData.CpuDatas[ProcessorNumber], sizeof (EFI_PROCESSOR_INFORMATION));
-  return EFI_SUCCESS;
+  return MpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, NULL);
 }
 
 /**
@@ -659,155 +645,14 @@ StartupAllAPs (
   OUT UINTN                     **FailedCpuList         OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  CPU_DATA_BLOCK        *CpuData;
-  UINTN                 Number;
-  CPU_STATE             APInitialState;
-  CPU_STATE             CpuState;
-
-  CpuData = NULL;
-
-  if (FailedCpuList != NULL) {
-    *FailedCpuList = NULL;
-  }
-
-  if (!IsBSP ()) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (mMpSystemData.NumberOfProcessors == 1) {
-    return EFI_NOT_STARTED;
-  }
-
-  if (Procedure == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // temporarily stop checkAllAPsStatus for avoid resource dead-lock.
-  //
-  mStopCheckAllAPsStatus = TRUE;
-
-  for (Number = 0; Number < mMpSystemData.NumberOfProcessors; Number++) {
-    CpuData = &mMpSystemData.CpuDatas[Number];
-    if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
-      //
-      // Skip BSP
-      //
-      continue;
-    }
-
-    if (!TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
-      //
-      // Skip Disabled processors
-      //
-      continue;
-    }
-
-    CpuState = GetApState (CpuData);
-    if (CpuState != CpuStateIdle &&
-        CpuState != CpuStateSleeping) {
-      return EFI_NOT_READY;
-    }
-  }
-
-  mMpSystemData.Procedure         = Procedure;
-  mMpSystemData.ProcedureArgument = ProcedureArgument;
-  mMpSystemData.WaitEvent         = WaitEvent;
-  mMpSystemData.Timeout           = TimeoutInMicroseconds;
-  mMpSystemData.TimeoutActive     = (BOOLEAN) (TimeoutInMicroseconds != 0);
-  mMpSystemData.FinishCount       = 0;
-  mMpSystemData.StartCount        = 0;
-  mMpSystemData.SingleThread      = SingleThread;
-  mMpSystemData.FailedList        = FailedCpuList;
-  mMpSystemData.FailedListIndex   = 0;
-  APInitialState                  = CpuStateReady;
-
-  for (Number = 0; Number < mMpSystemData.NumberOfProcessors; Number++) {
-    CpuData = &mMpSystemData.CpuDatas[Number];
-    if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
-      //
-      // Skip BSP
-      //
-      continue;
-    }
-
-    if (!TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
-      //
-      // Skip Disabled processors
-      //
-      continue;
-    }
-
-    //
-    // Get APs prepared, and put failing APs into FailedCpuList
-    // if "SingleThread", only 1 AP will put to ready state, other AP will be put to ready
-    // state 1 by 1, until the previous 1 finished its task
-    // if not "SingleThread", all APs are put to ready state from the beginning
-    //
-    CpuState = GetApState (CpuData);
-    if (CpuState == CpuStateIdle ||
-        CpuState == CpuStateSleeping) {
-      mMpSystemData.StartCount++;
-
-      SetApState (CpuData, APInitialState);
-
-      if (APInitialState == CpuStateReady) {
-        SetApProcedure (CpuData, Procedure, ProcedureArgument);
-        //
-        // If this AP previous state is Sleeping, we should
-        // wake up this AP by sent a SIPI. and avoid
-        // re-involve the sleeping state. we must call
-        // SetApProcedure() first.
-        //
-        if (CpuState == CpuStateSleeping) {
-          ResetProcessorToIdleState (CpuData);
-        }
-      }
-
-      if (SingleThread) {
-        APInitialState = CpuStateBlocked;
-      }
-    }
-  }
-
-  mStopCheckAllAPsStatus = FALSE;
-
-  if (WaitEvent != NULL) {
-    //
-    // non blocking
-    //
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Blocking temporarily stop CheckAllAPsStatus()
-  //
-  mStopCheckAllAPsStatus = TRUE;
-
-  while (TRUE) {
-    CheckAndUpdateAllAPsToIdleState ();
-    if (mMpSystemData.FinishCount == mMpSystemData.StartCount) {
-      Status = EFI_SUCCESS;
-      goto Done;
-    }
-
-    //
-    // task timeout
-    //
-    if (mMpSystemData.TimeoutActive && mMpSystemData.Timeout < 0) {
-      ResetAllFailedAPs();
-      Status = EFI_TIMEOUT;
-      goto Done;
-    }
-
-    MicroSecondDelay (gPollInterval);
-    mMpSystemData.Timeout -= gPollInterval;
-  }
-
-Done:
-
-  return Status;
+  return MpInitLibStartupAllAPs (
+           Procedure,
+           SingleThread,
+           WaitEvent,
+           TimeoutInMicroseconds,
+           ProcedureArgument,
+           FailedCpuList
+           );
 }
 
 /**
@@ -908,90 +753,14 @@ StartupThisAP (
   OUT BOOLEAN                   *Finished               OPTIONAL
   )
 {
-  CPU_DATA_BLOCK        *CpuData;
-  CPU_STATE             CpuState;
-
-  CpuData = NULL;
-
-  if (Finished != NULL) {
-    *Finished = FALSE;
-  }
-
-  if (!IsBSP ()) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (Procedure == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (ProcessorNumber >= mMpSystemData.NumberOfProcessors) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // temporarily stop checkAllAPsStatus for avoid resource dead-lock.
-  //
-  mStopCheckAllAPsStatus = TRUE;
-
-  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
-  if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT) ||
-      !TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  CpuState = GetApState (CpuData);
-  if (CpuState != CpuStateIdle &&
-      CpuState != CpuStateSleeping) {
-    return EFI_NOT_READY;
-  }
-
-  SetApState (CpuData, CpuStateReady);
-
-  SetApProcedure (CpuData, Procedure, ProcedureArgument);
-  //
-  // If this AP previous state is Sleeping, we should
-  // wake up this AP by sent a SIPI. and avoid
-  // re-involve the sleeping state. we must call
-  // SetApProcedure() first.
-  //
-  if (CpuState == CpuStateSleeping) {
-    ResetProcessorToIdleState (CpuData);
-  }
-
-  CpuData->Timeout = TimeoutInMicroseconds;
-  CpuData->WaitEvent = WaitEvent;
-  CpuData->TimeoutActive = (BOOLEAN) (TimeoutInMicroseconds != 0);
-  CpuData->Finished = Finished;
-
-  mStopCheckAllAPsStatus = FALSE;
-
-  if (WaitEvent != NULL) {
-    //
-    // Non Blocking
-    //
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Blocking
-  //
-  while (TRUE) {
-    if (GetApState (CpuData) == CpuStateFinished) {
-      SetApState (CpuData, CpuStateIdle);
-      break;
-    }
-
-    if (CpuData->TimeoutActive && CpuData->Timeout < 0) {
-      ResetProcessorToIdleState (CpuData);
-      return EFI_TIMEOUT;
-    }
-
-    MicroSecondDelay (gPollInterval);
-    CpuData->Timeout -= gPollInterval;
-  }
-
-  return EFI_SUCCESS;
+  return MpInitLibStartupThisAP (
+           Procedure,
+           ProcessorNumber,
+           WaitEvent,
+           TimeoutInMicroseconds,
+           ProcedureArgument,
+           Finished
+           );
 }
 
 /**
@@ -1037,10 +806,7 @@ SwitchBSP (
   IN  BOOLEAN                  EnableOldBSP
   )
 {
-   //
-   // Current always return unsupported.
-   //
-   return EFI_UNSUPPORTED;
+  return MpInitLibSwitchBSP (ProcessorNumber, EnableOldBSP);
 }
 
 /**
@@ -1093,62 +859,7 @@ EnableDisableAP (
   IN  UINT32                    *HealthFlag OPTIONAL
   )
 {
-  CPU_DATA_BLOCK *CpuData;
-  BOOLEAN        TempStopCheckState;
-  CPU_STATE      CpuState;
-
-  CpuData = NULL;
-  TempStopCheckState = FALSE;
-
-  if (!IsBSP ()) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (ProcessorNumber >= mMpSystemData.NumberOfProcessors) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // temporarily stop checkAllAPsStatus for initialize parameters.
-  //
-  if (!mStopCheckAllAPsStatus) {
-    mStopCheckAllAPsStatus = TRUE;
-    TempStopCheckState = TRUE;
-  }
-
-  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
-  if (TestCpuStatusFlag (CpuData, PROCESSOR_AS_BSP_BIT)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  CpuState = GetApState (CpuData);
-  if (CpuState != CpuStateIdle &&
-      CpuState != CpuStateSleeping) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if (EnableAP) {
-    if (!(TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT))) {
-      mMpSystemData.NumberOfEnabledProcessors++;
-    }
-    CpuStatusFlagOr (CpuData, PROCESSOR_ENABLED_BIT);
-  } else {
-    if (TestCpuStatusFlag (CpuData, PROCESSOR_ENABLED_BIT)) {
-      mMpSystemData.NumberOfEnabledProcessors--;
-    }
-    CpuStatusFlagAndNot (CpuData, PROCESSOR_ENABLED_BIT);
-  }
-
-  if (HealthFlag != NULL) {
-    CpuStatusFlagAndNot (CpuData, (UINT32)~PROCESSOR_HEALTH_STATUS_BIT);
-    CpuStatusFlagOr (CpuData, (*HealthFlag & PROCESSOR_HEALTH_STATUS_BIT));
-  }
-
-  if (TempStopCheckState) {
-    mStopCheckAllAPsStatus = FALSE;
-  }
-
-  return EFI_SUCCESS;
+  return MpInitLibEnableDisableAP (ProcessorNumber, EnableAP, HealthFlag);
 }
 
 /**
@@ -1182,383 +893,7 @@ WhoAmI (
   OUT UINTN                    *ProcessorNumber
   )
 {
-  UINTN   Index;
-  UINT32  ProcessorId;
-
-  if (ProcessorNumber == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  ProcessorId = GetApicId ();
-  for (Index = 0; Index < mMpSystemData.NumberOfProcessors; Index++) {
-    if (mMpSystemData.CpuDatas[Index].Info.ProcessorId == ProcessorId) {
-      break;
-    }
-  }
-
-  *ProcessorNumber = Index;
-  return EFI_SUCCESS;
-}
-
-/**
-  Terminate AP's task and set it to idle state.
-
-  This function terminates AP's task due to timeout by sending INIT-SIPI,
-  and sends it to idle state.
-
-  @param CpuData           the pointer to CPU_DATA_BLOCK of specified AP
-
-**/
-VOID
-ResetProcessorToIdleState (
-  IN CPU_DATA_BLOCK  *CpuData
-  )
-{
-  ResetApStackless ((UINT32)CpuData->Info.ProcessorId);
-}
-
-/**
-  Application Processors do loop routine
-  after switch to its own stack.
-
-  @param  Context1    A pointer to the context to pass into the function.
-  @param  Context2    A pointer to the context to pass into the function.
-
-**/
-VOID
-ProcessorToIdleState (
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2   OPTIONAL
-  )
-{
-  UINTN                 ProcessorNumber;
-  CPU_DATA_BLOCK        *CpuData;
-  EFI_AP_PROCEDURE      Procedure;
-  volatile VOID         *ProcedureArgument;
-
-  AsmApDoneWithCommonStack ();
-
-  while (!mAPsAlreadyInitFinished) {
-    CpuPause ();
-  }
-
-  WhoAmI (&mMpServicesTemplate, &ProcessorNumber);
-  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
-
-  //
-  // Avoid forcibly reset AP caused the AP got lock not release.
-  //
-  if (CpuData->LockSelf == (INTN) GetApicId ()) {
-    ReleaseSpinLock (&CpuData->CpuDataLock);
-  }
-
-  //
-  // Avoid forcibly reset AP caused the timeout AP State is not
-  // updated.
-  //
-  GetMpSpinLock (CpuData);
-  if (CpuData->State == CpuStateBusy) {
-    CpuData->Procedure = NULL;
-  }
-  CpuData->State = CpuStateIdle;
-  ReleaseMpSpinLock (CpuData);
-
-  while (TRUE) {
-    GetMpSpinLock (CpuData);
-    ProcedureArgument = CpuData->Parameter;
-    Procedure = CpuData->Procedure;
-    ReleaseMpSpinLock (CpuData);
-
-    if (Procedure != NULL) {
-      SetApState (CpuData, CpuStateBusy);
-
-      Procedure ((VOID*) ProcedureArgument);
-
-      GetMpSpinLock (CpuData);
-      CpuData->Procedure = NULL;
-      CpuData->State = CpuStateFinished;
-      ReleaseMpSpinLock (CpuData);
-    } else {
-      //
-      // if no procedure to execution, we simply put AP
-      // into sleeping state, and waiting BSP sent SIPI.
-      //
-      GetMpSpinLock (CpuData);
-      if (CpuData->State == CpuStateIdle) {
-          CpuData->State = CpuStateSleeping;
-      }
-      ReleaseMpSpinLock (CpuData);
-    }
-
-    if (GetApState (CpuData) == CpuStateSleeping) {
-      CpuSleep ();
-    }
-
-    CpuPause ();
-  }
-
-  CpuSleep ();
-  CpuDeadLoop ();
-}
-
-/**
-  Checks AP' status periodically.
-
-  This function is triggerred by timer perodically to check the
-  state of AP forStartupThisAP() executed in non-blocking mode.
-
-  @param  Event    Event triggered.
-  @param  Context  Parameter passed with the event.
-
-**/
-VOID
-EFIAPI
-CheckThisAPStatus (
-  IN  EFI_EVENT        Event,
-  IN  VOID             *Context
-  )
-{
-  CPU_DATA_BLOCK  *CpuData;
-  CPU_STATE       CpuState;
-
-  CpuData = (CPU_DATA_BLOCK *) Context;
-  if (CpuData->TimeoutActive) {
-    CpuData->Timeout -= gPollInterval;
-  }
-
-  CpuState = GetApState (CpuData);
-
-  if (CpuState == CpuStateFinished) {
-    if (CpuData->Finished) {
-      *CpuData->Finished = TRUE;
-    }
-    SetApState (CpuData, CpuStateIdle);
-    goto out;
-  }
-
-  if (CpuData->TimeoutActive && CpuData->Timeout < 0) {
-    if (CpuState != CpuStateIdle &&
-        CpuData->Finished) {
-      *CpuData->Finished = FALSE;
-    }
-    ResetProcessorToIdleState (CpuData);
-    goto out;
-  }
-
-  return;
-
-out:
-  CpuData->TimeoutActive = FALSE;
-  gBS->SignalEvent (CpuData->WaitEvent);
-  CpuData->WaitEvent = NULL;
-}
-
-/**
-  Checks APs' status periodically.
-
-  This function is triggerred by timer perodically to check the
-  state of APs for StartupAllAPs() executed in non-blocking mode.
-
-  @param  Event    Event triggered.
-  @param  Context  Parameter passed with the event.
-
-**/
-VOID
-EFIAPI
-CheckAllAPsStatus (
-  IN  EFI_EVENT        Event,
-  IN  VOID             *Context
-  )
-{
-  CPU_DATA_BLOCK *CpuData;
-  UINTN          Number;
-  EFI_STATUS     Status;
-
-  if (mMpSystemData.TimeoutActive) {
-    mMpSystemData.Timeout -= gPollInterval;
-  }
-
-  if (mStopCheckAllAPsStatus) {
-    return;
-  }
-
-  //
-  // avoid next timer enter.
-  //
-  Status = gBS->SetTimer (
-                  mMpSystemData.CheckAllAPsEvent,
-                  TimerCancel,
-                  0
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  if (mMpSystemData.WaitEvent != NULL) {
-    CheckAndUpdateAllAPsToIdleState ();
-    //
-    // task timeout
-    //
-    if (mMpSystemData.TimeoutActive && mMpSystemData.Timeout < 0) {
-      ResetAllFailedAPs();
-      //
-      // force exit
-      //
-      mMpSystemData.FinishCount = mMpSystemData.StartCount;
-    }
-
-    if (mMpSystemData.FinishCount != mMpSystemData.StartCount) {
-      goto EXIT;
-    }
-
-    mMpSystemData.TimeoutActive = FALSE;
-    gBS->SignalEvent (mMpSystemData.WaitEvent);
-    mMpSystemData.WaitEvent = NULL;
-    mStopCheckAllAPsStatus = TRUE;
-
-    goto EXIT;
-  }
-
-  //
-  // check each AP status for StartupThisAP
-  //
-  for (Number = 0; Number < mMpSystemData.NumberOfProcessors; Number++) {
-    CpuData = &mMpSystemData.CpuDatas[Number];
-    if (CpuData->WaitEvent) {
-      CheckThisAPStatus (NULL, (VOID *)CpuData);
-    }
-  }
-
-EXIT:
-  Status = gBS->SetTimer (
-                  mMpSystemData.CheckAllAPsEvent,
-                  TimerPeriodic,
-                  EFI_TIMER_PERIOD_MICROSECONDS (100)
-                  );
-  ASSERT_EFI_ERROR (Status);
-}
-
-/**
-  Application Processor C code entry point.
-
-**/
-VOID
-EFIAPI
-ApEntryPointInC (
-  VOID
-  )
-{
-  VOID*           TopOfApStack;
-  UINTN           ProcessorNumber;
-
-  if (!mAPsAlreadyInitFinished) {
-    FillInProcessorInformation (FALSE, mMpSystemData.NumberOfProcessors);
-    TopOfApStack  = (UINT8*)mApStackStart + gApStackSize;
-    mApStackStart = TopOfApStack;
-
-    //
-    // Store the Stack address, when reset the AP, We can found the original address.
-    //
-    mMpSystemData.CpuDatas[mMpSystemData.NumberOfProcessors].TopOfStack = TopOfApStack;
-    mMpSystemData.NumberOfProcessors++;
-    mMpSystemData.NumberOfEnabledProcessors++;
-  } else {
-    WhoAmI (&mMpServicesTemplate, &ProcessorNumber);
-    //
-    // Get the original stack address.
-    //
-    TopOfApStack = mMpSystemData.CpuDatas[ProcessorNumber].TopOfStack;
-  }
-
-  SwitchStack (
-    (SWITCH_STACK_ENTRY_POINT)(UINTN)ProcessorToIdleState,
-    NULL,
-    NULL,
-    TopOfApStack);
-}
-
-/**
-  This function is called by all processors (both BSP and AP) once and collects MP related data.
-
-  @param Bsp             TRUE if the CPU is BSP
-  @param ProcessorNumber The specific processor number
-
-  @retval EFI_SUCCESS    Data for the processor collected and filled in
-
-**/
-EFI_STATUS
-FillInProcessorInformation (
-  IN     BOOLEAN              Bsp,
-  IN     UINTN                ProcessorNumber
-  )
-{
-  CPU_DATA_BLOCK  *CpuData;
-  UINT32          ProcessorId;
-
-  CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
-  ProcessorId  = GetApicId ();
-  CpuData->Info.ProcessorId  = ProcessorId;
-  CpuData->Info.StatusFlag   = PROCESSOR_ENABLED_BIT | PROCESSOR_HEALTH_STATUS_BIT;
-  if (Bsp) {
-    CpuData->Info.StatusFlag |= PROCESSOR_AS_BSP_BIT;
-  }
-  CpuData->Info.Location.Package = ProcessorId;
-  CpuData->Info.Location.Core    = 0;
-  CpuData->Info.Location.Thread  = 0;
-  CpuData->State = Bsp ? CpuStateBusy : CpuStateIdle;
-
-  CpuData->Procedure        = NULL;
-  CpuData->Parameter        = NULL;
-  InitializeSpinLock (&CpuData->CpuDataLock);
-  CpuData->LockSelf         = -1;
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Prepare the System Data.
-
-  @retval EFI_SUCCESS     the System Data finished initilization.
-
-**/
-EFI_STATUS
-InitMpSystemData (
-  VOID
-  )
-{
-  EFI_STATUS     Status;
-
-  ZeroMem (&mMpSystemData, sizeof (MP_SYSTEM_DATA));
-
-  mMpSystemData.NumberOfProcessors = 1;
-  mMpSystemData.NumberOfEnabledProcessors = 1;
-
-  mMpSystemData.CpuDatas = AllocateZeroPool (sizeof (CPU_DATA_BLOCK) * gMaxLogicalProcessorNumber);
-  ASSERT(mMpSystemData.CpuDatas != NULL);
-
-  Status = gBS->CreateEvent (
-                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  CheckAllAPsStatus,
-                  NULL,
-                  &mMpSystemData.CheckAllAPsEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Set timer to check all APs status.
-  //
-  Status = gBS->SetTimer (
-                  mMpSystemData.CheckAllAPsEvent,
-                  TimerPeriodic,
-                  EFI_TIMER_PERIOD_MICROSECONDS (100)
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // BSP
-  //
-  FillInProcessorInformation (TRUE, 0);
-
-  return EFI_SUCCESS;
+  return MpInitLibWhoAmI (ProcessorNumber);;
 }
 
 /**
@@ -1580,8 +915,8 @@ CollectBistDataFromHob (
   EFI_SEC_PLATFORM_INFORMATION_CPU      *CpuInstance;
   EFI_SEC_PLATFORM_INFORMATION_CPU      BspCpuInstance;
   UINTN                                 ProcessorNumber;
-  UINT32                                InitialLocalApicId;
-  CPU_DATA_BLOCK                        *CpuData;
+  EFI_PROCESSOR_INFORMATION             ProcessorInfo;
+  EFI_HEALTH_FLAGS                      BistData;
 
   SecPlatformInformation2 = NULL;
   SecPlatformInformation  = NULL;
@@ -1622,23 +957,22 @@ CollectBistDataFromHob (
   }
 
   while ((NumberOfData--) > 0) {
-    for (ProcessorNumber = 0; ProcessorNumber < mMpSystemData.NumberOfProcessors; ProcessorNumber++) {
-      CpuData = &mMpSystemData.CpuDatas[ProcessorNumber];
-      InitialLocalApicId = (UINT32) CpuData->Info.ProcessorId;
-      if (InitialLocalApicId == CpuInstance[NumberOfData].CpuLocation) {
+    for (ProcessorNumber = 0; ProcessorNumber < mNumberOfProcessors; ProcessorNumber++) {
+      MpInitLibGetProcessorInfo (ProcessorNumber, &ProcessorInfo, &BistData);
+      if (ProcessorInfo.ProcessorId == CpuInstance[NumberOfData].CpuLocation) {
         //
         // Update CPU health status for MP Services Protocol according to BIST data.
         //
-        if (CpuInstance[NumberOfData].InfoRecord.IA32HealthFlags.Uint32 != 0) {
-          CpuData->Info.StatusFlag &= ~PROCESSOR_HEALTH_STATUS_BIT;
-          //
-          // Report Status Code that self test is failed
-          //
-          REPORT_STATUS_CODE (
-            EFI_ERROR_CODE | EFI_ERROR_MAJOR,
-            (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_SELF_TEST)
-            );
-        }
+        BistData = CpuInstance[NumberOfData].InfoRecord.IA32HealthFlags;
+      }
+      if (BistData.Uint32 != 0) {
+        //
+        // Report Status Code that self test is failed
+        //
+        REPORT_STATUS_CODE (
+          EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+          (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_SELF_TEST)
+          );
       }
     }
   }
@@ -1692,93 +1026,31 @@ InitializeMpSupport (
   )
 {
   EFI_STATUS     Status;
-  MTRR_SETTINGS  MtrrSettings;
-  UINTN          Timeout;
+  UINTN          NumberOfProcessors;
+  UINTN          NumberOfEnabledProcessors;
 
-  gMaxLogicalProcessorNumber = (UINTN) PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-  if (gMaxLogicalProcessorNumber < 1) {
+  NumberOfProcessors = (UINTN) PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  if (NumberOfProcessors < 1) {
     DEBUG ((DEBUG_ERROR, "Setting PcdCpuMaxLogicalProcessorNumber should be more than zero.\n"));
     return;
   }
 
-
-
-  InitMpSystemData ();
-
   //
   // Only perform AP detection if PcdCpuMaxLogicalProcessorNumber is greater than 1
   //
-  if (gMaxLogicalProcessorNumber > 1) {
+  if (NumberOfProcessors > 1) {
+    Status = MpInitLibInitialize ();
+    ASSERT_EFI_ERROR (Status);
 
-    gApStackSize = (UINTN) PcdGet32 (PcdCpuApStackSize);
-    ASSERT ((gApStackSize & (SIZE_4KB - 1)) == 0);
-
-    mApStackStart = AllocatePages (EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
-    ASSERT (mApStackStart != NULL);
-
-    //
-    // the first buffer of stack size used for common stack, when the amount of AP
-    // more than 1, we should never free the common stack which maybe used for AP reset.
-    //
-    mCommonStack = mApStackStart;
-    mTopOfApCommonStack = (UINT8*) mApStackStart + gApStackSize;
-    mApStackStart = mTopOfApCommonStack;
-
-    PrepareAPStartupCode ();
-
-    StartApsStackless ();
+    MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
+    mNumberOfProcessors = NumberOfProcessors;
   }
-
-  DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mMpSystemData.NumberOfProcessors));
-  if (mMpSystemData.NumberOfProcessors == 1) {
-    FreeApStartupCode ();
-    if (mCommonStack != NULL) {
-      FreePages (mCommonStack, EFI_SIZE_TO_PAGES (gMaxLogicalProcessorNumber * gApStackSize));
-    }
-  }
-
-  mMpSystemData.CpuDatas = ReallocatePool (
-                             sizeof (CPU_DATA_BLOCK) * gMaxLogicalProcessorNumber,
-                             sizeof (CPU_DATA_BLOCK) * mMpSystemData.NumberOfProcessors,
-                             mMpSystemData.CpuDatas);
-
-  //
-  // Release all APs to complete initialization and enter idle loop
-  //
-  mAPsAlreadyInitFinished = TRUE;
-
-  //
-  // Wait for all APs to enter idle loop.
-  //
-  Timeout = 0;
-  do {
-    if (CheckAllAPsSleeping ()) {
-      break;
-    }
-    MicroSecondDelay (gPollInterval);
-    Timeout += gPollInterval;
-  } while (Timeout <= PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
-  ASSERT (Timeout <= PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds));
+  DEBUG ((EFI_D_ERROR, "Detect CPU count: %d\n", mNumberOfProcessors));
 
   //
   // Update CPU healthy information from Guided HOB
   //
   CollectBistDataFromHob ();
-
-  //
-  // Synchronize MTRR settings to APs.
-  //
-  MtrrGetAllMtrrs (&MtrrSettings);
-  Status = mMpServicesTemplate.StartupAllAPs (
-                                 &mMpServicesTemplate, // This
-                                 SetMtrrsFromBuffer,   // Procedure
-                                 TRUE,                 // SingleThread
-                                 NULL,                 // WaitEvent
-                                 0,                    // TimeoutInMicrosecsond
-                                 &MtrrSettings,        // ProcedureArgument
-                                 NULL                  // FailedCpuList
-                                 );
-  ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_STARTED);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mMpServiceHandle,
@@ -1786,21 +1058,5 @@ InitializeMpSupport (
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-
-  if (mMpSystemData.NumberOfProcessors > 1 && mMpSystemData.NumberOfProcessors < gMaxLogicalProcessorNumber) {
-    if (mApStackStart != NULL) {
-      FreePages (mApStackStart, EFI_SIZE_TO_PAGES (
-                                  (gMaxLogicalProcessorNumber - mMpSystemData.NumberOfProcessors) *
-                                  gApStackSize));
-    }
-  }
-
-  Status = gBS->CreateEvent (
-                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
-                  TPL_CALLBACK,
-                  ExitBootServicesCallback,
-                  NULL,
-                  &mExitBootServicesEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
 }
+

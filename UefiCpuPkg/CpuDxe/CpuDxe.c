@@ -1,5 +1,5 @@
 /** @file
-  CPU DXE Module.
+  CPU DXE Module to produce CPU ARCH Protocol.
 
   Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
