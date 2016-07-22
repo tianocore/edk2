@@ -377,6 +377,7 @@ ProcessStatement (
   Status          = EFI_SUCCESS;
   BinOp           = OperatorMax;
   OperationResult = FALSE;
+  Match           = FALSE;
   StatementWalker = gEfiShellParametersProtocol->Argv[StartParameterNumber];
   if (!EFI_ERROR (IsNextFragment((CONST CHAR16**)(&StatementWalker), L"not", &Match)) && Match) {
     NotPresent      = TRUE;
