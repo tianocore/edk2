@@ -31,8 +31,6 @@
   CpuMpPei.h
   CpuMpPei.c
   CpuBist.c
-  PeiMpServices.h
-  PeiMpServices.c
 
 [Packages]
   MdePkg/MdePkg.dec
