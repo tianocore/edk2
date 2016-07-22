@@ -31,20 +31,8 @@
   CpuMpPei.h
   CpuMpPei.c
   CpuBist.c
-  Microcode.h
-  Microcode.c
   PeiMpServices.h
   PeiMpServices.c
-
-[Sources.IA32]
-  Ia32/MpEqu.inc
-  Ia32/MpFuncs.asm
-  Ia32/MpFuncs.nasm
-
-[Sources.X64]
-  X64/MpEqu.inc
-  X64/MpFuncs.asm
-  X64/MpFuncs.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,39 +41,22 @@
 
 [LibraryClasses]
   BaseLib
-  BaseMemoryLib
   DebugLib
   HobLib
   LocalApicLib
-  MtrrLib
-  PcdLib
   PeimEntryPoint
   PeiServicesLib
   ReportStatusCodeLib
-  SynchronizationLib
-  TimerLib
-  UefiCpuLib
-  CpuLib
   CpuExceptionHandlerLib
   MpInitLib
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES
-  gEfiEndOfPeiSignalPpiGuid                     ## NOTIFY
   gEfiSecPlatformInformationPpiGuid             ## SOMETIMES_CONSUMES
   ## SOMETIMES_CONSUMES
   ## SOMETIMES_PRODUCES
   gEfiSecPlatformInformation2PpiGuid
   gEfiVectorHandoffInfoPpiGuid                  ## SOMETIMES_CONSUMES
-
-[Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds      ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                      ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress            ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                       ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                   ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid

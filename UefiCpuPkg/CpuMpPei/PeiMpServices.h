@@ -17,29 +17,6 @@
 
 #include "CpuMpPei.h"
 
-//
-//  The MP data for switch BSP
-//
-#define CPU_SWITCH_STATE_IDLE   0
-#define CPU_SWITCH_STATE_STORED 1
-#define CPU_SWITCH_STATE_LOADED 2
-
-#define CPU_CHECK_AP_INTERVAL             0x100     // 100 microseconds
-
-/**
-  This function is called by both the BSP and the AP which is to become the BSP to
-  Exchange execution context including stack between them. After return from this
-  function, the BSP becomes AP and the AP becomes the BSP.
-
-  @param MyInfo      Pointer to buffer holding the exchanging information for the executing processor.
-  @param OthersInfo  Pointer to buffer holding the exchanging information for the peer.
-**/
-VOID
-EFIAPI
-AsmExchangeRole (
-  IN   CPU_EXCHANGE_ROLE_INFO    *MyInfo,
-  IN   CPU_EXCHANGE_ROLE_INFO    *OthersInfo
-  );
 
 /**
   This service retrieves the number of logical processor in the platform
