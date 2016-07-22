@@ -3699,8 +3699,10 @@ CreatePopulateInstallShellProtocol (
                                );
       if (!EFI_ERROR(Status)) {
         OldProtocolNode = AllocateZeroPool(sizeof(SHELL_PROTOCOL_HANDLE_LIST));
-        if (OldProtocolNode == NULL && !IsListEmpty (&ShellInfoObject.OldShellList.Link)) {
-          CleanUpShellProtocol (&mShellProtocol);
+        if (OldProtocolNode == NULL) {
+          if (!IsListEmpty (&ShellInfoObject.OldShellList.Link)) {
+            CleanUpShellProtocol (&mShellProtocol);
+          }
           Status = EFI_OUT_OF_RESOURCES;
           break;
         }
