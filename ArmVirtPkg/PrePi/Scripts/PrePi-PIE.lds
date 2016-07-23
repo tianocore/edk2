@@ -30,8 +30,11 @@ SECTIONS
     PROVIDE(__reloc_end = .);
   }
 
+  .note (INFO) : { *(.note.gnu.build-id) }
+
   /DISCARD/ : {
     *(.note.GNU-stack)
+    *(.gnu.hash)
     *(.gnu_debuglink)
     *(.interp)
     *(.dynamic)
