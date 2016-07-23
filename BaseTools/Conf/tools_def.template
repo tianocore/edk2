@@ -4460,6 +4460,7 @@ DEFINE GCC49_AARCH64_ASLDLINK_FLAGS  = DEF(GCC48_AARCH64_ASLDLINK_FLAGS)
 #   UNIXGCC         - UNIX GCC
 #   ASL             - Intel Linux ACPI Source Language Compiler (iasl)
 *_UNIXGCC_*_*_FAMILY               = GCC
+*_UNIXGCC_*_*_BUILDRULEFAMILY      = GCCLD
 
 *_UNIXGCC_*_MAKE_PATH                    = make
 *_UNIXGCC_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
@@ -5268,6 +5269,7 @@ RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS)
 #   CYGGCC        - CygWin GCC
 #   ASL           - Intel ACPI Source Language Compiler (iasl.exe)
 *_CYGGCC_*_*_FAMILY              = GCC
+*_CYGGCC_*_*_BUILDRULEFAMILY     = GCCLD
 
 *_CYGGCC_*_*_DLL                 = DEF(CYGWIN_BIN)
 *_CYGGCC_*_MAKE_PATH             = DEF(MS_VS_BIN)\nmake.exe
@@ -5375,6 +5377,7 @@ RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS)
 #   CYGGCCxASL        - CygWin GCC
 #   ASL           - Microsoft ACPI Source Language Compiler (asl.exe)
 *_CYGGCCxASL_*_*_FAMILY              = GCC
+*_CYGGCCxASL_*_*_BUILDRULEFAMILY     = GCCLD
 
 *_CYGGCCxASL_*_*_DLL                 = DEF(CYGWIN_BIN)
 *_CYGGCCxASL_*_MAKE_PATH             = DEF(MS_VS_BIN)\nmake.exe
@@ -5478,6 +5481,7 @@ RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS)
 ####################################################################################
 #   ELFGCC           - Linux ELF GCC
 *_ELFGCC_*_*_FAMILY                 = GCC
+*_ELFGCC_*_*_BUILDRULEFAMILY        = GCCLD
 *_ELFGCC_*_MAKE_PATH                = make
 
 *_ELFGCC_*_PP_FLAGS                     = -E -x assembler-with-cpp -include AutoGen.h
