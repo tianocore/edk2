@@ -64,8 +64,45 @@ SaveCpuMpData (
     );
 }
 
+/**
+  Get available system memory below 1MB by specified size.
+
+  @param[in] PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+BackupAndPrepareWakeupBuffer(
+  IN CPU_MP_DATA              *CpuMpData
+  )
+{
+  CopyMem (
+    (VOID *) CpuMpData->BackupBuffer,
+    (VOID *) CpuMpData->WakeupBuffer,
+    CpuMpData->BackupBufferSize
+    );
+  CopyMem (
+    (VOID *) CpuMpData->WakeupBuffer,
+    (VOID *) CpuMpData->AddressMap.RendezvousFunnelAddress,
+    CpuMpData->AddressMap.RendezvousFunnelSize
+    );
+}
 
 /**
+  Restore wakeup buffer data.
+
+  @param[in] PeiCpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+RestoreWakeupBuffer(
+  IN CPU_MP_DATA              *CpuMpData
+  )
+{
+  CopyMem (
+    (VOID *) CpuMpData->WakeupBuffer,
+    (VOID *) CpuMpData->BackupBuffer,
+    CpuMpData->BackupBufferSize
+    );
+}
+
 /**
   Notify function on End Of PEI PPI.
 
@@ -86,11 +123,219 @@ CpuMpEndOfPeiCallback (
   IN VOID                         *Ppi
   )
 {
+  EFI_STATUS                Status;
+  EFI_BOOT_MODE             BootMode;
+  CPU_MP_DATA               *CpuMpData;
+  EFI_PEI_HOB_POINTERS      Hob;
+  EFI_HOB_MEMORY_ALLOCATION *MemoryHob;
 
   DEBUG ((DEBUG_INFO, "PeiMpInitLib: CpuMpEndOfPeiCallback () invoked\n"));
 
+  Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  CpuMpData = GetCpuMpData ();
+  if (BootMode != BOOT_ON_S3_RESUME) {
+    //
+    // Get the HOB list for processing
+    //
+    Hob.Raw = GetHobList ();
+    //
+    // Collect memory ranges
+    //
+    while (!END_OF_HOB_LIST (Hob)) {
+      if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
+        MemoryHob = Hob.MemoryAllocation;
+        if (MemoryHob->AllocDescriptor.MemoryBaseAddress == CpuMpData->WakeupBuffer) {
+          //
+          // Flag this HOB type to un-used
+          //
+          GET_HOB_TYPE (Hob) = EFI_HOB_TYPE_UNUSED;
+          break;
+        }
+      }
+      Hob.Raw = GET_NEXT_HOB (Hob);
+    }
+  } else {
+    CpuMpData->EndOfPeiFlag = TRUE;
+    RestoreWakeupBuffer (CpuMpData);
+  }
   return EFI_SUCCESS;
 }
+
+/**
+  Check if AP wakeup buffer is overlapped with existing allocated buffer.
+
+  @param[in]  WakeupBufferStart     AP wakeup buffer start address.
+  @param[in]  WakeupBufferEnd       AP wakeup buffer end address.
+
+  @retval  TRUE       There is overlap.
+  @retval  FALSE      There is no overlap.
+**/
+BOOLEAN
+CheckOverlapWithAllocatedBuffer (
+  IN UINTN                WakeupBufferStart,
+  IN UINTN                WakeupBufferEnd
+  )
+{
+  EFI_PEI_HOB_POINTERS      Hob;
+  EFI_HOB_MEMORY_ALLOCATION *MemoryHob;
+  BOOLEAN                   Overlapped;
+  UINTN                     MemoryStart;
+  UINTN                     MemoryEnd;
+
+  Overlapped = FALSE;
+  //
+  // Get the HOB list for processing
+  //
+  Hob.Raw = GetHobList ();
+  //
+  // Collect memory ranges
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
+      MemoryHob   = Hob.MemoryAllocation;
+      MemoryStart = (UINTN) MemoryHob->AllocDescriptor.MemoryBaseAddress;
+      MemoryEnd   = (UINTN) (MemoryHob->AllocDescriptor.MemoryBaseAddress +
+                             MemoryHob->AllocDescriptor.MemoryLength);
+      if (!((WakeupBufferStart >= MemoryEnd) || (WakeupBufferEnd <= MemoryStart))) {
+        Overlapped = TRUE;
+        break;
+      }
+    }
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+  return Overlapped;
+}
+
+/**
+  Get available system memory below 1MB by specified size.
+
+  @param[in] WakeupBufferSize   Wakeup buffer size required
+
+  @retval other   Return wakeup buffer address below 1MB.
+  @retval -1      Cannot find free memory below 1MB.
+**/
+UINTN
+GetWakeupBuffer (
+  IN UINTN                WakeupBufferSize
+  )
+{
+  EFI_PEI_HOB_POINTERS    Hob;
+  UINTN                   WakeupBufferStart;
+  UINTN                   WakeupBufferEnd;
+
+  WakeupBufferSize = (WakeupBufferSize + SIZE_4KB - 1) & ~(SIZE_4KB - 1);
+
+  //
+  // Get the HOB list for processing
+  //
+  Hob.Raw = GetHobList ();
+
+  //
+  // Collect memory ranges
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if ((Hob.ResourceDescriptor->PhysicalStart < BASE_1MB) &&
+          (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
+          ((Hob.ResourceDescriptor->ResourceAttribute &
+            (EFI_RESOURCE_ATTRIBUTE_READ_PROTECTED |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_PROTECTED |
+             EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTED
+             )) == 0)
+           ) {
+        //
+        // Need memory under 1MB to be collected here
+        //
+        WakeupBufferEnd = (UINTN) (Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength);
+        if (WakeupBufferEnd > BASE_1MB) {
+          //
+          // Wakeup buffer should be under 1MB
+          //
+          WakeupBufferEnd = BASE_1MB;
+        }
+        while (WakeupBufferEnd > WakeupBufferSize) {
+          //
+          // Wakeup buffer should be aligned on 4KB
+          //
+          WakeupBufferStart = (WakeupBufferEnd - WakeupBufferSize) & ~(SIZE_4KB - 1);
+          if (WakeupBufferStart < Hob.ResourceDescriptor->PhysicalStart) {
+            break;
+          }
+          if (CheckOverlapWithAllocatedBuffer (WakeupBufferStart, WakeupBufferEnd)) {
+            //
+            // If this range is overlapped with existing allocated buffer, skip it
+            // and find the next range
+            //
+            WakeupBufferEnd -= WakeupBufferSize;
+            continue;
+          }
+          DEBUG ((DEBUG_INFO, "WakeupBufferStart = %x, WakeupBufferSize = %x\n",
+                               WakeupBufferStart, WakeupBufferSize));
+          //
+          // Create a memory allocation HOB.
+          //
+          BuildMemoryAllocationHob (
+            WakeupBufferStart,
+            WakeupBufferSize,
+            EfiBootServicesData
+            );
+          return WakeupBufferStart;
+        }
+      }
+    }
+    //
+    // Find the next HOB
+    //
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return (UINTN) -1;
+}
+
+/**
+  Allocate reset vector buffer.
+
+  @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AllocateResetVector (
+  IN OUT CPU_MP_DATA          *CpuMpData
+  )
+{
+  UINTN           ApResetVectorSize;
+
+  if (CpuMpData->WakeupBuffer == (UINTN) -1) {
+    ApResetVectorSize = CpuMpData->AddressMap.RendezvousFunnelSize +
+                          sizeof (MP_CPU_EXCHANGE_INFO);
+
+    CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSize);
+    CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *) (UINTN)
+                    (CpuMpData->WakeupBuffer + CpuMpData->AddressMap.RendezvousFunnelSize);
+    BackupAndPrepareWakeupBuffer (CpuMpData);
+  }
+
+  if (CpuMpData->EndOfPeiFlag) {
+    BackupAndPrepareWakeupBuffer (CpuMpData);
+  }
+}
+
+/**
+  Free AP reset vector buffer.
+
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+FreeResetVector (
+  IN CPU_MP_DATA              *CpuMpData
+  )
+{
+  if (CpuMpData->EndOfPeiFlag) {
+    RestoreWakeupBuffer (CpuMpData);
+  }
+}
+
 /**
   Initialize global data for MP support.
 
