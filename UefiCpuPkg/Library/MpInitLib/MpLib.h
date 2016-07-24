@@ -520,6 +520,17 @@ MicrocodeDetect (
   );
 
 /**
+  Detect whether Mwait-monitor feature is supported.
+
+  @retval TRUE    Mwait-monitor feature is supported.
+  @retval FALSE   Mwait-monitor feature is not supported.
+**/
+BOOLEAN
+IsMwaitSupport (
+  VOID
+  );
+
+/**
   Notify function on End Of PEI PPI.
 
   On S3 boot, this function will restore wakeup buffer data.
