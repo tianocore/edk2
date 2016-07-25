@@ -455,6 +455,52 @@ BmGetNetworkDescription (
 }
 
 /**
+  Return the boot description for LoadFile
+
+  @param Handle                Controller handle.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetLoadFileDescription (
+  IN EFI_HANDLE                  Handle
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_DEVICE_PATH_PROTOCOL              *FilePath;
+  EFI_DEVICE_PATH_PROTOCOL              *DevicePathNode;
+  CHAR16                                *Description;
+  EFI_LOAD_FILE_PROTOCOL                *LoadFile;
+
+  Status = gBS->HandleProtocol (Handle, &gEfiLoadFileProtocolGuid, (VOID **)&LoadFile);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Get the file name
+  //
+  Description = NULL;
+  Status = gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid, (VOID **)&FilePath);
+  if (!EFI_ERROR (Status)) {
+    DevicePathNode = FilePath;
+    while (!IsDevicePathEnd (DevicePathNode)) {
+      if (DevicePathNode->Type == MEDIA_DEVICE_PATH && DevicePathNode->SubType == MEDIA_FILEPATH_DP) {
+        Description = (CHAR16 *)(DevicePathNode + 1);
+        break;
+      }
+      DevicePathNode = NextDevicePathNode (DevicePathNode);
+    }
+  }
+
+  if (Description != NULL) {
+    return AllocateCopyPool (StrSize (Description), Description);
+  }
+
+  return NULL;
+}
+
+/**
   Return the boot description for the controller based on the type.
 
   @param Handle                Controller handle.
@@ -559,6 +605,7 @@ BM_GET_BOOT_DESCRIPTION mBmBootDescriptionHandlers[] = {
   BmGetUsbDescription,
   BmGetDescriptionFromDiskInfo,
   BmGetNetworkDescription,
+  BmGetLoadFileDescription,
   BmGetMiscDescription
 };
 
