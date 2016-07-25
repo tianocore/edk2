@@ -469,6 +469,7 @@
   MdeModulePkg/Application/VariableInfo/VariableInfo.inf
 
   MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+  MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
 
 ###################################################################################################
 #

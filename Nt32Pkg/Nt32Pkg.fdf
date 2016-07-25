@@ -282,7 +282,7 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
     SECTION RAW = MdeModulePkg/Logo/Logo.bmp
   }
 
-
+INF MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
 ################################################################################
 #
 # Rules are use with the [FV] section's module INF type to define
