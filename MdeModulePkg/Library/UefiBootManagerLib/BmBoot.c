@@ -1530,6 +1530,34 @@ EfiBootManagerGetLoadOptionBuffer (
 }
 
 /**
+  Check if it's a Device Path pointing to BootMenuApp.
+
+  @param  DevicePath     Input device path.
+
+  @retval TRUE   The device path is BootMenuApp File Device Path.
+  @retval FALSE  The device path is NOT BootMenuApp File Device Path.
+**/
+BOOLEAN
+BmIsBootMenuAppFilePath (
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
+)
+{
+  EFI_HANDLE                      FvHandle;
+  VOID                            *NameGuid;
+  EFI_STATUS                      Status;
+
+  Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &DevicePath, &FvHandle);
+  if (!EFI_ERROR (Status)) {
+    NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) DevicePath);
+    if (NameGuid != NULL) {
+      return CompareGuid (NameGuid, PcdGetPtr (PcdBootManagerMenuFile));
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Attempt to boot the EFI boot option. This routine sets L"BootCurent" and
   also signals the EFI ready to boot event. If the device path for the option
   starts with a BBS device path a legacy boot is attempted via the registered 
@@ -1562,9 +1590,7 @@ EfiBootManagerBoot (
   UINTN                     OptionNumber;
   UINTN                     OriginalOptionNumber;
   EFI_DEVICE_PATH_PROTOCOL  *FilePath;
-  EFI_DEVICE_PATH_PROTOCOL  *Node;
   EFI_DEVICE_PATH_PROTOCOL  *RamDiskDevicePath;
-  EFI_HANDLE                FvHandle;
   VOID                      *FileBuffer;
   UINTN                     FileSize;
   EFI_BOOT_LOGO_PROTOCOL    *BootLogo;
@@ -1619,12 +1645,7 @@ EfiBootManagerBoot (
   // 3. Signal the EVT_SIGNAL_READY_TO_BOOT event when we are about to load and execute
   //    the boot option.
   //
-  Node   = BootOption->FilePath;
-  Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &Node, &FvHandle);
-  if (!EFI_ERROR (Status) && CompareGuid (
-        EfiGetNameGuidFromFwVolDevicePathNode ((CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) Node),
-        PcdGetPtr (PcdBootManagerMenuFile)
-        )) {
+  if (BmIsBootMenuAppFilePath (BootOption->FilePath)) {
     DEBUG ((EFI_D_INFO, "[Bds] Booting Boot Manager Menu.\n"));
     BmStopHotkeyService (NULL, NULL);
   } else {
@@ -2272,20 +2293,11 @@ EfiBootManagerGetBootManagerMenu (
   UINTN                        BootOptionCount;
   EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions;
   UINTN                        Index;
-  EFI_DEVICE_PATH_PROTOCOL     *Node;
-  EFI_HANDLE                   FvHandle;
   
   BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
 
   for (Index = 0; Index < BootOptionCount; Index++) {
-    Node   = BootOptions[Index].FilePath;
-    Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &Node, &FvHandle);
-    if (!EFI_ERROR (Status)) {
-      if (CompareGuid (
-            EfiGetNameGuidFromFwVolDevicePathNode ((CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) Node),
-            PcdGetPtr (PcdBootManagerMenuFile)
-            )
-          ) {        
+    if (BmIsBootMenuAppFilePath (BootOptions[Index].FilePath)) {
         Status = EfiBootManagerInitializeLoadOption (
                    BootOption,
                    BootOptions[Index].OptionNumber,
@@ -2298,7 +2310,6 @@ EfiBootManagerGetBootManagerMenu (
                    );
         ASSERT_EFI_ERROR (Status);
         break;
-      }
     }
   }
 
