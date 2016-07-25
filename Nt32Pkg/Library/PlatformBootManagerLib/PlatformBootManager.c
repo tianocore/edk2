@@ -115,6 +115,35 @@ PlatformBootManagerBeforeConsole (
 }
 
 /**
+  Returns the priority number.
+
+  @param BootOption
+**/
+UINTN
+BootOptionPriority (
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOption
+  )
+{
+  //
+  // Make sure Shell is first
+  //
+  if (StrCmp (BootOption->Description, L"UEFI Shell") == 0) {
+    return 0;
+  }
+  return 100;
+}
+
+INTN
+EFIAPI
+CompareBootOption (
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Left,
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Right
+  )
+{
+  return BootOptionPriority (Left) - BootOptionPriority (Right);
+}
+
+/**
   Do the platform specific action after the console is connected.
 
   Such as:
@@ -155,6 +184,11 @@ PlatformBootManagerAfterConsole (
   F2.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
   EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL);
+
+  //
+  // Make Shell as the first boot option
+  //
+  EfiBootManagerSortLoadOptionVariable (LoadOptionTypeBoot, (SORT_COMPARE) CompareBootOption);
 
   PlatformBootManagerDiagnostics (QUICK, TRUE);
   
