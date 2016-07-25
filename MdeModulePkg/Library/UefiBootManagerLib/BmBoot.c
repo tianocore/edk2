@@ -1940,6 +1940,7 @@ BmEnumerateBootOptions (
   UINTN                                 Removable;
   UINTN                                 Index;
   CHAR16                                *Description;
+  UINT32                                BootAttributes;
 
   ASSERT (BootOptionCount != NULL);
 
@@ -2059,7 +2060,7 @@ BmEnumerateBootOptions (
   }
 
   //
-  // Parse load file, assuming UEFI Network boot option
+  // Parse load file protocol
   //
   gBS->LocateHandleBuffer (
          ByProtocol,
@@ -2078,11 +2079,19 @@ BmEnumerateBootOptions (
                     );
     ASSERT (BootOptions != NULL);
 
+    //
+    // If LoadFile includes BootMenuApp, its boot attribue will be set to APP and HIDDEN.
+    //
+    BootAttributes = LOAD_OPTION_ACTIVE;
+    if (BmIsBootMenuAppFilePath (DevicePathFromHandle (Handles[Index]))) {
+      BootAttributes = LOAD_OPTION_CATEGORY_APP | LOAD_OPTION_ACTIVE | LOAD_OPTION_HIDDEN;
+    }
+
     Status = EfiBootManagerInitializeLoadOption (
                &BootOptions[(*BootOptionCount)++],
                LoadOptionNumberUnassigned,
                LoadOptionTypeBoot,
-               LOAD_OPTION_ACTIVE,
+               BootAttributes,
                Description,
                DevicePathFromHandle (Handles[Index]),
                NULL,
@@ -2197,51 +2206,78 @@ BmRegisterBootManagerMenu (
   EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
   EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
+  UINTN                              HandleCount;
+  EFI_HANDLE                         *Handles;
+  UINTN                              Index;
   VOID                               *Data;
   UINTN                              DataSize;
 
-  Data = NULL;
-  Status = GetSectionFromFv (
-             PcdGetPtr (PcdBootManagerMenuFile),
-             EFI_SECTION_PE32,
-             0,
-             (VOID **) &Data,
-             &DataSize
-             );
-  if (Data != NULL) {
-    FreePool (Data);
+  DevicePath = NULL;
+  //
+  // Try to find BootMenuApp from LoadFile protocol
+  //
+  gBS->LocateHandleBuffer (
+         ByProtocol,
+         &gEfiLoadFileProtocolGuid,
+         NULL,
+         &HandleCount,
+         &Handles
+         );
+  for (Index = 0; Index < HandleCount; Index++) {
+    if (BmIsBootMenuAppFilePath (DevicePathFromHandle (Handles[Index]))) {
+      DevicePath  = DuplicateDevicePath (DevicePathFromHandle (Handles[Index]));
+      Description = BmGetBootDescription (Handles[Index]);
+      break;
+    }
   }
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_WARN, "[Bds]BootManagerMenu FFS section can not be found, skip its boot option registration\n"));
-    return EFI_NOT_FOUND;
+  if (HandleCount != 0) {
+    FreePool (Handles);
   }
 
-  //
-  // Get BootManagerMenu application's description from EFI User Interface Section.
-  //
-  Status = GetSectionFromFv (
-             PcdGetPtr (PcdBootManagerMenuFile),
-             EFI_SECTION_USER_INTERFACE,
-             0,
-             (VOID **) &Description,
-             &DescriptionLength
-             );
-  if (EFI_ERROR (Status)) {
-    Description = NULL;
-  }
+  if (DevicePath == NULL) {
+    Data = NULL;
+    Status = GetSectionFromFv (
+               PcdGetPtr (PcdBootManagerMenuFile),
+               EFI_SECTION_PE32,
+               0,
+               (VOID **) &Data,
+               &DataSize
+               );
+    if (Data != NULL) {
+      FreePool (Data);
+    }
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN, "[Bds]BootManagerMenu FFS section can not be found, skip its boot option registration\n"));
+      return EFI_NOT_FOUND;
+    }
 
-  EfiInitializeFwVolDevicepathNode (&FileNode, PcdGetPtr (PcdBootManagerMenuFile));
-  Status = gBS->HandleProtocol (
-                  gImageHandle,
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID **) &LoadedImage
-                  );
-  ASSERT_EFI_ERROR (Status);
-  DevicePath = AppendDevicePathNode (
-                 DevicePathFromHandle (LoadedImage->DeviceHandle),
-                 (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
-                 );
-  ASSERT (DevicePath != NULL);
+    //
+    // Get BootManagerMenu application's description from EFI User Interface Section.
+    //
+    Status = GetSectionFromFv (
+               PcdGetPtr (PcdBootManagerMenuFile),
+               EFI_SECTION_USER_INTERFACE,
+               0,
+               (VOID **) &Description,
+               &DescriptionLength
+               );
+    if (EFI_ERROR (Status)) {
+      Description = NULL;
+    }
+
+    EfiInitializeFwVolDevicepathNode (&FileNode, PcdGetPtr (PcdBootManagerMenuFile));
+    Status = gBS->HandleProtocol (
+                    gImageHandle,
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **) &LoadedImage
+                    );
+    ASSERT_EFI_ERROR (Status);
+    DevicePath = AppendDevicePathNode (
+                   DevicePathFromHandle (LoadedImage->DeviceHandle),
+                   (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
+                   );
+    ASSERT (DevicePath != NULL);
+  }
 
   Status = EfiBootManagerInitializeLoadOption (
              BootOption,
