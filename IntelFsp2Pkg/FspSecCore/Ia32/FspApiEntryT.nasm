@@ -172,7 +172,15 @@ ASM_PFX(LoadMicrocodeDefault):
    cmp    eax, 0
    jz     ParamError
    mov    esp, eax
-   
+
+   ; skip loading Microcode if the MicrocodeCodeSize is zero
+   ; and report error if size is less than 2k
+   mov    eax, dword [esp + LoadMicrocodeParams.MicrocodeCodeSize]
+   cmp    eax, 0
+   jz     Exit2
+   cmp    eax, 0800h
+   jl     ParamError
+
    mov    esi, dword [esp + LoadMicrocodeParams.MicrocodeCodeAddr]
    cmp    esi, 0
    jnz    CheckMainHeader
