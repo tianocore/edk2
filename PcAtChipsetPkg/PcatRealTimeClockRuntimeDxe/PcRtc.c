@@ -1271,7 +1271,7 @@ GetCenturyRtcAddress (
   Fadt = NULL;
   if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
     Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->XsdtAddress;
-    Fadt = ScanTableInSDT (Xsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE, sizeof (UINT64));
+    Fadt = ScanTableInSDT (Xsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE, sizeof (UINTN));
   }
 
   if (Fadt == NULL) {
