@@ -162,14 +162,14 @@ if not defined WORKSPACE (
 
 if not defined CONF_PATH (
   set CONF_PATH=%WORKSPACE%\Conf
+)
 
-  if NOT exist %CONF_PATH% (
-    if defined PACKAGES_PATH (
-      for %%i IN (%PACKAGES_PATH%) DO (
-        if exist %%~fi\Conf (
-          set CONF_PATH=%%i\Conf
-          goto CopyConf
-        )
+if NOT exist %CONF_PATH% (
+  if defined PACKAGES_PATH (
+    for %%i IN (%PACKAGES_PATH%) DO (
+      if exist %%~fi\Conf (
+        set CONF_PATH=%%i\Conf
+        goto CopyConf
       )
     )
   )
