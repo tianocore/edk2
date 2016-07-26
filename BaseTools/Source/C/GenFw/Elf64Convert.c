@@ -806,26 +806,59 @@ WriteSections64 (
           switch (ELF_R_TYPE(Rel->r_info)) {
 
           case R_AARCH64_ADR_PREL_PG_HI21:
+            //
+            // AArch64 PG_H21 relocations are typically paired with ABS_LO12
+            // relocations, where a PC-relative reference with +/- 4 GB range is
+            // split into a relative high part and an absolute low part. Since
+            // the absolute low part represents the offset into a 4 KB page, we
+            // either have to convert the ADRP into an ADR instruction, or we
+            // need to use a section alignment of at least 4 KB, so that the
+            // binary appears at a correct offset at runtime. In any case, we
+            // have to make sure that the 4 KB relative offsets of both the
+            // section containing the reference as well as the section to which
+            // it refers have not been changed during PE/COFF conversion (i.e.,
+            // in ScanSections64() above).
+            //
+            if (mCoffAlignment < 0x1000) {
+              //
+              // Attempt to convert the ADRP into an ADR instruction.
+              // This is only possible if the symbol is within +/- 1 MB.
+              //
+              INT64 Offset;
+
+              // Decode the ADRP instruction
+              Offset = (INT32)((*(UINT32 *)Targ & 0xffffe0) << 8);
+              Offset = (Offset << (6 - 5)) | ((*(UINT32 *)Targ & 0x60000000) >> (29 - 12));
+
+              //
+              // ADRP offset is relative to the previous page boundary,
+              // whereas ADR offset is relative to the instruction itself.
+              // So fix up the offset so it points to the page containing
+              // the symbol.
+              //
+              Offset -= (UINTN)(Targ - mCoffFile) & 0xfff;
+
+              if (Offset < -0x100000 || Offset > 0xfffff) {
+                Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s  due to its size (> 1 MB), this module requires 4 KB section alignment.",
+                  mInImageName);
+                break;
+              }
+
+              // Re-encode the offset as an ADR instruction
+              *(UINT32 *)Targ &= 0x1000001f;
+              *(UINT32 *)Targ |= ((Offset & 0x1ffffc) << (5 - 2)) | ((Offset & 0x3) << 29);
+            }
+            /* fall through */
+
           case R_AARCH64_ADD_ABS_LO12_NC:
           case R_AARCH64_LDST8_ABS_LO12_NC:
           case R_AARCH64_LDST16_ABS_LO12_NC:
           case R_AARCH64_LDST32_ABS_LO12_NC:
           case R_AARCH64_LDST64_ABS_LO12_NC:
           case R_AARCH64_LDST128_ABS_LO12_NC:
-            //
-            // AArch64 PG_H21 relocations are typically paired with ABS_LO12
-            // relocations, where a PC-relative reference with +/- 4 GB range is
-            // split into a relative high part and an absolute low part. Since
-            // the absolute low part represents the offset into a 4 KB page, we
-            // have to make sure that the 4 KB relative offsets of both the
-            // section containing the reference as well as the section to which
-            // it refers have not been changed during PE/COFF conversion (i.e.,
-            // in ScanSections64() above).
-            //
             if (((SecShdr->sh_addr ^ SecOffset) & 0xfff) != 0 ||
-                ((SymShdr->sh_addr ^ mCoffSectionsOffset[Sym->st_shndx]) & 0xfff) != 0 ||
-                mCoffAlignment < 0x1000) {
-              Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s AARCH64 small code model requires 4 KB section alignment.",
+                ((SymShdr->sh_addr ^ mCoffSectionsOffset[Sym->st_shndx]) & 0xfff) != 0) {
+              Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s AARCH64 small code model requires identical ELF and PE/COFF section offsets modulo 4 KB.",
                 mInImageName);
               break;
             }
