@@ -3605,13 +3605,13 @@ class ModuleAutoGen(AutoGen):
         # Find all DynamicEx and PatchableInModule PCDs used by this module and dependent libraries
         # Also find all packages that the DynamicEx PCDs depend on
         Pcds = []
-        PatchablePcds = {}
+        PatchablePcds = []
         Packages = []
         PcdCheckList = []
         PcdTokenSpaceList = []
         for Pcd in self.ModulePcdList + self.LibraryPcdList:
             if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE:
-                PatchablePcds[Pcd.TokenCName] = Pcd
+                PatchablePcds += [Pcd]
                 PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, 'PatchableInModule'))
             elif Pcd.Type in GenC.gDynamicExPcd:
                 if Pcd not in Pcds:
@@ -3764,15 +3764,17 @@ class ModuleAutoGen(AutoGen):
                             os.path.join(self.OutputDir, self.Name + '.efi')
                         )
         if PatchList:
-            for PatchPcd in PatchList:
-                if PatchPcd[0] in PatchablePcds:
-                    key = PatchPcd[0]
-                elif PatchPcd[0] + '_PatchableInModule' in PatchablePcds:
-                    key = PatchPcd[0] + '_PatchableInModule'
+            for Pcd in PatchablePcds:
+                TokenCName = Pcd.TokenCName
+                for PcdItem in GlobalData.MixedPcd:
+                    if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                        TokenCName = PcdItem[0]
+                        break
+                for PatchPcd in PatchList:
+                    if TokenCName == PatchPcd[0]:
+                        break
                 else:
                     continue
-                Pcd = PatchablePcds[key]
-                TokenCName = PatchPcd[0]
                 PcdValue = ''
                 if Pcd.DatumType != 'VOID*':
                     HexFormat = '0x%02x'
