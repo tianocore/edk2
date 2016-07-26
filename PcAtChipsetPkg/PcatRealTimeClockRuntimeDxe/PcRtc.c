@@ -1250,8 +1250,6 @@ GetCenturyRtcAddress (
 {
   EFI_STATUS                                    Status;
   EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
   EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
 
   Status = EfiGetSystemConfigurationTable (&gEfiAcpiTableGuid, (VOID **) &Rsdp);
@@ -1259,27 +1257,32 @@ GetCenturyRtcAddress (
     Status = EfiGetSystemConfigurationTable (&gEfiAcpi10TableGuid, (VOID **) &Rsdp);
   }
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Rsdp == NULL)) {
     return 0;
   }
 
-  ASSERT (Rsdp != NULL);
+  Fadt = NULL;
 
   //
   // Find FADT in XSDT
   //
-  Fadt = NULL;
-  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
-    Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->XsdtAddress;
-    Fadt = ScanTableInSDT (Xsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE, sizeof (UINTN));
+  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION && Rsdp->XsdtAddress != 0) {
+    Fadt = ScanTableInSDT (
+             (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->XsdtAddress,
+             EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+             sizeof (UINTN)
+             );
   }
 
-  if (Fadt == NULL) {
-    //
-    // Find FADT in RSDT
-    //
-    Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->RsdtAddress;
-    Fadt = ScanTableInSDT (Rsdt, EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE, sizeof (UINT32));
+  //
+  // Find FADT in RSDT
+  //
+  if (Fadt == NULL && Rsdp->RsdtAddress != 0) {
+    Fadt = ScanTableInSDT (
+             (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->RsdtAddress,
+             EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+             sizeof (UINT32)
+             );
   }
 
   if ((Fadt != NULL) &&
