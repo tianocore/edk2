@@ -62,6 +62,12 @@ SECTIONS {
     KEEP (*(.hii))
   }
 
+  /*
+   * Retain the GNU build id but in a non-allocatable section so GenFw
+   * does not copy it into the PE/COFF image.
+   */
+  .build-id (INFO) : { *(.note.gnu.build-id) }
+
   /DISCARD/ : {
     *(.note.GNU-stack)
     *(.gnu_debuglink)
