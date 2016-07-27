@@ -2,6 +2,7 @@
   Main SEC phase code.  Transitions to PEI.
 
   Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -332,11 +333,11 @@ DecompressMemFvs (
   UINT32                            AuthenticationStatus;
   VOID                              *OutputBuffer;
   VOID                              *ScratchBuffer;
-  EFI_FIRMWARE_VOLUME_IMAGE_SECTION *FvSection;
+  EFI_COMMON_SECTION_HEADER         *FvSection;
   EFI_FIRMWARE_VOLUME_HEADER        *PeiMemFv;
   EFI_FIRMWARE_VOLUME_HEADER        *DxeMemFv;
 
-  FvSection = (EFI_FIRMWARE_VOLUME_IMAGE_SECTION*) NULL;
+  FvSection = (EFI_COMMON_SECTION_HEADER*) NULL;
 
   Status = FindFfsFileAndSection (
              *Fv,
@@ -386,7 +387,7 @@ DecompressMemFvs (
              OutputBufferSize,
              EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
              0,
-             (EFI_COMMON_SECTION_HEADER**) &FvSection
+             &FvSection
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Unable to find PEI FV section\n"));
@@ -411,7 +412,7 @@ DecompressMemFvs (
              OutputBufferSize,
              EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
              1,
-             (EFI_COMMON_SECTION_HEADER**) &FvSection
+             &FvSection
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Unable to find DXE FV section\n"));
