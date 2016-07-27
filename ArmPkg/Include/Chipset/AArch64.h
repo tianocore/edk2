@@ -49,6 +49,7 @@
 #define ARM_CPU_TYPE_AEMv8      0xD0F
 #define ARM_CPU_TYPE_A53        0xD03
 #define ARM_CPU_TYPE_A57        0xD07
+#define ARM_CPU_TYPE_A72        0xD08
 #define ARM_CPU_TYPE_A15        0xC0F
 #define ARM_CPU_TYPE_A9         0xC09
 #define ARM_CPU_TYPE_A7         0xC07
