@@ -30,14 +30,6 @@
 #include <Library/IoLib.h>
 #include <Library/PrintLib.h>
 
-//
-// Hardware platform identifiers
-//
-typedef enum {
-  UNKNOWN,
-  JUNO_R0,
-  JUNO_R1
-} JUNO_REVISION;
 
 // This GUID must match the FILE_GUID in ArmPlatformPkg/ArmJunoPkg/AcpiTables/AcpiTables.inf
 STATIC CONST EFI_GUID mJunoAcpiTableFile = { 0xa1dd808e, 0x1e95, 0x4399, { 0xab, 0xc0, 0x65, 0x3c, 0x82, 0xe8, 0x53, 0x0c } };
@@ -134,6 +126,16 @@ AcpiTableJunoR1Check (
   return TRUE;
 }
 
+STATIC
+BOOLEAN
+AcpiTableJunoR2Check (
+  IN  EFI_ACPI_DESCRIPTION_HEADER *AcpiHeader
+  )
+{
+  return TRUE;
+}
+
+
 EFI_STATUS
 EFIAPI
 ArmJunoEntryPoint (
@@ -146,13 +148,9 @@ ArmJunoEntryPoint (
   CHAR16                *TextDevicePath;
   UINTN                 TextDevicePathSize;
   VOID                  *Buffer;
-  UINT32                Midr;
-  UINT32                CpuType;
-  UINT32                CpuRev;
-  JUNO_REVISION         JunoRevision;
+  UINT32                JunoRevision;
   EFI_EVENT             EndOfDxeEvent;
 
-  JunoRevision = UNKNOWN;
   Status = PciEmulationEntryPoint ();
   if (EFI_ERROR (Status)) {
     return Status;
@@ -217,47 +215,25 @@ ArmJunoEntryPoint (
     DEBUG ((EFI_D_ERROR, "ArmJunoDxe: Failed to install ShellDynCmdRunAxf\n"));
   }
 
-  //
-  // We detect whether we are running on a Juno r0 or Juno r1 board at
-  // runtime by checking the value of the MIDR register.
-  //
-
-  Midr     = ArmReadMidr ();
-  CpuType  = (Midr >> ARM_CPU_TYPE_SHIFT) & ARM_CPU_TYPE_MASK;
-  CpuRev   = Midr & ARM_CPU_REV_MASK;
-
-  switch (CpuType) {
-  case ARM_CPU_TYPE_A53:
-    if (CpuRev == ARM_CPU_REV (0, 0)) {
-      JunoRevision = JUNO_R0;
-    } else if (CpuRev == ARM_CPU_REV (0, 3)) {
-      JunoRevision = JUNO_R1;
-    }
-    break;
-
-  case ARM_CPU_TYPE_A57:
-    if (CpuRev == ARM_CPU_REV (0, 0)) {
-      JunoRevision = JUNO_R0;
-    } else if (CpuRev == ARM_CPU_REV (1, 1)) {
-      JunoRevision = JUNO_R1;
-    }
-  }
+  GetJunoRevision(JunoRevision);
 
   //
   // Try to install the ACPI Tables
   //
-  if (JunoRevision == JUNO_R0) {
+  if (JunoRevision == JUNO_REVISION_R0) {
     Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR0Check);
-  } else if (JunoRevision == JUNO_R1) {
+  } else if (JunoRevision == JUNO_REVISION_R1) {
     Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR1Check);
+  } else if (JunoRevision == JUNO_REVISION_R2) {
+    Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR2Check);
   }
+
   ASSERT_EFI_ERROR (Status);
 
-
   //
-  // Set the R1 two boot options if not already done.
+  // Setup R1/R2 options if not already done.
   //
-  if (JunoRevision == JUNO_R1) {
+  if (JunoRevision != JUNO_REVISION_R0) {
     // Enable PCI enumeration
     PcdSetBool (PcdPciDisableBusEnumeration, FALSE);
 
