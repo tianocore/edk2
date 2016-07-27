@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define checkpoints used by ECC tool
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1087,7 +1087,7 @@ class Check(object):
         SqlCommand = """
                      select A.ID, A.Value1 from %s as A, %s as B
                      where A.Model = %s and B.Model = %s
-                     and A.Value1 = B.Value1 and A.ID <> B.ID
+                     and A.Value1 like B.Value1 and A.ID <> B.ID
                      and A.Scope1 = B.Scope1
                      and A.Enabled > -1
                      and B.Enabled > -1
@@ -1111,7 +1111,7 @@ class Check(object):
         SqlCommand = """
                      select A.ID, A.Value1, A.Value2 from %s as A, %s as B
                      where A.Model = %s and B.Model = %s
-                     and A.Value2 = B.Value2 and A.ID <> B.ID
+                     and A.Value2 like B.Value2 and A.ID <> B.ID
                      and A.Scope1 = B.Scope1 and A.Value1 <> B.Value1
                      group by A.ID
                      """ % (Table.Table, Table.Table, Model, Model)
