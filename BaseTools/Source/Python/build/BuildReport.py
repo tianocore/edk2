@@ -47,6 +47,9 @@ from Common.DataType import TAB_BACK_SLASH
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import Common.GlobalData as GlobalData
+from AutoGen.AutoGen import ModuleAutoGen
+from Common.Misc import PathClass
+from Common.String import NormPath
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -1647,8 +1650,21 @@ class PlatformReport(object):
         else:
             self._IsModuleBuild = False
             for Pa in Wa.AutoGenObjectList:
+                ModuleAutoGenList = []
                 for ModuleKey in Pa.Platform.Modules:
-                    self.ModuleReportList.append(ModuleReport(Pa.Platform.Modules[ModuleKey].M, ReportType))
+                    ModuleAutoGenList.append(Pa.Platform.Modules[ModuleKey].M)
+                if GlobalData.gFdfParser != None:
+                    if Pa.Arch in GlobalData.gFdfParser.Profile.InfDict:
+                        INFList = GlobalData.gFdfParser.Profile.InfDict[Pa.Arch]
+                        for InfName in INFList:
+                            InfClass = PathClass(NormPath(InfName), Wa.WorkspaceDir, Pa.Arch)
+                            Ma = ModuleAutoGen(Wa, InfClass, Pa.BuildTarget, Pa.ToolChain, Pa.Arch, Wa.MetaFile)
+                            if Ma == None:
+                                continue
+                            if Ma not in ModuleAutoGenList:
+                                ModuleAutoGenList.append(Ma)
+                for MGen in ModuleAutoGenList:
+                    self.ModuleReportList.append(ModuleReport(MGen, ReportType))
 
 
 

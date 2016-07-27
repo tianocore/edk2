@@ -1942,6 +1942,10 @@ class PlatformAutoGen(AutoGen):
     #   @retval library_list    List of library instances sorted
     #
     def ApplyLibraryInstance(self, Module):
+        # Cover the case that the binary INF file is list in the FDF file but not DSC file, return empty list directly
+        if str(Module) not in self.Platform.Modules:
+            return []
+
         ModuleType = Module.ModuleType
 
         # for overridding library instances with module specific setting
