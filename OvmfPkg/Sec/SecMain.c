@@ -336,6 +336,8 @@ DecompressMemFvs (
   EFI_COMMON_SECTION_HEADER         *FvSection;
   EFI_FIRMWARE_VOLUME_HEADER        *PeiMemFv;
   EFI_FIRMWARE_VOLUME_HEADER        *DxeMemFv;
+  UINT32                            FvHeaderSize;
+  UINT32                            FvSectionSize;
 
   FvSection = (EFI_COMMON_SECTION_HEADER*) NULL;
 
@@ -420,11 +422,19 @@ DecompressMemFvs (
   }
 
   ASSERT (FvSection->Type == EFI_SECTION_FIRMWARE_VOLUME_IMAGE);
-  ASSERT (SECTION_SIZE (FvSection) ==
-          (PcdGet32 (PcdOvmfDxeMemFvSize) + sizeof (*FvSection)));
+
+  if (IS_SECTION2 (FvSection)) {
+    FvSectionSize = SECTION2_SIZE (FvSection);
+    FvHeaderSize = sizeof (EFI_COMMON_SECTION_HEADER2);
+  } else {
+    FvSectionSize = SECTION_SIZE (FvSection);
+    FvHeaderSize = sizeof (EFI_COMMON_SECTION_HEADER);
+  }
+
+  ASSERT (FvSectionSize == (PcdGet32 (PcdOvmfDxeMemFvSize) + FvHeaderSize));
 
   DxeMemFv = (EFI_FIRMWARE_VOLUME_HEADER*)(UINTN) PcdGet32 (PcdOvmfDxeMemFvBase);
-  CopyMem (DxeMemFv, (VOID*) (FvSection + 1), PcdGet32 (PcdOvmfDxeMemFvSize));
+  CopyMem (DxeMemFv, (VOID*) ((UINTN)FvSection + FvHeaderSize), PcdGet32 (PcdOvmfDxeMemFvSize));
 
   if (DxeMemFv->Signature != EFI_FVH_SIGNATURE) {
     DEBUG ((EFI_D_ERROR, "Extracted FV at %p does not have FV header signature\n", DxeMemFv));
