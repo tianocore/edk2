@@ -23,6 +23,11 @@
 
 // Motherboard Peripheral and On-chip peripheral
 #define ARM_VE_BOARD_PERIPH_BASE              0x1C010000
+#define ARM_VE_BOARD_SYS_ID                   0x0000
+#define ARM_VE_BOARD_SYS_PCIE_GBE_L           0x0074
+#define ARM_VE_BOARD_SYS_PCIE_GBE_H           0x0078
+
+#define ARM_VE_BOARD_SYS_ID_REV(word)         ((word >> 28) & 0xff)
 
 // NOR Flash 0
 #define ARM_VE_SMB_NOR0_BASE                  0x08000000
@@ -83,6 +88,26 @@
     EFI_ACPI_ARM_CREATOR_REVISION   /* UINT32  CreatorRevision */ \
   }
 
+//
+// Hardware platform identifiers
+//
+#define JUNO_REVISION_PROTOTYPE 0
+#define JUNO_REVISION_R0        1
+#define JUNO_REVISION_R1        2
+#define JUNO_REVISION_R2        3
+#define JUNO_REVISION_UKNOWN    0xFF
+
+//
+// We detect whether we are running on a Juno r0, r1 or r2
+// board at runtime by checking the value of board SYS_ID
+//
+#define GetJunoRevision(JunoRevision)                                  \
+{                                                                      \
+  UINT32    SysId;                                                     \
+  SysId = MmioRead32 (ARM_VE_BOARD_PERIPH_BASE+ARM_VE_BOARD_SYS_ID);   \
+  JunoRevision = ARM_VE_BOARD_SYS_ID_REV( SysId );                     \
+}
+
 #define JUNO_WATCHDOG_COUNT  2
 
 // Define if the exported ACPI Tables are based on ACPI 5.0 spec or latest
@@ -93,7 +118,7 @@
 // assigned to the PCI Gigabyte Ethernet device.
 //
 
-#define ARM_JUNO_SYS_PCIGBE_L  (ARM_VE_BOARD_PERIPH_BASE + 0x74)
-#define ARM_JUNO_SYS_PCIGBE_H  (ARM_VE_BOARD_PERIPH_BASE + 0x78)
+#define ARM_JUNO_SYS_PCIGBE_L  (ARM_VE_BOARD_PERIPH_BASE + ARM_VE_BOARD_SYS_PCIE_GBE_L)
+#define ARM_JUNO_SYS_PCIGBE_H  (ARM_VE_BOARD_PERIPH_BASE + ARM_VE_BOARD_SYS_PCIE_GBE_H)
 
 #endif
