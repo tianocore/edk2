@@ -87,6 +87,8 @@ typedef struct {
 //
 typedef enum {
   DefaultValueFromDefault = 0,     // Get from the minimum or first one when not set default value.
+  DefaultValueFromOtherDefault,    // Get default vale from other default when no default(When other
+                                   // defaults are more than one, use the default with smallest default id).
   DefaultValueFromFlag,            // Get default value from the defalut flag.
   DefaultValueFromOpcode           // Get default value from default opcode, highest priority.
 } DEFAULT_VALUE_TYPE;

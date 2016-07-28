@@ -1151,8 +1151,9 @@ InsertDefaultValue (
     if (DefaultValueArray->DefaultId == DefaultValueData->DefaultId) {
       //
       // DEFAULT_VALUE_FROM_OPCODE has high priority, DEFAULT_VALUE_FROM_DEFAULT has low priority.
+      // When default types are DEFAULT_VALUE_FROM_OTHER_DEFAULT, the default value can be overrode.
       //
-      if (DefaultValueData->Type > DefaultValueArray->Type) {
+      if ((DefaultValueData->Type > DefaultValueArray->Type) || (DefaultValueData->Type == DefaultValueArray->Type && DefaultValueData->Type == DefaultValueFromOtherDefault)) {
         //
         // Update the default value array in BlockData.
         //
@@ -2101,6 +2102,9 @@ ParseIfrData (
   EFI_IFR_VARSTORE_NAME_VALUE *IfrNameValueVarStore;
   EFI_HII_PACKAGE_HEADER   *PackageHeader;
   EFI_VARSTORE_ID          VarStoreId;
+  UINT16                   SmallestDefaultId;
+  UINT16                   SmallestIdFromFlag;
+  BOOLEAN                  FromOtherDefaultOpcode;
 
   Status           = EFI_SUCCESS;
   BlockData        = NULL;
@@ -2110,6 +2114,8 @@ ParseIfrData (
   FirstOrderedList = FALSE;
   VarStoreName     = NULL;
   ZeroMem (&DefaultData, sizeof (IFR_DEFAULT_DATA));
+  SmallestDefaultId = 0xFFFF;
+  FromOtherDefaultOpcode = FALSE;
 
   //
   // Go through the form package to parse OpCode one by one.
@@ -2475,6 +2481,8 @@ ParseIfrData (
       //
       ASSERT (BlockData != NULL);
 
+      SmallestIdFromFlag = FALSE;
+
       //
       // Add default value for standard ID by CheckBox Flag
       //
@@ -2489,17 +2497,16 @@ ParseIfrData (
         //
         DefaultData.Type    = DefaultValueFromFlag;
         DefaultData.Value.b = TRUE;
-      } else {
-        //
-        // When flag is not set, defautl value is FASLE.
-        //
-        DefaultData.Type    = DefaultValueFromDefault;
-        DefaultData.Value.b = FALSE;
+        InsertDefaultValue (BlockData, &DefaultData);
+
+        if (SmallestDefaultId > EFI_HII_DEFAULT_CLASS_STANDARD) {
+          //
+          // Record the SmallestDefaultId and update the SmallestIdFromFlag.
+          //
+          SmallestDefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
+          SmallestIdFromFlag = TRUE;
+        }
       }
-      //
-      // Add DefaultValue into current BlockData
-      //
-      InsertDefaultValue (BlockData, &DefaultData);
 
       //
       // Add default value for Manufacture ID by CheckBox Flag
@@ -2515,17 +2522,45 @@ ParseIfrData (
         //
         DefaultData.Type    = DefaultValueFromFlag;
         DefaultData.Value.b = TRUE;
+        InsertDefaultValue (BlockData, &DefaultData);
+
+        if (SmallestDefaultId > EFI_HII_DEFAULT_CLASS_MANUFACTURING) {
+          //
+          // Record the SmallestDefaultId and update the SmallestIdFromFlag.
+          //
+          SmallestDefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
+          SmallestIdFromFlag = TRUE;
+        }
+      }
+      if (SmallestIdFromFlag) {
+        //
+        // When smallest default Id is given by the  flag of CheckBox, set defaut value with TRUE for other default Id in the DefaultId list.
+        //
+        DefaultData.Type    = DefaultValueFromOtherDefault;
+        DefaultData.Value.b = TRUE;
+        //
+        // Set default value for all the default id in the DefaultId list.
+        //
+        for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
+          DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry);
+          DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
+          InsertDefaultValue (BlockData, &DefaultData);
+        }
       } else {
         //
         // When flag is not set, defautl value is FASLE.
         //
         DefaultData.Type    = DefaultValueFromDefault;
         DefaultData.Value.b = FALSE;
+        //
+        // Set default value for all the default id in the DefaultId list.
+        //
+        for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
+          DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry);
+          DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
+          InsertDefaultValue (BlockData, &DefaultData);
+        }
       }
-      //
-      // Add DefaultValue into current BlockData
-      //
-      InsertDefaultValue (BlockData, &DefaultData);
       break;
 
     case EFI_IFR_DATE_OP:
@@ -2779,6 +2814,7 @@ ParseIfrData (
 
       //
       // 1. Set default value for OneOf option when flag field has default attribute.
+      //    And set the default value with the smallest default id for other default id in the DefaultId list.
       //
       if (((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) ||
           ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT_MFG) == EFI_IFR_OPTION_DEFAULT_MFG)) {
@@ -2787,6 +2823,8 @@ ParseIfrData (
         // The first oneof option value will be used as default value when no default value is specified. 
         //
         FirstOneOfOption = FALSE;
+
+        SmallestIdFromFlag = FALSE;
         
         // Prepare new DefaultValue
         //
@@ -2795,10 +2833,39 @@ ParseIfrData (
         if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT) == EFI_IFR_OPTION_DEFAULT) {
           DefaultData.DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
           InsertDefaultValue (BlockData, &DefaultData);
-        } 
+          if (SmallestDefaultId > EFI_HII_DEFAULT_CLASS_STANDARD) {
+            //
+            // Record the SmallestDefaultId and update the SmallestIdFromFlag.
+            //
+            SmallestDefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
+            SmallestIdFromFlag = TRUE;
+          }
+        }
         if ((IfrOneOfOption->Flags & EFI_IFR_OPTION_DEFAULT_MFG) == EFI_IFR_OPTION_DEFAULT_MFG) {
           DefaultData.DefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
           InsertDefaultValue (BlockData, &DefaultData);
+          if (SmallestDefaultId > EFI_HII_DEFAULT_CLASS_MANUFACTURING) {
+            //
+            // Record the SmallestDefaultId and update the SmallestIdFromFlag.
+            //
+            SmallestDefaultId = EFI_HII_DEFAULT_CLASS_MANUFACTURING;
+            SmallestIdFromFlag = TRUE;
+          }
+        }
+
+        if (SmallestIdFromFlag) {
+          //
+          // When smallest default Id is given by the flag of oneofOption, set this option value for other default Id in the DefaultId list.
+          //
+          DefaultData.Type = DefaultValueFromOtherDefault;
+          //
+          // Set default value for other default id in the DefaultId list.
+          //
+          for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
+            DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry);
+            DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
+            InsertDefaultValue (BlockData, &DefaultData);
+          }
         }
       }
 
@@ -2856,6 +2923,25 @@ ParseIfrData (
       InsertDefaultValue (BlockData, &DefaultData);
 
       //
+      // Set default value for other default id in the DefaultId list.
+      // when SmallestDefaultId == VarDefaultId means there are two defaults with same default Id.
+      // If the two defaults are both from default opcode, use the first default as the default value of other default Id.
+      // If one from flag and the other form default opcode, use the default opcode value as the default value of other default Id.
+      //
+      if ((SmallestDefaultId > VarDefaultId) || (SmallestDefaultId == VarDefaultId && !FromOtherDefaultOpcode)) {
+        FromOtherDefaultOpcode = TRUE;
+        SmallestDefaultId = VarDefaultId;
+        for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
+          DefaultDataPtr = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry);
+          if (DefaultDataPtr->DefaultId != DefaultData.DefaultId){
+            DefaultData.Type        = DefaultValueFromOtherDefault;
+            DefaultData.DefaultId   = DefaultDataPtr->DefaultId;
+            InsertDefaultValue (BlockData, &DefaultData);
+          }
+        }
+      }
+
+      //
       // After insert the default value, reset the cleaned value for next 
       // time used. If not set here, need to set the value before everytime 
       // use it.
@@ -2873,6 +2959,11 @@ ParseIfrData (
         }
         if (BlockData->Scope == 0) {
           BlockData = NULL;
+          //
+          // when finishing parsing a question, clean the SmallestDefaultId and GetDefaultFromDefaultOpcode.
+          //
+          SmallestDefaultId = 0xFFFF;
+          FromOtherDefaultOpcode = FALSE;
         }
       }
 
