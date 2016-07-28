@@ -58,6 +58,7 @@ Abstract:
 #include <PchAccess.h>
 #include <Guid/Vlv2Variable.h>
 #include <Guid/PlatformCpuInfo.h>
+#include <IndustryStandard/WindowsSmmSecurityMitigationTable.h>
 
 
 CHAR16    EfiPlatformCpuInfoVariable[] = L"PlatformCpuInfo";
@@ -238,6 +239,7 @@ PlatformUpdateTables (
   UINT8                                                       TempVal;
   EFI_ACPI_3_0_IO_APIC_STRUCTURE                              *IOApicType;
   EFI_ACPI_3_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER         *APICTableHeader;
+  EFI_ACPI_WSMT_TABLE                                         *WsmtTable;
 
   CurrPtr                 = NULL;
   EndPtr                  = NULL;
@@ -599,6 +601,17 @@ PlatformUpdateTables (
       gBS->FreePool (OcurModelStringBuffer);
       gBS->FreePool (OcurRefDataBlockBuffer);
       break;
+
+
+    case EFI_ACPI_WINDOWS_SMM_SECURITY_MITIGATION_TABLE_SIGNATURE:
+      WsmtTable = (EFI_ACPI_WSMT_TABLE *) Table;
+       //
+       // Update Microsoft WSMT table Protections flags.
+       //
+      WsmtTable->ProtectionFlags = ((WsmtTable->ProtectionFlags) | (EFI_WSMT_PROTECTION_FLAGS_FIXED_COMM_BUFFERS | EFI_WSMT_PROTECTION_FLAGS_COMM_BUFFER_NESTED_PTR_PROTECTION ));
+      break;
+
+
     default:
       break;
   }
