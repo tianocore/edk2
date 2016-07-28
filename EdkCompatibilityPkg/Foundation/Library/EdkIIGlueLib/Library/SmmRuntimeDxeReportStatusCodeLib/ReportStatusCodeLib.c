@@ -280,7 +280,7 @@ GlueReportStatusCodeExtractDebugInfo (
   // The first 12 * UINTN bytes of the string are really an
   // argument stack to support varargs on the Format string.
   //
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
   // This is non portable C code you can't assume VA_LIST is pointer
   return FALSE;
 #else

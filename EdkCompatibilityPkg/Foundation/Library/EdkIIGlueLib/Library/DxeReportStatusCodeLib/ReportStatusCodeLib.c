@@ -296,7 +296,7 @@ GlueReportStatusCodeExtractDebugInfo (
 
   *ErrorLevel = DebugInfo->ErrorLevel;
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
   // This is non portable C code you can't assume VA_LIST is pointer
   return FALSE;
 #else
