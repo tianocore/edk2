@@ -667,7 +667,7 @@ FreeResources:
     if (ShellInfoObject.NewEfiShellProtocol->IsRootShell()){
       InternalEfiShellSetEnv(L"cwd", NULL, TRUE);
     }
-    CleanUpShellProtocol(ShellInfoObject.NewEfiShellProtocol);
+    CleanUpShellEnvironment (ShellInfoObject.NewEfiShellProtocol);
     DEBUG_CODE(ShellInfoObject.NewEfiShellProtocol = NULL;);
   }
 
