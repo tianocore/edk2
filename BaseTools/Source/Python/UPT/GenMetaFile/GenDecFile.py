@@ -65,6 +65,7 @@ from Library.DataType import TAB_SECTION_END
 from Library.DataType import TAB_SPLIT
 import Library.DataType as DT
 from Library.UniClassObject import FormatUniEntry
+from Library.String import GetUniFileName
 
 def GenPcd(Package, Content):
     #
@@ -586,9 +587,9 @@ def GenPackageUNIEncodeFile(PackageObject, UniFileHeader = '', Encoding=TAB_ENCO
         
     if not os.path.exists(os.path.dirname(PackageObject.GetFullPath())):
         os.makedirs(os.path.dirname(PackageObject.GetFullPath()))
-    ContainerFile = os.path.normpath(os.path.join(os.path.dirname(PackageObject.GetFullPath()), 
-                                                  (PackageObject.GetBaseName() + '.uni')))
     
+    ContainerFile = GetUniFileName(os.path.dirname(PackageObject.GetFullPath()), PackageObject.GetBaseName())
+
     Content = UniFileHeader + '\r\n'
     Content += '\r\n'
     

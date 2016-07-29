@@ -2,7 +2,7 @@
 # This file is used to define common string related functions used in parsing
 # process
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available
 # under the terms and conditions of the BSD License which accompanies this
@@ -957,3 +957,27 @@ def IsMatchArch(Arch1, Arch2):
                     return True
 
     return False
+
+# Search all files in FilePath to find the FileName with the largest index
+# Return the FileName with index +1 under the FilePath
+#
+def GetUniFileName(FilePath, FileName):
+    Files = os.listdir(FilePath)
+    LargestIndex = -1
+    for File in Files:
+        if File.upper().startswith(FileName.upper()) and File.upper().endswith('.UNI'):
+            Index = File.upper().replace(FileName.upper(), '').replace('.UNI', '')
+            if Index:
+                try:
+                    Index = int(Index)
+                except Exception:
+                    Index = -1
+            else:
+                Index = 0
+            if Index > LargestIndex:
+                LargestIndex = Index + 1
+
+    if LargestIndex > -1:
+        return os.path.normpath(os.path.join(FilePath, FileName + str(LargestIndex) + '.uni'))
+    else:
+        return os.path.normpath(os.path.join(FilePath, FileName + '.uni'))

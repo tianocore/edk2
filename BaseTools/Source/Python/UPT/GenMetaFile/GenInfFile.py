@@ -2,7 +2,7 @@
 #
 # This file contained the logical of transfer package object to INF files.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -41,6 +41,7 @@ import Logger.Log as Logger
 from Library import DataType as DT
 from GenMetaFile import GenMetaFileMisc
 from Library.UniClassObject import FormatUniEntry
+from Library.String import GetUniFileName
 
 
 ## Transfer Module Object to Inf files
@@ -225,8 +226,8 @@ def GenModuleUNIEncodeFile(ModuleObject, UniFileHeader='', Encoding=DT.TAB_ENCOD
         return
     else:
         ModuleObject.UNIFlag = True
-    ContainerFile = os.path.normpath(os.path.join(os.path.dirname(ModuleObject.GetFullPath()),
-                                                  (ModuleObject.GetBaseName() + '.uni')))
+    ContainerFile = GetUniFileName(os.path.dirname(ModuleObject.GetFullPath()), ModuleObject.GetBaseName())
+
     if not os.path.exists(os.path.dirname(ModuleObject.GetFullPath())):
         os.makedirs(os.path.dirname(ModuleObject.GetFullPath()))
 
