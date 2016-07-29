@@ -426,3 +426,4 @@
   # ACPI Support
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
