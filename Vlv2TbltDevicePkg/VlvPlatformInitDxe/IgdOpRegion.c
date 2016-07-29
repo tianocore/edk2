@@ -133,7 +133,6 @@ GetIntegratedIntelVbtPtr (
 {
   EFI_STATUS                    Status;
   EFI_PHYSICAL_ADDRESS          VbtAddress = 0;
-  UINT32                        VbtSize = 0;
   UINTN                         FvProtocolCount;
   EFI_HANDLE                    *FvHandles;
   EFI_FIRMWARE_VOLUME_PROTOCOL  *Fv;
@@ -174,7 +173,6 @@ GetIntegratedIntelVbtPtr (
 
       if (!EFI_ERROR (Status)) {
         VbtAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer;
-        VbtSize = (UINT32)VbtBufferSize;
         Status = EFI_SUCCESS;
         break;
       }
@@ -406,7 +404,6 @@ JudgeHandleIsPCIDevice(
 {
   EFI_STATUS  Status;
   EFI_DEVICE_PATH   *DPath;
-  EFI_DEVICE_PATH   *DevicePath;
 
   Status = gBS->HandleProtocol (
                   Handle,
@@ -414,7 +411,6 @@ JudgeHandleIsPCIDevice(
                   (VOID **) &DPath
                   );
   if(!EFI_ERROR(Status)) {
-    DevicePath = DPath;
     while(!IsDevicePathEnd(DPath)) {
       if((DPath->Type == HARDWARE_DEVICE_PATH) && (DPath->SubType == HW_PCI_DP)) {
         PCI_DEVICE_PATH   *PCIPath;
