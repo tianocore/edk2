@@ -1091,7 +1091,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
     !endif
        <BuildOptions>
         ICC:*_*_*_CC_FLAGS = -D MDEPKG_NDEBUG
-        GCC:*_*_*_CC_FLAGS = -D MDEPKG_NDEBUG
+        GCC:RELEASE_*_*_CC_FLAGS = -D MDEPKG_NDEBUG
   }
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
     <LibraryClasses>
