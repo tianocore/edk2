@@ -157,6 +157,7 @@ GetWakeupEventAndSaveToHob (
   }
 
   DEBUG ((EFI_D_ERROR, "ACPI Wake Status Register: %04x\n", Pm1Sts));
+  DEBUG ((EFI_D_ERROR, "ACPI Wake Event Data: %02x\n", WakeEventData));
 
   return EFI_SUCCESS;
 }
