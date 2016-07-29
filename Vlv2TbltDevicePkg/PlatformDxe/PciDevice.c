@@ -102,8 +102,6 @@ InitBadBars(
   )
 {
 
-  EFI_STATUS                          Status;
-  PCI_IO_DEVICE                       *PciIoDevice;
   UINT64                              BaseAddress = 0;
   UINT64                              TempBaseAddress = 0;
   UINT8                               RevId = 0;
@@ -112,8 +110,6 @@ InitBadBars(
   UINT64                              MemSize;
   UINTN                               MemSizeBits;
 
-
-  PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (PciIo);
   switch ( VendorId) {
     case ATI_VENDOR_ID:
       //
@@ -124,31 +120,31 @@ InitBadBars(
       //
       // Get original BAR address
       //
-      Status = PciIo->Pci.Read (
-                            PciIo,
-                            EfiPciIoWidthUint32,
-                            Bar,
-                            1,
-                                (VOID *) &BaseAddress
-                            );
+      PciIo->Pci.Read (
+                   PciIo,
+                   EfiPciIoWidthUint32,
+                   Bar,
+                   1,
+                       (VOID *) &BaseAddress
+                   );
       //
       // Find BAR size
       //
       TempBaseAddress = 0xffffffff;
-      Status = PciIo->Pci.Write (
-                            PciIo,
-                            EfiPciIoWidthUint32,
-                            Bar,
-                            1,
-                                 (VOID *) &TempBaseAddress
-                            );
-      Status = PciIo->Pci.Read (
-                            PciIo,
-                            EfiPciIoWidthUint32,
-                            Bar,
-                            1,
-                                (VOID *) &TempBaseAddress
-                            );
+      PciIo->Pci.Write (
+                   PciIo,
+                   EfiPciIoWidthUint32,
+                   Bar,
+                   1,
+                        (VOID *) &TempBaseAddress
+                   );
+      PciIo->Pci.Read (
+                   PciIo,
+                   EfiPciIoWidthUint32,
+                   Bar,
+                   1,
+                       (VOID *) &TempBaseAddress
+                   );
       TempBaseAddress &= 0xfffffffe;
       MemSize = 1;
       while ((TempBaseAddress & 0x01) == 0) {
@@ -159,32 +155,32 @@ InitBadBars(
       //
       // Free up allocated memory memory and re-allocate with increased size.
       //
-      Status = gDS->FreeMemorySpace (
-                      BaseAddress,
-                      MemSize
-                      );
+      gDS->FreeMemorySpace (
+             BaseAddress,
+             MemSize
+             );
       //
       // Force new alignment
       //
       MemSize = 0x8000000;
       MemSizeBits = 28;
 
-      Status = gDS->AllocateMemorySpace (
-                      EfiGcdAllocateAnySearchBottomUp,
-                      EfiGcdMemoryTypeMemoryMappedIo,
-                      MemSizeBits,           // Alignment
-                      MemSize,
-                      &BaseAddress,
-                      mImageHandle,
-                      NULL
-                      );
-      Status = PciIo->Pci.Write (
-                            PciIo,
-                            EfiPciIoWidthUint32,
-                            Bar,
-                            1,
-                                 (VOID *) &BaseAddress
-                            );
+      gDS->AllocateMemorySpace (
+             EfiGcdAllocateAnySearchBottomUp,
+             EfiGcdMemoryTypeMemoryMappedIo,
+             MemSizeBits,           // Alignment
+             MemSize,
+             &BaseAddress,
+             mImageHandle,
+             NULL
+             );
+      PciIo->Pci.Write (
+                   PciIo,
+                   EfiPciIoWidthUint32,
+                   Bar,
+                   1,
+                        (VOID *) &BaseAddress
+                   );
 
       break;
     case    NCR_VENDOR_ID:
@@ -195,22 +191,22 @@ InitBadBars(
   //
   for (Bar = 0x10; Bar < 0x28; Bar+= 4) {
 
-    Status = PciIo->Pci.Read (
-                          PciIo,
-                          EfiPciIoWidthUint32,
-                          Bar,
-                          1,
-                              (VOID *) &BaseAddress
-                          );
+    PciIo->Pci.Read (
+                 PciIo,
+                 EfiPciIoWidthUint32,
+                 Bar,
+                 1,
+                     (VOID *) &BaseAddress
+                 );
     if (BaseAddress && 0x01) {
       TempBaseAddress = 0xffffffff;
-      Status = PciIo->Pci.Write (
-                            PciIo,
-                            EfiPciIoWidthUint32,
-                            Bar,
-                            1,
-                                 (VOID *) &TempBaseAddress
-                            );
+      PciIo->Pci.Write (
+                   PciIo,
+                   EfiPciIoWidthUint32,
+                   Bar,
+                   1,
+                        (VOID *) &TempBaseAddress
+                   );
       TempBaseAddress &= 0xfffffffc;
       IoSize = 1;
       while ((TempBaseAddress & 0x01) == 0) {
@@ -218,28 +214,28 @@ InitBadBars(
         IoSize = IoSize << 1;
       }
       if (IoSize < MIN_NCR_IO_SIZE) {
-        Status = gDS->FreeIoSpace (
-                        BaseAddress,
-                        IoSize
-                        );
+        gDS->FreeIoSpace (
+               BaseAddress,
+               IoSize
+               );
 
-        Status = gDS->AllocateIoSpace (
-                        EfiGcdAllocateAnySearchTopDown,
-                        EfiGcdIoTypeIo,
-                        NCR_GRAN,           // Alignment
-                        MIN_NCR_IO_SIZE,
-                        &BaseAddress,
-                        mImageHandle,
-                        NULL
-                        );
+        gDS->AllocateIoSpace (
+               EfiGcdAllocateAnySearchTopDown,
+               EfiGcdIoTypeIo,
+               NCR_GRAN,           // Alignment
+               MIN_NCR_IO_SIZE,
+               &BaseAddress,
+               mImageHandle,
+               NULL
+               );
         TempBaseAddress = BaseAddress + 1;
-        Status = PciIo->Pci.Write (
-                              PciIo,
-                              EfiPciIoWidthUint32,
-                              Bar,
-                              1,
-                                   (VOID *) &TempBaseAddress
-                              );
+        PciIo->Pci.Write (
+                     PciIo,
+                     EfiPciIoWidthUint32,
+                     Bar,
+                     1,
+                          (VOID *) &TempBaseAddress
+                     );
       }
     }
   }
@@ -255,13 +251,13 @@ InitBadBars(
         //  Controller.
         //  All Tekoa A2 or earlier step chips for now.
         //
-        Status = PciIo->Pci.Read (
-                              PciIo,
-                              EfiPciIoWidthUint8,
-                              PCI_REVISION_ID_OFFSET,
-                              1,
-                              &RevId
-                              );
+        PciIo->Pci.Read (
+                     PciIo,
+                     EfiPciIoWidthUint8,
+                     PCI_REVISION_ID_OFFSET,
+                     1,
+                     &RevId
+                     );
         if (RevId <= 0x02) {
           for (Bar = 0x14; Bar < 0x24; Bar+= 4) {
             //
@@ -269,13 +265,13 @@ InitBadBars(
             // Bars don't worry aboyut freeing up thge allocs.
             //
             TempBaseAddress = 0x0;
-            Status = PciIo->Pci.Write (
-                                  PciIo,
-                                  EfiPciIoWidthUint32,
-                                  Bar,
-                                  1,
-                                       (VOID *) &TempBaseAddress
-                                  );
+            PciIo->Pci.Write (
+                         PciIo,
+                         EfiPciIoWidthUint32,
+                         Bar,
+                         1,
+                              (VOID *) &TempBaseAddress
+                         );
           } // end for
         }
         else
@@ -286,13 +282,13 @@ InitBadBars(
           //since Tekoa does not fully support IDE Bus Mastering
           //
           TempBaseAddress = 0x0;
-          Status = PciIo->Pci.Write (
-                                PciIo,
-                                EfiPciIoWidthUint32,
-                                0x20,
-                                1,
-                                     (VOID *) &TempBaseAddress
-                                );
+          PciIo->Pci.Write (
+                       PciIo,
+                       EfiPciIoWidthUint32,
+                       0x20,
+                       1,
+                            (VOID *) &TempBaseAddress
+                       );
         }
       }
       break;
@@ -308,19 +304,17 @@ ProgramPciLatency(
   IN    EFI_PCI_IO_PROTOCOL           *PciIo
   )
 {
-  EFI_STATUS                          Status;
-
   //
   // Program Master Latency Timer
   //
   if (mSystemConfiguration.PciLatency != 0) {
-     Status = PciIo->Pci.Write (
-                           PciIo,
-                           EfiPciIoWidthUint8,
-                           PCI_LATENCY_TIMER_OFFSET,
-                           1,
-                           &mSystemConfiguration.PciLatency
-                           );
+     PciIo->Pci.Write (
+                  PciIo,
+                  EfiPciIoWidthUint8,
+                  PCI_LATENCY_TIMER_OFFSET,
+                  1,
+                  &mSystemConfiguration.PciLatency
+                  );
   }
   return;
 }

@@ -99,10 +99,8 @@ InitializeSubsystemIds (
 
   EFI_REG_TABLE *RegTablePtr;
   UINT32 SubsystemVidDid;
-  UINT32 SubsystemAudioVidDid;
 
   SubsystemVidDid = mPlatformInfo.SsidSvid;
-  SubsystemAudioVidDid = mPlatformInfo.SsidSvid;
 
   RegTablePtr = mSubsystemIdRegs;
 

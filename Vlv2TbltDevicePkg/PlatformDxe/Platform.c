@@ -513,16 +513,15 @@ InitPciDevPME (
   )
 {
   UINTN                  VarSize;
-  EFI_STATUS             Status;
 
   VarSize = sizeof(SYSTEM_CONFIGURATION);
-  Status = gRT->GetVariable(
-                  NORMAL_SETUP_NAME,
-                  &gEfiNormalSetupGuid,
-                  NULL,
-                  &VarSize,
-                  &mSystemConfiguration
-                  );
+  gRT->GetVariable(
+         NORMAL_SETUP_NAME,
+         &gEfiNormalSetupGuid,
+         NULL,
+         &VarSize,
+         &mSystemConfiguration
+         );
 
   //
   //Program HDA PME_EN
@@ -572,21 +571,20 @@ InitThermalZone (
   )
 {
   UINTN                  VarSize;
-  EFI_STATUS             Status;
   EFI_GLOBAL_NVS_AREA_PROTOCOL       *GlobalNvsArea;
   VarSize = sizeof(SYSTEM_CONFIGURATION);
-  Status = gRT->GetVariable(
-                  NORMAL_SETUP_NAME,
-                  &gEfiNormalSetupGuid,
-                  NULL,
-                  &VarSize,
-                  &mSystemConfiguration
-                  );
-  Status = gBS->LocateProtocol (
-                  &gEfiGlobalNvsAreaProtocolGuid,
-                  NULL,
-                  (void **)&GlobalNvsArea
-                  );
+  gRT->GetVariable(
+         NORMAL_SETUP_NAME,
+         &gEfiNormalSetupGuid,
+         NULL,
+         &VarSize,
+         &mSystemConfiguration
+         );
+  gBS->LocateProtocol (
+         &gEfiGlobalNvsAreaProtocolGuid,
+         NULL,
+         (void **)&GlobalNvsArea
+         );
   GlobalNvsArea->Area->CriticalThermalTripPoint = mSystemConfiguration.CriticalThermalTripPoint;
   GlobalNvsArea->Area->PassiveThermalTripPoint = mSystemConfiguration.PassiveThermalTripPoint;
 }
