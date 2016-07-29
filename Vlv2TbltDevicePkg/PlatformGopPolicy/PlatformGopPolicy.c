@@ -23,10 +23,8 @@ Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved
 
 #include <Guid/SetupVariable.h>
 #include <SetupMode.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-
-EFI_BOOT_SERVICES   *gBS;
-
 
 PLATFORM_GOP_POLICY_PROTOCOL  mPlatformGOPPolicy;
 
