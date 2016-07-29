@@ -36,7 +36,6 @@
 #include <Library/UefiCpuLib.h>
 #include <Library/UefiLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
-#include <Library/TimerLib.h>
 #include <Library/HobLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/MpInitLib.h>

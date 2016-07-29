@@ -46,7 +46,6 @@
   MpInitLib
 
 [Sources]
-  ApStartup.c
   CpuDxe.c
   CpuDxe.h
   CpuGdt.c
@@ -58,15 +57,11 @@
   Ia32/CpuAsm.asm
   Ia32/CpuAsm.nasm
   Ia32/CpuAsm.S
-  Ia32/MpAsm.asm
-  Ia32/MpAsm.nasm
 
 [Sources.X64]
   X64/CpuAsm.asm
   X64/CpuAsm.nasm
   X64/CpuAsm.S
-  X64/MpAsm.asm
-  X64/MpAsm.nasm
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
@@ -82,8 +77,6 @@
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber    ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                  ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds  ## CONSUMES
 
 [Depex]
   TRUE
