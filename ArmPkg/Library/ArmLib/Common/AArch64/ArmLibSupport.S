@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2016, ARM Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -39,6 +39,7 @@ GCC_ASM_EXPORT (ArmCallWFE)
 GCC_ASM_EXPORT (ArmCallSEV)
 GCC_ASM_EXPORT (ArmReadCpuActlr)
 GCC_ASM_EXPORT (ArmWriteCpuActlr)
+GCC_ASM_EXPORT (ArmReadSctlr)
 
 #------------------------------------------------------------------------------
 
@@ -204,5 +205,14 @@ ASM_PFX(ArmWriteCpuActlr):
   dsb   sy
   isb
   ret
+
+ASM_PFX(ArmReadSctlr):
+  EL1_OR_EL2_OR_EL3(x1)
+1:mrs   x0, sctlr_el1
+  ret
+2:mrs   x0, sctlr_el2
+  ret
+3:mrs   x0, sctlr_el3
+4:ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
