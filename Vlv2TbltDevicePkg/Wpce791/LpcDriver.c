@@ -227,10 +227,6 @@ LpcDriverStart (
 {
   EFI_STATUS             Status;
   EFI_PCI_IO_PROTOCOL    *PciIo;
-  LPC_DEV                *LpcDev;
-
-
-  LpcDev = NULL;
 
   //
   // Get Pci IO
