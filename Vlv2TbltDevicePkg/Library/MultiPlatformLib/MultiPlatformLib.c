@@ -34,8 +34,7 @@ MultiPlatformInfoInit (
   IN OUT EFI_PLATFORM_INFO_HOB          *PlatformInfoHob
   )
 {
-  UINT32                                PcieLength;
-  EFI_STATUS      Status;
+  UINT32 PcieLength;
 
 
   PlatformInfoHob->IohSku = MmPci16(0, MC_BUS, MC_DEV, MC_FUN, PCI_DEVICE_ID_OFFSET);
@@ -52,10 +51,10 @@ MultiPlatformInfoInit (
 
   PlatformInfoHob->IchRevision = PchLpcPciCfg8(PCI_REVISION_ID_OFFSET);
 
-  	//
-    //64MB
-    //
-    PcieLength = 0x04000000;
+  //
+  //64MB
+  //
+  PcieLength = 0x04000000;
 
   //
   // Don't support BASE above 4GB currently.
@@ -95,28 +94,32 @@ MultiPlatformInfoInit (
   //
   PlatformInfoHob->SysData.SysIoApicEnable  = ICH_IOAPIC;
 
-   DEBUG ((EFI_D_ERROR,  "PlatformFlavor is %x (%x=tablet,%x=mobile,%x=desktop)\n", PlatformInfoHob->PlatformFlavor,FlavorTablet,FlavorMobile,FlavorDesktop));
+  DEBUG ((EFI_D_ERROR, "PlatformFlavor is %x (%x=tablet,%x=mobile,%x=desktop)\n",
+    PlatformInfoHob->PlatformFlavor,
+    FlavorTablet,
+    FlavorMobile,
+    FlavorDesktop));
 
-    //
-    // Get Platform Info and fill the Hob.
-    //
-    PlatformInfoHob->RevisonId = PLATFORM_INFO_HOB_REVISION;
+  //
+  // Get Platform Info and fill the Hob.
+  //
+  PlatformInfoHob->RevisonId = PLATFORM_INFO_HOB_REVISION;
 
-      //
-      // Get GPIO table
-      //
-      Status = MultiPlatformGpioTableInit (PeiServices, PlatformInfoHob);
+  //
+  // Get GPIO table
+  //
+  MultiPlatformGpioTableInit (PeiServices, PlatformInfoHob);
 
-      //
-      // Program GPIO
-      //
-      Status = MultiPlatformGpioProgram (PeiServices, PlatformInfoHob);
+  //
+  // Program GPIO
+  //
+  MultiPlatformGpioProgram (PeiServices, PlatformInfoHob);
 
-      //
-      // Update OemId
-      //
-      Status = InitializeBoardOemId (PeiServices, PlatformInfoHob);
-      Status = InitializeBoardSsidSvid (PeiServices, PlatformInfoHob);
+  //
+  // Update OemId
+  //
+  InitializeBoardOemId (PeiServices, PlatformInfoHob);
+  InitializeBoardSsidSvid (PeiServices, PlatformInfoHob);
 
-    return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
