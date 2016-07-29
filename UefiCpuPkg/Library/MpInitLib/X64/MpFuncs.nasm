@@ -57,7 +57,7 @@ BITS 16
     mov        di,  CodeSegmentLocation
     mov        edx, [di]
     mov        di,  ax
-    sub        di,  02h  
+    sub        di,  02h
     mov        [di],dx                         ; Patch long mode CS
     sub        di,  04h
     add        eax, ebx
@@ -117,7 +117,7 @@ TestLock:
     jz         TestLock
 
     mov        edi, esi
-    add        edi, NumApsExecutingLoction
+    add        edi, NumApsExecutingLocation
     inc        dword [edi]
     mov        ebx, [edi]
 
@@ -138,8 +138,8 @@ Releaselock:
     xchg       qword [edi], rax
 
 CProcedureInvoke:
-    push       rbp               ; push BIST data at top of AP stack
-    xor        rbp, rbp          ; clear ebp for call stack trace
+    push       rbp               ; Push BIST data at top of AP stack
+    xor        rbp, rbp          ; Clear ebp for call stack trace
     push       rbp
     mov        rbp, rsp
 
@@ -157,9 +157,9 @@ CProcedureInvoke:
     mov        rax, qword [edi]
 
     sub        rsp, 20h
-    call       rax               ; invoke C function
+    call       rax               ; Invoke C function
     add        rsp, 20h
-    jmp        $
+    jmp        $                 ; Should never reach here
 
 RendezvousFunnelProcEnd:
 
@@ -176,7 +176,7 @@ ASM_PFX(AsmGetAddressMap):
 
 ;-------------------------------------------------------------------------------------
 ;AsmExchangeRole procedure follows. This procedure executed by current BSP, that is
-;about to become an AP. It switches it'stack with the current AP.
+;about to become an AP. It switches its stack with the current AP.
 ;AsmExchangeRole (IN   CPU_EXCHANGE_INFO    *MyInfo, IN   CPU_EXCHANGE_INFO    *OthersInfo);
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmExchangeRole)

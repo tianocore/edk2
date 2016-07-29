@@ -71,8 +71,8 @@ o32 lidt       [cs:si]
     xor        ax,  ax
     mov        ds,  ax
 
-    mov        eax, cr0                        ;Get control register 0
-    or         eax, 000000003h                 ;Set PE bit (bit #0) & MP
+    mov        eax, cr0                        ; Get control register 0
+    or         eax, 000000003h                 ; Set PE bit (bit #0) & MP
     mov        cr0, eax
 
     jmp        0:strict dword 0                ; far jump to protected mode
@@ -95,7 +95,7 @@ TestLock:
     jz         TestLock
 
     mov        edi, esi
-    add        edi, NumApsExecutingLoction
+    add        edi, NumApsExecutingLocation
     inc        dword [edi]
     mov        ebx, [edi]
 
@@ -133,9 +133,9 @@ CProcedureInvoke:
     add        edi, ApProcedureLocation
     mov        eax, [edi]
 
-    call       eax               ; invoke C function
+    call       eax               ; Invoke C function
 
-    jmp        $                 ; never reach here
+    jmp        $                 ; Never reach here
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------

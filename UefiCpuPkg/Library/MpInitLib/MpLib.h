@@ -56,7 +56,6 @@ typedef struct {
   UINTN                 CodeSegment;
   UINTN                 DataSegment;
   UINTN                 Cr3;
-  PEI_CPU_MP_DATA       *PeiCpuMpData;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
