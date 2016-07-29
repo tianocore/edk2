@@ -520,7 +520,6 @@ PrepareSetupInformation (
   EFI_DATA_HUB_PROTOCOL       *DataHub;
   EFI_DATA_RECORD_HEADER      *Record;
   UINT8                       *SrcData;
-  UINT32                      SrcDataSize;
   EFI_SUBCLASS_TYPE1_HEADER   *DataHeader;
   CHAR16                      *NewString;
   CHAR16                      *NewString2;
@@ -528,7 +527,6 @@ PrepareSetupInformation (
   STRING_REF                  TokenToUpdate;
   EFI_PROCESSOR_VERSION_DATA  *ProcessorVersion;
   UINTN                       Index;
-  UINT16                      EeState;
   UINTN                       DataOutput;
 
   EFI_PROCESSOR_MICROCODE_REVISION_DATA   *CpuUcodeRevisionData;
@@ -545,11 +543,6 @@ PrepareSetupInformation (
   SetMem(Version, sizeof(Version), 0);
   SetMem(ReleaseDate, sizeof(ReleaseDate), 0);
   SetMem(ReleaseTime, sizeof(ReleaseTime), 0);
-
-  //
-  // Initialize EE state for not to show EE related setup options
-  //
-  EeState = 0;
 
   //
   // Get the Data Hub Protocol. Assume only one instance
@@ -569,7 +562,6 @@ PrepareSetupInformation (
       if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA) {
         DataHeader  = (EFI_SUBCLASS_TYPE1_HEADER *)(Record + 1);
         SrcData     = (UINT8  *)(DataHeader + 1);
-        SrcDataSize = Record->RecordSize - Record->HeaderSize - sizeof (EFI_SUBCLASS_TYPE1_HEADER);
 
         //
         // Processor
@@ -805,8 +797,6 @@ UpdateAdditionalInformation (
   EFI_DATA_HUB_PROTOCOL           *DataHub;
   EFI_DATA_RECORD_HEADER          *Record;
   EFI_SUBCLASS_TYPE1_HEADER       *DataHeader;
-  EFI_MISC_SYSTEM_MANUFACTURER    *SystemManufacturer;
-  UINTN                           Size;
   EFI_SMBIOS_PROTOCOL             *Smbios;
   EFI_SMBIOS_HANDLE               SmbiosHandle;
   EFI_SMBIOS_TABLE_HEADER         *SmbiosRecord;
@@ -816,6 +806,9 @@ UpdateAdditionalInformation (
   CHAR16                          *IfwiVersion = NULL;
   UINT16                          SearchIndex;
   EFI_STRING_ID                   TokenToUpdate;
+#if defined( RVP_SUPPORT ) && RVP_SUPPORT
+  EFI_MISC_SYSTEM_MANUFACTURER    *SystemManufacturer;
+#endif
 
   Status = gBS->LocateProtocol (
                   &gEfiDataHubProtocolGuid,
@@ -824,8 +817,6 @@ UpdateAdditionalInformation (
                   );
 
   ASSERT_EFI_ERROR(Status);
-
-  Size = 3;
 
   MonotonicCount  = 0;
   Record = NULL;
@@ -841,12 +832,12 @@ UpdateAdditionalInformation (
 
       if (CompareGuid(&Record->DataRecordGuid, &gEfiMiscSubClassGuid) &&
           (DataHeader->RecordType == EFI_MISC_SYSTEM_MANUFACTURER_RECORD_NUMBER)) {
+#if defined( RVP_SUPPORT ) && RVP_SUPPORT
         //
         // System Information
         //
         SystemManufacturer = (EFI_MISC_SYSTEM_MANUFACTURER *)(DataHeader + 1);
 
-#if defined( RVP_SUPPORT ) && RVP_SUPPORT
         //
         // UUID  (System Information)
         //
@@ -1082,7 +1073,6 @@ JudgeHandleIsPCIDevice(
 {
   EFI_STATUS  Status;
   EFI_DEVICE_PATH   *DPath;
-  EFI_DEVICE_PATH   *DevicePath;
 
   Status = gBS->HandleProtocol (
                   Handle,
@@ -1091,7 +1081,6 @@ JudgeHandleIsPCIDevice(
                   );
   if(!EFI_ERROR(Status))
   {
-    DevicePath = DPath;
     while(!IsDevicePathEnd(DPath))
     {
       if((DPath->Type == HARDWARE_DEVICE_PATH) && (DPath->SubType == HW_PCI_DP))
@@ -1457,9 +1446,6 @@ GetChipsetSataPortSpeed (
   UINT32                      IdeAhciBar;
   EFI_PHYSICAL_ADDRESS        MemBaseAddress = 0;
   UINT8                       FunNum;
-  EFI_STATUS                  Status;
-  UINT32                      DwordReg;
-
 
   DeviceSpeed = 0x01; // generation 1
 
@@ -1469,15 +1455,15 @@ GetChipsetSataPortSpeed (
   //
     FunNum = PCI_FUNCTION_NUMBER_PCH_SATA;
     MemBaseAddress = 0x0ffffffff;
-    Status = gDS->AllocateMemorySpace (
-                    EfiGcdAllocateMaxAddressSearchBottomUp,
-                    EfiGcdMemoryTypeMemoryMappedIo,
-                    N_PCH_SATA_ABAR_ALIGNMENT,  // 2^11: 2K Alignment
-                    V_PCH_SATA_ABAR_LENGTH,     // 2K Length
-                    &MemBaseAddress,
-                    mImageHandle,
-                    NULL
-                    );
+    gDS->AllocateMemorySpace (
+           EfiGcdAllocateMaxAddressSearchBottomUp,
+           EfiGcdMemoryTypeMemoryMappedIo,
+           N_PCH_SATA_ABAR_ALIGNMENT,  // 2^11: 2K Alignment
+           V_PCH_SATA_ABAR_LENGTH,     // 2K Length
+           &MemBaseAddress,
+           mImageHandle,
+           NULL
+           );
     IdeAhciBar = MmioRead32 (
                    MmPciAddress (
 				     0,
@@ -1507,7 +1493,6 @@ GetChipsetSataPortSpeed (
       // Program the "Ports Implemented Register"
       //
       MmioAndThenOr32 (IdeAhciBar + R_PCH_SATA_AHCI_PI, (UINT32)~(B_PCH_SATA_PORT0_IMPLEMENTED + B_PCH_SATA_PORT1_IMPLEMENTED), (UINT32)(B_PCH_SATA_PORT0_IMPLEMENTED + B_PCH_SATA_PORT1_IMPLEMENTED));
-      DwordReg = MmioRead32 (IdeAhciBar + R_PCH_SATA_AHCI_PI);
     }
 
     switch (PortNum)
