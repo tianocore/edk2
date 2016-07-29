@@ -211,8 +211,6 @@ PlatformUpdateTables (
   EFI_MP_SERVICES_PROTOCOL                                    *MpService;
   UINTN                                                       MaximumNumberOfCPUs;
   UINTN                                                       NumberOfEnabledCPUs;
-  UINTN                                                       BufferSize;
-  ACPI_APIC_STRUCTURE_PTR                                     *ProcessorLocalApicEntry;
   UINTN                                                       BspIndex;
   EFI_ACPI_1_0_ASF_DESCRIPTION_TABLE                          *AsfEntry;
   EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_HEADER            *HpetTbl;
@@ -234,7 +232,6 @@ PlatformUpdateTables (
   UINT16                                                      NumberOfHpets;
   UINT16                                                      HpetCapIdValue;
   UINT32                                                      HpetBlockID;
-  UINTN                                                       LocalApicCounter;
   EFI_PROCESSOR_INFORMATION                                   ProcessorInfoBuffer;
   UINT8                                                       TempVal;
   EFI_ACPI_3_0_IO_APIC_STRUCTURE                              *IOApicType;
@@ -244,9 +241,7 @@ PlatformUpdateTables (
   CurrPtr                 = NULL;
   EndPtr                  = NULL;
   ApicPtr                 = NULL;
-  LocalApicCounter        = 0;
   CurrProcessor           = 0;
-  ProcessorLocalApicEntry = NULL;
 
 
  if (Table->Signature != EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
@@ -374,7 +369,6 @@ PlatformUpdateTables (
               ApicPtr->AcpiLocalApic.AcpiProcessorId = (UINT8)MaximumNumberOfCPUs;
             }
 
-            BufferSize                    = 0;
             ApicPtr->AcpiLocalApic.Flags  = 0;
 
             for (CurrProcessor = 0; CurrProcessor < MaximumNumberOfCPUs; CurrProcessor++) {
@@ -807,7 +801,6 @@ AcpiPlatformEntryPoint (
   EFI_MP_SERVICES_PROTOCOL      *MpService;
   UINTN                         MaximumNumberOfCPUs;
   UINTN                         NumberOfEnabledCPUs;
-  UINT32                        Data32;
   PCH_STEPPING                  pchStepping;
 
   mFirstNotify      = FALSE;
@@ -816,7 +809,6 @@ AcpiPlatformEntryPoint (
   Instance          = 0;
   CurrentTable      = NULL;
   TableHandle       = 0;
-  Data32            = 0;
 
   //
   // Update HOB variable for PCI resource information.
