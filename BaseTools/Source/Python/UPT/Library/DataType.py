@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define class for data type structure
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -680,6 +680,8 @@ TAB_DEFINE = 'DEFINE'
 TAB_NMAKE = 'Nmake'
 TAB_USER_EXTENSIONS = 'UserExtensions'
 TAB_INCLUDE = '!include'
+TAB_PRIVATE = 'Private'
+TAB_INTEL = 'Intel'
 
 #
 # Common Define

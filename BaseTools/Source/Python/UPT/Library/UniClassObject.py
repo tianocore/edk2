@@ -328,11 +328,11 @@ class UniFileClassObject(object):
         Lang = distutils.util.split_quoted((Line.split(u"//")[0]))
         if len(Lang) != 3:
             try:
-                FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').read()
+                FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
             except UnicodeError, Xstr:
-                FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').read()
+                FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
             except UnicodeError, Xstr:
-                FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').read()
+                FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
             except:
                 EdkLogger.Error("Unicode File Parser", 
                                 ToolError.FILE_OPEN_FAILURE, 
@@ -437,7 +437,7 @@ class UniFileClassObject(object):
 #                             ExtraData='The file %s is either invalid UTF-16LE or it is missing the BOM.' % File.Path)
 
         try:
-            FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').read()
+            FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
         except UnicodeError, Xstr:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
@@ -579,9 +579,9 @@ class UniFileClassObject(object):
             #
             if Line.startswith(u'"'):
                 if StringEntryExistsFlag == 2:
-                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, 
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
                                     Message=ST.ERR_UNIPARSE_LINEFEED_UP_EXIST % Line, ExtraData=File.Path)
-                     
+
                 StringEntryExistsFlag = 1
                 if not Line.endswith('"'):
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
@@ -589,7 +589,7 @@ class UniFileClassObject(object):
                                               % (LineCount, File.Path))
             elif Line.startswith(u'#language'):
                 if StringEntryExistsFlag == 2:
-                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, 
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
                                     Message=ST.ERR_UNI_MISS_STRING_ENTRY % Line, ExtraData=File.Path)
                 StringEntryExistsFlag = 0
             else:
@@ -1050,7 +1050,7 @@ class UniFileClassObject(object):
                              ToolError.FILE_NOT_FOUND,
                              ExtraData=FilaPath)
         try:
-            FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_8').read()
+            FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_8').readlines()
         except UnicodeError, Xstr:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:

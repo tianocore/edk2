@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse DEC file. It will consumed by DecParser
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -742,7 +742,26 @@ class Dec(_DecBase, _DecComments):
         except BaseException:
             Logger.Error(TOOL_NAME, FILE_OPEN_FAILURE, File=DecFile,
                          ExtraData=ST.ERR_DECPARSE_FILEOPEN % DecFile)
-        RawData = FileContent(DecFile, Content)
+
+        #
+        # Pre-parser for Private section
+        #
+        self._Private = ''
+        __IsFoundPrivate = False
+        NewContent = []
+        for Line in Content:
+            Line = Line.strip()
+            if Line.startswith(DT.TAB_SECTION_START) and Line.endswith(DT.TAB_PRIVATE + DT.TAB_SECTION_END):
+                __IsFoundPrivate = True
+            if Line.startswith(DT.TAB_SECTION_START) and Line.endswith(DT.TAB_SECTION_END)\
+               and not Line.endswith(DT.TAB_PRIVATE + DT.TAB_SECTION_END):
+                __IsFoundPrivate = False
+            if __IsFoundPrivate:
+                self._Private += Line + '\r'
+            if not __IsFoundPrivate:
+                NewContent.append(Line + '\r')
+
+        RawData = FileContent(DecFile, NewContent)
         
         _DecComments.__init__(self)
         _DecBase.__init__(self, RawData)
@@ -1060,3 +1079,5 @@ class Dec(_DecBase, _DecComments):
         return self._Define.GetDataObject().GetPackageVersion()
     def GetPackageUniFile(self):
         return self._Define.GetDataObject().GetPackageUniFile()
+    def GetPrivateSections(self):
+        return self._Private

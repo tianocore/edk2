@@ -2,7 +2,7 @@
 #
 # This file contained the logical of transfer package object to DEC files.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -63,6 +63,7 @@ from Library.DataType import TAB_PCD_ERROR
 from Library.DataType import TAB_SECTION_START
 from Library.DataType import TAB_SECTION_END
 from Library.DataType import TAB_SPLIT
+import Library.DataType as DT
 from Library.UniClassObject import FormatUniEntry
 
 def GenPcd(Package, Content):
@@ -487,6 +488,12 @@ def PackageToDec(Package, DistHeader = None):
         if UserExtension.GetUserID() == TAB_BINARY_HEADER_USERID and \
             UserExtension.GetIdentifier() == TAB_BINARY_HEADER_IDENTIFIER:
             continue
+
+        # Generate Private Section first
+        if UserExtension.GetUserID() == DT.TAB_INTEL and UserExtension.GetIdentifier() == DT.TAB_PRIVATE:
+            Content += '\n' + UserExtension.GetStatement()
+            continue
+
         Statement = UserExtension.GetStatement()
         if not Statement:
             continue

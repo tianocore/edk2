@@ -1,7 +1,7 @@
 ## @file DecPomAlignment.py
 # This file contained the adapter for convert INF parser object to POM Object
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -63,6 +63,7 @@ from Library.DataType import TAB_STR_TOKENHELP
 from Library.DataType import TAB_STR_TOKENERR
 from Library.DataType import TAB_HEX_START
 from Library.DataType import TAB_SPLIT
+import Library.DataType as DT
 from Library.CommentParsing import ParseHeaderCommentSection
 from Library.CommentParsing import ParseGenericComment
 from Library.CommentParsing import ParseDecPcdGenericComment
@@ -221,6 +222,14 @@ class DecPomAlignment(PackageObject):
             self.SetUserExtensionList(
                 self.GetUserExtensionList() + [UserExtension]
             )
+
+        # Add Private sections to UserExtension
+        if self.DecParser.GetPrivateSections():
+            PrivateUserExtension = UserExtensionObject()
+            PrivateUserExtension.SetStatement(self.DecParser.GetPrivateSections())
+            PrivateUserExtension.SetIdentifier(DT.TAB_PRIVATE)
+            PrivateUserExtension.SetUserID(DT.TAB_INTEL)
+            self.SetUserExtensionList(self.GetUserExtensionList() + [PrivateUserExtension])
             
     ## Generate miscellaneous files on DEC file
     #
