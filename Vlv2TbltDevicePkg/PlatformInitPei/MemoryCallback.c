@@ -52,7 +52,6 @@ EndOfPeiPpiNotifyCallback (
   )
 {
   EFI_STATUS                  Status;
-  UINT64                      MemoryTop;
   UINT64                      LowUncableBase;
   EFI_PLATFORM_INFO_HOB       *PlatformInfo;
   UINT32                      HecBaseHigh;
@@ -100,7 +99,6 @@ EndOfPeiPpiNotifyCallback (
 
   LowUncableBase = PlatformInfo->MemData.MemMaxTolm;
   LowUncableBase &= (0x0FFF00000);
-  MemoryTop = (0x100000000);
 
   if (BootMode != BOOT_ON_S3_RESUME) {
     //
