@@ -46,7 +46,6 @@ PpmPolicyEntry(
   EFI_HANDLE                Handle;
   EFI_STATUS                Status;
   UINTN                     CpuCount;
-  UINT64                    MaxRatio;
   UINT8                     CPUMobileFeature;
 
   PCH_STEPPING              Stepping;
@@ -77,8 +76,6 @@ PpmPolicyEntry(
   // Store the CPUID for use by SETUP items.
   //
   AsmCpuid (EFI_CPUID_VERSION_INFO, &Cpuid01.RegEax, &Cpuid01.RegEbx, &Cpuid01.RegEcx, &Cpuid01.RegEdx);
-  MaxRatio = ((RShiftU64 (AsmReadMsr64(EFI_MSR_IA32_PLATFORM_ID), 8)) & 0x1F);
-
 
   mDxePlatformPpmPolicy.Revision                       = PPM_PLATFORM_POLICY_PROTOCOL_REVISION_4;
 
