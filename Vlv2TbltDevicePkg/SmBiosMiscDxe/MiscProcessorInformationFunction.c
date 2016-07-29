@@ -179,7 +179,6 @@ MISC_SMBIOS_TABLE_FUNCTION (MiscProcessorInformation)
     EFI_DATA_RECORD_HEADER          *Record;
     EFI_SUBCLASS_TYPE1_HEADER       *DataHeader;
     UINT8                           *SrcData;
-    UINT32                          SrcDataSize;
     EFI_PROCESSOR_VERSION_DATA      *ProcessorVersion;
     CHAR16                          *NewStringToken;
     STRING_REF                      TokenToUpdate;
@@ -225,7 +224,6 @@ MISC_SMBIOS_TABLE_FUNCTION (MiscProcessorInformation)
 
             DataHeader  = (EFI_SUBCLASS_TYPE1_HEADER *)(Record + 1);
             SrcData     = (UINT8  *)(DataHeader + 1);
-            SrcDataSize = Record->RecordSize - Record->HeaderSize - sizeof (EFI_SUBCLASS_TYPE1_HEADER);
 
             //
             // Processor

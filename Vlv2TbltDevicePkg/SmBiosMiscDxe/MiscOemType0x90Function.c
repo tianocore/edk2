@@ -152,7 +152,6 @@ JudgeHandleIsPCIDevice(
 {
   EFI_STATUS  Status;
   EFI_DEVICE_PATH   *DPath;
-  EFI_DEVICE_PATH   *DevicePath;
 
   Status = gBS->HandleProtocol (
                   Handle,
@@ -160,7 +159,6 @@ JudgeHandleIsPCIDevice(
                   (VOID **) &DPath
                   );
   if(!EFI_ERROR(Status)) {
-    DevicePath = DPath;
     while(!IsDevicePathEnd(DPath)) {
       if((DPath->Type == HARDWARE_DEVICE_PATH) && (DPath->SubType == HW_PCI_DP)) {
         PCI_DEVICE_PATH   *PCIPath;
@@ -280,7 +278,6 @@ AddSmbiosT0x90Callback (
   UINTN                 SteppingStrLen = 0;
   SMBIOS_TABLE_TYPE90    *SmbiosRecord;
   EFI_SMBIOS_HANDLE     SmbiosHandle;
-  EFI_MISC_OEM_TYPE_0x90  *ForType90InputData;
   CHAR16                *SECVer;
   CHAR16                *uCodeVer;
   CHAR16                *GOPVer;
@@ -288,8 +285,6 @@ AddSmbiosT0x90Callback (
   STRING_REF            TokenToGet;
   CHAR8                 *OptionalStrStart;
   EFI_SMBIOS_PROTOCOL               *SmbiosProtocol;
-
-  ForType90InputData        = (EFI_MISC_OEM_TYPE_0x90 *)Context;
 
   DEBUG ((EFI_D_INFO, "Executing SMBIOS T0x90 callback.\n"));
 

@@ -66,7 +66,6 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscProcessorCache)
 	EFI_DATA_RECORD_HEADER          *Record;
 	EFI_SUBCLASS_TYPE1_HEADER       *DataHeader;
 	UINT8                           *SrcData;
-	UINT32                          SrcDataSize;
 	EFI_STATUS                      Status;
 
 	//
@@ -113,7 +112,6 @@ MISC_SMBIOS_TABLE_FUNCTION(MiscProcessorCache)
 			if (Record->DataRecordClass == EFI_DATA_RECORD_CLASS_DATA) {
 				DataHeader  = (EFI_SUBCLASS_TYPE1_HEADER *)(Record + 1);
 				SrcData     = (UINT8  *)(DataHeader + 1);
-				SrcDataSize = Record->RecordSize - Record->HeaderSize - sizeof (EFI_SUBCLASS_TYPE1_HEADER);
 				if (CompareGuid(&Record->DataRecordGuid, &gEfiCacheSubClassGuid) && (DataHeader->RecordType == CacheSizeRecordType)) {
           			if (DataHeader->SubInstance == EFI_CACHE_L1) {
 						SmbiosRecordL1->InstalledSize += (UINT16) (ConvertBase2ToRaw((EFI_EXP_BASE2_DATA *)SrcData) >> 10);
