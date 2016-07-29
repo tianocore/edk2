@@ -103,7 +103,6 @@ MemoryDiscoveredPpiNotifyCallback (
   )
 {
 
-  EFI_STATUS       Status;
   EFI_BOOT_MODE    BootMode;
   UINT32           Pages;
   VOID*            Memory;
@@ -113,10 +112,10 @@ MemoryDiscoveredPpiNotifyCallback (
   // Allocate LM memory and configure PDM if enabled by user.
   // ConfigureLM(PeiServices);
   //
-  Status = (*PeiServices)->GetBootMode (
-                             (const EFI_PEI_SERVICES **)PeiServices,
-                             &BootMode
-                             );
+  (*PeiServices)->GetBootMode (
+                    (const EFI_PEI_SERVICES **)PeiServices,
+                    &BootMode
+                    );
 
   if (BootMode != BOOT_ON_S3_RESUME) {
     Size = (PcdGet32 (PcdFlashFvRecovery2Base) - PcdGet32 (PcdFlashFvMainBase)) + FixedPcdGet32(PcdFlashFvRecovery2Size);
