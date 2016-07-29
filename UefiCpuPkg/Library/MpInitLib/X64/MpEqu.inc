@@ -36,6 +36,8 @@ ModeOffsetLocation            equ        LockLocation + 3Ch
 NumApsExecutingLocation       equ        LockLocation + 44h
 CodeSegmentLocation           equ        LockLocation + 4Ch
 DataSegmentLocation           equ        LockLocation + 54h
-Cr3Location                   equ        LockLocation + 5Ch
+EnableExecuteDisableLocation  equ        LockLocation + 5Ch
+Cr3Location                   equ        LockLocation + 64h
+
 
 ;-------------------------------------------------------------------------------

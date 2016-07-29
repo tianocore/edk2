@@ -69,6 +69,19 @@ o32 lgdt       [cs:si]
     mov        si, IdtrLocation
 o32 lidt       [cs:si]
 
+    mov        si, EnableExecuteDisableLocation
+    cmp        byte [si], 0
+    jz         SkipEnableExecuteDisableBit
+
+    ;
+    ; Enable execute disable bit
+    ;
+    mov        ecx, 0c0000080h             ; EFER MSR number
+    rdmsr                                  ; Read EFER
+    bts        eax, 11                     ; Enable Execute Disable Bit
+    wrmsr                                  ; Write EFER
+
+SkipEnableExecuteDisableBit:
 
     mov        di,  DataSegmentLocation
     mov        edi, [di]                   ; Save long mode DS in edi

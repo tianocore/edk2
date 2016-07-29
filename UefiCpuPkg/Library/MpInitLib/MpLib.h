@@ -55,6 +55,7 @@ typedef struct {
   UINTN                 NumApsExecuting;
   UINTN                 CodeSegment;
   UINTN                 DataSegment;
+  UINTN                 EnableExecuteDisable;
   UINTN                 Cr3;
 } MP_CPU_EXCHANGE_INFO;
 

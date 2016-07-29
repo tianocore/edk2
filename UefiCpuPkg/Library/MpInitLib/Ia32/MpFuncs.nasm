@@ -85,6 +85,36 @@ Flat32Start:                                   ; protected mode entry point
     mov        ss, dx
 
     mov        esi, ebx
+
+    mov         edi, esi
+    add         edi, EnableExecuteDisableLocation
+    cmp         byte [edi], 0
+    jz          SkipEnableExecuteDisable
+
+    ;
+    ; Enable IA32 PAE execute disable
+    ;
+
+    mov         ecx, 0xc0000080
+    rdmsr
+    bts         eax, 11
+    wrmsr
+
+    mov         edi, esi
+    add         edi, Cr3Location
+    mov         eax, dword [edi]
+    mov         cr3, eax
+
+    mov         eax, cr4
+    bts         eax, 5
+    mov         cr4, eax
+
+    mov         eax, cr0
+    bts         eax, 31
+    mov         cr0, eax
+
+SkipEnableExecuteDisable:
+
     mov        edi, esi
     add        edi, LockLocation
     mov        eax, NotVacantFlag
