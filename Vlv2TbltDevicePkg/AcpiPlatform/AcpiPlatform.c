@@ -67,6 +67,7 @@ CHAR16    gACPIOSFRRefDataBlockVariableName[] = ACPI_OSFR_REF_DATA_BLOCK_VARIABL
 CHAR16    gACPIOSFRMfgStringVariableName[] = ACPI_OSFR_MFG_STRING_VARIABLE_NAME;
 
 EFI_CPU_IO_PROTOCOL                    *mCpuIo;
+EFI_GLOBAL_NVS_AREA_PROTOCOL            mGlobalNvsArea;
 #ifndef __GNUC__
 #pragma optimize("", off)
 #endif

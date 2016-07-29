@@ -33,7 +33,6 @@ Abstract:
 //
 #include "AcpiPlatformHooksLib.h"
 
-extern EFI_GLOBAL_NVS_AREA_PROTOCOL  mGlobalNvsArea;
 extern SYSTEM_CONFIGURATION             mSystemConfiguration;
 
 ENHANCED_SPEEDSTEP_PROTOCOL             *mEistProtocol  = NULL;

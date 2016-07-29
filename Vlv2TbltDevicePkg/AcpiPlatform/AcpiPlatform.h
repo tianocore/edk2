@@ -59,7 +59,7 @@ Abstract:
 //
 // Global variables.
 //
-EFI_GLOBAL_NVS_AREA_PROTOCOL  mGlobalNvsArea;
+extern EFI_GLOBAL_NVS_AREA_PROTOCOL  mGlobalNvsArea;
 
 //
 // ACPI table information used to initialize tables.
