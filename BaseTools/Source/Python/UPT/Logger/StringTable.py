@@ -858,3 +858,8 @@ HLP_SPECIFY_PACKAGE_NAME_TO_BE_REPLACED = _(
     "Specify the UEFI Distribution Package file name to be replaced")
 HLP_USE_GUIDED_PATHS = _(
     "Install packages to the following directory path by default: <PackageName>_<PACKAGE_GUID>_<PACKAGE_VERSION>")
+HLP_TEST_INSTALL = _(
+    "Specify the UEFI Distribution Package filenames to install")
+
+MSG_TEST_INSTALL_PASS = _("All distribution package file are satisfied for dependence check.")
+MSG_TEST_INSTALL_FAIL = _("NOT all distribution package file are satisfied for dependence check.")

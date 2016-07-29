@@ -1,7 +1,7 @@
 ## @file
 # This file is for installed package information database operations
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -183,6 +183,25 @@ class DependencyRules(object):
     def CheckInstallDpDepexSatisfied(self, DpObj):
         self.PkgsToBeDepend = [(PkgInfo[1], PkgInfo[2]) for PkgInfo in self.WsPkgList]
         return self.CheckDpDepexSatisfied(DpObj)
+
+    # # Check whether multiple DP depex satisfied by current workspace for Install
+    #
+    # @param DpObjList:  A distribution object list
+    # @return: True if distribution depex satisfied
+    #          False else
+    #
+    def CheckTestInstallPdDepexSatisfied(self, DpObjList):
+        self.PkgsToBeDepend = [(PkgInfo[1], PkgInfo[2]) for PkgInfo in self.WsPkgList]
+        for DpObj in DpObjList:
+            if self.CheckDpDepexSatisfied(DpObj):
+                for PkgKey in DpObj.PackageSurfaceArea.keys():
+                    PkgObj = DpObj.PackageSurfaceArea[PkgKey]
+                    self.PkgsToBeDepend.append((PkgObj.Guid, PkgObj.Version))
+            else:
+                return False, DpObj
+
+        return True, DpObj
+
 
     ## Check whether a DP depex satisfied by current workspace 
     #  (excluding the original distribution's packages to be replaced) for Replace

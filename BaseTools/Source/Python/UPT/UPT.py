@@ -46,6 +46,7 @@ import InstallPkg
 import RmPkg
 import InventoryWs
 import ReplacePkg
+import TestInstall
 from Library.Misc import GetWorkspace
 from Library import GlobalData
 from Core.IpiDb import IpiDatabase
@@ -68,6 +69,9 @@ def CheckConflictOption(Opt):
     elif Opt.PackFileToInstall and Opt.PackFileToRemove:
         Logger.Error("UPT", OPTION_CONFLICT, ExtraData=ST.ERR_I_R_EXCLUSIVE)
     elif Opt.PackFileToCreate and  Opt.PackFileToRemove:
+        Logger.Error("UPT", OPTION_CONFLICT, ExtraData=ST.ERR_C_R_EXCLUSIVE)
+    elif Opt.TestDistFiles and (Opt.PackFileToCreate or Opt.PackFileToInstall \
+                                or Opt.PackFileToRemove or Opt.PackFileToReplace):
         Logger.Error("UPT", OPTION_CONFLICT, ExtraData=ST.ERR_C_R_EXCLUSIVE)
 
     if Opt.CustomPath and Opt.UseGuidedPkgPath:
@@ -146,6 +150,9 @@ def Main():
 
     Parser.add_option("--use-guided-paths", action="store_true", dest="Use_Guided_Paths", help=ST.HLP_USE_GUIDED_PATHS)
 
+    Parser.add_option("-j", "--test-install", action="append", type="string",
+                      dest="Test_Install_Distribution_Package_Files", help=ST.HLP_TEST_INSTALL)
+
     Opt = Parser.parse_args()[0]
 
     Var2Var = [
@@ -159,6 +166,7 @@ def Main():
         ("PackFileToReplace", Opt.Replace_Distribution_Package_File),
         ("PackFileToBeReplaced", Opt.Original_Distribution_Package_File),
         ("UseGuidedPkgPath", Opt.Use_Guided_Paths),
+        ("TestDistFiles", Opt.Test_Install_Distribution_Package_Files)
     ]
 
     for Var in Var2Var:
@@ -264,6 +272,14 @@ def Main():
 
             Opt.PackFileToReplace = AbsPath
             RunModule = ReplacePkg.Main
+
+        elif Opt.Test_Install_Distribution_Package_Files:
+            for Dist in Opt.Test_Install_Distribution_Package_Files:
+                if not Dist.endswith('.dist'):
+                    Logger.Error("TestInstall", FILE_TYPE_MISMATCH, ExtraData=ST.ERR_DIST_EXT_ERROR % Dist)
+
+            setattr(Opt, 'DistFiles', Opt.Test_Install_Distribution_Package_Files)
+            RunModule = TestInstall.Main
 
         else:
             Parser.print_usage()
