@@ -86,7 +86,7 @@ EFI_ACPI_5_0_FIXED_ACPI_DESCRIPTION_TABLE FACP = {
     0,
     0xCF9
   },
-  0x06,             // Hardware reset value
+  0x0E,             // Hardware reset value
   0, 0, 0,          // Reserved
   0,                // XFirmwareCtrl
   0,                // XDsdt
