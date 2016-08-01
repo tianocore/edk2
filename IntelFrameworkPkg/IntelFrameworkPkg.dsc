@@ -70,3 +70,6 @@
   IntelFrameworkPkg/Library/PeiSmbusLibSmbusPpi/PeiSmbusLibSmbusPpi.inf
   IntelFrameworkPkg/Library/PeiHobLibFramework/PeiHobLibFramework.inf
 
+[BuildOptions]
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
