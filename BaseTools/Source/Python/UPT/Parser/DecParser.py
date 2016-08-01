@@ -270,7 +270,21 @@ class _DecBase:
                     self._LoggerError(ST.ERR_DECPARSE_BACKSLASH_EMPTY)
                 CatLine += Line
          
-        self._RawData.CurrentLine = self._ReplaceMacro(CatLine)
+        #
+        # All MACRO values defined by the DEFINE statements in any section
+        # (except [Userextensions] sections for Intel) of the INF or DEC file
+        # must be expanded before processing of the file.
+        #
+        __IsReplaceMacro = True
+        Header = self._RawData.CurrentScope[0] if self._RawData.CurrentScope else None
+        if Header and len(Header) > 2:
+            if Header[0].upper() == 'USEREXTENSIONS' and not (Header[1] == 'TianoCore' and Header[2] == '"ExtraFiles"'):
+                __IsReplaceMacro = False
+        if __IsReplaceMacro:
+            self._RawData.CurrentLine = self._ReplaceMacro(CatLine)
+        else:
+            self._RawData.CurrentLine = CatLine
+
         return CatLine, CommentList
     
     ## Parse
