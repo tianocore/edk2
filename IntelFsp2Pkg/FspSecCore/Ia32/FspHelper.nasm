@@ -14,22 +14,21 @@
     SECTION .text
 
 global ASM_PFX(FspInfoHeaderRelativeOff)
-ASM_PFX(FspInfoHeaderRelativeOff):
-   ;
-   ; This value will be pached by the build script
-   ;
-   DD    0x12345678
 
 global ASM_PFX(AsmGetFspBaseAddress)
 ASM_PFX(AsmGetFspBaseAddress):
-   mov   eax, ASM_PFX(AsmGetFspInfoHeader)
-   sub   eax, dword [ASM_PFX(FspInfoHeaderRelativeOff)]
+   call  ASM_PFX(AsmGetFspInfoHeader)
    add   eax, 0x1C
    mov   eax, dword [eax]
    ret
 
 global ASM_PFX(AsmGetFspInfoHeader)
 ASM_PFX(AsmGetFspInfoHeader):
-   mov   eax, ASM_PFX(AsmGetFspInfoHeader)
-   sub   eax, dword [ASM_PFX(FspInfoHeaderRelativeOff)]
+   call  ASM_PFX(NextInstruction)
+ASM_PFX(NextInstruction):
+   pop   eax
+   sub   eax, ASM_PFX(NextInstruction)
+   add   eax, ASM_PFX(AsmGetFspInfoHeader)
+   DB    02Dh                                               ; opcode of sub eax, imm32
+ASM_PFX(FspInfoHeaderRelativeOff):    DD    0x12345678      ; sub eax, FspInfoHeaderRelativeOff
    ret
