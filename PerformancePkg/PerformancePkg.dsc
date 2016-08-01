@@ -80,3 +80,6 @@
 
 [Components]
   PerformancePkg/Dp_App/Dp.inf
+
+[BuildOptions]
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
