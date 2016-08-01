@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1181,6 +1181,8 @@ CIfrRecordInfoDB::CheckQuestionOpCode (
   case EFI_IFR_DATE_OP:
   case EFI_IFR_TIME_OP:
   case EFI_IFR_ORDERED_LIST_OP:
+  case EFI_IFR_REF_OP:
+  case EFI_IFR_RESET_BUTTON_OP:
     return TRUE;
   default:
     return FALSE;
