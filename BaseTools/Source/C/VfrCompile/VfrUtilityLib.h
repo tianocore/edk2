@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -265,6 +265,14 @@ struct EFI_VARSTORE_INFO {
   BOOLEAN operator == (IN EFI_VARSTORE_INFO *);
 };
 
+struct BufferVarStoreFieldInfoNode {
+  EFI_VARSTORE_INFO  mVarStoreInfo;
+  struct BufferVarStoreFieldInfoNode *mNext;
+
+  BufferVarStoreFieldInfoNode( IN EFI_VARSTORE_INFO  *Info );
+  ~BufferVarStoreFieldInfoNode ();
+};
+
 #define EFI_VARSTORE_ID_MAX              0xFFFF
 #define EFI_FREE_VARSTORE_ID_BITMAP_SIZE ((EFI_VARSTORE_ID_MAX + 1) / EFI_BITS_PER_UINT32)
 
@@ -278,6 +286,8 @@ private:
 
   struct SVfrVarStorageNode *mCurrVarStorageNode;
   struct SVfrVarStorageNode *mNewVarStorageNode;
+  BufferVarStoreFieldInfoNode    *mBufferFieldInfoListHead;
+  BufferVarStoreFieldInfoNode    *mBufferFieldInfoListTail;
 
 private:
 
@@ -317,7 +327,11 @@ public:
   EFI_VFR_RETURN_CODE GetBufferVarStoreDataTypeName (IN EFI_VARSTORE_ID, OUT CHAR8 **);
   EFI_VFR_RETURN_CODE GetEfiVarStoreInfo (IN EFI_VARSTORE_INFO *);
   EFI_VFR_RETURN_CODE GetNameVarStoreInfo (IN EFI_VARSTORE_INFO *, IN UINT32);
+  EFI_VFR_RETURN_CODE AddBufferVarStoreFieldInfo (IN EFI_VARSTORE_INFO *);
+  EFI_VFR_RETURN_CODE GetBufferVarStoreFieldInfo (IN OUT EFI_VARSTORE_INFO *);
 };
+
+extern CVfrDataStorage gCVfrDataStorage;
 
 #define EFI_QUESTION_ID_MAX              0xFFFF
 #define EFI_FREE_QUESTION_ID_BITMAP_SIZE ((EFI_QUESTION_ID_MAX + 1) / EFI_BITS_PER_UINT32)
@@ -401,6 +415,8 @@ public:
   EFI_VFR_RETURN_CODE GetDefaultId (IN CHAR8 *, OUT UINT16 *);
   EFI_VFR_RETURN_CODE BufferVarStoreAltConfigAdd (IN EFI_VARSTORE_ID, IN EFI_VARSTORE_INFO &, IN CHAR8 *, IN EFI_GUID *, IN UINT8, IN EFI_IFR_TYPE_VALUE);
 };
+
+extern CVfrDefaultStore gCVfrDefaultStore;
 
 #define EFI_RULE_ID_START    0x01
 #define EFI_RULE_ID_INVALID  0x00

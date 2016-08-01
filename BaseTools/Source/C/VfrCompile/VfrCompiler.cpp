@@ -83,6 +83,8 @@ CVfrCompiler::OptionInitialization (
   mOptions.CompatibleMode                = FALSE;
   mOptions.HasOverrideClassGuid          = FALSE;
   mOptions.WarningAsError                = FALSE;
+  mOptions.AutoDefault                   = FALSE;
+  mOptions.CheckDefault                  = FALSE;
   memset (&mOptions.OverrideClassGuid, 0, sizeof (EFI_GUID));
   
   if (Argc == 1) {
@@ -160,6 +162,10 @@ CVfrCompiler::OptionInitialization (
       mOptions.HasOverrideClassGuid = TRUE;
     } else if (stricmp(Argv[Index], "-w") == 0 || stricmp(Argv[Index], "--warning-as-error") == 0) {
       mOptions.WarningAsError = TRUE;
+    } else if (stricmp(Argv[Index], "-a") == 0 ||stricmp(Argv[Index], "--autodefault") == 0) {
+      mOptions.AutoDefault = TRUE;
+    } else if (stricmp(Argv[Index], "-d") == 0 ||stricmp(Argv[Index], "--checkdefault") == 0) {
+      mOptions.CheckDefault = TRUE;
     } else {
       DebugError (NULL, 0, 1000, "Unknown option", "unrecognized option %s", Argv[Index]);
       goto Fail;
@@ -437,6 +443,8 @@ CVfrCompiler::Usage (
     "                 format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
     "  -w  --warning-as-error",
     "                 treat warning as an error",
+    "  -a  --autodefaut    generate default value for question opcode if some default is missing",
+    "  -d  --checkdefault  check the default information in a question opcode",
     NULL
     };
   for (Index = 0; Help[Index] != NULL; Index++) {
@@ -582,42 +590,6 @@ Fail:
 }
 
 VOID
-CVfrCompiler::UpdateInfoForDynamicOpcode (
-  VOID
-  )
-{
-  SIfrRecord          *pRecord;
-
-  if (!gNeedAdjustOpcode) {
-    return;
-  }
-  
-  //
-  // Base on the original offset info to update the record list.
-  //
-  if (!gCIfrRecordInfoDB.IfrAdjustDynamicOpcodeInRecords()) {
-    DebugError (NULL, 0, 1001, "Error parsing vfr file", "Can find the offset in the record.");
-  }
-
-  //
-  // Base on the opcode binary length to recalculate the offset for each opcode.
-  //
-  gCIfrRecordInfoDB.IfrAdjustOffsetForRecord();
-
-  //
-  // Base on the offset to find the binary address.
-  //
-  pRecord = gCIfrRecordInfoDB.GetRecordInfoFromOffset(gAdjustOpcodeOffset);
-  while (pRecord != NULL) {
-    pRecord->mIfrBinBuf = gCFormPkg.GetBufAddrBaseOnOffset(pRecord->mOffset);
-    if (pRecord->mIfrBinBuf == NULL) {
-      DebugError (NULL, 0, 0001, "Error parsing vfr file", " 0x%X. offset not allocated.", pRecord->mOffset);
-    }
-    pRecord = pRecord->mNext;
-  }
-}
-
-VOID
 CVfrCompiler::AdjustBin (
   VOID
   )
@@ -628,7 +600,19 @@ CVfrCompiler::AdjustBin (
     return;
   }
 
-  UpdateInfoForDynamicOpcode ();
+  if (gNeedAdjustOpcode) {
+    //
+    // When parsing the Vfr, has created some opcodes, now need to update the record info.
+    //
+    gCIfrRecordInfoDB.IfrUpdateRecordInfoForDynamicOpcode (FALSE);
+  }
+
+  //
+  // Check whether need to check default info for question or auto add default for question.
+  //
+  if (mOptions.AutoDefault || mOptions.CheckDefault) {
+    gCIfrRecordInfoDB.IfrCheckAddDefaultRecord (mOptions.AutoDefault, mOptions.CheckDefault);
+  }
 
   //
   // Check Binary Code consistent between Form and IfrRecord

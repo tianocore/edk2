@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -154,7 +154,8 @@ public:
     );
   EFI_VFR_RETURN_CODE AdjustDynamicInsertOpcode (
     IN CHAR8              *LastFormEndAddr,
-    IN CHAR8              *InsertOpcodeAddr
+    IN CHAR8              *InsertOpcodeAddr,
+    IN BOOLEAN            CreateOpcodeAfterParsingVfr
     );
   CHAR8 *             GetBufAddrBaseOnOffset (
     IN UINT32             Offset
@@ -177,8 +178,23 @@ struct SIfrRecord {
   ~SIfrRecord (VOID);
 };
 
+
 #define EFI_IFR_RECORDINFO_IDX_INVALUD 0xFFFFFF
 #define EFI_IFR_RECORDINFO_IDX_START   0x0
+#define EFI_HII_MAX_SUPPORT_DEFAULT_TYPE  0x08
+
+struct QuestionDefaultRecord {
+  BOOLEAN     mIsDefaultIdExist[EFI_HII_MAX_SUPPORT_DEFAULT_TYPE]; // Record the default id in mAllDefaultIdArray[EFI_HII_MAX_SUPPORT_DEFAULT_TYPE]
+                                                                   // whether exists in current question.
+
+  SIfrRecord  *mDefaultValueRecord;   // Point to the default value record in RecordList which has smallest default Id.
+                                      // (for checkbox it may be NULL, because the dedault value is always true when the flag is set.)
+
+  BOOLEAN     mIsDefaultOpcode;       // whether the default value with smallest default id is given by default opcode.
+                                      // (for oneof and checkbox default info may be given by flag.)
+
+  UINT16      mDefaultNumber;         // The default number of this question.
+};
 
 class CIfrRecordInfoDB {
 private:
@@ -186,6 +202,8 @@ private:
   UINT32     mRecordCount;
   SIfrRecord *mIfrRecordListHead;
   SIfrRecord *mIfrRecordListTail;
+  UINT8      mAllDefaultTypeCount;
+  UINT16     mAllDefaultIdArray[EFI_HII_MAX_SUPPORT_DEFAULT_TYPE];
 
   SIfrRecord * GetRecordInfoFromIdx (IN UINT32);
   BOOLEAN          CheckQuestionOpCode (IN UINT8);
@@ -205,13 +223,20 @@ public:
 
   SIfrRecord * GetRecordInfoFromOffset (IN UINT32);
   VOID        IfrAdjustOffsetForRecord (VOID);
-  BOOLEAN     IfrAdjustDynamicOpcodeInRecords (VOID);
+  BOOLEAN     IfrAdjustDynamicOpcodeInRecords (IN BOOLEAN);
 
   UINT32      IfrRecordRegister (IN UINT32, IN CHAR8 *, IN UINT8, IN UINT32);
   VOID        IfrRecordInfoUpdate (IN UINT32, IN UINT32, IN CHAR8*, IN UINT8, IN UINT32);
   VOID        IfrRecordOutput (IN FILE *, IN UINT32 LineNo);
   VOID        IfrRecordOutput (OUT PACKAGE_DATA &);
-  EFI_VFR_RETURN_CODE  IfrRecordAdjust (VOID);   
+  EFI_VFR_RETURN_CODE  IfrRecordAdjust (VOID);
+  VOID        IfrUpdateRecordInfoForDynamicOpcode (IN BOOLEAN);
+  VOID        IfrCheckAddDefaultRecord (IN BOOLEAN, IN BOOLEAN);
+  VOID        IfrGetDefaultStoreInfo ();
+  VOID        IfrCreateDefaultRecord (IN UINT8 Size,IN UINT16 DefaultId,IN UINT8 Type,IN UINT32 LineNo,IN EFI_IFR_TYPE_VALUE Value);
+  VOID        IfrCreateDefaultForQuestion (IN  SIfrRecord *, IN  QuestionDefaultRecord *);
+  VOID        IfrParseDefaulInfoInQuestion (IN  SIfrRecord *, OUT QuestionDefaultRecord *);
+  VOID        IfrAddDefaultToBufferConfig (IN  UINT16, IN  SIfrRecord *,IN  EFI_IFR_TYPE_VALUE);
 };
 
 extern CIfrRecordInfoDB gCIfrRecordInfoDB;

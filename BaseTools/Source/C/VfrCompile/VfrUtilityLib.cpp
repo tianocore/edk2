@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1419,6 +1419,8 @@ CVfrDataStorage::CVfrDataStorage (
   mNameVarStoreList        = NULL;
   mCurrVarStorageNode      = NULL;
   mNewVarStorageNode       = NULL;
+  mBufferFieldInfoListHead = NULL;
+  mBufferFieldInfoListTail = NULL;
 }
 
 CVfrDataStorage::~CVfrDataStorage (
@@ -2000,6 +2002,48 @@ CVfrDataStorage::GetEfiVarStoreInfo (
 }
 
 EFI_VFR_RETURN_CODE
+CVfrDataStorage::AddBufferVarStoreFieldInfo (
+  IN EFI_VARSTORE_INFO  *Info
+  )
+{
+  BufferVarStoreFieldInfoNode *pNew;
+
+  if ((pNew = new BufferVarStoreFieldInfoNode(Info)) == NULL) {
+    return VFR_RETURN_FATAL_ERROR;
+  }
+
+  if (mBufferFieldInfoListHead == NULL) {
+    mBufferFieldInfoListHead = pNew;
+    mBufferFieldInfoListTail= pNew;
+  } else {
+    mBufferFieldInfoListTail->mNext = pNew;
+    mBufferFieldInfoListTail = pNew;
+  }
+
+  return VFR_RETURN_SUCCESS;
+}
+
+EFI_VFR_RETURN_CODE
+CVfrDataStorage::GetBufferVarStoreFieldInfo (
+  IN OUT EFI_VARSTORE_INFO  *Info
+  )
+{
+  BufferVarStoreFieldInfoNode *pNode;
+
+  pNode = mBufferFieldInfoListHead;
+  while (pNode != NULL) {
+    if (Info->mVarStoreId == pNode->mVarStoreInfo.mVarStoreId &&
+      Info->mInfo.mVarOffset == pNode->mVarStoreInfo.mInfo.mVarOffset) {
+      Info->mVarTotalSize = pNode->mVarStoreInfo.mVarTotalSize;
+      Info->mVarType      = pNode->mVarStoreInfo.mVarType;
+      return VFR_RETURN_SUCCESS;
+    }
+    pNode = pNode->mNext;
+  }
+  return VFR_RETURN_FATAL_ERROR;
+}
+
+EFI_VFR_RETURN_CODE
 CVfrDataStorage::GetNameVarStoreInfo (
   OUT EFI_VARSTORE_INFO  *Info,
   IN  UINT32             Index
@@ -2356,6 +2400,26 @@ EFI_VARSTORE_INFO::operator == (
   }
 
   return FALSE;
+}
+
+BufferVarStoreFieldInfoNode::BufferVarStoreFieldInfoNode(
+  IN EFI_VARSTORE_INFO  *Info
+  )
+{
+  mVarStoreInfo.mVarType               = Info->mVarType;
+  mVarStoreInfo.mVarTotalSize          = Info->mVarTotalSize;
+  mVarStoreInfo.mInfo.mVarOffset       = Info->mInfo.mVarOffset;
+  mVarStoreInfo.mVarStoreId            = Info->mVarStoreId;
+  mNext = NULL;
+}
+
+BufferVarStoreFieldInfoNode::~BufferVarStoreFieldInfoNode ()
+{
+  mVarStoreInfo.mVarType               = EFI_IFR_TYPE_OTHER;
+  mVarStoreInfo.mVarTotalSize          = 0;
+  mVarStoreInfo.mInfo.mVarOffset       = EFI_VAROFFSET_INVALID;
+  mVarStoreInfo.mVarStoreId            = EFI_VARSTORE_ID_INVALID;
+  mNext = NULL;
 }
 
 static EFI_VARSTORE_INFO gEfiInvalidVarStoreInfo;
@@ -3632,5 +3696,7 @@ CVfrStringDB::GetUnicodeStringTextSize (
 BOOLEAN  VfrCompatibleMode = FALSE;
 
 CVfrVarDataTypeDB gCVfrVarDataTypeDB;
+CVfrDefaultStore  gCVfrDefaultStore;
+CVfrDataStorage  gCVfrDataStorage;
 
 
