@@ -123,3 +123,6 @@
   NetworkPkg/IScsiDxe/IScsiDxe.inf
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
   NetworkPkg/Application/Ping6/Ping6.inf
+
+[BuildOptions]
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
