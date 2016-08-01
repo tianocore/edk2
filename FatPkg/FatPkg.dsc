@@ -31,6 +31,7 @@
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
   RVCT:RELEASE_*_*_CC_FLAGS            = -DMDEPKG_NDEBUG
+  *_*_*_CC_FLAGS                       = -D DISABLE_NEW_DEPRECATED_INTERFACES
 
 [LibraryClasses]
   #
