@@ -122,3 +122,5 @@
 !endif #$(NO_SHELL_PROFILES)
   }
 
+[BuildOptions]
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
