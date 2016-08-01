@@ -29,12 +29,12 @@
 
 #if defined(__GNUC__) && defined(__pic__)
 //
-// Mark all symbol declarations and references as protected, meaning they will
+// Mark all symbol declarations and references as hidden, meaning they will
 // not be subject to symbol preemption. This allows the compiler to refer to
 // symbols directly using relative references rather than via the GOT, which
 // contains absolute symbol addresses that are subject to runtime relocation.
 //
-#pragma GCC visibility push (protected)
+#pragma GCC visibility push (hidden)
 #endif
 
 #if defined(__INTEL_COMPILER)
