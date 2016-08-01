@@ -59,3 +59,6 @@
   PcAtChipsetPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   PcAtChipsetPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+
+[BuildOptions]
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
