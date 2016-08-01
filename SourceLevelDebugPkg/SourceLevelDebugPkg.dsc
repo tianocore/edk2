@@ -107,3 +107,6 @@
   SourceLevelDebugPkg/Library/DebugAgent/SmmDebugAgentLib.inf
   SourceLevelDebugPkg/DebugAgentPei/DebugAgentPei.inf
   SourceLevelDebugPkg/DebugAgentDxe/DebugAgentDxe.inf
+
+[BuildOptions]
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
