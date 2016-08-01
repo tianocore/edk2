@@ -900,6 +900,8 @@ EXIT:
 
   gBS->CloseEvent (Private->ExitBootServiceEvent);
 
+  mCallbackInfo->Current = NULL;
+
   FreePool (Private);
   return Status;
 }
