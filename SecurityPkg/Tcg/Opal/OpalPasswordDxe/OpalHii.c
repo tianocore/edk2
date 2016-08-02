@@ -595,12 +595,15 @@ HiiPsidRevert(
   OPAL_DISK                     *OpalDisk;
   TCG_RESULT                    Ret;
   OPAL_SESSION                  Session;
+  UINT8                         TmpBuf[PSID_CHARACTER_STRING_END_LENGTH];
 
   Ret = TcgResultFailure;
 
   OpalHiiGetBrowserData();
 
-  UnicodeStrToAsciiStrS (gHiiConfiguration.Psid, (CHAR8*)Psid.Psid, PSID_CHARACTER_LENGTH);
+  ZeroMem (TmpBuf, sizeof (TmpBuf));
+  UnicodeStrToAsciiStrS (gHiiConfiguration.Psid, (CHAR8*)TmpBuf, PSID_CHARACTER_STRING_END_LENGTH);
+  CopyMem (Psid.Psid, TmpBuf, PSID_CHARACTER_LENGTH);
 
   OpalDisk = HiiGetOpalDiskCB (gHiiConfiguration.SelectedDiskIndex);
   if (OpalDisk != NULL) {

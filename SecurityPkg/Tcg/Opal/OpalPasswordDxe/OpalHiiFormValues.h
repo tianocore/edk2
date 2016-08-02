@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 // PSID Length
 #define PSID_CHARACTER_LENGTH                              0x20
+#define PSID_CHARACTER_STRING_END_LENGTH                   0x21
 
 // ID's for various forms that will be used by HII
 #define FORMID_VALUE_MAIN_MENU                             0x01
@@ -38,7 +39,7 @@ typedef struct {
     UINT8   KeepUserData;
     UINT16  AvailableFields;
     UINT16  Password[MAX_PASSWORD_CHARACTER_LENGTH];
-    UINT16  Psid[PSID_CHARACTER_LENGTH];
+    UINT16  Psid[PSID_CHARACTER_STRING_END_LENGTH];
     UINT8   EnableBlockSid;
 } OPAL_HII_CONFIGURATION;
 #pragma pack()
