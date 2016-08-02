@@ -2213,6 +2213,7 @@ BmRegisterBootManagerMenu (
   UINTN                              DataSize;
 
   DevicePath = NULL;
+  Description = NULL;
   //
   // Try to find BootMenuApp from LoadFile protocol
   //
