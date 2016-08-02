@@ -613,22 +613,14 @@ InitializeMpSupport (
   UINTN          NumberOfProcessors;
   UINTN          NumberOfEnabledProcessors;
 
-  NumberOfProcessors = (UINTN) PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-  if (NumberOfProcessors < 1) {
-    DEBUG ((DEBUG_ERROR, "Setting PcdCpuMaxLogicalProcessorNumber should be more than zero.\n"));
-    return;
-  }
-
   //
-  // Only perform AP detection if PcdCpuMaxLogicalProcessorNumber is greater than 1
+  // Wakeup APs to do initialization
   //
-  if (NumberOfProcessors > 1) {
-    Status = MpInitLibInitialize ();
-    ASSERT_EFI_ERROR (Status);
+  Status = MpInitLibInitialize ();
+  ASSERT_EFI_ERROR (Status);
 
-    MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
-    mNumberOfProcessors = NumberOfProcessors;
-  }
+  MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
+  mNumberOfProcessors = NumberOfProcessors;
   DEBUG ((EFI_D_ERROR, "Detect CPU count: %d\n", mNumberOfProcessors));
 
   //
