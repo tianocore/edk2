@@ -526,7 +526,10 @@ FvSimpleFileSystemOpen (
     InitializeListHead (&NewFile->Link);
     InsertHeadList (&Instance->FileHead, &NewFile->Link);
 
-    NewFile->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+    NewFile->DirReadNext = NULL;
+    if (!IsListEmpty (&Instance->FileInfoHead)) {
+      NewFile->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+    }
 
     *NewHandle = &NewFile->FileProtocol;
     return EFI_SUCCESS;
@@ -821,7 +824,9 @@ FvSimpleFileSystemSetPosition (
     //
     // Reset directory position to first entry
     //
-    File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+    if (File->DirReadNext) {
+      File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance); 
+    }
   } else if (Position == 0xFFFFFFFFFFFFFFFFull) {
     File->Position = File->FvFileInfo->FileInfo.FileSize;
   } else {

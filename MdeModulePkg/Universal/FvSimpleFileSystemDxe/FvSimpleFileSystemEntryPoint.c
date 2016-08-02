@@ -223,7 +223,11 @@ FvSimpleFileSystemOpenVolume (
     }
   }
 
-  Instance->Root->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+  Instance->Root->DirReadNext = NULL;
+  if (!IsListEmpty (&Instance->FileInfoHead)) {
+    Instance->Root->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+  }
+
   *RootFile = &Instance->Root->FileProtocol;
   return Status;
 }
