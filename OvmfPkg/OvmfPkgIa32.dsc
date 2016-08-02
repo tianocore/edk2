@@ -2,6 +2,7 @@
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
 #  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -497,7 +498,8 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
+  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
+  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -534,7 +536,8 @@
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   }
 
-  IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
+  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf  {
    <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf

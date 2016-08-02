@@ -2,6 +2,7 @@
 #  Open Virtual Machine Firmware: FDF
 #
 #  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -154,7 +155,8 @@ APRIORI PEI {
 #
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-INF  IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
+INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
+INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
 INF  OvmfPkg/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
@@ -198,7 +200,8 @@ APRIORI DXE {
 #
 INF  MdeModulePkg/Core/Dxe/DxeMain.inf
 
-INF  IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
+INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
