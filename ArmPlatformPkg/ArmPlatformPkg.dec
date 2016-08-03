@@ -55,7 +55,7 @@
   gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices|FALSE|BOOLEAN|0x0000003D
 
   # Enable Legacy Linux support in the BDS
-  gArmPlatformTokenSpaceGuid.PcdBdsLinuxSupport|TRUE|BOOLEAN|0x0000002E
+  gArmPlatformTokenSpaceGuid.PcdBdsLinuxSupport|FALSE|BOOLEAN|0x0000002E
 
 [PcdsFixedAtBuild.common]
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1|UINT32|0x00000039
