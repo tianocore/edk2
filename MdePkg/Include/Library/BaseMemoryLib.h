@@ -5,7 +5,7 @@
   These functions should be used in place of coding your own loops to do equivalent common functions. 
   This allows optimized library implementations to help increase performance. 
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -440,6 +440,26 @@ EFIAPI
 ScanGuid (
   IN CONST VOID  *Buffer,
   IN UINTN       Length,
+  IN CONST GUID  *Guid
+  );
+
+/**
+  Checks if the given GUID is a zero GUID.
+
+  This function checks whether the given GUID is a zero GUID. If the GUID is
+  identical to a zero GUID then TRUE is returned. Otherwise, FALSE is returned.
+
+  If Guid is NULL, then ASSERT().
+
+  @param  Guid        The pointer to a 128 bit GUID.
+
+  @retval TRUE        Guid is a zero GUID.
+  @retval FALSE       Guid is not a zero GUID.
+
+**/
+BOOLEAN
+EFIAPI
+IsZeroGuid (
   IN CONST GUID  *Guid
   );
 
