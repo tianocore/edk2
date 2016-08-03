@@ -342,7 +342,7 @@ ShellCommandRunTftp (
     goto Error;
   }
 
-  Mtftp4ConfigData = DefaultMtftp4ConfigData;
+  CopyMem (&Mtftp4ConfigData, &DefaultMtftp4ConfigData, sizeof (EFI_MTFTP4_CONFIG_DATA));
 
   //
   // Check the host IPv4 address
