@@ -15,7 +15,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PrePiMemoryAllocationLib
   FILE_GUID                      = 4f14c900-51a9-11e0-afbf-0002a5d5c51b
-  MODULE_TYPE                    = PEIM
+  MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MemoryAllocationLib
 
