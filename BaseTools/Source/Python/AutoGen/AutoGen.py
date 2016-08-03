@@ -330,15 +330,21 @@ class WorkspaceAutoGen(AutoGen):
                     EdkLogger.error("build", OPTION_VALUE_INVALID,
                                     "No such an FV in FDF file: %s" % fvname)
 
+            # In DSC file may use FILE_GUID to override the module, then in the Platform.Modules use FILE_GUIDmodule.inf as key,
+            # but the path (self.MetaFile.Path) is the real path
             for key in self.FdfProfile.InfDict:
                 if key == 'ArchTBD':
                     Platform_cache = {}
+                    MetaFile_cache = {}
                     for Arch in self.ArchList:
                         Platform_cache[Arch] = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
+                        MetaFile_cache[Arch] = []
+                        for Pkey in Platform_cache[Arch].Modules.keys():
+                            MetaFile_cache[Arch].append(Platform_cache[Arch].Modules[Pkey].MetaFile)
                     for Inf in self.FdfProfile.InfDict[key]:
                         ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
                         for Arch in self.ArchList:
-                            if ModuleFile in Platform_cache[Arch].Modules:
+                            if ModuleFile in MetaFile_cache[Arch]:
                                 break
                         else:
                             ModuleData = self.BuildDatabase[ModuleFile, Arch, Target, Toolchain]
@@ -349,9 +355,12 @@ class WorkspaceAutoGen(AutoGen):
                     for Arch in self.ArchList:
                         if Arch == key:
                             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
+                            MetaFileList = []
+                            for Pkey in Platform.Modules.keys():
+                                MetaFileList.append(Platform.Modules[Pkey].MetaFile)
                             for Inf in self.FdfProfile.InfDict[key]:
                                 ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
-                                if ModuleFile in Platform.Modules:
+                                if ModuleFile in MetaFileList:
                                     continue
                                 ModuleData = self.BuildDatabase[ModuleFile, Arch, Target, Toolchain]
                                 if not ModuleData.IsBinaryModule:
