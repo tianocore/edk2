@@ -85,6 +85,7 @@ typedef struct {
 
 **/
 EFI_STATUS
+EFIAPI
 CatPrint (
   IN OUT POOL_PRINT   *Str,
   IN CHAR16           *Fmt,
