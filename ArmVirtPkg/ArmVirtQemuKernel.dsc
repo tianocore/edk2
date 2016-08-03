@@ -45,6 +45,9 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
   ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA15Lib/ArmCortexA15Lib.inf
 
+[LibraryClasses.ARM.SEC]
+  ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7LibSec.inf
+
 [LibraryClasses.common]
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
@@ -77,6 +80,11 @@
   GCC:*_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a15 -I$(WORKSPACE)/ArmVirtPkg/Include
   *_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/ArmVirtPkg/Include
 
+[BuildOptions.ARM.EDKII.SEC, BuildOptions.ARM.EDKII.BASE]
+  # Avoid MOVT/MOVW instruction pairs in code that may end up in the PIE
+  # executable we build for the relocatable PrePi. They are not runtime
+  # relocatable in ELF.
+  *_CLANG35_*_CC_FLAGS = -mno-movt
 
 ################################################################################
 #
