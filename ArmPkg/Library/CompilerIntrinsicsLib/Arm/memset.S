@@ -40,6 +40,14 @@ ASM_PFX(__aeabi_memset):
 #  IN  UINT32  Character,
 #  IN  UINT32  Size
 #  );
+  //
+  // This object may be pulled in to satisfy an undefined reference to
+  // __aeabi_memset above, but in some cases, memset() is already provided
+  // by another library (i.e., CryptoPkg/IntrinsicLib), in which case we
+  // prefer the other version. So allow this one to be overridden by
+  // giving it weak linkage.
+  //
+  .weak   memset
 ASM_PFX(memset):
   subs ip, r2, #0
   bxeq lr
