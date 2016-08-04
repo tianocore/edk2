@@ -1429,40 +1429,44 @@ BufferToValue (
   *StringPtr = L'\0';
 
   LengthStr = StrLen (Value);
+
+  //
+  // Value points to a Unicode hexadecimal string, we need to convert the string to the value with CHAR16/UINT8...type.
+  // When generating the Value string, we follow this rule: 1 byte -> 2 Unicode characters (for string: 2 byte(CHAR16) ->4 Unicode characters).
+  // So the maximum value string length of a question is : Question->StorageWidth * 2.
+  // If the value string length > Question->StorageWidth * 2, only set the string length as Question->StorageWidth * 2, then convert.
+  //
+  if (LengthStr > (UINTN) Question->StorageWidth * 2) {
+    Length = (UINTN) Question->StorageWidth * 2;
+  } else {
+    Length = LengthStr;
+  }
+
   Status    = EFI_SUCCESS;
   if (!IsBufferStorage && IsString) {
     //
     // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
     // Add string tail char L'\0' into Length
     //
-    Length    = Question->StorageWidth + sizeof (CHAR16);
-    if (Length < ((LengthStr / 4 + 1) * 2)) {
-      Status = EFI_BUFFER_TOO_SMALL;
-    } else {
-      DstBuf = (CHAR16 *) Dst;
-      ZeroMem (TemStr, sizeof (TemStr));
-      for (Index = 0; Index < LengthStr; Index += 4) {
-        StrnCpyS (TemStr, sizeof (TemStr) / sizeof (CHAR16), Value + Index, 4);
-        DstBuf[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
-      }
-      //
-      // Add tailing L'\0' character
-      //
-      DstBuf[Index/4] = L'\0';
+    DstBuf = (CHAR16 *) Dst;
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < Length; Index += 4) {
+      StrnCpyS (TemStr, sizeof (TemStr) / sizeof (CHAR16), Value + Index, 4);
+      DstBuf[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
     }
+    //
+    // Add tailing L'\0' character
+    //
+    DstBuf[Index/4] = L'\0';
   } else {
-    if (Question->StorageWidth < ((LengthStr + 1) / 2)) {
-      Status = EFI_BUFFER_TOO_SMALL;
-    } else {
-      ZeroMem (TemStr, sizeof (TemStr));
-      for (Index = 0; Index < LengthStr; Index ++) {
-        TemStr[0] = Value[LengthStr - Index - 1];
-        DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
-        if ((Index & 1) == 0) {
-          Dst [Index/2] = DigitUint8;
-        } else {
-          Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
-        }
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < Length; Index ++) {
+      TemStr[0] = Value[LengthStr - Index - 1];
+      DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+      if ((Index & 1) == 0) {
+        Dst [Index/2] = DigitUint8;
+      } else {
+        Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
       }
     }
   }
@@ -3755,6 +3759,11 @@ GetOffsetFromConfigResp (
   //
   // Type is EFI_HII_VARSTORE_EFI_VARIABLE or EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER
   //
+
+  //
+  // Convert all hex digits in ConfigResp to lower case before searching.
+  //
+  HiiToLower (ConfigResp);
 
   //
   // 1. Directly use Question->BlockName to find.
