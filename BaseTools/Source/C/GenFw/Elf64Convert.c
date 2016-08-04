@@ -785,6 +785,17 @@ WriteSections64 (
             *(INT32 *)Targ = (INT32)((INT64)(*(INT32 *)Targ) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
             VerboseMsg ("Relocation:  0x%08X", *(UINT32*)Targ);
             break;
+
+          case R_X86_64_PLT32:
+            //
+            // Treat R_X86_64_PLT32 relocations as R_X86_64_PC32: this is
+            // possible since we know all code symbol references resolve to
+            // definitions in the same module (UEFI has no shared libraries),
+            // and so there is never a reason to jump via a PLT entry,
+            // allowing us to resolve the reference using the symbol directly.
+            //
+            VerboseMsg ("Treating R_X86_64_PLT32 as R_X86_64_PC32 ...");
+            /* fall through */
           case R_X86_64_PC32:
             //
             // Relative relocation: Symbol - Ip + Addend
@@ -935,6 +946,7 @@ WriteRelocations64 (
             switch (ELF_R_TYPE(Rel->r_info)) {
             case R_X86_64_NONE:
             case R_X86_64_PC32:
+            case R_X86_64_PLT32:
               break;
             case R_X86_64_64:
               VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08X", 
