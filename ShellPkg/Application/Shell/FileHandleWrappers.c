@@ -293,6 +293,134 @@ FileInterfaceNulWrite(
 }
 
 /**
+  Create the TAB completion list.
+
+  @param[in]  InputString       The command line to expand.
+  @param[in]  StringLen         Length of the command line.
+  @param[in]  BufferSize        Buffer size.
+  @param[out] TabCompletionList Return the TAB completion list.
+  @param[out] TabUpdatePos      Return the TAB update position.
+**/
+EFI_STATUS
+EFIAPI
+CreateTabCompletionList (
+  IN CONST CHAR16             *InputString,
+  IN CONST UINTN              StringLen, 
+  IN CONST UINTN              BufferSize,
+  IN OUT EFI_SHELL_FILE_INFO  **TabCompletionList,
+  IN OUT   UINTN              *TabUpdatePos
+)
+{
+  BOOLEAN             InQuotation;
+  UINTN               TabPos;
+  UINTN               Index;
+  CONST CHAR16        *Cwd;
+  EFI_STATUS          Status;
+  CHAR16              *TabStr;
+  EFI_SHELL_FILE_INFO *FileList;
+  EFI_SHELL_FILE_INFO *FileInfo;
+  EFI_SHELL_FILE_INFO *TempFileInfo;
+
+  //
+  // Allocate buffers
+  //
+  TabStr = AllocateZeroPool (BufferSize);
+  if (TabStr == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // handle auto complete of file and directory names...
+  // E.g.: cd fs0:\EFI\Bo<TAB>
+  //          ^        ^
+  //          TabPos   TabUpdatePos
+  //
+  TabPos        = 0;
+  *TabUpdatePos = 0;
+  FileList      = NULL;
+  InQuotation   = FALSE;
+  for (Index = 0; Index < StringLen; Index++) {
+    switch (InputString[Index]) {
+    case L'\"':
+      InQuotation = (BOOLEAN) (!InQuotation);
+      break;
+
+    case L' ':
+      if (!InQuotation) {
+        TabPos = Index + 1;
+        *TabUpdatePos = TabPos;
+      }
+      break;
+
+    case L':':
+      //
+      // handle the case "fs0:<TAB>"
+      // Update the TabUpdatePos as well.
+      //
+    case L'\\':
+      *TabUpdatePos = Index + 1;
+      break;
+
+    default:
+      break;
+    }
+  }
+
+  if (StrStr (InputString + TabPos, L":") == NULL) {
+    //
+    // If file path doesn't contain ":", it's a path relative to current directory.
+    //
+    Cwd = ShellInfoObject.NewEfiShellProtocol->GetCurDir (NULL);
+    if (Cwd != NULL) {
+      StrnCpyS (TabStr, (BufferSize) / sizeof (CHAR16), Cwd, (BufferSize) / sizeof (CHAR16) - 1);
+      if (InputString[TabPos] != L'\\') {
+        StrCatS (TabStr, (BufferSize) / sizeof (CHAR16), L"\\");
+      }
+    }
+  }
+  StrnCatS (TabStr, (BufferSize) / sizeof (CHAR16), InputString + TabPos, StringLen - TabPos);
+  StrnCatS (TabStr, (BufferSize) / sizeof (CHAR16), L"*", (BufferSize) / sizeof (CHAR16) - 1 - StrLen (TabStr));
+  Status  = ShellInfoObject.NewEfiShellProtocol->FindFiles(TabStr, &FileList);
+
+  //
+  // Filter out the non-directory for "CD" command
+  // Filter "." and ".." for all
+  //
+  if (!EFI_ERROR (Status) && FileList != NULL) {
+    //
+    // Skip the spaces in the beginning
+    //
+    while (*InputString == L' ') {
+      InputString++;
+    }
+
+    for (FileInfo = (EFI_SHELL_FILE_INFO *) GetFirstNode (&FileList->Link); !IsNull (&FileList->Link, &FileInfo->Link); ) {
+      if (((StrCmp (FileInfo->FileName, L".") == 0) || (StrCmp (FileInfo->FileName, L"..") == 0)) ||
+          (((InputString[0] == L'c' || InputString[0] == L'C') && (InputString[1] == L'd' || InputString[1] == L'D')) &&
+           (ShellIsDirectory (FileInfo->FullName) != EFI_SUCCESS))) {
+        TempFileInfo = FileInfo;
+        FileInfo = (EFI_SHELL_FILE_INFO *) RemoveEntryList (&FileInfo->Link);
+        InternalFreeShellFileInfoNode (TempFileInfo);
+      } else {
+        FileInfo = (EFI_SHELL_FILE_INFO *) GetNextNode (&FileList->Link, &FileInfo->Link);
+      }
+    }
+  }
+
+  if (FileList != NULL && !IsListEmpty (&FileList->Link)) {
+    Status = EFI_SUCCESS;
+  } else {
+    ShellInfoObject.NewEfiShellProtocol->FreeFileList (&FileList);
+    Status = EFI_NOT_FOUND;
+  }
+
+  FreePool (TabStr);
+
+  *TabCompletionList = FileList;
+  return Status;
+}
+
+/**
   File style interface for console (Read).
 
   This will return a single line of input from the console.
@@ -326,6 +454,7 @@ FileInterfaceStdInRead(
 {
   CHAR16              *CurrentString;
   BOOLEAN             Done;
+  UINTN               TabUpdatePos;   // Start index of the string updated by TAB stroke
   UINTN               Column;         // Column of current cursor
   UINTN               Row;            // Row of current cursor
   UINTN               StartColumn;    // Column at the beginning of the line
@@ -334,7 +463,6 @@ FileInterfaceStdInRead(
   UINTN               StringLen;      // Total length of the line
   UINTN               StringCurPos;   // Line index corresponding to the cursor
   UINTN               MaxStr;         // Maximum possible line length
-  UINTN               Index;
   UINTN               TotalColumn;     // Num of columns in the console
   UINTN               TotalRow;       // Num of rows in the console
   UINTN               SkipLength;
@@ -348,18 +476,10 @@ FileInterfaceStdInRead(
   BOOLEAN             InScrolling;
   EFI_STATUS          Status;
   BOOLEAN             InTabScrolling; // Whether in TAB-completion state
-  EFI_SHELL_FILE_INFO *FoundFileList;
-  EFI_SHELL_FILE_INFO *TabLinePos;
-  EFI_SHELL_FILE_INFO *TempPos;
-  CHAR16              *TabStr;
-  CHAR16              *TabOutputStr;
-  BOOLEAN             InQuotationMode;
-  CHAR16              *TempStr;
-  UINTN               TabPos;         // Start index of the string to search for TAB completion.
-  UINTN               TabUpdatePos;   // Start index of the string updated by TAB stroke
-//  UINTN               Count;
+  EFI_SHELL_FILE_INFO *TabCompleteList;
+  EFI_SHELL_FILE_INFO *TabCurrent;
   UINTN               EventIndex;
-  CONST CHAR16        *Cwd;
+  CHAR16              *TabOutputStr;
 
   //
   // If buffer is not large enough to hold a CHAR16, return minimum buffer size
@@ -380,24 +500,10 @@ FileInterfaceStdInRead(
   InScrolling       = FALSE;
   InTabScrolling    = FALSE;
   Status            = EFI_SUCCESS;
-  TabLinePos        = NULL;
-  FoundFileList     = NULL;
-  TempPos           = NULL;
-  TabPos            = 0;
+  TabOutputStr      = NULL;
   TabUpdatePos      = 0;
-
-  //
-  // Allocate buffers
-  //
-  TabStr            = AllocateZeroPool (*BufferSize);
-  if (TabStr == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  TabOutputStr      = AllocateZeroPool (*BufferSize);
-  if (TabOutputStr == NULL) {
-    FreePool(TabStr);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  TabCompleteList   = NULL;
+  TabCurrent        = NULL;
 
   //
   // Get the screen setting and the current cursor location
@@ -454,11 +560,11 @@ FileInterfaceStdInRead(
     // If we are quitting TAB scrolling...
     //
     if (InTabScrolling && Key.UnicodeChar != CHAR_TAB) {
-        if (FoundFileList != NULL) {
-          ShellInfoObject.NewEfiShellProtocol->FreeFileList (&FoundFileList);
-          DEBUG_CODE(FoundFileList = NULL;);
-        }
-        InTabScrolling = FALSE;
+      if (TabCompleteList != NULL) {
+        ShellInfoObject.NewEfiShellProtocol->FreeFileList (&TabCompleteList);
+        DEBUG_CODE(TabCompleteList = NULL;);
+      }
+      InTabScrolling = FALSE;
     }
 
     switch (Key.UnicodeChar) {
@@ -491,95 +597,39 @@ FileInterfaceStdInRead(
       break;
 
     case CHAR_TAB:
-      //
-      // handle auto complete of file and directory names...
-      //
+      if (!InTabScrolling) {
+        TabCurrent = NULL;
+        //
+        // Initialize a tab complete operation.
+        //
+        Status = CreateTabCompletionList (CurrentString, StringLen, *BufferSize, &TabCompleteList, &TabUpdatePos);
+        if (!EFI_ERROR(Status)) {
+          InTabScrolling = TRUE;
+        }
+
+        //
+        // We do not set up the replacement.
+        // The next section will do that.
+        //
+      }
+
       if (InTabScrolling) {
-        ASSERT(FoundFileList != NULL);
-        ASSERT(TabLinePos != NULL);
-        TabLinePos = (EFI_SHELL_FILE_INFO*)GetNextNode(&(FoundFileList->Link), &TabLinePos->Link);
-        if (IsNull(&(FoundFileList->Link), &TabLinePos->Link)) {
-          TabLinePos = (EFI_SHELL_FILE_INFO*)GetNextNode(&(FoundFileList->Link), &TabLinePos->Link);
-        }
-      } else {
-        TabPos          = 0;
-        TabUpdatePos    = 0;
-        InQuotationMode = FALSE;
-        for (Index = 0; Index < StringLen; Index++) {
-          if (CurrentString[Index] == L'\"') {
-            InQuotationMode = (BOOLEAN)(!InQuotationMode);
-          }
-          if (CurrentString[Index] == L' ' && !InQuotationMode) {
-            TabPos = Index + 1;
-            TabUpdatePos = Index + 1;
-          }
-          if (CurrentString[Index] == L'\\') {
-            TabUpdatePos = Index + 1;
-          }
-        }
-        if (StrStr(CurrentString + TabPos, L":") == NULL) {
-          Cwd = ShellInfoObject.NewEfiShellProtocol->GetCurDir(NULL);
-          if (Cwd != NULL) {
-            StrnCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), Cwd, (*BufferSize)/sizeof(CHAR16) - 1);
-            StrCatS(TabStr, (*BufferSize)/sizeof(CHAR16), L"\\");
-            if (TabStr[StrLen(TabStr)-1] == L'\\' && *(CurrentString + TabPos) == L'\\' ) {
-              TabStr[StrLen(TabStr)-1] = CHAR_NULL;
-            }
-            StrnCatS( TabStr, 
-                      (*BufferSize)/sizeof(CHAR16), 
-                      CurrentString + TabPos, 
-                      StringLen - TabPos
-                      );
-          } else {
-            *TabStr = CHAR_NULL;
-            StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos, StringLen - TabPos);
-          }
-        } else {
-          StrnCpyS(TabStr, (*BufferSize)/sizeof(CHAR16), CurrentString + TabPos, (*BufferSize)/sizeof(CHAR16) - 1);
-        }
-        StrnCatS(TabStr, (*BufferSize)/sizeof(CHAR16), L"*", (*BufferSize)/sizeof(CHAR16) - 1 - StrLen(TabStr));
-        FoundFileList = NULL;
-        Status  = ShellInfoObject.NewEfiShellProtocol->FindFiles(TabStr, &FoundFileList);
-        for ( TempStr = CurrentString
-            ; *TempStr == L' '
-            ; TempStr++); // note the ';'... empty for loop
         //
-        // make sure we have a list before we do anything more...
+        // We are in a tab complete operation.
+        // set up the next replacement.
         //
-        if (EFI_ERROR (Status) || FoundFileList == NULL) {
-          InTabScrolling = FALSE;
-          TabLinePos = NULL;
-          continue;
+        ASSERT(TabCompleteList != NULL);
+        if (TabCurrent == NULL) {
+          TabCurrent = (EFI_SHELL_FILE_INFO*) GetFirstNode (&TabCompleteList->Link);
         } else {
-          //
-          // enumerate through the list of files
-          //
-          for ( TempPos = (EFI_SHELL_FILE_INFO*)GetFirstNode(&(FoundFileList->Link))
-              ; !IsNull(&FoundFileList->Link, &TempPos->Link)
-              ; TempPos = (EFI_SHELL_FILE_INFO*)GetNextNode(&(FoundFileList->Link), &(TempPos->Link))
-             ){
-            //
-            // If "cd" is typed, only directory name will be auto-complete filled
-            // in either case . and .. will be removed.
-            //
-            if ((((TempStr[0] == L'c' || TempStr[0] == L'C') &&
-                (TempStr[1] == L'd' || TempStr[1] == L'D')
-               ) && ((ShellIsDirectory(TempPos->FullName) != EFI_SUCCESS)
-                ||(StrCmp(TempPos->FileName, L".") == 0)
-                ||(StrCmp(TempPos->FileName, L"..") == 0)
-               )) || ((StrCmp(TempPos->FileName, L".") == 0)
-                ||(StrCmp(TempPos->FileName, L"..") == 0))){
-                TabLinePos = TempPos;
-                TempPos = (EFI_SHELL_FILE_INFO*)(RemoveEntryList(&(TempPos->Link))->BackLink);
-                InternalFreeShellFileInfoNode(TabLinePos);
-            }
-          }
-          if (FoundFileList != NULL && !IsListEmpty(&FoundFileList->Link)) {
-            TabLinePos = (EFI_SHELL_FILE_INFO*)GetFirstNode(&FoundFileList->Link);
-            InTabScrolling = TRUE;
-          } else {
-            ShellInfoObject.NewEfiShellProtocol->FreeFileList (&FoundFileList);
-          }
+          TabCurrent = (EFI_SHELL_FILE_INFO*) GetNextNode (&TabCompleteList->Link, &TabCurrent->Link);
+        }
+
+        //
+        // Skip over the empty list beginning node
+        //
+        if (IsNull(&TabCompleteList->Link, &TabCurrent->Link)) {
+          TabCurrent = (EFI_SHELL_FILE_INFO*) GetNextNode (&TabCompleteList->Link, &TabCurrent->Link);
         }
       }
       break;
@@ -720,23 +770,31 @@ FileInterfaceStdInRead(
     // the next file or directory name
     //
     if (InTabScrolling) {
+      TabOutputStr = AllocateZeroPool (*BufferSize);
+      if (TabOutputStr == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+      }
+    }
+
+    if (InTabScrolling && TabOutputStr != NULL) {
+
       //
       // Adjust the column and row to the start of TAB-completion string.
       //
       Column = (StartColumn + TabUpdatePos) % TotalColumn;
       Row -= (StartColumn + StringCurPos) / TotalColumn - (StartColumn + TabUpdatePos) / TotalColumn;
-      OutputLength = StrLen (TabLinePos->FileName);
+      OutputLength = StrLen (TabCurrent->FileName);
       //
       // if the output string contains  blank space, quotation marks L'\"'
       // should be added to the output.
       //
-      if (StrStr(TabLinePos->FileName, L" ") != NULL){
+      if (StrStr(TabCurrent->FileName, L" ") != NULL){
         TabOutputStr[0] = L'\"';
-        CopyMem (TabOutputStr + 1, TabLinePos->FileName, OutputLength * sizeof (CHAR16));
+        CopyMem (TabOutputStr + 1, TabCurrent->FileName, OutputLength * sizeof (CHAR16));
         TabOutputStr[OutputLength + 1] = L'\"';
         TabOutputStr[OutputLength + 2] = CHAR_NULL;
       } else {
-        CopyMem (TabOutputStr, TabLinePos->FileName, OutputLength * sizeof (CHAR16));
+        CopyMem (TabOutputStr, TabCurrent->FileName, OutputLength * sizeof (CHAR16));
         TabOutputStr[OutputLength] = CHAR_NULL;
       }
       OutputLength = StrLen (TabOutputStr) < MaxStr - 1 ? StrLen (TabOutputStr) : MaxStr - 1;
@@ -747,6 +805,8 @@ FileInterfaceStdInRead(
       if (StringLen > TabUpdatePos + OutputLength) {
         Delete = StringLen - TabUpdatePos - OutputLength;
       }
+
+      FreePool(TabOutputStr);
     }
 
     //
@@ -850,8 +910,6 @@ FileInterfaceStdInRead(
     AddLineToCommandHistory(CurrentString);
   }
 
-  FreePool (TabStr);
-  FreePool (TabOutputStr);
   //
   // Return the data to the caller
   //
@@ -861,10 +919,10 @@ FileInterfaceStdInRead(
   // if this was used it should be deallocated by now...
   // prevent memory leaks...
   //
-  if (FoundFileList != NULL) {
-    ShellInfoObject.NewEfiShellProtocol->FreeFileList (&FoundFileList);
+  if (TabCompleteList != NULL) {
+    ShellInfoObject.NewEfiShellProtocol->FreeFileList (&TabCompleteList);
   }
-  ASSERT(FoundFileList == NULL);
+  ASSERT(TabCompleteList == NULL);
 
   return Status;
 }
