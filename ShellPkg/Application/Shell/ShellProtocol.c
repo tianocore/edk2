@@ -2434,15 +2434,14 @@ ShellSearchHandle(
          ){
         if (UnicodeCollation->MetaiMatch(UnicodeCollation, (CHAR16*)ShellInfoNode->FileName, CurrentFilePattern)){
           if (ShellInfoNode->FullName != NULL && StrStr(ShellInfoNode->FullName, L":") == NULL) {
-            Size = StrSize(ShellInfoNode->FullName);
-            Size += StrSize(MapName) + sizeof(CHAR16);
+            Size = StrSize (ShellInfoNode->FullName) + StrSize (MapName);
             NewFullName = AllocateZeroPool(Size);
             if (NewFullName == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
             } else {
-              StrCpyS(NewFullName, Size/sizeof(CHAR16), MapName);
-              StrCatS(NewFullName, Size/sizeof(CHAR16), ShellInfoNode->FullName+1);
-              FreePool((VOID*)ShellInfoNode->FullName);
+              StrCpyS(NewFullName, Size / sizeof(CHAR16), MapName);
+              StrCatS(NewFullName, Size / sizeof(CHAR16), ShellInfoNode->FullName);
+              FreePool ((VOID *) ShellInfoNode->FullName);
               ShellInfoNode->FullName = NewFullName;
             }
           }
@@ -2572,8 +2571,8 @@ EfiShellFindFiles(
 
   PatternCopy = PathCleanUpDirectories(PatternCopy);
 
-  Count = StrStr(PatternCopy, L":") - PatternCopy;
-  Count += 2;
+  Count = StrStr(PatternCopy, L":") - PatternCopy + 1;
+  ASSERT (Count <= StrLen (PatternCopy));
 
   ASSERT(MapName == NULL);
   MapName = StrnCatGrow(&MapName, NULL, PatternCopy, Count);
