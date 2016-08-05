@@ -1,7 +1,7 @@
 /** @file
   Module for clarifying the content of the smbios structure element information.
 
-  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>  
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
@@ -399,7 +399,7 @@ SmbiosPrintStructure (
   // Processor Information (Type 4)
   //
   case 4:
-    PRINT_PENDING_STRING (Struct, Type4, Socket);
+    PRINT_SMBIOS_STRING (Struct, Struct->Type4->Socket, SocketDesignation)
     DisplayProcessorType (Struct->Type4->ProcessorType, Option);
     if (AE_SMBIOS_VERSION (0x2, 0x6) && (Struct->Hdr->Length > 0x28) &&
         (Struct->Type4->ProcessorFamily == 0xFE)) {
