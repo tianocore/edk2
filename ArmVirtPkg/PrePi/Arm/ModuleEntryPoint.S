@@ -154,17 +154,17 @@ _GetStackBase:
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
-  sub   r12, r1, r2
+  sub   r9, r1, r2
 
   // Stack for the secondary core = Number of Cores - 1
   LoadConstantToReg (FixedPcdGet32(PcdCoreCount), r0)
   sub   r0, r0, #1
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r1)
   mul   r1, r1, r0
-  sub   r12, r12, r1
+  sub   r9, r9, r1
 
-  // r12 = The base of the MpCore Stacks (primary stack & secondary stacks)
-  mov   r0, r12
+  // r9 = The base of the MpCore Stacks (primary stack & secondary stacks)
+  mov   r0, r9
   mov   r1, r10
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
@@ -180,7 +180,7 @@ _GetStackBase:
 _PrepareArguments:
   mov   r0, r10
   mov   r1, r11
-  mov   r2, r12
+  mov   r2, r9
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)

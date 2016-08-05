@@ -71,7 +71,7 @@ ASM_PFX(_ModuleEntryPoint):
   // Get ID of this CPU in Multicore system
   bl    ASM_PFX(ArmReadMpidr)
   // Keep a copy of the MpId register value
-  mov   x10, x0
+  mov   x20, x0
 
 // Check if we can install the stack at the top of the System Memory or if we need
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
@@ -113,40 +113,40 @@ _SetupStack:
   // Because the 'push' instruction is equivalent to 'stmdb' (decrement before), we need to increment
   // one to the top of the stack. We check if incrementing one does not overflow (case of DRAM at the
   // top of the memory space)
-  adds  x11, x1, #1
+  adds  x21, x1, #1
   b.cs  _SetupOverflowStack
 
 _SetupAlignedStack:
-  mov   x1, x11
+  mov   x1, x21
   b     _GetBaseUefiMemory
 
 _SetupOverflowStack:
   // Case memory at the top of the address space. Ensure the top of the stack is EFI_PAGE_SIZE
   // aligned (4KB)
-  LoadConstantToReg (EFI_PAGE_MASK, x11)
-  and   x11, x11, x1
-  sub   x1, x1, x11
+  LoadConstantToReg (EFI_PAGE_MASK, x21)
+  and   x21, x21, x1
+  sub   x1, x1, x21
 
 _GetBaseUefiMemory:
   // Calculate the Base of the UEFI Memory
-  sub   x11, x1, x4
+  sub   x21, x1, x4
 
 _GetStackBase:
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
-  sub   x12, x1, x2
+  sub   x22, x1, x2
 
   // Stack for the secondary core = Number of Cores - 1
   LoadConstantToReg (FixedPcdGet32(PcdCoreCount), x0)
   sub   x0, x0, #1
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), x1)
   mul   x1, x1, x0
-  sub   x12, x12, x1
+  sub   x22, x22, x1
 
-  // x12 = The base of the MpCore Stacks (primary stack & secondary stacks)
-  mov   x0, x12
-  mov   x1, x10
+  // x22 = The base of the MpCore Stacks (primary stack & secondary stacks)
+  mov   x0, x22
+  mov   x1, x20
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
   LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), x3)
@@ -159,9 +159,9 @@ _GetStackBase:
   bne   _PrepareArguments
 
 _PrepareArguments:
-  mov   x0, x10
-  mov   x1, x11
-  mov   x2, x12
+  mov   x0, x20
+  mov   x1, x21
+  mov   x2, x22
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
