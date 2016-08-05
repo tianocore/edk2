@@ -368,13 +368,24 @@ CreateTabCompletionList (
 
   if (StrStr (InputString + TabPos, L":") == NULL) {
     //
-    // If file path doesn't contain ":", it's a path relative to current directory.
+    // If file path doesn't contain ":", ...
     //
     Cwd = ShellInfoObject.NewEfiShellProtocol->GetCurDir (NULL);
     if (Cwd != NULL) {
-      StrnCpyS (TabStr, (BufferSize) / sizeof (CHAR16), Cwd, (BufferSize) / sizeof (CHAR16) - 1);
       if (InputString[TabPos] != L'\\') {
+        //
+        // and it doesn't begin with "\\", it's a path relative to current directory.
+        // TabStr = "<cwd>\\"
+        //
+        StrnCpyS (TabStr, BufferSize / sizeof (CHAR16), Cwd, (BufferSize) / sizeof (CHAR16) - 1);
         StrCatS (TabStr, (BufferSize) / sizeof (CHAR16), L"\\");
+      } else {
+        //
+        // and it begins with "\\", it's a path pointing to root directory of current map.
+        // TabStr = "fsx:"
+        //
+        Index = StrStr (Cwd, L":") - Cwd + 1;
+        StrnCpyS (TabStr, BufferSize / sizeof (CHAR16), Cwd, Index);
       }
     }
   }
