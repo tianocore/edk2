@@ -32,7 +32,7 @@ cryptography. This patch will enable openssl building under UEFI environment.
           "openssl-1.0.2h.tar.gz" or rename the local downloaded file with ".tar.tar"
           extension to ".tar.gz".
 
-2.  Extract TAR into CryptoPkg/Library/OpenSslLib/openssl-1.0.2h
+2.  Extract TAR into CryptoPkg/Library/OpensslLib/openssl-1.0.2h
 
     NOTE: If you use WinZip to unpack the openssl source in Windows, please
           uncheck the WinZip smart CR/LF conversion option (WINZIP: Options -->
