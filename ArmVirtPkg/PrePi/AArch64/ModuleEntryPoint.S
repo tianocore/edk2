@@ -27,7 +27,6 @@ GCC_ASM_IMPORT(ArmPlatformStackSet)
 GCC_ASM_EXPORT(_ModuleEntryPoint)
 ASM_GLOBAL ASM_PFX(mSystemMemoryEnd)
 
-StartupAddr:                  .8byte ASM_PFX(CEntryPoint)
 ASM_PFX(mSystemMemoryEnd):    .8byte 0
 
 ASM_PFX(_ModuleEntryPoint):
@@ -163,15 +162,11 @@ _PrepareArguments:
   mov   x1, x21
   mov   x2, x22
 
-  // Move sec startup address into a data register
-  // Ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   x4, StartupAddr
-
   // Jump to PrePiCore C code
   //    x0 = MpId
   //    x1 = UefiMemoryBase
   //    x2 = StacksBase
-  blr   x4
+  bl    ASM_PFX(CEntryPoint)
 
 _NeverReturn:
   b _NeverReturn
