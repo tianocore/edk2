@@ -52,7 +52,7 @@
   PcdLib
   UefiLib
   SmbusLib
-  PciLib
+  PciSegmentLib
   IoLib
   LockBoxLib
 

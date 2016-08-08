@@ -1291,7 +1291,7 @@ S3BootScriptSavePciCfgReadWrite (
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
-  @note  A known Limitations in the implementation which is non-zero Segment and 64bits operations are not supported.
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
 RETURN_STATUS
@@ -1309,8 +1309,7 @@ S3BootScriptSavePciCfg2Write (
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE  ScriptPciWrite2;
 
-  if (Segment != 0 ||
-      Width == S3BootScriptWidthUint64 ||
+  if (Width == S3BootScriptWidthUint64 ||
       Width == S3BootScriptWidthFifoUint64 ||
       Width == S3BootScriptWidthFillUint64) {
     return EFI_INVALID_PARAMETER;
@@ -1351,7 +1350,7 @@ S3BootScriptSavePciCfg2Write (
 
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
-  @note  A known Limitations in the implementation which is non-zero Segment and 64bits operations are not supported.
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
 RETURN_STATUS
@@ -1369,8 +1368,7 @@ S3BootScriptSavePciCfg2ReadWrite (
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE  ScriptPciReadWrite2;
 
-  if (Segment != 0 ||
-      Width == S3BootScriptWidthUint64 ||
+  if (Width == S3BootScriptWidthUint64 ||
       Width == S3BootScriptWidthFifoUint64 ||
       Width == S3BootScriptWidthFillUint64) {
     return EFI_INVALID_PARAMETER;
@@ -1946,7 +1944,7 @@ S3BootScriptSavePciPoll (
 
  @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
  @retval RETURN_SUCCESS           Opcode is added.
-  @note  A known Limitations in the implementation which is non-zero Segment and 64bits operations are not supported.
+  @note  A known Limitations in the implementation which is 64bits operations are not supported.
 
 **/
 RETURN_STATUS
@@ -1965,8 +1963,7 @@ S3BootScriptSavePci2Poll (
   UINT8                    Length;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL  ScriptPci2Poll;
 
-  if (Segment != 0 ||
-      Width == S3BootScriptWidthUint64 ||
+  if (Width == S3BootScriptWidthUint64 ||
       Width == S3BootScriptWidthFifoUint64 ||
       Width == S3BootScriptWidthFillUint64) {
     return EFI_INVALID_PARAMETER;

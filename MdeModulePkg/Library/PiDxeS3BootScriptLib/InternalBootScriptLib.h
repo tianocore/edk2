@@ -2,7 +2,7 @@
   Support for S3 boot script lib. This file defined some internal macro and internal
   data structure
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -33,7 +33,7 @@
 #include <Library/PcdLib.h>
 #include <Library/SmbusLib.h>
 #include <Library/IoLib.h>
-#include <Library/PciLib.h>
+#include <Library/PciSegmentLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/TimerLib.h>
@@ -45,13 +45,15 @@
 #define MAX_IO_ADDRESS 0xFFFF
 
 //
-// Macro to convert a UEFI PCI address to a PCI Library PCI address
+// Macro to convert a UEFI PCI address + segment to a PCI Segment Library PCI address
 //
-#define PCI_ADDRESS_ENCODE(A) (UINTN)PCI_LIB_ADDRESS( \
-        ((((UINTN)(A))& 0xff000000) >> 24), ((((UINTN)(A)) &0x00ff0000) >> 16), ((((UINTN)(A)) & 0xff00) >> 8), ((RShiftU64 ((A), 32) & 0xfff) | ((A)& 0xff)) \
-        )
-
-
+#define PCI_ADDRESS_ENCODE(S, A) PCI_SEGMENT_LIB_ADDRESS( \
+                                   S, \
+                                   ((((UINTN)(A)) & 0xff000000) >> 24), \
+                                   ((((UINTN)(A)) & 0x00ff0000) >> 16), \
+                                   ((((UINTN)(A)) & 0xff00) >> 8), \
+                                   ((RShiftU64 ((A), 32) & 0xfff) | ((A) & 0xff)) \
+                                   )
 
 typedef union {
   UINT8 volatile  *Buf;
