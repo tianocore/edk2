@@ -1,7 +1,7 @@
 /** @file
   ACPI Timer implements one instance of Timer Library.
 
-  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -335,3 +335,57 @@ GetTimeInNanoSecond (
 
   return NanoSeconds;
 }
+
+/**
+  Calculate TSC frequency.
+
+  The TSC counting frequency is determined by comparing how far it counts
+  during a 100us period as determined by the ACPI timer. The ACPI timer is
+  used because it counts at a known frequency.
+  The TSC is sampled, followed by waiting for ACPI_TIMER_FREQUENCY / 10000
+  clocks of the ACPI timer, or 100us. The TSC is then sampled again. The
+  difference multiplied by 10000 is the TSC frequency. There will be a small
+  error because of the overhead of reading the ACPI timer. An attempt is
+  made to determine and compensate for this error.
+
+  @return The number of TSC counts per second.
+
+**/
+UINT64
+InternalCalculateTscFrequency (
+  VOID
+  )
+{
+  UINT64      StartTSC;
+  UINT64      EndTSC;
+  UINT16      TimerAddr;
+  UINT32      Ticks;
+  UINT64      TscFrequency;
+  BOOLEAN     InterruptState;
+
+  InterruptState = SaveAndDisableInterrupts ();
+
+  TimerAddr = InternalAcpiGetAcpiTimerIoPort ();
+  Ticks = IoRead32 (TimerAddr) + (ACPI_TIMER_FREQUENCY / 10000);    // Set Ticks to 100us in the future
+
+  StartTSC = AsmReadTsc ();                                         // Get base value for the TSC
+  //
+  // Wait until the ACPI timer has counted 100us.
+  // Timer wrap-arounds are handled correctly by this function.
+  // When the current ACPI timer value is greater than 'Ticks', the while loop will exit.
+  //
+  while (((Ticks - IoRead32 (TimerAddr)) & BIT23) == 0) {
+    CpuPause();
+  }
+  EndTSC = AsmReadTsc ();                                           // TSC value 100us later
+
+  TscFrequency = MultU64x32 (
+                   (EndTSC - StartTSC),                             // Number of TSC counts in 100us
+                   10000                                            // Number of 100us in a second
+                   );
+
+  SetInterruptState (InterruptState);
+
+  return TscFrequency;
+}
+
