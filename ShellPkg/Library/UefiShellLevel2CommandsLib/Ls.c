@@ -442,6 +442,7 @@ PrintLsOutput(
       }
 
       if (!Sfo && !HeaderPrinted) {
+        PathRemoveLastItem (CorrectedPath);
         PrintNonSfoHeader(CorrectedPath);
       }
       PrintFileInformation(Sfo, Node, &FileCount, &FileSize, &DirCount);
