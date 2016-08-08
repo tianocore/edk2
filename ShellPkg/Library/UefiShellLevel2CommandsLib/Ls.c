@@ -2,7 +2,7 @@
   Main file for ls shell level 2 function.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -707,10 +707,9 @@ ShellCommandRunLs (
               //
               // must split off the search part that applies to files from the end of the directory part
               //
-              for (StrnCatGrow(&SearchString, NULL, PathName, 0)
-                ; SearchString != NULL && StrStr(SearchString, L"\\") != NULL
-                ; CopyMem(SearchString, StrStr(SearchString, L"\\") + 1, 1 + StrSize(StrStr(SearchString, L"\\") + 1))) ;
-              FullPath[StrLen(FullPath) - StrLen(SearchString)] = CHAR_NULL;
+              StrnCatGrow(&SearchString, NULL, FullPath, 0);
+              PathRemoveLastItem (FullPath);
+              CopyMem (SearchString, SearchString + StrLen (FullPath), StrSize (SearchString + StrLen (FullPath)));
             }
           }
         }
