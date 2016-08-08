@@ -71,4 +71,4 @@
 # Nasty things could happen if you do.
 
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS  = -DSOFTFLOAT_FOR_GCC -Wno-enum-compare -fno-tree-vrp
+  GCC:*_*_*_CC_FLAGS  = -DSOFTFLOAT_FOR_GCC -Wno-enum-compare -fno-tree-vrp -fno-lto
