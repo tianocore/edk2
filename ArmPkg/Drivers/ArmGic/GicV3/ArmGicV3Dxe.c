@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2016, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -169,9 +169,8 @@ GicV3IrqInterruptHandler (
     InterruptHandler (GicInterrupt, SystemContext);
   } else {
     DEBUG ((EFI_D_ERROR, "Spurious GIC interrupt: 0x%x\n", GicInterrupt));
+    GicV3EndOfInterrupt (&gHardwareInterruptV3Protocol, GicInterrupt);
   }
-
-  GicV3EndOfInterrupt (&gHardwareInterruptV3Protocol, GicInterrupt);
 }
 
 //

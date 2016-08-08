@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
+Portions copyright (c) 2011-2016, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -178,9 +178,8 @@ GicV2IrqInterruptHandler (
     InterruptHandler (GicInterrupt, SystemContext);
   } else {
     DEBUG ((EFI_D_ERROR, "Spurious GIC interrupt: 0x%x\n", GicInterrupt));
+    GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
   }
-
-  GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
 }
 
 //
