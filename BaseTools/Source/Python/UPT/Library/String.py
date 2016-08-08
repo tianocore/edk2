@@ -962,7 +962,12 @@ def IsMatchArch(Arch1, Arch2):
 # Return the FileName with index +1 under the FilePath
 #
 def GetUniFileName(FilePath, FileName):
-    Files = os.listdir(FilePath)
+    Files = []
+    try:
+        Files = os.listdir(FilePath)
+    except:
+        pass
+
     LargestIndex = -1
     for File in Files:
         if File.upper().startswith(FileName.upper()) and File.upper().endswith('.UNI'):
