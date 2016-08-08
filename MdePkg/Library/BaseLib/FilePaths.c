@@ -17,7 +17,8 @@
 
 /**
   Removes the last directory or file entry in a path by changing the last
-  L'\' to a CHAR_NULL.
+  L'\' to a CHAR_NULL. For a path which is like L"fs0:startup.nsh",
+  it's converted to L"fs0:".
 
   @param[in,out] Path     A pointer to the path to modify.
 
@@ -39,7 +40,7 @@ PathRemoveLastItem(
       ; Walker != NULL && *Walker != CHAR_NULL
       ; Walker++
      ){
-    if (*Walker == L'\\' && *(Walker + 1) != CHAR_NULL) {
+    if ((*Walker == L'\\' || *Walker == L':') && *(Walker + 1) != CHAR_NULL) {
       LastSlash = Walker+1;
     }
   }
