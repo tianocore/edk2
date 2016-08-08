@@ -26,6 +26,7 @@
 
 extern char *sys_errlist[];
 
+#if !((defined(MDE_CPU_ARM) || defined(MDE_CPU_AARCH64)) && defined(__GNUC__))
 /** The memset function copies the value of c (converted to an unsigned char)
     into each of the first n characters of the object pointed to by s.
 
@@ -36,6 +37,7 @@ memset(void *s, int c, size_t n)
 {
   return SetMem( s, (UINTN)n, (UINT8)c);
 }
+#endif
 
 int
 strerror_r(int errnum, char *buf, size_t buflen)

@@ -39,6 +39,7 @@ memcpy(void * __restrict s1, const void * __restrict s2, size_t n)
 }
 #endif  /* !(defined(MDE_CPU_IPF) && defined(__GCC)) */
 
+#if !(defined(MDE_CPU_ARM) && defined(__GNUC__))
 /** The memmove function copies n characters from the object pointed to by s2
     into the object pointed to by s1. Copying takes place as if the n
     characters from the object pointed to by s2 are first copied into a
@@ -57,6 +58,7 @@ memmove(void *s1, const void *s2, size_t n)
 {
   return CopyMem( s1, s2, n);
 }
+#endif
 
 /** The strcpy function copies the string pointed to by s2 (including the
     terminating null character) into the array pointed to by s1. If copying
