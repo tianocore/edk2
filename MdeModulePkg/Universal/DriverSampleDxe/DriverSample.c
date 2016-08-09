@@ -778,6 +778,11 @@ AppendAltCfgString (
     StringPtr += Length;
 
     //
+    // Skip the character "&" before "OFFSET".
+    //
+    StringPtr ++;
+
+    //
     // Calculate Value and convert it to hex string.
     //
     if (Offset + Width > BlockSize) {
