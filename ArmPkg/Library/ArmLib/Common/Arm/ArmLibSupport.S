@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2016, ARM Limited. All rights reserved.
+# Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -15,65 +16,33 @@
 
 #include <AsmMacroIoLib.h>
 
-.text
-.align 2
-GCC_ASM_EXPORT(ArmReadMidr)
-GCC_ASM_EXPORT(ArmCacheInfo)
-GCC_ASM_EXPORT(ArmGetInterruptState)
-GCC_ASM_EXPORT(ArmGetFiqState)
-GCC_ASM_EXPORT(ArmGetTTBR0BaseAddress)
-GCC_ASM_EXPORT(ArmSetTTBR0)
-GCC_ASM_EXPORT(ArmSetTTBCR)
-GCC_ASM_EXPORT(ArmSetDomainAccessControl)
-GCC_ASM_EXPORT(CPSRMaskInsert)
-GCC_ASM_EXPORT(CPSRRead)
-GCC_ASM_EXPORT(ArmReadCpacr)
-GCC_ASM_EXPORT(ArmWriteCpacr)
-GCC_ASM_EXPORT(ArmWriteAuxCr)
-GCC_ASM_EXPORT(ArmReadAuxCr)
-GCC_ASM_EXPORT(ArmInvalidateTlb)
-GCC_ASM_EXPORT(ArmUpdateTranslationTableEntry)
-GCC_ASM_EXPORT(ArmReadScr)
-GCC_ASM_EXPORT(ArmWriteScr)
-GCC_ASM_EXPORT(ArmReadMVBar)
-GCC_ASM_EXPORT(ArmWriteMVBar)
-GCC_ASM_EXPORT(ArmReadHVBar)
-GCC_ASM_EXPORT(ArmWriteHVBar)
-GCC_ASM_EXPORT(ArmCallWFE)
-GCC_ASM_EXPORT(ArmCallSEV)
-GCC_ASM_EXPORT(ArmReadSctlr)
-GCC_ASM_EXPORT(ArmReadCpuActlr)
-GCC_ASM_EXPORT(ArmWriteCpuActlr)
-
-#------------------------------------------------------------------------------
-
-ASM_PFX(ArmReadMidr):
+ASM_FUNC(ArmReadMidr)
   mrc     p15,0,R0,c0,c0,0
   bx      LR
 
-ASM_PFX(ArmCacheInfo):
+ASM_FUNC(ArmCacheInfo)
   mrc     p15,0,R0,c0,c0,1
   bx      LR
 
-ASM_PFX(ArmGetInterruptState):
+ASM_FUNC(ArmGetInterruptState)
   mrs     R0,CPSR
   tst     R0,#0x80      @Check if IRQ is enabled.
   moveq   R0,#1
   movne   R0,#0
   bx      LR
 
-ASM_PFX(ArmGetFiqState):
+ASM_FUNC(ArmGetFiqState)
   mrs     R0,CPSR
   tst     R0,#0x40      @Check if FIQ is enabled.
   moveq   R0,#1
   movne   R0,#0
   bx      LR
 
-ASM_PFX(ArmSetDomainAccessControl):
+ASM_FUNC(ArmSetDomainAccessControl)
   mcr     p15,0,r0,c3,c0,0
   bx      lr
 
-ASM_PFX(CPSRMaskInsert):    @ on entry, r0 is the mask and r1 is the field to insert
+ASM_FUNC(CPSRMaskInsert)    @ on entry, r0 is the mask and r1 is the field to insert
   stmfd   sp!, {r4-r12, lr} @ save all the banked registers
   mov     r3, sp            @ copy the stack pointer into a non-banked register
   mrs     r2, cpsr          @ read the cpsr
@@ -86,40 +55,40 @@ ASM_PFX(CPSRMaskInsert):    @ on entry, r0 is the mask and r1 is the field to in
   ldmfd   sp!, {r4-r12, lr} @ restore registers
   bx      lr                @ return (hopefully thumb-safe!)
 
-ASM_PFX(CPSRRead):
+ASM_FUNC(CPSRRead)
   mrs     r0, cpsr
   bx      lr
 
-ASM_PFX(ArmReadCpacr):
+ASM_FUNC(ArmReadCpacr)
   mrc     p15, 0, r0, c1, c0, 2
   bx      lr
 
-ASM_PFX(ArmWriteCpacr):
+ASM_FUNC(ArmWriteCpacr)
   mcr     p15, 0, r0, c1, c0, 2
   isb
   bx      lr
 
-ASM_PFX(ArmWriteAuxCr):
+ASM_FUNC(ArmWriteAuxCr)
   mcr     p15, 0, r0, c1, c0, 1
   bx      lr
 
-ASM_PFX(ArmReadAuxCr):
+ASM_FUNC(ArmReadAuxCr)
   mrc     p15, 0, r0, c1, c0, 1
   bx      lr
 
-ASM_PFX(ArmSetTTBR0):
+ASM_FUNC(ArmSetTTBR0)
   mcr     p15,0,r0,c2,c0,0
   isb
   bx      lr
 
-ASM_PFX(ArmSetTTBCR):
+ASM_FUNC(ArmSetTTBCR)
   mcr     p15, 0, r0, c2, c0, 2
   isb
   bx      lr
 
-ASM_PFX(ArmGetTTBR0BaseAddress):
+ASM_FUNC(ArmGetTTBR0BaseAddress)
   mrc     p15,0,r0,c2,c0,0
-  LoadConstantToReg(0xFFFFC000, r1)
+  MOV32   (r1, 0xFFFFC000)
   and     r0, r0, r1
   isb
   bx      lr
@@ -130,7 +99,7 @@ ASM_PFX(ArmGetTTBR0BaseAddress):
 //  IN VOID  *TranslationTableEntry  // R0
 //  IN VOID  *MVA                    // R1
 //  );
-ASM_PFX(ArmUpdateTranslationTableEntry):
+ASM_FUNC(ArmUpdateTranslationTableEntry)
   mcr     p15,0,R0,c7,c14,1     @ DCCIMVAC Clean data cache by MVA
   dsb
   mcr     p15,0,R1,c8,c7,1      @ TLBIMVA TLB Invalidate MVA
@@ -139,7 +108,7 @@ ASM_PFX(ArmUpdateTranslationTableEntry):
   isb
   bx      lr
 
-ASM_PFX(ArmInvalidateTlb):
+ASM_FUNC(ArmInvalidateTlb)
   mov     r0,#0
   mcr     p15,0,r0,c8,c7,0
   mcr     p15,0,R9,c7,c5,6      @ BPIALL Invalidate Branch predictor array. R9 == NoOp
@@ -147,48 +116,48 @@ ASM_PFX(ArmInvalidateTlb):
   isb
   bx      lr
 
-ASM_PFX(ArmReadScr):
+ASM_FUNC(ArmReadScr)
   mrc     p15, 0, r0, c1, c1, 0
   bx      lr
 
-ASM_PFX(ArmWriteScr):
+ASM_FUNC(ArmWriteScr)
   mcr     p15, 0, r0, c1, c1, 0
   isb
   bx      lr
 
-ASM_PFX(ArmReadHVBar):
+ASM_FUNC(ArmReadHVBar)
   mrc     p15, 4, r0, c12, c0, 0
   bx      lr
 
-ASM_PFX(ArmWriteHVBar):
+ASM_FUNC(ArmWriteHVBar)
   mcr     p15, 4, r0, c12, c0, 0
   bx      lr
 
-ASM_PFX(ArmReadMVBar):
+ASM_FUNC(ArmReadMVBar)
   mrc     p15, 0, r0, c12, c0, 1
   bx      lr
 
-ASM_PFX(ArmWriteMVBar):
+ASM_FUNC(ArmWriteMVBar)
   mcr     p15, 0, r0, c12, c0, 1
   bx      lr
 
-ASM_PFX(ArmCallWFE):
+ASM_FUNC(ArmCallWFE)
   wfe
   bx      lr
 
-ASM_PFX(ArmCallSEV):
+ASM_FUNC(ArmCallSEV)
   sev
   bx      lr
 
-ASM_PFX(ArmReadSctlr):
+ASM_FUNC(ArmReadSctlr)
   mrc     p15, 0, r0, c1, c0, 0      @ Read SCTLR into R0 (Read control register configuration data)
   bx      lr
 
-ASM_PFX(ArmReadCpuActlr):
+ASM_FUNC(ArmReadCpuActlr)
   mrc     p15, 0, r0, c1, c0, 1
   bx      lr
 
-ASM_PFX(ArmWriteCpuActlr):
+ASM_FUNC(ArmWriteCpuActlr)
   mcr     p15, 0, r0, c1, c0, 1
   dsb
   isb

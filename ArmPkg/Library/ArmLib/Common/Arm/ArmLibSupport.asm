@@ -13,8 +13,6 @@
 //
 //------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
-
     INCLUDE AsmMacroIoLib.inc
 
 
@@ -92,7 +90,7 @@
 
  RVCT_ASM_EXPORT ArmGetTTBR0BaseAddress
   mrc     p15,0,r0,c2,c0,0
-  LoadConstantToReg(0xFFFFC000, r1)
+  MOV32   r1, 0xFFFFC000
   and     r0, r0, r1
   isb
   bx      lr

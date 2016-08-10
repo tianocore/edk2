@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+# Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -15,27 +16,7 @@
 
 #include <AsmMacroIoLib.h>
 
-.text
-.align 2
-
-GCC_ASM_EXPORT(ArmIsMpCore)
-GCC_ASM_EXPORT(ArmHasMpExtensions)
-GCC_ASM_EXPORT(ArmEnableAsynchronousAbort)
-GCC_ASM_EXPORT(ArmDisableAsynchronousAbort)
-GCC_ASM_EXPORT(ArmEnableIrq)
-GCC_ASM_EXPORT(ArmDisableIrq)
-GCC_ASM_EXPORT(ArmEnableFiq)
-GCC_ASM_EXPORT(ArmDisableFiq)
-GCC_ASM_EXPORT(ArmEnableInterrupts)
-GCC_ASM_EXPORT(ArmDisableInterrupts)
-GCC_ASM_EXPORT(ReadCCSIDR)
-GCC_ASM_EXPORT(ReadCLIDR)
-GCC_ASM_EXPORT(ArmReadNsacr)
-GCC_ASM_EXPORT(ArmWriteNsacr)
-
-#------------------------------------------------------------------------------
-
-ASM_PFX(ArmIsMpCore):
+ASM_FUNC(ArmIsMpCore)
   mrc     p15,0,R0,c0,c0,5
   // Get Multiprocessing extension (bit31) & U bit (bit30)
   and     R0, R0, #0xC0000000
@@ -45,42 +26,42 @@ ASM_PFX(ArmIsMpCore):
   movne   R0, #0
   bx      LR
 
-ASM_PFX(ArmEnableAsynchronousAbort):
+ASM_FUNC(ArmEnableAsynchronousAbort)
   cpsie   a
   isb
   bx      LR
 
-ASM_PFX(ArmDisableAsynchronousAbort):
+ASM_FUNC(ArmDisableAsynchronousAbort)
   cpsid   a
   isb
   bx      LR
 
-ASM_PFX(ArmEnableIrq):
+ASM_FUNC(ArmEnableIrq)
   cpsie   i
   isb
   bx      LR
 
-ASM_PFX(ArmDisableIrq):
+ASM_FUNC(ArmDisableIrq)
   cpsid   i
   isb
   bx      LR
 
-ASM_PFX(ArmEnableFiq):
+ASM_FUNC(ArmEnableFiq)
   cpsie   f
   isb
   bx      LR
 
-ASM_PFX(ArmDisableFiq):
+ASM_FUNC(ArmDisableFiq)
   cpsid   f
   isb
   bx      LR
 
-ASM_PFX(ArmEnableInterrupts):
+ASM_FUNC(ArmEnableInterrupts)
   cpsie   if
   isb
   bx      LR
 
-ASM_PFX(ArmDisableInterrupts):
+ASM_FUNC(ArmDisableInterrupts)
   cpsid   if
   isb
   bx      LR
@@ -89,7 +70,7 @@ ASM_PFX(ArmDisableInterrupts):
 // ReadCCSIDR (
 //   IN UINT32 CSSELR
 //   )
-ASM_PFX(ReadCCSIDR):
+ASM_FUNC(ReadCCSIDR)
   mcr p15,2,r0,c0,c0,0   @ Write Cache Size Selection Register (CSSELR)
   isb
   mrc p15,1,r0,c0,c0,0   @ Read current CP15 Cache Size ID Register (CCSIDR)
@@ -99,15 +80,15 @@ ASM_PFX(ReadCCSIDR):
 // ReadCLIDR (
 //   IN UINT32 CSSELR
 //   )
-ASM_PFX(ReadCLIDR):
+ASM_FUNC(ReadCLIDR)
   mrc p15,1,r0,c0,c0,1 @ Read CP15 Cache Level ID Register
   bx  lr
 
-ASM_PFX(ArmReadNsacr):
+ASM_FUNC(ArmReadNsacr)
   mrc     p15, 0, r0, c1, c1, 2
   bx      lr
 
-ASM_PFX(ArmWriteNsacr):
+ASM_FUNC(ArmWriteNsacr)
   mcr     p15, 0, r0, c1, c1, 2
   bx      lr
 

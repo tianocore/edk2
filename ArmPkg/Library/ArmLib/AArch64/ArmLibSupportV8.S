@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+# Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -15,24 +16,6 @@
 
 #include <AsmMacroIoLibV8.h>
 
-.text
-.align 3
-
-GCC_ASM_EXPORT (ArmIsMpCore)
-GCC_ASM_EXPORT (ArmEnableAsynchronousAbort)
-GCC_ASM_EXPORT (ArmDisableAsynchronousAbort)
-GCC_ASM_EXPORT (ArmEnableIrq)
-GCC_ASM_EXPORT (ArmDisableIrq)
-GCC_ASM_EXPORT (ArmEnableFiq)
-GCC_ASM_EXPORT (ArmDisableFiq)
-GCC_ASM_EXPORT (ArmEnableInterrupts)
-GCC_ASM_EXPORT (ArmDisableInterrupts)
-GCC_ASM_EXPORT (ArmDisableAllExceptions)
-GCC_ASM_EXPORT (ReadCCSIDR)
-GCC_ASM_EXPORT (ReadCLIDR)
-
-#------------------------------------------------------------------------------
-
 .set MPIDR_U_BIT,    (30)
 .set MPIDR_U_MASK,   (1 << MPIDR_U_BIT)
 
@@ -45,7 +28,7 @@ GCC_ASM_EXPORT (ReadCLIDR)
 .set DAIF_WR_ALL,       (DAIF_WR_DEBUG_BIT | DAIF_WR_ABORT_BIT | DAIF_WR_INT_BITS)
 
 
-ASM_PFX(ArmIsMpCore):
+ASM_FUNC(ArmIsMpCore)
   mrs   x0, mpidr_el1         // Read EL1 Mutliprocessor Affinty Reg (MPIDR)
   and   x0, x0, #MPIDR_U_MASK // U Bit clear, the processor is part of a multiprocessor system
   lsr   x0, x0, #MPIDR_U_BIT
@@ -53,55 +36,55 @@ ASM_PFX(ArmIsMpCore):
   ret
 
 
-ASM_PFX(ArmEnableAsynchronousAbort):
+ASM_FUNC(ArmEnableAsynchronousAbort)
   msr   daifclr, #DAIF_WR_ABORT_BIT
   isb
   ret
 
 
-ASM_PFX(ArmDisableAsynchronousAbort):
+ASM_FUNC(ArmDisableAsynchronousAbort)
   msr   daifset, #DAIF_WR_ABORT_BIT
   isb
   ret
 
 
-ASM_PFX(ArmEnableIrq):
+ASM_FUNC(ArmEnableIrq)
   msr   daifclr, #DAIF_WR_IRQ_BIT
   isb
   ret
 
 
-ASM_PFX(ArmDisableIrq):
+ASM_FUNC(ArmDisableIrq)
   msr   daifset, #DAIF_WR_IRQ_BIT
   isb
   ret
 
 
-ASM_PFX(ArmEnableFiq):
+ASM_FUNC(ArmEnableFiq)
   msr   daifclr, #DAIF_WR_FIQ_BIT
   isb
   ret
 
 
-ASM_PFX(ArmDisableFiq):
+ASM_FUNC(ArmDisableFiq)
   msr   daifset, #DAIF_WR_FIQ_BIT
   isb
   ret
 
 
-ASM_PFX(ArmEnableInterrupts):
+ASM_FUNC(ArmEnableInterrupts)
   msr   daifclr, #DAIF_WR_INT_BITS
   isb
   ret
 
 
-ASM_PFX(ArmDisableInterrupts):
+ASM_FUNC(ArmDisableInterrupts)
   msr   daifset, #DAIF_WR_INT_BITS
   isb
   ret
 
 
-ASM_PFX(ArmDisableAllExceptions):
+ASM_FUNC(ArmDisableAllExceptions)
   msr   daifset, #DAIF_WR_ALL
   isb
   ret
@@ -111,7 +94,7 @@ ASM_PFX(ArmDisableAllExceptions):
 // ReadCCSIDR (
 //   IN UINT32 CSSELR
 //   )
-ASM_PFX(ReadCCSIDR):
+ASM_FUNC(ReadCCSIDR)
   msr   csselr_el1, x0        // Write Cache Size Selection Register (CSSELR)
   isb
   mrs   x0, ccsidr_el1        // Read current Cache Size ID Register (CCSIDR)
@@ -122,7 +105,7 @@ ASM_PFX(ReadCCSIDR):
 // ReadCLIDR (
 //   IN UINT32 CSSELR
 //   )
-ASM_PFX(ReadCLIDR):
+ASM_FUNC(ReadCLIDR)
   mrs   x0, clidr_el1         // Read Cache Level ID Register
   ret
 

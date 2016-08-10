@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2011, ARM Limited. All rights reserved.
+# Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -12,107 +13,85 @@
 #
 #------------------------------------------------------------------------------
 
-.text
-.align 2
+#include <AsmMacroIoLib.h>
 
-GCC_ASM_EXPORT (ArmReadCntFrq)
-GCC_ASM_EXPORT (ArmWriteCntFrq)
-GCC_ASM_EXPORT (ArmReadCntPct)
-GCC_ASM_EXPORT (ArmReadCntkCtl)
-GCC_ASM_EXPORT (ArmWriteCntkCtl)
-GCC_ASM_EXPORT (ArmReadCntpTval)
-GCC_ASM_EXPORT (ArmWriteCntpTval)
-GCC_ASM_EXPORT (ArmReadCntpCtl)
-GCC_ASM_EXPORT (ArmWriteCntpCtl)
-GCC_ASM_EXPORT (ArmReadCntvTval)
-GCC_ASM_EXPORT (ArmWriteCntvTval)
-GCC_ASM_EXPORT (ArmReadCntvCtl)
-GCC_ASM_EXPORT (ArmWriteCntvCtl)
-GCC_ASM_EXPORT (ArmReadCntvCt)
-GCC_ASM_EXPORT (ArmReadCntpCval)
-GCC_ASM_EXPORT (ArmWriteCntpCval)
-GCC_ASM_EXPORT (ArmReadCntvCval)
-GCC_ASM_EXPORT (ArmWriteCntvCval)
-GCC_ASM_EXPORT (ArmReadCntvOff)
-GCC_ASM_EXPORT (ArmWriteCntvOff)
-
-ASM_PFX(ArmReadCntFrq):
+ASM_FUNC(ArmReadCntFrq)
   mrc    p15, 0, r0, c14, c0, 0    @ Read CNTFRQ
   bx     lr
 
-ASM_PFX(ArmWriteCntFrq):
+ASM_FUNC(ArmWriteCntFrq)
   mcr    p15, 0, r0, c14, c0, 0    @ Write to CNTFRQ
   bx     lr
 
-ASM_PFX(ArmReadCntPct):
+ASM_FUNC(ArmReadCntPct)
   mrrc   p15, 0, r0, r1, c14       @ Read CNTPT (Physical counter register)
   bx     lr
 
-ASM_PFX(ArmReadCntkCtl):
+ASM_FUNC(ArmReadCntkCtl)
   mrc    p15, 0, r0, c14, c1, 0    @ Read CNTK_CTL (Timer PL1 Control Register)
   bx     lr
 
-ASM_PFX(ArmWriteCntkCtl):
+ASM_FUNC(ArmWriteCntkCtl)
   mcr    p15, 0, r0, c14, c1, 0    @ Write to CNTK_CTL (Timer PL1 Control Register)
   bx     lr
 
-ASM_PFX(ArmReadCntpTval):
+ASM_FUNC(ArmReadCntpTval)
   mrc    p15, 0, r0, c14, c2, 0    @ Read CNTP_TVAL (PL1 physical timer value register)
   bx     lr
 
-ASM_PFX(ArmWriteCntpTval):
+ASM_FUNC(ArmWriteCntpTval)
   mcr    p15, 0, r0, c14, c2, 0    @ Write to CNTP_TVAL (PL1 physical timer value register)
   bx     lr
 
-ASM_PFX(ArmReadCntpCtl):
+ASM_FUNC(ArmReadCntpCtl)
   mrc    p15, 0, r0, c14, c2, 1    @ Read CNTP_CTL (PL1 Physical Timer Control Register)
   bx     lr
 
-ASM_PFX(ArmWriteCntpCtl):
+ASM_FUNC(ArmWriteCntpCtl)
   mcr    p15, 0, r0, c14, c2, 1    @ Write to  CNTP_CTL (PL1 Physical Timer Control Register)
   bx     lr
 
-ASM_PFX(ArmReadCntvTval):
+ASM_FUNC(ArmReadCntvTval)
   mrc    p15, 0, r0, c14, c3, 0    @ Read CNTV_TVAL (Virtual Timer Value register)
   bx     lr
 
-ASM_PFX(ArmWriteCntvTval):
+ASM_FUNC(ArmWriteCntvTval)
   mcr    p15, 0, r0, c14, c3, 0    @ Write to CNTV_TVAL (Virtual Timer Value register)
   bx     lr
 
-ASM_PFX(ArmReadCntvCtl):
+ASM_FUNC(ArmReadCntvCtl)
   mrc    p15, 0, r0, c14, c3, 1    @ Read CNTV_CTL (Virtual Timer Control Register)
   bx     lr
 
-ASM_PFX(ArmWriteCntvCtl):
+ASM_FUNC(ArmWriteCntvCtl)
   mcr    p15, 0, r0, c14, c3, 1    @ Write to CNTV_CTL (Virtual Timer Control Register)
   bx     lr
 
-ASM_PFX(ArmReadCntvCt):
+ASM_FUNC(ArmReadCntvCt)
   mrrc   p15, 1, r0, r1, c14       @ Read CNTVCT  (Virtual Count Register)
   bx     lr
 
-ASM_PFX(ArmReadCntpCval):
+ASM_FUNC(ArmReadCntpCval)
   mrrc   p15, 2, r0, r1, c14       @ Read CNTP_CTVAL (Physical Timer Compare Value Register)
   bx     lr
 
-ASM_PFX(ArmWriteCntpCval):
+ASM_FUNC(ArmWriteCntpCval)
   mcrr   p15, 2, r0, r1, c14       @ Write to CNTP_CTVAL (Physical Timer Compare Value Register)
   bx     lr
 
-ASM_PFX(ArmReadCntvCval):
+ASM_FUNC(ArmReadCntvCval)
   mrrc   p15, 3, r0, r1, c14       @ Read CNTV_CTVAL (Virtual Timer Compare Value Register)
   bx     lr
 
-ASM_PFX(ArmWriteCntvCval):
+ASM_FUNC(ArmWriteCntvCval)
   mcrr   p15, 3, r0, r1, c14       @ write to  CNTV_CTVAL (Virtual Timer Compare Value Register)
   bx     lr
 
-ASM_PFX(ArmReadCntvOff):
+ASM_FUNC(ArmReadCntvOff)
   mrrc   p15, 4, r0, r1, c14       @ Read CNTVOFF (virtual Offset register)
   bx     lr
 
-ASM_PFX(ArmWriteCntvOff):
+ASM_FUNC(ArmWriteCntvOff)
   mcrr   p15, 4, r0, r1, c14       @ Write to CNTVOFF (Virtual Offset register)
   bx     lr
 

@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2016, ARM Limited. All rights reserved.
+# Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -15,76 +16,48 @@
 
 #include <AsmMacroIoLibV8.h>
 
-.text
-.align 3
-GCC_ASM_EXPORT (ArmReadMidr)
-GCC_ASM_EXPORT (ArmCacheInfo)
-GCC_ASM_EXPORT (ArmGetInterruptState)
-GCC_ASM_EXPORT (ArmGetFiqState)
-GCC_ASM_EXPORT (ArmGetTTBR0BaseAddress)
-GCC_ASM_EXPORT (ArmSetTTBR0)
-GCC_ASM_EXPORT (ArmGetTCR)
-GCC_ASM_EXPORT (ArmSetTCR)
-GCC_ASM_EXPORT (ArmGetMAIR)
-GCC_ASM_EXPORT (ArmSetMAIR)
-GCC_ASM_EXPORT (ArmWriteCpacr)
-GCC_ASM_EXPORT (ArmWriteAuxCr)
-GCC_ASM_EXPORT (ArmReadAuxCr)
-GCC_ASM_EXPORT (ArmInvalidateTlb)
-GCC_ASM_EXPORT (ArmUpdateTranslationTableEntry)
-GCC_ASM_EXPORT (ArmWriteCptr)
-GCC_ASM_EXPORT (ArmWriteScr)
-GCC_ASM_EXPORT (ArmWriteMVBar)
-GCC_ASM_EXPORT (ArmCallWFE)
-GCC_ASM_EXPORT (ArmCallSEV)
-GCC_ASM_EXPORT (ArmReadCpuActlr)
-GCC_ASM_EXPORT (ArmWriteCpuActlr)
-GCC_ASM_EXPORT (ArmReadSctlr)
-
-#------------------------------------------------------------------------------
-
 .set DAIF_RD_FIQ_BIT,   (1 << 6)
 .set DAIF_RD_IRQ_BIT,   (1 << 7)
 
-ASM_PFX(ArmReadMidr):
+ASM_FUNC(ArmReadMidr)
   mrs     x0, midr_el1        // Read from Main ID Register (MIDR)
   ret
 
-ASM_PFX(ArmCacheInfo):
+ASM_FUNC(ArmCacheInfo)
   mrs     x0, ctr_el0         // Read from Cache Type Regiter (CTR)
   ret
 
-ASM_PFX(ArmGetInterruptState):
+ASM_FUNC(ArmGetInterruptState)
   mrs     x0, daif
   tst     w0, #DAIF_RD_IRQ_BIT  // Check if IRQ is enabled. Enabled if 0 (Z=1)
   cset    w0, eq                // if Z=1 return 1, else 0
   ret
 
-ASM_PFX(ArmGetFiqState):
+ASM_FUNC(ArmGetFiqState)
   mrs     x0, daif
   tst     w0, #DAIF_RD_FIQ_BIT  // Check if FIQ is enabled. Enabled if 0 (Z=1)
   cset    w0, eq                // if Z=1 return 1, else 0
   ret
 
-ASM_PFX(ArmWriteCpacr):
+ASM_FUNC(ArmWriteCpacr)
   msr     cpacr_el1, x0      // Coprocessor Access Control Reg (CPACR)
   ret
 
-ASM_PFX(ArmWriteAuxCr):
+ASM_FUNC(ArmWriteAuxCr)
   EL1_OR_EL2(x1)
 1:msr     actlr_el1, x0      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
   ret
 2:msr     actlr_el2, x0      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
   ret
 
-ASM_PFX(ArmReadAuxCr):
+ASM_FUNC(ArmReadAuxCr)
   EL1_OR_EL2(x1)
 1:mrs     x0, actlr_el1      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
   ret
 2:mrs     x0, actlr_el2      // Aux Control Reg (ACTLR) at EL1. Also available in EL2 and EL3
   ret
 
-ASM_PFX(ArmSetTTBR0):
+ASM_FUNC(ArmSetTTBR0)
   EL1_OR_EL2_OR_EL3(x1)
 1:msr     ttbr0_el1, x0      // Translation Table Base Reg 0 (TTBR0)
   b       4f
@@ -94,17 +67,16 @@ ASM_PFX(ArmSetTTBR0):
 4:isb
   ret
 
-ASM_PFX(ArmGetTTBR0BaseAddress):
+ASM_FUNC(ArmGetTTBR0BaseAddress)
   EL1_OR_EL2(x1)
 1:mrs     x0, ttbr0_el1
   b       3f
 2:mrs     x0, ttbr0_el2
-3:LoadConstantToReg(0xFFFFFFFFFFFF, x1) /* Look at bottom 48 bits */
-  and     x0, x0, x1
+3:and     x0, x0, 0xFFFFFFFFFFFF  /* Look at bottom 48 bits */
   isb
   ret
 
-ASM_PFX(ArmGetTCR):
+ASM_FUNC(ArmGetTCR)
   EL1_OR_EL2_OR_EL3(x1)
 1:mrs     x0, tcr_el1
   b       4f
@@ -114,7 +86,7 @@ ASM_PFX(ArmGetTCR):
 4:isb
   ret
 
-ASM_PFX(ArmSetTCR):
+ASM_FUNC(ArmSetTCR)
   EL1_OR_EL2_OR_EL3(x1)
 1:msr     tcr_el1, x0
   b       4f
@@ -124,7 +96,7 @@ ASM_PFX(ArmSetTCR):
 4:isb
   ret
 
-ASM_PFX(ArmGetMAIR):
+ASM_FUNC(ArmGetMAIR)
   EL1_OR_EL2_OR_EL3(x1)
 1:mrs     x0, mair_el1
   b       4f
@@ -134,7 +106,7 @@ ASM_PFX(ArmGetMAIR):
 4:isb
   ret
 
-ASM_PFX(ArmSetMAIR):
+ASM_FUNC(ArmSetMAIR)
   EL1_OR_EL2_OR_EL3(x1)
 1:msr     mair_el1, x0
   b       4f
@@ -151,7 +123,7 @@ ASM_PFX(ArmSetMAIR):
 //  IN VOID  *TranslationTableEntry  // X0
 //  IN VOID  *MVA                    // X1
 //  );
-ASM_PFX(ArmUpdateTranslationTableEntry):
+ASM_FUNC(ArmUpdateTranslationTableEntry)
    dc      civac, x0             // Clean and invalidate data line
    dsb     sy
    EL1_OR_EL2_OR_EL3(x0)
@@ -164,7 +136,7 @@ ASM_PFX(ArmUpdateTranslationTableEntry):
    isb
    ret
 
-ASM_PFX(ArmInvalidateTlb):
+ASM_FUNC(ArmInvalidateTlb)
    EL1_OR_EL2_OR_EL3(x0)
 1: tlbi  vmalle1
    b     4f
@@ -175,38 +147,38 @@ ASM_PFX(ArmInvalidateTlb):
    isb
    ret
 
-ASM_PFX(ArmWriteCptr):
+ASM_FUNC(ArmWriteCptr)
   msr     cptr_el3, x0           // EL3 Coprocessor Trap Reg (CPTR)
   ret
 
-ASM_PFX(ArmWriteScr):
+ASM_FUNC(ArmWriteScr)
   msr     scr_el3, x0            // Secure configuration register EL3
   isb
   ret
 
-ASM_PFX(ArmWriteMVBar):
+ASM_FUNC(ArmWriteMVBar)
   msr    vbar_el3, x0            // Exception Vector Base address for Monitor on EL3
   ret
 
-ASM_PFX(ArmCallWFE):
+ASM_FUNC(ArmCallWFE)
   wfe
   ret
 
-ASM_PFX(ArmCallSEV):
+ASM_FUNC(ArmCallSEV)
   sev
   ret
 
-ASM_PFX(ArmReadCpuActlr):
+ASM_FUNC(ArmReadCpuActlr)
   mrs   x0, S3_1_c15_c2_0
   ret
 
-ASM_PFX(ArmWriteCpuActlr):
+ASM_FUNC(ArmWriteCpuActlr)
   msr   S3_1_c15_c2_0, x0
   dsb   sy
   isb
   ret
 
-ASM_PFX(ArmReadSctlr):
+ASM_FUNC(ArmReadSctlr)
   EL1_OR_EL2_OR_EL3(x1)
 1:mrs   x0, sctlr_el1
   ret

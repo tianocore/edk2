@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+# Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -13,45 +14,7 @@
 #
 #------------------------------------------------------------------------------
 
-.text
-.align 2
-
-GCC_ASM_EXPORT (ArmInvalidateInstructionCache)
-GCC_ASM_EXPORT (ArmInvalidateDataCacheEntryByMVA)
-GCC_ASM_EXPORT (ArmInvalidateInstructionCacheEntryToPoUByMVA)
-GCC_ASM_EXPORT (ArmCleanDataCacheEntryByMVA)
-GCC_ASM_EXPORT (ArmCleanDataCacheEntryToPoUByMVA)
-GCC_ASM_EXPORT (ArmCleanInvalidateDataCacheEntryByMVA)
-GCC_ASM_EXPORT (ArmInvalidateDataCacheEntryBySetWay)
-GCC_ASM_EXPORT (ArmCleanDataCacheEntryBySetWay)
-GCC_ASM_EXPORT (ArmCleanInvalidateDataCacheEntryBySetWay)
-GCC_ASM_EXPORT (ArmEnableMmu)
-GCC_ASM_EXPORT (ArmDisableMmu)
-GCC_ASM_EXPORT (ArmDisableCachesAndMmu)
-GCC_ASM_EXPORT (ArmMmuEnabled)
-GCC_ASM_EXPORT (ArmEnableDataCache)
-GCC_ASM_EXPORT (ArmDisableDataCache)
-GCC_ASM_EXPORT (ArmEnableInstructionCache)
-GCC_ASM_EXPORT (ArmDisableInstructionCache)
-GCC_ASM_EXPORT (ArmEnableSWPInstruction)
-GCC_ASM_EXPORT (ArmEnableBranchPrediction)
-GCC_ASM_EXPORT (ArmDisableBranchPrediction)
-GCC_ASM_EXPORT (ArmSetLowVectors)
-GCC_ASM_EXPORT (ArmSetHighVectors)
-GCC_ASM_EXPORT (ArmV7AllDataCachesOperation)
-GCC_ASM_EXPORT (ArmDataMemoryBarrier)
-GCC_ASM_EXPORT (ArmDataSynchronizationBarrier)
-GCC_ASM_EXPORT (ArmInstructionSynchronizationBarrier)
-GCC_ASM_EXPORT (ArmReadVBar)
-GCC_ASM_EXPORT (ArmWriteVBar)
-GCC_ASM_EXPORT (ArmEnableVFP)
-GCC_ASM_EXPORT (ArmCallWFI)
-GCC_ASM_EXPORT (ArmReadCbar)
-GCC_ASM_EXPORT (ArmReadMpidr)
-GCC_ASM_EXPORT (ArmReadTpidrurw)
-GCC_ASM_EXPORT (ArmWriteTpidrurw)
-GCC_ASM_EXPORT (ArmIsArchTimerImplemented)
-GCC_ASM_EXPORT (ArmReadIdPfr1)
+#include <AsmMacroIoLib.h>
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
@@ -61,50 +24,50 @@ GCC_ASM_EXPORT (ArmReadIdPfr1)
 .set CTRL_I_BIT,  (1 << 12)
 
 
-ASM_PFX(ArmInvalidateDataCacheEntryByMVA):
+ASM_FUNC(ArmInvalidateDataCacheEntryByMVA)
   mcr     p15, 0, r0, c7, c6, 1   @invalidate single data cache line
   bx      lr
 
-ASM_PFX(ArmCleanDataCacheEntryByMVA):
+ASM_FUNC(ArmCleanDataCacheEntryByMVA)
   mcr     p15, 0, r0, c7, c10, 1  @clean single data cache line
   bx      lr
 
 
-ASM_PFX(ArmCleanDataCacheEntryToPoUByMVA):
+ASM_FUNC(ArmCleanDataCacheEntryToPoUByMVA)
   mcr     p15, 0, r0, c7, c11, 1  @clean single data cache line to PoU
   bx      lr
 
-ASM_PFX(ArmInvalidateInstructionCacheEntryToPoUByMVA):
+ASM_FUNC(ArmInvalidateInstructionCacheEntryToPoUByMVA)
   mcr     p15, 0, r0, c7, c5, 1  @Invalidate single instruction cache line to PoU
   mcr     p15, 0, r0, c7, c5, 7  @Invalidate branch predictor
   bx      lr
 
-ASM_PFX(ArmCleanInvalidateDataCacheEntryByMVA):
+ASM_FUNC(ArmCleanInvalidateDataCacheEntryByMVA)
   mcr     p15, 0, r0, c7, c14, 1  @clean and invalidate single data cache line
   bx      lr
 
 
-ASM_PFX(ArmInvalidateDataCacheEntryBySetWay):
+ASM_FUNC(ArmInvalidateDataCacheEntryBySetWay)
   mcr     p15, 0, r0, c7, c6, 2        @ Invalidate this line
   bx      lr
 
 
-ASM_PFX(ArmCleanInvalidateDataCacheEntryBySetWay):
+ASM_FUNC(ArmCleanInvalidateDataCacheEntryBySetWay)
   mcr     p15, 0, r0, c7, c14, 2       @ Clean and Invalidate this line
   bx      lr
 
 
-ASM_PFX(ArmCleanDataCacheEntryBySetWay):
+ASM_FUNC(ArmCleanDataCacheEntryBySetWay)
   mcr     p15, 0, r0, c7, c10, 2       @ Clean this line
   bx      lr
 
-ASM_PFX(ArmInvalidateInstructionCache):
+ASM_FUNC(ArmInvalidateInstructionCache)
   mcr     p15,0,R0,c7,c5,0      @Invalidate entire instruction cache
   dsb
   isb
   bx      LR
 
-ASM_PFX(ArmEnableMmu):
+ASM_FUNC(ArmEnableMmu)
   mrc     p15,0,R0,c1,c0,0
   orr     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0
@@ -113,7 +76,7 @@ ASM_PFX(ArmEnableMmu):
   bx      LR
 
 
-ASM_PFX(ArmDisableMmu):
+ASM_FUNC(ArmDisableMmu)
   mrc     p15,0,R0,c1,c0,0
   bic     R0,R0,#1
   mcr     p15,0,R0,c1,c0,0      @Disable MMU
@@ -124,7 +87,7 @@ ASM_PFX(ArmDisableMmu):
   isb
   bx      LR
 
-ASM_PFX(ArmDisableCachesAndMmu):
+ASM_FUNC(ArmDisableCachesAndMmu)
   mrc   p15, 0, r0, c1, c0, 0           @ Get control register
   bic   r0, r0, #CTRL_M_BIT             @ Disable MMU
   bic   r0, r0, #CTRL_C_BIT             @ Disable D Cache
@@ -134,12 +97,12 @@ ASM_PFX(ArmDisableCachesAndMmu):
   isb
   bx      LR
 
-ASM_PFX(ArmMmuEnabled):
+ASM_FUNC(ArmMmuEnabled)
   mrc     p15,0,R0,c1,c0,0
   and     R0,R0,#1
   bx      LR
 
-ASM_PFX(ArmEnableDataCache):
+ASM_FUNC(ArmEnableDataCache)
   ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
   orr     R0,R0,R1              @Set C bit
@@ -148,7 +111,7 @@ ASM_PFX(ArmEnableDataCache):
   isb
   bx      LR
 
-ASM_PFX(ArmDisableDataCache):
+ASM_FUNC(ArmDisableDataCache)
   ldr     R1,=DC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
   bic     R0,R0,R1              @Clear C bit
@@ -157,7 +120,7 @@ ASM_PFX(ArmDisableDataCache):
   isb
   bx      LR
 
-ASM_PFX(ArmEnableInstructionCache):
+ASM_FUNC(ArmEnableInstructionCache)
   ldr     R1,=IC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
   orr     R0,R0,R1              @Set I bit
@@ -166,7 +129,7 @@ ASM_PFX(ArmEnableInstructionCache):
   isb
   bx      LR
 
-ASM_PFX(ArmDisableInstructionCache):
+ASM_FUNC(ArmDisableInstructionCache)
   ldr     R1,=IC_ON
   mrc     p15,0,R0,c1,c0,0      @Read control register configuration data
   bic     R0,R0,R1              @Clear I bit.
@@ -175,14 +138,14 @@ ASM_PFX(ArmDisableInstructionCache):
   isb
   bx      LR
 
-ASM_PFX(ArmEnableSWPInstruction):
+ASM_FUNC(ArmEnableSWPInstruction)
   mrc     p15, 0, r0, c1, c0, 0
   orr     r0, r0, #0x00000400
   mcr     p15, 0, r0, c1, c0, 0
   isb
   bx      LR
 
-ASM_PFX(ArmEnableBranchPrediction):
+ASM_FUNC(ArmEnableBranchPrediction)
   mrc     p15, 0, r0, c1, c0, 0
   orr     r0, r0, #0x00000800
   mcr     p15, 0, r0, c1, c0, 0
@@ -190,7 +153,7 @@ ASM_PFX(ArmEnableBranchPrediction):
   isb
   bx      LR
 
-ASM_PFX(ArmDisableBranchPrediction):
+ASM_FUNC(ArmDisableBranchPrediction)
   mrc     p15, 0, r0, c1, c0, 0
   bic     r0, r0, #0x00000800
   mcr     p15, 0, r0, c1, c0, 0
@@ -198,21 +161,21 @@ ASM_PFX(ArmDisableBranchPrediction):
   isb
   bx      LR
 
-ASM_PFX(ArmSetLowVectors):
+ASM_FUNC(ArmSetLowVectors)
   mrc     p15, 0, r0, c1, c0, 0 @ Read SCTLR into R0 (Read control register configuration data)
   bic     r0, r0, #0x00002000   @ clear V bit
   mcr     p15, 0, r0, c1, c0, 0 @ Write R0 into SCTLR (Write control register configuration data)
   isb
   bx      LR
 
-ASM_PFX(ArmSetHighVectors):
+ASM_FUNC(ArmSetHighVectors)
   mrc     p15, 0, r0, c1, c0, 0 @ Read SCTLR into R0 (Read control register configuration data)
   orr     r0, r0, #0x00002000   @ Set V bit
   mcr     p15, 0, r0, c1, c0, 0 @ Write R0 into SCTLR (Write control register configuration data)
   isb
   bx      LR
 
-ASM_PFX(ArmV7AllDataCachesOperation):
+ASM_FUNC(ArmV7AllDataCachesOperation)
   stmfd SP!,{r4-r12, LR}
   mov   R1, R0                @ Save Function call in R1
   mrc   p15, 1, R6, c0, c0, 1 @ Read CLIDR
@@ -265,24 +228,24 @@ L_Finished:
   ldmfd SP!, {r4-r12, lr}
   bx    LR
 
-ASM_PFX(ArmDataMemoryBarrier):
+ASM_FUNC(ArmDataMemoryBarrier)
   dmb
   bx      LR
 
-ASM_PFX(ArmDataSynchronizationBarrier):
+ASM_FUNC(ArmDataSynchronizationBarrier)
   dsb
   bx      LR
 
-ASM_PFX(ArmInstructionSynchronizationBarrier):
+ASM_FUNC(ArmInstructionSynchronizationBarrier)
   isb
   bx      LR
 
-ASM_PFX(ArmReadVBar):
+ASM_FUNC(ArmReadVBar)
   # Set the Address of the Vector Table in the VBAR register
   mrc     p15, 0, r0, c12, c0, 0
   bx      lr
 
-ASM_PFX(ArmWriteVBar):
+ASM_FUNC(ArmWriteVBar)
   # Set the Address of the Vector Table in the VBAR register
   mcr     p15, 0, r0, c12, c0, 0
   # Ensure the SCTLR.V bit is clear
@@ -292,7 +255,7 @@ ASM_PFX(ArmWriteVBar):
   isb
   bx      lr
 
-ASM_PFX(ArmEnableVFP):
+ASM_FUNC(ArmEnableVFP)
   # Read CPACR (Coprocessor Access Control Register)
   mrc     p15, 0, r0, c1, c0, 2
   # Enable VPF access (Full Access to CP10, CP11) (V* instructions)
@@ -309,33 +272,33 @@ ASM_PFX(ArmEnableVFP):
 #endif
   bx      lr
 
-ASM_PFX(ArmCallWFI):
+ASM_FUNC(ArmCallWFI)
   wfi
   bx      lr
 
 #Note: Return 0 in Uniprocessor implementation
-ASM_PFX(ArmReadCbar):
+ASM_FUNC(ArmReadCbar)
   mrc     p15, 4, r0, c15, c0, 0  @ Read Configuration Base Address Register
   bx      lr
 
-ASM_PFX(ArmReadMpidr):
+ASM_FUNC(ArmReadMpidr)
   mrc     p15, 0, r0, c0, c0, 5       @ read MPIDR
   bx      lr
 
-ASM_PFX(ArmReadTpidrurw):
+ASM_FUNC(ArmReadTpidrurw)
   mrc     p15, 0, r0, c13, c0, 2    @ read TPIDRURW
   bx      lr
 
-ASM_PFX(ArmWriteTpidrurw):
+ASM_FUNC(ArmWriteTpidrurw)
   mcr     p15, 0, r0, c13, c0, 2    @ write TPIDRURW
   bx      lr
 
-ASM_PFX(ArmIsArchTimerImplemented):
+ASM_FUNC(ArmIsArchTimerImplemented)
   mrc    p15, 0, r0, c0, c1, 1     @ Read ID_PFR1
   and    r0, r0, #0x000F0000
   bx     lr
 
-ASM_PFX(ArmReadIdPfr1):
+ASM_FUNC(ArmReadIdPfr1)
   mrc    p15, 0, r0, c0, c1, 1     @ Read ID_PFR1 Register
   bx     lr
 
