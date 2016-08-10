@@ -14,8 +14,6 @@
 
 #include <AsmMacroIoLibV8.h>
 
-GCC_ASM_EXPORT(ArmReplaceLiveTranslationEntry)
-
   .set CTRL_M_BIT,      (1 << 0)
 
   .macro __replace_entry, el
@@ -52,7 +50,7 @@ GCC_ASM_EXPORT(ArmReplaceLiveTranslationEntry)
 //  IN  UINT64  *Entry,
 //  IN  UINT64  Value
 //  )
-ASM_PFX(ArmReplaceLiveTranslationEntry):
+ASM_FUNC(ArmReplaceLiveTranslationEntry)
 
   // disable interrupts
   mrs   x2, daif
