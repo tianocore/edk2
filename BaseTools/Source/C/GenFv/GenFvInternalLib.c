@@ -2770,11 +2770,13 @@ Returns:
       //
       // Update reset vector (SALE_ENTRY for IPF)
       // Now for IA32 and IA64 platform, the fv which has bsf file must have the 
-      // EndAddress of 0xFFFFFFFF. Thus, only this type fv needs to update the   
-      // reset vector. If the PEI Core is found, the VTF file will probably get  
-      // corrupted by updating the entry point.                                  
+      // EndAddress of 0xFFFFFFFF (unless the section was rebased).
+      // Thus, only this type fv needs to update the  reset vector.
+      // If the PEI Core is found, the VTF file will probably get
+      // corrupted by updating the entry point.
       //
-      if ((mFvDataInfo.BaseAddress + mFvDataInfo.Size) == FV_IMAGES_TOP_ADDRESS) {       
+      if (mFvDataInfo.ForceRebase == 1 ||
+          (mFvDataInfo.BaseAddress + mFvDataInfo.Size) == FV_IMAGES_TOP_ADDRESS) {
         Status = UpdateResetVector (&FvImageMemoryFile, &mFvDataInfo, VtfFileImage);
         if (EFI_ERROR(Status)) {                                               
           Error (NULL, 0, 3000, "Invalid", "Could not update the reset vector.");
