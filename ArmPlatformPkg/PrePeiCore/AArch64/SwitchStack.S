@@ -14,12 +14,7 @@
 #
 #------------------------------------------------------------------------------
 
-.text
-.align 3
-
-GCC_ASM_EXPORT(SecSwitchStack)
-
-
+#include <AsmMacroIoLibV8.h>
 
 #/**
 #  This allows the caller to switch the stack and return
@@ -35,7 +30,7 @@ GCC_ASM_EXPORT(SecSwitchStack)
 #  VOID  *StackDelta
 #  )#
 #
-ASM_PFX(SecSwitchStack):
+ASM_FUNC(SecSwitchStack)
     mov   x1, sp
     add   x1, x0, x1
     mov   sp, x1

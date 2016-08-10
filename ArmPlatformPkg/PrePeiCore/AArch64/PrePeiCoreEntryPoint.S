@@ -12,23 +12,8 @@
 //
 
 #include <AsmMacroIoLibV8.h>
-#include <Base.h>
-#include <Library/PcdLib.h>
-#include <AutoGen.h>
 
-.text
-.align 3
-
-GCC_ASM_IMPORT(CEntryPoint)
-GCC_ASM_IMPORT(ArmPlatformGetCorePosition)
-GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_IMPORT(ArmReadMpidr)
-GCC_ASM_IMPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(_ModuleEntryPoint)
-
-StartupAddr: .8byte CEntryPoint
-
-ASM_PFX(_ModuleEntryPoint):
+ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
@@ -60,9 +45,7 @@ ASM_PFX(MainEntryPoint):
   bl    ASM_PFX(ArmPlatformIsPrimaryCore)
 
   // Get the top of the primary stacks (and the base of the secondary stacks)
-  LoadConstantToReg (FixedPcdGet64(PcdCPUCoresStackBase), x1)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
-  add   x1, x1, x2
+  MOV64 (x1, FixedPcdGet64(PcdCPUCoresStackBase) + FixedPcdGet32(PcdCPUCorePrimaryStackSize))
 
   // x0 is equal to 1 if I am the primary core
   cmp   x0, #1
@@ -79,20 +62,19 @@ _SetupSecondaryCoreStack:
   add   x0, x0, #1
 
   // StackOffset = CorePos * StackSize
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), x2)
+  MOV32 (x2, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   mul   x0, x0, x2
   // SP = StackBase + StackOffset
   add   sp, x6, x0
 
 _PrepareArguments:
   // The PEI Core Entry Point has been computed by GenFV and stored in the second entry of the Reset Vector
-  LoadConstantToReg (FixedPcdGet64(PcdFvBaseAddress), x2)
-  add   x2, x2, #8
-  ldr   x1, [x2]
+  MOV64 (x2, FixedPcdGet64(PcdFvBaseAddress))
+  ldr   x1, [x2, #8]
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   x3, StartupAddr
+  ldr   x3, =ASM_PFX(CEntryPoint)
 
   // Jump to PrePeiCore C code
   //    x0 = mp_id

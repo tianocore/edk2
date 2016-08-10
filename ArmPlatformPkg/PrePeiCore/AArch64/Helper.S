@@ -14,15 +14,8 @@
 #include <AsmMacroIoLibV8.h>
 #include <Chipset/AArch64.h>
 
-#start of the code section
-.text
-.align 3
-
-GCC_ASM_EXPORT(SetupExceptionLevel1)
-GCC_ASM_EXPORT(SetupExceptionLevel2)
-
 // Setup EL1 while in EL1
-ASM_PFX(SetupExceptionLevel1):
+ASM_FUNC(SetupExceptionLevel1)
    mov  x5, x30                   // Save LR
 
    mov  x0, #CPACR_CP_FULL_ACCESS
@@ -31,7 +24,7 @@ ASM_PFX(SetupExceptionLevel1):
    ret  x5
 
 // Setup EL2 while in EL2
-ASM_PFX(SetupExceptionLevel2):
+ASM_FUNC(SetupExceptionLevel2)
    msr     sctlr_el2, xzr
    mrs     x0, hcr_el2            // Read EL2 Hypervisor configuration Register
 
