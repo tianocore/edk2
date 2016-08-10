@@ -86,6 +86,8 @@
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+
 [LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmV7/ArmV7Lib.inf
 
@@ -144,6 +146,8 @@
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
   ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+
+  ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
 [Components.ARM]
   ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
