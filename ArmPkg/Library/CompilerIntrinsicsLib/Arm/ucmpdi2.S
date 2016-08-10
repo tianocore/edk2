@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__ucmpdi2)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__ucmpdi2):
+ASM_FUNC(__ucmpdi2)
   stmfd  sp!, {r4, r5, r8, lr}
   cmp  r1, r3
   mov  r8, r0

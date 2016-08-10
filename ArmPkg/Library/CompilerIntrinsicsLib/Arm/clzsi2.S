@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__clzsi2)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__clzsi2):
+ASM_FUNC(__clzsi2)
   @ frame_needed = 1, uses_anonymous_args = 0
   stmfd  sp!, {r7, lr}
   add  r7, sp, #0

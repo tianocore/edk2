@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__ctzsi2)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__ctzsi2):
+ASM_FUNC(__ctzsi2)
   uxth  r3, r0
   cmp  r3, #0
   moveq  ip, #16

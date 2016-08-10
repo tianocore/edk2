@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__umodsi3)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__umodsi3):
+ASM_FUNC(__umodsi3)
   stmfd  sp!, {r4, r5, r7, lr}
   add  r7, sp, #8
   mov  r5, r0

@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__divsi3)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__divsi3):
+ASM_FUNC(__divsi3)
   eor  r3, r0, r0, asr #31
   eor  r2, r1, r1, asr #31
   stmfd  sp!, {r4, r5, r7, lr}

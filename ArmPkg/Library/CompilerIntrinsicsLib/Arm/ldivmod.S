@@ -12,10 +12,7 @@
 //
 //------------------------------------------------------------------------------
 
-
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__aeabi_ldivmod)
+#include <AsmMacroIoLib.h>
 
 //
 // A pair of (unsigned) long longs is returned in {{r0, r1}, {r2, r3}},
@@ -29,7 +26,7 @@
 //  )//
 //
 
-ASM_PFX(__aeabi_ldivmod):
+ASM_FUNC(__aeabi_ldivmod)
     push     {r4,lr}
     asrs     r4,r1,#1
     eor      r4,r4,r3,LSR #1

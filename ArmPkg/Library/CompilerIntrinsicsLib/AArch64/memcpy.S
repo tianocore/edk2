@@ -26,16 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-.text
-.align 2
-
-
-GCC_ASM_EXPORT(memcpy)
-
+#include <AsmMacroIoLibV8.h>
 
 // Taken from Newlib BSD implementation.
-ASM_PFX(memcpy):
+ASM_FUNC(memcpy)
         // Copy dst to x6, so we can preserve return value.
         mov     x6, x0
 

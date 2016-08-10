@@ -13,14 +13,11 @@
 #**/
 #
 
-.text
+#include <AsmMacroIoLib.h>
+
 .syntax unified
-.p2align 2
 
-GCC_ASM_EXPORT(__switchu8)
-
-
-ASM_PFX(__switchu8):
+ASM_FUNC(__switchu8)
     ldrb      ip,[lr,#-1]
     cmp       r0,ip
     ldrbcc    r0,[lr,r0]

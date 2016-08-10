@@ -13,13 +13,11 @@
 #**/
 #
 
-.text
+#include <AsmMacroIoLib.h>
+
 .syntax unified
-.p2align 2
 
-GCC_ASM_EXPORT(__switch16)
-
-ASM_PFX(__switch16):
+ASM_FUNC(__switch16)
     ldrh      ip, [lr, #-1]
     cmp       r0, ip
     add       r0, lr, r0, lsl #1

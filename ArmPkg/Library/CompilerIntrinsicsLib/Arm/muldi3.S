@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__muldi3)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__muldi3):
+ASM_FUNC(__muldi3)
   stmfd  sp!, {r4, r5, r6, r7, lr}
   add  r7, sp, #12
   stmfd  sp!, {r8, r10, r11}

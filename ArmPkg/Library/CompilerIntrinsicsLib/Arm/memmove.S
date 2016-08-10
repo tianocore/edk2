@@ -12,9 +12,7 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT (memmove)
+#include <AsmMacroIoLib.h>
 
 # VOID
 # EFIAPI
@@ -23,7 +21,7 @@
 #  IN  CONST VOID    *Source,
 #  IN  UINT32        Size
 #  );
-ASM_PFX(memmove):
+ASM_FUNC(memmove)
   CMP     r2, #0
   BXEQ    lr
   CMP     r0, r1

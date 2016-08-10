@@ -12,10 +12,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-.text
-.align 2
-GCC_ASM_EXPORT(__aeabi_llsl)
+#include <AsmMacroIoLib.h>
 
 #
 #VOID
@@ -26,7 +23,7 @@ GCC_ASM_EXPORT(__aeabi_llsl)
 # IN  UINT32  Size
 # );
 #
-ASM_PFX(__aeabi_llsl):
+ASM_FUNC(__aeabi_llsl)
     subs     r3,r2,#0x20
     bpl      1f
     rsb      r3,r2,#0x20

@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__ashldi3)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__ashldi3):
+ASM_FUNC(__ashldi3)
   cmp  r2, #31
   bls  L2
   cmp  r2, #63

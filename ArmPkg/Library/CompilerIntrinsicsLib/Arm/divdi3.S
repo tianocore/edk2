@@ -12,11 +12,9 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .align 2
-  GCC_ASM_EXPORT(__divdi3)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__divdi3):
+ASM_FUNC(__divdi3)
   @ args = 0, pretend = 0, frame = 0
   @ frame_needed = 1, uses_anonymous_args = 0
   stmfd  sp!, {r4, r5, r7, lr}

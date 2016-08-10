@@ -12,12 +12,11 @@
 #
 #------------------------------------------------------------------------------
 
-  .text
-  .syntax unified
-  .align 2
-  GCC_ASM_EXPORT(__udivmoddi4)
+#include <AsmMacroIoLib.h>
 
-ASM_PFX(__udivmoddi4):
+  .syntax unified
+
+ASM_FUNC(__udivmoddi4)
   stmfd  sp!, {r4, r5, r6, r7, lr}
   add  r7, sp, #12
   stmfd  sp!, {r10, r11}
