@@ -14,6 +14,8 @@
 
 #include <AsmMacroIoLibV8.h>
 
+GCC_ASM_EXPORT(ArmReplaceLiveTranslationEntry)
+
   .set CTRL_M_BIT,      (1 << 0)
 
   .macro __replace_entry, el
@@ -71,6 +73,8 @@ ASM_PFX(ArmReplaceLiveTranslationEntry):
 
 4:msr   daif, x2
   ret
+
+ASM_GLOBAL ASM_PFX(ArmReplaceLiveTranslationEntrySize)
 
 ASM_PFX(ArmReplaceLiveTranslationEntrySize):
   .long   . - ArmReplaceLiveTranslationEntry
