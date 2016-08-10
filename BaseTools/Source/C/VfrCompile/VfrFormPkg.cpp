@@ -1201,7 +1201,6 @@ CIfrRecordInfoDB::CheckQuestionOpCode (
   case EFI_IFR_TIME_OP:
   case EFI_IFR_ORDERED_LIST_OP:
   case EFI_IFR_REF_OP:
-  case EFI_IFR_RESET_BUTTON_OP:
     return TRUE;
   default:
     return FALSE;
