@@ -4050,9 +4050,14 @@ GetQuestionDefault (
   INTN                            Action;
   CHAR16                          *NewString;
   EFI_IFR_TYPE_VALUE              *TypeValue;
+  UINT16                          OriginalDefaultId;
+  FORMSET_DEFAULTSTORE            *DefaultStore;
+  LIST_ENTRY                      *DefaultLink;
 
   Status   = EFI_NOT_FOUND;
   StrValue = NULL;
+  OriginalDefaultId  = DefaultId;
+  DefaultLink        = GetFirstNode (&FormSet->DefaultStoreListHead);
 
   //
   // Statement don't have storage, skip them
@@ -4069,6 +4074,7 @@ GetQuestionDefault (
   //  4, set flags of EFI_ONE_OF_OPTION (provide Standard and Manufacturing default)
   //  5, set flags of EFI_IFR_CHECKBOX (provide Standard and Manufacturing default) (lowest priority)
   //
+ReGetDefault:
   HiiValue = &Question->HiiValue;
   TypeValue = &HiiValue->Value;
   if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
@@ -4235,7 +4241,22 @@ GetQuestionDefault (
   }
 
   //
-  // For Questions without default
+  // For question without default value for current default Id, we try to re-get the default value form other default id in the DefaultStoreList.
+  // If get, will exit the function, if not, will choose next default id in the DefaultStoreList.
+  // The default id in DefaultStoreList are in ascending order to make sure choose the smallest default id every time.
+  //
+  while (!IsNull(&FormSet->DefaultStoreListHead, DefaultLink)) {
+    DefaultStore = FORMSET_DEFAULTSTORE_FROM_LINK(DefaultLink);
+    DefaultLink = GetNextNode (&FormSet->DefaultStoreListHead,DefaultLink);
+    DefaultId = DefaultStore->DefaultId;
+    if (DefaultId == OriginalDefaultId) {
+      continue;
+    }
+    goto ReGetDefault;
+  }
+
+  //
+  // For Questions without default value for all the default id in the DefaultStoreList.
   //
   Status = EFI_NOT_FOUND;
   switch (Question->Operand) {

@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1311,6 +1311,9 @@ ParseOpCodes (
   INTN                    ConditionalExprCount;
   BOOLEAN                 InUnknownScope;
   UINT8                   UnknownDepth;
+  FORMSET_DEFAULTSTORE    *PreDefaultStore;
+  LIST_ENTRY              *DefaultLink;
+  BOOLEAN                 HaveInserted;
 
   SuppressForQuestion      = FALSE;
   SuppressForOption        = FALSE;
@@ -1875,17 +1878,31 @@ ParseOpCodes (
     // DefaultStore
     //
     case EFI_IFR_DEFAULTSTORE_OP:
+      HaveInserted = FALSE;
       DefaultStore = AllocateZeroPool (sizeof (FORMSET_DEFAULTSTORE));
       ASSERT (DefaultStore != NULL);
       DefaultStore->Signature = FORMSET_DEFAULTSTORE_SIGNATURE;
 
       CopyMem (&DefaultStore->DefaultId,   &((EFI_IFR_DEFAULTSTORE *) OpCodeData)->DefaultId,   sizeof (UINT16));
       CopyMem (&DefaultStore->DefaultName, &((EFI_IFR_DEFAULTSTORE *) OpCodeData)->DefaultName, sizeof (EFI_STRING_ID));
-
       //
-      // Insert to DefaultStore list of this Formset
+      // Insert it to the DefaultStore list of this Formset with ascending order.
       //
-      InsertTailList (&FormSet->DefaultStoreListHead, &DefaultStore->Link);
+      if (!IsListEmpty (&FormSet->DefaultStoreListHead)) {
+        DefaultLink = GetFirstNode (&FormSet->DefaultStoreListHead);
+        while (!IsNull (&FormSet->DefaultStoreListHead, DefaultLink)) {
+          PreDefaultStore = FORMSET_DEFAULTSTORE_FROM_LINK(DefaultLink);
+          DefaultLink = GetNextNode (&FormSet->DefaultStoreListHead, DefaultLink);
+          if (DefaultStore->DefaultId < PreDefaultStore->DefaultId) {
+            InsertTailList (&PreDefaultStore->Link, &DefaultStore->Link);
+            HaveInserted = TRUE;
+            break;
+          }
+        }
+      }
+      if (!HaveInserted) {
+        InsertTailList (&FormSet->DefaultStoreListHead, &DefaultStore->Link);
+      }
       break;
 
     //
