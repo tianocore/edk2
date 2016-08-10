@@ -16,24 +16,12 @@
 
 // For the moment we assume this will run in SVC mode on ARMv7
 
-.text
-.align 2
-
-GCC_ASM_EXPORT(ArmGicV3GetControlSystemRegisterEnable)
-GCC_ASM_EXPORT(ArmGicV3SetControlSystemRegisterEnable)
-GCC_ASM_EXPORT(ArmGicV3EnableInterruptInterface)
-GCC_ASM_EXPORT(ArmGicV3DisableInterruptInterface)
-GCC_ASM_EXPORT(ArmGicV3EndOfInterrupt)
-GCC_ASM_EXPORT(ArmGicV3AcknowledgeInterrupt)
-GCC_ASM_EXPORT(ArmGicV3SetPriorityMask)
-GCC_ASM_EXPORT(ArmGicV3SetBinaryPointer)
-
 //UINT32
 //EFIAPI
 //ArmGicGetControlSystemRegisterEnable (
 //  VOID
 //  );
-ASM_PFX(ArmGicV3GetControlSystemRegisterEnable):
+ASM_FUNC(ArmGicV3GetControlSystemRegisterEnable)
         mrc     p15, 0, r0, c12, c12, 5 // ICC_SRE
         bx      lr
 
@@ -42,7 +30,7 @@ ASM_PFX(ArmGicV3GetControlSystemRegisterEnable):
 //ArmGicSetControlSystemRegisterEnable (
 //  IN UINT32         ControlSystemRegisterEnable
 //  );
-ASM_PFX(ArmGicV3SetControlSystemRegisterEnable):
+ASM_FUNC(ArmGicV3SetControlSystemRegisterEnable)
         mcr     p15, 0, r0, c12, c12, 5 // ICC_SRE
         isb
         bx      lr
@@ -51,7 +39,7 @@ ASM_PFX(ArmGicV3SetControlSystemRegisterEnable):
 //ArmGicV3EnableInterruptInterface (
 //  VOID
 //  );
-ASM_PFX(ArmGicV3EnableInterruptInterface):
+ASM_FUNC(ArmGicV3EnableInterruptInterface)
         mov     r0, #1
         mcr     p15, 0, r0, c12, c12, 7 // ICC_IGRPEN1
         bx      lr
@@ -60,7 +48,7 @@ ASM_PFX(ArmGicV3EnableInterruptInterface):
 //ArmGicV3DisableInterruptInterface (
 //  VOID
 //  );
-ASM_PFX(ArmGicV3DisableInterruptInterface):
+ASM_FUNC(ArmGicV3DisableInterruptInterface)
         mov     r0, #0
         mcr     p15, 0, r0, c12, c12, 7 // ICC_IGRPEN1
         bx      lr
@@ -69,7 +57,7 @@ ASM_PFX(ArmGicV3DisableInterruptInterface):
 //ArmGicV3EndOfInterrupt (
 //  IN UINTN InterruptId
 //  );
-ASM_PFX(ArmGicV3EndOfInterrupt):
+ASM_FUNC(ArmGicV3EndOfInterrupt)
         mcr     p15, 0, r0, c12, c12, 1 //ICC_EOIR1
         bx      lr
 
@@ -77,7 +65,7 @@ ASM_PFX(ArmGicV3EndOfInterrupt):
 //ArmGicV3AcknowledgeInterrupt (
 //  VOID
 //  );
-ASM_PFX(ArmGicV3AcknowledgeInterrupt):
+ASM_FUNC(ArmGicV3AcknowledgeInterrupt)
         mrc     p15, 0, r0, c12, c8, 0 //ICC_IAR1
         bx      lr
 
@@ -85,7 +73,7 @@ ASM_PFX(ArmGicV3AcknowledgeInterrupt):
 //ArmGicV3SetPriorityMask (
 //  IN UINTN                  Priority
 //  );
-ASM_PFX(ArmGicV3SetPriorityMask):
+ASM_FUNC(ArmGicV3SetPriorityMask)
         mcr     p15, 0, r0, c4, c6, 0 //ICC_PMR
         bx      lr
 
@@ -93,6 +81,6 @@ ASM_PFX(ArmGicV3SetPriorityMask):
 //ArmGicV3SetBinaryPointer (
 //  IN UINTN                  BinaryPoint
 //  );
-ASM_PFX(ArmGicV3SetBinaryPointer):
+ASM_FUNC(ArmGicV3SetBinaryPointer)
         mcr     p15, 0, r0, c12, c12, 3 //ICC_BPR1
         bx      lr
