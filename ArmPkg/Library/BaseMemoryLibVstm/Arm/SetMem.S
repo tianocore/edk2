@@ -17,6 +17,8 @@
 #
 #------------------------------------------------------------------------------
 
+#include <AsmMacroIoLib.h>
+
 /**
   Set Buffer to Value for Size bytes.
 
@@ -34,12 +36,7 @@ InternalMemSetMem (
   IN      UINT8                     Value
   )
 **/
-
-.text
-.align 2
-GCC_ASM_EXPORT(InternalMemSetMem)
-
-ASM_PFX(InternalMemSetMem):
+ASM_FUNC(InternalMemSetMem)
   stmfd  sp!, {r4-r7, lr}
   tst    r0, #3
   movne  r3, #0
