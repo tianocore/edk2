@@ -12,11 +12,7 @@
 #
 #------------------------------------------------------------------------------
 
-.text
-.align 2
-
-.globl ASM_PFX(GccSemihostCall)
-INTERWORK_FUNC(GccSemihostCall)
+#include <AsmMacroIoLib.h>
 
 /*
   Semihosting operation request mechanism
@@ -32,7 +28,7 @@ INTERWORK_FUNC(GccSemihostCall)
        the svc lr register. That happens to be the one we are using, so we must
        save it or we will not be able to return.
  */
-ASM_PFX(GccSemihostCall):
+ASM_FUNC(GccSemihostCall)
   stmfd   sp!, {lr}
   svc     #0x123456
   ldmfd   sp!, {lr}

@@ -13,11 +13,8 @@
 #
 #------------------------------------------------------------------------------
 
-.text
-.align 2
+#include <AsmMacroIoLibV8.h>
 
-.globl ASM_PFX(GccSemihostCall)
-
-ASM_PFX(GccSemihostCall):
+ASM_FUNC(GccSemihostCall)
   hlt     #0xf000
   ret
