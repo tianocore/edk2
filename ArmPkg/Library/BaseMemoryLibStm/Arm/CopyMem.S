@@ -17,6 +17,8 @@
 #
 #------------------------------------------------------------------------------
 
+#include <AsmMacroIoLib.h>
+
 /**
   Copy Length bytes from Source to Destination. Overlap is OK.
 
@@ -37,11 +39,7 @@ InternalMemCopyMem (
   IN      UINTN                     Length
   )
 **/
-.text
-.align 2
-GCC_ASM_EXPORT(InternalMemCopyMem)
-
-ASM_PFX(InternalMemCopyMem):
+ASM_FUNC(InternalMemCopyMem)
   stmfd  sp!, {r4-r11, lr}
   // Save the input parameters in extra registers (r11 = destination, r14 = source, r12 = length)
   mov  r11, r0
