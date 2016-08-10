@@ -54,7 +54,7 @@ SECTIONS {
     KEEP (*(.eh_frame))
   }
 
-  .rela ALIGN(CONSTANT(COMMONPAGESIZE)) : {
+  .rela (INFO) : {
     *(.rela .rela.*)
   }
 
