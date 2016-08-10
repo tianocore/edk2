@@ -12,21 +12,6 @@
 //
 
 #include <AsmMacroIoLib.h>
-#include <Base.h>
-#include <AutoGen.h>
-
-.text
-.align 3
-
-GCC_ASM_EXPORT(ArmPlatformStackSet)
-GCC_ASM_EXPORT(ArmPlatformStackSetPrimary)
-GCC_ASM_EXPORT(ArmPlatformStackSetSecondary)
-
-GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_IMPORT(ArmPlatformGetCorePosition)
-GCC_ASM_IMPORT(ArmPlatformGetPrimaryCoreMpId)
-
-GCC_ASM_IMPORT(gPcd_FixedAtBuild_PcdCoreCount)
 
 //VOID
 //ArmPlatformStackSet (
@@ -35,7 +20,7 @@ GCC_ASM_IMPORT(gPcd_FixedAtBuild_PcdCoreCount)
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
-ASM_PFX(ArmPlatformStackSet):
+ASM_FUNC(ArmPlatformStackSet)
   // Save parameters
   mov   r6, r3
   mov   r5, r2
@@ -69,16 +54,14 @@ ASM_PFX(ArmPlatformStackSet):
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
-ASM_PFX(ArmPlatformStackSetPrimary):
+ASM_FUNC(ArmPlatformStackSetPrimary)
   mov   r4, lr
 
   // Add stack of primary stack to StackBase
   add   r0, r0, r2
 
   // Compute SecondaryCoresCount * SecondaryCoreStackSize
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdCoreCount, r1)
-  ldr   r1, [r1]
-  sub   r1, #1
+  MOV32 (r1, FixedPcdGet32(PcdCoreCount) - 1)
   mul   r3, r3, r1
 
   // Set Primary Stack ((StackBase + PrimaryStackSize) + (SecondaryCoresCount * SecondaryCoreStackSize))
@@ -93,7 +76,7 @@ ASM_PFX(ArmPlatformStackSetPrimary):
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
-ASM_PFX(ArmPlatformStackSetSecondary):
+ASM_FUNC(ArmPlatformStackSetSecondary)
   mov   r4, lr
   mov   sp, r0
 

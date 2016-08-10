@@ -12,21 +12,6 @@
 //
 
 #include <AsmMacroIoLibV8.h>
-#include <Base.h>
-#include <AutoGen.h>
-
-.text
-.align 3
-
-GCC_ASM_EXPORT(ArmPlatformStackSet)
-GCC_ASM_EXPORT(ArmPlatformStackSetPrimary)
-GCC_ASM_EXPORT(ArmPlatformStackSetSecondary)
-
-GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_IMPORT(ArmPlatformGetCorePosition)
-GCC_ASM_IMPORT(ArmPlatformGetPrimaryCoreMpId)
-
-GCC_ASM_IMPORT(gPcd_FixedAtBuild_PcdCoreCount)
 
 //VOID
 //ArmPlatformStackSet (
@@ -35,7 +20,7 @@ GCC_ASM_IMPORT(gPcd_FixedAtBuild_PcdCoreCount)
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
-ASM_PFX(ArmPlatformStackSet):
+ASM_FUNC(ArmPlatformStackSet)
   // Save parameters
   mov   x6, x3
   mov   x5, x2
@@ -59,10 +44,10 @@ ASM_PFX(ArmPlatformStackSet):
   // Restore the Link register
   mov   x30, x7
 
-  // Should be ASM_PFX(ArmPlatformStackSetPrimary) but generate linker error 'unsupported ELF EM_AARCH64'
-  b.eq  ArmPlatformStackSetPrimaryL
-  // Should be ASM_PFX(ArmPlatformStackSetSecondary) but generate linker error 'unsupported ELF EM_AARCH64'
-  b.ne  ArmPlatformStackSetSecondaryL
+  b.ne  0f
+
+  b     ASM_PFX(ArmPlatformStackSetPrimary)
+0:b     ASM_PFX(ArmPlatformStackSetSecondary)
 
 //VOID
 //ArmPlatformStackSetPrimary (
@@ -71,8 +56,7 @@ ASM_PFX(ArmPlatformStackSet):
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
-ArmPlatformStackSetPrimaryL:
-ASM_PFX(ArmPlatformStackSetPrimary):
+ASM_FUNC(ArmPlatformStackSetPrimary)
   // Save the Link register
   mov   x4, x30
 
@@ -80,9 +64,7 @@ ASM_PFX(ArmPlatformStackSetPrimary):
   add   x0, x0, x2
 
   // Compute SecondaryCoresCount * SecondaryCoreStackSize
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdCoreCount, x1)
-  ldr   w1, [x1]
-  sub   x1, x1, #1
+  MOV32 (w1, FixedPcdGet32(PcdCoreCount) - 1)
   mul   x3, x3, x1
 
   // Set Primary Stack ((StackBase + PrimaryStackSize) + (SecondaryCoresCount * SecondaryCoreStackSize))
@@ -97,8 +79,7 @@ ASM_PFX(ArmPlatformStackSetPrimary):
 //  IN UINTN PrimaryStackSize,
 //  IN UINTN SecondaryStackSize
 //  );
-ArmPlatformStackSetSecondaryL:
-ASM_PFX(ArmPlatformStackSetSecondary):
+ASM_FUNC(ArmPlatformStackSetSecondary)
   // Save the Link register
   mov   x4, x30
   mov   sp, x0
