@@ -22,12 +22,8 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmSmcLib
 
-[Sources.ARM]
-  Arm/ArmSmcNull.asm    | RVCT
-  Arm/ArmSmcNull.S      | GCC
-
-[Sources.AARCH64]
-  AArch64/ArmSmcNull.S
+[Sources]
+  ArmSmcLibNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
