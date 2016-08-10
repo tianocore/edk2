@@ -12,24 +12,10 @@
 //
 
 #include <AsmMacroIoLibV8.h>
-#include <Base.h>
-#include <Library/PcdLib.h>
-#include <AutoGen.h>
 
-.text
-.align 3
-
-GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_IMPORT(ArmReadMpidr)
-GCC_ASM_IMPORT(ArmPlatformPeiBootAction)
-GCC_ASM_IMPORT(ArmPlatformStackSet)
-GCC_ASM_EXPORT(_ModuleEntryPoint)
 ASM_GLOBAL ASM_PFX(mSystemMemoryEnd)
 
-StartupAddr:                  .8byte ASM_PFX(CEntryPoint)
-ASM_PFX(mSystemMemoryEnd):    .8byte 0
-
-ASM_PFX(_ModuleEntryPoint):
+ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
@@ -49,10 +35,8 @@ _SystemMemoryEndInit:
   cmp   x1, #0
   bne   _SetupStackPosition
 
-  LoadConstantToReg (FixedPcdGet64(PcdSystemMemoryBase), x1)
-  LoadConstantToReg (FixedPcdGet64(PcdSystemMemorySize), x2)
-  sub   x2, x2, #1
-  add   x1, x1, x2
+  MOV64 (x1, FixedPcdGet64(PcdSystemMemoryBase) + FixedPcdGet64(PcdSystemMemorySize) - 1)
+
   // Update the global variable
   adr   x2, mSystemMemoryEnd
   str   x1, [x2]
@@ -61,13 +45,13 @@ _SetupStackPosition:
   // r1 = SystemMemoryTop
 
   // Calculate Top of the Firmware Device
-  LoadConstantToReg (FixedPcdGet64(PcdFdBaseAddress), x2)
-  LoadConstantToReg (FixedPcdGet32(PcdFdSize), x3)
+  MOV64 (x2, FixedPcdGet64(PcdFdBaseAddress))
+  MOV32 (x3, FixedPcdGet32(PcdFdSize) - 1)
   sub   x3, x3, #1
   add   x3, x3, x2      // x3 = FdTop = PcdFdBaseAddress + PcdFdSize
 
   // UEFI Memory Size (stacks are allocated in this region)
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryUefiRegionSize), x4)
+  MOV32 (x4, FixedPcdGet32(PcdSystemMemoryUefiRegionSize))
 
   //
   // Reserve the memory for the UEFI region (contain stacks on its top)
@@ -98,9 +82,7 @@ _SetupAlignedStack:
 _SetupOverflowStack:
   // Case memory at the top of the address space. Ensure the top of the stack is EFI_PAGE_SIZE
   // aligned (4KB)
-  LoadConstantToReg (EFI_PAGE_MASK, x11)
-  and   x11, x11, x1
-  sub   x1, x1, x11
+  and   x1, x1, ~EFI_PAGE_MASK
 
 _GetBaseUefiMemory:
   // Calculate the Base of the UEFI Memory
@@ -109,22 +91,19 @@ _GetBaseUefiMemory:
 _GetStackBase:
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
+  MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
   sub   x12, x1, x2
 
   // Stack for the secondary core = Number of Cores - 1
-  LoadConstantToReg (FixedPcdGet32(PcdCoreCount), x0)
-  sub   x0, x0, #1
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), x1)
-  mul   x1, x1, x0
+  MOV32 (x1, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   sub   x12, x12, x1
 
   // x12 = The base of the MpCore Stacks (primary stack & secondary stacks)
   mov   x0, x12
   mov   x1, x10
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), x3)
+  MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
+  MOV32 (x3, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   bl    ASM_PFX(ArmPlatformStackSet)
 
   // Is it the Primary Core ?
@@ -140,7 +119,7 @@ _PrepareArguments:
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
-  ldr   x4, StartupAddr
+  ldr   x4, =ASM_PFX(CEntryPoint)
 
   // Jump to PrePiCore C code
   //    x0 = MpId
@@ -150,3 +129,5 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
+
+ASM_PFX(mSystemMemoryEnd):    .8byte 0
