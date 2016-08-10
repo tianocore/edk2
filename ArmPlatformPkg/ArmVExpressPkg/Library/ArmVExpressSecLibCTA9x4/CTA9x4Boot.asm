@@ -11,7 +11,6 @@
 //
 //
 
-#include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/ArmPlatformLib.h>
 #include <Drivers/PL35xSmc.h>
@@ -90,7 +89,7 @@ ArmPlatformSecBootMemoryInit
   //
   // Initialize PL354 SMC
   //
-  LoadConstantToReg (ARM_VE_SMC_CTRL_BASE, r1)
+  mov32 r1, ARM_VE_SMC_CTRL_BASE
   ldr   r2, =VersatileExpressSmcConfiguration
   ldr   r3, =VersatileExpressSmcConfigurationEnd
   blx   PL35xSmcInitialize
@@ -98,7 +97,7 @@ ArmPlatformSecBootMemoryInit
   //
   // Page mode setup for VRAM
   //
-  LoadConstantToReg (VRAM_MOTHERBOARD_BASE, r2)
+  mov32 r2, VRAM_MOTHERBOARD_BASE
 
   // Read current state
   ldr     r0, [r2, #0]

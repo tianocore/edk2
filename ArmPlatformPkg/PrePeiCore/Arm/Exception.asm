@@ -11,8 +11,6 @@
 //
 //
 
-#include <AsmMacroIoLib.h>
-#include <Base.h>
 #include <AutoGen.h>
 
   IMPORT  PeiCommonExceptionEntry

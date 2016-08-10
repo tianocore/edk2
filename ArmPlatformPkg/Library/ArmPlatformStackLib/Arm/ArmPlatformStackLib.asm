@@ -11,8 +11,6 @@
 //
 //
 
-#include <AsmMacroIoLib.h>
-#include <Base.h>
 #include <AutoGen.h>
 
   INCLUDE AsmMacroIoLib.inc
@@ -79,8 +77,7 @@ ArmPlatformStackSetPrimary FUNCTION
   add   r0, r0, r2
 
   // Compute SecondaryCoresCount * SecondaryCoreStackSize
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdCoreCount, r1)
-  ldr   r1, [r1]
+  mov32 r1, FixedPcdGet32 (PcdCoreCount)
   sub   r1, #1
   mul   r3, r3, r1
 

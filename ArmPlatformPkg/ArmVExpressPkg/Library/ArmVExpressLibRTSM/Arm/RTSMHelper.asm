@@ -11,7 +11,6 @@
 //
 //
 
-#include <AsmMacroIoLib.h>
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/PcdLib.h>
@@ -27,9 +26,6 @@
   EXPORT    ArmPlatformIsPrimaryCore
   EXPORT    ArmPlatformGetPrimaryCoreMpId
   EXPORT    ArmPlatformGetCorePosition
-
-  IMPORT    _gPcd_FixedAtBuild_PcdArmPrimaryCore
-  IMPORT    _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
 
   AREA RTSMHelper, CODE, READONLY
 
@@ -52,8 +48,7 @@ ArmGetScuBaseAddress FUNCTION
 //  VOID
 //  );
 ArmPlatformGetPrimaryCoreMpId FUNCTION
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr   r0, [r0]
+  mov32 r0, FixedPcdGet32(PcdArmPrimaryCore)
   bx    lr
   ENDFUNC
 
@@ -99,10 +94,9 @@ _Return
 //  IN UINTN MpId
 //  );
 ArmPlatformIsPrimaryCore FUNCTION
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r1)
-  ldr   r1, [r1]
+  mov32 r1, FixedPcdGet32(PcdArmPrimaryCoreMask)
   and   r0, r0, r1
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r1)
+  mov32 r1, FixedPcdGet32(PcdArmPrimaryCore)
   ldr   r1, [r1]
   cmp   r0, r1
   moveq r0, #1
