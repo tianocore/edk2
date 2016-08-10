@@ -12,32 +12,16 @@
 #
 
 #include <AsmMacroIoLib.h>
-#include <Base.h>
 #include <Library/ArmLib.h>
-#include <Library/PcdLib.h>
-#include <AutoGen.h>
-#include "AsmMacroIoLib.inc"
 
 #include <Chipset/ArmCortexA9.h>
 
-.text
-.align 2
-
-GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(ArmGetCpuCountPerCluster)
-GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
-GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
-
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
-
-ASM_PFX(ArmPlatformPeiBootAction):
+ASM_FUNC(ArmPlatformPeiBootAction)
   bx    lr
 
 # IN None
 # OUT r0 = SCU Base Address
-ASM_PFX(ArmGetScuBaseAddress):
+ASM_FUNC(ArmGetScuBaseAddress)
   # Read Configuration Base Address Register. ArmCBar cannot be called to get
   # the Configuration BAR as a stack is not necessary setup. The SCU is at the
   # offset 0x0000 from the Private Memory Region.
@@ -48,14 +32,13 @@ ASM_PFX(ArmGetScuBaseAddress):
 //ArmPlatformGetPrimaryCoreMpId (
 //  VOID
 //  );
-ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr   r0, [r0]
+ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
+  MOV32  (r0, FixedPcdGet32 (PcdArmPrimaryCore))
   bx    lr
 
 # IN None
 # OUT r0 = number of cores present in the system
-ASM_PFX(ArmGetCpuCountPerCluster):
+ASM_FUNC(ArmGetCpuCountPerCluster)
   stmfd SP!, {r1-r2}
 
   # Read CP15 MIDR
@@ -63,10 +46,10 @@ ASM_PFX(ArmGetCpuCountPerCluster):
 
   # Check if the CPU is A15
   mov   r1, r1, LSR #4
-  LoadConstantToReg (ARM_CPU_TYPE_MASK, r0)
+  MOV32 (r0, ARM_CPU_TYPE_MASK)
   and   r1, r1, r0
 
-  LoadConstantToReg (ARM_CPU_TYPE_A15, r0)
+  MOV32 (r0, ARM_CPU_TYPE_A15)
   cmp   r1, r0
   beq   _Read_cp15_reg
 
@@ -92,12 +75,10 @@ _Return:
 //ArmPlatformIsPrimaryCore (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformIsPrimaryCore):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r1)
-  ldr   r1, [r1]
+ASM_FUNC(ArmPlatformIsPrimaryCore)
+  MOV32  (r1, FixedPcdGet32 (PcdArmPrimaryCoreMask))
   and   r0, r0, r1
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r1)
-  ldr   r1, [r1]
+  MOV32  (r1, FixedPcdGet32 (PcdArmPrimaryCore))
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
@@ -107,7 +88,7 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 //ArmPlatformGetCorePosition (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformGetCorePosition):
+ASM_FUNC(ArmPlatformGetCorePosition)
   and   r1, r0, #ARM_CORE_MASK
   and   r0, r0, #ARM_CLUSTER_MASK
   add   r0, r1, r0, LSR #7

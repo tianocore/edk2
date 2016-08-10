@@ -14,36 +14,22 @@
 #include <AsmMacroIoLib.h>
 #include <Library/ArmLib.h>
 
-.text
-.align 2
-
-GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
-GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
-
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
-
 //UINTN
 //ArmPlatformGetPrimaryCoreMpId (
 //  VOID
 //  );
-ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr   r0, [r0]
+ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
+  MOV32  (r0, FixedPcdGet32 (PcdArmPrimaryCore))
   bx    lr
 
 //UINTN
 //ArmPlatformIsPrimaryCore (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformIsPrimaryCore):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r1)
-  ldr   r1, [r1]
+ASM_FUNC(ArmPlatformIsPrimaryCore)
+  MOV32  (r1, FixedPcdGet32 (PcdArmPrimaryCoreMask))
   and   r0, r0, r1
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r1)
-  ldr   r1, [r1]
+  MOV32  (r1, FixedPcdGet32 (PcdArmPrimaryCore))
   cmp   r0, r1
   moveq r0, #1
   movne r0, #0
@@ -53,11 +39,11 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 //ArmPlatformGetCorePosition (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformGetCorePosition):
+ASM_FUNC(ArmPlatformGetCorePosition)
   and   r0, r0, #ARM_CORE_MASK
   bx    lr
 
-ASM_PFX(ArmPlatformPeiBootAction):
+ASM_FUNC(ArmPlatformPeiBootAction)
   bx    lr
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

@@ -16,22 +16,14 @@
 
 #include <ArmPlatform.h>
 
-.text
-.align 2
-
-GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
-GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
-
-ASM_PFX(ArmPlatformPeiBootAction):
+ASM_FUNC(ArmPlatformPeiBootAction)
   bx    lr
 
 //UINTN
 //ArmPlatformGetCorePosition (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformGetCorePosition):
+ASM_FUNC(ArmPlatformGetCorePosition)
   and   r1, r0, #ARM_CORE_MASK
   and   r0, r0, #ARM_CLUSTER_MASK
   add   r0, r1, r0, LSR #7
@@ -41,10 +33,10 @@ ASM_PFX(ArmPlatformGetCorePosition):
 //ArmPlatformIsPrimaryCore (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformIsPrimaryCore):
+ASM_FUNC(ArmPlatformIsPrimaryCore)
   // Extract cpu_id and cluster_id from ARM_SCC_CFGREG48
   // with cpu_id[0:3] and cluster_id[4:7]
-  LoadConstantToReg (ARM_CTA15A7_SCC_CFGREG48, r1)
+  MOV32 (r1, ARM_CTA15A7_SCC_CFGREG48)
   ldr   r1, [r1]
   lsr   r1, #24
 
@@ -58,7 +50,7 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
   orr   r1, r1, r2
 
   // Keep the Cluster ID and Core ID from the MPID
-  LoadConstantToReg (ARM_CLUSTER_MASK | ARM_CORE_MASK, r2)
+  MOV32 (r2, ARM_CLUSTER_MASK | ARM_CORE_MASK)
   and   r0, r0, r2
 
   // Compare mpid and boot cpu from ARM_SCC_CFGREG48
@@ -71,10 +63,10 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 //ArmPlatformGetPrimaryCoreMpId (
 //  VOID
 //  );
-ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
+ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
   // Extract cpu_id and cluster_id from ARM_SCC_CFGREG48
   // with cpu_id[0:3] and cluster_id[4:7]
-  LoadConstantToReg (ARM_CTA15A7_SCC_CFGREG48, r0)
+  MOV32 (r0, ARM_CTA15A7_SCC_CFGREG48)
   ldr   r0, [r0]
   lsr   r0, #24
 

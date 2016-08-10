@@ -12,18 +12,9 @@
 //
 
 #include <AsmMacroIoLib.h>
-#include <Base.h>
 #include <Library/ArmPlatformLib.h>
 #include <Drivers/PL35xSmc.h>
 #include <ArmPlatform.h>
-#include <AutoGen.h>
-
-.text
-.align 3
-
-GCC_ASM_EXPORT(ArmPlatformSecBootAction)
-GCC_ASM_EXPORT(ArmPlatformSecBootMemoryInit)
-GCC_ASM_IMPORT(PL35xSmcInitialize)
 
 //
 // For each Chip Select: ChipSelect / SetCycle / SetOpMode
@@ -69,7 +60,7 @@ VersatileExpressSmcConfigurationEnd:
   Note: This function must be implemented in assembler as there is no stack set up yet
 
 **/
-ASM_PFX(ArmPlatformSecBootAction):
+ASM_FUNC(ArmPlatformSecBootAction)
   bx    lr
 
 /**
@@ -82,21 +73,21 @@ ASM_PFX(ArmPlatformSecBootAction):
   pointer is not used (probably required to use assembly language)
 
 **/
-ASM_PFX(ArmPlatformSecBootMemoryInit):
+ASM_FUNC(ArmPlatformSecBootMemoryInit)
   mov   r5, lr
 
   //
   // Initialize PL354 SMC
   //
-  LoadConstantToReg (ARM_VE_SMC_CTRL_BASE, r1)
-  LoadConstantToReg (VersatileExpressSmcConfiguration, r2)
-  LoadConstantToReg (VersatileExpressSmcConfigurationEnd, r3)
+  MOV32 (r1, ARM_VE_SMC_CTRL_BASE)
+  MOV32 (r2, VersatileExpressSmcConfiguration)
+  MOV32 (r3, VersatileExpressSmcConfigurationEnd)
   blx   ASM_PFX(PL35xSmcInitialize)
 
   //
   // Page mode setup for VRAM
   //
-  LoadConstantToReg (VRAM_MOTHERBOARD_BASE, r2)
+  MOV32 (r2, VRAM_MOTHERBOARD_BASE)
 
   // Read current state
   ldr     r0, [r2, #0]
@@ -110,7 +101,7 @@ ASM_PFX(ArmPlatformSecBootMemoryInit):
   ldr     r0, [r2, #0]
   ldr     r0, = 0x00000000
   str     r0, [r2, #0]
-  LoadConstantToReg (0x00900090, r0)
+  ldr     r0, = 0x00900090
   str     r0, [r2, #0]
 
   // Confirm page mode enabled
