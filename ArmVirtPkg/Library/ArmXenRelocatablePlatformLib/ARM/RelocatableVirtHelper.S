@@ -1,6 +1,6 @@
 #
 #  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-#  Copyright (c) 2014, Linaro Limited. All rights reserved.
+#  Copyright (c) 2014-2016, Linaro Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -13,28 +13,9 @@
 #
 
 #include <AsmMacroIoLib.h>
-#include <Base.h>
 #include <Library/ArmLib.h>
-#include <Library/PcdLib.h>
-#include <AutoGen.h>
 
-.text
-.align 2
-
-GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
-GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
-GCC_ASM_EXPORT(ArmGetPhysAddrTop)
-
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdCoreCount)
-
-.LArm32LinuxMagic:
-  .byte   0x18, 0x28, 0x6f, 0x01
-
-ASM_PFX(ArmPlatformPeiBootAction):
+ASM_FUNC(ArmPlatformPeiBootAction)
   mov   r11, r14            // preserve LR
   mov   r10, r0             // preserve DTB pointer
   mov   r9, r1              // preserve base of image pointer
@@ -63,8 +44,8 @@ ASM_PFX(ArmPlatformPeiBootAction):
   // to the actual relocated value, and add the shift of PcdFdBaseAddress to
   // PcdFvBaseAddress as well
   //
-  ldr   r8, =PcdGet64 (PcdFdBaseAddress)
-  ldr   r7, =PcdGet64 (PcdFvBaseAddress)
+  ADRL  (r8, PcdGet64 (PcdFdBaseAddress))
+  ADRL  (r7, PcdGet64 (PcdFvBaseAddress))
   ldr   r6, [r8]
   ldr   r5, [r7]
   sub   r5, r5, r6
@@ -78,8 +59,8 @@ ASM_PFX(ArmPlatformPeiBootAction):
   // encountered. Since we are calling a C function, use the window at the
   // beginning of the FD image as a temp stack.
   //
-  ldr   r1, =PcdGet64 (PcdSystemMemoryBase)
-  ldr   r2, =PcdGet64 (PcdSystemMemorySize)
+  ADRL  (r1, PcdGet64 (PcdSystemMemoryBase))
+  ADRL  (r2, PcdGet64 (PcdSystemMemorySize))
   mov   sp, r5
   bl    FindMemnode
   teq   r0, #0
@@ -90,7 +71,7 @@ ASM_PFX(ArmPlatformPeiBootAction):
   // image header at the base of this image (defined in the FDF), and record the
   // pointer in PcdDeviceTreeInitialBaseAddress.
   //
-  ldr   r8, =PcdGet64 (PcdDeviceTreeInitialBaseAddress)
+  ADRL  (r8, PcdGet64 (PcdDeviceTreeInitialBaseAddress))
   add   r9, r9, #0x40
   str   r9, [r8]
 
@@ -101,20 +82,22 @@ ASM_PFX(ArmPlatformPeiBootAction):
 .Lout:
   bx    r11
 
+.LArm32LinuxMagic:
+  .byte   0x18, 0x28, 0x6f, 0x01
+
 //UINTN
 //ArmPlatformGetPrimaryCoreMpId (
 //  VOID
 //  );
-ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr    r0, [r0]
+ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
+  MOV32  (r0, FixedPcdGet32 (PcdArmPrimaryCore))
   bx     lr
 
 //UINTN
 //ArmPlatformIsPrimaryCore (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformIsPrimaryCore):
+ASM_FUNC(ArmPlatformIsPrimaryCore)
   mov   r0, #1
   bx    lr
 
@@ -123,7 +106,7 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 //  IN UINTN MpId
 //  );
 // With this function: CorePos = (ClusterId * 4) + CoreId
-ASM_PFX(ArmPlatformGetCorePosition):
+ASM_FUNC(ArmPlatformGetCorePosition)
   and   r1, r0, #ARM_CORE_MASK
   and   r0, r0, #ARM_CLUSTER_MASK
   add   r0, r1, r0, LSR #6
@@ -133,7 +116,7 @@ ASM_PFX(ArmPlatformGetCorePosition):
 //GetPhysAddrTop (
 //  VOID
 //  );
-ASM_PFX(ArmGetPhysAddrTop):
+ASM_FUNC(ArmGetPhysAddrTop)
   mov   r0, #0x00000000
   mov   r1, #0x10000
   bx    lr

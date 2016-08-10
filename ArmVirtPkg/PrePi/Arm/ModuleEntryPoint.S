@@ -1,6 +1,6 @@
 //
 //  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-//  Copyright (c) 2015, Linaro Limited. All rights reserved.
+//  Copyright (c) 2015-2016, Linaro Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -13,41 +13,18 @@
 //
 
 #include <AsmMacroIoLib.h>
-#include <Base.h>
-#include <Library/PcdLib.h>
-#include <AutoGen.h>
 
-.text
-.align 3
-
-GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_IMPORT(ArmReadMpidr)
-GCC_ASM_IMPORT(ArmPlatformPeiBootAction)
-GCC_ASM_IMPORT(ArmPlatformStackSet)
-GCC_ASM_EXPORT(_ModuleEntryPoint)
 ASM_GLOBAL ASM_PFX(mSystemMemoryEnd)
 
-ASM_PFX(mSystemMemoryEnd):    .quad 0
-
-__relocs:
-  .long   __reloc_base - __relocs
-  .long   __reloc_start - __relocs
-  .long   __reloc_end - __relocs
-
-ASM_PFX(_ModuleEntryPoint):
+ASM_FUNC(_ModuleEntryPoint)
   //
   // We are built as a ET_DYN PIE executable, so we need to process all
   // relative relocations if we are executing from a different offset than we
   // were linked at. This is only possible if we are running from RAM.
   //
-
-  adr   r12, __relocs
-  ldrd  r4, r5, [r12]
-  ldr   r6, [r12, #8]
-
-  add   r4, r4, r12
-  add   r5, r5, r12
-  add   r6, r6, r12
+  ADRL  (r4, __reloc_base)
+  ADRL  (r5, __reloc_start)
+  ADRL  (r6, __reloc_end)
 
 .Lreloc_loop:
   cmp   r5, r6
@@ -85,9 +62,8 @@ ASM_PFX(_ModuleEntryPoint):
 // at the top of the DRAM)
 _SetupStackPosition:
   // Compute Top of System Memory
-  ldr   r12, =PcdGet64 (PcdSystemMemoryBase)
-  ldr   r1, [r12]
-  ldr   r12, =PcdGet64 (PcdSystemMemorySize)
+  LDRL  (r1, PcdGet64 (PcdSystemMemoryBase))
+  ADRL  (r12, PcdGet64 (PcdSystemMemorySize))
   ldrd  r2, r3, [r12]
 
   // calculate the top of memory, and record it in mSystemMemoryEnd
@@ -103,14 +79,12 @@ _SetupStackPosition:
   moveq r1, r2
 
   // Calculate Top of the Firmware Device
-  ldr   r12, =PcdGet64 (PcdFdBaseAddress)
-  ldr   r2, [r12]
-  ldr   r3, =FixedPcdGet32 (PcdFdSize)
-  sub   r3, r3, #1
+  LDRL  (r2, PcdGet64 (PcdFdBaseAddress))
+  MOV32 (r3, FixedPcdGet32 (PcdFdSize) - 1)
   add   r3, r3, r2      // r3 = FdTop = PcdFdBaseAddress + PcdFdSize
 
   // UEFI Memory Size (stacks are allocated in this region)
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryUefiRegionSize), r4)
+  MOV32 (r4, FixedPcdGet32(PcdSystemMemoryUefiRegionSize))
 
   //
   // Reserve the memory for the UEFI region (contain stacks on its top)
@@ -141,9 +115,8 @@ _SetupAlignedStack:
 _SetupOverflowStack:
   // Case memory at the top of the address space. Ensure the top of the stack is EFI_PAGE_SIZE
   // aligned (4KB)
-  LoadConstantToReg (EFI_PAGE_MASK, r11)
-  and   r11, r11, r1
-  sub   r1, r1, r11
+  MOV32 (r11, (~EFI_PAGE_MASK) & 0xffffffff)
+  and   r1, r1, r11
 
 _GetBaseUefiMemory:
   // Calculate the Base of the UEFI Memory
@@ -152,22 +125,19 @@ _GetBaseUefiMemory:
 _GetStackBase:
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
+  MOV32 (r2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
   sub   r9, r1, r2
 
   // Stack for the secondary core = Number of Cores - 1
-  LoadConstantToReg (FixedPcdGet32(PcdCoreCount), r0)
-  sub   r0, r0, #1
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r1)
-  mul   r1, r1, r0
+  MOV32 (r1, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   sub   r9, r9, r1
 
   // r9 = The base of the MpCore Stacks (primary stack & secondary stacks)
   mov   r0, r9
   mov   r1, r10
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), r2)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), r3)
+  MOV32 (r2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
+  MOV32 (r3, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   bl    ASM_PFX(ArmPlatformStackSet)
 
   // Is it the Primary Core ?
@@ -189,3 +159,5 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
+
+ASM_PFX(mSystemMemoryEnd):    .quad 0

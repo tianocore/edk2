@@ -11,10 +11,7 @@
 //  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 
-#include <AsmMacroIoLib.h>
-#include <Base.h>
 #include <Library/ArmLib.h>
-#include <Library/PcdLib.h>
 #include <AutoGen.h>
 
   INCLUDE AsmMacroIoLib.inc
@@ -24,10 +21,6 @@
   EXPORT  ArmPlatformGetPrimaryCoreMpId
   EXPORT  ArmPlatformGetCorePosition
   EXPORT  ArmGetPhysAddrTop
-
-  IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCore
-  IMPORT  _gPcd_FixedAtBuild_PcdArmPrimaryCoreMask
-  IMPORT  _gPcd_FixedAtBuild_PcdCoreCount
 
   AREA VirtHelper, CODE, READONLY
 
@@ -40,8 +33,7 @@ ArmPlatformPeiBootAction FUNCTION
 //  VOID
 //  );
 ArmPlatformGetPrimaryCoreMpId FUNCTION
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, r0)
-  ldr    r0, [r0]
+  MOV32  r0, FixedPcdGet32 (PcdArmPrimaryCore)
   bx     lr
   ENDFUNC
 

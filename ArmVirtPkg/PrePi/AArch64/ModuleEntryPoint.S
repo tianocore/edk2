@@ -1,6 +1,6 @@
 //
 //  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
-//  Copyright (c) 2015, Linaro Limited. All rights reserved.
+//  Copyright (c) 2015-2016, Linaro Limited. All rights reserved.
 //
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
@@ -13,23 +13,10 @@
 //
 
 #include <AsmMacroIoLibV8.h>
-#include <Base.h>
-#include <Library/PcdLib.h>
-#include <AutoGen.h>
 
-.text
-.align 3
-
-GCC_ASM_IMPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_IMPORT(ArmReadMpidr)
-GCC_ASM_IMPORT(ArmPlatformPeiBootAction)
-GCC_ASM_IMPORT(ArmPlatformStackSet)
-GCC_ASM_EXPORT(_ModuleEntryPoint)
 ASM_GLOBAL ASM_PFX(mSystemMemoryEnd)
 
-ASM_PFX(mSystemMemoryEnd):    .8byte 0
-
-ASM_PFX(_ModuleEntryPoint):
+ASM_FUNC(_ModuleEntryPoint)
   //
   // We are built as a ET_DYN PIE executable, so we need to process all
   // relative relocations regardless of whether or not we are executing from
@@ -86,12 +73,11 @@ _SetupStackPosition:
 
   // Calculate Top of the Firmware Device
   ldr   x2, PcdGet64 (PcdFdBaseAddress)
-  ldr   w3, PcdGet32 (PcdFdSize)
-  sub   x3, x3, #1
+  MOV32 (w3, FixedPcdGet32 (PcdFdSize) - 1)
   add   x3, x3, x2      // x3 = FdTop = PcdFdBaseAddress + PcdFdSize
 
   // UEFI Memory Size (stacks are allocated in this region)
-  LoadConstantToReg (FixedPcdGet32(PcdSystemMemoryUefiRegionSize), x4)
+  MOV32 (x4, FixedPcdGet32(PcdSystemMemoryUefiRegionSize))
 
   //
   // Reserve the memory for the UEFI region (contain stacks on its top)
@@ -122,9 +108,7 @@ _SetupAlignedStack:
 _SetupOverflowStack:
   // Case memory at the top of the address space. Ensure the top of the stack is EFI_PAGE_SIZE
   // aligned (4KB)
-  LoadConstantToReg (EFI_PAGE_MASK, x21)
-  and   x21, x21, x1
-  sub   x1, x1, x21
+  and   x1, x1, ~EFI_PAGE_MASK
 
 _GetBaseUefiMemory:
   // Calculate the Base of the UEFI Memory
@@ -133,22 +117,19 @@ _GetBaseUefiMemory:
 _GetStackBase:
   // r1 = The top of the Mpcore Stacks
   // Stack for the primary core = PrimaryCoreStack
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
+  MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
   sub   x22, x1, x2
 
   // Stack for the secondary core = Number of Cores - 1
-  LoadConstantToReg (FixedPcdGet32(PcdCoreCount), x0)
-  sub   x0, x0, #1
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), x1)
-  mul   x1, x1, x0
+  MOV32 (x1, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   sub   x22, x22, x1
 
   // x22 = The base of the MpCore Stacks (primary stack & secondary stacks)
   mov   x0, x22
   mov   x1, x20
   //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCorePrimaryStackSize), x2)
-  LoadConstantToReg (FixedPcdGet32(PcdCPUCoreSecondaryStackSize), x3)
+  MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
+  MOV32 (x3, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   bl    ASM_PFX(ArmPlatformStackSet)
 
   // Is it the Primary Core ?
@@ -170,3 +151,5 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
+
+ASM_PFX(mSystemMemoryEnd):    .8byte 0

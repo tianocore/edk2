@@ -1,5 +1,6 @@
 #
 #  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,33 +13,14 @@
 #
 
 #include <AsmMacroIoLibV8.h>
-#include <Base.h>
 #include <Library/ArmLib.h>
-#include <Library/PcdLib.h>
-#include <AutoGen.h>
-
-.text
-.align 2
-
-GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
-GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
-GCC_ASM_EXPORT(ArmGetPhysAddrTop)
-
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCore)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdCoreCount)
-
-.LArm64LinuxMagic:
-  .byte   0x41, 0x52, 0x4d, 0x64
 
 // VOID
 // ArmPlatformPeiBootAction (
 //   VOID   *DeviceTreeBaseAddress,   // passed by loader in x0
 //   VOID   *ImageBase                // passed by FDF trampoline in x1
 //   );
-ASM_PFX(ArmPlatformPeiBootAction):
+ASM_FUNC(ArmPlatformPeiBootAction)
   //
   // If we are booting from RAM using the Linux kernel boot protocol, x0 will
   // point to the DTB image in memory. Otherwise, use the default value defined
@@ -104,20 +86,22 @@ ASM_PFX(ArmPlatformPeiBootAction):
 .Lout:
   ret    x29
 
+.LArm64LinuxMagic:
+  .byte   0x41, 0x52, 0x4d, 0x64
+
 //UINTN
 //ArmPlatformGetPrimaryCoreMpId (
 //  VOID
 //  );
-ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCore, x0)
-  ldrh   w0, [x0]
+ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
+  MOV32  (w0, FixedPcdGet32 (PcdArmPrimaryCore))
   ret
 
 //UINTN
 //ArmPlatformIsPrimaryCore (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformIsPrimaryCore):
+ASM_FUNC(ArmPlatformIsPrimaryCore)
   mov   x0, #1
   ret
 
@@ -126,7 +110,7 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 //  IN UINTN MpId
 //  );
 // With this function: CorePos = (ClusterId * 4) + CoreId
-ASM_PFX(ArmPlatformGetCorePosition):
+ASM_FUNC(ArmPlatformGetCorePosition)
   and   x1, x0, #ARM_CORE_MASK
   and   x0, x0, #ARM_CLUSTER_MASK
   add   x0, x1, x0, LSR #6
@@ -136,7 +120,7 @@ ASM_PFX(ArmPlatformGetCorePosition):
 //GetPhysAddrTop (
 //  VOID
 //  );
-ASM_PFX(ArmGetPhysAddrTop):
+ASM_FUNC(ArmGetPhysAddrTop)
   mrs   x0, id_aa64mmfr0_el1
   adr   x1, .LPARanges
   and   x0, x0, #7
