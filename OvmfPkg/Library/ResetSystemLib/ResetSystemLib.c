@@ -1,7 +1,7 @@
 /** @file
   Reset System Library functions for OVMF
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -124,4 +124,25 @@ EnterS3WithImmediateWake (
 {
   AcpiPmControl (1);
   ASSERT (FALSE);
+}
+
+/**
+  This function causes a systemwide reset. The exact type of the reset is
+  defined by the EFI_GUID that follows the Null-terminated Unicode string passed
+  into ResetData. If the platform does not recognize the EFI_GUID in ResetData
+  the platform must pick a supported reset type to perform.The platform may
+  optionally log the parameters from any non-normal reset that occurs.
+
+  @param[in]  DataSize   The size, in bytes, of ResetData.
+  @param[in]  ResetData  The data buffer starts with a Null-terminated string,
+                         followed by the EFI_GUID.
+**/
+VOID
+EFIAPI
+ResetPlatformSpecific (
+  IN UINTN   DataSize,
+  IN VOID    *ResetData
+  )
+{
+  ResetCold ();
 }
