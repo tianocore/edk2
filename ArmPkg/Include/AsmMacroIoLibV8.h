@@ -3,6 +3,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -71,5 +72,22 @@
 
 #endif // __GNUC__
 
-#endif // __MACRO_IO_LIBV8_H__
+#define _ASM_FUNC(Name, Section)    \
+  .global   Name                  ; \
+  .section  #Section, "ax"        ; \
+  .type     Name, %function       ; \
+  Name:
 
+#define ASM_FUNC(Name)            _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
+
+#define MOV32(Reg, Val)                   \
+  movz      Reg, (Val) >> 16, lsl #16   ; \
+  movk      Reg, (Val) & 0xffff
+
+#define MOV64(Reg, Val)                             \
+  movz      Reg, (Val) >> 48, lsl #48             ; \
+  movk      Reg, ((Val) >> 32) & 0xffff, lsl #32  ; \
+  movk      Reg, ((Val) >> 16) & 0xffff, lsl #16  ; \
+  movk      Reg, (Val) & 0xffff
+
+#endif // __MACRO_IO_LIBV8_H__
