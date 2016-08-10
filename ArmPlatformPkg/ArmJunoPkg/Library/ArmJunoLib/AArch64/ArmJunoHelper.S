@@ -15,25 +15,12 @@
 #include <AsmMacroIoLibV8.h>
 #include <Library/ArmLib.h>
 
-.text
-.align 3
-
-GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
-GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
-
-
-PrimaryCoreMpid:  .word    0x0
-
 //UINTN
 //ArmPlatformGetCorePosition (
 //  IN UINTN MpId
 //  );
 // With this function: CorePos = (ClusterId * 2) + CoreId
-ASM_PFX(ArmPlatformGetCorePosition):
+ASM_FUNC(ArmPlatformGetCorePosition)
   and   x1, x0, #ARM_CORE_MASK
   and   x0, x0, #ARM_CLUSTER_MASK
   add   x0, x1, x0, LSR #7
@@ -43,33 +30,29 @@ ASM_PFX(ArmPlatformGetCorePosition):
 //ArmPlatformGetPrimaryCoreMpId (
 //  VOID
 //  );
-ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  ldr   x0, =PrimaryCoreMpid
-  ldrh  w0, [x0]
+ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
+  ldr   w0, PrimaryCoreMpid
   ret
 
 //UINTN
 //ArmPlatformIsPrimaryCore (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformIsPrimaryCore):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, x1)
-  ldrh  w1, [x1]
+ASM_FUNC(ArmPlatformIsPrimaryCore)
+  MOV32 (w1, FixedPcdGet32 (PcdArmPrimaryCoreMask))
   and   x0, x0, x1
 
-  ldr   x1, =PrimaryCoreMpid
-  ldrh  w1, [x1]
+  ldr   w1, PrimaryCoreMpid
 
   cmp   w0, w1
-  mov   x0, #1
-  mov   x1, #0
-  csel  x0, x0, x1, eq
+  cset  x0, eq
   ret
 
-ASM_PFX(ArmPlatformPeiBootAction):
+ASM_FUNC(ArmPlatformPeiBootAction)
   // The trusted firmware passes the primary CPU MPID through x0 register.
   // Save it in a variable.
-  ldr  x1, =PrimaryCoreMpid
+  adr  x1, PrimaryCoreMpid
   str  w0, [x1]
   ret
 
+PrimaryCoreMpid:  .word    0x0

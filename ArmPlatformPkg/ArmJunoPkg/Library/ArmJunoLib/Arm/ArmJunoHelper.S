@@ -12,21 +12,8 @@
 *
 **/
 
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroIoLib.h>
 #include <Library/ArmLib.h>
-
-.text
-.align 3
-
-GCC_ASM_EXPORT(ArmPlatformPeiBootAction)
-GCC_ASM_EXPORT(ArmPlatformGetCorePosition)
-GCC_ASM_EXPORT(ArmPlatformGetPrimaryCoreMpId)
-GCC_ASM_EXPORT(ArmPlatformIsPrimaryCore)
-
-GCC_ASM_IMPORT(_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask)
-
-
-PrimaryCoreMpid:  .word    0x0
 
 //
 // Return the core position from the value of its MpId register
@@ -41,7 +28,7 @@ PrimaryCoreMpid:  .word    0x0
 //  IN UINTN MpId
 //  );
 // With this function: CorePos = (ClusterId * 2) + CoreId
-ASM_PFX(ArmPlatformGetCorePosition):
+ASM_FUNC(ArmPlatformGetCorePosition)
   and   r1, r0, #ARM_CORE_MASK
   and   r0, r0, #ARM_CLUSTER_MASK
   add   r0, r1, r0, LSR #7
@@ -59,9 +46,8 @@ ASM_PFX(ArmPlatformGetCorePosition):
 //ArmPlatformGetPrimaryCoreMpId (
 //  VOID
 //  );
-ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
-  ldr   r0, =PrimaryCoreMpid
-  ldr   r0, [r0]
+ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
+  LDRL  (r0, PrimaryCoreMpid)
   bx    lr
 
 //
@@ -77,13 +63,11 @@ ASM_PFX(ArmPlatformGetPrimaryCoreMpId):
 //ArmPlatformIsPrimaryCore (
 //  IN UINTN MpId
 //  );
-ASM_PFX(ArmPlatformIsPrimaryCore):
-  LoadConstantToReg (_gPcd_FixedAtBuild_PcdArmPrimaryCoreMask, r1)
-  ldr   r1, [r1]
+ASM_FUNC(ArmPlatformIsPrimaryCore)
+  MOV32 (r1, FixedPcdGet32 (PcdArmPrimaryCoreMask))
   and   r0, r0, r1
 
-  ldr   r1, =PrimaryCoreMpid
-  ldr   r1, [r1]
+  LDRL  (r1, PrimaryCoreMpid)
 
   cmp   r0, r1
   moveq r0, #1
@@ -97,9 +81,11 @@ ASM_PFX(ArmPlatformIsPrimaryCore):
 // or PrePeiCore modules. It allows to retrieve arguments passed to
 // the UEFI firmware through the CPU registers.
 //
-ASM_PFX(ArmPlatformPeiBootAction):
+ASM_FUNC(ArmPlatformPeiBootAction)
   // The trusted firmware passes the primary CPU MPID through r0 register.
   // Save it in a variable.
-  ldr  r1, =PrimaryCoreMpid
+  adr  r1, PrimaryCoreMpid
   str  r0, [r1]
   bx   lr
+
+PrimaryCoreMpid:  .word    0x0
