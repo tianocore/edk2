@@ -11,13 +11,11 @@
 //
 //
 
-.text
-.align 3
+#include <AsmMacroIoLibV8.h>
+
 .arch_extension sec
 
-GCC_ASM_EXPORT(ArmCallSmc)
-
-ASM_PFX(ArmCallSmc):
+ASM_FUNC(ArmCallSmc)
     push    {r4-r8}
     // r0 will be popped just after the SMC call
     push    {r0}

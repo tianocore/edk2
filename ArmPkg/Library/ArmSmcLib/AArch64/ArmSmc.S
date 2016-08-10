@@ -11,12 +11,9 @@
 //
 //
 
-.text
-.align 3
+#include <AsmMacroIoLibV8.h>
 
-GCC_ASM_EXPORT(ArmCallSmc)
-
-ASM_PFX(ArmCallSmc):
+ASM_FUNC(ArmCallSmc)
   // Push x0 on the stack - The stack must always be quad-word aligned
   str   x0, [sp, #-16]!
 
