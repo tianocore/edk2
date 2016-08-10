@@ -14,16 +14,11 @@
 
 #include <AsmMacroIoLibV8.h>
 
-.text
-.align 3
-GCC_ASM_EXPORT (ArmReadCpuExCr)
-GCC_ASM_EXPORT (ArmWriteCpuExCr)
-
-ASM_PFX(ArmReadCpuExCr):
+ASM_FUNC(ArmReadCpuExCr)
   mrs   x0, S3_1_c15_c2_1
   ret
 
-ASM_PFX(ArmWriteCpuExCr):
+ASM_FUNC(ArmWriteCpuExCr)
   msr   S3_1_c15_c2_1, x0
   dsb   sy
   isb

@@ -12,17 +12,10 @@
 //
 
 #include <AsmMacroIoLib.h>
-#include <Library/ArmCpuLib.h>
-#include <Chipset/ArmCortexA9.h>
-
-.text
-.align 3
-
-GCC_ASM_EXPORT(ArmGetScuBaseAddress)
 
 // IN None
 // OUT r0 = SCU Base Address
-ASM_PFX(ArmGetScuBaseAddress):
+ASM_FUNC(ArmGetScuBaseAddress)
   // Read Configuration Base Address Register. ArmCBar cannot be called to get
   // the Configuration BAR as a stack is not necessary setup. The SCU is at the
   // offset 0x0000 from the Private Memory Region.
