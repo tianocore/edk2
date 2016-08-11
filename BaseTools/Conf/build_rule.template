@@ -310,7 +310,7 @@
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
     
     
-[Static-Library-File.SEC.AARCH64, Static-Library-File.PEI_CORE.AARCH64, Static-Library-File.PEIM.AARCH64]
+[Static-Library-File.SEC.AARCH64, Static-Library-File.PEI_CORE.AARCH64, Static-Library-File.PEIM.AARCH64,Static-Library-File.SEC.ARM, Static-Library-File.PEI_CORE.ARM, Static-Library-File.PEIM.ARM]
     <InputFile>
         *.lib
 
@@ -320,8 +320,8 @@
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
-    <Command.GCC, Command.GCCLD>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(DLINK2_FLAGS)
+    <Command.GCC>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(CC_XIPFLAGS) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
 
