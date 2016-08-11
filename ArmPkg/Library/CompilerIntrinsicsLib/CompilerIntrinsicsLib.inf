@@ -22,17 +22,14 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = CompilerIntrinsicsLib
 
-[Sources.AARCH64]
-  AArch64/memcpy.S
-  AArch64/memset.c
+[Sources]
+  memcpy.c
+  memset.c
 
 [Sources.ARM]
   Arm/mullu.asm        | RVCT
   Arm/switch.asm       | RVCT
   Arm/llsr.asm         | RVCT
-  Arm/memcpy.asm       | RVCT
-  Arm/memcpy4.asm      | RVCT
-  Arm/memset.asm       | RVCT
   Arm/memmove.asm      | RVCT
   Arm/uread.asm        | RVCT
   Arm/uwrite.asm       | RVCT
@@ -58,8 +55,6 @@
   Arm/divsi3.S     | GCC
   Arm/lshrdi3.S    | GCC
 
-  Arm/memcpy.S     | GCC
-  Arm/memset.S     | GCC
   Arm/memmove.S    | GCC
 
 #  Arm/modsi3.c     | GCC
