@@ -436,9 +436,12 @@ IScsiPublishIbft (
   EFI_HANDLE                                *HandleBuffer;
   UINT8                                     *Heap;
   UINT8                                     Checksum;
-  UINTN                                         Index;
   EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
   EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
+  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
+
+  Rsdt = NULL;
+  Xsdt = NULL;
 
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **)&AcpiTableProtocol);
   if (EFI_ERROR (Status)) {
@@ -449,25 +452,22 @@ IScsiPublishIbft (
   //
   // Find ACPI table RSD_PTR from system table
   //
-  for (Index = 0, Rsdp = NULL; Index < gST->NumberOfTableEntries; Index++) {
-    if (CompareGuid (&(gST->ConfigurationTable[Index].VendorGuid), &gEfiAcpi20TableGuid) ||
-      CompareGuid (&(gST->ConfigurationTable[Index].VendorGuid), &gEfiAcpi10TableGuid) ||
-      CompareGuid (&(gST->ConfigurationTable[Index].VendorGuid), &gEfiAcpiTableGuid)
-      ) {
-      //
-      // A match was found.
-      //
-      Rsdp = (EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER *) gST->ConfigurationTable[Index].VendorTable;
-      break;
-    }
+  Status = EfiGetSystemConfigurationTable (&gEfiAcpiTableGuid, (VOID **) &Rsdp);
+  if (EFI_ERROR (Status)) {
+    Status = EfiGetSystemConfigurationTable (&gEfiAcpi10TableGuid, (VOID **) &Rsdp);
   }
 
-  if (Rsdp == NULL) {
+  if (EFI_ERROR (Status) || (Rsdp == NULL)) {
     return ;
-  } else {
+  } else if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION && Rsdp->XsdtAddress != 0) {
+    Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->XsdtAddress;
+  } else if (Rsdp->RsdtAddress != 0) {
     Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *) (UINTN) Rsdp->RsdtAddress;
   }
 
+  if ((Xsdt == NULL) && (Rsdt == NULL)) {
+    return ;
+  }
 
   if (mIbftInstalled) {
     Status = AcpiTableProtocol->UninstallAcpiTable (
@@ -506,7 +506,12 @@ IScsiPublishIbft (
   //
   // Fill in the various section of the iSCSI Boot Firmware Table.
   //
-  IScsiInitIbfTableHeader (Table, Rsdt->OemId, &Rsdt->OemTableId);
+  if (Rsdp->Revision >= EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER_REVISION) {
+    IScsiInitIbfTableHeader (Table, Xsdt->OemId, &Xsdt->OemTableId);
+  } else {
+    IScsiInitIbfTableHeader (Table, Rsdt->OemId, &Rsdt->OemTableId);
+  }
+
   IScsiInitControlSection (Table, HandleCount);
   IScsiFillInitiatorSection (Table, &Heap, HandleBuffer[0]);
   IScsiFillNICAndTargetSections (Table, &Heap, HandleCount, HandleBuffer);
