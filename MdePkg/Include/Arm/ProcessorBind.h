@@ -28,6 +28,13 @@
 #pragma pack()
 #endif
 
+//
+// RVCT does not support the __builtin_unreachable() macro
+//
+#ifdef __ARMCC_VERSION
+#define UNREACHABLE()
+#endif
+
 #if _MSC_EXTENSIONS 
   //
   // use Microsoft* C complier dependent integer width types 
