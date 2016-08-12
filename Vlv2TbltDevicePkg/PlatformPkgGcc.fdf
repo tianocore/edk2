@@ -839,7 +839,11 @@ FV = BiosUpdate
 [Rule.Common.SEC.BINARY]
   FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
     PE32  PE32    Align = 8       |.efi
-    RAW BIN       Align = 16      |.com
+!if $(MINNOW2_FSP_BUILD) == TRUE
+    RAW   RAW                     |.raw
+!else
+    RAW   BIN     Align = 16      |.com
+!endif
   }
 
 [Rule.Common.PEI_CORE]
