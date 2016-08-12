@@ -14,7 +14,7 @@
 **/
 #include "PiPei.h"
 #include <Library/HobLib.h>
-#include <Library\BaseLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Guid/MemoryConfigData.h>
 #include <PlatformFspLib.h>
