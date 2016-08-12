@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -347,7 +347,10 @@ FvReadFile (
    if ((FvDevice->FwVolHeader->Attributes & EFI_FVB2_MEMORY_MAPPED) == EFI_FVB2_MEMORY_MAPPED) {
      *FileAttributes |= EFI_FV_FILE_ATTRIB_MEMORY_MAPPED;
    }
-  *AuthenticationStatus = 0;
+  //
+  // Inherit the authentication status.
+  //
+  *AuthenticationStatus = FvDevice->AuthenticationStatus;
   *BufferSize = FileSize;
 
   if (Buffer == NULL) {
