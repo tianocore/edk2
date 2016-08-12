@@ -15,8 +15,8 @@
 
 
 #include <PiPei.h>
-#include <Library\DebugLib.h>
-#include <Library\SerialPortLib.h>
+#include <Library/DebugLib.h>
+#include <Library/SerialPortLib.h>
 
 VOID EnableInternalUart ();
 

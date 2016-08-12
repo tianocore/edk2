@@ -49,14 +49,13 @@ GetMemorySizeInMemoryTypeInformation (
   IN EFI_PEI_SERVICES **PeiServices
   )
 {
-  EFI_STATUS                  Status;
   EFI_PEI_HOB_POINTERS        Hob;
   EFI_MEMORY_TYPE_INFORMATION *MemoryData;
   UINT8                       Index;
   UINTN                       TempPageNum;
 
   MemoryData = NULL;
-  Status     = (*PeiServices)->GetHobList (PeiServices, (VOID **) &Hob.Raw);
+  (*PeiServices)->GetHobList ((CONST EFI_PEI_SERVICES **)PeiServices, (VOID **) &Hob.Raw);
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION &&
       CompareGuid (&Hob.Guid->Name, &gEfiMemoryTypeInformationGuid)) {
@@ -398,7 +397,7 @@ FspHobProcessForOtherData (
   //
   // Other hob for platform
   //
-  PlatformHobCreateFromFsp ( PeiServices,  FspHobList);
+  PlatformHobCreateFromFsp ((CONST EFI_PEI_SERVICES **) PeiServices,  FspHobList);
 
   return EFI_SUCCESS;
 }

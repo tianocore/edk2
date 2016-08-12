@@ -15,8 +15,8 @@
 
 
 #include <PiPei.h>
-#include <Library\IoLib.h>
-#include <Library\SerialPortLib.h>
+#include <Library/IoLib.h>
+#include <Library/SerialPortLib.h>
 
 #define PCI_IDX        0xCF8
 #define PCI_DAT        0xCFC
@@ -192,7 +192,7 @@ EnableInternalUart(
   MmioOr8 (PciD31F0RegBase + R_PCH_LPC_UART_CTRL, (UINT8) B_PCH_LPC_UART_CTRL_COM1_EN);
 
   SerialPortInitialize ();
-  SerialPortWrite ("EnableInternalUart!\r\n", sizeof("EnableInternalUart!\r\n") - 1);
+  SerialPortWrite ((UINT8 *)"EnableInternalUart!\r\n", sizeof("EnableInternalUart!\r\n") - 1);
 
   return  ;
 }
