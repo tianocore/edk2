@@ -48,7 +48,7 @@ InitializePpiServices (
 
 **/
 VOID
-ConverSinglePpiPointer (
+ConvertSinglePpiPointer (
   IN PEI_PPI_LIST_POINTERS *PpiPointer,
   IN UINTN                 TempBottom,
   IN UINTN                 TempTop,
@@ -124,7 +124,7 @@ ConvertPpiPointers (
       //
       // Convert PPI pointer in old Heap
       //
-      ConverSinglePpiPointer (
+      ConvertSinglePpiPointer (
         &PrivateData->PpiData.PpiListPtrs[Index],
         (UINTN)SecCoreData->PeiTemporaryRamBase,
         (UINTN)SecCoreData->PeiTemporaryRamBase + SecCoreData->PeiTemporaryRamSize,
@@ -135,7 +135,7 @@ ConvertPpiPointers (
       //
       // Convert PPI pointer in old Stack
       //
-      ConverSinglePpiPointer (
+      ConvertSinglePpiPointer (
         &PrivateData->PpiData.PpiListPtrs[Index],
         (UINTN)SecCoreData->StackBase,
         (UINTN)SecCoreData->StackBase + SecCoreData->StackSize,
@@ -151,7 +151,7 @@ ConvertPpiPointers (
           continue;
         }
         
-        ConverSinglePpiPointer (
+        ConvertSinglePpiPointer (
           &PrivateData->PpiData.PpiListPtrs[Index],
           (UINTN)PrivateData->HoleData[IndexHole].Base,
           (UINTN)PrivateData->HoleData[IndexHole].Base + PrivateData->HoleData[IndexHole].Size,
