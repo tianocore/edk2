@@ -287,9 +287,8 @@ Ikev2InitPskParser (
   // as first payload and all other payloads unchanged.
   //
   if (IkeSaSession->SessionCommon.IsInitiator) {
-    if (NotifyPayload != NULL) {
-      Status = Ikev2ParserNotifyCookiePayload (NotifyPayload, IkeSaSession);
-      return Status;
+    if (NotifyPayload != NULL && !EFI_ERROR(Ikev2ParserNotifyCookiePayload (NotifyPayload, IkeSaSession))) {
+      return EFI_SUCCESS;
     }
   }
 
