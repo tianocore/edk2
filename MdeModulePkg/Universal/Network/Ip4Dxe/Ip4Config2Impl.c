@@ -150,7 +150,6 @@ Ip4Config2OnPolicyChanged (
   // Start the dhcp configuration.
   //
   if (NewPolicy == Ip4Config2PolicyDhcp) {
-    IpSb->Reconfig = TRUE;
     Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
   }
 
