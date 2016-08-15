@@ -18,6 +18,11 @@
 #include <IndustryStandard/Virtio095.h>
 
 //
+// Subsystem Device IDs (to be) introduced in VirtIo 1.0
+//
+#define VIRTIO_SUBSYSTEM_GPU_DEVICE         16
+
+//
 // Structures for parsing the VirtIo 1.0 specific PCI capabilities from the
 // config space
 //
