@@ -52,11 +52,13 @@ import Common.GlobalData as GlobalData
 from Common.Expression import *
 from Common import GlobalData
 from Common.String import ReplaceMacro
-
+import uuid
 from Common.Misc import tdict
 
 import Common.LongFilePathOs as os
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Capsule import EFI_CERT_TYPE_PKCS7_GUID
+from Capsule import EFI_CERT_TYPE_RSA2048_SHA256_GUID
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -1123,6 +1125,26 @@ class FdfParser:
         else:
             self.__UndoToken()
             return False
+
+    def __Verify(self, Name, Value, Scope):
+        if Scope in ['UINT64', 'UINT8']:
+            ValueNumber = 0
+            try:
+                if Value.upper().startswith('0X'):
+                    ValueNumber = int (Value, 16)
+                else:
+                    ValueNumber = int (Value)
+            except:
+                EdkLogger.error("FdfParser", FORMAT_INVALID, "The value is not valid dec or hex number for %s." % Name)
+            if ValueNumber < 0:
+                EdkLogger.error("FdfParser", FORMAT_INVALID, "The value can't be set to negative value for %s." % Name)
+            if Scope == 'UINT64':
+                if ValueNumber >= 0x10000000000000000:
+                    EdkLogger.error("FdfParser", FORMAT_INVALID, "Too large value for %s." % Name)
+            if Scope == 'UINT8':
+                if ValueNumber >= 0x100:
+                    EdkLogger.error("FdfParser", FORMAT_INVALID, "Too large value for %s." % Name)
+            return True
 
     ## __UndoToken() method
     #
@@ -3187,7 +3209,7 @@ class FdfParser:
 
         if not self.__GetNextToken():
             raise Warning("The FMP payload section is empty!", self.FileName, self.CurrentLineNumber)
-        FmpKeyList = ['IMAGE_HEADER_INIT_VERSION', 'IMAGE_TYPE_ID', 'IMAGE_INDEX', 'HARDWARE_INSTANCE']
+        FmpKeyList = ['IMAGE_HEADER_INIT_VERSION', 'IMAGE_TYPE_ID', 'IMAGE_INDEX', 'HARDWARE_INSTANCE', 'CERTIFICATE_GUID', 'MONOTONIC_COUNT']
         while self.__Token in FmpKeyList:
             Name = self.__Token
             FmpKeyList.remove(Name)
@@ -3195,32 +3217,58 @@ class FdfParser:
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
             if Name == 'IMAGE_TYPE_ID':
                 if not self.__GetNextGuid():
-                    raise Warning("expected GUID value for IMAGE_TYPE_ID", self.FileName, self.CurrentLineNumber)
+                    raise Warning("expected GUID value for IMAGE_TYPE_ID.", self.FileName, self.CurrentLineNumber)
                 FmpData.ImageTypeId = self.__Token
+            elif Name == 'CERTIFICATE_GUID':
+                if not self.__GetNextGuid():
+                    raise Warning("expected GUID value for CERTIFICATE_GUID.", self.FileName, self.CurrentLineNumber)
+                FmpData.Certificate_Guid = self.__Token
+                if uuid.UUID(FmpData.Certificate_Guid) != EFI_CERT_TYPE_RSA2048_SHA256_GUID and uuid.UUID(FmpData.Certificate_Guid) != EFI_CERT_TYPE_PKCS7_GUID:
+                    raise Warning("Only support EFI_CERT_TYPE_RSA2048_SHA256_GUID or EFI_CERT_TYPE_PKCS7_GUID for CERTIFICATE_GUID.", self.FileName, self.CurrentLineNumber)
             else:
                 if not self.__GetNextToken():
                     raise Warning("expected value of %s" % Name, self.FileName, self.CurrentLineNumber)
                 Value = self.__Token
                 if Name == 'IMAGE_HEADER_INIT_VERSION':
-                    FmpData.Version = Value
+                    if self.__Verify(Name, Value, 'UINT8'):
+                        FmpData.Version = Value
                 elif Name == 'IMAGE_INDEX':
-                    FmpData.ImageIndex = Value
+                    if self.__Verify(Name, Value, 'UINT8'):
+                        FmpData.ImageIndex = Value
                 elif Name == 'HARDWARE_INSTANCE':
-                    FmpData.HardwareInstance = Value
+                    if self.__Verify(Name, Value, 'UINT8'):
+                        FmpData.HardwareInstance = Value
+                elif Name == 'MONOTONIC_COUNT':
+                    if self.__Verify(Name, Value, 'UINT64'):
+                        FmpData.MonotonicCount = Value
+                        if FmpData.MonotonicCount.upper().startswith('0X'):
+                            FmpData.MonotonicCount = (long)(FmpData.MonotonicCount, 16)
+                        else:
+                            FmpData.MonotonicCount = (long)(FmpData.MonotonicCount)
             if not self.__GetNextToken():
                 break
         else:
             self.__UndoToken()
 
+        if (FmpData.MonotonicCount and not FmpData.Certificate_Guid) or (not FmpData.MonotonicCount and FmpData.Certificate_Guid):
+            EdkLogger.error("FdfParser", FORMAT_INVALID, "CERTIFICATE_GUID and MONOTONIC_COUNT must be work as a pair.")
+        # remove CERTIFICATE_GUID and MONOTONIC_COUNT from FmpKeyList, since these keys are optional
+        if 'CERTIFICATE_GUID' in FmpKeyList:
+            FmpKeyList.remove('CERTIFICATE_GUID')
+        if 'MONOTONIC_COUNT' in FmpKeyList:
+            FmpKeyList.remove('MONOTONIC_COUNT')
         if FmpKeyList:
-            raise Warning("Missing keywords %s in FMP payload section" % ', '.join(FmpKeyList), self.FileName, self.CurrentLineNumber)
+            raise Warning("Missing keywords %s in FMP payload section." % ', '.join(FmpKeyList), self.FileName, self.CurrentLineNumber)
         ImageFile = self.__ParseRawFileStatement()
         if not ImageFile:
-            raise Warning("Missing image file in FMP payload section", self.FileName, self.CurrentLineNumber)
+            raise Warning("Missing image file in FMP payload section.", self.FileName, self.CurrentLineNumber)
         FmpData.ImageFile = ImageFile
         VendorCodeFile = self.__ParseRawFileStatement()
         if VendorCodeFile:
             FmpData.VendorCodeFile = VendorCodeFile
+        AdditionalFile = self.__ParseRawFileStatement()
+        if AdditionalFile:
+            raise Warning("At most one Image file and one Vendor code file are allowed in FMP payload section.", self.FileName, self.CurrentLineNumber)
         self.Profile.FmpPayloadDict[FmpUiName] = FmpData
         return True
 

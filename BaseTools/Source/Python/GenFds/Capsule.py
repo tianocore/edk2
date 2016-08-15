@@ -1,7 +1,7 @@
 ## @file
 # generate capsule
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,9 +25,16 @@ from GenFds import GenFds
 from Common.Misc import PackRegistryFormatGuid
 import uuid
 from struct import pack
+from GenFds import FindExtendTool
+from Common import EdkLogger
+from Common.BuildToolError import *
 
 
 T_CHAR_LF = '\n'
+WIN_CERT_REVISION      = 0x0200
+WIN_CERT_TYPE_EFI_GUID = 0x0EF1
+EFI_CERT_TYPE_PKCS7_GUID = uuid.UUID('{4aafd29d-68df-49ee-8aa9-347d375665a7}')
+EFI_CERT_TYPE_RSA2048_SHA256_GUID = uuid.UUID('{a7717414-c616-4977-9420-844712a735bf}')
 
 ## create inf file describes what goes into capsule and call GenFv to generate capsule
 #
@@ -98,6 +105,32 @@ class Capsule (CapsuleClassObject) :
         FwMgrHdr.write(pack('=HH', len(self.CapsuleDataList), len(self.FmpPayloadList)))
         FwMgrHdrSize = 4+2+2+8*(len(self.CapsuleDataList)+len(self.FmpPayloadList))
 
+        #
+        # typedef struct _WIN_CERTIFICATE {
+        #   UINT32 dwLength;
+        #   UINT16 wRevision;
+        #   UINT16 wCertificateType;
+        # //UINT8 bCertificate[ANYSIZE_ARRAY];
+        # } WIN_CERTIFICATE;
+        #
+        # typedef struct _WIN_CERTIFICATE_UEFI_GUID {
+        #   WIN_CERTIFICATE Hdr;
+        #   EFI_GUID        CertType;
+        # //UINT8 CertData[ANYSIZE_ARRAY];
+        # } WIN_CERTIFICATE_UEFI_GUID;
+        #
+        # typedef struct {
+        #   UINT64                    MonotonicCount;
+        #   WIN_CERTIFICATE_UEFI_GUID AuthInfo;
+        # } EFI_FIRMWARE_IMAGE_AUTHENTICATION;
+        #
+        # typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
+        #   EFI_GUID HashType;
+        #   UINT8 PublicKey[256];
+        #   UINT8 Signature[256];
+        # } EFI_CERT_BLOCK_RSA_2048_SHA256;
+        #
+
         PreSize = FwMgrHdrSize
         Content = StringIO.StringIO()
         for driver in self.CapsuleDataList:
@@ -108,10 +141,47 @@ class Capsule (CapsuleClassObject) :
             Content.write(File.read())
             File.close()
         for fmp in self.FmpPayloadList:
-            payload = fmp.GenCapsuleSubItem()
-            FwMgrHdr.write(pack('=Q', PreSize))
-            PreSize += len(payload)
-            Content.write(payload)
+            if fmp.Certificate_Guid:
+                ExternalTool, ExternalOption = FindExtendTool([], GenFdsGlobalVariable.ArchList, fmp.Certificate_Guid)
+                CmdOption = ''
+                CapInputFile = fmp.ImageFile
+                if not os.path.isabs(fmp.ImageFile):
+                    CapInputFile = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, fmp.ImageFile)
+                CapOutputTmp = os.path.join(GenFdsGlobalVariable.FvDir, self.UiCapsuleName) + '.tmp'
+                if ExternalTool == None:
+                    EdkLogger.error("GenFds", GENFDS_ERROR, "No tool found with GUID %s" % fmp.Certificate_Guid)
+                else:
+                    CmdOption += ExternalTool
+                if ExternalOption:
+                    CmdOption = CmdOption + ' ' + ExternalOption
+                CmdOption += ' -e ' + ' --monotonic-count ' + str(fmp.MonotonicCount) + ' -o ' + CapOutputTmp + ' ' + CapInputFile
+                CmdList = CmdOption.split()
+                GenFdsGlobalVariable.CallExternalTool(CmdList, "Failed to generate FMP auth capsule")
+                if uuid.UUID(fmp.Certificate_Guid) == EFI_CERT_TYPE_PKCS7_GUID:
+                    dwLength = 4 + 2 + 2 + 16 + os.path.getsize(CapOutputTmp) - os.path.getsize(CapInputFile)
+                else:
+                    dwLength = 4 + 2 + 2 + 16 + 16 + 256 + 256
+                Buffer  = pack('Q', fmp.MonotonicCount)
+                Buffer += pack('I', dwLength)
+                Buffer += pack('H', WIN_CERT_REVISION)
+                Buffer += pack('H', WIN_CERT_TYPE_EFI_GUID)
+                Buffer += uuid.UUID(fmp.Certificate_Guid).get_bytes_le()
+                if os.path.exists(CapOutputTmp):
+                    TmpFile = open(CapOutputTmp, 'rb')
+                    Buffer += TmpFile.read()
+                    TmpFile.close()
+                    if fmp.VendorCodeFile:
+                        VendorFile = open(fmp.VendorCodeFile, 'rb')
+                        Buffer += VendorFile.read()
+                        VendorFile.close()
+                    FwMgrHdr.write(pack('=Q', PreSize))
+                    PreSize += len(Buffer)
+                    Content.write(Buffer)
+            else:
+                payload = fmp.GenCapsuleSubItem()
+                FwMgrHdr.write(pack('=Q', PreSize))
+                PreSize += len(payload)
+                Content.write(payload)
         BodySize = len(FwMgrHdr.getvalue()) + len(Content.getvalue())
         Header.write(pack('=I', HdrSize + BodySize))
         #

@@ -27,6 +27,7 @@ from Common import EdkLogger
 from Common.BuildToolError import *
 from FvImageSection import FvImageSection
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from GenFds import FindExtendTool
 
 ## generate GUIDed section
 #
@@ -128,7 +129,7 @@ class GuidSection(GuidSectionClassObject) :
         ExternalTool = None
         ExternalOption = None
         if self.NameGuid != None:
-            ExternalTool, ExternalOption = self.__FindExtendTool__()
+            ExternalTool, ExternalOption = FindExtendTool(self.KeyStringList, self.CurrentArchList, self.NameGuid)
 
         #
         # If not have GUID , call default
@@ -248,62 +249,6 @@ class GuidSection(GuidSectionClassObject) :
                 self.IncludeFvSection = False
                 self.ProcessRequired = "TRUE"
             return OutputFileList, self.Alignment
-
-    ## __FindExtendTool()
-    #
-    #    Find location of tools to process section data
-    #
-    #   @param  self        The object pointer
-    #
-    def __FindExtendTool__(self):
-        # if user not specify filter, try to deduce it from global data.
-        if self.KeyStringList == None or self.KeyStringList == []:
-            Target = GenFdsGlobalVariable.TargetName
-            ToolChain = GenFdsGlobalVariable.ToolChainTag
-            ToolDb = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDatabase
-            if ToolChain not in ToolDb['TOOL_CHAIN_TAG']:
-                EdkLogger.error("GenFds", GENFDS_ERROR, "Can not find external tool because tool tag %s is not defined in tools_def.txt!" % ToolChain)
-            self.KeyStringList = [Target + '_' + ToolChain + '_' + self.CurrentArchList[0]]
-            for Arch in self.CurrentArchList:
-                if Target + '_' + ToolChain + '_' + Arch not in self.KeyStringList:
-                    self.KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
-
-        if GenFdsGlobalVariable.GuidToolDefinition:
-            if self.NameGuid in GenFdsGlobalVariable.GuidToolDefinition.keys():
-                return GenFdsGlobalVariable.GuidToolDefinition[self.NameGuid]
-
-        ToolDefinition = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDictionary
-        ToolPathTmp = None
-        ToolOption = None
-        for ToolDef in ToolDefinition.items():
-            if self.NameGuid == ToolDef[1]:
-                KeyList = ToolDef[0].split('_')
-                Key = KeyList[0] + \
-                      '_' + \
-                      KeyList[1] + \
-                      '_' + \
-                      KeyList[2]
-                if Key in self.KeyStringList and KeyList[4] == 'GUID':
-
-                    ToolPath = ToolDefinition.get(Key + \
-                                                   '_' + \
-                                                   KeyList[3] + \
-                                                   '_' + \
-                                                   'PATH')
-
-                    ToolOption = ToolDefinition.get(Key + \
-                                                    '_' + \
-                                                    KeyList[3] + \
-                                                    '_' + \
-                                                    'FLAGS')
-                    if ToolPathTmp == None:
-                        ToolPathTmp = ToolPath
-                    else:
-                        if ToolPathTmp != ToolPath:
-                            EdkLogger.error("GenFds", GENFDS_ERROR, "Don't know which tool to use, %s or %s ?" % (ToolPathTmp, ToolPath))
-
-        GenFdsGlobalVariable.GuidToolDefinition[self.NameGuid] = (ToolPathTmp, ToolOption)
-        return ToolPathTmp, ToolOption
 
 
 

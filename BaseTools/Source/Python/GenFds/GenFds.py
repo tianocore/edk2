@@ -415,7 +415,64 @@ def BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, Val
             Value = '0'
     return  Value
 
-        
+## FindExtendTool()
+#
+#  Find location of tools to process data
+#
+#  @param  KeyStringList    Filter for inputs of section generation
+#  @param  CurrentArchList  Arch list
+#  @param  NameGuid         The Guid name
+#
+def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
+    # if user not specify filter, try to deduce it from global data.
+    if KeyStringList == None or KeyStringList == []:
+        Target = GenFdsGlobalVariable.TargetName
+        ToolChain = GenFdsGlobalVariable.ToolChainTag
+        ToolDb = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDatabase
+        if ToolChain not in ToolDb['TOOL_CHAIN_TAG']:
+            EdkLogger.error("GenFds", GENFDS_ERROR, "Can not find external tool because tool tag %s is not defined in tools_def.txt!" % ToolChain)
+        KeyStringList = [Target + '_' + ToolChain + '_' + CurrentArchList[0]]
+        for Arch in CurrentArchList:
+            if Target + '_' + ToolChain + '_' + Arch not in KeyStringList:
+                KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
+
+    if GenFdsGlobalVariable.GuidToolDefinition:
+        if NameGuid in GenFdsGlobalVariable.GuidToolDefinition.keys():
+            return GenFdsGlobalVariable.GuidToolDefinition[NameGuid]
+
+    ToolDefinition = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDictionary
+    ToolPathTmp = None
+    ToolOption = None
+    for ToolDef in ToolDefinition.items():
+        if NameGuid == ToolDef[1]:
+            KeyList = ToolDef[0].split('_')
+            Key = KeyList[0] + \
+                  '_' + \
+                  KeyList[1] + \
+                  '_' + \
+                  KeyList[2]
+            if Key in KeyStringList and KeyList[4] == 'GUID':
+
+                ToolPath = ToolDefinition.get(Key + \
+                                               '_' + \
+                                               KeyList[3] + \
+                                               '_' + \
+                                               'PATH')
+
+                ToolOption = ToolDefinition.get(Key + \
+                                                '_' + \
+                                                KeyList[3] + \
+                                                '_' + \
+                                                'FLAGS')
+                if ToolPathTmp == None:
+                    ToolPathTmp = ToolPath
+                else:
+                    if ToolPathTmp != ToolPath:
+                        EdkLogger.error("GenFds", GENFDS_ERROR, "Don't know which tool to use, %s or %s ?" % (ToolPathTmp, ToolPath))
+
+    GenFdsGlobalVariable.GuidToolDefinition[NameGuid] = (ToolPathTmp, ToolOption)
+    return ToolPathTmp, ToolOption
+
 ## Parse command line options
 #
 # Using standard Python module optparse to parse command line option of this tool.
