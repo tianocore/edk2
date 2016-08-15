@@ -2092,7 +2092,7 @@ typedef union {
     ///
     /// [Bit 11] Valid Enable range mask.
     ///
-    UINT32  V:8;
+    UINT32  V:1;
     ///
     /// [Bits 31:12] PhysMask.  MTRR address range mask.
     ///
