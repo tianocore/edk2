@@ -1,10 +1,10 @@
 ## @file
-# This tool encodes and decodes GUIDed FFS sections for a GUID type of
+# This tool encodes and decodes GUIDed FFS sections or FMP capsule for a GUID type of
 # EFI_CERT_TYPE_RSA2048_SHA256_GUID defined in the UEFI 2.4 Specification as
 #   {0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf}}
 # This tool has been tested with OpenSSL 1.0.1e 11 Feb 2013
 #
-# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -32,7 +32,7 @@ from Common.BuildVersion import gBUILD_VERSION
 #
 __prog__      = 'Rsa2048Sha256Sign'
 __version__   = '%s Version %s' % (__prog__, '0.9 ' + gBUILD_VERSION)
-__copyright__ = 'Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.'
+__copyright__ = 'Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.'
 __usage__     = '%s -e|-d [options] <input_file>' % (__prog__)
 
 #
@@ -66,6 +66,7 @@ if __name__ == '__main__':
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
   group.add_argument("-d", action="store_true", dest='Decode', help='decode file')
   parser.add_argument("-o", "--output", dest='OutputFile', type=str, metavar='filename', help="specify the output filename", required=True)
+  parser.add_argument("--monotonic-count", dest='MonotonicCountStr', type=str, help="specify the MonotonicCount in FMP capsule.")
   parser.add_argument("--private-key", dest='PrivateKeyFile', type=argparse.FileType('rb'), help="specify the private key filename.  If not specified, a test signing key is used.")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
@@ -155,13 +156,26 @@ if __name__ == '__main__':
     PublicKeyHexString=PublicKeyHexString[2:]
   if Process.returncode <> 0:
     sys.exit(Process.returncode)
-  
+
+  if args.MonotonicCountStr:
+    try:
+      if args.MonotonicCountStr.upper().startswith('0X'):
+        args.MonotonicCountValue = (long)(args.MonotonicCountStr, 16)
+      else:
+        args.MonotonicCountValue = (long)(args.MonotonicCountStr)
+    except:
+        pass
+
   if args.Encode:
+    FullInputFileBuffer = args.InputFileBuffer
+    if args.MonotonicCountStr:
+      format = "Q%ds" % len(args.InputFileBuffer)
+      FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
     # 
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
     Process = subprocess.Popen('%s sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    Signature = Process.communicate(input=args.InputFileBuffer)[0]
+    Signature = Process.communicate(input=FullInputFileBuffer)[0]
     if Process.returncode <> 0:
       sys.exit(Process.returncode)
       
@@ -196,6 +210,11 @@ if __name__ == '__main__':
       print 'ERROR: Public key in input file does not match public key from private key file'
       sys.exit(1)
 
+    FullInputFileBuffer = args.InputFileBuffer
+    if args.MonotonicCountStr:
+      format = "Q%ds" % len(args.InputFileBuffer)
+      FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
+
     #
     # Write Signature to output file
     #
@@ -205,7 +224,7 @@ if __name__ == '__main__':
     # Verify signature
     #    
     Process = subprocess.Popen('%s sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    Process.communicate(args.InputFileBuffer)
+    Process.communicate(input=FullInputFileBuffer)
     if Process.returncode <> 0:
       print 'ERROR: Verification failed'
       os.remove (args.OutputFileName)
