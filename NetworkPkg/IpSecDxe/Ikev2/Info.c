@@ -128,7 +128,11 @@ Ikev2InfoGenerator (
       // The input parameter is not correct.
       //
       goto ERROR_EXIT;
-    } 
+    }
+
+    if (IkeSaSession->SessionCommon.IsInitiator) {
+      IkePacket->Header->Flags = IKE_HEADER_FLAGS_INIT ;
+    }  
   } else {
     //
     // Delete the Child SA Information Exchagne
@@ -180,13 +184,16 @@ Ikev2InfoGenerator (
     // Change the IsOnDeleting Flag
     //
     ChildSaSession->SessionCommon.IsOnDeleting = TRUE;
+
+    if (ChildSaSession->SessionCommon.IsInitiator) {
+      IkePacket->Header->Flags = IKE_HEADER_FLAGS_INIT ;
+    }
   }
 
-  if (InfoContext == NULL) {
-    IkePacket->Header->Flags = IKE_HEADER_FLAGS_INIT;
-  } else {
-    IkePacket->Header->Flags = IKE_HEADER_FLAGS_RESPOND;
+  if (InfoContext != NULL) {
+    IkePacket->Header->Flags |= IKE_HEADER_FLAGS_RESPOND;
   }
+  
   return IkePacket;
 
 ERROR_EXIT:

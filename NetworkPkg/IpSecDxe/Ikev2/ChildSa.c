@@ -76,9 +76,7 @@ Ikev2CreateChildGenerator (
     }    
     
     if (ChildSaSession->SessionCommon.IsInitiator) {
-      IkePacket->Header->Flags = IKE_HEADER_FLAGS_CHILD_INIT;
-    } else {
-      IkePacket->Header->Flags = IKE_HEADER_FLAGS_RESPOND;
+      IkePacket->Header->Flags = IKE_HEADER_FLAGS_INIT;
     }
       
   } else {
@@ -96,11 +94,13 @@ Ikev2CreateChildGenerator (
     }    
     
     if (IkeSaSession->SessionCommon.IsInitiator) {
-      IkePacket->Header->Flags = IKE_HEADER_FLAGS_CHILD_INIT;
-    } else {
-      IkePacket->Header->Flags = IKE_HEADER_FLAGS_RESPOND;
+      IkePacket->Header->Flags = IKE_HEADER_FLAGS_INIT;
     }
-  } 
+  }
+
+  if (MessageId != NULL) {
+    IkePacket->Header->Flags |= IKE_HEADER_FLAGS_RESPOND;
+  }
    
   //
   // According to RFC4306, Chapter 4.

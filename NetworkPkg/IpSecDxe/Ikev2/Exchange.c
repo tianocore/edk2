@@ -705,7 +705,7 @@ ON_REPLY:
   //
   // Generate the reply packet if needed and send it out.
   //
-  if (IkePacket->Header->Flags != IKE_HEADER_FLAGS_RESPOND) {
+  if (!(IkePacket->Header->Flags & IKE_HEADER_FLAGS_RESPOND)) {
     Reply = mIkev2CreateChild.Generator ((UINT8 *) IkeSaSession, &IkePacket->Header->MessageId);
     if (Reply != NULL) {
       Status = Ikev2SendIkePacket (UdpService, (UINT8 *) &(IkeSaSession->SessionCommon), Reply, 0);

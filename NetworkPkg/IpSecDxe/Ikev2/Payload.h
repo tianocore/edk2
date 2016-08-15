@@ -1,7 +1,7 @@
 /** @file
   The Definitions related to IKEv2 payload.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -37,11 +37,16 @@
 #define IKEV2_PAYLOAD_TYPE_EAP      48
 
 //
-// IKE header Flag for IKEv2
+// IKE header Flag (1 octet) for IKEv2, defined in RFC 4306 section 3.1 
+//
+// I(nitiator) (bit 3 of Flags, 0x08) - This bit MUST be set in messages sent by the 
+//                                      original initiator of the IKE_SA
+//
+// R(esponse) (bit 5 of Flags, 0x20)  - This bit indicates that this message is a response to 
+//                                      a message containing the same message ID.
 //
 #define IKE_HEADER_FLAGS_INIT       0x08
 #define IKE_HEADER_FLAGS_RESPOND    0x20
-#define IKE_HEADER_FLAGS_CHILD_INIT 0
 
 //
 // IKE Header Exchange Type for IKEv2
