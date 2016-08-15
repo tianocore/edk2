@@ -7671,6 +7671,12 @@ RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_F
 *_*_*_VPDTOOL_GUID         = 8C3D856A-9BE6-468E-850A-24F7A8D38E08
 
 ##################
+# Pkcs7Sign tool definitions
+##################
+*_*_*_PKCS7SIGN_PATH       = Pkcs7Sign
+*_*_*_PKCS7SIGN_GUID       = 4AAFD29D-68DF-49EE-8AA9-347D375665A7
+
+##################
 # NASM tool definitions
 ##################
 *_*_*_NASM_PATH                = ENV(NASM_PREFIX)nasm

@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for Python tools build.
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -31,7 +31,7 @@ EDK_TOOLS_PATH  = $(EDK_TOOLS_PATH::\\=:\)
 
 BIN_DIR=$(EDK_TOOLS_PATH)\Bin\Win32
 
-APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe $(BIN_DIR)\Rsa2048Sha256Sign.exe $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe $(BIN_DIR)\Ecc.exe
+APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BIN_DIR)\TargetTool.exe $(BIN_DIR)\GenDepex.exe $(BIN_DIR)\GenPatchPcdTable.exe $(BIN_DIR)\PatchPcdValue.exe $(BIN_DIR)\BPDG.exe $(BIN_DIR)\UPT.exe $(BIN_DIR)\Rsa2048Sha256Sign.exe $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe $(BIN_DIR)\Pkcs7Sign.exe $(BIN_DIR)\Ecc.exe
 
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
@@ -285,7 +285,28 @@ $(BIN_DIR)\config.ini: $(BASE_TOOLS_PATH)\Source\Python\Ecc\config.ini
 
 $(BIN_DIR)\exception.xml: $(BASE_TOOLS_PATH)\Source\Python\Ecc\exception.xml
   @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\exception.xml $(BIN_DIR)\exception.xml
-  
+
+$(BIN_DIR)\Pkcs7Sign.exe: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\Pkcs7Sign.py $(BIN_DIR)\TestCert.pem $(BIN_DIR)\TestCert.pub.pem $(BIN_DIR)\TestRoot.pem $(BIN_DIR)\TestRoot.pub.pem $(BIN_DIR)\TestSub.pem $(BIN_DIR)\TestSub.pub.pem
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Pkcs7Sign\Pkcs7Sign.py
+
+$(BIN_DIR)\TestCert.pem: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestCert.pem
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestCert.pem $(BIN_DIR)\TestCert.pem
+
+$(BIN_DIR)\TestCert.pub.pem: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestCert.pub.pem
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestCert.pub.pem $(BIN_DIR)\TestCert.pub.pem
+
+$(BIN_DIR)\TestSub.pem: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestSub.pem
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestSub.pem $(BIN_DIR)\TestSub.pem
+
+$(BIN_DIR)\TestSub.pub.pem: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestSub.pub.pem
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestSub.pub.pem $(BIN_DIR)\TestSub.pub.pem
+
+$(BIN_DIR)\TestRoot.pem: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestRoot.pem
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestRoot.pem $(BIN_DIR)\TestRoot.pem
+
+$(BIN_DIR)\TestRoot.pub.pem: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestRoot.pub.pem
+  @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestRoot.pub.pem $(BIN_DIR)\TestRoot.pub.pem
+
 clean:
 cleanall:  
   @del /f /q $(BIN_DIR)\*.pyd $(BIN_DIR)\*.dll
