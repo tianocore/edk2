@@ -709,6 +709,11 @@ ShellCommandRunLs (
               // must split off the search part that applies to files from the end of the directory part
               //
               StrnCatGrow(&SearchString, NULL, FullPath, 0);
+              if (SearchString == NULL) {
+                FreePool (FullPath);
+                ShellCommandLineFreeVarList (Package);
+                return SHELL_OUT_OF_RESOURCES;
+              }
               PathRemoveLastItem (FullPath);
               CopyMem (SearchString, SearchString + StrLen (FullPath), StrSize (SearchString + StrLen (FullPath)));
             }
