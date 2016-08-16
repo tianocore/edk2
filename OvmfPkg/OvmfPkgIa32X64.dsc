@@ -647,6 +647,7 @@
     <LibraryClasses>
       BltLib|OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
   }
+  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 
   #
   # ISA Support
