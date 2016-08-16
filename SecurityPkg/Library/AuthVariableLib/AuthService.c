@@ -2100,7 +2100,7 @@ CleanCertsFromDb (
                                        &AuthVariableInfo
                                        );
 
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR(Status) || (AuthVariableInfo.Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == 0) {
         Status      = DeleteCertsFromDb(
                         VariableName,
                         &AuthVarGuid,
