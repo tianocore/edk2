@@ -49,6 +49,16 @@ typedef struct {
   EFI_UNICODE_STRING_TABLE *BusName;
 
   //
+  // VirtIo ring used for VirtIo communication.
+  //
+  VRING                    Ring;
+
+  //
+  // Event to be signaled at ExitBootServices().
+  //
+  EFI_EVENT                ExitBoot;
+
+  //
   // The Child field references the GOP wrapper structure. If this pointer is
   // NULL, then the hybrid driver has bound (i.e., started) the
   // VIRTIO_DEVICE_PROTOCOL controller without producing the child GOP
@@ -102,5 +112,63 @@ struct VGPU_GOP_STRUCT {
   //
   UINT8                                Gop;
 };
+
+//
+// VirtIo GPU initialization, and commands (primitives) for the GPU device.
+//
+/**
+  Configure the VirtIo GPU device that underlies VgpuDev.
+
+  @param[in,out] VgpuDev  The VGPU_DEV object to set up VirtIo messaging for.
+                          On input, the caller is responsible for having
+                          initialized VgpuDev->VirtIo. On output, VgpuDev->Ring
+                          has been initialized, and synchronous VirtIo GPU
+                          commands (primitives) can be submitted to the device.
+
+  @retval EFI_SUCCESS      VirtIo GPU configuration successful.
+
+  @retval EFI_UNSUPPORTED  The host-side configuration of the VirtIo GPU is not
+                           supported by this driver.
+
+  @retval                  Error codes from underlying functions.
+**/
+EFI_STATUS
+VirtioGpuInit (
+  IN OUT VGPU_DEV *VgpuDev
+  );
+
+/**
+  De-configure the VirtIo GPU device that underlies VgpuDev.
+
+  @param[in,out] VgpuDev  The VGPU_DEV object to tear down VirtIo messaging
+                          for. On input, the caller is responsible for having
+                          called VirtioGpuInit(). On output, VgpuDev->Ring has
+                          been uninitialized; VirtIo GPU commands (primitives)
+                          can no longer be submitted to the device.
+**/
+VOID
+VirtioGpuUninit (
+  IN OUT VGPU_DEV *VgpuDev
+  );
+
+/**
+  EFI_EVENT_NOTIFY function for the VGPU_DEV.ExitBoot event. It resets the
+  VirtIo device, causing it to release its resources and to forget its
+  configuration.
+
+  This function may only be called (that is, VGPU_DEV.ExitBoot may only be
+  signaled) after VirtioGpuInit() returns and before VirtioGpuUninit() is
+  called.
+
+  @param[in] Event    Event whose notification function is being invoked.
+
+  @param[in] Context  Pointer to the associated VGPU_DEV object.
+**/
+VOID
+EFIAPI
+VirtioGpuExitBoot (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  );
 
 #endif // _VIRTIO_GPU_DXE_H_

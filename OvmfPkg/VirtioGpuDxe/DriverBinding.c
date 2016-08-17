@@ -646,13 +646,25 @@ VirtioGpuDriverBindingStart (
       goto FreeVgpuDev;
     }
 
+    Status = VirtioGpuInit (VgpuDev);
+    if (EFI_ERROR (Status)) {
+      goto FreeVgpuDevBusName;
+    }
+
+    Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
+                    VirtioGpuExitBoot, VgpuDev /* NotifyContext */,
+                    &VgpuDev->ExitBoot);
+    if (EFI_ERROR (Status)) {
+      goto UninitGpu;
+    }
+
     //
     // Install the VGPU_DEV "protocol interface" on ControllerHandle.
     //
     Status = gBS->InstallProtocolInterface (&ControllerHandle,
                     &gEfiCallerIdGuid, EFI_NATIVE_INTERFACE, VgpuDev);
     if (EFI_ERROR (Status)) {
-      goto FreeVgpuDevBusName;
+      goto CloseExitBoot;
     }
 
     if (RemainingDevicePath != NULL && IsDevicePathEnd (RemainingDevicePath)) {
@@ -691,6 +703,16 @@ UninstallVgpuDev:
   if (VirtIoBoundJustNow) {
     gBS->UninstallProtocolInterface (ControllerHandle, &gEfiCallerIdGuid,
            VgpuDev);
+  }
+
+CloseExitBoot:
+  if (VirtIoBoundJustNow) {
+    gBS->CloseEvent (VgpuDev->ExitBoot);
+  }
+
+UninitGpu:
+  if (VirtIoBoundJustNow) {
+    VirtioGpuUninit (VgpuDev);
   }
 
 FreeVgpuDevBusName:
@@ -761,6 +783,10 @@ VirtioGpuDriverBindingStop (
                     &gEfiCallerIdGuid, VgpuDev);
     ASSERT_EFI_ERROR (Status);
 
+    Status = gBS->CloseEvent (VgpuDev->ExitBoot);
+    ASSERT_EFI_ERROR (Status);
+
+    VirtioGpuUninit (VgpuDev);
     FreeUnicodeStringTable (VgpuDev->BusName);
     FreePool (VgpuDev);
 

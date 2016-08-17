@@ -24,6 +24,7 @@
   ENTRY_POINT                    = VirtioGpuEntryPoint
 
 [Sources]
+  Commands.c
   DriverBinding.c
   VirtioGpu.h
 
@@ -40,6 +41,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
+  VirtioLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid     ## TO_START ## BY_START
