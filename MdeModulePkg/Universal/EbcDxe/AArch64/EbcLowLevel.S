@@ -35,30 +35,75 @@ ASM_GLOBAL ASM_PFX(mEbcInstructionBufferTemplate)
 //****************************************************************************
 // UINTN EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
 ASM_PFX(EbcLLCALLEXNative):
-      stp  x19, x20, [sp, #-16]!
-      stp  x29, x30, [sp, #-16]!
+    mov     x8, x0                 // Preserve x0
+    mov     x9, x1                 // Preserve x1
 
-      mov  x19, x0
-      mov  x20, sp
-      sub  x2, x2, x1   // Length = NewStackPointer-FramePtr
-      sub  sp, sp, x2
-      sub  sp, sp, #64  // Make sure there is room for at least 8 args in the new stack
-      mov  x0, sp
+    //
+    // If the EBC stack frame is smaller than or equal to 64 bytes, we know there
+    // are no stacked arguments #9 and beyond that we need to copy to the native
+    // stack. In this case, we can perform a tail call which is much more
+    // efficient, since there is no need to touch the native stack at all.
+    //
+    sub     x3, x2, x1              // Length = NewStackPointer - FramePtr
+    cmp     x3, #64
+    b.gt    1f
 
-      bl   CopyMem      // Sp, NewStackPointer, Length
+    //
+    // While probably harmless in practice, we should not access the VM stack
+    // outside of the interval [NewStackPointer, FramePtr), which means we
+    // should not blindly fill all 8 argument registers with VM stack data.
+    // So instead, calculate how many argument registers we can fill based on
+    // the size of the VM stack frame, and skip the remaining ones.
+    //
+    adr     x0, 0f                  // Take address of 'br' instruction below
+    bic     x3, x3, #7              // Ensure correct alignment
+    sub     x0, x0, x3, lsr #1      // Subtract 4 bytes for each arg to unstack
+    br      x0                      // Skip remaining argument registers
 
-      ldp  x0, x1, [sp], #16
-      ldp  x2, x3, [sp], #16
-      ldp  x4, x5, [sp], #16
-      ldp  x6, x7, [sp], #16
+    ldr     x7, [x9, #56]           // Call with 8 arguments
+    ldr     x6, [x9, #48]           //  |
+    ldr     x5, [x9, #40]           //  |
+    ldr     x4, [x9, #32]           //  |
+    ldr     x3, [x9, #24]           //  |
+    ldr     x2, [x9, #16]           //  |
+    ldr     x1, [x9, #8]            //  V
+    ldr     x0, [x9]                // Call with 1 argument
 
-      blr  x19
+0:  br      x8                      // Call with no arguments
 
-      mov  sp,  x20
-      ldp  x29, x30, [sp], #16
-      ldp  x19, x20, [sp], #16
+    //
+    // More than 64 bytes: we need to build the full native stack frame and copy
+    // the part of the VM stack exceeding 64 bytes (which may contain stacked
+    // arguments) to the native stack
+    //
+1:  stp     x29, x30, [sp, #-16]!
+    mov     x29, sp
 
-      ret
+    //
+    // Ensure that the stack pointer remains 16 byte aligned,
+    // even if the size of the VM stack frame is not a multiple of 16
+    //
+    add     x1, x1, #64             // Skip over [potential] reg params
+    tbz     x3, #3, 2f              // Multiple of 16?
+    ldr     x4, [x2, #-8]!          // No? Then push one word
+    str     x4, [sp, #-16]!         // ... but use two slots
+    b       3f
+
+2:  ldp     x4, x5, [x2, #-16]!
+    stp     x4, x5, [sp, #-16]!
+3:  cmp     x2, x1
+    b.gt    2b
+
+    ldp     x0, x1, [x9]
+    ldp     x2, x3, [x9, #16]
+    ldp     x4, x5, [x9, #32]
+    ldp     x6, x7, [x9, #48]
+
+    blr     x8
+
+    mov     sp, x29
+    ldp     x29, x30, [sp], #16
+    ret
 
 //****************************************************************************
 // EbcLLEbcInterpret
