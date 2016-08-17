@@ -20,6 +20,7 @@
 #include <IndustryStandard/VirtioGpu.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
+#include <Protocol/GraphicsOutput.h>
 #include <Protocol/VirtioDevice.h>
 
 //
@@ -114,9 +115,34 @@ struct VGPU_GOP_STRUCT {
   // The Gop field is installed on the child handle as Graphics Output Protocol
   // interface.
   //
-  // For now it is just a placeholder.
+  EFI_GRAPHICS_OUTPUT_PROTOCOL         Gop;
+
   //
-  UINT8                                Gop;
+  // Referenced by Gop.Mode, GopMode provides a summary about the supported
+  // graphics modes, and the current mode.
+  //
+  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    GopMode;
+
+  //
+  // Referenced by GopMode.Info, GopModeInfo provides detailed information
+  // about the current mode.
+  //
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION GopModeInfo;
+
+  //
+  // Identifier of the 2D host resource that is in use by this head (scanout)
+  // of the VirtIo GPU device. Zero until the first successful -- internal --
+  // Gop.SetMode() call, never zero afterwards.
+  //
+  UINT32                               ResourceId;
+
+  //
+  // A number of whole pages providing the backing store for the 2D host
+  // resource identified by ResourceId above. NULL until the first successful
+  // -- internal -- Gop.SetMode() call, never NULL afterwards.
+  //
+  UINT32                               *BackingStore;
+  UINTN                                NumberOfPages;
 };
 
 //
@@ -263,5 +289,39 @@ VirtioGpuResourceFlush (
   IN     UINT32   Height,
   IN     UINT32   ResourceId
   );
+
+/**
+  Release guest-side and host-side resources that are related to an initialized
+  VGPU_GOP.Gop.
+
+  param[in,out] VgpuGop  The VGPU_GOP object to release resources for.
+
+                         On input, the caller is responsible for having called
+                         VgpuGop->Gop.SetMode() at least once successfully.
+                         (This is equivalent to the requirement that
+                         VgpuGop->BackingStore be non-NULL. It is also
+                         equivalent to the requirement that VgpuGop->ResourceId
+                         be nonzero.)
+
+                         On output, resources will be released, and
+                         VgpuGop->BackingStore and VgpuGop->ResourceId will be
+                         nulled.
+
+  param[in] DisableHead  Whether this head (scanout) currently references the
+                         resource identified by VgpuGop->ResourceId. Only pass
+                         FALSE when VgpuGop->Gop.SetMode() calls this function
+                         while switching between modes, and set it to TRUE
+                         every other time.
+**/
+VOID
+ReleaseGopResources (
+  IN OUT VGPU_GOP *VgpuGop,
+  IN     BOOLEAN  DisableHead
+  );
+
+//
+// Template for initializing VGPU_GOP.Gop.
+//
+extern CONST EFI_GRAPHICS_OUTPUT_PROTOCOL mGopTemplate;
 
 #endif // _VIRTIO_GPU_DXE_H_

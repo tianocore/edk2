@@ -29,16 +29,6 @@
 #include "VirtioGpu.h"
 
 //
-// Dummy Graphics Output Protocol GUID: a temporary placeholder for the EFI
-// counterpart. It will be replaced with the real thing as soon as we implement
-// the EFI GOP. Refer to VGPU_GOP.Gop.
-//
-STATIC EFI_GUID mDummyGraphicsOutputProtocolGuid = {
-  0x4983f8dc, 0x2782, 0x415b,
-  { 0x91, 0xf5, 0x2c, 0xeb, 0x48, 0x4a, 0x0f, 0xe9 }
-};
-
-//
 // The device path node that describes the Video Output Device Attributes for
 // the single head (UEFI child handle) that we support.
 //
@@ -356,9 +346,11 @@ InitVgpuGop (
   //
   // Initialize our Graphics Output Protocol.
   //
-  // This means "nothing" for now.
+  // Fill in the function members of VgpuGop->Gop from the template, then set
+  // up the rest of the GOP infrastructure by calling SetMode() right now.
   //
-  Status = EFI_SUCCESS;
+  CopyMem (&VgpuGop->Gop, &mGopTemplate, sizeof mGopTemplate);
+  Status = VgpuGop->Gop.SetMode (&VgpuGop->Gop, 0);
   if (EFI_ERROR (Status)) {
     goto CloseVirtIoByChild;
   }
@@ -367,7 +359,7 @@ InitVgpuGop (
   // Install the Graphics Output Protocol on the child handle.
   //
   Status = gBS->InstallProtocolInterface (&VgpuGop->GopHandle,
-                  &mDummyGraphicsOutputProtocolGuid, EFI_NATIVE_INTERFACE,
+                  &gEfiGraphicsOutputProtocolGuid, EFI_NATIVE_INTERFACE,
                   &VgpuGop->Gop);
   if (EFI_ERROR (Status)) {
     goto UninitGop;
@@ -381,9 +373,7 @@ InitVgpuGop (
   return EFI_SUCCESS;
 
 UninitGop:
-  //
-  // Nothing, for now.
-  //
+  ReleaseGopResources (VgpuGop, TRUE /* DisableHead */);
 
 CloseVirtIoByChild:
   gBS->CloseProtocol (ParentBusController, &gVirtioDeviceProtocolGuid,
@@ -439,16 +429,13 @@ UninitVgpuGop (
 
   VgpuGop = ParentBus->Child;
   Status = gBS->UninstallProtocolInterface (VgpuGop->GopHandle,
-                  &mDummyGraphicsOutputProtocolGuid, &VgpuGop->Gop);
+                  &gEfiGraphicsOutputProtocolGuid, &VgpuGop->Gop);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Uninitialize VgpuGop->Gop.
   //
-  // Nothing, for now.
-  //
-  Status = EFI_SUCCESS;
-  ASSERT_EFI_ERROR (Status);
+  ReleaseGopResources (VgpuGop, TRUE /* DisableHead */);
 
   Status = gBS->CloseProtocol (ParentBusController, &gVirtioDeviceProtocolGuid,
                   DriverBindingHandle, VgpuGop->GopHandle);

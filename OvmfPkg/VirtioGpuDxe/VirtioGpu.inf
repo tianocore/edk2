@@ -26,6 +26,7 @@
 [Sources]
   Commands.c
   DriverBinding.c
+  Gop.c
   VirtioGpu.h
 
 [Packages]
@@ -45,5 +46,6 @@
 
 [Protocols]
   gEfiDevicePathProtocolGuid     ## TO_START ## BY_START
+  gEfiGraphicsOutputProtocolGuid ## BY_START
   gEfiPciIoProtocolGuid          ## TO_START
   gVirtioDeviceProtocolGuid      ## TO_START
