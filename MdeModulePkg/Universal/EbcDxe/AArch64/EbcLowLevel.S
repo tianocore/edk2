@@ -3,8 +3,10 @@
 //  This code provides low level routines that support the Virtual Machine
 //  for option ROMs.
 //
-//  Copyright (c) 2015, The Linux Foundation. All rights reserved.
+//  Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
+//  Copyright (c) 2015, The Linux Foundation. All rights reserved.<BR>
 //  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +20,8 @@
 ASM_GLOBAL ASM_PFX(EbcLLCALLEXNative)
 ASM_GLOBAL ASM_PFX(EbcLLEbcInterpret)
 ASM_GLOBAL ASM_PFX(EbcLLExecuteEbcImageEntryPoint)
+
+ASM_GLOBAL ASM_PFX(mEbcInstructionBufferTemplate)
 
 //****************************************************************************
 // EbcLLCALLEX
@@ -61,7 +65,7 @@ ASM_PFX(EbcLLCALLEXNative):
 //
 // This function is called by the thunk code to handle an Native to EBC call
 // This can handle up to 16 arguments (1-8 on in x0-x7, 9-16 are on the stack)
-// x9 contains the Entry point that will be the first argument when
+// x16 contains the Entry point that will be the first argument when
 // EBCInterpret is called.
 //
 //****************************************************************************
@@ -97,7 +101,7 @@ ASM_PFX(EbcLLEbcInterpret):
     mov x3, x2
     mov x2, x1
     mov x1, x0
-    mov x0, x9
+    mov x0, x16
 
     // call C-code
     bl ASM_PFX(EbcInterpret)
@@ -111,7 +115,7 @@ ASM_PFX(EbcLLEbcInterpret):
 // EbcLLExecuteEbcImageEntryPoint
 //
 // This function is called by the thunk code to handle the image entry point
-// x9 contains the Entry point that will be the first argument when
+// x16 contains the Entry point that will be the third argument when
 // ExecuteEbcImageEntryPoint is called.
 //
 //****************************************************************************
@@ -120,9 +124,27 @@ ASM_PFX(EbcLLExecuteEbcImageEntryPoint):
     // build new parameter calling convention
     mov  x2, x1
     mov  x1, x0
-    mov  x0, x9
+    mov  x0, x16
 
     // call C-code
     bl ASM_PFX(ExecuteEbcImageEntryPoint)
     ldp  x29, x30, [sp], #16
     ret
+
+//****************************************************************************
+// mEbcInstructionBufferTemplate
+//****************************************************************************
+    .section    ".rodata", "a"
+    .align      3
+ASM_PFX(mEbcInstructionBufferTemplate):
+    adr     x17, 0f
+    ldp     x16, x17, [x17]
+    br      x17
+
+    //
+    // Add a magic code here to help the VM recognize the thunk.
+    //
+    hlt     #0xEBC
+
+0:  .quad   0   // EBC_ENTRYPOINT_SIGNATURE
+    .quad   0   // EBC_LL_EBC_ENTRYPOINT_SIGNATURE
