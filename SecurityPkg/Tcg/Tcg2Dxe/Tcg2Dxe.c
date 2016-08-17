@@ -202,33 +202,6 @@ InternalDumpHex (
 }
 
 /**
-  Check if buffer is all zero.
-
-  @param[in] Buffer      Buffer to be checked.
-  @param[in] BufferSize  Size of buffer to be checked.
-
-  @retval TRUE  Buffer is all zero.
-  @retval FALSE Buffer is not all zero.
-**/
-BOOLEAN
-InternalIsZeroBuffer (
-  IN VOID  *Buffer,
-  IN UINTN BufferSize
-  )
-{
-  UINT8 *BufferData;
-  UINTN Index;
-
-  BufferData = Buffer;
-  for (Index = 0; Index < BufferSize; Index++) {
-    if (BufferData[Index] != 0) {
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-
-/**
   Get All processors EFI_CPU_LOCATION in system. LocationBuf is allocated inside the function
   Caller is responsible to free LocationBuf.
 
@@ -2471,31 +2444,31 @@ DriverEntry (
       switch (Pcrs.pcrSelections[Index].hash) {
       case TPM_ALG_SHA1:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
         }        
         break;
       case TPM_ALG_SHA256:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
         }
         break;
       case TPM_ALG_SHA384:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
         }
         break;
       case TPM_ALG_SHA512:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
         }
         break;
       case TPM_ALG_SM3_256:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
         }
         break;

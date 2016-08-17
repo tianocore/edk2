@@ -225,33 +225,6 @@ EndofPeiSignalNotifyCallBack (
 }
 
 /**
-  Check if buffer is all zero.
-
-  @param[in] Buffer      Buffer to be checked.
-  @param[in] BufferSize  Size of buffer to be checked.
-
-  @retval TRUE  Buffer is all zero.
-  @retval FALSE Buffer is not all zero.
-**/
-BOOLEAN
-InternalIsZeroBuffer (
-  IN VOID  *Buffer,
-  IN UINTN BufferSize
-  )
-{
-  UINT8 *BufferData;
-  UINTN Index;
-
-  BufferData = Buffer;
-  for (Index = 0; Index < BufferSize; Index++) {
-    if (BufferData[Index] != 0) {
-      return FALSE;
-    }
-  }
-  return TRUE;
-}
-
-/**
   Get TPML_DIGEST_VALUES data size.
 
   @param[in]     DigestList    TPML_DIGEST_VALUES data.
@@ -383,27 +356,27 @@ SetTpm2HashMask (
       DEBUG ((EFI_D_INFO, "hash - %x\n", Pcrs.pcrSelections[Index].hash));
       switch (Pcrs.pcrSelections[Index].hash) {
       case TPM_ALG_SHA1:
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
         }        
         break;
       case TPM_ALG_SHA256:
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
         }
         break;
       case TPM_ALG_SHA384:
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
         }
         break;
       case TPM_ALG_SHA512:
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
         }
         break;
       case TPM_ALG_SM3_256:
-        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
         }
         break;
