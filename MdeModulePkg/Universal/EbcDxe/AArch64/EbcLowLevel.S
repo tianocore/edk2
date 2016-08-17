@@ -1,40 +1,35 @@
-#/** @file
-#
-#    This code provides low level routines that support the Virtual Machine
-#   for option ROMs.
-#
-#  Copyright (c) 2015, The Linux Foundation. All rights reserved.
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
-#  This program and the accompanying materials
-#  are licensed and made available under the terms and conditions of the BSD License
-#  which accompanies this distribution.  The full text of the license may be found at
-#  http://opensource.org/licenses/bsd-license.php
-#
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#
-#**/
+///** @file
+//
+//  This code provides low level routines that support the Virtual Machine
+//  for option ROMs.
+//
+//  Copyright (c) 2015, The Linux Foundation. All rights reserved.
+//  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//  This program and the accompanying materials
+//  are licensed and made available under the terms and conditions of the BSD License
+//  which accompanies this distribution.  The full text of the license may be found at
+//  http://opensource.org/licenses/bsd-license.php
+//
+//  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+//**/
 
-#---------------------------------------------------------------------------
-# Equate files needed.
-#---------------------------------------------------------------------------
+ASM_GLOBAL ASM_PFX(EbcLLCALLEXNative)
+ASM_GLOBAL ASM_PFX(EbcLLEbcInterpret)
+ASM_GLOBAL ASM_PFX(EbcLLExecuteEbcImageEntryPoint)
 
-ASM_GLOBAL ASM_PFX(CopyMem);
-ASM_GLOBAL ASM_PFX(EbcInterpret);
-ASM_GLOBAL ASM_PFX(ExecuteEbcImageEntryPoint);
-
-#****************************************************************************
-# EbcLLCALLEX
-#
-# This function is called to execute an EBC CALLEX instruction.
-# This instruction requires that we thunk out to external native
-# code. For AArch64, we copy the VM stack into the main stack and then pop
-# the first 8 arguments off according to the AArch64 Procedure Call Standard
-# On return, we restore the stack pointer to its original location.
-#
-#****************************************************************************
-# UINTN EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
-ASM_GLOBAL ASM_PFX(EbcLLCALLEXNative);
+//****************************************************************************
+// EbcLLCALLEX
+//
+// This function is called to execute an EBC CALLEX instruction.
+// This instruction requires that we thunk out to external native
+// code. For AArch64, we copy the VM stack into the main stack and then pop
+// the first 8 arguments off according to the AArch64 Procedure Call Standard
+// On return, we restore the stack pointer to its original location.
+//
+//****************************************************************************
+// UINTN EbcLLCALLEXNative(UINTN FuncAddr, UINTN NewStackPointer, VOID *FramePtr)
 ASM_PFX(EbcLLCALLEXNative):
       stp  x19, x20, [sp, #-16]!
       stp  x29, x30, [sp, #-16]!
@@ -61,16 +56,15 @@ ASM_PFX(EbcLLCALLEXNative):
 
       ret
 
-#****************************************************************************
-# EbcLLEbcInterpret
-#
-# This function is called by the thunk code to handle an Native to EBC call
-# This can handle up to 16 arguments (1-8 on in x0-x7, 9-16 are on the stack)
-# x9 contains the Entry point that will be the first argument when
-# EBCInterpret is called.
-#
-#****************************************************************************
-ASM_GLOBAL ASM_PFX(EbcLLEbcInterpret);
+//****************************************************************************
+// EbcLLEbcInterpret
+//
+// This function is called by the thunk code to handle an Native to EBC call
+// This can handle up to 16 arguments (1-8 on in x0-x7, 9-16 are on the stack)
+// x9 contains the Entry point that will be the first argument when
+// EBCInterpret is called.
+//
+//****************************************************************************
 ASM_PFX(EbcLLEbcInterpret):
     stp  x29, x30, [sp, #-16]!
 
@@ -105,7 +99,7 @@ ASM_PFX(EbcLLEbcInterpret):
     mov x1, x0
     mov x0, x9
 
-    # call C-code
+    // call C-code
     bl ASM_PFX(EbcInterpret)
     add sp, sp, #80
 
@@ -113,23 +107,22 @@ ASM_PFX(EbcLLEbcInterpret):
 
     ret
 
-#****************************************************************************
-# EbcLLExecuteEbcImageEntryPoint
-#
-# This function is called by the thunk code to handle the image entry point
-# x9 contains the Entry point that will be the first argument when
-# ExecuteEbcImageEntryPoint is called.
-#
-#****************************************************************************
-ASM_GLOBAL ASM_PFX(EbcLLExecuteEbcImageEntryPoint);
+//****************************************************************************
+// EbcLLExecuteEbcImageEntryPoint
+//
+// This function is called by the thunk code to handle the image entry point
+// x9 contains the Entry point that will be the first argument when
+// ExecuteEbcImageEntryPoint is called.
+//
+//****************************************************************************
 ASM_PFX(EbcLLExecuteEbcImageEntryPoint):
     stp  x29, x30, [sp, #-16]!
-    # build new paramater calling convention
+    // build new parameter calling convention
     mov  x2, x1
     mov  x1, x0
     mov  x0, x9
 
-    # call C-code
+    // call C-code
     bl ASM_PFX(ExecuteEbcImageEntryPoint)
     ldp  x29, x30, [sp], #16
     ret
