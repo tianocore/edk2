@@ -110,50 +110,23 @@ ASM_PFX(EbcLLCALLEXNative):
 //
 // This function is called by the thunk code to handle an Native to EBC call
 // This can handle up to 16 arguments (1-8 on in x0-x7, 9-16 are on the stack)
-// x16 contains the Entry point that will be the first argument when
+// x16 contains the Entry point that will be the first stacked argument when
 // EBCInterpret is called.
 //
 //****************************************************************************
 ASM_PFX(EbcLLEbcInterpret):
-    stp  x29, x30, [sp, #-16]!
+    stp     x29, x30, [sp, #-16]!
+    mov     x29, sp
 
-    // copy the current arguments 9-16 from old location and add arg 7 to stack
-    // keeping 16 byte stack alignment
-    sub sp, sp, #80
-    str x7, [sp]
-    ldr x11, [sp, #96]
-    str x11, [sp, #8]
-    ldr x11, [sp, #104]
-    str x11, [sp, #16]
-    ldr x11, [sp, #112]
-    str x11, [sp, #24]
-    ldr x11, [sp, #120]
-    str x11, [sp, #32]
-    ldr x11, [sp, #128]
-    str x11, [sp, #40]
-    ldr x11, [sp, #136]
-    str x11, [sp, #48]
-    ldr x11, [sp, #144]
-    str x11, [sp, #56]
-    ldr x11, [sp, #152]
-    str x11, [sp, #64]
-
-    // Shift arguments and add entry point and as argument 1
-    mov x7, x6
-    mov x6, x5
-    mov x5, x4
-    mov x4, x3
-    mov x3, x2
-    mov x2, x1
-    mov x1, x0
-    mov x0, x16
+    // push the entry point and the address of args #9 - #16 onto the stack
+    add     x17, sp, #16
+    stp     x16, x17, [sp, #-16]!
 
     // call C-code
-    bl ASM_PFX(EbcInterpret)
-    add sp, sp, #80
+    bl      ASM_PFX(EbcInterpret)
 
-    ldp  x29, x30, [sp], #16
-
+    add     sp, sp, #16
+    ldp     x29, x30, [sp], #16
     ret
 
 //****************************************************************************
@@ -165,16 +138,10 @@ ASM_PFX(EbcLLEbcInterpret):
 //
 //****************************************************************************
 ASM_PFX(EbcLLExecuteEbcImageEntryPoint):
-    stp  x29, x30, [sp, #-16]!
-    // build new parameter calling convention
-    mov  x2, x1
-    mov  x1, x0
-    mov  x0, x16
+    mov     x2, x16
 
-    // call C-code
-    bl ASM_PFX(ExecuteEbcImageEntryPoint)
-    ldp  x29, x30, [sp], #16
-    ret
+    // tail call to C code
+    b       ASM_PFX(ExecuteEbcImageEntryPoint)
 
 //****************************************************************************
 // mEbcInstructionBufferTemplate

@@ -89,7 +89,6 @@ PushU64 (
 
   This is a thunk function.
 
-  @param  EntryPoint            The entrypoint of EBC code.
   @param  Arg1                  The 1st argument.
   @param  Arg2                  The 2nd argument.
   @param  Arg3                  The 3rd argument.
@@ -98,14 +97,8 @@ PushU64 (
   @param  Arg6                  The 6th argument.
   @param  Arg7                  The 7th argument.
   @param  Arg8                  The 8th argument.
-  @param  Arg9                  The 9th argument.
-  @param  Arg10                 The 10th argument.
-  @param  Arg11                 The 11th argument.
-  @param  Arg12                 The 12th argument.
-  @param  Arg13                 The 13th argument.
-  @param  Arg14                 The 14th argument.
-  @param  Arg15                 The 15th argument.
-  @param  Arg16                 The 16th argument.
+  @param  EntryPoint            The entrypoint of EBC code.
+  @param  Args9_16[]            Array containing arguments #9 to #16.
 
   @return The value returned by the EBC application we're going to run.
 
@@ -113,23 +106,16 @@ PushU64 (
 UINT64
 EFIAPI
 EbcInterpret (
-  IN UINTN      EntryPoint,
-  IN UINTN      Arg1,
-  IN UINTN      Arg2,
-  IN UINTN      Arg3,
-  IN UINTN      Arg4,
-  IN UINTN      Arg5,
-  IN UINTN      Arg6,
-  IN UINTN      Arg7,
-  IN UINTN      Arg8,
-  IN UINTN      Arg9,
-  IN UINTN      Arg10,
-  IN UINTN      Arg11,
-  IN UINTN      Arg12,
-  IN UINTN      Arg13,
-  IN UINTN      Arg14,
-  IN UINTN      Arg15,
-  IN UINTN      Arg16
+  IN UINTN        Arg1,
+  IN UINTN        Arg2,
+  IN UINTN        Arg3,
+  IN UINTN        Arg4,
+  IN UINTN        Arg5,
+  IN UINTN        Arg6,
+  IN UINTN        Arg7,
+  IN UINTN        Arg8,
+  IN UINTN        EntryPoint,
+  IN CONST UINTN  Args9_16[]
   )
 {
   //
@@ -193,14 +179,14 @@ EbcInterpret (
   // For the worst case, assume there are 4 arguments passed in registers, store
   // them to VM's stack.
   //
-  PushU64 (&VmContext, (UINT64) Arg16);
-  PushU64 (&VmContext, (UINT64) Arg15);
-  PushU64 (&VmContext, (UINT64) Arg14);
-  PushU64 (&VmContext, (UINT64) Arg13);
-  PushU64 (&VmContext, (UINT64) Arg12);
-  PushU64 (&VmContext, (UINT64) Arg11);
-  PushU64 (&VmContext, (UINT64) Arg10);
-  PushU64 (&VmContext, (UINT64) Arg9);
+  PushU64 (&VmContext, (UINT64) Args9_16[7]);
+  PushU64 (&VmContext, (UINT64) Args9_16[6]);
+  PushU64 (&VmContext, (UINT64) Args9_16[5]);
+  PushU64 (&VmContext, (UINT64) Args9_16[4]);
+  PushU64 (&VmContext, (UINT64) Args9_16[3]);
+  PushU64 (&VmContext, (UINT64) Args9_16[2]);
+  PushU64 (&VmContext, (UINT64) Args9_16[1]);
+  PushU64 (&VmContext, (UINT64) Args9_16[0]);
   PushU64 (&VmContext, (UINT64) Arg8);
   PushU64 (&VmContext, (UINT64) Arg7);
   PushU64 (&VmContext, (UINT64) Arg6);
@@ -252,10 +238,10 @@ EbcInterpret (
 /**
   Begin executing an EBC image.
 
-  @param  EntryPoint       The entrypoint of EBC code.
   @param  ImageHandle      image handle for the EBC application we're executing
   @param  SystemTable      standard system table passed into an driver's entry
                            point
+  @param  EntryPoint       The entrypoint of EBC code.
 
   @return The value returned by the EBC application we're going to run.
 
@@ -263,9 +249,9 @@ EbcInterpret (
 UINT64
 EFIAPI
 ExecuteEbcImageEntryPoint (
-  IN UINTN                EntryPoint,
   IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_SYSTEM_TABLE     *SystemTable,
+  IN UINTN                EntryPoint
   )
 {
   //
