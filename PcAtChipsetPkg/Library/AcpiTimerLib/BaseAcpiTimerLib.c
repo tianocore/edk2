@@ -20,13 +20,13 @@
   Calculate TSC frequency.
 
   The TSC counting frequency is determined by comparing how far it counts
-  during a 100us period as determined by the ACPI timer. The ACPI timer is
-  used because it counts at a known frequency.
-  The TSC is sampled, followed by waiting for ACPI_TIMER_FREQUENCY / 10000
-  clocks of the ACPI timer, or 100us. The TSC is then sampled again. The
-  difference multiplied by 10000 is the TSC frequency. There will be a small
-  error because of the overhead of reading the ACPI timer. An attempt is
-  made to determine and compensate for this error.
+  during a 101.4 us period as determined by the ACPI timer.
+  The ACPI timer is used because it counts at a known frequency.
+  The TSC is sampled, followed by waiting 363 counts of the ACPI timer,
+  or 101.4 us. The TSC is then sampled again. The difference multiplied by
+  9861 is the TSC frequency. There will be a small error because of the
+  overhead of reading the ACPI timer. An attempt is made to determine and
+  compensate for this error.
 
   @return The number of TSC counts per second.
 
