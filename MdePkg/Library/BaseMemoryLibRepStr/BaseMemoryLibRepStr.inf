@@ -4,7 +4,7 @@
 #  Base Memory Library that uses REP string instructions for
 #  high performance and small size. Optimized for use in PEI.
 #
-#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -43,6 +43,7 @@
   SetMem16Wrapper.c
   SetMemWrapper.c
   CopyMemWrapper.c
+  IsZeroBufferWrapper.c
   MemLibGuid.c
 
 [Sources.Ia32]
@@ -90,6 +91,7 @@
   Ia32/SetMem.asm
   Ia32/CopyMem.nasm
   Ia32/CopyMem.asm
+  Ia32/IsZeroBuffer.nasm
 
 [Sources.X64]
   X64/ScanMem64.nasm
@@ -136,6 +138,7 @@
   X64/SetMem.asm
   X64/CopyMem.nasm
   X64/CopyMem.asm
+  X64/IsZeroBuffer.nasm
 
 [Packages]
   MdePkg/MdePkg.dec

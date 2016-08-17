@@ -4,7 +4,7 @@
 #  Base Memory Library that uses MMX registers for high performance.
 #  Optimized for use in DXE.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -46,6 +46,7 @@
   SetMem16Wrapper.c
   SetMemWrapper.c
   CopyMemWrapper.c
+  IsZeroBufferWrapper.c
   MemLibGuid.c
   MemLibInternals.h
 
@@ -94,6 +95,7 @@
   Ia32/SetMem.asm
   Ia32/CopyMem.nasm
   Ia32/CopyMem.asm
+  Ia32/IsZeroBuffer.nasm
 
 [Sources.X64]
   X64/ZeroMem.nasm
@@ -140,6 +142,7 @@
   X64/SetMem.S
   X64/CopyMem.nasm
   X64/CopyMem.S
+  X64/IsZeroBuffer.nasm
 
 
 [LibraryClasses]
