@@ -133,10 +133,10 @@ BOOLEAN                          mS3BootScriptTableSmmAllocated = FALSE;
 EFI_SMM_SYSTEM_TABLE2            *mBootScriptSmst = NULL;
 
 /**
-  This is an internal function to add a terminate node the entry, recalculate the table 
-  length and fill into the table. 
-  
-  @return the base address of the boot script table.   
+  This is an internal function to add a terminate node the entry, recalculate the table
+  length and fill into the table.
+
+  @return the base address of the boot script table.
  **/
 UINT8*
 S3BootScriptInternalCloseTable (
@@ -147,7 +147,7 @@ S3BootScriptInternalCloseTable (
   EFI_BOOT_SCRIPT_TERMINATE      ScriptTerminate;
   EFI_BOOT_SCRIPT_TABLE_HEADER   *ScriptTableInfo;
   S3TableBase = mS3BootScriptTablePtr->TableBase;
-  
+
   if (S3TableBase == NULL) {
     //
     // the table is not exist
@@ -165,17 +165,17 @@ S3BootScriptInternalCloseTable (
   //
   ScriptTableInfo                = (EFI_BOOT_SCRIPT_TABLE_HEADER*)(mS3BootScriptTablePtr->TableBase);
   ScriptTableInfo->TableLength = mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE);
-  
- 
-  
+
+
+
   return S3TableBase;
   //
-  // NOTE: Here we did NOT adjust the mS3BootScriptTablePtr->TableLength to 
+  // NOTE: Here we did NOT adjust the mS3BootScriptTablePtr->TableLength to
   // mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE).
   // Because maybe after SmmReadyToLock, we still need add entries into the table,
   // and the entry should be added start before this TERMINATE node.
   //
-}  
+}
 
 /**
   This function save boot script data to LockBox.
@@ -220,9 +220,9 @@ SaveBootScriptDataToLockBox (
 /**
   This is the Event call back function to notify the Library the system is entering
   SmmLocked phase.
-  
+
   @param  Event   Pointer to this event
-  @param  Context Event handler private data 
+  @param  Context Event handler private data
  **/
 VOID
 EFIAPI
@@ -419,8 +419,8 @@ S3BootScriptSmmAtRuntimeCallBack (
 
 /**
   Library Constructor.
-  this function just identify it is a smm driver or non-smm driver linked against 
-  with the library   
+  this function just identify it is a smm driver or non-smm driver linked against
+  with the library
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
@@ -637,12 +637,12 @@ S3BootScriptLibDeinitialize (
 /**
   To get the start address from which a new boot time s3 boot script entry will write into.
   If the table is not exist, the functio will first allocate a buffer for the table
-  If the table buffer is not enough for the new entry, in non-smm mode, the funtion will 
+  If the table buffer is not enough for the new entry, in non-smm mode, the funtion will
   invoke reallocate to enlarge buffer.
-  
+
   @param EntryLength      the new entry length.
-  
-  @retval the address from which the a new s3 boot script entry will write into 
+
+  @retval the address from which the a new s3 boot script entry will write into
  **/
 UINT8*
 S3BootScriptGetBootTimeEntryAddAddress (
@@ -656,11 +656,11 @@ S3BootScriptGetBootTimeEntryAddAddress (
    UINT16                            PageNumber;
    EFI_STATUS                        Status;
    EFI_BOOT_SCRIPT_TABLE_HEADER      *ScriptTableInfo;
-   
+
    S3TableBase = (EFI_PHYSICAL_ADDRESS)(UINTN)(mS3BootScriptTablePtr->TableBase);
    if (S3TableBase == 0) {
      //
-     // The table is not exist. This is the first to add entry. 
+     // The table is not exist. This is the first to add entry.
      // Allocate ACPI script table space under 4G memory.
      //
      S3TableBase = 0xffffffff;
@@ -670,7 +670,7 @@ S3BootScriptGetBootTimeEntryAddAddress (
                   2 + PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber),
                   (EFI_PHYSICAL_ADDRESS*)&S3TableBase
                   );
-     
+
      if (EFI_ERROR(Status)) {
        ASSERT_EFI_ERROR (Status);
        return 0;
@@ -687,12 +687,12 @@ S3BootScriptGetBootTimeEntryAddAddress (
      mS3BootScriptTablePtr->TableBase = (UINT8*)(UINTN)S3TableBase;
      mS3BootScriptTablePtr->TableMemoryPageNumber = (UINT16)(2 + PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber));
    }
-     
+
    // Here we do not count the reserved memory for runtime script table.
    PageNumber = (UINT16) (mS3BootScriptTablePtr->TableMemoryPageNumber - PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber));
    TableLength =  mS3BootScriptTablePtr->TableLength;
    if ((UINTN) EFI_PAGES_TO_SIZE ((UINTN) PageNumber) < (UINTN) (TableLength + EntryLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE))) {
-     // 
+     //
      // The buffer is too small to hold the table, Reallocate the buffer
      //
      NewS3TableBase = 0xffffffff;
@@ -702,43 +702,43 @@ S3BootScriptGetBootTimeEntryAddAddress (
                   2 + PageNumber + PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber),
                   (EFI_PHYSICAL_ADDRESS*)&NewS3TableBase
                   );
-   
+
      if (EFI_ERROR(Status)) {
        ASSERT_EFI_ERROR (Status);
        return 0;
      }
-     
+
      CopyMem ((VOID*)(UINTN)NewS3TableBase, (VOID*)(UINTN)S3TableBase, TableLength);
      gBS->FreePages (S3TableBase, mS3BootScriptTablePtr->TableMemoryPageNumber);
-         
+
      mS3BootScriptTablePtr->TableBase = (UINT8*)(UINTN)NewS3TableBase;
-     mS3BootScriptTablePtr->TableMemoryPageNumber =  (UINT16) (2 + PageNumber + PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber)); 
+     mS3BootScriptTablePtr->TableMemoryPageNumber =  (UINT16) (2 + PageNumber + PcdGet16(PcdS3BootScriptRuntimeTableReservePageNumber));
    }
    //
-   // calculate the the start address for the new entry. 
+   // calculate the the start address for the new entry.
    //
    NewEntryPtr = mS3BootScriptTablePtr->TableBase + TableLength;
-   
+
    //
    // update the table lenghth
    //
    mS3BootScriptTablePtr->TableLength =  TableLength + EntryLength;
-   
+
    //
    // In the boot time, we will not append the termination entry to the boot script
-   // table until the callers think there is no boot time data that should be added and 
-   // it is caller's responsibility to explicit call the CloseTable. 
+   // table until the callers think there is no boot time data that should be added and
+   // it is caller's responsibility to explicit call the CloseTable.
    //
    //
-  
-   return NewEntryPtr;    
+
+   return NewEntryPtr;
 }
 /**
   To get the start address from which a new runtime(after SmmReadyToLock) s3 boot script entry will write into.
   In this case, it should be ensured that there is enough buffer to hold the entry.
-  
+
   @param EntryLength      the new entry length.
-  
+
   @retval the address from which the a new s3 runtime(after SmmReadyToLock) script entry will write into
  **/
 UINT8*
@@ -747,20 +747,20 @@ S3BootScriptGetRuntimeEntryAddAddress (
   )
 {
    UINT8     *NewEntryPtr;
-   
-   NewEntryPtr = NULL;   
+
+   NewEntryPtr = NULL;
    //
-   // Check if the memory range reserved for S3 Boot Script table is large enough to hold the node. 
+   // Check if the memory range reserved for S3 Boot Script table is large enough to hold the node.
    //
    if ((UINTN) (mS3BootScriptTablePtr->TableLength + EntryLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE)) <= (UINTN) EFI_PAGES_TO_SIZE ((UINTN) (mS3BootScriptTablePtr->TableMemoryPageNumber))) {
-     NewEntryPtr = mS3BootScriptTablePtr->TableBase + mS3BootScriptTablePtr->TableLength;   
+     NewEntryPtr = mS3BootScriptTablePtr->TableBase + mS3BootScriptTablePtr->TableLength;
      mS3BootScriptTablePtr->TableLength = mS3BootScriptTablePtr->TableLength + EntryLength;
      //
      // Append a terminate node on every insert
      //
      S3BootScriptInternalCloseTable ();
    }
-   return (UINT8*)NewEntryPtr;    
+   return (UINT8*)NewEntryPtr;
 }
 
 /**
@@ -805,12 +805,12 @@ RestoreBootTimeDataFromLockBox (
 
 /**
   To get the start address from which a new s3 boot script entry will write into.
-  
+
   @param EntryLength      the new entry length.
-  
-  @retval the address from which the a new s3 boot script entry will write into 
- **/ 
-UINT8* 
+
+  @retval the address from which the a new s3 boot script entry will write into
+ **/
+UINT8*
 S3BootScriptGetEntryAddAddress (
   UINT8  EntryLength
   )
@@ -842,10 +842,10 @@ S3BootScriptGetEntryAddAddress (
     NewEntryPtr  = S3BootScriptGetRuntimeEntryAddAddress (EntryLength);
   } else {
     NewEntryPtr  = S3BootScriptGetBootTimeEntryAddAddress (EntryLength);
-  }  
+  }
   return NewEntryPtr;
-  
-}  
+
+}
 
 /**
   Sync BootScript LockBox data.
@@ -899,28 +899,28 @@ SyncBootScript (
   ASSERT_EFI_ERROR (Status);
 }
 
-/** 
-  This is an function to close the S3 boot script table. The function could only be called in 
-  BOOT time phase. To comply with the Framework spec definition on 
+/**
+  This is an function to close the S3 boot script table. The function could only be called in
+  BOOT time phase. To comply with the Framework spec definition on
   EFI_BOOT_SCRIPT_SAVE_PROTOCOL.CloseTable(), this function will fulfill following things:
   1. Closes the specified boot script table
-  2. It allocates a new memory pool to duplicate all the boot scripts in the specified table. 
-     Once this function is called, the table maintained by the library will be destroyed 
+  2. It allocates a new memory pool to duplicate all the boot scripts in the specified table.
+     Once this function is called, the table maintained by the library will be destroyed
      after it is copied into the allocated pool.
-  3. Any attempts to add a script record after calling this function will cause a new table 
+  3. Any attempts to add a script record after calling this function will cause a new table
      to be created by the library.
-  4. The base address of the allocated pool will be returned in Address. Note that after 
+  4. The base address of the allocated pool will be returned in Address. Note that after
      using the boot script table, the CALLER is responsible for freeing the pool that is allocated
-     by this function. 
+     by this function.
 
-  In Spec PI1.1, this EFI_BOOT_SCRIPT_SAVE_PROTOCOL.CloseTable() is retired. To provides this API for now is 
+  In Spec PI1.1, this EFI_BOOT_SCRIPT_SAVE_PROTOCOL.CloseTable() is retired. To provides this API for now is
   for Framework Spec compatibility.
-  
-  If anyone does call CloseTable() on a real platform, then the caller is responsible for figuring out 
-  how to get the script to run at S3 resume because the boot script maintained by the lib will be 
+
+  If anyone does call CloseTable() on a real platform, then the caller is responsible for figuring out
+  how to get the script to run at S3 resume because the boot script maintained by the lib will be
   destroyed.
- 
-  @return the base address of the new copy of the boot script table.   
+
+  @return the base address of the new copy of the boot script table.
   @note this function could only called in boot time phase
 
 **/
@@ -935,10 +935,10 @@ S3BootScriptCloseTable (
   UINT8                          *Buffer;
   EFI_STATUS                      Status;
   EFI_BOOT_SCRIPT_TABLE_HEADER      *ScriptTableInfo;
-  
-  S3TableBase =    mS3BootScriptTablePtr->TableBase;    
+
+  S3TableBase =    mS3BootScriptTablePtr->TableBase;
   if (S3TableBase == 0) {
-    return 0; 
+    return 0;
   }
   //
   // Append the termination record the S3 boot script table
@@ -946,7 +946,7 @@ S3BootScriptCloseTable (
   S3BootScriptInternalCloseTable();
   TableLength = mS3BootScriptTablePtr->TableLength + sizeof (EFI_BOOT_SCRIPT_TERMINATE);
   //
-  // Allocate the buffer and copy the boot script to the buffer. 
+  // Allocate the buffer and copy the boot script to the buffer.
   //
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
@@ -954,12 +954,12 @@ S3BootScriptCloseTable (
                   (VOID **) &Buffer
                   );
   if (EFI_ERROR (Status)) {
-        return 0; 
+        return 0;
   }
   CopyMem (Buffer, S3TableBase, TableLength);
-  
+
   //
-  // Destroy the table maintained by the library so that the next write operation 
+  // Destroy the table maintained by the library so that the next write operation
   // will write the record to the first entry of the table.
   //
   // Fill the table header.
@@ -967,12 +967,12 @@ S3BootScriptCloseTable (
   ScriptTableInfo->OpCode      = S3_BOOT_SCRIPT_LIB_TABLE_OPCODE;
   ScriptTableInfo->Length      = (UINT8) sizeof (EFI_BOOT_SCRIPT_TABLE_HEADER);
   ScriptTableInfo->TableLength = 0;   // will be calculate at close the table
-  
+
   mS3BootScriptTablePtr->TableLength = sizeof (EFI_BOOT_SCRIPT_TABLE_HEADER);
   return Buffer;
 }
 /**
-  Save I/O write to boot script 
+  Save I/O write to boot script
 
   @param Width   The width of the I/O operations.Enumerated in S3_BOOT_SCRIPT_LIB_WIDTH.
   @param Address The base address of the I/O operations.
@@ -999,7 +999,7 @@ S3BootScriptSaveIoWrite (
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_IO_WRITE) + (WidthInByte * Count));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -1047,7 +1047,7 @@ S3BootScriptSaveIoReadWrite (
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_IO_READ_WRITE) + (WidthInByte * 2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -1059,7 +1059,7 @@ S3BootScriptSaveIoReadWrite (
   ScriptIoReadWrite.Length  = Length;
   ScriptIoReadWrite.Width   = Width;
   ScriptIoReadWrite.Address = Address;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptIoReadWrite, sizeof(EFI_BOOT_SCRIPT_IO_READ_WRITE));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_IO_READ_WRITE)), Data, WidthInByte);
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_IO_READ_WRITE) + WidthInByte), DataMask, WidthInByte);
@@ -1092,14 +1092,14 @@ S3BootScriptSaveMemWrite (
   UINT8                *Script;
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_MEM_WRITE  ScriptMemWrite;
-  
+
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_MEM_WRITE) + (WidthInByte * Count));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  }  
+  }
   //
   // Build script data
   //
@@ -1108,10 +1108,10 @@ S3BootScriptSaveMemWrite (
   ScriptMemWrite.Width    = Width;
   ScriptMemWrite.Address  = Address;
   ScriptMemWrite.Count    = (UINT32) Count;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptMemWrite, sizeof(EFI_BOOT_SCRIPT_MEM_WRITE));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_MEM_WRITE)), Buffer, WidthInByte * Count);
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1140,22 +1140,22 @@ S3BootScriptSaveMemReadWrite (
   UINT8                *Script;
   UINT8                 WidthInByte;
   EFI_BOOT_SCRIPT_MEM_READ_WRITE  ScriptMemReadWrite;
- 
+
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_MEM_READ_WRITE) + (WidthInByte * 2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  } 
+  }
   //
   // Build script data
-  //    
+  //
   ScriptMemReadWrite.OpCode   = EFI_BOOT_SCRIPT_MEM_READ_WRITE_OPCODE;
   ScriptMemReadWrite.Length   = Length;
   ScriptMemReadWrite.Width    = Width;
   ScriptMemReadWrite.Address  = Address;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptMemReadWrite , sizeof (EFI_BOOT_SCRIPT_MEM_READ_WRITE));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_MEM_READ_WRITE)), Data, WidthInByte);
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_MEM_READ_WRITE) + WidthInByte), DataMask, WidthInByte);
@@ -1199,11 +1199,11 @@ S3BootScriptSavePciCfgWrite (
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE) + (WidthInByte * Count));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  } 
+  }
   //
   // Build script data
   //
@@ -1212,10 +1212,10 @@ S3BootScriptSavePciCfgWrite (
   ScriptPciWrite.Width    = Width;
   ScriptPciWrite.Address  = Address;
   ScriptPciWrite.Count    = (UINT32) Count;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptPciWrite,  sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE)), Buffer, WidthInByte * Count);
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1255,19 +1255,19 @@ S3BootScriptSavePciCfgReadWrite (
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE) + (WidthInByte * 2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  }  
+  }
   //
   // Build script data
-  // 
+  //
   ScriptPciReadWrite.OpCode   = EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE;
   ScriptPciReadWrite.Length   = Length;
   ScriptPciReadWrite.Width    = Width;
   ScriptPciReadWrite.Address  = Address;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptPciReadWrite, sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE)), Data, WidthInByte);
   CopyMem (
@@ -1318,11 +1318,11 @@ S3BootScriptSavePciCfg2Write (
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE) + (WidthInByte * Count));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  }  
+  }
   //
   // Build script data
   //
@@ -1332,7 +1332,7 @@ S3BootScriptSavePciCfg2Write (
   ScriptPciWrite2.Address  = Address;
   ScriptPciWrite2.Segment  = Segment;
   ScriptPciWrite2.Count    = (UINT32)Count;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptPciWrite2, sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE)), Buffer, WidthInByte * Count);
 
@@ -1375,14 +1375,14 @@ S3BootScriptSavePciCfg2ReadWrite (
       Width == S3BootScriptWidthFillUint64) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE) + (WidthInByte * 2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  }  
+  }
   //
   // Build script data
   //
@@ -1391,7 +1391,7 @@ S3BootScriptSavePciCfg2ReadWrite (
   ScriptPciReadWrite2.Width    = Width;
   ScriptPciReadWrite2.Segment  = Segment;
   ScriptPciReadWrite2.Address  = Address;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptPciReadWrite2, sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE)), Data, WidthInByte);
   CopyMem (
@@ -1399,7 +1399,7 @@ S3BootScriptSavePciCfg2ReadWrite (
     DataMask,
     WidthInByte
     );
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1412,7 +1412,7 @@ S3BootScriptSavePciCfg2ReadWrite (
   for certain SMBus bus protocol, it will return EFI_SUCCESS; otherwise, it will return certain
   error code based on the input SMBus bus protocol.
 
-  @param  SmBusAddress            Address that encodes the SMBUS Slave Address, SMBUS Command, SMBUS Data Length, 
+  @param  SmBusAddress            Address that encodes the SMBUS Slave Address, SMBUS Command, SMBUS Data Length,
                                   and PEC.
   @param  Operation               Signifies which particular SMBus hardware protocol instance that
                                   it will use to execute the SMBus transactions. This SMBus
@@ -1428,7 +1428,7 @@ S3BootScriptSavePciCfg2ReadWrite (
                                   buffer is identified by Length.
 
   @retval EFI_SUCCESS             All the parameters are valid for the corresponding SMBus bus
-                                  protocol. 
+                                  protocol.
   @retval EFI_INVALID_PARAMETER   Operation is not defined in EFI_SMBUS_OPERATION.
   @retval EFI_INVALID_PARAMETER   Length/Buffer is NULL for operations except for EfiSmbusQuickRead
                                   and EfiSmbusQuickWrite. Length is outside the range of valid
@@ -1449,12 +1449,12 @@ CheckParameters (
   UINTN       RequiredLen;
   EFI_SMBUS_DEVICE_COMMAND Command;
   BOOLEAN                  PecCheck;
- 
+
   Command      = SMBUS_LIB_COMMAND (SmBusAddress);
   PecCheck     = SMBUS_LIB_PEC (SmBusAddress);
   //
   // Set default value to be 2:
-  // for SmbusReadWord, SmbusWriteWord and SmbusProcessCall. 
+  // for SmbusReadWord, SmbusWriteWord and SmbusProcessCall.
   //
   RequiredLen = 2;
   Status      = EFI_SUCCESS;
@@ -1492,8 +1492,8 @@ CheckParameters (
     case EfiSmbusReadBlock:
     case EfiSmbusWriteBlock:
     case EfiSmbusBWBRProcessCall:
-      if ((Buffer == NULL) || 
-          (Length == NULL) || 
+      if ((Buffer == NULL) ||
+          (Length == NULL) ||
           (*Length < MIN_SMBUS_BLOCK_LEN) ||
           (*Length > MAX_SMBUS_BLOCK_LEN)) {
         return EFI_INVALID_PARAMETER;
@@ -1513,14 +1513,14 @@ CheckParameters (
                         transactions.
   @param Length         A pointer to signify the number of bytes that this operation will do.
   @param Buffer         Contains the value of data to execute to the SMBUS slave device.
-  
+
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
 **/
 RETURN_STATUS
 EFIAPI
 S3BootScriptSaveSmbusExecute (
-  IN  UINTN                             SmBusAddress, 
+  IN  UINTN                             SmBusAddress,
   IN  EFI_SMBUS_OPERATION               Operation,
   IN  UINTN                             *Length,
   IN  VOID                              *Buffer
@@ -1544,7 +1544,7 @@ S3BootScriptSaveSmbusExecute (
   }
 
   DataSize = (UINT8)(sizeof (EFI_BOOT_SCRIPT_SMBUS_EXECUTE) + BufferLength);
-  
+
   Script = S3BootScriptGetEntryAddAddress (DataSize);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -1573,7 +1573,7 @@ S3BootScriptSaveSmbusExecute (
   Adds a record for an execution stall on the processor into a specified boot script table.
 
   @param Duration   Duration in microseconds of the stall
-  
+
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
 **/
@@ -1588,20 +1588,20 @@ S3BootScriptSaveStall (
   EFI_BOOT_SCRIPT_STALL  ScriptStall;
 
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_STALL));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  }  
+  }
   //
   // Build script data
   //
   ScriptStall.OpCode    = EFI_BOOT_SCRIPT_STALL_OPCODE;
   ScriptStall.Length    = Length;
   ScriptStall.Duration  = Duration;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptStall, sizeof (EFI_BOOT_SCRIPT_STALL));
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1611,7 +1611,7 @@ S3BootScriptSaveStall (
 
   @param EntryPoint   Entry point of the code to be dispatched.
   @param Context      Argument to be passed into the EntryPoint of the code to be dispatched.
-  
+
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
 **/
@@ -1626,11 +1626,11 @@ S3BootScriptSaveDispatch2 (
   UINT8                 *Script;
   EFI_BOOT_SCRIPT_DISPATCH_2  ScriptDispatch2;
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_DISPATCH_2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  }  
+  }
   //
   // Build script data
   //
@@ -1638,9 +1638,9 @@ S3BootScriptSaveDispatch2 (
   ScriptDispatch2.Length     = Length;
   ScriptDispatch2.EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)EntryPoint;
   ScriptDispatch2.Context =   (EFI_PHYSICAL_ADDRESS)(UINTN)Context;
-  
+
   CopyMem ((VOID*)Script, (VOID*)&ScriptDispatch2, sizeof (EFI_BOOT_SCRIPT_DISPATCH_2));
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1679,13 +1679,13 @@ S3BootScriptSaveMemPoll (
 {
   UINT8                 Length;
   UINT8                *Script;
-  UINT8                 WidthInByte; 
-  EFI_BOOT_SCRIPT_MEM_POLL      ScriptMemPoll; 
+  UINT8                 WidthInByte;
+  EFI_BOOT_SCRIPT_MEM_POLL      ScriptMemPoll;
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
-  
+
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_MEM_POLL) + (WidthInByte * 2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -1695,14 +1695,14 @@ S3BootScriptSaveMemPoll (
   //
   ScriptMemPoll.OpCode   = EFI_BOOT_SCRIPT_MEM_POLL_OPCODE;
   ScriptMemPoll.Length   = Length;
-  ScriptMemPoll.Width    = Width;  
+  ScriptMemPoll.Width    = Width;
   ScriptMemPoll.Address  = Address;
   ScriptMemPoll.Duration = Duration;
   ScriptMemPoll.LoopTimes = LoopTimes;
 
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_MEM_POLL)), BitValue, WidthInByte);
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_MEM_POLL) + WidthInByte), BitMask, WidthInByte);
-  CopyMem ((VOID*)Script, (VOID*)&ScriptMemPoll, sizeof (EFI_BOOT_SCRIPT_MEM_POLL)); 
+  CopyMem ((VOID*)Script, (VOID*)&ScriptMemPoll, sizeof (EFI_BOOT_SCRIPT_MEM_POLL));
 
   SyncBootScript (Script);
 
@@ -1711,10 +1711,10 @@ S3BootScriptSaveMemPoll (
 /**
   Store arbitrary information in the boot script table. This opcode is a no-op on dispatch and is only
   used for debugging script issues.
-  
+
   @param InformationLength   Length of the data in bytes
   @param Information       Information to be logged in the boot scrpit
- 
+
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
 
@@ -1722,7 +1722,7 @@ S3BootScriptSaveMemPoll (
 RETURN_STATUS
 EFIAPI
 S3BootScriptSaveInformation (
-  IN  UINT32                                InformationLength, 
+  IN  UINT32                                InformationLength,
   IN  VOID                                 *Information
   )
 {
@@ -1743,7 +1743,7 @@ S3BootScriptSaveInformation (
   ScriptInformation.Length     = Length;
 
 
-  ScriptInformation.InformationLength = InformationLength;  
+  ScriptInformation.InformationLength = InformationLength;
 
   CopyMem ((VOID*)Script, (VOID*)&ScriptInformation, sizeof (EFI_BOOT_SCRIPT_INFORMATION));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION)), (VOID *) Information, (UINTN) InformationLength);
@@ -1756,9 +1756,9 @@ S3BootScriptSaveInformation (
 /**
   Store a string in the boot script table. This opcode is a no-op on dispatch and is only
   used for debugging script issues.
-  
+
   @param String            The string to save to boot script table
-  
+
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
 
@@ -1769,8 +1769,8 @@ S3BootScriptSaveInformationAsciiString (
   IN  CONST CHAR8               *String
   )
 {
-  return S3BootScriptSaveInformation (      
-           (UINT32) AsciiStrLen (String) + 1, 
+  return S3BootScriptSaveInformation (
+           (UINT32) AsciiStrLen (String) + 1,
            (VOID*) String
            );
 }
@@ -1778,7 +1778,7 @@ S3BootScriptSaveInformationAsciiString (
   Adds a record for dispatching specified arbitrary code into a specified boot script table.
 
   @param EntryPoint   Entry point of the code to be dispatched.
-  
+
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
 **/
@@ -1791,22 +1791,22 @@ S3BootScriptSaveDispatch (
   UINT8                 Length;
   UINT8                *Script;
   EFI_BOOT_SCRIPT_DISPATCH  ScriptDispatch;
-  
+
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_DISPATCH));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  }  
+  }
   //
   // Build script data
   //
   ScriptDispatch.OpCode     = EFI_BOOT_SCRIPT_DISPATCH_OPCODE;
   ScriptDispatch.Length     = Length;
   ScriptDispatch.EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)EntryPoint;
-  
-  CopyMem ((VOID*)Script, (VOID*)&ScriptDispatch, sizeof (EFI_BOOT_SCRIPT_DISPATCH)); 
-  
+
+  CopyMem ((VOID*)Script, (VOID*)&ScriptDispatch, sizeof (EFI_BOOT_SCRIPT_DISPATCH));
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1815,8 +1815,8 @@ S3BootScriptSaveDispatch (
 /**
   Adds a record for I/O reads the I/O location and continues when the exit criteria is satisfied or after a
   defined duration.
-  
-  @param  Width                 The width of the I/O operations. 
+
+  @param  Width                 The width of the I/O operations.
   @param  Address               The base address of the I/O operations.
   @param  Data                  The comparison value used for the polling exit criteria.
   @param  DataMask              Mask used for the polling criteria. The bits in the bytes below Width which are zero
@@ -1834,36 +1834,36 @@ S3BootScriptSaveIoPoll (
   IN S3_BOOT_SCRIPT_LIB_WIDTH       Width,
   IN UINT64                     Address,
   IN VOID                      *Data,
-  IN VOID                      *DataMask, 
-  IN UINT64                     Delay   
+  IN VOID                      *DataMask,
+  IN UINT64                     Delay
   )
 {
-  UINT8                 WidthInByte;  
+  UINT8                 WidthInByte;
   UINT8                *Script;
   UINT8                 Length;
   EFI_BOOT_SCRIPT_IO_POLL  ScriptIoPoll;
-  
 
-  WidthInByte = (UINT8) (0x01 << (Width & 0x03));  
+
+  WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_IO_POLL) + (WidthInByte * 2));
- 
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  } 
+  }
   //
   // Build script data
   //
   ScriptIoPoll.OpCode   = EFI_BOOT_SCRIPT_IO_POLL_OPCODE;
   ScriptIoPoll.Length   = (UINT8) (sizeof (EFI_BOOT_SCRIPT_IO_POLL) + (WidthInByte * 2));
-  ScriptIoPoll.Width    = Width;  
+  ScriptIoPoll.Width    = Width;
   ScriptIoPoll.Address  = Address;
   ScriptIoPoll.Delay    = Delay;
 
-  CopyMem ((VOID*)Script, (VOID*)&ScriptIoPoll, sizeof (EFI_BOOT_SCRIPT_IO_POLL));  
+  CopyMem ((VOID*)Script, (VOID*)&ScriptIoPoll, sizeof (EFI_BOOT_SCRIPT_IO_POLL));
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_IO_POLL)), Data, WidthInByte);
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_IO_POLL) + WidthInByte), DataMask, WidthInByte);
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1873,7 +1873,7 @@ S3BootScriptSaveIoPoll (
   Adds a record for PCI configuration space reads and continues when the exit criteria is satisfied or
   after a defined duration.
 
-  @param  Width                 The width of the I/O operations. 
+  @param  Width                 The width of the I/O operations.
   @param  Address               The address within the PCI configuration space.
   @param  Data                  The comparison value used for the polling exit criteria.
   @param  DataMask              Mask used for the polling criteria. The bits in the bytes below Width which are zero
@@ -1897,7 +1897,7 @@ S3BootScriptSavePciPoll (
 )
 {
   UINT8                   *Script;
-  UINT8                    WidthInByte;  
+  UINT8                    WidthInByte;
   UINT8                    Length;
   EFI_BOOT_SCRIPT_PCI_CONFIG_POLL  ScriptPciPoll;
 
@@ -1909,7 +1909,7 @@ S3BootScriptSavePciPoll (
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_POLL) + (WidthInByte * 2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -1919,14 +1919,14 @@ S3BootScriptSavePciPoll (
   //
   ScriptPciPoll.OpCode   = EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE;
   ScriptPciPoll.Length   = (UINT8) (sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_POLL) + (WidthInByte * 2));
-  ScriptPciPoll.Width    = Width;  
+  ScriptPciPoll.Width    = Width;
   ScriptPciPoll.Address  = Address;
   ScriptPciPoll.Delay    = Delay;
 
   CopyMem ((VOID*)Script, (VOID*)&ScriptPciPoll, sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_POLL));
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_POLL)), Data, WidthInByte);
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG_POLL) + WidthInByte), DataMask, WidthInByte);
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
@@ -1935,7 +1935,7 @@ S3BootScriptSavePciPoll (
   Adds a record for PCI configuration space reads and continues when the exit criteria is satisfied or
   after a defined duration.
 
-  @param  Width                 The width of the I/O operations. 
+  @param  Width                 The width of the I/O operations.
   @param  Segment               The PCI segment number for Address.
   @param  Address               The address within the PCI configuration space.
   @param  Data                  The comparison value used for the polling exit criteria.
@@ -1960,7 +1960,7 @@ S3BootScriptSavePci2Poll (
   IN UINT64                         Delay
 )
 {
-  UINT8                    WidthInByte;  
+  UINT8                    WidthInByte;
   UINT8                   *Script;
   UINT8                    Length;
   EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL  ScriptPci2Poll;
@@ -1974,17 +1974,17 @@ S3BootScriptSavePci2Poll (
 
   WidthInByte = (UINT8) (0x01 << (Width & 0x03));
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL) + (WidthInByte * 2));
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
-  } 
+  }
   //
   // Build script data
   //
   ScriptPci2Poll.OpCode   = EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE;
   ScriptPci2Poll.Length   = (UINT8) (sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL) + (WidthInByte * 2));
-  ScriptPci2Poll.Width    = Width; 
+  ScriptPci2Poll.Width    = Width;
   ScriptPci2Poll.Segment  = Segment;
   ScriptPci2Poll.Address  = Address;
   ScriptPci2Poll.Delay    = Delay;
@@ -1992,17 +1992,17 @@ S3BootScriptSavePci2Poll (
   CopyMem ((VOID*)Script, (VOID*)&ScriptPci2Poll, sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL));
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL)), Data, WidthInByte);
   CopyMem ((UINT8 *) (Script + sizeof (EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL) + WidthInByte), DataMask, WidthInByte);
-  
+
   SyncBootScript (Script);
 
   return RETURN_SUCCESS;
 }
 /**
   Do the calculation of start address from which a new s3 boot script entry will write into.
-  
+
   @param EntryLength      The new entry length.
   @param Position         specifies the position in the boot script table where the opcode will be
-                          inserted, either before or after, depending on BeforeOrAfter. 
+                          inserted, either before or after, depending on BeforeOrAfter.
   @param BeforeOrAfter    The flag to indicate to insert the nod before or after the position.
                           This parameter is effective when InsertFlag is TRUE
   @param Script           return out the position from which the a new s3 boot script entry will write into
@@ -2012,58 +2012,58 @@ S3BootScriptCalculateInsertAddress (
   IN  UINT8     EntryLength,
   IN  VOID     *Position OPTIONAL,
   IN  BOOLEAN   BeforeOrAfter OPTIONAL,
-  OUT UINT8   **Script   
+  OUT UINT8   **Script
   )
 {
    UINTN                            TableLength;
    UINT8                            *S3TableBase;
-   UINTN                            PositionOffset; 
+   UINTN                            PositionOffset;
    EFI_BOOT_SCRIPT_COMMON_HEADER     ScriptHeader;
    //
    // The entry inserting to table is already added to the end of the table
    //
    TableLength =  mS3BootScriptTablePtr->TableLength - EntryLength;
    S3TableBase = mS3BootScriptTablePtr->TableBase ;
-   // 
+   //
    // calculate the Position offset
    //
    if (Position != NULL) {
      PositionOffset = (UINTN) ((UINT8 *)Position - S3TableBase);
-   
+
      //
      // If the BeforeOrAfter is FALSE, that means to insert the node right after the node.
      //
      if (!BeforeOrAfter) {
-        CopyMem ((VOID*)&ScriptHeader, Position, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));  
+        CopyMem ((VOID*)&ScriptHeader, Position, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));
         PositionOffset += (ScriptHeader.Length);
      }
-     //     
+     //
      // Insert the node before the adjusted Position
      //
-     CopyMem (S3TableBase+PositionOffset+EntryLength, S3TableBase+PositionOffset, TableLength - PositionOffset);  
+     CopyMem (S3TableBase+PositionOffset+EntryLength, S3TableBase+PositionOffset, TableLength - PositionOffset);
      //
-     // calculate the the start address for the new entry. 
+     // calculate the the start address for the new entry.
      //
      *Script = S3TableBase + PositionOffset;
-       
+
    } else {
      if (!BeforeOrAfter) {
        //
        //  Insert the node to the end of the table
        //
-       *Script = S3TableBase + TableLength; 
+       *Script = S3TableBase + TableLength;
      } else {
-       // 
+       //
        // Insert the node to the beginning of the table
        //
        PositionOffset = (UINTN) sizeof(EFI_BOOT_SCRIPT_TABLE_HEADER);
-       CopyMem (S3TableBase+PositionOffset+EntryLength, S3TableBase+PositionOffset, TableLength - PositionOffset); 
-       *Script = S3TableBase + PositionOffset; 
+       CopyMem (S3TableBase+PositionOffset+EntryLength, S3TableBase+PositionOffset, TableLength - PositionOffset);
+       *Script = S3TableBase + PositionOffset;
      }
-   }       
+   }
 }
 /**
-  Move the last boot script entry to the position 
+  Move the last boot script entry to the position
 
   @param  BeforeOrAfter         Specifies whether the opcode is stored before (TRUE) or after (FALSE) the position
                                 in the boot script table specified by Position. If Position is NULL or points to
@@ -2085,14 +2085,14 @@ S3BootScriptMoveLastOpcode (
 )
 {
   UINT8*                Script;
-  VOID                  *TempPosition;  
+  VOID                  *TempPosition;
   UINTN                 StartAddress;
   UINT32                TableLength;
   EFI_BOOT_SCRIPT_COMMON_HEADER  ScriptHeader;
   BOOLEAN               ValidatePosition;
   UINT8*                LastOpcode;
   UINT8                 TempBootScriptEntry[BOOT_SCRIPT_NODE_MAX_LENGTH];
-  
+
   ValidatePosition = FALSE;
   TempPosition = (Position == NULL) ? NULL:(*Position);
 
@@ -2112,17 +2112,17 @@ S3BootScriptMoveLastOpcode (
   //
   // Find the last boot Script Entry which is not the terminate node
   //
-  while ((UINTN) Script < (UINTN) (StartAddress + TableLength)) {    
-    CopyMem ((VOID*)&ScriptHeader, Script, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));   
+  while ((UINTN) Script < (UINTN) (StartAddress + TableLength)) {
+    CopyMem ((VOID*)&ScriptHeader, Script, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));
     if (TempPosition != NULL && TempPosition == Script) {
       //
-      // If the position is specified, the position must be pointed to a boot script entry start address. 
+      // If the position is specified, the position must be pointed to a boot script entry start address.
       //
       ValidatePosition = TRUE;
     }
     if (ScriptHeader.OpCode != S3_BOOT_SCRIPT_LIB_TERMINATE_OPCODE) {
       LastOpcode = Script;
-    } 
+    }
     Script  = Script + ScriptHeader.Length;
   }
   //
@@ -2131,10 +2131,10 @@ S3BootScriptMoveLastOpcode (
   if (TempPosition != NULL && !ValidatePosition) {
     return RETURN_INVALID_PARAMETER;
   }
-  
-  CopyMem ((VOID*)&ScriptHeader, LastOpcode, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER)); 
-  
-  CopyMem((VOID*)TempBootScriptEntry, LastOpcode, ScriptHeader.Length); 
+
+  CopyMem ((VOID*)&ScriptHeader, LastOpcode, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));
+
+  CopyMem((VOID*)TempBootScriptEntry, LastOpcode, ScriptHeader.Length);
   //
   // Find the right position to write the node in
   //
@@ -2142,7 +2142,7 @@ S3BootScriptMoveLastOpcode (
     ScriptHeader.Length,
     TempPosition,
     BeforeOrAfter,
-    &Script   
+    &Script
   );
   //
   // Copy the node to Boot script table
@@ -2160,18 +2160,18 @@ S3BootScriptMoveLastOpcode (
   return RETURN_SUCCESS;
 }
 /**
-  Create a Label node in the boot script table. 
-  
+  Create a Label node in the boot script table.
+
   @param  BeforeOrAfter         Specifies whether the opcode is stored before (TRUE) or after (FALSE) the position
                                 in the boot script table specified by Position. If Position is NULL or points to
                                 NULL then the new opcode is inserted at the beginning of the table (if TRUE) or end
                                 of the table (if FALSE).
   @param  Position              On entry, specifies the position in the boot script table where the opcode will be
                                 inserted, either before or after, depending on BeforeOrAfter. On exit, specifies
-                                the position of the inserted opcode in the boot script table.  
+                                the position of the inserted opcode in the boot script table.
   @param InformationLength      Length of the label in bytes
   @param Information            Label to be logged in the boot scrpit
- 
+
   @retval RETURN_INVALID_PARAMETER The Position is not a valid position in the boot script table.
   @retval RETURN_OUT_OF_RESOURCES  Not enough memory for the table do operation.
   @retval RETURN_SUCCESS           Opcode is added.
@@ -2181,17 +2181,17 @@ RETURN_STATUS
 EFIAPI
 S3BootScriptLabelInternal (
   IN        BOOLEAN                        BeforeOrAfter,
-  IN OUT    VOID                         **Position OPTIONAL, 
-  IN        UINT32                         InformationLength, 
+  IN OUT    VOID                         **Position OPTIONAL,
+  IN        UINT32                         InformationLength,
   IN CONST  CHAR8                          *Information
   )
 {
   UINT8                 Length;
   UINT8                 *Script;
   EFI_BOOT_SCRIPT_INFORMATION  ScriptInformation;
- 
+
   Length = (UINT8)(sizeof (EFI_BOOT_SCRIPT_INFORMATION) + InformationLength);
-  
+
   Script = S3BootScriptGetEntryAddAddress (Length);
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
@@ -2203,7 +2203,7 @@ S3BootScriptLabelInternal (
   ScriptInformation.Length     = Length;
 
 
-  ScriptInformation.InformationLength = InformationLength;  
+  ScriptInformation.InformationLength = InformationLength;
 
   CopyMem ((VOID*)Script, (VOID*)&ScriptInformation, sizeof (EFI_BOOT_SCRIPT_INFORMATION));
   CopyMem ((VOID*)(Script + sizeof (EFI_BOOT_SCRIPT_INFORMATION)), (VOID *) Information, (UINTN) InformationLength);
@@ -2217,9 +2217,9 @@ S3BootScriptLabelInternal (
   Find a label within the boot script table and, if not present, optionally create it.
 
   @param  BeforeOrAfter         Specifies whether the opcode is stored before (TRUE)
-                                or after (FALSE) the position in the boot script table 
+                                or after (FALSE) the position in the boot script table
                                 specified by Position.
-  @param  CreateIfNotFound      Specifies whether the label will be created if the label 
+  @param  CreateIfNotFound      Specifies whether the label will be created if the label
                                 does not exists (TRUE) or not (FALSE).
   @param  Position              On entry, specifies the position in the boot script table
                                 where the opcode will be inserted, either before or after,
@@ -2230,13 +2230,13 @@ S3BootScriptLabelInternal (
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
-                                If the opcode is unknow or not supported because of the PCD 
+                                If the opcode is unknow or not supported because of the PCD
                                 Feature Flags.
   @retval EFI_OUT_OF_RESOURCES  There is insufficient memory to store the boot script.
 
 **/
 RETURN_STATUS
-EFIAPI 
+EFIAPI
 S3BootScriptLabel (
   IN       BOOLEAN                      BeforeOrAfter,
   IN       BOOLEAN                      CreateIfNotFound,
@@ -2262,7 +2262,7 @@ S3BootScriptLabel (
   if (Label[0] == '\0') {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check that the script is initialized and synced without adding an entry to the script.
   // The code must search for the label first before it knows if a new entry needs
@@ -2272,10 +2272,10 @@ S3BootScriptLabel (
   if (Script == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Check the header and search for existing label.
-  // 
+  //
   Script = mS3BootScriptTablePtr->TableBase;
   CopyMem ((VOID*)&TableHeader, Script, sizeof(EFI_BOOT_SCRIPT_TABLE_HEADER));
   if (TableHeader.OpCode != S3_BOOT_SCRIPT_LIB_TABLE_OPCODE) {
@@ -2285,22 +2285,22 @@ S3BootScriptLabel (
   TableLength   = mS3BootScriptTablePtr->TableLength;
   Script    =     Script + TableHeader.Length;
   while ((UINTN) Script < (UINTN) (StartAddress + TableLength)) {
-    
-    CopyMem ((VOID*)&ScriptHeader, Script, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));   
+
+    CopyMem ((VOID*)&ScriptHeader, Script, sizeof(EFI_BOOT_SCRIPT_COMMON_HEADER));
     if (ScriptHeader.OpCode == S3_BOOT_SCRIPT_LIB_LABEL_OPCODE) {
       if (AsciiStrCmp ((CHAR8 *)(UINTN)(Script+sizeof(EFI_BOOT_SCRIPT_INFORMATION)), Label) == 0) {
-        (*Position) = Script; 
+        (*Position) = Script;
         return EFI_SUCCESS;
       }
-    } 
+    }
     Script  = Script + ScriptHeader.Length;
   }
   if (CreateIfNotFound) {
     LabelLength = (UINT32)AsciiStrSize(Label);
-    return S3BootScriptLabelInternal (BeforeOrAfter,Position, LabelLength, Label);     
+    return S3BootScriptLabelInternal (BeforeOrAfter,Position, LabelLength, Label);
   } else {
     return EFI_NOT_FOUND;
-  }   
+  }
 }
 
 /**
@@ -2312,13 +2312,13 @@ S3BootScriptLabel (
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
-                                If the opcode is unknow or not supported because of the PCD 
+                                If the opcode is unknow or not supported because of the PCD
                                 Feature Flags.
   @retval EFI_OUT_OF_RESOURCES  There is insufficient memory to store the boot script.
 
 **/
 RETURN_STATUS
-EFIAPI 
+EFIAPI
 S3BootScriptCompare (
   IN  UINT8                       *Position1,
   IN  UINT8                       *Position2,
@@ -2326,7 +2326,7 @@ S3BootScriptCompare (
   )
 {
   UINT8*                    Script;
-  UINT32                    TableLength; 
+  UINT32                    TableLength;
 
   if (RelativePosition == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2352,7 +2352,7 @@ S3BootScriptCompare (
     return EFI_INVALID_PARAMETER;
   }
   *RelativePosition = (Position1 < Position2)?-1:((Position1 == Position2)?0:1);
-  
+
   return EFI_SUCCESS;
 }
 

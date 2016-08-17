@@ -169,7 +169,7 @@ typedef struct {
   UINT8   Length;
   UINT32  Width;
   UINT64  Address;
-  UINT16  Segment;  
+  UINT16  Segment;
   UINT64  Delay;
 } EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL;
 
