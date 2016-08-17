@@ -626,7 +626,7 @@ FillBufferWithTCG2EventLogFormat (
   @retval FALSE Buffer is not all zero.
 **/
 BOOLEAN
-IsZeroBuffer (
+InternalIsZeroBuffer (
   IN VOID  *Buffer,
   IN UINTN BufferSize
   )
@@ -735,7 +735,7 @@ InstallTcg2ConfigForm (
   } else {
     TempBuffer[0] = 0;
     for (Index = 0; Index < Pcrs.count; Index++) {
-      if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+      if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
         AppendBufferWithTpmAlgHash (TempBuffer, sizeof(TempBuffer), Pcrs.pcrSelections[Index].hash);
       }
     }

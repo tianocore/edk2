@@ -211,7 +211,7 @@ InternalDumpHex (
   @retval FALSE Buffer is not all zero.
 **/
 BOOLEAN
-IsZeroBuffer (
+InternalIsZeroBuffer (
   IN VOID  *Buffer,
   IN UINTN BufferSize
   )
@@ -2471,31 +2471,31 @@ DriverEntry (
       switch (Pcrs.pcrSelections[Index].hash) {
       case TPM_ALG_SHA1:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
         }        
         break;
       case TPM_ALG_SHA256:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
         }
         break;
       case TPM_ALG_SHA384:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
         }
         break;
       case TPM_ALG_SHA512:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
         }
         break;
       case TPM_ALG_SM3_256:
         TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
+        if (!InternalIsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
           ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
         }
         break;
