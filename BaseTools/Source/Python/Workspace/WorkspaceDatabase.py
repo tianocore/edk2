@@ -802,9 +802,10 @@ class DscBuildData(PlatformBuildClassObject):
             options = sdict()
             self._ModuleTypeOptions[Edk, ModuleType] = options
             DriverType = '%s.%s' % (Edk, ModuleType)
+            CommonDriverType = '%s.%s' % ('COMMON', ModuleType)
             RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, DriverType]
             for ToolChainFamily, ToolChain, Option, Arch, Type, Dummy3, Dummy4 in RecordList:
-                if Type == DriverType:
+                if Type == DriverType or Type == CommonDriverType:
                     Key = (ToolChainFamily, ToolChain, Edk)
                     if Key not in options or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
                         options[Key] = Option

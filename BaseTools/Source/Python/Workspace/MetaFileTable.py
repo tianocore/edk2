@@ -341,7 +341,13 @@ class PlatformTable(MetaFileTable):
         if Scope1 != None and Scope1 != 'COMMON':
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Scope1
         if Scope2 != None and Scope2 != 'COMMON':
-            ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Scope2
+            # Cover the case that CodeBase is 'COMMON' for BuildOptions section
+            if '.' in Scope2:
+                Index = Scope2.index('.')
+                NewScope = 'COMMON'+ Scope2[Index:]
+                ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT' OR Scope2='%s')" % (Scope2, NewScope)
+            else:
+                ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Scope2
 
         if BelongsToItem != None:
             ConditionString += " AND BelongsToItem=%s" % BelongsToItem
