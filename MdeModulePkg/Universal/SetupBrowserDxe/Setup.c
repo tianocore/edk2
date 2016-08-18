@@ -4241,8 +4241,6 @@ ReGetDefault:
           ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && ((Question->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG) != 0))
          ) {
         HiiValue->Value.b = TRUE;
-      } else {
-        HiiValue->Value.b = FALSE;
       }
 
       return EFI_SUCCESS;
@@ -4269,6 +4267,11 @@ ReGetDefault:
   //
   Status = EFI_NOT_FOUND;
   switch (Question->Operand) {
+  case EFI_IFR_CHECKBOX_OP:
+    HiiValue->Value.b = FALSE;
+    Status = EFI_SUCCESS;
+    break;
+
   case EFI_IFR_NUMERIC_OP:
     //
     // Take minimum value as numeric default value
