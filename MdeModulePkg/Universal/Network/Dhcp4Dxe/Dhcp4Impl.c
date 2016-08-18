@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1188,6 +1188,7 @@ Dhcp4InstanceConfigUdpIo (
   )
 {
   DHCP_PROTOCOL                     *Instance;
+  DHCP_SERVICE                      *DhcpSb;
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
   EFI_UDP4_CONFIG_DATA              UdpConfigData;
   IP4_ADDR                          ClientAddr;
@@ -1196,6 +1197,7 @@ Dhcp4InstanceConfigUdpIo (
   IP4_ADDR                          SubnetMask;
 
   Instance = (DHCP_PROTOCOL *) Context;
+  DhcpSb   = Instance->Service;
   Token    = Instance->Token;
 
   ZeroMem (&UdpConfigData, sizeof (EFI_UDP4_CONFIG_DATA));
@@ -1208,10 +1210,15 @@ Dhcp4InstanceConfigUdpIo (
   ClientAddr = EFI_NTOHL (Token->Packet->Dhcp4.Header.ClientAddr);
   Ip = HTONL (ClientAddr);
   CopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
-  
-  Class = NetGetIpClass (ClientAddr);
-  ASSERT (Class < IP4_ADDR_CLASSE);
-  SubnetMask = gIp4AllMasks[Class << 3];
+
+  if (DhcpSb->Netmask == 0) {
+    Class = NetGetIpClass (ClientAddr);
+    ASSERT (Class < IP4_ADDR_CLASSE);
+    SubnetMask = gIp4AllMasks[Class << 3];
+  } else {
+    SubnetMask = DhcpSb->Netmask;
+  }
+
   Ip = HTONL (SubnetMask);
   CopyMem (&UdpConfigData.SubnetMask, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
@@ -1576,12 +1583,17 @@ EfiDhcp4TransmitReceive (
     EndPoint.RemotePort = Token->RemotePort;
   }
 
+  if (DhcpSb->Netmask == 0) {
+    Class = NetGetIpClass (ClientAddr);
+    ASSERT (Class < IP4_ADDR_CLASSE);
+    SubnetMask = gIp4AllMasks[Class << 3];
+  } else {
+    SubnetMask = DhcpSb->Netmask;
+  }
+  
   //
   // Get the gateway.
   //
-  Class = NetGetIpClass (ClientAddr);
-  ASSERT (Class < IP4_ADDR_CLASSE);
-  SubnetMask = gIp4AllMasks[Class << 3];
   ZeroMem (&Gateway, sizeof (Gateway));
   if (!IP4_NET_EQUAL (ClientAddr, EndPoint.RemoteAddr.Addr[0], SubnetMask)) {
     CopyMem (&Gateway.v4, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
