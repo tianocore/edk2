@@ -56,7 +56,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
 
 [FeaturePcd]
-  gArmVirtTokenSpaceGuid.PcdKludgeMapPciMmioAsCached
   gArmVirtTokenSpaceGuid.PcdPureAcpiBoot
 
 [depex]

@@ -100,9 +100,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
 
-  # Activate KVM workaround for now.
-  gArmVirtTokenSpaceGuid.PcdKludgeMapPciMmioAsCached|TRUE
-
 !if $(PURE_ACPI_BOOT_ENABLE) == TRUE
   gArmVirtTokenSpaceGuid.PcdPureAcpiBoot|TRUE
 !endif

@@ -365,8 +365,7 @@ InitializePciHostBridge (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  MmioAttributes = FeaturePcdGet (PcdKludgeMapPciMmioAsCached) ?
-                   EFI_MEMORY_WB : EFI_MEMORY_UC;
+  MmioAttributes = EFI_MEMORY_UC;
 
   Status = gDS->AddMemorySpace (
                   EfiGcdMemoryTypeMemoryMappedIo,
