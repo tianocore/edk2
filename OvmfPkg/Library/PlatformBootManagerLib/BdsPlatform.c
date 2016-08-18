@@ -618,7 +618,7 @@ GetGopDevicePath (
 }
 
 EFI_STATUS
-PreparePciVgaDevicePath (
+PreparePciDisplayDevicePath (
   IN EFI_HANDLE                DeviceHandle
   )
 /*++
@@ -868,14 +868,14 @@ DetectAndPreparePlatformPciDevicePath (
   }
 
   //
-  // Here we decide which VGA device to enable in PCI bus
+  // Here we decide which display device to enable in PCI bus
   //
-  if (IS_PCI_VGA (Pci)) {
+  if (IS_PCI_DISPLAY (Pci)) {
     //
     // Add them to ConOut.
     //
-    DEBUG ((EFI_D_INFO, "Found PCI VGA device\n"));
-    PreparePciVgaDevicePath (Handle);
+    DEBUG ((EFI_D_INFO, "Found PCI display device\n"));
+    PreparePciDisplayDevicePath (Handle);
     return EFI_SUCCESS;
   }
 
