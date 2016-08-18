@@ -134,6 +134,9 @@ QemuVideoControllerDriverSupported (
   }
 
   Status = EFI_UNSUPPORTED;
+  if (!IS_PCI_VGA (&Pci)) {
+    goto Done;
+  }
   Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
   if (Card != NULL) {
     DEBUG ((EFI_D_INFO, "QemuVideo: %s detected\n", Card->Name));
