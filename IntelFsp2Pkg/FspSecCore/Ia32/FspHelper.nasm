@@ -14,6 +14,8 @@
     SECTION .text
 
 global ASM_PFX(FspInfoHeaderRelativeOff)
+ASM_PFX(FspInfoHeaderRelativeOff):
+   DD    0x12345678               ; This value must be patched by the build script
 
 global ASM_PFX(AsmGetFspBaseAddress)
 ASM_PFX(AsmGetFspBaseAddress):
@@ -29,6 +31,11 @@ ASM_PFX(NextInstruction):
    pop   eax
    sub   eax, ASM_PFX(NextInstruction)
    add   eax, ASM_PFX(AsmGetFspInfoHeader)
-   DB    02Dh                                               ; opcode of sub eax, imm32
-ASM_PFX(FspInfoHeaderRelativeOff):    DD    0x12345678      ; sub eax, FspInfoHeaderRelativeOff
+   sub   eax, dword [ASM_PFX(FspInfoHeaderRelativeOff)]
    ret
+
+global ASM_PFX(AsmGetFspInfoHeaderNoStack)
+ASM_PFX(AsmGetFspInfoHeaderNoStack):
+   mov   eax, ASM_PFX(AsmGetFspInfoHeader)
+   sub   eax, dword [ASM_PFX(FspInfoHeaderRelativeOff)]
+   jmp   edi
