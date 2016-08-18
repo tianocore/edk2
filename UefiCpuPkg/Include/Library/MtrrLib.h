@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@
 #define  _MTRR_LIB_H_
 
 //
-// According to IA32 SDM, MTRRs number and msr offset are always consistent
+// According to IA32 SDM, MTRRs number and MSR offset are always consistent
 // for IA32 processor family
 //
 
@@ -92,11 +92,11 @@ typedef struct _MTRR_VARIABLE_SETTING_ {
 // Array for variable MTRRs
 //
 typedef struct _MTRR_VARIABLE_SETTINGS_ {
-	MTRR_VARIABLE_SETTING   Mtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
-}	MTRR_VARIABLE_SETTINGS;
+  MTRR_VARIABLE_SETTING   Mtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
+} MTRR_VARIABLE_SETTINGS;
 
 //
-// Array for fixed mtrrs
+// Array for fixed MTRRs
 //
 typedef  struct  _MTRR_FIXED_SETTINGS_ {
   UINT64       Mtrr[MTRR_NUMBER_OF_FIXED_MTRR];
@@ -209,7 +209,7 @@ MtrrGetMemoryAttribute (
 
   @param[out]  VariableSettings   A buffer to hold variable MTRRs content.
 
-  @return The buffer point to MTRR_VARIABLE_SETTINGS in which holds the content of the variable mtrr
+  @return The buffer point to MTRR_VARIABLE_SETTINGS in which holds the content of the variable MTRR
 
 **/
 MTRR_VARIABLE_SETTINGS*
@@ -220,7 +220,7 @@ MtrrGetVariableMtrr (
 
 
 /**
-  This function sets fixed MTRRs
+  This function sets variable MTRRs
 
   @param[in]  VariableSettings   A buffer to hold variable MTRRs content.
 
