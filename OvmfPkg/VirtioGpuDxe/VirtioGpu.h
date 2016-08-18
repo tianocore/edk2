@@ -17,6 +17,7 @@
 #ifndef _VIRTIO_GPU_DXE_H_
 #define _VIRTIO_GPU_DXE_H_
 
+#include <IndustryStandard/VirtioGpu.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/VirtioDevice.h>
@@ -57,6 +58,11 @@ typedef struct {
   // Event to be signaled at ExitBootServices().
   //
   EFI_EVENT                ExitBoot;
+
+  //
+  // Common running counter for all VirtIo GPU requests that ask for fencing.
+  //
+  UINT64                   FenceId;
 
   //
   // The Child field references the GOP wrapper structure. If this pointer is
@@ -169,6 +175,93 @@ EFIAPI
 VirtioGpuExitBoot (
   IN EFI_EVENT Event,
   IN VOID      *Context
+  );
+
+/**
+  The following functions send requests to the VirtIo GPU device model, await
+  the answer from the host, and return a status. They share the following
+  interface details:
+
+  @param[in,out] VgpuDev  The VGPU_DEV object that represents the VirtIo GPU
+                          device. The caller is responsible to have
+                          successfully invoked VirtioGpuInit() on VgpuDev
+                          previously, while VirtioGpuUninit() must not have
+                          been called on VgpuDev.
+
+  @retval EFI_INVALID_PARAMETER  Invalid command-specific parameters were
+                                 detected by this driver.
+
+  @retval EFI_SUCCESS            Operation successful.
+
+  @retval EFI_DEVICE_ERROR       The host rejected the request. The host error
+                                 code has been logged on the EFI_D_ERROR level.
+
+  @return                        Codes for unexpected errors in VirtIo
+                                 messaging.
+
+  For the command-specific parameters, please consult the GPU Device section of
+  the VirtIo 1.0 specification (see references in
+  "OvmfPkg/Include/IndustryStandard/VirtioGpu.h").
+**/
+EFI_STATUS
+VirtioGpuResourceCreate2d (
+  IN OUT VGPU_DEV           *VgpuDev,
+  IN     UINT32             ResourceId,
+  IN     VIRTIO_GPU_FORMATS Format,
+  IN     UINT32             Width,
+  IN     UINT32             Height
+  );
+
+EFI_STATUS
+VirtioGpuResourceUnref (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   ResourceId
+  );
+
+EFI_STATUS
+VirtioGpuResourceAttachBacking (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   ResourceId,
+  IN     VOID     *FirstBackingPage,
+  IN     UINTN    NumberOfPages
+  );
+
+EFI_STATUS
+VirtioGpuResourceDetachBacking (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   ResourceId
+  );
+
+EFI_STATUS
+VirtioGpuSetScanout (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   X,
+  IN     UINT32   Y,
+  IN     UINT32   Width,
+  IN     UINT32   Height,
+  IN     UINT32   ScanoutId,
+  IN     UINT32   ResourceId
+  );
+
+EFI_STATUS
+VirtioGpuTransferToHost2d (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   X,
+  IN     UINT32   Y,
+  IN     UINT32   Width,
+  IN     UINT32   Height,
+  IN     UINT64   Offset,
+  IN     UINT32   ResourceId
+  );
+
+EFI_STATUS
+VirtioGpuResourceFlush (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   X,
+  IN     UINT32   Y,
+  IN     UINT32   Width,
+  IN     UINT32   Height,
+  IN     UINT32   ResourceId
   );
 
 #endif // _VIRTIO_GPU_DXE_H_

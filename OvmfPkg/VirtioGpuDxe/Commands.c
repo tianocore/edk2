@@ -14,7 +14,6 @@
 
 **/
 
-#include <IndustryStandard/VirtioGpu.h>
 #include <Library/VirtioLib.h>
 
 #include "VirtioGpu.h"
@@ -211,4 +210,350 @@ VirtioGpuExitBoot (
 
   VgpuDev = Context;
   VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, 0);
+}
+
+/**
+  Internal utility function that sends a request to the VirtIo GPU device
+  model, awaits the answer from the host, and returns a status.
+
+  @param[in,out] VgpuDev  The VGPU_DEV object that represents the VirtIo GPU
+                          device. The caller is responsible to have
+                          successfully invoked VirtioGpuInit() on VgpuDev
+                          previously, while VirtioGpuUninit() must not have
+                          been called on VgpuDev.
+
+  @param[in] RequestType  The type of the request. The caller is responsible
+                          for providing a VirtioGpuCmd* RequestType which, on
+                          success, elicits a VirtioGpuRespOkNodata response
+                          from the host.
+
+  @param[in] Fence        Whether to enable fencing for this request. Fencing
+                          forces the host to complete the command before
+                          producing a response. If Fence is TRUE, then
+                          VgpuDev->FenceId is consumed, and incremented.
+
+  @param[in,out] Header   Pointer to the caller-allocated request object. The
+                          request must start with VIRTIO_GPU_CONTROL_HEADER.
+                          This function overwrites all fields of Header before
+                          submitting the request to the host:
+
+                          - it sets Type from RequestType,
+
+                          - it sets Flags and FenceId based on Fence,
+
+                          - it zeroes CtxId and Padding.
+
+  @param[in] RequestSize  Size of the entire caller-allocated request object,
+                          including the leading VIRTIO_GPU_CONTROL_HEADER.
+
+  @retval EFI_SUCCESS            Operation successful.
+
+  @retval EFI_DEVICE_ERROR       The host rejected the request. The host error
+                                 code has been logged on the EFI_D_ERROR level.
+
+  @return                        Codes for unexpected errors in VirtIo
+                                 messaging.
+**/
+STATIC
+EFI_STATUS
+VirtioGpuSendCommand (
+  IN OUT VGPU_DEV                           *VgpuDev,
+  IN     VIRTIO_GPU_CONTROL_TYPE            RequestType,
+  IN     BOOLEAN                            Fence,
+  IN OUT volatile VIRTIO_GPU_CONTROL_HEADER *Header,
+  IN     UINTN                              RequestSize
+  )
+{
+  DESC_INDICES                       Indices;
+  volatile VIRTIO_GPU_CONTROL_HEADER Response;
+  EFI_STATUS                         Status;
+  UINT32                             ResponseSize;
+
+  //
+  // Initialize Header.
+  //
+  Header->Type      = RequestType;
+  if (Fence) {
+    Header->Flags   = VIRTIO_GPU_FLAG_FENCE;
+    Header->FenceId = VgpuDev->FenceId++;
+  } else {
+    Header->Flags   = 0;
+    Header->FenceId = 0;
+  }
+  Header->CtxId     = 0;
+  Header->Padding   = 0;
+
+  ASSERT (RequestSize >= sizeof *Header);
+
+  //
+  // Compose the descriptor chain.
+  //
+  VirtioPrepare (&VgpuDev->Ring, &Indices);
+  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)Header, RequestSize,
+    VRING_DESC_F_NEXT, &Indices);
+  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)&Response, sizeof Response,
+    VRING_DESC_F_WRITE, &Indices);
+
+  //
+  // Send the command.
+  //
+  Status = VirtioFlush (VgpuDev->VirtIo, VIRTIO_GPU_CONTROL_QUEUE,
+             &VgpuDev->Ring, &Indices, &ResponseSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Parse the response.
+  //
+  if (ResponseSize != sizeof Response) {
+    DEBUG ((EFI_D_ERROR, "%a: malformed response to Request=0x%x\n",
+      __FUNCTION__, (UINT32)RequestType));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  if (Response.Type == VirtioGpuRespOkNodata) {
+    return EFI_SUCCESS;
+  }
+
+  DEBUG ((EFI_D_ERROR, "%a: Request=0x%x Response=0x%x\n", __FUNCTION__,
+    (UINT32)RequestType, Response.Type));
+  return EFI_DEVICE_ERROR;
+}
+
+/**
+  The following functions send requests to the VirtIo GPU device model, await
+  the answer from the host, and return a status. They share the following
+  interface details:
+
+  @param[in,out] VgpuDev  The VGPU_DEV object that represents the VirtIo GPU
+                          device. The caller is responsible to have
+                          successfully invoked VirtioGpuInit() on VgpuDev
+                          previously, while VirtioGpuUninit() must not have
+                          been called on VgpuDev.
+
+  @retval EFI_INVALID_PARAMETER  Invalid command-specific parameters were
+                                 detected by this driver.
+
+  @retval EFI_SUCCESS            Operation successful.
+
+  @retval EFI_DEVICE_ERROR       The host rejected the request. The host error
+                                 code has been logged on the EFI_D_ERROR level.
+
+  @return                        Codes for unexpected errors in VirtIo
+                                 messaging.
+
+  For the command-specific parameters, please consult the GPU Device section of
+  the VirtIo 1.0 specification (see references in
+  "OvmfPkg/Include/IndustryStandard/VirtioGpu.h").
+**/
+EFI_STATUS
+VirtioGpuResourceCreate2d (
+  IN OUT VGPU_DEV           *VgpuDev,
+  IN     UINT32             ResourceId,
+  IN     VIRTIO_GPU_FORMATS Format,
+  IN     UINT32             Width,
+  IN     UINT32             Height
+  )
+{
+  volatile VIRTIO_GPU_RESOURCE_CREATE_2D Request;
+
+  if (ResourceId == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Request.ResourceId = ResourceId;
+  Request.Format     = (UINT32)Format;
+  Request.Width      = Width;
+  Request.Height     = Height;
+
+  return VirtioGpuSendCommand (
+           VgpuDev,
+           VirtioGpuCmdResourceCreate2d,
+           FALSE,                        // Fence
+           &Request.Header,
+           sizeof Request
+           );
+}
+
+EFI_STATUS
+VirtioGpuResourceUnref (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   ResourceId
+  )
+{
+  volatile VIRTIO_GPU_RESOURCE_UNREF Request;
+
+  if (ResourceId == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Request.ResourceId = ResourceId;
+  Request.Padding    = 0;
+
+  return VirtioGpuSendCommand (
+           VgpuDev,
+           VirtioGpuCmdResourceUnref,
+           FALSE,                     // Fence
+           &Request.Header,
+           sizeof Request
+           );
+}
+
+EFI_STATUS
+VirtioGpuResourceAttachBacking (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   ResourceId,
+  IN     VOID     *FirstBackingPage,
+  IN     UINTN    NumberOfPages
+  )
+{
+  volatile VIRTIO_GPU_RESOURCE_ATTACH_BACKING Request;
+
+  if (ResourceId == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Request.ResourceId    = ResourceId;
+  Request.NrEntries     = 1;
+  Request.Entry.Addr    = (UINTN)FirstBackingPage;
+  Request.Entry.Length  = (UINT32)EFI_PAGES_TO_SIZE (NumberOfPages);
+  Request.Entry.Padding = 0;
+
+  return VirtioGpuSendCommand (
+           VgpuDev,
+           VirtioGpuCmdResourceAttachBacking,
+           FALSE,                             // Fence
+           &Request.Header,
+           sizeof Request
+           );
+}
+
+EFI_STATUS
+VirtioGpuResourceDetachBacking (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   ResourceId
+  )
+{
+  volatile VIRTIO_GPU_RESOURCE_DETACH_BACKING Request;
+
+  if (ResourceId == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Request.ResourceId = ResourceId;
+  Request.Padding    = 0;
+
+  //
+  // In this case, we set Fence to TRUE, because after this function returns,
+  // the caller might reasonably want to repurpose the backing pages
+  // immediately. Thus we should ensure that the host releases all references
+  // to the backing pages before we return.
+  //
+  return VirtioGpuSendCommand (
+           VgpuDev,
+           VirtioGpuCmdResourceDetachBacking,
+           TRUE,                              // Fence
+           &Request.Header,
+           sizeof Request
+           );
+}
+
+EFI_STATUS
+VirtioGpuSetScanout (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   X,
+  IN     UINT32   Y,
+  IN     UINT32   Width,
+  IN     UINT32   Height,
+  IN     UINT32   ScanoutId,
+  IN     UINT32   ResourceId
+  )
+{
+  volatile VIRTIO_GPU_SET_SCANOUT Request;
+
+  //
+  // Unlike for most other commands, ResourceId=0 is valid; it
+  // is used to disable a scanout.
+  //
+  Request.Rectangle.X      = X;
+  Request.Rectangle.Y      = Y;
+  Request.Rectangle.Width  = Width;
+  Request.Rectangle.Height = Height;
+  Request.ScanoutId        = ScanoutId;
+  Request.ResourceId       = ResourceId;
+
+  return VirtioGpuSendCommand (
+           VgpuDev,
+           VirtioGpuCmdSetScanout,
+           FALSE,                  // Fence
+           &Request.Header,
+           sizeof Request
+           );
+}
+
+EFI_STATUS
+VirtioGpuTransferToHost2d (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   X,
+  IN     UINT32   Y,
+  IN     UINT32   Width,
+  IN     UINT32   Height,
+  IN     UINT64   Offset,
+  IN     UINT32   ResourceId
+  )
+{
+  volatile VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D Request;
+
+  if (ResourceId == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Request.Rectangle.X      = X;
+  Request.Rectangle.Y      = Y;
+  Request.Rectangle.Width  = Width;
+  Request.Rectangle.Height = Height;
+  Request.Offset           = Offset;
+  Request.ResourceId       = ResourceId;
+  Request.Padding          = 0;
+
+  return VirtioGpuSendCommand (
+           VgpuDev,
+           VirtioGpuCmdTransferToHost2d,
+           FALSE,                        // Fence
+           &Request.Header,
+           sizeof Request
+           );
+}
+
+EFI_STATUS
+VirtioGpuResourceFlush (
+  IN OUT VGPU_DEV *VgpuDev,
+  IN     UINT32   X,
+  IN     UINT32   Y,
+  IN     UINT32   Width,
+  IN     UINT32   Height,
+  IN     UINT32   ResourceId
+  )
+{
+  volatile VIRTIO_GPU_RESOURCE_FLUSH Request;
+
+  if (ResourceId == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Request.Rectangle.X      = X;
+  Request.Rectangle.Y      = Y;
+  Request.Rectangle.Width  = Width;
+  Request.Rectangle.Height = Height;
+  Request.ResourceId       = ResourceId;
+  Request.Padding          = 0;
+
+  return VirtioGpuSendCommand (
+           VgpuDev,
+           VirtioGpuCmdResourceFlush,
+           FALSE,                     // Fence
+           &Request.Header,
+           sizeof Request
+           );
 }
