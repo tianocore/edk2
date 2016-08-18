@@ -63,6 +63,22 @@ VERIFY_SIZE_OF (UINT64, 8);
 VERIFY_SIZE_OF (CHAR8, 1);
 VERIFY_SIZE_OF (CHAR16, 2);
 
+typedef enum {
+  __VerifyUint8EnumValue = 0xff
+} __VERIFY_UINT8_ENUM_SIZE;
+
+typedef enum {
+  __VerifyUint16EnumValue = 0xffff
+} __VERIFY_UINT16_ENUM_SIZE;
+
+typedef enum {
+  __VerifyUint32EnumValue = 0xffffffff
+} __VERIFY_UINT32_ENUM_SIZE;
+
+VERIFY_SIZE_OF (__VERIFY_UINT8_ENUM_SIZE, 4);
+VERIFY_SIZE_OF (__VERIFY_UINT16_ENUM_SIZE, 4);
+VERIFY_SIZE_OF (__VERIFY_UINT32_ENUM_SIZE, 4);
+
 //
 // The Microsoft* C compiler can removed references to unreferenced data items
 //  if the /OPT:REF linker option is used. We defined a macro as this is a
