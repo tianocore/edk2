@@ -822,6 +822,7 @@ Virtio10BindingSupported (
     goto CloseProtocol;
   }
 
+  Status = EFI_UNSUPPORTED;
   //
   // Recognize non-transitional modern devices. Also, we'll have to parse the
   // PCI capability list, so make sure the CapabilityPtr field will be valid.
@@ -832,9 +833,20 @@ Virtio10BindingSupported (
       Pci.Hdr.RevisionID >= 0x01 &&
       Pci.Device.SubsystemID >= 0x40 &&
       (Pci.Hdr.Status & EFI_PCI_STATUS_CAPABILITY) != 0) {
-    Status = EFI_SUCCESS;
-  } else {
-    Status = EFI_UNSUPPORTED;
+    //
+    // The virtio-vga device is special. It can be driven both as a VGA device
+    // with a linear framebuffer, and through its underlying, modern,
+    // virtio-gpu-pci device, which has no linear framebuffer itself. For
+    // compatibility with guest OSes that insist on inheriting a linear
+    // framebuffer from the firmware, we should leave virtio-vga to
+    // QemuVideoDxe, and support only virtio-gpu-pci here.
+    //
+    // Both virtio-vga and virtio-gpu-pci have DeviceId 0x1050, but only the
+    // former has device class PCI_CLASS_DISPLAY_VGA.
+    //
+    if (Pci.Hdr.DeviceId != 0x1050 || !IS_PCI_VGA (&Pci)) {
+      Status = EFI_SUCCESS;
+    }
   }
 
 CloseProtocol:
