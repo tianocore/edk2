@@ -152,8 +152,11 @@ def main():
                 # This also handles someone specifying the Conf directory in the workspace. Using --conf=Conf
                 ConfDirectoryPath = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, ConfDirectoryPath)
         else:
-            # Get standard WORKSPACE/Conf, use the absolute path to the WORKSPACE/Conf
-            ConfDirectoryPath = mws.join(GenFdsGlobalVariable.WorkSpaceDir, 'Conf')
+            if "CONF_PATH" in os.environ.keys():
+                ConfDirectoryPath = os.path.normcase(os.environ["CONF_PATH"])
+            else:
+                # Get standard WORKSPACE/Conf, use the absolute path to the WORKSPACE/Conf
+                ConfDirectoryPath = mws.join(GenFdsGlobalVariable.WorkSpaceDir, 'Conf')
         GenFdsGlobalVariable.ConfDir = ConfDirectoryPath
         BuildConfigurationFile = os.path.normpath(os.path.join(ConfDirectoryPath, "target.txt"))
         if os.path.isfile(BuildConfigurationFile) == True:

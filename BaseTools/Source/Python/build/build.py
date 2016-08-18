@@ -775,8 +775,11 @@ class Build():
                 # This also handles someone specifying the Conf directory in the workspace. Using --conf=Conf
                 ConfDirectoryPath = mws.join(self.WorkspaceDir, ConfDirectoryPath)
         else:
-            # Get standard WORKSPACE/Conf use the absolute path to the WORKSPACE/Conf
-            ConfDirectoryPath = mws.join(self.WorkspaceDir, 'Conf')
+            if "CONF_PATH" in os.environ:
+                ConfDirectoryPath = os.path.normcase(os.path.normpath(os.environ["CONF_PATH"]))
+            else:
+                # Get standard WORKSPACE/Conf use the absolute path to the WORKSPACE/Conf
+                ConfDirectoryPath = mws.join(self.WorkspaceDir, 'Conf')
         GlobalData.gConfDirectory = ConfDirectoryPath
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
 
@@ -812,7 +815,7 @@ class Build():
         if "EDK_TOOLS_BIN" in os.environ:
             # Print the same path style with WORKSPACE env. 
             EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_BIN", os.path.normcase(os.path.normpath(os.environ["EDK_TOOLS_BIN"]))))
-
+        EdkLogger.quiet("%-16s = %s" % ("CONF_PATH", GlobalData.gConfDirectory))
         self.InitPreBuild()
         self.InitPostBuild()
         if self.PrebuildScript:
