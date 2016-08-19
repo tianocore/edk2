@@ -2726,6 +2726,9 @@ NetLibAsciiStrToIp4 (
     TempStr = Ip4Str;
 
     while ((*Ip4Str != '\0') && (*Ip4Str != '.')) {
+      if (!NET_IS_DIGIT (*Ip4Str)) {
+        return EFI_INVALID_PARAMETER;
+      }
       Ip4Str++;
     }
 
