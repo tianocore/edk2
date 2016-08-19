@@ -92,6 +92,7 @@ MicrocodeDetect (
   PlatformId = (UINT8) PlatformIdMsr.Bits.PlatformId;
 
   LatestRevision = 0;
+  MicrocodeData  = NULL;
   MicrocodeEnd = (UINTN) (MicrocodePatchAddress + MicrocodePatchRegionSize);
   MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (UINTN) MicrocodePatchAddress;
   do {
@@ -198,6 +199,7 @@ MicrocodeDetect (
     // Revision. A processor with no loaded update is considered to have a
     // revision equal to zero.
     //
+    ASSERT (MicrocodeData != NULL);
     AsmWriteMsr64 (
         MSR_IA32_BIOS_UPDT_TRIG,
         (UINT64) (UINTN) MicrocodeData
