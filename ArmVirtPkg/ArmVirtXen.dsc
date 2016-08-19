@@ -232,6 +232,5 @@
   # ACPI support
   #
 !if $(ARCH) == AARCH64
-  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   ArmVirtPkg/XenAcpiPlatformDxe/XenAcpiPlatformDxe.inf
 !endif
