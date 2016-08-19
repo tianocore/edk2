@@ -3,7 +3,7 @@
   NVM Express specification.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -895,12 +895,16 @@ NvmExpressBuildDevicePath (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NamespaceId == 0) {
-    return EFI_NOT_FOUND;
-  }
-
   Status  = EFI_SUCCESS;
   Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
+
+  //
+  // Check NamespaceId is valid or not.
+  //
+  if ((NamespaceId == 0) ||
+    (NamespaceId > Private->ControllerData->Nn)) {
+    return EFI_NOT_FOUND;
+  }
 
   Node = (NVME_NAMESPACE_DEVICE_PATH *)AllocateZeroPool (sizeof (NVME_NAMESPACE_DEVICE_PATH));
   if (Node == NULL) {
