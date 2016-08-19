@@ -188,6 +188,11 @@ READ_LOCK_STATUS   = TRUE
   INF ArmVirtPkg/XenAcpiPlatformDxe/XenAcpiPlatformDxe.inf
 !endif
 
+ #
+ # Ramdisk support
+ #
+ INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
