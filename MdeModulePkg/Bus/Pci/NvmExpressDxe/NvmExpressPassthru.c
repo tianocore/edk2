@@ -820,6 +820,7 @@ NvmExpressGetNamespace (
   )
 {
   NVME_NAMESPACE_DEVICE_PATH       *Node;
+  NVME_CONTROLLER_PRIVATE_DATA     *Private;
 
   if ((This == NULL) || (DevicePath == NULL) || (NamespaceId == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -829,10 +830,19 @@ NvmExpressGetNamespace (
     return EFI_UNSUPPORTED;
   }
 
-  Node = (NVME_NAMESPACE_DEVICE_PATH *)DevicePath;
+  Node    = (NVME_NAMESPACE_DEVICE_PATH *)DevicePath;
+  Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
 
   if (DevicePath->SubType == MSG_NVME_NAMESPACE_DP) {
     if (DevicePathNodeLength(DevicePath) != sizeof(NVME_NAMESPACE_DEVICE_PATH)) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // Check NamespaceId in the device path node is valid or not.
+    //
+    if ((Node->NamespaceId == 0) ||
+      (Node->NamespaceId > Private->ControllerData->Nn)) {
       return EFI_NOT_FOUND;
     }
 
