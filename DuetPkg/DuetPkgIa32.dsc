@@ -105,6 +105,7 @@
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
+  MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 
   #
   # To save size, use NULL library for DebugLib and ReportStatusCodeLib.
