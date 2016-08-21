@@ -79,42 +79,6 @@ PCI_HOST_BRIDGE_INSTANCE mPciHostBridgeInstanceTemplate = {
 // Implementation
 //
 
-STATIC
-VOID
-SetLinuxPciProbeOnlyProperty (
-  IN FDT_CLIENT_PROTOCOL         *FdtClient
-  )
-{
-  INT32         Node;
-  UINT32        Tmp;
-  EFI_STATUS    Status;
-
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    //
-    // Set the /chosen/linux,pci-probe-only property to 1, so that the PCI
-    // setup we will perform in the firmware is honored by the Linux OS,
-    // rather than torn down and done from scratch. This is generally a more
-    // sensible approach, and aligns with what ACPI based OSes do typically.
-    //
-    // In case we are exposing an emulated VGA PCI device to the guest, which
-    // may subsequently get exposed via the Graphics Output protocol and
-    // driven as an efifb by Linux, we need this setting to prevent the
-    // framebuffer from becoming unresponsive.
-    //
-    Status = FdtClient->GetOrInsertChosenNode (FdtClient, &Node);
-
-    if (!EFI_ERROR (Status)) {
-      Tmp = SwapBytes32 (1);
-      Status = FdtClient->SetNodeProperty (FdtClient, Node,
-                            "linux,pci-probe-only", &Tmp, sizeof (Tmp));
-    }
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN,
-        "Failed to set /chosen/linux,pci-probe-only property\n"));
-    }
-  }
-}
-
 //
 // We expect the "ranges" property of "pci-host-ecam-generic" to consist of
 // records like this.
@@ -292,8 +256,6 @@ ProcessPciHost (
   // and should match the value we found in the DT node.
   //
   ASSERT (PcdGet64 (PcdPciExpressBaseAddress) == ConfigBase);
-
-  SetLinuxPciProbeOnlyProperty (FdtClient);
 
   DEBUG ((EFI_D_INFO, "%a: Config[0x%Lx+0x%Lx) Bus[0x%x..0x%x] "
     "Io[0x%Lx+0x%Lx)@0x%Lx Mem[0x%Lx+0x%Lx)@0x%Lx\n", __FUNCTION__, ConfigBase,
