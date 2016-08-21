@@ -87,8 +87,10 @@ EFI_STATUS
 ProcessPciHost (
   OUT  UINT64    *IoBase,
   OUT  UINT64    *IoSize,
-  OUT  UINT64    *MmioBase,
-  OUT  UINT64    *MmioSize,
+  OUT  UINT64    *Mmio32Base,
+  OUT  UINT64    *Mmio32Size,
+  OUT  UINT64    *Mmio64Base,
+  OUT  UINT64    *Mmio64Size,
   OUT  UINT32    *BusMin,
   OUT  UINT32    *BusMax
   )
@@ -101,7 +103,8 @@ ProcessPciHost (
   UINT32                      RecordIdx;
   EFI_STATUS                  Status;
   UINT64                      IoTranslation;
-  UINT64                      MmioTranslation;
+  UINT64                      Mmio32Translation;
+  UINT64                      Mmio64Translation;
 
   //
   // The following output arguments are initialized only in
@@ -109,17 +112,19 @@ ProcessPciHost (
   // *incorrectly* emitted by some gcc versions.
   //
   *IoBase = 0;
-  *MmioBase = 0;
+  *Mmio32Base = 0;
+  *Mmio64Base = MAX_UINT64;
   *BusMin = 0;
   *BusMax = 0;
 
   //
-  // *IoSize, *MmioSize and IoTranslation are initialized to zero because the
+  // *IoSize, *Mmio##Size and IoTranslation are initialized to zero because the
   // logic below requires it. However, since they are also affected by the issue
   // reported above, they are initialized early.
   //
   *IoSize = 0;
-  *MmioSize = 0;
+  *Mmio32Size = 0;
+  *Mmio64Size = 0;
   IoTranslation = 0;
 
   Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
@@ -209,28 +214,43 @@ ProcessPciHost (
       break;
 
     case DTB_PCI_HOST_RANGE_MMIO32:
-      *MmioBase = SwapBytes64 (Record->ChildBase);
-      *MmioSize = SwapBytes64 (Record->Size);
-      MmioTranslation = SwapBytes64 (Record->CpuBase) - *MmioBase;
+      *Mmio32Base = SwapBytes64 (Record->ChildBase);
+      *Mmio32Size = SwapBytes64 (Record->Size);
+      Mmio32Translation = SwapBytes64 (Record->CpuBase) - *Mmio32Base;
 
-      if (*MmioBase > MAX_UINT32 || *MmioSize > MAX_UINT32 ||
-          *MmioBase + *MmioSize > SIZE_4GB) {
+      if (*Mmio32Base > MAX_UINT32 || *Mmio32Size > MAX_UINT32 ||
+          *Mmio32Base + *Mmio32Size > SIZE_4GB) {
         DEBUG ((EFI_D_ERROR, "%a: MMIO32 space invalid\n", __FUNCTION__));
         return EFI_PROTOCOL_ERROR;
       }
 
-      ASSERT (PcdGet64 (PcdPciMmio32Translation) == MmioTranslation);
+      ASSERT (PcdGet64 (PcdPciMmio32Translation) == Mmio32Translation);
 
-      if (MmioTranslation != 0) {
+      if (Mmio32Translation != 0) {
         DEBUG ((EFI_D_ERROR, "%a: unsupported nonzero MMIO32 translation "
-          "0x%Lx\n", __FUNCTION__, MmioTranslation));
+          "0x%Lx\n", __FUNCTION__, Mmio32Translation));
+        return EFI_UNSUPPORTED;
+      }
+
+      break;
+
+    case DTB_PCI_HOST_RANGE_MMIO64:
+      *Mmio64Base = SwapBytes64 (Record->ChildBase);
+      *Mmio64Size = SwapBytes64 (Record->Size);
+      Mmio64Translation = SwapBytes64 (Record->CpuBase) - *Mmio64Base;
+
+      ASSERT (PcdGet64 (PcdPciMmio64Translation) == Mmio64Translation);
+
+      if (Mmio64Translation != 0) {
+        DEBUG ((EFI_D_ERROR, "%a: unsupported nonzero MMIO64 translation "
+          "0x%Lx\n", __FUNCTION__, Mmio64Translation));
         return EFI_UNSUPPORTED;
       }
 
       break;
     }
   }
-  if (*IoSize == 0 || *MmioSize == 0) {
+  if (*IoSize == 0 || *Mmio32Size == 0) {
     DEBUG ((EFI_D_ERROR, "%a: %a space empty\n", __FUNCTION__,
       (*IoSize == 0) ? "IO" : "MMIO32"));
     return EFI_PROTOCOL_ERROR;
@@ -243,9 +263,9 @@ ProcessPciHost (
   ASSERT (PcdGet64 (PcdPciExpressBaseAddress) == ConfigBase);
 
   DEBUG ((EFI_D_INFO, "%a: Config[0x%Lx+0x%Lx) Bus[0x%x..0x%x] "
-    "Io[0x%Lx+0x%Lx)@0x%Lx Mem[0x%Lx+0x%Lx)@0x0\n", __FUNCTION__, ConfigBase,
-    ConfigSize, *BusMin, *BusMax, *IoBase, *IoSize, IoTranslation, *MmioBase,
-    *MmioSize));
+    "Io[0x%Lx+0x%Lx)@0x%Lx Mem32[0x%Lx+0x%Lx)@0x0 Mem64[0x%Lx+0x%Lx)@0x0\n",
+    __FUNCTION__, ConfigBase, ConfigSize, *BusMin, *BusMax, *IoBase, *IoSize,
+    IoTranslation, *Mmio32Base, *Mmio32Size, *Mmio64Base, *Mmio64Size));
   return EFI_SUCCESS;
 }
 
@@ -268,6 +288,7 @@ PciHostBridgeGetRootBridges (
 {
   UINT64              IoBase, IoSize;
   UINT64              Mmio32Base, Mmio32Size;
+  UINT64              Mmio64Base, Mmio64Size;
   UINT32              BusMin, BusMax;
   EFI_STATUS          Status;
 
@@ -278,8 +299,8 @@ PciHostBridgeGetRootBridges (
     return NULL;
   }
 
-  Status = ProcessPciHost (&IoBase, &IoSize, &Mmio32Base, &Mmio32Size, &BusMin,
-             &BusMax);
+  Status = ProcessPciHost (&IoBase, &IoSize, &Mmio32Base, &Mmio32Size,
+             &Mmio64Base, &Mmio64Size, &BusMin, &BusMax);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "%a: failed to discover PCI host bridge: %r\n",
       __FUNCTION__, Status));
@@ -308,8 +329,23 @@ PciHostBridgeGetRootBridges (
   mRootBridge.Io.Limit              = IoBase + IoSize - 1;
   mRootBridge.Mem.Base              = Mmio32Base;
   mRootBridge.Mem.Limit             = Mmio32Base + Mmio32Size - 1;
-  mRootBridge.MemAbove4G.Base       = MAX_UINT64;
-  mRootBridge.MemAbove4G.Limit      = 0;
+
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    mRootBridge.MemAbove4G.Base       = Mmio64Base;
+    mRootBridge.MemAbove4G.Limit      = Mmio64Base + Mmio64Size - 1;
+    if (Mmio64Size > 0) {
+      mRootBridge.AllocationAttributes |= EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
+    }
+  } else {
+    //
+    // UEFI mandates a 1:1 virtual-to-physical mapping, so on a 32-bit
+    // architecture such as ARM, we will not be able to access 64-bit MMIO
+    // BARs unless they are allocated below 4 GB. So ignore the range above
+    // 4 GB in this case.
+    //
+    mRootBridge.MemAbove4G.Base       = MAX_UINT64;
+    mRootBridge.MemAbove4G.Limit      = 0;
+  }
 
   //
   // No separate ranges for prefetchable and non-prefetchable BARs

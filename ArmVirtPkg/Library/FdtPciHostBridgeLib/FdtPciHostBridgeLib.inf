@@ -47,6 +47,7 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdPciMmio32Translation
+  gArmTokenSpaceGuid.PcdPciMmio64Translation
 
 [Pcd]
   gArmTokenSpaceGuid.PcdPciIoTranslation
