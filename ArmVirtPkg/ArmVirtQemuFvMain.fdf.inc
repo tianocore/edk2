@@ -156,7 +156,8 @@ READ_LOCK_STATUS   = TRUE
   #
   # PCI support
   #
-  INF ArmVirtPkg/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   INF OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   INF OvmfPkg/Virtio10Dxe/Virtio10.inf
