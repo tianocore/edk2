@@ -11,7 +11,7 @@
 # must ensure that files that are required by the cx_freeze frozen binaries are 
 # present in the Bin\Win32 directory.
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -58,11 +58,18 @@ Trim.exe
 UPT.exe
 VfrCompile.exe
 VolInfo.exe
+Pkcs7Sign.exe
 
 [ExtraFiles.Win32]
 TestSigningPrivateKey.pem
 config.ini
 exception.xml
+TestCert.pem
+TestCert.pub.pem
+TestRoot.pem
+TestRoot.pub.pem
+TestSub.pem
+TestSub.pub.pem
 
 [CxFreeze.Win32]
 _ctypes.pyd
