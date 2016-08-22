@@ -683,6 +683,20 @@ WriteSections64 (
     }
 
     //
+    // If this is a ET_DYN (PIE) executable, we will encounter a dynamic SHT_RELA
+    // section that applies to the entire binary, and which will have its section
+    // index set to #0 (which is a NULL section with the SHF_ALLOC bit cleared).
+    //
+    // In the absence of GOT based relocations (which we currently don't support),
+    // this RELA section will contain redundant R_xxx_RELATIVE relocations, one
+    // for every R_xxx_xx64 relocation appearing in the per-section RELA sections.
+    // (i.e., .rela.text and .rela.data)
+    //
+    if (RelShdr->sh_info == 0) {
+      continue;
+    }
+
+    //
     // Relocation section found.  Now extract section information that the relocations
     // apply to in the ELF data and the new COFF data.
     //
