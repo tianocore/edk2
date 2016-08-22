@@ -2,7 +2,7 @@
 
   Functions to get info and load PE/COFF image.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -336,7 +336,7 @@ Returns:
   //
   if ((!(ImageContext->IsTeImage)) && ((PeHdr->Pe32.FileHeader.Characteristics & EFI_IMAGE_FILE_RELOCS_STRIPPED) != 0)) {
     ImageContext->RelocationsStripped = TRUE;
-  } else if ((ImageContext->IsTeImage) && (TeHdr->DataDirectory[0].Size == 0)) {
+  } else if ((ImageContext->IsTeImage) && (TeHdr->DataDirectory[0].Size == 0) && (TeHdr->DataDirectory[0].VirtualAddress == 0)) {
     ImageContext->RelocationsStripped = TRUE;
   } else {
     ImageContext->RelocationsStripped = FALSE;
