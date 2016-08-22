@@ -375,6 +375,7 @@ NvmExpressPassThru (
   UINT64                         *Prp;
   VOID                           *PrpListHost;
   UINTN                          PrpListNo;
+  UINT32                         Attributes;
   UINT32                         IoAlign;
   UINT32                         Data;
   NVME_PASS_THRU_ASYNC_REQ       *AsyncRequest;
@@ -396,9 +397,20 @@ NvmExpressPassThru (
   }
 
   //
+  // 'Attributes' with neither EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_LOGICAL nor
+  // EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL set is an illegal
+  // configuration.
+  //
+  Attributes  = This->Mode->Attributes;
+  if ((Attributes & (EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL |
+    EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_LOGICAL)) == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // Buffer alignment check for TransferBuffer & MetadataBuffer.
   //
-  IoAlign = This->Mode->IoAlign;
+  IoAlign     = This->Mode->IoAlign;
   if (IoAlign > 0 && (((UINTN) Packet->TransferBuffer & (IoAlign - 1)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
