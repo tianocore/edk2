@@ -6,7 +6,7 @@
 # ARCH = ia64 or IA64 for IA64 build
 # ARCH = Arm or ARM for ARM build
 #
-# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -21,12 +21,12 @@ CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
 LINUX:=$(findstring Linux, $(shell uname -s))
 DARWIN:=$(findstring Darwin, $(shell uname -s))
 
-CC ?= gcc
-CXX ?= g++
-AS ?= gcc
-AR ?= ar
-LD ?= ld
-LINKER ?= $(CC)
+BUILD_CC ?= gcc
+BUILD_CXX ?= g++
+BUILD_AS ?= gcc
+BUILD_AR ?= ar
+BUILD_LD ?= ld
+LINKER ?= $(BUILD_CC)
 ifeq ($(ARCH), IA32)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/Ia32/
 endif
@@ -44,14 +44,14 @@ ARCH_INCLUDE = -I $(MAKEROOT)/Include/AArch64/
 endif
 
 INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE) 
-CPPFLAGS = $(INCLUDE)
+BUILD_CPPFLAGS = $(INCLUDE)
 ifeq ($(DARWIN),Darwin)
 # assume clang or clang compatible flags on OS X
-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -nostdlib -c -g
+BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -nostdlib -c -g
 else
-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -nostdlib -c -g
+BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -nostdlib -c -g
 endif
-LFLAGS =
+BUILD_LFLAGS =
 
 ifeq ($(ARCH), IA32)
 #
@@ -60,9 +60,9 @@ ifeq ($(ARCH), IA32)
 #  so only do this is uname -m returns i386.
 #
 ifeq ($(DARWIN),Darwin)
-  CFLAGS   += -arch i386
-  CPPFLAGS += -arch i386
-  LFLAGS   += -arch i386
+  BUILD_CFLAGS   += -arch i386
+  BUILD_CPPFLAGS += -arch i386
+  BUILD_LFLAGS   += -arch i386
 endif
 endif
 
