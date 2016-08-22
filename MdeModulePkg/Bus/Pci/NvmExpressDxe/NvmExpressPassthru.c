@@ -357,27 +357,28 @@ NvmExpressPassThru (
   IN     EFI_EVENT                                   Event OPTIONAL
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA  *Private;
-  EFI_STATUS                    Status;
-  EFI_PCI_IO_PROTOCOL           *PciIo;
-  NVME_SQ                       *Sq;
-  NVME_CQ                       *Cq;
-  UINT16                        QueueId;
-  UINT32                        Bytes;
-  UINT16                        Offset;
-  EFI_EVENT                     TimerEvent;
-  EFI_PCI_IO_PROTOCOL_OPERATION Flag;
-  EFI_PHYSICAL_ADDRESS          PhyAddr;
-  VOID                          *MapData;
-  VOID                          *MapMeta;
-  VOID                          *MapPrpList;
-  UINTN                         MapLength;
-  UINT64                        *Prp;
-  VOID                          *PrpListHost;
-  UINTN                         PrpListNo;
-  UINT32                        Data;
-  NVME_PASS_THRU_ASYNC_REQ      *AsyncRequest;
-  EFI_TPL                       OldTpl;
+  NVME_CONTROLLER_PRIVATE_DATA   *Private;
+  EFI_STATUS                     Status;
+  EFI_PCI_IO_PROTOCOL            *PciIo;
+  NVME_SQ                        *Sq;
+  NVME_CQ                        *Cq;
+  UINT16                         QueueId;
+  UINT32                         Bytes;
+  UINT16                         Offset;
+  EFI_EVENT                      TimerEvent;
+  EFI_PCI_IO_PROTOCOL_OPERATION  Flag;
+  EFI_PHYSICAL_ADDRESS           PhyAddr;
+  VOID                           *MapData;
+  VOID                           *MapMeta;
+  VOID                           *MapPrpList;
+  UINTN                          MapLength;
+  UINT64                         *Prp;
+  VOID                           *PrpListHost;
+  UINTN                          PrpListNo;
+  UINT32                         IoAlign;
+  UINT32                         Data;
+  NVME_PASS_THRU_ASYNC_REQ       *AsyncRequest;
+  EFI_TPL                        OldTpl;
 
   //
   // check the data fields in Packet parameter.
@@ -391,6 +392,18 @@ NvmExpressPassThru (
   }
 
   if (Packet->QueueType != NVME_ADMIN_QUEUE && Packet->QueueType != NVME_IO_QUEUE) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Buffer alignment check for TransferBuffer & MetadataBuffer.
+  //
+  IoAlign = This->Mode->IoAlign;
+  if (IoAlign > 0 && (((UINTN) Packet->TransferBuffer & (IoAlign - 1)) != 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (IoAlign > 0 && (((UINTN) Packet->MetadataBuffer & (IoAlign - 1)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
