@@ -216,14 +216,4 @@ class CapsulePayload(CapsuleData):
                        VendorFileSize,
                        int(self.HardwareInstance, 16)
                        )
-        #
-        # Append file content to the structure
-        #
-        ImageFile = open(self.ImageFile, 'rb')
-        Buffer += ImageFile.read()
-        ImageFile.close()
-        if self.VendorCodeFile:
-            VendorFile = open(self.VendorCodeFile, 'rb')
-            Buffer += VendorFile.read()
-            VendorFile.close()
         return Buffer
