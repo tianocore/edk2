@@ -2,7 +2,7 @@
   Main file for Echo shell level 3 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,12 @@
 
 #include <Library/ShellLib.h>
 
+STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
+  {L"-on", TypeFlag},
+  {L"-off", TypeFlag},
+  {NULL, TypeMax}
+  };
+
 /**
   Function for 'echo' command.
 
@@ -30,73 +36,86 @@ ShellCommandRunEcho (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  CHAR16              *RawCmdLine;
-  SHELL_STATUS        Status;
+  EFI_STATUS          Status;
+  LIST_ENTRY          *Package;
+  SHELL_STATUS        ShellStatus;
+  UINTN               ParamCount;
+  CHAR16              *ProblemParam;
   UINTN               Size;
-  CHAR16              *Walker;
-  CHAR16              *TempParameter;
-  BOOLEAN             OnFlag;
-  BOOLEAN             OffFlag;
-  UINTN               Count;
+  CHAR16              *PrintString;
 
-  RawCmdLine = ShellGetRawCmdLine ();
-  if (RawCmdLine == NULL) {
-    return SHELL_OUT_OF_RESOURCES;
-  }
+  Size                = 0;
+  ProblemParam        = NULL;
+  PrintString         = NULL;
+  ShellStatus         = SHELL_SUCCESS;
 
-  OnFlag  = FALSE;
-  OffFlag = FALSE;
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize();
+  ASSERT_EFI_ERROR(Status);
 
-  Size = StrSize (RawCmdLine);
-  TempParameter  = AllocateZeroPool(Size);
-  if (TempParameter == NULL) {
-    Status = SHELL_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
-  for ( Count = 0
-      , Walker = RawCmdLine
-      ; Walker != NULL && *Walker != CHAR_NULL
-      ; Count++
-      ) {
-    if (EFI_ERROR (ShellGetNextParameter (&Walker, TempParameter, Size, FALSE))) {
-      break;
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, TRUE);
+  if (EFI_ERROR(Status)) {
+    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"echo", ProblemParam);  
+      FreePool(ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT(FALSE);
     }
-
-    if (Count == 1) {
-      if (gUnicodeCollation->StriColl(gUnicodeCollation, TempParameter, L"-on") == 0 ) {
-        OnFlag = TRUE;
+  } else {
+    //
+    // check for "-?"
+    //
+    if (ShellCommandLineGetFlag(Package, L"-?")) {
+      ASSERT(FALSE);
+    }
+    if (ShellCommandLineGetFlag(Package, L"-on")) {
+      //
+      // Turn it on
+      //
+      ShellCommandSetEchoState(TRUE);
+    } else if (ShellCommandLineGetFlag(Package, L"-off")) {
+      //
+      // turn it off
+      //
+      ShellCommandSetEchoState(FALSE);
+    } else if (ShellCommandLineGetRawValue(Package, 1) == NULL) {
+      //
+      // output its current state
+      //
+      if (ShellCommandGetEchoState()) {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_ECHO_ON), gShellLevel3HiiHandle);
+      } else {
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_ECHO_OFF), gShellLevel3HiiHandle);
       }
-      if (gUnicodeCollation->StriColl(gUnicodeCollation, TempParameter, L"-off") == 0 ) {
-        OffFlag = TRUE;
+    } else {
+      //
+      // print the line
+      //
+      for ( ParamCount = 1
+          ; ShellCommandLineGetRawValue(Package, ParamCount) != NULL
+          ; ParamCount++
+         ) {
+        StrnCatGrow(&PrintString, &Size, ShellCommandLineGetRawValue(Package, ParamCount), 0);
+        if (ShellCommandLineGetRawValue(Package, ParamCount+1) != NULL) {
+          StrnCatGrow(&PrintString, &Size, L" ", 0);
+        } 
       }
-    }
-  }
-
-  if (OnFlag || OffFlag) {
-    if (Count != 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_ECHO_INVALID_PARAM), gShellLevel3HiiHandle, L"echo", L"-on/-off");
-      Status = SHELL_INVALID_PARAMETER;
-      goto Done;
+      ShellPrintEx(-1, -1, L"%s\r\n", PrintString);
+      SHELL_FREE_NON_NULL(PrintString);
     }
 
-    ShellCommandSetEchoState(OnFlag);
-    Status = SHELL_SUCCESS;
-    goto Done;
+    //
+    // free the command line package
+    //
+    ShellCommandLineFreeVarList (Package);
   }
 
-  Walker = RawCmdLine + StrLen (L"echo");
-  if  (*Walker != CHAR_NULL) {
-    Walker++;
-    ShellPrintEx (-1, -1, L"%s\r\n", Walker);
-  }
-
-  Status = SHELL_SUCCESS;
-
-Done:
-  SHELL_FREE_NON_NULL (TempParameter);
-  SHELL_FREE_NON_NULL (RawCmdLine);
-  return Status;
-
+  return (ShellStatus);
 }
 
