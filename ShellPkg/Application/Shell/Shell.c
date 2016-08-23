@@ -213,7 +213,7 @@ ContainsSplit(
 
   FirstQuote    = FindNextInstance (CmdLine, L"\"", TRUE);
   SecondQuote   = NULL;
-  TempSpot      = ShellFindFirstCharacter(CmdLine, L"|", TRUE);
+  TempSpot      = FindFirstCharacter(CmdLine, L"|", L'^');
 
   if (FirstQuote == NULL    || 
       TempSpot == NULL      || 
@@ -236,7 +236,7 @@ ContainsSplit(
       continue;
     } else {
       FirstQuote = FindNextInstance (SecondQuote + 1, L"\"", TRUE);
-      TempSpot = ShellFindFirstCharacter(TempSpot + 1, L"|", TRUE);
+      TempSpot = FindFirstCharacter(TempSpot + 1, L"|", L'^');
       continue;
     } 
   }
@@ -716,7 +716,6 @@ FreeResources:
   }
 
   ShellFreeEnvVarList ();
-  ShellSetRawCmdLine (NULL);
 
   if (ShellCommandGetExit()) {
     return ((EFI_STATUS)ShellCommandGetExitCode());
@@ -1993,7 +1992,7 @@ IsValidSplit(
       return (EFI_OUT_OF_RESOURCES);
     }
     TempWalker = (CHAR16*)Temp;
-    if (!EFI_ERROR (ShellGetNextParameter (&TempWalker, FirstParameter, StrSize(CmdLine), TRUE))) {
+    if (!EFI_ERROR(GetNextParameter(&TempWalker, &FirstParameter, StrSize(CmdLine), TRUE))) {
       if (GetOperationType(FirstParameter) == Unknown_Invalid) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
         SetLastError(SHELL_NOT_FOUND);
@@ -2042,7 +2041,7 @@ VerifySplit(
   //
   // recurse to verify the next item
   //
-  TempSpot = ShellFindFirstCharacter(CmdLine, L"|", TRUE) + 1;
+  TempSpot = FindFirstCharacter(CmdLine, L"|", L'^') + 1;
   if (*TempSpot == L'a' && 
       (*(TempSpot + 1) == L' ' || *(TempSpot + 1) == CHAR_NULL)
      ) {
@@ -2159,7 +2158,7 @@ DoHelpUpdate(
 
   Walker = *CmdLine;
   while(Walker != NULL && *Walker != CHAR_NULL) {
-    if (!EFI_ERROR (ShellGetNextParameter (&Walker, CurrentParameter, StrSize(*CmdLine), TRUE))) {
+    if (!EFI_ERROR(GetNextParameter(&Walker, &CurrentParameter, StrSize(*CmdLine), TRUE))) {
       if (StrStr(CurrentParameter, L"-?") == CurrentParameter) {
         CurrentParameter[0] = L' ';
         CurrentParameter[1] = L' ';
@@ -2590,7 +2589,6 @@ RunShellCommand(
   CHAR16                    *FirstParameter;
   CHAR16                    *TempWalker;
   SHELL_OPERATION_TYPES     Type;
-  CHAR16                    *OldCmdLine;
 
   ASSERT(CmdLine != NULL);
   if (StrLen(CmdLine) == 0) {
@@ -2598,14 +2596,11 @@ RunShellCommand(
   }
 
   Status              = EFI_SUCCESS;
-  FirstParameter      = NULL;
   CleanOriginal       = NULL;
-  OldCmdLine          = NULL;
 
   CleanOriginal = StrnCatGrow(&CleanOriginal, NULL, CmdLine, 0);
   if (CleanOriginal == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
+    return (EFI_OUT_OF_RESOURCES);
   }
 
   TrimSpaces(&CleanOriginal);
@@ -2632,36 +2627,35 @@ RunShellCommand(
   // Handle case that passed in command line is just 1 or more " " characters.
   //
   if (StrLen (CleanOriginal) == 0) {
-    Status = EFI_SUCCESS;
-    goto Done;
+    SHELL_FREE_NON_NULL(CleanOriginal);
+    return (EFI_SUCCESS);
   }
 
   Status = ProcessCommandLineToFinal(&CleanOriginal);
   if (EFI_ERROR(Status)) {
-    goto Done;
+    SHELL_FREE_NON_NULL(CleanOriginal);
+    return (Status);
   }
-
-  OldCmdLine = ShellGetRawCmdLine ();
-  ShellSetRawCmdLine (CleanOriginal);
 
   //
   // We don't do normal processing with a split command line (output from one command input to another)
   //
   if (ContainsSplit(CleanOriginal)) {
     Status = ProcessNewSplitCommandLine(CleanOriginal);
-    goto Done;
-  }
+    SHELL_FREE_NON_NULL(CleanOriginal);
+    return (Status);
+  } 
 
   //
   // We need the first parameter information so we can determine the operation type
   //
   FirstParameter = AllocateZeroPool(StrSize(CleanOriginal));
   if (FirstParameter == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
+    SHELL_FREE_NON_NULL(CleanOriginal);
+    return (EFI_OUT_OF_RESOURCES);
   }
   TempWalker = CleanOriginal;
-  if (!EFI_ERROR (ShellGetNextParameter (&TempWalker, FirstParameter, StrSize(CleanOriginal), TRUE))) {
+  if (!EFI_ERROR(GetNextParameter(&TempWalker, &FirstParameter, StrSize(CleanOriginal), TRUE))) {
     //
     // Depending on the first parameter we change the behavior
     //
@@ -2686,12 +2680,9 @@ RunShellCommand(
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
     SetLastError(SHELL_NOT_FOUND);
   }
-
-Done:
-  ShellSetRawCmdLine (OldCmdLine);
-  SHELL_FREE_NON_NULL (OldCmdLine);
-  SHELL_FREE_NON_NULL (CleanOriginal);
-  SHELL_FREE_NON_NULL (FirstParameter);
+ 
+  SHELL_FREE_NON_NULL(CleanOriginal);
+  SHELL_FREE_NON_NULL(FirstParameter);
 
   return (Status);
 }
@@ -3129,3 +3120,37 @@ RunScriptFile (
   return (Status);
 }
 
+/**
+  Return the pointer to the first occurrence of any character from a list of characters.
+
+  @param[in] String           the string to parse
+  @param[in] CharacterList    the list of character to look for
+  @param[in] EscapeCharacter  An escape character to skip
+
+  @return the location of the first character in the string
+  @retval CHAR_NULL no instance of any character in CharacterList was found in String
+**/
+CONST CHAR16*
+EFIAPI
+FindFirstCharacter(
+  IN CONST CHAR16 *String,
+  IN CONST CHAR16 *CharacterList,
+  IN CONST CHAR16 EscapeCharacter
+  )
+{
+  UINT32 WalkChar;
+  UINT32 WalkStr;
+
+  for (WalkStr = 0; WalkStr < StrLen(String); WalkStr++) {
+    if (String[WalkStr] == EscapeCharacter) {
+      WalkStr++;
+      continue;
+    }
+    for (WalkChar = 0; WalkChar < StrLen(CharacterList); WalkChar++) {
+      if (String[WalkStr] == CharacterList[WalkChar]) {
+        return (&String[WalkStr]);
+      }
+    }
+  }
+  return (String + StrLen(String));
+}
