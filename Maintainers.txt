@@ -127,12 +127,24 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkPkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
 M: Jeff Fan <jeff.fan@intel.com>
 
+IntelFsp2Pkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
+M: Jiewen Yao <jiewen.yao@intel.com>
+
+IntelFsp2WrapperPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
+M: Jiewen Yao <jiewen.yao@intel.com>
+
 IntelFspPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFspPkg
 M: Jiewen Yao <jiewen.yao@intel.com>
 
 IntelFspWrapperPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFspWrapperPkg
+M: Jiewen Yao <jiewen.yao@intel.com>
+
+IntelSiliconPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/IntelSiliconPkg
 M: Jiewen Yao <jiewen.yao@intel.com>
 
 MdeModulePkg
