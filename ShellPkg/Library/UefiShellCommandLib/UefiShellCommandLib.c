@@ -30,7 +30,6 @@ STATIC UINTN                              mProfileListSize;
 STATIC UINTN                              mFsMaxCount = 0;
 STATIC UINTN                              mBlkMaxCount = 0;
 STATIC BUFFER_LIST                        mFileHandleList;
-STATIC CHAR16                             *mRawCmdLine = NULL;
 
 STATIC CONST CHAR8 Hex[] = {
   '0',
@@ -1867,50 +1866,6 @@ ShellFileHandleEof(
   FreePool (Info);
 
   return (RetVal);
-}
-
-/**
-  Function to get the original CmdLine string for current command.
-
-  @return     A pointer to the buffer of the original command string.
-              It's the caller's responsibility to free the buffer.
-**/
-CHAR16*
-EFIAPI
-ShellGetRawCmdLine (
-  VOID
-  )
-{
-  if (mRawCmdLine == NULL) {
-    return NULL;
-  } else {
-    return AllocateCopyPool(StrSize(mRawCmdLine), mRawCmdLine);
-  }
-}
-
-/**
-  Function to store the raw command string.
-
-  The alias and variables have been replaced and spaces are trimmed.
-
-  @param[in] CmdLine     the command line string to store.
-**/
-VOID
-EFIAPI
-ShellSetRawCmdLine (
-  IN CONST CHAR16     *CmdLine
-  )
-{
-  SHELL_FREE_NON_NULL(mRawCmdLine);
-
-  if (CmdLine != NULL) {
-    //
-    // The spaces in the beginning and end are trimmed.
-    //
-    ASSERT (*CmdLine != L' ');
-    ASSERT (CmdLine[StrLen (CmdLine) - 1] != L' ');
-    mRawCmdLine = AllocateCopyPool (StrSize(CmdLine), CmdLine);
-  }
 }
 
 /**

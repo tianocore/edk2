@@ -670,29 +670,6 @@ ShellFileHandleEof(
   IN SHELL_FILE_HANDLE Handle
   );
 
-/**
-  Function to get the original CmdLine string for current command.
-
-  @return     A pointer to the buffer of the original command string.
-              It's the caller's responsibility to free the buffer.
-**/
-CHAR16*
-EFIAPI
-ShellGetRawCmdLine (
-  VOID
-  );
-
-/**
-  Function to store the orgignal command string into mOriginalCmdLine.
-
-  @param[in] CmdLine     the command line string to store.
-**/
-VOID
-EFIAPI
-ShellSetRawCmdLine (
-  IN CONST CHAR16     *CmdLine
-  );
-
 typedef struct {
   LIST_ENTRY    Link;
   void          *Buffer;
