@@ -119,7 +119,8 @@ typedef enum {
   CacheWriteCombining = 1,
   CacheWriteThrough   = 4,
   CacheWriteProtected = 5,
-  CacheWriteBack      = 6
+  CacheWriteBack      = 6,
+  CacheInvalid        = 7
 } MTRR_MEMORY_CACHE_TYPE;
 
 #define  MTRR_CACHE_UNCACHEABLE      0
