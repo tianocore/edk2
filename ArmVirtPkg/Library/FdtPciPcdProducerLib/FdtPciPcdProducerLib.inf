@@ -26,6 +26,7 @@
   FdtPciPcdProducerLib.c
 
 [Packages]
+  ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
@@ -40,6 +41,7 @@
   gFdtClientProtocolGuid                                      ## CONSUMES
 
 [Pcd]
+  gArmTokenSpaceGuid.PcdPciIoTranslation                      ## PRODUCES
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress           ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration  ## PRODUCES
 
