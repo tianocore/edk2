@@ -66,29 +66,33 @@ AllocateResetVector (
   UINTN                 ApResetVectorSize;
   EFI_PHYSICAL_ADDRESS  StartAddress;
 
-  ApResetVectorSize = CpuMpData->AddressMap.RendezvousFunnelSize +
-                      sizeof (MP_CPU_EXCHANGE_INFO);
+  if (CpuMpData->SaveRestoreFlag) {
+    BackupAndPrepareWakeupBuffer (CpuMpData);
+  } else {
+    ApResetVectorSize = CpuMpData->AddressMap.RendezvousFunnelSize +
+                        sizeof (MP_CPU_EXCHANGE_INFO);
 
-  StartAddress = BASE_1MB;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiACPIMemoryNVS,
-                  EFI_SIZE_TO_PAGES (ApResetVectorSize),
-                  &StartAddress
-                  );
-  ASSERT_EFI_ERROR (Status);
+    StartAddress = BASE_1MB;
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiACPIMemoryNVS,
+                    EFI_SIZE_TO_PAGES (ApResetVectorSize),
+                    &StartAddress
+                    );
+    ASSERT_EFI_ERROR (Status);
 
-  CpuMpData->WakeupBuffer      = (UINTN) StartAddress;
-  CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *) (UINTN)
+    CpuMpData->WakeupBuffer      = (UINTN) StartAddress;
+    CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *) (UINTN)
                   (CpuMpData->WakeupBuffer + CpuMpData->AddressMap.RendezvousFunnelSize);
-  //
-  // copy AP reset code in it
-  //
-  CopyMem (
-    (VOID *) CpuMpData->WakeupBuffer,
-    (VOID *) CpuMpData->AddressMap.RendezvousFunnelAddress,
-    CpuMpData->AddressMap.RendezvousFunnelSize
-    );
+    //
+    // copy AP reset code in it
+    //
+    CopyMem (
+      (VOID *) CpuMpData->WakeupBuffer,
+      (VOID *) CpuMpData->AddressMap.RendezvousFunnelAddress,
+      CpuMpData->AddressMap.RendezvousFunnelSize
+      );
+  }
 }
 
 /**
@@ -103,13 +107,18 @@ FreeResetVector (
 {
   EFI_STATUS            Status;
   UINTN                 ApResetVectorSize;
-  ApResetVectorSize = CpuMpData->AddressMap.RendezvousFunnelSize +
-                      sizeof (MP_CPU_EXCHANGE_INFO);
-  Status = gBS->FreePages(
-             (EFI_PHYSICAL_ADDRESS)CpuMpData->WakeupBuffer,
-             EFI_SIZE_TO_PAGES (ApResetVectorSize)
-             );
-  ASSERT_EFI_ERROR (Status);
+
+  if (CpuMpData->SaveRestoreFlag) {
+    RestoreWakeupBuffer (CpuMpData);
+  } else {
+    ApResetVectorSize = CpuMpData->AddressMap.RendezvousFunnelSize +
+                        sizeof (MP_CPU_EXCHANGE_INFO);
+    Status = gBS->FreePages(
+               (EFI_PHYSICAL_ADDRESS)CpuMpData->WakeupBuffer,
+               EFI_SIZE_TO_PAGES (ApResetVectorSize)
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
 }
 
 /**
@@ -260,6 +269,7 @@ MpInitExitBootServicesCallback (
   CPU_MP_DATA               *CpuMpData;
 
   CpuMpData = GetCpuMpData ();
+  CpuMpData->SaveRestoreFlag = TRUE;
   CpuMpData->PmCodeSegment = GetProtectedModeCS ();
   CpuMpData->ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
   WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, mReservedApLoopFunc);
