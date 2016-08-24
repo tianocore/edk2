@@ -23,7 +23,7 @@ CPU_MP_DATA      *mCpuMpData = NULL;
 EFI_EVENT        mCheckAllApsEvent = NULL;
 EFI_EVENT        mMpInitExitBootServicesEvent = NULL;
 volatile BOOLEAN mStopCheckAllApsStatus = TRUE;
-
+VOID             *mReservedApLoopFunc = NULL;
 
 /**
   Get the pointer to CPU MP Data structure.
@@ -258,19 +258,11 @@ MpInitExitBootServicesCallback (
   )
 {
   CPU_MP_DATA               *CpuMpData;
-  VOID                      *ReservedApLoopFunc;
-  //
-  // Avoid APs access invalid buff data which allocated by BootServices,
-  // so we will allocate reserved data for AP loop code.
-  //
+
   CpuMpData = GetCpuMpData ();
   CpuMpData->PmCodeSegment = GetProtectedModeCS ();
   CpuMpData->ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
-  ReservedApLoopFunc = AllocateReservedCopyPool (
-                         CpuMpData->AddressMap.RelocateApLoopFuncSize,
-                         CpuMpData->AddressMap.RelocateApLoopFuncAddress
-                         );
-  WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, ReservedApLoopFunc);
+  WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, mReservedApLoopFunc);
   DEBUG ((DEBUG_INFO, "MpInitExitBootServicesCallback() done!\n"));
 }
 
@@ -287,6 +279,18 @@ InitMpGlobalData (
   EFI_STATUS     Status;
 
   SaveCpuMpData (CpuMpData);
+
+  //
+  // Avoid APs access invalid buff data which allocated by BootServices,
+  // so we will allocate reserved data for AP loop code.
+  // Allocating it in advance since memory services are not available in
+  // Exit Boot Services callback function.
+  //
+  mReservedApLoopFunc = AllocateReservedCopyPool (
+                          CpuMpData->AddressMap.RelocateApLoopFuncSize,
+                          CpuMpData->AddressMap.RelocateApLoopFuncAddress
+                          );
+  ASSERT (mReservedApLoopFunc != NULL);
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
