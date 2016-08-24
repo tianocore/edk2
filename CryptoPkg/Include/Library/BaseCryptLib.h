@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -193,6 +193,32 @@ Md4Final (
   );
 
 /**
+  Computes the MD4 message digest of a input data buffer.
+
+  This function performs the MD4 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the MD4 digest
+                           value (16 bytes).
+
+  @retval TRUE   MD4 digest computation succeeded.
+  @retval FALSE  MD4 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Md4HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+/**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
   If this interface is not supported, then return zero.
@@ -304,6 +330,32 @@ EFIAPI
 Md5Final (
   IN OUT  VOID   *Md5Context,
   OUT     UINT8  *HashValue
+  );
+
+/**
+  Computes the MD5 message digest of a input data buffer.
+
+  This function performs the MD5 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the MD5 digest
+                           value (16 bytes).
+
+  @retval TRUE   MD5 digest computation succeeded.
+  @retval FALSE  MD5 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Md5HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 /**
@@ -421,6 +473,32 @@ Sha1Final (
   );
 
 /**
+  Computes the SHA-1 message digest of a input data buffer.
+
+  This function performs the SHA-1 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-1 digest
+                           value (20 bytes).
+
+  @retval TRUE   SHA-1 digest computation succeeded.
+  @retval FALSE  SHA-1 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha1HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+/**
   Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
 
   @return  The size, in bytes, of the context buffer required for SHA-256 hash operations.
@@ -523,6 +601,32 @@ EFIAPI
 Sha256Final (
   IN OUT  VOID   *Sha256Context,
   OUT     UINT8  *HashValue
+  );
+
+/**
+  Computes the SHA-256 message digest of a input data buffer.
+
+  This function performs the SHA-256 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-256 digest
+                           value (32 bytes).
+
+  @retval TRUE   SHA-256 digest computation succeeded.
+  @retval FALSE  SHA-256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha256HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 /**
@@ -631,6 +735,32 @@ Sha384Final (
   );
 
 /**
+  Computes the SHA-384 message digest of a input data buffer.
+
+  This function performs the SHA-384 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-384 digest
+                           value (48 bytes).
+
+  @retval TRUE   SHA-384 digest computation succeeded.
+  @retval FALSE  SHA-384 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha384HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+/**
   Retrieves the size, in bytes, of the context buffer required for SHA-512 hash operations.
 
   @return  The size, in bytes, of the context buffer required for SHA-512 hash operations.
@@ -733,6 +863,32 @@ EFIAPI
 Sha512Final (
   IN OUT  VOID   *Sha512Context,
   OUT     UINT8  *HashValue
+  );
+
+/**
+  Computes the SHA-512 message digest of a input data buffer.
+
+  This function performs the SHA-512 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-512 digest
+                           value (64 bytes).
+
+  @retval TRUE   SHA-512 digest computation succeeded.
+  @retval FALSE  SHA-512 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha512HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 //=====================================================================================
@@ -974,6 +1130,125 @@ HmacSha1Final (
   IN OUT  VOID   *HmacSha1Context,
   OUT     UINT8  *HmacValue
   );
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+
+  If this interface is not supported, then return zero.
+
+  @return  The size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+  @retval  0   This interface is not supported.
+
+**/
+UINTN
+EFIAPI
+HmacSha256GetContextSize (
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory pointed by HmacSha256Context as HMAC-SHA256 context for
+  subsequent use.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[out]  HmacSha256Context  Pointer to HMAC-SHA256 context being initialized.
+  @param[in]   Key                Pointer to the user-supplied key.
+  @param[in]   KeySize            Key size in bytes.
+
+  @retval TRUE   HMAC-SHA256 context initialization succeeded.
+  @retval FALSE  HMAC-SHA256 context initialization failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Init (
+  OUT  VOID         *HmacSha256Context,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize
+  );
+
+/**
+  Makes a copy of an existing HMAC-SHA256 context.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If NewHmacSha256Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  HmacSha256Context     Pointer to HMAC-SHA256 context being copied.
+  @param[out] NewHmacSha256Context  Pointer to new HMAC-SHA256 context.
+
+  @retval TRUE   HMAC-SHA256 context copy succeeded.
+  @retval FALSE  HMAC-SHA256 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Duplicate (
+  IN   CONST VOID  *HmacSha256Context,
+  OUT  VOID        *NewHmacSha256Context
+  );
+
+/**
+  Digests the input data and updates HMAC-SHA256 context.
+
+  This function performs HMAC-SHA256 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  HMAC-SHA256 context should be already correctly intialized by HmacSha256Init(), and should not
+  be finalized by HmacSha256Final(). Behavior with invalid context is undefined.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha256Context Pointer to the HMAC-SHA256 context.
+  @param[in]       Data              Pointer to the buffer containing the data to be digested.
+  @param[in]       DataSize          Size of Data buffer in bytes.
+
+  @retval TRUE   HMAC-SHA256 data digest succeeded.
+  @retval FALSE  HMAC-SHA256 data digest failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Update (
+  IN OUT  VOID        *HmacSha256Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the HMAC-SHA256 digest value.
+
+  This function completes HMAC-SHA256 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the HMAC-SHA256 context cannot
+  be used again.
+  HMAC-SHA256 context should be already correctly intialized by HmacSha256Init(), and should
+  not be finalized by HmacSha256Final(). Behavior with invalid HMAC-SHA256 context is undefined.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha256Context  Pointer to the HMAC-SHA256 context.
+  @param[out]      HashValue          Pointer to a buffer that receives the HMAC-SHA256 digest
+                                      value (32 bytes).
+
+  @retval TRUE   HMAC-SHA256 digest computation succeeded.
+  @retval FALSE  HMAC-SHA256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Final (
+  IN OUT  VOID   *HmacSha256Context,
+  OUT     UINT8  *HmacValue
+  );
+
 
 //=====================================================================================
 //    Symmetric Cryptography Primitive
