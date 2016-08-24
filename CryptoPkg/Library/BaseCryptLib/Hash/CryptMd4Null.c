@@ -1,7 +1,7 @@
 /** @file
   MD4 Digest Wrapper Implementation which does not provide real capabilities.
 
-Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -117,6 +117,31 @@ EFIAPI
 Md4Final (
   IN OUT  VOID   *Md4Context,
   OUT     UINT8  *HashValue
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
+  Computes the MD4 message digest of a input data buffer.
+
+  Return FALSE to indicate this interface is not supported.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the MD4 digest
+                           value (16 bytes).
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Md4HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   )
 {
   ASSERT (FALSE);
