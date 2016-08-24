@@ -262,6 +262,7 @@ INF  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 INF  NetworkPkg/DnsDxe/DnsDxe.inf
 INF  NetworkPkg/HttpDxe/HttpDxe.inf
 INF  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
+INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 ################################################################################
 #
 # FILE statements are provided so that a platform integrator can include

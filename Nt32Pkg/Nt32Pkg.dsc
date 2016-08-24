@@ -470,6 +470,10 @@
 
   MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
   MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
+  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf {
+    <LibraryClasses>
+      NULL|IntelFrameworkModulePkg/Library/LegacyBootManagerLib/LegacyBootManagerLib.inf
+  }
 
 ###################################################################################################
 #

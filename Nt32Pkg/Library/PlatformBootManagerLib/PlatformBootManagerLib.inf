@@ -62,6 +62,7 @@
   gEfiGraphicsOutputProtocolGuid  ## CONSUMES
   gEfiUgaDrawProtocolGuid         ## CONSUMES
   gEfiBootLogoProtocolGuid        ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut

@@ -20,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/WinNtThunk.h>
 #include <Protocol/WinNtIo.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/FirmwareVolume2.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
