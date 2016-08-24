@@ -157,7 +157,7 @@ CpuMpEndOfPeiCallback (
       Hob.Raw = GET_NEXT_HOB (Hob);
     }
   } else {
-    CpuMpData->EndOfPeiFlag = TRUE;
+    CpuMpData->SaveRestoreFlag = TRUE;
     RestoreWakeupBuffer (CpuMpData);
   }
   return EFI_SUCCESS;
@@ -316,7 +316,7 @@ AllocateResetVector (
     BackupAndPrepareWakeupBuffer (CpuMpData);
   }
 
-  if (CpuMpData->EndOfPeiFlag) {
+  if (CpuMpData->SaveRestoreFlag) {
     BackupAndPrepareWakeupBuffer (CpuMpData);
   }
 }
@@ -331,7 +331,7 @@ FreeResetVector (
   IN CPU_MP_DATA              *CpuMpData
   )
 {
-  if (CpuMpData->EndOfPeiFlag) {
+  if (CpuMpData->SaveRestoreFlag) {
     RestoreWakeupBuffer (CpuMpData);
   }
 }

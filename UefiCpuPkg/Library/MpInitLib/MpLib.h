@@ -198,7 +198,7 @@ struct _CPU_MP_DATA {
   UINTN                          WakeupBuffer;
   UINTN                          BackupBuffer;
   UINTN                          BackupBufferSize;
-  BOOLEAN                        EndOfPeiFlag;
+  BOOLEAN                        SaveRestoreFlag;
 
   volatile UINT32                StartCount;
   volatile UINT32                FinishedCount;

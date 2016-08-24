@@ -1292,7 +1292,7 @@ MpInitLibInitialize (
   CpuMpData->CpuApStackSize   = ApStackSize;
   CpuMpData->BackupBuffer     = BackupBufferAddr;
   CpuMpData->BackupBufferSize = ApResetVectorSize;
-  CpuMpData->EndOfPeiFlag     = FALSE;
+  CpuMpData->SaveRestoreFlag  = FALSE;
   CpuMpData->WakeupBuffer     = (UINTN) -1;
   CpuMpData->CpuCount         = 1;
   CpuMpData->BspNumber        = 0;
