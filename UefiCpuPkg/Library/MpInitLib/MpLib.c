@@ -513,10 +513,6 @@ CollectProcessorCount (
   CpuMpData->InitFlag     = ApInitConfig;
   CpuMpData->X2ApicEnable = FALSE;
   WakeUpAP (CpuMpData, TRUE, 0, NULL, NULL);
-  //
-  // Wait for AP task to complete and then exit.
-  //
-  MicroSecondDelay (PcdGet32(PcdCpuApInitTimeOutInMicroSeconds));
   CpuMpData->InitFlag = ApInitDone;
   ASSERT (CpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
   //
@@ -863,7 +859,12 @@ WakeUpAP (
       //
       SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
     }
-    if (CpuMpData->InitFlag != ApInitConfig) {
+    if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // Wait for all potential APs waken up in one specified period
+      //
+      MicroSecondDelay (PcdGet32(PcdCpuApInitTimeOutInMicroSeconds));
+    } else {
       //
       // Wait all APs waken up if this is not the 1st broadcast of SIPI
       //
