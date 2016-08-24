@@ -189,7 +189,7 @@ CheckApsStatus (
 /**
   Get Protected mode code segment from current GDT table.
 
-  @returen  Protected mode code segment value.
+  @return  Protected mode code segment value.
 **/
 UINT16
 GetProtectedModeCS (

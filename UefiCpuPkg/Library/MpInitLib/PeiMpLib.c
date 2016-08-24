@@ -67,7 +67,7 @@ SaveCpuMpData (
 /**
   Get available system memory below 1MB by specified size.
 
-  @param[in] PeiCpuMpData        Pointer to PEI CPU MP Data
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
 **/
 VOID
 BackupAndPrepareWakeupBuffer(
@@ -89,7 +89,7 @@ BackupAndPrepareWakeupBuffer(
 /**
   Restore wakeup buffer data.
 
-  @param[in] PeiCpuMpData        Pointer to PEI CPU MP Data
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
 **/
 VOID
 RestoreWakeupBuffer(
