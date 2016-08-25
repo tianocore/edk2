@@ -1296,6 +1296,10 @@ ShellCommandRunBcfg (
         CurrentParam = ShellCommandLineGetRawValue(Package, ParamNumber);
         if        (gUnicodeCollation->StriColl(gUnicodeCollation, (CHAR16*)CurrentParam, L"dump") == 0)    {
           CurrentOperation.Type = BcfgTypeDump;
+          if (ShellCommandLineGetCount(Package) > 3) {
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellBcfgHiiHandle, L"bcfg");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          }
         } else if (ShellCommandLineGetFlag(Package, L"-v")) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"-v (without dump)");  
           ShellStatus = SHELL_INVALID_PARAMETER;
