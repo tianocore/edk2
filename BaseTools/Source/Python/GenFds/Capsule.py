@@ -141,7 +141,6 @@ class Capsule (CapsuleClassObject) :
             Content.write(File.read())
             File.close()
         for fmp in self.FmpPayloadList:
-            Buffer = fmp.GenCapsuleSubItem()
             if fmp.Certificate_Guid:
                 ExternalTool, ExternalOption = FindExtendTool([], GenFdsGlobalVariable.ArchList, fmp.Certificate_Guid)
                 CmdOption = ''
@@ -162,33 +161,14 @@ class Capsule (CapsuleClassObject) :
                     dwLength = 4 + 2 + 2 + 16 + os.path.getsize(CapOutputTmp) - os.path.getsize(CapInputFile)
                 else:
                     dwLength = 4 + 2 + 2 + 16 + 16 + 256 + 256
-                Buffer += pack('Q', fmp.MonotonicCount)
-                Buffer += pack('I', dwLength)
-                Buffer += pack('H', WIN_CERT_REVISION)
-                Buffer += pack('H', WIN_CERT_TYPE_EFI_GUID)
-                Buffer += uuid.UUID(fmp.Certificate_Guid).get_bytes_le()
-                if os.path.exists(CapOutputTmp):
-                    TmpFile = open(CapOutputTmp, 'rb')
-                    Buffer += TmpFile.read()
-                    TmpFile.close()
-                    if fmp.VendorCodeFile:
-                        VendorFile = open(fmp.VendorCodeFile, 'rb')
-                        Buffer += VendorFile.read()
-                        VendorFile.close()
-                    FwMgrHdr.write(pack('=Q', PreSize))
-                    PreSize += len(Buffer)
-                    Content.write(Buffer)
+                fmp.ImageFile = CapOutputTmp
+                AuthData = [fmp.MonotonicCount, dwLength, WIN_CERT_REVISION, WIN_CERT_TYPE_EFI_GUID, fmp.Certificate_Guid]
+                Buffer = fmp.GenCapsuleSubItem(AuthData)
             else:
-                ImageFile = open(fmp.ImageFile, 'rb')
-                Buffer += ImageFile.read()
-                ImageFile.close()
-                if fmp.VendorCodeFile:
-                    VendorFile = open(fmp.VendorCodeFile, 'rb')
-                    Buffer += VendorFile.read()
-                    VendorFile.close()
-                FwMgrHdr.write(pack('=Q', PreSize))
-                PreSize += len(Buffer)
-                Content.write(Buffer)
+                Buffer = fmp.GenCapsuleSubItem()
+            FwMgrHdr.write(pack('=Q', PreSize))
+            PreSize += len(Buffer)
+            Content.write(Buffer)
         BodySize = len(FwMgrHdr.getvalue()) + len(Content.getvalue())
         Header.write(pack('=I', HdrSize + BodySize))
         #

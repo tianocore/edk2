@@ -21,6 +21,7 @@ import StringIO
 from struct import pack
 import os
 from Common.Misc import SaveFileOnChange
+import uuid
 
 ## base class for capsule data
 #
@@ -183,10 +184,14 @@ class CapsulePayload(CapsuleData):
         self.Certificate_Guid = None
         self.MonotonicCount = None
 
-    def GenCapsuleSubItem(self):
+    def GenCapsuleSubItem(self, AuthData=[]):
         if not self.Version:
             self.Version = 0x00000002
         ImageFileSize = os.path.getsize(self.ImageFile)
+        if AuthData:
+            # the ImageFileSize need include the full authenticated info size. From first bytes of MonotonicCount to last bytes of certificate.
+            # the 32 bit is the MonotonicCount, dwLength, wRevision, wCertificateType and CertType
+            ImageFileSize += 32
         VendorFileSize = 0
         if self.VendorCodeFile:
             VendorFileSize = os.path.getsize(self.VendorCodeFile)
@@ -216,4 +221,18 @@ class CapsulePayload(CapsuleData):
                        VendorFileSize,
                        int(self.HardwareInstance, 16)
                        )
+        if AuthData:
+            Buffer += pack('QIHH', AuthData[0], AuthData[1], AuthData[2], AuthData[3])
+            Buffer += uuid.UUID(AuthData[4]).get_bytes_le()
+
+        #
+        # Append file content to the structure
+        #
+        ImageFile = open(self.ImageFile, 'rb')
+        Buffer += ImageFile.read()
+        ImageFile.close()
+        if self.VendorCodeFile:
+            VendorFile = open(self.VendorCodeFile, 'rb')
+            Buffer += VendorFile.read()
+            VendorFile.close()
         return Buffer
