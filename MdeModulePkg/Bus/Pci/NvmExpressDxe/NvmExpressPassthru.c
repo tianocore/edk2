@@ -377,6 +377,7 @@ NvmExpressPassThru (
   UINTN                          PrpListNo;
   UINT32                         Attributes;
   UINT32                         IoAlign;
+  UINT32                         MaxTransLen;
   UINT32                         Data;
   NVME_PASS_THRU_ASYNC_REQ       *AsyncRequest;
   EFI_TPL                        OldTpl;
@@ -420,6 +421,19 @@ NvmExpressPassThru (
   }
 
   Private     = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
+
+  //
+  // Check whether TransferLength exceeds the maximum data transfer size.
+  //
+  if (Private->ControllerData->Mdts != 0) {
+    MaxTransLen = (1 << (Private->ControllerData->Mdts)) *
+                  (1 << (Private->Cap.Mpsmin + 12));
+    if (Packet->TransferLength > MaxTransLen) {
+      Packet->TransferLength = MaxTransLen;
+      return EFI_BAD_BUFFER_SIZE;
+    }
+  }
+
   PciIo       = Private->PciIo;
   MapData     = NULL;
   MapMeta     = NULL;
@@ -477,6 +491,10 @@ NvmExpressPassThru (
   // processor and a PCI Bus Master. It's caller's responsbility to ensure this.
   //
   if (((Sq->Opc & (BIT0 | BIT1)) != 0) && (Sq->Opc != NVME_ADMIN_CRIOCQ_CMD) && (Sq->Opc != NVME_ADMIN_CRIOSQ_CMD)) {
+    if ((Packet->TransferLength == 0) || (Packet->TransferBuffer == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     if ((Sq->Opc & BIT0) != 0) {
       Flag = EfiPciIoOperationBusMasterRead;
     } else {
@@ -499,8 +517,7 @@ NvmExpressPassThru (
     Sq->Prp[0] = PhyAddr;
     Sq->Prp[1] = 0;
 
-    MapLength = Packet->MetadataLength;
-    if(Packet->MetadataBuffer != NULL) {
+    if((Packet->MetadataLength != 0) && (Packet->MetadataBuffer != NULL)) {
       MapLength = Packet->MetadataLength;
       Status = PciIo->Map (
                         PciIo,
