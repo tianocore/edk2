@@ -758,11 +758,15 @@ NvmExpressGetNextNamespace (
 
     *NamespaceId = NextNamespaceId;
   } else {
-    if (*NamespaceId >= Private->ControllerData->Nn) {
+    if (*NamespaceId > Private->ControllerData->Nn) {
       return EFI_INVALID_PARAMETER;
     }
 
     NextNamespaceId = *NamespaceId + 1;
+    if (NextNamespaceId > Private->ControllerData->Nn) {
+      return EFI_NOT_FOUND;
+    }
+
     //
     // Allocate buffer for Identify Namespace data.
     //
