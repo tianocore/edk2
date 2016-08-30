@@ -423,6 +423,14 @@ NvmExpressPassThru (
   Private     = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
 
   //
+  // Check NamespaceId is valid or not.
+  //
+  if ((NamespaceId > Private->ControllerData->Nn) &&
+      (NamespaceId != (UINT32) -1)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // Check whether TransferLength exceeds the maximum data transfer size.
   //
   if (Private->ControllerData->Mdts != 0) {
