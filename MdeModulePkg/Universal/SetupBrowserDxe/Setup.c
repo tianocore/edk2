@@ -181,7 +181,7 @@ UiFindMenuList (
     // Find the same FromSet.
     //
     if (MenuList->HiiHandle == HiiHandle) {
-      if (CompareGuid (&MenuList->FormSetGuid, &gZeroGuid)) {
+      if (IsZeroGuid (&MenuList->FormSetGuid)) {
         //
         // FormSetGuid is not specified.
         //
@@ -5689,7 +5689,7 @@ GetIfrBinaryData (
           //
           // Try to compare against formset GUID
           //
-          if (CompareGuid (FormSetGuid, &gZeroGuid) || 
+          if (IsZeroGuid (FormSetGuid) ||
               CompareGuid (ComparingGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
             break;
           }

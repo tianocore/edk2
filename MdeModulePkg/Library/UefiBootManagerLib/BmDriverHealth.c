@@ -1,7 +1,7 @@
 /** @file
   Library functions which relates with driver health.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
@@ -446,7 +446,7 @@ BmRepairAllControllers (
   //
   // Configure PcdDriverHealthConfigureForm to ZeroGuid to disable driver health check.
   //
-  if (CompareGuid (PcdGetPtr (PcdDriverHealthConfigureForm), &gZeroGuid)) {
+  if (IsZeroGuid (PcdGetPtr (PcdDriverHealthConfigureForm))) {
     return;
   }
 

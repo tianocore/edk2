@@ -358,7 +358,7 @@ InitializeDisplayStatement (
   //
   // Create the refresh event process function.
   //
-  if (!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) {
+  if (!IsZeroGuid (&Statement->RefreshGuid)) {
     CreateRefreshEventForStatement (Statement);
   }
 
@@ -373,7 +373,7 @@ InitializeDisplayStatement (
   // Create the refresh guid hook event.
   // If the statement in this form has refresh event or refresh interval, browser will create this event for display engine.
   //
-  if ((!CompareGuid (&Statement->RefreshGuid, &gZeroGuid)) || (Statement->RefreshInterval != 0)) {
+  if ((!IsZeroGuid (&Statement->RefreshGuid)) || (Statement->RefreshInterval != 0)) {
     gDisplayFormData.FormRefreshEvent = mValueChangedEvent;
   }
 
@@ -628,7 +628,7 @@ AddStatementToDisplayForm (
   //
   // Create the refresh event process function for Form.
   //
-  if (!CompareGuid (&gCurrentSelection->Form->RefreshGuid, &gZeroGuid)) {
+  if (!IsZeroGuid (&gCurrentSelection->Form->RefreshGuid)) {
     CreateRefreshEventForForm (gCurrentSelection->Form);
     if (gDisplayFormData.FormRefreshEvent == NULL) {
       gDisplayFormData.FormRefreshEvent = mValueChangedEvent;
@@ -1410,7 +1410,7 @@ ProcessGotoOpCode (
     CopyMem (&Selection->FormSetGuid,&Statement->HiiValue.Value.ref.FormSetGuid, sizeof (EFI_GUID));
     Selection->FormId = Statement->HiiValue.Value.ref.FormId;
     Selection->QuestionId = Statement->HiiValue.Value.ref.QuestionId;
-  } else if (!CompareGuid (&Statement->HiiValue.Value.ref.FormSetGuid, &gZeroGuid)) {
+  } else if (!IsZeroGuid (&Statement->HiiValue.Value.ref.FormSetGuid)) {
     if (Selection->Form->ModalForm) {
       return Status;
     }

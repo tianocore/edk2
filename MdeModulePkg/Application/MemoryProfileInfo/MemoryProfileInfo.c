@@ -27,7 +27,6 @@
 #include <Protocol/SmmCommunication.h>
 #include <Protocol/SmmAccess2.h>
 
-#include <Guid/ZeroGuid.h>
 #include <Guid/MemoryProfile.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
 
@@ -255,7 +254,7 @@ GetDriverNameString (
     return mNameString;
   }
 
-  if (!CompareGuid (&DriverInfo->FileName, &gZeroGuid)) {
+  if (!IsZeroGuid (&DriverInfo->FileName)) {
     //
     // Try to get the image's FFS UI section by image GUID
     //

@@ -36,7 +36,6 @@
 #include <Guid/Apriori.h>
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
-#include <Guid/ZeroGuid.h>
 #include <Guid/MemoryProfile.h>
 
 #include <Library/BaseLib.h>

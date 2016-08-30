@@ -2829,7 +2829,7 @@ EvaluateExpression (
         if (StrPtr != NULL) {
           FreePool (StrPtr);
         }
-      } else if (CompareGuid (&OpCode->Guid, &gZeroGuid) != 0) {
+      } else if (IsZeroGuid (&OpCode->Guid)) {
         if (!GetQuestionValueFromForm(NULL, FormSet->HiiHandle, &OpCode->Guid, Value->Value.u16, &QuestionVal)){
           Value->Type = EFI_IFR_TYPE_UNDEFINED;
           break;

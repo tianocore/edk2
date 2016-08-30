@@ -124,7 +124,6 @@
   gEventExitBootServicesFailedGuid              ## SOMETIMES_PRODUCES   ## Event
   gEfiVectorHandoffTableGuid                    ## SOMETIMES_PRODUCES   ## SystemTable
   gEdkiiMemoryProfileGuid                       ## SOMETIMES_PRODUCES   ## GUID # Install protocol
-  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
   gEfiPropertiesTableGuid                       ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiMemoryAttributesTableGuid                 ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiEndOfDxeEventGroupGuid                    ## SOMETIMES_CONSUMES   ## Event

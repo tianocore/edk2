@@ -52,7 +52,6 @@
   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
   ## SOMETIMES_CONSUMES   ## GUID # SmiHandlerRegister
   gEdkiiMemoryProfileGuid
-  gZeroGuid                            ## SOMETIMES_CONSUMES   ## GUID
   gEdkiiPiSmmCommunicationRegionTableGuid    ## SOMETIMES_CONSUMES ## SystemTable
 
 [Protocols]

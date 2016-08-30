@@ -69,7 +69,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/IdleLoopEvent.h>
 #include <Guid/VectorHandoffTable.h>
 #include <Ppi/VectorHandoffInfo.h>
-#include <Guid/ZeroGuid.h>
 #include <Guid/MemoryProfile.h>
 
 #include <Library/DxeCoreEntryPoint.h>

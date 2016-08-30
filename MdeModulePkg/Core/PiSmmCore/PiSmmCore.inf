@@ -96,7 +96,6 @@
   gEdkiiMemoryProfileGuid
   ## SOMETIMES_PRODUCES   ## GUID # Install protocol
   gEdkiiSmmMemoryProfileGuid
-  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PiSmmCoreExtra.uni

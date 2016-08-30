@@ -1,7 +1,7 @@
 /** @file
   Var Check Hii generation from FV.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -372,7 +372,7 @@ CreateVfrDriverList (
   UINTN                         Index;
   VAR_CHECK_VFR_DRIVER_INFO     *VfrDriverInfo;
 
-  for (Index = 0; !CompareGuid (&DriverGuidArray[Index], &gZeroGuid); Index++) {
+  for (Index = 0; !IsZeroGuid (&DriverGuidArray[Index]); Index++) {
      DEBUG ((EFI_D_INFO, "CreateVfrDriverList: %g\n", &DriverGuidArray[Index]));
      VfrDriverInfo = InternalVarCheckAllocateZeroPool (sizeof (*VfrDriverInfo));
      ASSERT (VfrDriverInfo != NULL);
@@ -421,7 +421,7 @@ VarCheckHiiGenFromFv (
   //
   DriverGuidArray = (EFI_GUID *) PcdGetPtr (PcdVarCheckVfrDriverGuidArray);
 
-  if (CompareGuid (&DriverGuidArray[0], &gZeroGuid)) {
+  if (IsZeroGuid (&DriverGuidArray[0])) {
     //
     // No VFR driver will be parsed from FVs.
     //

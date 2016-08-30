@@ -46,9 +46,6 @@
   PcdLib
   VarCheckLib
 
-[Guids]
-  gZeroGuid                                 ## SOMETIMES_CONSUMES   ## GUID
-
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid           ## SOMETIMES_CONSUMES
   gEfiFirmwareVolumeBlock2ProtocolGuid      ## SOMETIMES_CONSUMES

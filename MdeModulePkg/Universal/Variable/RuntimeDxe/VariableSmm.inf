@@ -114,7 +114,6 @@
   ## SOMETIMES_CONSUMES   ## Variable:L"VarErrorFlag"
   ## SOMETIMES_PRODUCES   ## Variable:L"VarErrorFlag"
   gEdkiiVarErrorFlagGuid
-  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize       ## CONSUMES
