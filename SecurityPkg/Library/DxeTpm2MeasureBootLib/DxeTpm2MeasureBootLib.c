@@ -15,7 +15,7 @@
   Tcg2MeasureGptTable() function will receive untrusted GPT partition table, and parse
   partition data carefully.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
@@ -36,7 +36,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Guid/MeasuredFvHob.h>
-#include <Guid/ZeroGuid.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -202,7 +201,7 @@ Tcg2MeasureGptTable (
   PartitionEntry    = (EFI_PARTITION_ENTRY *)EntryPtr;
   NumberOfPartition = 0;
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
-    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &gZeroGuid)) {
+    if (!IsZeroGuid (&PartitionEntry->PartitionTypeGUID)) {
       NumberOfPartition++;  
     }
     PartitionEntry = (EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntry + PrimaryHeader->SizeOfPartitionEntry);
@@ -238,7 +237,7 @@ Tcg2MeasureGptTable (
   PartitionEntry    = (EFI_PARTITION_ENTRY*)EntryPtr;
   NumberOfPartition = 0;
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
-    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &gZeroGuid)) {
+    if (!IsZeroGuid (&PartitionEntry->PartitionTypeGUID)) {
       CopyMem (
         (UINT8 *)&GptData->Partitions + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry,
         (UINT8 *)PartitionEntry,

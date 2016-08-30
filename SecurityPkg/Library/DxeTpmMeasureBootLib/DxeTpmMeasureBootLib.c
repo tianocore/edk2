@@ -34,7 +34,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Guid/MeasuredFvHob.h>
-#include <Guid/ZeroGuid.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -202,7 +201,7 @@ TcgMeasureGptTable (
   PartitionEntry    = (EFI_PARTITION_ENTRY *)EntryPtr;
   NumberOfPartition = 0;
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
-    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &gZeroGuid)) {
+    if (!IsZeroGuid (&PartitionEntry->PartitionTypeGUID)) {
       NumberOfPartition++;  
     }
     PartitionEntry = (EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntry + PrimaryHeader->SizeOfPartitionEntry);
@@ -236,7 +235,7 @@ TcgMeasureGptTable (
   PartitionEntry    = (EFI_PARTITION_ENTRY*)EntryPtr;
   NumberOfPartition = 0;
   for (Index = 0; Index < PrimaryHeader->NumberOfPartitionEntries; Index++) {
-    if (!CompareGuid (&PartitionEntry->PartitionTypeGUID, &gZeroGuid)) {
+    if (!IsZeroGuid (&PartitionEntry->PartitionTypeGUID)) {
       CopyMem (
         (UINT8 *)&GptData->Partitions + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry,
         (UINT8 *)PartitionEntry,
