@@ -262,3 +262,32 @@ InternalMemScanMem64 (
   } while (--Length != 0);
   return NULL;
 }
+
+/**
+  Checks whether the contents of a buffer are all zeros.
+
+  @param  Buffer  The pointer to the buffer to be checked.
+  @param  Length  The size of the buffer (in bytes) to be checked.
+
+  @retval TRUE    Contents of the buffer are all zeros.
+  @retval FALSE   Contents of the buffer are not all zeros.
+
+**/
+BOOLEAN
+EFIAPI
+InternalMemIsZeroBuffer (
+  IN CONST VOID  *Buffer,
+  IN UINTN       Length
+  )
+{
+  CONST UINT8 *BufferData;
+  UINTN       Index;
+
+  BufferData = Buffer;
+  for (Index = 0; Index < Length; Index++) {
+    if (BufferData[Index] != 0) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
