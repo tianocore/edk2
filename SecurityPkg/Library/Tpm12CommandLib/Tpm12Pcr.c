@@ -74,6 +74,11 @@ Tpm12Extend (
     return Status;
   }
 
+  if (SwapBytes32(Response.Hdr.returnCode) != TPM_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "Tpm12Extend: Response Code error! 0x%08x\r\n", SwapBytes32(Response.Hdr.returnCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
   if (NewPcrValue != NULL) {
     CopyMem (NewPcrValue, &Response.TpmDigest, sizeof (*NewPcrValue));
   }

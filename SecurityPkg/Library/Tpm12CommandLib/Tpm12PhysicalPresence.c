@@ -44,6 +44,7 @@ Tpm12PhysicalPresence (
   IN TPM_PHYSICAL_PRESENCE  PhysicalPresence
   )
 {
+  EFI_STATUS                 Status;
   TPM_CMD_PHYSICAL_PRESENCE  Command;
   TPM_RSP_COMMAND_HDR        Response;
   UINT32                     Length;
@@ -56,5 +57,16 @@ Tpm12PhysicalPresence (
   Command.Hdr.ordinal      = SwapBytes32 (TSC_ORD_PhysicalPresence);
   Command.PhysicalPresence = SwapBytes16 (PhysicalPresence);
   Length = sizeof (Response);
-  return Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length, (UINT8 *)&Response);
+
+  Status = Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length, (UINT8 *)&Response);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (SwapBytes32(Response.returnCode) != TPM_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "Tpm12PhysicalPresence: Response Code error! 0x%08x\r\n", SwapBytes32(Response.returnCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
 }
