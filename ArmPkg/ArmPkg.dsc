@@ -150,8 +150,6 @@
   ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
 [Components.ARM]
-  ArmPkg/Library/BaseMemoryLibVstm/BaseMemoryLibVstm.inf
-
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA15Lib/ArmCortexA15Lib.inf
