@@ -1,7 +1,7 @@
 /** @file
 Private functions used by PCD DXE driver.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Please make sure the PCD Serivce DXE Version is consistent with
 // the version of the generated DXE PCD Database by build tool.
 //
-#define PCD_SERVICE_DXE_VERSION      5
+#define PCD_SERVICE_DXE_VERSION      6
 
 //
 // PCD_DXE_SERVICE_DRIVER_VERSION is defined in Autogen.h.

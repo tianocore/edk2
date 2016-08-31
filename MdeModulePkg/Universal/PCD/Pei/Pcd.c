@@ -226,7 +226,7 @@ PeiGetPcdInfoGetSku (
   VOID
   )
 {
-  return GetPcdDatabase()->SystemSkuId;
+  return (UINTN) GetPcdDatabase()->SystemSkuId;
 }
 
 /**

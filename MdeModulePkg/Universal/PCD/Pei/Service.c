@@ -2,7 +2,7 @@
   The driver internal functions are implmented here.
   They build Pei PCD database, and provide access service to PCD database.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -550,7 +550,7 @@ GetSkuEnabledTokenNumber (
   PEI_PCD_DATABASE      *PeiPcdDb;
   SKU_HEAD              *SkuHead;
   SKU_ID                *SkuIdTable;
-  INTN                  Index;
+  UINTN                 Index;
   UINT8                 *Value;
   BOOLEAN               FoundSku;
 

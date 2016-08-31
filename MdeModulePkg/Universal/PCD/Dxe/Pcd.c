@@ -239,7 +239,7 @@ DxeGetPcdInfoGetSku (
   VOID
   )
 {
-  return mPcdDatabase.DxeDb->SystemSkuId;
+  return (UINTN) mPcdDatabase.DxeDb->SystemSkuId;
 }
 
 /**

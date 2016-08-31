@@ -958,7 +958,7 @@ GetSkuEnabledTokenNumber (
 {
   SKU_HEAD              *SkuHead;
   SKU_ID                *SkuIdTable;
-  INTN                  Index;
+  UINTN                 Index;
   UINT8                 *Value;
   UINT8                 *PcdDb;
   BOOLEAN               FoundSku;

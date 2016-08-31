@@ -1,7 +1,7 @@
 /** @file
   Guid for Pcd DataBase Signature.
 
-Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -23,7 +23,7 @@ extern EFI_GUID gPcdDataBaseSignatureGuid;
 //
 // Common definitions
 //
-typedef UINT8 SKU_ID;
+typedef UINT64 SKU_ID;
 
 #define PCD_TYPE_SHIFT        28
 
@@ -62,7 +62,7 @@ typedef struct  {
 } DYNAMICEX_MAPPING;
 
 typedef struct {
-  UINT32  SkuDataStartOffset;   // Offset(with TYPE info) from the PCD_DB.
+  UINT32  SkuDataStartOffset;   // Offset(with DATUM TYPE info) from the PCD_DB.
   UINT32  SkuIdTableOffset;     // Offset from the PCD_DB.
 } SKU_HEAD;
 
@@ -95,6 +95,7 @@ typedef struct {
     GUID                  Signature;            // PcdDataBaseGuid.
     UINT32                BuildVersion;
     UINT32                Length;
+    SKU_ID                SystemSkuId;          // Current SkuId value.
     UINT32                UninitDataBaseSize;   // Total size for PCD those default value with 0.
     TABLE_OFFSET          LocalTokenNumberTableOffset;
     TABLE_OFFSET          ExMapTableOffset;
@@ -106,14 +107,15 @@ typedef struct {
     UINT16                LocalTokenCount;      // LOCAL_TOKEN_NUMBER for all.
     UINT16                ExTokenCount;         // EX_TOKEN_NUMBER for DynamicEx.
     UINT16                GuidTableCount;       // The Number of Guid in GuidTable.
-    SKU_ID                SystemSkuId;          // Current SkuId value.
-    UINT8                 Pad;                  // Pad bytes to satisfy the alignment.
+    UINT8                 Pad[2];               // Pad bytes to satisfy the alignment.
 
     //
     // Default initialized external PCD database binary structure
     //
     // Padding is needed to keep necessary alignment
     //
+    //SKU_ID                         SkuIdTable[];            // SkuIds system supports.
+    //SKU_ID                         SkuIndexTable[];         // SkuIds for each PCD with SKU enable.
     //UINT64                         ValueUint64[];
     //UINT32                         ValueUint32[];
     //VPD_HEAD                       VpdHead[];               // VPD Offset
@@ -129,8 +131,6 @@ typedef struct {
     //UINT16                         ValueUint16[];
     //UINT8                          ValueUint8[];
     //BOOLEAN                        ValueBoolean[];
-    //UINT8                          SkuIdTable[];            // SkuIds system supports.
-    //UINT8                          SkuIndexTable[];         // SkuIds for each PCD with SKU enable.
 
 } PCD_DATABASE_INIT;
 
