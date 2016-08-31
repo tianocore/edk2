@@ -1212,6 +1212,11 @@ ShellCommandRunDrvCfg (
     }
   } 
   if (ShellStatus == SHELL_SUCCESS) {
+    if (ShellCommandLineGetCount(Package) > 4) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drvcfg");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
     Lang = ShellCommandLineGetValue(Package, L"-l");
     if (Lang != NULL) {
       Language = AllocateZeroPool(StrSize(Lang));
