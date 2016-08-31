@@ -130,3 +130,32 @@ ScanGuid (
   }
   return NULL;
 }
+
+/**
+  Checks if the given GUID is a zero GUID.
+
+  This function checks whether the given GUID is a zero GUID. If the GUID is
+  identical to a zero GUID then TRUE is returned. Otherwise, FALSE is returned.
+
+  If Guid is NULL, then ASSERT().
+
+  @param  Guid        The pointer to a 128 bit GUID.
+
+  @retval TRUE        Guid is a zero GUID.
+  @retval FALSE       Guid is not a zero GUID.
+
+**/
+BOOLEAN
+EFIAPI
+IsZeroGuid (
+  IN CONST GUID  *Guid
+  )
+{
+  UINT64  LowPartOfGuid;
+  UINT64  HighPartOfGuid;
+
+  LowPartOfGuid  = ReadUnaligned64 ((CONST UINT64*) Guid);
+  HighPartOfGuid = ReadUnaligned64 ((CONST UINT64*) Guid + 1);
+
+  return (BOOLEAN) (LowPartOfGuid == 0 && HighPartOfGuid == 0);
+}
