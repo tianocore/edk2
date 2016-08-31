@@ -26,9 +26,6 @@ $(LIBRARY): $(OBJECTS)
 %.o : %.c 
 	$(BUILD_CC)  -c $(BUILD_CFLAGS) $(BUILD_CPPFLAGS) $< -o $@
 
-%.o : %.S
-	$(BUILD_AS) -c $(BUILD_ASFLAGS) $< -o $@
-
 %.o : %.cpp
 	$(BUILD_CXX) -c $(BUILD_CPPFLAGS) $(BUILD_CXXFLAGS) $< -o $@
 
