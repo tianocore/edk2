@@ -30,7 +30,7 @@ $(LIBRARY): $(OBJECTS)
 	$(BUILD_AS) -c $(BUILD_ASFLAGS) $< -o $@
 
 %.o : %.cpp
-	$(BUILD_CXX) -c $(BUILD_CPPFLAGS) $< -o $@
+	$(BUILD_CXX) -c $(BUILD_CPPFLAGS) $(BUILD_CXXFLAGS) $< -o $@
 
 .PHONY: clean
 clean:
