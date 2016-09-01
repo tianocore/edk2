@@ -22,7 +22,7 @@ Pkcs7Sign
 
 import os
 import sys
-import argparse 
+import argparse
 import subprocess
 import uuid
 import struct
@@ -74,7 +74,7 @@ TEST_TRUSTED_PUBLIC_CERT_FILENAME = 'TestRoot.pub.pem'
 if __name__ == '__main__':
   #
   # Create command line argument parser object
-  #  
+  #
   parser = argparse.ArgumentParser(prog=__prog__, version=__version__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
   #
   # Parse command line arguments
-  #  
+  #
   args = parser.parse_args()
 
   #
@@ -110,7 +110,7 @@ if __name__ == '__main__':
   #
   try:
     Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  except:  
+  except:
     print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
     sys.exit(1)
 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
   #
   # Read input file into a buffer and save input filename
-  #  
+  #
   args.InputFileName   = args.InputFile.name
   args.InputFileBuffer = args.InputFile.read()
   args.InputFile.close()
@@ -200,7 +200,7 @@ if __name__ == '__main__':
     format = "Q%ds" % len(args.InputFileBuffer)
     FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
 
-    # 
+    #
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
     Process = subprocess.Popen('%s smime -sign -binary -signer "%s" -outform DER -md sha256 -certfile "%s"' % (OpenSslCommand, args.SignerPrivateCertFileName, args.OtherPublicCertFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -210,7 +210,7 @@ if __name__ == '__main__':
 
     #
     # Write output file that contains Signature, and Input data
-    #    
+    #
     args.OutputFile = open(args.OutputFileName, 'wb')
     args.OutputFile.write(Signature)
     args.OutputFile.write(args.InputFileBuffer)
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
 
     #
-    # Save output file contents from input file 
+    # Save output file contents from input file
     #
     open(args.OutputFileName, 'wb').write(FullInputFileBuffer)
 
