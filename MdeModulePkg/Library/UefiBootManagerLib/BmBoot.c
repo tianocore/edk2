@@ -1940,7 +1940,6 @@ BmEnumerateBootOptions (
   UINTN                                 Removable;
   UINTN                                 Index;
   CHAR16                                *Description;
-  UINT32                                BootAttributes;
 
   ASSERT (BootOptionCount != NULL);
 
@@ -2070,6 +2069,12 @@ BmEnumerateBootOptions (
          &Handles
          );
   for (Index = 0; Index < HandleCount; Index++) {
+    //
+    // Ignore BootManagerMenu. its boot option will be created by EfiBootManagerGetBootManagerMenu().
+    //
+    if (BmIsBootManagerMenuFilePath (DevicePathFromHandle (Handles[Index]))) {
+      continue;
+    }
 
     Description = BmGetBootDescription (Handles[Index]);
     BootOptions = ReallocatePool (
@@ -2079,19 +2084,11 @@ BmEnumerateBootOptions (
                     );
     ASSERT (BootOptions != NULL);
 
-    //
-    // If LoadFile includes BootManagerMenu, its boot attribue will be set to APP and HIDDEN.
-    //
-    BootAttributes = LOAD_OPTION_ACTIVE;
-    if (BmIsBootManagerMenuFilePath (DevicePathFromHandle (Handles[Index]))) {
-      BootAttributes = LOAD_OPTION_CATEGORY_APP | LOAD_OPTION_ACTIVE | LOAD_OPTION_HIDDEN;
-    }
-
     Status = EfiBootManagerInitializeLoadOption (
                &BootOptions[(*BootOptionCount)++],
                LoadOptionNumberUnassigned,
                LoadOptionTypeBoot,
-               BootAttributes,
+               LOAD_OPTION_ACTIVE,
                Description,
                DevicePathFromHandle (Handles[Index]),
                NULL,
