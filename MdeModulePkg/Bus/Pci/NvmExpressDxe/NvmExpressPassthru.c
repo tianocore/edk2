@@ -596,7 +596,7 @@ NvmExpressPassThru (
   //
   // Ring the submission queue doorbell.
   //
-  if (Event != NULL) {
+  if ((Event != NULL) && (QueueId != 0)) {
     Private->SqTdbl[QueueId].Sqt =
       (Private->SqTdbl[QueueId].Sqt + 1) % (NVME_ASYNC_CSQ_SIZE + 1);
   } else {
@@ -616,7 +616,7 @@ NvmExpressPassThru (
   // For non-blocking requests, return directly if the command is placed
   // in the submission queue.
   //
-  if (Event != NULL) {
+  if ((Event != NULL) && (QueueId != 0)) {
     AsyncRequest = AllocateZeroPool (sizeof (NVME_PASS_THRU_ASYNC_REQ));
     if (AsyncRequest == NULL) {
       Status = EFI_DEVICE_ERROR;
@@ -698,6 +698,15 @@ NvmExpressPassThru (
                1,
                &Data
                );
+
+  //
+  // For now, the code does not support the non-blocking feature for admin queue.
+  // If Event is not NULL for admin queue, signal the caller's event here.
+  //
+  if (Event != NULL) {
+    ASSERT (QueueId == 0);
+    gBS->SignalEvent (Event);
+  }
 
 EXIT:
   if (MapData != NULL) {
