@@ -49,8 +49,17 @@
 #define ARM_GIC_ICDDCR_ARE      (1 << 4) // Affinity Routing Enable (ARE)
 #define ARM_GIC_ICDDCR_DS       (1 << 6) // Disable Security (DS)
 
-// GIC Redistributor
+// GICD_ICDICFR bits
+#define ARM_GIC_ICDICFR_WIDTH            32   // ICDICFR is a 32 bit register
+#define ARM_GIC_ICDICFR_BYTES            (ARM_GIC_ICDICFR_WIDTH / 8)
+#define ARM_GIC_ICDICFR_F_WIDTH          2    // Each F field is 2 bits
+#define ARM_GIC_ICDICFR_F_STRIDE         16   // (32/2) F fields per register
+#define ARM_GIC_ICDICFR_F_CONFIG1_BIT    1    // Bit number within F field
+#define ARM_GIC_ICDICFR_LEVEL_TRIGGERED  0x0  // Level triggered interrupt
+#define ARM_GIC_ICDICFR_EDGE_TRIGGERED   0x1  // Edge triggered interrupt
 
+
+// GIC Redistributor
 #define ARM_GICR_CTLR_FRAME_SIZE    SIZE_64KB
 #define ARM_GICR_SGI_PPI_FRAME_SIZE SIZE_64KB
 

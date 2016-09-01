@@ -29,6 +29,7 @@ Abstract:
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol;
+extern EFI_HARDWARE_INTERRUPT2_PROTOCOL gHardwareInterrupt2V2Protocol;
 
 STATIC UINT32 mGicInterruptInterfaceBase;
 STATIC UINT32 mGicDistributorBase;
@@ -199,6 +200,141 @@ EFI_HARDWARE_INTERRUPT_PROTOCOL gHardwareInterruptV2Protocol = {
 };
 
 /**
+  Get interrupt trigger type of an interrupt
+
+  @param This          Instance pointer for this protocol
+  @param Source        Hardware source of the interrupt.
+  @param TriggerType   Returns interrupt trigger type.
+
+  @retval EFI_SUCCESS       Source interrupt supported.
+  @retval EFI_UNSUPPORTED   Source interrupt is not supported.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GicV2GetTriggerType (
+  IN  EFI_HARDWARE_INTERRUPT2_PROTOCOL      *This,
+  IN  HARDWARE_INTERRUPT_SOURCE              Source,
+  OUT EFI_HARDWARE_INTERRUPT2_TRIGGER_TYPE  *TriggerType
+  )
+{
+  UINTN                   RegAddress;
+  UINTN                   Config1Bit;
+  EFI_STATUS              Status;
+
+  Status = GicGetDistributorIcfgBaseAndBit (
+              Source,
+              &RegAddress,
+              &Config1Bit
+              );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((MmioRead32 (RegAddress) & (1 << Config1Bit)) == 0) {
+     *TriggerType = EFI_HARDWARE_INTERRUPT2_TRIGGER_LEVEL_HIGH;
+  } else {
+     *TriggerType = EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Set interrupt trigger type of an interrupt
+
+  @param This          Instance pointer for this protocol
+  @param Source        Hardware source of the interrupt.
+  @param TriggerType   Interrupt trigger type.
+
+  @retval EFI_SUCCESS       Source interrupt supported.
+  @retval EFI_UNSUPPORTED   Source interrupt is not supported.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GicV2SetTriggerType (
+  IN  EFI_HARDWARE_INTERRUPT2_PROTOCOL      *This,
+  IN  HARDWARE_INTERRUPT_SOURCE             Source,
+  IN  EFI_HARDWARE_INTERRUPT2_TRIGGER_TYPE  TriggerType
+  )
+{
+  UINTN                   RegAddress;
+  UINTN                   Config1Bit;
+  UINT32                  Value;
+  EFI_STATUS              Status;
+  BOOLEAN                 SourceEnabled;
+
+  if (   (TriggerType != EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING)
+      && (TriggerType != EFI_HARDWARE_INTERRUPT2_TRIGGER_LEVEL_HIGH)) {
+          DEBUG ((DEBUG_ERROR, "Invalid interrupt trigger type: %d\n", \
+                  TriggerType));
+          ASSERT (FALSE);
+          return EFI_UNSUPPORTED;
+  }
+
+  Status = GicGetDistributorIcfgBaseAndBit (
+             Source,
+             &RegAddress,
+             &Config1Bit
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = GicV2GetInterruptSourceState (
+             (EFI_HARDWARE_INTERRUPT_PROTOCOL*)This,
+             Source,
+             &SourceEnabled
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Value = (TriggerType == EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING)
+          ?  ARM_GIC_ICDICFR_EDGE_TRIGGERED
+          :  ARM_GIC_ICDICFR_LEVEL_TRIGGERED;
+
+  // Before changing the value, we must disable the interrupt,
+  // otherwise GIC behavior is UNPREDICTABLE.
+  if (SourceEnabled) {
+    GicV2DisableInterruptSource (
+      (EFI_HARDWARE_INTERRUPT_PROTOCOL*)This,
+      Source
+      );
+  }
+
+  MmioAndThenOr32 (
+    RegAddress,
+    ~(0x1 << Config1Bit),
+    Value << Config1Bit
+    );
+
+  // Restore interrupt state
+  if (SourceEnabled) {
+    GicV2EnableInterruptSource (
+      (EFI_HARDWARE_INTERRUPT_PROTOCOL*)This,
+      Source
+      );
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_HARDWARE_INTERRUPT2_PROTOCOL gHardwareInterrupt2V2Protocol = {
+  (HARDWARE_INTERRUPT2_REGISTER)RegisterInterruptSource,
+  (HARDWARE_INTERRUPT2_ENABLE)GicV2EnableInterruptSource,
+  (HARDWARE_INTERRUPT2_DISABLE)GicV2DisableInterruptSource,
+  (HARDWARE_INTERRUPT2_INTERRUPT_STATE)GicV2GetInterruptSourceState,
+  (HARDWARE_INTERRUPT2_END_OF_INTERRUPT)GicV2EndOfInterrupt,
+  GicV2GetTriggerType,
+  GicV2SetTriggerType
+};
+
+/**
   Shutdown our hardware
 
   DXE Core will disable interrupts and turn off the timer and disable
@@ -321,6 +457,7 @@ GicV2DxeInitialize (
 
   Status = InstallAndRegisterInterruptService (
              &gHardwareInterruptV2Protocol,
+             &gHardwareInterrupt2V2Protocol,
              GicV2IrqInterruptHandler,
              GicV2ExitBootServicesEvent
              );
