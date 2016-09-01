@@ -181,6 +181,11 @@ InstallReadyToLock (
                     );
     ASSERT_EFI_ERROR (Status);
 
+    //
+    // Signal EndOfDxe PI Event
+    //
+    EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
+
     Handle = NULL;
     Status = gBS->InstallProtocolInterface (
                     &Handle,
@@ -226,11 +231,6 @@ PlatformBdsInit (
   EFI_STATUS  Status;
   EFI_EVENT   ShellImageEvent;
   EFI_GUID    ShellEnvProtocol = SHELL_ENVIRONMENT_INTERFACE_PROTOCOL;
-  
-  //
-  // Signal EndOfDxe PI Event
-  //
-  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
   #ifdef __GNUC__
   SerialPortWrite((UINT8 *)">>>>BdsEntry[GCC]\r\n", 19);
