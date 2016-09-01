@@ -1530,15 +1530,15 @@ EfiBootManagerGetLoadOptionBuffer (
 }
 
 /**
-  Check if it's a Device Path pointing to BootMenuApp.
+  Check if it's a Device Path pointing to BootManagerMenu.
 
   @param  DevicePath     Input device path.
 
-  @retval TRUE   The device path is BootMenuApp File Device Path.
-  @retval FALSE  The device path is NOT BootMenuApp File Device Path.
+  @retval TRUE   The device path is BootManagerMenu File Device Path.
+  @retval FALSE  The device path is NOT BootManagerMenu File Device Path.
 **/
 BOOLEAN
-BmIsBootMenuAppFilePath (
+BmIsBootManagerMenuFilePath (
   EFI_DEVICE_PATH_PROTOCOL     *DevicePath
 )
 {
@@ -1645,7 +1645,7 @@ EfiBootManagerBoot (
   // 3. Signal the EVT_SIGNAL_READY_TO_BOOT event when we are about to load and execute
   //    the boot option.
   //
-  if (BmIsBootMenuAppFilePath (BootOption->FilePath)) {
+  if (BmIsBootManagerMenuFilePath (BootOption->FilePath)) {
     DEBUG ((EFI_D_INFO, "[Bds] Booting Boot Manager Menu.\n"));
     BmStopHotkeyService (NULL, NULL);
   } else {
@@ -2080,10 +2080,10 @@ BmEnumerateBootOptions (
     ASSERT (BootOptions != NULL);
 
     //
-    // If LoadFile includes BootMenuApp, its boot attribue will be set to APP and HIDDEN.
+    // If LoadFile includes BootManagerMenu, its boot attribue will be set to APP and HIDDEN.
     //
     BootAttributes = LOAD_OPTION_ACTIVE;
-    if (BmIsBootMenuAppFilePath (DevicePathFromHandle (Handles[Index]))) {
+    if (BmIsBootManagerMenuFilePath (DevicePathFromHandle (Handles[Index]))) {
       BootAttributes = LOAD_OPTION_CATEGORY_APP | LOAD_OPTION_ACTIVE | LOAD_OPTION_HIDDEN;
     }
 
@@ -2215,7 +2215,7 @@ BmRegisterBootManagerMenu (
   DevicePath = NULL;
   Description = NULL;
   //
-  // Try to find BootMenuApp from LoadFile protocol
+  // Try to find BootManagerMenu from LoadFile protocol
   //
   gBS->LocateHandleBuffer (
          ByProtocol,
@@ -2225,7 +2225,7 @@ BmRegisterBootManagerMenu (
          &Handles
          );
   for (Index = 0; Index < HandleCount; Index++) {
-    if (BmIsBootMenuAppFilePath (DevicePathFromHandle (Handles[Index]))) {
+    if (BmIsBootManagerMenuFilePath (DevicePathFromHandle (Handles[Index]))) {
       DevicePath  = DuplicateDevicePath (DevicePathFromHandle (Handles[Index]));
       Description = BmGetBootDescription (Handles[Index]);
       break;
@@ -2334,7 +2334,7 @@ EfiBootManagerGetBootManagerMenu (
   BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
 
   for (Index = 0; Index < BootOptionCount; Index++) {
-    if (BmIsBootMenuAppFilePath (BootOptions[Index].FilePath)) {
+    if (BmIsBootManagerMenuFilePath (BootOptions[Index].FilePath)) {
         Status = EfiBootManagerInitializeLoadOption (
                    BootOption,
                    BootOptions[Index].OptionNumber,
