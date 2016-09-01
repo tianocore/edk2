@@ -19,7 +19,7 @@ from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB
 from ValidCheckingInfoObject import VAR_VALID_OBJECT_FACTORY
 from Common.VariableAttributes import VariableAttributes
 
-DATABASE_VERSION = 5
+DATABASE_VERSION = 6
 
 gPcdDatabaseAutoGenC = TemplateString("""
 //
@@ -27,6 +27,8 @@ gPcdDatabaseAutoGenC = TemplateString("""
 //
 #if 0
 ${PHASE}_PCD_DATABASE_INIT g${PHASE}PcdDbInit = {
+  /* SkuIdTable */
+  { ${BEGIN}${SKUID_VALUE}, ${END} },
 ${BEGIN}  { ${INIT_VALUE_UINT64} }, /*  ${INIT_CNAME_DECL_UINT64}_${INIT_GUID_DECL_UINT64}[${INIT_NUMSKUS_DECL_UINT64}] */
 ${END}
 ${BEGIN}  ${VARDEF_VALUE_UINT64}, /* ${VARDEF_CNAME_UINT64}_${VARDEF_GUID_UINT64}_VariableDefault_${VARDEF_SKUID_UINT64} */
@@ -86,8 +88,6 @@ ${BEGIN}  { ${INIT_VALUE_BOOLEAN} }, /*  ${INIT_CNAME_DECL_BOOLEAN}_${INIT_GUID_
 ${END}
 ${BEGIN}  ${VARDEF_VALUE_BOOLEAN}, /* ${VARDEF_CNAME_BOOLEAN}_${VARDEF_GUID_BOOLEAN}_VariableDefault_${VARDEF_SKUID_BOOLEAN} */
 ${END}
-  /* SkuIdTable */
-  { ${BEGIN}${SKUID_VALUE}, ${END} },
   ${SYSTEM_SKU_ID_VALUE}
 };
 #endif
@@ -122,6 +122,7 @@ gPcdDatabaseAutoGenH = TemplateString("""
 #define ${PHASE}_EXMAP_TABLE_EMPTY              ${EXMAP_TABLE_EMPTY}
 
 typedef struct {
+  UINT64             SkuIdTable[${PHASE}_SKUID_TABLE_SIZE];
 ${BEGIN}  UINT64             ${INIT_CNAME_DECL_UINT64}_${INIT_GUID_DECL_UINT64}[${INIT_NUMSKUS_DECL_UINT64}];
 ${END}
 ${BEGIN}  UINT64             ${VARDEF_CNAME_UINT64}_${VARDEF_GUID_UINT64}_VariableDefault_${VARDEF_SKUID_UINT64};
@@ -156,7 +157,6 @@ ${BEGIN}  BOOLEAN            ${INIT_CNAME_DECL_BOOLEAN}_${INIT_GUID_DECL_BOOLEAN
 ${END}
 ${BEGIN}  BOOLEAN            ${VARDEF_CNAME_BOOLEAN}_${VARDEF_GUID_BOOLEAN}_VariableDefault_${VARDEF_SKUID_BOOLEAN};
 ${END}
-  UINT8              SkuIdTable[${PHASE}_SKUID_TABLE_SIZE];
 ${SYSTEM_SKU_ID}
 } ${PHASE}_PCD_DATABASE_INIT;
 
@@ -176,7 +176,9 @@ ${END}
 
 typedef struct {
   //GUID                  Signature;  // PcdDataBaseGuid
+  //UINT32                BuildVersion;
   //UINT32                Length;
+  //SKU_ID                SystemSkuId;      // Current SkuId value.
   //UINT32                UninitDataBaseSize;// Total size for PCD those default value with 0.
   //TABLE_OFFSET          LocalTokenNumberTableOffset;
   //TABLE_OFFSET          ExMapTableOffset;
@@ -184,11 +186,11 @@ typedef struct {
   //TABLE_OFFSET          StringTableOffset;
   //TABLE_OFFSET          SizeTableOffset;
   //TABLE_OFFSET          SkuIdTableOffset; 
+  //TABLE_OFFSET          PcdNameTableOffset;
   //UINT16                LocalTokenCount;  // LOCAL_TOKEN_NUMBER for all
   //UINT16                ExTokenCount;     // EX_TOKEN_NUMBER for DynamicEx
   //UINT16                GuidTableCount;   // The Number of Guid in GuidTable
-  //SKU_ID                SystemSkuId;      // Current SkuId value.
-  //UINT8                 Pad;
+  //UINT8                 Pad[2];
   ${PHASE}_PCD_DATABASE_INIT    Init;
   ${PHASE}_PCD_DATABASE_UNINIT  Uninit;
 } ${PHASE}_PCD_DATABASE;
@@ -204,6 +206,8 @@ gEmptyPcdDatabaseAutoGenC = TemplateString("""
 //
 #if 0
 ${PHASE}_PCD_DATABASE_INIT g${PHASE}PcdDbInit = {
+  /* SkuIdTable */
+  { 0 },
   /* ExMapTable */
   {
     {0, 0, 0}
@@ -226,8 +230,6 @@ ${PHASE}_PCD_DATABASE_INIT g${PHASE}PcdDbInit = {
   {
     0, 0
   },
-  /* SkuIdTable */
-  { 0 },
   ${SYSTEM_SKU_ID_VALUE}
 };
 #endif
@@ -760,9 +762,9 @@ def BuildExDataBase(Dict):
     VardefValueBoolean = Dict['VARDEF_DB_VALUE_BOOLEAN']
     DbVardefValueBoolean = DbItemList(1, RawDataList = VardefValueBoolean)
     SkuidValue = Dict['SKUID_VALUE']
-    DbSkuidValue = DbItemList(1, RawDataList = SkuidValue)
+    DbSkuidValue = DbItemList(8, RawDataList = SkuidValue)
     SkuIndexValue = Dict['SKU_INDEX_VALUE']
-    DbSkuIndexValue = DbItemList(0,RawDataList = SkuIndexValue)
+    DbSkuIndexValue = DbItemList(8,RawDataList = SkuIndexValue)
     
     # Unit Db Items
     UnInitValueUint64 = Dict['UNINIT_GUID_DECL_UINT64']
@@ -777,24 +779,24 @@ def BuildExDataBase(Dict):
     DbUnInitValueBoolean = DbItemList(1, RawDataList = UnInitValueBoolean)
     PcdTokenNumberMap = Dict['PCD_ORDER_TOKEN_NUMBER_MAP']
  
-    DbNameTotle = ["InitValueUint64", "VardefValueUint64", "InitValueUint32", "VardefValueUint32", "VpdHeadValue", "ExMapTable", 
+    DbNameTotle = ["SkuidValue", "SkuIndexValue", "InitValueUint64", "VardefValueUint64", "InitValueUint32", "VardefValueUint32", "VpdHeadValue", "ExMapTable",
                "LocalTokenNumberTable", "GuidTable", "StringHeadValue",  "PcdNameOffsetTable","VariableTable","SkuTable", "StringTableLen", "PcdTokenTable", "PcdCNameTable", 
                "SizeTableValue", "InitValueUint16", "VardefValueUint16", "InitValueUint8", "VardefValueUint8", "InitValueBoolean",
-               "VardefValueBoolean", "SkuidValue", "SkuIndexValue","UnInitValueUint64", "UnInitValueUint32", "UnInitValueUint16", "UnInitValueUint8", "UnInitValueBoolean"]
+               "VardefValueBoolean", "UnInitValueUint64", "UnInitValueUint32", "UnInitValueUint16", "UnInitValueUint8", "UnInitValueBoolean"]
  
-    DbTotal = [InitValueUint64, VardefValueUint64, InitValueUint32, VardefValueUint32, VpdHeadValue, ExMapTable, 
+    DbTotal = [SkuidValue, SkuIndexValue, InitValueUint64, VardefValueUint64, InitValueUint32, VardefValueUint32, VpdHeadValue, ExMapTable,
                LocalTokenNumberTable, GuidTable, StringHeadValue,  PcdNameOffsetTable,VariableTable,SkuTable, StringTableLen, PcdTokenTable,PcdCNameTable, 
                SizeTableValue, InitValueUint16, VardefValueUint16, InitValueUint8, VardefValueUint8, InitValueBoolean,
-               VardefValueBoolean, SkuidValue, SkuIndexValue, UnInitValueUint64, UnInitValueUint32, UnInitValueUint16, UnInitValueUint8, UnInitValueBoolean]
-    DbItemTotal = [DbInitValueUint64, DbVardefValueUint64, DbInitValueUint32, DbVardefValueUint32, DbVpdHeadValue, DbExMapTable, 
+               VardefValueBoolean, UnInitValueUint64, UnInitValueUint32, UnInitValueUint16, UnInitValueUint8, UnInitValueBoolean]
+    DbItemTotal = [DbSkuidValue, DbSkuIndexValue, DbInitValueUint64, DbVardefValueUint64, DbInitValueUint32, DbVardefValueUint32, DbVpdHeadValue, DbExMapTable,
                DbLocalTokenNumberTable, DbGuidTable, DbStringHeadValue,  DbPcdNameOffsetTable,DbVariableTable,DbSkuTable, DbStringTableLen, DbPcdTokenTable, DbPcdCNameTable, 
                DbSizeTableValue, DbInitValueUint16, DbVardefValueUint16, DbInitValueUint8, DbVardefValueUint8, DbInitValueBoolean,
-               DbVardefValueBoolean, DbSkuidValue, DbSkuIndexValue, DbUnInitValueUint64, DbUnInitValueUint32, DbUnInitValueUint16, DbUnInitValueUint8, DbUnInitValueBoolean]
+               DbVardefValueBoolean, DbUnInitValueUint64, DbUnInitValueUint32, DbUnInitValueUint16, DbUnInitValueUint8, DbUnInitValueBoolean]
     
-    # SkuidValue is the last table in the init table items
-    InitTableNum = DbTotal.index(SkuidValue) + 1 + 1 # +1 is for SkuIndexValue table
+    # VardefValueBoolean is the last table in the init table items
+    InitTableNum = DbNameTotle.index("VardefValueBoolean") + 1
     # The FixedHeader length of the PCD_DATABASE_INIT, from Signature to Pad
-    FixedHeaderLen = 64
+    FixedHeaderLen = 72
 
     # Get offset of SkuId table in the database 
     SkuIdTableOffset = FixedHeaderLen
@@ -809,18 +811,15 @@ def BuildExDataBase(Dict):
     for DbIndex in xrange(len(DbTotal)):
         if DbTotal[DbIndex] is SkuTable:
             break
+        elif DbItemTotal[DbIndex] is DbSkuIndexValue:
+            if DbItemTotal[DbIndex].RawDataList:
+                Count = 0
+                for item in DbItemTotal[DbIndex].RawDataList:
+                    Count += len(item)
+                SkuTableOffset += DbItemTotal[DbIndex].ItemSize * Count
+                continue
         SkuTableOffset += DbItemTotal[DbIndex].GetListSize()
-    PcdTokenTableDbOffset = FixedHeaderLen
-    for DbIndex in xrange(len(DbTotal)):
-        if DbTotal[DbIndex] is PcdTokenTable:
-            break
-        PcdTokenTableDbOffset += DbItemTotal[DbIndex].GetListSize()
-    
-    PcdCNameTableDbOffset = FixedHeaderLen
-    for DbIndex in xrange(len(DbTotal)):
-        if DbTotal[DbIndex] is PcdCNameTable:
-            break
-        PcdCNameTableDbOffset += DbItemTotal[DbIndex].GetListSize()
+
     # Fix up the LocalTokenNumberTable, SkuHeader table
     SkuHeaderIndex = 0
     if len(Dict['SKU_INDEX_VALUE']) > 0:
@@ -835,6 +834,13 @@ def BuildExDataBase(Dict):
             if DbTotal[DbIndex] is Table:
                 DbOffset += DbItemTotal[DbIndex].GetInterOffset(Offset)
                 break
+            elif DbItemTotal[DbIndex] is DbSkuIndexValue:
+                if DbItemTotal[DbIndex].RawDataList:
+                    Count = 0
+                    for item in DbItemTotal[DbIndex].RawDataList:
+                        Count += len(item)
+                    DbOffset += DbItemTotal[DbIndex].ItemSize * Count
+                    continue
             DbOffset += DbItemTotal[DbIndex].GetListSize()
             if DbIndex + 1 == InitTableNum:
                 if DbOffset % 8:
@@ -847,9 +853,9 @@ def BuildExDataBase(Dict):
         LocalTokenNumberTable[LocalTokenNumberTableIndex] = DbOffset|int(TokenTypeValue)
         # if PCD_TYPE_SKU_ENABLED, then we need to fix up the SkuTable
         
-        SkuIndexTabalOffset = SkuIdTableOffset + Dict['SKUID_VALUE'][0] + 1
+        SkuIndexTabalOffset = SkuIdTableOffset + len(Dict['SKUID_VALUE']) * 8
         if (TokenTypeValue & (0x2 << 28)):
-            SkuTable[SkuHeaderIndex] = (DbOffset|int(TokenTypeValue & ~(0x2<<28)), SkuIndexTabalOffset + SkuIndexIndexTable[PcdTokenNumberMap[LocalTokenNumberTableIndex]])
+            SkuTable[SkuHeaderIndex] = (DbOffset|int(TokenTypeValue & ~(0x2<<28)), SkuIndexTabalOffset + SkuIndexIndexTable[PcdTokenNumberMap[LocalTokenNumberTableIndex]] * 8)
             LocalTokenNumberTable[LocalTokenNumberTableIndex] = (SkuTableOffset + SkuHeaderIndex * 8) | int(TokenTypeValue)
             SkuHeaderIndex += 1
         
@@ -869,6 +875,13 @@ def BuildExDataBase(Dict):
                 if DbTotal[DbIndex] is VariableRefTable:
                     DbOffset += DbItemTotal[DbIndex].GetInterOffset(VariableOffset)
                     break
+                elif DbItemTotal[DbIndex] is DbSkuIndexValue:
+                    if DbItemTotal[DbIndex].RawDataList:
+                        Count = 0
+                        for item in DbItemTotal[DbIndex].RawDataList:
+                            Count += len(item)
+                        DbOffset += DbItemTotal[DbIndex].ItemSize * Count
+                        continue
                 DbOffset += DbItemTotal[DbIndex].GetListSize()
                 if DbIndex + 1 == InitTableNum:
                     if DbOffset % 8:
@@ -900,6 +913,13 @@ def BuildExDataBase(Dict):
             SkuIdTableOffset = DbTotalLength
         elif DbItemTotal[DbIndex] is DbPcdNameOffsetTable:
             DbPcdNameOffset = DbTotalLength
+        elif DbItemTotal[DbIndex] is DbSkuIndexValue:
+            if DbItemTotal[DbIndex].RawDataList:
+                Count = 0
+                for item in DbItemTotal[DbIndex].RawDataList:
+                    Count += len(item)
+                DbTotalLength += DbItemTotal[DbIndex].ItemSize * Count
+                continue
 
         DbTotalLength += DbItemTotal[DbIndex].GetListSize()
     if not Dict['PCD_INFO_FLAG']:
@@ -939,6 +959,9 @@ def BuildExDataBase(Dict):
     b = pack('=L', DbTotalLength - UninitDataBaseSize)
 
     Buffer += b
+    b = pack('=Q', SystemSkuId)
+
+    Buffer += b
     b = pack('=L', UninitDataBaseSize)
 
     Buffer += b
@@ -972,8 +995,8 @@ def BuildExDataBase(Dict):
     b = pack('=H', GuidTableCount)
  
     Buffer += b
-    b = pack('=B', SystemSkuId)
- 
+    b = pack('=B', Pad)
+
     Buffer += b
     b = pack('=B', Pad)
  
