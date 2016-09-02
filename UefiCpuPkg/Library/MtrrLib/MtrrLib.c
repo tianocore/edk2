@@ -243,7 +243,7 @@ MtrrGetDefaultMemoryType (
 
 **/
 VOID
-PreMtrrChange (
+MtrrLibPreMtrrChange (
   OUT MTRR_CONTEXT  *MtrrContext
   )
 {
@@ -284,7 +284,7 @@ PreMtrrChange (
 
 **/
 VOID
-PostMtrrChangeEnableCache (
+MtrrLibPostMtrrChangeEnableCache (
   IN MTRR_CONTEXT  *MtrrContext
   )
 {
@@ -319,7 +319,7 @@ PostMtrrChangeEnableCache (
 
 **/
 VOID
-PostMtrrChange (
+MtrrLibPostMtrrChange (
   IN MTRR_CONTEXT  *MtrrContext
   )
 {
@@ -328,7 +328,7 @@ PostMtrrChange (
   //
   AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 3);
 
-  PostMtrrChangeEnableCache (MtrrContext);
+  MtrrLibPostMtrrChangeEnableCache (MtrrContext);
 }
 
 /**
@@ -1086,7 +1086,7 @@ MtrrLibInitializeMtrrMask (
 
 **/
 UINT64
-MtrrPrecedence (
+MtrrLibPrecedence (
   IN UINT64    MtrrType1,
   IN UINT64    MtrrType2
   )
@@ -1245,7 +1245,7 @@ MtrrGetMemoryAttributeByAddressWorker (
       if (Address >= VariableMtrr[Index].BaseAddress &&
           Address < VariableMtrr[Index].BaseAddress+VariableMtrr[Index].Length) {
         TempMtrrType = VariableMtrr[Index].Type;
-        MtrrType = MtrrPrecedence (MtrrType, TempMtrrType);
+        MtrrType = MtrrLibPrecedence (MtrrType, TempMtrrType);
       }
     }
   }
@@ -1791,7 +1791,7 @@ Done:
   for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
     if (FixedSettingsModified[Index]) {
       if (!MtrrContextValid) {
-        PreMtrrChange (&MtrrContext);
+        MtrrLibPreMtrrChange (&MtrrContext);
         MtrrContextValid = TRUE;
       }
       AsmWriteMsr64 (
@@ -1809,7 +1809,7 @@ Done:
       if (WorkingVariableSettings.Mtrr[Index].Base != OriginalVariableSettings.Mtrr[Index].Base ||
           WorkingVariableSettings.Mtrr[Index].Mask != OriginalVariableSettings.Mtrr[Index].Mask    ) {
         if (!MtrrContextValid) {
-          PreMtrrChange (&MtrrContext);
+          MtrrLibPreMtrrChange (&MtrrContext);
           MtrrContextValid = TRUE;
         }
         AsmWriteMsr64 (
@@ -1824,7 +1824,7 @@ Done:
     }
   }
   if (MtrrContextValid) {
-    PostMtrrChange (&MtrrContext);
+    MtrrLibPostMtrrChange (&MtrrContext);
   }
 
   DEBUG((DEBUG_CACHE, "  Status = %r\n", Status));
@@ -1971,9 +1971,9 @@ MtrrSetVariableMtrr (
     return VariableSettings;
   }
 
-  PreMtrrChange (&MtrrContext);
+  MtrrLibPreMtrrChange (&MtrrContext);
   MtrrSetVariableMtrrWorker (VariableSettings);
-  PostMtrrChange (&MtrrContext);
+  MtrrLibPostMtrrChange (&MtrrContext);
   MtrrDebugPrintAllMtrrs ();
 
   return  VariableSettings;
@@ -2021,9 +2021,9 @@ MtrrSetFixedMtrr (
     return FixedSettings;
   }
 
-  PreMtrrChange (&MtrrContext);
+  MtrrLibPreMtrrChange (&MtrrContext);
   MtrrSetFixedMtrrWorker (FixedSettings);
-  PostMtrrChange (&MtrrContext);
+  MtrrLibPostMtrrChange (&MtrrContext);
   MtrrDebugPrintAllMtrrs ();
 
   return FixedSettings;
@@ -2091,7 +2091,7 @@ MtrrSetAllMtrrs (
     return MtrrSetting;
   }
 
-  PreMtrrChange (&MtrrContext);
+  MtrrLibPreMtrrChange (&MtrrContext);
 
   //
   // Set fixed MTRRs
@@ -2108,7 +2108,7 @@ MtrrSetAllMtrrs (
   //
   AsmWriteMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, MtrrSetting->MtrrDefType);
 
-  PostMtrrChangeEnableCache (&MtrrContext);
+  MtrrLibPostMtrrChangeEnableCache (&MtrrContext);
 
   return MtrrSetting;
 }
