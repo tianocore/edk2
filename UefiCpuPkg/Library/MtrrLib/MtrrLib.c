@@ -568,20 +568,19 @@ MtrrLibProgramFixedMtrr (
   This function shadows the content of variable MTRRs into an
   internal array: VariableMtrr.
 
-  @param[in]   VariableSettings           The variable MTRR values to shadow
-  @param[in]   FirmwareVariableMtrrCount  The number of variable MTRRs available to firmware
-  @param[in]   MtrrValidBitsMask          The mask for the valid bit of the MTRR
-  @param[in]   MtrrValidAddressMask       The valid address mask for MTRR
-  @param[out]  VariableMtrr               The array to shadow variable MTRRs content
+  @param[in]   VariableSettings      The variable MTRR values to shadow
+  @param[in]   VariableMtrrCount     The number of variable MTRRs
+  @param[in]   MtrrValidBitsMask     The mask for the valid bit of the MTRR
+  @param[in]   MtrrValidAddressMask  The valid address mask for MTRR
+  @param[out]  VariableMtrr          The array to shadow variable MTRRs content
 
-  @return                       The return value of this parameter indicates the
-                                number of MTRRs which has been used.
+  @return      Number of MTRRs which has been used.
 
 **/
 UINT32
 MtrrGetMemoryAttributeInVariableMtrrWorker (
   IN  MTRR_VARIABLE_SETTINGS  *VariableSettings,
-  IN  UINTN                   FirmwareVariableMtrrCount,
+  IN  UINTN                   VariableMtrrCount,
   IN  UINT64                  MtrrValidBitsMask,
   IN  UINT64                  MtrrValidAddressMask,
   OUT VARIABLE_MTRR           *VariableMtrr
@@ -591,7 +590,7 @@ MtrrGetMemoryAttributeInVariableMtrrWorker (
   UINT32  UsedMtrr;
 
   ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
-  for (Index = 0, UsedMtrr = 0; Index < FirmwareVariableMtrrCount; Index++) {
+  for (Index = 0, UsedMtrr = 0; Index < VariableMtrrCount; Index++) {
     if ((VariableSettings->Mtrr[Index].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) != 0) {
       VariableMtrr[Index].Msr         = (UINT32)Index;
       VariableMtrr[Index].BaseAddress = (VariableSettings->Mtrr[Index].Base & MtrrValidAddressMask);
@@ -724,8 +723,10 @@ MtrrLibGetPositiveMtrrNumber (
   Return whether the left MTRR type precedes the right MTRR type.
 
   The MTRR type precedence rules are:
-  1. UC precedes any other type
-  2. WT precedes WB
+    1. UC precedes any other type
+    2. WT precedes WB
+  For further details, please refer the IA32 Software Developer's Manual,
+  Volume 3, Section "MTRR Precedences".
 
   @param Left  The left MTRR type.
   @param Right The right MTRR type.
@@ -954,46 +955,6 @@ MtrrLibGetMtrrNumber (
   return LeastSubtractiveMtrrNumber + MiddleMtrrNumber + LeastRightMtrrNumber;
 }
 
-
-/**
-  Converts the Memory attribute value to MTRR_MEMORY_CACHE_TYPE.
-
-  If MtrrSetting is not NULL, gets the default memory attribute from input
-  MTRR settings buffer.
-  If MtrrSetting is NULL, gets the default memory attribute from MSR.
-
-  @param[in]  MtrrSetting        A buffer holding all MTRRs content.
-  @param[in]  MtrrType           MTRR memory type
-
-  @return The enum item in MTRR_MEMORY_CACHE_TYPE
-
-**/
-MTRR_MEMORY_CACHE_TYPE
-GetMemoryCacheTypeFromMtrrType (
-  IN MTRR_SETTINGS         *MtrrSetting,
-  IN UINT64                MtrrType
-  )
-{
-  switch (MtrrType) {
-  case MTRR_CACHE_UNCACHEABLE:
-    return CacheUncacheable;
-  case MTRR_CACHE_WRITE_COMBINING:
-    return CacheWriteCombining;
-  case MTRR_CACHE_WRITE_THROUGH:
-    return CacheWriteThrough;
-  case MTRR_CACHE_WRITE_PROTECTED:
-    return CacheWriteProtected;
-  case MTRR_CACHE_WRITE_BACK:
-    return CacheWriteBack;
-  default:
-    //
-    // MtrrType is MTRR_CACHE_INVALID_TYPE, that means
-    // no MTRR covers the range
-    //
-    return MtrrGetDefaultMemoryTypeWorker (MtrrSetting);
-  }
-}
-
 /**
   Initializes the valid bits mask and valid address mask for MTRRs.
 
@@ -1030,71 +991,34 @@ MtrrLibInitializeMtrrMask (
   Determines the real attribute of a memory range.
 
   This function is to arbitrate the real attribute of the memory when
-  there are 2 MTRRs covers the same memory range.  For further details,
+  there are 2 MTRRs covers the same memory range. For further details,
   please refer the IA32 Software Developer's Manual, Volume 3,
-  Section 10.11.4.1.
+  Section "MTRR Precedences".
 
   @param[in]  MtrrType1    The first kind of Memory type
   @param[in]  MtrrType2    The second kind of memory type
 
 **/
-UINT64
+MTRR_MEMORY_CACHE_TYPE
 MtrrLibPrecedence (
-  IN UINT64    MtrrType1,
-  IN UINT64    MtrrType2
+  IN MTRR_MEMORY_CACHE_TYPE    MtrrType1,
+  IN MTRR_MEMORY_CACHE_TYPE    MtrrType2
   )
 {
-  UINT64 MtrrType;
-
-  MtrrType = MTRR_CACHE_INVALID_TYPE;
-  switch (MtrrType1) {
-  case MTRR_CACHE_UNCACHEABLE:
-    MtrrType = MTRR_CACHE_UNCACHEABLE;
-    break;
-  case MTRR_CACHE_WRITE_COMBINING:
-    if (
-         MtrrType2==MTRR_CACHE_WRITE_COMBINING ||
-         MtrrType2==MTRR_CACHE_UNCACHEABLE
-       ) {
-      MtrrType = MtrrType2;
-    }
-    break;
-  case MTRR_CACHE_WRITE_THROUGH:
-    if (
-         MtrrType2==MTRR_CACHE_WRITE_THROUGH ||
-         MtrrType2==MTRR_CACHE_WRITE_BACK
-       ) {
-      MtrrType = MTRR_CACHE_WRITE_THROUGH;
-    } else if(MtrrType2==MTRR_CACHE_UNCACHEABLE) {
-      MtrrType = MTRR_CACHE_UNCACHEABLE;
-    }
-    break;
-  case MTRR_CACHE_WRITE_PROTECTED:
-    if (MtrrType2 == MTRR_CACHE_WRITE_PROTECTED ||
-        MtrrType2 == MTRR_CACHE_UNCACHEABLE) {
-      MtrrType = MtrrType2;
-    }
-    break;
-  case MTRR_CACHE_WRITE_BACK:
-    if (
-         MtrrType2== MTRR_CACHE_UNCACHEABLE ||
-         MtrrType2==MTRR_CACHE_WRITE_THROUGH ||
-         MtrrType2== MTRR_CACHE_WRITE_BACK
-       ) {
-      MtrrType = MtrrType2;
-    }
-    break;
-  case MTRR_CACHE_INVALID_TYPE:
-    MtrrType = MtrrType2;
-    break;
-  default:
-    break;
+  if (MtrrType1 == MtrrType2) {
+    return MtrrType1;
   }
 
-  if (MtrrType2 == MTRR_CACHE_INVALID_TYPE) {
-    MtrrType = MtrrType1;
+  ASSERT (
+    MtrrLibTypeLeftPrecedeRight (MtrrType1, MtrrType2) ||
+    MtrrLibTypeLeftPrecedeRight (MtrrType2, MtrrType1)
+  );
+
+  if (MtrrLibTypeLeftPrecedeRight (MtrrType1, MtrrType2)) {
+    return MtrrType1;
+  } else {
+    return MtrrType2;
   }
-  return MtrrType;
 }
 
 /**
@@ -1116,29 +1040,27 @@ MtrrGetMemoryAttributeByAddressWorker (
   IN PHYSICAL_ADDRESS   Address
   )
 {
-  UINT64                  TempQword;
-  UINTN                   Index;
-  UINTN                   SubIndex;
-  UINT64                  MtrrType;
-  UINT64                  TempMtrrType;
-  MTRR_MEMORY_CACHE_TYPE  CacheType;
-  VARIABLE_MTRR           VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
-  UINT64                  MtrrValidBitsMask;
-  UINT64                  MtrrValidAddressMask;
-  UINTN                   VariableMtrrCount;
-  MTRR_VARIABLE_SETTINGS  VariableSettings;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER DefType;
+  UINT64                          FixedMtrr;
+  UINTN                           Index;
+  UINTN                           SubIndex;
+  MTRR_MEMORY_CACHE_TYPE          MtrrType;
+  VARIABLE_MTRR                   VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
+  UINT64                          MtrrValidBitsMask;
+  UINT64                          MtrrValidAddressMask;
+  UINT32                          VariableMtrrCount;
+  MTRR_VARIABLE_SETTINGS          VariableSettings;
 
   //
   // Check if MTRR is enabled, if not, return UC as attribute
   //
   if (MtrrSetting == NULL) {
-    TempQword = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
+    DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
   } else {
-    TempQword = MtrrSetting->MtrrDefType;
+    DefType.Uint64 = MtrrSetting->MtrrDefType;
   }
-  MtrrType = MTRR_CACHE_INVALID_TYPE;
 
-  if ((TempQword & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+  if (DefType.Bits.E == 0) {
     return CacheUncacheable;
   }
 
@@ -1146,65 +1068,66 @@ MtrrGetMemoryAttributeByAddressWorker (
   // If address is less than 1M, then try to go through the fixed MTRR
   //
   if (Address < BASE_1MB) {
-    if ((TempQword & MTRR_LIB_CACHE_FIXED_MTRR_ENABLED) != 0) {
+    if (DefType.Bits.FE != 0) {
       //
       // Go through the fixed MTRR
       //
       for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-         if (Address >= mMtrrLibFixedMtrrTable[Index].BaseAddress &&
-             Address  < (
-                          mMtrrLibFixedMtrrTable[Index].BaseAddress +
-                          (mMtrrLibFixedMtrrTable[Index].Length * 8)
-                        )
-            ) {
-           SubIndex =
-             ((UINTN)Address - mMtrrLibFixedMtrrTable[Index].BaseAddress) /
-               mMtrrLibFixedMtrrTable[Index].Length;
-           if (MtrrSetting == NULL) {
-             TempQword = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
-           } else {
-             TempQword = MtrrSetting->Fixed.Mtrr[Index];
-           }
-           MtrrType =  RShiftU64 (TempQword, SubIndex * 8) & 0xFF;
-           return GetMemoryCacheTypeFromMtrrType (MtrrSetting, MtrrType);
-         }
+        if (Address >= mMtrrLibFixedMtrrTable[Index].BaseAddress &&
+            Address < mMtrrLibFixedMtrrTable[Index].BaseAddress +
+            (mMtrrLibFixedMtrrTable[Index].Length * 8)) {
+          SubIndex =
+            ((UINTN) Address - mMtrrLibFixedMtrrTable[Index].BaseAddress) /
+            mMtrrLibFixedMtrrTable[Index].Length;
+          if (MtrrSetting == NULL) {
+            FixedMtrr = AsmReadMsr64 (mMtrrLibFixedMtrrTable[Index].Msr);
+          } else {
+            FixedMtrr = MtrrSetting->Fixed.Mtrr[Index];
+          }
+          return (MTRR_MEMORY_CACHE_TYPE) (RShiftU64 (FixedMtrr, SubIndex * 8) & 0xFF);
+        }
       }
     }
   }
-  MtrrLibInitializeMtrrMask(&MtrrValidBitsMask, &MtrrValidAddressMask);
 
-  MtrrGetVariableMtrrWorker (
-    MtrrSetting,
-    GetVariableMtrrCountWorker (),
-    &VariableSettings
-    );
+  VariableMtrrCount = GetVariableMtrrCountWorker ();
+  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+  MtrrGetVariableMtrrWorker (MtrrSetting, VariableMtrrCount, &VariableSettings);
 
+  MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
   MtrrGetMemoryAttributeInVariableMtrrWorker (
-           &VariableSettings,
-           GetFirmwareVariableMtrrCountWorker (),
-           MtrrValidBitsMask,
-           MtrrValidAddressMask,
-           VariableMtrr
-           );
+    &VariableSettings,
+    VariableMtrrCount,
+    MtrrValidBitsMask,
+    MtrrValidAddressMask,
+    VariableMtrr
+  );
 
   //
   // Go through the variable MTRR
   //
-  VariableMtrrCount = GetVariableMtrrCountWorker ();
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
-
+  MtrrType = CacheInvalid;
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     if (VariableMtrr[Index].Valid) {
       if (Address >= VariableMtrr[Index].BaseAddress &&
-          Address < VariableMtrr[Index].BaseAddress+VariableMtrr[Index].Length) {
-        TempMtrrType = VariableMtrr[Index].Type;
-        MtrrType = MtrrLibPrecedence (MtrrType, TempMtrrType);
+          Address < VariableMtrr[Index].BaseAddress + VariableMtrr[Index].Length) {
+        if (MtrrType == CacheInvalid) {
+          MtrrType = (MTRR_MEMORY_CACHE_TYPE) VariableMtrr[Index].Type;
+        } else {
+          MtrrType = MtrrLibPrecedence (MtrrType, (MTRR_MEMORY_CACHE_TYPE) VariableMtrr[Index].Type);
+        }
       }
     }
   }
-  CacheType = GetMemoryCacheTypeFromMtrrType (MtrrSetting, MtrrType);
 
-  return CacheType;
+  //
+  // If there is no MTRR which covers the Address, use the default MTRR type.
+  //
+  if (MtrrType == CacheInvalid) {
+    MtrrType = (MTRR_MEMORY_CACHE_TYPE) DefType.Bits.Type;
+  }
+
+  return MtrrType;
 }
 
 
