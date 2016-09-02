@@ -445,7 +445,7 @@ MtrrGetVariableMtrr (
 /**
   Programs fixed MTRRs registers.
 
-  @param[in]      MemoryCacheType  The memory type to set.
+  @param[in]      Type             The memory type to set.
   @param[in, out] Base             The base address of memory range.
   @param[in, out] Length           The length of memory range.
   @param[in, out] LastMsrNum       On input, the last index of the fixed MTRR MSR to program.
@@ -459,13 +459,13 @@ MtrrGetVariableMtrr (
 
 **/
 RETURN_STATUS
-ProgramFixedMtrr (
-  IN     UINT64               MemoryCacheType,
-  IN OUT UINT64               *Base,
-  IN OUT UINT64               *Length,
-  IN OUT UINT32               *LastMsrNum,
-  OUT    UINT64               *ReturnClearMask,
-  OUT    UINT64               *ReturnOrMask
+MtrrLibProgramFixedMtrr (
+  IN     MTRR_MEMORY_CACHE_TYPE  Type,
+  IN OUT UINT64                  *Base,
+  IN OUT UINT64                  *Length,
+  IN OUT UINT32                  *LastMsrNum,
+  OUT    UINT64                  *ReturnClearMask,
+  OUT    UINT64                  *ReturnOrMask
   )
 {
   UINT32  MsrNum;
@@ -491,7 +491,7 @@ ProgramFixedMtrr (
     }
   }
 
-  if (MsrNum >= MTRR_NUMBER_OF_FIXED_MTRR) {
+  if (MsrNum == MTRR_NUMBER_OF_FIXED_MTRR) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -526,7 +526,7 @@ ProgramFixedMtrr (
   }
 
   ClearMask = CLEAR_SEED;
-  OrMask    = MultU64x32 (OR_SEED, (UINT32)MemoryCacheType);
+  OrMask    = MultU64x32 (OR_SEED, (UINT32) Type);
 
   if (LeftByteShift != 0) {
     //
@@ -1562,7 +1562,7 @@ MtrrSetMemoryAttributeWorker (
   if (BaseAddress < BASE_1MB) {
     MsrNum = (UINT32)-1;
     while ((BaseAddress < BASE_1MB) && (Length > 0) && Status == RETURN_SUCCESS) {
-      Status = ProgramFixedMtrr (MemoryType, &BaseAddress, &Length, &MsrNum, &ClearMask, &OrMask);
+      Status = MtrrLibProgramFixedMtrr (Attribute, &BaseAddress, &Length, &MsrNum, &ClearMask, &OrMask);
       if (RETURN_ERROR (Status)) {
         goto Done;
       }
