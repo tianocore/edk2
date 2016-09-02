@@ -124,11 +124,11 @@ GetVariableMtrrCountWorker (
   VOID
   )
 {
-  UINT32  VariableMtrrCount;
+  MSR_IA32_MTRRCAP_REGISTER MtrrCap;
 
-  VariableMtrrCount = (UINT32)(AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
-  ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
-  return VariableMtrrCount;
+  MtrrCap.Uint64 = AsmReadMsr64 (MSR_IA32_MTRRCAP);
+  ASSERT (MtrrCap.Bits.VCNT <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+  return MtrrCap.Bits.VCNT;
 }
 
 /**
