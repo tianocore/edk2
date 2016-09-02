@@ -18,6 +18,9 @@
 
 #include <Base.h>
 
+#include <Register/Cpuid.h>
+#include <Register/Msr.h>
+
 #include <Library/MtrrLib.h>
 #include <Library/BaseLib.h>
 #include <Library/CpuLib.h>
@@ -2124,26 +2127,25 @@ IsMtrrSupported (
   VOID
   )
 {
-  UINT32  RegEdx;
-  UINT64  MtrrCap;
+  CPUID_VERSION_INFO_EDX    Edx;
+  MSR_IA32_MTRRCAP_REGISTER MtrrCap;
 
   //
   // Check CPUID(1).EDX[12] for MTRR capability
   //
-  AsmCpuid (1, NULL, NULL, NULL, &RegEdx);
-  if (BitFieldRead32 (RegEdx, 12, 12) == 0) {
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
+  if (Edx.Bits.MTRR == 0) {
     return FALSE;
   }
 
   //
-  // Check IA32_MTRRCAP.[0..7] for number of variable MTRRs and IA32_MTRRCAP[8] for
-  // fixed MTRRs existence. If number of variable MTRRs is zero, or fixed MTRRs do not
+  // Check number of variable MTRRs and fixed MTRRs existence.
+  // If number of variable MTRRs is zero, or fixed MTRRs do not
   // exist, return false.
   //
-  MtrrCap = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_CAP);
-  if  ((BitFieldRead64 (MtrrCap, 0, 7) == 0) || (BitFieldRead64 (MtrrCap, 8, 8) == 0)) {
+  MtrrCap.Uint64 = AsmReadMsr64 (MSR_IA32_MTRRCAP);
+  if ((MtrrCap.Bits.VCNT == 0) || (MtrrCap.Bits.FIX == 0)) {
     return FALSE;
   }
-
   return TRUE;
 }
