@@ -50,57 +50,57 @@ typedef struct {
 //
 CONST FIXED_MTRR  mMtrrLibFixedMtrrTable[] = {
   {
-    MTRR_LIB_IA32_MTRR_FIX64K_00000,
+    MSR_IA32_MTRR_FIX64K_00000,
     0,
     SIZE_64KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX16K_80000,
+    MSR_IA32_MTRR_FIX16K_80000,
     0x80000,
     SIZE_16KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX16K_A0000,
+    MSR_IA32_MTRR_FIX16K_A0000,
     0xA0000,
     SIZE_16KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_C0000,
+    MSR_IA32_MTRR_FIX4K_C0000,
     0xC0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_C8000,
+    MSR_IA32_MTRR_FIX4K_C8000,
     0xC8000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_D0000,
+    MSR_IA32_MTRR_FIX4K_D0000,
     0xD0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_D8000,
+    MSR_IA32_MTRR_FIX4K_D8000,
     0xD8000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_E0000,
+    MSR_IA32_MTRR_FIX4K_E0000,
     0xE0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_E8000,
+    MSR_IA32_MTRR_FIX4K_E8000,
     0xE8000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_F0000,
+    MSR_IA32_MTRR_FIX4K_F0000,
     0xF0000,
     SIZE_4KB
   },
   {
-    MTRR_LIB_IA32_MTRR_FIX4K_F8000,
+    MSR_IA32_MTRR_FIX4K_F8000,
     0xF8000,
     SIZE_4KB
   }
@@ -214,11 +214,15 @@ MtrrGetDefaultMemoryTypeWorker (
   IN MTRR_SETTINGS      *MtrrSetting
   )
 {
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER DefType;
+
   if (MtrrSetting == NULL) {
-    return (MTRR_MEMORY_CACHE_TYPE) (AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE) & 0x7);
+    DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
   } else {
-    return (MTRR_MEMORY_CACHE_TYPE) (MtrrSetting->MtrrDefType & 0x7);
+    DefType.Uint64 = MtrrSetting->MtrrDefType;
   }
+
+  return (MTRR_MEMORY_CACHE_TYPE) DefType.Bits.Type;
 }
 
 
@@ -254,6 +258,7 @@ MtrrLibPreMtrrChange (
   OUT MTRR_CONTEXT  *MtrrContext
   )
 {
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  DefType;
   //
   // Disable interrupts and save current interrupt state
   //
@@ -278,7 +283,9 @@ MtrrLibPreMtrrChange (
   //
   // Disable MTRRs
   //
-  AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 0);
+  DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  DefType.Bits.E = 0;
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
 }
 
 /**
@@ -330,10 +337,14 @@ MtrrLibPostMtrrChange (
   IN MTRR_CONTEXT  *MtrrContext
   )
 {
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  DefType;
   //
   // Enable Cache MTRR
   //
-  AsmMsrBitFieldWrite64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, 10, 11, 3);
+  DefType.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  DefType.Bits.E = 1;
+  DefType.Bits.FE = 1;
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
 
   MtrrLibPostMtrrChangeEnableCache (MtrrContext);
 }
@@ -412,9 +423,9 @@ MtrrGetVariableMtrrWorker (
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     if (MtrrSetting == NULL) {
       VariableSettings->Mtrr[Index].Base =
-        AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1));
+        AsmReadMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1));
       VariableSettings->Mtrr[Index].Mask =
-        AsmReadMsr64 (MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1);
+        AsmReadMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1));
     } else {
       VariableSettings->Mtrr[Index].Base = MtrrSetting->Variables.Mtrr[Index].Base;
       VariableSettings->Mtrr[Index].Mask = MtrrSetting->Variables.Mtrr[Index].Mask;
@@ -591,7 +602,7 @@ MtrrGetMemoryAttributeInVariableMtrrWorker (
 
   ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
   for (Index = 0, UsedMtrr = 0; Index < VariableMtrrCount; Index++) {
-    if ((VariableSettings->Mtrr[Index].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) != 0) {
+    if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *) &VariableSettings->Mtrr[Index].Mask)->Bits.V != 0) {
       VariableMtrr[Index].Msr         = (UINT32)Index;
       VariableMtrr[Index].BaseAddress = (VariableSettings->Mtrr[Index].Base & MtrrValidAddressMask);
       VariableMtrr[Index].Length      = ((~(VariableSettings->Mtrr[Index].Mask & MtrrValidAddressMask)) & MtrrValidBitsMask) + 1;
@@ -2206,11 +2217,11 @@ MtrrSetVariableMtrrWorker (
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     AsmWriteMsr64 (
-      MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1),
+      MSR_IA32_MTRR_PHYSBASE0 + (Index << 1),
       VariableSettings->Mtrr[Index].Base
       );
     AsmWriteMsr64 (
-      MTRR_LIB_IA32_VARIABLE_MTRR_BASE + (Index << 1) + 1,
+      MSR_IA32_MTRR_PHYSMASK0 + (Index << 1),
       VariableSettings->Mtrr[Index].Mask
       );
   }
@@ -2331,7 +2342,7 @@ MtrrGetAllMtrrs (
   //
   // Get MTRR_DEF_TYPE value
   //
-  MtrrSetting->MtrrDefType = AsmReadMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE);
+  MtrrSetting->MtrrDefType = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
 
   return MtrrSetting;
 }
@@ -2372,7 +2383,7 @@ MtrrSetAllMtrrs (
   //
   // Set MTRR_DEF_TYPE value
   //
-  AsmWriteMsr64 (MTRR_LIB_IA32_MTRR_DEF_TYPE, MtrrSetting->MtrrDefType);
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, MtrrSetting->MtrrDefType);
 
   MtrrLibPostMtrrChangeEnableCache (&MtrrContext);
 
