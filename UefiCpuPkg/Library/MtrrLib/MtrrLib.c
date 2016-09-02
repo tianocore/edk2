@@ -1054,22 +1054,20 @@ MtrrLibInitializeMtrrMask (
   OUT UINT64 *MtrrValidAddressMask
   )
 {
-  UINT32  RegEax;
-  UINT8   PhysicalAddressBits;
+  UINT32                          MaxExtendedFunction;
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
 
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
 
-  if (RegEax >= 0x80000008) {
-    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
 
-    PhysicalAddressBits = (UINT8) RegEax;
-
-    *MtrrValidBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
-    *MtrrValidAddressMask = *MtrrValidBitsMask & 0xfffffffffffff000ULL;
+  if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
   } else {
-    *MtrrValidBitsMask    = MTRR_LIB_MSR_VALID_MASK;
-    *MtrrValidAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
   }
+
+  *MtrrValidBitsMask = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
+  *MtrrValidAddressMask = *MtrrValidBitsMask & 0xfffffffffffff000ULL;
 }
 
 
