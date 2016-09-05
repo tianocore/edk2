@@ -1,0 +1,59 @@
+#/** @file
+#
+# Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+# Portions copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+# Copyright (c) 2016, Linaro Ltd. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmBaseLib
+  FILE_GUID                      = f1d943b6-99c5-46d5-af5a-66ec67662700
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmLib
+
+[Sources]
+  Common/ArmLib.c
+
+[Sources.ARM]
+  ArmV7/ArmV7Lib.c
+  ArmV7/ArmV7ArchTimer.c
+
+  ArmV7/ArmLibSupportV7.S         | GCC
+  ArmV7/ArmV7Support.S            | GCC
+  ArmV7/ArmV7ArchTimerSupport.S   | GCC
+  Common/Arm/ArmLibSupport.S      | GCC
+
+  ArmV7/ArmLibSupportV7.asm       | RVCT
+  ArmV7/ArmV7Support.asm          | RVCT
+  ArmV7/ArmV7ArchTimerSupport.asm | RVCT
+  Common/Arm/ArmLibSupport.asm    | RVCT
+
+[Sources.AARCH64]
+  AArch64/AArch64Lib.c
+  AArch64/AArch64ArchTimer.c
+
+  AArch64/ArmLibSupportV8.S
+  AArch64/AArch64Support.S
+  AArch64/AArch64ArchTimerSupport.S
+  Common/AArch64/ArmLibSupport.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+
+[FeaturePcd.ARM]
+  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
