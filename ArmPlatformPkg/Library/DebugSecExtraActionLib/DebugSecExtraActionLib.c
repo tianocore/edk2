@@ -40,11 +40,11 @@ NonSecureWaitForFirmware (
   ArmCallWFI ();
 
   // Acknowledge the interrupt and send End of Interrupt signal.
-  AcknowledgeInterrupt = ArmGicAcknowledgeInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), &InterruptId);
+  AcknowledgeInterrupt = ArmGicAcknowledgeInterrupt (PcdGet64 (PcdGicInterruptInterfaceBase), &InterruptId);
   // Check if it is a valid interrupt ID
-  if (InterruptId < ArmGicGetMaxNumInterrupts (PcdGet32 (PcdGicDistributorBase))) {
+  if (InterruptId < ArmGicGetMaxNumInterrupts (PcdGet64 (PcdGicDistributorBase))) {
     // Got a valid SGI number hence signal End of Interrupt
-    ArmGicEndOfInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), AcknowledgeInterrupt);
+    ArmGicEndOfInterrupt (PcdGet64 (PcdGicInterruptInterfaceBase), AcknowledgeInterrupt);
   }
 
   // Jump to secondary core entry point.
@@ -105,7 +105,7 @@ ArmPlatformSecExtraAction (
 
     if (ArmPlatformIsPrimaryCore (MpId)) {
       // Signal the secondary cores they can jump to PEI phase
-      ArmGicSendSgiTo (PcdGet32 (PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
+      ArmGicSendSgiTo (PcdGet64 (PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
 
       // To enter into Non Secure state, we need to make a return from exception
       *JumpAddress = PcdGet64 (PcdFvBaseAddress);

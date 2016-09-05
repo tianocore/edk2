@@ -89,11 +89,11 @@ SecondaryMain (
     SecondaryEntryAddr = MmioRead32 (ArmCoreInfoTable[Index].MailboxGetAddress);
 
     // Acknowledge the interrupt and send End of Interrupt signal.
-    AcknowledgeInterrupt = ArmGicAcknowledgeInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), &InterruptId);
+    AcknowledgeInterrupt = ArmGicAcknowledgeInterrupt (PcdGet64 (PcdGicInterruptInterfaceBase), &InterruptId);
     // Check if it is a valid interrupt ID
-    if (InterruptId < ArmGicGetMaxNumInterrupts (PcdGet32 (PcdGicDistributorBase))) {
+    if (InterruptId < ArmGicGetMaxNumInterrupts (PcdGet64 (PcdGicDistributorBase))) {
       // Got a valid SGI number hence signal End of Interrupt
-      ArmGicEndOfInterrupt (PcdGet32 (PcdGicInterruptInterfaceBase), AcknowledgeInterrupt);
+      ArmGicEndOfInterrupt (PcdGet64 (PcdGicInterruptInterfaceBase), AcknowledgeInterrupt);
     }
   } while (SecondaryEntryAddr == 0);
 
@@ -120,12 +120,12 @@ PrimaryMain (
   CreatePpiList (&PpiListSize, &PpiList);
 
   // Enable the GIC Distributor
-  ArmGicEnableDistributor (PcdGet32(PcdGicDistributorBase));
+  ArmGicEnableDistributor (PcdGet64(PcdGicDistributorBase));
 
   // If ArmVe has not been built as Standalone then we need to wake up the secondary cores
   if (FeaturePcdGet (PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
-    ArmGicSendSgiTo (PcdGet32(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
+    ArmGicSendSgiTo (PcdGet64(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
   }
 
   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at

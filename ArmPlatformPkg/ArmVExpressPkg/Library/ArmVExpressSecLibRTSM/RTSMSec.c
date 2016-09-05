@@ -73,7 +73,7 @@ ArmPlatformSecInitialize (
   MmioAndThenOr32 (SP810_CTRL_BASE + SP810_SYS_CTRL_REG, ~SP810_SYS_CTRL_TIMER3_EN, SP810_SYS_CTRL_TIMER3_TIMCLK);
 
   // Read the GIC Identification Register
-  Identification = ArmGicGetInterfaceIdentification (PcdGet32 (PcdGicInterruptInterfaceBase));
+  Identification = ArmGicGetInterfaceIdentification (PcdGet64 (PcdGicInterruptInterfaceBase));
 
   // Check if we are GICv3
   if (ARM_GIC_ICCIIDR_GET_ARCH_VERSION(Identification) >= 0x3) {

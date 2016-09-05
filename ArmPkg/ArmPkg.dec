@@ -251,10 +251,10 @@
   #
   # ARM Generic Interrupt Controller
   #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT32|0x0000000C
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT64|0x0000000C
   # Base address for the GIC Redistributor region that contains the boot CPU
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT32|0x0000000E
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT32|0x0000000D
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
   gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
 
   #

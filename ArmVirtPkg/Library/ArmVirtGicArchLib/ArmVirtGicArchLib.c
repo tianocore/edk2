@@ -82,8 +82,8 @@ ArmVirtGicArchLibConstructor (
     RedistBase = SwapBytes64 (Reg[2]);
     ASSERT (RedistBase < MAX_UINT32);
 
-    PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
-    PcdSet32 (PcdGicRedistributorsBase, (UINT32)RedistBase);
+    PcdSet64 (PcdGicDistributorBase, DistBase);
+    PcdSet64 (PcdGicRedistributorsBase, RedistBase);
 
     DEBUG ((EFI_D_INFO, "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
       DistBase, RedistBase));
@@ -117,8 +117,8 @@ ArmVirtGicArchLibConstructor (
     ASSERT (DistBase < MAX_UINT32);
     ASSERT (CpuBase < MAX_UINT32);
 
-    PcdSet32 (PcdGicDistributorBase, (UINT32)DistBase);
-    PcdSet32 (PcdGicInterruptInterfaceBase, (UINT32)CpuBase);
+    PcdSet64 (PcdGicDistributorBase, DistBase);
+    PcdSet64 (PcdGicInterruptInterfaceBase, CpuBase);
 
     DEBUG ((EFI_D_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
 

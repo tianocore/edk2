@@ -97,7 +97,7 @@ StartLinux (
   LINUX_KERNEL64        LinuxKernel = (LINUX_KERNEL64)LinuxImage;
 
   // Send msg to secondary cores to go to the kernel pen.
-  ArmGicSendSgiTo (PcdGet32 (PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
+  ArmGicSendSgiTo (PcdGet64 (PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
 
   // Shut down UEFI boot services. ExitBootServices() will notify every driver that created an event on
   // ExitBootServices event. Example the Interrupt DXE driver will disable the interrupts on this event.

@@ -259,8 +259,8 @@ GicV2DxeInitialize (
   // Make sure the Interrupt Controller Protocol is not already installed in the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicInterruptInterfaceBase = PcdGet32 (PcdGicInterruptInterfaceBase);
-  mGicDistributorBase = PcdGet32 (PcdGicDistributorBase);
+  mGicInterruptInterfaceBase = PcdGet64 (PcdGicInterruptInterfaceBase);
+  mGicDistributorBase = PcdGet64 (PcdGicDistributorBase);
   mGicNumInterrupts = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
