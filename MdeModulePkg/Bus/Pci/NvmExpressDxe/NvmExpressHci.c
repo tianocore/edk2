@@ -863,6 +863,19 @@ NvmeControllerInit (
   }
 
   //
+  // Enable 64-bit DMA support in the PCI layer.
+  //
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationEnable,
+                    EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                    NULL
+                    );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_WARN, "NvmeControllerInit: failed to enable 64-bit DMA (%r)\n", Status));
+  }
+
+  //
   // Read the Controller Capabilities register and verify that the NVM command set is supported
   //
   Status = ReadNvmeControllerCapabilities (Private, &Private->Cap);
