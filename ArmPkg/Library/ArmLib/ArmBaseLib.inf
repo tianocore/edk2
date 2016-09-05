@@ -23,30 +23,30 @@
   LIBRARY_CLASS                  = ArmLib
 
 [Sources]
-  Common/ArmLib.c
+  ArmLib.c
 
 [Sources.ARM]
-  ArmV7/ArmV7Lib.c
-  ArmV7/ArmV7ArchTimer.c
+  Arm/ArmV7Lib.c
+  Arm/ArmV7ArchTimer.c
 
-  ArmV7/ArmLibSupportV7.S         | GCC
-  ArmV7/ArmV7Support.S            | GCC
-  ArmV7/ArmV7ArchTimerSupport.S   | GCC
-  Common/Arm/ArmLibSupport.S      | GCC
+  Arm/ArmLibSupport.S           | GCC
+  Arm/ArmLibSupportV7.S         | GCC
+  Arm/ArmV7Support.S            | GCC
+  Arm/ArmV7ArchTimerSupport.S   | GCC
 
-  ArmV7/ArmLibSupportV7.asm       | RVCT
-  ArmV7/ArmV7Support.asm          | RVCT
-  ArmV7/ArmV7ArchTimerSupport.asm | RVCT
-  Common/Arm/ArmLibSupport.asm    | RVCT
+  Arm/ArmLibSupport.asm         | RVCT
+  Arm/ArmLibSupportV7.asm       | RVCT
+  Arm/ArmV7Support.asm          | RVCT
+  Arm/ArmV7ArchTimerSupport.asm | RVCT
 
 [Sources.AARCH64]
   AArch64/AArch64Lib.c
   AArch64/AArch64ArchTimer.c
 
+  AArch64/ArmLibSupport.S
   AArch64/ArmLibSupportV8.S
   AArch64/AArch64Support.S
   AArch64/AArch64ArchTimerSupport.S
-  Common/AArch64/ArmLibSupport.S
 
 [Packages]
   ArmPkg/ArmPkg.dec
