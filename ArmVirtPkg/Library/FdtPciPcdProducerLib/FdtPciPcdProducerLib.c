@@ -128,6 +128,7 @@ FdtPciPcdProducerLibConstructor (
 
       PcdSetBool (PcdPciDisableBusEnumeration, FALSE);
 
+      IoTranslation = 0;
       RetStatus = GetPciIoTranslation (FdtClient, Node, &IoTranslation);
       if (!RETURN_ERROR (RetStatus)) {
           PcdSet64 (PcdPciIoTranslation, IoTranslation);
