@@ -15,7 +15,6 @@
 #include <Uefi.h>
 #include <Chipset/ArmV7.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
