@@ -256,6 +256,8 @@ struct _USB_XHCI_INSTANCE {
   // The array supports up to 255 devices, entry 0 is reserved and should not be used.
   //
   USB_DEV_CONTEXT           UsbDevContext[256];
+
+  BOOLEAN                   Support64BitDma; // Whether 64 bit DMA may be used with this device
 };
 
 
