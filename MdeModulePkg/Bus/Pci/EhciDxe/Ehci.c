@@ -89,7 +89,7 @@ EhcGetCapability (
 
   *MaxSpeed       = EFI_USB_SPEED_HIGH;
   *PortNumber     = (UINT8) (Ehc->HcStructParams & HCSP_NPORTS);
-  *Is64BitCapable = (UINT8) (Ehc->HcCapParams & HCCP_64BIT);
+  *Is64BitCapable = (UINT8) Ehc->Support64BitDma;
 
   DEBUG ((EFI_D_INFO, "EhcGetCapability: %d ports, 64 bit %d\n", *PortNumber, *Is64BitCapable));
 
@@ -1875,6 +1875,26 @@ EhcDriverBindingStart (
 
     Status = EFI_OUT_OF_RESOURCES;
     goto CLOSE_PCIIO;
+  }
+
+  //
+  // Enable 64-bit DMA support in the PCI layer if this controller
+  // supports it.
+  //
+  if (EHC_BIT_IS_SET (Ehc->HcCapParams, HCCP_64BIT)) {
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                      NULL
+                      );
+    if (!EFI_ERROR (Status)) {
+      Ehc->Support64BitDma = TRUE;
+    } else {
+      DEBUG ((EFI_D_WARN,
+        "%a: failed to enable 64-bit DMA on 64-bit capable controller @ %p (%r)\n",
+        __FUNCTION__, Controller, Status));
+    }
   }
 
   Status = gBS->InstallProtocolInterface (

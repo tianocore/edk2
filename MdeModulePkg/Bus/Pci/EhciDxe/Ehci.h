@@ -173,6 +173,8 @@ struct _USB2_HC_DEV {
   UINT16                    DebugPortOffset; // The offset of debug port mmio register
   UINT8                     DebugPortBarNum; // The bar number of debug port mmio register
   UINT8                     DebugPortNum;    // The port number of usb debug port
+
+  BOOLEAN                   Support64BitDma; // Whether 64 bit DMA may be used with this device
 };
 
 

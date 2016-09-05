@@ -178,7 +178,7 @@ EhcInitSched (
   //
   Ehc->MemPool = UsbHcInitMemPool (
                    PciIo,
-                   EHC_BIT_IS_SET (Ehc->HcCapParams, HCCP_64BIT),
+                   Ehc->Support64BitDma,
                    EHC_HIGH_32BIT (PhyAddr)
                    );
 
