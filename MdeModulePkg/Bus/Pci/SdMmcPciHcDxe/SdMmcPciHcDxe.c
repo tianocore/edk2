@@ -527,6 +527,7 @@ SdMmcPciHcDriverBindingStart (
   CARD_TYPE_DETECT_ROUTINE        *Routine;
   UINT32                          RoutineNum;
   BOOLEAN                         MediaPresent;
+  BOOLEAN                         Support64BitDma;
 
   DEBUG ((EFI_D_INFO, "SdMmcPciHcDriverBindingStart: Start\n"));
 
@@ -600,6 +601,7 @@ SdMmcPciHcDriverBindingStart (
     goto Done;
   }
 
+  Support64BitDma = TRUE;
   for (Slot = FirstBar; Slot < (FirstBar + SlotNum); Slot++) {
     Private->Slot[Slot].Enable = TRUE;
 
@@ -608,6 +610,8 @@ SdMmcPciHcDriverBindingStart (
       continue;
     }
     DumpCapabilityReg (Slot, &Private->Capability[Slot]);
+
+    Support64BitDma &= Private->Capability[Slot].SysBus64;
 
     Status = SdMmcHcGetMaxCurrent (PciIo, Slot, &Private->MaxCurrent[Slot]);
     if (EFI_ERROR (Status)) {
@@ -660,6 +664,22 @@ SdMmcPciHcDriverBindingStart (
     //
     if (Index == RoutineNum) {
       Private->Slot[Slot].Initialized = FALSE;
+    }
+  }
+
+  //
+  // Enable 64-bit DMA support in the PCI layer if this controller
+  // supports it.
+  //
+  if (Support64BitDma) {
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                      NULL
+                      );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN, "SdMmcPciHcDriverBindingStart: failed to enable 64-bit DMA (%r)\n", Status));
     }
   }
 
