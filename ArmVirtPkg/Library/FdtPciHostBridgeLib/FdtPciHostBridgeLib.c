@@ -317,7 +317,7 @@ PciHostBridgeGetRootBridges (
                                       EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
   mRootBridge.Attributes            = mRootBridge.Supports;
 
-  mRootBridge.DmaAbove4G            = FALSE;
+  mRootBridge.DmaAbove4G            = TRUE;
   mRootBridge.NoExtendedConfigSpace = FALSE;
   mRootBridge.ResourceAssigned      = FALSE;
 
