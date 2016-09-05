@@ -1073,10 +1073,15 @@ RootBridgeIoMap (
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
   PhysicalAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
-  if (!RootBridge->DmaAbove4G && ((PhysicalAddress + *NumberOfBytes) > SIZE_4GB)) {
+  if ((!RootBridge->DmaAbove4G ||
+       (Operation != EfiPciOperationBusMasterRead64 &&
+        Operation != EfiPciOperationBusMasterWrite64 &&
+        Operation != EfiPciOperationBusMasterCommonBuffer64)) &&
+      ((PhysicalAddress + *NumberOfBytes) > SIZE_4GB)) {
+
     //
-    // If the root bridge can not handle performing DMA above 4GB but
-    // any part of the DMA transfer being mapped is above 4GB, then
+    // If the root bridge or the device cannot handle performing DMA above
+    // 4GB but any part of the DMA transfer being mapped is above 4GB, then
     // map the DMA transfer to a buffer below 4GB.
     //
 
@@ -1308,7 +1313,8 @@ RootBridgeIoAllocateBuffer (
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
   AllocateType = AllocateAnyPages;
-  if (!RootBridge->DmaAbove4G) {
+  if (!RootBridge->DmaAbove4G ||
+      (Attributes & EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0) {
     //
     // Limit allocations to memory below 4GB
     //
