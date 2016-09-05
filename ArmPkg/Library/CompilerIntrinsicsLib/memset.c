@@ -31,6 +31,15 @@ void *memset(void *dest, int c, size_t n);
 
 #ifdef __arm__
 
+//
+// Other modules (such as CryptoPkg/IntrinsicLib) may provide another
+// implementation of memset(), which may conflict with this one if this
+// object was pulled into the link due to the definitions below. So make
+// our memset() 'weak' to let the other implementation take precedence.
+//
+__attribute__((__weak__))
+void *memset(void *dest, int c, size_t n);
+
 void __aeabi_memset(void *dest, size_t n, int c)
 {
   __memset(dest, c, n);
