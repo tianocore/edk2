@@ -2258,7 +2258,25 @@ AhciModeInitialization (
   if ((Capability & EFI_AHCI_CAP_SAM) == 0) {
     AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
   }
-  
+
+  //
+  // Enable 64-bit DMA support in the PCI layer if this controller
+  // supports it.
+  //
+  if ((Capability & EFI_AHCI_CAP_S64A) != 0) {
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE,
+                      NULL
+                      );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN,
+        "AhciModeInitialization: failed to enable 64-bit DMA on 64-bit capable controller (%r)\n",
+        Status));
+    }
+  }
+
   //
   // Get the number of command slots per port supported by this HBA.
   //
