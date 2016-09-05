@@ -2907,11 +2907,11 @@ EfiConfigKeywordHandlerSetData (
     StringPtr = NextStringPtr;
 
     //
-    // 5. Find ReadOnly filter.
+    // 5. Find READONLY tag.
     //
-    if ((StringPtr != NULL) && StrnCmp (StringPtr, L"&ReadOnly", StrLen (L"&ReadOnly")) == 0) {
+    if ((StringPtr != NULL) && StrnCmp (StringPtr, L"&READONLY", StrLen (L"&READONLY")) == 0) {
       ReadOnly = TRUE;
-      StringPtr += StrLen (L"&ReadOnly");
+      StringPtr += StrLen (L"&READONLY");
     } else {
       ReadOnly = FALSE;
     }
@@ -2937,9 +2937,18 @@ EfiConfigKeywordHandlerSetData (
     // 8. Check the readonly flag.
     //
     if (ExtractReadOnlyFromOpCode (OpCode) != ReadOnly) {
+      //
+      // Extracting readonly flag form opcode and extracting "READONLY" tag form KeywordString should have the same results.
+      // If not, the input KeywordString must be incorrect, return the error status to caller.
+      //
+      *ProgressErr = KEYWORD_HANDLER_INCOMPATIBLE_VALUE_DETECTED;
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    if (ReadOnly) {
       *ProgressErr = KEYWORD_HANDLER_ACCESS_NOT_PERMITTED;
       Status = EFI_ACCESS_DENIED;
-      goto Done;      
+      goto Done;
     }
     
     //
