@@ -40,6 +40,7 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_TURBO_RATIO_LIMIT);
   AsmWriteMsr64 (MSR_XEON_E7_TURBO_RATIO_LIMIT, Msr);
   @endcode
+  @note MSR_XEON_E7_TURBO_RATIO_LIMIT is defined as MSR_TURBO_RATIO_LIMIT in SDM.
 **/
 #define MSR_XEON_E7_TURBO_RATIO_LIMIT            0x000001AD
 
@@ -58,6 +59,7 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C8_PMON_BOX_CTRL);
   AsmWriteMsr64 (MSR_XEON_E7_C8_PMON_BOX_CTRL, Msr);
   @endcode
+  @note MSR_XEON_E7_C8_PMON_BOX_CTRL is defined as MSR_C8_PMON_BOX_CTRL in SDM.
 **/
 #define MSR_XEON_E7_C8_PMON_BOX_CTRL             0x00000F40
 
@@ -76,6 +78,7 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C8_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_XEON_E7_C8_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_XEON_E7_C8_PMON_BOX_STATUS is defined as MSR_C8_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_XEON_E7_C8_PMON_BOX_STATUS           0x00000F41
 
@@ -94,6 +97,7 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C8_PMON_BOX_OVF_CTRL);
   AsmWriteMsr64 (MSR_XEON_E7_C8_PMON_BOX_OVF_CTRL, Msr);
   @endcode
+  @note MSR_XEON_E7_C8_PMON_BOX_OVF_CTRL is defined as MSR_C8_PMON_BOX_OVF_CTRL in SDM.
 **/
 #define MSR_XEON_E7_C8_PMON_BOX_OVF_CTRL         0x00000F42
 
@@ -112,6 +116,12 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C8_PMON_EVNT_SEL0);
   AsmWriteMsr64 (MSR_XEON_E7_C8_PMON_EVNT_SEL0, Msr);
   @endcode
+  @note MSR_XEON_E7_C8_PMON_EVNT_SEL0 is defined as MSR_C8_PMON_EVNT_SEL0 in SDM.
+        MSR_XEON_E7_C8_PMON_EVNT_SEL1 is defined as MSR_C8_PMON_EVNT_SEL1 in SDM.
+        MSR_XEON_E7_C8_PMON_EVNT_SEL2 is defined as MSR_C8_PMON_EVNT_SEL2 in SDM.
+        MSR_XEON_E7_C8_PMON_EVNT_SEL3 is defined as MSR_C8_PMON_EVNT_SEL3 in SDM.
+        MSR_XEON_E7_C8_PMON_EVNT_SEL4 is defined as MSR_C8_PMON_EVNT_SEL4 in SDM.
+        MSR_XEON_E7_C8_PMON_EVNT_SEL5 is defined as MSR_C8_PMON_EVNT_SEL5 in SDM.
   @{
 **/
 #define MSR_XEON_E7_C8_PMON_EVNT_SEL0            0x00000F50
@@ -137,6 +147,12 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C8_PMON_CTR0);
   AsmWriteMsr64 (MSR_XEON_E7_C8_PMON_CTR0, Msr);
   @endcode
+  @note MSR_XEON_E7_C8_PMON_CTR0 is defined as MSR_C8_PMON_CTR0 in SDM.
+        MSR_XEON_E7_C8_PMON_CTR1 is defined as MSR_C8_PMON_CTR1 in SDM.
+        MSR_XEON_E7_C8_PMON_CTR2 is defined as MSR_C8_PMON_CTR2 in SDM.
+        MSR_XEON_E7_C8_PMON_CTR3 is defined as MSR_C8_PMON_CTR3 in SDM.
+        MSR_XEON_E7_C8_PMON_CTR4 is defined as MSR_C8_PMON_CTR4 in SDM.
+        MSR_XEON_E7_C8_PMON_CTR5 is defined as MSR_C8_PMON_CTR5 in SDM.
   @{
 **/
 #define MSR_XEON_E7_C8_PMON_CTR0                 0x00000F51
@@ -162,6 +178,7 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C9_PMON_BOX_CTRL);
   AsmWriteMsr64 (MSR_XEON_E7_C9_PMON_BOX_CTRL, Msr);
   @endcode
+  @note MSR_XEON_E7_C9_PMON_BOX_CTRL is defined as MSR_C9_PMON_BOX_CTRL in SDM.
 **/
 #define MSR_XEON_E7_C9_PMON_BOX_CTRL             0x00000FC0
 
@@ -180,6 +197,7 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C9_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_XEON_E7_C9_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_XEON_E7_C9_PMON_BOX_STATUS is defined as MSR_C9_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_XEON_E7_C9_PMON_BOX_STATUS           0x00000FC1
 
@@ -198,6 +216,7 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C9_PMON_BOX_OVF_CTRL);
   AsmWriteMsr64 (MSR_XEON_E7_C9_PMON_BOX_OVF_CTRL, Msr);
   @endcode
+  @note MSR_XEON_E7_C9_PMON_BOX_OVF_CTRL is defined as MSR_C9_PMON_BOX_OVF_CTRL in SDM.
 **/
 #define MSR_XEON_E7_C9_PMON_BOX_OVF_CTRL         0x00000FC2
 
@@ -216,6 +235,12 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C9_PMON_EVNT_SEL0);
   AsmWriteMsr64 (MSR_XEON_E7_C9_PMON_EVNT_SEL0, Msr);
   @endcode
+  @note MSR_XEON_E7_C9_PMON_EVNT_SEL0 is defined as MSR_C9_PMON_EVNT_SEL0 in SDM.
+        MSR_XEON_E7_C9_PMON_EVNT_SEL1 is defined as MSR_C9_PMON_EVNT_SEL1 in SDM.
+        MSR_XEON_E7_C9_PMON_EVNT_SEL2 is defined as MSR_C9_PMON_EVNT_SEL2 in SDM.
+        MSR_XEON_E7_C9_PMON_EVNT_SEL3 is defined as MSR_C9_PMON_EVNT_SEL3 in SDM.
+        MSR_XEON_E7_C9_PMON_EVNT_SEL4 is defined as MSR_C9_PMON_EVNT_SEL4 in SDM.
+        MSR_XEON_E7_C9_PMON_EVNT_SEL5 is defined as MSR_C9_PMON_EVNT_SEL5 in SDM.
   @{
 **/
 #define MSR_XEON_E7_C9_PMON_EVNT_SEL0            0x00000FD0
@@ -241,6 +266,12 @@
   Msr = AsmReadMsr64 (MSR_XEON_E7_C9_PMON_CTR0);
   AsmWriteMsr64 (MSR_XEON_E7_C9_PMON_CTR0, Msr);
   @endcode
+  @note MSR_XEON_E7_C9_PMON_CTR0 is defined as MSR_C9_PMON_CTR0 in SDM.
+        MSR_XEON_E7_C9_PMON_CTR1 is defined as MSR_C9_PMON_CTR1 in SDM.
+        MSR_XEON_E7_C9_PMON_CTR2 is defined as MSR_C9_PMON_CTR2 in SDM.
+        MSR_XEON_E7_C9_PMON_CTR3 is defined as MSR_C9_PMON_CTR3 in SDM.
+        MSR_XEON_E7_C9_PMON_CTR4 is defined as MSR_C9_PMON_CTR4 in SDM.
+        MSR_XEON_E7_C9_PMON_CTR5 is defined as MSR_C9_PMON_CTR5 in SDM.
   @{
 **/
 #define MSR_XEON_E7_C9_PMON_CTR0                 0x00000FD1
