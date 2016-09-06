@@ -44,6 +44,7 @@
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_PKG_CST_CONFIG_CONTROL);
   AsmWriteMsr64 (MSR_HASWELL_E_PKG_CST_CONFIG_CONTROL, Msr.Uint64);
   @endcode
+  @note MSR_HASWELL_E_PKG_CST_CONFIG_CONTROL is defined as MSR_PKG_CST_CONFIG_CONTROL in SDM.
 **/
 #define MSR_HASWELL_E_PKG_CST_CONFIG_CONTROL     0x000000E2
 
@@ -129,6 +130,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_IA32_MCG_CAP);
   @endcode
+  @note MSR_HASWELL_E_IA32_MCG_CAP is defined as IA32_MCG_CAP in SDM.
 **/
 #define MSR_HASWELL_E_IA32_MCG_CAP               0x00000179
 
@@ -208,6 +210,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_SMM_MCA_CAP);
   AsmWriteMsr64 (MSR_HASWELL_E_SMM_MCA_CAP, Msr.Uint64);
   @endcode
+  @note MSR_HASWELL_E_SMM_MCA_CAP is defined as MSR_SMM_MCA_CAP in SDM.
 **/
 #define MSR_HASWELL_E_SMM_MCA_CAP                0x0000017D
 
@@ -258,6 +261,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_ERROR_CONTROL);
   AsmWriteMsr64 (MSR_HASWELL_E_ERROR_CONTROL, Msr.Uint64);
   @endcode
+  @note MSR_HASWELL_E_ERROR_CONTROL is defined as MSR_ERROR_CONTROL in SDM.
 **/
 #define MSR_HASWELL_E_ERROR_CONTROL              0x0000017F
 
@@ -305,6 +309,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_TURBO_RATIO_LIMIT);
   @endcode
+  @note MSR_HASWELL_E_TURBO_RATIO_LIMIT is defined as MSR_TURBO_RATIO_LIMIT in SDM.
 **/
 #define MSR_HASWELL_E_TURBO_RATIO_LIMIT          0x000001AD
 
@@ -380,6 +385,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_TURBO_RATIO_LIMIT1);
   @endcode
+  @note MSR_HASWELL_E_TURBO_RATIO_LIMIT1 is defined as MSR_TURBO_RATIO_LIMIT1 in SDM.
 **/
 #define MSR_HASWELL_E_TURBO_RATIO_LIMIT1         0x000001AE
 
@@ -455,6 +461,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_TURBO_RATIO_LIMIT2);
   @endcode
+  @note MSR_HASWELL_E_TURBO_RATIO_LIMIT2 is defined as MSR_TURBO_RATIO_LIMIT2 in SDM.
 **/
 #define MSR_HASWELL_E_TURBO_RATIO_LIMIT2         0x000001AF
 
@@ -524,6 +531,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_MC5_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_MC5_CTL  is defined as MSR_MC5_CTL  in SDM.
+        MSR_HASWELL_E_MC6_CTL  is defined as MSR_MC6_CTL  in SDM.
+        MSR_HASWELL_E_MC7_CTL  is defined as MSR_MC7_CTL  in SDM.
+        MSR_HASWELL_E_MC8_CTL  is defined as MSR_MC8_CTL  in SDM.
+        MSR_HASWELL_E_MC9_CTL  is defined as MSR_MC9_CTL  in SDM.
+        MSR_HASWELL_E_MC10_CTL is defined as MSR_MC10_CTL in SDM.
+        MSR_HASWELL_E_MC11_CTL is defined as MSR_MC11_CTL in SDM.
+        MSR_HASWELL_E_MC12_CTL is defined as MSR_MC12_CTL in SDM.
+        MSR_HASWELL_E_MC13_CTL is defined as MSR_MC13_CTL in SDM.
+        MSR_HASWELL_E_MC14_CTL is defined as MSR_MC14_CTL in SDM.
+        MSR_HASWELL_E_MC15_CTL is defined as MSR_MC15_CTL in SDM.
+        MSR_HASWELL_E_MC16_CTL is defined as MSR_MC16_CTL in SDM.
+        MSR_HASWELL_E_MC17_CTL is defined as MSR_MC17_CTL in SDM.
+        MSR_HASWELL_E_MC18_CTL is defined as MSR_MC18_CTL in SDM.
+        MSR_HASWELL_E_MC19_CTL is defined as MSR_MC19_CTL in SDM.
+        MSR_HASWELL_E_MC20_CTL is defined as MSR_MC20_CTL in SDM.
+        MSR_HASWELL_E_MC21_CTL is defined as MSR_MC21_CTL in SDM.
   @{
 **/
 #define MSR_HASWELL_E_MC5_CTL                    0x00000414
@@ -561,6 +585,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_MC5_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_MC5_STATUS  is defined as MSR_MC5_STATUS  in SDM.
+        MSR_HASWELL_E_MC6_STATUS  is defined as MSR_MC6_STATUS  in SDM.
+        MSR_HASWELL_E_MC7_STATUS  is defined as MSR_MC7_STATUS  in SDM.
+        MSR_HASWELL_E_MC8_STATUS  is defined as MSR_MC8_STATUS  in SDM.
+        MSR_HASWELL_E_MC9_STATUS  is defined as MSR_MC9_STATUS  in SDM.
+        MSR_HASWELL_E_MC10_STATUS is defined as MSR_MC10_STATUS in SDM.
+        MSR_HASWELL_E_MC11_STATUS is defined as MSR_MC11_STATUS in SDM.
+        MSR_HASWELL_E_MC12_STATUS is defined as MSR_MC12_STATUS in SDM.
+        MSR_HASWELL_E_MC13_STATUS is defined as MSR_MC13_STATUS in SDM.
+        MSR_HASWELL_E_MC14_STATUS is defined as MSR_MC14_STATUS in SDM.
+        MSR_HASWELL_E_MC15_STATUS is defined as MSR_MC15_STATUS in SDM.
+        MSR_HASWELL_E_MC16_STATUS is defined as MSR_MC16_STATUS in SDM.
+        MSR_HASWELL_E_MC17_STATUS is defined as MSR_MC17_STATUS in SDM.
+        MSR_HASWELL_E_MC18_STATUS is defined as MSR_MC18_STATUS in SDM.
+        MSR_HASWELL_E_MC19_STATUS is defined as MSR_MC19_STATUS in SDM.
+        MSR_HASWELL_E_MC20_STATUS is defined as MSR_MC20_STATUS in SDM.
+        MSR_HASWELL_E_MC21_STATUS is defined as MSR_MC21_STATUS in SDM.
   @{
 **/
 #define MSR_HASWELL_E_MC5_STATUS                 0x00000415
@@ -597,6 +638,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_ADDR);
   AsmWriteMsr64 (MSR_HASWELL_E_MC5_ADDR, Msr);
   @endcode
+  @note MSR_HASWELL_E_MC5_ADDR  is defined as MSR_MC5_ADDR  in SDM.
+        MSR_HASWELL_E_MC6_ADDR  is defined as MSR_MC6_ADDR  in SDM.
+        MSR_HASWELL_E_MC7_ADDR  is defined as MSR_MC7_ADDR  in SDM.
+        MSR_HASWELL_E_MC8_ADDR  is defined as MSR_MC8_ADDR  in SDM.
+        MSR_HASWELL_E_MC9_ADDR  is defined as MSR_MC9_ADDR  in SDM.
+        MSR_HASWELL_E_MC10_ADDR is defined as MSR_MC10_ADDR in SDM.
+        MSR_HASWELL_E_MC11_ADDR is defined as MSR_MC11_ADDR in SDM.
+        MSR_HASWELL_E_MC12_ADDR is defined as MSR_MC12_ADDR in SDM.
+        MSR_HASWELL_E_MC13_ADDR is defined as MSR_MC13_ADDR in SDM.
+        MSR_HASWELL_E_MC14_ADDR is defined as MSR_MC14_ADDR in SDM.
+        MSR_HASWELL_E_MC15_ADDR is defined as MSR_MC15_ADDR in SDM.
+        MSR_HASWELL_E_MC16_ADDR is defined as MSR_MC16_ADDR in SDM.
+        MSR_HASWELL_E_MC17_ADDR is defined as MSR_MC17_ADDR in SDM.
+        MSR_HASWELL_E_MC18_ADDR is defined as MSR_MC18_ADDR in SDM.
+        MSR_HASWELL_E_MC19_ADDR is defined as MSR_MC19_ADDR in SDM.
+        MSR_HASWELL_E_MC20_ADDR is defined as MSR_MC20_ADDR in SDM.
+        MSR_HASWELL_E_MC21_ADDR is defined as MSR_MC21_ADDR in SDM.
   @{
 **/
 #define MSR_HASWELL_E_MC5_ADDR                   0x00000416
@@ -634,6 +692,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_MISC);
   AsmWriteMsr64 (MSR_HASWELL_E_MC5_MISC, Msr);
   @endcode
+  @note MSR_HASWELL_E_MC5_MISC  is defined as MSR_MC5_MISC  in SDM.
+        MSR_HASWELL_E_MC6_MISC  is defined as MSR_MC6_MISC  in SDM.
+        MSR_HASWELL_E_MC7_MISC  is defined as MSR_MC7_MISC  in SDM.
+        MSR_HASWELL_E_MC8_MISC  is defined as MSR_MC8_MISC  in SDM.
+        MSR_HASWELL_E_MC9_MISC  is defined as MSR_MC9_MISC  in SDM.
+        MSR_HASWELL_E_MC10_MISC is defined as MSR_MC10_MISC in SDM.
+        MSR_HASWELL_E_MC11_MISC is defined as MSR_MC11_MISC in SDM.
+        MSR_HASWELL_E_MC12_MISC is defined as MSR_MC12_MISC in SDM.
+        MSR_HASWELL_E_MC13_MISC is defined as MSR_MC13_MISC in SDM.
+        MSR_HASWELL_E_MC14_MISC is defined as MSR_MC14_MISC in SDM.
+        MSR_HASWELL_E_MC15_MISC is defined as MSR_MC15_MISC in SDM.
+        MSR_HASWELL_E_MC16_MISC is defined as MSR_MC16_MISC in SDM.
+        MSR_HASWELL_E_MC17_MISC is defined as MSR_MC17_MISC in SDM.
+        MSR_HASWELL_E_MC18_MISC is defined as MSR_MC18_MISC in SDM.
+        MSR_HASWELL_E_MC19_MISC is defined as MSR_MC19_MISC in SDM.
+        MSR_HASWELL_E_MC20_MISC is defined as MSR_MC20_MISC in SDM.
+        MSR_HASWELL_E_MC21_MISC is defined as MSR_MC21_MISC in SDM.
   @{
 **/
 #define MSR_HASWELL_E_MC5_MISC                   0x00000417
@@ -671,6 +746,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_RAPL_POWER_UNIT);
   @endcode
+  @note MSR_HASWELL_E_RAPL_POWER_UNIT is defined as MSR_RAPL_POWER_UNIT in SDM.
 **/
 #define MSR_HASWELL_E_RAPL_POWER_UNIT            0x00000606
 
@@ -729,6 +805,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_DRAM_POWER_LIMIT);
   AsmWriteMsr64 (MSR_HASWELL_E_DRAM_POWER_LIMIT, Msr);
   @endcode
+  @note MSR_HASWELL_E_DRAM_POWER_LIMIT is defined as MSR_DRAM_POWER_LIMIT in SDM.
 **/
 #define MSR_HASWELL_E_DRAM_POWER_LIMIT           0x00000618
 
@@ -746,6 +823,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_HASWELL_E_DRAM_ENERGY_STATUS);
   @endcode
+  @note MSR_HASWELL_E_DRAM_ENERGY_STATUS is defined as MSR_DRAM_ENERGY_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_DRAM_ENERGY_STATUS         0x00000619
 
@@ -764,6 +842,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_HASWELL_E_DRAM_PERF_STATUS);
   @endcode
+  @note MSR_HASWELL_E_DRAM_PERF_STATUS is defined as MSR_DRAM_PERF_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_DRAM_PERF_STATUS           0x0000061B
 
@@ -782,6 +861,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_DRAM_POWER_INFO);
   AsmWriteMsr64 (MSR_HASWELL_E_DRAM_POWER_INFO, Msr);
   @endcode
+  @note MSR_HASWELL_E_DRAM_POWER_INFO is defined as MSR_DRAM_POWER_INFO in SDM.
 **/
 #define MSR_HASWELL_E_DRAM_POWER_INFO            0x0000061C
 
@@ -803,6 +883,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_CORE_PERF_LIMIT_REASONS);
   AsmWriteMsr64 (MSR_HASWELL_E_CORE_PERF_LIMIT_REASONS, Msr.Uint64);
   @endcode
+  @note MSR_HASWELL_E_CORE_PERF_LIMIT_REASONS is defined as MSR_CORE_PERF_LIMIT_REASONS in SDM.
 **/
 #define MSR_HASWELL_E_CORE_PERF_LIMIT_REASONS    0x00000690
 
@@ -982,6 +1063,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_IA32_QM_EVTSEL);
   AsmWriteMsr64 (MSR_HASWELL_E_IA32_QM_EVTSEL, Msr.Uint64);
   @endcode
+  @note MSR_HASWELL_E_IA32_QM_EVTSEL is defined as IA32_QM_EVTSEL in SDM.
 **/
 #define MSR_HASWELL_E_IA32_QM_EVTSEL             0x00000C8D
 
@@ -1028,6 +1110,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_IA32_PQR_ASSOC);
   AsmWriteMsr64 (MSR_HASWELL_E_IA32_PQR_ASSOC, Msr.Uint64);
   @endcode
+  @note MSR_HASWELL_E_IA32_PQR_ASSOC is defined as IA32_PQR_ASSOC in SDM.
 **/
 #define MSR_HASWELL_E_IA32_PQR_ASSOC             0x00000C8F
 
@@ -1071,6 +1154,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PMON_GLOBAL_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_PMON_GLOBAL_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_PMON_GLOBAL_CTL is defined as MSR_PMON_GLOBAL_CTL in SDM.
 **/
 #define MSR_HASWELL_E_PMON_GLOBAL_CTL            0x00000700
 
@@ -1089,6 +1173,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PMON_GLOBAL_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_PMON_GLOBAL_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_PMON_GLOBAL_STATUS is defined as MSR_PMON_GLOBAL_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_PMON_GLOBAL_STATUS         0x00000701
 
@@ -1107,6 +1192,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PMON_GLOBAL_CONFIG);
   AsmWriteMsr64 (MSR_HASWELL_E_PMON_GLOBAL_CONFIG, Msr);
   @endcode
+  @note MSR_HASWELL_E_PMON_GLOBAL_CONFIG is defined as MSR_PMON_GLOBAL_CONFIG in SDM.
 **/
 #define MSR_HASWELL_E_PMON_GLOBAL_CONFIG         0x00000702
 
@@ -1125,6 +1211,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTL is defined as MSR_U_PMON_UCLK_FIXED_CTL in SDM.
 **/
 #define MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTL      0x00000703
 
@@ -1143,6 +1230,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTR);
   AsmWriteMsr64 (MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTR, Msr);
   @endcode
+  @note MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTR is defined as MSR_U_PMON_UCLK_FIXED_CTR in SDM.
 **/
 #define MSR_HASWELL_E_U_PMON_UCLK_FIXED_CTR      0x00000704
 
@@ -1161,6 +1249,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_U_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_U_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_U_PMON_EVNTSEL0 is defined as MSR_U_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_U_PMON_EVNTSEL0            0x00000705
 
@@ -1179,6 +1268,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_U_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_U_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_U_PMON_EVNTSEL1 is defined as MSR_U_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_U_PMON_EVNTSEL1            0x00000706
 
@@ -1197,6 +1287,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_U_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_U_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_U_PMON_BOX_STATUS is defined as MSR_U_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_U_PMON_BOX_STATUS          0x00000708
 
@@ -1215,6 +1306,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_U_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_U_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_U_PMON_CTR0 is defined as MSR_U_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_U_PMON_CTR0                0x00000709
 
@@ -1233,6 +1325,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_U_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_U_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_U_PMON_CTR1 is defined as MSR_U_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_U_PMON_CTR1                0x0000070A
 
@@ -1251,6 +1344,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_BOX_CTL is defined as MSR_PCU_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_BOX_CTL           0x00000710
 
@@ -1269,6 +1363,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_EVNTSEL0 is defined as MSR_PCU_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_EVNTSEL0          0x00000711
 
@@ -1287,6 +1382,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_EVNTSEL1 is defined as MSR_PCU_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_EVNTSEL1          0x00000712
 
@@ -1305,6 +1401,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_EVNTSEL2 is defined as MSR_PCU_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_EVNTSEL2          0x00000713
 
@@ -1323,6 +1420,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_EVNTSEL3 is defined as MSR_PCU_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_EVNTSEL3          0x00000714
 
@@ -1341,6 +1439,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_BOX_FILTER);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_BOX_FILTER, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_BOX_FILTER is defined as MSR_PCU_PMON_BOX_FILTER in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_BOX_FILTER        0x00000715
 
@@ -1359,6 +1458,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_BOX_STATUS is defined as MSR_PCU_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_BOX_STATUS        0x00000716
 
@@ -1377,6 +1477,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_CTR0 is defined as MSR_PCU_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_CTR0              0x00000717
 
@@ -1395,6 +1496,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_CTR1 is defined as MSR_PCU_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_CTR1              0x00000718
 
@@ -1413,6 +1515,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_CTR2 is defined as MSR_PCU_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_CTR2              0x00000719
 
@@ -1431,6 +1534,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_PCU_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_PCU_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_PCU_PMON_CTR3 is defined as MSR_PCU_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_PCU_PMON_CTR3              0x0000071A
 
@@ -1449,6 +1553,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_BOX_CTL is defined as MSR_S0_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_BOX_CTL            0x00000720
 
@@ -1467,6 +1572,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_EVNTSEL0 is defined as MSR_S0_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_EVNTSEL0           0x00000721
 
@@ -1485,6 +1591,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_EVNTSEL1 is defined as MSR_S0_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_EVNTSEL1           0x00000722
 
@@ -1503,6 +1610,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_EVNTSEL2 is defined as MSR_S0_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_EVNTSEL2           0x00000723
 
@@ -1521,6 +1629,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_EVNTSEL3 is defined as MSR_S0_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_EVNTSEL3           0x00000724
 
@@ -1539,6 +1648,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_BOX_FILTER);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_BOX_FILTER, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_BOX_FILTER is defined as MSR_S0_PMON_BOX_FILTER in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_BOX_FILTER         0x00000725
 
@@ -1557,6 +1667,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_CTR0 is defined as MSR_S0_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_CTR0               0x00000726
 
@@ -1575,6 +1686,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_CTR1 is defined as MSR_S0_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_CTR1               0x00000727
 
@@ -1593,6 +1705,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_CTR2 is defined as MSR_S0_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_CTR2               0x00000728
 
@@ -1611,6 +1724,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S0_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_S0_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S0_PMON_CTR3 is defined as MSR_S0_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_S0_PMON_CTR3               0x00000729
 
@@ -1629,6 +1743,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_BOX_CTL is defined as MSR_S1_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_BOX_CTL            0x0000072A
 
@@ -1647,6 +1762,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_EVNTSEL0 is defined as MSR_S1_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_EVNTSEL0           0x0000072B
 
@@ -1665,6 +1781,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_EVNTSEL1 is defined as MSR_S1_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_EVNTSEL1           0x0000072C
 
@@ -1683,6 +1800,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_EVNTSEL2 is defined as MSR_S1_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_EVNTSEL2           0x0000072D
 
@@ -1701,6 +1819,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_EVNTSEL3 is defined as MSR_S1_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_EVNTSEL3           0x0000072E
 
@@ -1719,6 +1838,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_BOX_FILTER);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_BOX_FILTER, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_BOX_FILTER is defined as MSR_S1_PMON_BOX_FILTER in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_BOX_FILTER         0x0000072F
 
@@ -1737,6 +1857,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_CTR0 is defined as MSR_S1_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_CTR0               0x00000730
 
@@ -1755,6 +1876,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_CTR1 is defined as MSR_S1_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_CTR1               0x00000731
 
@@ -1773,6 +1895,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_CTR2 is defined as MSR_S1_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_CTR2               0x00000732
 
@@ -1791,6 +1914,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S1_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_S1_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S1_PMON_CTR3 is defined as MSR_S1_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_S1_PMON_CTR3               0x00000733
 
@@ -1809,6 +1933,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_BOX_CTL is defined as MSR_S2_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_BOX_CTL            0x00000734
 
@@ -1827,6 +1952,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_EVNTSEL0 is defined as MSR_S2_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_EVNTSEL0           0x00000735
 
@@ -1845,6 +1971,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_EVNTSEL1 is defined as MSR_S2_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_EVNTSEL1           0x00000736
 
@@ -1863,6 +1990,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_EVNTSEL2 is defined as MSR_S2_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_EVNTSEL2           0x00000737
 
@@ -1881,6 +2009,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_EVNTSEL3 is defined as MSR_S2_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_EVNTSEL3           0x00000738
 
@@ -1899,6 +2028,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_BOX_FILTER);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_BOX_FILTER, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_BOX_FILTER is defined as MSR_S2_PMON_BOX_FILTER in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_BOX_FILTER         0x00000739
 
@@ -1917,6 +2047,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_CTR0 is defined as MSR_S2_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_CTR0               0x0000073A
 
@@ -1935,6 +2066,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_CTR1 is defined as MSR_S2_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_CTR1               0x0000073B
 
@@ -1953,6 +2085,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_CTR2 is defined as MSR_S2_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_CTR2               0x0000073C
 
@@ -1971,6 +2104,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S2_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_S2_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S2_PMON_CTR3 is defined as MSR_S2_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_S2_PMON_CTR3               0x0000073D
 
@@ -1989,6 +2123,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_BOX_CTL is defined as MSR_S3_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_BOX_CTL            0x0000073E
 
@@ -2007,6 +2142,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_EVNTSEL0 is defined as MSR_S3_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_EVNTSEL0           0x0000073F
 
@@ -2025,6 +2161,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_EVNTSEL1 is defined as MSR_S3_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_EVNTSEL1           0x00000740
 
@@ -2043,6 +2180,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_EVNTSEL2 is defined as MSR_S3_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_EVNTSEL2           0x00000741
 
@@ -2061,6 +2199,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_EVNTSEL3 is defined as MSR_S3_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_EVNTSEL3           0x00000742
 
@@ -2079,6 +2218,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_BOX_FILTER);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_BOX_FILTER, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_BOX_FILTER is defined as MSR_S3_PMON_BOX_FILTER in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_BOX_FILTER         0x00000743
 
@@ -2097,6 +2237,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_CTR0 is defined as MSR_S3_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_CTR0               0x00000744
 
@@ -2115,6 +2256,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_CTR1 is defined as MSR_S3_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_CTR1               0x00000745
 
@@ -2133,6 +2275,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_CTR2 is defined as MSR_S3_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_CTR2               0x00000746
 
@@ -2151,6 +2294,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_S3_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_S3_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_S3_PMON_CTR3 is defined as MSR_S3_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_S3_PMON_CTR3               0x00000747
 
@@ -2169,6 +2313,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_BOX_CTL is defined as MSR_C0_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_BOX_CTL            0x00000E00
 
@@ -2187,6 +2332,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_EVNTSEL0 is defined as MSR_C0_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_EVNTSEL0           0x00000E01
 
@@ -2205,6 +2351,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_EVNTSEL1 is defined as MSR_C0_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_EVNTSEL1           0x00000E02
 
@@ -2223,6 +2370,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_EVNTSEL2 is defined as MSR_C0_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_EVNTSEL2           0x00000E03
 
@@ -2241,6 +2389,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_EVNTSEL3 is defined as MSR_C0_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_EVNTSEL3           0x00000E04
 
@@ -2259,6 +2408,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_BOX_FILTER0 is defined as MSR_C0_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_BOX_FILTER0        0x00000E05
 
@@ -2277,6 +2427,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_BOX_FILTER1 is defined as MSR_C0_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_BOX_FILTER1        0x00000E06
 
@@ -2295,6 +2446,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_BOX_STATUS is defined as MSR_C0_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_BOX_STATUS         0x00000E07
 
@@ -2313,6 +2465,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_CTR0 is defined as MSR_C0_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_CTR0               0x00000E08
 
@@ -2331,6 +2484,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_CTR1 is defined as MSR_C0_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_CTR1               0x00000E09
 
@@ -2349,6 +2503,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_CTR2 is defined as MSR_C0_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_CTR2               0x00000E0A
 
@@ -2367,6 +2522,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C0_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C0_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C0_PMON_CTR3 is defined as MSR_C0_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C0_PMON_CTR3               0x00000E0B
 
@@ -2385,6 +2541,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_BOX_CTL is defined as MSR_C1_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_BOX_CTL            0x00000E10
 
@@ -2403,6 +2560,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_EVNTSEL0 is defined as MSR_C1_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_EVNTSEL0           0x00000E11
 
@@ -2421,6 +2579,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_EVNTSEL1 is defined as MSR_C1_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_EVNTSEL1           0x00000E12
 
@@ -2439,6 +2598,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_EVNTSEL2 is defined as MSR_C1_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_EVNTSEL2           0x00000E13
 
@@ -2457,6 +2617,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_EVNTSEL3 is defined as MSR_C1_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_EVNTSEL3           0x00000E14
 
@@ -2475,6 +2636,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_BOX_FILTER0 is defined as MSR_C1_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_BOX_FILTER0        0x00000E15
 
@@ -2493,6 +2655,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_BOX_FILTER1 is defined as MSR_C1_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_BOX_FILTER1        0x00000E16
 
@@ -2511,6 +2674,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_BOX_STATUS is defined as MSR_C1_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_BOX_STATUS         0x00000E17
 
@@ -2529,6 +2693,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_CTR0 is defined as MSR_C1_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_CTR0               0x00000E18
 
@@ -2547,6 +2712,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_CTR1 is defined as MSR_C1_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_CTR1               0x00000E19
 
@@ -2565,6 +2731,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_CTR2 is defined as MSR_C1_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_CTR2               0x00000E1A
 
@@ -2583,6 +2750,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C1_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C1_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C1_PMON_CTR3 is defined as MSR_C1_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C1_PMON_CTR3               0x00000E1B
 
@@ -2601,6 +2769,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_BOX_CTL is defined as MSR_C2_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_BOX_CTL            0x00000E20
 
@@ -2619,6 +2788,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_EVNTSEL0 is defined as MSR_C2_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_EVNTSEL0           0x00000E21
 
@@ -2637,6 +2807,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_EVNTSEL1 is defined as MSR_C2_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_EVNTSEL1           0x00000E22
 
@@ -2655,6 +2826,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_EVNTSEL2 is defined as MSR_C2_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_EVNTSEL2           0x00000E23
 
@@ -2673,6 +2845,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_EVNTSEL3 is defined as MSR_C2_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_EVNTSEL3           0x00000E24
 
@@ -2691,6 +2864,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_BOX_FILTER0 is defined as MSR_C2_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_BOX_FILTER0        0x00000E25
 
@@ -2709,6 +2883,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_BOX_FILTER1 is defined as MSR_C2_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_BOX_FILTER1        0x00000E26
 
@@ -2727,6 +2902,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_BOX_STATUS is defined as MSR_C2_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_BOX_STATUS         0x00000E27
 
@@ -2745,6 +2921,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_CTR0 is defined as MSR_C2_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_CTR0               0x00000E28
 
@@ -2763,6 +2940,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_CTR1 is defined as MSR_C2_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_CTR1               0x00000E29
 
@@ -2781,6 +2959,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_CTR2 is defined as MSR_C2_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_CTR2               0x00000E2A
 
@@ -2799,6 +2978,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C2_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C2_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C2_PMON_CTR3 is defined as MSR_C2_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C2_PMON_CTR3               0x00000E2B
 
@@ -2817,6 +2997,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_BOX_CTL is defined as MSR_C3_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_BOX_CTL            0x00000E30
 
@@ -2835,6 +3016,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_EVNTSEL0 is defined as MSR_C3_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_EVNTSEL0           0x00000E31
 
@@ -2853,6 +3035,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_EVNTSEL1 is defined as MSR_C3_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_EVNTSEL1           0x00000E32
 
@@ -2871,6 +3054,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_EVNTSEL2 is defined as MSR_C3_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_EVNTSEL2           0x00000E33
 
@@ -2889,6 +3073,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_EVNTSEL3 is defined as MSR_C3_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_EVNTSEL3           0x00000E34
 
@@ -2907,6 +3092,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_BOX_FILTER0 is defined as MSR_C3_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_BOX_FILTER0        0x00000E35
 
@@ -2925,6 +3111,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_BOX_FILTER1 is defined as MSR_C3_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_BOX_FILTER1        0x00000E36
 
@@ -2943,6 +3130,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_BOX_STATUS is defined as MSR_C3_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_BOX_STATUS         0x00000E37
 
@@ -2961,6 +3149,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_CTR0 is defined as MSR_C3_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_CTR0               0x00000E38
 
@@ -2979,6 +3168,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_CTR1 is defined as MSR_C3_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_CTR1               0x00000E39
 
@@ -2997,6 +3187,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_CTR2 is defined as MSR_C3_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_CTR2               0x00000E3A
 
@@ -3015,6 +3206,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C3_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C3_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C3_PMON_CTR3 is defined as MSR_C3_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C3_PMON_CTR3               0x00000E3B
 
@@ -3033,6 +3225,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_BOX_CTL is defined as MSR_C4_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_BOX_CTL            0x00000E40
 
@@ -3051,6 +3244,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_EVNTSEL0 is defined as MSR_C4_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_EVNTSEL0           0x00000E41
 
@@ -3069,6 +3263,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_EVNTSEL1 is defined as MSR_C4_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_EVNTSEL1           0x00000E42
 
@@ -3087,6 +3282,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_EVNTSEL2 is defined as MSR_C4_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_EVNTSEL2           0x00000E43
 
@@ -3105,6 +3301,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_EVNTSEL3 is defined as MSR_C4_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_EVNTSEL3           0x00000E44
 
@@ -3123,6 +3320,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_BOX_FILTER0 is defined as MSR_C4_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_BOX_FILTER0        0x00000E45
 
@@ -3141,6 +3339,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_BOX_FILTER1 is defined as MSR_C4_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_BOX_FILTER1        0x00000E46
 
@@ -3159,6 +3358,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_BOX_STATUS is defined as MSR_C4_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_BOX_STATUS         0x00000E47
 
@@ -3177,6 +3377,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_CTR0 is defined as MSR_C4_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_CTR0               0x00000E48
 
@@ -3195,6 +3396,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_CTR1 is defined as MSR_C4_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_CTR1               0x00000E49
 
@@ -3213,6 +3415,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_CTR2 is defined as MSR_C4_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_CTR2               0x00000E4A
 
@@ -3231,6 +3434,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C4_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C4_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C4_PMON_CTR3 is defined as MSR_C4_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C4_PMON_CTR3               0x00000E4B
 
@@ -3249,6 +3453,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_BOX_CTL is defined as MSR_C5_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_BOX_CTL            0x00000E50
 
@@ -3267,6 +3472,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_EVNTSEL0 is defined as MSR_C5_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_EVNTSEL0           0x00000E51
 
@@ -3285,6 +3491,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_EVNTSEL1 is defined as MSR_C5_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_EVNTSEL1           0x00000E52
 
@@ -3303,6 +3510,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_EVNTSEL2 is defined as MSR_C5_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_EVNTSEL2           0x00000E53
 
@@ -3321,6 +3529,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_EVNTSEL3 is defined as MSR_C5_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_EVNTSEL3           0x00000E54
 
@@ -3339,6 +3548,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_BOX_FILTER0 is defined as MSR_C5_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_BOX_FILTER0        0x00000E55
 
@@ -3357,6 +3567,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_BOX_FILTER1 is defined as MSR_C5_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_BOX_FILTER1        0x00000E56
 
@@ -3375,6 +3586,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_BOX_STATUS is defined as MSR_C5_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_BOX_STATUS         0x00000E57
 
@@ -3393,6 +3605,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_CTR0 is defined as MSR_C5_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_CTR0               0x00000E58
 
@@ -3411,6 +3624,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_CTR1 is defined as MSR_C5_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_CTR1               0x00000E59
 
@@ -3429,6 +3643,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_CTR2 is defined as MSR_C5_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_CTR2               0x00000E5A
 
@@ -3447,6 +3662,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C5_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C5_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C5_PMON_CTR3 is defined as MSR_C5_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C5_PMON_CTR3               0x00000E5B
 
@@ -3465,6 +3681,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_BOX_CTL is defined as MSR_C6_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_BOX_CTL            0x00000E60
 
@@ -3483,6 +3700,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_EVNTSEL0 is defined as MSR_C6_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_EVNTSEL0           0x00000E61
 
@@ -3501,6 +3719,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_EVNTSEL1 is defined as MSR_C6_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_EVNTSEL1           0x00000E62
 
@@ -3519,6 +3738,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_EVNTSEL2 is defined as MSR_C6_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_EVNTSEL2           0x00000E63
 
@@ -3537,6 +3757,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_EVNTSEL3 is defined as MSR_C6_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_EVNTSEL3           0x00000E64
 
@@ -3555,6 +3776,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_BOX_FILTER0 is defined as MSR_C6_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_BOX_FILTER0        0x00000E65
 
@@ -3573,6 +3795,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_BOX_FILTER1 is defined as MSR_C6_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_BOX_FILTER1        0x00000E66
 
@@ -3591,6 +3814,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_BOX_STATUS is defined as MSR_C6_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_BOX_STATUS         0x00000E67
 
@@ -3609,6 +3833,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_CTR0 is defined as MSR_C6_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_CTR0               0x00000E68
 
@@ -3627,6 +3852,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_CTR1 is defined as MSR_C6_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_CTR1               0x00000E69
 
@@ -3645,6 +3871,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_CTR2 is defined as MSR_C6_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_CTR2               0x00000E6A
 
@@ -3663,6 +3890,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C6_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C6_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C6_PMON_CTR3 is defined as MSR_C6_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C6_PMON_CTR3               0x00000E6B
 
@@ -3681,6 +3909,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_BOX_CTL is defined as MSR_C7_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_BOX_CTL            0x00000E70
 
@@ -3699,6 +3928,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_EVNTSEL0 is defined as MSR_C7_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_EVNTSEL0           0x00000E71
 
@@ -3717,6 +3947,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_EVNTSEL1 is defined as MSR_C7_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_EVNTSEL1           0x00000E72
 
@@ -3735,6 +3966,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_EVNTSEL2 is defined as MSR_C7_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_EVNTSEL2           0x00000E73
 
@@ -3753,6 +3985,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_EVNTSEL3 is defined as MSR_C7_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_EVNTSEL3           0x00000E74
 
@@ -3771,6 +4004,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_BOX_FILTER0 is defined as MSR_C7_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_BOX_FILTER0        0x00000E75
 
@@ -3789,6 +4023,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_BOX_FILTER1 is defined as MSR_C7_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_BOX_FILTER1        0x00000E76
 
@@ -3807,6 +4042,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_BOX_STATUS is defined as MSR_C7_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_BOX_STATUS         0x00000E77
 
@@ -3825,6 +4061,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_CTR0 is defined as MSR_C7_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_CTR0               0x00000E78
 
@@ -3843,6 +4080,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_CTR1 is defined as MSR_C7_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_CTR1               0x00000E79
 
@@ -3861,6 +4099,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_CTR2 is defined as MSR_C7_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_CTR2               0x00000E7A
 
@@ -3879,6 +4118,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C7_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C7_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C7_PMON_CTR3 is defined as MSR_C7_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C7_PMON_CTR3               0x00000E7B
 
@@ -3897,6 +4137,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_BOX_CTL is defined as MSR_C8_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_BOX_CTL            0x00000E80
 
@@ -3915,6 +4156,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_EVNTSEL0 is defined as MSR_C8_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_EVNTSEL0           0x00000E81
 
@@ -3933,6 +4175,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_EVNTSEL1 is defined as MSR_C8_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_EVNTSEL1           0x00000E82
 
@@ -3951,6 +4194,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_EVNTSEL2 is defined as MSR_C8_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_EVNTSEL2           0x00000E83
 
@@ -3969,6 +4213,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_EVNTSEL3 is defined as MSR_C8_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_EVNTSEL3           0x00000E84
 
@@ -3987,6 +4232,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_BOX_FILTER0 is defined as MSR_C8_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_BOX_FILTER0        0x00000E85
 
@@ -4005,6 +4251,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_BOX_FILTER1 is defined as MSR_C8_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_BOX_FILTER1        0x00000E86
 
@@ -4023,6 +4270,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_BOX_STATUS is defined as MSR_C8_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_BOX_STATUS         0x00000E87
 
@@ -4041,6 +4289,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_CTR0 is defined as MSR_C8_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_CTR0               0x00000E88
 
@@ -4059,6 +4308,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_CTR1 is defined as MSR_C8_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_CTR1               0x00000E89
 
@@ -4077,6 +4327,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_CTR2 is defined as MSR_C8_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_CTR2               0x00000E8A
 
@@ -4095,6 +4346,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C8_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C8_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C8_PMON_CTR3 is defined as MSR_C8_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C8_PMON_CTR3               0x00000E8B
 
@@ -4113,6 +4365,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_BOX_CTL is defined as MSR_C9_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_BOX_CTL            0x00000E90
 
@@ -4131,6 +4384,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_EVNTSEL0 is defined as MSR_C9_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_EVNTSEL0           0x00000E91
 
@@ -4149,6 +4403,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_EVNTSEL1 is defined as MSR_C9_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_EVNTSEL1           0x00000E92
 
@@ -4167,6 +4422,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_EVNTSEL2 is defined as MSR_C9_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_EVNTSEL2           0x00000E93
 
@@ -4185,6 +4441,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_EVNTSEL3 is defined as MSR_C9_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_EVNTSEL3           0x00000E94
 
@@ -4203,6 +4460,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_BOX_FILTER0 is defined as MSR_C9_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_BOX_FILTER0        0x00000E95
 
@@ -4221,6 +4479,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_BOX_FILTER1 is defined as MSR_C9_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_BOX_FILTER1        0x00000E96
 
@@ -4239,6 +4498,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_BOX_STATUS is defined as MSR_C9_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_BOX_STATUS         0x00000E97
 
@@ -4257,6 +4517,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_CTR0 is defined as MSR_C9_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_CTR0               0x00000E98
 
@@ -4275,6 +4536,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_CTR1 is defined as MSR_C9_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_CTR1               0x00000E99
 
@@ -4293,6 +4555,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_CTR2 is defined as MSR_C9_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_CTR2               0x00000E9A
 
@@ -4311,6 +4574,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C9_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C9_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C9_PMON_CTR3 is defined as MSR_C9_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C9_PMON_CTR3               0x00000E9B
 
@@ -4329,6 +4593,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_BOX_CTL is defined as MSR_C10_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_BOX_CTL           0x00000EA0
 
@@ -4347,6 +4612,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_EVNTSEL0 is defined as MSR_C10_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_EVNTSEL0          0x00000EA1
 
@@ -4365,6 +4631,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_EVNTSEL1 is defined as MSR_C10_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_EVNTSEL1          0x00000EA2
 
@@ -4383,6 +4650,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_EVNTSEL2 is defined as MSR_C10_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_EVNTSEL2          0x00000EA3
 
@@ -4401,6 +4669,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_EVNTSEL3 is defined as MSR_C10_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_EVNTSEL3          0x00000EA4
 
@@ -4419,6 +4688,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_BOX_FILTER0 is defined as MSR_C10_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_BOX_FILTER0       0x00000EA5
 
@@ -4437,6 +4707,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_BOX_FILTER1 is defined as MSR_C10_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_BOX_FILTER1       0x00000EA6
 
@@ -4455,6 +4726,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_BOX_STATUS is defined as MSR_C10_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_BOX_STATUS        0x00000EA7
 
@@ -4473,6 +4745,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_CTR0 is defined as MSR_C10_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_CTR0              0x00000EA8
 
@@ -4491,6 +4764,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_CTR1 is defined as MSR_C10_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_CTR1              0x00000EA9
 
@@ -4509,6 +4783,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_CTR2 is defined as MSR_C10_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_CTR2              0x00000EAA
 
@@ -4527,6 +4802,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C10_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C10_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C10_PMON_CTR3 is defined as MSR_C10_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C10_PMON_CTR3              0x00000EAB
 
@@ -4545,6 +4821,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_BOX_CTL is defined as MSR_C11_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_BOX_CTL           0x00000EB0
 
@@ -4563,6 +4840,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_EVNTSEL0 is defined as MSR_C11_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_EVNTSEL0          0x00000EB1
 
@@ -4581,6 +4859,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_EVNTSEL1 is defined as MSR_C11_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_EVNTSEL1          0x00000EB2
 
@@ -4599,6 +4878,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_EVNTSEL2 is defined as MSR_C11_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_EVNTSEL2          0x00000EB3
 
@@ -4617,6 +4897,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_EVNTSEL3 is defined as MSR_C11_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_EVNTSEL3          0x00000EB4
 
@@ -4635,6 +4916,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_BOX_FILTER0 is defined as MSR_C11_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_BOX_FILTER0       0x00000EB5
 
@@ -4653,6 +4935,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_BOX_FILTER1 is defined as MSR_C11_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_BOX_FILTER1       0x00000EB6
 
@@ -4671,6 +4954,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_BOX_STATUS is defined as MSR_C11_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_BOX_STATUS        0x00000EB7
 
@@ -4689,6 +4973,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_CTR0 is defined as MSR_C11_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_CTR0              0x00000EB8
 
@@ -4707,6 +4992,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_CTR1 is defined as MSR_C11_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_CTR1              0x00000EB9
 
@@ -4725,6 +5011,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_CTR2 is defined as MSR_C11_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_CTR2              0x00000EBA
 
@@ -4743,6 +5030,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C11_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C11_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C11_PMON_CTR3 is defined as MSR_C11_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C11_PMON_CTR3              0x00000EBB
 
@@ -4761,6 +5049,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_BOX_CTL is defined as MSR_C12_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_BOX_CTL           0x00000EC0
 
@@ -4779,6 +5068,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_EVNTSEL0 is defined as MSR_C12_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_EVNTSEL0          0x00000EC1
 
@@ -4797,6 +5087,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_EVNTSEL1 is defined as MSR_C12_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_EVNTSEL1          0x00000EC2
 
@@ -4815,6 +5106,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_EVNTSEL2 is defined as MSR_C12_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_EVNTSEL2          0x00000EC3
 
@@ -4833,6 +5125,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_EVNTSEL3 is defined as MSR_C12_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_EVNTSEL3          0x00000EC4
 
@@ -4851,6 +5144,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_BOX_FILTER0 is defined as MSR_C12_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_BOX_FILTER0       0x00000EC5
 
@@ -4869,6 +5163,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_BOX_FILTER1 is defined as MSR_C12_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_BOX_FILTER1       0x00000EC6
 
@@ -4887,6 +5182,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_BOX_STATUS is defined as MSR_C12_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_BOX_STATUS        0x00000EC7
 
@@ -4905,6 +5201,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_CTR0 is defined as MSR_C12_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_CTR0              0x00000EC8
 
@@ -4923,6 +5220,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_CTR1 is defined as MSR_C12_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_CTR1              0x00000EC9
 
@@ -4941,6 +5239,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_CTR2 is defined as MSR_C12_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_CTR2              0x00000ECA
 
@@ -4959,6 +5258,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C12_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C12_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C12_PMON_CTR3 is defined as MSR_C12_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C12_PMON_CTR3              0x00000ECB
 
@@ -4977,6 +5277,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_BOX_CTL is defined as MSR_C13_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_BOX_CTL           0x00000ED0
 
@@ -4995,6 +5296,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_EVNTSEL0 is defined as MSR_C13_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_EVNTSEL0          0x00000ED1
 
@@ -5013,6 +5315,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_EVNTSEL1 is defined as MSR_C13_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_EVNTSEL1          0x00000ED2
 
@@ -5031,6 +5334,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_EVNTSEL2 is defined as MSR_C13_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_EVNTSEL2          0x00000ED3
 
@@ -5049,6 +5353,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_EVNTSEL3 is defined as MSR_C13_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_EVNTSEL3          0x00000ED4
 
@@ -5067,6 +5372,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_BOX_FILTER0 is defined as MSR_C13_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_BOX_FILTER0       0x00000ED5
 
@@ -5085,6 +5391,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_BOX_FILTER1 is defined as MSR_C13_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_BOX_FILTER1       0x00000ED6
 
@@ -5103,6 +5410,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_BOX_STATUS is defined as MSR_C13_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_BOX_STATUS        0x00000ED7
 
@@ -5121,6 +5429,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_CTR0 is defined as MSR_C13_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_CTR0              0x00000ED8
 
@@ -5139,6 +5448,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_CTR1 is defined as MSR_C13_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_CTR1              0x00000ED9
 
@@ -5157,6 +5467,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_CTR2 is defined as MSR_C13_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_CTR2              0x00000EDA
 
@@ -5175,6 +5486,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C13_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C13_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C13_PMON_CTR3 is defined as MSR_C13_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C13_PMON_CTR3              0x00000EDB
 
@@ -5193,6 +5505,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_BOX_CTL is defined as MSR_C14_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_BOX_CTL           0x00000EE0
 
@@ -5211,6 +5524,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_EVNTSEL0 is defined as MSR_C14_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_EVNTSEL0          0x00000EE1
 
@@ -5229,6 +5543,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_EVNTSEL1 is defined as MSR_C14_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_EVNTSEL1          0x00000EE2
 
@@ -5247,6 +5562,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_EVNTSEL2 is defined as MSR_C14_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_EVNTSEL2          0x00000EE3
 
@@ -5265,6 +5581,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_EVNTSEL3 is defined as MSR_C14_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_EVNTSEL3          0x00000EE4
 
@@ -5283,6 +5600,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_BOX_FILTER);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_BOX_FILTER, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_BOX_FILTER is defined as MSR_C14_PMON_BOX_FILTER in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_BOX_FILTER        0x00000EE5
 
@@ -5301,6 +5619,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_BOX_FILTER1 is defined as MSR_C14_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_BOX_FILTER1       0x00000EE6
 
@@ -5319,6 +5638,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_BOX_STATUS is defined as MSR_C14_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_BOX_STATUS        0x00000EE7
 
@@ -5337,6 +5657,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_CTR0 is defined as MSR_C14_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_CTR0              0x00000EE8
 
@@ -5355,6 +5676,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_CTR1 is defined as MSR_C14_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_CTR1              0x00000EE9
 
@@ -5373,6 +5695,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_CTR2 is defined as MSR_C14_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_CTR2              0x00000EEA
 
@@ -5391,6 +5714,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C14_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C14_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C14_PMON_CTR3 is defined as MSR_C14_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C14_PMON_CTR3              0x00000EEB
 
@@ -5409,6 +5733,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_BOX_CTL is defined as MSR_C15_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_BOX_CTL           0x00000EF0
 
@@ -5427,6 +5752,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_EVNTSEL0 is defined as MSR_C15_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_EVNTSEL0          0x00000EF1
 
@@ -5445,6 +5771,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_EVNTSEL1 is defined as MSR_C15_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_EVNTSEL1          0x00000EF2
 
@@ -5463,6 +5790,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_EVNTSEL2 is defined as MSR_C15_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_EVNTSEL2          0x00000EF3
 
@@ -5481,6 +5809,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_EVNTSEL3 is defined as MSR_C15_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_EVNTSEL3          0x00000EF4
 
@@ -5499,6 +5828,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_BOX_FILTER0 is defined as MSR_C15_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_BOX_FILTER0       0x00000EF5
 
@@ -5517,6 +5847,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_BOX_FILTER1 is defined as MSR_C15_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_BOX_FILTER1       0x00000EF6
 
@@ -5535,6 +5866,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_BOX_STATUS is defined as MSR_C15_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_BOX_STATUS        0x00000EF7
 
@@ -5553,6 +5885,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_CTR0 is defined as MSR_C15_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_CTR0              0x00000EF8
 
@@ -5571,6 +5904,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_CTR1 is defined as MSR_C15_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_CTR1              0x00000EF9
 
@@ -5589,6 +5923,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_CTR2 is defined as MSR_C15_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_CTR2              0x00000EFA
 
@@ -5607,6 +5942,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C15_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C15_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C15_PMON_CTR3 is defined as MSR_C15_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C15_PMON_CTR3              0x00000EFB
 
@@ -5625,6 +5961,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_BOX_CTL is defined as MSR_C16_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_BOX_CTL           0x00000F00
 
@@ -5643,6 +5980,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_EVNTSEL0 is defined as MSR_C16_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_EVNTSEL0          0x00000F01
 
@@ -5661,6 +5999,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_EVNTSEL1 is defined as MSR_C16_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_EVNTSEL1          0x00000F02
 
@@ -5679,6 +6018,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_EVNTSEL2 is defined as MSR_C16_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_EVNTSEL2          0x00000F03
 
@@ -5697,6 +6037,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_EVNTSEL3 is defined as MSR_C16_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_EVNTSEL3          0x00000F04
 
@@ -5715,6 +6056,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_BOX_FILTER0 is defined as MSR_C16_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_BOX_FILTER0       0x00000F05
 
@@ -5733,6 +6075,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_BOX_FILTER1 is defined as MSR_C16_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_BOX_FILTER1       0x00000F06
 
@@ -5751,6 +6094,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_BOX_STATUS is defined as MSR_C16_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_BOX_STATUS        0x00000F07
 
@@ -5769,6 +6113,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_CTR0 is defined as MSR_C16_PMON_CTR0 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_CTR0              0x00000F08
 
@@ -5787,6 +6132,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_CTR1);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_CTR1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_CTR1 is defined as MSR_C16_PMON_CTR1 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_CTR1              0x00000F09
 
@@ -5805,6 +6151,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_CTR2);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_CTR2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_CTR2 is defined as MSR_C16_PMON_CTR2 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_CTR2              0x00000F0A
 
@@ -5823,6 +6170,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C16_PMON_CTR3);
   AsmWriteMsr64 (MSR_HASWELL_E_C16_PMON_CTR3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C16_PMON_CTR3 is defined as MSR_C16_PMON_CTR3 in SDM.
 **/
 #define MSR_HASWELL_E_C16_PMON_CTR3              0x00000E0B
 
@@ -5841,6 +6189,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_BOX_CTL);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_BOX_CTL, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_BOX_CTL is defined as MSR_C17_PMON_BOX_CTL in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_BOX_CTL           0x00000F10
 
@@ -5859,6 +6208,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL0);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_EVNTSEL0 is defined as MSR_C17_PMON_EVNTSEL0 in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_EVNTSEL0          0x00000F11
 
@@ -5877,6 +6227,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL1);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_EVNTSEL1 is defined as MSR_C17_PMON_EVNTSEL1 in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_EVNTSEL1          0x00000F12
 
@@ -5895,6 +6246,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL2);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL2, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_EVNTSEL2 is defined as MSR_C17_PMON_EVNTSEL2 in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_EVNTSEL2          0x00000F13
 
@@ -5913,6 +6265,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL3);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_EVNTSEL3, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_EVNTSEL3 is defined as MSR_C17_PMON_EVNTSEL3 in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_EVNTSEL3          0x00000F14
 
@@ -5931,6 +6284,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_BOX_FILTER0);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_BOX_FILTER0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_BOX_FILTER0 is defined as MSR_C17_PMON_BOX_FILTER0 in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_BOX_FILTER0       0x00000F15
 
@@ -5949,6 +6303,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_BOX_FILTER1);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_BOX_FILTER1, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_BOX_FILTER1 is defined as MSR_C17_PMON_BOX_FILTER1 in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_BOX_FILTER1       0x00000F16
 
@@ -5966,6 +6321,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_BOX_STATUS);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_BOX_STATUS, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_BOX_STATUS is defined as MSR_C17_PMON_BOX_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_C17_PMON_BOX_STATUS        0x00000F17
 
@@ -5984,6 +6340,10 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_HASWELL_E_C17_PMON_CTR0);
   AsmWriteMsr64 (MSR_HASWELL_E_C17_PMON_CTR0, Msr);
   @endcode
+  @note MSR_HASWELL_E_C17_PMON_CTR0 is defined as MSR_C17_PMON_CTR0 in SDM.
+        MSR_HASWELL_E_C17_PMON_CTR1 is defined as MSR_C17_PMON_CTR1 in SDM.
+        MSR_HASWELL_E_C17_PMON_CTR2 is defined as MSR_C17_PMON_CTR2 in SDM.
+        MSR_HASWELL_E_C17_PMON_CTR3 is defined as MSR_C17_PMON_CTR3 in SDM.
   @{
 **/
 #define MSR_HASWELL_E_C17_PMON_CTR0              0x00000F18
