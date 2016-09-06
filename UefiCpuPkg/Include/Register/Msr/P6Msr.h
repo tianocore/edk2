@@ -40,6 +40,7 @@
   Msr = AsmReadMsr64 (MSR_P6_P5_MC_ADDR);
   AsmWriteMsr64 (MSR_P6_P5_MC_ADDR, Msr);
   @endcode
+  @note MSR_P6_P5_MC_ADDR is defined as P5_MC_ADDR in SDM.
 **/
 #define MSR_P6_P5_MC_ADDR                        0x00000000
 
@@ -58,6 +59,7 @@
   Msr = AsmReadMsr64 (MSR_P6_P5_MC_TYPE);
   AsmWriteMsr64 (MSR_P6_P5_MC_TYPE, Msr);
   @endcode
+  @note MSR_P6_P5_MC_TYPE is defined as P5_MC_TYPE in SDM.
 **/
 #define MSR_P6_P5_MC_TYPE                        0x00000001
 
@@ -76,6 +78,7 @@
   Msr = AsmReadMsr64 (MSR_P6_TSC);
   AsmWriteMsr64 (MSR_P6_TSC, Msr);
   @endcode
+  @note MSR_P6_TSC is defined as TSC in SDM.
 **/
 #define MSR_P6_TSC                               0x00000010
 
@@ -96,6 +99,7 @@
 
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_IA32_PLATFORM_ID);
   @endcode
+  @note MSR_P6_IA32_PLATFORM_ID is defined as IA32_PLATFORM_ID in SDM.
 **/
 #define MSR_P6_IA32_PLATFORM_ID                  0x00000017
 
@@ -158,6 +162,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_APIC_BASE);
   AsmWriteMsr64 (MSR_P6_APIC_BASE, Msr.Uint64);
   @endcode
+  @note MSR_P6_APIC_BASE is defined as APIC_BASE in SDM.
 **/
 #define MSR_P6_APIC_BASE                         0x0000001B
 
@@ -214,6 +219,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_EBL_CR_POWERON);
   AsmWriteMsr64 (MSR_P6_EBL_CR_POWERON, Msr.Uint64);
   @endcode
+  @note MSR_P6_EBL_CR_POWERON is defined as EBL_CR_POWERON in SDM.
 **/
 #define MSR_P6_EBL_CR_POWERON                    0x0000002A
 
@@ -338,6 +344,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_TEST_CTL);
   AsmWriteMsr64 (MSR_P6_TEST_CTL, Msr.Uint64);
   @endcode
+  @note MSR_P6_TEST_CTL is defined as TEST_CTL in SDM.
 **/
 #define MSR_P6_TEST_CTL                          0x00000033
 
@@ -385,6 +392,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_BIOS_UPDT_TRIG);
   AsmWriteMsr64 (MSR_P6_BIOS_UPDT_TRIG, Msr);
   @endcode
+  @note MSR_P6_BIOS_UPDT_TRIG is defined as BIOS_UPDT_TRIG in SDM.
 **/
 #define MSR_P6_BIOS_UPDT_TRIG                    0x00000079
 
@@ -403,6 +411,9 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_BBL_CR_D0);
   AsmWriteMsr64 (MSR_P6_BBL_CR_D0, Msr);
   @endcode
+  @note MSR_P6_BBL_CR_D0 is defined as BBL_CR_D0 in SDM.
+        MSR_P6_BBL_CR_D1 is defined as BBL_CR_D1 in SDM.
+        MSR_P6_BBL_CR_D2 is defined as BBL_CR_D2 in SDM.
   @{
 **/
 #define MSR_P6_BBL_CR_D0                         0x00000088
@@ -426,6 +437,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_BIOS_SIGN);
   AsmWriteMsr64 (MSR_P6_BIOS_SIGN, Msr);
   @endcode
+  @note MSR_P6_BIOS_SIGN is defined as BIOS_SIGN in SDM.
 **/
 #define MSR_P6_BIOS_SIGN                         0x0000008B
 
@@ -444,6 +456,8 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_PERFCTR0);
   AsmWriteMsr64 (MSR_P6_PERFCTR0, Msr);
   @endcode
+  @note MSR_P6_PERFCTR0 is defined as PERFCTR0 in SDM.
+        MSR_P6_PERFCTR1 is defined as PERFCTR1 in SDM.
   @{
 **/
 #define MSR_P6_PERFCTR0                          0x000000C1
@@ -465,6 +479,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRCAP);
   AsmWriteMsr64 (MSR_P6_MTRRCAP, Msr);
   @endcode
+  @note MSR_P6_MTRRCAP is defined as MTRRCAP in SDM.
 **/
 #define MSR_P6_MTRRCAP                           0x000000FE
 
@@ -486,6 +501,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_BBL_CR_ADDR);
   AsmWriteMsr64 (MSR_P6_BBL_CR_ADDR, Msr.Uint64);
   @endcode
+  @note MSR_P6_BBL_CR_ADDR is defined as BBL_CR_ADDR in SDM.
 **/
 #define MSR_P6_BBL_CR_ADDR                       0x00000116
 
@@ -529,6 +545,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_BBL_CR_DECC);
   AsmWriteMsr64 (MSR_P6_BBL_CR_DECC, Msr);
   @endcode
+  @note MSR_P6_BBL_CR_DECC is defined as BBL_CR_DECC in SDM.
 **/
 #define MSR_P6_BBL_CR_DECC                       0x00000118
 
@@ -550,6 +567,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_BBL_CR_CTL);
   AsmWriteMsr64 (MSR_P6_BBL_CR_CTL, Msr.Uint64);
   @endcode
+  @note MSR_P6_BBL_CR_CTL is defined as BBL_CR_CTL in SDM.
 **/
 #define MSR_P6_BBL_CR_CTL                        0x00000119
 
@@ -637,6 +655,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_BBL_CR_TRIG);
   AsmWriteMsr64 (MSR_P6_BBL_CR_TRIG, Msr);
   @endcode
+  @note MSR_P6_BBL_CR_TRIG is defined as BBL_CR_TRIG in SDM.
 **/
 #define MSR_P6_BBL_CR_TRIG                       0x0000011A
 
@@ -656,6 +675,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_BBL_CR_BUSY);
   AsmWriteMsr64 (MSR_P6_BBL_CR_BUSY, Msr);
   @endcode
+  @note MSR_P6_BBL_CR_BUSY is defined as BBL_CR_BUSY in SDM.
 **/
 #define MSR_P6_BBL_CR_BUSY                       0x0000011B
 
@@ -676,6 +696,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_BBL_CR_CTL3);
   AsmWriteMsr64 (MSR_P6_BBL_CR_CTL3, Msr.Uint64);
   @endcode
+  @note MSR_P6_BBL_CR_CTL3 is defined as BBL_CR_CTL3 in SDM.
 **/
 #define MSR_P6_BBL_CR_CTL3                       0x0000011E
 
@@ -772,6 +793,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_SYSENTER_CS_MSR);
   AsmWriteMsr64 (MSR_P6_SYSENTER_CS_MSR, Msr);
   @endcode
+  @note MSR_P6_SYSENTER_CS_MSR is defined as SYSENTER_CS_MSR in SDM.
 **/
 #define MSR_P6_SYSENTER_CS_MSR                   0x00000174
 
@@ -790,6 +812,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_SYSENTER_ESP_MSR);
   AsmWriteMsr64 (MSR_P6_SYSENTER_ESP_MSR, Msr);
   @endcode
+  @note MSR_P6_SYSENTER_ESP_MSR is defined as SYSENTER_ESP_MSR in SDM.
 **/
 #define MSR_P6_SYSENTER_ESP_MSR                  0x00000175
 
@@ -808,6 +831,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_SYSENTER_EIP_MSR);
   AsmWriteMsr64 (MSR_P6_SYSENTER_EIP_MSR, Msr);
   @endcode
+  @note MSR_P6_SYSENTER_EIP_MSR is defined as SYSENTER_EIP_MSR in SDM.
 **/
 #define MSR_P6_SYSENTER_EIP_MSR                  0x00000176
 
@@ -826,6 +850,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MCG_CAP);
   AsmWriteMsr64 (MSR_P6_MCG_CAP, Msr);
   @endcode
+  @note MSR_P6_MCG_CAP is defined as MCG_CAP in SDM.
 **/
 #define MSR_P6_MCG_CAP                           0x00000179
 
@@ -844,6 +869,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MCG_STATUS);
   AsmWriteMsr64 (MSR_P6_MCG_STATUS, Msr);
   @endcode
+  @note MSR_P6_MCG_STATUS is defined as MCG_STATUS in SDM.
 **/
 #define MSR_P6_MCG_STATUS                        0x0000017A
 
@@ -862,6 +888,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MCG_CTL);
   AsmWriteMsr64 (MSR_P6_MCG_CTL, Msr);
   @endcode
+  @note MSR_P6_MCG_CTL is defined as MCG_CTL in SDM.
 **/
 #define MSR_P6_MCG_CTL                           0x0000017B
 
@@ -882,6 +909,8 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_PERFEVTSEL0);
   AsmWriteMsr64 (MSR_P6_PERFEVTSEL0, Msr.Uint64);
   @endcode
+  @note MSR_P6_PERFEVTSEL0 is defined as PERFEVTSEL0 in SDM.
+        MSR_P6_PERFEVTSEL1 is defined as PERFEVTSEL1 in SDM.
   @{
 **/
 #define MSR_P6_PERFEVTSEL0                       0x00000186
@@ -974,6 +1003,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_DEBUGCTLMSR);
   AsmWriteMsr64 (MSR_P6_DEBUGCTLMSR, Msr.Uint64);
   @endcode
+  @note MSR_P6_DEBUGCTLMSR is defined as DEBUGCTLMSR in SDM.
 **/
 #define MSR_P6_DEBUGCTLMSR                       0x000001D9
 
@@ -1041,6 +1071,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_LASTBRANCHFROMIP);
   AsmWriteMsr64 (MSR_P6_LASTBRANCHFROMIP, Msr);
   @endcode
+  @note MSR_P6_LASTBRANCHFROMIP is defined as LASTBRANCHFROMIP in SDM.
 **/
 #define MSR_P6_LASTBRANCHFROMIP                  0x000001DB
 
@@ -1059,6 +1090,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_LASTBRANCHTOIP);
   AsmWriteMsr64 (MSR_P6_LASTBRANCHTOIP, Msr);
   @endcode
+  @note MSR_P6_LASTBRANCHTOIP is defined as LASTBRANCHTOIP in SDM.
 **/
 #define MSR_P6_LASTBRANCHTOIP                    0x000001DC
 
@@ -1077,6 +1109,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_LASTINTFROMIP);
   AsmWriteMsr64 (MSR_P6_LASTINTFROMIP, Msr);
   @endcode
+  @note MSR_P6_LASTINTFROMIP is defined as LASTINTFROMIP in SDM.
 **/
 #define MSR_P6_LASTINTFROMIP                     0x000001DD
 
@@ -1095,6 +1128,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_LASTINTTOIP);
   AsmWriteMsr64 (MSR_P6_LASTINTTOIP, Msr);
   @endcode
+  @note MSR_P6_LASTINTTOIP is defined as LASTINTTOIP in SDM.
 **/
 #define MSR_P6_LASTINTTOIP                       0x000001DE
 
@@ -1115,6 +1149,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_ROB_CR_BKUPTMPDR6);
   AsmWriteMsr64 (MSR_P6_ROB_CR_BKUPTMPDR6, Msr.Uint64);
   @endcode
+  @note MSR_P6_ROB_CR_BKUPTMPDR6 is defined as ROB_CR_BKUPTMPDR6 in SDM.
 **/
 #define MSR_P6_ROB_CR_BKUPTMPDR6                 0x000001E0
 
@@ -1159,6 +1194,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRPHYSBASE0);
   AsmWriteMsr64 (MSR_P6_MTRRPHYSBASE0, Msr);
   @endcode
+  @note MSR_P6_MTRRPHYSBASE0 is defined as MTRRPHYSBASE0 in SDM.
+        MSR_P6_MTRRPHYSBASE1 is defined as MTRRPHYSBASE1 in SDM.
+        MSR_P6_MTRRPHYSBASE2 is defined as MTRRPHYSBASE2 in SDM.
+        MSR_P6_MTRRPHYSBASE3 is defined as MTRRPHYSBASE3 in SDM.
+        MSR_P6_MTRRPHYSBASE4 is defined as MTRRPHYSBASE4 in SDM.
+        MSR_P6_MTRRPHYSBASE5 is defined as MTRRPHYSBASE5 in SDM.
+        MSR_P6_MTRRPHYSBASE6 is defined as MTRRPHYSBASE6 in SDM.
+        MSR_P6_MTRRPHYSBASE7 is defined as MTRRPHYSBASE7 in SDM.
   @{
 **/
 #define MSR_P6_MTRRPHYSBASE0                     0x00000200
@@ -1186,6 +1229,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRPHYSMASK0);
   AsmWriteMsr64 (MSR_P6_MTRRPHYSMASK0, Msr);
   @endcode
+  @note MSR_P6_MTRRPHYSMASK0 is defined as MTRRPHYSMASK0 in SDM.
+        MSR_P6_MTRRPHYSMASK1 is defined as MTRRPHYSMASK1 in SDM.
+        MSR_P6_MTRRPHYSMASK2 is defined as MTRRPHYSMASK2 in SDM.
+        MSR_P6_MTRRPHYSMASK3 is defined as MTRRPHYSMASK3 in SDM.
+        MSR_P6_MTRRPHYSMASK4 is defined as MTRRPHYSMASK4 in SDM.
+        MSR_P6_MTRRPHYSMASK5 is defined as MTRRPHYSMASK5 in SDM.
+        MSR_P6_MTRRPHYSMASK6 is defined as MTRRPHYSMASK6 in SDM.
+        MSR_P6_MTRRPHYSMASK7 is defined as MTRRPHYSMASK7 in SDM.
   @{
 **/
 #define MSR_P6_MTRRPHYSMASK0                     0x00000201
@@ -1213,6 +1264,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX64K_00000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX64K_00000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX64K_00000 is defined as MTRRFIX64K_00000 in SDM.
 **/
 #define MSR_P6_MTRRFIX64K_00000                  0x00000250
 
@@ -1231,6 +1283,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX16K_80000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX16K_80000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX16K_80000 is defined as MTRRFIX16K_80000 in SDM.
 **/
 #define MSR_P6_MTRRFIX16K_80000                  0x00000258
 
@@ -1249,6 +1302,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX16K_A0000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX16K_A0000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX16K_A0000 is defined as MTRRFIX16K_A0000 in SDM.
 **/
 #define MSR_P6_MTRRFIX16K_A0000                  0x00000259
 
@@ -1267,6 +1321,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_C0000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_C0000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_C0000 is defined as MTRRFIX4K_C0000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_C0000                   0x00000268
 
@@ -1285,6 +1340,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_C8000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_C8000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_C8000 is defined as MTRRFIX4K_C8000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_C8000                   0x00000269
 
@@ -1303,6 +1359,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_D0000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_D0000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_D0000 is defined as MTRRFIX4K_D0000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_D0000                   0x0000026A
 
@@ -1321,6 +1378,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_D8000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_D8000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_D8000 is defined as MTRRFIX4K_D8000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_D8000                   0x0000026B
 
@@ -1339,6 +1397,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_E0000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_E0000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_E0000 is defined as MTRRFIX4K_E0000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_E0000                   0x0000026C
 
@@ -1357,6 +1416,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_E8000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_E8000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_E8000 is defined as MTRRFIX4K_E8000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_E8000                   0x0000026D
 
@@ -1375,6 +1435,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_F0000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_F0000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_F0000 is defined as MTRRFIX4K_F0000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_F0000                   0x0000026E
 
@@ -1393,6 +1454,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MTRRFIX4K_F8000);
   AsmWriteMsr64 (MSR_P6_MTRRFIX4K_F8000, Msr);
   @endcode
+  @note MSR_P6_MTRRFIX4K_F8000 is defined as MTRRFIX4K_F8000 in SDM.
 **/
 #define MSR_P6_MTRRFIX4K_F8000                   0x0000026F
 
@@ -1413,6 +1475,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_MTRRDEFTYPE);
   AsmWriteMsr64 (MSR_P6_MTRRDEFTYPE, Msr.Uint64);
   @endcode
+  @note MSR_P6_MTRRDEFTYPE is defined as MTRRDEFTYPE in SDM.
 **/
 #define MSR_P6_MTRRDEFTYPE                       0x000002FF
 
@@ -1465,6 +1528,11 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MC0_CTL);
   AsmWriteMsr64 (MSR_P6_MC0_CTL, Msr);
   @endcode
+  @note MSR_P6_MC0_CTL is defined as MC0_CTL in SDM.
+        MSR_P6_MC1_CTL is defined as MC1_CTL in SDM.
+        MSR_P6_MC2_CTL is defined as MC2_CTL in SDM.
+        MSR_P6_MC3_CTL is defined as MC3_CTL in SDM.
+        MSR_P6_MC4_CTL is defined as MC4_CTL in SDM.
   @{
 **/
 #define MSR_P6_MC0_CTL                           0x00000400
@@ -1493,6 +1561,11 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_P6_MC0_STATUS);
   AsmWriteMsr64 (MSR_P6_MC0_STATUS, Msr.Uint64);
   @endcode
+  @note MSR_P6_MC0_STATUS is defined as MC0_STATUS in SDM.
+        MSR_P6_MC1_STATUS is defined as MC1_STATUS in SDM.
+        MSR_P6_MC2_STATUS is defined as MC2_STATUS in SDM.
+        MSR_P6_MC3_STATUS is defined as MC3_STATUS in SDM.
+        MSR_P6_MC4_STATUS is defined as MC4_STATUS in SDM.
   @{
 **/
 #define MSR_P6_MC0_STATUS                        0x00000401
@@ -1572,6 +1645,11 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MC0_ADDR);
   AsmWriteMsr64 (MSR_P6_MC0_ADDR, Msr);
   @endcode
+  @note MSR_P6_MC0_ADDR is defined as MC0_ADDR in SDM.
+        MSR_P6_MC1_ADDR is defined as MC1_ADDR in SDM.
+        MSR_P6_MC2_ADDR is defined as MC2_ADDR in SDM.
+        MSR_P6_MC3_ADDR is defined as MC3_ADDR in SDM.
+        MSR_P6_MC4_ADDR is defined as MC4_ADDR in SDM.
   @{
 **/
 #define MSR_P6_MC0_ADDR                          0x00000402
@@ -1596,6 +1674,11 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_P6_MC0_MISC);
   AsmWriteMsr64 (MSR_P6_MC0_MISC, Msr);
   @endcode
+  @note MSR_P6_MC0_MISC is defined as MC0_MISC in SDM.
+        MSR_P6_MC1_MISC is defined as MC1_MISC in SDM.
+        MSR_P6_MC2_MISC is defined as MC2_MISC in SDM.
+        MSR_P6_MC3_MISC is defined as MC3_MISC in SDM.
+        MSR_P6_MC4_MISC is defined as MC4_MISC in SDM.
   @{
 **/
 #define MSR_P6_MC0_MISC                          0x00000403
