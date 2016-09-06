@@ -243,34 +243,30 @@ ShellLibConstructorWorker (
   //
   // only success getting 2 of either the old or new, but no 1/2 and 1/2
   //
-  if ((mEfiShellEnvironment2 != NULL && mEfiShellInterface          != NULL) ||
-      (gEfiShellProtocol     != NULL && gEfiShellParametersProtocol != NULL)   ) {
-    if (gEfiShellProtocol != NULL) {
-      FileFunctionMap.GetFileInfo     = gEfiShellProtocol->GetFileInfo;
-      FileFunctionMap.SetFileInfo     = gEfiShellProtocol->SetFileInfo;
-      FileFunctionMap.ReadFile        = gEfiShellProtocol->ReadFile;
-      FileFunctionMap.WriteFile       = gEfiShellProtocol->WriteFile;
-      FileFunctionMap.CloseFile       = gEfiShellProtocol->CloseFile;
-      FileFunctionMap.DeleteFile      = gEfiShellProtocol->DeleteFile;
-      FileFunctionMap.GetFilePosition = gEfiShellProtocol->GetFilePosition;
-      FileFunctionMap.SetFilePosition = gEfiShellProtocol->SetFilePosition;
-      FileFunctionMap.FlushFile       = gEfiShellProtocol->FlushFile;
-      FileFunctionMap.GetFileSize     = gEfiShellProtocol->GetFileSize;
-    } else {
-      FileFunctionMap.GetFileInfo     = (EFI_SHELL_GET_FILE_INFO)FileHandleGetInfo;
-      FileFunctionMap.SetFileInfo     = (EFI_SHELL_SET_FILE_INFO)FileHandleSetInfo;
-      FileFunctionMap.ReadFile        = (EFI_SHELL_READ_FILE)FileHandleRead;
-      FileFunctionMap.WriteFile       = (EFI_SHELL_WRITE_FILE)FileHandleWrite;
-      FileFunctionMap.CloseFile       = (EFI_SHELL_CLOSE_FILE)FileHandleClose;
-      FileFunctionMap.DeleteFile      = (EFI_SHELL_DELETE_FILE)FileHandleDelete;
-      FileFunctionMap.GetFilePosition = (EFI_SHELL_GET_FILE_POSITION)FileHandleGetPosition;
-      FileFunctionMap.SetFilePosition = (EFI_SHELL_SET_FILE_POSITION)FileHandleSetPosition;
-      FileFunctionMap.FlushFile       = (EFI_SHELL_FLUSH_FILE)FileHandleFlush;
-      FileFunctionMap.GetFileSize     = (EFI_SHELL_GET_FILE_SIZE)FileHandleGetSize;
-    }
-    return (EFI_SUCCESS);
+  if (gEfiShellProtocol     != NULL && gEfiShellParametersProtocol != NULL) {
+    FileFunctionMap.GetFileInfo     = gEfiShellProtocol->GetFileInfo;
+    FileFunctionMap.SetFileInfo     = gEfiShellProtocol->SetFileInfo;
+    FileFunctionMap.ReadFile        = gEfiShellProtocol->ReadFile;
+    FileFunctionMap.WriteFile       = gEfiShellProtocol->WriteFile;
+    FileFunctionMap.CloseFile       = gEfiShellProtocol->CloseFile;
+    FileFunctionMap.DeleteFile      = gEfiShellProtocol->DeleteFile;
+    FileFunctionMap.GetFilePosition = gEfiShellProtocol->GetFilePosition;
+    FileFunctionMap.SetFilePosition = gEfiShellProtocol->SetFilePosition;
+    FileFunctionMap.FlushFile       = gEfiShellProtocol->FlushFile;
+    FileFunctionMap.GetFileSize     = gEfiShellProtocol->GetFileSize;
+  } else {
+    FileFunctionMap.GetFileInfo     = (EFI_SHELL_GET_FILE_INFO)FileHandleGetInfo;
+    FileFunctionMap.SetFileInfo     = (EFI_SHELL_SET_FILE_INFO)FileHandleSetInfo;
+    FileFunctionMap.ReadFile        = (EFI_SHELL_READ_FILE)FileHandleRead;
+    FileFunctionMap.WriteFile       = (EFI_SHELL_WRITE_FILE)FileHandleWrite;
+    FileFunctionMap.CloseFile       = (EFI_SHELL_CLOSE_FILE)FileHandleClose;
+    FileFunctionMap.DeleteFile      = (EFI_SHELL_DELETE_FILE)FileHandleDelete;
+    FileFunctionMap.GetFilePosition = (EFI_SHELL_GET_FILE_POSITION)FileHandleGetPosition;
+    FileFunctionMap.SetFilePosition = (EFI_SHELL_SET_FILE_POSITION)FileHandleSetPosition;
+    FileFunctionMap.FlushFile       = (EFI_SHELL_FLUSH_FILE)FileHandleFlush;
+    FileFunctionMap.GetFileSize     = (EFI_SHELL_GET_FILE_SIZE)FileHandleGetSize;
   }
-  return (EFI_NOT_FOUND);
+  return (EFI_SUCCESS);
 }
 /**
   Constructor for the Shell library.
@@ -678,7 +674,13 @@ ShellOpenFileByName(
   EFI_FILE_INFO                 *FileInfo;
   CHAR16                        *FileNameCopy;
   EFI_STATUS                    Status2;
-
+  UINT16                        *BootCurrent;
+  UINTN                         BootCurrentSize;
+  UINT16                        BootString[10];
+  UINT8                         *Ptr = NULL;
+  UINT8                         *LoadOptionFromVar;
+  UINTN                         Size;
+  
   //
   // ASSERT if FileName is NULL
   //
@@ -738,8 +740,73 @@ ShellOpenFileByName(
   // this means convert name to path and call that function
   // since this will use EFI method again that will open it.
   //
-  ASSERT(mEfiShellEnvironment2 != NULL);
-  FilePath = mEfiShellEnvironment2->NameToPath ((CHAR16*)FileName);
+  if (mEfiShellEnvironment2 != NULL) {
+	  FilePath = mEfiShellEnvironment2->NameToPath((CHAR16*)FileName);
+  }
+  // Use the current boot medium as root path for file search if efi shell is not available
+  else
+  {
+	  // Idea use bootburrent and boot#### to get the device path of the boot device
+	  BootCurrent = NULL;
+	  BootCurrentSize = 0;
+	  LoadOptionFromVar = NULL;
+	  Size = 0;
+	  Ptr = NULL;
+
+	  // Get BootCurrent, which is a Boot#### variable name
+	  Status = GetEfiGlobalVariable2(L"BootCurrent", (VOID **)&BootCurrent, &BootCurrentSize);
+	  if (EFI_ERROR(Status)) {
+		  return (EFI_DEVICE_ERROR);
+	  }
+
+	  // Convert BootCurrent number into Boot#### variable name
+	  UnicodeSPrint(BootString, sizeof(BootString), L"Boot%04x", *BootCurrent);
+
+	  // Get Boot#### data
+	  Status = GetEfiGlobalVariable2(BootString, (VOID **)&LoadOptionFromVar, &Size);
+	  if (EFI_ERROR(Status)) {
+		  return (EFI_DEVICE_ERROR);
+	  }
+
+	  //
+	  // Is a Legacy Device?
+	  //
+	  Ptr = (UINT8 *)LoadOptionFromVar;
+
+	  //
+	  // Attribute = *(UINT32 *)Ptr;
+	  //
+	  Ptr += sizeof(UINT32);
+
+	  //
+	  // FilePathSize = *(UINT16 *)Ptr;
+	  //
+	  Ptr += sizeof(UINT16);
+
+	  //
+	  // Description = (CHAR16 *)Ptr;
+	  //
+	  Ptr += StrSize((CHAR16 *)Ptr);
+
+	  //
+	  // Now Ptr point to Device Path
+	  //
+	  FilePath = (EFI_DEVICE_PATH_PROTOCOL *)Ptr;
+
+	  //
+	  // get the handle
+	  //
+	  EFI_HANDLE Handle;
+	  Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &FilePath, &Handle);
+	  if (EFI_ERROR(Status)) {
+		  return (EFI_DEVICE_ERROR);
+	  }
+
+	  //
+	  // build the full device path
+	  //
+	  FilePath = FileDevicePath(Handle, FileName);
+  }
   if (FilePath != NULL) {
     return (ShellOpenFileByDevicePath(&FilePath,
                                       &DeviceHandle,
@@ -4146,7 +4213,11 @@ ShellFileHandleReadLine(
   UINTN       CountSoFar;
   UINT64      OriginalFilePosition;
 
-
+  // Check if Efi Shell is available
+  if (gEfiShellProtocol != NULL) {
+	  return EFI_UNSUPPORTED;
+  }
+  
   if (Handle == NULL
     ||Size   == NULL
    ){
@@ -4240,6 +4311,11 @@ ShellPrintHelp (
 	CHAR16              *OutText;
 	  
 	OutText = NULL;
+	
+	// Check if Efi Shell is available
+	if (gEfiShellProtocol == NULL) {
+		return EFI_NOT_FOUND;
+	}
 	
   //
   // Get the string to print based
