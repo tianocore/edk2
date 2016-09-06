@@ -42,6 +42,7 @@
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_TURBO_RATIO_LIMIT);
   @endcode
+  @note MSR_SKYLAKE_TURBO_RATIO_LIMIT is defined as MSR_TURBO_RATIO_LIMIT in SDM.
 **/
 #define MSR_SKYLAKE_TURBO_RATIO_LIMIT            0x000001AD
 
@@ -101,6 +102,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SKYLAKE_LASTBRANCH_TOS);
   AsmWriteMsr64 (MSR_SKYLAKE_LASTBRANCH_TOS, Msr);
   @endcode
+  @note MSR_SKYLAKE_LASTBRANCH_TOS is defined as MSR_LASTBRANCH_TOS in SDM.
 **/
 #define MSR_SKYLAKE_LASTBRANCH_TOS               0x000001C9
 
@@ -119,6 +121,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_SGXOWNER0);
   @endcode
+  @note MSR_SKYLAKE_SGXOWNER0 is defined as MSR_SGXOWNER0 in SDM.
 **/
 #define MSR_SKYLAKE_SGXOWNER0                    0x00000300
 
@@ -137,6 +140,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_SGXOWNER1);
   @endcode
+  @note MSR_SKYLAKE_SGXOWNER1 is defined as MSR_SGXOWNER1 in SDM.
 **/
 #define MSR_SKYLAKE_SGXOWNER1                    0x00000301
 
@@ -158,6 +162,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS);
   AsmWriteMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS, Msr.Uint64);
   @endcode
+  @note MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
 **/
 #define MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS       0x0000038E
 
@@ -269,6 +274,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_RESET);
   AsmWriteMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_RESET, Msr.Uint64);
   @endcode
+  @note MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_RESET is defined as IA32_PERF_GLOBAL_STATUS_RESET in SDM.
 **/
 #define MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_RESET 0x00000390
 
@@ -381,6 +387,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_SET);
   AsmWriteMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_SET, Msr.Uint64);
   @endcode
+  @note MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_SET is defined as IA32_PERF_GLOBAL_STATUS_SET in SDM.
 **/
 #define MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_SET  0x00000391
 
@@ -489,6 +496,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_PEBS_FRONTEND);
   AsmWriteMsr64 (MSR_SKYLAKE_PEBS_FRONTEND, Msr.Uint64);
   @endcode
+  @note MSR_SKYLAKE_PEBS_FRONTEND is defined as MSR_PEBS_FRONTEND in SDM.
 **/
 #define MSR_SKYLAKE_PEBS_FRONTEND                0x000003F7
 
@@ -549,6 +557,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_PLATFORM_ENERGY_COUNTER);
   @endcode
+  @note MSR_SKYLAKE_PLATFORM_ENERGY_COUNTER is defined as MSR_PLATFORM_ENERGY_COUNTER in SDM.
 **/
 #define MSR_SKYLAKE_PLATFORM_ENERGY_COUNTER      0x0000064D
 
@@ -596,6 +605,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_PPERF);
   @endcode
+  @note MSR_SKYLAKE_PPERF is defined as MSR_PPERF in SDM.
 **/
 #define MSR_SKYLAKE_PPERF                        0x0000064E
 
@@ -616,6 +626,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_PKG_HDC_CONFIG);
   AsmWriteMsr64 (MSR_SKYLAKE_PKG_HDC_CONFIG, Msr.Uint64);
   @endcode
+  @note MSR_SKYLAKE_PKG_HDC_CONFIG is defined as MSR_PKG_HDC_CONFIG in SDM.
 **/
 #define MSR_SKYLAKE_PKG_HDC_CONFIG               0x00000652
 
@@ -659,6 +670,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_CORE_HDC_RESIDENCY);
   @endcode
+  @note MSR_SKYLAKE_CORE_HDC_RESIDENCY is defined as MSR_CORE_HDC_RESIDENCY in SDM.
 **/
 #define MSR_SKYLAKE_CORE_HDC_RESIDENCY           0x00000653
 
@@ -677,6 +689,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_PKG_HDC_SHALLOW_RESIDENCY);
   @endcode
+  @note MSR_SKYLAKE_PKG_HDC_SHALLOW_RESIDENCY is defined as MSR_PKG_HDC_SHALLOW_RESIDENCY in SDM.
 **/
 #define MSR_SKYLAKE_PKG_HDC_SHALLOW_RESIDENCY    0x00000655
 
@@ -694,6 +707,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_PKG_HDC_DEEP_RESIDENCY);
   @endcode
+  @note MSR_SKYLAKE_PKG_HDC_DEEP_RESIDENCY is defined as MSR_PKG_HDC_DEEP_RESIDENCY in SDM.
 **/
 #define MSR_SKYLAKE_PKG_HDC_DEEP_RESIDENCY       0x00000656
 
@@ -714,6 +728,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_WEIGHTED_CORE_C0);
   @endcode
+  @note MSR_SKYLAKE_WEIGHTED_CORE_C0 is defined as MSR_WEIGHTED_CORE_C0 in SDM.
 **/
 #define MSR_SKYLAKE_WEIGHTED_CORE_C0             0x00000658
 
@@ -733,6 +748,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_ANY_CORE_C0);
   @endcode
+  @note MSR_SKYLAKE_ANY_CORE_C0 is defined as MSR_ANY_CORE_C0 in SDM.
 **/
 #define MSR_SKYLAKE_ANY_CORE_C0                  0x00000659
 
@@ -752,6 +768,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_ANY_GFXE_C0);
   @endcode
+  @note MSR_SKYLAKE_ANY_GFXE_C0 is defined as MSR_ANY_GFXE_C0 in SDM.
 **/
 #define MSR_SKYLAKE_ANY_GFXE_C0                  0x0000065A
 
@@ -772,6 +789,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SKYLAKE_CORE_GFXE_OVERLAP_C0);
   @endcode
+  @note MSR_SKYLAKE_CORE_GFXE_OVERLAP_C0 is defined as MSR_CORE_GFXE_OVERLAP_C0 in SDM.
 **/
 #define MSR_SKYLAKE_CORE_GFXE_OVERLAP_C0         0x0000065B
 
@@ -798,6 +816,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_PLATFORM_POWER_LIMIT);
   AsmWriteMsr64 (MSR_SKYLAKE_PLATFORM_POWER_LIMIT, Msr.Uint64);
   @endcode
+  @note MSR_SKYLAKE_PLATFORM_POWER_LIMIT is defined as MSR_PLATFORM_POWER_LIMIT in SDM.
 **/
 #define MSR_SKYLAKE_PLATFORM_POWER_LIMIT         0x0000065C
 
@@ -893,6 +912,22 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SKYLAKE_LASTBRANCH_16_FROM_IP);
   AsmWriteMsr64 (MSR_SKYLAKE_LASTBRANCH_16_FROM_IP, Msr);
   @endcode
+  @note MSR_SKYLAKE_LASTBRANCH_16_FROM_IP is defined as MSR_LASTBRANCH_16_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_17_FROM_IP is defined as MSR_LASTBRANCH_17_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_18_FROM_IP is defined as MSR_LASTBRANCH_18_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_19_FROM_IP is defined as MSR_LASTBRANCH_19_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_20_FROM_IP is defined as MSR_LASTBRANCH_20_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_21_FROM_IP is defined as MSR_LASTBRANCH_21_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_22_FROM_IP is defined as MSR_LASTBRANCH_22_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_23_FROM_IP is defined as MSR_LASTBRANCH_23_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_24_FROM_IP is defined as MSR_LASTBRANCH_24_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_25_FROM_IP is defined as MSR_LASTBRANCH_25_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_26_FROM_IP is defined as MSR_LASTBRANCH_26_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_27_FROM_IP is defined as MSR_LASTBRANCH_27_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_28_FROM_IP is defined as MSR_LASTBRANCH_28_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_29_FROM_IP is defined as MSR_LASTBRANCH_29_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_30_FROM_IP is defined as MSR_LASTBRANCH_30_FROM_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_31_FROM_IP is defined as MSR_LASTBRANCH_31_FROM_IP in SDM.
   @{
 **/
 #define MSR_SKYLAKE_LASTBRANCH_16_FROM_IP        0x00000690
@@ -930,6 +965,22 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SKYLAKE_LASTBRANCH_16_TO_IP);
   AsmWriteMsr64 (MSR_SKYLAKE_LASTBRANCH_16_TO_IP, Msr);
   @endcode
+  @note MSR_SKYLAKE_LASTBRANCH_16_TO_IP is defined as MSR_LASTBRANCH_16_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_17_TO_IP is defined as MSR_LASTBRANCH_17_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_18_TO_IP is defined as MSR_LASTBRANCH_18_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_19_TO_IP is defined as MSR_LASTBRANCH_19_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_20_TO_IP is defined as MSR_LASTBRANCH_20_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_21_TO_IP is defined as MSR_LASTBRANCH_21_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_22_TO_IP is defined as MSR_LASTBRANCH_22_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_23_TO_IP is defined as MSR_LASTBRANCH_23_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_24_TO_IP is defined as MSR_LASTBRANCH_24_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_25_TO_IP is defined as MSR_LASTBRANCH_25_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_26_TO_IP is defined as MSR_LASTBRANCH_26_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_27_TO_IP is defined as MSR_LASTBRANCH_27_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_28_TO_IP is defined as MSR_LASTBRANCH_28_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_29_TO_IP is defined as MSR_LASTBRANCH_29_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_30_TO_IP is defined as MSR_LASTBRANCH_30_TO_IP in SDM.
+        MSR_SKYLAKE_LASTBRANCH_31_TO_IP is defined as MSR_LASTBRANCH_31_TO_IP in SDM.
   @{
 **/
 #define MSR_SKYLAKE_LASTBRANCH_16_TO_IP          0x000006D0
@@ -969,6 +1020,38 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SKYLAKE_LBR_INFO_0);
   AsmWriteMsr64 (MSR_SKYLAKE_LBR_INFO_0, Msr);
   @endcode
+  @note MSR_SKYLAKE_LBR_INFO_0  is defined as MSR_LBR_INFO_0  in SDM.
+        MSR_SKYLAKE_LBR_INFO_1  is defined as MSR_LBR_INFO_1  in SDM.
+        MSR_SKYLAKE_LBR_INFO_2  is defined as MSR_LBR_INFO_2  in SDM.
+        MSR_SKYLAKE_LBR_INFO_3  is defined as MSR_LBR_INFO_3  in SDM.
+        MSR_SKYLAKE_LBR_INFO_4  is defined as MSR_LBR_INFO_4  in SDM.
+        MSR_SKYLAKE_LBR_INFO_5  is defined as MSR_LBR_INFO_5  in SDM.
+        MSR_SKYLAKE_LBR_INFO_6  is defined as MSR_LBR_INFO_6  in SDM.
+        MSR_SKYLAKE_LBR_INFO_7  is defined as MSR_LBR_INFO_7  in SDM.
+        MSR_SKYLAKE_LBR_INFO_8  is defined as MSR_LBR_INFO_8  in SDM.
+        MSR_SKYLAKE_LBR_INFO_9  is defined as MSR_LBR_INFO_9  in SDM.
+        MSR_SKYLAKE_LBR_INFO_10 is defined as MSR_LBR_INFO_10 in SDM.
+        MSR_SKYLAKE_LBR_INFO_11 is defined as MSR_LBR_INFO_11 in SDM.
+        MSR_SKYLAKE_LBR_INFO_12 is defined as MSR_LBR_INFO_12 in SDM.
+        MSR_SKYLAKE_LBR_INFO_13 is defined as MSR_LBR_INFO_13 in SDM.
+        MSR_SKYLAKE_LBR_INFO_14 is defined as MSR_LBR_INFO_14 in SDM.
+        MSR_SKYLAKE_LBR_INFO_15 is defined as MSR_LBR_INFO_15 in SDM.
+        MSR_SKYLAKE_LBR_INFO_16 is defined as MSR_LBR_INFO_16 in SDM.
+        MSR_SKYLAKE_LBR_INFO_17 is defined as MSR_LBR_INFO_17 in SDM.
+        MSR_SKYLAKE_LBR_INFO_18 is defined as MSR_LBR_INFO_18 in SDM.
+        MSR_SKYLAKE_LBR_INFO_19 is defined as MSR_LBR_INFO_19 in SDM.
+        MSR_SKYLAKE_LBR_INFO_20 is defined as MSR_LBR_INFO_20 in SDM.
+        MSR_SKYLAKE_LBR_INFO_21 is defined as MSR_LBR_INFO_21 in SDM.
+        MSR_SKYLAKE_LBR_INFO_22 is defined as MSR_LBR_INFO_22 in SDM.
+        MSR_SKYLAKE_LBR_INFO_23 is defined as MSR_LBR_INFO_23 in SDM.
+        MSR_SKYLAKE_LBR_INFO_24 is defined as MSR_LBR_INFO_24 in SDM.
+        MSR_SKYLAKE_LBR_INFO_25 is defined as MSR_LBR_INFO_25 in SDM.
+        MSR_SKYLAKE_LBR_INFO_26 is defined as MSR_LBR_INFO_26 in SDM.
+        MSR_SKYLAKE_LBR_INFO_27 is defined as MSR_LBR_INFO_27 in SDM.
+        MSR_SKYLAKE_LBR_INFO_28 is defined as MSR_LBR_INFO_28 in SDM.
+        MSR_SKYLAKE_LBR_INFO_29 is defined as MSR_LBR_INFO_29 in SDM.
+        MSR_SKYLAKE_LBR_INFO_30 is defined as MSR_LBR_INFO_30 in SDM.
+        MSR_SKYLAKE_LBR_INFO_31 is defined as MSR_LBR_INFO_31 in SDM.
   @{
 **/
 #define MSR_SKYLAKE_LBR_INFO_0                   0x00000DC0
