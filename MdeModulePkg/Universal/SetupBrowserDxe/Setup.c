@@ -3275,6 +3275,7 @@ SubmitForForm (
 
         Status = EFI_SUCCESS;
       }
+      SendDiscardInfoToDriver (FormSet,Form);
     } else {
       Status = EFI_UNSUPPORTED;
     }
@@ -3336,9 +3337,11 @@ SubmitForFormSet (
   BOOLEAN                 HasInserted;
   FORM_BROWSER_STATEMENT  *Question;
   BOOLEAN                 SubmitFormSetFail;
+  BOOLEAN                 DiscardChange;
 
   HasInserted = FALSE;
   SubmitFormSetFail = FALSE;
+  DiscardChange     = FALSE;
 
   if (!IsNvUpdateRequiredForFormSet (FormSet)) {
     return EFI_SUCCESS;
@@ -3439,6 +3442,7 @@ SubmitForFormSet (
       // If not in system level, just handl the save failed storage here.
       //
       if (ConfirmSaveFail (Form->FormTitle, FormSet->HiiHandle) == BROWSER_ACTION_DISCARD) {
+        DiscardChange = TRUE;
         Link = GetFirstNode (&FormSet->SaveFailStorageListHead);
         while (!IsNull (&FormSet->SaveFailStorageListHead, Link)) {
           FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (Link);
@@ -3484,6 +3488,21 @@ SubmitForFormSet (
       // If in system level, just return error and handle the failed formset later.
       //
       Status = EFI_UNSUPPORTED;
+    }
+  }
+
+  //
+  // If user discard the change, send the discard info to driver.
+  //
+  if (DiscardChange) {
+    Link = GetFirstNode (&FormSet->FormListHead);
+    while (!IsNull (&FormSet->FormListHead, Link)) {
+      Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+      Link = GetNextNode (&FormSet->FormListHead, Link);
+      //
+      // Call callback with Changed type to inform the driver.
+      //
+      SendDiscardInfoToDriver (FormSet, Form);
     }
   }
 
@@ -3604,6 +3623,16 @@ SubmitForSystem (
             FormSetStorage->SyncConfigRequest = NULL;
           }
         }
+      }
+
+      Link = GetFirstNode (&LocalFormSet->FormListHead);
+      while (!IsNull (&LocalFormSet->FormListHead, Link)) {
+        Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+        Link = GetNextNode (&LocalFormSet->FormListHead, Link);
+        //
+        // Call callback with Changed type to inform the driver.
+        //
+        SendDiscardInfoToDriver (LocalFormSet, Form);
       }
 
       if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
