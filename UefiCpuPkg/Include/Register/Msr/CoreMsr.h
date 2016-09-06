@@ -40,6 +40,7 @@
   Msr = AsmReadMsr64 (MSR_CORE_P5_MC_ADDR);
   AsmWriteMsr64 (MSR_CORE_P5_MC_ADDR, Msr);
   @endcode
+  @note MSR_CORE_P5_MC_ADDR is defined as P5_MC_ADDR in SDM.
 **/
 #define MSR_CORE_P5_MC_ADDR                      0x00000000
 
@@ -58,6 +59,7 @@
   Msr = AsmReadMsr64 (MSR_CORE_P5_MC_TYPE);
   AsmWriteMsr64 (MSR_CORE_P5_MC_TYPE, Msr);
   @endcode
+  @note MSR_CORE_P5_MC_TYPE is defined as P5_MC_TYPE in SDM.
 **/
 #define MSR_CORE_P5_MC_TYPE                      0x00000001
 
@@ -79,6 +81,7 @@
   Msr.Uint64 = AsmReadMsr64 (MSR_CORE_EBL_CR_POWERON);
   AsmWriteMsr64 (MSR_CORE_EBL_CR_POWERON, Msr.Uint64);
   @endcode
+  @note MSR_CORE_EBL_CR_POWERON is defined as MSR_EBL_CR_POWERON in SDM.
 **/
 #define MSR_CORE_EBL_CR_POWERON                  0x0000002A
 
@@ -189,6 +192,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_LASTBRANCH_0);
   AsmWriteMsr64 (MSR_CORE_LASTBRANCH_0, Msr);
   @endcode
+  @note MSR_CORE_LASTBRANCH_0 is defined as MSR_LASTBRANCH_0 in SDM.
+        MSR_CORE_LASTBRANCH_1 is defined as MSR_LASTBRANCH_1 in SDM.
+        MSR_CORE_LASTBRANCH_2 is defined as MSR_LASTBRANCH_2 in SDM.
+        MSR_CORE_LASTBRANCH_3 is defined as MSR_LASTBRANCH_3 in SDM.
+        MSR_CORE_LASTBRANCH_4 is defined as MSR_LASTBRANCH_4 in SDM.
+        MSR_CORE_LASTBRANCH_5 is defined as MSR_LASTBRANCH_5 in SDM.
+        MSR_CORE_LASTBRANCH_6 is defined as MSR_LASTBRANCH_6 in SDM.
+        MSR_CORE_LASTBRANCH_7 is defined as MSR_LASTBRANCH_7 in SDM.
   @{
 **/
 #define MSR_CORE_LASTBRANCH_0                    0x00000040
@@ -218,6 +229,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_CORE_FSB_FREQ);
   @endcode
+  @note MSR_CORE_FSB_FREQ is defined as MSR_FSB_FREQ in SDM.
 **/
 #define MSR_CORE_FSB_FREQ                        0x000000CD
 
@@ -270,6 +282,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_CORE_BBL_CR_CTL3);
   AsmWriteMsr64 (MSR_CORE_BBL_CR_CTL3, Msr.Uint64);
   @endcode
+  @note MSR_CORE_BBL_CR_CTL3 is defined as MSR_BBL_CR_CTL3 in SDM.
 **/
 #define MSR_CORE_BBL_CR_CTL3                     0x0000011E
 
@@ -328,6 +341,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_CORE_THERM2_CTL);
   AsmWriteMsr64 (MSR_CORE_THERM2_CTL, Msr.Uint64);
   @endcode
+  @note MSR_CORE_THERM2_CTL is defined as MSR_THERM2_CTL in SDM.
 **/
 #define MSR_CORE_THERM2_CTL                      0x0000019D
 
@@ -379,6 +393,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_CORE_IA32_MISC_ENABLE);
   AsmWriteMsr64 (MSR_CORE_IA32_MISC_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_CORE_IA32_MISC_ENABLE is defined as IA32_MISC_ENABLE in SDM.
 **/
 #define MSR_CORE_IA32_MISC_ENABLE                0x000001A0
 
@@ -479,6 +494,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_LASTBRANCH_TOS);
   AsmWriteMsr64 (MSR_CORE_LASTBRANCH_TOS, Msr);
   @endcode
+  @note MSR_CORE_LASTBRANCH_TOS is defined as MSR_LASTBRANCH_TOS in SDM.
 **/
 #define MSR_CORE_LASTBRANCH_TOS                  0x000001C9
 
@@ -498,6 +514,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_CORE_LER_FROM_LIP);
   @endcode
+  @note MSR_CORE_LER_FROM_LIP is defined as MSR_LER_FROM_LIP in SDM.
 **/
 #define MSR_CORE_LER_FROM_LIP                    0x000001DD
 
@@ -518,6 +535,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_CORE_LER_TO_LIP);
   @endcode
+  @note MSR_CORE_LER_TO_LIP is defined as MSR_LER_TO_LIP in SDM.
 **/
 #define MSR_CORE_LER_TO_LIP                      0x000001DE
 
@@ -538,6 +556,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_CORE_ROB_CR_BKUPTMPDR6);
   AsmWriteMsr64 (MSR_CORE_ROB_CR_BKUPTMPDR6, Msr.Uint64);
   @endcode
+  @note MSR_CORE_ROB_CR_BKUPTMPDR6 is defined as ROB_CR_BKUPTMPDR6 in SDM.
 **/
 #define MSR_CORE_ROB_CR_BKUPTMPDR6               0x000001E0
 
@@ -582,6 +601,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRPHYSBASE0);
   AsmWriteMsr64 (MSR_CORE_MTRRPHYSBASE0, Msr);
   @endcode
+  @note MSR_CORE_MTRRPHYSBASE0 is defined as MTRRPHYSBASE0 in SDM.
+        MSR_CORE_MTRRPHYSBASE1 is defined as MTRRPHYSBASE1 in SDM.
+        MSR_CORE_MTRRPHYSBASE2 is defined as MTRRPHYSBASE2 in SDM.
+        MSR_CORE_MTRRPHYSBASE3 is defined as MTRRPHYSBASE3 in SDM.
+        MSR_CORE_MTRRPHYSBASE4 is defined as MTRRPHYSBASE4 in SDM.
+        MSR_CORE_MTRRPHYSBASE5 is defined as MTRRPHYSBASE5 in SDM.
+        MSR_CORE_MTRRPHYSMASK6 is defined as MTRRPHYSMASK6 in SDM.
+        MSR_CORE_MTRRPHYSMASK7 is defined as MTRRPHYSMASK7 in SDM.
   @{
 **/
 #define MSR_CORE_MTRRPHYSBASE0                   0x00000200
@@ -609,6 +636,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRPHYSMASK0);
   AsmWriteMsr64 (MSR_CORE_MTRRPHYSMASK0, Msr);
   @endcode
+  @note MSR_CORE_MTRRPHYSMASK0 is defined as MTRRPHYSMASK0 in SDM.
+        MSR_CORE_MTRRPHYSMASK1 is defined as MTRRPHYSMASK1 in SDM.
+        MSR_CORE_MTRRPHYSMASK2 is defined as MTRRPHYSMASK2 in SDM.
+        MSR_CORE_MTRRPHYSMASK3 is defined as MTRRPHYSMASK3 in SDM.
+        MSR_CORE_MTRRPHYSMASK4 is defined as MTRRPHYSMASK4 in SDM.
+        MSR_CORE_MTRRPHYSMASK5 is defined as MTRRPHYSMASK5 in SDM.
+        MSR_CORE_MTRRPHYSBASE6 is defined as MTRRPHYSBASE6 in SDM.
+        MSR_CORE_MTRRPHYSBASE7 is defined as MTRRPHYSBASE7 in SDM.
   @{
 **/
 #define MSR_CORE_MTRRPHYSMASK0                   0x00000201
@@ -636,6 +671,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX64K_00000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX64K_00000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX64K_00000 is defined as MTRRFIX64K_00000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX64K_00000                0x00000250
 
@@ -654,6 +690,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX16K_80000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX16K_80000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX16K_80000 is defined as MTRRFIX16K_80000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX16K_80000                0x00000258
 
@@ -672,6 +709,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX16K_A0000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX16K_A0000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX16K_A0000 is defined as MTRRFIX16K_A0000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX16K_A0000                0x00000259
 
@@ -690,6 +728,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_C0000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_C0000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_C0000 is defined as MTRRFIX4K_C0000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_C0000                 0x00000268
 
@@ -708,6 +747,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_C8000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_C8000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_C8000 is defined as MTRRFIX4K_C8000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_C8000                 0x00000269
 
@@ -726,6 +766,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_D0000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_D0000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_D0000 is defined as MTRRFIX4K_D0000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_D0000                 0x0000026A
 
@@ -744,6 +785,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_D8000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_D8000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_D8000 is defined as MTRRFIX4K_D8000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_D8000                 0x0000026B
 
@@ -762,6 +804,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_E0000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_E0000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_E0000 is defined as MTRRFIX4K_E0000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_E0000                 0x0000026C
 
@@ -780,6 +823,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_E8000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_E8000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_E8000 is defined as MTRRFIX4K_E8000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_E8000                 0x0000026D
 
@@ -798,6 +842,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_F0000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_F0000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_F0000 is defined as MTRRFIX4K_F0000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_F0000                 0x0000026E
 
@@ -816,6 +861,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MTRRFIX4K_F8000);
   AsmWriteMsr64 (MSR_CORE_MTRRFIX4K_F8000, Msr);
   @endcode
+  @note MSR_CORE_MTRRFIX4K_F8000 is defined as MTRRFIX4K_F8000 in SDM.
 **/
 #define MSR_CORE_MTRRFIX4K_F8000                 0x0000026F
 
@@ -834,6 +880,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC4_CTL);
   AsmWriteMsr64 (MSR_CORE_MC4_CTL, Msr);
   @endcode
+  @note MSR_CORE_MC4_CTL is defined as MSR_MC4_CTL in SDM.
 **/
 #define MSR_CORE_MC4_CTL                         0x0000040C
 
@@ -852,6 +899,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC4_STATUS);
   AsmWriteMsr64 (MSR_CORE_MC4_STATUS, Msr);
   @endcode
+  @note MSR_CORE_MC4_STATUS is defined as MSR_MC4_STATUS in SDM.
 **/
 #define MSR_CORE_MC4_STATUS                      0x0000040D
 
@@ -874,6 +922,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC4_ADDR);
   AsmWriteMsr64 (MSR_CORE_MC4_ADDR, Msr);
   @endcode
+  @note MSR_CORE_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
 **/
 #define MSR_CORE_MC4_ADDR                        0x0000040E
 
@@ -892,6 +941,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC3_CTL);
   AsmWriteMsr64 (MSR_CORE_MC3_CTL, Msr);
   @endcode
+  @note MSR_CORE_MC3_CTL is defined as MSR_MC3_CTL in SDM.
 **/
 #define MSR_CORE_MC3_CTL                         0x00000410
 
@@ -910,6 +960,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC3_STATUS);
   AsmWriteMsr64 (MSR_CORE_MC3_STATUS, Msr);
   @endcode
+  @note MSR_CORE_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
 **/
 #define MSR_CORE_MC3_STATUS                      0x00000411
 
@@ -932,6 +983,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC3_ADDR);
   AsmWriteMsr64 (MSR_CORE_MC3_ADDR, Msr);
   @endcode
+  @note MSR_CORE_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
 **/
 #define MSR_CORE_MC3_ADDR                        0x00000412
 
@@ -950,6 +1002,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC3_MISC);
   AsmWriteMsr64 (MSR_CORE_MC3_MISC, Msr);
   @endcode
+  @note MSR_CORE_MC3_MISC is defined as MSR_MC3_MISC in SDM.
 **/
 #define MSR_CORE_MC3_MISC                        0x00000413
 
@@ -968,6 +1021,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC5_CTL);
   AsmWriteMsr64 (MSR_CORE_MC5_CTL, Msr);
   @endcode
+  @note MSR_CORE_MC5_CTL is defined as MSR_MC5_CTL in SDM.
 **/
 #define MSR_CORE_MC5_CTL                         0x00000414
 
@@ -986,6 +1040,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC5_STATUS);
   AsmWriteMsr64 (MSR_CORE_MC5_STATUS, Msr);
   @endcode
+  @note MSR_CORE_MC5_STATUS is defined as MSR_MC5_STATUS in SDM.
 **/
 #define MSR_CORE_MC5_STATUS                      0x00000415
 
@@ -1004,6 +1059,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC5_ADDR);
   AsmWriteMsr64 (MSR_CORE_MC5_ADDR, Msr);
   @endcode
+  @note MSR_CORE_MC5_ADDR is defined as MSR_MC5_ADDR in SDM.
 **/
 #define MSR_CORE_MC5_ADDR                        0x00000416
 
@@ -1022,6 +1078,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_CORE_MC5_MISC);
   AsmWriteMsr64 (MSR_CORE_MC5_MISC, Msr);
   @endcode
+  @note MSR_CORE_MC5_MISC is defined as MSR_MC5_MISC in SDM.
 **/
 #define MSR_CORE_MC5_MISC                        0x00000417
 
@@ -1042,6 +1099,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_CORE_IA32_EFER);
   AsmWriteMsr64 (MSR_CORE_IA32_EFER, Msr.Uint64);
   @endcode
+  @note MSR_CORE_IA32_EFER is defined as IA32_EFER in SDM.
 **/
 #define MSR_CORE_IA32_EFER                       0xC0000080
 
