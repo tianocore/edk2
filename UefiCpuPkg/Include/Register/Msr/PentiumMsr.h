@@ -40,6 +40,7 @@
   Msr = AsmReadMsr64 (MSR_PENTIUM_P5_MC_ADDR);
   AsmWriteMsr64 (MSR_PENTIUM_P5_MC_ADDR, Msr);
   @endcode
+  @note MSR_PENTIUM_P5_MC_ADDR is defined as P5_MC_ADDR in SDM.
 **/
 #define MSR_PENTIUM_P5_MC_ADDR                   0x00000000
 
@@ -58,6 +59,7 @@
   Msr = AsmReadMsr64 (MSR_PENTIUM_P5_MC_TYPE);
   AsmWriteMsr64 (MSR_PENTIUM_P5_MC_TYPE, Msr);
   @endcode
+  @note MSR_PENTIUM_P5_MC_TYPE is defined as P5_MC_TYPE in SDM.
 **/
 #define MSR_PENTIUM_P5_MC_TYPE                   0x00000001
 
@@ -76,6 +78,7 @@
   Msr = AsmReadMsr64 (MSR_PENTIUM_TSC);
   AsmWriteMsr64 (MSR_PENTIUM_TSC, Msr);
   @endcode
+  @note MSR_PENTIUM_TSC is defined as TSC in SDM.
 **/
 #define MSR_PENTIUM_TSC                          0x00000010
 
@@ -94,6 +97,7 @@
   Msr = AsmReadMsr64 (MSR_PENTIUM_CESR);
   AsmWriteMsr64 (MSR_PENTIUM_CESR, Msr);
   @endcode
+  @note MSR_PENTIUM_CESR is defined as CESR in SDM.
 **/
 #define MSR_PENTIUM_CESR                         0x00000011
 
@@ -112,6 +116,8 @@
   Msr = AsmReadMsr64 (MSR_PENTIUM_CTR0);
   AsmWriteMsr64 (MSR_PENTIUM_CTR0, Msr);
   @endcode
+  @note MSR_PENTIUM_CTR0 is defined as CTR0 in SDM.
+        MSR_PENTIUM_CTR1 is defined as CTR1 in SDM.
   @{
 **/
 #define MSR_PENTIUM_CTR0                         0x00000012
