@@ -42,6 +42,7 @@
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PPIN_CTL);
   AsmWriteMsr64 (MSR_XEON_D_PPIN_CTL, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_PPIN_CTL is defined as MSR_PPIN_CTL in SDM.
 **/
 #define MSR_XEON_D_PPIN_CTL                      0x0000004E
 
@@ -89,6 +90,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_XEON_D_PPIN);
   @endcode
+  @note MSR_XEON_D_PPIN is defined as MSR_PPIN in SDM.
 **/
 #define MSR_XEON_D_PPIN                          0x0000004F
 
@@ -109,6 +111,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PLATFORM_INFO);
   AsmWriteMsr64 (MSR_XEON_D_PLATFORM_INFO, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_PLATFORM_INFO is defined as MSR_PLATFORM_INFO in SDM.
 **/
 #define MSR_XEON_D_PLATFORM_INFO                 0x000000CE
 
@@ -178,6 +181,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PKG_CST_CONFIG_CONTROL);
   AsmWriteMsr64 (MSR_XEON_D_PKG_CST_CONFIG_CONTROL, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_PKG_CST_CONFIG_CONTROL is defined as MSR_PKG_CST_CONFIG_CONTROL in SDM.
 **/
 #define MSR_XEON_D_PKG_CST_CONFIG_CONTROL        0x000000E2
 
@@ -268,6 +272,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_IA32_MCG_CAP);
   @endcode
+  @note MSR_XEON_D_IA32_MCG_CAP is defined as IA32_MCG_CAP in SDM.
 **/
 #define MSR_XEON_D_IA32_MCG_CAP                  0x00000179
 
@@ -347,6 +352,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_SMM_MCA_CAP);
   AsmWriteMsr64 (MSR_XEON_D_SMM_MCA_CAP, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_SMM_MCA_CAP is defined as MSR_SMM_MCA_CAP in SDM.
 **/
 #define MSR_XEON_D_SMM_MCA_CAP                   0x0000017D
 
@@ -397,6 +403,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_TEMPERATURE_TARGET);
   AsmWriteMsr64 (MSR_XEON_D_TEMPERATURE_TARGET, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_TEMPERATURE_TARGET is defined as MSR_TEMPERATURE_TARGET in SDM.
 **/
 #define MSR_XEON_D_TEMPERATURE_TARGET            0x000001A2
 
@@ -447,6 +454,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_TURBO_RATIO_LIMIT);
   @endcode
+  @note MSR_XEON_D_TURBO_RATIO_LIMIT is defined as MSR_TURBO_RATIO_LIMIT in SDM.
 **/
 #define MSR_XEON_D_TURBO_RATIO_LIMIT             0x000001AD
 
@@ -514,6 +522,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_TURBO_RATIO_LIMIT1);
   @endcode
+  @note MSR_XEON_D_TURBO_RATIO_LIMIT1 is defined as MSR_TURBO_RATIO_LIMIT1 in SDM.
 **/
 #define MSR_XEON_D_TURBO_RATIO_LIMIT1            0x000001AE
 
@@ -580,6 +589,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_RAPL_POWER_UNIT);
   @endcode
+  @note MSR_XEON_D_RAPL_POWER_UNIT is defined as MSR_RAPL_POWER_UNIT in SDM.
 **/
 #define MSR_XEON_D_RAPL_POWER_UNIT               0x00000606
 
@@ -638,6 +648,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_D_DRAM_POWER_LIMIT);
   AsmWriteMsr64 (MSR_XEON_D_DRAM_POWER_LIMIT, Msr);
   @endcode
+  @note MSR_XEON_D_DRAM_POWER_LIMIT is defined as MSR_DRAM_POWER_LIMIT in SDM.
 **/
 #define MSR_XEON_D_DRAM_POWER_LIMIT              0x00000618
 
@@ -655,6 +666,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_XEON_D_DRAM_ENERGY_STATUS);
   @endcode
+  @note MSR_XEON_D_DRAM_ENERGY_STATUS is defined as MSR_DRAM_ENERGY_STATUS in SDM.
 **/
 #define MSR_XEON_D_DRAM_ENERGY_STATUS            0x00000619
 
@@ -673,6 +685,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_XEON_D_DRAM_PERF_STATUS);
   @endcode
+  @note MSR_XEON_D_DRAM_PERF_STATUS is defined as MSR_DRAM_PERF_STATUS in SDM.
 **/
 #define MSR_XEON_D_DRAM_PERF_STATUS              0x0000061B
 
@@ -691,6 +704,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_D_DRAM_POWER_INFO);
   AsmWriteMsr64 (MSR_XEON_D_DRAM_POWER_INFO, Msr);
   @endcode
+  @note MSR_XEON_D_DRAM_POWER_INFO is defined as MSR_DRAM_POWER_INFO in SDM.
 **/
 #define MSR_XEON_D_DRAM_POWER_INFO               0x0000061C
 
@@ -712,6 +726,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_CORE_PERF_LIMIT_REASONS);
   AsmWriteMsr64 (MSR_XEON_D_CORE_PERF_LIMIT_REASONS, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_CORE_PERF_LIMIT_REASONS is defined as MSR_CORE_PERF_LIMIT_REASONS in SDM.
 **/
 #define MSR_XEON_D_CORE_PERF_LIMIT_REASONS       0x00000690
 
@@ -891,6 +906,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_IA32_QM_EVTSEL);
   AsmWriteMsr64 (MSR_XEON_D_IA32_QM_EVTSEL, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_IA32_QM_EVTSEL is defined as IA32_QM_EVTSEL in SDM.
 **/
 #define MSR_XEON_D_IA32_QM_EVTSEL                0x00000C8D
 
@@ -938,6 +954,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_IA32_PQR_ASSOC);
   AsmWriteMsr64 (MSR_XEON_D_IA32_PQR_ASSOC, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_IA32_PQR_ASSOC is defined as IA32_PQR_ASSOC in SDM.
 **/
 #define MSR_XEON_D_IA32_PQR_ASSOC                0x00000C8F
 
@@ -984,6 +1001,22 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_IA32_L3_QOS_MASK_0);
   AsmWriteMsr64 (MSR_XEON_D_IA32_L3_QOS_MASK_0, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_IA32_L3_QOS_MASK_0  is defined as IA32_L3_QOS_MASK_0  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_1  is defined as IA32_L3_QOS_MASK_1  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_2  is defined as IA32_L3_QOS_MASK_2  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_3  is defined as IA32_L3_QOS_MASK_3  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_4  is defined as IA32_L3_QOS_MASK_4  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_5  is defined as IA32_L3_QOS_MASK_5  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_6  is defined as IA32_L3_QOS_MASK_6  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_7  is defined as IA32_L3_QOS_MASK_7  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_8  is defined as IA32_L3_QOS_MASK_8  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_9  is defined as IA32_L3_QOS_MASK_9  in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_10 is defined as IA32_L3_QOS_MASK_10 in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_11 is defined as IA32_L3_QOS_MASK_11 in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_12 is defined as IA32_L3_QOS_MASK_12 in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_13 is defined as IA32_L3_QOS_MASK_13 in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_14 is defined as IA32_L3_QOS_MASK_14 in SDM.
+        MSR_XEON_D_IA32_L3_QOS_MASK_15 is defined as IA32_L3_QOS_MASK_15 in SDM.
   @{
 **/
 #define MSR_XEON_D_IA32_L3_QOS_MASK_0            0x00000C90
@@ -1047,6 +1080,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_TURBO_RATIO_LIMIT3);
   @endcode
+  @note MSR_XEON_D_TURBO_RATIO_LIMIT3 is defined as MSR_TURBO_RATIO_LIMIT3 in SDM.
 **/
 #define MSR_XEON_D_TURBO_RATIO_LIMIT3            0x000001AC
 
@@ -1105,6 +1139,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_D_MC5_CTL);
   AsmWriteMsr64 (MSR_XEON_D_MC5_CTL, Msr);
   @endcode
+  @note MSR_XEON_D_MC5_CTL  is defined as MSR_MC5_CTL  in SDM.
+        MSR_XEON_D_MC6_CTL  is defined as MSR_MC6_CTL  in SDM.
+        MSR_XEON_D_MC7_CTL  is defined as MSR_MC7_CTL  in SDM.
+        MSR_XEON_D_MC8_CTL  is defined as MSR_MC8_CTL  in SDM.
+        MSR_XEON_D_MC9_CTL  is defined as MSR_MC9_CTL  in SDM.
+        MSR_XEON_D_MC10_CTL is defined as MSR_MC10_CTL in SDM.
+        MSR_XEON_D_MC11_CTL is defined as MSR_MC11_CTL in SDM.
+        MSR_XEON_D_MC12_CTL is defined as MSR_MC12_CTL in SDM.
+        MSR_XEON_D_MC13_CTL is defined as MSR_MC13_CTL in SDM.
+        MSR_XEON_D_MC14_CTL is defined as MSR_MC14_CTL in SDM.
+        MSR_XEON_D_MC15_CTL is defined as MSR_MC15_CTL in SDM.
+        MSR_XEON_D_MC16_CTL is defined as MSR_MC16_CTL in SDM.
+        MSR_XEON_D_MC17_CTL is defined as MSR_MC17_CTL in SDM.
+        MSR_XEON_D_MC18_CTL is defined as MSR_MC18_CTL in SDM.
+        MSR_XEON_D_MC19_CTL is defined as MSR_MC19_CTL in SDM.
+        MSR_XEON_D_MC20_CTL is defined as MSR_MC20_CTL in SDM.
+        MSR_XEON_D_MC21_CTL is defined as MSR_MC21_CTL in SDM.
   @{
 **/
 #define MSR_XEON_D_MC5_CTL                       0x00000414
@@ -1141,6 +1192,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_D_MC6_STATUS);
   AsmWriteMsr64 (MSR_XEON_D_MC6_STATUS, Msr);
   @endcode
+  @note MSR_XEON_D_MC5_STATUS  is defined as MSR_MC5_STATUS  in SDM.
+        MSR_XEON_D_MC6_STATUS  is defined as MSR_MC6_STATUS  in SDM.
+        MSR_XEON_D_MC7_STATUS  is defined as MSR_MC7_STATUS  in SDM.
+        MSR_XEON_D_MC8_STATUS  is defined as MSR_MC8_STATUS  in SDM.
+        MSR_XEON_D_MC9_STATUS  is defined as MSR_MC9_STATUS  in SDM.
+        MSR_XEON_D_MC10_STATUS is defined as MSR_MC10_STATUS in SDM.
+        MSR_XEON_D_MC11_STATUS is defined as MSR_MC11_STATUS in SDM.
+        MSR_XEON_D_MC12_STATUS is defined as MSR_MC12_STATUS in SDM.
+        MSR_XEON_D_MC13_STATUS is defined as MSR_MC13_STATUS in SDM.
+        MSR_XEON_D_MC14_STATUS is defined as MSR_MC14_STATUS in SDM.
+        MSR_XEON_D_MC15_STATUS is defined as MSR_MC15_STATUS in SDM.
+        MSR_XEON_D_MC16_STATUS is defined as MSR_MC16_STATUS in SDM.
+        MSR_XEON_D_MC17_STATUS is defined as MSR_MC17_STATUS in SDM.
+        MSR_XEON_D_MC18_STATUS is defined as MSR_MC18_STATUS in SDM.
+        MSR_XEON_D_MC19_STATUS is defined as MSR_MC19_STATUS in SDM.
+        MSR_XEON_D_MC20_STATUS is defined as MSR_MC20_STATUS in SDM.
+        MSR_XEON_D_MC21_STATUS is defined as MSR_MC21_STATUS in SDM.
   @{
 **/
 #define MSR_XEON_D_MC5_STATUS                    0x00000415
@@ -1177,6 +1245,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_D_MC6_ADDR);
   AsmWriteMsr64 (MSR_XEON_D_MC6_ADDR, Msr);
   @endcode
+  @note MSR_XEON_D_MC5_ADDR  is defined as MSR_MC5_ADDR  in SDM.
+        MSR_XEON_D_MC6_ADDR  is defined as MSR_MC6_ADDR  in SDM.
+        MSR_XEON_D_MC7_ADDR  is defined as MSR_MC7_ADDR  in SDM.
+        MSR_XEON_D_MC8_ADDR  is defined as MSR_MC8_ADDR  in SDM.
+        MSR_XEON_D_MC9_ADDR  is defined as MSR_MC9_ADDR  in SDM.
+        MSR_XEON_D_MC10_ADDR is defined as MSR_MC10_ADDR in SDM.
+        MSR_XEON_D_MC11_ADDR is defined as MSR_MC11_ADDR in SDM.
+        MSR_XEON_D_MC12_ADDR is defined as MSR_MC12_ADDR in SDM.
+        MSR_XEON_D_MC13_ADDR is defined as MSR_MC13_ADDR in SDM.
+        MSR_XEON_D_MC14_ADDR is defined as MSR_MC14_ADDR in SDM.
+        MSR_XEON_D_MC15_ADDR is defined as MSR_MC15_ADDR in SDM.
+        MSR_XEON_D_MC16_ADDR is defined as MSR_MC16_ADDR in SDM.
+        MSR_XEON_D_MC17_ADDR is defined as MSR_MC17_ADDR in SDM.
+        MSR_XEON_D_MC18_ADDR is defined as MSR_MC18_ADDR in SDM.
+        MSR_XEON_D_MC19_ADDR is defined as MSR_MC19_ADDR in SDM.
+        MSR_XEON_D_MC20_ADDR is defined as MSR_MC20_ADDR in SDM.
+        MSR_XEON_D_MC21_ADDR is defined as MSR_MC21_ADDR in SDM.
   @{
 **/
 #define MSR_XEON_D_MC5_ADDR                      0x00000416
@@ -1214,6 +1299,23 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_D_MC6_MISC);
   AsmWriteMsr64 (MSR_XEON_D_MC6_MISC, Msr);
   @endcode
+  @note MSR_XEON_D_MC5_MISC  is defined as MSR_MC5_MISC  in SDM.
+        MSR_XEON_D_MC6_MISC  is defined as MSR_MC6_MISC  in SDM.
+        MSR_XEON_D_MC7_MISC  is defined as MSR_MC7_MISC  in SDM.
+        MSR_XEON_D_MC8_MISC  is defined as MSR_MC8_MISC  in SDM.
+        MSR_XEON_D_MC9_MISC  is defined as MSR_MC9_MISC  in SDM.
+        MSR_XEON_D_MC10_MISC is defined as MSR_MC10_MISC in SDM.
+        MSR_XEON_D_MC11_MISC is defined as MSR_MC11_MISC in SDM.
+        MSR_XEON_D_MC12_MISC is defined as MSR_MC12_MISC in SDM.
+        MSR_XEON_D_MC13_MISC is defined as MSR_MC13_MISC in SDM.
+        MSR_XEON_D_MC14_MISC is defined as MSR_MC14_MISC in SDM.
+        MSR_XEON_D_MC15_MISC is defined as MSR_MC15_MISC in SDM.
+        MSR_XEON_D_MC16_MISC is defined as MSR_MC16_MISC in SDM.
+        MSR_XEON_D_MC17_MISC is defined as MSR_MC17_MISC in SDM.
+        MSR_XEON_D_MC18_MISC is defined as MSR_MC18_MISC in SDM.
+        MSR_XEON_D_MC19_MISC is defined as MSR_MC19_MISC in SDM.
+        MSR_XEON_D_MC20_MISC is defined as MSR_MC20_MISC in SDM.
+        MSR_XEON_D_MC21_MISC is defined as MSR_MC21_MISC in SDM.
   @{
 **/
 #define MSR_XEON_D_MC5_MISC                      0x00000417
@@ -1253,6 +1355,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PKG_C8_RESIDENCY);
   AsmWriteMsr64 (MSR_XEON_D_PKG_C8_RESIDENCY, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_PKG_C8_RESIDENCY is defined as MSR_PKG_C8_RESIDENCY in SDM.
 **/
 #define MSR_XEON_D_PKG_C8_RESIDENCY              0x00000630
 
@@ -1302,6 +1405,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PKG_C9_RESIDENCY);
   AsmWriteMsr64 (MSR_XEON_D_PKG_C9_RESIDENCY, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_PKG_C9_RESIDENCY is defined as MSR_PKG_C9_RESIDENCY in SDM.
 **/
 #define MSR_XEON_D_PKG_C9_RESIDENCY              0x00000631
 
@@ -1351,6 +1455,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PKG_C10_RESIDENCY);
   AsmWriteMsr64 (MSR_XEON_D_PKG_C10_RESIDENCY, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_PKG_C10_RESIDENCY is defined as MSR_PKG_C10_RESIDENCY in SDM.
 **/
 #define MSR_XEON_D_PKG_C10_RESIDENCY             0x00000632
 
@@ -1399,6 +1504,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_IA32_L3_QOS_CFG);
   AsmWriteMsr64 (MSR_XEON_D_IA32_L3_QOS_CFG, Msr.Uint64);
   @endcode
+  @note MSR_XEON_D_IA32_L3_QOS_CFG is defined as IA32_L3_QOS_CFG in SDM.
 **/
 #define MSR_XEON_D_IA32_L3_QOS_CFG               0x00000C81
 
