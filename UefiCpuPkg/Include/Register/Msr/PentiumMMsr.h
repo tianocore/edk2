@@ -40,6 +40,7 @@
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_P5_MC_ADDR);
   AsmWriteMsr64 (MSR_PENTIUM_M_P5_MC_ADDR, Msr);
   @endcode
+  @note MSR_PENTIUM_M_P5_MC_ADDR is defined as P5_MC_ADDR in SDM.
 **/
 #define MSR_PENTIUM_M_P5_MC_ADDR                 0x00000000
 
@@ -58,6 +59,7 @@
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_P5_MC_TYPE);
   AsmWriteMsr64 (MSR_PENTIUM_M_P5_MC_TYPE, Msr);
   @endcode
+  @note MSR_PENTIUM_M_P5_MC_TYPE is defined as P5_MC_TYPE in SDM.
 **/
 #define MSR_PENTIUM_M_P5_MC_TYPE                 0x00000001
 
@@ -79,6 +81,7 @@
   Msr.Uint64 = AsmReadMsr64 (MSR_PENTIUM_M_EBL_CR_POWERON);
   AsmWriteMsr64 (MSR_PENTIUM_M_EBL_CR_POWERON, Msr.Uint64);
   @endcode
+  @note MSR_PENTIUM_M_EBL_CR_POWERON is defined as MSR_EBL_CR_POWERON in SDM.
 **/
 #define MSR_PENTIUM_M_EBL_CR_POWERON             0x0000002A
 
@@ -195,6 +198,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_LASTBRANCH_0);
   AsmWriteMsr64 (MSR_PENTIUM_M_LASTBRANCH_0, Msr);
   @endcode
+  @note MSR_PENTIUM_M_LASTBRANCH_0 is defined as MSR_LASTBRANCH_0 in SDM.
+        MSR_PENTIUM_M_LASTBRANCH_1 is defined as MSR_LASTBRANCH_1 in SDM.
+        MSR_PENTIUM_M_LASTBRANCH_2 is defined as MSR_LASTBRANCH_2 in SDM.
+        MSR_PENTIUM_M_LASTBRANCH_3 is defined as MSR_LASTBRANCH_3 in SDM.
+        MSR_PENTIUM_M_LASTBRANCH_4 is defined as MSR_LASTBRANCH_4 in SDM.
+        MSR_PENTIUM_M_LASTBRANCH_5 is defined as MSR_LASTBRANCH_5 in SDM.
+        MSR_PENTIUM_M_LASTBRANCH_6 is defined as MSR_LASTBRANCH_6 in SDM.
+        MSR_PENTIUM_M_LASTBRANCH_7 is defined as MSR_LASTBRANCH_7 in SDM.
   @{
 **/
 #define MSR_PENTIUM_M_LASTBRANCH_0               0x00000040
@@ -222,6 +233,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_BBL_CR_CTL);
   AsmWriteMsr64 (MSR_PENTIUM_M_BBL_CR_CTL, Msr);
   @endcode
+  @note MSR_PENTIUM_M_BBL_CR_CTL is defined as MSR_BBL_CR_CTL in SDM.
 **/
 #define MSR_PENTIUM_M_BBL_CR_CTL                 0x00000119
 
@@ -242,6 +254,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_PENTIUM_M_BBL_CR_CTL3);
   AsmWriteMsr64 (MSR_PENTIUM_M_BBL_CR_CTL3, Msr.Uint64);
   @endcode
+  @note MSR_PENTIUM_M_BBL_CR_CTL3 is defined as MSR_BBL_CR_CTL3 in SDM.
 **/
 #define MSR_PENTIUM_M_BBL_CR_CTL3                0x0000011E
 
@@ -308,6 +321,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_PENTIUM_M_THERM2_CTL);
   AsmWriteMsr64 (MSR_PENTIUM_M_THERM2_CTL, Msr.Uint64);
   @endcode
+  @note MSR_PENTIUM_M_THERM2_CTL is defined as MSR_THERM2_CTL in SDM.
 **/
 #define MSR_PENTIUM_M_THERM2_CTL                 0x0000019D
 
@@ -359,6 +373,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_PENTIUM_M_IA32_MISC_ENABLE);
   AsmWriteMsr64 (MSR_PENTIUM_M_IA32_MISC_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_PENTIUM_M_IA32_MISC_ENABLE is defined as IA32_MISC_ENABLE in SDM.
 **/
 #define MSR_PENTIUM_M_IA32_MISC_ENABLE           0x000001A0
 
@@ -460,6 +475,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_LASTBRANCH_TOS);
   AsmWriteMsr64 (MSR_PENTIUM_M_LASTBRANCH_TOS, Msr);
   @endcode
+  @note MSR_PENTIUM_M_LASTBRANCH_TOS is defined as MSR_LASTBRANCH_TOS in SDM.
 **/
 #define MSR_PENTIUM_M_LASTBRANCH_TOS             0x000001C9
 
@@ -480,6 +496,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_DEBUGCTLB);
   AsmWriteMsr64 (MSR_PENTIUM_M_DEBUGCTLB, Msr);
   @endcode
+  @note MSR_PENTIUM_M_DEBUGCTLB is defined as MSR_DEBUGCTLB in SDM.
 **/
 #define MSR_PENTIUM_M_DEBUGCTLB                  0x000001D9
 
@@ -502,6 +519,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_LER_TO_LIP);
   @endcode
+  @note MSR_PENTIUM_M_LER_TO_LIP is defined as MSR_LER_TO_LIP in SDM.
 **/
 #define MSR_PENTIUM_M_LER_TO_LIP                 0x000001DD
 
@@ -523,6 +541,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_LER_FROM_LIP);
   @endcode
+  @note MSR_PENTIUM_M_LER_FROM_LIP is defined as MSR_LER_FROM_LIP in SDM.
 **/
 #define MSR_PENTIUM_M_LER_FROM_LIP               0x000001DE
 
@@ -541,6 +560,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_MC4_CTL);
   AsmWriteMsr64 (MSR_PENTIUM_M_MC4_CTL, Msr);
   @endcode
+  @note MSR_PENTIUM_M_MC4_CTL is defined as MSR_MC4_CTL in SDM.
 **/
 #define MSR_PENTIUM_M_MC4_CTL                    0x0000040C
 
@@ -559,6 +579,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_MC4_STATUS);
   AsmWriteMsr64 (MSR_PENTIUM_M_MC4_STATUS, Msr);
   @endcode
+  @note MSR_PENTIUM_M_MC4_STATUS is defined as MSR_MC4_STATUS in SDM.
 **/
 #define MSR_PENTIUM_M_MC4_STATUS                 0x0000040D
 
@@ -580,6 +601,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_MC4_ADDR);
   AsmWriteMsr64 (MSR_PENTIUM_M_MC4_ADDR, Msr);
   @endcode
+  @note MSR_PENTIUM_M_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
 **/
 #define MSR_PENTIUM_M_MC4_ADDR                   0x0000040E
 
@@ -598,6 +620,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_MC3_CTL);
   AsmWriteMsr64 (MSR_PENTIUM_M_MC3_CTL, Msr);
   @endcode
+  @note MSR_PENTIUM_M_MC3_CTL is defined as MSR_MC3_CTL in SDM.
 **/
 #define MSR_PENTIUM_M_MC3_CTL                    0x00000410
 
@@ -616,6 +639,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_MC3_STATUS);
   AsmWriteMsr64 (MSR_PENTIUM_M_MC3_STATUS, Msr);
   @endcode
+  @note MSR_PENTIUM_M_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
 **/
 #define MSR_PENTIUM_M_MC3_STATUS                 0x00000411
 
@@ -637,6 +661,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_PENTIUM_M_MC3_ADDR);
   AsmWriteMsr64 (MSR_PENTIUM_M_MC3_ADDR, Msr);
   @endcode
+  @note MSR_PENTIUM_M_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
 **/
 #define MSR_PENTIUM_M_MC3_ADDR                   0x00000412
 
