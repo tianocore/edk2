@@ -43,6 +43,7 @@
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_5600_FEATURE_CONFIG);
   AsmWriteMsr64 (MSR_XEON_5600_FEATURE_CONFIG, Msr.Uint64);
   @endcode
+  @note MSR_XEON_5600_FEATURE_CONFIG is defined as MSR_FEATURE_CONFIG in SDM.
 **/
 #define MSR_XEON_5600_FEATURE_CONFIG             0x0000013C
 
@@ -92,6 +93,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_5600_OFFCORE_RSP_1);
   AsmWriteMsr64 (MSR_XEON_5600_OFFCORE_RSP_1, Msr);
   @endcode
+  @note MSR_XEON_5600_OFFCORE_RSP_1 is defined as MSR_OFFCORE_RSP_1 in SDM.
 **/
 #define MSR_XEON_5600_OFFCORE_RSP_1              0x000001A7
 
@@ -112,6 +114,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_XEON_5600_TURBO_RATIO_LIMIT);
   @endcode
+  @note MSR_XEON_5600_TURBO_RATIO_LIMIT is defined as MSR_TURBO_RATIO_LIMIT in SDM.
 **/
 #define MSR_XEON_5600_TURBO_RATIO_LIMIT          0x000001AD
 
@@ -176,6 +179,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_XEON_5600_IA32_ENERGY_PERF_BIAS);
   AsmWriteMsr64 (MSR_XEON_5600_IA32_ENERGY_PERF_BIAS, Msr);
   @endcode
+  @note MSR_XEON_5600_IA32_ENERGY_PERF_BIAS is defined as IA32_ENERGY_PERF_BIAS in SDM.
 **/
 #define MSR_XEON_5600_IA32_ENERGY_PERF_BIAS      0x000001B0
 
