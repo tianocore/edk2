@@ -41,6 +41,7 @@
 
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_PLATFORM_ID);
   @endcode
+  @note MSR_ATOM_PLATFORM_ID is defined as MSR_PLATFORM_ID in SDM.
 **/
 #define MSR_ATOM_PLATFORM_ID                     0x00000017
 
@@ -88,6 +89,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_EBL_CR_POWERON);
   AsmWriteMsr64 (MSR_ATOM_EBL_CR_POWERON, Msr.Uint64);
   @endcode
+  @note MSR_ATOM_EBL_CR_POWERON is defined as MSR_EBL_CR_POWERON in SDM.
 **/
 #define MSR_ATOM_EBL_CR_POWERON                  0x0000002A
 
@@ -193,6 +195,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_LASTBRANCH_0_FROM_IP);
   AsmWriteMsr64 (MSR_ATOM_LASTBRANCH_0_FROM_IP, Msr);
   @endcode
+  @note MSR_ATOM_LASTBRANCH_0_FROM_IP is defined as MSR_LASTBRANCH_0_FROM_IP in SDM.
+        MSR_ATOM_LASTBRANCH_1_FROM_IP is defined as MSR_LASTBRANCH_1_FROM_IP in SDM.
+        MSR_ATOM_LASTBRANCH_2_FROM_IP is defined as MSR_LASTBRANCH_2_FROM_IP in SDM.
+        MSR_ATOM_LASTBRANCH_3_FROM_IP is defined as MSR_LASTBRANCH_3_FROM_IP in SDM.
+        MSR_ATOM_LASTBRANCH_4_FROM_IP is defined as MSR_LASTBRANCH_4_FROM_IP in SDM.
+        MSR_ATOM_LASTBRANCH_5_FROM_IP is defined as MSR_LASTBRANCH_5_FROM_IP in SDM.
+        MSR_ATOM_LASTBRANCH_6_FROM_IP is defined as MSR_LASTBRANCH_6_FROM_IP in SDM.
+        MSR_ATOM_LASTBRANCH_7_FROM_IP is defined as MSR_LASTBRANCH_7_FROM_IP in SDM.
   @{
 **/
 #define MSR_ATOM_LASTBRANCH_0_FROM_IP            0x00000040
@@ -223,6 +233,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_LASTBRANCH_0_TO_IP);
   AsmWriteMsr64 (MSR_ATOM_LASTBRANCH_0_TO_IP, Msr);
   @endcode
+  @note MSR_ATOM_LASTBRANCH_0_TO_IP is defined as MSR_LASTBRANCH_0_TO_IP in SDM.
+        MSR_ATOM_LASTBRANCH_1_TO_IP is defined as MSR_LASTBRANCH_1_TO_IP in SDM.
+        MSR_ATOM_LASTBRANCH_2_TO_IP is defined as MSR_LASTBRANCH_2_TO_IP in SDM.
+        MSR_ATOM_LASTBRANCH_3_TO_IP is defined as MSR_LASTBRANCH_3_TO_IP in SDM.
+        MSR_ATOM_LASTBRANCH_4_TO_IP is defined as MSR_LASTBRANCH_4_TO_IP in SDM.
+        MSR_ATOM_LASTBRANCH_5_TO_IP is defined as MSR_LASTBRANCH_5_TO_IP in SDM.
+        MSR_ATOM_LASTBRANCH_6_TO_IP is defined as MSR_LASTBRANCH_6_TO_IP in SDM.
+        MSR_ATOM_LASTBRANCH_7_TO_IP is defined as MSR_LASTBRANCH_7_TO_IP in SDM.
   @{
 **/
 #define MSR_ATOM_LASTBRANCH_0_TO_IP              0x00000060
@@ -252,6 +270,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_FSB_FREQ);
   @endcode
+  @note MSR_ATOM_FSB_FREQ is defined as MSR_FSB_FREQ in SDM.
 **/
 #define MSR_ATOM_FSB_FREQ                        0x000000CD
 
@@ -310,6 +329,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_BBL_CR_CTL3);
   AsmWriteMsr64 (MSR_ATOM_BBL_CR_CTL3, Msr.Uint64);
   @endcode
+  @note MSR_ATOM_BBL_CR_CTL3 is defined as MSR_BBL_CR_CTL3 in SDM.
 **/
 #define MSR_ATOM_BBL_CR_CTL3                     0x0000011E
 
@@ -368,6 +388,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_PERF_STATUS);
   AsmWriteMsr64 (MSR_ATOM_PERF_STATUS, Msr.Uint64);
   @endcode
+  @note MSR_ATOM_PERF_STATUS is defined as MSR_PERF_STATUS in SDM.
 **/
 #define MSR_ATOM_PERF_STATUS                     0x00000198
 
@@ -415,6 +436,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_THERM2_CTL);
   AsmWriteMsr64 (MSR_ATOM_THERM2_CTL, Msr.Uint64);
   @endcode
+  @note MSR_ATOM_THERM2_CTL is defined as MSR_THERM2_CTL in SDM.
 **/
 #define MSR_ATOM_THERM2_CTL                      0x0000019D
 
@@ -466,6 +488,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_IA32_MISC_ENABLE);
   AsmWriteMsr64 (MSR_ATOM_IA32_MISC_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_ATOM_IA32_MISC_ENABLE is defined as IA32_MISC_ENABLE in SDM.
 **/
 #define MSR_ATOM_IA32_MISC_ENABLE                0x000001A0
 
@@ -586,6 +609,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_LASTBRANCH_TOS);
   AsmWriteMsr64 (MSR_ATOM_LASTBRANCH_TOS, Msr);
   @endcode
+  @note MSR_ATOM_LASTBRANCH_TOS is defined as MSR_LASTBRANCH_TOS in SDM.
 **/
 #define MSR_ATOM_LASTBRANCH_TOS                  0x000001C9
 
@@ -605,6 +629,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_ATOM_LER_FROM_LIP);
   @endcode
+  @note MSR_ATOM_LER_FROM_LIP is defined as MSR_LER_FROM_LIP in SDM.
 **/
 #define MSR_ATOM_LER_FROM_LIP                    0x000001DD
 
@@ -625,6 +650,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_ATOM_LER_TO_LIP);
   @endcode
+  @note MSR_ATOM_LER_TO_LIP is defined as MSR_LER_TO_LIP in SDM.
 **/
 #define MSR_ATOM_LER_TO_LIP                      0x000001DE
 
@@ -644,6 +670,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_IA32_PERF_GLOBAL_STAUS);
   AsmWriteMsr64 (MSR_ATOM_IA32_PERF_GLOBAL_STAUS, Msr);
   @endcode
+  @note MSR_ATOM_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
 **/
 #define MSR_ATOM_IA32_PERF_GLOBAL_STAUS          0x0000038E
 
@@ -665,6 +692,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_ATOM_PEBS_ENABLE);
   AsmWriteMsr64 (MSR_ATOM_PEBS_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_ATOM_PEBS_ENABLE is defined as MSR_PEBS_ENABLE in SDM.
 **/
 #define MSR_ATOM_PEBS_ENABLE                     0x000003F1
 
@@ -708,6 +736,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_MC3_CTL);
   AsmWriteMsr64 (MSR_ATOM_MC3_CTL, Msr);
   @endcode
+  @note MSR_ATOM_MC3_CTL is defined as MSR_MC3_CTL in SDM.
 **/
 #define MSR_ATOM_MC3_CTL                         0x0000040C
 
@@ -726,6 +755,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_MC3_STATUS);
   AsmWriteMsr64 (MSR_ATOM_MC3_STATUS, Msr);
   @endcode
+  @note MSR_ATOM_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
 **/
 #define MSR_ATOM_MC3_STATUS                      0x0000040D
 
@@ -748,6 +778,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_MC3_ADDR);
   AsmWriteMsr64 (MSR_ATOM_MC3_ADDR, Msr);
   @endcode
+  @note MSR_ATOM_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
 **/
 #define MSR_ATOM_MC3_ADDR                        0x0000040E
 
@@ -766,6 +797,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_MC4_CTL);
   AsmWriteMsr64 (MSR_ATOM_MC4_CTL, Msr);
   @endcode
+  @note MSR_ATOM_MC4_CTL is defined as MSR_MC4_CTL in SDM.
 **/
 #define MSR_ATOM_MC4_CTL                         0x00000410
 
@@ -784,6 +816,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_MC4_STATUS);
   AsmWriteMsr64 (MSR_ATOM_MC4_STATUS, Msr);
   @endcode
+  @note MSR_ATOM_MC4_STATUS is defined as MSR_MC4_STATUS in SDM.
 **/
 #define MSR_ATOM_MC4_STATUS                      0x00000411
 
@@ -806,6 +839,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_MC4_ADDR);
   AsmWriteMsr64 (MSR_ATOM_MC4_ADDR, Msr);
   @endcode
+  @note MSR_ATOM_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
 **/
 #define MSR_ATOM_MC4_ADDR                        0x00000412
 
@@ -828,6 +862,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_PKG_C2_RESIDENCY);
   AsmWriteMsr64 (MSR_ATOM_PKG_C2_RESIDENCY, Msr);
   @endcode
+  @note MSR_ATOM_PKG_C2_RESIDENCY is defined as MSR_PKG_C2_RESIDENCY in SDM.
 **/
 #define MSR_ATOM_PKG_C2_RESIDENCY                0x000003F8
 
@@ -850,6 +885,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_PKG_C4_RESIDENCY);
   AsmWriteMsr64 (MSR_ATOM_PKG_C4_RESIDENCY, Msr);
   @endcode
+  @note MSR_ATOM_PKG_C4_RESIDENCY is defined as MSR_PKG_C4_RESIDENCY in SDM.
 **/
 #define MSR_ATOM_PKG_C4_RESIDENCY                0x000003F9
 
@@ -872,6 +908,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_ATOM_PKG_C6_RESIDENCY);
   AsmWriteMsr64 (MSR_ATOM_PKG_C6_RESIDENCY, Msr);
   @endcode
+  @note MSR_ATOM_PKG_C6_RESIDENCY is defined as MSR_PKG_C6_RESIDENCY in SDM.
 **/
 #define MSR_ATOM_PKG_C6_RESIDENCY                0x000003FA
 
