@@ -274,6 +274,8 @@ GetBootManagerMenuAppOption (
   UINTN                        Index;
   UINTN                        OptionNumber;
 
+  OptionNumber = 0;
+
   BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
 
   for (Index = 0; Index < BootOptionCount; Index++) {
