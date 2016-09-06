@@ -1127,6 +1127,7 @@ ParseDnsResponse (
   UINT32                IpCount;
   UINT32                RRCount;
   UINT32                AnswerSectionNum;
+  UINT32                CNameTtl;
   
   EFI_IPv4_ADDRESS      *HostAddr4;
   EFI_IPv6_ADDRESS      *HostAddr6;
@@ -1148,6 +1149,7 @@ ParseDnsResponse (
   IpCount          = 0;
   RRCount          = 0;
   AnswerSectionNum = 0;
+  CNameTtl         = 0;
   
   HostAddr4        = NULL;
   HostAddr6        = NULL;
@@ -1233,13 +1235,6 @@ ParseDnsResponse (
       Status = EFI_ABORTED;
       goto ON_EXIT;
   }
-
-  //
-  // Free the sending packet.
-  //
-  if (Item->Value != NULL) {
-    NetbufFree ((NET_BUF *) (Item->Value));
-  }
   
   //
   // Do some buffer allocations.
@@ -1290,12 +1285,12 @@ ParseDnsResponse (
       //
       Dns6TokenEntry->Token->RspData.GLookupData = AllocatePool (sizeof (DNS_RESOURCE_RECORD));
       if (Dns6TokenEntry->Token->RspData.GLookupData == NULL) {
-        Status = EFI_UNSUPPORTED;
+        Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
       Dns6TokenEntry->Token->RspData.GLookupData->RRList = AllocatePool (DnsHeader->AnswersNum * sizeof (DNS_RESOURCE_RECORD));
       if (Dns6TokenEntry->Token->RspData.GLookupData->RRList == NULL) {
-        Status = EFI_UNSUPPORTED;
+        Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
     } else {
@@ -1305,12 +1300,12 @@ ParseDnsResponse (
       if (QuerySection->Type == DNS_TYPE_AAAA) {
         Dns6TokenEntry->Token->RspData.H2AData = AllocatePool (sizeof (DNS6_HOST_TO_ADDR_DATA));
         if (Dns6TokenEntry->Token->RspData.H2AData == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
         Dns6TokenEntry->Token->RspData.H2AData->IpList = AllocatePool (DnsHeader->AnswersNum * sizeof (EFI_IPv6_ADDRESS));
         if (Dns6TokenEntry->Token->RspData.H2AData->IpList == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
       } else {
@@ -1319,6 +1314,8 @@ ParseDnsResponse (
       }
     }
   }
+
+  Status = EFI_NOT_FOUND;
 
   //
   // Processing AnswerSection.
@@ -1350,7 +1347,7 @@ ParseDnsResponse (
       //
       Dns4RR[RRCount].QName = AllocateZeroPool (AsciiStrLen (QueryName) + 1);
       if (Dns4RR[RRCount].QName == NULL) {
-        Status = EFI_UNSUPPORTED;
+        Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
       CopyMem (Dns4RR[RRCount].QName, QueryName, AsciiStrLen (QueryName));
@@ -1360,12 +1357,13 @@ ParseDnsResponse (
       Dns4RR[RRCount].DataLength = AnswerSection->DataLength;
       Dns4RR[RRCount].RData = AllocateZeroPool (Dns4RR[RRCount].DataLength);
       if (Dns4RR[RRCount].RData == NULL) {
-        Status = EFI_UNSUPPORTED;
+        Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
       CopyMem (Dns4RR[RRCount].RData, AnswerData, Dns4RR[RRCount].DataLength);
       
       RRCount ++;
+      Status = EFI_SUCCESS;
     } else if (Instance->Service->IpVersion == IP_VERSION_6 && Dns6TokenEntry->GeneralLookUp) {
       Dns6RR = Dns6TokenEntry->Token->RspData.GLookupData->RRList;
       AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
@@ -1375,7 +1373,7 @@ ParseDnsResponse (
       //
       Dns6RR[RRCount].QName = AllocateZeroPool (AsciiStrLen (QueryName) + 1);
       if (Dns6RR[RRCount].QName == NULL) {
-        Status = EFI_UNSUPPORTED;
+        Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
       CopyMem (Dns6RR[RRCount].QName, QueryName, AsciiStrLen (QueryName));
@@ -1385,12 +1383,13 @@ ParseDnsResponse (
       Dns6RR[RRCount].DataLength = AnswerSection->DataLength;
       Dns6RR[RRCount].RData = AllocateZeroPool (Dns6RR[RRCount].DataLength);
       if (Dns6RR[RRCount].RData == NULL) {
-        Status = EFI_UNSUPPORTED;
+        Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
       CopyMem (Dns6RR[RRCount].RData, AnswerData, Dns6RR[RRCount].DataLength);
       
       RRCount ++;
+      Status = EFI_SUCCESS;
     } else {
       //
       // It's not the GeneralLookUp querying. 
@@ -1427,26 +1426,32 @@ ParseDnsResponse (
         //
         Dns4CacheEntry = AllocateZeroPool (sizeof (EFI_DNS4_CACHE_ENTRY));
         if (Dns4CacheEntry == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
         Dns4CacheEntry->HostName = AllocateZeroPool (2 * (StrLen(Dns4TokenEntry->QueryHostName) + 1));
         if (Dns4CacheEntry->HostName == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
         CopyMem (Dns4CacheEntry->HostName, Dns4TokenEntry->QueryHostName, 2 * (StrLen(Dns4TokenEntry->QueryHostName) + 1));
         Dns4CacheEntry->IpAddress = AllocateZeroPool (sizeof (EFI_IPv4_ADDRESS));
         if (Dns4CacheEntry->IpAddress == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
         CopyMem (Dns4CacheEntry->IpAddress, AnswerData, sizeof (EFI_IPv4_ADDRESS));
-        Dns4CacheEntry->Timeout = AnswerSection->Ttl;
+
+        if (CNameTtl != 0 && AnswerSection->Ttl != 0) {
+          Dns4CacheEntry->Timeout = MIN (CNameTtl, AnswerSection->Ttl);
+        } else {
+          Dns4CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
+        }
         
         UpdateDns4Cache (&mDriverData->Dns4CacheList, FALSE, TRUE, *Dns4CacheEntry);  
 
-        IpCount ++; 
+        IpCount ++;
+        Status = EFI_SUCCESS;
         break;
       case DNS_TYPE_AAAA:
         //
@@ -1478,26 +1483,40 @@ ParseDnsResponse (
         //
         Dns6CacheEntry = AllocateZeroPool (sizeof (EFI_DNS6_CACHE_ENTRY));
         if (Dns6CacheEntry == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
         Dns6CacheEntry->HostName = AllocateZeroPool (2 * (StrLen(Dns6TokenEntry->QueryHostName) + 1));
         if (Dns6CacheEntry->HostName == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
         CopyMem (Dns6CacheEntry->HostName, Dns6TokenEntry->QueryHostName, 2 * (StrLen(Dns6TokenEntry->QueryHostName) + 1));
         Dns6CacheEntry->IpAddress = AllocateZeroPool (sizeof (EFI_IPv6_ADDRESS));
         if (Dns6CacheEntry->IpAddress == NULL) {
-          Status = EFI_UNSUPPORTED;
+          Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
         }
         CopyMem (Dns6CacheEntry->IpAddress, AnswerData, sizeof (EFI_IPv6_ADDRESS));
-        Dns6CacheEntry->Timeout = AnswerSection->Ttl;
+
+        if (CNameTtl != 0 && AnswerSection->Ttl != 0) {
+          Dns6CacheEntry->Timeout = MIN (CNameTtl, AnswerSection->Ttl);
+        } else {
+          Dns6CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
+        }
         
         UpdateDns6Cache (&mDriverData->Dns6CacheList, FALSE, TRUE, *Dns6CacheEntry);  
         
         IpCount ++;
+        Status = EFI_SUCCESS;
+        break;
+      case DNS_TYPE_CNAME:
+        //
+        // According RFC 1034 - 3.6.2, if the query name is an alias, the name server will include the CNAME 
+        // record in the response and restart the query at the domain name specified in the data field of the 
+        // CNAME record. So, just record the TTL value of the CNAME, then skip to parse the next record.
+        //
+        CNameTtl = AnswerSection->Ttl;
         break;
       default:
         Status = EFI_UNSUPPORTED;
@@ -1541,12 +1560,16 @@ ParseDnsResponse (
   }
 
   //
-  // Parsing is complete, SignalEvent here.
+  // Parsing is complete, free the sending packet and signal Event here.
   //
+  if (Item != NULL && Item->Value != NULL) {
+    NetbufFree ((NET_BUF *) (Item->Value));
+  }
+  
   if (Instance->Service->IpVersion == IP_VERSION_4) {
     ASSERT (Dns4TokenEntry != NULL);
     Dns4RemoveTokenEntry (&Instance->Dns4TxTokens, Dns4TokenEntry);
-    Dns4TokenEntry->Token->Status = EFI_SUCCESS;
+    Dns4TokenEntry->Token->Status = Status;
     if (Dns4TokenEntry->Token->Event != NULL) {
       gBS->SignalEvent (Dns4TokenEntry->Token->Event);
       DispatchDpc ();
@@ -1554,7 +1577,7 @@ ParseDnsResponse (
   } else {
     ASSERT (Dns6TokenEntry != NULL);
     Dns6RemoveTokenEntry (&Instance->Dns6TxTokens, Dns6TokenEntry);
-    Dns6TokenEntry->Token->Status = EFI_SUCCESS;
+    Dns6TokenEntry->Token->Status = Status;
     if (Dns6TokenEntry->Token->Event != NULL) {
       gBS->SignalEvent (Dns6TokenEntry->Token->Event);
       DispatchDpc ();
@@ -2037,7 +2060,7 @@ DnsOnTimerUpdate (
   Entry = mDriverData->Dns4CacheList.ForwardLink;
   while (Entry != &mDriverData->Dns4CacheList) {
     Item4 = NET_LIST_USER_STRUCT (Entry, DNS4_CACHE, AllCacheLink);
-    if (Item4->DnsCache.Timeout<=0) {
+    if (Item4->DnsCache.Timeout == 0) {
       RemoveEntryList (&Item4->AllCacheLink);
       Entry = mDriverData->Dns4CacheList.ForwardLink;
     } else {
@@ -2056,7 +2079,7 @@ DnsOnTimerUpdate (
   Entry = mDriverData->Dns6CacheList.ForwardLink;
   while (Entry != &mDriverData->Dns6CacheList) {
     Item6 = NET_LIST_USER_STRUCT (Entry, DNS6_CACHE, AllCacheLink);
-    if (Item6->DnsCache.Timeout<=0) {
+    if (Item6->DnsCache.Timeout == 0) {
       RemoveEntryList (&Item6->AllCacheLink);
       Entry = mDriverData->Dns6CacheList.ForwardLink;
     } else {
