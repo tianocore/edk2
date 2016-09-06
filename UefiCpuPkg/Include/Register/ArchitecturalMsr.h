@@ -38,6 +38,7 @@
   Msr = AsmReadMsr64 (MSR_IA32_P5_MC_ADDR);
   AsmWriteMsr64 (MSR_IA32_P5_MC_ADDR, Msr);
   @endcode
+  @note MSR_IA32_P5_MC_ADDR is defined as IA32_P5_MC_ADDR in SDM.
 **/
 #define MSR_IA32_P5_MC_ADDR                      0x00000000
 
@@ -56,6 +57,7 @@
   Msr = AsmReadMsr64 (MSR_IA32_P5_MC_TYPE);
   AsmWriteMsr64 (MSR_IA32_P5_MC_TYPE, Msr);
   @endcode
+  @note MSR_IA32_P5_MC_TYPE is defined as IA32_P5_MC_TYPE in SDM.
 **/
 #define MSR_IA32_P5_MC_TYPE                      0x00000001
 
@@ -75,6 +77,7 @@
   Msr = AsmReadMsr64 (MSR_IA32_MONITOR_FILTER_SIZE);
   AsmWriteMsr64 (MSR_IA32_MONITOR_FILTER_SIZE, Msr);
   @endcode
+  @note MSR_IA32_MONITOR_FILTER_SIZE is defined as IA32_MONITOR_FILTER_SIZE in SDM.
 **/
 #define MSR_IA32_MONITOR_FILTER_SIZE             0x00000006
 
@@ -94,6 +97,7 @@
   Msr = AsmReadMsr64 (MSR_IA32_TIME_STAMP_COUNTER);
   AsmWriteMsr64 (MSR_IA32_TIME_STAMP_COUNTER, Msr);
   @endcode
+  @note MSR_IA32_TIME_STAMP_COUNTER is defined as IA32_TIME_STAMP_COUNTER in SDM.
 **/
 #define MSR_IA32_TIME_STAMP_COUNTER              0x00000010
 
@@ -115,6 +119,7 @@
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
   @endcode
+  @note MSR_IA32_PLATFORM_ID is defined as IA32_PLATFORM_ID in SDM.
 **/
 #define MSR_IA32_PLATFORM_ID                     0x00000017
 
@@ -168,6 +173,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
   AsmWriteMsr64 (MSR_IA32_APIC_BASE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_APIC_BASE is defined as IA32_APIC_BASE in SDM.
 **/
 #define MSR_IA32_APIC_BASE                       0x0000001B
 
@@ -227,6 +233,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_FEATURE_CONTROL);
   AsmWriteMsr64 (MSR_IA32_FEATURE_CONTROL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_FEATURE_CONTROL is defined as IA32_FEATURE_CONTROL in SDM.
 **/
 #define MSR_IA32_FEATURE_CONTROL                 0x0000003A
 
@@ -326,6 +333,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_TSC_ADJUST);
   AsmWriteMsr64 (MSR_IA32_TSC_ADJUST, Msr);
   @endcode
+  @note MSR_IA32_TSC_ADJUST is defined as IA32_TSC_ADJUST in SDM.
 **/
 #define MSR_IA32_TSC_ADJUST                      0x0000003B
 
@@ -348,6 +356,7 @@ typedef union {
   Msr = 0;
   AsmWriteMsr64 (MSR_IA32_BIOS_UPDT_TRIG, Msr);
   @endcode
+  @note MSR_IA32_BIOS_UPDT_TRIG is defined as IA32_BIOS_UPDT_TRIG in SDM.
 **/
 #define MSR_IA32_BIOS_UPDT_TRIG                  0x00000079
 
@@ -370,6 +379,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_BIOS_SIGN_ID);
   @endcode
+  @note MSR_IA32_BIOS_SIGN_ID is defined as IA32_BIOS_SIGN_ID in SDM.
 **/
 #define MSR_IA32_BIOS_SIGN_ID                    0x0000008B
 
@@ -417,6 +427,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_SMM_MONITOR_CTL);
   AsmWriteMsr64 (MSR_IA32_SMM_MONITOR_CTL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_SMM_MONITOR_CTL is defined as IA32_SMM_MONITOR_CTL in SDM.
 **/
 #define MSR_IA32_SMM_MONITOR_CTL                 0x0000009B
 
@@ -475,6 +486,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_SMBASE);
   @endcode
+  @note MSR_IA32_SMBASE is defined as IA32_SMBASE in SDM.
 **/
 #define MSR_IA32_SMBASE                          0x0000009E
 
@@ -494,6 +506,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_PMC0);
   AsmWriteMsr64 (MSR_IA32_PMC0, Msr);
   @endcode
+  @note MSR_IA32_PMC0 is defined as IA32_PMC0 in SDM.
+        MSR_IA32_PMC1 is defined as IA32_PMC1 in SDM.
+        MSR_IA32_PMC2 is defined as IA32_PMC2 in SDM.
+        MSR_IA32_PMC3 is defined as IA32_PMC3 in SDM.
+        MSR_IA32_PMC4 is defined as IA32_PMC4 in SDM.
+        MSR_IA32_PMC5 is defined as IA32_PMC5 in SDM.
+        MSR_IA32_PMC6 is defined as IA32_PMC6 in SDM.
+        MSR_IA32_PMC7 is defined as IA32_PMC7 in SDM.
   @{
 **/
 #define MSR_IA32_PMC0                            0x000000C1
@@ -524,6 +544,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MPERF);
   AsmWriteMsr64 (MSR_IA32_MPERF, Msr);
   @endcode
+  @note MSR_IA32_MPERF is defined as IA32_MPERF in SDM.
 **/
 #define MSR_IA32_MPERF                           0x000000E7
 
@@ -545,6 +566,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_APERF);
   AsmWriteMsr64 (MSR_IA32_APERF, Msr);
   @endcode
+  @note MSR_IA32_APERF is defined as IA32_APERF in SDM.
 **/
 #define MSR_IA32_APERF                           0x000000E8
 
@@ -565,6 +587,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MTRRCAP);
   @endcode
+  @note MSR_IA32_MTRRCAP is defined as IA32_MTRRCAP in SDM.
 **/
 #define MSR_IA32_MTRRCAP                         0x000000FE
 
@@ -624,6 +647,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_SYSENTER_CS);
   AsmWriteMsr64 (MSR_IA32_SYSENTER_CS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_SYSENTER_CS is defined as IA32_SYSENTER_CS in SDM.
 **/
 #define MSR_IA32_SYSENTER_CS                     0x00000174
 
@@ -667,6 +691,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_SYSENTER_ESP);
   AsmWriteMsr64 (MSR_IA32_SYSENTER_ESP, Msr);
   @endcode
+  @note MSR_IA32_SYSENTER_ESP is defined as IA32_SYSENTER_ESP in SDM.
 **/
 #define MSR_IA32_SYSENTER_ESP                    0x00000175
 
@@ -685,6 +710,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_SYSENTER_EIP);
   AsmWriteMsr64 (MSR_IA32_SYSENTER_EIP, Msr);
   @endcode
+  @note MSR_IA32_SYSENTER_EIP is defined as IA32_SYSENTER_EIP in SDM.
 **/
 #define MSR_IA32_SYSENTER_EIP                    0x00000176
 
@@ -705,6 +731,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
   @endcode
+  @note MSR_IA32_MCG_CAP is defined as IA32_MCG_CAP in SDM.
 **/
 #define MSR_IA32_MCG_CAP                         0x00000179
 
@@ -798,6 +825,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_STATUS);
   AsmWriteMsr64 (MSR_IA32_MCG_STATUS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_MCG_STATUS is defined as IA32_MCG_STATUS in SDM.
 **/
 #define MSR_IA32_MCG_STATUS                      0x0000017A
 
@@ -856,6 +884,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MCG_CTL);
   AsmWriteMsr64 (MSR_IA32_MCG_CTL, Msr);
   @endcode
+  @note MSR_IA32_MCG_CTL is defined as IA32_MCG_CTL in SDM.
 **/
 #define MSR_IA32_MCG_CTL                         0x0000017B
 
@@ -876,6 +905,10 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERFEVTSEL0);
   AsmWriteMsr64 (MSR_IA32_PERFEVTSEL0, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PERFEVTSEL0 is defined as IA32_PERFEVTSEL0 in SDM.
+        MSR_IA32_PERFEVTSEL1 is defined as IA32_PERFEVTSEL1 in SDM.
+        MSR_IA32_PERFEVTSEL2 is defined as IA32_PERFEVTSEL2 in SDM.
+        MSR_IA32_PERFEVTSEL3 is defined as IA32_PERFEVTSEL3 in SDM.
   @{
 **/
 #define MSR_IA32_PERFEVTSEL0                     0x00000186
@@ -974,6 +1007,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_STATUS);
   @endcode
+  @note MSR_IA32_PERF_STATUS is defined as IA32_PERF_STATUS in SDM.
 **/
 #define MSR_IA32_PERF_STATUS                     0x00000198
 
@@ -1019,6 +1053,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_CTL);
   AsmWriteMsr64 (MSR_IA32_PERF_CTL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PERF_CTL is defined as IA32_PERF_CTL in SDM.
 **/
 #define MSR_IA32_PERF_CTL                        0x00000199
 
@@ -1066,6 +1101,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_CLOCK_MODULATION);
   AsmWriteMsr64 (MSR_IA32_CLOCK_MODULATION, Msr.Uint64);
   @endcode
+  @note MSR_IA32_CLOCK_MODULATION is defined as IA32_CLOCK_MODULATION in SDM.
 **/
 #define MSR_IA32_CLOCK_MODULATION                0x0000019A
 
@@ -1124,6 +1160,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_THERM_INTERRUPT);
   AsmWriteMsr64 (MSR_IA32_THERM_INTERRUPT, Msr.Uint64);
   @endcode
+  @note MSR_IA32_THERM_INTERRUPT is defined as IA32_THERM_INTERRUPT in SDM.
 **/
 #define MSR_IA32_THERM_INTERRUPT                 0x0000019B
 
@@ -1208,6 +1245,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_THERM_STATUS);
   @endcode
+  @note MSR_IA32_THERM_STATUS is defined as IA32_THERM_STATUS in SDM.
 **/
 #define MSR_IA32_THERM_STATUS                    0x0000019C
 
@@ -1327,6 +1365,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MISC_ENABLE);
   AsmWriteMsr64 (MSR_IA32_MISC_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_MISC_ENABLE is defined as IA32_MISC_ENABLE in SDM.
 **/
 #define MSR_IA32_MISC_ENABLE                     0x000001A0
 
@@ -1456,6 +1495,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_ENERGY_PERF_BIAS);
   AsmWriteMsr64 (MSR_IA32_ENERGY_PERF_BIAS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_ENERGY_PERF_BIAS is defined as IA32_ENERGY_PERF_BIAS in SDM.
 **/
 #define MSR_IA32_ENERGY_PERF_BIAS                0x000001B0
 
@@ -1503,6 +1543,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PACKAGE_THERM_STATUS);
   @endcode
+  @note MSR_IA32_PACKAGE_THERM_STATUS is defined as IA32_PACKAGE_THERM_STATUS in SDM.
 **/
 #define MSR_IA32_PACKAGE_THERM_STATUS            0x000001B1
 
@@ -1600,6 +1641,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PACKAGE_THERM_INTERRUPT);
   AsmWriteMsr64 (MSR_IA32_PACKAGE_THERM_INTERRUPT, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PACKAGE_THERM_INTERRUPT is defined as IA32_PACKAGE_THERM_INTERRUPT in SDM.
 **/
 #define MSR_IA32_PACKAGE_THERM_INTERRUPT         0x000001B2
 
@@ -1680,6 +1722,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_DEBUGCTL);
   AsmWriteMsr64 (MSR_IA32_DEBUGCTL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_DEBUGCTL is defined as IA32_DEBUGCTL in SDM.
 **/
 #define MSR_IA32_DEBUGCTL                        0x000001D9
 
@@ -1790,6 +1833,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_SMRR_PHYSBASE);
   AsmWriteMsr64 (MSR_IA32_SMRR_PHYSBASE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_SMRR_PHYSBASE is defined as IA32_SMRR_PHYSBASE in SDM.
 **/
 #define MSR_IA32_SMRR_PHYSBASE                   0x000001F2
 
@@ -1840,6 +1884,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_SMRR_PHYSMASK);
   AsmWriteMsr64 (MSR_IA32_SMRR_PHYSMASK, Msr.Uint64);
   @endcode
+  @note MSR_IA32_SMRR_PHYSMASK is defined as IA32_SMRR_PHYSMASK in SDM.
 **/
 #define MSR_IA32_SMRR_PHYSMASK                   0x000001F3
 
@@ -1886,6 +1931,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_PLATFORM_DCA_CAP);
   @endcode
+  @note MSR_IA32_PLATFORM_DCA_CAP is defined as IA32_PLATFORM_DCA_CAP in SDM.
 **/
 #define MSR_IA32_PLATFORM_DCA_CAP                0x000001F8
 
@@ -1904,6 +1950,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_CPU_DCA_CAP);
   AsmWriteMsr64 (MSR_IA32_CPU_DCA_CAP, Msr);
   @endcode
+  @note MSR_IA32_CPU_DCA_CAP is defined as IA32_CPU_DCA_CAP in SDM.
 **/
 #define MSR_IA32_CPU_DCA_CAP                     0x000001F9
 
@@ -1924,6 +1971,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_DCA_0_CAP);
   AsmWriteMsr64 (MSR_IA32_DCA_0_CAP, Msr.Uint64);
   @endcode
+  @note MSR_IA32_DCA_0_CAP is defined as IA32_DCA_0_CAP in SDM.
 **/
 #define MSR_IA32_DCA_0_CAP                       0x000001FA
 
@@ -1999,6 +2047,16 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_PHYSBASE0);
   AsmWriteMsr64 (MSR_IA32_MTRR_PHYSBASE0, Msr.Uint64);
   @endcode
+  @note MSR_IA32_MTRR_PHYSBASE0 is defined as IA32_MTRR_PHYSBASE0 in SDM.
+        MSR_IA32_MTRR_PHYSBASE1 is defined as IA32_MTRR_PHYSBASE1 in SDM.
+        MSR_IA32_MTRR_PHYSBASE2 is defined as IA32_MTRR_PHYSBASE2 in SDM.
+        MSR_IA32_MTRR_PHYSBASE3 is defined as IA32_MTRR_PHYSBASE3 in SDM.
+        MSR_IA32_MTRR_PHYSBASE4 is defined as IA32_MTRR_PHYSBASE4 in SDM.
+        MSR_IA32_MTRR_PHYSBASE5 is defined as IA32_MTRR_PHYSBASE5 in SDM.
+        MSR_IA32_MTRR_PHYSBASE6 is defined as IA32_MTRR_PHYSBASE6 in SDM.
+        MSR_IA32_MTRR_PHYSBASE7 is defined as IA32_MTRR_PHYSBASE7 in SDM.
+        MSR_IA32_MTRR_PHYSBASE8 is defined as IA32_MTRR_PHYSBASE8 in SDM.
+        MSR_IA32_MTRR_PHYSBASE9 is defined as IA32_MTRR_PHYSBASE9 in SDM.
   @{
 **/
 #define MSR_IA32_MTRR_PHYSBASE0                  0x00000200
@@ -2065,6 +2123,16 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_PHYSMASK0);
   AsmWriteMsr64 (MSR_IA32_MTRR_PHYSMASK0, Msr.Uint64);
   @endcode
+  @note MSR_IA32_MTRR_PHYSMASK0 is defined as IA32_MTRR_PHYSMASK0 in SDM.
+        MSR_IA32_MTRR_PHYSMASK1 is defined as IA32_MTRR_PHYSMASK1 in SDM.
+        MSR_IA32_MTRR_PHYSMASK2 is defined as IA32_MTRR_PHYSMASK2 in SDM.
+        MSR_IA32_MTRR_PHYSMASK3 is defined as IA32_MTRR_PHYSMASK3 in SDM.
+        MSR_IA32_MTRR_PHYSMASK4 is defined as IA32_MTRR_PHYSMASK4 in SDM.
+        MSR_IA32_MTRR_PHYSMASK5 is defined as IA32_MTRR_PHYSMASK5 in SDM.
+        MSR_IA32_MTRR_PHYSMASK6 is defined as IA32_MTRR_PHYSMASK6 in SDM.
+        MSR_IA32_MTRR_PHYSMASK7 is defined as IA32_MTRR_PHYSMASK7 in SDM.
+        MSR_IA32_MTRR_PHYSMASK8 is defined as IA32_MTRR_PHYSMASK8 in SDM.
+        MSR_IA32_MTRR_PHYSMASK9 is defined as IA32_MTRR_PHYSMASK9 in SDM.
   @{
 **/
 #define MSR_IA32_MTRR_PHYSMASK0                  0x00000201
@@ -2128,6 +2196,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX64K_00000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX64K_00000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX64K_00000 is defined as IA32_MTRR_FIX64K_00000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX64K_00000               0x00000250
 
@@ -2146,6 +2215,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX16K_80000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX16K_80000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX16K_80000 is defined as IA32_MTRR_FIX16K_80000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX16K_80000               0x00000258
 
@@ -2164,6 +2234,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX16K_A0000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX16K_A0000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX16K_A0000 is defined as IA32_MTRR_FIX16K_A0000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX16K_A0000               0x00000259
 
@@ -2182,6 +2253,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_C0000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_C0000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_C0000 is defined as IA32_MTRR_FIX4K_C0000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_C0000                0x00000268
 
@@ -2200,6 +2272,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_C8000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_C8000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_C8000 is defined as IA32_MTRR_FIX4K_C8000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_C8000                0x00000269
 
@@ -2218,6 +2291,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_D0000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_D0000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_D0000 is defined as IA32_MTRR_FIX4K_D0000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_D0000                0x0000026A
 
@@ -2236,6 +2310,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_D8000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_D8000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_D8000 is defined as IA32_MTRR_FIX4K_D8000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_D8000                0x0000026B
 
@@ -2254,6 +2329,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_E0000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_E0000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_E0000 is defined as IA32_MTRR_FIX4K_E0000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_E0000                0x0000026C
 
@@ -2272,6 +2348,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_E8000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_E8000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_E8000 is defined as IA32_MTRR_FIX4K_E8000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_E8000                0x0000026D
 
@@ -2290,6 +2367,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_F0000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_F0000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_F0000 is defined as IA32_MTRR_FIX4K_F0000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_F0000                0x0000026E
 
@@ -2308,6 +2386,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MTRR_FIX4K_F8000);
   AsmWriteMsr64 (MSR_IA32_MTRR_FIX4K_F8000, Msr);
   @endcode
+  @note MSR_IA32_MTRR_FIX4K_F8000 is defined as IA32_MTRR_FIX4K_F8000 in SDM.
 **/
 #define MSR_IA32_MTRR_FIX4K_F8000                0x0000026F
 
@@ -2328,6 +2407,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PAT);
   AsmWriteMsr64 (MSR_IA32_PAT, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PAT is defined as IA32_PAT in SDM.
 **/
 #define MSR_IA32_PAT                             0x00000277
 
@@ -2404,6 +2484,38 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MC0_CTL2);
   AsmWriteMsr64 (MSR_IA32_MC0_CTL2, Msr.Uint64);
   @endcode
+  @note MSR_IA32_MC0_CTL2  is defined as IA32_MC0_CTL2  in SDM.
+        MSR_IA32_MC1_CTL2  is defined as IA32_MC1_CTL2  in SDM.
+        MSR_IA32_MC2_CTL2  is defined as IA32_MC2_CTL2  in SDM.
+        MSR_IA32_MC3_CTL2  is defined as IA32_MC3_CTL2  in SDM.
+        MSR_IA32_MC4_CTL2  is defined as IA32_MC4_CTL2  in SDM.
+        MSR_IA32_MC5_CTL2  is defined as IA32_MC5_CTL2  in SDM.
+        MSR_IA32_MC6_CTL2  is defined as IA32_MC6_CTL2  in SDM.
+        MSR_IA32_MC7_CTL2  is defined as IA32_MC7_CTL2  in SDM.
+        MSR_IA32_MC8_CTL2  is defined as IA32_MC8_CTL2  in SDM.
+        MSR_IA32_MC9_CTL2  is defined as IA32_MC9_CTL2  in SDM.
+        MSR_IA32_MC10_CTL2 is defined as IA32_MC10_CTL2 in SDM.
+        MSR_IA32_MC11_CTL2 is defined as IA32_MC11_CTL2 in SDM.
+        MSR_IA32_MC12_CTL2 is defined as IA32_MC12_CTL2 in SDM.
+        MSR_IA32_MC13_CTL2 is defined as IA32_MC13_CTL2 in SDM.
+        MSR_IA32_MC14_CTL2 is defined as IA32_MC14_CTL2 in SDM.
+        MSR_IA32_MC15_CTL2 is defined as IA32_MC15_CTL2 in SDM.
+        MSR_IA32_MC16_CTL2 is defined as IA32_MC16_CTL2 in SDM.
+        MSR_IA32_MC17_CTL2 is defined as IA32_MC17_CTL2 in SDM.
+        MSR_IA32_MC18_CTL2 is defined as IA32_MC18_CTL2 in SDM.
+        MSR_IA32_MC19_CTL2 is defined as IA32_MC19_CTL2 in SDM.
+        MSR_IA32_MC20_CTL2 is defined as IA32_MC20_CTL2 in SDM.
+        MSR_IA32_MC21_CTL2 is defined as IA32_MC21_CTL2 in SDM.
+        MSR_IA32_MC22_CTL2 is defined as IA32_MC22_CTL2 in SDM.
+        MSR_IA32_MC23_CTL2 is defined as IA32_MC23_CTL2 in SDM.
+        MSR_IA32_MC24_CTL2 is defined as IA32_MC24_CTL2 in SDM.
+        MSR_IA32_MC25_CTL2 is defined as IA32_MC25_CTL2 in SDM.
+        MSR_IA32_MC26_CTL2 is defined as IA32_MC26_CTL2 in SDM.
+        MSR_IA32_MC27_CTL2 is defined as IA32_MC27_CTL2 in SDM.
+        MSR_IA32_MC28_CTL2 is defined as IA32_MC28_CTL2 in SDM.
+        MSR_IA32_MC29_CTL2 is defined as IA32_MC29_CTL2 in SDM.
+        MSR_IA32_MC30_CTL2 is defined as IA32_MC30_CTL2 in SDM.
+        MSR_IA32_MC31_CTL2 is defined as IA32_MC31_CTL2 in SDM.
   @{
 **/
 #define MSR_IA32_MC0_CTL2                        0x00000280
@@ -2488,6 +2600,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
   AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_MTRR_DEF_TYPE is defined as IA32_MTRR_DEF_TYPE in SDM.
 **/
 #define MSR_IA32_MTRR_DEF_TYPE                   0x000002FF
 
@@ -2541,6 +2654,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_FIXED_CTR0);
   AsmWriteMsr64 (MSR_IA32_FIXED_CTR0, Msr);
   @endcode
+  @note MSR_IA32_FIXED_CTR0 is defined as IA32_FIXED_CTR0 in SDM.
 **/
 #define MSR_IA32_FIXED_CTR0                      0x00000309
 
@@ -2560,6 +2674,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_FIXED_CTR1);
   AsmWriteMsr64 (MSR_IA32_FIXED_CTR1, Msr);
   @endcode
+  @note MSR_IA32_FIXED_CTR1 is defined as IA32_FIXED_CTR1 in SDM.
 **/
 #define MSR_IA32_FIXED_CTR1                      0x0000030A
 
@@ -2579,6 +2694,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_FIXED_CTR2);
   AsmWriteMsr64 (MSR_IA32_FIXED_CTR2, Msr);
   @endcode
+  @note MSR_IA32_FIXED_CTR2 is defined as IA32_FIXED_CTR2 in SDM.
 **/
 #define MSR_IA32_FIXED_CTR2                      0x0000030B
 
@@ -2599,6 +2715,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_CAPABILITIES);
   AsmWriteMsr64 (MSR_IA32_PERF_CAPABILITIES, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PERF_CAPABILITIES is defined as IA32_PERF_CAPABILITIES in SDM.
 **/
 #define MSR_IA32_PERF_CAPABILITIES               0x00000345
 
@@ -2667,6 +2784,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_FIXED_CTR_CTRL);
   AsmWriteMsr64 (MSR_IA32_FIXED_CTR_CTRL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_FIXED_CTR_CTRL is defined as IA32_FIXED_CTR_CTRL in SDM.
 **/
 #define MSR_IA32_FIXED_CTR_CTRL                  0x0000038D
 
@@ -2767,6 +2885,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_GLOBAL_STATUS);
   @endcode
+  @note MSR_IA32_PERF_GLOBAL_STATUS is defined as IA32_PERF_GLOBAL_STATUS in SDM.
 **/
 #define MSR_IA32_PERF_GLOBAL_STATUS              0x0000038E
 
@@ -2882,6 +3001,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_GLOBAL_CTRL);
   AsmWriteMsr64 (MSR_IA32_PERF_GLOBAL_CTRL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PERF_GLOBAL_CTRL is defined as IA32_PERF_GLOBAL_CTRL in SDM.
 **/
 #define MSR_IA32_PERF_GLOBAL_CTRL                0x0000038F
 
@@ -2930,6 +3050,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_GLOBAL_OVF_CTRL);
   AsmWriteMsr64 (MSR_IA32_PERF_GLOBAL_OVF_CTRL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PERF_GLOBAL_OVF_CTRL is defined as IA32_PERF_GLOBAL_OVF_CTRL in SDM.
 **/
 #define MSR_IA32_PERF_GLOBAL_OVF_CTRL            0x00000390
 
@@ -2998,6 +3119,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_GLOBAL_STATUS_RESET);
   AsmWriteMsr64 (MSR_IA32_PERF_GLOBAL_STATUS_RESET, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PERF_GLOBAL_STATUS_RESET is defined as IA32_PERF_GLOBAL_STATUS_RESET in SDM.
 **/
 #define MSR_IA32_PERF_GLOBAL_STATUS_RESET        0x00000390
 
@@ -3078,6 +3200,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_GLOBAL_STATUS_SET);
   AsmWriteMsr64 (MSR_IA32_PERF_GLOBAL_STATUS_SET, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PERF_GLOBAL_STATUS_SET is defined as IA32_PERF_GLOBAL_STATUS_SET in SDM.
 **/
 #define MSR_IA32_PERF_GLOBAL_STATUS_SET          0x00000391
 
@@ -3152,6 +3275,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PERF_GLOBAL_INUSE);
   @endcode
+  @note MSR_IA32_PERF_GLOBAL_INUSE is defined as IA32_PERF_GLOBAL_INUSE in SDM.
 **/
 #define MSR_IA32_PERF_GLOBAL_INUSE               0x00000392
 
@@ -3204,6 +3328,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PEBS_ENABLE);
   AsmWriteMsr64 (MSR_IA32_PEBS_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PEBS_ENABLE is defined as IA32_PEBS_ENABLE in SDM.
 **/
 #define MSR_IA32_PEBS_ENABLE                     0x000003F1
 
@@ -3252,6 +3377,35 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MC0_CTL);
   AsmWriteMsr64 (MSR_IA32_MC0_CTL, Msr);
   @endcode
+  @note MSR_IA32_MC0_CTL  is defined as IA32_MC0_CTL  in SDM.
+        MSR_IA32_MC1_CTL  is defined as IA32_MC1_CTL  in SDM.
+        MSR_IA32_MC2_CTL  is defined as IA32_MC2_CTL  in SDM.
+        MSR_IA32_MC3_CTL  is defined as IA32_MC3_CTL  in SDM.
+        MSR_IA32_MC4_CTL  is defined as IA32_MC4_CTL  in SDM.
+        MSR_IA32_MC5_CTL  is defined as IA32_MC5_CTL  in SDM.
+        MSR_IA32_MC6_CTL  is defined as IA32_MC6_CTL  in SDM.
+        MSR_IA32_MC7_CTL  is defined as IA32_MC7_CTL  in SDM.
+        MSR_IA32_MC8_CTL  is defined as IA32_MC8_CTL  in SDM.
+        MSR_IA32_MC9_CTL  is defined as IA32_MC9_CTL  in SDM.
+        MSR_IA32_MC10_CTL is defined as IA32_MC10_CTL in SDM.
+        MSR_IA32_MC11_CTL is defined as IA32_MC11_CTL in SDM.
+        MSR_IA32_MC12_CTL is defined as IA32_MC12_CTL in SDM.
+        MSR_IA32_MC13_CTL is defined as IA32_MC13_CTL in SDM.
+        MSR_IA32_MC14_CTL is defined as IA32_MC14_CTL in SDM.
+        MSR_IA32_MC15_CTL is defined as IA32_MC15_CTL in SDM.
+        MSR_IA32_MC16_CTL is defined as IA32_MC16_CTL in SDM.
+        MSR_IA32_MC17_CTL is defined as IA32_MC17_CTL in SDM.
+        MSR_IA32_MC18_CTL is defined as IA32_MC18_CTL in SDM.
+        MSR_IA32_MC19_CTL is defined as IA32_MC19_CTL in SDM.
+        MSR_IA32_MC20_CTL is defined as IA32_MC20_CTL in SDM.
+        MSR_IA32_MC21_CTL is defined as IA32_MC21_CTL in SDM.
+        MSR_IA32_MC22_CTL is defined as IA32_MC22_CTL in SDM.
+        MSR_IA32_MC23_CTL is defined as IA32_MC23_CTL in SDM.
+        MSR_IA32_MC24_CTL is defined as IA32_MC24_CTL in SDM.
+        MSR_IA32_MC25_CTL is defined as IA32_MC25_CTL in SDM.
+        MSR_IA32_MC26_CTL is defined as IA32_MC26_CTL in SDM.
+        MSR_IA32_MC27_CTL is defined as IA32_MC27_CTL in SDM.
+        MSR_IA32_MC28_CTL is defined as IA32_MC28_CTL in SDM.
   @{
 **/
 #define MSR_IA32_MC0_CTL                         0x00000400
@@ -3300,6 +3454,35 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MC0_STATUS);
   AsmWriteMsr64 (MSR_IA32_MC0_STATUS, Msr);
   @endcode
+  @note MSR_IA32_MC0_STATUS  is defined as IA32_MC0_STATUS  in SDM.
+        MSR_IA32_MC1_STATUS  is defined as IA32_MC1_STATUS  in SDM.
+        MSR_IA32_MC2_STATUS  is defined as IA32_MC2_STATUS  in SDM.
+        MSR_IA32_MC3_STATUS  is defined as IA32_MC3_STATUS  in SDM.
+        MSR_IA32_MC4_STATUS  is defined as IA32_MC4_STATUS  in SDM.
+        MSR_IA32_MC5_STATUS  is defined as IA32_MC5_STATUS  in SDM.
+        MSR_IA32_MC6_STATUS  is defined as IA32_MC6_STATUS  in SDM.
+        MSR_IA32_MC7_STATUS  is defined as IA32_MC7_STATUS  in SDM.
+        MSR_IA32_MC8_STATUS  is defined as IA32_MC8_STATUS  in SDM.
+        MSR_IA32_MC9_STATUS  is defined as IA32_MC9_STATUS  in SDM.
+        MSR_IA32_MC10_STATUS is defined as IA32_MC10_STATUS in SDM.
+        MSR_IA32_MC11_STATUS is defined as IA32_MC11_STATUS in SDM.
+        MSR_IA32_MC12_STATUS is defined as IA32_MC12_STATUS in SDM.
+        MSR_IA32_MC13_STATUS is defined as IA32_MC13_STATUS in SDM.
+        MSR_IA32_MC14_STATUS is defined as IA32_MC14_STATUS in SDM.
+        MSR_IA32_MC15_STATUS is defined as IA32_MC15_STATUS in SDM.
+        MSR_IA32_MC16_STATUS is defined as IA32_MC16_STATUS in SDM.
+        MSR_IA32_MC17_STATUS is defined as IA32_MC17_STATUS in SDM.
+        MSR_IA32_MC18_STATUS is defined as IA32_MC18_STATUS in SDM.
+        MSR_IA32_MC19_STATUS is defined as IA32_MC19_STATUS in SDM.
+        MSR_IA32_MC20_STATUS is defined as IA32_MC20_STATUS in SDM.
+        MSR_IA32_MC21_STATUS is defined as IA32_MC21_STATUS in SDM.
+        MSR_IA32_MC22_STATUS is defined as IA32_MC22_STATUS in SDM.
+        MSR_IA32_MC23_STATUS is defined as IA32_MC23_STATUS in SDM.
+        MSR_IA32_MC24_STATUS is defined as IA32_MC24_STATUS in SDM.
+        MSR_IA32_MC25_STATUS is defined as IA32_MC25_STATUS in SDM.
+        MSR_IA32_MC26_STATUS is defined as IA32_MC26_STATUS in SDM.
+        MSR_IA32_MC27_STATUS is defined as IA32_MC27_STATUS in SDM.
+        MSR_IA32_MC28_STATUS is defined as IA32_MC28_STATUS in SDM.
   @{
 **/
 #define MSR_IA32_MC0_STATUS                      0x00000401
@@ -3348,6 +3531,35 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MC0_ADDR);
   AsmWriteMsr64 (MSR_IA32_MC0_ADDR, Msr);
   @endcode
+  @note MSR_IA32_MC0_ADDR  is defined as IA32_MC0_ADDR  in SDM.
+        MSR_IA32_MC1_ADDR  is defined as IA32_MC1_ADDR  in SDM.
+        MSR_IA32_MC2_ADDR  is defined as IA32_MC2_ADDR  in SDM.
+        MSR_IA32_MC3_ADDR  is defined as IA32_MC3_ADDR  in SDM.
+        MSR_IA32_MC4_ADDR  is defined as IA32_MC4_ADDR  in SDM.
+        MSR_IA32_MC5_ADDR  is defined as IA32_MC5_ADDR  in SDM.
+        MSR_IA32_MC6_ADDR  is defined as IA32_MC6_ADDR  in SDM.
+        MSR_IA32_MC7_ADDR  is defined as IA32_MC7_ADDR  in SDM.
+        MSR_IA32_MC8_ADDR  is defined as IA32_MC8_ADDR  in SDM.
+        MSR_IA32_MC9_ADDR  is defined as IA32_MC9_ADDR  in SDM.
+        MSR_IA32_MC10_ADDR is defined as IA32_MC10_ADDR in SDM.
+        MSR_IA32_MC11_ADDR is defined as IA32_MC11_ADDR in SDM.
+        MSR_IA32_MC12_ADDR is defined as IA32_MC12_ADDR in SDM.
+        MSR_IA32_MC13_ADDR is defined as IA32_MC13_ADDR in SDM.
+        MSR_IA32_MC14_ADDR is defined as IA32_MC14_ADDR in SDM.
+        MSR_IA32_MC15_ADDR is defined as IA32_MC15_ADDR in SDM.
+        MSR_IA32_MC16_ADDR is defined as IA32_MC16_ADDR in SDM.
+        MSR_IA32_MC17_ADDR is defined as IA32_MC17_ADDR in SDM.
+        MSR_IA32_MC18_ADDR is defined as IA32_MC18_ADDR in SDM.
+        MSR_IA32_MC19_ADDR is defined as IA32_MC19_ADDR in SDM.
+        MSR_IA32_MC20_ADDR is defined as IA32_MC20_ADDR in SDM.
+        MSR_IA32_MC21_ADDR is defined as IA32_MC21_ADDR in SDM.
+        MSR_IA32_MC22_ADDR is defined as IA32_MC22_ADDR in SDM.
+        MSR_IA32_MC23_ADDR is defined as IA32_MC23_ADDR in SDM.
+        MSR_IA32_MC24_ADDR is defined as IA32_MC24_ADDR in SDM.
+        MSR_IA32_MC25_ADDR is defined as IA32_MC25_ADDR in SDM.
+        MSR_IA32_MC26_ADDR is defined as IA32_MC26_ADDR in SDM.
+        MSR_IA32_MC27_ADDR is defined as IA32_MC27_ADDR in SDM.
+        MSR_IA32_MC28_ADDR is defined as IA32_MC28_ADDR in SDM.
   @{
 **/
 #define MSR_IA32_MC0_ADDR                        0x00000402
@@ -3396,6 +3608,35 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_MC0_MISC);
   AsmWriteMsr64 (MSR_IA32_MC0_MISC, Msr);
   @endcode
+  @note MSR_IA32_MC0_MISC  is defined as IA32_MC0_MISC  in SDM.
+        MSR_IA32_MC1_MISC  is defined as IA32_MC1_MISC  in SDM.
+        MSR_IA32_MC2_MISC  is defined as IA32_MC2_MISC  in SDM.
+        MSR_IA32_MC3_MISC  is defined as IA32_MC3_MISC  in SDM.
+        MSR_IA32_MC4_MISC  is defined as IA32_MC4_MISC  in SDM.
+        MSR_IA32_MC5_MISC  is defined as IA32_MC5_MISC  in SDM.
+        MSR_IA32_MC6_MISC  is defined as IA32_MC6_MISC  in SDM.
+        MSR_IA32_MC7_MISC  is defined as IA32_MC7_MISC  in SDM.
+        MSR_IA32_MC8_MISC  is defined as IA32_MC8_MISC  in SDM.
+        MSR_IA32_MC9_MISC  is defined as IA32_MC9_MISC  in SDM.
+        MSR_IA32_MC10_MISC is defined as IA32_MC10_MISC in SDM.
+        MSR_IA32_MC11_MISC is defined as IA32_MC11_MISC in SDM.
+        MSR_IA32_MC12_MISC is defined as IA32_MC12_MISC in SDM.
+        MSR_IA32_MC13_MISC is defined as IA32_MC13_MISC in SDM.
+        MSR_IA32_MC14_MISC is defined as IA32_MC14_MISC in SDM.
+        MSR_IA32_MC15_MISC is defined as IA32_MC15_MISC in SDM.
+        MSR_IA32_MC16_MISC is defined as IA32_MC16_MISC in SDM.
+        MSR_IA32_MC17_MISC is defined as IA32_MC17_MISC in SDM.
+        MSR_IA32_MC18_MISC is defined as IA32_MC18_MISC in SDM.
+        MSR_IA32_MC19_MISC is defined as IA32_MC19_MISC in SDM.
+        MSR_IA32_MC20_MISC is defined as IA32_MC20_MISC in SDM.
+        MSR_IA32_MC21_MISC is defined as IA32_MC21_MISC in SDM.
+        MSR_IA32_MC22_MISC is defined as IA32_MC22_MISC in SDM.
+        MSR_IA32_MC23_MISC is defined as IA32_MC23_MISC in SDM.
+        MSR_IA32_MC24_MISC is defined as IA32_MC24_MISC in SDM.
+        MSR_IA32_MC25_MISC is defined as IA32_MC25_MISC in SDM.
+        MSR_IA32_MC26_MISC is defined as IA32_MC26_MISC in SDM.
+        MSR_IA32_MC27_MISC is defined as IA32_MC27_MISC in SDM.
+        MSR_IA32_MC28_MISC is defined as IA32_MC28_MISC in SDM.
   @{
 **/
 #define MSR_IA32_MC0_MISC                        0x00000403
@@ -3444,6 +3685,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_BASIC);
   @endcode
+  @note MSR_IA32_VMX_BASIC is defined as IA32_VMX_BASIC in SDM.
 **/
 #define MSR_IA32_VMX_BASIC                       0x00000480
 
@@ -3462,6 +3704,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_PINBASED_CTLS);
   @endcode
+  @note MSR_IA32_VMX_PINBASED_CTLS is defined as IA32_VMX_PINBASED_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_PINBASED_CTLS               0x00000481
 
@@ -3481,6 +3724,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_PROCBASED_CTLS);
   @endcode
+  @note MSR_IA32_VMX_PROCBASED_CTLS is defined as IA32_VMX_PROCBASED_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_PROCBASED_CTLS              0x00000482
 
@@ -3499,6 +3743,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_EXIT_CTLS);
   @endcode
+  @note MSR_IA32_VMX_EXIT_CTLS is defined as IA32_VMX_EXIT_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_EXIT_CTLS                   0x00000483
 
@@ -3517,6 +3762,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_ENTRY_CTLS);
   @endcode
+  @note MSR_IA32_VMX_ENTRY_CTLS is defined as IA32_VMX_ENTRY_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_ENTRY_CTLS                  0x00000484
 
@@ -3535,6 +3781,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_MISC);
   @endcode
+  @note MSR_IA32_VMX_MISC is defined as IA32_VMX_MISC in SDM.
 **/
 #define MSR_IA32_VMX_MISC                        0x00000485
 
@@ -3553,6 +3800,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_CR0_FIXED0);
   @endcode
+  @note MSR_IA32_VMX_CR0_FIXED0 is defined as IA32_VMX_CR0_FIXED0 in SDM.
 **/
 #define MSR_IA32_VMX_CR0_FIXED0                  0x00000486
 
@@ -3571,6 +3819,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_CR0_FIXED1);
   @endcode
+  @note MSR_IA32_VMX_CR0_FIXED1 is defined as IA32_VMX_CR0_FIXED1 in SDM.
 **/
 #define MSR_IA32_VMX_CR0_FIXED1                  0x00000487
 
@@ -3589,6 +3838,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_CR4_FIXED0);
   @endcode
+  @note MSR_IA32_VMX_CR4_FIXED0 is defined as IA32_VMX_CR4_FIXED0 in SDM.
 **/
 #define MSR_IA32_VMX_CR4_FIXED0                  0x00000488
 
@@ -3607,6 +3857,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_CR4_FIXED1);
   @endcode
+  @note MSR_IA32_VMX_CR4_FIXED1 is defined as IA32_VMX_CR4_FIXED1 in SDM.
 **/
 #define MSR_IA32_VMX_CR4_FIXED1                  0x00000489
 
@@ -3625,6 +3876,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_VMCS_ENUM);
   @endcode
+  @note MSR_IA32_VMX_VMCS_ENUM is defined as IA32_VMX_VMCS_ENUM in SDM.
 **/
 #define MSR_IA32_VMX_VMCS_ENUM                   0x0000048A
 
@@ -3644,6 +3896,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_PROCBASED_CTLS2);
   @endcode
+  @note MSR_IA32_VMX_PROCBASED_CTLS2 is defined as IA32_VMX_PROCBASED_CTLS2 in SDM.
 **/
 #define MSR_IA32_VMX_PROCBASED_CTLS2             0x0000048B
 
@@ -3663,6 +3916,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_EPT_VPID_CAP);
   @endcode
+  @note MSR_IA32_VMX_EPT_VPID_CAP is defined as IA32_VMX_EPT_VPID_CAP in SDM.
 **/
 #define MSR_IA32_VMX_EPT_VPID_CAP                0x0000048C
 
@@ -3682,6 +3936,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_TRUE_PINBASED_CTLS);
   @endcode
+  @note MSR_IA32_VMX_TRUE_PINBASED_CTLS is defined as IA32_VMX_TRUE_PINBASED_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_TRUE_PINBASED_CTLS          0x0000048D
 
@@ -3701,6 +3956,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_TRUE_PROCBASED_CTLS);
   @endcode
+  @note MSR_IA32_VMX_TRUE_PROCBASED_CTLS is defined as IA32_VMX_TRUE_PROCBASED_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_TRUE_PROCBASED_CTLS         0x0000048E
 
@@ -3719,6 +3975,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_TRUE_EXIT_CTLS);
   @endcode
+  @note MSR_IA32_VMX_TRUE_EXIT_CTLS is defined as IA32_VMX_TRUE_EXIT_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_TRUE_EXIT_CTLS              0x0000048F
 
@@ -3737,6 +3994,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_TRUE_ENTRY_CTLS);
   @endcode
+  @note MSR_IA32_VMX_TRUE_ENTRY_CTLS is defined as IA32_VMX_TRUE_ENTRY_CTLS in SDM.
 **/
 #define MSR_IA32_VMX_TRUE_ENTRY_CTLS             0x00000490
 
@@ -3755,6 +4013,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_VMX_VMFUNC);
   @endcode
+  @note MSR_IA32_VMX_VMFUNC is defined as IA32_VMX_VMFUNC in SDM.
 **/
 #define MSR_IA32_VMX_VMFUNC                      0x00000491
 
@@ -3774,6 +4033,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_A_PMC0);
   AsmWriteMsr64 (MSR_IA32_A_PMC0, Msr);
   @endcode
+  @note MSR_IA32_A_PMC0 is defined as IA32_A_PMC0 in SDM.
+        MSR_IA32_A_PMC1 is defined as IA32_A_PMC1 in SDM.
+        MSR_IA32_A_PMC2 is defined as IA32_A_PMC2 in SDM.
+        MSR_IA32_A_PMC3 is defined as IA32_A_PMC3 in SDM.
+        MSR_IA32_A_PMC4 is defined as IA32_A_PMC4 in SDM.
+        MSR_IA32_A_PMC5 is defined as IA32_A_PMC5 in SDM.
+        MSR_IA32_A_PMC6 is defined as IA32_A_PMC6 in SDM.
+        MSR_IA32_A_PMC7 is defined as IA32_A_PMC7 in SDM.
   @{
 **/
 #define MSR_IA32_A_PMC0                          0x000004C1
@@ -3803,6 +4070,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_EXT_CTL);
   AsmWriteMsr64 (MSR_IA32_MCG_EXT_CTL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_MCG_EXT_CTL is defined as IA32_MCG_EXT_CTL in SDM.
 **/
 #define MSR_IA32_MCG_EXT_CTL                     0x000004D0
 
@@ -3848,6 +4116,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_SGX_SVN_STATUS);
   @endcode
+  @note MSR_IA32_SGX_SVN_STATUS is defined as IA32_SGX_SVN_STATUS in SDM.
 **/
 #define MSR_IA32_SGX_SVN_STATUS                  0x00000500
 
@@ -3902,6 +4171,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_OUTPUT_BASE);
   AsmWriteMsr64 (MSR_IA32_RTIT_OUTPUT_BASE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_RTIT_OUTPUT_BASE is defined as IA32_RTIT_OUTPUT_BASE in SDM.
 **/
 #define MSR_IA32_RTIT_OUTPUT_BASE                0x00000560
 
@@ -3948,6 +4218,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_OUTPUT_MASK_PTRS);
   AsmWriteMsr64 (MSR_IA32_RTIT_OUTPUT_MASK_PTRS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_RTIT_OUTPUT_MASK_PTRS is defined as IA32_RTIT_OUTPUT_MASK_PTRS in SDM.
 **/
 #define MSR_IA32_RTIT_OUTPUT_MASK_PTRS           0x00000561
 
@@ -3992,6 +4263,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_CTL);
   AsmWriteMsr64 (MSR_IA32_RTIT_CTL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_RTIT_CTL is defined as IA32_RTIT_CTL in SDM.
 **/
 #define MSR_IA32_RTIT_CTL                        0x00000570
 
@@ -4105,6 +4377,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_STATUS);
   AsmWriteMsr64 (MSR_IA32_RTIT_STATUS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_RTIT_STATUS is defined as IA32_RTIT_STATUS in SDM.
 **/
 #define MSR_IA32_RTIT_STATUS                     0x00000571
 
@@ -4169,6 +4442,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_CR3_MATCH);
   AsmWriteMsr64 (MSR_IA32_RTIT_CR3_MATCH, Msr.Uint64);
   @endcode
+  @note MSR_IA32_RTIT_CR3_MATCH is defined as IA32_RTIT_CR3_MATCH in SDM.
 **/
 #define MSR_IA32_RTIT_CR3_MATCH                  0x00000572
 
@@ -4213,6 +4487,10 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_ADDR0_A);
   AsmWriteMsr64 (MSR_IA32_RTIT_ADDR0_A, Msr.Uint64);
   @endcode
+  @note MSR_IA32_RTIT_ADDR0_A is defined as IA32_RTIT_ADDR0_A in SDM.
+        MSR_IA32_RTIT_ADDR1_A is defined as IA32_RTIT_ADDR1_A in SDM.
+        MSR_IA32_RTIT_ADDR2_A is defined as IA32_RTIT_ADDR2_A in SDM.
+        MSR_IA32_RTIT_ADDR3_A is defined as IA32_RTIT_ADDR3_A in SDM.
   @{
 **/
 #define MSR_IA32_RTIT_ADDR0_A                    0x00000580
@@ -4238,6 +4516,10 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_ADDR0_B);
   AsmWriteMsr64 (MSR_IA32_RTIT_ADDR0_B, Msr.Uint64);
   @endcode
+  @note MSR_IA32_RTIT_ADDR0_B is defined as IA32_RTIT_ADDR0_B in SDM.
+        MSR_IA32_RTIT_ADDR1_B is defined as IA32_RTIT_ADDR1_B in SDM.
+        MSR_IA32_RTIT_ADDR2_B is defined as IA32_RTIT_ADDR2_B in SDM.
+        MSR_IA32_RTIT_ADDR3_B is defined as IA32_RTIT_ADDR3_B in SDM.
   @{
 **/
 #define MSR_IA32_RTIT_ADDR0_B                    0x00000581
@@ -4302,6 +4584,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_DS_AREA);
   AsmWriteMsr64 (MSR_IA32_DS_AREA, Msr);
   @endcode
+  @note MSR_IA32_DS_AREA is defined as IA32_DS_AREA in SDM.
 **/
 #define MSR_IA32_DS_AREA                         0x00000600
 
@@ -4321,6 +4604,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_TSC_DEADLINE);
   AsmWriteMsr64 (MSR_IA32_TSC_DEADLINE, Msr);
   @endcode
+  @note MSR_IA32_TSC_DEADLINE is defined as IA32_TSC_DEADLINE in SDM.
 **/
 #define MSR_IA32_TSC_DEADLINE                    0x000006E0
 
@@ -4341,6 +4625,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PM_ENABLE);
   AsmWriteMsr64 (MSR_IA32_PM_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PM_ENABLE is defined as IA32_PM_ENABLE in SDM.
 **/
 #define MSR_IA32_PM_ENABLE                       0x00000770
 
@@ -4386,6 +4671,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_HWP_CAPABILITIES);
   @endcode
+  @note MSR_IA32_HWP_CAPABILITIES is defined as IA32_HWP_CAPABILITIES in SDM.
 **/
 #define MSR_IA32_HWP_CAPABILITIES                0x00000771
 
@@ -4447,6 +4733,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_HWP_REQUEST_PKG);
   AsmWriteMsr64 (MSR_IA32_HWP_REQUEST_PKG, Msr.Uint64);
   @endcode
+  @note MSR_IA32_HWP_REQUEST_PKG is defined as IA32_HWP_REQUEST_PKG in SDM.
 **/
 #define MSR_IA32_HWP_REQUEST_PKG                 0x00000772
 
@@ -4508,6 +4795,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_HWP_INTERRUPT);
   AsmWriteMsr64 (MSR_IA32_HWP_INTERRUPT, Msr.Uint64);
   @endcode
+  @note MSR_IA32_HWP_INTERRUPT is defined as IA32_HWP_INTERRUPT in SDM.
 **/
 #define MSR_IA32_HWP_INTERRUPT                   0x00000773
 
@@ -4560,6 +4848,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_HWP_REQUEST);
   AsmWriteMsr64 (MSR_IA32_HWP_REQUEST, Msr.Uint64);
   @endcode
+  @note MSR_IA32_HWP_REQUEST is defined as IA32_HWP_REQUEST in SDM.
 **/
 #define MSR_IA32_HWP_REQUEST                     0x00000774
 
@@ -4627,6 +4916,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_HWP_STATUS);
   AsmWriteMsr64 (MSR_IA32_HWP_STATUS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_HWP_STATUS is defined as IA32_HWP_STATUS in SDM.
 **/
 #define MSR_IA32_HWP_STATUS                      0x00000777
 
@@ -4677,6 +4967,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_APICID);
   @endcode
+  @note MSR_IA32_X2APIC_APICID is defined as IA32_X2APIC_APICID in SDM.
 **/
 #define MSR_IA32_X2APIC_APICID                   0x00000802
 
@@ -4695,6 +4986,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_VERSION);
   @endcode
+  @note MSR_IA32_X2APIC_VERSION is defined as IA32_X2APIC_VERSION in SDM.
 **/
 #define MSR_IA32_X2APIC_VERSION                  0x00000803
 
@@ -4714,6 +5006,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_TPR);
   AsmWriteMsr64 (MSR_IA32_X2APIC_TPR, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_TPR is defined as IA32_X2APIC_TPR in SDM.
 **/
 #define MSR_IA32_X2APIC_TPR                      0x00000808
 
@@ -4732,6 +5025,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_PPR);
   @endcode
+  @note MSR_IA32_X2APIC_PPR is defined as IA32_X2APIC_PPR in SDM.
 **/
 #define MSR_IA32_X2APIC_PPR                      0x0000080A
 
@@ -4751,6 +5045,7 @@ typedef union {
   Msr = 0;
   AsmWriteMsr64 (MSR_IA32_X2APIC_EOI, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_EOI is defined as IA32_X2APIC_EOI in SDM.
 **/
 #define MSR_IA32_X2APIC_EOI                      0x0000080B
 
@@ -4769,6 +5064,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LDR);
   @endcode
+  @note MSR_IA32_X2APIC_LDR is defined as IA32_X2APIC_LDR in SDM.
 **/
 #define MSR_IA32_X2APIC_LDR                      0x0000080D
 
@@ -4788,6 +5084,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_SIVR);
   AsmWriteMsr64 (MSR_IA32_X2APIC_SIVR, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_SIVR is defined as IA32_X2APIC_SIVR in SDM.
 **/
 #define MSR_IA32_X2APIC_SIVR                     0x0000080F
 
@@ -4806,6 +5103,14 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_ISR0);
   @endcode
+  @note MSR_IA32_X2APIC_ISR0 is defined as IA32_X2APIC_ISR0 in SDM.
+        MSR_IA32_X2APIC_ISR1 is defined as IA32_X2APIC_ISR1 in SDM.
+        MSR_IA32_X2APIC_ISR2 is defined as IA32_X2APIC_ISR2 in SDM.
+        MSR_IA32_X2APIC_ISR3 is defined as IA32_X2APIC_ISR3 in SDM.
+        MSR_IA32_X2APIC_ISR4 is defined as IA32_X2APIC_ISR4 in SDM.
+        MSR_IA32_X2APIC_ISR5 is defined as IA32_X2APIC_ISR5 in SDM.
+        MSR_IA32_X2APIC_ISR6 is defined as IA32_X2APIC_ISR6 in SDM.
+        MSR_IA32_X2APIC_ISR7 is defined as IA32_X2APIC_ISR7 in SDM.
   @{
 **/
 #define MSR_IA32_X2APIC_ISR0                     0x00000810
@@ -4833,6 +5138,14 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_TMR0);
   @endcode
+  @note MSR_IA32_X2APIC_TMR0 is defined as IA32_X2APIC_TMR0 in SDM.
+        MSR_IA32_X2APIC_TMR1 is defined as IA32_X2APIC_TMR1 in SDM.
+        MSR_IA32_X2APIC_TMR2 is defined as IA32_X2APIC_TMR2 in SDM.
+        MSR_IA32_X2APIC_TMR3 is defined as IA32_X2APIC_TMR3 in SDM.
+        MSR_IA32_X2APIC_TMR4 is defined as IA32_X2APIC_TMR4 in SDM.
+        MSR_IA32_X2APIC_TMR5 is defined as IA32_X2APIC_TMR5 in SDM.
+        MSR_IA32_X2APIC_TMR6 is defined as IA32_X2APIC_TMR6 in SDM.
+        MSR_IA32_X2APIC_TMR7 is defined as IA32_X2APIC_TMR7 in SDM.
   @{
 **/
 #define MSR_IA32_X2APIC_TMR0                     0x00000818
@@ -4860,6 +5173,14 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_IRR0);
   @endcode
+  @note MSR_IA32_X2APIC_IRR0 is defined as IA32_X2APIC_IRR0 in SDM.
+        MSR_IA32_X2APIC_IRR1 is defined as IA32_X2APIC_IRR1 in SDM.
+        MSR_IA32_X2APIC_IRR2 is defined as IA32_X2APIC_IRR2 in SDM.
+        MSR_IA32_X2APIC_IRR3 is defined as IA32_X2APIC_IRR3 in SDM.
+        MSR_IA32_X2APIC_IRR4 is defined as IA32_X2APIC_IRR4 in SDM.
+        MSR_IA32_X2APIC_IRR5 is defined as IA32_X2APIC_IRR5 in SDM.
+        MSR_IA32_X2APIC_IRR6 is defined as IA32_X2APIC_IRR6 in SDM.
+        MSR_IA32_X2APIC_IRR7 is defined as IA32_X2APIC_IRR7 in SDM.
   @{
 **/
 #define MSR_IA32_X2APIC_IRR0                     0x00000820
@@ -4888,6 +5209,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_ESR);
   AsmWriteMsr64 (MSR_IA32_X2APIC_ESR, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_ESR is defined as IA32_X2APIC_ESR in SDM.
 **/
 #define MSR_IA32_X2APIC_ESR                      0x00000828
 
@@ -4907,6 +5229,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LVT_CMCI);
   AsmWriteMsr64 (MSR_IA32_X2APIC_LVT_CMCI, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_LVT_CMCI is defined as IA32_X2APIC_LVT_CMCI in SDM.
 **/
 #define MSR_IA32_X2APIC_LVT_CMCI                 0x0000082F
 
@@ -4926,6 +5249,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_ICR);
   AsmWriteMsr64 (MSR_IA32_X2APIC_ICR, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_ICR is defined as IA32_X2APIC_ICR in SDM.
 **/
 #define MSR_IA32_X2APIC_ICR                      0x00000830
 
@@ -4945,6 +5269,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LVT_TIMER);
   AsmWriteMsr64 (MSR_IA32_X2APIC_LVT_TIMER, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_LVT_TIMER is defined as IA32_X2APIC_LVT_TIMER in SDM.
 **/
 #define MSR_IA32_X2APIC_LVT_TIMER                0x00000832
 
@@ -4964,6 +5289,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LVT_THERMAL);
   AsmWriteMsr64 (MSR_IA32_X2APIC_LVT_THERMAL, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_LVT_THERMAL is defined as IA32_X2APIC_LVT_THERMAL in SDM.
 **/
 #define MSR_IA32_X2APIC_LVT_THERMAL              0x00000833
 
@@ -4983,6 +5309,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LVT_PMI);
   AsmWriteMsr64 (MSR_IA32_X2APIC_LVT_PMI, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_LVT_PMI is defined as IA32_X2APIC_LVT_PMI in SDM.
 **/
 #define MSR_IA32_X2APIC_LVT_PMI                  0x00000834
 
@@ -5002,6 +5329,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LVT_LINT0);
   AsmWriteMsr64 (MSR_IA32_X2APIC_LVT_LINT0, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_LVT_LINT0 is defined as IA32_X2APIC_LVT_LINT0 in SDM.
 **/
 #define MSR_IA32_X2APIC_LVT_LINT0                0x00000835
 
@@ -5021,6 +5349,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LVT_LINT1);
   AsmWriteMsr64 (MSR_IA32_X2APIC_LVT_LINT1, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_LVT_LINT1 is defined as IA32_X2APIC_LVT_LINT1 in SDM.
 **/
 #define MSR_IA32_X2APIC_LVT_LINT1                0x00000836
 
@@ -5040,6 +5369,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_LVT_ERROR);
   AsmWriteMsr64 (MSR_IA32_X2APIC_LVT_ERROR, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_LVT_ERROR is defined as IA32_X2APIC_LVT_ERROR in SDM.
 **/
 #define MSR_IA32_X2APIC_LVT_ERROR                0x00000837
 
@@ -5059,6 +5389,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_INIT_COUNT);
   AsmWriteMsr64 (MSR_IA32_X2APIC_INIT_COUNT, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_INIT_COUNT is defined as IA32_X2APIC_INIT_COUNT in SDM.
 **/
 #define MSR_IA32_X2APIC_INIT_COUNT               0x00000838
 
@@ -5077,6 +5408,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_CUR_COUNT);
   @endcode
+  @note MSR_IA32_X2APIC_CUR_COUNT is defined as IA32_X2APIC_CUR_COUNT in SDM.
 **/
 #define MSR_IA32_X2APIC_CUR_COUNT                0x00000839
 
@@ -5096,6 +5428,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_X2APIC_DIV_CONF);
   AsmWriteMsr64 (MSR_IA32_X2APIC_DIV_CONF, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_DIV_CONF is defined as IA32_X2APIC_DIV_CONF in SDM.
 **/
 #define MSR_IA32_X2APIC_DIV_CONF                 0x0000083E
 
@@ -5115,6 +5448,7 @@ typedef union {
   Msr = 0;
   AsmWriteMsr64 (MSR_IA32_X2APIC_SELF_IPI, Msr);
   @endcode
+  @note MSR_IA32_X2APIC_SELF_IPI is defined as IA32_X2APIC_SELF_IPI in SDM.
 **/
 #define MSR_IA32_X2APIC_SELF_IPI                 0x0000083F
 
@@ -5135,6 +5469,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_DEBUG_INTERFACE);
   AsmWriteMsr64 (MSR_IA32_DEBUG_INTERFACE, Msr.Uint64);
   @endcode
+  @note MSR_IA32_DEBUG_INTERFACE is defined as IA32_DEBUG_INTERFACE in SDM.
 **/
 #define MSR_IA32_DEBUG_INTERFACE                 0x00000C80
 
@@ -5192,6 +5527,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_L3_QOS_CFG);
   AsmWriteMsr64 (MSR_IA32_L3_QOS_CFG, Msr.Uint64);
   @endcode
+  @note MSR_IA32_L3_QOS_CFG is defined as IA32_L3_QOS_CFG in SDM.
 **/
 #define MSR_IA32_L3_QOS_CFG                      0x00000C81
 
@@ -5239,6 +5575,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_QM_EVTSEL);
   AsmWriteMsr64 (MSR_IA32_QM_EVTSEL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_QM_EVTSEL is defined as IA32_QM_EVTSEL in SDM.
 **/
 #define MSR_IA32_QM_EVTSEL                       0x00000C8D
 
@@ -5286,6 +5623,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_QM_CTR);
   @endcode
+  @note MSR_IA32_QM_CTR is defined as IA32_QM_CTR in SDM.
 **/
 #define MSR_IA32_QM_CTR                          0x00000C8E
 
@@ -5340,6 +5678,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PQR_ASSOC);
   AsmWriteMsr64 (MSR_IA32_PQR_ASSOC, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PQR_ASSOC is defined as IA32_PQR_ASSOC in SDM.
 **/
 #define MSR_IA32_PQR_ASSOC                       0x00000C8F
 
@@ -5388,6 +5727,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_BNDCFGS);
   AsmWriteMsr64 (MSR_IA32_BNDCFGS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_BNDCFGS is defined as IA32_BNDCFGS in SDM.
 **/
 #define MSR_IA32_BNDCFGS                         0x00000D90
 
@@ -5441,6 +5781,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_XSS);
   AsmWriteMsr64 (MSR_IA32_XSS, Msr.Uint64);
   @endcode
+  @note MSR_IA32_XSS is defined as IA32_XSS in SDM.
 **/
 #define MSR_IA32_XSS                             0x00000DA0
 
@@ -5487,6 +5828,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PKG_HDC_CTL);
   AsmWriteMsr64 (MSR_IA32_PKG_HDC_CTL, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PKG_HDC_CTL is defined as IA32_PKG_HDC_CTL in SDM.
 **/
 #define MSR_IA32_PKG_HDC_CTL                     0x00000DB0
 
@@ -5534,6 +5876,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_PM_CTL1);
   AsmWriteMsr64 (MSR_IA32_PM_CTL1, Msr.Uint64);
   @endcode
+  @note MSR_IA32_PM_CTL1 is defined as IA32_PM_CTL1 in SDM.
 **/
 #define MSR_IA32_PM_CTL1                         0x00000DB1
 
@@ -5580,6 +5923,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_IA32_THREAD_STALL);
   @endcode
+  @note MSR_IA32_THREAD_STALL is defined as IA32_THREAD_STALL in SDM.
 **/
 #define MSR_IA32_THREAD_STALL                    0x00000DB2
 
@@ -5601,6 +5945,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
   AsmWriteMsr64 (MSR_IA32_EFER, Msr.Uint64);
   @endcode
+  @note MSR_IA32_EFER is defined as IA32_EFER in SDM.
 **/
 #define MSR_IA32_EFER                            0xC0000080
 
@@ -5661,6 +6006,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_STAR);
   AsmWriteMsr64 (MSR_IA32_STAR, Msr);
   @endcode
+  @note MSR_IA32_STAR is defined as IA32_STAR in SDM.
 **/
 #define MSR_IA32_STAR                            0xC0000081
 
@@ -5679,6 +6025,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_LSTAR);
   AsmWriteMsr64 (MSR_IA32_LSTAR, Msr);
   @endcode
+  @note MSR_IA32_LSTAR is defined as IA32_LSTAR in SDM.
 **/
 #define MSR_IA32_LSTAR                           0xC0000082
 
@@ -5697,6 +6044,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_FMASK);
   AsmWriteMsr64 (MSR_IA32_FMASK, Msr);
   @endcode
+  @note MSR_IA32_FMASK is defined as IA32_FMASK in SDM.
 **/
 #define MSR_IA32_FMASK                           0xC0000084
 
@@ -5715,6 +6063,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_FS_BASE);
   AsmWriteMsr64 (MSR_IA32_FS_BASE, Msr);
   @endcode
+  @note MSR_IA32_FS_BASE is defined as IA32_FS_BASE in SDM.
 **/
 #define MSR_IA32_FS_BASE                         0xC0000100
 
@@ -5733,6 +6082,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_GS_BASE);
   AsmWriteMsr64 (MSR_IA32_GS_BASE, Msr);
   @endcode
+  @note MSR_IA32_GS_BASE is defined as IA32_GS_BASE in SDM.
 **/
 #define MSR_IA32_GS_BASE                         0xC0000101
 
@@ -5751,6 +6101,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_IA32_KERNEL_GS_BASE);
   AsmWriteMsr64 (MSR_IA32_KERNEL_GS_BASE, Msr);
   @endcode
+  @note MSR_IA32_KERNEL_GS_BASE is defined as IA32_KERNEL_GS_BASE in SDM.
 **/
 #define MSR_IA32_KERNEL_GS_BASE                  0xC0000102
 
@@ -5771,6 +6122,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_IA32_TSC_AUX);
   AsmWriteMsr64 (MSR_IA32_TSC_AUX, Msr.Uint64);
   @endcode
+  @note MSR_IA32_TSC_AUX is defined as IA32_TSC_AUX in SDM.
 **/
 #define MSR_IA32_TSC_AUX                         0xC0000103
 
