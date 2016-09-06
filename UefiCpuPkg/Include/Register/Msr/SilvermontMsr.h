@@ -41,6 +41,7 @@
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PLATFORM_ID);
   @endcode
+  @note MSR_SILVERMONT_PLATFORM_ID is defined as MSR_PLATFORM_ID in SDM.
 **/
 #define MSR_SILVERMONT_PLATFORM_ID               0x00000017
 
@@ -89,6 +90,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_EBL_CR_POWERON);
   AsmWriteMsr64 (MSR_SILVERMONT_EBL_CR_POWERON, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_EBL_CR_POWERON is defined as MSR_EBL_CR_POWERON in SDM.
 **/
 #define MSR_SILVERMONT_EBL_CR_POWERON            0x0000002A
 
@@ -190,6 +192,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_SMI_COUNT);
   @endcode
+  @note MSR_SILVERMONT_SMI_COUNT is defined as MSR_SMI_COUNT in SDM.
 **/
 #define MSR_SILVERMONT_SMI_COUNT                 0x00000034
 
@@ -238,6 +241,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_LASTBRANCH_0_FROM_IP);
   AsmWriteMsr64 (MSR_SILVERMONT_LASTBRANCH_0_FROM_IP, Msr);
   @endcode
+  @note MSR_SILVERMONT_LASTBRANCH_0_FROM_IP is defined as MSR_LASTBRANCH_0_FROM_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_1_FROM_IP is defined as MSR_LASTBRANCH_1_FROM_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_2_FROM_IP is defined as MSR_LASTBRANCH_2_FROM_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_3_FROM_IP is defined as MSR_LASTBRANCH_3_FROM_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_4_FROM_IP is defined as MSR_LASTBRANCH_4_FROM_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_5_FROM_IP is defined as MSR_LASTBRANCH_5_FROM_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_6_FROM_IP is defined as MSR_LASTBRANCH_6_FROM_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_7_FROM_IP is defined as MSR_LASTBRANCH_7_FROM_IP in SDM.
   @{
 **/
 #define MSR_SILVERMONT_LASTBRANCH_0_FROM_IP      0x00000040
@@ -268,6 +279,14 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_LASTBRANCH_0_TO_IP);
   AsmWriteMsr64 (MSR_SILVERMONT_LASTBRANCH_0_TO_IP, Msr);
   @endcode
+  @note MSR_SILVERMONT_LASTBRANCH_0_TO_IP is defined as MSR_LASTBRANCH_0_TO_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_1_TO_IP is defined as MSR_LASTBRANCH_1_TO_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_2_TO_IP is defined as MSR_LASTBRANCH_2_TO_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_3_TO_IP is defined as MSR_LASTBRANCH_3_TO_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_4_TO_IP is defined as MSR_LASTBRANCH_4_TO_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_5_TO_IP is defined as MSR_LASTBRANCH_5_TO_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_6_TO_IP is defined as MSR_LASTBRANCH_6_TO_IP in SDM.
+        MSR_SILVERMONT_LASTBRANCH_7_TO_IP is defined as MSR_LASTBRANCH_7_TO_IP in SDM.
   @{
 **/
 #define MSR_SILVERMONT_LASTBRANCH_0_TO_IP        0x00000060
@@ -297,6 +316,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_FSB_FREQ);
   @endcode
+  @note MSR_SILVERMONT_FSB_FREQ is defined as MSR_FSB_FREQ in SDM.
 **/
 #define MSR_SILVERMONT_FSB_FREQ                  0x000000CD
 
@@ -364,6 +384,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PKG_CST_CONFIG_CONTROL);
   AsmWriteMsr64 (MSR_SILVERMONT_PKG_CST_CONFIG_CONTROL, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_PKG_CST_CONFIG_CONTROL is defined as MSR_PKG_CST_CONFIG_CONTROL in SDM.
 **/
 #define MSR_SILVERMONT_PKG_CST_CONFIG_CONTROL    0x000000E2
 
@@ -428,6 +449,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PMG_IO_CAPTURE_BASE);
   AsmWriteMsr64 (MSR_SILVERMONT_PMG_IO_CAPTURE_BASE, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_PMG_IO_CAPTURE_BASE is defined as MSR_PMG_IO_CAPTURE_BASE in SDM.
 **/
 #define MSR_SILVERMONT_PMG_IO_CAPTURE_BASE       0x000000E4
 
@@ -486,6 +508,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_BBL_CR_CTL3);
   AsmWriteMsr64 (MSR_SILVERMONT_BBL_CR_CTL3, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_BBL_CR_CTL3 is defined as MSR_BBL_CR_CTL3 in SDM.
 **/
 #define MSR_SILVERMONT_BBL_CR_CTL3               0x0000011E
 
@@ -545,6 +568,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_FEATURE_CONFIG);
   AsmWriteMsr64 (MSR_SILVERMONT_FEATURE_CONFIG, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_FEATURE_CONFIG is defined as MSR_FEATURE_CONFIG in SDM.
 **/
 #define MSR_SILVERMONT_FEATURE_CONFIG            0x0000013C
 
@@ -597,6 +621,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_IA32_MISC_ENABLE);
   AsmWriteMsr64 (MSR_SILVERMONT_IA32_MISC_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_IA32_MISC_ENABLE is defined as IA32_MISC_ENABLE in SDM.
 **/
 #define MSR_SILVERMONT_IA32_MISC_ENABLE          0x000001A0
 
@@ -697,6 +722,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_TEMPERATURE_TARGET);
   AsmWriteMsr64 (MSR_SILVERMONT_TEMPERATURE_TARGET, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_TEMPERATURE_TARGET is defined as MSR_TEMPERATURE_TARGET in SDM.
 **/
 #define MSR_SILVERMONT_TEMPERATURE_TARGET        0x000001A2
 
@@ -750,6 +776,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_OFFCORE_RSP_0);
   AsmWriteMsr64 (MSR_SILVERMONT_OFFCORE_RSP_0, Msr);
   @endcode
+  @note MSR_SILVERMONT_OFFCORE_RSP_0 is defined as MSR_OFFCORE_RSP_0 in SDM.
 **/
 #define MSR_SILVERMONT_OFFCORE_RSP_0             0x000001A6
 
@@ -768,6 +795,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_OFFCORE_RSP_1);
   AsmWriteMsr64 (MSR_SILVERMONT_OFFCORE_RSP_1, Msr);
   @endcode
+  @note MSR_SILVERMONT_OFFCORE_RSP_1 is defined as MSR_OFFCORE_RSP_1 in SDM.
 **/
 #define MSR_SILVERMONT_OFFCORE_RSP_1             0x000001A7
 
@@ -788,6 +816,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_TURBO_RATIO_LIMIT);
   AsmWriteMsr64 (MSR_SILVERMONT_TURBO_RATIO_LIMIT, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_TURBO_RATIO_LIMIT is defined as MSR_TURBO_RATIO_LIMIT in SDM.
 **/
 #define MSR_SILVERMONT_TURBO_RATIO_LIMIT         0x000001AD
 
@@ -863,6 +892,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_LASTBRANCH_TOS);
   AsmWriteMsr64 (MSR_SILVERMONT_LASTBRANCH_TOS, Msr);
   @endcode
+  @note MSR_SILVERMONT_LASTBRANCH_TOS is defined as MSR_LASTBRANCH_TOS in SDM.
 **/
 #define MSR_SILVERMONT_LASTBRANCH_TOS            0x000001C9
 
@@ -882,6 +912,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SILVERMONT_LER_FROM_LIP);
   @endcode
+  @note MSR_SILVERMONT_LER_FROM_LIP is defined as MSR_LER_FROM_LIP in SDM.
 **/
 #define MSR_SILVERMONT_LER_FROM_LIP              0x000001DD
 
@@ -902,6 +933,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SILVERMONT_LER_TO_LIP);
   @endcode
+  @note MSR_SILVERMONT_LER_TO_LIP is defined as MSR_LER_TO_LIP in SDM.
 **/
 #define MSR_SILVERMONT_LER_TO_LIP                0x000001DE
 
@@ -921,6 +953,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS);
   AsmWriteMsr64 (MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS, Msr);
   @endcode
+  @note MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
 **/
 #define MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS    0x0000038E
 
@@ -942,6 +975,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PEBS_ENABLE);
   AsmWriteMsr64 (MSR_SILVERMONT_PEBS_ENABLE, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_PEBS_ENABLE is defined as MSR_PEBS_ENABLE in SDM.
 **/
 #define MSR_SILVERMONT_PEBS_ENABLE               0x000003F1
 
@@ -988,6 +1022,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_PKG_C6_RESIDENCY);
   AsmWriteMsr64 (MSR_SILVERMONT_PKG_C6_RESIDENCY, Msr);
   @endcode
+  @note MSR_SILVERMONT_PKG_C6_RESIDENCY is defined as MSR_PKG_C6_RESIDENCY in SDM.
 **/
 #define MSR_SILVERMONT_PKG_C6_RESIDENCY          0x000003FA
 
@@ -1009,6 +1044,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_CORE_C6_RESIDENCY);
   AsmWriteMsr64 (MSR_SILVERMONT_CORE_C6_RESIDENCY, Msr);
   @endcode
+  @note MSR_SILVERMONT_CORE_C6_RESIDENCY is defined as MSR_CORE_C6_RESIDENCY in SDM.
 **/
 #define MSR_SILVERMONT_CORE_C6_RESIDENCY         0x000003FD
 
@@ -1027,6 +1063,9 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_MC3_CTL);
   AsmWriteMsr64 (MSR_SILVERMONT_MC3_CTL, Msr);
   @endcode
+  @note MSR_SILVERMONT_MC3_CTL is defined as MSR_MC3_CTL in SDM.
+        MSR_SILVERMONT_MC4_CTL is defined as MSR_MC4_CTL in SDM.
+        MSR_SILVERMONT_MC5_CTL is defined as MSR_MC5_CTL in SDM.
   @{
 **/
 #define MSR_SILVERMONT_MC3_CTL                   0x0000040C
@@ -1049,6 +1088,9 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_MC3_STATUS);
   AsmWriteMsr64 (MSR_SILVERMONT_MC3_STATUS, Msr);
   @endcode
+  @note MSR_SILVERMONT_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
+        MSR_SILVERMONT_MC4_STATUS is defined as MSR_MC4_STATUS in SDM.
+        MSR_SILVERMONT_MC5_STATUS is defined as MSR_MC5_STATUS in SDM.
   @{
 **/
 #define MSR_SILVERMONT_MC3_STATUS                0x0000040D
@@ -1074,6 +1116,9 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_MC3_ADDR);
   AsmWriteMsr64 (MSR_SILVERMONT_MC3_ADDR, Msr);
   @endcode
+  @note MSR_SILVERMONT_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
+        MSR_SILVERMONT_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
+        MSR_SILVERMONT_MC5_ADDR is defined as MSR_MC5_ADDR in SDM.
   @{
 **/
 #define MSR_SILVERMONT_MC3_ADDR                  0x0000040E
@@ -1095,6 +1140,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SILVERMONT_IA32_VMX_EPT_VPID_ENUM);
   @endcode
+  @note MSR_SILVERMONT_IA32_VMX_EPT_VPID_ENUM is defined as IA32_VMX_EPT_VPID_ENUM in SDM.
 **/
 #define MSR_SILVERMONT_IA32_VMX_EPT_VPID_ENUM    0x0000048C
 
@@ -1113,6 +1159,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SILVERMONT_IA32_VMX_FMFUNC);
   @endcode
+  @note MSR_SILVERMONT_IA32_VMX_FMFUNC is defined as IA32_VMX_FMFUNC in SDM.
 **/
 #define MSR_SILVERMONT_IA32_VMX_FMFUNC           0x00000491
 
@@ -1134,6 +1181,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_CORE_C1_RESIDENCY);
   AsmWriteMsr64 (MSR_SILVERMONT_CORE_C1_RESIDENCY, Msr);
   @endcode
+  @note MSR_SILVERMONT_CORE_C1_RESIDENCY is defined as MSR_CORE_C1_RESIDENCY in SDM.
 **/
 #define MSR_SILVERMONT_CORE_C1_RESIDENCY         0x00000660
 
@@ -1154,6 +1202,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_RAPL_POWER_UNIT);
   @endcode
+  @note MSR_SILVERMONT_RAPL_POWER_UNIT is defined as MSR_RAPL_POWER_UNIT in SDM.
 **/
 #define MSR_SILVERMONT_RAPL_POWER_UNIT           0x00000606
 
@@ -1216,6 +1265,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PKG_POWER_LIMIT);
   AsmWriteMsr64 (MSR_SILVERMONT_PKG_POWER_LIMIT, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_PKG_POWER_LIMIT is defined as MSR_PKG_POWER_LIMIT in SDM.
 **/
 #define MSR_SILVERMONT_PKG_POWER_LIMIT           0x00000610
 
@@ -1275,6 +1325,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SILVERMONT_PKG_ENERGY_STATUS);
   @endcode
+  @note MSR_SILVERMONT_PKG_ENERGY_STATUS is defined as MSR_PKG_ENERGY_STATUS in SDM.
 **/
 #define MSR_SILVERMONT_PKG_ENERGY_STATUS         0x00000611
 
@@ -1293,6 +1344,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SILVERMONT_PP0_ENERGY_STATUS);
   @endcode
+  @note MSR_SILVERMONT_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
 **/
 #define MSR_SILVERMONT_PP0_ENERGY_STATUS         0x00000639
 
@@ -1312,6 +1364,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_CC6_DEMOTION_POLICY_CONFIG);
   AsmWriteMsr64 (MSR_SILVERMONT_CC6_DEMOTION_POLICY_CONFIG, Msr);
   @endcode
+  @note MSR_SILVERMONT_CC6_DEMOTION_POLICY_CONFIG is defined as MSR_CC6_DEMOTION_POLICY_CONFIG in SDM.
 **/
 #define MSR_SILVERMONT_CC6_DEMOTION_POLICY_CONFIG 0x00000668
 
@@ -1332,6 +1385,7 @@ typedef union {
   Msr = AsmReadMsr64 (MSR_SILVERMONT_MC6_DEMOTION_POLICY_CONFIG);
   AsmWriteMsr64 (MSR_SILVERMONT_MC6_DEMOTION_POLICY_CONFIG, Msr);
   @endcode
+  @note MSR_SILVERMONT_MC6_DEMOTION_POLICY_CONFIG is defined as MSR_MC6_DEMOTION_POLICY_CONFIG in SDM.
 **/
 #define MSR_SILVERMONT_MC6_DEMOTION_POLICY_CONFIG 0x00000669
 
@@ -1352,6 +1406,7 @@ typedef union {
 
   Msr = AsmReadMsr64 (MSR_SILVERMONT_MC6_RESIDENCY_COUNTER);
   @endcode
+  @note MSR_SILVERMONT_MC6_RESIDENCY_COUNTER is defined as MSR_MC6_RESIDENCY_COUNTER in SDM.
 **/
 #define MSR_SILVERMONT_MC6_RESIDENCY_COUNTER     0x00000664
 
@@ -1371,6 +1426,7 @@ typedef union {
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PKG_POWER_INFO);
   @endcode
+  @note MSR_SILVERMONT_PKG_POWER_INFO is defined as MSR_PKG_POWER_INFO in SDM.
 **/
 #define MSR_SILVERMONT_PKG_POWER_INFO            0x0000066E
 
@@ -1419,6 +1475,7 @@ typedef union {
   Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PP0_POWER_LIMIT);
   AsmWriteMsr64 (MSR_SILVERMONT_PP0_POWER_LIMIT, Msr.Uint64);
   @endcode
+  @note MSR_SILVERMONT_PP0_POWER_LIMIT is defined as MSR_PP0_POWER_LIMIT in SDM.
 **/
 #define MSR_SILVERMONT_PP0_POWER_LIMIT           0x00000638
 
