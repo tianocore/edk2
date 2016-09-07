@@ -152,9 +152,30 @@ DefaultExceptionHandler (
     CHAR8  *Pdb;
     UINTN  ImageBase;
     UINTN  PeCoffSizeOfHeader;
+    UINT64 *Fp;
+
     Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
     if (Pdb != NULL) {
       DEBUG ((EFI_D_ERROR, "%a loaded at 0x%016lx \n", Pdb, ImageBase));
+
+      Pdb = GetImageName (SystemContext.SystemContextAArch64->LR, &ImageBase,
+              &PeCoffSizeOfHeader);
+      if (Pdb != NULL) {
+        DEBUG ((EFI_D_ERROR, "called from %a (0x%016lx) loaded at 0x%016lx \n",
+          Pdb, SystemContext.SystemContextAArch64->LR, ImageBase));
+      }
+      for (Fp = (UINT64 *)SystemContext.SystemContextAArch64->FP;
+           *Fp != 0;
+           Fp = (UINT64 *)Fp[0]) {
+        if (Fp[1] == SystemContext.SystemContextAArch64->LR) {
+         continue;
+        }
+        Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
+        if (Pdb != NULL) {
+          DEBUG ((EFI_D_ERROR, "called from %a (0x%016lx) loaded at 0x%016lx \n",
+            Pdb, Fp[1], ImageBase));
+        }
+      }
     }
   DEBUG_CODE_END ();
 
