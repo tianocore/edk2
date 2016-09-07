@@ -872,13 +872,13 @@ TranslatePciOfwNodes (
     //
     // UEFI device path prefix:
     //
-    //   PciRoot(0x0)/Pci(0x6,0x0)/HD( -- if PCI function is 0 or absent
-    //   PciRoot(0x0)/Pci(0x6,0x3)/HD( -- if PCI function is present and nonzero
+    //   PciRoot(0x0)/Pci(0x6,0x0) -- if PCI function is 0 or absent
+    //   PciRoot(0x0)/Pci(0x6,0x3) -- if PCI function is present and nonzero
     //
     Written = UnicodeSPrintAsciiFormat (
       Translated,
       *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-      "PciRoot(0x%x)%s/Pci(0x%Lx,0x%Lx)/HD(",
+      "PciRoot(0x%x)%s/Pci(0x%Lx,0x%Lx)",
       PciRoot,
       Bridges,
       PciDevFun[0],
@@ -1117,12 +1117,12 @@ TranslateMmioOfwNodes (
     //
     // UEFI device path prefix:
     //
-    //   <VenHwString>/HD(
+    //   <VenHwString>
     //
     Written = UnicodeSPrintAsciiFormat (
                 Translated,
                 *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-                "%s/HD(",
+                "%s",
                 VenHwString
                 );
   } else if (NumNodes >= 3 &&
