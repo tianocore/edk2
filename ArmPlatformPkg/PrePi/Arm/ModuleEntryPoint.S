@@ -101,7 +101,7 @@ _GetStackBase:
   sub   r10, r1, r2
 
   // Stack for the secondary core = Number of Cores - 1
-  MOV32 (r0, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
+  MOV32 (r1, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   sub   r10, r10, r1
 
   // r10 = The base of the MpCore Stacks (primary stack & secondary stacks)
