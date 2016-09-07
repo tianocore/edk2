@@ -76,7 +76,7 @@ GicGetCpuRedistributorBase (
     }
 
     // Move to the next GIC Redistributor frame
-    GicRedistributorBase += GicRedistributorGranularity;
+    GicCpuRedistributorBase += GicRedistributorGranularity;
   }
 
   // The Redistributor has not been found for the current CPU
