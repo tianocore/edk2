@@ -43,6 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FRONT_PAGE_KEY_CONTINUE               0x1000
 #define FRONT_PAGE_KEY_RESET                  0x1001
 #define FRONT_PAGE_KEY_LANGUAGE               0x1002
+#define FRONT_PAGE_KEY_DRIVER                 0x2000
 
 typedef struct {
   EFI_STRING_ID   PromptId;
@@ -656,7 +657,7 @@ UiListThirdPartyDrivers (
       gHiiDriverList[Index].PromptId,
       gHiiDriverList[Index].HelpId,
       0,
-      0,
+      (EFI_QUESTION_ID) (Index + FRONT_PAGE_KEY_DRIVER),
       0,
       &gHiiDriverList[Index].FormSetGuid,
       gHiiDriverList[Index].DevicePathId
