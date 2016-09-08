@@ -1,7 +1,7 @@
 ##  @file
 # Provides shell network1 functions
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -55,6 +55,7 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiTimerArchProtocolGuid
   gEfiIp6ProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiIp6ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiIp6ConfigProtocolGuid                     ## SOMETIMES_CONSUMES
