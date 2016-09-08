@@ -2802,11 +2802,18 @@ ParseHandleDatabaseForChildControllers(
 
   FreePool (DriverBindingHandleBuffer);
 
+  if (MatchingHandleBuffer == NULL || *MatchingHandleCount == 0) {
+    //
+    // The caller is not interested in the actual handles, or we've found none.
+    //
+    FreePool (HandleBufferForReturn);
+    HandleBufferForReturn = NULL;
+  }
+
   if (MatchingHandleBuffer != NULL) {
     *MatchingHandleBuffer = HandleBufferForReturn;
-  } else {
-    FreePool(HandleBufferForReturn);
   }
+
   ASSERT ((MatchingHandleBuffer == NULL) ||
           (*MatchingHandleCount == 0 && *MatchingHandleBuffer == NULL) ||
           (*MatchingHandleCount != 0 && *MatchingHandleBuffer != NULL));
