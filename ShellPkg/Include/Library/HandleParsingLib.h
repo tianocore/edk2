@@ -306,7 +306,7 @@ ParseHandleDatabaseForChildDevices(
   Gets handles for any child controllers of the passed in controller.
 
   @param[in] ControllerHandle       The handle of the "parent controller".
-  @param[in] MatchingHandleCount    The pointer to the number of handles in
+  @param[out] MatchingHandleCount   The pointer to the number of handles in
                                     MatchingHandleBuffer on return.
   @param[out] MatchingHandleBuffer  The buffer containing handles on a successful
                                     return.
@@ -317,7 +317,7 @@ EFI_STATUS
 EFIAPI
 ParseHandleDatabaseForChildControllers(
   IN CONST EFI_HANDLE       ControllerHandle,
-  IN UINTN                  *MatchingHandleCount,
+  OUT UINTN                 *MatchingHandleCount,
   OUT EFI_HANDLE            **MatchingHandleBuffer OPTIONAL
   );
 
