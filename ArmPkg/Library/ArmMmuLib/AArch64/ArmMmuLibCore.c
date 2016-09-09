@@ -298,7 +298,7 @@ GetBlockEntryListFromAddress (
         }
 
         // Create a new translation table
-        TranslationTable = (UINT64*)AllocateAlignedPages (EFI_SIZE_TO_PAGES(TT_ENTRY_COUNT * sizeof(UINT64)), TT_ALIGNMENT_DESCRIPTION_TABLE);
+        TranslationTable = AllocatePages (1);
         if (TranslationTable == NULL) {
           return NULL;
         }
@@ -321,7 +321,7 @@ GetBlockEntryListFromAddress (
         //
 
         // Create a new translation table
-        TranslationTable = (UINT64*)AllocateAlignedPages (EFI_SIZE_TO_PAGES(TT_ENTRY_COUNT * sizeof(UINT64)), TT_ALIGNMENT_DESCRIPTION_TABLE);
+        TranslationTable = AllocatePages (1);
         if (TranslationTable == NULL) {
           return NULL;
         }
@@ -553,7 +553,6 @@ ArmConfigureMmu (
   )
 {
   VOID*                         TranslationTable;
-  UINTN                         TranslationTablePageCount;
   UINT32                        TranslationTableAttribute;
   ARM_MEMORY_REGION_DESCRIPTOR *MemoryTableEntry;
   UINT64                        MaxAddress;
@@ -640,8 +639,7 @@ ArmConfigureMmu (
   ArmSetTCR (TCR);
 
   // Allocate pages for translation table
-  TranslationTablePageCount = EFI_SIZE_TO_PAGES(RootTableEntryCount * sizeof(UINT64));
-  TranslationTable = (UINT64*)AllocateAlignedPages (TranslationTablePageCount, TT_ALIGNMENT_DESCRIPTION_TABLE);
+  TranslationTable = AllocatePages (1);
   if (TranslationTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
@@ -718,7 +716,7 @@ ArmConfigureMmu (
   return RETURN_SUCCESS;
 
 FREE_TRANSLATION_TABLE:
-  FreePages (TranslationTable, TranslationTablePageCount);
+  FreePages (TranslationTable, 1);
   return Status;
 }
 
