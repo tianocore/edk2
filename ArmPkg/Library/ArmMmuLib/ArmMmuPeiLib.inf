@@ -28,9 +28,13 @@
 
 [Packages]
   ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
   ArmLib
   CacheMaintenanceLib
   MemoryAllocationLib
+
+[Pcd.AARCH64]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize

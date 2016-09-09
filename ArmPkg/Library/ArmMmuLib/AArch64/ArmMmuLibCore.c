@@ -555,9 +555,7 @@ ArmConfigureMmu (
   VOID*                         TranslationTable;
   VOID*                         TranslationTableBuffer;
   UINT32                        TranslationTableAttribute;
-  ARM_MEMORY_REGION_DESCRIPTOR *MemoryTableEntry;
   UINT64                        MaxAddress;
-  UINT64                        TopAddress;
   UINTN                         T0SZ;
   UINTN                         RootTableEntryCount;
   UINTN                         RootTableEntrySize;
@@ -569,16 +567,8 @@ ArmConfigureMmu (
     return RETURN_INVALID_PARAMETER;
   }
 
-  // Identify the highest address of the memory table
-  MaxAddress = MemoryTable->PhysicalBase + MemoryTable->Length - 1;
-  MemoryTableEntry = MemoryTable;
-  while (MemoryTableEntry->Length != 0) {
-    TopAddress = MemoryTableEntry->PhysicalBase + MemoryTableEntry->Length - 1;
-    if (TopAddress > MaxAddress) {
-      MaxAddress = TopAddress;
-    }
-    MemoryTableEntry++;
-  }
+  // Cover the entire GCD memory space
+  MaxAddress = (1UL << PcdGet8 (PcdPrePiCpuMemorySize)) - 1;
 
   // Lookup the Table Level to get the information
   LookupAddresstoRootTable (MaxAddress, &T0SZ, &RootTableEntryCount);
