@@ -553,12 +553,14 @@ ArmConfigureMmu (
   )
 {
   VOID*                         TranslationTable;
+  VOID*                         TranslationTableBuffer;
   UINT32                        TranslationTableAttribute;
   ARM_MEMORY_REGION_DESCRIPTOR *MemoryTableEntry;
   UINT64                        MaxAddress;
   UINT64                        TopAddress;
   UINTN                         T0SZ;
   UINTN                         RootTableEntryCount;
+  UINTN                         RootTableEntrySize;
   UINT64                        TCR;
   RETURN_STATUS                 Status;
 
@@ -638,8 +640,19 @@ ArmConfigureMmu (
   // Set TCR
   ArmSetTCR (TCR);
 
-  // Allocate pages for translation table
-  TranslationTable = AllocatePages (1);
+  // Allocate pages for translation table. Pool allocations are 8 byte aligned,
+  // but we may require a higher alignment based on the size of the root table.
+  RootTableEntrySize = RootTableEntryCount * sizeof(UINT64);
+  if (RootTableEntrySize < EFI_PAGE_SIZE / 2) {
+    TranslationTableBuffer = AllocatePool (2 * RootTableEntrySize - 8);
+    //
+    // Naturally align the root table. Preserves possible NULL value
+    //
+    TranslationTable = (VOID *)((UINTN)(TranslationTableBuffer - 1) | (RootTableEntrySize - 1)) + 1;
+  } else {
+    TranslationTable = AllocatePages (1);
+    TranslationTableBuffer = NULL;
+  }
   if (TranslationTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
@@ -653,10 +666,10 @@ ArmConfigureMmu (
   }
 
   if (TranslationTableSize != NULL) {
-    *TranslationTableSize = RootTableEntryCount * sizeof(UINT64);
+    *TranslationTableSize = RootTableEntrySize;
   }
 
-  ZeroMem (TranslationTable, RootTableEntryCount * sizeof(UINT64));
+  ZeroMem (TranslationTable, RootTableEntrySize);
 
   // Disable MMU and caches. ArmDisableMmu() also invalidates the TLBs
   ArmDisableMmu ();
@@ -716,7 +729,11 @@ ArmConfigureMmu (
   return RETURN_SUCCESS;
 
 FREE_TRANSLATION_TABLE:
-  FreePages (TranslationTable, 1);
+  if (TranslationTableBuffer != NULL) {
+    FreePool (TranslationTableBuffer);
+  } else {
+    FreePages (TranslationTable, 1);
+  }
   return Status;
 }
 
