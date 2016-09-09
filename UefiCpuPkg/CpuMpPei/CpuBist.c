@@ -84,6 +84,7 @@ SecPlatformInformation2 (
   @param  PpiDescriptor       Return a pointer to instance of the
                               EFI_PEI_PPI_DESCRIPTOR
   @param  BistInformationData Pointer to BIST information data
+  @param  BistInformationSize Return the size in bytes of BIST information
 
   @retval EFI_SUCCESS         Retrieve of the BIST data successfully
   @retval EFI_NOT_FOUND       No sec platform information(2) ppi export
@@ -95,7 +96,8 @@ GetBistInfoFromPpi (
   IN CONST EFI_PEI_SERVICES     **PeiServices,
   IN CONST EFI_GUID             *Guid,
      OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor,
-     OUT VOID                   **BistInformationData
+     OUT VOID                   **BistInformationData,
+     OUT UINT64                 *BistInformationSize OPTIONAL
   )
 {
   EFI_STATUS                            Status;
@@ -140,6 +142,9 @@ GetBistInfoFromPpi (
                                                );
         if (Status == EFI_SUCCESS) {
           *BistInformationData = SecPlatformInformation2;
+          if (BistInformationSize != NULL) {
+            *BistInformationSize = InformationSize;
+          }
           return EFI_SUCCESS;
         }
       }
@@ -191,7 +196,8 @@ CollectBistDataFromPpi (
              PeiServices,
              &gEfiSecPlatformInformation2PpiGuid,
              &SecInformationDescriptor,
-             (VOID *) &SecPlatformInformation2
+             (VOID *) &SecPlatformInformation2,
+             NULL
              );
   if (Status == EFI_SUCCESS) {
     //
@@ -207,7 +213,8 @@ CollectBistDataFromPpi (
                PeiServices,
                &gEfiSecPlatformInformationPpiGuid,
                &SecInformationDescriptor,
-               (VOID *) &SecPlatformInformation
+               (VOID *) &SecPlatformInformation,
+               NULL
                );
     if (Status == EFI_SUCCESS) {
       NumberOfData = 1;
