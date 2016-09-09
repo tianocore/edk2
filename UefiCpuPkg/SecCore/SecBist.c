@@ -15,30 +15,26 @@
 #include "SecMain.h"
 
 /**
-  Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
+  Worker function to parse CPU BIST information from Guided HOB.
 
-  @param  PeiServices                The pointer to the PEI Services Table.
-  @param  StructureSize              The pointer to the variable describing size of the input buffer.
-  @param  PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
+  @param[out] StructureSize     Pointer to the variable describing size of the input buffer.
+  @param[out] StructureBuffer   Pointer to the buffer save CPU BIST information.
 
-  @retval EFI_SUCCESS                The data was successfully returned.
-  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small. The current buffer size needed to
-                                     hold the record is returned in StructureSize.
+  @retval EFI_SUCCESS           The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL  The buffer was too small.
 
 **/
 EFI_STATUS
-EFIAPI
-SecPlatformInformation2 (
-  IN CONST EFI_PEI_SERVICES                   **PeiServices,
-  IN OUT UINT64                               *StructureSize,
-     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
+GetBistFromHob (
+  IN OUT UINT64           *StructureSize,
+  IN OUT VOID             *StructureBuffer
   )
 {
   EFI_HOB_GUID_TYPE       *GuidHob;
   VOID                    *DataInHob;
   UINTN                   DataSize;
 
-  GuidHob = GetFirstGuidHob (&gEfiSecPlatformInformation2PpiGuid);
+  GuidHob = GetFirstGuidHob (&gEfiCallerIdGuid);
   if (GuidHob == NULL) {
     *StructureSize = 0;
     return EFI_SUCCESS;
@@ -56,20 +52,65 @@ SecPlatformInformation2 (
   }
 
   *StructureSize = (UINT64) DataSize;
-  CopyMem (PlatformInformationRecord2, DataInHob, DataSize);
+  CopyMem (StructureBuffer, DataInHob, DataSize);
   return EFI_SUCCESS;
+}
+
+/**
+  Implementation of the PlatformInformation service in EFI_SEC_PLATFORM_INFORMATION_PPI.
+
+  @param[in]  PeiServices                Pointer to the PEI Services Table.
+  @param[out] StructureSize              Pointer to the variable describing size of the input buffer.
+  @param[out  PlatformInformationRecord  Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
+
+  @retval EFI_SUCCESS                    The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL           The buffer was too small.
+
+**/
+EFI_STATUS
+EFIAPI
+SecPlatformInformationBist (
+  IN CONST EFI_PEI_SERVICES                  **PeiServices,
+  IN OUT UINT64                              *StructureSize,
+     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD *PlatformInformationRecord
+  )
+{
+  return GetBistFromHob (StructureSize, PlatformInformationRecord);
+}
+
+/**
+  Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
+
+  @param[in]  PeiServices                The pointer to the PEI Services Table.
+  @param[out] StructureSize              The pointer to the variable describing size of the input buffer.
+  @param[out] PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
+
+  @retval EFI_SUCCESS                    The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL           The buffer was too small. The current buffer size needed to
+                                         hold the record is returned in StructureSize.
+
+**/
+EFI_STATUS
+EFIAPI
+SecPlatformInformation2Bist (
+  IN CONST EFI_PEI_SERVICES                   **PeiServices,
+  IN OUT UINT64                               *StructureSize,
+     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
+  )
+{
+  return GetBistFromHob (StructureSize, PlatformInformationRecord2);
 }
 
 /**
   Worker function to get CPUs' BIST by calling SecPlatformInformationPpi
   or SecPlatformInformation2Ppi.
 
-  @param  PeiServices         Pointer to PEI Services Table
-  @param  Guid                PPI Guid
-  @param  PpiDescriptor       Return a pointer to instance of the
-                              EFI_PEI_PPI_DESCRIPTOR
-  @param  BistInformationData Pointer to BIST information data
-  @param  BistInformationSize Return the size in bytes of BIST information
+  @param[in]  PeiServices         Pointer to PEI Services Table
+  @param[in]  Guid                PPI Guid
+  @param[out] PpiDescriptor       Return a pointer to instance of the
+                                  EFI_PEI_PPI_DESCRIPTOR
+  @param[out] BistInformationData Pointer to BIST information data
+  @param[out] BistInformationSize Return the size in bytes of BIST information
 
   @retval EFI_SUCCESS         Retrieve of the BIST data successfully
   @retval EFI_NOT_FOUND       No sec platform information(2) ppi export
