@@ -1,7 +1,7 @@
 /** @file
   Master header file for SecCore.
 
-  Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,7 @@
 #include <PiPei.h>
 
 #include <Ppi/SecPlatformInformation.h>
+#include <Ppi/SecPlatformInformation2.h>
 #include <Ppi/TemporaryRamDone.h>
 
 #include <Library/BaseLib.h>
@@ -31,7 +32,9 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/ReportStatusCodeLib.h>
-
+#include <Library/PeiServicesTablePointerLib.h>
+#include <Library/HobLib.h>
+#include <Library/PeiServicesLib.h>
 
 #define SEC_IDT_ENTRY_COUNT  34
 

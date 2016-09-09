@@ -37,6 +37,7 @@
   SecMain.c
   SecMain.h
   FindPeiCore.c
+  SecBist.c
 
 [Sources.IA32]
   Ia32/ResetVec.nasmb
@@ -58,6 +59,9 @@
   PeCoffExtraActionLib
   CpuExceptionHandlerLib
   ReportStatusCodeLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  HobLib
 
 [Ppis]
   gEfiSecPlatformInformationPpiGuid                    ## PRODUCES
