@@ -231,7 +231,7 @@ FileHandleWrite(
 
 @param FileHandle               the file handle to close.
 
-@retval EFI_SUCCESS             the file handle was closed sucessfully.
+@retval EFI_SUCCESS             the file handle was closed successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -261,7 +261,7 @@ FileHandleClose (
 
   @param FileHandle             the file handle to delete
 
-  @retval EFI_SUCCESS           the file was closed sucessfully
+  @retval EFI_SUCCESS           the file was closed successfully
   @retval EFI_WARN_DELETE_FAILURE the handle was closed, but the file was not
                                 deleted
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
@@ -297,9 +297,9 @@ FileHandleDelete (
   has the effect of starting the read process of the directory entries over.
 
   @param FileHandle             The file handle on which the position is being set
-  @param Position               Byte position from begining of file
+  @param Position               Byte position from beginning of file
 
-  @retval EFI_SUCCESS           Operation completed sucessfully.
+  @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_UNSUPPORTED       the seek request for non-zero is not valid on
                                 directories.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
@@ -330,9 +330,9 @@ FileHandleSetPosition (
   if FileHandle is a directory.
 
   @param FileHandle             The open file handle on which to get the position.
-  @param Position               Byte position from begining of file.
+  @param Position               Byte position from beginning of file.
 
-  @retval EFI_SUCCESS           the operation completed sucessfully.
+  @retval EFI_SUCCESS           the operation completed successfully.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED       the request is not valid on directories.
 **/
@@ -489,7 +489,7 @@ FileHandleFindFirstFile (
   }
 
   //
-  // reset to the begining of the directory
+  // reset to the beginning of the directory
   //
   Status = FileHandleSetPosition(DirHandle, 0);
   if (EFI_ERROR(Status)) {
@@ -581,7 +581,7 @@ FileHandleFindNextFile(
   @param[in] FileHandle         The file handle from which size is retrieved.
   @param[out] Size              The pointer to size.
 
-  @retval EFI_SUCCESS           Operation was completed sucessfully.
+  @retval EFI_SUCCESS           Operation was completed successfully.
   @retval EFI_DEVICE_ERROR      Cannot access the file.
   @retval EFI_INVALID_PARAMETER FileHandle is NULL.
                                 Size is NULL.
@@ -821,7 +821,7 @@ FileHandleGetFileName (
         break;
       } else {
         //
-        // We got info... do we have a name? if yes preceed the current path with it...
+        // We got info... do we have a name? if yes precede the current path with it...
         //
         if (StrLen (FileInfo->FileName) == 0) {
           if (*FullFileName == NULL) {
@@ -1181,7 +1181,7 @@ FileHandleWriteLine(
   @param[in] Format   the format argument (see printlib for format specifier)
   @param[in] ...      the variable arguments for the format
 
-  @retval EFI_SUCCESS the operation was sucessful
+  @retval EFI_SUCCESS the operation was successful
   @return other       a return value from FileHandleWriteLine
 
   @sa FileHandleWriteLine

@@ -1,5 +1,5 @@
 /** @file
-  Unicode and ASCII string primatives.
+  Unicode and ASCII string primitives.
 
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials

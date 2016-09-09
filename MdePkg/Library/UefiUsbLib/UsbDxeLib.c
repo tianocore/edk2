@@ -628,7 +628,7 @@ UsbClearEndpointHalt (
 
   ZeroMem (&EndpointDescriptor, sizeof (EFI_USB_ENDPOINT_DESCRIPTOR));
   //
-  // First seach the endpoint descriptor for that endpoint addr
+  // First search the endpoint descriptor for that endpoint addr
   //
   Result = UsbIo->UsbGetInterfaceDescriptor (
                     UsbIo,
