@@ -119,6 +119,26 @@ DescribeExceptionSyndrome (
   DEBUG ((EFI_D_ERROR, "\n %a \n", Message));
 }
 
+#ifndef MDEPKG_NDEBUG
+STATIC
+CONST CHAR8 *
+BaseName (
+  IN  CONST CHAR8 *FullName
+  )
+{
+  CONST CHAR8 *Str;
+
+  Str = FullName + AsciiStrLen (FullName);
+
+  while (--Str > FullName) {
+    if (*Str == '/' || *Str == '\\') {
+      return Str + 1;
+    }
+  }
+  return Str;
+}
+#endif
+
 /**
   This is the default action to take on an unexpected exception
 
@@ -156,13 +176,13 @@ DefaultExceptionHandler (
 
     Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
     if (Pdb != NULL) {
-      DEBUG ((EFI_D_ERROR, "%a loaded at 0x%016lx \n", Pdb, ImageBase));
+      DEBUG ((EFI_D_ERROR, "%a loaded at 0x%016lx \n", BaseName (Pdb), ImageBase));
 
       Pdb = GetImageName (SystemContext.SystemContextAArch64->LR, &ImageBase,
               &PeCoffSizeOfHeader);
       if (Pdb != NULL) {
         DEBUG ((EFI_D_ERROR, "called from %a (0x%016lx) loaded at 0x%016lx \n",
-          Pdb, SystemContext.SystemContextAArch64->LR, ImageBase));
+          BaseName (Pdb), SystemContext.SystemContextAArch64->LR, ImageBase));
       }
       for (Fp = (UINT64 *)SystemContext.SystemContextAArch64->FP;
            *Fp != 0;
@@ -173,7 +193,7 @@ DefaultExceptionHandler (
         Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
         if (Pdb != NULL) {
           DEBUG ((EFI_D_ERROR, "called from %a (0x%016lx) loaded at 0x%016lx \n",
-            Pdb, Fp[1], ImageBase));
+            BaseName (Pdb), Fp[1], ImageBase));
         }
       }
     }
