@@ -250,7 +250,7 @@ CollectBistDataFromPpi (
         );
     }
     DEBUG ((EFI_D_INFO, "  APICID - 0x%08x, BIST - 0x%08x\n",
-            ProcessorInfo.ProcessorId,
+            (UINT32) ProcessorInfo.ProcessorId,
             BistData
             ));
   }
