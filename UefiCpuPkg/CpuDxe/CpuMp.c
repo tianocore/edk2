@@ -539,6 +539,7 @@ CollectBistDataFromHob (
   UINTN                                 ProcessorNumber;
   EFI_PROCESSOR_INFORMATION             ProcessorInfo;
   EFI_HEALTH_FLAGS                      BistData;
+  UINTN                                 CpuInstanceNumber;
 
   SecPlatformInformation2 = NULL;
   SecPlatformInformation  = NULL;
@@ -578,24 +579,24 @@ CollectBistDataFromHob (
     }
   }
 
-  while ((NumberOfData--) > 0) {
-    for (ProcessorNumber = 0; ProcessorNumber < mNumberOfProcessors; ProcessorNumber++) {
-      MpInitLibGetProcessorInfo (ProcessorNumber, &ProcessorInfo, &BistData);
-      if (ProcessorInfo.ProcessorId == CpuInstance[NumberOfData].CpuLocation) {
+  for (ProcessorNumber = 0; ProcessorNumber < mNumberOfProcessors; ProcessorNumber++) {
+    MpInitLibGetProcessorInfo (ProcessorNumber, &ProcessorInfo, &BistData);
+    for (CpuInstanceNumber = 0; CpuInstanceNumber < NumberOfData; CpuInstanceNumber++) {
+      if (ProcessorInfo.ProcessorId == CpuInstance[CpuInstanceNumber].CpuLocation) {
         //
         // Update CPU health status for MP Services Protocol according to BIST data.
         //
-        BistData = CpuInstance[NumberOfData].InfoRecord.IA32HealthFlags;
+        BistData = CpuInstance[CpuInstanceNumber].InfoRecord.IA32HealthFlags;
       }
-      if (BistData.Uint32 != 0) {
-        //
-        // Report Status Code that self test is failed
-        //
-        REPORT_STATUS_CODE (
-          EFI_ERROR_CODE | EFI_ERROR_MAJOR,
-          (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_SELF_TEST)
-          );
-      }
+    }
+    if (BistData.Uint32 != 0) {
+      //
+      // Report Status Code that self test is failed
+      //
+      REPORT_STATUS_CODE (
+        EFI_ERROR_CODE | EFI_ERROR_MAJOR,
+        (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_SELF_TEST)
+        );
     }
   }
 }
