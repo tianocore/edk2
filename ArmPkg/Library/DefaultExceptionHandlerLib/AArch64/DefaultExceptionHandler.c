@@ -169,31 +169,49 @@ DefaultExceptionHandler (
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
   DEBUG_CODE_BEGIN ();
-    CHAR8  *Pdb;
+    CHAR8  *Pdb, *PrevPdb;
     UINTN  ImageBase;
     UINTN  PeCoffSizeOfHeader;
     UINT64 *Fp;
+    UINT64 RootFp[2];
+    UINTN  Idx;
 
-    Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
+    PrevPdb = Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
     if (Pdb != NULL) {
-      DEBUG ((EFI_D_ERROR, "%a loaded at 0x%016lx \n", BaseName (Pdb), ImageBase));
+      DEBUG ((EFI_D_ERROR, "PC 0x%012lx (0x%012lx+0x%08x) [ 0] %a\n",
+        SystemContext.SystemContextAArch64->ELR, ImageBase,
+        SystemContext.SystemContextAArch64->ELR - ImageBase, BaseName (Pdb)));
 
-      Pdb = GetImageName (SystemContext.SystemContextAArch64->LR, &ImageBase,
-              &PeCoffSizeOfHeader);
-      if (Pdb != NULL) {
-        DEBUG ((EFI_D_ERROR, "called from %a (0x%016lx) loaded at 0x%016lx \n",
-          BaseName (Pdb), SystemContext.SystemContextAArch64->LR, ImageBase));
-      }
-      for (Fp = (UINT64 *)SystemContext.SystemContextAArch64->FP;
-           *Fp != 0;
-           Fp = (UINT64 *)Fp[0]) {
-        if (Fp[1] == SystemContext.SystemContextAArch64->LR) {
-         continue;
+      if ((UINT64 *)SystemContext.SystemContextAArch64->FP != 0) {
+        Idx = 0;
+
+        RootFp[0] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[0];
+        RootFp[1] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[1];
+        if (RootFp[1] != SystemContext.SystemContextAArch64->LR) {
+          RootFp[0] = SystemContext.SystemContextAArch64->FP;
+          RootFp[1] = SystemContext.SystemContextAArch64->LR;
         }
-        Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
-        if (Pdb != NULL) {
-          DEBUG ((EFI_D_ERROR, "called from %a (0x%016lx) loaded at 0x%016lx \n",
-            BaseName (Pdb), Fp[1], ImageBase));
+        for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
+          Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
+          if (Pdb != NULL) {
+            if (Pdb != PrevPdb) {
+              Idx++;
+              PrevPdb = Pdb;
+            }
+            DEBUG ((EFI_D_ERROR, "PC 0x%012lx (0x%012lx+0x%08x) [% 2d] %a\n",
+              Fp[1], ImageBase, Fp[1] - ImageBase, Idx, BaseName (Pdb)));
+          }
+        }
+        PrevPdb = Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
+        DEBUG ((EFI_D_ERROR, "\n[ 0] %a\n", Pdb));
+
+        Idx = 0;
+        for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
+          Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
+          if (Pdb != NULL && Pdb != PrevPdb) {
+            DEBUG ((EFI_D_ERROR, "[% 2d] %a\n", ++Idx, Pdb));
+            PrevPdb = Pdb;
+          }
         }
       }
     }
