@@ -121,20 +121,8 @@ GcdAttributeToArmAttribute (
   }
 }
 
-// Describe the T0SZ values for each translation table level
-typedef struct {
-  UINTN     MinT0SZ;
-  UINTN     MaxT0SZ;
-  UINTN     LargestT0SZ; // Generally (MaxT0SZ == LargestT0SZ) but at the Level3 Table
-                         // the MaxT0SZ is not at the boundary of the table
-} T0SZ_DESCRIPTION_PER_LEVEL;
-
-// Map table for the corresponding Level of Table
-STATIC CONST T0SZ_DESCRIPTION_PER_LEVEL T0SZPerTableLevel[] = {
-    { 16, 24, 24 }, // Table Level 0
-    { 25, 33, 33 }, // Table Level 1
-    { 34, 39, 42 }  // Table Level 2
-};
+#define MIN_T0SZ        16
+#define BITS_PER_LEVEL  9
 
 VOID
 GetRootTranslationTableInfo (
@@ -143,28 +131,13 @@ GetRootTranslationTableInfo (
   OUT UINTN   *TableEntryCount
   )
 {
-  UINTN Index;
-
-  // Identify the level of the root table from the given T0SZ
-  for (Index = 0; Index < sizeof (T0SZPerTableLevel) / sizeof (T0SZ_DESCRIPTION_PER_LEVEL); Index++) {
-    if (T0SZ <= T0SZPerTableLevel[Index].MaxT0SZ) {
-      break;
-    }
-  }
-
-  // If we have not found the corresponding maximum T0SZ then we use the last one
-  if (Index == sizeof (T0SZPerTableLevel) / sizeof (T0SZ_DESCRIPTION_PER_LEVEL)) {
-    Index--;
-  }
-
   // Get the level of the root table
   if (TableLevel) {
-    *TableLevel = Index;
+    *TableLevel = (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
   }
 
-  // The Size of the Table is 2^(T0SZ-LargestT0SZ)
   if (TableEntryCount) {
-    *TableEntryCount = 1 << (T0SZPerTableLevel[Index].LargestT0SZ - T0SZ + 1);
+    *TableEntryCount = 1UL << (BITS_PER_LEVEL - (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL);
   }
 }
 
