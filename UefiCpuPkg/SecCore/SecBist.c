@@ -14,6 +14,26 @@
 
 #include "SecMain.h"
 
+EFI_SEC_PLATFORM_INFORMATION_PPI mSecPlatformInformation = {
+  SecPlatformInformationBist
+};
+
+EFI_PEI_PPI_DESCRIPTOR mPeiSecPlatformInformation = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiSecPlatformInformationPpiGuid,
+  &mSecPlatformInformation
+};
+
+EFI_SEC_PLATFORM_INFORMATION2_PPI mSecPlatformInformation2 = {
+  SecPlatformInformation2Bist
+};
+
+EFI_PEI_PPI_DESCRIPTOR mPeiSecPlatformInformation2 = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiSecPlatformInformation2PpiGuid,
+  &mSecPlatformInformation2
+};
+
 /**
   Worker function to parse CPU BIST information from Guided HOB.
 
@@ -178,4 +198,71 @@ GetBistInfoFromPpi (
   }
 
   return EFI_DEVICE_ERROR;
+}
+
+/**
+  Get CPUs' BIST by calling SecPlatformInformationPpi/SecPlatformInformation2Ppi.
+
+**/
+VOID
+RepublishSecPlatformInformationPpi (
+  VOID
+  )
+{
+  EFI_STATUS                            Status;
+  CONST EFI_PEI_SERVICES                **PeiServices;
+  UINT64                                BistInformationSize;
+  VOID                                  *BistInformationData;
+  EFI_PEI_PPI_DESCRIPTOR                *SecInformationDescriptor;
+
+  PeiServices = GetPeiServicesTablePointer ();
+  Status = GetBistInfoFromPpi (
+             PeiServices,
+             &gEfiSecPlatformInformation2PpiGuid,
+             &SecInformationDescriptor,
+             &BistInformationData,
+             &BistInformationSize
+             );
+  if (Status == EFI_SUCCESS) {
+    BuildGuidDataHob (
+      &gEfiCallerIdGuid,
+      BistInformationData,
+      (UINTN) BistInformationSize
+      );
+    //
+    // The old SecPlatformInformation data is on CAR.
+    // After memory discovered, we should never get it from CAR, or the data will be crashed.
+    // So, we reinstall SecPlatformInformation PPI here.
+    //
+    Status = PeiServicesReInstallPpi (
+               SecInformationDescriptor,
+               &mPeiSecPlatformInformation2
+               );
+  } if (Status == EFI_NOT_FOUND) {
+    Status = GetBistInfoFromPpi (
+               PeiServices,
+               &gEfiSecPlatformInformationPpiGuid,
+               &SecInformationDescriptor,
+               &BistInformationData,
+               &BistInformationSize
+               );
+    if (Status == EFI_SUCCESS) {
+      BuildGuidDataHob (
+        &gEfiCallerIdGuid,
+        BistInformationData,
+        (UINTN) BistInformationSize
+        );
+      //
+      // The old SecPlatformInformation2 data is on CAR.
+      // After memory discovered, we should never get it from CAR, or the data will be crashed.
+      // So, we reinstall SecPlatformInformation2 PPI here.
+      //
+      Status = PeiServicesReInstallPpi (
+                 SecInformationDescriptor,
+                 &mPeiSecPlatformInformation
+                 );
+    }
+  }
+
+  ASSERT_EFI_ERROR(Status);
 }

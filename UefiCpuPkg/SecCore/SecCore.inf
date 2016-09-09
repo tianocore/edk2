@@ -66,7 +66,12 @@
   HobLib
 
 [Ppis]
-  gEfiSecPlatformInformationPpiGuid                    ## PRODUCES
+  ## SOMETIMES_CONSUMES
+  ## PRODUCES
+  gEfiSecPlatformInformationPpiGuid
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecPlatformInformation2PpiGuid
   gEfiTemporaryRamDonePpiGuid                          ## PRODUCES
 
 [Pcd]
