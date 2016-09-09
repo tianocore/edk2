@@ -44,34 +44,29 @@ SecPlatformInformation2 (
      OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
   )
 {
-  UINTN                                BistInformationSize;
-  UINTN                                CpuIndex;
-  EFI_SEC_PLATFORM_INFORMATION_CPU     *CpuInstance;
-  EFI_PROCESSOR_INFORMATION            ProcessorInfo;
-  EFI_HEALTH_FLAGS                     BistData;
-  UINTN                                NumberOfProcessors;
-  UINTN                                NumberOfEnabledProcessors;
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  VOID                    *DataInHob;
+  UINTN                   DataSize;
 
-  MpInitLibGetNumberOfProcessors(&NumberOfProcessors, &NumberOfEnabledProcessors);
+  GuidHob = GetFirstGuidHob (&gEfiSecPlatformInformation2PpiGuid);
+  if (GuidHob == NULL) {
+    *StructureSize = 0;
+    return EFI_SUCCESS;
+  }
 
-  BistInformationSize = sizeof (EFI_SEC_PLATFORM_INFORMATION_RECORD2) +
-                        sizeof (EFI_SEC_PLATFORM_INFORMATION_CPU) * NumberOfProcessors;
+  DataInHob = GET_GUID_HOB_DATA (GuidHob);
+  DataSize  = GET_GUID_HOB_DATA_SIZE (GuidHob);
+
   //
-  // return the information size if input buffer size is too small
+  // return the information from BistHob
   //
-  if ((*StructureSize) < (UINT64) BistInformationSize) {
-    *StructureSize = (UINT64) BistInformationSize;
+  if ((*StructureSize) < (UINT64) DataSize) {
+    *StructureSize = (UINT64) DataSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  PlatformInformationRecord2->NumberOfCpus = (UINT32)NumberOfProcessors;
-  CpuInstance = PlatformInformationRecord2->CpuInstance;
-  for (CpuIndex = 0; CpuIndex < NumberOfProcessors; CpuIndex ++) {
-    MpInitLibGetProcessorInfo (CpuIndex, &ProcessorInfo, &BistData);
-    CpuInstance[CpuIndex].CpuLocation = (UINT32) ProcessorInfo.ProcessorId;
-    CpuInstance[CpuIndex].InfoRecord.IA32HealthFlags = BistData;
-  }
-
+  *StructureSize = (UINT64) DataSize;
+  CopyMem (PlatformInformationRecord2, DataInHob, DataSize);
   return EFI_SUCCESS;
 }
 
@@ -181,14 +176,26 @@ CollectBistDataFromPpi (
   EFI_HEALTH_FLAGS                      BistData;
   UINTN                                 NumberOfProcessors;
   UINTN                                 NumberOfEnabledProcessors;
+  UINTN                                 BistInformationSize;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD2  *PlatformInformationRecord2;
+  EFI_SEC_PLATFORM_INFORMATION_CPU      *CpuInstanceInHob;
+  
 
   MpInitLibGetNumberOfProcessors(&NumberOfProcessors, &NumberOfEnabledProcessors);
+
+  BistInformationSize = sizeof (EFI_SEC_PLATFORM_INFORMATION_RECORD2) +
+                        sizeof (EFI_SEC_PLATFORM_INFORMATION_CPU) * NumberOfProcessors;
+  Status = PeiServicesAllocatePool (
+             (UINTN) BistInformationSize,
+             (VOID **) &PlatformInformationRecord2
+             );
+  ASSERT_EFI_ERROR (Status);
+  PlatformInformationRecord2->NumberOfCpus = (UINT32)NumberOfProcessors;
 
   SecPlatformInformation2 = NULL;
   SecPlatformInformation  = NULL;
   NumberOfData            = 0;
   CpuInstance             = NULL;
-
   //
   // Get BIST information from Sec Platform Information2 Ppi firstly
   //
@@ -253,7 +260,20 @@ CollectBistDataFromPpi (
             (UINT32) ProcessorInfo.ProcessorId,
             BistData
             ));
+    CpuInstanceInHob = PlatformInformationRecord2->CpuInstance;
+    CpuInstanceInHob[ProcessorNumber].CpuLocation = (UINT32) ProcessorInfo.ProcessorId;
+    CpuInstanceInHob[ProcessorNumber].InfoRecord.IA32HealthFlags = BistData;
   }
+ 
+  //
+  // Build SecPlatformInformation2 PPI GUIDed HOB that also could be consumed
+  // by CPU MP driver to get CPU BIST data
+  //
+  BuildGuidDataHob (
+    &gEfiSecPlatformInformation2PpiGuid,
+    PlatformInformationRecord2,
+    (UINTN) BistInformationSize
+    );
 
   if (SecPlatformInformation2 != NULL && NumberOfData < NumberOfProcessors) {
     //

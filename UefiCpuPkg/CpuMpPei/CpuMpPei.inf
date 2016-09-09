@@ -47,12 +47,14 @@
   ReportStatusCodeLib
   CpuExceptionHandlerLib
   MpInitLib
+  BaseMemoryLib
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES
   gEfiSecPlatformInformationPpiGuid             ## SOMETIMES_CONSUMES
   ## SOMETIMES_CONSUMES
-  ## SOMETIMES_PRODUCES
+  ## PRODUCES
+  ## UNDEFINED # HOB
   gEfiSecPlatformInformation2PpiGuid
   gEfiVectorHandoffInfoPpiGuid                  ## SOMETIMES_CONSUMES
 

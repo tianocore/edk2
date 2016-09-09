@@ -31,6 +31,7 @@
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/MpInitLib.h>
+#include <Library/BaseMemoryLib.h>
 
 extern EFI_PEI_PPI_DESCRIPTOR   mPeiCpuMpPpiDesc;
 
