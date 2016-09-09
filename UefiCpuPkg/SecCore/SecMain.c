@@ -274,6 +274,11 @@ SecTemporaryRamDone (
   BOOLEAN  State;
 
   //
+  // Republish Sec Platform Information(2) PPI
+  //
+  RepublishSecPlatformInformationPpi ();
+
+  //
   // Migrate DebugAgentContext.
   //
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
