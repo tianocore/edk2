@@ -40,6 +40,7 @@ InternalSwitchStackAsm (
   );
 **/
 ASM_PFX(InternalSwitchStackAsm):
+    mov   x29, #0
     mov   x30, x0
     mov   sp, x3
     mov   x0, x1
