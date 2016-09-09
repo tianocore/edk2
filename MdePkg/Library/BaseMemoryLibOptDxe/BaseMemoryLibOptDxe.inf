@@ -116,6 +116,15 @@
   X64/CopyMem.S
   X64/IsZeroBuffer.nasm
 
+[Defines.ARM, Defines.AARCH64]
+  #
+  # The ARM implementations of this library may perform unaligned accesses, and
+  # may use DC ZVA instructions that are only allowed when the MMU and D-cache
+  # are on. Since SEC, PEI_CORE and PEIM modules may execute with the MMU off,
+  # omit them from the supported module types list for this library.
+  #
+  LIBRARY_CLASS = BaseMemoryLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
 [Sources.ARM]
   Arm/ScanMem.S       |GCC
   Arm/SetMem.S        |GCC
