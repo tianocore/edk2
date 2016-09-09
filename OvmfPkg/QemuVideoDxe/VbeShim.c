@@ -134,7 +134,7 @@ InstallVbeShim (
   PciWrite8 (Pam1Address, Pam1 | (BIT1 | BIT0));
 
   //
-  // We never added memory space durig PEI or DXE for the C segment, so we
+  // We never added memory space during PEI or DXE for the C segment, so we
   // don't need to (and can't) allocate from there. Also, guest operating
   // systems will see a hole in the UEFI memory map there.
   //

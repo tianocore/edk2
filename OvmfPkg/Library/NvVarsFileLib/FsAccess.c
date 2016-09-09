@@ -184,7 +184,7 @@ FileHandleEmpty (
   @param[in]  ReadSize - The size of data to read from the file
 
   @return     Pointer to buffer allocated to hold the file
-              contents.  NULL if an error occured.
+              contents.  NULL if an error occurred.
 
 **/
 VOID*
@@ -332,7 +332,7 @@ LoadNvVarsFromFs (
   // We write a variable to indicate we've already loaded the
   // variable data.  If it is found, we skip the loading.
   //
-  // This is relevent if the non-volatile variable have been
+  // This is relevant if the non-volatile variable have been
   // able to survive a reboot operation.  In that case, we don't
   // want to re-load the file as it would overwrite newer changes
   // made to the variables.

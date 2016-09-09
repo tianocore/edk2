@@ -256,8 +256,8 @@ GetSelectedVgaDeviceInfo (
   *VgaHandle = NULL;
 
   //
-  // Initialize variable states.  Ths is important for selecting the VGA device
-  // if multiple devices exist behind a single bridge.
+  // Initialize variable states.  This is important for selecting the VGA
+  // device if multiple devices exist behind a single bridge.
   //
   HandleCount = 0;
   HandleBuffer = NULL;

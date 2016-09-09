@@ -1,7 +1,7 @@
 /** @file
   Event Channel function implementation.
 
-  Event channel are use to notify of an event that happend in a shared
+  Event channel are use to notify of an event that happened in a shared
   structure for example.
 
   Copyright (C) 2014, Citrix Ltd.

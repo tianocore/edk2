@@ -156,7 +156,7 @@ XenPvBlkDxeBlockIoReadWriteBlocks (
     Sector += IoData.Size / 512;
     Status = XenPvBlockIo (&IoData, IsWrite);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XenPvBlkDxe: Error durring %a operation.\n",
+      DEBUG ((EFI_D_ERROR, "XenPvBlkDxe: Error during %a operation.\n",
               IsWrite ? "write" : "read"));
       return Status;
     }

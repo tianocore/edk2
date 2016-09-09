@@ -1255,8 +1255,8 @@ ConnectRecursivelyIfPciMassStorage (
   This notification function is invoked when the
   EMU Variable FVB has been changed.
 
-  @param  Event                 The event that occured
-  @param  Context               For EFI compatiblity.  Not used.
+  @param  Event                 The event that occurred
+  @param  Context               For EFI compatibility.  Not used.
 
 **/
 VOID
@@ -1480,8 +1480,8 @@ Routine Description:
   This notification function is invoked when an instance of the
   EFI_DEVICE_PATH_PROTOCOL is produced.
 
-  @param  Event                 The event that occured
-  @param  Context               For EFI compatiblity.  Not used.
+  @param  Event                 The event that occurred
+  @param  Context               For EFI compatibility.  Not used.
 
 **/
 VOID

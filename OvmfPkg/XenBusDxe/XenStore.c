@@ -10,7 +10,7 @@
 
   The XenStore is ASCII string based, and has a structure and semantics
   similar to a filesystem.  There are files and directories, the directories
-  able to contain files or other directories.  The depth of the hierachy
+  able to contain files or other directories.  The depth of the hierarchy
   is only limited by the XenStore's maximum path length.
 
   The communication channel between the XenStore service and other

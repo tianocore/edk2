@@ -363,7 +363,7 @@ ProcessCmdAddChecksum (
   array is an ACPI table, and if so, install it.
 
   This function assumes that the entire QEMU linker/loader command file has
-  been processed successfuly in a prior first pass.
+  been processed successfully in a prior first pass.
 
   @param[in] AddPointer        The QEMU_LOADER_ADD_POINTER command to process.
 

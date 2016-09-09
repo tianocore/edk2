@@ -433,7 +433,7 @@ QemuInitializeRam (
     // PEI RAM, in a backup buffer allocated with the normal PEI services.
     // CpuMpPei restores the original contents ("returns" the borrowed area) at
     // End-of-PEI. End-of-PEI in turn is emitted by S3Resume2Pei before
-    // transfering control to the OS's wakeup vector in the FACS.
+    // transferring control to the OS's wakeup vector in the FACS.
     //
     // We expect any other PEIMs that "borrow" memory similarly to CpuMpPei to
     // restore the original contents. Furthermore, we expect all such PEIMs
