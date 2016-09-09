@@ -1,0 +1,140 @@
+/** @file
+  Get SEC platform information(2) PPI and reinstall it.
+
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#include "SecMain.h"
+
+/**
+  Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
+
+  @param  PeiServices                The pointer to the PEI Services Table.
+  @param  StructureSize              The pointer to the variable describing size of the input buffer.
+  @param  PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
+
+  @retval EFI_SUCCESS                The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small. The current buffer size needed to
+                                     hold the record is returned in StructureSize.
+
+**/
+EFI_STATUS
+EFIAPI
+SecPlatformInformation2 (
+  IN CONST EFI_PEI_SERVICES                   **PeiServices,
+  IN OUT UINT64                               *StructureSize,
+     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
+  )
+{
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  VOID                    *DataInHob;
+  UINTN                   DataSize;
+
+  GuidHob = GetFirstGuidHob (&gEfiSecPlatformInformation2PpiGuid);
+  if (GuidHob == NULL) {
+    *StructureSize = 0;
+    return EFI_SUCCESS;
+  }
+
+  DataInHob = GET_GUID_HOB_DATA (GuidHob);
+  DataSize  = GET_GUID_HOB_DATA_SIZE (GuidHob);
+
+  //
+  // return the information from BistHob
+  //
+  if ((*StructureSize) < (UINT64) DataSize) {
+    *StructureSize = (UINT64) DataSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  *StructureSize = (UINT64) DataSize;
+  CopyMem (PlatformInformationRecord2, DataInHob, DataSize);
+  return EFI_SUCCESS;
+}
+
+/**
+  Worker function to get CPUs' BIST by calling SecPlatformInformationPpi
+  or SecPlatformInformation2Ppi.
+
+  @param  PeiServices         Pointer to PEI Services Table
+  @param  Guid                PPI Guid
+  @param  PpiDescriptor       Return a pointer to instance of the
+                              EFI_PEI_PPI_DESCRIPTOR
+  @param  BistInformationData Pointer to BIST information data
+  @param  BistInformationSize Return the size in bytes of BIST information
+
+  @retval EFI_SUCCESS         Retrieve of the BIST data successfully
+  @retval EFI_NOT_FOUND       No sec platform information(2) ppi export
+  @retval EFI_DEVICE_ERROR    Failed to get CPU Information
+
+**/
+EFI_STATUS
+GetBistInfoFromPpi (
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
+  IN CONST EFI_GUID             *Guid,
+     OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor,
+     OUT VOID                   **BistInformationData,
+     OUT UINT64                 *BistInformationSize OPTIONAL
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_SEC_PLATFORM_INFORMATION2_PPI     *SecPlatformInformation2Ppi;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD2  *SecPlatformInformation2;
+  UINT64                                InformationSize;
+
+  Status = PeiServicesLocatePpi (
+             Guid,                                // GUID
+             0,                                   // INSTANCE
+             PpiDescriptor,                       // EFI_PEI_PPI_DESCRIPTOR
+             (VOID **)&SecPlatformInformation2Ppi // PPI
+             );
+  if (Status == EFI_NOT_FOUND) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (Status == EFI_SUCCESS) {
+    //
+    // Get the size of the sec platform information2(BSP/APs' BIST data)
+    //
+    InformationSize         = 0;
+    SecPlatformInformation2 = NULL;
+    Status = SecPlatformInformation2Ppi->PlatformInformation2 (
+                                           PeiServices,
+                                           &InformationSize,
+                                           SecPlatformInformation2
+                                           );
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      Status = PeiServicesAllocatePool (
+                 (UINTN) InformationSize,
+                 (VOID **) &SecPlatformInformation2
+                 );
+      if (Status == EFI_SUCCESS) {
+        //
+        // Retrieve BIST data
+        //
+        Status = SecPlatformInformation2Ppi->PlatformInformation2 (
+                                               PeiServices,
+                                               &InformationSize,
+                                               SecPlatformInformation2
+                                               );
+        if (Status == EFI_SUCCESS) {
+          *BistInformationData = SecPlatformInformation2;
+          if (BistInformationSize != NULL) {
+            *BistInformationSize = InformationSize;
+          }
+          return EFI_SUCCESS;
+        }
+      }
+    }
+  }
+
+  return EFI_DEVICE_ERROR;
+}
