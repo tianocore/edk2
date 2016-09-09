@@ -43,7 +43,7 @@
  * table are identified by grant references. A grant reference is an
  * integer, which indexes into the grant table. It acts as a
  * capability which the grantee can use to perform operations on the
- * granter’s memory.
+ * granter's memory.
  *
  * This capability-based system allows shared-memory communications
  * between unprivileged domains. A grant reference also encapsulates
