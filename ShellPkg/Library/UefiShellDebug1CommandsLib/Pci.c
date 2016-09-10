@@ -2370,7 +2370,7 @@ PCI_CONFIG_SPACE  *mConfigSpace = NULL;
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-s", TypeValue},
   {L"-i", TypeFlag},
-  {L"-_e", TypeFlag},
+  {L"-_e", TypeValue},
   {NULL, TypeMax}
   };
 
@@ -5914,7 +5914,7 @@ PciExplainPciExpress (
       // Advance to the next item if it exists
       //
       if (ExtHdr->NextCapabilityOffset != 0) {
-        ExtHdr = (PCI_EXP_EXT_HDR*)((UINT8*)ExRegBuffer + ExtHdr->NextCapabilityOffset);
+        ExtHdr = (PCI_EXP_EXT_HDR*)((UINT8*)ExRegBuffer + ExtHdr->NextCapabilityOffset - EFI_PCIE_CAPABILITY_BASE_OFFSET);
       } else {
         break;
       }
