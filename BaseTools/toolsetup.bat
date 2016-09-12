@@ -247,39 +247,39 @@ if defined FORCE_REBUILD goto check_build_environment
 if defined REBUILD goto check_build_environment
 if not exist "%EDK_TOOLS_PATH%" goto check_build_environment
 
-IF NOT EXIST "%EDK_TOOLS_BIN%\BootSectImage.exe" goto check_build_environment
+IF NOT EXIST "%EDK_TOOLS_BIN%\BootSectImage.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\EfiLdrImage.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\EfiRom.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenBootSector.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenFfs.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenFv.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenFw.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenPage.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenSec.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\GenVtf.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\Split.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\TianoCompress.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\VfrCompile.exe" goto check_c_tools
+IF NOT EXIST "%EDK_TOOLS_BIN%\VolInfo.exe" goto check_c_tools
+
+goto check_python_tools
+
+:check_c_tools
+  echo.
+  echo !!! ERROR !!! Binary C tools are missing. They are requried to be built from BaseTools Source.
+  echo.
+  goto end
+
+:check_python_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\build.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\EfiLdrImage.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\EfiRom.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenBootSector.exe" goto check_build_environment
 IF NOT EXIST "%EDK_TOOLS_BIN%\GenFds.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenFfs.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenFv.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenFw.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenPage.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenSec.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenVtf.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\Split.exe" goto check_build_environment
 IF NOT EXIST "%EDK_TOOLS_BIN%\TargetTool.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\TianoCompress.exe" goto check_build_environment
 IF NOT EXIST "%EDK_TOOLS_BIN%\Trim.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\VfrCompile.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\VolInfo.exe" goto check_build_environment
 
 goto end
 
 :check_build_environment
-
-  if not defined FORCE_REBUILD (
-    echo.
-    echo Rebuilding of tools is not required.  Binaries of the latest,
-    echo tested versions of the tools have been tested and included in the
-    echo EDK II repository.
-    echo.
-    echo If you really want to build the tools, use the ForceRebuild option.
-    echo.
-    goto end
-  )
+  if defined BASETOOLS_PYTHON_SOURCE goto VisualStudioAvailable
 
   if not defined BASE_TOOLS_PATH (
      if not exist "Source\C\Makefile" (
@@ -289,17 +289,14 @@ goto end
        set BASE_TOOLS_PATH=%CD%
      )
   )
-  set PATH=%BASE_TOOLS_PATH%\Bin\Win32;%PATH%
-
-  set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
-  set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
 
   if not defined PYTHON_HOME (
     if defined PYTHONHOME (
       set PYTHON_HOME=%PYTHONHOME%
     ) else (
       echo.
-      echo  !!! ERROR !!! PYTHON_HOME is required to build or execute the tools, please set it. !!!
+      echo  !!! ERROR !!! Binary python tools are missing. PYTHON_HOME environment variable is not set. 
+      echo PYTHON_HOME is required to build or execute the python tools.
       echo.
       goto end
     )
@@ -307,36 +304,30 @@ goto end
 
   @REM We have Python, now test for FreezePython application
   if not defined PYTHON_FREEZER_PATH (
-    @REM see if we can find FreezePython.ex
-    if exist "%PYTHON_HOME%\Tools\cx_Freeze-3.0.3\FreezePython.exe" (
-      set PYTHON_FREEZER_PATH=%PYTHON_HOME%\Tools\cx_Freeze-3.0.3
-    ) 
-    if exist "%PYTHON_HOME%\Tools\cx_Freeze\FreezePython.exe" (
-      set PYTHON_FREEZER_PATH=%PYTHON_HOME%\Tools\cx_Freeze
-    ) 
-    if exist "C:\cx_Freeze\FreezePython.exe" (
-        set PYTHON_FREEZER_PATH=C:\cx_Freeze
-    )
-    if exist "C:\cx_Freeze-3.0.3" (
-        set PYTHON_FREEZER_PATH=C:\cx_Freeze-3.0.3
-    )
-    if not defined PYTHON_FREEZER_PATH (
-      echo.
-      echo !!! WARNING !!! Will not be able to compile Python programs to .exe
-      echo Will setup environment to run Python scripts directly.
-      echo.
-      set "PATH=%BASETOOLS_PYTHON_SOURCE%\Trim;%PATH%"
-      set "PATH=%BASETOOLS_PYTHON_SOURCE%\GenFds;%PATH%"
-      set "PATH=%BASETOOLS_PYTHON_SOURCE%\build;%PATH%"
-      set PATHEXT=%PATHEXT%;.py
-    )
+    echo.
+    echo !!! WARNING !!! PYTHON_FREEZER_PATH environment variable is not set.
+    echo Setup environment to run Python scripts directly.
+    echo.
+    set "PATH=%PATH%;%BASE_TOOLS_PATH%\BinWrappers\WindowsLike"
   )
+
+  set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
+  set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
   
-  echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
-  echo     PYTHON_PATH     = %PYTHON_PATH%
-  echo PYTHON_FREEZER_PATH = %PYTHON_FREEZER_PATH%
+  echo                PATH = %PATH%
+  echo         PYTHON_HOME = %PYTHON_HOME%
+  echo          PYTHONPATH = %PYTHONPATH%
+  if defined PYTHON_FREEZER_PATH (
+    echo PYTHON_FREEZER_PATH = %PYTHON_FREEZER_PATH%
+  )
   echo.
 
+:VisualStudioAvailable
+  if not defined FORCE_REBUILD (
+    if not defined REBUILD (
+      goto end
+    )
+  )
   call "%EDK_TOOLS_PATH%\get_vsvars.bat"
   if not defined VCINSTALLDIR (
     @echo.
@@ -344,8 +335,6 @@ goto end
     @echo.
     goto end
   )
-
-:VisualStudioAvailable
   if not defined FORCE_REBUILD goto IncrementalBuild
 
 :CleanAndBuild
