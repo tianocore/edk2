@@ -268,12 +268,13 @@ def LaunchCommand(Command, WorkingDir):
     if not isinstance(Command, list):
         if platform.system() != 'Windows':
             Command = Command.split()
+            Command = ' '.join(Command)
 
     Proc = None
     EndOfProcedure = None
     try:
         # launch the command
-        Proc = Popen(Command, stdout=PIPE, stderr=PIPE, env=os.environ, cwd=WorkingDir, bufsize=-1)
+        Proc = Popen(Command, stdout=PIPE, stderr=PIPE, env=os.environ, cwd=WorkingDir, bufsize=-1, shell=True)
 
         # launch two threads to read the STDOUT and STDERR
         EndOfProcedure = Event()

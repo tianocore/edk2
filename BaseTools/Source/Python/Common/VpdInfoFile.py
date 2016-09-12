@@ -233,14 +233,15 @@ def CallExtenalBPDGTool(ToolPath, VpdFileName):
     OutputBinFileName = os.path.join(OutputDir, "%s.bin" % BaseName)
           
     try:
-        PopenObject = subprocess.Popen([ToolPath,
+        PopenObject = subprocess.Popen(' '.join([ToolPath,
                                         '-o', OutputBinFileName, 
                                         '-m', OutputMapFileName,
                                         '-q',
                                         '-f',
-                                        VpdFileName],
+                                        VpdFileName]),
                                         stdout=subprocess.PIPE, 
-                                        stderr= subprocess.PIPE)
+                                        stderr= subprocess.PIPE,
+                                        shell=True)
     except Exception, X:
         EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, ExtraData="%s" % (str(X)))
     (out, error) = PopenObject.communicate()
