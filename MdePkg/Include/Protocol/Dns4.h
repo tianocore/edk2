@@ -310,7 +310,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS             The operation completed successfully.
   @retval EFI_UNSUPPORTED         The designated protocol is not supported.
-  @retval EFI_INVALID_PARAMTER    Thisis NULL.
+  @retval EFI_INVALID_PARAMETER   This is NULL.
                                   The StationIp address provided in DnsConfigData is not a 
                                   valid unicast.
                                   DnsServerList is NULL while DnsServerListCount

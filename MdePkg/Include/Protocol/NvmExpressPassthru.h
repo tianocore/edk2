@@ -115,7 +115,7 @@ typedef struct {
 } EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET;
 
 //
-// Protocol funtion prototypes
+// Protocol function prototypes
 //
 /**
   Sends an NVM Express Command Packet to an NVM Express controller or namespace. This function supports

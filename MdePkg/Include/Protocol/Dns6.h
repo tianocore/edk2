@@ -300,7 +300,7 @@ EFI_STATUS
                                   storage to be allocated and released by caller.
 
   @retval EFI_SUCCESS             The operation completed successfully.
-  @retval EFI_INVALID_PARAMTER    This is NULL.
+  @retval EFI_INVALID_PARAMETER   This is NULL.
                                   The StationIp address provided in DnsConfigData is not zero and not a valid unicast.
                                   DnsServerList is NULL while DnsServerList Count is not ZERO.
                                   DnsServerList Count is ZERO while DnsServerList is not NULL.

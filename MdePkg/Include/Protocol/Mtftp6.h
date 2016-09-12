@@ -1,5 +1,5 @@
 /** @file
-  UEFI Multicast Trivial File Tranfer Protocol v6 Definition, which is built upon
+  UEFI Multicast Trivial File Transfer Protocol v6 Definition, which is built upon
   the EFI UDPv6 Protocol and provides basic services for client-side unicast and/or
   multicast TFTP operations.
 
@@ -325,7 +325,7 @@ typedef struct {
   @param[in] PacketLen     Indicates the length of the packet.
   @param[in] Packet        Pointer to an MTFTPv6 packet.
 
-  @retval EFI_SUCCESS      Operation sucess.
+  @retval EFI_SUCCESS      Operation success.
   @retval Others           Aborts session.
 
 **/
@@ -352,7 +352,7 @@ EFI_STATUS
                            EFI_MTFTP6_PROTOCOL.WriteFile() or EFI_MTFTP6_PROTOCOL.ReadDirectory()
                            functions by the caller.
 
-  @retval EFI_SUCCESS      Operation sucess.
+  @retval EFI_SUCCESS      Operation success.
   @retval Others           Aborts session.
 
 **/
@@ -379,7 +379,7 @@ EFI_STATUS
                            length the data available on output.
   @param[out]     Buffer   Pointer to the buffer where the data is stored.
 
-  @retval EFI_SUCCESS      Operation sucess.
+  @retval EFI_SUCCESS      Operation success.
   @retval Others           Aborts session.
 
 **/

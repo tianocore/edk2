@@ -172,7 +172,7 @@ typedef struct {
 
   @param[in]  This                 Pointer to the EFI_BLOCK_IO_CRYPTO_PROTOCOL instance.
   @param[in]  ExtendedVerification Indicates that the driver may perform a more exhausive
-                                   verfication operation of the device during reset.
+                                   verification operation of the device during reset.
 
   @retval EFI_SUCCESS              The block device was reset.
   @retval EFI_DEVICE_ERROR         The block device is not functioning correctly and could

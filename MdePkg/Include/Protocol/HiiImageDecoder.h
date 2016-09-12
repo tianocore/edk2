@@ -142,7 +142,7 @@ EFI_STATUS
   @param This                    EFI_HII_IMAGE_DECODER_PROTOCOL instance.
   @param Image                   Pointer to the image raw data.
   @param SizeOfImage             Size of the entire image raw data.
-  @param ImageInfo               Pointer to recieve EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER.
+  @param ImageInfo               Pointer to receive EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER.
 
   @retval EFI_SUCCESS            Get image info success.
   @retval EFI_UNSUPPORTED        Unsupported format of image.

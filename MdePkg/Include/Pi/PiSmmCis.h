@@ -178,7 +178,7 @@ EFI_STATUS
 /**
   Registers a handler to execute within SMM.
 
-  @param[in]  Handler            Handler service funtion pointer.
+  @param[in]  Handler            Handler service function pointer.
   @param[in]  HandlerType        Points to the handler type or NULL for root SMI handlers.
   @param[out] DispatchHandle     On return, contains a unique handle which can be used to later
                                  unregister the handler function.

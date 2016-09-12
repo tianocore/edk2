@@ -1,5 +1,5 @@
 /** @file
-  Internal data structure defintions for Base UEFI Decompress Libary.
+  Internal data structure defintions for Base UEFI Decompress Library.
 
   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials

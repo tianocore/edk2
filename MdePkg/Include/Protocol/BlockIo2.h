@@ -52,7 +52,7 @@ typedef struct {
 
   @param[in]  This                 Indicates a pointer to the calling context.
   @param[in]  ExtendedVerification Indicates that the driver may perform a more
-                                   exhausive verfication operation of the device
+                                   exhausive verification operation of the device
                                    during reset.
 
   @retval EFI_SUCCESS          The device was reset.

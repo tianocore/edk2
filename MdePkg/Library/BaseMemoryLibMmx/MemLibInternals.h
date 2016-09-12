@@ -103,7 +103,7 @@ InternalMemSetMem32 (
 /**
   Fills a target buffer with a 64-bit value, and returns the target buffer.
 
-  @param  Buffer  Teh pointer to the target buffer to fill.
+  @param  Buffer  The pointer to the target buffer to fill.
   @param  Length  The count of 64-bit value to fill.
   @param  Value   The value with which to fill Length bytes of Buffer.
 

@@ -241,7 +241,7 @@ typedef struct {
 #define  PACKAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED 0x0000000000000004
 
 /**
-  Callback funtion to report the process of the firmware updating.
+  Callback function to report the process of the firmware updating.
 
   @param[in]  Completion    A value between 1 and 100 indicating the current completion
                             progress of the firmware update. Completion progress is

@@ -337,7 +337,7 @@ PeCoffLoaderImageReadFromMemory (
 
 
 /**
-  Reapply fixups on a fixed up PE32/PE32+ image to allow virutal calling at EFI
+  Reapply fixups on a fixed up PE32/PE32+ image to allow virtual calling at EFI
   runtime. 
   
   This function reapplies relocation fixups to the PE/COFF image specified by ImageBase 
