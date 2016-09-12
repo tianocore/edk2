@@ -11,16 +11,17 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-!IFNDEF PYTHON_FREEZER_PATH
-!ERROR PYTHON_FREEZER_PATH must be defined!
+!IFNDEF PYTHON_HOME
+!ERROR PYTHON_HOME must be defined!
 !ENDIF
 
+!IFDEF PYTHON_FREEZER_PATH
 !IF EXIST ($(PYTHON_FREEZER_PATH)\cxfreeze)
 # Using cx_Freeze 4.2.3 with Python 2.7.2
 FREEZE=$(PYTHON_HOME)\python $(PYTHON_FREEZER_PATH)\cxfreeze
 !ELSE
-# Using cx_Freeze 3.0.3 with Python 2.5.4
-FREEZE=$(PYTHON_FREEZER_PATH)\FreezePython.exe
+!ERROR PYTHON_FREEZER_PATH does not exist!
+!ENDIF
 !ENDIF
 
 MODULES=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_8,encodings.utf_16_le,encodings.latin_1,encodings.ascii
@@ -236,7 +237,14 @@ CMD_UPT=$(BASE_TOOLS_PATH)\Source\Python\UPT\Core\DependencyRules.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParser.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParserMisc.py
 
+!IFDEF PYTHON_FREEZER_PATH
 all: SetPythonPath $(APPLICATIONS)
+!ELSE
+all:
+  @echo.
+  @echo !!! WARNING !!! PYTHON_FREEZER_PATH is not set.
+  @echo Cannot make executable from Python code, executing python scripts instead !!!
+!ENDIF
 
 SetPythonPath:
   set PYTHONPATH=$(BASE_TOOLS_PATH)\Source\Python
@@ -310,5 +318,6 @@ $(BIN_DIR)\TestRoot.pub.pem: $(BASE_TOOLS_PATH)\Source\Python\Pkcs7Sign\TestRoot
 clean:
 cleanall:  
   @del /f /q $(BIN_DIR)\*.pyd $(BIN_DIR)\*.dll
+  @del /f /q $(BASE_TOOLS_PATH)\Source\Python\*.pyc
   @for %%i in ($(APPLICATIONS)) do @del /f /q %%i
 
