@@ -110,9 +110,9 @@ ASM_PFX(InternalMemCompareMem):
     bic     src1, src1, #3
     bic     src2, src2, #3
     add     limit, limit, tmp1          // Adjust the limit for the extra.
-    lsl     tmp1, tmp1, #2              // Bytes beyond alignment -> bits.
+    lsl     tmp1, tmp1, #3              // Bytes beyond alignment -> bits.
     ldr     data1, [src1], #4
-    neg     tmp1, tmp1                  // Bits to alignment -32.
+    rsb     tmp1, tmp1, #32             // Bits to alignment -32.
     ldr     data2, [src2], #4
     mov     tmp2, #~0
 
