@@ -991,19 +991,19 @@ GetHashSizeFromAlgo (
 /**
   This function get digest from digest list.
 
-  @param HashAlg    digest algorithm
-  @param DigestList digest list
-  @param Digest     digest
+  @param[in]  HashAlg       Digest algorithm
+  @param[in]  DigestList    Digest list
+  @param[out] Digest        Digest
 
-  @retval EFI_SUCCESS   Sha1Digest is found and returned.
-  @retval EFI_NOT_FOUND Sha1Digest is not found.
+  @retval EFI_SUCCESS       Digest is found and returned.
+  @retval EFI_NOT_FOUND     Digest is not found.
 **/
 EFI_STATUS
 EFIAPI
 GetDigestFromDigestList(
   IN TPMI_ALG_HASH      HashAlg,
   IN TPML_DIGEST_VALUES *DigestList,
-  IN VOID               *Digest
+  OUT VOID              *Digest
   );
 
 #endif
