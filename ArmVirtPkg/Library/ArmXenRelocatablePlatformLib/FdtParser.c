@@ -65,17 +65,15 @@ FindMemnode (
     return FALSE;
   }
 
-  if (AddressCells == 1) {
-    *SystemMemoryBase = fdt32_to_cpu (*Prop);
-  } else {
-    *SystemMemoryBase = fdt64_to_cpu (*(UINT64 *)Prop);
+  *SystemMemoryBase = fdt32_to_cpu (Prop[0]);
+  if (AddressCells > 1) {
+    *SystemMemoryBase = (*SystemMemoryBase << 32) | fdt32_to_cpu (Prop[1]);
   }
   Prop += AddressCells;
 
-  if (SizeCells == 1) {
-    *SystemMemorySize = fdt32_to_cpu (*Prop);
-  } else {
-    *SystemMemorySize = fdt64_to_cpu (*(UINT64 *)Prop);
+  *SystemMemorySize = fdt32_to_cpu (Prop[0]);
+  if (SizeCells > 1) {
+    *SystemMemorySize = (*SystemMemorySize << 32) | fdt32_to_cpu (Prop[1]);
   }
 
   return TRUE;
