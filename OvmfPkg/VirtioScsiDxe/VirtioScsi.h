@@ -32,7 +32,7 @@
 // identification, and 8 bytes for LUN identification.
 //
 // EFI_EXT_SCSI_PASS_THRU_MODE.AdapterId is also a target identifier,
-// consisting of 4 bytes. Make sure TARGET_MAX_BYTES can accomodate both
+// consisting of 4 bytes. Make sure TARGET_MAX_BYTES can accommodate both
 // AdapterId and our target identifiers.
 //
 #if TARGET_MAX_BYTES < 4

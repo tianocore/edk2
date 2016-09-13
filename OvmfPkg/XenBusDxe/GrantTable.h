@@ -47,7 +47,7 @@ XenGrantTableDeinit (
   @param DomainId   ID of the domain to grant acces to.
   @param Frame      Frame Number of the page to grant access to.
   @param ReadOnly   Provide read-only or read-write access.
-  @param RefPtr     Reference number of the grant will be writen to this pointer.
+  @param RefPtr     Reference number of the grant will be written to this pointer.
 **/
 EFI_STATUS
 EFIAPI

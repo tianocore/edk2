@@ -224,7 +224,7 @@ XENSTORE_STATUS
   @param DomainId   ID of the domain to grant acces to.
   @param Frame      Frame Number of the page to grant access to.
   @param ReadOnly   Provide read-only or read-write access.
-  @param RefPtr     Reference number of the grant will be writen to this pointer.
+  @param RefPtr     Reference number of the grant will be written to this pointer.
 **/
 typedef
 EFI_STATUS
@@ -310,7 +310,7 @@ UINT32
 
   @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
            indicating the type of write failure.  EEXIST errors from the
-           XenStore are supressed, allowing multiple, physically different,
+           XenStore are suppressed, allowing multiple, physically different,
            xenbus_watch objects, to watch the same path in the XenStore.
 **/
 typedef
@@ -333,7 +333,7 @@ XENSTORE_STATUS
 
   @return  On success, XENSTORE_STATUS_SUCCESS. Otherwise an errno value
            indicating the type of write failure.  EEXIST errors from the
-           XenStore are supressed, allowing multiple, physically different,
+           XenStore are suppressed, allowing multiple, physically different,
            xenbus_watch objects, to watch the same path in the XenStore.
 **/
 typedef

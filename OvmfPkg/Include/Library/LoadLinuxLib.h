@@ -44,7 +44,7 @@ LoadLinuxCheckKernelSetup (
   @param[in]     KernelSetup - The kernel setup image
   @param[in]     KernelSize - The kernel size on disk.
 
-  @retval    0                An error occured
+  @retval    0                An error occurred
   @retval    !0               The initial size required by the kernel to
                               begin execution.
 

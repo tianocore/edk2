@@ -45,7 +45,7 @@ struct setup_header {
 	UINT16 movesize;
 	UINT32 code32_start;	/* Start of code loaded high */
 	UINT32 ramdisk_start;	/* Start of initial ramdisk */
-	UINT32 ramdisk_len;	/* Lenght of initial ramdisk */
+	UINT32 ramdisk_len;	/* Length of initial ramdisk */
 	UINT32 bootsect_kludge;
 	UINT16 heap_end;
 	UINT8 ext_loader_ver;  /* Extended boot loader version */
