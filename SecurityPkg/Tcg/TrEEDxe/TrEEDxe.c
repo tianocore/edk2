@@ -625,41 +625,6 @@ TcgDxeLogEvent (
 }
 
 /**
-  This function get digest from digest list.
-
-  @param HashAlg    digest algorithm
-  @param DigestList digest list
-  @param Digest     digest
-
-  @retval EFI_SUCCESS   Sha1Digest is found and returned.
-  @retval EFI_NOT_FOUND Sha1Digest is not found.
-**/
-EFI_STATUS
-Tpm2GetDigestFromDigestList (
-  IN TPMI_ALG_HASH      HashAlg,
-  IN TPML_DIGEST_VALUES *DigestList,
-  IN VOID               *Digest
-  )
-{
-  UINTN  Index;
-  UINT16 DigestSize;
-
-  DigestSize = GetHashSizeFromAlgo (HashAlg);
-  for (Index = 0; Index < DigestList->count; Index++) {
-    if (DigestList->digests[Index].hashAlg == HashAlg) {
-      CopyMem (
-        Digest,
-        &DigestList->digests[Index].digest,
-        DigestSize
-        );
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
-/**
   Add a new entry to the Event Log.
 
   @param[in]     DigestList    A list of digest.
@@ -686,7 +651,7 @@ TcgDxeLogHashEvent (
       DEBUG ((EFI_D_INFO, "  LogFormat - 0x%08x\n", mTreeEventInfo[Index].LogFormat));
       switch (mTreeEventInfo[Index].LogFormat) {
       case TREE_EVENT_LOG_FORMAT_TCG_1_2:
-        Status = Tpm2GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
+        Status = GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
         if (!EFI_ERROR (Status)) {
           //
           // Enter critical region
