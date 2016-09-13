@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to send TPM2 command.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -558,6 +558,23 @@ Tpm2PcrAllocate (
   OUT UINT32                    *MaxPCR,
   OUT UINT32                    *SizeNeeded,
   OUT UINT32                    *SizeAvailable
+  );
+
+/**
+  Alloc PCR data.
+
+  @param[in]  PlatformAuth      platform auth value. NULL means no platform auth change.
+  @param[in]  SupportedPCRBanks Supported PCR banks
+  @param[in]  PCRBanks          PCR banks
+
+  @retval EFI_SUCCESS Operation completed successfully.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2PcrAllocateBanks (
+  IN TPM2B_AUTH                *PlatformAuth,  OPTIONAL
+  IN UINT32                    SupportedPCRBanks,
+  IN UINT32                    PCRBanks
   );
 
 /**
