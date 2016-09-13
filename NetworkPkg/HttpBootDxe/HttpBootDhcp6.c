@@ -418,9 +418,6 @@ HttpBootDhcp6CallBack (
    HTTP_BOOT_PRIVATE_DATA          *Private;
    EFI_DHCP6_PACKET                *SelectAd;
    EFI_STATUS                      Status;
-   if ((Dhcp6Event != Dhcp6RcvdAdvertise) && (Dhcp6Event != Dhcp6SelectAdvertise)) {
-     return EFI_SUCCESS;
-   }
 
    ASSERT (Packet != NULL);
    
