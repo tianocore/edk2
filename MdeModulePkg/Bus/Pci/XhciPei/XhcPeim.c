@@ -407,6 +407,12 @@ XhcPeiResetHC (
   }
 
   XhcPeiSetOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET);
+  //
+  // Some XHCI host controllers require to have extra 1ms delay before accessing any MMIO register during reset.
+  // Otherwise there may have the timeout case happened.
+  // The below is a workaround to solve such problem.
+  //
+  MicroSecondDelay (1000);
   Status = XhcPeiWaitOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET, FALSE, Timeout);
 ON_EXIT:
   DEBUG ((EFI_D_INFO, "XhcPeiResetHC: %r\n", Status));
