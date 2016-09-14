@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -9,11 +9,8 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 # In *inux environment, the build tools's source is required and need to be compiled
-# firstly, please reference https://edk2.tianocore.org/unix-getting-started.html to 
+# firstly, please reference https://github.com/tianocore/tianocore.github.io/wiki/SourceForge-to-Github-Quick-Start
 # to get how to setup build tool.
-#
-# After build tool is downloaded and compiled, a soft symbol linker need to be created
-# at <workspace>/Conf. For example: ln -s /work/BaseTools /work/edk2/Conf/BaseToolsSource.
 #
 # Setup the environment for unix-like systems running a bash-like shell.
 # This file must be "sourced" not merely executed. For example: ". edksetup.sh"
@@ -22,7 +19,7 @@
 # set up in the unix style.  This script will make the necessary conversions to
 # windows style.
 #
-# Please reference edk2 user manual for more detail descriptions at https://edk2.tianocore.org/files/documents/64/494/EDKII_UserManual.pdf
+# Please reference edk2 user manual for more detail descriptions at https://github.com/tianocore-docs/Docs/raw/master/User_Docs/EDK_II_UserManual_0_7.pdf
 #
 
 function HelpMsg()
