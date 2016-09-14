@@ -41,6 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PerformanceLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/ResetSystemLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 
 #define PERF_ID_TCG2_PEI  0x3080
@@ -190,60 +191,80 @@ EndofPeiSignalNotifyCallBack (
 }
 
 /**
-  Set Tpm2HashMask PCD value according to TPM2 PCR bank.
+  Make sure that the current PCR allocations, the TPM supported PCRs,
+  and the PcdTpm2HashMask are all in agreement.
 **/
 VOID
-SetTpm2HashMask (
+SyncPcrAllocationsAndPcrMask (
   VOID
   )
 {
-  EFI_STATUS           Status;
-  UINT32               ActivePcrBanks;
-  TPML_PCR_SELECTION   Pcrs;
-  UINTN                Index;
+  EFI_STATUS                        Status;
+  EFI_TCG2_EVENT_ALGORITHM_BITMAP   TpmHashAlgorithmBitmap;
+  UINT32                            TpmActivePcrBanks;
+  UINT32                            NewTpmActivePcrBanks;
+  UINT32                            Tpm2PcrMask;
+  UINT32                            NewTpm2PcrMask;
 
-  DEBUG ((EFI_D_ERROR, "SetTpm2HashMask!\n"));
+  DEBUG ((EFI_D_ERROR, "SyncPcrAllocationsAndPcrMask!\n"));
 
-  Status = Tpm2GetCapabilityPcrs (&Pcrs);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2GetCapabilityPcrs fail!\n"));
-    ActivePcrBanks = EFI_TCG2_BOOT_HASH_ALG_SHA1;
-  } else {
-    DEBUG ((EFI_D_INFO, "Tpm2GetCapabilityPcrs Count - %08x\n", Pcrs.count));
-    ActivePcrBanks = 0;
-    for (Index = 0; Index < Pcrs.count; Index++) {
-      DEBUG ((EFI_D_INFO, "hash - %x\n", Pcrs.pcrSelections[Index].hash));
-      switch (Pcrs.pcrSelections[Index].hash) {
-      case TPM_ALG_SHA1:
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
-        }        
-        break;
-      case TPM_ALG_SHA256:
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
-        }
-        break;
-      case TPM_ALG_SHA384:
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
-        }
-        break;
-      case TPM_ALG_SHA512:
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
-        }
-        break;
-      case TPM_ALG_SM3_256:
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePcrBanks |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
-        }
-        break;
+  //
+  // Determine the current TPM support and the Platform PCR mask.
+  //
+  Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &TpmActivePcrBanks);
+  ASSERT_EFI_ERROR (Status);
+
+  Tpm2PcrMask = PcdGet32 (PcdTpm2HashMask);
+
+  //
+  // Find the intersection of Pcd support and TPM support.
+  // If banks are missing from the TPM support that are in the PCD, update the PCD.
+  // If banks are missing from the PCD that are active in the TPM, reallocate the banks and reboot.
+  //
+
+  //
+  // If there are active PCR banks that are not supported by the Platform mask,
+  // update the TPM allocations and reboot the machine.
+  //
+  if ((TpmActivePcrBanks & Tpm2PcrMask) != TpmActivePcrBanks) {
+    NewTpmActivePcrBanks = TpmActivePcrBanks & Tpm2PcrMask;
+
+    DEBUG ((EFI_D_INFO, __FUNCTION__" - Reallocating PCR banks from 0x%X to 0x%X.\n", TpmActivePcrBanks, NewTpmActivePcrBanks ));
+    if (NewTpmActivePcrBanks == 0) {
+      DEBUG ((EFI_D_ERROR, __FUNCTION__" - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n"));
+      ASSERT (FALSE);
+    } else {
+      Status = Tpm2PcrAllocateBanks (NULL, (UINT32)TpmHashAlgorithmBitmap, NewTpmActivePcrBanks);
+      if (EFI_ERROR (Status)) {
+        //
+        // We can't do much here, but we hope that this doesn't happen.
+        //
+        DEBUG ((EFI_D_ERROR, __FUNCTION__" - Failed to reallocate PCRs!\n"));
+        ASSERT_EFI_ERROR (Status);
       }
+      //
+      // Need reset system, since we just called Tpm2PcrAllocateBanks().
+      //
+      ResetCold();
     }
   }
-  Status = PcdSet32S (PcdTpm2HashMask, ActivePcrBanks);
-  ASSERT_EFI_ERROR (Status);
+
+  //
+  // If there are any PCRs that claim support in the Platform mask that are
+  // not supported by the TPM, update the mask.
+  //
+  if ((Tpm2PcrMask & TpmHashAlgorithmBitmap) != Tpm2PcrMask) {
+    NewTpm2PcrMask = Tpm2PcrMask & TpmHashAlgorithmBitmap;
+
+    DEBUG ((EFI_D_INFO, __FUNCTION__" - Updating PcdTpm2HashMask from 0x%X to 0x%X.\n", Tpm2PcrMask, NewTpm2PcrMask ));
+    if (NewTpm2PcrMask == 0) {
+      DEBUG ((EFI_D_ERROR, __FUNCTION__" - No viable PCRs supported! Please set a less restrictive value for PcdTpm2HashMask!\n"));
+      ASSERT (FALSE);
+    }
+
+    Status = PcdSet32S (PcdTpm2HashMask, NewTpm2PcrMask);
+    ASSERT_EFI_ERROR (Status);
+  }
 }
 
 /**
@@ -767,7 +788,7 @@ PeimEntryMA (
     //
     // Update Tpm2HashMask according to PCR bank.
     //
-    SetTpm2HashMask ();
+    SyncPcrAllocationsAndPcrMask ();
 
     if (S3ErrorReport) {
       //
