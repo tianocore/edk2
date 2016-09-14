@@ -989,6 +989,23 @@ GetHashSizeFromAlgo (
   );
 
 /**
+  Copy TPML_DIGEST_VALUES into a buffer
+
+  @param[in,out] Buffer             Buffer to hold TPML_DIGEST_VALUES.
+  @param[in]     DigestList         TPML_DIGEST_VALUES to be copied.
+  @param[in]     HashAlgorithmMask  HASH bits corresponding to the desired digests to copy.
+
+  @return The end of buffer to hold TPML_DIGEST_VALUES.
+**/
+VOID *
+EFIAPI
+CopyDigestListToBuffer(
+  IN OUT VOID                       *Buffer,
+  IN TPML_DIGEST_VALUES             *DigestList,
+  IN UINT32                         HashAlgorithmMask
+  );
+
+/**
   Get TPML_DIGEST_VALUES data size.
 
   @param[in]     DigestList    TPML_DIGEST_VALUES data.

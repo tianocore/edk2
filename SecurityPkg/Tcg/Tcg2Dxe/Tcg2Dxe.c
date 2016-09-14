@@ -898,84 +898,6 @@ GetDigestListBinSize (
 }
 
 /**
-  Return if hash alg is supported in TPM PCR bank.
-
-  @param HashAlg  Hash algorithm to be checked.
-
-  @retval TRUE  Hash algorithm is supported.
-  @retval FALSE Hash algorithm is not supported.
-**/
-BOOLEAN
-IsHashAlgSupportedInPcrBank (
-  IN TPMI_ALG_HASH  HashAlg
-  )
-{
-  switch (HashAlg) {
-  case TPM_ALG_SHA1:
-    if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SHA256:
-    if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SHA384:
-    if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SHA512:
-    if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SM3_256:
-    if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
-      return TRUE;
-    }
-    break;
-  }
-
-  return FALSE;
-}
-
-/**
-  Copy TPML_DIGEST_VALUES into a buffer
-
-  @param[in,out] Buffer        Buffer to hold TPML_DIGEST_VALUES.
-  @param[in]     DigestList    TPML_DIGEST_VALUES to be copied.
-
-  @return The end of buffer to hold TPML_DIGEST_VALUES.
-**/
-VOID *
-CopyDigestListToBuffer (
-  IN OUT VOID                       *Buffer,
-  IN TPML_DIGEST_VALUES             *DigestList
-  )
-{
-  UINTN  Index;
-  UINT16 DigestSize;
-
-  CopyMem (Buffer, &DigestList->count, sizeof(DigestList->count));
-  Buffer = (UINT8 *)Buffer + sizeof(DigestList->count);
-  for (Index = 0; Index < DigestList->count; Index++) {
-    if (!IsHashAlgSupportedInPcrBank (DigestList->digests[Index].hashAlg)) {
-      DEBUG ((EFI_D_ERROR, "WARNING: TPM2 Event log has HashAlg unsupported by PCR bank (0x%x)\n", DigestList->digests[Index].hashAlg));
-      continue;
-    }
-    CopyMem (Buffer, &DigestList->digests[Index].hashAlg, sizeof(DigestList->digests[Index].hashAlg));
-    Buffer = (UINT8 *)Buffer + sizeof(DigestList->digests[Index].hashAlg);
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
-    Buffer = (UINT8 *)Buffer + DigestSize;
-  }
-
-  return Buffer;
-}
-
-/**
   Add a new entry to the Event Log.
 
   @param[in]     DigestList    A list of digest.
@@ -1034,7 +956,7 @@ TcgDxeLogHashEvent (
         TcgPcrEvent2.PCRIndex = NewEventHdr->PCRIndex;
         TcgPcrEvent2.EventType = NewEventHdr->EventType;
         DigestBuffer = (UINT8 *)&TcgPcrEvent2.Digest;
-        DigestBuffer = CopyDigestListToBuffer (DigestBuffer, DigestList);
+        DigestBuffer = CopyDigestListToBuffer (DigestBuffer, DigestList, mTcgDxeData.BsCap.ActivePcrBanks);
         CopyMem (DigestBuffer, &NewEventHdr->EventSize, sizeof(NewEventHdr->EventSize));
         DigestBuffer = DigestBuffer + sizeof(NewEventHdr->EventSize);
 

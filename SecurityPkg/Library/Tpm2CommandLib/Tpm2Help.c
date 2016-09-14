@@ -166,6 +166,89 @@ CopyAuthSessionResponse (
 }
 
 /**
+  Return if hash alg is supported in HashAlgorithmMask.
+
+  @param HashAlg            Hash algorithm to be checked.
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  Hash algorithm is supported.
+  @retval FALSE Hash algorithm is not supported.
+**/
+BOOLEAN
+IsHashAlgSupportedInHashAlgorithmMask(
+  IN TPMI_ALG_HASH  HashAlg,
+  IN UINT32         HashAlgorithmMask
+  )
+{
+  switch (HashAlg) {
+  case TPM_ALG_SHA1:
+    if ((HashAlgorithmMask & HASH_ALG_SHA1) != 0) {
+      return TRUE;
+    }
+    break;
+  case TPM_ALG_SHA256:
+    if ((HashAlgorithmMask & HASH_ALG_SHA256) != 0) {
+      return TRUE;
+    }
+    break;
+  case TPM_ALG_SHA384:
+    if ((HashAlgorithmMask & HASH_ALG_SHA384) != 0) {
+      return TRUE;
+    }
+    break;
+  case TPM_ALG_SHA512:
+    if ((HashAlgorithmMask & HASH_ALG_SHA512) != 0) {
+      return TRUE;
+    }
+    break;
+  case TPM_ALG_SM3_256:
+    if ((HashAlgorithmMask & HASH_ALG_SM3_256) != 0) {
+      return TRUE;
+    }
+    break;
+  }
+
+  return FALSE;
+}
+
+/**
+  Copy TPML_DIGEST_VALUES into a buffer
+
+  @param[in,out] Buffer             Buffer to hold TPML_DIGEST_VALUES.
+  @param[in]     DigestList         TPML_DIGEST_VALUES to be copied.
+  @param[in]     HashAlgorithmMask  HASH bits corresponding to the desired digests to copy.
+
+  @return The end of buffer to hold TPML_DIGEST_VALUES.
+**/
+VOID *
+EFIAPI
+CopyDigestListToBuffer (
+  IN OUT VOID                       *Buffer,
+  IN TPML_DIGEST_VALUES             *DigestList,
+  IN UINT32                         HashAlgorithmMask
+  )
+{
+  UINTN  Index;
+  UINT16 DigestSize;
+
+  CopyMem (Buffer, &DigestList->count, sizeof(DigestList->count));
+  Buffer = (UINT8 *)Buffer + sizeof(DigestList->count);
+  for (Index = 0; Index < DigestList->count; Index++) {
+    if (!IsHashAlgSupportedInHashAlgorithmMask(DigestList->digests[Index].hashAlg, HashAlgorithmMask)) {
+      DEBUG ((EFI_D_ERROR, "WARNING: TPM2 Event log has HashAlg unsupported by PCR bank (0x%x)\n", DigestList->digests[Index].hashAlg));
+      continue;
+    }
+    CopyMem (Buffer, &DigestList->digests[Index].hashAlg, sizeof(DigestList->digests[Index].hashAlg));
+    Buffer = (UINT8 *)Buffer + sizeof(DigestList->digests[Index].hashAlg);
+    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
+    CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
+    Buffer = (UINT8 *)Buffer + DigestSize;
+  }
+
+  return Buffer;
+}
+
+/**
   Get TPML_DIGEST_VALUES data size.
 
   @param[in]     DigestList    TPML_DIGEST_VALUES data.
