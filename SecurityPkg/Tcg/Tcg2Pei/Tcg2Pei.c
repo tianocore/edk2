@@ -190,31 +190,6 @@ EndofPeiSignalNotifyCallBack (
 }
 
 /**
-  Get TPML_DIGEST_VALUES data size.
-
-  @param[in]     DigestList    TPML_DIGEST_VALUES data.
-
-  @return TPML_DIGEST_VALUES data size.
-**/
-UINT32
-GetDigestListSize (
-  IN TPML_DIGEST_VALUES             *DigestList
-  )
-{
-  UINTN  Index;
-  UINT16 DigestSize;
-  UINT32 TotalSize;
-
-  TotalSize = sizeof(DigestList->count);
-  for (Index = 0; Index < DigestList->count; Index++) {
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    TotalSize += sizeof(DigestList->digests[Index].hashAlg) + DigestSize;
-  }
-
-  return TotalSize;
-}
-
-/**
   Return if hash alg is supported in TPM PCR bank.
 
   @param HashAlg  Hash algorithm to be checked.

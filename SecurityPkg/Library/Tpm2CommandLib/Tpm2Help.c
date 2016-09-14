@@ -166,6 +166,32 @@ CopyAuthSessionResponse (
 }
 
 /**
+  Get TPML_DIGEST_VALUES data size.
+
+  @param[in]     DigestList    TPML_DIGEST_VALUES data.
+
+  @return TPML_DIGEST_VALUES data size.
+**/
+UINT32
+EFIAPI
+GetDigestListSize (
+  IN TPML_DIGEST_VALUES             *DigestList
+  )
+{
+  UINTN  Index;
+  UINT16 DigestSize;
+  UINT32 TotalSize;
+
+  TotalSize = sizeof(DigestList->count);
+  for (Index = 0; Index < DigestList->count; Index++) {
+    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
+    TotalSize += sizeof(DigestList->digests[Index].hashAlg) + DigestSize;
+  }
+
+  return TotalSize;
+}
+
+/**
   This function get digest from digest list.
 
   @param[in]  HashAlg       Digest algorithm
