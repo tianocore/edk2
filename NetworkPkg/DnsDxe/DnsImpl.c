@@ -1232,8 +1232,16 @@ ParseDnsResponse (
   //
   if (DnsHeader->Flags.Bits.RCode != DNS_FLAGS_RCODE_NO_ERROR || DnsHeader->AnswersNum < 1 || \
       DnsHeader->Flags.Bits.QR != DNS_FLAGS_QR_RESPONSE) {
-      Status = EFI_ABORTED;
-      goto ON_EXIT;
+    //
+    // The domain name referenced in the query does not exist.
+    //
+    if (DnsHeader->Flags.Bits.RCode == DNS_FLAGS_RCODE_NAME_ERROR) {
+      Status = EFI_NOT_FOUND; 
+    } else {
+      Status = EFI_DEVICE_ERROR;
+    }
+    
+    goto ON_COMPLETE;
   }
   
   //
@@ -1406,23 +1414,8 @@ ParseDnsResponse (
         AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
         CopyMem (&HostAddr4[IpCount], AnswerData, sizeof (EFI_IPv4_ADDRESS));
 
-        //
-        // Update DNS cache dynamically.
-        //
-        if (Dns4CacheEntry != NULL) {
-          if (Dns4CacheEntry->HostName != NULL) {
-            FreePool (Dns4CacheEntry->HostName);
-          }
-
-          if (Dns4CacheEntry->IpAddress != NULL) {
-            FreePool (Dns4CacheEntry->IpAddress);
-          }
-          
-          FreePool (Dns4CacheEntry);
-        }
-
         // 
-        // Allocate new CacheEntry pool.
+        // Allocate new CacheEntry pool to update DNS cache dynamically.
         //
         Dns4CacheEntry = AllocateZeroPool (sizeof (EFI_DNS4_CACHE_ENTRY));
         if (Dns4CacheEntry == NULL) {
@@ -1448,7 +1441,19 @@ ParseDnsResponse (
           Dns4CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
         }
         
-        UpdateDns4Cache (&mDriverData->Dns4CacheList, FALSE, TRUE, *Dns4CacheEntry);  
+        UpdateDns4Cache (&mDriverData->Dns4CacheList, FALSE, TRUE, *Dns4CacheEntry);
+
+        // 
+        // Free allocated CacheEntry pool.
+        //
+        FreePool (Dns4CacheEntry->HostName);
+        Dns4CacheEntry->HostName = NULL;
+        
+        FreePool (Dns4CacheEntry->IpAddress);
+        Dns4CacheEntry->IpAddress = NULL;
+
+        FreePool (Dns4CacheEntry);
+        Dns4CacheEntry = NULL;
 
         IpCount ++;
         Status = EFI_SUCCESS;
@@ -1463,23 +1468,8 @@ ParseDnsResponse (
         AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
         CopyMem (&HostAddr6[IpCount], AnswerData, sizeof (EFI_IPv6_ADDRESS));
 
-        //
-        // Update DNS cache dynamically.
-        //
-        if (Dns6CacheEntry != NULL) {
-          if (Dns6CacheEntry->HostName != NULL) {
-            FreePool (Dns6CacheEntry->HostName);
-          }
-
-          if (Dns6CacheEntry->IpAddress != NULL) {
-            FreePool (Dns6CacheEntry->IpAddress);
-          }
-          
-          FreePool (Dns6CacheEntry);
-        }
-
         // 
-        // Allocate new CacheEntry pool.
+        // Allocate new CacheEntry pool to update DNS cache dynamically.
         //
         Dns6CacheEntry = AllocateZeroPool (sizeof (EFI_DNS6_CACHE_ENTRY));
         if (Dns6CacheEntry == NULL) {
@@ -1505,7 +1495,19 @@ ParseDnsResponse (
           Dns6CacheEntry->Timeout = MAX (CNameTtl, AnswerSection->Ttl);
         }
         
-        UpdateDns6Cache (&mDriverData->Dns6CacheList, FALSE, TRUE, *Dns6CacheEntry);  
+        UpdateDns6Cache (&mDriverData->Dns6CacheList, FALSE, TRUE, *Dns6CacheEntry);
+
+        // 
+        // Free allocated CacheEntry pool.
+        //
+        FreePool (Dns6CacheEntry->HostName);
+        Dns6CacheEntry->HostName = NULL;
+        
+        FreePool (Dns6CacheEntry->IpAddress);
+        Dns6CacheEntry->IpAddress = NULL;
+
+        FreePool (Dns6CacheEntry);
+        Dns6CacheEntry = NULL;
         
         IpCount ++;
         Status = EFI_SUCCESS;
@@ -1558,7 +1560,8 @@ ParseDnsResponse (
       }
     }
   }
-
+  
+ON_COMPLETE:
   //
   // Parsing is complete, free the sending packet and signal Event here.
   //
@@ -1582,33 +1585,6 @@ ParseDnsResponse (
       gBS->SignalEvent (Dns6TokenEntry->Token->Event);
       DispatchDpc ();
     }
-  }
-
-  // 
-  // Free allocated CacheEntry pool.
-  //
-  if (Dns4CacheEntry != NULL) {
-    if (Dns4CacheEntry->HostName != NULL) {
-      FreePool (Dns4CacheEntry->HostName);
-    }
-
-    if (Dns4CacheEntry->IpAddress != NULL) {
-      FreePool (Dns4CacheEntry->IpAddress);
-    }
-
-    FreePool (Dns4CacheEntry);
-  }
-  
-  if (Dns6CacheEntry != NULL) {
-    if (Dns6CacheEntry->HostName != NULL) {
-      FreePool (Dns6CacheEntry->HostName);
-    }
-
-    if (Dns6CacheEntry->IpAddress != NULL) {
-      FreePool (Dns6CacheEntry->IpAddress);
-    }
-  
-    FreePool (Dns6CacheEntry);
   }
 
 ON_EXIT:
