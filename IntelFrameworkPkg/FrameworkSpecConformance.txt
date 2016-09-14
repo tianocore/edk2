@@ -1,7 +1,7 @@
 ##
 # This file is used to document mismatches between Intel Platform Innovation Framework specification
 # (http://www.intel.com/technology/framework/spec.htm) and data structures defind at IntelFrameworkPkg
-# package in EdkII Open Source Project (https://edk2.tianocore.org/source/browse/edk2/trunk/edk2/IntelFrameworkPkg)
+# package in EdkII Open Source Project (https://github.com/tianocore/edk2/tree/master/IntelFrameworkPkg)
 ##
 
 ##
