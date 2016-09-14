@@ -2222,7 +2222,6 @@ DriverEntry (
   VOID                              *Registration;
   UINT32                            MaxCommandSize;
   UINT32                            MaxResponseSize;
-  TPML_PCR_SELECTION                Pcrs;
   UINTN                             Index;
   EFI_TCG2_EVENT_ALGORITHM_BITMAP   TpmHashAlgorithmBitmap;
   UINT32                            ActivePCRBanks;
@@ -2292,51 +2291,9 @@ DriverEntry (
   //
   // Get supported PCR and current Active PCRs
   //
-  Status = Tpm2GetCapabilityPcrs (&Pcrs);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2GetCapabilityPcrs fail!\n"));
-    TpmHashAlgorithmBitmap = EFI_TCG2_BOOT_HASH_ALG_SHA1;
-    ActivePCRBanks = EFI_TCG2_BOOT_HASH_ALG_SHA1;
-  } else {
-    DEBUG ((EFI_D_INFO, "Tpm2GetCapabilityPcrs Count - %08x\n", Pcrs.count));
-    TpmHashAlgorithmBitmap = 0;
-    ActivePCRBanks = 0;
-    for (Index = 0; Index < Pcrs.count; Index++) {
-      DEBUG ((EFI_D_INFO, "hash - %x\n", Pcrs.pcrSelections[Index].hash));
-      switch (Pcrs.pcrSelections[Index].hash) {
-      case TPM_ALG_SHA1:
-        TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA1;
-        }        
-        break;
-      case TPM_ALG_SHA256:
-        TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA256;
-        }
-        break;
-      case TPM_ALG_SHA384:
-        TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA384;
-        }
-        break;
-      case TPM_ALG_SHA512:
-        TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SHA512;
-        }
-        break;
-      case TPM_ALG_SM3_256:
-        TpmHashAlgorithmBitmap |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
-        if (!IsZeroBuffer (Pcrs.pcrSelections[Index].pcrSelect, Pcrs.pcrSelections[Index].sizeofSelect)) {
-          ActivePCRBanks |= EFI_TCG2_BOOT_HASH_ALG_SM3_256;
-        }
-        break;
-      }
-    }
-  }
+  Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &ActivePCRBanks);
+  ASSERT_EFI_ERROR (Status);
+
   mTcgDxeData.BsCap.HashAlgorithmBitmap = TpmHashAlgorithmBitmap & PcdGet32 (PcdTcg2HashAlgorithmBitmap);
   mTcgDxeData.BsCap.ActivePcrBanks = ActivePCRBanks & PcdGet32 (PcdTcg2HashAlgorithmBitmap);
 

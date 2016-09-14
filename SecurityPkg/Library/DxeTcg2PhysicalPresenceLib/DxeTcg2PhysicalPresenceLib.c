@@ -160,17 +160,10 @@ Tcg2ExecutePhysicalPresence (
   )
 {
   EFI_STATUS                        Status;
-  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
-  EFI_TCG2_BOOT_SERVICE_CAPABILITY  ProtocolCapability;
+  EFI_TCG2_EVENT_ALGORITHM_BITMAP   TpmHashAlgorithmBitmap;
+  UINT32                            ActivePcrBanks;
 
-  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
-  ASSERT_EFI_ERROR (Status);
-
-  ProtocolCapability.Size = sizeof(ProtocolCapability);
-  Status = Tcg2Protocol->GetCapability (
-                           Tcg2Protocol,
-                           &ProtocolCapability
-                           );
+  Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &ActivePcrBanks);
   ASSERT_EFI_ERROR (Status);
 
   switch (CommandCode) {
@@ -194,7 +187,7 @@ Tcg2ExecutePhysicalPresence (
       return TCG_PP_OPERATION_RESPONSE_SUCCESS;
 
     case TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS:
-      Status = Tpm2PcrAllocateBanks (PlatformAuth, ProtocolCapability.HashAlgorithmBitmap, CommandParameter);
+      Status = Tpm2PcrAllocateBanks (PlatformAuth, TpmHashAlgorithmBitmap, CommandParameter);
       if (EFI_ERROR (Status)) {
         return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
       } else {
@@ -210,7 +203,7 @@ Tcg2ExecutePhysicalPresence (
       }
 
     case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
-      Status = Tpm2PcrAllocateBanks (PlatformAuth, ProtocolCapability.HashAlgorithmBitmap, ProtocolCapability.HashAlgorithmBitmap);
+      Status = Tpm2PcrAllocateBanks (PlatformAuth, TpmHashAlgorithmBitmap, TpmHashAlgorithmBitmap);
       if (EFI_ERROR (Status)) {
         return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
       } else {
