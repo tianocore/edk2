@@ -182,7 +182,7 @@ class FV (FvClassObject):
         # Write the Fv contents to Buffer
         #
         if os.path.isfile(FvOutputFile):
-            FvFileObj = open ( FvOutputFile,'r+b')
+            FvFileObj = open ( FvOutputFile,'rb')
 
             GenFdsGlobalVariable.VerboseLogger( "\nGenerate %s FV Successfully" %self.UiFvName)
             GenFdsGlobalVariable.SharpCounter = 0

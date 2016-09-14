@@ -148,7 +148,7 @@ class Region(RegionClassObject):
                         EdkLogger.error("GenFds", GENFDS_ERROR,
                                         "Size of FV File (%s) is larger than Region Size 0x%X specified." \
                                         % (RegionData, Size))
-                    BinFile = open(FileName, 'r+b')
+                    BinFile = open(FileName, 'rb')
                     Buffer.write(BinFile.read())
                     BinFile.close()
                     Size = Size - FileLength
@@ -201,7 +201,7 @@ class Region(RegionClassObject):
                     EdkLogger.error("GenFds", GENFDS_ERROR,
                                     "Size 0x%X of Capsule File (%s) is larger than Region Size 0x%X specified." \
                                     % (FileLength, RegionData, Size))
-                BinFile = open(FileName, 'r+b')
+                BinFile = open(FileName, 'rb')
                 Buffer.write(BinFile.read())
                 BinFile.close()
                 Size = Size - FileLength

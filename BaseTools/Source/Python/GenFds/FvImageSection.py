@@ -64,7 +64,7 @@ class FvImageSection(FvImageSectionClassObject):
             for FvFileName in FileList:
                 FvAlignmentValue = 0
                 if os.path.isfile(FvFileName):
-                    FvFileObj = open (FvFileName,'r+b')
+                    FvFileObj = open (FvFileName,'rb')
                     FvFileObj.seek(0)
                     # PI FvHeader is 0x48 byte
                     FvHeaderBuffer = FvFileObj.read(0x48)
@@ -109,7 +109,7 @@ class FvImageSection(FvImageSectionClassObject):
                 if self.FvFileName != None:
                     FvFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FvFileName)
                     if os.path.isfile(FvFileName):
-                        FvFileObj = open (FvFileName,'r+b')
+                        FvFileObj = open (FvFileName,'rb')
                         FvFileObj.seek(0)
                         # PI FvHeader is 0x48 byte
                         FvHeaderBuffer = FvFileObj.read(0x48)

@@ -101,7 +101,7 @@ class FileStatement (FileStatementClassObject) :
                     MaxAlignValue = 1
                     for Index, File in enumerate(self.FileName):
                         try:
-                            f = open(File, 'r+b')
+                            f = open(File, 'rb')
                         except:
                             GenFdsGlobalVariable.ErrorLogger("Error opening RAW file %s." % (File))
                         Content = f.read()
