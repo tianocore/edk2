@@ -36,7 +36,8 @@ ArmVirtGicArchLibConstructor (
   UINT32                IccSre;
   FDT_CLIENT_PROTOCOL   *FdtClient;
   CONST UINT64          *Reg;
-  UINT32                RegElemSize, RegSize;
+  UINT32                RegSize;
+  UINTN                 AddressCells, SizeCells;
   UINTN                 GicRevision;
   EFI_STATUS            Status;
   UINT64                DistBase, CpuBase, RedistBase;
@@ -47,11 +48,13 @@ ArmVirtGicArchLibConstructor (
 
   GicRevision = 2;
   Status = FdtClient->FindCompatibleNodeReg (FdtClient, "arm,cortex-a15-gic",
-                        (CONST VOID **)&Reg, &RegElemSize, &RegSize);
+                        (CONST VOID **)&Reg, &AddressCells, &SizeCells,
+                        &RegSize);
   if (Status == EFI_NOT_FOUND) {
     GicRevision = 3;
     Status = FdtClient->FindCompatibleNodeReg (FdtClient, "arm,gic-v3",
-                          (CONST VOID **)&Reg, &RegElemSize, &RegSize);
+                          (CONST VOID **)&Reg, &AddressCells, &SizeCells,
+                          &RegSize);
   }
   if (EFI_ERROR (Status)) {
     return Status;

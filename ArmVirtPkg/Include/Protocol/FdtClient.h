@@ -80,7 +80,8 @@ EFI_STATUS
   IN  FDT_CLIENT_PROTOCOL     *This,
   IN  CONST CHAR8             *CompatibleString,
   OUT CONST VOID              **Reg,
-  OUT UINT32                  *RegElemSize,
+  OUT UINTN                   *AddressCells,
+  OUT UINTN                   *SizeCells,
   OUT UINT32                  *RegSize
   );
 

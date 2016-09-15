@@ -159,7 +159,8 @@ FindCompatibleNodeReg (
   IN  FDT_CLIENT_PROTOCOL     *This,
   IN  CONST CHAR8             *CompatibleString,
   OUT CONST VOID              **Reg,
-  OUT UINT32                  *RegElemSize,
+  OUT UINTN                   *AddressCells,
+  OUT UINTN                   *SizeCells,
   OUT UINT32                  *RegSize
   )
 {
@@ -185,7 +186,8 @@ FindCompatibleNodeReg (
     return EFI_NOT_FOUND;
   }
 
-  *RegElemSize = 8;
+  *AddressCells = 2;
+  *SizeCells = 2;
 
   return EFI_SUCCESS;
 }

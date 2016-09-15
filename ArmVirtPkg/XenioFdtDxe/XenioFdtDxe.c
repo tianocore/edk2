@@ -31,7 +31,8 @@ InitializeXenioFdtDxe (
   EFI_STATUS            Status;
   FDT_CLIENT_PROTOCOL   *FdtClient;
   CONST UINT64          *Reg;
-  UINT32                RegElemSize, RegSize;
+  UINT32                RegSize;
+  UINTN                 AddressCells, SizeCells;
   EFI_HANDLE            Handle;
   UINT64                RegBase;
 
@@ -40,14 +41,17 @@ InitializeXenioFdtDxe (
   ASSERT_EFI_ERROR (Status);
 
   Status = FdtClient->FindCompatibleNodeReg (FdtClient, "xen,xen",
-                        (CONST VOID **)&Reg, &RegElemSize, &RegSize);
+                        (CONST VOID **)&Reg, &AddressCells, &SizeCells,
+                        &RegSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_WARN, "%a: No 'xen,xen' compatible DT node found\n",
       __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
 
-  ASSERT (RegSize == 16);
+  ASSERT (AddressCells == 2);
+  ASSERT (SizeCells == 2);
+  ASSERT (RegSize == 2 * sizeof (UINT64));
 
   //
   // Retrieve the reg base from this node and wire it up to the

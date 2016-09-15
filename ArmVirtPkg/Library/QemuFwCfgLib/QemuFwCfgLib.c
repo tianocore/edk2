@@ -122,7 +122,8 @@ QemuFwCfgInitialize (
   EFI_STATUS                    Status;
   FDT_CLIENT_PROTOCOL           *FdtClient;
   CONST UINT64                  *Reg;
-  UINT32                        RegElemSize, RegSize;
+  UINT32                        RegSize;
+  UINTN                         AddressCells, SizeCells;
   UINT64                        FwCfgSelectorAddress;
   UINT64                        FwCfgSelectorSize;
   UINT64                        FwCfgDataAddress;
@@ -135,7 +136,8 @@ QemuFwCfgInitialize (
   ASSERT_EFI_ERROR (Status);
 
   Status = FdtClient->FindCompatibleNodeReg (FdtClient, "qemu,fw-cfg-mmio",
-                         (CONST VOID **)&Reg, &RegElemSize, &RegSize);
+                         (CONST VOID **)&Reg, &AddressCells, &SizeCells,
+                         &RegSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_WARN,
       "%a: No 'qemu,fw-cfg-mmio' compatible DT node found (Status == %r)\n",
@@ -143,7 +145,8 @@ QemuFwCfgInitialize (
     return EFI_SUCCESS;
   }
 
-  ASSERT (RegElemSize == sizeof (UINT64));
+  ASSERT (AddressCells == 2);
+  ASSERT (SizeCells == 2);
   ASSERT (RegSize == 2 * sizeof (UINT64));
 
   FwCfgDataAddress     = SwapBytes64 (Reg[0]);
