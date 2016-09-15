@@ -1,7 +1,7 @@
 /** @file
 *  High memory node enumeration DXE driver for ARM Virtual Machines
 *
-*  Copyright (c) 2015, Linaro Ltd. All rights reserved.
+*  Copyright (c) 2015-2016, Linaro Ltd. All rights reserved.
 *
 *  This program and the accompanying materials are licensed and made available
 *  under the terms and conditions of the BSD License which accompanies this
@@ -15,12 +15,12 @@
 **/
 
 #include <Library/BaseLib.h>
-#include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
-#include <Library/HobLib.h>
-#include <libfdt.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <Protocol/FdtClient.h>
 
 EFI_STATUS
 EFIAPI
@@ -29,76 +29,64 @@ InitializeHighMemDxe (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  VOID             *Hob;
-  VOID             *DeviceTreeBase;
-  INT32            Node, Prev;
-  EFI_STATUS       Status;
-  CONST CHAR8      *Type;
-  INT32            Len;
-  CONST VOID       *RegProp;
-  UINT64           CurBase;
-  UINT64           CurSize;
+  FDT_CLIENT_PROTOCOL   *FdtClient;
+  EFI_STATUS            Status, FindNodeStatus;
+  INT32                 Node;
+  CONST UINT32          *Reg;
+  UINT32                RegSize;
+  UINTN                 AddressCells, SizeCells;
+  UINT64                CurBase;
+  UINT64                CurSize;
 
-  Hob = GetFirstGuidHob(&gFdtHobGuid);
-  if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
-    return EFI_NOT_FOUND;
-  }
-  DeviceTreeBase = (VOID *)(UINTN)*(UINT64 *)GET_GUID_HOB_DATA (Hob);
-
-  if (fdt_check_header (DeviceTreeBase) != 0) {
-    DEBUG ((EFI_D_ERROR, "%a: No DTB found @ 0x%p\n", __FUNCTION__,
-      DeviceTreeBase));
-    return EFI_NOT_FOUND;
-  }
-
-  DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, DeviceTreeBase));
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
+                  (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
 
   //
-  // Check for memory node and add the memory spaces expect the lowest one
+  // Check for memory node and add the memory spaces except the lowest one
   //
-  for (Prev = 0;; Prev = Node) {
-    Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
-    if (Node < 0) {
-      break;
-    }
+  for (FindNodeStatus = FdtClient->FindMemoryNodeReg (FdtClient, &Node,
+                                     (CONST VOID **) &Reg, &AddressCells,
+                                     &SizeCells, &RegSize);
+       !EFI_ERROR (FindNodeStatus);
+       FindNodeStatus = FdtClient->FindNextMemoryNodeReg (FdtClient, Node,
+                                     &Node, (CONST VOID **) &Reg, &AddressCells,
+                                     &SizeCells, &RegSize)) {
+    ASSERT (AddressCells <= 2);
+    ASSERT (SizeCells <= 2);
 
-    Type = fdt_getprop (DeviceTreeBase, Node, "device_type", &Len);
-    if (Type && AsciiStrnCmp (Type, "memory", Len) == 0) {
-      //
-      // Get the 'reg' property of this node. For now, we will assume
-      // two 8 byte quantities for base and size, respectively.
-      //
-      RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
-      if (RegProp != NULL && Len == (2 * sizeof (UINT64))) {
+    while (RegSize > 0) {
+      CurBase = SwapBytes32 (*Reg++);
+      if (AddressCells > 1) {
+        CurBase = (CurBase << 32) | SwapBytes32 (*Reg++);
+      }
+      CurSize = SwapBytes32 (*Reg++);
+      if (SizeCells > 1) {
+        CurSize = (CurSize << 32) | SwapBytes32 (*Reg++);
+      }
+      RegSize -= (AddressCells + SizeCells) * sizeof (UINT32);
 
-        CurBase = fdt64_to_cpu (((UINT64 *)RegProp)[0]);
-        CurSize = fdt64_to_cpu (((UINT64 *)RegProp)[1]);
+      if (PcdGet64 (PcdSystemMemoryBase) != CurBase) {
+        Status = gDS->AddMemorySpace (EfiGcdMemoryTypeSystemMemory, CurBase,
+                        CurSize, EFI_MEMORY_WB);
 
-        if (PcdGet64 (PcdSystemMemoryBase) != CurBase) {
-          Status = gDS->AddMemorySpace (
-                          EfiGcdMemoryTypeSystemMemory,
-                          CurBase, CurSize,
-                          EFI_MEMORY_WB);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((EFI_D_ERROR,
+            "%a: Failed to add System RAM @ 0x%lx - 0x%lx (%r)\n",
+            __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
+          continue;
+        }
 
-          if (EFI_ERROR (Status)) {
-            DEBUG ((EFI_D_ERROR,
-              "%a: Failed to add System RAM @ 0x%lx - 0x%lx (%r)\n",
-              __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
-            continue;
-          }
+        Status = gDS->SetMemorySpaceAttributes (CurBase, CurSize,
+                        EFI_MEMORY_WB);
 
-          Status = gDS->SetMemorySpaceAttributes (
-                          CurBase, CurSize,
-                          EFI_MEMORY_WB);
-
-          if (EFI_ERROR (Status)) {
-            DEBUG ((EFI_D_ERROR,
-              "%a: Failed to set System RAM @ 0x%lx - 0x%lx attribute (%r)\n",
-              __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
-          } else {
-            DEBUG ((EFI_D_INFO, "%a: Add System RAM @ 0x%lx - 0x%lx\n",
-              __FUNCTION__, CurBase, CurBase + CurSize - 1));
-          }
+        if (EFI_ERROR (Status)) {
+          DEBUG ((EFI_D_ERROR,
+            "%a: Failed to set System RAM @ 0x%lx - 0x%lx attribute (%r)\n",
+            __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
+        } else {
+          DEBUG ((EFI_D_INFO, "%a: Add System RAM @ 0x%lx - 0x%lx\n",
+            __FUNCTION__, CurBase, CurBase + CurSize - 1));
         }
       }
     }
