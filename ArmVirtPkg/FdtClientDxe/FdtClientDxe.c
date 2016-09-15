@@ -178,7 +178,7 @@ FindCompatibleNodeReg (
     return Status;
   }
 
-  if ((*RegSize % 8) != 0) {
+  if ((*RegSize % 16) != 0) {
     DEBUG ((EFI_D_ERROR,
       "%a: '%a' compatible node has invalid 'reg' property (size == 0x%x)\n",
       __FUNCTION__, CompatibleString, *RegSize));
