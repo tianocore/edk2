@@ -194,6 +194,79 @@ FindCompatibleNodeReg (
 
 STATIC
 EFI_STATUS
+EFIAPI
+FindNextMemoryNodeReg (
+  IN  FDT_CLIENT_PROTOCOL     *This,
+  IN  INT32                   PrevNode,
+  OUT INT32                   *Node,
+  OUT CONST VOID              **Reg,
+  OUT UINTN                   *AddressCells,
+  OUT UINTN                   *SizeCells,
+  OUT UINT32                  *RegSize
+  )
+{
+  INT32          Prev, Next;
+  CONST CHAR8    *DeviceType;
+  INT32          Len;
+  EFI_STATUS     Status;
+
+  ASSERT (mDeviceTreeBase != NULL);
+  ASSERT (Node != NULL);
+
+  for (Prev = PrevNode;; Prev = Next) {
+    Next = fdt_next_node (mDeviceTreeBase, Prev, NULL);
+    if (Next < 0) {
+      break;
+    }
+
+    DeviceType = fdt_getprop (mDeviceTreeBase, Next, "device_type", &Len);
+    if (DeviceType != NULL && AsciiStrCmp (DeviceType, "memory") == 0) {
+      //
+      // Get the 'reg' property of this memory node. For now, we will assume
+      // 8 byte quantities for base and size, respectively.
+      // TODO use #cells root properties instead
+      //
+      Status = GetNodeProperty (This, Next, "reg", Reg, RegSize);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_WARN,
+          "%a: ignoring memory node with no 'reg' property\n",
+          __FUNCTION__));
+        continue;
+      }
+      if ((*RegSize % 16) != 0) {
+        DEBUG ((EFI_D_WARN,
+          "%a: ignoring memory node with invalid 'reg' property (size == 0x%x)\n",
+          __FUNCTION__, *RegSize));
+        continue;
+      }
+
+      *Node = Next;
+      *AddressCells = 2;
+      *SizeCells = 2;
+      return EFI_SUCCESS;
+    }
+  }
+  return EFI_NOT_FOUND;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+FindMemoryNodeReg (
+  IN  FDT_CLIENT_PROTOCOL     *This,
+  OUT INT32                   *Node,
+  OUT CONST VOID              **Reg,
+  OUT UINTN                   *AddressCells,
+  OUT UINTN                   *SizeCells,
+  OUT UINT32                  *RegSize
+  )
+{
+  return FindNextMemoryNodeReg (This, 0, Node, Reg, AddressCells, SizeCells,
+           RegSize);
+}
+
+STATIC
+EFI_STATUS
 GetOrInsertChosenNode (
   IN  FDT_CLIENT_PROTOCOL     *This,
   OUT INT32                   *Node
@@ -225,6 +298,8 @@ STATIC FDT_CLIENT_PROTOCOL mFdtClientProtocol = {
   FindNextCompatibleNode,
   FindCompatibleNodeProperty,
   FindCompatibleNodeReg,
+  FindMemoryNodeReg,
+  FindNextMemoryNodeReg,
   GetOrInsertChosenNode,
 };
 
