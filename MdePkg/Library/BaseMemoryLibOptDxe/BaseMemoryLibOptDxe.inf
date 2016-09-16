@@ -79,6 +79,7 @@
   Ia32/CopyMem.nasm
   Ia32/CopyMem.asm
   Ia32/IsZeroBuffer.nasm
+  MemLibGuid.c
 
 [Sources.X64]
   X64/ScanMem64.nasm
@@ -115,6 +116,7 @@
   X64/CopyMem.asm
   X64/CopyMem.S
   X64/IsZeroBuffer.nasm
+  MemLibGuid.c
 
 [Defines.ARM, Defines.AARCH64]
   #
@@ -130,20 +132,24 @@
   Arm/SetMem.S        |GCC
   Arm/CopyMem.S       |GCC
   Arm/CompareMem.S    |GCC
+  Arm/CompareGuid.S   |GCC
 
   Arm/ScanMem.asm     |RVCT
   Arm/SetMem.asm      |RVCT
   Arm/CopyMem.asm     |RVCT
   Arm/CompareMem.asm  |RVCT
+  Arm/CompareGuid.asm |RVCT
 
 [Sources.AARCH64]
   AArch64/ScanMem.S
   AArch64/SetMem.S
   AArch64/CopyMem.S
   AArch64/CompareMem.S
+  AArch64/CompareGuid.S
 
 [Sources.ARM, Sources.AARCH64]
   Arm/ScanMemGeneric.c
+  Arm/MemLibGuid.c
 
 [Sources]
   ScanMem64Wrapper.c
@@ -158,7 +164,6 @@
   SetMemWrapper.c
   CopyMemWrapper.c
   IsZeroBufferWrapper.c
-  MemLibGuid.c
 
 [Packages]
   MdePkg/MdePkg.dec
