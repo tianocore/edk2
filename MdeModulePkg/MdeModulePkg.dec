@@ -749,6 +749,18 @@
   # @Prompt Turn on PS2 Mouse Extended Verification
   gEfiMdeModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification|TRUE|BOOLEAN|0x00010075
 
+[PcdsFeatureFlag.X64]
+  ## Indicates whether 64-bit PCI MMIO BARs should degrade to 32-bit in the presence of an option ROM
+  #  On X64 platforms, Option ROMs may contain code that executes in the context of a legacy BIOS (CSM),
+  #  which requires that all PCI MMIO BARs are located below 4 GB
+  #   TRUE  - All PCI MMIO BARs of a device will be located below 4 GB if it has an option ROM
+  #   FALSE - PCI MMIO BARs of a device may be located above 4 GB even if it has an option ROM
+  # @Prompt Degrade 64-bit PCI MMIO BARs for legacy BIOS option ROMs
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|TRUE|BOOLEAN|0x0001003a
+
+[PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
   ## Indicates if DxeIpl should switch to long mode to enter DXE phase.
   #  It is assumed that 64-bit DxeCore is built in firmware if it is true; otherwise 32-bit DxeCore

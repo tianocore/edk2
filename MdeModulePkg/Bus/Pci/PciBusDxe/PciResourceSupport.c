@@ -1058,48 +1058,50 @@ DegradeResource (
   LIST_ENTRY           *NextChildNodeLink;
   PCI_RESOURCE_NODE    *ResourceNode;
 
-  //
-  // If any child device has both option ROM and 64-bit BAR, degrade its PMEM64/MEM64
-  // requests in case that if a legacy option ROM image can not access 64-bit resources.
-  //
-  ChildDeviceLink = Bridge->ChildList.ForwardLink;
-  while (ChildDeviceLink != NULL && ChildDeviceLink != &Bridge->ChildList) {
-    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (ChildDeviceLink);
-    if (PciIoDevice->RomSize != 0) {
-      if (!IsListEmpty (&Mem64Node->ChildList)) {      
-        ChildNodeLink = Mem64Node->ChildList.ForwardLink;
-        while (ChildNodeLink != &Mem64Node->ChildList) {
-          ResourceNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
-          NextChildNodeLink = ChildNodeLink->ForwardLink;
+  if (FeaturePcdGet (PcdPciDegradeResourceForOptionRom)) {
+    //
+    // If any child device has both option ROM and 64-bit BAR, degrade its PMEM64/MEM64
+    // requests in case that if a legacy option ROM image can not access 64-bit resources.
+    //
+    ChildDeviceLink = Bridge->ChildList.ForwardLink;
+    while (ChildDeviceLink != NULL && ChildDeviceLink != &Bridge->ChildList) {
+      PciIoDevice = PCI_IO_DEVICE_FROM_LINK (ChildDeviceLink);
+      if (PciIoDevice->RomSize != 0) {
+        if (!IsListEmpty (&Mem64Node->ChildList)) {
+          ChildNodeLink = Mem64Node->ChildList.ForwardLink;
+          while (ChildNodeLink != &Mem64Node->ChildList) {
+            ResourceNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
+            NextChildNodeLink = ChildNodeLink->ForwardLink;
 
-          if ((ResourceNode->PciDev == PciIoDevice) &&
-              (ResourceNode->Virtual || !PciIoDevice->PciBar[ResourceNode->Bar].BarTypeFixed)
-              ) {
-            RemoveEntryList (ChildNodeLink);
-            InsertResourceNode (Mem32Node, ResourceNode);
+            if ((ResourceNode->PciDev == PciIoDevice) &&
+                (ResourceNode->Virtual || !PciIoDevice->PciBar[ResourceNode->Bar].BarTypeFixed)
+                ) {
+              RemoveEntryList (ChildNodeLink);
+              InsertResourceNode (Mem32Node, ResourceNode);
+            }
+            ChildNodeLink = NextChildNodeLink;
           }
-          ChildNodeLink = NextChildNodeLink;
-        }        
-      }
+        }
 
-      if (!IsListEmpty (&PMem64Node->ChildList)) {      
-        ChildNodeLink = PMem64Node->ChildList.ForwardLink;
-        while (ChildNodeLink != &PMem64Node->ChildList) {
-          ResourceNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
-          NextChildNodeLink = ChildNodeLink->ForwardLink;
+        if (!IsListEmpty (&PMem64Node->ChildList)) {
+          ChildNodeLink = PMem64Node->ChildList.ForwardLink;
+          while (ChildNodeLink != &PMem64Node->ChildList) {
+            ResourceNode = RESOURCE_NODE_FROM_LINK (ChildNodeLink);
+            NextChildNodeLink = ChildNodeLink->ForwardLink;
 
-          if ((ResourceNode->PciDev == PciIoDevice) &&
-              (ResourceNode->Virtual || !PciIoDevice->PciBar[ResourceNode->Bar].BarTypeFixed)
-              ) {
-            RemoveEntryList (ChildNodeLink);
-            InsertResourceNode (PMem32Node, ResourceNode);
+            if ((ResourceNode->PciDev == PciIoDevice) &&
+                (ResourceNode->Virtual || !PciIoDevice->PciBar[ResourceNode->Bar].BarTypeFixed)
+                ) {
+              RemoveEntryList (ChildNodeLink);
+              InsertResourceNode (PMem32Node, ResourceNode);
+            }
+            ChildNodeLink = NextChildNodeLink;
           }
-          ChildNodeLink = NextChildNodeLink;
-        }        
-      }
+        }
 
+      }
+      ChildDeviceLink = ChildDeviceLink->ForwardLink;
     }
-    ChildDeviceLink = ChildDeviceLink->ForwardLink;
   }
 
   //

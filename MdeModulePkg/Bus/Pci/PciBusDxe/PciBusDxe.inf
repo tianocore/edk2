@@ -97,9 +97,10 @@
   gEfiLoadFile2ProtocolGuid                       ## SOMETIMES_PRODUCES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUnalignedPciIoEnable            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom  ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
