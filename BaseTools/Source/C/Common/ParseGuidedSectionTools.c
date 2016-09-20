@@ -1,7 +1,7 @@
 /** @file
 Helper functions for parsing GuidedSectionTools.txt
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -144,13 +144,14 @@ Returns:
           NewGuidTool->Name = CloneString(Tool->Strings[1]);
           NewGuidTool->Path = CloneString(Tool->Strings[2]);
           NewGuidTool->Next = NULL;
+
+          if (FirstGuidTool == NULL) {
+            FirstGuidTool = NewGuidTool;
+          } else {
+            LastGuidTool->Next = NewGuidTool;
+          }
+          LastGuidTool = NewGuidTool;
         }
-        if (FirstGuidTool == NULL) {
-          FirstGuidTool = NewGuidTool;
-        } else {
-          LastGuidTool->Next = NewGuidTool;
-        }
-        LastGuidTool = NewGuidTool;
       }
       FreeStringList (Tool);
     }

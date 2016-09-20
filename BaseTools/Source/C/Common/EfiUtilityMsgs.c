@@ -1,7 +1,7 @@
 /** @file
 EFI tools utility functions to display warning, error, and informational messages
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -451,14 +451,16 @@ Notes:
     //
     time (&CurrentTime);
     NewTime = localtime (&CurrentTime);
-    fprintf (stdout, "%04d-%02d-%02d %02d:%02d:%02d",
-                     NewTime->tm_year + 1900,
-                     NewTime->tm_mon + 1,
-                     NewTime->tm_mday,
-                     NewTime->tm_hour,
-                     NewTime->tm_min,
-                     NewTime->tm_sec
-                     );
+    if (NewTime != NULL) {
+      fprintf (stdout, "%04d-%02d-%02d %02d:%02d:%02d",
+                       NewTime->tm_year + 1900,
+                       NewTime->tm_mon + 1,
+                       NewTime->tm_mday,
+                       NewTime->tm_hour,
+                       NewTime->tm_min,
+                       NewTime->tm_sec
+                       );
+    }
     if (Cptr != NULL) {
       sprintf (Line, ": %s", Cptr);
       if (LineNumber != 0) {

@@ -4,7 +4,7 @@ coding. LZ77 transforms the source data into a sequence of Original Characters
 and Pointers to repeated strings. This sequence is further divided into Blocks 
 and Huffman codings are applied to each Block.
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -417,6 +417,9 @@ Returns:
   UINT32  Index;
 
   mText = malloc (WNDSIZ * 2 + MAXMATCH);
+  if (mText == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   for (Index = 0; Index < WNDSIZ * 2 + MAXMATCH; Index++) {
     mText[Index] = 0;
   }
@@ -427,6 +430,10 @@ Returns:
   mParent     = malloc (WNDSIZ * 2 * sizeof (*mParent));
   mPrev       = malloc (WNDSIZ * 2 * sizeof (*mPrev));
   mNext       = malloc ((MAX_HASH_VAL + 1) * sizeof (*mNext));
+  if (mLevel == NULL || mChildCount == NULL || mPosition == NULL ||
+    mParent == NULL || mPrev == NULL || mNext == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   mBufSiz     = BLKSIZ;
   mBuf        = malloc (mBufSiz);

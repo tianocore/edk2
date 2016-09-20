@@ -650,6 +650,10 @@ Returns:
                         ImageContext,
                         RelocDir->VirtualAddress + RelocDir->Size - 1
                         );
+        if (RelocBase == NULL || RelocBaseEnd == NULL || RelocBaseEnd < RelocBase) {
+          ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+          return RETURN_LOAD_ERROR;
+        }
       } else {
         //
         // Set base and end to bypass processing below.
@@ -674,6 +678,10 @@ Returns:
                         ImageContext,
                         RelocDir->VirtualAddress + RelocDir->Size - 1
                         );
+        if (RelocBase == NULL || RelocBaseEnd == NULL || RelocBaseEnd < RelocBase) {
+          ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+          return RETURN_LOAD_ERROR;
+        }
       } else {
         //
         // Set base and end to bypass processing below.
@@ -710,6 +718,10 @@ Returns:
     RelocEnd  = (UINT16 *) ((CHAR8 *) RelocBase + RelocBase->SizeOfBlock);
     if (!(ImageContext->IsTeImage)) {
       FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress);
+      if (FixupBase == NULL) {
+        ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+        return RETURN_LOAD_ERROR;
+      }
     } else {
       FixupBase = (CHAR8 *)(UINTN)(ImageContext->ImageAddress +
                     RelocBase->VirtualAddress +
