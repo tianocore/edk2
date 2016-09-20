@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2013 - 2015 Intel Corporation.
+# Copyright (c) 2013 - 2016 Intel Corporation.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -263,7 +263,7 @@ L0:
   # Set up stack pointer
   #
   movl    ASM_PFX(PcdGet32(PcdEsramStage1Base)), %esp
-  movl    $QUARK_STACK_SIZE_BYTES, %esi
+  movl    $QUARK_ESRAM_MEM_SIZE_BYTES, %esi
   addl    %esi, %esp                          # ESP = top of stack (stack grows downwards).
 
   #
