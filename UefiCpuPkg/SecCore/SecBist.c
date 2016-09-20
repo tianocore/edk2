@@ -230,9 +230,9 @@ RepublishSecPlatformInformationPpi (
       (UINTN) BistInformationSize
       );
     //
-    // The old SecPlatformInformation data is on CAR.
-    // After memory discovered, we should never get it from CAR, or the data will be crashed.
-    // So, we reinstall SecPlatformInformation PPI here.
+    // The old SecPlatformInformation2 data is on temporary memory.
+    // After memory discovered, we should never get it from temporary memory,
+    // or the data will be crashed. So, we reinstall SecPlatformInformation2 PPI here.
     //
     Status = PeiServicesReInstallPpi (
                SecInformationDescriptor,
@@ -253,9 +253,9 @@ RepublishSecPlatformInformationPpi (
         (UINTN) BistInformationSize
         );
       //
-      // The old SecPlatformInformation2 data is on CAR.
-      // After memory discovered, we should never get it from CAR, or the data will be crashed.
-      // So, we reinstall SecPlatformInformation2 PPI here.
+      // The old SecPlatformInformation data is on temporary memory.
+      // After memory discovered, we should never get it from temporary memory,
+      // or the data will be crashed. So, we reinstall SecPlatformInformation PPI here.
       //
       Status = PeiServicesReInstallPpi (
                  SecInformationDescriptor,
