@@ -261,6 +261,8 @@ RepublishSecPlatformInformationPpi (
                  SecInformationDescriptor,
                  &mPeiSecPlatformInformation
                  );
+    } else if (Status == EFI_NOT_FOUND) {
+      return;
     }
   }
 
