@@ -49,6 +49,7 @@
   ShellPkg/ShellPkg.dec
   CryptoPkg/CryptoPkg.dec
   SecurityPkg/SecurityPkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
 
 [LibraryClasses]
   DxeServicesTableLib
@@ -102,6 +103,11 @@
   gEfiEndOfDxeEventGroupGuid
 
 [Pcd]
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiRsa2048Sha256TestPublicKeyFileGuid
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiPkcs7TestPublicKeyFileGuid
+  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer
+  gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed
   gPlatformModuleTokenSpaceGuid.PcdFlashFvRecovery2Base
   gPlatformModuleTokenSpaceGuid.PcdFlashFvMainBase
   gPlatformModuleTokenSpaceGuid.PcdFlashFvRecoveryBase

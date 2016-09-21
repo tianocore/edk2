@@ -1872,9 +1872,9 @@ PlatformBdsPolicyBehavior (
     PlatformBdsConnectConsole (gPlatformConsole);
     PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
 
-    DEBUG((EFI_D_INFO, "ProcessCapsules Before EndOfDxe......\n"));
+    DEBUG((DEBUG_INFO, "ProcessCapsules Before EndOfDxe......\n"));
     ProcessCapsules ();
-    DEBUG((EFI_D_INFO, "ProcessCapsules Done\n"));
+    DEBUG((DEBUG_INFO, "ProcessCapsules Done\n"));
 
     //
     // Close boot script and install ready to lock
@@ -1901,9 +1901,9 @@ PlatformBdsPolicyBehavior (
       EsrtManagement->SyncEsrtFmp();
     }
 
-    DEBUG((EFI_D_INFO, "ProcessCapsules After ConnectAll......\n"));
+    DEBUG((DEBUG_INFO, "ProcessCapsules After ConnectAll......\n"));
     ProcessCapsules();
-    DEBUG((EFI_D_INFO, "ProcessCapsules Done\n"));
+    DEBUG((DEBUG_INFO, "ProcessCapsules Done\n"));
     break;
 
   case BOOT_IN_RECOVERY_MODE:
@@ -2411,6 +2411,12 @@ ShowProgressHotKey (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Color;
   UINT32                        GpioValue;
+  CHAR16                        *TmpStr1;
+  CHAR16                        *TmpStr2;
+  CHAR16                        *TmpStr3;
+  UINTN                         TmpStrSize;
+  VOID                          *Buffer;
+  UINTN                         Size;
 
   if (TimeoutDefault == 0) {
     return EFI_TIMEOUT;
@@ -2434,10 +2440,76 @@ ShowProgressHotKey (
   SetMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
   SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0xff);
 
+  TmpStr2 = NULL;
+  TmpStr3 = NULL;
+
+  //
+  // Check if the platform is using test key.
+  //
+  Status = GetSectionFromAnyFv(
+             PcdGetPtr(PcdEdkiiRsa2048Sha256TestPublicKeyFileGuid),
+             EFI_SECTION_RAW,
+             0,
+             &Buffer,
+             &Size
+             );
+  if (!EFI_ERROR(Status)) {
+    if ((Size == PcdGetSize(PcdRsa2048Sha256PublicKeyBuffer)) &&
+        (CompareMem(Buffer, PcdGetPtr(PcdRsa2048Sha256PublicKeyBuffer), Size) == 0)) {
+      TmpStr2 = L"WARNING: Recovery Test Key is used.\r\n";
+      if (DebugAssertEnabled()) {
+        DEBUG ((DEBUG_INFO, "\n\nWARNING: Recovery Test Key is used.\n"));
+      } else {
+        SerialPortWrite((UINT8 *)"\n\nWARNING: Recovery Test Key is used.", sizeof("\n\nWARNING: Recovery Test Key is used."));
+      }
+      PcdSetBoolS(PcdTestKeyUsed, TRUE);
+    }
+    FreePool(Buffer);
+  }
+  Status = GetSectionFromAnyFv(
+             PcdGetPtr(PcdEdkiiPkcs7TestPublicKeyFileGuid),
+             EFI_SECTION_RAW,
+             0,
+             &Buffer,
+             &Size
+             );
+  if (!EFI_ERROR(Status)) {
+    if ((Size == PcdGetSize(PcdPkcs7CertBuffer)) &&
+        (CompareMem(Buffer, PcdGetPtr(PcdPkcs7CertBuffer), Size) == 0)) {
+      TmpStr3 = L"WARNING: Capsule Test Key is used.\r\n";
+      if (DebugAssertEnabled()) {
+        DEBUG ((DEBUG_INFO, "\n\nWARNING: Capsule Test Key is used.\r\n"));
+      } else {
+        SerialPortWrite((UINT8 *)"\n\nWARNING: Capsule Test Key is used.", sizeof("\n\nWARNING: Capsule Test Key is used."));
+      }
+      PcdSetBoolS(PcdTestKeyUsed, TRUE);
+    }
+    FreePool(Buffer);
+  }
+
   //
   // Clear the progress status bar first
   //
-  TmpStr = L"Start boot option, Press <F2> or <DEL> to enter setup page.";
+  TmpStr1 = L"Start boot option, Press <F2> or <DEL> to enter setup page.\r\n";
+  TmpStrSize = StrSize(TmpStr1);
+  if (TmpStr2 != NULL) {
+    TmpStrSize += StrSize(TmpStr2);
+  }
+  if (TmpStr3 != NULL) {
+    TmpStrSize += StrSize(TmpStr3);
+  }
+  TmpStr = AllocatePool (TmpStrSize);
+  if (TmpStr == NULL) {
+    TmpStr = TmpStr1;
+  } else {
+    StrCpyS(TmpStr, TmpStrSize/sizeof(CHAR16), TmpStr1);
+    if (TmpStr2 != NULL) {
+      StrCatS(TmpStr, TmpStrSize/sizeof(CHAR16), TmpStr2);
+    }
+    if (TmpStr3 != NULL) {
+      StrCatS(TmpStr, TmpStrSize/sizeof(CHAR16), TmpStr3);
+    }
+  }
   PlatformBdsShowProgress (Foreground, Background, TmpStr, Color, 0, 0);
 
   TimeoutRemain = TimeoutDefault;
