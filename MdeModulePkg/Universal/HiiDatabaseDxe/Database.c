@@ -356,7 +356,7 @@ InvokeRegisteredFunction (
   @param  NotifyType             The type of change concerning the database.
   @param  PackageList            Pointer to a package list which will be inserted
                                  to.
-  @param  Package                Created GUID pacakge
+  @param  Package                Created GUID package
 
   @retval EFI_SUCCESS            Guid Package is inserted successfully.
   @retval EFI_OUT_OF_RESOURCES   Unable to allocate necessary resources for the new
@@ -903,7 +903,7 @@ Error:
  @param  PackageList        Pointer to a package list which will be adjusted.
 
  @retval EFI_SUCCESS  Adjust all string packages successfully.
- @retval others       Can't adjust string packges.
+ @retval others       Can't adjust string packages.
 
 **/
 EFI_STATUS
@@ -3041,7 +3041,7 @@ HiiNewPackageList (
 
 
 /**
-  This function removes the package list that is associated with a handle Handle
+  This function removes the package list that is associated with Handle
   from the HII database. Before removing the package, any registered functions
   with the notification type REMOVE_PACK and the same package type will be called.
 
@@ -3052,7 +3052,7 @@ HiiNewPackageList (
 
   @retval EFI_SUCCESS            The data associated with the Handle was removed
                                  from  the HII database.
-  @retval EFI_NOT_FOUND          The specified andle is not in database.
+  @retval EFI_NOT_FOUND          The specified handle is not in database.
   @retval EFI_INVALID_PARAMETER  The Handle was not valid.
 
 **/
@@ -3294,7 +3294,7 @@ HiiUpdatePackageList (
                                  buffer that is required for the handles found.
   @param  Handle                 An array of EFI_HII_HANDLE instances returned.
 
-  @retval EFI_SUCCESS            The matching handles are outputed successfully.
+  @retval EFI_SUCCESS            The matching handles are outputted successfully.
                                  HandleBufferLength is updated with the actual length.
   @retval EFI_BUFFER_TO_SMALL    The HandleBufferLength parameter indicates that
                                  Handle is too small to support the number of
@@ -3400,7 +3400,7 @@ HiiListPackageLists (
         }
         break;
         //
-        // Pesudo-type EFI_HII_PACKAGE_TYPE_ALL will cause all package handles
+        // Pseudo-type EFI_HII_PACKAGE_TYPE_ALL will cause all package handles
         // to be listed.
         //
       case EFI_HII_PACKAGE_TYPE_ALL:
@@ -3457,7 +3457,7 @@ HiiListPackageLists (
                                  Handle is too small to support the number of
                                  handles.      HandleBufferLength is updated with a
                                  value that will enable the data to fit.
-  @retval EFI_NOT_FOUND          The specifiecd Handle could not be found in the
+  @retval EFI_NOT_FOUND          The specified Handle could not be found in the
                                  current database.
   @retval EFI_INVALID_PARAMETER  BufferSize was NULL.
   @retval EFI_INVALID_PARAMETER  The value referenced by BufferSize was not zero 

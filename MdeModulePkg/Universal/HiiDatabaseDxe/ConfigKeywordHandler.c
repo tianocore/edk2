@@ -28,7 +28,7 @@ extern HII_DATABASE_PRIVATE_DATA mPrivate;
   @param  NextString             string follow the possible PathHdr string.
 
   @retval EFI_INVALID_PARAMETER  The device path is not valid or the incoming parameter is invalid.
-  @retval EFI_OUT_OF_RESOURCES   Lake of resources to store neccesary structures.
+  @retval EFI_OUT_OF_RESOURCES   Lake of resources to store necessary structures.
   @retval EFI_SUCCESS            The device path is retrieved and translated to binary format.
                                  The Input string not include PathHdr section.
 
@@ -240,10 +240,10 @@ ExtractNameSpace (
 
   @param  String                 KeywordRequestformat string.
   @param  Keyword                return the extract keyword string.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
 
   @retval EFI_SUCCESS            Success to get the keyword string.
-  @retval EFI_INVALID_PARAMETER  Parsr the input string return error.
+  @retval EFI_INVALID_PARAMETER  Parse the input string return error.
 
 **/
 EFI_STATUS
@@ -306,10 +306,10 @@ ExtractKeyword (
 
   @param  String                 KeywordRequestformat string.
   @param  Value                  return the extract value string.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
 
   @retval EFI_SUCCESS            Success to get the keyword string.
-  @retval EFI_INVALID_PARAMETER  Parsr the input string return error.
+  @retval EFI_INVALID_PARAMETER  Parse the input string return error.
 
 **/
 EFI_STATUS
@@ -361,10 +361,10 @@ ExtractValue (
 
   @param  String                 KeywordRequestformat string.
   @param  FilterFlags            return the filter condition.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
 
   @retval EFI_SUCCESS            Success to get the keyword string.
-  @retval EFI_INVALID_PARAMETER  Parsr the input string return error.
+  @retval EFI_INVALID_PARAMETER  Parse the input string return error.
 
 **/
 BOOLEAN
@@ -477,7 +477,7 @@ ExtractFilter (
         String = KeywordPtr;
       } else {
         //
-        // Only has paltform defined filter section, just skip it.
+        // Only has platform defined filter section, just skip it.
         //
         String += StrLen (String);
       }
@@ -520,9 +520,9 @@ ExtractReadOnlyFromOpCode (
 
   This is a internal function.
 
-  @param  OpCodeData             The questin binary ifr data.
+  @param  OpCodeData             The question binary ifr data.
   @param  KeywordRequest         KeywordRequestformat string.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
   @param  ReadOnly               Return whether this question is read only.
 
   @retval KEYWORD_HANDLER_NO_ERROR                     Success validate.
@@ -711,7 +711,7 @@ GetRecordFromDevicePath (
   @param  BufferSize             Length of the buffer.
   @param  StringDest             Buffer to store the string text. 
 
-  @retval EFI_SUCCESS            The string text was outputed successfully.
+  @retval EFI_SUCCESS            The string text was outputted successfully.
   @retval EFI_OUT_OF_RESOURCES   Out of resource.
 
 **/
@@ -1310,7 +1310,7 @@ GetNextStringId (
   @param  KeywordValue                   Keyword value.
   @param  StringId                       String Id for this keyword.
 
-  @retval KEYWORD_HANDLER_NO_ERROR                     Get String id succes.
+  @retval KEYWORD_HANDLER_NO_ERROR                     Get String id successfully.
   @retval KEYWORD_HANDLER_KEYWORD_NOT_FOUND            Not found the string id in the string package.
   @retval KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND       Not found the string package for this namespace.
   @retval KEYWORD_HANDLER_UNDEFINED_PROCESSING_ERROR   Out of resource error.
@@ -1609,7 +1609,7 @@ GetWidth (
 }
 
 /**
-  Converts all hex dtring characters in range ['A'..'F'] to ['a'..'f'] for 
+  Converts all hex string characters in range ['A'..'F'] to ['a'..'f'] for
   hex digits that appear between a '=' and a '&' in a config string.
 
   If ConfigString is NULL, then ASSERT().
@@ -1657,7 +1657,7 @@ InternalLowerConfigString (
   @param[in]  DriverHandle  The driver handle which supports a Device Path Protocol
                             that is the routing information PATH.  Each byte of
                             the Device Path associated with DriverHandle is converted
-                            to a 2 Unicode character hexidecimal string.
+                            to a 2 Unicode character hexadecimal string.
 
   @retval NULL   DriverHandle does not support the Device Path Protocol.
   @retval Other  A pointer to the Null-terminate Unicode <ConfigHdr> string
@@ -2356,7 +2356,7 @@ GetStringIdFromDatabase (
 }
 
 /**
-  Genereate the KeywordResp String.
+  Generate the KeywordResp String.
 
   <KeywordResp> ::= <NameSpaceId><PathHdr>'&'<Keyword>'&VALUE='<Number>['&READONLY']
 
@@ -2419,7 +2419,7 @@ GenerateKeywordResp (
   RespStrLen += StrLen (PathHdr);
 
   //
-  // 1.3 Keyword setion.
+  // 1.3 Keyword section.
   // 'KEYWORD='<String>[':'<DecCh>(1/4)]
   //
   RespStrLen += 8 + StrLen (KeywordData);
@@ -2709,7 +2709,7 @@ Error:
   }
 
   //
-  // return the already get MultiKeywordString even error occured.
+  // return the already get MultiKeywordString even error occurred.
   //
   if (MultiKeywordResp == NULL) {
     Status = EFI_NOT_FOUND;
@@ -3071,7 +3071,7 @@ Done:
   @retval EFI_SUCCESS             The specified action was completed successfully.
   
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
-                                  1.Progress, ProgressErr, or Resuts is NULL.
+                                  1.Progress, ProgressErr, or Results is NULL.
                                   2.Parsing of the KeywordString resulted in an error. See
                                     Progress and ProgressErr for more data.
   

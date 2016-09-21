@@ -65,7 +65,7 @@ CalculateConfigStringLen (
 
   @retval EFI_NOT_FOUND          The device path is not invalid.
   @retval EFI_INVALID_PARAMETER  Any incoming parameter is invalid.
-  @retval EFI_OUT_OF_RESOURCES   Lake of resources to store neccesary structures.
+  @retval EFI_OUT_OF_RESOURCES   Lake of resources to store necessary structures.
   @retval EFI_SUCCESS            The device path is retrieved and translated to
                                  binary format.
 
@@ -436,7 +436,7 @@ AppendToMultiString (
                                  to free memory.
   @param  Len                    Length of the <Number>, in characters.
 
-  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store necessary
                                  structures.
   @retval EFI_SUCCESS            Value of <Number> is outputted in Number
                                  successfully.
@@ -518,7 +518,7 @@ Exit:
   @param  Found                  The Block whether has been found.
   @param  BufferLen              The length of the buffer.
 
-  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary structures.
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store necessary structures.
   @retval EFI_SUCCESS            The function finishes successfully.
 
 **/
@@ -574,7 +574,7 @@ FindSameBlockElement(
   @param  AltConfigHdr           Pointer to a Unicode string in <AltConfigHdr> format.
   @param  ConfigAltRespChanged   Whether the ConfigAltResp has been changed.
 
-  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary structures.
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store necessary structures.
   @retval EFI_SUCCESS            The function finishes  successfully.
 
 **/
@@ -715,7 +715,7 @@ Exit:
   @param  AltConfigHdr           Pointer to a Unicode string in <AltConfigHdr> format.
   @param  ConfigAltRespChanged   Whether the ConfigAltResp has been changed.
 
-  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary structures.
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store necessary structures.
   @retval EFI_SUCCESS            The function finishes  successfully.
 
 **/
@@ -845,7 +845,7 @@ Exit:
                                  string for the different varstore buffer.
   @param  AltConfigHdr           Pointer to a Unicode string in <AltConfigHdr> format.
 
-  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store neccessary
+  @retval EFI_OUT_OF_RESOURCES   Insufficient resources to store necessary
                                  structures.
   @retval EFI_SUCCESS            The function finishes  successfully.
 
@@ -1021,7 +1021,7 @@ MergeDefaultString (
   }
   
   //
-  // Get the requestr ConfigHdr
+  // Get the request ConfigHdr
   //
   SizeAltCfgResp  = 0;
   StringPtr       = *AltCfgResp;
@@ -1249,9 +1249,9 @@ InsertBlockData (
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
 
   @retval NULL   HiiHandle is not registered in the HII database
-  @retval NULL   There are not enough resources available to retrieve the suported 
+  @retval NULL   There are not enough resources available to retrieve the supported
                  languages.
-  @retval NULL   The list of suported languages could not be retrieved.
+  @retval NULL   The list of supported languages could not be retrieved.
   @retval Other  A pointer to the Null-terminated ASCII string of supported languages.
 
 **/
@@ -1697,7 +1697,7 @@ GetVarStoreType (
       } 
         
       //
-      // Free alllocated temp string.
+      // Free allocated temp string.
       //
       FreePool (VarStoreName);
       FreePool (GuidStr);
@@ -1755,8 +1755,8 @@ GetElementsFromRequest (
   @param  Name              Varstore name.
   @param  ConfigHdr         Current configRequest info.
 
-  @retval  TRUE              This varstore is the requst one.
-  @retval  FALSE             This varstore is not the requst one.
+  @retval  TRUE              This varstore is the request one.
+  @retval  FALSE             This varstore is not the request one.
                                  
 **/
 BOOLEAN
@@ -1825,8 +1825,8 @@ Done:
   @param  DataBaseRecord        The DataBaseRecord instance contains the found Hii handle and package.
   @param  ConfigHdr             Request string ConfigHdr. If it is NULL,
                                 the first found varstore will be as ConfigHdr.
-  @retval  TRUE                 This hii package is the reqeust one.
-  @retval  FALSE                This hii package is not the reqeust one.
+  @retval  TRUE                 This hii package is the request one.
+  @retval  FALSE                This hii package is not the request one.
 **/                                
 BOOLEAN
 IsThisPackageList (
@@ -1955,7 +1955,7 @@ Done:
 
   @param  RequestBlockArray      The array includes all the request info or NULL.
   @param  HiiHandle              The hii handle for this form package.
-  @param  VarStorageData         The varstore data strucure.
+  @param  VarStorageData         The varstore data structure.
   @param  IfrOpHdr               Ifr opcode header for this opcode.
   @param  VarWidth               The buffer width for this opcode.
   @param  ReturnData             The data block added for this opcode.
@@ -2048,7 +2048,7 @@ IsThisOpcodeRequired (
 
   @param  HiiHandle             Hii Handle for this hii package.
   @param  Package               Pointer to the form package data.
-  @param  PackageLength         Length of the pacakge.
+  @param  PackageLength         Length of the package.
   @param  ConfigHdr             Request string ConfigHdr. If it is NULL,
                                 the first found varstore will be as ConfigHdr.
   @param  RequestBlockArray     The block array is retrieved from the request string.
@@ -2056,7 +2056,7 @@ IsThisOpcodeRequired (
   @param  DefaultIdArray        Point to the got default id and default name array.
 
   @retval EFI_SUCCESS           The block array and the default value array are got.
-  @retval EFI_INVALID_PARAMETER The varstore defintion in the differnt form pacakges
+  @retval EFI_INVALID_PARAMETER The varstore definition in the different form packages
                                 are conflicted. 
   @retval EFI_OUT_OF_RESOURCES  No enough memory.
 **/
@@ -2493,7 +2493,7 @@ ParseIfrData (
       DefaultData.DefaultId   = VarDefaultId;
       if ((IfrCheckBox->Flags & EFI_IFR_CHECKBOX_DEFAULT) == EFI_IFR_CHECKBOX_DEFAULT) {
         //
-        // When flag is set, defautl value is TRUE.
+        // When flag is set, default value is TRUE.
         //
         DefaultData.Type    = DefaultValueFromFlag;
         DefaultData.Value.b = TRUE;
@@ -2518,7 +2518,7 @@ ParseIfrData (
       DefaultData.DefaultId   = VarDefaultId;
       if ((IfrCheckBox->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG) == EFI_IFR_CHECKBOX_DEFAULT_MFG) {
         //
-        // When flag is set, defautl value is TRUE.
+        // When flag is set, default value is TRUE.
         //
         DefaultData.Type    = DefaultValueFromFlag;
         DefaultData.Value.b = TRUE;
@@ -2534,7 +2534,7 @@ ParseIfrData (
       }
       if (SmallestIdFromFlag) {
         //
-        // When smallest default Id is given by the  flag of CheckBox, set defaut value with TRUE for other default Id in the DefaultId list.
+        // When smallest default Id is given by the  flag of CheckBox, set default value with TRUE for other default Id in the DefaultId list.
         //
         DefaultData.Type    = DefaultValueFromOtherDefault;
         DefaultData.Value.b = TRUE;
@@ -2548,7 +2548,7 @@ ParseIfrData (
         }
       } else {
         //
-        // When flag is not set, defautl value is FASLE.
+        // When flag is not set, default value is FASLE.
         //
         DefaultData.Type    = DefaultValueFromDefault;
         DefaultData.Value.b = FALSE;
@@ -2942,8 +2942,8 @@ ParseIfrData (
       }
 
       //
-      // After insert the default value, reset the cleaned value for next 
-      // time used. If not set here, need to set the value before everytime 
+      // After insert the default value, reset the cleaned value for next
+      // time used. If not set here, need to set the value before every time.
       // use it.
       //
       DefaultData.Cleaned     = FALSE;
@@ -3743,7 +3743,7 @@ GenerateAltConfigResp (
                                  When Request points to NULL, the default value string 
                                  for each varstore in form package will be merged into 
                                  a <MultiConfigAltResp> format string and return.
-  @param  PointerProgress        Optional parameter, it can be be NULL. 
+  @param  PointerProgress        Optional parameter, it can be NULL.
                                  When it is not NULL, if Request is NULL, it returns NULL. 
                                  On return, points to a character in the Request
                                  string. Points to the string's null terminator if
@@ -3807,7 +3807,7 @@ GetFullStringFromHiiFormPackages (
   }
 
   //
-  // 1. Get the request block array by Request String when Request string containts the block array.
+  // 1. Get the request block array by Request String when Request string contains the block array.
   //
   StringPtr = NULL;
   if (*Request != NULL) {
@@ -3890,7 +3890,7 @@ GetFullStringFromHiiFormPackages (
   //
 
   //
-  // Parse the opcode in form pacakge to get the default setting.
+  // Parse the opcode in form package to get the default setting.
   //
   Status = ParseIfrData (DataBaseRecord->Handle,
                          HiiFormPackage,
@@ -3936,7 +3936,7 @@ GetFullStringFromHiiFormPackages (
   }
 
   //
-  // 5. Merge string into the input AltCfgResp if the iput *AltCfgResp is not NULL.
+  // 5. Merge string into the input AltCfgResp if the input *AltCfgResp is not NULL.
   //
   if (*AltCfgResp != NULL && DefaultAltCfgResp != NULL) {
     Status = MergeDefaultString (AltCfgResp, DefaultAltCfgResp);
@@ -4009,7 +4009,7 @@ Done:
   }
 
   //
-  // Free Pacakge data
+  // Free Package data
   //
   if (HiiFormPackage != NULL) {
     FreePool (HiiFormPackage);
@@ -4675,7 +4675,7 @@ HiiConfigRoutingExtractConfig (
 
     //
     // Attach this <ConfigAltResp> to a <MultiConfigAltResp>. There is a '&'
-    // which seperates the first <ConfigAltResp> and the following ones.
+    // which separates the first <ConfigAltResp> and the following ones.
     //
     ASSERT (*AccessProgress == 0);
 
@@ -4928,7 +4928,7 @@ HiiConfigRoutingExportConfig (
       
       //
       // Attach this <ConfigAltResp> to a <MultiConfigAltResp>. There is a '&'
-      // which seperates the first <ConfigAltResp> and the following ones.      
+      // which separates the first <ConfigAltResp> and the following ones.
       //
       if (!FirstElement) {
         Status = AppendToMultiString (Results, L"&");

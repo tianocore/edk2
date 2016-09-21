@@ -275,7 +275,7 @@ GetGlyphBuffer (
   @param  RowWidth       The width of the text on the line, in pixels.
   @param  RowHeight      The height of the line, in pixels.
   @param  Transparent    If TRUE, the Background color is ignored and all
-                         "off" pixels in the character's drawn wil use the
+                         "off" pixels in the character's drawn will use the
                          pixel value from BltBuffer.
   @param  Origin         On input, points to the origin of the to be
                          displayed character, on output, points to the
@@ -351,7 +351,7 @@ NarrowGlyphToBlt (
   @param  RowWidth                The width of the text on the line, in pixels.
   @param  RowHeight               The height of the line, in pixels.
   @param  Transparent             If TRUE, the Background color is ignored and all
-                                  "off" pixels in the character's drawn wil use the
+                                  "off" pixels in the character's drawn will use the
                                   pixel value from BltBuffer.
   @param  Cell                    Points to EFI_HII_GLYPH_INFO structure.
   @param  Attributes              The attribute of incoming glyph in GlyphBuffer.
@@ -467,7 +467,7 @@ GlyphToBlt (
   @param  RowWidth                The width of the text on the line, in pixels.
   @param  RowHeight               The height of the line, in pixels.
   @param  Transparent             If TRUE, the Background color is ignored and all
-                                  "off" pixels in the character's drawn wil use the
+                                  "off" pixels in the character's drawn will use the
                                   pixel value from BltBuffer.
   @param  Cell                    Points to EFI_HII_GLYPH_INFO structure.
   @param  Attributes              The attribute of incoming glyph in GlyphBuffer.
@@ -593,7 +593,7 @@ GlyphToImage (
   @param  InputCell               Buffer which stores cell information of the
                                   encoded bitmap.
   @param  GlyphBuffer             Output the corresponding bitmap data of the found
-                                  block. It is the caller's responsiblity to free
+                                  block. It is the caller's responsibility to free
                                   this buffer.
   @param  Cell                    Output cell information of the encoded bitmap.
   @param  GlyphBufferLen          If not NULL, output the length of GlyphBuffer.
@@ -647,7 +647,7 @@ WriteOutputParam (
   @param  CharValue               Unicode character value, which identifies a glyph
                                   block.
   @param  GlyphBuffer             Output the corresponding bitmap data of the found
-                                  block. It is the caller's responsiblity to free
+                                  block. It is the caller's responsibility to free
                                   this buffer.
   @param  Cell                    Output cell information of the encoded bitmap.
   @param  GlyphBufferLen          If not NULL, output the length of GlyphBuffer.
@@ -1143,7 +1143,7 @@ Exit:
   @param  FontHandle              On entry, Points to the font handle returned by a
                                   previous  call to GetFontInfo() or NULL to start
                                   with the first font.
-  @param  GlobalFontInfo          If not NULL, output the corresponding globa font
+  @param  GlobalFontInfo          If not NULL, output the corresponding global font
                                   info.
 
   @retval TRUE                    Existed
@@ -1172,7 +1172,7 @@ IsFontInfoExisted (
   ASSERT (FontInfo != NULL);
 
   //
-  // Matched flag represents an exactly match; VagueMatched1 repensents a RESIZE
+  // Matched flag represents an exactly match; VagueMatched1 represents a RESIZE
   // or RESTYLE match; VagueMatched2 represents a RESIZE | RESTYLE match.
   //
   Matched           = FALSE;
@@ -1248,7 +1248,7 @@ IsFontInfoExisted (
         }
         break;
       //
-      // If EFI_FONT_INFO_RESIZE is specified, then the sytem may attempt to
+      // If EFI_FONT_INFO_RESIZE is specified, then the system may attempt to
       // stretch or shrink a font to meet the size requested.
       //
       case EFI_FONT_INFO_ANY_FONT | EFI_FONT_INFO_RESIZE:
@@ -1747,8 +1747,8 @@ HiiStringToImage (
   }
   
   //
-  // Use the maxinum height of font as the base line.
-  // And, use the maxinum height as line height.
+  // Use the maximum height of font as the base line.
+  // And, use the maximum height as line height.
   //
   LineHeight     = Height;
   LastLineHeight = Height;
@@ -1783,7 +1783,7 @@ HiiStringToImage (
   }
   //
   // If EFI_HII_IGNORE_IF_NO_GLYPH is set, then characters which have no glyphs
-  // are not drawn. Otherwise they are replaced wth Unicode character 0xFFFD.
+  // are not drawn. Otherwise they are replaced with Unicode character 0xFFFD.
   //
   StringIn2  = AllocateZeroPool (StrSize (StringPtr));
   if (StringIn2 == NULL) {
@@ -2074,7 +2074,7 @@ HiiStringToImage (
       for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
         if (RowInfo[RowIndex].LineWidth > 0 && RowInfo[RowIndex].LineWidth > LineOffset) {
           //
-          // Only BLT these character which have corrsponding glyph in font basebase.
+          // Only BLT these character which have corresponding glyph in font database.
           //
           GlyphToImage (
             GlyphBuf[Index1],
@@ -2124,7 +2124,7 @@ HiiStringToImage (
       }
     } else {
       //
-      // Save the starting position for calculate the starting postition of next row. 
+      // Save the starting position for calculate the starting position of next row.
       //
       RowBufferPtr = BufferPtr;
       //
@@ -2134,7 +2134,7 @@ HiiStringToImage (
       for (Index1 = RowInfo[RowIndex].StartIndex; Index1 <= RowInfo[RowIndex].EndIndex; Index1++) {
         if (RowInfo[RowIndex].LineWidth > 0 && RowInfo[RowIndex].LineWidth > LineOffset) {
           //
-          // Only BLT these character which have corrsponding glyph in font basebase.
+          // Only BLT these character which have corresponding glyph in font database.
           //
           GlyphToImage (
             GlyphBuf[Index1],
@@ -2299,13 +2299,13 @@ Exit:
                                   when character display is normalized that some
                                   character cells overlap.
 
-  @retval EFI_SUCCESS             The string was successfully rendered.
-  @retval EFI_OUT_OF_RESOURCES    Unable to allocate an output buffer for
-                                  RowInfoArray or Blt.
+  @retval EFI_SUCCESS            The string was successfully rendered.
+  @retval EFI_OUT_OF_RESOURCES   Unable to allocate an output buffer for
+                                 RowInfoArray or Blt.
   @retval EFI_INVALID_PARAMETER  The Blt or PackageList was NULL.
   @retval EFI_INVALID_PARAMETER  Flags were invalid combination.
-  @retval EFI_NOT_FOUND         The specified PackageList is not in the Database or the stringid is not 
-                          in the specified PackageList. 
+  @retval EFI_NOT_FOUND          The specified PackageList is not in the Database or the string id is not
+                                 in the specified PackageList.
 
 **/
 EFI_STATUS

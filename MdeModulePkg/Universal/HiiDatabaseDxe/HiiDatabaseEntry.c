@@ -160,7 +160,7 @@ OnReadyToBoot (
   @retval EFI_SUCCESS    The Hii database is setup correctly.
   @return Other value if failed to create the default event for
           gHiiKeyboardLayoutChanged. Check gBS->CreateEventEx for
-          details. Or failed to insatll the protocols.
+          details. Or failed to install the protocols.
           Check gBS->InstallMultipleProtocolInterfaces for details.
           Or failed to create Ready To Boot Event.
           Check EfiCreateEventReadyToBootEx for details.
