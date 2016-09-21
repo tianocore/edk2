@@ -1,0 +1,61 @@
+## @file
+#  EDKII System Capsule library.
+#
+#  EDKII System Capsule library instance for DXE/PEI post memory phase.
+#
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EdkiiSystemCapsuleLib
+  MODULE_UNI_FILE                = EdkiiSystemCapsuleLib.uni
+  FILE_GUID                      = 109D5FC6-56E6-481A-88EF-0CB828FBE0F6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = EdkiiSystemCapsuleLib
+  CONSTRUCTOR                    = EdkiiSystemCapsuleLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  EdkiiSystemCapsuleLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  FmpAuthenticationLib
+
+[Pcd]
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid
+  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer
+  gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer
+
+[Guids]
+  gEdkiiSystemFirmwareImageDescriptorFileGuid
+  gEdkiiSystemFmpCapsuleConfigFileGuid
+  gEdkiiSystemFmpCapsuleDriverFvFileGuid
+  gEfiCertPkcs7Guid
+  gEfiCertTypeRsa2048Sha256Guid
+
