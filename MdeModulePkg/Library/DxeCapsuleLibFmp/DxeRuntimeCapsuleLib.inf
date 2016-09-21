@@ -1,0 +1,83 @@
+## @file
+#  Capsule library instance for DXE_RUNTIME_DRIVER.
+#
+#  Capsule library instance for DXE_RUNTIME_DRIVER module types.
+#
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRuntimeCapsuleLib
+  MODULE_UNI_FILE                = DxeRuntimeCapsuleLib.uni
+  FILE_GUID                      = 19BE1E4B-1A9A-44c1-8F12-32DD0470516A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CapsuleLib|DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = DxeCapsuleLibConstructor
+  CONSTRUCTOR                    = DxeRuntimeCapsuleLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  DxeCapsuleLib.c
+  DxeCapsuleProcessLibNull.c
+  DxeCapsuleReportLibNull.c
+  DxeCapsuleRuntime.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  ReportStatusCodeLib
+  PrintLib
+  HobLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax                               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag      ## CONSUMES
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeSubClassCapsule                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesBegin    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesEnd      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdatingFirmware        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareSuccess   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareFailed    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeResettingSystem         ## CONSUMES
+
+[Protocols]
+  gEsrtManagementProtocolGuid             ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid      ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid          ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
+  gWindowsUxCapsuleGuid                   ## SOMETIMES_CONSUMES ## GUID
+  gEfiSystemResourceTableGuid             ## SOMETIMES_CONSUMES ## GUID
+  gEfiCapsuleReportGuid                   ## CONSUMES ## Variable
+  gEfiCapsuleVendorGuid                   ## CONSUMES ## Variable
+  gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
+  gEfiEventVirtualAddressChangeGuid       ## CONSUMES ## Event
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid
