@@ -568,6 +568,17 @@
 
     <Command>
 
+[Image-Definition-File]
+    <InputFile>
+        *.idf, *.Idf, *.IDF
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)AutoGen.c
+        $(DEBUG_DIR)(+)$(MODULE_NAME)ImgDefs.h
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)Idf.hpk
+
+    <Command>
+
 [Efi-Image.UEFI_OPTIONROM]
     <InputFile>
         ?.efi, ?.EFI, ?.Efi
@@ -585,6 +596,16 @@
     <OutputFile>
         $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk
         $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+
+    <Command>
+
+[Image-Definition-File.UEFI_HII]
+    <InputFile>
+        *.idf, *.Idf, *.IDF
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME)ImgDefs.h
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)Idf.hpk
 
     <Command>
 

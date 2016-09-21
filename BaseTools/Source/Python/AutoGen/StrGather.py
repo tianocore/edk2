@@ -19,7 +19,7 @@ import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
 from UniClassObject import *
 from StringIO import StringIO
-from struct import pack
+from struct import pack, unpack
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ##
@@ -131,7 +131,7 @@ def DecToHexList(Dec, Digit = 8):
 def AscToHexList(Ascii):
     List = []
     for Item in Ascii:
-        List.append('0x%2X' % ord(Item))
+        List.append('0x%02X' % ord(Item))
 
     return List
 

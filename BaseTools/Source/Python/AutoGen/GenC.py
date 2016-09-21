@@ -14,7 +14,8 @@
 ## Import Modules
 #
 import string
-
+import collections
+import struct
 from Common import EdkLogger
 
 from Common.BuildToolError import *
@@ -23,6 +24,7 @@ from Common.Misc import *
 from Common.String import StringToArray
 from StrGather import *
 from GenPcdDb import CreatePcdDatabaseCode
+from IdfClassObject import *
 
 ## PCD type string
 gItemTypeStringDatabase  = {
@@ -1619,6 +1621,232 @@ def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH, UniGenCFlag, UniGenBinBuff
         AutoGenH.Append("\n#define STRING_ARRAY_NAME %sStrings\n" % Info.Name)
     os.chdir(WorkingDir)
 
+def CreateIdfFileCode(Info, AutoGenC, StringH, IdfGenCFlag, IdfGenBinBuffer):
+    if len(Info.IdfFileList) > 0:
+        ImageFiles = IdfFileClassObject(sorted (Info.IdfFileList))
+        if ImageFiles.ImageFilesDict:
+            Index = 1
+            PaletteIndex = 1
+            IncList = [Info.MetaFile.Dir]
+            SrcList = [F for F in Info.SourceFileList]
+            SkipList = ['.jpg', '.png', '.bmp', '.inf', '.idf']
+            FileList = GetFileList(SrcList, IncList, SkipList)
+            ValueStartPtr = 60
+            StringH.Append("\n//\n//Image ID\n//\n")
+            ImageInfoOffset = 0
+            PaletteInfoOffset = 0
+            ImageBuffer = pack('x')
+            PaletteBuffer = pack('x')
+            BufferStr = ''
+            PaletteStr = ''
+            for Idf in ImageFiles.ImageFilesDict:
+                if ImageFiles.ImageFilesDict[Idf]:
+                    for FileObj in ImageFiles.ImageFilesDict[Idf]:
+                        for sourcefile in Info.SourceFileList:
+                            if FileObj.FileName == sourcefile.File:
+                                if not sourcefile.Ext.upper() in ['.PNG', '.BMP', '.JPG']:
+                                    EdkLogger.error("build", AUTOGEN_ERROR, "The %s's postfix must be one of .bmp, .jpg, .png" % (FileObj.FileName), ExtraData="[%s]" % str(Info))
+                                FileObj.File = sourcefile
+                                break
+                        else:
+                            EdkLogger.error("build", AUTOGEN_ERROR, "The %s in %s is not defined in the driver's [Sources] section" % (FileObj.FileName, Idf), ExtraData="[%s]" % str(Info))
+
+                    for FileObj in ImageFiles.ImageFilesDict[Idf]:
+                        ID = FileObj.ImageID
+                        File = FileObj.File
+                        if not os.path.exists(File.Path) or not os.path.isfile(File.Path):
+                            EdkLogger.error("build", FILE_NOT_FOUND, ExtraData=File.Path)
+                        SearchImageID (FileObj, FileList)
+                        if FileObj.Referenced:
+                            if (ValueStartPtr - len(DEFINE_STR + ID)) <= 0:
+                                Line = DEFINE_STR + ' ' + ID + ' ' + DecToHexStr(Index, 4) + '\n'
+                            else:
+                                Line = DEFINE_STR + ' ' + ID + ' ' * (ValueStartPtr - len(DEFINE_STR + ID)) + DecToHexStr(Index, 4) + '\n'
+
+                            TmpFile = open(File.Path, 'rb')
+                            Buffer = TmpFile.read()
+                            TmpFile.close()
+                            if File.Ext.upper() == '.PNG':
+                                TempBuffer = pack('B', EFI_HII_IIBT_IMAGE_PNG)
+                                TempBuffer += pack('I', len(Buffer))
+                                TempBuffer += Buffer
+                            elif File.Ext.upper() == '.JPG':
+                                ImageType, = struct.unpack('4s', Buffer[6:10])
+                                if ImageType != 'JFIF':
+                                    EdkLogger.error("build", FILE_TYPE_MISMATCH, "The file %s is not a standard JPG file." % File.Path)
+                                TempBuffer = pack('B', EFI_HII_IIBT_IMAGE_JPEG)
+                                TempBuffer += pack('I', len(Buffer))
+                                TempBuffer += Buffer
+                            elif File.Ext.upper() == '.BMP':
+                                TempBuffer, TempPalette = BmpImageDecoder(File, Buffer, PaletteIndex, FileObj.TransParent)
+                                if len(TempPalette) > 1:
+                                    PaletteIndex += 1
+                                    PaletteBuffer += pack('H', len(TempPalette))
+                                    PaletteBuffer += TempPalette
+                                    PaletteStr = WriteLine(PaletteStr, '// %s: %s: %s' % (DecToHexStr(PaletteIndex - 1, 4), ID, DecToHexStr(PaletteIndex - 1, 4)))
+                                    TempPaletteList = AscToHexList(TempPalette)
+                                    PaletteStr = WriteLine(PaletteStr, CreateArrayItem(TempPaletteList, 16) + '\n')
+                            ImageBuffer += TempBuffer
+                            BufferStr = WriteLine(BufferStr, '// %s: %s: %s' % (DecToHexStr(Index, 4), ID, DecToHexStr(Index, 4)))
+                            TempBufferList = AscToHexList(TempBuffer)
+                            BufferStr = WriteLine(BufferStr, CreateArrayItem(TempBufferList, 16) + '\n')
+
+                            StringH.Append(Line)
+                            Index += 1
+
+            BufferStr = WriteLine(BufferStr, '// End of the Image Info')
+            BufferStr = WriteLine(BufferStr, CreateArrayItem(DecToHexList(EFI_HII_IIBT_END, 2)) + '\n')
+            ImageEnd = pack('B', EFI_HII_IIBT_END)
+            ImageBuffer += ImageEnd
+
+            if len(ImageBuffer) > 1:
+                ImageInfoOffset = 12
+            if len(PaletteBuffer) > 1:
+                PaletteInfoOffset = 12 + len(ImageBuffer) - 1 # -1 is for the first empty pad byte of ImageBuffer
+
+            IMAGE_PACKAGE_HDR = pack('=II', ImageInfoOffset, PaletteInfoOffset)
+            # PACKAGE_HEADER_Length = PACKAGE_HEADER + ImageInfoOffset + PaletteInfoOffset + ImageBuffer Length + PaletteCount + PaletteBuffer Length
+            if len(PaletteBuffer) > 1:
+                PACKAGE_HEADER_Length = 4 + 4 + 4 + len(ImageBuffer) - 1 + 2 + len(PaletteBuffer) - 1
+            else:
+                PACKAGE_HEADER_Length = 4 + 4 + 4 + len(ImageBuffer) - 1
+            if PaletteIndex > 1:
+                PALETTE_INFO_HEADER = pack('H', PaletteIndex - 1)
+            # EFI_HII_PACKAGE_HEADER length max value is 0xFFFFFF
+            Hex_Length = '%06X' % PACKAGE_HEADER_Length
+            if PACKAGE_HEADER_Length > 0xFFFFFF:
+                EdkLogger.error("build", AUTOGEN_ERROR, "The Length of EFI_HII_PACKAGE_HEADER exceed its maximum value", ExtraData="[%s]" % str(Info))
+            PACKAGE_HEADER = pack('=HBB', int('0x' + Hex_Length[2:], 16), int('0x' + Hex_Length[0:2], 16), EFI_HII_PACKAGE_IMAGES)
+
+            IdfGenBinBuffer.write(PACKAGE_HEADER)
+            IdfGenBinBuffer.write(IMAGE_PACKAGE_HDR)
+            if len(ImageBuffer) > 1 :
+                IdfGenBinBuffer.write(ImageBuffer[1:])
+            if PaletteIndex > 1:
+                IdfGenBinBuffer.write(PALETTE_INFO_HEADER)
+            if len(PaletteBuffer) > 1:
+                IdfGenBinBuffer.write(PaletteBuffer[1:])
+
+            if IdfGenCFlag:
+                TotalLength = EFI_HII_ARRAY_SIZE_LENGTH + PACKAGE_HEADER_Length
+                AutoGenC.Append("\n//\n//Image Pack Definition\n//\n")
+                AllStr = WriteLine('', CHAR_ARRAY_DEFIN + ' ' + Info.Module.BaseName + 'Images' + '[] = {\n')
+                AllStr = WriteLine(AllStr, '// STRGATHER_OUTPUT_HEADER')
+                AllStr = WriteLine(AllStr, CreateArrayItem(DecToHexList(TotalLength)) + '\n')
+                AllStr = WriteLine(AllStr, '// Image PACKAGE HEADER\n')
+                IMAGE_PACKAGE_HDR_List = AscToHexList(PACKAGE_HEADER)
+                IMAGE_PACKAGE_HDR_List += AscToHexList(IMAGE_PACKAGE_HDR)
+                AllStr = WriteLine(AllStr, CreateArrayItem(IMAGE_PACKAGE_HDR_List, 16) + '\n')
+                AllStr = WriteLine(AllStr, '// Image DATA\n')
+                if BufferStr:
+                    AllStr = WriteLine(AllStr, BufferStr)
+                if PaletteStr:
+                    AllStr = WriteLine(AllStr, '// Palette Header\n')
+                    PALETTE_INFO_HEADER_List = AscToHexList(PALETTE_INFO_HEADER)
+                    AllStr = WriteLine(AllStr, CreateArrayItem(PALETTE_INFO_HEADER_List, 16) + '\n')
+                    AllStr = WriteLine(AllStr, '// Palette Data\n')
+                    AllStr = WriteLine(AllStr, PaletteStr)
+                AllStr = WriteLine(AllStr, '};')
+                AutoGenC.Append(AllStr)
+                AutoGenC.Append("\n")
+                StringH.Append('\nextern unsigned char ' + Info.Module.BaseName + 'Images[];\n')
+                StringH.Append("\n#define IMAGE_ARRAY_NAME %sImages\n" % Info.Module.BaseName)
+
+# typedef struct _EFI_HII_IMAGE_PACKAGE_HDR {
+#   EFI_HII_PACKAGE_HEADER  Header;          # Standard package header, where Header.Type = EFI_HII_PACKAGE_IMAGES
+#   UINT32                  ImageInfoOffset;
+#   UINT32                  PaletteInfoOffset;
+# } EFI_HII_IMAGE_PACKAGE_HDR;
+
+# typedef struct {
+#   UINT32   Length:24;
+#   UINT32   Type:8;
+#   UINT8    Data[];
+# } EFI_HII_PACKAGE_HEADER;
+
+# typedef struct _EFI_HII_IMAGE_BLOCK {
+#   UINT8    BlockType;
+#   UINT8    BlockBody[];
+# } EFI_HII_IMAGE_BLOCK;
+
+def BmpImageDecoder(File, Buffer, PaletteIndex, TransParent):
+    ImageType, = struct.unpack('2s', Buffer[0:2])
+    if ImageType!= 'BM': # BMP file type is 'BM'
+        EdkLogger.error("build", FILE_TYPE_MISMATCH, "The file %s is not a standard BMP file." % File.Path)
+    BMP_IMAGE_HEADER = collections.namedtuple('BMP_IMAGE_HEADER', ['bfSize','bfReserved1','bfReserved2','bfOffBits','biSize','biWidth','biHeight','biPlanes','biBitCount', 'biCompression', 'biSizeImage','biXPelsPerMeter','biYPelsPerMeter','biClrUsed','biClrImportant'])
+    BMP_IMAGE_HEADER_STRUCT = struct.Struct('IHHIIIIHHIIIIII')
+    BmpHeader = BMP_IMAGE_HEADER._make(BMP_IMAGE_HEADER_STRUCT.unpack_from(Buffer[2:]))
+    #
+    # Doesn't support compress.
+    #
+    if BmpHeader.biCompression != 0:
+        EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "The compress BMP file %s is not support." % File.Path)
+
+    # The Width and Height is UINT16 type in Image Package
+    if BmpHeader.biWidth > 0xFFFF:
+        EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "The BMP file %s Width is exceed 0xFFFF." % File.Path)
+    if BmpHeader.biHeight > 0xFFFF:
+        EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "The BMP file %s Height is exceed 0xFFFF." % File.Path)
+
+    PaletteBuffer = pack('x')
+    if BmpHeader.biBitCount == 1:
+        if TransParent:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_1BIT_TRANS)
+        else:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_1BIT)
+        ImageBuffer += pack('B', PaletteIndex)
+        Width = (BmpHeader.biWidth + 7)/8
+        if BmpHeader.bfOffBits > BMP_IMAGE_HEADER_STRUCT.size + 2:
+            PaletteBuffer = Buffer[BMP_IMAGE_HEADER_STRUCT.size + 2 : BmpHeader.bfOffBits]
+    elif BmpHeader.biBitCount == 4:
+        if TransParent:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_4BIT_TRANS)
+        else:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_4BIT)
+        ImageBuffer += pack('B', PaletteIndex)
+        Width = (BmpHeader.biWidth + 1)/2
+        if BmpHeader.bfOffBits > BMP_IMAGE_HEADER_STRUCT.size + 2:
+            PaletteBuffer = Buffer[BMP_IMAGE_HEADER_STRUCT.size + 2 : BmpHeader.bfOffBits]
+    elif BmpHeader.biBitCount == 8:
+        if TransParent:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_8BIT_TRANS)
+        else:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_8BIT)
+        ImageBuffer += pack('B', PaletteIndex)
+        Width = BmpHeader.biWidth
+        if BmpHeader.bfOffBits > BMP_IMAGE_HEADER_STRUCT.size + 2:
+            PaletteBuffer = Buffer[BMP_IMAGE_HEADER_STRUCT.size + 2 : BmpHeader.bfOffBits]
+    elif BmpHeader.biBitCount == 24:
+        if TransParent:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_24BIT_TRANS)
+        else:
+            ImageBuffer = pack('B', EFI_HII_IIBT_IMAGE_24BIT)
+        Width = BmpHeader.biWidth * 3
+    else:
+        EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "Only support the 1 bit, 4 bit, 8bit, 24 bit BMP files.", ExtraData="[%s]" % str(File.Path))
+
+    ImageBuffer += pack('H', BmpHeader.biWidth)
+    ImageBuffer += pack('H', BmpHeader.biHeight)
+    Start = BmpHeader.bfOffBits
+    End = BmpHeader.bfSize - 1
+    for Height in range(0, BmpHeader.biHeight):
+        if Width % 4 != 0:
+            Start = End + (Width % 4) - 4 - Width
+        else:
+            Start = End - Width
+        ImageBuffer += Buffer[Start + 1 : Start + Width + 1]
+        End = Start
+
+    # handle the Palette info,  BMP use 4 bytes for R, G, B and Reserved info while EFI_HII_RGB_PIXEL only have the R, G, B info
+    if PaletteBuffer and len(PaletteBuffer) > 1:
+        PaletteTemp = pack('x')
+        for Index in range(0, len(PaletteBuffer)):
+            if Index % 4 == 3:
+                continue
+            PaletteTemp += PaletteBuffer[Index]
+        PaletteBuffer = PaletteTemp[1:]
+    return ImageBuffer, PaletteBuffer
+
 ## Create common code
 #
 #   @param      Info        The ModuleAutoGen object
@@ -1684,10 +1912,14 @@ def CreateFooterCode(Info, AutoGenC, AutoGenH):
 #   @param      Info        The ModuleAutoGen object
 #   @param      AutoGenC    The TemplateString object for C code
 #   @param      AutoGenH    The TemplateString object for header file
+#   @param      StringH     The TemplateString object for header file
 #   @param      UniGenCFlag     UniString is generated into AutoGen C file when it is set to True
 #   @param      UniGenBinBuffer Buffer to store uni string package data
+#   @param      StringIdf       The TemplateString object for header file
+#   @param      IdfGenCFlag     IdfString is generated into AutoGen C file when it is set to True
+#   @param      IdfGenBinBuffer Buffer to store Idf string package data
 #
-def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer):
+def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, StringIdf, IdfGenCFlag, IdfGenBinBuffer):
     CreateHeaderCode(Info, AutoGenC, AutoGenH)
 
     if Info.AutoGenVersion >= 0x00010005:
@@ -1717,6 +1949,15 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer):
             StringH.Append('\n#ifdef VFRCOMPILE\n%s\n#endif\n' % '\n'.join(GuidMacros))
 
         StringH.Append("\n#endif\n")
+        AutoGenH.Append('#include "%s"\n' % FileName)
+
+    if Info.IdfFileList:
+        FileName = "%sImgDefs.h" % Info.Name
+        StringIdf.Append(gAutoGenHeaderString.Replace({'FileName':FileName}))
+        StringIdf.Append(gAutoGenHPrologueString.Replace({'File':'IMAGEDEFS', 'Guid':Info.Guid.replace('-','_')}))
+        CreateIdfFileCode(Info, AutoGenC, StringIdf, IdfGenCFlag, IdfGenBinBuffer)
+
+        StringIdf.Append("\n#endif\n")
         AutoGenH.Append('#include "%s"\n' % FileName)
 
     CreateFooterCode(Info, AutoGenC, AutoGenH)

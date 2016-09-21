@@ -72,7 +72,8 @@ gAutoGenHeaderFileName = "AutoGen.h"
 gAutoGenStringFileName = "%(module_name)sStrDefs.h"
 gAutoGenStringFormFileName = "%(module_name)sStrDefs.hpk"
 gAutoGenDepexFileName = "%(module_name)s.depex"
-
+gAutoGenImageDefFileName = "%(module_name)sImgDefs.h"
+gAutoGenIdfFileName = "%(module_name)sIdf.hpk"
 gInfSpecVersion = "0x00010017"
 
 #
@@ -2590,6 +2591,7 @@ class ModuleAutoGen(AutoGen):
         self._IncludePathLength = 0
         self._AutoGenFileList = None
         self._UnicodeFileList = None
+        self._IdfFileList = None
         self._SourceFileList  = None
         self._ObjectFileList  = None
         self._BinaryFileList  = None
@@ -3114,6 +3116,15 @@ class ModuleAutoGen(AutoGen):
                 self._UnicodeFileList = []
         return self._UnicodeFileList
 
+    ## Return the list of Image Definition files
+    def _GetIdfFileList(self):
+        if self._IdfFileList == None:
+            if TAB_IMAGE_FILE in self.FileTypes:
+                self._IdfFileList = self.FileTypes[TAB_IMAGE_FILE]
+            else:
+                self._IdfFileList = []
+        return self._IdfFileList
+
     ## Return a list of files which can be built from binary
     #
     #  "Build" binary files are just to copy them to build directory.
@@ -3276,15 +3287,19 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetAutoGenFileList(self):
         UniStringAutoGenC = True
+        IdfStringAutoGenC = True
         UniStringBinBuffer = StringIO()
+        IdfGenBinBuffer = StringIO()
         if self.BuildType == 'UEFI_HII':
             UniStringAutoGenC = False
+            IdfStringAutoGenC = False
         if self._AutoGenFileList == None:
             self._AutoGenFileList = {}
             AutoGenC = TemplateString()
             AutoGenH = TemplateString()
             StringH = TemplateString()
-            GenC.CreateCode(self, AutoGenC, AutoGenH, StringH, UniStringAutoGenC, UniStringBinBuffer)
+            StringIdf = TemplateString()
+            GenC.CreateCode(self, AutoGenC, AutoGenH, StringH, UniStringAutoGenC, UniStringBinBuffer, StringIdf, IdfStringAutoGenC, IdfGenBinBuffer)
             #
             # AutoGen.c is generated if there are library classes in inf, or there are object files
             #
@@ -3308,6 +3323,17 @@ class ModuleAutoGen(AutoGen):
                 self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
             if UniStringBinBuffer != None:
                 UniStringBinBuffer.close()
+            if str(StringIdf) != "":
+                AutoFile = PathClass(gAutoGenImageDefFileName % {"module_name":self.Name}, self.DebugDir)
+                self._AutoGenFileList[AutoFile] = str(StringIdf)
+                self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
+            if IdfGenBinBuffer != None and IdfGenBinBuffer.getvalue() != "":
+                AutoFile = PathClass(gAutoGenIdfFileName % {"module_name":self.Name}, self.OutputDir)
+                self._AutoGenFileList[AutoFile] = IdfGenBinBuffer.getvalue()
+                AutoFile.IsBinary = True
+                self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
+            if IdfGenBinBuffer != None:
+                IdfGenBinBuffer.close()
         return self._AutoGenFileList
 
     ## Return the list of library modules explicitly or implicityly used by this module
@@ -4061,6 +4087,7 @@ class ModuleAutoGen(AutoGen):
     CodaTargetList  = property(_GetFinalTargetList)
     FileTypes       = property(_GetFileTypes)
     BuildRules      = property(_GetBuildRules)
+    IdfFileList     = property(_GetIdfFileList)
 
     DependentPackageList    = property(_GetDependentPackageList)
     DependentLibraryList    = property(_GetLibraryList)
