@@ -569,6 +569,37 @@ ImageToBlt (
   return EFI_SUCCESS;
 }
 
+/**
+  Return the HII package list identified by PackageList HII handle.
+
+  @param Database    Pointer to HII database list header.
+  @param PackageList HII handle of the package list to locate.
+
+  @retval The HII package list instance.
+**/
+HII_DATABASE_PACKAGE_LIST_INSTANCE *
+LocatePackageList (
+  IN  LIST_ENTRY                     *Database,
+  IN  EFI_HII_HANDLE                 PackageList
+  )
+{
+  LIST_ENTRY                         *Link;
+  HII_DATABASE_RECORD                *Record;
+
+  //
+  // Get the specified package list and image package.
+  //
+  for (Link = GetFirstNode (Database);
+       !IsNull (Database, Link);
+       Link = GetNextNode (Database, Link)
+      ) {
+    Record = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
+    if (Record->Handle == PackageList) {
+      return Record->PackageList;
+    }
+  }
+  return NULL;
+}
 
 /**
   This function adds the image Image to the group of images owned by PackageList, and returns
@@ -598,8 +629,6 @@ HiiNewImage (
   )
 {
   HII_DATABASE_PRIVATE_DATA           *Private;
-  LIST_ENTRY                          *Link;
-  HII_DATABASE_RECORD                 *DatabaseRecord;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_IMAGE_PACKAGE_INSTANCE          *ImagePackage;
   UINT8                               *ImageBlock;
@@ -618,24 +647,7 @@ HiiNewImage (
   }
 
   Private = HII_IMAGE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // Get the specified package list
-  //
-
-  PackageListNode = NULL;
-
-  for (Link = Private->DatabaseList.ForwardLink;
-       Link != &Private->DatabaseList;
-       Link = Link->ForwardLink
-      ) {
-    DatabaseRecord = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-    if (DatabaseRecord->Handle == PackageList) {
-      PackageListNode = DatabaseRecord->PackageList;
-      break;
-    }
-  }
-
+  PackageListNode = LocatePackageList (&Private->DatabaseList, PackageList);
   if (PackageListNode == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -820,8 +832,6 @@ HiiGetImage (
   )
 {
   HII_DATABASE_PRIVATE_DATA           *Private;
-  LIST_ENTRY                          *Link;
-  HII_DATABASE_RECORD                 *DatabaseRecord;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_IMAGE_PACKAGE_INSTANCE          *ImagePackage;
   UINT8                               *ImageBlock;
@@ -845,21 +855,7 @@ HiiGetImage (
   }
 
   Private = HII_IMAGE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // Get the specified package list and image package.
-  //
-  PackageListNode = NULL;
-  for (Link = Private->DatabaseList.ForwardLink;
-       Link != &Private->DatabaseList;
-       Link = Link->ForwardLink
-      ) {
-    DatabaseRecord = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-    if (DatabaseRecord->Handle == PackageList) {
-      PackageListNode = DatabaseRecord->PackageList;
-      break;
-    }
-  }
+  PackageListNode = LocatePackageList (&Private->DatabaseList, PackageList);
   if (PackageListNode == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -1011,8 +1007,6 @@ HiiSetImage (
   )
 {
   HII_DATABASE_PRIVATE_DATA           *Private;
-  LIST_ENTRY                          *Link;
-  HII_DATABASE_RECORD                 *DatabaseRecord;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_IMAGE_PACKAGE_INSTANCE          *ImagePackage;
   UINT8                               *ImageBlock;
@@ -1043,21 +1037,7 @@ HiiSetImage (
   }
 
   Private = HII_IMAGE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-
-  //
-  // Get the specified package list and image package.
-  //
-  PackageListNode = NULL;
-  for (Link = Private->DatabaseList.ForwardLink;
-       Link != &Private->DatabaseList;
-       Link = Link->ForwardLink
-      ) {
-    DatabaseRecord = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
-    if (DatabaseRecord->Handle == PackageList) {
-      PackageListNode = DatabaseRecord->PackageList;
-      break;
-    }
-  }
+  PackageListNode = LocatePackageList (&Private->DatabaseList, PackageList);
   if (PackageListNode == NULL) {
     return EFI_NOT_FOUND;
   }
