@@ -157,6 +157,10 @@
   ##
   FrameBufferBltLib|Include/Library/FrameBufferBltLib.h
 
+  ## @libraryclass  Provides services to authenticate a UEFI defined FMP Capsule.
+  #
+  FmpAuthenticationLib|Include/Library/FmpAuthenticationLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -1142,6 +1146,66 @@
   # @Prompt MAX repair count
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxRepairCount|0x00|UINT32|0x00010076
 
+  ## Status Code for Capsule subclass definitions.<BR><BR>
+  #  EFI_OEM_SPECIFIC_SUBCLASS_CAPSULE  = 0x00810000<BR>
+  #  NOTE: The default value of this PCD may collide with other OEM specific status codes.
+  #        Override the value of this PCD in the platform DSC file as needed.
+  # @Prompt Status Code for Capsule subclass definitions
+  # @ValidList  0x80000003 | 0x00810000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeSubClassCapsule|0x00810000|UINT32|0x00000100
+
+  ## Status Code for Capsule Process Begin.<BR><BR>
+  #  EFI_CAPSULE_PROCESS_CAPSULES_BEGIN  = (EFI_OEM_SPECIFIC | 0x00000001) = 0x00008001<BR>
+  #  NOTE: The default value of this PCD may collide with other OEM specific status codes.
+  #        Override the value of this PCD in the platform DSC file as needed.
+  # @Prompt Status Code for Capsule Process Begin
+  # @ValidList  0x80000003 | 0x00008001
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesBegin|0x00008001|UINT32|0x00000101
+
+  ## Status Code for Capsule Process End.<BR><BR>
+  #  EFI_CAPSULE_PROCESS_CAPSULES_END    = (EFI_OEM_SPECIFIC | 0x00000002) = 0x00008002<BR>
+  #  NOTE: The default value of this PCD may collide with other OEM specific status codes.
+  #        Override the value of this PCD in the platform DSC file as needed.
+  # @Prompt Status Code for Capsule Process End
+  # @ValidList  0x80000003 | 0x00008002
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesEnd|0x00008002|UINT32|0x00000102
+
+  ## Status Code for Capsule Process Updating Firmware.<BR><BR>
+  #  EFI_CAPSULE_UPDATING_FIRMWARE       = (EFI_OEM_SPECIFIC | 0x00000003) = 0x00008003<BR>
+  #  NOTE: The default value of this PCD may collide with other OEM specific status codes.
+  #        Override the value of this PCD in the platform DSC file as needed.
+  # @Prompt Status Code for Capsule Process Updating Firmware
+  # @ValidList  0x80000003 | 0x00008003
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdatingFirmware|0x00008003|UINT32|0x00000103
+
+  ## Status Code for Capsule Process Update Firmware Success.<BR><BR>
+  #  EFI_CAPSULE_UPDATE_FIRMWARE_SUCCESS = (EFI_OEM_SPECIFIC | 0x00000004) = 0x00008004<BR>
+  #  NOTE: The default value of this PCD may collide with other OEM specific status codes.
+  #        Override the value of this PCD in the platform DSC file as needed.
+  # @Prompt Status Code for Capsule Process Update Firmware Success
+  # @ValidList  0x80000003 | 0x00008004
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareSuccess|0x00008004|UINT32|0x00000104
+
+  ## Status Code for Capsule Process Update Firmware Failed.<BR><BR>
+  #  EFI_CAPSULE_UPDATE_FIRMWARE_FAILED  = (EFI_OEM_SPECIFIC | 0x00000005) = 0x00008005<BR>
+  #  NOTE: The default value of this PCD may collide with other OEM specific status codes.
+  #        Override the value of this PCD in the platform DSC file as needed.
+  # @Prompt Status Code for Capsule Process Update Firmware Failed
+  # @ValidList  0x80000003 | 0x00008005
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareFailed|0x00008005|UINT32|0x00000105
+
+  ## Status Code for Capsule Resetting System.<BR><BR>
+  #  EFI_CAPSULE_RESETTING_SYSTEM        = (EFI_OEM_SPECIFIC | 0x00000006) = 0x00008006<BR>
+  #  NOTE: The default value of this PCD may collide with other OEM specific status codes.
+  #        Override the value of this PCD in the platform DSC file as needed.
+  # @Prompt Status Code for Capsule Resetting System
+  # @ValidList  0x80000003 | 0x00008006
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeResettingSystem|0x00008006|UINT32|0x00000106
+
+  ## CapsuleMax value in capsule report variable.
+  # @Prompt CapsuleMax value in capsule report variable.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax|0xFFFF|UINT16|0x00000107
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -1587,6 +1651,11 @@
   #  The PCD data must be in UNICODE format.
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"|VOID*|0x30001045
 
+  ## This PCD hold a list GUIDs for the ImageTypeId to indicate the
+  #  FMP capsule is a system FMP.
+  # @Prompt A list of system FMP ImageTypeId GUIDs
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid|{0x0}|VOID*|0x30001046
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
@@ -1638,6 +1707,10 @@
   # @Prompt Identify Mapping Page Table pointer.
   # @ValidList  0x80000001 | 0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdIdentifyMappingPageTablePtr|0x0|UINT64|0x00030002
+
+  ## This dynamic PCD holds the information if there is any test key used by the platform.
+  # @Prompt If there is any test key used by the platform.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE|BOOLEAN|0x00030003
 
 [UserExtensions.TianoCore."ExtraFiles"]
   MdeModulePkgExtra.uni
