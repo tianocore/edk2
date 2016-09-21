@@ -39,6 +39,8 @@
   DEFINE SOURCE_DEBUG_ENABLE  = FALSE
   DEFINE PERFORMANCE_ENABLE   = FALSE
   DEFINE LOGGING              = FALSE
+  DEFINE CAPSULE_ENABLE       = FALSE
+  DEFINE RECOVERY_ENABLE      = FALSE
 
   #
   # Galileo board.  Options are [GEN1, GEN2]
@@ -160,11 +162,9 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
 !endif
 
-!if $(SECURE_BOOT_ENABLE) || $(MEASURED_BOOT_ENABLE)
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-!endif
 
 !if $(SECURE_BOOT_ENABLE)
   PlatformSecureLib|QuarkPlatformPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
@@ -225,6 +225,17 @@
   PlatformPcieHelperLib|QuarkPlatformPkg/Library/PlatformPcieHelperLib/PlatformPcieHelperLib.inf
   PlatformHelperLib|QuarkPlatformPkg/Library/PlatformHelperLib/DxePlatformHelperLib.inf
 
+!if $(CAPSULE_ENABLE)
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
+!else
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+!endif
+
+  EdkiiSystemCapsuleLib|SignedCapsulePkg/Library/EdkiiSystemCapsuleLib/EdkiiSystemCapsuleLib.inf
+  FmpAuthenticationLib|MdeModulePkg/Library/FmpAuthenticationLibNull/FmpAuthenticationLibNull.inf
+  IniParsingLib|SignedCapsulePkg/Library/IniParsingLib/IniParsingLib.inf
+  PlatformFlashAccessLib|QuarkPlatformPkg/Feature/Capsule/Library/PlatformFlashAccessLib/PlatformFlashAccessLibDxe.inf
+
 [LibraryClasses.common.SEC]
   #
   # SEC specific phase
@@ -250,9 +261,7 @@
   PlatformHelperLib|QuarkPlatformPkg/Library/PlatformHelperLib/PeiPlatformHelperLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
-!if $(SECURE_BOOT_ENABLE) || $(MEASURED_BOOT_ENABLE)
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-!endif
 !if $(PERFORMANCE_ENABLE)
   PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
 !endif
@@ -273,9 +282,7 @@
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
-!if $(SECURE_BOOT_ENABLE) || $(MEASURED_BOOT_ENABLE)
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-!endif
 !if $(PERFORMANCE_ENABLE)
   PerformanceLib|MdeModulePkg/Library/SmmPerformanceLib/SmmPerformanceLib.inf
 !endif
@@ -299,6 +306,10 @@
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
 !if $(SECURE_BOOT_ENABLE) || $(MEASURED_BOOT_ENABLE)
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+!endif
+
+!if $(CAPSULE_ENABLE)
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
 !endif
 
 [LibraryClasses.IA32.UEFI_DRIVER,LibraryClasses.IA32.UEFI_APPLICATION]
@@ -431,6 +442,10 @@
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|FALSE
 
+!if $(RECOVERY_ENABLE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"QUARKREC.Cap"
+!endif
+
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x803000C7
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
@@ -448,6 +463,12 @@
   gQuarkPlatformTokenSpaceGuid.PcdEnableFastBoot|TRUE
   gQuarkPlatformTokenSpaceGuid.PcdUserIsPhysicallyPresent|FALSE
   gQuarkPlatformTokenSpaceGuid.PcdSpiFlashDeviceSize|0
+
+!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor|{0x0}|VOID*|0x100
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid|{0xc0, 0x20, 0xaf, 0x62, 0x16, 0x70, 0x4a, 0x42, 0x9b, 0xf8, 0x9c, 0xcc, 0x86, 0x58, 0x40, 0x90}
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid|{0x59, 0x3A, 0xD8, 0x14, 0x10, 0xA8, 0x56, 0x45, 0x81, 0x92, 0x1C, 0x0A, 0x59, 0x3C, 0x06, 0x5C}
+!endif
 
 !if $(MEASURED_BOOT_ENABLE)
   #
@@ -540,6 +561,11 @@
     !endif
   }
 
+!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
+  # FMP image decriptor
+  QuarkPlatformPkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
+!endif
+
   #
   # PEI Core
   #
@@ -594,6 +620,7 @@
   #
   # Recovery
   #
+!if $(RECOVERY_ENABLE)
   QuarkSocPkg/QuarkSouthCluster/Usb/Common/Pei/UsbPei.inf
   MdeModulePkg/Bus/Pci/EhciPei/EhciPei.inf
   QuarkSocPkg/QuarkSouthCluster/Usb/Ohci/Pei/OhciPei.inf
@@ -601,6 +628,11 @@
   MdeModulePkg/Bus/Usb/UsbBusPei/UsbBusPei.inf
   FatPkg/FatPei/FatPei.inf
   MdeModulePkg/Universal/Disk/CdExpressPei/CdExpressPei.inf
+  SignedCapsulePkg/Universal/RecoveryModuleLoadPei/RecoveryModuleLoadPei.inf {
+    <LibraryClasses>
+      FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibRsa2048Sha256/FmpAuthenticationLibRsa2048Sha256.inf
+  }
+!endif
 
 [Components.IA32]
   #
@@ -645,11 +677,7 @@
       NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
   }
 
-  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf {
-    <LibraryClasses>
-      GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
-      CapsuleLib|IntelFrameworkModulePkg/Library/DxeCapsuleLib/DxeCapsuleLib.inf
-  }
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
@@ -675,6 +703,11 @@
     <LibraryClasses>
       UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
       PlatformBootManagerLib|QuarkPlatformPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+!if $(CAPSULE_ENABLE)
+      FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
+!else
+      FmpAuthenticationLib|MdeModulePkg/Library/FmpAuthenticationLibNull/FmpAuthenticationLibNull.inf
+!endif
   }
   MdeModulePkg/Application/UiApp/UiApp.inf {
     <LibraryClasses>
@@ -888,6 +921,24 @@
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
   }
+
+!if $(CAPSULE_ENABLE)
+  MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+
+  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf {
+    <LibraryClasses>
+      FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
+  }
+  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf {
+    <LibraryClasses>
+      FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
+  }
+
+  MdeModulePkg/Application/CapsuleApp/CapsuleApp.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
+!endif
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096

@@ -317,6 +317,11 @@ APRIORI PEI {
 ##
 INF  UefiCpuPkg/SecCore/SecCore.inf
 
+!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
+  # FMP image decriptor
+INF RuleOverride = FMP_IMAGE_DESC QuarkPlatformPkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
+!endif
+
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 
 ##
@@ -347,12 +352,16 @@ INF  SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf
 INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
 !endif
 
+!if $(RECOVERY_ENABLE)
 FILE FV_IMAGE = 1E9D7604-EF45-46a0-BD8A-71AC78C17AC1 {
   SECTION PEI_DEPEX_EXP = {gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid}
   SECTION GUIDED A31280AD-481E-41B6-95E8-127F4C984779 {    # TIANO COMPRESS GUID
     SECTION FV_IMAGE = FVRECOVERY_COMPONENTS
   }
 }
+!endif
+
+!if $(RECOVERY_ENABLE)
 
 ################################################################################
 #
@@ -390,6 +399,9 @@ INF  MdeModulePkg/Bus/Usb/UsbBusPei/UsbBusPei.inf
 INF  MdeModulePkg/Bus/Usb/UsbBotPei/UsbBotPei.inf
 INF  FatPkg/FatPei/FatPei.inf
 INF  MdeModulePkg/Universal/Disk/CdExpressPei/CdExpressPei.inf
+INF  SignedCapsulePkg/Universal/RecoveryModuleLoadPei/RecoveryModuleLoadPei.inf
+
+!endif
 
 ################################################################################
 #
@@ -579,6 +591,25 @@ INF  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
 INF  RuleOverride = DRIVER_ACPITABLE SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
 !endif
 
+!if $(CAPSULE_ENABLE)
+INF  MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf
+!endif
+
+!if $(RECOVERY_ENABLE)
+FILE FREEFORM = PCD(gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiRsa2048Sha256TestPublicKeyFileGuid) {
+     SECTION RAW = BaseTools/Source/Python/Rsa2048Sha256Sign/TestSigningPublicKey.bin
+     SECTION UI = "Rsa2048Sha256TestSigningPublicKey"
+     }
+!endif
+
+!if $(CAPSULE_ENABLE)
+FILE FREEFORM = PCD(gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiPkcs7TestPublicKeyFileGuid) {
+     SECTION RAW = BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer
+     SECTION UI = "Pkcs7TestRoot"
+     }
+!endif
+
 ################################################################################
 #
 # FV Section
@@ -648,6 +679,102 @@ READ_LOCK_STATUS   = TRUE
 INF  RuleOverride = TIANOCOMPRESSED ShellPkg/Application/Shell/Shell.inf
 !if $(PERFORMANCE_ENABLE)
 INF  RuleOverride = TIANOCOMPRESSED PerformancePkg/Dp_App/Dp.inf
+!endif
+
+!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
+
+[FV.CapsuleDispatchFv]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+!if $(CAPSULE_ENABLE)
+INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf
+!endif
+
+[FV.SystemFirmwareUpdateCargo]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+FILE RAW = 14D83A59-A810-4556-8192-1C0A593C065C { # PcdEdkiiSystemFirmwareFileGuid
+    FD = Quark
+  }
+
+FILE RAW = ce57b167-b0e4-41e8-a897-5f4feb781d40 { # gEdkiiSystemFmpCapsuleDriverFvFileGuid
+    FV = CapsuleDispatchFv
+  }
+
+FILE RAW = 812136D3-4D3A-433A-9418-29BB9BF78F6E { # gEdkiiSystemFmpCapsuleConfigFileGuid
+    QuarkPlatformPkg/Feature/Capsule/SystemFirmwareUpdateConfig/SystemFirmwareUpdateConfig.ini
+  }
+
+!endif
+
+!if $(CAPSULE_ENABLE)
+[FmpPayload.FmpPayloadSystemFirmwarePkcs7]
+IMAGE_HEADER_INIT_VERSION = 0x02
+IMAGE_TYPE_ID             = 62af20c0-7016-424a-9bf8-9ccc86584090 # PcdSystemFmpCapsuleImageTypeIdGuid
+IMAGE_INDEX               = 0x1
+HARDWARE_INSTANCE         = 0x0
+MONOTONIC_COUNT           = 0x2
+CERTIFICATE_GUID          = 4AAFD29D-68DF-49EE-8AA9-347D375665A7 # PKCS7
+
+FV = SystemFirmwareUpdateCargo
+
+[Capsule.QuarkFirmwareUpdateCapsuleFmpPkcs7]
+CAPSULE_GUID                = 6dcbd5ed-e82d-4c44-bda1-7194199ad92a # gEfiFmpCapsuleGuid
+CAPSULE_FLAGS               = PersistAcrossReset,InitiateReset
+CAPSULE_HEADER_SIZE         = 0x20
+CAPSULE_HEADER_INIT_VERSION = 0x1
+
+FMP_PAYLOAD = FmpPayloadSystemFirmwarePkcs7
+!endif
+
+!if $(RECOVERY_ENABLE)
+[FmpPayload.FmpPayloadSystemFirmwareRsa2048]
+IMAGE_HEADER_INIT_VERSION = 0x02
+IMAGE_TYPE_ID             = 62af20c0-7016-424a-9bf8-9ccc86584090 # PcdSystemFmpCapsuleImageTypeIdGuid
+IMAGE_INDEX               = 0x1
+HARDWARE_INSTANCE         = 0x0
+MONOTONIC_COUNT           = 0x2
+CERTIFICATE_GUID          = A7717414-C616-4977-9420-844712A735BF # RSA2048SHA256
+
+FV = SystemFirmwareUpdateCargo
+
+[Capsule.QuarkRec]
+CAPSULE_GUID                = 6dcbd5ed-e82d-4c44-bda1-7194199ad92a # gEfiFmpCapsuleGuid
+CAPSULE_FLAGS               = PersistAcrossReset,InitiateReset
+CAPSULE_HEADER_SIZE         = 0x20
+CAPSULE_HEADER_INIT_VERSION = 0x1
+
+FMP_PAYLOAD = FmpPayloadSystemFirmwareRsa2048
 !endif
 
 ################################################################################
@@ -771,3 +898,13 @@ INF  RuleOverride = TIANOCOMPRESSED PerformancePkg/Dp_App/Dp.inf
     RAW ACPI               |.acpi
     RAW ASL                |.aml
   }
+
+[Rule.Common.PEIM.FMP_IMAGE_DESC]
+  FILE PEIM = $(NAMED_GUID) {
+     RAW BIN                  |.acpi
+     PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
+     PE32      PE32    Align=4K          $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI       STRING="$(MODULE_NAME)" Optional
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
