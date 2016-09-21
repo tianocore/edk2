@@ -1139,7 +1139,6 @@ HiiDrawImage (
   EFI_STATUS                          Status;
   HII_DATABASE_PRIVATE_DATA           *Private;
   BOOLEAN                             Transparent;
-  EFI_IMAGE_INPUT                     *ImageIn;
   EFI_IMAGE_OUTPUT                    *ImageOut;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL       *BltBuffer;
   UINTN                               BufferLen;
@@ -1165,7 +1164,6 @@ HiiDrawImage (
   }
 
   FontInfo = NULL;
-  ImageIn = (EFI_IMAGE_INPUT *) Image;
 
   //
   // Check whether the image will be drawn transparently or opaquely.
@@ -1180,7 +1178,7 @@ HiiDrawImage (
     // Now EFI_HII_DRAW_FLAG_DEFAULT is set, whether image will be drawn depending
     // on the image's transparency setting.
     //
-    if ((ImageIn->Flags & EFI_IMAGE_TRANSPARENT) == EFI_IMAGE_TRANSPARENT) {
+    if ((Image->Flags & EFI_IMAGE_TRANSPARENT) == EFI_IMAGE_TRANSPARENT) {
       Transparent = TRUE;
     }
   }
@@ -1209,8 +1207,8 @@ HiiDrawImage (
     // Clip the image by (Width, Height)
     //
 
-    Width  = ImageIn->Width;
-    Height = ImageIn->Height;
+    Width  = Image->Width;
+    Height = Image->Height;
 
     if (Width > (*Blt)->Width - BltX) {
       Width = (*Blt)->Width - BltX;
@@ -1225,14 +1223,14 @@ HiiDrawImage (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    if (Width == ImageIn->Width && Height == ImageIn->Height) {
-      CopyMem (BltBuffer, ImageIn->Bitmap, BufferLen);
+    if (Width == Image->Width && Height == Image->Height) {
+      CopyMem (BltBuffer, Image->Bitmap, BufferLen);
     } else {
       for (Ypos = 0; Ypos < Height; Ypos++) {
-        OffsetY1 = ImageIn->Width * Ypos;
+        OffsetY1 = Image->Width * Ypos;
         OffsetY2 = Width * Ypos;
         for (Xpos = 0; Xpos < Width; Xpos++) {
-          BltBuffer[OffsetY2 + Xpos] = ImageIn->Bitmap[OffsetY1 + Xpos];
+          BltBuffer[OffsetY2 + Xpos] = Image->Bitmap[OffsetY1 + Xpos];
         }
       }
     }
@@ -1283,8 +1281,8 @@ HiiDrawImage (
     //
     // Allocate a new bitmap to hold the incoming image.
     //
-    Width  = ImageIn->Width  + BltX;
-    Height = ImageIn->Height + BltY;
+    Width  = Image->Width  + BltX;
+    Height = Image->Height + BltY;
 
     BufferLen = Width * Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
     BltBuffer = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocateZeroPool (BufferLen);
@@ -1322,11 +1320,11 @@ HiiDrawImage (
     //
     *Blt = ImageOut;
     return ImageToBlt (
-             ImageIn->Bitmap,
+             Image->Bitmap,
              BltX,
              BltY,
-             ImageIn->Width,
-             ImageIn->Height,
+             Image->Width,
+             Image->Height,
              Transparent,
              Blt
              );
