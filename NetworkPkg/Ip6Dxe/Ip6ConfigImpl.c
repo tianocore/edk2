@@ -665,36 +665,35 @@ Ip6ConfigSetPolicy (
 
     return EFI_ABORTED;
   } else {
+    //
+    // Clean the ManualAddress, Gateway and DnsServers, shrink the variable
+    // data size, and fire up all the related events.
+    //
+    DataItem           = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
 
-    if (NewPolicy == Ip6ConfigPolicyAutomatic) {
-      //
-      // Clean the ManualAddress, Gateway and DnsServers, shrink the variable
-      // data size, and fire up all the related events.
-      //
-      DataItem           = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
+    DataItem           = &Instance->DataItem[Ip6ConfigDataTypeGateway];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
 
-      DataItem           = &Instance->DataItem[Ip6ConfigDataTypeGateway];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
-
-      DataItem           = &Instance->DataItem[Ip6ConfigDataTypeDnsServer];
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
-    } else {
+    DataItem           = &Instance->DataItem[Ip6ConfigDataTypeDnsServer];
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
+    
+    if (NewPolicy == Ip6ConfigPolicyManual) {
       //
       // The policy is changed from automatic to manual. Stop the DHCPv6 process
       // and destroy the DHCPv6 child.
