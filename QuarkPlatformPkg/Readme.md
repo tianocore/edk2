@@ -146,6 +146,8 @@ features on the build command line using ```-D``` flags.
 | ```SECURE_BOOT_ENABLE```   |             FALSE | TRUE, FALSE          |
 | ```MEASURED_BOOT_ENABLE``` |             FALSE | TRUE, FALSE          |
 | ```TPM_12_HARDWARE```      |              NONE | NONE, LPC, ATMEL_I2C, INFINEON_I2C |
+| ```CAPSULE_ENABLE```       |             FALSE | TRUE, FALSE          |
+| ```RECOVERY_ENABLE```      |             FALSE | TRUE, FALSE          |
 
 * ```GALILEO``` - Used to specify the type of Intel(R) Galileo board type.  The
   default is ```GEN2``` for the [Intel(R) Galileo Gen 2 Development Board](
@@ -199,6 +201,22 @@ features on the build command line using ```-D``` flags.
   has been tested with the [CryptoShield](https://www.sparkfun.com/products/13183)
   available from [SparkFun](https://www.sparkfun.com/).
 
+* ```CAPSULE_ENABLE``` - Used to enable/disable capsule update features.
+  The default is FALSE for disabled.  Add ```-D CAPSULE_ENABLE``` to the
+  build command line to enable capsule update features.
+  The build process generate capsule update image - QUARKFIRMWAREUPDATECAPSULEFMPPKCS7.Cap.
+  The user need copy QUARKFIRMWAREUPDATECAPSULEFMPPKCS7.Cap and CapsuleApp.efi
+  to a storage media attached to the Quark Board.
+  Then the user can boot to shell and run ```CapsuleApp QUARKFIRMWAREUPDATECAPSULEFMPPKCS7.Cap```.
+  In next reboot, the system firmware is updated.
+
+* ```RECOVERY_ENABLE``` - Used to enable/disable recovery features.
+  The default is FALSE for disabled.  Add ```-D RECOVERY_ENABLE``` to the
+  build command line to enable recovery features.
+  The build process generates the recovery capsule image - QUARKREC.Cap.
+  Then the user need copy QUARKREC.Cap to a USB KEY, plug the USB KEY to the Quark Board.
+  In next boot, if a user runs ForceRecovery.efi in shell, or if a user presses the RESET button during power on, warm reset or REBOOT,
+  or if the FvMain is corrupted in flash, the system will boot into recovery mode.
 
 ### **Example Build Commands**
 
