@@ -169,6 +169,11 @@ echo        IFWI Suffix:      Suffix to append to end of IFWI filename (default:
 echo.
 echo        See  Stitch/Stitch_Config.txt  for additional stitching settings.
 echo.
+echo        If capsule update is needed, please update CAPSULE_ENABLE = TRUE in Config.dsc.
+echo        If recovery is needed, please update RECOVERY_ENABLE = TRUE in Config.dsc.
+echo        If either of above is TRUE, please set OPENSSL_PATH in windows evironment
+echo        and put openssl.exe there, to generate final capsule image.
+echo.
 set exitCode=1
 
 :Exit
