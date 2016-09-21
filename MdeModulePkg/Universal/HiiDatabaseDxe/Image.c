@@ -965,26 +965,15 @@ HiiSetImage (
   HII_DATABASE_PRIVATE_DATA           *Private;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_IMAGE_PACKAGE_INSTANCE          *ImagePackage;
-  UINT8                               *ImageBlock;
-  EFI_IMAGE_ID                        LocalImageId;
-  UINT8                               BlockType;
-  EFI_HII_IIBT_IMAGE_1BIT_BLOCK       Iibt1bit;
-  EFI_HII_IIBT_IMAGE_4BIT_BLOCK       Iibt4bit;
-  EFI_HII_IIBT_IMAGE_8BIT_BLOCK       Iibt8bit;
-  UINT16                              Width;
-  UINT16                              Height;
-  UINT32                              BlockSize;
+  EFI_HII_IMAGE_BLOCK                 *CurrentImageBlock;
+  EFI_HII_IMAGE_BLOCK                 *ImageBlocks;
+  EFI_HII_IMAGE_BLOCK                 *NewImageBlock;
   UINT32                              NewBlockSize;
   UINT32                              OldBlockSize;
-  EFI_IMAGE_INPUT                     *ImageIn;
-  UINT8                               *NewBlock;
-  UINT8                               *NewBlockPtr;
-  UINT8                               *Block;
-  UINT8                               *BlockPtr;
   UINT32                               Part1Size;
   UINT32                               Part2Size;
 
-  if (This == NULL || Image == NULL || ImageId < 1 || Image->Bitmap == NULL) {
+  if (This == NULL || Image == NULL || ImageId == 0 || Image->Bitmap == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1005,19 +994,16 @@ HiiSetImage (
   //
   // Find the image block specified by ImageId
   //
-  LocalImageId = ImageId;
-  ImageBlock = (UINT8 *) GetImageIdOrAddress (ImagePackage->ImageBlock, &LocalImageId);
-  if (ImageBlock == NULL) {
+  CurrentImageBlock = GetImageIdOrAddress (ImagePackage->ImageBlock, &ImageId);
+  if (CurrentImageBlock == NULL) {
     return EFI_NOT_FOUND;
   }
-
-  BlockType = *ImageBlock;
 
   //
   // Get the size of original image block. Use some common block code here
   // since the definition of some structures is the same.
   //
-  switch (BlockType) {
+  switch (CurrentImageBlock->BlockType) {
   case EFI_HII_IIBT_IMAGE_JPEG:
     //
     // BUGBUG: need to be supported as soon as image tool is designed.
@@ -1026,32 +1012,35 @@ HiiSetImage (
 
   case EFI_HII_IIBT_IMAGE_1BIT:
   case EFI_HII_IIBT_IMAGE_1BIT_TRANS:
-    CopyMem (&Iibt1bit, ImageBlock, sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK));
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK) - sizeof (UINT8) +
-                   BITMAP_LEN_1_BIT (Iibt1bit.Bitmap.Width, Iibt1bit.Bitmap.Height);
+                   BITMAP_LEN_1_BIT (
+                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_1BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_1BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
+                     );
     break;
   case EFI_HII_IIBT_IMAGE_4BIT:
   case EFI_HII_IIBT_IMAGE_4BIT_TRANS:
-    CopyMem (&Iibt4bit, ImageBlock, sizeof (EFI_HII_IIBT_IMAGE_4BIT_BLOCK));
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_4BIT_BLOCK) - sizeof (UINT8) +
-                   BITMAP_LEN_4_BIT (Iibt4bit.Bitmap.Width, Iibt4bit.Bitmap.Height);
+                   BITMAP_LEN_4_BIT (
+                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_4BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_4BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
+                     );
     break;
   case EFI_HII_IIBT_IMAGE_8BIT:
   case EFI_HII_IIBT_IMAGE_8BIT_TRANS:
-    CopyMem (&Iibt8bit, ImageBlock, sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK));
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK) - sizeof (UINT8) +
-                   BITMAP_LEN_8_BIT (Iibt8bit.Bitmap.Width, Iibt8bit.Bitmap.Height);
+                   BITMAP_LEN_8_BIT (
+                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
+                     );
     break;
   case EFI_HII_IIBT_IMAGE_24BIT:
   case EFI_HII_IIBT_IMAGE_24BIT_TRANS:
-    CopyMem (&Width, ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK), sizeof (UINT16));
-    CopyMem (
-      &Height,
-      ImageBlock + sizeof (EFI_HII_IMAGE_BLOCK) + sizeof (UINT16),
-      sizeof (UINT16)
-      );
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
-                   BITMAP_LEN_24_BIT (Width , Height);
+                   BITMAP_LEN_24_BIT (
+                     ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
+                     );
     break;
   default:
     return EFI_NOT_FOUND;
@@ -1060,53 +1049,40 @@ HiiSetImage (
   //
   // Create the new image block according to input image.
   //
-  ImageIn = (EFI_IMAGE_INPUT *) Image;
   NewBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
-                 BITMAP_LEN_24_BIT (ImageIn->Width, ImageIn->Height);
-  NewBlock = (UINT8 *) AllocateZeroPool (NewBlockSize);
-  if (NewBlock == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  NewBlockPtr = NewBlock;
-  if ((ImageIn->Flags & EFI_IMAGE_TRANSPARENT) == EFI_IMAGE_TRANSPARENT) {
-    *NewBlockPtr = EFI_HII_IIBT_IMAGE_24BIT_TRANS;
-  } else {
-    *NewBlockPtr = EFI_HII_IIBT_IMAGE_24BIT;
-  }
-  NewBlockPtr++;
-
-  CopyMem (NewBlockPtr, &ImageIn->Width, sizeof (UINT16));
-  NewBlockPtr += sizeof (UINT16);
-  CopyMem (NewBlockPtr, &ImageIn->Height, sizeof (UINT16));
-  NewBlockPtr += sizeof (UINT16);
-
-  CopyGopToRgbPixel ((EFI_HII_RGB_PIXEL *) NewBlockPtr, ImageIn->Bitmap, ImageIn->Width * ImageIn->Height);
-
+                 BITMAP_LEN_24_BIT (Image->Width, Image->Height);
   //
   // Adjust the image package to remove the original block firstly then add the new block.
   //
-  BlockSize = ImagePackage->ImageBlockSize + NewBlockSize - OldBlockSize;
-  Block = (UINT8 *) AllocateZeroPool (BlockSize);
-  if (Block == NULL) {
-    FreePool (NewBlock);
+  ImageBlocks = AllocateZeroPool (ImagePackage->ImageBlockSize + NewBlockSize - OldBlockSize);
+  if (ImageBlocks == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  BlockPtr  = Block;
-  Part1Size = (UINT32) (ImageBlock - (UINT8 *) ImagePackage->ImageBlock);
+  Part1Size = (UINT32) (UINTN) ((UINT8 *) CurrentImageBlock - (UINT8 *) ImagePackage->ImageBlock);
   Part2Size = ImagePackage->ImageBlockSize - Part1Size - OldBlockSize;
-  CopyMem (BlockPtr, ImagePackage->ImageBlock, Part1Size);
-  BlockPtr += Part1Size;
-  CopyMem (BlockPtr, NewBlock, NewBlockSize);
-  BlockPtr += NewBlockSize;
-  CopyMem (BlockPtr, ImageBlock + OldBlockSize, Part2Size);
+  CopyMem (ImageBlocks, ImagePackage->ImageBlock, Part1Size);
+
+  //
+  // Set the new image block
+  //
+  NewImageBlock = (EFI_HII_IMAGE_BLOCK *) ((UINT8 *) ImageBlocks + Part1Size);
+  if ((Image->Flags & EFI_IMAGE_TRANSPARENT) == EFI_IMAGE_TRANSPARENT) {
+    NewImageBlock->BlockType= EFI_HII_IIBT_IMAGE_24BIT_TRANS;
+  } else {
+    NewImageBlock->BlockType = EFI_HII_IIBT_IMAGE_24BIT;
+  }
+  WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Width, Image->Width);
+  WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Height, Image->Height);
+  CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Bitmap,
+                       Image->Bitmap, Image->Width * Image->Height);
+
+  CopyMem ((UINT8 *) NewImageBlock + NewBlockSize, (UINT8 *) CurrentImageBlock + OldBlockSize, Part2Size);
 
   FreePool (ImagePackage->ImageBlock);
-  FreePool (NewBlock);
-  ImagePackage->ImageBlock     = (EFI_HII_IMAGE_BLOCK *) Block;
-  ImagePackage->ImageBlockSize = BlockSize;
-  ImagePackage->ImagePkgHdr.Header.Length += NewBlockSize - OldBlockSize;
+  ImagePackage->ImageBlock                       = ImageBlocks;
+  ImagePackage->ImageBlockSize                  += NewBlockSize - OldBlockSize;
+  ImagePackage->ImagePkgHdr.Header.Length       += NewBlockSize - OldBlockSize;
   PackageListNode->PackageListHdr.PackageLength += NewBlockSize - OldBlockSize;
 
   //
