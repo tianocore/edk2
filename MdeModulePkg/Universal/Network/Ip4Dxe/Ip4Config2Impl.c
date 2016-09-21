@@ -1146,39 +1146,39 @@ Ip4Config2SetPolicy (
       return EFI_ABORTED;
     }
   } else {
+    //
+    // The policy is changed. Clean the ManualAddress, Gateway and DnsServers, 
+    // shrink the variable data size, and fire up all the related events.
+    //
+    DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
+
+    DataItem           = &Instance->DataItem[Ip4Config2DataTypeGateway];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
+
+    DataItem           = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
+    
     if (NewPolicy == Ip4Config2PolicyDhcp) {
-      //
-      // The policy is changed from static to dhcp:
-      // Clean the ManualAddress, Gateway and DnsServers, shrink the variable
-      // data size, and fire up all the related events.
-      //
-      DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
-
-      DataItem           = &Instance->DataItem[Ip4Config2DataTypeGateway];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
-
-      DataItem           = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
       SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_VOLATILE);
-      NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
     } else {
       //
       // The policy is changed from dhcp to static. Stop the DHCPv4 process
