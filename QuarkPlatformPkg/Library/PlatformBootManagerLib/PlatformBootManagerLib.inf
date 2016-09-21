@@ -1,7 +1,7 @@
 ## @file
 #  Include all platform action which can be customized by IBV/OEM.
 #
-#  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -38,6 +38,9 @@
   IntelFrameworkPkg/IntelFrameworkPkg.dec
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+  QuarkPlatformPkg/QuarkPlatformPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -49,11 +52,16 @@
   UefiBootServicesTableLib
   UefiLib
   UefiBootManagerLib
+  PrintLib
+  HobLib
+  CapsuleLib
+  DxeServicesLib
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid
   gEfiAcpiS3SaveProtocolGuid
   gEfiDxeSmmReadyToLockProtocolGuid
+  gEsrtManagementProtocolGuid
 
 [Guids]
   gEfiPcAnsiGuid
@@ -70,3 +78,10 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdBootState
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiRsa2048Sha256TestPublicKeyFileGuid
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiPkcs7TestPublicKeyFileGuid
+  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer
+  gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed
+
