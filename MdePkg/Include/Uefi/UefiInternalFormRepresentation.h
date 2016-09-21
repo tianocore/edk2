@@ -3,7 +3,7 @@
   IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
@@ -2125,5 +2125,11 @@ typedef struct _EFI_HII_AIBT_SKIP2_BLOCK {
 /// here for the easy access by C files and VFR source files.
 ///
 #define STRING_TOKEN(t) t
+
+///
+/// IMAGE_TOKEN is not defined in UEFI specification. But it is placed
+/// here for the easy access by C files and VFR source files.
+///
+#define IMAGE_TOKEN(t) t
 
 #endif
