@@ -39,11 +39,19 @@ HII_DATABASE_PRIVATE_DATA mPrivate = {
     HiiGetFontInfo
   },
   {
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL
+    HiiNewImage,
+    HiiGetImage,
+    HiiSetImage,
+    HiiDrawImage,
+    HiiDrawImageId
+  },
+  {
+    HiiNewImageEx,
+    HiiGetImageEx,
+    HiiSetImageEx,
+    HiiDrawImageEx,
+    HiiDrawImageIdEx,
+    HiiGetImageInfo
   },
   {
     HiiNewString,
@@ -94,14 +102,6 @@ HII_DATABASE_PRIVATE_DATA mPrivate = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   },
   NULL
-};
-
-GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_HII_IMAGE_PROTOCOL mImageProtocol = {
-  HiiNewImage,
-  HiiGetImage,
-  HiiSetImage,
-  HiiDrawImage,
-  HiiDrawImageId
 };
 
 /**
@@ -230,12 +230,10 @@ InitializeHiiDatabase (
   }
 
   if (FeaturePcdGet (PcdSupportHiiImageProtocol)) {
-    CopyMem (&mPrivate.HiiImage, &mImageProtocol, sizeof (mImageProtocol));
-
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &Handle,
-                    &gEfiHiiImageProtocolGuid,
-                    &mPrivate.HiiImage,
+                    &gEfiHiiImageProtocolGuid, &mPrivate.HiiImage,
+                    &gEfiHiiImageExProtocolGuid, &mPrivate.HiiImageEx,
                     NULL
                     );
 

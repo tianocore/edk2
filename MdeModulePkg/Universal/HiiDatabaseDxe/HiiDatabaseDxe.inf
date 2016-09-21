@@ -35,6 +35,7 @@
 [Sources]
   HiiDatabaseEntry.c
   Image.c
+  ImageEx.c
   HiiDatabase.h
   ConfigRouting.c
   String.c
@@ -63,7 +64,9 @@
 [Protocols]
   gEfiDevicePathProtocolGuid                                            ## SOMETIMES_CONSUMES
   gEfiHiiStringProtocolGuid                                             ## PRODUCES
-  gEfiHiiImageProtocolGuid |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_PRODUCES
+  gEfiHiiImageProtocolGuid        |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_PRODUCES
+  gEfiHiiImageExProtocolGuid      |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_PRODUCES
+  gEfiHiiImageDecoderProtocolGuid |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES
   gEfiHiiConfigRoutingProtocolGuid                                      ## PRODUCES
   gEfiHiiDatabaseProtocolGuid                                           ## PRODUCES
   gEfiHiiFontProtocolGuid                                               ## PRODUCES
@@ -85,6 +88,8 @@
   ## CONSUMES  ## Event
   ## PRODUCES  ## Event
   gEfiHiiKeyBoardLayoutGuid
+  gEfiHiiImageDecoderNameJpegGuid |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES
+  gEfiHiiImageDecoderNamePngGuid  |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES
 
 [Depex]
   TRUE

@@ -643,10 +643,6 @@ HiiNewImage (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!IsHiiHandleValid (PackageList)) {
-    return EFI_NOT_FOUND;
-  }
-
   Private = HII_IMAGE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
   PackageListNode = LocatePackageList (&Private->DatabaseList, PackageList);
   if (PackageListNode == NULL) {
@@ -781,33 +777,34 @@ HiiNewImage (
   This function retrieves the image specified by ImageId which is associated with
   the specified PackageList and copies it into the buffer specified by Image.
 
-  @param  This                   A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
+  @param  Database               A pointer to the database list header.
   @param  PackageList            Handle of the package list where this image will
                                  be searched.
   @param  ImageId                The image's id,, which is unique within
                                  PackageList.
   @param  Image                  Points to the image.
+  @param  BitmapOnly             TRUE to only return the bitmap type image.
+                                 FALSE to locate image decoder instance to decode image.
 
   @retval EFI_SUCCESS            The new image was returned successfully.
-  @retval EFI_NOT_FOUND           The image specified by ImageId is not in the
-                                                database. The specified PackageList is not in the database.
+  @retval EFI_NOT_FOUND          The image specified by ImageId is not in the
+                                 database. The specified PackageList is not in the database.
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by ImageSize is too small to
                                  hold the image.
   @retval EFI_INVALID_PARAMETER  The Image or ImageSize was NULL.
   @retval EFI_OUT_OF_RESOURCES   The bitmap could not be retrieved because there was not
-                                                     enough memory.
-
+                                 enough memory.
 **/
 EFI_STATUS
-EFIAPI
-HiiGetImage (
-  IN  CONST EFI_HII_IMAGE_PROTOCOL   *This,
+IGetImage (
+  IN  LIST_ENTRY                     *Database,
   IN  EFI_HII_HANDLE                 PackageList,
   IN  EFI_IMAGE_ID                   ImageId,
-  OUT EFI_IMAGE_INPUT                *Image
+  OUT EFI_IMAGE_INPUT                *Image,
+  IN  BOOLEAN                        BitmapOnly
   )
 {
-  HII_DATABASE_PRIVATE_DATA           *Private;
+  EFI_STATUS                          Status;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
   HII_IMAGE_PACKAGE_INSTANCE          *ImagePackage;
   EFI_HII_IMAGE_BLOCK                 *CurrentImageBlock;
@@ -818,17 +815,14 @@ HiiGetImage (
   UINT8                               *PaletteInfo;
   UINT8                               PaletteIndex;
   UINT16                              PaletteSize;
+  EFI_HII_IMAGE_DECODER_PROTOCOL      *Decoder;
+  EFI_IMAGE_OUTPUT                    *ImageOut;
 
-  if (This == NULL || Image == NULL || ImageId == 0) {
+  if (Image == NULL || ImageId == 0) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!IsHiiHandleValid (PackageList)) {
-    return EFI_NOT_FOUND;
-  }
-
-  Private = HII_IMAGE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
-  PackageListNode = LocatePackageList (&Private->DatabaseList, PackageList);
+  PackageListNode = LocatePackageList (Database, PackageList);
   if (PackageListNode == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -845,14 +839,47 @@ HiiGetImage (
     return EFI_NOT_FOUND;
   }
 
+  Image->Flags = 0;
   switch (CurrentImageBlock->BlockType) {
   case EFI_HII_IIBT_IMAGE_JPEG:
   case EFI_HII_IIBT_IMAGE_PNG:
+    if (BitmapOnly) {
+      return EFI_UNSUPPORTED;
+    }
+
+    ImageOut = NULL;
+    Decoder = LocateHiiImageDecoder (CurrentImageBlock->BlockType);
+    if (Decoder == NULL) {
+      return EFI_UNSUPPORTED;
+    }
     //
-    // HiiImage protocol doesn't support return JPEG/PNG.
-    // Use HiiImageEx instead.
+    // Use the common block code since the definition of two structures is the same.
     //
-    return EFI_UNSUPPORTED;
+    ASSERT (OFFSET_OF (EFI_HII_IIBT_JPEG_BLOCK, Data) == OFFSET_OF (EFI_HII_IIBT_PNG_BLOCK, Data));
+    ASSERT (sizeof (((EFI_HII_IIBT_JPEG_BLOCK *) CurrentImageBlock)->Data) ==
+            sizeof (((EFI_HII_IIBT_PNG_BLOCK *) CurrentImageBlock)->Data));
+    ASSERT (OFFSET_OF (EFI_HII_IIBT_JPEG_BLOCK, Size) == OFFSET_OF (EFI_HII_IIBT_PNG_BLOCK, Size));
+    ASSERT (sizeof (((EFI_HII_IIBT_JPEG_BLOCK *) CurrentImageBlock)->Size) ==
+            sizeof (((EFI_HII_IIBT_PNG_BLOCK *) CurrentImageBlock)->Size));
+    Status = Decoder->DecodeImage (
+      Decoder,
+      ((EFI_HII_IIBT_JPEG_BLOCK *) CurrentImageBlock)->Data,
+      ((EFI_HII_IIBT_JPEG_BLOCK *) CurrentImageBlock)->Size,
+      &ImageOut,
+      FALSE
+    );
+
+    //
+    // Spec requires to use the first capable image decoder instance.
+    // The first image decoder instance may fail to decode the image.
+    //
+    if (!EFI_ERROR (Status)) {
+      Image->Bitmap = ImageOut->Image.Bitmap;
+      Image->Height = ImageOut->Height;
+      Image->Width = ImageOut->Width;
+      FreePool (ImageOut);
+    }
+    return Status;
 
   case EFI_HII_IIBT_IMAGE_1BIT_TRANS:
   case EFI_HII_IIBT_IMAGE_4BIT_TRANS:
@@ -870,7 +897,7 @@ HiiGetImage (
     CopyMem (&Iibt1bit, CurrentImageBlock, sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK));
     ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) *
                   (Iibt1bit.Bitmap.Width * Iibt1bit.Bitmap.Height);
-    Image->Bitmap = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocateZeroPool (ImageLength);
+    Image->Bitmap = AllocateZeroPool (ImageLength);
     if (Image->Bitmap == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -943,6 +970,41 @@ HiiGetImage (
   }
 }
 
+/**
+  This function retrieves the image specified by ImageId which is associated with
+  the specified PackageList and copies it into the buffer specified by Image.
+
+  @param  This                   A pointer to the EFI_HII_IMAGE_PROTOCOL instance.
+  @param  PackageList            Handle of the package list where this image will
+                                 be searched.
+  @param  ImageId                The image's id,, which is unique within
+                                 PackageList.
+  @param  Image                  Points to the image.
+
+  @retval EFI_SUCCESS            The new image was returned successfully.
+  @retval EFI_NOT_FOUND           The image specified by ImageId is not in the
+                                                database. The specified PackageList is not in the database.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by ImageSize is too small to
+                                 hold the image.
+  @retval EFI_INVALID_PARAMETER  The Image or ImageSize was NULL.
+  @retval EFI_OUT_OF_RESOURCES   The bitmap could not be retrieved because there was not
+                                 enough memory.
+
+**/
+EFI_STATUS
+EFIAPI
+HiiGetImage (
+  IN  CONST EFI_HII_IMAGE_PROTOCOL   *This,
+  IN  EFI_HII_HANDLE                 PackageList,
+  IN  EFI_IMAGE_ID                   ImageId,
+  OUT EFI_IMAGE_INPUT                *Image
+  )
+{
+  HII_DATABASE_PRIVATE_DATA           *Private;
+  Private = HII_IMAGE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
+  return IGetImage (&Private->DatabaseList, PackageList, ImageId, Image, TRUE);
+}
+
 
 /**
   This function updates the image specified by ImageId in the specified PackageListHandle to
@@ -982,10 +1044,6 @@ HiiSetImage (
 
   if (This == NULL || Image == NULL || ImageId == 0 || Image->Bitmap == NULL) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  if (!IsHiiHandleValid (PackageList)) {
-    return EFI_NOT_FOUND;
   }
 
   Private = HII_IMAGE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
@@ -1392,10 +1450,6 @@ HiiDrawImageId (
   //
   if (This == NULL || Blt == NULL) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  if (!IsHiiHandleValid (PackageList)) {
-    return EFI_NOT_FOUND;
   }
 
   //
