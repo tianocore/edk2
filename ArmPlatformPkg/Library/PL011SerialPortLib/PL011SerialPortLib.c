@@ -23,14 +23,12 @@
 
 #include <Drivers/PL011Uart.h>
 
+/** Initialise the serial device hardware with default settings.
 
-/**
-
-  Programmed hardware of Serial port.
-
-  @return    Always return RETURN_UNSUPPORTED.
-
-**/
+  @retval RETURN_SUCCESS            The serial device was initialised.
+  @retval RETURN_INVALID_PARAMETER  One or more of the default settings
+                                    has an unsupported value.
+ **/
 RETURN_STATUS
 EFIAPI
 SerialPortInitialize (
@@ -103,9 +101,8 @@ SerialPortRead (
 /**
   Check to see if any data is available to be read from the debug device.
 
-  @retval EFI_SUCCESS       At least one byte of data is available to be read
-  @retval EFI_NOT_READY     No data is available to be read
-  @retval EFI_DEVICE_ERROR  The serial device is not functioning properly
+  @retval TRUE       At least one byte of data is available to be read
+  @retval FALSE      No data is available to be read
 
 **/
 BOOLEAN

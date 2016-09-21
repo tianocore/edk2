@@ -246,9 +246,8 @@ PL011UartRead (
 /**
   Check to see if any data is available to be read from the debug device.
 
-  @retval EFI_SUCCESS       At least one byte of data is available to be read
-  @retval EFI_NOT_READY     No data is available to be read
-  @retval EFI_DEVICE_ERROR  The serial device is not functioning properly
+  @retval TRUE       At least one byte of data is available to be read
+  @retval FALSE      No data is available to be read
 
 **/
 BOOLEAN
