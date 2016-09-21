@@ -222,8 +222,7 @@ MemoryDiscoveredPpiNotifyCallback (
   QNCPortWrite (QUARK_NC_HOST_BRIDGE_SB_PORT_ID, QNC_MSG_FSBIC_REG_HMISC, RegData32);
 
   if (BootMode == BOOT_IN_RECOVERY_MODE) {
-    Status = PeimInitializeRecovery (PeiServices);
-    ASSERT_EFI_ERROR (Status);
+    // Do nothing here. A generic RecoveryModule will handle it.
   } else if (BootMode == BOOT_ON_S3_RESUME) {
     return EFI_SUCCESS;
   } else {
