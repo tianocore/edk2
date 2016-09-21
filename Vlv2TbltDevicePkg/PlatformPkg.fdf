@@ -82,6 +82,9 @@ NumBlocks     = $(FLASH_NUM_BLOCKS)          #The number of blocks in 3Mb FLASH 
 SET gPlatformModuleTokenSpaceGuid.PcdFlashAreaBaseAddress            = $(FLASH_AREA_BASE_ADDRESS)
 SET gPlatformModuleTokenSpaceGuid.PcdFlashAreaSize                   = $(FLASH_AREA_SIZE)
 
+SET gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress = $(FLASH_REGION_VLVMICROCODE_BASE) + 0x60
+SET gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize = $(FLASH_REGION_VLVMICROCODE_SIZE) - 0x60
+
 !if $(MINNOW2_FSP_BUILD) == TRUE
 # put below PCD value setting into dsc file
 #SET gFspWrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress                = $(FLASH_REGION_VLVMICROCODE_BASE)
@@ -242,6 +245,34 @@ FILE RAW = 197DB236-F856-4924-90F8-CDF12FB875F3 {
   $(OUTPUT_DIRECTORY)\$(TARGET)_$(TOOL_CHAIN_TAG)\$(DXE_ARCHITECTURE)\MicrocodeUpdates.bin
 }
 
+!if $(RECOVERY_ENABLE)
+[FV.FVRECOVERY_COMPONENTS]
+FvAlignment        = 16         #FV alignment and FV attributes setting.
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+INF  RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/PchUsb.inf
+INF  MdeModulePkg/Bus/Pci/EhciPei/EhciPei.inf
+INF  MdeModulePkg/Bus/Usb/UsbBusPei/UsbBusPei.inf
+INF  MdeModulePkg/Bus/Usb/UsbBotPei/UsbBotPei.inf
+INF  FatPkg/FatPei/FatPei.inf
+INF  MdeModulePkg/Universal/Disk/CdExpressPei/CdExpressPei.inf
+INF  SignedCapsulePkg/Universal/RecoveryModuleLoadPei/RecoveryModuleLoadPei.inf
+!endif
+
 ################################################################################
 #
 # FV Section
@@ -304,6 +335,15 @@ INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 !endif
 !if $(PERFORMANCE_ENABLE) == TRUE
 INF MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
+!endif
+
+!if $(RECOVERY_ENABLE)
+FILE FV_IMAGE = 1E9D7604-EF45-46a0-BD8A-71AC78C17AC1 {
+  SECTION PEI_DEPEX_EXP = {gEfiPeiMemoryDiscoveredPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid}
+  SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF {    # LZMA COMPRESS GUID
+    SECTION FV_IMAGE = FVRECOVERY_COMPONENTS
+  }
+}
 !endif
 
 [FV.FVRECOVERY]
@@ -372,6 +412,11 @@ INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET
 !endif
 
 INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+
+!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
+  # FMP image decriptor
+INF RuleOverride = FMP_IMAGE_DESC Vlv2TbltDevicePkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
+!endif
 
 [FV.FVMAIN]
 BlockSize          = $(FLASH_BLOCK_SIZE)
@@ -717,6 +762,30 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
   !endif
 !endif
 
+!if $(CAPSULE_ENABLE) || $(MICOCODE_CAPSULE_ENABLE)
+INF  MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+!endif
+!if $(CAPSULE_ENABLE)
+INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf
+!endif
+!if $(MICOCODE_CAPSULE_ENABLE)
+INF  UefiCpuPkg/Feature/Capsule/MicrocodeUpdateDxe/MicrocodeUpdateDxe.inf
+!endif
+
+!if $(RECOVERY_ENABLE)
+FILE FREEFORM = PCD(gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiRsa2048Sha256TestPublicKeyFileGuid) {
+     SECTION RAW = BaseTools/Source/Python/Rsa2048Sha256Sign/TestSigningPublicKey.bin
+     SECTION UI = "Rsa2048Sha256TestSigningPublicKey"
+     }
+!endif
+
+!if $(CAPSULE_ENABLE)
+FILE FREEFORM = PCD(gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiPkcs7TestPublicKeyFileGuid) {
+     SECTION RAW = BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer
+     SECTION UI = "Pkcs7TestRoot"
+     }
+!endif
+
 [FV.FVMAIN_COMPACT]
 BlockSize          = $(FLASH_BLOCK_SIZE)
 FvAlignment        = 16
@@ -780,8 +849,8 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 
-[FV.Update_Data]
-BlockSize          = $(FLASH_BLOCK_SIZE)
+!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
+[FV.CapsuleDispatchFv]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
@@ -799,71 +868,11 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-FILE RAW = 88888888-8888-8888-8888-888888888888 {
-       FD = Vlv
-     }
+!if $(CAPSULE_ENABLE)
+INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf
+!endif
 
-[FV.BiosUpdateCargo]
-BlockSize          = $(FLASH_BLOCK_SIZE)
-FvAlignment        = 16
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
-
-
-
-[FV.BiosUpdate]
-BlockSize          = $(FLASH_BLOCK_SIZE)
-FvAlignment        = 16
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
-
-[Capsule.Capsule_Boot]
-#
-# gEfiCapsuleGuid supported by platform
-# { 0x3B6686BD, 0x0D76, 0x4030, { 0xB7, 0x0E, 0xB5, 0x51, 0x9E, 0x2F, 0xC5, 0xA0 }}
-#
-CAPSULE_GUID  = 3B6686BD-0D76-4030-B70E-B5519E2FC5A0
-CAPSULE_FLAGS = PersistAcrossReset
-CAPSULE_HEADER_SIZE = 0x20
-
-FV = BiosUpdate
-
-[Capsule.Capsule_Reset]
-#
-# gEfiCapsuleGuid supported by platform
-# { 0x3B6686BD, 0x0D76, 0x4030, { 0xB7, 0x0E, 0xB5, 0x51, 0x9E, 0x2F, 0xC5, 0xA0 }}
-#
-CAPSULE_GUID  = 3B6686BD-0D76-4030-B70E-B5519E2FC5A0
-CAPSULE_FLAGS = PersistAcrossReset
-CAPSULE_HEADER_SIZE = 0x20
-
-FV = BiosUpdate
+!endif
 
 ################################################################################
 #
@@ -1089,3 +1098,11 @@ FV = BiosUpdate
     RAW ASL   Optional            |.aml
   }
 
+[Rule.Common.PEIM.FMP_IMAGE_DESC]
+  FILE PEIM = $(NAMED_GUID) {
+     RAW BIN                  |.acpi
+     PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
+     PE32      PE32    Align=4K          $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI       STRING="$(MODULE_NAME)" Optional
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }

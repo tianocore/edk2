@@ -1,7 +1,7 @@
 #/** @file
 # platform configuration file.
 #
-# Copyright (c) 2012  - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012  - 2016, Intel Corporation. All rights reserved.<BR>
 #                                                                                  
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.  
@@ -65,6 +65,8 @@ DEFINE VARIABLE_INFO_ENABLE = FALSE
 DEFINE S3_ENABLE = TRUE
 DEFINE CAPSULE_ENABLE = FALSE
 DEFINE CAPSULE_RESET_ENABLE = TRUE
+DEFINE RECOVERY_ENABLE = FALSE
+DEFINE MICOCODE_CAPSULE_ENABLE = FALSE
 
 DEFINE GOP_DRIVER_ENABLE = TRUE
 DEFINE DATAHUB_ENABLE = TRUE
