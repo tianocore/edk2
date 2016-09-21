@@ -72,6 +72,7 @@
   FileHandleLib
   S3BootScriptLib
   SerialPortLib
+  CapsuleLib
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid
@@ -90,6 +91,7 @@
   gEfiMmioDeviceProtocolGuid
   gEfiI2cMasterProtocolGuid
   gEfiI2cHostProtocolGuid
+  gEsrtManagementProtocolGuid
 
 [Guids]
   gEfiMemoryTypeInformationGuid

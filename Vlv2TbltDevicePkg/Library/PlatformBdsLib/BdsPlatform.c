@@ -1,15 +1,15 @@
 /** @file
 
   Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
-                                                                                   
-  This program and the accompanying materials are licensed and made available under
-  the terms and conditions of the BSD License that accompanies this distribution.  
-  The full text of the license may be found at                                     
-  http://opensource.org/licenses/bsd-license.php.                                  
-                                                                                   
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
-                                                                                   
+                                                                                   
+  This program and the accompanying materials are licensed and made available under
+  the terms and conditions of the BSD License that accompanies this distribution.  
+  The full text of the license may be found at                                     
+  http://opensource.org/licenses/bsd-license.php.                                  
+                                                                                   
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,            
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.    
+                                                                                   
 
 
 Module Name:
@@ -44,6 +44,9 @@ Abstract:
 #include <Library/GenericBdsLib/InternalBdsLib.h>
 #include <Library/GenericBdsLib/String.h>
 #include <Library/NetLib.h>
+
+#include <Library/CapsuleLib.h>
+#include <Protocol/EsrtManagement.h>
 
 EFI_GUID *ConnectDriverTable[] = {
   &gEfiMmioDeviceProtocolGuid,
@@ -1585,7 +1588,7 @@ EFIAPI
 PlatformBdsPolicyBehavior (
   IN OUT LIST_ENTRY                  *DriverOptionList,
   IN OUT LIST_ENTRY                  *BootOptionList,
-  IN PROCESS_CAPSULES                ProcessCapsules,
+  IN PROCESS_CAPSULES                BdsProcessCapsules,
   IN BASEM_MEMORY_TEST               BaseMemoryTest
   )
 {
@@ -1594,11 +1597,8 @@ PlatformBdsPolicyBehavior (
   EFI_BOOT_MODE                      BootMode;
   BOOLEAN                            DeferredImageExist;
   UINTN                              Index;
-  CHAR16                             CapsuleVarName[36];
-  CHAR16                             *TempVarName;
   SYSTEM_CONFIGURATION               SystemConfiguration;
   UINTN                              VarSize;
-  BOOLEAN                            SetVariableFlag;
   PLATFORM_PCI_DEVICE_PATH           *EmmcBootDevPath;
   EFI_GLOBAL_NVS_AREA_PROTOCOL       *GlobalNvsArea;
   EFI_HANDLE                         FvProtocolHandle;
@@ -1612,13 +1612,14 @@ PlatformBdsPolicyBehavior (
   BOOLEAN                            IsFirstBoot;
   UINT16                             *BootOrder;
   UINTN                              BootOrderSize;
+  ESRT_MANAGEMENT_PROTOCOL           *EsrtManagement;
 
   Timeout = PcdGet16 (PcdPlatformBootTimeOut);
   if (Timeout > 10 ) {
     //we think the Timeout variable is corrupted
     Timeout = 10;
   }
-  	
+
   VarSize = sizeof(SYSTEM_CONFIGURATION);
   Status = gRT->GetVariable(
                   NORMAL_SETUP_NAME,
@@ -1639,7 +1640,7 @@ PlatformBdsPolicyBehavior (
               &SystemConfiguration
               );
     ASSERT_EFI_ERROR (Status);
-  }  
+  }
 
   //
   // Load the driver option as the driver option list
@@ -1650,37 +1651,6 @@ PlatformBdsPolicyBehavior (
   // Get current Boot Mode
   //
   BootMode = GetBootModeHob();
-
-  //
-  // Clear all the capsule variables CapsuleUpdateData, CapsuleUpdateData1, CapsuleUpdateData2...
-  // as early as possible which will avoid the next time boot after the capsule update
-  // will still into the capsule loop
-  //
-  StrCpy (CapsuleVarName, EFI_CAPSULE_VARIABLE_NAME);
-  TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
-  Index = 0;
-  SetVariableFlag = TRUE;
-  while (SetVariableFlag) {
-    if (Index > 0) {
-      UnicodeValueToString (TempVarName, 0, Index, 0);
-    }
-    Status = gRT->SetVariable (
-                    CapsuleVarName,
-                    &gEfiCapsuleVendorGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS |
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    0,
-                    (VOID *)NULL
-                    );
-    if (EFI_ERROR (Status)) {
-      //
-      // There is no capsule variables, quit
-      //
-      SetVariableFlag = FALSE;
-      continue;
-    }
-    Index++;
-  }
 
   //
   // No deferred images exist by default
@@ -1731,6 +1701,11 @@ PlatformBdsPolicyBehavior (
                       &RegistrationExitPmAuth
                       );
     }
+  }
+
+  Status = gBS->LocateProtocol(&gEsrtManagementProtocolGuid, NULL, (VOID **)&EsrtManagement);
+  if (EFI_ERROR(Status)) {
+    EsrtManagement = NULL;
   }
 
   switch (BootMode) {
@@ -1822,13 +1797,18 @@ PlatformBdsPolicyBehavior (
     #ifdef FTPM_ENABLE
     TrEEPhysicalPresenceLibProcessRequest(NULL);
     #endif
+
+    if (EsrtManagement != NULL) {
+      EsrtManagement->LockEsrtRepository();
+    }
+
     //
     // Close boot script and install ready to lock
     //
     InstallReadyToLock ();
 
     //
-    // Give one chance to enter the setup if we 
+    // Give one chance to enter the setup if we
     // select Gummiboot "Reboot Into Firmware Interface" and Fast Boot is enabled.
     //
     BootIntoFirmwareInterface();
@@ -1863,6 +1843,10 @@ PlatformBdsPolicyBehavior (
       }
     }
 
+    if (EsrtManagement != NULL) {
+      EsrtManagement->LockEsrtRepository();
+    }
+
     //
     // Close boot script and install ready to lock
     //
@@ -1887,6 +1871,16 @@ PlatformBdsPolicyBehavior (
     //
     PlatformBdsConnectConsole (gPlatformConsole);
     PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
+
+    DEBUG((EFI_D_INFO, "ProcessCapsules Before EndOfDxe......\n"));
+    ProcessCapsules ();
+    DEBUG((EFI_D_INFO, "ProcessCapsules Done\n"));
+
+    //
+    // Close boot script and install ready to lock
+    //
+    InstallReadyToLock ();
+
     BdsLibConnectAll ();
 
     //
@@ -1903,12 +1897,13 @@ PlatformBdsPolicyBehavior (
       }
     }
 
-    //
-    // Close boot script and install ready to lock
-    //
-    InstallReadyToLock ();
+    if (EsrtManagement != NULL) {
+      EsrtManagement->SyncEsrtFmp();
+    }
 
-    ProcessCapsules (BOOT_ON_FLASH_UPDATE);
+    DEBUG((EFI_D_INFO, "ProcessCapsules After ConnectAll......\n"));
+    ProcessCapsules();
+    DEBUG((EFI_D_INFO, "ProcessCapsules Done\n"));
     break;
 
   case BOOT_IN_RECOVERY_MODE:
@@ -2012,6 +2007,10 @@ FULL_CONFIGURATION:
    #ifdef FTPM_ENABLE
    TrEEPhysicalPresenceLibProcessRequest(NULL);
    #endif
+
+    if (EsrtManagement != NULL) {
+      EsrtManagement->SyncEsrtFmp();
+    }
     //
     // Close boot script and install ready to lock
     //
@@ -2029,7 +2028,7 @@ FULL_CONFIGURATION:
     PlatformBdsEnterFrontPageWithHotKey (Timeout, FALSE);
 
 	//
-	// Give one chance to enter the setup if we 
+	// Give one chance to enter the setup if we
 	// select Gummiboot "Reboot Into Firmware Interface"
 	//
 	BootIntoFirmwareInterface();
@@ -2047,7 +2046,7 @@ FULL_CONFIGURATION:
       return;
     }
 
-    
+
     break;
   }
 
