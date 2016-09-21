@@ -1,7 +1,7 @@
 @REM @file
 @REM   Windows batch file to build BIOS ROM
 @REM
-@REM Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 @REM This program and the accompanying materials
 @REM are licensed and made available under the terms and conditions of the BSD License
 @REM which accompanies this distribution.  The full text of the license may be found at
@@ -234,6 +234,7 @@ del /f/q ver_strings >nul
 
 set BIOS_Name=%BOARD_ID%_%Arch%_%BUILD_TYPE%_%VERSION_MAJOR%_%VERSION_MINOR%.ROM
 copy /y/b %BUILD_PATH%\FV\Vlv%Arch%.fd  %WORKSPACE%\%BIOS_Name% >nul
+copy /y/b %BUILD_PATH%\FV\Vlv%Arch%.fd  %BUILD_PATH%\FV\Vlv.ROM >nul
 
 echo.
 echo Build location:     %BUILD_PATH%
@@ -241,6 +242,12 @@ echo BIOS ROM Created:   %BIOS_Name%
 echo.
 echo -------------------- The EDKII BIOS build has successfully completed. --------------------
 echo.
+
+@REM build capsule here
+if "%openssl_path%" == "" goto Exit
+echo > %BUILD_PATH%\FV\SYSTEMFIRMWAREUPDATECARGO.Fv
+build -p %PLATFORM_PACKAGE%\PlatformCapsule.dsc
+
 goto Exit
 
 :Usage
