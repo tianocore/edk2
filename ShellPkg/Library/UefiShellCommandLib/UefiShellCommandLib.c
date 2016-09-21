@@ -1227,10 +1227,8 @@ ShellCommandAddMapItemAndUpdatePath(
     ASSERT((NewPath == NULL && NewPathSize == 0) || (NewPath != NULL));
     if (OriginalPath != NULL) {
       StrnCatGrow(&NewPath, &NewPathSize, OriginalPath, 0);
-    } else {
-      StrnCatGrow(&NewPath, &NewPathSize, L".\\", 0);
+      StrnCatGrow(&NewPath, &NewPathSize, L";", 0);
     }
-    StrnCatGrow(&NewPath, &NewPathSize, L";", 0);
     StrnCatGrow(&NewPath, &NewPathSize, Name, 0);
     StrnCatGrow(&NewPath, &NewPathSize, L"\\efi\\tools\\;", 0);
     StrnCatGrow(&NewPath, &NewPathSize, Name, 0);
