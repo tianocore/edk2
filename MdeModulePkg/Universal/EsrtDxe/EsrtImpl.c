@@ -1,7 +1,7 @@
 /** @file
   Esrt management implementation.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -391,6 +391,35 @@ EXIT:
 }
 
 /**
+  Return if this FMP is a system FMP or a device FMP, based upon FmpImageInfo.
+
+  @param[in] FmpImageInfo A pointer to EFI_FIRMWARE_IMAGE_DESCRIPTOR
+
+  @return TRUE  It is a system FMP.
+  @return FALSE It is a device FMP.
+**/
+BOOLEAN
+IsSystemFmp (
+  IN EFI_FIRMWARE_IMAGE_DESCRIPTOR   *FmpImageInfo
+  )
+{
+  GUID      *Guid;
+  UINTN     Count;
+  UINTN     Index;
+
+  Guid = PcdGetPtr(PcdSystemFmpCapsuleImageTypeIdGuid);
+  Count = PcdGetSize(PcdSystemFmpCapsuleImageTypeIdGuid)/sizeof(GUID);
+
+  for (Index = 0; Index < Count; Index++, Guid++) {
+    if (CompareGuid(&FmpImageInfo->ImageTypeId, Guid)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Init one ESRT entry according to input FmpImageInfo (V1, V2, V3) .
 
   @param[in, out]     EsrtEntry            Esrt entry to be Init
@@ -407,7 +436,11 @@ SetEsrtEntryFromFmpInfo (
 {
   EsrtEntry->FwVersion                = FmpImageInfo->Version;
   EsrtEntry->FwClass                  = FmpImageInfo->ImageTypeId;
-  EsrtEntry->FwType                   = ESRT_FW_TYPE_DEVICEFIRMWARE;
+  if (IsSystemFmp(FmpImageInfo)) {
+    EsrtEntry->FwType                   = ESRT_FW_TYPE_SYSTEMFIRMWARE;
+  } else {
+    EsrtEntry->FwType                   = ESRT_FW_TYPE_DEVICEFIRMWARE;
+  }
   EsrtEntry->LowestSupportedFwVersion = 0;
   EsrtEntry->CapsuleFlags             = 0;
   EsrtEntry->LastAttemptVersion       = 0;
