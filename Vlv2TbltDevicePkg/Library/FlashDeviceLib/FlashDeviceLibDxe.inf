@@ -16,11 +16,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = FlashDeviceLibRuntimeSmm
-  FILE_GUID                      = E38A1C3C-928C-4bf7-B6C1-7F0EF163FAA5
+  BASE_NAME                      = FlashDeviceLibDxe
+  FILE_GUID                      = F0D7222F-FD43-4A5D-B8BF-A259C87AE3B2
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = FlashDeviceLib | DXE_SMM_DRIVER DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = FlashDeviceLib | DXE_DRIVER
   CONSTRUCTOR                    = LibFvbFlashDeviceSupportInit
 
 
@@ -32,7 +32,7 @@
 
 [Sources]
   FlashDeviceLib.c
-  FlashDeviceLibDxeRuntimeSmm.c
+  FlashDeviceLibDxe.c
 
 
 [Packages]
@@ -44,11 +44,6 @@
 [LibraryClasses]
   DebugLib
 
-[Guids]
-  gEfiEventVirtualAddressChangeGuid
-
 [Protocols]
   gEfiSpiProtocolGuid
-  gEfiSmmSpiProtocolGuid
-  gEfiSmmBase2ProtocolGuid
 
