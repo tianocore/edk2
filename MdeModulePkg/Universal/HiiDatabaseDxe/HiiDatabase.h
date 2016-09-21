@@ -223,7 +223,7 @@ typedef struct _HII_IMAGE_PACKAGE_INSTANCE {
   EFI_HII_IMAGE_PACKAGE_HDR             ImagePkgHdr;
   UINT32                                ImageBlockSize;
   UINT32                                PaletteInfoSize;
-  UINT8                                 *ImageBlock;
+  EFI_HII_IMAGE_BLOCK                   *ImageBlock;
   UINT8                                 *PaletteBlock;
 } HII_IMAGE_PACKAGE_INSTANCE;
 

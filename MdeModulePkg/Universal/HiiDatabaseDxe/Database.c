@@ -1552,7 +1552,7 @@ InsertImagePackage (
   if (ImageInfoOffset != 0) {
     ImageSize = ImagePackage->ImagePkgHdr.Header.Length -
                 sizeof (EFI_HII_IMAGE_PACKAGE_HDR) - PaletteSize;
-    ImagePackage->ImageBlock = (UINT8 *) AllocateZeroPool (ImageSize);
+    ImagePackage->ImageBlock = AllocateZeroPool (ImageSize);
     if (ImagePackage->ImageBlock == NULL) {
       FreePool (ImagePackage->PaletteBlock);
       FreePool (ImagePackage);
