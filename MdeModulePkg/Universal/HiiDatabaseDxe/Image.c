@@ -127,7 +127,12 @@ GetImageIdOrAddress (
       break;
 
     case EFI_HII_IIBT_IMAGE_JPEG:
-      Length = ReadUnaligned32 ((VOID *) &((EFI_HII_IIBT_JPEG_BLOCK *) CurrentImageBlock)->Size);
+      Length = OFFSET_OF (EFI_HII_IIBT_JPEG_BLOCK, Data) + ReadUnaligned32 ((VOID *) &((EFI_HII_IIBT_JPEG_BLOCK *) CurrentImageBlock)->Size);
+      ImageIdCurrent++;
+      break;
+
+    case EFI_HII_IIBT_IMAGE_PNG:
+      Length = OFFSET_OF (EFI_HII_IIBT_PNG_BLOCK, Data) + ReadUnaligned32 ((VOID *) &((EFI_HII_IIBT_PNG_BLOCK *) CurrentImageBlock)->Size);
       ImageIdCurrent++;
       break;
 
@@ -842,8 +847,10 @@ HiiGetImage (
 
   switch (CurrentImageBlock->BlockType) {
   case EFI_HII_IIBT_IMAGE_JPEG:
+  case EFI_HII_IIBT_IMAGE_PNG:
     //
-    // BUGBUG: need to be supported as soon as image tool is designed.
+    // HiiImage protocol doesn't support return JPEG/PNG.
+    // Use HiiImageEx instead.
     //
     return EFI_UNSUPPORTED;
 
@@ -1005,11 +1012,11 @@ HiiSetImage (
   //
   switch (CurrentImageBlock->BlockType) {
   case EFI_HII_IIBT_IMAGE_JPEG:
-    //
-    // BUGBUG: need to be supported as soon as image tool is designed.
-    //
-    return EFI_UNSUPPORTED;
-
+    OldBlockSize = OFFSET_OF (EFI_HII_IIBT_JPEG_BLOCK, Data) + ReadUnaligned32 ((VOID *) &((EFI_HII_IIBT_JPEG_BLOCK *) CurrentImageBlock)->Size);
+    break;
+  case EFI_HII_IIBT_IMAGE_PNG:
+    OldBlockSize = OFFSET_OF (EFI_HII_IIBT_PNG_BLOCK, Data) + ReadUnaligned32 ((VOID *) &((EFI_HII_IIBT_PNG_BLOCK *) CurrentImageBlock)->Size);
+    break;
   case EFI_HII_IIBT_IMAGE_1BIT:
   case EFI_HII_IIBT_IMAGE_1BIT_TRANS:
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK) - sizeof (UINT8) +
