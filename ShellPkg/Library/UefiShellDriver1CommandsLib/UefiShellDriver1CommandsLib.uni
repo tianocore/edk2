@@ -1,5 +1,6 @@
 // /**
 //
+// (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 // (C) Copyright 2012-2015 Hewlett-Packard Development Company, L.P.<BR>
 // Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
@@ -299,11 +300,14 @@
 "Disconnects one or more drivers from the specified devices. \r\n"
 ".SH SYNOPSIS\r\n"
 " \r\n"
-"DISCONNECT DeviceHandle [DriverHandle [ChildHandle]] [-r] \r\n"
+"DISCONNECT DeviceHandle [DriverHandle [ChildHandle]] \r\n"
+"DISCONNECT [-r] [-nc] \r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
 "NOTES:\r\n"
-"  -r           - Disconnects all drivers from all devices.\r\n"
+"  -r           - Disconnects all drivers from all devices, then reconnect\r\n"
+"                 consoles.\r\n"
+"  -nc          - Do not reconnect the console devices.\r\n"
 "  DeviceHandle - Specifies a device handle (a hexadecimal number). If not specified, then\r\n"
 "                 disconnect DriverHandle.\r\n"
 "  DriverHandle - Specifies a driver handle (a hexadecimal number).\r\n"
@@ -324,8 +328,12 @@
 ".SH EXAMPLES\r\n"
 " \r\n"
 "EXAMPLES:\r\n"
-"  * To disconnect all drivers from all devices:\r\n"
+"  * To disconnect all drivers from all devices, then reconnect console\r\n"
+"    devices:\r\n"
 "    Shell> disconnect -r\r\n"
+" \r\n"
+"  * To disconnect all drivers from all devices, including console devices:\r\n"
+"    Shell> disconnect -r -nc\r\n"
 " \r\n"
 "  * To disconnect all drivers from device 0x28:\r\n"
 "    fs0:\> disconnect 28\r\n"

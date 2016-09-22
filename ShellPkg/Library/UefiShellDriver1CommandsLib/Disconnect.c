@@ -1,6 +1,7 @@
 /** @file
   Main file for Disconnect shell Driver1 function.
 
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -17,6 +18,7 @@
 
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-r", TypeFlag},
+  {L"-nc", TypeFlag},
   {NULL, TypeMax}
   };
 
@@ -132,8 +134,22 @@ ShellCommandRunDisconnect (
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"disconnect");  
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        Status = DisconnectAll();
+         Status = DisconnectAll ();
+         //
+         // Reconnect all consoles if -nc is not provided
+         //
+         if (!ShellCommandLineGetFlag (Package, L"-nc")){
+           ShellConnectFromDevPaths (L"ConInDev");
+           ShellConnectFromDevPaths (L"ConOutDev");
+           ShellConnectFromDevPaths (L"ErrOutDev");
+           ShellConnectFromDevPaths (L"ErrOut");
+           ShellConnectFromDevPaths (L"ConIn");
+           ShellConnectFromDevPaths (L"ConOut");
+         }
       }
+    } else if (ShellCommandLineGetFlag (Package, L"-nc")) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"disconnect");
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       if (ShellCommandLineGetCount(Package) > 4){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"disconnect");  
