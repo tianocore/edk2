@@ -1,6 +1,7 @@
 /** @file
   Main file for Mode shell Debug1 function.
 
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -100,6 +101,8 @@ ShellCommandRunMemMap (
   UINT64              UnusableMemoryPagesSize;
   UINT64              PalCodePages;
   UINT64              PalCodePagesSize;
+  UINT64              PersistentPages;
+  UINT64              PersistentPagesSize;
   BOOLEAN             Sfo;
 
   AcpiReclaimPages    = 0;
@@ -117,6 +120,7 @@ ShellCommandRunMemMap (
   MmioPortPages       = 0;
   UnusableMemoryPages = 0;
   PalCodePages        = 0;
+  PersistentPages     = 0;
   Size                = 0;
   Buffer              = NULL;
   ShellStatus         = SHELL_SUCCESS;
@@ -210,8 +214,8 @@ ShellCommandRunMemMap (
               break;
             case EfiPersistentMemory:
               ShellPrintHiiEx(-1, -1, NULL, (EFI_STRING_ID)(!Sfo?STRING_TOKEN (STR_MEMMAP_LIST_ITEM):STRING_TOKEN (STR_MEMMAP_LIST_ITEM_SFO)), gShellDebug1HiiHandle, NameEfiPersistentMemory, ((EFI_MEMORY_DESCRIPTOR*)Walker)->PhysicalStart, ((EFI_MEMORY_DESCRIPTOR*)Walker)->PhysicalStart+MultU64x64(SIZE_4KB,((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages)-1, ((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages, ((EFI_MEMORY_DESCRIPTOR*)Walker)->Attribute);
-              AvailPages += ((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages;
-              TotalPages += ((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages;
+              PersistentPages += ((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages;
+              TotalPages      += ((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages;
               break;
             case EfiUnusableMemory:
               ShellPrintHiiEx(-1, -1, NULL, (EFI_STRING_ID)(!Sfo?STRING_TOKEN (STR_MEMMAP_LIST_ITEM):STRING_TOKEN (STR_MEMMAP_LIST_ITEM_SFO)), gShellDebug1HiiHandle, !Sfo?NameEfiUnusableMemoryShort:NameEfiUnusableMemory, ((EFI_MEMORY_DESCRIPTOR*)Walker)->PhysicalStart, ((EFI_MEMORY_DESCRIPTOR*)Walker)->PhysicalStart+MultU64x64(SIZE_4KB,((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages)-1, ((EFI_MEMORY_DESCRIPTOR*)Walker)->NumberOfPages, ((EFI_MEMORY_DESCRIPTOR*)Walker)->Attribute);
@@ -261,6 +265,7 @@ ShellCommandRunMemMap (
         MmioSpacePagesSize      = MultU64x64(SIZE_4KB,MmioSpacePages);
         MmioPortPagesSize       = MultU64x64(SIZE_4KB,MmioPortPages);
         PalCodePagesSize        = MultU64x64(SIZE_4KB,PalCodePages);
+        PersistentPagesSize     = MultU64x64(SIZE_4KB,PersistentPages);
         UnusableMemoryPagesSize = MultU64x64(SIZE_4KB,UnusableMemoryPages);
         if (!Sfo) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MEMMAP_LIST_SUMM), gShellDebug1HiiHandle,
@@ -277,6 +282,7 @@ ShellCommandRunMemMap (
             MmioPortPages, MmioPortPagesSize,
             PalCodePages, PalCodePagesSize,
             AvailPages, AvailPagesSize,
+            PersistentPages, PersistentPagesSize,
             DivU64x32(MultU64x64(SIZE_4KB,TotalPages), SIZE_1MB), TotalPagesSize
            );
         } else {
@@ -295,7 +301,8 @@ ShellCommandRunMemMap (
             UnusableMemoryPagesSize,
             AcpiReclaimPagesSize,
             AcpiNvsPagesSize,
-            PalCodePagesSize
+            PalCodePagesSize,
+            PersistentPagesSize
            );
         }
       }
