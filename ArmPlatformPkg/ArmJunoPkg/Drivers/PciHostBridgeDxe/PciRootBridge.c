@@ -518,11 +518,14 @@ PciRbMap (
 
   PCI_TRACE ("PciRbMap()");
 
-  if (Operation == EfiPciOperationBusMasterRead) {
+  if (Operation == EfiPciOperationBusMasterRead ||
+      Operation == EfiPciOperationBusMasterRead64) {
     DmaOperation = MapOperationBusMasterRead;
-  } else if (Operation == EfiPciOperationBusMasterWrite) {
+  } else if (Operation == EfiPciOperationBusMasterWrite ||
+             Operation == EfiPciOperationBusMasterWrite64) {
     DmaOperation = MapOperationBusMasterWrite;
-  } else if (Operation == EfiPciOperationBusMasterCommonBuffer) {
+  } else if (Operation == EfiPciOperationBusMasterCommonBuffer ||
+             Operation == EfiPciOperationBusMasterCommonBuffer64) {
     DmaOperation = MapOperationBusMasterCommonBuffer;
   } else {
     return EFI_INVALID_PARAMETER;
