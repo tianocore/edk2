@@ -2153,7 +2153,7 @@ Returns:
   UINT16  Start[18];
   UINT16  *Pointer;
   UINT16  Index3;
-  volatile UINT16  Index;
+  UINT16  Index;
   UINT16  Len;
   UINT16  Char;
   UINT16  JuBits;
@@ -2163,7 +2163,7 @@ Returns:
   UINT16  WordOfStart;
   UINT16  WordOfCount;
 
-  for (Index = 1; Index <= 16; Index++) {
+  for (Index = 0; Index <= 16; Index++) {
     Count[Index] = 0;
   }
 
@@ -2171,6 +2171,7 @@ Returns:
     Count[BitLen[Index]]++;
   }
 
+  Start[0] = 0;
   Start[1] = 0;
 
   for (Index = 1; Index <= 16; Index++) {
@@ -2188,6 +2189,7 @@ Returns:
 
   JuBits = (UINT16) (16 - TableBits);
 
+  Weight[0] = 0;
   for (Index = 1; Index <= TableBits; Index++) {
     Start[Index] >>= JuBits;
     Weight[Index] = (UINT16) (1U << (TableBits - Index));
