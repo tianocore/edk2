@@ -16,27 +16,37 @@
     .thumb
     .syntax unified
     .align  5
-ASM_GLOBAL ASM_PFX(InternalMemZeroMem)
-ASM_PFX(InternalMemZeroMem):
-    movs    r2, #0
+ASM_GLOBAL ASM_PFX(InternalMemSetMem16)
+ASM_PFX(InternalMemSetMem16):
+    uxth    r2, r2
+    lsl     r1, r1, #1
+    orr     r2, r2, r2, lsl #16
+    b       0f
 
+ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
+ASM_PFX(InternalMemSetMem32):
+    lsl     r1, r1, #2
+    b       0f
+
+ASM_GLOBAL ASM_PFX(InternalMemSetMem64)
+ASM_PFX(InternalMemSetMem64):
+    lsl     r1, r1, #3
+    b       1f
+
+    .align  5
 ASM_GLOBAL ASM_PFX(InternalMemSetMem)
 ASM_PFX(InternalMemSetMem):
     uxtb    r2, r2
     orr     r2, r2, r2, lsl #8
-
-ASM_GLOBAL ASM_PFX(InternalMemSetMem16)
-ASM_PFX(InternalMemSetMem16):
-    uxth    r2, r2
     orr     r2, r2, r2, lsl #16
+    b       0f
 
-ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
-ASM_PFX(InternalMemSetMem32):
-    mov     r3, r2
+ASM_GLOBAL ASM_PFX(InternalMemZeroMem)
+ASM_PFX(InternalMemZeroMem):
+    movs    r2, #0
+0:  mov     r3, r2
 
-ASM_GLOBAL ASM_PFX(InternalMemSetMem64)
-ASM_PFX(InternalMemSetMem64):
-    push    {r4, lr}
+1:  push    {r4, lr}
     cmp     r1, #16                 // fewer than 16 bytes of input?
     add     r1, r1, r0              // r1 := dst + length
     add     lr, r0, #16

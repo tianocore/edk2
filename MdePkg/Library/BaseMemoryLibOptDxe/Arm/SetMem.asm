@@ -21,21 +21,33 @@
     AREA    SetMem, CODE, READONLY, CODEALIGN, ALIGN=5
     THUMB
 
-InternalMemZeroMem
-    movs    r2, #0
+InternalMemSetMem16
+    uxth    r2, r2
+    lsl     r1, r1, #1
+    orr     r2, r2, r2, lsl #16
+    b       B0
 
+InternalMemSetMem32
+    lsl     r1, r1, #2
+    b       B0
+
+InternalMemSetMem64
+    lsl     r1, r1, #3
+    b       B1
+
+    ALIGN   32
 InternalMemSetMem
     uxtb    r2, r2
     orr     r2, r2, r2, lsl #8
+    orr     r2, r2, r2, lsl #16
+    b       B0
 
-InternalMemSetMem16
-    uxth    r2, r2
-    orr     r2, r2, r2, lsr #16
-
-InternalMemSetMem32
+InternalMemZeroMem
+    movs    r2, #0
+B0
     mov     r3, r2
 
-InternalMemSetMem64
+B1
     push    {r4, lr}
     cmp     r1, #16                 ; fewer than 16 bytes of input?
     add     r1, r1, r0              ; r1 := dst + length

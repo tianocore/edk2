@@ -78,16 +78,19 @@
 ASM_GLOBAL ASM_PFX(InternalMemSetMem16)
 ASM_PFX(InternalMemSetMem16):
     dup     v0.8H, valw
+    lsl     count, count, #1
     b       0f
 
 ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
 ASM_PFX(InternalMemSetMem32):
     dup     v0.4S, valw
+    lsl     count, count, #2
     b       0f
 
 ASM_GLOBAL ASM_PFX(InternalMemSetMem64)
 ASM_PFX(InternalMemSetMem64):
     dup     v0.2D, val
+    lsl     count, count, #3
     b       0f
 
 ASM_GLOBAL ASM_PFX(InternalMemZeroMem)
