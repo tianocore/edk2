@@ -284,12 +284,13 @@ VirtioGpuSendCommand (
   Header->Padding   = 0;
 
   ASSERT (RequestSize >= sizeof *Header);
+  ASSERT (RequestSize <= MAX_UINT32);
 
   //
   // Compose the descriptor chain.
   //
   VirtioPrepare (&VgpuDev->Ring, &Indices);
-  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)Header, RequestSize,
+  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)Header, (UINT32)RequestSize,
     VRING_DESC_F_NEXT, &Indices);
   VirtioAppendDesc (&VgpuDev->Ring, (UINTN)&Response, sizeof Response,
     VRING_DESC_F_WRITE, &Indices);
