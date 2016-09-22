@@ -938,7 +938,7 @@ InitializeSetup (
   
   Status = gBS->InstallProtocolInterface (
                   &mPrivateData.Handle,
-                  &gEfiFormBrowserExProtocolGuid,
+                  &gEdkiiFormBrowserExProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mPrivateData.FormBrowserEx
                   );

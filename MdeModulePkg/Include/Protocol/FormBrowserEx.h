@@ -2,7 +2,7 @@
   Extension Form Browser Protocol provides the services that can be used to 
   register the different hot keys for the standard Browser actions described in UEFI specification.
 
-Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -19,7 +19,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FORM_BROWSER_EXTENSION_PROTOCOL_GUID  \
   { 0x1f73b18d, 0x4630, 0x43c1, { 0xa1, 0xde, 0x6f, 0x80, 0x85, 0x5d, 0x7d, 0xa4 } }
 
-typedef struct _EFI_FORM_BROWSER_EXTENSION_PROTOCOL   EFI_FORM_BROWSER_EXTENSION_PROTOCOL;
+typedef struct _EDKII_FORM_BROWSER_EXTENSION_PROTOCOL   EDKII_FORM_BROWSER_EXTENSION_PROTOCOL;
+
+//
+// To be compatible, keep EFI_FORM_BROWSER_EXTENSION_PROTOCOL definition
+//
+typedef EDKII_FORM_BROWSER_EXTENSION_PROTOCOL   EFI_FORM_BROWSER_EXTENSION_PROTOCOL;
 
 //
 // Return value of SAVE_REMINDER() that describes whether the changed data is saved or discarded.
@@ -137,7 +142,7 @@ UINT32
   VOID
   );
 
-struct _EFI_FORM_BROWSER_EXTENSION_PROTOCOL {
+struct _EDKII_FORM_BROWSER_EXTENSION_PROTOCOL {
   SET_SCOPE              SetScope;
   REGISTER_HOT_KEY       RegisterHotKey;
   REGISTER_EXIT_HANDLER  RegiserExitHandler;
@@ -145,6 +150,7 @@ struct _EFI_FORM_BROWSER_EXTENSION_PROTOCOL {
 };
 
 extern EFI_GUID gEfiFormBrowserExProtocolGuid;
+extern EFI_GUID gEdkiiFormBrowserExProtocolGuid;
 
 #endif
 
