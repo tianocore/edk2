@@ -1,6 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +26,7 @@
 #include <Protocol/EfiShellEnvironment2.h>
 #include <Protocol/EfiShell.h>
 #include <Protocol/EfiShellParameters.h>
+#include <Protocol/UnicodeCollation.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>

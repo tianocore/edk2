@@ -1,6 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright 2016 Dell Inc.
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -36,6 +37,7 @@ EFI_SHELL_PROTOCOL            *gEfiShellProtocol;
 EFI_SHELL_PARAMETERS_PROTOCOL *gEfiShellParametersProtocol;
 EFI_HANDLE                    mEfiShellEnvironment2Handle;
 FILE_HANDLE_FUNCTION_MAP      FileFunctionMap;
+EFI_UNICODE_COLLATION_PROTOCOL  *mUnicodeCollationProtocol;
 
 /**
   Check if a Unicode character is a hexadecimal character.
@@ -290,11 +292,18 @@ ShellLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS  Status;
+
   mEfiShellEnvironment2       = NULL;
   gEfiShellProtocol           = NULL;
   gEfiShellParametersProtocol = NULL;
   mEfiShellInterface          = NULL;
   mEfiShellEnvironment2Handle = NULL;
+
+  if (mUnicodeCollationProtocol == NULL) {
+    Status = gBS->LocateProtocol (&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&mUnicodeCollationProtocol);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // verify that auto initialize is not set false
@@ -720,7 +729,10 @@ ShellOpenFileByName(
     Status = gEfiShellProtocol->OpenFileByName(FileName,
                                                FileHandle,
                                                OpenMode);
-    if (StrCmp(FileName, L"NUL") != 0 && !EFI_ERROR(Status) && ((OpenMode & EFI_FILE_MODE_CREATE) != 0)){
+
+    if ((mUnicodeCollationProtocol->StriColl (mUnicodeCollationProtocol, (CHAR16*)FileName, L"NUL") != 0) &&
+        (mUnicodeCollationProtocol->StriColl (mUnicodeCollationProtocol, (CHAR16*)FileName, L"NULL") != 0) &&
+         !EFI_ERROR(Status) && ((OpenMode & EFI_FILE_MODE_CREATE) != 0)){
       FileInfo = FileFunctionMap.GetFileInfo(*FileHandle);
       ASSERT(FileInfo != NULL);
       FileInfo->Attribute = Attributes;

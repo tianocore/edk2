@@ -1,6 +1,7 @@
 ##  @file
 # Provides interface to shell functionality for shell commands and applications.
 #
+# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
@@ -51,6 +52,7 @@
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid             ## CONSUMES
 
   # shell 2.0
   gEfiShellProtocolGuid                         ## SOMETIMES_CONSUMES

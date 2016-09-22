@@ -3,6 +3,7 @@
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1287,9 +1288,10 @@ EfiShellOpenFileByName(
   }
 
   //
-  // Is this for NUL file
+  // Is this for NUL / NULL file
   //
-  if (StrCmp(FileName, L"NUL") == 0) {
+  if ((gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)FileName, L"NUL") == 0) ||
+      (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)FileName, L"NULL") == 0)) {
     *FileHandle = &FileInterfaceNulFile;
     return (EFI_SUCCESS);
   }

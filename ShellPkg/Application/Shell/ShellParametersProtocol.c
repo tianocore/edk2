@@ -2,6 +2,7 @@
   Member functions of EFI_SHELL_PARAMETERS_PROTOCOL and functions for creation,
   manipulation, and initialization of EFI_SHELL_PARAMETERS_PROTOCOL.
 
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (C) 2014, Red Hat, Inc.
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
@@ -1174,7 +1175,7 @@ UpdateStdInStdOutStdErr(
         if (TempHandle == NULL) {
           Status = EFI_INVALID_PARAMETER;
         } else {
-          if (StrStr(StdOutFileName, L"NUL")==StdOutFileName) {
+          if (gUnicodeCollation->MetaiMatch (gUnicodeCollation, StdOutFileName, L"NUL")) {
             //no-op
           } else if (!OutAppend && OutUnicode && !EFI_ERROR(Status)) {
             Status = WriteFileTag (TempHandle);
