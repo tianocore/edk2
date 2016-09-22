@@ -1,7 +1,7 @@
 /** @file
 This contains some useful functions for parsing INF files.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -391,10 +391,10 @@ Returns:
 --*/
 {
   INT32 Index;
-  unsigned Data1;
-  unsigned Data2;
-  unsigned Data3;
-  unsigned Data4[8];
+  int   Data1;
+  int   Data2;
+  int   Data3;
+  int   Data4[8];
 
   if (AsciiGuidBuffer == NULL || GuidBuffer == NULL) {
     return EFI_INVALID_PARAMETER;

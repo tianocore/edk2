@@ -1,7 +1,7 @@
 /** @file
 Generic but simple file parsing routines.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -530,7 +530,7 @@ Returns:
 
 --*/
 {
-  unsigned Val;
+  int Val;
 
   SkipWhiteSpace (&mGlobals.SourceFile);
   if (EndOfFile (&mGlobals.SourceFile)) {
@@ -1276,7 +1276,7 @@ Returns:
 
 --*/
 {
-  unsigned      Value32;
+  INT32         Value32;
   UINT32        Index;
   FILE_POSITION FPos;
   CHAR8         TempString[20];
