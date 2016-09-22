@@ -941,22 +941,23 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     #
                     # Generate the Raw data of raw section
                     #
-                    os.path.join( self.OutputPath, self.BaseName + '.offset')
-                    UniVfrOffsetFileName    =  os.path.join( self.OutputPath, self.BaseName + '.offset')
-                    UniVfrOffsetFileSection =  os.path.join( self.OutputPath, self.BaseName + 'Offset' + '.raw')
-                    
-                    self.__GenUniVfrOffsetFile (VfrUniOffsetList, UniVfrOffsetFileName)
-                    
-                    UniVfrOffsetFileNameList = []
-                    UniVfrOffsetFileNameList.append(UniVfrOffsetFileName)
-                    """Call GenSection"""
-                    GenFdsGlobalVariable.GenerateSection(UniVfrOffsetFileSection,
-                                                         UniVfrOffsetFileNameList,
-                                                         "EFI_SECTION_RAW"
-                                                         )
-                    os.remove(UniVfrOffsetFileName)         
-                    SectList.append(UniVfrOffsetFileSection)
-                    HasGneratedFlag = True
+                    if VfrUniOffsetList:
+                        os.path.join( self.OutputPath, self.BaseName + '.offset')
+                        UniVfrOffsetFileName    =  os.path.join( self.OutputPath, self.BaseName + '.offset')
+                        UniVfrOffsetFileSection =  os.path.join( self.OutputPath, self.BaseName + 'Offset' + '.raw')
+
+                        self.__GenUniVfrOffsetFile (VfrUniOffsetList, UniVfrOffsetFileName)
+
+                        UniVfrOffsetFileNameList = []
+                        UniVfrOffsetFileNameList.append(UniVfrOffsetFileName)
+                        """Call GenSection"""
+                        GenFdsGlobalVariable.GenerateSection(UniVfrOffsetFileSection,
+                                                             UniVfrOffsetFileNameList,
+                                                             "EFI_SECTION_RAW"
+                                                             )
+                        os.remove(UniVfrOffsetFileName)
+                        SectList.append(UniVfrOffsetFileSection)
+                        HasGneratedFlag = True
                 
             for SecName in  SectList :
                 SectFiles.append(SecName)
