@@ -229,9 +229,9 @@ SyncPcrAllocationsAndPcrMask (
   if ((TpmActivePcrBanks & Tpm2PcrMask) != TpmActivePcrBanks) {
     NewTpmActivePcrBanks = TpmActivePcrBanks & Tpm2PcrMask;
 
-    DEBUG ((EFI_D_INFO, __FUNCTION__" - Reallocating PCR banks from 0x%X to 0x%X.\n", TpmActivePcrBanks, NewTpmActivePcrBanks ));
+    DEBUG ((EFI_D_INFO, "%a - Reallocating PCR banks from 0x%X to 0x%X.\n", __FUNCTION__, TpmActivePcrBanks, NewTpmActivePcrBanks));
     if (NewTpmActivePcrBanks == 0) {
-      DEBUG ((EFI_D_ERROR, __FUNCTION__" - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n"));
+      DEBUG ((EFI_D_ERROR, "%a - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
       ASSERT (FALSE);
     } else {
       Status = Tpm2PcrAllocateBanks (NULL, (UINT32)TpmHashAlgorithmBitmap, NewTpmActivePcrBanks);
@@ -239,7 +239,7 @@ SyncPcrAllocationsAndPcrMask (
         //
         // We can't do much here, but we hope that this doesn't happen.
         //
-        DEBUG ((EFI_D_ERROR, __FUNCTION__" - Failed to reallocate PCRs!\n"));
+        DEBUG ((EFI_D_ERROR, "%a - Failed to reallocate PCRs!\n", __FUNCTION__));
         ASSERT_EFI_ERROR (Status);
       }
       //
@@ -256,9 +256,9 @@ SyncPcrAllocationsAndPcrMask (
   if ((Tpm2PcrMask & TpmHashAlgorithmBitmap) != Tpm2PcrMask) {
     NewTpm2PcrMask = Tpm2PcrMask & TpmHashAlgorithmBitmap;
 
-    DEBUG ((EFI_D_INFO, __FUNCTION__" - Updating PcdTpm2HashMask from 0x%X to 0x%X.\n", Tpm2PcrMask, NewTpm2PcrMask ));
+    DEBUG ((EFI_D_INFO, "%a - Updating PcdTpm2HashMask from 0x%X to 0x%X.\n", __FUNCTION__, Tpm2PcrMask, NewTpm2PcrMask));
     if (NewTpm2PcrMask == 0) {
-      DEBUG ((EFI_D_ERROR, __FUNCTION__" - No viable PCRs supported! Please set a less restrictive value for PcdTpm2HashMask!\n"));
+      DEBUG ((EFI_D_ERROR, "%a - No viable PCRs supported! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
       ASSERT (FALSE);
     }
 
