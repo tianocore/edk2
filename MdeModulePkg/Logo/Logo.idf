@@ -1,0 +1,18 @@
+// /** @file
+// Platform Logo image definition file.
+//
+// Console Platfrom DXE Driver that specifies whether device can be used as console
+// input/output device or error output device and update global variables accordingly.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution. The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// **/
+
+#image IMG_LOGO Logo.bmp
