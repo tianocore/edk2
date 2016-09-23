@@ -1,7 +1,7 @@
 /** @file
   TCP output process routines.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -847,7 +847,7 @@ TcpToSendData (
           TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)
             ) {
         DEBUG (
-          (EFI_D_INFO,
+          (EFI_D_NET,
           "TcpToSendData: send FIN to peer for TCB %p in state %s\n",
           Tcb,
           mTcpStateName[Tcb->State])
@@ -927,7 +927,7 @@ TcpToSendData (
     if ((Tcb->CongestState == TCP_CONGEST_OPEN) && !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RTT_ON)) {
 
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpToSendData: set RTT measure sequence %d for TCB %p\n",
         Seq,
         Tcb)
@@ -1058,7 +1058,7 @@ TcpToSendAck (
   }
 
   DEBUG (
-    (EFI_D_INFO,
+    (EFI_D_NET,
     "TcpToSendAck: scheduled a delayed ACK for TCB %p\n",
     Tcb)
     );

@@ -74,7 +74,7 @@ TcpFastRecover (
     Tcb->CWnd = Tcb->Ssthresh + 3 * Tcb->SndMss;
 
     DEBUG (
-      (EFI_D_INFO,
+      (EFI_D_NET,
       "TcpFastRecover: enter fast retransmission for TCB %p, recover point is %d\n",
       Tcb,
       Tcb->Recover)
@@ -97,7 +97,7 @@ TcpFastRecover (
     //
     Tcb->CWnd += Tcb->SndMss;
     DEBUG (
-      (EFI_D_INFO,
+      (EFI_D_NET,
       "TcpFastRecover: received another duplicated ACK (%d) for TCB %p\n",
       Seg->Ack,
       Tcb)
@@ -121,7 +121,7 @@ TcpFastRecover (
 
       Tcb->CongestState = TCP_CONGEST_OPEN;
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpFastRecover: received a full ACK(%d) for TCB %p, exit fast recovery\n",
         Seg->Ack,
         Tcb)
@@ -150,7 +150,7 @@ TcpFastRecover (
       Tcb->CWnd -= Acked;
 
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpFastRecover: received a partial ACK(%d) for TCB %p\n",
         Seg->Ack,
         Tcb)
@@ -188,7 +188,7 @@ TcpFastLossRecover (
       Tcb->CongestState = TCP_CONGEST_OPEN;
 
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpFastLossRecover: received a full ACK(%d) for TCB %p\n",
         Seg->Ack,
         Tcb)
@@ -202,7 +202,7 @@ TcpFastLossRecover (
       //
       TcpRetransmit (Tcb, Seg->Ack);
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpFastLossRecover: received a partial ACK(%d) for TCB %p\n",
         Seg->Ack,
         Tcb)
@@ -264,7 +264,7 @@ TcpComputeRtt (
   }
 
   DEBUG (
-    (EFI_D_INFO,
+    (EFI_D_NET,
     "TcpComputeRtt: new RTT for TCB %p computed SRTT: %d RTTVAR: %d RTO: %d\n",
     Tcb,
     Tcb->SRtt,
@@ -455,7 +455,7 @@ TcpDeliverData (
       }
 
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpDeliverData: processing FIN from peer of TCB %p\n",
         Tcb)
         );
@@ -750,7 +750,7 @@ TcpInput (
   ASSERT (Head != NULL);
   
   if (Nbuf->TotalSize < sizeof (TCP_HEAD)) {
-    DEBUG ((EFI_D_INFO, "TcpInput: received a malformed packet\n"));
+    DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
     goto DISCARD;
   }
   
@@ -758,7 +758,7 @@ TcpInput (
 
   if ((Head->HeadLen < 5) || (Len < 0)) {
 
-    DEBUG ((EFI_D_INFO, "TcpInput: received a malformed packet\n"));
+    DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
     
     goto DISCARD;
   }
@@ -794,7 +794,7 @@ TcpInput (
           );
 
   if ((Tcb == NULL) || (Tcb->State == TCP_CLOSED)) {
-    DEBUG ((EFI_D_INFO, "TcpInput: send reset because no TCB found\n"));
+    DEBUG ((EFI_D_NET, "TcpInput: send reset because no TCB found\n"));
 
     Tcb = NULL;
     goto SEND_RESET;
@@ -874,7 +874,7 @@ TcpInput (
       }
 
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpInput: create a child for TCB %p in listening\n",
         Tcb)
         );
@@ -979,7 +979,7 @@ TcpInput (
         TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
 
         DEBUG (
-          (EFI_D_INFO,
+          (EFI_D_NET,
           "TcpInput: connection established for TCB %p in SYN_SENT\n",
           Tcb)
           );
@@ -1134,7 +1134,7 @@ TcpInput (
       TcpDeliverData (Tcb);
 
       DEBUG (
-        (EFI_D_INFO,
+        (EFI_D_NET,
         "TcpInput: connection established for TCB %p in SYN_RCVD\n",
         Tcb)
         );
@@ -1330,7 +1330,7 @@ NO_UPDATE:
   {
 
     DEBUG (
-      (EFI_D_INFO,
+      (EFI_D_NET,
       "TcpInput: local FIN is ACKed by peer for connected TCB %p\n",
       Tcb)
       );
@@ -1426,7 +1426,7 @@ StepSix:
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_URG) && !TCP_FIN_RCVD (Tcb->State)) {
 
     DEBUG (
-      (EFI_D_INFO,
+      (EFI_D_NET,
       "TcpInput: received urgent data from peer for connected TCB %p\n",
       Tcb)
       );

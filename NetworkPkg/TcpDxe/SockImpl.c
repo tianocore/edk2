@@ -522,7 +522,7 @@ SockWakeListenToken (
 
     Parent->ConnCnt--;
     DEBUG (
-      (EFI_D_INFO,
+      (EFI_D_NET,
       "SockWakeListenToken: accept a socket, now conncnt is %d",
       Parent->ConnCnt)
       );
@@ -776,7 +776,7 @@ SockCreate (
     Parent->ConnCnt++;
 
     DEBUG (
-      (EFI_D_INFO,
+      (EFI_D_NET,
       "SockCreate: Create a new socket and add to parent, now conncnt is %d\n",
       Parent->ConnCnt)
       );
