@@ -279,10 +279,7 @@ INF  EdkShellBinPkg/FullShell/FullShell.inf
 
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
-FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
-    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-  }
-
+INF MdeModulePkg/Logo/LogoDxe.inf
 INF MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
 ################################################################################
 #

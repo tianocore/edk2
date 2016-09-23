@@ -42,7 +42,7 @@ PlatformBootManagerDiagnostics (
   // from the graphic lib
   //
   if (QuietBoot) {
-    // BootLogoEnableLogo (ImageFormatBmp, PcdGetPtr(PcdLogoFile), EdkiiPlatformLogoDisplayAttributeCenter, 0, 0);
+    BootLogoEnableLogo ();
 
     //
     // Perform system diagnostic
