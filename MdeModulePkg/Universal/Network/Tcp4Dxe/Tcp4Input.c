@@ -75,7 +75,7 @@ TcpFastRecover (
     TcpRetransmit (Tcb, Tcb->SndUna);
     Tcb->CWnd = Tcb->Ssthresh + 3 * Tcb->SndMss;
 
-    DEBUG ((EFI_D_INFO, "TcpFastRecover: enter fast retransmission"
+    DEBUG ((EFI_D_NET, "TcpFastRecover: enter fast retransmission"
       " for TCB %p, recover point is %d\n", Tcb, Tcb->Recover));
     return;
   }
@@ -94,7 +94,7 @@ TcpFastRecover (
     // by TcpToSendData
     //
     Tcb->CWnd += Tcb->SndMss;
-    DEBUG ((EFI_D_INFO, "TcpFastRecover: received another"
+    DEBUG ((EFI_D_NET, "TcpFastRecover: received another"
       " duplicated ACK (%d) for TCB %p\n", Seg->Ack, Tcb));
 
   } else {
@@ -114,7 +114,7 @@ TcpFastRecover (
       Tcb->CWnd         = MIN (Tcb->Ssthresh, FlightSize + Tcb->SndMss);
 
       Tcb->CongestState = TCP_CONGEST_OPEN;
-      DEBUG ((EFI_D_INFO, "TcpFastRecover: received a full ACK(%d)"
+      DEBUG ((EFI_D_NET, "TcpFastRecover: received a full ACK(%d)"
         " for TCB %p, exit fast recovery\n", Seg->Ack, Tcb));
 
     } else {
@@ -139,7 +139,7 @@ TcpFastRecover (
 
       Tcb->CWnd -= Acked;
 
-      DEBUG ((EFI_D_INFO, "TcpFastRecover: received a partial"
+      DEBUG ((EFI_D_NET, "TcpFastRecover: received a partial"
         " ACK(%d) for TCB %p\n", Seg->Ack, Tcb));
 
     }
@@ -174,7 +174,7 @@ TcpFastLossRecover (
       Tcb->LossTimes    = 0;
       Tcb->CongestState = TCP_CONGEST_OPEN;
 
-      DEBUG ((EFI_D_INFO, "TcpFastLossRecover: received a "
+      DEBUG ((EFI_D_NET, "TcpFastLossRecover: received a "
         "full ACK(%d) for TCB %p\n", Seg->Ack, Tcb));
 
     } else {
@@ -184,7 +184,7 @@ TcpFastLossRecover (
       // fast retransmit the first unacknowledge field.
       //
       TcpRetransmit (Tcb, Seg->Ack);
-      DEBUG ((EFI_D_INFO, "TcpFastLossRecover: received a "
+      DEBUG ((EFI_D_NET, "TcpFastLossRecover: received a "
         "partial ACK(%d) for TCB %p\n", Seg->Ack, Tcb));
     }
   }
@@ -243,7 +243,7 @@ TcpComputeRtt (
 
   }
 
-  DEBUG ((EFI_D_INFO, "TcpComputeRtt: new RTT for TCB %p"
+  DEBUG ((EFI_D_NET, "TcpComputeRtt: new RTT for TCB %p"
     " computed SRTT: %d RTTVAR: %d RTO: %d\n",
     Tcb, Tcb->SRtt, Tcb->RttVar, Tcb->Rto));
 
@@ -429,7 +429,7 @@ TcpDeliverData (
         return -1;
       }
 
-      DEBUG ((EFI_D_INFO, "TcpDeliverData: processing FIN "
+      DEBUG ((EFI_D_NET, "TcpDeliverData: processing FIN "
         "from peer of TCB %p\n", Tcb));
 
       switch (Tcb->State) {
@@ -713,7 +713,7 @@ TcpInput (
   ASSERT (Head != NULL);
 
   if (Nbuf->TotalSize < sizeof (TCP_HEAD)) {
-    DEBUG ((EFI_D_INFO, "TcpInput: received a malformed packet\n"));
+    DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
     goto DISCARD;
   }
   
@@ -722,7 +722,7 @@ TcpInput (
   if ((Head->HeadLen < 5) || (Len < 0) ||
       (TcpChecksum (Nbuf, NetPseudoHeadChecksum (Src, Dst, 6, 0)) != 0)) {
 
-    DEBUG ((EFI_D_INFO, "TcpInput: received a malformed packet\n"));
+    DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
     goto DISCARD;
   }
 
@@ -743,7 +743,7 @@ TcpInput (
           );
 
   if ((Tcb == NULL) || (Tcb->State == TCP_CLOSED)) {
-    DEBUG ((EFI_D_INFO, "TcpInput: send reset because no TCB found\n"));
+    DEBUG ((EFI_D_NET, "TcpInput: send reset because no TCB found\n"));
 
     Tcb = NULL;
     goto SEND_RESET;
@@ -810,7 +810,7 @@ TcpInput (
         goto DISCARD;
       }
 
-      DEBUG ((EFI_D_INFO, "TcpInput: create a child for TCB %p"
+      DEBUG ((EFI_D_NET, "TcpInput: create a child for TCB %p"
         " in listening\n", Tcb));
 
       //
@@ -902,7 +902,7 @@ TcpInput (
 
         TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
 
-        DEBUG ((EFI_D_INFO, "TcpInput: connection established"
+        DEBUG ((EFI_D_NET, "TcpInput: connection established"
           " for TCB %p in SYN_SENT\n", Tcb));
 
         goto StepSix;
@@ -1037,7 +1037,7 @@ TcpInput (
       TcpClearTimer (Tcb, TCP_TIMER_CONNECT);
       TcpDeliverData (Tcb);
 
-      DEBUG ((EFI_D_INFO, "TcpInput: connection established "
+      DEBUG ((EFI_D_NET, "TcpInput: connection established "
         " for TCB %p in SYN_RCVD\n", Tcb));
 
       //
@@ -1209,7 +1209,7 @@ NO_UPDATE:
   if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_FIN_SENT) &&
       (Tcb->SndUna == Tcb->SndNxt)) {
 
-    DEBUG ((EFI_D_INFO, "TcpInput: local FIN is ACKed by"
+    DEBUG ((EFI_D_NET, "TcpInput: local FIN is ACKed by"
       " peer for connected TCB %p\n", Tcb));
 
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_FIN_ACKED);
@@ -1299,7 +1299,7 @@ StepSix:
       !TCP_FIN_RCVD (Tcb->State)) 
   {
 
-    DEBUG ((EFI_D_INFO, "TcpInput: received urgent data "
+    DEBUG ((EFI_D_NET, "TcpInput: received urgent data "
       "from peer for connected TCB %p\n", Tcb));
 
     Urg = Seg->Seq + Seg->Urg;

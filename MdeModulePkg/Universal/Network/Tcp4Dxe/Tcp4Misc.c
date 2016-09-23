@@ -1,7 +1,7 @@
 /** @file
   Misc support routines for tcp.
 
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -504,7 +504,7 @@ TcpSetState (
   ASSERT (State < (sizeof (mTcpStateName) / sizeof (CHAR16 *)));
 
   DEBUG (
-    (EFI_D_INFO,
+    (EFI_D_NET,
     "Tcb (%p) state %s --> %s\n",
     Tcb,
     mTcpStateName[Tcb->State],
@@ -815,13 +815,13 @@ TcpOnAppConsume (
 
       if (TcpOld < Tcb->RcvMss) {
 
-        DEBUG ((EFI_D_INFO, "TcpOnAppConsume: send a window"
+        DEBUG ((EFI_D_NET, "TcpOnAppConsume: send a window"
           " update for a window closed Tcb %p\n", Tcb));
 
         TcpSendAck (Tcb);
       } else if (Tcb->DelayedAck == 0) {
 
-        DEBUG ((EFI_D_INFO, "TcpOnAppConsume: scheduled a delayed"
+        DEBUG ((EFI_D_NET, "TcpOnAppConsume: scheduled a delayed"
           " ACK to update window for Tcb %p\n", Tcb));
 
         Tcb->DelayedAck = 1;

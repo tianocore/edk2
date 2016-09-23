@@ -805,7 +805,7 @@ SEND_AGAIN:
         TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)) {
 
       DEBUG (
-	  	(EFI_D_INFO, 
+	  	(EFI_D_NET, 
 	  	"TcpToSendData: send FIN "
         "to peer for TCB %p in state %s\n", 
         Tcb, 
@@ -883,7 +883,7 @@ SEND_AGAIN:
   if ((Tcb->CongestState == TCP_CONGEST_OPEN) &&
       !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RTT_ON)) {
 
-    DEBUG ((EFI_D_INFO, "TcpToSendData: set RTT measure "
+    DEBUG ((EFI_D_NET, "TcpToSendData: set RTT measure "
       "sequence %d for TCB %p\n", Seq, Tcb));
 
     TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_RTT_ON);
@@ -1011,7 +1011,7 @@ TcpToSendAck (
     return;
   }
 
-  DEBUG ((EFI_D_INFO, "TcpToSendAck: scheduled a delayed"
+  DEBUG ((EFI_D_NET, "TcpToSendAck: scheduled a delayed"
     " ACK for TCB %p\n", Tcb));
 
   //
