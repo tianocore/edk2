@@ -134,11 +134,12 @@ ASM_PFX(InternalMemScanMem8):
     bne     61f
     adds    r0, r0, #1
     tst     r5, #CHARTSTMASK(1)     // 2nd character
-    ittt    eq
-    addeq   r0, r0 ,#1
-    tsteq   r5, #(3 << 15)          // 2nd & 3rd character
+    bne     61f
+    adds    r0, r0 ,#1
+    tst     r5, #(3 << 15)          // 2nd & 3rd character
     // If not the 3rd must be the last one
-    addeq   r0, r0, #1
+    it      eq
+    addeq.n r0, r0, #1
 
 61:
     pop     {r4-r7}
