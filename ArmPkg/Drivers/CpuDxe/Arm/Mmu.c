@@ -297,6 +297,11 @@ SyncCacheConfig (
       }
       NextRegionLength += TT_DESCRIPTOR_SECTION_SIZE;
     } else if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(FirstLevelTable[i])) {
+      // In this case any bits set in the 'NextSectionAttributes' are garbage and were set from
+      // bits that are actually part of the pagetable address.  We clear it out to zero so that
+      // the SyncCacheConfigPage will use the page attributes instead of trying to convert the
+      // section attributes into page attributes
+      NextSectionAttributes = 0;
       Status = SyncCacheConfigPage (
           i,FirstLevelTable[i],
           NumberOfDescriptors, MemorySpaceMap,
