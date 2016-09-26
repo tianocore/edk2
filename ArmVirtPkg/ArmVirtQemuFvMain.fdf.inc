@@ -181,9 +181,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # TianoCore logo (splash screen)
   #
-  FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
-    SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-  }
+  INF MdeModulePkg/Logo/LogoDxe.inf
 
   #
   # Ramdisk support
