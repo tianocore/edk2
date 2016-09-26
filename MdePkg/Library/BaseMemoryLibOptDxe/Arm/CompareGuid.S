@@ -42,7 +42,7 @@ ASM_PFX(InternalMemCompareGuid):
     ldr     lr, [r1, #4]
     cmp     r2, ip
     it      eq
-    cmpeq   r3, lr
+    cmpeq.n r3, lr
     beq     0f
     movs    r0, #0
     pop     {r4, pc}
@@ -51,7 +51,7 @@ ASM_PFX(InternalMemCompareGuid):
     ldr     r3, [r1, #12]
     cmp     r4, r2
     it      eq
-    cmpeq   r0, r3
+    cmpeq.n r0, r3
     bne     2f
     movs    r0, #1
     pop     {r4, pc}
@@ -61,5 +61,5 @@ ASM_PFX(InternalMemCompareGuid):
     movs    r0, #1
     orrs    r2, r2, r4
 2:  it      ne
-    movne   r0, #0
+    movne.n r0, #0
     pop     {r4, pc}

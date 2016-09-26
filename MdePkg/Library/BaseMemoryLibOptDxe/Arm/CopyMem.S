@@ -65,16 +65,18 @@ memcopy_check_optim_default:
     // Check if we can use an optimized path ((length >= 32) && destination word-aligned && source word-aligned) for the memcopy (optimized path if r0 == 1)
     tst     r0, #0xF
     it      ne
-    movne   r0, #0
+    movne.n r0, #0
     bne     memcopy_default
     tst     r1, #0xF
-    ite     ne
-    movne   r3, #0
-    moveq   r3, #1
+    it      ne
+    movne.n r3, #0
+    it      eq
+    moveq.n r3, #1
     cmp     r2, #31
-    ite     ls
-    movls   r0, #0
-    andhi   r0, r3, #1
+    it      ls
+    movls.n r0, #0
+    bls     memcopy_default
+    and     r0, r3, #1
     b       memcopy_default
 
 memcopy_check_optim_overlap:
@@ -84,15 +86,16 @@ memcopy_check_optim_overlap:
 
     // Are we in the optimized case ((length >= 32) && dest_end word-aligned && source_end word-aligned)
     cmp     r2, #31
-    ite     ls
-    movls   r0, #0
-    movhi   r0, #1
+    it      ls
+    movls.n r0, #0
+    it      hi
+    movhi.n r0, #1
     tst     r10, #0xF
     it      ne
-    movne   r0, #0
+    movne.n r0, #0
     tst     r14, #0xF
     it      ne
-    movne   r0, #0
+    movne.n r0, #0
     b       memcopy_overlapped
 
 memcopy_overlapped_non_optim:
@@ -123,7 +126,7 @@ memcopy_overlapped:
 
     // If length is less than 32 then disable optim
     it      ls
-    movls   r0, #0
+    movls.n r0, #0
 
     cmp     r12, #0
 
@@ -157,7 +160,7 @@ memcopy_default_loop:
 
     // If length is less than 32 then disable optim
     it      ls
-    movls   r0, #0
+    movls.n r0, #0
 
     cmp     r12, #0
 

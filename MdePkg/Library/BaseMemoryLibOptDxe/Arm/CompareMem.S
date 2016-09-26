@@ -132,7 +132,7 @@ ASM_PFX(InternalMemCompareMem):
     ldrb    data2, [src2], #1
     subs    limit, limit, #1
     it      cs
-    cmpcs   data1, data2
+    cmpcs.n data1, data2
     beq     1b
     sub     result, data1, data2
     pop     {r4-r8, pc}
