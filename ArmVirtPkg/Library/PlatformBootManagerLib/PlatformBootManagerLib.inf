@@ -58,7 +58,6 @@
   UefiRuntimeServicesTableLib
 
 [FixedPcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
