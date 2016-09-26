@@ -2103,7 +2103,7 @@ ParseIfrData (
   EFI_HII_PACKAGE_HEADER   *PackageHeader;
   EFI_VARSTORE_ID          VarStoreId;
   UINT16                   SmallestDefaultId;
-  UINT16                   SmallestIdFromFlag;
+  BOOLEAN                  SmallestIdFromFlag;
   BOOLEAN                  FromOtherDefaultOpcode;
 
   Status           = EFI_SUCCESS;
