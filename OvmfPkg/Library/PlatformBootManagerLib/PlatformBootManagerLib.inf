@@ -56,7 +56,6 @@
   UefiLib
 
 [Pcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId

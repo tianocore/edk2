@@ -1445,13 +1445,13 @@ Routine Description:
   //
   // Logo show
   //
-  BootLogoEnableLogo (
-    ImageFormatBmp,                          // ImageFormat
-    PcdGetPtr (PcdLogoFile),                 // Logo
-    EdkiiPlatformLogoDisplayAttributeCenter, // Attribute
-    0,                                       // OffsetX
-    0                                        // OffsetY
-    );
+  //BootLogoEnableLogo (
+  //  ImageFormatBmp,                          // ImageFormat
+  //  PcdGetPtr (PcdLogoFile),                 // Logo
+  //  EdkiiPlatformLogoDisplayAttributeCenter, // Attribute
+  //  0,                                       // OffsetX
+  //  0                                        // OffsetY
+  //  );
 
   //
   // Perform some platform specific connect sequence
