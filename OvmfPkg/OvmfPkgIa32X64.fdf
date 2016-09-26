@@ -287,9 +287,7 @@ INF  ShellPkg/Application/Shell/Shell.inf
 INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
 !endif
 
-FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
-  SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-}
+INF MdeModulePkg/Logo/LogoDxe.inf
 
 #
 # Network modules
