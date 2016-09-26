@@ -2,7 +2,7 @@
   The TPM definition block in ACPI table for physical presence  
   and MemoryClear.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -78,7 +78,8 @@ DefinitionBlock (
         MCIN,   8,  //   Software SMI for Memory Clear Interface
         MCIP,   32, //   Used for save the Mor paramter
         MORD,   32, //   Memory Overwrite Request Data
-        MRET,   32  //   Memory Overwrite function return code
+        MRET,   32, //   Memory Overwrite function return code
+        UCRQ,   32  //   Phyical Presence request operation to Get User Confirmation Status 
       }
 
       Method (PTS, 1, Serialized)
@@ -269,7 +270,7 @@ DefinitionBlock (
             // e) Get User Confirmation Status for Operation
             //
             Store (8, PPIP)
-            Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
+            Store (DerefOf (Index (Arg2, 0x00)), UCRQ)
                   
             //
             // Triggle the SMI interrupt

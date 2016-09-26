@@ -79,7 +79,8 @@ DefinitionBlock (
         MCIN,   8,  //   Software SMI for Memory Clear Interface
         MCIP,   32, //   Used for save the Mor paramter
         MORD,   32, //   Memory Overwrite Request Data
-        MRET,   32  //   Memory Overwrite function return code
+        MRET,   32, //   Memory Overwrite function return code
+        UCRQ,   32  //   Phyical Presence request operation to Get User Confirmation Status 
       }
 
       Method (PTS, 1, Serialized)
@@ -274,7 +275,7 @@ DefinitionBlock (
             // e) Get User Confirmation Status for Operation
             //
             Store (8, PPIP)
-            Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
+            Store (DerefOf (Index (Arg2, 0x00)), UCRQ)
                   
             //
             // Triggle the SMI interrupt

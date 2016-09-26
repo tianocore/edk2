@@ -135,8 +135,8 @@ PhysicalPresenceCallback (
                                              mTcgNvs->PhysicalPresence.RequestParameter
                                              );
   } else if (mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST) {
-    mTcgNvs->PhysicalPresence.ReturnCode = Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (mTcgNvs->PhysicalPresence.Request);
-  } 
+    mTcgNvs->PhysicalPresence.ReturnCode = Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (mTcgNvs->PPRequestUserConfirm);
+  }
 
   return EFI_SUCCESS;
 }

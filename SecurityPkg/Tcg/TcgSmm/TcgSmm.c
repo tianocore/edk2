@@ -8,7 +8,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -152,7 +152,7 @@ PhysicalPresenceCallback (
 
     RequestConfirmed = FALSE;
 
-    switch (mTcgNvs->PhysicalPresence.Request) {
+    switch (mTcgNvs->PPRequestUserConfirm) {
       case PHYSICAL_PRESENCE_ENABLE:
       case PHYSICAL_PRESENCE_DISABLE:
       case PHYSICAL_PRESENCE_ACTIVATE:

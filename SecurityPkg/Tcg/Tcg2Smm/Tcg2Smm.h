@@ -62,6 +62,7 @@ typedef struct {
 typedef struct {
   PHYSICAL_PRESENCE_NVS  PhysicalPresence;
   MEMORY_CLEAR_NVS       MemoryClear;
+  UINT32                 PPRequestUserConfirm;
 } TCG_NVS;
 
 typedef struct {
