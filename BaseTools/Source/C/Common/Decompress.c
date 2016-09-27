@@ -2,7 +2,7 @@
 Decompressor. Algorithm Ported from OPSD code (Decomp.asm) for Efi and Tiano 
 compress algorithm.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "Decompress.h"
 
 //
@@ -240,7 +241,7 @@ Returns:
   for (Char = 0; Char < NumOfChar; Char++) {
 
     Len = BitLen[Char];
-    if (Len == 0) {
+    if (Len == 0 || Len >= 17) {
       continue;
     }
 
@@ -372,6 +373,8 @@ Returns:
   UINT16  CharC;
   UINT16  Index;
   UINT32  Mask;
+
+  assert (nn <= NPT);
 
   Number = (UINT16) GetBits (Sd, nbit);
 
