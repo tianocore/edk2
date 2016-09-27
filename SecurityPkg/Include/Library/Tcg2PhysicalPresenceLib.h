@@ -2,7 +2,7 @@
   Ihis library is intended to be used by BDS modules.
   This library will execute TPM2 request.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -116,6 +116,26 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   OUT UINT32                *Response
   );
 
+/**
+  The handler for TPM physical presence function:
+  Submit TPM Operation Request to Pre-OS Environment and
+  Submit TPM Operation Request to Pre-OS Environment 2.
+
+  This API should be invoked in OS runtime phase to interface with ACPI method.
+
+  Caution: This function may receive untrusted input.
+
+  @param[in out]  Pointer to OperationRequest TPM physical presence operation request.
+  @param[in out]  Pointer to RequestParameter TPM physical presence operation request parameter.
+
+  @return Return Code for Submit TPM Operation Request to Pre-OS Environment and
+        Submit TPM Operation Request to Pre-OS Environment 2.
+  **/
+UINT32
+Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
+  IN OUT UINT32               *OperationRequest,
+  IN OUT UINT32               *RequestParameter
+  );
 
 /**
   The handler for TPM physical presence function:
@@ -125,7 +145,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   This API should be invoked in OS runtime phase to interface with ACPI method.
 
   Caution: This function may receive untrusted input.
-  
+
   @param[in]      OperationRequest TPM physical presence operation request.
   @param[in]      RequestParameter TPM physical presence operation request parameter.
 

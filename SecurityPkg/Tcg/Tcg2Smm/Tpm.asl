@@ -198,6 +198,7 @@ DefinitionBlock (
             //
                   
             Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
+            Store (0, PPRM)
             Store (0x02, PPIP)
               
             //
