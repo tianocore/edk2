@@ -1,5 +1,5 @@
 diff --git a/Configure b/Configure
-index c98107a..c122709 100755
+index c39f71a..98dd1d0 100755
 --- a/Configure
 +++ b/Configure
 @@ -609,6 +609,9 @@ my %table=(
@@ -12,7 +12,7 @@ index c98107a..c122709 100755
  # UWIN 
  "UWIN", "cc:-DTERMIOS -DL_ENDIAN -O -Wall:::UWIN::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${no_asm}:win32",
  
-@@ -1088,7 +1091,7 @@ if (defined($disabled{"tls1"}))
+@@ -1083,7 +1086,7 @@ if (defined($disabled{"md5"}) || defined($disabled{"sha"})
  	}
  
  if (defined($disabled{"ec"}) || defined($disabled{"dsa"})
@@ -22,20 +22,20 @@ index c98107a..c122709 100755
  	$disabled{"gost"} = "forced";
  	}
 diff --git a/apps/apps.c b/apps/apps.c
-index b1dd970..8278c28 100644
+index 9fdc3e0..6c183b0 100644
 --- a/apps/apps.c
 +++ b/apps/apps.c
-@@ -2374,6 +2374,8 @@ int args_verify(char ***pargs, int *pargc,
+@@ -2375,6 +2375,8 @@ int args_verify(char ***pargs, int *pargc,
          flags |= X509_V_FLAG_PARTIAL_CHAIN;
      else if (!strcmp(arg, "-no_alt_chains"))
          flags |= X509_V_FLAG_NO_ALT_CHAINS;
 +    else if (!strcmp(arg, "-no_check_time"))
 +        flags |= X509_V_FLAG_NO_CHECK_TIME;
+     else if (!strcmp(arg, "-allow_proxy_certs"))
+         flags |= X509_V_FLAG_ALLOW_PROXY_CERTS;
      else
-         return 0;
- 
 diff --git a/crypto/asn1/a_strex.c b/crypto/asn1/a_strex.c
-index 35fd44c..9f39bff 100644
+index 2d562f9..91203b7 100644
 --- a/crypto/asn1/a_strex.c
 +++ b/crypto/asn1/a_strex.c
 @@ -104,6 +104,7 @@ static int send_bio_chars(void *arg, const void *buf, int len)
@@ -426,7 +426,7 @@ index 5281384..952b545 100644
  #ifndef OPENSSL_NO_FP_API
  int NCONF_load_fp(CONF *conf, FILE *fp, long *eline)
 diff --git a/crypto/conf/conf_mod.c b/crypto/conf/conf_mod.c
-index 9acfca4..5e0a482 100644
+index e0c9a67..13d93ea 100644
 --- a/crypto/conf/conf_mod.c
 +++ b/crypto/conf/conf_mod.c
 @@ -159,6 +159,7 @@ int CONF_modules_load(const CONF *cnf, const char *appname,
@@ -747,21 +747,6 @@ index b58e3fa..926be98 100644
  }
  
  const EVP_PKEY_METHOD dh_pkey_meth = {
-diff --git a/crypto/ec/ec_ameth.c b/crypto/ec/ec_ameth.c
-index 83e208c..4869098 100644
---- a/crypto/ec/ec_ameth.c
-+++ b/crypto/ec/ec_ameth.c
-@@ -67,8 +67,10 @@
- #include <openssl/asn1t.h>
- #include "asn1_locl.h"
- 
-+#ifndef OPENSSL_NO_CMS
- static int ecdh_cms_decrypt(CMS_RecipientInfo *ri);
- static int ecdh_cms_encrypt(CMS_RecipientInfo *ri);
-+#endif
- 
- static int eckey_param2type(int *pptype, void **ppval, EC_KEY *ec_key)
- {
 diff --git a/crypto/engine/eng_int.h b/crypto/engine/eng_int.h
 index 46f163b..b4a72a0 100644
 --- a/crypto/engine/eng_int.h
@@ -943,7 +928,7 @@ index 7a1c85d..7162c0f 100644
  #undef BN_LLONG
  
 diff --git a/crypto/pem/pem.h b/crypto/pem/pem.h
-index d3b23fc..5df6ffd 100644
+index aac72fb..d271ec8 100644
 --- a/crypto/pem/pem.h
 +++ b/crypto/pem/pem.h
 @@ -324,6 +324,7 @@ int PEM_write_bio_##name(BIO *bp, type *x, const EVP_CIPHER *enc, \
@@ -987,7 +972,7 @@ index d3b23fc..5df6ffd 100644
  EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x);
  int PEM_write_bio_Parameters(BIO *bp, EVP_PKEY *x);
 diff --git a/crypto/pem/pem_lib.c b/crypto/pem/pem_lib.c
-index fe881d6..e25cc68 100644
+index c82b3c0..56c77b1 100644
 --- a/crypto/pem/pem_lib.c
 +++ b/crypto/pem/pem_lib.c
 @@ -84,7 +84,7 @@ int pem_check_suffix(const char *pem_str, const char *suffix);
@@ -1130,7 +1115,7 @@ index 737aebf..f23f348 100644
  {
      return (-1);
 diff --git a/crypto/rand/rand_unix.c b/crypto/rand/rand_unix.c
-index 266111e..f60fac6 100644
+index 6c5b65d..11ee152 100644
 --- a/crypto/rand/rand_unix.c
 +++ b/crypto/rand/rand_unix.c
 @@ -116,7 +116,7 @@
@@ -1151,71 +1136,6 @@ index 266111e..f60fac6 100644
  int RAND_poll(void)
  {
      return 0;
-diff --git a/crypto/rsa/rsa_ameth.c b/crypto/rsa/rsa_ameth.c
-index 4e06218..ddead3d 100644
---- a/crypto/rsa/rsa_ameth.c
-+++ b/crypto/rsa/rsa_ameth.c
-@@ -68,10 +68,12 @@
- #endif
- #include "asn1_locl.h"
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_sign(CMS_SignerInfo *si);
- static int rsa_cms_verify(CMS_SignerInfo *si);
- static int rsa_cms_decrypt(CMS_RecipientInfo *ri);
- static int rsa_cms_encrypt(CMS_RecipientInfo *ri);
-+#endif
- 
- static int rsa_pub_encode(X509_PUBKEY *pk, const EVP_PKEY *pkey)
- {
-@@ -665,6 +667,7 @@ static int rsa_pss_to_ctx(EVP_MD_CTX *ctx, EVP_PKEY_CTX *pkctx,
-     return rv;
- }
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_verify(CMS_SignerInfo *si)
- {
-     int nid, nid2;
-@@ -683,6 +686,7 @@ static int rsa_cms_verify(CMS_SignerInfo *si)
-     }
-     return 0;
- }
-+#endif
- 
- /*
-  * Customised RSA item verification routine. This is called when a signature
-@@ -705,6 +709,7 @@ static int rsa_item_verify(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
-     return -1;
- }
- 
-+#ifndef OPENSSL_NO_CMS
- static int rsa_cms_sign(CMS_SignerInfo *si)
- {
-     int pad_mode = RSA_PKCS1_PADDING;
-@@ -729,6 +734,7 @@ static int rsa_cms_sign(CMS_SignerInfo *si)
-     X509_ALGOR_set0(alg, OBJ_nid2obj(NID_rsassaPss), V_ASN1_SEQUENCE, os);
-     return 1;
- }
-+#endif
- 
- static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
-                          X509_ALGOR *alg1, X509_ALGOR *alg2,
-@@ -762,6 +768,7 @@ static int rsa_item_sign(EVP_MD_CTX *ctx, const ASN1_ITEM *it, void *asn,
-     return 2;
- }
- 
-+#ifndef OPENSSL_NO_CMS
- static RSA_OAEP_PARAMS *rsa_oaep_decode(const X509_ALGOR *alg,
-                                         X509_ALGOR **pmaskHash)
- {
-@@ -920,6 +927,7 @@ static int rsa_cms_encrypt(CMS_RecipientInfo *ri)
-         ASN1_STRING_free(os);
-     return rv;
- }
-+#endif
- 
- const EVP_PKEY_ASN1_METHOD rsa_asn1_meths[] = {
-     {
 diff --git a/crypto/srp/srp.h b/crypto/srp/srp.h
 index 028892a..4ed4bfe 100644
 --- a/crypto/srp/srp.h
@@ -1231,10 +1151,10 @@ index 028892a..4ed4bfe 100644
  /* This method ignores the configured seed and fails for an unknown user. */
  SRP_user_pwd *SRP_VBASE_get_by_user(SRP_VBASE *vb, char *username);
 diff --git a/crypto/srp/srp_vfy.c b/crypto/srp/srp_vfy.c
-index 26ad3e0..6be4cf2 100644
+index a8ec52a..ce20804 100644
 --- a/crypto/srp/srp_vfy.c
 +++ b/crypto/srp/srp_vfy.c
-@@ -225,6 +225,7 @@ static int SRP_user_pwd_set_ids(SRP_user_pwd *vinfo, const char *id,
+@@ -228,6 +228,7 @@ static int SRP_user_pwd_set_ids(SRP_user_pwd *vinfo, const char *id,
      return (info == NULL || NULL != (vinfo->info = BUF_strdup(info)));
  }
  
@@ -1242,15 +1162,15 @@ index 26ad3e0..6be4cf2 100644
  static int SRP_user_pwd_set_sv(SRP_user_pwd *vinfo, const char *s,
                                 const char *v)
  {
-@@ -239,6 +240,7 @@ static int SRP_user_pwd_set_sv(SRP_user_pwd *vinfo, const char *s,
-     len = t_fromb64(tmp, s);
-     return ((vinfo->s = BN_bin2bn(tmp, len, NULL)) != NULL);
+@@ -254,6 +255,7 @@ static int SRP_user_pwd_set_sv(SRP_user_pwd *vinfo, const char *s,
+     vinfo->v = NULL;
+     return 0;
  }
 +#endif
  
  static int SRP_user_pwd_set_sv_BN(SRP_user_pwd *vinfo, BIGNUM *s, BIGNUM *v)
  {
-@@ -297,6 +299,7 @@ int SRP_VBASE_free(SRP_VBASE *vb)
+@@ -312,6 +314,7 @@ int SRP_VBASE_free(SRP_VBASE *vb)
      return 0;
  }
  
@@ -1258,7 +1178,7 @@ index 26ad3e0..6be4cf2 100644
  static SRP_gN_cache *SRP_gN_new_init(const char *ch)
  {
      unsigned char tmp[MAX_LEN];
-@@ -328,6 +331,7 @@ static void SRP_gN_free(SRP_gN_cache *gN_cache)
+@@ -346,6 +349,7 @@ static void SRP_gN_free(SRP_gN_cache *gN_cache)
      BN_free(gN_cache->bn);
      OPENSSL_free(gN_cache);
  }
@@ -1266,7 +1186,7 @@ index 26ad3e0..6be4cf2 100644
  
  static SRP_gN *SRP_get_gN_by_id(const char *id, STACK_OF(SRP_gN) *gN_tab)
  {
-@@ -344,6 +348,7 @@ static SRP_gN *SRP_get_gN_by_id(const char *id, STACK_OF(SRP_gN) *gN_tab)
+@@ -362,6 +366,7 @@ static SRP_gN *SRP_get_gN_by_id(const char *id, STACK_OF(SRP_gN) *gN_tab)
      return SRP_get_default_gN(id);
  }
  
@@ -1274,7 +1194,7 @@ index 26ad3e0..6be4cf2 100644
  static BIGNUM *SRP_gN_place_bn(STACK_OF(SRP_gN_cache) *gN_cache, char *ch)
  {
      int i;
-@@ -485,6 +490,7 @@ int SRP_VBASE_init(SRP_VBASE *vb, char *verifier_file)
+@@ -503,6 +508,7 @@ int SRP_VBASE_init(SRP_VBASE *vb, char *verifier_file)
      return error_code;
  
  }
@@ -1283,7 +1203,7 @@ index 26ad3e0..6be4cf2 100644
  static SRP_user_pwd *find_user(SRP_VBASE *vb, char *username)
  {
 diff --git a/crypto/ts/ts.h b/crypto/ts/ts.h
-index 16eccbb..a9fe40e 100644
+index 2daa1b2..5205bc5 100644
 --- a/crypto/ts/ts.h
 +++ b/crypto/ts/ts.h
 @@ -281,8 +281,10 @@ TS_REQ *d2i_TS_REQ(TS_REQ **a, const unsigned char **pp, long length);
@@ -1342,7 +1262,7 @@ index 16eccbb..a9fe40e 100644
  
  TS_ACCURACY *TS_ACCURACY_new(void);
  void TS_ACCURACY_free(TS_ACCURACY *a);
-@@ -728,15 +736,18 @@ int TS_MSG_IMPRINT_print_bio(BIO *bio, TS_MSG_IMPRINT *msg);
+@@ -731,15 +739,18 @@ int TS_MSG_IMPRINT_print_bio(BIO *bio, TS_MSG_IMPRINT *msg);
   * ts/ts_conf.c
   */
  
@@ -1361,7 +1281,7 @@ index 16eccbb..a9fe40e 100644
  int TS_CONF_set_signer_cert(CONF *conf, const char *section,
                              const char *cert, TS_RESP_CTX *ctx);
  int TS_CONF_set_certs(CONF *conf, const char *section, const char *certs,
-@@ -744,6 +755,7 @@ int TS_CONF_set_certs(CONF *conf, const char *section, const char *certs,
+@@ -747,6 +758,7 @@ int TS_CONF_set_certs(CONF *conf, const char *section, const char *certs,
  int TS_CONF_set_signer_key(CONF *conf, const char *section,
                             const char *key, const char *pass,
                             TS_RESP_CTX *ctx);
@@ -1369,7 +1289,7 @@ index 16eccbb..a9fe40e 100644
  int TS_CONF_set_def_policy(CONF *conf, const char *section,
                             const char *policy, TS_RESP_CTX *ctx);
  int TS_CONF_set_policies(CONF *conf, const char *section, TS_RESP_CTX *ctx);
-@@ -784,6 +796,11 @@ void ERR_load_TS_strings(void);
+@@ -787,6 +799,11 @@ void ERR_load_TS_strings(void);
  # define TS_F_TS_CHECK_SIGNING_CERTS                      103
  # define TS_F_TS_CHECK_STATUS_INFO                        104
  # define TS_F_TS_COMPUTE_IMPRINT                          145
@@ -1381,7 +1301,7 @@ index 16eccbb..a9fe40e 100644
  # define TS_F_TS_CONF_SET_DEFAULT_ENGINE                  146
  # define TS_F_TS_GET_STATUS_TEXT                          105
  # define TS_F_TS_MSG_IMPRINT_SET_ALGO                     118
-@@ -822,6 +839,8 @@ void ERR_load_TS_strings(void);
+@@ -825,6 +842,8 @@ void ERR_load_TS_strings(void);
  /* Reason codes. */
  # define TS_R_BAD_PKCS7_TYPE                              132
  # define TS_R_BAD_TYPE                                    133
@@ -1390,7 +1310,7 @@ index 16eccbb..a9fe40e 100644
  # define TS_R_CERTIFICATE_VERIFY_ERROR                    100
  # define TS_R_COULD_NOT_SET_ENGINE                        127
  # define TS_R_COULD_NOT_SET_TIME                          115
-@@ -854,6 +873,8 @@ void ERR_load_TS_strings(void);
+@@ -857,6 +876,8 @@ void ERR_load_TS_strings(void);
  # define TS_R_UNACCEPTABLE_POLICY                         125
  # define TS_R_UNSUPPORTED_MD_ALGORITHM                    126
  # define TS_R_UNSUPPORTED_VERSION                         113
@@ -1531,7 +1451,7 @@ index 0f29011..80dd40e 100644
                             int verify)
  {
 diff --git a/crypto/x509/by_dir.c b/crypto/x509/by_dir.c
-index 9ee8f8d..64b052e 100644
+index bbc3189..29695f9 100644
 --- a/crypto/x509/by_dir.c
 +++ b/crypto/x509/by_dir.c
 @@ -69,6 +69,8 @@
@@ -1543,17 +1463,17 @@ index 9ee8f8d..64b052e 100644
  #include <openssl/lhash.h>
  #include <openssl/x509.h>
  
-@@ -434,3 +436,5 @@ static int get_cert_by_subject(X509_LOOKUP *xl, int type, X509_NAME *name,
+@@ -438,3 +440,5 @@ static int get_cert_by_subject(X509_LOOKUP *xl, int type, X509_NAME *name,
          BUF_MEM_free(b);
      return (ok);
  }
 +
 +#endif /* OPENSSL_NO_STDIO */
 diff --git a/crypto/x509/x509_vfy.c b/crypto/x509/x509_vfy.c
-index 4d34dba..25e8a89 100644
+index 8334b3f..d075f66 100644
 --- a/crypto/x509/x509_vfy.c
 +++ b/crypto/x509/x509_vfy.c
-@@ -950,6 +950,8 @@ static int check_crl_time(X509_STORE_CTX *ctx, X509_CRL *crl, int notify)
+@@ -1064,6 +1064,8 @@ static int check_crl_time(X509_STORE_CTX *ctx, X509_CRL *crl, int notify)
          ctx->current_crl = crl;
      if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
          ptime = &ctx->param->check_time;
@@ -1562,7 +1482,7 @@ index 4d34dba..25e8a89 100644
      else
          ptime = NULL;
  
-@@ -1673,6 +1675,8 @@ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
+@@ -1805,6 +1807,8 @@ static int check_cert_time(X509_STORE_CTX *ctx, X509 *x)
  
      if (ctx->param->flags & X509_V_FLAG_USE_CHECK_TIME)
          ptime = &ctx->param->check_time;
@@ -1572,10 +1492,10 @@ index 4d34dba..25e8a89 100644
          ptime = NULL;
  
 diff --git a/crypto/x509/x509_vfy.h b/crypto/x509/x509_vfy.h
-index 2663e1c..3790ef5 100644
+index 5062682..e90d931 100644
 --- a/crypto/x509/x509_vfy.h
 +++ b/crypto/x509/x509_vfy.h
-@@ -438,6 +438,8 @@ void X509_STORE_CTX_set_depth(X509_STORE_CTX *ctx, int depth);
+@@ -443,6 +443,8 @@ void X509_STORE_CTX_set_depth(X509_STORE_CTX *ctx, int depth);
   * will force the behaviour to match that of previous versions.
   */
  # define X509_V_FLAG_NO_ALT_CHAINS               0x100000
@@ -1584,11 +1504,10 @@ index 2663e1c..3790ef5 100644
  
  # define X509_VP_FLAG_DEFAULT                    0x1
  # define X509_VP_FLAG_OVERWRITE                  0x2
-@@ -490,9 +492,10 @@ void X509_STORE_CTX_cleanup(X509_STORE_CTX *ctx);
- X509_STORE *X509_STORE_CTX_get0_store(X509_STORE_CTX *ctx);
+@@ -496,8 +498,10 @@ X509_STORE *X509_STORE_CTX_get0_store(X509_STORE_CTX *ctx);
  
  X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *v, X509_LOOKUP_METHOD *m);
--
+ 
 +#ifndef OPENSSL_NO_STDIO
  X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir(void);
  X509_LOOKUP_METHOD *X509_LOOKUP_file(void);
@@ -1944,10 +1863,10 @@ index f6b3ff2..1dcbe36 100755
  		     SEED,-
  		     SHA,-
 diff --git a/ssl/d1_both.c b/ssl/d1_both.c
-index 5d26c94..ee3f49b 100644
+index 9bc6153..b5648eb 100644
 --- a/ssl/d1_both.c
 +++ b/ssl/d1_both.c
-@@ -1053,7 +1053,7 @@ int dtls1_send_change_cipher_spec(SSL *s, int a, int b)
+@@ -1068,7 +1068,7 @@ int dtls1_send_change_cipher_spec(SSL *s, int a, int b)
  int dtls1_read_failed(SSL *s, int code)
  {
      if (code > 0) {
@@ -1957,7 +1876,7 @@ index 5d26c94..ee3f49b 100644
      }
  
 diff --git a/ssl/ssl_asn1.c b/ssl/ssl_asn1.c
-index 35cc27c..a1f5335 100644
+index 499f0e8..5672f99 100644
 --- a/ssl/ssl_asn1.c
 +++ b/ssl/ssl_asn1.c
 @@ -418,7 +418,7 @@ SSL_SESSION *d2i_SSL_SESSION(SSL_SESSION **a, const unsigned char **pp,
@@ -1992,9 +1911,9 @@ index 35cc27c..a1f5335 100644
              c.error = SSL_R_BAD_LENGTH;
 -            c.line = __LINE__;
 +            c.line = OPENSSL_LINE;
-             goto err;
-         } else {
-             ret->sid_ctx_length = os.length;
+             OPENSSL_free(os.data);
+             os.data = NULL;
+             os.length = 0;
 diff --git a/ssl/ssl_cert.c b/ssl/ssl_cert.c
 index f48ebae..ac4f08c 100644
 --- a/ssl/ssl_cert.c
@@ -2068,10 +1987,10 @@ index 8d3709d..2bb403b 100644
  
  static int ssl_conf_cmd_skip_prefix(SSL_CONF_CTX *cctx, const char **pcmd)
 diff --git a/ssl/t1_enc.c b/ssl/t1_enc.c
-index 514fcb3..2a54cc9 100644
+index b6d1ee9..75f38cd 100644
 --- a/ssl/t1_enc.c
 +++ b/ssl/t1_enc.c
-@@ -780,9 +780,7 @@ int tls1_enc(SSL *s, int send)
+@@ -779,9 +779,7 @@ int tls1_enc(SSL *s, int send)
                       * we can't write into the input stream: Can this ever
                       * happen?? (steve)
                       */
@@ -2152,7 +2071,7 @@ index b9b159a..9841498 100755
  			if ($keyword eq "TLSEXT" && $no_tlsext) { return 0; }
  			if ($keyword eq "PSK" && $no_psk) { return 0; }
 diff --git a/util/mkerr.pl b/util/mkerr.pl
-index 09ebebe..cd57ade 100644
+index c197f3a..97b295c 100644
 --- a/util/mkerr.pl
 +++ b/util/mkerr.pl
 @@ -89,7 +89,7 @@ Options:
@@ -2164,7 +2083,7 @@ index 09ebebe..cd57ade 100644
                  while the code facilitates the use of these in an environment
                  where the error support routines are dynamically loaded at 
                  runtime.
-@@ -474,7 +474,7 @@ EOF
+@@ -482,7 +482,7 @@ EOF
  ${staticloader}void ERR_load_${lib}_strings(void);
  ${staticloader}void ERR_unload_${lib}_strings(void);
  ${staticloader}void ERR_${lib}_error(int function, int reason, char *file, int line);
