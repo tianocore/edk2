@@ -2,7 +2,7 @@
   
   VfrCompiler Error definition
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -73,6 +73,10 @@ struct SVfrFileScopeRecord {
 
   SVfrFileScopeRecord (IN CHAR8 *, IN UINT32);
   ~SVfrFileScopeRecord();
+
+private:
+  SVfrFileScopeRecord (IN CONST SVfrFileScopeRecord&);             // Prevent copy-construction
+  SVfrFileScopeRecord& operator= (IN CONST SVfrFileScopeRecord&);  // Prevent assignment
 };
 
 class CVfrErrorHandle {
@@ -95,6 +99,10 @@ public:
   UINT8 HandleError (IN EFI_VFR_RETURN_CODE, IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL);
   UINT8 HandleWarning (IN EFI_VFR_WARNING_CODE, IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL);
   VOID  PrintMsg (IN UINT32 LineNum = 0, IN CHAR8 *TokName = NULL, IN CONST CHAR8 *MsgType = "Error", IN CONST CHAR8 *ErrorMsg = "");
+
+private:
+  CVfrErrorHandle (IN CONST CVfrErrorHandle&);             // Prevent copy-construction
+  CVfrErrorHandle& operator= (IN CONST CVfrErrorHandle&);  // Prevent assignment
 };
 
 #define CHECK_ERROR_RETURN(f, v) do { EFI_VFR_RETURN_CODE r; if ((r = (f)) != (v)) { return r; } } while (0)

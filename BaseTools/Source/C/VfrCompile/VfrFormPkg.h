@@ -87,6 +87,10 @@ struct SPendingAssign {
   VOID   SetAddrAndLen (IN VOID *, IN UINT32);
   VOID   AssignValue (IN VOID *, IN UINT32);
   CHAR8 * GetKey (VOID);
+
+private:
+  SPendingAssign (IN CONST SPendingAssign&);             // Prevent copy-construction
+  SPendingAssign& operator= (IN CONST SPendingAssign&);  // Prevent assignment
 };
 
 struct SBufferNode {
@@ -138,6 +142,10 @@ public:
   EFI_VFR_RETURN_CODE BuildPkg (IN FILE *, IN PACKAGE_DATA *PkgData = NULL);
   EFI_VFR_RETURN_CODE BuildPkg (OUT PACKAGE_DATA &);
   EFI_VFR_RETURN_CODE GenCFile (IN CHAR8 *, IN FILE *, IN PACKAGE_DATA *PkgData = NULL);
+
+private:
+  CFormPkg (IN CONST CFormPkg&);             // Prevent copy-construction
+  CFormPkg& operator= (IN CONST CFormPkg&);  // Prevent assignment
 
 public:
   EFI_VFR_RETURN_CODE AssignPending (IN CHAR8 *, IN VOID *, IN UINT32, IN UINT32, IN CONST CHAR8 *Msg = NULL);
@@ -237,6 +245,10 @@ public:
   VOID        IfrCreateDefaultForQuestion (IN  SIfrRecord *, IN  QuestionDefaultRecord *);
   VOID        IfrParseDefaulInfoInQuestion (IN  SIfrRecord *, OUT QuestionDefaultRecord *);
   VOID        IfrAddDefaultToBufferConfig (IN  UINT16, IN  SIfrRecord *,IN  EFI_IFR_TYPE_VALUE);
+
+private:
+  CIfrRecordInfoDB (IN CONST CIfrRecordInfoDB&);             // Prevent copy-construction
+  CIfrRecordInfoDB& operator= (IN CONST CIfrRecordInfoDB&);  // Prevent assignment
 };
 
 extern CIfrRecordInfoDB gCIfrRecordInfoDB;

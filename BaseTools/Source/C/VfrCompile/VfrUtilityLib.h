@@ -55,6 +55,10 @@ struct SConfigInfo {
 
   SConfigInfo (IN UINT8, IN UINT16, IN UINT32, IN EFI_IFR_TYPE_VALUE);
   ~SConfigInfo (VOID);
+
+private:
+  SConfigInfo (IN CONST SConfigInfo&);             // Prevent copy-construction
+  SConfigInfo& operator= (IN CONST SConfigInfo&);  // Prevent assignment
 };
 
 struct SConfigItem {
@@ -68,6 +72,10 @@ public:
   SConfigItem (IN CHAR8 *, IN EFI_GUID *, IN CHAR8 *);
   SConfigItem (IN CHAR8 *, IN EFI_GUID *, IN CHAR8 *, IN UINT8, IN UINT16, IN UINT16, IN EFI_IFR_TYPE_VALUE);
   virtual ~SConfigItem ();
+
+private:
+  SConfigItem (IN CONST SConfigItem&);             // Prevent copy-construction
+  SConfigItem& operator= (IN CONST SConfigItem&);  // Prevent assignment
 };
 
 class CVfrBufferConfig {
@@ -90,6 +98,10 @@ public:
 #endif
   virtual VOID    Close (VOID);
   virtual VOID    OutputCFile (IN FILE *, IN CHAR8 *);
+
+private:
+  CVfrBufferConfig (IN CONST CVfrBufferConfig&);             // Prevent copy-construction
+  CVfrBufferConfig& operator= (IN CONST CVfrBufferConfig&);  // Prevent assignment
 };
 
 extern CVfrBufferConfig gCVfrBufferConfig;
@@ -157,6 +169,10 @@ struct SVfrPackStackNode {
       return FALSE;
     }
   }
+
+private:
+  SVfrPackStackNode (IN CONST SVfrPackStackNode&);             // Prevent copy-construction
+  SVfrPackStackNode& operator= (IN CONST SVfrPackStackNode&);  // Prevent assignment
 };
 
 class CVfrVarDataTypeDB {
@@ -210,6 +226,10 @@ public:
 #ifdef CVFR_VARDATATYPEDB_DEBUG
   VOID ParserDB ();
 #endif
+
+private:
+  CVfrVarDataTypeDB (IN CONST CVfrVarDataTypeDB&);             // Prevent copy-construction
+  CVfrVarDataTypeDB& operator= (IN CONST CVfrVarDataTypeDB&);  // Prevent assignment
 };
 
 extern CVfrVarDataTypeDB  gCVfrVarDataTypeDB;
@@ -251,6 +271,10 @@ public:
   SVfrVarStorageNode (IN EFI_GUID *, IN CHAR8 *, IN EFI_VARSTORE_ID, IN SVfrDataType *, IN BOOLEAN Flag = TRUE);
   SVfrVarStorageNode (IN CHAR8 *, IN EFI_VARSTORE_ID);
   ~SVfrVarStorageNode (VOID);
+
+private:
+  SVfrVarStorageNode (IN CONST SVfrVarStorageNode&);             // Prevent copy-construction
+  SVfrVarStorageNode& operator= (IN CONST SVfrVarStorageNode&);  // Prevent assignment
 };
 
 struct EFI_VARSTORE_INFO {
@@ -332,6 +356,10 @@ public:
   EFI_VFR_RETURN_CODE GetNameVarStoreInfo (IN EFI_VARSTORE_INFO *, IN UINT32);
   EFI_VFR_RETURN_CODE AddBufferVarStoreFieldInfo (IN EFI_VARSTORE_INFO *);
   EFI_VFR_RETURN_CODE GetBufferVarStoreFieldInfo (IN OUT EFI_VARSTORE_INFO *);
+
+private:
+  CVfrDataStorage (IN CONST CVfrDataStorage&);             // Prevent copy-construction
+  CVfrDataStorage& operator= (IN CONST CVfrDataStorage&);  // Prevent assignment
 };
 
 extern CVfrDataStorage gCVfrDataStorage;
@@ -357,6 +385,10 @@ struct SVfrQuestionNode {
 
   SVfrQuestionNode (IN CHAR8 *, IN CHAR8 *, IN UINT32 BitMask = 0);
   ~SVfrQuestionNode ();
+
+private:
+  SVfrQuestionNode (IN CONST SVfrQuestionNode&);             // Prevent copy-construction
+  SVfrQuestionNode& operator= (IN CONST SVfrQuestionNode&);  // Prevent assignment
 };
 
 class CVfrQuestionDB {
@@ -390,6 +422,10 @@ public:
   VOID SetCompatibleMode (IN BOOLEAN Mode) {
     VfrCompatibleMode = Mode;
   }
+
+private:
+  CVfrQuestionDB (IN CONST CVfrQuestionDB&);             // Prevent copy-construction
+  CVfrQuestionDB& operator= (IN CONST CVfrQuestionDB&);  // Prevent assignment
 };
 
 struct SVfrDefaultStoreNode {
@@ -402,6 +438,10 @@ struct SVfrDefaultStoreNode {
 
   SVfrDefaultStoreNode (IN EFI_IFR_DEFAULTSTORE *, IN CHAR8 *, IN EFI_STRING_ID, IN UINT16);
   ~SVfrDefaultStoreNode();
+
+private:
+  SVfrDefaultStoreNode (IN CONST SVfrDefaultStoreNode&);             // Prevent copy-construction
+  SVfrDefaultStoreNode& operator= (IN CONST SVfrDefaultStoreNode&);  // Prevent assignment
 };
 
 class CVfrDefaultStore {
@@ -417,6 +457,10 @@ public:
   BOOLEAN             DefaultIdRegistered (IN UINT16);
   EFI_VFR_RETURN_CODE GetDefaultId (IN CHAR8 *, OUT UINT16 *);
   EFI_VFR_RETURN_CODE BufferVarStoreAltConfigAdd (IN EFI_VARSTORE_ID, IN EFI_VARSTORE_INFO &, IN CHAR8 *, IN EFI_GUID *, IN UINT8, IN EFI_IFR_TYPE_VALUE);
+
+private:
+  CVfrDefaultStore (IN CONST CVfrDefaultStore&);             // Prevent copy-construction
+  CVfrDefaultStore& operator= (IN CONST CVfrDefaultStore&);  // Prevent assignment
 };
 
 extern CVfrDefaultStore gCVfrDefaultStore;
@@ -431,6 +475,10 @@ struct SVfrRuleNode {
 
   SVfrRuleNode(IN CHAR8 *, IN UINT8);
   ~SVfrRuleNode();
+
+private:
+  SVfrRuleNode (IN CONST SVfrRuleNode&);             // Prevent copy-construction
+  SVfrRuleNode& operator= (IN CONST SVfrRuleNode&);  // Prevent assignment
 };
 
 class CVfrRulesDB {
@@ -444,6 +492,10 @@ public:
 
   VOID RegisterRule (IN CHAR8 *);
   UINT8 GetRuleId (IN CHAR8 *);
+
+private:
+  CVfrRulesDB (IN CONST CVfrRulesDB&);             // Prevent copy-construction
+  CVfrRulesDB& operator= (IN CONST CVfrRulesDB&);  // Prevent assignment
 };
 
 class CVfrStringDB {
@@ -478,6 +530,9 @@ public:
     IN EFI_STRING_ID StringId
     );
 
+private:
+  CVfrStringDB (IN CONST CVfrStringDB&);             // Prevent copy-construction
+  CVfrStringDB& operator= (IN CONST CVfrStringDB&);  // Prevent assignment
 };
 
 #endif
