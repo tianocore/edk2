@@ -237,6 +237,26 @@ CMD_UPT=$(BASE_TOOLS_PATH)\Source\Python\UPT\Core\DependencyRules.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParser.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Xml\XmlParserMisc.py
 
+CMD_ECC=$(BASE_TOOLS_PATH)\Source\Python\Ecc\c.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\Check.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\CLexer.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\CodeFragment.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\CodeFragmentCollector.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\Configuration.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\CParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\Database.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\Ecc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\EccGlobalData.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\EccToolError.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\Exception.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\FileProfile.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\MetaDataParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\ParserWarning.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\MetaFileWorkspace\MetaDataTable.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\MetaFileWorkspace\MetaFileParser.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\MetaFileWorkspace\MetaFileTable.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\Xml\XmlRoutines.py
+
 !IFDEF PYTHON_FREEZER_PATH
 all: SetPythonPath $(APPLICATIONS)
 !ELSE
