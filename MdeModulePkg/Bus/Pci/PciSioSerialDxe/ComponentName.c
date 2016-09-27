@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name and Name2 protocol for Isa serial driver.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,9 +43,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSerialDriverNameTable[] 
     NULL
   }
 };
-
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 mSioSerialPortName[] = L"SIO Serial Port #%d";
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 mPciSerialPortName[] = L"PCI Serial Port #%d";
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
