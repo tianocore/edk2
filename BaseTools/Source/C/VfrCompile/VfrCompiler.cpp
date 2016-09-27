@@ -677,7 +677,7 @@ CVfrCompiler::PreProcess (
     goto Fail;
   }
 
-  delete PreProcessCmd;
+  delete[] PreProcessCmd;
 
 Out:
   SET_RUN_STATUS (STATUS_PREPROCESSED);
@@ -687,7 +687,7 @@ Fail:
   if (!IS_RUN_STATUS(STATUS_DEAD)) {
     SET_RUN_STATUS (STATUS_FAILED);
   }
-  delete PreProcessCmd;
+  delete[] PreProcessCmd;
 }
 
 extern UINT8 VfrParserStart (IN FILE *, IN INPUT_INFO_TO_SYNTAX *);

@@ -123,7 +123,7 @@ SConfigInfo::~SConfigInfo (
   VOID
   )
 {
-  BUFFER_SAFE_FREE (mValue);
+  ARRAY_SAFE_FREE (mValue);
 }
 
 SConfigItem::SConfigItem (
@@ -200,9 +200,9 @@ SConfigItem::~SConfigItem (
 {
   SConfigInfo  *Info;
 
-  BUFFER_SAFE_FREE (mName);
-  BUFFER_SAFE_FREE (mGuid);
-  BUFFER_SAFE_FREE (mId);
+  ARRAY_SAFE_FREE (mName);
+  ARRAY_SAFE_FREE (mGuid);
+  ARRAY_SAFE_FREE (mId);
   while (mInfoStrList != NULL) {
     Info = mInfoStrList;
     mInfoStrList = mInfoStrList->mNext;
@@ -1393,7 +1393,7 @@ SVfrVarStorageNode::~SVfrVarStorageNode (
   )
 {
   if (mVarStoreName != NULL) {
-    delete mVarStoreName;
+    delete[] mVarStoreName;
   }
 
   if (mVarStoreType == EFI_VFR_VARSTORE_NAME) {
@@ -2102,7 +2102,7 @@ SVfrDefaultStoreNode::~SVfrDefaultStoreNode (
   )
 {
   if (mRefName != NULL) {
-    delete mRefName;
+    delete[] mRefName;
   }
 }
 
@@ -2304,7 +2304,7 @@ SVfrRuleNode::~SVfrRuleNode (
   )
 {
   if (mRuleName != NULL) {
-    delete mRuleName;
+    delete[] mRuleName;
   }
 }
 
@@ -2523,11 +2523,11 @@ SVfrQuestionNode::~SVfrQuestionNode (
   )
 {
   if (mName != NULL) {
-    delete mName;
+    delete[] mName;
   }
 
   if (mVarIdStr != NULL) {
-    delete mVarIdStr;
+    delete[] mVarIdStr;
   }
 }
 
@@ -3387,7 +3387,7 @@ CVfrStringDB::GetVarStoreNameFormStringId (
   // Check the String package.
   //
   if (PkgHeader->Header.Type != EFI_HII_PACKAGE_STRINGS) {
-    delete StringPtr;
+    delete[] StringPtr;
     return NULL;
   }
 
@@ -3414,7 +3414,7 @@ CVfrStringDB::GetVarStoreNameFormStringId (
   //
   Status = FindStringBlock(Current, StringId, &NameOffset, &BlockType);
   if (Status != EFI_SUCCESS) {
-    delete StringPtr;
+    delete[] StringPtr;
     return NULL;
   }
 
@@ -3447,7 +3447,7 @@ CVfrStringDB::GetVarStoreNameFormStringId (
     break;
   }
 
-  delete StringPtr;
+  delete[] StringPtr;
 
   return VarStoreName;
 }

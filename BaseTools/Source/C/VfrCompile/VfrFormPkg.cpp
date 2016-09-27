@@ -56,13 +56,13 @@ SPendingAssign::~SPendingAssign (
   )
 {
   if (mKey != NULL) {
-    delete mKey;
+    delete[] mKey;
   }
   mAddr   = NULL;
   mLen    = 0;
   mLineNo = 0;
   if (mMsg != NULL) {
-    delete mMsg;
+    delete[] mMsg;
   }
   mNext   = NULL;
 }
@@ -898,7 +898,7 @@ CFormPkg::DeclarePendingQuestion (
             strcpy (NewStr, SName);
             strcat (NewStr, VarStr + strlen (FName));
             ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize);
-            delete NewStr;
+            delete[] NewStr;
           }
         } else {
           ReturnCode = VFR_RETURN_UNSUPPORTED;

@@ -33,6 +33,8 @@ extern BOOLEAN  VfrCompatibleMode;
 #define EFI_BITS_PER_UINT32                (1 << EFI_BITS_SHIFT_PER_UINT32)
 
 #define BUFFER_SAFE_FREE(Buf)              do { if ((Buf) != NULL) { delete (Buf); } } while (0);
+#define ARRAY_SAFE_FREE(Buf)               do { if ((Buf) != NULL) { delete[] (Buf); } } while (0);
+
 
 class CVfrBinaryOutput {
 public:
@@ -139,7 +141,7 @@ struct SVfrPackStackNode {
 
   ~SVfrPackStackNode (VOID) {
     if (mIdentifier != NULL) {
-      delete mIdentifier;
+      delete[] mIdentifier;
     }
     mNext = NULL;
   }
