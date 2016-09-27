@@ -20,7 +20,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = OpensslLib
-  DEFINE OPENSSL_PATH            = openssl-1.0.2h
+  DEFINE OPENSSL_PATH            = openssl-1.0.2j
   DEFINE OPENSSL_FLAGS           = -DL_ENDIAN -DOPENSSL_SMALL_FOOTPRINT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE
 
 #

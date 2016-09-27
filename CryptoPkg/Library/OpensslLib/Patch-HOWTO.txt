@@ -17,36 +17,36 @@ cryptography. This patch will enable openssl building under UEFI environment.
 ================================================================================
                                 OpenSSL-Version
 ================================================================================
-  Current supported OpenSSL version for UEFI Crypto Library is 1.0.2h.
-    http://www.openssl.org/source/openssl-1.0.2h.tar.gz
+  Current supported OpenSSL version for UEFI Crypto Library is 1.0.2j.
+    http://www.openssl.org/source/openssl-1.0.2j.tar.gz
 
 
 ================================================================================
                       HOW to Install Openssl for UEFI Building
 ================================================================================
-1.  Download OpenSSL 1.0.2h from official website:
-    http://www.openssl.org/source/openssl-1.0.2h.tar.gz
+1.  Download OpenSSL 1.0.2j from official website:
+    http://www.openssl.org/source/openssl-1.0.2j.tar.gz
 
-    NOTE: Some web browsers may rename the downloaded TAR file to openssl-1.0.2h.tar.tar.
-          When you do the download, rename the "openssl-1.0.2h.tar.tar" to
-          "openssl-1.0.2h.tar.gz" or rename the local downloaded file with ".tar.tar"
+    NOTE: Some web browsers may rename the downloaded TAR file to openssl-1.0.2j.tar.tar.
+          When you do the download, rename the "openssl-1.0.2j.tar.tar" to
+          "openssl-1.0.2j.tar.gz" or rename the local downloaded file with ".tar.tar"
           extension to ".tar.gz".
 
-2.  Extract TAR into CryptoPkg/Library/OpensslLib/openssl-1.0.2h
+2.  Extract TAR into CryptoPkg/Library/OpensslLib/openssl-1.0.2j
 
     NOTE: If you use WinZip to unpack the openssl source in Windows, please
           uncheck the WinZip smart CR/LF conversion option (WINZIP: Options -->
           Configuration --> Miscellaneous --> "TAR file smart CR/LF conversion").
 
-3.  Apply this patch: EDKII_openssl-1.0.2h.patch, and make installation
+3.  Apply this patch: EDKII_openssl-1.0.2j.patch, and make installation
 
     For Windows Environment:
     ------------------------
     1) Make sure the patch utility has been installed in your machine.
        Install Cygwin or get the patch utility binary from
           http://gnuwin32.sourceforge.net/packages/patch.htm
-    2) cd $(WORKSPACE)\CryptoPkg\Library\OpensslLib\openssl-1.0.2h
-    3) patch -p1 -i ..\EDKII_openssl-1.0.2h.patch
+    2) cd $(WORKSPACE)\CryptoPkg\Library\OpensslLib\openssl-1.0.2j
+    3) patch -p1 -i ..\EDKII_openssl-1.0.2j.patch
     4) cd ..
     5) Install.cmd
 
@@ -54,8 +54,8 @@ cryptography. This patch will enable openssl building under UEFI environment.
     -----------------------
     1) Make sure the patch utility has been installed in your machine.
        Patch utility is available from http://directory.fsf.org/project/patch/
-    2) cd $(WORKSPACE)/CryptoPkg/Library/OpensslLib/openssl-1.0.2h
-    3) patch -p1 -i ../EDKII_openssl-1.0.2h.patch
+    2) cd $(WORKSPACE)/CryptoPkg/Library/OpensslLib/openssl-1.0.2j
+    3) patch -p1 -i ../EDKII_openssl-1.0.2j.patch
     4) cd ..
     5) ./Install.sh
 
