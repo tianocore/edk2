@@ -2390,6 +2390,22 @@ EFI_VARSTORE_INFO::EFI_VARSTORE_INFO (
   mVarTotalSize    = Info.mVarTotalSize;
 }
 
+EFI_VARSTORE_INFO&
+EFI_VARSTORE_INFO::operator= (
+  IN CONST EFI_VARSTORE_INFO &Info
+  )
+{
+  if (this != &Info) {
+    mVarStoreId      = Info.mVarStoreId;
+    mInfo.mVarName   = Info.mInfo.mVarName;
+    mInfo.mVarOffset = Info.mInfo.mVarOffset;
+    mVarType         = Info.mVarType;
+    mVarTotalSize    = Info.mVarTotalSize;
+  }
+
+  return *this;
+}
+
 BOOLEAN
 EFI_VARSTORE_INFO::operator == (
   IN EFI_VARSTORE_INFO  *Info

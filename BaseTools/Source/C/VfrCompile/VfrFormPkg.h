@@ -307,6 +307,7 @@ private:
 public:
   CIfrOpHeader (IN UINT8 OpCode, IN VOID *StartAddr, IN UINT8 Length = 0);
   CIfrOpHeader (IN CIfrOpHeader &);
+  CIfrOpHeader& operator=(IN CONST CIfrOpHeader &);
 
   VOID IncLength (UINT8 Size) {
     if ((mHeader->Length + Size) > mHeader->Length) {
