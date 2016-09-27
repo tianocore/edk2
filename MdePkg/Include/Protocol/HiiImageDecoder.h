@@ -2,6 +2,7 @@
   This protocol provides generic image decoder interfaces to various image formats.
 
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
@@ -12,8 +13,8 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-#ifndef __EFI_IMAGE_DECODER_PROTOCOL_H__
-#define __EFI_IMAGE_DECODER_PROTOCOL_H__
+#ifndef __HII_IMAGE_DECODER_H__
+#define __HII_IMAGE_DECODER_H__
 
 #include <Protocol/HiiImage.h>
 
@@ -64,6 +65,9 @@ typedef struct _EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER {
   UINT8                               ColorDepthInBits;
 } EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER;
 
+#define EFI_IMAGE_JPEG_SCANTYPE_PROGREESSIVE 0x01
+#define EFI_IMAGE_JPEG_SCANTYPE_INTERLACED   0x02
+
 //
 // EFI_HII_IMAGE_DECODER_JPEG_INFO
 // Header         The common header
@@ -72,9 +76,6 @@ typedef struct _EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER {
 //
 typedef struct _EFI_HII_IMAGE_DECODER_JPEG_INFO {
   EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER  Header;
-
-#define EFI_IMAGE_JPEG_SCANTYPE_PROGREESSIVE 0x01
-#define EFI_IMAGE_JPEG_SCANTYPE_INTERLACED   0x02
   UINT16                                    ScanType;
   UINT64                                    Reserved;
 } EFI_HII_IMAGE_DECODER_JPEG_INFO;
@@ -90,6 +91,17 @@ typedef struct _EFI_HII_IMAGE_DECODER_PNG_INFO {
   UINT16                                    Channels;
   UINT64                                    Reserved;
 } EFI_HII_IMAGE_DECODER_PNG_INFO;
+
+//
+// EFI_HII_IMAGE_DECODER_OTHER_INFO
+//
+typedef struct _EFI_HII_IMAGE_DECODER_OTHER_INFO {
+  EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER Header;
+  CHAR16                                  ImageExtenion[1];
+  //
+  // Variable length of image file extension name.
+  //
+} EFI_HII_IMAGE_DECODER_OTHER_INFO;
 
 /**
   There could be more than one EFI_HII_IMAGE_DECODER_PROTOCOL instances installed
@@ -112,10 +124,10 @@ typedef struct _EFI_HII_IMAGE_DECODER_PNG_INFO {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_HII_IMAGE_DECODER_GET_DECODER_NAME)(
+(EFIAPI *EFI_HII_IMAGE_DECODER_GET_NAME)(
   IN      EFI_HII_IMAGE_DECODER_PROTOCOL   *This,
   IN OUT  EFI_GUID                         **DecoderName,
-  IN OUT  UINT16                           *NumberofDecoderName
+  IN OUT  UINT16                           *NumberOfDecoderName
   );
 
 /**
@@ -183,12 +195,12 @@ EFI_STATUS
   IN      EFI_HII_IMAGE_DECODER_PROTOCOL   *This,
   IN      VOID                              *Image,
   IN      UINTN                             ImageRawDataSize,
-  IN OUT  EFI_IMAGE_OUTPUT                  **BitMap OPTIONAL,
+  IN OUT  EFI_IMAGE_OUTPUT                  **Bitmap,
   IN      BOOLEAN                           Transparent
   );
 
 struct _EFI_HII_IMAGE_DECODER_PROTOCOL {
-  EFI_HII_IMAGE_DECODER_GET_DECODER_NAME  GetImageDecoderName;
+  EFI_HII_IMAGE_DECODER_GET_NAME          GetImageDecoderName;
   EFI_HII_IMAGE_DECODER_GET_IMAGE_INFO    GetImageInfo;
   EFI_HII_IMAGE_DECODER_DECODE            DecodeImage;
 };
