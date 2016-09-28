@@ -75,7 +75,6 @@ Returns:
 --*/
 {
   printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  exit (0);
 }
 
 VOID
