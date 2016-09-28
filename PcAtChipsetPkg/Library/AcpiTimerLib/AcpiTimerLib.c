@@ -162,14 +162,14 @@ InternalAcpiDelay (
     //
     // The target timer count is calculated here
     //
-    Ticks = IoRead32 (Port) + Delay;
+    Ticks = IoBitFieldRead32 (Port, 0, 23) + Delay;
     Delay = BIT22;
     //
     // Wait until time out
     // Delay >= 2^23 could not be handled by this function
     // Timer wrap-arounds are handled correctly by this function
     //
-    while (((Ticks - IoRead32 (Port)) & BIT23) == 0) {
+    while (((Ticks - IoBitFieldRead32 (Port, 0, 23)) & BIT23) == 0) {
       CpuPause ();
     }
   } while (Times-- > 0);
@@ -371,7 +371,7 @@ InternalCalculateTscFrequency (
   // Use 363 * 9861 = 3579543 Hz which is within 2 Hz of ACPI_TIMER_FREQUENCY.
   // 363 counts is a calibration time of 101.4 uS.
   //
-  Ticks = IoRead32 (TimerAddr) + 363;
+  Ticks = IoBitFieldRead32 (TimerAddr, 0, 23) + 363;
 
   StartTSC = AsmReadTsc ();                                         // Get base value for the TSC
   //
@@ -380,7 +380,7 @@ InternalCalculateTscFrequency (
   // When the current ACPI timer value is greater than 'Ticks',
   // the while loop will exit.
   //
-  while (((Ticks - IoRead32 (TimerAddr)) & BIT23) == 0) {
+  while (((Ticks - IoBitFieldRead32 (TimerAddr, 0, 23)) & BIT23) == 0) {
     CpuPause();
   }
   EndTSC = AsmReadTsc ();                                           // TSC value 101.4 us later
