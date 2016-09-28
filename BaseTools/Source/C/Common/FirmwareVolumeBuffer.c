@@ -186,6 +186,7 @@ Returns:
 
   Status = FvBufClearAllFiles (TempFv);
   if (EFI_ERROR (Status)) {
+    CommonLibBinderFree (TempFv);
     return Status;
   }
 

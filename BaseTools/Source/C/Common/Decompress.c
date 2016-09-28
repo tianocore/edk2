@@ -934,7 +934,9 @@ Extract (
   UINT32        ScratchSize;
   EFI_STATUS    Status;
 
-  Status = EFI_SUCCESS;
+  Scratch = NULL;
+  Status  = EFI_SUCCESS;
+
   switch (Algorithm) {
   case 0:
     *Destination = (VOID *)malloc(SrcSize);
@@ -948,28 +950,42 @@ Extract (
     Status = EfiGetInfo(Source, SrcSize, DstSize, &ScratchSize);
     if (Status == EFI_SUCCESS) {
       Scratch = (VOID *)malloc(ScratchSize);
-      *Destination = (VOID *)malloc(*DstSize);
-      if (Scratch != NULL && *Destination != NULL) {
-        Status = EfiDecompress(Source, SrcSize, *Destination, *DstSize, Scratch, ScratchSize);
-      } else {
-        Status = EFI_OUT_OF_RESOURCES;
+      if (Scratch == NULL) {
+        return EFI_OUT_OF_RESOURCES;
       }
+
+      *Destination = (VOID *)malloc(*DstSize);
+      if (*Destination == NULL) {
+        free (Scratch);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Status = EfiDecompress(Source, SrcSize, *Destination, *DstSize, Scratch, ScratchSize);
     }
     break;
   case 2:
     Status = TianoGetInfo(Source, SrcSize, DstSize, &ScratchSize);
     if (Status == EFI_SUCCESS) {
       Scratch = (VOID *)malloc(ScratchSize);
-      *Destination = (VOID *)malloc(*DstSize);
-      if (Scratch != NULL && *Destination != NULL) {
-        Status = TianoDecompress(Source, SrcSize, *Destination, *DstSize, Scratch, ScratchSize);
-      } else {
-        Status = EFI_OUT_OF_RESOURCES;
+      if (Scratch == NULL) {
+        return EFI_OUT_OF_RESOURCES;
       }
+
+      *Destination = (VOID *)malloc(*DstSize);
+      if (*Destination == NULL) {
+        free (Scratch);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Status = TianoDecompress(Source, SrcSize, *Destination, *DstSize, Scratch, ScratchSize);
     }
     break;
   default:
     Status = EFI_INVALID_PARAMETER;
+  }
+
+  if (Scratch != NULL) {
+    free (Scratch);
   }
 
   return Status;

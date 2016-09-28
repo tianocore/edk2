@@ -125,10 +125,12 @@ Returns:
     
     Status = StripInfDscStringInPlace (NextLine);
     if (EFI_ERROR (Status)) {
+      free (NextLine);
       break;
     }
 
     if (NextLine[0] == '\0') {
+      free (NextLine);
       continue;
     }
 
@@ -153,8 +155,12 @@ Returns:
           LastGuidTool = NewGuidTool;
         }
       }
+    }
+
+    if (Tool != NULL) {
       FreeStringList (Tool);
     }
+    free (NextLine);
   }
 
   return FirstGuidTool;
