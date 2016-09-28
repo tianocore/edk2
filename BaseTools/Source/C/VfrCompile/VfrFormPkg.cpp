@@ -828,7 +828,6 @@ CFormPkg::DeclarePendingQuestion (
   UINT32         ShrinkSize = 0;
   EFI_VFR_RETURN_CODE  ReturnCode;
   EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
-  EFI_VARSTORE_ID       VarStoreId    = EFI_VARSTORE_ID_INVALID;
 
   //
   // Declare all questions as Numeric in DisableIf True
@@ -1410,7 +1409,6 @@ CIfrRecordInfoDB::IfrRecordAdjust (
   EFI_QUESTION_ID    QuestionId;
   UINT32             StackCount;
   UINT32             QuestionScope;
-  UINT32             OpcodeOffset;
   CHAR8              ErrorMsg[MAX_STRING_LEN] = {0, };
   EFI_VFR_RETURN_CODE  Status;
 
