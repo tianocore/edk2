@@ -133,7 +133,6 @@ FileBasedSimpleTextInReadKeyStroke(
   @return                     A pointer to the allocated protocol structure;
 **/
 EFI_SIMPLE_TEXT_INPUT_PROTOCOL*
-EFIAPI
 CreateSimpleTextInOnFile(
   IN SHELL_FILE_HANDLE  FileHandleToUse,
   IN EFI_HANDLE         *HandleLocation
@@ -200,7 +199,6 @@ CreateSimpleTextInOnFile(
   @retval EFI_SUCCESS         The object was closed.
 **/
 EFI_STATUS
-EFIAPI
 CloseSimpleTextInOnFile(
   IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *SimpleTextIn
   )
@@ -434,7 +432,6 @@ FileBasedSimpleTextOutOutputString (
   @return                     A pointer to the allocated protocol structure;
 **/
 EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*
-EFIAPI
 CreateSimpleTextOutOnFile(
   IN SHELL_FILE_HANDLE               FileHandleToUse,
   IN EFI_HANDLE                      *HandleLocation,
@@ -499,7 +496,6 @@ CreateSimpleTextOutOnFile(
   @retval EFI_SUCCESS         The object was closed.
 **/
 EFI_STATUS
-EFIAPI
 CloseSimpleTextOutOnFile(
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *SimpleTextOut
   )

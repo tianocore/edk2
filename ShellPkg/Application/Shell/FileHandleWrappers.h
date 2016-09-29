@@ -55,7 +55,6 @@ extern EFI_FILE_PROTOCOL FileInterfaceNulFile;
   @return other     a pointer to an EFI_FILE_PROTOCOL structure
 **/
 EFI_FILE_PROTOCOL*
-EFIAPI
 CreateFileInterfaceEnv(
   CONST CHAR16 *EnvName
   );
@@ -70,7 +69,6 @@ CreateFileInterfaceEnv(
   @return other     a pointer to an EFI_FILE_PROTOCOL structure
 **/
 EFI_FILE_PROTOCOL*
-EFIAPI
 CreateFileInterfaceMem(
   IN CONST BOOLEAN Unicode
   );

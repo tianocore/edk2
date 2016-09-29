@@ -58,7 +58,6 @@ typedef struct _CONSOLE_LOGGER_PRIVATE_DATA{
   @sa InstallProtocolInterface
 **/
 EFI_STATUS
-EFIAPI
 ConsoleLoggerInstall(
   IN CONST UINTN ScreensToSave,
   OUT CONSOLE_LOGGER_PRIVATE_DATA **ConsoleInfo
@@ -74,7 +73,6 @@ ConsoleLoggerInstall(
   @return other           The operation failed.  This was from UninstallProtocolInterface.
 **/
 EFI_STATUS
-EFIAPI
 ConsoleLoggerUninstall(
   IN OUT CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );
@@ -92,7 +90,6 @@ ConsoleLoggerUninstall(
   @param[in] ConsoleInfo  The pointer to the instance of the console logger information.
 **/
 EFI_STATUS
-EFIAPI
 ConsoleLoggerDisplayHistory(
   IN CONST BOOLEAN  Forward,
   IN CONST UINTN    Rows,
@@ -109,7 +106,6 @@ ConsoleLoggerDisplayHistory(
   @sa UpdateDisplayFromHistory
 **/
 EFI_STATUS
-EFIAPI
 ConsoleLoggerStopHistory(
   IN CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );
@@ -122,7 +118,6 @@ ConsoleLoggerStopHistory(
   @return other           The operation failed.
 **/
 EFI_STATUS
-EFIAPI
 UpdateDisplayFromHistory(
   IN CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );
@@ -320,7 +315,6 @@ ConsoleLoggerEnableCursor (
   history buffers.
 **/
 EFI_STATUS
-EFIAPI
 ConsoleLoggerResetBuffers(
   IN CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );

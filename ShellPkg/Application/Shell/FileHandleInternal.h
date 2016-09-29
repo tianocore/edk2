@@ -23,7 +23,6 @@
   @param[in, out] Row         Current row of the cursor position
 **/
 VOID
-EFIAPI
 MoveCursorBackward (
   IN     UINTN                   LineLength,
   IN OUT UINTN                   *Column,
@@ -39,7 +38,6 @@ MoveCursorBackward (
   @param[in, out] Row         Current row of the cursor position
 **/
 VOID
-EFIAPI
 MoveCursorForward (
   IN     UINTN                   LineLength,
   IN     UINTN                   TotalRow,
@@ -57,7 +55,6 @@ MoveCursorForward (
   @param[in] StartColumn  which column to start at
 **/
 VOID
-EFIAPI
 PrintCommandHistory (
   IN CONST UINTN TotalCols,
   IN CONST UINTN TotalRows,
