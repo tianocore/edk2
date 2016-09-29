@@ -29,7 +29,6 @@ UINTN             GuidListCount;
   @retval               A string representation of the type allocated from BS Pool.
 **/
 CHAR16*
-EFIAPI
 ConvertMemoryType (
   IN CONST EFI_MEMORY_TYPE Memory
   )
@@ -66,7 +65,6 @@ ConvertMemoryType (
   @retval               A string representation of the type allocated from BS Pool.
 **/
 CHAR16*
-EFIAPI
 ConvertPixelFormat (
   IN CONST EFI_GRAPHICS_PIXEL_FORMAT Fmt
   )
@@ -1831,7 +1829,6 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   @return                       The node.
 **/
 CONST GUID_INFO_BLOCK *
-EFIAPI
 InternalShellGetNodeFromGuid(
   IN CONST EFI_GUID* Guid
   )
@@ -1875,7 +1872,6 @@ Function to add a new GUID/Name mapping.
 @retval EFI_INVALID_PARAMETER Guid NameId was invalid
 **/
 EFI_STATUS
-EFIAPI
 InsertNewGuidNameMapping(
   IN CONST EFI_GUID           *Guid,
   IN CONST EFI_STRING_ID      NameID,
@@ -2190,7 +2186,6 @@ GetStringNameFromHandle(
   @retval EFI_SUCCESS     The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 InternalShellInitHandleList(
   VOID
   )
@@ -2837,7 +2832,6 @@ ParseHandleDatabaseForChildControllers(
   @return                           A pointer to (*DestinationBuffer).
 **/
 VOID*
-EFIAPI
 BuffernCatGrow (
   IN OUT VOID   **DestinationBuffer,
   IN OUT UINTN  *DestinationSize,
