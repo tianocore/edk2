@@ -48,7 +48,6 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
-  ImageDecoderLib|MdeModulePkg/Library/ImageDecoderLib/ImageDecoderLib.inf
   #
   # UEFI & PI
   #
@@ -293,9 +292,7 @@
   MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
-  MdeModulePkg/Library/ImageDecoderLib/ImageDecoderLib.inf
   MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
-  MdeModulePkg/Library/BmpImageDecoderLib/BmpImageDecoderLib.inf
   MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf

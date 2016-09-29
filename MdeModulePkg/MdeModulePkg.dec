@@ -137,10 +137,6 @@
   #
   FileExplorerLib|Include/Library/FileExplorerLib.h
 
-  ## @libraryclass  Provides image decoding service.
-  #
-  ImageDecoderLib|Include/Library/ImageDecoderLib.h
-
   ## @libraryclass  Provides interfaces about logo display.
   #
   BootLogoLib|Include/Library/BootLogoLib.h
