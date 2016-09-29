@@ -26,7 +26,6 @@
   @retval EFI_SUCCESS       The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 TouchFileByHandle (
   IN EFI_HANDLE Handle
   )
@@ -65,7 +64,6 @@ TouchFileByHandle (
   @retval EFI_SUCCESS           The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 DoTouchByHandle (
   IN CONST CHAR16       *Name,
   IN       CHAR16       *FS,

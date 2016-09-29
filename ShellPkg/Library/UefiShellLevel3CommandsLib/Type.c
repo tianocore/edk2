@@ -30,7 +30,6 @@
   @retval EFI_SUCCESS           The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 TypeFileByHandle (
   IN SHELL_FILE_HANDLE Handle,
   IN BOOLEAN Ascii,
