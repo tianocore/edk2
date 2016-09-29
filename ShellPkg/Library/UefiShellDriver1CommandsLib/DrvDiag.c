@@ -42,7 +42,6 @@ typedef enum {
   @retval EFI_NOT_FOUND         No diagnostic handle could be found.
 **/
 EFI_STATUS
-EFIAPI
 DoDiagnostics (
   IN CONST DRV_DIAG_TEST_MODE Mode,
   IN CONST CHAR8              *Lang,

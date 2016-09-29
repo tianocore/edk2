@@ -28,7 +28,6 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   @retval EFI_SUCCESS     The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 DisconnectAll(
   VOID
   )

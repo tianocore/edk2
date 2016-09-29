@@ -34,7 +34,6 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   @retval SHELL_SUCCESS     The operation was successful.
 **/
 SHELL_STATUS
-EFIAPI
 DoDevTreeForHandle(
   IN CONST EFI_HANDLE TheHandle,
   IN CONST CHAR8      *Lang OPTIONAL,

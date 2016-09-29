@@ -215,7 +215,6 @@ ShellCommandRunUnload (
   @retval EFI_SUCCESS   The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 ShellConnectFromDevPaths (
   IN CONST CHAR16 *Key
   );

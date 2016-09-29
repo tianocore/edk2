@@ -53,7 +53,6 @@ STATIC CONST EFI_GUID *UefiDriverModelProtocolsGuidArray[] = {
   @retval EFI_SUCCESS     The name was found.
 **/
 EFI_STATUS
-EFIAPI
 GetDriverName (
   IN EFI_HANDLE   TheHandle,
   IN CONST CHAR8  *Language,
@@ -107,7 +106,6 @@ GetDriverName (
   @retval FALSE     The guid does not represent a driver model protocol.
 **/
 BOOLEAN
-EFIAPI
 IsDriverProt (
   IN CONST EFI_GUID *Guid
   )
@@ -140,7 +138,6 @@ IsDriverProt (
   @retval SHELL_INVALID_PARAMETER ProtocolName was NULL or invalid.
 **/
 CHAR16*
-EFIAPI
 GetProtocolInfoString(
   IN CONST EFI_HANDLE TheHandle,
   IN CONST CHAR8      *Language,
@@ -217,7 +214,6 @@ GetProtocolInfoString(
   @retval EFI_SUCCESS     The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 GetDriverImageName (
   IN EFI_HANDLE   TheHandle,
   OUT CHAR16      **Name
@@ -256,7 +252,6 @@ GetDriverImageName (
   @param[in] Language   The language to output in.
 **/
 EFI_STATUS
-EFIAPI
 DisplayDriverModelHandle (
   IN EFI_HANDLE  Handle,
   IN BOOLEAN     BestName,
@@ -648,7 +643,6 @@ DisplayDriverModelHandle (
   @retval SHELL_INVALID_PARAMETER ProtocolName was NULL or invalid.
 **/
 SHELL_STATUS
-EFIAPI
 DoDhByHandle(
   IN CONST EFI_HANDLE TheHandle,
   IN CONST BOOLEAN    Verbose,
@@ -729,7 +723,6 @@ DoDhByHandle(
   @retval SHELL_INVALID_PARAMETER ProtocolName was NULL or invalid.
 **/
 SHELL_STATUS
-EFIAPI
 DoDhForHandleList(
   IN CONST EFI_HANDLE *HandleList,
   IN CONST BOOLEAN    Verbose,
@@ -772,7 +765,6 @@ DoDhForHandleList(
   @retval SHELL_INVALID_PARAMETER ProtocolName was NULL or invalid.
 **/
 SHELL_STATUS
-EFIAPI
 DoDhForAll(
   IN CONST BOOLEAN  Sfo,
   IN CONST BOOLEAN  Verbose,
@@ -810,7 +802,6 @@ DoDhForAll(
   @retval SHELL_INVALID_PARAMETER ProtocolName was NULL or invalid.
 **/
 SHELL_STATUS
-EFIAPI
 DoDhByProtocol(
   IN CONST CHAR16   *ProtocolName,
   IN CONST BOOLEAN  Verbose,
