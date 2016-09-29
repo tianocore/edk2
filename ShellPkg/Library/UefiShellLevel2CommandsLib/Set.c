@@ -24,7 +24,6 @@
   @return any return code from GetNextVariableName except EFI_NOT_FOUND
 **/
 SHELL_STATUS
-EFIAPI
 PrintAllShellEnvVars(
   VOID
   )

@@ -78,7 +78,6 @@ IsStdInDataAvailable (
                                 Size was updated to the minimum space required.
 **/
 EFI_STATUS
-EFIAPI
 ShellFileHandleReadStdInLine(
   IN SHELL_FILE_HANDLE          Handle,
   IN OUT CHAR16                 *Buffer,
@@ -160,7 +159,6 @@ ShellFileHandleReadStdInLine(
   @sa ShellFileHandleReadLine
 **/
 CHAR16*
-EFIAPI
 ParseReturnStdInLine (
   IN SHELL_FILE_HANDLE Handle
   )
@@ -249,7 +247,6 @@ HandleStringWithEscapeCharForParse (
   @retval SHELL_SUCCESS       The operation was successful.
 **/
 SHELL_STATUS
-EFIAPI
 PerformParsing(
   IN CONST CHAR16 *FileName,
   IN CONST CHAR16 *TableName,

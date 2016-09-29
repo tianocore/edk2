@@ -35,7 +35,6 @@
   @retval SHELL_OUT_OF_RESOURCES    a memory allocation failed
 **/
 SHELL_STATUS
-EFIAPI
 ValidateAndCopyFiles(
   IN CONST EFI_SHELL_FILE_INFO  *FileList,
   IN CONST CHAR16               *DestDir,
@@ -58,7 +57,6 @@ ValidateAndCopyFiles(
   @retval SHELL_SUCCESS   The source file was copied to the destination
 **/
 SHELL_STATUS
-EFIAPI
 CopySingleFile(
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Dest,
@@ -291,7 +289,6 @@ CopySingleFile(
   @retval SHELL_OUT_OF_RESOURCES    a memory allocation failed
 **/
 SHELL_STATUS
-EFIAPI
 ValidateAndCopyFiles(
   IN CONST EFI_SHELL_FILE_INFO  *FileList,
   IN CONST CHAR16               *DestDir,
@@ -576,7 +573,6 @@ ValidateAndCopyFiles(
   @retval SHELL_SUCCESS             The operation was successful.
 **/
 SHELL_STATUS
-EFIAPI
 ProcessValidateAndCopyFiles(
   IN       EFI_SHELL_FILE_INFO  *FileList,
   IN CONST CHAR16               *DestDir,

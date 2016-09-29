@@ -263,7 +263,6 @@ ShellCommandRunMv (
   @retval other           pointer to a fuly qualified path.
 **/
 CHAR16*
-EFIAPI
 GetFullyQualifiedPath(
   IN CONST CHAR16* Path
   );
@@ -276,7 +275,6 @@ GetFullyQualifiedPath(
   @retval EFI_SUCCESS   The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 VerifyIntermediateDirectories (
   IN CONST CHAR16 *Path
   );
@@ -292,7 +290,6 @@ VerifyIntermediateDirectories (
   @return     non-zero if the strings are different.
 **/
 CONST CHAR16*
-EFIAPI
 StrniCmp(
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Target,
@@ -310,7 +307,6 @@ StrniCmp(
   @retval EFI_SUCCESS   The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 ShellLevel2StripQuotes (
   IN  CONST CHAR16     *OriginalString,
   OUT CHAR16           **CleanString
@@ -343,7 +339,6 @@ ShellCommandRunVol (
   @retval SHELL_SUCCESS   The source file was copied to the destination
 **/
 SHELL_STATUS
-EFIAPI
 CopySingleFile(
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Dest,
@@ -364,7 +359,6 @@ CopySingleFile(
   @retval SHELL_DEVICE_ERROR  A device error occured reading this Node.
 **/
 SHELL_STATUS
-EFIAPI
 CascadeDelete(
   IN EFI_SHELL_FILE_INFO  *Node,
   IN CONST BOOLEAN        Quiet

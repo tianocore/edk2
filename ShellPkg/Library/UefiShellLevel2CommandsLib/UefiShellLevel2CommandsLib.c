@@ -169,7 +169,6 @@ ShellLevel2CommandsLibDestructor (
   @retval other           An allocated pointer to a fuly qualified path.
 **/
 CHAR16*
-EFIAPI
 GetFullyQualifiedPath(
   IN CONST CHAR16* Path
   )
@@ -216,7 +215,6 @@ GetFullyQualifiedPath(
   @retval EFI_SUCCESS   The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 VerifyIntermediateDirectories (
   IN CONST CHAR16 *Path
   )
@@ -270,7 +268,6 @@ VerifyIntermediateDirectories (
   @return Char as an upper case character.
 **/
 CHAR16
-EFIAPI
 InternalCharToUpper (
   IN CONST CHAR16                    Char
   );
@@ -286,7 +283,6 @@ InternalCharToUpper (
   @return The location in Source where there is a difference.
 **/
 CONST CHAR16*
-EFIAPI
 StrniCmp(
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Target,
@@ -322,7 +318,6 @@ StrniCmp(
   @retval EFI_SUCCESS   The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 ShellLevel2StripQuotes (
   IN  CONST CHAR16     *OriginalString,
   OUT CHAR16           **CleanString
