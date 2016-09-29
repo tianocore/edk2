@@ -24,7 +24,6 @@
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorInit (
   VOID
   );
@@ -36,7 +35,6 @@ MainEditorInit (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorCleanup (
   VOID
   );
@@ -45,7 +43,6 @@ MainEditorCleanup (
   Refresh the main editor component.
 **/
 VOID
-EFIAPI
 MainEditorRefresh (
   VOID
   );
@@ -58,7 +55,6 @@ MainEditorRefresh (
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorKeyInput (
   VOID
   );
@@ -69,7 +65,6 @@ MainEditorKeyInput (
   @retval EFI_SUCCESS The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorBackup (
   VOID
   );

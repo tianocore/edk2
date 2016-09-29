@@ -24,7 +24,6 @@
   @return                       a pointer to the newly allcoated line.
 **/
 EFI_EDITOR_LINE *
-EFIAPI
 LineDup (
   IN  EFI_EDITOR_LINE *Src
   )
@@ -65,7 +64,6 @@ LineDup (
   @param Src                    The line structure to free.
 **/
 VOID
-EFIAPI
 LineFree (
   IN  EFI_EDITOR_LINE *Src
   )

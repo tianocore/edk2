@@ -19,7 +19,6 @@
   Initialize the input bar.
 **/
 VOID
-EFIAPI
 InputBarInit (
   VOID
   );
@@ -28,7 +27,6 @@ InputBarInit (
   Cleanup function for input bar.
 **/
 VOID
-EFIAPI
 InputBarCleanup (
   VOID
   );
@@ -42,7 +40,6 @@ InputBarCleanup (
   @retval EFI_SUCCESS           The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 InputBarRefresh (
   UINTN LastRow,
   UINTN LastColumn
@@ -57,7 +54,6 @@ InputBarRefresh (
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 InputBarSetPrompt (
   IN CONST CHAR16 *Str
   );
@@ -71,7 +67,6 @@ InputBarSetPrompt (
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 InputBarSetStringSize (
   UINTN   Size
   );
@@ -83,7 +78,6 @@ InputBarSetStringSize (
   @return The string that was input.
 **/
 CONST CHAR16*
-EFIAPI
 InputBarGetString (
   VOID
   );

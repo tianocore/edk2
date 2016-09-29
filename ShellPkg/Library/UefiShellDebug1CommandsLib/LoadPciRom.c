@@ -44,7 +44,6 @@ LoadPciRomConnectAllDriversToAllControllers (
   @retval Other value             Unknown error.
 **/
 EFI_STATUS
-EFIAPI
 LoadEfiDriversFromRomImage (
   VOID                      *RomBar,
   UINTN                     RomSize,
@@ -198,7 +197,6 @@ ShellCommandRunLoadPciRom (
   @retval Other value             Unknown error.
 **/
 EFI_STATUS
-EFIAPI
 LoadEfiDriversFromRomImage (
   VOID                      *RomBar,
   UINTN                     RomSize,

@@ -26,7 +26,6 @@
   @retval SHELL_SUCCESS   The display was successful.
 **/
 SHELL_STATUS
-EFIAPI
 DisplayTheBlocks(
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevPath,
   IN CONST UINT64                   Lba,

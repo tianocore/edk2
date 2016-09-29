@@ -131,7 +131,6 @@ UefiShellDebug1CommandsLibDestructor (
   //Stolen from MdePkg Baselib
 **/
 CHAR16
-EFIAPI
 CharToUpper (
   IN      CHAR16                    Char
   )
@@ -154,7 +153,6 @@ CharToUpper (
   @retval EFI_NOT_FOUND    A configuration table matching TableGuid was not found.
 **/
 EFI_STATUS
-EFIAPI
 GetSystemConfigurationTable (
   IN EFI_GUID *TableGuid,
   IN OUT VOID **Table
@@ -187,7 +185,6 @@ GetSystemConfigurationTable (
 
 **/
 UINTN
-EFIAPI
 HexCharToUintn (
   IN      CHAR16                    Char
   )
@@ -209,7 +206,6 @@ HexCharToUintn (
   @retval EFI_SUCCESS             The conversion was successful.
 **/
 EFI_STATUS
-EFIAPI
 ConvertStringToGuid (
   IN CONST CHAR16 *StringGuid,
   IN OUT EFI_GUID *Guid
@@ -300,7 +296,6 @@ ConvertStringToGuid (
   @param[in] LastRow            The last printable row.
 **/
 VOID
-EFIAPI
 EditorClearLine (
   IN UINTN Row,
   IN UINTN LastCol,
@@ -342,7 +337,6 @@ EditorClearLine (
   @retval FALSE     The character is not valid.
 **/
 BOOLEAN
-EFIAPI
 IsValidFileNameChar (
   IN CONST CHAR16 Ch
   )
@@ -366,7 +360,6 @@ IsValidFileNameChar (
   @retval FALSE     The filename is not ok.
 **/
 BOOLEAN
-EFIAPI
 IsValidFileName (
   IN CONST CHAR16 *Name
   )
@@ -408,7 +401,6 @@ IsValidFileName (
   @return the valid filename.
 **/
 CHAR16 *
-EFIAPI
 EditGetDefaultFileName (
   IN CONST CHAR16 *Extension
   )
@@ -462,7 +454,6 @@ EditGetDefaultFileName (
   @retval EFI_INVALID_PARAMETER FileName was a directory.
 **/
 EFI_STATUS
-EFIAPI
 ReadFileIntoBuffer (
   IN CONST CHAR16 *FileName,
   OUT VOID        **Buffer,

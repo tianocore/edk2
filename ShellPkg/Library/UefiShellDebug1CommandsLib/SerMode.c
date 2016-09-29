@@ -29,7 +29,6 @@
   @retval SHELL_SUCCESS             The operation was successful.
 **/
 SHELL_STATUS
-EFIAPI
 DisplaySettings (
   IN UINTN                   HandleIdx,
   IN BOOLEAN                 HandleValid

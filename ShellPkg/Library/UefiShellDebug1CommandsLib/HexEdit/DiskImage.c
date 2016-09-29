@@ -114,7 +114,6 @@ HDiskImageCleanup (
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 HDiskImageSetDiskNameOffsetSize (
   IN CONST CHAR16   *Str,
   IN UINTN    Offset,

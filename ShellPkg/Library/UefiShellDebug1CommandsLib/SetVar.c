@@ -36,7 +36,6 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
                  empty.)
 **/
 BOOLEAN
-EFIAPI
 IsStringOfHexNibbles (
   IN CONST CHAR16  *String
   )

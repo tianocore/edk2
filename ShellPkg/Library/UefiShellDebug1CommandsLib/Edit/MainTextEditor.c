@@ -1418,7 +1418,6 @@ EFI_EDITOR_GLOBAL_EDITOR      MainEditorConst = {
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorInit (
   VOID
   )
@@ -1552,7 +1551,6 @@ MainEditorInit (
   @retval EFI_LOAD_ERROR          A load error occured.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorCleanup (
   VOID
   )
@@ -1596,7 +1594,6 @@ MainEditorCleanup (
   Refresh the main editor component.
 **/
 VOID
-EFIAPI
 MainEditorRefresh (
   VOID
   )
@@ -1649,7 +1646,6 @@ MainEditorRefresh (
   @return The X location of the mouse.
 **/
 INT32
-EFIAPI
 GetTextX (
   IN INT32 GuidX
   )
@@ -1671,7 +1667,6 @@ GetTextX (
   @return The Y location of the mouse.
 **/
 INT32
-EFIAPI
 GetTextY (
   IN INT32 GuidY
   )
@@ -1695,7 +1690,6 @@ GetTextY (
   @retval EFI_NOT_FOUND     There was no mouse support found.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorHandleMouseInput (
   IN EFI_SIMPLE_POINTER_STATE       MouseState
   )
@@ -1796,7 +1790,6 @@ MainEditorHandleMouseInput (
   @retval EFI_OUT_OF_RESOURCES    A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorKeyInput (
   VOID
   )
@@ -1893,7 +1886,6 @@ MainEditorKeyInput (
   @retval EFI_OUT_OF_RESOURCES A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorSetCutLine (
   EFI_EDITOR_LINE *Line
   )
@@ -1925,7 +1917,6 @@ MainEditorSetCutLine (
   @retval EFI_SUCCESS The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 MainEditorBackup (
   VOID
   )

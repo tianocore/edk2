@@ -27,7 +27,6 @@ CHAR16  *Title = NULL;
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 MainTitleBarInit (
   CONST CHAR16 *Prompt
   )
@@ -52,7 +51,6 @@ MainTitleBarInit (
   Clean up the memory used.
 **/
 VOID
-EFIAPI
 MainTitleBarCleanup (
   VOID
   )
@@ -86,7 +84,6 @@ typedef union {
   @retval EFI_SUCCESS           The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 MainTitleBarRefresh (
   IN CONST CHAR16                 *FileName OPTIONAL,
   IN CONST EDIT_FILE_TYPE         FileType,

@@ -69,7 +69,6 @@ CONST EFI_CPU_IO_PROTOCOL_WIDTH mShellMmCpuIoWidth[] = {
   @param[out] Register       PCI register offset.
 **/
 VOID
-EFIAPI
 ShellMmDecodePciAddress (
   IN BOOLEAN                PciFormat,
   IN UINT64                 Address,
