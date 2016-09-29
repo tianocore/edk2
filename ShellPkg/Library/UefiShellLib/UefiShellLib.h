@@ -68,7 +68,6 @@ typedef struct  {
   @retval FALSE       There is a non-numeric character.
 **/
 BOOLEAN
-EFIAPI
 InternalShellIsHexOrDecimalNumber (
   IN CONST CHAR16   *String,
   IN CONST BOOLEAN  ForceHex,
@@ -87,7 +86,6 @@ InternalShellIsHexOrDecimalNumber (
   @retval EFI_SUCCESS   The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 InternalShellStripQuotes (
   IN  CONST CHAR16     *OriginalString,
   OUT CHAR16           **CleanString

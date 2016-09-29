@@ -92,7 +92,6 @@ ShellIsDecimalDigitCharacter (
   @retval EFI_OUT_OF_RESOURCES    Memory allocation failed.
 **/
 EFI_STATUS
-EFIAPI
 ShellFindSE2 (
   IN EFI_HANDLE        ImageHandle
   )
@@ -176,7 +175,6 @@ ShellFindSE2 (
   @retval EFI_SUCCESS   The operationw as successful.
 **/
 EFI_STATUS
-EFIAPI
 ShellLibConstructorWorker (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -1423,7 +1421,6 @@ typedef struct {
   @retval the resultant head of the double linked new format list;
 **/
 LIST_ENTRY*
-EFIAPI
 InternalShellConvertFileListType (
   IN LIST_ENTRY                 *FileList,
   IN OUT LIST_ENTRY             *ListHead
@@ -1893,7 +1890,6 @@ typedef struct {
   @retval FALSE                 the Parameter was not found.  Type is not valid.
 **/
 BOOLEAN
-EFIAPI
 InternalIsOnCheckList (
   IN CONST CHAR16               *Name,
   IN CONST SHELL_PARAM_ITEM     *CheckList,
@@ -1962,7 +1958,6 @@ InternalIsOnCheckList (
   @retval FALSE                 the Parameter not a flag.
 **/
 BOOLEAN
-EFIAPI
 InternalIsFlag (
   IN CONST CHAR16               *Name,
   IN CONST BOOLEAN              AlwaysAllowNumbers,
@@ -2019,7 +2014,6 @@ InternalIsFlag (
                                 ProblemParam if provided.
 **/
 EFI_STATUS
-EFIAPI
 InternalCommandLineParse (
   IN CONST SHELL_PARAM_ITEM     *CheckList,
   OUT LIST_ENTRY                **CheckPackage,
@@ -2708,7 +2702,6 @@ ShellCopySearchAndReplace(
   @retval !EFI_SUCCESS    The operation failed.
 **/
 EFI_STATUS
-EFIAPI
 InternalPrintTo (
   IN CONST CHAR16 *String
   )
@@ -2764,7 +2757,6 @@ InternalPrintTo (
   @return EFI_DEVICE_ERROR      The console device reported an error.
 **/
 EFI_STATUS
-EFIAPI
 InternalShellPrintWorker(
   IN INT32                Col OPTIONAL,
   IN INT32                Row OPTIONAL,
@@ -3614,7 +3606,6 @@ ShellPromptForResponseHii (
   @retval FALSE       There is a non-numeric character.
 **/
 BOOLEAN
-EFIAPI
 InternalShellIsHexOrDecimalNumber (
   IN CONST CHAR16   *String,
   IN CONST BOOLEAN  ForceHex,
@@ -3727,7 +3718,6 @@ ShellFileExists(
 
 **/
 CHAR16
-EFIAPI
 InternalShellCharToUpper (
   IN      CHAR16                    Char
   )
@@ -3753,7 +3743,6 @@ InternalShellCharToUpper (
 
 **/
 UINTN
-EFIAPI
 InternalShellHexCharToUintn (
   IN      CHAR16                    Char
   )
@@ -3796,7 +3785,6 @@ InternalShellHexCharToUintn (
   @retval EFI_DEVICE_ERROR        An overflow occured.
 **/
 EFI_STATUS
-EFIAPI
 InternalShellStrHexToUint64 (
   IN CONST CHAR16   *String,
      OUT   UINT64   *Value,
@@ -3898,7 +3886,6 @@ InternalShellStrHexToUint64 (
   @retval EFI_DEVICE_ERROR        An overflow occured.
 **/
 EFI_STATUS
-EFIAPI
 InternalShellStrDecimalToUint64 (
   IN CONST CHAR16 *String,
      OUT   UINT64 *Value,
@@ -4350,7 +4337,6 @@ ShellDeleteFileByName(
   @retval EFI_SUCCESS   The operation was successful.
 **/
 EFI_STATUS
-EFIAPI
 InternalShellStripQuotes (
   IN  CONST CHAR16     *OriginalString,
   OUT CHAR16           **CleanString
