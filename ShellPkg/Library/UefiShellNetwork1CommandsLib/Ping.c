@@ -148,7 +148,6 @@ typedef struct _PING_PRIVATE_DATA {
                        ones complement sum of 16 bit words
 **/
 UINT16
-EFIAPI
 NetChecksum (
   IN UINT8   *Buffer,
   IN UINT32  Length
@@ -231,7 +230,6 @@ EFI_CPU_ARCH_PROTOCOL    *gCpu = NULL;
   @retval the current tick value.
 **/
 UINT64
-EFIAPI
 ReadTime (
   VOID
   )
@@ -263,7 +261,6 @@ ReadTime (
 
 **/
 EFI_STATUS
-EFIAPI
 GetFrequency (
   VOID
   )
@@ -302,7 +299,6 @@ GetFrequency (
   @retval 0             The parameters were not valid.
 **/
 UINT64
-EFIAPI
 CalculateTick (
   IN UINT64    Begin,
   IN UINT64    End
@@ -321,7 +317,6 @@ CalculateTick (
   @param[in]    IpChoice  Whether the token is IPv4 or IPv6
 **/
 VOID
-EFIAPI
 PingDestroyTxInfo (
   IN PING_ICMPX_TX_INFO    *TxInfo,
   IN UINT32                IpChoice
@@ -393,7 +388,6 @@ PingDestroyTxInfo (
 
 **/
 EFI_STATUS
-EFIAPI
 Ping6MatchEchoReply (
   IN PING_PRIVATE_DATA           *Private,
   IN ICMPX_ECHO_REQUEST_REPLY    *Packet
@@ -569,7 +563,6 @@ ON_EXIT:
 
 **/
 PING_IPX_COMPLETION_TOKEN *
-EFIAPI
 PingGenerateToken (
   IN PING_PRIVATE_DATA    *Private,
   IN UINT64                TimeStamp,
@@ -672,7 +665,6 @@ PingGenerateToken (
 
 **/
 EFI_STATUS
-EFIAPI
 PingSendEchoRequest (
   IN PING_PRIVATE_DATA    *Private
   )
@@ -723,7 +715,6 @@ PingSendEchoRequest (
 
 **/
 EFI_STATUS
-EFIAPI
 Ping6ReceiveEchoReply (
   IN PING_PRIVATE_DATA    *Private
   )
@@ -835,7 +826,6 @@ Ping6OnTimerRoutine (
   @retval FALSE     It is not.
 **/
 BOOLEAN
-EFIAPI
 PingNetIp4IsLinkLocalAddr (
   IN CONST EFI_IPv4_ADDRESS *Address
   )
@@ -852,7 +842,6 @@ PingNetIp4IsLinkLocalAddr (
   @retval FALSE     It is not.
 **/
 BOOLEAN
-EFIAPI
 PingNetIp4IsUnspecifiedAddr (
   IN CONST EFI_IPv4_ADDRESS *Address
   )
@@ -872,7 +861,6 @@ PingNetIp4IsUnspecifiedAddr (
   @retval EFI_NOT_FOUND            The source address is not found.
 **/
 EFI_STATUS
-EFIAPI
 PingCreateIpInstance (
   IN  PING_PRIVATE_DATA    *Private
   )
@@ -1226,7 +1214,6 @@ ON_ERROR:
 
 **/
 VOID
-EFIAPI
 Ping6DestroyIp6Instance (
   IN PING_PRIVATE_DATA    *Private
   )
@@ -1265,7 +1252,6 @@ Ping6DestroyIp6Instance (
   @retval others         The ping processed unsuccessfully.
 **/
 SHELL_STATUS
-EFIAPI
 ShellPing (
   IN UINT32              SendNumber,
   IN UINT32              BufferSize,
