@@ -358,6 +358,7 @@ IScsiStart (
   VOID                            *Interface;
   EFI_GUID                        *ProtocolGuid;
   UINT8                           NetworkBootPolicy;
+  ISCSI_SESSION_CONFIG_NVDATA     *NvData;
 
   //
   // Test to see if iSCSI driver supports the given controller.
@@ -699,6 +700,24 @@ IScsiStart (
       Status = IScsiSessionLogin (Session);
     } else if (Status == EFI_NOT_READY) {
       Status = IScsiSessionReLogin (Session);
+    }
+
+    //
+    // Restore the origial user setting which specifies the proxy/virtual iSCSI target to NV region.
+    //
+    NvData = &AttemptConfigData->SessionConfigData;
+    if (NvData->RedirectFlag) {
+      NvData->TargetPort = NvData->OriginalTargetPort;
+      CopyMem (&NvData->TargetIp, &NvData->OriginalTargetIp, sizeof (EFI_IP_ADDRESS));
+      NvData->RedirectFlag = FALSE;
+
+      gRT->SetVariable (
+             mPrivate->PortString,
+             &gEfiIScsiInitiatorNameProtocolGuid,
+             ISCSI_CONFIG_VAR_ATTR,
+             sizeof (ISCSI_ATTEMPT_CONFIG_NVDATA),
+             AttemptConfigData
+             );
     }
 
     if (EFI_ERROR (Status)) {

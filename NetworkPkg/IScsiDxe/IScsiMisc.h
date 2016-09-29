@@ -50,9 +50,14 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
   UINT8             PrefixLength;
   UINT8             BootLun[8];
 
-  UINT16            ConnectTimeout; ///< timout value in milliseconds
+  UINT16            ConnectTimeout; ///< timout value in milliseconds.
   UINT8             ConnectRetryCount;
   UINT8             IsId[6];
+
+  BOOLEAN           RedirectFlag;
+  UINT16            OriginalTargetPort;     // The port of proxy/virtual target.
+  EFI_IP_ADDRESS    OriginalTargetIp;       // The address of proxy/virtual target.
+  
 } ISCSI_SESSION_CONFIG_NVDATA;
 #pragma pack()
 

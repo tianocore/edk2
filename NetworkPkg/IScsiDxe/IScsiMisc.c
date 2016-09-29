@@ -1188,11 +1188,11 @@ IScsiGetConfigData (
       );
 
     GetVariable2 (
-                 mPrivate->PortString,
-                 &gEfiIScsiInitiatorNameProtocolGuid,
-                 (VOID**)&AttemptConfigData,
-                 NULL
-                 );
+      mPrivate->PortString,
+      &gEfiIScsiInitiatorNameProtocolGuid,
+      (VOID**)&AttemptConfigData,
+      NULL
+      );
 
     if (AttemptConfigData == NULL) {
       continue;
