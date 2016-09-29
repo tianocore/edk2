@@ -92,7 +92,6 @@ IsNextFragment (
   @retval FALSE   String is not a valid profile.
 **/
 BOOLEAN
-EFIAPI
 IsValidProfile (
   IN CONST CHAR16 *String
   )
@@ -121,7 +120,6 @@ IsValidProfile (
   @return     The result of the comparison.
 **/
 BOOLEAN
-EFIAPI
 TestOperation (
   IN CONST CHAR16             *Compare1,
   IN CONST CHAR16             *Compare2,
@@ -351,7 +349,6 @@ TestOperation (
   @retval EFI_SUCCESS             The operation was successful.                                  
 **/
 EFI_STATUS
-EFIAPI
 ProcessStatement (
   IN OUT BOOLEAN          *PassingState,
   IN UINTN                StartParameterNumber,
@@ -661,7 +658,6 @@ ProcessStatement (
   @retval FALSE   A valid statement was not found.
 **/
 BOOLEAN
-EFIAPI
 BuildNextStatement (
   IN UINTN          ParameterNumber,
   OUT UINTN         *EndParameter,
@@ -713,7 +709,6 @@ BuildNextStatement (
   @retval FALSE    Something went wrong.
 **/
 BOOLEAN
-EFIAPI
 MoveToTagSpecial (
   IN SCRIPT_FILE                *ScriptFile
   )
@@ -804,7 +799,6 @@ MoveToTagSpecial (
   @retval EFI_NOT_FOUND     The ending tag could not be found.
 **/
 EFI_STATUS
-EFIAPI
 PerformResultOperation (
   IN CONST BOOLEAN Result
   )

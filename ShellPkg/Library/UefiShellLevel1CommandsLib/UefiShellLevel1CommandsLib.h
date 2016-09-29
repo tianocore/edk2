@@ -195,7 +195,6 @@ LIST_ENTRY *
                                searching.
 **/
 BOOLEAN
-EFIAPI
 MoveToTag (
   IN CONST LIST_MANIP_FUNC      Function,
   IN CONST CHAR16               *DecrementerTag,
