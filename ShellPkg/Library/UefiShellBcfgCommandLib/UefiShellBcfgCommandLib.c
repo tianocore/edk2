@@ -89,7 +89,6 @@ typedef struct {
   @retval other             A error occured.
 **/
 EFI_STATUS
-EFIAPI
 UpdateOptionalData(
   UINT16                          Index, 
   UINTN                           DataSize, 
@@ -175,7 +174,6 @@ UpdateOptionalData(
   @retval other                 A error occured.
 **/
 EFI_STATUS
-EFIAPI
 GetBootOptionCrc(
   UINT32      *Crc, 
   UINT16      BootIndex
@@ -232,7 +230,6 @@ GetBootOptionCrc(
   @sa HandleProtocol
 **/
 EFI_STATUS
-EFIAPI
 GetDevicePathForDriverHandle (
   IN EFI_HANDLE                   TheHandle,
   IN OUT EFI_DEVICE_PATH_PROTOCOL **FilePath
@@ -295,7 +292,6 @@ GetDevicePathForDriverHandle (
   @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
 **/
 SHELL_STATUS
-EFIAPI
 BcfgAdd(
   IN       UINTN                  Position,
   IN CONST CHAR16                 *File,
@@ -619,7 +615,6 @@ BcfgAdd(
   @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
 **/
 SHELL_STATUS
-EFIAPI
 BcfgRemove(
   IN CONST BCFG_OPERATION_TARGET  Target,
   IN CONST UINT16                 *CurrentOrder,
@@ -680,7 +675,6 @@ BcfgRemove(
   @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
 **/
 SHELL_STATUS
-EFIAPI
 BcfgMove(
   IN CONST BCFG_OPERATION_TARGET  Target,
   IN CONST UINT16                 *CurrentOrder,
@@ -741,7 +735,6 @@ BcfgMove(
   @retval SHELL_SUCCESS   The operation was succesful.
 **/
 SHELL_STATUS
-EFIAPI
 BcfgAddOpt(
   IN CONST CHAR16                 *OptData,
   IN CONST UINT16                 *CurrentOrder,
@@ -1028,7 +1021,6 @@ BcfgAddOpt(
   @retval SHELL_INVALID_PARAMETER A parameter was invalid.
 **/
 SHELL_STATUS
-EFIAPI
 BcfgDisplayDump(
   IN CONST CHAR16   *Op,
   IN CONST UINTN    OrderCount,
@@ -1153,7 +1145,6 @@ Cleanup:
   @param[in] Struct   The stuct to initialize.
 **/
 VOID
-EFIAPI
 InitBcfgStruct(
   IN BGFG_OPERATION *Struct
   )
