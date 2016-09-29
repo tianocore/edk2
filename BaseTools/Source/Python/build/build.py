@@ -265,10 +265,10 @@ def LaunchCommand(Command, WorkingDir):
     # It could be a string or sequence. We find that if command is a string in following Popen(),
     # ubuntu may fail with an error message that the command is not found.
     # So here we may need convert command from string to list instance.
-    if not isinstance(Command, list):
-        if platform.system() != 'Windows':
+    if platform.system() != 'Windows':
+        if not isinstance(Command, list):
             Command = Command.split()
-            Command = ' '.join(Command)
+        Command = ' '.join(Command)
 
     Proc = None
     EndOfProcedure = None
