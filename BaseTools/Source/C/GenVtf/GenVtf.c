@@ -796,6 +796,7 @@ Returns:
 
   TmpFitPtr         = (FIT_TABLE *) RelativeAddress;
   NumFitComponents  = TmpFitPtr->CompSize;
+  *FitPtr           = NULL;
 
   for (Index = 0; Index < NumFitComponents; Index++) {
     if ((TmpFitPtr->CvAndType & FIT_TYPE_MASK) == COMP_TYPE_FIT_UNUSED) {
