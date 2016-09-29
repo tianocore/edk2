@@ -1,7 +1,7 @@
 /** @file
   Functions to deal with Disk buffer.
 
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -343,6 +343,7 @@ HDiskImageSave (
 
   CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   EFI_DEVICE_PATH_PROTOCOL        *DupDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL        *DupDevicePathForFree;
   EFI_BLOCK_IO_PROTOCOL           *BlkIo;
   EFI_STATUS                      Status;
   EFI_HANDLE                      Handle;
@@ -364,12 +365,13 @@ HDiskImageSave (
     return EFI_INVALID_PARAMETER;
   }
   DupDevicePath = DuplicateDevicePath(DevicePath);
+  DupDevicePathForFree = DupDevicePath;
 
   //
   // get blkio interface
   //
   Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid,&DupDevicePath,&Handle);
-  FreePool(DupDevicePath);
+  FreePool(DupDevicePathForFree);
   if (EFI_ERROR (Status)) {
 //    StatusBarSetStatusString (L"Read Disk Failed");
     return Status;
