@@ -66,6 +66,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct {
   UINTN                           CapsuleStartLBA;
   UINTN                           CapsuleSize;
+  UINTN                           CapsuleBlockAlignedSize;
   UINTN                           IndexBlock;
   EFI_PEI_RECOVERY_BLOCK_IO_PPI   *BlockIo;
   EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *BlockIo2;

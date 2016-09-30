@@ -1,7 +1,7 @@
 /** @file
   Source file for CD recovery PEIM
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -477,13 +477,14 @@ RetrieveCapsuleFileFromRoot (
     }
 
     PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleStartLBA = FileRecord->LocationOfExtent[0];
-    PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleSize =
+    PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleBlockAlignedSize =
       (
         FileRecord->DataLength[0] /
         PEI_CD_BLOCK_SIZE +
         1
       ) *
       PEI_CD_BLOCK_SIZE;
+    PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleSize = FileRecord->DataLength[0];
 
     return EFI_SUCCESS;
   }
@@ -659,7 +660,7 @@ LoadRecoveryCapsule (
                           BlockIo2Ppi,
                           PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
                           PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,
-                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleSize,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleBlockAlignedSize,
                           Buffer
                           );
   } else {
@@ -668,7 +669,7 @@ LoadRecoveryCapsule (
                           BlockIoPpi,
                           PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
                           PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,
-                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleSize,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleBlockAlignedSize,
                           Buffer
                           );
   }
