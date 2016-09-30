@@ -361,6 +361,10 @@ HiiGetImageInfo (
   // Find the image block specified by ImageId
   //
   CurrentImageBlock = GetImageIdOrAddress (ImagePackage->ImageBlock, &ImageId);
+  if (CurrentImageBlock == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   switch (CurrentImageBlock->BlockType) {
   case EFI_HII_IIBT_IMAGE_JPEG:
   case EFI_HII_IIBT_IMAGE_PNG:
