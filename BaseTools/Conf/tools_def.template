@@ -4335,6 +4335,7 @@ NOOPT_DDK3790xASL_IPF_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT:REF
 *_*_*_SYMRENAME_FLAGS           = Symbol renaming not needed for
 DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
 RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
+NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
 
 DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common
 DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe
@@ -4371,7 +4372,7 @@ DEFINE GCC_AARCH64_RC_FLAGS        = -I binary -O elf64-littleaarch64 -B aarch64
 
 DEFINE GCC44_ALL_CC_FLAGS            = -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 DEFINE GCC44_IA32_CC_FLAGS           = DEF(GCC44_ALL_CC_FLAGS) -m32 -march=i586 -malign-double -fno-stack-protector -D EFI32 -fno-asynchronous-unwind-tables
-DEFINE GCC44_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -Os -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables
+DEFINE GCC44_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables
 DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x20
 DEFINE GCC44_IA32_X64_ASLDLINK_FLAGS = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE GCC44_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
@@ -4472,13 +4473,13 @@ DEFINE GCC49_AARCH64_DLINK2_FLAGS    = DEF(GCC48_AARCH64_DLINK2_FLAGS)
 DEFINE GCC49_ARM_ASLDLINK_FLAGS      = DEF(GCC48_ARM_ASLDLINK_FLAGS)
 DEFINE GCC49_AARCH64_ASLDLINK_FLAGS  = DEF(GCC48_AARCH64_ASLDLINK_FLAGS)
 
-DEFINE GCC5_IA32_CC_FLAGS            = DEF(GCC49_IA32_CC_FLAGS) -flto -fno-builtin
-DEFINE GCC5_X64_CC_FLAGS             = DEF(GCC49_X64_CC_FLAGS) -flto -fno-builtin -DUSING_LTO
+DEFINE GCC5_IA32_CC_FLAGS            = DEF(GCC49_IA32_CC_FLAGS) -fno-builtin
+DEFINE GCC5_X64_CC_FLAGS             = DEF(GCC49_X64_CC_FLAGS) -fno-builtin
 DEFINE GCC5_IA32_X64_DLINK_COMMON    = DEF(GCC49_IA32_X64_DLINK_COMMON)
 DEFINE GCC5_IA32_X64_ASLDLINK_FLAGS  = DEF(GCC49_IA32_X64_ASLDLINK_FLAGS)
-DEFINE GCC5_IA32_X64_DLINK_FLAGS     = DEF(GCC49_IA32_X64_DLINK_FLAGS) -flto
+DEFINE GCC5_IA32_X64_DLINK_FLAGS     = DEF(GCC49_IA32_X64_DLINK_FLAGS)
 DEFINE GCC5_IA32_DLINK2_FLAGS        = DEF(GCC49_IA32_DLINK2_FLAGS) -Wno-error
-DEFINE GCC5_X64_DLINK_FLAGS          = DEF(GCC49_X64_DLINK_FLAGS) -flto
+DEFINE GCC5_X64_DLINK_FLAGS          = DEF(GCC49_X64_DLINK_FLAGS)
 DEFINE GCC5_X64_DLINK2_FLAGS         = DEF(GCC49_X64_DLINK2_FLAGS) -Wno-error
 DEFINE GCC5_ASM_FLAGS                = DEF(GCC49_ASM_FLAGS)
 DEFINE GCC5_ARM_ASM_FLAGS            = DEF(GCC49_ARM_ASM_FLAGS)
@@ -4621,12 +4622,15 @@ DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 *_GCC44_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32
 *_GCC44_IA32_ASLDLINK_FLAGS       = DEF(GCC44_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386
 *_GCC44_IA32_ASM_FLAGS            = DEF(GCC44_ASM_FLAGS) -m32 --32 -march=i386
-*_GCC44_IA32_CC_FLAGS             = DEF(GCC44_IA32_CC_FLAGS) -Os
 *_GCC44_IA32_DLINK_FLAGS          = DEF(GCC44_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC44_IA32_DLINK2_FLAGS         = DEF(GCC44_IA32_DLINK2_FLAGS)
 *_GCC44_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_GCC44_IA32_OBJCOPY_FLAGS        = 
 *_GCC44_IA32_NASM_FLAGS           = -f elf32
+
+  DEBUG_GCC44_IA32_CC_FLAGS       = DEF(GCC44_IA32_CC_FLAGS) -Os
+RELEASE_GCC44_IA32_CC_FLAGS       = DEF(GCC44_IA32_CC_FLAGS) -Os
+  NOOPT_GCC44_IA32_CC_FLAGS       = DEF(GCC44_IA32_CC_FLAGS) -O0
 
 ##################
 # GCC44 X64 definitions
@@ -4646,12 +4650,15 @@ DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 *_GCC44_X64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64
 *_GCC44_X64_ASLDLINK_FLAGS       = DEF(GCC44_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_x86_64
 *_GCC44_X64_ASM_FLAGS            = DEF(GCC44_ASM_FLAGS) -m64 --64 -melf_x86_64
-*_GCC44_X64_CC_FLAGS             = DEF(GCC44_X64_CC_FLAGS)
 *_GCC44_X64_DLINK_FLAGS          = DEF(GCC44_X64_DLINK_FLAGS)
 *_GCC44_X64_DLINK2_FLAGS         = DEF(GCC44_X64_DLINK2_FLAGS)
 *_GCC44_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
 *_GCC44_X64_OBJCOPY_FLAGS        = 
 *_GCC44_X64_NASM_FLAGS           = -f elf64
+
+  DEBUG_GCC44_X64_CC_FLAGS       = DEF(GCC44_X64_CC_FLAGS) -Os
+RELEASE_GCC44_X64_CC_FLAGS       = DEF(GCC44_X64_CC_FLAGS) -Os
+  NOOPT_GCC44_X64_CC_FLAGS       = DEF(GCC44_X64_CC_FLAGS) -O0
 
 ####################################################################################
 #
@@ -4691,12 +4698,15 @@ DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 *_GCC45_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32
 *_GCC45_IA32_ASLDLINK_FLAGS       = DEF(GCC45_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386
 *_GCC45_IA32_ASM_FLAGS            = DEF(GCC45_ASM_FLAGS) -m32 --32 -march=i386
-*_GCC45_IA32_CC_FLAGS             = DEF(GCC45_IA32_CC_FLAGS) -Os
 *_GCC45_IA32_DLINK_FLAGS          = DEF(GCC45_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC45_IA32_DLINK2_FLAGS         = DEF(GCC45_IA32_DLINK2_FLAGS)
 *_GCC45_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_GCC45_IA32_OBJCOPY_FLAGS        = 
 *_GCC45_IA32_NASM_FLAGS           = -f elf32
+
+  DEBUG_GCC45_IA32_CC_FLAGS       = DEF(GCC45_IA32_CC_FLAGS) -Os
+RELEASE_GCC45_IA32_CC_FLAGS       = DEF(GCC45_IA32_CC_FLAGS) -Os
+  NOOPT_GCC45_IA32_CC_FLAGS       = DEF(GCC45_IA32_CC_FLAGS) -O0
 
 ##################
 # GCC45 X64 definitions
@@ -4716,12 +4726,15 @@ DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 *_GCC45_X64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64
 *_GCC45_X64_ASLDLINK_FLAGS       = DEF(GCC45_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_x86_64
 *_GCC45_X64_ASM_FLAGS            = DEF(GCC45_ASM_FLAGS) -m64 --64 -melf_x86_64
-*_GCC45_X64_CC_FLAGS             = DEF(GCC45_X64_CC_FLAGS)
 *_GCC45_X64_DLINK_FLAGS          = DEF(GCC45_X64_DLINK_FLAGS)
 *_GCC45_X64_DLINK2_FLAGS         = DEF(GCC45_X64_DLINK2_FLAGS)
 *_GCC45_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
 *_GCC45_X64_OBJCOPY_FLAGS        = 
 *_GCC45_X64_NASM_FLAGS           = -f elf64
+
+  DEBUG_GCC45_X64_CC_FLAGS       = DEF(GCC45_X64_CC_FLAGS) -Os
+RELEASE_GCC45_X64_CC_FLAGS       = DEF(GCC45_X64_CC_FLAGS) -Os
+  NOOPT_GCC45_X64_CC_FLAGS       = DEF(GCC45_X64_CC_FLAGS) -O0
 
 ####################################################################################
 #
@@ -4769,6 +4782,7 @@ DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 
   DEBUG_GCC46_IA32_CC_FLAGS       = DEF(GCC46_IA32_CC_FLAGS) -Os
 RELEASE_GCC46_IA32_CC_FLAGS       = DEF(GCC46_IA32_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC46_IA32_CC_FLAGS       = DEF(GCC46_IA32_CC_FLAGS) -O0
 
 ##################
 # GCC46 X64 definitions
@@ -4794,8 +4808,9 @@ RELEASE_GCC46_IA32_CC_FLAGS       = DEF(GCC46_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC46_X64_OBJCOPY_FLAGS        = 
 *_GCC46_X64_NASM_FLAGS           = -f elf64
 
-  DEBUG_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS)
-RELEASE_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS) -Wno-unused-but-set-variable
+  DEBUG_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS) -Os
+RELEASE_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS) -O0
 
 ##################
 # GCC46 ARM definitions
@@ -4828,6 +4843,7 @@ RELEASE_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC46_ARM_CC_FLAGS       = DEF(GCC46_ARM_CC_FLAGS) -O0
 RELEASE_GCC46_ARM_CC_FLAGS       = DEF(GCC46_ARM_CC_FLAGS) -Wno-unused-but-set-variable
+  NOOPT_GCC46_ARM_CC_FLAGS       = DEF(GCC46_ARM_CC_FLAGS) -O0
 
 ####################################################################################
 #
@@ -4875,6 +4891,7 @@ RELEASE_GCC46_ARM_CC_FLAGS       = DEF(GCC46_ARM_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC47_IA32_CC_FLAGS       = DEF(GCC47_IA32_CC_FLAGS) -Os
 RELEASE_GCC47_IA32_CC_FLAGS       = DEF(GCC47_IA32_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC47_IA32_CC_FLAGS       = DEF(GCC47_IA32_CC_FLAGS) -O0
 
 ##################
 # GCC47 X64 definitions
@@ -4900,8 +4917,9 @@ RELEASE_GCC47_IA32_CC_FLAGS       = DEF(GCC47_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC47_X64_OBJCOPY_FLAGS        = 
 *_GCC47_X64_NASM_FLAGS           = -f elf64
 
-  DEBUG_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS)
-RELEASE_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS) -Wno-unused-but-set-variable
+  DEBUG_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS) -Os
+RELEASE_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS) -O0
 
 ##################
 # GCC47 ARM definitions
@@ -4933,6 +4951,7 @@ RELEASE_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC47_ARM_CC_FLAGS       = DEF(GCC47_ARM_CC_FLAGS) -O0
 RELEASE_GCC47_ARM_CC_FLAGS       = DEF(GCC47_ARM_CC_FLAGS) -Wno-unused-but-set-variable
+  NOOPT_GCC47_ARM_CC_FLAGS       = DEF(GCC47_ARM_CC_FLAGS) -O0
 
 ##################
 # GCC47 AARCH64 definitions
@@ -4961,6 +4980,7 @@ RELEASE_GCC47_ARM_CC_FLAGS       = DEF(GCC47_ARM_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -O0
 RELEASE_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable -fomit-frame-pointer
+  NOOPT_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -O0
 
 ####################################################################################
 #
@@ -5008,6 +5028,7 @@ RELEASE_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -Wno-unused-but-s
 
   DEBUG_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os
 RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -O0
 
 ##################
 # GCC48 X64 definitions
@@ -5033,8 +5054,9 @@ RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC48_X64_OBJCOPY_FLAGS        = 
 *_GCC48_X64_NASM_FLAGS           = -f elf64
 
-  DEBUG_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS)
-RELEASE_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Wno-unused-but-set-variable
+  DEBUG_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Os
+RELEASE_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -O0
 
 ##################
 # GCC48 ARM definitions
@@ -5066,6 +5088,7 @@ RELEASE_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC48_ARM_CC_FLAGS       = DEF(GCC48_ARM_CC_FLAGS) -O0
 RELEASE_GCC48_ARM_CC_FLAGS       = DEF(GCC48_ARM_CC_FLAGS) -Wno-unused-but-set-variable
+  NOOPT_GCC48_ARM_CC_FLAGS       = DEF(GCC48_ARM_CC_FLAGS) -O0
 
 ##################
 # GCC48 AARCH64 definitions
@@ -5094,6 +5117,7 @@ RELEASE_GCC48_ARM_CC_FLAGS       = DEF(GCC48_ARM_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -O0
 RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable -fomit-frame-pointer
+  NOOPT_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -O0
 
 ####################################################################################
 #
@@ -5141,6 +5165,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 
   DEBUG_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os
 RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -O0
 
 ##################
 # GCC49 X64 definitions
@@ -5166,8 +5191,9 @@ RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC49_X64_OBJCOPY_FLAGS        = 
 *_GCC49_X64_NASM_FLAGS           = -f elf64
 
-  DEBUG_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS)
-RELEASE_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Wno-unused-but-set-variable
+  DEBUG_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Os
+RELEASE_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  NOOPT_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -O0
 
 ##################
 # GCC49 ARM definitions
@@ -5199,6 +5225,7 @@ RELEASE_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Wno-unused-but-set-v
 
   DEBUG_GCC49_ARM_CC_FLAGS       = DEF(GCC49_ARM_CC_FLAGS) -O0
 RELEASE_GCC49_ARM_CC_FLAGS       = DEF(GCC49_ARM_CC_FLAGS) -Wno-unused-but-set-variable
+  NOOPT_GCC49_ARM_CC_FLAGS       = DEF(GCC49_ARM_CC_FLAGS) -O0
 
 ##################
 # GCC49 AARCH64 definitions
@@ -5230,6 +5257,10 @@ RELEASE_GCC49_ARM_CC_FLAGS       = DEF(GCC49_ARM_CC_FLAGS) -Wno-unused-but-set-v
 
 RELEASE_GCC49_AARCH64_CC_FLAGS     = DEF(GCC49_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable -mcmodel=tiny -fomit-frame-pointer
 RELEASE_GCC49_AARCH64_DLINK_FLAGS  = DEF(GCC49_AARCH64_DLINK_FLAGS)
+
+  NOOPT_GCC49_AARCH64_CC_FLAGS     = DEF(GCC49_AARCH64_CC_FLAGS) -O0 -mcmodel=small
+  NOOPT_GCC49_AARCH64_DLINK_FLAGS  = DEF(GCC49_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000 -O0
+  NOOPT_GCC49_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20 -O0
 
 ####################################################################################
 #
@@ -5269,14 +5300,19 @@ RELEASE_GCC49_AARCH64_DLINK_FLAGS  = DEF(GCC49_AARCH64_DLINK_FLAGS)
 *_GCC5_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32 -fno-lto
 *_GCC5_IA32_ASLDLINK_FLAGS       = DEF(GCC5_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386
 *_GCC5_IA32_ASM_FLAGS            = DEF(GCC5_ASM_FLAGS) -m32 -march=i386
-*_GCC5_IA32_DLINK_FLAGS          = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Os -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC5_IA32_DLINK2_FLAGS         = DEF(GCC5_IA32_DLINK2_FLAGS)
 *_GCC5_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_GCC5_IA32_OBJCOPY_FLAGS        =
 *_GCC5_IA32_NASM_FLAGS           = -f elf32
 
-  DEBUG_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -Os
-RELEASE_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -Os -Wno-unused-but-set-variable
+  DEBUG_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Os
+  DEBUG_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
+
+RELEASE_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Os -Wno-unused-but-set-variable
+RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
+
+  NOOPT_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -O0
+  NOOPT_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386 -O0
 
 ##################
 # GCC5 X64 definitions
@@ -5296,14 +5332,19 @@ RELEASE_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -Os -Wno-unused-but-s
 *_GCC5_X64_ASLCC_FLAGS           = DEF(GCC_ASLCC_FLAGS) -m64 -fno-lto
 *_GCC5_X64_ASLDLINK_FLAGS        = DEF(GCC5_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_x86_64
 *_GCC5_X64_ASM_FLAGS             = DEF(GCC5_ASM_FLAGS) -m64
-*_GCC5_X64_DLINK_FLAGS           = DEF(GCC5_X64_DLINK_FLAGS) -Os
 *_GCC5_X64_DLINK2_FLAGS          = DEF(GCC5_X64_DLINK2_FLAGS)
 *_GCC5_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
 *_GCC5_X64_OBJCOPY_FLAGS         =
 *_GCC5_X64_NASM_FLAGS            = -f elf64
 
-  DEBUG_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS)
-RELEASE_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -Wno-unused-but-set-variable
+  DEBUG_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -Os
+  DEBUG_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
+
+RELEASE_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -Os -Wno-unused-but-set-variable
+RELEASE_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
+
+  NOOPT_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -O0
+  NOOPT_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -O0
 
 ##################
 # GCC5 ARM definitions
@@ -5336,6 +5377,9 @@ RELEASE_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -Wno-unused-but-set-va
 RELEASE_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable
 RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
+  NOOPT_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -O0
+  NOOPT_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -O0
+
 ##################
 # GCC5 AARCH64 definitions
 ##################
@@ -5366,6 +5410,10 @@ RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKS
 
 RELEASE_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -mcmodel=tiny -fomit-frame-pointer
 RELEASE_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64
+
+  NOOPT_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0 -mcmodel=small
+  NOOPT_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000 -O0
+  NOOPT_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20 -O0
 
 ####################################################################################
 #
@@ -5488,7 +5536,7 @@ DEFINE CLANG38_ALL_CC_FLAGS         = DEF(GCC44_ALL_CC_FLAGS) -Wno-empty-body -f
 *_CLANG38_IA32_ASM_FLAGS            = DEF(GCC5_ASM_FLAGS) -m32 -march=i386 DEF(CLANG38_IA32_TARGET)
 DEBUG_CLANG38_IA32_CC_FLAGS         = DEF(CLANG38_ALL_CC_FLAGS) -m32 -Oz -flto -march=i586 DEF(CLANG38_IA32_TARGET) -g
 RELEASE_CLANG38_IA32_CC_FLAGS       = DEF(CLANG38_ALL_CC_FLAGS) -m32 -Oz -flto -march=i586 DEF(CLANG38_IA32_TARGET)
-*_CLANG38_IA32_DLINK_FLAGS          = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-Oz -Wl,-melf_i386 -Wl,--oformat=elf32-i386
+*_CLANG38_IA32_DLINK_FLAGS          = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Wl,-Oz -Wl,-melf_i386 -Wl,--oformat=elf32-i386
 *_CLANG38_IA32_DLINK2_FLAGS         = DEF(GCC5_IA32_DLINK2_FLAGS) -O3
 *_CLANG38_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_CLANG38_IA32_OBJCOPY_FLAGS        =
@@ -5517,7 +5565,7 @@ RELEASE_CLANG38_IA32_CC_FLAGS       = DEF(CLANG38_ALL_CC_FLAGS) -m32 -Oz -flto -
 *_CLANG38_X64_ASM_FLAGS            = DEF(GCC5_ASM_FLAGS) -m64 DEF(CLANG38_X64_TARGET)
 DEBUG_CLANG38_X64_CC_FLAGS         = DEF(CLANG38_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -Oz -flto DEF(CLANG38_X64_TARGET) -g
 RELEASE_CLANG38_X64_CC_FLAGS       = DEF(CLANG38_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -Oz -flto DEF(CLANG38_X64_TARGET)
-*_CLANG38_X64_DLINK_FLAGS          = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-Oz -Wl,-melf_x86_64 -Wl,--oformat=elf64-x86-64 -Wl,-pie -mcmodel=small
+*_CLANG38_X64_DLINK_FLAGS          = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Wl,-Oz -Wl,-melf_x86_64 -Wl,--oformat=elf64-x86-64 -Wl,-pie -mcmodel=small
 *_CLANG38_X64_DLINK2_FLAGS         = DEF(GCC5_X64_DLINK2_FLAGS) -O3
 *_CLANG38_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
 *_CLANG38_X64_OBJCOPY_FLAGS        =
