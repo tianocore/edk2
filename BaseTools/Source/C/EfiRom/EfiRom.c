@@ -176,9 +176,6 @@ Returns:
 
 BailOut:
   if (Status == STATUS_SUCCESS) {
-    if (FptrOut != NULL) {
-      fclose (FptrOut);
-    }
     //
     // Clean up our file list
     //
@@ -187,6 +184,10 @@ BailOut:
       free (mOptions.FileList);
       mOptions.FileList = FList;
     }
+  }
+
+  if (FptrOut != NULL) {
+    fclose (FptrOut);
   }
 
   if (mOptions.Verbose) {
