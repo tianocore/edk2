@@ -3,6 +3,7 @@
   by IBV/OEM.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -116,6 +117,13 @@ PlatformBootManagerBeforeConsole (
       EfiBootManagerUpdateConsoleVariable (ErrOut, gPlatformConsole[Index].DevicePath, NULL);
     }
   }
+
+  //
+  // From PI spec vol2:
+  // Prior to invoking any UEFI drivers, applications, or connecting consoles, 
+  // the platform should signal the event EFI_END_OF_DXE_EVENT_GUID
+  //
+  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 }
 
 /**
