@@ -554,7 +554,6 @@ InstallEfiMemory (
   UINT64                                PeiMemoryLength;
   UINTN                                 BufferSize;
   UINTN                                 PeiMemoryIndex;
-  UINTN                                 RequiredMemSize;
   EFI_RESOURCE_ATTRIBUTE_TYPE           Attribute;
   EFI_PHYSICAL_ADDRESS                  BadMemoryAddress;
   EFI_SMRAM_DESCRIPTOR                  DescriptorAcpiVariable;
@@ -612,12 +611,6 @@ InstallEfiMemory (
              &PeiMemoryLength
              );
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Get required memory size for ACPI use. This helps to put ACPI memory on the topest
-  //
-  RequiredMemSize = 0;
-  RetriveRequiredMemorySize (PeiServices, &RequiredMemSize);
 
   //
   // Detect MOR request by the OS.
@@ -735,15 +728,14 @@ InstallEfiMemory (
   //
   Status = SetPlatformImrPolicy (
               PeiMemoryBaseAddress,
-              PeiMemoryLength,
-              RequiredMemSize
+              PeiMemoryLength
               );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Carve out the top memory reserved for ACPI
   //
-  Status        = PeiServicesInstallPeiMemory (PeiMemoryBaseAddress, (PeiMemoryLength - RequiredMemSize));
+  Status        = PeiServicesInstallPeiMemory (PeiMemoryBaseAddress, PeiMemoryLength);
   ASSERT_EFI_ERROR (Status);
 
   BuildResourceDescriptorHob (
@@ -1071,69 +1063,6 @@ InstallS3Memory (
   }
 
   return EFI_SUCCESS;
-}
-
-/**
-
-  This function returns the size, in bytes, required for the DXE phase.
-
-  @param  PeiServices    PEI Services table.
-  @param  Size           Pointer to the size, in bytes, required for the DXE phase.
-
-  @return  None
-
-**/
-VOID
-RetriveRequiredMemorySize (
-  IN      EFI_PEI_SERVICES                  **PeiServices,
-  OUT     UINTN                             *Size
-  )
-{
-  EFI_PEI_HOB_POINTERS           Hob;
-  EFI_MEMORY_TYPE_INFORMATION    *MemoryData;
-  UINT8                          Index;
-  UINTN                          TempPageNum;
-
-  MemoryData  = NULL;
-  TempPageNum = 0;
-  Index       = 0;
-
-  PeiServicesGetHobList ((VOID **)&Hob.Raw);
-  while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION &&
-        CompareGuid (&Hob.Guid->Name, &gEfiMemoryTypeInformationGuid)
-          ) {
-      MemoryData = (EFI_MEMORY_TYPE_INFORMATION *) (Hob.Raw + sizeof (EFI_HOB_GENERIC_HEADER) + sizeof (EFI_GUID));
-      break;
-    }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-  }
-  //
-  // Platform PEIM should supply such a information. Generic PEIM doesn't assume any default value
-  //
-  if (!MemoryData) {
-    return ;
-  }
-
-  while (MemoryData[Index].Type != EfiMaxMemoryType) {
-    //
-    // Accumulate default memory size requirements
-    //
-    TempPageNum += MemoryData[Index].NumberOfPages;
-    Index++;
-  }
-
-  if (TempPageNum == 0) {
-    return ;
-  }
-
-  //
-  // Add additional pages used by DXE memory manager
-  //
-  (*Size) = (TempPageNum + EDKII_DXE_MEM_SIZE_PAGES) * EFI_PAGE_SIZE;
-
-  return ;
 }
 
 /**
@@ -1481,7 +1410,6 @@ Done:
 
   @param  PeiMemoryBaseAddress  Base address of memory allocated for PEI.
   @param  PeiMemoryLength       Length in bytes of the PEI memory (includes ACPI memory).
-  @param  RequiredMemSize       Size in bytes of the ACPI/Runtime memory
 
   @return EFI_SUCCESS           The function completed successfully.
           EFI_ACCESS_DENIED     Access to IMRs failed.
@@ -1490,8 +1418,7 @@ Done:
 EFI_STATUS
 SetPlatformImrPolicy (
   IN      EFI_PHYSICAL_ADDRESS    PeiMemoryBaseAddress,
-  IN      UINT64                  PeiMemoryLength,
-  IN      UINTN                   RequiredMemSize
+  IN      UINT64                  PeiMemoryLength
   )
 {
   UINT8         Index;
@@ -1515,17 +1442,6 @@ SetPlatformImrPolicy (
   }
 
   //
-  // Add IMR0 protection for the 'PeiMemory'
-  //
-  QncImrWrite (
-            QUARK_NC_MEMORY_MANAGER_IMR0,
-            (UINT32)(((RShiftU64(PeiMemoryBaseAddress, 8)) & IMRL_MASK) | IMR_EN),
-            (UINT32)((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength-RequiredMemSize + EFI_PAGES_TO_SIZE(EDKII_DXE_MEM_SIZE_PAGES-1) - 1), 8)) & IMRL_MASK),
-            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-        );
-
-  //
   // Add IMR2 protection for shadowed RMU binary.
   //
   QncImrWrite (
@@ -1543,28 +1459,6 @@ SetPlatformImrPolicy (
             QUARK_NC_MEMORY_MANAGER_IMR3,
             (UINT32)(((RShiftU64((SMM_DEFAULT_SMBASE), 8)) & IMRL_MASK) | IMR_EN),
             (UINT32)((RShiftU64((SMM_DEFAULT_SMBASE+SMM_DEFAULT_SMBASE_SIZE_BYTES-1), 8)) & IMRH_MASK),
-            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-        );
-
-  //
-  // Add IMR5 protection for the legacy S3 and AP Startup Vector region (below 1MB).
-  //
-  QncImrWrite (
-            QUARK_NC_MEMORY_MANAGER_IMR5,
-            (UINT32)(((RShiftU64(AP_STARTUP_VECTOR, 8)) & IMRL_MASK) | IMR_EN),
-            (UINT32)((RShiftU64((AP_STARTUP_VECTOR + EFI_PAGE_SIZE - 1), 8)) & IMRH_MASK),
-            (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
-            (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
-        );
-
-  //
-  // Add IMR6 protection for the ACPI Reclaim/ACPI/Runtime Services.
-  //
-  QncImrWrite (
-            QUARK_NC_MEMORY_MANAGER_IMR6,
-            (UINT32)(((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength-RequiredMemSize+EFI_PAGES_TO_SIZE(EDKII_DXE_MEM_SIZE_PAGES-1)), 8)) & IMRL_MASK) | IMR_EN),
-            (UINT32)((RShiftU64((PeiMemoryBaseAddress+PeiMemoryLength-EFI_PAGE_SIZE-1), 8)) & IMRH_MASK),
             (UINT32)(CPU_SNOOP + CPU0_NON_SMM),
             (UINT32)(CPU_SNOOP + CPU0_NON_SMM)
         );

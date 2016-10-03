@@ -67,7 +67,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/IntelQNCLib.h>
 #include <Library/PcdLib.h>
 #include <Library/SmbusLib.h>
-#include <Library/RecoveryOemHookLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ResetSystemLib.h>
@@ -81,5 +80,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/I2cLib.h>
 
 #include <Register/Cpuid.h>
+
+#include <Pcal9555.h>
+#include <QNCAccess.h>
 
 #endif

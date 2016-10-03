@@ -200,7 +200,8 @@ SetLanControllerMacAddr (
 **/
 EFI_STATUS
 EarlyPlatformConfigGpioExpanders (
-  IN CONST EFI_PLATFORM_TYPE              PlatformType
+  IN CONST EFI_PLATFORM_TYPE              PlatformType,
+  EFI_BOOT_MODE                           BootMode
   )
 {
   EFI_STATUS              Status;
@@ -266,6 +267,30 @@ EarlyPlatformConfigGpioExpanders (
       GALILEO_GEN2_IOEXP2_7BIT_SLAVE_ADDR,  // IO Expander 2.
       15                                    // P1-7.
       );
+
+    if (BootMode != BOOT_IN_RECOVERY_MODE) {
+      //
+      // Read state of Reset Button - EXP2.P1_7
+      // This GPIO is pulled high when the button is not pressed
+      // This GPIO reads low when button is pressed
+      //
+      if (!PlatformPcal9555GpioGetState (
+             GALILEO_GEN2_IOEXP2_7BIT_SLAVE_ADDR,  // IO Expander 2
+             15                                    // P1-7
+             )) {
+        DEBUG ((EFI_D_INFO, "  Force Recovery mode and reset\n"));
+
+        //
+        // Set 'B_CFG_STICKY_RW_FORCE_RECOVERY' sticky bit so we know we need to do a recovery following warm reset
+        //
+        QNCAltPortWrite (
+          QUARK_SCSS_SOC_UNIT_SB_PORT_ID,
+          QUARK_SCSS_SOC_UNIT_CFG_STICKY_RW,
+          QNCAltPortRead (QUARK_SCSS_SOC_UNIT_SB_PORT_ID, QUARK_SCSS_SOC_UNIT_CFG_STICKY_RW) | B_CFG_STICKY_RW_FORCE_RECOVERY
+          );
+        ResetWarm();
+      }
+    }
   }
 
   //
@@ -393,6 +418,40 @@ EarlyPlatformConfigGpioExpanders (
       &Buffer
       );
     ASSERT_EFI_ERROR (Status);
+
+    if (BootMode != BOOT_IN_RECOVERY_MODE) {
+      //
+      // Read state of RESET_N_SHLD (GPORT5_BIT0)
+      //
+      Buffer[1] = 5;
+      Length = 1;
+      ReadLength = 1;
+      Status = I2cReadMultipleByte (
+                 I2CSlaveAddress,
+                 EfiI2CSevenBitAddrMode,
+                 &Length,
+                 &ReadLength,
+                 &Buffer[1]
+                 );
+      ASSERT_EFI_ERROR (Status);
+
+      //
+      // Return the state of GPORT5_BIT0
+      //
+      if ((Buffer[1] & BIT0) == 0) {
+        DEBUG ((EFI_D_INFO, "  Force Recovery mode and reset\n"));
+
+        //
+        // Set 'B_CFG_STICKY_RW_FORCE_RECOVERY' sticky bit so we know we need to do a recovery following warm reset
+        //
+        QNCAltPortWrite (
+          QUARK_SCSS_SOC_UNIT_SB_PORT_ID,
+          QUARK_SCSS_SOC_UNIT_CFG_STICKY_RW,
+          QNCAltPortRead (QUARK_SCSS_SOC_UNIT_SB_PORT_ID, QUARK_SCSS_SOC_UNIT_CFG_STICKY_RW) | B_CFG_STICKY_RW_FORCE_RECOVERY
+          );
+        ResetWarm();
+      }
+    }
   }
 
   return EFI_SUCCESS;
@@ -514,7 +573,7 @@ PeiInitPlatform (
   //
   //
   DEBUG ((EFI_D_INFO, "EarlyPlatformConfigGpioExpanders ()\n"));
-  EarlyPlatformConfigGpioExpanders (PlatformType);
+  EarlyPlatformConfigGpioExpanders (PlatformType, BootMode);
 
   //
   // Now that all of the pre-permanent memory activities have
@@ -791,8 +850,8 @@ EarlyPlatformInit (
   //
   if (CheckForResetDueToErrors (TRUE)) {
     if(FeaturePcdGet (WaitIfResetDueToError)) {
-      DEBUG ((EFI_D_ERROR, "Press any key to continue.\n"));
-      PlatformDebugPortGetChar8 ();
+      DEBUG ((EFI_D_ERROR, "Wait 10 seconds.\n"));
+      MicroSecondDelay(10000000);
     }
   }
 
