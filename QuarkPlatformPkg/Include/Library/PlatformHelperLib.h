@@ -46,20 +46,6 @@ PlatformFindFvFileRawDataSection (
   );
 
 /**
-  Read 8bit character from debug stream.
-
-  Block until character is read.
-
-  @return 8bit character read from debug stream.
-
-**/
-CHAR8
-EFIAPI
-PlatformDebugPortGetChar8 (
-  VOID
-  );
-
-/**
   Find free spi protect register and write to it to protect a flash region.
 
   @param   DirectValue      Value to directly write to register.

@@ -91,33 +91,6 @@ WriteFirstFreeSpiProtect (
 //
 
 /**
-  Read 8bit character from debug stream.
-
-  Block until character is read.
-
-  @return 8bit character read from debug stream.
-
-**/
-CHAR8
-EFIAPI
-PlatformDebugPortGetChar8 (
-  VOID
-  )
-{
-  CHAR8                             Got;
-
-  do {
-    if (SerialPortPoll ()) {
-      if (SerialPortRead ((UINT8 *) &Got, 1) == 1) {
-        break;
-      }
-    }
-  } while (TRUE);
-
-  return Got;
-}
-
-/**
   Clear SPI Protect registers.
 
   @retval EFI_SUCCESS        SPI protect registers cleared.
