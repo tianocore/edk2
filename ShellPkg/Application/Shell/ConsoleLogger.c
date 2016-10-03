@@ -3,6 +3,7 @@
 
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -91,6 +92,15 @@ ConsoleLoggerInstall(
   gST->ConsoleOutHandle = gImageHandle;
   gST->ConOut           = &(*ConsoleInfo)->OurConOut;
 
+  //
+  // Update the CRC32 in the EFI System Table header
+  //
+  gST->Hdr.CRC32 = 0;
+  gBS->CalculateCrc32 (
+        (UINT8 *)&gST->Hdr,
+        gST->Hdr.HeaderSize,
+        &gST->Hdr.CRC32
+        );
   return (Status);
 }
 
@@ -125,6 +135,16 @@ ConsoleLoggerUninstall(
 
   gST->ConsoleOutHandle = ConsoleInfo->OldConHandle;
   gST->ConOut = ConsoleInfo->OldConOut;
+
+  //
+  // Update the CRC32 in the EFI System Table header
+  //
+  gST->Hdr.CRC32 = 0;
+  gBS->CalculateCrc32 (
+        (UINT8 *)&gST->Hdr,
+        gST->Hdr.HeaderSize,
+        &gST->Hdr.CRC32
+        );
 
   return (gBS->UninstallProtocolInterface(gImageHandle, &gEfiSimpleTextOutProtocolGuid, (VOID*)&ConsoleInfo->OurConOut));
 }
