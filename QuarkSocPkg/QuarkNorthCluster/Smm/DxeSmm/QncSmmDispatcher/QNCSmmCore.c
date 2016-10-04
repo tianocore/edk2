@@ -592,6 +592,7 @@ QNCSmmCoreDispatcher (
   BOOLEAN             ChildWasDispatched;
 
   DATABASE_RECORD     *RecordInDb;
+  DATABASE_RECORD     ActiveRecordInDb;
   LIST_ENTRY          *LinkInDb;
   DATABASE_RECORD     *RecordToExhaust;
   LIST_ENTRY          *LinkToExhaust;
@@ -614,6 +615,16 @@ QNCSmmCoreDispatcher (
   ChildWasDispatched    = FALSE;
 
   //
+  // Mark all child handlers as not processed
+  //
+  LinkInDb = GetFirstNode (&mPrivateData.CallbackDataBase);
+  while (!IsNull (&mPrivateData.CallbackDataBase, LinkInDb)) {
+    RecordInDb = DATABASE_RECORD_FROM_LINK (LinkInDb);
+    RecordInDb->Processed = FALSE;
+    LinkInDb = GetNextNode (&mPrivateData.CallbackDataBase, LinkInDb);
+  }
+
+  //
   // Preserve Index registers
   //
   SaveState ();
@@ -634,6 +645,12 @@ QNCSmmCoreDispatcher (
 
       while ((!IsNull (&mPrivateData.CallbackDataBase, LinkInDb)) && (ResetListSearch == FALSE)) {
         RecordInDb = DATABASE_RECORD_FROM_LINK (LinkInDb);
+        //
+        // Make a copy of the record that contains an active SMI source,
+        // because un-register maybe invoked in callback function and
+        // RecordInDb maybe released
+        //
+        CopyMem (&ActiveRecordInDb, RecordInDb, sizeof (ActiveRecordInDb));
 
         //
         // look for the first active source
@@ -663,6 +680,13 @@ QNCSmmCoreDispatcher (
           //
           while (!IsNull (&mPrivateData.CallbackDataBase, LinkToExhaust)) {
             RecordToExhaust = DATABASE_RECORD_FROM_LINK (LinkToExhaust);
+            LinkToExhaust = GetNextNode (&mPrivateData.CallbackDataBase, LinkToExhaust);
+            if (RecordToExhaust->Processed) {
+              //
+              // Record has already been processed.  Continue with next child handler.
+              //
+              continue;
+            }
 
             if (CompareSources (&RecordToExhaust->SrcDesc, &ActiveSource)) {
               //
@@ -692,6 +716,11 @@ QNCSmmCoreDispatcher (
                 ContextsMatch = TRUE;
               }
 
+              //
+              // Mark this child handler so it will not be processed again
+              //
+              RecordToExhaust->Processed = TRUE;
+
               if (ContextsMatch) {
 
                 if (RecordToExhaust->BufferSize != 0) {
@@ -720,11 +749,13 @@ QNCSmmCoreDispatcher (
                   SxChildWasDispatched = TRUE;
                 }
               }
+              //
+              // Can not use RecordInDb after this point because Callback may have unregistered RecordInDb
+              // Restart processing of SMI handlers from the begining of the linked list because the
+              // state of the linked listed may have been modified due to unregister actions in the Callback.
+              //
+              LinkToExhaust = GetFirstNode (&mPrivateData.CallbackDataBase);
             }
-            //
-            // Get next record in DB
-            //
-            LinkToExhaust = GetNextNode (&mPrivateData.CallbackDataBase, &RecordToExhaust->Link);
           }
 
           if (RecordInDb->ClearSource == NULL) {
@@ -736,7 +767,7 @@ QNCSmmCoreDispatcher (
             //
             // This source requires special handling to clear
             //
-            RecordInDb->ClearSource (&ActiveSource);
+            ActiveRecordInDb.ClearSource (&ActiveSource);
           }
 
           if (ChildWasDispatched) {

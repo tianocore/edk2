@@ -387,6 +387,8 @@ struct _DATABASE_RECORD {
   UINT32                Signature;
   LIST_ENTRY            Link;
 
+  BOOLEAN               Processed;
+
   //
   // Status and Enable bit description
   //
