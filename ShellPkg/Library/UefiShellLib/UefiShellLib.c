@@ -292,18 +292,12 @@ ShellLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
-
   mEfiShellEnvironment2       = NULL;
   gEfiShellProtocol           = NULL;
   gEfiShellParametersProtocol = NULL;
   mEfiShellInterface          = NULL;
   mEfiShellEnvironment2Handle = NULL;
-
-  if (mUnicodeCollationProtocol == NULL) {
-    Status = gBS->LocateProtocol (&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&mUnicodeCollationProtocol);
-    ASSERT_EFI_ERROR (Status);
-  }
+  mUnicodeCollationProtocol   = NULL;
 
   //
   // verify that auto initialize is not set false
@@ -729,6 +723,14 @@ ShellOpenFileByName(
     Status = gEfiShellProtocol->OpenFileByName(FileName,
                                                FileHandle,
                                                OpenMode);
+
+    if (mUnicodeCollationProtocol == NULL) {
+      Status = gBS->LocateProtocol (&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&mUnicodeCollationProtocol);
+      if (EFI_ERROR (Status)) {
+        gEfiShellProtocol->CloseFile (*FileHandle);
+        return Status;
+      }
+    }
 
     if ((mUnicodeCollationProtocol->StriColl (mUnicodeCollationProtocol, (CHAR16*)FileName, L"NUL") != 0) &&
         (mUnicodeCollationProtocol->StriColl (mUnicodeCollationProtocol, (CHAR16*)FileName, L"NULL") != 0) &&
