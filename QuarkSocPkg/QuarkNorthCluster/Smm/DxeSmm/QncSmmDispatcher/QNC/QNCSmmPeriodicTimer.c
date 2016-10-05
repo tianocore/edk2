@@ -1,7 +1,7 @@
 /** @file
 File to contain all the hardware specific stuff for the Periodical Timer dispatch protocol.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -177,7 +177,7 @@ PeriodicTimerGetContext (
     // Update the elapsed time w/ the data from our tables
     //
     Record->CommBuffer.PeriodicTimer.ElapsedTime += TimerInterval->Interval;
-    *HwContext = Record->ChildContext;
+    CopyMem (HwContext, &Record->ChildContext, sizeof (QNC_SMM_CONTEXT));
   }
 }
 

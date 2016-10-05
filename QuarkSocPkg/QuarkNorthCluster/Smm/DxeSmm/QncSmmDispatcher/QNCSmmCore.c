@@ -2,7 +2,7 @@
 This driver is responsible for the registration of child drivers
 and the abstraction of the QNC SMI sources.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -351,7 +351,8 @@ Returns:
   // Gather information about the registration request
   //
   Record->Callback          = DispatchFunction;
-  Record->ChildContext      = *RegisterContext;
+  Record->CallbackContext   = RegisterContext;
+  CopyMem (&Record->ChildContext, RegisterContext, sizeof (QNC_SMM_CONTEXT));
 
   Qualified                 = QUALIFIED_PROTOCOL_FROM_GENERIC (This);
 
@@ -407,7 +408,7 @@ Returns:
       //
       // Update ChildContext again as SwSmiInputValue has been changed
       //
-      Record->ChildContext = *RegisterContext;
+      CopyMem (&Record->ChildContext, RegisterContext, sizeof (QNC_SMM_CONTEXT));
     }
 
     //
@@ -688,7 +689,6 @@ QNCSmmCoreDispatcher (
                 // it supplied in registration.  Simply pass back what it gave us.
                 //
                 ASSERT (RecordToExhaust->Callback != NULL);
-                Context       = RecordToExhaust->ChildContext;
                 ContextsMatch = TRUE;
               }
 
@@ -710,7 +710,7 @@ QNCSmmCoreDispatcher (
 
                 RecordToExhaust->Callback (
                                    (EFI_HANDLE) & RecordToExhaust->Link,
-                                   &Context,
+                                   RecordToExhaust->CallbackContext,
                                    CommunicationBuffer,
                                    &BufferSize
                                    );

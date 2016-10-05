@@ -1,7 +1,7 @@
 /** @file
 Prototypes and defines for the QNC SMM Dispatcher.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -396,8 +396,9 @@ struct _DATABASE_RECORD {
   // Callback function
   //
   EFI_SMM_HANDLER_ENTRY_POINT2      Callback;
-  QNC_SMM_CONTEXT       ChildContext;
-  QNC_SMM_BUFFER                     CommBuffer;
+  QNC_SMM_CONTEXT                   ChildContext;
+  VOID                              *CallbackContext;
+  QNC_SMM_BUFFER                    CommBuffer;
   UINTN                             BufferSize;
 
   //
