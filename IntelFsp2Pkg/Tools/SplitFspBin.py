@@ -159,11 +159,101 @@ class EFI_TE_IMAGE_HEADER(Structure):
         ('DataDirectoryDebug',      EFI_IMAGE_DATA_DIRECTORY)
         ]
 
+class EFI_IMAGE_DOS_HEADER(Structure):
+    _fields_ = [
+        ('e_magic',              c_uint16),
+        ('e_cblp',               c_uint16),
+        ('e_cp',                 c_uint16),
+        ('e_crlc',               c_uint16),
+        ('e_cparhdr',            c_uint16),
+        ('e_minalloc',           c_uint16),
+        ('e_maxalloc',           c_uint16),
+        ('e_ss',                 c_uint16),
+        ('e_sp',                 c_uint16),
+        ('e_csum',               c_uint16),
+        ('e_ip',                 c_uint16),
+        ('e_cs',                 c_uint16),
+        ('e_lfarlc',             c_uint16),
+        ('e_ovno',               c_uint16),
+        ('e_res',                ARRAY(c_uint16, 4)),
+        ('e_oemid',              c_uint16),
+        ('e_oeminfo',            c_uint16),
+        ('e_res2',               ARRAY(c_uint16, 10)),
+        ('e_lfanew',             c_uint16)
+        ]
+
+class EFI_IMAGE_FILE_HEADER(Structure):
+    _fields_ = [
+        ('Machine',               c_uint16),
+        ('NumberOfSections',      c_uint16),
+        ('TimeDateStamp',         c_uint32),
+        ('PointerToSymbolTable',  c_uint32),
+        ('NumberOfSymbols',       c_uint32),
+        ('SizeOfOptionalHeader',  c_uint16),
+        ('Characteristics',       c_uint16)
+        ]
+
 class PE_RELOC_BLOCK_HEADER(Structure):
     _fields_ = [
         ('PageRVA',              c_uint32),
         ('BlockSize',            c_uint32)
         ]
+
+class EFI_IMAGE_OPTIONAL_HEADER32(Structure):
+    _fields_ = [
+        ('Magic',                         c_uint16),
+        ('MajorLinkerVersion',            c_uint8),
+        ('MinorLinkerVersion',            c_uint8),
+        ('SizeOfCode',                    c_uint32),
+        ('SizeOfInitializedData',         c_uint32),
+        ('SizeOfUninitializedData',       c_uint32),
+        ('AddressOfEntryPoint',           c_uint32),
+        ('BaseOfCode',                    c_uint32),
+        ('BaseOfData',                    c_uint32),
+        ('ImageBase',                     c_uint32),
+        ('SectionAlignment',              c_uint32),
+        ('FileAlignment',                 c_uint32),
+        ('MajorOperatingSystemVersion',   c_uint16),
+        ('MinorOperatingSystemVersion',   c_uint16),
+        ('MajorImageVersion',             c_uint16),
+        ('MinorImageVersion',             c_uint16),
+        ('MajorSubsystemVersion',         c_uint16),
+        ('MinorSubsystemVersion',         c_uint16),
+        ('Win32VersionValue',             c_uint32),
+        ('SizeOfImage',                   c_uint32),
+        ('SizeOfHeaders',                 c_uint32),
+        ('CheckSum'     ,                 c_uint32),
+        ('Subsystem',                     c_uint16),
+        ('DllCharacteristics',            c_uint16),
+        ('SizeOfStackReserve',            c_uint32),
+        ('SizeOfStackCommit' ,            c_uint32),
+        ('SizeOfHeapReserve',             c_uint32),
+        ('SizeOfHeapCommit' ,             c_uint32),
+        ('LoaderFlags'     ,              c_uint32),
+        ('NumberOfRvaAndSizes',           c_uint32),
+        ('DataDirectory',                 ARRAY(EFI_IMAGE_DATA_DIRECTORY, 16))
+        ]
+
+class EFI_IMAGE_NT_HEADERS32(Structure):
+    _fields_ = [
+        ('Signature',            c_uint32),
+        ('FileHeader',           EFI_IMAGE_FILE_HEADER),
+        ('OptionalHeader',       EFI_IMAGE_OPTIONAL_HEADER32)
+        ]
+
+
+class EFI_IMAGE_DIRECTORY_ENTRY:
+    EXPORT                     = 0
+    IMPORT                     = 1
+    RESOURCE                   = 2
+    EXCEPTION                  = 3
+    SECURITY                   = 4
+    BASERELOC                  = 5
+    DEBUG                      = 6
+    COPYRIGHT                  = 7
+    GLOBALPTR                  = 8
+    TLS                        = 9
+    LOAD_CONFIG                = 10
 
 class EFI_FV_FILETYPE:
     ALL                        = 0x00
@@ -431,26 +521,47 @@ class FirmwareDevice:
                     raise Exception("ERROR: Incorrect FV size in image !")
         self.CheckFsp ()
 
-class TeImage:
-    def __init__(self, offset, tedata):
-        self.Offset = offset
-        self.TeHdr     = EFI_TE_IMAGE_HEADER.from_buffer (tedata, 0)
-        self.TeData    = tedata
+class PeTeImage:
+    def __init__(self, offset, data):
+        self.Offset    = offset
+        tehdr          = EFI_TE_IMAGE_HEADER.from_buffer (data, 0)
+        if   tehdr.Signature == 'VZ': # TE image
+            self.TeHdr   = tehdr
+        elif tehdr.Signature == 'MZ': # PE32 image
+            self.TeHdr   = None
+            self.DosHdr  = EFI_IMAGE_DOS_HEADER.from_buffer (data, 0)
+            self.PeHdr   = EFI_IMAGE_NT_HEADERS32.from_buffer (data, self.DosHdr.e_lfanew)
+            if self.PeHdr.Signature != 0x4550:
+                raise Exception("ERROR: Invalid PE32 header !")
+            if self.PeHdr.FileHeader.SizeOfOptionalHeader < EFI_IMAGE_OPTIONAL_HEADER32.DataDirectory.offset:
+                raise Exception("ERROR: Unsupported PE32 image !")
+            if self.PeHdr.OptionalHeader.NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC:
+                raise Exception("ERROR: No relocation information available !")
+        self.Offset    = offset
+        self.Data      = data
         self.RelocList = []
 
+    def IsTeImage(self):
+        return  self.TeHdr is not None
+
     def ParseReloc(self):
-        rsize   = self.TeHdr.DataDirectoryBaseReloc.Size
-        roffset   = sizeof(self.TeHdr) - self.TeHdr.StrippedSize + self.TeHdr.DataDirectoryBaseReloc.VirtualAddress
+        if self.IsTeImage():
+            rsize   = self.TeHdr.DataDirectoryBaseReloc.Size
+            roffset = sizeof(self.TeHdr) - self.TeHdr.StrippedSize + self.TeHdr.DataDirectoryBaseReloc.VirtualAddress
+        else:
+            rsize   = self.PeHdr.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].Size
+            roffset = self.PeHdr.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].VirtualAddress
+
         alignment = 4
         offset = roffset
         while offset < roffset + rsize:
             offset = AlignPtr(offset, 4)
-            blkhdr = PE_RELOC_BLOCK_HEADER.from_buffer(self.TeData, offset)
+            blkhdr = PE_RELOC_BLOCK_HEADER.from_buffer(self.Data, offset)
             offset += sizeof(blkhdr)
             # Read relocation type,offset pairs
             rlen  = blkhdr.BlockSize - sizeof(PE_RELOC_BLOCK_HEADER)
             rnum  = rlen/sizeof(c_uint16)
-            rdata = (c_uint16 * rnum).from_buffer(self.TeData, offset)
+            rdata = (c_uint16 * rnum).from_buffer(self.Data, offset)
             for each in rdata:
                 roff  = each & 0xfff
                 rtype = each >> 12
@@ -459,7 +570,9 @@ class TeImage:
                 if rtype != 3: # IMAGE_REL_BASED_HIGHLOW
                     raise Exception("ERROR: Unsupported relocation type %d!" % rtype)
                 # Calculate the offset of the relocation
-                aoff = sizeof(self.TeHdr) - self.TeHdr.StrippedSize + blkhdr.PageRVA + roff
+                aoff  = blkhdr.PageRVA + roff
+                if self.IsTeImage():
+                    aoff += sizeof(self.TeHdr) - self.TeHdr.StrippedSize
                 self.RelocList.append((rtype, aoff))
             offset += sizeof(rdata)
 
@@ -478,10 +591,17 @@ class TeImage:
             else:
                 raise Exception('ERROR: Unknown relocation type %d !' % rtype)
 
-        tehdr = self.TeHdr
-        tehdr.ImageBase += delta
-        offset = self.Offset
-        fdbin[offset:offset+sizeof(tehdr)] = bytearray(tehdr)
+        if self.IsTeImage():
+            offset  = self.Offset + EFI_TE_IMAGE_HEADER.ImageBase.offset
+            size    = EFI_TE_IMAGE_HEADER.ImageBase.size
+        else:
+            offset  = self.Offset + self.DosHdr.e_lfanew
+            offset += EFI_IMAGE_NT_HEADERS32.OptionalHeader.offset
+            offset += EFI_IMAGE_OPTIONAL_HEADER32.ImageBase.offset
+            size    = EFI_IMAGE_OPTIONAL_HEADER32.ImageBase.size
+
+        value  = Bytes2Val(fdbin[offset:offset+size]) + delta
+        fdbin[offset:offset+size] = Val2Bytes(value, size)
 
         return count
 
@@ -588,28 +708,24 @@ def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
         delta = newbase - oldbase
         print "Rebase FSP-%c from 0x%08X to 0x%08X:" % (ftype.upper(),oldbase,newbase)
 
-        telist = []
+        imglist = []
         for fvidx in fsp.FvIdxList:
             fv = fd.FvList[fvidx]
             for ffs in fv.FfsList:
                 for sec in ffs.SecList:
-                    if sec.SecHdr.Type == EFI_SECTION_TYPE.TE:   # TE
+                    if sec.SecHdr.Type in [EFI_SECTION_TYPE.TE, EFI_SECTION_TYPE.PE32]:   # TE or PE32
                         offset = fd.Offset + fv.Offset + ffs.Offset + sec.Offset + sizeof(sec.SecHdr)
-                        telist.append ((offset, len(sec.SecData) - sizeof(sec.SecHdr)))
-                    elif sec.SecHdr.Type == EFI_SECTION_TYPE.PE32: # PE
-                        raise Exception("ERROR: PE32 Section is not supported !")
+                        imglist.append ((offset, len(sec.SecData) - sizeof(sec.SecHdr)))
 
         fcount  = 0
-        tecount = 0
-        for (teoffset, telen) in telist:
-            tehdr = EFI_TE_IMAGE_HEADER.from_buffer (fd.FdData, teoffset)
-            if 'VZ' != tehdr.Signature:
-                raise Exception("ERROR: Invalid TE header !")
-            te = TeImage(teoffset, fd.FdData[teoffset:teoffset + telen])
-            te.ParseReloc()
-            tecount += te.Rebase(delta, newfspbin)
-            fcount  += 1
-        print "  Patched %d entries in %d TE images." % (tecount, fcount)
+        pcount  = 0
+        for (offset, length) in imglist:
+            img = PeTeImage(offset, fd.FdData[offset:offset + length])
+            img.ParseReloc()
+            pcount += img.Rebase(delta, newfspbin)
+            fcount += 1
+
+        print "  Patched %d entries in %d TE/PE32 images." % (pcount, fcount)
 
         (count, applied) = fsp.Patch(delta, newfspbin)
         print "  Patched %d entries using FSP patch table." % applied
