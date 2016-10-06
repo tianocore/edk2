@@ -723,6 +723,9 @@ ShellOpenFileByName(
     Status = gEfiShellProtocol->OpenFileByName(FileName,
                                                FileHandle,
                                                OpenMode);
+    if (EFI_ERROR(Status)) {
+      return Status;
+    }
 
     if (mUnicodeCollationProtocol == NULL) {
       Status = gBS->LocateProtocol (&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&mUnicodeCollationProtocol);
