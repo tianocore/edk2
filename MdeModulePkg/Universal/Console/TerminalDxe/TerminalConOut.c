@@ -2,6 +2,7 @@
   Implementation for EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL protocol.
 
 Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -313,6 +314,30 @@ TerminalConOutOutputString (
           Mode->CursorRow++;
         }
 
+        if (TerminalDevice->TerminalType == TTYTERMTYPE &&
+            !TerminalDevice->OutputEscChar) {
+          //
+          // We've written the last character on the line.  The
+          // terminal doesn't actually wrap its cursor until we print
+          // the next character, but the driver thinks it has wrapped
+          // already.  Print CR LF to synchronize the terminal with
+          // the driver, but only if we're not in the middle of
+          // printing an escape sequence.
+          //
+          CHAR8 CrLfStr[] = {'\r', '\n'};
+
+          Length = sizeof(CrLfStr);
+
+          Status = TerminalDevice->SerialIo->Write (
+                                                TerminalDevice->SerialIo,
+                                                &Length,
+                                                CrLfStr
+                                                );
+
+          if (EFI_ERROR (Status)) {
+            goto OutputError;
+          }
+        }
       }
       break;
 
