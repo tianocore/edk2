@@ -83,6 +83,8 @@ CHAR16 mSetModeString[]            = { ESC, '[', '=', '3', 'h', 0 };
 CHAR16 mSetAttributeString[]       = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
 CHAR16 mClearScreenString[]        = { ESC, '[', '2', 'J', 0 };
 CHAR16 mSetCursorPositionString[]  = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
+CHAR16 mCursorForwardString[]      = { ESC, '[', '0', '0', 'C', 0 };
+CHAR16 mCursorBackwardString[]     = { ESC, '[', '0', '0', 'D', 0 };
 
 //
 // Body of the ConOut functions
@@ -755,6 +757,7 @@ TerminalConOutSetCursorPosition (
   UINTN                       MaxRow;
   EFI_STATUS                  Status;
   TERMINAL_DEV                *TerminalDevice;
+  CHAR16                      *String;
 
   TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
 
@@ -782,13 +785,36 @@ TerminalConOutSetCursorPosition (
   //
   // control sequence to move the cursor
   //
-  mSetCursorPositionString[ROW_OFFSET + 0]    = (CHAR16) ('0' + ((Row + 1) / 10));
-  mSetCursorPositionString[ROW_OFFSET + 1]    = (CHAR16) ('0' + ((Row + 1) % 10));
-  mSetCursorPositionString[COLUMN_OFFSET + 0] = (CHAR16) ('0' + ((Column + 1) / 10));
-  mSetCursorPositionString[COLUMN_OFFSET + 1] = (CHAR16) ('0' + ((Column + 1) % 10));
+  // Optimize cursor motion control sequences for TtyTerm.  Move
+  // within the current line if possible, and don't output anyting if
+  // it isn't necessary.
+  //
+  if (TerminalDevice->TerminalType == TTYTERMTYPE &&
+      Mode->CursorRow == Row) {
+    if (Mode->CursorColumn > Column) {
+      mCursorBackwardString[FW_BACK_OFFSET + 0] = (CHAR16) ('0' + ((Mode->CursorColumn - Column) / 10));
+      mCursorBackwardString[FW_BACK_OFFSET + 1] = (CHAR16) ('0' + ((Mode->CursorColumn - Column) % 10));
+      String = mCursorBackwardString;
+    }
+    else if (Column > Mode->CursorColumn) {
+      mCursorForwardString[FW_BACK_OFFSET + 0] = (CHAR16) ('0' + ((Column - Mode->CursorColumn) / 10));
+      mCursorForwardString[FW_BACK_OFFSET + 1] = (CHAR16) ('0' + ((Column - Mode->CursorColumn) % 10));
+      String = mCursorForwardString;
+    }
+    else {
+      String = L"";  // No cursor motion necessary
+    }
+  }
+  else {
+    mSetCursorPositionString[ROW_OFFSET + 0]    = (CHAR16) ('0' + ((Row + 1) / 10));
+    mSetCursorPositionString[ROW_OFFSET + 1]    = (CHAR16) ('0' + ((Row + 1) % 10));
+    mSetCursorPositionString[COLUMN_OFFSET + 0] = (CHAR16) ('0' + ((Column + 1) / 10));
+    mSetCursorPositionString[COLUMN_OFFSET + 1] = (CHAR16) ('0' + ((Column + 1) % 10));
+    String = mSetCursorPositionString;
+  }
 
   TerminalDevice->OutputEscChar               = TRUE;
-  Status = This->OutputString (This, mSetCursorPositionString);
+  Status = This->OutputString (This, String);
   TerminalDevice->OutputEscChar = FALSE;
 
   if (EFI_ERROR (Status)) {

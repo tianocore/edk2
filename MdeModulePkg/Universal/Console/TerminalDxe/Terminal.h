@@ -2,6 +2,7 @@
   Header file for Terminal driver.
 
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -157,6 +158,7 @@ typedef union {
 #define BACKGROUND_CONTROL_OFFSET 11
 #define ROW_OFFSET                2
 #define COLUMN_OFFSET             5
+#define FW_BACK_OFFSET            2
 
 typedef struct {
   UINT16  Unicode;
