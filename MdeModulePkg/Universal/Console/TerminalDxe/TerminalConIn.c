@@ -3,6 +3,7 @@
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1374,7 +1375,7 @@ UnicodeToEfiKey (
           break;
         }
       } else if (TerminalDevice->TerminalType == TTYTERMTYPE) {
-        /* Also accept VT100 escape codes for F1-F4 for TTY term */
+        /* Also accept VT100 escape codes for F1-F4, HOME and END for TTY term */
         switch (UnicodeChar) {
         case 'P':
           Key.ScanCode = SCAN_F1;
@@ -1387,6 +1388,12 @@ UnicodeToEfiKey (
           break;
         case 'S':
           Key.ScanCode = SCAN_F4;
+          break;
+        case 'H':
+          Key.ScanCode = SCAN_HOME;
+          break;
+        case 'F':
+          Key.ScanCode = SCAN_END;
           break;
         }
       }
@@ -1429,12 +1436,14 @@ UnicodeToEfiKey (
           break;
         case 'H':
           if (TerminalDevice->TerminalType == PCANSITYPE ||
-              TerminalDevice->TerminalType == VT100TYPE) {
+              TerminalDevice->TerminalType == VT100TYPE  ||
+              TerminalDevice->TerminalType == TTYTERMTYPE) {
             Key.ScanCode = SCAN_HOME;
           }
           break;
         case 'F':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == PCANSITYPE ||
+              TerminalDevice->TerminalType == TTYTERMTYPE) {
             Key.ScanCode = SCAN_END;
           }
           break;
@@ -1573,8 +1582,17 @@ UnicodeToEfiKey (
           TerminalDevice->TtyEscapeStr[TerminalDevice->TtyEscapeIndex] = 0; /* Terminate string */
           EscCode = (UINT16) StrDecimalToUintn(TerminalDevice->TtyEscapeStr);
           switch (EscCode) {
+          case 2:
+              Key.ScanCode = SCAN_INSERT;
+              break;
           case 3:
               Key.ScanCode = SCAN_DELETE;
+              break;
+          case 5:
+              Key.ScanCode = SCAN_PAGE_UP;
+              break;
+          case 6:
+              Key.ScanCode = SCAN_PAGE_DOWN;
               break;
           case 11:
           case 12:
