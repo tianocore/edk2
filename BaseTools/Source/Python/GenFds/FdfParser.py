@@ -1385,25 +1385,10 @@ class FdfParser:
 
         try:
             self.Preprocess()
-            while self.__GetFd():
-                pass
-
-            while self.__GetFv():
-                pass
-
-            while self.__GetFmp():
-                pass
-
-            while self.__GetCapsule():
-                pass
-
-            while self.__GetVtf():
-                pass
-
-            while self.__GetRule():
-                pass
-            
-            while self.__GetOptionRom():
+            #
+            # Keep processing sections of the FDF until no new sections or a syntax error is found
+            #
+            while self.__GetFd() or self.__GetFv() or self.__GetFmp() or self.__GetCapsule() or self.__GetVtf() or self.__GetRule() or self.__GetOptionRom():
                 pass
 
         except Warning, X:
