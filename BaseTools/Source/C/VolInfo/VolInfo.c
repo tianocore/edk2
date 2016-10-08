@@ -1599,7 +1599,6 @@ Returns:
   CHAR8               *ExtractionTool;
   CHAR8               *ToolInputFile;
   CHAR8               *ToolOutputFile;
-  CHAR8               *SystemCommandFormatString;
   CHAR8               *SystemCommand;
   EFI_GUID            *EfiGuid;
   UINT16              DataOffset;
@@ -1659,9 +1658,8 @@ Returns:
           SectionLength - SectionHeaderLen
           );
 
-        SystemCommandFormatString = "%s sha1 -out %s %s";
         SystemCommand = malloc (
-          strlen (SystemCommandFormatString) +
+          strlen (OPENSSL_COMMAND_FORMAT_STRING) +
           strlen (OpenSslPath) +
           strlen (ToolInputFileName) +
           strlen (ToolOutputFileName) +
@@ -1673,7 +1671,7 @@ Returns:
         }
         sprintf (
           SystemCommand,
-          SystemCommandFormatString,
+          OPENSSL_COMMAND_FORMAT_STRING,
           OpenSslPath,
           ToolOutputFileName,
           ToolInputFileName
@@ -1891,9 +1889,8 @@ Returns:
         //
         // Construction 'system' command string
         //
-        SystemCommandFormatString = "%s -d -o %s %s";
         SystemCommand = malloc (
-          strlen (SystemCommandFormatString) +
+          strlen (EXTRACT_COMMAND_FORMAT_STRING) +
           strlen (ExtractionTool) +
           strlen (ToolInputFile) +
           strlen (ToolOutputFile) +
@@ -1909,7 +1906,7 @@ Returns:
         }
         sprintf (
           SystemCommand,
-          SystemCommandFormatString,
+          EXTRACT_COMMAND_FORMAT_STRING,
           ExtractionTool,
           ToolOutputFile,
           ToolInputFile

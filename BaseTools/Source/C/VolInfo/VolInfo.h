@@ -1,7 +1,7 @@
 /** @file
 Local Definitions for the VolInfo utility
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,5 +30,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define EFI_SECTION_LAST_LEAF_SECTION_TYPE  0x1B
 #define EFI_SECTION_LAST_SECTION_TYPE       0x1B
+
+#define OPENSSL_COMMAND_FORMAT_STRING       "%s sha1 -out %s %s"
+#define EXTRACT_COMMAND_FORMAT_STRING       "%s -d -o %s %s"
 
 #endif
