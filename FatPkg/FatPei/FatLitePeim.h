@@ -1,7 +1,7 @@
 /** @file
   Data structures for FAT recovery PEIM
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -37,8 +37,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Definitions
 //
-#define PEI_FAT_RECOVERY_CAPSULE_WITH_NT_EMULATOR     L"fv0001.fv"
-#define PEI_FAT_RECOVERY_CAPSULE_WITHOUT_NT_EMULATOR  L"fvmain.fv"
 
 #define PEI_FAT_CACHE_SIZE                            4
 #define PEI_FAT_MAX_BLOCK_SIZE                        8192
