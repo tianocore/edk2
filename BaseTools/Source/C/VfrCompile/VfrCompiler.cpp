@@ -139,7 +139,7 @@ CVfrCompiler::OptionInitialization (
           strcat (mOptions.OutputDirectory, "\\");
         }
       }
-      DebugMsg (NULL, 0, 9, (CHAR8 *) "Output Directory", mOptions.OutputDirectory);
+      DebugMsg (NULL, 0, 9, (CHAR8 *) "Output Directory", (CHAR8 *) "%s", mOptions.OutputDirectory);
     } else if (stricmp(Argv[Index], "-b") == 0 || stricmp(Argv[Index], "--create-ifr-package") == 0 || stricmp(Argv[Index], "-ibin") == 0) {
       mOptions.CreateIfrPkgFile = TRUE;
     } else if (stricmp(Argv[Index], "-n") == 0 || stricmp(Argv[Index], "--no-pre-processing") == 0 || stricmp(Argv[Index], "-nopp") == 0) {
@@ -161,7 +161,7 @@ CVfrCompiler::OptionInitialization (
         goto Fail;
       }
       gCVfrStringDB.SetStringFileName(Argv[Index]);
-      DebugMsg (NULL, 0, 9, (CHAR8 *) "Input string file path", Argv[Index]);
+      DebugMsg (NULL, 0, 9, (CHAR8 *) "Input string file path", (CHAR8 *) "%s", Argv[Index]);
     } else if ((stricmp (Argv[Index], "-g") == 0) || (stricmp (Argv[Index], "--guid") == 0)) {
       Index++;
       Status = StringToGuid (Argv[Index], &mOptions.OverrideClassGuid);
