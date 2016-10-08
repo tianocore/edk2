@@ -1045,6 +1045,7 @@ Arguments:
 Returns:
 
   EFI_INVALID_PARAMETER  - The parameter is invalid
+  EFI_OUT_OF_RESOURCES   - Resource can not be allocated
   EFI_SUCCESS            - The function completed successfully
 
 --*/
@@ -1062,6 +1063,8 @@ Returns:
   CHAR8   Buff4[10];
   CHAR8   Buff5[10];
   CHAR8   Token[50];
+  CHAR8   *FormatString;
+  INTN    FormatLength;
 
   Fp = fopen (LongFilePath (VtfInfo->CompSymName), "rb");
 
@@ -1070,10 +1073,47 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Generate the format string for fscanf
+  //
+  FormatLength = snprintf (
+                   NULL,
+                   0,
+                   "%%%us %%%us %%%us %%%us %%%us %%%us %%%us",
+                   (unsigned) sizeof (Buff1) - 1,
+                   (unsigned) sizeof (Buff2) - 1,
+                   (unsigned) sizeof (OffsetStr) - 1,
+                   (unsigned) sizeof (Buff3) - 1,
+                   (unsigned) sizeof (Buff4) - 1,
+                   (unsigned) sizeof (Buff5) - 1,
+                   (unsigned) sizeof (Token) - 1
+                   ) + 1;
+
+  FormatString = (CHAR8 *) malloc (FormatLength);
+  if (FormatString == NULL) {
+    fclose (Fp);
+
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  snprintf (
+    FormatString,
+    FormatLength,
+    "%%%us %%%us %%%us %%%us %%%us %%%us %%%us",
+    (unsigned) sizeof (Buff1) - 1,
+    (unsigned) sizeof (Buff2) - 1,
+    (unsigned) sizeof (OffsetStr) - 1,
+    (unsigned) sizeof (Buff3) - 1,
+    (unsigned) sizeof (Buff4) - 1,
+    (unsigned) sizeof (Buff5) - 1,
+    (unsigned) sizeof (Token) - 1
+    );
+
   while (fgets (Buff, sizeof (Buff), Fp) != NULL) {
     fscanf (
       Fp,
-      "%s %s %s %s %s %s %s",
+      FormatString,
       Buff1,
       Buff2,
       OffsetStr,
@@ -1095,6 +1135,10 @@ Returns:
   GetRelativeAddressInVtfBuffer (SalEntryAdd, &RelativeAddress, FIRST_VTF);
 
   memcpy ((VOID *) RelativeAddress, (VOID *) CompStartAddress, sizeof (UINT64));
+
+  if (FormatString != NULL) {
+    free (FormatString);
+  }
 
   if (Fp != NULL) {
     fclose (Fp);
@@ -2198,6 +2242,8 @@ Returns:
   CHAR8   Section[MAX_LONG_FILE_PATH];
   CHAR8   Token[MAX_LONG_FILE_PATH];
   CHAR8   BaseToken[MAX_LONG_FILE_PATH];
+  CHAR8   *FormatString;
+  INTN    FormatLength;
   UINT64  TokenAddress;
   long    StartLocation;
 
@@ -2276,6 +2322,37 @@ Returns:
   }
 
   //
+  // Generate the format string for fscanf
+  //
+  FormatLength = snprintf (
+                   NULL,
+                   0,
+                   "%%%us | %%%us | %%%us | %%%us\n",
+                   (unsigned) sizeof (Type) - 1,
+                   (unsigned) sizeof (Address) - 1,
+                   (unsigned) sizeof (Section) - 1,
+                   (unsigned) sizeof (Token) - 1
+                   ) + 1;
+
+  FormatString = (CHAR8 *) malloc (FormatLength);
+  if (FormatString == NULL) {
+    fclose (SourceFile);
+    fclose (DestFile);
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    return EFI_ABORTED;
+  }
+
+  snprintf (
+    FormatString,
+    FormatLength,
+    "%%%us | %%%us | %%%us | %%%us\n",
+    (unsigned) sizeof (Type) - 1,
+    (unsigned) sizeof (Address) - 1,
+    (unsigned) sizeof (Section) - 1,
+    (unsigned) sizeof (Token) - 1
+    );
+
+  //
   // Read in the file
   //
   while (feof (SourceFile) == 0) {
@@ -2283,7 +2360,7 @@ Returns:
     //
     // Read a line
     //
-    if (fscanf (SourceFile, "%s | %s | %s | %s\n", Type, Address, Section, Token) == 4) {
+    if (fscanf (SourceFile, FormatString, Type, Address, Section, Token) == 4) {
 
       //
       // Get the token address
@@ -2306,6 +2383,7 @@ Returns:
     }
   }
 
+  free (FormatString);
   fclose (SourceFile);
   fclose (DestFile);
   return EFI_SUCCESS;
