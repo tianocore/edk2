@@ -16,7 +16,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/HiiConfigAccess.h>
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include "FrontPage.h"
 #include "FrontPageCustomizedUiSupport.h"
+
+extern FRONT_PAGE_CALLBACK_DATA  gFrontPagePrivate;
 
 /**
   Customize menus in the page.
@@ -129,4 +132,14 @@ UiCustomizeFrontPageBanner (
   IN OUT EFI_STRING     *BannerStr
   )
 {
+  if ((LineIndex == 5) && LeftOrRight) {
+    // Update STR_CUSTOMIZE_BANNER_LINE5_LEFT
+    if (PcdGetBool(PcdTestKeyUsed)) {
+      if (BannerStr != NULL) {
+        FreePool(*BannerStr);
+      }
+      *BannerStr = HiiGetString(gFrontPagePrivate.HiiHandle, STRING_TOKEN(STR_TEST_KEY_USED), NULL);
+    }
+  }
+  return;
 }
