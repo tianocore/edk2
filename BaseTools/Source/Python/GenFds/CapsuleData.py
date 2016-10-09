@@ -179,8 +179,8 @@ class CapsulePayload(CapsuleData):
         self.ImageTypeId = None
         self.ImageIndex = None
         self.HardwareInstance = None
-        self.ImageFile = None
-        self.VendorCodeFile = None
+        self.ImageFile = []
+        self.VendorCodeFile = []
         self.Certificate_Guid = None
         self.MonotonicCount = None
 

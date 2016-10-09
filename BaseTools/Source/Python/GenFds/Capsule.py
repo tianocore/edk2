@@ -141,6 +141,12 @@ class Capsule (CapsuleClassObject) :
             Content.write(File.read())
             File.close()
         for fmp in self.FmpPayloadList:
+            if fmp.ImageFile:
+                for Obj in fmp.ImageFile:
+                    fmp.ImageFile = Obj.GenCapsuleSubItem()
+            if fmp.VendorCodeFile:
+                for Obj in fmp.VendorCodeFile:
+                    fmp.VendorCodeFile = Obj.GenCapsuleSubItem()
             if fmp.Certificate_Guid:
                 ExternalTool, ExternalOption = FindExtendTool([], GenFdsGlobalVariable.ArchList, fmp.Certificate_Guid)
                 CmdOption = ''

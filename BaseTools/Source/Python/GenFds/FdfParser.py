@@ -3259,15 +3259,12 @@ class FdfParser:
             FmpKeyList.remove('MONOTONIC_COUNT')
         if FmpKeyList:
             raise Warning("Missing keywords %s in FMP payload section." % ', '.join(FmpKeyList), self.FileName, self.CurrentLineNumber)
-        ImageFile = self.__ParseRawFileStatement()
-        if not ImageFile:
+        # get the Image file and Vendor code file
+        self.__GetFMPCapsuleData(FmpData)
+        if not FmpData.ImageFile:
             raise Warning("Missing image file in FMP payload section.", self.FileName, self.CurrentLineNumber)
-        FmpData.ImageFile = ImageFile
-        VendorCodeFile = self.__ParseRawFileStatement()
-        if VendorCodeFile:
-            FmpData.VendorCodeFile = VendorCodeFile
-        AdditionalFile = self.__ParseRawFileStatement()
-        if AdditionalFile:
+        # check whether more than one Vendor code file
+        if len(FmpData.VendorCodeFile) > 1:
             raise Warning("At most one Image file and one Vendor code file are allowed in FMP payload section.", self.FileName, self.CurrentLineNumber)
         self.Profile.FmpPayloadDict[FmpUiName] = FmpData
         return True
@@ -3400,6 +3397,22 @@ class FdfParser:
             if not (IsInf or IsFile or IsFv or IsFd or IsAnyFile or IsAfile or IsFmp):
                 break
 
+    ## __GetFMPCapsuleData() method
+    #
+    #   Get capsule data for FMP capsule
+    #
+    #   @param  self        The object pointer
+    #   @param  Obj         for whom capsule data are got
+    #
+    def __GetFMPCapsuleData(self, Obj):
+
+        while True:
+            IsFv = self.__GetFvStatement(Obj, True)
+            IsFd = self.__GetFdStatement(Obj, True)
+            IsAnyFile = self.__GetAnyFileStatement(Obj, True)
+            if not (IsFv or IsFd or IsAnyFile):
+                break
+
     ## __GetFvStatement() method
     #
     #   Get FV for capsule
@@ -3409,7 +3422,7 @@ class FdfParser:
     #   @retval True        Successfully find a FV statement
     #   @retval False       Not able to find a FV statement
     #
-    def __GetFvStatement(self, CapsuleObj):
+    def __GetFvStatement(self, CapsuleObj, FMPCapsule = False):
 
         if not self.__IsKeyword("FV"):
             return False
@@ -3425,7 +3438,13 @@ class FdfParser:
 
         CapsuleFv = CapsuleData.CapsuleFv()
         CapsuleFv.FvName = self.__Token
-        CapsuleObj.CapsuleDataList.append(CapsuleFv)
+        if FMPCapsule:
+            if not CapsuleObj.ImageFile:
+                CapsuleObj.ImageFile.append(CapsuleFv)
+            else:
+                CapsuleObj.VendorCodeFile.append(CapsuleFv)
+        else:
+            CapsuleObj.CapsuleDataList.append(CapsuleFv)
         return True
 
     ## __GetFdStatement() method
@@ -3437,7 +3456,7 @@ class FdfParser:
     #   @retval True        Successfully find a FD statement
     #   @retval False       Not able to find a FD statement
     #
-    def __GetFdStatement(self, CapsuleObj):
+    def __GetFdStatement(self, CapsuleObj, FMPCapsule = False):
 
         if not self.__IsKeyword("FD"):
             return False
@@ -3453,7 +3472,13 @@ class FdfParser:
 
         CapsuleFd = CapsuleData.CapsuleFd()
         CapsuleFd.FdName = self.__Token
-        CapsuleObj.CapsuleDataList.append(CapsuleFd)
+        if FMPCapsule:
+            if not CapsuleObj.ImageFile:
+                CapsuleObj.ImageFile.append(CapsuleFd)
+            else:
+                CapsuleObj.VendorCodeFile.append(CapsuleFd)
+        else:
+            CapsuleObj.CapsuleDataList.append(CapsuleFd)
         return True
 
     def __GetFmpStatement(self, CapsuleObj):
@@ -3504,14 +3529,20 @@ class FdfParser:
     #   @retval True        Successfully find a Anyfile statement
     #   @retval False       Not able to find a AnyFile statement
     #
-    def __GetAnyFileStatement(self, CapsuleObj):
+    def __GetAnyFileStatement(self, CapsuleObj, FMPCapsule = False):
         AnyFileName = self.__ParseRawFileStatement()
         if not AnyFileName:
             return False
 
         CapsuleAnyFile = CapsuleData.CapsuleAnyFile()
         CapsuleAnyFile.FileName = AnyFileName
-        CapsuleObj.CapsuleDataList.append(CapsuleAnyFile)
+        if FMPCapsule:
+            if not CapsuleObj.ImageFile:
+                CapsuleObj.ImageFile.append(CapsuleAnyFile)
+            else:
+                CapsuleObj.VendorCodeFile.append(CapsuleAnyFile)
+        else:
+            CapsuleObj.CapsuleDataList.append(CapsuleAnyFile)
         return True
     
     ## __GetAfileStatement() method
