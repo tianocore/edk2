@@ -252,6 +252,7 @@ static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
 #define MAX_ERROR_PAR_LEN   30
 
 extern int
+EFIAPI
 #ifdef HAVE_STDARG_PROTOTYPES
 onig_error_code_to_str(UChar* s, int code, ...)
 #else
@@ -324,6 +325,7 @@ onig_error_code_to_str(s, code, va_alist)
 
 
 void
+EFIAPI
 #ifdef HAVE_STDARG_PROTOTYPES
 onig_snprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
                            UChar* pat, UChar* pat_end, const UChar *fmt, ...)

@@ -14,7 +14,7 @@
 **/
 #include "OnigurumaUefiPort.h"
 
-int sprintf_s(char *str, size_t sizeOfBuffer, char const *fmt, ...)
+int EFIAPI sprintf_s(char *str, size_t sizeOfBuffer, char const *fmt, ...)
 {
   VA_LIST Marker;
   int   NumberOfPrinted;
