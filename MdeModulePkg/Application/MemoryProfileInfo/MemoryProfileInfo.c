@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -249,8 +249,8 @@ GetDriverNameString (
   //
   // Method 1: Get the name string from image PDB
   //
-  if (DriverInfo->Header.Length > sizeof (MEMORY_PROFILE_DRIVER_INFO)) {
-    GetShortPdbFileName ((CHAR8 *) (DriverInfo + 1), mNameString);
+  if (DriverInfo->PdbStringOffset != 0) {
+    GetShortPdbFileName ((CHAR8 *) ((UINTN) DriverInfo + DriverInfo->PdbStringOffset), mNameString);
     return mNameString;
   }
 
