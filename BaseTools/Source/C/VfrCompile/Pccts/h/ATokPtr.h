@@ -58,8 +58,8 @@ public:
 //  7-Apr-97 133MR1
 //	     Fix suggested by Andreas Magnusson
 //			(Andreas.Magnusson@mailbox.swipnet.se)
-    void operator = (const ANTLRTokenPtr & lhs);		    	// MR1
-    void operator = (ANTLRAbstractToken *addr);
+    ANTLRTokenPtr& operator = (const ANTLRTokenPtr & lhs);      // MR1
+    ANTLRTokenPtr& operator = (ANTLRAbstractToken *addr);
     int operator != (const ANTLRTokenPtr &q) const	    		// MR1 // MR11 unsigned -> int
 	{ return this->ptr_ != q.ptr_; }
     int operator == (const ANTLRTokenPtr &q) const  			// MR1 // MR11 unsigned -> int
