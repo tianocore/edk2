@@ -4,7 +4,7 @@ Reading/writing MBR/DBR.
     If we write MBR to disk, we just update the MBR code and the partition table wouldn't be over written.
     If we process DBR, we will patch MBR to set first partition active if no active partition exists.
     
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -167,7 +167,7 @@ Return:
   if (VolumeHandle == INVALID_HANDLE_VALUE) {
     fprintf (
       stderr, 
-      "error E0005: CreateFile failed: Volume = %s, LastError = 0x%x\n", 
+      "error E0005: CreateFile failed: Volume = %s, LastError = 0x%lx\n", 
       VolumeAccessPath, 
       GetLastError ()
       );
@@ -599,7 +599,7 @@ GetPathInfo (
     }
 
     if (!GetDriveInfo(VolumeLetter, &DriveInfo)) {
-      fprintf (stderr, "ERROR: GetDriveInfo - 0x%x\n", GetLastError ());
+      fprintf (stderr, "ERROR: GetDriveInfo - 0x%lx\n", GetLastError ());
       return ErrorPath;
     }
 
@@ -787,7 +787,7 @@ main (
   } else {
     fprintf (
       stderr, 
-      "%s: %s %s: failed - %s (LastError: 0x%x)!\n",
+      "%s: %s %s: failed - %s (LastError: 0x%lx)!\n",
       (Status == ErrorNoMbr) ? "WARNING" : "ERROR",
       (OutputPathInfo.Type != PathFile) ? "Write" : "Read", 
       ProcessMbr ? "MBR" : "DBR", 
