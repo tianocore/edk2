@@ -45,7 +45,8 @@
   DebugLib
   Tcg2PpVendorLib
   SmmServicesTableLib
-  
+  BaseMemoryLib
+
 [Guids]
   ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
   ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
