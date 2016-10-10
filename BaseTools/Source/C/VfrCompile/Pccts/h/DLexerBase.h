@@ -57,6 +57,7 @@ public:
 class DllExportPCCTS DLGInputStream {
 public:
 	virtual int nextChar() = 0;
+    virtual ~DLGInputStream() {};
 };
 
 /* Predefined char stream: Input from FILE */
