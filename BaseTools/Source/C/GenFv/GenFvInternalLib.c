@@ -751,7 +751,7 @@ Returns:
   EFI_IMAGE_OPTIONAL_HEADER_UNION     *ImgHdr;
   EFI_TE_IMAGE_HEADER                 *TEImageHeader;
   EFI_IMAGE_SECTION_HEADER            *SectionHeader;
-  unsigned long long                  TempLongAddress;
+  long long                           TempLongAddress;
   UINT32                              TextVirtualAddress;
   UINT32                              DataVirtualAddress;
   EFI_PHYSICAL_ADDRESS                LinkTimeBaseAddress;
