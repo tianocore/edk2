@@ -112,8 +112,8 @@ Returns:
 --*/
 {
   CHAR8  TemStr[5] = "0000";
-  unsigned Major;
-  unsigned Minor;
+  int    Major;
+  int    Minor;
   UINTN Length;
 
   Major = 0;
