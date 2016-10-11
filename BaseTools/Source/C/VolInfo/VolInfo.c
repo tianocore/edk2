@@ -265,6 +265,10 @@ Returns:
         OpenSslPath = OpenSslCommand;
       } else {
         OpenSslPath = malloc(strlen(OpenSslEnv)+strlen(OpenSslCommand)+1);
+        if (OpenSslPath == NULL) {
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+          return GetUtilityStatus ();
+        }
         CombinePath(OpenSslEnv, OpenSslCommand, OpenSslPath);
       }
       if (OpenSslPath == NULL){
@@ -1623,9 +1627,11 @@ Returns:
     SectionHeaderLen = GetSectionHeaderLength((EFI_COMMON_SECTION_HEADER *)Ptr);
 
     SectionName = SectionNameToStr (Type);
-    printf ("------------------------------------------------------------\n");
-    printf ("  Type:  %s\n  Size:  0x%08X\n", SectionName, (unsigned) SectionLength);
-    free (SectionName);
+    if (SectionName != NULL) {
+      printf ("------------------------------------------------------------\n");
+      printf ("  Type:  %s\n  Size:  0x%08X\n", SectionName, (unsigned) SectionLength);
+      free (SectionName);
+    }
 
     switch (Type) {
     case EFI_SECTION_RAW:
@@ -1653,6 +1659,10 @@ Returns:
           strlen (ToolOutputFileName) +
           1
           );
+        if (SystemCommand == NULL) {
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+          return EFI_OUT_OF_RESOURCES;
+        }
         sprintf (
           SystemCommand,
           SystemCommandFormatString,
@@ -1678,12 +1688,18 @@ Returns:
             nFileLen = ftell(fp);
             fseek(fp,0,SEEK_SET);
             StrLine = malloc(nFileLen);
+            if (StrLine == NULL) {
+              fclose(fp);
+              free (SystemCommand);
+              Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+              return EFI_OUT_OF_RESOURCES;
+            }
             fgets(StrLine, nFileLen, fp);
             NewStr = strrchr (StrLine, '=');
             printf ("  SHA1: %s\n", NewStr + 1);
             free (StrLine);
+            fclose(fp);
           }
-          fclose(fp);
         }
         remove(ToolInputFileName);
         remove(ToolOutputFileName);
@@ -1845,6 +1861,19 @@ Returns:
         close(fd2);
        #endif
 
+        if ((ToolInputFile == NULL) || (ToolOutputFile == NULL)) {
+          if (ToolInputFile != NULL) {
+            free (ToolInputFile);
+          }
+          if (ToolOutputFile != NULL) {
+            free (ToolOutputFile);
+          }
+          free (ExtractionTool);
+
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+          return EFI_OUT_OF_RESOURCES;
+        }
+
         //
         // Construction 'system' command string
         //
@@ -1856,6 +1885,14 @@ Returns:
           strlen (ToolOutputFile) +
           1
           );
+        if (SystemCommand == NULL) {
+          free (ToolInputFile);
+          free (ToolOutputFile);
+          free (ExtractionTool);
+
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+          return EFI_OUT_OF_RESOURCES;
+        }
         sprintf (
           SystemCommand,
           SystemCommandFormatString,
@@ -1884,6 +1921,7 @@ Returns:
             );
         remove (ToolOutputFile);
         free (ToolOutputFile);
+        free (SystemCommand);
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 0004, "unable to read decoded GUIDED section", NULL);
           return EFI_SECTION_ERROR;
