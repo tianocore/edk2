@@ -258,6 +258,14 @@ Returns:
       continue;
     }
     if ((stricmp (argv[0], "--hash") == 0)) {
+      if (EnableHash == TRUE) {
+        //
+        // --hash already given in the option, ignore this one
+        //
+        argc --;
+        argv ++;
+        continue;
+      }
       EnableHash = TRUE;
       OpenSslCommand = "openssl";
       OpenSslEnv = getenv("OPENSSL_PATH");
@@ -1784,8 +1792,14 @@ Returns:
         }
 
         ScratchBuffer       = malloc (ScratchSize);
+        if (ScratchBuffer == NULL) {
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+          return EFI_OUT_OF_RESOURCES;
+        }
         UncompressedBuffer  = malloc (UncompressedLength);
-        if ((ScratchBuffer == NULL) || (UncompressedBuffer == NULL)) {
+        if (UncompressedBuffer == NULL) {
+          free (ScratchBuffer);
+          Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
           return EFI_OUT_OF_RESOURCES;
         }
         Status = DecompressFunction (
