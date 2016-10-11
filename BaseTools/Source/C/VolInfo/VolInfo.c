@@ -2178,6 +2178,8 @@ Returns:
 {
   FILE              *Fptr;
   CHAR8             Line[MAX_LINE_LEN];
+  CHAR8             *FormatString;
+  INTN              FormatLength;
   GUID_TO_BASENAME  *GPtr;
 
   if ((Fptr = fopen (LongFilePath (FileName), "r")) == NULL) {
@@ -2185,18 +2187,44 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
+  //
+  // Generate the format string for fscanf
+  //
+  FormatLength = snprintf (
+                   NULL,
+                   0,
+                   "%%%us %%%us",
+                   (unsigned) sizeof (GPtr->Guid) - 1,
+                   (unsigned) sizeof (GPtr->BaseName) - 1
+                   ) + 1;
+
+  FormatString = (CHAR8 *) malloc (FormatLength);
+  if (FormatString == NULL) {
+    fclose (Fptr);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  snprintf (
+    FormatString,
+    FormatLength,
+    "%%%us %%%us",
+    (unsigned) sizeof (GPtr->Guid) - 1,
+    (unsigned) sizeof (GPtr->BaseName) - 1
+    );
+
   while (fgets (Line, sizeof (Line), Fptr) != NULL) {
     //
     // Allocate space for another guid/basename element
     //
     GPtr = malloc (sizeof (GUID_TO_BASENAME));
     if (GPtr == NULL) {
+      free (FormatString);
       fclose (Fptr);
       return EFI_OUT_OF_RESOURCES;
     }
 
     memset ((char *) GPtr, 0, sizeof (GUID_TO_BASENAME));
-    if (sscanf (Line, "%s %s", GPtr->Guid, GPtr->BaseName) == 2) {
+    if (sscanf (Line, FormatString, GPtr->Guid, GPtr->BaseName) == 2) {
       GPtr->Next        = mGuidBaseNameList;
       mGuidBaseNameList = GPtr;
     } else {
@@ -2207,6 +2235,7 @@ Returns:
     }
   }
 
+  free (FormatString);
   fclose (Fptr);
   return EFI_SUCCESS;
 }
