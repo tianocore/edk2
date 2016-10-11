@@ -1474,6 +1474,10 @@ CVfrDataStorage::GetFreeVarStoreId (
     }
   }
 
+  if (Index == EFI_FREE_VARSTORE_ID_BITMAP_SIZE) {
+    return EFI_VARSTORE_ID_INVALID;
+  }
+
   for (Offset = 0, Mask = 0x80000000; Mask != 0; Mask >>= 1, Offset++) {
     if ((mFreeVarStoreIdBitMap[Index] & Mask) == 0) {
       mFreeVarStoreIdBitMap[Index] |= Mask;
@@ -2435,6 +2439,10 @@ CVfrQuestionDB::GetFreeQuestionId (
     if (mFreeQIdBitMap[Index] != 0xFFFFFFFF) {
       break;
     }
+  }
+
+  if (Index == EFI_FREE_QUESTION_ID_BITMAP_SIZE) {
+    return EFI_QUESTION_ID_INVALID;
   }
 
   for (Offset = 0, Mask = 0x80000000; Mask != 0; Mask >>= 1, Offset++) {

@@ -30,6 +30,8 @@
  * 1989-2000
  */
 
+#include <assert.h>
+
 #define ZZINC {if ( track_columns ) (++_endcol);}
 
 #define ZZGETC {ch = input->nextChar(); cl = ZZSHIFT(ch);}
@@ -114,6 +116,7 @@ more:
 		state = dfa_base[automaton];
 		while (ZZNEWSTATE != DfaStates) {
 			state = newstate;
+            assert(state <= sizeof(dfa)/sizeof(dfa[0]));
 			ZZCOPY;
 			ZZGETC;
 			ZZINC;
