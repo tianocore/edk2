@@ -201,6 +201,7 @@ Return:
     //
     // Only care about the disk.
     //
+    CloseHandle(VolumeHandle);
     return FALSE;
   } else{
     DriveInfo->DiskNumber = StorageDeviceNumber.DeviceNumber;
@@ -437,8 +438,8 @@ ProcessBsOrMbr (
   BYTE              DiskPartitionBackup[0x200] = {0};
   DWORD             BytesReturn;
   INT               DrvNumOffset;
-  HANDLE            InputHandle;
-  HANDLE            OutputHandle;
+  HANDLE            InputHandle = INVALID_HANDLE_VALUE;
+  HANDLE            OutputHandle = INVALID_HANDLE_VALUE;
   ERROR_STATUS      Status;
   DWORD             InputDbrOffset;
   DWORD             OutputDbrOffset;
@@ -448,7 +449,7 @@ ProcessBsOrMbr (
   //
   Status =  GetFileHandle(InputInfo, ProcessMbr, &InputHandle, &InputDbrOffset);
   if (Status != ErrorSuccess) {
-    return Status;
+    goto Done;
   }
 
   //
@@ -456,14 +457,15 @@ ProcessBsOrMbr (
   //
   Status = GetFileHandle(OutputInfo, ProcessMbr, &OutputHandle, &OutputDbrOffset);
   if (Status != ErrorSuccess) {
-    return Status;
+    goto Done;
   }
 
   //
   // Read boot sector from source disk/file
   // 
   if (!ReadFile (InputHandle, DiskPartition, 0x200, &BytesReturn, NULL)) {
-    return ErrorFileReadWrite;
+    Status = ErrorFileReadWrite;
+    goto Done;
   }
 
   if (InputInfo->Type == PathUsb) {
@@ -473,7 +475,8 @@ ProcessBsOrMbr (
       //
       DrvNumOffset = GetDrvNumOffset (DiskPartition);
       if (DrvNumOffset == -1) {
-        return ErrorFatType;
+        Status = ErrorFatType;
+        goto Done;
       }
       //
       // Some legacy BIOS require 0x80 discarding MBR.
@@ -495,7 +498,8 @@ ProcessBsOrMbr (
       // Use original partition table
       //
       if (!ReadFile (OutputHandle, DiskPartitionBackup, 0x200, &BytesReturn, NULL)) {
-        return ErrorFileReadWrite;
+        Status = ErrorFileReadWrite;
+        goto Done;
       }
       memcpy (DiskPartition + 0x1BE, DiskPartitionBackup + 0x1BE, 0x40);
       SetFilePointer (OutputHandle, 0, NULL, FILE_BEGIN);
@@ -507,13 +511,19 @@ ProcessBsOrMbr (
   // Write boot sector to taget disk/file
   // 
   if (!WriteFile (OutputHandle, DiskPartition, 0x200, &BytesReturn, NULL)) {
-    return ErrorFileReadWrite;
+    Status = ErrorFileReadWrite;
+    goto Done;
   }
 
-  CloseHandle (InputHandle);
-  CloseHandle (OutputHandle);
+Done:
+  if (InputHandle != INVALID_HANDLE_VALUE) {
+    CloseHandle (InputHandle);
+  }
+  if (OutputHandle != INVALID_HANDLE_VALUE) {
+    CloseHandle (OutputHandle);
+  }
 
-  return ErrorSuccess;
+  return Status;
 }
 
 void
@@ -630,7 +640,8 @@ GetPathInfo (
     if (f == NULL) {
       fprintf (stderr, "error E2003: File was not provided!\n");
       return ErrorPath;
-    }  
+    }
+    fclose (f);
   }
   PathInfo->Type = PathFile;
   strcpy(PathInfo->PhysicalPath, PathInfo->Path);
