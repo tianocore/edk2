@@ -1,7 +1,7 @@
 /** @file
 This file contains functions required to generate a Firmware File System file.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -842,7 +842,7 @@ Returns:
                );
   }
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (FileBuffer == NULL)) {
     goto Finish;
   }
   
@@ -915,22 +915,24 @@ Returns:
   //
   // Open output file to write ffs data.
   //
-  remove(OutputFileName);
-  FfsFile = fopen (LongFilePath (OutputFileName), "wb");
-  if (FfsFile == NULL) {
-    Error (NULL, 0, 0001, "Error opening file", OutputFileName);
-    goto Finish;
-  }
-  //
-  // write header
-  //
-  fwrite (&FfsFileHeader, 1, HeaderSize, FfsFile);
-  //
-  // write data
-  //
-  fwrite (FileBuffer, 1, FileSize - HeaderSize, FfsFile);
+  if (OutputFileName != NULL) {
+    remove(OutputFileName);
+    FfsFile = fopen (LongFilePath (OutputFileName), "wb");
+    if (FfsFile == NULL) {
+      Error (NULL, 0, 0001, "Error opening file", OutputFileName);
+      goto Finish;
+    }
+    //
+    // write header
+    //
+    fwrite (&FfsFileHeader, 1, HeaderSize, FfsFile);
+    //
+    // write data
+    //
+    fwrite (FileBuffer, 1, FileSize - HeaderSize, FfsFile);
 
-  fclose (FfsFile);
+    fclose (FfsFile);
+  }
 
 Finish:
   if (InputFileName != NULL) {
