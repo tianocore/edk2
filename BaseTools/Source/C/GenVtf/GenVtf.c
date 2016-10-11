@@ -1232,11 +1232,13 @@ Returns:
     Vtf1TotalSize += (UINT32) (FileSize + NumAdjustByte);
     Status = UpdateVtfBuffer (CompStartAddress, Buffer, FileSize, FIRST_VTF);
   } else {
+    free (Buffer);
     Error (NULL, 0, 2000,"Invalid Parameter", "There's component in second VTF so second BaseAddress and Size must be specified!");
     return EFI_INVALID_PARAMETER;
   }
 
   if (EFI_ERROR (Status)) {
+    free (Buffer);
     return EFI_ABORTED;
   }
 
@@ -1248,6 +1250,7 @@ Returns:
 
   CompFitPtr->CompAddress = CompStartAddress | IPF_CACHE_BIT;
   if ((FileSize % 16) != 0) {
+    free (Buffer);
     Error (NULL, 0, 2000, "Invalid parameter", "Binary FileSize must be a multiple of 16.");
     return EFI_INVALID_PARAMETER;
   }
@@ -1389,6 +1392,7 @@ Returns:
   PalFitPtr->CompAddress  = PalStartAddress | IPF_CACHE_BIT;
   //assert ((FileSize % 16) == 0);
   if ((FileSize % 16) != 0) {
+    free (Buffer);
     Error (NULL, 0, 2000, "Invalid parameter", "Binary FileSize must be a multiple of 16.");
     return EFI_INVALID_PARAMETER;
   }
