@@ -2191,6 +2191,7 @@ Returns:
     //
     GPtr = malloc (sizeof (GUID_TO_BASENAME));
     if (GPtr == NULL) {
+      fclose (Fptr);
       return EFI_OUT_OF_RESOURCES;
     }
 
