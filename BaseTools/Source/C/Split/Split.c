@@ -223,14 +223,15 @@ Returns:
 --*/
 {
   EFI_STATUS    Status = EFI_SUCCESS;
+  INTN          ReturnStatus = STATUS_SUCCESS;
   FILE          *In;
   CHAR8         *InputFileName = NULL;
   CHAR8         *OutputDir = NULL;
   CHAR8         *OutFileName1 = NULL;
   CHAR8         *OutFileName2 = NULL;
   UINT64        SplitValue = (UINT64) -1;
-  FILE          *Out1;
-  FILE          *Out2;
+  FILE          *Out1 = NULL;
+  FILE          *Out2 = NULL;
   CHAR8         *OutName1 = NULL;
   CHAR8         *OutName2 = NULL;
   CHAR8         *CurrentDir = NULL;
@@ -366,7 +367,8 @@ Returns:
     OutName1 = (CHAR8*)malloc(strlen(InputFileName) + 16);
     if (OutName1 == NULL) {
       Warning (NULL, 0, 0, NULL, "Memory Allocation Fail.");
-      return STATUS_ERROR;
+      ReturnStatus = STATUS_ERROR;
+      goto Finish;
     }
     strcpy (OutName1, InputFileName);
     strcat (OutName1, "1");
@@ -377,7 +379,8 @@ Returns:
     OutName2 = (CHAR8*)malloc(strlen(InputFileName) + 16);
     if (OutName2 == NULL) {
       Warning (NULL, 0, 0, NULL, "Memory Allocation Fail.");
-      return STATUS_ERROR;
+      ReturnStatus = STATUS_ERROR;
+      goto Finish;
     }
     strcpy (OutName2, InputFileName);
     strcat (OutName2, "2");
@@ -389,20 +392,23 @@ Returns:
     //OutputDirSpecified = TRUE;
     if (chdir(OutputDir) != 0) {
       Warning (NULL, 0, 0, NULL, "Change dir to OutputDir Fail.");
-      return STATUS_ERROR;
+      ReturnStatus = STATUS_ERROR;
+      goto Finish;
     }
   }
 
   CurrentDir = (CHAR8*)getcwd((CHAR8*)0, 0);
   if (EFI_ERROR(CreateDir(&OutFileName1))) {
       Error (OutFileName1, 0, 5, "Create Dir for File1 Fail.", NULL);
-      return STATUS_ERROR;
+      ReturnStatus = STATUS_ERROR;
+      goto Finish;
   }
   chdir(CurrentDir);
 
   if (EFI_ERROR(CreateDir(&OutFileName2))) {
       Error (OutFileName2, 0, 5, "Create Dir for File2 Fail.", NULL);
-      return STATUS_ERROR;
+      ReturnStatus = STATUS_ERROR;
+      goto Finish;
   }
   chdir(CurrentDir);
   free(CurrentDir);
@@ -411,14 +417,16 @@ Returns:
   if (Out1 == NULL) {
     // ("Unable to open file \"%s\"\n", OutFileName1);
     Error (OutFileName1, 0, 1, "File open failure", NULL);
-    return STATUS_ERROR;
+    ReturnStatus = STATUS_ERROR;
+    goto Finish;
   }
 
   Out2 = fopen (LongFilePath (OutFileName2), "wb");
   if (Out2 == NULL) {
     // ("Unable to open file \"%s\"\n", OutFileName2);
     Error (OutFileName2, 0, 1, "File open failure", NULL);
-    return STATUS_ERROR;
+    ReturnStatus = STATUS_ERROR;
+    goto Finish;
   }
 
   for (Index = 0; Index < SplitValue; Index++) {
@@ -439,15 +447,22 @@ Returns:
     fputc (CharC, Out2);
   }
 
+Finish:
   if (OutName1 != NULL) {
     free(OutName1);
   }
   if (OutName2 != NULL) {
     free(OutName2);
   }
-  fclose (In);
-  fclose (Out1);
-  fclose (Out2);
+  if (In != NULL) {
+    fclose (In);
+  }
+  if (Out1 != NULL) {
+    fclose (Out1);
+  }
+  if (Out2 != NULL) {
+    fclose (Out2);
+  }
 
-  return STATUS_SUCCESS;
+  return ReturnStatus;
 }
