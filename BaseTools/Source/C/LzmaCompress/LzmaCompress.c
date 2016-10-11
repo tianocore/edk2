@@ -329,8 +329,10 @@ int main2(int numArgs, const char *args[], char *rs)
   if (InFile_Open(&inStream.file, inputFile) != 0)
     return PrintError(rs, "Can not open input file");
 
-  if (OutFile_Open(&outStream.file, outputFile) != 0)
+  if (OutFile_Open(&outStream.file, outputFile) != 0) {
+    File_Close(&inStream.file);
     return PrintError(rs, "Can not open output file");
+  }
 
   File_GetLength(&inStream.file, &fileSize);
 
