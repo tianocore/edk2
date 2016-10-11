@@ -431,9 +431,11 @@ main (
   //
   result = GenBinPage (BaseMemory, InputFile, OutputFile);
   if (result < 0) {
+    free (BaseMemory);
     return STATUS_ERROR;
   }
 
+  free (BaseMemory);
   return 0;
 }
 
