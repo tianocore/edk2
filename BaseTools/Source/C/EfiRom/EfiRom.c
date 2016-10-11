@@ -883,9 +883,11 @@ Returns:
   UINT32    ClassCode;
   UINT32    CodeRevision;
   EFI_STATUS Status;
+  INTN       ReturnStatus;
   BOOLEAN    EfiRomFlag;
   UINT64     TempValue;
 
+  ReturnStatus = 0;
   FileFlags = 0;
   EfiRomFlag = FALSE;
 
@@ -940,11 +942,13 @@ Returns:
         Status = AsciiStringToUint64(Argv[1], FALSE, &TempValue);
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 2000, "Invalid option value", "%s = %s", Argv[0], Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         if (TempValue >= 0x10000) {
           Error (NULL, 0, 2000, "Invalid option value", "Vendor Id %s out of range!", Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         Options->VendId       = (UINT16) TempValue;
         Options->VendIdValid  = 1;
@@ -959,11 +963,13 @@ Returns:
         Status = AsciiStringToUint64(Argv[1], FALSE, &TempValue);
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 2000, "Invalid option value", "%s = %s", Argv[0], Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         if (TempValue >= 0x10000) {
           Error (NULL, 0, 2000, "Invalid option value", "Device Id %s out of range!", Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         Options->DevId      = (UINT16) TempValue;
         Options->DevIdValid = 1;
@@ -977,11 +983,13 @@ Returns:
         //
         if (Argv[1] == NULL || Argv[1][0] == '-') {
           Error (NULL, 0, 2000, "Invalid parameter", "Missing output file name with %s option!", Argv[0]);
-          return STATUS_ERROR;
+          ReturnStatus = STATUS_ERROR;
+          goto Done;
         }
         if (strlen (Argv[1]) > MAX_PATH - 1) {
           Error (NULL, 0, 2000, "Invalid parameter", "Output file name %s is too long!", Argv[1]);
-          return STATUS_ERROR;
+          ReturnStatus = STATUS_ERROR;
+          goto Done;
         }
         strncpy (Options->OutFileName, Argv[1], MAX_PATH - 1);
         Options->OutFileName[MAX_PATH - 1] = 0;
@@ -993,7 +1001,8 @@ Returns:
         // Help option
         //
         Usage ();
-        return STATUS_ERROR;
+        ReturnStatus = STATUS_ERROR;
+        goto Done;
       } else if (stricmp (Argv[0], "-b") == 0) {
         //
         // Specify binary files with -b
@@ -1021,11 +1030,13 @@ Returns:
         Status = AsciiStringToUint64(Argv[1], FALSE, &DebugLevel);
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 2000, "Invalid option value", "%s = %s", Argv[0], Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         if (DebugLevel > 9)  {
           Error (NULL, 0, 2000, "Invalid option value", "Debug Level range is 0-9, current input level is %d", Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         if (DebugLevel>=5 && DebugLevel<=9) {
           Options->Debug = TRUE;
@@ -1055,12 +1066,14 @@ Returns:
         Status = AsciiStringToUint64(Argv[1], FALSE, &TempValue);
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 2000, "Invalid option value", "%s = %s", Argv[0], Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         ClassCode = (UINT32) TempValue;
         if (ClassCode & 0xFF000000) {
           Error (NULL, 0, 2000, "Invalid parameter", "Class code %s out of range!", Argv[1]);
-          return STATUS_ERROR;
+          ReturnStatus = STATUS_ERROR;
+          goto Done;
         }
         if (FileList != NULL && FileList->ClassCode == 0) {
           FileList->ClassCode = ClassCode;
@@ -1076,12 +1089,14 @@ Returns:
         Status = AsciiStringToUint64(Argv[1], FALSE, &TempValue);
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 2000, "Invalid option value", "%s = %s", Argv[0], Argv[1]);
-          return 1;
+          ReturnStatus = 1;
+          goto Done;
         }
         CodeRevision = (UINT32) TempValue;
         if (CodeRevision & 0xFFFF0000) {
           Error (NULL, 0, 2000, "Invalid parameter", "Code revision %s out of range!", Argv[1]);
-          return STATUS_ERROR;
+          ReturnStatus = STATUS_ERROR;
+          goto Done;
         }
         if (FileList != NULL && FileList->CodeRevision == 0) {
           FileList->CodeRevision = (UINT16) CodeRevision;
@@ -1095,7 +1110,8 @@ Returns:
         mOptions.Pci23 = 1;
       } else {
         Error (NULL, 0, 2000, "Invalid parameter", "Invalid option specified: %s", Argv[0]);
-        return STATUS_ERROR;
+        ReturnStatus = STATUS_ERROR;
+        goto Done;
       }
     } else {
       //
@@ -1104,7 +1120,8 @@ Returns:
       //
       if ((FileFlags & (FILE_FLAG_BINARY | FILE_FLAG_EFI)) == 0) {
         Error (NULL, 0, 2000, "Invalid parameter", "Missing -e or -b with input file %s!", Argv[0]);
-        return STATUS_ERROR;
+        ReturnStatus = STATUS_ERROR;
+        goto Done;
       }
       //
       // Check Efi Option RomImage
@@ -1118,7 +1135,8 @@ Returns:
       FileList = (FILE_LIST *) malloc (sizeof (FILE_LIST));
       if (FileList == NULL) {
         Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!", NULL);
-        return STATUS_ERROR;
+        ReturnStatus = STATUS_ERROR;
+        goto Done;
       }
       
       //
@@ -1156,6 +1174,9 @@ Returns:
   //
   if (Options->FileList == NULL) {
     Error (NULL, 0, 2000, "Invalid parameter", "Missing input file name!");
+    //
+    // No memory allocation, return directly.
+    //
     return STATUS_ERROR;
   }
 
@@ -1165,16 +1186,27 @@ Returns:
   if (EfiRomFlag) {
     if (!Options->VendIdValid) {
       Error (NULL, 0, 2000, "Missing Vendor ID in command line", NULL);
-      return STATUS_ERROR;
+      ReturnStatus = STATUS_ERROR;
+      goto Done;
     }
   
     if (!Options->DevIdValid) {
       Error (NULL, 0, 2000, "Missing Device ID in command line", NULL);
-      return STATUS_ERROR;
+      ReturnStatus = STATUS_ERROR;
+      goto Done;
     }
   }
 
-  return 0;
+Done:
+  if (ReturnStatus != 0) {
+    while (Options->FileList != NULL) {
+      FileList = Options->FileList->Next;
+      free (Options->FileList);
+      Options->FileList = FileList;
+    }
+  }
+
+  return ReturnStatus;
 }
 
 static
