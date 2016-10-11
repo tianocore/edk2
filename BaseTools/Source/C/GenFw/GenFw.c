@@ -3158,7 +3158,7 @@ Returns:
 {
   CHAR8  Line[MAX_LINE_LEN];
   CHAR8  *cptr;
-  unsigned ScannedData = 0;
+  int    ScannedData = 0;
 
   Line[MAX_LINE_LEN - 1]  = 0;
   while (1) {
