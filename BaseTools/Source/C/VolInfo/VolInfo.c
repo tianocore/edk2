@@ -1708,7 +1708,7 @@ Returns:
       break;
 
     case EFI_SECTION_USER_INTERFACE:
-      printf ("  String: %ls\n", (CHAR16 *) &((EFI_USER_INTERFACE_SECTION *) Ptr)->FileNameString);
+      printf ("  String: %ls\n", (wchar_t *) &((EFI_USER_INTERFACE_SECTION *) Ptr)->FileNameString);
       break;
 
     case EFI_SECTION_FIRMWARE_VOLUME_IMAGE:
