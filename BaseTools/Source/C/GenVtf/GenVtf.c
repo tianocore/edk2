@@ -1164,6 +1164,7 @@ Returns:
 
   if (VtfInfo->PreferredSize) {
     if (FileSize > VtfInfo->CompSize) {
+      fclose (Fp);
       Error (NULL, 0, 2000, "Invalid parameter", "The component size is more than specified size.");
       return EFI_ABORTED;
     }
@@ -1173,6 +1174,7 @@ Returns:
 
   Buffer = malloc ((UINTN) FileSize);
   if (Buffer == NULL) {
+    fclose (Fp);
     return EFI_OUT_OF_RESOURCES;
   }
   memset (Buffer, 0, (UINTN) FileSize);
@@ -1342,6 +1344,7 @@ Returns:
 
   FileSize = _filelength (fileno (Fp));
   if (FileSize < 64) {
+    fclose (Fp);
     Error (NULL, 0, 2000, "Invalid parameter", "PAL_A bin header is 64 bytes, so the Bin size must be larger than 64 bytes!");
     return EFI_INVALID_PARAMETER;
   }
@@ -1350,6 +1353,7 @@ Returns:
 
   if (VtfInfo->PreferredSize) {
     if (FileSize > VtfInfo->CompSize) {
+      fclose (Fp);
       Error (NULL, 0, 2000, "Invalid parameter", "The PAL_A Size is more than the specified size.");
       return EFI_ABORTED;
     }
@@ -1359,6 +1363,7 @@ Returns:
 
   Buffer = malloc ((UINTN) FileSize);
   if (Buffer == NULL) {
+    fclose (Fp);
     return EFI_OUT_OF_RESOURCES;
   }
   memset (Buffer, 0, (UINTN) FileSize);
@@ -1775,11 +1780,13 @@ Returns:
   FileSize = _filelength (fileno (Fp));
 
   if (FileSize > 16) {
+    fclose (Fp);
     return EFI_ABORTED;
   }
 
   Buffer = malloc (FileSize);
   if (Buffer == NULL) {
+    fclose (Fp);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -2548,6 +2555,12 @@ Returns:
       // Get the input VTF file name
       //
       VtfFileName = argv[Index+1];
+      if (VtfFP != NULL) {
+        //
+        // VTF file name has been given previously, override with the new value
+        //
+        fclose (VtfFP);
+      }
       VtfFP = fopen (LongFilePath (VtfFileName), "rb");
       if (VtfFP == NULL) {
         Error (NULL, 0, 0001, "Error opening file", VtfFileName);
