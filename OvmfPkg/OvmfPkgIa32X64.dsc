@@ -643,10 +643,7 @@
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 
-  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
-    <LibraryClasses>
-      BltLib|OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
-  }
+  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 
   #
