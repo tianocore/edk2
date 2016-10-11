@@ -902,6 +902,7 @@ Returns:
   }
 
   if (InputLength == 0) {
+    free (FileBuffer);
     Error (NULL, 0, 2000, "Invalid parameter", "the size of input file %s can't be zero", InputFileName);
     return EFI_NOT_FOUND;
   }
@@ -1215,7 +1216,7 @@ Returns:
         InputFileAlign = (UINT32 *) malloc (MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32));
         if (InputFileAlign == NULL) {
           Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
-          return 1;
+          goto Finish;
         }
         memset (InputFileAlign, 1, MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32));
       } else if (InputFileAlignNum % MAXIMUM_INPUT_FILE_NUM == 0) {
@@ -1226,7 +1227,7 @@ Returns:
 
         if (InputFileAlign == NULL) {
           Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
-          return 1;
+          goto Finish;
         }
         memset (&(InputFileAlign[InputFileNum]), 1, (MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32)));
       }
@@ -1249,7 +1250,7 @@ Returns:
       InputFileName = (CHAR8 **) malloc (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *));
       if (InputFileName == NULL) {
         Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
-        return 1;
+        goto Finish;
       }
       memset (InputFileName, 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
     } else if (InputFileNum % MAXIMUM_INPUT_FILE_NUM == 0) {
@@ -1263,7 +1264,7 @@ Returns:
 
       if (InputFileName == NULL) {
         Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
-        return 1;
+        goto Finish;
       }
       memset (&(InputFileName[InputFileNum]), 0, (MAXIMUM_INPUT_FILE_NUM * sizeof (CHAR8 *)));
     }
