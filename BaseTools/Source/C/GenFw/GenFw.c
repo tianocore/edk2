@@ -625,6 +625,10 @@ PeCoffConvertImageToXip (
   // Allocate the extra space that we need to grow the image
   //
   XipFile = malloc (XipLength);
+  if (XipFile == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    return;
+  }
   memset (XipFile, 0, XipLength);
 
   //
@@ -701,6 +705,10 @@ Returns:
                           + 3 * (sizeof (UINT16) + 3 * sizeof (CHAR16)) 
                           + sizeof (EFI_IMAGE_RESOURCE_DATA_ENTRY);
   HiiSectionHeader = malloc (HiiSectionHeaderSize);
+  if (HiiSectionHeader == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    return NULL;
+  }
   memset (HiiSectionHeader, 0, HiiSectionHeaderSize);
 
   HiiSectionOffset = 0;
@@ -1693,6 +1701,10 @@ Returns:
       // Create the resource section header
       //
       HiiSectionHeader = CreateHiiResouceSectionHeader (&HiiSectionHeaderSize, HiiPackageListHeader.PackageLength);
+      if (HiiSectionHeader == NULL) {
+        free (HiiPackageListBuffer);
+        goto Finish;
+      }
       //
       // Wrtie section header and HiiData into File.
       //
@@ -3028,8 +3040,10 @@ Returns:
   }
 
   ptime = localtime (&newtime);
-  DebugMsg (NULL, 0, 9, "New Image Time Stamp", "%04d-%02d-%02d %02d:%02d:%02d",
-            ptime->tm_year + 1900, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+  if (ptime != NULL) {
+    DebugMsg (NULL, 0, 9, "New Image Time Stamp", "%04d-%02d-%02d %02d:%02d:%02d",
+              ptime->tm_year + 1900, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+  }
   //
   // Set new time and data into PeImage.
   //

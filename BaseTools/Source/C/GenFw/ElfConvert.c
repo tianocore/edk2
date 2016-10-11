@@ -1,7 +1,7 @@
 /** @file
 Elf convert solution
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
@@ -24,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include <Common/UefiBaseTypes.h>
 #include <IndustryStandard/PeImage.h>
@@ -98,6 +99,10 @@ CoffAddFixup(
       mCoffFile,
       mCoffOffset + sizeof(EFI_IMAGE_BASE_RELOCATION) + 2 * MAX_COFF_ALIGNMENT
       );
+    if (mCoffFile == NULL) {
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    }
+    assert (mCoffFile != NULL);
     memset (
       mCoffFile + mCoffOffset, 0,
       sizeof(EFI_IMAGE_BASE_RELOCATION) + 2 * MAX_COFF_ALIGNMENT

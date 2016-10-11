@@ -167,6 +167,10 @@ InitializeElf32 (
   // Create COFF Section offset buffer and zero.
   //
   mCoffSectionsOffset = (UINT32 *)malloc(mEhdr->e_shnum * sizeof (UINT32));
+  if (mCoffSectionsOffset == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    return FALSE;
+  }
   memset(mCoffSectionsOffset, 0, mEhdr->e_shnum * sizeof(UINT32));
 
   //
@@ -526,6 +530,10 @@ ScanSections32 (
   // Allocate base Coff file.  Will be expanded later for relocations.
   //
   mCoffFile = (UINT8 *)malloc(mCoffOffset);
+  if (mCoffFile == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+  }
+  assert (mCoffFile != NULL);
   memset(mCoffFile, 0, mCoffOffset);
 
   //
