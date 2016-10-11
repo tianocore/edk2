@@ -1220,6 +1220,7 @@ Returns:
     if (CompareGuid ((EFI_GUID *) FileBuffer, &mFileGuidArray [Index1]) == 0) {
       Error (NULL, 0, 2000, "Invalid parameter", "the %dth file and %uth file have the same file GUID.", (unsigned) Index1 + 1, (unsigned) Index + 1);
       PrintGuid ((EFI_GUID *) FileBuffer);
+      free (FileBuffer);
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -2626,7 +2627,7 @@ Returns:
   //
   Status = CalculateFvSize (&mFvDataInfo);
   if (EFI_ERROR (Status)) {
-    return Status;    
+    goto Finish;
   }
   VerboseMsg ("the generated FV image size is %u bytes", (unsigned) mFvDataInfo.Size);
   
@@ -2640,7 +2641,8 @@ Returns:
   //
   FvBufferHeader = malloc (FvImageSize + sizeof (UINT64));
   if (FvBufferHeader == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Finish;
   }
   FvImage = (UINT8 *) (((UINTN) FvBufferHeader + 7) & ~7);
 
@@ -2732,7 +2734,8 @@ Returns:
   FvMapFile = fopen (LongFilePath (FvMapName), "w");
   if (FvMapFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FvMapName);
-    return EFI_ABORTED;
+    Status = EFI_ABORTED;
+    goto Finish;
   }
   
   //
@@ -2741,7 +2744,8 @@ Returns:
   FvReportFile = fopen (LongFilePath (FvReportName), "w");
   if (FvReportFile == NULL) {
     Error (NULL, 0, 0001, "Error opening file", FvReportName);
-    return EFI_ABORTED;
+    Status = EFI_ABORTED;
+    goto Finish;
   }
   //
   // record FV size information into FvMap file.
@@ -4259,6 +4263,7 @@ Returns:
 
   fwrite (CapBuffer, 1, CapSize, fpout);
   fclose (fpout);
+  free (CapBuffer);
   
   VerboseMsg ("The size of the generated capsule image is %u bytes", (unsigned) CapSize);
 
