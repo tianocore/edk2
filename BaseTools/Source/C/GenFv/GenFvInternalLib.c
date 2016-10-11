@@ -1161,6 +1161,7 @@ Returns:
   //
   FileBuffer = malloc (FileSize);
   if (FileBuffer == NULL) {
+    fclose (NewFile);
     Error (NULL, 0, 4001, "Resouce", "memory cannot be allocated!");
     return EFI_OUT_OF_RESOURCES;
   }
@@ -3506,6 +3507,7 @@ Returns:
           PeFileSize = _filelength (fileno (PeFile));
           PeFileBuffer = (UINT8 *) malloc (PeFileSize);
           if (PeFileBuffer == NULL) {
+            fclose (PeFile);
             Error (NULL, 0, 4001, "Resource", "memory cannot be allocated on rebase of %s", FileName);
             return EFI_OUT_OF_RESOURCES;
           }
@@ -3761,6 +3763,7 @@ Returns:
         PeFileSize = _filelength (fileno (PeFile));
         PeFileBuffer = (UINT8 *) malloc (PeFileSize);
         if (PeFileBuffer == NULL) {
+          fclose (PeFile);
           Error (NULL, 0, 4001, "Resource", "memory cannot be allocated on rebase of %s", FileName);
           return EFI_OUT_OF_RESOURCES;
         }
