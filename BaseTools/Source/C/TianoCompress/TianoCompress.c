@@ -2215,7 +2215,7 @@ Returns:
   for (Char = 0; Char < NumOfChar; Char++) {
 
     Len = BitLen[Char];
-    if (Len == 0) {
+    if (Len == 0 || Len >= 17) {
       continue;
     }
 
@@ -2345,6 +2345,8 @@ Returns:
   UINT16  CharC;
   volatile UINT16  Index;
   UINT32  Mask;
+
+  assert (nn <= NPT);
 
   Number = (UINT16) GetBits (Sd, nbit);
 
