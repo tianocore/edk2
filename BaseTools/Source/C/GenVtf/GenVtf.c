@@ -1125,6 +1125,7 @@ Returns:
   EFI_ABORTED      - Aborted due to one of the many reasons like:
                       (a) Component Size greater than the specified size.
                       (b) Error opening files.
+                      (c) Fail to get the FIT table address.
 
   EFI_INVALID_PARAMETER     Value returned from call to UpdateEntryPoint()
   EFI_OUT_OF_RESOURCES      Memory allocation failure.
@@ -1240,6 +1241,10 @@ Returns:
   }
 
   GetNextAvailableFitPtr (&CompFitPtr);
+  if (CompFitPtr == NULL) {
+    free (Buffer);
+    return EFI_ABORTED;
+  }
 
   CompFitPtr->CompAddress = CompStartAddress | IPF_CACHE_BIT;
   if ((FileSize % 16) != 0) {
@@ -2652,6 +2657,7 @@ Returns:
     }
     SymFileName = VTF_SYM_FILE;
   } else {
+    assert (OutFileName1);
     INTN OutFileNameLen = strlen(OutFileName1);
     INTN NewIndex;
 
@@ -2665,6 +2671,10 @@ Returns:
     } else {
       INTN SymFileNameLen = NewIndex + 1 + strlen(VTF_SYM_FILE);
       SymFileName = malloc(SymFileNameLen + 1);
+      if (SymFileName == NULL) {
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+        goto ERROR;
+      }
       memcpy(SymFileName, OutFileName1, NewIndex + 1);
       memcpy(SymFileName + NewIndex + 1, VTF_SYM_FILE, strlen(VTF_SYM_FILE));
       SymFileName[SymFileNameLen] = '\0';
