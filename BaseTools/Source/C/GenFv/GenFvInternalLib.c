@@ -1,7 +1,7 @@
 /** @file
 This file contains the internal functions required to generate a Firmware Volume.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2016 HP Development Company, L.P.<BR>
 This program and the accompanying materials                          
@@ -2494,6 +2494,10 @@ Returns:
     // Open the FV Extension Header file
     //
     FvExtHeaderFile = fopen (LongFilePath (mFvDataInfo.FvExtHeaderFile), "rb");
+    if (FvExtHeaderFile == NULL) {
+      Error (NULL, 0, 0001, "Error opening file", mFvDataInfo.FvExtHeaderFile);
+      return EFI_ABORTED;
+    }
 
     //
     // Get the file size
