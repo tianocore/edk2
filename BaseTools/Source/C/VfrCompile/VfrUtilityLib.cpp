@@ -1328,7 +1328,7 @@ SVfrVarStorageNode::SVfrVarStorageNode (
   if (Guid != NULL) {
     mGuid = *Guid;
   } else {
-    memset (&Guid, 0, sizeof (EFI_GUID));
+    memset (&mGuid, 0, sizeof (EFI_GUID));
   }
   if (StoreName != NULL) {
     mVarStoreName = new CHAR8[strlen(StoreName) + 1];
@@ -1355,7 +1355,7 @@ SVfrVarStorageNode::SVfrVarStorageNode (
   if (Guid != NULL) {
     mGuid = *Guid;
   } else {
-    memset (&Guid, 0, sizeof (EFI_GUID));
+    memset (&mGuid, 0, sizeof (EFI_GUID));
   }
   if (StoreName != NULL) {
     mVarStoreName = new CHAR8[strlen(StoreName) + 1];

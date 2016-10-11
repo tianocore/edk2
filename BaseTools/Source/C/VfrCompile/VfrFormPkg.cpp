@@ -825,7 +825,7 @@ CFormPkg::DeclarePendingQuestion (
   CHAR8          FName[MAX_NAME_LEN];
   CHAR8          *SName;
   CHAR8          *NewStr;
-  UINT32         ShrinkSize;
+  UINT32         ShrinkSize = 0;
   EFI_VFR_RETURN_CODE  ReturnCode;
   EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
   EFI_VARSTORE_ID       VarStoreId    = EFI_VARSTORE_ID_INVALID;
@@ -1297,6 +1297,7 @@ CIfrRecordInfoDB::IfrAdjustDynamicOpcodeInRecords (
   SIfrRecord         *pAdjustNode, *pNodeBeforeAdjust;
   SIfrRecord         *pNodeBeforeDynamic;
 
+  pPreNode            = NULL;
   pAdjustNode         = NULL;
   pNodeBeforeDynamic  = NULL;
   OpcodeOffset        = 0;
@@ -1845,6 +1846,7 @@ CIfrRecordInfoDB::IfrCreateDefaultForQuestion (
     // Point to the first expression opcode.
     //
     pSNode = pDefaultNode->mNext;
+    pENode = NULL;
     ScopeCount++;
     //
     // Get opcode number behind the EFI_IFR_DEFAULT_2 until reach its END opcode (including the END opcode of EFI_IFR_DEFAULT_2)
