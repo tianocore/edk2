@@ -52,6 +52,7 @@ ClearScreen (
 }
 
 VOID
+EFIAPI
 PrintString (
   IN CONST CHAR8  *FormatString,
   ...
