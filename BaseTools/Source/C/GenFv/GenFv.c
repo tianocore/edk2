@@ -4,7 +4,7 @@
   can be found in the Tiano Firmware Volume Generation Utility 
   Specification, review draft.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -337,7 +337,12 @@ Returns:
         Error (NULL, 0, 1003, "Invalid option value", "Input Ffsfile can't be null");
         return STATUS_ERROR;
       }
-      strcpy (mFvDataInfo.FvFiles[Index], argv[1]);
+      if (strlen (argv[1]) > MAX_LONG_FILE_PATH - 1) {
+        Error (NULL, 0, 1003, "Invalid option value", "Input Ffsfile name %s is too long!", argv[1]);
+        return STATUS_ERROR;
+      }
+      strncpy (mFvDataInfo.FvFiles[Index], argv[1], MAX_LONG_FILE_PATH - 1);
+      mFvDataInfo.FvFiles[Index][MAX_LONG_FILE_PATH - 1] = 0;
       DebugMsg (NULL, 0, 9, "FV component file", "the %uth name is %s", (unsigned) Index + 1, argv[1]);
       argc -= 2;
       argv += 2;

@@ -374,7 +374,7 @@ Returns:
     }
   }
 
-  for (Index = 0; Index < MAX_NUMBER_OF_FILES_IN_FV; Index++) {
+  for (Index = 0; Number + Index < MAX_NUMBER_OF_FILES_IN_FV; Index++) {
     //
     // Read the FFS file list
     //
@@ -2418,17 +2418,19 @@ Returns:
   UINT8                           *FvImage;
   UINTN                           FvImageSize;
   FILE                            *FvFile;
-  CHAR8                           FvMapName [MAX_LONG_FILE_PATH];
+  CHAR8                           *FvMapName;
   FILE                            *FvMapFile;
   EFI_FIRMWARE_VOLUME_EXT_HEADER  *FvExtHeader;
   FILE                            *FvExtHeaderFile;
   UINTN                           FileSize;
-  CHAR8                           FvReportName[MAX_LONG_FILE_PATH];
+  CHAR8                           *FvReportName;
   FILE                            *FvReportFile;
 
   FvBufferHeader = NULL;
   FvFile         = NULL;
+  FvMapName      = NULL;
   FvMapFile      = NULL;
+  FvReportName   = NULL;
   FvReportFile   = NULL;
 
   if (InfFileImage != NULL) {
@@ -2566,8 +2568,34 @@ Returns:
   // FvMap file to log the function address of all modules in one Fvimage
   //
   if (MapFileName != NULL) {
+    if (strlen (MapFileName) > MAX_LONG_FILE_PATH - 1) {
+      Error (NULL, 0, 1003, "Invalid option value", "MapFileName %s is too long!", MapFileName);
+      Status = EFI_ABORTED;
+      goto Finish;
+    }
+
+    FvMapName = malloc (strlen (MapFileName) + 1);
+    if (FvMapName == NULL) {
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Finish;
+    }
+
     strcpy (FvMapName, MapFileName);
   } else {
+    if (strlen (FvFileName) + strlen (".map") > MAX_LONG_FILE_PATH - 1) {
+      Error (NULL, 0, 1003, "Invalid option value", "FvFileName %s is too long!", FvFileName);
+      Status = EFI_ABORTED;
+      goto Finish;
+    }
+
+    FvMapName = malloc (strlen (FvFileName) + strlen (".map") + 1);
+    if (FvMapName == NULL) {
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Finish;
+    }
+
     strcpy (FvMapName, FvFileName);
     strcat (FvMapName, ".map");
   }
@@ -2576,6 +2604,19 @@ Returns:
   //
   // FvReport file to log the FV information in one Fvimage
   //
+  if (strlen (FvFileName) + strlen (".txt") > MAX_LONG_FILE_PATH - 1) {
+    Error (NULL, 0, 1003, "Invalid option value", "FvFileName %s is too long!", FvFileName);
+    Status = EFI_ABORTED;
+    goto Finish;
+  }
+
+  FvReportName = malloc (strlen (FvFileName) + strlen (".txt") + 1);
+  if (FvReportName == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Finish;
+  }
+
   strcpy (FvReportName, FvFileName);
   strcat (FvReportName, ".txt");
 
@@ -2851,6 +2892,14 @@ Finish:
 
   if (FvExtHeader != NULL) {
     free (FvExtHeader);
+  }
+
+  if (FvMapName != NULL) {
+    free (FvMapName);
+  }
+
+  if (FvReportName != NULL) {
+    free (FvReportName);
   }
   
   if (FvFile != NULL) {
