@@ -519,7 +519,7 @@ UpdateConsolePage (
       (UINT16) (VariableOffsetBase + Index),
       NewMenuEntry->DisplayStringToken,
       NewMenuEntry->HelpStringToken,
-      0,
+      EFI_IFR_FLAG_CALLBACK,
       CheckFlags,
       NULL
       );
@@ -548,7 +548,7 @@ UpdateConsolePage (
       (UINT16) (VariableOffsetBase + Index),
       NewMenuEntry->DisplayStringToken,
       NewMenuEntry->HelpStringToken,
-      0,
+      EFI_IFR_FLAG_CALLBACK,
       CheckFlags,
       NULL
       );
@@ -831,7 +831,7 @@ UpdateTerminalPage (
     (UINT16) (COM_BAUD_RATE_VAR_OFFSET + CurrentTerminal),
     STRING_TOKEN (STR_COM_BAUD_RATE),
     STRING_TOKEN (STR_COM_BAUD_RATE),
-    0,
+    EFI_IFR_FLAG_CALLBACK,
     EFI_IFR_NUMERIC_SIZE_1,
     OptionsOpCodeHandle,
     NULL
@@ -864,7 +864,7 @@ UpdateTerminalPage (
     (UINT16) (COM_DATA_RATE_VAR_OFFSET + CurrentTerminal),
     STRING_TOKEN (STR_COM_DATA_BITS),
     STRING_TOKEN (STR_COM_DATA_BITS),
-    0,
+    EFI_IFR_FLAG_CALLBACK,
     EFI_IFR_NUMERIC_SIZE_1,
     OptionsOpCodeHandle,
     NULL
@@ -896,7 +896,7 @@ UpdateTerminalPage (
     (UINT16) (COM_PARITY_VAR_OFFSET + CurrentTerminal),
     STRING_TOKEN (STR_COM_PARITY),
     STRING_TOKEN (STR_COM_PARITY),
-    0,
+    EFI_IFR_FLAG_CALLBACK,
     EFI_IFR_NUMERIC_SIZE_1,
     OptionsOpCodeHandle,
     NULL
@@ -928,7 +928,7 @@ UpdateTerminalPage (
     (UINT16) (COM_STOP_BITS_VAR_OFFSET + CurrentTerminal),
     STRING_TOKEN (STR_COM_STOP_BITS),
     STRING_TOKEN (STR_COM_STOP_BITS),
-    0,
+    EFI_IFR_FLAG_CALLBACK,
     EFI_IFR_NUMERIC_SIZE_1,
     OptionsOpCodeHandle,
     NULL
@@ -960,7 +960,7 @@ UpdateTerminalPage (
     (UINT16) (COM_TERMINAL_VAR_OFFSET + CurrentTerminal),
     STRING_TOKEN (STR_COM_TERMI_TYPE),
     STRING_TOKEN (STR_COM_TERMI_TYPE),
-    0,
+    EFI_IFR_FLAG_CALLBACK,
     EFI_IFR_NUMERIC_SIZE_1,
     OptionsOpCodeHandle,
     NULL
@@ -991,7 +991,7 @@ UpdateTerminalPage (
     (UINT16) (COM_FLOWCONTROL_VAR_OFFSET + CurrentTerminal),
     STRING_TOKEN (STR_COM_FLOW_CONTROL),
     STRING_TOKEN (STR_COM_FLOW_CONTROL),
-    0,
+    EFI_IFR_FLAG_CALLBACK,
     EFI_IFR_NUMERIC_SIZE_1,
     OptionsOpCodeHandle,
     NULL

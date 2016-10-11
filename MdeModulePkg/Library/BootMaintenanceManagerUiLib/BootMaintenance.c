@@ -444,6 +444,108 @@ BmmExtractDevicePathFromHiiHandle (
 }
 
 /**
+  Update the terminal content in TerminalMenu.
+
+  @param BmmData           The BMM fake NV data.
+
+**/
+VOID
+UpdateTerminalContent (
+  IN BMM_FAKE_NV_DATA       *BmmData
+  )
+{
+  UINT16                          Index;
+  BM_TERMINAL_CONTEXT             *NewTerminalContext;
+  BM_MENU_ENTRY                   *NewMenuEntry;
+
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    ASSERT (NewMenuEntry != NULL);
+    NewTerminalContext = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    NewTerminalContext->BaudRateIndex = BmmData->COMBaudRate[Index];
+    ASSERT (BmmData->COMBaudRate[Index] < (sizeof (BaudRateList) / sizeof (BaudRateList[0])));
+    NewTerminalContext->BaudRate      = BaudRateList[BmmData->COMBaudRate[Index]].Value;
+    NewTerminalContext->DataBitsIndex = BmmData->COMDataRate[Index];
+    ASSERT (BmmData->COMDataRate[Index] < (sizeof (DataBitsList) / sizeof (DataBitsList[0])));
+    NewTerminalContext->DataBits      = (UINT8) DataBitsList[BmmData->COMDataRate[Index]].Value;
+    NewTerminalContext->StopBitsIndex = BmmData->COMStopBits[Index];
+    ASSERT (BmmData->COMStopBits[Index] < (sizeof (StopBitsList) / sizeof (StopBitsList[0])));
+    NewTerminalContext->StopBits      = (UINT8) StopBitsList[BmmData->COMStopBits[Index]].Value;
+    NewTerminalContext->ParityIndex   = BmmData->COMParity[Index];
+    ASSERT (BmmData->COMParity[Index] < (sizeof (ParityList) / sizeof (ParityList[0])));
+    NewTerminalContext->Parity        = (UINT8) ParityList[BmmData->COMParity[Index]].Value;
+    NewTerminalContext->TerminalType  = BmmData->COMTerminalType[Index];
+    NewTerminalContext->FlowControl   = BmmData->COMFlowControl[Index];
+    ChangeTerminalDevicePath (
+      NewTerminalContext->DevicePath,
+      FALSE
+      );
+  }
+}
+
+/**
+  Update the console content in ConsoleMenu.
+
+  @param BmmData           The BMM fake NV data.
+
+**/
+VOID
+UpdateConsoleContent(
+  IN CHAR16                 *ConsoleName,
+  IN BMM_FAKE_NV_DATA       *BmmData
+  )
+{
+  UINT16                          Index;
+  BM_CONSOLE_CONTEXT              *NewConsoleContext;
+  BM_TERMINAL_CONTEXT             *NewTerminalContext;
+  BM_MENU_ENTRY                   *NewMenuEntry;
+
+  if (StrCmp (ConsoleName, L"ConIn") == 0) {
+    for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++){
+      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleInpMenu, Index);
+      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
+      ASSERT (Index < MAX_MENU_NUMBER);
+      NewConsoleContext->IsActive = BmmData->ConsoleInCheck[Index];
+    }
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+      ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
+      NewTerminalContext->IsConIn = BmmData->ConsoleInCheck[Index + ConsoleInpMenu.MenuNumber];
+    }
+  }
+
+  if (StrCmp (ConsoleName, L"ConOut") == 0) {
+    for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++){
+      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleOutMenu, Index);
+      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
+      ASSERT (Index < MAX_MENU_NUMBER);
+      NewConsoleContext->IsActive = BmmData->ConsoleOutCheck[Index];
+    }
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+      ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
+      NewTerminalContext->IsConOut = BmmData->ConsoleOutCheck[Index + ConsoleOutMenu.MenuNumber];
+    }
+  }
+  if (StrCmp (ConsoleName, L"ErrOut") == 0) {
+    for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++){
+      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleErrMenu, Index);
+      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
+      ASSERT (Index < MAX_MENU_NUMBER);
+      NewConsoleContext->IsActive = BmmData->ConsoleErrCheck[Index];
+    }
+    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+      ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
+      NewTerminalContext->IsStdErr = BmmData->ConsoleErrCheck[Index + ConsoleErrMenu.MenuNumber];
+    }
+  }
+}
+
+/**
   This function allows a caller to extract the current configuration for one
   or more named elements from the target driver.
 
@@ -589,8 +691,6 @@ BootMaintRouteConfig (
   EFI_HII_CONFIG_ROUTING_PROTOCOL *ConfigRouting;
   BMM_FAKE_NV_DATA                *NewBmmData;
   BMM_FAKE_NV_DATA                *OldBmmData;
-  BM_CONSOLE_CONTEXT              *NewConsoleContext;
-  BM_TERMINAL_CONTEXT             *NewTerminalContext;
   BM_MENU_ENTRY                   *NewMenuEntry;
   BM_LOAD_CONTEXT                 *NewLoadContext;
   UINT16                          Index;
@@ -735,27 +835,6 @@ BootMaintRouteConfig (
       continue;
     }
 
-    NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Index);
-    ASSERT (NewMenuEntry != NULL);
-    NewTerminalContext = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-    NewTerminalContext->BaudRateIndex = NewBmmData->COMBaudRate[Index];
-    ASSERT (NewBmmData->COMBaudRate[Index] < (sizeof (BaudRateList) / sizeof (BaudRateList[0])));
-    NewTerminalContext->BaudRate      = BaudRateList[NewBmmData->COMBaudRate[Index]].Value;
-    NewTerminalContext->DataBitsIndex = NewBmmData->COMDataRate[Index];
-    ASSERT (NewBmmData->COMDataRate[Index] < (sizeof (DataBitsList) / sizeof (DataBitsList[0])));
-    NewTerminalContext->DataBits      = (UINT8) DataBitsList[NewBmmData->COMDataRate[Index]].Value;
-    NewTerminalContext->StopBitsIndex = NewBmmData->COMStopBits[Index];
-    ASSERT (NewBmmData->COMStopBits[Index] < (sizeof (StopBitsList) / sizeof (StopBitsList[0])));
-    NewTerminalContext->StopBits      = (UINT8) StopBitsList[NewBmmData->COMStopBits[Index]].Value;
-    NewTerminalContext->ParityIndex   = NewBmmData->COMParity[Index];
-    ASSERT (NewBmmData->COMParity[Index] < (sizeof (ParityList) / sizeof (ParityList[0])));
-    NewTerminalContext->Parity        = (UINT8) ParityList[NewBmmData->COMParity[Index]].Value;
-    NewTerminalContext->TerminalType  = NewBmmData->COMTerminalType[Index];
-    NewTerminalContext->FlowControl   = NewBmmData->COMFlowControl[Index];
-    ChangeTerminalDevicePath (
-      NewTerminalContext->DevicePath,
-      FALSE
-      );
     TerminalAttChange = TRUE;
   }
   if (TerminalAttChange) {
@@ -767,50 +846,14 @@ BootMaintRouteConfig (
   // Check data which located in Console Options Menu and save the settings if need
   //
   if (CompareMem (NewBmmData->ConsoleInCheck, OldBmmData->ConsoleInCheck, sizeof (NewBmmData->ConsoleInCheck)) != 0){
-    for (Index = 0; Index < ConsoleInpMenu.MenuNumber; Index++){
-      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleInpMenu, Index);
-      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
-      ASSERT (Index < MAX_MENU_NUMBER);
-      NewConsoleContext->IsActive = NewBmmData->ConsoleInCheck[Index];
-    }
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
-      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
-      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
-      NewTerminalContext->IsConIn = NewBmmData->ConsoleInCheck[Index + ConsoleInpMenu.MenuNumber];
-    }
     Var_UpdateConsoleInpOption();
   }
 
   if (CompareMem (NewBmmData->ConsoleOutCheck, OldBmmData->ConsoleOutCheck, sizeof (NewBmmData->ConsoleOutCheck)) != 0){
-    for (Index = 0; Index < ConsoleOutMenu.MenuNumber; Index++){
-      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleOutMenu, Index);
-      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
-      ASSERT (Index < MAX_MENU_NUMBER);
-      NewConsoleContext->IsActive = NewBmmData->ConsoleOutCheck[Index];
-    }
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
-      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
-      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
-      NewTerminalContext->IsConOut = NewBmmData->ConsoleOutCheck[Index + ConsoleOutMenu.MenuNumber];
-    }
     Var_UpdateConsoleOutOption();
   }
 
   if (CompareMem (NewBmmData->ConsoleErrCheck, OldBmmData->ConsoleErrCheck, sizeof (NewBmmData->ConsoleErrCheck)) != 0){
-    for (Index = 0; Index < ConsoleErrMenu.MenuNumber; Index++){
-      NewMenuEntry                = BOpt_GetMenuEntry(&ConsoleErrMenu, Index);
-      NewConsoleContext           = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
-      ASSERT (Index < MAX_MENU_NUMBER);
-      NewConsoleContext->IsActive = NewBmmData->ConsoleErrCheck[Index];
-    }
-    for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
-      NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
-      NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-      ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
-      NewTerminalContext->IsStdErr = NewBmmData->ConsoleErrCheck[Index + ConsoleErrMenu.MenuNumber];
-    }
     Var_UpdateErrorOutOption();
   }
 
@@ -1075,6 +1118,22 @@ BootMaintCallback (
       default:
         break;
       }
+    }
+    //
+    // Update the content in Terminal menu and Console menu here.
+    //
+    if (QuestionId == COM_BAUD_RATE_QUESTION_ID + Private->CurrentTerminal || QuestionId == COM_DATA_RATE_QUESTION_ID + Private->CurrentTerminal ||
+      QuestionId == COM_PARITY_QUESTION_ID + Private->CurrentTerminal || QuestionId == COM_STOP_BITS_QUESTION_ID + Private->CurrentTerminal ||
+      QuestionId == COM_TERMINAL_QUESTION_ID + Private->CurrentTerminal || QuestionId == COM_FLOWCONTROL_QUESTION_ID + Private->CurrentTerminal
+    ) {
+      UpdateTerminalContent(CurrentFakeNVMap);
+    }
+    if ((QuestionId >= CON_IN_DEVICE_QUESTION_ID) && (QuestionId < CON_IN_DEVICE_QUESTION_ID + MAX_MENU_NUMBER)) {
+      UpdateConsoleContent (L"ConIn",CurrentFakeNVMap);
+    } else if ((QuestionId >= CON_OUT_DEVICE_QUESTION_ID) && (QuestionId < CON_OUT_DEVICE_QUESTION_ID + MAX_MENU_NUMBER)) {
+      UpdateConsoleContent (L"ConOut", CurrentFakeNVMap);
+    } else if ((QuestionId >= CON_ERR_DEVICE_QUESTION_ID) && (QuestionId < CON_ERR_DEVICE_QUESTION_ID + MAX_MENU_NUMBER)) {
+      UpdateConsoleContent (L"ConErr", CurrentFakeNVMap);
     }
   }
 
