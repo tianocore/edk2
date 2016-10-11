@@ -1906,7 +1906,7 @@ Returns:
     FileBuffer = (UINT8 *) malloc (InputLength);
     if (FileBuffer == NULL) {
       Error (NULL, 0, 4001, "Resource:", "Memory cannot be allocated!");
-      return 1;
+      goto ERROR;
     }
 
     Status = GetFileContents (
@@ -1917,8 +1917,8 @@ Returns:
   }
 
   if (EFI_ERROR(Status)) {
-    free(FileBuffer);
-    return 1;
+    Error (NULL, 0, 0004, "Error getting contents of file: %s", InputFileName);
+    goto ERROR;
   }
 
   if (OutputFileName == NULL) {
