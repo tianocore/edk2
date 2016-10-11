@@ -362,10 +362,7 @@
   #
   # Video support
   #
-  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
-    <LibraryClasses>
-      BltLib|OptionRomPkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
-  }
+  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
   OvmfPkg/PlatformDxe/Platform.inf
 
