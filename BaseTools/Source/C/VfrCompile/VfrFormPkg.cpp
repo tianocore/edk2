@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "stdio.h"
+#include "assert.h"
 #include "VfrFormPkg.h"
 
 /*
@@ -669,6 +670,8 @@ CFormPkg::AdjustDynamicInsertOpcode (
 
   InserPositionNode  = GetBinBufferNodeForAddr(InserPositionAddr);
   InsertOpcodeNode = GetBinBufferNodeForAddr(InsertOpcodeAddr);
+  assert (InserPositionNode != NULL);
+  assert (InsertOpcodeNode  != NULL);
 
   if (InserPositionNode == InsertOpcodeNode) {
     //
@@ -741,6 +744,8 @@ CFormPkg::AdjustDynamicInsertOpcode (
       // Insert the last restore data node.
       //
       TmpNode = GetNodeBefore (InsertOpcodeNode);
+      assert (TmpNode != NULL);
+
       if (TmpNode == InserPositionNode) {
         NewRestoreNodeBegin->mNext = NewRestoreNodeEnd;
       } else {
@@ -790,6 +795,8 @@ CFormPkg::AdjustDynamicInsertOpcode (
       mBufferNodeQueueTail = NewLastEndNode;
     } else if (mBufferNodeQueueTail->mBufferFree - mBufferNodeQueueTail->mBufferStart == 2) {
       TmpNode = GetNodeBefore(mBufferNodeQueueTail);
+      assert (TmpNode != NULL);
+
       TmpNode->mNext = NewRestoreNodeBegin;
       if (NewRestoreNodeEnd != NULL) {
         NewRestoreNodeEnd->mNext = mBufferNodeQueueTail;
@@ -1314,7 +1321,7 @@ CIfrRecordInfoDB::IfrAdjustDynamicOpcodeInRecords (
   //
   // Check the nodes whether exist.
   //
-  if (pNodeBeforeDynamic == NULL || pAdjustNode == NULL) {
+  if (pNodeBeforeDynamic == NULL || pAdjustNode == NULL || pNodeBeforeAdjust == NULL) {
     return FALSE;
   }
 
@@ -1854,6 +1861,10 @@ CIfrRecordInfoDB::IfrCreateDefaultForQuestion (
       pSNode = pSNode->mNext;
       OpcodeCount++;
     }
+
+    assert (pSNode);
+    assert (pENode);
+
     //
     // Record the offset of node which need to be adjust, will move the new created default opcode to this offset.
     //
@@ -1875,6 +1886,7 @@ CIfrRecordInfoDB::IfrCreateDefaultForQuestion (
         while (pSNode != NULL && pSNode->mNext != NULL && OpcodeNumber-- != 0) {
           pOpHead = (EFI_IFR_OP_HEADER *) pSNode->mIfrBinBuf;
           Obj = new CIfrObj (pOpHead->OpCode, NULL, pSNode->mBinBufLen, FALSE);
+          assert (Obj != NULL);
           Obj->SetLineNo (pSNode->mLineNo);
           ObjBinBuf = Obj->GetObjBinAddr();
           memcpy (ObjBinBuf, pSNode->mIfrBinBuf, (UINTN)pSNode->mBinBufLen);
@@ -2377,6 +2389,8 @@ CIfrObj::CIfrObj (
   mObjBinLen   = (ObjBinLen == 0) ? gOpcodeSizesScopeTable[OpCode].mSize : ObjBinLen;
   mObjBinBuf   = ((DelayEmit == FALSE) && (gCreateOp == TRUE)) ? gCFormPkg.IfrBinBufferGet (mObjBinLen) : new CHAR8[EFI_IFR_MAX_LENGTH];
   mRecordIdx   = (gCreateOp == TRUE) ? gCIfrRecordInfoDB.IfrRecordRegister (0xFFFFFFFF, mObjBinBuf, mObjBinLen, mPkgOffset) : EFI_IFR_RECORDINFO_IDX_INVALUD;
+
+  assert (mObjBinBuf != NULL);
 
   if (IfrObj != NULL) {
     *IfrObj    = mObjBinBuf;

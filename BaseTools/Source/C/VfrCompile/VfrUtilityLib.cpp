@@ -665,7 +665,7 @@ CVfrVarDataTypeDB::GetTypeField (
 {
   SVfrDataField  *pField = NULL;
 
-  if ((FName == NULL) && (Type == NULL)) {
+  if ((FName == NULL) || (Type == NULL)) {
     return VFR_RETURN_FATAL_ERROR;
   }
 
