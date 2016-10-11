@@ -1,7 +1,7 @@
 /** @file
 Utility program to create an EFI option ROM image from binary and EFI PE32 files.
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -95,24 +95,26 @@ Returns:
   // the command line, or the first input filename with a different extension.
   //
   if (!mOptions.OutFileName[0]) {
-    strcpy (mOptions.OutFileName, mOptions.FileList->FileName);
-    //
-    // Find the last . on the line and replace the filename extension with
-    // the default
-    //
-    for (Ext = mOptions.OutFileName + strlen (mOptions.OutFileName) - 1;
-         (Ext >= mOptions.OutFileName) && (*Ext != '.') && (*Ext != '\\');
-         Ext--
-        )
-      ;
-    //
-    // If dot here, then insert extension here, otherwise append
-    //
-    if (*Ext != '.') {
-      Ext = mOptions.OutFileName + strlen (mOptions.OutFileName);
-    }
+    if (mOptions.FileList != NULL) {
+      strcpy (mOptions.OutFileName, mOptions.FileList->FileName);
+      //
+      // Find the last . on the line and replace the filename extension with
+      // the default
+      //
+      for (Ext = mOptions.OutFileName + strlen (mOptions.OutFileName) - 1;
+           (Ext >= mOptions.OutFileName) && (*Ext != '.') && (*Ext != '\\');
+           Ext--
+          )
+        ;
+      //
+      // If dot here, then insert extension here, otherwise append
+      //
+      if (*Ext != '.') {
+        Ext = mOptions.OutFileName + strlen (mOptions.OutFileName);
+      }
 
-    strcpy (Ext, DEFAULT_OUTPUT_EXTENSION);
+      strcpy (Ext, DEFAULT_OUTPUT_EXTENSION);
+    }
   }
   //
   // Make sure we don't have the same filename for input and output files
