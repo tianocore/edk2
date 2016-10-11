@@ -1,7 +1,7 @@
 /** @file
 Creates output file that is a properly formed section per the PI spec.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -667,6 +667,10 @@ Returns:
     return Status;
   }
 
+  if (FileBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   CompressFunction = NULL;
 
   //
@@ -730,6 +734,10 @@ Returns:
       }
 
       return Status;
+    }
+
+    if (FileBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
     }
   }
 
@@ -887,6 +895,10 @@ Returns:
     }
     Error (NULL, 0, 0001, "Error opening file for reading", InputFileName[0]);
     return Status;
+  }
+
+  if (FileBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   if (InputLength == 0) {
@@ -1365,7 +1377,9 @@ Returns:
   //
   // GuidValue is only required by Guided section.
   //
-  if ((SectType != EFI_SECTION_GUID_DEFINED) && (CompareGuid (&VendorGuid, &mZeroGuid) != 0)) {
+  if ((SectType != EFI_SECTION_GUID_DEFINED) &&
+    (SectionName != NULL) &&
+    (CompareGuid (&VendorGuid, &mZeroGuid) != 0)) {
     fprintf (stdout, "Warning: the input guid value is not required for this section type %s\n", SectionName);
   }
   
