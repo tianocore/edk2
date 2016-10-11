@@ -979,7 +979,12 @@ Returns:
           Error (NULL, 0, 2000, "Invalid parameter", "Missing output file name with %s option!", Argv[0]);
           return STATUS_ERROR;
         }
-        strcpy (Options->OutFileName, Argv[1]);
+        if (strlen (Argv[1]) > MAX_PATH - 1) {
+          Error (NULL, 0, 2000, "Invalid parameter", "Output file name %s is too long!", Argv[1]);
+          return STATUS_ERROR;
+        }
+        strncpy (Options->OutFileName, Argv[1], MAX_PATH - 1);
+        Options->OutFileName[MAX_PATH - 1] = 0;
 
         Argv++;
         Argc--;
