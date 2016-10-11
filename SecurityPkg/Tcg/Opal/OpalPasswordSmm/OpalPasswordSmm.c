@@ -483,6 +483,53 @@ done:
   return Status;
 }
 
+/**
+  The function extracts device information from OpalDeviceList and creat SmmDeviceList used for S3.
+
+  @param[in]       OpalDeviceList   Opal device list created at POST which contains the information of OPAL_DISK_AND_PASSWORD_INFO
+  @param[in,out]   SmmDeviceList    Opal Smm device list to be created and used for unlocking devices at S3 resume.
+
+  @retval EFI_SUCCESS            Create SmmDeviceList successfully.
+  @retval Others                 Other execution results.
+**/
+EFI_STATUS
+CreateSmmDeviceList (
+  IN     LIST_ENTRY                 *OpalDeviceList,
+  IN OUT LIST_ENTRY                 *SmmDeviceList
+  )
+{
+  LIST_ENTRY                        *Entry;
+  OPAL_DISK_AND_PASSWORD_INFO       *PciDev;
+  OPAL_SMM_DEVICE                   *SmmDev;
+
+  for (Entry = OpalDeviceList->ForwardLink; Entry != OpalDeviceList; Entry = Entry->ForwardLink) {
+    PciDev = BASE_CR (Entry, OPAL_DISK_AND_PASSWORD_INFO, Link);
+
+    SmmDev = AllocateZeroPool (sizeof (OPAL_SMM_DEVICE));
+    if (SmmDev == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    SmmDev->Signature = OPAL_SMM_DEVICE_SIGNATURE;
+
+    ExtractDeviceInfoFromDevicePath(&PciDev->OpalDevicePath, SmmDev);
+
+    SmmDev->PasswordLength = PciDev->PasswordLength;
+    CopyMem(&(SmmDev->Password), PciDev->Password, OPAL_PASSWORD_MAX_LENGTH);
+
+    SmmDev->Sscp.ReceiveData = SecurityReceiveData;
+    SmmDev->Sscp.SendData = SecuritySendData;
+
+    DEBUG ((DEBUG_INFO, "Opal SMM: Insert device node to SmmDeviceList:\n"));
+    DEBUG ((DEBUG_INFO, "DeviceType:%x, Bus:%d, Dev:%d, Fun:%d\n", \
+      SmmDev->DeviceType, SmmDev->BusNum, SmmDev->DevNum, SmmDev->FuncNum));
+    DEBUG ((DEBUG_INFO, "SataPort:%x, MultiplierPort:%x, NvmeNamespaceId:%x\n", \
+      SmmDev->SataPort, SmmDev->SataPortMultiplierPort, SmmDev->NvmeNamespaceId));
+
+    InsertHeadList (SmmDeviceList, &SmmDev->Link);
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Main entry point for an SMM handler dispatch or communicate-based callback.
@@ -521,7 +568,6 @@ S3SleepEntryCallBack (
   UINT64                            Address;
   S3_BOOT_SCRIPT_LIB_WIDTH          Width;
   UINT32                            Data;
-  OPAL_DISK_AND_PASSWORD_INFO       *PciDev;
   OPAL_HC_PCI_REGISTER_SAVE         *HcRegisterSaveListPtr;
   UINTN                             Count;
   OPAL_SMM_DEVICE                   *SmmDev;
@@ -530,25 +576,28 @@ S3SleepEntryCallBack (
   Status   = EFI_SUCCESS;
 
   mOpalDeviceList = OpalSupportGetOpalDeviceList();
+  if (IsListEmpty (mOpalDeviceList)) {
+    //
+    // No Opal enabled device. Do nothing.
+    //
+    return EFI_SUCCESS;
+  }
 
-  for (Entry = mOpalDeviceList->ForwardLink; Entry != mOpalDeviceList; Entry = Entry->ForwardLink) {
-    PciDev   = BASE_CR (Entry, OPAL_DISK_AND_PASSWORD_INFO, Link);
-
-    SmmDev = AllocateZeroPool (sizeof (OPAL_SMM_DEVICE));
-    if (SmmDev == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+  if (IsListEmpty (&mSmmDeviceList)) {
+    //
+    // mSmmDeviceList for S3 is empty, creat it by mOpalDeviceList.
+    //
+    Status = CreateSmmDeviceList (mOpalDeviceList, &mSmmDeviceList);
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
-    SmmDev->Signature = OPAL_SMM_DEVICE_SIGNATURE;
+  }
 
-    ExtractDeviceInfoFromDevicePath(&PciDev->OpalDevicePath, SmmDev);
-
-    SmmDev->PasswordLength = PciDev->PasswordLength;
-    CopyMem(&(SmmDev->Password), PciDev->Password, OPAL_PASSWORD_MAX_LENGTH);
-
-    SmmDev->Sscp.ReceiveData = SecurityReceiveData;
-    SmmDev->Sscp.SendData = SecuritySendData;
-
-    InsertHeadList (&mSmmDeviceList, &SmmDev->Link);
+  //
+  // Go through SmmDeviceList to save register data for S3
+  //
+  for (Entry = mSmmDeviceList.ForwardLink; Entry != &mSmmDeviceList; Entry = Entry->ForwardLink) {
+    SmmDev = BASE_CR (Entry, OPAL_SMM_DEVICE, Link);
 
     if (SmmDev->DeviceType == OPAL_DEVICE_TYPE_NVME) {
       continue;
@@ -592,10 +641,8 @@ S3SleepEntryCallBack (
     }
   }
 
-  if (!IsListEmpty (mOpalDeviceList)) {
-    Status = S3BootScriptSaveIoWrite (S3BootScriptWidthUint8, 0xB2, 1, &mSwSmiValue);
-    ASSERT_EFI_ERROR (Status);
-  }
+  Status = S3BootScriptSaveIoWrite (S3BootScriptWidthUint8, 0xB2, 1, &mSwSmiValue);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }

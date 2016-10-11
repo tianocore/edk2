@@ -1691,6 +1691,14 @@ NvmeControllerInit (
   Nvme->Cid[0] = 0;
   Nvme->Cid[1] = 0;
 
+  Nvme->Pt[0]  = 0;
+  Nvme->Pt[1]  = 0;
+
+  ZeroMem ((VOID *)(UINTN)(&(Nvme->SqTdbl[0])), sizeof (NVME_SQTDBL) * NVME_MAX_IO_QUEUES);
+  ZeroMem ((VOID *)(UINTN)(&(Nvme->CqHdbl[0])), sizeof (NVME_CQHDBL) * NVME_MAX_IO_QUEUES);
+
+  ZeroMem ((VOID *)(UINTN)Nvme->BaseMem, NVME_MEM_MAX_SIZE);
+
   Status = NvmeDisableController (Nvme);
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "NvmeDisableController fail, Status: %r\n", Status));
