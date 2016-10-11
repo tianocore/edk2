@@ -1764,6 +1764,8 @@ Returns:
   InputLength = 0;
   InputFileName = NULL;
   OutputFileName = NULL;
+  InputFile = NULL;
+  OutputFile = NULL;
   DstSize=0;
   DebugLevel = 0;
   DebugMode = FALSE;
@@ -1927,9 +1929,6 @@ Returns:
   OutputFile = fopen (LongFilePath (OutputFileName), "wb");
   if (OutputFile == NULL) {
     Error (NULL, 0, 0001, "Error opening output file for writing", OutputFileName);
-    if (InputFile != NULL) {
-      fclose (InputFile);
-    }
     goto ERROR;
   }
     
@@ -1962,6 +1961,8 @@ Returns:
   }
 
   fwrite(OutBuffer,(size_t)DstSize, 1, OutputFile);
+  fclose(OutputFile);
+  fclose(InputFile);
   free(Scratch);
   free(FileBuffer);
   free(OutBuffer);
@@ -1999,6 +2000,8 @@ Returns:
   }
 
   fwrite(OutBuffer, (size_t)(Scratch->mOrigSize), 1, OutputFile);
+  fclose(OutputFile);
+  fclose(InputFile);
   free(Scratch);
   free(FileBuffer);
   free(OutBuffer);
@@ -2020,6 +2023,12 @@ ERROR:
     } else if (DECODE) {
       DebugMsg(UTILITY_NAME, 0, DebugLevel, "Decoding Error\n", NULL);
     }
+  }
+  if (OutputFile != NULL) {
+    fclose(OutputFile);
+  }
+  if (InputFile != NULL) {
+    fclose (InputFile);
   }
   if (Scratch != NULL) {
     free(Scratch);
