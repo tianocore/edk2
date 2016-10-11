@@ -750,7 +750,6 @@
   # @Prompt Turn on PS2 Mouse Extended Verification
   gEfiMdeModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification|TRUE|BOOLEAN|0x00010075
 
-[PcdsFeatureFlag.X64]
   ## Indicates whether 64-bit PCI MMIO BARs should degrade to 32-bit in the presence of an option ROM
   #  On X64 platforms, Option ROMs may contain code that executes in the context of a legacy BIOS (CSM),
   #  which requires that all PCI MMIO BARs are located below 4 GB
