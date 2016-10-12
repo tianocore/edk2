@@ -131,7 +131,6 @@ typedef struct {
   UINT32  Width;
   UINT32  Height;
   UINT32  ColorDepth;
-  UINT32  RefreshRate;
   UINT8   *CrtcSettings;
   UINT16  *SeqSettings;
   UINT8   MiscSetting;
