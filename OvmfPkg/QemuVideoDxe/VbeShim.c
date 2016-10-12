@@ -100,7 +100,7 @@ InstallVbeShim (
     //
     Handler = (Int0x10->Segment << 4) + Int0x10->Offset;
     if (Handler >= SegmentC && Handler < SegmentF) {
-      DEBUG ((EFI_D_VERBOSE, "%a: Video BIOS handler found at %04x:%04x\n",
+      DEBUG ((EFI_D_INFO, "%a: Video BIOS handler found at %04x:%04x\n",
         __FUNCTION__, Int0x10->Segment, Int0x10->Offset));
       return;
     }
@@ -109,7 +109,7 @@ InstallVbeShim (
     // Otherwise we'll overwrite the Int10h vector, even though we may not own
     // the page at zero.
     //
-    DEBUG ((EFI_D_VERBOSE, "%a: failed to allocate page at zero: %r\n",
+    DEBUG ((EFI_D_INFO, "%a: failed to allocate page at zero: %r\n",
       __FUNCTION__, Status));
   } else {
     //

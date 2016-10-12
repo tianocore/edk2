@@ -303,7 +303,7 @@ QemuVideoBochsModeSetup (
     AvailableFbSize  = BochsRead (Private, VBE_DISPI_INDEX_VIDEO_MEMORY_64K);
     AvailableFbSize *= SIZE_64KB;
   }
-  DEBUG ((EFI_D_VERBOSE, "%a: AvailableFbSize=0x%x\n", __FUNCTION__,
+  DEBUG ((EFI_D_INFO, "%a: AvailableFbSize=0x%x\n", __FUNCTION__,
     AvailableFbSize));
 
   //
