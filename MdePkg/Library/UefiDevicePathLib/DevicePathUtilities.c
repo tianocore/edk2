@@ -8,7 +8,7 @@
   environment varibles. Multi-instance device paths should never be placed
   on a Handle.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -61,18 +61,26 @@ IsDevicePathValid (
 
   ASSERT (DevicePath != NULL);
 
-  for (Count = 0, Size = 0; !IsDevicePathEnd (DevicePath); DevicePath = NextDevicePathNode (DevicePath)) {
+  if (MaxSize == 0){
+    MaxSize = MAX_UINTN;
+  }
+
+  Size = 0;
+  Count = 0;
+
+  while (MaxSize >= sizeof (EFI_DEVICE_PATH_PROTOCOL) &&
+        (MaxSize - sizeof (EFI_DEVICE_PATH_PROTOCOL) >= Size) &&
+        !IsDevicePathEnd (DevicePath)) {
     NodeLength = DevicePathNodeLength (DevicePath);
     if (NodeLength < sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
       return FALSE;
     }
 
-    if (MaxSize > 0) {
-      Size += NodeLength;
-      if (Size + END_DEVICE_PATH_LENGTH > MaxSize) {
-        return FALSE;
-      }
+    if (NodeLength > MAX_UINTN - Size) {
+      return FALSE;
     }
+
+    Size += NodeLength;
 
     if (PcdGet32 (PcdMaximumDevicePathNodeCount) > 0) {
       Count++;
@@ -80,6 +88,8 @@ IsDevicePathValid (
         return FALSE;
       }
     }
+
+    DevicePath = NextDevicePathNode (DevicePath);
   }
 
   //
@@ -87,6 +97,7 @@ IsDevicePathValid (
   //
   return (BOOLEAN) (DevicePathNodeLength (DevicePath) == END_DEVICE_PATH_LENGTH);
 }
+
 
 /**
   Returns the Type field of a device path node.
