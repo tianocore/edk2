@@ -50,7 +50,7 @@ typedef struct {
   UINT32 MBOX;          ///< Offset 0x58 Supported Mailboxes
   UINT32 DMOD;          ///< Offset 0x5C Driver Model
   UINT32 PCON;          ///< Offset 0x60 Platform Configuration
-  CHAR16 DVER[0x10]     ///< Offset 0x64 GOP Version
+  CHAR16 DVER[0x10];    ///< Offset 0x64 GOP Version
   UINT8  RM01[0x7C];    ///< Offset 0x84 Reserved Must be zero
 } IGD_OPREGION_HEADER;
 
