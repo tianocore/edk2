@@ -110,11 +110,9 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL              *GopDevicePath;
 
   //
-  // The next three fields match the client-visible
-  // EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE.Mode and
-  // EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE.MaxMode fields.
+  // The next two fields match the client-visible
+  // EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE.MaxMode field.
   //
-  UINTN                                 CurrentMode;
   UINTN                                 MaxMode;
   QEMU_VIDEO_MODE_DATA                  *ModeData;
 
