@@ -56,7 +56,6 @@ typedef struct {
   UINT32  HorizontalResolution;
   UINT32  VerticalResolution;
   UINT32  ColorDepth;
-  UINT32  RefreshRate;
 } QEMU_VIDEO_MODE_DATA;
 
 #define PIXEL_RED_SHIFT   0
