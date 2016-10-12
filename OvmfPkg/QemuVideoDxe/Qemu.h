@@ -116,7 +116,6 @@ typedef struct {
   UINTN                                 MaxMode;
   QEMU_VIDEO_MODE_DATA                  *ModeData;
 
-  UINT8                                 *LineBuffer;
   QEMU_VIDEO_VARIANT                    Variant;
   FRAME_BUFFER_CONFIGURE                *FrameBufferBltConfigure;
   UINTN                                 FrameBufferBltConfigureSize;

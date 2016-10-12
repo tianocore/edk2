@@ -167,15 +167,6 @@ Routine Description:
 
   ModeData = &Private->ModeData[ModeNumber];
 
-  if (Private->LineBuffer) {
-    gBS->FreePool (Private->LineBuffer);
-  }
-
-  Private->LineBuffer = AllocatePool (4 * ModeData->HorizontalResolution);
-  if (Private->LineBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
   switch (Private->Variant) {
   case QEMU_VIDEO_CIRRUS_5430:
   case QEMU_VIDEO_CIRRUS_5446:
@@ -187,8 +178,6 @@ Routine Description:
     break;
   default:
     ASSERT (FALSE);
-    gBS->FreePool (Private->LineBuffer);
-    Private->LineBuffer = NULL;
     return EFI_DEVICE_ERROR;
   }
 
@@ -349,7 +338,6 @@ QemuVideoGraphicsOutputConstructor (
   }
   Private->GraphicsOutput.Mode->MaxMode = (UINT32) Private->MaxMode;
   Private->GraphicsOutput.Mode->Mode    = GRAPHICS_OUTPUT_INVALIDE_MODE_NUMBER;
-  Private->LineBuffer                   = NULL;
   Private->FrameBufferBltConfigure      = NULL;
   Private->FrameBufferBltConfigureSize  = 0;
 
@@ -395,10 +383,6 @@ Returns:
 
 --*/
 {
-  if (Private->LineBuffer != NULL) {
-    FreePool (Private->LineBuffer);
-  }
-
   if (Private->FrameBufferBltConfigure != NULL) {
     FreePool (Private->FrameBufferBltConfigure);
   }
