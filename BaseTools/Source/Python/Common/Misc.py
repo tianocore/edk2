@@ -1412,32 +1412,7 @@ def ParseConsoleLog(Filename):
     Opr.close()
     Opw.close()
 
-## AnalyzeDscPcd
-#
-#  Analyze DSC PCD value, since there is no data type info in DSC
-#  This fuction is used to match functions (AnalyzePcdData, AnalyzeHiiPcdData, AnalyzeVpdPcdData) used for retrieving PCD value from database
-#  1. Feature flag: TokenSpace.PcdCName|PcdValue
-#  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|MaxSize]
-#  3. Dynamic default:
-#     TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
-#     TokenSpace.PcdCName|PcdValue
-#  4. Dynamic VPD:
-#     TokenSpace.PcdCName|VpdOffset[|VpdValue]
-#     TokenSpace.PcdCName|VpdOffset[|MaxSize[|VpdValue]]
-#  5. Dynamic HII:
-#     TokenSpace.PcdCName|HiiString|VaiableGuid|VariableOffset[|HiiValue]
-#  PCD value needs to be located in such kind of string, and the PCD value might be an expression in which
-#    there might have "|" operator, also in string value.
-#
-#  @param Setting: String contain information described above with "TokenSpace.PcdCName|" stripped
-#  @param PcdType: PCD type: feature, fixed, dynamic default VPD HII
-#  @param DataType: The datum type of PCD: VOID*, UNIT, BOOL
-#  @retval:
-#    ValueList: A List contain fields described above
-#    IsValid:   True if conforming EBNF, otherwise False
-#    Index:     The index where PcdValue is in ValueList
-#
-def AnalyzeDscPcd(Setting, PcdType, DataType=''):
+def AnalyzePcdExpression(Setting):
     Setting = Setting.strip()
     # There might be escaped quote in a string: \", \\\"
     Data = Setting.replace('\\\\', '//').replace('\\\"', '\\\'')
@@ -1466,6 +1441,36 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             break
         FieldList.append(Setting[StartPos:Pos].strip())
         StartPos = Pos + 1
+
+    return FieldList
+
+## AnalyzeDscPcd
+#
+#  Analyze DSC PCD value, since there is no data type info in DSC
+#  This fuction is used to match functions (AnalyzePcdData, AnalyzeHiiPcdData, AnalyzeVpdPcdData) used for retrieving PCD value from database
+#  1. Feature flag: TokenSpace.PcdCName|PcdValue
+#  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|MaxSize]
+#  3. Dynamic default:
+#     TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
+#     TokenSpace.PcdCName|PcdValue
+#  4. Dynamic VPD:
+#     TokenSpace.PcdCName|VpdOffset[|VpdValue]
+#     TokenSpace.PcdCName|VpdOffset[|MaxSize[|VpdValue]]
+#  5. Dynamic HII:
+#     TokenSpace.PcdCName|HiiString|VaiableGuid|VariableOffset[|HiiValue]
+#  PCD value needs to be located in such kind of string, and the PCD value might be an expression in which
+#    there might have "|" operator, also in string value.
+#
+#  @param Setting: String contain information described above with "TokenSpace.PcdCName|" stripped
+#  @param PcdType: PCD type: feature, fixed, dynamic default VPD HII
+#  @param DataType: The datum type of PCD: VOID*, UNIT, BOOL
+#  @retval:
+#    ValueList: A List contain fields described above
+#    IsValid:   True if conforming EBNF, otherwise False
+#    Index:     The index where PcdValue is in ValueList
+#
+def AnalyzeDscPcd(Setting, PcdType, DataType=''):
+    FieldList = AnalyzePcdExpression(Setting)
 
     IsValid = True
     if PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_FEATURE_FLAG):

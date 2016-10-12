@@ -26,7 +26,7 @@ import Common.GlobalData as GlobalData
 from CommonDataClass.DataClass import *
 from Common.DataType import *
 from Common.String import *
-from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClass, AnalyzePcdData, AnalyzeDscPcd
+from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClass, AnalyzePcdData, AnalyzeDscPcd, AnalyzePcdExpression
 from Common.Expression import *
 from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
@@ -1635,6 +1635,7 @@ class DecParser(MetaFileParser):
         self._Comments = []
         self._Version = 0x00010005  # Only EDK2 dec file is supported
         self._AllPCDs = [] # Only for check duplicate PCD
+        self._AllPcdDict = {}
 
     ## Parser starter
     def Start(self):
@@ -1848,10 +1849,10 @@ class DecParser(MetaFileParser):
         # Has VOID* type string, may contain "|" character in the string. 
         if len(PtrValue) != 0:
             ptrValueList = re.sub(ValueRe, '', TokenList[1])
-            ValueList = GetSplitValueList(ptrValueList)
+            ValueList = AnalyzePcdExpression(ptrValueList)
             ValueList[0] = PtrValue[0]
         else:
-            ValueList = GetSplitValueList(TokenList[1])
+            ValueList = AnalyzePcdExpression(TokenList[1])
 
 
         # check if there's enough datum information given
@@ -1878,6 +1879,19 @@ class DecParser(MetaFileParser):
                             ExtraData=self._CurrentLine + \
                                       " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
                             File=self.MetaFile, Line=self._LineIndex + 1)
+
+        PcdValue = ValueList[0]
+        if PcdValue:
+            try:
+                ValueList[0] = ValueExpression(PcdValue, self._AllPcdDict)(True)
+            except WrnExpression, Value:
+                ValueList[0] = Value.result
+
+        if ValueList[0] == 'True':
+            ValueList[0] = '1'
+        if ValueList[0] == 'False':
+            ValueList[0] = '0'
+
         # check format of default value against the datum type
         IsValid, Cause = CheckPcdDatum(ValueList[1], ValueList[0])
         if not IsValid:
@@ -1896,6 +1910,7 @@ class DecParser(MetaFileParser):
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
         else:
             self._AllPCDs.append((self._Scope[0], self._ValueList[0], self._ValueList[1]))
+            self._AllPcdDict[TAB_SPLIT.join(self._ValueList[0:2])] = ValueList[0]
 
         self._ValueList[2] = ValueList[0].strip() + '|' + ValueList[1].strip() + '|' + ValueList[2].strip()
 
