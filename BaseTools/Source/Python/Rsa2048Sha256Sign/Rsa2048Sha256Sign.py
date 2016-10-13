@@ -169,8 +169,8 @@ if __name__ == '__main__':
   if args.Encode:
     FullInputFileBuffer = args.InputFileBuffer
     if args.MonotonicCountStr:
-      format = "Q%ds" % len(args.InputFileBuffer)
-      FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
+      format = "%dsQ" % len(args.InputFileBuffer)
+      FullInputFileBuffer = struct.pack(format, args.InputFileBuffer, args.MonotonicCountValue)
     # 
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
@@ -212,8 +212,8 @@ if __name__ == '__main__':
 
     FullInputFileBuffer = args.InputFileBuffer
     if args.MonotonicCountStr:
-      format = "Q%ds" % len(args.InputFileBuffer)
-      FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
+      format = "%dsQ" % len(args.InputFileBuffer)
+      FullInputFileBuffer = struct.pack(format, args.InputFileBuffer, args.MonotonicCountValue)
 
     #
     # Write Signature to output file

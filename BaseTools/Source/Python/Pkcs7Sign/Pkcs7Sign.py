@@ -197,8 +197,8 @@ if __name__ == '__main__':
         print 'ERROR: test other public cert file %s missing' % (args.OtherPublicCertFileName)
         sys.exit(1)
 
-    format = "Q%ds" % len(args.InputFileBuffer)
-    FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
+    format = "%dsQ" % len(args.InputFileBuffer)
+    FullInputFileBuffer = struct.pack(format, args.InputFileBuffer, args.MonotonicCountValue)
 
     #
     # Sign the input file using the specified private key and capture signature from STDOUT
@@ -261,8 +261,8 @@ if __name__ == '__main__':
     args.SignatureBuffer = args.InputFileBuffer[0:SignatureSize]
     args.InputFileBuffer = args.InputFileBuffer[SignatureSize:]
 
-    format = "Q%ds" % len(args.InputFileBuffer)
-    FullInputFileBuffer = struct.pack(format,args.MonotonicCountValue, args.InputFileBuffer)
+    format = "%dsQ" % len(args.InputFileBuffer)
+    FullInputFileBuffer = struct.pack(format, args.InputFileBuffer, args.MonotonicCountValue)
 
     #
     # Save output file contents from input file
