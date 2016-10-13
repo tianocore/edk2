@@ -31,7 +31,7 @@ ASM_PFX(NextInstruction):
    pop   eax
    sub   eax, ASM_PFX(NextInstruction)
    add   eax, ASM_PFX(AsmGetFspInfoHeader)
-   sub   eax, dword [ASM_PFX(FspInfoHeaderRelativeOff)]
+   sub   eax, dword [eax - ASM_PFX(AsmGetFspInfoHeader) + ASM_PFX(FspInfoHeaderRelativeOff)]
    ret
 
 global ASM_PFX(AsmGetFspInfoHeaderNoStack)
