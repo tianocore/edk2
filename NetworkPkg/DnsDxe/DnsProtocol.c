@@ -287,6 +287,7 @@ Dns4Configure (
     if (EFI_ERROR (Status)) {
       if (Instance->Dns4CfgData.DnsServerList != NULL) {
         FreePool (Instance->Dns4CfgData.DnsServerList);
+        Instance->Dns4CfgData.DnsServerList = NULL;
       }
       goto ON_EXIT;
     }
@@ -298,6 +299,7 @@ Dns4Configure (
     if (EFI_ERROR (Status)) {
       if (Instance->Dns4CfgData.DnsServerList != NULL) {
         FreePool (Instance->Dns4CfgData.DnsServerList);
+        Instance->Dns4CfgData.DnsServerList = NULL;
       }
       goto ON_EXIT;
     }
@@ -1108,6 +1110,7 @@ Dns6Configure (
     if (EFI_ERROR (Status)) {
       if (Instance->Dns6CfgData.DnsServerList != NULL) {
         FreePool (Instance->Dns6CfgData.DnsServerList);
+        Instance->Dns6CfgData.DnsServerList = NULL;
       }
       goto ON_EXIT;
     }
@@ -1119,6 +1122,7 @@ Dns6Configure (
     if (EFI_ERROR (Status)) {
       if (Instance->Dns6CfgData.DnsServerList != NULL) {
         FreePool (Instance->Dns6CfgData.DnsServerList);
+        Instance->Dns6CfgData.DnsServerList = NULL;
       }
       goto ON_EXIT;
     }
