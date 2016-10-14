@@ -19,8 +19,8 @@
 
 #include <Protocol/DevicePathToText.h>
 #include <Protocol/DevicePathFromText.h>
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellDynamicCommand.h>
+#include <Protocol/Shell.h>
+#include <Protocol/ShellDynamicCommand.h>
 
 #include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
