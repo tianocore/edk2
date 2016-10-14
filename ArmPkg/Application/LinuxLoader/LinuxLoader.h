@@ -25,8 +25,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
-#include <Protocol/EfiShellParameters.h>
-#include <Protocol/EfiShell.h>
+#include <Protocol/ShellParameters.h>
+#include <Protocol/Shell.h>
 
 #include <libfdt.h>
 
