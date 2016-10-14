@@ -620,6 +620,14 @@ LibAppendFileName (
 
   Size1 = StrSize (Str1);
   Size2 = StrSize (Str2);
+  
+  //
+  // Check overflow
+  //
+  if (((MAX_UINTN - Size1) < Size2) || ((MAX_UINTN - Size1 - Size2) < sizeof(CHAR16))) {
+    return NULL;
+  }
+  
   MaxLen = (Size1 + Size2 + sizeof (CHAR16))/ sizeof (CHAR16);
   Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
   ASSERT (Str != NULL);
@@ -963,6 +971,7 @@ LibGetFileHandleFromDevicePath (
     // the file system support below to be skipped.
     //
     Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
   }
         
   //
@@ -992,6 +1001,11 @@ LibGetFileHandleFromDevicePath (
       *ParentFileName = AllocateCopyPool (StrSize (((FILEPATH_DEVICE_PATH *) DevicePathNode)->PathName), ((FILEPATH_DEVICE_PATH *) DevicePathNode)->PathName);
     } else {
       TempPath = LibAppendFileName (*ParentFileName, ((FILEPATH_DEVICE_PATH *) DevicePathNode)->PathName);
+      if (TempPath == NULL) {
+        LastHandle->Close (LastHandle);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
       FreePool (*ParentFileName);
       *ParentFileName = TempPath;
     }
@@ -1067,12 +1081,14 @@ LibFindFiles (
   // Pass 1 to get Directories
   // Pass 2 to get files that are EFI images
   //
+  Status = EFI_SUCCESS;
   for (Pass = 1; Pass <= 2; Pass++) {
     FileHandle->SetPosition (FileHandle, 0);
     for (;;) {
       BufferSize  = DirBufferSize;
       Status      = FileHandle->Read (FileHandle, &BufferSize, DirInfo);
       if (EFI_ERROR (Status) || BufferSize == 0) {
+        Status = EFI_SUCCESS;
         break;
       }
 
@@ -1095,12 +1111,18 @@ LibFindFiles (
 
       NewMenuEntry = LibCreateMenuEntry ();
       if (NULL == NewMenuEntry) {
-        return EFI_OUT_OF_RESOURCES;
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
       }
 
       NewFileContext = (FILE_CONTEXT *) NewMenuEntry->VariableContext;
       NewFileContext->DeviceHandle = DeviceHandle;
       NewFileContext->FileName = LibAppendFileName (FileName, DirInfo->FileName);
+      if  (NewFileContext->FileName == NULL) {
+        LibDestroyMenuEntry (NewMenuEntry);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Done;
+      }
       NewFileContext->FileHandle = FileHandle;
       NewFileContext->DevicePath = FileDevicePath (NewFileContext->DeviceHandle, NewFileContext->FileName);
       NewMenuEntry->HelpString = NULL;
@@ -1135,9 +1157,11 @@ LibFindFiles (
 
   gFileExplorerPrivate.FsOptionMenu->MenuNumber = OptionNumber;
 
+Done:
+
   FreePool (DirInfo);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
