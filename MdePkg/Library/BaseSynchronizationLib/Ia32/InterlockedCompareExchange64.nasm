@@ -41,7 +41,7 @@ ASM_PFX(InternalSyncCompareExchange64):
     mov     edx, [esp + 20]
     mov     ebx, [esp + 24]
     mov     ecx, [esp + 28]
-    lock    cmpxchg8b   qword [esi]
+    lock    cmpxchg8b [esi]
     pop     ebx
     pop     esi
     ret
