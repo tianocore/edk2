@@ -1,7 +1,7 @@
 /** @file
   Root include file for Shell Package modules that utilize the SHELL_RETURN type
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,14 +16,6 @@
 #define _SHELL_BASE_
 
 typedef VOID *SHELL_FILE_HANDLE;
-
-#define SHELL_FREE_NON_NULL(Pointer)  \
-  do {                                \
-    if ((Pointer) != NULL) {          \
-      FreePool((Pointer));            \
-      (Pointer) = NULL;               \
-    }                                 \
-  } while(FALSE)
 
 typedef enum {
 ///

@@ -7,7 +7,7 @@
   This sequence is further divided into Blocks and Huffman codings
   are applied to each Block.
 
-  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,12 +17,12 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-
+#include <Uefi.h>
+#include <ShellBase.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <ShellBase.h>
-#include <Uefi.h>
+#include <Library/ShellLib.h>
 
 //
 // Macro Definitions
