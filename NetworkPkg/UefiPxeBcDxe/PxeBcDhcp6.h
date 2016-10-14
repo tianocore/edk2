@@ -33,7 +33,8 @@
 #define PXEBC_DHCP6_IDX_BOOT_FILE_URL     1
 #define PXEBC_DHCP6_IDX_BOOT_FILE_PARAM   2
 #define PXEBC_DHCP6_IDX_VENDOR_CLASS      3
-#define PXEBC_DHCP6_IDX_MAX               4
+#define PXEBC_DHCP6_IDX_DNS_SERVER        4
+#define PXEBC_DHCP6_IDX_MAX               5
 
 #define PXEBC_DHCP6_BOOT_FILE_URL_PREFIX  "tftp://"
 #define PXEBC_TFTP_URL_SEPARATOR          '/'
@@ -128,6 +129,7 @@ PxeBcFreeBootFileOption (
 /**
   Parse the Boot File URL option.
 
+  @param[in]      Private             Pointer to PxeBc private data.
   @param[out]     FileName     The pointer to the boot file name.
   @param[in, out] SrvAddr      The pointer to the boot server address.
   @param[in]      BootFile     The pointer to the boot file URL option data.
@@ -140,6 +142,7 @@ PxeBcFreeBootFileOption (
 **/
 EFI_STATUS
 PxeBcExtractBootFileUrl (
+  IN PXEBC_PRIVATE_DATA      *Private,
      OUT UINT8               **FileName,
   IN OUT EFI_IPv6_ADDRESS    *SrvAddr,
   IN     CHAR8               *BootFile,

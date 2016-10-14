@@ -6,7 +6,7 @@
 #  with an IPv4 stack, an IPv6 stack or both.
 #
 #
-#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -95,6 +95,8 @@
   gEfiMtftp6ProtocolGuid                               ## TO_START
   gEfiDhcp6ServiceBindingProtocolGuid                  ## TO_START
   gEfiDhcp6ProtocolGuid                                ## TO_START
+  gEfiDns6ServiceBindingProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                                 ## SOMETIMES_CONSUMES
   gEfiPxeBaseCodeCallbackProtocolGuid                  ## SOMETIMES_PRODUCES
   gEfiPxeBaseCodeProtocolGuid                          ## BY_START
   gEfiLoadFileProtocolGuid                             ## BY_START

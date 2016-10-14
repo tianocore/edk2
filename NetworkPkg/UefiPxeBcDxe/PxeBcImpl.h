@@ -32,6 +32,7 @@
 #include <Protocol/Udp6.h>
 #include <Protocol/Dhcp4.h>
 #include <Protocol/Dhcp6.h>
+#include <Protocol/Dns6.h>
 #include <Protocol/Mtftp4.h>
 #include <Protocol/Mtftp6.h>
 #include <Protocol/PxeBaseCode.h>
@@ -136,6 +137,7 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_MTFTP6_PROTOCOL                       *Mtftp6;
   EFI_UDP6_PROTOCOL                         *Udp6Read;
   EFI_UDP6_PROTOCOL                         *Udp6Write;
+  EFI_DNS6_PROTOCOL                         *Dns6;
 
   EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
   EFI_PXE_BASE_CODE_PROTOCOL                PxeBc;
@@ -169,6 +171,7 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_IP_ADDRESS                            SubnetMask;
   EFI_IP_ADDRESS                            GatewayIp;
   EFI_IP_ADDRESS                            ServerIp;
+  EFI_IPv6_ADDRESS                          *DnsServer;
   UINT16                                    CurSrcPort;
   UINT32                                    IaId;
 

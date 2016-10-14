@@ -93,10 +93,11 @@ PxeBcBuildDhcp6Options (
   // Append client option request option
   //
   OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ORO);
-  OptList[Index]->OpLen      = HTONS (4);
+  OptList[Index]->OpLen      = HTONS (6);
   OptEnt.Oro                 = (PXEBC_DHCP6_OPTION_ORO *) OptList[Index]->Data;
   OptEnt.Oro->OpCode[0]      = HTONS(DHCP6_OPT_BOOT_FILE_URL);
   OptEnt.Oro->OpCode[1]      = HTONS(DHCP6_OPT_BOOT_FILE_PARAM);
+  OptEnt.Oro->OpCode[2]      = HTONS(DHCP6_OPT_DNS_SERVERS);
   Index++;
   OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
@@ -216,10 +217,173 @@ PxeBcFreeBootFileOption (
   }
 }
 
+/**
+  Retrieve the boot server address using the EFI_DNS6_PROTOCOL.
+
+  @param[in]  Private             Pointer to PxeBc private data.
+  @param[in]  HostName            Pointer to buffer containing hostname.
+  @param[out] IpAddress           On output, pointer to buffer containing IPv6 address.
+
+  @retval EFI_SUCCESS             Operation succeeded.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate needed resources.
+  @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
+  @retval Others                  Other errors as indicated.
+  
+**/
+EFI_STATUS
+PxeBcDns6 (
+  IN PXEBC_PRIVATE_DATA           *Private,
+  IN     CHAR16                   *HostName,
+     OUT EFI_IPv6_ADDRESS         *IpAddress                
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_DNS6_PROTOCOL               *Dns6;
+  EFI_DNS6_CONFIG_DATA            Dns6ConfigData;
+  EFI_DNS6_COMPLETION_TOKEN       Token;
+  EFI_HANDLE                      Dns6Handle;
+  EFI_IPv6_ADDRESS                *DnsServerList;
+  BOOLEAN                         IsDone;
+  
+  Dns6                = NULL;
+  Dns6Handle          = NULL;
+  DnsServerList       = Private->DnsServer;
+  ZeroMem (&Token, sizeof (EFI_DNS6_COMPLETION_TOKEN));
+
+  //
+  // Create a DNSv6 child instance and get the protocol.
+  //
+  Status = NetLibCreateServiceChild (
+             Private->Controller,
+             Private->Image,
+             &gEfiDns6ServiceBindingProtocolGuid,
+             &Dns6Handle
+             );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  } 
+  
+  Status = gBS->OpenProtocol (
+                  Dns6Handle,
+                  &gEfiDns6ProtocolGuid,
+                  (VOID **) &Dns6,
+                  Private->Image,
+                  Private->Controller,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  //
+  // Configure DNS6 instance for the DNS server address and protocol.
+  //
+  ZeroMem (&Dns6ConfigData, sizeof (EFI_DNS6_CONFIG_DATA));
+  Dns6ConfigData.DnsServerCount = 1;
+  Dns6ConfigData.DnsServerList  = DnsServerList;
+  Dns6ConfigData.EnableDnsCache = TRUE;
+  Dns6ConfigData.Protocol       = EFI_IP_PROTO_UDP;
+  IP6_COPY_ADDRESS (&Dns6ConfigData.StationIp, &Private->TmpStationIp.v6);
+  Status = Dns6->Configure (
+                   Dns6,
+                   &Dns6ConfigData
+                   );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  Token.Status = EFI_NOT_READY;
+  IsDone       = FALSE;
+  //
+  // Create event to set the  IsDone flag when name resolution is finished.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  PxeBcCommonNotify,
+                  &IsDone,
+                  &Token.Event
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  //
+  // Start asynchronous name resolution.
+  //
+  Status = Dns6->HostNameToIp (Dns6, HostName, &Token);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  while (!IsDone) {
+    Dns6->Poll (Dns6);
+  }
+
+  //
+  // Name resolution is done, check result.
+  //
+  Status = Token.Status;  
+  if (!EFI_ERROR (Status)) {
+    if (Token.RspData.H2AData == NULL) {
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
+    if (Token.RspData.H2AData->IpCount == 0 || Token.RspData.H2AData->IpList == NULL) {
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
+    //
+    // We just return the first IPv6 address from DNS protocol.
+    //
+    IP6_COPY_ADDRESS (IpAddress, Token.RspData.H2AData->IpList);
+    Status = EFI_SUCCESS;
+  }
+  
+Exit:
+  FreePool (HostName);
+
+  if (Token.Event != NULL) {
+    gBS->CloseEvent (Token.Event);
+  }
+  if (Token.RspData.H2AData != NULL) {
+    if (Token.RspData.H2AData->IpList != NULL) {
+      FreePool (Token.RspData.H2AData->IpList);
+    }
+    FreePool (Token.RspData.H2AData);
+  }
+
+  if (Dns6 != NULL) {
+    Dns6->Configure (Dns6, NULL);
+    
+    gBS->CloseProtocol (
+           Dns6Handle,
+           &gEfiDns6ProtocolGuid,
+           Private->Image,
+           Private->Controller
+           );
+  }
+
+  if (Dns6Handle != NULL) {
+    NetLibDestroyServiceChild (
+      Private->Controller,
+      Private->Image,
+      &gEfiDns6ServiceBindingProtocolGuid,
+      Dns6Handle
+      );
+  }
+
+  if (DnsServerList != NULL) {
+    FreePool (DnsServerList);
+  }
+  
+  return Status;  
+}
 
 /**
   Parse the Boot File URL option.
 
+  @param[in]      Private      Pointer to PxeBc private data.
   @param[out]     FileName     The pointer to the boot file name.
   @param[in, out] SrvAddr      The pointer to the boot server address.
   @param[in]      BootFile     The pointer to the boot file URL option data.
@@ -232,6 +396,7 @@ PxeBcFreeBootFileOption (
 **/
 EFI_STATUS
 PxeBcExtractBootFileUrl (
+  IN PXEBC_PRIVATE_DATA      *Private,
      OUT UINT8               **FileName,
   IN OUT EFI_IPv6_ADDRESS    *SrvAddr,
   IN     CHAR8               *BootFile,
@@ -247,8 +412,12 @@ PxeBcExtractBootFileUrl (
   CHAR8                      *ServerAddressOption;
   CHAR8                      *ServerAddress;
   CHAR8                      *ModeStr;
+  CHAR16                     *HostName;
+  BOOLEAN                    IpExpressedUrl;
+  UINTN                      Len;
   EFI_STATUS                 Status;
 
+  IpExpressedUrl = TRUE;
   //
   // The format of the Boot File URL option is:
   //
@@ -264,8 +433,8 @@ PxeBcExtractBootFileUrl (
   //
 
   //
-  // Based upon RFC 5970 and UEFI 2.3 Errata D specification, bootfile-url format
-  // is tftp://[SERVER_ADDRESS]/BOOTFILE_NAME
+  // Based upon RFC 5970 and UEFI 2.6, bootfile-url format can be
+  // tftp://[SERVER_ADDRESS]/BOOTFILE_NAME or tftp://domain_name/BOOTFILE_NAME
   // As an example where the BOOTFILE_NAME is the EFI loader and
   // SERVER_ADDRESS is the ASCII encoding of an IPV6 address.
   //
@@ -291,43 +460,76 @@ PxeBcExtractBootFileUrl (
   // Get the part of SERVER_ADDRESS string.
   //
   ServerAddressOption = TmpStr;
-  if (*ServerAddressOption != PXEBC_ADDR_START_DELIMITER) {
-    FreePool (TmpStr);
-    return EFI_INVALID_PARAMETER;
-  }
+  if (*ServerAddressOption == PXEBC_ADDR_START_DELIMITER) {
+    ServerAddressOption ++;
+    ServerAddress = ServerAddressOption;
+    while (*ServerAddress != '\0' && *ServerAddress != PXEBC_ADDR_END_DELIMITER) {
+      ServerAddress++;
+    }
+    
+    if (*ServerAddress != PXEBC_ADDR_END_DELIMITER) {
+      FreePool (TmpStr);
+      return EFI_INVALID_PARAMETER;
+    }
+    
+    *ServerAddress = '\0';
+    
+    //
+    // Convert the string of server address to Ipv6 address format and store it.
+    //
+    Status = NetLibAsciiStrToIp6 (ServerAddressOption, SrvAddr);
+    if (EFI_ERROR (Status)) {
+      FreePool (TmpStr);
+      return Status;
+    }
 
-  ServerAddressOption ++;
-  ServerAddress = ServerAddressOption;
-  while (*ServerAddress != '\0' && *ServerAddress != PXEBC_ADDR_END_DELIMITER) {
-    ServerAddress++;
-  }
+  } else {
+    IpExpressedUrl = FALSE;
+    ServerAddress = ServerAddressOption;
+    while (*ServerAddress != '\0' && *ServerAddress != PXEBC_TFTP_URL_SEPARATOR) {
+      ServerAddress++;
+    }
 
-  if (*ServerAddress != PXEBC_ADDR_END_DELIMITER) {
-    FreePool (TmpStr);
-    return EFI_INVALID_PARAMETER;
-  }
+    if (*ServerAddress != PXEBC_TFTP_URL_SEPARATOR) {
+      FreePool (TmpStr);
+      return EFI_INVALID_PARAMETER;
+    }
+    *ServerAddress = '\0';
 
-  *ServerAddress = '\0';
+    Len = AsciiStrSize (ServerAddressOption);
+    HostName = AllocateZeroPool (Len * sizeof (CHAR16));
+    if (HostName == NULL) {
+      FreePool (TmpStr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    AsciiStrToUnicodeStrS (
+      ServerAddressOption,
+      HostName,
+      Len
+      );
 
-  //
-  // Convert the string of server address to Ipv6 address format and store it.
-  //
-  Status = NetLibAsciiStrToIp6 (ServerAddressOption, SrvAddr);
-  if (EFI_ERROR (Status)) {
-    FreePool (TmpStr);
-    return Status;
+    //
+    // Perform DNS resolution.
+    //
+    Status = PxeBcDns6 (Private,HostName, SrvAddr);
+    if (EFI_ERROR (Status)) {
+      FreePool (TmpStr);
+      return Status;
+    }
   }
 
   //
   // Get the part of BOOTFILE_NAME string.
   //
   BootFileNamePtr = (CHAR8*)((UINTN)ServerAddress + 1);
-  if (*BootFileNamePtr != PXEBC_TFTP_URL_SEPARATOR) {
-    FreePool (TmpStr);
-    return EFI_INVALID_PARAMETER;
+  if (IpExpressedUrl) {
+    if (*BootFileNamePtr != PXEBC_TFTP_URL_SEPARATOR) {
+      FreePool (TmpStr);
+      return EFI_INVALID_PARAMETER;
+    }
+    ++BootFileNamePtr;
   }
 
-  ++BootFileNamePtr;
   BootFileNameLen = (UINT16)(Length - (UINT16) ((UINTN)BootFileNamePtr - (UINTN)TmpStr) + 1);
   if (BootFileNameLen != 0 || FileName != NULL) {
     //
@@ -482,6 +684,8 @@ PxeBcParseDhcp6Packet (
       Options[PXEBC_DHCP6_IDX_BOOT_FILE_PARAM] = Option;
     } else if (NTOHS (Option->OpCode) == DHCP6_OPT_VENDOR_CLASS) {
       Options[PXEBC_DHCP6_IDX_VENDOR_CLASS] = Option;
+    } else if (NTOHS (Option->OpCode) == DHCP6_OPT_DNS_SERVERS) {
+      Options[PXEBC_DHCP6_IDX_DNS_SERVER] = Option;
     }
 
     Offset += (NTOHS (Option->OpLen) + 4);
@@ -864,6 +1068,7 @@ PxeBcRetryDhcp6Binl (
     // Parse out the next server address from the last offer, and store it
     //
     Status = PxeBcExtractBootFileUrl (
+               Private,
                &Private->BootFileName,
                &Private->ServerIp.v6,
                (CHAR8 *) (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL]->Data),
@@ -1114,6 +1319,14 @@ PxeBcHandleDhcp6Offer (
   ASSERT (SelectIndex < PXEBC_OFFER_MAX_NUM);
   Cache6      = &Private->OfferBuffer[SelectIndex].Dhcp6;
   Status      = EFI_SUCCESS;
+
+  //
+  // First try to cache DNS server address if DHCP6 offer provides.
+  //
+  if (Cache6->OptList[PXEBC_DHCP6_IDX_DNS_SERVER] != NULL) {
+    Private->DnsServer = AllocateZeroPool (NTOHS (Cache6->OptList[PXEBC_DHCP6_IDX_DNS_SERVER]->OpLen));
+    CopyMem (Private->DnsServer, Cache6->OptList[PXEBC_DHCP6_IDX_DNS_SERVER]->Data, sizeof (EFI_IPv6_ADDRESS));
+  }
 
   if (Cache6->OfferType == PxeOfferTypeDhcpBinl) {
     //
