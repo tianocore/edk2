@@ -254,10 +254,6 @@
 
 [PcdsFeatureFlag.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnosticsDisable|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|TRUE
-  gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|TRUE
 
   #
   # Control what commands are supported from the UI
