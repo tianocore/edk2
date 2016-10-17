@@ -459,8 +459,6 @@ UpdateConsolePage (
   UINT16              Index2;
   UINT8               CheckFlags;
   UINT8               *ConsoleCheck;
-  UINT8               *OldConsoleCheck;
-  UINTN               ConsoleCheckSize;
   EFI_QUESTION_ID     QuestionIdBase;
   UINT16              VariableOffsetBase;
 
@@ -469,32 +467,24 @@ UpdateConsolePage (
   UpdatePageStart (CallbackData);
 
   ConsoleCheck       = NULL;
-  OldConsoleCheck    = NULL;
   QuestionIdBase     = 0;
   VariableOffsetBase = 0;
-  ConsoleCheckSize   = 0;
 
   switch (UpdatePageId) {
   case FORM_CON_IN_ID:
     ConsoleCheck       = &CallbackData->BmmFakeNvData.ConsoleInCheck[0];
-    OldConsoleCheck    = &CallbackData->BmmOldFakeNVData.ConsoleInCheck[0];
-    ConsoleCheckSize   = sizeof (CallbackData->BmmFakeNvData.ConsoleInCheck);
     QuestionIdBase     = CON_IN_DEVICE_QUESTION_ID;
     VariableOffsetBase = CON_IN_DEVICE_VAR_OFFSET;
     break;
 
   case FORM_CON_OUT_ID:
     ConsoleCheck       = &CallbackData->BmmFakeNvData.ConsoleOutCheck[0];
-    OldConsoleCheck    = &CallbackData->BmmOldFakeNVData.ConsoleOutCheck[0];
-    ConsoleCheckSize   = sizeof (CallbackData->BmmFakeNvData.ConsoleOutCheck);
     QuestionIdBase     = CON_OUT_DEVICE_QUESTION_ID;
     VariableOffsetBase = CON_OUT_DEVICE_VAR_OFFSET;
     break;
 
   case FORM_CON_ERR_ID:
     ConsoleCheck       = &CallbackData->BmmFakeNvData.ConsoleErrCheck[0];
-    OldConsoleCheck    = &CallbackData->BmmOldFakeNVData.ConsoleErrCheck[0];
-    ConsoleCheckSize   = sizeof (CallbackData->BmmFakeNvData.ConsoleErrCheck);
     QuestionIdBase     = CON_ERR_DEVICE_QUESTION_ID;
     VariableOffsetBase = CON_ERR_DEVICE_VAR_OFFSET;
     break;
@@ -555,8 +545,6 @@ UpdateConsolePage (
 
     Index++;
   }
-
-  CopyMem (OldConsoleCheck, ConsoleCheck, ConsoleCheckSize);
 
   UpdatePageEnd (CallbackData);
 }
