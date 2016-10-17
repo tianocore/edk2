@@ -1,5 +1,5 @@
 /** @file
-  Ihis library is to support TCG PC Client Platform Physical Presence Interface Specification
+  This library is to support TCG PC Client Platform Physical Presence Interface Specification
   Family "2.0" part, >= 128 Vendor Specific PPI Operation.
 
   The Vendor Specific PPI operation may change TPM state, BIOS TPM management
@@ -7,7 +7,7 @@
   
   Caution: This function may receive untrusted input.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 

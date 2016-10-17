@@ -1,5 +1,5 @@
 /** @file
-  Ihis library is TPM2 DTPM instance.
+  This library is TPM2 DTPM instance.
   It can be registered to Tpm2 Device router, to be active TPM2 engine,
   based on platform setting.
 

@@ -1,5 +1,5 @@
 /** @file
-  Ihis library is intended to be used by BDS modules.
+  This library is intended to be used by BDS modules.
   This library will execute TPM2 request.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>

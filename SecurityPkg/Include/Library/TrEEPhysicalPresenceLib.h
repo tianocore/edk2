@@ -1,8 +1,8 @@
 /** @file
-  Ihis library is intended to be used by BDS modules.
+  This library is intended to be used by BDS modules.
   This library will execute TPM2 request.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
