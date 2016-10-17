@@ -585,14 +585,30 @@ UpdateOrderPage (
   switch (UpdatePageId) { 
   
   case FORM_BOOT_CHG_ID:
-    GetBootOrder (CallbackData);
+    //
+    // If the BootOptionOrder in the BmmFakeNvData are same with the date in the BmmOldFakeNVData,
+    // means all Boot Options has been save in BootOptionMenu, we can get the date from the menu.
+    // else means browser maintains some uncommitted date which are not saved in BootOptionMenu,
+    // so we should not get the data from BootOptionMenu to show it.
+    //
+    if (CompareMem (CallbackData->BmmFakeNvData.BootOptionOrder, CallbackData->BmmOldFakeNVData.BootOptionOrder, sizeof (CallbackData->BmmFakeNvData.BootOptionOrder)) == 0) {
+      GetBootOrder (CallbackData);
+    }
     OptionOrder = CallbackData->BmmFakeNvData.BootOptionOrder;
     QuestionId = BOOT_OPTION_ORDER_QUESTION_ID;
     VarOffset = BOOT_OPTION_ORDER_VAR_OFFSET;
     break;
     
   case FORM_DRV_CHG_ID:
-    GetDriverOrder (CallbackData);
+    //
+    // If the DriverOptionOrder in the BmmFakeNvData are same with the date in the BmmOldFakeNVData,
+    // means all Driver Options has been save in DriverOptionMenu, we can get the DriverOptionOrder from the menu.
+    // else means browser maintains some uncommitted date which are not saved in DriverOptionMenu,
+    // so we should not get the data from DriverOptionMenu to show it.
+    //
+    if (CompareMem (CallbackData->BmmFakeNvData.DriverOptionOrder, CallbackData->BmmOldFakeNVData.DriverOptionOrder, sizeof (CallbackData->BmmFakeNvData.DriverOptionOrder)) == 0) {
+      GetDriverOrder (CallbackData);
+    }
     OptionOrder = CallbackData->BmmFakeNvData.DriverOptionOrder;
     QuestionId = DRIVER_OPTION_ORDER_QUESTION_ID;
     VarOffset = DRIVER_OPTION_ORDER_VAR_OFFSET;
