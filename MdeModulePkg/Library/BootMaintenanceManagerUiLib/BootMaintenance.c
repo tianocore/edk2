@@ -444,6 +444,91 @@ BmmExtractDevicePathFromHiiHandle (
 }
 
 /**
+  Converts the unicode character of the string from uppercase to lowercase.
+  This is a internal function.
+
+  @param ConfigString  String to be converted
+
+**/
+VOID
+HiiToLower (
+  IN EFI_STRING  ConfigString
+  )
+{
+  EFI_STRING  String;
+  BOOLEAN     Lower;
+
+  ASSERT (ConfigString != NULL);
+
+  //
+  // Convert all hex digits in range [A-F] in the configuration header to [a-f]
+  //
+  for (String = ConfigString, Lower = FALSE; *String != L'\0'; String++) {
+    if (*String == L'=') {
+      Lower = TRUE;
+    } else if (*String == L'&') {
+      Lower = FALSE;
+    } else if (Lower && *String >= L'A' && *String <= L'F') {
+      *String = (CHAR16) (*String - L'A' + L'a');
+    }
+  }
+}
+
+/**
+  Update the progress string through the offset value.
+
+  @param Offset           The offset value
+  @param Configuration    Point to the configuration string.
+
+**/
+EFI_STRING
+UpdateProgress(
+  IN  UINTN       Offset,
+  IN  EFI_STRING  Configuration
+)
+{
+  UINTN       Length;
+  EFI_STRING  StringPtr;
+  EFI_STRING  ReturnString;
+
+  StringPtr    = NULL;
+  ReturnString = NULL;
+
+  //
+  // &OFFSET=XXXX followed by a Null-terminator.
+  // Length = StrLen (L"&OFFSET=") + 4 + 1
+  //
+  Length    = StrLen (L"&OFFSET=") + 4 + 1;
+
+  StringPtr = AllocateZeroPool (Length * sizeof (CHAR16));
+
+  if (StringPtr == NULL) {
+    return  NULL;
+  }
+
+  UnicodeSPrint (
+    StringPtr,
+    (8 + 4 + 1) * sizeof (CHAR16),
+    L"&OFFSET=%04x",
+    Offset
+    );
+
+  ReturnString = StrStr (Configuration, StringPtr);
+
+  if (ReturnString == NULL) {
+    //
+    // If doesn't find the string in Configuration, convert the string to lower case then search again.
+    //
+    HiiToLower (StringPtr);
+    ReturnString = StrStr (Configuration, StringPtr);
+  }
+
+  FreePool (StringPtr);
+
+  return ReturnString;
+}
+
+/**
   Update the terminal content in TerminalMenu.
 
   @param BmmData           The BMM fake NV data.
@@ -695,7 +780,8 @@ BootMaintRouteConfig (
   BM_LOAD_CONTEXT                 *NewLoadContext;
   UINT16                          Index;
   BOOLEAN                         TerminalAttChange;
-  BMM_CALLBACK_DATA               *Private; 
+  BMM_CALLBACK_DATA               *Private;
+  UINTN                           Offset;
 
   if (Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -730,6 +816,7 @@ BootMaintRouteConfig (
   BufferSize = sizeof (BMM_FAKE_NV_DATA);
   OldBmmData = &Private->BmmOldFakeNVData;
   NewBmmData = &Private->BmmFakeNvData;
+  Offset     = 0;
   //
   // Convert <ConfigResp> to buffer data by helper function ConfigToBlock()
   //
@@ -751,6 +838,10 @@ BootMaintRouteConfig (
   //         
   if (CompareMem (&NewBmmData->BootNext, &OldBmmData->BootNext, sizeof (NewBmmData->BootNext)) != 0) {
     Status = Var_UpdateBootNext (Private);
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, BootNext);
+      goto Exit;
+    }
   }
 
   //
@@ -767,11 +858,19 @@ BootMaintRouteConfig (
       NewBmmData->BootOptionDelMark[Index] = FALSE;
     }
 
-    Var_DelBootOption ();
+    Status = Var_DelBootOption ();
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, BootOptionDel);
+      goto Exit;
+    }
   }
 
   if (CompareMem (NewBmmData->BootOptionOrder, OldBmmData->BootOptionOrder, sizeof (NewBmmData->BootOptionOrder)) != 0) {
     Status = Var_UpdateBootOrder (Private);
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, BootOptionOrder);
+      goto Exit;
+    }
   }
 
   if (CompareMem (&NewBmmData->BootTimeOut, &OldBmmData->BootTimeOut, sizeof (NewBmmData->BootTimeOut)) != 0){
@@ -783,15 +882,8 @@ BootMaintRouteConfig (
                     &(NewBmmData->BootTimeOut)
                     );
     if (EFI_ERROR (Status)) {
-      //
-      // If set variable fail, and don't have the appropriate error status for RouteConfig fuction to return,
-      // just return the EFI_NOT_FOUND.
-      //
-      if (Status == EFI_OUT_OF_RESOURCES) {
-        return Status;
-      } else {
-        return EFI_NOT_FOUND;
-      }
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, BootTimeOut);
+      goto Exit;
     }
     Private->BmmOldFakeNVData.BootTimeOut = NewBmmData->BootTimeOut;
   }
@@ -809,15 +901,27 @@ BootMaintRouteConfig (
       NewBmmData->DriverOptionDel[Index] = FALSE;
       NewBmmData->DriverOptionDelMark[Index] = FALSE;
     }
-    Var_DelDriverOption ();  
+    Status = Var_DelDriverOption ();
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, DriverOptionDel);
+      goto Exit;
+    }
   }
 
   if (CompareMem (NewBmmData->DriverOptionOrder, OldBmmData->DriverOptionOrder, sizeof (NewBmmData->DriverOptionOrder)) != 0) {  
     Status = Var_UpdateDriverOrder (Private);
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, DriverOptionOrder);
+      goto Exit;
+    }
   }
 
   if (CompareMem (&NewBmmData->ConsoleOutMode, &OldBmmData->ConsoleOutMode, sizeof (NewBmmData->ConsoleOutMode)) != 0){
-    Var_UpdateConMode(Private);
+    Status = Var_UpdateConMode(Private);
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, ConsoleOutMode);
+      goto Exit;
+    }
   }
 
   TerminalAttChange = FALSE;
@@ -838,23 +942,57 @@ BootMaintRouteConfig (
     TerminalAttChange = TRUE;
   }
   if (TerminalAttChange) {
-    Var_UpdateConsoleInpOption ();
-    Var_UpdateConsoleOutOption ();
-    Var_UpdateErrorOutOption ();
+    if (CompareMem (&NewBmmData->COMBaudRate[Index], &OldBmmData->COMBaudRate[Index], sizeof (NewBmmData->COMBaudRate[Index])) != 0) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, COMBaudRate);
+    } else if (CompareMem (&NewBmmData->COMDataRate[Index], &OldBmmData->COMDataRate[Index], sizeof (NewBmmData->COMDataRate[Index])) != 0) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, COMDataRate);
+    } else if (CompareMem (&NewBmmData->COMStopBits[Index], &OldBmmData->COMStopBits[Index], sizeof (NewBmmData->COMStopBits[Index])) != 0) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, COMStopBits);
+    } else if (CompareMem (&NewBmmData->COMParity[Index], &OldBmmData->COMParity[Index], sizeof (NewBmmData->COMParity[Index])) != 0) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, COMParity);
+    } else if (CompareMem (&NewBmmData->COMTerminalType[Index], &OldBmmData->COMTerminalType[Index], sizeof (NewBmmData->COMTerminalType[Index])) != 0) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, COMTerminalType);
+    } else if (CompareMem (&NewBmmData->COMFlowControl[Index], &OldBmmData->COMFlowControl[Index], sizeof (NewBmmData->COMFlowControl[Index])) != 0) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, COMFlowControl);
+    }
+    Status = Var_UpdateConsoleInpOption ();
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+    Status = Var_UpdateConsoleOutOption ();
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+    Status = Var_UpdateErrorOutOption ();
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
   }
   //
   // Check data which located in Console Options Menu and save the settings if need
   //
   if (CompareMem (NewBmmData->ConsoleInCheck, OldBmmData->ConsoleInCheck, sizeof (NewBmmData->ConsoleInCheck)) != 0){
-    Var_UpdateConsoleInpOption();
+    Status = Var_UpdateConsoleInpOption();
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, ConsoleInCheck);
+      goto Exit;
+    }
   }
 
   if (CompareMem (NewBmmData->ConsoleOutCheck, OldBmmData->ConsoleOutCheck, sizeof (NewBmmData->ConsoleOutCheck)) != 0){
-    Var_UpdateConsoleOutOption();
+    Status = Var_UpdateConsoleOutOption();
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, ConsoleOutCheck);
+      goto Exit;
+    }
   }
 
   if (CompareMem (NewBmmData->ConsoleErrCheck, OldBmmData->ConsoleErrCheck, sizeof (NewBmmData->ConsoleErrCheck)) != 0){
-    Var_UpdateErrorOutOption();
+    Status = Var_UpdateErrorOutOption();
+    if (EFI_ERROR (Status)) {
+      Offset = OFFSET_OF (BMM_FAKE_NV_DATA, ConsoleErrCheck);
+      goto Exit;
+    }
   }
 
   if (CompareMem (NewBmmData->BootDescriptionData, OldBmmData->BootDescriptionData, sizeof (NewBmmData->BootDescriptionData)) != 0 ||
@@ -862,7 +1000,12 @@ BootMaintRouteConfig (
     Status = Var_UpdateBootOption (Private);
     NewBmmData->BootOptionChanged = FALSE;
     if (EFI_ERROR (Status)) {
-      return Status;
+      if (CompareMem (NewBmmData->BootDescriptionData, OldBmmData->BootDescriptionData, sizeof (NewBmmData->BootDescriptionData)) != 0) {
+        Offset = OFFSET_OF (BMM_FAKE_NV_DATA, BootDescriptionData);
+      } else {
+        Offset = OFFSET_OF (BMM_FAKE_NV_DATA, BootOptionalData);
+      }
+      goto Exit;
     }
     BOpt_GetBootOptions (Private);
   }
@@ -879,7 +1022,12 @@ BootMaintRouteConfig (
     NewBmmData->DriverOptionChanged = FALSE;
     NewBmmData->ForceReconnect      = TRUE;
     if (EFI_ERROR (Status)) {
-      return Status;
+      if (CompareMem (NewBmmData->DriverDescriptionData, OldBmmData->DriverDescriptionData, sizeof (NewBmmData->DriverDescriptionData)) != 0) {
+        Offset = OFFSET_OF (BMM_FAKE_NV_DATA, DriverDescriptionData);
+      } else {
+        Offset = OFFSET_OF (BMM_FAKE_NV_DATA, DriverOptionalData);
+      }
+      goto Exit;
     }
 
     BOpt_GetDriverOptions (Private);
@@ -891,6 +1039,17 @@ BootMaintRouteConfig (
   CopyMem (OldBmmData, NewBmmData, sizeof (BMM_FAKE_NV_DATA));
 
   return EFI_SUCCESS;
+
+Exit:
+  //
+  // Fail to save the data, update the progress string.
+  //
+  *Progress = UpdateProgress (Offset, Configuration);
+  if (Status == EFI_OUT_OF_RESOURCES) {
+    return Status;
+  } else {
+    return EFI_NOT_FOUND;
+  }
 }
 
 /**
