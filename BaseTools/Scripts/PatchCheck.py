@@ -340,6 +340,14 @@ class GitDiffCheck:
 
         self.error(*lines)
 
+    old_debug_re = \
+        re.compile(r'''
+                        DEBUG \s* \( \s* \( \s*
+                        (?: DEBUG_[A-Z_]+ \s* \| \s*)*
+                        EFI_D_ ([A-Z_]+)
+                   ''',
+                   re.VERBOSE)
+
     def check_added_line(self, line):
         eol = ''
         for an_eol in self.line_endings:
@@ -356,6 +364,12 @@ class GitDiffCheck:
             self.added_line_error('Tab character used', line)
         if len(stripped) < len(line):
             self.added_line_error('Trailing whitespace found', line)
+
+        mo = self.old_debug_re.search(line)
+        if mo is not None:
+            self.added_line_error('EFI_D_' + mo.group(1) + ' was used, '
+                                  'but DEBUG_' + mo.group(1) +
+                                  ' is now recommended', line)
 
     split_diff_re = re.compile(r'''
                                    (?P<cmd>
