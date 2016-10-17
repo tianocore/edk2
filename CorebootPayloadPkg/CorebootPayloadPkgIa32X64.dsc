@@ -176,6 +176,7 @@
   SerialPortLib|CorebootModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
   PlatformHookLib|CorebootPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
   PlatformBootManagerLib|CorebootPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  CbPlatformSupportLib|CorebootModulePkg/Library/CbPlatformSupportLibNull/CbPlatformSupportLibNull.inf
 
   #
   # Misc

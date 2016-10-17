@@ -388,6 +388,15 @@ CbPeiEntryPoint (
   }
 
   //
+  // Parse platform specific information from coreboot. 
+  //
+  Status = CbParsePlatformInfo ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "Error when parsing platform info, Status = %r\n", Status));
+    return Status;
+  }
+
+  //
   // Mask off all legacy 8259 interrupt sources
   //
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);

@@ -52,6 +52,7 @@
   CbParseLib
   MtrrLib
   IoLib
+  CbPlatformSupportLib
 
 [Guids]
   gEfiSmmPeiSmramMemoryReserveGuid
