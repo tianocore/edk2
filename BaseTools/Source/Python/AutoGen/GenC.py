@@ -1639,6 +1639,7 @@ def CreateIdfFileCode(Info, AutoGenC, StringH, IdfGenCFlag, IdfGenBinBuffer):
             PaletteBuffer = pack('x')
             BufferStr = ''
             PaletteStr = ''
+            FileDict = {}
             for Idf in ImageFiles.ImageFilesDict:
                 if ImageFiles.ImageFilesDict[Idf]:
                     for FileObj in ImageFiles.ImageFilesDict[Idf]:
@@ -1662,6 +1663,19 @@ def CreateIdfFileCode(Info, AutoGenC, StringH, IdfGenCFlag, IdfGenBinBuffer):
                                 Line = DEFINE_STR + ' ' + ID + ' ' + DecToHexStr(Index, 4) + '\n'
                             else:
                                 Line = DEFINE_STR + ' ' + ID + ' ' * (ValueStartPtr - len(DEFINE_STR + ID)) + DecToHexStr(Index, 4) + '\n'
+
+                            if File not in FileDict:
+                                FileDict[File] = Index
+                            else:
+                                DuplicateBlock = pack('B', EFI_HII_IIBT_DUPLICATE)
+                                DuplicateBlock += pack('H', FileDict[File])
+                                ImageBuffer += DuplicateBlock
+                                BufferStr = WriteLine(BufferStr, '// %s: %s: %s' % (DecToHexStr(Index, 4), ID, DecToHexStr(Index, 4)))
+                                TempBufferList = AscToHexList(DuplicateBlock)
+                                BufferStr = WriteLine(BufferStr, CreateArrayItem(TempBufferList, 16) + '\n')
+                                StringH.Append(Line)
+                                Index += 1
+                                continue
 
                             TmpFile = open(File.Path, 'rb')
                             Buffer = TmpFile.read()
