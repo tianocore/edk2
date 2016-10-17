@@ -55,13 +55,15 @@
   PlatformHookLib
 
 [Guids]
-
+  gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
   gEfiGenericMemTestProtocolGuid  ## CONSUMES
   gEfiGraphicsOutputProtocolGuid  ## CONSUMES
   gEfiUgaDrawProtocolGuid         ## CONSUMES
   gEfiBootLogoProtocolGuid        ## CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid
+  gEfiSmmAccess2ProtocolGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut

@@ -2,7 +2,7 @@
   This file include all platform action which can be customized
   by IBV/OEM.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,63 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PlatformBootManager.h"
 #include "PlatformConsole.h"
+
+VOID
+EFIAPI
+InternalBdsEmptyCallbackFuntion (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  return;
+}
+
+VOID
+InstallReadyToLock (
+  VOID
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_HANDLE                            Handle;
+  EFI_SMM_ACCESS2_PROTOCOL              *SmmAccess;
+  EFI_EVENT                             EndOfDxeEvent;
+
+  DEBUG((DEBUG_INFO,"InstallReadyToLock  entering......\n"));
+  //
+  // Inform the SMM infrastructure that we're entering BDS and may run 3rd party code hereafter
+  // Since PI1.2.1, we need signal EndOfDxe as ExitPmAuth
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  InternalBdsEmptyCallbackFuntion,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+  gBS->SignalEvent (EndOfDxeEvent);
+  gBS->CloseEvent (EndOfDxeEvent);
+  DEBUG((DEBUG_INFO,"All EndOfDxe callbacks have returned successfully\n"));
+
+  //
+  // Install DxeSmmReadyToLock protocol in order to lock SMM
+  //
+  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **) &SmmAccess);
+  if (!EFI_ERROR (Status)) {
+    Handle = NULL;
+    Status = gBS->InstallProtocolInterface (
+                    &Handle,
+                    &gEfiDxeSmmReadyToLockProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  DEBUG((DEBUG_INFO,"InstallReadyToLock  end\n"));
+  return;
+}
 
 /**
   Return the index of the load option in the load option array.
@@ -147,6 +204,12 @@ PlatformBootManagerBeforeConsole (
   // Register UEFI Shell
   //
   PlatformRegisterFvBootOption (PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE);
+
+  //
+  // Install ready to lock.
+  // This needs to be done before option rom dispatched.
+  //
+  InstallReadyToLock ();
 }
 
 /**
