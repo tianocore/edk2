@@ -91,7 +91,7 @@ AdjustRootBridgeResource (
   // Align IO  resource at 4K  boundary
   //
   Mask        = 0xFFFULL;
-  Io->Limit   = (Io->Limit + Mask) & ~Mask;
+  Io->Limit   = ((Io->Limit + Mask) & ~Mask) - 1;
   if (Io->Base != MAX_UINT64) {
     Io->Base &= ~Mask;
   }
@@ -100,7 +100,7 @@ AdjustRootBridgeResource (
   // Align MEM resource at 1MB boundary
   //
   Mask        = 0xFFFFFULL;
-  Mem->Limit  = (Mem->Limit + Mask) & ~Mask;
+  Mem->Limit  = ((Mem->Limit + Mask) & ~Mask) - 1;
   if (Mem->Base != MAX_UINT64) {
     Mem->Base &= ~Mask;
   }
