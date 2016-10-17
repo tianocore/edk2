@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -30,8 +30,8 @@
 ;   IN UINT16 Ldtr
 ;   );
 ;------------------------------------------------------------------------------
-global ASM_PFX(_AsmWriteLdtr)
-ASM_PFX(_AsmWriteLdtr):
+global ASM_PFX(AsmWriteLdtr)
+ASM_PFX(AsmWriteLdtr):
     mov     eax, [esp + 4]
     lldt    ax
     ret
