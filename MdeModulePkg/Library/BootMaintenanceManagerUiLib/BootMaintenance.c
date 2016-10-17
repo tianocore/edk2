@@ -925,6 +925,7 @@ BootMaintCallback (
   BMM_CALLBACK_DATA *Private;
   BM_MENU_ENTRY     *NewMenuEntry;
   BMM_FAKE_NV_DATA  *CurrentFakeNVMap;
+  BMM_FAKE_NV_DATA  *OldFakeNVMap;
   UINTN             Index;
   EFI_DEVICE_PATH_PROTOCOL * File;
 
@@ -959,6 +960,7 @@ BootMaintCallback (
   // Retrive uncommitted data from Form Browser
   //
   CurrentFakeNVMap = &Private->BmmFakeNvData;
+  OldFakeNVMap     = &Private->BmmOldFakeNVData;
   HiiGetBrowserData (&mBootMaintGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
@@ -1061,8 +1063,10 @@ BootMaintCallback (
       //
       // Discard changes and exit formset
       //
-      CurrentFakeNVMap->DriverOptionalData[0]     = 0x0000;
-      CurrentFakeNVMap->DriverDescriptionData[0]  = 0x0000;
+      ZeroMem (CurrentFakeNVMap->DriverOptionalData, sizeof (CurrentFakeNVMap->DriverOptionalData));
+      ZeroMem (CurrentFakeNVMap->BootDescriptionData, sizeof (CurrentFakeNVMap->BootDescriptionData));
+      ZeroMem (OldFakeNVMap->DriverOptionalData, sizeof (OldFakeNVMap->DriverOptionalData));
+      ZeroMem (OldFakeNVMap->DriverDescriptionData, sizeof (OldFakeNVMap->DriverDescriptionData));
       CurrentFakeNVMap->DriverOptionChanged = FALSE;
       CurrentFakeNVMap->ForceReconnect      = TRUE;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
@@ -1070,8 +1074,10 @@ BootMaintCallback (
       //
       // Discard changes and exit formset
       //
-      CurrentFakeNVMap->BootOptionalData[0]     = 0x0000;
-      CurrentFakeNVMap->BootDescriptionData[0]  = 0x0000;
+      ZeroMem (CurrentFakeNVMap->BootOptionalData, sizeof (CurrentFakeNVMap->BootOptionalData));
+      ZeroMem (CurrentFakeNVMap->BootDescriptionData, sizeof (CurrentFakeNVMap->BootDescriptionData));
+      ZeroMem (OldFakeNVMap->BootOptionalData, sizeof (OldFakeNVMap->BootOptionalData));
+      ZeroMem (OldFakeNVMap->BootDescriptionData, sizeof (OldFakeNVMap->BootDescriptionData));
       CurrentFakeNVMap->BootOptionChanged = FALSE;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
     } else if (QuestionId == KEY_VALUE_BOOT_DESCRIPTION || QuestionId == KEY_VALUE_BOOT_OPTION) {

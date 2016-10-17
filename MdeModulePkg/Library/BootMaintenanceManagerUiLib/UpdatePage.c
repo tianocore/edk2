@@ -262,6 +262,7 @@ UpdateBootDelPage (
       // through HiiSetBrowserData function.
       //
       CallbackData->BmmFakeNvData.BootOptionDel[Index] = FALSE;
+      CallbackData->BmmOldFakeNVData.BootOptionDel[Index] = FALSE;
     }
     
     HiiCreateCheckBoxOpCode (
@@ -348,6 +349,7 @@ UpdateDrvDelPage (
       // through HiiSetBrowserData function.
       //
       CallbackData->BmmFakeNvData.DriverOptionDel[Index] = FALSE;
+      CallbackData->BmmOldFakeNVData.DriverOptionDel[Index] = FALSE;
     }
     HiiCreateCheckBoxOpCode (
       mStartOpCodeHandle,
@@ -1025,11 +1027,15 @@ UpdateOptionPage(
     if (!CallbackData->BmmFakeNvData.BootOptionChanged) {
       ZeroMem (CallbackData->BmmFakeNvData.BootOptionalData, sizeof (CallbackData->BmmFakeNvData.BootOptionalData));
       ZeroMem (CallbackData->BmmFakeNvData.BootDescriptionData, sizeof (CallbackData->BmmFakeNvData.BootDescriptionData));
+      ZeroMem (CallbackData->BmmOldFakeNVData.BootOptionalData, sizeof (CallbackData->BmmOldFakeNVData.BootOptionalData));
+      ZeroMem (CallbackData->BmmOldFakeNVData.BootDescriptionData, sizeof (CallbackData->BmmOldFakeNVData.BootDescriptionData));
     }
   } else if (FormId == FORM_DRV_ADD_FILE_ID){
     if (!CallbackData->BmmFakeNvData.DriverOptionChanged) {
       ZeroMem (CallbackData->BmmFakeNvData.DriverOptionalData, sizeof (CallbackData->BmmFakeNvData.DriverOptionalData));
       ZeroMem (CallbackData->BmmFakeNvData.DriverDescriptionData, sizeof (CallbackData->BmmFakeNvData.DriverDescriptionData));
+      ZeroMem (CallbackData->BmmOldFakeNVData.DriverOptionalData, sizeof (CallbackData->BmmOldFakeNVData.DriverOptionalData));
+      ZeroMem (CallbackData->BmmOldFakeNVData.DriverDescriptionData, sizeof (CallbackData->BmmOldFakeNVData.DriverDescriptionData));
     }
   }
 
