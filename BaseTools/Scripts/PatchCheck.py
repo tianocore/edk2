@@ -436,6 +436,14 @@ class CheckOnePatch:
                    ''',
                    re.IGNORECASE | re.VERBOSE | re.MULTILINE)
 
+    subject_prefix_re = \
+        re.compile(r'''^
+                       \s* (\[
+                        [^\[\]]* # Allow all non-brackets
+                       \])* \s*
+                   ''',
+                   re.VERBOSE)
+
     def find_patch_pieces(self):
         if sys.version_info < (3, 0):
             patch = self.patch.encode('ascii', 'ignore')
@@ -472,14 +480,7 @@ class CheckOnePatch:
 
         self.commit_subject = pmail['subject'].replace('\r\n', '')
         self.commit_subject = self.commit_subject.replace('\n', '')
-
-        pfx_start = self.commit_subject.find('[')
-        if pfx_start >= 0:
-            pfx_end = self.commit_subject.find(']')
-            if pfx_end > pfx_start:
-                self.commit_prefix = self.commit_subject[pfx_start + 1 : pfx_end]
-                self.commit_subject = self.commit_subject[pfx_end + 1 :].lstrip()
-
+        self.commit_subject = self.subject_prefix_re.sub('', self.commit_subject, 1)
 
 class CheckGitCommits:
     """Reads patches from git based on the specified git revision range.
