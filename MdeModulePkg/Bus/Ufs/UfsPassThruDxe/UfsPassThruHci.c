@@ -2,7 +2,7 @@
   UfsPassThruDxe driver is used to produce EFI_EXT_SCSI_PASS_THRU protocol interface
   for upper layer application to execute UFS-supported SCSI cmds.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -399,6 +399,11 @@ UfsInitUtpPrdt (
   UINT32     RemainingLen;
   UINT8      *Remaining;
   UINTN      PrdtNumber;
+
+  if ((BufferSize & (BIT0 | BIT1)) != 0) {
+    BufferSize &= ~(BIT0 | BIT1);
+    DEBUG ((EFI_D_WARN, "UfsInitUtpPrdt: The BufferSize [%d] is not dword-aligned!\n", BufferSize));
+  }
 
   if (BufferSize == 0) {
     return EFI_SUCCESS;
