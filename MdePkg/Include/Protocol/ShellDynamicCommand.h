@@ -2,6 +2,7 @@
   EFI Shell Dynamic Command registration protocol
 
   (C) Copyright 2012-2014 Hewlett-Packard Development Company, L.P.<BR>
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,13 +13,11 @@
 
 **/
 
-#ifndef __EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL__
-#define __EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL__
+#ifndef __EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL_H__
+#define __EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL_H__
 
-#include <ShellBase.h>
-#include <Protocol/EfiShellParameters.h>
-#include <Protocol/EfiShell.h>
-
+#include <Protocol/Shell.h>
+#include <Protocol/ShellParameters.h>
 
 // {3C7200E9-005F-4EA4-87DE-A3DFAC8A27C3}
 #define EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL_GUID \

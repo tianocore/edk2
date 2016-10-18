@@ -2,7 +2,7 @@
   EFI Shell protocol as defined in the UEFI Shell 2.0 specification including errata.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,16 +13,146 @@
 
 **/
 
-#ifndef __EFI_SHELL_PROTOCOL__
-#define __EFI_SHELL_PROTOCOL__
+#ifndef __EFI_SHELL_PROTOCOL_H__
+#define __EFI_SHELL_PROTOCOL_H__
 
-#include <ShellBase.h>
 #include <Guid/FileInfo.h>
 
 #define EFI_SHELL_PROTOCOL_GUID \
   { \
   0x6302d008, 0x7f9b, 0x4f30, { 0x87, 0xac, 0x60, 0xc9, 0xfe, 0xf5, 0xda, 0x4e } \
   }
+typedef VOID *SHELL_FILE_HANDLE;
+
+typedef enum {
+  ///
+  /// The operation completed successfully.
+  ///
+  SHELL_SUCCESS               = 0,
+
+  ///
+  /// The image failed to load.
+  ///
+  SHELL_LOAD_ERROR            = 1,
+
+  ///
+  /// The parameter was incorrect.
+  ///
+  SHELL_INVALID_PARAMETER     = 2,
+
+  ///
+  /// The operation is not supported.
+  ///
+  SHELL_UNSUPPORTED           = 3,
+
+  ///
+  /// The buffer was not the proper size for the request.
+  ///
+  SHELL_BAD_BUFFER_SIZE       = 4,
+
+  ///
+  /// The buffer was not large enough to hold the requested data.
+  /// The required buffer size is returned in the appropriate
+  /// parameter when this error occurs.
+  ///
+  SHELL_BUFFER_TOO_SMALL      = 5,
+
+  ///
+  /// There is no data pending upon return.
+  ///
+  SHELL_NOT_READY             = 6,
+
+  ///
+  /// The physical device reported an error while attempting the
+  /// operation.
+  ///
+  SHELL_DEVICE_ERROR          = 7,
+
+  ///
+  /// The device cannot be written to.
+  ///
+  SHELL_WRITE_PROTECTED       = 8,
+
+  ///
+  /// The resource has run out.
+  ///
+  SHELL_OUT_OF_RESOURCES      = 9,
+
+  ///
+  /// An inconsistency was detected on the file system causing the
+  /// operation to fail.
+  ///
+  SHELL_VOLUME_CORRUPTED      = 10,
+
+  ///
+  /// There is no more space on the file system.
+  ///
+  SHELL_VOLUME_FULL           = 11,
+
+  ///
+  /// The device does not contain any medium to perform the
+  /// operation.
+  ///
+  SHELL_NO_MEDIA              = 12,
+
+  ///
+  /// The medium in the device has changed since the last
+  /// access.
+  ///
+  SHELL_MEDIA_CHANGED         = 13,
+
+  ///
+  /// The item was not found.
+  ///
+  SHELL_NOT_FOUND             = 14,
+
+  ///
+  /// Access was denied.
+  ///
+  SHELL_ACCESS_DENIED         = 15,
+
+  // note the skipping of 16 and 17
+
+  ///
+  /// A timeout time expired.
+  ///
+  SHELL_TIMEOUT               = 18,
+
+  ///
+  /// The protocol has not been started.
+  ///
+  SHELL_NOT_STARTED           = 19,
+
+  ///
+  /// The protocol has already been started.
+  ///
+  SHELL_ALREADY_STARTED       = 20,
+
+  ///
+  /// The operation was aborted.
+  ///
+  SHELL_ABORTED               = 21,
+
+  // note the skipping of 22, 23, and 24
+
+  ///
+  /// A function encountered an internal version that was
+  /// incompatible with a version requested by the caller.
+  ///
+  SHELL_INCOMPATIBLE_VERSION  = 25,
+
+  ///
+  /// The function was not performed due to a security violation.
+  ///
+  SHELL_SECURITY_VIOLATION    = 26,
+
+  ///
+  /// The function was performed and resulted in an unequal
+  /// comparison..
+  ///
+  SHELL_NOT_EQUAL             = 27
+} SHELL_STATUS;
+
 
 // replaced EFI_LIST_ENTRY with LIST_ENTRY for simplicity.
 // they are identical outside of the name.

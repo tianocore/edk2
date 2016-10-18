@@ -1,7 +1,7 @@
 /** @file
   EFI Shell protocol as defined in the UEFI Shell 2.0 specification.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,10 +12,10 @@
 
 **/
 
-#ifndef __EFI_SHELL_PARAMETERS_PROTOCOL__
-#define __EFI_SHELL_PARAMETERS_PROTOCOL__
+#ifndef __EFI_SHELL_PARAMETERS_PROTOCOL_H__
+#define __EFI_SHELL_PARAMETERS_PROTOCOL_H__
 
-#include <ShellBase.h>
+#include <Protocol/Shell.h>
 
 #define EFI_SHELL_PARAMETERS_PROTOCOL_GUID \
   { \
