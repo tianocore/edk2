@@ -21,8 +21,8 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/EfiShellInterface.h>
 #include <Protocol/EfiShellEnvironment2.h>
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellParameters.h>
+#include <Protocol/Shell.h>
+#include <Protocol/ShellParameters.h>
 
 #define SHELL_FREE_NON_NULL(Pointer)  \
   do {                                \

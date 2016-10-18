@@ -17,17 +17,16 @@
 #define _SHELL_INTERNAL_HEADER_
 
 #include <Uefi.h>
-#include <ShellBase.h>
 
 #include <Guid/ShellVariableGuid.h>
 #include <Guid/ShellAliasGuid.h>
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleTextOut.h>
-#include <Protocol/EfiShell.h>
+#include <Protocol/Shell.h>
 #include <Protocol/EfiShellInterface.h>
 #include <Protocol/EfiShellEnvironment2.h>
-#include <Protocol/EfiShellParameters.h>
+#include <Protocol/ShellParameters.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/HiiPackageList.h>
 

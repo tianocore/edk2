@@ -20,7 +20,7 @@
 #include <Library/ShellLib.h>
 #include <Library/HandleParsingLib.h>
 
-#include <Protocol/EfiShellDynamicCommand.h>
+#include <Protocol/ShellDynamicCommand.h>
 
 /**
    function to insert string items into a list in the correct alphabetical place

@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2016 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
@@ -32,8 +32,8 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/EfiShellInterface.h>
 #include <Protocol/EfiShellEnvironment2.h>
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellParameters.h>
+#include <Protocol/Shell.h>
+#include <Protocol/ShellParameters.h>
 #include <Protocol/DevicePathToText.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/DriverConfiguration2.h>
@@ -136,7 +136,7 @@
 #include <Protocol/IdeControllerInit.h>
 #include <Protocol/DiskIo2.h>
 #include <Protocol/AdapterInformation.h>
-#include <Protocol/EfiShellDynamicCommand.h>
+#include <Protocol/ShellDynamicCommand.h>
 #include <Protocol/DiskInfo.h>
 
 #include <Library/HandleParsingLib.h>

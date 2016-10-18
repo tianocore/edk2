@@ -21,10 +21,9 @@
 #define _SHELL_COMMAND_LIB_
 
 #include <Uefi.h>
-#include <ShellBase.h>
 
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellParameters.h>
+#include <Protocol/Shell.h>
+#include <Protocol/ShellParameters.h>
 #include <Protocol/UnicodeCollation.h>
 #include <Protocol/SimpleFileSystem.h>
 

@@ -1,7 +1,7 @@
 /** @file
   header file for NULL named library for level 3 shell command functions.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,12 +16,11 @@
 #define _UEFI_SHELL_LEVEL3_COMMANDS_LIB_H_
 
 #include <Uefi.h>
-#include <ShellBase.h>
 
 #include <Guid/ShellLibHiiGuid.h>
 
-#include <Protocol/EfiShell.h>
-#include <Protocol/EfiShellParameters.h>
+#include <Protocol/Shell.h>
+#include <Protocol/ShellParameters.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/UnicodeCollation.h>

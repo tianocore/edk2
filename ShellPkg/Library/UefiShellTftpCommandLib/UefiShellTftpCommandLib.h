@@ -1,7 +1,7 @@
 /** @file
   header file for NULL named library for 'tftp' Shell command functions.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved. <BR>
   Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -18,7 +18,6 @@
 #define _UEFI_SHELL_TFTP_COMMAND_LIB_H_
 
 #include <Uefi.h>
-#include <ShellBase.h>
 
 #include <Guid/ShellLibHiiGuid.h>
 

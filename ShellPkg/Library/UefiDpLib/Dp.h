@@ -1,7 +1,7 @@
 /** @file
   Common declarations for the Dp Performance Reporting Utility.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@
 #define _EFI_APP_DP_H_
 
 #include <Library/ShellLib.h>
-#include <ShellBase.h>
 
 #define DP_MAJOR_VERSION        2
 #define DP_MINOR_VERSION        4

@@ -84,7 +84,9 @@
   #
   ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
+  ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
   ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
+  ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
   ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf
   ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
   ShellPkg/Library/UefiShellLevel3CommandsLib/UefiShellLevel3CommandsLib.inf
