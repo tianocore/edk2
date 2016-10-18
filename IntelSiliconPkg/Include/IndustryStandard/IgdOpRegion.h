@@ -4,6 +4,8 @@
 
   https://01.org/sites/default/files/documentation/skl_opregion_rev0p5.pdf
 
+  @note Fixed bug in the spec Mailbox3 - RM31 size from 0x45(69) to 0x46(70)
+
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -116,7 +118,7 @@ typedef struct {
   UINT64 FDSS;          ///< Offset 0x3AA DSS Buffer address allocated for IFFS feature
   UINT32 FDSP;          ///< Offset 0x3B2 Size of DSS buffer
   UINT32 STAT;          ///< Offset 0x3B6 State Indicator
-  UINT8  RM31[0x45];    ///< Offset 0x3BA - 0x3FF  Reserved Must be zero
+  UINT8  RM31[0x46];    ///< Offset 0x3BA - 0x3FF  Reserved Must be zero. Bug in spec 0x45(69)
 } IGD_OPREGION_MBOX3;
 
 ///
