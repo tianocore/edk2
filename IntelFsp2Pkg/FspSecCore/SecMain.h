@@ -105,7 +105,7 @@ InitializeFloatingPointUnits (
 
 
   @param[in] SizeOfRam          Size of the temporary memory available for use.
-  @param[in] TempRamBase        Base address of tempory ram
+  @param[in] TempRamBase        Base address of temporary ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
   @param[in] PeiCore            PeiCore entry point.
   @param[in] BootLoaderStack    BootLoader stack.
