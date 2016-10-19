@@ -2,7 +2,7 @@
   Provides interface to shell internal functions for shell commands.
 
   This library is for use ONLY by shell commands linked into the shell application.
-  This library will not funciton if it is used for UEFI Shell 2.0 Applications.
+  This library will not function if it is used for UEFI Shell 2.0 Applications.
 
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>

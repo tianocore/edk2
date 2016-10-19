@@ -99,7 +99,7 @@ ShellLevel2CommandsLibConstructor (
   ShellCommandRegisterCommandName(L"vol",      ShellCommandRunVol     , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_VOL)    );
 
   //
-  // support for permenant (built in) aliases
+  // support for permanent (built in) aliases
   //
   ShellCommandRegisterAlias(L"rm", L"del");
   ShellCommandRegisterAlias(L"ls", L"dir");

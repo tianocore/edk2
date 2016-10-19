@@ -1,5 +1,5 @@
 /** @file
-  Provides application point extension for "C" style main funciton.
+  Provides application point extension for "C" style main function.
 
   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials

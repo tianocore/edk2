@@ -124,7 +124,7 @@ GUID for the shell environment2 extension (main GUID above).
   @param[in] ParentImageHandle  Handle of the image executing this operation.
   @param[in] CommandLine        The string command line to execute.
   @param[in] DebugOutput        TRUE indicates that errors should be printed directly.
-                                FALSE supresses error messages.
+                                FALSE suppresses error messages.
 
   @retval EFI_SUCCESS           The command line executed and completed.
   @retval EFI_ABORTED           The operation aborted.

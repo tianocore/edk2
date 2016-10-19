@@ -1599,7 +1599,7 @@ ShellCommandRunPing (
   }
 
   //
-  // Parse the paramter of count number.
+  // Parse the parameter of count number.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"-n");
   if (ValueStr != NULL) {
@@ -1617,7 +1617,7 @@ ShellCommandRunPing (
     SendNumber = DEFAULT_SEND_COUNT;
   }
   //
-  // Parse the paramter of buffer size.
+  // Parse the parameter of buffer size.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"-l");
   if (ValueStr != NULL) {
@@ -1639,7 +1639,7 @@ ShellCommandRunPing (
   ZeroMem (&DstAddress, sizeof (EFI_IPv6_ADDRESS));
 
   //
-  // Parse the paramter of source ip address.
+  // Parse the parameter of source ip address.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"-s");
   if (ValueStr == NULL) {
@@ -1660,7 +1660,7 @@ ShellCommandRunPing (
     }
   }
   //
-  // Parse the paramter of destination ip address.
+  // Parse the parameter of destination ip address.
   //
   NonOptionCount = ShellCommandLineGetCount(ParamPackage);
   if (NonOptionCount < 2) {

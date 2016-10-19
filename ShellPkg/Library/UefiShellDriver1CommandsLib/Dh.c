@@ -130,7 +130,7 @@ IsDriverProt (
 
   @param[in] TheHandle        The handles to show info on.
   @param[in] Language         Language string per UEFI specification.
-  @param[in] Seperator        Separator string between information blocks.
+  @param[in] Separator        Separator string between information blocks.
   @param[in] Verbose          TRUE for extra info, FALSE otherwise.
   @param[in] ExtraInfo        TRUE for extra info, FALSE otherwise.
 
@@ -141,7 +141,7 @@ CHAR16*
 GetProtocolInfoString(
   IN CONST EFI_HANDLE TheHandle,
   IN CONST CHAR8      *Language,
-  IN CONST CHAR16     *Seperator,
+  IN CONST CHAR16     *Separator,
   IN CONST BOOLEAN    Verbose,
   IN CONST BOOLEAN    ExtraInfo
   )
@@ -169,7 +169,7 @@ GetProtocolInfoString(
       if (Temp != NULL) {
         ASSERT((RetVal == NULL && Size == 0) || (RetVal != NULL));
         if (Size != 0) {
-          StrnCatGrow(&RetVal, &Size, Seperator, 0);
+          StrnCatGrow(&RetVal, &Size, Separator, 0);
         }
         StrnCatGrow(&RetVal, &Size, L"%H", 0);
         StrnCatGrow(&RetVal, &Size, Temp, 0);
@@ -185,7 +185,7 @@ GetProtocolInfoString(
             StrnCatGrow(&RetVal, &Size, Temp, 0);
             StrnCatGrow(&RetVal, &Size, L")\r\n", 0);
           } else {
-            StrnCatGrow(&RetVal, &Size, Seperator, 0);
+            StrnCatGrow(&RetVal, &Size, Separator, 0);
             StrnCatGrow(&RetVal, &Size, Temp, 0);
           }
           FreePool(Temp);
@@ -201,7 +201,7 @@ GetProtocolInfoString(
   }
 
   ASSERT((RetVal == NULL && Size == 0) || (RetVal != NULL));
-  StrnCatGrow(&RetVal, &Size, Seperator, 0);
+  StrnCatGrow(&RetVal, &Size, Separator, 0);
   return (RetVal);
 }
 
