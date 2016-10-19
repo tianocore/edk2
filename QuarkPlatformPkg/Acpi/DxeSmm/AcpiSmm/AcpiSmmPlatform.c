@@ -3,7 +3,7 @@ ACPISMM Driver implementation file.
 
 This is QNC Smm platform driver
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -501,7 +501,7 @@ RestoreQncS3SwCallback (
 /*++
 
 Routine Description:
-  SMI handler to retore QncS3 code & context for S3 path
+  SMI handler to restore QncS3 code & context for S3 path
   This will be only triggered when BootScript got executed during resume
 
 Arguments:

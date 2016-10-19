@@ -4,7 +4,7 @@ This is the code for Boot Script Executer module.
 This driver is dispatched by Dxe core and the driver will reload itself to ACPI NVS memory
 in the entry point. The functionality is to interpret and restore the S3 boot script
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -225,7 +225,7 @@ BootScriptExecutorEntryPoint (
       }
       ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
       //
-      // Align buffer on section boundry
+      // Align buffer on section boundary
       //
       ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
       ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);

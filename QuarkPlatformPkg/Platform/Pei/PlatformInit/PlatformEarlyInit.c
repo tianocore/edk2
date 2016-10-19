@@ -142,7 +142,7 @@ SetLanControllerMacAddr (
   SaveBarReg = PciRead32 (DevPcieAddr + R_IOH_MAC_MEMBAR);
 
   //
-  // Use predefined tempory memory resource
+  // Use predefined temporary memory resource
   //
   PciWrite32 ( DevPcieAddr + R_IOH_MAC_MEMBAR, Bar0);
   PciWrite8 ( DevPcieAddr + PCI_COMMAND_OFFSET, EFI_PCI_COMMAND_MEMORY_SPACE);
@@ -800,7 +800,7 @@ CheckForResetDueToErrors (
 
   //
   // Check if RMU reset system due to access violations.
-  // RMU updates a SOC Unit register before reseting the system.
+  // RMU updates a SOC Unit register before resetting the system.
   //
   RegValue = QNCAltPortRead (QUARK_SCSS_SOC_UNIT_SB_PORT_ID, QUARK_SCSS_SOC_UNIT_CFG_STICKY_RW);
   if ((RegValue & B_CFG_STICKY_RW_VIOLATION) != 0) {
@@ -1048,7 +1048,7 @@ EarlyPlatformGpioCtrlerInitAndManipulation (
   SaveBarReg = PciRead32 (DevPcieAddr + PcdGet8 (PcdIohGpioBarRegister));
 
   //
-  // Use predefined tempory memory resource.
+  // Use predefined temporary memory resource.
   //
   PciWrite32 ( DevPcieAddr + PcdGet8 (PcdIohGpioBarRegister), IohGpioBase);
   PciWrite8 ( DevPcieAddr + PCI_COMMAND_OFFSET, EFI_PCI_COMMAND_MEMORY_SPACE);
