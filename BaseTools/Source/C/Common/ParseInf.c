@@ -506,7 +506,7 @@ Returns:
   Index = 0;
   
   //
-  // Check input paramter
+  // Check input parameter
   //
   if (AsciiString == NULL || ReturnValue == NULL) {
     return EFI_INVALID_PARAMETER;

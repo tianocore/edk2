@@ -1093,7 +1093,7 @@ Returns:
   EFI_HII_PACKAGE_LIST_HEADER      HiiPackageListHeader;
   EFI_HII_PACKAGE_HEADER           HiiPackageHeader;
   EFI_IFR_FORM_SET                 IfrFormSet;
-  UINT8                            NumberOfFormPacakge;
+  UINT8                            NumberOfFormPackage;
   EFI_HII_PACKAGE_HEADER           EndPackage;
   UINT32                           HiiSectionHeaderSize;
   UINT8                            *HiiSectionHeader;
@@ -1140,7 +1140,7 @@ Returns:
   KeepExceptionTableFlag = FALSE;
   KeepOptionalHeaderFlag = FALSE;
   KeepZeroPendingFlag    = FALSE;
-  NumberOfFormPacakge    = 0;
+  NumberOfFormPackage    = 0;
   HiiPackageListBuffer   = NULL;
   HiiPackageDataPointer  = NULL;
   EndPackage.Length      = sizeof (EFI_HII_PACKAGE_HEADER);
@@ -1642,7 +1642,7 @@ Returns:
           fread (&IfrFormSet, 1, sizeof (IfrFormSet), fpIn);
           memcpy (&HiiPackageListGuid, &IfrFormSet.Guid, sizeof (EFI_GUID));
         }
-        NumberOfFormPacakge ++;
+        NumberOfFormPackage ++;
       }
       HiiPackageListHeader.PackageLength += FileLength;
       fclose (fpIn);
@@ -1651,7 +1651,7 @@ Returns:
     //
     // Check whether hii packages are valid
     //
-    if (NumberOfFormPacakge > 1) {
+    if (NumberOfFormPackage > 1) {
       Error (NULL, 0, 3000, "Invalid", "The input hii packages contains more than one hii form package");
       goto Finish;
     }

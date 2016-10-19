@@ -120,7 +120,7 @@ Returns:
   for (FList = mOptions.FileList; FList != NULL; FList = FList->Next) {
     if (stricmp (mOptions.OutFileName, FList->FileName) == 0) {
       Status = STATUS_ERROR;
-      Error (NULL, 0, 1002, "Invalid input paramter", "Input and output file names must be different - %s = %s.", FList->FileName, mOptions.OutFileName);
+      Error (NULL, 0, 1002, "Invalid input parameter", "Input and output file names must be different - %s = %s.", FList->FileName, mOptions.OutFileName);
       goto BailOut;
     }
   }
@@ -168,7 +168,7 @@ Returns:
   // Check total size
   //
   if (TotalSize > MAX_OPTION_ROM_SIZE) {
-    Error (NULL, 0, 2000, "Invalid paramter", "Option ROM image size exceeds limit of 0x%X bytes.", MAX_OPTION_ROM_SIZE);
+    Error (NULL, 0, 2000, "Invalid parameter", "Option ROM image size exceeds limit of 0x%X bytes.", MAX_OPTION_ROM_SIZE);
     Status = STATUS_ERROR;
   }
 

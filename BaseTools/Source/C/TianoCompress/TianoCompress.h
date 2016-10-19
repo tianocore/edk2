@@ -1,5 +1,5 @@
 /** @file
-  Internal include file for Tiano Decompress Libary.
+  Internal include file for Tiano Decompress Library.
 
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -361,7 +361,7 @@ DecodeP (
 /**
   Reads code lengths for the Extra Set or the Position Set.
 
-  Read in the Extra Set or Pointion Set Length Arrary, then
+  Read in the Extra Set or Position Set Length Array, then
   generate the Huffman code mapping for them.
 
   @param  Sd      The global scratch data.

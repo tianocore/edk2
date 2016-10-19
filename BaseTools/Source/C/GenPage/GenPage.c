@@ -401,7 +401,7 @@ main (
     }
     
     //
-    // Don't recognize the paramter.
+    // Don't recognize the parameter.
     //
     InputFile = argv[0];
     argc--;

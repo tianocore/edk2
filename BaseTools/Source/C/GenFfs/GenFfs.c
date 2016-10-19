@@ -739,7 +739,7 @@ Returns:
   VerboseMsg ("%s tool start.", UTILITY_NAME);
 
   //
-  // Check the complete input paramters.
+  // Check the complete input parameters.
   //
   if (FfsFiletype == EFI_FV_FILETYPE_ALL) {
     Error (NULL, 0, 1001, "Missing option", "filetype");

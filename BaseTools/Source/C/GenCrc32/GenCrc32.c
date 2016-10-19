@@ -248,7 +248,7 @@ Returns:
   VerboseMsg ("%s tool start.", UTILITY_NAME);
   
   //
-  // Check Input paramters
+  // Check Input parameters
   //
   if (FileAction == CRC32_NULL) {
     Error (NULL, 0, 1001, "Missing option", "either the encode or the decode option must be specified!");

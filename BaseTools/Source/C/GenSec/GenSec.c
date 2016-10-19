@@ -267,10 +267,10 @@ Returns:
   STATUS                    Status;
 
   if (InputFileNum > 1) {
-    Error (NULL, 0, 2000, "Invalid paramter", "more than one input file specified");
+    Error (NULL, 0, 2000, "Invalid parameter", "more than one input file specified");
     return STATUS_ERROR;
   } else if (InputFileNum < 1) {
-    Error (NULL, 0, 2000, "Invalid paramter", "no input file specified");
+    Error (NULL, 0, 2000, "Invalid parameter", "no input file specified");
     return STATUS_ERROR;
   }
   //
@@ -296,7 +296,7 @@ Returns:
   // Size must fit in 3 bytes
   //
   //if (TotalLength >= MAX_SECTION_SIZE) {
-  //  Error (NULL, 0, 2000, "Invalid paramter", "%s file size (0x%X) exceeds section size limit(%uM).", InputFileName[0], (unsigned) TotalLength, MAX_SECTION_SIZE>>20);
+  //  Error (NULL, 0, 2000, "Invalid parameter", "%s file size (0x%X) exceeds section size limit(%uM).", InputFileName[0], (unsigned) TotalLength, MAX_SECTION_SIZE>>20);
   //  goto Done;
   //}
   HeaderLength = sizeof (EFI_COMMON_SECTION_HEADER);
@@ -436,12 +436,12 @@ Returns:
   UINT32                     HeaderSize;
 
   if (InputFileNum < 1) {
-    Error (NULL, 0, 2000, "Invalid paramter", "must specify at least one input file");
+    Error (NULL, 0, 2000, "Invalid parameter", "must specify at least one input file");
     return EFI_INVALID_PARAMETER;
   }
 
   if (BufferLength == NULL) {
-    Error (NULL, 0, 2000, "Invalid paramter", "BufferLength can't be NULL");
+    Error (NULL, 0, 2000, "Invalid parameter", "BufferLength can't be NULL");
     return EFI_INVALID_PARAMETER;
   }
 
@@ -698,7 +698,7 @@ Returns:
     break;
 
   default:
-    Error (NULL, 0, 2000, "Invalid paramter", "unknown compression type");
+    Error (NULL, 0, 2000, "Invalid parameter", "unknown compression type");
     free (FileBuffer);
     return EFI_ABORTED;
   }
@@ -737,7 +737,7 @@ Returns:
             "the original section size is %d bytes and the compressed section size is %u bytes", (unsigned) InputLength, (unsigned) CompressedLength);
 
   //if (TotalLength >= MAX_SECTION_SIZE) {
-  //  Error (NULL, 0, 2000, "Invalid paramter", "The size of all files exceeds section size limit(%uM).", MAX_SECTION_SIZE>>20);
+  //  Error (NULL, 0, 2000, "Invalid parameter", "The size of all files exceeds section size limit(%uM).", MAX_SECTION_SIZE>>20);
   //  if (FileBuffer != NULL) {
   //    free (FileBuffer);
   //  }
