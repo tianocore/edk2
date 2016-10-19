@@ -934,7 +934,7 @@ KeyboardReadKeyStrokeWorker (
   }
 
   //
-  // Use TimerEvent callback funciton to check whether there's any key pressed
+  // Use TimerEvent callback function to check whether there's any key pressed
   //
   
   //
@@ -978,7 +978,7 @@ KeyboardReadKeyStrokeWorker (
   @param  ExtendedVerification  Whether perform the extra validation of keyboard. True: perform; FALSE: skip.
 
   @retval EFI_SUCCESS           The command byte is written successfully.
-  @retval EFI_DEVICE_ERROR      Errors occurred during reseting keyboard.
+  @retval EFI_DEVICE_ERROR      Errors occurred during resetting keyboard.
 
 **/
 EFI_STATUS
@@ -1176,8 +1176,8 @@ BiosKeyboardReset (
              );
 
   //
-  // For reseting keyboard is not mandatory before booting OS and sometimes keyboard responses very slow,
-  // so we only do the real reseting for keyboard when user asks, and normally during booting an OS, it's skipped.
+  // For resetting keyboard is not mandatory before booting OS and sometimes keyboard responses very slow,
+  // so we only do the real resetting for keyboard when user asks, and normally during booting an OS, it's skipped.
   // Call CheckKeyboardConnect() to check whether keyboard is connected, if it is not connected,
   // Real reset will not do.
   //
@@ -1431,7 +1431,7 @@ BiosKeyboardWaitForKey (
   //
   gBS->Stall (1000);
   //
-  // Use TimerEvent callback funciton to check whether there's any key pressed
+  // Use TimerEvent callback function to check whether there's any key pressed
   //
   BiosKeyboardTimerHandler (NULL, BIOS_KEYBOARD_DEV_FROM_THIS (Context));
 
@@ -1795,7 +1795,7 @@ BiosKeyboardTimerHandler (
   // will be disabled after the thunk call finish, which means if user crazy input during int 9 being disabled, some keystrokes will be lost when 
   // KB device own hardware buffer overflows. And if the lost keystroke code is CTRL or ALT or SHIFT release code, these function key flags bit 
   // in BDA will not be updated. So the Int 16 will believe the CTRL or ALT or SHIFT is still pressed, and Int 16 will translate later scancode 
-  // to wrong ASCII code. We can increase the Thunk frequence to let Int 9 response in time, but this way will much hurt other dirvers 
+  // to wrong ASCII code. We can increase the Thunk frequence to let Int 9 response in time, but this way will much hurt other drivers
   // performance, like USB.
   //
   // 1. If CTRL or ALT release code is missed,  all later input keys will be translated to wrong ASCII codes which the Tiano cannot support. In 

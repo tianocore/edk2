@@ -56,7 +56,7 @@ DataHubStdErrEventHandler (
   //
   // If StdErr is not yet initialized just return a DEBUG print in the BDS
   // after consoles are connect will make sure data gets flushed properly
-  // when StdErr is availible.
+  // when StdErr is available.
   //
   if (gST == NULL) {
     return ;

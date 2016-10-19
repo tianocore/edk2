@@ -223,7 +223,7 @@ RelocateImageUnder4GIfNeeded (
       }
       ImageContext.ImageAddress = (PHYSICAL_ADDRESS)MemoryAddress;
       //
-      // Align buffer on section boundry
+      // Align buffer on section boundary
       //
       ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
      ImageContext.ImageAddress &= ~((PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);

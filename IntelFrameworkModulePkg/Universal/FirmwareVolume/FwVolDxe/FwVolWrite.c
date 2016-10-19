@@ -782,7 +782,7 @@ FvCreateNewFile (
 
   //
   // First find a free space that can hold this image.
-  // Check alignment, FFS at least must be aligned at 8-byte boundry
+  // Check alignment, FFS at least must be aligned at 8-byte boundary
   //
   RequiredAlignment = GetRequiredAlignment (FileAttributes);
 
@@ -1513,7 +1513,7 @@ FvWriteFile (
 
   for (Index1 = 0; Index1 < NumberOfFiles; Index1++) {
     //
-    // Making Buffersize QWORD boundry, and add file tail.
+    // Making Buffersize QWORD boundary, and add file tail.
     //
     HeaderSize = sizeof (EFI_FFS_FILE_HEADER);
     ActualSize = FileData[Index1].BufferSize + HeaderSize;

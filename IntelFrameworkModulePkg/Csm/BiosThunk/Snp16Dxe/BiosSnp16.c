@@ -2148,7 +2148,7 @@ Undi16SimpleNetworkInitialize (
   @param This                 A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
   @param ExtendedVerification Need extended verfication.
   
-  @retval EFI_INVALID_PARAMETER Invalid This paramter.
+  @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
   @retval EFI_DEVICE_ERROR      Invalid status for network device
@@ -2229,7 +2229,7 @@ Undi16SimpleNetworkReset (
 
   @param This                 A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
   
-  @retval EFI_INVALID_PARAMETER Invalid This paramter.
+  @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
   @retval EFI_DEVICE_ERROR      Invalid status for network device
@@ -2342,7 +2342,7 @@ Undi16SimpleNetworkShutdown (
   @param MCastFilterCnt       Count of mutli cast filter for different MAC address
   @param MCastFilter          Buffer for mustli cast filter for different MAC address.
   
-  @retval EFI_INVALID_PARAMETER Invalid This paramter.
+  @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
   @retval EFI_DEVICE_ERROR      Invalid status for network device
@@ -2496,10 +2496,10 @@ Undi16SimpleNetworkReceiveFilters (
   Set new MAC address.
 
   @param This                 A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  @param Reset                Whether reset station MAC address to permenent address
+  @param Reset                Whether reset station MAC address to permanent address
   @param New                  A pointer to New address
   
-  @retval EFI_INVALID_PARAMETER Invalid This paramter.
+  @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
   @retval EFI_DEVICE_ERROR      Invalid status for network device
@@ -2554,7 +2554,7 @@ Undi16SimpleNetworkStationAddress (
 
   if (Reset) {
     //
-    // If we are reseting the Station Address to the permanent address, and the
+    // If we are resetting the Station Address to the permanent address, and the
     // Station Address is not programmable, then just return EFI_SUCCESS.
     //
     if (!SimpleNetworkDevice->SimpleNetworkMode.MacAddressChangeable) {
@@ -2853,7 +2853,7 @@ Undi16SimpleNetworkStatistics (
   @param IP                   A pointer to given Ip address.
   @param MAC                  On return, translated MAC address.
   
-  @retval EFI_INVALID_PARAMETER Invalid This paramter.
+  @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_INVALID_PARAMETER Invalid IP address.
   @retval EFI_INVALID_PARAMETER Invalid return buffer for holding MAC address.
   @retval EFI_UNSUPPORTED       Do not support IPv6 

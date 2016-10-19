@@ -417,7 +417,7 @@ ErrorExit:
 }
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This              Protocol instance pointer.
@@ -513,14 +513,14 @@ PS2MouseDriverStop (
 }
 
 /**
-  Reset the Mouse and do BAT test for it, if ExtendedVerification isTRUE and there is a mouse device connectted to system
+  Reset the Mouse and do BAT test for it, if ExtendedVerification is TRUE and there is a mouse device connected to system
 
   @param This                 - Pointer of simple pointer Protocol.
   @param ExtendedVerification - Whether configure mouse parameters. True: do; FALSE: skip.
 
 
   @retval EFI_SUCCESS         - The command byte is written successfully.
-  @retval EFI_DEVICE_ERROR    - Errors occurred during reseting keyboard.
+  @retval EFI_DEVICE_ERROR    - Errors occurred during resetting keyboard.
 
 **/
 EFI_STATUS

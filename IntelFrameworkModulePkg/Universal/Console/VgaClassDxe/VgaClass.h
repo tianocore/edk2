@@ -134,7 +134,7 @@ VgaClassDriverBindingStart (
   Starts the device controller.
   
   This function implments EFI_DRIVER_BINDING_PROTOCOL.Stop().
-  It stops this driver on Controller. Support stoping any child handles
+  It stops this driver on Controller. Support stopping any child handles
   created by this driver.
 
   @param  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.

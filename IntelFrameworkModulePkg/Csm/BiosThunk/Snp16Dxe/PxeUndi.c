@@ -57,7 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Status: See the PXENV_STATUS_xxx constants.    
 
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                                 
   @return Return value of PXE option ROM far call.                                
@@ -105,7 +105,7 @@ PxeStartUndi (
   Status: See the PXENV_STATUS_xxx constants.
 
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                                 
   @return Return value of PXE option ROM far call.    
@@ -145,7 +145,7 @@ PxeUndiStartup (
   Status: See the PXENV_STATUS_xxx constants.
 
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                                 
   @return Return value of PXE option ROM far call. 
@@ -198,7 +198,7 @@ PxeUndiCleanup (
   Status: See the PXENV_STATUS_xxx constants.    
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                                 
   @return Return value of PXE option ROM far call. 
@@ -254,7 +254,7 @@ PxeUndiInitialize (
   Status: See the PXENV_STATUS_xxx constants.
   
   @param  SimpleNetworkDevice   Device instance.
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
   @param  RxFilter             Filter setting mask value for PXE recive .     
                                
@@ -347,7 +347,7 @@ PxeUndiResetNic (
   Status: See the PXENV_STATUS_xxx constants.
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.   
@@ -401,7 +401,7 @@ PxeUndiShutdown (
   Status: See the PXENV_STATUS_xxx constants.
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -439,7 +439,7 @@ PxeUndiOpen (
   Status: See the PXENV_STATUS_xxx constants.
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -532,7 +532,7 @@ PxeUndiClose (
   Status: See the PXENV_STATUS_xxx constants  
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -586,7 +586,7 @@ PxeUndiTransmit (
   Status: See the PXENV_STATUS_xxx constants        
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -628,7 +628,7 @@ PxeUndiSetMcastAddr (
   Status: See the PXENV_STATUS_xxx constants.     
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -669,7 +669,7 @@ PxeUndiSetStationAddr (
   Status: See the PXENV_STATUS_xxx constants.   
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -735,7 +735,7 @@ PxeUndiSetPacketFilter (
   TxBufCnt: Transmit queue length.  
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -783,7 +783,7 @@ PxeUndiGetInformation (
   because receive queue was full.
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -820,7 +820,7 @@ PxeUndiGetStatistics (
   Status: See the PXENV_STATUS_xxx constants.
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -858,7 +858,7 @@ PxeUndiClearStatistics (
   Status: See the PXENV_STATUS_xxx constants.    
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -902,7 +902,7 @@ PxeUndiInitiateDiags (
   Status: See the PXENV_STATUS_xxx constants.  
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -943,7 +943,7 @@ PxeUndiForceInterrupt (
   MediaAddr: MAC multicast address.
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -1016,7 +1016,7 @@ PxeUndiGetMcastAddr (
   in the [PnP] and [PCI] specifications    
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -1072,7 +1072,7 @@ PxeUndiGetNicType (
   Reserved: Must be zero.       
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -1137,7 +1137,7 @@ PxeUndiGetNdisInfo (
   strategy routine when the UNDI re-enables interrupts.   
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -1179,7 +1179,7 @@ PxeUndiIsr (
   Status: See the PXENV_STATUS_xxx constants.      
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  
@@ -1234,7 +1234,7 @@ PxeUndiStop (
   status of that operation on return.     
   
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold paramter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value 
                                 for option ROM call.
                               
   @return Return value of PXE option ROM far call.  

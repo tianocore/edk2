@@ -170,7 +170,7 @@ BdsLibBootViaBootOption (
   This function will enumerate all possible boot devices in the system, and
   automatically create boot options for Network, Shell, Removable BlockIo, 
   and Non-BlockIo Simplefile devices.
-  It will excute once every boot.
+  It will execute once every boot.
   
   @param  BdsBootOptionList      The header of the linked list that indexed all
                                  current boot options.
@@ -995,7 +995,7 @@ BdsLibUserIdentify (
 /**
   This function checks if a Fv file device path is valid, according to a file GUID. If it is invalid,
   it tries to return the valid device path.
-  FV address maybe changes for memory layout adjust from time to time, use this funciton
+  FV address maybe changes for memory layout adjust from time to time, use this function
   could promise the Fv file device path is right.
 
   @param  DevicePath             On input, the Fv file device path to check. On

@@ -72,7 +72,7 @@ PlatformBdsInit (
   );
 
 /**
-  The function will excute with as the platform policy, current policy
+  The function will execute with as the platform policy, current policy
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 

@@ -370,7 +370,7 @@ FileExplorerRouteConfig (
   @retval  EFI_OUT_OF_RESOURCES  Not enough storage is available to hold the variable and its data.
   @retval  EFI_DEVICE_ERROR      The variable could not be saved.
   @retval  EFI_UNSUPPORTED       The specified Action is not supported by the callback.
-  @retval  EFI_INVALID_PARAMETER If paramter Value or ActionRequest is NULL.
+  @retval  EFI_INVALID_PARAMETER If parameter Value or ActionRequest is NULL.
 **/
 EFI_STATUS
 EFIAPI

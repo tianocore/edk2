@@ -540,7 +540,7 @@ PS2MouseRead (
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Command I/O command.
   
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -579,7 +579,7 @@ Out8042Command (
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Data value
   
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -615,7 +615,7 @@ Out8042Data (
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Data value
   
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -659,7 +659,7 @@ In8042Data (
   @param Command Aux I/O command
   @param Resend  Whether need resend the Aux command.
   
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -740,7 +740,7 @@ Out8042AuxCommand (
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Buffer holding return value  
   
-  @retval EFI_SUCCESS Success to excute I/O work flow.
+  @retval EFI_SUCCESS Success to execute I/O work flow.
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -786,7 +786,7 @@ Out8042AuxData (
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Buffer holding return value.
   
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS

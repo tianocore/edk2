@@ -529,7 +529,7 @@ FvCheck (
       continue;
     }
     //
-    // double check boundry
+    // double check boundary
     //
     if (TestLength < sizeof (EFI_FFS_FILE_HEADER)) {
       break;
@@ -570,7 +570,7 @@ FvCheck (
         DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &((EFI_FFS_FILE_HEADER *) Ptr)->Name));
         Ptr = Ptr + FFS_FILE2_SIZE (Ptr);
         //
-        // Adjust Ptr to the next 8-byte aligned boundry.
+        // Adjust Ptr to the next 8-byte aligned boundary.
         //
         while (((UINTN) Ptr & 0x07) != 0) {
           Ptr++;
@@ -609,7 +609,7 @@ FvCheck (
       }
 
       //
-      // Adjust Ptr to the next 8-byte aligned boundry.
+      // Adjust Ptr to the next 8-byte aligned boundary.
       //
       while (((UINTN) Ptr & 0x07) != 0) {
         Ptr++;

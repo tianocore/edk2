@@ -255,7 +255,7 @@ FindFilterDriverByEvent (
 /**
 
   Get a previously logged data record and the MonotonicCount for the next
-  availible Record. This allows all records or all records later 
+  available Record. This allows all records or all records later
   than a give MonotonicCount to be returned. If an optional FilterDriverEvent
   is passed in with a MonotonicCout of zero return the first record 
   not yet read by the filter driver. If FilterDriverEvent is NULL and 
@@ -264,7 +264,7 @@ FindFilterDriverByEvent (
   @param This                     Pointer to the EFI_DATA_HUB_PROTOCOL instance.
   @param MonotonicCount           Specifies the Record to return. On input, zero means
                                   return the first record. On output, contains the next
-                                  record to availible. Zero indicates no more records.
+                                  record to available. Zero indicates no more records.
   @param FilterDriverEvent        If FilterDriverEvent is not passed in a MonotonicCount 
                                   of zero, it means to return the first data record. 
                                   If FilterDriverEvent is passed in, then a MonotonicCount 

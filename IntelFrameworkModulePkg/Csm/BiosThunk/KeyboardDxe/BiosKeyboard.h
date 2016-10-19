@@ -447,7 +447,7 @@ BiosKeyboardComponentNameGetControllerName (
   @param  ExtendedVerification  Whether perform the extra validation of keyboard. True: perform; FALSE: skip.
 
   @retval EFI_SUCCESS           The command byte is written successfully.
-  @retval EFI_DEVICE_ERROR      Errors occurred during reseting keyboard.
+  @retval EFI_DEVICE_ERROR      Errors occurred during resetting keyboard.
 
 **/
 EFI_STATUS

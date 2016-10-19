@@ -823,7 +823,7 @@ LaunchBaseCode (
 
   @param SimpleNetworkDevice    Device instance for simple network
   @param Table                 Point to parameter/retun value table for legacy far call
-  @param TableSize              The size of paramter/return value table
+  @param TableSize              The size of parameter/return value table
   @param CallIndex              The index of legacy call.
   
   @return EFI_STATUS 

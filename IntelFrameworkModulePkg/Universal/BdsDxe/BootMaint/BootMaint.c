@@ -739,7 +739,7 @@ BootMaintCallback (
 
   Private      = BMM_CALLBACK_DATA_FROM_THIS (This);
   //
-  // Retrive uncommitted data from Form Browser
+  // Retrieve uncommitted data from Form Browser
   //
   CurrentFakeNVMap = &Private->BmmFakeNvData;
   HiiGetBrowserData (&gBootMaintFormSetGuid, mBootMaintStorageName, sizeof (BMM_FAKE_NV_DATA), (UINT8 *) CurrentFakeNVMap);
