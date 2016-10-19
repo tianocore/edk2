@@ -22,7 +22,7 @@ Abstract:
   will be, how may FD's will be loaded and also what the boot mode is.
 
   The SEC registers a set of services with the SEC core. gPrivateDispatchTable
-  is a list of PPI's produced by the SEC that are availble for usage in PEI.
+  is a list of PPI's produced by the SEC that are available for usage in PEI.
 
   This code produces 128 K of temporary memory for the PEI stack by directly
   allocate memory space with ReadWrite and Execute attribute.
@@ -161,7 +161,7 @@ Routine Description:
 Arguments:
   Argc - Number of command line arguments
   Argv - Array of command line argument strings
-  Envp - Array of environmemt variable strings
+  Envp - Array of environment variable strings
 
 Returns:
   0 - Normal exit
@@ -228,7 +228,7 @@ Returns:
   //
   // Allocate space for gSystemMemory Array
   //
-  gSystemMemoryCount  = CountSeperatorsInString (MemorySizeStr, '!') + 1;
+  gSystemMemoryCount  = CountSeparatorsInString (MemorySizeStr, '!') + 1;
   gSystemMemory       = calloc (gSystemMemoryCount, sizeof (NT_SYSTEM_MEMORY));
   if (gSystemMemory == NULL) {
     SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n", MemorySizeStr);
@@ -237,7 +237,7 @@ Returns:
   //
   // Allocate space for gSystemMemory Array
   //
-  gFdInfoCount  = CountSeperatorsInString (FirmwareVolumesStr, '!') + 1;
+  gFdInfoCount  = CountSeparatorsInString (FirmwareVolumesStr, '!') + 1;
   gFdInfo       = calloc (gFdInfoCount, sizeof (NT_FD_INFO));
   if (gFdInfo == NULL) {
     SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n", FirmwareVolumesStr);
@@ -291,7 +291,7 @@ Returns:
     }
 
     //
-    // Open the FD and remmeber where it got mapped into our processes address space
+    // Open the FD and remember where it got mapped into our processes address space
     //
     Status = WinNtOpenFile (
               FileName,
@@ -307,7 +307,7 @@ Returns:
 
     SecPrint ("  FD loaded from");
     //
-    // printf can't print filenames directly as the \ gets interperted as an
+    // printf can't print filenames directly as the \ gets interpreted as an
     //  escape character.
     //
     for (Index2 = 0; FileName[Index2] != '\0'; Index2++) {
@@ -385,7 +385,7 @@ Arguments:
   CreationDisposition - The flags to pass to CreateFile().  Use to create new files for
                         memory emulation, and exiting files for firmware volume emulation
   BaseAddress         - The base address of the mapped file in the user address space.
-                         If passed in as NULL the a new memory region is used.
+                         If passed in as NULL the new memory region is used.
                          If passed in as non NULL the request memory region is used for
                           the mapping of the file into the process space.
   Length              - The size of the mapped region in bytes
@@ -701,7 +701,7 @@ SecWinNtPeiAutoScan (
 
 Routine Description:
   This service is called from Index == 0 until it returns EFI_UNSUPPORTED.
-  It allows discontiguous memory regions to be supported by the emulator.
+  It allows discontinuous memory regions to be supported by the emulator.
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
   parsing PcdWinNtMemorySizeForSecMain value.
   The size comes from the Pcd value and the address comes from the memory space 
@@ -746,7 +746,7 @@ SecWinNtWinNtThunkAddress (
 Routine Description:
   Since the SEC is the only Windows program in stack it must export
   an interface to do Win API calls. That's what the WinNtThunk address
-  is for. gWinNt is initailized in WinNtThunk.c.
+  is for. gWinNt is initialized in WinNtThunk.c.
 
 Arguments:
   InterfaceSize - sizeof (EFI_WIN_NT_THUNK_PROTOCOL);
@@ -799,7 +799,7 @@ Returns:
     return Status;
   }
   //
-  // Allocate space in NT (not emulator) memory with ReadWrite and Execute attribue. 
+  // Allocate space in NT (not emulator) memory with ReadWrite and Execute attribute. 
   // Extra space is for alignment
   //
   ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) VirtualAlloc (NULL, (SIZE_T) (ImageContext.ImageSize + (ImageContext.SectionAlignment * 2)), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
@@ -807,7 +807,7 @@ Returns:
     return EFI_OUT_OF_RESOURCES;
   }
   //
-  // Align buffer on section boundry
+  // Align buffer on section boundary
   //
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
   ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
@@ -853,7 +853,7 @@ Arguments:
 
 Returns:
   EFI_SUCCESS     - Return the Base address and size of the FV
-  EFI_UNSUPPORTED - Index does nto map to an FD in the system
+  EFI_UNSUPPORTED - Index does not map to an FD in the system
 
 --*/
 {
@@ -956,28 +956,28 @@ Returns:
 }
 
 UINTN
-CountSeperatorsInString (
+CountSeparatorsInString (
   IN  CONST CHAR16   *String,
-  IN  CHAR16         Seperator
+  IN  CHAR16         Separator
   )
 /*++
 
 Routine Description:
-  Count the number of seperators in String
+  Count the number of separators in String
 
 Arguments:
   String    - String to process
-  Seperator - Item to count
+  Separator - Item to count
 
 Returns:
-  Number of Seperator in String
+  Number of Separator in String
 
 --*/
 {
   UINTN Count;
 
   for (Count = 0; *String != '\0'; String++) {
-    if (*String == Seperator) {
+    if (*String == Separator) {
       Count++;
     }
   }
@@ -1010,7 +1010,7 @@ SecNt32PeCoffRelocateImage (
   // If we load our own PE COFF images the Windows debugger can not source
   //  level debug our code. If a valid PDB pointer exists usw it to load
   //  the *.dll file as a library using Windows* APIs. This allows 
-  //  source level debug. The image is still loaded and reloaced
+  //  source level debug. The image is still loaded and relocated
   //  in the Framework memory space like on a real system (by the code above),
   //  but the entry point points into the DLL loaded by the code bellow. 
   //
@@ -1055,11 +1055,11 @@ SecNt32PeCoffRelocateImage (
     if (Library != NULL) {
       //
       // InitializeDriver is the entry point we put in all our EFI DLL's. The
-      // DONT_RESOLVE_DLL_REFERENCES argument to LoadLIbraryEx() supresses the 
+      // DONT_RESOLVE_DLL_REFERENCES argument to LoadLIbraryEx() suppresses the 
       // normal DLL entry point of DllMain, and prevents other modules that are
       // referenced in side the DllFileName from being loaded. There is no error 
       // checking as the we can point to the PE32 image loaded by Tiano. This 
-      // step is only needed for source level debuging
+      // step is only needed for source level debugging
       //
       DllEntryPoint = (VOID *) (UINTN) GetProcAddress (Library, "InitializeDriver");
 
@@ -1103,7 +1103,7 @@ SecTemporaryRamSupport (
   )
 {
   //
-  // Migrate the whole temporary memory to permenent memory.
+  // Migrate the whole temporary memory to permanent memory.
   // 
   CopyMem (
     (VOID*)(UINTN)PermanentMemoryBase, 
@@ -1113,8 +1113,8 @@ SecTemporaryRamSupport (
 
   //
   // SecSwitchStack function must be invoked after the memory migration
-  // immediatly, also we need fixup the stack change caused by new call into 
-  // permenent memory.
+  // immediately, also we need fixup the stack change caused by new call into 
+  // permanent memory.
   // 
   SecSwitchStack (
     (UINT32) TemporaryMemoryBase,
@@ -1123,7 +1123,7 @@ SecTemporaryRamSupport (
 
   //
   // We need *not* fix the return address because currently, 
-  // The PeiCore is excuted in flash.
+  // The PeiCore is executed in flash.
   //
 
   //

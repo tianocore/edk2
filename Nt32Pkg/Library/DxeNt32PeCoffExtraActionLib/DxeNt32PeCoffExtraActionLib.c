@@ -290,7 +290,7 @@ PeCoffLoaderRelocateImageExtraAction (
   // If we load our own PE COFF images the Windows debugger can not source
   //  level debug our code. If a valid PDB pointer exists usw it to load
   //  the *.dll file as a library using Windows* APIs. This allows 
-  //  source level debug. The image is still loaded and reloaced
+  //  source level debug. The image is still loaded and relocated
   //  in the Framework memory space like on a real system (by the code above),
   //  but the entry point points into the DLL loaded by the code bellow. 
   //
@@ -335,11 +335,11 @@ PeCoffLoaderRelocateImageExtraAction (
     if (Library != NULL) {
       //
       // InitializeDriver is the entry point we put in all our EFI DLL's. The
-      // DONT_RESOLVE_DLL_REFERENCES argument to LoadLIbraryEx() supresses the 
+      // DONT_RESOLVE_DLL_REFERENCES argument to LoadLIbraryEx() suppresses the 
       // normal DLL entry point of DllMain, and prevents other modules that are
       // referenced in side the DllFileName from being loaded. There is no error 
       // checking as the we can point to the PE32 image loaded by Tiano. This 
-      // step is only needed for source level debuging
+      // step is only needed for source level debugging
       //
       DllEntryPoint = (VOID *) (UINTN) mWinNt->GetProcAddress (Library, "InitializeDriver");
 
@@ -355,7 +355,7 @@ PeCoffLoaderRelocateImageExtraAction (
         DEBUG ((EFI_D_ERROR, "WARNING: DLL already loaded.  No source level debug %s. \n", DllFileName));
       } else {
         //
-        // This DLL is not already loaded, so source level debugging is suported.
+        // This DLL is not already loaded, so source level debugging is supported.
         //
         ImageContext->EntryPoint  = (EFI_PHYSICAL_ADDRESS) (UINTN) DllEntryPoint;
         DEBUG ((EFI_D_INFO, "LoadLibraryEx (%s,\n               NULL, DONT_RESOLVE_DLL_REFERENCES)\n", DllFileName));

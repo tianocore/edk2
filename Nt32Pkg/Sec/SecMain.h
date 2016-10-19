@@ -524,9 +524,9 @@ Returns:
 ;
 
 UINTN
-CountSeperatorsInString (
+CountSeparatorsInString (
   IN  CONST CHAR16   *String,
-  IN  CHAR16   Seperator
+  IN  CHAR16   Separator
   )
 /*++
 
@@ -537,7 +537,7 @@ Routine Description:
 Arguments:
 
   String    - TODO: add argument description
-  Seperator - TODO: add argument description
+  Separator - TODO: add argument description
 
 Returns:
 

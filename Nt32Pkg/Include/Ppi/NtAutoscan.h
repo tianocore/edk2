@@ -41,7 +41,7 @@ EFI_STATUS
 
 Routine Description:
   This service is called from Index == 0 until it returns EFI_UNSUPPORTED.
-  It allows discontiguous memory regions to be supported by the emulator.
+  It allows discontinuous memory regions to be supported by the emulator.
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
   parsing the Windows environment variable EFI_MEMORY_SIZE.
   The size comes from the varaible and the address comes from the call to

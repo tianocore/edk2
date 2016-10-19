@@ -42,7 +42,7 @@ Abstract:
 //  point could be modified dynamically. The SEC does not do that, so we must
 //  disable the warning so we can compile the SEC. The previous method was to
 //  asign each element in code. The disadvantage to that approach is it's harder
-//  to tell if all the elements have been initailized properly.
+//  to tell if all the elements have been initialized properly.
 //
 #pragma warning(disable : 4232)
 #pragma warning(disable : 4996)
