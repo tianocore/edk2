@@ -1430,10 +1430,10 @@ HttpFreeMsgParser (
 
 
 /**
-  Get the next string, which is distinguished by specified seperator.
+  Get the next string, which is distinguished by specified separator.
 
   @param[in]  String             Pointer to the string.
-  @param[in]  Seperator          Specified seperator used to distinguish where is the beginning
+  @param[in]  Separator          Specified separator used to distinguish where is the beginning
                                  of next string.
 
   @return     Pointer to the next string.
@@ -1444,7 +1444,7 @@ CHAR8 *
 EFIAPI
 AsciiStrGetNextToken (
   IN CONST CHAR8 *String,
-  IN       CHAR8 Seperator
+  IN       CHAR8 Separator
   )
 {
   CONST CHAR8 *Token;
@@ -1454,7 +1454,7 @@ AsciiStrGetNextToken (
     if (*Token == 0) {
       return NULL;
     }
-    if (*Token == Seperator) {
+    if (*Token == Separator) {
       return (CHAR8 *)(Token + 1);
     }
     Token++;

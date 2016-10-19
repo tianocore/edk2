@@ -248,7 +248,7 @@ GetDebugPrintErrorLevel (
         }
       } else {
         //
-        // If variable services are not yet availible optionally get the global
+        // If variable services are not yet available optionally get the global
         // debug print error level mask from a HOB.
         //
         Hob = GetFirstGuidHob (&gEfiGenericVariableGuid);

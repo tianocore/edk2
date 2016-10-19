@@ -24,7 +24,7 @@
   function and pass it into InitializeDebugAgent(). InitializeDebugAgent() is
   responsible to invoke the passing-in function at the end of InitializeDebugAgent().
 
-  If the parameter Function is not NULL, Debug Agent Libary instance will invoke it by
+  If the parameter Function is not NULL, Debug Agent Library instance will invoke it by
   passing in the Context to be its parameter.
 
   If Function() is NULL, Debug Agent Library instance will return after setup debug

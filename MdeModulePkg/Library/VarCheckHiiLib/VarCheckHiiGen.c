@@ -1308,7 +1308,7 @@ VarCheckParseHiiDatabase (
 
     while ((UINTN) HiiPackageHeader < ((UINTN) HiiPackageListHeader + HiiPackageListHeader->PackageLength)) {
       //
-      // Parse Hii Pacakge.
+      // Parse Hii Package.
       //
       VarCheckParseHiiPackage (HiiPackageHeader, FALSE);
 

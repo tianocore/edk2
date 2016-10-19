@@ -48,7 +48,7 @@ typedef struct {
   @param SectionAttribute   The attribute of the input guided section.
 
   @retval EFI_SUCCESS            The size of destination buffer, the size of scratch buffer and 
-                                 the attribute of the input section are successull retrieved.
+                                 the attribute of the input section are successfully retrieved.
   @retval EFI_INVALID_PARAMETER  The GUID in InputSection does not match this instance guid.
 
 **/

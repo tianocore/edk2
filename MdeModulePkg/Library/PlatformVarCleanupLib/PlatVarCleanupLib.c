@@ -926,7 +926,7 @@ VariableCleanupHiiCallback (
   }
 
   //
-  // Retrive uncommitted data from Form Browser.
+  // Retrieve uncommitted data from Form Browser.
   //
   VariableCleanupData = &Private->VariableCleanupData;
   HiiGetBrowserData (&mVariableCleanupHiiGuid, mVarStoreName, sizeof (VARIABLE_CLEANUP_DATA), (UINT8 *) VariableCleanupData);

@@ -301,7 +301,7 @@ ON_EXIT:
   Build a syslog packet, including the Ethernet/Ip/Udp headers
   and user's message.
 
-  @param[in]  Level     Syslog servity level
+  @param[in]  Level     Syslog severity level
   @param[in]  Module    The module that generates the log
   @param[in]  File      The file that contains the current log
   @param[in]  Line      The line of code in the File that contains the current log
@@ -475,7 +475,7 @@ NetDebugASPrint (
   This function will locate a instance of SNP then send the message through it.
   Because it isn't open the SNP BY_DRIVER, apply caution when using it.
 
-  @param Level    The servity level of the message.
+  @param Level    The severity level of the message.
   @param Module   The Moudle that generates the log.
   @param File     The file that contains the log.
   @param Line     The exact line that contains the log.
@@ -1151,7 +1151,7 @@ NetDestroyLinkList (
   @param[in]  ChildHandleBuffer  An array of child handles to be freed. May be NULL
                                  if NumberOfChildren is 0.
 
-  @retval TURE                   Found the input Handle in ChildHandleBuffer.
+  @retval TRUE                   Found the input Handle in ChildHandleBuffer.
   @retval FALSE                  Can't find the input Handle in ChildHandleBuffer.
 
 **/
@@ -1636,7 +1636,7 @@ NetMapRemoveTail (
 /**
   Iterate through the netmap and call CallBack for each item.
 
-  It will contiue the traverse if CallBack returns EFI_SUCCESS, otherwise, break
+  It will continue the traverse if CallBack returns EFI_SUCCESS, otherwise, break
   from the loop. It returns the CallBack's last return value. This function is
   delete safe for the current item.
 
@@ -2765,7 +2765,7 @@ NetLibAsciiStrToIp4 (
 
 /**
   Convert one Null-terminated ASCII string to EFI_IPv6_ADDRESS. The format of the
-  string is defined in RFC 4291 - Text Pepresentation of Addresses.
+  string is defined in RFC 4291 - Text Representation of Addresses.
 
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
@@ -3004,7 +3004,7 @@ NetLibStrToIp4 (
 
 /**
   Convert one Null-terminated Unicode string to EFI_IPv6_ADDRESS.  The format of
-  the string is defined in RFC 4291 - Text Pepresentation of Addresses.
+  the string is defined in RFC 4291 - Text Representation of Addresses.
 
   @param[in]      String         The pointer to the Ascii string.
   @param[out]     Ip6Address     The pointer to the converted IPv6 address.
@@ -3046,7 +3046,7 @@ NetLibStrToIp6 (
 
 /**
   Convert one Null-terminated Unicode string to EFI_IPv6_ADDRESS and prefix length.
-  The format of the string is defined in RFC 4291 - Text Pepresentation of Addresses
+  The format of the string is defined in RFC 4291 - Text Representation of Addresses
   Prefixes: ipv6-address/prefix-length.
 
   @param[in]      String         The pointer to the Ascii string.

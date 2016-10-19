@@ -27,9 +27,9 @@
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
 
   @retval NULL   HiiHandle is not registered in the HII database
-  @retval NULL   There are not enough resources available to retrieve the suported 
+  @retval NULL   There are not enough resources available to retrieve the supported
                  languages.
-  @retval NULL   The list of suported languages could not be retrieved.
+  @retval NULL   The list of supported languages could not be retrieved.
   @retval Other  A pointer to the Null-terminated ASCII string of supported languages.
 
 **/

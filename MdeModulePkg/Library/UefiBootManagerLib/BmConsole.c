@@ -251,7 +251,7 @@ EfiBootManagerConnectVideoController (
   }
 
   //
-  // Try to connect the PCI device path, so that GOP dirver could start on this 
+  // Try to connect the PCI device path, so that GOP driver could start on this
   // device and create child handles with GraphicsOutput Protocol installed
   // on them, then we get device paths of these child handles and select 
   // them as possible console device.

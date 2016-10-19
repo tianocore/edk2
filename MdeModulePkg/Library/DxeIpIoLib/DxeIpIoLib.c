@@ -1439,7 +1439,7 @@ IpIoStop (
   }
 
   //
-  // All pending send tokens should be flushed by reseting the IP instances.
+  // All pending send tokens should be flushed by resetting the IP instances.
   //
   ASSERT (IsListEmpty (&IpIo->PendingSndList));
 

@@ -383,13 +383,13 @@ HiiGetHiiHandles (
   for freeing the allocated buffer using FreePool().
 
   @param Handle            The HII handle.
-  @param Buffer            On return, opints to a pointer which point to the buffer that contain the formset opcode.
+  @param Buffer            On return, points to a pointer which point to the buffer that contain the formset opcode.
   @param BufferSize        On return, points to the length of the buffer.
 
   @retval EFI_OUT_OF_RESOURCES   No enough memory resource is allocated.
   @retval EFI_NOT_FOUND          Can't find the package data for the input Handle.
   @retval EFI_INVALID_PARAMETER  The input parameters are not correct.
-  @retval EFI_SUCCESS            Get the formset opcode from the hii handle sucessfully.
+  @retval EFI_SUCCESS            Get the formset opcode from the hii handle successfully.
 
 **/
 EFI_STATUS
@@ -696,17 +696,17 @@ InternalHiiBrowserCallback (
 
   @param[in]  Guid          Pointer to an EFI_GUID that is the routing information
                             GUID.  Each of the 16 bytes in Guid is converted to 
-                            a 2 Unicode character hexidecimal string.  This is 
+                            a 2 Unicode character hexadecimal string.  This is
                             an optional parameter that may be NULL.
   @param[in]  Name          Pointer to a Null-terminated Unicode string that is 
                             the routing information NAME.  This is an optional 
                             parameter that may be NULL.  Each 16-bit Unicode 
                             character in Name is converted to a 4 character Unicode 
-                            hexidecimal string.                        
+                            hexadecimal string.
   @param[in]  DriverHandle  The driver handle which supports a Device Path Protocol
                             that is the routing information PATH.  Each byte of
                             the Device Path associated with DriverHandle is converted
-                            to a 2 Unicode character hexidecimal string.
+                            to a 2 Unicode character hexadecimal string.
 
   @retval NULL   DriverHandle does not support the Device Path Protocol.
   @retval Other  A pointer to the Null-terminate Unicode <ConfigHdr> string
@@ -1130,7 +1130,7 @@ ValidateQuestionFromVfr (
   UINT64                       VarValue;
   EFI_IFR_TYPE_VALUE           TmpValue;
   EFI_STATUS                   Status;
-  EFI_HII_PACKAGE_HEADER       PacakgeHeader;
+  EFI_HII_PACKAGE_HEADER       PackageHeader;
   UINT32                       PackageOffset;
   UINT8                        *PackageData;
   UINTN                        IfrOffset;
@@ -1167,15 +1167,15 @@ ValidateQuestionFromVfr (
   //
   PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
   while (PackageOffset < PackageListLength) {
-    CopyMem (&PacakgeHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PacakgeHeader));
+    CopyMem (&PackageHeader, (UINT8 *) HiiPackageList + PackageOffset, sizeof (PackageHeader));
 
     //
     // Parse IFR opcode from the form package.
     //
-    if (PacakgeHeader.Type == EFI_HII_PACKAGE_FORMS) {
-      IfrOffset   = sizeof (PacakgeHeader);
+    if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
+      IfrOffset   = sizeof (PackageHeader);
       PackageData = (UINT8 *) HiiPackageList + PackageOffset;
-      while (IfrOffset < PacakgeHeader.Length) {
+      while (IfrOffset < PackageHeader.Length) {
         IfrOpHdr = (EFI_IFR_OP_HEADER *) (PackageData + IfrOffset);
         //
         // Validate current setting to the value built in IFR opcode
@@ -1710,7 +1710,7 @@ ValidateQuestionFromVfr (
     //
     // Go to next package.
     //
-    PackageOffset += PacakgeHeader.Length;
+    PackageOffset += PackageHeader.Length;
   }
 
   return EFI_SUCCESS;
@@ -2107,7 +2107,7 @@ GetElementsFromRequest (
   @param DefaultId  Specifies the type of defaults to retrieve only for setting default action.
   @param ActionType Action supports setting defaults and validate current setting.
   
-  @retval TURE    Action runs successfully.
+  @retval TRUE    Action runs successfully.
   @retval FALSE   Action is not valid or Action can't be executed successfully..
 **/
 BOOLEAN
@@ -2501,7 +2501,7 @@ HiiValidateSettings (
                     entirety of the current HII database will be reset.
   @param DefaultId  Specifies the type of defaults to retrieve.
   
-  @retval TURE    The default value is set successfully.
+  @retval TRUE    The default value is set successfully.
   @retval FALSE   The default value can't be found and set.
 **/
 BOOLEAN
@@ -4206,7 +4206,7 @@ HiiUpdateForm (
   UINTN                        BufferSize;
   UINT8                        *UpdateBufferPos;
   EFI_HII_PACKAGE_HEADER       *Package;
-  EFI_HII_PACKAGE_HEADER       *TempPacakge;
+  EFI_HII_PACKAGE_HEADER       *TempPackage;
   EFI_HII_PACKAGE_HEADER       PackageHeader;
   BOOLEAN                      Updated;
   HII_LIB_OPCODE_BUFFER        *OpCodeBufferStart;
@@ -4218,7 +4218,7 @@ HiiUpdateForm (
   ASSERT (HiiHandle != NULL);
   ASSERT (StartOpCodeHandle != NULL);
   UpdatePackageList = NULL;
-  TempPacakge       = NULL;
+  TempPackage       = NULL;
   HiiPackageList    = NULL;
   
   //
@@ -4264,8 +4264,8 @@ HiiUpdateForm (
   //
   // Allocate temp buffer to store the temp updated package buffer
   //
-  TempPacakge = AllocateZeroPool (BufferSize);
-  if (TempPacakge == NULL) {
+  TempPackage = AllocateZeroPool (BufferSize);
+  if (TempPackage == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Finish;
   }
@@ -4293,7 +4293,7 @@ HiiUpdateForm (
       //
       // Check this package is the matched package.
       //
-      Status = InternalHiiUpdateFormPackageData (FormSetGuid, FormId, Package, OpCodeBufferStart, OpCodeBufferEnd, TempPacakge);
+      Status = InternalHiiUpdateFormPackageData (FormSetGuid, FormId, Package, OpCodeBufferStart, OpCodeBufferEnd, TempPackage);
       //
       // The matched package is found. Its package buffer will be updated by the input new data.
       //
@@ -4305,7 +4305,7 @@ HiiUpdateForm (
         //
         // Add updated package buffer
         //
-        Package = TempPacakge;
+        Package = TempPackage;
       }
     }
 
@@ -4344,8 +4344,8 @@ Finish:
     FreePool (UpdatePackageList);
   }
   
-  if (TempPacakge != NULL) {
-    FreePool (TempPacakge);
+  if (TempPackage != NULL) {
+    FreePool (TempPackage);
   }
 
   return Status; 

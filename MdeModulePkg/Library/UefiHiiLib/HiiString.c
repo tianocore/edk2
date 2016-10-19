@@ -100,7 +100,7 @@ HiiSetString (
     Language = Supported;
 
     //
-    // Search for the next language seperator and replace it with a Null-terminator
+    // Search for the next language separator and replace it with a Null-terminator
     //
     for (; *Supported != 0 && *Supported != ';'; Supported++);
     if (*Supported != 0) {

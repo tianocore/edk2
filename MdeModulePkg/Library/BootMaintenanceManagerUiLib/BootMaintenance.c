@@ -1116,7 +1116,7 @@ BootMaintCallback (
     }
   }
   //
-  // Retrive uncommitted data from Form Browser
+  // Retrieve uncommitted data from Form Browser
   //
   CurrentFakeNVMap = &Private->BmmFakeNvData;
   OldFakeNVMap     = &Private->BmmOldFakeNVData;
