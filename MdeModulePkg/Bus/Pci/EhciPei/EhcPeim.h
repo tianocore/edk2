@@ -66,13 +66,13 @@ typedef struct _PEI_USB2_HC_DEV PEI_USB2_HC_DEV;
 #define EHC_SYNC_POLL_INTERVAL       (6 * EHC_1_MILLISECOND)
 
 //
-//Iterate through the doule linked list. NOT delete safe
+//Iterate through the double linked list. NOT delete safe
 //
 #define EFI_LIST_FOR_EACH(Entry, ListHead)    \
   for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
 
 //
-//Iterate through the doule linked list. This is delete-safe.
+//Iterate through the double linked list. This is delete-safe.
 //Don't touch NextEntry
 //
 #define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \
@@ -119,7 +119,7 @@ struct _PEI_USB2_HC_DEV {
   PEI_EHC_QH                          *ReclaimHead;
   
   //
-  // Peroidic (interrupt) transfer schedule data:
+  // Periodic (interrupt) transfer schedule data:
   //
   VOID                                *PeriodFrame;     // Mapped as common buffer 
   VOID                                *PeriodFrameHost;

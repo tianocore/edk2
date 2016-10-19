@@ -1005,7 +1005,7 @@ AtaBlockIoReset (
   @param[in, out]  Token      A pointer to the token associated with the transaction.
   @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
   @param[out]      Buffer     A pointer to the destination/source buffer for the data.
-  @param[in]       IsBlockIo2 Indicate the calling is from BlockIO or BlockIO2. TURE is
+  @param[in]       IsBlockIo2 Indicate the calling is from BlockIO or BlockIO2. TRUE is
                               from BlockIO2, FALSE is for BlockIO.
   @param[in]       IsWrite    Indicates whether it is a write operation.
 

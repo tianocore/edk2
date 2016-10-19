@@ -51,7 +51,7 @@ typedef struct {
 } UFS_EXPOSED_LUNS;
 
 //
-// Iterate through the doule linked list. This is delete-safe.
+// Iterate through the double linked list. This is delete-safe.
 // Do not touch NextEntry
 //
 #define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \

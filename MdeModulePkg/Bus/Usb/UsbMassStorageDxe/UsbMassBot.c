@@ -392,7 +392,7 @@ UsbBotGetStatus (
   @param  CmdStatus             The result of high level command execution
 
   @retval EFI_SUCCESS           The command is executed successfully.
-  @retval Other                 Failed to excute command
+  @retval Other                 Failed to execute command
 
 **/
 EFI_STATUS

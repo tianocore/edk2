@@ -1878,7 +1878,7 @@ AtaPassThruResetDevice (
 }
 
 /**
-  Sumbit ATAPI request sense command.
+  Submit ATAPI request sense command.
 
   @param[in] This            A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param[in] Target          The Target is an array of size TARGET_MAX_BYTES and it represents

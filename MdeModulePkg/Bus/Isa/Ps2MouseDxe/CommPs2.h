@@ -279,7 +279,7 @@ PS2MouseRead (
 
   @param Command I/O command.
 
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -292,7 +292,7 @@ Out8042Command (
 
   @param Data    Data value
 
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -305,7 +305,7 @@ In8042Data (
 
   @param Data    Data value
 
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -319,7 +319,7 @@ Out8042Data (
   @param Command Aux I/O command
   @param Resend  Whether need resend the Aux command.
 
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -333,7 +333,7 @@ Out8042AuxCommand (
 
   @param Data    Buffer holding return value.
 
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS
@@ -346,7 +346,7 @@ In8042AuxData (
 
   @param Data    Buffer holding return value
 
-  @retval EFI_SUCCESS Success to excute I/O work flow
+  @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
 EFI_STATUS

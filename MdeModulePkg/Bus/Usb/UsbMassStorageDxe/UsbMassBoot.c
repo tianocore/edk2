@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  UsbMass                The device whose sense data is requested.
 
-  @retval EFI_SUCCESS            The command is excuted successfully.
+  @retval EFI_SUCCESS            The command is executed successfully.
   @retval EFI_DEVICE_ERROR       Failed to request sense.
   @retval EFI_NO_RESPONSE        The device media doesn't response this request.
   @retval EFI_INVALID_PARAMETER  The command has some invalid parameters.
@@ -152,7 +152,7 @@ UsbBootRequestSense (
   @param  DataLen                The length of expected data
   @param  Timeout                The timeout used to transfer
 
-  @retval EFI_SUCCESS            Command is excuted successfully
+  @retval EFI_SUCCESS            Command is executed successfully
   @retval Others                 Command execution failed.
 
 **/

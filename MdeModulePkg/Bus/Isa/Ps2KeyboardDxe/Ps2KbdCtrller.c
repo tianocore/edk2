@@ -1649,9 +1649,9 @@ InitKeyboard (
 
   ConsoleIn->IsSupportPartialKey = FALSE;
   //
-  // For reseting keyboard is not mandatory before booting OS and sometimes keyboard responses very slow,
+  // For resetting keyboard is not mandatory before booting OS and sometimes keyboard responses very slow,
   // and to support KB hot plug, we need to let the InitKB succeed no matter whether there is a KB device connected
-  // to system. So we only do the real reseting for keyboard when user asks and there is a real KB connected t system,
+  // to system. So we only do the real resetting for keyboard when user asks and there is a real KB connected t system,
   // and normally during booting an OS, it's skipped.
   //
   if (ExtendedVerification && CheckKeyboardConnect (ConsoleIn)) {

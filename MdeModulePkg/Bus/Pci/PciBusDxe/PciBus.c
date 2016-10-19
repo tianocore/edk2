@@ -113,7 +113,7 @@ PciBusEntryPoint (
 
   @param  This                Protocol instance pointer.
   @param  Controller          Handle of device to test.
-  @param  RemainingDevicePath Optional parameter use to pick a specific child.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
   @retval EFI_SUCCESS         This driver supports this device.
@@ -223,7 +223,7 @@ PciBusDriverBindingSupported (
 
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to.
-  @param  RemainingDevicePath  Optional parameter use to pick a specific child.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle.
@@ -332,7 +332,7 @@ PciBusDriverBindingStart (
 }
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This              Protocol instance pointer.

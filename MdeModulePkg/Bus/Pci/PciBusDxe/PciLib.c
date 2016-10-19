@@ -429,7 +429,7 @@ PciHostBridgeResourceAllocator (
       //
 
       //
-      // If non-stardard PCI Bridge I/O window alignment is supported,
+      // If non-standard PCI Bridge I/O window alignment is supported,
       // set I/O aligment to minimum possible alignment for root bridge.
       //
       IoBridge = CreateResourceNode (

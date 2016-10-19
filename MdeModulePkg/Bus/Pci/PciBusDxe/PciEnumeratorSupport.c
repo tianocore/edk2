@@ -599,14 +599,14 @@ GatherPpbInfo (
 
   //
   // if PcdPciBridgeIoAlignmentProbe is TRUE, PCI bus driver probes
-  // PCI bridge supporting non-stardard I/O window alignment less than 4K.
+  // PCI bridge supporting non-standard I/O window alignment less than 4K.
   //
 
   PciIoDevice->BridgeIoAlignment = 0xFFF;
   if (FeaturePcdGet (PcdPciBridgeIoAlignmentProbe)) {
     //
     // Check any bits of bit 3-1 of I/O Base Register are writable.
-    // if so, it is assumed non-stardard I/O window alignment is supported by this bridge.
+    // if so, it is assumed non-standard I/O window alignment is supported by this bridge.
     // Per spec, bit 3-1 of I/O Base Register are reserved bits, so its content can't be assumed.
     //
     Value = (UINT8)(Temp ^ (BIT3 | BIT2 | BIT1));
