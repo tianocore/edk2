@@ -57,7 +57,7 @@ PrintStringAt (
 }
 
 /**
-  Prints a chracter to the default console, at
+  Prints a character to the default console, at
   the supplied cursor position, using L"%c" format.
 
   @param  Column     The cursor position to print the string at.
@@ -79,7 +79,7 @@ PrintCharAt (
 }
 
 /**
-  Count the storage space of a Unicode string which uses current lanaguag to get 
+  Count the storage space of a Unicode string which uses current language to get
   from input string ID.
 
   @param StringId          The input string to be counted.
@@ -147,7 +147,7 @@ GetLineWidth (
 /**
   This function uses calculate the boot menu location, size and scroll bar information.
 
-  @param  BootMenuData            The boot menu data to be proccessed.
+  @param  BootMenuData            The boot menu data to be processed.
 
   @return EFI_SUCCESS             calculate boot menu information successful.
   @retval EFI_INVALID_PARAMETER   Input parameter is invalid   
@@ -219,7 +219,7 @@ InitializeBootMenuScreen (
   return EFI_SUCCESS;
 }
 /**
-  This funciton uses check boot option is wheher setup application or no
+  This function uses check boot option is wheher setup application or no
 
   @param   BootOption   Pointer to EFI_BOOT_MANAGER_LOAD_OPTION array.
   
@@ -248,7 +248,7 @@ IsBootManagerMenu (
 
   @param BootOption  Pointer to EFI_BOOT_MANAGER_LOAD_OPTION to check.
 
-  @retval TRUE  Ignore the boot optin.
+  @retval TRUE  Ignore the boot option.
   @retval FALSE Do not ignore the boot option.
 **/
 BOOLEAN
@@ -286,7 +286,7 @@ IgnoreBootOption (
 }
 
 /**
-  This funciton uses to initialize boot menu data
+  This function uses to initialize boot menu data
 
   @param   BootOption             Pointer to EFI_BOOT_MANAGER_LOAD_OPTION array.
   @param   BootOptionCount        Number of boot option.
@@ -345,7 +345,7 @@ InitializeBootMenuData (
   and set current selected item in BootMenuData
 
   @param  WantSelectItem          The user wants to select item.
-  @param  BootMenuData            The boot menu data to be proccessed
+  @param  BootMenuData            The boot menu data to be processed
 
   @return EFI_SUCCESS             Highlight selected item and update current selected 
                                   item successful 
@@ -485,7 +485,7 @@ BootMenuSelectItem (
 }
 
 /**
-  This funciton uses to draw boot popup menu
+  This function uses to draw boot popup menu
 
   @param   BootMenuData           The Input BootMenuData to be processed.
   
@@ -644,7 +644,7 @@ DrawBootPopupMenu (
 }
 
 /**
-  This funciton uses to boot from selected item 
+  This function uses to boot from selected item 
 
   @param   BootOptions            Pointer to EFI_BOOT_MANAGER_LOAD_OPTION array.
   @param   BootOptionCount        Number of boot option.
