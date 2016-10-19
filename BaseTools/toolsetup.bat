@@ -4,6 +4,7 @@
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
 @REM Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+@REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
 @REM under the terms and conditions of the BSD License which accompanies this 
@@ -33,6 +34,9 @@ if /I "%1"=="/?" goto Usage
 :loop
   if "%1"=="" goto setup_workspace
   if /I "%1"=="--nt32" (
+    if /I "%2" == "X64" (
+      shift
+    )
     @REM Ignore --nt32 flag
     shift
     goto loop
