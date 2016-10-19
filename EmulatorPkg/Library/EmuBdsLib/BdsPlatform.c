@@ -92,7 +92,7 @@ Routine Description:
 
 Arguments:
 
-  PlatformConsole         - Predfined platform default console device array.
+  PlatformConsole         - Predefined platform default console device array.
 
 Returns:
 
@@ -113,7 +113,7 @@ Returns:
 
   //
   // Have chance to connect the platform default console,
-  // the platform default console is the minimue device group
+  // the platform default console is the minimum device group
   // the platform should support
   //
   while (PlatformConsole[Index].DevicePath != NULL) {
@@ -149,7 +149,7 @@ PlatformBdsConnectSequence (
 
 Routine Description:
 
-  Connect with predeined platform connect sequence,
+  Connect with predefined platform connect sequence,
   the OEM/IBV can customize with their own connect sequence.
 
 Arguments:
@@ -288,7 +288,7 @@ PlatformBdsPolicyBehavior (
 
 Routine Description:
 
-  The function will excute with as the platform policy, current policy
+  The function will execute with as the platform policy, current policy
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 

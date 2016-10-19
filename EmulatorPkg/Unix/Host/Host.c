@@ -87,7 +87,7 @@ Routine Description:
 Arguments:
   Argc - Number of command line arguments
   Argv - Array of command line argument strings
-  Envp - Array of environmemt variable strings
+  Envp - Array of environment variable strings
 
 Returns:
   0 - Normal exit
@@ -175,7 +175,7 @@ main (
   //
   // Allocate space for gSystemMemory Array
   //
-  gSystemMemoryCount  = CountSeperatorsInString (MemorySizeStr, '!') + 1;
+  gSystemMemoryCount  = CountSeparatorsInString (MemorySizeStr, '!') + 1;
   gSystemMemory       = AllocateZeroPool (gSystemMemoryCount * sizeof (EMU_SYSTEM_MEMORY));
   if (gSystemMemory == NULL) {
     printf ("ERROR : Can not allocate memory for system.  Exiting.\n");
@@ -184,7 +184,7 @@ main (
   //
   // Allocate space for gSystemMemory Array
   //
-  gFdInfoCount  = CountSeperatorsInString (FirmwareVolumesStr, '!') + 1;
+  gFdInfoCount  = CountSeparatorsInString (FirmwareVolumesStr, '!') + 1;
   gFdInfo       = AllocateZeroPool (gFdInfoCount * sizeof (EMU_FD_INFO));
   if (gFdInfo == NULL) {
     printf ("ERROR : Can not allocate memory for fd info.  Exiting.\n");
@@ -249,7 +249,7 @@ main (
                 );
     } else {
       //
-      // Open the FD and remmeber where it got mapped into our processes address space
+      // Open the FD and remember where it got mapped into our processes address space
       // Maps Read Only
       //
       Status = MapFile (
@@ -614,7 +614,7 @@ SecLoadFromCore (
 
 Routine Description:
   This service is called from Index == 0 until it returns EFI_UNSUPPORTED.
-  It allows discontiguous memory regions to be supported by the emulator.
+  It allows discontinuous memory regions to be supported by the emulator.
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
   parsing the host environment variable EFI_MEMORY_SIZE.
   The size comes from the varaible and the address comes from the call to
@@ -703,7 +703,7 @@ EfiSystemMemoryRange (
 
 Routine Description:
   Since the SEC is the only Unix program in stack it must export
-  an interface to do POSIX calls.  gUnix is initailized in UnixThunk.c.
+  an interface to do POSIX calls.  gUnix is initialized in UnixThunk.c.
 
 Arguments:
   InterfaceSize - sizeof (EFI_WIN_NT_THUNK_PROTOCOL);
@@ -830,26 +830,26 @@ SecUnixFdAddress (
 /*++
 
 Routine Description:
-  Count the number of seperators in String
+  Count the number of separators in String
 
 Arguments:
   String    - String to process
-  Seperator - Item to count
+  Separator - Item to count
 
 Returns:
-  Number of Seperator in String
+  Number of Separator in String
 
 **/
 UINTN
-CountSeperatorsInString (
+CountSeparatorsInString (
   IN  const CHAR16   *String,
-  IN  CHAR16         Seperator
+  IN  CHAR16         Separator
   )
 {
   UINTN Count;
 
   for (Count = 0; *String != '\0'; String++) {
-    if (*String == Seperator) {
+    if (*String == Separator) {
       Count++;
     }
   }

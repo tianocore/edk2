@@ -126,7 +126,7 @@ PlatfomrSmbiosDriverEntryPoint (
   // Phase 3 - Create tables from scratch 
 
   // Create Type 13 record from EFI Variables
-  // Do we need this record for EFI as the info is availible from EFI varaibles
+  // Do we need this record for EFI as the info is available from EFI varaibles
   // Also language types don't always match between EFI and SMBIOS
   // CreateSmbiosLanguageInformation (1, gSmbiosLangToEfiLang);
 

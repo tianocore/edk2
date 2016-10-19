@@ -25,7 +25,7 @@
 
 Routine Description:
   This service is called from Index == 0 until it returns EFI_UNSUPPORTED.
-  It allows discontiguous memory regions to be supported by the emulator.
+  It allows discontinuous memory regions to be supported by the emulator.
 
 Arguments:
   Index      - Which memory region to use

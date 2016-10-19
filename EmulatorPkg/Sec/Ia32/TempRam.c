@@ -36,7 +36,7 @@ SecTemporaryRamSupport (
   )
 {
   //
-  // Migrate the whole temporary memory to permenent memory.
+  // Migrate the whole temporary memory to permanent memory.
   //
   CopyMem (
     (VOID*)(UINTN)PermanentMemoryBase,
@@ -46,14 +46,14 @@ SecTemporaryRamSupport (
 
   //
   // SecSwitchStack function must be invoked after the memory migration
-  // immediatly, also we need fixup the stack change caused by new call into
-  // permenent memory.
+  // immediately, also we need fixup the stack change caused by new call into
+  // permanent memory.
   //
   SecSwitchStack ((UINT32) TemporaryMemoryBase, (UINT32) PermanentMemoryBase);
 
   //
   // We need *not* fix the return address because currently,
-  // The PeiCore is excuted in flash.
+  // The PeiCore is executed in flash.
   //
 
   //

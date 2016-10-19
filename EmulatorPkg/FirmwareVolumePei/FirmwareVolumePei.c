@@ -33,7 +33,7 @@ Routine Description:
   Perform a call-back into the SEC simulator to get address of the Firmware Hub
 
 Arguments:
-  FfsHeader   - Ffs Header availible to every PEIM
+  FfsHeader   - Ffs Header available to every PEIM
   PeiServices - General purpose services available to every PEIM.
 
 Returns:

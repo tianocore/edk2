@@ -255,9 +255,9 @@ AsciiToUnicode (
   );
 
 UINTN
-CountSeperatorsInString (
+CountSeparatorsInString (
   IN  const CHAR16   *String,
-  IN  CHAR16   Seperator
+  IN  CHAR16   Separator
   );
 
 EFI_STATUS
