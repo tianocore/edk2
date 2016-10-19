@@ -106,7 +106,7 @@ typedef struct {
   @param[in] PeiServices   The pointer to the PEI Services Table.
   @param[in] This          The pointer to this instance of the PEI_ATA_CONTROLLER_PPI.
   @param[in] ChannelMask   The bitmask that identifies the IDE and SATA channels to 
-                           enable or disable. This paramter is optional. 
+                           enable or disable. This parameter is optional.
 
   @retval EFI_SUCCESS        The IDE or SATA channels were enabled or disabled successfully.
   @retval EFI_DEVICE_ERROR   The IDE or SATA channels could not be enabled or disabled.

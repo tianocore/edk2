@@ -230,13 +230,13 @@ HiiGetHiiHandles (
   for freeing the allocated buffer using FreePool().
 
   @param Handle            The HII handle.
-  @param Buffer            On return, opints to a pointer which point to the buffer that contain the formset opcode.
+  @param Buffer            On return, points to a pointer which point to the buffer that contain the formset opcode.
   @param BufferSize        On return, points to the length of the buffer.
 
   @retval EFI_OUT_OF_RESOURCES   No enough memory resource is allocated.
   @retval EFI_NOT_FOUND          Can't find the package data for the input Handle.
   @retval EFI_INVALID_PARAMETER  The input parameters are not correct.
-  @retval EFI_SUCCESS            Get the formset opcode from the hii handle sucessfully.
+  @retval EFI_SUCCESS            Get the formset opcode from the hii handle successfully.
 
 **/
 EFI_STATUS
@@ -259,9 +259,9 @@ HiiGetFormSetFromHiiHandle(
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
 
   @retval NULL   HiiHandle is not registered in the HII database
-  @retval NULL   There are not enough resources available to retrieve the suported 
+  @retval NULL   There are not enough resources available to retrieve the supported
                  languages.
-  @retval NULL   The list of suported languages could not be retrieved.
+  @retval NULL   The list of supported languages could not be retrieved.
   @retval Other  A pointer to the Null-terminated ASCII string of supported languages.
 
 **/
@@ -284,17 +284,17 @@ HiiGetSupportedLanguages (
 
   @param[in]  Guid          The pointer to an EFI_GUID that is the routing information
                             GUID.  Each of the 16 bytes in Guid is converted to 
-                            a 2 Unicode character hexidecimal string.  This is 
+                            a 2 Unicode character hexadecimal string.  This is
                             an optional parameter that may be NULL.
   @param[in]  Name          The pointer to a Null-terminated Unicode string that is 
                             the routing information NAME.  This is an optional 
                             parameter that may be NULL.  Each 16-bit Unicode 
                             character in Name is converted to a 4 character Unicode 
-                            hexidecimal string.                        
+                            hexadecimal string.
   @param[in]  DriverHandle  The driver handle that supports a Device Path Protocol
                             that is the routing information PATH.  Each byte of
                             the Device Path associated with DriverHandle is converted
-                            to a two (Unicode) character hexidecimal string.
+                            to a two (Unicode) character hexadecimal string.
 
   @retval NULL   DriverHandle does not support the Device Path Protocol.
   @retval NULL   DriverHandle does not support the Device Path Protocol.
@@ -322,7 +322,7 @@ HiiConstructConfigHdr (
                     entirety of the current HII database will be reset.
   @param DefaultId  Specifies the type of defaults to retrieve.
   
-  @retval TURE    The default value was set successfully.
+  @retval TRUE    The default value was set successfully.
   @retval FALSE   The default value was not found.
 **/
 BOOLEAN
