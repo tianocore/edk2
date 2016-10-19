@@ -54,7 +54,7 @@ typedef struct _SEC_IDT_TABLE {
   the control is transferred to this function.
 
   @param[in] SizeOfRam           Size of the temporary memory available for use.
-  @param[in] TempRamBase         Base address of tempory ram
+  @param[in] TempRamBase         Base address of temporary ram
   @param[in] BootFirmwareVolume  Base address of the Boot Firmware Volume.
 **/
 VOID
@@ -68,7 +68,7 @@ SecStartup (
 /**
   Find and return Pei Core entry point.
 
-  It also find SEC and PEI Core file debug inforamtion. It will report them if
+  It also find SEC and PEI Core file debug information. It will report them if
   remote debug is enabled.
 
   @param[in]  BootFirmwareVolumePtr  Point to the boot firmware volume.

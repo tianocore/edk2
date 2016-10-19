@@ -52,7 +52,7 @@ SecStartupPhase2(
   the control is transferred to this function.
 
   @param[in] SizeOfRam           Size of the temporary memory available for use.
-  @param[in] TempRamBase         Base address of tempory ram
+  @param[in] TempRamBase         Base address of temporary ram
   @param[in] BootFirmwareVolume  Base address of the Boot Firmware Volume.
 **/
 VOID

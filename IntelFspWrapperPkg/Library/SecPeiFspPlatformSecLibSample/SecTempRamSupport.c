@@ -139,8 +139,8 @@ SecTemporaryRamSupport (
 
   //
   // SecSwitchStack function must be invoked after the memory migration
-  // immediatly, also we need fixup the stack change caused by new call into
-  // permenent memory.
+  // immediately, also we need fixup the stack change caused by new call into
+  // permanent memory.
   //
   SecSwitchStack (
     (UINT32) (UINTN) OldStack,

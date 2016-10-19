@@ -146,7 +146,7 @@ FindImageBase (
 /**
   Find and return Pei Core entry point.
 
-  It also find SEC and PEI Core file debug inforamtion. It will report them if
+  It also find SEC and PEI Core file debug information. It will report them if
   remote debug is enabled.
 
   @param[in]  BootFirmwareVolumePtr    Point to the boot firmware volume.
