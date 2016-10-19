@@ -1641,7 +1641,7 @@ Returns:
   }
 
   //
-  // Retrive formset storage data from Form Browser
+  // Retrieve formset storage data from Form Browser
   //
   ConfigHdr = mFakeConfigHdr;
   HeaderLen = EfiStrLen (ConfigHdr);

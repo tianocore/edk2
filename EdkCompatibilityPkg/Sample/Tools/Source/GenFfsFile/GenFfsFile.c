@@ -644,7 +644,7 @@ Returns:
 
   } else if (_strcmpi (Type, "LZH") == 0) {
     //
-    // EFI stardard compression (LZH)
+    // EFI standard compression (LZH)
     //
     CompressionType   = EFI_STANDARD_COMPRESSION;
     CompressFunction  = (COMPRESS_FUNCTION) TianoCompress;

@@ -66,7 +66,7 @@ Arguments:
     
 Returns:
     
-  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
+  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successfully retrieved.
   EFI_INVALID_PARAMETER - The source data is corrupted
   EFI_UNSUPPORTED       - The operation is unsupported.
 

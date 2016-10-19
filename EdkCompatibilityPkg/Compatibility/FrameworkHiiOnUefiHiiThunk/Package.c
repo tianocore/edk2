@@ -455,7 +455,7 @@ FindStringPackAndUpdatePackListWithOnlyIfrPack (
   @param Handle                       On output, a FRAMEWORK_EFI_HII_HANDLE number is
                                       returned.
 
-  @retval EFI_SUCCESS                 The Package List is registered successfull in 
+  @retval EFI_SUCCESS                 The Package List is registered successfully in
                                       the database.
   @retval EFI_UNSUPPORTED             The number of IFR package in the package list
                                       is greater than 1.
@@ -644,7 +644,7 @@ Done:
   @param Packages  Pointer of HII packages.
   @param Handle    Handle value to be returned.
 
-  @retval EFI_SUCCESS           Pacakges has added to HII database successfully.
+  @retval EFI_SUCCESS           Packages has added to HII database successfully.
   @retval EFI_INVALID_PARAMETER If Handle or Packages is NULL.
 
 **/
@@ -701,7 +701,7 @@ HiiNewPack (
   @param This      Pointer of Frameowk HII protocol instance.
   @param Handle    Handle value to be removed.
 
-  @retval EFI_SUCCESS           Pacakges has added to HII database successfully.
+  @retval EFI_SUCCESS           Packages has added to HII database successfully.
   @retval EFI_INVALID_PARAMETER If Handle or Packages is NULL.
 
 **/

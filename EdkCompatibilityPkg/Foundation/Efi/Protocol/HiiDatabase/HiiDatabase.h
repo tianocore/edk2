@@ -201,7 +201,7 @@ EFI_STATUS
     Handle             - An array of EFI_HII_HANDLE instances returned.
         
   Returns:
-    EFI_SUCCESS            - The matching handles are outputed successfully.
+    EFI_SUCCESS            - The matching handles are outputted successfully.
                              HandleBufferLength is updated with the actual length.
     EFI_BUFFER_TO_SMALL    - The HandleBufferLength parameter indicates that
                              Handle is too small to support the number of handles.
@@ -248,7 +248,7 @@ EFI_STATUS
                              is too small to support the number of handles.     
                              HandleBufferLength is updated with a value that will
                              enable the data to fit.
-    EFI_NOT_FOUND          - The specifiecd Handle could not be found in the current
+    EFI_NOT_FOUND          - The specified Handle could not be found in the current
                              database.
     EFI_INVALID_PARAMETER  - Handle or Buffer or BufferSize was NULL.
      

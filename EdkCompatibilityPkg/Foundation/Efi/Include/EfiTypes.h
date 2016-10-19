@@ -262,12 +262,12 @@ typedef struct {
 #define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
 
 //
-//  ALIGN_POINTER - aligns a pointer to the lowest boundry
+//  ALIGN_POINTER - aligns a pointer to the lowest boundary
 //
 #define ALIGN_POINTER(p, s) ((VOID *) (p + ((s - ((UINTN) p)) & (s - 1))))
 
 //
-//  ALIGN_VARIABLE - aligns a variable up to the next natural boundry for int size of a processor
+//  ALIGN_VARIABLE - aligns a variable up to the next natural boundary for int size of a processor
 //
 #define ALIGN_VARIABLE(Value, Adjustment) \
   (UINTN) Adjustment = 0; \

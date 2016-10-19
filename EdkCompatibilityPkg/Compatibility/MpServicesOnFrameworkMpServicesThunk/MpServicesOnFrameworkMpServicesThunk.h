@@ -340,7 +340,7 @@ WhoAmI (
 /**
   Checks APs' status periodically.
 
-  This function is triggerred by timer perodically to check the
+  This function is triggered by timer periodically to check the
   state of APs for StartupAllAPs() and StartupThisAP() executed
   in non-blocking mode.
 

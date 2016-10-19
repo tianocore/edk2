@@ -182,7 +182,7 @@ EfiCpuid (
                                                                                     
 Routine Description:                                     
            
-  Get the Cpu info by excute the CPUID instruction.
+  Get the Cpu info by execute the CPUID instruction.
   
 Arguments:                
 

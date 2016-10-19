@@ -63,7 +63,7 @@ Abstract:
                           by Source and SourceSize.
 
   @retval  RETURN_SUCCESS The size of destination buffer and the size of scratch 
-                          buffer are successull retrieved.
+                          buffer are successfully retrieved.
   @retval  RETURN_INVALID_PARAMETER The source data is corrupted
 
 **/

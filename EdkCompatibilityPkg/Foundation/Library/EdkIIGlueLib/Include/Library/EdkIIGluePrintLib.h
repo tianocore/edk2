@@ -25,7 +25,7 @@ Abstract:
 
 ///
 /// Define the maximum number of characters that are required to
-/// encode a decimal, hexidecimal, GUID, or TIME value with a NULL 
+/// encode a decimal, hexadecimal, GUID, or TIME value with a NULL
 /// terminator.
 ///  
 ///  Maximum Length Decimal String     = 28

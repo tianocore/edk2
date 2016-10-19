@@ -28,8 +28,8 @@ Abstract:
 // EFI_DEP_BEFORE       - If present, it must be the first and only opcode
 // EFI_DEP_AFTER        - If present, it must be the first and only opcode
 // EFI_DEP_SOR          - If present, it must be the first opcode
-// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependecy expression
-//                        to save time.  A EFI_DEP_PUSH is evauated one an
+// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependency expression
+//                        to save time.  A EFI_DEP_PUSH is evaluated one an
 //                        replaced with EFI_DEP_REPLACE_TRUE
 //
 #define EFI_DEP_BEFORE        0x00

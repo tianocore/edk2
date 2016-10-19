@@ -433,7 +433,7 @@ EFI_STATUS
     Flags     - Indicates if ROM found and if PC-AT.
 
   Returns:
-    EFI_SUCCESS  - Legacy Option ROM availible for this device
+    EFI_SUCCESS  - Legacy Option ROM available for this device
     EFI_UNSUPPORTED  - Legacy Option ROM not supported.
 
 --*/

@@ -249,7 +249,7 @@ extern BOOLEAN                                    mInFrameworkUpdatePakcage;
   @param Packages  Pointer of HII packages.
   @param Handle    Handle value to be returned.
 
-  @retval EFI_SUCCESS           Pacakges has added to HII database successfully.
+  @retval EFI_SUCCESS           Packages has added to HII database successfully.
   @retval EFI_INVALID_PARAMETER If Handle or Packages is NULL.
 
 **/
@@ -268,7 +268,7 @@ HiiNewPack (
   @param This      Pointer of Frameowk HII protocol instance.
   @param Handle    Handle value to be removed.
 
-  @retval EFI_SUCCESS           Pacakges has added to HII database successfully.
+  @retval EFI_SUCCESS           Packages has added to HII database successfully.
   @retval EFI_INVALID_PARAMETER If Handle or Packages is NULL.
 
 **/

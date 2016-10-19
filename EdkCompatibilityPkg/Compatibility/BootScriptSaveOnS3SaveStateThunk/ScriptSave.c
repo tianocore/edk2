@@ -358,7 +358,7 @@ BootScriptPciCfg2ReadWrite (
                           );
 }
 /**
-  Internal function to add smbus excute opcode to the table.
+  Internal function to add smbus execute opcode to the table.
 
   @param  Marker                The variable argument list to get the opcode
                                 and associated attributes.
@@ -913,7 +913,7 @@ InitializeScriptSaveOnS3SaveState (
     ASSERT_EFI_ERROR (Status);
     ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)MemoryAddress;
     //
-    // Align buffer on section boundry
+    // Align buffer on section boundary
     //
     ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
     ImageContext.ImageAddress &= ~(ImageContext.SectionAlignment - 1);

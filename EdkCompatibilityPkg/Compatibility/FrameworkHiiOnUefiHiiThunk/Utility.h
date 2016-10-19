@@ -48,7 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param HandleBuffer         On output, an array of EFI_HII_HANDLE  instances returned.
                               The caller is responcible to free this pointer allocated.
 
-  @retval EFI_SUCCESS           The matching handles are outputed successfully.
+  @retval EFI_SUCCESS           The matching handles are outputted successfully.
                                 HandleBufferLength is updated with the actual length.
   @retval EFI_OUT_OF_RESOURCES  Not enough resource to complete the operation.
   @retval EFI_NOT_FOUND         No matching handle could not be found in database.

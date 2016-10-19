@@ -266,7 +266,7 @@ Routine Description:
     <boolval> ::= true | 
                   false
 
-  The outputed binary grammer is thus:
+  The outputted binary grammer is thus:
     <depex> ::= sor <dep> | 
                 before <depinst> <dep> | 
                 after <depinst> <dep> | 
