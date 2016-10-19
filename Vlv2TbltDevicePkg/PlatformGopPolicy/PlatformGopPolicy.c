@@ -33,7 +33,7 @@ PLATFORM_GOP_POLICY_PROTOCOL  mPlatformGOPPolicy;
 //
 
 /**
-  The function will excute with as the platform policy, and gives
+  The function will execute with as the platform policy, and gives
   the Platform Lid Status. IBV/OEM can customize this code for their specific
   policy action.
 
@@ -54,7 +54,7 @@ GetPlatformLidStatus (
 }
 
 /**
-  The function will excute and gives the Video Bios Table Size and Address.
+  The function will execute and gives the Video Bios Table Size and Address.
 
   @param VbtAddress  Gives the Physical Address of Video BIOS Table
 

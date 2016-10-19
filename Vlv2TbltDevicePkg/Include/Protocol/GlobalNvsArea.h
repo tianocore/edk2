@@ -216,7 +216,7 @@ typedef struct {
   UINT8       TpmEnable;              // 121 TPM Enable
 
   UINT8       MorData;                // 122 Memory Overwrite Request Data
-  UINT8       TcgParamter;            // 123 Used for save the Mor and/or physical presence paramter
+  UINT8       TcgParamter;            // 123 Used for save the Mor and/or physical presence parameter
   UINT32      PPResponse;             // 124 Physical Presence request operation response
   UINT8       PPRequest;              // 128 Physical Presence request operation
   UINT8       LastPPRequest;          // 129 Last Physical Presence request operation

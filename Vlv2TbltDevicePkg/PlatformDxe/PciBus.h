@@ -187,7 +187,7 @@ struct _PCI_IO_DEVICE {
   LIST_ENTRY                                ChildList;
 
   //
-  // TURE if the PCI bus driver creates the handle for this PCI device
+  // TRUE if the PCI bus driver creates the handle for this PCI device
   //
   BOOLEAN                                   Registered;
 
@@ -266,7 +266,7 @@ struct _PCI_IO_DEVICE {
 
   //
   // Per PCI to PCI Bridge spec, I/O window is 4K aligned,
-  // but some chipsets support non-stardard I/O window aligments less than 4K.
+  // but some chipsets support non-standard I/O window alignments less than 4K.
   // This field is used to support this case.
   //
   UINT16                                    BridgeIoAlignment;
@@ -308,8 +308,8 @@ extern BOOLEAN                                      mReserveVgaAliases;
 
   @param  _p      Specified device.
 
-  @retval TRUE    Device is a a GFX device.
-  @retval FALSE   Device is not a a GFX device.
+  @retval TRUE    Device is a GFX device.
+  @retval FALSE   Device is not a GFX device.
 
 **/
 #define IS_PCI_GFX(_p)     IS_CLASS2 (_p, PCI_CLASS_DISPLAY, PCI_CLASS_DISPLAY_OTHER)
@@ -320,7 +320,7 @@ extern BOOLEAN                                      mReserveVgaAliases;
 
   @param  This                Protocol instance pointer.
   @param  Controller          Handle of device to test.
-  @param  RemainingDevicePath Optional parameter use to pick a specific child.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
   @retval EFI_SUCCESS         This driver supports this device.
@@ -342,7 +342,7 @@ PciBusDriverBindingSupported (
 
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to.
-  @param  RemainingDevicePath  Optional parameter use to pick a specific child.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle.
@@ -359,7 +359,7 @@ PciBusDriverBindingStart (
   );
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This              Protocol instance pointer.

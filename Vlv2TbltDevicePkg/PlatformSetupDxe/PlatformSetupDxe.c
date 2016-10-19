@@ -126,7 +126,7 @@ LoadLpssDefaultValues (
   )
 {
   //
-  // Load LPSS and SCC defalut configurations for Android
+  // Load LPSS and SCC default configurations for Android
   //
   Private->FakeNvData.LpsseMMCEnabled            = FALSE;
   Private->FakeNvData.LpssSdioEnabled            = TRUE;
@@ -780,7 +780,7 @@ SystemConfigCallback (
 
 
 /**
-  The driver Entry Point. The funciton will export a disk device class formset and
+  The driver Entry Point. The function will export a disk device class formset and
   its callback function to hii database.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.

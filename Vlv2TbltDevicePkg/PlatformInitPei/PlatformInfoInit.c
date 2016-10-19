@@ -79,7 +79,7 @@ CheckOsSelection (
       SystemConfiguration->ReservedO   = OsSelectionHob->OsSelection;
 
       //
-      // Load LPSS and SCC defalut configurations
+      // Load LPSS and SCC default configurations
       //
       OsSelectionHob->LpssData.LpsseMMCEnabled            = FALSE;
       OsSelectionHob->LpssData.LpssSdioEnabled            = TRUE;

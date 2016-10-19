@@ -217,7 +217,7 @@ ShellImageCallback (
 // BDS Platform Functions
 //
 /**
-  Platform Bds init. Incude the platform firmware vendor, revision
+  Platform Bds init. Include the platform firmware vendor, revision
   and so crc check.
 
   @param VOID
@@ -313,7 +313,7 @@ GetGopDevicePath (
   }
 
   //
-  // Try to connect this handle, so that GOP dirver could start on this
+  // Try to connect this handle, so that GOP driver could start on this
   // device and create child handles with GraphicsOutput Protocol installed
   // on them, then we get device paths of these child handles and select
   // them as possible console device.
@@ -430,7 +430,7 @@ GetGopDevicePath (
         // In current implementation, we only enable one of the child handles
         // as console device, i.e. sotre one of the child handle's device
         // path to variable "ConOut"
-        // In futhure, we could select all child handles to be console device
+        // In future, we could select all child handles to be console device
         //
         *GopDevicePath = TempDevicePath;
       }
@@ -783,7 +783,7 @@ UpdateConsoleResolution(
   Connect the predefined platform default console device. Always try to find
   and enable the vga device if have.
 
-  @param PlatformConsole    Predfined platform default console device array.
+  @param PlatformConsole    Predefined platform default console device array.
 
   @retval EFI_SUCCESS       Success connect at least one ConIn and ConOut
                             device, there must have one ConOut device is
@@ -822,7 +822,7 @@ PlatformBdsConnectConsole (
   if (VarConout == NULL || VarConin == NULL) {
     //
     // Have chance to connect the platform default console,
-    // the platform default console is the minimue device group
+    // the platform default console is the minimum device group
     // the platform should support
     //
     while (PlatformConsole[Index].DevicePath != NULL) {
@@ -869,7 +869,7 @@ PlatformBdsConnectConsole (
 }
 
 /**
-  Connect with predeined platform connect sequence,
+  Connect with predefined platform connect sequence,
   the OEM/IBV can customize with their own connect sequence.
 
   @param None.
@@ -1571,7 +1571,7 @@ PlatformBdsLibEnumerateAllBootOption (
 
 /**
 
-  The function will excute with as the platform policy, current policy
+  The function will execute with as the platform policy, current policy
   is driven by boot mode. IBV/OEM can customize this code for their specific
   policy action.
 
@@ -2838,7 +2838,7 @@ PlatformBdsConnectSimpleConsole (
   if (VarConout == NULL || VarConin == NULL) {
     //
     // Have chance to connect the platform default console,
-    // the platform default console is the minimue device group
+    // the platform default console is the minimum device group
     // the platform should support
     //
     while (PlatformConsole[Index].DevicePath != NULL) {

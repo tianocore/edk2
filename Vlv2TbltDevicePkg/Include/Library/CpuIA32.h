@@ -180,7 +180,7 @@ EfiInvd (
   );
 
 /**
-  Get the Cpu info by excute the CPUID instruction
+  Get the Cpu info by execute the CPUID instruction
 
   @param[in] RegisterInEax The input value to put into register EAX
   @param[in] Regs          The Output value
