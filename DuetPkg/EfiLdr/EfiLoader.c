@@ -66,7 +66,7 @@ EfiLoader (
 
   //
   // Add all EfiConventionalMemory descriptors to the table.  If there are partial pages, then
-  // round the start address up to the next page, and round the length down to a page boundry.
+  // round the start address up to the next page, and round the length down to a page boundary.
   //
   BiosMemoryMap = (BIOS_MEMORY_MAP *) (UINTN) BiosMemoryMapBaseAddress;
   NumberOfMemoryMapEntries = 0;

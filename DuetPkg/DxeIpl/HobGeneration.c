@@ -727,7 +727,7 @@ PrepareHobBfv (
 
   //
   // Calculate BFV location at top of the memory region.
-  // This is like a RAM Disk. Align to page boundry.
+  // This is like a RAM Disk. Align to page boundary.
   //
   //BfvLengthPageSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (BfvLength));
  

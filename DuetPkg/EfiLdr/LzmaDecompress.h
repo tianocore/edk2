@@ -23,7 +23,7 @@
   @param DestinationSize  The size of destination buffer.
   @param ScratchSize      The size of scratch buffer.
 
-  @retval RETURN_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
+  @retval RETURN_SUCCESS           - The size of destination buffer and the size of scratch buffer are successfully retrieved.
   @retval RETURN_INVALID_PARAMETER - The source data is corrupted
 **/
 RETURN_STATUS

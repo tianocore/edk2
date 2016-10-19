@@ -137,7 +137,7 @@ typedef struct _PCI_IO_DEVICE {
   LIST_ENTRY                            ChildList;
 
   //
-  // TURE if the PCI bus driver creates the handle for this PCI device
+  // TRUE if the PCI bus driver creates the handle for this PCI device
   //
   BOOLEAN                                   Registered;
 

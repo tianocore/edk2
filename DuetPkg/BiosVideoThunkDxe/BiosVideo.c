@@ -94,7 +94,7 @@ VESA_BIOS_EXTENSIONS_EDID_TIMING mEstablishedEdidTiming[] = {
 };
 
 /**
-  Install child hanlde for a detect BiosVideo device and install related protocol
+  Install child handle for a detect BiosVideo device and install related protocol
   into this handle, such as EFI_GRAPHIC_OUTPUT_PROTOCOL.
 
   @param This                Instance pointer of EFI_DRIVER_BINDING_PROTOCOL
@@ -391,7 +391,7 @@ BiosVideoDriverBindingStop (
 }
 
 /**
-  Install child hanlde for a detect BiosVideo device and install related protocol
+  Install child handle for a detect BiosVideo device and install related protocol
   into this handle, such as EFI_GRAPHIC_OUTPUT_PROTOCOL.
 
   @param This                Instance pointer of EFI_DRIVER_BINDING_PROTOCOL

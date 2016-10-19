@@ -1,5 +1,5 @@
 /** @file
-  Internal include file for Base UEFI Decompress Libary.
+  Internal include file for Base UEFI Decompress Library.
 
   Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -47,7 +47,7 @@ Arguments:
 
 Returns:
 
-  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successull retrieved.
+  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successfully retrieved.
   EFI_INVALID_PARAMETER - The source data is corrupted
 
 --*/
