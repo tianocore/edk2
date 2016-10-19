@@ -102,7 +102,7 @@ Sha1Duplicate (
 
   This function performs SHA-1 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-1 context should be already correctly intialized by Sha1Init(), and should not be finalized
+  SHA-1 context should be already correctly initialized by Sha1Init(), and should not be finalized
   by Sha1Final(). Behavior with invalid context is undefined.
 
   If Sha1Context is NULL, then return FALSE.
@@ -149,7 +149,7 @@ Sha1Update (
   This function completes SHA-1 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-1 context cannot
   be used again.
-  SHA-1 context should be already correctly intialized by Sha1Init(), and should not be
+  SHA-1 context should be already correctly initialized by Sha1Init(), and should not be
   finalized by Sha1Final(). Behavior with invalid SHA-1 context is undefined.
 
   If Sha1Context is NULL, then return FALSE.

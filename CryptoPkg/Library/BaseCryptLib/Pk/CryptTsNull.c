@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalCryptLib.h"
 
 /**
-  Verifies the validility of a RFC3161 Timestamp CounterSignature embedded in PE/COFF Authenticode
+  Verifies the validity of a RFC3161 Timestamp CounterSignature embedded in PE/COFF Authenticode
   signature.
 
   Return FALSE to indicate this interface is not supported.

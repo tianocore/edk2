@@ -323,7 +323,7 @@ _Exit:
 }
 
 /**
-  Verifies the validility of a TimeStamp Token as described in RFC 3161 ("Internet
+  Verifies the validity of a TimeStamp Token as described in RFC 3161 ("Internet
   X.509 Public Key Infrastructure Time-Stamp Protocol (TSP)").
 
   If TSToken is NULL, then return FALSE.
@@ -497,7 +497,7 @@ _Exit:
 }
 
 /**
-  Verifies the validility of a RFC3161 Timestamp CounterSignature embedded in PE/COFF Authenticode
+  Verifies the validity of a RFC3161 Timestamp CounterSignature embedded in PE/COFF Authenticode
   signature.
 
   If AuthData is NULL, then return FALSE.

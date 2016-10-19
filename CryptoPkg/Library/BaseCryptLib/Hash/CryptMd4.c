@@ -101,7 +101,7 @@ Md4Duplicate (
 
   This function performs MD4 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  MD4 context should be already correctly intialized by Md4Init(), and should not be finalized
+  MD4 context should be already correctly initialized by Md4Init(), and should not be finalized
   by Md4Final(). Behavior with invalid context is undefined.
 
   If Md4Context is NULL, then return FALSE.
@@ -148,7 +148,7 @@ Md4Update (
   This function completes MD4 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the MD4 context cannot
   be used again.
-  MD4 context should be already correctly intialized by Md4Init(), and should not be
+  MD4 context should be already correctly initialized by Md4Init(), and should not be
   finalized by Md4Final(). Behavior with invalid MD4 context is undefined.
 
   If Md4Context is NULL, then return FALSE.

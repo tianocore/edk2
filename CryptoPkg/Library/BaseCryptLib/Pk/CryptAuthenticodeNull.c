@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalCryptLib.h"
 
 /**
-  Verifies the validility of a PE/COFF Authenticode Signature as described in "Windows
+  Verifies the validity of a PE/COFF Authenticode Signature as described in "Windows
   Authenticode Portable Executable Signature Format".
 
   Return FALSE to indicate this interface is not supported.
@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]  TrustedCert  Pointer to a trusted/root certificate encoded in DER, which
                            is used for certificate chain verification.
   @param[in]  CertSize     Size of the trusted certificate in bytes.
-  @param[in]  ImageHash    Pointer to the original image file hash value. The procudure
+  @param[in]  ImageHash    Pointer to the original image file hash value. The procedure
                            for calculating the image hash value is described in Authenticode
                            specification.
   @param[in]  HashSize     Size of Image hash value in bytes.

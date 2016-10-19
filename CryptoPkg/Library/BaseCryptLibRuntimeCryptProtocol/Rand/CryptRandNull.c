@@ -46,7 +46,7 @@ RandomSeed (
   Return FALSE to indicate this interface is not supported.
 
   @param[out]  Output  Pointer to buffer to receive random value.
-  @param[in]   Size    Size of randome bytes to generate.
+  @param[in]   Size    Size of random bytes to generate.
 
   @retval FALSE  This interface is not supported.
 

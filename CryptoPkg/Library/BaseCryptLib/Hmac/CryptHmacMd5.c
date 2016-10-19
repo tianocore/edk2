@@ -108,7 +108,7 @@ HmacMd5Duplicate (
 
   This function performs HMAC-MD5 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
+  HMAC-MD5 context should be already correctly initialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid context is undefined.
 
   If HmacMd5Context is NULL, then return FALSE.
@@ -157,7 +157,7 @@ HmacMd5Update (
   This function completes HMAC-MD5 digest computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-MD5 context cannot
   be used again.
-  HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
+  HMAC-MD5 context should be already correctly initialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
 
   If HmacMd5Context is NULL, then return FALSE.

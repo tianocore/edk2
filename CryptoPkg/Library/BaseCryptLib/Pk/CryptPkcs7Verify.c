@@ -229,7 +229,7 @@ _Exit:
   in a ContentInfo structure.
 
   If P7Data, CertStack, StackLength, TrustedCert or CertLength is NULL, then
-  return FALSE. If P7Length overflow, then return FAlSE.
+  return FALSE. If P7Length overflow, then return FALSE.
 
   Caution: This function may receive untrusted input.
   UEFI Authenticated Variable is external input, so this function will do basic
@@ -718,12 +718,12 @@ _Error:
 }
 
 /**
-  Verifies the validility of a PKCS#7 signed data as described in "PKCS #7:
+  Verifies the validity of a PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
 
   If P7Data, TrustedCert or InData is NULL, then return FALSE.
-  If P7Length, CertLength or DataLength overflow, then return FAlSE.
+  If P7Length, CertLength or DataLength overflow, then return FALSE.
 
   Caution: This function may receive untrusted input.
   UEFI Authenticated Variable is external input, so this function will do basic
@@ -897,7 +897,7 @@ _Exit:
   data could be wrapped in a ContentInfo structure.
 
   If P7Data, Content, or ContentSize is NULL, then return FALSE. If P7Length overflow,
-  then return FAlSE. If the P7Data is not correctly formatted, then return FALSE.
+  then return FALSE. If the P7Data is not correctly formatted, then return FALSE.
 
   Caution: This function may receive untrusted input. So this function will do
            basic check for PKCS#7 data structure.

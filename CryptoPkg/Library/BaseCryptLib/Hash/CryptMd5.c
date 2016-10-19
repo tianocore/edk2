@@ -103,7 +103,7 @@ Md5Duplicate (
 
   This function performs MD5 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  MD5 context should be already correctly intialized by Md5Init(), and should not be finalized
+  MD5 context should be already correctly initialized by Md5Init(), and should not be finalized
   by Md5Final(). Behavior with invalid context is undefined.
 
   If Md5Context is NULL, then return FALSE.
@@ -150,7 +150,7 @@ Md5Update (
   This function completes MD5 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the MD5 context cannot
   be used again.
-  MD5 context should be already correctly intialized by Md5Init(), and should not be
+  MD5 context should be already correctly initialized by Md5Init(), and should not be
   finalized by Md5Final(). Behavior with invalid MD5 context is undefined.
 
   If Md5Context is NULL, then return FALSE.

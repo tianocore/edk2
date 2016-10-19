@@ -101,7 +101,7 @@ Sha256Duplicate (
 
   This function performs SHA-256 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-256 context should be already correctly intialized by Sha256Init(), and should not be finalized
+  SHA-256 context should be already correctly initialized by Sha256Init(), and should not be finalized
   by Sha256Final(). Behavior with invalid context is undefined.
 
   If Sha256Context is NULL, then return FALSE.
@@ -148,7 +148,7 @@ Sha256Update (
   This function completes SHA-256 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-256 context cannot
   be used again.
-  SHA-256 context should be already correctly intialized by Sha256Init(), and should not be
+  SHA-256 context should be already correctly initialized by Sha256Init(), and should not be
   finalized by Sha256Final(). Behavior with invalid SHA-256 context is undefined.
 
   If Sha256Context is NULL, then return FALSE.

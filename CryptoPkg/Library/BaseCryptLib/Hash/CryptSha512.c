@@ -103,7 +103,7 @@ Sha384Duplicate (
 
   This function performs SHA-384 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-384 context should be already correctly intialized by Sha384Init(), and should not be finalized
+  SHA-384 context should be already correctly initialized by Sha384Init(), and should not be finalized
   by Sha384Final(). Behavior with invalid context is undefined.
 
   If Sha384Context is NULL, then return FALSE.
@@ -150,7 +150,7 @@ Sha384Update (
   This function completes SHA-384 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-384 context cannot
   be used again.
-  SHA-384 context should be already correctly intialized by Sha384Init(), and should not be
+  SHA-384 context should be already correctly initialized by Sha384Init(), and should not be
   finalized by Sha384Final(). Behavior with invalid SHA-384 context is undefined.
 
   If Sha384Context is NULL, then return FALSE.
@@ -318,7 +318,7 @@ Sha512Duplicate (
 
   This function performs SHA-512 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-512 context should be already correctly intialized by Sha512Init(), and should not be finalized
+  SHA-512 context should be already correctly initialized by Sha512Init(), and should not be finalized
   by Sha512Final(). Behavior with invalid context is undefined.
 
   If Sha512Context is NULL, then return FALSE.
@@ -365,7 +365,7 @@ Sha512Update (
   This function completes SHA-512 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-512 context cannot
   be used again.
-  SHA-512 context should be already correctly intialized by Sha512Init(), and should not be
+  SHA-512 context should be already correctly initialized by Sha512Init(), and should not be
   finalized by Sha512Final(). Behavior with invalid SHA-512 context is undefined.
 
   If Sha512Context is NULL, then return FALSE.

@@ -344,14 +344,14 @@ RsaFree (
   This function sets the tag-designated RSA key component into the established
   RSA context from the user-specified non-negative integer (octet string format
   represented in RSA PKCS#1).
-  If BigNumber is NULL, then the specified key componenet in RSA context is cleared.
+  If BigNumber is NULL, then the specified key component in RSA context is cleared.
 
   If RsaContext is NULL, then return FALSE.
 
   @param[in, out]  RsaContext  Pointer to RSA context being set.
   @param[in]       KeyTag      Tag of RSA key component being set.
   @param[in]       BigNumber   Pointer to octet integer buffer.
-                               If NULL, then the specified key componenet in RSA
+                               If NULL, then the specified key component in RSA
                                context is cleared.
   @param[in]       BnSize      Size of big number buffer in bytes.
                                If BigNumber is NULL, then it is ignored.

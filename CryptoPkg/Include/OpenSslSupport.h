@@ -69,7 +69,7 @@ typedef VOID  *FILE;
 #endif
 
 //
-// #defines from EFI Application Toolkit required to buiild Open SSL
+// #defines from EFI Application Toolkit required to build Open SSL
 //
 #define ENOMEM       12               /* Cannot allocate memory */
 #define EINVAL       22               /* Invalid argument */
@@ -92,7 +92,7 @@ typedef VOID  *FILE;
 #define LOG_CONS     0x02             /* log on the console if errors in sending */
 
 //
-// Macros from EFI Application Toolkit required to buiild Open SSL
+// Macros from EFI Application Toolkit required to build Open SSL
 //
 /* The offsetof() macro calculates the offset of a structure member
    in its structure.  Unfortunately this cannot be written down
@@ -102,7 +102,7 @@ typedef VOID  *FILE;
 #define offsetof(type, member) OFFSET_OF (type, member)
 
 //
-// Basic types from EFI Application Toolkit required to buiild Open SSL
+// Basic types from EFI Application Toolkit required to build Open SSL
 //
 typedef UINTN          size_t;
 typedef INTN           ssize_t;
@@ -120,7 +120,7 @@ typedef void           *DIR;
 typedef void           __sighandler_t (int);
 
 //
-// Structures from EFI Application Toolkit required to buiild Open SSL
+// Structures from EFI Application Toolkit required to build Open SSL
 //
 struct tm {
   int   tm_sec;     /* seconds after the minute [0-60] */
@@ -173,12 +173,12 @@ struct stat {
 };
 
 //
-// Externs from EFI Application Toolkit required to buiild Open SSL
+// Externs from EFI Application Toolkit required to build Open SSL
 //
 extern int errno;
 
 //
-// Function prototypes from EFI Application Toolkit required to buiild Open SSL
+// Function prototypes from EFI Application Toolkit required to build Open SSL
 //
 void           *malloc     (size_t);
 void           *realloc    (void *, size_t);
@@ -247,7 +247,7 @@ void           abort       (void);
 __sighandler_t *signal     (int, __sighandler_t *);
 
 //
-// Global variables from EFI Application Toolkit required to buiild Open SSL
+// Global variables from EFI Application Toolkit required to build Open SSL
 //
 extern FILE  *stderr;
 extern FILE  *stdin;

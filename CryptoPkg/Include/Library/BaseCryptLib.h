@@ -140,7 +140,7 @@ Md4Duplicate (
 
   This function performs MD4 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  MD4 context should be already correctly intialized by Md4Init(), and should not be finalized
+  MD4 context should be already correctly initialized by Md4Init(), and should not be finalized
   by Md4Final(). Behavior with invalid context is undefined.
 
   If Md4Context is NULL, then return FALSE.
@@ -169,7 +169,7 @@ Md4Update (
   This function completes MD4 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the MD4 context cannot
   be used again.
-  MD4 context should be already correctly intialized by Md4Init(), and should not be
+  MD4 context should be already correctly initialized by Md4Init(), and should not be
   finalized by Md4Final(). Behavior with invalid MD4 context is undefined.
 
   If Md4Context is NULL, then return FALSE.
@@ -280,7 +280,7 @@ Md5Duplicate (
 
   This function performs MD5 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  MD5 context should be already correctly intialized by Md5Init(), and should not be finalized
+  MD5 context should be already correctly initialized by Md5Init(), and should not be finalized
   by Md5Final(). Behavior with invalid context is undefined.
 
   If Md5Context is NULL, then return FALSE.
@@ -309,7 +309,7 @@ Md5Update (
   This function completes MD5 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the MD5 context cannot
   be used again.
-  MD5 context should be already correctly intialized by Md5Init(), and should not be
+  MD5 context should be already correctly initialized by Md5Init(), and should not be
   finalized by Md5Final(). Behavior with invalid MD5 context is undefined.
 
   If Md5Context is NULL, then return FALSE.
@@ -420,7 +420,7 @@ Sha1Duplicate (
 
   This function performs SHA-1 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-1 context should be already correctly intialized by Sha1Init(), and should not be finalized
+  SHA-1 context should be already correctly initialized by Sha1Init(), and should not be finalized
   by Sha1Final(). Behavior with invalid context is undefined.
 
   If Sha1Context is NULL, then return FALSE.
@@ -449,7 +449,7 @@ Sha1Update (
   This function completes SHA-1 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-1 context cannot
   be used again.
-  SHA-1 context should be already correctly intialized by Sha1Init(), and should not be
+  SHA-1 context should be already correctly initialized by Sha1Init(), and should not be
   finalized by Sha1Final(). Behavior with invalid SHA-1 context is undefined.
 
   If Sha1Context is NULL, then return FALSE.
@@ -555,7 +555,7 @@ Sha256Duplicate (
 
   This function performs SHA-256 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-256 context should be already correctly intialized by Sha256Init(), and should not be finalized
+  SHA-256 context should be already correctly initialized by Sha256Init(), and should not be finalized
   by Sha256Final(). Behavior with invalid context is undefined.
 
   If Sha256Context is NULL, then return FALSE.
@@ -582,7 +582,7 @@ Sha256Update (
   This function completes SHA-256 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-256 context cannot
   be used again.
-  SHA-256 context should be already correctly intialized by Sha256Init(), and should not be
+  SHA-256 context should be already correctly initialized by Sha256Init(), and should not be
   finalized by Sha256Final(). Behavior with invalid SHA-256 context is undefined.
 
   If Sha256Context is NULL, then return FALSE.
@@ -686,7 +686,7 @@ Sha384Duplicate (
 
   This function performs SHA-384 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-384 context should be already correctly intialized by Sha384Init(), and should not be finalized
+  SHA-384 context should be already correctly initialized by Sha384Init(), and should not be finalized
   by Sha384Final(). Behavior with invalid context is undefined.
 
   If Sha384Context is NULL, then return FALSE.
@@ -713,7 +713,7 @@ Sha384Update (
   This function completes SHA-384 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-384 context cannot
   be used again.
-  SHA-384 context should be already correctly intialized by Sha384Init(), and should not be
+  SHA-384 context should be already correctly initialized by Sha384Init(), and should not be
   finalized by Sha384Final(). Behavior with invalid SHA-384 context is undefined.
 
   If Sha384Context is NULL, then return FALSE.
@@ -817,7 +817,7 @@ Sha512Duplicate (
 
   This function performs SHA-512 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  SHA-512 context should be already correctly intialized by Sha512Init(), and should not be finalized
+  SHA-512 context should be already correctly initialized by Sha512Init(), and should not be finalized
   by Sha512Final(). Behavior with invalid context is undefined.
 
   If Sha512Context is NULL, then return FALSE.
@@ -844,7 +844,7 @@ Sha512Update (
   This function completes SHA-512 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the SHA-512 context cannot
   be used again.
-  SHA-512 context should be already correctly intialized by Sha512Init(), and should not be
+  SHA-512 context should be already correctly initialized by Sha512Init(), and should not be
   finalized by Sha512Final(). Behavior with invalid SHA-512 context is undefined.
 
   If Sha512Context is NULL, then return FALSE.
@@ -961,7 +961,7 @@ HmacMd5Duplicate (
 
   This function performs HMAC-MD5 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
+  HMAC-MD5 context should be already correctly initialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid context is undefined.
 
   If HmacMd5Context is NULL, then return FALSE.
@@ -990,7 +990,7 @@ HmacMd5Update (
   This function completes HMAC-MD5 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-MD5 context cannot
   be used again.
-  HMAC-MD5 context should be already correctly intialized by HmacMd5Init(), and should not be
+  HMAC-MD5 context should be already correctly initialized by HmacMd5Init(), and should not be
   finalized by HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
 
   If HmacMd5Context is NULL, then return FALSE.
@@ -1079,7 +1079,7 @@ HmacSha1Duplicate (
 
   This function performs HMAC-SHA1 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should not
+  HMAC-SHA1 context should be already correctly initialized by HmacSha1Init(), and should not
   be finalized by HmacSha1Final(). Behavior with invalid context is undefined.
 
   If HmacSha1Context is NULL, then return FALSE.
@@ -1108,7 +1108,7 @@ HmacSha1Update (
   This function completes HMAC-SHA1 hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-SHA1 context cannot
   be used again.
-  HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should
+  HMAC-SHA1 context should be already correctly initialized by HmacSha1Init(), and should
   not be finalized by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
 
   If HmacSha1Context is NULL, then return FALSE.
@@ -1811,14 +1811,14 @@ RsaFree (
   This function sets the tag-designated RSA key component into the established
   RSA context from the user-specified non-negative integer (octet string format
   represented in RSA PKCS#1).
-  If BigNumber is NULL, then the specified key componenet in RSA context is cleared.
+  If BigNumber is NULL, then the specified key component in RSA context is cleared.
 
   If RsaContext is NULL, then return FALSE.
 
   @param[in, out]  RsaContext  Pointer to RSA context being set.
   @param[in]       KeyTag      Tag of RSA key component being set.
   @param[in]       BigNumber   Pointer to octet integer buffer.
-                               If NULL, then the specified key componenet in RSA
+                               If NULL, then the specified key component in RSA
                                context is cleared.
   @param[in]       BnSize      Size of big number buffer in bytes.
                                If BigNumber is NULL, then it is ignored.
@@ -1910,7 +1910,7 @@ RsaGenerateKey (
   NOTE: This function performs integrity checks on all the RSA key material, so
         the RSA key structure must contain all the private key data.
 
-  This function validates key compoents of RSA context in following aspects:
+  This function validates key components of RSA context in following aspects:
   - Whether p is a prime
   - Whether q is a prime
   - Whether n = p * q
@@ -2256,16 +2256,16 @@ Pkcs5HashPassword (
   in a ContentInfo structure.
 
   If P7Data, CertStack, StackLength, TrustedCert or CertLength is NULL, then
-  return FALSE. If P7Length overflow, then return FAlSE.
+  return FALSE. If P7Length overflow, then return FALSE.
   If this interface is not supported, then return FALSE.
 
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
   @param[in]  P7Length     Length of the PKCS#7 message in bytes.
   @param[out] CertStack    Pointer to Signer's certificates retrieved from P7Data.
-                           It's caller's responsiblity to free the buffer.
+                           It's caller's responsibility to free the buffer.
   @param[out] StackLength  Length of signer's certificates in bytes.
   @param[out] TrustedCert  Pointer to a trusted certificate from Signer's certificates.
-                           It's caller's responsiblity to free the buffer.
+                           It's caller's responsibility to free the buffer.
   @param[out] CertLength   Length of the trusted certificate in bytes.
 
   @retval  TRUE            The operation is finished successfully.
@@ -2307,10 +2307,10 @@ Pkcs7FreeSigners (
   @param[in]  P7Data            Pointer to the PKCS#7 message.
   @param[in]  P7Length          Length of the PKCS#7 message in bytes.
   @param[out] SignerChainCerts  Pointer to the certificates list chained to signer's
-                                certificate. It's caller's responsiblity to free the buffer.
+                                certificate. It's caller's responsibility to free the buffer.
   @param[out] ChainLength       Length of the chained certificates list buffer in bytes.
   @param[out] UnchainCerts      Pointer to the unchained certificates lists. It's caller's
-                                responsiblity to free the buffer.
+                                responsibility to free the buffer.
   @param[out] UnchainLength     Length of the unchained certificates list buffer in bytes.
 
   @retval  TRUE         The operation is finished successfully.
@@ -2369,12 +2369,12 @@ Pkcs7Sign (
   );
 
 /**
-  Verifies the validility of a PKCS#7 signed data as described in "PKCS #7:
+  Verifies the validity of a PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
 
   If P7Data, TrustedCert or InData is NULL, then return FALSE.
-  If P7Length, CertLength or DataLength overflow, then return FAlSE.
+  If P7Length, CertLength or DataLength overflow, then return FALSE.
   If this interface is not supported, then return FALSE.
 
   @param[in]  P7Data       Pointer to the PKCS#7 message to verify.
@@ -2406,7 +2406,7 @@ Pkcs7Verify (
   data could be wrapped in a ContentInfo structure.
 
   If P7Data, Content, or ContentSize is NULL, then return FALSE. If P7Length overflow,
-  then return FAlSE. If the P7Data is not correctly formatted, then return FALSE.
+  then return FALSE. If the P7Data is not correctly formatted, then return FALSE.
 
   Caution: This function may receive untrusted input. So this function will do
            basic check for PKCS#7 data structure.
@@ -2414,7 +2414,7 @@ Pkcs7Verify (
   @param[in]   P7Data       Pointer to the PKCS#7 signed data to process.
   @param[in]   P7Length     Length of the PKCS#7 signed data in bytes.
   @param[out]  Content      Pointer to the extracted content from the PKCS#7 signedData.
-                            It's caller's responsiblity to free the buffer.
+                            It's caller's responsibility to free the buffer.
   @param[out]  ContentSize  The size of the extracted content in bytes.
 
   @retval     TRUE          The P7Data was correctly formatted for processing.
@@ -2431,7 +2431,7 @@ Pkcs7GetAttachedContent (
   );
 
 /**
-  Verifies the validility of a PE/COFF Authenticode Signature as described in "Windows
+  Verifies the validity of a PE/COFF Authenticode Signature as described in "Windows
   Authenticode Portable Executable Signature Format".
 
   If AuthData is NULL, then return FALSE.
@@ -2444,7 +2444,7 @@ Pkcs7GetAttachedContent (
   @param[in]  TrustedCert  Pointer to a trusted/root certificate encoded in DER, which
                            is used for certificate chain verification.
   @param[in]  CertSize     Size of the trusted certificate in bytes.
-  @param[in]  ImageHash    Pointer to the original image file hash value. The procudure
+  @param[in]  ImageHash    Pointer to the original image file hash value. The procedure
                            for calculating the image hash value is described in Authenticode
                            specification.
   @param[in]  HashSize     Size of Image hash value in bytes.
@@ -2466,7 +2466,7 @@ AuthenticodeVerify (
   );
 
 /**
-  Verifies the validility of a RFC3161 Timestamp CounterSignature embedded in PE/COFF Authenticode
+  Verifies the validity of a RFC3161 Timestamp CounterSignature embedded in PE/COFF Authenticode
   signature.
 
   If AuthData is NULL, then return FALSE.
@@ -2545,7 +2545,7 @@ DhFree (
   @param[in]       PrimeLength  Length in bits of prime to be generated.
   @param[out]      Prime        Pointer to the buffer to receive the generated prime number.
 
-  @retval TRUE   DH pamameter generation succeeded.
+  @retval TRUE   DH parameter generation succeeded.
   @retval FALSE  Value of Generator is not supported.
   @retval FALSE  PRNG fails to generate random prime number with PrimeLength.
   @retval FALSE  This interface is not supported.
@@ -2575,7 +2575,7 @@ DhGenerateParameter (
   @param[in]       PrimeLength  Length in bits of prime to be generated.
   @param[in]       Prime        Pointer to the prime number.
 
-  @retval TRUE   DH pamameter setting succeeded.
+  @retval TRUE   DH parameter setting succeeded.
   @retval FALSE  Value of Generator is not supported.
   @retval FALSE  Value of Generator is not suitable for the Prime.
   @retval FALSE  Value of Prime is not a prime number.
@@ -2696,7 +2696,7 @@ RandomSeed (
   If this interface is not supported, then return FALSE.
 
   @param[out]  Output  Pointer to buffer to receive random value.
-  @param[in]   Size    Size of randome bytes to generate.
+  @param[in]   Size    Size of random bytes to generate.
 
   @retval TRUE   Pseudorandom byte stream generated successfully.
   @retval FALSE  Pseudorandom number generator fails to generate due to lack of entropy.

@@ -108,7 +108,7 @@ HmacSha1Duplicate (
 
   This function performs HMAC-SHA1 digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should not
+  HMAC-SHA1 context should be already correctly initialized by HmacSha1Init(), and should not
   be finalized by HmacSha1Final(). Behavior with invalid context is undefined.
 
   If HmacSha1Context is NULL, then return FALSE.
@@ -157,7 +157,7 @@ HmacSha1Update (
   This function completes HMAC-SHA1 digest computation and retrieves the digest value into
   the specified memory. After this function has been called, the HMAC-SHA1 context cannot
   be used again.
-  HMAC-SHA1 context should be already correctly intialized by HmacSha1Init(), and should
+  HMAC-SHA1 context should be already correctly initialized by HmacSha1Init(), and should
   not be finalized by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
 
   If HmacSha1Context is NULL, then return FALSE.
