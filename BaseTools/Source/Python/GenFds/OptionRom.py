@@ -1,7 +1,7 @@
 ## @file
 # process OptionROM generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -67,7 +67,7 @@ class OPTIONROM (OptionRomClassObject):
                     EfiFileList.extend(FilePathNameList)
                 else:
                     FileName = os.path.basename(FilePathNameList[0])
-                    TmpOutputDir = os.path.join(GenFdsGlobalVariable.FvDir, self.DriverName)
+                    TmpOutputDir = os.path.join(GenFdsGlobalVariable.FvDir, self.DriverName, FfsFile.CurrentArch)
                     if not os.path.exists(TmpOutputDir) :
                         os.makedirs(TmpOutputDir)
                     TmpOutputFile = os.path.join(TmpOutputDir, FileName+'.tmp')
@@ -85,7 +85,7 @@ class OPTIONROM (OptionRomClassObject):
                 FilePathName = FfsFile.GenFfs()
                 if FfsFile.OverrideAttribs != None:
                     FileName = os.path.basename(FilePathName)
-                    TmpOutputDir = os.path.join(GenFdsGlobalVariable.FvDir, self.DriverName)
+                    TmpOutputDir = os.path.join(GenFdsGlobalVariable.FvDir, self.DriverName, FfsFile.CurrentArch)
                     if not os.path.exists(TmpOutputDir) :
                         os.makedirs(TmpOutputDir)
                     TmpOutputFile = os.path.join(TmpOutputDir, FileName+'.tmp')
