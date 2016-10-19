@@ -90,7 +90,7 @@ PeiPciLibPciCfg2ReadWorker (
 
   This function wraps EFI_PEI_PCI_CFG2_PPI.Write() service.
   It writes the PCI configuration register specified by Address with the
-  value specified by Data. The width of data is specifed by Width.
+  value specified by Data. The width of data is specified by Width.
   Data is returned.
 
   @param  Address The address that encodes the PCI Bus, Device, Function and

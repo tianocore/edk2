@@ -124,7 +124,7 @@ DxePciSegmentLibEsalReadWorker (
   This function wraps EsalPciConfigWrite function of Extended SAL PCI
   Services Class.
   It writes the PCI configuration register specified by Address with the
-  value specified by Data. The width of data is specifed by Width.
+  value specified by Data. The width of data is specified by Width.
   Data is returned.
 
   @param  Address Address that encodes the PCI Bus, Device, Function and

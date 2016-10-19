@@ -214,7 +214,7 @@ EFI_STATUS
 
   @param Handle               An array of EFI_HII_HANDLE instances returned.
 
-  @retval EFI_SUCCESS           The matching handles are outputed successfully.
+  @retval EFI_SUCCESS           The matching handles are outputted successfully.
                                 HandleBufferLength is updated with the actual length.
   @retval EFI_BUFFER_TOO_SMALL  The HandleBufferLength parameter
                                 indicates that Handle is too
@@ -273,7 +273,7 @@ EFI_STATUS
   
   @retval EFI_OUT_OF_RESOURCES  BufferSize is too small to hold the package.
 
-  @retval EFI_NOT_FOUND         The specifiecd Handle could not be found in the
+  @retval EFI_NOT_FOUND         The specified Handle could not be found in the
                                 current database.
   
   @retval EFI_INVALID_PARAMETER BufferSize was NULL.

@@ -41,8 +41,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TCG_PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE                   1
 
 //
-// TCG PP definition of return code for Sumbit TPM Request to Pre-OS Environment
-// and Sumbit TPM Request to Pre-OS Environment 2
+// TCG PP definition of return code for Submit TPM Request to Pre-OS Environment
+// and Submit TPM Request to Pre-OS Environment 2
 //
 #define TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS                                  0
 #define TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED                          1

@@ -179,7 +179,7 @@ ExtractGuidedSectionRegisterHandlers (
   VOID   *GuidData;
 
   //
-  // Check input paramter.
+  // Check input parameter.
   //
   ASSERT (SectionGuid != NULL);
   ASSERT (GetInfoHandler != NULL);

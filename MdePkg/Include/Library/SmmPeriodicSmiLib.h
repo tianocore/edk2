@@ -79,7 +79,7 @@ PeriodicSmiExit (
   If this function is not called from within an enabled periodic SMI handler, 
   then 0 is returned.
 
-  @return  The actual time in 100ns units elasped since this function was
+  @return  The actual time in 100ns units elapsed since this function was
            called.  A value of 0 indicates an unknown amount of time.
 
 **/
@@ -95,7 +95,7 @@ PeriodicSmiYield (
   PeriodicSmiDisable().
 
   @param[in] Context      Content registered with PeriodicSmiEnable().
-  @param[in] ElapsedTime  The actual time in 100ns units elasped since 
+  @param[in] ElapsedTime  The actual time in 100ns units elapsed since
                           this function was called.  A value of 0 indicates 
                           an unknown amount of time.
                             

@@ -112,7 +112,7 @@ SmmPciLibPciRootBridgeIoReadWorker (
 
   This function wraps EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.Pci.Write() service.
   It writes the PCI configuration register specified by Address with the
-  value specified by Data. The width of data is specifed by Width.
+  value specified by Data. The width of data is specified by Width.
   Data is returned.
 
   @param  Address The address that encodes the PCI Bus, Device, Function and

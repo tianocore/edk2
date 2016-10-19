@@ -114,7 +114,7 @@ SmmMemoryAllocationLibDestructor (
 
   @param[in]  Buffer   The pointer to the buffer to be checked.
 
-  @retval     TURE     The buffer is in SMRAM ranges.
+  @retval     TRUE     The buffer is in SMRAM ranges.
   @retval     FALSE    The buffer is out of SMRAM ranges.
 **/
 BOOLEAN

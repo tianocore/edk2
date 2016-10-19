@@ -308,7 +308,7 @@ DecodeP (
 /**
   Reads code lengths for the Extra Set or the Position Set.
 
-  Read in the Extra Set or Pointion Set Length Arrary, then
+  Read in the Extra Set or Position Set Length Array, then
   generate the Huffman code mapping for them.
 
   @param  Sd      The global scratch data.
@@ -508,7 +508,7 @@ DecodeC (
     Sd->mBlockSize    = (UINT16) GetBits (Sd, 16);
 
     //
-    // Read in the Extra Set Code Length Arrary,
+    // Read in the Extra Set Code Length Array,
     // Generate the Huffman code mapping table for Extra Set.
     //
     Sd->mBadTableFlag = ReadPTLen (Sd, NT, TBIT, 3);
@@ -517,13 +517,13 @@ DecodeC (
     }
 
     //
-    // Read in and decode the Char&Len Set Code Length Arrary,
+    // Read in and decode the Char&Len Set Code Length Array,
     // Generate the Huffman code mapping table for Char&Len Set.
     //
     ReadCLen (Sd);
 
     //
-    // Read in the Position Set Code Length Arrary, 
+    // Read in the Position Set Code Length Array,
     // Generate the Huffman code mapping table for the Position Set.
     //
     Sd->mBadTableFlag = ReadPTLen (Sd, MAXNP, Sd->mPBit, (UINT16) (-1));

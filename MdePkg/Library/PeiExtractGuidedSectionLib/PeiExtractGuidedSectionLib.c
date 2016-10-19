@@ -198,7 +198,7 @@ ExtractGuidedSectionRegisterHandlers (
   PEI_EXTRACT_GUIDED_SECTION_HANDLER_INFO *HandlerInfo;
 
   //
-  // Check input paramter
+  // Check input parameter
   //
   ASSERT (SectionGuid != NULL);
   ASSERT (GetInfoHandler != NULL);
@@ -305,7 +305,7 @@ ExtractGuidedSectionGetInfo (
   EFI_GUID *SectionDefinitionGuid;
   
   //
-  // Check input paramter
+  // Check input parameter
   //
   ASSERT (InputSection != NULL);
   ASSERT (OutputBufferSize != NULL);

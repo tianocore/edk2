@@ -1197,12 +1197,12 @@ struct _EFI_KMS_PROTOCOL {
   ///
   BOOLEAN                           ServiceAvailable;
   ///
-  /// TURE if and only if the service supports client identifiers. Client identifiers may be used
+  /// TRUE if and only if the service supports client identifiers. Client identifiers may be used
   /// for auditing, access control or any other purpose specific to the implementation.
   ///
   BOOLEAN                           ClientIdSupported;
   ///
-  /// TURE if and only if the service requires a client identifier in order to process key requests.
+  /// TRUE if and only if the service requires a client identifier in order to process key requests.
   /// FALSE otherwise.
   ///
   BOOLEAN                           ClientIdRequired;
@@ -1218,7 +1218,7 @@ struct _EFI_KMS_PROTOCOL {
   ///
   UINT8                             ClientNameStringTypes;
   ///
-  /// TURE if only if the KMS requires a client name to be supplied to the service.
+  /// TRUE if only if the KMS requires a client name to be supplied to the service.
   /// FALSE otherwise.
   ///
   BOOLEAN                           ClientNameRequired;
@@ -1227,7 +1227,7 @@ struct _EFI_KMS_PROTOCOL {
   ///
   UINT16                            ClientNameMaxCount;
   ///
-  /// TURE if and only if the service supports arbitrary client data requests. The use of client
+  /// TRUE if and only if the service supports arbitrary client data requests. The use of client
   /// data requires the caller to have specific knowledge of the individual KMS service and
   /// should be used only if absolutely necessary.
   /// FALSE otherwise.
@@ -1239,7 +1239,7 @@ struct _EFI_KMS_PROTOCOL {
   ///
   UINTN                             ClientDataMaxSize;
   ///
-  /// TURE if variable length key identifiers are supported.
+  /// TRUE if variable length key identifiers are supported.
   /// FALSE if a fixed length key identifier is supported.
   ///
   BOOLEAN                           KeyIdVariableLenSupported;
