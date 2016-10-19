@@ -1,7 +1,7 @@
 /** @file
 Lib function for Pei Quark South Cluster.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -87,7 +87,7 @@ ReadIohGpioValues (
 
   DEBUG ((EFI_D_INFO, "SC GPIO temporary enable  at %08X\n", TempBarAddr));
 
-  // Use predefined tempory memory resource.
+  // Use predefined temporary memory resource.
   PciWrite32 ( GipAddr + PcdGet8 (PcdIohGpioBarRegister), TempBarAddr);
   PciWrite8 ( GipAddr + PCI_COMMAND_OFFSET, EFI_PCI_COMMAND_MEMORY_SPACE);
 

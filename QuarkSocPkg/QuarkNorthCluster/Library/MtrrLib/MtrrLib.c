@@ -1,7 +1,7 @@
 /** @file
 MTRR setting library
 
-Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -582,7 +582,7 @@ MtrrGetMemoryAttributeInVariableMtrrWorker (
   @param[in]   MtrrValidAddressMask  The valid address mask for MTRR
   @param[out]  VariableMtrr          The array to shadow variable MTRRs content
 
-  @return                       The return value of this paramter indicates the
+  @return                       The return value of this parameter indicates the
                                 number of MTRRs which has been used.
 
 **/

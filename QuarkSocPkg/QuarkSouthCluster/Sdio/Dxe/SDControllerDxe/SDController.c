@@ -1156,7 +1156,7 @@ ResetSDHost (
 
   //
   // To improve SD stability, we zero the MMIO_CLKCTL register and
-  // stall for 50 microseconds before reseting the controller.  We
+  // stall for 50 microseconds before resetting the controller.  We
   // restore the register setting following the reset operation.
   //
   PciIo->Mem.Read (
@@ -1713,7 +1713,7 @@ Exit:
 
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This                 Protocol instance pointer.

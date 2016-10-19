@@ -2,7 +2,7 @@
 
 The definition for SD media device driver model and blkio protocol routines.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -247,7 +247,7 @@ Exit:
 
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This                 Protocol instance pointer.

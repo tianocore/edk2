@@ -1,7 +1,7 @@
 /** @file
 This file contains the implementation of Usb Hc Protocol.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -2203,7 +2203,7 @@ OhciCleanDevUp (
   One notified function to stop the Host Controller when gBS->ExitBootServices() called.
 
   @param  Event                 Pointer to this event
-  @param  Context               Event hanlder private data
+  @param  Context               Event handler private data
 **/
 VOID
 EFIAPI
@@ -2429,7 +2429,7 @@ CLOSE_PCIIO:
 }
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This                  Protocol instance pointer.

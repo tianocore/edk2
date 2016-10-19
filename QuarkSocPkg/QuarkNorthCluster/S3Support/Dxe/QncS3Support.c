@@ -1,7 +1,7 @@
 /** @file
 This is the driver that implements the QNC S3 Support protocol
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -312,7 +312,7 @@ Returns:
   Status = PcdSet64S (PcdQncS3CodeInLockBoxSize, (UINT64)mQncS3ImageSize);
   ASSERT_EFI_ERROR (Status);
   //
-  // Align buffer on section boundry
+  // Align buffer on section boundary
   //
   ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
   if (ImageContext.SectionAlignment != 0) {
