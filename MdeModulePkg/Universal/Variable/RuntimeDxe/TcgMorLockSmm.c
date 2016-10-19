@@ -190,7 +190,7 @@ SetVariableCheckHandlerMorLock (
     //
     if (DataSize == MOR_LOCK_V1_SIZE) {
       //
-      // V1 - lock permenantly
+      // V1 - lock permanently
       //
       if (*(UINT8 *)Data == MOR_LOCK_DATA_UNLOCKED) {
         //

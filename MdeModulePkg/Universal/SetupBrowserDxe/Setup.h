@@ -1222,8 +1222,8 @@ IsNvUpdateRequiredForFormSet (
   @param Action                The action request.
   @param SkipSaveOrDiscard     Whether skip save or discard action.
 
-  @retval EFI_SUCCESS          The call back function excutes successfully.
-  @return Other value if the call back function failed to excute.  
+  @retval EFI_SUCCESS          The call back function executes successfully.
+  @return Other value if the call back function failed to execute.
 **/
 EFI_STATUS 
 ProcessCallBackFunction (
@@ -1245,8 +1245,8 @@ ProcessCallBackFunction (
   @param Statement             The Question which need to call.
   @param FormSet               The formset this question belong to.
 
-  @retval EFI_SUCCESS          The call back function excutes successfully.
-  @return Other value if the call back function failed to excute.  
+  @retval EFI_SUCCESS          The call back function executes successfully.
+  @return Other value if the call back function failed to execute.
 **/
 EFI_STATUS 
 ProcessRetrieveForQuestion (

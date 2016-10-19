@@ -147,7 +147,7 @@ CheckExistInStack (
 
   According to a file GUID, check a Fv file device path is valid. If it is invalid,
   try to return the valid device path.
-  FV address maybe changes for memory layout adjust from time to time, use this funciton
+  FV address maybe changes for memory layout adjust from time to time, use this function
   could promise the Fv file device path is right.
 
   @param  DevicePath               On input, the FV file device path to check
@@ -1115,7 +1115,7 @@ SaveOverridesMapping (
                                If Binding protocol is not found, it is set to NULL. 
 
   @return                      Pointer into the Binding Protocol interface
-  @retval NULL                 The paramter is not valid or the binding protocol is not found.
+  @retval NULL                 The parameter is not valid or the binding protocol is not found.
 
 **/
 EFI_DRIVER_BINDING_PROTOCOL *
@@ -1315,7 +1315,7 @@ GetDriverFromMapping (
   //
   if (CheckExistInStack (OverrideItem->ControllerDevicePath)) {
     //
-    // There is a dependecy dead loop if the ControllerDevicePath appear in stack twice
+    // There is a dependency dead loop if the ControllerDevicePath appear in stack twice
     //
     return EFI_UNSUPPORTED;
   }
@@ -1337,7 +1337,7 @@ GetDriverFromMapping (
         // If the image device path contains an FV node, check the FV file device path is valid.
         // If it is invalid, try to return the valid device path.
         // FV address maybe changes for memory layout adjust from time to time,
-        // use this funciton could promise the FV file device path is right.
+        // use this function could promise the FV file device path is right.
         //
         Status = UpdateFvFileDevicePath (&TempDriverImagePath, NULL, CallerImageHandle);
         if (!EFI_ERROR (Status)) {

@@ -106,7 +106,7 @@ ReferFontInfoLocally (
   @param  StringSrc              Points to current null-terminated string.
   @param  BufferSize             Length of the buffer.
 
-  @retval EFI_SUCCESS            The string text was outputed successfully.
+  @retval EFI_SUCCESS            The string text was outputted successfully.
   @retval EFI_BUFFER_TOO_SMALL   Buffer is insufficient to store the found string
                                  text. BufferSize is updated to the required buffer
                                  size.
@@ -150,7 +150,7 @@ ConvertToUnicodeText (
   @param  StringSrc              Points to current null-terminated string.
   @param  BufferSize             Length of the buffer.
 
-  @retval EFI_SUCCESS            The string text was outputed successfully.
+  @retval EFI_SUCCESS            The string text was outputted successfully.
   @retval EFI_BUFFER_TOO_SMALL   Buffer is insufficient to store the found string
                                  text. BufferSize is updated to the required buffer
                                  size.
@@ -199,7 +199,7 @@ GetUnicodeStringTextOrSize (
   @param  StringFontInfo         Buffer to record the output font info. It's
                                  caller's responsibility to free this buffer.
 
-  @retval EFI_SUCCESS            The string font is outputed successfully.
+  @retval EFI_SUCCESS            The string font is outputted successfully.
   @retval EFI_NOT_FOUND          The specified font id does not exist.
 
 **/
@@ -719,7 +719,7 @@ GetStringWorker (
   @param  StringBlockAddr         Output the block address of found string block.  
   @param  FontBlock               whether this string block has font info.
 
-  @retval EFI_SUCCESS            The string font is outputed successfully.
+  @retval EFI_SUCCESS            The string font is outputted successfully.
   @retval EFI_OUT_OF_RESOURCES   NO resource for the memory to save the new string block.
 
 **/

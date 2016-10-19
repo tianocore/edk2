@@ -389,7 +389,7 @@ ReleaseLockOnlyAtBootTime (
   );
 
 /**
-  Retrive the FVB protocol interface by HANDLE.
+  Retrieve the FVB protocol interface by HANDLE.
 
   @param[in]  FvBlockHandle     The handle of FVB protocol that provides services for
                                 reading, writing, and erasing the target block.
@@ -472,7 +472,7 @@ VariableWriteServiceInitialize (
   );
 
 /**
-  Retrive the SMM Fault Tolerent Write protocol interface.
+  Retrieve the SMM Fault Tolerent Write protocol interface.
 
   @param[out] FtwProtocol       The interface of SMM Ftw protocol
 

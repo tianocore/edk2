@@ -1827,7 +1827,7 @@ FindTopMenu (
       }
     } else {
       //
-      // Last time highlight menu has disappear, find the first highlightable menu as the defalut one.
+      // Last time highlight menu has disappear, find the first highlightable menu as the default one.
       //
       *HighlightMenu = gMenuOption.ForwardLink;
       if (!IsListEmpty (&gMenuOption)) {

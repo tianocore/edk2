@@ -150,7 +150,7 @@ SockTcpDataToRcv (
   @param  Sock                  Pointer to the socket.
   @param  TcpRxData             Pointer to the application provided receive buffer.
   @param  RcvdBytes             The maximum length of the data can be copied.
-  @param  IsOOB                 If TURE the data is OOB, FALSE the data is normal.
+  @param  IsOOB                 If TRUE the data is OOB, FALSE the data is normal.
 
 **/
 VOID

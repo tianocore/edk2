@@ -901,7 +901,7 @@ Exit:
 
   @param[in]  Instance           The IP4 config2 instance to configure
 
-  @retval EFI_SUCCESS            The auto configuration is successfull started
+  @retval EFI_SUCCESS            The auto configuration is successfully started
   @retval Others                 Failed to start auto configuration.
 
 **/

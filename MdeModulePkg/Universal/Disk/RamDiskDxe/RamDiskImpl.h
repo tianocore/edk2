@@ -54,13 +54,13 @@
 #define RAM_DISK_BLOCK_SIZE 512
 
 //
-// Iterate through the doule linked list. NOT delete safe
+// Iterate through the double linked list. NOT delete safe
 //
 #define EFI_LIST_FOR_EACH(Entry, ListHead)    \
   for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
 
 //
-// Iterate through the doule linked list. This is delete-safe.
+// Iterate through the double linked list. This is delete-safe.
 // Do not touch NextEntry
 //
 #define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \

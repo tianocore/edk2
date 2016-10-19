@@ -91,7 +91,7 @@ typedef enum {
   DefaultValueFromDefault = 0,     // Get from the minimum or first one when not set default value.
   DefaultValueFromOtherDefault,    // Get default vale from other default when no default(When other
                                    // defaults are more than one, use the default with smallest default id).
-  DefaultValueFromFlag,            // Get default value from the defalut flag.
+  DefaultValueFromFlag,            // Get default value from the default flag.
   DefaultValueFromOpcode           // Get default value from default opcode, highest priority.
 } DEFAULT_VALUE_TYPE;
 
@@ -230,7 +230,7 @@ typedef struct _HII_IMAGE_PACKAGE_INSTANCE {
 } HII_IMAGE_PACKAGE_INSTANCE;
 
 //
-// Keyboard Layout Pacakge definitions
+// Keyboard Layout Package definitions
 //
 #define HII_KB_LAYOUT_PACKAGE_SIGNATURE SIGNATURE_32 ('h','k','l','p')
 typedef struct _HII_KEYBOARD_LAYOUT_PACKAGE_INSTANCE {
@@ -430,7 +430,7 @@ IsHiiHandleValid (
   @param  FontHandle              On entry, Points to the font handle returned by a
                                   previous  call to GetFontInfo() or NULL to start
                                   with the first font.
-  @param  GlobalFontInfo          If not NULL, output the corresponding globa font
+  @param  GlobalFontInfo          If not NULL, output the corresponding global font
                                   info.
 
   @retval TRUE                    Existed
@@ -542,7 +542,7 @@ FindStringBlock (
   @param  CharValue               Unicode character value, which identifies a glyph
                                   block.
   @param  GlyphBuffer             Output the corresponding bitmap data of the found
-                                  block. It is the caller's responsiblity to free
+                                  block. It is the caller's responsibility to free
                                   this buffer.
   @param  Cell                    Output cell information of the encoded bitmap.
   @param  GlyphBufferLen          If not NULL, output the length of GlyphBuffer.
@@ -1591,7 +1591,7 @@ HiiUpdatePackageList (
                                   buffer that is required for the handles found.
   @param  Handle                  An array of EFI_HII_HANDLE instances returned.
 
-  @retval EFI_SUCCESS             The matching handles are outputed successfully.
+  @retval EFI_SUCCESS             The matching handles are outputted successfully.
                                   HandleBufferLength is updated with the actual length.
   @retval EFI_BUFFER_TO_SMALL     The HandleBufferLength parameter indicates that
                                   Handle is too small to support the number of
@@ -1640,7 +1640,7 @@ HiiListPackageLists (
                                   Handle is too small to support the number of
                                   handles.      HandleBufferLength is updated with
                                   a value that will enable the data to fit.
-  @retval EFI_NOT_FOUND           The specifiecd Handle could not be found in the
+  @retval EFI_NOT_FOUND           The specified Handle could not be found in the
                                   current database.
   @retval EFI_INVALID_PARAMETER   BufferSize was NULL.
   @retval EFI_INVALID_PARAMETER   The value referenced by BufferSize was not zero 
@@ -2236,7 +2236,7 @@ EfiConfigKeywordHandlerSetData (
   @retval EFI_SUCCESS             The specified action was completed successfully.
   
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
-                                  1.Progress, ProgressErr, or Resuts is NULL.
+                                  1.Progress, ProgressErr, or Results is NULL.
                                   2.Parsing of the KeywordString resulted in an error. See
                                     Progress and ProgressErr for more data.
   
@@ -2286,7 +2286,7 @@ HiiCompareLanguage (
 ;
 
 /**
-  Retrieves a pointer to the a Null-terminated ASCII string containing the list 
+  Retrieves a pointer to a Null-terminated ASCII string containing the list
   of languages that an HII handle in the HII Database supports.  The returned 
   string is allocated using AllocatePool().  The caller is responsible for freeing
   the returned string using FreePool().  The format of the returned string follows
@@ -2297,9 +2297,9 @@ HiiCompareLanguage (
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
 
   @retval NULL   HiiHandle is not registered in the HII database
-  @retval NULL   There are not enough resources available to retrieve the suported 
+  @retval NULL   There are not enough resources available to retrieve the supported
                  languages.
-  @retval NULL   The list of suported languages could not be retrieved.
+  @retval NULL   The list of supported languages could not be retrieved.
   @retval Other  A pointer to the Null-terminated ASCII string of supported languages.
 
 **/

@@ -541,7 +541,7 @@ UpdateDeviceSelectPage (
   @param  ImageHandle          The Image handle
 
   @return                      Handle to Driver binding
-  @retval NULL                 The paramter is not valid or the driver binding handle is not found.
+  @retval NULL                 The parameter is not valid or the driver binding handle is not found.
 
 **/
 EFI_HANDLE
@@ -1577,7 +1577,7 @@ DriverLoaded (
 }
 
 /**
-  The driver Entry Point. The funciton will export a disk device class formset and
+  The driver Entry Point. The function will export a disk device class formset and
   its callback function to hii database.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.

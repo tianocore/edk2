@@ -140,7 +140,7 @@ ConPlatformTextInDriverBindingStart (
   );
 
 /**
-  Start this driver on the device for console output and stardard error output.
+  Start this driver on the device for console output and standard error output.
 
   Start this driver on ControllerHandle by opening Simple Text Output Protocol,
   reading Device Path, and installing Console Out Devcic GUID, Standard Error

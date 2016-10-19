@@ -684,7 +684,7 @@ IScsiFormCallback (
 
   Private   = ISCSI_FORM_CALLBACK_INFO_FROM_FORM_CALLBACK (This);
   //
-  // Retrive uncommitted data from Browser
+  // Retrieve uncommitted data from Browser
   //
   IfrNvData = AllocateZeroPool (sizeof (ISCSI_CONFIG_IFR_NVDATA));
   ASSERT (IfrNvData != NULL);

@@ -71,7 +71,7 @@ EFI_FTW_DEVICE                            *mFtwDevice      = NULL;
 BOOLEAN                                   mEndOfDxe = FALSE;
 
 /**
-  Retrive the SMM FVB protocol interface by HANDLE.
+  Retrieve the SMM FVB protocol interface by HANDLE.
 
   @param[in]  FvBlockHandle     The handle of SMM FVB protocol that provides services for
                                 reading, writing, and erasing the target block.
@@ -99,7 +99,7 @@ FtwGetFvbByHandle (
 }
 
 /**
-  Retrive the SMM Swap Address Range protocol interface.
+  Retrieve the SMM Swap Address Range protocol interface.
 
   @param[out] SarProtocol       The interface of SMM SAR protocol
 

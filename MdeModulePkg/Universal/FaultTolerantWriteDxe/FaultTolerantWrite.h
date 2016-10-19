@@ -300,7 +300,7 @@ FtwEraseSpareBlock (
   );
 
 /**
-  Retrive the proper FVB protocol interface by HANDLE.
+  Retrieve the proper FVB protocol interface by HANDLE.
 
 
   @param FvBlockHandle   The handle of FVB protocol that provides services for
@@ -641,7 +641,7 @@ GetFvbByAddress (
   );
 
 /**
-  Retrive the proper Swap Address Range protocol interface.
+  Retrieve the proper Swap Address Range protocol interface.
 
   @param[out] SarProtocol       The interface of SAR protocol
 

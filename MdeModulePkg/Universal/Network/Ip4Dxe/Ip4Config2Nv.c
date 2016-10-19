@@ -1134,7 +1134,7 @@ Ip4FormCallback (
     }
 
     //
-    // Retrive uncommitted data from Browser
+    // Retrieve uncommitted data from Browser
     //
     if (!HiiGetBrowserData (&gIp4Config2NvDataGuid, mIp4Config2StorageName, sizeof (IP4_CONFIG2_IFR_NVDATA), (UINT8 *) IfrFormNvData)) {
       FreePool (IfrFormNvData);

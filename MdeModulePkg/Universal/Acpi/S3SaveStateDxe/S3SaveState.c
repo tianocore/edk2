@@ -248,7 +248,7 @@ BootScriptWritePciCfg2ReadWrite (
   return S3BootScriptSavePciCfg2ReadWrite (Width, Segment, Address, Data, DataMask);
 }
 /**
-  Internal function to add smbus excute opcode to the table.
+  Internal function to add smbus execute opcode to the table.
 
   @param  Marker                The variable argument list to get the opcode
                                 and associated attributes.

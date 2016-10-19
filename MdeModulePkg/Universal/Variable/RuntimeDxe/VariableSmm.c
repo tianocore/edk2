@@ -199,7 +199,7 @@ ReleaseLockOnlyAtBootTime (
 }
 
 /**
-  Retrive the SMM Fault Tolerent Write protocol interface.
+  Retrieve the SMM Fault Tolerent Write protocol interface.
 
   @param[out] FtwProtocol       The interface of SMM Ftw protocol
 
@@ -228,7 +228,7 @@ GetFtwProtocol (
 
 
 /**
-  Retrive the SMM FVB protocol interface by HANDLE.
+  Retrieve the SMM FVB protocol interface by HANDLE.
 
   @param[in]  FvBlockHandle     The handle of SMM FVB protocol that provides services for
                                 reading, writing, and erasing the target block.

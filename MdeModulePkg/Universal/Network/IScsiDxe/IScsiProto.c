@@ -1815,7 +1815,7 @@ IScsiNewDataSegment (
 
   @param[in]  Packet The EXT SCSI PASS THRU request packet containing the SCSI command.
   @param[in]  Lun    The LUN.
-  @param[in]  Tcb    The tcb assocated with this SCSI command.
+  @param[in]  Tcb    The tcb associated with this SCSI command.
 
   @return The  created iSCSI SCSI command PDU.
   @retval NULL Other errors as indicated.

@@ -56,7 +56,7 @@ EFI_EVENT                                 mFvbRegistration = NULL;
 
 
 /**
-  Retrive the FVB protocol interface by HANDLE.
+  Retrieve the FVB protocol interface by HANDLE.
 
   @param[in]  FvBlockHandle     The handle of FVB protocol that provides services for
                                 reading, writing, and erasing the target block.
@@ -84,7 +84,7 @@ FtwGetFvbByHandle (
 }
 
 /**
-  Retrive the Swap Address Range protocol interface.
+  Retrieve the Swap Address Range protocol interface.
 
   @param[out] SarProtocol       The interface of SAR protocol
 

@@ -446,7 +446,7 @@ SetPassword (
   FreePool (TempPassword);
 
   //
-  // Retrive uncommitted data from Browser
+  // Retrieve uncommitted data from Browser
   //
   Configuration = AllocateZeroPool (sizeof (DRIVER_SAMPLE_CONFIGURATION));
   ASSERT (Configuration != NULL);

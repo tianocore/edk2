@@ -551,7 +551,7 @@ GenPerformMemoryTest (
 
   //
   // In extensive mode the boundary of "mCurrentRange->Length" may will lost
-  // some range that is not Private->BdsBlockSize size boundry, so need
+  // some range that is not Private->BdsBlockSize size boundary, so need
   // the software mechanism to confirm all memory location be covered.
   //
   if (mCurrentAddress < (mCurrentRange->StartAddress + mCurrentRange->Length)) {

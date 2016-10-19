@@ -678,7 +678,7 @@ TerminalDriverBindingStart (
   //
   if (FirstEnter) {
     //
-    // First enther the start funciton
+    // First enther the start function
     //
     FirstEnter = FALSE;
     //

@@ -322,7 +322,7 @@ ReadyToLockEventNotify (
   ASSERT_EFI_ERROR (Status);
   ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
   //
-  // Align buffer on section boundry
+  // Align buffer on section boundary
   //
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
   ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
