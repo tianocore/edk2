@@ -1197,7 +1197,7 @@ BOOLEAN
                             - 01 = ROM Found.
                             - 02 = ROM is a valid legacy ROM.
 
-  @retval EFI_SUCCESS       The Legacy Option ROM availible for this device
+  @retval EFI_SUCCESS       The Legacy Option ROM available for this device
   @retval EFI_UNSUPPORTED   The Legacy Option ROM is not supported.
 
 **/

@@ -149,7 +149,7 @@ EFI_STATUS
   @param  Attributes            Attributes bit-mask to set for the variable.
                                 Inconsistent with specification here: 
                                 Attributes data type has been changed from 
-                                UINT32 * to UINT32, because the input paramter is 
+                                UINT32 * to UINT32, because the input parameter is
                                 not necessary to use a pointer date type.
   @param  DataSize              The size in bytes of the Buffer. A size of zero causes
                                 the variable to be deleted.
