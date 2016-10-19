@@ -259,7 +259,7 @@ GetImageContext (
   function and pass it into InitializeDebugAgent(). InitializeDebugAgent() is
   responsible to invoke the passing-in function at the end of InitializeDebugAgent().
 
-  If the parameter Function is not NULL, Debug Agent Libary instance will invoke it by
+  If the parameter Function is not NULL, Debug Agent Library instance will invoke it by
   passing in the Context to be its parameter.
 
   If Function() is NULL, Debug Agent Library instance will return after setup debug
@@ -289,7 +289,7 @@ InitializeDebugAgent (
   ASSERT (((UINTN)DebugAgentVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
   ArmWriteVBar ((UINTN)DebugAgentVectorTable);
 
-  // We use InitFlag to know if DebugAgent has been intialized from
+  // We use InitFlag to know if DebugAgent has been initialized from
   // Sec (DEBUG_AGENT_INIT_PREMEM_SEC) or PrePi (DEBUG_AGENT_INIT_POSTMEM_SEC)
   // modules
   if (InitFlag == DEBUG_AGENT_INIT_PREMEM_SEC) {
