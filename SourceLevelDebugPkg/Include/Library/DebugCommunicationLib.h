@@ -20,10 +20,10 @@ typedef VOID *    DEBUG_PORT_HANDLE;
 /**
   Caller provided function to be invoked at the end of DebugPortInitialize().
 
-  Refer to the descrption for DebugPortInitialize() for more details.
+  Refer to the description for DebugPortInitialize() for more details.
 
   @param[in] Context           The first input argument of DebugPortInitialize().
-  @param[in] DebugPortHandle   Debug port handle created by Debug Communication Libary.
+  @param[in] DebugPortHandle   Debug port handle created by Debug Communication Library.
 
 **/
 typedef
@@ -41,9 +41,9 @@ VOID
   stack, this function must work on the mode that doesn't return to the caller, then
   the caller needs to wrap up all rest of logic after DebugPortInitialize() into one
   function and pass it into DebugPortInitialize(). DebugPortInitialize() is
-  responsible to invoke the passing-in funciton at the end of DebugPortInitialize().
+  responsible to invoke the passing-in function at the end of DebugPortInitialize().
 
-  If the paramter Function is not NULL, Debug Communication Libary instance will
+  If the parameter Function is not NULL, Debug Communication Library instance will
   invoke it by passing in the Context to be the first parameter. Debug Communication
   Library instance could create one debug port handle to be the second parameter
   passing into the Function. Debug Communication Library instance also could pass

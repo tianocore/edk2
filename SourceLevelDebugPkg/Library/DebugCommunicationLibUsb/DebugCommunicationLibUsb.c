@@ -511,7 +511,7 @@ UsbDebugPortControlTransfer (
   Check if it needs to re-initialize usb debug port hardware.
 
   During different phases switch, such as SEC to PEI or PEI to DXE or DXE to SMM, we should check
-  whether the usb debug port hardware configuration is changed. Such case can be triggerred by
+  whether the usb debug port hardware configuration is changed. Such case can be triggered by
   Pci bus resource allocation and so on.
 
   @param  Handle           Debug port handle.
@@ -1007,7 +1007,7 @@ DebugPortPollBuffer (
 /**
   Initialize the debug port.
 
-  If Function is not NULL, Debug Communication Libary will call this function
+  If Function is not NULL, Debug Communication Library will call this function
   by passing in the Context to be the first parameter. If needed, Debug Communication
   Library will create one debug port handle to be the second argument passing in
   calling the Function, otherwise it will pass NULL to be the second argument of

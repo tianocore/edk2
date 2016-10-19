@@ -30,10 +30,10 @@ typedef struct {
 /**
   Caller provided function to be invoked at the end of DebugPortInitialize().
 
-  Refer to the descrption for DebugPortInitialize() for more details.
+  Refer to the description for DebugPortInitialize() for more details.
 
   @param[in] Context           The first input argument of DebugPortInitialize().
-  @param[in] DebugPortHandle   Debug port handle created by Debug Communication Libary.
+  @param[in] DebugPortHandle   Debug port handle created by Debug Communication Library.
 
 **/
 VOID
