@@ -16,7 +16,7 @@
 
 /**
 
-  This funciton will switch the current stack to the previous saved stack.
+  This function will switch the current stack to the previous saved stack.
   Before calling the previous stack has to be set in  FSP_GLOBAL_DATA.CoreStack.
                     EIP
                     FLAGS  16 bit  FLAGS  16 bit
