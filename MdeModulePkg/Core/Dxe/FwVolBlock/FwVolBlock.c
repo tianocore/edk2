@@ -234,7 +234,7 @@ FwVolBlockReadBlock (
 
   if (Offset > FvbDevice->LbaCache[LbaIndex].Length) {
     //
-    // all exceed boundry, read nothing.
+    // all exceed boundary, read nothing.
     //
     *NumBytes = 0;
     return EFI_BAD_BUFFER_SIZE;
@@ -243,7 +243,7 @@ FwVolBlockReadBlock (
   NumOfBytesRead = *NumBytes;
   if (Offset + NumOfBytesRead > FvbDevice->LbaCache[LbaIndex].Length) {
     //
-    // partial exceed boundry, read data from current postion to end.
+    // partial exceed boundary, read data from current postion to end.
     //
     NumOfBytesRead = FvbDevice->LbaCache[LbaIndex].Length - Offset;
   }

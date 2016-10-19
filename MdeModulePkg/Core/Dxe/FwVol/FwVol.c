@@ -554,7 +554,7 @@ FvCheck (
         DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &CacheFfsHeader->Name));
         FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
         //
-        // Adjust pointer to the next 8-byte aligned boundry.
+        // Adjust pointer to the next 8-byte aligned boundary.
         //
         FfsHeader = (EFI_FFS_FILE_HEADER *) (((UINTN) FfsHeader + 7) & ~0x07);
         continue;
@@ -589,7 +589,7 @@ FvCheck (
     }
 
     //
-    // Adjust pointer to the next 8-byte aligned boundry.
+    // Adjust pointer to the next 8-byte aligned boundary.
     //
     FfsHeader = (EFI_FFS_FILE_HEADER *)(((UINTN)FfsHeader + 7) & ~0x07);
 

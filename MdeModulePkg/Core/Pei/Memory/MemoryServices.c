@@ -222,7 +222,7 @@ PeiAllocatePages (
 
 /**
 
-  Pool allocation service. Before permenent memory is discoveried, the pool will 
+  Pool allocation service. Before permanent memory is discoveried, the pool will
   be allocated the heap in the temporary memory. Genenrally, the size of heap in temporary 
   memory does not exceed to 64K, so the biggest pool size could be allocated is 
   64K.

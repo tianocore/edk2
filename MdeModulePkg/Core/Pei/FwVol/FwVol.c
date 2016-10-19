@@ -2019,7 +2019,7 @@ FindNextCoreFvHandle (
 /**
   After PeiCore image is shadowed into permanent memory, all build-in FvPpi should
   be re-installed with the instance in permanent memory and all cached FvPpi pointers in 
-  PrivateData->Fv[] array should be fixed up to be pointed to the one in permenant
+  PrivateData->Fv[] array should be fixed up to be pointed to the one in permanent
   memory.
   
   @param PrivateData   Pointer to PEI_CORE_INSTANCE.

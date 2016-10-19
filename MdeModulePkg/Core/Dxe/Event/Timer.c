@@ -187,7 +187,7 @@ CoreInitializeTimer (
 /**
   Called by the platform code to process a tick.
 
-  @param  Duration               The number of 100ns elasped since the last call
+  @param  Duration               The number of 100ns elapsed since the last call
                                  to TimerTick
 
 **/

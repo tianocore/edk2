@@ -218,7 +218,7 @@ PeiCore (
       SetPeiServicesTablePointer ((CONST EFI_PEI_SERVICES **)&OldCoreData->Ps);
 
       //
-      // Update HandOffHob for new installed permenent memory
+      // Update HandOffHob for new installed permanent memory
       //
       HandoffInformationTable = OldCoreData->HobList.HandoffInformationTable;
       if (OldCoreData->HeapOffsetPositive) {
@@ -238,7 +238,7 @@ PeiCore (
 
       //
       // After the whole temporary memory is migrated, then we can allocate page in
-      // permenent memory.
+      // permanent memory.
       //
       OldCoreData->PeiMemoryInstalled = TRUE;
 

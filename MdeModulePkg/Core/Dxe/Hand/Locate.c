@@ -640,7 +640,7 @@ Done:
   @retval EFI_NOT_FOUND          No handles match the search.
   @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
                                  matching results.
-  @retval EFI_INVALID_PARAMETER  One or more paramters are not valid.
+  @retval EFI_INVALID_PARAMETER  One or more parameters are not valid.
 
 **/
 EFI_STATUS

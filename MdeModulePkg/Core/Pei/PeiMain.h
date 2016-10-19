@@ -1119,7 +1119,7 @@ PeiRegisterForShadow (
   @param OldCoreData     Pointer to Old PeiCore's private data.
                          If NULL, PeiCore is entered at first time, stack/heap in temporary memory.
                          If not NULL, PeiCore is entered at second time, stack/heap has been moved
-                         to permenent memory.
+                         to permanent memory.
 
 **/
 VOID
@@ -1732,7 +1732,7 @@ extern EFI_PEI_PCI_CFG2_PPI gPeiDefaultPciCfg2Ppi;
 /**
   After PeiCore image is shadowed into permanent memory, all build-in FvPpi should
   be re-installed with the instance in permanent memory and all cached FvPpi pointers in 
-  PrivateData->Fv[] array should be fixed up to be pointed to the one in permenant
+  PrivateData->Fv[] array should be fixed up to be pointed to the one in permanent
   memory.
   
   @param PrivateData   Pointer to PEI_CORE_INSTANCE.

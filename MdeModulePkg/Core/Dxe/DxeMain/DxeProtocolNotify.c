@@ -76,7 +76,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY mMissingProtoc
 };
 
 /**
-  Return TRUE if all AP services are availible.
+  Return TRUE if all AP services are available.
 
   @retval EFI_SUCCESS    All AP services are available
   @retval EFI_NOT_FOUND  At least one AP service is not available

@@ -507,7 +507,7 @@ CoreLoadPeImage (
   }
 
   //
-  // Allocate memory of the correct memory type aligned on the required image boundry
+  // Allocate memory of the correct memory type aligned on the required image boundary
   //
   DstBufAlocated = FALSE;
   if (DstBuffer == 0) {
@@ -1857,7 +1857,7 @@ Done:
                                   unloaded.
 
   @retval EFI_SUCCESS             The image has been unloaded.
-  @retval EFI_UNSUPPORTED         The image has been sarted, and does not support
+  @retval EFI_UNSUPPORTED         The image has been started, and does not support
                                   unload.
   @retval EFI_INVALID_PARAMPETER  ImageHandle is not a valid image handle.
 

@@ -19,8 +19,8 @@
 #include "PiSmmCore.h"
 
 ///
-/// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependecy expression
-///                        to save time.  A EFI_DEP_PUSH is evauated one an
+/// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependency expression
+///                        to save time.  A EFI_DEP_PUSH is evaluated one an
 ///                        replaced with EFI_DEP_REPLACE_TRUE. If PI spec's Vol 2
 ///                        Driver Execution Environment Core Interface use 0xff
 ///                        as new DEPEX opcode. EFI_DEP_REPLACE_TRUE should be

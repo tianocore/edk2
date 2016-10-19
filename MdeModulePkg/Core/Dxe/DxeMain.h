@@ -109,8 +109,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 ///
-/// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependecy expression
-///                        to save time.  A EFI_DEP_PUSH is evauated one an
+/// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependency expression
+///                        to save time.  A EFI_DEP_PUSH is evaluated one an
 ///                        replaced with EFI_DEP_REPLACE_TRUE. If PI spec's Vol 2
 ///                        Driver Execution Environment Core Interface use 0xff
 ///                        as new DEPEX opcode. EFI_DEP_REPLACE_TRUE should be
@@ -141,7 +141,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #else
 ///
-/// For genric EFI machines make the default allocations 4K aligned
+/// For generic EFI machines make the default allocations 4K aligned
 ///
 #define EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT  (EFI_PAGE_SIZE)
 #define DEFAULT_PAGE_ALLOCATION                     (EFI_PAGE_SIZE)
@@ -246,9 +246,9 @@ typedef struct {
   UINTN                       ExitDataSize;   
   /// Pointer to exit data from started image
   VOID                        *ExitData;      
-  /// Pointer to pool allocation for context save/retore
+  /// Pointer to pool allocation for context save/restore
   VOID                        *JumpBuffer;    
-  /// Pointer to buffer for context save/retore
+  /// Pointer to buffer for context save/restore
   BASE_LIBRARY_JUMP_BUFFER    *JumpContext;  
   /// Machine type from PE image
   UINT16                      Machine;        
@@ -256,7 +256,7 @@ typedef struct {
   EFI_EBC_PROTOCOL            *Ebc;           
   /// Runtime image list
   EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   
-  /// Pointer to Loaded Image Device Path Protocl
+  /// Pointer to Loaded Image Device Path Protocol
   EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  
   /// PeCoffLoader ImageContext
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; 
@@ -445,7 +445,7 @@ CoreNotifyOnProtocolInstallation (
 
 
 /**
-  Return TRUE if all AP services are availible.
+  Return TRUE if all AP services are available.
 
   @retval EFI_SUCCESS    All AP services are available
   @retval EFI_NOT_FOUND  At least one AP service is not available
@@ -473,7 +473,7 @@ CalculateEfiHdrCrc (
 /**
   Called by the platform code to process a tick.
 
-  @param  Duration               The number of 100ns elasped since the last call
+  @param  Duration               The number of 100ns elapsed since the last call
                                  to TimerTick
 
 **/
@@ -1097,7 +1097,7 @@ CoreLocateDevicePath (
   @retval EFI_NOT_FOUND          No handles match the search.
   @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
                                  matching results.
-  @retval EFI_INVALID_PARAMETER  One or more paramters are not valid.
+  @retval EFI_INVALID_PARAMETER  One or more parameters are not valid.
 
 **/
 EFI_STATUS
@@ -1458,7 +1458,7 @@ CoreLoadImage (
                                   unloaded.
 
   @retval EFI_SUCCESS             The image has been unloaded.
-  @retval EFI_UNSUPPORTED         The image has been sarted, and does not support
+  @retval EFI_UNSUPPORTED         The image has been started, and does not support
                                   unload.
   @retval EFI_INVALID_PARAMPETER  ImageHandle is not a valid image handle.
 

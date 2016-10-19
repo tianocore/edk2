@@ -204,7 +204,7 @@ CoreAddRange (
   // If we are in EFI 1.10 compatability mode no event groups will be
   // found and nothing will happen we we call this function. These events
   // will get signaled but since a lock is held around the call to this
-  // function the notificaiton events will only be called after this funciton
+  // function the notificaiton events will only be called after this function
   // returns and the lock is released.
   //
   CoreNotifySignalList (&gEfiEventMemoryMapChangeGuid);
