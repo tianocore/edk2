@@ -127,7 +127,9 @@ BOpt_DestroyMenuEntry (
     FileContext = (BM_FILE_CONTEXT *) MenuEntry->VariableContext;
 
     if (!FileContext->IsRoot) {
-      FreePool (FileContext->DevicePath);
+      if (FileContext->DevicePath != NULL) {
+        FreePool (FileContext->DevicePath);
+      }
     } else {
       if (FileContext->FHandle != NULL) {
         FileContext->FHandle->Close (FileContext->FHandle);
@@ -164,7 +166,9 @@ BOpt_DestroyMenuEntry (
     break;
   }
 
-  FreePool (MenuEntry->DisplayString);
+  if (MenuEntry->DisplayString != NULL) {
+    FreePool (MenuEntry->DisplayString);
+  }
   if (MenuEntry->HelpString != NULL) {
     FreePool (MenuEntry->HelpString);
   }
