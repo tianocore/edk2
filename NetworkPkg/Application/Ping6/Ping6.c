@@ -1103,7 +1103,7 @@ InitializePing6 (
   BufferSize = 16;
 
   //
-  // Parse the paramter of count number.
+  // Parse the parameter of count number.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"-n");
   ValueStrPtr = ValueStr;
@@ -1120,7 +1120,7 @@ InitializePing6 (
     }
   }
   //
-  // Parse the paramter of buffer size.
+  // Parse the parameter of buffer size.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"-l");
   ValueStrPtr = ValueStr;
@@ -1141,7 +1141,7 @@ InitializePing6 (
   ZeroMem (&DstAddress, sizeof (EFI_IPv6_ADDRESS));
 
   //
-  // Parse the paramter of source ip address.
+  // Parse the parameter of source ip address.
   //
   ValueStr = ShellCommandLineGetValue (ParamPackage, L"-s");
   ValueStrPtr = ValueStr;
@@ -1155,7 +1155,7 @@ InitializePing6 (
     }
   }
   //
-  // Parse the paramter of destination ip address.
+  // Parse the parameter of destination ip address.
   //
   NonOptionCount = ShellCommandLineGetCount(ParamPackage);
   ValueStr = ShellCommandLineGetRawValue (ParamPackage, (UINT32)(NonOptionCount-1));

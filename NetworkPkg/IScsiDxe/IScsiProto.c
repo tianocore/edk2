@@ -786,7 +786,7 @@ IScsiPrepareLoginReq (
 
   case ISCSI_LOGIN_OPERATIONAL_NEGOTIATION:
     //
-    // Only negotiate the paramter once.
+    // Only negotiate the parameter once.
     //
     if (!Conn->ParamNegotiated) {
       IScsiFillOpParams (Conn, Nbuf);
@@ -2117,7 +2117,7 @@ IScsiNewDataSegment (
 
   @param[in]  Packet The EXT SCSI PASS THRU request packet containing the SCSI command.
   @param[in]  Lun    The LUN.
-  @param[in]  Tcb    The tcb assocated with this SCSI command.
+  @param[in]  Tcb    The tcb associated with this SCSI command.
 
   @return The  created iSCSI SCSI command PDU.
   @retval NULL Other errors as indicated.

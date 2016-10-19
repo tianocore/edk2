@@ -23,7 +23,7 @@ UINT32 mIp6Id;
 
   @param[in]       IpSb             Points to an IP6 service binding instance.
   @param[out]      SourceList       The list entry head of all source addresses.
-                                    It is the caller's responsiblity to free the
+                                    It is the caller's responsibility to free the
                                     resources.
   @param[out]      SourceCount      The number of source addresses.
 
@@ -364,7 +364,7 @@ Ip6SysPacketSent (
   @param[in]  LastHeader       The pointer of next header of last extension header.
   @param[in]  HeadLen          The length of the unfragmented part of the IP6 header.
 
-  @retval EFI_BAD_BUFFER_SIZE  There is no enought room in the head space of
+  @retval EFI_BAD_BUFFER_SIZE  There is no enough room in the head space of
                                Packet.
   @retval EFI_SUCCESS          The operation performed successfully.
 
@@ -726,7 +726,7 @@ Ip6Output (
       }
 
       //
-      // Send out multicast neighbor solicitation for address resolution immediatly.
+      // Send out multicast neighbor solicitation for address resolution immediately.
       //
       Ip6CreateSNMulticastAddr (&NeighborCache->Neighbor, &Destination);
       Status = Ip6SelectSourceAddress (IpSb, &NeighborCache->Neighbor, &Source);
@@ -809,7 +809,7 @@ Ip6Output (
   //
   // OK, selected the source and route, fragment the packet then send
   // them. Tag each fragment other than the first one as spawn from it.
-  // Each extension header is an integar multiple of 8 octets long, in
+  // Each extension header is an integer multiple of 8 octets long, in
   // order to retain 8-octet alignment for subsequent headers.
   //
   Mtu     = IpSb->MaxPacketSize + sizeof (EFI_IP6_HEADER);

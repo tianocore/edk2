@@ -121,7 +121,7 @@ Ip6ConfigOnPolicyChanged (
 
   if (NewPolicy == Ip6ConfigPolicyAutomatic) {
     //
-    // Set paramters to trigger router solicitation sending in timer handler.
+    // Set parameters to trigger router solicitation sending in timer handler.
     //
     IpSb->RouterAdvertiseReceived = FALSE;
     IpSb->SolicitTimer            = IP6_MAX_RTR_SOLICITATIONS;

@@ -104,7 +104,7 @@ BOOLEAN
   );
 
 /**
-  Prototype of HMAC finallization.
+  Prototype of HMAC finalization.
   Terminate a HMAC message digest operation and output the message digest.
 
   If Context is NULL, then ASSERT().
@@ -139,7 +139,7 @@ UINTN
 
 /**
   Prototype of Block Cipher initiation.
-  Intializes the user-supplied key as the specifed context (key materials) for both
+  Initializes the user-supplied key as the specified context (key materials) for both
   encryption and decryption operations.
 
   If Context is NULL, then ASSERT().
@@ -165,7 +165,7 @@ BOOLEAN
   Encrypts plaintext message with the specified cipher.
 
   If Context is NULL, then ASSERT().
-  if InData is NULL, then ASSERT().
+  If InData is NULL, then ASSERT().
   If Size of input data is not multiple of Cipher algorithm related block size,
   then ASSERT().
 
@@ -193,7 +193,7 @@ BOOLEAN
   Decrypts cipher message with specified cipher.
 
   If Context is NULL, then ASSERT().
-  if InData is NULL, then ASSERT().
+  If InData is NULL, then ASSERT().
   If Size of input data is not a multiple of a certaion block size , then ASSERT().
 
   @param[in]      Context      The specified Context.
@@ -256,7 +256,7 @@ BOOLEAN
 
   This function performs digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  Context should be already correctly intialized by HashInit(), and should not be finalized
+  Context should be already correctly initialized by HashInit(), and should not be finalized
   by HashFinal(). Behavior with invalid context is undefined.
 
   If Context is NULL, then ASSERT().
@@ -285,7 +285,7 @@ BOOLEAN
   This function completes hash computation and retrieves the digest value into
   the specified memory. After this function has been called, the context cannot
   be used again.
-  context should be already correctly intialized by HashInit(), and should not be
+  context should be already correctly initialized by HashInit(), and should not be
   finalized by HashFinal(). Behavior with invalid context is undefined.
 
   If Context is NULL, then ASSERT().
@@ -339,13 +339,13 @@ typedef struct _ENCRYPT_ALGORITHM {
   //
   CRYPTO_CIPHER_ENCRYPT        CipherEncrypt;
   //
-  // The Function pointer of Cipher Decrption.
+  // The Function pointer of Cipher Decryption.
   //
   CRYPTO_CIPHER_DECRYPT        CipherDecrypt;
 } ENCRYPT_ALGORITHM;
 
 //
-// The struct used to store the information and operation of Autahentication algorithm.
+// The struct used to store the information and operation of Authentication algorithm.
 //
 typedef struct _AUTH_ALGORITHM {
   //
@@ -383,7 +383,7 @@ typedef struct _AUTH_ALGORITHM {
 } AUTH_ALGORITHM;
 
 //
-// The struct used to store the informatino and operation of Hash algorithm.
+// The struct used to store the information and operation of Hash algorithm.
 //
 typedef struct _HASH_ALGORITHM {
   //
@@ -421,7 +421,7 @@ typedef struct _HASH_ALGORITHM {
 } HASH_ALGORITHM;
 
 /**
-  Get the IV size of specified encryption alogrithm.
+  Get the IV size of specified encryption algorithm.
 
   @param[in]  AlgorithmId          The encryption algorithm ID.
 
@@ -434,7 +434,7 @@ IpSecGetEncryptIvLength (
   );
 
 /**
-  Get the block size of specified encryption alogrithm.
+  Get the block size of specified encryption algorithm.
 
   @param[in]  AlgorithmId          The encryption algorithm ID.
 
@@ -447,7 +447,7 @@ IpSecGetEncryptBlockSize (
   );
 
 /**
-  Get the required key length of the specified encryption alogrithm.
+  Get the required key length of the specified encryption algorithm.
 
   @param[in]  AlgorithmId          The encryption algorithm ID.
 
@@ -460,7 +460,7 @@ IpSecGetEncryptKeyLength (
   );
 
 /**
-  Get the ICV size of the specified Authenticaion alogrithm.
+  Get the ICV size of the specified Authentication algorithm.
 
   @param[in]  AlgorithmId          The Authentication algorithm ID.
 
@@ -475,7 +475,7 @@ IpSecGetIcvLength (
 /**
   Get the HMAC digest length by the specified Algorithm ID.
 
-  @param[in]  AlgorithmId  The specified Alogrithm ID.
+  @param[in]  AlgorithmId  The specified Algorithm ID.
 
   @return The digest length of the specified Authentication Algorithm ID.
 
@@ -505,14 +505,14 @@ IpSecGenerateIv (
   Encrypt the buffer.
 
   This function calls relevant encryption interface from CryptoLib according to
-  the input alogrithm ID. The InData should be multiple of block size. This function
+  the input algorithm ID. The InData should be multiple of block size. This function
   doesn't perform the padding. If it has the Ivec data, the length of it should be
   same with the block size. The block size is different from the different algorithm.
 
-  @param[in]       AlgorithmId    The Alogrithem identification defined in RFC.
+  @param[in]       AlgorithmId    The Algorithm identification defined in RFC.
   @param[in]       Key            Pointer to the buffer containing encrypting key.
   @param[in]       KeyBits        The length of the key in bits.
-  @param[in]       Ivec           Point to the buffer containning the Initializeion
+  @param[in]       Ivec           Point to the buffer containing the Initialization
                                   Vector (IV) data.
   @param[in]       InData         Point to the buffer containing the data to be
                                   encrypted.
@@ -540,14 +540,14 @@ IpSecCryptoIoEncrypt (
   Decrypts the buffer.
 
   This function calls relevant Decryption interface from CryptoLib according to
-  the input alogrithm ID. The InData should be multiple of block size. This function
+  the input algorithm ID. The InData should be multiple of block size. This function
   doesn't perform the padding. If it has the Ivec data, the length of it should be
   same with the block size. The block size is different from the different algorithm.
 
-  @param[in]       AlgorithmId    The Alogrithem identification defined in RFC.
+  @param[in]       AlgorithmId    The Algorithm identification defined in RFC.
   @param[in]       Key            Pointer to the buffer containing encrypting key.
   @param[in]       KeyBits        The length of the key in bits.
-  @param[in]       Ivec           Point to the buffer containning the Initializeion
+  @param[in]       Ivec           Point to the buffer containing the Initialization
                                   Vector (IV) data.
   @param[in]       InData         Point to the buffer containing the data to be
                                   decrypted.
@@ -575,9 +575,9 @@ IpSecCryptoIoDecrypt (
   Digests the Payload with key and store the result into the OutData.
 
   This function calls relevant Hmac interface from CryptoLib according to
-  the input alogrithm ID. It computes all datas from InDataFragment and output
+  the input algorithm ID. It computes all datas from InDataFragment and output
   the result into the OutData buffer. If the OutDataSize is larger than the related
-  HMAC alogrithm output size, return EFI_INVALID_PARAMETER.
+  HMAC algorithm output size, return EFI_INVALID_PARAMETER.
   
   @param[in]      AlgorithmId     The authentication Identification.
   @param[in]      Key             Pointer of the authentication key.
@@ -609,9 +609,9 @@ IpSecCryptoIoHmac (
   Digests the Payload and store the result into the OutData.
 
   This function calls relevant Hash interface from CryptoLib according to
-  the input alogrithm ID. It computes all datas from InDataFragment and output
+  the input algorithm ID. It computes all datas from InDataFragment and output
   the result into the OutData buffer. If the OutDataSize is larger than the related
-  Hash alogrithm output size, return EFI_INVALID_PARAMETER.
+  Hash algorithm output size, return EFI_INVALID_PARAMETER.
 
   @param[in]      AlgorithmId     The authentication Identification.
   @param[in]      InDataFragment  A list contains all data to be authenticated.
@@ -640,14 +640,14 @@ IpSecCryptoIoHash (
   Generates the Diffie-Hellman public key.
 
   This function first initiate a DHContext, then call the DhSetParameter() to set
-  the prime and primelenght, at end call the DhGenerateKey() to generates random
+  the prime and primelength, at end call the DhGenerateKey() to generates random
   secret exponent, and computes the public key. The output returned via parameter
   PublicKey and PublicKeySize. DH context is updated accordingly. If the PublicKey
   buffer is too small to hold the public key, EFI_INVALID_PARAMETER is returned
   and PublicKeySize is set to the required buffer size to obtain the public key.
 
   @param[in, out] DhContext       Pointer to the DH context.
-  @param[in]      Generator       Vlaue of generator.
+  @param[in]      Generator       Value of generator.
   @param[in]      PrimeLength     Length in bits of prime to be generated.
   @param[in]      Prime           Pointer to the buffer to receive the generated
                                   prime number.
@@ -656,7 +656,7 @@ IpSecCryptoIoHash (
                                   For out, the size of data returned in PublicKey
                                   buffer in bytes.
 
-  @retval EFI_SUCCESS             The operation perfoms successfully.
+  @retval EFI_SUCCESS             The operation performs successfully.
   @retval Otherwise               The operation is failed.
 
 **/
@@ -684,7 +684,7 @@ IpSecCryptoIoDhGetPublicKey (
                                     For out, the size of data returned in Key
                                     buffer in bytes.
 
-  @retval EFI_SUCCESS              The operation perfoms successfully.
+  @retval EFI_SUCCESS              The operation performs successfully.
   @retval Otherwise                The operation is failed.
 
 **/
@@ -702,7 +702,7 @@ IpSecCryptoIoDhComputeKey (
 
   @param[in, out]     DhContext         Pointer to the DH context to be freed.
 
-  @retval EFI_SUCCESS              The operation perfoms successfully.
+  @retval EFI_SUCCESS              The operation performs successfully.
   @retval EFI_INVALID_PARAMETER    The DhContext is NULL.
   
 **/
@@ -717,9 +717,9 @@ IpSecCryptoIoFreeDh (
   If the Random Generator wasn't initiated, initiate it first, then call RandomBytes.
 
   @param[out]  OutBuffer        Pointer to buffer to receive random value.
-  @param[in]   Bytes            Size of randome bytes to generate.
+  @param[in]   Bytes            Size of random bytes to generate.
 
-  @retval EFI_SUCCESS              The operation perfoms successfully.
+  @retval EFI_SUCCESS              The operation performs successfully.
   @retval Otherwise                The operation is failed.
 
 **/
@@ -762,9 +762,9 @@ IpSecCryptoIoAuthDataWithCertificate (
   @param[in]     CertLen         The size of Certificate in bytes.
   @param[in]     InCa            Pointer to the CA certificate
   @param[in]     CaLen           The size of CA certificate in bytes.
-  @param[in]     InData          Pointer to octect message hash to be checked.
+  @param[in]     InData          Pointer to octet message hash to be checked.
   @param[in]     InDataSize      Size of the message hash in bytes.
-  @param[in]     Singnature      The pointer to the RSA PKCS1-V1_5 signature to be verifed.
+  @param[in]     Singnature      The pointer to the RSA PKCS1-V1_5 signature to be verified.
   @param[in]     SigSize         Size of signature in bytes.
 
   @retval  TRUE   Valid signature encoded in PKCS1-v1_5.
