@@ -39,7 +39,7 @@ UINT64  mIdtEntryTemplate = 0xffff8e000008ffe4ULL;
 
 
   @param[in] SizeOfRam          Size of the temporary memory available for use.
-  @param[in] TempRamBase        Base address of tempory ram
+  @param[in] TempRamBase        Base address of temporary ram
   @param[in] BootFirmwareVolume Base address of the Boot Firmware Volume.
   @param[in] PeiCore            PeiCore entry point.
   @param[in] BootLoaderStack    BootLoader stack.
@@ -200,8 +200,8 @@ SecTemporaryRamSupport (
 
   //
   // SecSwitchStack function must be invoked after the memory migration
-  // immediatly, also we need fixup the stack change caused by new call into
-  // permenent memory.
+  // immediately, also we need fixup the stack change caused by new call into
+  // permanent memory.
   //
   SecSwitchStack (
     (UINT32) (UINTN) OldStack,

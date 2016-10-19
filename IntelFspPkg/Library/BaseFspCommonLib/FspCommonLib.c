@@ -89,9 +89,9 @@ GetFspGlobalDataPointer (
 }
 
 /**
-  This function gets back the FSP API paramter passed by the bootlaoder.
+  This function gets back the FSP API parameter passed by the bootlaoder.
 
-  @retval ApiParameter FSP API paramter passed by the bootlaoder.
+  @retval ApiParameter FSP API parameter passed by the bootlaoder.
 **/
 UINT32
 EFIAPI
@@ -106,7 +106,7 @@ GetFspApiParameter (
 }
 
 /**
-  This function sets the FSP API paramter in the stack.
+  This function sets the FSP API parameter in the stack.
 
    @param[in] Value       New parameter value.
 
