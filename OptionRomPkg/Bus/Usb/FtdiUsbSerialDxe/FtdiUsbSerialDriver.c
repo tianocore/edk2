@@ -1370,7 +1370,7 @@ GetControlBitsInternal (
 /**
   Resets the USB Serial Device
 
-  This function is the internal method for reseting the device and is called by
+  This function is the internal method for resetting the device and is called by
   SerialReset()
 
   @param  UsbSerialDevice[in]  A pointer to the USB Serial device

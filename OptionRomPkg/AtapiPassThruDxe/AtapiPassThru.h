@@ -1119,11 +1119,11 @@ RequestSenseCommand (
 
 Routine Description:
 
-  Sumbit request sense command
+  Submit request sense command
 
 Arguments:
 
-  AtapiScsiPrivate  - The pionter of ATAPI_SCSI_PASS_THRU_DEV
+  AtapiScsiPrivate  - The pointer of ATAPI_SCSI_PASS_THRU_DEV
   Target            - The target ID
   Timeout           - The time to complete the command
   SenseData         - The buffer to fill in sense data
