@@ -53,7 +53,7 @@ ExtractGuidedSectionRegisterHandlers (
   PRE_PI_EXTRACT_GUIDED_SECTION_DATA  *SavedData;
   UINT32                              Index;
   //
-  // Check input paramter.
+  // Check input parameter.
   //
   if (SectionGuid == NULL) {
     return RETURN_INVALID_PARAMETER;

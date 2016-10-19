@@ -94,8 +94,8 @@ GdbSerialInit (
   Check to see if a character is available from GDB. Do not read the character as that is
   done via GdbGetChar().
 
-  @return TRUE  - Character availible
-  @return FALSE - Character not availible
+  @return TRUE  - Character available
+  @return FALSE - Character not available
 
 **/
 BOOLEAN

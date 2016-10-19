@@ -325,7 +325,7 @@ SendPacket (
   $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
   the packet teminating character '#' and the two digit checksum.
 
-  If host re-starts sending a packet without ending the previous packet, only the last valid packet is proccessed.
+  If host re-starts sending a packet without ending the previous packet, only the last valid packet is processed.
   (In other words, if received packet is '$12345$12345$123456#checksum', only '$123456#checksum' will be processed.)
 
   If an ack '+' is not sent resend the packet

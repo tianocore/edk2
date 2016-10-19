@@ -120,7 +120,7 @@ Returns:
   }
 
   //
-  //Assume that capsules have the same flags on reseting or not.
+  //Assume that capsules have the same flags on resetting or not.
   //
   CapsuleHeader = CapsuleHeaderArray[0];
 
@@ -253,7 +253,7 @@ Returns:
 
   SupportCapsuleSize(&MaxSizePopulate,&MaxSizeNonPopulate);
   //
-  //Assume that capsules have the same flags on reseting or not.
+  //Assume that capsules have the same flags on resetting or not.
   //
   CapsuleHeader = CapsuleHeaderArray[0];
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {

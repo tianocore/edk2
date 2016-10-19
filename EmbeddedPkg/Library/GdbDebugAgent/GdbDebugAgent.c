@@ -93,7 +93,7 @@ gXferObjectReadResponse (
   1) Length will generally be max remote packet size (big enough)
   2) First Offset of an XML document read needs to be 0
   3) This code will return back small chunks of the XML document on every read.
-     Each subseqent call will ask for the next availble part of the document.
+     Each subseqent call will ask for the next available part of the document.
 
   Note: The only variable size element in the XML is:
   "  <library name=\"%s\"><segment address=\"%p\"/></library>\n" and it is
@@ -257,7 +257,7 @@ SendPacket (
   $PacketData#checksum PacketData is passed in and this function adds the packet prefix '$',
   the packet teminating character '#' and the two digit checksum.
 
-  If host re-starts sending a packet without ending the previous packet, only the last valid packet is proccessed.
+  If host re-starts sending a packet without ending the previous packet, only the last valid packet is processed.
   (In other words, if received packet is '$12345$12345$123456#checksum', only '$123456#checksum' will be processed.)
 
   If an ack '+' is not sent resend the packet

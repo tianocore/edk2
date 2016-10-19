@@ -1516,7 +1516,7 @@ SnpReceive (
     }
 
     //
-    // Restart the receiver and the transmitter without reseting the FIFOs
+    // Restart the receiver and the transmitter without resetting the FIFOs
     // as it has been done by SoftReset().
     //
     StartRx (0, Snp);
