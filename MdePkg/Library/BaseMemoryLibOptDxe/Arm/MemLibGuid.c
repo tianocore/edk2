@@ -15,6 +15,19 @@
 
 #include "MemLibInternals.h"
 
+/**
+  Internal function to compare two GUIDs.
+
+  This function compares Guid1 to Guid2.  If the GUIDs are identical then TRUE is returned.
+  If there are any bit differences in the two GUIDs, then FALSE is returned.
+
+  @param  Guid1       A pointer to a 128 bit GUID.
+  @param  Guid2       A pointer to a 128 bit GUID.
+
+  @retval TRUE        Guid1 and Guid2 are identical.
+  @retval FALSE       Guid1 and Guid2 are not identical.
+
+**/
 BOOLEAN
 EFIAPI
 InternalMemCompareGuid (
