@@ -1,5 +1,6 @@
 #
 # Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -22,12 +23,21 @@
 # Please reference edk2 user manual for more detail descriptions at https://github.com/tianocore-docs/Docs/raw/master/User_Docs/EDK_II_UserManual_0_7.pdf
 #
 
+SCRIPTNAME="edksetup.sh"
+
 function HelpMsg()
 {
+  echo "Usage: $SCRIPTNAME [Options]"
+  echo
+  echo "The system environment variable, WORKSPACE, is always set to the current"
+  echo "working directory."
+  echo
+  echo "Options: "
+  echo "  --help, -h, -?        Print this help screen and exit."
+  echo
   echo Please note: This script must be \'sourced\' so the environment can be changed.
-  echo ". edksetup.sh" 
-  echo "source edksetup.sh"
-  return 1
+  echo ". $SCRIPTNAME"
+  echo "source $SCRIPTNAME"
 }
 
 function SetWorkspace()
@@ -71,10 +81,10 @@ function SetupEnv()
 {
   if [ -n "$EDK_TOOLS_PATH" ]
   then
-    . $EDK_TOOLS_PATH/BuildEnv $*
+    . $EDK_TOOLS_PATH/BuildEnv
   elif [ -f "$WORKSPACE/BaseTools/BuildEnv" ]
   then
-    . $WORKSPACE/BaseTools/BuildEnv $*
+    . $WORKSPACE/BaseTools/BuildEnv
   elif [ -n "$PACKAGES_PATH" ]
   then 
     PATH_LIST=$PACKAGES_PATH
@@ -84,7 +94,7 @@ function SetupEnv()
       if [ -f "$DIR/BaseTools/BuildEnv" ]
       then
         export EDK_TOOLS_PATH=$DIR/BaseTools
-        . $DIR/BaseTools/BuildEnv $*
+        . $DIR/BaseTools/BuildEnv
         break
       fi
     done
@@ -99,32 +109,31 @@ function SetupEnv()
 
 function SourceEnv()
 {
-  if [ \
-       "$1" = "-?" -o \
-       "$1" = "-h" -o \
-       "$1" = "--help" \
-     ]
-  then
-    HelpMsg
-  else
-    SetWorkspace &&
-    SetupEnv "$*"
-  fi
+  SetWorkspace &&
+  SetupEnv
 }
 
-if [ $# -gt 1 ]
+I=$#
+while [ $I -gt 0 ]
+do
+  case "$1" in
+    BaseTools)
+      # Ignore argument for backwards compatibility
+      shift
+    ;;
+    -?|-h|--help|*)
+      HelpMsg
+      break
+    ;;
+  esac
+  I=$(($I - 1))
+done
+
+if [ $I -gt 0 ]
 then
-  HelpMsg
-elif [ $# -eq 1 ] && [ "$1" != "BaseTools" ]
-then
-  HelpMsg
+  return 1
 fi
 
-RETVAL=$?
-if [ $RETVAL -ne 0 ]
-then
-  return $RETVAL
-fi
+SourceEnv
 
-SourceEnv "$*"
-
+return $?
