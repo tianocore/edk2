@@ -997,3 +997,12 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxRepairCount_PROMPT  #language en-US "MAX repair count"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxRepairCount_HELP  #language en-US "This PCD defines the MAX repair count. The default value is 0 that means infinite.<BR>"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPciDegradeResourceForOptionRom_PROMPT  #language en-US "Degrade 64-bit PCI MMIO BARs for legacy BIOS option ROMs"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPciDegradeResourceForOptionRom_HELP  #language en-US "Indicates whether 64-bit PCI MMIO BARs should degrade to 32-bit in the presence of an option ROM.<BR>"
+                                                                                                   "On X64 platforms, Option ROMs may contain code that executes in the context of a legacy BIOS (CSM),"
+                                                                                                   "which requires that all PCI MMIO BARs are located below 4 GB.<BR>"
+                                                                                                   "TRUE  - All PCI MMIO BARs of a device will be located below 4 GB if it has an option ROM.<BR>"
+                                                                                                   "FALSE - PCI MMIO BARs of a device may be located above 4 GB even if it has an option ROM.<BR>"
+
