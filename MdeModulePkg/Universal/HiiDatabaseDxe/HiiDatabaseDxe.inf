@@ -88,8 +88,8 @@
   ## CONSUMES  ## Event
   ## PRODUCES  ## Event
   gEfiHiiKeyBoardLayoutGuid
-  gEfiHiiImageDecoderNameJpegGuid |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES
-  gEfiHiiImageDecoderNamePngGuid  |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES
+  gEfiHiiImageDecoderNameJpegGuid |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES ## GUID
+  gEfiHiiImageDecoderNamePngGuid  |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES ## GUID
 
 [Depex]
   TRUE
