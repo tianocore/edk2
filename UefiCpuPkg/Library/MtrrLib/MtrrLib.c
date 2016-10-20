@@ -606,7 +606,7 @@ MtrrGetMemoryAttributeInVariableMtrrWorker (
   @param[in]   MtrrValidAddressMask  The valid address mask for MTRR
   @param[out]  VariableMtrr          The array to shadow variable MTRRs content
 
-  @return                       The return value of this paramter indicates the
+  @return                       The return value of this parameter indicates the
                                 number of MTRRs which has been used.
 
 **/

@@ -65,7 +65,7 @@ CommonExceptionHandlerWorker (
       //
       if (ReservedVectors[ExceptionType].ApicId == GetApicId ()) {
         //
-        // Old IDT handler has been executed, then retore CPU exception content to
+        // Old IDT handler has been executed, then restore CPU exception content to
         // run new exception handler.
         //
         ArchRestoreExceptionContext (ExceptionType, SystemContext);

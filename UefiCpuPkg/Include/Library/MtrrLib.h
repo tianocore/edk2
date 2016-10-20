@@ -306,7 +306,7 @@ MtrrSetAllMtrrs (
                                     MtrrValidBitsMask & 0xfffffffffffff000ULL
   @param[out]  VariableMtrr         The array to shadow variable MTRRs content
 
-  @return                       The ruturn value of this paramter indicates the number of
+  @return                       The return value of this parameter indicates the number of
                                 MTRRs which has been used.
 **/
 UINT32

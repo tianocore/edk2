@@ -1,7 +1,7 @@
 /** @file
   This module produces the EFI_PEI_S3_RESUME2_PPI.
   This module works with StandAloneBootScriptExecutor to S3 resume to OS.
-  This module will excute the boot script saved during last boot and after that,
+  This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
@@ -294,7 +294,7 @@ WriteToOsS3PerformanceData (
   UINT64                                        Freq;
 
   //
-  // Retrive time stamp count as early as possilbe
+  // Retrieve time stamp count as early as possible
   //
   Ticker = GetPerformanceCounter ();
 
@@ -612,12 +612,12 @@ RestoreS3PageTables (
     // NOTE: We have to ASSUME the page table generation format, because we do not know whole page table information.
     // The whole page table is too large to be saved in SMRAM.
     //
-    // The assumption is : whole page table is allocated in CONTINOUS memory and CR3 points to TOP page.
+    // The assumption is : whole page table is allocated in CONTINUOUS memory and CR3 points to TOP page.
     //
     DEBUG ((EFI_D_ERROR, "S3NvsPageTableAddress - %x (%x)\n", (UINTN)S3NvsPageTableAddress, (UINTN)Build4GPageTableOnly));
 
     //
-    // By architecture only one PageMapLevel4 exists - so lets allocate storgage for it.
+    // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
     //
     PageMap = (PAGE_MAP_AND_DIRECTORY_POINTER *)S3NvsPageTableAddress;
     S3NvsPageTableAddress += SIZE_4KB;
@@ -819,7 +819,7 @@ S3ResumeExecuteBootScript (
     //
     IdtDescriptor = (IA32_DESCRIPTOR *) (UINTN) (AcpiS3Context->IdtrProfile);
     //
-    // Make sure the newly allcated IDT align with 16-bytes
+    // Make sure the newly allocated IDT align with 16-bytes
     // 
     IdtBuffer = AllocatePages (EFI_SIZE_TO_PAGES((IdtDescriptor->Limit + 1) + 16));
     if (IdtBuffer == NULL) {
