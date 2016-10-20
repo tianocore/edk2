@@ -24,6 +24,7 @@
 #
 
 SCRIPTNAME="edksetup.sh"
+RECONFIG=FALSE
 
 function HelpMsg()
 {
@@ -34,6 +35,9 @@ function HelpMsg()
   echo
   echo "Options: "
   echo "  --help, -h, -?        Print this help screen and exit."
+  echo
+  echo "  --reconfig            Overwrite the WORKSPACE/Conf/*.txt files with the"
+  echo "                        template files from the BaseTools/Conf directory."
   echo
   echo Please note: This script must be \'sourced\' so the environment can be changed.
   echo ". $SCRIPTNAME"
@@ -121,6 +125,10 @@ do
       # Ignore argument for backwards compatibility
       shift
     ;;
+    --reconfig)
+      RECONFIG=TRUE
+      shift
+    ;;
     -?|-h|--help|*)
       HelpMsg
       break
@@ -135,5 +143,7 @@ then
 fi
 
 SourceEnv
+
+unset SCRIPTNAME RECONFIG
 
 return $?
