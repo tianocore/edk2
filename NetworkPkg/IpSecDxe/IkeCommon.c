@@ -201,9 +201,9 @@ IkePayloadFree (
 /**
   Generate an new SPI.
   
-  @param[in]      IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA 
-                                 Session.
-  @param[in out]  SpiValue       Pointer to the new generated SPI value. 
+  @param[in]       IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA 
+                                  Session.
+  @param[in, out]  SpiValue       Pointer to the new generated SPI value. 
                               
   @retval EFI_SUCCESS         The operation performs successfully.
   @retval Otherwise           The operation is failed.
@@ -211,8 +211,8 @@ IkePayloadFree (
 **/
 EFI_STATUS
 IkeGenerateSpi (
-  IN  IKEV2_SA_SESSION         *IkeSaSession,
-  OUT UINT32                   *SpiValue
+  IN     IKEV2_SA_SESSION         *IkeSaSession,
+  IN OUT UINT32                   *SpiValue
   )
 {
   EFI_STATUS   Status;
