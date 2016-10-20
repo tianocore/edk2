@@ -157,7 +157,7 @@ LOAD_FILE_ON_FV2_PRIVATE_DATA  mLoadFileOnFv2PrivateDataTemplate = {
 /**
   Check if the FFS has been installed LoadFileProtocol for it.
 
-  @param EFI_GUID     File GUID.
+  @param[in] NameGuid Point to FFS File GUID to be checked.
 
   @retval TRUE        The FFS's FileLoadProtocol is in list.
   @retval FALSE       The FFS's FileLoadProtocol is not in list.
