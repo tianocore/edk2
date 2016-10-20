@@ -49,10 +49,10 @@
   HobLib
 
 [Guids]
-  gEfiGraphicsInfoHobGuid                       # HOB TO_START
-  gEfiGraphicsDeviceInfoHobGuid                 # HOB TO_START
+  gEfiGraphicsInfoHobGuid                       ## CONSUMES ## HOB
+  gEfiGraphicsDeviceInfoHobGuid                 ## CONSUMES ## HOB
 
 [Protocols]
-  gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
-  gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
-  gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+  gEfiGraphicsOutputProtocolGuid                ## BY_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+  gEfiPciIoProtocolGuid                         ## TO_START
