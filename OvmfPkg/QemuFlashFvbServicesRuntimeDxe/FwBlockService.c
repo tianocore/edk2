@@ -965,6 +965,7 @@ FvbInitialize (
   EFI_PHYSICAL_ADDRESS                BaseAddress;
   UINTN                               Length;
   UINTN                               NumOfBlocks;
+  RETURN_STATUS                       PcdStatus;
 
   if (EFI_ERROR (QemuFlashInitialize ())) {
     //
@@ -1095,18 +1096,21 @@ FvbInitialize (
   //
   // Set several PCD values to point to flash
   //
-  PcdSet64 (
+  PcdStatus = PcdSet64S (
     PcdFlashNvStorageVariableBase64,
     (UINTN) PcdGet32 (PcdOvmfFlashNvStorageVariableBase)
     );
-  PcdSet32 (
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (
     PcdFlashNvStorageFtwWorkingBase,
     PcdGet32 (PcdOvmfFlashNvStorageFtwWorkingBase)
     );
-  PcdSet32 (
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (
     PcdFlashNvStorageFtwSpareBase,
     PcdGet32 (PcdOvmfFlashNvStorageFtwSpareBase)
     );
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   FwhInstance = (EFI_FW_VOL_INSTANCE *)
     (
@@ -1119,6 +1123,7 @@ FvbInitialize (
   //
   InstallVirtualAddressChangeHandler ();
 
-  PcdSetBool (PcdOvmfFlashVariablesEnable, TRUE);
+  PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
   return EFI_SUCCESS;
 }
