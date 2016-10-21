@@ -38,6 +38,7 @@ typedef struct  {
 
 #define FSP_GLOBAL_DATA_SIGNATURE  SIGNATURE_32 ('F', 'S', 'P', 'D')
 #define FSP_PERFORMANCE_DATA_SIGNATURE  SIGNATURE_32 ('P', 'E', 'R', 'F')
+#define FSP_PERFORMANCE_DATA_TIMER_MASK 0xFFFFFFFFFFFFFF
 
 typedef struct  {
    UINT32             Signature;

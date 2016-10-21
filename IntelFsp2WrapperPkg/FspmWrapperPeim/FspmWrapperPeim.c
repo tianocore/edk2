@@ -38,6 +38,7 @@
 #include <Ppi/SecPlatformInformation.h>
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
+#include <FspStatusCode.h>
 
 extern EFI_GUID gFspHobGuid;
 
@@ -89,8 +90,8 @@ PeiFspMemoryInit (
   TimeStampCounterStart = AsmReadTsc ();
   Status = CallFspMemoryInit (FspmUpdDataPtr, &FspHobListPtr);
   // Create hobs after memory initialization and not in temp RAM. Hence passing the recorded timestamp here
-  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, TimeStampCounterStart, 0xD000);
-  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0xD07F);
+  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, TimeStampCounterStart, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
+  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_MEMORY_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
   DEBUG ((DEBUG_INFO, "Total time spent executing FspMemoryInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
 
   //
