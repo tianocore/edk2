@@ -27,6 +27,12 @@
 #include <Protocol/DebugSupport.h>
 #include <Library/DefaultExceptionHandlerLib.h>
 
+//
+// The number of elements in a CHAR8 array, including the terminating NUL, that
+// is meant to hold the string rendering of the CPSR.
+//
+#define CPSR_STRING_SIZE 32
+
 typedef struct {
   UINT32  BIT;
   CHAR8   Char;
@@ -46,7 +52,8 @@ GetImageName (
   It is possible to add extra bits by adding them to CpsrChar array.
 
   @param  Cpsr         ARM CPSR register value
-  @param  ReturnStr    32 byte string that contains string version of CPSR
+  @param  ReturnStr    CPSR_STRING_SIZE byte string that contains string
+                       version of CPSR
 
 **/
 VOID
@@ -116,8 +123,10 @@ CpsrString (
     break;
   }
 
-  AsciiStrCat (Str, ModeStr);
-  return;
+  //
+  // See the interface contract in the leading comment block.
+  //
+  AsciiStrCatS (Str, CPSR_STRING_SIZE - (Str - ReturnStr), ModeStr);
 }
 
 CHAR8 *
@@ -192,7 +201,8 @@ DefaultExceptionHandler (
     UINT32  ImageBase;
     UINT32  PeCoffSizeOfHeader;
     UINT32  Offset;
-    CHAR8   CpsrStr[32];  // char per bit. Lower 5-bits are mode that is a 3 char string
+    CHAR8   CpsrStr[CPSR_STRING_SIZE];  // char per bit. Lower 5-bits are mode
+                                        // that is a 3 char string
     CHAR8   Buffer[80];
     UINT8   *DisAsm;
     UINT32  ItBlock;
