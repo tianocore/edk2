@@ -41,6 +41,7 @@ ArmVirtTimerFdtClientLibConstructor (
   CONST INTERRUPT_PROPERTY      *InterruptProp;
   UINT32                        PropSize;
   INT32                         SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
+  RETURN_STATUS                 PcdStatus;
 
   Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
                   (VOID **)&FdtClient);
@@ -78,10 +79,14 @@ ArmVirtTimerFdtClientLibConstructor (
   DEBUG ((EFI_D_INFO, "Found Timer interrupts %d, %d, %d, %d\n",
     SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum));
 
-  PcdSet32 (PcdArmArchTimerSecIntrNum, SecIntrNum);
-  PcdSet32 (PcdArmArchTimerIntrNum, IntrNum);
-  PcdSet32 (PcdArmArchTimerVirtIntrNum, VirtIntrNum);
-  PcdSet32 (PcdArmArchTimerHypIntrNum, HypIntrNum);
+  PcdStatus = PcdSet32S (PcdArmArchTimerSecIntrNum, SecIntrNum);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (PcdArmArchTimerIntrNum, IntrNum);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (PcdArmArchTimerVirtIntrNum, VirtIntrNum);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (PcdArmArchTimerHypIntrNum, HypIntrNum);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   return EFI_SUCCESS;
 }
