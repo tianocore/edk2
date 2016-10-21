@@ -246,6 +246,12 @@
 
   GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
+  #
+  # Disable deprecated APIs.
+  #
+  RVCT:*_*_*_CC_FLAGS = -DDISABLE_NEW_DEPRECATED_INTERFACES
+  GCC:*_*_*_CC_FLAGS = -DDISABLE_NEW_DEPRECATED_INTERFACES
+
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
