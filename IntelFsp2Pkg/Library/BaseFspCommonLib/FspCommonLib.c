@@ -17,7 +17,6 @@
 #include <Library/PcdLib.h>
 #include <FspGlobalData.h>
 #include <FspEas.h>
-#include <FspDataTable.h>
 #include <Library/FspSwitchStackLib.h>
 
 #pragma pack(1)
