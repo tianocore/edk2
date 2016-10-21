@@ -210,6 +210,8 @@ InitializeXen (
   VOID
   )
 {
+  RETURN_STATUS PcdStatus;
+
   if (mXenLeaf == 0) {
     return EFI_NOT_FOUND;
   }
@@ -222,7 +224,8 @@ InitializeXen (
   //
   AddReservedMemoryBaseSizeHob (0xFC000000, 0x1000000, FALSE);
 
-  PcdSetBool (PcdPciDisableBusEnumeration, TRUE);
+  PcdStatus = PcdSetBoolS (PcdPciDisableBusEnumeration, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   return EFI_SUCCESS;
 }

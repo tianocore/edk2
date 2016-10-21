@@ -156,8 +156,9 @@ MemMapInitialization (
   VOID
   )
 {
-  UINT64 PciIoBase;
-  UINT64 PciIoSize;
+  UINT64        PciIoBase;
+  UINT64        PciIoSize;
+  RETURN_STATUS PcdStatus;
 
   PciIoBase = 0xC000;
   PciIoSize = 0x4000;
@@ -212,8 +213,11 @@ MemMapInitialization (
     //
     PciSize = 0xFC000000 - PciBase;
     AddIoMemoryBaseSizeHob (PciBase, PciSize);
-    PcdSet64 (PcdPciMmio32Base, PciBase);
-    PcdSet64 (PcdPciMmio32Size, PciSize);
+    PcdStatus = PcdSet64S (PcdPciMmio32Base, PciBase);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdPciMmio32Size, PciSize);
+    ASSERT_RETURN_ERROR (PcdStatus);
+
     AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
     AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
     if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
@@ -266,8 +270,10 @@ MemMapInitialization (
     PciIoBase,
     PciIoSize
     );
-  PcdSet64 (PcdPciIoBase, PciIoBase);
-  PcdSet64 (PcdPciIoSize, PciIoSize);
+  PcdStatus = PcdSet64S (PcdPciIoBase, PciIoBase);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciIoSize, PciIoSize);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 EFI_STATUS
@@ -316,11 +322,13 @@ GetNamedFwCfgBoolean (
 
 #define UPDATE_BOOLEAN_PCD_FROM_FW_CFG(TokenName)                   \
           do {                                                      \
-            BOOLEAN Setting;                                        \
+            BOOLEAN       Setting;                                  \
+            RETURN_STATUS PcdStatus;                                \
                                                                     \
             if (!EFI_ERROR (GetNamedFwCfgBoolean (                  \
                               "opt/ovmf/" #TokenName, &Setting))) { \
-              PcdSetBool (TokenName, Setting);                      \
+              PcdStatus = PcdSetBoolS (TokenName, Setting);         \
+              ASSERT_RETURN_ERROR (PcdStatus);                      \
             }                                                       \
           } while (0)
 
@@ -379,12 +387,13 @@ MiscInitialization (
   VOID
   )
 {
-  UINTN  PmCmd;
-  UINTN  Pmba;
-  UINT32 PmbaAndVal;
-  UINT32 PmbaOrVal;
-  UINTN  AcpiCtlReg;
-  UINT8  AcpiEnBit;
+  UINTN         PmCmd;
+  UINTN         Pmba;
+  UINT32        PmbaAndVal;
+  UINT32        PmbaOrVal;
+  UINTN         AcpiCtlReg;
+  UINT8         AcpiEnBit;
+  RETURN_STATUS PcdStatus;
 
   //
   // Disable A20 Mask
@@ -424,7 +433,8 @@ MiscInitialization (
       ASSERT (FALSE);
       return;
   }
-  PcdSet16 (PcdOvmfHostBridgePciDevId, mHostBridgeDevId);
+  PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId, mHostBridgeDevId);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // If the appropriate IOspace enable bit is set, assume the ACPI PMBA
@@ -491,6 +501,7 @@ ReserveEmuVariableNvStore (
   )
 {
   EFI_PHYSICAL_ADDRESS VariableStore;
+  RETURN_STATUS        PcdStatus;
 
   //
   // Allocate storage for NV variables early on so it will be
@@ -509,7 +520,8 @@ ReserveEmuVariableNvStore (
           VariableStore,
           (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
         ));
-  PcdSet64 (PcdEmuVariableNvStoreReserved, VariableStore);
+  PcdStatus = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 
