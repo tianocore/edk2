@@ -1298,11 +1298,8 @@ XenStoreTransactionEnd (
 {
   CHAR8 AbortStr[2];
 
-  if (Abort) {
-    AsciiStrCpy (AbortStr, "F");
-  } else {
-    AsciiStrCpy (AbortStr, "T");
-  }
+  AbortStr[0] = Abort ? 'F' : 'T';
+  AbortStr[1] = '\0';
 
   return XenStoreSingle (Transaction, XS_TRANSACTION_END, AbortStr, NULL, NULL);
 }
