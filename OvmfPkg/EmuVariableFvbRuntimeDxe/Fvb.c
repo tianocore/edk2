@@ -803,6 +803,7 @@ FvbInitialize (
   BOOLEAN                             Initialize;
   EFI_HANDLE                          Handle;
   EFI_PHYSICAL_ADDRESS                Address;
+  RETURN_STATUS                       PcdStatus;
 
   DEBUG ((EFI_D_INFO, "EMU Variable FVB Started\n"));
 
@@ -862,19 +863,24 @@ FvbInitialize (
     SetMem (Ptr, EMU_FVB_SIZE, ERASED_UINT8);
     InitializeFvAndVariableStoreHeaders (Ptr);
   }
-  PcdSet64 (PcdFlashNvStorageVariableBase64, (UINT32)(UINTN) Ptr);
+  PcdStatus = PcdSet64S (PcdFlashNvStorageVariableBase64, (UINT32)(UINTN) Ptr);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Initialize the Fault Tolerant Write data area
   //
   SubPtr = (VOID*) ((UINT8*) Ptr + PcdGet32 (PcdVariableStoreSize));
-  PcdSet32 (PcdFlashNvStorageFtwWorkingBase, (UINT32)(UINTN) SubPtr);
+  PcdStatus = PcdSet32S (PcdFlashNvStorageFtwWorkingBase,
+                (UINT32)(UINTN) SubPtr);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Initialize the Fault Tolerant Write spare block
   //
   SubPtr = (VOID*) ((UINT8*) Ptr + EMU_FVB_BLOCK_SIZE);
-  PcdSet32 (PcdFlashNvStorageFtwSpareBase, (UINT32)(UINTN) SubPtr);
+  PcdStatus = PcdSet32S (PcdFlashNvStorageFtwSpareBase,
+                (UINT32)(UINTN) SubPtr);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Setup FVB device path
