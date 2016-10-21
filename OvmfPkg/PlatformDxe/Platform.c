@@ -663,6 +663,7 @@ ExecutePlatformConfig (
   EFI_STATUS      Status;
   PLATFORM_CONFIG PlatformConfig;
   UINT64          OptionalElements;
+  RETURN_STATUS   PcdStatus;
 
   Status = PlatformConfigLoad (&PlatformConfig, &OptionalElements);
   if (EFI_ERROR (Status)) {
@@ -675,10 +676,13 @@ ExecutePlatformConfig (
     //
     // Pass the preferred resolution to GraphicsConsoleDxe via dynamic PCDs.
     //
-    PcdSet32 (PcdVideoHorizontalResolution,
+    PcdStatus = PcdSet32S (PcdVideoHorizontalResolution,
       PlatformConfig.HorizontalResolution);
-    PcdSet32 (PcdVideoVerticalResolution,
+    ASSERT_RETURN_ERROR (PcdStatus);
+
+    PcdStatus = PcdSet32S (PcdVideoVerticalResolution,
       PlatformConfig.VerticalResolution);
+    ASSERT_RETURN_ERROR (PcdStatus);
   }
 
   return EFI_SUCCESS;
