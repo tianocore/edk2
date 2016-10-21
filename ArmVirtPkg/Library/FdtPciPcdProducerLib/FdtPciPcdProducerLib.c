@@ -98,6 +98,7 @@ FdtPciPcdProducerLibConstructor (
   INT32               Node;
   RETURN_STATUS       RetStatus;
   UINT64              IoTranslation;
+  RETURN_STATUS       PcdStatus;
 
   PciExpressBaseAddress = PcdGet64 (PcdPciExpressBaseAddress);
   if (PciExpressBaseAddress != MAX_UINT64) {
@@ -126,12 +127,14 @@ FdtPciPcdProducerLibConstructor (
     if (!EFI_ERROR (Status) && RegSize == 2 * sizeof (UINT64)) {
       PciExpressBaseAddress = SwapBytes64 (*Reg);
 
-      PcdSetBool (PcdPciDisableBusEnumeration, FALSE);
+      PcdStatus = PcdSetBoolS (PcdPciDisableBusEnumeration, FALSE);
+      ASSERT_RETURN_ERROR (PcdStatus);
 
       IoTranslation = 0;
       RetStatus = GetPciIoTranslation (FdtClient, Node, &IoTranslation);
       if (!RETURN_ERROR (RetStatus)) {
-          PcdSet64 (PcdPciIoTranslation, IoTranslation);
+          PcdStatus = PcdSet64S (PcdPciIoTranslation, IoTranslation);
+          ASSERT_RETURN_ERROR (PcdStatus);
       } else {
         //
         // Support for I/O BARs is not mandatory, and so it does not make sense
@@ -145,7 +148,8 @@ FdtPciPcdProducerLibConstructor (
     }
   }
 
-  PcdSet64 (PcdPciExpressBaseAddress, PciExpressBaseAddress);
+  PcdStatus = PcdSet64S (PcdPciExpressBaseAddress, PciExpressBaseAddress);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   return RETURN_SUCCESS;
 }
