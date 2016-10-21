@@ -578,6 +578,8 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
+  RETURN_STATUS PcdStatus;
+
   //
   // Signal EndOfDxe PI Event
   //
@@ -629,7 +631,9 @@ PlatformBootManagerBeforeConsole (
   //
   // Set the front page timeout from the QEMU configuration.
   //
-  PcdSet16 (PcdPlatformBootTimeOut, GetFrontPageTimeoutFromQemu ());
+  PcdStatus = PcdSet16S (PcdPlatformBootTimeOut,
+                GetFrontPageTimeoutFromQemu ());
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Register platform-specific boot options and keyboard shortcuts.
