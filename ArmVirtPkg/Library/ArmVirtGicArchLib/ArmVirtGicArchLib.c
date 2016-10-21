@@ -79,11 +79,11 @@ ArmVirtGicArchLibConstructor (
 
     // RegProp[0..1] == { GICD base, GICD size }
     DistBase = SwapBytes64 (Reg[0]);
-    ASSERT (DistBase < MAX_UINT32);
+    ASSERT (DistBase < MAX_UINTN);
 
     // RegProp[2..3] == { GICR base, GICR size }
     RedistBase = SwapBytes64 (Reg[2]);
-    ASSERT (RedistBase < MAX_UINT32);
+    ASSERT (RedistBase < MAX_UINTN);
 
     PcdSet64 (PcdGicDistributorBase, DistBase);
     PcdSet64 (PcdGicRedistributorsBase, RedistBase);
@@ -117,8 +117,8 @@ ArmVirtGicArchLibConstructor (
 
     DistBase = SwapBytes64 (Reg[0]);
     CpuBase  = SwapBytes64 (Reg[2]);
-    ASSERT (DistBase < MAX_UINT32);
-    ASSERT (CpuBase < MAX_UINT32);
+    ASSERT (DistBase < MAX_UINTN);
+    ASSERT (CpuBase < MAX_UINTN);
 
     PcdSet64 (PcdGicDistributorBase, DistBase);
     PcdSet64 (PcdGicInterruptInterfaceBase, CpuBase);
