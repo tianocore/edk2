@@ -348,6 +348,33 @@ DebugPrintLevelEnabled (
   #define ASSERT_EFI_ERROR(StatusParameter)
 #endif
 
+/**
+  Macro that calls DebugAssert() if a RETURN_STATUS evaluates to an error code.
+
+  If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED
+  bit of PcdDebugProperyMask is set, then this macro evaluates the
+  RETURN_STATUS value specified by StatusParameter.  If StatusParameter is an
+  error code, then DebugAssert() is called passing in the source filename,
+  source line number, and StatusParameter.
+
+  @param  StatusParameter  RETURN_STATUS value to evaluate.
+
+**/
+#if !defined(MDEPKG_NDEBUG)
+  #define ASSERT_RETURN_ERROR(StatusParameter)                          \
+    do {                                                                \
+      if (DebugAssertEnabled ()) {                                      \
+        if (RETURN_ERROR (StatusParameter)) {                           \
+          DEBUG ((DEBUG_ERROR, "\nASSERT_RETURN_ERROR (Status = %r)\n", \
+            StatusParameter));                                          \
+          _ASSERT (!RETURN_ERROR (StatusParameter));                    \
+        }                                                               \
+      }                                                                 \
+    } while (FALSE)
+#else
+  #define ASSERT_RETURN_ERROR(StatusParameter)
+#endif
+
 /**  
   Macro that calls DebugAssert() if a protocol is already installed in the 
   handle database.
