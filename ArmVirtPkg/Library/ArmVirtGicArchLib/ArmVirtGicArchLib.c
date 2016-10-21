@@ -41,6 +41,7 @@ ArmVirtGicArchLibConstructor (
   UINTN                 GicRevision;
   EFI_STATUS            Status;
   UINT64                DistBase, CpuBase, RedistBase;
+  RETURN_STATUS         PcdStatus;
 
   Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
                   (VOID **)&FdtClient);
@@ -85,8 +86,10 @@ ArmVirtGicArchLibConstructor (
     RedistBase = SwapBytes64 (Reg[2]);
     ASSERT (RedistBase < MAX_UINTN);
 
-    PcdSet64 (PcdGicDistributorBase, DistBase);
-    PcdSet64 (PcdGicRedistributorsBase, RedistBase);
+    PcdStatus = PcdSet64S (PcdGicDistributorBase, DistBase);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdGicRedistributorsBase, RedistBase);
+    ASSERT_RETURN_ERROR (PcdStatus);
 
     DEBUG ((EFI_D_INFO, "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
       DistBase, RedistBase));
@@ -120,8 +123,10 @@ ArmVirtGicArchLibConstructor (
     ASSERT (DistBase < MAX_UINTN);
     ASSERT (CpuBase < MAX_UINTN);
 
-    PcdSet64 (PcdGicDistributorBase, DistBase);
-    PcdSet64 (PcdGicInterruptInterfaceBase, CpuBase);
+    PcdStatus = PcdSet64S (PcdGicDistributorBase, DistBase);
+    ASSERT_RETURN_ERROR (PcdStatus);
+    PcdStatus = PcdSet64S (PcdGicInterruptInterfaceBase, CpuBase);
+    ASSERT_RETURN_ERROR (PcdStatus);
 
     DEBUG ((EFI_D_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
 
