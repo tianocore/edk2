@@ -38,6 +38,7 @@
 #include <Ppi/SecPlatformInformation.h>
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
+#include <FspStatusCode.h>
 
 extern EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc;
 extern EFI_GUID                  gFspHobGuid;
@@ -253,9 +254,9 @@ PeiMemoryDiscoveredNotify (
   UpdateFspsUpdData ((VOID *)FspsUpdDataPtr);
 
   TimeStampCounterStart = AsmReadTsc ();
-  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x9000);
+  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
   Status = CallFspSiliconInit ((VOID *)FspsUpdDataPtr);
-  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, 0x907F);
+  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_SILICON_INIT | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
   DEBUG ((DEBUG_INFO, "Total time spent executing FspSiliconInitApi: %d millisecond\n", DivU64x32 (GetTimeInNanoSecond (AsmReadTsc () - TimeStampCounterStart), 1000000)));
 
   //

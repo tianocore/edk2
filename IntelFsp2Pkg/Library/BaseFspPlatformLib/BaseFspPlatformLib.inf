@@ -44,6 +44,10 @@
 [Guids]
   gFspPerformanceDataGuid                                   ## CONSUMES ## GUID
   gFspEventEndOfFirmwareGuid                                ## PRODUCES ## GUID
+  gEfiEventReadyToBootGuid                                  ## CONSUMES ## Event
+
+[Protocols]
+  gEfiPciEnumerationCompleteProtocolGuid                    ## CONSUMES
 
 [FixedPcd]
   gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPatchEntry        ## CONSUMES
