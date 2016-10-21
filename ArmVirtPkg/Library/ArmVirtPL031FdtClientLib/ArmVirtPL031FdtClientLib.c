@@ -34,6 +34,7 @@ ArmVirtPL031FdtClientLibConstructor (
   CONST UINT64                  *Reg;
   UINT32                        RegSize;
   UINT64                        RegBase;
+  RETURN_STATUS                 PcdStatus;
 
   Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
                   (VOID **)&FdtClient);
@@ -60,7 +61,8 @@ ArmVirtPL031FdtClientLibConstructor (
   RegBase = SwapBytes64 (Reg[0]);
   ASSERT (RegBase < MAX_UINT32);
 
-  PcdSet32 (PcdPL031RtcBase, (UINT32)RegBase);
+  PcdStatus = PcdSet32S (PcdPL031RtcBase, (UINT32)RegBase);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   DEBUG ((EFI_D_INFO, "Found PL031 RTC @ 0x%Lx\n", RegBase));
 
