@@ -353,8 +353,9 @@ Returns:
 
 --*/
 {
-  EFI_HANDLE Handle;
-  EFI_STATUS Status;
+  EFI_HANDLE    Handle;
+  EFI_STATUS    Status;
+  RETURN_STATUS PcdStatus;
 
   DEBUG ((EFI_D_INFO, "PlatformBootManagerBeforeConsole\n"));
   InstallDevicePathCallback ();
@@ -394,7 +395,9 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   PlatformInitializeConsole (gPlatformConsole);
-  PcdSet16 (PcdPlatformBootTimeOut, GetFrontPageTimeoutFromQemu ());
+  PcdStatus = PcdSet16S (PcdPlatformBootTimeOut,
+                GetFrontPageTimeoutFromQemu ());
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   PlatformRegisterOptionsAndKeys ();
 }
@@ -1281,6 +1284,7 @@ VisitingFileSystemInstance (
 {
   EFI_STATUS      Status;
   STATIC BOOLEAN  ConnectedToFileSystem = FALSE;
+  RETURN_STATUS   PcdStatus;
 
   if (ConnectedToFileSystem) {
     return EFI_ALREADY_STARTED;
@@ -1300,7 +1304,9 @@ VisitingFileSystemInstance (
       NULL,
       &mEmuVariableEventReg
       );
-  PcdSet64 (PcdEmuVariableEvent, (UINT64)(UINTN) mEmuVariableEvent);
+  PcdStatus = PcdSet64S (PcdEmuVariableEvent,
+                (UINT64)(UINTN) mEmuVariableEvent);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   return EFI_SUCCESS;
 }
