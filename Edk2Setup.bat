@@ -27,6 +27,7 @@
 @REM     build.exe Version 0.51 Developer Build based on Revision: 15668
 @REM
 @REM Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+@REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM This program and the accompanying materials
 @REM are licensed and made available under the terms and conditions of the BSD License
 @REM which accompanies this distribution.  The full text of the license may be found at
@@ -59,6 +60,7 @@
 @set SRC_CONF=
 @set ARGUMENT=
 @set SCRIPT=EDKSETUP_BAT
+@set PYTHON_BUILD=
 
 @if not defined ORIGINAL_PATH set "ORIGINAL_PATH=%PATH%"
 @REM Always set the WORKSPACE environment variable to the current directory
@@ -352,12 +354,7 @@
 
 @if defined REBUILD_TOOLS goto SetConf
 @if defined SVN_PULL goto SetConf
-@if not exist "%EDK_TOOLS_PATH%\Bin\Win32\build.exe" (
-    @echo ERROR : %EDK_TOOLS_PATH%\Bin\Win32\build.exe does not exist
-    @echo         Re-run this script using --reset, --pull or --rebuild
-    @echo.
-    @goto ExitFailure
-)
+
 @echo.
 @echo Rebuilding of the tools is not required. Binaries of the latest,
 @echo tested versions of the tools have been tested and included in the
@@ -416,6 +413,31 @@
 )
 @set "PATH=%EDK_TOOLS_BIN%;%PATH%"
 
+@if NOT EXIST "%EDK_TOOLS_BIN%\build.exe" @set PYTHON_BUILD=TRUE
+@if NOT EXIST "%EDK_TOOLS_BIN%\GenFds.exe" @set PYTHON_BUILD=TRUE
+@if NOT EXIST "%EDK_TOOLS_BIN%\TargetTool.exe" @set PYTHON_BUILD=TRUE
+@if NOT EXIST "%EDK_TOOLS_BIN%\Trim.exe" @set PYTHON_BUILD=TRUE
+
+@if not defined PYTHON_BUILD goto SvnPull
+
+@echo  !!! WARNING !!! Setup environment to run Python scripts directly.
+
+@if not defined PYTHON_HOME (
+  @if defined PYTHONHOME (
+    @set PYTHON_HOME=%PYTHONHOME%
+  ) else (
+    @echo.
+    @echo  !!! ERROR !!! PYTHON_HOME is required to build or execute the tools, please set it. !!!
+    @echo.
+    @goto ExitFailure
+  )
+)
+
+@set PATH=%PATH%;%BASE_TOOLS_PATH%\BinWrappers\WindowsLike
+@set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
+@set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
+
+:SvnPull
 @if "%REBUILD_TOOLS%"=="TRUE" @goto Rebuild
 @if "%SVN_PULL%"== "TRUE" (
     if defined PYTHONHOME (
@@ -485,6 +507,7 @@
 @set SCRIPT=
 @set LIST_VS_VERSIONS=
 @set PYTHON_FREEZER_PATH=
+@set PYTHON_BUILD=
 @echo on
 @exit /B 0
 
@@ -504,5 +527,6 @@
 @set SCRIPT=
 @set LIST_VS_VERSIONS=
 @set PYTHON_FREEZER_PATH=
+@set PYTHON_BUILD=
 @echo on
 @exit /B 1
