@@ -40,6 +40,7 @@ DetectSmbiosVersion (
   UINTN                AnchorSize, TablesSize;
   QEMU_SMBIOS_ANCHOR   QemuAnchor;
   UINT16               SmbiosVersion;
+  RETURN_STATUS        PcdStatus;
 
   if (PcdGetBool (PcdQemuSmbiosValidated)) {
     //
@@ -87,7 +88,8 @@ DetectSmbiosVersion (
 
     DEBUG ((EFI_D_INFO, "%a: SMBIOS 3.x DocRev from QEMU: 0x%02x\n",
       __FUNCTION__, QemuAnchor.V3.DocRev));
-    PcdSet8 (PcdSmbiosDocRev, QemuAnchor.V3.DocRev);
+    PcdStatus = PcdSet8S (PcdSmbiosDocRev, QemuAnchor.V3.DocRev);
+    ASSERT_RETURN_ERROR (PcdStatus);
     break;
 
   default:
@@ -96,12 +98,14 @@ DetectSmbiosVersion (
 
   DEBUG ((EFI_D_INFO, "%a: SMBIOS version from QEMU: 0x%04x\n", __FUNCTION__,
     SmbiosVersion));
-  PcdSet16 (PcdSmbiosVersion, SmbiosVersion);
+  PcdStatus = PcdSet16S (PcdSmbiosVersion, SmbiosVersion);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // SMBIOS platform drivers can now fetch and install
   // "etc/smbios/smbios-tables" from QEMU.
   //
-  PcdSetBool (PcdQemuSmbiosValidated, TRUE);
+  PcdStatus = PcdSetBoolS (PcdQemuSmbiosValidated, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
   return RETURN_SUCCESS;
 }
