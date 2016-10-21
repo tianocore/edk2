@@ -88,12 +88,10 @@ MRegList (
   )
 {
   UINTN     Index, Start, End;
-  CHAR8     *Str;
   BOOLEAN   First;
 
-  Str = mMregListStr;
-  *Str = '\0';
-  AsciiStrCat  (Str, "{");
+  mMregListStr[0] = '\0';
+  AsciiStrCatS (mMregListStr, sizeof mMregListStr, "{");
   for (Index = 0, First = TRUE; Index <= 15; Index++) {
     if ((OpCode & (1 << Index)) != 0) {
       Start = End = Index;
@@ -102,25 +100,25 @@ MRegList (
       }
 
       if (!First) {
-        AsciiStrCat  (Str, ",");
+        AsciiStrCatS (mMregListStr, sizeof mMregListStr, ",");
       } else {
         First = FALSE;
       }
 
       if (Start == End) {
-        AsciiStrCat  (Str, gReg[Start]);
-        AsciiStrCat  (Str, ", ");
+        AsciiStrCatS (mMregListStr, sizeof mMregListStr, gReg[Start]);
+        AsciiStrCatS (mMregListStr, sizeof mMregListStr, ", ");
       } else {
-        AsciiStrCat  (Str, gReg[Start]);
-        AsciiStrCat  (Str, "-");
-        AsciiStrCat  (Str, gReg[End]);
+        AsciiStrCatS (mMregListStr, sizeof mMregListStr, gReg[Start]);
+        AsciiStrCatS (mMregListStr, sizeof mMregListStr, "-");
+        AsciiStrCatS (mMregListStr, sizeof mMregListStr, gReg[End]);
       }
     }
   }
   if (First) {
-    AsciiStrCat  (Str, "ERROR");
+    AsciiStrCatS (mMregListStr, sizeof mMregListStr, "ERROR");
   }
-  AsciiStrCat  (Str, "}");
+  AsciiStrCatS (mMregListStr, sizeof mMregListStr, "}");
 
   // BugBug: Make caller pass in buffer it is cleaner
   return mMregListStr;

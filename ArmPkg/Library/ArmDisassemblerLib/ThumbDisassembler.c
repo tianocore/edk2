@@ -397,12 +397,10 @@ ThumbMRegList (
   )
 {
   UINTN     Index, Start, End;
-  CHAR8     *Str;
   BOOLEAN   First;
 
-  Str = mThumbMregListStr;
-  *Str = '\0';
-  AsciiStrCat  (Str, "{");
+  mThumbMregListStr[0] = '\0';
+  AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, "{");
 
   for (Index = 0, First = TRUE; Index <= 15; Index++) {
     if ((RegBitMask & (1 << Index)) != 0) {
@@ -412,24 +410,24 @@ ThumbMRegList (
       }
 
       if (!First) {
-        AsciiStrCat  (Str, ",");
+        AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, ",");
       } else {
         First = FALSE;
       }
 
       if (Start == End) {
-        AsciiStrCat  (Str, gReg[Start]);
+        AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, gReg[Start]);
       } else {
-        AsciiStrCat  (Str, gReg[Start]);
-        AsciiStrCat  (Str, "-");
-        AsciiStrCat  (Str, gReg[End]);
+        AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, gReg[Start]);
+        AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, "-");
+        AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, gReg[End]);
       }
     }
   }
   if (First) {
-    AsciiStrCat  (Str, "ERROR");
+    AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, "ERROR");
   }
-  AsciiStrCat  (Str, "}");
+  AsciiStrCatS (mThumbMregListStr, sizeof mThumbMregListStr, "}");
 
   // BugBug: Make caller pass in buffer it is cleaner
   return mThumbMregListStr;
