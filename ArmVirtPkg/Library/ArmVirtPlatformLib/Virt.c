@@ -70,13 +70,14 @@ ArmPlatformInitializeSystemMemory (
   VOID
   )
 {
-  VOID         *DeviceTreeBase;
-  INT32        Node, Prev;
-  UINT64       NewBase, CurBase;
-  UINT64       NewSize, CurSize;
-  CONST CHAR8  *Type;
-  INT32        Len;
-  CONST UINT64 *RegProp;
+  VOID          *DeviceTreeBase;
+  INT32         Node, Prev;
+  UINT64        NewBase, CurBase;
+  UINT64        NewSize, CurSize;
+  CONST CHAR8   *Type;
+  INT32         Len;
+  CONST UINT64  *RegProp;
+  RETURN_STATUS PcdStatus;
 
   NewBase = 0;
   NewSize = 0;
@@ -131,7 +132,8 @@ ArmPlatformInitializeSystemMemory (
   // Make sure the start of DRAM matches our expectation
   //
   ASSERT (FixedPcdGet64 (PcdSystemMemoryBase) == NewBase);
-  PcdSet64 (PcdSystemMemorySize, NewSize);
+  PcdStatus = PcdSet64S (PcdSystemMemorySize, NewSize);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // We need to make sure that the machine we are running on has at least
