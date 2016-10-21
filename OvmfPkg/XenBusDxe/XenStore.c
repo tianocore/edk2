@@ -303,14 +303,17 @@ XenStoreJoin (
   )
 {
   CHAR8 *Buf;
+  UINTN BufSize;
 
   /* +1 for '/' and +1 for '\0' */
-  Buf = AllocateZeroPool (
-          AsciiStrLen (DirectoryPath) + AsciiStrLen (Node) + 2);
-  AsciiStrCat (Buf, DirectoryPath);
-  if (Node[0] != '\0') {
-    AsciiStrCat (Buf, "/");
-    AsciiStrCat (Buf, Node);
+  BufSize = AsciiStrLen (DirectoryPath) + AsciiStrLen (Node) + 2;
+  Buf = AllocatePool (BufSize);
+  ASSERT (Buf != NULL);
+
+  if (Node[0] == '\0') {
+    AsciiSPrint (Buf, BufSize, "%a", DirectoryPath);
+  } else {
+    AsciiSPrint (Buf, BufSize, "%a/%a", DirectoryPath, Node);
   }
 
   return Buf;
