@@ -125,8 +125,8 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
 
   Caution: This function may receive untrusted input.
 
-  @param[in out]  Pointer to OperationRequest TPM physical presence operation request.
-  @param[in out]  Pointer to RequestParameter TPM physical presence operation request parameter.
+  @param[in, out]  Pointer to OperationRequest TPM physical presence operation request.
+  @param[in, out]  Pointer to RequestParameter TPM physical presence operation request parameter.
 
   @return Return Code for Submit TPM Operation Request to Pre-OS Environment and
         Submit TPM Operation Request to Pre-OS Environment 2.
