@@ -206,6 +206,14 @@
   # @Prompt The specified AP target C-state for Mwait.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate|0|UINT8|0x00000007
 
+  ## Indicates if SMM uses static page table.
+  #  If enabled, SMM will not use on-demand paging. SMM will build static page table for all memory.<BR><BR>
+  #  This flag only impacts X64 build, because SMM alway builds static page table for IA32.
+  #   TRUE  - SMM uses static page table for all memory.<BR>
+  #   FALSE - SMM uses static page table for below 4G memory and use on-demand paging for above 4G memory.<BR>
+  # @Prompt Use static page table for all memory in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStaticPageTable|TRUE|BOOLEAN|0x3213210D
+
 [PcdsDynamic, PcdsDynamicEx]
   ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
   # @Prompt The pointer to a CPU S3 data buffer.
