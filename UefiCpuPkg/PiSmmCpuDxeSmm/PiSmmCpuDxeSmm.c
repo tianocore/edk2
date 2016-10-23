@@ -113,6 +113,19 @@ InitializeSmmIdt (
   EFI_STATUS               Status;
   BOOLEAN                  InterruptState;
   IA32_DESCRIPTOR          DxeIdtr;
+
+  //
+  // There are 32 (not 255) entries in it since only processor
+  // generated exceptions will be handled.
+  //
+  gcSmiIdtr.Limit = (sizeof(IA32_IDT_GATE_DESCRIPTOR) * 32) - 1;
+  //
+  // Allocate page aligned IDT, because it might be set as read only.
+  //
+  gcSmiIdtr.Base = (UINTN)AllocateCodePages (EFI_SIZE_TO_PAGES(gcSmiIdtr.Limit + 1));
+  ASSERT (gcSmiIdtr.Base != 0);
+  ZeroMem ((VOID *)gcSmiIdtr.Base, gcSmiIdtr.Limit + 1);
+
   //
   // Disable Interrupt and save DXE IDT table
   //
@@ -731,9 +744,9 @@ PiCpuSmmEntry (
   //
   BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
   if ((FamilyId == 4) || (FamilyId == 5)) {
-    Buffer = AllocateAlignedPages (BufferPages, SIZE_32KB);
+    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
   } else {
-    Buffer = AllocateAlignedPages (BufferPages, SIZE_4KB);
+    Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
   }
   ASSERT (Buffer != NULL);
   DEBUG ((EFI_D_INFO, "SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE(BufferPages)));
@@ -841,6 +854,8 @@ PiCpuSmmEntry (
   // SMM base addresses have been relocated on all CPUs
   //
   SmmCpuFeaturesSmmRelocationComplete ();
+
+  DEBUG ((DEBUG_INFO, "mXdSupported - 0x%x\n", mXdSupported));
 
   //
   // SMM Time initialization
@@ -1138,6 +1153,17 @@ ConfigSmmCodeAccessCheck (
 }
 
 /**
+  Set code region to be read only and data region to be execute disable.
+**/
+VOID
+SetRegionAttributes (
+  VOID
+  )
+{
+  SetMemMapAttributes ();
+}
+
+/**
   This API provides a way to allocate memory for page table.
 
   This API can be called more once to allocate memory for page tables.
@@ -1167,6 +1193,109 @@ AllocatePageTableMemory (
 }
 
 /**
+  Allocate pages for code.
+
+  @param[in]  Pages Number of pages to be allocated.
+
+  @return Allocated memory.
+**/
+VOID *
+AllocateCodePages (
+  IN UINTN           Pages
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  Memory;
+
+  if (Pages == 0) {
+    return NULL;
+  }
+
+  Status = gSmst->SmmAllocatePages (AllocateAnyPages, EfiRuntimeServicesCode, Pages, &Memory);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  return (VOID *) (UINTN) Memory;
+}
+
+/**
+  Allocate aligned pages for code.
+
+  @param[in]  Pages                 Number of pages to be allocated.
+  @param[in]  Alignment             The requested alignment of the allocation.
+                                    Must be a power of two.
+                                    If Alignment is zero, then byte alignment is used.
+
+  @return Allocated memory.
+**/
+VOID *
+AllocateAlignedCodePages (
+  IN UINTN            Pages,
+  IN UINTN            Alignment
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  Memory;
+  UINTN                 AlignedMemory;
+  UINTN                 AlignmentMask;
+  UINTN                 UnalignedPages;
+  UINTN                 RealPages;
+
+  //
+  // Alignment must be a power of two or zero.
+  //
+  ASSERT ((Alignment & (Alignment - 1)) == 0);
+
+  if (Pages == 0) {
+    return NULL;
+  }
+  if (Alignment > EFI_PAGE_SIZE) {
+    //
+    // Calculate the total number of pages since alignment is larger than page size.
+    //
+    AlignmentMask  = Alignment - 1;
+    RealPages      = Pages + EFI_SIZE_TO_PAGES (Alignment);
+    //
+    // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
+    //
+    ASSERT (RealPages > Pages);
+
+    Status         = gSmst->SmmAllocatePages (AllocateAnyPages, EfiRuntimeServicesCode, RealPages, &Memory);
+    if (EFI_ERROR (Status)) {
+      return NULL;
+    }
+    AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
+    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN) Memory);
+    if (UnalignedPages > 0) {
+      //
+      // Free first unaligned page(s).
+      //
+      Status = gSmst->SmmFreePages (Memory, UnalignedPages);
+      ASSERT_EFI_ERROR (Status);
+    }
+    Memory         = (EFI_PHYSICAL_ADDRESS) (AlignedMemory + EFI_PAGES_TO_SIZE (Pages));
+    UnalignedPages = RealPages - Pages - UnalignedPages;
+    if (UnalignedPages > 0) {
+      //
+      // Free last unaligned page(s).
+      //
+      Status = gSmst->SmmFreePages (Memory, UnalignedPages);
+      ASSERT_EFI_ERROR (Status);
+    }
+  } else {
+    //
+    // Do not over-allocate pages in this case.
+    //
+    Status = gSmst->SmmAllocatePages (AllocateAnyPages, EfiRuntimeServicesCode, Pages, &Memory);
+    if (EFI_ERROR (Status)) {
+      return NULL;
+    }
+    AlignedMemory  = (UINTN) Memory;
+  }
+  return (VOID *) AlignedMemory;
+}
+
+/**
   Perform the remaining tasks.
 
 **/
@@ -1186,6 +1315,17 @@ PerformRemainingTasks (
     // Create a mix of 2MB and 4KB page table. Update some memory ranges absent and execute-disable.
     //
     InitPaging ();
+
+    //
+    // Mark critical region to be read-only in page table
+    //
+    SetRegionAttributes ();
+
+    //
+    // Set page table itself to be read-only
+    //
+    SetPageTableAttributes ();
+
     //
     // Configure SMM Code Access Check feature if available.
     //

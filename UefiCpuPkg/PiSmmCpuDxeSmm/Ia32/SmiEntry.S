@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -24,8 +24,12 @@ ASM_GLOBAL  ASM_PFX(gcSmiHandlerSize)
 ASM_GLOBAL  ASM_PFX(gSmiCr3)
 ASM_GLOBAL  ASM_PFX(gSmiStack)
 ASM_GLOBAL  ASM_PFX(gSmbase)
+ASM_GLOBAL  ASM_PFX(mXdSupported)
 ASM_GLOBAL  ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))
 ASM_GLOBAL  ASM_PFX(gSmiHandlerIdtr)
+
+.equ            MSR_EFER, 0xc0000080
+.equ            MSR_EFER_XD, 0x800
 
 .equ            DSC_OFFSET, 0xfb00
 .equ            DSC_GDTPTR, 0x30
@@ -122,8 +126,41 @@ L11:
     orl     $BIT10, %eax
 L12:                                       # as cr4.PGE is not set here, refresh cr3
     movl    %eax, %cr4                     # in PreModifyMtrrs() to flush TLB.
+
+    cmpb    $0, ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))
+    jz      L5
+# Load TSS
+    movb    $0x89, (TSS_SEGMENT + 5)(%ebp) # clear busy flag
+    movl    $TSS_SEGMENT, %eax
+    ltrw    %ax
+L5:
+
+# enable NXE if supported
+    .byte   0xb0                           # mov al, imm8
+ASM_PFX(mXdSupported): .byte 1
+    cmpb    $0, %al
+    jz      SkipNxe
+#
+# Check XD disable bit
+#
+    movl    $MSR_IA32_MISC_ENABLE, %ecx
+    rdmsr
+    pushl   %edx                           # save MSR_IA32_MISC_ENABLE[63-32]
+    testl   $BIT2, %edx                    # MSR_IA32_MISC_ENABLE[34]
+    jz      L13
+    andw    $0x0FFFB, %dx                  # clear XD Disable bit if it is set
+    wrmsr
+L13:
+    movl    $MSR_EFER, %ecx
+    rdmsr
+    orw     $MSR_EFER_XD,%ax               # enable NXE
+    wrmsr
+SkipNxe:
+    subl    $4, %esp
+NxeDone:
+
     movl    %cr0, %ebx
-    orl     $0x080010000, %ebx             # enable paging + WP
+    orl     $0x080010023, %ebx             # enable paging + WP + NE + MP + PE
     movl    %ebx, %cr0
     leal    DSC_OFFSET(%edi),%ebx
     movw    DSC_DS(%ebx),%ax
@@ -135,35 +172,39 @@ L12:                                       # as cr4.PGE is not set here, refresh
     movw    DSC_SS(%ebx),%ax
     movl    %eax, %ss
 
-    cmpb    $0, ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))
-    jz      L5
-
-# Load TSS
-    movb    $0x89, (TSS_SEGMENT + 5)(%ebp) # clear busy flag
-    movl    $TSS_SEGMENT, %eax
-    ltrw    %ax
-L5:
-
 #   jmp     _SmiHandler                 # instruction is not needed
 
 _SmiHandler:
-    movl    (%esp), %ebx
+    movl    4(%esp), %ebx
 
     pushl   %ebx
     movl    $ASM_PFX(CpuSmmDebugEntry), %eax
     call    *%eax
-    popl    %ecx
-    
+    addl    $4, %esp
+
     pushl   %ebx
     movl    $ASM_PFX(SmiRendezvous), %eax
     call    *%eax
-    popl    %ecx
+    addl    $4, %esp
 
     pushl   %ebx
     movl    $ASM_PFX(CpuSmmDebugExit), %eax
     call    *%eax
-    popl    %ecx
+    addl    $4, %esp
 
+    movl    $ASM_PFX(mXdSupported), %eax
+    movb    (%eax), %al
+    cmpb    $0, %al
+    jz      L16
+    popl    %edx                        # get saved MSR_IA32_MISC_ENABLE[63-32]
+    testl   $BIT2, %edx
+    jz      L16
+    movl    $MSR_IA32_MISC_ENABLE, %ecx
+    rdmsr
+    orw     $BIT2, %dx                  # set XD Disable bit if it was set before entering into SMM
+    wrmsr
+
+L16:
     rsm
 
 ASM_PFX(gcSmiHandlerSize):    .word      . - _SmiEntryPoint

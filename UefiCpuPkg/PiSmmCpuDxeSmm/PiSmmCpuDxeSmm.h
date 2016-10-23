@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmCpuService.h>
 
 #include <Guid/AcpiS3Context.h>
+#include <Guid/PiSmmMemoryAttributesTable.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -83,12 +84,37 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define IA32_PG_PMNT                BIT62
 #define IA32_PG_NX                  BIT63
 
-#define PAGE_ATTRIBUTE_BITS         (IA32_PG_RW | IA32_PG_P)
+#define PAGE_ATTRIBUTE_BITS         (IA32_PG_D | IA32_PG_A | IA32_PG_U | IA32_PG_RW | IA32_PG_P)
 //
 // Bits 1, 2, 5, 6 are reserved in the IA32 PAE PDPTE
 // X64 PAE PDPTE does not have such restriction
 //
 #define IA32_PAE_PDPTE_ATTRIBUTE_BITS    (IA32_PG_P)
+
+#define PAGE_PROGATE_BITS           (IA32_PG_NX | PAGE_ATTRIBUTE_BITS)
+
+#define PAGING_4K_MASK  0xFFF
+#define PAGING_2M_MASK  0x1FFFFF
+#define PAGING_1G_MASK  0x3FFFFFFF
+
+#define PAGING_PAE_INDEX_MASK  0x1FF
+
+#define PAGING_4K_ADDRESS_MASK_64 0x000FFFFFFFFFF000ull
+#define PAGING_2M_ADDRESS_MASK_64 0x000FFFFFFFE00000ull
+#define PAGING_1G_ADDRESS_MASK_64 0x000FFFFFC0000000ull
+
+typedef enum {
+  PageNone,
+  Page4K,
+  Page2M,
+  Page1G,
+} PAGE_ATTRIBUTE;
+
+typedef struct {
+  PAGE_ATTRIBUTE   Attribute;
+  UINT64           Length;
+  UINT64           AddressMask;
+} PAGE_ATTRIBUTE_TABLE;
 
 //
 // Size of Task-State Segment defined in IA32 Manual
@@ -97,6 +123,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TSS_X64_IST1_OFFSET   36
 #define TSS_IA32_CR3_OFFSET   28
 #define TSS_IA32_ESP_OFFSET   56
+
+#define CR0_WP                BIT16
 
 //
 // Code select value
@@ -395,6 +423,8 @@ typedef struct {
 } SMM_CPU_SEMAPHORES;
 
 extern IA32_DESCRIPTOR                     gcSmiGdtr;
+extern EFI_PHYSICAL_ADDRESS                mGdtBuffer;
+extern UINTN                               mGdtBufferSize;
 extern IA32_DESCRIPTOR                     gcSmiIdtr;
 extern VOID                                *gcSmiIdtrPtr;
 extern CONST PROCESSOR_SMM_DESCRIPTOR      gcPsd;
@@ -414,14 +444,12 @@ extern SPIN_LOCK                           *mMemoryMappedLock;
 /**
   Create 4G PageTable in SMRAM.
 
-  @param          ExtraPages       Additional page numbers besides for 4G memory
-  @param          Is32BitPageTable Whether the page table is 32-bit PAE
+  @param[in]      Is32BitPageTable Whether the page table is 32-bit PAE
   @return         PageTable Address
 
 **/
 UINT32
 Gen4GPageTable (
-  IN      UINTN                     ExtraPages,
   IN      BOOLEAN                   Is32BitPageTable
   );
 
@@ -482,7 +510,7 @@ InitializeIDTSmmStackGuard (
 
 /**
   Initialize Gdt for all processors.
-  
+
   @param[in]   Cr3          CR3 value.
   @param[out]  GdtStepSize  The step size for GDT table.
 
@@ -761,6 +789,96 @@ DumpModuleInfoByIp (
   );
 
 /**
+  This function sets memory attribute according to MemoryAttributesTable.
+**/
+VOID
+SetMemMapAttributes (
+  VOID
+  );
+
+/**
+  This function sets memory attribute for page table.
+**/
+VOID
+SetPageTableAttributes (
+  VOID
+  );
+
+/**
+  Return page table base.
+
+  @return page table base.
+**/
+UINTN
+GetPageTableBase (
+  VOID
+  );
+
+/**
+  This function sets the attributes for the memory region specified by BaseAddress and
+  Length from their current attributes to the attributes specified by Attributes.
+
+  @param[in]   BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]   Length           The size in bytes of the memory region.
+  @param[in]   Attributes       The bit mask of attributes to set for the memory region.
+  @param[out]  IsSplitted       TRUE means page table splitted. FALSE means page table not splitted.
+
+  @retval EFI_SUCCESS           The attributes were set for the memory region.
+  @retval EFI_ACCESS_DENIED     The attributes for the memory resource range specified by
+                                BaseAddress and Length cannot be modified.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes specified an illegal combination of attributes that
+                                cannot be set together.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
+                                the memory resource range.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
+                                resource range specified by BaseAddress and Length.
+                                The bit mask of attributes is not support for the memory resource
+                                range specified by BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmSetMemoryAttributesEx (
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length,
+  IN  UINT64                                     Attributes,
+  OUT BOOLEAN                                    *IsSplitted  OPTIONAL
+  );
+
+/**
+  This function clears the attributes for the memory region specified by BaseAddress and
+  Length from their current attributes to the attributes specified by Attributes.
+
+  @param[in]   BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]   Length           The size in bytes of the memory region.
+  @param[in]   Attributes       The bit mask of attributes to clear for the memory region.
+  @param[out]  IsSplitted       TRUE means page table splitted. FALSE means page table not splitted.
+
+  @retval EFI_SUCCESS           The attributes were cleared for the memory region.
+  @retval EFI_ACCESS_DENIED     The attributes for the memory resource range specified by
+                                BaseAddress and Length cannot be modified.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes specified an illegal combination of attributes that
+                                cannot be set together.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
+                                the memory resource range.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
+                                resource range specified by BaseAddress and Length.
+                                The bit mask of attributes is not support for the memory resource
+                                range specified by BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmClearMemoryAttributesEx (
+  IN  EFI_PHYSICAL_ADDRESS                       BaseAddress,
+  IN  UINT64                                     Length,
+  IN  UINT64                                     Attributes,
+  OUT BOOLEAN                                    *IsSplitted  OPTIONAL
+  );
+
+/**
   This API provides a way to allocate memory for page table.
 
   This API can be called more once to allocate memory for page tables.
@@ -778,6 +896,34 @@ DumpModuleInfoByIp (
 VOID *
 AllocatePageTableMemory (
   IN UINTN           Pages
+  );
+
+/**
+  Allocate pages for code.
+
+  @param[in]  Pages Number of pages to be allocated.
+
+  @return Allocated memory.
+**/
+VOID *
+AllocateCodePages (
+  IN UINTN           Pages
+  );
+
+/**
+  Allocate aligned pages for code.
+
+  @param[in]  Pages                 Number of pages to be allocated.
+  @param[in]  Alignment             The requested alignment of the allocation.
+                                    Must be a power of two.
+                                    If Alignment is zero, then byte alignment is used.
+
+  @return Allocated memory.
+**/
+VOID *
+AllocateAlignedCodePages (
+  IN UINTN            Pages,
+  IN UINTN            Alignment
   );
 
 

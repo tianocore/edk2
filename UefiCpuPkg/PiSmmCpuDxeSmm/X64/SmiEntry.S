@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,12 @@ ASM_GLOBAL  ASM_PFX(gcSmiHandlerSize)
 ASM_GLOBAL  ASM_PFX(gSmiCr3)
 ASM_GLOBAL  ASM_PFX(gSmiStack)
 ASM_GLOBAL  ASM_PFX(gSmbase)
+ASM_GLOBAL  ASM_PFX(mXdSupported)
 ASM_GLOBAL  ASM_PFX(gSmiHandlerIdtr)
+
+.equ            MSR_IA32_MISC_ENABLE, 0x1A0
+.equ            MSR_EFER, 0xc0000080
+.equ            MSR_EFER_XD, 0x800
 
 #
 # Constants relating to PROCESSOR_SMM_DESCRIPTOR
@@ -132,6 +137,32 @@ ASM_PFX(gSmiCr3):    .space  4
     movl    $TSS_SEGMENT, %eax
     ltr     %ax
 
+# enable NXE if supported
+    .byte   0xb0                        # mov al, imm8
+ASM_PFX(mXdSupported): .byte 1
+    cmpb    $0, %al
+    jz      SkipNxe
+#
+# Check XD disable bit
+#
+    movl    $MSR_IA32_MISC_ENABLE, %ecx
+    rdmsr
+    subl    $4, %esp
+    pushq   %rdx                       # save MSR_IA32_MISC_ENABLE[63-32]
+    testl   $BIT2, %edx                # MSR_IA32_MISC_ENABLE[34]
+    jz      L13
+    andw    $0x0FFFB, %dx              # clear XD Disable bit if it is set
+    wrmsr
+L13:
+    movl    $MSR_EFER, %ecx
+    rdmsr
+    orw     $MSR_EFER_XD,%ax            # enable NXE
+    wrmsr
+    jmp     @NxeDone
+SkipNxe:
+    subl    $8, %esp
+NxeDone:
+
     #
     # Switch to LongMode
     #
@@ -139,12 +170,13 @@ ASM_PFX(gSmiCr3):    .space  4
     call     Base                         # push return address for retf later
 Base:
     addl    $(LongMode - Base), (%rsp)  # offset for far retf, seg is the 1st arg
-    movl    $0xc0000080, %ecx
+
+    movl    $MSR_EFER, %ecx
     rdmsr
-    orb     $1,%ah
+    orb     $1,%ah                      # enable LME
     wrmsr
     movq    %cr0, %rbx
-    orl     $0x080010000, %ebx          # enable paging + WP
+    orl     $0x080010023, %ebx          # enable paging + WP + NE + MP + PE
     movq    %rbx, %cr0
     retf
 LongMode:                               # long mode (64-bit code) starts here
@@ -162,10 +194,10 @@ LongMode:                               # long mode (64-bit code) starts here
 #   jmp     _SmiHandler                 ; instruction is not needed
 
 _SmiHandler:
-    movq    (%rsp), %rbx
+    movq    8(%rsp), %rbx
     # Save FP registers
 
-    subq    $0x208, %rsp
+    subq    $0x200, %rsp
     .byte   0x48                        # FXSAVE64
     fxsave  (%rsp)
 
@@ -191,6 +223,21 @@ _SmiHandler:
     .byte   0x48                        # FXRSTOR64
     fxrstor (%rsp)
 
+    addq    $0x200, %rsp
+
+    movabsq $ASM_PFX(mXdSupported), %rax
+    movb    (%rax), %al
+    cmpb    $0, %al
+    jz      L16
+    popq    %rdx                        # get saved MSR_IA32_MISC_ENABLE[63-32]
+    testl   $BIT2, %edx
+    jz      L16
+    movl    $MSR_IA32_MISC_ENABLE, %ecx
+    rdmsr
+    orw     $BIT2, %dx                  # set XD Disable bit if it was set before entering into SMM
+    wrmsr
+
+L16:
     rsm
 
 ASM_PFX(gcSmiHandlerSize):    .word      . - _SmiEntryPoint

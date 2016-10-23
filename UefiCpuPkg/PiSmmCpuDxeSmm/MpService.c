@@ -734,14 +734,12 @@ APHandler (
 /**
   Create 4G PageTable in SMRAM.
 
-  @param          ExtraPages       Additional page numbers besides for 4G memory
-  @param          Is32BitPageTable Whether the page table is 32-bit PAE
+  @param[in]      Is32BitPageTable Whether the page table is 32-bit PAE
   @return         PageTable Address
 
 **/
 UINT32
 Gen4GPageTable (
-  IN      UINTN                     ExtraPages,
   IN      BOOLEAN                   Is32BitPageTable
   )
 {
@@ -775,10 +773,10 @@ Gen4GPageTable (
   //
   // Allocate the page table
   //
-  PageTable = AllocatePageTableMemory (ExtraPages + 5 + PagesNeeded);
+  PageTable = AllocatePageTableMemory (5 + PagesNeeded);
   ASSERT (PageTable != NULL);
 
-  PageTable = (VOID *)((UINTN)PageTable + EFI_PAGES_TO_SIZE (ExtraPages));
+  PageTable = (VOID *)((UINTN)PageTable);
   Pte = (UINT64*)PageTable;
 
   //
@@ -903,6 +901,94 @@ SetCacheability (
   PageTable[PTIndex] |= (UINT64)Cacheability;
 }
 
+/**
+  Schedule a procedure to run on the specified CPU.
+
+  @param[in]       Procedure                The address of the procedure to run
+  @param[in]       CpuIndex                 Target CPU Index
+  @param[in, OUT]  ProcArguments            The parameter to pass to the procedure
+  @param[in]       BlockingMode             Startup AP in blocking mode or not
+
+  @retval EFI_INVALID_PARAMETER    CpuNumber not valid
+  @retval EFI_INVALID_PARAMETER    CpuNumber specifying BSP
+  @retval EFI_INVALID_PARAMETER    The AP specified by CpuNumber did not enter SMM
+  @retval EFI_INVALID_PARAMETER    The AP specified by CpuNumber is busy
+  @retval EFI_SUCCESS              The procedure has been successfully scheduled
+
+**/
+EFI_STATUS
+InternalSmmStartupThisAp (
+  IN      EFI_AP_PROCEDURE          Procedure,
+  IN      UINTN                     CpuIndex,
+  IN OUT  VOID                      *ProcArguments OPTIONAL,
+  IN      BOOLEAN                   BlockingMode
+  )
+{
+  if (CpuIndex >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus) {
+    DEBUG((DEBUG_ERROR, "CpuIndex(%d) >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus(%d)\n", CpuIndex, gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus));
+    return EFI_INVALID_PARAMETER;
+  }
+  if (CpuIndex == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu) {
+    DEBUG((DEBUG_ERROR, "CpuIndex(%d) == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu\n", CpuIndex));
+    return EFI_INVALID_PARAMETER;
+  }
+  if (!(*(mSmmMpSyncData->CpuData[CpuIndex].Present))) {
+    if (mSmmMpSyncData->EffectiveSyncMode == SmmCpuSyncModeTradition) {
+      DEBUG((DEBUG_ERROR, "!mSmmMpSyncData->CpuData[%d].Present\n", CpuIndex));
+    }
+    return EFI_INVALID_PARAMETER;
+  }
+  if (gSmmCpuPrivate->Operation[CpuIndex] == SmmCpuRemove) {
+    if (!FeaturePcdGet (PcdCpuHotPlugSupport)) {
+      DEBUG((DEBUG_ERROR, "gSmmCpuPrivate->Operation[%d] == SmmCpuRemove\n", CpuIndex));
+    }
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (BlockingMode) {
+    AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
+  } else {
+    if (!AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
+      DEBUG((DEBUG_ERROR, "mSmmMpSyncData->CpuData[%d].Busy\n", CpuIndex));
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  mSmmMpSyncData->CpuData[CpuIndex].Procedure = Procedure;
+  mSmmMpSyncData->CpuData[CpuIndex].Parameter = ProcArguments;
+  ReleaseSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
+
+  if (BlockingMode) {
+    AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
+    ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
+  }
+  return EFI_SUCCESS;
+}
+
+/**
+  Schedule a procedure to run on the specified CPU in blocking mode.
+
+  @param[in]       Procedure                The address of the procedure to run
+  @param[in]       CpuIndex                 Target CPU Index
+  @param[in, out]  ProcArguments            The parameter to pass to the procedure
+
+  @retval EFI_INVALID_PARAMETER    CpuNumber not valid
+  @retval EFI_INVALID_PARAMETER    CpuNumber specifying BSP
+  @retval EFI_INVALID_PARAMETER    The AP specified by CpuNumber did not enter SMM
+  @retval EFI_INVALID_PARAMETER    The AP specified by CpuNumber is busy
+  @retval EFI_SUCCESS              The procedure has been successfully scheduled
+
+**/
+EFI_STATUS
+EFIAPI
+SmmBlockingStartupThisAp (
+  IN      EFI_AP_PROCEDURE          Procedure,
+  IN      UINTN                     CpuIndex,
+  IN OUT  VOID                      *ProcArguments OPTIONAL
+  )
+{
+  return InternalSmmStartupThisAp(Procedure, CpuIndex, ProcArguments, TRUE);
+}
 
 /**
   Schedule a procedure to run on the specified CPU.
@@ -926,23 +1012,7 @@ SmmStartupThisAp (
   IN OUT  VOID                      *ProcArguments OPTIONAL
   )
 {
-  if (CpuIndex >= gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus ||
-      CpuIndex == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu ||
-      !(*(mSmmMpSyncData->CpuData[CpuIndex].Present)) ||
-      gSmmCpuPrivate->Operation[CpuIndex] == SmmCpuRemove ||
-      !AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  mSmmMpSyncData->CpuData[CpuIndex].Procedure = Procedure;
-  mSmmMpSyncData->CpuData[CpuIndex].Parameter = ProcArguments;
-  ReleaseSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
-
-  if (FeaturePcdGet (PcdCpuSmmBlockStartupThisAp)) {
-    AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
-    ReleaseSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
-  }
-  return EFI_SUCCESS;
+  return InternalSmmStartupThisAp(Procedure, CpuIndex, ProcArguments, FeaturePcdGet (PcdCpuSmmBlockStartupThisAp));
 }
 
 /**
@@ -964,6 +1034,7 @@ CpuSmmDebugEntry (
   SMRAM_SAVE_STATE_MAP *CpuSaveState;
   
   if (FeaturePcdGet (PcdCpuSmmDebug)) {
+    ASSERT(CpuIndex < mMaxNumberOfCpus);
     CpuSaveState = (SMRAM_SAVE_STATE_MAP *)gSmmCpuPrivate->CpuSaveState[CpuIndex];
     if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
       AsmWriteDr6 (CpuSaveState->x86._DR6);
@@ -993,6 +1064,7 @@ CpuSmmDebugExit (
   SMRAM_SAVE_STATE_MAP *CpuSaveState;
 
   if (FeaturePcdGet (PcdCpuSmmDebug)) {
+    ASSERT(CpuIndex < mMaxNumberOfCpus);
     CpuSaveState = (SMRAM_SAVE_STATE_MAP *)gSmmCpuPrivate->CpuSaveState[CpuIndex];
     if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
       CpuSaveState->x86._DR7 = (UINT32)AsmReadDr7 ();
@@ -1022,8 +1094,8 @@ SmiRendezvous (
   BOOLEAN                        BspInProgress;
   UINTN                          Index;
   UINTN                          Cr2;
-  BOOLEAN                        XdDisableFlag;
-  MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
+
+  ASSERT(CpuIndex < mMaxNumberOfCpus);
 
   //
   // Save Cr2 because Page Fault exception in SMM may override its value
@@ -1080,20 +1152,6 @@ SmiRendezvous (
       // after AP's present flag is detected.
       //
       InitializeSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
-    }
-
-    //
-    // Try to enable XD
-    //
-    XdDisableFlag = FALSE;
-    if (mXdSupported) {
-      MiscEnableMsr.Uint64 = AsmReadMsr64 (MSR_IA32_MISC_ENABLE);
-      if (MiscEnableMsr.Bits.XD == 1) {
-        XdDisableFlag = TRUE;
-        MiscEnableMsr.Bits.XD = 0;
-        AsmWriteMsr64 (MSR_IA32_MISC_ENABLE, MiscEnableMsr.Uint64);
-      }
-      ActivateXd ();
     }
 
     if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
@@ -1176,15 +1234,6 @@ SmiRendezvous (
     //
     while (*mSmmMpSyncData->AllCpusInSync) {
       CpuPause ();
-     }
-
-    //
-    // Restore XD
-    //
-    if (XdDisableFlag) {
-      MiscEnableMsr.Uint64 = AsmReadMsr64 (MSR_IA32_MISC_ENABLE);
-      MiscEnableMsr.Bits.XD = 1;
-      AsmWriteMsr64 (MSR_IA32_MISC_ENABLE, MiscEnableMsr.Uint64);
     }
   }
 

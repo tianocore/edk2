@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -144,27 +144,8 @@ gcSmiGdtr   LABEL   FWORD
     DQ      offset NullSeg
 
 gcSmiIdtr   LABEL   FWORD
-    DW      IDT_SIZE - 1
-    DQ      offset _SmiIDT
-
-    .data
-
-;
-; Here is the IDT. There are 32 (not 255) entries in it since only processor
-; generated exceptions will be handled.
-;
-_SmiIDT:
-REPEAT      32
-    DW      0                           ; Offset 0:15
-    DW      CODE_SEL                    ; Segment selector
-    DB      0                           ; Unused
-    DB      8eh                         ; Interrupt Gate, Present
-    DW      0                           ; Offset 16:31
-    DQ      0                           ; Offset 32:63
-            ENDM
-_SmiIDTEnd:
-
-IDT_SIZE = (offset _SmiIDTEnd - offset _SmiIDT)
+    DW      0
+    DQ      0
 
     .code
 
@@ -399,15 +380,5 @@ PageFaultIdtHandlerSmmProfile    PROC
     add     rsp, 16           ; skip INT# & ErrCode
     iretq
 PageFaultIdtHandlerSmmProfile ENDP
-
-InitializeIDTSmmStackGuard   PROC
-;
-; If SMM Stack Guard feature is enabled, set the IST field of
-; the interrupt gate for Page Fault Exception to be 1
-;
-    lea     rax, _SmiIDT + 14 * 16
-    mov     byte ptr [rax + 4], 1
-    ret
-InitializeIDTSmmStackGuard   ENDP
 
     END

@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -24,6 +24,7 @@ ASM_GLOBAL  ASM_PFX(PageFaultStubFunction)
 ASM_GLOBAL  ASM_PFX(gSmiMtrrs)
 ASM_GLOBAL  ASM_PFX(gcSmiIdtr)
 ASM_GLOBAL  ASM_PFX(gcSmiGdtr)
+ASM_GLOBAL  ASM_PFX(gTaskGateDescriptor)
 ASM_GLOBAL  ASM_PFX(gcPsd)
 ASM_GLOBAL  ASM_PFX(FeaturePcdGet (PcdCpuSmmProfileEnable))
 
@@ -236,207 +237,10 @@ ASM_PFX(gcPsd):
 ASM_PFX(gcSmiGdtr):  .word      GDT_SIZE - 1
                      .long      NullSeg
 
-ASM_PFX(gcSmiIdtr):  .word      IDT_SIZE - 1
-                     .long      _SmiIDT
+ASM_PFX(gcSmiIdtr):  .word      0
+                     .long      0
 
-_SmiIDT:
-# The following segment repeats 32 times:
-# No. 1
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 2
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 3
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 4
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 5
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 6
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 7
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 8
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 9
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 10
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 11
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 12
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 13
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 14
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 15
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 16
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 17
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 18
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 19
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 20
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 21
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 22
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 23
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 24
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 25
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 26
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 27
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 28
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 29
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 30
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 31
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-# No. 32
-    .word 0                             # Offset 0:15
-    .word      CODE_SEL
-    .byte 0                             # Unused
-    .byte 0x8e                          # Interrupt Gate, Present
-    .word 0                             # Offset 16:31
-
-.equ  IDT_SIZE, . - _SmiIDT
-
-TaskGateDescriptor:
+ASM_PFX(gTaskGateDescriptor):
     .word      0                        # Reserved
     .word      EXCEPTION_TSS_SEL        # TSS Segment selector
     .byte      0                        # Reserved
@@ -891,21 +695,3 @@ ASM_PFX(PageFaultStubFunction):
 #
     clts
     iret
-
-ASM_GLOBAL ASM_PFX(InitializeIDTSmmStackGuard)
-ASM_PFX(InitializeIDTSmmStackGuard):
-    pushl   %ebx
-#
-# If SMM Stack Guard feature is enabled, the Page Fault Exception entry in IDT
-# is a Task Gate Descriptor so that when a Page Fault Exception occurs,
-# the processors can use a known good stack in case stack ran out.
-#
-    leal    _SmiIDT + 14 * 8, %ebx
-    leal    TaskGateDescriptor, %edx
-    movl    (%edx), %eax
-    movl    %eax, (%ebx)
-    movl    4(%edx), %eax
-    movl    %eax, 4(%ebx)
-
-    popl    %ebx
-    ret

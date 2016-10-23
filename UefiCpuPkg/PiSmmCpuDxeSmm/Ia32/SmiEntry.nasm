@@ -18,6 +18,10 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%define MSR_IA32_MISC_ENABLE 0x1A0
+%define MSR_EFER      0xc0000080
+%define MSR_EFER_XD   0x800
+
 %define DSC_OFFSET 0xfb00
 %define DSC_GDTPTR 0x30
 %define DSC_GDTSIZ 0x38
@@ -40,6 +44,7 @@ global ASM_PFX(gcSmiHandlerSize)
 global ASM_PFX(gSmiCr3)
 global ASM_PFX(gSmiStack)
 global ASM_PFX(gSmbase)
+global ASM_PFX(mXdSupported)
 extern ASM_PFX(gSmiHandlerIdtr)
 
     SECTION .text
@@ -56,7 +61,7 @@ _SmiEntryPoint:
     mov     ebp, eax                      ; ebp = GDT base
 o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
     mov     ax, PROTECT_MODE_CS
-    mov     [cs:bx-0x2],ax    
+    mov     [cs:bx-0x2],ax
     DB      0x66, 0xbf                   ; mov edi, SMBASE
 ASM_PFX(gSmbase): DD 0
     lea     eax, [edi + (@32bit - _SmiEntryPoint) + 0x8000]
@@ -66,7 +71,7 @@ ASM_PFX(gSmbase): DD 0
     or      ebx, 0x23
     mov     cr0, ebx
     jmp     dword 0x0:0x0
-_GdtDesc:   
+_GdtDesc:
     DW 0
     DD 0
 
@@ -115,8 +120,42 @@ ASM_PFX(gSmiCr3): DD 0
     or      eax, BIT10
 .4:                                     ; as cr4.PGE is not set here, refresh cr3
     mov     cr4, eax                    ; in PreModifyMtrrs() to flush TLB.
+
+    cmp     byte [dword ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))], 0
+    jz      .6
+; Load TSS
+    mov     byte [ebp + TSS_SEGMENT + 5], 0x89 ; clear busy flag
+    mov     eax, TSS_SEGMENT
+    ltr     ax
+.6:
+
+; enable NXE if supported
+    DB      0b0h                        ; mov al, imm8
+ASM_PFX(mXdSupported):     DB      1
+    cmp     al, 0
+    jz      @SkipXd
+;
+; Check XD disable bit
+;
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    push    edx                        ; save MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2                  ; MSR_IA32_MISC_ENABLE[34]
+    jz      .5
+    and     dx, 0xFFFB                 ; clear XD Disable bit if it is set
+    wrmsr
+.5:
+    mov     ecx, MSR_EFER
+    rdmsr
+    or      ax, MSR_EFER_XD             ; enable NXE
+    wrmsr
+    jmp     @XdDone
+@SkipXd:
+    sub     esp, 4
+@XdDone:
+
     mov     ebx, cr0
-    or      ebx, 0x080010000            ; enable paging + WP
+    or      ebx, 0x80010023             ; enable paging + WP + NE + MP + PE
     mov     cr0, ebx
     lea     ebx, [edi + DSC_OFFSET]
     mov     ax, [ebx + DSC_DS]
@@ -128,35 +167,39 @@ ASM_PFX(gSmiCr3): DD 0
     mov     ax, [ebx + DSC_SS]
     mov     ss, eax
 
-    cmp     byte [dword ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))], 0
-    jz      .5
-
-; Load TSS
-    mov     byte [ebp + TSS_SEGMENT + 5], 0x89 ; clear busy flag
-    mov     eax, TSS_SEGMENT
-    ltr     ax
-.5:
 ;   jmp     _SmiHandler                 ; instruction is not needed
 
 global ASM_PFX(SmiHandler)
 ASM_PFX(SmiHandler):
-    mov     ebx, [esp]                  ; CPU Index
-
+    mov     ebx, [esp + 4]                  ; CPU Index
     push    ebx
     mov     eax, ASM_PFX(CpuSmmDebugEntry)
     call    eax
-    pop     ecx
+    add     esp, 4
 
     push    ebx
     mov     eax, ASM_PFX(SmiRendezvous)
     call    eax
-    pop     ecx
-    
+    add     esp, 4
+
     push    ebx
     mov     eax, ASM_PFX(CpuSmmDebugExit)
     call    eax
-    pop     ecx
+    add     esp, 4
 
+    mov     eax, ASM_PFX(mXdSupported)
+    mov     al, [eax]
+    cmp     al, 0
+    jz      .7
+    pop     edx                       ; get saved MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2
+    jz      .7
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    or      dx, BIT2                  ; set XD Disable bit if it was set before entering into SMM
+    wrmsr
+
+.7:
     rsm
 
 ASM_PFX(gcSmiHandlerSize): DW $ - _SmiEntryPoint

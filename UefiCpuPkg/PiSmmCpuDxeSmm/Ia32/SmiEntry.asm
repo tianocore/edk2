@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,10 @@
     .model  flat,C
     .xmm
 
+MSR_IA32_MISC_ENABLE  EQU     1A0h
+MSR_EFER      EQU     0c0000080h
+MSR_EFER_XD   EQU     0800h
+
 DSC_OFFSET    EQU     0fb00h
 DSC_GDTPTR    EQU     30h
 DSC_GDTSIZ    EQU     38h
@@ -43,6 +47,7 @@ EXTERNDEF   gcSmiHandlerSize:WORD
 EXTERNDEF   gSmiCr3:DWORD
 EXTERNDEF   gSmiStack:DWORD
 EXTERNDEF   gSmbase:DWORD
+EXTERNDEF   mXdSupported:BYTE
 EXTERNDEF   FeaturePcdGet (PcdCpuSmmStackGuard):BYTE
 EXTERNDEF   gSmiHandlerIdtr:FWORD
 
@@ -128,8 +133,42 @@ gSmiCr3     DD      ?
     or      eax, BIT10
 @@:                                     ; as cr4.PGE is not set here, refresh cr3
     mov     cr4, eax                    ; in PreModifyMtrrs() to flush TLB.
+
+    cmp     FeaturePcdGet (PcdCpuSmmStackGuard), 0
+    jz      @F
+; Load TSS
+    mov     byte ptr [ebp + TSS_SEGMENT + 5], 89h ; clear busy flag
+    mov     eax, TSS_SEGMENT
+    ltr     ax
+@@:
+
+; enable NXE if supported
+    DB      0b0h                        ; mov al, imm8
+mXdSupported     DB      1
+    cmp     al, 0
+    jz      @SkipXd
+;
+; Check XD disable bit
+;
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    push    edx                        ; save MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2                  ; MSR_IA32_MISC_ENABLE[34]
+    jz      @f
+    and     dx, 0FFFBh                 ; clear XD Disable bit if it is set
+    wrmsr
+@@:
+    mov     ecx, MSR_EFER
+    rdmsr
+    or      ax, MSR_EFER_XD             ; enable NXE
+    wrmsr
+    jmp     @XdDone
+@SkipXd:
+    sub     esp, 4
+@XdDone:
+
     mov     ebx, cr0
-    or      ebx, 080010000h             ; enable paging + WP
+    or      ebx, 080010023h             ; enable paging + WP + NE + MP + PE
     mov     cr0, ebx
     lea     ebx, [edi + DSC_OFFSET]
     mov     ax, [ebx + DSC_DS]
@@ -141,34 +180,38 @@ gSmiCr3     DD      ?
     mov     ax, [ebx + DSC_SS]
     mov     ss, eax
 
-    cmp     FeaturePcdGet (PcdCpuSmmStackGuard), 0
-    jz      @F
-
-; Load TSS
-    mov     byte ptr [ebp + TSS_SEGMENT + 5], 89h ; clear busy flag
-    mov     eax, TSS_SEGMENT
-    ltr     ax
-@@:
 ;   jmp     _SmiHandler                 ; instruction is not needed
 
 _SmiHandler PROC
-    mov     ebx, [esp]                  ; CPU Index
-
+    mov     ebx, [esp + 4]                  ; CPU Index
     push    ebx
     mov     eax, CpuSmmDebugEntry
     call    eax
-    pop     ecx
+    add     esp, 4
 
     push    ebx
     mov     eax, SmiRendezvous
     call    eax
-    pop     ecx
-    
+    add     esp, 4
+
     push    ebx
     mov     eax, CpuSmmDebugExit
     call    eax
-    pop     ecx
+    add     esp, 4
 
+    mov     eax, mXdSupported
+    mov     al, [eax]
+    cmp     al, 0
+    jz      @f
+    pop     edx                       ; get saved MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2
+    jz      @f
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    or      dx, BIT2                  ; set XD Disable bit if it was set before entering into SMM
+    wrmsr
+
+@@:
     rsm
 _SmiHandler ENDP
 

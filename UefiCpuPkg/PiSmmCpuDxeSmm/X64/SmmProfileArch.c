@@ -1,7 +1,7 @@
 /** @file
 X64 processor specific functions to enable SMM profile.
 
-Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,12 +45,13 @@ InitSmmS3Cr3 (
   //
   // Generate PAE page table for the first 4GB memory space
   //
-  Pages = Gen4GPageTable (1, FALSE);
+  Pages = Gen4GPageTable (FALSE);
 
   //
   // Fill Page-Table-Level4 (PML4) entry
   //
-  PTEntry = (UINT64*)(UINTN)(Pages - EFI_PAGES_TO_SIZE (1));
+  PTEntry = (UINT64*)AllocatePageTableMemory (1);
+  ASSERT (PTEntry != NULL);
   *PTEntry = Pages | PAGE_ATTRIBUTE_BITS;
   ZeroMem (PTEntry + 1, EFI_PAGE_SIZE - sizeof (*PTEntry));
 

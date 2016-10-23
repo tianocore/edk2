@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -26,6 +26,7 @@ EXTERNDEF   PageFaultStubFunction:PROC
 EXTERNDEF   gSmiMtrrs:QWORD
 EXTERNDEF   gcSmiIdtr:FWORD
 EXTERNDEF   gcSmiGdtr:FWORD
+EXTERNDEF   gTaskGateDescriptor:QWORD
 EXTERNDEF   gcPsd:BYTE
 EXTERNDEF   FeaturePcdGet (PcdCpuSmmProfileEnable):BYTE
 
@@ -252,20 +253,10 @@ gcSmiGdtr   LABEL   FWORD
     DD      offset NullSeg
 
 gcSmiIdtr   LABEL   FWORD
-    DW      IDT_SIZE - 1
-    DD      offset _SmiIDT
+    DW      0
+    DD      0
 
-_SmiIDT     LABEL   QWORD
-REPEAT      32
-    DW      0                           ; Offset 0:15
-    DW      CODE_SEL                    ; Segment selector
-    DB      0                           ; Unused
-    DB      8eh                         ; Interrupt Gate, Present
-    DW      0                           ; Offset 16:31
-            ENDM
-IDT_SIZE = $ - offset _SmiIDT
-
-TaskGateDescriptor LABEL DWORD
+gTaskGateDescriptor LABEL QWORD
     DW      0                           ; Reserved
     DW      EXCEPTION_TSS_SEL           ; TSS Segment selector
     DB      0                           ; Reserved
@@ -719,20 +710,5 @@ PageFaultStubFunction   PROC
     clts
     iretd
 PageFaultStubFunction   ENDP
-
-InitializeIDTSmmStackGuard   PROC    USES    ebx
-;
-; If SMM Stack Guard feature is enabled, the Page Fault Exception entry in IDT
-; is a Task Gate Descriptor so that when a Page Fault Exception occurs,
-; the processors can use a known good stack in case stack is ran out.
-;
-    lea     ebx, _SmiIDT + 14 * 8
-    lea     edx, TaskGateDescriptor
-    mov     eax, [edx]
-    mov     [ebx], eax
-    mov     eax, [edx + 4]
-    mov     [ebx + 4], eax
-    ret
-InitializeIDTSmmStackGuard   ENDP
 
     END

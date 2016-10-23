@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -29,8 +29,12 @@ EXTERNDEF   gcSmiHandlerSize:WORD
 EXTERNDEF   gSmiCr3:DWORD
 EXTERNDEF   gSmiStack:DWORD
 EXTERNDEF   gSmbase:DWORD
+EXTERNDEF   mXdSupported:BYTE
 EXTERNDEF   gSmiHandlerIdtr:FWORD
 
+MSR_IA32_MISC_ENABLE  EQU     1A0h
+MSR_EFER      EQU     0c0000080h
+MSR_EFER_XD   EQU     0800h
 
 ;
 ; Constants relating to PROCESSOR_SMM_DESCRIPTOR
@@ -130,17 +134,44 @@ gSmiCr3     DD      ?
     mov     eax, TSS_SEGMENT
     ltr     ax
 
+; enable NXE if supported
+    DB      0b0h                        ; mov al, imm8
+mXdSupported     DB      1
+    cmp     al, 0
+    jz      @SkipXd
+;
+; Check XD disable bit
+;
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    sub     esp, 4
+    push    rdx                        ; save MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2                  ; MSR_IA32_MISC_ENABLE[34]
+    jz      @f
+    and     dx, 0FFFBh                 ; clear XD Disable bit if it is set
+    wrmsr
+@@:
+    mov     ecx, MSR_EFER
+    rdmsr
+    or      ax, MSR_EFER_XD            ; enable NXE
+    wrmsr
+    jmp     @XdDone
+@SkipXd:
+    sub     esp, 8
+@XdDone:
+
 ; Switch into @LongMode
     push    LONG_MODE_CS                ; push cs hardcore here
     call    Base                       ; push return address for retf later
 Base:
     add     dword ptr [rsp], @LongMode - Base; offset for far retf, seg is the 1st arg
-    mov     ecx, 0c0000080h
+
+    mov     ecx, MSR_EFER
     rdmsr
-    or      ah, 1
+    or      ah, 1                      ; enable LME
     wrmsr
     mov     rbx, cr0
-    or      ebx, 080010000h            ; enable paging + WP
+    or      ebx, 080010023h            ; enable paging + WP + NE + MP + PE
     mov     cr0, rbx
     retf
 @LongMode:                              ; long mode (64-bit code) starts here
@@ -163,7 +194,7 @@ _SmiHandler:
     ;
     ; Save FP registers
     ;
-    sub     rsp, 208h
+    sub     rsp, 200h
     DB      48h                         ; FXSAVE64
     fxsave  [rsp]
 
@@ -172,15 +203,15 @@ _SmiHandler:
     mov     rcx, rbx
     mov     rax, CpuSmmDebugEntry
     call    rax
-    
+
     mov     rcx, rbx
     mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
     call    rax
-    
+
     mov     rcx, rbx
     mov     rax, CpuSmmDebugExit
     call    rax
-    
+
     add     rsp, 20h
 
     ;
@@ -189,6 +220,21 @@ _SmiHandler:
     DB      48h                         ; FXRSTOR64
     fxrstor [rsp]
 
+    add     rsp, 200h
+
+    mov     rax, ASM_PFX(mXdSupported)
+    mov     al, [rax]
+    cmp     al, 0
+    jz      @f
+    pop     rdx                       ; get saved MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2
+    jz      @f
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    or      dx, BIT2                  ; set XD Disable bit if it was set before entering into SMM
+    wrmsr
+
+@@:
     rsm
 
 gcSmiHandlerSize    DW      $ - _SmiEntryPoint

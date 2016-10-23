@@ -30,11 +30,6 @@ UINTN                     mSmmProfileSize;
 UINTN                     mMsrDsAreaSize   = SMM_PROFILE_DTS_SIZE;
 
 //
-// The flag indicates if execute-disable is supported by processor.
-//
-BOOLEAN                   mXdSupported     = TRUE;
-
-//
 // The flag indicates if execute-disable is enabled on processor.
 //
 BOOLEAN                   mXdEnabled       = FALSE;
@@ -529,6 +524,12 @@ InitPaging (
         //
         continue;
       }
+      if ((*Pde & IA32_PG_PS) != 0) {
+        //
+        // This is 1G entry, skip it
+        //
+        continue;
+      }
       Pte = (UINT64 *)(UINTN)(*Pde & PHYSICAL_ADDRESS_MASK);
       if (Pte == 0) {
         continue;
@@ -585,6 +586,15 @@ InitPaging (
         //
         // If PDE entry does not exist, skip it
         //
+        continue;
+      }
+      if ((*Pde & IA32_PG_PS) != 0) {
+        //
+        // This is 1G entry, set NX bit and skip it
+        //
+        if (mXdSupported) {
+          *Pde = *Pde | IA32_PG_NX;
+        }
         continue;
       }
       Pte = (UINT64 *)(UINTN)(*Pde & PHYSICAL_ADDRESS_MASK);
@@ -973,25 +983,6 @@ CheckFeatureSupported (
       }
     }
   }
-}
-
-/**
-  Enable XD feature.
-
-**/
-VOID
-ActivateXd (
-  VOID
-  )
-{
-  UINT64           MsrRegisters;
-
-  MsrRegisters = AsmReadMsr64 (MSR_EFER);
-  if ((MsrRegisters & MSR_EFER_XD) != 0) {
-    return ;
-  }
-  MsrRegisters |= MSR_EFER_XD;
-  AsmWriteMsr64 (MSR_EFER, MsrRegisters);
 }
 
 /**

@@ -18,6 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ACC_MAX_BIT                 BIT3
 LIST_ENTRY                          mPagePool = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                             m1GPageTableSupport = FALSE;
+UINT8                               mPhysicalAddressBits;
+BOOLEAN                             mCpuSmmStaticPageTable;
 
 /**
   Check if 1-GByte pages is supported by processor or not.
@@ -86,6 +88,146 @@ GetSubEntriesNum (
 }
 
 /**
+  Calculate the maximum support address.
+
+  @return the maximum support address.
+**/
+UINT8
+CalculateMaximumSupportAddress (
+  VOID
+  )
+{
+  UINT32                                        RegEax;
+  UINT8                                         PhysicalAddressBits;
+  VOID                                          *Hob;
+
+  //
+  // Get physical address bits supported.
+  //
+  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+  if (Hob != NULL) {
+    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+  } else {
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000008) {
+      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+      PhysicalAddressBits = (UINT8) RegEax;
+    } else {
+      PhysicalAddressBits = 36;
+    }
+  }
+
+  //
+  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
+  //
+  ASSERT (PhysicalAddressBits <= 52);
+  if (PhysicalAddressBits > 48) {
+    PhysicalAddressBits = 48;
+  }
+  return PhysicalAddressBits;
+}
+
+/**
+  Set static page table.
+
+  @param[in] PageTable     Address of page table.
+**/
+VOID
+SetStaticPageTable (
+  IN UINTN               PageTable
+  )
+{
+  UINT64                                        PageAddress;
+  UINTN                                         NumberOfPml4EntriesNeeded;
+  UINTN                                         NumberOfPdpEntriesNeeded;
+  UINTN                                         IndexOfPml4Entries;
+  UINTN                                         IndexOfPdpEntries;
+  UINTN                                         IndexOfPageDirectoryEntries;
+  UINT64                                        *PageMapLevel4Entry;
+  UINT64                                        *PageMap;
+  UINT64                                        *PageDirectoryPointerEntry;
+  UINT64                                        *PageDirectory1GEntry;
+  UINT64                                        *PageDirectoryEntry;
+
+  if (mPhysicalAddressBits <= 39 ) {
+    NumberOfPml4EntriesNeeded = 1;
+    NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (mPhysicalAddressBits - 30));
+  } else {
+    NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (mPhysicalAddressBits - 39));
+    NumberOfPdpEntriesNeeded = 512;
+  }
+
+  //
+  // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
+  //
+  PageMap         = (VOID *) PageTable;
+
+  PageMapLevel4Entry = PageMap;
+  PageAddress        = 0;
+  for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
+    //
+    // Each PML4 entry points to a page of Page Directory Pointer entries.
+    //
+    PageDirectoryPointerEntry = (UINT64 *) ((*PageMapLevel4Entry) & gPhyMask);
+    if (PageDirectoryPointerEntry == NULL) {
+      PageDirectoryPointerEntry = AllocatePageTableMemory (1);
+      ASSERT(PageDirectoryPointerEntry != NULL);
+      ZeroMem (PageDirectoryPointerEntry, EFI_PAGES_TO_SIZE(1));
+
+      *PageMapLevel4Entry = ((UINTN)PageDirectoryPointerEntry & gPhyMask)  | PAGE_ATTRIBUTE_BITS;
+    }
+
+    if (m1GPageTableSupport) {
+      PageDirectory1GEntry = PageDirectoryPointerEntry;
+      for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
+        if (IndexOfPml4Entries == 0 && IndexOfPageDirectoryEntries < 4) {
+          //
+          // Skip the < 4G entries
+          //
+          continue;
+        }
+        //
+        // Fill in the Page Directory entries
+        //
+        *PageDirectory1GEntry = (PageAddress & gPhyMask) | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+      }
+    } else {
+      PageAddress = BASE_4GB;
+      for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
+        if (IndexOfPml4Entries == 0 && IndexOfPdpEntries < 4) {
+          //
+          // Skip the < 4G entries
+          //
+          continue;
+        }
+        //
+        // Each Directory Pointer entries points to a page of Page Directory entires.
+        // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+        //
+        PageDirectoryEntry = (UINT64 *) ((*PageDirectoryPointerEntry) & gPhyMask);
+        if (PageDirectoryEntry == NULL) {
+          PageDirectoryEntry = AllocatePageTableMemory (1);
+          ASSERT(PageDirectoryEntry != NULL);
+          ZeroMem (PageDirectoryEntry, EFI_PAGES_TO_SIZE(1));
+
+          //
+          // Fill in a Page Directory Pointer Entries
+          //
+          *PageDirectoryPointerEntry = (UINT64)(UINTN)PageDirectoryEntry | PAGE_ATTRIBUTE_BITS;
+        }
+
+        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+          //
+          // Fill in the Page Directory entries
+          //
+          *PageDirectoryEntry = (UINT64)PageAddress | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+        }
+      }
+    }
+  }
+}
+
+/**
   Create PageTable for SMM use.
 
   @return The address of PML4 (to set CR3).
@@ -108,11 +250,17 @@ SmmInitPageTable (
   //
   InitializeSpinLock (mPFLock);
 
+  mCpuSmmStaticPageTable = PcdGetBool (PcdCpuSmmStaticPageTable);
   m1GPageTableSupport = Is1GPageSupport ();
+  DEBUG ((DEBUG_INFO, "1GPageTableSupport - 0x%x\n", m1GPageTableSupport));
+  DEBUG ((DEBUG_INFO, "PcdCpuSmmStaticPageTable - 0x%x\n", mCpuSmmStaticPageTable));
+
+  mPhysicalAddressBits = CalculateMaximumSupportAddress ();
+  DEBUG ((DEBUG_INFO, "PhysicalAddressBits - 0x%x\n", mPhysicalAddressBits));
   //
   // Generate PAE page table for the first 4GB memory space
   //
-  Pages = Gen4GPageTable (PAGE_TABLE_PAGES + 1, FALSE);
+  Pages = Gen4GPageTable (FALSE);
 
   //
   // Set IA32_PG_PMNT bit to mask this entry
@@ -125,21 +273,28 @@ SmmInitPageTable (
   //
   // Fill Page-Table-Level4 (PML4) entry
   //
-  PTEntry = (UINT64*)(UINTN)(Pages - EFI_PAGES_TO_SIZE (PAGE_TABLE_PAGES + 1));
-  *PTEntry = Pages + PAGE_ATTRIBUTE_BITS;
+  PTEntry = (UINT64*)AllocatePageTableMemory (1);
+  ASSERT (PTEntry != NULL);
+  *PTEntry = Pages | PAGE_ATTRIBUTE_BITS;
   ZeroMem (PTEntry + 1, EFI_PAGE_SIZE - sizeof (*PTEntry));
+
   //
   // Set sub-entries number
   //
   SetSubEntriesNum (PTEntry, 3);
 
-  //
-  // Add remaining pages to page pool
-  //
-  FreePage = (LIST_ENTRY*)(PTEntry + EFI_PAGE_SIZE / sizeof (*PTEntry));
-  while ((UINTN)FreePage < Pages) {
-    InsertTailList (&mPagePool, FreePage);
-    FreePage += EFI_PAGE_SIZE / sizeof (*FreePage);
+  if (mCpuSmmStaticPageTable) {
+    SetStaticPageTable ((UINTN)PTEntry);
+  } else {
+    //
+    // Add pages to page pool
+    //
+    FreePage = (LIST_ENTRY*)AllocatePageTableMemory (PAGE_TABLE_PAGES);
+    ASSERT (FreePage != NULL);
+    for (Index = 0; Index < PAGE_TABLE_PAGES; Index++) {
+      InsertTailList (&mPagePool, FreePage);
+      FreePage += EFI_PAGE_SIZE / sizeof (*FreePage);
+    }
   }
 
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
@@ -561,7 +716,7 @@ SmiDefaultPFHandler (
     break;
   case SmmPageSize1G:
     if (!m1GPageTableSupport) {
-      DEBUG ((EFI_D_ERROR, "1-GByte pages is not supported!"));
+      DEBUG ((DEBUG_ERROR, "1-GByte pages is not supported!"));
       ASSERT (FALSE);
     }
     //
@@ -612,8 +767,8 @@ SmiDefaultPFHandler (
       // Check if the entry has already existed, this issue may occur when the different
       // size page entries created under the same entry
       //
-      DEBUG ((EFI_D_ERROR, "PageTable = %lx, PTIndex = %x, PageTable[PTIndex] = %lx\n", PageTable, PTIndex, PageTable[PTIndex]));
-      DEBUG ((EFI_D_ERROR, "New page table overlapped with old page table!\n"));
+      DEBUG ((DEBUG_ERROR, "PageTable = %lx, PTIndex = %x, PageTable[PTIndex] = %lx\n", PageTable, PTIndex, PageTable[PTIndex]));
+      DEBUG ((DEBUG_ERROR, "New page table overlapped with old page table!\n"));
       ASSERT (FALSE);
     }
     //
@@ -654,13 +809,18 @@ SmiPFHandler (
 
   PFAddress = AsmReadCr2 ();
 
+  if (mCpuSmmStaticPageTable && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
+    DEBUG ((DEBUG_ERROR, "Do not support address 0x%lx by processor!\n", PFAddress));
+    CpuDeadLoop ();
+  }
+
   //
   // If a page fault occurs in SMRAM range, it should be in a SMM stack guard page.
   //
   if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
       (PFAddress >= mCpuHotPlugData.SmrrBase) &&
       (PFAddress < (mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize))) {
-    DEBUG ((EFI_D_ERROR, "SMM stack overflow!\n"));
+    DEBUG ((DEBUG_ERROR, "SMM stack overflow!\n"));
     CpuDeadLoop ();
   }
 
@@ -670,7 +830,7 @@ SmiPFHandler (
   if ((PFAddress < mCpuHotPlugData.SmrrBase) ||
       (PFAddress >= mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
     if ((SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0) {
-      DEBUG ((EFI_D_ERROR, "Code executed on IP(0x%lx) out of SMM range after SMM is locked!\n", PFAddress));
+      DEBUG ((DEBUG_ERROR, "Code executed on IP(0x%lx) out of SMM range after SMM is locked!\n", PFAddress));
       DEBUG_CODE (
         DumpModuleInfoByIp (*(UINTN *)(UINTN)SystemContext.SystemContextX64->Rsp);
       );
@@ -688,4 +848,88 @@ SmiPFHandler (
   }
 
   ReleaseSpinLock (mPFLock);
+}
+
+/**
+  This function sets memory attribute for page table.
+**/
+VOID
+SetPageTableAttributes (
+  VOID
+  )
+{
+  UINTN                 Index2;
+  UINTN                 Index3;
+  UINTN                 Index4;
+  UINT64                *L1PageTable;
+  UINT64                *L2PageTable;
+  UINT64                *L3PageTable;
+  UINT64                *L4PageTable;
+  BOOLEAN               IsSplitted;
+  BOOLEAN               PageTableSplitted;
+
+  if (!mCpuSmmStaticPageTable) {
+    return ;
+  }
+
+  DEBUG ((DEBUG_INFO, "SetPageTableAttributes\n"));
+
+  //
+  // Disable write protection, because we need mark page table to be write protected.
+  // We need *write* page table memory, to mark itself to be *read only*.
+  //
+  AsmWriteCr0 (AsmReadCr0() & ~CR0_WP);
+
+  do {
+    DEBUG ((DEBUG_INFO, "Start...\n"));
+    PageTableSplitted = FALSE;
+
+    L4PageTable = (UINT64 *)GetPageTableBase ();
+    SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L4PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+    PageTableSplitted = (PageTableSplitted || IsSplitted);
+
+    for (Index4 = 0; Index4 < SIZE_4KB/sizeof(UINT64); Index4++) {
+      L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & PAGING_4K_ADDRESS_MASK_64);
+      if (L3PageTable == NULL) {
+        continue;
+      }
+
+      SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L3PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+      PageTableSplitted = (PageTableSplitted || IsSplitted);
+
+      for (Index3 = 0; Index3 < SIZE_4KB/sizeof(UINT64); Index3++) {
+        if ((L3PageTable[Index3] & IA32_PG_PS) != 0) {
+          // 1G
+          continue;
+        }
+        L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & PAGING_4K_ADDRESS_MASK_64);
+        if (L2PageTable == NULL) {
+          continue;
+        }
+
+        SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L2PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+        PageTableSplitted = (PageTableSplitted || IsSplitted);
+
+        for (Index2 = 0; Index2 < SIZE_4KB/sizeof(UINT64); Index2++) {
+          if ((L2PageTable[Index2] & IA32_PG_PS) != 0) {
+            // 2M
+            continue;
+          }
+          L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & PAGING_4K_ADDRESS_MASK_64);
+          if (L1PageTable == NULL) {
+            continue;
+          }
+          SmmSetMemoryAttributesEx ((EFI_PHYSICAL_ADDRESS)(UINTN)L1PageTable, SIZE_4KB, EFI_MEMORY_RO, &IsSplitted);
+          PageTableSplitted = (PageTableSplitted || IsSplitted);
+        }
+      }
+    }
+  } while (PageTableSplitted);
+
+  //
+  // Enable write protection, after page table updated.
+  //
+  AsmWriteCr0 (AsmReadCr0() | CR0_WP);
+
+  return ;
 }

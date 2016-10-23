@@ -14,6 +14,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PiSmmCpuDxeSmm.h"
 
+EFI_PHYSICAL_ADDRESS                mGdtBuffer;
+UINTN                               mGdtBufferSize;
+
+/**
+  Initialize IDT for SMM Stack Guard.
+
+**/
+VOID
+EFIAPI
+InitializeIDTSmmStackGuard (
+  VOID
+  )
+{
+  IA32_IDT_GATE_DESCRIPTOR  *IdtGate;
+
+  //
+  // If SMM Stack Guard feature is enabled, set the IST field of
+  // the interrupt gate for Page Fault Exception to be 1
+  //
+  IdtGate = (IA32_IDT_GATE_DESCRIPTOR *)gcSmiIdtr.Base;
+  IdtGate += EXCEPT_IA32_PAGE_FAULT;
+  IdtGate->Bits.Reserved_0 = 1;
+}
+
 /**
   Initialize Gdt for all processors.
   
@@ -41,8 +65,10 @@ InitGdt (
   // on each SMI entry.
   //
   GdtTssTableSize = (gcSmiGdtr.Limit + 1 + TSS_SIZE + 7) & ~7; // 8 bytes aligned
-  GdtTssTables = (UINT8*)AllocatePages (EFI_SIZE_TO_PAGES (GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus));
+  mGdtBufferSize = GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+  GdtTssTables = (UINT8*)AllocateCodePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
   ASSERT (GdtTssTables != NULL);
+  mGdtBuffer = (UINTN)GdtTssTables;
   GdtTableStepSize = GdtTssTableSize;
 
   for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {

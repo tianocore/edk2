@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -24,6 +24,7 @@ extern  ASM_PFX(SmiPFHandler)
 
 global  ASM_PFX(gcSmiIdtr)
 global  ASM_PFX(gcSmiGdtr)
+global  ASM_PFX(gTaskGateDescriptor)
 global  ASM_PFX(gcPsd)
 
     SECTION .data
@@ -250,21 +251,10 @@ ASM_PFX(gcSmiGdtr):
     DD      NullSeg
 
 ASM_PFX(gcSmiIdtr):
-    DW      IDT_SIZE - 1
-    DD      _SmiIDT
+    DW      0
+    DD      0
 
-_SmiIDT:
-%rep 32
-    DW      0                           ; Offset 0:15
-    DW      CODE_SEL                    ; Segment selector
-    DB      0                           ; Unused
-    DB      0x8e                         ; Interrupt Gate, Present
-    DW      0                           ; Offset 16:31
-%endrep
-
-IDT_SIZE equ $ - _SmiIDT
-
-TaskGateDescriptor:
+ASM_PFX(gTaskGateDescriptor):
     DW      0                           ; Reserved
     DW      EXCEPTION_TSS_SEL           ; TSS Segment selector
     DB      0                           ; Reserved
@@ -717,19 +707,3 @@ ASM_PFX(PageFaultStubFunction):
     clts
     iretd
 
-global ASM_PFX(InitializeIDTSmmStackGuard)
-ASM_PFX(InitializeIDTSmmStackGuard):
-    push    ebx
-;
-; If SMM Stack Guard feature is enabled, the Page Fault Exception entry in IDT
-; is a Task Gate Descriptor so that when a Page Fault Exception occurrs,
-; the processors can use a known good stack in case stack is ran out.
-;
-    lea     ebx, [_SmiIDT + 14 * 8]
-    lea     edx, [TaskGateDescriptor]
-    mov     eax, [edx]
-    mov     [ebx], eax
-    mov     eax, [edx + 4]
-    mov     [ebx + 4], eax
-    pop     ebx
-    ret

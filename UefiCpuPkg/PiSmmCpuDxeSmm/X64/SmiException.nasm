@@ -145,25 +145,8 @@ ASM_PFX(gcSmiGdtr):
     DQ        NullSeg
 
 ASM_PFX(gcSmiIdtr):
-    DW      IDT_SIZE - 1
-    DQ        _SmiIDT
-
-;
-; Here is the IDT. There are 32 (not 255) entries in it since only processor
-; generated exceptions will be handled.
-;
-_SmiIDT:
-%rep 32
-    DW      0                           ;   0:15
-    DW      CODE_SEL                    ; Segment selector
-    DB      0                           ; Unused
-    DB      0x8e                         ; Interrupt Gate, Present
-    DW      0                           ;   16:31
-    DQ      0                           ;   32:63
-%endrep
-_SmiIDTEnd:
-
-IDT_SIZE equ  _SmiIDTEnd -   _SmiIDT
+    DW      0
+    DQ      0
 
     DEFAULT REL
     SECTION .text
@@ -399,14 +382,4 @@ ASM_PFX(PageFaultIdtHandlerSmmProfile):
     pop     rbp
     add     rsp, 16           ; skip INT# & ErrCode
     iretq
-
-global ASM_PFX(InitializeIDTSmmStackGuard)
-ASM_PFX(InitializeIDTSmmStackGuard):
-;
-; If SMM Stack Guard feature is enabled, set the IST field of
-; the interrupt gate for Page Fault Exception to be 1
-;
-    lea     rax, [_SmiIDT + 14 * 16]
-    mov     byte [rax + 4], 1
-    ret
 

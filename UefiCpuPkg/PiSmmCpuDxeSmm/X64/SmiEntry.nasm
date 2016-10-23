@@ -22,6 +22,10 @@
 ; Variables referrenced by C code
 ;
 
+%define MSR_IA32_MISC_ENABLE 0x1A0
+%define MSR_EFER      0xc0000080
+%define MSR_EFER_XD   0x800
+
 ;
 ; Constants relating to PROCESSOR_SMM_DESCRIPTOR
 ;
@@ -50,6 +54,7 @@ extern ASM_PFX(CpuSmmDebugEntry)
 extern ASM_PFX(CpuSmmDebugExit)
 
 global ASM_PFX(gSmbase)
+global ASM_PFX(mXdSupported)
 global ASM_PFX(gSmiStack)
 global ASM_PFX(gSmiCr3)
 global ASM_PFX(gcSmiHandlerTemplate)
@@ -69,7 +74,7 @@ _SmiEntryPoint:
     mov     [cs:bx + 2], eax
 o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
     mov     ax, PROTECT_MODE_CS
-    mov     [cs:bx-0x2],ax    
+    mov     [cs:bx-0x2],ax
     DB      0x66, 0xbf                   ; mov edi, SMBASE
 ASM_PFX(gSmbase): DD 0
     lea     eax, [edi + (@ProtectedMode - _SmiEntryPoint) + 0x8000]
@@ -79,7 +84,7 @@ ASM_PFX(gSmbase): DD 0
     or      ebx, 0x23
     mov     cr0, ebx
     jmp     dword 0x0:0x0
-_GdtDesc:   
+_GdtDesc:
     DW 0
     DD 0
 
@@ -112,17 +117,44 @@ ASM_PFX(gSmiCr3): DD 0
     mov     eax, TSS_SEGMENT
     ltr     ax
 
+; enable NXE if supported
+    DB      0xb0                        ; mov al, imm8
+ASM_PFX(mXdSupported):     DB      1
+    cmp     al, 0
+    jz      @SkipXd
+;
+; Check XD disable bit
+;
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    sub     esp, 4
+    push    rdx                        ; save MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2                  ; MSR_IA32_MISC_ENABLE[34]
+    jz      .0
+    and     dx, 0xFFFB                 ; clear XD Disable bit if it is set
+    wrmsr
+.0:
+    mov     ecx, MSR_EFER
+    rdmsr
+    or      ax, MSR_EFER_XD            ; enable NXE
+    wrmsr
+    jmp     @XdDone
+@SkipXd:
+    sub     esp, 8
+@XdDone:
+
 ; Switch into @LongMode
     push    LONG_MODE_CS                ; push cs hardcore here
-    call    Base                       ; push reture address for retf later
+    call    Base                       ; push return address for retf later
 Base:
     add     dword [rsp], @LongMode - Base; offset for far retf, seg is the 1st arg
-    mov     ecx, 0xc0000080
+
+    mov     ecx, MSR_EFER
     rdmsr
-    or      ah, 1
+    or      ah, 1                      ; enable LME
     wrmsr
     mov     rbx, cr0
-    or      ebx, 080010000h            ; enable paging + WP
+    or      ebx, 0x80010023            ; enable paging + WP + NE + MP + PE
     mov     cr0, rbx
     retf
 @LongMode:                              ; long mode (64-bit code) starts here
@@ -140,12 +172,12 @@ Base:
 ;   jmp     _SmiHandler                 ; instruction is not needed
 
 _SmiHandler:
-    mov     rbx, [rsp]                  ; rbx <- CpuIndex
+    mov     rbx, [rsp + 0x8]             ; rcx <- CpuIndex
 
     ;
     ; Save FP registers
     ;
-    sub     rsp, 0x208
+    sub     rsp, 0x200
     DB      0x48                         ; FXSAVE64
     fxsave  [rsp]
 
@@ -154,15 +186,15 @@ _SmiHandler:
     mov     rcx, rbx
     mov     rax, CpuSmmDebugEntry
     call    rax
-    
+
     mov     rcx, rbx
     mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
     call    rax
-    
+
     mov     rcx, rbx
     mov     rax, CpuSmmDebugExit
     call    rax
-    
+
     add     rsp, 0x20
 
     ;
@@ -171,6 +203,21 @@ _SmiHandler:
     DB      0x48                         ; FXRSTOR64
     fxrstor [rsp]
 
+    add     rsp, 0x200
+
+    mov     rax, ASM_PFX(mXdSupported)
+    mov     al, [rax]
+    cmp     al, 0
+    jz      .1
+    pop     rdx                       ; get saved MSR_IA32_MISC_ENABLE[63-32]
+    test    edx, BIT2
+    jz      .1
+    mov     ecx, MSR_IA32_MISC_ENABLE
+    rdmsr
+    or      dx, BIT2                  ; set XD Disable bit if it was set before entering into SMM
+    wrmsr
+
+.1:
     rsm
 
 gcSmiHandlerSize    DW      $ - _SmiEntryPoint
