@@ -580,6 +580,11 @@ SmmLoadImage (
   DriverEntry->LoadedImage->SystemTable   = gST;
   DriverEntry->LoadedImage->DeviceHandle  = DeviceHandle;
 
+  DriverEntry->SmmLoadedImage.Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  DriverEntry->SmmLoadedImage.ParentHandle = gSmmCorePrivate->SmmIplImageHandle;
+  DriverEntry->SmmLoadedImage.SystemTable  = gST;
+  DriverEntry->SmmLoadedImage.DeviceHandle = DeviceHandle;
+
   //
   // Make an EfiBootServicesData buffer copy of FilePath
   //
@@ -599,6 +604,25 @@ SmmLoadImage (
   DriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;
 
   //
+  // Make a buffer copy of FilePath
+  //
+  Status = SmmAllocatePool (EfiRuntimeServicesData, GetDevicePathSize(FilePath), (VOID **)&DriverEntry->SmmLoadedImage.FilePath);
+  if (EFI_ERROR (Status)) {
+    if (Buffer != NULL) {
+      gBS->FreePool (Buffer);
+    }
+    gBS->FreePool (DriverEntry->LoadedImage->FilePath);
+    SmmFreePages (DstBuffer, PageCount);
+    return Status;
+  }
+  CopyMem (DriverEntry->SmmLoadedImage.FilePath, FilePath, GetDevicePathSize(FilePath));
+
+  DriverEntry->SmmLoadedImage.ImageBase = (VOID *)(UINTN)DriverEntry->ImageBuffer;
+  DriverEntry->SmmLoadedImage.ImageSize = ImageContext.ImageSize;
+  DriverEntry->SmmLoadedImage.ImageCodeType = EfiRuntimeServicesCode;
+  DriverEntry->SmmLoadedImage.ImageDataType = EfiRuntimeServicesData;
+
+  //
   // Create a new image handle in the UEFI handle database for the SMM Driver
   //
   DriverEntry->ImageHandle = NULL;
@@ -607,6 +631,17 @@ SmmLoadImage (
                   &gEfiLoadedImageProtocolGuid, DriverEntry->LoadedImage,
                   NULL
                   );
+
+  //
+  // Create a new image handle in the SMM handle database for the SMM Driver
+  //
+  DriverEntry->SmmImageHandle = NULL;
+  Status = SmmInstallProtocolInterface (
+             &DriverEntry->SmmImageHandle,
+             &gEfiLoadedImageProtocolGuid,
+             EFI_NATIVE_INTERFACE,
+             &DriverEntry->SmmLoadedImage
+             );
 
   PERF_START (DriverEntry->ImageHandle, "LoadImage:", NULL, Tick);
   PERF_END (DriverEntry->ImageHandle, "LoadImage:", NULL, 0);
@@ -895,6 +930,16 @@ SmmDispatcher (
             gBS->FreePool (DriverEntry->LoadedImage->FilePath);
           }
           gBS->FreePool (DriverEntry->LoadedImage);
+        }
+        Status = SmmUninstallProtocolInterface (
+                   DriverEntry->SmmImageHandle,
+                   &gEfiLoadedImageProtocolGuid,
+                   &DriverEntry->SmmLoadedImage
+                   );
+        if (!EFI_ERROR(Status)) {
+          if (DriverEntry->SmmLoadedImage.FilePath != NULL) {
+            SmmFreePool (DriverEntry->SmmLoadedImage.FilePath);
+          }
         }
       }
 
@@ -1326,6 +1371,27 @@ SmmDriverDispatchHandler (
               CopyMem (mSmmCoreLoadedImage->FilePath, &mFvDevicePath, GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath));
 
               mSmmCoreLoadedImage->DeviceHandle = FvHandle;
+            }
+            if (mSmmCoreDriverEntry->SmmLoadedImage.FilePath == NULL) {
+              //
+              // Maybe one special FV contains only one SMM_CORE module, so its device path must
+              // be initialized completely.
+              //
+              EfiInitializeFwVolDevicepathNode (&mFvDevicePath.File, &NameGuid);
+              SetDevicePathEndNode (&mFvDevicePath.End);
+
+              //
+              // Make a buffer copy FilePath
+              //
+              Status = SmmAllocatePool (
+                         EfiRuntimeServicesData,
+                         GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath),
+                         (VOID **)&mSmmCoreDriverEntry->SmmLoadedImage.FilePath
+                         );
+              ASSERT_EFI_ERROR (Status);
+              CopyMem (mSmmCoreDriverEntry->SmmLoadedImage.FilePath, &mFvDevicePath, GetDevicePathSize((EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath));
+
+              mSmmCoreDriverEntry->SmmLoadedImage.DeviceHandle = FvHandle;
             }
           } else {
             SmmAddToDriverList (Fv, FvHandle, &NameGuid);

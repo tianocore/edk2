@@ -87,6 +87,8 @@ SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
 UINTN                           mFullSmramRangeCount;
 EFI_SMRAM_DESCRIPTOR            *mFullSmramRanges;
 
+EFI_SMM_DRIVER_ENTRY            *mSmmCoreDriverEntry;
+
 EFI_LOADED_IMAGE_PROTOCOL       *mSmmCoreLoadedImage;
 
 /**
@@ -564,6 +566,42 @@ SmmCoreInstallLoadedImage (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Allocate a Loaded Image Protocol in SMM
+  //
+  Status = SmmAllocatePool (EfiRuntimeServicesData, sizeof(EFI_SMM_DRIVER_ENTRY), (VOID **)&mSmmCoreDriverEntry);
+  ASSERT_EFI_ERROR(Status);
+
+  ZeroMem (mSmmCoreDriverEntry, sizeof(EFI_SMM_DRIVER_ENTRY));
+  //
+  // Fill in the remaining fields of the Loaded Image Protocol instance.
+  //
+  mSmmCoreDriverEntry->Signature = EFI_SMM_DRIVER_ENTRY_SIGNATURE;
+  mSmmCoreDriverEntry->SmmLoadedImage.Revision = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  mSmmCoreDriverEntry->SmmLoadedImage.ParentHandle = gSmmCorePrivate->SmmIplImageHandle;
+  mSmmCoreDriverEntry->SmmLoadedImage.SystemTable = gST;
+
+  mSmmCoreDriverEntry->SmmLoadedImage.ImageBase = (VOID *)(UINTN)gSmmCorePrivate->PiSmmCoreImageBase;
+  mSmmCoreDriverEntry->SmmLoadedImage.ImageSize = gSmmCorePrivate->PiSmmCoreImageSize;
+  mSmmCoreDriverEntry->SmmLoadedImage.ImageCodeType = EfiRuntimeServicesCode;
+  mSmmCoreDriverEntry->SmmLoadedImage.ImageDataType = EfiRuntimeServicesData;
+
+  mSmmCoreDriverEntry->ImageEntryPoint = gSmmCorePrivate->PiSmmCoreEntryPoint;
+  mSmmCoreDriverEntry->ImageBuffer     = gSmmCorePrivate->PiSmmCoreImageBase;
+  mSmmCoreDriverEntry->NumberOfPage    = EFI_SIZE_TO_PAGES((UINTN)gSmmCorePrivate->PiSmmCoreImageSize);
+
+  //
+  // Create a new image handle in the SMM handle database for the SMM Driver
+  //
+  mSmmCoreDriverEntry->SmmImageHandle = NULL;
+  Status = SmmInstallProtocolInterface (
+             &mSmmCoreDriverEntry->SmmImageHandle,
+             &gEfiLoadedImageProtocolGuid,
+             EFI_NATIVE_INTERFACE,
+             &mSmmCoreDriverEntry->SmmLoadedImage
+             );
+  ASSERT_EFI_ERROR(Status);
+
   return ;
 }
 
@@ -635,6 +673,8 @@ SmmMain (
   SmramProfileInstallProtocol ();
 
   SmmCoreInstallLoadedImage ();
+
+  SmmCoreInitializeMemoryAttributesTable ();
 
   return EFI_SUCCESS;
 }

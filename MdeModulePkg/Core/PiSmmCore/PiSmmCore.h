@@ -110,6 +110,8 @@ typedef struct {
   // Image Page Number
   //
   UINTN                           NumberOfPage;
+  EFI_HANDLE                      SmmImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL       SmmLoadedImage;
 } EFI_SMM_DRIVER_ENTRY;
 
 #define EFI_HANDLE_SIGNATURE            SIGNATURE_32('h','n','d','l')
@@ -551,6 +553,38 @@ SmmLocateProtocol (
   );
 
 /**
+  Function returns an array of handles that support the requested protocol
+  in a buffer allocated from pool. This is a version of SmmLocateHandle()
+  that allocates a buffer for the caller.
+
+  @param  SearchType             Specifies which handle(s) are to be returned.
+  @param  Protocol               Provides the protocol to search by.    This
+                                 parameter is only valid for SearchType
+                                 ByProtocol.
+  @param  SearchKey              Supplies the search key depending on the
+                                 SearchType.
+  @param  NumberHandles          The number of handles returned in Buffer.
+  @param  Buffer                 A pointer to the buffer to return the requested
+                                 array of  handles that support Protocol.
+
+  @retval EFI_SUCCESS            The result array of handles was returned.
+  @retval EFI_NOT_FOUND          No handles match the search.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
+                                 matching results.
+  @retval EFI_INVALID_PARAMETER  One or more paramters are not valid.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmLocateHandleBuffer (
+  IN     EFI_LOCATE_SEARCH_TYPE  SearchType,
+  IN     EFI_GUID                *Protocol OPTIONAL,
+  IN     VOID                    *SearchKey OPTIONAL,
+  IN OUT UINTN                   *NumberHandles,
+  OUT    EFI_HANDLE              **Buffer
+  );
+
+/**
   Manage SMI of a particular type.
 
   @param  HandlerType    Points to the handler type or NULL for root SMI handlers.
@@ -980,8 +1014,65 @@ SmramProfileReadyToLock (
   VOID
   );
 
+/**
+  Initialize MemoryAttributes support.
+**/
+VOID
+EFIAPI
+SmmCoreInitializeMemoryAttributesTable (
+  VOID
+  );
+
+/**
+  This function returns a copy of the current memory map. The map is an array of
+  memory descriptors, each of which describes a contiguous block of memory.
+
+  @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
+                                          MemoryMap buffer. On input, this is the size of
+                                          the buffer allocated by the caller.  On output,
+                                          it is the size of the buffer returned by the
+                                          firmware  if the buffer was large enough, or the
+                                          size of the buffer needed  to contain the map if
+                                          the buffer was too small.
+  @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
+                                          the current memory map.
+  @param[out]      MapKey                 A pointer to the location in which firmware
+                                          returns the key for the current memory map.
+  @param[out]      DescriptorSize         A pointer to the location in which firmware
+                                          returns the size, in bytes, of an individual
+                                          EFI_MEMORY_DESCRIPTOR.
+  @param[out]      DescriptorVersion      A pointer to the location in which firmware
+                                          returns the version number associated with the
+                                          EFI_MEMORY_DESCRIPTOR.
+
+  @retval EFI_SUCCESS            The memory map was returned in the MemoryMap
+                                 buffer.
+  @retval EFI_BUFFER_TOO_SMALL   The MemoryMap buffer was too small. The current
+                                 buffer size needed to hold the memory map is
+                                 returned in MemoryMapSize.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmCoreGetMemoryMap (
+  IN OUT UINTN                  *MemoryMapSize,
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  OUT UINTN                     *MapKey,
+  OUT UINTN                     *DescriptorSize,
+  OUT UINT32                    *DescriptorVersion
+  );
+
+///
+/// For generic EFI machines make the default allocations 4K aligned
+///
+#define EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT  (EFI_PAGE_SIZE)
+#define DEFAULT_PAGE_ALLOCATION                     (EFI_PAGE_SIZE)
+
 extern UINTN                    mFullSmramRangeCount;
 extern EFI_SMRAM_DESCRIPTOR     *mFullSmramRanges;
+
+extern EFI_SMM_DRIVER_ENTRY       *mSmmCoreDriverEntry;
 
 extern EFI_LOADED_IMAGE_PROTOCOL  *mSmmCoreLoadedImage;
 

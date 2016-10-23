@@ -86,8 +86,24 @@ SmmInitializeMemoryServices (
   }
   //
   // Initialize free SMRAM regions
+  // Need add Free memory at first, to let gSmmMemoryMap record data
   //
   for (Index = 0; Index < SmramRangeCount; Index++) {
+    if ((SmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
+      continue;
+    }
+    SmmAddMemoryRegion (
+      SmramRanges[Index].CpuStart,
+      SmramRanges[Index].PhysicalSize,
+      EfiConventionalMemory,
+      SmramRanges[Index].RegionState
+      );
+  }
+
+  for (Index = 0; Index < SmramRangeCount; Index++) {
+    if ((SmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) == 0) {
+      continue;
+    }
     SmmAddMemoryRegion (
       SmramRanges[Index].CpuStart,
       SmramRanges[Index].PhysicalSize,

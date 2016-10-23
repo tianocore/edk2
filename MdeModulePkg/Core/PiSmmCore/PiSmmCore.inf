@@ -38,6 +38,7 @@
   Smi.c
   InstallConfigurationTable.c
   SmramProfileRecord.c
+  MemoryAttributesTable.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -96,6 +97,7 @@
   gEdkiiMemoryProfileGuid
   ## SOMETIMES_PRODUCES   ## GUID # Install protocol
   gEdkiiSmmMemoryProfileGuid
+  gEdkiiPiSmmMemoryAttributesTableGuid          ## SOMETIMES_PRODUCES   ## SystemTable
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PiSmmCoreExtra.uni
