@@ -384,9 +384,10 @@ EblFileDevicePath (
 
 
   if ( *FileName != 0 ) {
-    AsciiStrToUnicodeStr (FileName, UnicodeFileName);
+    AsciiStrToUnicodeStrS (FileName, UnicodeFileName,
+      ARRAY_SIZE (UnicodeFileName));
   } else {
-    AsciiStrToUnicodeStr ("\\", UnicodeFileName);
+    AsciiStrToUnicodeStrS ("\\", UnicodeFileName, ARRAY_SIZE (UnicodeFileName));
   }
 
   Size = StrSize (UnicodeFileName);
@@ -589,7 +590,7 @@ EblFvFileDevicePath (
           &AuthenticationStatus
           );
         if (!EFI_ERROR (Status)) {
-          UnicodeStrToAsciiStr (Section, AsciiSection);
+          UnicodeStrToAsciiStrS (Section, AsciiSection, MAX_PATHNAME);
           if (AsciiStriCmp (FileName, AsciiSection) == 0) {
             FreePool (Section);
             break;
@@ -674,6 +675,7 @@ EfiOpen (
   CHAR8                     *CwdPlusPathName;
   UINTN                     Index;
   EFI_SECTION_TYPE          ModifiedSectionType;
+  UINTN                     AsciiLength;
 
   EblUpdateDeviceLists ();
 
@@ -706,7 +708,8 @@ EfiOpen (
       }
 
       // We could add a current working directory concept
-      CwdPlusPathName = AllocatePool (AsciiStrSize (gCwd) + AsciiStrSize (PathName));
+      AsciiLength = AsciiStrSize (gCwd) + AsciiStrSize (PathName);
+      CwdPlusPathName = AllocatePool (AsciiLength);
       if (CwdPlusPathName == NULL) {
         return NULL;
       }
@@ -723,14 +726,14 @@ EfiOpen (
           }
         }
       } else {
-        AsciiStrCpy (CwdPlusPathName, gCwd);
+        AsciiStrCpyS (CwdPlusPathName, AsciiLength, gCwd);
         StrLen = AsciiStrLen (gCwd);
         if ((*PathName != '/') && (*PathName != '\\') && (gCwd[StrLen-1] != '/') && (gCwd[StrLen-1] != '\\')) {
-          AsciiStrCat (CwdPlusPathName, "\\");
+          AsciiStrCatS (CwdPlusPathName, AsciiLength, "\\");
         }
       }
 
-      AsciiStrCat (CwdPlusPathName, PathName);
+      AsciiStrCatS (CwdPlusPathName, AsciiLength, PathName);
       if (AsciiStrStr (CwdPlusPathName, ":") == NULL) {
         // Extra error check to make sure we don't recurse and blow stack
         return NULL;
@@ -745,7 +748,7 @@ EfiOpen (
   }
 
   File->DeviceName = AllocatePool (StrLen);
-  AsciiStrCpy (File->DeviceName, PathName);
+  AsciiStrCpyS (File->DeviceName, StrLen, PathName);
   File->DeviceName[FileStart - 1] = '\0';
   File->FileName = &File->DeviceName[FileStart];
   if (File->FileName[0] == '\0') {
@@ -1611,7 +1614,7 @@ ExpandPath (
 {
   CHAR8   *NewPath;
   CHAR8   *Work, *Start, *End;
-  UINTN   StrLen;
+  UINTN   StrLen, AllocLen;
   INTN    i;
 
   if (Cwd == NULL || Path == NULL) {
@@ -1625,11 +1628,12 @@ ExpandPath (
   }
 
   StrLen = AsciiStrSize (Path);
-  NewPath = AllocatePool (AsciiStrSize (Cwd) + StrLen + 1);
+  AllocLen = AsciiStrSize (Cwd) + StrLen + 1;
+  NewPath = AllocatePool (AllocLen);
   if (NewPath == NULL) {
     return NULL;
   }
-  AsciiStrCpy (NewPath, Cwd);
+  AsciiStrCpyS (NewPath, AllocLen, Cwd);
 
   End = Path + StrLen;
   for (Start = Path ;;) {
@@ -1640,7 +1644,7 @@ ExpandPath (
     }
 
     // append path prior to ..
-    AsciiStrnCat (NewPath, Start, Work - Start);
+    AsciiStrnCatS (NewPath, AllocLen, Start, Work - Start);
     StrLen = AsciiStrLen (NewPath);
     for (i = StrLen; i >= 0; i--) {
       if (NewPath[i] == ':') {
@@ -1663,7 +1667,7 @@ ExpandPath (
   }
 
   // Handle the path that remains after the ..
-  AsciiStrnCat (NewPath, Start, End - Start);
+  AsciiStrnCatS (NewPath, AllocLen, Start, End - Start);
 
   return NewPath;
 }
@@ -1686,7 +1690,7 @@ EfiSetCwd (
   )
 {
   EFI_OPEN_FILE *File;
-  UINTN         Len;
+  UINTN         Len, AllocLen;
   CHAR8         *Path;
 
   if (Cwd == NULL) {
@@ -1729,17 +1733,18 @@ EfiSetCwd (
 
   // Use the info returned from EfiOpen as it can add in CWD if needed. So Cwd could be
   // relative to the current gCwd or not.
-  gCwd = AllocatePool (AsciiStrSize (File->DeviceName) + AsciiStrSize (File->FileName) + 10);
+  AllocLen = AsciiStrSize (File->DeviceName) + AsciiStrSize (File->FileName) + 10;
+  gCwd = AllocatePool (AllocLen);
   if (gCwd == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  AsciiStrCpy (gCwd, File->DeviceName);
+  AsciiStrCpyS (gCwd, AllocLen, File->DeviceName);
   if (File->FileName == NULL) {
-    AsciiStrCat (gCwd, ":\\");
+    AsciiStrCatS (gCwd, AllocLen, ":\\");
   } else {
-    AsciiStrCat (gCwd, ":");
-    AsciiStrCat (gCwd, File->FileName);
+    AsciiStrCatS (gCwd, AllocLen, ":");
+    AsciiStrCatS (gCwd, AllocLen, File->FileName);
   }
 
 
