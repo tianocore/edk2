@@ -99,7 +99,7 @@ HandleDownload (
   IN CHAR8 *NumBytesString
   )
 {
-  CHAR8       Response[12] = "DATA";
+  CHAR8       Response[13];
   CHAR16      OutputString[FASTBOOT_STRING_MAX_LENGTH];
 
   // Argument is 8-character ASCII string hex representation of number of bytes
@@ -127,8 +127,10 @@ HandleDownload (
   if (mDataBuffer == NULL) {
     SEND_LITERAL ("FAILNot enough memory");
   } else {
-    AsciiStrnCpy (Response + 4, NumBytesString, 8);
-    mTransport->Send (sizeof(Response), Response, &mFatalSendErrorEvent);
+    ZeroMem (Response, sizeof Response);
+    AsciiSPrint (Response, sizeof Response, "DATA%x",
+      (UINT32)mNumDataBytes);
+    mTransport->Send (sizeof Response - 1, Response, &mFatalSendErrorEvent);
 
     mState = ExpectDataState;
     mBytesReceivedSoFar = 0;
@@ -257,8 +259,7 @@ AcceptCmd (
   }
 
   // Commands aren't null-terminated. Let's get a null-terminated version.
-  AsciiStrnCpy (Command, Data, Size);
-  Command[Size] = '\0';
+  AsciiStrnCpyS (Command, sizeof Command, Data, Size);
 
   // Parse command
   if (MATCH_CMD_LITERAL ("getvar", Command)) {

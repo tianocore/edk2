@@ -84,7 +84,8 @@ ParseAndroidBootImg (
                  + ALIGN_VALUE (Header->KernelSize, Header->PageSize));
   }
 
-  AsciiStrnCpy (KernelArgs, Header->KernelArgs, BOOTIMG_KERNEL_ARGS_SIZE);
+  AsciiStrnCpyS (KernelArgs, BOOTIMG_KERNEL_ARGS_SIZE, Header->KernelArgs,
+    BOOTIMG_KERNEL_ARGS_SIZE);
 
   return EFI_SUCCESS;
 }
