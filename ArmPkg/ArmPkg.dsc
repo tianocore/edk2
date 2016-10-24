@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -36,6 +37,7 @@
   RVCT:*_*_ARM_PLATFORM_FLAGS  == --cpu Cortex-A15
 
   RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+  *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
 
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
