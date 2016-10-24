@@ -329,7 +329,8 @@ CbPeiEntryPoint (
   if ((CbParseGetCbHeader (1, &pCbHeader) == RETURN_SUCCESS)
     && ((UINTN)pCbHeader > BASE_4KB)) {
     DEBUG((EFI_D_ERROR, "Actual Coreboot header: %p.\n", pCbHeader));
-    PcdSet32 (PcdCbHeaderPointer, (UINT32)(UINTN)pCbHeader);
+    Status = PcdSet32S (PcdCbHeaderPointer, (UINT32)(UINTN)pCbHeader);
+    ASSERT_EFI_ERROR (Status);
   }
 
   //
