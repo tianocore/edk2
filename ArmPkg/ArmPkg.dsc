@@ -142,6 +142,16 @@
 
   ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
+  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+  ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
+  ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
+  ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
+  ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLibBase.inf
+  ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+
 [Components.ARM]
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA8Lib/ArmCortexA8Lib.inf
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA9Lib/ArmCortexA9Lib.inf
@@ -150,3 +160,4 @@
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
   ArmPkg/Drivers/ArmCpuLib/ArmCortexA5xLib/ArmCortexA5xLib.inf
+  ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
