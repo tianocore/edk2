@@ -116,7 +116,8 @@ EblDirCmd (
     UnicodeFileName[0] = '\0';
     MatchSubString = &UnicodeFileName[0];
     if (Argc > 2) {
-      AsciiStrToUnicodeStr (Argv[2], UnicodeFileName);
+      AsciiStrToUnicodeStrS (Argv[2], UnicodeFileName,
+        ARRAY_SIZE (UnicodeFileName));
       if (UnicodeFileName[0] == '*') {
         // Handle *Name substring matching
         MatchSubString = &UnicodeFileName[1];
@@ -231,7 +232,7 @@ EblDirCmd (
     MatchSubString = NULL;
     UnicodeFileName[0] = '\0';
     if (Argc > 2) {
-      AsciiStrToUnicodeStr (Argv[2], UnicodeFileName);
+      AsciiStrToUnicodeStrS (Argv[2], UnicodeFileName, MAX_CMD_LINE);
       if (UnicodeFileName[0] == '*') {
         MatchSubString = &UnicodeFileName[1];
       }

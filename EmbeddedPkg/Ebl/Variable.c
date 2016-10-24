@@ -29,6 +29,7 @@ EblGetCmd (
   VOID*       Value;
   CHAR8*      AsciiVariableName = NULL;
   CHAR16*     VariableName;
+  UINTN       VariableNameLen;
   UINT32      Index;
 
   if (Argc == 1) {
@@ -48,8 +49,9 @@ EblGetCmd (
     AsciiPrint("Variable name is missing.\n");
     return Status;
   } else {
-    VariableName = AllocatePool((AsciiStrLen (AsciiVariableName) + 1) * sizeof (CHAR16));
-    AsciiStrToUnicodeStr (AsciiVariableName,VariableName);
+    VariableNameLen = AsciiStrLen (AsciiVariableName) + 1;
+    VariableName = AllocatePool (VariableNameLen * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (AsciiVariableName, VariableName, VariableNameLen);
   }
 
   // Try to get the variable size.
@@ -93,6 +95,7 @@ EblSetCmd (
   CHAR8*        AsciiValue;
   UINT32        AsciiValueLength;
   CHAR16*       VariableName;
+  UINTN         VariableNameLen;
   UINT32        Index;
   UINT32        EscapedQuotes = 0;
   BOOLEAN       Volatile = FALSE;
@@ -125,8 +128,9 @@ EblSetCmd (
     //
 
     // Convert VariableName into Unicode
-    VariableName = AllocatePool((AsciiStrLen (AsciiVariableSetting) + 1) * sizeof (CHAR16));
-    AsciiStrToUnicodeStr (AsciiVariableSetting,VariableName);
+    VariableNameLen = AsciiStrLen (AsciiVariableSetting) + 1;
+    VariableName = AllocatePool (VariableNameLen * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (AsciiVariableSetting, VariableName, VariableNameLen);
 
     Status = gRT->SetVariable (
                           VariableName,
@@ -170,8 +174,9 @@ EblSetCmd (
   }
 
   // Convert VariableName into Unicode
-  VariableName = AllocatePool((AsciiStrLen (AsciiVariableName) + 1) * sizeof (CHAR16));
-  AsciiStrToUnicodeStr (AsciiVariableName,VariableName);
+  VariableNameLen = AsciiStrLen (AsciiVariableName) + 1;
+  VariableName = AllocatePool (VariableNameLen * sizeof (CHAR16));
+  AsciiStrToUnicodeStrS (AsciiVariableName, VariableName, VariableNameLen);
 
   Status = gRT->SetVariable (
                       VariableName,

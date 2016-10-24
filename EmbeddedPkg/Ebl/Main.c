@@ -88,7 +88,7 @@ SetCmdHistory (
     }
 
     // Copy the new command line into the ring buffer
-    AsciiStrnCpy(&mCmdHistory[mCmdHistoryStart][0], Cmd, MAX_CMD_LINE);
+    AsciiStrnCpyS (&mCmdHistory[mCmdHistoryStart][0], MAX_CMD_LINE, Cmd, MAX_CMD_LINE);
   }
 
   // Reset the command history for the next up arrow press
@@ -432,7 +432,7 @@ GetCmd (
       }
       AsciiPrint (History);
       Index = AsciiStrLen (History);
-      AsciiStrnCpy (Cmd, History, CmdMaxSize);
+      AsciiStrnCpyS (Cmd, CmdMaxSize, History, CmdMaxSize);
     } else {
       Cmd[Index++] = Char;
       if (FixedPcdGetBool(PcdEmbeddedShellCharacterEcho) == TRUE) {
@@ -644,14 +644,14 @@ EdkBootLoaderEntry (
 
     Status = gRT->GetVariable(CommandLineVariableName, &VendorGuid, NULL, &CommandLineVariableSize, CommandLineVariable);
     if (!EFI_ERROR(Status)) {
-      UnicodeStrToAsciiStr(CommandLineVariable, CmdLine);
+      UnicodeStrToAsciiStrS (CommandLineVariable, CmdLine, MAX_CMD_LINE);
     }
 
     FreePool(CommandLineVariable);
   }
 
   if (EFI_ERROR(Status)) {
-    AsciiStrCpy (CmdLine, (CHAR8 *)PcdGetPtr (PcdEmbeddedAutomaticBootCommand));
+    AsciiStrCpyS (CmdLine, MAX_CMD_LINE, (CHAR8 *)PcdGetPtr (PcdEmbeddedAutomaticBootCommand));
   }
 
   for (;;) {

@@ -343,7 +343,7 @@ EblStartCmd (
 
       ImageInfo->LoadOptionsSize = (UINT32)AsciiStrSize (Argv[2]);
       ImageInfo->LoadOptions     = AllocatePool (ImageInfo->LoadOptionsSize);
-      AsciiStrCpy (ImageInfo->LoadOptions, Argv[2]);
+      AsciiStrCpyS (ImageInfo->LoadOptions, ImageInfo->LoadOptionsSize, Argv[2]);
     }
 
     // Transfer control to the EFI image we loaded with LoadImage()
@@ -741,7 +741,7 @@ EblFileCopyCmd (
   UINTN         Size;
   UINTN         Offset;
   UINTN         Chunk        = FILE_COPY_CHUNK;
-  UINTN         FileNameLen;
+  UINTN         FileNameLen, DestFileNameLen;
   CHAR8*        DestFileName;
   CHAR8*        SrcFileName;
   CHAR8*        SrcPtr;
@@ -786,9 +786,10 @@ EblFileCopyCmd (
     }
 
     // Construct the destination filepath
-    DestFileName = (CHAR8*)AllocatePool (FileNameLen + AsciiStrLen (SrcFileName) + 1);
-    AsciiStrCpy (DestFileName, Argv[2]);
-    AsciiStrCat (DestFileName, SrcFileName);
+    DestFileNameLen = FileNameLen + AsciiStrLen (SrcFileName) + 1;
+    DestFileName = (CHAR8*)AllocatePool (DestFileNameLen);
+    AsciiStrCpyS (DestFileName, DestFileNameLen, Argv[2]);
+    AsciiStrCatS (DestFileName, DestFileNameLen, SrcFileName);
   }
 
   Source = EfiOpen(Argv[1], EFI_FILE_MODE_READ, 0);

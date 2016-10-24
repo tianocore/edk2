@@ -614,7 +614,7 @@ OutputData (
   UINTN Spaces   = 0;
   CHAR8 Blanks[80];
 
-  AsciiStrCpy (Blanks, mBlanks);
+  AsciiStrCpyS (Blanks, sizeof Blanks, mBlanks);
   for (EndAddress = Address + Length; Address < EndAddress; Offset += Line) {
     AsciiPrint ("%08x: ", Offset);
     for (Line = 0; (Line < 0x10) && (Address < EndAddress);) {
