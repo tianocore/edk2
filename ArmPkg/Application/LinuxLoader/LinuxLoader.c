@@ -61,6 +61,7 @@ LinuxLoaderEntryPoint (
   LIST_ENTRY                          *ResourceLink;
   SYSTEM_MEMORY_RESOURCE              *Resource;
   EFI_PHYSICAL_ADDRESS                SystemMemoryBase;
+  UINTN                               Length;
 
   Status = gBS->LocateProtocol (
                   &gEfiDevicePathFromTextProtocolGuid,
@@ -182,12 +183,13 @@ LinuxLoaderEntryPoint (
   }
 
   if (LinuxCommandLine != NULL) {
-    AsciiLinuxCommandLine = AllocatePool ((StrLen (LinuxCommandLine) + 1) * sizeof (CHAR8));
+    Length = StrLen (LinuxCommandLine) + 1;
+    AsciiLinuxCommandLine = AllocatePool (Length);
     if (AsciiLinuxCommandLine == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Error;
     }
-    UnicodeStrToAsciiStr (LinuxCommandLine, AsciiLinuxCommandLine);
+    UnicodeStrToAsciiStrS (LinuxCommandLine, AsciiLinuxCommandLine, Length);
   }
 
   //

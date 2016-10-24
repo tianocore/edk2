@@ -72,7 +72,7 @@ SetupCmdlineTag (
     mLinuxKernelCurrentAtag->header.type = ATAG_CMDLINE;
 
     /* place CommandLine into tag */
-    AsciiStrCpy (mLinuxKernelCurrentAtag->body.cmdline_tag.cmdline, CmdLine);
+    AsciiStrCpyS (mLinuxKernelCurrentAtag->body.cmdline_tag.cmdline, LineLength, CmdLine);
 
     // move pointer to next tag
     mLinuxKernelCurrentAtag = next_tag_address (mLinuxKernelCurrentAtag);
