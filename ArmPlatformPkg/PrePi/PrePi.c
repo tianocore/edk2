@@ -32,6 +32,9 @@
 #define IS_XIP() (((UINT64)FixedPcdGet64 (PcdFdBaseAddress) > mSystemMemoryEnd) || \
                   ((FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet64 (PcdSystemMemoryBase)))
 
+UINT64 mSystemMemoryEnd = FixedPcdGet64(PcdSystemMemoryBase) +
+                          FixedPcdGet64(PcdSystemMemorySize) - 1;
+
 EFI_STATUS
 EFIAPI
 ExtractGuidedSectionLibConstructor (

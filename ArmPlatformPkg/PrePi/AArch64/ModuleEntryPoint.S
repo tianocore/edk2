@@ -13,8 +13,6 @@
 
 #include <AsmMacroIoLibV8.h>
 
-ASM_GLOBAL ASM_PFX(mSystemMemoryEnd)
-
 ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
@@ -30,16 +28,6 @@ _SetSVCMode:
 // at the top of the DRAM)
 _SystemMemoryEndInit:
   ldr   x1, mSystemMemoryEnd
-
-  // Is mSystemMemoryEnd initialized?
-  cmp   x1, #0
-  bne   _SetupStackPosition
-
-  MOV64 (x1, FixedPcdGet64(PcdSystemMemoryBase) + FixedPcdGet64(PcdSystemMemorySize) - 1)
-
-  // Update the global variable
-  adr   x2, mSystemMemoryEnd
-  str   x1, [x2]
 
 _SetupStackPosition:
   // r1 = SystemMemoryTop
@@ -129,5 +117,3 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
-
-ASM_PFX(mSystemMemoryEnd):    .8byte 0

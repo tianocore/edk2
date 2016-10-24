@@ -21,15 +21,14 @@
   IMPORT  ArmReadMpidr
   IMPORT  ArmPlatformPeiBootAction
   IMPORT  ArmPlatformStackSet
+  IMPORT  mSystemMemoryEnd
 
   EXPORT  _ModuleEntryPoint
-  EXPORT  mSystemMemoryEnd
 
   PRESERVE8
   AREA    PrePiCoreEntryPoint, CODE, READONLY
 
 StartupAddr        DCD      CEntryPoint
-mSystemMemoryEnd   DCQ      0
 
 _ModuleEntryPoint
   // Do early platform specific actions
@@ -49,19 +48,11 @@ _SetSVCMode
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)
 _SystemMemoryEndInit
-  ldr   r1, mSystemMemoryEnd
-
-  // Is mSystemMemoryEnd initialized?
-  cmp   r1, #0
-  bne   _SetupStackPosition
-
-  mov32 r1, FixedPcdGet32(PcdSystemMemoryBase)
-  mov32 r2, FixedPcdGet32(PcdSystemMemorySize)
-  sub   r2, r2, #1
-  add   r1, r1, r2
-  // Update the global variable
-  adr   r2, mSystemMemoryEnd
-  str   r1, [r2]
+  mov32 r1, mSystemMemoryEnd
+  ldrd  r2, r3, [r1]
+  teq   r3, #0
+  moveq r1, r2
+  mvnne r1, #0
 
 _SetupStackPosition
   // r1 = SystemMemoryTop

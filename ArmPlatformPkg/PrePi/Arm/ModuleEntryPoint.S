@@ -15,8 +15,6 @@
 
 #include <Chipset/ArmV7.h>
 
-GCC_ASM_EXPORT(mSystemMemoryEnd)
-
 ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
@@ -35,17 +33,11 @@ _SetSVCMode:
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)
 _SystemMemoryEndInit:
-  ldr   r1, mSystemMemoryEnd
-
-  // Is mSystemMemoryEnd initialized?
-  cmp   r1, #0
-  bne   _SetupStackPosition
-
-  MOV32 (r1, FixedPcdGet32(PcdSystemMemoryBase) + FixedPcdGet32(PcdSystemMemorySize) - 1)
-
-  // Update the global variable
-  adr   r2, mSystemMemoryEnd
-  str   r1, [r2]
+  ADRL  (r1, mSystemMemoryEnd)
+  ldrd  r2, r3, [r1]
+  teq   r3, #0
+  moveq r1, r2
+  mvnne r1, #0
 
 _SetupStackPosition:
   // r1 = SystemMemoryTop
@@ -136,5 +128,3 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
-
-ASM_PFX(mSystemMemoryEnd):  .8byte 0
