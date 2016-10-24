@@ -141,7 +141,6 @@
 
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x80001000
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0x87FE0000 # stack at top of memory
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0x20000  # 128K stack
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80000000

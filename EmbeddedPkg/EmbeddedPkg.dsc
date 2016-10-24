@@ -184,7 +184,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
 
-  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0
 

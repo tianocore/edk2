@@ -97,7 +97,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000|UINT32|0x00000009
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPrompt|"Ebl"|VOID*|0x00000034
 
-  gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|131072|UINT32|0x00000040
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
 
