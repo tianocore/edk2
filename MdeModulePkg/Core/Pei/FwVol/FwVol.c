@@ -565,6 +565,20 @@ FirmwareVolmeInfoPpiNotifyCallback (
     IsFvInfo2 = FALSE;
   }
 
+  if (CompareGuid (&FvInfo2Ppi.FvFormat, &gEfiFirmwareFileSystem2Guid)) {
+    //
+    // gEfiFirmwareFileSystem2Guid is specified for FvFormat, then here to check the
+    // FileSystemGuid pointed by FvInfo against gEfiFirmwareFileSystem2Guid to make sure
+    // FvInfo has the firmware file system 2 format.
+    //
+    // If the ASSERT really appears, FvFormat needs to be specified correctly, for example,
+    // gEfiFirmwareFileSystem3Guid can be used for firmware file system 3 format, or
+    // ((EFI_FIRMWARE_VOLUME_HEADER *) FvInfo)->FileSystemGuid can be just used for both
+    // firmware file system 2 and 3 format.
+    //
+    ASSERT (CompareGuid (&(((EFI_FIRMWARE_VOLUME_HEADER *) FvInfo2Ppi.FvInfo)->FileSystemGuid), &gEfiFirmwareFileSystem2Guid));
+  }
+
   //
   // Locate the corresponding FV_PPI according to founded FV's format guid
   //
