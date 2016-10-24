@@ -42,9 +42,9 @@ DiagnosticLog (
   )
 {
   UINTN len = StrLen (Str);
-  if (len <= mLogRemainChar) {
+  if (len < mLogRemainChar) {
+    StrCpyS (mLogBuffer, mLogRemainChar, Str);
     mLogRemainChar -= len;
-    StrCpy (mLogBuffer, Str);
     mLogBuffer += len;
     return len;
   } else {
