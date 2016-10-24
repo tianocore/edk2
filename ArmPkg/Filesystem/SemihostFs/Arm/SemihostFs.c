@@ -207,11 +207,12 @@ FileOpen (
     return EFI_WRITE_PROTECTED;
   }
 
-  AsciiFileName = AllocatePool (StrLen (FileName) + 1);
+  Length = StrLen (FileName) + 1;
+  AsciiFileName = AllocatePool (Length);
   if (AsciiFileName == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr (FileName, AsciiFileName);
+  UnicodeStrToAsciiStrS (FileName, AsciiFileName, Length);
 
   // Opening '/', '\', '.', or the NULL pathname is trying to open the root directory
   if ((AsciiStrCmp (AsciiFileName, "\\") == 0) ||
@@ -463,7 +464,7 @@ FileDelete (
     NameSize = AsciiStrLen (Fcb->FileName);
     FileName = AllocatePool (NameSize + 1);
 
-    AsciiStrCpy (FileName, Fcb->FileName);
+    AsciiStrCpyS (FileName, NameSize + 1, Fcb->FileName);
 
     // Close the file if it's open.  Disregard return status,
     // since it might give an error if the file isn't open.
@@ -828,8 +829,10 @@ GetFilesystemInfo (
   EFI_FILE_SYSTEM_INFO  *Info;
   EFI_STATUS            Status;
   UINTN                 ResultSize;
+  UINTN                 StringSize;
 
-  ResultSize = SIZE_OF_EFI_FILE_SYSTEM_INFO + StrSize (mSemihostFsLabel);
+  StringSize = StrSize (mSemihostFsLabel);
+  ResultSize = SIZE_OF_EFI_FILE_SYSTEM_INFO + StringSize;
 
   if (*BufferSize >= ResultSize) {
     ZeroMem (Buffer, ResultSize);
@@ -843,7 +846,7 @@ GetFilesystemInfo (
     Info->FreeSpace  = 0;
     Info->BlockSize  = 0;
 
-    StrCpy (Info->VolumeLabel, mSemihostFsLabel);
+    CopyMem (Info->VolumeLabel, mSemihostFsLabel, StringSize);
   } else {
     Status = EFI_BUFFER_TOO_SMALL;
   }
@@ -903,7 +906,7 @@ FileGetInfo (
     ResultSize = StrSize (mSemihostFsLabel);
 
     if (*BufferSize >= ResultSize) {
-      StrCpy (Buffer, mSemihostFsLabel);
+      CopyMem (Buffer, mSemihostFsLabel, ResultSize);
       Status = EFI_SUCCESS;
     } else {
       Status = EFI_BUFFER_TOO_SMALL;
@@ -963,11 +966,12 @@ SetFileInfo (
     return EFI_ACCESS_DENIED;
   }
 
-  AsciiFileName = AllocatePool (StrLen (Info->FileName) + 1);
+  Length = StrLen (Info->FileName) + 1;
+  AsciiFileName = AllocatePool (Length);
   if (AsciiFileName == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr (Info->FileName, AsciiFileName);
+  UnicodeStrToAsciiStrS (Info->FileName, AsciiFileName, Length);
 
   FileSizeIsDifferent = (Info->FileSize != Fcb->Info.FileSize);
   FileNameIsDifferent = (AsciiStrCmp (AsciiFileName, Fcb->FileName) != 0);
