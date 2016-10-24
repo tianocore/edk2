@@ -657,7 +657,7 @@ InitializeDebugAgent (
   *(UINTN *) (((UINT8 *)VectorBase) + Offset) = (UINTN)AsmCommonExceptionEntry;
 
   // Flush Caches since we updated executable stuff
-  InvalidateInstructionCacheRange ((VOID *)PcdGet64(PcdCpuVectorBaseAddress), Length);
+  InvalidateInstructionCacheRange ((VOID *)(UINTN)PcdGet64(PcdCpuVectorBaseAddress), Length);
 
   // setup a timer so gdb can break in via ctrl-c
   DebugAgentTimerIntialize ();
