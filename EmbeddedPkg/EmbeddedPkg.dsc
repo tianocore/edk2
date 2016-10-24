@@ -4,6 +4,7 @@
 #
 # Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2012-2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -227,7 +228,7 @@
 
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu=7-A.security
-
+  *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
 
 ################################################################################
 #
