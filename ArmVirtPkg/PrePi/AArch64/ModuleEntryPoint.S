@@ -14,8 +14,6 @@
 
 #include <AsmMacroIoLibV8.h>
 
-ASM_GLOBAL ASM_PFX(mSystemMemoryEnd)
-
 ASM_FUNC(_ModuleEntryPoint)
   //
   // We are built as a ET_DYN PIE executable, so we need to process all
@@ -68,8 +66,6 @@ _SetupStackPosition:
   ldr   x2, PcdGet64 (PcdSystemMemorySize)
   sub   x2, x2, #1
   add   x1, x1, x2      // x1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
-  adr   x2, mSystemMemoryEnd
-  str   x1, [x2]
 
   // Calculate Top of the Firmware Device
   ldr   x2, PcdGet64 (PcdFdBaseAddress)
@@ -151,5 +147,3 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
-
-ASM_PFX(mSystemMemoryEnd):    .8byte 0

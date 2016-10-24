@@ -14,8 +14,6 @@
 
 #include <AsmMacroIoLib.h>
 
-ASM_GLOBAL ASM_PFX(mSystemMemoryEnd)
-
 ASM_FUNC(_ModuleEntryPoint)
   //
   // We are built as a ET_DYN PIE executable, so we need to process all
@@ -66,12 +64,10 @@ _SetupStackPosition:
   ADRL  (r12, PcdGet64 (PcdSystemMemorySize))
   ldrd  r2, r3, [r12]
 
-  // calculate the top of memory, and record it in mSystemMemoryEnd
+  // calculate the top of memory
   adds  r2, r2, r1
   sub   r2, r2, #1
   addcs r3, r3, #1
-  adr   r12, mSystemMemoryEnd
-  strd  r2, r3, [r12]
 
   // truncate the memory used by UEFI to 4 GB range
   teq   r3, #0
@@ -159,5 +155,3 @@ _PrepareArguments:
 
 _NeverReturn:
   b _NeverReturn
-
-ASM_PFX(mSystemMemoryEnd):    .quad 0
