@@ -1,7 +1,7 @@
 /** @file
   Implementation for PEI Services Library.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -574,6 +574,7 @@ PeiServicesFfsGetVolumeInfo (
   the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI instance.
   If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI, then ASSERT().
   If the EFI_PEI_FIRMWARE_VOLUME_INFO(2)_PPI can not be installed, then ASSERT().
+  If NULL is specified for FvFormat, but FvInfo does not have the firmware file system 2 format, then ASSERT.
 
   @param  InstallFvInfoPpi     Install FvInfo Ppi if it is TRUE. Otherwise, install FvInfo2 Ppi.
   @param  FvFormat             Unique identifier of the format of the memory-mapped
@@ -640,6 +641,16 @@ InternalPeiServicesInstallFvInfoPpi (
     CopyGuid (&FvInfoPpi->FvFormat, FvFormat);
   } else {
     CopyGuid (&FvInfoPpi->FvFormat, &gEfiFirmwareFileSystem2Guid);
+    //
+    // Since the EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed if NULL is specified for FvFormat,
+    // check the FileSystemGuid pointed by FvInfo against EFI_FIRMWARE_FILE_SYSTEM2_GUID to make sure
+    // FvInfo has the firmware file system 2 format.
+    // If the ASSERT really appears, FvFormat needs to be specified correctly, for example,
+    // EFI_FIRMWARE_FILE_SYSTEM3_GUID can be used for firmware file system 3 format, or
+    // ((EFI_FIRMWARE_VOLUME_HEADER *) FvInfo)->FileSystemGuid can be just used for both
+    // firmware file system 2 and 3 format.
+    //
+    ASSERT (CompareGuid (&(((EFI_FIRMWARE_VOLUME_HEADER *) FvInfo)->FileSystemGuid), &gEfiFirmwareFileSystem2Guid));
   }
   FvInfoPpi->FvInfo = (VOID *) FvInfo;
   FvInfoPpi->FvInfoSize = FvInfoSize;
@@ -672,6 +683,7 @@ InternalPeiServicesInstallFvInfoPpi (
   the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance.
   If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO_PPI, then ASSERT().
   If the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI can not be installed, then ASSERT().
+  If NULL is specified for FvFormat, but FvInfo does not have the firmware file system 2 format, then ASSERT.
 
   @param  FvFormat             Unique identifier of the format of the memory-mapped
                                firmware volume.  This parameter is optional and
@@ -714,6 +726,7 @@ PeiServicesInstallFvInfoPpi (
   the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI instance.
   If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI, then ASSERT().
   If the EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI can not be installed, then ASSERT().
+  If NULL is specified for FvFormat, but FvInfo does not have the firmware file system 2 format, then ASSERT.
 
   @param  FvFormat             Unique identifier of the format of the memory-mapped
                                firmware volume.  This parameter is optional and
