@@ -2,7 +2,7 @@
     Manually generated Python Configuration file for EDK II.
 
     Copyright (c) 2015, Daryl McDaniel. All rights reserved.<BR>
-    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -983,7 +983,7 @@
 #define PACKAGE_TARNAME   "EADK_Python"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL   "http://edk2.tianocore.org/"
+#define PACKAGE_URL   "http://www.tianocore.org/"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION  "V0.1"

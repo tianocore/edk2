@@ -1,7 +1,7 @@
 /** @file
     Manually generated Python Configuration file for EDK II.
 
-    Copyright (c) 2011 - 2012, Intel Corporation. All rights reserved.<BR>
+    Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
     This program and the accompanying materials are licensed and made available under
     the terms and conditions of the BSD License that accompanies this distribution.
     The full text of the license may be found at
@@ -928,7 +928,7 @@
 #undef MVWDELCH_IS_EXPRESSION
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT   "edk2-devel@lists.sourceforge.net"
+#define PACKAGE_BUGREPORT   "edk2-devel@lists.01.org"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME    "EDK II Python Package"
@@ -940,7 +940,7 @@
 #define PACKAGE_TARNAME   "EADK_Python"
 
 /* Define to the home page for this package. */
-#define PACKAGE_URL   "http://edk2.tianocore.org/toolkit/python"
+#define PACKAGE_URL   "https://github.com/tianocore/edk2/tree/master/AppPkg/Applications/Python"
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION  "V0.8"
