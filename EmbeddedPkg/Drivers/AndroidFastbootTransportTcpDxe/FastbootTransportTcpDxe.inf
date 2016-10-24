@@ -47,8 +47,5 @@
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
 
-[Guids]
-  gEfiHostnameVariableGuid
-
 [FixedPcd]
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootTcpPort

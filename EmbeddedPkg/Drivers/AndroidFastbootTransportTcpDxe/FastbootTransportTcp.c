@@ -27,8 +27,6 @@
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#include <Guid/Hostname.h>
-
 #define IP4_ADDR_TO_STRING(IpAddr, IpAddrString) UnicodeSPrint (       \
                                                    IpAddrString,       \
                                                    16 * 2,             \
@@ -307,9 +305,6 @@ TcpFastbootTransportStart (
   EFI_HANDLE                   *HandleBuffer;
   EFI_IP4_MODE_DATA             Ip4ModeData;
   UINTN                         NumHandles;
-  UINTN                         HostnameSize = 256;
-  CHAR8                         Hostname[256];
-  CHAR16                        HostnameUnicode[256] = L"<no hostname>";
   CHAR16                        IpAddrString[16];
   UINTN                         Index;
 
@@ -442,27 +437,9 @@ TcpFastbootTransportStart (
   //
   IP4_ADDR_TO_STRING (Ip4ModeData.ConfigData.StationAddress, IpAddrString);
 
-  // Look up hostname
-  Status = gRT->GetVariable (
-                  L"Hostname",
-                  &gEfiHostnameVariableGuid,
-                  NULL,
-                  &HostnameSize,
-                  &Hostname
-                  );
-  if (!EFI_ERROR (Status) && HostnameSize != 0) {
-    AsciiStrToUnicodeStr (Hostname, HostnameUnicode);
-  }
-
-  // Hostname variable is not null-terminated.
-  Hostname[HostnameSize] = L'\0';
-
   mTextOut->OutputString (mTextOut, L"TCP Fastboot transport configured.");
   mTextOut->OutputString (mTextOut, L"\r\nIP address: ");
   mTextOut->OutputString (mTextOut ,IpAddrString);
-  mTextOut->OutputString (mTextOut, L"\r\n");
-  mTextOut->OutputString (mTextOut, L"\r\nhostname: ");
-  mTextOut->OutputString (mTextOut, HostnameUnicode);
   mTextOut->OutputString (mTextOut, L"\r\n");
 
   //
