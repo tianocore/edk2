@@ -11,10 +11,6 @@
 //
 //
 
-#include <AsmMacroIoLib.h>
-#include <Library/ArmCpuLib.h>
-#include <Chipset/ArmCortexA9.h>
-
   INCLUDE AsmMacroExport.inc
   INCLUDE AsmMacroIoLib.inc
 
