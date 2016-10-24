@@ -964,7 +964,7 @@ Mtftp4CheckPacket (
       Step      = (Context->DownloadedNbOfBytes   * TFTP_PROGRESS_SLIDER_STEPS) / Context->FileSize;
       if (Step > LastStep) {
         Print (mTftpProgressDelete);
-        StrCpy (Progress, mTftpProgressFrame);
+        CopyMem (Progress, mTftpProgressFrame, sizeof mTftpProgressFrame);
         for (Index = 1; Index < Step; Index++) {
           Progress[Index] = L'=';
         }
@@ -1044,6 +1044,7 @@ BdsTftpLoadImage (
   UINT64                   FileSize;
   UINT64                   TftpBufferSize;
   BDS_TFTP_CONTEXT         *TftpContext;
+  UINTN                    PathNameLen;
 
   ASSERT(IS_DEVICE_PATH_NODE (RemainingDevicePath, MESSAGING_DEVICE_PATH, MSG_IPv4_DP));
   IPv4DevicePathNode = (IPv4_DEVICE_PATH*)RemainingDevicePath;
@@ -1187,8 +1188,9 @@ BdsTftpLoadImage (
 
   // The Device Path might contain multiple FilePath nodes
   PathName      = ConvertDevicePathToText ((EFI_DEVICE_PATH_PROTOCOL*)(IPv4DevicePathNode + 1), FALSE, FALSE);
-  AsciiFilePath = AllocatePool (StrLen (PathName) + 1);
-  UnicodeStrToAsciiStr (PathName, AsciiFilePath);
+  PathNameLen   = StrLen (PathName) + 1;
+  AsciiFilePath = AllocatePool (PathNameLen);
+  UnicodeStrToAsciiStrS (PathName, AsciiFilePath, PathNameLen);
 
   //
   // Try to get the size of the file in bytes from the server. If it fails,
