@@ -280,5 +280,14 @@
   EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
   EmbeddedPkg/Drivers/SataSiI3132Dxe/SataSiI3132Dxe.inf
 
+  EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
+  EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
+  EmbeddedPkg/Library/DxeHobPeCoffLib/DxeHobPeCoffLib.inf
+  EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
+  EmbeddedPkg/Library/FdtLib/FdtLib.inf
+  EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
+  EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
+  EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
+
 [Components.IA32, Components.X64, Components.IPF, Components.ARM]
   EmbeddedPkg/GdbStub/GdbStub.inf
