@@ -891,7 +891,7 @@ NorFlashRead (
   SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
 
   // Readout the data
-  AlignedCopyMem (Buffer, (VOID *)StartAddress + Offset, BufferSizeInBytes);
+  AlignedCopyMem (Buffer, (VOID *)(StartAddress + Offset), BufferSizeInBytes);
 
   return EFI_SUCCESS;
 }
