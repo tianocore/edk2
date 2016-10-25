@@ -273,7 +273,7 @@ ArmFastbootPlatformInit (
 
       // Copy handle and partition name
       Entry->PartitionHandle = AllHandles[LoopIndex];
-      StrnCpy (
+      CopyMem (
         Entry->PartitionName,
         PartitionEntries[PartitionNode->PartitionNumber - 1].PartitionName, // Partition numbers start from 1.
         PARTITION_NAME_MAX_LENGTH
@@ -341,7 +341,8 @@ ArmFastbootPlatformFlashPartition (
   CHAR16                   PartitionNameUnicode[60];
   BOOLEAN                  PartitionFound;
 
-  AsciiStrToUnicodeStr (PartitionName, PartitionNameUnicode);
+  AsciiStrToUnicodeStrS (PartitionName, PartitionNameUnicode,
+    ARRAY_SIZE (PartitionNameUnicode));
 
   PartitionFound = FALSE;
   Entry = (FASTBOOT_PARTITION_LIST *) GetFirstNode (&(mPartitionListHead));
@@ -445,7 +446,7 @@ ArmFastbootPlatformGetVar (
   )
 {
   if (AsciiStrCmp (Name, "product")) {
-    AsciiStrCpy (Value, FixedPcdGetPtr (PcdFirmwareVendor));
+    AsciiStrCpyS (Value, 61, FixedPcdGetPtr (PcdFirmwareVendor));
   } else {
     *Value = '\0';
   }
@@ -479,7 +480,7 @@ ArmFastbootPlatformOemCommand (
 {
   CHAR16 CommandUnicode[65];
 
-  AsciiStrToUnicodeStr (Command, CommandUnicode);
+  AsciiStrToUnicodeStrS (Command, CommandUnicode, ARRAY_SIZE (CommandUnicode));
 
   if (AsciiStrCmp (Command, "Demonstrate") == 0) {
     DEBUG ((EFI_D_ERROR, "ARM OEM Fastboot command 'Demonstrate' received.\n"));
