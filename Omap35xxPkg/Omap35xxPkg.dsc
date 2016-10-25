@@ -62,6 +62,8 @@
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   DmaLib|ArmPkg/Library/ArmDmaLib/ArmDmaLib.inf
 
+  TimerLib|Omap35xxPkg/Library/Omap35xxTimerLib/Omap35xxTimerLib.inf
+
 #
 # Assume everything is fixed at build
 #
@@ -80,12 +82,8 @@
 
 
 [LibraryClasses.ARM]
-  #
-  # Note: This NULL library feature is not yet in the edk2/BaseTools, but it is checked in to
-  # the BaseTools project. So you need to build with the BaseTools project util this feature gets synced.
-  #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
+  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [BuildOptions]
   XCODE:*_*_ARM_ARCHCC_FLAGS     == -arch armv7 -march=armv7
@@ -140,9 +138,6 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
 
-  gEmbeddedTokenSpaceGuid.PcdPrePiTempMemorySize|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvBaseAddress|0
-  gEmbeddedTokenSpaceGuid.PcdPrePiBfvSize|0
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainBase|0
   gEmbeddedTokenSpaceGuid.PcdFlashFvMainSize|0
   gEmbeddedTokenSpaceGuid.PcdPrePiHobBase|0x80001000
@@ -187,5 +182,13 @@
   Omap35xxPkg/TimerDxe/TimerDxe.inf
   Omap35xxPkg/TPS65950Dxe/TPS65950.inf
 
+  Omap35xxPkg/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
+  Omap35xxPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
+  Omap35xxPkg/Library/EblCmdLib/EblCmdLib.inf
+  Omap35xxPkg/Library/GdbSerialLib/GdbSerialLib.inf
+  Omap35xxPkg/Library/RealTimeClockLib/RealTimeClockLib.inf
+  Omap35xxPkg/Library/SerialPortLib/SerialPortLib.inf
+  Omap35xxPkg/MmcHostDxe/MmcHostDxe.inf
+  Omap35xxPkg/PciEmulation/PciEmulation.inf
 
 
