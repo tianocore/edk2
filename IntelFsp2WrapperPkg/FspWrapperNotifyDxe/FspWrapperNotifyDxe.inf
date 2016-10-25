@@ -62,6 +62,7 @@
 
 [Pcd]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi       ## CONSUMES
 
 [Depex]
   TRUE

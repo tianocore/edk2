@@ -75,6 +75,24 @@
   gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00000301
 
+  ## This PCD indicates if FSP APIs are skipped from FSP wrapper.<BR><BR>
+  #  If a bit is set, that means this FSP API is skipped.<BR>
+  #  If a bit is clear, that means this FSP API is NOT skipped.<BR>
+  #  NOTE: Only NotifyPhase Post PCI enumeration (BIT16) is implemented.<BR>
+  #  BIT[15:0] is for function:<BR>
+  #    BIT0    - Skip TempRamInit<BR>
+  #    BIT1    - Skip MemoryInit<BR>
+  #    BIT2    - Skip TempRamExit<BR>
+  #    BIT3    - Skip SiliconInit<BR>
+  #    BIT4    - Skip NotifyPhase<BR>
+  #  BIT[32:16] is for sub-function:<BR>
+  #    BIT16   - Skip NotifyPhase (AfterPciEnumeration)<BR>
+  #    BIT17   - Skip NotifyPhase (ReadyToBoot)<BR>
+  #    BIT18   - Skip NotifyPhase (EndOfFirmware)<BR>
+  #  Any undefined BITs are reserved for future use.<BR>
+  # @Prompt Skip FSP API from FSP wrapper.
+  gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi|0x00000000|UINT32|0x40000009
+
 [PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
   

@@ -27,6 +27,8 @@
 #include <Library/HobLib.h>
 #include <FspStatusCode.h>
 
+#define   FSP_API_NOTIFY_PHASE_AFTER_PCI_ENUMERATION     BIT16
+
 typedef
 EFI_STATUS
 (EFIAPI * ADD_PERFORMANCE_RECORDS)(
@@ -236,6 +238,7 @@ FspWrapperNotifyDxeEntryPoint (
   EFI_EVENT  ReadyToBootEvent;
   VOID       *Registration;
   EFI_EVENT  ProtocolNotifyEvent;
+  UINT32     FspApiMask;
 
   //
   // Load this driver's image to memory
@@ -245,14 +248,17 @@ FspWrapperNotifyDxeEntryPoint (
     return EFI_SUCCESS;
   }
 
-  ProtocolNotifyEvent = EfiCreateProtocolNotifyEvent (
-                          &gEfiPciEnumerationCompleteProtocolGuid,
-                          TPL_CALLBACK,
-                          OnPciEnumerationComplete,
-                          NULL,
-                          &Registration
-                          );
-  ASSERT (ProtocolNotifyEvent != NULL);
+  FspApiMask = PcdGet32 (PcdSkipFspApi);
+  if ((FspApiMask & FSP_API_NOTIFY_PHASE_AFTER_PCI_ENUMERATION) == 0) {
+    ProtocolNotifyEvent = EfiCreateProtocolNotifyEvent (
+                            &gEfiPciEnumerationCompleteProtocolGuid,
+                            TPL_CALLBACK,
+                            OnPciEnumerationComplete,
+                            NULL,
+                            &Registration
+                            );
+    ASSERT (ProtocolNotifyEvent != NULL);
+  }
 
   Status = EfiCreateEventReadyToBootEx (
              TPL_CALLBACK,
