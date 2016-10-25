@@ -220,10 +220,10 @@
 
 [BuildOptions]
   XCODE:*_*_ARM_PLATFORM_FLAGS == -arch armv7
-
   GCC:*_*_ARM_PLATFORM_FLAGS == -march=armv7-a
-
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A8
+
+  *_*_*_CC_FLAGS = -DDISABLE_NEW_DEPRECATED_INTERFACES
 
 ################################################################################
 #
