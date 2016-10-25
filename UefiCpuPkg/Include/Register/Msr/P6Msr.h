@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-19.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.21.
 
 **/
 
@@ -27,7 +27,7 @@
 #include <Register/ArchitecturalMsr.h>
 
 /**
-  See Section 35.20, "MSRs in Pentium Processors.".
+  See Section 35.22, "MSRs in Pentium Processors.".
 
   @param  ECX  MSR_P6_P5_MC_ADDR (0x00000000)
   @param  EAX  Lower 32-bits of MSR value.
@@ -46,7 +46,7 @@
 
 
 /**
-  See Section 35.20, "MSRs in Pentium Processors.".
+  See Section 35.22, "MSRs in Pentium Processors.".
 
   @param  ECX  MSR_P6_P5_MC_TYPE (0x00000001)
   @param  EAX  Lower 32-bits of MSR value.

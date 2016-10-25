@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-15.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.17.
 
 **/
 
@@ -302,6 +302,58 @@ typedef union {
 
 
 /**
+  THREAD. Enhanced SMM Capabilities (SMM-RO) Reports SMM capability
+  Enhancement. Accessible only while in SMM.
+
+  @param  ECX  MSR_XEON_PHI_SMM_MCA_CAP (0x0000017D)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_XEON_PHI_SMM_MCA_CAP_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_XEON_PHI_SMM_MCA_CAP_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_XEON_PHI_SMM_MCA_CAP_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_XEON_PHI_SMM_MCA_CAP);
+  AsmWriteMsr64 (MSR_XEON_PHI_SMM_MCA_CAP, Msr.Uint64);
+  @endcode
+  @note MSR_XEON_PHI_SMM_MCA_CAP is defined as MSR_SMM_MCA_CAP in SDM.
+**/
+#define MSR_XEON_PHI_SMM_MCA_CAP                 0x0000017D
+
+/**
+  MSR information returned for MSR index #MSR_XEON_PHI_SMM_MCA_CAP
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    UINT32  Reserved1:32;
+    UINT32  Reserved2:26;
+    ///
+    /// [Bit 58] SMM_Code_Access_Chk (SMM-RO) If set to 1 indicates that the
+    /// SMM code access restriction is supported and a host-space interface
+    /// available to SMM handler.
+    ///
+    UINT32  SMM_Code_Access_Chk:1;
+    ///
+    /// [Bit 59] Long_Flow_Indication (SMM-RO) If set to 1 indicates that the
+    /// SMM long flow indicator is supported and a host-space interface
+    /// available to SMM handler.
+    ///
+    UINT32  Long_Flow_Indication:1;
+    UINT32  Reserved3:4;
+  } Bits;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_XEON_PHI_SMM_MCA_CAP_REGISTER;
+
+
+/**
   Thread. Enable Misc. Processor Features (R/W)  Allows a variety of processor
   functions to be enabled and disabled.
 
@@ -336,7 +388,8 @@ typedef union {
     UINT32  FastStrings:1;
     UINT32  Reserved1:2;
     ///
-    /// [Bit 3] Automatic Thermal Control Circuit Enable (R/W).
+    /// [Bit 3] Automatic Thermal Control Circuit Enable (R/W) Default value
+    /// is 1.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
@@ -350,7 +403,7 @@ typedef union {
     ///
     UINT32  BTS:1;
     ///
-    /// [Bit 12] Precise Event Based Sampling Unavailable (RO).
+    /// [Bit 12] Processor Event Based Sampling Unavailable (RO).
     ///
     UINT32  PEBS:1;
     UINT32  Reserved4:3;
@@ -441,6 +494,58 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_XEON_PHI_TEMPERATURE_TARGET_REGISTER;
+
+
+/**
+  Miscellaneous Feature Control (R/W).
+
+  @param  ECX  MSR_XEON_PHI_MISC_FEATURE_CONTROL (0x000001A4)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_XEON_PHI_MISC_FEATURE_CONTROL_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_XEON_PHI_MISC_FEATURE_CONTROL_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_XEON_PHI_MISC_FEATURE_CONTROL_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_XEON_PHI_MISC_FEATURE_CONTROL);
+  AsmWriteMsr64 (MSR_XEON_PHI_MISC_FEATURE_CONTROL, Msr.Uint64);
+  @endcode
+  @note MSR_XEON_PHI_MISC_FEATURE_CONTROL is defined as MSR_MISC_FEATURE_CONTROL in SDM.
+**/
+#define MSR_XEON_PHI_MISC_FEATURE_CONTROL        0x000001A4
+
+/**
+  MSR information returned for MSR index #MSR_XEON_PHI_MISC_FEATURE_CONTROL
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Core. DCU Hardware Prefetcher Disable (R/W) If 1, disables the
+    /// L1 data cache prefetcher.
+    ///
+    UINT32  DCUHardwarePrefetcherDisable:1;
+    ///
+    /// [Bit 1] Core. L2 Hardware Prefetcher Disable (R/W)  If 1, disables the
+    /// L2 hardware prefetcher.
+    ///
+    UINT32  L2HardwarePrefetcherDisable:1;
+    UINT32  Reserved1:30;
+    UINT32  Reserved2:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_XEON_PHI_MISC_FEATURE_CONTROL_REGISTER;
 
 
 /**
@@ -685,25 +790,6 @@ typedef union {
 /**
   Thread. See Table 35-2.
 
-  @param  ECX  MSR_XEON_PHI_IA32_PERF_GLOBAL_STAUS (0x0000038E)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_IA32_PERF_GLOBAL_STAUS);
-  AsmWriteMsr64 (MSR_XEON_PHI_IA32_PERF_GLOBAL_STAUS, Msr);
-  @endcode
-  @note MSR_XEON_PHI_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
-**/
-#define MSR_XEON_PHI_IA32_PERF_GLOBAL_STAUS      0x0000038E
-
-
-/**
-  Thread. See Table 35-2.
-
   @param  ECX  MSR_XEON_PHI_PEBS_ENABLE (0x000003F1)
   @param  EAX  Lower 32-bits of MSR value.
   @param  EDX  Upper 32-bits of MSR value.
@@ -838,180 +924,6 @@ typedef union {
   @note MSR_XEON_PHI_CORE_C6_RESIDENCY is defined as MSR_CORE_C6_RESIDENCY in SDM.
 **/
 #define MSR_XEON_PHI_CORE_C6_RESIDENCY           0x000003FF
-
-
-/**
-  Core. See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_XEON_PHI_MC3_CTL (0x0000040C)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC3_CTL);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC3_CTL, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC3_CTL is defined as MSR_MC3_CTL in SDM.
-**/
-#define MSR_XEON_PHI_MC3_CTL                     0x0000040C
-
-
-/**
-  Core. See Section 15.3.2.2, "IA32_MCi_STATUS MSRS.".
-
-  @param  ECX  MSR_XEON_PHI_MC3_STATUS (0x0000040D)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC3_STATUS);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC3_STATUS, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
-**/
-#define MSR_XEON_PHI_MC3_STATUS                  0x0000040D
-
-
-/**
-  Core. See Section 15.3.2.3, "IA32_MCi_ADDR MSRs.".
-
-  @param  ECX  MSR_XEON_PHI_MC3_ADDR (0x0000040E)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC3_ADDR);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC3_ADDR, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
-**/
-#define MSR_XEON_PHI_MC3_ADDR                    0x0000040E
-
-
-/**
-  Core. See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_XEON_PHI_MC4_CTL (0x00000410)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC4_CTL);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC4_CTL, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC4_CTL is defined as MSR_MC4_CTL in SDM.
-**/
-#define MSR_XEON_PHI_MC4_CTL                     0x00000410
-
-
-/**
-  Core. See Section 15.3.2.2, "IA32_MCi_STATUS MSRS.".
-
-  @param  ECX  MSR_XEON_PHI_MC4_STATUS (0x00000411)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC4_STATUS);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC4_STATUS, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC4_STATUS is defined as MSR_MC4_STATUS in SDM.
-**/
-#define MSR_XEON_PHI_MC4_STATUS                  0x00000411
-
-
-/**
-  Core. See Section 15.3.2.3, "IA32_MCi_ADDR MSRs." The MSR_MC4_ADDR register
-  is either not implemented or contains no address if the ADDRV flag in the
-  MSR_MC4_STATUS register is clear. When not implemented in the processor, all
-  reads and writes to this MSR will cause a general-protection exception.
-
-  @param  ECX  MSR_XEON_PHI_MC4_ADDR (0x00000412)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC4_ADDR);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC4_ADDR, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
-**/
-#define MSR_XEON_PHI_MC4_ADDR                    0x00000412
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_XEON_PHI_MC5_CTL (0x00000414)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC5_CTL);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC5_CTL, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC5_CTL is defined as MSR_MC5_CTL in SDM.
-**/
-#define MSR_XEON_PHI_MC5_CTL                     0x00000414
-
-
-/**
-  Package. See Section 15.3.2.2, "IA32_MCi_STATUS MSRS.".
-
-  @param  ECX  MSR_XEON_PHI_MC5_STATUS (0x00000415)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC5_STATUS);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC5_STATUS, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC5_STATUS is defined as MSR_MC5_STATUS in SDM.
-**/
-#define MSR_XEON_PHI_MC5_STATUS                  0x00000415
-
-
-/**
-  Package. See Section 15.3.2.3, "IA32_MCi_ADDR MSRs.".
-
-  @param  ECX  MSR_XEON_PHI_MC5_ADDR (0x00000416)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_PHI_MC5_ADDR);
-  AsmWriteMsr64 (MSR_XEON_PHI_MC5_ADDR, Msr);
-  @endcode
-  @note MSR_XEON_PHI_MC5_ADDR is defined as MSR_MC5_ADDR in SDM.
-**/
-#define MSR_XEON_PHI_MC5_ADDR                    0x00000416
 
 
 /**
@@ -1323,7 +1235,7 @@ typedef union {
 
 
 /**
-  Package. Base TDP Ratio (R/O) See Table 35-20.
+  Package. Base TDP Ratio (R/O) See Table 35-23.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_NOMINAL (0x00000648)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1341,7 +1253,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Level 1 ratio and power level (R/O). See Table 35-20.
+  Package. ConfigTDP Level 1 ratio and power level (R/O). See Table 35-23.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_LEVEL1 (0x00000649)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1359,7 +1271,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Level 2 ratio and power level (R/O). See Table 35-20.
+  Package. ConfigTDP Level 2 ratio and power level (R/O). See Table 35-23.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_LEVEL2 (0x0000064A)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1377,7 +1289,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Control (R/W) See Table 35-20.
+  Package. ConfigTDP Control (R/W) See Table 35-23.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_CONTROL (0x0000064B)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1396,7 +1308,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Control (R/W) See Table 35-20.
+  Package. ConfigTDP Control (R/W) See Table 35-23.
 
   @param  ECX  MSR_XEON_PHI_TURBO_ACTIVATION_RATIO (0x0000064C)
   @param  EAX  Lower 32-bits of MSR value.

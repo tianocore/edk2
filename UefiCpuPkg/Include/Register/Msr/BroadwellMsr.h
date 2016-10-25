@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-12.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.13.
 
 **/
 
@@ -30,25 +30,25 @@
   Thread. See Table 35-2. See Section 18.4.2, "Global Counter Control
   Facilities.".
 
-  @param  ECX  MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS (0x0000038E)
+  @param  ECX  MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS (0x0000038E)
   @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS_REGISTER.
+               Described by the type MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS_REGISTER.
   @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS_REGISTER.
+               Described by the type MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS_REGISTER.
 
   <b>Example usage</b>
   @code
-  MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS_REGISTER  Msr;
+  MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS_REGISTER  Msr;
 
-  Msr.Uint64 = AsmReadMsr64 (MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS);
-  AsmWriteMsr64 (MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS, Msr.Uint64);
+  Msr.Uint64 = AsmReadMsr64 (MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS);
+  AsmWriteMsr64 (MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS, Msr.Uint64);
   @endcode
-  @note MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
+  @note MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS is defined as IA32_PERF_GLOBAL_STATUS in SDM.
 **/
-#define MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS     0x0000038E
+#define MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS    0x0000038E
 
 /**
-  MSR information returned for MSR index #MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS
+  MSR information returned for MSR index #MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS
 **/
 typedef union {
   ///
@@ -86,7 +86,7 @@ typedef union {
     UINT32  Ovf_FixedCtr2:1;
     UINT32  Reserved2:20;
     ///
-    /// [Bit 55] Trace_ToPA_PMI. See Section 36.2.4.2, "Table of Physical
+    /// [Bit 55] Trace_ToPA_PMI. See Section 36.2.6.2, "Table of Physical
     /// Addresses (ToPA).".
     ///
     UINT32  Trace_ToPA_PMI:1;
@@ -108,7 +108,7 @@ typedef union {
   /// All bit fields as a 64-bit value
   ///
   UINT64  Uint64;
-} MSR_BROADWELL_IA32_PERF_GLOBAL_STAUS_REGISTER;
+} MSR_BROADWELL_IA32_PERF_GLOBAL_STATUS_REGISTER;
 
 
 /**
@@ -264,5 +264,24 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_BROADWELL_TURBO_RATIO_LIMIT_REGISTER;
+
+
+/**
+  Package. PP0 Energy Status (R/O)  See Section 14.9.4, "PP0/PP1 RAPL
+  Domains.".
+
+  @param  ECX  MSR_BROADWELL_PP0_ENERGY_STATUS (0x00000639)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_BROADWELL_PP0_ENERGY_STATUS);
+  @endcode
+  @note MSR_BROADWELL_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
+**/
+#define MSR_BROADWELL_PP0_ENERGY_STATUS          0x00000639
 
 #endif

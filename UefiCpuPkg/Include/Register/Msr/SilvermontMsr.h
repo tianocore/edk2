@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-4.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.4.
 
 **/
 
@@ -27,7 +27,7 @@
 #include <Register/ArchitecturalMsr.h>
 
 /**
-  Shared. Model Specific Platform ID (R).
+  Module. Model Specific Platform ID (R).
 
   @param  ECX  MSR_SILVERMONT_PLATFORM_ID (0x00000017)
   @param  EAX  Lower 32-bits of MSR value.
@@ -74,8 +74,7 @@ typedef union {
 
 
 /**
-  Shared. Processor Hard Power-On Configuration (R/W) Enables and disables
-  processor features; (R) indicates current processor configuration.
+  Module. Processor Hard Power-On Configuration (R/W) Writes ignored.
 
   @param  ECX  MSR_SILVERMONT_EBL_CR_POWERON (0x0000002A)
   @param  EAX  Lower 32-bits of MSR value.
@@ -102,69 +101,8 @@ typedef union {
   /// Individual bit fields
   ///
   struct {
-    UINT32  Reserved1:1;
-    ///
-    /// [Bit 1] Data Error Checking Enable (R/W) 1 = Enabled; 0 = Disabled
-    /// Always 0.
-    ///
-    UINT32  DataErrorCheckingEnable:1;
-    ///
-    /// [Bit 2] Response Error Checking Enable (R/W) 1 = Enabled; 0 = Disabled
-    /// Always 0.
-    ///
-    UINT32  ResponseErrorCheckingEnable:1;
-    ///
-    /// [Bit 3] AERR# Drive Enable (R/W)  1 = Enabled; 0 = Disabled Always 0.
-    ///
-    UINT32  AERR_DriveEnable:1;
-    ///
-    /// [Bit 4] BERR# Enable for initiator bus requests (R/W) 1 = Enabled; 0 =
-    /// Disabled Always 0.
-    ///
-    UINT32  BERR_Enable:1;
-    UINT32  Reserved2:1;
-    UINT32  Reserved3:1;
-    ///
-    /// [Bit 7] BINIT# Driver Enable (R/W) 1 = Enabled; 0 = Disabled Always 0.
-    ///
-    UINT32  BINIT_DriverEnable:1;
-    UINT32  Reserved4:1;
-    ///
-    /// [Bit 9] Execute BIST (R/O) 1 = Enabled; 0 = Disabled.
-    ///
-    UINT32  ExecuteBIST:1;
-    ///
-    /// [Bit 10] AERR# Observation Enabled (R/O) 1 = Enabled; 0 = Disabled
-    /// Always 0.
-    ///
-    UINT32  AERR_ObservationEnabled:1;
-    UINT32  Reserved5:1;
-    ///
-    /// [Bit 12] BINIT# Observation Enabled (R/O) 1 = Enabled; 0 = Disabled
-    /// Always 0.
-    ///
-    UINT32  BINIT_ObservationEnabled:1;
-    UINT32  Reserved6:1;
-    ///
-    /// [Bit 14] 1 MByte Power on Reset Vector (R/O) 1 = 1 MByte; 0 = 4 GBytes.
-    ///
-    UINT32  ResetVector:1;
-    UINT32  Reserved7:1;
-    ///
-    /// [Bits 17:16] APIC Cluster ID (R/O) Always 00B.
-    ///
-    UINT32  APICClusterID:2;
-    UINT32  Reserved8:2;
-    ///
-    /// [Bits 21:20] Symmetric Arbitration ID (R/O) Always 00B.
-    ///
-    UINT32  SymmetricArbitrationID:2;
-    ///
-    /// [Bits 26:22] Integer Bus Frequency Ratio (R/O).
-    ///
-    UINT32  IntegerBusFrequencyRatio:5;
-    UINT32  Reserved9:5;
-    UINT32  Reserved10:32;
+    UINT32  Reserved1:32;
+    UINT32  Reserved2:32;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
@@ -223,12 +161,64 @@ typedef union {
 
 
 /**
+  Core. Control Features in Intel 64 Processor (R/W). See Table 35-2.
+
+  @param  ECX  MSR_IA32_SILVERMONT_FEATURE_CONTROL (0x0000003A)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type
+               MSR_SILVERMONT_IA32_FEATURE_CONTROL_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type
+               MSR_SILVERMONT_IA32_FEATURE_CONTROL_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SILVERMONT_IA32_FEATURE_CONTROL_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_IA32_FEATURE_CONTROL);
+  AsmWriteMsr64 (MSR_SILVERMONT_IA32_FEATURE_CONTROL, Msr.Uint64);
+  @endcode
+  @note MSR_SILVERMONT_IA32_FEATURE_CONTROL is defined as IA32_FEATURE_CONTROL in SDM.
+**/
+#define MSR_SILVERMONT_IA32_FEATURE_CONTROL      0x0000003A
+
+/**
+  MSR information returned for MSR index #MSR_SILVERMONT_IA32_FEATURE_CONTROL
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Lock (R/WL).
+    ///
+    UINT32  Lock:1;
+    UINT32  Reserved1:1;
+    ///
+    /// [Bit 2] Enable VMX outside SMX operation (R/WL).
+    ///
+    UINT32  EnableVmxOutsideSmx:1;
+    UINT32  Reserved2:29;
+    UINT32  Reserved3:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SILVERMONT_IA32_FEATURE_CONTROL_REGISTER;
+
+
+/**
   Core. Last Branch Record n From IP (R/W) One of eight pairs of last branch
-  record registers on the last branch record stack. This part of the stack
-  contains pointers to the source instruction for one of the last eight
-  branches, exceptions, or interrupts taken by the processor. See also: -
-  Last Branch Record Stack TOS at 1C9H -  Section 17.12, "Last Branch,
-  Interrupt, and Exception Recording (Pentium M Processors).".
+  record registers on the last branch record stack. The From_IP part of the
+  stack contains pointers to the source instruction. See also: -  Last Branch
+  Record Stack TOS at 1C9H -  Section 17.5 and record format in Section
+  17.4.8.1.
 
   @param  ECX  MSR_SILVERMONT_LASTBRANCH_n_FROM_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -264,9 +254,8 @@ typedef union {
 
 /**
   Core. Last Branch Record n To IP (R/W) One of eight pairs of last branch
-  record registers on the last branch record stack. This part of the stack
-  contains pointers to the destination instruction for one of the last eight
-  branches, exceptions, or interrupts taken by the processor.
+  record registers on the last branch record stack. The To_IP part of the
+  stack contains pointers to the destination instruction.
 
   @param  ECX  MSR_SILVERMONT_LASTBRANCH_n_TO_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -301,7 +290,7 @@ typedef union {
 
 
 /**
-  Shared. Scalable Bus Speed(RO) This field indicates the intended scalable
+  Module. Scalable Bus Speed(RO) This field indicates the intended scalable
   bus clock speed for processors based on Silvermont microarchitecture:.
 
   @param  ECX  MSR_SILVERMONT_FSB_FREQ (0x000000CD)
@@ -367,7 +356,7 @@ typedef union {
 
 
 /**
-  Shared. C-State Configuration Control (R/W)  Note: C-state values are
+  Module. C-State Configuration Control (R/W)  Note: C-state values are
   processor specific C-state code names, unrelated to MWAIT extension C-state
   parameters or ACPI CStates. See http://biosbits.org.
 
@@ -433,7 +422,7 @@ typedef union {
 
 
 /**
-  Shared. Power Management IO Redirection in C-state (R/W) See
+  Module. Power Management IO Redirection in C-state (R/W) See
   http://biosbits.org.
 
   @param  ECX  MSR_SILVERMONT_PMG_IO_CAPTURE_BASE (0x000000E4)
@@ -493,7 +482,7 @@ typedef union {
 
 
 /**
-  Shared.
+  Module.
 
   @param  ECX  MSR_SILVERMONT_BBL_CR_CTL3 (0x0000011E)
   @param  EAX  Lower 32-bits of MSR value.
@@ -639,8 +628,8 @@ typedef union {
     UINT32  FastStrings:1;
     UINT32  Reserved1:2;
     ///
-    /// [Bit 3] Shared. Automatic Thermal Control Circuit Enable (R/W) See
-    /// Table 35-2.
+    /// [Bit 3] Module. Automatic Thermal Control Circuit Enable (R/W) See
+    /// Table 35-2. Default value is 0.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
@@ -654,13 +643,13 @@ typedef union {
     ///
     UINT32  BTS:1;
     ///
-    /// [Bit 12] Core. Precise Event Based Sampling Unavailable (RO) See Table
-    /// 35-2.
+    /// [Bit 12] Core. Processor Event Based Sampling Unavailable (RO) See
+    /// Table 35-2.
     ///
     UINT32  PEBS:1;
     UINT32  Reserved4:3;
     ///
-    /// [Bit 16] Shared. Enhanced Intel SpeedStep Technology Enable (R/W) See
+    /// [Bit 16] Module. Enhanced Intel SpeedStep Technology Enable (R/W) See
     /// Table 35-2.
     ///
     UINT32  EIST:1;
@@ -675,7 +664,7 @@ typedef union {
     ///
     UINT32  LimitCpuidMaxval:1;
     ///
-    /// [Bit 23] Shared. xTPR Message Disable (R/W) See Table 35-2.
+    /// [Bit 23] Module. xTPR Message Disable (R/W) See Table 35-2.
     ///
     UINT32  xTPR_Message_Disable:1;
     UINT32  Reserved7:8;
@@ -686,7 +675,7 @@ typedef union {
     UINT32  XD:1;
     UINT32  Reserved9:3;
     ///
-    /// [Bit 38] Shared. Turbo Mode Disable (R/W) When set to 1 on processors
+    /// [Bit 38] Module. Turbo Mode Disable (R/W) When set to 1 on processors
     /// that support Intel Turbo Boost Technology, the turbo mode feature is
     /// disabled and the IDA_Enable feature flag will be clear (CPUID.06H:
     /// EAX[1]=0). When set to a 0 on processors that support IDA, CPUID.06H:
@@ -763,7 +752,62 @@ typedef union {
 
 
 /**
-  Shared. Offcore Response Event Select Register (R/W).
+  Miscellaneous Feature Control (R/W).
+
+  @param  ECX  MSR_SILVERMONT_MISC_FEATURE_CONTROL (0x000001A4)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SILVERMONT_MISC_FEATURE_CONTROL_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SILVERMONT_MISC_FEATURE_CONTROL_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SILVERMONT_MISC_FEATURE_CONTROL_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_MISC_FEATURE_CONTROL);
+  AsmWriteMsr64 (MSR_SILVERMONT_MISC_FEATURE_CONTROL, Msr.Uint64);
+  @endcode
+  @note MSR_SILVERMONT_MISC_FEATURE_CONTROL is defined as MSR_MISC_FEATURE_CONTROL in SDM.
+**/
+#define MSR_SILVERMONT_MISC_FEATURE_CONTROL      0x000001A4
+
+/**
+  MSR information returned for MSR index #MSR_SILVERMONT_MISC_FEATURE_CONTROL
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Core. L2 Hardware Prefetcher Disable (R/W)  If 1, disables the
+    /// L2 hardware prefetcher, which fetches additional lines of code or data
+    /// into the L2 cache.
+    ///
+    UINT32  L2HardwarePrefetcherDisable:1;
+    UINT32  Reserved1:1;
+    ///
+    /// [Bit 2] Core. DCU Hardware Prefetcher Disable (R/W)  If 1, disables
+    /// the L1 data cache prefetcher, which fetches the next cache line into
+    /// L1 data cache.
+    ///
+    UINT32  DCUHardwarePrefetcherDisable:1;
+    UINT32  Reserved2:29;
+    UINT32  Reserved3:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SILVERMONT_MISC_FEATURE_CONTROL_REGISTER;
+
+
+/**
+  Module. Offcore Response Event Select Register (R/W).
 
   @param  ECX  MSR_SILVERMONT_OFFCORE_RSP_0 (0x000001A6)
   @param  EAX  Lower 32-bits of MSR value.
@@ -782,7 +826,7 @@ typedef union {
 
 
 /**
-  Shared. Offcore Response Event Select Register (R/W).
+  Module. Offcore Response Event Select Register (R/W).
 
   @param  ECX  MSR_SILVERMONT_OFFCORE_RSP_1 (0x000001A7)
   @param  EAX  Lower 32-bits of MSR value.
@@ -877,9 +921,88 @@ typedef union {
 
 
 /**
+  Core. Last Branch Record Filtering Select Register (R/W)  See Section
+  17.7.2, "Filtering of Last Branch Records.".
+
+  @param  ECX  MSR_SILVERMONT_LBR_SELECT (0x000001C8)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SILVERMONT_LBR_SELECT_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SILVERMONT_LBR_SELECT_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SILVERMONT_LBR_SELECT_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_LBR_SELECT);
+  AsmWriteMsr64 (MSR_SILVERMONT_LBR_SELECT, Msr.Uint64);
+  @endcode
+  @note MSR_SILVERMONT_LBR_SELECT is defined as MSR_LBR_SELECT in SDM.
+**/
+#define MSR_SILVERMONT_LBR_SELECT                0x000001C8
+
+/**
+  MSR information returned for MSR index #MSR_SILVERMONT_LBR_SELECT
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] CPL_EQ_0.
+    ///
+    UINT32  CPL_EQ_0:1;
+    ///
+    /// [Bit 1] CPL_NEQ_0.
+    ///
+    UINT32  CPL_NEQ_0:1;
+    ///
+    /// [Bit 2] JCC.
+    ///
+    UINT32  JCC:1;
+    ///
+    /// [Bit 3] NEAR_REL_CALL.
+    ///
+    UINT32  NEAR_REL_CALL:1;
+    ///
+    /// [Bit 4] NEAR_IND_CALL.
+    ///
+    UINT32  NEAR_IND_CALL:1;
+    ///
+    /// [Bit 5] NEAR_RET.
+    ///
+    UINT32  NEAR_RET:1;
+    ///
+    /// [Bit 6] NEAR_IND_JMP.
+    ///
+    UINT32  NEAR_IND_JMP:1;
+    ///
+    /// [Bit 7] NEAR_REL_JMP.
+    ///
+    UINT32  NEAR_REL_JMP:1;
+    ///
+    /// [Bit 8] FAR_BRANCH.
+    ///
+    UINT32  FAR_BRANCH:1;
+    UINT32  Reserved1:23;
+    UINT32  Reserved2:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SILVERMONT_LBR_SELECT_REGISTER;
+
+
+/**
   Core. Last Branch Record Stack TOS (R/W)  Contains an index (bits 0-2) that
   points to the MSR containing the most recent branch record. See
-  MSR_LASTBRANCH_0_FROM_IP (at 40H).
+  MSR_LASTBRANCH_0_FROM_IP.
 
   @param  ECX  MSR_SILVERMONT_LASTBRANCH_TOS (0x000001C9)
   @param  EAX  Lower 32-bits of MSR value.
@@ -939,27 +1062,7 @@ typedef union {
 
 
 /**
-  Core. See Table 35-2. See Section 18.4.2, "Global Counter Control
-  Facilities.".
-
-  @param  ECX  MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS (0x0000038E)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS);
-  AsmWriteMsr64 (MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS, Msr);
-  @endcode
-  @note MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
-**/
-#define MSR_SILVERMONT_IA32_PERF_GLOBAL_STAUS    0x0000038E
-
-
-/**
-  Core. See Table 35-2. See Section 18.4.4, "Precise Event Based Sampling
+  Core. See Table 35-2. See Section 18.4.4, "Processor Event Based Sampling
   (PEBS).".
 
   @param  ECX  MSR_SILVERMONT_PEBS_ENABLE (0x000003F1)
@@ -988,7 +1091,7 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bit 0] Enable PEBS on IA32_PMC0. (R/W).
+    /// [Bit 0] Enable PEBS for precise event on IA32_PMC0. (R/W).
     ///
     UINT32  PEBS:1;
     UINT32  Reserved1:31;
@@ -1047,84 +1150,6 @@ typedef union {
   @note MSR_SILVERMONT_CORE_C6_RESIDENCY is defined as MSR_CORE_C6_RESIDENCY in SDM.
 **/
 #define MSR_SILVERMONT_CORE_C6_RESIDENCY         0x000003FD
-
-
-/**
-  Core. See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_SILVERMONT_MCi_CTL
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_SILVERMONT_MC3_CTL);
-  AsmWriteMsr64 (MSR_SILVERMONT_MC3_CTL, Msr);
-  @endcode
-  @note MSR_SILVERMONT_MC3_CTL is defined as MSR_MC3_CTL in SDM.
-        MSR_SILVERMONT_MC4_CTL is defined as MSR_MC4_CTL in SDM.
-        MSR_SILVERMONT_MC5_CTL is defined as MSR_MC5_CTL in SDM.
-  @{
-**/
-#define MSR_SILVERMONT_MC3_CTL                   0x0000040C
-#define MSR_SILVERMONT_MC4_CTL                   0x00000410
-#define MSR_SILVERMONT_MC5_CTL                   0x00000414
-/// @}
-
-
-/**
-  Core. See Section 15.3.2.2, "IA32_MCi_STATUS MSRS.".
-
-  @param  ECX  MSR_SILVERMONT_MCi_STATUS
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_SILVERMONT_MC3_STATUS);
-  AsmWriteMsr64 (MSR_SILVERMONT_MC3_STATUS, Msr);
-  @endcode
-  @note MSR_SILVERMONT_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
-        MSR_SILVERMONT_MC4_STATUS is defined as MSR_MC4_STATUS in SDM.
-        MSR_SILVERMONT_MC5_STATUS is defined as MSR_MC5_STATUS in SDM.
-  @{
-**/
-#define MSR_SILVERMONT_MC3_STATUS                0x0000040D
-#define MSR_SILVERMONT_MC4_STATUS                0x00000411
-#define MSR_SILVERMONT_MC5_STATUS                0x00000415
-/// @}
-
-
-/**
-  Core. See Section 15.3.2.3, "IA32_MCi_ADDR MSRs." The MSR_MCi_ADDR register
-  is either not implemented or contains no address if the ADDRV flag in the
-  MSR_MCi_STATUS register is clear. When not implemented in the processor, all
-  reads and writes to this MSR will cause a general-protection exception.
-
-  @param  ECX  MSR_SILVERMONT_MCi_ADDR
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_SILVERMONT_MC3_ADDR);
-  AsmWriteMsr64 (MSR_SILVERMONT_MC3_ADDR, Msr);
-  @endcode
-  @note MSR_SILVERMONT_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
-        MSR_SILVERMONT_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
-        MSR_SILVERMONT_MC5_ADDR is defined as MSR_MC5_ADDR in SDM.
-  @{
-**/
-#define MSR_SILVERMONT_MC3_ADDR                  0x0000040E
-#define MSR_SILVERMONT_MC4_ADDR                  0x00000412
-#define MSR_SILVERMONT_MC5_ADDR                  0x00000416
-/// @}
 
 
 /**
@@ -1279,7 +1304,7 @@ typedef union {
   struct {
     ///
     /// [Bits 14:0] Package Power Limit #1. (R/W) See Section 14.9.3, "Package
-    /// RAPL Domain." and MSR_RAPL_POWER_UNIT in Table 35-7.
+    /// RAPL Domain." and MSR_RAPL_POWER_UNIT in Table 35-8.
     ///
     UINT32  Limit:15;
     ///
@@ -1313,7 +1338,7 @@ typedef union {
 
 /**
   Package. PKG Energy Status (R/O) See Section 14.9.3, "Package RAPL Domain."
-  and MSR_RAPL_POWER_UNIT in Table 35-7.
+  and MSR_RAPL_POWER_UNIT in Table 35-8.
 
   @param  ECX  MSR_SILVERMONT_PKG_ENERGY_STATUS (0x00000611)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1332,7 +1357,7 @@ typedef union {
 
 /**
   Package. PP0 Energy Status (R/O)  See Section 14.9.4, "PP0/PP1 RAPL
-  Domains." and MSR_RAPL_POWER_UNIT in Table 35-7.
+  Domains." and MSR_RAPL_POWER_UNIT in Table 35-8.
 
   @param  ECX  MSR_SILVERMONT_PP0_ENERGY_STATUS (0x00000639)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1489,7 +1514,7 @@ typedef union {
   struct {
     ///
     /// [Bits 14:0] PP0 Power Limit #1. (R/W) See Section 14.9.4, "PP0/PP1
-    /// RAPL Domains." and MSR_RAPL_POWER_UNIT in Table 35-7.
+    /// RAPL Domains." and MSR_RAPL_POWER_UNIT in Table 35-8.
     ///
     UINT32  Limit:15;
     ///

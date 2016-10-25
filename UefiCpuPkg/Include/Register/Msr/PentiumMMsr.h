@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-18.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.20.
 
 **/
 
@@ -27,7 +27,7 @@
 #include <Register/ArchitecturalMsr.h>
 
 /**
-  See Section 35.20, "MSRs in Pentium Processors.".
+  See Section 35.22, "MSRs in Pentium Processors.".
 
   @param  ECX  MSR_PENTIUM_M_P5_MC_ADDR (0x00000000)
   @param  EAX  Lower 32-bits of MSR value.
@@ -46,7 +46,7 @@
 
 
 /**
-  See Section 35.20, "MSRs in Pentium Processors.".
+  See Section 35.22, "MSRs in Pentium Processors.".
 
   @param  ECX  MSR_PENTIUM_M_P5_MC_TYPE (0x00000001)
   @param  EAX  Lower 32-bits of MSR value.
@@ -184,7 +184,7 @@ typedef union {
   Last Branch Record n (R/W) One of 8 last branch record registers on the last
   branch record stack: bits 31-0 hold the 'from' address and bits 63-32 hold
   the to address. See also: -  Last Branch Record Stack TOS at 1C9H -  Section
-  17.12, "Last Branch, Interrupt, and Exception Recording (Pentium M
+  17.13, "Last Branch, Interrupt, and Exception Recording (Pentium M
   Processors)".
 
   @param  ECX  MSR_PENTIUM_M_LASTBRANCH_n
@@ -424,9 +424,9 @@ typedef union {
     ///
     UINT32  BTS:1;
     ///
-    /// [Bit 12] Precise Event Based Sampling Unavailable (RO)  1 = Processor
-    /// does not support precise event-based sampling (PEBS); 0 = PEBS is
-    /// supported. The Pentium M processor does not support PEBS.
+    /// [Bit 12] Processor Event Based Sampling Unavailable (RO)  1 =
+    /// Processor does not support processor event based sampling (PEBS); 0 =
+    /// PEBS is supported. The Pentium M processor does not support PEBS.
     ///
     UINT32  PEBS:1;
     UINT32  Reserved5:3;
@@ -461,7 +461,7 @@ typedef union {
 /**
   Last Branch Record Stack TOS (R/W)  Contains an index (bits 0-3) that points
   to the MSR containing the most recent branch record. See also: -
-  MSR_LASTBRANCH_0_FROM_IP (at 40H) -  Section 17.12, "Last Branch, Interrupt,
+  MSR_LASTBRANCH_0_FROM_IP (at 40H) -  Section 17.13, "Last Branch, Interrupt,
   and Exception Recording (Pentium M Processors)".
 
   @param  ECX  MSR_PENTIUM_M_LASTBRANCH_TOS (0x000001C9)
@@ -482,7 +482,7 @@ typedef union {
 
 /**
   Debug Control (R/W)  Controls how several debug features are used. Bit
-  definitions are discussed in the referenced section. See Section 17.12,
+  definitions are discussed in the referenced section. See Section 17.13,
   "Last Branch, Interrupt, and Exception Recording (Pentium M Processors).".
 
   @param  ECX  MSR_PENTIUM_M_DEBUGCTLB (0x000001D9)
@@ -505,8 +505,8 @@ typedef union {
   Last Exception Record To Linear IP (R)  This area contains a pointer to the
   target of the last branch instruction that the processor executed prior to
   the last exception that was generated or the last interrupt that was
-  handled. See Section 17.12, "Last Branch, Interrupt, and Exception Recording
-  (Pentium M Processors)" and Section 17.13.2, "Last Branch and Last Exception
+  handled. See Section 17.13, "Last Branch, Interrupt, and Exception Recording
+  (Pentium M Processors)" and Section 17.14.2, "Last Branch and Last Exception
   MSRs.".
 
   @param  ECX  MSR_PENTIUM_M_LER_TO_LIP (0x000001DD)
@@ -528,8 +528,8 @@ typedef union {
   Last Exception Record From Linear IP (R)  Contains a pointer to the last
   branch instruction that the processor executed prior to the last exception
   that was generated or the last interrupt that was handled. See Section
-  17.12, "Last Branch, Interrupt, and Exception Recording (Pentium M
-  Processors)" and Section 17.13.2, "Last Branch and Last Exception MSRs.".
+  17.13, "Last Branch, Interrupt, and Exception Recording (Pentium M
+  Processors)" and Section 17.14.2, "Last Branch and Last Exception MSRs.".
 
   @param  ECX  MSR_PENTIUM_M_LER_FROM_LIP (0x000001DE)
   @param  EAX  Lower 32-bits of MSR value.

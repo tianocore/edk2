@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-17.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.19.
 
 **/
 
@@ -27,7 +27,7 @@
 #include <Register/ArchitecturalMsr.h>
 
 /**
-  Unique. See Section 35.20, "MSRs in Pentium Processors," and see Table 35-2.
+  Unique. See Section 35.22, "MSRs in Pentium Processors," and see Table 35-2.
 
   @param  ECX  MSR_CORE_P5_MC_ADDR (0x00000000)
   @param  EAX  Lower 32-bits of MSR value.
@@ -46,7 +46,7 @@
 
 
 /**
-  Unique. See Section 35.20, "MSRs in Pentium Processors," and see Table 35-2.
+  Unique. See Section 35.22, "MSRs in Pentium Processors," and see Table 35-2.
 
   @param  ECX  MSR_CORE_P5_MC_TYPE (0x00000001)
   @param  EAX  Lower 32-bits of MSR value.
@@ -178,7 +178,7 @@ typedef union {
   Unique. Last Branch Record n (R/W) One of 8 last branch record registers on
   the last branch record stack: bits 31-0 hold the 'from' address and bits
   63-32 hold the 'to' address. See also: -  Last Branch Record Stack TOS at
-  1C9H -  Section 17.12, "Last Branch, Interrupt, and Exception Recording
+  1C9H -  Section 17.13, "Last Branch, Interrupt, and Exception Recording
   (Pentium M Processors).".
 
   @param  ECX  MSR_CORE_LASTBRANCH_n
@@ -434,14 +434,14 @@ typedef union {
     /// thermal sensor indicates that the die temperature is at the
     /// pre-determined threshold, the Thermal Monitor 2 mechanism is engaged.
     /// TM2 will reduce the bus to core ratio and voltage according to the
-    /// value last written to MSR_THERM2_CTL bits 15:0.
-    ///   When this bit is clear (0, default), the processor does not change
-    ///   the VID signals or the bus to core ratio when the processor enters a
-    ///   thermal managed state. If the TM2 feature flag (ECX[8]) is not set
-    ///   to 1 after executing CPUID with EAX = 1, then this feature is not
-    ///   supported and BIOS must not alter the contents of this bit location.
-    ///   The processor is operating out of spec if both this bit and the TM1
-    ///   bit are set to disabled states.
+    /// value last written to MSR_THERM2_CTL bits 15:0. When this bit is clear
+    /// (0, default), the processor does not change the VID signals or the bus
+    /// to core ratio when the processor enters a thermal managed state. If
+    /// the TM2 feature flag (ECX[8]) is not set to 1 after executing CPUID
+    /// with EAX = 1, then this feature is not supported and BIOS must not
+    /// alter the contents of this bit location. The processor is operating
+    /// out of spec if both this bit and the TM1 bit are set to disabled
+    /// states.
     ///
     UINT32  TM2:1;
     UINT32  Reserved5:2;
@@ -460,7 +460,7 @@ typedef union {
     ///
     /// [Bit 22] Shared. Limit CPUID Maxval (R/W) See Table 35-2. Setting this
     /// bit may cause behavior in software that depends on the availability of
-    /// CPUID leaves greater than 3.
+    /// CPUID leaves greater than 2.
     ///
     UINT32  LimitCpuidMaxval:1;
     UINT32  Reserved9:9;
@@ -925,44 +925,6 @@ typedef union {
   @note MSR_CORE_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
 **/
 #define MSR_CORE_MC4_ADDR                        0x0000040E
-
-
-/**
-  See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_CORE_MC3_CTL (0x00000410)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_CORE_MC3_CTL);
-  AsmWriteMsr64 (MSR_CORE_MC3_CTL, Msr);
-  @endcode
-  @note MSR_CORE_MC3_CTL is defined as MSR_MC3_CTL in SDM.
-**/
-#define MSR_CORE_MC3_CTL                         0x00000410
-
-
-/**
-  See Section 15.3.2.2, "IA32_MCi_STATUS MSRS.".
-
-  @param  ECX  MSR_CORE_MC3_STATUS (0x00000411)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_CORE_MC3_STATUS);
-  AsmWriteMsr64 (MSR_CORE_MC3_STATUS, Msr);
-  @endcode
-  @note MSR_CORE_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
-**/
-#define MSR_CORE_MC3_STATUS                      0x00000411
 
 
 /**

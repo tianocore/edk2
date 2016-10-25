@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-13.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.14.
 
 **/
 
@@ -55,11 +55,11 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bit 0] LockOut (R/WO) See Table 35-21.
+    /// [Bit 0] LockOut (R/WO) See Table 35-24.
     ///
     UINT32  LockOut:1;
     ///
-    /// [Bit 1] Enable_PPIN (R/W) See Table 35-21.
+    /// [Bit 1] Enable_PPIN (R/W) See Table 35-24.
     ///
     UINT32  Enable_PPIN:1;
     UINT32  Reserved1:30;
@@ -78,7 +78,7 @@ typedef union {
 
 /**
   Package. Protected Processor Inventory Number (R/O). Protected Processor
-  Inventory Number (R/O) See Table 35-21.
+  Inventory Number (R/O) See Table 35-24.
 
   @param  ECX  MSR_XEON_D_PPIN (0x0000004F)
   @param  EAX  Lower 32-bits of MSR value.
@@ -125,33 +125,33 @@ typedef union {
   struct {
     UINT32  Reserved1:8;
     ///
-    /// [Bits 15:8] Package. Maximum Non-Turbo Ratio (R/O) See Table 35-21.
+    /// [Bits 15:8] Package. Maximum Non-Turbo Ratio (R/O) See Table 35-24.
     ///
     UINT32  MaximumNonTurboRatio:8;
     UINT32  Reserved2:7;
     ///
-    /// [Bit 23] Package. PPIN_CAP (R/O) See Table 35-21.
+    /// [Bit 23] Package. PPIN_CAP (R/O) See Table 35-24.
     ///
     UINT32  PPIN_CAP:1;
     UINT32  Reserved3:4;
     ///
     /// [Bit 28] Package. Programmable Ratio Limit for Turbo Mode (R/O) See
-    /// Table 35-21.
+    /// Table 35-24.
     ///
     UINT32  RatioLimit:1;
     ///
     /// [Bit 29] Package. Programmable TDP Limit for Turbo Mode (R/O) See
-    /// Table 35-21.
+    /// Table 35-24.
     ///
     UINT32  TDPLimit:1;
     ///
-    /// [Bit 30] Package. Programmable TJ OFFSET (R/O) See Table 35-21.
+    /// [Bit 30] Package. Programmable TJ OFFSET (R/O) See Table 35-24.
     ///
     UINT32  TJOFFSET:1;
     UINT32  Reserved4:1;
     UINT32  Reserved5:8;
     ///
-    /// [Bits 47:40] Package. Maximum Efficiency Ratio (R/O) See Table 35-21.
+    /// [Bits 47:40] Package. Maximum Efficiency Ratio (R/O) See Table 35-24.
     ///
     UINT32  MaximumEfficiencyRatio:8;
     UINT32  Reserved6:16;
@@ -417,11 +417,11 @@ typedef union {
   struct {
     UINT32  Reserved1:16;
     ///
-    /// [Bits 23:16] Temperature Target (RO) See Table 35-21.
+    /// [Bits 23:16] Temperature Target (RO) See Table 35-24.
     ///
     UINT32  TemperatureTarget:8;
     ///
-    /// [Bits 27:24] TCC Activation Offset (R/W) See Table 35-21.
+    /// [Bits 27:24] TCC Activation Offset (R/W) See Table 35-24.
     ///
     UINT32  TCCActivationOffset:4;
     UINT32  Reserved2:4;
@@ -654,21 +654,48 @@ typedef union {
 
 
 /**
-  Package. DRAM Energy Status (R/O)  See Section 14.9.5, "DRAM RAPL Domain.".
+  Package. DRAM Energy Status (R/O)  Energy consumed by DRAM devices.
 
   @param  ECX  MSR_XEON_D_DRAM_ENERGY_STATUS (0x00000619)
   @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_XEON_D_DRAM_ENERGY_STATUS_REGISTER.
   @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_XEON_D_DRAM_ENERGY_STATUS_REGISTER.
 
   <b>Example usage</b>
   @code
-  UINT64  Msr;
+  MSR_XEON_D_DRAM_ENERGY_STATUS_REGISTER  Msr;
 
-  Msr = AsmReadMsr64 (MSR_XEON_D_DRAM_ENERGY_STATUS);
+  Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_DRAM_ENERGY_STATUS);
   @endcode
   @note MSR_XEON_D_DRAM_ENERGY_STATUS is defined as MSR_DRAM_ENERGY_STATUS in SDM.
 **/
 #define MSR_XEON_D_DRAM_ENERGY_STATUS            0x00000619
+
+/**
+  MSR information returned for MSR index #MSR_XEON_D_DRAM_ENERGY_STATUS
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 31:0] Energy in 15.3 micro-joules. Requires BIOS configuration
+    /// to enable DRAM RAPL mode 0 (Direct VR).
+    ///
+    UINT32  Energy:32;
+    UINT32  Reserved:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_XEON_D_DRAM_ENERGY_STATUS_REGISTER;
 
 
 /**
@@ -707,6 +734,24 @@ typedef union {
   @note MSR_XEON_D_DRAM_POWER_INFO is defined as MSR_DRAM_POWER_INFO in SDM.
 **/
 #define MSR_XEON_D_DRAM_POWER_INFO               0x0000061C
+
+
+/**
+  Package. Reserved (R/O)  Reads return 0.
+
+  @param  ECX  MSR_XEON_D_PP0_ENERGY_STATUS (0x00000639)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_XEON_D_PP0_ENERGY_STATUS);
+  @endcode
+  @note MSR_XEON_D_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
+**/
+#define MSR_XEON_D_PP0_ENERGY_STATUS             0x00000639
 
 
 /**
@@ -891,7 +936,7 @@ typedef union {
 
 /**
   THREAD. Monitoring Event Select Register (R/W) if CPUID.(EAX=07H,
-  ECX=0):EBX.PQM[bit 12] = 1.
+  ECX=0):EBX.RDT-M[bit 12] = 1.
 
   @param  ECX  MSR_XEON_D_IA32_QM_EVTSEL (0x00000C8D)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1107,385 +1152,6 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_XEON_D_TURBO_RATIO_LIMIT3_REGISTER;
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  * Bank MC5 reports MC error from the Intel QPI 0 module.
-  * Bank MC6 reports MC error from the integrated I/O module.
-  * Bank MC7 reports MC error from the home agent HA 0.
-  * Bank MC8 reports MC error from the home agent HA 1.
-  * Banks MC9 through MC16 report MC error from each channel of the integrated
-    memory controllers.
-  * Bank MC17 reports MC error from the following pair of CBo/L3 Slices
-    (if the pair is present): CBo0, CBo3, CBo6, CBo9, CBo12, CBo15.
-  * Bank MC18 reports MC error from the following pair of CBo/L3 Slices
-    (if the pair is present): CBo1, CBo4, CBo7, CBo10, CBo13, CBo16.
-  * Bank MC19 reports MC error from the following pair of CBo/L3 Slices
-    (if the pair is present): CBo2, CBo5, CBo8, CBo11, CBo14, CBo17.
-  * Bank MC20 reports MC error from the Intel QPI 1 module.
-  * Bank MC21 reports MC error from the Intel QPI 2 module.
-
-  @param  ECX  MSR_XEON_D_MCi_CTL
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_D_MC5_CTL);
-  AsmWriteMsr64 (MSR_XEON_D_MC5_CTL, Msr);
-  @endcode
-  @note MSR_XEON_D_MC5_CTL  is defined as MSR_MC5_CTL  in SDM.
-        MSR_XEON_D_MC6_CTL  is defined as MSR_MC6_CTL  in SDM.
-        MSR_XEON_D_MC7_CTL  is defined as MSR_MC7_CTL  in SDM.
-        MSR_XEON_D_MC8_CTL  is defined as MSR_MC8_CTL  in SDM.
-        MSR_XEON_D_MC9_CTL  is defined as MSR_MC9_CTL  in SDM.
-        MSR_XEON_D_MC10_CTL is defined as MSR_MC10_CTL in SDM.
-        MSR_XEON_D_MC11_CTL is defined as MSR_MC11_CTL in SDM.
-        MSR_XEON_D_MC12_CTL is defined as MSR_MC12_CTL in SDM.
-        MSR_XEON_D_MC13_CTL is defined as MSR_MC13_CTL in SDM.
-        MSR_XEON_D_MC14_CTL is defined as MSR_MC14_CTL in SDM.
-        MSR_XEON_D_MC15_CTL is defined as MSR_MC15_CTL in SDM.
-        MSR_XEON_D_MC16_CTL is defined as MSR_MC16_CTL in SDM.
-        MSR_XEON_D_MC17_CTL is defined as MSR_MC17_CTL in SDM.
-        MSR_XEON_D_MC18_CTL is defined as MSR_MC18_CTL in SDM.
-        MSR_XEON_D_MC19_CTL is defined as MSR_MC19_CTL in SDM.
-        MSR_XEON_D_MC20_CTL is defined as MSR_MC20_CTL in SDM.
-        MSR_XEON_D_MC21_CTL is defined as MSR_MC21_CTL in SDM.
-  @{
-**/
-#define MSR_XEON_D_MC5_CTL                       0x00000414
-#define MSR_XEON_D_MC6_CTL                       0x00000418
-#define MSR_XEON_D_MC7_CTL                       0x0000041C
-#define MSR_XEON_D_MC8_CTL                       0x00000420
-#define MSR_XEON_D_MC9_CTL                       0x00000424
-#define MSR_XEON_D_MC10_CTL                      0x00000428
-#define MSR_XEON_D_MC11_CTL                      0x0000042C
-#define MSR_XEON_D_MC12_CTL                      0x00000430
-#define MSR_XEON_D_MC13_CTL                      0x00000434
-#define MSR_XEON_D_MC14_CTL                      0x00000438
-#define MSR_XEON_D_MC15_CTL                      0x0000043C
-#define MSR_XEON_D_MC16_CTL                      0x00000440
-#define MSR_XEON_D_MC17_CTL                      0x00000444
-#define MSR_XEON_D_MC18_CTL                      0x00000448
-#define MSR_XEON_D_MC19_CTL                      0x0000044C
-#define MSR_XEON_D_MC20_CTL                      0x00000450
-#define MSR_XEON_D_MC21_CTL                      0x00000454
-/// @}
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_XEON_D_MCi_STATUS
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_D_MC6_STATUS);
-  AsmWriteMsr64 (MSR_XEON_D_MC6_STATUS, Msr);
-  @endcode
-  @note MSR_XEON_D_MC5_STATUS  is defined as MSR_MC5_STATUS  in SDM.
-        MSR_XEON_D_MC6_STATUS  is defined as MSR_MC6_STATUS  in SDM.
-        MSR_XEON_D_MC7_STATUS  is defined as MSR_MC7_STATUS  in SDM.
-        MSR_XEON_D_MC8_STATUS  is defined as MSR_MC8_STATUS  in SDM.
-        MSR_XEON_D_MC9_STATUS  is defined as MSR_MC9_STATUS  in SDM.
-        MSR_XEON_D_MC10_STATUS is defined as MSR_MC10_STATUS in SDM.
-        MSR_XEON_D_MC11_STATUS is defined as MSR_MC11_STATUS in SDM.
-        MSR_XEON_D_MC12_STATUS is defined as MSR_MC12_STATUS in SDM.
-        MSR_XEON_D_MC13_STATUS is defined as MSR_MC13_STATUS in SDM.
-        MSR_XEON_D_MC14_STATUS is defined as MSR_MC14_STATUS in SDM.
-        MSR_XEON_D_MC15_STATUS is defined as MSR_MC15_STATUS in SDM.
-        MSR_XEON_D_MC16_STATUS is defined as MSR_MC16_STATUS in SDM.
-        MSR_XEON_D_MC17_STATUS is defined as MSR_MC17_STATUS in SDM.
-        MSR_XEON_D_MC18_STATUS is defined as MSR_MC18_STATUS in SDM.
-        MSR_XEON_D_MC19_STATUS is defined as MSR_MC19_STATUS in SDM.
-        MSR_XEON_D_MC20_STATUS is defined as MSR_MC20_STATUS in SDM.
-        MSR_XEON_D_MC21_STATUS is defined as MSR_MC21_STATUS in SDM.
-  @{
-**/
-#define MSR_XEON_D_MC5_STATUS                    0x00000415
-#define MSR_XEON_D_MC6_STATUS                    0x00000419
-#define MSR_XEON_D_MC7_STATUS                    0x0000041D
-#define MSR_XEON_D_MC8_STATUS                    0x00000421
-#define MSR_XEON_D_MC9_STATUS                    0x00000425
-#define MSR_XEON_D_MC10_STATUS                   0x00000429
-#define MSR_XEON_D_MC11_STATUS                   0x0000042D
-#define MSR_XEON_D_MC12_STATUS                   0x00000431
-#define MSR_XEON_D_MC13_STATUS                   0x00000435
-#define MSR_XEON_D_MC14_STATUS                   0x00000439
-#define MSR_XEON_D_MC15_STATUS                   0x0000043D
-#define MSR_XEON_D_MC16_STATUS                   0x00000441
-#define MSR_XEON_D_MC17_STATUS                   0x00000445
-#define MSR_XEON_D_MC18_STATUS                   0x00000449
-#define MSR_XEON_D_MC19_STATUS                   0x0000044D
-#define MSR_XEON_D_MC20_STATUS                   0x00000451
-#define MSR_XEON_D_MC21_STATUS                   0x00000455
-/// @}
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_XEON_D_MCi_ADDR
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_D_MC6_ADDR);
-  AsmWriteMsr64 (MSR_XEON_D_MC6_ADDR, Msr);
-  @endcode
-  @note MSR_XEON_D_MC5_ADDR  is defined as MSR_MC5_ADDR  in SDM.
-        MSR_XEON_D_MC6_ADDR  is defined as MSR_MC6_ADDR  in SDM.
-        MSR_XEON_D_MC7_ADDR  is defined as MSR_MC7_ADDR  in SDM.
-        MSR_XEON_D_MC8_ADDR  is defined as MSR_MC8_ADDR  in SDM.
-        MSR_XEON_D_MC9_ADDR  is defined as MSR_MC9_ADDR  in SDM.
-        MSR_XEON_D_MC10_ADDR is defined as MSR_MC10_ADDR in SDM.
-        MSR_XEON_D_MC11_ADDR is defined as MSR_MC11_ADDR in SDM.
-        MSR_XEON_D_MC12_ADDR is defined as MSR_MC12_ADDR in SDM.
-        MSR_XEON_D_MC13_ADDR is defined as MSR_MC13_ADDR in SDM.
-        MSR_XEON_D_MC14_ADDR is defined as MSR_MC14_ADDR in SDM.
-        MSR_XEON_D_MC15_ADDR is defined as MSR_MC15_ADDR in SDM.
-        MSR_XEON_D_MC16_ADDR is defined as MSR_MC16_ADDR in SDM.
-        MSR_XEON_D_MC17_ADDR is defined as MSR_MC17_ADDR in SDM.
-        MSR_XEON_D_MC18_ADDR is defined as MSR_MC18_ADDR in SDM.
-        MSR_XEON_D_MC19_ADDR is defined as MSR_MC19_ADDR in SDM.
-        MSR_XEON_D_MC20_ADDR is defined as MSR_MC20_ADDR in SDM.
-        MSR_XEON_D_MC21_ADDR is defined as MSR_MC21_ADDR in SDM.
-  @{
-**/
-#define MSR_XEON_D_MC5_ADDR                      0x00000416
-#define MSR_XEON_D_MC6_ADDR                      0x0000041A
-#define MSR_XEON_D_MC7_ADDR                      0x0000041E
-#define MSR_XEON_D_MC8_ADDR                      0x00000422
-#define MSR_XEON_D_MC9_ADDR                      0x00000426
-#define MSR_XEON_D_MC10_ADDR                     0x0000042A
-#define MSR_XEON_D_MC11_ADDR                     0x0000042E
-#define MSR_XEON_D_MC12_ADDR                     0x00000432
-#define MSR_XEON_D_MC13_ADDR                     0x00000436
-#define MSR_XEON_D_MC14_ADDR                     0x0000043A
-#define MSR_XEON_D_MC15_ADDR                     0x0000043E
-#define MSR_XEON_D_MC16_ADDR                     0x00000442
-#define MSR_XEON_D_MC17_ADDR                     0x00000446
-#define MSR_XEON_D_MC18_ADDR                     0x0000044A
-#define MSR_XEON_D_MC19_ADDR                     0x0000044E
-#define MSR_XEON_D_MC20_ADDR                     0x00000452
-#define MSR_XEON_D_MC21_ADDR                     0x00000456
-/// @}
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_XEON_D_MCi_MISC
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_XEON_D_MC6_MISC);
-  AsmWriteMsr64 (MSR_XEON_D_MC6_MISC, Msr);
-  @endcode
-  @note MSR_XEON_D_MC5_MISC  is defined as MSR_MC5_MISC  in SDM.
-        MSR_XEON_D_MC6_MISC  is defined as MSR_MC6_MISC  in SDM.
-        MSR_XEON_D_MC7_MISC  is defined as MSR_MC7_MISC  in SDM.
-        MSR_XEON_D_MC8_MISC  is defined as MSR_MC8_MISC  in SDM.
-        MSR_XEON_D_MC9_MISC  is defined as MSR_MC9_MISC  in SDM.
-        MSR_XEON_D_MC10_MISC is defined as MSR_MC10_MISC in SDM.
-        MSR_XEON_D_MC11_MISC is defined as MSR_MC11_MISC in SDM.
-        MSR_XEON_D_MC12_MISC is defined as MSR_MC12_MISC in SDM.
-        MSR_XEON_D_MC13_MISC is defined as MSR_MC13_MISC in SDM.
-        MSR_XEON_D_MC14_MISC is defined as MSR_MC14_MISC in SDM.
-        MSR_XEON_D_MC15_MISC is defined as MSR_MC15_MISC in SDM.
-        MSR_XEON_D_MC16_MISC is defined as MSR_MC16_MISC in SDM.
-        MSR_XEON_D_MC17_MISC is defined as MSR_MC17_MISC in SDM.
-        MSR_XEON_D_MC18_MISC is defined as MSR_MC18_MISC in SDM.
-        MSR_XEON_D_MC19_MISC is defined as MSR_MC19_MISC in SDM.
-        MSR_XEON_D_MC20_MISC is defined as MSR_MC20_MISC in SDM.
-        MSR_XEON_D_MC21_MISC is defined as MSR_MC21_MISC in SDM.
-  @{
-**/
-#define MSR_XEON_D_MC5_MISC                      0x00000417
-#define MSR_XEON_D_MC6_MISC                      0x0000041B
-#define MSR_XEON_D_MC7_MISC                      0x0000041F
-#define MSR_XEON_D_MC8_MISC                      0x00000423
-#define MSR_XEON_D_MC9_MISC                      0x00000427
-#define MSR_XEON_D_MC10_MISC                     0x0000042B
-#define MSR_XEON_D_MC11_MISC                     0x0000042F
-#define MSR_XEON_D_MC12_MISC                     0x00000433
-#define MSR_XEON_D_MC13_MISC                     0x00000437
-#define MSR_XEON_D_MC14_MISC                     0x0000043B
-#define MSR_XEON_D_MC15_MISC                     0x0000043F
-#define MSR_XEON_D_MC16_MISC                     0x00000443
-#define MSR_XEON_D_MC17_MISC                     0x00000447
-#define MSR_XEON_D_MC18_MISC                     0x0000044B
-#define MSR_XEON_D_MC19_MISC                     0x0000044F
-#define MSR_XEON_D_MC20_MISC                     0x00000453
-#define MSR_XEON_D_MC21_MISC                     0x00000457
-/// @}
-
-
-/**
-  Package. Note: C-state values are processor specific C-state code names,
-  unrelated to MWAIT extension C-state parameters or ACPI C-States.
-
-  @param  ECX  MSR_XEON_D_PKG_C8_RESIDENCY (0x00000630)
-  @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_XEON_D_PKG_C8_RESIDENCY_REGISTER.
-  @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_XEON_D_PKG_C8_RESIDENCY_REGISTER.
-
-  <b>Example usage</b>
-  @code
-  MSR_XEON_D_PKG_C8_RESIDENCY_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PKG_C8_RESIDENCY);
-  AsmWriteMsr64 (MSR_XEON_D_PKG_C8_RESIDENCY, Msr.Uint64);
-  @endcode
-  @note MSR_XEON_D_PKG_C8_RESIDENCY is defined as MSR_PKG_C8_RESIDENCY in SDM.
-**/
-#define MSR_XEON_D_PKG_C8_RESIDENCY              0x00000630
-
-/**
-  MSR information returned for MSR index #MSR_XEON_D_PKG_C8_RESIDENCY
-**/
-typedef union {
-  ///
-  /// Individual bit fields
-  ///
-  struct {
-    ///
-    /// [Bits 31:0] Package C8 Residency Counter. (R/O) Value since last reset
-    /// that this package is in processor-specific C8 states. Count at the
-    /// same frequency as the TSC.
-    ///
-    UINT32  C8ResidencyCounter:32;
-    ///
-    /// [Bits 59:32] Package C8 Residency Counter. (R/O) Value since last
-    /// reset that this package is in processor-specific C8 states. Count at
-    /// the same frequency as the TSC.
-    ///
-    UINT32  C8ResidencyCounterHi:28;
-    UINT32  Reserved:4;
-  } Bits;
-  ///
-  /// All bit fields as a 64-bit value
-  ///
-  UINT64  Uint64;
-} MSR_XEON_D_PKG_C8_RESIDENCY_REGISTER;
-
-
-/**
-  Package. Note: C-state values are processor specific C-state code names,
-  unrelated to MWAIT extension C-state parameters or ACPI C-States.
-
-  @param  ECX  MSR_XEON_D_PKG_C9_RESIDENCY (0x00000631)
-  @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_XEON_D_PKG_C9_RESIDENCY_REGISTER.
-  @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_XEON_D_PKG_C9_RESIDENCY_REGISTER.
-
-  <b>Example usage</b>
-  @code
-  MSR_XEON_D_PKG_C9_RESIDENCY_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PKG_C9_RESIDENCY);
-  AsmWriteMsr64 (MSR_XEON_D_PKG_C9_RESIDENCY, Msr.Uint64);
-  @endcode
-  @note MSR_XEON_D_PKG_C9_RESIDENCY is defined as MSR_PKG_C9_RESIDENCY in SDM.
-**/
-#define MSR_XEON_D_PKG_C9_RESIDENCY              0x00000631
-
-/**
-  MSR information returned for MSR index #MSR_XEON_D_PKG_C9_RESIDENCY
-**/
-typedef union {
-  ///
-  /// Individual bit fields
-  ///
-  struct {
-    ///
-    /// [Bits 31:0] Package C9 Residency Counter. (R/O) Value since last reset
-    /// that this package is in processor-specific C9 states. Count at the
-    /// same frequency as the TSC.
-    ///
-    UINT32  C9ResidencyCounter:32;
-    ///
-    /// [Bits 59:32] Package C9 Residency Counter. (R/O) Value since last
-    /// reset that this package is in processor-specific C9 states. Count at
-    /// the same frequency as the TSC.
-    ///
-    UINT32  C9ResidencyCounterHi:28;
-    UINT32  Reserved:4;
-  } Bits;
-  ///
-  /// All bit fields as a 64-bit value
-  ///
-  UINT64  Uint64;
-} MSR_XEON_D_PKG_C9_RESIDENCY_REGISTER;
-
-
-/**
-  Package. Note: C-state values are processor specific C-state code names,
-  unrelated to MWAIT extension C-state parameters or ACPI C-States.
-
-  @param  ECX  MSR_XEON_D_PKG_C10_RESIDENCY (0x00000632)
-  @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_XEON_D_PKG_C10_RESIDENCY_REGISTER.
-  @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_XEON_D_PKG_C10_RESIDENCY_REGISTER.
-
-  <b>Example usage</b>
-  @code
-  MSR_XEON_D_PKG_C10_RESIDENCY_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_XEON_D_PKG_C10_RESIDENCY);
-  AsmWriteMsr64 (MSR_XEON_D_PKG_C10_RESIDENCY, Msr.Uint64);
-  @endcode
-  @note MSR_XEON_D_PKG_C10_RESIDENCY is defined as MSR_PKG_C10_RESIDENCY in SDM.
-**/
-#define MSR_XEON_D_PKG_C10_RESIDENCY             0x00000632
-
-/**
-  MSR information returned for MSR index #MSR_XEON_D_PKG_C10_RESIDENCY
-**/
-typedef union {
-  ///
-  /// Individual bit fields
-  ///
-  struct {
-    ///
-    /// [Bits 31:0] Package C10 Residency Counter. (R/O) Value since last
-    /// reset that this package is in processor-specific C10 states. Count at
-    /// the same frequency as the TSC.
-    ///
-    UINT32  C10ResidencyCounter:32;
-    ///
-    /// [Bits 59:32] Package C10 Residency Counter. (R/O) Value since last
-    /// reset that this package is in processor-specific C10 states. Count at
-    /// the same frequency as the TSC.
-    ///
-    UINT32  C10ResidencyCounterHi:28;
-    UINT32  Reserved:4;
-  } Bits;
-  ///
-  /// All bit fields as a 64-bit value
-  ///
-  UINT64  Uint64;
-} MSR_XEON_D_PKG_C10_RESIDENCY_REGISTER;
 
 
 /**

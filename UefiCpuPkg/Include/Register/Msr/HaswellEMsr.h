@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-11.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.12.
 
 **/
 
@@ -25,6 +25,113 @@
 #define __HASWELL_E_MSR_H__
 
 #include <Register/ArchitecturalMsr.h>
+
+/**
+  Package. Configured State of Enabled Processor Core Count and Logical
+  Processor Count (RO) -  After a Power-On RESET, enumerates factory
+  configuration of the number of processor cores and logical processors in the
+  physical package. -  Following the sequence of (i) BIOS modified a
+  Configuration Mask which selects a subset of processor cores to be active
+  post RESET and (ii) a RESET event after the modification, enumerates the
+  current configuration of enabled processor core count and logical processor
+  count in the physical package.
+
+  @param  ECX  MSR_HASWELL_E_CORE_THREAD_COUNT (0x00000035)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_CORE_THREAD_COUNT_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_CORE_THREAD_COUNT_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_HASWELL_E_CORE_THREAD_COUNT_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_CORE_THREAD_COUNT);
+  @endcode
+  @note MSR_HASWELL_E_CORE_THREAD_COUNT is defined as MSR_CORE_THREAD_COUNT in SDM.
+**/
+#define MSR_HASWELL_E_CORE_THREAD_COUNT          0x00000035
+
+/**
+  MSR information returned for MSR index #MSR_HASWELL_E_CORE_THREAD_COUNT
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 15:0] Core_COUNT (RO) The number of processor cores that are
+    /// currently enabled (by either factory configuration or BIOS
+    /// configuration) in the physical package.
+    ///
+    UINT32  Core_Count:16;
+    ///
+    /// [Bits 31:16] THREAD_COUNT (RO) The number of logical processors that
+    /// are currently enabled (by either factory configuration or BIOS
+    /// configuration) in the physical package.
+    ///
+    UINT32  Thread_Count:16;
+    UINT32  Reserved:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_HASWELL_E_CORE_THREAD_COUNT_REGISTER;
+
+
+/**
+  Thread. A Hardware Assigned ID for the Logical Processor (RO).
+
+  @param  ECX  MSR_HASWELL_E_THREAD_ID_INFO (0x00000053)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_THREAD_ID_INFO_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_THREAD_ID_INFO_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_HASWELL_E_THREAD_ID_INFO_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_THREAD_ID_INFO);
+  @endcode
+  @note MSR_HASWELL_E_THREAD_ID_INFO is defined as MSR_THREAD_ID_INFO in SDM.
+**/
+#define MSR_HASWELL_E_THREAD_ID_INFO             0x00000053
+
+/**
+  MSR information returned for MSR index #MSR_HASWELL_E_THREAD_ID_INFO
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 7:0] Logical_Processor_ID (RO) An implementation-specific
+    /// numerical. value physically assigned to each logical processor. This
+    /// ID is not related to Initial APIC ID or x2APIC ID, it is unique within
+    /// a physical package.
+    ///
+    UINT32  Logical_Processor_ID:8;
+    UINT32  Reserved1:24;
+    UINT32  Reserved2:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_HASWELL_E_THREAD_ID_INFO_REGISTER;
+
 
 /**
   Core. C-State Configuration Control (R/W) Note: C-state values are processor
@@ -502,236 +609,6 @@ typedef union {
 
 
 /**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  * Bank MC5 reports MC error from the Intel QPI 0 module.
-  * Bank MC6 reports MC error from the integrated I/O module.
-  * Bank MC7 reports MC error from the home agent HA 0.
-  * Bank MC8 reports MC error from the home agent HA 1.
-  * Banks MC9 through MC16 report MC error from each channel of the integrated
-    memory controllers.
-  * Bank MC17 reports MC error from the following pair of CBo/L3 Slices
-    (if the pair is present): CBo0, CBo3, CBo6, CBo9, CBo12, CBo15.
-  * Bank MC18 reports MC error from the following pair of CBo/L3 Slices
-    (if the pair is present): CBo1, CBo4, CBo7, CBo10, CBo13, CBo16.
-  * Bank MC19 reports MC error from the following pair of CBo/L3 Slices
-    (if the pair is present): CBo2, CBo5, CBo8, CBo11, CBo14, CBo17.
-  * Bank MC20 reports MC error from the Intel QPI 1 module.
-  * Bank MC21 reports MC error from the Intel QPI 2 module.
-
-  @param  ECX  MSR_HASWELL_E_MCi_CTL
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_CTL);
-  AsmWriteMsr64 (MSR_HASWELL_E_MC5_CTL, Msr);
-  @endcode
-  @note MSR_HASWELL_E_MC5_CTL  is defined as MSR_MC5_CTL  in SDM.
-        MSR_HASWELL_E_MC6_CTL  is defined as MSR_MC6_CTL  in SDM.
-        MSR_HASWELL_E_MC7_CTL  is defined as MSR_MC7_CTL  in SDM.
-        MSR_HASWELL_E_MC8_CTL  is defined as MSR_MC8_CTL  in SDM.
-        MSR_HASWELL_E_MC9_CTL  is defined as MSR_MC9_CTL  in SDM.
-        MSR_HASWELL_E_MC10_CTL is defined as MSR_MC10_CTL in SDM.
-        MSR_HASWELL_E_MC11_CTL is defined as MSR_MC11_CTL in SDM.
-        MSR_HASWELL_E_MC12_CTL is defined as MSR_MC12_CTL in SDM.
-        MSR_HASWELL_E_MC13_CTL is defined as MSR_MC13_CTL in SDM.
-        MSR_HASWELL_E_MC14_CTL is defined as MSR_MC14_CTL in SDM.
-        MSR_HASWELL_E_MC15_CTL is defined as MSR_MC15_CTL in SDM.
-        MSR_HASWELL_E_MC16_CTL is defined as MSR_MC16_CTL in SDM.
-        MSR_HASWELL_E_MC17_CTL is defined as MSR_MC17_CTL in SDM.
-        MSR_HASWELL_E_MC18_CTL is defined as MSR_MC18_CTL in SDM.
-        MSR_HASWELL_E_MC19_CTL is defined as MSR_MC19_CTL in SDM.
-        MSR_HASWELL_E_MC20_CTL is defined as MSR_MC20_CTL in SDM.
-        MSR_HASWELL_E_MC21_CTL is defined as MSR_MC21_CTL in SDM.
-  @{
-**/
-#define MSR_HASWELL_E_MC5_CTL                    0x00000414
-#define MSR_HASWELL_E_MC6_CTL                    0x00000418
-#define MSR_HASWELL_E_MC7_CTL                    0x0000041C
-#define MSR_HASWELL_E_MC8_CTL                    0x00000420
-#define MSR_HASWELL_E_MC9_CTL                    0x00000424
-#define MSR_HASWELL_E_MC10_CTL                   0x00000428
-#define MSR_HASWELL_E_MC11_CTL                   0x0000042C
-#define MSR_HASWELL_E_MC12_CTL                   0x00000430
-#define MSR_HASWELL_E_MC13_CTL                   0x00000434
-#define MSR_HASWELL_E_MC14_CTL                   0x00000438
-#define MSR_HASWELL_E_MC15_CTL                   0x0000043C
-#define MSR_HASWELL_E_MC16_CTL                   0x00000440
-#define MSR_HASWELL_E_MC17_CTL                   0x00000444
-#define MSR_HASWELL_E_MC18_CTL                   0x00000448
-#define MSR_HASWELL_E_MC19_CTL                   0x0000044C
-#define MSR_HASWELL_E_MC20_CTL                   0x00000450
-#define MSR_HASWELL_E_MC21_CTL                   0x00000454
-/// @}
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_HASWELL_E_MCi_STATUS
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_STATUS);
-  AsmWriteMsr64 (MSR_HASWELL_E_MC5_STATUS, Msr);
-  @endcode
-  @note MSR_HASWELL_E_MC5_STATUS  is defined as MSR_MC5_STATUS  in SDM.
-        MSR_HASWELL_E_MC6_STATUS  is defined as MSR_MC6_STATUS  in SDM.
-        MSR_HASWELL_E_MC7_STATUS  is defined as MSR_MC7_STATUS  in SDM.
-        MSR_HASWELL_E_MC8_STATUS  is defined as MSR_MC8_STATUS  in SDM.
-        MSR_HASWELL_E_MC9_STATUS  is defined as MSR_MC9_STATUS  in SDM.
-        MSR_HASWELL_E_MC10_STATUS is defined as MSR_MC10_STATUS in SDM.
-        MSR_HASWELL_E_MC11_STATUS is defined as MSR_MC11_STATUS in SDM.
-        MSR_HASWELL_E_MC12_STATUS is defined as MSR_MC12_STATUS in SDM.
-        MSR_HASWELL_E_MC13_STATUS is defined as MSR_MC13_STATUS in SDM.
-        MSR_HASWELL_E_MC14_STATUS is defined as MSR_MC14_STATUS in SDM.
-        MSR_HASWELL_E_MC15_STATUS is defined as MSR_MC15_STATUS in SDM.
-        MSR_HASWELL_E_MC16_STATUS is defined as MSR_MC16_STATUS in SDM.
-        MSR_HASWELL_E_MC17_STATUS is defined as MSR_MC17_STATUS in SDM.
-        MSR_HASWELL_E_MC18_STATUS is defined as MSR_MC18_STATUS in SDM.
-        MSR_HASWELL_E_MC19_STATUS is defined as MSR_MC19_STATUS in SDM.
-        MSR_HASWELL_E_MC20_STATUS is defined as MSR_MC20_STATUS in SDM.
-        MSR_HASWELL_E_MC21_STATUS is defined as MSR_MC21_STATUS in SDM.
-  @{
-**/
-#define MSR_HASWELL_E_MC5_STATUS                 0x00000415
-#define MSR_HASWELL_E_MC6_STATUS                 0x00000419
-#define MSR_HASWELL_E_MC7_STATUS                 0x0000041D
-#define MSR_HASWELL_E_MC8_STATUS                 0x00000421
-#define MSR_HASWELL_E_MC9_STATUS                 0x00000425
-#define MSR_HASWELL_E_MC10_STATUS                0x00000429
-#define MSR_HASWELL_E_MC11_STATUS                0x0000042D
-#define MSR_HASWELL_E_MC12_STATUS                0x00000431
-#define MSR_HASWELL_E_MC13_STATUS                0x00000435
-#define MSR_HASWELL_E_MC14_STATUS                0x00000439
-#define MSR_HASWELL_E_MC15_STATUS                0x0000043D
-#define MSR_HASWELL_E_MC16_STATUS                0x00000441
-#define MSR_HASWELL_E_MC17_STATUS                0x00000445
-#define MSR_HASWELL_E_MC18_STATUS                0x00000449
-#define MSR_HASWELL_E_MC19_STATUS                0x0000044D
-#define MSR_HASWELL_E_MC20_STATUS                0x00000451
-#define MSR_HASWELL_E_MC21_STATUS                0x00000455
-/// @}
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_HASWELL_E_MCi_ADDR
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_ADDR);
-  AsmWriteMsr64 (MSR_HASWELL_E_MC5_ADDR, Msr);
-  @endcode
-  @note MSR_HASWELL_E_MC5_ADDR  is defined as MSR_MC5_ADDR  in SDM.
-        MSR_HASWELL_E_MC6_ADDR  is defined as MSR_MC6_ADDR  in SDM.
-        MSR_HASWELL_E_MC7_ADDR  is defined as MSR_MC7_ADDR  in SDM.
-        MSR_HASWELL_E_MC8_ADDR  is defined as MSR_MC8_ADDR  in SDM.
-        MSR_HASWELL_E_MC9_ADDR  is defined as MSR_MC9_ADDR  in SDM.
-        MSR_HASWELL_E_MC10_ADDR is defined as MSR_MC10_ADDR in SDM.
-        MSR_HASWELL_E_MC11_ADDR is defined as MSR_MC11_ADDR in SDM.
-        MSR_HASWELL_E_MC12_ADDR is defined as MSR_MC12_ADDR in SDM.
-        MSR_HASWELL_E_MC13_ADDR is defined as MSR_MC13_ADDR in SDM.
-        MSR_HASWELL_E_MC14_ADDR is defined as MSR_MC14_ADDR in SDM.
-        MSR_HASWELL_E_MC15_ADDR is defined as MSR_MC15_ADDR in SDM.
-        MSR_HASWELL_E_MC16_ADDR is defined as MSR_MC16_ADDR in SDM.
-        MSR_HASWELL_E_MC17_ADDR is defined as MSR_MC17_ADDR in SDM.
-        MSR_HASWELL_E_MC18_ADDR is defined as MSR_MC18_ADDR in SDM.
-        MSR_HASWELL_E_MC19_ADDR is defined as MSR_MC19_ADDR in SDM.
-        MSR_HASWELL_E_MC20_ADDR is defined as MSR_MC20_ADDR in SDM.
-        MSR_HASWELL_E_MC21_ADDR is defined as MSR_MC21_ADDR in SDM.
-  @{
-**/
-#define MSR_HASWELL_E_MC5_ADDR                   0x00000416
-#define MSR_HASWELL_E_MC6_ADDR                   0x0000041A
-#define MSR_HASWELL_E_MC7_ADDR                   0x0000041E
-#define MSR_HASWELL_E_MC8_ADDR                   0x00000422
-#define MSR_HASWELL_E_MC9_ADDR                   0x00000426
-#define MSR_HASWELL_E_MC10_ADDR                  0x0000042A
-#define MSR_HASWELL_E_MC11_ADDR                  0x0000042E
-#define MSR_HASWELL_E_MC12_ADDR                  0x00000432
-#define MSR_HASWELL_E_MC13_ADDR                  0x00000436
-#define MSR_HASWELL_E_MC14_ADDR                  0x0000043A
-#define MSR_HASWELL_E_MC15_ADDR                  0x0000043E
-#define MSR_HASWELL_E_MC16_ADDR                  0x00000442
-#define MSR_HASWELL_E_MC17_ADDR                  0x00000446
-#define MSR_HASWELL_E_MC18_ADDR                  0x0000044A
-#define MSR_HASWELL_E_MC19_ADDR                  0x0000044E
-#define MSR_HASWELL_E_MC20_ADDR                  0x00000452
-#define MSR_HASWELL_E_MC21_ADDR                  0x00000456
-/// @}
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_HASWELL_E_MCi_MISC
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_HASWELL_E_MC5_MISC);
-  AsmWriteMsr64 (MSR_HASWELL_E_MC5_MISC, Msr);
-  @endcode
-  @note MSR_HASWELL_E_MC5_MISC  is defined as MSR_MC5_MISC  in SDM.
-        MSR_HASWELL_E_MC6_MISC  is defined as MSR_MC6_MISC  in SDM.
-        MSR_HASWELL_E_MC7_MISC  is defined as MSR_MC7_MISC  in SDM.
-        MSR_HASWELL_E_MC8_MISC  is defined as MSR_MC8_MISC  in SDM.
-        MSR_HASWELL_E_MC9_MISC  is defined as MSR_MC9_MISC  in SDM.
-        MSR_HASWELL_E_MC10_MISC is defined as MSR_MC10_MISC in SDM.
-        MSR_HASWELL_E_MC11_MISC is defined as MSR_MC11_MISC in SDM.
-        MSR_HASWELL_E_MC12_MISC is defined as MSR_MC12_MISC in SDM.
-        MSR_HASWELL_E_MC13_MISC is defined as MSR_MC13_MISC in SDM.
-        MSR_HASWELL_E_MC14_MISC is defined as MSR_MC14_MISC in SDM.
-        MSR_HASWELL_E_MC15_MISC is defined as MSR_MC15_MISC in SDM.
-        MSR_HASWELL_E_MC16_MISC is defined as MSR_MC16_MISC in SDM.
-        MSR_HASWELL_E_MC17_MISC is defined as MSR_MC17_MISC in SDM.
-        MSR_HASWELL_E_MC18_MISC is defined as MSR_MC18_MISC in SDM.
-        MSR_HASWELL_E_MC19_MISC is defined as MSR_MC19_MISC in SDM.
-        MSR_HASWELL_E_MC20_MISC is defined as MSR_MC20_MISC in SDM.
-        MSR_HASWELL_E_MC21_MISC is defined as MSR_MC21_MISC in SDM.
-  @{
-**/
-#define MSR_HASWELL_E_MC5_MISC                   0x00000417
-#define MSR_HASWELL_E_MC6_MISC                   0x0000041B
-#define MSR_HASWELL_E_MC7_MISC                   0x0000041F
-#define MSR_HASWELL_E_MC8_MISC                   0x00000423
-#define MSR_HASWELL_E_MC9_MISC                   0x00000427
-#define MSR_HASWELL_E_MC10_MISC                  0x0000042B
-#define MSR_HASWELL_E_MC11_MISC                  0x0000042F
-#define MSR_HASWELL_E_MC12_MISC                  0x00000433
-#define MSR_HASWELL_E_MC13_MISC                  0x00000437
-#define MSR_HASWELL_E_MC14_MISC                  0x0000043B
-#define MSR_HASWELL_E_MC15_MISC                  0x0000043F
-#define MSR_HASWELL_E_MC16_MISC                  0x00000443
-#define MSR_HASWELL_E_MC17_MISC                  0x00000447
-#define MSR_HASWELL_E_MC18_MISC                  0x0000044B
-#define MSR_HASWELL_E_MC19_MISC                  0x0000044F
-#define MSR_HASWELL_E_MC20_MISC                  0x00000453
-#define MSR_HASWELL_E_MC21_MISC                  0x00000457
-/// @}
-
-
-/**
   Package. Unit Multipliers used in RAPL Interfaces (R/O).
 
   @param  ECX  MSR_HASWELL_E_RAPL_POWER_UNIT (0x00000606)
@@ -811,21 +688,48 @@ typedef union {
 
 
 /**
-  Package. DRAM Energy Status (R/O)  See Section 14.9.5, "DRAM RAPL Domain.".
+  Package. DRAM Energy Status (R/O)  Energy Consumed by DRAM devices.
 
   @param  ECX  MSR_HASWELL_E_DRAM_ENERGY_STATUS (0x00000619)
   @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_DRAM_ENERGY_STATUS_REGISTER.
   @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_DRAM_ENERGY_STATUS_REGISTER.
 
   <b>Example usage</b>
   @code
-  UINT64  Msr;
+  MSR_HASWELL_E_DRAM_ENERGY_STATUS_REGISTER  Msr;
 
-  Msr = AsmReadMsr64 (MSR_HASWELL_E_DRAM_ENERGY_STATUS);
+  Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_DRAM_ENERGY_STATUS);
   @endcode
   @note MSR_HASWELL_E_DRAM_ENERGY_STATUS is defined as MSR_DRAM_ENERGY_STATUS in SDM.
 **/
 #define MSR_HASWELL_E_DRAM_ENERGY_STATUS         0x00000619
+
+/**
+  MSR information returned for MSR index #MSR_HASWELL_E_DRAM_ENERGY_STATUS
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 31:0] Energy in 15.3 micro-joules. Requires BIOS configuration
+    /// to enable DRAM RAPL mode 0 (Direct VR).
+    ///
+    UINT32  Energy:32;
+    UINT32  Reserved:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_HASWELL_E_DRAM_ENERGY_STATUS_REGISTER;
 
 
 /**
@@ -864,6 +768,83 @@ typedef union {
   @note MSR_HASWELL_E_DRAM_POWER_INFO is defined as MSR_DRAM_POWER_INFO in SDM.
 **/
 #define MSR_HASWELL_E_DRAM_POWER_INFO            0x0000061C
+
+
+/**
+  Package. Configuration of PCIE PLL Relative to BCLK(R/W).
+
+  @param  ECX  MSR_HASWELL_E_PCIE_PLL_RATIO (0x0000061E)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_PCIE_PLL_RATIO_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_HASWELL_E_PCIE_PLL_RATIO_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_HASWELL_E_PCIE_PLL_RATIO_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_HASWELL_E_PCIE_PLL_RATIO);
+  AsmWriteMsr64 (MSR_HASWELL_E_PCIE_PLL_RATIO, Msr.Uint64);
+  @endcode
+  @note MSR_HASWELL_E_PCIE_PLL_RATIO is defined as MSR_PCIE_PLL_RATIO in SDM.
+**/
+#define MSR_HASWELL_E_PCIE_PLL_RATIO             0x0000061E
+
+/**
+  MSR information returned for MSR index #MSR_HASWELL_E_PCIE_PLL_RATIO
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 1:0] Package. PCIE Ratio (R/W) 00b: Use 5:5 mapping for100MHz
+    /// operation (default) 01b: Use 5:4 mapping for125MHz operation 10b: Use
+    /// 5:3 mapping for166MHz operation 11b: Use 5:2 mapping for250MHz
+    /// operation.
+    ///
+    UINT32  PCIERatio:2;
+    ///
+    /// [Bit 2] Package. LPLL Select (R/W) if 1, use configured setting of
+    /// PCIE Ratio.
+    ///
+    UINT32  LPLLSelect:1;
+    ///
+    /// [Bit 3] Package. LONG RESET (R/W) if 1, wait additional time-out
+    /// before re-locking Gen2/Gen3 PLLs.
+    ///
+    UINT32  LONGRESET:1;
+    UINT32  Reserved1:28;
+    UINT32  Reserved2:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_HASWELL_E_PCIE_PLL_RATIO_REGISTER;
+
+
+/**
+  Package. Reserved (R/O)  Reads return 0.
+
+  @param  ECX  MSR_HASWELL_E_PP0_ENERGY_STATUS (0x00000639)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_HASWELL_E_PP0_ENERGY_STATUS);
+  @endcode
+  @note MSR_HASWELL_E_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
+**/
+#define MSR_HASWELL_E_PP0_ENERGY_STATUS          0x00000639
 
 
 /**
@@ -1048,7 +1029,7 @@ typedef union {
 
 /**
   THREAD. Monitoring Event Select Register (R/W). if CPUID.(EAX=07H,
-  ECX=0):EBX.PQM[bit 12] = 1.
+  ECX=0):EBX.RDT-M[bit 12] = 1.
 
   @param  ECX  MSR_HASWELL_E_IA32_QM_EVTSEL (0x00000C8D)
   @param  EAX  Lower 32-bits of MSR value.

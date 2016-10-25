@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-10.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.11.
 
 **/
 
@@ -442,15 +442,8 @@ typedef union {
     UINT32  InterruptResponseTimeLimit:10;
     ///
     /// [Bits 12:10] Time Unit (R/W)  Specifies the encoding value of time
-    /// unit of the interrupt response time limit. The following time unit
-    /// encodings are supported:
-    ///
-    ///   000b: 1 ns
-    ///   001b: 32 ns
-    ///   010b: 1024 ns
-    ///   011b: 32768 ns
-    ///   100b: 1048576 ns
-    ///   101b: 33554432 ns.
+    /// unit of the interrupt response time limit. See Table 35-18 for
+    /// supported time unit encodings.
     ///
     UINT32  TimeUnit:3;
     UINT32  Reserved1:2;
@@ -514,15 +507,8 @@ typedef union {
     UINT32  InterruptResponseTimeLimit:10;
     ///
     /// [Bits 12:10] Time Unit (R/W)  Specifies the encoding value of time
-    /// unit of the interrupt response time limit. The following time unit
-    /// encodings are supported:
-    ///
-    ///   000b: 1 ns
-    ///   001b: 32 ns
-    ///   010b: 1024 ns
-    ///   011b: 32768 ns
-    ///   100b: 1048576 ns
-    ///   101b: 33554432 ns.
+    /// unit of the interrupt response time limit. See Table 35-18 for
+    /// supported time unit encodings.
     ///
     UINT32  TimeUnit:3;
     UINT32  Reserved1:2;
@@ -861,25 +847,6 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_HASWELL_TURBO_ACTIVATION_RATIO_REGISTER;
-
-
-/**
-  Package. Silicon Debug Feature Control (R/W) See Table 35-2.
-
-  @param  ECX  MSR_HASWELL_IA32_DEBUG_FEATURE (0x00000C80)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_HASWELL_IA32_DEBUG_FEATURE);
-  AsmWriteMsr64 (MSR_HASWELL_IA32_DEBUG_FEATURE, Msr);
-  @endcode
-  @note MSR_HASWELL_IA32_DEBUG_FEATURE is defined as IA32_DEBUG_FEATURE in SDM.
-**/
-#define MSR_HASWELL_IA32_DEBUG_FEATURE           0x00000C80
 
 
 /**
@@ -1607,6 +1574,25 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_HASWELL_RAPL_POWER_UNIT_REGISTER;
+
+
+/**
+  Package. PP0 Energy Status (R/O)  See Section 14.9.4, "PP0/PP1 RAPL
+  Domains.".
+
+  @param  ECX  MSR_HASWELL_PP0_ENERGY_STATUS (0x00000639)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_HASWELL_PP0_ENERGY_STATUS);
+  @endcode
+  @note MSR_HASWELL_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
+**/
+#define MSR_HASWELL_PP0_ENERGY_STATUS            0x00000639
 
 
 /**

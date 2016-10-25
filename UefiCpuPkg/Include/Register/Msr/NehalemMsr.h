@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-5.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.6.
 
 **/
 
@@ -254,7 +254,23 @@ typedef union {
     /// auto-demote information.
     ///
     UINT32  C1AutoDemotion:1;
-    UINT32  Reserved4:5;
+    ///
+    /// [Bit 27] Enable C3 Undemotion (R/W).
+    ///
+    UINT32  C3Undemotion:1;
+    ///
+    /// [Bit 28] Enable C1 Undemotion (R/W).
+    ///
+    UINT32  C1Undemotion:1;
+    ///
+    /// [Bit 29] Package C State Demotion Enable (R/W).
+    ///
+    UINT32  CStateDemotion:1;
+    ///
+    /// [Bit 30] Package C State UnDemotion Enable (R/W).
+    ///
+    UINT32  CStateUndemotion:1;
+    UINT32  Reserved4:1;
     UINT32  Reserved5:32;
   } Bits;
   ///
@@ -364,7 +380,7 @@ typedef union {
     UINT32  Reserved1:2;
     ///
     /// [Bit 3] Thread. Automatic Thermal Control Circuit Enable (R/W) See
-    /// Table 35-2.
+    /// Table 35-2. Default value is 1.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
@@ -378,7 +394,7 @@ typedef union {
     ///
     UINT32  BTS:1;
     ///
-    /// [Bit 12] Thread. Precise Event Based Sampling Unavailable (RO) See
+    /// [Bit 12] Thread. Processor Event Based Sampling Unavailable (RO) See
     /// Table 35-2.
     ///
     UINT32  PEBS:1;
@@ -744,7 +760,7 @@ typedef union {
 
 /**
   Core. Last Branch Record Filtering Select Register (R/W)  See Section
-  17.6.2, "Filtering of Last Branch Records.".
+  17.7.2, "Filtering of Last Branch Records.".
 
   @param  ECX  MSR_NEHALEM_LBR_SELECT (0x000001C8)
   @param  EAX  Lower 32-bits of MSR value.
@@ -933,46 +949,26 @@ typedef union {
 
 
 /**
-  Thread. See Table 35-2. See Section 18.4.2, "Global Counter Control
-  Facilities.".
-
-  @param  ECX  MSR_NEHALEM_IA32_PERF_GLOBAL_STAUS (0x0000038E)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_NEHALEM_IA32_PERF_GLOBAL_STAUS);
-  AsmWriteMsr64 (MSR_NEHALEM_IA32_PERF_GLOBAL_STAUS, Msr);
-  @endcode
-  @note MSR_NEHALEM_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
-**/
-#define MSR_NEHALEM_IA32_PERF_GLOBAL_STAUS       0x0000038E
-
-
-/**
   Thread. (RO).
 
-  @param  ECX  MSR_NEHALEM_PERF_GLOBAL_STAUS (0x0000038E)
+  @param  ECX  MSR_NEHALEM_PERF_GLOBAL_STATUS (0x0000038E)
   @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_NEHALEM_PERF_GLOBAL_STAUS_REGISTER.
+               Described by the type MSR_NEHALEM_PERF_GLOBAL_STATUS_REGISTER.
   @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_NEHALEM_PERF_GLOBAL_STAUS_REGISTER.
+               Described by the type MSR_NEHALEM_PERF_GLOBAL_STATUS_REGISTER.
 
   <b>Example usage</b>
   @code
-  MSR_NEHALEM_PERF_GLOBAL_STAUS_REGISTER  Msr;
+  MSR_NEHALEM_PERF_GLOBAL_STATUS_REGISTER  Msr;
 
-  Msr.Uint64 = AsmReadMsr64 (MSR_NEHALEM_PERF_GLOBAL_STAUS);
+  Msr.Uint64 = AsmReadMsr64 (MSR_NEHALEM_PERF_GLOBAL_STATUS);
   @endcode
-  @note MSR_NEHALEM_PERF_GLOBAL_STAUS is defined as MSR_PERF_GLOBAL_STAUS in SDM.
+  @note MSR_NEHALEM_PERF_GLOBAL_STATUS is defined as MSR_PERF_GLOBAL_STATUS in SDM.
 **/
-#define MSR_NEHALEM_PERF_GLOBAL_STAUS            0x0000038E
+#define MSR_NEHALEM_PERF_GLOBAL_STATUS           0x0000038E
 
 /**
-  MSR information returned for MSR index #MSR_NEHALEM_PERF_GLOBAL_STAUS
+  MSR information returned for MSR index #MSR_NEHALEM_PERF_GLOBAL_STATUS
 **/
 typedef union {
   ///
@@ -991,7 +987,7 @@ typedef union {
   /// All bit fields as a 64-bit value
   ///
   UINT64  Uint64;
-} MSR_NEHALEM_PERF_GLOBAL_STAUS_REGISTER;
+} MSR_NEHALEM_PERF_GLOBAL_STATUS_REGISTER;
 
 
 /**
@@ -1038,7 +1034,7 @@ typedef union {
 
 
 /**
-  Thread. See Section 18.7.1.1, "Precise Event Based Sampling (PEBS).".
+  Thread. See Section 18.8.1.1, "Processor Event Based Sampling (PEBS).".
 
   @param  ECX  MSR_NEHALEM_PEBS_ENABLE (0x000003F1)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1108,7 +1104,7 @@ typedef union {
 
 
 /**
-  Thread. See Section 18.7.1.2, "Load Latency Performance Monitoring
+  Thread. See Section 18.8.1.2, "Load Latency Performance Monitoring
   Facility.".
 
   @param  ECX  MSR_NEHALEM_PEBS_LD_LAT (0x000003F6)
@@ -1266,256 +1262,11 @@ typedef union {
 
 
 /**
-  See Section 15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_NEHALEM_MCi_MISC
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_NEHALEM_MC0_MISC);
-  AsmWriteMsr64 (MSR_NEHALEM_MC0_MISC, Msr);
-  @endcode
-  @note MSR_NEHALEM_MC0_MISC  is defined as MSR_MC0_MISC  in SDM.
-        MSR_NEHALEM_MC1_MISC  is defined as MSR_MC1_MISC  in SDM.
-        MSR_NEHALEM_MC2_MISC  is defined as MSR_MC2_MISC  in SDM.
-        MSR_NEHALEM_MC3_MISC  is defined as MSR_MC3_MISC  in SDM.
-        MSR_NEHALEM_MC4_MISC  is defined as MSR_MC4_MISC  in SDM.
-        MSR_NEHALEM_MC5_MISC  is defined as MSR_MC5_MISC  in SDM.
-        MSR_NEHALEM_MC6_MISC  is defined as MSR_MC6_MISC  in SDM.
-        MSR_NEHALEM_MC7_MISC  is defined as MSR_MC7_MISC  in SDM.
-        MSR_NEHALEM_MC8_MISC  is defined as MSR_MC8_MISC  in SDM.
-        MSR_NEHALEM_MC9_MISC  is defined as MSR_MC9_MISC  in SDM.
-        MSR_NEHALEM_MC10_MISC is defined as MSR_MC10_MISC in SDM.
-        MSR_NEHALEM_MC11_MISC is defined as MSR_MC11_MISC in SDM.
-        MSR_NEHALEM_MC12_MISC is defined as MSR_MC12_MISC in SDM.
-        MSR_NEHALEM_MC13_MISC is defined as MSR_MC13_MISC in SDM.
-        MSR_NEHALEM_MC14_MISC is defined as MSR_MC14_MISC in SDM.
-        MSR_NEHALEM_MC15_MISC is defined as MSR_MC15_MISC in SDM.
-        MSR_NEHALEM_MC16_MISC is defined as MSR_MC16_MISC in SDM.
-        MSR_NEHALEM_MC17_MISC is defined as MSR_MC17_MISC in SDM.
-        MSR_NEHALEM_MC18_MISC is defined as MSR_MC18_MISC in SDM.
-        MSR_NEHALEM_MC19_MISC is defined as MSR_MC19_MISC in SDM.
-        MSR_NEHALEM_MC20_MISC is defined as MSR_MC20_MISC in SDM.
-        MSR_NEHALEM_MC21_MISC is defined as MSR_MC21_MISC in SDM.
-  @{
-**/
-#define MSR_NEHALEM_MC0_MISC                     0x00000403
-#define MSR_NEHALEM_MC1_MISC                     0x00000407
-#define MSR_NEHALEM_MC2_MISC                     0x0000040B
-#define MSR_NEHALEM_MC3_MISC                     0x0000040F
-#define MSR_NEHALEM_MC4_MISC                     0x00000413
-#define MSR_NEHALEM_MC5_MISC                     0x00000417
-#define MSR_NEHALEM_MC6_MISC                     0x0000041B
-#define MSR_NEHALEM_MC7_MISC                     0x0000041F
-#define MSR_NEHALEM_MC8_MISC                     0x00000423
-#define MSR_NEHALEM_MC9_MISC                     0x00000427
-#define MSR_NEHALEM_MC10_MISC                    0x0000042B
-#define MSR_NEHALEM_MC11_MISC                    0x0000042F
-#define MSR_NEHALEM_MC12_MISC                    0x00000433
-#define MSR_NEHALEM_MC13_MISC                    0x00000437
-#define MSR_NEHALEM_MC14_MISC                    0x0000043B
-#define MSR_NEHALEM_MC15_MISC                    0x0000043F
-#define MSR_NEHALEM_MC16_MISC                    0x00000443
-#define MSR_NEHALEM_MC17_MISC                    0x00000447
-#define MSR_NEHALEM_MC18_MISC                    0x0000044B
-#define MSR_NEHALEM_MC19_MISC                    0x0000044F
-#define MSR_NEHALEM_MC20_MISC                    0x00000453
-#define MSR_NEHALEM_MC21_MISC                    0x00000457
-/// @}
-
-
-/**
-  See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_NEHALEM_MCi_CTL
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_NEHALEM_MC3_CTL);
-  AsmWriteMsr64 (MSR_NEHALEM_MC3_CTL, Msr);
-  @endcode
-  @note MSR_NEHALEM_MC3_CTL  is defined as MSR_MC3_CTL  in SDM.
-        MSR_NEHALEM_MC4_CTL  is defined as MSR_MC4_CTL  in SDM.
-        MSR_NEHALEM_MC5_CTL  is defined as MSR_MC5_CTL  in SDM.
-        MSR_NEHALEM_MC6_CTL  is defined as MSR_MC6_CTL  in SDM.
-        MSR_NEHALEM_MC7_CTL  is defined as MSR_MC7_CTL  in SDM.
-        MSR_NEHALEM_MC8_CTL  is defined as MSR_MC8_CTL  in SDM.
-        MSR_NEHALEM_MC9_CTL  is defined as MSR_MC9_CTL  in SDM.
-        MSR_NEHALEM_MC10_CTL is defined as MSR_MC10_CTL in SDM.
-        MSR_NEHALEM_MC11_CTL is defined as MSR_MC11_CTL in SDM.
-        MSR_NEHALEM_MC12_CTL is defined as MSR_MC12_CTL in SDM.
-        MSR_NEHALEM_MC13_CTL is defined as MSR_MC13_CTL in SDM.
-        MSR_NEHALEM_MC14_CTL is defined as MSR_MC14_CTL in SDM.
-        MSR_NEHALEM_MC15_CTL is defined as MSR_MC15_CTL in SDM.
-        MSR_NEHALEM_MC16_CTL is defined as MSR_MC16_CTL in SDM.
-        MSR_NEHALEM_MC17_CTL is defined as MSR_MC17_CTL in SDM.
-        MSR_NEHALEM_MC18_CTL is defined as MSR_MC18_CTL in SDM.
-        MSR_NEHALEM_MC19_CTL is defined as MSR_MC19_CTL in SDM.
-        MSR_NEHALEM_MC20_CTL is defined as MSR_MC20_CTL in SDM.
-        MSR_NEHALEM_MC21_CTL is defined as MSR_MC21_CTL in SDM.
-  @{
-**/
-#define MSR_NEHALEM_MC3_CTL                      0x0000040C
-#define MSR_NEHALEM_MC4_CTL                      0x00000410
-#define MSR_NEHALEM_MC5_CTL                      0x00000414
-#define MSR_NEHALEM_MC6_CTL                      0x00000418
-#define MSR_NEHALEM_MC7_CTL                      0x0000041C
-#define MSR_NEHALEM_MC8_CTL                      0x00000420
-#define MSR_NEHALEM_MC9_CTL                      0x00000424
-#define MSR_NEHALEM_MC10_CTL                     0x00000428
-#define MSR_NEHALEM_MC11_CTL                     0x0000042C
-#define MSR_NEHALEM_MC12_CTL                     0x00000430
-#define MSR_NEHALEM_MC13_CTL                     0x00000434
-#define MSR_NEHALEM_MC14_CTL                     0x00000438
-#define MSR_NEHALEM_MC15_CTL                     0x0000043C
-#define MSR_NEHALEM_MC16_CTL                     0x00000440
-#define MSR_NEHALEM_MC17_CTL                     0x00000444
-#define MSR_NEHALEM_MC18_CTL                     0x00000448
-#define MSR_NEHALEM_MC19_CTL                     0x0000044C
-#define MSR_NEHALEM_MC20_CTL                     0x00000450
-#define MSR_NEHALEM_MC21_CTL                     0x00000454
-/// @}
-
-
-/**
-  See Section 15.3.2.2, "IA32_MCi_STATUS MSRS," and Chapter 16.
-
-  @param  ECX  MSR_NEHALEM_MCi_STATUS (0x0000040D)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_NEHALEM_MC3_STATUS);
-  AsmWriteMsr64 (MSR_NEHALEM_MC3_STATUS, Msr);
-  @endcode
-  @note MSR_NEHALEM_MC3_STATUS  is defined as MSR_MC3_STATUS  in SDM.
-        MSR_NEHALEM_MC4_STATUS  is defined as MSR_MC4_STATUS  in SDM.
-        MSR_NEHALEM_MC5_STATUS  is defined as MSR_MC5_STATUS  in SDM.
-        MSR_NEHALEM_MC6_STATUS  is defined as MSR_MC6_STATUS  in SDM.
-        MSR_NEHALEM_MC7_STATUS  is defined as MSR_MC7_STATUS  in SDM.
-        MSR_NEHALEM_MC8_STATUS  is defined as MSR_MC8_STATUS  in SDM.
-        MSR_NEHALEM_MC9_STATUS  is defined as MSR_MC9_STATUS  in SDM.
-        MSR_NEHALEM_MC10_STATUS is defined as MSR_MC10_STATUS in SDM.
-        MSR_NEHALEM_MC11_STATUS is defined as MSR_MC11_STATUS in SDM.
-        MSR_NEHALEM_MC12_STATUS is defined as MSR_MC12_STATUS in SDM.
-        MSR_NEHALEM_MC13_STATUS is defined as MSR_MC13_STATUS in SDM.
-        MSR_NEHALEM_MC14_STATUS is defined as MSR_MC14_STATUS in SDM.
-        MSR_NEHALEM_MC15_STATUS is defined as MSR_MC15_STATUS in SDM.
-        MSR_NEHALEM_MC16_STATUS is defined as MSR_MC16_STATUS in SDM.
-        MSR_NEHALEM_MC17_STATUS is defined as MSR_MC17_STATUS in SDM.
-        MSR_NEHALEM_MC18_STATUS is defined as MSR_MC18_STATUS in SDM.
-        MSR_NEHALEM_MC19_STATUS is defined as MSR_MC19_STATUS in SDM.
-        MSR_NEHALEM_MC20_STATUS is defined as MSR_MC20_STATUS in SDM.
-        MSR_NEHALEM_MC21_STATUS is defined as MSR_MC21_STATUS in SDM.
-  @{
-**/
-#define MSR_NEHALEM_MC3_STATUS                   0x0000040D
-#define MSR_NEHALEM_MC4_STATUS                   0x00000411
-#define MSR_NEHALEM_MC5_STATUS                   0x00000415
-#define MSR_NEHALEM_MC6_STATUS                   0x00000419
-#define MSR_NEHALEM_MC7_STATUS                   0x0000041D
-#define MSR_NEHALEM_MC8_STATUS                   0x00000421
-#define MSR_NEHALEM_MC9_STATUS                   0x00000425
-#define MSR_NEHALEM_MC10_STATUS                  0x00000429
-#define MSR_NEHALEM_MC11_STATUS                  0x0000042D
-#define MSR_NEHALEM_MC12_STATUS                  0x00000431
-#define MSR_NEHALEM_MC13_STATUS                  0x00000435
-#define MSR_NEHALEM_MC14_STATUS                  0x00000439
-#define MSR_NEHALEM_MC15_STATUS                  0x0000043D
-#define MSR_NEHALEM_MC16_STATUS                  0x00000441
-#define MSR_NEHALEM_MC17_STATUS                  0x00000445
-#define MSR_NEHALEM_MC18_STATUS                  0x00000449
-#define MSR_NEHALEM_MC19_STATUS                  0x0000044D
-#define MSR_NEHALEM_MC20_STATUS                  0x00000451
-#define MSR_NEHALEM_MC21_STATUS                  0x00000455
-/// @}
-
-
-/**
-  Core. See Section 15.3.2.3, "IA32_MCi_ADDR MSRs."
-
-  The MSR_MC3_ADDR register is either not implemented or contains no address
-  if the ADDRV flag in the MSR_MC3_STATUS register is clear. When not
-  implemented in the processor, all reads and writes to this MSR will cause a
-  general-protection exception.
-
-  The MSR_MC4_ADDR register is either not implemented or contains no address
-  if the ADDRV flag in the MSR_MC4_STATUS register is clear. When not
-  implemented in the processor, all reads and writes to this MSR will cause a
-  general-protection exception.
-
-  @param  ECX  MSR_NEHALEM_MC3_ADDR (0x0000040E)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_NEHALEM_MC3_ADDR);
-  AsmWriteMsr64 (MSR_NEHALEM_MC3_ADDR, Msr);
-  @endcode
-  @note MSR_NEHALEM_MC3_ADDR  is defined as MSR_MC3_ADDR  in SDM.
-        MSR_NEHALEM_MC4_ADDR  is defined as MSR_MC4_ADDR  in SDM.
-        MSR_NEHALEM_MC5_ADDR  is defined as MSR_MC5_ADDR  in SDM.
-        MSR_NEHALEM_MC6_ADDR  is defined as MSR_MC6_ADDR  in SDM.
-        MSR_NEHALEM_MC7_ADDR  is defined as MSR_MC7_ADDR  in SDM.
-        MSR_NEHALEM_MC8_ADDR  is defined as MSR_MC8_ADDR  in SDM.
-        MSR_NEHALEM_MC9_ADDR  is defined as MSR_MC9_ADDR  in SDM.
-        MSR_NEHALEM_MC10_ADDR is defined as MSR_MC10_ADDR in SDM.
-        MSR_NEHALEM_MC11_ADDR is defined as MSR_MC11_ADDR in SDM.
-        MSR_NEHALEM_MC12_ADDR is defined as MSR_MC12_ADDR in SDM.
-        MSR_NEHALEM_MC13_ADDR is defined as MSR_MC13_ADDR in SDM.
-        MSR_NEHALEM_MC14_ADDR is defined as MSR_MC14_ADDR in SDM.
-        MSR_NEHALEM_MC15_ADDR is defined as MSR_MC15_ADDR in SDM.
-        MSR_NEHALEM_MC16_ADDR is defined as MSR_MC16_ADDR in SDM.
-        MSR_NEHALEM_MC17_ADDR is defined as MSR_MC17_ADDR in SDM.
-        MSR_NEHALEM_MC18_ADDR is defined as MSR_MC18_ADDR in SDM.
-        MSR_NEHALEM_MC19_ADDR is defined as MSR_MC19_ADDR in SDM.
-        MSR_NEHALEM_MC20_ADDR is defined as MSR_MC20_ADDR in SDM.
-        MSR_NEHALEM_MC21_ADDR is defined as MSR_MC21_ADDR in SDM.
-  @{
-**/
-#define MSR_NEHALEM_MC3_ADDR                     0x0000040E
-#define MSR_NEHALEM_MC4_ADDR                     0x00000412
-#define MSR_NEHALEM_MC5_ADDR                     0x00000416
-#define MSR_NEHALEM_MC6_ADDR                     0x0000041A
-#define MSR_NEHALEM_MC7_ADDR                     0x0000041E
-#define MSR_NEHALEM_MC8_ADDR                     0x00000422
-#define MSR_NEHALEM_MC9_ADDR                     0x00000426
-#define MSR_NEHALEM_MC10_ADDR                    0x0000042A
-#define MSR_NEHALEM_MC11_ADDR                    0x0000042E
-#define MSR_NEHALEM_MC12_ADDR                    0x00000432
-#define MSR_NEHALEM_MC13_ADDR                    0x00000436
-#define MSR_NEHALEM_MC14_ADDR                    0x0000043A
-#define MSR_NEHALEM_MC15_ADDR                    0x0000043E
-#define MSR_NEHALEM_MC16_ADDR                    0x00000442
-#define MSR_NEHALEM_MC17_ADDR                    0x00000446
-#define MSR_NEHALEM_MC18_ADDR                    0x0000044A
-#define MSR_NEHALEM_MC19_ADDR                    0x0000044E
-#define MSR_NEHALEM_MC20_ADDR                    0x00000452
-#define MSR_NEHALEM_MC21_ADDR                    0x00000456
-/// @}
-
-
-/**
   Thread. Last Branch Record n From IP (R/W) One of sixteen pairs of last
-  branch record registers on the last branch record stack. This part of the
-  stack contains pointers to the source instruction for one of the last
-  sixteen branches, exceptions, or interrupts taken by the processor. See
-  also: -  Last Branch Record Stack TOS at 1C9H -  Section 17.6.1, "LBR
-  Stack.".
+  branch record registers on the last branch record stack. The From_IP part of
+  the stack contains pointers to the source instruction. See also: -  Last
+  Branch Record Stack TOS at 1C9H -  Section 17.7.1 and record format in
+  Section 17.4.8.1.
 
   @param  ECX  MSR_NEHALEM_LASTBRANCH_n_FROM_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -1568,8 +1319,7 @@ typedef union {
 /**
   Thread. Last Branch Record n To IP (R/W) One of sixteen pairs of last branch
   record registers on the last branch record stack. This part of the stack
-  contains pointers to the destination instruction for one of the last sixteen
-  branches, exceptions, or interrupts taken by the processor.
+  contains pointers to the destination instruction.
 
   @param  ECX  MSR_NEHALEM_LASTBRANCH_n_TO_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -1694,7 +1444,7 @@ typedef union {
 
 
 /**
-  Package. See Section 18.7.2.1, "Uncore Performance Monitoring Management
+  Package. See Section 18.8.2.1, "Uncore Performance Monitoring Management
   Facility.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_PERF_GLOBAL_CTRL (0x00000391)
@@ -1714,7 +1464,7 @@ typedef union {
 
 
 /**
-  Package. See Section 18.7.2.1, "Uncore Performance Monitoring Management
+  Package. See Section 18.8.2.1, "Uncore Performance Monitoring Management
   Facility.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_PERF_GLOBAL_STATUS (0x00000392)
@@ -1734,7 +1484,7 @@ typedef union {
 
 
 /**
-  Package. See Section 18.7.2.1, "Uncore Performance Monitoring Management
+  Package. See Section 18.8.2.1, "Uncore Performance Monitoring Management
   Facility.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_PERF_GLOBAL_OVF_CTRL (0x00000393)
@@ -1754,7 +1504,7 @@ typedef union {
 
 
 /**
-  Package. See Section 18.7.2.1, "Uncore Performance Monitoring Management
+  Package. See Section 18.8.2.1, "Uncore Performance Monitoring Management
   Facility.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_FIXED_CTR0 (0x00000394)
@@ -1774,7 +1524,7 @@ typedef union {
 
 
 /**
-  Package. See Section 18.7.2.1, "Uncore Performance Monitoring Management
+  Package. See Section 18.8.2.1, "Uncore Performance Monitoring Management
   Facility.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_FIXED_CTR_CTRL (0x00000395)
@@ -1794,7 +1544,7 @@ typedef union {
 
 
 /**
-  Package. See Section 18.7.2.3, "Uncore Address/Opcode Match MSR.".
+  Package. See Section 18.8.2.3, "Uncore Address/Opcode Match MSR.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_ADDR_OPCODE_MATCH (0x00000396)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1813,7 +1563,7 @@ typedef union {
 
 
 /**
-  Package. See Section 18.7.2.2, "Uncore Performance Event Configuration
+  Package. See Section 18.8.2.2, "Uncore Performance Event Configuration
   Facility.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_PMCi
@@ -1848,7 +1598,7 @@ typedef union {
 /// @}
 
 /**
-  Package. See Section 18.7.2.2, "Uncore Performance Event Configuration
+  Package. See Section 18.8.2.2, "Uncore Performance Event Configuration
   Facility.".
 
   @param  ECX  MSR_NEHALEM_UNCORE_PERFEVTSELi

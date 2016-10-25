@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-20.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.22.
 
 **/
 
@@ -65,7 +65,7 @@
 
 
 /**
-  See Section 17.14, "Time-Stamp Counter.".
+  See Section 17.15, "Time-Stamp Counter.".
 
   @param  ECX  MSR_PENTIUM_TSC (0x00000010)
   @param  EAX  Lower 32-bits of MSR value.
@@ -84,7 +84,7 @@
 
 
 /**
-  See Section 18.20.1, "Control and Event Select Register (CESR).".
+  See Section 18.24.1, "Control and Event Select Register (CESR).".
 
   @param  ECX  MSR_PENTIUM_CESR (0x00000011)
   @param  EAX  Lower 32-bits of MSR value.
@@ -103,7 +103,7 @@
 
 
 /**
-  Section 18.20.3, "Events Counted.".
+  Section 18.24.3, "Events Counted.".
 
   @param  ECX  MSR_PENTIUM_CTRn
   @param  EAX  Lower 32-bits of MSR value.

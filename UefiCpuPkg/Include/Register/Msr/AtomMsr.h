@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-3.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.3.
 
 **/
 
@@ -177,12 +177,10 @@ typedef union {
 
 
 /**
-  Unique. Last Branch Record 0 From IP (R/W) One of eight pairs of last branch
-  record registers on the last branch record stack. This part of the stack
-  contains pointers to the source instruction for one of the last eight
-  branches, exceptions, or interrupts taken by the processor. See also: -
-  Last Branch Record Stack TOS at 1C9H -  Section 17.12, "Last Branch,
-  Interrupt, and Exception Recording (Pentium M Processors).".
+  Unique. Last Branch Record n From IP (R/W) One of eight pairs of last branch
+  record registers on the last branch record stack. The From_IP part of the
+  stack contains pointers to the source instruction . See also: -  Last Branch
+  Record Stack TOS at 1C9H -  Section 17.5.
 
   @param  ECX  MSR_ATOM_LASTBRANCH_n_FROM_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -217,10 +215,9 @@ typedef union {
 
 
 /**
-  Unique. Last Branch Record 0 To IP (R/W) One of eight pairs of last branch
-  record registers on the last branch record stack. This part of the stack
-  contains pointers to the destination instruction for one of the last eight
-  branches, exceptions, or interrupts taken by the processor.
+  Unique. Last Branch Record n To IP (R/W) One of eight pairs of last branch
+  record registers on the last branch record stack. The To_IP part of the
+  stack contains pointers to the destination instruction.
 
   @param  ECX  MSR_ATOM_LASTBRANCH_n_TO_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -507,7 +504,7 @@ typedef union {
     UINT32  Reserved1:2;
     ///
     /// [Bit 3] Unique. Automatic Thermal Control Circuit Enable (R/W) See
-    /// Table 35-2.
+    /// Table 35-2. Default value is 0.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
@@ -529,7 +526,7 @@ typedef union {
     ///
     UINT32  BTS:1;
     ///
-    /// [Bit 12] Shared. Precise Event Based Sampling Unavailable (RO) See
+    /// [Bit 12] Shared. Processor Event Based Sampling Unavailable (RO) See
     /// Table 35-2.
     ///
     UINT32  PEBS:1;
@@ -656,27 +653,7 @@ typedef union {
 
 
 /**
-  Unique. See Table 35-2. See Section 18.4.2, "Global Counter Control
-  Facilities.".
-
-  @param  ECX  MSR_ATOM_IA32_PERF_GLOBAL_STAUS (0x0000038E)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_ATOM_IA32_PERF_GLOBAL_STAUS);
-  AsmWriteMsr64 (MSR_ATOM_IA32_PERF_GLOBAL_STAUS, Msr);
-  @endcode
-  @note MSR_ATOM_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
-**/
-#define MSR_ATOM_IA32_PERF_GLOBAL_STAUS          0x0000038E
-
-
-/**
-  Unique. See Table 35-2. See Section 18.4.4, "Precise Event Based Sampling
+  Unique. See Table 35-2. See Section 18.4.4, "Processor Event Based Sampling
   (PEBS).".
 
   @param  ECX  MSR_ATOM_PEBS_ENABLE (0x000003F1)
@@ -720,128 +697,6 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_ATOM_PEBS_ENABLE_REGISTER;
-
-
-/**
-  Shared. See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_ATOM_MC3_CTL (0x0000040C)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_ATOM_MC3_CTL);
-  AsmWriteMsr64 (MSR_ATOM_MC3_CTL, Msr);
-  @endcode
-  @note MSR_ATOM_MC3_CTL is defined as MSR_MC3_CTL in SDM.
-**/
-#define MSR_ATOM_MC3_CTL                         0x0000040C
-
-
-/**
-  Shared. See Section 15.3.2.2, "IA32_MCi_STATUS MSRS.".
-
-  @param  ECX  MSR_ATOM_MC3_STATUS (0x0000040D)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_ATOM_MC3_STATUS);
-  AsmWriteMsr64 (MSR_ATOM_MC3_STATUS, Msr);
-  @endcode
-  @note MSR_ATOM_MC3_STATUS is defined as MSR_MC3_STATUS in SDM.
-**/
-#define MSR_ATOM_MC3_STATUS                      0x0000040D
-
-
-/**
-  Shared. See Section 15.3.2.3, "IA32_MCi_ADDR MSRs." The MSR_MC3_ADDR
-  register is either not implemented or contains no address if the ADDRV flag
-  in the MSR_MC3_STATUS register is clear. When not implemented in the
-  processor, all reads and writes to this MSR will cause a general-protection
-  exception.
-
-  @param  ECX  MSR_ATOM_MC3_ADDR (0x0000040E)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_ATOM_MC3_ADDR);
-  AsmWriteMsr64 (MSR_ATOM_MC3_ADDR, Msr);
-  @endcode
-  @note MSR_ATOM_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
-**/
-#define MSR_ATOM_MC3_ADDR                        0x0000040E
-
-
-/**
-  Shared. See Section 15.3.2.1, "IA32_MCi_CTL MSRs.".
-
-  @param  ECX  MSR_ATOM_MC4_CTL (0x00000410)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_ATOM_MC4_CTL);
-  AsmWriteMsr64 (MSR_ATOM_MC4_CTL, Msr);
-  @endcode
-  @note MSR_ATOM_MC4_CTL is defined as MSR_MC4_CTL in SDM.
-**/
-#define MSR_ATOM_MC4_CTL                         0x00000410
-
-
-/**
-  Shared. See Section 15.3.2.2, "IA32_MCi_STATUS MSRS.".
-
-  @param  ECX  MSR_ATOM_MC4_STATUS (0x00000411)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_ATOM_MC4_STATUS);
-  AsmWriteMsr64 (MSR_ATOM_MC4_STATUS, Msr);
-  @endcode
-  @note MSR_ATOM_MC4_STATUS is defined as MSR_MC4_STATUS in SDM.
-**/
-#define MSR_ATOM_MC4_STATUS                      0x00000411
-
-
-/**
-  Shared. See Section 15.3.2.3, "IA32_MCi_ADDR MSRs." The MSR_MC4_ADDR
-  register is either not implemented or contains no address if the ADDRV flag
-  in the MSR_MC4_STATUS register is clear. When not implemented in the
-  processor, all reads and writes to this MSR will cause a general-protection
-  exception.
-
-  @param  ECX  MSR_ATOM_MC4_ADDR (0x00000412)
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_ATOM_MC4_ADDR);
-  AsmWriteMsr64 (MSR_ATOM_MC4_ADDR, Msr);
-  @endcode
-  @note MSR_ATOM_MC4_ADDR is defined as MSR_MC4_ADDR in SDM.
-**/
-#define MSR_ATOM_MC4_ADDR                        0x00000412
 
 
 /**

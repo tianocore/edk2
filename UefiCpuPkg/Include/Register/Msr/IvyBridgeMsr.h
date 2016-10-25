@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-9.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.10.
 
 **/
 
@@ -198,6 +198,25 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_IVY_BRIDGE_PKG_CST_CONFIG_CONTROL_REGISTER;
+
+
+/**
+  Package. PP0 Energy Status (R/O)  See Section 14.9.4, "PP0/PP1 RAPL
+  Domains.".
+
+  @param  ECX  MSR_IVY_BRIDGE_PP0_ENERGY_STATUS (0x00000639)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_PP0_ENERGY_STATUS);
+  @endcode
+  @note MSR_IVY_BRIDGE_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
+**/
+#define MSR_IVY_BRIDGE_PP0_ENERGY_STATUS         0x00000639
 
 
 /**
@@ -813,313 +832,6 @@ typedef union {
 
 
 /**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.". Bank MC5 reports MC error from the Intel
-  QPI module.
-
-  * Bank MC6 reports MC error from the integrated I/O module.
-  * Banks MC7 and MC 8 report MC error from the two home agents.
-  * Banks MC9 through MC 16 report MC error from each channel of the integrated
-    memory controllers.
-  * Banks MC17 through MC31 reports MC error from a specific CBo
-    (core broadcast) and its corresponding slice of L3.
-
-  @param  ECX  MSR_IVY_BRIDGE_MCi_CTL
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_MC5_CTL);
-  AsmWriteMsr64 (MSR_IVY_BRIDGE_MC5_CTL, Msr);
-  @endcode
-  @note MSR_IVY_BRIDGE_MC5_CTL  is defined as MSR_MC5_CTL  in SDM.
-        MSR_IVY_BRIDGE_MC6_CTL  is defined as MSR_MC6_CTL  in SDM.
-        MSR_IVY_BRIDGE_MC7_CTL  is defined as MSR_MC7_CTL  in SDM.
-        MSR_IVY_BRIDGE_MC8_CTL  is defined as MSR_MC8_CTL  in SDM.
-        MSR_IVY_BRIDGE_MC9_CTL  is defined as MSR_MC9_CTL  in SDM.
-        MSR_IVY_BRIDGE_MC10_CTL is defined as MSR_MC10_CTL in SDM.
-        MSR_IVY_BRIDGE_MC11_CTL is defined as MSR_MC11_CTL in SDM.
-        MSR_IVY_BRIDGE_MC12_CTL is defined as MSR_MC12_CTL in SDM.
-        MSR_IVY_BRIDGE_MC13_CTL is defined as MSR_MC13_CTL in SDM.
-        MSR_IVY_BRIDGE_MC14_CTL is defined as MSR_MC14_CTL in SDM.
-        MSR_IVY_BRIDGE_MC15_CTL is defined as MSR_MC15_CTL in SDM.
-        MSR_IVY_BRIDGE_MC16_CTL is defined as MSR_MC16_CTL in SDM.
-        MSR_IVY_BRIDGE_MC17_CTL is defined as MSR_MC17_CTL in SDM.
-        MSR_IVY_BRIDGE_MC18_CTL is defined as MSR_MC18_CTL in SDM.
-        MSR_IVY_BRIDGE_MC19_CTL is defined as MSR_MC19_CTL in SDM.
-        MSR_IVY_BRIDGE_MC20_CTL is defined as MSR_MC20_CTL in SDM.
-        MSR_IVY_BRIDGE_MC21_CTL is defined as MSR_MC21_CTL in SDM.
-        MSR_IVY_BRIDGE_MC22_CTL is defined as MSR_MC22_CTL in SDM.
-        MSR_IVY_BRIDGE_MC23_CTL is defined as MSR_MC23_CTL in SDM.
-        MSR_IVY_BRIDGE_MC24_CTL is defined as MSR_MC24_CTL in SDM.
-        MSR_IVY_BRIDGE_MC25_CTL is defined as MSR_MC25_CTL in SDM.
-        MSR_IVY_BRIDGE_MC26_CTL is defined as MSR_MC26_CTL in SDM.
-        MSR_IVY_BRIDGE_MC27_CTL is defined as MSR_MC27_CTL in SDM.
-        MSR_IVY_BRIDGE_MC28_CTL is defined as MSR_MC28_CTL in SDM.
-        MSR_IVY_BRIDGE_MC29_CTL is defined as MSR_MC29_CTL in SDM.
-        MSR_IVY_BRIDGE_MC30_CTL is defined as MSR_MC30_CTL in SDM.
-        MSR_IVY_BRIDGE_MC31_CTL is defined as MSR_MC31_CTL in SDM.
-  @{
-**/
-#define MSR_IVY_BRIDGE_MC5_CTL                   0x00000414
-#define MSR_IVY_BRIDGE_MC6_CTL                   0x00000418
-#define MSR_IVY_BRIDGE_MC7_CTL                   0x0000041C
-#define MSR_IVY_BRIDGE_MC8_CTL                   0x00000420
-#define MSR_IVY_BRIDGE_MC9_CTL                   0x00000424
-#define MSR_IVY_BRIDGE_MC10_CTL                  0x00000428
-#define MSR_IVY_BRIDGE_MC11_CTL                  0x0000042C
-#define MSR_IVY_BRIDGE_MC12_CTL                  0x00000430
-#define MSR_IVY_BRIDGE_MC13_CTL                  0x00000434
-#define MSR_IVY_BRIDGE_MC14_CTL                  0x00000438
-#define MSR_IVY_BRIDGE_MC15_CTL                  0x0000043C
-#define MSR_IVY_BRIDGE_MC16_CTL                  0x00000440
-#define MSR_IVY_BRIDGE_MC17_CTL                  0x00000444
-#define MSR_IVY_BRIDGE_MC18_CTL                  0x00000448
-#define MSR_IVY_BRIDGE_MC19_CTL                  0x0000044C
-#define MSR_IVY_BRIDGE_MC20_CTL                  0x00000450
-#define MSR_IVY_BRIDGE_MC21_CTL                  0x00000454
-#define MSR_IVY_BRIDGE_MC22_CTL                  0x00000458
-#define MSR_IVY_BRIDGE_MC23_CTL                  0x0000045C
-#define MSR_IVY_BRIDGE_MC24_CTL                  0x00000460
-#define MSR_IVY_BRIDGE_MC25_CTL                  0x00000464
-#define MSR_IVY_BRIDGE_MC26_CTL                  0x00000468
-#define MSR_IVY_BRIDGE_MC27_CTL                  0x0000046C
-#define MSR_IVY_BRIDGE_MC28_CTL                  0x00000470
-#define MSR_IVY_BRIDGE_MC29_CTL                  0x00000474
-#define MSR_IVY_BRIDGE_MC30_CTL                  0x00000478
-#define MSR_IVY_BRIDGE_MC31_CTL                  0x0000047C
-/// @}
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  Bank MC20 reports MC error from a specific CBo (core broadcast) and
-  its corresponding slice of L3.
-
-  @param  ECX  MSR_IVY_BRIDGE_MCi_STATUS
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_MC5_STATUS);
-  AsmWriteMsr64 (MSR_IVY_BRIDGE_MC5_STATUS, Msr);
-  @endcode
-  @note MSR_IVY_BRIDGE_MC5_STATUS  is defined as MSR_MC5_STATUS  in SDM.
-        MSR_IVY_BRIDGE_MC6_STATUS  is defined as MSR_MC6_STATUS  in SDM.
-        MSR_IVY_BRIDGE_MC7_STATUS  is defined as MSR_MC7_STATUS  in SDM.
-        MSR_IVY_BRIDGE_MC8_STATUS  is defined as MSR_MC8_STATUS  in SDM.
-        MSR_IVY_BRIDGE_MC9_STATUS  is defined as MSR_MC9_STATUS  in SDM.
-        MSR_IVY_BRIDGE_MC10_STATUS is defined as MSR_MC10_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC11_STATUS is defined as MSR_MC11_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC12_STATUS is defined as MSR_MC12_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC13_STATUS is defined as MSR_MC13_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC14_STATUS is defined as MSR_MC14_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC15_STATUS is defined as MSR_MC15_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC16_STATUS is defined as MSR_MC16_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC17_STATUS is defined as MSR_MC17_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC18_STATUS is defined as MSR_MC18_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC19_STATUS is defined as MSR_MC19_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC20_STATUS is defined as MSR_MC20_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC21_STATUS is defined as MSR_MC21_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC22_STATUS is defined as MSR_MC22_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC23_STATUS is defined as MSR_MC23_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC24_STATUS is defined as MSR_MC24_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC25_STATUS is defined as MSR_MC25_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC26_STATUS is defined as MSR_MC26_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC27_STATUS is defined as MSR_MC27_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC28_STATUS is defined as MSR_MC28_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC29_STATUS is defined as MSR_MC29_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC30_STATUS is defined as MSR_MC30_STATUS in SDM.
-        MSR_IVY_BRIDGE_MC31_STATUS is defined as MSR_MC31_STATUS in SDM.
-  @{
-**/
-#define MSR_IVY_BRIDGE_MC5_STATUS                0x00000415
-#define MSR_IVY_BRIDGE_MC6_STATUS                0x00000419
-#define MSR_IVY_BRIDGE_MC7_STATUS                0x0000041D
-#define MSR_IVY_BRIDGE_MC8_STATUS                0x00000421
-#define MSR_IVY_BRIDGE_MC9_STATUS                0x00000425
-#define MSR_IVY_BRIDGE_MC10_STATUS               0x00000429
-#define MSR_IVY_BRIDGE_MC11_STATUS               0x0000042D
-#define MSR_IVY_BRIDGE_MC12_STATUS               0x00000431
-#define MSR_IVY_BRIDGE_MC13_STATUS               0x00000435
-#define MSR_IVY_BRIDGE_MC14_STATUS               0x00000439
-#define MSR_IVY_BRIDGE_MC15_STATUS               0x0000043D
-#define MSR_IVY_BRIDGE_MC16_STATUS               0x00000441
-#define MSR_IVY_BRIDGE_MC17_STATUS               0x00000445
-#define MSR_IVY_BRIDGE_MC18_STATUS               0x00000449
-#define MSR_IVY_BRIDGE_MC19_STATUS               0x0000044D
-#define MSR_IVY_BRIDGE_MC20_STATUS               0x00000451
-#define MSR_IVY_BRIDGE_MC21_STATUS               0x00000455
-#define MSR_IVY_BRIDGE_MC22_STATUS               0x00000459
-#define MSR_IVY_BRIDGE_MC23_STATUS               0x0000045D
-#define MSR_IVY_BRIDGE_MC24_STATUS               0x00000461
-#define MSR_IVY_BRIDGE_MC25_STATUS               0x00000465
-#define MSR_IVY_BRIDGE_MC26_STATUS               0x00000469
-#define MSR_IVY_BRIDGE_MC27_STATUS               0x0000046D
-#define MSR_IVY_BRIDGE_MC28_STATUS               0x00000471
-#define MSR_IVY_BRIDGE_MC29_STATUS               0x00000475
-#define MSR_IVY_BRIDGE_MC30_STATUS               0x00000479
-#define MSR_IVY_BRIDGE_MC31_STATUS               0x0000047D
-/// @}
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_IVY_BRIDGE_MCi_ADDR
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_MC5_ADDR);
-  AsmWriteMsr64 (MSR_IVY_BRIDGE_MC5_ADDR, Msr);
-  @endcode
-  @note MSR_IVY_BRIDGE_MC5_ADDR  is defined as MSR_MC5_ADDR  in SDM.
-        MSR_IVY_BRIDGE_MC6_ADDR  is defined as MSR_MC6_ADDR  in SDM.
-        MSR_IVY_BRIDGE_MC7_ADDR  is defined as MSR_MC7_ADDR  in SDM.
-        MSR_IVY_BRIDGE_MC8_ADDR  is defined as MSR_MC8_ADDR  in SDM.
-        MSR_IVY_BRIDGE_MC9_ADDR  is defined as MSR_MC9_ADDR  in SDM.
-        MSR_IVY_BRIDGE_MC10_ADDR is defined as MSR_MC10_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC11_ADDR is defined as MSR_MC11_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC12_ADDR is defined as MSR_MC12_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC13_ADDR is defined as MSR_MC13_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC14_ADDR is defined as MSR_MC14_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC15_ADDR is defined as MSR_MC15_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC16_ADDR is defined as MSR_MC16_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC17_ADDR is defined as MSR_MC17_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC18_ADDR is defined as MSR_MC18_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC19_ADDR is defined as MSR_MC19_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC20_ADDR is defined as MSR_MC20_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC21_ADDR is defined as MSR_MC21_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC22_ADDR is defined as MSR_MC22_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC23_ADDR is defined as MSR_MC23_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC24_ADDR is defined as MSR_MC24_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC25_ADDR is defined as MSR_MC25_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC26_ADDR is defined as MSR_MC26_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC27_ADDR is defined as MSR_MC27_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC28_ADDR is defined as MSR_MC28_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC29_ADDR is defined as MSR_MC29_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC30_ADDR is defined as MSR_MC30_ADDR in SDM.
-        MSR_IVY_BRIDGE_MC31_ADDR is defined as MSR_MC31_ADDR in SDM.
-  @{
-**/
-#define MSR_IVY_BRIDGE_MC5_ADDR                  0x00000416
-#define MSR_IVY_BRIDGE_MC6_ADDR                  0x0000041A
-#define MSR_IVY_BRIDGE_MC7_ADDR                  0x0000041E
-#define MSR_IVY_BRIDGE_MC8_ADDR                  0x00000422
-#define MSR_IVY_BRIDGE_MC9_ADDR                  0x00000426
-#define MSR_IVY_BRIDGE_MC10_ADDR                 0x0000042A
-#define MSR_IVY_BRIDGE_MC11_ADDR                 0x0000042E
-#define MSR_IVY_BRIDGE_MC12_ADDR                 0x00000432
-#define MSR_IVY_BRIDGE_MC13_ADDR                 0x00000436
-#define MSR_IVY_BRIDGE_MC14_ADDR                 0x0000043A
-#define MSR_IVY_BRIDGE_MC15_ADDR                 0x0000043E
-#define MSR_IVY_BRIDGE_MC16_ADDR                 0x00000442
-#define MSR_IVY_BRIDGE_MC17_ADDR                 0x00000446
-#define MSR_IVY_BRIDGE_MC18_ADDR                 0x0000044A
-#define MSR_IVY_BRIDGE_MC19_ADDR                 0x0000044E
-#define MSR_IVY_BRIDGE_MC20_ADDR                 0x00000452
-#define MSR_IVY_BRIDGE_MC21_ADDR                 0x00000456
-#define MSR_IVY_BRIDGE_MC22_ADDR                 0x0000045A
-#define MSR_IVY_BRIDGE_MC23_ADDR                 0x0000045E
-#define MSR_IVY_BRIDGE_MC24_ADDR                 0x00000462
-#define MSR_IVY_BRIDGE_MC25_ADDR                 0x00000466
-#define MSR_IVY_BRIDGE_MC26_ADDR                 0x0000046A
-#define MSR_IVY_BRIDGE_MC27_ADDR                 0x0000046E
-#define MSR_IVY_BRIDGE_MC28_ADDR                 0x00000472
-#define MSR_IVY_BRIDGE_MC29_ADDR                 0x00000476
-#define MSR_IVY_BRIDGE_MC30_ADDR                 0x0000047A
-#define MSR_IVY_BRIDGE_MC31_ADDR                 0x0000047E
-/// @}
-
-
-/**
-  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
-  15.3.2.4, "IA32_MCi_MISC MSRs.".
-
-  @param  ECX  MSR_IVY_BRIDGE_MCi_MISC
-  @param  EAX  Lower 32-bits of MSR value.
-  @param  EDX  Upper 32-bits of MSR value.
-
-  <b>Example usage</b>
-  @code
-  UINT64  Msr;
-
-  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_MC5_MISC);
-  AsmWriteMsr64 (MSR_IVY_BRIDGE_MC5_MISC, Msr);
-  @endcode
-  @note MSR_IVY_BRIDGE_MC5_MISC  is defined as MSR_MC5_MISC  in SDM.
-        MSR_IVY_BRIDGE_MC6_MISC  is defined as MSR_MC6_MISC  in SDM.
-        MSR_IVY_BRIDGE_MC7_MISC  is defined as MSR_MC7_MISC  in SDM.
-        MSR_IVY_BRIDGE_MC8_MISC  is defined as MSR_MC8_MISC  in SDM.
-        MSR_IVY_BRIDGE_MC9_MISC  is defined as MSR_MC9_MISC  in SDM.
-        MSR_IVY_BRIDGE_MC10_MISC is defined as MSR_MC10_MISC in SDM.
-        MSR_IVY_BRIDGE_MC11_MISC is defined as MSR_MC11_MISC in SDM.
-        MSR_IVY_BRIDGE_MC12_MISC is defined as MSR_MC12_MISC in SDM.
-        MSR_IVY_BRIDGE_MC13_MISC is defined as MSR_MC13_MISC in SDM.
-        MSR_IVY_BRIDGE_MC14_MISC is defined as MSR_MC14_MISC in SDM.
-        MSR_IVY_BRIDGE_MC15_MISC is defined as MSR_MC15_MISC in SDM.
-        MSR_IVY_BRIDGE_MC16_MISC is defined as MSR_MC16_MISC in SDM.
-        MSR_IVY_BRIDGE_MC17_MISC is defined as MSR_MC17_MISC in SDM.
-        MSR_IVY_BRIDGE_MC18_MISC is defined as MSR_MC18_MISC in SDM.
-        MSR_IVY_BRIDGE_MC19_MISC is defined as MSR_MC19_MISC in SDM.
-        MSR_IVY_BRIDGE_MC20_MISC is defined as MSR_MC20_MISC in SDM.
-        MSR_IVY_BRIDGE_MC21_MISC is defined as MSR_MC21_MISC in SDM.
-        MSR_IVY_BRIDGE_MC22_MISC is defined as MSR_MC22_MISC in SDM.
-        MSR_IVY_BRIDGE_MC23_MISC is defined as MSR_MC23_MISC in SDM.
-        MSR_IVY_BRIDGE_MC24_MISC is defined as MSR_MC24_MISC in SDM.
-        MSR_IVY_BRIDGE_MC25_MISC is defined as MSR_MC25_MISC in SDM.
-        MSR_IVY_BRIDGE_MC26_MISC is defined as MSR_MC26_MISC in SDM.
-        MSR_IVY_BRIDGE_MC27_MISC is defined as MSR_MC27_MISC in SDM.
-        MSR_IVY_BRIDGE_MC28_MISC is defined as MSR_MC28_MISC in SDM.
-        MSR_IVY_BRIDGE_MC29_MISC is defined as MSR_MC29_MISC in SDM.
-        MSR_IVY_BRIDGE_MC30_MISC is defined as MSR_MC30_MISC in SDM.
-        MSR_IVY_BRIDGE_MC31_MISC is defined as MSR_MC31_MISC in SDM.
-  @{
-**/
-#define MSR_IVY_BRIDGE_MC5_MISC                  0x00000417
-#define MSR_IVY_BRIDGE_MC6_MISC                  0x0000041B
-#define MSR_IVY_BRIDGE_MC7_MISC                  0x0000041F
-#define MSR_IVY_BRIDGE_MC8_MISC                  0x00000423
-#define MSR_IVY_BRIDGE_MC9_MISC                  0x00000427
-#define MSR_IVY_BRIDGE_MC10_MISC                 0x0000042B
-#define MSR_IVY_BRIDGE_MC11_MISC                 0x0000042F
-#define MSR_IVY_BRIDGE_MC12_MISC                 0x00000433
-#define MSR_IVY_BRIDGE_MC13_MISC                 0x00000437
-#define MSR_IVY_BRIDGE_MC14_MISC                 0x0000043B
-#define MSR_IVY_BRIDGE_MC15_MISC                 0x0000043F
-#define MSR_IVY_BRIDGE_MC16_MISC                 0x00000443
-#define MSR_IVY_BRIDGE_MC17_MISC                 0x00000447
-#define MSR_IVY_BRIDGE_MC18_MISC                 0x0000044B
-#define MSR_IVY_BRIDGE_MC19_MISC                 0x0000044F
-#define MSR_IVY_BRIDGE_MC20_MISC                 0x00000453
-#define MSR_IVY_BRIDGE_MC21_MISC                 0x00000457
-#define MSR_IVY_BRIDGE_MC22_MISC                 0x0000045B
-#define MSR_IVY_BRIDGE_MC23_MISC                 0x0000045F
-#define MSR_IVY_BRIDGE_MC24_MISC                 0x00000463
-#define MSR_IVY_BRIDGE_MC25_MISC                 0x00000467
-#define MSR_IVY_BRIDGE_MC26_MISC                 0x0000046B
-#define MSR_IVY_BRIDGE_MC27_MISC                 0x0000046F
-#define MSR_IVY_BRIDGE_MC28_MISC                 0x00000473
-#define MSR_IVY_BRIDGE_MC29_MISC                 0x00000477
-#define MSR_IVY_BRIDGE_MC30_MISC                 0x0000047B
-#define MSR_IVY_BRIDGE_MC31_MISC                 0x0000047F
-/// @}
-
-
-/**
   Package. Misc MAC information of Integrated I/O. (R/O) see Section 15.3.2.4.
 
   @param  ECX  MSR_IVY_BRIDGE_IA32_MC6_MISC (0x0000041B)
@@ -1170,6 +882,122 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_IVY_BRIDGE_IA32_MC6_MISC_REGISTER;
+
+
+/**
+  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
+  15.3.2.4, "IA32_MCi_MISC MSRs.".
+
+  Bank MC29 through MC31 reports MC error from a specific CBo (core broadcast)
+  and its corresponding slice of L3.
+
+  @param  ECX  MSR_IVY_BRIDGE_IA32_MCi_CTL
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_IA32_MC29_CTL);
+  AsmWriteMsr64 (MSR_IVY_BRIDGE_IA32_MC29_CTL, Msr);
+  @endcode
+  @note MSR_IVY_BRIDGE_IA32_MC29_CTL is defined as IA32_MC29_CTL in SDM.
+        MSR_IVY_BRIDGE_IA32_MC30_CTL is defined as IA32_MC30_CTL in SDM.
+        MSR_IVY_BRIDGE_IA32_MC31_CTL is defined as IA32_MC31_CTL in SDM.
+  @{
+**/
+#define MSR_IVY_BRIDGE_IA32_MC29_CTL             0x00000474
+#define MSR_IVY_BRIDGE_IA32_MC30_CTL             0x00000478
+#define MSR_IVY_BRIDGE_IA32_MC31_CTL             0x0000047C
+/// @}
+
+
+/**
+  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
+  15.3.2.4, "IA32_MCi_MISC MSRs.".
+
+  Bank MC29 through MC31 reports MC error from a specific CBo (core broadcast)
+  and its corresponding slice of L3.
+
+  @param  ECX  MSR_IVY_BRIDGE_IA32_MCi_STATUS
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_IA32_MC29_STATUS);
+  AsmWriteMsr64 (MSR_IVY_BRIDGE_IA32_MC29_STATUS, Msr);
+  @endcode
+  @note MSR_IVY_BRIDGE_IA32_MC29_STATUS is defined as IA32_MC29_STATUS in SDM.
+        MSR_IVY_BRIDGE_IA32_MC30_STATUS is defined as IA32_MC30_STATUS in SDM.
+        MSR_IVY_BRIDGE_IA32_MC31_STATUS is defined as IA32_MC31_STATUS in SDM.
+  @{
+**/
+#define MSR_IVY_BRIDGE_IA32_MC29_STATUS          0x00000475
+#define MSR_IVY_BRIDGE_IA32_MC30_STATUS          0x00000479
+#define MSR_IVY_BRIDGE_IA32_MC31_STATUS          0x0000047D
+/// @}
+
+
+/**
+  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
+  15.3.2.4, "IA32_MCi_MISC MSRs.".
+
+  Bank MC29 through MC31 reports MC error from a specific CBo (core broadcast)
+  and its corresponding slice of L3.
+
+  @param  ECX  MSR_IVY_BRIDGE_IA32_MCi_ADDR
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_IA32_MC29_ADDR);
+  AsmWriteMsr64 (MSR_IVY_BRIDGE_IA32_MC29_ADDR, Msr);
+  @endcode
+  @note MSR_IVY_BRIDGE_IA32_MC29_ADDR is defined as IA32_MC29_ADDR in SDM.
+        MSR_IVY_BRIDGE_IA32_MC30_ADDR is defined as IA32_MC30_ADDR in SDM.
+        MSR_IVY_BRIDGE_IA32_MC31_ADDR is defined as IA32_MC31_ADDR in SDM.
+  @{
+**/
+#define MSR_IVY_BRIDGE_IA32_MC29_ADDR            0x00000476
+#define MSR_IVY_BRIDGE_IA32_MC30_ADDR            0x0000047A
+#define MSR_IVY_BRIDGE_IA32_MC31_ADDR            0x0000047E
+/// @}
+
+
+/**
+  Package. See Section 15.3.2.1, "IA32_MCi_CTL MSRs." through Section
+  15.3.2.4, "IA32_MCi_MISC MSRs.".
+
+  Bank MC29 through MC31 reports MC error from a specific CBo (core broadcast)
+  and its corresponding slice of L3.
+
+  @param  ECX  MSR_IVY_BRIDGE_IA32_MCi_MISC
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_IVY_BRIDGE_IA32_MC29_MISC);
+  AsmWriteMsr64 (MSR_IVY_BRIDGE_IA32_MC29_MISC, Msr);
+  @endcode
+  @note MSR_IVY_BRIDGE_IA32_MC29_MISC is defined as IA32_MC29_MISC in SDM.
+        MSR_IVY_BRIDGE_IA32_MC30_MISC is defined as IA32_MC30_MISC in SDM.
+        MSR_IVY_BRIDGE_IA32_MC31_MISC is defined as IA32_MC31_MISC in SDM.
+  @{
+**/
+#define MSR_IVY_BRIDGE_IA32_MC29_MISC            0x00000477
+#define MSR_IVY_BRIDGE_IA32_MC30_MISC            0x0000047B
+#define MSR_IVY_BRIDGE_IA32_MC31_MISC            0x0000047F
+/// @}
 
 
 /**
@@ -1267,7 +1095,7 @@ typedef union {
 
 
 /**
-  Thread. See Section 18.7.1.1, "Precise Event Based Sampling (PEBS).".
+  Thread. See Section 18.8.1.1, "Precise Event Based Sampling (PEBS).".
 
   @param  ECX  MSR_IVY_BRIDGE_PEBS_ENABLE (0x000003F1)
   @param  EAX  Lower 32-bits of MSR value.

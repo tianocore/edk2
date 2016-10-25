@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-6.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.7.
 
 **/
 
