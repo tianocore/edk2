@@ -98,7 +98,8 @@ BootMonGetFileFromAsciiFileName (
   {
     FileEntry = BOOTMON_FS_FILE_FROM_LINK_THIS (Entry);
     if (FileEntry->Info != NULL) {
-      UnicodeStrToAsciiStr (FileEntry->Info->FileName, OpenFileAsciiFileName);
+      UnicodeStrToAsciiStrS (FileEntry->Info->FileName, OpenFileAsciiFileName,
+        MAX_NAME_LENGTH);
       AsciiFileNameToCompare = OpenFileAsciiFileName;
     } else {
       AsciiFileNameToCompare = FileEntry->HwDescription.Footer.Filename;

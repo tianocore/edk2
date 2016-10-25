@@ -304,7 +304,6 @@ SetFileName (
   IN  CONST CHAR16         *FileName
   )
 {
-  CHAR16           TruncFileName[MAX_NAME_LENGTH];
   CHAR8            AsciiFileName[MAX_NAME_LENGTH];
   BOOTMON_FS_FILE  *SameFile;
 
@@ -314,9 +313,7 @@ SetFileName (
     FileName++;
   }
 
-  StrnCpy (TruncFileName, FileName, MAX_NAME_LENGTH - 1);
-  TruncFileName[MAX_NAME_LENGTH - 1] = 0;
-  UnicodeStrToAsciiStr (TruncFileName, AsciiFileName);
+  UnicodeStrToAsciiStrS (FileName, AsciiFileName, MAX_NAME_LENGTH);
 
   if (BootMonGetFileFromAsciiFileName (
         File->Instance,
@@ -327,7 +324,8 @@ SetFileName (
     return EFI_ACCESS_DENIED;
   } else {
     // OK, change the filename.
-    AsciiStrToUnicodeStr (AsciiFileName, File->Info->FileName);
+    AsciiStrToUnicodeStrS (AsciiFileName, File->Info->FileName,
+      (File->Info->Size - SIZE_OF_EFI_FILE_INFO) / sizeof (CHAR16));
     return EFI_SUCCESS;
   }
 }

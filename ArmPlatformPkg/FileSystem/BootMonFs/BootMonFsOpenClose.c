@@ -101,7 +101,8 @@ WriteFileDescription (
   Description->Attributes = 1;
   Description->BlockStart = FileStart / BlockSize;
   Description->BlockEnd   = Description->BlockStart + (FileSize / BlockSize);
-  AsciiStrCpy (Description->Footer.Filename, FileName);
+  AsciiStrCpyS (Description->Footer.Filename,
+    sizeof Description->Footer.Filename, FileName);
 
 #ifdef MDE_CPU_ARM
   Description->Footer.Offset  = HW_IMAGE_FOOTER_OFFSET;
@@ -294,7 +295,7 @@ BootMonFsFlushFile (
   DiskIo    = Instance->DiskIo;
   BlockSize = Media->BlockSize;
 
-  UnicodeStrToAsciiStr (Info->FileName, AsciiFileName);
+  UnicodeStrToAsciiStrS (Info->FileName, AsciiFileName, MAX_NAME_LENGTH);
 
   // If the file doesn't exist then find a space for it
   if (File->HwDescription.RegionCount == 0) {
@@ -513,6 +514,7 @@ BootMonFsOpenFile (
   CHAR16               *Separator;
   CHAR8                *AsciiFileName;
   EFI_FILE_INFO        *Info;
+  UINTN                AsciiFileNameSize;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -621,15 +623,16 @@ BootMonFsOpenFile (
   //
   // BootMonFs interface requires ASCII filenames
   //
-  AsciiFileName = AllocatePool (StrLen (Path) + 1);
+  AsciiFileNameSize = StrLen (Path) + 1;
+  if (AsciiFileNameSize > MAX_NAME_LENGTH) {
+    AsciiFileNameSize = MAX_NAME_LENGTH;
+  }
+  AsciiFileName = AllocatePool (AsciiFileNameSize);
   if (AsciiFileName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error;
   }
-  UnicodeStrToAsciiStr (Path, AsciiFileName);
-  if (AsciiStrSize (AsciiFileName) > MAX_NAME_LENGTH) {
-   AsciiFileName[MAX_NAME_LENGTH - 1] = '\0';
-  }
+  UnicodeStrToAsciiStrS (Path, AsciiFileName, AsciiFileNameSize);
 
   if ((AsciiFileName[0] == '\0') ||
       (AsciiFileName[0] == '.' )    ) {
@@ -688,7 +691,7 @@ BootMonFsOpenFile (
 
     Info->FileSize     = BootMonFsGetImageLength (File);
     Info->PhysicalSize = BootMonFsGetPhysicalSize (File);
-    AsciiStrToUnicodeStr (AsciiFileName, Info->FileName);
+    AsciiStrToUnicodeStrS (AsciiFileName, Info->FileName, MAX_NAME_LENGTH);
 
     File->Info = Info;
     Info = NULL;
