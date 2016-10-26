@@ -46,6 +46,6 @@ NorFlashPlatformGetDevices (
   )
 {
   *NorFlashDescriptions = mNorFlashDevices;
-  *Count = sizeof (mNorFlashDevices) / sizeof (mNorFlashDevices[0]);
+  *Count = ARRAY_SIZE (mNorFlashDevices);
   return EFI_SUCCESS;
 }
