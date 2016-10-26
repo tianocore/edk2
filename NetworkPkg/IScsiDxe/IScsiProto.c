@@ -1091,12 +1091,47 @@ IScsiUpdateTargetAddress (
       break;
     }
 
-    if (!NET_IS_DIGIT (TargetAddress[0])) {
+    //
+    // RFC 3720 defines format of the TargetAddress=domainname[:port][,portal-group-tag]
+    // The domainname can be specified as either a DNS host name, adotted-decimal IPv4 address,
+    // or a bracketed IPv6 address as specified in [RFC2732].
+    //
+    if (NET_IS_DIGIT (TargetAddress[0])) {
       //
-      // The domainname of the target may be presented in three formats: a DNS host name,
-      // a dotted-decimal IPv4 address, or a bracketed IPv6 address. Only accept dotted
-      // IPv4 address.
+      // The domainname of the target is presented in a dotted-decimal IPv4 address format.
       //
+      IpStr = TargetAddress;
+
+      while ((*TargetAddress != '\0') && (*TargetAddress != ':') && (*TargetAddress != ',')) {
+        //
+        // NULL, ':', or ',' ends the IPv4 string.
+        //
+        TargetAddress++;
+      }
+    } else if (*TargetAddress == ISCSI_REDIRECT_ADDR_START_DELIMITER){
+      //
+      // The domainname of the target is presented in a bracketed IPv6 address format.
+      //
+      TargetAddress ++;
+      IpStr = TargetAddress;
+      while ((*TargetAddress != '\0') && (*TargetAddress != ISCSI_REDIRECT_ADDR_END_DELIMITER)) {
+        //
+        // ']' ends the IPv6 string.
+        //
+        TargetAddress++;
+      }
+
+      if (*TargetAddress != ISCSI_REDIRECT_ADDR_END_DELIMITER) {
+        continue;
+      }
+
+      *TargetAddress = '\0';
+      TargetAddress ++;
+
+    } else {
+      //
+      // The domainname of the target is presented in the format of a DNS host name.
+      // Temporary not supported.
       continue;
     }
 
@@ -1104,15 +1139,6 @@ IScsiUpdateTargetAddress (
     // Save the origial user setting which specifies the proxy/virtual iSCSI target.
     //
     NvData->OriginalTargetPort = NvData->TargetPort;
-
-    IpStr = TargetAddress;
-
-    while ((*TargetAddress != 0) && (*TargetAddress != ':') && (*TargetAddress != ',')) {
-      //
-      // NULL, ':', or ',' ends the IPv4 string.
-      //
-      TargetAddress++;
-    }
 
     if (*TargetAddress == ',') {
       //
@@ -1133,7 +1159,7 @@ IScsiUpdateTargetAddress (
       }
     } else {
       //
-      // The string only contains the IPv4 address. Use the well-known port.
+      // The string only contains the Target address. Use the well-known port.
       //
       NvData->TargetPort = ISCSI_WELL_KNOWN_PORT;
     }

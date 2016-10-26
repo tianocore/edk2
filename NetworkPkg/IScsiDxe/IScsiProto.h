@@ -1,7 +1,7 @@
 /** @file
   The header file of iSCSI Protocol that defines many specific data structures.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,6 +39,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define ISCSI_VERSION_MAX                       0x00
 #define ISCSI_VERSION_MIN                       0x00
+
+#define ISCSI_REDIRECT_ADDR_START_DELIMITER     '['
+#define ISCSI_REDIRECT_ADDR_END_DELIMITER       ']'
 
 #define ISCSI_KEY_AUTH_METHOD                   "AuthMethod"
 #define ISCSI_KEY_HEADER_DIGEST                 "HeaderDigest"
