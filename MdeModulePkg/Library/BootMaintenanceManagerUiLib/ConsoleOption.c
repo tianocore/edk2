@@ -567,7 +567,7 @@ LocateSerialIo (
     Vendor.Header.Type                = MESSAGING_DEVICE_PATH;
     Vendor.Header.SubType             = MSG_VENDOR_DP;
 
-    for (Index2 = 0; Index2 < (sizeof (TerminalTypeGuid) / sizeof (TerminalTypeGuid[0])); Index2++) {
+    for (Index2 = 0; Index2 < (ARRAY_SIZE (TerminalTypeGuid)); Index2++) {
       CopyMem (&Vendor.Guid, &TerminalTypeGuid[Index2], sizeof (EFI_GUID));
       SetDevicePathNodeLength (&Vendor.Header, sizeof (VENDOR_DEVICE_PATH));
       NewDevicePath = AppendDevicePathNode (
@@ -1131,21 +1131,21 @@ GetTerminalAttribute (
         break;
       }
     }
-    for (AttributeIndex = 0; AttributeIndex < sizeof (DataBitsList) / sizeof (DataBitsList[0]); AttributeIndex++) {
+    for (AttributeIndex = 0; AttributeIndex < ARRAY_SIZE (DataBitsList); AttributeIndex++) {
       if (NewTerminalContext->DataBits == (UINT64) (DataBitsList[AttributeIndex].Value)) {
         NewTerminalContext->DataBitsIndex = AttributeIndex;
         break;
       }
     }    
 
-    for (AttributeIndex = 0; AttributeIndex < sizeof (ParityList) / sizeof (ParityList[0]); AttributeIndex++) {
+    for (AttributeIndex = 0; AttributeIndex < ARRAY_SIZE (ParityList); AttributeIndex++) {
       if (NewTerminalContext->Parity == (UINT64) (ParityList[AttributeIndex].Value)) {
         NewTerminalContext->ParityIndex = AttributeIndex;
         break;
       }
     }
 
-    for (AttributeIndex = 0; AttributeIndex < sizeof (StopBitsList) / sizeof (StopBitsList[0]); AttributeIndex++) {
+    for (AttributeIndex = 0; AttributeIndex < ARRAY_SIZE (StopBitsList); AttributeIndex++) {
       if (NewTerminalContext->StopBits == (UINT64) (StopBitsList[AttributeIndex].Value)) {
         NewTerminalContext->StopBitsIndex = AttributeIndex;
         break;
