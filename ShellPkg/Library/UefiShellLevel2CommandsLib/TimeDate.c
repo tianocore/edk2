@@ -942,7 +942,7 @@ ShellCommandRunTimeZone (
         //
         if (ShellCommandLineGetFlag (Package, L"-f")) {
           for ( LoopVar = 0
-              ; LoopVar < sizeof (TimeZoneList) / sizeof (TimeZoneList[0])
+              ; LoopVar < ARRAY_SIZE (TimeZoneList)
               ; LoopVar++
              ){
             if (TheTime.TimeZone == TimeZoneList[LoopVar].TimeZone) {
