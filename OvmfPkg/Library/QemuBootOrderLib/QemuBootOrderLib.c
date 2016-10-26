@@ -707,7 +707,7 @@ TranslatePciOfwNodes (
   // Parse the OFW nodes starting with the first non-bridge node.
   //
   PciDevFun[1] = 0;
-  NumEntries = sizeof (PciDevFun) / sizeof (PciDevFun[0]);
+  NumEntries = ARRAY_SIZE (PciDevFun);
   if (ParseUnitAddressHexList (
         OfwNode[FirstNonBridge].UnitAddress,
         PciDevFun,
@@ -910,7 +910,7 @@ TranslatePciOfwNodes (
     UINT64 TargetLun[2];
 
     TargetLun[1] = 0;
-    NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
+    NumEntries = ARRAY_SIZE (TargetLun);
     if (ParseUnitAddressHexList (
           OfwNode[FirstNonBridge + 2].UnitAddress,
           TargetLun,
@@ -958,7 +958,7 @@ TranslatePciOfwNodes (
     UINTN  RequiredEntries;
     UINT8  *Eui64;
 
-    RequiredEntries = sizeof (Namespace) / sizeof (Namespace[0]);
+    RequiredEntries = ARRAY_SIZE (Namespace);
     NumEntries = RequiredEntries;
     if (ParseUnitAddressHexList (
           OfwNode[FirstNonBridge + 1].UnitAddress,
@@ -1145,7 +1145,7 @@ TranslateMmioOfwNodes (
     UINT64 TargetLun[2];
 
     TargetLun[1] = 0;
-    NumEntries = sizeof (TargetLun) / sizeof (TargetLun[0]);
+    NumEntries = ARRAY_SIZE (TargetLun);
     if (ParseUnitAddressHexList (
           OfwNode[2].UnitAddress,
           TargetLun,
@@ -1803,7 +1803,7 @@ SetBootOrderFromQemu (
   //
   // translate each OpenFirmware path
   //
-  TranslatedSize = sizeof (Translated) / sizeof (Translated[0]);
+  TranslatedSize = ARRAY_SIZE (Translated);
   Status = TranslateOfwPath (&FwCfgPtr, ExtraPciRoots, Translated,
              &TranslatedSize);
   while (Status == RETURN_SUCCESS ||
@@ -1835,7 +1835,7 @@ SetBootOrderFromQemu (
       } // scanned all active boot options
     }   // translation successful
 
-    TranslatedSize = sizeof (Translated) / sizeof (Translated[0]);
+    TranslatedSize = ARRAY_SIZE (Translated);
     Status = TranslateOfwPath (&FwCfgPtr, ExtraPciRoots, Translated,
                &TranslatedSize);
   } // scanning of OpenFirmware paths done
