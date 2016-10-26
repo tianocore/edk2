@@ -492,11 +492,17 @@ TimerDriverSetTimerPeriod (
   IN UINT64                   TimerPeriod
   )
 {
+  EFI_TPL                        Tpl;
   UINT64                         MainCounter;
   UINT64                         Delta;
   UINT64                         CurrentComparator;
   HPET_TIMER_MSI_ROUTE_REGISTER  HpetTimerMsiRoute;
-  
+
+  //
+  // Disable interrupts
+  //
+  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+
   //
   // Disable HPET timer when adjusting the timer period
   //
@@ -616,7 +622,12 @@ TimerDriverSetTimerPeriod (
   // is disabled.
   //
   HpetEnable (TRUE);
-  
+
+  //
+  // Restore interrupts
+  //
+  gBS->RestoreTPL (Tpl);
+
   return EFI_SUCCESS;
 }
 
