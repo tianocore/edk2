@@ -34,7 +34,7 @@ FV_REGION_INFO mRegionInfo[] = {
   {FixedPcdGet32 (PcdBiosRomBase), FixedPcdGet32 (PcdBiosRomSize), TRUE}
 };
 
-UINTN mRegionInfoCount = sizeof (mRegionInfo) / sizeof (mRegionInfo[0]);
+UINTN mRegionInfoCount = ARRAY_SIZE (mRegionInfo);
 
 FV_INPUT_DATA mInputData = {0};
 
