@@ -868,7 +868,7 @@ PciHostBridgeResourceAllocator (
       Resources[2] = PMem32Bridge;
       Resources[3] = Mem64Bridge;
       Resources[4] = PMem64Bridge;
-      DumpResourceMap (RootBridgeDev, Resources, sizeof (Resources) / sizeof (Resources[0]));
+      DumpResourceMap (RootBridgeDev, Resources, ARRAY_SIZE (Resources));
     );
 
     FreePool (AcpiConfig);
