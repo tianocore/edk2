@@ -183,7 +183,7 @@ LegacyBmBuildLegacyDevNameString (
     //
     CopyMem (StringBufferA, StringDesc, LEGACY_BM_BOOT_DESCRIPTION_LENGTH);
     StringBufferA[LEGACY_BM_BOOT_DESCRIPTION_LENGTH] = 0;
-    AsciiStrToUnicodeStrS (StringBufferA, StringBufferU, sizeof (StringBufferU) / sizeof (StringBufferU[0]));
+    AsciiStrToUnicodeStrS (StringBufferA, StringBufferU, ARRAY_SIZE (StringBufferU));
     Fmt   = L"%s";
     Type  = StringBufferU;
   }
