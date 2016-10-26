@@ -1371,7 +1371,7 @@ UpdatePlatformInformation (
                             );
 
          Data8 = MmioRead8 (PciD31F0RegBase + R_PCH_LPC_RID_CC);
-         count = sizeof (SBRevisionTable) / sizeof (SBRevisionTable[0]);
+         count = ARRAY_SIZE (SBRevisionTable);
          for (Index = 0; Index < count; Index++) {
            if(Data8 == SBRevisionTable[Index].RevId) {
               UnicodeSPrint (Buffer, sizeof (Buffer), L"%02x %a", Data8, SBRevisionTable[Index].String);
