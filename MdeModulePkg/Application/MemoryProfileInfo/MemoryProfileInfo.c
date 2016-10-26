@@ -343,16 +343,16 @@ ProfileActionToStr (
 
   if (IsForSmm) {
     ActionString = mSmmActionString;
-    ActionStringCount = sizeof (mSmmActionString) / sizeof (mSmmActionString[0]);
+    ActionStringCount = ARRAY_SIZE (mSmmActionString);
   } else {
     ActionString = mActionString;
-    ActionStringCount = sizeof (mActionString) / sizeof (mActionString[0]);
+    ActionStringCount = ARRAY_SIZE (mActionString);
   }
 
   if ((UINTN) (UINT32) Action < ActionStringCount) {
     return ActionString[Action];
   }
-  for (Index = 0; Index < sizeof (mExtActionString) / sizeof (mExtActionString[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mExtActionString); Index++) {
     if (mExtActionString[Index].Action == Action) {
       return mExtActionString[Index].String;
     }
