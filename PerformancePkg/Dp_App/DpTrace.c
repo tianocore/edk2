@@ -220,8 +220,8 @@ DumpAllTrace(
       ++Count;    // Count the number of records printed
 
       // If Handle is non-zero, see if we can determine a name for the driver
-      AsciiStrToUnicodeStrS (Measurement.Module, mGaugeString, sizeof (mGaugeString) / sizeof (mGaugeString[0])); // Use Module by default
-      AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, sizeof (mUnicodeToken) / sizeof (mUnicodeToken[0]));
+      AsciiStrToUnicodeStrS (Measurement.Module, mGaugeString, ARRAY_SIZE (mGaugeString)); // Use Module by default
+      AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, ARRAY_SIZE (mUnicodeToken));
       if (Measurement.Handle != NULL) {
         // See if the Handle is in the HandleBuffer
         for (TIndex = 0; TIndex < HandleCount; TIndex++) {
@@ -594,7 +594,7 @@ ProcessHandles(
         continue;
       }
       mGaugeString[0] = 0;    // Empty driver name by default
-      AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, sizeof (mUnicodeToken) / sizeof (mUnicodeToken[0]));
+      AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, ARRAY_SIZE (mUnicodeToken));
       // See if the Handle is in the HandleBuffer
       for (Index = 0; Index < HandleCount; Index++) {
         if (Measurement.Handle == HandleBuffer[Index]) {
@@ -777,8 +777,8 @@ ProcessGlobal(
                           &Measurement.EndTimeStamp,
                           &Measurement.Identifier)) != 0)
   {
-    AsciiStrToUnicodeStrS (Measurement.Module, mGaugeString, sizeof (mGaugeString) / sizeof (mGaugeString[0]));
-    AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, sizeof (mUnicodeToken) / sizeof (mUnicodeToken[0]));
+    AsciiStrToUnicodeStrS (Measurement.Module, mGaugeString, ARRAY_SIZE (mGaugeString));
+    AsciiStrToUnicodeStrS (Measurement.Token, mUnicodeToken, ARRAY_SIZE (mUnicodeToken));
     mGaugeString[25] = 0;
     mUnicodeToken[31] = 0;
     if ( ! ( IsPhase( &Measurement)  ||

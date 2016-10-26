@@ -114,7 +114,7 @@ InitialShellParamList( void )
   //
   // Allocate one more for the end tag.
   //
-  ListLength = sizeof (ParamList) / sizeof (ParamList[0]) + 1;  
+  ListLength = ARRAY_SIZE (ParamList) + 1;  
   DpParamList = AllocatePool (sizeof (SHELL_PARAM_ITEM) * ListLength);
   ASSERT (DpParamList != NULL);
   
