@@ -984,7 +984,7 @@ Returns:
   //The lower baud rate supported by the serial device will be selected without exceeding the unsupported BaudRate parameter
   // 
   
-  for (Index = 1; Index < (sizeof (mBaudRateCurrentSupport) / sizeof (mBaudRateCurrentSupport[0])); Index++) {
+  for (Index = 1; Index < (ARRAY_SIZE (mBaudRateCurrentSupport)); Index++) {
     if (BaudRate < mBaudRateCurrentSupport[Index]) {
       BaudRate = mBaudRateCurrentSupport[Index-1];
       break;
