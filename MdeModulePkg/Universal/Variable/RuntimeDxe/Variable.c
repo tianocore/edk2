@@ -4017,7 +4017,7 @@ VariableWriteServiceInitialize (
   }
 
   if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < sizeof (mVariableEntryProperty) / sizeof (mVariableEntryProperty[0]); Index++) {
+    for (Index = 0; Index < ARRAY_SIZE (mVariableEntryProperty); Index++) {
       VariableEntry = &mVariableEntryProperty[Index];
       Status = VarCheckLibVariablePropertySet (VariableEntry->Name, VariableEntry->Guid, &VariableEntry->VariableProperty);
       ASSERT_EFI_ERROR (Status);
