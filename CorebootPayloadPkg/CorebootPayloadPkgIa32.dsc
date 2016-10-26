@@ -88,6 +88,9 @@
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS      = /D MDEPKG_NDEBUG
 
+[BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+  MSFT:*_*_*_DLINK_FLAGS         = /ALIGN:4096
+
 ################################################################################
 #
 # SKU Identification section - list of all SKU IDs supported by this Platform.

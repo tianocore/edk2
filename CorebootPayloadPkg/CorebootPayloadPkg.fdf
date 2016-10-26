@@ -61,6 +61,7 @@ INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
 [FV.DXEFV]
 BlockSize          = 0x1000
+FvForceRebase      = FALSE
 FvAlignment        = 16
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
