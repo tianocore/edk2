@@ -372,13 +372,13 @@ PrioritizeBootMode (
   // Find the position of the current boot mode in our priority array
   //
   for ( CurrentIndex = 0;
-        CurrentIndex < sizeof (mBootModePriority) / sizeof (mBootModePriority[0]);
+        CurrentIndex < ARRAY_SIZE (mBootModePriority);
         CurrentIndex++) {
     if (mBootModePriority[CurrentIndex] == *CurrentBootMode) {
       break;
     }
   }
-  if (CurrentIndex >= sizeof (mBootModePriority) / sizeof (mBootModePriority[0])) {
+  if (CurrentIndex >= ARRAY_SIZE (mBootModePriority)) {
     return EFI_NOT_FOUND;
   }
 
@@ -386,7 +386,7 @@ PrioritizeBootMode (
   // Find the position of the new boot mode in our priority array
   //
   for ( NewIndex = 0;
-        NewIndex < sizeof (mBootModePriority) / sizeof (mBootModePriority[0]);
+        NewIndex < ARRAY_SIZE (mBootModePriority);
         NewIndex++) {
     if (mBootModePriority[NewIndex] == NewBootMode) {
       //
