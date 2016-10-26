@@ -49,7 +49,7 @@ SCAN_CODE_TO_SCREEN_OPERATION     gScanCodeToOperation[] = {
   }
 };
 
-UINTN mScanCodeNumber = sizeof (gScanCodeToOperation) / sizeof (gScanCodeToOperation[0]);
+UINTN mScanCodeNumber = ARRAY_SIZE (gScanCodeToOperation);
 
 SCREEN_OPERATION_T0_CONTROL_FLAG  gScreenOperationToControlFlag[] = {
   {
@@ -3248,7 +3248,7 @@ UiDisplayMenu (
       }
 
       for (Index = 0;
-           Index < sizeof (gScreenOperationToControlFlag) / sizeof (gScreenOperationToControlFlag[0]);
+           Index < ARRAY_SIZE (gScreenOperationToControlFlag);
            Index++
           ) {
         if (ScreenOperation == gScreenOperationToControlFlag[Index].ScreenOperation) {

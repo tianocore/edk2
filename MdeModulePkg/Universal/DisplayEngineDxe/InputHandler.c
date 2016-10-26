@@ -1070,14 +1070,14 @@ EnterCarriageReturn:
 
           if (ValidateFail) {
             UpdateStatusBar (INPUT_ERROR, TRUE);
-            ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
+            ASSERT (Count < ARRAY_SIZE (PreviousNumber));
             EditValue = PreviousNumber[Count];
             break;
           }
         } else {
           if (EditValue > Maximum) {
             UpdateStatusBar (INPUT_ERROR, TRUE);
-            ASSERT (Count < sizeof (PreviousNumber) / sizeof (PreviousNumber[0]));
+            ASSERT (Count < ARRAY_SIZE (PreviousNumber));
             EditValue = PreviousNumber[Count];
             break;
           }
@@ -1086,7 +1086,7 @@ EnterCarriageReturn:
         UpdateStatusBar (INPUT_ERROR, FALSE);
 
         Count++;
-        ASSERT (Count < (sizeof (PreviousNumber) / sizeof (PreviousNumber[0])));
+        ASSERT (Count < (ARRAY_SIZE (PreviousNumber)));
         PreviousNumber[Count] = EditValue;
 
         gST->ConOut->SetAttribute (gST->ConOut, GetHighlightTextColor ());
