@@ -415,7 +415,7 @@ InitializePciHostBridge (
     MemApertures[2] = &RootBridges[Index].PMem;
     MemApertures[3] = &RootBridges[Index].PMemAbove4G;
 
-    for (MemApertureIndex = 0; MemApertureIndex < sizeof (MemApertures) / sizeof (MemApertures[0]); MemApertureIndex++) {
+    for (MemApertureIndex = 0; MemApertureIndex < ARRAY_SIZE (MemApertures); MemApertureIndex++) {
       if (MemApertures[MemApertureIndex]->Base <= MemApertures[MemApertureIndex]->Limit) {
         Status = AddMemoryMappedIoSpace (
                    MemApertures[MemApertureIndex]->Base,
