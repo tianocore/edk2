@@ -1211,5 +1211,18 @@ typedef UINTN RETURN_STATUS;
   #define RETURN_ADDRESS(L)     ((VOID *) 0)
 #endif
 
+/**
+  Return the number of elements in an array.
+
+  @param  Array  An object of array type. Array is only used as an argument to
+                 the sizeof operator, therefore Array is never evaluated. The
+                 caller is responsible for ensuring that Array's type is not
+                 incomplete; that is, Array must have known constant size.
+
+  @return The number of elements in Array. The result has type UINTN.
+
+**/
+#define ARRAY_SIZE(Array) (sizeof (Array) / sizeof ((Array)[0]))
+
 #endif
 
