@@ -1752,7 +1752,7 @@ Returns:
   UINT8 ArrayLen;
 
   OpCode = (UINT8 *) (Packet->Cdb);
-  ArrayLen = (UINT8) (sizeof (gSupportedATAPICommands) / sizeof (gSupportedATAPICommands[0]));
+  ArrayLen = (UINT8) (ARRAY_SIZE (gSupportedATAPICommands));
 
   for (Index = 0; (Index < ArrayLen) && (CompareMem (&gSupportedATAPICommands[Index], &gEndTable, sizeof (SCSI_COMMAND_SET)) != 0); Index++) {
 
@@ -1995,7 +1995,7 @@ Returns:
   UINT8 ArrayLen;
 
   OpCode = (UINT8 *) (Packet->Cdb);
-  ArrayLen = (UINT8) (sizeof (gSupportedATAPICommands) / sizeof (gSupportedATAPICommands[0]));
+  ArrayLen = (UINT8) (ARRAY_SIZE (gSupportedATAPICommands));
 
   for (Index = 0; (Index < ArrayLen) && (CompareMem (&gSupportedATAPICommands[Index], &gEndTable, sizeof (SCSI_COMMAND_SET)) != 0); Index++) {
 
