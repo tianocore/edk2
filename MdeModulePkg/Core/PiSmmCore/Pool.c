@@ -42,7 +42,7 @@ SmmInitializeMemoryServices (
   //
   // Initialize Pool list
   //
-  for (Index = sizeof (mSmmPoolLists) / sizeof (*mSmmPoolLists); Index > 0;) {
+  for (Index = ARRAY_SIZE (mSmmPoolLists); Index > 0;) {
     InitializeListHead (&mSmmPoolLists[--Index]);
   }
   CurrentSmramRangesIndex = 0;

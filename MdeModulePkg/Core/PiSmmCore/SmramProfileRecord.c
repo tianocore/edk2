@@ -2670,7 +2670,7 @@ ProfileMemoryTypeToStr (
   )
 {
   UINTN     Index;
-  for (Index = 0; Index < sizeof (mMemoryTypeString) / sizeof (mMemoryTypeString[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mMemoryTypeString); Index++) {
     if (mMemoryTypeString[Index].MemoryType == MemoryType) {
       return mMemoryTypeString[Index].MemoryTypeStr;
     }
@@ -2697,12 +2697,12 @@ ProfileActionToStr (
   CHAR8     **ActionString;
 
   ActionString = mSmmActionString;
-  ActionStringCount = sizeof (mSmmActionString) / sizeof (mSmmActionString[0]);
+  ActionStringCount = ARRAY_SIZE (mSmmActionString);
 
   if ((UINTN) (UINT32) Action < ActionStringCount) {
     return ActionString[Action];
   }
-  for (Index = 0; Index < sizeof (mExtActionString) / sizeof (mExtActionString[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mExtActionString); Index++) {
     if (mExtActionString[Index].Action == Action) {
       return mExtActionString[Index].String;
     }
