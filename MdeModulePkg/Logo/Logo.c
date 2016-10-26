@@ -69,7 +69,7 @@ GetImage (
   }
 
   Current = *Instance;
-  if (Current >= sizeof (mLogos) / sizeof (mLogos[0])) {
+  if (Current >= ARRAY_SIZE (mLogos)) {
     return EFI_NOT_FOUND;
   }
 
