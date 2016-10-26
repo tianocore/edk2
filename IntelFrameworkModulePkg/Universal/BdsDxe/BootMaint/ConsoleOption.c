@@ -1167,21 +1167,21 @@ GetTerminalAttribute (
         break;
       }
     }
-    for (AttributeIndex = 0; AttributeIndex < sizeof (DataBitsList) / sizeof (DataBitsList[0]); AttributeIndex++) {
+    for (AttributeIndex = 0; AttributeIndex < ARRAY_SIZE (DataBitsList); AttributeIndex++) {
       if (NewTerminalContext->DataBits == (UINT64) (DataBitsList[AttributeIndex].Value)) {
         NewTerminalContext->DataBitsIndex = AttributeIndex;
         break;
       }
     }    
     
-    for (AttributeIndex = 0; AttributeIndex < sizeof (ParityList) / sizeof (ParityList[0]); AttributeIndex++) {
+    for (AttributeIndex = 0; AttributeIndex < ARRAY_SIZE (ParityList); AttributeIndex++) {
       if (NewTerminalContext->Parity == (UINT64) (ParityList[AttributeIndex].Value)) {
         NewTerminalContext->ParityIndex = AttributeIndex;
         break;
       }
     }            
     
-    for (AttributeIndex = 0; AttributeIndex < sizeof (StopBitsList) / sizeof (StopBitsList[0]); AttributeIndex++) {
+    for (AttributeIndex = 0; AttributeIndex < ARRAY_SIZE (StopBitsList); AttributeIndex++) {
       if (NewTerminalContext->StopBits == (UINT64) (StopBitsList[AttributeIndex].Value)) {
         NewTerminalContext->StopBitsIndex = AttributeIndex;
         break;

@@ -448,7 +448,7 @@ Var_UpdateConsoleOption (
       Vendor.Header.Type    = MESSAGING_DEVICE_PATH;
       Vendor.Header.SubType = MSG_VENDOR_DP;
       
-      ASSERT (NewTerminalContext->TerminalType < (sizeof (TerminalTypeGuid) / sizeof (TerminalTypeGuid[0])));
+      ASSERT (NewTerminalContext->TerminalType < (ARRAY_SIZE (TerminalTypeGuid)));
       CopyMem (
         &Vendor.Guid,
         &TerminalTypeGuid[NewTerminalContext->TerminalType],

@@ -206,7 +206,7 @@ GroupMultipleLegacyBootOption4SameType (
       //
       // Legacy Boot Option
       //
-      ASSERT ((((BBS_BBS_DEVICE_PATH *) BootOption->DevicePath)->DeviceType & 0xF) < sizeof (DeviceTypeIndex) / sizeof (DeviceTypeIndex[0]));
+      ASSERT ((((BBS_BBS_DEVICE_PATH *) BootOption->DevicePath)->DeviceType & 0xF) < ARRAY_SIZE (DeviceTypeIndex));
       NextIndex = &DeviceTypeIndex[((BBS_BBS_DEVICE_PATH *) BootOption->DevicePath)->DeviceType & 0xF];
 
       if (*NextIndex == (UINTN) -1) {
@@ -225,7 +225,7 @@ GroupMultipleLegacyBootOption4SameType (
         //
         // Update the DeviceTypeIndex array to reflect the right shift operation
         //
-        for (DeviceIndex = 0; DeviceIndex < sizeof (DeviceTypeIndex) / sizeof (DeviceTypeIndex[0]); DeviceIndex++) {
+        for (DeviceIndex = 0; DeviceIndex < ARRAY_SIZE (DeviceTypeIndex); DeviceIndex++) {
           if (DeviceTypeIndex[DeviceIndex] != (UINTN) -1 && DeviceTypeIndex[DeviceIndex] >= *NextIndex) {
             DeviceTypeIndex[DeviceIndex]++;
           }

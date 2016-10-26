@@ -305,7 +305,7 @@ CallBootManager (
                      HiiHandle,
                      0,
                      mDeviceTypeStr[
-                       MIN (DeviceType & 0xF, sizeof (mDeviceTypeStr) / sizeof (mDeviceTypeStr[0]) - 1)
+                       MIN (DeviceType & 0xF, ARRAY_SIZE (mDeviceTypeStr) - 1)
                        ],
                      NULL
                      );

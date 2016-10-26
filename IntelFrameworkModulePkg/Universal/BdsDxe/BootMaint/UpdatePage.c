@@ -830,7 +830,7 @@ UpdateConModePage (
     //
     UnicodeValueToString (ModeString, 0, Col, 0);
     PStr = &ModeString[0];
-    StrCatS (PStr, sizeof (ModeString) / sizeof (ModeString[0]), L" x ");
+    StrCatS (PStr, ARRAY_SIZE (ModeString), L" x ");
     PStr = PStr + StrLen (PStr);
     UnicodeValueToString (PStr , 0, Row, 0);
 
@@ -939,7 +939,7 @@ UpdateTerminalPage (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
-  for (Index = 0; Index < sizeof (DataBitsList) / sizeof (DataBitsList[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (DataBitsList); Index++) {
     CheckFlags = 0;
 
     if (DataBitsList[Index].Value == 8) {
@@ -972,7 +972,7 @@ UpdateTerminalPage (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
-  for (Index = 0; Index < sizeof (ParityList) / sizeof (ParityList[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (ParityList); Index++) {
     CheckFlags = 0;
     if (ParityList[Index].Value ==  NoParity) {
       CheckFlags |= EFI_IFR_OPTION_DEFAULT;
@@ -1004,7 +1004,7 @@ UpdateTerminalPage (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
-  for (Index = 0; Index < sizeof (StopBitsList) / sizeof (StopBitsList[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (StopBitsList); Index++) {
     CheckFlags = 0;
     if (StopBitsList[Index].Value == OneStopBit) {
       CheckFlags |= EFI_IFR_OPTION_DEFAULT;
@@ -1068,7 +1068,7 @@ UpdateTerminalPage (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
-  for (Index = 0; Index < sizeof (mFlowControlType) / sizeof (mFlowControlType[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mFlowControlType); Index++) {
   CheckFlags = 0;
     if (Index == 0) {
       CheckFlags |= EFI_IFR_OPTION_DEFAULT;

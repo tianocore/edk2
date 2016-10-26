@@ -1702,7 +1702,7 @@ GetLegacyDeviceOrder (
   LegacyOrder = NULL;
   OldData     = NULL;
   DisMap      = ZeroMem (CallbackData->BmmFakeNvData.DisableMap, sizeof (CallbackData->BmmFakeNvData.DisableMap));
-  PageNum     = sizeof (PageIdList) / sizeof (PageIdList[0]);
+  PageNum     = ARRAY_SIZE (PageIdList);
   VarData     = BdsLibGetVariableAndSize (
                   VAR_LEGACY_DEV_ORDER,
                   &gEfiLegacyDevOrderVariableGuid,
