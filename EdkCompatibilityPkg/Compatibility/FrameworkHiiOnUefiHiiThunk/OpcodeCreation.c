@@ -51,7 +51,7 @@ QuestionOpFwToUefi (
 {
   UINTN       Index;
 
-  for (Index = 0; Index < sizeof (QuestionOpcodeMap) / sizeof (QuestionOpcodeMap[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (QuestionOpcodeMap); Index++) {
     if (FwOp == QuestionOpcodeMap[Index].FrameworkIfrOp) {
       *UefiOp = QuestionOpcodeMap[Index].UefiIfrOp;
       return EFI_SUCCESS;
