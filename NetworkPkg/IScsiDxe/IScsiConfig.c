@@ -1111,7 +1111,7 @@ IScsiConfigUpdateAttempt (
   NET_LIST_FOR_EACH (Entry, &mPrivate->AttemptConfigs) {
     AttemptConfigData = NET_LIST_USER_STRUCT (Entry, ISCSI_ATTEMPT_CONFIG_NVDATA, Link);
 
-    AsciiStrToUnicodeStrS (AttemptConfigData->AttemptName, AttemptName, sizeof (AttemptName) / sizeof (AttemptName[0]));
+    AsciiStrToUnicodeStrS (AttemptConfigData->AttemptName, AttemptName, ARRAY_SIZE (AttemptName));
     UnicodeSPrint (mPrivate->PortString, (UINTN) 128, L"Attempt %s", AttemptName);
     AttemptConfigData->AttemptTitleToken = HiiSetString (
                                              mCallbackInfo->RegisteredHandle,
@@ -1240,7 +1240,7 @@ IScsiConfigDeleteAttempts (
       mPrivate->SinglePathCount--;
     }
 
-    AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
+    AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, ARRAY_SIZE (MacString));
 
     UnicodeSPrint (
       mPrivate->PortString,

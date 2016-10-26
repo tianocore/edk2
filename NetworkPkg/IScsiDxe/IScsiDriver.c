@@ -673,7 +673,7 @@ IScsiStart (
     Session->ConfigData = AttemptConfigData;
     Session->AuthType   = AttemptConfigData->AuthenticationType;
 
-    AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, sizeof (MacString) / sizeof (MacString[0]));
+    AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, ARRAY_SIZE (MacString));
     UnicodeSPrint (
       mPrivate->PortString,
       (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
