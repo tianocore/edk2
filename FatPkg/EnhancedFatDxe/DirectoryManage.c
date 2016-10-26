@@ -118,7 +118,7 @@ Returns:
     SetMem (LfnBuffer, sizeof (CHAR16) * LFN_CHAR_TOTAL * EntryCount, 0xff);
     Status = StrCpyS (
                LfnBuffer,
-               sizeof (LfnBuffer) / sizeof (LfnBuffer[0]),
+               ARRAY_SIZE (LfnBuffer),
                DirEnt->FileString
                );
     if (EFI_ERROR (Status)) {
@@ -360,7 +360,7 @@ Returns:
     FatGetFileNameViaCaseFlag (
       DirEnt,
       LfnBuffer,
-      sizeof (LfnBuffer) / sizeof (LfnBuffer[0])
+      ARRAY_SIZE (LfnBuffer)
       );
   }
 

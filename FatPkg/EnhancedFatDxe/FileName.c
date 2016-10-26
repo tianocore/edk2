@@ -310,7 +310,7 @@ Returns:
   // Lower case a copy of the string, if it matches the
   // original then the string is lower case
   //
-  StrCpyS (Buffer, sizeof (Buffer) / sizeof (Buffer[0]), Str);
+  StrCpyS (Buffer, ARRAY_SIZE (Buffer), Str);
   FatStrLwr (Buffer);
   if (StrCmp (Str, Buffer) == 0) {
     OutCaseFlag = InCaseFlag;
@@ -319,7 +319,7 @@ Returns:
   // Upper case a copy of the string, if it matches the
   // original then the string is upper case
   //
-  StrCpyS (Buffer, sizeof (Buffer) / sizeof (Buffer[0]), Str);
+  StrCpyS (Buffer, ARRAY_SIZE (Buffer), Str);
   FatStrUpr (Buffer);
   if (StrCmp (Str, Buffer) == 0) {
     OutCaseFlag = 0;

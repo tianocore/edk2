@@ -49,9 +49,9 @@ Returns:
   CHAR16  UpCasedLongFileName[EFI_PATH_STRING_LENGTH];
   StrnCpyS (
     UpCasedLongFileName,
-    sizeof (UpCasedLongFileName) / sizeof (UpCasedLongFileName[0]),
+    ARRAY_SIZE (UpCasedLongFileName),
     LongNameString,
-    sizeof (UpCasedLongFileName) / sizeof (UpCasedLongFileName[0]) - 1
+    ARRAY_SIZE (UpCasedLongFileName) - 1
     );
   FatStrUpr (UpCasedLongFileName);
   gBS->CalculateCrc32 (UpCasedLongFileName, StrSize (UpCasedLongFileName), &HashValue);
