@@ -797,7 +797,7 @@ TcpToSendData (
     Len   = TcpDataToSend (Tcb, Force);
     Seq   = Tcb->SndNxt;
 
-    ASSERT ((Tcb->State) < (sizeof (mTcpOutFlag) / sizeof (mTcpOutFlag[0])));
+    ASSERT ((Tcb->State) < (ARRAY_SIZE (mTcpOutFlag)));
     Flag  = mTcpOutFlag[Tcb->State];
 
     if ((Flag & TCP_FLG_SYN) != 0) {
