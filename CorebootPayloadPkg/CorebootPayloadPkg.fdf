@@ -52,7 +52,8 @@ INF CorebootModulePkg/SecCore/SecCore.inf
 
 INF MdeModulePkg/Core/Pei/PeiMain.inf
 INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-INF IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
+INF MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
+INF MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
 INF CorebootModulePkg/CbSupportPei/CbSupportPei.inf
 INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
@@ -82,7 +83,8 @@ READ_LOCK_STATUS   = TRUE
 #
 INF MdeModulePkg/Core/Dxe/DxeMain.inf
 INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
-INF IntelFrameworkModulePkg/Universal/StatusCode/RuntimeDxe/StatusCodeRuntimeDxe.inf
+INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 
 INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
