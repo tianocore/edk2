@@ -343,7 +343,7 @@ GroupMultipleLegacyBootOption4SameType (
       // Legacy Boot Option
       //
       DEBUG ((EFI_D_ERROR, "[BootManagerDxe] ==== Find Legacy Boot Option  0x%x! ==== \n", Index));
-      ASSERT ((((BBS_BBS_DEVICE_PATH *) BootOption.FilePath)->DeviceType & 0xF) < sizeof (DeviceTypeIndex) / sizeof (DeviceTypeIndex[0]));
+      ASSERT ((((BBS_BBS_DEVICE_PATH *) BootOption.FilePath)->DeviceType & 0xF) < ARRAY_SIZE (DeviceTypeIndex));
       NextIndex = &DeviceTypeIndex[((BBS_BBS_DEVICE_PATH *) BootOption.FilePath)->DeviceType & 0xF];
 
       if (*NextIndex == (UINTN) -1) {
@@ -362,7 +362,7 @@ GroupMultipleLegacyBootOption4SameType (
         //
         // Update the DeviceTypeIndex array to reflect the right shift operation
         //
-        for (DeviceIndex = 0; DeviceIndex < sizeof (DeviceTypeIndex) / sizeof (DeviceTypeIndex[0]); DeviceIndex++) {
+        for (DeviceIndex = 0; DeviceIndex < ARRAY_SIZE (DeviceTypeIndex); DeviceIndex++) {
           if (DeviceTypeIndex[DeviceIndex] != (UINTN) -1 && DeviceTypeIndex[DeviceIndex] >= *NextIndex) {
             DeviceTypeIndex[DeviceIndex]++;
           }
@@ -526,7 +526,7 @@ UpdateBootManager (
                      HiiHandle,
                      0,
                      mDeviceTypeStr[
-                       MIN (DeviceType & 0xF, sizeof (mDeviceTypeStr) / sizeof (mDeviceTypeStr[0]) - 1)
+                       MIN (DeviceType & 0xF, ARRAY_SIZE (mDeviceTypeStr) - 1)
                        ],
                      NULL
                      );
