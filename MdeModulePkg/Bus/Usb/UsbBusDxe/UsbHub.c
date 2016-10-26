@@ -884,7 +884,7 @@ UsbHubClearPortChange (
   // It may lead to extra port state report. USB bus should
   // be able to handle this.
   //
-  for (Index = 0; Index < sizeof (mHubFeatureMap) / sizeof (mHubFeatureMap[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mHubFeatureMap); Index++) {
     Map = &mHubFeatureMap[Index];
 
     if (USB_BIT_IS_SET (PortState.PortChangeStatus, Map->ChangedBit)) {
@@ -1180,7 +1180,7 @@ UsbRootHubClearPortChange (
   // It may lead to extra port state report. USB bus should
   // be able to handle this.
   //
-  for (Index = 0; Index < sizeof (mRootHubFeatureMap) / sizeof (mRootHubFeatureMap[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mRootHubFeatureMap); Index++) {
     Map = &mRootHubFeatureMap[Index];
 
     if (USB_BIT_IS_SET (PortState.PortChangeStatus, Map->ChangedBit)) {
