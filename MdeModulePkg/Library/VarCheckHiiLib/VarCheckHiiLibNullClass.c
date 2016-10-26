@@ -318,7 +318,7 @@ HiiOpCodeToStr (
   )
 {
   UINTN     Index;
-  for (Index = 0; Index < sizeof (mHiiOpCodeStringTable) / sizeof (mHiiOpCodeStringTable[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mHiiOpCodeStringTable); Index++) {
     if (mHiiOpCodeStringTable[Index].HiiOpCode == HiiOpCode) {
       return mHiiOpCodeStringTable[Index].HiiOpCodeStr;
     }

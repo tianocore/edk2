@@ -57,7 +57,7 @@ IfrOpCodeToStr (
   )
 {
   UINTN  Index;
-  for (Index = 0; Index < sizeof (mIfrOpCodeStringTable) / sizeof (mIfrOpCodeStringTable[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mIfrOpCodeStringTable); Index++) {
     if (mIfrOpCodeStringTable[Index].HiiOpCode == IfrOpCode) {
       return mIfrOpCodeStringTable[Index].HiiOpCodeStr;
     }
@@ -96,7 +96,7 @@ HiiPackageTypeToStr (
   )
 {
   UINTN     Index;
-  for (Index = 0; Index < sizeof (mPackageTypeStringTable) / sizeof (mPackageTypeStringTable[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mPackageTypeStringTable); Index++) {
     if (mPackageTypeStringTable[Index].PackageType == PackageType) {
       return mPackageTypeStringTable[Index].PackageTypeStr;
     }
