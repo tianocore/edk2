@@ -155,7 +155,7 @@ QEMU_VIDEO_CIRRUS_MODES  QemuVideoCirrusModes[] = {
 };
 
 #define QEMU_VIDEO_CIRRUS_MODE_COUNT \
-  (sizeof (QemuVideoCirrusModes) / sizeof (QemuVideoCirrusModes[0]))
+  (ARRAY_SIZE (QemuVideoCirrusModes))
 
 /**
   Construct the valid video modes for QemuVideo.
@@ -247,7 +247,7 @@ QEMU_VIDEO_BOCHS_MODES  QemuVideoBochsModes[] = {
 };
 
 #define QEMU_VIDEO_BOCHS_MODE_COUNT \
-  (sizeof (QemuVideoBochsModes) / sizeof (QemuVideoBochsModes[0]))
+  (ARRAY_SIZE (QemuVideoBochsModes))
 
 EFI_STATUS
 QemuVideoBochsModeSetup (
