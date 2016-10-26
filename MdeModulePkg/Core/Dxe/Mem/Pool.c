@@ -58,7 +58,7 @@ STATIC CONST UINT16 mPoolSizeTable[] = {
 #define SIZE_TO_LIST(a)   (GetPoolIndexFromSize (a))
 #define LIST_TO_SIZE(a)   (mPoolSizeTable [a])
 
-#define MAX_POOL_LIST     (sizeof (mPoolSizeTable) / sizeof (mPoolSizeTable[0]))
+#define MAX_POOL_LIST     (ARRAY_SIZE (mPoolSizeTable))
 
 #define MAX_POOL_SIZE     (MAX_ADDRESS - POOL_OVERHEAD)
 
