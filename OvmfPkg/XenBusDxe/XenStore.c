@@ -713,7 +713,9 @@ static XenStoreErrors gXenStoreErrors[] = {
   { XENSTORE_STATUS_EISCONN, "EISCONN" },
   { XENSTORE_STATUS_E2BIG, "E2BIG" }
 };
+#ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+#endif
 
 STATIC
 XENSTORE_STATUS
