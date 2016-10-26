@@ -397,8 +397,8 @@ GetCodeTypeStr (
   UINT8     CodeType
   )
 {
-  if (CodeType >= sizeof (mCodeTypeStr) / sizeof (*mCodeTypeStr)) {
-    CodeType = sizeof (mCodeTypeStr) / sizeof (*mCodeTypeStr) - 1;
+  if (CodeType >= ARRAY_SIZE (mCodeTypeStr)) {
+    CodeType = ARRAY_SIZE (mCodeTypeStr) - 1;
   }
   return mCodeTypeStr[CodeType];
 }

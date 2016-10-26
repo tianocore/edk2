@@ -470,7 +470,7 @@ static const IFR_PARSE_TABLE_ENTRY  mIfrParseTable[] = {
     IfrParse2A
   },
 };
-#define PARSE_TABLE_ENTRIES (sizeof (mIfrParseTable) / sizeof (mIfrParseTable[0]))
+#define PARSE_TABLE_ENTRIES (ARRAY_SIZE (mIfrParseTable))
 
 static
 STATUS
