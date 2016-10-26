@@ -72,7 +72,7 @@ static EFI_FLASH_AREA_DATA          mFlashAreaData[]  = {
 
 };
 
-#define NUM_FLASH_AREA_DATA (sizeof (mFlashAreaData) / sizeof (mFlashAreaData[0]))
+#define NUM_FLASH_AREA_DATA (ARRAY_SIZE (mFlashAreaData))
 
 /**
   Build GUID HOBs for platform specific flash map.
