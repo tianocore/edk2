@@ -421,7 +421,7 @@ AuthVariableLibInitialize (
   AuthVarLibContextOut->StructVersion = AUTH_VAR_LIB_CONTEXT_OUT_STRUCT_VERSION;
   AuthVarLibContextOut->StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_OUT);
   AuthVarLibContextOut->AuthVarEntry = mAuthVarEntry;
-  AuthVarLibContextOut->AuthVarEntryCount = sizeof (mAuthVarEntry) / sizeof (mAuthVarEntry[0]);
+  AuthVarLibContextOut->AuthVarEntryCount = ARRAY_SIZE (mAuthVarEntry);
   mAuthVarAddressPointer[0] = (VOID **) &mPubKeyStore;
   mAuthVarAddressPointer[1] = (VOID **) &mCertDbStore;
   mAuthVarAddressPointer[2] = (VOID **) &mHashCtx;
@@ -433,7 +433,7 @@ AuthVariableLibInitialize (
   mAuthVarAddressPointer[8] = (VOID **) &(mAuthVarLibContextIn->CheckRemainingSpaceForConsistency),
   mAuthVarAddressPointer[9] = (VOID **) &(mAuthVarLibContextIn->AtRuntime),
   AuthVarLibContextOut->AddressPointer = mAuthVarAddressPointer;
-  AuthVarLibContextOut->AddressPointerCount = sizeof (mAuthVarAddressPointer) / sizeof (mAuthVarAddressPointer[0]);
+  AuthVarLibContextOut->AddressPointerCount = ARRAY_SIZE (mAuthVarAddressPointer);
 
   return Status;
 }
