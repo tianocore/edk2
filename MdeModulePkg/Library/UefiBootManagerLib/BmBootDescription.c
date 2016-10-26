@@ -632,7 +632,7 @@ BmGetBootDescription (
   // Firstly get the default boot description
   //
   DefaultDescription = NULL;
-  for (Index = 0; Index < sizeof (mBmBootDescriptionHandlers) / sizeof (mBmBootDescriptionHandlers[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mBmBootDescriptionHandlers); Index++) {
     DefaultDescription = mBmBootDescriptionHandlers[Index] (Handle);
     if (DefaultDescription != NULL) {
       //

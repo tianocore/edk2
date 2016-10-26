@@ -796,7 +796,7 @@ EfiBootManagerIsValidLoadOptionVariableName (
     return FALSE;
   }
 
-  for (Index = 0; Index < sizeof (mBmLoadOptionName) / sizeof (mBmLoadOptionName[0]); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mBmLoadOptionName); Index++) {
     if ((VariableNameLen - 4 == StrLen (mBmLoadOptionName[Index])) &&
         (StrnCmp (VariableName, mBmLoadOptionName[Index], VariableNameLen - 4) == 0)
         ) {
@@ -804,7 +804,7 @@ EfiBootManagerIsValidLoadOptionVariableName (
     }
   }
 
-  if (Index == sizeof (mBmLoadOptionName) / sizeof (mBmLoadOptionName[0])) {
+  if (Index == ARRAY_SIZE (mBmLoadOptionName)) {
     return FALSE;
   }
 
