@@ -4216,7 +4216,7 @@ ExecuteDataManip (
   //
   DataManipDispatchTableIndex = (Opcode & OPCODE_M_OPCODE) - OPCODE_NOT;
   if ((DataManipDispatchTableIndex < 0) ||
-      (DataManipDispatchTableIndex >= sizeof (mDataManipDispatchTable) / sizeof (mDataManipDispatchTable[0]))) {
+      (DataManipDispatchTableIndex >= ARRAY_SIZE (mDataManipDispatchTable))) {
     EbcDebugSignalException (
       EXCEPT_EBC_INVALID_OPCODE,
       EXCEPTION_FLAG_ERROR,
