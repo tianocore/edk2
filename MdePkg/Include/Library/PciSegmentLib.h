@@ -23,7 +23,7 @@
   access method.  Modules will typically use the PCI Segment Library for its PCI configuration 
   accesses when PCI Segments other than Segment #0 must be accessed.  
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -56,11 +56,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #define PCI_SEGMENT_LIB_ADDRESS(Segment,Bus,Device,Function,Register) \
-  ( ((Register) & 0xfff)              | \
-    (((Function) & 0x07) << 12)       | \
-    (((Device) & 0x1f) << 15)         | \
-    (((Bus) & 0xff) << 20)            | \
-    (LShiftU64((Segment) & 0xffff, 32)) \
+  ((Segment != 0) ? \
+    ( ((Register) & 0xfff)                 | \
+      (((Function) & 0x07) << 12)          | \
+      (((Device) & 0x1f) << 15)            | \
+      (((Bus) & 0xff) << 20)               | \
+      (LShiftU64 ((Segment) & 0xffff, 32))   \
+    ) :                                      \
+    ( ((Register) & 0xfff)                 | \
+      (((Function) & 0x07) << 12)          | \
+      (((Device) & 0x1f) << 15)            | \
+      (((Bus) & 0xff) << 20)                 \
+    )                                        \
   )
 
 /**
