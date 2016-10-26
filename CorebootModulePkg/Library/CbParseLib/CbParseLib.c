@@ -2,7 +2,7 @@
   This library will parse the coreboot table in memory and extract those required
   information.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -229,18 +229,17 @@ FindCbMemTable (
 /**
   Acquire the memory information from the coreboot table in memory.
 
-  @param  pLowMemorySize     Pointer to the variable of low memory size
-  @param  pHighMemorySize    Pointer to the variable of high memory size
+  @param  MemInfoCallback     The callback routine
+  @param  pParam              Pointer to the callback routine parameter
 
   @retval RETURN_SUCCESS     Successfully find out the memory information.
-  @retval RETURN_INVALID_PARAMETER    Invalid input parameters.
   @retval RETURN_NOT_FOUND   Failed to find the memory information.
 
 **/
 RETURN_STATUS
 CbParseMemoryInfo (
-  OUT UINT64     *pLowMemorySize,
-  OUT UINT64     *pHighMemorySize
+  IN  CB_MEM_INFO_CALLBACK  MemInfoCallback,
+  IN  VOID                  *pParam
   )
 {
   struct cb_memory         *rec;
@@ -248,10 +247,6 @@ CbParseMemoryInfo (
   UINT64                   Start;
   UINT64                   Size;
   UINTN                    Index;
-
-  if ((pLowMemorySize == NULL) || (pHighMemorySize == NULL)) {
-    return RETURN_INVALID_PARAMETER;
-  }
 
   //
   // Get the coreboot memory table
@@ -265,9 +260,6 @@ CbParseMemoryInfo (
     return RETURN_NOT_FOUND;
   }
 
-  *pLowMemorySize = 0;
-  *pHighMemorySize = 0;
-
   for (Index = 0; Index < MEM_RANGE_COUNT(rec); Index++) {
     Range = MEM_RANGE_PTR(rec, Index);
     Start = cb_unpack64(Range->start);
@@ -275,18 +267,8 @@ CbParseMemoryInfo (
     DEBUG ((EFI_D_INFO, "%d. %016lx - %016lx [%02x]\n",
             Index, Start, Start + Size - 1, Range->type));
 
-    if (Range->type != CB_MEM_RAM) {
-      continue;
-    }
-
-    if (Start + Size < 0x100000000ULL) {
-      *pLowMemorySize = Start + Size;
-    } else {
-      *pHighMemorySize = Start + Size - 0x100000000ULL;
-    }
+    MemInfoCallback (Start, Size, Range->type, pParam);
   }
-
-  DEBUG ((EFI_D_INFO, "Low memory 0x%lx, High Memory 0x%lx\n", *pLowMemorySize, *pHighMemorySize));
 
   return RETURN_SUCCESS;
 }

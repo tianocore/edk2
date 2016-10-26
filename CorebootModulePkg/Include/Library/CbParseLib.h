@@ -14,21 +14,23 @@
 **/
 #include <Guid/FrameBufferInfoGuid.h>
 
+typedef RETURN_STATUS \
+        (*CB_MEM_INFO_CALLBACK) (UINT64 Base, UINT64 Size, UINT32 Type, VOID *Param);
+
 /**
   Acquire the memory information from the coreboot table in memory.
 
-  @param  pLowMemorySize     Pointer to the variable of low memory size
-  @param  pHighMemorySize    Pointer to the variable of high memory size
+  @param  MemInfoCallback     The callback routine
+  @param  pParam              Pointer to the callback routine parameter
 
   @retval RETURN_SUCCESS     Successfully find out the memory information.
-  @retval RETURN_INVALID_PARAMETER    Invalid input parameters.
   @retval RETURN_NOT_FOUND   Failed to find the memory information.
 
 **/
 RETURN_STATUS
 CbParseMemoryInfo (
-  IN UINT64*    pLowMemorySize,
-  IN UINT64*    pHighMemorySize
+  IN  CB_MEM_INFO_CALLBACK  MemInfoCallback,
+  IN  VOID                  *pParam
   );
 
 /**

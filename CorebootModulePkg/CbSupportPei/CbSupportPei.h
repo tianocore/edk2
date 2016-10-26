@@ -38,5 +38,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/AcpiBoardInfoGuid.h>
 
 #include <Ppi/MasterBootMode.h>
+#include "Coreboot.h"
+
+typedef struct {
+  UINT32  UsableLowMemTop;
+  UINT32  SystemLowMemTop;
+} CB_MEM_INFO;
 
 #endif
