@@ -393,8 +393,6 @@ DhcpLeaseAcquired (
   IN OUT DHCP_SERVICE           *DhcpSb
   )
 {
-  INTN                      Class;
-
   DhcpSb->ClientAddr = EFI_NTOHL (DhcpSb->Selected->Dhcp4.Header.YourAddr);
 
   if (DhcpSb->Para != NULL) {
@@ -403,9 +401,7 @@ DhcpLeaseAcquired (
   }
 
   if (DhcpSb->Netmask == 0) {
-    Class           = NetGetIpClass (DhcpSb->ClientAddr);
-    ASSERT (Class < IP4_ADDR_CLASSE);
-    DhcpSb->Netmask = gIp4AllMasks[Class << 3];
+    return EFI_ABORTED;
   }
 
   if (DhcpSb->LeaseIoPort != NULL) {

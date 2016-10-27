@@ -1,7 +1,7 @@
 /** @file
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -171,9 +171,9 @@ Udp4Configure (
 
 
     if (!UdpConfigData->UseDefaultAddress &&
-      (!IP4_IS_VALID_NETMASK (SubnetMask) ||
-      !((StationAddress == 0) || NetIp4IsUnicast (StationAddress, SubnetMask)) ||
-      !((RemoteAddress  == 0) || NetIp4IsUnicast (RemoteAddress, 0)))) {
+        (!IP4_IS_VALID_NETMASK (SubnetMask) ||
+         !((StationAddress == 0) || NetIp4IsUnicast (StationAddress, SubnetMask)) ||
+         IP4_IS_LOCAL_BROADCAST (RemoteAddress))) {
       //
       // Don't use default address, and subnet mask is invalid or StationAddress is not
       // a valid unicast IPv4 address or RemoteAddress is not a valid unicast IPv4 address

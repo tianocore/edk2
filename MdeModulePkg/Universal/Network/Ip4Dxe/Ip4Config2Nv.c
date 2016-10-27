@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to Ip4.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -608,20 +608,20 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
     //
     Ip4NvData->Policy = Ip4Config2PolicyStatic;
 
-    Status = Ip4Config2StrToIp (IfrFormNvData->StationAddress, &StationAddress.v4);
-    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), 0)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
-      return EFI_INVALID_PARAMETER;
-    }
-    
     Status = Ip4Config2StrToIp (IfrFormNvData->SubnetMask, &SubnetMask.v4);
     if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (GetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
       return EFI_INVALID_PARAMETER;
     }
+
+    Status = Ip4Config2StrToIp (IfrFormNvData->StationAddress, &StationAddress.v4);
+    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), NTOHL (SubnetMask.Addr[0]))) {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
+      return EFI_INVALID_PARAMETER;
+    }
     
     Status = Ip4Config2StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
-    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), NTOHL (SubnetMask.Addr[0])))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
       return EFI_INVALID_PARAMETER;
     }
@@ -630,7 +630,7 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
     if (!EFI_ERROR (Status) && DnsCount > 0) {
       for (Index = 0; Index < DnsCount; Index ++) {
         CopyMem (&Ip, &DnsAddress[Index], sizeof (IP4_ADDR));
-        if (!NetIp4IsUnicast (NTOHL (Ip), 0)) {
+        if (IP4_IS_UNSPECIFIED (NTOHL (Ip)) || IP4_IS_LOCAL_BROADCAST (NTOHL (Ip))) {
           CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Dns Server!", NULL);
           FreePool(DnsAddress);
           return EFI_INVALID_PARAMETER;
@@ -1146,7 +1146,7 @@ Ip4FormCallback (
     switch (QuestionId) {
     case KEY_LOCAL_IP:
       Status = Ip4Config2StrToIp (IfrFormNvData->StationAddress, &StationAddress.v4);
-      if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), 0)) {
+      if (EFI_ERROR (Status) || IP4_IS_UNSPECIFIED (NTOHL (StationAddress.Addr[0])) || IP4_IS_LOCAL_BROADCAST (NTOHL (StationAddress.Addr[0]))) {
         CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
         Status = EFI_INVALID_PARAMETER;
       }
@@ -1162,7 +1162,7 @@ Ip4FormCallback (
 
     case KEY_GATE_WAY:
       Status = Ip4Config2StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
-      if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+      if (EFI_ERROR (Status) || IP4_IS_LOCAL_BROADCAST(NTOHL(Gateway.Addr[0]))) {
         CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
         Status = EFI_INVALID_PARAMETER;
       }
@@ -1173,7 +1173,7 @@ Ip4FormCallback (
       if (!EFI_ERROR (Status) && DnsCount > 0) {
         for (Index = 0; Index < DnsCount; Index ++) {
           CopyMem (&Ip, &DnsAddress[Index], sizeof (IP4_ADDR));
-          if (!NetIp4IsUnicast (NTOHL (Ip), 0)) {
+          if (IP4_IS_UNSPECIFIED (NTOHL (Ip)) || IP4_IS_LOCAL_BROADCAST (NTOHL (Ip))) {
             CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Dns Server!", NULL);
             Status = EFI_INVALID_PARAMETER;
             break;
