@@ -1,11 +1,11 @@
 ## @file
 #  LzmaCustomDecompressLib produces LZMA custom decompression algorithm.
 #
-#  It is based on the LZMA SDK 4.65.
-#  LZMA SDK 4.65 was placed in the public domain on 2009-02-03.
+#  It is based on the LZMA SDK 16.04.
+#  LZMA SDK 16.04 was placed in the public domain on 2016-10-04.
 #  It was released on the http://www.7-zip.org/sdk.html website.
 #
-#  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -42,7 +42,9 @@
   Sdk/C/LzFind.h
   Sdk/C/LzHash.h
   Sdk/C/LzmaDec.h
-  Sdk/C/Types.h  
+  Sdk/C/7zTypes.h
+  Sdk/C/Precomp.h
+  Sdk/C/Compiler.h
   GuidedSectionExtraction.c
   UefiLzma.h
   LzmaDecompressLibInternal.h
