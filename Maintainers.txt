@@ -233,8 +233,8 @@ S: Obsolete (Use EmulatorPkg instead)
 
 Vlv2DeviceRefCodePkg
 M: David Wei <david.wei@intel.com>
-M: Tim He <tim.he@intel.com>
+M: Mang Guo <mang.guo@intel.com>
 
 Vlv2TbltDevicePkg
 M: David Wei <david.wei@intel.com>
-M: Tim He <tim.he@intel.com>
+M: Mang Guo <mang.guo@intel.com>
