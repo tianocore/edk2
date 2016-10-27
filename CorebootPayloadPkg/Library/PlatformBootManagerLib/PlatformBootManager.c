@@ -181,6 +181,7 @@ PlatformBootManagerBeforeConsole (
 {
   EFI_INPUT_KEY                Enter;
   EFI_INPUT_KEY                F2;
+  EFI_INPUT_KEY                Down;
   EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
 
   PlatformConsoleInit ();
@@ -199,6 +200,14 @@ PlatformBootManagerBeforeConsole (
   F2.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
   EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL);
+
+  //
+  // Also add Down key to Boot Manager Menu since some serial terminals don't support F2 key.
+  //
+  Down.ScanCode    = SCAN_DOWN;
+  Down.UnicodeChar = CHAR_NULL;
+  EfiBootManagerGetBootManagerMenu (&BootOption);
+  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &Down, NULL);
 
   //
   // Install ready to lock.
@@ -239,8 +248,8 @@ PlatformBootManagerAfterConsole (
   
   Print (
     L"\n"
-    L"F2      to enter Boot Manager Menu.\n"
-    L"ENTER   to boot directly.\n"
+    L"F2 or Down      to enter Boot Manager Menu.\n"
+    L"ENTER           to boot directly.\n"
     L"\n"
   );
 
