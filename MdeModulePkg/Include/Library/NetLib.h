@@ -43,9 +43,9 @@ typedef UINT16          TCP_PORTNO;
 //
 // The address classification
 //
-#define  IP4_ADDR_CLASSA       1
-#define  IP4_ADDR_CLASSB       2
-#define  IP4_ADDR_CLASSC       3
+#define  IP4_ADDR_CLASSA       1     // Deprecated
+#define  IP4_ADDR_CLASSB       2     // Deprecated
+#define  IP4_ADDR_CLASSC       3     // Deprecated
 #define  IP4_ADDR_CLASSD       4
 #define  IP4_ADDR_CLASSE       5
 
@@ -231,6 +231,7 @@ typedef struct {
 // Test the IP's attribute, All the IPs are in host byte order.
 //
 #define IP4_IS_MULTICAST(Ip)              (((Ip) & 0xF0000000) == 0xE0000000)
+#define IP4_IS_UNSPECIFIED(Ip)            ((Ip) == 0)
 #define IP4_IS_LOCAL_BROADCAST(Ip)        ((Ip) == 0xFFFFFFFF)
 #define IP4_NET_EQUAL(Ip1, Ip2, NetMask)  (((Ip1) & (NetMask)) == ((Ip2) & (NetMask)))
 #define IP4_IS_VALID_NETMASK(Ip)          (NetGetMaskLength (Ip) != (IP4_MASK_MAX + 1))
@@ -379,6 +380,11 @@ NetGetMaskLength (
   Return the class of the IP address, such as class A, B, C.
   Addr is in host byte order.
 
+  [ATTENTION]
+  Classful addressing (IP class A/B/C) has been deprecated according to RFC4632.
+  Caller of this function could only check the returned value against
+  IP4_ADDR_CLASSD (multicast) or IP4_ADDR_CLASSE (reserved) now.
+
   The address of class A  starts with 0.
   If the address belong to class A, return IP4_ADDR_CLASSA.
   The address of class B  starts with 10.
@@ -404,17 +410,16 @@ NetGetIpClass (
 
 /**
   Check whether the IP is a valid unicast address according to
-  the netmask. If NetMask is zero, use the IP address's class to get the default mask.
+  the netmask. 
 
-  If Ip is 0, IP is not a valid unicast address.
-  Class D address is used for multicasting and class E address is reserved for future. If Ip
-  belongs to class D or class E, Ip is not a valid unicast address.
-  If all bits of the host address of Ip are 0 or 1, Ip is not a valid unicast address.
+  ASSERT if NetMask is zero.
+  
+  If all bits of the host address of IP are 0 or 1, IP is also not a valid unicast address.
 
   @param[in]  Ip                    The IP to check against.
   @param[in]  NetMask               The mask of the IP.
 
-  @return TRUE if Ip is a valid unicast address on the network, otherwise FALSE.
+  @return TRUE if IP is a valid unicast address on the network, otherwise FALSE.
 
 **/
 BOOLEAN
