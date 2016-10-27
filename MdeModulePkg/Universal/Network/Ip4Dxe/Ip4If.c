@@ -560,9 +560,7 @@ Ip4SetAddress (
 {
   EFI_ARP_CONFIG_DATA       ArpConfig;
   EFI_STATUS                Status;
-  INTN                      Type;
   INTN                      Len;
-  IP4_ADDR                  Netmask;
 
   NET_CHECK_SIGNATURE (Interface, IP4_INTERFACE_SIGNATURE);
 
@@ -578,12 +576,9 @@ Ip4SetAddress (
   Interface->SubnetMask     = SubnetMask;
   Interface->SubnetBrdcast  = (IpAddr | ~SubnetMask);
 
-  Type                      = NetGetIpClass (IpAddr);
-  ASSERT (Type <= IP4_ADDR_CLASSC);
   Len                       = NetGetMaskLength (SubnetMask);
   ASSERT (Len <= IP4_MASK_MAX);
-  Netmask                   = gIp4AllMasks[MIN (Len, Type << 3)];
-  Interface->NetBrdcast     = (IpAddr | ~Netmask);
+  Interface->NetBrdcast     = (IpAddr | ~SubnetMask);
 
   //
   // Do clean up for Arp child

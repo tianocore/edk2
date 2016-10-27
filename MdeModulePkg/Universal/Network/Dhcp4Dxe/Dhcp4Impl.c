@@ -660,9 +660,7 @@ EfiDhcp4Configure (
     }
 
     CopyMem (&Ip, &Dhcp4CfgData->ClientAddress, sizeof (IP4_ADDR));
-
-    if ((Ip != 0) && !NetIp4IsUnicast (NTOHL (Ip), 0)) {
-
+    if (IP4_IS_LOCAL_BROADCAST(NTOHL (Ip))) {
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -1192,9 +1190,9 @@ Dhcp4InstanceConfigUdpIo (
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
   EFI_UDP4_CONFIG_DATA              UdpConfigData;
   IP4_ADDR                          ClientAddr;
-  IP4_ADDR                          Ip;   
+  IP4_ADDR                          Ip; 
   INTN                              Class; 
-  IP4_ADDR                          SubnetMask;
+  IP4_ADDR                          SubnetMask;  
 
   Instance = (DHCP_PROTOCOL *) Context;
   DhcpSb   = Instance->Service;
@@ -1212,6 +1210,13 @@ Dhcp4InstanceConfigUdpIo (
   CopyMem (&UdpConfigData.StationAddress, &Ip, sizeof (EFI_IPv4_ADDRESS));
 
   if (DhcpSb->Netmask == 0) {
+    //
+    // The Dhcp4.TransmitReceive() API should be able to used at any time according to
+    // UEFI spec, while in classless addressing network, the netmask must be explicitly
+    // provided together with the station address.
+    // If the DHCP instance haven't be configured with a valid netmask, we could only
+    // compute it accroding to the classful addressing rule.
+    //
     Class = NetGetIpClass (ClientAddr);
     ASSERT (Class < IP4_ADDR_CLASSE);
     SubnetMask = gIp4AllMasks[Class << 3];
@@ -1492,8 +1497,6 @@ EfiDhcp4TransmitReceive (
   DHCP_SERVICE   *DhcpSb;
   EFI_IP_ADDRESS Gateway;
   IP4_ADDR       ClientAddr;
-  INTN           Class;
-  IP4_ADDR       SubnetMask;
 
   if ((This == NULL) || (Token == NULL) || (Token->Packet == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1583,19 +1586,11 @@ EfiDhcp4TransmitReceive (
     EndPoint.RemotePort = Token->RemotePort;
   }
 
-  if (DhcpSb->Netmask == 0) {
-    Class = NetGetIpClass (ClientAddr);
-    ASSERT (Class < IP4_ADDR_CLASSE);
-    SubnetMask = gIp4AllMasks[Class << 3];
-  } else {
-    SubnetMask = DhcpSb->Netmask;
-  }
-  
   //
   // Get the gateway.
   //
   ZeroMem (&Gateway, sizeof (Gateway));
-  if (!IP4_NET_EQUAL (ClientAddr, EndPoint.RemoteAddr.Addr[0], SubnetMask)) {
+  if (!IP4_NET_EQUAL (ClientAddr, EndPoint.RemoteAddr.Addr[0], DhcpSb->Netmask)) {
     CopyMem (&Gateway.v4, &Token->GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
     Gateway.Addr[0] = NTOHL (Gateway.Addr[0]);
   }

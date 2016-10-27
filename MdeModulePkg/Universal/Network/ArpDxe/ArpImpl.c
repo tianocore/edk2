@@ -943,9 +943,9 @@ ArpConfigureInstance (
       if (ConfigData->SwAddressType == IPV4_ETHER_PROTO_TYPE) {
         CopyMem (&Ip, ConfigData->StationAddress, sizeof (IP4_ADDR));
 
-        if (!NetIp4IsUnicast (NTOHL (Ip), 0)) {
+        if (IP4_IS_UNSPECIFIED (Ip) || IP4_IS_LOCAL_BROADCAST (Ip)) {
           //
-          // The station address is not a valid IPv4 unicast address.
+          // The station address should not be zero or broadcast address.
           //
           return EFI_INVALID_PARAMETER;
         }

@@ -737,8 +737,7 @@ Ip4Config2SetDnsServerWorker (
 
   for (NewIndex = 0; NewIndex < NewDnsCount; NewIndex++) {
     CopyMem (&DnsAddress, NewDns + NewIndex, sizeof (IP4_ADDR));
-
-    if (!NetIp4IsUnicast (NTOHL (DnsAddress), 0)) {
+    if (IP4_IS_UNSPECIFIED (NTOHL (DnsAddress)) || IP4_IS_LOCAL_BROADCAST (NTOHL (DnsAddress))) {
       //
       // The dns server address must be unicast.
       //
@@ -1347,14 +1346,15 @@ Ip4Config2SetGateway (
     return EFI_WRITE_PROTECTED;
   }
 
+  IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
   NewGateway      = (EFI_IPv4_ADDRESS *) Data;
   NewGatewayCount = DataSize / sizeof (EFI_IPv4_ADDRESS);
   for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
     CopyMem (&Gateway, NewGateway + Index1, sizeof (IP4_ADDR));
-    
-    if (!NetIp4IsUnicast (NTOHL (Gateway), 0)) {
 
+    if ((IpSb->DefaultInterface->SubnetMask != 0) && 
+        !NetIp4IsUnicast (NTOHL (Gateway), IpSb->DefaultInterface->SubnetMask)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -1365,7 +1365,6 @@ Ip4Config2SetGateway (
     }
   }
  
-  IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
   DataItem = &Instance->DataItem[Ip4Config2DataTypeGateway];
   OldGateway      = DataItem->Data.Gateway;
   OldGatewayCount = DataItem->DataSize / sizeof (EFI_IPv4_ADDRESS);

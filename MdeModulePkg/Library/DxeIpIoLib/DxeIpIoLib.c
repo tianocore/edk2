@@ -1029,7 +1029,9 @@ IpIoListenHandlerDpc (
 
   if (IpIo->IpVersion == IP_VERSION_4) {
     if ((EFI_IP4 (RxData->Ip4RxData.Header->SourceAddress) != 0) &&
-        !NetIp4IsUnicast (EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), 0)) {
+        (IpIo->SubnetMask != 0) &&
+        IP4_NET_EQUAL (IpIo->StationIp, EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), IpIo->SubnetMask) &&
+        !NetIp4IsUnicast (EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), IpIo->SubnetMask)) {
       //
       // The source address is not zero and it's not a unicast IP address, discard it.
       //
@@ -1299,6 +1301,11 @@ IpIoOpen (
     ASSERT (!OpenData->IpConfigData.Ip4CfgData.RawData);
     if (OpenData->IpConfigData.Ip4CfgData.RawData) {
       return EFI_UNSUPPORTED;
+    }
+
+    if (!OpenData->IpConfigData.Ip4CfgData.UseDefaultAddress) {
+      IpIo->StationIp = EFI_NTOHL (OpenData->IpConfigData.Ip4CfgData.StationAddress);
+      IpIo->SubnetMask = EFI_NTOHL (OpenData->IpConfigData.Ip4CfgData.SubnetMask);
     }
     
     Status = IpIo->Ip.Ip4->Configure (
