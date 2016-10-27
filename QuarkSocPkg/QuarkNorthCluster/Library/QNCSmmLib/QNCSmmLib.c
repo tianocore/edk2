@@ -1,7 +1,7 @@
 /** @file
 QNC Smm Library Services that implements SMM Region access, S/W SMI generation and detection.
 
-Copyright (c) 2013-2015 Intel Corporation.
+Copyright (c) 2013-2016 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
-#include <Uefi/UefiBaseType.h>
 #include <Library/QNCAccessLib.h>
 
 #define BOOT_SERVICE_SOFTWARE_SMI_DATA          0
