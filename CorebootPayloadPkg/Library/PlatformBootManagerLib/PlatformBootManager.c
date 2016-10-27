@@ -201,11 +201,6 @@ PlatformBootManagerBeforeConsole (
   EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL);
 
   //
-  // Register UEFI Shell
-  //
-  PlatformRegisterFvBootOption (PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE);
-
-  //
   // Install ready to lock.
   // This needs to be done before option rom dispatched.
   //
@@ -237,6 +232,11 @@ PlatformBootManagerAfterConsole (
   EfiBootManagerConnectAll ();
   EfiBootManagerRefreshAllBootOption ();
 
+  //
+  // Register UEFI Shell
+  //
+  PlatformRegisterFvBootOption (PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  
   Print (
     L"\n"
     L"F2      to enter Boot Manager Menu.\n"
