@@ -790,13 +790,13 @@ TerminalConOutSetCursorPosition (
   // it isn't necessary.
   //
   if (TerminalDevice->TerminalType == TTYTERMTYPE &&
-      Mode->CursorRow == Row) {
-    if (Mode->CursorColumn > Column) {
+      (UINTN)Mode->CursorRow == Row) {
+    if ((UINTN)Mode->CursorColumn > Column) {
       mCursorBackwardString[FW_BACK_OFFSET + 0] = (CHAR16) ('0' + ((Mode->CursorColumn - Column) / 10));
       mCursorBackwardString[FW_BACK_OFFSET + 1] = (CHAR16) ('0' + ((Mode->CursorColumn - Column) % 10));
       String = mCursorBackwardString;
     }
-    else if (Column > Mode->CursorColumn) {
+    else if (Column > (UINTN)Mode->CursorColumn) {
       mCursorForwardString[FW_BACK_OFFSET + 0] = (CHAR16) ('0' + ((Column - Mode->CursorColumn) / 10));
       mCursorForwardString[FW_BACK_OFFSET + 1] = (CHAR16) ('0' + ((Column - Mode->CursorColumn) % 10));
       String = mCursorForwardString;
