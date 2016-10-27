@@ -1,11 +1,11 @@
 /** @file
   LZMA Compress/Decompress tool (LzmaCompress)
 
-  Based on LZMA SDK 4.65:
+  Based on LZMA SDK 16.04:
     LzmaUtil.c -- Test application for LZMA compression
-    2008-11-23 : Igor Pavlov : Public domain
+    2016-10-04 : Igor Pavlov : Public domain
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,10 +43,6 @@ const char *kCantWriteMessage = "Can not write output file";
 const char *kCantAllocateMessage = "Can not allocate memory";
 const char *kDataErrorMessage = "Data error";
 
-static void *SzAlloc(void *p, size_t size) { (void)p; return MyAlloc(size); }
-static void SzFree(void *p, void *address) { (void)p; MyFree(address); }
-static ISzAlloc g_Alloc = { SzAlloc, SzFree };
-
 static Bool mQuietMode = False;
 static CONVERTER_TYPE mConType = NoConverter;
 
@@ -54,7 +50,7 @@ static CONVERTER_TYPE mConType = NoConverter;
 #define UTILITY_MAJOR_VERSION 0
 #define UTILITY_MINOR_VERSION 2
 #define INTEL_COPYRIGHT \
-  "Copyright (c) 2009-2012, Intel Corporation. All rights reserved."
+  "Copyright (c) 2009-2016, Intel Corporation. All rights reserved."
 void PrintHelp(char *buffer)
 {
   strcat(buffer,

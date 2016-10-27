@@ -1,10 +1,12 @@
 /*  LzmaEnc.h -- LZMA Encoder
-2008-10-04 : Igor Pavlov : Public domain */
+2013-01-18 : Igor Pavlov : Public domain */
 
-#ifndef __LZMAENC_H
-#define __LZMAENC_H
+#ifndef __LZMA_ENC_H
+#define __LZMA_ENC_H
 
-#include "Types.h"
+#include "7zTypes.h"
+
+EXTERN_C_BEGIN
 
 #define LZMA_PROPS_SIZE 5
 
@@ -14,6 +16,8 @@ typedef struct _CLzmaEncProps
   UInt32 dictSize; /* (1 << 12) <= dictSize <= (1 << 27) for 32-bit version
                       (1 << 12) <= dictSize <= (1 << 30) for 64-bit version
                        default = (1 << 24) */
+  UInt64 reduceSize; /* estimated size of data that will be compressed. default = 0xFFFFFFFF.
+                        Encoder uses this value to reduce dictionary size */
   int lc;          /* 0 <= lc <= 8, default = 3 */
   int lp;          /* 0 <= lp <= 4, default = 0 */
   int pb;          /* 0 <= pb <= 4, default = 2 */
@@ -68,5 +72,7 @@ Return code:
 SRes LzmaEncode(Byte *dest, SizeT *destLen, const Byte *src, SizeT srcLen,
     const CLzmaEncProps *props, Byte *propsEncoded, SizeT *propsSize, int writeEndMark,
     ICompressProgress *progress, ISzAlloc *alloc, ISzAlloc *allocBig);
+
+EXTERN_C_END
 
 #endif
