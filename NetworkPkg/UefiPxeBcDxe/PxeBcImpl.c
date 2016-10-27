@@ -856,8 +856,7 @@ EfiPxeBcMtftp (
       (BufferSize == NULL) ||
       (ServerIp == NULL) ||
       ((BufferPtr == NULL) && DontUseBuffer) ||
-      ((BlockSize != NULL) && (*BlockSize < PXE_MTFTP_DEFAULT_BLOCK_SIZE)) ||
-      (!NetIp4IsUnicast (NTOHL (ServerIp->Addr[0]), 0) && !NetIp6IsValidUnicast (&ServerIp->v6))) {
+      ((BlockSize != NULL) && (*BlockSize < PXE_MTFTP_DEFAULT_BLOCK_SIZE))) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -865,6 +864,16 @@ EfiPxeBcMtftp (
   Status    = EFI_DEVICE_ERROR;
   Private   = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode      = Private->PxeBc.Mode;
+
+  if (Mode->UsingIpv6) {
+    if (!NetIp6IsValidUnicast (&ServerIp->v6)) {
+      return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    if (IP4_IS_UNSPECIFIED (NTOHL (ServerIp->Addr[0])) || IP4_IS_LOCAL_BROADCAST (NTOHL (ServerIp->Addr[0])))   {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
 
   if (Mode->UsingIpv6) {
     //
@@ -1076,7 +1085,7 @@ EfiPxeBcUdpWrite (
     DoNotFragment = TRUE;
   }
 
-  if (!Mode->UsingIpv6 && GatewayIp != NULL && !NetIp4IsUnicast (NTOHL (GatewayIp->Addr[0]), 0)) {
+  if (!Mode->UsingIpv6 && GatewayIp != NULL && !NetIp4IsUnicast (NTOHL (GatewayIp->Addr[0]), EFI_NTOHL(Mode->SubnetMask))) {
     //
     // Gateway is provided but it's not a unicast IPv4 address, while it will be ignored for IPv6.
     //
@@ -1587,13 +1596,16 @@ EfiPxeBcSetIpFilter (
       //
       return EFI_INVALID_PARAMETER;
     }
-    if ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) != 0 &&
-        (NetIp4IsUnicast (EFI_IP4 (NewFilter->IpList[Index].v4), 0) ||
-         NetIp6IsValidUnicast (&NewFilter->IpList[Index].v6))) {
-      //
-      // If EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP is set and IPv4/IPv6 address
-      // is in IpList, promiscuous mode is needed.
-      //
+    if (Mode->UsingIpv6) {
+      if ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) != 0 &&
+          NetIp6IsValidUnicast (&NewFilter->IpList[Index].v6)) {
+        NeedPromiscuous = TRUE;
+      }
+    } else if ((EFI_NTOHL(Mode->StationIp) != 0) &&
+               (EFI_NTOHL(Mode->SubnetMask) != 0) &&
+               IP4_NET_EQUAL(EFI_NTOHL(Mode->StationIp), EFI_NTOHL(NewFilter->IpList[Index].v4), EFI_NTOHL(Mode->SubnetMask.v4)) &&
+               NetIp4IsUnicast (EFI_IP4 (NewFilter->IpList[Index].v4), EFI_NTOHL(Mode->SubnetMask)) &&
+               ((NewFilter->Filters & EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP) != 0)) {
       NeedPromiscuous = TRUE;
     }
   }
@@ -1987,9 +1999,7 @@ EfiPxeBcSetStationIP (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NewStationIp != NULL &&
-      (!NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), 0) &&
-       !NetIp6IsValidUnicast (&NewStationIp->v6))) {
+  if (NewStationIp != NULL && !NetIp6IsValidUnicast (&NewStationIp->v6)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2000,6 +2010,10 @@ EfiPxeBcSetStationIP (
   if (!Mode->UsingIpv6 &&
       NewSubnetMask != NULL &&
       !IP4_IS_VALID_NETMASK (NTOHL (NewSubnetMask->Addr[0]))) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!Mode->UsingIpv6 && NewStationIp != NULL && !NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), NTOHL (NewSubnetMask->Addr[0]))) {
     return EFI_INVALID_PARAMETER;
   }
 

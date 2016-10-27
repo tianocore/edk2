@@ -164,7 +164,10 @@ IpIsUnicast (
   )
 {
   if (IpMode == IP_MODE_IP4) {
-    return NetIp4IsUnicast (NTOHL (Ip->Addr[0]), 0);
+    if (IP4_IS_UNSPECIFIED (NTOHL (Ip->Addr[0])) || IP4_IS_LOCAL_BROADCAST (NTOHL (Ip->Addr[0])))   {
+      return FALSE;
+    }
+    return TRUE;
   } else if (IpMode == IP_MODE_IP6) {
     return NetIp6IsValidUnicast (&Ip->v6);
   } else {
@@ -2349,7 +2352,9 @@ IScsiFormCallback (
 
     case KEY_LOCAL_IP:
       Status = NetLibStrToIp4 (IfrNvData->LocalIp, &HostIp.v4);
-      if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), 0)) {
+      if (EFI_ERROR (Status) || 
+          ((Private->Current->SessionConfigData.SubnetMask.Addr[0] != 0) && 
+           !NetIp4IsUnicast (NTOHL (HostIp.Addr[0]), NTOHL(*(UINT32*)Private->Current->SessionConfigData.SubnetMask.Addr)))) {
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
@@ -2383,7 +2388,10 @@ IScsiFormCallback (
 
     case KEY_GATE_WAY:
       Status = NetLibStrToIp4 (IfrNvData->Gateway, &Gateway.v4);
-      if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+      if (EFI_ERROR (Status) || 
+          ((Gateway.Addr[0] != 0) && 
+           (Private->Current->SessionConfigData.SubnetMask.Addr[0] != 0) && 
+           !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), NTOHL(*(UINT32*)Private->Current->SessionConfigData.SubnetMask.Addr)))) {
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
@@ -2400,7 +2408,7 @@ IScsiFormCallback (
     case KEY_TARGET_IP:
       UnicodeStrToAsciiStrS (IfrNvData->TargetIp, IpString, sizeof (IpString));
       Status = IScsiAsciiStrToIp (IpString, IfrNvData->IpMode, &HostIp);
-      if (EFI_ERROR (Status) || !IpIsUnicast (&HostIp, IfrNvData->IpMode)) {
+      if (EFI_ERROR (Status) || IP4_IS_LOCAL_BROADCAST (EFI_NTOHL(HostIp.v4)) || IP4_IS_UNSPECIFIED (EFI_NTOHL(HostIp.v4))) {
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
