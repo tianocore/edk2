@@ -1298,8 +1298,9 @@ PxeBcSelectDhcp6Offer (
 
   @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
 
-  @retval     EFI_SUCCESS         Handled the DHCPv6 offer packet successfully.
-  @retval     EFI_NO_RESPONSE     No response to the following request packet.
+  @retval     EFI_SUCCESS           Handled the DHCPv6 offer packet successfully.
+  @retval     EFI_NO_RESPONSE       No response to the following request packet.
+  @retval     EFI_OUT_OF_RESOURCES  Failed to allocate resources.
 
 **/
 EFI_STATUS
@@ -1325,6 +1326,9 @@ PxeBcHandleDhcp6Offer (
   //
   if (Cache6->OptList[PXEBC_DHCP6_IDX_DNS_SERVER] != NULL) {
     Private->DnsServer = AllocateZeroPool (NTOHS (Cache6->OptList[PXEBC_DHCP6_IDX_DNS_SERVER]->OpLen));
+    if (Private->DnsServer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
     CopyMem (Private->DnsServer, Cache6->OptList[PXEBC_DHCP6_IDX_DNS_SERVER]->Data, sizeof (EFI_IPv6_ADDRESS));
   }
 
