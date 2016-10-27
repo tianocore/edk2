@@ -78,6 +78,11 @@
   DEFINE PCI_SERIAL_PARAMETERS            = {0xff,0xff, 0x00,0x00, 0x0,0x20,0x1c,0x00, 0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0, 0x00,    0x01, 0x0,0x0, 0x0,0x0, 0x0,0x0, 0xff,0xff}
 
   #
+  # Chipset options
+  #
+  DEFINE USE_HPET_TIMER                   = FALSE
+
+  #
   # Shell options: [BUILD_SHELL, FULL_BIN, MIN_BIN, NONE, UEFI]
   #
   DEFINE SHELL_TYPE              = FULL_BIN
@@ -174,6 +179,7 @@
   SerialPortLib|CorebootModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
   PlatformHookLib|CorebootPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
   PlatformBootManagerLib|CorebootPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
   CbPlatformSupportLib|CorebootModulePkg/Library/CbPlatformSupportLibNull/CbPlatformSupportLibNull.inf
 
   #
@@ -392,7 +398,11 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
+!if $(USE_HPET_TIMER) == TRUE
+  PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!else
   PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
+!endif
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
