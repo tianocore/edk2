@@ -94,6 +94,7 @@ CbCheckSum16 (
 
 **/
 VOID *
+EFIAPI
 FindCbTag (
   IN  VOID     *Start,
   IN  UINT32   Tag
@@ -175,6 +176,7 @@ FindCbTag (
 
 **/
 RETURN_STATUS
+EFIAPI
 FindCbMemTable (
   IN  struct cbmem_root  *Root,
   IN  UINT32             TableId,
@@ -237,6 +239,7 @@ FindCbMemTable (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseMemoryInfo (
   IN  CB_MEM_INFO_CALLBACK  MemInfoCallback,
   IN  VOID                  *pParam
@@ -287,6 +290,7 @@ CbParseMemoryInfo (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseCbMemTable (
   IN  UINT32     TableId,
   OUT VOID       **pMemTable,
@@ -343,6 +347,7 @@ CbParseCbMemTable (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseAcpiTable (
   OUT VOID       **pMemTable,
   OUT UINT32     *pMemTableSize
@@ -363,6 +368,7 @@ CbParseAcpiTable (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseSmbiosTable (
   OUT VOID       **pMemTable,
   OUT UINT32     *pMemTableSize
@@ -386,6 +392,7 @@ CbParseSmbiosTable (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseFadtInfo (
   OUT UINTN      *pPmCtrlReg,
   OUT UINTN      *pPmTimerReg,
@@ -533,6 +540,7 @@ CbParseFadtInfo (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseSerialInfo (
   OUT UINT32      *pRegBase,
   OUT UINT32      *pRegAccessType,
@@ -591,6 +599,7 @@ CbParseSerialInfo (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseGetCbHeader (
   IN  UINTN  Level,
   OUT VOID   **HeaderPtr
@@ -629,6 +638,7 @@ CbParseGetCbHeader (
 
 **/
 RETURN_STATUS
+EFIAPI
 CbParseFbInfo (
   OUT FRAME_BUFFER_INFO       *pFbInfo
   )
