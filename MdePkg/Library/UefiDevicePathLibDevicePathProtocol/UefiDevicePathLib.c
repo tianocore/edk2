@@ -103,26 +103,18 @@ IsDevicePathValid (
 
   ASSERT (DevicePath != NULL);
 
-  if (MaxSize == 0){
-    MaxSize = MAX_UINTN;
-  }
-
-  Size = 0;
-  Count = 0;
-
-  while (MaxSize >= sizeof (EFI_DEVICE_PATH_PROTOCOL) &&
-        (MaxSize - sizeof (EFI_DEVICE_PATH_PROTOCOL) >= Size) &&
-        !IsDevicePathEnd (DevicePath)) {
+  for (Count = 0, Size = 0; !IsDevicePathEnd (DevicePath); DevicePath = NextDevicePathNode (DevicePath)) {
     NodeLength = DevicePathNodeLength (DevicePath);
     if (NodeLength < sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
       return FALSE;
     }
 
-    if (NodeLength > MAX_UINTN - Size) {
-      return FALSE;
+    if (MaxSize > 0) {
+      Size += NodeLength;
+      if (Size + END_DEVICE_PATH_LENGTH > MaxSize) {
+        return FALSE;
+      }
     }
-
-    Size += NodeLength;
 
     if (PcdGet32 (PcdMaximumDevicePathNodeCount) > 0) {
       Count++;
@@ -130,8 +122,6 @@ IsDevicePathValid (
         return FALSE;
       }
     }
-
-    DevicePath = NextDevicePathNode (DevicePath);
   }
 
   //
