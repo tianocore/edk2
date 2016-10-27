@@ -204,7 +204,7 @@ GopQueryMode (
 {
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *GopModeInfo;
 
-  if (ModeNumber >= sizeof mGopResolutions / sizeof mGopResolutions[0]) {
+  if (ModeNumber >= ARRAY_SIZE (mGopResolutions)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -239,7 +239,7 @@ GopSetMode (
   EFI_STATUS Status;
   EFI_STATUS Status2;
 
-  if (ModeNumber >= sizeof mGopResolutions / sizeof mGopResolutions[0]) {
+  if (ModeNumber >= ARRAY_SIZE (mGopResolutions)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -258,8 +258,7 @@ GopSetMode (
     //
     VgpuGop->Gop.Mode = &VgpuGop->GopMode;
 
-    VgpuGop->GopMode.MaxMode         = (UINT32)(sizeof mGopResolutions /
-                                                sizeof mGopResolutions[0]);
+    VgpuGop->GopMode.MaxMode         = (UINT32)(ARRAY_SIZE (mGopResolutions));
     VgpuGop->GopMode.Info            = &VgpuGop->GopModeInfo;
     VgpuGop->GopMode.SizeOfInfo      = sizeof VgpuGop->GopModeInfo;
 

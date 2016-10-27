@@ -130,18 +130,18 @@ LegacyRegionManipulationInternal (
   // Loop to find the start PAM.
   //
   StartIndex = 0;
-  for (Index = 0; Index < (sizeof(mSectionArray) / sizeof (mSectionArray[0])); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (mSectionArray); Index++) {
     if ((Start >= mSectionArray[Index].Start) && (Start < (mSectionArray[Index].Start + mSectionArray[Index].Length))) {
       StartIndex = Index;
       break;
     }
   }
-  ASSERT (Index < (sizeof(mSectionArray) / sizeof (mSectionArray[0])));
+  ASSERT (Index < ARRAY_SIZE (mSectionArray));
 
   //
   // Program PAM until end PAM is encountered
   //
-  for (Index = StartIndex; Index < (sizeof(mSectionArray) / sizeof (mSectionArray[0])); Index++) {
+  for (Index = StartIndex; Index < ARRAY_SIZE (mSectionArray); Index++) {
     if (ReadEnable != NULL) {
       if (*ReadEnable) {
         PciOr8 (
@@ -177,7 +177,7 @@ LegacyRegionManipulationInternal (
       break;
     }
   }
-  ASSERT (Index < (sizeof(mSectionArray) / sizeof (mSectionArray[0])));
+  ASSERT (Index < ARRAY_SIZE (mSectionArray));
 
   return EFI_SUCCESS;
 }

@@ -419,9 +419,7 @@ PciHostBridgeResourceConflict (
     DEBUG ((EFI_D_ERROR, "RootBridge[%d]:\n", RootBridgeIndex++));
     for (; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
       ASSERT (Descriptor->ResType <
-              (sizeof (mPciHostBridgeLibAcpiAddressSpaceTypeStr) /
-               sizeof (mPciHostBridgeLibAcpiAddressSpaceTypeStr[0])
-               )
+              ARRAY_SIZE (mPciHostBridgeLibAcpiAddressSpaceTypeStr)
               );
       DEBUG ((EFI_D_ERROR, " %s: Length/Alignment = 0x%lx / 0x%lx\n",
               mPciHostBridgeLibAcpiAddressSpaceTypeStr[Descriptor->ResType],

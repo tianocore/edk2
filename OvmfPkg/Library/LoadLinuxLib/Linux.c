@@ -357,7 +357,7 @@ SetupLinuxMemmap (
       LastE820->size += EFI_PAGES_TO_SIZE ((UINTN) MemoryMap->NumberOfPages);
       LastEndAddr += EFI_PAGES_TO_SIZE ((UINTN) MemoryMap->NumberOfPages);
     } else {
-      if (E820EntryCount >= (sizeof (Bp->e820_map) / sizeof (Bp->e820_map[0]))) {
+      if (E820EntryCount >= ARRAY_SIZE (Bp->e820_map)) {
         break;
       }
       E820->type = (UINT32) E820Type;
