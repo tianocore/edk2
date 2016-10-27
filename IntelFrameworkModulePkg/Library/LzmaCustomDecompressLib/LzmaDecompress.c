@@ -1,7 +1,7 @@
 /** @file
   LZMA Decompress interfaces
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -13,7 +13,7 @@
 **/
 
 #include "LzmaDecompressLibInternal.h"
-#include "Sdk/C/Types.h"
+#include "Sdk/C/7zTypes.h"
 #include "Sdk/C/7zVersion.h"
 #include "Sdk/C/LzmaDec.h"
 
