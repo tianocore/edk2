@@ -580,6 +580,11 @@ NetGetMaskLength (
   Return the class of the IP address, such as class A, B, C.
   Addr is in host byte order.
 
+  [ATTENTION]
+  Classful addressing (IP class A/B/C) has been deprecated according to RFC4632.
+  Caller of this function could only check the returned value against
+  IP4_ADDR_CLASSD (multicast) or IP4_ADDR_CLASSE (reserved) now.
+
   The address of class A  starts with 0.
   If the address belong to class A, return IP4_ADDR_CLASSA.
   The address of class B  starts with 10.
@@ -628,11 +633,10 @@ NetGetIpClass (
 
 /**
   Check whether the IP is a valid unicast address according to
-  the netmask. If NetMask is zero, use the IP address's class to get the default mask.
+  the netmask. 
 
-  If Ip is 0, IP is not a valid unicast address.
-  Class D address is used for multicasting and class E address is reserved for future. If Ip
-  belongs to class D or class E, IP is not a valid unicast address.
+  ASSERT if NetMask is zero.
+  
   If all bits of the host address of IP are 0 or 1, IP is also not a valid unicast address.
 
   @param[in]  Ip                    The IP to check against.
@@ -648,18 +652,12 @@ NetIp4IsUnicast (
   IN IP4_ADDR               NetMask
   )
 {
-  INTN                      Class;
-
-  Class = NetGetIpClass (Ip);
-
-  if ((Ip == 0) || (Class >= IP4_ADDR_CLASSD)) {
+  ASSERT (NetMask != 0);
+  
+  if (Ip == 0 || IP4_IS_LOCAL_BROADCAST (Ip)) {
     return FALSE;
   }
-
-  if (NetMask == 0) {
-    NetMask = gIp4AllMasks[Class << 3];
-  }
-
+  
   if (((Ip &~NetMask) == ~NetMask) || ((Ip &~NetMask) == 0)) {
     return FALSE;
   }
