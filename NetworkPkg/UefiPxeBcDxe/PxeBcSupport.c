@@ -258,7 +258,9 @@ PxeBcIcmpErrorDpcHandle (
   }
 
   if (EFI_IP4 (RxData->Header->SourceAddress) != 0 &&
-      !NetIp4IsUnicast (EFI_NTOHL (RxData->Header->SourceAddress), 0)) {
+      (NTOHL (Mode->SubnetMask.Addr[0]) != 0) &&
+      IP4_NET_EQUAL (NTOHL(Mode->StationIp.Addr[0]), EFI_NTOHL (RxData->Header->SourceAddress), NTOHL (Mode->SubnetMask.Addr[0])) &&
+      !NetIp4IsUnicast (EFI_NTOHL (RxData->Header->SourceAddress), NTOHL (Mode->SubnetMask.Addr[0]))) {
     //
     // The source address of the received packet should be a valid unicast address.
     //
