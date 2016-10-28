@@ -565,7 +565,7 @@ Dns4GetMapping (
     return FALSE;
   }
 
-  while (!EFI_ERROR (gBS->CheckEvent (Service->TimerToGetMap))) {
+  while (EFI_ERROR (gBS->CheckEvent (Service->TimerToGetMap))) {
     Udp->Poll (Udp);
 
     if (!EFI_ERROR (Udp->GetModeData (Udp, NULL, &Ip4Mode, NULL, NULL)) &&
@@ -615,7 +615,7 @@ Dns6GetMapping (
     return FALSE;
   }
 
-  while (!EFI_ERROR (gBS->CheckEvent (Service->TimerToGetMap))) {
+  while (EFI_ERROR (gBS->CheckEvent (Service->TimerToGetMap))) {
     Udp->Poll (Udp);
 
     if (!EFI_ERROR (Udp->GetModeData (Udp, NULL, &Ip6Mode, NULL, NULL))) {
