@@ -17,16 +17,6 @@
 
 
   MACRO
-  LoadConstantMacro $Data
-  ldr  r0, =($Data)
-  MEND
-
-  MACRO
-  LoadConstantToRegMacro $Data, $Reg
-  ldr  $Reg, =($Data)
-  MEND
-
-  MACRO
   adrll   $Reg, $Symbol
   add     $Reg, pc, #-8
   RELOC   R_ARM_ALU_PC_G0_NC, $Symbol

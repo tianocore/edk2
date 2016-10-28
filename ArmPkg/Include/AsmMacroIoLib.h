@@ -19,39 +19,6 @@
 #ifndef __MACRO_IO_LIB_H__
 #define __MACRO_IO_LIB_H__
 
-#if defined(__APPLE__)
-
-//
-//  ldr reg, =expr does not work with current Apple tool chain. So do the work our selves
-//
-
-// load _Reg with _Data
-#define LoadConstantToReg(_Data, _Reg)  \
-  ldr  _Reg, [pc, #0]   ;               \
-  b    1f               ;               \
-  .long (_Data)         ;               \
-1:
-
-#elif defined (__GNUC__)
-
-#define LoadConstantToReg(Data, Reg) \
-  ldr  Reg, =Data
-
-#else
-
-//
-// Use ARM assembly macros, form armasam
-//
-//  Less magic in the macros if ldr reg, =expr works
-//
-
-// load _Reg with _Data
-
-
-#define LoadConstantToReg(Data, Reg)  LoadConstantToRegMacro Data, Reg
-
-#endif
-
 #define _ASM_FUNC(Name, Section)    \
   .global   Name                  ; \
   .section  #Section, "ax"        ; \

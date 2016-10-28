@@ -42,36 +42,6 @@
         cbnz   SAFE_XREG, 1f        ;\
         b      .                    ;// We should never get here
 
-#if defined(__clang__)
-
-// load x0 with _Data
-#define LoadConstant(_Data)              \
-  ldr  x0, 1f                          ; \
-  b    2f                              ; \
-.align(8)                              ; \
-1:                                       \
-  .8byte (_Data)                       ; \
-2:
-
-// load _Reg with _Data
-#define LoadConstantToReg(_Data, _Reg)    \
-  ldr  _Reg, 1f                         ; \
-  b    2f                               ; \
-.align(8)                               ; \
-1:                                        \
-  .8byte (_Data)                        ; \
-2:
-
-#elif defined (__GNUC__)
-
-#define LoadConstant(Data) \
-  ldr  x0, =Data
-
-#define LoadConstantToReg(Data, Reg) \
-  ldr  Reg, =Data
-
-#endif // __GNUC__
-
 #define _ASM_FUNC(Name, Section)    \
   .global   Name                  ; \
   .section  #Section, "ax"        ; \
