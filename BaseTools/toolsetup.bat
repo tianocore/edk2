@@ -3,7 +3,7 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 @REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
@@ -163,6 +163,14 @@ if not defined WORKSPACE (
    )
    goto skip_reconfig
 )
+
+IF NOT exist "%EDK_TOOLS_PATH%\set_vsprefix_envs.bat" (
+  @echo.
+  @echo !!! ERROR !!! The set_vsprefix_envs.bat was not found !!!
+  @echo.
+  goto end
+)
+call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat
 
 if not defined CONF_PATH (
   set CONF_PATH=%WORKSPACE%\Conf
