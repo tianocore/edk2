@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -135,11 +136,13 @@ ReadPartitionEntries (
 
 
 /*
-  Initialise: Open the Android NVM device and find the partitions on it. Save them in
-  a list along with the "PartitionName" fields for their GPT entries.
-  We will use these partition names as the key in
-  ArmFastbootPlatformFlashPartition.
+  Do any initialisation that needs to be done in order to be able to respond to
+  commands.
+
+  @retval EFI_SUCCESS   Initialised successfully.
+  @retval !EFI_SUCCESS  Error in initialisation.
 */
+STATIC
 EFI_STATUS
 ArmFastbootPlatformInit (
   VOID
@@ -164,6 +167,7 @@ ArmFastbootPlatformInit (
   //
   // Get EFI_HANDLES for all the partitions on the block devices pointed to by
   // PcdFastbootFlashDevicePath, also saving their GPT partition labels.
+  // We will use these labels as the key in ArmFastbootPlatformFlashPartition.
   // There's no way to find all of a device's children, so we get every handle
   // in the system supporting EFI_BLOCK_IO_PROTOCOL and then filter out ones
   // that don't represent partitions on the flash device.
@@ -296,6 +300,11 @@ Exit:
 
 }
 
+/*
+  To be called when Fastboot is finished and we aren't rebooting or booting an
+  image. Undo initialisation, free resrouces.
+*/
+STATIC
 VOID
 ArmFastbootPlatformUnInit (
   VOID
@@ -304,6 +313,18 @@ ArmFastbootPlatformUnInit (
   FreePartitionList ();
 }
 
+/*
+  Flash the partition named (according to a platform-specific scheme)
+  PartitionName, with the image pointed to by Buffer, whose size is BufferSize.
+
+  @param[in] PartitionName  Null-terminated name of partition to write.
+  @param[in] BufferSize     Size of Buffer in byets.
+  @param[in] Buffer         Data to write to partition.
+
+  @retval EFI_NOT_FOUND     No such partition.
+  @retval EFI_DEVICE_ERROR  Flashing failed.
+*/
+STATIC
 EFI_STATUS
 ArmFastbootPlatformFlashPartition (
   IN CHAR8  *PartitionName,
@@ -381,6 +402,15 @@ ArmFastbootPlatformFlashPartition (
   return Status;
 }
 
+/*
+  Erase the partition named PartitionName.
+
+  @param[in] PartitionName  Null-terminated name of partition to erase.
+
+  @retval EFI_NOT_FOUND     No such partition.
+  @retval EFI_DEVICE_ERROR  Erasing failed.
+*/
+STATIC
 EFI_STATUS
 ArmFastbootPlatformErasePartition (
   IN CHAR8 *Partition
@@ -389,6 +419,25 @@ ArmFastbootPlatformErasePartition (
   return EFI_SUCCESS;
 }
 
+/*
+  If the variable referred to by Name exists, copy it (as a null-terminated
+  string) into Value. If it doesn't exist, put the Empty string in Value.
+
+  Variable names and values may not be larger than 60 bytes, excluding the
+  terminal null character. This is a limitation of the Fastboot protocol.
+
+  The Fastboot application will handle platform-nonspecific variables
+  (Currently "version" is the only one of these.)
+
+  @param[in]  Name   Null-terminated name of Fastboot variable to retrieve.
+  @param[out] Value  Caller-allocated buffer for null-terminated value of
+                     variable.
+
+  @retval EFI_SUCCESS       The variable was retrieved, or it doesn't exist.
+  @retval EFI_DEVICE_ERROR  There was an error looking up the variable. This
+                            does _not_ include the variable not existing.
+*/
+STATIC
 EFI_STATUS
 ArmFastbootPlatformGetVar (
   IN  CHAR8   *Name,
@@ -403,6 +452,26 @@ ArmFastbootPlatformGetVar (
   return EFI_SUCCESS;
 }
 
+/*
+  React to an OEM-specific command.
+
+  Future versions of this function might want to allow the platform to do some
+  extra communication with the host. A way to do this would be to add a function
+  to the FASTBOOT_TRANSPORT_PROTOCOL that allows the implementation of
+  DoOemCommand to replace the ReceiveEvent with its own, and to restore the old
+  one when it's finished.
+
+  However at the moment although the specification allows it, the AOSP fastboot
+  host application doesn't handle receiving any data from the client, and it
+  doesn't support a data phase for OEM commands.
+
+  @param[in] Command    Null-terminated command string.
+
+  @retval EFI_SUCCESS       The command executed successfully.
+  @retval EFI_NOT_FOUND     The command wasn't recognised.
+  @retval EFI_DEVICE_ERROR  There was an error executing the command.
+*/
+STATIC
 EFI_STATUS
 ArmFastbootPlatformOemCommand (
   IN  CHAR8   *Command
@@ -424,7 +493,7 @@ ArmFastbootPlatformOemCommand (
   }
 }
 
-FASTBOOT_PLATFORM_PROTOCOL mPlatformProtocol = {
+STATIC FASTBOOT_PLATFORM_PROTOCOL mPlatformProtocol = {
   ArmFastbootPlatformInit,
   ArmFastbootPlatformUnInit,
   ArmFastbootPlatformFlashPartition,
