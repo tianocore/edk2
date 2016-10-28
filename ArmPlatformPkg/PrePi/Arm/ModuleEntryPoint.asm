@@ -48,7 +48,7 @@ _SetSVCMode
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)
 _SystemMemoryEndInit
-  mov32 r1, mSystemMemoryEnd
+  adrll r1, mSystemMemoryEnd
   ldrd  r2, r3, [r1]
   teq   r3, #0
   moveq r1, r2
