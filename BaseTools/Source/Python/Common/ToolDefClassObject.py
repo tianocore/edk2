@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of tools_def.txt file
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -236,13 +236,16 @@ class ToolDefClassObject(object):
     # @retval Value:  The string which has been replaced with real value
     #
     def ExpandMacros(self, Value):
+        # os.environ contains all environment variables uppercase on Windows which cause the key in the self.MacroDictionary is uppercase, but Ref may not
         EnvReference = gEnvRefPattern.findall(Value)
         for Ref in EnvReference:
-            if Ref not in self.MacroDictionary:
+            if Ref not in self.MacroDictionary and Ref.upper() not in self.MacroDictionary:
                 Value = Value.replace(Ref, "")
             else:
-                Value = Value.replace(Ref, self.MacroDictionary[Ref])
- 
+                if Ref in self.MacroDictionary:
+                    Value = Value.replace(Ref, self.MacroDictionary[Ref])
+                else:
+                    Value = Value.replace(Ref, self.MacroDictionary[Ref.upper()])
 
         MacroReference = gMacroRefPattern.findall(Value)
         for Ref in MacroReference:
