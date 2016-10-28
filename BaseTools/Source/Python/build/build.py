@@ -825,6 +825,8 @@ class Build():
             EdkLogger.quiet("%-16s = %s" % ("POSTBUILD", self.PostbuildScript))
         if self.PrebuildScript:
             self.LaunchPrebuild()
+            self.TargetTxt = TargetTxtClassObject()
+            self.ToolDef   = ToolDefClassObject()
         if not (self.LaunchPrebuildFlag and os.path.exists(self.PlatformBuildPath)):
             self.InitBuild()
 
