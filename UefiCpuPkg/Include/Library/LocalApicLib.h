@@ -410,6 +410,26 @@ GetApicMsiValue (
   IN BOOLEAN  LevelTriggered,
   IN BOOLEAN  AssertionLevel
   );
+
+/**
+  Get Package ID/Core ID/Thread ID of a processor.
+
+  The algorithm assumes the target system has symmetry across physical
+  package  boundaries with respect to the number of logical processors
+  per package,  number of cores per package.
+
+  @param[in]  InitialApicId  Initial APIC ID of the target logical processor.
+  @param[out]  Package       Returns the processor package ID.
+  @param[out]  Core          Returns the processor core ID.
+  @param[out]  Thread        Returns the processor thread ID.
+**/
+VOID
+GetProcessorLocation(
+  IN  UINT32  InitialApicId,
+  OUT UINT32  *Package  OPTIONAL,
+  OUT UINT32  *Core    OPTIONAL,
+  OUT UINT32  *Thread  OPTIONAL
+  );
   
 #endif
 

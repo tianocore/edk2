@@ -1036,3 +1036,149 @@ GetApicMsiValue (
   }
   return MsiData.Uint64;
 }
+
+/**
+  Get Package ID/Core ID/Thread ID of a processor.
+
+  The algorithm assumes the target system has symmetry across physical
+  package  boundaries with respect to the number of logical processors
+  per package,  number of cores per package.
+
+  @param[in]  InitialApicId  Initial APIC ID of the target logical processor.
+  @param[out]  Package       Returns the processor package ID.
+  @param[out]  Core          Returns the processor core ID.
+  @param[out]  Thread        Returns the processor thread ID.
+**/
+VOID
+GetProcessorLocation(
+  IN  UINT32  InitialApicId,
+  OUT UINT32  *Package  OPTIONAL,
+  OUT UINT32  *Core    OPTIONAL,
+  OUT UINT32  *Thread  OPTIONAL
+  )
+{
+  BOOLEAN                       TopologyLeafSupported;
+  UINTN                         ThreadBits;
+  UINTN                         CoreBits;
+  CPUID_VERSION_INFO_EBX        VersionInfoEbx;
+  CPUID_VERSION_INFO_EDX        VersionInfoEdx;
+  CPUID_CACHE_PARAMS_EAX        CacheParamsEax;
+  CPUID_EXTENDED_TOPOLOGY_EAX   ExtendedTopologyEax;
+  CPUID_EXTENDED_TOPOLOGY_EBX   ExtendedTopologyEbx;
+  CPUID_EXTENDED_TOPOLOGY_ECX   ExtendedTopologyEcx;
+  UINT32                        MaxCpuIdIndex;
+  UINT32                        SubIndex;
+  UINTN                         LevelType;
+  UINT32                        MaxLogicProcessorsPerPackage;
+  UINT32                        MaxCoresPerPackage;
+
+  //
+  // Check if the processor is capable of supporting more than one logical processor.
+  //
+  AsmCpuid(CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
+  if (VersionInfoEdx.Bits.HTT == 0) {
+    if (Thread != NULL) {
+      *Thread  = 0;
+    }
+    if (Core != NULL) {
+      *Core    = 0;
+    }
+    if (Package != NULL) {
+      *Package = 0;
+    }
+    return;
+  }
+
+  ThreadBits = 0;
+  CoreBits = 0;
+
+  //
+  // Assume three-level mapping of APIC ID: Package:Core:SMT.
+  //
+  TopologyLeafSupported = FALSE;
+
+  //
+  // Get the max index of basic CPUID
+  //
+  AsmCpuid(CPUID_SIGNATURE, &MaxCpuIdIndex, NULL, NULL, NULL);
+
+  //
+  // If the extended topology enumeration leaf is available, it
+  // is the preferred mechanism for enumerating topology.
+  //
+  if (MaxCpuIdIndex >= CPUID_EXTENDED_TOPOLOGY) {
+    AsmCpuidEx(
+      CPUID_EXTENDED_TOPOLOGY,
+      0,
+      &ExtendedTopologyEax.Uint32,
+      &ExtendedTopologyEbx.Uint32,
+      &ExtendedTopologyEcx.Uint32,
+      NULL
+      );
+    //
+    // If CPUID.(EAX=0BH, ECX=0H):EBX returns zero and maximum input value for
+    // basic CPUID information is greater than 0BH, then CPUID.0BH leaf is not
+    // supported on that processor.
+    //
+    if (ExtendedTopologyEbx.Uint32 != 0) {
+      TopologyLeafSupported = TRUE;
+
+      //
+      // Sub-leaf index 0 (ECX= 0 as input) provides enumeration parameters to extract
+      // the SMT sub-field of x2APIC ID.
+      //
+      LevelType = ExtendedTopologyEcx.Bits.LevelType;
+      ASSERT(LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT);
+      ThreadBits = ExtendedTopologyEax.Bits.ApicIdShift;
+
+      //
+      // Software must not assume any "level type" encoding
+      // value to be related to any sub-leaf index, except sub-leaf 0.
+      //
+      SubIndex = 1;
+      do {
+        AsmCpuidEx(
+          CPUID_EXTENDED_TOPOLOGY,
+          SubIndex,
+          &ExtendedTopologyEax.Uint32,
+          NULL,
+          &ExtendedTopologyEcx.Uint32,
+          NULL
+          );
+        LevelType = ExtendedTopologyEcx.Bits.LevelType;
+        if (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE) {
+          CoreBits = ExtendedTopologyEax.Bits.ApicIdShift - ThreadBits;
+          break;
+        }
+        SubIndex++;
+      } while (LevelType != CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_INVALID);
+    }
+  }
+
+  if (!TopologyLeafSupported) {
+    AsmCpuid(CPUID_VERSION_INFO, NULL, &VersionInfoEbx.Uint32, NULL, NULL);
+    MaxLogicProcessorsPerPackage = VersionInfoEbx.Bits.MaximumAddressableIdsForLogicalProcessors;
+    if (MaxCpuIdIndex >= CPUID_CACHE_PARAMS) {
+      AsmCpuidEx(CPUID_CACHE_PARAMS, 0, &CacheParamsEax.Uint32, NULL, NULL, NULL);
+      MaxCoresPerPackage = CacheParamsEax.Bits.MaximumAddressableIdsForLogicalProcessors + 1;
+    }
+    else {
+      //
+      // Must be a single-core processor.
+      //
+      MaxCoresPerPackage = 1;
+    }
+
+    ThreadBits = (UINTN)(HighBitSet32(MaxLogicProcessorsPerPackage / MaxCoresPerPackage - 1) + 1);
+    CoreBits = (UINTN)(HighBitSet32(MaxCoresPerPackage - 1) + 1);  }
+
+  if (Thread != NULL) {
+    *Thread  = InitialApicId & ((1 << ThreadBits) - 1);
+  }
+  if (Core != NULL) {
+    *Core    = (InitialApicId >> ThreadBits) & ((1 << CoreBits) - 1);
+  }
+  if (Package != NULL) {
+    *Package = (InitialApicId >> (ThreadBits + CoreBits));
+  }
+}

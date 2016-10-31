@@ -27,125 +27,6 @@ EFI_SMM_CPU_SERVICE_PROTOCOL  mSmmCpuService = {
 };
 
 /**
-  Get Package ID/Core ID/Thread ID of a processor.
-
-  APIC ID must be an initial APIC ID.
-
-  The algorithm below assumes the target system has symmetry across physical package boundaries
-  with respect to the number of logical processors per package, number of cores per package.
-
-  @param  ApicId    APIC ID of the target logical processor.
-  @param  Location    Returns the processor location information.
-**/
-VOID
-SmmGetProcessorLocation (
-  IN UINT32 ApicId,
-  OUT EFI_CPU_PHYSICAL_LOCATION *Location
-  )
-{
-  UINTN   ThreadBits;
-  UINTN   CoreBits;
-  UINT32  RegEax;
-  UINT32  RegEbx;
-  UINT32  RegEcx;
-  UINT32  RegEdx;
-  UINT32  MaxCpuIdIndex;
-  UINT32  SubIndex;
-  UINTN   LevelType;
-  UINT32  MaxLogicProcessorsPerPackage;
-  UINT32  MaxCoresPerPackage;
-  BOOLEAN TopologyLeafSupported;
-
-  ASSERT (Location != NULL);
-
-  ThreadBits            = 0;
-  CoreBits              = 0;
-  TopologyLeafSupported = FALSE;
-
-  //
-  // Check if the processor is capable of supporting more than one logical processor.
-  //
-  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &RegEdx);
-  ASSERT ((RegEdx & BIT28) != 0);
-
-  //
-  // Assume three-level mapping of APIC ID: Package:Core:SMT.
-  //
-
-  //
-  // Get the max index of basic CPUID
-  //
-  AsmCpuid (CPUID_SIGNATURE, &MaxCpuIdIndex, NULL, NULL, NULL);
-
-  //
-  // If the extended topology enumeration leaf is available, it
-  // is the preferred mechanism for enumerating topology.
-  //
-  if (MaxCpuIdIndex >= CPUID_EXTENDED_TOPOLOGY) {
-    AsmCpuidEx (CPUID_EXTENDED_TOPOLOGY, 0, &RegEax, &RegEbx, &RegEcx, NULL);
-    //
-    // If CPUID.(EAX=0BH, ECX=0H):EBX returns zero and maximum input value for
-    // basic CPUID information is greater than 0BH, then CPUID.0BH leaf is not
-    // supported on that processor.
-    //
-    if ((RegEbx & 0xffff) != 0) {
-      TopologyLeafSupported = TRUE;
-
-      //
-      // Sub-leaf index 0 (ECX= 0 as input) provides enumeration parameters to extract
-      // the SMT sub-field of x2APIC ID.
-      //
-      LevelType = (RegEcx >> 8) & 0xff;
-      ASSERT (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT);
-      if ((RegEbx & 0xffff) > 1 ) {
-        ThreadBits = RegEax & 0x1f;
-      } else {
-        //
-        // HT is not supported
-        //
-        ThreadBits = 0;
-      }
-
-      //
-      // Software must not assume any "level type" encoding
-      // value to be related to any sub-leaf index, except sub-leaf 0.
-      //
-      SubIndex = 1;
-      do {
-        AsmCpuidEx (CPUID_EXTENDED_TOPOLOGY, SubIndex, &RegEax, NULL, &RegEcx, NULL);
-        LevelType = (RegEcx >> 8) & 0xff;
-        if (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_CORE) {
-          CoreBits = (RegEax & 0x1f) - ThreadBits;
-          break;
-        }
-        SubIndex++;
-      } while (LevelType != CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_INVALID);
-    }
-  }
-
-  if (!TopologyLeafSupported) {
-    AsmCpuid (CPUID_VERSION_INFO, NULL, &RegEbx, NULL, NULL);
-    MaxLogicProcessorsPerPackage = (RegEbx >> 16) & 0xff;
-    if (MaxCpuIdIndex >= CPUID_CACHE_PARAMS) {
-      AsmCpuidEx (CPUID_CACHE_PARAMS, 0, &RegEax, NULL, NULL, NULL);
-      MaxCoresPerPackage = (RegEax >> 26) + 1;
-    } else {
-      //
-      // Must be a single-core processor.
-      //
-      MaxCoresPerPackage = 1;
-    }
-
-    ThreadBits = (UINTN) (HighBitSet32 (MaxLogicProcessorsPerPackage / MaxCoresPerPackage - 1) + 1);
-    CoreBits = (UINTN) (HighBitSet32 (MaxCoresPerPackage - 1) + 1);
-  }
-
-  Location->Thread = ApicId & ~((-1) << ThreadBits);
-  Location->Core = (ApicId >> ThreadBits) & ~((-1) << CoreBits);
-  Location->Package = (ApicId >> (ThreadBits+ CoreBits));
-}
-
-/**
   Gets processor information on the requested processor at the instant this call is made.
 
   @param[in]  This                 A pointer to the EFI_SMM_CPU_SERVICE_PROTOCOL instance.
@@ -280,7 +161,12 @@ SmmAddProcessor (
         gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId == INVALID_APIC_ID) {
       gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId = ProcessorId;
       gSmmCpuPrivate->ProcessorInfo[Index].StatusFlag = 0;
-      SmmGetProcessorLocation ((UINT32)ProcessorId, &gSmmCpuPrivate->ProcessorInfo[Index].Location);
+      GetProcessorLocation (
+        (UINT32)ProcessorId,
+        &gSmmCpuPrivate->ProcessorInfo[Index].Location.Package,
+        &gSmmCpuPrivate->ProcessorInfo[Index].Location.Core,
+        &gSmmCpuPrivate->ProcessorInfo[Index].Location.Thread
+        );
 
       *ProcessorNumber = Index;
       gSmmCpuPrivate->Operation[Index] = SmmCpuAdd;
