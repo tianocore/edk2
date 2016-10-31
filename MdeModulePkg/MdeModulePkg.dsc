@@ -265,6 +265,7 @@
   MdeModulePkg/Bus/Isa/IsaBusDxe/IsaBusDxe.inf
   MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
   MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
+  MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
