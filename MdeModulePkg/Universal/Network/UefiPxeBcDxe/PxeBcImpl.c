@@ -2317,11 +2317,15 @@ EfiPxeBcSetStationIP (
   if (NewSubnetMask != NULL && !IP4_IS_VALID_NETMASK (NTOHL (NewSubnetMask->Addr[0]))) {
     return EFI_INVALID_PARAMETER;
   }
-  
-  if (NewStationIp != NULL && !NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), NTOHL (NewSubnetMask->Addr[0]))) {
-    return EFI_INVALID_PARAMETER;
-  }
 
+  if (NewStationIp != NULL) {
+    if (IP4_IS_UNSPECIFIED(NTOHL (NewStationIp->Addr[0])) || 
+        IP4_IS_LOCAL_BROADCAST(NTOHL (NewStationIp->Addr[0])) ||
+        (NewSubnetMask != NULL && !NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), NTOHL (NewSubnetMask->Addr[0])))) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+  
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode    = Private->PxeBc.Mode;
 
