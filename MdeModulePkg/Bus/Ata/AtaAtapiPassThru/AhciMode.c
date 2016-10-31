@@ -371,6 +371,7 @@ AhciClearPortStatus (
   in the Status Register, the Error Register's value is also be dumped.
 
   @param  PciIo            The PCI IO protocol instance.
+  @param  AhciRegisters    The pointer to the EFI_AHCI_REGISTERS.
   @param  Port             The number of port.
   @param  AtaStatusBlock   A pointer to EFI_ATA_STATUS_BLOCK data structure.
 
@@ -379,24 +380,42 @@ VOID
 EFIAPI
 AhciDumpPortStatus (
   IN     EFI_PCI_IO_PROTOCOL        *PciIo,
+  IN     EFI_AHCI_REGISTERS         *AhciRegisters,
   IN     UINT8                      Port,
   IN OUT EFI_ATA_STATUS_BLOCK       *AtaStatusBlock
   )
 {
-  UINT32               Offset;
+  UINTN                Offset;
   UINT32               Data;
+  UINTN                FisBaseAddr;
+  EFI_STATUS           Status;
 
   ASSERT (PciIo != NULL);
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
-  Data   = AhciReadReg (PciIo, Offset);
 
   if (AtaStatusBlock != NULL) {
     ZeroMem (AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
 
-    AtaStatusBlock->AtaStatus  = (UINT8)Data;
-    if ((AtaStatusBlock->AtaStatus & BIT0) != 0) {
-      AtaStatusBlock->AtaError = (UINT8)(Data >> 8);
+    FisBaseAddr = (UINTN)AhciRegisters->AhciRFis + Port * sizeof (EFI_AHCI_RECEIVED_FIS);
+    Offset      = FisBaseAddr + EFI_AHCI_D2H_FIS_OFFSET;
+
+    Status = AhciCheckMemSet (Offset, EFI_AHCI_FIS_TYPE_MASK, EFI_AHCI_FIS_REGISTER_D2H, NULL);
+    if (!EFI_ERROR (Status)) {
+      //
+      // If D2H FIS is received, update StatusBlock with its content.
+      //
+      CopyMem (AtaStatusBlock, (UINT8 *)Offset, sizeof (EFI_ATA_STATUS_BLOCK));
+    } else {
+      //
+      // If D2H FIS is not received, only update Status & Error field through PxTFD
+      // as there is no other way to get the content of the Shadow Register Block.
+      //
+      Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
+      Data   = AhciReadReg (PciIo, (UINT32)Offset);
+
+      AtaStatusBlock->AtaStatus  = (UINT8)Data;
+      if ((AtaStatusBlock->AtaStatus & BIT0) != 0) {
+        AtaStatusBlock->AtaError = (UINT8)(Data >> 8);
+      }
     }
   }
 }
@@ -866,7 +885,7 @@ Exit:
     Map
     );
 
-  AhciDumpPortStatus (PciIo, Port, AtaStatusBlock);
+  AhciDumpPortStatus (PciIo, AhciRegisters, Port, AtaStatusBlock);
 
   return Status;
 }
@@ -1085,7 +1104,7 @@ Exit:
     }
   }
 
-  AhciDumpPortStatus (PciIo, Port, AtaStatusBlock);
+  AhciDumpPortStatus (PciIo, AhciRegisters, Port, AtaStatusBlock);
   return Status;
 }
 
@@ -1201,7 +1220,7 @@ Exit:
     Timeout
     );
 
-  AhciDumpPortStatus (PciIo, Port, AtaStatusBlock);
+  AhciDumpPortStatus (PciIo, AhciRegisters, Port, AtaStatusBlock);
 
   return Status;
 }
