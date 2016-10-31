@@ -22,3 +22,10 @@
 
 [Includes]
   Include
+
+[Guids]
+  ## HOB GUID to publish SMBIOS data records from PEI phase
+  # HOB data format is same as SMBIOS records defined in SMBIOS spec or OEM defined types
+  # Generic DXE Library / Driver can locate HOB(s) and add SMBIOS records into SMBIOS table
+  gIntelSmbiosDataHobGuid         = { 0x798e722e, 0x15b2, 0x4e13, { 0x8a, 0xe9, 0x6b, 0xa3, 0x0f, 0xf7, 0xf1, 0x67 }}
+
