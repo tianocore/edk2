@@ -1,0 +1,46 @@
+# @file
+# Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
+#
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = NonDiscoverableDeviceRegistrationLib
+  FILE_GUID                      = 8802ae41-8184-49cb-8aec-62627cd7ceb4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NonDiscoverableDeviceRegistrationLib
+
+[Sources]
+  NonDiscoverableDeviceRegistrationLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid
+
+[Guids]
+  gEdkiiNonDiscoverableAhciDeviceGuid
+  gEdkiiNonDiscoverableAmbaDeviceGuid
+  gEdkiiNonDiscoverableEhciDeviceGuid
+  gEdkiiNonDiscoverableNvmeDeviceGuid
+  gEdkiiNonDiscoverableOhciDeviceGuid
+  gEdkiiNonDiscoverableSdhciDeviceGuid
+  gEdkiiNonDiscoverableUfsDeviceGuid
+  gEdkiiNonDiscoverableUhciDeviceGuid
+  gEdkiiNonDiscoverableXhciDeviceGuid
