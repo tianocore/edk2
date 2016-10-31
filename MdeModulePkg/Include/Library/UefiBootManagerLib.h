@@ -777,4 +777,17 @@ EfiBootManagerIsValidLoadOptionVariableName (
   OUT UINT16                            *OptionNumber OPTIONAL
   );
 
+
+/**
+  Dispatch the deferred images that are returned from all DeferredImageLoad instances.
+
+  @retval EFI_SUCCESS       At least one deferred image is loaded successfully and started.
+  @retval EFI_NOT_FOUND     There is no deferred image.
+  @retval EFI_ACCESS_DENIED There are deferred images but all of them are failed to load.
+**/
+EFI_STATUS
+EFIAPI
+EfiBootManagerDispatchDeferredImages (
+  VOID
+  );
 #endif

@@ -109,6 +109,7 @@
   gEfiDriverHealthProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiFormBrowser2ProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiRamDiskProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiDeferredImageLoadProtocolGuid             ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange      ## SOMETIMES_CONSUMES
