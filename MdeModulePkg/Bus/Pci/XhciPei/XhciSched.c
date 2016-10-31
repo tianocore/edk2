@@ -683,7 +683,7 @@ XhcPeiCheckUrbResult (
       case TRB_COMPLETION_SHORT_PACKET:
       case TRB_COMPLETION_SUCCESS:
         if (EvtTrb->Completecode == TRB_COMPLETION_SHORT_PACKET) {
-          DEBUG ((EFI_D_ERROR, "XhcPeiCheckUrbResult: short packet happens!\n"));
+          DEBUG ((EFI_D_VERBOSE, "XhcPeiCheckUrbResult: short packet happens!\n"));
         }
 
         TRBType = (UINT8) (TRBPtr->Type);
