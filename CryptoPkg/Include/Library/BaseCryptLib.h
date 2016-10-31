@@ -1131,6 +1131,124 @@ HmacSha1Final (
   OUT     UINT8  *HmacValue
   );
 
+/**
+  Retrieves the size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+
+  If this interface is not supported, then return zero.
+
+  @return  The size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+  @retval  0   This interface is not supported.
+
+**/
+UINTN
+EFIAPI
+HmacSha256GetContextSize (
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory pointed by HmacSha256Context as HMAC-SHA256 context for
+  subsequent use.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[out]  HmacSha256Context  Pointer to HMAC-SHA256 context being initialized.
+  @param[in]   Key                Pointer to the user-supplied key.
+  @param[in]   KeySize            Key size in bytes.
+
+  @retval TRUE   HMAC-SHA256 context initialization succeeded.
+  @retval FALSE  HMAC-SHA256 context initialization failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Init (
+  OUT  VOID         *HmacSha256Context,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeySize
+  );
+
+/**
+  Makes a copy of an existing HMAC-SHA256 context.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If NewHmacSha256Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in]  HmacSha256Context     Pointer to HMAC-SHA256 context being copied.
+  @param[out] NewHmacSha256Context  Pointer to new HMAC-SHA256 context.
+
+  @retval TRUE   HMAC-SHA256 context copy succeeded.
+  @retval FALSE  HMAC-SHA256 context copy failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Duplicate (
+  IN   CONST VOID  *HmacSha256Context,
+  OUT  VOID        *NewHmacSha256Context
+  );
+
+/**
+  Digests the input data and updates HMAC-SHA256 context.
+
+  This function performs HMAC-SHA256 digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  HMAC-SHA256 context should be already correctly initialized by HmacSha256Init(), and should not
+  be finalized by HmacSha256Final(). Behavior with invalid context is undefined.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha256Context Pointer to the HMAC-SHA256 context.
+  @param[in]       Data              Pointer to the buffer containing the data to be digested.
+  @param[in]       DataSize          Size of Data buffer in bytes.
+
+  @retval TRUE   HMAC-SHA256 data digest succeeded.
+  @retval FALSE  HMAC-SHA256 data digest failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Update (
+  IN OUT  VOID        *HmacSha256Context,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the HMAC-SHA256 digest value.
+
+  This function completes HMAC-SHA256 hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the HMAC-SHA256 context cannot
+  be used again.
+  HMAC-SHA256 context should be already correctly initialized by HmacSha256Init(), and should
+  not be finalized by HmacSha256Final(). Behavior with invalid HMAC-SHA256 context is undefined.
+
+  If HmacSha256Context is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HmacSha256Context  Pointer to the HMAC-SHA256 context.
+  @param[out]      HashValue          Pointer to a buffer that receives the HMAC-SHA256 digest
+                                      value (32 bytes).
+
+  @retval TRUE   HMAC-SHA256 digest computation succeeded.
+  @retval FALSE  HMAC-SHA256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+HmacSha256Final (
+  IN OUT  VOID   *HmacSha256Context,
+  OUT     UINT8  *HmacValue
+  );
+
 //=====================================================================================
 //    Symmetric Cryptography Primitive
 //=====================================================================================
