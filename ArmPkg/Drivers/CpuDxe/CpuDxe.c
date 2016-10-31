@@ -225,8 +225,17 @@ EFI_CPU_ARCH_PROTOCOL mCpu = {
   CpuGetTimerValue,
   CpuSetMemoryAttributes,
   0,          // NumberOfTimers
-  4,          // DmaBufferAlignment
+  2048,       // DmaBufferAlignment
 };
+
+STATIC
+VOID
+InitializeDma (
+  IN OUT  EFI_CPU_ARCH_PROTOCOL   *CpuArchProtocol
+  )
+{
+  CpuArchProtocol->DmaBufferAlignment = ArmCacheWritebackGranule ();
+}
 
 EFI_STATUS
 CpuDxeInitialize (
@@ -238,6 +247,8 @@ CpuDxeInitialize (
   EFI_EVENT    IdleLoopEvent;
 
   InitializeExceptions (&mCpu);
+
+  InitializeDma (&mCpu);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                 &mCpuHandle,
