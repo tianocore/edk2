@@ -54,6 +54,7 @@
 
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
+  Pk/CryptPkcs5Pbkdf2Null.c
   Pk/CryptPkcs7SignNull.c
   Pk/CryptPkcs7Verify.c
 

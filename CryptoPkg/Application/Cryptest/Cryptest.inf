@@ -1,9 +1,9 @@
 ## @file
 #  Shell application that will test the crypto library.
 #
-#  UEFI Application for the Validation of cryptography library (based on OpenSSL 0.9.8zb).
+#  UEFI Application for the Validation of cryptography library (based on OpenSSL-1.0.2j).
 #
-#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -37,6 +37,7 @@
   BlockCipherVerify.c
   RsaVerify.c
   RsaVerify2.c
+  Pkcs5Pbkdf2Verify.c
   AuthenticodeVerify.c
   TSVerify.c
   DhVerify.c
