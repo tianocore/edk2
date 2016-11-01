@@ -1,7 +1,7 @@
 /** @file
   Application for Hash Primitives Validation.
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -127,7 +127,19 @@ ValidateCryptDigest (
   FreePool (HashCtx);
 
   Print (L"Check Value... ");
-  if (CompareMem (Digest, Md4Digest, MD5_DIGEST_SIZE) != 0) {
+  if (CompareMem (Digest, Md4Digest, MD4_DIGEST_SIZE) != 0) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print (L"HashAll... ");
+  ZeroMem (Digest, MD5_DIGEST_SIZE);
+  Status  = Md4HashAll (HashData, DataSize, Digest);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+  if (CompareMem (Digest, Md4Digest, MD4_DIGEST_SIZE) != 0) {
     Print (L"[Fail]");
     return EFI_ABORTED;
   }
@@ -167,6 +179,18 @@ ValidateCryptDigest (
   FreePool (HashCtx);
 
   Print (L"Check Value... ");
+  if (CompareMem (Digest, Md5Digest, MD5_DIGEST_SIZE) != 0) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print (L"HashAll... ");
+  ZeroMem (Digest, MD5_DIGEST_SIZE);
+  Status  = Md5HashAll (HashData, DataSize, Digest);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
   if (CompareMem (Digest, Md5Digest, MD5_DIGEST_SIZE) != 0) {
     Print (L"[Fail]");
     return EFI_ABORTED;
@@ -212,6 +236,18 @@ ValidateCryptDigest (
     return EFI_ABORTED;
   }
 
+  Print (L"HashAll... ");
+  ZeroMem (Digest, SHA1_DIGEST_SIZE);
+  Status  = Sha1HashAll (HashData, DataSize, Digest);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+  if (CompareMem (Digest, Sha1Digest, SHA1_DIGEST_SIZE) != 0) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
   Print (L"[Pass]\n");
 
   Print (L"- SHA256: ");
@@ -247,6 +283,18 @@ ValidateCryptDigest (
   FreePool (HashCtx);
 
   Print (L"Check Value... ");
+  if (CompareMem (Digest, Sha256Digest, SHA256_DIGEST_SIZE) != 0) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print (L"HashAll... ");
+  ZeroMem (Digest, SHA256_DIGEST_SIZE);
+  Status  = Sha256HashAll (HashData, DataSize, Digest);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
   if (CompareMem (Digest, Sha256Digest, SHA256_DIGEST_SIZE) != 0) {
     Print (L"[Fail]");
     return EFI_ABORTED;
@@ -292,6 +340,18 @@ ValidateCryptDigest (
     return EFI_ABORTED;
   }
 
+  Print (L"HashAll... ");
+  ZeroMem (Digest, SHA384_DIGEST_SIZE);
+  Status  = Sha384HashAll (HashData, DataSize, Digest);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+  if (CompareMem (Digest, Sha384Digest, SHA384_DIGEST_SIZE) != 0) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
   Print (L"[Pass]\n");
 
   Print (L"- SHA512: ");
@@ -327,6 +387,18 @@ ValidateCryptDigest (
   FreePool (HashCtx);
 
   Print (L"Check Value... ");
+  if (CompareMem (Digest, Sha512Digest, SHA512_DIGEST_SIZE) != 0) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
+
+  Print (L"HashAll... ");
+  ZeroMem (Digest, SHA512_DIGEST_SIZE);
+  Status  = Sha512HashAll (HashData, DataSize, Digest);
+  if (!Status) {
+    Print (L"[Fail]");
+    return EFI_ABORTED;
+  }
   if (CompareMem (Digest, Sha512Digest, SHA512_DIGEST_SIZE) != 0) {
     Print (L"[Fail]");
     return EFI_ABORTED;

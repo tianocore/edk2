@@ -1,7 +1,7 @@
 /** @file
   SHA-384 and SHA-512 Digest Wrapper Implementations which does not provide real capabilities.
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -123,6 +123,31 @@ Sha384Final (
 }
 
 /**
+  Computes the SHA-384 message digest of a input data buffer.
+
+  Return FALSE to indicate this interface is not supported.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-384 digest
+                           value (48 bytes).
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha384HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
   Retrieves the size, in bytes, of the context buffer required for SHA-512 hash operations.
 
   Return zero to indicate this interface is not supported.
@@ -224,6 +249,31 @@ EFIAPI
 Sha512Final (
   IN OUT  VOID   *Sha512Context,
   OUT     UINT8  *HashValue
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
+  Computes the SHA-512 message digest of a input data buffer.
+
+  Return FALSE to indicate this interface is not supported.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-512 digest
+                           value (64 bytes).
+
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha512HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   )
 {
   ASSERT (FALSE);

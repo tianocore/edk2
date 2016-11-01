@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -193,6 +193,32 @@ Md4Final (
   );
 
 /**
+  Computes the MD4 message digest of a input data buffer.
+
+  This function performs the MD4 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the MD4 digest
+                           value (16 bytes).
+
+  @retval TRUE   MD4 digest computation succeeded.
+  @retval FALSE  MD4 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Md4HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+/**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
   If this interface is not supported, then return zero.
@@ -304,6 +330,32 @@ EFIAPI
 Md5Final (
   IN OUT  VOID   *Md5Context,
   OUT     UINT8  *HashValue
+  );
+
+/**
+  Computes the MD5 message digest of a input data buffer.
+
+  This function performs the MD5 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the MD5 digest
+                           value (16 bytes).
+
+  @retval TRUE   MD5 digest computation succeeded.
+  @retval FALSE  MD5 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Md5HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 /**
@@ -421,6 +473,32 @@ Sha1Final (
   );
 
 /**
+  Computes the SHA-1 message digest of a input data buffer.
+
+  This function performs the SHA-1 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-1 digest
+                           value (20 bytes).
+
+  @retval TRUE   SHA-1 digest computation succeeded.
+  @retval FALSE  SHA-1 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha1HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+/**
   Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
 
   @return  The size, in bytes, of the context buffer required for SHA-256 hash operations.
@@ -523,6 +601,32 @@ EFIAPI
 Sha256Final (
   IN OUT  VOID   *Sha256Context,
   OUT     UINT8  *HashValue
+  );
+
+/**
+  Computes the SHA-256 message digest of a input data buffer.
+
+  This function performs the SHA-256 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-256 digest
+                           value (32 bytes).
+
+  @retval TRUE   SHA-256 digest computation succeeded.
+  @retval FALSE  SHA-256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha256HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 /**
@@ -631,6 +735,32 @@ Sha384Final (
   );
 
 /**
+  Computes the SHA-384 message digest of a input data buffer.
+
+  This function performs the SHA-384 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-384 digest
+                           value (48 bytes).
+
+  @retval TRUE   SHA-384 digest computation succeeded.
+  @retval FALSE  SHA-384 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha384HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  );
+
+/**
   Retrieves the size, in bytes, of the context buffer required for SHA-512 hash operations.
 
   @return  The size, in bytes, of the context buffer required for SHA-512 hash operations.
@@ -733,6 +863,32 @@ EFIAPI
 Sha512Final (
   IN OUT  VOID   *Sha512Context,
   OUT     UINT8  *HashValue
+  );
+
+/**
+  Computes the SHA-512 message digest of a input data buffer.
+
+  This function performs the SHA-512 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-512 digest
+                           value (64 bytes).
+
+  @retval TRUE   SHA-512 digest computation succeeded.
+  @retval FALSE  SHA-512 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha512HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
   );
 
 //=====================================================================================

@@ -1,7 +1,7 @@
 /** @file
   SHA-256 Digest Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -180,4 +180,50 @@ Sha256Final (
   // OpenSSL SHA-256 Hash Finalization
   //
   return (BOOLEAN) (SHA256_Final (HashValue, (SHA256_CTX *) Sha256Context));
+}
+
+/**
+  Computes the SHA-256 message digest of a input data buffer.
+
+  This function performs the SHA-256 message digest of a given data buffer, and places
+  the digest value into the specified memory.
+
+  If this interface is not supported, then return FALSE.
+
+  @param[in]   Data        Pointer to the buffer containing the data to be hashed.
+  @param[in]   DataSize    Size of Data buffer in bytes.
+  @param[out]  HashValue   Pointer to a buffer that receives the SHA-256 digest
+                           value (32 bytes).
+
+  @retval TRUE   SHA-256 digest computation succeeded.
+  @retval FALSE  SHA-256 digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+Sha256HashAll (
+  IN   CONST VOID  *Data,
+  IN   UINTN       DataSize,
+  OUT  UINT8       *HashValue
+  )
+{
+  //
+  // Check input parameters.
+  //
+  if (HashValue == NULL) {
+    return FALSE;
+  }
+  if (Data == NULL && DataSize != 0) {
+    return FALSE;
+  }
+
+  //
+  // OpenSSL SHA-256 Hash Computation.
+  //
+  if (SHA256 (Data, DataSize, HashValue) == NULL) {
+    return FALSE;
+  } else {
+    return TRUE;
+  }
 }
