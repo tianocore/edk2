@@ -571,6 +571,7 @@ UpdateTerminalContent (
 /**
   Update the console content in ConsoleMenu.
 
+  @param ConsoleName       The name for the console device type.
   @param BmmData           The BMM fake NV data.
 
 **/
