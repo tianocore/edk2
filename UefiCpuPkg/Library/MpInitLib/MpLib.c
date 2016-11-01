@@ -1325,7 +1325,7 @@ MpInitLibGetProcessorInfo (
   //
   // Get processor location information
   //
-  GetProcessorLocation (
+  GetProcessorLocationByApicId (
     CpuMpData->CpuData[ProcessorNumber].ApicId,
     &ProcessorInfoBuffer->Location.Package,
     &ProcessorInfoBuffer->Location.Core,

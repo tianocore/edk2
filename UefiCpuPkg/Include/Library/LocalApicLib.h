@@ -424,7 +424,7 @@ GetApicMsiValue (
   @param[out]  Thread        Returns the processor thread ID.
 **/
 VOID
-GetProcessorLocation(
+GetProcessorLocationByApicId (
   IN  UINT32  InitialApicId,
   OUT UINT32  *Package  OPTIONAL,
   OUT UINT32  *Core    OPTIONAL,

@@ -161,7 +161,7 @@ SmmAddProcessor (
         gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId == INVALID_APIC_ID) {
       gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId = ProcessorId;
       gSmmCpuPrivate->ProcessorInfo[Index].StatusFlag = 0;
-      GetProcessorLocation (
+      GetProcessorLocationByApicId (
         (UINT32)ProcessorId,
         &gSmmCpuPrivate->ProcessorInfo[Index].Location.Package,
         &gSmmCpuPrivate->ProcessorInfo[Index].Location.Core,
