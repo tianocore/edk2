@@ -30,6 +30,7 @@ typedef struct {
   DEFERRED_3RD_PARTY_IMAGE_INFO     *ImageInfo;    ///< deferred 3rd party image item
 } DEFERRED_3RD_PARTY_IMAGE_TABLE;
 
+BOOLEAN                          mImageLoadedAfterEndOfDxe   = FALSE;
 BOOLEAN                          mEndOfDxe                   = FALSE;
 DEFERRED_3RD_PARTY_IMAGE_TABLE   mDeferred3rdPartyImage = {
   0,       // Deferred image count
@@ -257,6 +258,53 @@ EndOfDxe (
 }
 
 /**
+  Event notification for gEfiDxeSmmReadyToLockProtocolGuid event.
+
+  This function reports failure if any deferred image is loaded before
+  this callback.
+  Platform should publish ReadyToLock protocol immediately after signaling
+  of the End of DXE Event.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+DxeSmmReadyToLock (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS                Status;
+  VOID                      *Interface;
+
+  Status = gBS->LocateProtocol (&gEfiDxeSmmReadyToLockProtocolGuid, NULL, &Interface);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  gBS->CloseEvent (Event);
+
+  if (mImageLoadedAfterEndOfDxe) {
+    //
+    // Platform should not dispatch the 3rd party images after signaling EndOfDxe event
+    // but before publishing DxeSmmReadyToLock protocol.
+    //
+    DEBUG ((
+      DEBUG_ERROR,
+      "[Security] 3rd party images must be dispatched after DxeSmmReadyToLock Protocol installation!\n"
+      ));
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED,
+      (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_EC_ILLEGAL_SOFTWARE_STATE)
+      );
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+}
+
+/**
   Defer the 3rd party image load and installs Deferred Image Load Protocol.
 
   @param[in]  File                  This is a pointer to the device path of the file that
@@ -303,6 +351,7 @@ Defer3rdPartyImageLoad (
     );
 
   if (mEndOfDxe) {
+    mImageLoadedAfterEndOfDxe = TRUE;
     //
     // The image might be first time loaded after EndOfDxe,
     // So ImageInfo can be NULL.
@@ -334,6 +383,7 @@ Defer3rdPartyImageLoadInitialize (
   EFI_STATUS                           Status;
   EFI_HANDLE                           Handle;
   EFI_EVENT                            Event;
+  VOID                                 *Registration;
 
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
@@ -353,4 +403,12 @@ Defer3rdPartyImageLoadInitialize (
                   &Event
                   );
   ASSERT_EFI_ERROR (Status);
+
+  EfiCreateProtocolNotifyEvent (
+    &gEfiDxeSmmReadyToLockProtocolGuid,
+    TPL_CALLBACK,
+    DxeSmmReadyToLock,
+    NULL,
+    &Registration
+    );
 }

@@ -41,6 +41,8 @@
   UefiBootServicesTableLib
   DebugLib
   SecurityManagementLib
+  ReportStatusCodeLib
+  UefiLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
@@ -49,6 +51,7 @@
   gEfiSecurityArchProtocolGuid                  ## PRODUCES
   gEfiSecurity2ArchProtocolGuid                 ## PRODUCES
   gEfiDeferredImageLoadProtocolGuid             ## PRODUCES
+  gEfiDxeSmmReadyToLockProtocolGuid             ## CONSUMES
 
 [Depex]
   TRUE

@@ -15,16 +15,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _DEFER_3RD_PARTY_IMAGE_LOAD_H_
 #define _DEFER_3RD_PARTY_IMAGE_LOAD_H_
 
-#include <Uefi.h>
+#include <PiDxe.h>
 #include <Guid/EventGroup.h>
 #include <Protocol/DeferredImageLoad.h>
 #include <Protocol/FirmwareVolume2.h>
+#include <Protocol/DxeSmmReadyToLock.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 /**
   Returns information about a deferred image.
