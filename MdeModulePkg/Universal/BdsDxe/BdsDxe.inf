@@ -79,11 +79,13 @@
   gConnectConInEventGuid                        ## SOMETIMES_CONSUMES ## Event
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
   gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
+  gEfiEventReadyToBootGuid                      ## CONSUMES           ## Event
 
 [Protocols]
   gEfiBdsArchProtocolGuid                       ## PRODUCES
   gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
   gEdkiiVariableLockProtocolGuid                ## CONSUMES
+  gEfiDeferredImageLoadProtocolGuid             ## CONSUMES
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate    ## CONSUMES

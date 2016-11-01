@@ -86,6 +86,81 @@ BdsDxeOnConnectConInCallBack (
     DEBUG ((EFI_D_WARN, "[Bds] Connect ConIn failed - %r!!!\n", Status));
   }
 }
+/**
+  Notify function for event group EFI_EVENT_GROUP_READY_TO_BOOT. This is used to
+  check whether there is remaining deferred load images.
+
+  @param[in]  Event   The Event that is being processed.
+  @param[in]  Context The Event Context.
+
+**/
+VOID
+EFIAPI
+CheckDeferredLoadImageOnReadyToBoot (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_DEFERRED_IMAGE_LOAD_PROTOCOL   *DeferredImage;
+  UINTN                              HandleCount;
+  EFI_HANDLE                         *Handles;
+  UINTN                              Index;
+  UINTN                              ImageIndex;
+  EFI_DEVICE_PATH_PROTOCOL           *ImageDevicePath;
+  VOID                               *Image;
+  UINTN                              ImageSize;
+  BOOLEAN                            BootOption;
+  CHAR16                             *DevicePathStr;
+
+  //
+  // Find all the deferred image load protocols.
+  //
+  HandleCount = 0;
+  Handles = NULL;
+  Status = gBS->LocateHandleBuffer (
+    ByProtocol,
+    &gEfiDeferredImageLoadProtocolGuid,
+    NULL,
+    &HandleCount,
+    &Handles
+  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (Handles[Index], &gEfiDeferredImageLoadProtocolGuid, (VOID **) &DeferredImage);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    for (ImageIndex = 0; ; ImageIndex++) {
+      //
+      // Load all the deferred images in this protocol instance.
+      //
+      Status = DeferredImage->GetImageInfo (
+        DeferredImage,
+        ImageIndex,
+        &ImageDevicePath,
+        (VOID **) &Image,
+        &ImageSize,
+        &BootOption
+      );
+      if (EFI_ERROR (Status)) {
+        break;
+      }
+      DevicePathStr = ConvertDevicePathToText (ImageDevicePath, FALSE, FALSE);
+      DEBUG ((DEBUG_LOAD, "[Bds] Image was deferred but not loaded: %s.\n", DevicePathStr));
+      if (DevicePathStr != NULL) {
+        FreePool (DevicePathStr);
+      }
+    }
+  }
+  if (Handles != NULL) {
+    FreePool (Handles);
+  }
+}
 
 /**
 
@@ -119,6 +194,21 @@ BdsInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  DEBUG_CODE (
+    EFI_EVENT   Event;
+    //
+    // Register notify function to check deferred images on ReadyToBoot Event.
+    //
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    CheckDeferredLoadImageOnReadyToBoot,
+                    NULL,
+                    &gEfiEventReadyToBootGuid,
+                    &Event
+                    );
+    ASSERT_EFI_ERROR (Status);
+  );
   return Status;
 }
 

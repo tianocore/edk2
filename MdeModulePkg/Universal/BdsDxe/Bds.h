@@ -1,7 +1,7 @@
 /** @file
   Head file for BDS Architectural Protocol implementation
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,10 +20,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/ConnectConInEvent.h>
 #include <Guid/Performance.h>
 #include <Guid/StatusCodeDataTypeVariable.h>
+#include <Guid/EventGroup.h>
 
 #include <Protocol/Bds.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/VariableLock.h>
+#include <Protocol/DeferredImageLoad.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
