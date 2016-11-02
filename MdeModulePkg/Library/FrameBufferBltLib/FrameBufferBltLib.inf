@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FrameBufferBltLib
   FILE_GUID                      = 243D3E8C-2780-4A25-9693-A410475BFCEC
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = FrameBufferBltLib
 
