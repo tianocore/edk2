@@ -101,7 +101,7 @@ Returns:
     return 0;
   }
 
-  if (ErrorString != '\0') {
+  if (ErrorString != NULL) {
     if (gST->StdErr != NULL) {
       //
       // To be extra safe make sure StdErr has been initialized
