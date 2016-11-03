@@ -768,7 +768,11 @@ cleanlib:
                                     break
                             else:
                                 break
-                        RespDict[Key] = Value
+
+                        if self._AutoGenObject.ToolChainFamily == 'GCC':
+                            RespDict[Key] = Value.replace('\\', '/')
+                        else:
+                            RespDict[Key] = Value
                         for Target in BuildTargets:
                             for i, SingleCommand in enumerate(BuildTargets[Target].Commands):
                                 if FlagDict[Flag]['Macro'] in SingleCommand:
