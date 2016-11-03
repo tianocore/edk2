@@ -10,10 +10,8 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
-#include  <Uefi/UefiBaseType.h>
 #include  <Library/BaseMemoryLib.h>
 #include  <Library/BaseLib.h>
-#include  <Protocol/SimpleTextIn.h>
 
 /**
   Removes the last directory or file entry in a path by changing the last

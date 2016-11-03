@@ -338,6 +338,11 @@ struct _LIST_ENTRY {
 ///
 #define NULL  ((VOID *) 0)
 
+//
+// Null character
+//
+#define CHAR_NULL             0x0000
+
 ///
 /// Maximum values for common UEFI Data Types
 ///
