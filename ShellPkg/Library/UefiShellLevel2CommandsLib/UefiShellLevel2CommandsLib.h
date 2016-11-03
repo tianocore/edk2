@@ -25,6 +25,7 @@
 
 #include <Uefi.h>
 
+#include <Guid/GlobalVariable.h>
 #include <Guid/ShellLibHiiGuid.h>
 
 #include <Protocol/Shell.h>

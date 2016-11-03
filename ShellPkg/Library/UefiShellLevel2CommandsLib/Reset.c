@@ -2,7 +2,7 @@
   Main file for attrib shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,10 +16,11 @@
 #include "UefiShellLevel2CommandsLib.h"
 
 STATIC CONST SHELL_PARAM_ITEM ResetParamList[] = {
-  {L"-w", TypeValue},
-  {L"-s", TypeValue},
-  {L"-c", TypeValue},
-  {NULL, TypeMax}
+  {L"-w",    TypeValue},
+  {L"-s",    TypeValue},
+  {L"-c",    TypeValue},
+  {L"-fwui", TypeFlag },
+  {NULL,     TypeMax  }
   };
 
 /**
@@ -40,6 +41,9 @@ ShellCommandRunReset (
   CONST CHAR16  *String;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
+  UINT64        OsIndications;
+  UINT32        Attr;
+  UINTN         DataSize;
 
   ShellStatus = SHELL_SUCCESS;
   ProblemParam = NULL;
@@ -72,6 +76,39 @@ ShellCommandRunReset (
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");  
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
+
+      if (ShellCommandLineGetFlag (Package, L"-fwui")) {
+
+        DataSize  = sizeof (OsIndications);
+        Status = gRT->GetVariable (
+                        EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME, &gEfiGlobalVariableGuid,
+                        &Attr, &DataSize, &OsIndications
+                        );
+        if (!EFI_ERROR (Status)) {
+          if ((OsIndications & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0) {
+            DataSize = sizeof (OsIndications);
+            Status = gRT->GetVariable (
+                            EFI_OS_INDICATIONS_VARIABLE_NAME, &gEfiGlobalVariableGuid,
+                            &Attr, &DataSize, &OsIndications
+                            );
+            if (!EFI_ERROR (Status)) {
+              OsIndications |= EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+            } else {
+              OsIndications = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+            }
+            Status = gRT->SetVariable (
+                            EFI_OS_INDICATIONS_VARIABLE_NAME, &gEfiGlobalVariableGuid,
+                            EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                            sizeof (OsIndications), &OsIndications
+                            );
+          }
+        }
+        if (EFI_ERROR (Status)) {
+          ShellStatus = SHELL_UNSUPPORTED;
+          goto Error;
+        }
+      }
+
       //
       // check for warm reset flag, then shutdown reset flag, then cold (default) reset flag
       //
@@ -119,6 +156,7 @@ ShellCommandRunReset (
   // as the ResetSystem function should not return...
   //
 
+Error:
   //
   // free the command line package
   //
