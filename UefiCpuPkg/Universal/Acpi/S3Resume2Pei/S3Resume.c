@@ -515,6 +515,13 @@ S3ResumeBootOs (
     // Switch to native waking vector
     //
     TempStackTop = (UINTN)&TempStack + sizeof(TempStack);
+    DEBUG ((
+      DEBUG_INFO,
+      "%a() Stack Base: 0x%x, Stack Size: 0x%x\n",
+      __FUNCTION__,
+      TempStackTop,
+      sizeof (TempStack)
+      ));
     if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
         ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
