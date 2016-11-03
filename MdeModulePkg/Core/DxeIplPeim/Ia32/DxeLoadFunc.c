@@ -317,6 +317,14 @@ HandOffToDxeCore (
 
     AsmWriteIdtr (&gLidtDescriptor);
 
+    DEBUG ((
+      DEBUG_INFO,
+      "%a() Stack Base: 0x%lx, Stack Size: 0x%x\n",
+      __FUNCTION__,
+      BaseOfStack,
+      STACK_SIZE
+      ));
+
     //
     // Go to Long Mode and transfer control to DxeCore.
     // Interrupts will not get turned on until the CPU AP is loaded.
@@ -386,6 +394,14 @@ HandOffToDxeCore (
     // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
     //
     UpdateStackHob (BaseOfStack, STACK_SIZE);
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a() Stack Base: 0x%lx, Stack Size: 0x%x\n",
+      __FUNCTION__,
+      BaseOfStack,
+      STACK_SIZE
+      ));
 
     //
     // Transfer the control to the entry point of DxeCore.

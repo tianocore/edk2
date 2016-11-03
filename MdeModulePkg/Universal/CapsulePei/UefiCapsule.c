@@ -321,6 +321,14 @@ Thunk32To64 (
     //
     AsmWriteCr3 ((UINTN) PageTableAddress);
 
+    DEBUG ((
+      DEBUG_INFO,
+      "%a() Stack Base: 0x%lx, Stack Size: 0x%lx\n",
+      __FUNCTION__,
+      Context->StackBufferBase,
+      Context->StackBufferLength
+      ));
+
     //
     // Disable interrupt of Debug timer, since the IDT table cannot work in long mode
     //

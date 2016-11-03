@@ -265,6 +265,14 @@ _ModuleEntryPoint (
   
   ReturnContext->ReturnStatus = Status;
 
+  DEBUG ((
+    DEBUG_INFO,
+    "%a() Stack Base: 0x%lx, Stack Size: 0x%lx\n",
+    __FUNCTION__,
+    EntrypointContext->StackBufferBase,
+    EntrypointContext->StackBufferLength
+    ));
+
   //
   // Disable interrupt of Debug timer, since the new IDT table cannot work in long mode
   //
