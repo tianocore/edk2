@@ -5,7 +5,7 @@
 #    PCD Name    Offset in binary
 #    ========    ================
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ __copyright__ = "Copyright (c) 2008 - 2010, Intel Corporation. All rights reserv
 
 #============================================== Code ===============================================
 secRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.\w\$]+) +(\w+)', re.UNICODE)
-symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.\-:\\\\\w\?@\$]+) +([\da-fA-F]+)', re.UNICODE)
+symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.\-:\\\\\w\?@\$<>]+) +([\da-fA-F]+)', re.UNICODE)
 
 def parsePcdInfoFromMapFile(mapfilepath, efifilepath):
     """ Parse map file to get binary patch pcd information 
