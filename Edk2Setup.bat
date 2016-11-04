@@ -355,6 +355,15 @@
 @if defined REBUILD_TOOLS goto SetConf
 @if defined SVN_PULL goto SetConf
 
+@REM call set_vsprefix_envs.bat to set up the PREFIX env for VS tool path.
+@IF NOT exist "%EDK_TOOLS_PATH%\set_vsprefix_envs.bat" (
+  @echo.
+  @echo !!! ERROR !!! The set_vsprefix_envs.bat was not found !!!
+  @echo.
+  @goto ExitFailure
+)
+@call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat
+
 @echo.
 @echo Rebuilding of the tools is not required. Binaries of the latest,
 @echo tested versions of the tools have been tested and included in the
