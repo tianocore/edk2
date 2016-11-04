@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 2A,
-  December 2015, CPUID instruction.
+  September 2016, CPUID instruction.
 
 **/
 
@@ -433,11 +433,10 @@ typedef union {
     ///
     UINT32  PGE:1;
     ///
-    /// [Bit 14] Machine Check Architecture.  The Machine Check Architecture,
-    /// which provides a compatible mechanism for error reporting in P6 family,
-    /// Pentium 4, Intel Xeon processors, and future processors, is supported.
-    /// The MCG_CAP MSR contains feature bits describing how many banks of error
-    /// reporting MSRs are supported.
+    /// [Bit 14] Machine Check Architecture. A value of 1 indicates the Machine
+    /// Check Architecture of reporting machine errors is supported. The MCG_CAP
+    /// MSR contains feature bits describing how many banks of error reporting
+    /// MSRs are supported.
     ///
     UINT32  MCA:1;
     ///
@@ -634,13 +633,16 @@ typedef union {
   <tr><td> 0x56 </td><td> TLB     </td><td> Data TLB0: 4 MByte pages, 4-way set associative, 16 entries</td></tr>
   <tr><td> 0x57 </td><td> TLB     </td><td> Data TLB0: 4 KByte pages, 4-way associative, 16 entries</td></tr>
   <tr><td> 0x59 </td><td> TLB     </td><td> Data TLB0: 4 KByte pages, fully associative, 16 entries</td></tr>
-  <tr><td> 0x5A </td><td> TLB     </td><td> Data TLB0: 2-MByte or 4 MByte pages, 4-way set associative, 32 entries</td></tr>
+  <tr><td> 0x5A </td><td> TLB     </td><td> Data TLB0: 2 MByte or 4 MByte pages, 4-way set associative, 32 entries</td></tr>
   <tr><td> 0x5B </td><td> TLB     </td><td> Data TLB: 4 KByte and 4 MByte pages, 64 entries</td></tr>
   <tr><td> 0x5C </td><td> TLB     </td><td> Data TLB: 4 KByte and 4 MByte pages,128 entries</td></tr>
   <tr><td> 0x5D </td><td> TLB     </td><td> Data TLB: 4 KByte and 4 MByte pages,256 entries</td></tr>
   <tr><td> 0x60 </td><td> Cache   </td><td> 1st-level data cache: 16 KByte, 8-way set associative, 64 byte line size</td></tr>
   <tr><td> 0x61 </td><td> TLB     </td><td> Instruction TLB: 4 KByte pages, fully associative, 48 entries</td></tr>
-  <tr><td> 0x63 </td><td> TLB     </td><td> Data TLB: 1 GByte pages, 4-way set associative, 4 entries</td></tr>
+  <tr><td> 0x63 </td><td> TLB     </td><td> Data TLB: 2 MByte or 4 MByte pages, 4-way set associative,
+                                            32 entries and a separate array with 1 GByte pages, 4-way set associative,
+                                            4 entries</td></tr>
+  <tr><td> 0x64 </td><td> TLB     </td><td> Data TLB: 4 KByte pages, 4-way set associative, 512 entries</td></tr>
   <tr><td> 0x66 </td><td> Cache   </td><td> 1st-level data cache: 8 KByte, 4-way set associative, 64 byte line size</td></tr>
   <tr><td> 0x67 </td><td> Cache   </td><td> 1st-level data cache: 16 KByte, 4-way set associative, 64 byte line size</td></tr>
   <tr><td> 0x68 </td><td> Cache   </td><td> 1st-level data cache: 32 KByte, 4-way set associative, 64 byte line size</td></tr>
@@ -686,6 +688,7 @@ typedef union {
   <tr><td> 0xC2 </td><td> DTLB    </td><td> DTLB: 4 KByte/2 MByte pages, 4-way associative, 16 entries</td></tr>
   <tr><td> 0xC3 </td><td> STLB    </td><td> Shared 2nd-Level TLB: 4 KByte /2 MByte pages, 6-way associative,
                                             1536 entries. Also 1GBbyte pages, 4-way, 16 entries.</td></tr>
+  <tr><td> 0xC4 </td><td> DTLB    </td><td> DTLB: 2M/4M Byte pages, 4-way associative, 32 entries</td></tr>
   <tr><td> 0xCA </td><td> STLB    </td><td> Shared 2nd-Level TLB: 4 KByte pages, 4-way associative, 512 entries</td></tr>
   <tr><td> 0xD0 </td><td> Cache   </td><td> 3rd-level cache: 512 KByte, 4-way set associative, 64 byte line size</td></tr>
   <tr><td> 0xD1 </td><td> Cache   </td><td> 3rd-level cache: 1 MByte, 4-way set associative, 64 byte line size</td></tr>
@@ -1349,10 +1352,10 @@ typedef union {
     ///
     UINT32  RTM:1;
     ///
-    /// [Bit 12] Supports Platform Quality of Service Monitoring (PQM)
-    /// capability if 1.
+    /// [Bit 12] Supports Intel(R) Resource Director Technology (Intel(R) RDT)
+    /// Monitoring capability if 1.
     ///
-    UINT32  PQM:1;
+    UINT32  RDT_M:1;
     ///
     /// [Bit 13] Deprecates FPU CS and FPU DS values if 1.
     ///
@@ -1362,10 +1365,10 @@ typedef union {
     ///
     UINT32  MPX:1;
     ///
-    /// [Bit 15] Supports Platform Quality of Service Enforcement (PQE)
-    /// capability if 1.
+    /// [Bit 15] Supports Intel(R) Resource Director Technology (Intel(R) RDT)
+    /// Allocation capability if 1.
     ///
-    UINT32  PQE:1;
+    UINT32  RDT_A:1;
     UINT32  Reserved2:2;
     ///
     /// [Bit 18] If 1 indicates the processor supports the RDSEED instruction.
@@ -1386,13 +1389,22 @@ typedef union {
     /// [Bit 23] If 1 indicates the processor supports the CLFLUSHOPT instruction.
     ///
     UINT32  CLFLUSHOPT:1;
-    UINT32  Reserved4:1;
+    ///
+    /// [Bit 24] If 1 indicates the processor supports the CLWB instruction.
+    ///
+    UINT32  CLWB:1;
     ///
     /// [Bit 25] If 1 indicates the processor supports the Intel Processor Trace
     /// extensions.
     ///
     UINT32  IntelProcessorTrace:1;
-    UINT32  Reserved5:6;
+    UINT32  Reserved4:3;
+    ///
+    /// [Bit 29] Supports Intel(R) Secure Hash Algorithm Extensions (Intel(R)
+    /// SHA Extensions) if 1.
+    ///
+    UINT32  SHA:1;
+    UINT32  Reserved5:2;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
@@ -1414,7 +1426,11 @@ typedef union {
     /// [Bit 0] If 1 indicates the processor supports the PREFETCHWT1 instruction.
     ///
     UINT32  PREFETCHWT1:1;
-    UINT32  Reserved1:2;
+    UINT32  Reserved1:1;
+    ///
+    /// [Bit 2] Supports user-mode instruction prevention if 1.
+    ///
+    UINT32  UMIP:1;
     ///
     /// [Bit 3] Supports protection keys for user-mode pages if 1.
     ///
@@ -1424,7 +1440,22 @@ typedef union {
     /// RDPKRU/WRPKRU instructions).
     ///
     UINT32  OSPKE:1;
-    UINT32  Reserved2:27;
+    UINT32  Reserved2:12;
+    ///
+    /// [Bits 21:17] The value of MAWAU used by the BNDLDX and BNDSTX instructions
+    /// in 64-bit mode.
+    ///
+    UINT32  MAWAU:5;
+    ///
+    /// [Bit 22] Supports Read Processor ID if 1.
+    ///
+    UINT32  RDPID:1;
+    UINT32  Reserved3:7;
+    ///
+    /// [Bit 30] Supports SGX Launch Configuration if 1.
+    ///
+    UINT32  SGX_LC:1;
+    UINT32  Reserved4:1;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
@@ -1756,7 +1787,7 @@ typedef union {
                 enabled.
   @retval  ECX  Maximum size (bytes, from the beginning of the XSAVE/XRSTOR save
                 area) of the XSAVE/XRSTOR save area required by all supported
-                features in the processor, i.e all the valid bit fields in XCR0.
+                features in the processor, i.e., all the valid bit fields in XCR0.
   @retval  EDX  Reports the supported bits of the upper 32 bits of XCR0.
                 XCR0[n+32] can be set to 1 only if EDX[n] is 1.
 
@@ -1991,45 +2022,46 @@ typedef union {
 
 
 /**
-  CPUID Platform QoS Monitoring Information
+  CPUID Intel Resource Director Technology (Intel RDT) Monitoring Information
 
-  @param   EAX  CPUID_PLATFORM_QOS_MONITORING (0x0F)
-  @param   ECX  CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF (0x00).
-                CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF  (0x01).
+  @param   EAX  CPUID_INTEL_RDT_MONITORING (0x0F)
+  @param   ECX  CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF (0x00).
+                CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF (0x01).
 
 **/
-#define CPUID_PLATFORM_QOS_MONITORING                       0x0F
+#define CPUID_INTEL_RDT_MONITORING                          0x0F
 
 /**
-  CPUID Platform QoS Monitoring Information Enumeration Sub-leaf
+  CPUID Intel Resource Director Technology (Intel RDT) Monitoring Information
+  Enumeration Sub-leaf
 
-  @param   EAX  CPUID_PLATFORM_QOS_MONITORING (0x0F)
-  @param   ECX  CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF (0x00)
+  @param   EAX  CPUID_INTEL_RDT_MONITORING (0x0F)
+  @param   ECX  CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF (0x00)
 
   @retval  EAX  Reserved.
   @retval  EBX  Maximum range (zero-based) of RMID within this physical
                 processor of all types.
   @retval  ECX  Reserved.
-  @retval  EDX  L3 Cache QoS Monitoring Information Enumeration described by the
-                type CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF_EDX.
+  @retval  EDX  L3 Cache Intel RDT Monitoring Information Enumeration described by
+                the type CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF_EDX.
 
   <b>Example usage</b>
   @code
   UINT32                                                  Ebx;
-  CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF_EDX  Edx;
+  CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF_EDX     Edx;
 
   AsmCpuidEx (
-    CPUID_PLATFORM_QOS_MONITORING, CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF,
+    CPUID_INTEL_RDT_MONITORING, CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF,
     NULL, &Ebx, NULL, &Edx.Uint32
     );
   @endcode
 **/
-#define CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF  0x00
+#define CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF     0x00
 
 /**
-  CPUID Platform QoS Monitoring Information EDX for CPUID leaf
-  #CPUID_PLATFORM_QOS_MONITORING, sub-leaf
-  #CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF.
+  CPUID Intel RDT Monitoring Information EDX for CPUID leaf
+  #CPUID_INTEL_RDT_MONITORING, sub-leaf
+  #CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF.
 **/
 typedef union {
   ///
@@ -2038,47 +2070,47 @@ typedef union {
   struct {
     UINT32  Reserved1:1;
     ///
-    /// [Bit 1] Supports L3 Cache QoS Monitoring if 1.
+    /// [Bit 1] Supports L3 Cache Intel RDT Monitoring if 1.
     ///
-    UINT32  L3CacheQosEnforcement:1;
+    UINT32  L3CacheRDT_M:1;
     UINT32  Reserved2:30;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
   ///
   UINT32  Uint32;
-} CPUID_PLATFORM_QOS_MONITORING_ENUMERATION_SUB_LEAF_EDX;
+} CPUID_INTEL_RDT_MONITORING_ENUMERATION_SUB_LEAF_EDX;
 
 /**
-  CPUID Platform QoS Monitoring Information Capability Sub-leaf
+  CPUID L3 Cache Intel RDT Monitoring Capability Enumeration Sub-leaf
 
-  @param   EAX  CPUID_PLATFORM_QOS_MONITORING (0x0F)
-  @param   ECX  CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF (0x01)
+  @param   EAX  CPUID_INTEL_RDT_MONITORING (0x0F)
+  @param   ECX  CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF (0x01)
 
   @retval  EAX  Reserved.
   @retval  EBX  Conversion factor from reported IA32_QM_CTR value to occupancy metric (bytes).
   @retval  ECX  Maximum range (zero-based) of RMID of this resource type.
-  @retval  EDX  L3 Cache QoS Monitoring Capability information described by the
-                type CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF_EDX.
+  @retval  EDX  L3 Cache Intel RDT Monitoring Capability information described by the
+                type CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF_EDX.
 
   <b>Example usage</b>
   @code
-  UINT32                                                 Ebx;
-  UINT32                                                 Ecx;
-  CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF_EDX  Edx;
+  UINT32                                            Ebx;
+  UINT32                                            Ecx;
+  CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF_EDX  Edx;
 
   AsmCpuidEx (
-    CPUID_PLATFORM_QOS_MONITORING, CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF,
+    CPUID_INTEL_RDT_MONITORING, CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF,
     NULL, &Ebx, &Ecx, &Edx.Uint32
     );
   @endcode
 **/
-#define CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF   0x01
+#define CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF        0x01
 
 /**
-  CPUID Platform QoS Monitoring Information Capability EDX for CPUID leaf
-  #CPUID_PLATFORM_QOS_MONITORING, sub-leaf
-  #CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF.
+  CPUID L3 Cache Intel RDT Monitoring Capability Information EDX for CPUID leaf
+  #CPUID_INTEL_RDT_MONITORING, sub-leaf
+  #CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF.
 **/
 typedef union {
   ///
@@ -2089,53 +2121,61 @@ typedef union {
     /// [Bit 0] Supports L3 occupancy monitoring if 1.
     ///
     UINT32  L3CacheOccupancyMonitoring:1;
-    UINT32  Reserved:31;
+    ///
+    /// [Bit 1] Supports L3 Total Bandwidth monitoring if 1.
+    ///
+    UINT32  L3CacheTotalBandwidthMonitoring:1;
+    ///
+    /// [Bit 2] Supports L3 Local Bandwidth monitoring if 1.
+    ///
+    UINT32  L3CacheLocalBandwidthMonitoring:1;
+    UINT32  Reserved:29;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
   ///
   UINT32  Uint32;
-} CPUID_PLATFORM_QOS_MONITORING_CAPABILITY_SUB_LEAF_EDX;
+} CPUID_INTEL_RDT_MONITORING_L3_CACHE_SUB_LEAF_EDX;
 
 
 /**
-  CPUID Platform QoS Enforcement Information
+  CPUID Intel Resource Director Technology (Intel RDT) Allocation Information
 
-  @param   EAX  CPUID_PLATFORM_QOS_ENFORCEMENT (0x10).
-  @param   ECX  CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF (0x00).
-                CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF (0x01).
-                Additional sub leafs 1..n based in RESID from sub leaf 0x00.
+  @param   EAX  CPUID_INTEL_RDT_ALLOCATION (0x10).
+  @param   ECX  CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF (0x00).
+                CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF (0x01).
+                CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF (0x02).
 **/
-#define CPUID_PLATFORM_QOS_ENFORCEMENT                      0x10
+#define CPUID_INTEL_RDT_ALLOCATION                          0x10
 
 /**
-  CPUID Platform QoS Enforcement Information
+  Intel Resource Director Technology (Intel RDT) Allocation Enumeration Sub-leaf
 
-  @param   EAX  CPUID_PLATFORM_QOS_ENFORCEMENT (0x10)
-  @param   ECX  CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF (0x00).
+  @param   EAX  CPUID_INTEL_RDT_ALLOCATION (0x10)
+  @param   ECX  CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF (0x00).
 
   @retval  EAX  Reserved.
-  @retval  EBX  L3 Cache QoS Enforcement information described by the
-                type CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF_EBX.
+  @retval  EBX  L3 and L2 Cache Allocation Technology information described by
+                the type CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF_EBX.
   @retval  ECX  Reserved.
   @retval  EDX  Reserved.
 
   <b>Example usage</b>
   @code
-  CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF_EBX  Ebx;
+  CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF_EBX  Ebx;
 
   AsmCpuidEx (
-    CPUID_PLATFORM_QOS_ENFORCEMENT, CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF,
+    CPUID_INTEL_RDT_ALLOCATION, CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF,
     NULL, &Ebx.Uint32, NULL, NULL
     );
   @endcode
 **/
-#define CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF            0x00
+#define CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF     0x00
 
 /**
-  CPUID Platform QoS Enforcement Information EBX for CPUID leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT, sub-leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF.
+  CPUID L3 and L2 Cache Allocation Support Information EBX for CPUID leaf
+  #CPUID_INTEL_RDT_ALLOCATION, sub-leaf
+  #CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF.
 **/
 typedef union {
   ///
@@ -2144,52 +2184,55 @@ typedef union {
   struct {
     UINT32  Reserved1:1;
     ///
-    /// [Bit 1] Supports L3 Cache QoS Enforcement if 1.
+    /// [Bit 1] Supports L3 Cache Allocation Technology if 1.
     ///
-    UINT32  L3CacheQosEnforcement:1;
-    UINT32  Reserved2:30;
+    UINT32  L3CacheAllocation:1;
+    ///
+    /// [Bit 2] Supports L2 Cache Allocation Technology if 1.
+    ///
+    UINT32  L2CacheAllocation:1;
+    UINT32  Reserved2:29;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
   ///
   UINT32  Uint32;
-} CPUID_PLATFORM_QOS_ENFORCEMENT_MAIN_LEAF_EBX;
+} CPUID_INTEL_RDT_ALLOCATION_ENUMERATION_SUB_LEAF_EBX;
 
 
 /**
-  CPUID Platform QoS Enforcement Information
+  L3 Cache Allocation Technology Enumeration Sub-leaf
 
-  @param   EAX  CPUID_PLATFORM_QOS_ENFORCEMENT (0x10)
-  @param   ECX  CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF (0x00)
-                Additional sub leafs 1..n based in RESID from sub leaf 0x00.
+  @param   EAX  CPUID_INTEL_RDT_ALLOCATION (0x10)
+  @param   ECX  CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF (0x01)
 
-  @retval  EAX  RESID L3 Cache3 QoS Enforcement information described by the
-                type CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_EAX.
+  @retval  EAX  RESID L3 Cache Allocation Technology information described by
+                the type CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_EAX.
   @retval  EBX  Bit-granular map of isolation/contention of allocation units.
-  @retval  ECX  RESID L3 Cache3 QoS Enforcement information described by the
-                type CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_ECX.
-  @retval  EDX  RESID L3 Cache3 QoS Enforcement information described by the
-                type CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_EDX.
+  @retval  ECX  RESID L3 Cache Allocation Technology information described by
+                the type CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_ECX.
+  @retval  EDX  RESID L3 Cache Allocation Technology information described by
+                the type CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_EDX.
 
   <b>Example usage</b>
   @code
-  CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_EAX Eax;
+  CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_EAX  Eax;
   UINT32                                            Ebx;
-  CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_ECX Ecx;
-  CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_EDX Edx;
+  CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_ECX  Ecx;
+  CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_EDX  Edx;
 
   AsmCpuidEx (
-    CPUID_PLATFORM_QOS_ENFORCEMENT, CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF,
+    CPUID_INTEL_RDT_ALLOCATION, CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF,
     &Eax.Uint32, &Ebx, &Ecx.Uint32, &Edx.Uint32
     );
   @endcode
 **/
-#define CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF       0x01
+#define CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF        0x01
 
 /**
-  CPUID Platform QoS Enforcement Information EAX for CPUID leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT, sub-leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF.
+  CPUID L3 Cache Allocation Technology Information EAX for CPUID leaf
+  #CPUID_INTEL_RDT_ALLOCATION, sub-leaf
+  #CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF.
 **/
 typedef union {
   ///
@@ -2197,21 +2240,22 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bits 3:0] Length of the capacity bit mask for the corresponding ResID.
+    /// [Bits 4:0] Length of the capacity bit mask for the corresponding ResID
+    /// using minus-one notation.
     ///
-    UINT32  CapacityLength:4;
-    UINT32  Reserved:28;
+    UINT32  CapacityLength:5;
+    UINT32  Reserved:27;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
   ///
   UINT32  Uint32;
-} CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_EAX;
+} CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_EAX;
 
 /**
-  CPUID Platform QoS Enforcement Information ECX for CPUID leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT, sub-leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF.
+  CPUID L3 Cache Allocation Technology Information ECX for CPUID leaf
+  #CPUID_INTEL_RDT_ALLOCATION, sub-leaf
+  #CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF.
 **/
 typedef union {
   ///
@@ -2233,12 +2277,12 @@ typedef union {
   /// All bit fields as a 32-bit value
   ///
   UINT32  Uint32;
-} CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_ECX;
+} CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_ECX;
 
 /**
-  CPUID Platform QoS Enforcement Information EDX for CPUID leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT, sub-leaf
-  #CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF.
+  CPUID L3 Cache Allocation Technology Information EDX for CPUID leaf
+  #CPUID_INTEL_RDT_ALLOCATION, sub-leaf
+  #CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF.
 **/
 typedef union {
   ///
@@ -2255,7 +2299,79 @@ typedef union {
   /// All bit fields as a 32-bit value
   ///
   UINT32  Uint32;
-} CPUID_PLATFORM_QOS_ENFORCEMENT_RESID_SUB_LEAF_EDX;
+} CPUID_INTEL_RDT_ALLOCATION_L3_CACHE_SUB_LEAF_EDX;
+
+/**
+  L2 Cache Allocation Technology Enumeration Sub-leaf
+
+  @param   EAX  CPUID_INTEL_RDT_ALLOCATION (0x10)
+  @param   ECX  CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF (0x02)
+
+  @retval  EAX  RESID L2 Cache Allocation Technology information described by
+                the type CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF_EAX.
+  @retval  EBX  Bit-granular map of isolation/contention of allocation units.
+  @retval  ECX  Reserved.
+  @retval  EDX  RESID L2 Cache Allocation Technology information described by
+                the type CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF_EDX.
+
+  <b>Example usage</b>
+  @code
+  CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF_EAX  Eax;
+  UINT32                                            Ebx;
+  CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF_EDX  Edx;
+
+  AsmCpuidEx (
+    CPUID_INTEL_RDT_ALLOCATION, CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF,
+    &Eax.Uint32, &Ebx, NULL, &Edx.Uint32
+    );
+  @endcode
+**/
+#define CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF        0x02
+
+/**
+  CPUID L2 Cache Allocation Technology Information EAX for CPUID leaf
+  #CPUID_INTEL_RDT_ALLOCATION, sub-leaf
+  #CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 4:0] Length of the capacity bit mask for the corresponding ResID
+    /// using minus-one notation.
+    ///
+    UINT32  CapacityLength:5;
+    UINT32  Reserved:27;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF_EAX;
+
+/**
+  CPUID L2 Cache Allocation Technology Information EDX for CPUID leaf
+  #CPUID_INTEL_RDT_ALLOCATION, sub-leaf
+  #CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 15:0] Highest COS number supported for this ResID.
+    ///
+    UINT32  HighestCosNumber:16;
+    UINT32  Reserved:16;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_INTEL_RDT_ALLOCATION_L2_CACHE_SUB_LEAF_EDX;
 
 
 /**
@@ -2580,26 +2696,38 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bit 0] If 1, Indicates that IA32_RTIT_CTL.CR3Filter can be set to 1,
+    /// [Bit 0] If 1, indicates that IA32_RTIT_CTL.CR3Filter can be set to 1,
     /// and that IA32_RTIT_CR3_MATCH MSR can be accessed.
     ///
     UINT32  Cr3Filter:1;
     ///
-    /// [Bit 1] If 1, Indicates support of Configurable PSB and Cycle-Accurate
+    /// [Bit 1] If 1, indicates support of Configurable PSB and Cycle-Accurate
     /// Mode.
     ///
     UINT32  ConfigurablePsb:1;
     ///
-    /// [Bit 2] If 1, Indicates support of IP Filtering, TraceStop filtering,
+    /// [Bit 2] If 1, indicates support of IP Filtering, TraceStop filtering,
     /// and preservation of Intel PT MSRs across warm reset.
     ///
     UINT32  IpTraceStopFiltering:1;
     ///
-    /// [Bit 3] If 1, Indicates support of MTC timing packet and suppression of
+    /// [Bit 3] If 1, indicates support of MTC timing packet and suppression of
     /// COFI-based packets.
     ///
     UINT32  Mtc:1;
-    UINT32  Reserved:28;
+    ///
+    /// [Bit 4] If 1, indicates support of PTWRITE. Writes can set
+    /// IA32_RTIT_CTL[12] (PTWEn) and IA32_RTIT_CTL[5] (FUPonPTW), and PTWRITE
+    /// can generate packets.
+    ///
+    UINT32  PTWrite:1;
+    ///
+    /// [Bit 5] If 1, indicates support of Power Event Trace. Writes can set
+    /// IA32_RTIT_CTL[4] (PwrEvtEn), enabling Power Event Trace packet
+    /// generation.
+    ///
+    UINT32  PowerEventTrace:1;
+    UINT32  Reserved:26;
   } Bits;
   ///
   /// All bit fields as a 32-bit value
@@ -2629,16 +2757,16 @@ typedef union {
     ///
     UINT32  ToPA:1;
     ///
-    /// [Bit 2] If 1, Indicates support of Single-Range Output scheme.
+    /// [Bit 2] If 1, indicates support of Single-Range Output scheme.
     ///
     UINT32  SingleRangeOutput:1;
     ///
-    /// [Bit 3] If 1, Indicates support of output to Trace Transport subsystem.
+    /// [Bit 3] If 1, indicates support of output to Trace Transport subsystem.
     ///
     UINT32  TraceTransportSubsystem:1;
     UINT32  Reserved:27;
     ///
-    /// [Bit 31] If 1, Generated packets which contain IP payloads have LIP
+    /// [Bit 31] If 1, generated packets which contain IP payloads have LIP
     /// values, which include the CS base component.
     ///
     UINT32  LIP:1;
@@ -2738,13 +2866,14 @@ typedef union {
 
 
 /**
-  CPUID Time Stamp Counter Information
+  CPUID Time Stamp Counter and Nominal Core Crystal Clock Information
 
   @note
   If EBX[31:0] is 0, the TSC/"core crystal clock" ratio is not enumerated.
   EBX[31:0]/EAX[31:0] indicates the ratio of the TSC frequency and the core
   crystal clock frequency.
-    "TSC frequency" = "core crystal clock frequency" * EBX/EAX.
+  If ECX is 0, the nominal core crystal clock frequency is not enumerated.
+  "TSC frequency" = "core crystal clock frequency" * EBX/EAX.
   The core crystal clock may differ from the reference clock, bus clock, or core
   clock frequencies.
 
@@ -2754,15 +2883,17 @@ typedef union {
                 TSC/"core crystal clock" ratio
   @retval  EBX  An unsigned integer which is the numerator of the
                 TSC/"core crystal clock" ratio.
-  @retval  ECX  Reserved.
+  @retval  ECX  An unsigned integer which is the nominal frequency
+                of the core crystal clock in Hz.
   @retval  EDX  Reserved.
 
   <b>Example usage</b>
   @code
   UINT32  Eax;
   UINT32  Ebx;
+  UINT32  Ecx;
 
-  AsmCpuid (CPUID_TIME_STAMP_COUNTER, &Eax, &Ebx, NULL, NULL);
+  AsmCpuid (CPUID_TIME_STAMP_COUNTER, &Eax, &Ebx, &Ecx, NULL);
   @endcode
 **/
 #define CPUID_TIME_STAMP_COUNTER                            0x15
