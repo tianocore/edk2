@@ -53,6 +53,13 @@
 %include "Ia32/SearchForSecEntry.asm"
 
 %ifdef ARCH_X64
+  #include <AutoGen.h>
+
+  %if (FixedPcdGet32 (PcdOvmfSecPageTablesSize) != 0x6000)
+    %error "This implementation inherently depends on PcdOvmfSecPageTablesSize"
+  %endif
+
+  %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
 %include "Ia32/Flat32ToFlat64.asm"
 %include "Ia32/PageTables64.asm"
 %endif

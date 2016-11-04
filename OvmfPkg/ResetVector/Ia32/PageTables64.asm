@@ -44,10 +44,11 @@ BITS    32
 SetCr3ForPageTables64:
 
     ;
-    ; For OVMF, build some initial page tables at 0x800000-0x806000.
+    ; For OVMF, build some initial page tables at
+    ; PcdOvmfSecPageTablesBase - (PcdOvmfSecPageTablesBase + 0x6000).
     ;
-    ; This range should match with PcdOvmfSecPageTablesBase and
-    ; PcdOvmfSecPageTablesSize which are declared in the FDF files.
+    ; This range should match with PcdOvmfSecPageTablesSize which is
+    ; declared in the FDF files.
     ;
     ; At the end of PEI, the pages tables will be rebuilt into a
     ; more permanent location by DxeIpl.
@@ -56,21 +57,21 @@ SetCr3ForPageTables64:
     mov     ecx, 6 * 0x1000 / 4
     xor     eax, eax
 clearPageTablesMemoryLoop:
-    mov     dword[ecx * 4 + 0x800000 - 4], eax
+    mov     dword[ecx * 4 + PT_ADDR (0) - 4], eax
     loop    clearPageTablesMemoryLoop
 
     ;
     ; Top level Page Directory Pointers (1 * 512GB entry)
     ;
-    mov     dword[0x800000], 0x801000 + PAGE_PDP_ATTR
+    mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDP_ATTR
 
     ;
     ; Next level Page Directory Pointers (4 * 1GB entries => 4GB)
     ;
-    mov     dword[0x801000], 0x802000 + PAGE_PDP_ATTR
-    mov     dword[0x801008], 0x803000 + PAGE_PDP_ATTR
-    mov     dword[0x801010], 0x804000 + PAGE_PDP_ATTR
-    mov     dword[0x801018], 0x805000 + PAGE_PDP_ATTR
+    mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x2000) + PAGE_PDP_ATTR
+    mov     dword[PT_ADDR (0x1008)], PT_ADDR (0x3000) + PAGE_PDP_ATTR
+    mov     dword[PT_ADDR (0x1010)], PT_ADDR (0x4000) + PAGE_PDP_ATTR
+    mov     dword[PT_ADDR (0x1018)], PT_ADDR (0x5000) + PAGE_PDP_ATTR
 
     ;
     ; Page Table Entries (2048 * 2MB entries => 4GB)
@@ -81,13 +82,13 @@ pageTableEntriesLoop:
     dec     eax
     shl     eax, 21
     add     eax, PAGE_2M_PDE_ATTR
-    mov     [ecx * 8 + 0x802000 - 8], eax
+    mov     [ecx * 8 + PT_ADDR (0x2000 - 8)], eax
     loop    pageTableEntriesLoop
 
     ;
     ; Set CR3 now that the paging structures are available
     ;
-    mov     eax, 0x800000
+    mov     eax, PT_ADDR (0)
     mov     cr3, eax
 
     OneTimeCallRet SetCr3ForPageTables64

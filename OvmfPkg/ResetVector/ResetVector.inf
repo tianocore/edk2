@@ -29,9 +29,14 @@
   ResetVector.nasmb
 
 [Packages]
+  OvmfPkg/OvmfPkg.dec
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [BuildOptions]
    *_*_IA32_NASMB_FLAGS = -I$(WORKSPACE)/UefiCpuPkg/ResetVector/Vtf0/
    *_*_X64_NASMB_FLAGS = -I$(WORKSPACE)/UefiCpuPkg/ResetVector/Vtf0/
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
