@@ -1,7 +1,7 @@
 /** @file
   Declaration of internal functions in BaseLib.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -726,6 +726,52 @@ InternalX86DisablePaging64 (
   IN      UINT32                    Context1,  OPTIONAL
   IN      UINT32                    Context2,  OPTIONAL
   IN      UINT32                    NewStack
+  );
+
+/**
+  Generates a 16-bit random number through RDRAND instruction.
+
+  @param[out]  Rand     Buffer pointer to store the random result.
+
+  @retval TRUE          RDRAND call was successful.
+  @retval FALSE         Failed attempts to call RDRAND.
+
+ **/
+BOOLEAN
+EFIAPI
+InternalX86RdRand16 (
+  OUT     UINT16                    *Rand
+  );
+
+/**
+  Generates a 32-bit random number through RDRAND instruction.
+
+  @param[out]  Rand     Buffer pointer to store the random result.
+
+  @retval TRUE          RDRAND call was successful.
+  @retval FALSE         Failed attempts to call RDRAND.
+
+**/
+BOOLEAN
+EFIAPI
+InternalX86RdRand32 (
+  OUT     UINT32                    *Rand
+  );
+
+/**
+  Generates a 64-bit random number through RDRAND instruction.
+
+
+  @param[out]  Rand     Buffer pointer to store the random result.
+
+  @retval TRUE          RDRAND call was successful.
+  @retval FALSE         Failed attempts to call RDRAND.
+
+**/
+BOOLEAN
+EFIAPI
+InternalX86RdRand64  (
+  OUT     UINT64                    *Rand
   );
 
 

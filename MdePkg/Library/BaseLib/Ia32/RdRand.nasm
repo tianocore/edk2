@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -27,10 +27,10 @@ SECTION .text
 ;  Generates a 16 bit random number through RDRAND instruction.
 ;  Return TRUE if Rand generated successfully, or FALSE if not.
 ;
-;  BOOLEAN EFIAPI AsmRdRand16 (UINT16 *Rand);
+;  BOOLEAN EFIAPI InternalX86RdRand16 (UINT16 *Rand);
 ;------------------------------------------------------------------------------
-global ASM_PFX(AsmRdRand16)
-ASM_PFX(AsmRdRand16):
+global ASM_PFX(InternalX86RdRand16)
+ASM_PFX(InternalX86RdRand16):
     ; rdrand   ax                  ; generate a 16 bit RN into ax
                                    ; CF=1 if RN generated ok, otherwise CF=0
     db     0xf, 0xc7, 0xf0         ; rdrand r16: "0f c7 /6  ModRM:r/m(w)"
@@ -47,10 +47,10 @@ rn16_ok:
 ;  Generates a 32 bit random number through RDRAND instruction.
 ;  Return TRUE if Rand generated successfully, or FALSE if not.
 ;
-;  BOOLEAN EFIAPI AsmRdRand32 (UINT32 *Rand);
+;  BOOLEAN EFIAPI InternalX86RdRand32 (UINT32 *Rand);
 ;------------------------------------------------------------------------------
-global ASM_PFX(AsmRdRand32)
-ASM_PFX(AsmRdRand32):
+global ASM_PFX(InternalX86RdRand32)
+ASM_PFX(InternalX86RdRand32):
     ; rdrand   eax                 ; generate a 32 bit RN into eax
                                    ; CF=1 if RN generated ok, otherwise CF=0
     db     0xf, 0xc7, 0xf0         ; rdrand r32: "0f c7 /6  ModRM:r/m(w)"
@@ -67,10 +67,10 @@ rn32_ok:
 ;  Generates a 64 bit random number through RDRAND instruction.
 ;  Return TRUE if Rand generated successfully, or FALSE if not.
 ;
-;  BOOLEAN EFIAPI AsmRdRand64 (UINT64 *Rand);
+;  BOOLEAN EFIAPI InternalX86RdRand64 (UINT64 *Rand);
 ;------------------------------------------------------------------------------
-global ASM_PFX(AsmRdRand64)
-ASM_PFX(AsmRdRand64):
+global ASM_PFX(InternalX86RdRand64)
+ASM_PFX(InternalX86RdRand64):
     ; rdrand   eax                 ; generate a 32 bit RN into eax
                                    ; CF=1 if RN generated ok, otherwise CF=0
     db     0xf, 0xc7, 0xf0         ; rdrand r32: "0f c7 /6  ModRM:r/m(w)"

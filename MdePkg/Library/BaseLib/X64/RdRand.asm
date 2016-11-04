@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -27,9 +27,9 @@
 ;  Generates a 16 bit random number through RDRAND instruction.
 ;  Return TRUE if Rand generated successfully, or FALSE if not.
 ;
-;  BOOLEAN EFIAPI AsmRdRand16 (UINT16 *Rand);
+;  BOOLEAN EFIAPI InternalX86RdRand16 (UINT16 *Rand);
 ;------------------------------------------------------------------------------
-AsmRdRand16  PROC
+InternalX86RdRand16  PROC
     ; rdrand   ax                  ; generate a 16 bit RN into eax,
                                    ; CF=1 if RN generated ok, otherwise CF=0
     db     0fh, 0c7h, 0f0h         ; rdrand r16: "0f c7 /6  ModRM:r/m(w)"
@@ -40,15 +40,15 @@ rn16_ok:
     mov    [rcx], ax
     mov    rax,  1
     ret
-AsmRdRand16 ENDP
+InternalX86RdRand16 ENDP
 
 ;------------------------------------------------------------------------------
 ;  Generates a 32 bit random number through RDRAND instruction.
 ;  Return TRUE if Rand generated successfully, or FALSE if not.
 ;
-;  BOOLEAN EFIAPI AsmRdRand32 (UINT32 *Rand);
+;  BOOLEAN EFIAPI InternalX86RdRand32 (UINT32 *Rand);
 ;------------------------------------------------------------------------------
-AsmRdRand32  PROC
+InternalX86RdRand32  PROC
     ; rdrand   eax                 ; generate a 32 bit RN into eax,
                                    ; CF=1 if RN generated ok, otherwise CF=0
     db     0fh, 0c7h, 0f0h         ; rdrand r32: "0f c7 /6  ModRM:r/m(w)"
@@ -59,15 +59,15 @@ rn32_ok:
     mov    [rcx], eax
     mov    rax,  1
     ret
-AsmRdRand32 ENDP
+InternalX86RdRand32 ENDP
 
 ;------------------------------------------------------------------------------
 ;  Generates a 64 bit random number through one RDRAND instruction.
 ;  Return TRUE if Rand generated successfully, or FALSE if not.
 ;
-;  BOOLEAN EFIAPI AsmRdRand64 (UINT64 *Random);
+;  BOOLEAN EFIAPI InternalX86RdRand64 (UINT64 *Random);
 ;------------------------------------------------------------------------------
-AsmRdRand64  PROC
+InternalX86RdRand64  PROC
     ; rdrand   rax                 ; generate a 64 bit RN into rax,
                                    ; CF=1 if RN generated ok, otherwise CF=0
     db     048h, 0fh, 0c7h, 0f0h   ; rdrand r64: "REX.W + 0f c7 /6 ModRM:r/m(w)"
@@ -78,6 +78,6 @@ rn64_ok:
     mov    [rcx], rax
     mov    rax, 1
     ret
-AsmRdRand64 ENDP
+InternalX86RdRand64 ENDP
 
     END
