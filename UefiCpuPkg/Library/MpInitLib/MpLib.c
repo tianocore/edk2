@@ -1143,6 +1143,7 @@ MpInitLibInitialize (
   } else {
     MaxLogicalProcessorNumber = OldCpuMpData->CpuCount;
   }
+  ASSERT (MaxLogicalProcessorNumber != 0);
 
   AsmGetAddressMap (&AddressMap);
   ApResetVectorSize = AddressMap.RendezvousFunnelSize + sizeof (MP_CPU_EXCHANGE_INFO);
@@ -1209,10 +1210,12 @@ MpInitLibInitialize (
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
   if (OldCpuMpData == NULL) {
-    //
-    // Wakeup all APs and calculate the processor count in system
-    //
-    CollectProcessorCount (CpuMpData);
+    if (MaxLogicalProcessorNumber > 1) {
+      //
+      // Wakeup all APs and calculate the processor count in system
+      //
+      CollectProcessorCount (CpuMpData);
+    }
   } else {
     //
     // APs have been wakeup before, just get the CPU Information
@@ -1238,19 +1241,21 @@ MpInitLibInitialize (
         sizeof (CPU_VOLATILE_REGISTERS)
         );
     }
-    //
-    // Wakeup APs to do some AP initialize sync
-    //
-    WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData);
-    //
-    // Wait for all APs finished initialization
-    //
-    while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
-      CpuPause ();
-    }
-    CpuMpData->InitFlag = ApInitDone;
-    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
-      SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+    if (MaxLogicalProcessorNumber > 1) {
+      //
+      // Wakeup APs to do some AP initialize sync
+      //
+      WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData);
+      //
+      // Wait for all APs finished initialization
+      //
+      while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
+        CpuPause ();
+      }
+      CpuMpData->InitFlag = ApInitDone;
+      for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+        SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+      }
     }
   }
 

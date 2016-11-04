@@ -321,6 +321,14 @@ InitMpGlobalData (
   EFI_STATUS      Status;
 
   SaveCpuMpData (CpuMpData);
+
+  if (CpuMpData->CpuCount == 1) {
+    //
+    // If only BSP exists, return
+    //
+    return;
+  }
+
   //
   // Register an event for EndOfPei
   //

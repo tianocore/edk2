@@ -290,6 +290,13 @@ InitMpGlobalData (
 
   SaveCpuMpData (CpuMpData);
 
+  if (CpuMpData->CpuCount == 1) {
+    //
+    // If only BSP exists, return
+    //
+    return;
+  }
+
   //
   // Avoid APs access invalid buff data which allocated by BootServices,
   // so we will allocate reserved data for AP loop code.
