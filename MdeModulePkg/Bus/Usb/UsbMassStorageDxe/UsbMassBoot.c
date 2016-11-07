@@ -189,11 +189,6 @@ UsbBootExecCmd (
     return EFI_TIMEOUT;
   }
 
-  if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((EFI_D_ERROR, "UsbBootExecCmd: Device Error to Exec 0x%x Cmd\n", *(UINT8 *)Cmd));
-    return EFI_DEVICE_ERROR;
-  }
-
   //
   // If ExecCommand() returns no error and CmdResult is success,
   // then the commnad transfer is successful.
@@ -276,7 +271,7 @@ UsbBootExecCmdWithRetry (
                DataLen,
                Timeout
                );
-    if (Status == EFI_SUCCESS || Status == EFI_MEDIA_CHANGED || Status == EFI_NO_MEDIA || Status == EFI_DEVICE_ERROR) {
+    if (Status == EFI_SUCCESS || Status == EFI_MEDIA_CHANGED || Status == EFI_NO_MEDIA) {
       break;
     }
     //
