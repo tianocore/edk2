@@ -99,6 +99,8 @@
 "  -n count    Send request count, (default=10, min=1, max=10000).\r\n"
 "  -s SourceIp Source IPv6 address.\r\n"
 "  TargetIp    Target IPv6 address.\r\n"
+"NOTES:\r\n"
+"  1. When TargetIp is a link local address, SourceIp needs to be specified.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
 "Examples:\r\n"
