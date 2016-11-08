@@ -93,4 +93,39 @@ FspWaitForNotify (
   VOID
   );
 
+/**
+  This function transfer control back to BootLoader after FspSiliconInit.
+
+  @param[in] Status return status for the FspSiliconInit.
+**/
+VOID
+EFIAPI
+FspSiliconInitDone2 (
+  IN EFI_STATUS Status
+  );
+
+/**
+  This function returns control to BootLoader after MemoryInitApi.
+
+  @param[in] Status return status for the MemoryInitApi.
+  @param[in,out] HobListPtr The address of HobList pointer.
+**/
+VOID
+EFIAPI
+FspMemoryInitDone2 (
+  IN EFI_STATUS Status,
+  IN OUT VOID   **HobListPtr
+  );
+
+/**
+  This function returns control to BootLoader after TempRamExitApi.
+
+  @param[in] Status return status for the TempRamExitApi.
+**/
+VOID
+EFIAPI
+FspTempRamExitDone2 (
+  IN EFI_STATUS Status
+  );
+
 #endif
