@@ -321,6 +321,11 @@ PlatformBootManagerBeforeConsole (
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Dispatch deferred images after EndOfDxe event and ReadyToLock installation.
+  //
+  EfiBootManagerDispatchDeferredImages ();
 }
 
 /**
