@@ -88,7 +88,7 @@
   DEFINE SHELL_TYPE              = FULL_BIN
 
 [BuildOptions]
-  *_*_*_CC_FLAGS                 = /D DISABLE_NEW_DEPRECATED_INTERFACES
+  *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
   GCC:DEBUG_*_*_CC_FLAGS         = -Og -flto
   GCC:DEBUG_*_*_DLINK_FLAGS      = -flto
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
