@@ -214,6 +214,11 @@ PlatformBootManagerBeforeConsole (
   // This needs to be done before option rom dispatched.
   //
   InstallReadyToLock ();
+
+  //
+  // Dispatch deferred images after EndOfDxe event and ReadyToLock installation.
+  //
+  EfiBootManagerDispatchDeferredImages ();
 }
 
 /**
