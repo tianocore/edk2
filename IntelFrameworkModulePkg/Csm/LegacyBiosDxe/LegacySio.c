@@ -354,7 +354,7 @@ LegacyBiosBuildSioDataFromIsaIo (
         //
         for (ChildIndex = 0; ChildIndex < EntryCount; ChildIndex++) {
           if ((OpenInfoBuffer[ChildIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0) {
-            Status = gBS->HandleProtocol (OpenInfoBuffer[ChildIndex].AgentHandle, &gEfiSerialIoProtocolGuid, (VOID **) &SerialIo);
+            Status = gBS->HandleProtocol (OpenInfoBuffer[ChildIndex].ControllerHandle, &gEfiSerialIoProtocolGuid, (VOID **) &SerialIo);
             if (!EFI_ERROR (Status)) {
               SioSerial           = &SioPtr->Serial[ResourceList->Device.UID];
               SioSerial->Address  = (UINT16) IoResource->StartRange;
