@@ -124,6 +124,11 @@ PlatformBootManagerBeforeConsole (
   // the platform should signal the event EFI_END_OF_DXE_EVENT_GUID
   //
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
+
+  //
+  // Dispatch deferred images after EndOfDxe event.
+  //
+  EfiBootManagerDispatchDeferredImages ();
 }
 
 /**
