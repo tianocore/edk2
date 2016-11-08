@@ -586,6 +586,11 @@ PlatformBootManagerBeforeConsole (
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
   //
+  // Dispatch deferred images after EndOfDxe event.
+  //
+  EfiBootManagerDispatchDeferredImages ();
+
+  //
   // Locate the PCI root bridges and make the PCI bus driver connect each,
   // non-recursively. This will produce a number of child handles with PciIo on
   // them.
