@@ -201,7 +201,7 @@ GetGopDevicePath (
   }
 
   //
-  // Try to connect this handle, so that GOP dirver could start on this
+  // Try to connect this handle, so that GOP driver could start on this
   // device and create child handles with GraphicsOutput Protocol installed
   // on them, then we get device paths of these child handles and select
   // them as possible console device.
@@ -243,7 +243,7 @@ GetGopDevicePath (
         // In current implementation, we only enable one of the child handles
         // as console device, i.e. sotre one of the child handle's device
         // path to variable "ConOut"
-        // In futhure, we could select all child handles to be console device
+        // In future, we could select all child handles to be console device
         //
         *GopDevicePath = TempDevicePath;
 
