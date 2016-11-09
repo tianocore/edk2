@@ -645,14 +645,21 @@ Returns:
       //
       if (OptionHeader.Optional32->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
         RelocDir  = &OptionHeader.Optional32->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC];
-        RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
-        RelocBaseEnd = PeCoffLoaderImageAddress (
-                        ImageContext,
-                        RelocDir->VirtualAddress + RelocDir->Size - 1
-                        );
-        if (RelocBase == NULL || RelocBaseEnd == NULL || RelocBaseEnd < RelocBase) {
-          ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
-          return RETURN_LOAD_ERROR;
+        if ((RelocDir != NULL) && (RelocDir->Size > 0)) {
+          RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
+          RelocBaseEnd = PeCoffLoaderImageAddress (
+                           ImageContext,
+                           RelocDir->VirtualAddress + RelocDir->Size - 1
+                           );
+          if (RelocBase == NULL || RelocBaseEnd == NULL || RelocBaseEnd < RelocBase) {
+            ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+            return RETURN_LOAD_ERROR;
+          }
+        } else {
+          //
+          // Set base and end to bypass processing below.
+          //
+          RelocBase = RelocBaseEnd = 0;
         }
       } else {
         //
@@ -673,14 +680,21 @@ Returns:
       //
       if (OptionHeader.Optional64->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
         RelocDir  = &OptionHeader.Optional64->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC];
-        RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
-        RelocBaseEnd = PeCoffLoaderImageAddress (
-                        ImageContext,
-                        RelocDir->VirtualAddress + RelocDir->Size - 1
-                        );
-        if (RelocBase == NULL || RelocBaseEnd == NULL || RelocBaseEnd < RelocBase) {
-          ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
-          return RETURN_LOAD_ERROR;
+        if ((RelocDir != NULL) && (RelocDir->Size > 0)) {
+          RelocBase = PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress);
+          RelocBaseEnd = PeCoffLoaderImageAddress (
+                           ImageContext,
+                           RelocDir->VirtualAddress + RelocDir->Size - 1
+                          );
+          if (RelocBase == NULL || RelocBaseEnd == NULL || RelocBaseEnd < RelocBase) {
+            ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+            return RETURN_LOAD_ERROR;
+          }
+        } else {
+          //
+          // Set base and end to bypass processing below.
+          //
+          RelocBase = RelocBaseEnd = 0;
         }
       } else {
         //
