@@ -2746,7 +2746,9 @@ class FdfParser:
             if self.__GetAlignment():
                 if self.__Token not in ("Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K" ,"64K"):
                     raise Warning("Incorrect alignment '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-                AlignValue = self.__Token
+                #For FFS, Auto is default option same to ""
+                if not self.__Token == "Auto":
+                    AlignValue = self.__Token
             if not self.__GetNextToken():
                 raise Warning("expected Filename value", self.FileName, self.CurrentLineNumber)
 
