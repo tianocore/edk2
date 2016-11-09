@@ -842,7 +842,12 @@ Returns:
                );
   }
 
-  if (EFI_ERROR (Status) || (FileBuffer == NULL)) {
+  if (EFI_ERROR (Status)) {
+    goto Finish;
+  }
+
+  if (FileBuffer == NULL && FileSize != 0) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
     goto Finish;
   }
   
@@ -929,7 +934,9 @@ Returns:
     //
     // write data
     //
-    fwrite (FileBuffer, 1, FileSize - HeaderSize, FfsFile);
+    if (FileBuffer != NULL) {
+      fwrite (FileBuffer, 1, FileSize - HeaderSize, FfsFile);
+    }
 
     fclose (FfsFile);
   }
