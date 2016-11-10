@@ -897,14 +897,20 @@ Returns:
     return Status;
   }
 
-  if (FileBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
   if (InputLength == 0) {
-    free (FileBuffer);
+    if (FileBuffer != NULL) {
+      free (FileBuffer);
+    }
     Error (NULL, 0, 2000, "Invalid parameter", "the size of input file %s can't be zero", InputFileName);
     return EFI_NOT_FOUND;
+  }
+
+  //
+  // InputLength != 0, but FileBuffer == NULL means out of resources.
+  //
+  if (FileBuffer == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allcoated");
+    return EFI_OUT_OF_RESOURCES;
   }
 
   //
