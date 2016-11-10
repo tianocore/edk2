@@ -298,8 +298,8 @@ FileInterfaceNulWrite(
   @param[in]  InputString       The command line to expand.
   @param[in]  StringLen         Length of the command line.
   @param[in]  BufferSize        Buffer size.
-  @param[out] TabCompletionList Return the TAB completion list.
-  @param[out] TabUpdatePos      Return the TAB update position.
+  @param[in, out] TabCompletionList Return the TAB completion list.
+  @param[in, out] TabUpdatePos      Return the TAB update position.
 **/
 EFI_STATUS
 CreateTabCompletionList (
