@@ -1,7 +1,7 @@
 /** @file
   SMM CPU misc functions for x64 arch specific.
   
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -68,3 +68,30 @@ InitGdt (
   *GdtStepSize = GdtTableStepSize;
   return GdtTssTables;
 }
+
+/**
+  Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
+
+  @param[in] ApHltLoopCode    The 32-bit address of the safe hlt-loop function.
+  @param[in] TopOfStack       A pointer to the new stack to use for the ApHltLoopCode.
+
+**/
+VOID
+TransferApToSafeState (
+  IN UINT32             ApHltLoopCode,
+  IN UINT32             TopOfStack
+  )
+{
+  SwitchStack (
+    (SWITCH_STACK_ENTRY_POINT) (UINTN) ApHltLoopCode,
+    NULL,
+    NULL,
+    (VOID *) (UINTN) TopOfStack
+    );
+  //
+  // It should never reach here
+  //
+  ASSERT (FALSE);
+}
+
+

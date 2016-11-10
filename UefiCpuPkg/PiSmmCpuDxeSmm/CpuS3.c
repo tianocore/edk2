@@ -77,6 +77,13 @@ SMM_S3_RESUME_STATE          *mSmmS3ResumeState = NULL;
 
 BOOLEAN                      mAcpiS3Enable = TRUE;
 
+UINT8                        *mApHltLoopCode = NULL;
+UINT8                        mApHltLoopCodeTemplate[] = {
+                               0xFA,        // cli
+                               0xF4,        // hlt
+                               0xEB, 0xFC   // jmp $-2
+                               };
+
 /**
   Get MSR spin lock by MSR index.
 
@@ -376,6 +383,8 @@ MPRendezvousProcedure (
   CPU_REGISTER_TABLE         *RegisterTableList;
   UINT32                     InitApicId;
   UINTN                      Index;
+  UINT32                     TopOfStack;
+  UINT8                      Stack[128];
 
   ProgramVirtualWireMode ();
   DisableLvtInterrupts ();
@@ -393,6 +402,14 @@ MPRendezvousProcedure (
   // Count down the number with lock mechanism.
   //
   InterlockedDecrement (&mNumberToFinish);
+
+  //
+  // Place AP into the safe code
+  //
+  TopOfStack  = (UINT32) (UINTN) Stack + sizeof (Stack);
+  TopOfStack &= ~(UINT32) (CPU_STACK_ALIGNMENT - 1);
+  CopyMem ((VOID *) (UINTN) mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
+  TransferApToSafeState ((UINT32) (UINTN) mApHltLoopCode, TopOfStack);
 }
 
 /**
@@ -731,6 +748,8 @@ InitSmmS3ResumeState (
   VOID                       *GuidHob;
   EFI_SMRAM_DESCRIPTOR       *SmramDescriptor;
   SMM_S3_RESUME_STATE        *SmmS3ResumeState;
+  EFI_PHYSICAL_ADDRESS       Address;
+  EFI_STATUS                 Status;
 
   if (!mAcpiS3Enable) {
     return;
@@ -773,6 +792,20 @@ InitSmmS3ResumeState (
   // Patch SmmS3ResumeState->SmmS3Cr3
   //
   InitSmmS3Cr3 ();
+
+  //
+  // Allocate safe memory in ACPI NVS for AP to execute hlt loop in
+  // protected mode on S3 path
+  //
+  Address = BASE_4GB - 1;
+  Status  = gBS->AllocatePages (
+                   AllocateMaxAddress,
+                   EfiACPIMemoryNVS,
+                   EFI_SIZE_TO_PAGES (sizeof (mApHltLoopCodeTemplate)),
+                   &Address
+                   );
+  ASSERT_EFI_ERROR (Status);
+  mApHltLoopCode = (UINT8 *) (UINTN) Address;
 }
 
 /**

@@ -825,4 +825,17 @@ GetAcpiS3EnableFlag (
   VOID
   );
 
+/**
+  Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
+
+  @param[in] ApHltLoopCode    The 32-bit address of the safe hlt-loop function.
+  @param[in] TopOfStack       A pointer to the new stack to use for the ApHltLoopCode.
+
+**/
+VOID
+TransferApToSafeState (
+  IN UINT32             ApHltLoopCode,
+  IN UINT32             TopOfStack
+  );
+
 #endif
