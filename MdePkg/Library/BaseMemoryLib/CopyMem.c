@@ -3,7 +3,7 @@
   out into its own source file so that it can be excluded from a build for a
   particular platform easily if an optimized version is desired.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2012 - 2013, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
@@ -143,10 +143,10 @@ InternalMemCopyMem (
         *(Destination8++) = *(Source8++);
       }
     } else if (SourceBuffer < DestinationBuffer) {
-      Destination8 = (UINT8*)DestinationBuffer + Length;
-      Source8 = (CONST UINT8*)SourceBuffer + Length;
+      Destination8 = (UINT8*)DestinationBuffer + (Length - 1);
+      Source8 = (CONST UINT8*)SourceBuffer + (Length - 1);
       while (Length-- != 0) {
-        *(--Destination8) = *(--Source8);
+        *(Destination8--) = *(Source8--);
       }
     }
   }
