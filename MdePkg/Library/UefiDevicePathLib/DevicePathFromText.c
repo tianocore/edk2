@@ -3529,7 +3529,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"NVMe",                    DevPathFromTextNVMe                    },
   {L"UFS",                     DevPathFromTextUfs                     },
   {L"SD",                      DevPathFromTextSd                      },
-  {L"Emmc",                    DevPathFromTextEmmc                    },
+  {L"eMMC",                    DevPathFromTextEmmc                    },
   {L"DebugPort",               DevPathFromTextDebugPort               },
   {L"MAC",                     DevPathFromTextMAC                     },
   {L"IPv4",                    DevPathFromTextIPv4                    },

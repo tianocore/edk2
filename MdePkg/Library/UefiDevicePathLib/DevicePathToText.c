@@ -850,7 +850,7 @@ DevPathToTextEmmc (
   Emmc = DevPath;
   UefiDevicePathLibCatPrint (
     Str,
-    L"Emmc(0x%x)",
+    L"eMMC(0x%x)",
     Emmc->SlotNumber
     );
 }
