@@ -19,6 +19,14 @@
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
   December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-1.
 
+  @par Specification Reference:
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
+  December 2015, Appendix A VMX Capability Reporting Facility, Section A.1.
+
+  @par Specification Reference:
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
+  December 2015, Appendix A VMX Capability Reporting Facility, Section A.6.
+
 **/
 
 #ifndef __ARCHITECTURAL_MSR_H__
@@ -411,7 +419,7 @@ typedef union {
 
 
 /**
-  SMM Monitor Configuration (R/W). If CPUID.01H: ECX[5]=1. CPUID.01H: ECX[6] =
+  SMM Monitor Configuration (R/W). If CPUID.01H: ECX[5]=1 or CPUID.01H: ECX[6] =
   1.
 
   @param  ECX  MSR_IA32_SMM_MONITOR_CTL (0x0000009B)
@@ -470,6 +478,25 @@ typedef union {
   ///
   UINT64  Uint64;
 } MSR_IA32_SMM_MONITOR_CTL_REGISTER;
+
+/**
+  MSEG header that is located at the physical address specified by the MsegBase
+  field of #MSR_IA32_SMM_MONITOR_CTL_REGISTER.
+**/
+typedef struct {
+  UINT32  MsegHeaderRevision;
+  UINT32  MonitorFeatures;
+  UINT32  GdtrLimit;
+  UINT32  GdtrBaseOffset;
+  UINT32  CsSelector;
+  UINT32  EipOffset;
+  UINT32  EspOffset;
+  UINT32  Cr3Offset;
+  //
+  // Pad header so total size is 2KB
+  //
+  UINT8   Reserved[SIZE_2KB - 8 * sizeof (UINT32)];
+} MSEG_HEADER;
 
 
 /**
@@ -3681,13 +3708,118 @@ typedef union {
 
   <b>Example usage</b>
   @code
-  UINT64  Msr;
+  MSR_IA32_VMX_BASIC_REGISTER  Msr;
 
-  Msr = AsmReadMsr64 (MSR_IA32_VMX_BASIC);
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_VMX_BASIC);
   @endcode
   @note MSR_IA32_VMX_BASIC is defined as IA32_VMX_BASIC in SDM.
 **/
 #define MSR_IA32_VMX_BASIC                       0x00000480
+
+/**
+  MSR information returned for MSR index #MSR_IA32_VMX_BASIC
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 30:0] VMCS revision identifier used by the processor.  Processors
+    /// that use the same VMCS revision identifier use the same size for VMCS
+    /// regions (see subsequent item on bits 44:32).
+    ///
+    /// @note Earlier versions of this manual specified that the VMCS revision
+    /// identifier was a 32-bit field in bits 31:0 of this MSR. For all
+    /// processors produced prior to this change, bit 31 of this MSR was read
+    /// as 0.
+    ///
+    UINT32  VmcsRevisonId:31;
+    UINT32  MustBeZero:1;
+    ///
+    /// [Bit 44:32] Reports the number of bytes that software should allocate
+    /// for the VMXON region and any VMCS region.  It is a value greater than
+    /// 0 and at most 4096(bit 44 is set if and only if bits 43:32 are clear).
+    ///
+    UINT32  VmcsSize:13;
+    UINT32  Reserved1:3;
+    ///
+    /// [Bit 48] Indicates the width of the physical addresses that may be used
+    /// for the VMXON region, each VMCS, and data structures referenced by
+    /// pointers in a VMCS (I/O bitmaps, virtual-APIC page, MSR areas for VMX
+    /// transitions).  If the bit is 0, these addresses are limited to the
+    /// processor's physical-address width.  If the bit is 1, these addresses
+    /// are limited to 32 bits. This bit is always 0 for processors that
+    /// support Intel 64 architecture.
+    ///
+    /// @note On processors that support Intel 64 architecture, the pointer
+    /// must not set bits beyond the processor's physical address width.
+    ///
+    UINT32  VmcsAddressWidth:1;
+    ///
+    /// [Bit 49] If bit 49 is read as 1, the logical processor supports the
+    /// dual-monitor treatment of system-management interrupts and
+    /// system-management mode. See Section 34.15 for details of this treatment.
+    ///
+    UINT32  DualMonitor:1;
+    ///
+    /// [Bit 53:50] report the memory type that should be used for the VMCS,
+    /// for data structures referenced by pointers in the VMCS (I/O bitmaps,
+    /// virtual-APIC page, MSR areas for VMX transitions), and for the MSEG
+    /// header. If software needs to access these data structures (e.g., to
+    /// modify the contents of the MSR bitmaps), it can configure the paging
+    /// structures to map them into the linear-address space. If it does so,
+    /// it should establish mappings that use the memory type reported bits
+    /// 53:50 in this MSR.
+    ///
+    /// As of this writing, all processors that support VMX operation indicate
+    /// the write-back type.
+    ///
+    /// If software needs to access these data structures (e.g., to modify
+    /// the contents of the MSR bitmaps), it can configure the paging
+    /// structures to map them into the linear-address space. If it does so,
+    /// it should establish mappings that use the memory type reported in this
+    /// MSR.
+    ///
+    /// @note Alternatively, software may map any of these regions or
+    /// structures with the UC memory type. (This may be necessary for the MSEG
+    /// header.) Doing so is discouraged unless necessary as it will cause the
+    /// performance of software accesses to those structures to suffer.
+    ///
+    ///
+    UINT32  MemoryType:4;
+    ///
+    /// [Bit 54] If bit 54 is read as 1, the logical processor reports
+    /// information in the VM-exit instruction-information field on VM exits
+    /// due to execution of the INS and OUTS instructions. This reporting is
+    /// done only if this bit is read as 1.
+    ///
+    UINT32  InsOutsReporting:1;
+    ///
+    /// [Bit 55] Bit 55 is read as 1 if any VMX controls that default to 1 may
+    /// be cleared to 0. See Appendix A.2 for details. It also reports support
+    /// for the VMX capability MSRs IA32_VMX_TRUE_PINBASED_CTLS,
+    /// IA32_VMX_TRUE_PROCBASED_CTLS, IA32_VMX_TRUE_EXIT_CTLS, and
+    /// IA32_VMX_TRUE_ENTRY_CTLS. See Appendix A.3.1, Appendix A.3.2,
+    /// Appendix A.4, and Appendix A.5 for details.
+    ///
+    UINT32  VmxControls:1;
+    UINT32  Reserved2:8;
+  } Bits;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_IA32_VMX_BASIC_REGISTER;
+
+///
+/// @{ Define value for bit field MSR_IA32_VMX_BASIC_REGISTER.MemoryType
+///
+#define MSR_IA32_VMX_BASIC_REGISTER_MEMORY_TYPE_UNCACHEABLE  0x00
+#define MSR_IA32_VMX_BASIC_REGISTER_MEMORY_TYPE_WRITE_BACK   0x06
+///
+/// @}
+///
 
 
 /**
@@ -3777,13 +3909,95 @@ typedef union {
 
   <b>Example usage</b>
   @code
-  UINT64  Msr;
+  IA32_VMX_MISC_REGISTER  Msr;
 
-  Msr = AsmReadMsr64 (MSR_IA32_VMX_MISC);
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_VMX_MISC);
   @endcode
   @note MSR_IA32_VMX_MISC is defined as IA32_VMX_MISC in SDM.
 **/
 #define MSR_IA32_VMX_MISC                        0x00000485
+
+/**
+  MSR information returned for MSR index #IA32_VMX_MISC
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 4:0] Reports a value X that specifies the relationship between the
+    /// rate of the VMX-preemption timer and that of the timestamp counter (TSC).
+    /// Specifically, the VMX-preemption timer (if it is active) counts down by
+    /// 1 every time bit X in the TSC changes due to a TSC increment.
+    ///
+    UINT32  VmxTimerRatio:5;
+    ///
+    /// [Bit 5] If bit 5 is read as 1, VM exits store the value of IA32_EFER.LMA
+    /// into the "IA-32e mode guest" VM-entry control;see Section 27.2 for more
+    /// details. This bit is read as 1 on any logical processor that supports
+    /// the 1-setting of the "unrestricted guest" VM-execution control.
+    ///
+    UINT32  VmExitEferLma:1;
+    ///
+    /// [Bit 6] reports (if set) the support for activity state 1 (HLT).
+    ///
+    UINT32  HltActivityStateSupported:1;
+    ///
+    /// [Bit 7] reports (if set) the support for activity state 2 (shutdown).
+    ///
+    UINT32  ShutdownActivityStateSupported:1;
+    ///
+    /// [Bit 8] reports (if set) the support for activity state 3 (wait-for-SIPI).
+    ///
+    UINT32  WaitForSipiActivityStateSupported:1;
+    UINT32  Reserved1:6;
+    ///
+    /// [Bit 15] If read as 1, the RDMSR instruction can be used in system-
+    /// management mode (SMM) to read the IA32_SMBASE MSR (MSR address 9EH).
+    /// See Section 34.15.6.4.
+    ///
+    UINT32  SmBaseMsrSupported:1;
+    ///
+    /// [Bits 24:16] Indicate the number of CR3-target values supported by the
+    /// processor. This number is a value between 0 and 256, inclusive (bit 24
+    /// is set if and only if bits 23:16 are clear).
+    ///
+    UINT32  NumberOfCr3TargetValues:9;
+    ///
+    /// [Bit 27:25] Bits 27:25 is used to compute the recommended maximum
+    /// number of MSRs that should appear in the VM-exit MSR-store list, the
+    /// VM-exit MSR-load list, or the VM-entry MSR-load list. Specifically, if
+    /// the value bits 27:25 of IA32_VMX_MISC is N, then 512 * (N + 1) is the
+    /// recommended maximum number of MSRs to be included in each list. If the
+    /// limit is exceeded, undefined processor behavior may result (including a
+    /// machine check during the VMX transition).
+    ///
+    UINT32  MsrStoreListMaximum:3;
+    ///
+    /// [Bit 28] If read as 1, bit 2 of the IA32_SMM_MONITOR_CTL can be set
+    /// to 1. VMXOFF unblocks SMIs unless IA32_SMM_MONITOR_CTL[bit 2] is 1
+    /// (see Section 34.14.4).
+    ///
+    UINT32  BlockSmiSupported:1;
+    ///
+    /// [Bit 29] read as 1, software can use VMWRITE to write to any supported
+    /// field in the VMCS; otherwise, VMWRITE cannot be used to modify VM-exit
+    /// information fields.
+    ///
+    UINT32  VmWriteSupported:1;
+    UINT32  Reserved2:2;
+    ///
+    /// [Bits 63:32] Reports the 32-bit MSEG revision identifier used by the
+    /// processor.
+    ///
+    UINT32  MsegRevisionIdentifier:32;
+  } Bits;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} IA32_VMX_MISC_REGISTER;
 
 
 /**
