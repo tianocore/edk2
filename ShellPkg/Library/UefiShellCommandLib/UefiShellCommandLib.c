@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
@@ -1715,6 +1715,7 @@ FreeBufferList (
   @param[in] UserData   The data to print out.
 **/
 VOID
+EFIAPI
 DumpHex (
   IN UINTN        Indent,
   IN UINTN        Offset,
@@ -1767,6 +1768,7 @@ DumpHex (
   @param[in] UserData   The data to print out.
 **/
 CHAR16*
+EFIAPI
 CatSDumpHex (
   IN CHAR16  *Buffer,
   IN UINTN   Indent,

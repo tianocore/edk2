@@ -694,6 +694,7 @@ FreeBufferList (
   @param[in] UserData     Pointer to some data.
 **/
 VOID
+EFIAPI
 DumpHex (
   IN UINTN        Indent,
   IN UINTN        Offset,
@@ -711,6 +712,7 @@ DumpHex (
   @param[in] UserData   The data to print out.
 **/
 CHAR16*
+EFIAPI
 CatSDumpHex (
   IN CHAR16  *Buffer,
   IN UINTN   Indent,
