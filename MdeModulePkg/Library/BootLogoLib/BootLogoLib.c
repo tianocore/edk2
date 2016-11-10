@@ -142,10 +142,6 @@ BootLogoEnableLogo (
       break;
     }
 
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-
     if (Blt != NULL) {
       FreePool (Blt);
     }
