@@ -1282,21 +1282,17 @@ Ip4Config2SetMaunualAddress (
 
   IpSb->Reconfig = TRUE;
   Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }  
 
-  DataItem->Status = EFI_SUCCESS;   
+  DataItem->Status = Status; 
 
-ON_EXIT:
-  if (EFI_ERROR (DataItem->Status)) {
+  if (EFI_ERROR (DataItem->Status) && DataItem->Status != EFI_NOT_READY) {
     if (Ptr != NULL) {
       FreePool (Ptr);
     }
     DataItem->Data.Ptr = NULL; 
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
