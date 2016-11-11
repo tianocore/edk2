@@ -34,7 +34,7 @@ if [ \
      "$*" = "--help" \
    ]
 then
-    echo "Usage: CreateBootDisk [usb|floppy|ide|file] MediaPath DevicePath [FAT12|FAT16|FAT32] [IA32|X64] [GCC44|UNIXGCC]"
+    echo "Usage: CreateBootDisk [usb|floppy|ide|file] MediaPath DevicePath [FAT12|FAT16|FAT32] [IA32|X64]"
     echo "e.g. : CreateBootDisk floppy /media/floppy0 /dev/fd0 FAT12 IA32"
     PROCESS_MARK=FALSE
 fi
@@ -51,13 +51,7 @@ case "$5" in
      return 1
 esac
 
-if [ -z "$6" ]
-then
-  TOOLCHAIN=GCC44
-else
-  TOOLCHAIN=$6
-fi
-
+. $WORKSPACE/DuetPkg/SetEnv_$PROCESSOR.sh
 export BUILD_DIR=$WORKSPACE/Build/DuetPkg$PROCESSOR/DEBUG_$TOOLCHAIN
 
 

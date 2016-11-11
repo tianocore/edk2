@@ -2,9 +2,7 @@
 
 ## @file
 #
-#  Currently, Build system does not provide post build mechanism for module
-#  and platform building, so just use a sh file to do post build commands.
-#  Originally, following post building command is for EfiLoader module.
+#  Post build script that will be automatically run after build.
 #
 #  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 #
@@ -26,43 +24,33 @@ fi
 
 export BOOTSECTOR_BIN_DIR=$WORKSPACE/DuetPkg/BootSector/bin
 export PROCESSOR=""
-if [ \
-     -z "$1" -o \
-     "$1" = "-?" -o \
-     "$1" = "-h" -o \
-     "$1" = "--help" \
-   ]
-then
-    echo Error! Please specific the architecture.
-    echo Usage: "./PostBuild.sh [IA32|X64] [UNIXGCC|GCC44]"
+export TOOLTAG=""
+
+while [ $# -gt 0 ]; do
+    if [ "$1" = "-a" ]; then
+        export PROCESSOR=$2
+    elif [ "$1" = "-t" ]; then
+        export TOOLTAG=$2
+    elif [ "$1" = "-h" ]; then
+        echo Usage: This script will be run automatically after build.
+        return 1
+    fi
+    shift
+    shift
+done
+
+if [ "$PROCESSOR" = "" -o "$TOOLTAG" = "" ]; then
+    echo Usage: This script will be run automatically after build.
+    return 1
 fi
-
-case "$1" in
-   IA32)
-     export PROCESSOR=IA32
-     ;;
-   X64)
-     export PROCESSOR=X64
-     ;;
-   *)
-     echo Invalid Architecture string, should be only IA32 or X64
-     return 1
-esac
-
-case "$2" in
-   UNIXGCC)
-     export TOOLTAG=UNIXGCC
-     ;;
-   GCC4*)
-     export TOOLTAG=$2
-     ;;
-   *)
-     echo Invalid tool tag, should be only UNIXGCC or GCC4\*
-     return 1
-esac
 
 export BUILD_DIR=$WORKSPACE/Build/DuetPkg$PROCESSOR/DEBUG_$TOOLTAG
 
+#
+# Store environment variables used by CreateBootDisk.sh
+#
+echo export TOOLCHAIN=$TOOLTAG> $WORKSPACE/DuetPkg/SetEnv_$PROCESSOR.sh
+chmod +x $WORKSPACE/DuetPkg/SetEnv_$PROCESSOR.sh
 
 #
 # Boot sector module could only be built under IA32 tool chain

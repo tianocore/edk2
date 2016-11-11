@@ -125,10 +125,8 @@ done
 #
 echo Running edk2 build for DuetPkg$PROCESSOR
 build -p $WORKSPACE/DuetPkg/DuetPkg$PROCESSOR.dsc -a $PROCESSOR -t $TARGET_TOOLS -n 3 $*
-echo Running DuetPkg/PostBuild.sh
-$WORKSPACE/DuetPkg/PostBuild.sh $PROCESSOR $TARGET_TOOLS
 echo Running DuetPkg/CreateBootDisk.sh
 
-$WORKSPACE/DuetPkg/CreateBootDisk.sh file $FLOPPY_IMAGE /dev/null FAT12 $PROCESSOR $TARGET_TOOLS
+$WORKSPACE/DuetPkg/CreateBootDisk.sh file $FLOPPY_IMAGE /dev/null FAT12 $PROCESSOR
 exit $?
 

@@ -1,7 +1,7 @@
 @echo off
 @REM ## @file
 @REM #
-@REM #  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+@REM #  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 @REM #
 @REM #  This program and the accompanying materials
 @REM #  are licensed and made available under the terms and conditions of the BSD License
@@ -15,14 +15,11 @@
 
 @REM Set up environment at first.
 
-set BASETOOLS_DIR=%WORKSPACE_TOOLS_PATH%\Bin\Win32
+set BASETOOLS_DIR=%EDK_TOOLS_BIN%
 set BOOTSECTOR_BIN_DIR=%WORKSPACE%\DuetPkg\BootSector\bin
 set DISK_LABEL=DUET
 set PROCESSOR=""
 set STEP=1
-call %WORKSPACE%\DuetPkg\GetVariables.bat
-
-echo on
 
 if "%1"=="" goto Help
 if "%2"=="" goto Help
@@ -35,6 +32,7 @@ set EFI_BOOT_DISK=%2
 if "%TARGET_ARCH%"=="IA32" set PROCESSOR=IA32
 if "%TARGET_ARCH%"=="X64" set PROCESSOR=X64
 if %PROCESSOR%=="" goto WrongArch
+call %WORKSPACE%\DuetPkg\SetEnv_%PROCESSOR%.bat
 set BUILD_DIR=%WORKSPACE%\Build\DuetPkg%PROCESSOR%\%TARGET%_%TOOL_CHAIN_TAG%
 
 if "%1"=="floppy" goto CreateFloppy

@@ -31,6 +31,11 @@
   BUILD_TARGETS                  = DEBUG
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = DuetPkg/DuetPkg.fdf
+!if $(TOOL_CHAIN_TAG) == GCC47 || $(TOOL_CHAIN_TAG) == GCC48 || $(TOOL_CHAIN_TAG) == GCC49 || $(TOOL_CHAIN_TAG) == GCC5
+  POSTBUILD                      = DuetPkg/PostBuild.sh
+!else
+  POSTBUILD                      = DuetPkg/PostBuild.bat
+!endif
 
 ################################################################################
 #
