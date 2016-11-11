@@ -105,18 +105,20 @@ GetProtectedModeCS (
 
   @param[in] ApHltLoopCode    The 32-bit address of the safe hlt-loop function.
   @param[in] TopOfStack       A pointer to the new stack to use for the ApHltLoopCode.
+  @param[in] NumberToFinish   Semaphore of APs finish count.
 
 **/
 VOID
 TransferApToSafeState (
   IN UINT32             ApHltLoopCode,
-  IN UINT32             TopOfStack
+  IN UINT32             TopOfStack,
+  IN UINT32             *NumberToFinish
   )
 {
   AsmDisablePaging64 (
     GetProtectedModeCS (),
     (UINT32) (UINTN) ApHltLoopCode,
-    0,
+    (UINT32) (UINTN) NumberToFinish,
     0,
     TopOfStack
     );

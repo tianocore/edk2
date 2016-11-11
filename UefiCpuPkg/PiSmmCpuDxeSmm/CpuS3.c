@@ -79,9 +79,11 @@ BOOLEAN                      mAcpiS3Enable = TRUE;
 
 UINT8                        *mApHltLoopCode = NULL;
 UINT8                        mApHltLoopCodeTemplate[] = {
-                               0xFA,        // cli
-                               0xF4,        // hlt
-                               0xEB, 0xFC   // jmp $-2
+                               0x8B, 0x44, 0x24, 0x04,  // mov  eax, dword ptr [esp+4]
+                               0xF0, 0xFF, 0x08,        // lock dec  dword ptr [eax]
+                               0xFA,                    // cli
+                               0xF4,                    // hlt
+                               0xEB, 0xFC               // jmp $-2
                                };
 
 /**
@@ -399,17 +401,12 @@ MPRendezvousProcedure (
   }
 
   //
-  // Count down the number with lock mechanism.
-  //
-  InterlockedDecrement (&mNumberToFinish);
-
-  //
-  // Place AP into the safe code
+  // Place AP into the safe code, count down the number with lock mechanism in the safe code.
   //
   TopOfStack  = (UINT32) (UINTN) Stack + sizeof (Stack);
   TopOfStack &= ~(UINT32) (CPU_STACK_ALIGNMENT - 1);
   CopyMem ((VOID *) (UINTN) mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
-  TransferApToSafeState ((UINT32) (UINTN) mApHltLoopCode, TopOfStack);
+  TransferApToSafeState ((UINT32) (UINTN) mApHltLoopCode, TopOfStack, &mNumberToFinish);
 }
 
 /**

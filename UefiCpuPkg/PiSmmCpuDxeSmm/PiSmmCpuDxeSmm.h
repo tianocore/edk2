@@ -830,12 +830,14 @@ GetAcpiS3EnableFlag (
 
   @param[in] ApHltLoopCode    The 32-bit address of the safe hlt-loop function.
   @param[in] TopOfStack       A pointer to the new stack to use for the ApHltLoopCode.
+  @param[in] NumberToFinish   Semaphore of APs finish count.
 
 **/
 VOID
 TransferApToSafeState (
   IN UINT32             ApHltLoopCode,
-  IN UINT32             TopOfStack
+  IN UINT32             TopOfStack,
+  IN UINT32             *NumberToFinish
   );
 
 #endif
