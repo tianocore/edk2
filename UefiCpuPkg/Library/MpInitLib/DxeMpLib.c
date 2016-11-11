@@ -22,6 +22,7 @@
 CPU_MP_DATA      *mCpuMpData = NULL;
 EFI_EVENT        mCheckAllApsEvent = NULL;
 EFI_EVENT        mMpInitExitBootServicesEvent = NULL;
+EFI_EVENT        mLegacyBootEvent = NULL;
 volatile BOOLEAN mStopCheckAllApsStatus = TRUE;
 VOID             *mReservedApLoopFunc = NULL;
 
@@ -340,12 +341,23 @@ InitMpGlobalData (
                   AP_CHECK_INTERVAL
                   );
   ASSERT_EFI_ERROR (Status);
+
   Status = gBS->CreateEvent (
                   EVT_SIGNAL_EXIT_BOOT_SERVICES,
                   TPL_CALLBACK,
                   MpInitChangeApLoopCallback,
                   NULL,
                   &mMpInitExitBootServicesEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  MpInitChangeApLoopCallback,
+                  NULL,
+                  &gEfiEventLegacyBootGuid,
+                  &mLegacyBootEvent
                   );
   ASSERT_EFI_ERROR (Status);
 }
