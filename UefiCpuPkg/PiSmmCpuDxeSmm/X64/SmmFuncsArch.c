@@ -70,6 +70,37 @@ InitGdt (
 }
 
 /**
+  Get Protected mode code segment from current GDT table.
+
+  @return  Protected mode code segment value.
+**/
+UINT16
+GetProtectedModeCS (
+  VOID
+  )
+{
+  IA32_DESCRIPTOR          GdtrDesc;
+  IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
+  UINTN                    GdtEntryCount;
+  UINT16                   Index;
+
+  Index = (UINT16) -1;
+  AsmReadGdtr (&GdtrDesc);
+  GdtEntryCount = (GdtrDesc.Limit + 1) / sizeof (IA32_SEGMENT_DESCRIPTOR);
+  GdtEntry = (IA32_SEGMENT_DESCRIPTOR *) GdtrDesc.Base;
+  for (Index = 0; Index < GdtEntryCount; Index++) {
+    if (GdtEntry->Bits.L == 0) {
+      if (GdtEntry->Bits.Type > 8 && GdtEntry->Bits.L == 0) {
+        break;
+      }
+    }
+    GdtEntry++;
+  }
+  ASSERT (Index != -1);
+  return Index * 8;
+}
+
+/**
   Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
 
   @param[in] ApHltLoopCode    The 32-bit address of the safe hlt-loop function.
@@ -82,11 +113,12 @@ TransferApToSafeState (
   IN UINT32             TopOfStack
   )
 {
-  SwitchStack (
-    (SWITCH_STACK_ENTRY_POINT) (UINTN) ApHltLoopCode,
-    NULL,
-    NULL,
-    (VOID *) (UINTN) TopOfStack
+  AsmDisablePaging64 (
+    GetProtectedModeCS (),
+    (UINT32) (UINTN) ApHltLoopCode,
+    0,
+    0,
+    TopOfStack
     );
   //
   // It should never reach here
