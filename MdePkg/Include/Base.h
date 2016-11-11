@@ -63,6 +63,13 @@ VERIFY_SIZE_OF (UINT64, 8);
 VERIFY_SIZE_OF (CHAR8, 1);
 VERIFY_SIZE_OF (CHAR16, 2);
 
+//
+// The following three enum types are used to verify that the compiler
+// configuration for enum types is compliant with Section 2.3.1 of the 
+// UEFI 2.3 Specification. These enum types and enum values are not 
+// intended to be used. A prefix of '__' is used avoid conflicts with
+// other types.
+//
 typedef enum {
   __VerifyUint8EnumValue = 0xff
 } __VERIFY_UINT8_ENUM_SIZE;
