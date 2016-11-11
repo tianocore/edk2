@@ -1,6 +1,6 @@
 @REM ## @file
 @REM #
-@REM #  Currently, Build system does not provide post build mechanism for module 
+@REM #  Currently, Build system does not provide post build mechanism for module
 @REM #  and platform building, so just use a bat file to do post build commands.
 @REM #  Originally, following post building command is for EfiLoader module.
 @REM #
