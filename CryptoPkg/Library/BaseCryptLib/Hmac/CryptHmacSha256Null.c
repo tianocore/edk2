@@ -109,7 +109,7 @@ HmacSha256Update (
   Return FALSE to indicate this interface is not supported.
 
   @param[in, out]  HmacSha256Context  Pointer to the HMAC-SHA256 context.
-  @param[out]      HashValue          Pointer to a buffer that receives the HMAC-SHA256 digest
+  @param[out]      HmacValue          Pointer to a buffer that receives the HMAC-SHA256 digest
                                       value (32 bytes).
 
   @retval FALSE  This interface is not supported.

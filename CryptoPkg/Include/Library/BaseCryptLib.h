@@ -994,11 +994,11 @@ HmacMd5Update (
   finalized by HmacMd5Final(). Behavior with invalid HMAC-MD5 context is undefined.
 
   If HmacMd5Context is NULL, then return FALSE.
-  If HashValue is NULL, then return FALSE.
+  If HmacValue is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
   @param[in, out]  HmacMd5Context  Pointer to the HMAC-MD5 context.
-  @param[out]      HashValue       Pointer to a buffer that receives the HMAC-MD5 digest
+  @param[out]      HmacValue       Pointer to a buffer that receives the HMAC-MD5 digest
                                    value (16 bytes).
 
   @retval TRUE   HMAC-MD5 digest computation succeeded.
@@ -1112,11 +1112,11 @@ HmacSha1Update (
   not be finalized by HmacSha1Final(). Behavior with invalid HMAC-SHA1 context is undefined.
 
   If HmacSha1Context is NULL, then return FALSE.
-  If HashValue is NULL, then return FALSE.
+  If HmacValue is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
   @param[in, out]  HmacSha1Context  Pointer to the HMAC-SHA1 context.
-  @param[out]      HashValue        Pointer to a buffer that receives the HMAC-SHA1 digest
+  @param[out]      HmacValue        Pointer to a buffer that receives the HMAC-SHA1 digest
                                     value (20 bytes).
 
   @retval TRUE   HMAC-SHA1 digest computation succeeded.
@@ -1230,11 +1230,11 @@ HmacSha256Update (
   not be finalized by HmacSha256Final(). Behavior with invalid HMAC-SHA256 context is undefined.
 
   If HmacSha256Context is NULL, then return FALSE.
-  If HashValue is NULL, then return FALSE.
+  If HmacValue is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
   @param[in, out]  HmacSha256Context  Pointer to the HMAC-SHA256 context.
-  @param[out]      HashValue          Pointer to a buffer that receives the HMAC-SHA256 digest
+  @param[out]      HmacValue          Pointer to a buffer that receives the HMAC-SHA256 digest
                                       value (32 bytes).
 
   @retval TRUE   HMAC-SHA256 digest computation succeeded.
