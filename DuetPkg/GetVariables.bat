@@ -1,3 +1,4 @@
+@echo off
 @REM ## @file
 @REM #
 @REM #  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
@@ -19,20 +20,20 @@
 @REM the original equal sign for our first assignation. Then we trim any left whitespaces.
 @REM NB: default token delimiters for "for /f" are tab and space.
 
-@set CONFIG_FILE=%WORKSPACE%\Conf\target.txt
+set CONFIG_FILE=%WORKSPACE%\Conf\target.txt
 
-@for /f "tokens=1*" %%i in ('type %CONFIG_FILE% ^| find "TOOL_CHAIN_TAG" ^| find /V "#"') do @set TOOL_CHAIN_TAG%%j
-@for /f "tokens=*" %%i in ("%TOOL_CHAIN_TAG%") do @set TOOL_CHAIN_TAG=%%i
+for /f "tokens=1*" %%i in ('type %CONFIG_FILE% ^| find "TOOL_CHAIN_TAG" ^| find /V "#"') do @set TOOL_CHAIN_TAG%%j
+for /f "tokens=*" %%i in ("%TOOL_CHAIN_TAG%") do @set TOOL_CHAIN_TAG=%%i
 
-@for /f "tokens=1*" %%i in ('type %CONFIG_FILE% ^| find "TARGET" ^| find /V "#" ^| find /V "TARGET_ARCH"') do @set TARGET%%j
-@for /f "tokens=*" %%i in ("%TARGET%") do @set TARGET=%%i
+for /f "tokens=1*" %%i in ('type %CONFIG_FILE% ^| find "TARGET" ^| find /V "#" ^| find /V "TARGET_ARCH"') do @set TARGET%%j
+for /f "tokens=*" %%i in ("%TARGET%") do @set TARGET=%%i
 
-@for /f "tokens=1*" %%i in ('type %CONFIG_FILE% ^| find "TARGET_ARCH" ^|find /V "#"') do @set TARGET_ARCH%%j
-@for /f "tokens=*" %%i in ("%TARGET_ARCH%") do @set TARGET_ARCH=%%i
+for /f "tokens=1*" %%i in ('type %CONFIG_FILE% ^| find "TARGET_ARCH" ^|find /V "#"') do @set TARGET_ARCH%%j
+for /f "tokens=*" %%i in ("%TARGET_ARCH%") do @set TARGET_ARCH=%%i
 
 
-@REM Set defaults if above variables are undefined in target.txt
+REM Set defaults if above variables are undefined in target.txt
 
-@if "%TOOL_CHAIN_TAG%%"=="" @set TOOL_CHAIN_TAG=MYTOOLS
-@if "%TARGET%"=="" @set TARGET=DEBUG
-@if "%TARGET_ARCH%"=="" @set TARGET_ARCH=IA32
+if "%TOOL_CHAIN_TAG%%"=="" @set TOOL_CHAIN_TAG=MYTOOLS
+if "%TARGET%"=="" @set TARGET=DEBUG
+if "%TARGET_ARCH%"=="" @set TARGET_ARCH=IA32
