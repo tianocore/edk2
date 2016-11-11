@@ -564,6 +564,11 @@ Ip4SetAddress (
 
   NET_CHECK_SIGNATURE (Interface, IP4_INTERFACE_SIGNATURE);
 
+  Len = NetGetMaskLength (SubnetMask);
+  if (Len == IP4_MASK_NUM) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   // Set the ip/netmask, then compute the subnet broadcast
   // and network broadcast for easy access. When computing
@@ -575,9 +580,6 @@ Ip4SetAddress (
   Interface->Ip             = IpAddr;
   Interface->SubnetMask     = SubnetMask;
   Interface->SubnetBrdcast  = (IpAddr | ~SubnetMask);
-
-  Len                       = NetGetMaskLength (SubnetMask);
-  ASSERT (Len <= IP4_MASK_MAX);
   Interface->NetBrdcast     = (IpAddr | ~SubnetMask);
 
   //

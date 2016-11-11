@@ -1255,6 +1255,13 @@ Ip4Config2SetMaunualAddress (
 
   NewAddress = *((EFI_IP4_CONFIG2_MANUAL_ADDRESS *) Data);
 
+  StationAddress = EFI_NTOHL (NewAddress.Address);
+  SubnetMask = EFI_NTOHL (NewAddress.SubnetMask);
+
+  if (NetGetMaskLength (SubnetMask) == IP4_MASK_NUM) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   // Store the new data, and init the DataItem status to EFI_NOT_READY because
   // we may have an asynchronous configuration process.
@@ -1272,9 +1279,6 @@ Ip4Config2SetMaunualAddress (
   DataItem->Data.Ptr = Ptr;
   DataItem->DataSize = DataSize;
   DataItem->Status   = EFI_NOT_READY;
-
-  StationAddress = EFI_NTOHL (NewAddress.Address);
-  SubnetMask = EFI_NTOHL (NewAddress.SubnetMask);
 
   IpSb->Reconfig = TRUE;
   Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
