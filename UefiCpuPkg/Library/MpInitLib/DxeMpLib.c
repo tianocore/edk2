@@ -261,7 +261,7 @@ RelocateApLoop (
 **/
 VOID
 EFIAPI
-MpInitExitBootServicesCallback (
+MpInitChangeApLoopCallback (
   IN EFI_EVENT                Event,
   IN VOID                     *Context
   )
@@ -273,7 +273,7 @@ MpInitExitBootServicesCallback (
   CpuMpData->PmCodeSegment = GetProtectedModeCS ();
   CpuMpData->ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
   WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, mReservedApLoopFunc);
-  DEBUG ((DEBUG_INFO, "MpInitExitBootServicesCallback() done!\n"));
+  DEBUG ((DEBUG_INFO, "%a() done!\n", __FUNCTION__));
 }
 
 /**
@@ -343,7 +343,7 @@ InitMpGlobalData (
   Status = gBS->CreateEvent (
                   EVT_SIGNAL_EXIT_BOOT_SERVICES,
                   TPL_CALLBACK,
-                  MpInitExitBootServicesCallback,
+                  MpInitChangeApLoopCallback,
                   NULL,
                   &mMpInitExitBootServicesEvent
                   );
