@@ -286,7 +286,8 @@ InitMpGlobalData (
   IN CPU_MP_DATA               *CpuMpData
   )
 {
-  EFI_STATUS     Status;
+  EFI_STATUS                 Status;
+  EFI_PHYSICAL_ADDRESS       Address;
 
   SaveCpuMpData (CpuMpData);
 
@@ -298,16 +299,28 @@ InitMpGlobalData (
   }
 
   //
-  // Avoid APs access invalid buff data which allocated by BootServices,
-  // so we will allocate reserved data for AP loop code.
+  // Avoid APs access invalid buffer data which allocated by BootServices,
+  // so we will allocate reserved data for AP loop code. We also need to
+  // allocate this buffer below 4GB due to APs may be transferred to 32bit
+  // protected mode on long mode DXE.
   // Allocating it in advance since memory services are not available in
   // Exit Boot Services callback function.
   //
-  mReservedApLoopFunc = AllocateReservedCopyPool (
-                          CpuMpData->AddressMap.RelocateApLoopFuncSize,
-                          CpuMpData->AddressMap.RelocateApLoopFuncAddress
-                          );
+  Address = BASE_4GB - 1;
+  Status  = gBS->AllocatePages (
+                   AllocateMaxAddress,
+                   EfiReservedMemoryType,
+                   EFI_SIZE_TO_PAGES (sizeof (CpuMpData->AddressMap.RelocateApLoopFuncSize)),
+                   &Address
+                   );
+  ASSERT_EFI_ERROR (Status);
+  mReservedApLoopFunc = (VOID *) (UINTN) Address;
   ASSERT (mReservedApLoopFunc != NULL);
+  CopyMem (
+    mReservedApLoopFunc,
+    CpuMpData->AddressMap.RelocateApLoopFuncAddress,
+    CpuMpData->AddressMap.RelocateApLoopFuncSize
+    );
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,
