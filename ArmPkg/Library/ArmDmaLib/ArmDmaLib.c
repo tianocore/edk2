@@ -22,7 +22,6 @@
 #include <Library/UncachedMemoryAllocationLib.h>
 #include <Library/IoLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/ArmLib.h>
 
 #include <Protocol/Cpu.h>
 
@@ -36,8 +35,7 @@ typedef struct {
 
 
 
-EFI_CPU_ARCH_PROTOCOL      *gCpu;
-UINTN                      gCacheAlignment = 0;
+STATIC EFI_CPU_ARCH_PROTOCOL      *mCpu;
 
 /**
   Provides the DMA controller-specific addresses needed to access system memory.
@@ -90,8 +88,8 @@ DmaMap (
     return  EFI_OUT_OF_RESOURCES;
   }
 
-  if ((((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) ||
-      ((*NumberOfBytes & (gCacheAlignment - 1)) != 0)) {
+  if ((((UINTN)HostAddress & (mCpu->DmaBufferAlignment - 1)) != 0) ||
+      ((*NumberOfBytes & (mCpu->DmaBufferAlignment - 1)) != 0)) {
 
     // Get the cacheability of the region
     Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
@@ -153,7 +151,8 @@ DmaMap (
     DEBUG_CODE_END ();
 
     // Flush the Data Cache (should not have any effect if the memory region is uncached)
-    gCpu->FlushDataCache (gCpu, *DeviceAddress, *NumberOfBytes, EfiCpuFlushTypeWriteBackInvalidate);
+    mCpu->FlushDataCache (mCpu, *DeviceAddress, *NumberOfBytes,
+            EfiCpuFlushTypeWriteBackInvalidate);
   }
 
   Map->HostAddress   = (UINTN)HostAddress;
@@ -217,7 +216,8 @@ DmaUnmap (
       //
       // Make sure we read buffer from uncached memory and not the cache
       //
-      gCpu->FlushDataCache (gCpu, Map->HostAddress, Map->NumberOfBytes, EfiCpuFlushTypeInvalidate);
+      mCpu->FlushDataCache (mCpu, Map->HostAddress, Map->NumberOfBytes,
+              EfiCpuFlushTypeInvalidate);
     }
   }
 
@@ -317,10 +317,8 @@ ArmDmaLibConstructor (
   EFI_STATUS              Status;
 
   // Get the Cpu protocol for later use
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
   ASSERT_EFI_ERROR(Status);
-
-  gCacheAlignment = ArmCacheWritebackGranule ();
 
   return Status;
 }

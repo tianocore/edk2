@@ -37,8 +37,6 @@
   UncachedMemoryAllocationLib
   IoLib
   BaseMemoryLib
-  ArmLib
-
 
 [Protocols]
   gEfiCpuArchProtocolGuid
