@@ -126,7 +126,7 @@ DmaMap (
         CopyMem (Buffer, HostAddress, *NumberOfBytes);
       }
 
-      *DeviceAddress = (PHYSICAL_ADDRESS)(UINTN)Buffer;
+      *DeviceAddress = ConvertToPhysicalAddress ((UINTN)Buffer);
     } else {
       Map->DoubleBuffer  = FALSE;
     }
