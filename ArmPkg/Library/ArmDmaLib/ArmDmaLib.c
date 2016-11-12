@@ -27,7 +27,7 @@
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS      HostAddress;
-  EFI_PHYSICAL_ADDRESS      DeviceAddress;
+  VOID                      *BufferAddress;
   UINTN                     NumberOfBytes;
   DMA_MAP_OPERATION         Operation;
   BOOLEAN                   DoubleBuffer;
@@ -92,7 +92,7 @@ DmaMap (
       ((*NumberOfBytes & (mCpu->DmaBufferAlignment - 1)) != 0)) {
 
     // Get the cacheability of the region
-    Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
+    Status = gDS->GetMemorySpaceDescriptor ((UINTN)HostAddress, &GcdDescriptor);
     if (EFI_ERROR(Status)) {
       goto FreeMapInfo;
     }
@@ -127,6 +127,7 @@ DmaMap (
       }
 
       *DeviceAddress = ConvertToPhysicalAddress ((UINTN)Buffer);
+      Map->BufferAddress = Buffer;
     } else {
       Map->DoubleBuffer  = FALSE;
     }
@@ -142,7 +143,7 @@ DmaMap (
     // So duplicate the check here when running in DEBUG mode, just to assert
     // that we are not trying to create a consistent mapping for cached memory.
     //
-    Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
+    Status = gDS->GetMemorySpaceDescriptor ((UINTN)HostAddress, &GcdDescriptor);
     ASSERT_EFI_ERROR(Status);
 
     ASSERT (Operation != MapOperationBusMasterCommonBuffer ||
@@ -151,12 +152,11 @@ DmaMap (
     DEBUG_CODE_END ();
 
     // Flush the Data Cache (should not have any effect if the memory region is uncached)
-    mCpu->FlushDataCache (mCpu, *DeviceAddress, *NumberOfBytes,
+    mCpu->FlushDataCache (mCpu, (UINTN)HostAddress, *NumberOfBytes,
             EfiCpuFlushTypeWriteBackInvalidate);
   }
 
   Map->HostAddress   = (UINTN)HostAddress;
-  Map->DeviceAddress = *DeviceAddress;
   Map->NumberOfBytes = *NumberOfBytes;
   Map->Operation     = Operation;
 
@@ -206,10 +206,11 @@ DmaUnmap (
     if (Map->Operation == MapOperationBusMasterCommonBuffer) {
       Status = EFI_INVALID_PARAMETER;
     } else if (Map->Operation == MapOperationBusMasterWrite) {
-      CopyMem ((VOID *)(UINTN)Map->HostAddress, (VOID *)(UINTN)Map->DeviceAddress, Map->NumberOfBytes);
+      CopyMem ((VOID *)(UINTN)Map->HostAddress, Map->BufferAddress,
+        Map->NumberOfBytes);
     }
 
-    DmaFreeBuffer (EFI_SIZE_TO_PAGES (Map->NumberOfBytes), (VOID *)(UINTN)Map->DeviceAddress);
+    DmaFreeBuffer (EFI_SIZE_TO_PAGES (Map->NumberOfBytes), Map->BufferAddress);
 
   } else {
     if (Map->Operation == MapOperationBusMasterWrite) {
