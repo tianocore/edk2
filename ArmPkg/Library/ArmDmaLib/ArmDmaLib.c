@@ -37,6 +37,15 @@ typedef struct {
 
 STATIC EFI_CPU_ARCH_PROTOCOL      *mCpu;
 
+STATIC
+PHYSICAL_ADDRESS
+HostToDeviceAddress (
+  IN  PHYSICAL_ADDRESS  HostAddress
+  )
+{
+  return HostAddress + PcdGet64 (PcdArmDmaDeviceOffset);
+}
+
 /**
   Provides the DMA controller-specific addresses needed to access system memory.
 
@@ -80,7 +89,14 @@ DmaMap (
     return EFI_INVALID_PARAMETER;
   }
 
-  *DeviceAddress = ConvertToPhysicalAddress (HostAddress);
+  //
+  // The debug implementation of UncachedMemoryAllocationLib in ArmPkg returns
+  // a virtual uncached alias, and unmaps the cached ID mapping of the buffer,
+  // in order to catch inadvertent references to the cached mapping.
+  // Since HostToDeviceAddress () expects ID mapped input addresses, convert
+  // the host address to an ID mapped address first.
+  //
+  *DeviceAddress = HostToDeviceAddress (ConvertToPhysicalAddress (HostAddress));
 
   // Remember range so we can flush on the other side
   Map = AllocatePool (sizeof (MAP_INFO_INSTANCE));
@@ -126,7 +142,7 @@ DmaMap (
         CopyMem (Buffer, HostAddress, *NumberOfBytes);
       }
 
-      *DeviceAddress = ConvertToPhysicalAddress ((UINTN)Buffer);
+      *DeviceAddress = HostToDeviceAddress (ConvertToPhysicalAddress ((UINTN)Buffer));
       Map->BufferAddress = Buffer;
     } else {
       Map->DoubleBuffer  = FALSE;

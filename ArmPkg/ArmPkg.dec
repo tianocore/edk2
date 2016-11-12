@@ -134,6 +134,14 @@
   gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
   gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
 
+  #
+  # Value to add to a host address to obtain a device address, using
+  # unsigned 64-bit integer arithmetic on both ARM and AArch64. This
+  # means we can rely on truncation on overflow to specify negative
+  # offsets.
+  #
+  gArmTokenSpaceGuid.PcdArmDmaDeviceOffset|0x0|UINT64|0x0000044
+
 [PcdsFixedAtBuild.common, PcdsPatchableInModule.common]
   gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
   gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
