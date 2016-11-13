@@ -90,7 +90,7 @@ EmmcIdentificationMode (
     DEBUG ((EFI_D_ERROR, "EmmcIdentificationMode(): ECSD fetch error, Status=%r.\n", Status));
   }
 
-  Status = Host->ReadBlockData (Host, 0, 512, (UINT32 *)&(MmcHostInstance->CardInfo.ECSD));
+  Status = Host->ReadBlockData (Host, 0, 512, (UINT32 *)&(MmcHostInstance->CardInfo.ECSDData));
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "EmmcIdentificationMode(): ECSD read error, Status=%r.\n", Status));
     return Status;
@@ -103,7 +103,7 @@ EmmcIdentificationMode (
   Media->LogicalBlocksPerPhysicalBlock = 1;
   Media->IoAlign = 4;
   // Compute last block using bits [215:212] of the ECSD
-  Media->LastBlock = MmcHostInstance->CardInfo.ECSD[EMMC_ECSD_SIZE_OFFSET] - 1; // eMMC isn't supposed to report this for
+  Media->LastBlock = MmcHostInstance->CardInfo.ECSDData.SECTOR_COUNT - 1; // eMMC isn't supposed to report this for
   // Cards <2GB in size, but the model does.
 
   // Setup card type
