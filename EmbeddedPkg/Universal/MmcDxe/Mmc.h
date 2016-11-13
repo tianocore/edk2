@@ -138,6 +138,7 @@ typedef struct  {
   OCR       OCRData;
   CID       CIDData;
   CSD       CSDData;
+  UINT32    ECSD[128];      // MMC V4 extended card specific
 } CARD_INFO;
 
 typedef struct _MMC_HOST_INSTANCE {
