@@ -222,14 +222,19 @@ MmcIdentificationMode (
 
   // Send CMD1 to get OCR (MMC)
   // This command only valid for MMC and eMMC
-  Status = MmcHost->SendCommand (MmcHost, MMC_CMD1, EMMC_CMD1_CAPACITY_GREATER_THAN_2GB);
-  if (Status == EFI_SUCCESS) {
+  Timeout = MAX_RETRY_COUNT;
+  do {
+    Status = MmcHost->SendCommand (MmcHost, MMC_CMD1, EMMC_CMD1_CAPACITY_GREATER_THAN_2GB);
+    if (EFI_ERROR (Status))
+      break;
     Status = MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_OCR, (UINT32 *)&OcrResponse);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "MmcIdentificationMode() : Failed to receive OCR, Status=%r.\n", Status));
       return Status;
     }
-
+    Timeout--;
+  } while (!OcrResponse.Ocr.PowerUp && (Timeout > 0));
+  if (Status == EFI_SUCCESS) {
     if (!OcrResponse.Ocr.PowerUp) {
       DEBUG ((EFI_D_ERROR, "MmcIdentificationMode(MMC_CMD1): Card initialisation failure, Status=%r.\n", Status));
       return EFI_DEVICE_ERROR;
