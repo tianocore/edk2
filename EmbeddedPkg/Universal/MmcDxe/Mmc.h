@@ -128,7 +128,8 @@ typedef struct {
   UINT8   NSAC                ;  // Data read access-time 2 in CLK cycles (NSAC*100) [111:104]
   UINT8   TAAC                ;  // Data read access-time 1 [119:112]
 
-  UINT8   RESERVED_5:         6; // Reserved [125:120]
+  UINT8   RESERVED_5:         2; // Reserved [121:120]
+  UINT8   SPEC_VERS:          4; // System specification version [125:122]
   UINT8   CSD_STRUCTURE:      2; // CSD structure [127:126]
 } CSD;
 
