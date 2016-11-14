@@ -1230,6 +1230,11 @@ ScanTableInSDT (
     //
     Table = 0;
     CopyMem (&Table, (VOID *) (EntryBase + Index * TablePointerSize), TablePointerSize);
+
+    if (Table == NULL) {
+      continue;
+    }
+
     if (Table->Signature == Signature) {
       return Table;
     }
