@@ -4359,7 +4359,7 @@ DEFINE GCC_IPF_SYMRENAME_FLAGS     = --redefine-sym memcpy=CopyMem
 DEFINE GCC_ASM_FLAGS               = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
 DEFINE GCC_PP_FLAGS                = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
 DEFINE GCC_VFRPP_FLAGS             = -x c -E -P -DVFRCOMPILE --include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
-DEFINE GCC_ASLPP_FLAGS             = -x c -E -P
+DEFINE GCC_ASLPP_FLAGS             = -x c -E
 DEFINE GCC_ASLCC_FLAGS             = -x c
 DEFINE GCC_WINDRES_FLAGS           = -J rc -O coff
 DEFINE GCC_IA32_RC_FLAGS           = -I binary -O elf32-i386          -B i386    --rename-section .data=.hii
@@ -5804,7 +5804,7 @@ RELEASE_CLANG38_X64_CC_FLAGS       = DEF(CLANG38_ALL_CC_FLAGS) -m64 "-DEFIAPI=__
 *_ELFGCC_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
 *_ELFGCC_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
 *_ELFGCC_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
-*_ELFGCC_*_ASLPP_FLAGS                  = -x c -E -P
+*_ELFGCC_*_ASLPP_FLAGS                  = -x c -E
 *_ELFGCC_*_ASLCC_FLAGS                  = -x c
 *_ELFGCC_*_ASLDLINK_FLAGS               = DEF(GCC_DLINK_FLAGS_COMMON) --entry _ReferenceAcpiTable
 
