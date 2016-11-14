@@ -549,6 +549,8 @@ ApWakeupFunction (
             GetProcessorNumber (CpuMpData, &ProcessorNumber);
             CpuMpData->CpuData[ProcessorNumber].ApFunction = 0;
             CpuMpData->CpuData[ProcessorNumber].ApFunctionArgument = 0;
+            ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
+            CpuInfoInHob[ProcessorNumber].ApTopOfStack = CpuInfoInHob[CpuMpData->NewBspNumber].ApTopOfStack;
           } else {
             //
             // Re-get the CPU APICID and Initial APICID
@@ -1420,6 +1422,7 @@ SwitchBSPWorker (
   CpuMpData->BSPInfo.State = CPU_SWITCH_STATE_IDLE;
   CpuMpData->APInfo.State  = CPU_SWITCH_STATE_IDLE;
   CpuMpData->SwitchBspFlag = TRUE;
+  CpuMpData->NewBspNumber  = ProcessorNumber;
 
   //
   // Clear the BSP bit of MSR_IA32_APIC_BASE
