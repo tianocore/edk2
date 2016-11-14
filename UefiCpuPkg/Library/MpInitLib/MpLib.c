@@ -899,7 +899,12 @@ ResetProcessorToIdleState (
 
   CpuMpData = GetCpuMpData ();
 
+  CpuMpData->InitFlag = ApInitReconfig;
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL);
+  while (CpuMpData->FinishedCount < 1) {
+    CpuPause ();
+  }
+  CpuMpData->InitFlag = ApInitDone;
 
   SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
 }
