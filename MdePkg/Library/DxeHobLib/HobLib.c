@@ -1,7 +1,7 @@
 /** @file
   HOB Library implemenation for Dxe Phase.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -418,6 +418,7 @@ BuildGuidDataHob (
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
+  If the FvImage buffer is not at its required alignment, then ASSERT().
 
   @param  BaseAddress   The base address of the Firmware Volume.
   @param  Length        The size of the Firmware Volume in bytes.
@@ -444,6 +445,7 @@ BuildFvHob (
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
   
   If there is no additional space for HOB creation, then ASSERT().
+  If the FvImage buffer is not at its required alignment, then ASSERT().
 
   @param  BaseAddress   The base address of the Firmware Volume.
   @param  Length        The size of the Firmware Volume in bytes.
