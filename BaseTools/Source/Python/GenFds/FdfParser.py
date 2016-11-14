@@ -54,7 +54,7 @@ from Common import GlobalData
 from Common.String import ReplaceMacro
 import uuid
 from Common.Misc import tdict
-
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 import Common.LongFilePathOs as os
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Capsule import EFI_CERT_TYPE_PKCS7_GUID
@@ -3504,6 +3504,9 @@ class FdfParser:
         
         AnyFileName = self.__Token
         self.__VerifyFile(AnyFileName)
+
+        if not os.path.isabs(AnyFileName):
+            AnyFileName = mws.join(GenFdsGlobalVariable.WorkSpaceDir, AnyFileName)
 
         return AnyFileName
 
