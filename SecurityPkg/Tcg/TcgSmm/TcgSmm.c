@@ -55,6 +55,7 @@ PhysicalPresenceCallback (
   EFI_PHYSICAL_PRESENCE          PpData;
   EFI_PHYSICAL_PRESENCE_FLAGS    Flags;
   BOOLEAN                        RequestConfirmed;
+  UINT32                         StorageFlags;
 
   //
   // Get the Physical Presence variable
@@ -150,6 +151,11 @@ PhysicalPresenceCallback (
       return EFI_SUCCESS;
     }
 
+    //
+    // Get the Physical Presence storage flags
+    //
+    StorageFlags = TcgPhysicalPresenceStorageLibReturnStorageFlags();
+
     RequestConfirmed = FALSE;
 
     switch (mTcgNvs->PPRequestUserConfirm) {
@@ -201,6 +207,23 @@ PhysicalPresenceCallback (
         //
         mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED; 
         return EFI_SUCCESS;
+
+      case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
+        if ((StorageFlags & TCG_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
+          RequestConfirmed = TRUE;
+        }
+        break;
+
+      case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
+        if ((StorageFlags & TCG_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
+          RequestConfirmed = TRUE;
+        }
+        break;
+
+      case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE:
+      case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE:
+        break;
+
       default:
         break;
     }

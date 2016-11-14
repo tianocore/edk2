@@ -50,6 +50,7 @@
   TpmMeasurementLib
   PcdLib
   TcgPpVendorLib
+  TcgPhysicalPresenceStorageLib
 
 [Guids]
   ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
