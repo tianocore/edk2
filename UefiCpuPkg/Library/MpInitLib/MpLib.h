@@ -171,6 +171,8 @@ typedef struct {
   UINTN                 DataSegment;
   UINTN                 EnableExecuteDisable;
   UINTN                 Cr3;
+  UINTN                 InitFlag;
+  CPU_INFO_IN_HOB       *CpuInfo;
   CPU_MP_DATA           *CpuMpData;
 } MP_CPU_EXCHANGE_INFO;
 

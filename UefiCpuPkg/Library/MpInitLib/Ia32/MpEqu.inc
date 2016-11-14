@@ -38,4 +38,6 @@ CodeSegmentLocation           equ        LockLocation + 28h
 DataSegmentLocation           equ        LockLocation + 2Ch
 EnableExecuteDisableLocation  equ        LockLocation + 30h
 Cr3Location                   equ        LockLocation + 34h
+InitFlagLocation              equ        LockLocation + 38h
+CpuInfoLocation               equ        LockLocation + 3Ch
 

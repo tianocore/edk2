@@ -664,6 +664,8 @@ FillExchangeInfoData (
 
   ExchangeInfo->CFunction       = (UINTN) ApWakeupFunction;
   ExchangeInfo->NumApsExecuting = 0;
+  ExchangeInfo->InitFlag        = (UINTN) CpuMpData->InitFlag;
+  ExchangeInfo->CpuInfo         = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
   ExchangeInfo->CpuMpData       = CpuMpData;
 
   ExchangeInfo->EnableExecuteDisable = IsBspExecuteDisableEnabled ();
