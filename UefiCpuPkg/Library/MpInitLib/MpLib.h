@@ -112,9 +112,6 @@ typedef struct {
   volatile UINT32                *StartupApSignal;
   volatile UINTN                 ApFunction;
   volatile UINTN                 ApFunctionArgument;
-  UINT32                         InitialApicId;
-  UINT32                         ApicId;
-  UINT32                         Health;
   BOOLEAN                        CpuHealthy;
   volatile CPU_STATE             State;
   CPU_VOLATILE_REGISTERS         VolatileRegisters;

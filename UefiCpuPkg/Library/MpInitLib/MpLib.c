@@ -253,33 +253,33 @@ SortApicId (
   UINTN             Index2;
   UINTN             Index3;
   UINT32            ApicId;
-  CPU_AP_DATA       CpuData;
+  CPU_INFO_IN_HOB   CpuInfo;
   UINT32            ApCount;
   CPU_INFO_IN_HOB   *CpuInfoInHob;
 
   ApCount = CpuMpData->CpuCount - 1;
-
+  CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
   if (ApCount != 0) {
     for (Index1 = 0; Index1 < ApCount; Index1++) {
       Index3 = Index1;
       //
       // Sort key is the hardware default APIC ID
       //
-      ApicId = CpuMpData->CpuData[Index1].ApicId;
+      ApicId = CpuInfoInHob[Index1].ApicId;
       for (Index2 = Index1 + 1; Index2 <= ApCount; Index2++) {
-        if (ApicId > CpuMpData->CpuData[Index2].ApicId) {
+        if (ApicId > CpuInfoInHob[Index2].ApicId) {
           Index3 = Index2;
-          ApicId = CpuMpData->CpuData[Index2].ApicId;
+          ApicId = CpuInfoInHob[Index2].ApicId;
         }
       }
       if (Index3 != Index1) {
-        CopyMem (&CpuData, &CpuMpData->CpuData[Index3], sizeof (CPU_AP_DATA));
+        CopyMem (&CpuInfo, &CpuInfoInHob[Index3], sizeof (CPU_INFO_IN_HOB));
         CopyMem (
-          &CpuMpData->CpuData[Index3],
-          &CpuMpData->CpuData[Index1],
-          sizeof (CPU_AP_DATA)
+          &CpuInfoInHob[Index3],
+          &CpuInfoInHob[Index1],
+          sizeof (CPU_INFO_IN_HOB)
           );
-        CopyMem (&CpuMpData->CpuData[Index1], &CpuData, sizeof (CPU_AP_DATA));
+        CopyMem (&CpuInfoInHob[Index1], &CpuInfo, sizeof (CPU_INFO_IN_HOB));
       }
     }
 
@@ -288,17 +288,10 @@ SortApicId (
     //
     ApicId = GetInitialApicId ();
     for (Index1 = 0; Index1 < CpuMpData->CpuCount; Index1++) {
-      if (CpuMpData->CpuData[Index1].ApicId == ApicId) {
+      if (CpuInfoInHob[Index1].ApicId == ApicId) {
         CpuMpData->BspNumber = (UINT32) Index1;
         break;
       }
-    }
-
-    CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
-    for (Index1 = 0; Index1 < CpuMpData->CpuCount; Index1++) {
-      CpuInfoInHob[Index1].InitialApicId = CpuMpData->CpuData[Index1].InitialApicId;
-      CpuInfoInHob[Index1].ApicId        = CpuMpData->CpuData[Index1].ApicId;
-      CpuInfoInHob[Index1].Health        = CpuMpData->CpuData[Index1].Health;
     }
   }
 }
@@ -358,10 +351,13 @@ GetProcessorNumber (
 {
   UINTN                   TotalProcessorNumber;
   UINTN                   Index;
+  CPU_INFO_IN_HOB         *CpuInfoInHob;
+
+  CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
 
   TotalProcessorNumber = CpuMpData->CpuCount;
   for (Index = 0; Index < TotalProcessorNumber; Index ++) {
-    if (CpuMpData->CpuData[Index].ApicId == GetApicId ()) {
+    if (CpuInfoInHob[Index].ApicId == GetApicId ()) {
       *ProcessorNumber = Index;
       return EFI_SUCCESS;
     }
@@ -439,12 +435,16 @@ InitializeApData (
   IN     UINT32           BistData
   )
 {
+  CPU_INFO_IN_HOB          *CpuInfoInHob;
+
+  CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
+  CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
+  CpuInfoInHob[ProcessorNumber].ApicId        = GetApicId ();
+  CpuInfoInHob[ProcessorNumber].Health        = BistData;
+
   CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
-  CpuMpData->CpuData[ProcessorNumber].Health     = BistData;
   CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
-  CpuMpData->CpuData[ProcessorNumber].ApicId     = GetApicId ();
-  CpuMpData->CpuData[ProcessorNumber].InitialApicId = GetInitialApicId ();
-  if (CpuMpData->CpuData[ProcessorNumber].InitialApicId >= 0xFF) {
+  if (CpuInfoInHob[ProcessorNumber].InitialApicId >= 0xFF) {
     //
     // Set x2APIC mode if there are any logical processor reporting
     // an Initial APIC ID of 255 or greater.
@@ -477,6 +477,7 @@ ApWakeupFunction (
   VOID                       *Parameter;
   UINT32                     BistData;
   volatile UINT32            *ApStartupSignalBuffer;
+  CPU_INFO_IN_HOB            *CpuInfoInHob;
 
   //
   // AP finished assembly code and begin to execute C code
@@ -536,6 +537,7 @@ ApWakeupFunction (
           // Invoke AP function here
           //
           Procedure (Parameter);
+          CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
           if (CpuMpData->SwitchBspFlag) {
             //
             // Re-get the processor number due to BSP/AP maybe exchange in AP function
@@ -547,8 +549,8 @@ ApWakeupFunction (
             //
             // Re-get the CPU APICID and Initial APICID
             //
-            CpuMpData->CpuData[ProcessorNumber].ApicId        = GetApicId ();
-            CpuMpData->CpuData[ProcessorNumber].InitialApicId = GetInitialApicId ();
+            CpuInfoInHob[ProcessorNumber].ApicId        = GetApicId ();
+            CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
           }
         }
         SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateFinished);
@@ -696,6 +698,7 @@ WakeUpAP (
   UINTN                            Index;
   CPU_AP_DATA                      *CpuData;
   BOOLEAN                          ResetVectorRequired;
+  CPU_INFO_IN_HOB                  *CpuInfoInHob;
 
   CpuMpData->FinishedCount = 0;
   ResetVectorRequired = FALSE;
@@ -760,8 +763,9 @@ WakeUpAP (
     ASSERT (CpuMpData->InitFlag != ApInitConfig);
     *(UINT32 *) CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
     if (ResetVectorRequired) {
+      CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
       SendInitSipiSipi (
-        CpuData->ApicId,
+        CpuInfoInHob[ProcessorNumber].ApicId,
         (UINT32) ExchangeInfo->BufferStart
         );
     }
@@ -1229,16 +1233,14 @@ MpInitLibInitialize (
     CpuMpData->CpuCount  = OldCpuMpData->CpuCount;
     CpuMpData->BspNumber = OldCpuMpData->BspNumber;
     CpuMpData->InitFlag  = ApInitReconfig;
-    CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) OldCpuMpData->CpuInfoInHob;
+    CpuMpData->CpuInfoInHob = OldCpuMpData->CpuInfoInHob;
+    CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
     for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
       InitializeSpinLock(&CpuMpData->CpuData[Index].ApLock);
-      CpuMpData->CpuData[Index].ApicId        = CpuInfoInHob[Index].ApicId;
-      CpuMpData->CpuData[Index].InitialApicId = CpuInfoInHob[Index].InitialApicId;
-      if (CpuMpData->CpuData[Index].InitialApicId >= 255) {
+      if (CpuInfoInHob[Index].InitialApicId >= 255) {
         CpuMpData->X2ApicEnable = TRUE;
       }
-      CpuMpData->CpuData[Index].Health     = CpuInfoInHob[Index].Health;
-      CpuMpData->CpuData[Index].CpuHealthy = (CpuMpData->CpuData[Index].Health == 0)? TRUE:FALSE;
+      CpuMpData->CpuData[Index].CpuHealthy = (CpuInfoInHob[Index].Health == 0)? TRUE:FALSE;
       CpuMpData->CpuData[Index].ApFunction = 0;
       CopyMem (
         &CpuMpData->CpuData[Index].VolatileRegisters,
@@ -1299,8 +1301,10 @@ MpInitLibGetProcessorInfo (
 {
   CPU_MP_DATA            *CpuMpData;
   UINTN                  CallerNumber;
+  CPU_INFO_IN_HOB        *CpuInfoInHob;
 
   CpuMpData = GetCpuMpData ();
+  CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
 
   //
   // Check whether caller processor is BSP
@@ -1318,7 +1322,7 @@ MpInitLibGetProcessorInfo (
     return EFI_NOT_FOUND;
   }
 
-  ProcessorInfoBuffer->ProcessorId = (UINT64) CpuMpData->CpuData[ProcessorNumber].ApicId;
+  ProcessorInfoBuffer->ProcessorId = (UINT64) CpuInfoInHob[ProcessorNumber].ApicId;
   ProcessorInfoBuffer->StatusFlag  = 0;
   if (ProcessorNumber == CpuMpData->BspNumber) {
     ProcessorInfoBuffer->StatusFlag |= PROCESSOR_AS_BSP_BIT;
@@ -1336,14 +1340,14 @@ MpInitLibGetProcessorInfo (
   // Get processor location information
   //
   GetProcessorLocationByApicId (
-    CpuMpData->CpuData[ProcessorNumber].ApicId,
+    CpuInfoInHob[ProcessorNumber].ApicId,
     &ProcessorInfoBuffer->Location.Package,
     &ProcessorInfoBuffer->Location.Core,
     &ProcessorInfoBuffer->Location.Thread
     );
 
   if (HealthData != NULL) {
-    HealthData->Uint32 = CpuMpData->CpuData[ProcessorNumber].Health;
+    HealthData->Uint32 = CpuInfoInHob[ProcessorNumber].Health;
   }
 
   return EFI_SUCCESS;
