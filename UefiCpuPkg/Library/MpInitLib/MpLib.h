@@ -133,6 +133,7 @@ typedef struct {
   UINT32                         InitialApicId;
   UINT32                         ApicId;
   UINT32                         Health;
+  UINT32                         ApTopOfStack;
 } CPU_INFO_IN_HOB;
 
 //

@@ -432,7 +432,8 @@ VOID
 InitializeApData (
   IN OUT CPU_MP_DATA      *CpuMpData,
   IN     UINTN            ProcessorNumber,
-  IN     UINT32           BistData
+  IN     UINT32           BistData,
+  IN     UINTN            ApTopOfStack
   )
 {
   CPU_INFO_IN_HOB          *CpuInfoInHob;
@@ -441,6 +442,7 @@ InitializeApData (
   CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
   CpuInfoInHob[ProcessorNumber].ApicId        = GetApicId ();
   CpuInfoInHob[ProcessorNumber].Health        = BistData;
+  CpuInfoInHob[ProcessorNumber].ApTopOfStack  = (UINT32) ApTopOfStack;
 
   CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
   CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
@@ -478,6 +480,7 @@ ApWakeupFunction (
   UINT32                     BistData;
   volatile UINT32            *ApStartupSignalBuffer;
   CPU_INFO_IN_HOB            *CpuInfoInHob;
+  UINTN                      ApTopOfStack;
 
   //
   // AP finished assembly code and begin to execute C code
@@ -496,7 +499,8 @@ ApWakeupFunction (
       //
       // This is first time AP wakeup, get BIST information from AP stack
       //
-      BistData = *(UINT32 *) (CpuMpData->Buffer + ProcessorNumber * CpuMpData->CpuApStackSize - sizeof (UINTN));
+      ApTopOfStack  = CpuMpData->Buffer + (ProcessorNumber + 1) * CpuMpData->CpuApStackSize;
+      BistData = *(UINT32 *) (ApTopOfStack - sizeof (UINTN));
       //
       // Do some AP initialize sync
       //
@@ -505,7 +509,7 @@ ApWakeupFunction (
       // Sync BSP's Control registers to APs
       //
       RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
-      InitializeApData (CpuMpData, ProcessorNumber, BistData);
+      InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
     } else {
       //
@@ -1194,7 +1198,7 @@ MpInitLibInitialize (
   //
   // Set BSP basic information
   //
-  InitializeApData (CpuMpData, 0, 0);
+  InitializeApData (CpuMpData, 0, 0, CpuMpData->Buffer);
   //
   // Save assembly code information
   //

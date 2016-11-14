@@ -120,6 +120,12 @@ LongModeStart:
     mov        ss,  ax
 
     mov        esi, ebx
+    lea        edi, [esi + InitFlagLocation]
+    cmp        qword [edi], 1       ; ApInitConfig
+    jnz        GetApicId
+
+    ; AP init
+    mov        esi, ebx
     mov        edi, esi
     add        edi, LockLocation
     mov        rax, NotVacantFlag
@@ -129,26 +135,64 @@ TestLock:
     cmp        rax, NotVacantFlag
     jz         TestLock
 
-    mov        edi, esi
-    add        edi, NumApsExecutingLocation
-    inc        dword [edi]
-    mov        ebx, [edi]
+    lea        ecx, [esi + InitFlagLocation]
+    inc        dword [ecx]
+    mov        ebx, [ecx]
 
-ProgramStack:
+Releaselock:
+    mov        rax, VacantFlag
+    xchg       qword [edi], rax
+    ; program stack
     mov        edi, esi
     add        edi, StackSizeLocation
-    mov        rax, qword [edi]
+    mov        eax, dword [edi]
+    mov        ecx, ebx
+    inc        ecx
+    mul        ecx                               ; EAX = StackSize * (CpuNumber + 1)
     mov        edi, esi
     add        edi, StackStartAddressLocation
     add        rax, qword [edi]
     mov        rsp, rax
-    mov        qword [edi], rax
+    jmp        CProcedureInvoke
 
-Releaselock:
-    mov        rax, VacantFlag
-    mov        edi, esi
-    add        edi, LockLocation
-    xchg       qword [edi], rax
+GetApicId:
+    mov        eax, 0
+    cpuid
+    cmp        eax, 0bh
+    jnb        X2Apic
+    ; Processor is not x2APIC capable, so get 8-bit APIC ID
+    mov        eax, 1
+    cpuid
+    shr        ebx, 24
+    mov        edx, ebx
+    jmp        GetProcessorNumber
+
+X2Apic:
+    ; Processor is x2APIC capable, so get 32-bit x2APIC ID
+    mov        eax, 0bh
+    xor        ecx, ecx
+    cpuid                   
+    ; edx save x2APIC ID
+    
+GetProcessorNumber:
+    ;
+    ; Get processor number for this AP
+    ; Note that BSP may become an AP due to SwitchBsp()
+    ;
+    xor         ebx, ebx
+    lea         eax, [esi + CpuInfoLocation]
+    mov         edi, [eax]
+
+GetNextProcNumber:
+    cmp         dword [edi], edx                      ; APIC ID match?
+    jz          ProgramStack
+    add         edi, 16
+    inc         ebx
+    jmp         GetNextProcNumber    
+
+ProgramStack:
+    xor         rsp, rsp
+    mov         esp, dword [edi + 12]
 
 CProcedureInvoke:
     push       rbp               ; Push BIST data at top of AP stack
