@@ -1,7 +1,7 @@
 /** @file
   Network library functions providing net buffer operation support.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1661,17 +1661,17 @@ NetblockChecksum (
 
   Sum = 0;
 
+  //
+  // Add left-over byte, if any
+  //
+  if (Len % 2 != 0) {
+    Sum += *(Bulk + Len - 1);
+  }
+
   while (Len > 1) {
     Sum += *(UINT16 *) Bulk;
     Bulk += 2;
     Len -= 2;
-  }
-
-  //
-  // Add left-over byte, if any
-  //
-  if (Len > 0) {
-    Sum += *(UINT8 *) Bulk;
   }
 
   //
