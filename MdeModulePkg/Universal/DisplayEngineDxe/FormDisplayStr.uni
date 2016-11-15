@@ -1,6 +1,6 @@
 // *++
 //
-// Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -117,3 +117,6 @@
                                        #language fr-FR  "Reconnect is required, exit and reconnect"
 #string GET_TIME_FAIL                  #language en-US  " Get date/time fail, display ??."
                                        #language fr-FR  " Get data/time fail, display ??."
+#string PASSWORD_NOT_SUPPORTED         #language en-US  "Unsupported! Because no interactieve flag or no ConfigAccess protocol!"
+                                       #language fr-FR  "Unsupported! Because no interactieve flag or no ConfigAccess protocol!"
+
