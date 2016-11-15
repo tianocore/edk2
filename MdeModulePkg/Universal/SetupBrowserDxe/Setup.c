@@ -6108,29 +6108,10 @@ PasswordCheck (
       return EFI_UNSUPPORTED;
     }
   } else {
-    if (PasswordString == NULL) {
-      return EFI_SUCCESS;
-    } 
-
     //
-    // Check whether has preexisted password.
+    // If a password doesn't have the CALLBACK flag, browser will not handle it.
     //
-    if (PasswordString[0] == 0) {
-      if (*((CHAR16 *) Question->BufferValue) == 0) {
-        return EFI_SUCCESS;
-      } else {
-        return EFI_NOT_READY;
-      }
-    }
-
-    //
-    // Check whether the input password is same as preexisted password.
-    //
-    if (StrnCmp (PasswordString, (CHAR16 *) Question->BufferValue, Question->StorageWidth/sizeof (CHAR16)) == 0) {
-      return EFI_SUCCESS;
-    } else {
-      return EFI_NOT_READY;
-    }
+    return EFI_UNSUPPORTED;
   }
     
   //
