@@ -406,7 +406,7 @@ OpalDriverGetDeviceList(
   ReadyToBoot callback to send BlockSid command.
 
   @param  Event   Pointer to this event
-  @param  Context Event hanlder private Data
+  @param  Context Event handler private Data
 
 **/
 VOID

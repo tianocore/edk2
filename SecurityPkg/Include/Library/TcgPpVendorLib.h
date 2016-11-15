@@ -42,8 +42,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE         0xFFFFFFF1
 
 //
-// The return code for Sumbit TPM Request to Pre-OS Environment
-// and Sumbit TPM Request to Pre-OS Environment 2
+// The return code for Submit TPM Request to Pre-OS Environment
+// and Submit TPM Request to Pre-OS Environment 2
 //
 #define TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS                                  0
 #define TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED                          1

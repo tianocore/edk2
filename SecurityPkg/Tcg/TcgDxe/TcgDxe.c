@@ -1160,7 +1160,7 @@ OnReadyToBoot (
     for (PcrIndex = 0; PcrIndex < 8; PcrIndex++) {
       Status = MeasureSeparatorEvent (PcrIndex);
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Seperator Event not Measured. Error!\n"));
+        DEBUG ((DEBUG_ERROR, "Separator Event not Measured. Error!\n"));
       }
     }
 

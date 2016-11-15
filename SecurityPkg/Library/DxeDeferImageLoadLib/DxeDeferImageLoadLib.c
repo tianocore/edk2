@@ -469,7 +469,7 @@ Done:
   @param[in] DevicePath  Points to device path.
   @param[in] AccessType  The type of user access control.
  
-  @retval    TURE        The DevicePath is in the specified List.
+  @retval    TRUE        The DevicePath is in the specified List.
   @retval    FALSE       The DevicePath is not in the specified List.
 
 **/
@@ -512,7 +512,7 @@ IsDevicePathInList (
 
   @param[in] DevicePath  Points to device path
  
-  @retval    TURE        The image pointed by DevicePath is permitted to load.
+  @retval    TRUE        The image pointed by DevicePath is permitted to load.
   @retval    FALSE       The image pointed by DevicePath is forbidden to load.
 
 **/
@@ -545,7 +545,7 @@ VerifyDevicePath (
 
   @param[in] DevicePath  Points to device path.
  
-  @retval    TURE        The image pointed by DevicePath is a boot option.
+  @retval    TRUE        The image pointed by DevicePath is a boot option.
   @retval    FALSE       The image pointed by DevicePath is not a boot option.
 
 **/

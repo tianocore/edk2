@@ -881,7 +881,7 @@ TcgIsProtocolSupported(
 
   @param     Discovery
 
-  @retval    TURE if lock, FALSE if not lock.
+  @retval    TRUE if lock, FALSE if not lock.
 **/
 BOOLEAN
 EFIAPI

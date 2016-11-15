@@ -64,7 +64,7 @@ BOOLEAN
 
   This function performs Hash digest on a data buffer of the specified size.
   It can be called multiple times to compute the digest of long or discontinuous data streams.
-  Hash context should be already correctly intialized by HashInit(), and should not be finalized
+  Hash context should be already correctly initialized by HashInit(), and should not be finalized
   by HashFinal(). Behavior with invalid context is undefined.
 
   If HashContext is NULL, then return FALSE.

@@ -290,7 +290,7 @@ OpalGlobalLockingRangeGenKey(
 /**
 
   The function updates the ReadLocked and WriteLocked columns of the Global Locking Range.
-  This funciton is required for a user1 authority, since a user1 authority shall only have access to ReadLocked and WriteLocked columns
+  This function is required for a user1 authority, since a user1 authority shall only have access to ReadLocked and WriteLocked columns
   (not ReadLockEnabled and WriteLockEnabled columns).
 
   @param[in]      LockingSpSession    OPAL_SESSION with OPAL_UID_LOCKING_SP to generate key
