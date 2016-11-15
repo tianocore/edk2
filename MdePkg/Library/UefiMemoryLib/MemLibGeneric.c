@@ -37,9 +37,9 @@ InternalMemSetMem16 (
   IN      UINT16                    Value
   )
 {
-  do {
-    ((UINT16*)Buffer)[--Length] = Value;
-  } while (Length != 0);
+  for (; Length != 0; Length--) {
+    ((UINT16*)Buffer)[Length - 1] = Value;
+  }
   return Buffer;
 }
 
@@ -61,9 +61,9 @@ InternalMemSetMem32 (
   IN      UINT32                    Value
   )
 {
-  do {
-    ((UINT32*)Buffer)[--Length] = Value;
-  } while (Length != 0);
+  for (; Length != 0; Length--) {
+    ((UINT32*)Buffer)[Length - 1] = Value;
+  }
   return Buffer;
 }
 
@@ -85,9 +85,9 @@ InternalMemSetMem64 (
   IN      UINT64                    Value
   )
 {
-  do {
-    ((UINT64*)Buffer)[--Length] = Value;
-  } while (Length != 0);
+  for (; Length != 0; Length--) {
+    ((UINT64*)Buffer)[Length - 1] = Value;
+  }
   return Buffer;
 }
 
