@@ -132,11 +132,10 @@ CvtNum (
 {
   UINTN Remainder;
 
-  while (Length > 0) {
+  for (; Length > 0; Length--) {
     Remainder = Number % 10;
     Number /= 10;
-    Length--;
-    Buffer[Length] = (UINT8) ('0' + Remainder);
+    Buffer[Length - 1] = (UINT8) ('0' + Remainder);
   }
 }
 
