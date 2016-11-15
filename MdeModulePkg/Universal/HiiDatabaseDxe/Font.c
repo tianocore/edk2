@@ -2056,7 +2056,7 @@ HiiStringToImage (
     if ((Flags & EFI_HII_DIRECT_TO_SCREEN) == EFI_HII_DIRECT_TO_SCREEN) {
       BltBuffer = NULL;
       if (RowInfo[RowIndex].LineWidth != 0) {
-        BltBuffer = AllocateZeroPool (RowInfo[RowIndex].LineWidth * RowInfo[RowIndex].LineHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+        BltBuffer = AllocatePool (RowInfo[RowIndex].LineWidth * RowInfo[RowIndex].LineHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
         if (BltBuffer == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           goto Exit;
