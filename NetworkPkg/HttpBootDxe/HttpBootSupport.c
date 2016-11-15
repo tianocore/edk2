@@ -86,11 +86,10 @@ HttpBootUintnToAscDecWithFormat (
 {
   UINTN                          Remainder;
 
-  while (Length > 0) {
-    Length--;
+  for (; Length > 0; Length--) {
     Remainder      = Number % 10;
     Number        /= 10;
-    Buffer[Length] = (UINT8) ('0' + Remainder);
+    Buffer[Length - 1] = (UINT8) ('0' + Remainder);
   }
 }
 
