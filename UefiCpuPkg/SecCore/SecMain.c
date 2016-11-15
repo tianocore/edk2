@@ -239,10 +239,10 @@ SecStartupPhase2(
 
   DEBUG ((
     DEBUG_INFO,
-    "%a() Stack Base: 0x%lx, Stack Size: 0x%lx\n",
+    "%a() Stack Base: 0x%p, Stack Size: 0x%x\n",
     __FUNCTION__,
     SecCoreData->StackBase,
-    SecCoreData->StackSize
+    (UINT32) SecCoreData->StackSize
     ));
 
   //
