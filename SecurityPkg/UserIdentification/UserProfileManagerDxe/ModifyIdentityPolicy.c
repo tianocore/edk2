@@ -409,7 +409,7 @@ CheckNewIdentityPolicy (
 /**
   Save the identity policy and update UI with it.
   
-  This funciton will verify the new identity policy, in current implementation, 
+  This function will verify the new identity policy, in current implementation, 
   the identity policy can be:  T, P & P & P & ..., P | P | P | ...
   Here, "T" means "True", "P" means "Credential Provider", "&" means "and", "|" means "or".
   Other identity policies are not supported.  
