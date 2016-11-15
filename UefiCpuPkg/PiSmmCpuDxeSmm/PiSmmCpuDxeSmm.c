@@ -1004,6 +1004,7 @@ FindSmramInfo (
     }
   } while (Found);
 
+  FreePool (SmramRanges);
   DEBUG ((EFI_D_INFO, "SMRR Base: 0x%x, SMRR Size: 0x%x\n", *SmrrBase, *SmrrSize));
 }
 
