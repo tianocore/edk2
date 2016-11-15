@@ -443,17 +443,28 @@ ProcessLoadOptions (
       LoadOptionType = LoadOptions[Index].OptionType;
     }
     ASSERT (LoadOptionType == LoadOptions[Index].OptionType);
+    ASSERT (LoadOptionType != LoadOptionTypeBoot);
 
     Status = EfiBootManagerProcessLoadOption (&LoadOptions[Index]);
 
+    //
+    // Status indicates whether the load option is loaded and executed
+    // LoadOptions[Index].Status is what the load option returns
+    //
     if (!EFI_ERROR (Status)) {
-      if (LoadOptionType == LoadOptionTypePlatformRecovery) {
-        //
-        // Stop processing if any entry is successful
-        //
+      //
+      // Stop processing if any PlatformRecovery#### returns success.
+      //
+      if ((LoadOptions[Index].Status == EFI_SUCCESS) &&
+          (LoadOptionType == LoadOptionTypePlatformRecovery)) {
         break;
       }
-      if ((LoadOptions[Index].Attributes & LOAD_OPTION_FORCE_RECONNECT) != 0) {
+
+      //
+      // Only set ReconnectAll flag when the load option executes successfully.
+      //
+      if (!EFI_ERROR (LoadOptions[Index].Status) &&
+          (LoadOptions[Index].Attributes & LOAD_OPTION_FORCE_RECONNECT) != 0) {
         ReconnectAll = TRUE;
       }
     }
