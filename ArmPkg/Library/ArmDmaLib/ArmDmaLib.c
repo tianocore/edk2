@@ -90,15 +90,13 @@ DmaMap (
     return  EFI_OUT_OF_RESOURCES;
   }
 
-  *Mapping = Map;
-
   if ((((UINTN)HostAddress & (gCacheAlignment - 1)) != 0) ||
       ((*NumberOfBytes & (gCacheAlignment - 1)) != 0)) {
 
     // Get the cacheability of the region
     Status = gDS->GetMemorySpaceDescriptor (*DeviceAddress, &GcdDescriptor);
     if (EFI_ERROR(Status)) {
-      return Status;
+      goto FreeMapInfo;
     }
 
     // If the mapped buffer is not an uncached buffer
@@ -112,7 +110,8 @@ DmaMap (
           "%a: Operation type 'MapOperationBusMasterCommonBuffer' is only supported\n"
           "on memory regions that were allocated using DmaAllocateBuffer ()\n",
           __FUNCTION__));
-        return EFI_UNSUPPORTED;
+        Status = EFI_UNSUPPORTED;
+        goto FreeMapInfo;
       }
 
       //
@@ -122,7 +121,7 @@ DmaMap (
       Map->DoubleBuffer  = TRUE;
       Status = DmaAllocateBuffer (EfiBootServicesData, EFI_SIZE_TO_PAGES (*NumberOfBytes), &Buffer);
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto FreeMapInfo;
       }
 
       if (Operation == MapOperationBusMasterRead) {
@@ -162,7 +161,14 @@ DmaMap (
   Map->NumberOfBytes = *NumberOfBytes;
   Map->Operation     = Operation;
 
+  *Mapping = Map;
+
   return EFI_SUCCESS;
+
+FreeMapInfo:
+  FreePool (Map);
+
+  return Status;
 }
 
 
