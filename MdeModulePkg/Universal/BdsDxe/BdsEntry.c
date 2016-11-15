@@ -837,7 +837,7 @@ BdsEntry (
   FilePath = FileDevicePath (NULL, EFI_REMOVABLE_MEDIA_FILE_NAME);
   Status = EfiBootManagerInitializeLoadOption (
              &LoadOption,
-             0,
+             LoadOptionNumberUnassigned,
              LoadOptionTypePlatformRecovery,
              LOAD_OPTION_ACTIVE,
              L"Default PlatformRecovery",
@@ -846,9 +846,24 @@ BdsEntry (
              0
              );
   ASSERT_EFI_ERROR (Status);
-  EfiBootManagerLoadOptionToVariable (&LoadOption);
+  LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
+  if (EfiBootManagerFindLoadOption (&LoadOption, LoadOptions, LoadOptionCount) == -1) {
+    for (Index = 0; Index < LoadOptionCount; Index++) {
+      //
+      // The PlatformRecovery#### options are sorted by OptionNumber.
+      // Find the the smallest unused number as the new OptionNumber.
+      //
+      if (LoadOptions[Index].OptionNumber != Index) {
+        break;
+      }
+    }
+    LoadOption.OptionNumber = Index;
+    Status = EfiBootManagerLoadOptionToVariable (&LoadOption);
+    ASSERT_EFI_ERROR (Status);
+  }
   EfiBootManagerFreeLoadOption (&LoadOption);
   FreePool (FilePath);
+  EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
 
   //
   // Report Status Code to indicate connecting drivers will happen
