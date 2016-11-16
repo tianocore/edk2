@@ -1375,5 +1375,8 @@ InitIdtr (
   VOID
   )
 {
-  SmmRegisterExceptionHandler (&mSmmCpuService, EXCEPT_IA32_DEBUG, DebugExceptionHandler);
+  EFI_STATUS                        Status;
+
+  Status = SmmRegisterExceptionHandler (&mSmmCpuService, EXCEPT_IA32_DEBUG, DebugExceptionHandler);
+  ASSERT_EFI_ERROR (Status);
 }

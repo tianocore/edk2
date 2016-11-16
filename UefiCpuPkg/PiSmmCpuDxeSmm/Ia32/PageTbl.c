@@ -27,6 +27,7 @@ SmmInitPageTable (
 {
   UINTN                             PageFaultHandlerHookAddress;
   IA32_IDT_GATE_DESCRIPTOR          *IdtEntry;
+  EFI_STATUS                        Status;
 
   //
   // Initialize spin lock
@@ -49,7 +50,8 @@ SmmInitPageTable (
     //
     // Register SMM Page Fault Handler
     //
-    SmmRegisterExceptionHandler (&mSmmCpuService, EXCEPT_IA32_PAGE_FAULT, SmiPFHandler);
+    Status = SmmRegisterExceptionHandler (&mSmmCpuService, EXCEPT_IA32_PAGE_FAULT, SmiPFHandler);
+    ASSERT_EFI_ERROR (Status);
   }
 
   //
