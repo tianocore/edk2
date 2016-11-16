@@ -54,7 +54,6 @@
   CpuLib
   UefiCpuLib
   UefiBootServicesTableLib
-  HobLib
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
