@@ -581,7 +581,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 1, "INTEL ", "OVMF    ", 4) {
             IO (Decode16, 0x278, 0x278, 0x00, 0x08)
             IO (Decode16, 0x370, 0x370, 0x00, 0x02)
             IO (Decode16, 0x378, 0x378, 0x00, 0x08)
-            IO (Decode16, 0x402, 0x402, 0x00, 0x01)        // QEMU debug console, should use FixedPcdGet16 (PcdDebugIoPort)
+            IO (Decode16, FixedPcdGet16 (PcdDebugIoPort), FixedPcdGet16 (PcdDebugIoPort), 0x00, 0x01)
             IO (Decode16, 0x440, 0x440, 0x00, 0x10)
             IO (Decode16, 0x678, 0x678, 0x00, 0x08)
             IO (Decode16, 0x778, 0x778, 0x00, 0x08)
