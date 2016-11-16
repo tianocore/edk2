@@ -1,7 +1,7 @@
 /** @file
   CPU Exception Handler library implementition with empty functions.
 
-  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -94,6 +94,6 @@ RegisterCpuInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
   )
 {
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
