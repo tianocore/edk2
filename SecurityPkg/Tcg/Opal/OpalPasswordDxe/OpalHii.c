@@ -694,6 +694,8 @@ HiiPsidRevert(
     Ret = OpalSupportPsidRevert(&Session, Psid.Psid, (UINT32)sizeof(Psid.Psid), OpalDisk->OpalDevicePath);
   }
 
+  ZeroMem (Psid.Psid, PSID_CHARACTER_LENGTH);
+
   if (Ret == TcgResultSuccess) {
     AsciiSPrint( Response, DEFAULT_RESPONSE_SIZE, "%a", "PSID Revert: Success" );
   } else {
@@ -1099,8 +1101,8 @@ HiiPasswordEntered(
   EFI_STRING_ID            Str
   )
 {
-  OPAL_DISK*                    OpalDisk;
-  CHAR8                         Password[MAX_PASSWORD_CHARACTER_LENGTH + 1];
+  OPAL_DISK*                   OpalDisk;
+  CHAR8                        Password[MAX_PASSWORD_CHARACTER_LENGTH + 1];
   CHAR16*                      UniStr;
   UINT32                       PassLength;
   EFI_STATUS                   Status;
@@ -1124,15 +1126,20 @@ HiiPasswordEntered(
   if (UniStr == NULL) {
     return EFI_NOT_FOUND;
   }
+
+  HiiSetString(gHiiPackageListHandle, Str, L"", NULL);
+
   PassLength = (UINT32) StrLen (UniStr);
   if (PassLength >= sizeof(Password)) {
     HiiSetFormString(STRING_TOKEN(STR_ACTION_STATUS), "Password too long");
-    gBS->FreePool(UniStr);
+    ZeroMem (UniStr, StrSize (UniStr));
+    FreePool(UniStr);
     return EFI_BUFFER_TOO_SMALL;
   }
 
   UnicodeStrToAsciiStrS (UniStr, Password, sizeof (Password));
-  gBS->FreePool(UniStr);
+  ZeroMem (UniStr, StrSize (UniStr));
+  FreePool(UniStr);
 
   if (gHiiConfiguration.SelectedAction == HII_KEY_ID_GOTO_UNLOCK) {
     Status = HiiUnlock (OpalDisk, Password, PassLength);
@@ -1153,6 +1160,8 @@ HiiPasswordEntered(
   } else {
     Status = HiiSetPassword(OpalDisk, Password, PassLength);
   }
+
+  ZeroMem (Password, sizeof (Password));
 
   OpalHiiSetBrowserData ();
 

@@ -240,6 +240,7 @@ OpalDriverPopUpHddPassword (
   }
 
   UnicodeStrToAsciiStrS (Unicode, Ascii, MAX_PASSWORD_SIZE + 1);
+  ZeroMem (Unicode, sizeof (Unicode));
 
   return Ascii;
 }
