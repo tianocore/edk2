@@ -2,7 +2,7 @@
   The Common operations used by IKE Exchange Process.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2627,6 +2627,8 @@ Ikev2ChildSaParseSaPayload (
 
   @retval EFI_SUCCESS            The operation complete successfully.
   @retval EFI_INVALID_PARAMETER  If NumFragments is zero.
+                                 If the authentication algorithm given by HashAlgId
+                                 cannot be found.
   @retval EFI_OUT_OF_RESOURCES   If the required resource can't be allocated.
   @retval Others                 The operation is failed.
 
@@ -2663,6 +2665,10 @@ Ikev2SaGenerateKey (
   LocalFragments[2].Data = NULL;
 
   AuthKeyLength = IpSecGetHmacDigestLength (HashAlgId);
+  if (AuthKeyLength == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   DigestSize    = AuthKeyLength;
   Digest        = AllocateZeroPool (AuthKeyLength);
 
