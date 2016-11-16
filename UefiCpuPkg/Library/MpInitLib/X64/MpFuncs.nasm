@@ -134,7 +134,7 @@ TestLock:
     cmp        rax, NotVacantFlag
     jz         TestLock
 
-    lea        ecx, [esi + InitFlagLocation]
+    lea        ecx, [esi + NumApsExecutingLocation]
     inc        dword [ecx]
     mov        ebx, [ecx]
 
