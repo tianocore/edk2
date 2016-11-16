@@ -33,6 +33,8 @@
 #
 
 [Sources]
+  EbcDebuggerHook.h
+  EbcDebuggerHook.c
   EbcExecute.h
   EbcExecute.c
   EbcInt.h

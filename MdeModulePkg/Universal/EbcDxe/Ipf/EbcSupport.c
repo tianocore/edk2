@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "EbcInt.h"
 #include "EbcExecute.h"
 #include "EbcSupport.h"
+#include "EbcDebuggerHook.h"
 
 /**
   Given raw bytes of Itanium based code, format them into a bundle and
@@ -214,12 +215,15 @@ EbcInterpret (
   PushU64 (&VmContext, 0);
   PushU64 (&VmContext, 0xDEADBEEFDEADBEEF);
   VmContext.StackRetAddr = (UINT64) VmContext.Gpr[0];
+
   //
   // Begin executing the EBC code
   //
+  EbcDebuggerHookEbcInterpret (&VmContext);
   EbcExecute (&VmContext);
+
   //
-  // Return the value in R[7] unless there was an error
+  // Return the value in Gpr[7] unless there was an error
   //
   ReturnEBCStack(StackIndex);
   return (UINT64) VmContext.Gpr[7];
@@ -334,10 +338,11 @@ ExecuteEbcImageEntryPoint (
   //
   // Begin executing the EBC code
   //
+  EbcDebuggerHookExecuteEbcImageEntryPoint (&VmContext);
   EbcExecute (&VmContext);
 
   //
-  // Return the value in R[7] unless there was an error
+  // Return the value in Gpr[7] unless there was an error
   //
   ReturnEBCStack(StackIndex);
   return (UINT64) VmContext.Gpr[7];

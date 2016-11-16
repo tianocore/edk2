@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "EbcInt.h"
 #include "EbcExecute.h"
+#include "EbcDebuggerHook.h"
 
 
 //
@@ -1488,6 +1489,9 @@ EbcExecute (
       Status = EFI_UNSUPPORTED;
       goto Done;
     }
+
+    EbcDebuggerHookExecuteStart (VmPtr);
+
     //
     // The EBC VM is a strongly ordered processor, so perform a fence operation before
     // and after each instruction is executed.
@@ -1497,6 +1501,8 @@ EbcExecute (
     mVmOpcodeTable[(*VmPtr->Ip & OPCODE_M_OPCODE)].ExecuteFunction (VmPtr);
 
     MemoryFence ();
+
+    EbcDebuggerHookExecuteEnd (VmPtr);
 
     //
     // If the step flag is set, signal an exception and continue. We don't
@@ -1976,7 +1982,9 @@ ExecuteJMP (
   ConditionFlag = (UINT8) VMFLAG_ISSET (VmPtr, VMFLAGS_CC);
   if ((Operand & CONDITION_M_CONDITIONAL) != 0) {
     if (CompareSet != ConditionFlag) {
+      EbcDebuggerHookJMPStart (VmPtr);
       VmPtr->Ip += Size;
+      EbcDebuggerHookJMPEnd (VmPtr);
       return EFI_SUCCESS;
     }
   }
@@ -2015,11 +2023,13 @@ ExecuteJMP (
     //
     // Take jump -- relative or absolute
     //
+    EbcDebuggerHookJMPStart (VmPtr);
     if ((Operand & JMP_M_RELATIVE) != 0) {
       VmPtr->Ip += (UINTN) Data64 + Size;
     } else {
       VmPtr->Ip = (VMIP) (UINTN) Data64;
     }
+    EbcDebuggerHookJMPEnd (VmPtr);
 
     return EFI_SUCCESS;
   }
@@ -2065,11 +2075,14 @@ ExecuteJMP (
       return EFI_UNSUPPORTED;
     }
 
+    EbcDebuggerHookJMPStart (VmPtr);
     if ((Operand & JMP_M_RELATIVE) != 0) {
       VmPtr->Ip += (UINTN) Addr + Size;
     } else {
       VmPtr->Ip = (VMIP) Addr;
     }
+    EbcDebuggerHookJMPEnd (VmPtr);
+
   } else {
     //
     // Form: JMP32 Rx {Immed32}
@@ -2085,11 +2098,14 @@ ExecuteJMP (
       return EFI_UNSUPPORTED;
     }
 
+    EbcDebuggerHookJMPStart (VmPtr);
     if ((Operand & JMP_M_RELATIVE) != 0) {
       VmPtr->Ip += (UINTN) Addr + Size;
     } else {
       VmPtr->Ip = (VMIP) Addr;
     }
+    EbcDebuggerHookJMPEnd (VmPtr);
+
   }
 
   return EFI_SUCCESS;
@@ -2129,7 +2145,9 @@ ExecuteJMP8 (
   //
   if ((Opcode & CONDITION_M_CONDITIONAL) != 0) {
     if (CompareSet != ConditionFlag) {
+      EbcDebuggerHookJMP8Start (VmPtr);
       VmPtr->Ip += 2;
+      EbcDebuggerHookJMP8End (VmPtr);
       return EFI_SUCCESS;
     }
   }
@@ -2141,7 +2159,9 @@ ExecuteJMP8 (
   //
   // Want to check for offset == -2 and then raise an exception?
   //
+  EbcDebuggerHookJMP8Start (VmPtr);
   VmPtr->Ip += (Offset * 2) + 2;
+  EbcDebuggerHookJMP8End (VmPtr);
   return EFI_SUCCESS;
 }
 
@@ -2966,6 +2986,13 @@ ExecuteCALL (
   //
   Opcode    = GETOPCODE (VmPtr);
   Operands  = GETOPERANDS (VmPtr);
+
+  if (Operands & OPERAND_M_NATIVE_CALL) {
+    EbcDebuggerHookCALLEXStart (VmPtr);
+  } else {
+    EbcDebuggerHookCALLStart (VmPtr);
+  }
+
   //
   // Assign these as well to avoid compiler warnings
   //
@@ -3067,6 +3094,12 @@ ExecuteCALL (
     }
   }
 
+  if (Operands & OPERAND_M_NATIVE_CALL) {
+    EbcDebuggerHookCALLEXEnd (VmPtr);
+  } else {
+    EbcDebuggerHookCALLEnd (VmPtr);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -3087,6 +3120,9 @@ ExecuteRET (
   IN VM_CONTEXT *VmPtr
   )
 {
+
+  EbcDebuggerHookRETStart (VmPtr);
+
   //
   // If we're at the top of the stack, then simply set the done
   // flag and return
@@ -3113,6 +3149,9 @@ ExecuteRET (
     VmPtr->FramePtr = (VOID *) VmReadMemN (VmPtr, (UINTN) VmPtr->Gpr[0]);
     VmPtr->Gpr[0] += 8;
   }
+
+
+  EbcDebuggerHookRETEnd (VmPtr);
 
   return EFI_SUCCESS;
 }

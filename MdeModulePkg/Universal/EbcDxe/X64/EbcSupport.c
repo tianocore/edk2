@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "EbcInt.h"
 #include "EbcExecute.h"
+#include "EbcDebuggerHook.h"
 
 //
 // NOTE: This is the stack size allocated for the interpreter
@@ -278,10 +279,11 @@ EbcInterpret (
   //
   // Begin executing the EBC code
   //
+  EbcDebuggerHookEbcInterpret (&VmContext);
   EbcExecute (&VmContext);
 
   //
-  // Return the value in R[7] unless there was an error
+  // Return the value in Gpr[7] unless there was an error
   //
   ReturnEBCStack(StackIndex);
   return (UINT64) VmContext.Gpr[7];
@@ -389,10 +391,11 @@ ExecuteEbcImageEntryPoint (
   //
   // Begin executing the EBC code
   //
+  EbcDebuggerHookExecuteEbcImageEntryPoint (&VmContext);
   EbcExecute (&VmContext);
 
   //
-  // Return the value in R[7] unless there was an error
+  // Return the value in Gpr[7] unless there was an error
   //
   ReturnEBCStack(StackIndex);
   return (UINT64) VmContext.Gpr[7];
