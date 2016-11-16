@@ -256,7 +256,7 @@ PxeBcBuildDhcp4Options (
     OptList[Index]->OpCode  = PXEBC_DHCP4_TAG_MAXMSG;
     OptList[Index]->Length  = (UINT8) sizeof (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE);
     OptEnt.MaxMesgSize      = (PXEBC_DHCP4_OPTION_MAX_MESG_SIZE *) OptList[Index]->Data;
-    Value                   = NTOHS (PXEBC_DHCP4_PACKET_MAX_SIZE - 8);
+    Value                   = NTOHS (PXEBC_DHCP4_PACKET_MAX_SIZE);
     CopyMem (&OptEnt.MaxMesgSize->Size, &Value, sizeof (UINT16));
     Index++;
     OptList[Index]          = GET_NEXT_DHCP_OPTION (OptList[Index - 1]);
@@ -1180,7 +1180,7 @@ PxeBcDhcp4CallBack (
                  PXEBC_DHCP4_TAG_MAXMSG
                  );
   if (MaxMsgSize != NULL) {
-    Value = HTONS (PXEBC_DHCP4_PACKET_MAX_SIZE - 8);
+    Value = HTONS (PXEBC_DHCP4_PACKET_MAX_SIZE);
     CopyMem (MaxMsgSize->Data, &Value, sizeof (Value));
   }
 
@@ -1206,6 +1206,14 @@ PxeBcDhcp4CallBack (
   switch (Dhcp4Event) {
 
   case Dhcp4SendDiscover:
+    if (Packet->Length > PXEBC_DHCP4_PACKET_MAX_SIZE) {
+      //
+      // If the to be sent packet exceeds the maximum length, abort the DHCP process.
+      //
+      Status = EFI_ABORTED;
+      break;
+    }
+
     //
     // Cache the DHCPv4 discover packet to mode data directly.
     // It need to check SendGuid as well as Dhcp4SendRequest.
@@ -1213,6 +1221,14 @@ PxeBcDhcp4CallBack (
     CopyMem (&Mode->DhcpDiscover.Dhcpv4, &Packet->Dhcp4, Packet->Length);
 
   case Dhcp4SendRequest:
+    if (Packet->Length > PXEBC_DHCP4_PACKET_MAX_SIZE) {
+      //
+      // If the to be sent packet exceeds the maximum length, abort the DHCP process.
+      //
+      Status = EFI_ABORTED;
+      break;
+    }
+    
     if (Mode->SendGUID) {
       //
       // Send the system Guid instead of the MAC address as the hardware address if required.
@@ -1229,6 +1245,12 @@ PxeBcDhcp4CallBack (
 
   case Dhcp4RcvdOffer:
     Status = EFI_NOT_READY;
+    if (Packet->Length > PXEBC_DHCP4_PACKET_MAX_SIZE) {
+      //
+      // Ignore the incoming packets which exceed the maximum length.
+      //
+      break;
+    }
     if (Private->OfferNum < PXEBC_OFFER_MAX_NUM) {
       //
       // Cache the DHCPv4 offers to OfferBuffer[] for select later, and record
@@ -1253,6 +1275,14 @@ PxeBcDhcp4CallBack (
     break;
 
   case Dhcp4RcvdAck:
+    if (Packet->Length > PXEBC_DHCP4_PACKET_MAX_SIZE) {
+      //
+      // Abort the DHCP if the ACK packet exceeds the maximum length.
+      //
+	  Status = EFI_ABORTED;
+	  break;
+    }
+
     //
     // Cache the DHCPv4 ack to Private->Dhcp4Ack, but it's not the final ack in mode data
     // without verification.
