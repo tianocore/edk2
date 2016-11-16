@@ -81,7 +81,7 @@ WaitForNotify (
   // Give control back to BootLoader after FspSiliconInit
   //
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "FSP is waiting for NOTIFY\n"));
-  FspSiliconInitDone ();
+  FspSiliconInitDone2 (EFI_SUCCESS);
 
   //
   // BootLoader called FSP again through NotifyPhase
