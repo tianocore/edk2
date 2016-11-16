@@ -230,8 +230,11 @@ CopyDigestListToBuffer (
 {
   UINTN  Index;
   UINT16 DigestSize;
+  UINT32 DigestListCount;
+  UINT32 *DigestListCountPtr;
 
-  CopyMem (Buffer, &DigestList->count, sizeof(DigestList->count));
+  DigestListCountPtr = (UINT32 *) Buffer;
+  DigestListCount = 0;
   Buffer = (UINT8 *)Buffer + sizeof(DigestList->count);
   for (Index = 0; Index < DigestList->count; Index++) {
     if (!IsHashAlgSupportedInHashAlgorithmMask(DigestList->digests[Index].hashAlg, HashAlgorithmMask)) {
@@ -243,7 +246,9 @@ CopyDigestListToBuffer (
     DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
     CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
     Buffer = (UINT8 *)Buffer + DigestSize;
+    DigestListCount++;
   }
+  WriteUnaligned32 (DigestListCountPtr, DigestListCount);
 
   return Buffer;
 }
