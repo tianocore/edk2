@@ -98,6 +98,7 @@
   Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibTcg/Tpm12DeviceLibTcg.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  TcgPhysicalPresenceStorageLib|SecurityPkg/Library/DxeTcgPhysicalPresenceStorageLib/DxeTcgPhysicalPresenceStorageLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_SAL_DRIVER,]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -205,6 +206,7 @@
   SecurityPkg/Library/TcgStorageCoreLib/TcgStorageCoreLib.inf
   SecurityPkg/Library/TcgStorageOpalLib/TcgStorageOpalLib.inf
   SecurityPkg/Library/OpalPasswordSupportLib/OpalPasswordSupportLib.inf
+  SecurityPkg/Library/DxeTcgPhysicalPresenceStorageLib/DxeTcgPhysicalPresenceStorageLib.inf
 
   #
   # Other

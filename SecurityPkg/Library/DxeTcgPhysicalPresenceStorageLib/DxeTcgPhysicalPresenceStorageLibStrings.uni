@@ -1,0 +1,31 @@
+/** @file
+  String definitions for TPM 1.2 & 2.0 physical presence storage related actions confirm text.
+
+Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+**/
+
+#langdef en-US "English"
+
+#string TCG_STORAGE_HEAD_STR                  #language en-US    "A configuration change was requested to %s on subsequent boots\n\n"
+#string TCG_STORAGE_PPI_HEAD_STR              #language en-US    "A configuration change was requested to allow the Operating System to %s without asking for user confirmation in the future.\n\n"
+
+#string TCG_STORAGE_ACCEPT_KEY                #language en-US    "Press F10 "
+#string TCG_STORAGE_CAUTION_KEY               #language en-US    "Press F12 "
+#string TCG_STORAGE_REJECT_KEY                #language en-US    "to %s\nPress ESC to reject this change request and continue\n"
+
+#string TCG_STORAGE_NO_PPI_INFO               #language en-US    "to approve future Operating System requests "
+
+#string TCG_STORAGE_ENABLE_BLOCK_SID          #language en-US    "issue Block SID "
+#string TCG_STORAGE_DISABLE_BLOCK_SID         #language en-US    "disable issuing Block SID "
+
+#string TCG_STORAGE_PP_ENABLE_BLOCK_SID       #language en-US    "enable blocking SID authentication"
+#string TCG_STORAGE_PP_DISABLE_BLOCK_SID      #language en-US    "disable blocking SID authentication"
+
