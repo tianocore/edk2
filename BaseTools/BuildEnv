@@ -2,7 +2,7 @@
 # Setup the environment for unix-like systems running a bash-like shell.
 # This file must be "sourced" not merely executed. For example: ". edksetup.sh"
 #
-# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -41,8 +41,8 @@ RestorePreviousConfiguration() {
     export CONF_PATH=$WORKSPACE/Conf
     if [ ! -d $WORKSPACE/Conf ] && [ -n "$PACKAGES_PATH" ]
     then
-      PACKAGES_PATH=${PACKAGES_PATH//:/ }
-      for DIR in $PACKAGES_PATH
+      PATH_LIST=${PACKAGES_PATH//:/ }
+      for DIR in $PATH_LIST
       do
         if [ -d $DIR/Conf ]
         then
@@ -138,8 +138,8 @@ SetEdkToolsPath() {
   #
   if [ -n "$PACKAGES_PATH"]
   then
-    PACKAGES_PATH=${PACKAGES_PATH//:/ }
-    for DIR in $PACKAGES_PATH
+    PATH_LIST=${PACKAGES_PATH//:/ }
+    for DIR in $PATH_LIST
     do
       if [ -d $DIR/BaseTools ]
       then
