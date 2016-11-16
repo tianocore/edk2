@@ -579,6 +579,9 @@ ProcessRecoveryImage (
   VOID                        *AuthenticatedImage;
   UINTN                       AuthenticatedImageSize;
 
+  AuthenticatedImage     = NULL;
+  AuthenticatedImageSize = 0;
+
   Status = CapsuleAuthenticateSystemFirmware(Image, Length, TRUE, &LastAttemptVersion, &LastAttemptStatus, &AuthenticatedImage, &AuthenticatedImageSize);
   if (EFI_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "CapsuleAuthenticateSystemFirmware - %r\n", Status));

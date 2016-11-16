@@ -223,6 +223,9 @@ SystemFirmwareAuthenticatedUpdate (
   VOID                        *AuthenticatedImage;
   UINTN                       AuthenticatedImageSize;
 
+  AuthenticatedImage     = NULL;
+  AuthenticatedImageSize = 0;
+
   DEBUG((DEBUG_INFO, "SystemFirmwareAuthenticatedUpdate...\n"));
 
   Status = CapsuleAuthenticateSystemFirmware(Image, ImageSize, FALSE, LastAttemptVersion, LastAttemptStatus, &AuthenticatedImage, &AuthenticatedImageSize);

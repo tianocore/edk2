@@ -58,6 +58,9 @@ DispatchSystemFmpImages (
   EFI_FIRMWARE_VOLUME_HEADER                    *FvImage;
   BOOLEAN                                       Result;
 
+  AuthenticatedImage     = NULL;
+  AuthenticatedImageSize = 0;
+
   DEBUG((DEBUG_INFO, "DispatchSystemFmpImages\n"));
 
   //
