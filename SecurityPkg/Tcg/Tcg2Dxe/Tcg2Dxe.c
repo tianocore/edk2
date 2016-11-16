@@ -974,6 +974,7 @@ TcgDxeLogHashEvent (
   EFI_STATUS                        RetStatus;
   TCG_PCR_EVENT2                    TcgPcrEvent2;
   UINT8                             *DigestBuffer;
+  UINT32                            *EventSizePtr;
 
   DEBUG ((EFI_D_INFO, "SupportedEventLogs - 0x%08x\n", mTcgDxeData.BsCap.SupportedEventLogs));
 
@@ -1010,9 +1011,8 @@ TcgDxeLogHashEvent (
         TcgPcrEvent2.PCRIndex = NewEventHdr->PCRIndex;
         TcgPcrEvent2.EventType = NewEventHdr->EventType;
         DigestBuffer = (UINT8 *)&TcgPcrEvent2.Digest;
-        DigestBuffer = CopyDigestListToBuffer (DigestBuffer, DigestList, mTcgDxeData.BsCap.ActivePcrBanks);
-        CopyMem (DigestBuffer, &NewEventHdr->EventSize, sizeof(NewEventHdr->EventSize));
-        DigestBuffer = DigestBuffer + sizeof(NewEventHdr->EventSize);
+        EventSizePtr = CopyDigestListToBuffer (DigestBuffer, DigestList, mTcgDxeData.BsCap.ActivePcrBanks);
+        CopyMem (EventSizePtr, &NewEventHdr->EventSize, sizeof(NewEventHdr->EventSize));
 
         //
         // Enter critical region
@@ -1021,7 +1021,7 @@ TcgDxeLogHashEvent (
         Status = TcgDxeLogEvent (
                    mTcg2EventInfo[Index].LogFormat,
                    &TcgPcrEvent2,
-                   sizeof(TcgPcrEvent2.PCRIndex) + sizeof(TcgPcrEvent2.EventType) + GetDigestListSize (DigestList) + sizeof(TcgPcrEvent2.EventSize),
+                   sizeof(TcgPcrEvent2.PCRIndex) + sizeof(TcgPcrEvent2.EventType) + GetDigestListBinSize (DigestBuffer) + sizeof(TcgPcrEvent2.EventSize),
                    NewEventData,
                    NewEventHdr->EventSize
                    );
