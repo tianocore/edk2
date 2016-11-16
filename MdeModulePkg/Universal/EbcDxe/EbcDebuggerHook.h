@@ -15,6 +15,29 @@
 #ifndef _EFI_EBC_DEBUGGER_HOOK_H_
 #define _EFI_EBC_DEBUGGER_HOOK_H_
 
+#include <Uefi.h>
+
+#include <Protocol/DebugSupport.h>
+#include <Protocol/EbcVmTest.h>
+
+/**
+  The VM interpreter calls this function when an exception is detected.
+
+  @param  ExceptionType          Specifies the processor exception detected.
+  @param  ExceptionFlags         Specifies the exception context.
+  @param  VmPtr                  Pointer to a VM context for passing info to the
+                                 EFI debugger.
+
+  @retval EFI_SUCCESS            This function completed successfully.
+
+**/
+EFI_STATUS
+EbcDebugSignalException (
+  IN EFI_EXCEPTION_TYPE                   ExceptionType,
+  IN EXCEPTION_FLAGS                      ExceptionFlags,
+  IN VM_CONTEXT                           *VmPtr
+  );
+
 //
 // Hooks in EbcInt.c
 //

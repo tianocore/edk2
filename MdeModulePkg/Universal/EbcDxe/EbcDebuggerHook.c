@@ -16,9 +16,7 @@
 
 **/
 
-#include <Uefi.h>
-#include <Protocol/DebugSupport.h>
-#include <Protocol/EbcVmTest.h>
+#include "EbcDebuggerHook.h"
 
 VOID
 EbcDebuggerHookInit (

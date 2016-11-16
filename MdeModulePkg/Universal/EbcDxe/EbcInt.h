@@ -34,13 +34,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern VM_CONTEXT                    *mVmPtr;
 
 //
-// Bits of exception flags field of VM context
-//
-#define EXCEPTION_FLAG_FATAL    0x80000000  // can't continue
-#define EXCEPTION_FLAG_ERROR    0x40000000  // bad, but try to continue
-#define EXCEPTION_FLAG_WARNING  0x20000000  // harmless problem
-#define EXCEPTION_FLAG_NONE     0x00000000  // for normal return
-//
 // Flags passed to the internal create-thunks function.
 //
 #define FLAG_THUNK_ENTRY_POINT  0x01  // thunk for an image entry point
@@ -94,28 +87,6 @@ EbcAddImageThunk (
   IN EFI_HANDLE      ImageHandle,
   IN VOID            *ThunkBuffer,
   IN UINT32          ThunkSize
-  );
-
-//
-// The interpreter calls these when an exception is detected,
-// or as a periodic callback.
-//
-/**
-  The VM interpreter calls this function when an exception is detected.
-
-  @param  ExceptionType          Specifies the processor exception detected.
-  @param  ExceptionFlags         Specifies the exception context.
-  @param  VmPtr                  Pointer to a VM context for passing info to the
-                                 EFI debugger.
-
-  @retval EFI_SUCCESS            This function completed successfully.
-
-**/
-EFI_STATUS
-EbcDebugSignalException (
-  IN EFI_EXCEPTION_TYPE                   ExceptionType,
-  IN EXCEPTION_FLAGS                      ExceptionFlags,
-  IN VM_CONTEXT                           *VmPtr
   );
 
 //

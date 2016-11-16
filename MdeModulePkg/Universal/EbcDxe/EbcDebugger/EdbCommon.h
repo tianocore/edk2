@@ -22,9 +22,14 @@ Abstract:
 #define _EFI_EDB_COMMON_H_
 
 #include <Uefi.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/Ebc.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/SimpleFileSystem.h>

@@ -21,11 +21,7 @@ Abstract:
 #ifndef _EFI_EDB_H_
 #define _EFI_EDB_H_
 
-#include <Uefi.h>
 #include "EdbCommon.h"
-
-#include "EbcInt.h"
-#include "EbcExecute.h"
 
 #define EBC_DEBUGGER_MAJOR_VERSION   1
 #define EBC_DEBUGGER_MINOR_VERSION   0
