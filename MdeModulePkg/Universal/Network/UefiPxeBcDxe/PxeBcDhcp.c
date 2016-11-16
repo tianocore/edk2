@@ -912,6 +912,14 @@ PxeBcDhcpCallBack (
 
   case Dhcp4SendDiscover:
   case Dhcp4SendRequest:
+    if (Packet->Length > PXEBC_DHCP4_MAX_PACKET_SIZE) {
+      //
+      // If the to be sent packet exceeds the maximum length, abort the DHCP process.
+      //
+      Status = EFI_ABORTED;
+      break;
+    }
+    
     if (Mode->SendGUID) {
       //
       // send the system GUID instead of the MAC address as the hardware address
@@ -942,6 +950,13 @@ PxeBcDhcpCallBack (
 
   case Dhcp4RcvdOffer:
     Status = EFI_NOT_READY;
+    if (Packet->Length > PXEBC_DHCP4_MAX_PACKET_SIZE) {
+      //
+      // Ignore the incoming Offers which exceed the maximum length.
+      //
+      break;
+    }
+    
     if (Private->NumOffers < PXEBC_MAX_OFFER_NUM) {
       //
       // Cache the dhcp offers in Private->Dhcp4Offers[]
@@ -967,6 +982,14 @@ PxeBcDhcpCallBack (
     break;
 
   case Dhcp4RcvdAck:
+    if (Packet->Length > PXEBC_DHCP4_MAX_PACKET_SIZE) {
+      //
+      // Abort the DHCP if the ACK packet exceeds the maximum length.
+      //
+	  Status = EFI_ABORTED;
+      break;
+    }
+
     //
     // Cache Ack
     //
