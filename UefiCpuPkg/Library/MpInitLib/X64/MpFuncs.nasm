@@ -125,7 +125,6 @@ LongModeStart:
     jnz        GetApicId
 
     ; AP init
-    mov        esi, ebx
     mov        edi, esi
     add        edi, LockLocation
     mov        rax, NotVacantFlag
