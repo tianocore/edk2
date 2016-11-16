@@ -1,7 +1,7 @@
 /** @file
   InterlockedCompareExchange16 function
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,7 @@
 UINT16
 EFIAPI
 InternalSyncCompareExchange16 (
-  IN      UINT16                    *Value,
+  IN      volatile UINT16           *Value,
   IN      UINT16                    CompareValue,
   IN      UINT16                    ExchangeValue
   )

@@ -244,7 +244,7 @@ ReleaseSpinLock (
 UINT32
 EFIAPI
 InterlockedIncrement (
-  IN      UINT32                    *Value
+  IN      volatile UINT32           *Value
   )
 {
   ASSERT (Value != NULL);
@@ -269,7 +269,7 @@ InterlockedIncrement (
 UINT32
 EFIAPI
 InterlockedDecrement (
-  IN      UINT32                    *Value
+  IN      volatile UINT32           *Value
   )
 {
   ASSERT (Value != NULL);
@@ -298,7 +298,7 @@ InterlockedDecrement (
 UINT16
 EFIAPI
 InterlockedCompareExchange16 (
-  IN OUT  UINT16                    *Value,
+  IN OUT  volatile UINT16           *Value,
   IN      UINT16                    CompareValue,
   IN      UINT16                    ExchangeValue
   )
@@ -329,7 +329,7 @@ InterlockedCompareExchange16 (
 UINT32
 EFIAPI
 InterlockedCompareExchange32 (
-  IN OUT  UINT32                    *Value,
+  IN OUT  volatile UINT32           *Value,
   IN      UINT32                    CompareValue,
   IN      UINT32                    ExchangeValue
   )
@@ -359,7 +359,7 @@ InterlockedCompareExchange32 (
 UINT64
 EFIAPI
 InterlockedCompareExchange64 (
-  IN OUT  UINT64                    *Value,
+  IN OUT  volatile UINT64           *Value,
   IN      UINT64                    CompareValue,
   IN      UINT64                    ExchangeValue
   )
@@ -389,7 +389,7 @@ InterlockedCompareExchange64 (
 VOID *
 EFIAPI
 InterlockedCompareExchangePointer (
-  IN OUT  VOID                      **Value,
+  IN OUT  VOID                      * volatile *Value,
   IN      VOID                      *CompareValue,
   IN      VOID                      *ExchangeValue
   )
@@ -401,13 +401,13 @@ InterlockedCompareExchangePointer (
   switch (SizeOfValue) {
     case sizeof (UINT32):
       return (VOID*)(UINTN)InterlockedCompareExchange32 (
-                             (UINT32*)Value,
+                             (volatile UINT32 *)Value,
                              (UINT32)(UINTN)CompareValue,
                              (UINT32)(UINTN)ExchangeValue
                              );
     case sizeof (UINT64):
       return (VOID*)(UINTN)InterlockedCompareExchange64 (
-                             (UINT64*)Value,
+                             (volatile UINT64 *)Value,
                              (UINT64)(UINTN)CompareValue,
                              (UINT64)(UINTN)ExchangeValue
                              );
