@@ -178,10 +178,12 @@ typedef struct {
   UINT32         Reserved;
 } HTTP_BOOT_VENDOR_OPTION;
 
+#define HTTP_CACHED_DHCP4_PACKET_MAX_SIZE  (OFFSET_OF (EFI_DHCP4_PACKET, Dhcp4) + HTTP_BOOT_DHCP4_PACKET_MAX_SIZE)
+
 typedef union {
   EFI_DHCP4_PACKET        Offer;
   EFI_DHCP4_PACKET        Ack;
-  UINT8                   Buffer[HTTP_BOOT_DHCP4_PACKET_MAX_SIZE];
+  UINT8                   Buffer[HTTP_CACHED_DHCP4_PACKET_MAX_SIZE];
 } HTTP_BOOT_DHCP4_PACKET;
 
 typedef struct {

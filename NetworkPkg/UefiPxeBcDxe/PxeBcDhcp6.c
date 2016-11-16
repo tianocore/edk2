@@ -1919,6 +1919,14 @@ PxeBcDhcp6CallBack (
   switch (Dhcp6Event) {
 
   case Dhcp6SendSolicit:
+    if (Packet->Length > PXEBC_DHCP6_PACKET_MAX_SIZE) {
+      //
+      // If the to be sent packet exceeds the maximum length, abort the DHCP process.
+      //
+      Status = EFI_ABORTED;
+      break;
+    }
+    
     //
     // Record the first Solicate msg time
     //
@@ -1934,6 +1942,12 @@ PxeBcDhcp6CallBack (
 
   case Dhcp6RcvdAdvertise:
     Status = EFI_NOT_READY;
+    if (Packet->Length > PXEBC_DHCP6_PACKET_MAX_SIZE) {
+      //
+      // Ignore the incoming packets which exceed the maximum length.
+      //
+      break;
+    }
     if (Private->OfferNum < PXEBC_OFFER_MAX_NUM) {
       //
       // Cache the dhcp offers to OfferBuffer[] for select later, and record
@@ -1944,6 +1958,14 @@ PxeBcDhcp6CallBack (
     break;
 
   case Dhcp6SendRequest:
+    if (Packet->Length > PXEBC_DHCP6_PACKET_MAX_SIZE) {
+      //
+      // If the to be sent packet exceeds the maximum length, abort the DHCP process.
+      //
+      Status = EFI_ABORTED;
+      break;
+    }
+    
     //
     // Store the request packet as seed packet for discover.
     //
@@ -1975,6 +1997,13 @@ PxeBcDhcp6CallBack (
     break;
 
   case Dhcp6RcvdReply:
+    if (Packet->Length > PXEBC_DHCP6_PACKET_MAX_SIZE) {
+      //
+      // Abort the DHCP if the Peply packet exceeds the maximum length.
+      //
+	  Status = EFI_ABORTED;
+      break;
+    }
     //
     // Cache the dhcp ack to Private->Dhcp6Ack, but it's not the final ack in mode data
     // without verification.

@@ -102,12 +102,12 @@ EfiPxeBcStart (
     // PXE over IPv6 starts here, initialize the fields and list header.
     //
     Private->Ip6Policy                          = PXEBC_IP6_POLICY_MAX;
-    Private->ProxyOffer.Dhcp6.Packet.Offer.Size = PXEBC_DHCP6_PACKET_MAX_SIZE;
-    Private->DhcpAck.Dhcp6.Packet.Ack.Size      = PXEBC_DHCP6_PACKET_MAX_SIZE;
-    Private->PxeReply.Dhcp6.Packet.Ack.Size     = PXEBC_DHCP6_PACKET_MAX_SIZE;
+    Private->ProxyOffer.Dhcp6.Packet.Offer.Size = PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE;
+    Private->DhcpAck.Dhcp6.Packet.Ack.Size      = PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE;
+    Private->PxeReply.Dhcp6.Packet.Ack.Size     = PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE;
 
     for (Index = 0; Index < PXEBC_OFFER_MAX_NUM; Index++) {
-      Private->OfferBuffer[Index].Dhcp6.Packet.Offer.Size = PXEBC_DHCP6_PACKET_MAX_SIZE;
+      Private->OfferBuffer[Index].Dhcp6.Packet.Offer.Size = PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE;
     }
 
     //
@@ -154,12 +154,12 @@ EfiPxeBcStart (
     //
     // PXE over IPv4 starts here, initialize the fields.
     //
-    Private->ProxyOffer.Dhcp4.Packet.Offer.Size = PXEBC_DHCP4_PACKET_MAX_SIZE;
-    Private->DhcpAck.Dhcp4.Packet.Ack.Size      = PXEBC_DHCP4_PACKET_MAX_SIZE;
-    Private->PxeReply.Dhcp4.Packet.Ack.Size     = PXEBC_DHCP4_PACKET_MAX_SIZE;
+    Private->ProxyOffer.Dhcp4.Packet.Offer.Size = PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE;
+    Private->DhcpAck.Dhcp4.Packet.Ack.Size      = PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE;
+    Private->PxeReply.Dhcp4.Packet.Ack.Size     = PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE;
 
     for (Index = 0; Index < PXEBC_OFFER_MAX_NUM; Index++) {
-      Private->OfferBuffer[Index].Dhcp4.Packet.Offer.Size = PXEBC_DHCP4_PACKET_MAX_SIZE;
+      Private->OfferBuffer[Index].Dhcp4.Packet.Offer.Size = PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE;
     }
 
     PxeBcSeedDhcp4Packet (&Private->SeedPacket, Private->Udp4Read);

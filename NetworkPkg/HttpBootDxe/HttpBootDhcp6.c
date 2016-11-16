@@ -427,6 +427,12 @@ HttpBootDhcp6CallBack (
     
    case Dhcp6RcvdAdvertise:
      Status = EFI_NOT_READY;
+    if (Packet->Length > HTTP_BOOT_DHCP6_PACKET_MAX_SIZE) {
+      //
+      // Ignore the incoming packets which exceed the maximum length.
+      //
+      break;
+    }
      if (Private->OfferNum < HTTP_BOOT_OFFER_MAX_NUM) {
        //
        // Cache the dhcp offers to OfferBuffer[] for select later, and record

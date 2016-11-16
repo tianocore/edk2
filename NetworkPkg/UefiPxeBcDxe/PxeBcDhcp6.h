@@ -18,7 +18,7 @@
 
 #define PXEBC_DHCP6_OPTION_MAX_NUM        16
 #define PXEBC_DHCP6_OPTION_MAX_SIZE       312
-#define PXEBC_DHCP6_PACKET_MAX_SIZE       1472
+#define PXEBC_DHCP6_PACKET_MAX_SIZE       (sizeof (EFI_PXE_BASE_CODE_PACKET))
 #define PXEBC_IP6_POLICY_MAX              0xff
 #define PXEBC_IP6_ROUTE_TABLE_TIMEOUT     10
 
@@ -101,10 +101,12 @@ typedef struct {
   UINT8                   Precedence;
 } PXEBC_DHCP6_OPTION_NODE;
 
+#define PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE  (OFFSET_OF (EFI_DHCP6_PACKET, Dhcp6) + PXEBC_DHCP6_PACKET_MAX_SIZE)
+
 typedef union {
   EFI_DHCP6_PACKET        Offer;
   EFI_DHCP6_PACKET        Ack;
-  UINT8                   Buffer[PXEBC_DHCP6_PACKET_MAX_SIZE];
+  UINT8                   Buffer[PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE];
 } PXEBC_DHCP6_PACKET;
 
 typedef struct {

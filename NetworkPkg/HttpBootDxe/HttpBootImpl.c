@@ -126,11 +126,11 @@ HttpBootStart (
   ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
   if (!Private->UsingIpv6) {
     for (Index = 0; Index < HTTP_BOOT_OFFER_MAX_NUM; Index++) {
-      Private->OfferBuffer[Index].Dhcp4.Packet.Offer.Size = HTTP_BOOT_DHCP4_PACKET_MAX_SIZE;
+      Private->OfferBuffer[Index].Dhcp4.Packet.Offer.Size = HTTP_CACHED_DHCP4_PACKET_MAX_SIZE;
     }
   } else {
     for (Index = 0; Index < HTTP_BOOT_OFFER_MAX_NUM; Index++) {
-      Private->OfferBuffer[Index].Dhcp6.Packet.Offer.Size = HTTP_BOOT_DHCP6_PACKET_MAX_SIZE;
+      Private->OfferBuffer[Index].Dhcp6.Packet.Offer.Size = HTTP_CACHED_DHCP6_PACKET_MAX_SIZE;
     }
   }
 

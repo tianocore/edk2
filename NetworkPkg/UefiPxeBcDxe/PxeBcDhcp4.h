@@ -18,7 +18,7 @@
 
 #define PXEBC_DHCP4_OPTION_MAX_NUM         16
 #define PXEBC_DHCP4_OPTION_MAX_SIZE        312
-#define PXEBC_DHCP4_PACKET_MAX_SIZE        1472
+#define PXEBC_DHCP4_PACKET_MAX_SIZE        (sizeof (EFI_PXE_BASE_CODE_PACKET))
 #define PXEBC_DHCP4_S_PORT                 67
 #define PXEBC_DHCP4_C_PORT                 68
 #define PXEBC_BS_DOWNLOAD_PORT             69
@@ -263,10 +263,12 @@ typedef struct {
   UINT8                 CredTypeLen;
 } PXEBC_VENDOR_OPTION;
 
+#define PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE  (OFFSET_OF (EFI_DHCP4_PACKET, Dhcp4) + PXEBC_DHCP4_PACKET_MAX_SIZE)
+
 typedef union {
   EFI_DHCP4_PACKET        Offer;
   EFI_DHCP4_PACKET        Ack;
-  UINT8                   Buffer[PXEBC_DHCP4_PACKET_MAX_SIZE];
+  UINT8                   Buffer[PXEBC_CACHED_DHCP4_PACKET_MAX_SIZE];
 } PXEBC_DHCP4_PACKET;
 
 typedef struct {
