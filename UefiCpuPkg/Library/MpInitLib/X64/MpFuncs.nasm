@@ -185,13 +185,12 @@ GetProcessorNumber:
 GetNextProcNumber:
     cmp         dword [edi], edx                      ; APIC ID match?
     jz          ProgramStack
-    add         edi, 16
+    add         edi, 20
     inc         ebx
     jmp         GetNextProcNumber    
 
 ProgramStack:
-    xor         rsp, rsp
-    mov         esp, dword [edi + 12]
+    mov         rsp, qword [edi + 12]
 
 CProcedureInvoke:
     push       rbp               ; Push BIST data at top of AP stack

@@ -129,12 +129,14 @@ typedef struct {
 // we need to make sure the each fields offset same in different
 // architecture.
 //
+#pragma pack (1)
 typedef struct {
   UINT32                         InitialApicId;
   UINT32                         ApicId;
   UINT32                         Health;
-  UINT32                         ApTopOfStack;
+  UINT64                         ApTopOfStack;
 } CPU_INFO_IN_HOB;
+#pragma pack ()
 
 //
 // AP reset code information including code address and size,

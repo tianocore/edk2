@@ -181,7 +181,7 @@ GetProcessorNumber:
 GetNextProcNumber:
     cmp         [edi], edx                       ; APIC ID match?
     jz          ProgramStack
-    add         edi, 16
+    add         edi, 20
     inc         ebx
     jmp         GetNextProcNumber    
 

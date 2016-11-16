@@ -433,7 +433,7 @@ InitializeApData (
   IN OUT CPU_MP_DATA      *CpuMpData,
   IN     UINTN            ProcessorNumber,
   IN     UINT32           BistData,
-  IN     UINTN            ApTopOfStack
+  IN     UINT64           ApTopOfStack
   )
 {
   CPU_INFO_IN_HOB          *CpuInfoInHob;
@@ -442,7 +442,7 @@ InitializeApData (
   CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
   CpuInfoInHob[ProcessorNumber].ApicId        = GetApicId ();
   CpuInfoInHob[ProcessorNumber].Health        = BistData;
-  CpuInfoInHob[ProcessorNumber].ApTopOfStack  = (UINT32) ApTopOfStack;
+  CpuInfoInHob[ProcessorNumber].ApTopOfStack  = ApTopOfStack;
 
   CpuMpData->CpuData[ProcessorNumber].Waiting    = FALSE;
   CpuMpData->CpuData[ProcessorNumber].CpuHealthy = (BistData == 0) ? TRUE : FALSE;
@@ -480,7 +480,7 @@ ApWakeupFunction (
   UINT32                     BistData;
   volatile UINT32            *ApStartupSignalBuffer;
   CPU_INFO_IN_HOB            *CpuInfoInHob;
-  UINTN                      ApTopOfStack;
+  UINT64                     ApTopOfStack;
 
   //
   // AP finished assembly code and begin to execute C code
@@ -500,7 +500,7 @@ ApWakeupFunction (
       // This is first time AP wakeup, get BIST information from AP stack
       //
       ApTopOfStack  = CpuMpData->Buffer + (ProcessorNumber + 1) * CpuMpData->CpuApStackSize;
-      BistData = *(UINT32 *) (ApTopOfStack - sizeof (UINTN));
+      BistData = *(UINT32 *) ((UINTN) ApTopOfStack - sizeof (UINTN));
       //
       // Do some AP initialize sync
       //
