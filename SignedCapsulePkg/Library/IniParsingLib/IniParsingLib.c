@@ -1257,6 +1257,7 @@ GetGuidFromDataFile (
   if (EFI_ERROR(Status)) {
     return EFI_NOT_FOUND;
   }
+  ASSERT (Value != NULL);
   if (!IsValidGuid(Value, AsciiStrLen(Value))) {
     return EFI_NOT_FOUND;
   }
@@ -1303,6 +1304,7 @@ GetDecimalUintnFromDataFile (
   if (EFI_ERROR(Status)) {
     return EFI_NOT_FOUND;
   }
+  ASSERT (Value != NULL);
   if (!IsValidDecimalString(Value, AsciiStrLen(Value))) {
     return EFI_NOT_FOUND;
   }
@@ -1346,6 +1348,7 @@ GetHexUintnFromDataFile (
   if (EFI_ERROR(Status)) {
     return EFI_NOT_FOUND;
   }
+  ASSERT (Value != NULL);
   if (!IsValidHexString(Value, AsciiStrLen(Value))) {
     return EFI_NOT_FOUND;
   }
@@ -1389,6 +1392,7 @@ GetHexUint64FromDataFile (
   if (EFI_ERROR(Status)) {
     return EFI_NOT_FOUND;
   }
+  ASSERT (Value != NULL);
   if (!IsValidHexString(Value, AsciiStrLen(Value))) {
     return EFI_NOT_FOUND;
   }
