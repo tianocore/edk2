@@ -156,10 +156,6 @@
   # @Prompt Processor stack size in SMM.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x2000|UINT32|0x32132105
 
-  ## Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM.
-  # @Prompt AP synchronization timeout value in SMM.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000|UINT64|0x32132104
-
   ## Indicates if SMM Code Access Check is enabled.
   #  If enabled, the SMM handler cannot execute the code outside SMM regions.
   #  This PCD is suggested to TRUE in production image.<BR><BR>
@@ -167,12 +163,6 @@
   #   FALSE - SMM Code Access Check will be disabled.<BR>
   # @Prompt SMM Code Access Check.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable|TRUE|BOOLEAN|0x60000013
-
-  ## Indicates the CPU synchronization method used when processing an SMI.
-  #   0x00  - Traditional CPU synchronization method.<BR>
-  #   0x01  - Relaxed CPU synchronization method.<BR>
-  # @Prompt SMM CPU Synchronization Method.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00|UINT8|0x60000014
 
   ## Specifies the number of variable MTRRs reserved for OS use. The default number of
   #  MTRRs reserved for OS use is 2.
@@ -213,6 +203,16 @@
   #   FALSE - SMM uses static page table for below 4G memory and use on-demand paging for above 4G memory.<BR>
   # @Prompt Use static page table for all memory in SMM.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStaticPageTable|TRUE|BOOLEAN|0x3213210D
+
+  ## Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM.
+  # @Prompt AP synchronization timeout value in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000|UINT64|0x32132104
+
+  ## Indicates the CPU synchronization method used when processing an SMI.
+  #   0x00  - Traditional CPU synchronization method.<BR>
+  #   0x01  - Relaxed CPU synchronization method.<BR>
+  # @Prompt SMM CPU Synchronization Method.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00|UINT8|0x60000014
 
 [PcdsDynamic, PcdsDynamicEx]
   ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.

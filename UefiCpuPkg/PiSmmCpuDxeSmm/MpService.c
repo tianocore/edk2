@@ -24,6 +24,7 @@ UINTN                                       mSmmMpSyncDataSize;
 SMM_CPU_SEMAPHORES                          mSmmCpuSemaphores;
 UINTN                                       mSemaphoreSize;
 SPIN_LOCK                                   *mPFLock = NULL;
+SMM_CPU_SYNC_MODE                           mCpuSmmSyncMode;
 
 /**
   Performs an atomic compare exchange operation to get semaphore.
@@ -1338,7 +1339,7 @@ InitializeMpSyncData (
       //
       mSmmMpSyncData->BspIndex = (UINT32)-1;
     }
-    mSmmMpSyncData->EffectiveSyncMode = (SMM_CPU_SYNC_MODE) PcdGet8 (PcdCpuSmmSyncMode);
+    mSmmMpSyncData->EffectiveSyncMode = mCpuSmmSyncMode;
 
     mSmmMpSyncData->Counter       = mSmmCpuSemaphores.SemaphoreGlobal.Counter;
     mSmmMpSyncData->InsideSmm     = mSmmCpuSemaphores.SemaphoreGlobal.InsideSmm;
@@ -1392,6 +1393,7 @@ InitializeMpServiceData (
                        (sizeof (SMM_CPU_DATA_BLOCK) + sizeof (BOOLEAN)) * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
   mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA*) AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
   ASSERT (mSmmMpSyncData != NULL);
+  mCpuSmmSyncMode = (SMM_CPU_SYNC_MODE)PcdGet8 (PcdCpuSmmSyncMode);
   InitializeMpSyncData ();
 
   //
