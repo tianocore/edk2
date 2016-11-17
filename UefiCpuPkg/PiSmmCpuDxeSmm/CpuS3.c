@@ -55,7 +55,7 @@ AsmGetAddressMap (
 #define LEGACY_REGION_BASE    (0xA0000 - LEGACY_REGION_SIZE)
 
 ACPI_CPU_DATA                mAcpiCpuData;
-UINT32                       mNumberToFinish;
+volatile UINT32              mNumberToFinish;
 MP_CPU_EXCHANGE_INFO         *mExchangeInfo;
 BOOLEAN                      mRestoreSmmConfigurationInS3 = FALSE;
 VOID                         *mGdtForAp = NULL;
