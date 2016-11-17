@@ -1747,8 +1747,7 @@ BcdToDecimal8 (
 //
 
 /**
-  Removes the last directory or file entry in a path by changing the last
-  L'\' to a CHAR_NULL.
+  Removes the last directory or file entry in a path.
 
   @param[in, out] Path    The pointer to the path to modify.
 
