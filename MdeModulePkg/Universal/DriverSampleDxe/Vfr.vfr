@@ -458,26 +458,6 @@ formset
       help     = STRING_TOKEN(STR_MANUFACTURE_DEFAULT_HELP),
     endresetbutton;
 
-    string    varid    = MyIfrNVData.PasswordClearText,
-              prompt   = STRING_TOKEN(STR_MY_STRING_PROMPT),
-              help     = STRING_TOKEN(STR_MY_STRING_HELP),
-              minsize  = 6,
-              maxsize  = 0x14,
-              default  = STRING_TOKEN(STR_MY_STRING_DEFAULT),
-    endstring;
-
-    //
-    // Interactive password, validate via ConfigAccess.Callback()
-    //
-    password  varid    = MyIfrNVData.WhatIsThePassword2,
-              prompt   = STRING_TOKEN(STR_PASSWORD_CALLBACK_PROMPT),
-              help     = STRING_TOKEN(STR_PASSWORD_HELP),
-              flags    = INTERACTIVE,
-              key      = 0x2000,
-              minsize  = 6,
-              maxsize  = 20,
-    endpassword;
-
     //
     // Sample use case for IFR Security op-code
     //

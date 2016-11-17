@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -84,7 +84,6 @@ typedef struct {
   EFI_HII_HANDLE                   HiiHandle[2];
   DRIVER_SAMPLE_CONFIGURATION      Configuration;
   MY_EFI_VARSTORE_DATA             VarStoreConfig;
-  UINT8                            PasswordState;
 
   //
   // Name/Value storage Name list
