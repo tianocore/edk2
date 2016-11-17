@@ -61,6 +61,11 @@
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 
+# Force PE/COFF sections to be aligned at 4KB boundaries to support page level
+# protection of DXE_SMM_DRIVER/SMM_CORE modules
+[BuildOptions.common.EDKII.DXE_SMM_DRIVER, BuildOptions.common.EDKII.SMM_CORE]
+  GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+
 ################################################################################
 #
 # SKU Identification section - list of all SKU IDs supported by this Platform.
