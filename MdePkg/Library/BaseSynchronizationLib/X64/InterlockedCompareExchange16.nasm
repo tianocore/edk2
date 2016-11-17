@@ -28,7 +28,7 @@
 ;------------------------------------------------------------------------------
 ; UINT16
 ; EFIAPI
-; InterlockedCompareExchange16 (
+; InternalSyncCompareExchange16 (
 ;   IN      volatile UINT16           *Value,
 ;   IN      UINT16                    CompareValue,
 ;   IN      UINT16                    ExchangeValue

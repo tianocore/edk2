@@ -26,7 +26,7 @@
 ;------------------------------------------------------------------------------
 ; UINT64
 ; EFIAPI
-; InterlockedCompareExchange64 (
+; InternalSyncCompareExchange64 (
 ;   IN      volatile UINT64           *Value,
 ;   IN      UINT64                    CompareValue,
 ;   IN      UINT64                    ExchangeValue
