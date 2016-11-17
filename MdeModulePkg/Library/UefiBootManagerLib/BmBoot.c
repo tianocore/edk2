@@ -1,7 +1,7 @@
 /** @file
   Library functions which relates with booting.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -2152,7 +2152,7 @@ EfiBootManagerRefreshAllBootOption (
       // Only check those added by BDS
       // so that the boot options added by end-user or OS installer won't be deleted
       //
-      if (EfiBootManagerFindLoadOption (&NvBootOptions[Index], BootOptions, BootOptionCount) == (UINTN) -1) {
+      if (EfiBootManagerFindLoadOption (&NvBootOptions[Index], BootOptions, BootOptionCount) == -1) {
         Status = EfiBootManagerDeleteLoadOptionVariable (NvBootOptions[Index].OptionNumber, LoadOptionTypeBoot);
         //
         // Deleting variable with current variable implementation shouldn't fail.
@@ -2166,7 +2166,7 @@ EfiBootManagerRefreshAllBootOption (
   // Add new EFI boot options to NV
   //
   for (Index = 0; Index < BootOptionCount; Index++) {
-    if (EfiBootManagerFindLoadOption (&BootOptions[Index], NvBootOptions, NvBootOptionCount) == (UINTN) -1) {
+    if (EfiBootManagerFindLoadOption (&BootOptions[Index], NvBootOptions, NvBootOptionCount) == -1) {
       EfiBootManagerAddLoadOptionVariable (&BootOptions[Index], (UINTN) -1);
       //
       // Try best to add the boot options so continue upon failure.
