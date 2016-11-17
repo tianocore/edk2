@@ -26,7 +26,7 @@
 [Guids]
   ## GUID for Package token space
   # {A9F8D54E-1107-4F0A-ADD0-4587E7A4A735}
-  gIntelSiliconPkgTokenSpaceGuid  = { 0xa9f8d54e, 0x1107, 0x4f0a, { 0xad, 0xd0, 0x45, 0x87, 0xe7, 0xa4, 0xa7, 0x35 } };
+  gIntelSiliconPkgTokenSpaceGuid  = { 0xa9f8d54e, 0x1107, 0x4f0a, { 0xad, 0xd0, 0x45, 0x87, 0xe7, 0xa4, 0xa7, 0x35 } }
 
   ## HOB GUID to publish SMBIOS data records from PEI phase
   # HOB data format is same as SMBIOS records defined in SMBIOS spec or OEM defined types
