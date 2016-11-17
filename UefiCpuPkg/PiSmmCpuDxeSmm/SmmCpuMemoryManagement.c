@@ -209,10 +209,12 @@ ConvertPageEntryAttribute (
     }
   }
   if ((Attributes & EFI_MEMORY_XP) != 0) {
-    if (IsSet) {
-      NewPageEntry |= IA32_PG_NX;
-    } else {
-      NewPageEntry &= ~IA32_PG_NX;
+    if (mXdSupported) {
+      if (IsSet) {
+        NewPageEntry |= IA32_PG_NX;
+      } else {
+        NewPageEntry &= ~IA32_PG_NX;
+      }
     }
   }
   *PageEntry = NewPageEntry;
