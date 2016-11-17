@@ -169,6 +169,11 @@ CbMemInfoCallback (
              EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
              EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
 
+  if ((Base  < 0x100000) && ((Base + Size) > 0x100000)) {
+         Size -= (0x100000 - Base);
+         Base  = 0x100000;
+  }
+
   MemInfo = (CB_MEM_INFO *)Param;
   if (Base >= 0x100000) {
     if (Type == CB_MEM_RAM) {
