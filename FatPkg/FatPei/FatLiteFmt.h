@@ -1,7 +1,7 @@
 /** @file
   FAT format data structures
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FAT_ATTR_ARCHIVE                  0x20
 #define FAT_ATTR_LFN                      (FAT_ATTR_READ_ONLY | FAT_ATTR_HIDDEN | FAT_ATTR_SYSTEM | FAT_ATTR_VOLUME_ID)
 
-#define FAT_CLUSTER_SPECIAL               ((-1 &~0xF) | 0x7)
+#define FAT_CLUSTER_SPECIAL               ((MAX_UINT32 &~0xF) | 0x7)
 #define FAT_CLUSTER_FREE                  0
 #define FAT_CLUSTER_RESERVED              (FAT_CLUSTER_SPECIAL)
 #define FAT_CLUSTER_BAD                   (FAT_CLUSTER_SPECIAL)
