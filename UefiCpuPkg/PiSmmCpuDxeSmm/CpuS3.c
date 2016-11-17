@@ -385,7 +385,7 @@ MPRendezvousProcedure (
   CPU_REGISTER_TABLE         *RegisterTableList;
   UINT32                     InitApicId;
   UINTN                      Index;
-  UINT32                     TopOfStack;
+  UINTN                      TopOfStack;
   UINT8                      Stack[128];
 
   ProgramVirtualWireMode ();
@@ -403,10 +403,10 @@ MPRendezvousProcedure (
   //
   // Place AP into the safe code, count down the number with lock mechanism in the safe code.
   //
-  TopOfStack  = (UINT32) (UINTN) Stack + sizeof (Stack);
-  TopOfStack &= ~(UINT32) (CPU_STACK_ALIGNMENT - 1);
+  TopOfStack  = (UINTN) Stack + sizeof (Stack);
+  TopOfStack &= ~(UINTN) (CPU_STACK_ALIGNMENT - 1);
   CopyMem ((VOID *) (UINTN) mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
-  TransferApToSafeState ((UINT32) (UINTN) mApHltLoopCode, TopOfStack, &mNumberToFinish);
+  TransferApToSafeState ((UINTN)mApHltLoopCode, TopOfStack, (UINTN)&mNumberToFinish);
 }
 
 /**

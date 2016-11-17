@@ -129,23 +129,23 @@ InitGdt (
 /**
   Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
 
-  @param[in] ApHltLoopCode    The 32-bit address of the safe hlt-loop function.
-  @param[in] TopOfStack       A pointer to the new stack to use for the ApHltLoopCode.
-  @param[in] NumberToFinish   Semaphore of APs finish count.
+  @param[in] ApHltLoopCode          The address of the safe hlt-loop function.
+  @param[in] TopOfStack             A pointer to the new stack to use for the ApHltLoopCode.
+  @param[in] NumberToFinishAddress  Address of Semaphore of APs finish count.
 
 **/
 VOID
 TransferApToSafeState (
-  IN UINT32             ApHltLoopCode,
-  IN UINT32             TopOfStack,
-  IN UINT32             *NumberToFinish
+  IN UINTN  ApHltLoopCode,
+  IN UINTN  TopOfStack,
+  IN UINTN  NumberToFinishAddress
   )
 {
   SwitchStack (
-    (SWITCH_STACK_ENTRY_POINT) (UINTN) ApHltLoopCode,
-    NumberToFinish,
+    (SWITCH_STACK_ENTRY_POINT)ApHltLoopCode,
+    (VOID *)NumberToFinishAddress,
     NULL,
-    (VOID *) (UINTN) TopOfStack
+    (VOID *)TopOfStack
     );
   //
   // It should never reach here

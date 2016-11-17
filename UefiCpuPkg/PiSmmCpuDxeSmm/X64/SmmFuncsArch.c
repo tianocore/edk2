@@ -129,24 +129,24 @@ GetProtectedModeCS (
 /**
   Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
 
-  @param[in] ApHltLoopCode    The 32-bit address of the safe hlt-loop function.
-  @param[in] TopOfStack       A pointer to the new stack to use for the ApHltLoopCode.
-  @param[in] NumberToFinish   Semaphore of APs finish count.
+  @param[in] ApHltLoopCode          The address of the safe hlt-loop function.
+  @param[in] TopOfStack             A pointer to the new stack to use for the ApHltLoopCode.
+  @param[in] NumberToFinishAddress  Address of Semaphore of APs finish count.
 
 **/
 VOID
 TransferApToSafeState (
-  IN UINT32             ApHltLoopCode,
-  IN UINT32             TopOfStack,
-  IN UINT32             *NumberToFinish
+  IN UINTN  ApHltLoopCode,
+  IN UINTN  TopOfStack,
+  IN UINTN  NumberToFinishAddress
   )
 {
   AsmDisablePaging64 (
     GetProtectedModeCS (),
-    (UINT32) (UINTN) ApHltLoopCode,
-    (UINT32) (UINTN) NumberToFinish,
+    (UINT32)ApHltLoopCode,
+    (UINT32)NumberToFinishAddress,
     0,
-    TopOfStack
+    (UINT32)TopOfStack
     );
   //
   // It should never reach here
