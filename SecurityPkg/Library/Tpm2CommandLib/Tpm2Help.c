@@ -175,6 +175,7 @@ CopyAuthSessionResponse (
   @retval FALSE Hash algorithm is not supported.
 **/
 BOOLEAN
+EFIAPI
 IsHashAlgSupportedInHashAlgorithmMask(
   IN TPMI_ALG_HASH  HashAlg,
   IN UINT32         HashAlgorithmMask

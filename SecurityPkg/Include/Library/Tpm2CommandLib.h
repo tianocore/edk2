@@ -1007,6 +1007,22 @@ GetHashSizeFromAlgo (
   );
 
 /**
+  Return if hash alg is supported in HashAlgorithmMask.
+
+  @param HashAlg            Hash algorithm to be checked.
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  Hash algorithm is supported.
+  @retval FALSE Hash algorithm is not supported.
+**/
+BOOLEAN
+EFIAPI
+IsHashAlgSupportedInHashAlgorithmMask(
+  IN TPMI_ALG_HASH  HashAlg,
+  IN UINT32         HashAlgorithmMask
+  );
+
+/**
   Copy TPML_DIGEST_VALUES into a buffer
 
   @param[in,out] Buffer             Buffer to hold TPML_DIGEST_VALUES.
