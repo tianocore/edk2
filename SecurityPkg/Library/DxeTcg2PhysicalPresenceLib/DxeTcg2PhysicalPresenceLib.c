@@ -794,6 +794,23 @@ Tcg2PhysicalPresenceLibProcessRequest (
   if (EFI_ERROR (Status)) {
     return ;
   }
+
+  //
+  // This flags variable controls whether physical presence is required for TPM command. 
+  // It should be protected from malicious software. We set it as read-only variable here.
+  //
+  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
+  if (!EFI_ERROR (Status)) {
+    Status = VariableLockProtocol->RequestToLock (
+                                     VariableLockProtocol,
+                                     TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+                                     &gEfiTcg2PhysicalPresenceGuid
+                                     );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "[TPM2] Error when lock variable %s, Status = %r\n", TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
   
   //
   // Check S4 resume
@@ -832,23 +849,6 @@ Tcg2PhysicalPresenceLibProcessRequest (
     }
   }
   DEBUG ((EFI_D_INFO, "[TPM2] PpiFlags = %x\n", PpiFlags.PPFlags));
-
-  //
-  // This flags variable controls whether physical presence is required for TPM command. 
-  // It should be protected from malicious software. We set it as read-only variable here.
-  //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
-  if (!EFI_ERROR (Status)) {
-    Status = VariableLockProtocol->RequestToLock (
-                                     VariableLockProtocol,
-                                     TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
-                                     &gEfiTcg2PhysicalPresenceGuid
-                                     );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM2] Error when lock variable %s, Status = %r\n", TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
-      ASSERT_EFI_ERROR (Status);
-    }
-  }
   
   //
   // Initialize physical presence variable.
