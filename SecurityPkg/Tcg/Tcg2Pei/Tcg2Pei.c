@@ -317,6 +317,10 @@ LogHashEvent (
         }
         break;
       case EFI_TCG2_EVENT_LOG_FORMAT_TCG_2:
+        //
+        // Use GetDigestListSize (DigestList) in the GUID HOB DataLength calculation
+        // to reserve enough buffer to hold TPML_DIGEST_VALUES compact binary.
+        //
         HobData = BuildGuidHob (
                    &gTcgEvent2EntryHobGuid,
                    sizeof(TcgPcrEvent2->PCRIndex) + sizeof(TcgPcrEvent2->EventType) + GetDigestListSize (DigestList) + sizeof(TcgPcrEvent2->EventSize) + NewEventHdr->EventSize
