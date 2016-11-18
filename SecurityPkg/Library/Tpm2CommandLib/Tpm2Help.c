@@ -22,14 +22,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct {
   TPMI_ALG_HASH              HashAlgo;
   UINT16                     HashSize;
+  UINT32                     HashMask;
 } INTERNAL_HASH_INFO;
 
 STATIC INTERNAL_HASH_INFO mHashInfo[] = {
-  {TPM_ALG_SHA1,          SHA1_DIGEST_SIZE},
-  {TPM_ALG_SHA256,        SHA256_DIGEST_SIZE},
-  {TPM_ALG_SM3_256,       SM3_256_DIGEST_SIZE},
-  {TPM_ALG_SHA384,        SHA384_DIGEST_SIZE},
-  {TPM_ALG_SHA512,        SHA512_DIGEST_SIZE},
+  {TPM_ALG_SHA1,          SHA1_DIGEST_SIZE,     HASH_ALG_SHA1},
+  {TPM_ALG_SHA256,        SHA256_DIGEST_SIZE,   HASH_ALG_SHA256},
+  {TPM_ALG_SM3_256,       SM3_256_DIGEST_SIZE,  HASH_ALG_SM3_256},
+  {TPM_ALG_SHA384,        SHA384_DIGEST_SIZE,   HASH_ALG_SHA384},
+  {TPM_ALG_SHA512,        SHA512_DIGEST_SIZE,   HASH_ALG_SHA512},
 };
 
 /**
@@ -50,6 +51,29 @@ GetHashSizeFromAlgo (
   for (Index = 0; Index < sizeof(mHashInfo)/sizeof(mHashInfo[0]); Index++) {
     if (mHashInfo[Index].HashAlgo == HashAlgo) {
       return mHashInfo[Index].HashSize;
+    }
+  }
+  return 0;
+}
+
+/**
+  Get hash mask from algorithm.
+
+  @param[in] HashAlgo   Hash algorithm
+
+  @return Hash mask
+**/
+UINT32
+EFIAPI
+GetHashMaskFromAlgo (
+  IN TPMI_ALG_HASH     HashAlgo
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < sizeof(mHashInfo)/sizeof(mHashInfo[0]); Index++) {
+    if (mHashInfo[Index].HashAlgo == HashAlgo) {
+      return mHashInfo[Index].HashMask;
     }
   }
   return 0;

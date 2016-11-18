@@ -1007,6 +1007,19 @@ GetHashSizeFromAlgo (
   );
 
 /**
+  Get hash mask from algorithm.
+
+  @param[in] HashAlgo   Hash algorithm
+
+  @return Hash mask
+**/
+UINT32
+EFIAPI
+GetHashMaskFromAlgo (
+  IN TPMI_ALG_HASH     HashAlgo
+  );
+
+/**
   Return if hash alg is supported in HashAlgorithmMask.
 
   @param HashAlg            Hash algorithm to be checked.
