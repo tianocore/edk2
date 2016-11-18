@@ -2724,9 +2724,17 @@ NetLibAsciiStrToIp4 (
     TempStr = Ip4Str;
 
     while ((*Ip4Str != '\0') && (*Ip4Str != '.')) {
-      if (!NET_IS_DIGIT (*Ip4Str)) {
+      if (Index != 3 && !NET_IS_DIGIT (*Ip4Str)) {
         return EFI_INVALID_PARAMETER;
       }
+      
+      //
+      // Allow the IPv4 with prefix case, e.g. 192.168.10.10/24 
+      //
+      if (Index == 3 && !NET_IS_DIGIT (*Ip4Str) && *Ip4Str != '/') {
+        return EFI_INVALID_PARAMETER;
+      }
+      
       Ip4Str++;
     }
 
