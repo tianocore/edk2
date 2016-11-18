@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Slots for all MTRR( FIXED MTRR + VARIABLE MTRR + MTRR_LIB_IA32_MTRR_DEF_TYPE)
 //
-UINT64                                      gSmiMtrrs[MTRR_NUMBER_OF_FIXED_MTRR + 2 * MTRR_NUMBER_OF_VARIABLE_MTRR + 1];
+MTRR_SETTINGS                               gSmiMtrrs;
 UINT64                                      gPhyMask;
 SMM_DISPATCHER_MP_SYNC_DATA                 *mSmmMpSyncData = NULL;
 UINTN                                       mSmmMpSyncDataSize;
@@ -283,20 +283,12 @@ ReplaceOSMtrrs (
   IN      UINTN                     CpuIndex
   )
 {
-  PROCESSOR_SMM_DESCRIPTOR       *Psd;
-  UINT64                         *SmiMtrrs;
-  MTRR_SETTINGS                  *BiosMtrr;
-
-  Psd = (PROCESSOR_SMM_DESCRIPTOR*)(mCpuHotPlugData.SmBase[CpuIndex] + SMM_PSD_OFFSET);
-  SmiMtrrs = (UINT64*)(UINTN)Psd->MtrrBaseMaskPtr;
-
   SmmCpuFeaturesDisableSmrr ();
 
   //
   // Replace all MTRRs registers
   //
-  BiosMtrr  = (MTRR_SETTINGS*)SmiMtrrs;
-  MtrrSetAllMtrrs(BiosMtrr);
+  MtrrSetAllMtrrs (&gSmiMtrrs);
 }
 
 /**
@@ -1379,7 +1371,6 @@ InitializeMpServiceData (
 {
   UINT32                    Cr3;
   UINTN                     Index;
-  MTRR_SETTINGS             *Mtrr;
   PROCESSOR_SMM_DESCRIPTOR  *Psd;
   UINT8                     *GdtTssTables;
   UINTN                     GdtTableStepSize;
@@ -1442,9 +1433,8 @@ InitializeMpServiceData (
   //
   // Record current MTRR settings
   //
-  ZeroMem(gSmiMtrrs, sizeof (gSmiMtrrs));
-  Mtrr =  (MTRR_SETTINGS*)gSmiMtrrs;
-  MtrrGetAllMtrrs (Mtrr);
+  ZeroMem (&gSmiMtrrs, sizeof (gSmiMtrrs));
+  MtrrGetAllMtrrs (&gSmiMtrrs);
 
   return Cr3;
 }

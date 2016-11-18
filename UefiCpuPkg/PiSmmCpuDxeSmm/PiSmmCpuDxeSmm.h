@@ -380,7 +380,7 @@ typedef struct {
   UINT16                            Reserved11;             // Offset 0x50
   UINT16                            Reserved12;             // Offset 0x52
   UINT32                            Reserved13;             // Offset 0x54
-  UINT64                            MtrrBaseMaskPtr;        // Offset 0x58
+  UINT64                            Reserved14;             // Offset 0x58
 } PROCESSOR_SMM_DESCRIPTOR;
 
 
