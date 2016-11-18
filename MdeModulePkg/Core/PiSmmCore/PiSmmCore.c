@@ -292,6 +292,8 @@ SmmEntryPoint (
   EFI_STATUS                  Status;
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
   BOOLEAN                     InLegacyBoot;
+  VOID                        *CommunicationBuffer;
+  UINTN                       BufferSize;
 
   PERF_START (NULL, "SMM", NULL, 0) ;
 
@@ -319,30 +321,32 @@ SmmEntryPoint (
     // Check to see if this is a Synchronous SMI sent through the SMM Communication 
     // Protocol or an Asynchronous SMI
     //
-    if (gSmmCorePrivate->CommunicationBuffer != NULL) {
+    CommunicationBuffer = gSmmCorePrivate->CommunicationBuffer;
+    BufferSize          = gSmmCorePrivate->BufferSize;
+    if (CommunicationBuffer != NULL) {
       //
       // Synchronous SMI for SMM Core or request from Communicate protocol
       //
-      if (!SmmIsBufferOutsideSmmValid ((UINTN)gSmmCorePrivate->CommunicationBuffer, gSmmCorePrivate->BufferSize)) {
+      if (!SmmIsBufferOutsideSmmValid ((UINTN)CommunicationBuffer, BufferSize)) {
         //
         // If CommunicationBuffer is not in valid address scope, return EFI_INVALID_PARAMETER
         //
         gSmmCorePrivate->CommunicationBuffer = NULL;
         gSmmCorePrivate->ReturnStatus = EFI_INVALID_PARAMETER;
       } else {
-        CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)gSmmCorePrivate->CommunicationBuffer;
-        gSmmCorePrivate->BufferSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+        CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;
+        BufferSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
         Status = SmiManage (
                    &CommunicateHeader->HeaderGuid, 
                    NULL, 
                    CommunicateHeader->Data, 
-                   &gSmmCorePrivate->BufferSize
+                   &BufferSize
                    );
         //
         // Update CommunicationBuffer, BufferSize and ReturnStatus
         // Communicate service finished, reset the pointer to CommBuffer to NULL
         //
-        gSmmCorePrivate->BufferSize += OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+        gSmmCorePrivate->BufferSize = BufferSize + OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
         gSmmCorePrivate->CommunicationBuffer = NULL;
         gSmmCorePrivate->ReturnStatus = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
       }
