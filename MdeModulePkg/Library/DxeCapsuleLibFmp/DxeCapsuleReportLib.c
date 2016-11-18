@@ -291,19 +291,26 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
   )
 {
-  UINT8                               CapsuleResultVariable[sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP)];
   EFI_CAPSULE_RESULT_VARIABLE_HEADER  *CapsuleResultVariableHeader;
   EFI_CAPSULE_RESULT_VARIABLE_FMP     *CapsuleResultVariableFmp;
   EFI_STATUS                          Status;
+  UINT8                               *CapsuleResultVariable;
+  UINT32                              CapsuleResultVariableSize;
 
-  CapsuleResultVariableHeader = (VOID *)&CapsuleResultVariable[0];
-  CapsuleResultVariableHeader->VariableTotalSize = sizeof(CapsuleResultVariable);
+  CapsuleResultVariable     = NULL;
+  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP);
+  CapsuleResultVariable     = AllocatePool (CapsuleResultVariableSize);
+  if (CapsuleResultVariable == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  CapsuleResultVariableHeader = (VOID *)CapsuleResultVariable;
+  CapsuleResultVariableHeader->VariableTotalSize = CapsuleResultVariableSize;
   CopyGuid(&CapsuleResultVariableHeader->CapsuleGuid, &CapsuleHeader->CapsuleGuid);
   ZeroMem(&CapsuleResultVariableHeader->CapsuleProcessed, sizeof(CapsuleResultVariableHeader->CapsuleProcessed));
   gRT->GetTime(&CapsuleResultVariableHeader->CapsuleProcessed, NULL);
   CapsuleResultVariableHeader->CapsuleStatus = CapsuleStatus;
 
-  CapsuleResultVariableFmp = (VOID *)&CapsuleResultVariable[sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER)];
+  CapsuleResultVariableFmp = (VOID *)(CapsuleResultVariable + sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER));
   CapsuleResultVariableFmp->Version = 0x1;
   CapsuleResultVariableFmp->PayloadIndex = (UINT8)PayloadIndex;
   CapsuleResultVariableFmp->UpdateImageIndex = ImageHeader->UpdateImageIndex;
@@ -312,11 +319,12 @@ RecordFmpCapsuleStatusVariable (
   //
   // Save Local Cache
   //
-  Status = WriteNewCapsuleResultVariableCache(&CapsuleResultVariable, sizeof(CapsuleResultVariable));
+  Status = WriteNewCapsuleResultVariableCache(CapsuleResultVariable, CapsuleResultVariableSize);
 
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
-    Status = WriteNewCapsuleResultVariable(&CapsuleResultVariable, sizeof(CapsuleResultVariable));
+    Status = WriteNewCapsuleResultVariable(CapsuleResultVariable, CapsuleResultVariableSize);
   }
+  FreePool (CapsuleResultVariable);
   return Status;
 }
 
