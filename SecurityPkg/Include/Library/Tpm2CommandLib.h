@@ -1038,7 +1038,7 @@ IsHashAlgSupportedInHashAlgorithmMask(
 /**
   Copy TPML_DIGEST_VALUES into a buffer
 
-  @param[in,out] Buffer             Buffer to hold TPML_DIGEST_VALUES.
+  @param[in,out] Buffer             Buffer to hold copied TPML_DIGEST_VALUES compact binary.
   @param[in]     DigestList         TPML_DIGEST_VALUES to be copied.
   @param[in]     HashAlgorithmMask  HASH bits corresponding to the desired digests to copy.
 
