@@ -1410,6 +1410,7 @@ class DecBuildData(PackageBuildClassObject):
             PrivateProtocolDict = tdict(True)
             NameList = []
             PrivateNameList = []
+            PublicNameList = []
             # find out all protocol definitions for specific and 'common' arch
             RecordList = self._RawData[MODEL_EFI_PROTOCOL, self._Arch]
             for Name, Guid, Dummy, Arch, PrivateFlag, ID, LineNo in RecordList:
@@ -1417,6 +1418,13 @@ class DecBuildData(PackageBuildClassObject):
                     if Name not in PrivateNameList:
                         PrivateNameList.append(Name)
                         PrivateProtocolDict[Arch, Name] = Guid
+                    if Name in PublicNameList:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % Name, File=self.MetaFile, Line=LineNo)
+                else:
+                    if Name not in PublicNameList:
+                        PublicNameList.append(Name)
+                    if Name in PrivateNameList:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % Name, File=self.MetaFile, Line=LineNo)
                 if Name not in NameList:
                     NameList.append(Name)
                 ProtocolDict[Arch, Name] = Guid
@@ -1444,6 +1452,7 @@ class DecBuildData(PackageBuildClassObject):
             PrivatePpiDict = tdict(True)
             NameList = []
             PrivateNameList = []
+            PublicNameList = []
             # find out all PPI definitions for specific arch and 'common' arch
             RecordList = self._RawData[MODEL_EFI_PPI, self._Arch]
             for Name, Guid, Dummy, Arch, PrivateFlag, ID, LineNo in RecordList:
@@ -1451,6 +1460,13 @@ class DecBuildData(PackageBuildClassObject):
                     if Name not in PrivateNameList:
                         PrivateNameList.append(Name)
                         PrivatePpiDict[Arch, Name] = Guid
+                    if Name in PublicNameList:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % Name, File=self.MetaFile, Line=LineNo)
+                else:
+                    if Name not in PublicNameList:
+                        PublicNameList.append(Name)
+                    if Name in PrivateNameList:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % Name, File=self.MetaFile, Line=LineNo)
                 if Name not in NameList:
                     NameList.append(Name)
                 PpiDict[Arch, Name] = Guid
@@ -1478,6 +1494,7 @@ class DecBuildData(PackageBuildClassObject):
             PrivateGuidDict = tdict(True)
             NameList = []
             PrivateNameList = []
+            PublicNameList = []
             # find out all protocol definitions for specific and 'common' arch
             RecordList = self._RawData[MODEL_EFI_GUID, self._Arch]
             for Name, Guid, Dummy, Arch, PrivateFlag, ID, LineNo in RecordList:
@@ -1485,6 +1502,13 @@ class DecBuildData(PackageBuildClassObject):
                     if Name not in PrivateNameList:
                         PrivateNameList.append(Name)
                         PrivateGuidDict[Arch, Name] = Guid
+                    if Name in PublicNameList:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % Name, File=self.MetaFile, Line=LineNo)
+                else:
+                    if Name not in PublicNameList:
+                        PublicNameList.append(Name)
+                    if Name in PrivateNameList:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % Name, File=self.MetaFile, Line=LineNo)
                 if Name not in NameList:
                     NameList.append(Name)
                 GuidDict[Arch, Name] = Guid
@@ -1506,6 +1530,7 @@ class DecBuildData(PackageBuildClassObject):
         if self._Includes == None:
             self._Includes = []
             self._PrivateIncludes = []
+            PublicInclues = []
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch]
             Macros = self._Macros
             Macros["EDK_SOURCE"] = GlobalData.gEcpSource
@@ -1523,6 +1548,14 @@ class DecBuildData(PackageBuildClassObject):
                 if Record[4] == 'PRIVATE':
                     if File not in self._PrivateIncludes:
                         self._PrivateIncludes.append(File)
+                    if File in PublicInclues:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % File, File=self.MetaFile, Line=LineNo)
+                else:
+                    if File not in PublicInclues:
+                        PublicInclues.append(File)
+                    if File in self._PrivateIncludes:
+                        EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % File, File=self.MetaFile, Line=LineNo)
+
         return self._Includes
 
     ## Retrieve library class declarations (not used in build at present)
