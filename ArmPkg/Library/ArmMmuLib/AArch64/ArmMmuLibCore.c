@@ -627,6 +627,19 @@ ArmConfigureMmu (
     return RETURN_UNSUPPORTED;
   }
 
+  //
+  // Translation table walks are always cache coherent on ARMv8-A, so cache
+  // maintenance on page tables is never needed. Since there is a risk of
+  // loss of coherency when using mismatched attributes, and given that memory
+  // is mapped cacheable except for extraordinary cases (such as non-coherent
+  // DMA), have the page table walker perform cached accesses as well, and
+  // assert below that that matches the attributes we use for CPU accesses to
+  // the region.
+  //
+  TCR |= TCR_SH_INNER_SHAREABLE |
+         TCR_RGN_OUTER_WRITE_BACK_ALLOC |
+         TCR_RGN_INNER_WRITE_BACK_ALLOC;
+
   // Set TCR
   ArmSetTCR (TCR);
 
@@ -672,11 +685,15 @@ ArmConfigureMmu (
 
   TranslationTableAttribute = TT_ATTR_INDX_INVALID;
   while (MemoryTable->Length != 0) {
-    // Find the memory attribute for the Translation Table
-    if (((UINTN)TranslationTable >= MemoryTable->PhysicalBase) &&
-        ((UINTN)TranslationTable <= MemoryTable->PhysicalBase - 1 + MemoryTable->Length)) {
-      TranslationTableAttribute = MemoryTable->Attributes;
-    }
+
+    DEBUG_CODE_BEGIN ();
+      // Find the memory attribute for the Translation Table
+      if ((UINTN)TranslationTable >= MemoryTable->PhysicalBase &&
+          (UINTN)TranslationTable + RootTableEntrySize <= MemoryTable->PhysicalBase +
+                                                          MemoryTable->Length) {
+        TranslationTableAttribute = MemoryTable->Attributes;
+      }
+    DEBUG_CODE_END ();
 
     Status = FillTranslationTable (TranslationTable, MemoryTable);
     if (RETURN_ERROR (Status)) {
@@ -685,26 +702,8 @@ ArmConfigureMmu (
     MemoryTable++;
   }
 
-  // Translate the Memory Attributes into Translation Table Register Attributes
-  if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED) ||
-      (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED)) {
-    TCR |= TCR_SH_NON_SHAREABLE | TCR_RGN_OUTER_NON_CACHEABLE | TCR_RGN_INNER_NON_CACHEABLE;
-  } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK) ||
-      (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK)) {
-    TCR |= TCR_SH_INNER_SHAREABLE | TCR_RGN_OUTER_WRITE_BACK_ALLOC | TCR_RGN_INNER_WRITE_BACK_ALLOC;
-  } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH) ||
-      (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH)) {
-    TCR |= TCR_SH_NON_SHAREABLE | TCR_RGN_OUTER_WRITE_THROUGH | TCR_RGN_INNER_WRITE_THROUGH;
-  } else {
-    // If we failed to find a mapping that contains the root translation table then it probably means the translation table
-    // is not mapped in the given memory map.
-    ASSERT (0);
-    Status = RETURN_UNSUPPORTED;
-    goto FREE_TRANSLATION_TABLE;
-  }
-
-  // Set again TCR after getting the Translation Table attributes
-  ArmSetTCR (TCR);
+  ASSERT (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK ||
+          TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK);
 
   ArmSetMAIR (MAIR_ATTR(TT_ATTR_INDX_DEVICE_MEMORY, MAIR_ATTR_DEVICE_MEMORY) |                      // mapped to EFI_MEMORY_UC
               MAIR_ATTR(TT_ATTR_INDX_MEMORY_NON_CACHEABLE, MAIR_ATTR_NORMAL_MEMORY_NON_CACHEABLE) | // mapped to EFI_MEMORY_WC
