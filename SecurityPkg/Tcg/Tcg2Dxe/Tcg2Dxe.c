@@ -1803,6 +1803,7 @@ MeasureVariable (
                (UINT8*)VarLog
                );
   } else {
+    ASSERT (VarData != NULL);
     Status = TcgDxeHashLogExtendEvent (
                0,
                (UINT8*)VarData,
