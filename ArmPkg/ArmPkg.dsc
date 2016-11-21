@@ -140,8 +140,6 @@
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
-  ArmPkg/Application/LinuxLoader/LinuxLoader.inf
-
   ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
