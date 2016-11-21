@@ -1435,6 +1435,8 @@ TcgGetNextTcgUid(
     return TcgResultFailure;
   }
 
+  ASSERT (ByteSeq != NULL);
+
   CopyMem(Uid, ByteSeq, sizeof(TCG_UID));
 
   return TcgResultSuccess;
