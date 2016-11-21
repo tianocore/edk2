@@ -285,6 +285,7 @@ DmpCapsuleStatusVariable (
              NULL
              );
   if (!EFI_ERROR(Status)) {
+    ASSERT (CapsuleIndex != NULL);
     CopyMem(CapsuleIndexData, CapsuleIndex, 11 * sizeof(CHAR16));
     CapsuleIndexData[11] = 0;
     Print(L"CapsuleMax - %s\n", CapsuleIndexData);
@@ -297,6 +298,7 @@ DmpCapsuleStatusVariable (
              NULL
              );
   if (!EFI_ERROR(Status)) {
+    ASSERT (CapsuleIndex != NULL);
     CopyMem(CapsuleIndexData, CapsuleIndex, 11 * sizeof(CHAR16));
     CapsuleIndexData[11] = 0;
     Print(L"CapsuleLast - %s\n", CapsuleIndexData);
