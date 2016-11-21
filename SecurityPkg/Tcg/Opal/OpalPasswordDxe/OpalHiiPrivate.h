@@ -225,12 +225,14 @@ HiiSetBlockSidAction (
 /**
   Reverts the Opal disk to factory default.
 
+  @param   PsidStringId      The string id for the PSID info.
+
   @retval  EFI_SUCCESS       Do the required action success.
 
 **/
 EFI_STATUS
 HiiPsidRevert(
-  VOID
+  EFI_STRING_ID         PsidStringId
   );
 
 /**
