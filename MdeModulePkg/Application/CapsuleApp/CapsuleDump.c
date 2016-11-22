@@ -31,9 +31,9 @@
 /**
   Read a file.
 
-  @param[in] FileName        The file to be read.
-  @param[in] BufferSize      The file buffer size
-  @param[in] Buffer          The file buffer
+  @param[in]  FileName        The file to be read.
+  @param[out] BufferSize      The file buffer size
+  @param[out] Buffer          The file buffer
 
   @retval EFI_SUCCESS    Read file successfully
   @retval EFI_NOT_FOUND  File not found

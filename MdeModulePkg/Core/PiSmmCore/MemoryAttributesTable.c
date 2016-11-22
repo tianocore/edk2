@@ -146,10 +146,10 @@ SmmMemoryAttributesTableConsistencyCheck (
 /**
   Sort memory map entries based upon PhysicalStart, from low to high.
 
-  @param[in]  MemoryMap              A pointer to the buffer in which firmware places
-                                 the current memory map.
-  @param[in]  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
-  @param[in]  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+  @param[in,out]  MemoryMap         A pointer to the buffer in which firmware places
+                                    the current memory map.
+  @param[in]      MemoryMapSize     Size, in bytes, of the MemoryMap buffer.
+  @param[in]      DescriptorSize    Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
 STATIC
 VOID

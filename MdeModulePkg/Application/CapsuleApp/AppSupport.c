@@ -350,11 +350,11 @@ ReadFileFromVol (
     If there is only one file match the name, it will be read.
     If there is more than one file match the name, it will return Error.
 
-  @param[in]  ThisVol         File System Volume
-  @param[in]  FileName        The file to be read.
-  @param[out] BufferSize      The file buffer size
-  @param[out] Buffer          The file buffer
-  @param[in]  ScanFs          Need Scan all FS
+  @param[in,out]  ThisVol         File System Volume
+  @param[in]      FileName        The file to be read.
+  @param[out]     BufferSize      The file buffer size
+  @param[out]     Buffer          The file buffer
+  @param[in]      ScanFs          Need Scan all FS
 
   @retval EFI_SUCCESS    Read file successfully
   @retval EFI_NOT_FOUND  File not found

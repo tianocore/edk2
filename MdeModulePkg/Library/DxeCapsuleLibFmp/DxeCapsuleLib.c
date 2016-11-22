@@ -776,8 +776,8 @@ DumpFmpCapsule (
 
   This function need support nested FMP capsule.
 
-  @param[in]  CapsuleHeader         Points to a capsule header.
-  @param[in]  AreAllImagesProcessed If all the FMP images in the capsule are processed.
+  @param[in]   CapsuleHeader         Points to a capsule header.
+  @param[out]  AreAllImagesProcessed If all the FMP images in the capsule are processed.
 
   @retval EFI_SUCESS            Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
