@@ -105,6 +105,15 @@ InitPaging (
   VOID
   );
 
+/**
+  Get CPU Index from APIC ID.
+
+**/
+UINTN
+GetCpuIndex (
+  VOID
+  );
+
 //
 // The flag indicates if execute-disable is supported by processor.
 //

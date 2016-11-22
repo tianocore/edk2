@@ -91,6 +91,8 @@ SmiPFHandler (
   )
 {
   UINTN             PFAddress;
+  UINTN             GuardPageAddress;
+  UINTN             CpuIndex;
 
   ASSERT (InterruptType == EXCEPT_IA32_PAGE_FAULT);
 
@@ -98,10 +100,40 @@ SmiPFHandler (
 
   PFAddress = AsmReadCr2 ();
 
-  if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
-      (PFAddress >= mCpuHotPlugData.SmrrBase) &&
+  //
+  // If a page fault occurs in SMRAM range, it might be in a SMM stack guard page,
+  // or SMM page protection violation.
+  //
+  if ((PFAddress >= mCpuHotPlugData.SmrrBase) &&
       (PFAddress < (mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize))) {
-    DEBUG ((DEBUG_ERROR, "SMM stack overflow!\n"));
+    CpuIndex = GetCpuIndex ();
+    GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * mSmmStackSize);
+    if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
+        (PFAddress >= GuardPageAddress) &&
+        (PFAddress < (GuardPageAddress + EFI_PAGE_SIZE))) {
+      DEBUG ((DEBUG_ERROR, "SMM stack overflow!\n"));
+    } else {
+      DEBUG ((DEBUG_ERROR, "SMM exception data - 0x%x(", SystemContext.SystemContextIa32->ExceptionData));
+      DEBUG ((DEBUG_ERROR, "I:%x, R:%x, U:%x, W:%x, P:%x",
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID) != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_RSVD) != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_US) != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_WR) != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_P) != 0
+        ));
+      DEBUG ((DEBUG_ERROR, ")\n"));
+      if ((SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID) != 0) {
+        DEBUG ((DEBUG_ERROR, "SMM exception at execution (0x%x)\n", PFAddress));
+        DEBUG_CODE (
+          DumpModuleInfoByIp (*(UINTN *)(UINTN)SystemContext.SystemContextIa32->Esp);
+        );
+      } else {
+        DEBUG ((DEBUG_ERROR, "SMM exception at access (0x%x)\n", PFAddress));
+        DEBUG_CODE (
+          DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
+        );
+      }
+    }
     CpuDeadLoop ();
   }
 
