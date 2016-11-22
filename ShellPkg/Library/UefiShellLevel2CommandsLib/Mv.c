@@ -58,6 +58,73 @@ IsBetweenFileSystem(
 }
 
 /**
+  function to determine if SrcPath is valid to mv.
+
+  if SrcPath equal CWD then it's invalid.
+  if SrcPath is the parent path of CWD then it's invalid.
+  is SrcPath is NULL return FALSE.
+
+  if CwdPath is NULL then ASSERT()
+
+  @param SrcPath  [in]    The source path.
+  @param CwdPath  [in]    The current working directory.
+
+  @retval TRUE            The source path is valid.
+  @retval FALSE           The source path is invalid.
+**/
+BOOLEAN
+IsSoucePathValid(
+  IN CONST CHAR16*  SrcPath,
+  IN CONST CHAR16*  CwdPath
+  )
+{
+  CHAR16* SrcPathBuffer;
+  CHAR16* CwdPathBuffer;
+  BOOLEAN Ret;
+
+  ASSERT (CwdPath != NULL);
+  if (SrcPath == NULL) {
+    return FALSE;
+  }
+
+  Ret = TRUE;
+
+  SrcPathBuffer = AllocateCopyPool (StrSize (SrcPath), SrcPath);
+  if (SrcPathBuffer == NULL) {
+    return FALSE;
+  }
+
+  CwdPathBuffer = AllocateCopyPool (StrSize (CwdPath), CwdPath);
+  if (CwdPathBuffer == NULL) {
+    FreePool(SrcPathBuffer);
+    return FALSE;
+  }
+
+  gUnicodeCollation->StrUpr (gUnicodeCollation, SrcPathBuffer);
+  gUnicodeCollation->StrUpr (gUnicodeCollation, CwdPathBuffer);
+
+  if (SrcPathBuffer[StrLen (SrcPathBuffer) -1 ] == L'\\') {
+    SrcPathBuffer[StrLen (SrcPathBuffer) - 1] = CHAR_NULL;
+  }
+
+  if (CwdPathBuffer[StrLen (CwdPathBuffer) - 1] == L'\\') {
+    CwdPathBuffer[StrLen (CwdPathBuffer) - 1] = CHAR_NULL;
+  }
+
+  if (StrCmp (CwdPathBuffer, SrcPathBuffer) == 0 ||
+      ((StrStr (CwdPathBuffer, SrcPathBuffer) == CwdPathBuffer) &&
+       (CwdPathBuffer[StrLen (SrcPathBuffer)] == L'\\'))
+     ) {
+    Ret = FALSE;
+  }
+
+  FreePool (SrcPathBuffer);
+  FreePool (CwdPathBuffer);
+
+  return Ret;
+}
+
+/**
   Function to validate that moving a specific file (FileName) to a specific
   location (DestPath) is valid.
 
@@ -90,12 +157,14 @@ IsValidMove(
   CHAR16  *DestPathCopy;
   CHAR16  *DestPathWalker;
 
-  if (Cwd != NULL && StrCmp(SourcePath, Cwd) == 0) {
-    //
-    // Invalid move
-    //
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MV_INV_CWD), gShellLevel2HiiHandle);
-    return (FALSE);
+  if ((Cwd != NULL) && ((Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)) {
+    if (!IsSoucePathValid (SourcePath, Cwd)) {
+      //
+      // Invalid move
+      //
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN(STR_MV_INV_CWD), gShellLevel2HiiHandle);
+      return FALSE;
+    }
   }
 
   //
