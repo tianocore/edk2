@@ -1050,18 +1050,21 @@ MoveToNextStatement (
       UpdateOptionSkipLines (NextMenuOption);
     }
 
-    if (IsSelectable (NextMenuOption)) {
-      break;
-    }
-
     //
-    // In this case, still can't find the selectable menu,
+    // Check whether the menu is beyond current showing form,
     // return the first one beyond the showing form.
     //
     if ((UINTN) Distance + NextMenuOption->Skip > GapToTop) {
       if (FindInForm) {
         NextMenuOption = PreMenuOption;
       }
+      break;
+    }
+
+    //
+    // return the selectable menu in the showing form.
+    //
+    if (IsSelectable (NextMenuOption)) {
       break;
     }
 
