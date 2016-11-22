@@ -314,12 +314,15 @@ GetInitialApicId (
 
   //
   // If CPUID Leaf B is supported, 
+  // And CPUID.0BH:EBX[15:0] reports a non-zero value,
   // Then the initial 32-bit APIC ID = CPUID.0BH:EDX
   // Else the initial 8-bit APIC ID = CPUID.1:EBX[31:24]
   //
   if (MaxCpuIdIndex >= CPUID_EXTENDED_TOPOLOGY) {
-    AsmCpuidEx (CPUID_EXTENDED_TOPOLOGY, 0, NULL, NULL, NULL, &ApicId);
-    return ApicId;
+    AsmCpuidEx (CPUID_EXTENDED_TOPOLOGY, 0, NULL, &RegEbx, NULL, &ApicId);
+    if ((RegEbx & (BIT16 - 1)) != 0) {
+      return ApicId;
+    }
   }
 
   AsmCpuid (CPUID_VERSION_INFO, NULL, &RegEbx, NULL, NULL);
