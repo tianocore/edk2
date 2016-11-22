@@ -154,21 +154,24 @@ GetApicId:
     mov        eax, 0
     cpuid
     cmp        eax, 0bh
-    jnb        X2Apic
+    jb         NoX2Apic             ; CPUID level below CPUID_EXTENDED_TOPOLOGY
+
+    mov        eax, 0bh
+    xor        ecx, ecx
+    cpuid
+    test       ebx, 0ffffh
+    jz         NoX2Apic             ; CPUID.0BH:EBX[15:0] is zero
+
+    ; Processor is x2APIC capable; 32-bit x2APIC ID is already in EDX
+    jmp        GetProcessorNumber
+
+NoX2Apic:
     ; Processor is not x2APIC capable, so get 8-bit APIC ID
     mov        eax, 1
     cpuid
     shr        ebx, 24
     mov        edx, ebx
-    jmp        GetProcessorNumber
 
-X2Apic:
-    ; Processor is x2APIC capable, so get 32-bit x2APIC ID
-    mov        eax, 0bh
-    xor        ecx, ecx
-    cpuid                   
-    ; edx save x2APIC ID
-    
 GetProcessorNumber:
     ;
     ; Get processor number for this AP
