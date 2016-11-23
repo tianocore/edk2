@@ -34,6 +34,10 @@
 
 #define MMC_OCR_POWERUP             0x80000000
 
+#define MMC_OCR_ACCESS_MASK         0x3     /* bit[30-29] */
+#define MMC_OCR_ACCESS_BYTE         0x1     /* bit[29] */
+#define MMC_OCR_ACCESS_SECTOR       0x2     /* bit[30] */
+
 #define MMC_CSD_GET_CCC(Response)    (Response[2] >> 20)
 #define MMC_CSD_GET_TRANSPEED(Response)    (Response[3] & 0xFF)
 #define MMC_CSD_GET_READBLLEN(Response)    ((Response[2] >> 16) & 0xF)

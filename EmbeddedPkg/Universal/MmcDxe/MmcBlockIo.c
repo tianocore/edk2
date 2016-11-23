@@ -126,6 +126,96 @@ MmcStopTransmission (
 #define MMCI0_BLOCKLEN 512
 #define MMCI0_TIMEOUT  10000
 
+STATIC
+EFI_STATUS
+MmcTransferBlock (
+  IN EFI_BLOCK_IO_PROTOCOL    *This,
+  IN UINTN                    Cmd,
+  IN UINTN                    Transfer,
+  IN UINT32                   MediaId,
+  IN EFI_LBA                  Lba,
+  IN UINTN                    BufferSize,
+  OUT VOID                    *Buffer
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   CmdArg;
+  INTN                    Timeout;
+  UINT32                  Response[4];
+  MMC_HOST_INSTANCE       *MmcHostInstance;
+  EFI_MMC_HOST_PROTOCOL   *MmcHost;
+
+  MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
+  MmcHost = MmcHostInstance->MmcHost;
+
+  //Set command argument based on the card access mode (Byte mode or Block mode)
+  if ((MmcHostInstance->CardInfo.OCRData.AccessMode & MMC_OCR_ACCESS_MASK) ==
+      MMC_OCR_ACCESS_SECTOR) {
+    CmdArg = Lba;
+  } else {
+    CmdArg = Lba * This->Media->BlockSize;
+  }
+
+  Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "%a(MMC_CMD%d): Error %r\n", __func__, Cmd, Status));
+    return Status;
+  }
+
+  if (Transfer == MMC_IOBLOCKS_READ) {
+    // Read Data
+    Status = MmcHost->ReadBlockData (MmcHost, Lba, BufferSize, Buffer);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_BLKIO, "%a(): Error Read Block Data and Status = %r\n", __func__, Status));
+      MmcStopTransmission (MmcHost);
+      return Status;
+    }
+    Status = MmcNotifyState (MmcHostInstance, MmcProgrammingState);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "%a() : Error MmcProgrammingState\n", __func__));
+      return Status;
+    }
+  } else {
+    // Write Data
+    Status = MmcHost->WriteBlockData (MmcHost, Lba, BufferSize, Buffer);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_BLKIO, "%a(): Error Write Block Data and Status = %r\n", __func__, Status));
+      MmcStopTransmission (MmcHost);
+      return Status;
+    }
+  }
+
+  // Command 13 - Read status and wait for programming to complete (return to tran)
+  Timeout = MMCI0_TIMEOUT;
+  CmdArg = MmcHostInstance->CardInfo.RCA << 16;
+  Response[0] = 0;
+  while(!(Response[0] & MMC_R0_READY_FOR_DATA)
+        && (MMC_R0_CURRENTSTATE (Response) != MMC_R0_STATE_TRAN)
+        && Timeout--) {
+    Status = MmcHost->SendCommand (MmcHost, MMC_CMD13, CmdArg);
+    if (!EFI_ERROR (Status)) {
+      MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1, Response);
+      if (Response[0] & MMC_R0_READY_FOR_DATA) {
+        break;  // Prevents delay once finished
+      }
+    }
+  }
+
+  if (BufferSize > This->Media->BlockSize) {
+    Status = MmcHost->SendCommand (MmcHost, MMC_CMD12, 0);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_BLKIO, "%a(): Error and Status:%r\n", __func__, Status));
+    }
+  }
+
+  Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "MmcIoBlocks() : Error MmcTransferState\n"));
+    return Status;
+  }
+  return Status;
+}
+
 EFI_STATUS
 MmcIoBlocks (
   IN EFI_BLOCK_IO_PROTOCOL    *This,
@@ -145,6 +235,7 @@ MmcIoBlocks (
   EFI_MMC_HOST_PROTOCOL   *MmcHost;
   UINTN                   BytesRemainingToBeTransfered;
   UINTN                   BlockCount;
+  UINTN                   ConsumeSize;
 
   BlockCount = 1;
   MmcHostInstance = MMC_HOST_INSTANCE_FROM_BLOCK_IO_THIS (This);
@@ -163,6 +254,10 @@ MmcIoBlocks (
   // Check if a Card is Present
   if (!MmcHostInstance->BlockIo.Media->MediaPresent) {
     return EFI_NO_MEDIA;
+  }
+
+  if (MMC_HOST_HAS_ISMULTIBLOCK(MmcHost) && MmcHost->IsMultiBlock(MmcHost)) {
+    BlockCount = (BufferSize + This->Media->BlockSize - 1) / This->Media->BlockSize;
   }
 
   // All blocks must be within the device
@@ -210,75 +305,38 @@ MmcIoBlocks (
       return EFI_NOT_READY;
     }
 
-    //Set command argument based on the card access mode (Byte mode or Block mode)
-    if (MmcHostInstance->CardInfo.OCRData.AccessMode & BIT1) {
-      CmdArg = Lba;
-    } else {
-      CmdArg = Lba * This->Media->BlockSize;
-    }
-
     if (Transfer == MMC_IOBLOCKS_READ) {
-      // Read a single block
-      Cmd = MMC_CMD17;
-    } else {
-      // Write a single block
-      Cmd = MMC_CMD24;
-    }
-    Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "MmcIoBlocks(MMC_CMD%d): Error %r\n", Cmd, Status));
-      return Status;
-    }
-
-    if (Transfer == MMC_IOBLOCKS_READ) {
-      // Read one block of Data
-      Status = MmcHost->ReadBlockData (MmcHost, Lba, This->Media->BlockSize, Buffer);
-      if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_BLKIO, "MmcIoBlocks(): Error Read Block Data and Status = %r\n", Status));
-        MmcStopTransmission (MmcHost);
-        return Status;
-      }
-      Status = MmcNotifyState (MmcHostInstance, MmcProgrammingState);
-      if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "MmcIoBlocks() : Error MmcProgrammingState\n"));
-        return Status;
+      if (BlockCount == 1) {
+        // Read a single block
+        Cmd = MMC_CMD17;
+      } else {
+	// Read multiple blocks
+	Cmd = MMC_CMD18;
       }
     } else {
-      // Write one block of Data
-      Status = MmcHost->WriteBlockData (MmcHost, Lba, This->Media->BlockSize, Buffer);
-      if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_BLKIO, "MmcIoBlocks(): Error Write Block Data and Status = %r\n", Status));
-        MmcStopTransmission (MmcHost);
-        return Status;
+      if (BlockCount == 1) {
+        // Write a single block
+        Cmd = MMC_CMD24;
+      } else {
+	// Write multiple blocks
+	Cmd = MMC_CMD25;
       }
     }
 
-    // Command 13 - Read status and wait for programming to complete (return to tran)
-    Timeout = MMCI0_TIMEOUT;
-    CmdArg = MmcHostInstance->CardInfo.RCA << 16;
-    Response[0] = 0;
-    while(   (!(Response[0] & MMC_R0_READY_FOR_DATA))
-          && (MMC_R0_CURRENTSTATE (Response) != MMC_R0_STATE_TRAN)
-          && Timeout--) {
-      Status = MmcHost->SendCommand (MmcHost, MMC_CMD13, CmdArg);
-      if (!EFI_ERROR (Status)) {
-        MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1, Response);
-        if ((Response[0] & MMC_R0_READY_FOR_DATA)) {
-          break;  // Prevents delay once finished
-        }
-      }
-      gBS->Stall (1);
+    ConsumeSize = BlockCount * This->Media->BlockSize;
+    if (BytesRemainingToBeTransfered < ConsumeSize) {
+      ConsumeSize = BytesRemainingToBeTransfered;
     }
-
-    Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
+    Status = MmcTransferBlock (This, Cmd, Transfer, MediaId, Lba, ConsumeSize, Buffer);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "MmcIoBlocks() : Error MmcTransferState\n"));
-      return Status;
+      DEBUG ((EFI_D_ERROR, "%a(): Failed to transfer block and Status:%r\n", __func__, Status));
     }
 
-    BytesRemainingToBeTransfered -= This->Media->BlockSize;
-    Lba    += BlockCount;
-    Buffer = (UINT8 *)Buffer + This->Media->BlockSize;
+    BytesRemainingToBeTransfered -= ConsumeSize;
+    if (BytesRemainingToBeTransfered > 0) {
+      Lba    += BlockCount;
+      Buffer = (UINT8 *)Buffer + ConsumeSize;
+    }
   }
 
   return EFI_SUCCESS;
