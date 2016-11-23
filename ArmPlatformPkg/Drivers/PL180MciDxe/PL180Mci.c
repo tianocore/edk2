@@ -63,11 +63,6 @@ MciIsReadOnly (
   return (MmioRead32 (FixedPcdGet32 (PcdPL180SysMciRegAddress)) & SYS_MCI_WPROT);
 }
 
-#if 0
-//Note: This function has been commented out because it is not used yet.
-//      This function could be used to remove the hardcoded BlockLen used
-//      in MciPrepareDataPath
-
 // Convert block size to 2^n
 STATIC
 UINT32
@@ -87,7 +82,6 @@ GetPow2BlockLen (
 
   return Pow2BlockLen;
 }
-#endif
 
 VOID
 MciPrepareDataPath (
@@ -126,6 +120,23 @@ MciSendCommand (
     MciPrepareDataPath (MCI_DATACTL_CARD_TO_CONT);
   } else if ((MmcCmd == MMC_CMD24) || (MmcCmd == MMC_CMD20)) {
     MciPrepareDataPath (MCI_DATACTL_CONT_TO_CARD);
+  } else if (MmcCmd == MMC_CMD6) {
+    MmioWrite32 (MCI_DATA_TIMER_REG, 0xFFFFFFF);
+    MmioWrite32 (MCI_DATA_LENGTH_REG, 64);
+#ifndef USE_STREAM
+    MmioWrite32 (MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE | MCI_DATACTL_CARD_TO_CONT | GetPow2BlockLen (64));
+#else
+    MmioWrite32 (MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE | MCI_DATACTL_CARD_TO_CONT | MCI_DATACTL_STREAM_TRANS);
+#endif
+  } else if (MmcCmd == MMC_ACMD51) {
+    MmioWrite32 (MCI_DATA_TIMER_REG, 0xFFFFFFF);
+    /* SCR register is 8 bytes long. */
+    MmioWrite32 (MCI_DATA_LENGTH_REG, 8);
+#ifndef USE_STREAM
+    MmioWrite32 (MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE | MCI_DATACTL_CARD_TO_CONT | GetPow2BlockLen (8));
+#else
+    MmioWrite32 (MCI_DATA_CTL_REG, MCI_DATACTL_ENABLE | MCI_DATACTL_CARD_TO_CONT | MCI_DATACTL_STREAM_TRANS);
+#endif
   }
 
   // Create Command for PL180
@@ -223,7 +234,11 @@ MciReadBlockData (
 
   // Read data from the RX FIFO
   Loop   = 0;
-  Finish = MMCI0_BLOCKLEN / 4;
+  if (Length < MMCI0_BLOCKLEN) {
+    Finish = Length / 4;
+  } else {
+    Finish = MMCI0_BLOCKLEN / 4;
+  }
 
   // Raise the TPL at the highest level to disable Interrupts.
   Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
