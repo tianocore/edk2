@@ -215,19 +215,26 @@ CProcedureInvoke:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment);
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack);
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmRelocateApLoop)
 ASM_PFX(AsmRelocateApLoop):
 AsmRelocateApLoopStart:
-    cmp        byte [esp + 4], 1
+    mov        eax, esp
+    mov        esp, [eax + 16]     ; TopOfApStack
+    push       dword [eax]         ; push return address for stack trace
+    push       ebp
+    mov        ebp, esp
+    mov        ebx, [eax + 8]      ; ApTargetCState
+    mov        ecx, [eax + 4]      ; MwaitSupport
+    cmp        cl,  1              ; Check mwait-monitor support
     jnz        HltLoop
 MwaitLoop:
     mov        eax, esp
     xor        ecx, ecx
     xor        edx, edx
     monitor
-    mov        eax, [esp + 8]    ; Mwait Cx, Target C-State per eax[7:4]
+    mov        eax, ebx            ; Mwait Cx, Target C-State per eax[7:4]
     shl        eax, 4
     mwait
     jmp        MwaitLoop

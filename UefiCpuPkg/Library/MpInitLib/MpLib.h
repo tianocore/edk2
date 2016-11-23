@@ -250,7 +250,8 @@ VOID
 (EFIAPI * ASM_RELOCATE_AP_LOOP) (
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
-  IN UINTN                   PmCodeSegment
+  IN UINTN                   PmCodeSegment,
+  IN UINTN                   TopOfApStack
   );
 
 /**
