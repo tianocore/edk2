@@ -81,6 +81,22 @@ typedef struct {
 } OCR;
 
 typedef struct {
+  UINT8   SD_SPEC:               4; // SD Memory Card - Spec. Version [59:56]
+  UINT8   SCR_STRUCTURE:         4; // SCR Structure [63:60]
+  UINT8   SD_BUS_WIDTHS:         4; // DAT Bus widths supported [51:48]
+  UINT8   DATA_STAT_AFTER_ERASE: 1; // Data Status after erases [55]
+  UINT8   SD_SECURITY:           3; // CPRM Security Support [54:52]
+  UINT8   EX_SECURITY_1:         1; // Extended Security Support [43]
+  UINT8   SD_SPEC4:              1; // Spec. Version 4.00 or higher [42]
+  UINT8   RESERVED_1:            2; // Reserved [41:40]
+  UINT8   SD_SPEC3:              1; // Spec. Version 3.00 or higher [47]
+  UINT8   EX_SECURITY_2:         3; // Extended Security Support [46:44]
+  UINT8   CMD_SUPPORT:           4; // Command Support bits [35:32]
+  UINT8   RESERVED_2:            4; // Reserved [39:36]
+  UINT32  RESERVED_3;               // Manufacturer Usage [31:0]
+} SCR;
+
+typedef struct {
   UINT32  NOT_USED;   // 1 [0:0]
   UINT32  CRC;        // CRC7 checksum [7:1]
   UINT32  MDT;        // Manufacturing date [19:8]
