@@ -244,7 +244,7 @@ RelocateApLoop (
 
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
-  AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP) (UINTN) Buffer;
+  AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP) (UINTN) mReservedApLoopFunc;
   AsmRelocateApLoopFunc (MwaitSupport, CpuMpData->ApTargetCState, CpuMpData->PmCodeSegment);
   //
   // It should never reach here
@@ -273,7 +273,7 @@ MpInitChangeApLoopCallback (
   CpuMpData->SaveRestoreFlag = TRUE;
   CpuMpData->PmCodeSegment = GetProtectedModeCS ();
   CpuMpData->ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
-  WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, mReservedApLoopFunc);
+  WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL);
   DEBUG ((DEBUG_INFO, "%a() done!\n", __FUNCTION__));
 }
 
