@@ -2,7 +2,7 @@
 
   Provides some data structure definitions used by the XHCI host controller driver.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -60,6 +60,11 @@ typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
 // The unit is millisecond, setting it as 1s.
 //
 #define XHC_RESET_TIMEOUT            (1000)
+//
+// TRSTRCY delay requirement in usb 2.0 spec chapter 7.1.7.5.
+// The unit is microsecond, setting it as 10ms.
+//
+#define XHC_RESET_RECOVERY_DELAY     (10 * 1000)
 //
 // XHC async transfer timer interval, set by experience.
 // The unit is 100us, takes 1ms as interval.
