@@ -55,6 +55,11 @@
 #define MMC_R0_STATE_TRAN       4
 #define MMC_R0_STATE_DATA       5
 
+#define EMMC_CMD6_ARG_ACCESS(x)             (((x) & 0x3) << 24)
+#define EMMC_CMD6_ARG_INDEX(x)              (((x) & 0xFF) << 16)
+#define EMMC_CMD6_ARG_VALUE(x)              (((x) & 0xFF) << 8)
+#define EMMC_CMD6_ARG_CMD_SET(x)            (((x) & 0x7) << 0)
+
 typedef enum {
   UNKNOWN_CARD,
   MMC_CARD,              //MMC card
