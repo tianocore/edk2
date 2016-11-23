@@ -96,6 +96,54 @@ InitGdt (
 }
 
 /**
+  This function sets GDT/IDT buffer to be RO and XP.
+**/
+VOID
+PatchGdtIdtMap (
+  VOID
+  )
+{
+  EFI_PHYSICAL_ADDRESS       BaseAddress;
+  UINTN                      Size;
+
+  //
+  // GDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - GDT:\n"));
+
+  BaseAddress = mGdtBuffer;
+  Size = ALIGN_VALUE(mGdtBufferSize, SIZE_4KB);
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_RO
+    );
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_XP
+    );
+
+  //
+  // IDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - IDT:\n"));
+
+  BaseAddress = gcSmiIdtr.Base;
+  Size = ALIGN_VALUE(gcSmiIdtr.Limit + 1, SIZE_4KB);
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_RO
+    );
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_XP
+    );
+}
+
+/**
   Get Protected mode code segment from current GDT table.
 
   @return  Protected mode code segment value.
@@ -153,5 +201,4 @@ TransferApToSafeState (
   //
   ASSERT (FALSE);
 }
-
 

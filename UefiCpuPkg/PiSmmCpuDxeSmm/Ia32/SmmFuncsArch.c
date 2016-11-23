@@ -127,6 +127,61 @@ InitGdt (
 }
 
 /**
+  This function sets GDT/IDT buffer to be RO and XP.
+**/
+VOID
+PatchGdtIdtMap (
+  VOID
+  )
+{
+  EFI_PHYSICAL_ADDRESS       BaseAddress;
+  UINTN                      Size;
+
+  //
+  // GDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - GDT:\n"));
+
+  BaseAddress = mGdtBuffer;
+  Size = ALIGN_VALUE(mGdtBufferSize, SIZE_4KB);
+  if (!FeaturePcdGet (PcdCpuSmmStackGuard)) {
+    //
+    // Do not set RO for IA32 when stack guard feature is enabled.
+    // Stack Guard need use task switch to switch stack.
+    // It need write GDT and TSS.
+    //
+    SmmSetMemoryAttributes (
+      BaseAddress,
+      Size,
+      EFI_MEMORY_RO
+      );
+  }
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_XP
+    );
+
+  //
+  // IDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - IDT:\n"));
+
+  BaseAddress = gcSmiIdtr.Base;
+  Size = ALIGN_VALUE(gcSmiIdtr.Limit + 1, SIZE_4KB);
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_RO
+    );
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_XP
+    );
+}
+
+/**
   Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
 
   @param[in] ApHltLoopCode          The address of the safe hlt-loop function.
