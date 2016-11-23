@@ -2,7 +2,7 @@
 
   XHCI transfer scheduling routines.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2115,6 +2115,10 @@ XhcInitializeDeviceSlot (
   // 8) Issue an Address Device Command for the Device Slot, where the command points to the Input
   //    Context data structure described above.
   //
+  // Delay 10ms to meet TRSTRCY delay requirement in usb 2.0 spec chapter 7.1.7.5 before sending SetAddress() request
+  // to device.
+  //
+  gBS->Stall (XHC_RESET_RECOVERY_DELAY);
   ZeroMem (&CmdTrbAddr, sizeof (CmdTrbAddr));
   PhyAddr = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Xhc->UsbDevContext[SlotId].InputContext, sizeof (INPUT_CONTEXT));
   CmdTrbAddr.PtrLo    = XHC_LOW_32BIT (PhyAddr);
@@ -2321,6 +2325,10 @@ XhcInitializeDeviceSlot64 (
   // 8) Issue an Address Device Command for the Device Slot, where the command points to the Input
   //    Context data structure described above.
   //
+  // Delay 10ms to meet TRSTRCY delay requirement in usb 2.0 spec chapter 7.1.7.5 before sending SetAddress() request
+  // to device.
+  //
+  gBS->Stall (XHC_RESET_RECOVERY_DELAY);
   ZeroMem (&CmdTrbAddr, sizeof (CmdTrbAddr));
   PhyAddr = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Xhc->UsbDevContext[SlotId].InputContext, sizeof (INPUT_CONTEXT_64));
   CmdTrbAddr.PtrLo    = XHC_LOW_32BIT (PhyAddr);

@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1195,6 +1195,10 @@ XhcPeiInitializeDeviceSlot (
   // 8) Issue an Address Device Command for the Device Slot, where the command points to the Input
   //    Context data structure described above.
   //
+  // Delay 10ms to meet TRSTRCY delay requirement in usb 2.0 spec chapter 7.1.7.5 before sending SetAddress() request
+  // to device.
+  //
+  MicroSecondDelay (XHC_RESET_RECOVERY_DELAY);
   ZeroMem (&CmdTrbAddr, sizeof (CmdTrbAddr));
   PhyAddr = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Xhc->UsbDevContext[SlotId].InputContext, sizeof (INPUT_CONTEXT));
   CmdTrbAddr.PtrLo    = XHC_LOW_32BIT (PhyAddr);
@@ -1402,6 +1406,10 @@ XhcPeiInitializeDeviceSlot64 (
   // 8) Issue an Address Device Command for the Device Slot, where the command points to the Input
   //    Context data structure described above.
   //
+  // Delay 10ms to meet TRSTRCY delay requirement in usb 2.0 spec chapter 7.1.7.5 before sending SetAddress() request
+  // to device.
+  //
+  MicroSecondDelay (XHC_RESET_RECOVERY_DELAY);
   ZeroMem (&CmdTrbAddr, sizeof (CmdTrbAddr));
   PhyAddr = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Xhc->UsbDevContext[SlotId].InputContext, sizeof (INPUT_CONTEXT_64));
   CmdTrbAddr.PtrLo    = XHC_LOW_32BIT (PhyAddr);
