@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/Tcg2PpVendorLib.h>
 #include <Library/SmmServicesTableLib.h>
-#include <Library/TcgPhysicalPresenceStorageLib.h>
 
 EFI_SMM_VARIABLE_PROTOCOL  *mTcg2PpSmmVariable;
 
@@ -130,10 +129,8 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
     goto EXIT;
   }
 
-  if (((*OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
-       (*OperationRequest < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN))||
-      ((*OperationRequest > TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE) &&
-       (*OperationRequest < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN))) {
+  if ((*OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
+      (*OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) ) {
     //
     // This command requires UI to prompt user for Auth data.
     //
@@ -247,13 +244,12 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
   IN UINT32                 OperationRequest
   )
 {
-  EFI_STATUS                               Status;
-  UINTN                                    DataSize;
-  EFI_TCG2_PHYSICAL_PRESENCE               PpData;
-  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS         Flags;
-  UINT32                                   StorageFlags;
-  BOOLEAN                                  RequestConfirmed;
-
+  EFI_STATUS                        Status;
+  UINTN                             DataSize;
+  EFI_TCG2_PHYSICAL_PRESENCE        PpData;
+  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  Flags;
+  BOOLEAN                           RequestConfirmed;
+  
   DEBUG ((EFI_D_INFO, "[TPM2] GetUserConfirmationStatusFunction, Request = %x\n", OperationRequest));
 
   //
@@ -286,11 +282,6 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
     DEBUG ((EFI_D_ERROR, "[TPM2] Get PP flags failure! Status = %r\n", Status));
     return TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
   }
-
-  //
-  // Get the Physical Presence storage flags
-  //
-  StorageFlags = TcgPhysicalPresenceStorageLibReturnStorageFlags();
 
   RequestConfirmed = FALSE;
 
@@ -325,22 +316,6 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
       
     case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
       RequestConfirmed = TRUE;
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
-      if ((StorageFlags & TCG_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
-        RequestConfirmed = TRUE;
-      }
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
-      if ((StorageFlags & TCG_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
-        RequestConfirmed = TRUE;
-      }
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE:
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE:
       break;
 
     default:

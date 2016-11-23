@@ -77,11 +77,6 @@
   #
   Tcg2PpVendorLib|Include/Library/TcgPpVendorLib.h
   
-  ##  @libraryclass  Provides support for TCG Physical Presence Interface (PPI) specification
-  #   >= 96 && < 128 Vendor Specific PPI Operation.
-  #
-  TcgPhysicalPresenceStorageLib|Include/Library/TcgPhysicalPresenceStorageLib.h
-
   ##  @libraryclass  Handle TPM 2.0 physical presence request from OS.
   #
   Tcg2PhysicalPresenceLib|Include/Library/Tcg2PhysicalPresenceLib.h
@@ -150,10 +145,6 @@
   ## GUID used to "Tcg2PhysicalPresence" variable and "Tcg2PhysicalPresenceFlags" variable for TPM2 request and response.
   #  Include/Guid/Tcg2PhysicalPresenceData.h
   gEfiTcg2PhysicalPresenceGuid = { 0xaeb9c5c1, 0x94f1, 0x4d02, { 0xbf, 0xd9, 0x46, 0x2, 0xdb, 0x2d, 0x3c, 0x54 }}
-
-  ##
-  #  Include/Guid/Tcg2PhysicalPresenceData.h
-  gEfiTcgPhysicalPresenceStorageGuid = { 0x2EBE3E34, 0xB3CD, 0x471A, { 0xBF, 0x87, 0xB3, 0xC6, 0x6E, 0xE0, 0x74, 0x9A}}
 
   ## GUID used for form browser, password credential and provider identifier.
   # Include/Guid/PwdCredentialProviderHii.h

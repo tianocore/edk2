@@ -46,7 +46,6 @@
   Tcg2PpVendorLib
   SmmServicesTableLib
   BaseMemoryLib
-  TcgPhysicalPresenceStorageLib
 
 [Guids]
   ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"

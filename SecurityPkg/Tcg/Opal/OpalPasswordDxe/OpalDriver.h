@@ -16,7 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _OPAL_DRIVER_H_
 
 #include <PiDxe.h>
-#include <IndustryStandard/TcgPhysicalPresence.h>
+
+#include <Guid/OpalPasswordExtraInfoVariable.h>
 
 #include <Protocol/PciIo.h>
 #include <Protocol/SmmCommunication.h>
@@ -39,7 +40,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiHiiServicesLib.h>
 #include <Library/TcgStorageOpalLib.h>
 #include <Library/OpalPasswordSupportLib.h>
-#include <Library/TcgPhysicalPresenceStorageLib.h>
 
 #define EFI_DRIVER_NAME_UNICODE L"1.0 UEFI Opal Driver"
 

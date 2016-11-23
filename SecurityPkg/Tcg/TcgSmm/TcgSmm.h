@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
-#include <IndustryStandard/TcgPhysicalPresence.h>
 
 #include <Guid/PhysicalPresenceData.h>
 #include <Guid/MemoryOverwriteControl.h>
@@ -38,7 +37,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/TpmMeasurementLib.h>
 #include <Library/PcdLib.h>
 #include <Library/TcgPpVendorLib.h>
-#include <Library/TcgPhysicalPresenceStorageLib.h>
 
 #pragma pack(1)
 typedef struct {
