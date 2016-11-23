@@ -296,16 +296,6 @@ Tcg2ExecutePhysicalPresence (
   EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
   EFI_TCG2_BOOT_SERVICE_CAPABILITY  ProtocolCapability;
 
-  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
-  ASSERT_EFI_ERROR (Status);
-
-  ProtocolCapability.Size = sizeof(ProtocolCapability);
-  Status = Tcg2Protocol->GetCapability (
-                           Tcg2Protocol,
-                           &ProtocolCapability
-                           );
-  ASSERT_EFI_ERROR (Status);
-
   switch (CommandCode) {
     case TCG2_PHYSICAL_PRESENCE_CLEAR:
     case TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR:
@@ -327,6 +317,16 @@ Tcg2ExecutePhysicalPresence (
       return TCG_PP_OPERATION_RESPONSE_SUCCESS;
 
     case TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS:
+      Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
+      ASSERT_EFI_ERROR (Status);
+
+      ProtocolCapability.Size = sizeof(ProtocolCapability);
+      Status = Tcg2Protocol->GetCapability (
+                               Tcg2Protocol,
+                               &ProtocolCapability
+                               );
+      ASSERT_EFI_ERROR (Status);
+
       Status = Tpm2CommandAllocPcr (PlatformAuth, ProtocolCapability.HashAlgorithmBitmap, CommandParameter);
       if (EFI_ERROR (Status)) {
         return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
@@ -343,12 +343,46 @@ Tcg2ExecutePhysicalPresence (
       }
 
     case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
+      Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
+      ASSERT_EFI_ERROR (Status);
+
+      ProtocolCapability.Size = sizeof(ProtocolCapability);
+      Status = Tcg2Protocol->GetCapability (
+                               Tcg2Protocol,
+                               &ProtocolCapability
+                               );
+      ASSERT_EFI_ERROR (Status);
+
       Status = Tpm2CommandAllocPcr (PlatformAuth, ProtocolCapability.HashAlgorithmBitmap, ProtocolCapability.HashAlgorithmBitmap);
       if (EFI_ERROR (Status)) {
         return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
       } else {
         return TCG_PP_OPERATION_RESPONSE_SUCCESS;
       }
+
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
+      PpiFlags->PPFlags |= TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID;
+      return TCG_PP_OPERATION_RESPONSE_SUCCESS;
+
+    case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
+      PpiFlags->PPFlags &= ~TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID;
+      return TCG_PP_OPERATION_RESPONSE_SUCCESS;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE:
+      PpiFlags->PPFlags |= TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID;
+      return TCG_PP_OPERATION_RESPONSE_SUCCESS;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE:
+      PpiFlags->PPFlags &= ~TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID;
+      return TCG_PP_OPERATION_RESPONSE_SUCCESS;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE:
+      PpiFlags->PPFlags |= TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID;
+      return TCG_PP_OPERATION_RESPONSE_SUCCESS;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE:
+      PpiFlags->PPFlags &= ~TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID;
+      return TCG_PP_OPERATION_RESPONSE_SUCCESS;
 
     default:
       if (CommandCode <= TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
@@ -479,22 +513,6 @@ Tcg2UserConfirm (
   EFI_TCG2_BOOT_SERVICE_CAPABILITY  ProtocolCapability;
   UINT32                            CurrentPCRBanks;
   EFI_STATUS                        Status;
-
-  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
-  ASSERT_EFI_ERROR (Status);
-
-  ProtocolCapability.Size = sizeof(ProtocolCapability);
-  Status = Tcg2Protocol->GetCapability (
-                           Tcg2Protocol,
-                           &ProtocolCapability
-                           );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = Tcg2Protocol->GetActivePcrBanks (
-                           Tcg2Protocol,
-                           &CurrentPCRBanks
-                           );
-  ASSERT_EFI_ERROR (Status);
   
   TmpStr2     = NULL;
   CautionKey  = FALSE;
@@ -502,6 +520,9 @@ Tcg2UserConfirm (
   BufSize     = CONFIRM_BUFFER_SIZE;
   ConfirmText = AllocateZeroPool (BufSize);
   ASSERT (ConfirmText != NULL);
+
+  mTcg2PpStringPackHandle = HiiAddPackages (&gEfiTcg2PhysicalPresenceGuid, gImageHandle, DxeTcg2PhysicalPresenceLibStrings, NULL);
+  ASSERT (mTcg2PpStringPackHandle != NULL);
 
   switch (TpmPpCommand) {
 
@@ -544,6 +565,22 @@ Tcg2UserConfirm (
       break;
 
     case TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS:
+      Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
+      ASSERT_EFI_ERROR (Status);
+
+      ProtocolCapability.Size = sizeof(ProtocolCapability);
+      Status = Tcg2Protocol->GetCapability (
+                               Tcg2Protocol,
+                               &ProtocolCapability
+                               );
+      ASSERT_EFI_ERROR (Status);
+
+      Status = Tcg2Protocol->GetActivePcrBanks (
+                               Tcg2Protocol,
+                               &CurrentPCRBanks
+                               );
+      ASSERT_EFI_ERROR (Status);
+
       CautionKey = TRUE;
       TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_SET_PCR_BANKS));
 
@@ -589,7 +626,40 @@ Tcg2UserConfirm (
       FreePool (TmpStr1);      
 
       break;
-      
+
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
+      TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_ENABLE_BLOCK_SID));
+
+      TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_HEAD_STR));
+      UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
+      FreePool (TmpStr1);
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
+      TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_DISABLE_BLOCK_SID));
+
+      TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_HEAD_STR));
+      UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
+      FreePool (TmpStr1);
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE:
+      NoPpiInfo  = TRUE;
+      TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PP_ENABLE_BLOCK_SID));
+
+      TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PPI_HEAD_STR));
+      UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
+      FreePool (TmpStr1);
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE:
+      NoPpiInfo  = TRUE;
+      TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PP_DISABLE_BLOCK_SID));
+
+      TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PPI_HEAD_STR));
+      UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
+      FreePool (TmpStr1);
+      break;
 
     default:
       ;
@@ -645,6 +715,7 @@ Tcg2UserConfirm (
   FreePool (TmpStr1);
   FreePool (TmpStr2);
   FreePool (ConfirmText);
+  HiiRemovePackages (mTcg2PpStringPackHandle);
 
   if (Tcg2ReadUserKey (CautionKey)) {
     return TRUE;
@@ -659,10 +730,10 @@ Tcg2UserConfirm (
  
    @param[in]  TcgPpData                 EFI Tcg2 Physical Presence request data. 
    @param[in]  Flags                     The physical presence interface flags.
-   @param[out] RequestConfirmed            If the physical presence operation command required user confirm from UI.
-                                             True, it indicates the command doesn't require user confirm, or already confirmed 
-                                                   in last boot cycle by user.
-                                             False, it indicates the command need user confirm from UI.
+   @param[out] RequestConfirmed          If the physical presence operation command required user confirm from UI.
+                                           True, it indicates the command doesn't require user confirm, or already confirmed 
+                                                 in last boot cycle by user.
+                                           False, it indicates the command need user confirm from UI.
 
    @retval  TRUE        Physical Presence operation command is valid.
    @retval  FALSE       Physical Presence operation command is invalid.
@@ -675,9 +746,21 @@ Tcg2HaveValidTpmRequest  (
   OUT     BOOLEAN                          *RequestConfirmed
   )
 {
-  BOOLEAN  IsRequestValid;
+  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
+  EFI_STATUS                        Status;
+  BOOLEAN                           IsRequestValid;
 
   *RequestConfirmed = FALSE;
+
+  if (TcgPpData->PPRequest <= TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
+    //
+    // Need TCG2 protocol.
+    //
+    Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+  }
 
   switch (TcgPpData->PPRequest) {
     case TCG2_PHYSICAL_PRESENCE_NO_ACTION:
@@ -714,6 +797,27 @@ Tcg2HaveValidTpmRequest  (
       
     case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
       *RequestConfirmed = TRUE;
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
+      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
+        *RequestConfirmed = TRUE;
+      }
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
+      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
+        *RequestConfirmed = TRUE;
+      }
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE:
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE:
+      *RequestConfirmed = TRUE;
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE:
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE:
       break;
 
     default:
@@ -753,15 +857,15 @@ Tcg2HaveValidTpmRequest  (
   TcgPpData variable is external input, so this function will validate
   its data structure to be valid value.
 
-  @param[in] PlatformAuth         platform auth value. NULL means no platform auth change.
-  @param[in] TcgPpData            Point to the physical presence NV variable.
-  @param[in] Flags                The physical presence interface flags.
+  @param[in]      PlatformAuth      platform auth value. NULL means no platform auth change.
+  @param[in, out] TcgPpData         Pointer to the physical presence NV variable.
+  @param[in, out] Flags             Pointer to the physical presence interface flags.
 **/
 VOID
 Tcg2ExecutePendingTpmRequest (
   IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
-  IN      EFI_TCG2_PHYSICAL_PRESENCE       *TcgPpData,
-  IN      EFI_TCG2_PHYSICAL_PRESENCE_FLAGS Flags
+  IN OUT  EFI_TCG2_PHYSICAL_PRESENCE       *TcgPpData,
+  IN OUT  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS *Flags
   )
 {
   EFI_STATUS                        Status;
@@ -778,7 +882,7 @@ Tcg2ExecutePendingTpmRequest (
     return;
   }
 
-  if (!Tcg2HaveValidTpmRequest(TcgPpData, Flags, &RequestConfirmed)) {
+  if (!Tcg2HaveValidTpmRequest(TcgPpData, *Flags, &RequestConfirmed)) {
     //
     // Invalid operation request.
     //
@@ -804,7 +908,7 @@ Tcg2ExecutePendingTpmRequest (
 
   ResetRequired = FALSE;
   if (TcgPpData->PPRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-    NewFlags = Flags;
+    NewFlags = *Flags;
     NewPPFlags = NewFlags.PPFlags;
     TcgPpData->PPResponse = Tcg2PpVendorLibExecutePendingRequest (PlatformAuth, TcgPpData->PPRequest, &NewPPFlags, &ResetRequired);
     NewFlags.PPFlags = NewPPFlags;
@@ -820,7 +924,7 @@ Tcg2ExecutePendingTpmRequest (
     // Execute requested physical presence command
     //
     TcgPpData->PPResponse = TCG_PP_OPERATION_RESPONSE_USER_ABORT;
-    NewFlags = Flags;
+    NewFlags = *Flags;
     if (RequestConfirmed) {
       TcgPpData->PPResponse = Tcg2ExecutePhysicalPresence (
                                 PlatformAuth,
@@ -834,7 +938,8 @@ Tcg2ExecutePendingTpmRequest (
   //
   // Save the flags if it is updated.
   //
-  if (CompareMem (&Flags, &NewFlags, sizeof(EFI_TCG2_PHYSICAL_PRESENCE_FLAGS)) != 0) {
+  if (CompareMem (Flags, &NewFlags, sizeof(EFI_TCG2_PHYSICAL_PRESENCE_FLAGS)) != 0) {
+    *Flags = NewFlags;
     Status   = gRT->SetVariable (
                       TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                       &gEfiTcg2PhysicalPresenceGuid,
@@ -885,6 +990,16 @@ Tcg2ExecutePendingTpmRequest (
     case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
       break;
 
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
+    case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE:
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE:
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE:
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE:
+      return;
+
     default:
       if (TcgPpData->LastPPRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
         if (ResetRequired) {
@@ -926,14 +1041,8 @@ Tcg2PhysicalPresenceLibProcessRequest (
   EFI_STATUS                        Status;
   UINTN                             DataSize;
   EFI_TCG2_PHYSICAL_PRESENCE        TcgPpData;
-  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
   EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
-
-  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
-  if (EFI_ERROR (Status)) {
-    return ;
-  }
 
   //
   // This flags variable controls whether physical presence is required for TPM command. 
@@ -960,9 +1069,6 @@ Tcg2PhysicalPresenceLibProcessRequest (
     return ;
   }
 
-  mTcg2PpStringPackHandle = HiiAddPackages (&gEfiTcg2PhysicalPresenceGuid, gImageHandle, DxeTcg2PhysicalPresenceLibStrings, NULL);
-  ASSERT (mTcg2PpStringPackHandle != NULL);
-
   //
   // Initialize physical presence flags.
   //
@@ -975,7 +1081,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
                   &PpiFlags
                   );
   if (EFI_ERROR (Status)) {
-    PpiFlags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT;
+    PpiFlags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
     Status   = gRT->SetVariable (
                       TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                       &gEfiTcg2PhysicalPresenceGuid,
@@ -988,7 +1094,6 @@ Tcg2PhysicalPresenceLibProcessRequest (
       return ;
     }
   }
-  DEBUG ((EFI_D_INFO, "[TPM2] PpiFlags = %x\n", PpiFlags.PPFlags));
   
   //
   // Initialize physical presence variable.
@@ -1022,7 +1127,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
   //
   // Execute pending TPM request.
   //  
-  Tcg2ExecutePendingTpmRequest (PlatformAuth, &TcgPpData, PpiFlags);
+  Tcg2ExecutePendingTpmRequest (PlatformAuth, &TcgPpData, &PpiFlags);
   DEBUG ((EFI_D_INFO, "[TPM2] PPResponse = %x (LastPPRequest=%x, Flags=%x)\n", TcgPpData.PPResponse, TcgPpData.LastPPRequest, PpiFlags.PPFlags));
 
 }
@@ -1047,13 +1152,7 @@ Tcg2PhysicalPresenceLibNeedUserConfirm(
   EFI_TCG2_PHYSICAL_PRESENCE        TcgPpData;
   UINTN                             DataSize;
   BOOLEAN                           RequestConfirmed;
-  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
-
-  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
 
   //
   // Check S4 resume
@@ -1205,10 +1304,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
   }
 
   if ((OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
-      (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) ) {
-    //
-    // This command requires UI to prompt user for Auth data.
-    //
+      (OperationRequest < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN) ) {
     return TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
   }
 
@@ -1224,11 +1320,10 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
                     DataSize,
                     &PpData
                     );
-  }
-
-  if (EFI_ERROR (Status)) { 
-    DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
-    return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+    if (EFI_ERROR (Status)) { 
+      DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
+      return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+    }
   }
 
   if (OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
@@ -1241,10 +1336,41 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
                     &Flags
                     );
     if (EFI_ERROR (Status)) {
-      Flags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT;
+      Flags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
     }
     return Tcg2PpVendorLibSubmitRequestToPreOSFunction (OperationRequest, Flags.PPFlags, RequestParameter);
   }
 
   return TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS;
+}
+
+/**
+  Return TPM2 ManagementFlags set by PP interface.
+
+  @retval    ManagementFlags    TPM2 Management Flags.
+**/
+UINT32
+EFIAPI
+Tcg2PhysicalPresenceLibGetManagementFlags (
+  VOID
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
+  UINTN                             DataSize;
+
+  DEBUG ((EFI_D_INFO, "[TPM2] GetManagementFlags\n"));
+
+  DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE_FLAGS);
+  Status = gRT->GetVariable (
+                  TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+                  &gEfiTcg2PhysicalPresenceGuid,
+                  NULL,
+                  &DataSize,
+                  &PpiFlags
+                  );
+  if (EFI_ERROR (Status)) {
+    PpiFlags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
+  }
+  return PpiFlags.PPFlags;
 }
