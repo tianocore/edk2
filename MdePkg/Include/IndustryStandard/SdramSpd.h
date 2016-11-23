@@ -1,18 +1,22 @@
 /** @file
   This file contains definitions for the SPD fields on an SDRAM.
-    
-  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #ifndef _SDRAM_SPD_H_
 #define _SDRAM_SPD_H_
+
+#include <IndustryStandard/SdramSpdDdr3.h>
+#include <IndustryStandard/SdramSpdDdr4.h>
+#include <IndustryStandard/SdramSpdLpDdr.h>
 
 //
 // SDRAM SPD field definitions
@@ -47,9 +51,14 @@
 //
 // Memory Type Definitions
 //
-#define SPD_VAL_SDR_TYPE  4 ///< SDR SDRAM memory
-#define SPD_VAL_DDR_TYPE  7 ///< DDR SDRAM memory
-#define SPD_VAL_DDR2_TYPE 8 ///< DDR2 SDRAM memory
+#define SPD_VAL_SDR_TYPE  4       ///< SDR SDRAM memory
+#define SPD_VAL_DDR_TYPE  7       ///< DDR SDRAM memory
+#define SPD_VAL_DDR2_TYPE 8       ///< DDR2 SDRAM memory
+#define SPD_VAL_DDR3_TYPE 11      ///< DDR3 SDRAM memory
+#define SPD_VAL_DDR4_TYPE 12      ///< DDR4 SDRAM memory
+#define SPD_VAL_LPDDR3_TYPE 15    ///< LPDDR3 SDRAM memory
+#define SPD_VAL_LPDDR4_TYPE 16    ///< LPDDR4 SDRAM memory
+
 //
 // ECC Type Definitions
 //
