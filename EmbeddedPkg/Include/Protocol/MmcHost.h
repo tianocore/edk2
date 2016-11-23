@@ -49,6 +49,7 @@ typedef UINT32 MMC_CMD;
 #define MMC_CMD2              (MMC_INDX(2) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_LONG_RESPONSE)
 #define MMC_CMD3              (MMC_INDX(3) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD5              (MMC_INDX(5) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
+#define MMC_CMD6              (MMC_INDX(6) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD7              (MMC_INDX(7) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD8              (MMC_INDX(8) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD9              (MMC_INDX(9) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_LONG_RESPONSE)
@@ -61,12 +62,16 @@ typedef UINT32 MMC_CMD;
 #define MMC_CMD20             (MMC_INDX(20) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD23             (MMC_INDX(23) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD24             (MMC_INDX(24) | MMC_CMD_WAIT_RESPONSE)
+#define MMC_CMD25             (MMC_INDX(25) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_CMD55             (MMC_INDX(55) | MMC_CMD_WAIT_RESPONSE)
 #define MMC_ACMD41            (MMC_INDX(41) | MMC_CMD_WAIT_RESPONSE | MMC_CMD_NO_CRC_RESPONSE)
+#define MMC_ACMD51            (MMC_INDX(51) | MMC_CMD_WAIT_RESPONSE)
 
 // Valid responses for CMD1 in eMMC
 #define EMMC_CMD1_CAPACITY_LESS_THAN_2GB 0x00FF8080 // Capacity <= 2GB, byte addressing used
 #define EMMC_CMD1_CAPACITY_GREATER_THAN_2GB 0x40FF8080 // Capacity > 2GB, 512-byte sector addressing used
+
+#define MMC_STATUS_APP_CMD    (1 << 5)
 
 typedef enum _MMC_STATE {
     MmcInvalidState = 0,
@@ -81,6 +86,16 @@ typedef enum _MMC_STATE {
     MmcProgrammingState,
     MmcDisconnectState,
 } MMC_STATE;
+
+#define EMMCBACKWARD         (0)
+#define EMMCHS26             (1 << 0)      // High-Speed @26MHz at rated device voltages
+#define EMMCHS52             (1 << 1)      // High-Speed @52MHz at rated device voltages
+#define EMMCHS52DDR1V8       (1 << 2)      // High-Speed Dual Data Rate @52MHz 1.8V or 3V I/O
+#define EMMCHS52DDR1V2       (1 << 3)      // High-Speed Dual Data Rate @52MHz 1.2V I/O
+#define EMMCHS200SDR1V8      (1 << 4)      // HS200 Single Data Rate @200MHz 1.8V I/O
+#define EMMCHS200SDR1V2      (1 << 5)      // HS200 Single Data Rate @200MHz 1.2V I/O
+#define EMMCHS400DDR1V8      (1 << 6)      // HS400 Dual Data Rate @400MHz 1.8V I/O
+#define EMMCHS400DDR1V2      (1 << 7)      // HS400 Dual Data Rate @400MHz 1.2V I/O
 
 ///
 /// Forward declaration for EFI_MMC_HOST_PROTOCOL
@@ -131,6 +146,16 @@ typedef EFI_STATUS (EFIAPI *MMC_WRITEBLOCKDATA) (
   IN  UINT32                    *Buffer
   );
 
+typedef EFI_STATUS (EFIAPI *MMC_SETIOS) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This,
+  IN  UINT32                    BusClockFreq,
+  IN  UINT32                    BusWidth,
+  IN  UINT32                    TimingMode
+  );
+
+typedef BOOLEAN (EFIAPI *MMC_ISMULTIBLOCK) (
+  IN  EFI_MMC_HOST_PROTOCOL     *This
+  );
 
 struct _EFI_MMC_HOST_PROTOCOL {
 
@@ -147,9 +172,17 @@ struct _EFI_MMC_HOST_PROTOCOL {
   MMC_READBLOCKDATA       ReadBlockData;
   MMC_WRITEBLOCKDATA      WriteBlockData;
 
+  MMC_SETIOS              SetIos;
+  MMC_ISMULTIBLOCK        IsMultiBlock;
+
 };
 
-#define MMC_HOST_PROTOCOL_REVISION    0x00010001    // 1.1
+#define MMC_HOST_PROTOCOL_REVISION    0x00010002    // 1.2
+
+#define MMC_HOST_HAS_SETIOS(Host)     (Host->Revision >= MMC_HOST_PROTOCOL_REVISION && \
+                                       Host->SetIos != NULL)
+#define MMC_HOST_HAS_ISMULTIBLOCK(Host) (Host->Revision >= MMC_HOST_PROTOCOL_REVISION && \
+                                         Host->IsMultiBlock != NULL)
 
 extern EFI_GUID gEfiMmcHostProtocolGuid;
 
