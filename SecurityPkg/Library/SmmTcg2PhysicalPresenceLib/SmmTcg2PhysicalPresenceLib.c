@@ -130,10 +130,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
   }
 
   if ((*OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
-      (*OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) ) {
-    //
-    // This command requires UI to prompt user for Auth data.
-    //
+      (*OperationRequest < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN) ) {
     ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
     goto EXIT;
   }
@@ -150,12 +147,11 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
                                    DataSize,
                                    &PpData
                                    );
-  }
-
-  if (EFI_ERROR (Status)) { 
-    DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
-    ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
-    goto EXIT;
+    if (EFI_ERROR (Status)) { 
+      DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
+      ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+      goto EXIT;
+    }
   }
 
   if (*OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
@@ -168,7 +164,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
                                    &Flags
                                    );
     if (EFI_ERROR (Status)) {
-      Flags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT;
+      Flags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
     }
     ReturnCode = Tcg2PpVendorLibSubmitRequestToPreOSFunction (*OperationRequest, Flags.PPFlags, *RequestParameter);
   }
@@ -318,6 +314,27 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
       RequestConfirmed = TRUE;
       break;
 
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
+      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
+        RequestConfirmed = TRUE;
+      }
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
+      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
+        RequestConfirmed = TRUE;
+      }
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE:
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE:
+      RequestConfirmed = TRUE;
+      break;
+
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE:
+    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE:
+      break;
+
     default:
       if (OperationRequest <= TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
         RequestConfirmed = TRUE;
@@ -341,7 +358,7 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
 }
 
 /**
-  The constructor function register UNI strings into imageHandle.
+  The constructor function locates SmmVariable protocol.
   
   It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
 
