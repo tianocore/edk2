@@ -684,6 +684,21 @@ FillExchangeInfoData (
 }
 
 /**
+  Helper function that waits until the finished AP count reaches the specified
+  limit, or the specified timeout elapses (whichever comes first).
+
+  @param[in] CpuMpData        Pointer to CPU MP Data.
+  @param[in] FinishedApLimit  The number of finished APs to wait for.
+  @param[in] TimeLimit        The number of microseconds to wait for.
+**/
+VOID
+TimedWaitForApFinish (
+  IN CPU_MP_DATA               *CpuMpData,
+  IN UINT32                    FinishedApLimit,
+  IN UINT32                    TimeLimit
+  );
+
+/**
   This function will be called by BSP to wakeup AP.
 
   @param[in] CpuMpData          Pointer to CPU MP Data
@@ -748,7 +763,11 @@ WakeUpAP (
       //
       // Wait for all potential APs waken up in one specified period
       //
-      MicroSecondDelay (PcdGet32(PcdCpuApInitTimeOutInMicroSeconds));
+      TimedWaitForApFinish (
+        CpuMpData,
+        PcdGet32 (PcdCpuMaxLogicalProcessorNumber) - 1,
+        PcdGet32 (PcdCpuApInitTimeOutInMicroSeconds)
+        );
     } else {
       //
       // Wait all APs waken up if this is not the 1st broadcast of SIPI
@@ -892,6 +911,58 @@ CheckTimeout (
     return TRUE;
   }
   return FALSE;
+}
+
+/**
+  Helper function that waits until the finished AP count reaches the specified
+  limit, or the specified timeout elapses (whichever comes first).
+
+  @param[in] CpuMpData        Pointer to CPU MP Data.
+  @param[in] FinishedApLimit  The number of finished APs to wait for.
+  @param[in] TimeLimit        The number of microseconds to wait for.
+**/
+VOID
+TimedWaitForApFinish (
+  IN CPU_MP_DATA               *CpuMpData,
+  IN UINT32                    FinishedApLimit,
+  IN UINT32                    TimeLimit
+  )
+{
+  //
+  // CalculateTimeout() and CheckTimeout() consider a TimeLimit of 0
+  // "infinity", so check for (TimeLimit == 0) explicitly.
+  //
+  if (TimeLimit == 0) {
+    return;
+  }
+
+  CpuMpData->TotalTime = 0;
+  CpuMpData->ExpectedTime = CalculateTimeout (
+                              TimeLimit,
+                              &CpuMpData->CurrentTime
+                              );
+  while (CpuMpData->FinishedCount < FinishedApLimit &&
+         !CheckTimeout (
+            &CpuMpData->CurrentTime,
+            &CpuMpData->TotalTime,
+            CpuMpData->ExpectedTime
+            )) {
+    CpuPause ();
+  }
+
+  if (CpuMpData->FinishedCount >= FinishedApLimit) {
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "%a: reached FinishedApLimit=%u in %Lu microseconds\n",
+      __FUNCTION__,
+      FinishedApLimit,
+      DivU64x64Remainder (
+        MultU64x32 (CpuMpData->TotalTime, 1000000),
+        GetPerformanceCounterProperties (NULL, NULL),
+        NULL
+        )
+      ));
+  }
 }
 
 /**
