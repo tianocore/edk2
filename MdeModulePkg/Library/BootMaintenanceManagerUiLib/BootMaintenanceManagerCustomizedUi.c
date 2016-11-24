@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #include <Uefi.h>
+#include <Guid/HiiBootMaintenanceFormset.h>
 #include <Protocol/HiiConfigAccess.h>
 #include "BootMaintenanceManagerCustomizedUiSupport.h"
 
