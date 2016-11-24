@@ -24,17 +24,19 @@
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          6
 
 // DDR attributes
-#define DDR_ATTRIBUTES_CACHED           ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
-#define DDR_ATTRIBUTES_UNCACHED         ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED
+#define DDR_ATTRIBUTES_CACHED   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
+#define DDR_ATTRIBUTES_UNCACHED ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED
 
 /**
   Return the Virtual Memory Map of your platform
 
-  This Virtual Memory Map is used by MemoryInitPei Module to initialize the MMU on your platform.
+  This Virtual Memory Map is used by MemoryInitPei Module to initialize
+  the MMU on your platform.
 
-  @param[out]   VirtualMemoryMap    Array of ARM_MEMORY_REGION_DESCRIPTOR describing a Physical-to-
-                                    Virtual Memory mapping. This array must be ended by a zero-filled
-                                    entry
+  @param[out]   VirtualMemoryMap    Array of ARM_MEMORY_REGION_DESCRIPTOR
+                                    describing a Physical-to-Virtual Memory
+                                    mapping. This array must be ended by a
+                                    zero-filled entry.
 
 **/
 VOID
@@ -59,12 +61,12 @@ ArmPlatformGetVirtualMemoryMap (
     HasSparseMemory = TRUE;
 
     ResourceAttributes =
-        EFI_RESOURCE_ATTRIBUTE_PRESENT |
-        EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-        EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-        EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-        EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-        EFI_RESOURCE_ATTRIBUTE_TESTED;
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_TESTED;
 
     // Declared the additional DRAM from 2GB to 4GB
     SparseMemoryBase = 0x0880000000;
@@ -81,77 +83,66 @@ ArmPlatformGetVirtualMemoryMap (
     SparseMemorySize = 0x0;
   }
 
-  VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR*)AllocatePages(EFI_SIZE_TO_PAGES (sizeof(ARM_MEMORY_REGION_DESCRIPTOR) * MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS));
+  VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR*)
+    AllocatePages (EFI_SIZE_TO_PAGES (sizeof(ARM_MEMORY_REGION_DESCRIPTOR)
+                                      * MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS));
   if (VirtualMemoryTable == NULL) {
-      return;
+    return;
   }
 
-  if (FeaturePcdGet(PcdCacheEnable) == TRUE) {
-      CacheAttributes = DDR_ATTRIBUTES_CACHED;
-  } else {
-      CacheAttributes = DDR_ATTRIBUTES_UNCACHED;
-  }
+  CacheAttributes = (FeaturePcdGet(PcdCacheEnable))
+                    ? DDR_ATTRIBUTES_CACHED
+                    : DDR_ATTRIBUTES_UNCACHED;
 
   // ReMap (Either NOR Flash or DRAM)
   VirtualMemoryTable[Index].PhysicalBase = ARM_VE_REMAP_BASE;
-  VirtualMemoryTable[Index].VirtualBase  = ARM_VE_REMAP_BASE;
-  VirtualMemoryTable[Index].Length       = ARM_VE_REMAP_SZ;
-
-  if (FeaturePcdGet(PcdNorFlashRemapping) == FALSE) {
-    // Map the NOR Flash as Secure Memory
-    if (FeaturePcdGet(PcdCacheEnable) == TRUE) {
-      VirtualMemoryTable[Index].Attributes   = DDR_ATTRIBUTES_CACHED;
-    } else {
-      VirtualMemoryTable[Index].Attributes   = DDR_ATTRIBUTES_UNCACHED;
-    }
-  } else {
-    // DRAM mapping
-    VirtualMemoryTable[Index].Attributes   = CacheAttributes;
-  }
+  VirtualMemoryTable[Index].VirtualBase = ARM_VE_REMAP_BASE;
+  VirtualMemoryTable[Index].Length = ARM_VE_REMAP_SZ;
+  VirtualMemoryTable[Index].Attributes = CacheAttributes;
 
   // DDR
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_DRAM_BASE;
-  VirtualMemoryTable[Index].VirtualBase  = ARM_VE_DRAM_BASE;
-  VirtualMemoryTable[Index].Length       = ARM_VE_DRAM_SZ;
-  VirtualMemoryTable[Index].Attributes   = CacheAttributes;
+  VirtualMemoryTable[Index].VirtualBase = ARM_VE_DRAM_BASE;
+  VirtualMemoryTable[Index].Length = ARM_VE_DRAM_SZ;
+  VirtualMemoryTable[Index].Attributes = CacheAttributes;
 
   // CPU peripherals. TRM. Manual says not all of them are implemented.
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_ON_CHIP_PERIPH_BASE;
-  VirtualMemoryTable[Index].VirtualBase  = ARM_VE_ON_CHIP_PERIPH_BASE;
-  VirtualMemoryTable[Index].Length       = ARM_VE_ON_CHIP_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+  VirtualMemoryTable[Index].VirtualBase = ARM_VE_ON_CHIP_PERIPH_BASE;
+  VirtualMemoryTable[Index].Length = ARM_VE_ON_CHIP_PERIPH_SZ;
+  VirtualMemoryTable[Index].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // SMB CS0-CS1 - NOR Flash 1 & 2
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_NOR0_BASE;
-  VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_NOR0_BASE;
-  VirtualMemoryTable[Index].Length       = ARM_VE_SMB_NOR0_SZ + ARM_VE_SMB_NOR1_SZ;
-  VirtualMemoryTable[Index].Attributes   = CacheAttributes;
+  VirtualMemoryTable[Index].VirtualBase = ARM_VE_SMB_NOR0_BASE;
+  VirtualMemoryTable[Index].Length = ARM_VE_SMB_NOR0_SZ + ARM_VE_SMB_NOR1_SZ;
+  VirtualMemoryTable[Index].Attributes = CacheAttributes;
 
   // SMB CS2 - SRAM
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_SRAM_BASE;
-  VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_SRAM_BASE;
-  VirtualMemoryTable[Index].Length       = ARM_VE_SMB_SRAM_SZ;
-  VirtualMemoryTable[Index].Attributes   = CacheAttributes;
+  VirtualMemoryTable[Index].VirtualBase = ARM_VE_SMB_SRAM_BASE;
+  VirtualMemoryTable[Index].Length = ARM_VE_SMB_SRAM_SZ;
+  VirtualMemoryTable[Index].Attributes = CacheAttributes;
 
   // Peripheral CS2 and CS3
   VirtualMemoryTable[++Index].PhysicalBase = ARM_VE_SMB_PERIPH_BASE;
-  VirtualMemoryTable[Index].VirtualBase  = ARM_VE_SMB_PERIPH_BASE;
-  VirtualMemoryTable[Index].Length       = 2 * ARM_VE_SMB_PERIPH_SZ;
-  VirtualMemoryTable[Index].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+  VirtualMemoryTable[Index].VirtualBase = ARM_VE_SMB_PERIPH_BASE;
+  VirtualMemoryTable[Index].Length = 2 * ARM_VE_SMB_PERIPH_SZ;
+  VirtualMemoryTable[Index].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // Map sparse memory region if present
   if (HasSparseMemory) {
     VirtualMemoryTable[++Index].PhysicalBase = SparseMemoryBase;
-    VirtualMemoryTable[Index].VirtualBase    = SparseMemoryBase;
-    VirtualMemoryTable[Index].Length         = SparseMemorySize;
-    VirtualMemoryTable[Index].Attributes     = CacheAttributes;
+    VirtualMemoryTable[Index].VirtualBase = SparseMemoryBase;
+    VirtualMemoryTable[Index].Length = SparseMemorySize;
+    VirtualMemoryTable[Index].Attributes = CacheAttributes;
   }
 
   // End of Table
   VirtualMemoryTable[++Index].PhysicalBase = 0;
-  VirtualMemoryTable[Index].VirtualBase  = 0;
-  VirtualMemoryTable[Index].Length       = 0;
-  VirtualMemoryTable[Index].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)0;
+  VirtualMemoryTable[Index].VirtualBase = 0;
+  VirtualMemoryTable[Index].Length = 0;
+  VirtualMemoryTable[Index].Attributes = (ARM_MEMORY_REGION_ATTRIBUTES)0;
 
   *VirtualMemoryMap = VirtualMemoryTable;
 }
