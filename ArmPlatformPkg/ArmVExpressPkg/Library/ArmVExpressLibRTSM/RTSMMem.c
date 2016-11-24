@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2016, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -21,7 +21,7 @@
 #include <ArmPlatform.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          6
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          8
 
 // DDR attributes
 #define DDR_ATTRIBUTES_CACHED   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
@@ -144,5 +144,6 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].Length = 0;
   VirtualMemoryTable[Index].Attributes = (ARM_MEMORY_REGION_ATTRIBUTES)0;
 
+  ASSERT (Index < MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
   *VirtualMemoryMap = VirtualMemoryTable;
 }
