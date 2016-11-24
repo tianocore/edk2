@@ -1006,3 +1006,72 @@
                                                                                                    "TRUE  - All PCI MMIO BARs of a device will be located below 4 GB if it has an option ROM.<BR>"
                                                                                                    "FALSE - PCI MMIO BARs of a device may be located above 4 GB even if it has an option ROM.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdStatusCodeSubClassCapsule_PROMPT  #language en-US "Status Code for Capsule subclass definitions"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdStatusCodeSubClassCapsule_HELP  #language en-US "Status Code for Capsule subclass definitions.<BR><BR>\n"
+                                                                                              "EFI_OEM_SPECIFIC_SUBCLASS_CAPSULE  = 0x00810000<BR>\n"
+                                                                                              "NOTE: The default value of this PCD may collide with other OEM specific status codes.\n"
+                                                                                              "Override the value of this PCD in the platform DSC file as needed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeProcessCapsulesBegin_PROMPT  #language en-US "Status Code for Capsule Process Begin"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeProcessCapsulesBegin_HELP  #language en-US "Status Code for Capsule Process Begin.<BR><BR>\n"
+                                                                                                          "EFI_CAPSULE_PROCESS_CAPSULES_BEGIN  = (EFI_OEM_SPECIFIC | 0x00000001) = 0x00008001<BR>\n"
+                                                                                                          "NOTE: The default value of this PCD may collide with other OEM specific status codes.\n"
+                                                                                                          "Override the value of this PCD in the platform DSC file as needed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeProcessCapsulesEnd_PROMPT  #language en-US "Status Code for Capsule Process End"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeProcessCapsulesEnd_HELP  #language en-US "Status Code for Capsule Process End.<BR><BR>\n"
+                                                                                                        "EFI_CAPSULE_PROCESS_CAPSULES_END    = (EFI_OEM_SPECIFIC | 0x00000002) = 0x00008002<BR>\n"
+                                                                                                        "NOTE: The default value of this PCD may collide with other OEM specific status codes.\n"
+                                                                                                        "Override the value of this PCD in the platform DSC file as needed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeUpdatingFirmware_PROMPT  #language en-US "Status Code for Capsule Process Updating Firmware"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeUpdatingFirmware_HELP  #language en-US "Status Code for Capsule Process Updating Firmware.<BR><BR>\n"
+                                                                                                      "EFI_CAPSULE_UPDATING_FIRMWARE       = (EFI_OEM_SPECIFIC | 0x00000003) = 0x00008003<BR>\n"
+                                                                                                      "NOTE: The default value of this PCD may collide with other OEM specific status codes.\n"
+                                                                                                      "Override the value of this PCD in the platform DSC file as needed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeUpdateFirmwareSuccess_PROMPT  #language en-US "Status Code for Capsule Process Update Firmware Success"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeUpdateFirmwareSuccess_HELP  #language en-US "Status Code for Capsule Process Update Firmware Success.<BR><BR>\n"
+                                                                                                           "EFI_CAPSULE_UPDATE_FIRMWARE_SUCCESS = (EFI_OEM_SPECIFIC | 0x00000004) = 0x00008004<BR>\n"
+                                                                                                           "NOTE: The default value of this PCD may collide with other OEM specific status codes.\n"
+                                                                                                           "Override the value of this PCD in the platform DSC file as needed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeUpdateFirmwareFailed_PROMPT  #language en-US "Status Code for Capsule Process Update Firmware Failed"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeUpdateFirmwareFailed_HELP  #language en-US "Status Code for Capsule Process Update Firmware Failed.<BR><BR>\n"
+                                                                                                          "EFI_CAPSULE_UPDATE_FIRMWARE_FAILED  = (EFI_OEM_SPECIFIC | 0x00000005) = 0x00008005<BR>\n"
+                                                                                                          "NOTE: The default value of this PCD may collide with other OEM specific status codes.\n"
+                                                                                                          "Override the value of this PCD in the platform DSC file as needed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeResettingSystem_PROMPT  #language en-US "Status Code for Capsule Resetting System"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleStatusCodeResettingSystem_HELP  #language en-US "Status Code for Capsule Resetting System.<BR><BR>\n"
+                                                                                                     "EFI_CAPSULE_RESETTING_SYSTEM        = (EFI_OEM_SPECIFIC | 0x00000006) = 0x00008006<BR>\n"
+                                                                                                     "NOTE: The default value of this PCD may collide with other OEM specific status codes.\n"
+                                                                                                     "Override the value of this PCD in the platform DSC file as needed."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleMax_PROMPT  #language en-US "CapsuleMax value in capsule report variable."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleMax_HELP  #language en-US "CapsuleMax value in capsule report variable."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRecoveryFileName_PROMPT  #language en-US "Recover file name in PEI phase"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRecoveryFileName_HELP  #language en-US "This is recover file name in PEI phase.\n"
+                                                                                     "The file must be in the root directory.\n"
+                                                                                     "The file name must be the 8.3 format.\n"
+                                                                                     "The PCD data must be in UNICODE format."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSystemFmpCapsuleImageTypeIdGuid_PROMPT  #language en-US "A list of system FMP ImageTypeId GUIDs"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSystemFmpCapsuleImageTypeIdGuid_HELP  #language en-US "This PCD hold a list GUIDs for the ImageTypeId to indicate the\n"
+                                                                                                    "FMP capsule is a system FMP."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTestKeyUsed_PROMPT  #language en-US "If there is any test key used by the platform."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdTestKeyUsed_HELP  #language en-US "This dynamic PCD holds the information if there is any test key used by the platform."
+

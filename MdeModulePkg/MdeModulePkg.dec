@@ -1674,6 +1674,7 @@
   #  The file must be in the root directory.
   #  The file name must be the 8.3 format.
   #  The PCD data must be in UNICODE format.
+  # @Prompt Recover file name in PEI phase
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"|VOID*|0x30001045
 
   ## This PCD hold a list GUIDs for the ImageTypeId to indicate the
