@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2016, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1587,6 +1587,7 @@ Returns:
       // get function name, function name is followed by char 0x09.
       //
       FieldBuffer = AsciiStrGetNewTokenField (LineBuffer, Char);
+      ASSERT (FieldBuffer != NULL);
       if (AsciiStriCmp (FieldBuffer, Name) == 0) {
         BufferStart = FieldBuffer;
         CodParseState = EdbEbcCodParseStateSymbolStart;
