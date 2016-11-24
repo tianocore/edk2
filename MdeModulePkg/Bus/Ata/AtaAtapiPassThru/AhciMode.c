@@ -1451,17 +1451,13 @@ AhciReset (
 {
   UINT64                 Delay;
   UINT32                 Value;
-  UINT32                 Capability;
 
   //
-  // Collect AHCI controller information
+  // Make sure that GHC.AE bit is set before accessing any AHCI registers.
   //
-  Capability = AhciReadReg (PciIo, EFI_AHCI_CAPABILITY_OFFSET);
-  
-  //
-  // Enable AE before accessing any AHCI registers if Supports AHCI Mode Only is not set
-  //
-  if ((Capability & EFI_AHCI_CAP_SAM) == 0) {
+  Value = AhciReadReg(PciIo, EFI_AHCI_GHC_OFFSET);
+
+  if ((Value & EFI_AHCI_GHC_ENABLE) == 0) {
     AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
   }
 
@@ -2252,6 +2248,7 @@ AhciModeInitialization (
   EFI_ATA_COLLECTIVE_MODE          *SupportedModes;
   EFI_ATA_TRANSFER_MODE            TransferMode;
   UINT32                           PhyDetectDelay;
+  UINT32                           Value;
 
   if (Instance == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2270,11 +2267,13 @@ AhciModeInitialization (
   // Collect AHCI controller information
   //
   Capability = AhciReadReg (PciIo, EFI_AHCI_CAPABILITY_OFFSET);
-  
+
   //
-  // Enable AE before accessing any AHCI registers if Supports AHCI Mode Only is not set
+  // Make sure that GHC.AE bit is set before accessing any AHCI registers.
   //
-  if ((Capability & EFI_AHCI_CAP_SAM) == 0) {
+  Value = AhciReadReg(PciIo, EFI_AHCI_GHC_OFFSET);
+
+  if ((Value & EFI_AHCI_GHC_ENABLE) == 0) {
     AhciOrReg (PciIo, EFI_AHCI_GHC_OFFSET, EFI_AHCI_GHC_ENABLE);
   }
 
