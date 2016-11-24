@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2016, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -461,6 +461,10 @@ Returns:
   // Get breakpoint index
   //
   Index = Atoi(CommandArg);
+  if (Index == (UINTN) -1) {
+    EDBPrint (L"BreakpointClear Argument error!\n");
+    return EFI_DEBUG_CONTINUE;
+  }
 
   if ((Index >= EFI_DEBUGGER_BREAKPOINT_MAX) ||
       (Index >= DebuggerPrivate->DebuggerBreakpointCount)) {
@@ -534,6 +538,10 @@ Returns:
   // Get breakpoint index
   //
   Index = Atoi(CommandArg);
+  if (Index == (UINTN) -1) {
+    EDBPrint (L"BreakpointDisable Argument error!\n");
+    return EFI_DEBUG_CONTINUE;
+  }
 
   //
   // Disable breakpoint
@@ -598,6 +606,10 @@ Returns:
   // Get breakpoint index
   //
   Index = Atoi(CommandArg);
+  if (Index == (UINTN) -1) {
+    EDBPrint (L"BreakpointEnable Argument error!\n");
+    return EFI_DEBUG_CONTINUE;
+  }
 
   //
   // Enable breakpoint
