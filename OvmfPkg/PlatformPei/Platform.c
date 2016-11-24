@@ -68,6 +68,7 @@ EFI_BOOT_MODE mBootMode = BOOT_WITH_FULL_CONFIGURATION;
 
 BOOLEAN mS3Supported = FALSE;
 
+UINT32 mMaxCpuCount;
 
 VOID
 AddIoMemoryBaseSizeHob (
@@ -568,6 +569,47 @@ S3Verification (
 
 
 /**
+  Fetch the number of boot CPUs from QEMU and expose it to UefiCpuPkg modules.
+  Set the mMaxCpuCount variable.
+**/
+VOID
+MaxCpuCountInitialization (
+  VOID
+  )
+{
+  UINT16        ProcessorCount;
+  RETURN_STATUS PcdStatus;
+
+  QemuFwCfgSelectItem (QemuFwCfgItemSmpCpuCount);
+  ProcessorCount = QemuFwCfgRead16 ();
+  //
+  // If the fw_cfg key or fw_cfg entirely is unavailable, load mMaxCpuCount
+  // from the PCD default. No change to PCDs.
+  //
+  if (ProcessorCount == 0) {
+    mMaxCpuCount = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+    return;
+  }
+  //
+  // Otherwise, set mMaxCpuCount to the value reported by QEMU.
+  //
+  mMaxCpuCount = ProcessorCount;
+  //
+  // Additionally, tell UefiCpuPkg modules (a) the exact number of VCPUs, (b)
+  // to wait, in the initial AP bringup, exactly as long as it takes for all of
+  // the APs to report in. For this, we set the longest representable timeout
+  // (approx. 71 minutes).
+  //
+  PcdStatus = PcdSet32S (PcdCpuMaxLogicalProcessorNumber, ProcessorCount);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (PcdCpuApInitTimeOutInMicroSeconds, MAX_UINT32);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  DEBUG ((DEBUG_INFO, "%a: QEMU reports %d processor(s)\n", __FUNCTION__,
+    ProcessorCount));
+}
+
+
+/**
   Perform Platform PEI initialization.
 
   @param  FileHandle      Handle of the file being invoked.
@@ -601,6 +643,7 @@ InitializePlatform (
   S3Verification ();
   BootModeInitialization ();
   AddressWidthInitialization ();
+  MaxCpuCountInitialization ();
 
   PublishPeiMemory ();
 

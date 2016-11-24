@@ -101,4 +101,6 @@ extern BOOLEAN mS3Supported;
 
 extern UINT8 mPhysMemAddressWidth;
 
+extern UINT32 mMaxCpuCount;
+
 #endif // _PLATFORM_PEI_H_INCLUDED_

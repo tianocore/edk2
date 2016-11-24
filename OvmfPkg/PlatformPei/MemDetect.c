@@ -358,7 +358,7 @@ PublishPeiMemory (
   //
   if (mS3Supported) {
     mS3AcpiReservedMemorySize = SIZE_512KB +
-      PcdGet32 (PcdCpuMaxLogicalProcessorNumber) *
+      mMaxCpuCount *
       PcdGet32 (PcdCpuApStackSize);
     mS3AcpiReservedMemoryBase = LowerMemorySize - mS3AcpiReservedMemorySize;
     LowerMemorySize = mS3AcpiReservedMemoryBase;

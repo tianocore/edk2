@@ -496,6 +496,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable|FALSE
 
+  # UefiCpuPkg PCDs related to initial AP bringup and general AP management.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|64
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.
