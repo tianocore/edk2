@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2016, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -882,7 +882,7 @@ Routine Description:
     return NULL;
   }
 
-  if (*Begin == L'\0') {
+  if (*Begin == '\0') {
     mAsciiFieldBuffer = NULL;
     return NULL;
   }
