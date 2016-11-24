@@ -1560,7 +1560,10 @@ class FdReport(object):
                 try:
                     PcdName, SkuId, Offset, Size, Value = Line.split("#")[0].split("|")
                     PcdName, SkuId, Offset, Size, Value = PcdName.strip(), SkuId.strip(), Offset.strip(), Size.strip(), Value.strip()
-                    Offset = '0x%08X' % (int(Offset, 16) + self.VPDBaseAddress)
+                    if Offset.lower().startswith('0x'):
+                        Offset = '0x%08X' % (int(Offset, 16) + self.VPDBaseAddress)
+                    else:
+                        Offset = '0x%08X' % (int(Offset, 10) + self.VPDBaseAddress)
                     self.VPDInfoList.append("%s | %s | %s | %s | %s" % (PcdName, SkuId, Offset, Size, Value))
                 except:
                     EdkLogger.error("BuildReport", CODE_ERROR, "Fail to parse VPD information file %s" % self.VpdFilePath)
