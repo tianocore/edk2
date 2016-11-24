@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2016, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -185,7 +185,7 @@ Returns:
   // Find the nearest symbol address
   //
   CandidateAddress = EbdFindSymbolAddress (Address, EdbMatchSymbolTypeNearestAddress, &Object, &Entry);
-  if (CandidateAddress == 0) {
+  if (CandidateAddress == 0 || CandidateAddress == (UINTN) -1) {
     EDBPrint (L"Symbole at Address not found!\n");
     return EFI_DEBUG_CONTINUE;
   } else if (Address != CandidateAddress) {
