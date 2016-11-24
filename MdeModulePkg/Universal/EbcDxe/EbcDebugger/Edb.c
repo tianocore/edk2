@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2007, Intel Corporation
+Copyright (c) 2007 - 2016, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -360,8 +360,8 @@ Returns:
   //
   // clear STEP flag in any condition.
   //
-  if (SystemContext.SystemContextEbc->Flags & VMFLAGS_STEP) {
-    SystemContext.SystemContextEbc->Flags &= ~VMFLAGS_STEP;
+  if (SystemContext.SystemContextEbc->Flags & ((UINT64) VMFLAGS_STEP)) {
+    SystemContext.SystemContextEbc->Flags &= ~((UINT64) VMFLAGS_STEP);
   }
 
   if (!Initialized) {
