@@ -867,6 +867,13 @@ SmiPFHandler (
       );
       CpuDeadLoop ();
     }
+    if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
+      DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
+      DEBUG_CODE (
+        DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
+      );
+      CpuDeadLoop ();
+    }
   }
 
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {

@@ -16,6 +16,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
 
+#define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
+  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
+
+EFI_MEMORY_DESCRIPTOR *mUefiMemoryMap;
+UINTN                 mUefiMemoryMapSize;
+UINTN                 mUefiDescriptorSize;
+
 PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
   {Page4K,  SIZE_4KB, PAGING_4K_ADDRESS_MASK_64},
   {Page2M,  SIZE_2MB, PAGING_2M_ADDRESS_MASK_64},
@@ -822,4 +829,267 @@ SetMemMapAttributes (
   PatchGdtIdtMap ();
 
   return ;
+}
+
+/**
+  Sort memory map entries based upon PhysicalStart, from low to high.
+
+  @param  MemoryMap              A pointer to the buffer in which firmware places
+                                 the current memory map.
+  @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
+  @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+**/
+STATIC
+VOID
+SortMemoryMap (
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  IN UINTN                      MemoryMapSize,
+  IN UINTN                      DescriptorSize
+  )
+{
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *NextMemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEnd;
+  EFI_MEMORY_DESCRIPTOR       TempMemoryMap;
+
+  MemoryMapEntry = MemoryMap;
+  NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + MemoryMapSize);
+  while (MemoryMapEntry < MemoryMapEnd) {
+    while (NextMemoryMapEntry < MemoryMapEnd) {
+      if (MemoryMapEntry->PhysicalStart > NextMemoryMapEntry->PhysicalStart) {
+        CopyMem (&TempMemoryMap, MemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
+        CopyMem (MemoryMapEntry, NextMemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
+        CopyMem (NextMemoryMapEntry, &TempMemoryMap, sizeof(EFI_MEMORY_DESCRIPTOR));
+      }
+
+      NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+    }
+
+    MemoryMapEntry      = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+    NextMemoryMapEntry  = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  }
+}
+
+/**
+  Return if a UEFI memory page should be marked as not present in SMM page table.
+  If the memory map entries type is
+  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
+  EfiUnusableMemory, EfiACPIReclaimMemory, return TRUE.
+  Or return FALSE.
+
+  @param[in]  MemoryMap              A pointer to the memory descriptor.
+
+  @return TRUE  The memory described will be marked as not present in SMM page table.
+  @return FALSE The memory described will not be marked as not present in SMM page table.
+**/
+BOOLEAN
+IsUefiPageNotPresent (
+  IN EFI_MEMORY_DESCRIPTOR  *MemoryMap
+  )
+{
+  switch (MemoryMap->Type) {
+  case EfiLoaderCode:
+  case EfiLoaderData:
+  case EfiBootServicesCode:
+  case EfiBootServicesData:
+  case EfiConventionalMemory:
+  case EfiUnusableMemory:
+  case EfiACPIReclaimMemory:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+/**
+  Merge continous memory map entries whose type is
+  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
+  EfiUnusableMemory, EfiACPIReclaimMemory, because the memory described by
+  these entries will be set as NOT present in SMM page table.
+
+  @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
+                                          the current memory map.
+  @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
+                                          MemoryMap buffer. On input, this is the size of
+                                          the current memory map.  On output,
+                                          it is the size of new memory map after merge.
+  @param[in]       DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+**/
+STATIC
+VOID
+MergeMemoryMapForNotPresentEntry (
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  IN OUT UINTN                  *MemoryMapSize,
+  IN UINTN                      DescriptorSize
+  )
+{
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEnd;
+  UINT64                      MemoryBlockLength;
+  EFI_MEMORY_DESCRIPTOR       *NewMemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *NextMemoryMapEntry;
+
+  MemoryMapEntry = MemoryMap;
+  NewMemoryMapEntry = MemoryMap;
+  MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + *MemoryMapSize);
+  while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
+    CopyMem (NewMemoryMapEntry, MemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
+    NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+
+    do {
+      MemoryBlockLength = (UINT64) (EFI_PAGES_TO_SIZE((UINTN)MemoryMapEntry->NumberOfPages));
+      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
+          IsUefiPageNotPresent(MemoryMapEntry) && IsUefiPageNotPresent(NextMemoryMapEntry) &&
+          ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart)) {
+        MemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        if (NewMemoryMapEntry != MemoryMapEntry) {
+          NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        }
+
+        NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        continue;
+      } else {
+        MemoryMapEntry = PREVIOUS_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        break;
+      }
+    } while (TRUE);
+
+    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+    NewMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NewMemoryMapEntry, DescriptorSize);
+  }
+
+  *MemoryMapSize = (UINTN)NewMemoryMapEntry - (UINTN)MemoryMap;
+
+  return ;
+}
+
+/**
+  This function caches the UEFI memory map information.
+**/
+VOID
+GetUefiMemoryMap (
+  VOID
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 MapKey;
+  UINT32                DescriptorVersion;
+  EFI_MEMORY_DESCRIPTOR *MemoryMap;
+  UINTN                 UefiMemoryMapSize;
+
+  DEBUG ((DEBUG_INFO, "GetUefiMemoryMap\n"));
+
+  UefiMemoryMapSize = 0;
+  MemoryMap = NULL;
+  Status = gBS->GetMemoryMap (
+                  &UefiMemoryMapSize,
+                  MemoryMap,
+                  &MapKey,
+                  &mUefiDescriptorSize,
+                  &DescriptorVersion
+                  );
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+
+  do {
+    Status = gBS->AllocatePool (EfiBootServicesData, UefiMemoryMapSize, (VOID **)&MemoryMap);
+    ASSERT (MemoryMap != NULL);
+    if (MemoryMap == NULL) {
+      return ;
+    }
+
+    Status = gBS->GetMemoryMap (
+                    &UefiMemoryMapSize,
+                    MemoryMap,
+                    &MapKey,
+                    &mUefiDescriptorSize,
+                    &DescriptorVersion
+                    );
+    if (EFI_ERROR (Status)) {
+      gBS->FreePool (MemoryMap);
+      MemoryMap = NULL;
+    }
+  } while (Status == EFI_BUFFER_TOO_SMALL);
+
+  SortMemoryMap (MemoryMap, UefiMemoryMapSize, mUefiDescriptorSize);
+  MergeMemoryMapForNotPresentEntry (MemoryMap, &UefiMemoryMapSize, mUefiDescriptorSize);
+
+  mUefiMemoryMapSize = UefiMemoryMapSize;
+  mUefiMemoryMap = AllocateCopyPool (UefiMemoryMapSize, MemoryMap);
+  ASSERT (mUefiMemoryMap != NULL);
+
+  gBS->FreePool (MemoryMap);
+}
+
+/**
+  This function sets UEFI memory attribute according to UEFI memory map.
+
+  The normal memory region is marked as not present, such as
+  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
+  EfiUnusableMemory, EfiACPIReclaimMemory.
+**/
+VOID
+SetUefiMemMapAttributes (
+  VOID
+  )
+{
+  EFI_MEMORY_DESCRIPTOR *MemoryMap;
+  UINTN                 MemoryMapEntryCount;
+  UINTN                 Index;
+
+  DEBUG ((DEBUG_INFO, "SetUefiMemMapAttributes\n"));
+
+  if (mUefiMemoryMap == NULL) {
+    DEBUG ((DEBUG_INFO, "UefiMemoryMap - NULL\n"));
+    return ;
+  }
+
+  MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
+  MemoryMap = mUefiMemoryMap;
+  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
+    if (IsUefiPageNotPresent(MemoryMap)) {
+      DEBUG ((DEBUG_INFO, "UefiMemory protection: 0x%lx - 0x%lx\n", MemoryMap->PhysicalStart, MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages)));
+      SmmSetMemoryAttributes (
+        MemoryMap->PhysicalStart,
+        EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages),
+        EFI_MEMORY_RP
+        );
+    }
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mUefiDescriptorSize);
+  }
+
+  //
+  // Do free mUefiMemoryMap, it will be checked in IsSmmCommBufferForbiddenAddress().
+  //
+}
+
+/**
+  Return if the Address is forbidden as SMM communication buffer.
+
+  @param[in] Address the address to be checked
+
+  @return TRUE  The address is forbidden as SMM communication buffer.
+  @return FALSE The address is allowed as SMM communication buffer.
+**/
+BOOLEAN
+IsSmmCommBufferForbiddenAddress (
+  IN UINT64  Address
+  )
+{
+  EFI_MEMORY_DESCRIPTOR *MemoryMap;
+  UINTN                 MemoryMapEntryCount;
+  UINTN                 Index;
+
+  MemoryMap = mUefiMemoryMap;
+  MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
+  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
+    if (IsUefiPageNotPresent (MemoryMap)) {
+      if ((Address >= MemoryMap->PhysicalStart) &&
+          (Address < MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages)) ) {
+        return TRUE;
+      }
+    }
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mUefiDescriptorSize);
+  }
+  return FALSE;
 }

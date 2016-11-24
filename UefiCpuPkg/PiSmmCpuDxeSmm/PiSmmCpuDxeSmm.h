@@ -839,6 +839,35 @@ SetMemMapAttributes (
   );
 
 /**
+  This function sets UEFI memory attribute according to UEFI memory map.
+**/
+VOID
+SetUefiMemMapAttributes (
+  VOID
+  );
+
+/**
+  Return if the Address is forbidden as SMM communication buffer.
+
+  @param[in] Address the address to be checked
+
+  @return TRUE  The address is forbidden as SMM communication buffer.
+  @return FALSE The address is allowed as SMM communication buffer.
+**/
+BOOLEAN
+IsSmmCommBufferForbiddenAddress (
+  IN UINT64  Address
+  );
+
+/**
+  This function caches the UEFI memory map information.
+**/
+VOID
+GetUefiMemoryMap (
+  VOID
+  );
+
+/**
   This function sets memory attribute for page table.
 **/
 VOID

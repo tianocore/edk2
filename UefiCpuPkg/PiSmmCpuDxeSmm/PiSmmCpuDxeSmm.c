@@ -504,6 +504,11 @@ SmmReadyToLockEventNotify (
   GetAcpiCpuData ();
 
   //
+  // Cache a copy of UEFI memory map before we start profiling feature.
+  //
+  GetUefiMemoryMap ();
+
+  //
   // Set SMM ready to lock flag and return
   //
   mSmmReadyToLock = TRUE;
@@ -1154,17 +1159,6 @@ ConfigSmmCodeAccessCheck (
 }
 
 /**
-  Set code region to be read only and data region to be execute disable.
-**/
-VOID
-SetRegionAttributes (
-  VOID
-  )
-{
-  SetMemMapAttributes ();
-}
-
-/**
   This API provides a way to allocate memory for page table.
 
   This API can be called more once to allocate memory for page tables.
@@ -1320,7 +1314,12 @@ PerformRemainingTasks (
     //
     // Mark critical region to be read-only in page table
     //
-    SetRegionAttributes ();
+    SetMemMapAttributes ();
+
+    //
+    // For outside SMRAM, we only map SMM communication buffer or MMIO.
+    //
+    SetUefiMemMapAttributes ();
 
     //
     // Set page table itself to be read-only
