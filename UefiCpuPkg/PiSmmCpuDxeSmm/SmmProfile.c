@@ -139,7 +139,7 @@ GetCpuIndex (
 
   ApicId = GetApicId ();
 
-  for (Index = 0; Index < PcdGet32 (PcdCpuMaxLogicalProcessorNumber); Index++) {
+  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     if (gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId == ApicId) {
       return Index;
     }
@@ -825,13 +825,13 @@ InitSmmProfileInternal (
   UINTN                      MsrDsAreaSizePerCpu;
   UINTN                      TotalSize;
 
-  mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
   ASSERT (mPFEntryCount != NULL);
   mLastPFEntryValue = (UINT64  (*)[MAX_PF_ENTRY_COUNT])AllocateZeroPool (
-                                                         sizeof (mLastPFEntryValue[0]) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+                                                         sizeof (mLastPFEntryValue[0]) * mMaxNumberOfCpus);
   ASSERT (mLastPFEntryValue != NULL);
   mLastPFEntryPointer = (UINT64 *(*)[MAX_PF_ENTRY_COUNT])AllocateZeroPool (
-                                                           sizeof (mLastPFEntryPointer[0]) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+                                                           sizeof (mLastPFEntryPointer[0]) * mMaxNumberOfCpus);
   ASSERT (mLastPFEntryPointer != NULL);
 
   //
@@ -872,17 +872,17 @@ InitSmmProfileInternal (
   mSmmProfileBase->NumCpus        = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
 
   if (mBtsSupported) {
-    mMsrDsArea = (MSR_DS_AREA_STRUCT **)AllocateZeroPool (sizeof (MSR_DS_AREA_STRUCT *) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+    mMsrDsArea = (MSR_DS_AREA_STRUCT **)AllocateZeroPool (sizeof (MSR_DS_AREA_STRUCT *) * mMaxNumberOfCpus);
     ASSERT (mMsrDsArea != NULL);
-    mMsrBTSRecord = (BRANCH_TRACE_RECORD **)AllocateZeroPool (sizeof (BRANCH_TRACE_RECORD *) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+    mMsrBTSRecord = (BRANCH_TRACE_RECORD **)AllocateZeroPool (sizeof (BRANCH_TRACE_RECORD *) * mMaxNumberOfCpus);
     ASSERT (mMsrBTSRecord != NULL);
-    mMsrPEBSRecord = (PEBS_RECORD **)AllocateZeroPool (sizeof (PEBS_RECORD *) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+    mMsrPEBSRecord = (PEBS_RECORD **)AllocateZeroPool (sizeof (PEBS_RECORD *) * mMaxNumberOfCpus);
     ASSERT (mMsrPEBSRecord != NULL);
 
     mMsrDsAreaBase  = (MSR_DS_AREA_STRUCT *)((UINTN)Base + mSmmProfileSize);
-    MsrDsAreaSizePerCpu = mMsrDsAreaSize / PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+    MsrDsAreaSizePerCpu = mMsrDsAreaSize / mMaxNumberOfCpus;
     mBTSRecordNumber    = (MsrDsAreaSizePerCpu - sizeof(PEBS_RECORD) * PEBS_RECORD_NUMBER - sizeof(MSR_DS_AREA_STRUCT)) / sizeof(BRANCH_TRACE_RECORD);
-    for (Index = 0; Index < PcdGet32 (PcdCpuMaxLogicalProcessorNumber); Index++) {
+    for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
       mMsrDsArea[Index]     = (MSR_DS_AREA_STRUCT *)((UINTN)mMsrDsAreaBase + MsrDsAreaSizePerCpu * Index);
       mMsrBTSRecord[Index]  = (BRANCH_TRACE_RECORD *)((UINTN)mMsrDsArea[Index] + sizeof(MSR_DS_AREA_STRUCT));
       mMsrPEBSRecord[Index] = (PEBS_RECORD *)((UINTN)mMsrDsArea[Index] + MsrDsAreaSizePerCpu - sizeof(PEBS_RECORD) * PEBS_RECORD_NUMBER);

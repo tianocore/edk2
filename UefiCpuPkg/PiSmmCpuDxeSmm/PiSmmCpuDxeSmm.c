@@ -344,7 +344,7 @@ SmmInitHandler (
   AsmWriteIdtr (&gcSmiIdtr);
   ApicId = GetApicId ();
 
-  ASSERT (mNumberOfCpus <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  ASSERT (mNumberOfCpus <= mMaxNumberOfCpus);
 
   for (Index = 0; Index < mNumberOfCpus; Index++) {
     if (ApicId == (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
