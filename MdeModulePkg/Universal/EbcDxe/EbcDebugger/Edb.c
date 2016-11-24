@@ -27,6 +27,10 @@ EFI_DEBUGGER_PRIVATE_DATA mDebuggerPrivate = {
     EBC_DEBUGGER_MINOR_VERSION,              // EfiDebuggerRevision
   (VM_MAJOR_VERSION << 16) |
     VM_MINOR_VERSION,                        // EbcVmRevision
+  {
+    EFI_DEBUGGER_CONFIGURATION_VERSION,
+    &mDebuggerPrivate,
+  },                                         // DebuggerConfiguration
   NULL,                                      // DebugImageInfoTableHeader
   NULL,                                      // Vol
   NULL,                                      // PciRootBridgeIo

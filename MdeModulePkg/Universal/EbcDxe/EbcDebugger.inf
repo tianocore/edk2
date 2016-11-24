@@ -102,6 +102,7 @@
 [Protocols]
   gEfiDebugSupportProtocolGuid                  ## PRODUCES
   gEfiEbcProtocolGuid                           ## PRODUCES
+  gEfiDebuggerConfigurationProtocolGuid         ## PRODUCES
   gEfiEbcVmTestProtocolGuid                     ## SOMETIMES_PRODUCES
   gEfiEbcSimpleDebuggerProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiPciRootBridgeIoProtocolGuid               ## SOMETIMES_CONSUMES

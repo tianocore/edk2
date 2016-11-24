@@ -30,9 +30,11 @@ Abstract:
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/Ebc.h>
+#include <Protocol/EbcVmTest.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/SimpleFileSystem.h>
+#include <Protocol/DebuggerConfiguration.h>
 #include <Guid/FileInfo.h>
 #include <Guid/FileSystemInfo.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
@@ -227,6 +229,7 @@ typedef struct _EFI_DEBUGGER_PRIVATE_DATA {
   EFI_INSTRUCTION_SET_ARCHITECTURE            Isa;
   UINT32                                      EfiDebuggerRevision;
   UINT32                                      EbcVmRevision;
+  EFI_DEBUGGER_CONFIGURATION_PROTOCOL         DebuggerConfiguration;
   EFI_DEBUG_IMAGE_INFO_TABLE_HEADER           *DebugImageInfoTableHeader;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL             *Vol;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL             *PciRootBridgeIo;

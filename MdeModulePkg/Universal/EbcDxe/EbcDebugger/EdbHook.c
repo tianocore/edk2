@@ -448,6 +448,17 @@ Returns:
              );
 
   //
+  // Register Debugger Configuration Protocol, for config in shell
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &Handle,
+                  &gEfiDebuggerConfigurationProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mDebuggerPrivate.DebuggerConfiguration
+                  );
+
+  //
+  //
   // Create break event
   //
   Status = gBS->CreateEvent (

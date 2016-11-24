@@ -432,6 +432,7 @@
   MdeModulePkg/Universal/DebugSupportDxe/DebugSupportDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDebugger.inf
+  MdeModulePkg/Universal/EbcDxe/EbcDebuggerConfig.inf
 
 [Components.IA32, Components.X64, Components.Ebc]
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
