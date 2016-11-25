@@ -1,7 +1,7 @@
 /** @file
   FormDiplay protocol to show Form
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -58,6 +58,7 @@ extern CHAR16            *gMiniString;
 extern CHAR16            *gOptionMismatch;
 extern CHAR16            *gFormSuppress;
 extern CHAR16            *gProtocolNotFound;
+extern CHAR16            *gPasswordUnsupported;
 
 extern CHAR16            gPromptBlockWidth;
 extern CHAR16            gOptionBlockWidth;
