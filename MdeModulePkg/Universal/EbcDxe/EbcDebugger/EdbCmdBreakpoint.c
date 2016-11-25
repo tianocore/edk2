@@ -439,8 +439,6 @@ Returns:
 {
   UINTN      Index;
   EFI_STATUS Status;
-  UINTN      Address;
-  UINT16     OldInstruction;
 
   if (CommandArg == NULL) {
     EDBPrint (L"BreakpointClear Argument error!\n");
@@ -470,9 +468,6 @@ Returns:
       (Index >= DebuggerPrivate->DebuggerBreakpointCount)) {
     EDBPrint (L"BreakpointClear error!\n");
     return EFI_DEBUG_CONTINUE;
-  } else {
-    Address = (UINTN)DebuggerPrivate->DebuggerBreakpointContext[Index].BreakpointAddress;
-    OldInstruction = (UINT16)DebuggerPrivate->DebuggerBreakpointContext[Index].OldInstruction;
   }
 
   //

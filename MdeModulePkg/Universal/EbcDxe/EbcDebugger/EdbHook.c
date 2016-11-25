@@ -457,11 +457,13 @@ Returns:
                   NULL,
                   &mDebuggerPrivate.BreakEvent
                   );
-  Status = gBS->SetTimer (
-                  mDebuggerPrivate.BreakEvent,
-                  TimerPeriodic,
-                  EFI_DEBUG_BREAK_TIMER_INTERVAL
-                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->SetTimer (
+                    mDebuggerPrivate.BreakEvent,
+                    TimerPeriodic,
+                    EFI_DEBUG_BREAK_TIMER_INTERVAL
+                    );
+  }
 
   return ;
 }
@@ -493,7 +495,9 @@ Returns:
   //
   // Close the break event
   //
-  gBS->CloseEvent (mDebuggerPrivate.BreakEvent);
+  if (mDebuggerPrivate.BreakEvent != NULL) {
+    gBS->CloseEvent (mDebuggerPrivate.BreakEvent);
+  }
 
   //
   // Clean up the symbol

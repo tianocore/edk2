@@ -194,7 +194,6 @@ Returns:
 {
   UINT64   Address;
   UINTN    Index;
-  UINT16   OldInstruction;
   BOOLEAN  IsHitBreakpoint;
 
   //
@@ -209,7 +208,6 @@ Returns:
   for (Index = 0; (Index < DebuggerPrivate->DebuggerBreakpointCount) && (Index < EFI_DEBUGGER_BREAKPOINT_MAX); Index++) {
     if ((DebuggerPrivate->DebuggerBreakpointContext[Index].BreakpointAddress == Address) &&
         (DebuggerPrivate->DebuggerBreakpointContext[Index].State)) {
-      OldInstruction = (UINT16)DebuggerPrivate->DebuggerBreakpointContext[Index].OldInstruction;
       IsHitBreakpoint = TRUE;
       break;
     }
@@ -244,7 +242,6 @@ Returns:
     for (Index = 0; (Index < DebuggerPrivate->DebuggerBreakpointCount) && (Index < EFI_DEBUGGER_BREAKPOINT_MAX); Index++) {
       if ((DebuggerPrivate->DebuggerBreakpointContext[Index].BreakpointAddress == Address) &&
           (DebuggerPrivate->DebuggerBreakpointContext[Index].State)) {
-        OldInstruction = (UINT16)DebuggerPrivate->DebuggerBreakpointContext[Index].OldInstruction;
         IsHitBreakpoint = TRUE;
         break;
       }

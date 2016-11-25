@@ -193,7 +193,6 @@ Returns:
 {
   CHAR8                      *LineBuffer;
   CHAR8                      *FieldBuffer;
-  EFI_DEBUGGER_SYMBOL_ENTRY  *Entry;
   EDB_EBC_MAP_PARSE_STATE    MapParseState;
   EDB_EBC_SYMBOL_PARSE_STATE SymbolParseState;
   CHAR8                      *Name;
@@ -201,7 +200,6 @@ Returns:
   UINTN                      Address;
   EFI_DEBUGGER_SYMBOL_TYPE   Type;
 
-  Entry = Object->Entry;
 
   //
   // Begin to parse the Buffer
