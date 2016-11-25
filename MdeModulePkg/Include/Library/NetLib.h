@@ -523,6 +523,7 @@ extern IP4_ADDR gIp4AllMasks[IP4_MASK_NUM];
 extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 
 #define NET_IS_DIGIT(Ch)            (('0' <= (Ch)) && ((Ch) <= '9'))
+#define NET_IS_HEX(Ch)              ((('0' <= (Ch)) && ((Ch) <= '9')) || (('A' <= (Ch)) && ((Ch) <= 'F')) || (('a' <= (Ch)) && ((Ch) <= 'f')))
 #define NET_ROUNDUP(size, unit)     (((size) + (unit) - 1) & (~((unit) - 1)))
 #define NET_IS_LOWER_CASE_CHAR(Ch)  (('a' <= (Ch)) && ((Ch) <= 'z'))
 #define NET_IS_UPPER_CASE_CHAR(Ch)  (('A' <= (Ch)) && ((Ch) <= 'Z'))

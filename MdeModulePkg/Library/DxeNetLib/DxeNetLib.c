@@ -2832,6 +2832,17 @@ NetLibAsciiStrToIp6 (
     TempStr = Ip6Str;
 
     while ((*Ip6Str != '\0') && (*Ip6Str != ':')) {
+      if (Index != 14 && !NET_IS_HEX (*Ip6Str)) {
+        return EFI_INVALID_PARAMETER;
+      }
+      
+      //
+      // Allow the IPv6 with prefix case, e.g. 2000:aaaa::10/24 
+      //
+      if (Index == 14 && !NET_IS_HEX (*Ip6Str) && *Ip6Str != '/') {
+        return EFI_INVALID_PARAMETER;
+      }
+      
       Ip6Str++;
     }
 
