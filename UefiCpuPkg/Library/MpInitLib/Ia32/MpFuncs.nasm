@@ -215,7 +215,7 @@ CProcedureInvoke:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack);
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish);
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmRelocateApLoop)
 ASM_PFX(AsmRelocateApLoop):
@@ -227,6 +227,8 @@ AsmRelocateApLoopStart:
     mov        ebp, esp
     mov        ebx, [eax + 8]      ; ApTargetCState
     mov        ecx, [eax + 4]      ; MwaitSupport
+    mov        eax, [eax + 20]     ; CountTofinish
+    lock dec   dword [eax]         ; (*CountTofinish)--
     cmp        cl,  1              ; Check mwait-monitor support
     jnz        HltLoop
 MwaitLoop:

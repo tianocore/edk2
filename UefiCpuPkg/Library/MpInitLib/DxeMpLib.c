@@ -27,6 +27,7 @@ EFI_EVENT        mLegacyBootEvent = NULL;
 volatile BOOLEAN mStopCheckAllApsStatus = TRUE;
 VOID             *mReservedApLoopFunc = NULL;
 UINTN            mReservedTopOfApStack;
+volatile UINT32  mNumberToFinish = 0;
 
 /**
   Get the pointer to CPU MP Data structure.
@@ -253,7 +254,8 @@ RelocateApLoop (
     MwaitSupport,
     CpuMpData->ApTargetCState,
     CpuMpData->PmCodeSegment,
-    mReservedTopOfApStack - ProcessorNumber * AP_SAFE_STACK_SIZE
+    mReservedTopOfApStack - ProcessorNumber * AP_SAFE_STACK_SIZE,
+    (UINTN) &mNumberToFinish
     );
   //
   // It should never reach here
@@ -282,7 +284,11 @@ MpInitChangeApLoopCallback (
   CpuMpData->SaveRestoreFlag = TRUE;
   CpuMpData->PmCodeSegment = GetProtectedModeCS ();
   CpuMpData->ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
+  mNumberToFinish = CpuMpData->CpuCount - 1;
   WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL);
+  while (mNumberToFinish > 0) {
+    CpuPause ();
+  }
   DEBUG ((DEBUG_INFO, "%a() done!\n", __FUNCTION__));
 }
 

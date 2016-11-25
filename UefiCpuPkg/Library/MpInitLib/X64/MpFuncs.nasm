@@ -222,11 +222,13 @@ CProcedureInvoke:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack);
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish);
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmRelocateApLoop)
 ASM_PFX(AsmRelocateApLoop):
 AsmRelocateApLoopStart:
+    mov        rax, [rsp + 40]   ; CountTofinish
+    lock dec   dword [rax]       ; (*CountTofinish)--
     mov        rsp, r9
     push       rcx
     push       rdx

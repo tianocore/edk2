@@ -251,7 +251,8 @@ VOID
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
   IN UINTN                   PmCodeSegment,
-  IN UINTN                   TopOfApStack
+  IN UINTN                   TopOfApStack,
+  IN UINTN                   NumberToFinish
   );
 
 /**
