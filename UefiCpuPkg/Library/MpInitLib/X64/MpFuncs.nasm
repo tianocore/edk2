@@ -266,8 +266,8 @@ MwaitLoop:
     xor        ecx, ecx           ; ecx = 0
     xor        edx, edx           ; edx = 0
     monitor
-    shl        ebx, 4
     mov        eax, ebx           ; Mwait Cx, Target C-State per eax[7:4]
+    shl        eax, 4
     mwait
     jmp        MwaitLoop
 HltLoop:
