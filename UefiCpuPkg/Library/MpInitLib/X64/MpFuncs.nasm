@@ -274,7 +274,6 @@ HltLoop:
     cli
     hlt
     jmp        HltLoop
-    ret
 BITS 64
 AsmRelocateApLoopEnd:
 

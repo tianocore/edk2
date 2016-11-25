@@ -244,7 +244,6 @@ HltLoop:
     cli
     hlt
     jmp        HltLoop
-    ret
 AsmRelocateApLoopEnd:
 
 ;-------------------------------------------------------------------------------------
