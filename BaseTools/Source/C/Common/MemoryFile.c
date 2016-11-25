@@ -222,6 +222,9 @@ Returns:
   // Increment the current file pointer (include the 0x0A)
   //
   InputFile->CurrentFilePointer += CharsToCopy + 1;
+  if (InputFile->CurrentFilePointer > InputFile->Eof) {
+    InputFile->CurrentFilePointer = InputFile->Eof;
+  }
   CheckMemoryFileState (InputMemoryFile);
 
   //
