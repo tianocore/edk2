@@ -1,5 +1,5 @@
 /** @file
-  String definitions for TCG configuration form.
+  String definitions for TCG2 configuration form.
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_TCG2_DEVICE_STATE_CONTENT       #language en-US ""
 
 #string STR_TCG2_DEVICE_PROMPT              #language en-US "Attempt TPM Device"
-#string STR_TCG2_DEVICE_HELP                #language en-US "Attempt TPM Device: Disable, TPM1.2, or TPM2.0"
+#string STR_TCG2_DEVICE_HELP                #language en-US "Attempt TPM Device: TPM1.2, or TPM2.0"
 #string STR_TCG2_DEVICE_CONTENT             #language en-US ""
 
 #string STR_TCG2_DEVICE_INTERFACE_STATE_PROMPT         #language en-US "Current TPM Device Interface"
@@ -58,7 +58,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_TCG2_OPERATION_PARAMETER       #language en-US "TPM2 Operation Parameter"
 #string STR_TCG2_OPERATION_PARAMETER_HELP  #language en-US "Additional TPM2 Operation Parameter need be sent with Operation Code (required for SetPCRBanks)"
 
-#string STR_TCG2_TPM_DISABLE               #language en-US "Disable"
 #string STR_TCG2_TPM_1_2                   #language en-US "TPM 1.2"
 #string STR_TCG2_TPM_2_0_DTPM              #language en-US "TPM 2.0"
 
