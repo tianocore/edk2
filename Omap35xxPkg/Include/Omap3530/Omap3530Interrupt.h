@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -15,7 +16,9 @@
 #ifndef __OMAP3530INTERRUPT_H__
 #define __OMAP3530INTERRUPT_H__
 
-#define INTERRUPT_BASE (0x48200000)
+#include <Library/PcdLib.h>
+
+#define INTERRUPT_BASE        (PcdGet32 (PcdInterruptBaseAddress))
 
 #define INT_NROF_VECTORS      (96)
 #define MAX_VECTOR            (INT_NROF_VECTORS - 1)

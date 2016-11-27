@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -358,6 +359,9 @@
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|77
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|13000000
+
+  # OMAP Interrupt Controller
+  gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress|0x48200000
 
   # We want to use the Shell Libraries but don't want it to initialise
   # automatically. We initialise the libraries when the command is called by the
