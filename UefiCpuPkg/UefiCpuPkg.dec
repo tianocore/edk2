@@ -60,6 +60,7 @@
 
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
+  gMsegSmramGuid                 = { 0x5802bce4, 0xeeee, 0x4e33, { 0xa1, 0x30, 0xeb, 0xad, 0x27, 0xf0, 0xe4, 0x39 }}
 
   ## Include/Guid/MicrocodeFmp.h
   gMicrocodeFmpImageTypeIdGuid      = { 0x96d4fdcd, 0x1502, 0x424d, { 0x9d, 0x4c, 0x9b, 0x12, 0xd2, 0xdc, 0xae, 0x5c } }
@@ -67,6 +68,9 @@
 [Protocols]
   ## Include/Protocol/SmmCpuService.h
   gEfiSmmCpuServiceProtocolGuid  = { 0x1d202cab, 0xc8ab, 0x4d5c, { 0x94, 0xf7, 0x3c, 0xfc, 0xc0, 0xd3, 0xd3, 0x35 }}
+
+  ## Include/Protocol/SmMonitorInit.h
+  gEfiSmMonitorInitProtocolGuid  = { 0x228f344d, 0xb3de, 0x43bb, { 0xa4, 0xd7, 0xea, 0x20, 0xb, 0x1b, 0x14, 0x82 }}
 
 #
 # [Error.gUefiCpuPkgTokenSpaceGuid]
@@ -168,6 +172,14 @@
   #  MTRRs reserved for OS use is 2.
   # @Prompt Number of reserved variable MTRRs.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0x2|UINT32|0x00000015
+
+  ## Specifies buffer size in bytes for STM exception stack. The value should be a multiple of 4KB.
+  # @Prompt STM exception stack size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStmExceptionStackSize|0x1000|UINT32|0x32132111
+
+  ## Specifies buffer size in bytes of MSEG. The value should be a multiple of 4KB.
+  # @Prompt MSEG size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMsegSize|0x200000|UINT32|0x32132112
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies max supported number of Logical Processors.
