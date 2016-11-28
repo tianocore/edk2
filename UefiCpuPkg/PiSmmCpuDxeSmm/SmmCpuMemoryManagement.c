@@ -684,7 +684,7 @@ PatchSmmSaveStateMap (
 
   TileCodeSize = GetSmiHandlerSize ();
   TileCodeSize = ALIGN_VALUE(TileCodeSize, SIZE_4KB);
-  TileDataSize = sizeof (SMRAM_SAVE_STATE_MAP) + sizeof (PROCESSOR_SMM_DESCRIPTOR);
+  TileDataSize = (SMRAM_SAVE_STATE_MAP_OFFSET - SMM_PSD_OFFSET) + sizeof (SMRAM_SAVE_STATE_MAP);
   TileDataSize = ALIGN_VALUE(TileDataSize, SIZE_4KB);
   TileSize = TileDataSize + TileCodeSize - 1;
   TileSize = 2 * GetPowerOfTwo32 ((UINT32)TileSize);

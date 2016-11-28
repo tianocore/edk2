@@ -31,6 +31,9 @@ ASM_GLOBAL  ASM_PFX(gSmiHandlerIdtr)
 .equ            MSR_EFER, 0xc0000080
 .equ            MSR_EFER_XD, 0x800
 
+#
+# Constants relating to PROCESSOR_SMM_DESCRIPTOR
+#
 .equ            DSC_OFFSET, 0xfb00
 .equ            DSC_GDTPTR, 0x30
 .equ            DSC_GDTSIZ, 0x38

@@ -711,22 +711,23 @@ PiCpuSmmEntry (
 
   //
   // Compute tile size of buffer required to hold the CPU SMRAM Save State Map, extra CPU
-  // specific context in a PROCESSOR_SMM_DESCRIPTOR, and the SMI entry point.  This size
-  // is rounded up to nearest power of 2.
+  // specific context start starts at SMBASE + SMM_PSD_OFFSET, and the SMI entry point.
+  // This size is rounded up to nearest power of 2.
   //
   TileCodeSize = GetSmiHandlerSize ();
   TileCodeSize = ALIGN_VALUE(TileCodeSize, SIZE_4KB);
-  TileDataSize = sizeof (SMRAM_SAVE_STATE_MAP) + sizeof (PROCESSOR_SMM_DESCRIPTOR);
+  TileDataSize = (SMRAM_SAVE_STATE_MAP_OFFSET - SMM_PSD_OFFSET) + sizeof (SMRAM_SAVE_STATE_MAP);
   TileDataSize = ALIGN_VALUE(TileDataSize, SIZE_4KB);
   TileSize = TileDataSize + TileCodeSize - 1;
   TileSize = 2 * GetPowerOfTwo32 ((UINT32)TileSize);
   DEBUG ((EFI_D_INFO, "SMRAM TileSize = 0x%08x (0x%08x, 0x%08x)\n", TileSize, TileCodeSize, TileDataSize));
 
   //
-  // If the TileSize is larger than space available for the SMI Handler of CPU[i],
-  // the PROCESSOR_SMM_DESCRIPTOR of CPU[i+1] and the SMRAM Save State Map of CPU[i+1],
-  // the ASSERT().  If this ASSERT() is triggered, then the SMI Handler size must be
-  // reduced.
+  // If the TileSize is larger than space available for the SMI Handler of
+  // CPU[i], the extra CPU specific context of CPU[i+1], and the SMRAM Save
+  // State Map of CPU[i+1], then ASSERT().  If this ASSERT() is triggered, then
+  // the SMI Handler size must be reduced or the size of the extra CPU specific
+  // context must be reduced.
   //
   ASSERT (TileSize <= (SMRAM_SAVE_STATE_MAP_OFFSET + sizeof (SMRAM_SAVE_STATE_MAP) - SMM_HANDLER_OFFSET));
 

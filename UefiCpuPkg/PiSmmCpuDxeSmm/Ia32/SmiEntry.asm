@@ -26,6 +26,9 @@ MSR_IA32_MISC_ENABLE  EQU     1A0h
 MSR_EFER      EQU     0c0000080h
 MSR_EFER_XD   EQU     0800h
 
+;
+; Constants relating to PROCESSOR_SMM_DESCRIPTOR
+;
 DSC_OFFSET    EQU     0fb00h
 DSC_GDTPTR    EQU     30h
 DSC_GDTSIZ    EQU     38h

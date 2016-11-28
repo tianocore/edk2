@@ -1,7 +1,7 @@
 /** @file
 Provides services to access SMRAM Save State Map
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,34 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Register/Cpuid.h>
 #include <Register/SmramSaveStateMap.h>
+
+#include "PiSmmCpuDxeSmm.h"
+
+typedef struct {
+  UINT64                            Signature;              // Offset 0x00
+  UINT16                            Reserved1;              // Offset 0x08
+  UINT16                            Reserved2;              // Offset 0x0A
+  UINT16                            Reserved3;              // Offset 0x0C
+  UINT16                            SmmCs;                  // Offset 0x0E
+  UINT16                            SmmDs;                  // Offset 0x10
+  UINT16                            SmmSs;                  // Offset 0x12
+  UINT16                            SmmOtherSegment;        // Offset 0x14
+  UINT16                            Reserved4;              // Offset 0x16
+  UINT64                            Reserved5;              // Offset 0x18
+  UINT64                            Reserved6;              // Offset 0x20
+  UINT64                            Reserved7;              // Offset 0x28
+  UINT64                            SmmGdtPtr;              // Offset 0x30
+  UINT32                            SmmGdtSize;             // Offset 0x38
+  UINT32                            Reserved8;              // Offset 0x3C
+  UINT64                            Reserved9;              // Offset 0x40
+  UINT64                            Reserved10;             // Offset 0x48
+  UINT16                            Reserved11;             // Offset 0x50
+  UINT16                            Reserved12;             // Offset 0x52
+  UINT32                            Reserved13;             // Offset 0x54
+  UINT64                            Reserved14;             // Offset 0x58
+} PROCESSOR_SMM_DESCRIPTOR;
+
+extern CONST PROCESSOR_SMM_DESCRIPTOR      gcPsd;
 
 //
 // EFER register LMA bit
@@ -657,6 +685,8 @@ InstallSmiHandler (
   IN UINT32  Cr3
   )
 {
+  PROCESSOR_SMM_DESCRIPTOR  *Psd;
+
   if (SmmCpuFeaturesGetSmiHandlerSize () != 0) {
     //
     // Install SMI handler provided by library
@@ -674,6 +704,14 @@ InstallSmiHandler (
       );
     return;
   }
+
+  //
+  // Initialize PROCESSOR_SMM_DESCRIPTOR
+  //
+  Psd = (PROCESSOR_SMM_DESCRIPTOR *)(VOID *)(UINTN)(SmBase + SMM_PSD_OFFSET);
+  CopyMem (Psd, &gcPsd, sizeof (gcPsd));
+  Psd->SmmGdtPtr = (UINT64)GdtBase;
+  Psd->SmmGdtSize = (UINT32)GdtSize;
 
   //
   // Initialize values in template before copy

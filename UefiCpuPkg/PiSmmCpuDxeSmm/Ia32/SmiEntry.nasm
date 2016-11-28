@@ -22,6 +22,9 @@
 %define MSR_EFER      0xc0000080
 %define MSR_EFER_XD   0x800
 
+;
+; Constants relating to PROCESSOR_SMM_DESCRIPTOR
+;
 %define DSC_OFFSET 0xfb00
 %define DSC_GDTPTR 0x30
 %define DSC_GDTSIZ 0x38

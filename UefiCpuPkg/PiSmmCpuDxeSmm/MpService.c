@@ -1371,7 +1371,6 @@ InitializeMpServiceData (
 {
   UINT32                    Cr3;
   UINTN                     Index;
-  PROCESSOR_SMM_DESCRIPTOR  *Psd;
   UINT8                     *GdtTssTables;
   UINTN                     GdtTableStepSize;
 
@@ -1406,24 +1405,16 @@ InitializeMpServiceData (
   GdtTssTables = InitGdt (Cr3, &GdtTableStepSize);
 
   //
-  // Initialize PROCESSOR_SMM_DESCRIPTOR for each CPU
+  // Install SMI handler for each CPU
   //
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    Psd = (PROCESSOR_SMM_DESCRIPTOR *)(VOID *)(UINTN)(mCpuHotPlugData.SmBase[Index] + SMM_PSD_OFFSET);
-    CopyMem (Psd, &gcPsd, sizeof (gcPsd));
-    Psd->SmmGdtPtr = (UINT64)(UINTN)(GdtTssTables + GdtTableStepSize * Index);
-    Psd->SmmGdtSize = gcSmiGdtr.Limit + 1;
-
-    //
-    // Install SMI handler
-    //
     InstallSmiHandler (
       Index,
       (UINT32)mCpuHotPlugData.SmBase[Index],
       (VOID*)((UINTN)Stacks + (StackSize * Index)),
       StackSize,
-      (UINTN)Psd->SmmGdtPtr,
-      Psd->SmmGdtSize,
+      (UINTN)(GdtTssTables + GdtTableStepSize * Index),
+      gcSmiGdtr.Limit + 1,
       gcSmiIdtr.Base,
       gcSmiIdtr.Limit + 1,
       Cr3
