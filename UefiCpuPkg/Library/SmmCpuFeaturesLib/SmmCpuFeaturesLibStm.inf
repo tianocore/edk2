@@ -1,0 +1,88 @@
+## @file
+#  The CPU specific programming for PiSmmCpuDxeSmm module when STM support
+#  is included.
+#
+#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmCpuFeaturesLibStm
+  MODULE_UNI_FILE                = SmmCpuFeaturesLib.uni
+  FILE_GUID                      = 374DE830-81C5-4CC8-B2AB-28F0AB73710B
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmmCpuFeaturesLib
+  CONSTRUCTOR                    = SmmCpuFeaturesLibStmConstructor
+
+[Sources]
+  SmmCpuFeaturesLib.c
+  SmmStm.c
+  SmmStm.h
+
+[Sources.Ia32]
+  Ia32/SmmStmSupport.c
+
+  Ia32/SmiEntry.asm
+  Ia32/SmiException.asm
+
+  Ia32/SmiEntry.nasm
+  Ia32/SmiException.nasm
+
+  Ia32/SmiEntry.S
+  Ia32/SmiException.S
+
+[Sources.X64]
+  X64/SmmStmSupport.c
+
+  X64/SmiEntry.asm
+  X64/SmiException.asm
+
+  X64/SmiEntry.nasm
+  X64/SmiException.nasm
+
+  X64/SmiEntry.S
+  X64/SmiException.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  PcdLib
+  HobLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  SmmServicesTableLib
+  TpmMeasurementLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid                ## CONSUMES
+  gEfiSmmEndOfDxeProtocolGuid              ## CONSUMES
+  gEfiSmMonitorInitProtocolGuid            ## PRODUCES
+
+[Guids]
+  gMsegSmramGuid                           ## SOMETIMES_CONSUMES ## HOB
+  gEfiAcpi20TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi10TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMsegSize                         ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStmExceptionStackSize         ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
+
+[Depex]
+  gEfiMpServiceProtocolGuid
