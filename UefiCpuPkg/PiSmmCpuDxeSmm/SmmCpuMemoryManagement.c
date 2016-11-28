@@ -299,7 +299,7 @@ SplitPage (
       for (Index = 0; Index < SIZE_4KB / sizeof(UINT64); Index++) {
         NewPageEntry[Index] = BaseAddress + SIZE_4KB * Index + ((*PageEntry) & PAGE_PROGATE_BITS);
       }
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry + ((*PageEntry) & PAGE_PROGATE_BITS);
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry + PAGE_ATTRIBUTE_BITS;
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
@@ -320,7 +320,7 @@ SplitPage (
       for (Index = 0; Index < SIZE_4KB / sizeof(UINT64); Index++) {
         NewPageEntry[Index] = BaseAddress + SIZE_2MB * Index + IA32_PG_PS + ((*PageEntry) & PAGE_PROGATE_BITS);
       }
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry + ((*PageEntry) & PAGE_PROGATE_BITS);
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry + PAGE_ATTRIBUTE_BITS;
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
