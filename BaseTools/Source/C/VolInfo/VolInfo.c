@@ -148,6 +148,65 @@ Usage (
   VOID
   );
 
+UINT32
+UnicodeStrLen (
+  IN CHAR16 *String
+  )
+  /*++
+
+  Routine Description:
+
+  Returns the length of a null-terminated unicode string.
+
+  Arguments:
+
+    String - The pointer to a null-terminated unicode string.
+
+  Returns:
+
+    N/A
+
+  --*/
+{
+  UINT32  Length;
+
+  for (Length = 0; *String != L'\0'; String++, Length++) {
+    ;
+  }
+  return Length;
+}
+
+VOID
+Unicode2AsciiString (
+  IN  CHAR16 *Source,
+  OUT CHAR8  *Destination
+  )
+  /*++
+
+  Routine Description:
+
+  Convert a null-terminated unicode string to a null-terminated ascii string.
+
+  Arguments:
+
+    Source      - The pointer to the null-terminated input unicode string.
+    Destination - The pointer to the null-terminated output ascii string.
+
+  Returns:
+
+    N/A
+
+  --*/
+{
+  while (*Source != '\0') {
+    *(Destination++) = (CHAR8) *(Source++);
+  }
+  //
+  // End the ascii with a NULL.
+  //
+  *Destination = '\0';
+}
+
 int
 main (
   int       argc,
@@ -1606,6 +1665,7 @@ Returns:
   UINT32              RealHdrLen;
   CHAR8               *ToolInputFileName;
   CHAR8               *ToolOutputFileName;
+  CHAR8               *UIFileName;
 
   ParsedLength = 0;
   ToolInputFileName = NULL;
@@ -1714,7 +1774,14 @@ Returns:
       break;
 
     case EFI_SECTION_USER_INTERFACE:
-      printf ("  String: %ls\n", (wchar_t *) &((EFI_USER_INTERFACE_SECTION *) Ptr)->FileNameString);
+      UIFileName = (CHAR8 *) malloc (UnicodeStrLen (((EFI_USER_INTERFACE_SECTION *) Ptr)->FileNameString) + 1);
+      if (UIFileName == NULL) {
+        Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+        return EFI_OUT_OF_RESOURCES;
+      }
+      Unicode2AsciiString (((EFI_USER_INTERFACE_SECTION *) Ptr)->FileNameString, UIFileName);
+      printf ("  String: %s\n", UIFileName);
+      free (UIFileName);
       break;
 
     case EFI_SECTION_FIRMWARE_VOLUME_IMAGE:
