@@ -255,6 +255,16 @@ MicrocodeRead (
         TotalSize = MicrocodeEntryPoint->TotalSize;
       }
 
+      if (ImageIndex == Count + 1) {
+        if (*ImageSize < TotalSize) {
+          *ImageSize = TotalSize;
+          return EFI_BUFFER_TOO_SMALL;
+        }
+        *ImageSize = TotalSize;
+        CopyMem (Image, MicrocodeEntryPoint, TotalSize);
+        return EFI_SUCCESS;
+      }
+
     } else {
       //
       // It is the padding data between the microcode patches for microcode patches alignment.
