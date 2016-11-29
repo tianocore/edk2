@@ -178,18 +178,6 @@ FmpGetImage (
   IN  OUT  UINTN                        *ImageSize
   )
 {
-  SYSTEM_FMP_PRIVATE_DATA *SystemFmpPrivate;
-
-  if (Image == NULL || ImageSize == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  SystemFmpPrivate = SYSTEM_FMP_PRIVATE_DATA_FROM_FMP(This);
-
-  if (ImageIndex == 0 || ImageIndex > SystemFmpPrivate->DescriptorCount || ImageSize == NULL || Image == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
   return EFI_UNSUPPORTED;
 }
 
