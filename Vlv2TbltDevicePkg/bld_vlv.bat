@@ -68,11 +68,11 @@ if /i "%~1"=="/l" (
 if /i "%~1" == "/c" (
     echo Removing previous build files ...
     if exist build (
-        del /f/s/q build > null
+        del /f/s/q build > nul
         rmdir /s/q build
     )
     if exist conf\.cache (
-        del /f/s/q conf\.cache > null
+        del /f/s/q conf\.cache > nul
         rmdir /s/q conf\.cache
     )
     echo.
