@@ -77,6 +77,15 @@
 #string STR_IFCONFIG6_ERR_LACK_OPTION          #language en-US    "Lack options.\r\n"
                                                                   "Hint: Please type 'IfConfig6 -?' for help info.\r\n"
 #string STR_IFCONFIG6_ERR_MAN_HOST             #language en-US    "Manual address configuration failed. Please retry.\r\n"
+
+#string STR_IFCONFIG6_ERR_MAN_GW               #language en-US    "Gateway address configuration failed. Please check the argument.\r\n"
+
+#string STR_IFCONFIG6_ERR_INVALID_IP_CONFIG    #language en-US    "The IP address is not configurable when the policy is Ip6ConfigPolicyAutomatic.\r\n"
+
+#string STR_IFCONFIG6_ERR_INVALID_GW_CONFIG    #language en-US    "The gateway address is not configurable when the policy is Ip6ConfigPolicyAutomatic.\r\n"
+
+#string STR_IFCONFIG6_ERR_INVALID_DNS_CONFIG   #language en-US    "The DNS server address is not configurable when the policy is Ip6ConfigPolicyAutomatic.\r\n"
+
 #string STR_IFCONFIG6_ERR_DUPLICATE_COMMAND    #language en-US    "Duplicate commands. Bad command %H%s%N is skipped.\r\n"
                                                                   "Hint: Please type 'IfConfig6 -?' for help info.\r\n"
 #string STR_IFCONFIG6_ERR_CONFLICT_COMMAND     #language en-US    "Conflict commands. Bad command %H%s%N is skipped.\r\n"
