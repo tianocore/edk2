@@ -59,7 +59,7 @@ PerformFlashWrite (
   }
 
   DEBUG((DEBUG_INFO, "                  - 0x%x(%x) - 0x%x\n", (UINTN)FlashAddress, (UINTN)FlashAddressType, Length));
-  LibFvbFlashDeviceBlockLock(FlashAddress, Length, FALSE);
+  LibFvbFlashDeviceBlockLock((UINTN)FlashAddress, Length, FALSE);
 
   //
   // Erase & Write
@@ -67,7 +67,7 @@ PerformFlashWrite (
   Status = LibFvbFlashDeviceBlockErase((UINTN)FlashAddress, Length);
   ASSERT_EFI_ERROR(Status);
   if (EFI_ERROR(Status)) {
-    LibFvbFlashDeviceBlockLock(FlashAddress, Length, TRUE);
+    LibFvbFlashDeviceBlockLock((UINTN)FlashAddress, Length, TRUE);
     DEBUG((DEBUG_ERROR, "Flash Erase error\n"));
     return Status;
   }
@@ -75,12 +75,12 @@ PerformFlashWrite (
   Status = LibFvbFlashDeviceWrite((UINTN)FlashAddress, &Length, Buffer);
   ASSERT_EFI_ERROR(Status);
   if (EFI_ERROR(Status)) {
-    LibFvbFlashDeviceBlockLock(FlashAddress, Length, TRUE);
+    LibFvbFlashDeviceBlockLock((UINTN)FlashAddress, Length, TRUE);
     DEBUG((DEBUG_ERROR, "Flash write error\n"));
     return Status;
   }
 
-  LibFvbFlashDeviceBlockLock(FlashAddress, Length, TRUE);
+  LibFvbFlashDeviceBlockLock((UINTN)FlashAddress, Length, TRUE);
 
   return EFI_SUCCESS;
 }
@@ -146,10 +146,10 @@ MicrocodeFlashWrite (
     // Save original buffer
     //
     if (OffsetHead != 0) {
-      CopyMem((UINT8 *)AlignedBuffer, (VOID *)AlignedFlashAddress, OffsetHead);
+      CopyMem((UINT8 *)AlignedBuffer, (VOID *)(UINTN)AlignedFlashAddress, OffsetHead);
     }
     if (OffsetTail != 0) {
-      CopyMem((UINT8 *)AlignedBuffer + OffsetHead + Length, (VOID *)(AlignedFlashAddress + OffsetHead + Length), OffsetTail);
+      CopyMem((UINT8 *)AlignedBuffer + OffsetHead + Length, (VOID *)(UINTN)(AlignedFlashAddress + OffsetHead + Length), OffsetTail);
     }
     //
     // Override new buffer
