@@ -27,6 +27,9 @@
 #include <Guid/FileInfo.h>
 #include <Guid/Gpt.h>
 
+#define IS_HYPHEN(a)               ((a) == L'-')
+#define IS_NULL(a)                 ((a) == L'\0')
+
 #define MAX_ARG_NUM     11
 
 UINTN  Argc;
@@ -57,6 +60,144 @@ GetArg (
 
   Argc = ShellParameters->Argc;
   Argv = ShellParameters->Argv;
+  return EFI_SUCCESS;
+}
+
+/**
+  Converts a list of string to a specified buffer.
+
+  @param[out] Buf             The output buffer that contains the string.
+  @param[in]  BufferLength    The length of the buffer
+  @param[in]  Str             The input string that contains the hex number
+
+  @retval EFI_SUCCESS    The string was successfully converted to the buffer.
+
+**/
+EFI_STATUS
+StrToBuf (
+  OUT UINT8    *Buf,
+  IN  UINTN    BufferLength,
+  IN  CHAR16   *Str
+  )
+{
+  UINTN       Index;
+  UINTN       StrLength;
+  UINT8       Digit;
+  UINT8       Byte;
+
+  Digit = 0;
+
+  //
+  // Two hex char make up one byte
+  //
+  StrLength = BufferLength * sizeof (CHAR16);
+
+  for(Index = 0; Index < StrLength; Index++, Str++) {
+
+    if ((*Str >= L'a') && (*Str <= L'f')) {
+      Digit = (UINT8) (*Str - L'a' + 0x0A);
+    } else if ((*Str >= L'A') && (*Str <= L'F')) {
+      Digit = (UINT8) (*Str - L'A' + 0x0A);
+    } else if ((*Str >= L'0') && (*Str <= L'9')) {
+      Digit = (UINT8) (*Str - L'0');
+    } else {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // For odd characters, write the upper nibble for each buffer byte,
+    // and for even characters, the lower nibble.
+    //
+    if ((Index & 1) == 0) {
+      Byte = (UINT8) (Digit << 4);
+    } else {
+      Byte = Buf[Index / 2];
+      Byte &= 0xF0;
+      Byte = (UINT8) (Byte | Digit);
+    }
+
+    Buf[Index / 2] = Byte;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Converts a string to GUID value.
+  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+  @param[in]  Str              The registry format GUID string that contains the GUID value.
+  @param[out] Guid             A pointer to the converted GUID value.
+
+  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
+  @retval EFI_UNSUPPORTED The input string is not in registry format.
+  @return others          Some error occurred when converting part of GUID value.
+
+**/
+EFI_STATUS
+StrToGuid (
+  IN  CHAR16   *Str,
+  OUT EFI_GUID *Guid
+  )
+{
+  //
+  // Get the first UINT32 data
+  //
+  Guid->Data1 = (UINT32) StrHexToUint64  (Str);
+  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
+    Str ++;
+  }
+
+  if (IS_HYPHEN (*Str)) {
+    Str++;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Get the second UINT16 data
+  //
+  Guid->Data2 = (UINT16) StrHexToUint64  (Str);
+  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
+    Str ++;
+  }
+
+  if (IS_HYPHEN (*Str)) {
+    Str++;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Get the third UINT16 data
+  //
+  Guid->Data3 = (UINT16) StrHexToUint64  (Str);
+  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
+    Str ++;
+  }
+
+  if (IS_HYPHEN (*Str)) {
+    Str++;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Get the following 8 bytes data
+  //
+  StrToBuf (&Guid->Data4[0], 2, Str);
+  //
+  // Skip 2 byte hex chars
+  //
+  Str += 2 * 2;
+
+  if (IS_HYPHEN (*Str)) {
+    Str++;
+  } else {
+    return EFI_UNSUPPORTED;
+  }
+  StrToBuf (&Guid->Data4[2], 6, Str);
+
   return EFI_SUCCESS;
 }
 

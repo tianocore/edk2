@@ -86,6 +86,22 @@ DumpFmpData (
   );
 
 /**
+  Dump FMP image data.
+
+  @param[in]  ImageTypeId   The ImageTypeId of the FMP image.
+                            It is used to identify the FMP protocol.
+  @param[in]  ImageIndex    The ImageIndex of the FMP image.
+                            It is the input parameter for FMP->GetImage().
+  @param[in]  ImageName     The file name to hold the output FMP image.
+**/
+VOID
+DumpFmpImage (
+  IN EFI_GUID  *ImageTypeId,
+  IN UINTN     ImageIndex,
+  IN CHAR16    *ImageName
+  );
+
+/**
   Dump ESRT info.
 **/
 VOID
@@ -124,6 +140,24 @@ WriteFileFromBuffer (
   IN  CHAR16                               *FileName,
   IN  UINTN                                BufferSize,
   IN  VOID                                 *Buffer
+  );
+
+/**
+  Converts a string to GUID value.
+  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+  @param[in]  Str              The registry format GUID string that contains the GUID value.
+  @param[out] Guid             A pointer to the converted GUID value.
+
+  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
+  @retval EFI_UNSUPPORTED The input string is not in registry format.
+  @return others          Some error occurred when converting part of GUID value.
+
+**/
+EFI_STATUS
+StrToGuid (
+  IN  CHAR16   *Str,
+  OUT EFI_GUID *Guid
   );
 
 /**
@@ -662,6 +696,7 @@ PrintUsage (
   Print(L"  CapsuleApp -G <BMP> -O <Capsule>\n");
   Print(L"  CapsuleApp -N <Capsule> -O <NestedCapsule>\n");
   Print(L"  CapsuleApp -D <Capsule>\n");
+  Print(L"  CapsuleApp -P GET <ImageTypeId> <Index> -O <FileName>\n");
   Print(L"Parameter:\n");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
@@ -737,7 +772,27 @@ UefiMain (
     return Status;
   }
   if (StrCmp(Argv[1], L"-P") == 0) {
-    DumpFmpData();
+    if (Argc == 2) {
+      DumpFmpData();
+    }
+    if (Argc >= 3) {
+      if (StrCmp(Argv[2], L"GET") == 0) {
+        EFI_GUID  ImageTypeId;
+        UINTN     ImageIndex;
+        //
+        // FMP->GetImage()
+        //
+        Status = StrToGuid(Argv[3], &ImageTypeId);
+        if (EFI_ERROR(Status)) {
+          Print (L"Invalid ImageTypeId - %s\n", Argv[3]);
+          return Status;
+        }
+        ImageIndex = StrDecimalToUintn(Argv[4]);
+        if (StrCmp(Argv[5], L"-O") == 0) {
+          DumpFmpImage(&ImageTypeId, ImageIndex, Argv[6]);
+        }
+      }
+    }
     return EFI_SUCCESS;
   }
   if (StrCmp(Argv[1], L"-E") == 0) {
