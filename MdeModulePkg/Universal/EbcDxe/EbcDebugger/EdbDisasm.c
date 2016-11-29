@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,14 +9,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbDisasm.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
@@ -117,29 +111,23 @@ EDB_DISASM_INSTRUCTION mEdbDisasmInstructionTable[] = {
   EdbDisasmMOVREL,            // opcode 0x39 MOVREL
 };
 
+/**
+
+  Disasm instruction - BREAK.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmBREAK (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - BREAK
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   ASSERT (GET_OPCODE(InstructionAddress) == OPCODE_BREAK);
 
@@ -164,29 +152,23 @@ Returns:
 
 extern CONST UINT8                    mJMPLen[];
 
+/**
+
+  Disasm instruction - JMP.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmJMP (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - JMP
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8   Modifiers;
   UINT8   Operands;
@@ -248,29 +230,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - JMP8.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmJMP8 (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - JMP8
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8   Modifiers;
 
@@ -300,29 +276,23 @@ Returns:
   return 2;
 }
 
+/**
+
+  Disasm instruction - CALL.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmCALL (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - CALL
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8   Modifiers;
   UINT8   Operands;
@@ -410,29 +380,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - RET.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmRET (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - RET
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   ASSERT (GET_OPCODE(InstructionAddress) == OPCODE_RET);
 
@@ -454,29 +418,23 @@ Returns:
   return 2;
 }
 
+/**
+
+  Disasm instruction - CMP.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmCMP (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - CMP
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Opcode;
   UINT8  Modifiers;
@@ -552,29 +510,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - Unsigned Data Manipulate.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmUnsignedDataManip (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - Unsigned Data Manipulate
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Opcode;
@@ -676,29 +628,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - Signed Data Manipulate,
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmSignedDataManip (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - Signed Data Manipulate
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Opcode;
@@ -780,29 +726,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - MOVxx.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmMOVxx (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - MOVxx
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8   Modifiers;
   UINT8   Opcode;
@@ -939,29 +879,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - MOVsnw.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmMOVsnw (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - MOVsnw
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1015,29 +949,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - MOVsnd.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmMOVsnd (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - MOVsnd
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1091,29 +1019,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - LOADSP.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmLOADSP (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - LOADSP
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Operands;
 
@@ -1139,29 +1061,23 @@ Returns:
   return 2;
 }
 
+/**
+
+  Disasm instruction - STORESP.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmSTORESP (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - STORESP
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Operands;
 
@@ -1187,29 +1103,24 @@ Returns:
   return 2;
 }
 
+
+/**
+
+  Disasm instruction - PUSH.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmPUSH (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - PUSH
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1257,29 +1168,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - POP.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmPOP (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - POP
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1327,29 +1232,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - CMPI.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmCMPI (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - CMPI
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Opcode;
@@ -1444,29 +1343,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - PUSHn.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmPUSHn (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - PUSHn
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1509,29 +1402,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - POPn.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmPOPn (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - POPn
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1574,29 +1461,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - MOVI.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmMOVI (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - MOVI
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1688,29 +1569,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - MOVIn.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmMOVIn (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - MOVIn
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8  Modifiers;
   UINT8  Operands;
@@ -1788,29 +1663,23 @@ Returns:
   return Size;
 }
 
+/**
+
+  Disasm instruction - MOVREL.
+
+  @param  InstructionAddress - The instruction address
+  @param  SystemContext      - EBC system context.
+  @param  DisasmString       - The instruction string
+
+  @return Instruction length
+
+**/
 UINTN
 EdbDisasmMOVREL (
   IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   OUT    CHAR16                    **DisasmString
   )
-/*++
-
-Routine Description:
-
-  Disasm instruction - MOVREL
-
-Arguments:
-
-  InstructionAddress - The instruction address
-  SystemContext      - EBC system context.
-  DisasmString       - The instruction string
-
-Returns:
-
-  Instruction length
-
---*/
 {
   UINT8   Modifiers;
   UINT8   Operands;

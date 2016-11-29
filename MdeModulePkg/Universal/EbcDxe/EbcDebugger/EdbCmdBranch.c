@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,14 +9,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbCmdBranch.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
@@ -28,25 +22,19 @@ CHAR16 *mBranchTypeStr[] = {
   L"(JMP8)",
 };
 
+/**
+
+  Comvert Branch Type to string.
+
+  @param Type        Branch Type
+
+  @retval String     string of Branch Type.
+
+**/
 CHAR16 *
 EdbBranchTypeToStr (
   IN EFI_DEBUGGER_BRANCH_TYPE  Type
   )
-/*++
-
-Routine Description:
-
-  Comvert Branch Type to string
-
-Arguments:
-
-  Type            - Branch Type
-
-Returns:
-
-  String
-
---*/
 {
   if (Type < 0 || Type >= EfiDebuggerBranchTypeEbcMax) {
     return L"(Unknown Type)";
@@ -55,6 +43,18 @@ Returns:
   return mBranchTypeStr [Type];
 }
 
+/**
+
+  DebuggerCommand - CallStack.
+
+  @param  CommandArg         The argument for this command
+  @param  DebuggerPrivate    EBC Debugger private data structure
+  @param  ExceptionType      Exception type.
+  @param  SystemContext      EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE   formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerCallStack (
   IN     CHAR16                    *CommandArg,
@@ -62,24 +62,6 @@ DebuggerCallStack (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - CallStack
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   INTN                           Index;
   UINTN                          SubIndex;
@@ -256,6 +238,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - InstructionBranch.
+
+  @param  CommandArg             The argument for this command
+  @param  DebuggerPrivate        EBC Debugger private data structure
+  @param  ExceptionType          Exception type.
+  @param  SystemContext          EBC system context.
+
+  @retval  EFI_DEBUG_CONTINUE    formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerInstructionBranch (
   IN     CHAR16                    *CommandArg,
@@ -263,24 +257,6 @@ DebuggerInstructionBranch (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - InstructionBranch
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN  Index;
 

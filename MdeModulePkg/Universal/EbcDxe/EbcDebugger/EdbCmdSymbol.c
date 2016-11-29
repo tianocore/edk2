@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007 - 2016, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,36 +9,24 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbCmdSymbol.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
+/**
+
+  Get file name from full path.
+
+  @param  FullPath        - full file path
+
+  @return  file name
+
+**/
 CHAR16 *
 GetFileNameFromFullPath (
   IN CHAR16   *FullPath
   )
-/*++
-
-Routine Description:
-
-  Get file name from full path
-
-Arguments:
-
-  FullPath        - full file path
-
-Returns:
-
-  file name
-
---*/
 {
   CHAR16   *FileName;
   CHAR16   *TempFileName;
@@ -55,25 +43,19 @@ Returns:
   return FileName;
 }
 
+/**
+
+  Get dir name from full path.
+
+  @param  FullPath        - full file path
+
+  @return dir name
+
+**/
 CHAR16 *
 GetDirNameFromFullPath (
   IN CHAR16   *FullPath
   )
-/*++
-
-Routine Description:
-
-  Get dir name from full path
-
-Arguments:
-
-  FullPath        - full file path
-
-Returns:
-
-  dir name
-
---*/
 {
   CHAR16   *FileName;
 
@@ -86,29 +68,23 @@ Returns:
   return L"";
 }
 
+/**
+
+  Construct full path accroding to dir and file path.
+
+  @param  DirPath         - dir path
+  @param  FilePath        - file path
+  @param  Size            - dir max size
+
+  @return Full file name
+
+**/
 CHAR16 *
 ConstructFullPath (
   IN CHAR16   *DirPath,
   IN CHAR16   *FilePath,
   IN UINTN    Size
   )
-/*++
-
-Routine Description:
-
-  Construct full path accroding to dir and file path
-
-Arguments:
-
-  DirPath         - dir path
-  FilePath        - file path
-  Size            - dir max size
-
-Returns:
-
-  Full file name
-
---*/
 {
   UINTN DirPathSize;
 
@@ -128,25 +104,19 @@ CHAR16 *mSymbolTypeStr[] = {
   L"(SV)",
 };
 
+/**
+
+  Comvert Symbol Type to string.
+
+  @param  Type            - Symbol Type
+
+  @return String
+
+**/
 CHAR16 *
 EdbSymbolTypeToStr (
   IN EFI_DEBUGGER_SYMBOL_TYPE  Type
   )
-/*++
-
-Routine Description:
-
-  Comvert Symbol Type to string
-
-Arguments:
-
-  Type            - Symbol Type
-
-Returns:
-
-  String
-
---*/
 {
   if (Type < 0 || Type >= EfiDebuggerSymbolTypeMax) {
     return L"(?)";
@@ -155,27 +125,21 @@ Returns:
   return mSymbolTypeStr [Type];
 }
 
+/**
+
+  Find the symbol accroding to address and display symbol.
+
+  @param  Address         - SymbolAddress
+  @param  DebuggerPrivate - EBC Debugger private data structure
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerDisplaySymbolAccrodingToAddress (
   IN     UINTN                      Address,
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate
   )
-/*++
-
-Routine Description:
-
-  Find the symbol accroding to address and display symbol
-
-Arguments:
-
-  Address         - SymbolAddress
-  DebuggerPrivate - EBC Debugger private data structure
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   EFI_DEBUGGER_SYMBOL_OBJECT *Object;
   EFI_DEBUGGER_SYMBOL_ENTRY  *Entry;
@@ -224,29 +188,23 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  Find the symbol accroding to name and display symbol.
+
+  @param  SymbolFileName  - The Symbol File Name, NULL means for all
+  @param  SymbolName      - The Symbol Name, NULL means for all
+  @param  DebuggerPrivate - EBC Debugger private data structure
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerDisplaySymbolAccrodingToName (
   IN     CHAR16                     *SymbolFileName,
   IN     CHAR16                     *SymbolName,
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate
   )
-/*++
-
-Routine Description:
-
-  Find the symbol accroding to name and display symbol
-
-Arguments:
-
-  SymbolFileName  - The Symbol File Name, NULL means for all
-  SymbolName      - The Symbol Name, NULL means for all
-  DebuggerPrivate - EBC Debugger private data structure
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN                      Index;
   UINTN                      SubIndex;
@@ -338,6 +296,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - ListSymbol.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerListSymbol (
   IN     CHAR16                    *CommandArg,
@@ -345,24 +315,6 @@ DebuggerListSymbol (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - ListSymbol
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   CHAR16                     *SymbolFileName;
   CHAR16                     *SymbolName;
@@ -425,6 +377,18 @@ Returns:
   return DebuggerDisplaySymbolAccrodingToName (SymbolFileName, SymbolName, DebuggerPrivate);
 }
 
+/**
+
+  DebuggerCommand - LoadSymbol.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerLoadSymbol (
   IN     CHAR16                    *CommandArg,
@@ -432,24 +396,6 @@ DebuggerLoadSymbol (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - LoadSymbol
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN      BufferSize;
   VOID       *Buffer;
@@ -590,6 +536,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - UnloadSymbol
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerUnloadSymbol (
   IN     CHAR16                    *CommandArg,
@@ -597,24 +555,6 @@ DebuggerUnloadSymbol (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - UnloadSymbol
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   EFI_STATUS Status;
   CHAR16     *FileName;
@@ -696,6 +636,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - DisplaySymbol.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerDisplaySymbol (
   IN     CHAR16                    *CommandArg,
@@ -703,24 +655,6 @@ DebuggerDisplaySymbol (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - DisplaySymbol
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   if (CommandArg == NULL) {
     DebuggerPrivate->DebuggerSymbolContext.DisplaySymbol = !DebuggerPrivate->DebuggerSymbolContext.DisplaySymbol;
@@ -738,6 +672,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - LoadCode.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerLoadCode (
   IN     CHAR16                    *CommandArg,
@@ -745,24 +691,6 @@ DebuggerLoadCode (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - LoadCode
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN      BufferSize;
   VOID       *Buffer;
@@ -838,6 +766,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - UnloadCode.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerUnloadCode (
   IN     CHAR16                    *CommandArg,
@@ -845,24 +785,6 @@ DebuggerUnloadCode (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - UnloadCode
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   CHAR16     *CommandArg2;
   CHAR16     *FileName;
@@ -909,6 +831,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - DisplayCode.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerDisplayCode (
   IN     CHAR16                    *CommandArg,
@@ -916,24 +850,6 @@ DebuggerDisplayCode (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - DisplayCode
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   if (CommandArg == NULL) {
     DebuggerPrivate->DebuggerSymbolContext.DisplayCodeOnly = !DebuggerPrivate->DebuggerSymbolContext.DisplayCodeOnly;

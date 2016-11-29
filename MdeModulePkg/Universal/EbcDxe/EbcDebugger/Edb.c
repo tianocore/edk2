@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007 - 2016, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,13 +9,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
-
-  Ebc.c
-
-Abstract:
-
---*/
+**/
 
 #include <Uefi.h>
 #include "Edb.h"
@@ -66,27 +60,19 @@ CHAR16 *mExceptionStr[] = {
   L"EXCEPT_EBC_SINGLE_STEP",
 };
 
+/**
+
+  Clear all the breakpoint.
+
+  @param DebuggerPrivate    EBC Debugger private data structure
+  @param NeedRemove         Whether need to remove all the breakpoint
+
+**/
 VOID
 EdbClearAllBreakpoint (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN     BOOLEAN                   NeedRemove
   )
-/*++
-
-Routine Description:
-
-  Clear all the breakpoint
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  NeedRemove      - Whether need to remove all the breakpoint
-
-Returns:
-
-  None
-
---*/
 {
   UINTN    Index;
 
@@ -117,25 +103,17 @@ Returns:
   return ;
 }
 
+/**
+
+  Set all the breakpoint.
+
+  @param DebuggerPrivate    EBC Debugger private data structure
+
+**/
 VOID
 EdbSetAllBreakpoint (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate
   )
-/*++
-
-Routine Description:
-
-  Set all the breakpoint
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-
-Returns:
-
-  None
-
---*/
 {
   UINTN    Index;
   UINT16   Data16;
@@ -173,28 +151,20 @@ Returns:
   return ;
 }
 
+/**
+
+  Check all the breakpoint, if match, then set status flag, and record current breakpoint.
+  Then clear all breakpoint to let user see a clean memory
+
+  @param   DebuggerPrivate    EBC Debugger private data structure
+  @param   SystemContext      EBC system context.
+
+**/
 VOID
 EdbCheckBreakpoint (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN     EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  Check all the breakpoint, if match, then set status flag, and record current breakpoint.
-  Then clear all breakpoint to let user see a clean memory
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  SystemContext   - EBC system context.
-
-Returns:
-
-  None
-
---*/
 {
   UINT64   Address;
   UINTN    Index;
@@ -277,25 +247,16 @@ Returns:
   return ;
 }
 
+/**
+  clear all the symbol.
+
+  @param DebuggerPrivate    EBC Debugger private data structure
+
+**/
 VOID
 EdbClearSymbol (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate
   )
-/*++
-
-Routine Description:
-
-  clear all the symbol
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-
-Returns:
-
-  None
-
---*/
 {
   EFI_DEBUGGER_SYMBOL_CONTEXT *DebuggerSymbolContext;
   EFI_DEBUGGER_SYMBOL_OBJECT  *Object;
@@ -332,6 +293,16 @@ Returns:
   return ;
 }
 
+/**
+
+  Initialize Debugger private data structure
+
+  @param DebuggerPrivate   EBC Debugger private data structure
+  @param ExceptionType     Exception type.
+  @param SystemContext     EBC system context.
+  @param Initialized       Whether the DebuggerPrivate data is initialized.
+
+**/
 EFI_STATUS
 InitDebuggerPrivateData (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
@@ -339,24 +310,6 @@ InitDebuggerPrivateData (
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   IN     BOOLEAN                   Initialized
   )
-/*++
-
-Routine Description:
-
-  Initialize Debugger private data structure
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-  Initialized     - Whether the DebuggerPrivate data is initialized.
-
-Returns:
-
-  None
-
---*/
 {
   //
   // clear STEP flag in any condition.
@@ -404,6 +357,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  De-initialize Debugger private data structure.
+
+  @param DebuggerPrivate   EBC Debugger private data structure
+  @param ExceptionType     Exception type.
+  @param SystemContext     EBC system context.
+  @param Initialized       Whether the DebuggerPrivate data is initialized.
+
+**/
 EFI_STATUS
 DeinitDebuggerPrivateData (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
@@ -411,24 +374,6 @@ DeinitDebuggerPrivateData (
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   IN     BOOLEAN                   Initialized
   )
-/*++
-
-Routine Description:
-
-  De-initialize Debugger private data structure
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-  Initialized     - Whether the DebuggerPrivate data is initialized.
-
-Returns:
-
-  None
-
---*/
 {
   if (!Initialized) {
     //
@@ -468,6 +413,16 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Print the reason of current break to EbcDebugger.
+
+  @param DebuggerPrivate   EBC Debugger private data structure
+  @param ExceptionType     Exception type.
+  @param SystemContext     EBC system context.
+  @param Initialized       Whether the DebuggerPrivate data is initialized.
+
+**/
 VOID
 PrintExceptionReason (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
@@ -475,24 +430,6 @@ PrintExceptionReason (
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   IN     BOOLEAN                   Initialized
   )
-/*++
-
-Routine Description:
-
-  Print the reason of current break to EbcDebugger.
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-  Initialized     - Whether the DebuggerPrivate data is initialized.
-
-Returns:
-
-  None
-
---*/
 {
   //
   // Print break status
@@ -529,30 +466,22 @@ Returns:
   return ;
 }
 
+/**
+
+  The default Exception Callback for the VM interpreter.
+  In this function, we report status code, and print debug information
+  about EBC_CONTEXT, then dead loop.
+
+  @param ExceptionType    Exception type.
+  @param SystemContext    EBC system context.
+
+**/
 VOID
 EFIAPI
 EdbExceptionHandler (
   IN     EFI_EXCEPTION_TYPE   ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT   SystemContext
   )
-/*++
-
-Routine Description:
-
-  The default Exception Callback for the VM interpreter.
-  In this function, we report status code, and print debug information
-  about EBC_CONTEXT, then dead loop.
-
-Arguments:
-
-  InterruptType - Interrupt type.
-  SystemContext - EBC system context.
-
-Returns:
-
-  None
-
---*/
 {
   CHAR16                  InputBuffer[EFI_DEBUG_INPUS_BUFFER_SIZE];
   CHAR16                  *CommandArg;

@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,17 +9,23 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbSupportFile.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
+/**
+  Read a file.
+
+  @param  Vol             - File System Volume
+  @param  FileName        - The file to be read.
+  @param  BufferSize      - The file buffer size
+  @param  Buffer          - The file buffer
+
+  @retval EFI_SUCCESS    - read file successfully
+  @retval EFI_NOT_FOUND  - file not found
+
+**/
 EFI_STATUS
 EFIAPI
 ReadFileFromVol (
@@ -28,25 +34,6 @@ ReadFileFromVol (
   OUT UINTN                       *BufferSize,
   OUT VOID                        **Buffer
   )
-/*++
-
-Routine Description:
-
-  Read a file.
-
-Arguments:
-
-  Vol             - File System Volume
-  FileName        - The file to be read.
-  BufferSize      - The file buffer size
-  Buffer          - The file buffer
-
-Returns:
-
-  EFI_SUCCESS    - read file successfully
-  EFI_NOT_FOUND  - file not found
-
---*/
 {
   EFI_STATUS                        Status;
   EFI_FILE_HANDLE                   RootDir;
@@ -138,6 +125,25 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Read a file.
+  If ScanFs is FLASE, it will use DebuggerPrivate->Vol as default Fs.
+  If ScanFs is TRUE, it will scan all FS and check the file.
+  If there is only one file match the name, it will be read.
+  If there is more than one file match the name, it will return Error.
+
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  FileName        - The file to be read.
+  @param  BufferSize      - The file buffer size
+  @param  Buffer          - The file buffer
+  @param  ScanFs          - Need Scan all FS
+
+  @retval EFI_SUCCESS    - read file successfully
+  @retval EFI_NOT_FOUND  - file not found
+  @retval EFI_NO_MAPPING - there is duplicated files found
+
+**/
 EFI_STATUS
 EFIAPI
 ReadFileToBuffer (
@@ -147,31 +153,6 @@ ReadFileToBuffer (
   OUT VOID                        **Buffer,
   IN  BOOLEAN                     ScanFs
   )
-/*++
-
-Routine Description:
-
-  Read a file.
-  If ScanFs is FLASE, it will use DebuggerPrivate->Vol as default Fs.
-  If ScanFs is TRUE, it will scan all FS and check the file.
-    If there is only one file match the name, it will be read.
-    If there is more than one file match the name, it will return Error.
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  FileName        - The file to be read.
-  BufferSize      - The file buffer size
-  Buffer          - The file buffer
-  ScanFs          - Need Scan all FS
-
-Returns:
-
-  EFI_SUCCESS    - read file successfully
-  EFI_NOT_FOUND  - file not found
-  EFI_NO_MAPPING - there is duplicated files found
-
---*/
 {
   EFI_STATUS                        Status;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   *Vol;
@@ -272,6 +253,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Get file name under this dir with index
+
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  DirName         - The dir to be read.
+  @param  FileName        - The file name pattern under this dir
+  @param  Index           - The file index under this dir
+
+  @return File Name which match the pattern and index.
+
+**/
 CHAR16 *
 EFIAPI
 GetFileNameUnderDir (
@@ -280,24 +273,6 @@ GetFileNameUnderDir (
   IN  CHAR16                      *FileName,
   IN OUT UINTN                    *Index
   )
-/*++
-
-Routine Description:
-
-  Get file name under this dir with index
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  DirName         - The dir to be read.
-  FileName        - The file name pattern under this dir
-  Index           - The file index under this dir
-
-Returns:
-
-  File Name which match the pattern and index.
-
---*/
 {
   EFI_STATUS                        Status;
   EFI_FILE_HANDLE                   RootDir;

@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,17 +9,24 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbCmdBreak.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
+
+/**
+
+  DebuggerCommand - BreakOnCALL.
+
+  @param  CommandArg          The argument for this command
+  @param  DebuggerPrivate     EBC Debugger private data structure
+  @param  ExceptionType       Exception type.
+  @param  SystemContext       EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE  formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakOnCALL (
   IN     CHAR16                    *CommandArg,
@@ -27,24 +34,6 @@ DebuggerBreakOnCALL (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakOnCALL
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   //
   // Check argument
@@ -71,6 +60,19 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand    BreakOnCALLEX.
+
+
+  @param  CommandArg           The argument for this command
+  @param  DebuggerPrivate      EBC Debugger private data structure
+  @param  ExceptionType        Exceptiont type.
+  @param  SystemContext        EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE   formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakOnCALLEX (
   IN     CHAR16                    *CommandArg,
@@ -78,24 +80,6 @@ DebuggerBreakOnCALLEX (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakOnCALLEX
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   //
   // Check argument
@@ -122,6 +106,19 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - BreakOnRET.
+
+
+  @param  CommandArg          The argument for this command
+  @param  DebuggerPrivate     EBC Debugger private data structure
+  @param  ExceptionType       Exception type.
+  @param  SystemContext       EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE  formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakOnRET (
   IN     CHAR16                    *CommandArg,
@@ -129,24 +126,6 @@ DebuggerBreakOnRET (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakOnRET
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   //
   // Check argument
@@ -173,6 +152,19 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - BreakOnEntrypoint.
+
+
+  @param  CommandArg           The argument for this command
+  @param  DebuggerPrivate      EBC Debugger private data structure
+  @param  ExceptionType        Exception type.
+  @param  SystemContext        EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE   formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakOnEntrypoint (
   IN     CHAR16                    *CommandArg,
@@ -180,24 +172,6 @@ DebuggerBreakOnEntrypoint (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakOnEntrypoint
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   //
   // Check argument
@@ -224,6 +198,21 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+
+  DebuggerCommand - BreakOnThunk.
+
+
+  @param  CommandArg          The argument for this command
+  @param  DebuggerPrivate     EBC Debugger private data structure
+  @param  ExceptionType       Exception type.
+  @param  SystemContext       EBC system context.
+
+
+  @retval EFI_DEBUG_CONTINUE  formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakOnThunk (
   IN     CHAR16                    *CommandArg,
@@ -231,24 +220,6 @@ DebuggerBreakOnThunk (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakOnThunk
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   //
   // Check argument
@@ -275,6 +246,20 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - BreakOnKey.
+
+
+  @param  CommandArg           The argument for this command
+  @param  DebuggerPrivate      EBC Debugger private data structure
+  @param  ExceptionType        Exception type.
+  @param  SystemContext        EBC system context.
+
+
+  @retval EFI_DEBUG_CONTINUE   formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakOnKey (
   IN     CHAR16                    *CommandArg,
@@ -282,24 +267,6 @@ DebuggerBreakOnKey (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakOnKey
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   //
   // Check argument

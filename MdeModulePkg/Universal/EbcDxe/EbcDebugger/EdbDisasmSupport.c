@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,14 +9,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbDisasmSupport.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
@@ -32,27 +26,19 @@ EDB_INSTRUCTION_STRING mInstructionString;
 UINTN                  mInstructionNameOffset;
 UINTN                  mInstructionContentOffset;
 
+/**
+
+  Set offset for Instruction name and content.
+
+  @param  InstructionNameOffset     - Instruction name offset
+  @param  InstructionContentOffset  - Instruction content offset
+
+**/
 VOID
 EdbSetOffset (
   IN UINTN InstructionNameOffset,
   IN UINTN InstructionContentOffset
   )
-/*++
-
-Routine Description:
-
-  Set offset for Instruction name and content
-
-Arguments:
-
-  InstructionNameOffset     - Instruction name offset
-  InstructionContentOffset  - Instruction content offset
-
-Returns:
-
-  None
-
---*/
 {
   mInstructionNameOffset = InstructionNameOffset;
   mInstructionContentOffset = InstructionContentOffset;
@@ -60,25 +46,17 @@ Returns:
   return ;
 }
 
+/**
+
+  Pre instruction string construction.
+
+  @return Instruction string
+
+**/
 CHAR16 *
 EdbPreInstructionString (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Pre instruction string construction
-
-Arguments:
-
-  None
-
-Returns:
-
-  Instruction string
-
---*/
 {
   ZeroMem (&mInstructionString, sizeof(mInstructionString));
   mInstructionNameOffset    = 0;
@@ -87,25 +65,17 @@ Returns:
   return (CHAR16 *)&mInstructionString;
 }
 
+/**
+
+  Post instruction string construction.
+
+  @return Instruction string
+
+**/
 CHAR16 *
 EdbPostInstructionString (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Post instruction string construction
-
-Arguments:
-
-  None
-
-Returns:
-
-  Instruction string
-
---*/
 {
   CHAR16 *Char;
 
@@ -122,29 +92,23 @@ Returns:
   return (CHAR16 *)&mInstructionString;
 }
 
+/**
+
+  Get Sign, NaturalUnits, and ConstantUnits of the WORD data.
+
+  @param  Data16        - WORD data
+  @param  NaturalUnits  - Natural Units of the WORD
+  @param  ConstantUnits - Constant Units of the WORD
+
+  @return Sign value of WORD
+
+**/
 BOOLEAN
 EdbGetNaturalIndex16 (
   IN  UINT16  Data16,
   OUT UINTN   *NaturalUnits,
   OUT UINTN   *ConstantUnits
   )
-/*++
-
-Routine Description:
-
-  Get Sign, NaturalUnits, and ConstantUnits of the WORD data
-
-Arguments:
-
-  Data16        - WORD data
-  NaturalUnits  - Natural Units of the WORD
-  ConstantUnits - Constant Units of the WORD
-
-Returns:
-
-  Sign value of WORD
-
---*/
 {
   BOOLEAN Sign;
   UINTN   NaturalUnitBit;
@@ -159,29 +123,23 @@ Returns:
   return Sign;
 }
 
+/**
+
+  Get Sign, NaturalUnits, and ConstantUnits of the DWORD data.
+
+  @param  Data32        - DWORD data
+  @param  NaturalUnits  - Natural Units of the DWORD
+  @param  ConstantUnits - Constant Units of the DWORD
+
+  @return Sign value of DWORD
+
+**/
 BOOLEAN
 EdbGetNaturalIndex32 (
   IN  UINT32  Data32,
   OUT UINTN   *NaturalUnits,
   OUT UINTN   *ConstantUnits
   )
-/*++
-
-Routine Description:
-
-  Get Sign, NaturalUnits, and ConstantUnits of the DWORD data
-
-Arguments:
-
-  Data32        - DWORD data
-  NaturalUnits  - Natural Units of the DWORD
-  ConstantUnits - Constant Units of the DWORD
-
-Returns:
-
-  Sign value of DWORD
-
---*/
 {
   BOOLEAN Sign;
   UINTN   NaturalUnitBit;
@@ -196,29 +154,23 @@ Returns:
   return Sign;
 }
 
+/**
+
+  Get Sign, NaturalUnits, and ConstantUnits of the QWORD data.
+
+  @param  Data64        - QWORD data
+  @param  NaturalUnits  - Natural Units of the QWORD
+  @param  ConstantUnits - Constant Units of the QWORD
+
+  @return Sign value of QWORD
+
+**/
 BOOLEAN
 EdbGetNaturalIndex64 (
   IN  UINT64  Data64,
   OUT UINT64  *NaturalUnits,
   OUT UINT64  *ConstantUnits
   )
-/*++
-
-Routine Description:
-
-  Get Sign, NaturalUnits, and ConstantUnits of the QWORD data
-
-Arguments:
-
-  Data64        - QWORD data
-  NaturalUnits  - Natural Units of the QWORD
-  ConstantUnits - Constant Units of the QWORD
-
-Returns:
-
-  Sign value of QWORD
-
---*/
 {
   BOOLEAN Sign;
   UINTN   NaturalUnitBit;
@@ -233,25 +185,19 @@ Returns:
   return Sign;
 }
 
+/**
+
+  Get Bit Width of the value.
+
+  @param  Value - data
+
+  @return Bit width
+
+**/
 UINT8
 EdbGetBitWidth (
   IN UINT64  Value
   )
-/*++
-
-Routine Description:
-
-  Get Bit Width of the value
-
-Arguments:
-
-  Value - data
-
-Returns:
-
-  Bit width
-
---*/
 {
   if (Value >= 10000000000000) {
     return 14;
@@ -284,25 +230,19 @@ Returns:
   }
 }
 
+/**
+
+  Print the instruction name.
+
+  @param  Name - instruction name
+
+  @return Instruction name offset
+
+**/
 UINTN
 EdbPrintInstructionName (
   IN CHAR16                 *Name
   )
-/*++
-
-Routine Description:
-
-  Print the instruction name
-
-Arguments:
-
-  Name - instruction name
-
-Returns:
-
-  Instruction name offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Name,
@@ -316,25 +256,19 @@ Returns:
   return mInstructionNameOffset;
 }
 
+/**
+
+  Print register 1 in operands.
+
+  @param  Operands - instruction operands
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintRegister1 (
   IN UINT8                  Operands
   )
-/*++
-
-Routine Description:
-
-  Print register 1 in operands
-
-Arguments:
-
-  Operands - instruction operands
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   if (Operands & OPERAND_M_INDIRECT1) {
     EDBSPrintWithOffset (
@@ -357,25 +291,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print register 2 in operands.
+
+  @param  Operands - instruction operands
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintRegister2 (
   IN UINT8                  Operands
   )
-/*++
-
-Routine Description:
-
-  Print register 2 in operands
-
-Arguments:
-
-  Operands - instruction operands
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   if (Operands & OPERAND_M_INDIRECT2) {
     EDBSPrintWithOffset (
@@ -398,25 +326,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print dedicated register 1 in operands.
+
+  @param Operands - instruction operands
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintDedicatedRegister1 (
   IN UINT8                  Operands
   )
-/*++
-
-Routine Description:
-
-  Print dedicated register 1 in operands
-
-Arguments:
-
-  Operands - instruction operands
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   switch (Operands & OPERAND_M_OP1) {
   case 0:
@@ -442,25 +364,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print dedicated register 2 in operands.
+
+  @param  Operands - instruction operands
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintDedicatedRegister2 (
   IN UINT8                  Operands
   )
-/*++
-
-Routine Description:
-
-  Print dedicated register 2 in operands
-
-Arguments:
-
-  Operands - instruction operands
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   switch ((Operands & OPERAND_M_OP2) >> 4) {
   case 0:
@@ -486,29 +402,23 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical UINTN index data to instruction content.
+
+  @param  Sign          - Signed bit of UINTN data
+  @param  NaturalUnits  - natural units of UINTN data
+  @param  ConstantUnits - natural units of UINTN data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintIndexData (
   IN BOOLEAN                Sign,
   IN UINTN                  NaturalUnits,
   IN UINTN                  ConstantUnits
   )
-/*++
-
-Routine Description:
-
-  Print the hexical UINTN index data to instruction content
-
-Arguments:
-
-  Sign          - Signed bit of UINTN data
-  NaturalUnits  - natural units of UINTN data
-  ConstantUnits - natural units of UINTN data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -525,29 +435,23 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical QWORD index data to instruction content.
+
+  @param  Sign          - Signed bit of QWORD data
+  @param  NaturalUnits  - natural units of QWORD data
+  @param  ConstantUnits - natural units of QWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintIndexData64 (
   IN BOOLEAN                Sign,
   IN UINT64                 NaturalUnits,
   IN UINT64                 ConstantUnits
   )
-/*++
-
-Routine Description:
-
-  Print the hexical QWORD index data to instruction content
-
-Arguments:
-
-  Sign          - Signed bit of QWORD data
-  NaturalUnits  - natural units of QWORD data
-  ConstantUnits - natural units of QWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -564,25 +468,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical WORD raw index data to instruction content.
+
+  @param  Data16 - WORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintRawIndexData16 (
   IN UINT16                 Data16
   )
-/*++
-
-Routine Description:
-
-  Print the hexical WORD raw index data to instruction content
-
-Arguments:
-
-  Data16 - WORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   BOOLEAN Sign;
   UINTN   NaturalUnits;
@@ -595,25 +493,19 @@ Returns:
   return Offset;
 }
 
+/**
+
+  Print the hexical DWORD raw index data to instruction content.
+
+  @param  Data32 - DWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintRawIndexData32 (
   IN UINT32                 Data32
   )
-/*++
-
-Routine Description:
-
-  Print the hexical DWORD raw index data to instruction content
-
-Arguments:
-
-  Data32 - DWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   BOOLEAN Sign;
   UINTN   NaturalUnits;
@@ -626,25 +518,19 @@ Returns:
   return Offset;
 }
 
+/**
+
+  Print the hexical QWORD raw index data to instruction content.
+
+  @param  Data64 - QWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintRawIndexData64 (
   IN UINT64                 Data64
   )
-/*++
-
-Routine Description:
-
-  Print the hexical QWORD raw index data to instruction content
-
-Arguments:
-
-  Data64 - QWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   BOOLEAN Sign;
   UINT64  NaturalUnits;
@@ -657,25 +543,19 @@ Returns:
   return Offset;
 }
 
+/**
+
+  Print the hexical BYTE immediate data to instruction content.
+
+  @param  Data - BYTE data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintImmData8 (
   IN UINT8                  Data
   )
-/*++
-
-Routine Description:
-
-  Print the hexical BYTE immediate data to instruction content
-
-Arguments:
-
-  Data - BYTE data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -689,25 +569,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical WORD immediate data to instruction content.
+
+  @param  Data - WORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintImmData16 (
   IN UINT16                 Data
   )
-/*++
-
-Routine Description:
-
-  Print the hexical WORD immediate data to instruction content
-
-Arguments:
-
-  Data - WORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -721,25 +595,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical DWORD immediate data to instruction content.
+
+  @param  Data - DWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintImmData32 (
   IN UINT32                 Data
   )
-/*++
-
-Routine Description:
-
-  Print the hexical DWORD immediate data to instruction content
-
-Arguments:
-
-  Data - DWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -753,25 +621,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical QWORD immediate data to instruction content.
+
+  @param  Data - QWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintImmData64 (
   IN UINT64                 Data
   )
-/*++
-
-Routine Description:
-
-  Print the hexical QWORD immediate data to instruction content
-
-Arguments:
-
-  Data - QWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -785,25 +647,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal UINTN immediate data to instruction content.
+
+  @param  Data - UINTN data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintImmDatan (
   IN UINTN                  Data
   )
-/*++
-
-Routine Description:
-
-  Print the decimal UINTN immediate data to instruction content
-
-Arguments:
-
-  Data - UINTN data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -817,25 +673,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal QWORD immediate data to instruction content.
+
+  @param  Data64 - QWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintImmData64n (
   IN UINT64                 Data64
   )
-/*++
-
-Routine Description:
-
-  Print the decimal QWORD immediate data to instruction content
-
-Arguments:
-
-  Data64 - QWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -849,25 +699,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical BYTE to instruction content.
+
+  @param  Data8 - BYTE data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData8 (
   IN UINT8                  Data8
   )
-/*++
-
-Routine Description:
-
-  Print the hexical BYTE to instruction content
-
-Arguments:
-
-  Data8 - BYTE data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -881,25 +725,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical WORD to instruction content.
+
+  @param  Data16 - WORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData16 (
   IN UINT16                 Data16
   )
-/*++
-
-Routine Description:
-
-  Print the hexical WORD to instruction content
-
-Arguments:
-
-  Data16 - WORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -913,25 +751,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical DWORD to instruction content.
+
+  @param  Data32 - DWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData32 (
   IN UINT32                 Data32
   )
-/*++
-
-Routine Description:
-
-  Print the hexical DWORD to instruction content
-
-Arguments:
-
-  Data32 - DWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -945,25 +777,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the hexical QWORD to instruction content.
+
+  @param  Data64 - QWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData64 (
   IN UINT64                 Data64
   )
-/*++
-
-Routine Description:
-
-  Print the hexical QWORD to instruction content
-
-Arguments:
-
-  Data64 - QWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -977,25 +803,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal unsigned UINTN to instruction content.
+
+  @param  Data - unsigned UINTN data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintDatan (
   IN UINTN                  Data
   )
-/*++
-
-Routine Description:
-
-  Print the decimal unsigned UINTN to instruction content
-
-Arguments:
-
-  Data - unsigned UINTN data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -1009,25 +829,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal unsigned QWORD to instruction content.
+
+  @param  Data64 - unsigned QWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData64n (
   IN UINT64                 Data64
   )
-/*++
-
-Routine Description:
-
-  Print the decimal unsigned QWORD to instruction content
-
-Arguments:
-
-  Data64 - unsigned QWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -1041,25 +855,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal signed BYTE to instruction content.
+
+  @param  Data8 - signed BYTE data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData8s (
   IN UINT8                  Data8
   )
-/*++
-
-Routine Description:
-
-  Print the decimal signed BYTE to instruction content
-
-Arguments:
-
-  Data8 - signed BYTE data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   BOOLEAN Sign;
 
@@ -1078,25 +886,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal signed WORD to instruction content.
+
+  @param  Data16 - signed WORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData16s (
   IN UINT16                 Data16
   )
-/*++
-
-Routine Description:
-
-  Print the decimal signed WORD to instruction content
-
-Arguments:
-
-  Data16 - signed WORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   BOOLEAN Sign;
 
@@ -1115,25 +917,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal signed DWORD to instruction content.
+
+  @param  Data32 - signed DWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData32s (
   IN UINT32                 Data32
   )
-/*++
-
-Routine Description:
-
-  Print the decimal signed DWORD to instruction content
-
-Arguments:
-
-  Data32 - signed DWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   BOOLEAN Sign;
 
@@ -1152,25 +948,19 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the decimal signed QWORD to instruction content.
+
+  @param  Data64 - signed QWORD data
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintData64s (
   IN UINT64                 Data64
   )
-/*++
-
-Routine Description:
-
-  Print the decimal signed QWORD to instruction content
-
-Arguments:
-
-  Data64 - signed QWORD data
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   BOOLEAN Sign;
   INT64   Data64s;
@@ -1191,25 +981,17 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Print the comma to instruction content.
+
+  @return Instruction content offset
+
+**/
 UINTN
 EdbPrintComma (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Print the comma to instruction content
-
-Arguments:
-
-  None
-
-Returns:
-
-  Instruction content offset
-
---*/
 {
   EDBSPrintWithOffset (
     mInstructionString.Content,
@@ -1222,26 +1004,20 @@ Returns:
   return mInstructionContentOffset;
 }
 
+/**
+
+  Find the symbol string according to address, then print it.
+
+  @param  Address - instruction address
+
+  @retval 1 - symbol string is found and printed
+  @retval 0 - symbol string not found
+
+**/
 UINTN
 EdbFindAndPrintSymbol (
   IN UINTN                  Address
   )
-/*++
-
-Routine Description:
-
-  Find the symbol string according to address, then print it
-
-Arguments:
-
-  Address - instruction address
-
-Returns:
-
-  1 - symbol string is found and printed
-  0 - symbol string not found
-
---*/
 {
   CHAR8 *SymbolStr;
 
@@ -1260,27 +1036,19 @@ Returns:
   return 0;
 }
 
+/**
+
+  Print the EBC byte code.
+
+  @param  InstructionAddress - instruction address
+  @param  InstructionNumber  - instruction number
+
+**/
 VOID
 EdbPrintRaw (
   IN EFI_PHYSICAL_ADDRESS   InstructionAddress,
   IN UINTN                  InstructionNumber
   )
-/*++
-
-Routine Description:
-
-  Print the EBC byte code
-
-Arguments:
-
-  InstructionAddress - instruction address
-  InstructionNumber  - instruction number
-
-Returns:
-
-  None
-
---*/
 {
   UINTN  LineNumber;
   UINTN  ByteNumber;
@@ -1328,27 +1096,21 @@ Returns:
   return ;
 }
 
+/**
+
+  Print the EBC asm code.
+
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_SUCCESS - show disasm successfully
+
+**/
 EFI_STATUS
 EdbShowDisasm (
   IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN     EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  Print the EBC asm code
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_SUCCESS - show disasm successfully
-
---*/
 {
   EFI_PHYSICAL_ADDRESS    InstructionAddress;
   UINTN                   InstructionNumber;
@@ -1414,27 +1176,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Get register value accroding to the system context, and register index.
+
+  @param  SystemContext   - EBC system context.
+  @param  Index           - EBC register index
+
+  @return register value
+
+**/
 UINT64
 GetRegisterValue (
   IN     EFI_SYSTEM_CONTEXT        SystemContext,
   IN     UINT8                     Index
   )
-/*++
-
-Routine Description:
-
-  Get register value accroding to the system context, and register index
-
-Arguments:
-
-  SystemContext   - EBC system context.
-  Index           - EBC register index
-
-Returns:
-
-  register value
-
---*/
 {
   switch (Index) {
   case 0:

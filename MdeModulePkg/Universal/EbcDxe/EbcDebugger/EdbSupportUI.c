@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,14 +9,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbSupportUI.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
@@ -33,28 +27,23 @@ SetCursorPosition (
   IN  UINTN                           Len
   );
 
+/**
+
+  Function waits for a given event to fire, or for an optional timeout to expire.
+
+  @param  Event            - The event to wait for
+  @param  Timeout          - An optional timeout value in 100 ns units.
+
+  @retval EFI_SUCCESS       - Event fired before Timeout expired.
+  @retval EFI_TIME_OUT     - Timout expired before Event fired..
+
+**/
 EFI_STATUS
 EFIAPI
 WaitForSingleEvent (
   IN EFI_EVENT                  Event,
   IN UINT64                     Timeout OPTIONAL
   )
-/*++
-
-Routine Description:
-  Function waits for a given event to fire, or for an optional timeout to expire.
-
-Arguments:
-  Event            - The event to wait for
-
-  Timeout          - An optional timeout value in 100 ns units.
-
-Returns:
-
-  EFI_SUCCESS       - Event fired before Timeout expired.
-  EFI_TIME_OUT     - Timout expired before Event fired..
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       Index;
@@ -103,6 +92,15 @@ Returns:
   return Status;
 }
 
+/**
+
+  Move the cursor position one character backward.
+
+  @param  LineLength       Length of a line. Get it by calling QueryMode
+  @param  Column           Current column of the cursor position
+  @param  Row              Current row of the cursor position
+
+**/
 VOID
 EFIAPI
 ConMoveCursorBackward (
@@ -110,19 +108,6 @@ ConMoveCursorBackward (
   IN OUT UINTN                   *Column,
   IN OUT UINTN                   *Row
   )
-/*++
-
-Routine Description:
-  Move the cursor position one character backward.
-
-Arguments:
-  LineLength       Length of a line. Get it by calling QueryMode
-  Column           Current column of the cursor position
-  Row              Current row of the cursor position
-
-Returns:
-
---*/
 {
   ASSERT (Column != NULL);
   ASSERT (Row != NULL);
@@ -144,6 +129,16 @@ Returns:
   }
 }
 
+/**
+
+  Move the cursor position one character backward.
+
+  @param  LineLength       Length of a line. Get it by calling QueryMode
+  @param  TotalRow         Total row of a screen, get by calling QueryMode
+  @param  Column           Current column of the cursor position
+  @param  Row              Current row of the cursor position
+
+**/
 VOID
 EFIAPI
 ConMoveCursorForward (
@@ -152,20 +147,6 @@ ConMoveCursorForward (
   IN OUT UINTN                   *Column,
   IN OUT UINTN                   *Row
   )
-/*++
-
-Routine Description:
-  Move the cursor position one character backward.
-
-Arguments:
-  LineLength       Length of a line. Get it by calling QueryMode
-  TotalRow         Total row of a screen, get by calling QueryMode
-  Column           Current column of the cursor position
-  Row              Current row of the cursor position
-
-Returns:
-
---*/
 {
   ASSERT (Column != NULL);
   ASSERT (Row != NULL);

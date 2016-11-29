@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,14 +9,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbCommand.h
-
-Abstract:
-
-
---*/
+**/
 
 #ifndef _EFI_EDB_COMMAND_H_
 #define _EFI_EDB_COMMAND_H_
@@ -29,12 +23,33 @@ typedef enum {
   EdbWidthMax
 } EDB_DATA_WIDTH;
 
+/**
+
+  Find the command according to name.
+
+  @param  CommandName   - Command Name
+  @param  CommandArg    - Command Argument
+
+  @return Not NULL        - The DebuggerCommand is found successfully
+  @return NULL            - not found
+
+**/
 EFI_DEBUGGER_COMMAND
 MatchDebuggerCommand (
   IN CHAR16    *CommandName,
   IN CHAR16    **CommandArg
   );
 
+/**
+
+  Find the command name according to the function key.
+
+  @param  CommandKey    - Command Function Key
+
+  @return Not NULL        - The DebuggerName is found successfully
+  @return NULL            - not found
+
+**/
 CHAR16 *
 GetCommandNameByKey (
   IN EFI_INPUT_KEY CommandKey

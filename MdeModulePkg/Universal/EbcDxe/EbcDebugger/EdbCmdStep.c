@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,37 +9,25 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbCmdStep.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
+/**
+
+  Check whether current IP is EBC CALL instruction (NOTE: CALLEX is exclusive)
+
+  @param  Address   - EBC IP address.
+
+  @retval TRUE  - Current IP is EBC CALL instruction
+  @retval FALSE - Current IP is not EBC CALL instruction
+
+**/
 BOOLEAN
 IsEBCCALL (
   IN UINTN            Address
   )
-/*++
-
-Routine Description:
-
-  Check whether current IP is EBC CALL instruction (NOTE: CALLEX is exclusive)
-
-Arguments:
-
-  Address   - EBC IP address.
-
-Returns:
-
-  TRUE  - Current IP is EBC CALL instruction
-  FALSE - Current IP is not EBC CALL instruction
-
---*/
 {
   if (GET_OPCODE(Address) != OPCODE_CALL) {
     return FALSE;
@@ -52,26 +40,20 @@ Returns:
   }
 }
 
+/**
+
+  Check whether current IP is EBC RET instruction.
+
+  @param  Address   - EBC IP address.
+
+  @retval TRUE  - Current IP is EBC RET instruction
+  @retval FALSE - Current IP is not EBC RET instruction
+
+**/
 BOOLEAN
 IsEBCRET (
   IN UINTN            Address
   )
-/*++
-
-Routine Description:
-
-  Check whether current IP is EBC RET instruction
-
-Arguments:
-
-  Address   - EBC IP address.
-
-Returns:
-
-  TRUE  - Current IP is EBC RET instruction
-  FALSE - Current IP is not EBC RET instruction
-
---*/
 {
   if (GET_OPCODE(Address) != OPCODE_RET) {
     return FALSE;
@@ -84,6 +66,18 @@ Returns:
   }
 }
 
+/**
+
+  DebuggerCommand - StepInto.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerStepInto (
   IN     CHAR16                    *CommandArg,
@@ -91,30 +85,24 @@ DebuggerStepInto (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - StepInto
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   SystemContext.SystemContextEbc->Flags |= VMFLAGS_STEP;
 
   return EFI_DEBUG_BREAK;
 }
 
+/**
+
+  DebuggerCommand - StepOver.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerStepOver (
   IN     CHAR16                    *CommandArg,
@@ -122,24 +110,6 @@ DebuggerStepOver (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - StepOver
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   if (IsEBCCALL((UINTN)SystemContext.SystemContextEbc->Ip)) {
     //
@@ -156,6 +126,18 @@ Returns:
   return EFI_DEBUG_BREAK;
 }
 
+/**
+
+  DebuggerCommand - StepOut.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerStepOut (
   IN     CHAR16                    *CommandArg,
@@ -163,24 +145,6 @@ DebuggerStepOut (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - StepOut
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   if (IsEBCRET((UINTN)SystemContext.SystemContextEbc->Ip)) {
     //

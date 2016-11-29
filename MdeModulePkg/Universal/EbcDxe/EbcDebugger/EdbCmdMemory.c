@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,38 +9,27 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbCmdMemory.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
+
+/**
+
+  Display memory unit.
+
+  @param  Address         - Memory Address
+  @param  Width           - Memory Width
+
+  @return Length of the memory unit
+
+**/
 UINTN
 EdbDisplayMemoryUnit (
   IN UINTN           Address,
   IN EDB_DATA_WIDTH  Width
   )
-/*++
-
-Routine Description:
-
-  Display memory unit
-
-Arguments:
-
-  Address         - Memory Address
-  Width           - Memory Width
-
-Returns:
-
-  Length of the memory unit
-
---*/
 {
   UINT8  Data8;
   UINT16 Data16;
@@ -78,29 +67,21 @@ Returns:
   return 0;
 }
 
+/**
+
+  Display memory.
+
+  @param  Address         - Memory Address
+  @param  Count           - Memory Count
+  @param  Width           - Memory Width
+
+**/
 VOID
 EdbDisplayMemory (
   IN UINTN          Address,
   IN UINTN          Count,
   IN EDB_DATA_WIDTH Width
   )
-/*++
-
-Routine Description:
-
-  Display memory
-
-Arguments:
-
-  Address         - Memory Address
-  Count           - Memory Count
-  Width           - Memory Width
-
-Returns:
-
-  None
-
---*/
 {
   UINTN  LineNumber;
   UINTN  ByteNumber;
@@ -182,29 +163,21 @@ Returns:
   return ;
 }
 
+/**
+
+  Entry memory.
+
+  @param  Address         - Memory Address
+  @param  Value           - Memory Value
+  @param  Width           - Memory Width
+
+**/
 VOID
 EdbEnterMemory (
   IN UINTN          Address,
   IN VOID           *Value,
   IN EDB_DATA_WIDTH Width
   )
-/*++
-
-Routine Description:
-
-  Entry memory
-
-Arguments:
-
-  Address         - Memory Address
-  Value           - Memory Value
-  Width           - Memory Width
-
-Returns:
-
-  None
-
---*/
 {
   switch (Width) {
   case EdbWidthUint8:
@@ -226,30 +199,24 @@ Returns:
   return ;
 }
 
+/**
+
+  Get memory address and count.
+
+  @param  CommandArg      - The argument for this command
+  @param  Address         - Memory Address
+  @param  Count           - Memory Count
+
+  @retval EFI_SUCCESS           - memory address and count are got
+  @retval EFI_INVALID_PARAMETER - something wrong
+
+**/
 EFI_STATUS
 EdbGetMemoryAddressCount (
   IN CHAR16    *CommandArg,
   IN UINTN     *Address,
   IN UINTN     *Count
   )
-/*++
-
-Routine Description:
-
-  Get memory address and count
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  Address         - Memory Address
-  Count           - Memory Count
-
-Returns:
-
-  EFI_SUCCESS           - memory address and count are got
-  EFI_INVALID_PARAMETER - something wrong
-
---*/
 {
   CHAR16       *CommandStr;
   UINTN        MemAddress;
@@ -293,30 +260,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Get memory address and value.
+
+  @param  CommandArg      - The argument for this command
+  @param  Address         - Memory Address
+  @param  Value           - Memory Value
+
+  @retval EFI_SUCCESS           - memory address and value are got
+  @retval EFI_INVALID_PARAMETER - something wrong
+
+**/
 EFI_STATUS
 EdbGetMemoryAddressValue (
   IN CHAR16    *CommandArg,
   IN UINTN     *Address,
   IN UINT64    *Value
   )
-/*++
-
-Routine Description:
-
-  Get memory address and value
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  Address         - Memory Address
-  Value           - Memory Value
-
-Returns:
-
-  EFI_SUCCESS           - memory address and value are got
-  EFI_INVALID_PARAMETER - something wrong
-
---*/
 {
   CHAR16       *CommandStr;
   UINTN        MemAddress;
@@ -360,27 +321,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Display memory.
+
+  @param  CommandArg      - The argument for this command
+  @param  Width           - Memory Width
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryDisplay (
   IN     CHAR16                    *CommandArg,
   IN     EDB_DATA_WIDTH            Width
   )
-/*++
-
-Routine Description:
-
-  Display memory
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  Width           - Memory Width
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   EFI_STATUS Status;
   UINTN      Address;
@@ -405,27 +360,21 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  Enter memory.
+
+  @param  CommandArg      - The argument for this command
+  @param  Width           - Memory Width
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryEnter (
   IN     CHAR16                    *CommandArg,
   IN     EDB_DATA_WIDTH            Width
   )
-/*++
-
-Routine Description:
-
-  Enter memory
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  Width           - Memory Width
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   EFI_STATUS Status;
   UINTN      Address;
@@ -450,6 +399,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - DB.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Interrupt type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryDB (
   IN     CHAR16                    *CommandArg,
@@ -457,28 +418,22 @@ DebuggerMemoryDB (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - DB
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryDisplay (CommandArg, EdbWidthUint8);
 }
 
+/**
+
+  DebuggerCommand - DW.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Interrupt type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryDW (
   IN     CHAR16                    *CommandArg,
@@ -486,28 +441,22 @@ DebuggerMemoryDW (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - DW
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryDisplay (CommandArg, EdbWidthUint16);
 }
 
+/**
+
+  DebuggerCommand - DD.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Interrupt type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryDD (
   IN     CHAR16                    *CommandArg,
@@ -515,28 +464,22 @@ DebuggerMemoryDD (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - DD
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryDisplay (CommandArg, EdbWidthUint32);
 }
 
+/**
+
+  DebuggerCommand - DQ.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryDQ (
   IN     CHAR16                    *CommandArg,
@@ -544,28 +487,22 @@ DebuggerMemoryDQ (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - DQ
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryDisplay (CommandArg, EdbWidthUint64);
 }
 
+/**
+
+  DebuggerCommand - EB.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryEB (
   IN     CHAR16                    *CommandArg,
@@ -573,28 +510,22 @@ DebuggerMemoryEB (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - EB
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryEnter (CommandArg, EdbWidthUint8);
 }
 
+/**
+
+  DebuggerCommand - EW.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Interrupt type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryEW (
   IN     CHAR16                    *CommandArg,
@@ -602,28 +533,22 @@ DebuggerMemoryEW (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - EW
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryEnter (CommandArg, EdbWidthUint16);
 }
 
+/**
+
+  DebuggerCommand - ED.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryED (
   IN     CHAR16                    *CommandArg,
@@ -631,28 +556,22 @@ DebuggerMemoryED (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - ED
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryEnter (CommandArg, EdbWidthUint32);
 }
 
+/**
+
+  DebuggerCommand - EQ.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_RETURN   - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerMemoryEQ (
   IN     CHAR16                    *CommandArg,
@@ -660,24 +579,6 @@ DebuggerMemoryEQ (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - EQ
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_RETURN   - formal return value
-
---*/
 {
   return DebuggerMemoryEnter (CommandArg, EdbWidthUint64);
 }

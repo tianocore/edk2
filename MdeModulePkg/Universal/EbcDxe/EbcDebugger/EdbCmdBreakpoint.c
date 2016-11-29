@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007 - 2016, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,37 +9,25 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbCmdBreakpoint.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
+/**
+
+  Check whether current IP is EBC BREAK3 instruction.
+
+  @param  Address    EBC IP address.
+
+  @retval TRUE       Current IP is EBC BREAK3 instruction
+  @retval FALSE      Current IP is not EBC BREAK3 instruction
+
+**/
 BOOLEAN
 IsEBCBREAK3 (
   IN UINTN            Address
   )
-/*++
-
-Routine Description:
-
-  Check whether current IP is EBC BREAK3 instruction
-
-Arguments:
-
-  Address   - EBC IP address.
-
-Returns:
-
-  TRUE  - Current IP is EBC BREAK3 instruction
-  FALSE - Current IP is not EBC BREAK3 instruction
-
---*/
 {
   if (GET_OPCODE(Address) != OPCODE_BREAK) {
     return FALSE;
@@ -52,28 +40,22 @@ Returns:
   }
 }
 
+/**
+
+  Check whether the Address is already set in breakpoint.
+
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  Address           Breakpoint Address
+
+  @retval TRUE              breakpoint is found
+  @retval FALSE             breakpoint is not found
+
+**/
 BOOLEAN
 DebuggerBreakpointIsDuplicated (
   IN EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN UINTN                     Address
   )
-/*++
-
-Routine Description:
-
-  Check whether the Address is already set in breakpoint
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  Address         - Breakpoint Address
-
-Returns:
-
-  TRUE          - breakpoint is found
-  FALSE         - breakpoint is not found
-
---*/
 {
   UINTN  Index;
 
@@ -95,29 +77,23 @@ Returns:
   return FALSE;
 }
 
+/**
+
+  Add this breakpoint.
+
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  Address           Breakpoint Address
+
+  @retval EFI_SUCCESS            breakpoint added successfully
+  @retval EFI_ALREADY_STARTED    breakpoint is already added
+  @retval EFI_OUT_OF_RESOURCES   all the breakpoint entries are used
+
+**/
 EFI_STATUS
 DebuggerBreakpointAdd (
   IN EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN UINTN                     Address
   )
-/*++
-
-Routine Description:
-
-  Add this breakpoint
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  Address         - Breakpoint Address
-
-Returns:
-
-  EFI_SUCCESS          - breakpoint added successfully
-  EFI_ALREADY_STARTED  - breakpoint is already added
-  EFI_OUT_OF_RESOURCES - all the breakpoint entries are used
-
---*/
 {
   //
   // Check duplicated breakpoint
@@ -160,28 +136,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Delete this breakpoint.
+
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  Index             Breakpoint Index
+
+  @retval EFI_SUCCESS     breakpoint deleted successfully
+  @retval EFI_NOT_FOUND   breakpoint not found
+
+**/
 EFI_STATUS
 DebuggerBreakpointDel (
   IN EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN UINTN                     Index
   )
-/*++
-
-Routine Description:
-
-  Delete this breakpoint
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  Index           - Breakpoint Index
-
-Returns:
-
-  EFI_SUCCESS   - breakpoint deleted successfully
-  EFI_NOT_FOUND - breakpoint not found
-
---*/
 {
   UINTN    BpIndex;
 
@@ -209,28 +179,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Disable this breakpoint.
+
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  Index             Breakpoint Index
+
+  @retval EFI_SUCCESS     breakpoint disabled successfully
+  @retval EFI_NOT_FOUND   breakpoint not found
+
+**/
 EFI_STATUS
 DebuggerBreakpointDis (
   IN EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN UINTN                     Index
   )
-/*++
-
-Routine Description:
-
-  Disable this breakpoint
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  Index           - Breakpoint Index
-
-Returns:
-
-  EFI_SUCCESS   - breakpoint disabled successfully
-  EFI_NOT_FOUND - breakpoint not found
-
---*/
 {
   if ((Index >= EFI_DEBUGGER_BREAKPOINT_MAX) ||
       (Index >= DebuggerPrivate->DebuggerBreakpointCount)) {
@@ -245,28 +209,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Enable this breakpoint.
+
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  Index           - Breakpoint Index
+
+  @retval EFI_SUCCESS   - breakpoint enabled successfully
+  @retval EFI_NOT_FOUND - breakpoint not found
+
+**/
 EFI_STATUS
 DebuggerBreakpointEn (
   IN EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
   IN UINTN                     Index
   )
-/*++
-
-Routine Description:
-
-  Enable this breakpoint
-
-Arguments:
-
-  DebuggerPrivate - EBC Debugger private data structure
-  Index           - Breakpoint Index
-
-Returns:
-
-  EFI_SUCCESS   - breakpoint enabled successfully
-  EFI_NOT_FOUND - breakpoint not found
-
---*/
 {
   if ((Index >= EFI_DEBUGGER_BREAKPOINT_MAX) ||
       (Index >= DebuggerPrivate->DebuggerBreakpointCount)) {
@@ -281,6 +239,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  DebuggerCommand - BreakpointList.
+
+  @param  CommandArg      - The argument for this command
+  @param  DebuggerPrivate - EBC Debugger private data structure
+  @param  ExceptionType   - Exception type.
+  @param  SystemContext   - EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakpointList (
   IN     CHAR16                    *CommandArg,
@@ -288,24 +258,6 @@ DebuggerBreakpointList (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakpointList
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN Index;
 
@@ -347,6 +299,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - BreakpointSet.
+
+  @param  CommandArg        The argument for this command
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  ExceptionType     Exception type.
+  @param  SystemContext     EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE - formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakpointSet (
   IN     CHAR16                    *CommandArg,
@@ -354,24 +318,6 @@ DebuggerBreakpointSet (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakpointSet
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN      Address;
   EFI_STATUS Status;
@@ -411,6 +357,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - BreakpointClear
+
+  @param  CommandArg        The argument for this command
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  ExceptionType     Exception type.
+  @param  SystemContext     EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE   formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakpointClear (
   IN     CHAR16                    *CommandArg,
@@ -418,24 +376,6 @@ DebuggerBreakpointClear (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakpointClear
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN      Index;
   EFI_STATUS Status;
@@ -484,6 +424,18 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+
+  DebuggerCommand - BreakpointDisable
+
+  @param  CommandArg        The argument for this command
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  ExceptionType     Exception type.
+  @param  SystemContext     EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE   formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakpointDisable (
   IN     CHAR16                    *CommandArg,
@@ -491,24 +443,6 @@ DebuggerBreakpointDisable (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakpointDisable
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN      Index;
   EFI_STATUS Status;
@@ -552,6 +486,17 @@ Returns:
   return EFI_DEBUG_CONTINUE;
 }
 
+/**
+  DebuggerCommand - BreakpointEnable.
+
+  @param  CommandArg        The argument for this command
+  @param  DebuggerPrivate   EBC Debugger private data structure
+  @param  ExceptionType     Exception type.
+  @param  SystemContext     EBC system context.
+
+  @retval EFI_DEBUG_CONTINUE   formal return value
+
+**/
 EFI_DEBUG_STATUS
 DebuggerBreakpointEnable (
   IN     CHAR16                    *CommandArg,
@@ -559,24 +504,6 @@ DebuggerBreakpointEnable (
   IN     EFI_EXCEPTION_TYPE        ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
-/*++
-
-Routine Description:
-
-  DebuggerCommand - BreakpointEnable
-
-Arguments:
-
-  CommandArg      - The argument for this command
-  DebuggerPrivate - EBC Debugger private data structure
-  InterruptType   - Interrupt type.
-  SystemContext   - EBC system context.
-
-Returns:
-
-  EFI_DEBUG_CONTINUE - formal return value
-
---*/
 {
   UINTN      Index;
   EFI_STATUS Status;

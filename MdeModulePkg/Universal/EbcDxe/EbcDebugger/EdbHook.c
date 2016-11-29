@@ -1,7 +1,7 @@
-/*++
+/** @file
 
-Copyright (c) 2007, Intel Corporation
-All rights reserved. This program and the accompanying materials
+Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
@@ -9,40 +9,24 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-Module Name:
 
-  EdbHook.c
-
-Abstract:
-
-
---*/
+**/
 
 #include "Edb.h"
 
-//
-// Hook support function
-//
+/**
+
+  Check the Hook flag, and trigger exception if match.
+
+  @param  VmPtr        - EbcDebuggerCheckHookFlag
+  @param  Flag         - Feature flag
+
+**/
 VOID
 EbcDebuggerCheckHookFlag (
   IN VM_CONTEXT *VmPtr,
   IN UINT32     Flag
   )
-/*++
-
-Routine Description:
-
-  Check the Hook flag, and trigger exception if match.
-
-Arguments:
-
-  VmPtr        - EbcDebuggerCheckHookFlag
-  Flag         - Feature flag
-
-Returns:
-  None
-
---*/
 {
   if ((mDebuggerPrivate.FeatureFlags & Flag) == Flag) {
     mDebuggerPrivate.StatusFlags = Flag;
@@ -55,26 +39,19 @@ Returns:
   return ;
 }
 
+/**
+
+  It will record soruce address for Callstack entry.
+
+  @param  SourceEntry  - Source address
+  @param  Type         - Branch type
+
+**/
 VOID
 EbcDebuggerPushCallstackSource (
   IN UINT64                   SourceEntry,
   IN EFI_DEBUGGER_BRANCH_TYPE Type
   )
-/*++
-
-Routine Description:
-
-  It will record soruce address for Callstack entry.
-
-Arguments:
-
-  SourceEntry  - Source address
-  Type         - Branch type
-
-Returns:
-  None
-
---*/
 {
   if (mDebuggerPrivate.CallStackEntryCount > EFI_DEBUGGER_CALLSTACK_MAX) {
     ASSERT (FALSE);
@@ -93,26 +70,19 @@ Returns:
   return ;
 }
 
+/**
+
+  It will record parameter for Callstack entry.
+
+  @param  ParameterAddress - The address for the parameter
+  @param  Type             - Branch type
+
+**/
 VOID
 EbcDebuggerPushCallstackParameter (
   IN UINT64                   ParameterAddress,
   IN EFI_DEBUGGER_BRANCH_TYPE Type
   )
-/*++
-
-Routine Description:
-
-  It will record parameter for Callstack entry.
-
-Arguments:
-
-  ParameterAddress - The address for the parameter
-  Type             - Branch type
-
-Returns:
-  None
-
---*/
 {
   if (mDebuggerPrivate.CallStackEntryCount > EFI_DEBUGGER_CALLSTACK_MAX) {
     ASSERT (FALSE);
@@ -135,26 +105,19 @@ Returns:
   return ;
 }
 
+/**
+
+  It will record source address for callstack entry.
+
+  @param  DestEntry    - Source address
+  @param  Type         - Branch type
+
+**/
 VOID
 EbcDebuggerPushCallstackDest (
   IN UINT64                   DestEntry,
   IN EFI_DEBUGGER_BRANCH_TYPE Type
   )
-/*++
-
-Routine Description:
-
-  It will record source address for callstack entry.
-
-Arguments:
-
-  DestEntry    - Source address
-  Type         - Branch type
-
-Returns:
-  None
-
---*/
 {
   UINTN Index;
 
@@ -180,24 +143,15 @@ Returns:
   return ;
 }
 
+/**
+
+  It will throw the newest Callstack entry.
+
+**/
 VOID
 EbcDebuggerPopCallstack (
   VOID
   )
-/*++
-
-Routine Description:
-
-  It will throw the newest Callstack entry.
-
-Arguments:
-
-  None
-
-Returns:
-  None
-
---*/
 {
   if ((mDebuggerPrivate.CallStackEntryCount > 0) &&
       (mDebuggerPrivate.CallStackEntryCount <= EFI_DEBUGGER_CALLSTACK_MAX)) {
@@ -219,26 +173,19 @@ Returns:
   return ;
 }
 
+/**
+
+  It will record source address for trace entry.
+
+  @param  SourceEntry  - Source address
+  @param  Type         - Branch type
+
+**/
 VOID
 EbcDebuggerPushTraceSourceEntry (
   IN UINT64                   SourceEntry,
   IN EFI_DEBUGGER_BRANCH_TYPE Type
   )
-/*++
-
-Routine Description:
-
-  It will record source address for trace entry.
-
-Arguments:
-
-  SourceEntry  - Source address
-  Type         - Branch type
-
-Returns:
-  None
-
---*/
 {
   if (mDebuggerPrivate.TraceEntryCount > EFI_DEBUGGER_TRACE_MAX) {
     ASSERT (FALSE);
@@ -257,26 +204,19 @@ Returns:
   return ;
 }
 
+/**
+
+  It will record destination address for trace entry.
+
+  @param  DestEntry    - Destination address
+  @param  Type         - Branch type
+
+**/
 VOID
 EbcDebuggerPushTraceDestEntry (
   IN UINT64                   DestEntry,
   IN EFI_DEBUGGER_BRANCH_TYPE Type
   )
-/*++
-
-Routine Description:
-
-  It will record destination address for trace entry.
-
-Arguments:
-
-  DestEntry    - Destination address
-  Type         - Branch type
-
-Returns:
-  None
-
---*/
 {
   UINTN Index;
 
@@ -302,28 +242,21 @@ Returns:
   return ;
 }
 
+/**
+
+  It will record address for StepEntry, if STEPOVER or STEPOUT is enabled.
+
+  @param  Entry    - Break Address
+  @param  FramePtr - Break Frame pointer
+  @param  Flag     - for STEPOVER or STEPOUT
+
+**/
 VOID
 EbcDebuggerPushStepEntry (
   IN UINT64                   Entry,
   IN UINT64                   FramePtr,
   IN UINT32                   Flag
   )
-/*++
-
-Routine Description:
-
-  It will record address for StepEntry, if STEPOVER or STEPOUT is enabled.
-
-Arguments:
-
-  Entry    - Break Address
-  FramePtr - Break Frame pointer
-  Flag     - for STEPOVER or STEPOUT
-
-Returns:
-  None
-
---*/
 {
   //
   // Check StepOver
@@ -364,30 +297,20 @@ EbcDebuggerBreakEventFunc (
   }
 }
 
-//
-// Hook function implementation
-//
+/**
+
+  The hook in InitializeEbcDriver.
+  It will init the EbcDebuggerPrivate data structure.
+
+  @param Handle           - The EbcDebugProtocol handle.
+  @param EbcDebugProtocol - The EbcDebugProtocol interface.
+
+**/
 VOID
 EbcDebuggerHookInit (
   IN EFI_HANDLE                  Handle,
   IN EFI_DEBUG_SUPPORT_PROTOCOL  *EbcDebugProtocol
   )
-/*++
-
-Routine Description:
-
-  The hook in InitializeEbcDriver.
-  It will init the EbcDebuggerPrivate data structure.
-
-Arguments:
-
-  Handle           - The EbcDebugProtocol handle.
-  EbcDebugProtocol - The EbcDebugProtocol interface.
-
-Returns:
-  None
-
---*/
 {
   EFI_STATUS                 Status;
   UINTN                      Index;
@@ -479,25 +402,16 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookUnload (
-  VOID
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in UnloadImage for EBC Interpreter.
   It clean up the environment.
 
-Arguments:
-
-  None
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookUnload (
+  VOID
+  )
 {
   UINTN                      Index;
   UINTN                      SubIndex;
@@ -545,49 +459,37 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookEbcUnloadImage (
-  IN EFI_HANDLE                  Handle
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in EbcUnloadImage.
   Currently do nothing here.
 
-Arguments:
+  @param  Handle           - The EbcImage handle.
 
-  Handle           - The EbcImage handle.
+**/
 
-Returns:
-  None
-
---*/
+VOID
+EbcDebuggerHookEbcUnloadImage (
+  IN EFI_HANDLE                  Handle
+  )
 {
   return ;
 }
 
-VOID
-EbcDebuggerHookExecuteEbcImageEntryPoint (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteEbcImageEntryPoint.
   It will record the call-stack entry. (-1 means EbcImageEntryPoint call)
   and trigger Exception if BOE enabled.
 
-Arguments:
 
-  VmPtr - pointer to VM context.
+  @param  VmPtr - pointer to VM context.
 
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookExecuteEbcImageEntryPoint (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerPushCallstackSource ((UINT64)(UINTN)-1, EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushCallstackParameter ((UINT64)(UINTN)VmPtr->Gpr[0], EfiDebuggerBranchTypeEbcCall);
@@ -596,26 +498,19 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookEbcInterpret (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteEbcImageEntryPoint.
   It will record the call-stack entry. (-2 means EbcInterpret call)
   and trigger Exception if BOT enabled.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookEbcInterpret (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerPushCallstackSource ((UINT64)(UINTN)-2, EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushCallstackParameter ((UINT64)(UINTN)VmPtr->Gpr[0], EfiDebuggerBranchTypeEbcCall);
@@ -624,25 +519,18 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookExecuteStart (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in EbcExecute, before ExecuteFunction.
   It will trigger Exception if GoTil, StepOver, or StepOut hit.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookExecuteStart (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EFI_TPL   CurrentTpl;
 
@@ -710,25 +598,18 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookExecuteEnd (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in EbcExecute, after ExecuteFunction.
   It will record StepOut Entry if need.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookExecuteEnd (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   UINTN  Address;
 
@@ -741,26 +622,19 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookCALLStart (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteCALL, before move IP.
   It will trigger Exception if BOC enabled,
   and record Callstack, and trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookCALLStart (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOC);
   EbcDebuggerPushCallstackSource ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCall);
@@ -769,26 +643,19 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookCALLEnd (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteCALL, after move IP.
   It will record Callstack, trace information
   and record StepOver/StepOut Entry if need.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookCALLEnd (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   UINT64  Address;
   UINTN   FramePtr;
@@ -817,26 +684,19 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookCALLEXStart (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteCALL, before call EbcLLCALLEX.
   It will trigger Exception if BOCX enabled,
   and record Callstack information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookCALLEXStart (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOCX);
 //  EbcDebuggerPushCallstackSource ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
@@ -845,51 +705,37 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookCALLEXEnd (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteCALL, after call EbcLLCALLEX.
   It will record trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookCALLEXEnd (
+  IN VM_CONTEXT *VmPtr
+  )
 {
 //  EbcDebuggerPushCallstackDest ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
   return ;
 }
 
-VOID
-EbcDebuggerHookRETStart (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteRET, before move IP.
   It will trigger Exception if BOR enabled,
   and record Callstack, and trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookRETStart (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOR);
   EbcDebuggerPopCallstack ();
@@ -897,121 +743,86 @@ Returns:
   return ;
 }
 
-VOID
-EbcDebuggerHookRETEnd (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteRET, after move IP.
   It will record trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookRETEnd (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcRet);
   return ;
 }
 
-VOID
-EbcDebuggerHookJMPStart (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteJMP, before move IP.
   It will record trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookJMPStart (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerPushTraceSourceEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp);
   return ;
 }
 
-VOID
-EbcDebuggerHookJMPEnd (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteJMP, after move IP.
   It will record trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookJMPEnd (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp);
   return ;
 }
 
-VOID
-EbcDebuggerHookJMP8Start (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteJMP8, before move IP.
   It will record trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookJMP8Start (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerPushTraceSourceEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp8);
   return ;
 }
 
-VOID
-EbcDebuggerHookJMP8End (
-  IN VM_CONTEXT *VmPtr
-  )
-/*++
-
-Routine Description:
+/**
 
   The hook in ExecuteJMP8, after move IP.
   It will record trace information.
 
-Arguments:
+  @param  VmPtr - pointer to VM context.
 
-  VmPtr - pointer to VM context.
-
-Returns:
-  None
-
---*/
+**/
+VOID
+EbcDebuggerHookJMP8End (
+  IN VM_CONTEXT *VmPtr
+  )
 {
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp8);
   return ;
