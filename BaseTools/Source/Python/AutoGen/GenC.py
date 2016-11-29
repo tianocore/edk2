@@ -1695,10 +1695,11 @@ def CreateIdfFileCode(Info, AutoGenC, StringH, IdfGenCFlag, IdfGenBinBuffer):
                                 TempBuffer, TempPalette = BmpImageDecoder(File, Buffer, PaletteIndex, FileObj.TransParent)
                                 if len(TempPalette) > 1:
                                     PaletteIndex += 1
-                                    PaletteBuffer += pack('H', len(TempPalette))
-                                    PaletteBuffer += TempPalette
+                                    NewPalette = pack('H', len(TempPalette))
+                                    NewPalette += TempPalette
+                                    PaletteBuffer += NewPalette
                                     PaletteStr = WriteLine(PaletteStr, '// %s: %s: %s' % (DecToHexStr(PaletteIndex - 1, 4), ID, DecToHexStr(PaletteIndex - 1, 4)))
-                                    TempPaletteList = AscToHexList(TempPalette)
+                                    TempPaletteList = AscToHexList(NewPalette)
                                     PaletteStr = WriteLine(PaletteStr, CreateArrayItem(TempPaletteList, 16) + '\n')
                             ImageBuffer += TempBuffer
                             BufferStr = WriteLine(BufferStr, '// %s: %s: %s' % (DecToHexStr(Index, 4), ID, DecToHexStr(Index, 4)))
