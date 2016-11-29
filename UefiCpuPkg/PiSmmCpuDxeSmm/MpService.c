@@ -1357,6 +1357,9 @@ InitializeMpSyncData (
         (UINT32 *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Run + mSemaphoreSize * CpuIndex);
       mSmmMpSyncData->CpuData[CpuIndex].Present =
         (BOOLEAN *)((UINTN)mSmmCpuSemaphores.SemaphoreCpu.Present + mSemaphoreSize * CpuIndex);
+      *(mSmmMpSyncData->CpuData[CpuIndex].Busy)    = 0;
+      *(mSmmMpSyncData->CpuData[CpuIndex].Run)     = 0;
+      *(mSmmMpSyncData->CpuData[CpuIndex].Present) = FALSE;
     }
   }
 }
