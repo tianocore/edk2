@@ -1,6 +1,6 @@
 /*++
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -83,6 +83,7 @@ Abstract:
 #include <Ppi/MasterBootMode.h>
 #include <Guid/PlatformCpuInfo.h>
 #include <Guid/OsSelection.h>
+#include <Guid/SmramMemoryReserve.h>
 
 #define SMC_LAN_ON       0x46
 #define SMC_LAN_OFF    0x47

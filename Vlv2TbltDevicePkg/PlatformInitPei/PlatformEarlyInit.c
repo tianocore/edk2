@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -820,6 +820,19 @@ PlatformEarlyInitEntry (
   EFI_PLATFORM_INFO_HOB       *PlatformInfo;
   EFI_PEI_HOB_POINTERS        Hob;
   EFI_PLATFORM_CPU_INFO       PlatformCpuInfo;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+  UINT64                          Size;
+
+  //
+  // Make sure last SMRAM region is aligned
+  //
+  Hob.Raw = GetFirstGuidHob (&gEfiSmmPeiSmramMemoryReserveGuid);
+  if (Hob.Raw != NULL) {
+    DescriptorBlock = GET_GUID_HOB_DATA (Hob.Raw);
+    Size = DescriptorBlock->Descriptor[DescriptorBlock->NumberOfSmmReservedRegions - 1].PhysicalSize;
+    Size = LShiftU64 (1, HighBitSet64 (Size - 1) + 1);
+    DescriptorBlock->Descriptor[DescriptorBlock->NumberOfSmmReservedRegions - 1].PhysicalSize = Size;
+  }
 
   //
   // Initialize SmbusPolicy PPI
