@@ -550,8 +550,13 @@ INF UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
 INF MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
 INF UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
 INF $(PLATFORM_PACKAGE)/SmmSwDispatch2OnSmmSwDispatchThunk/SmmSwDispatch2OnSmmSwDispatchThunk.inf
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PowerManagement2.inf
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/DigitalThermalSensor.inf
+
+#
+# Remove the following two SMM binary modules that prevent platform from booting to UEFI Shell
+#
+#INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/PowerManagement2.inf
+#INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/DigitalThermalSensor.inf
+
   #
   # ACPI
   #
