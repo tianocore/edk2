@@ -19,6 +19,7 @@ DEBUG_AGENT_MAILBOX         mLocalMailbox;
 UINTN                       mSavedDebugRegisters[6];
 IA32_IDT_GATE_DESCRIPTOR    mIdtEntryTable[33];
 BOOLEAN                     mSkipBreakpoint = FALSE;
+BOOLEAN                     mSmmDebugIdtInitFlag = FALSE;
 
 CHAR8 mWarningMsgIgnoreSmmEntryBreak[] = "Ignore smmentrybreak setting for SMI issued during DXE debugging!\r\n";
 
@@ -276,7 +277,14 @@ InitializeDebugAgent (
 
   case DEBUG_AGENT_INIT_ENTER_SMI:
     SaveDebugRegister ();
-    InitializeDebugIdt ();
+    if (!mSmmDebugIdtInitFlag) {
+      //
+      // We only need to initialize Debug IDT table at first SMI entry
+      // after SMM relocation.
+      //
+      InitializeDebugIdt ();
+      mSmmDebugIdtInitFlag = TRUE;
+    }
     //
     // Check if CPU APIC Timer is working, otherwise initialize it.
     //
