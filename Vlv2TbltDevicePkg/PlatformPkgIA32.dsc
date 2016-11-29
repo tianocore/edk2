@@ -77,9 +77,9 @@
 
   DEFINE   PLATFORM_PCIEXPRESS_BASE   = 0E0000000
 
-  DEFINE SEC_ENABLE = TRUE
-  DEFINE SEC_DEBUG_INFO_ENABLE = TRUE
-  DEFINE FTPM_ENABLE = TRUE
+  DEFINE SEC_ENABLE = FALSE
+  DEFINE SEC_DEBUG_INFO_ENABLE = FALSE
+  DEFINE FTPM_ENABLE = FALSE
 
 ################################################################################
 #
@@ -846,9 +846,6 @@
 [PcdsDynamicDefault.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr|0x0
   !if $(TPM_ENABLED) == TRUE
-    gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x7b, 0x3a, 0xcd, 0x72, 0xA5, 0xFE, 0x5e, 0x4f, 0x91, 0x65, 0x4d, 0xd1, 0x21, 0x87, 0xbb, 0x13}
-  !endif
-  !if $(FTPM_ENABLE) == TRUE
     gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x7b, 0x3a, 0xcd, 0x72, 0xA5, 0xFE, 0x5e, 0x4f, 0x91, 0x65, 0x4d, 0xd1, 0x21, 0x87, 0xbb, 0x13}
   !endif
 
