@@ -45,6 +45,11 @@ if /i "%~1"=="/y" (
     shift
     goto OptLoop
 )
+if /i "%~1"=="/m" (
+    set Build_Flags=%Build_Flags% /m
+    shift
+    goto OptLoop
+)
 if /i "%~1" == "/c" (
     set Build_Flags=%Build_Flags% /c
     shift

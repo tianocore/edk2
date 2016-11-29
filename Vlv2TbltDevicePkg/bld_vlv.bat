@@ -71,6 +71,13 @@ if /i "%~1"=="/y" (
     shift
     goto OptLoop
 )
+if /i "%~1"=="/m" (
+    if defined NUMBER_OF_PROCESSORS (
+        set /a build_threads=%NUMBER_OF_PROCESSORS%+1
+    )
+    shift
+    goto OptLoop
+)
 if /i "%~1" == "/c" (
     echo Removing previous build files ...
     if exist build (
@@ -266,6 +273,7 @@ echo.
 echo    /c    CleanAll before building
 echo    /l    Generate build log file
 echo    /y    Generate build report file
+echo    /m    Enable multi-processor build
 echo    /IA32 Set Arch to IA32 (default: X64)
 echo    /X64  Set Arch to X64 (default: X64)
 echo.
