@@ -205,7 +205,7 @@ if %ERRORLEVEL% NEQ 0 goto BldFail
 
 echo.
 echo Invoking EDK2 build...
-build %Build_Flags%
+call build %Build_Flags%
 
 if %ERRORLEVEL% NEQ 0 goto BldFail
 
