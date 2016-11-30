@@ -227,8 +227,8 @@
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
 !else
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+  SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
 !endif
 
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
@@ -332,14 +332,15 @@
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
 !else
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+  DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+  SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
 !endif
 
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
   HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
-  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
-  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
+!endif
 
  !if $(MINNOW2_FSP_BUILD) == TRUE
  PlatformFspLib|Vlv2TbltDevicePkg/Library/PlatformFspLib/PlatformFspLib.inf
@@ -413,7 +414,7 @@
 
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   !if $(TARGET) != RELEASE
-  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   !endif
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
@@ -436,12 +437,7 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
 
 !if $(TARGET) != RELEASE
-      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-!endif
-
-!if $(SOURCE_DEBUG_ENABLE) == TRUE
-  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
-  TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
+      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
 
 [LibraryClasses.X64.DXE_RUNTIME_DRIVER]
@@ -616,6 +612,10 @@
 
   gEfiCpuTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp|TRUE
 
+!if $(SOURCE_DEBUG_ENABLE)
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug|TRUE
+!endif
+
 [PcdsFixedAtBuild.common]
 !if $(MINNOW2_FSP_BUILD) == TRUE
 # $(FLASH_REGION_VLVMICROCODE_BASE)
@@ -694,6 +694,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|FALSE
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|2
 !endif
 
 [PcdsFixedAtBuild.IA32.PEIM, PcdsFixedAtBuild.IA32.PEI_CORE, PcdsFixedAtBuild.IA32.SEC]
@@ -848,16 +849,15 @@
   !if $(TPM_ENABLED) == TRUE
     gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x7b, 0x3a, 0xcd, 0x72, 0xA5, 0xFE, 0x5e, 0x4f, 0x91, 0x65, 0x4d, 0xd1, 0x21, 0x87, 0xbb, 0x13}
   !endif
-  !if $(FTPM_ENABLE) == TRUE
-    gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x7b, 0x3a, 0xcd, 0x72, 0xA5, 0xFE, 0x5e, 0x4f, 0x91, 0x65, 0x4d, 0xd1, 0x21, 0x87, 0xbb, 0x13}
-  !endif
 
   ## This PCD defines the video horizontal resolution.
   #  This PCD could be set to 0 then video resolution could be at highest resolution.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
+  #gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|800
   ## This PCD defines the video vertical resolution.
   #  This PCD could be set to 0 then video resolution could be at highest resolution.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
+  #gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|600
 
   ## This PCD defines the Console output column and the default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output could be at max column and max row.
@@ -943,11 +943,6 @@
 !endif
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000046
-    !if $(TARGET) == DEBUG
-  <LibraryClasses>
-    DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-    SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
-    !endif
   }
 
   $(PLATFORM_PACKAGE)/MonoStatusCode/MonoStatusCode.inf {
@@ -1013,7 +1008,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x803805c6
     <LibraryClasses>
 !if $(TARGET) != RELEASE
-      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   }
@@ -1125,7 +1120,6 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 !endif
 !if $(TARGET) != RELEASE
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-      SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
 !endif
   }
   IntelFrameworkModulePkg/Universal/Acpi/AcpiS3SaveDxe/AcpiS3SaveDxe.inf {
@@ -1135,7 +1129,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
         gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x27
     <LibraryClasses>
     !if $(TARGET) != RELEASE
-          DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+          DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
     !endif
        <BuildOptions>
         ICC:*_*_*_CC_FLAGS = -D MDEPKG_NDEBUG
@@ -1152,16 +1146,19 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf  {
     <LibraryClasses>
 !if $(TARGET) != RELEASE
-      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
   }
 
 !if $(CAPSULE_ENABLE) == TRUE
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf {
     <LibraryClasses>
-    PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-    MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-    HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+      MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+      HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+      DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
+!endif
   }
 !endif
 
@@ -1233,7 +1230,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 !endif
    MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf {
     <LibraryClasses>
-   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+      FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   }
 
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
@@ -1292,7 +1289,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   Vlv2TbltDevicePkg/VlvPlatformInitDxe/VlvPlatformInitDxe.inf{
     <LibraryClasses>
 !if $(TARGET) != RELEASE
-      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
@@ -1355,7 +1352,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   $(PLATFORM_PACKAGE)/PlatformSmm/PlatformSmm.inf{
     <LibraryClasses>
     !if $(TARGET) != RELEASE
-          DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+          DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
     !endif
           PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
@@ -1378,13 +1375,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   # SMM
   #
   MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
-  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf{
-     !if $(TARGET) != RELEASE
-    <LibraryClasses>
-           DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-           SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
-     !endif
-  }
+  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
@@ -1674,6 +1665,10 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   MSFT:*_*_X64_GENFW_FLAGS  = --keepexceptiontable
   GCC:*_*_X64_GENFW_FLAGS   = --keepexceptiontable
   INTEL:*_*_X64_GENFW_FLAGS = --keepexceptiontable
+  DEFINE SOURCE_LEVEL_DEBUG_BUILD_OPTIONS =
+!else
+  DEFINE SOURCE_LEVEL_DEBUG_BUILD_OPTIONS =
+
 !endif
 
 #
