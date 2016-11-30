@@ -338,8 +338,9 @@
 
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
   HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
-  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
-  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
+!endif
 
  !if $(MINNOW2_FSP_BUILD) == TRUE
  PlatformFspLib|Vlv2TbltDevicePkg/Library/PlatformFspLib/PlatformFspLib.inf
@@ -437,11 +438,6 @@
 
 !if $(TARGET) != RELEASE
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!endif
-
-!if $(SOURCE_DEBUG_ENABLE) == TRUE
-  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
-  TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
 !endif
 
 [LibraryClasses.IA32.DXE_RUNTIME_DRIVER]
@@ -616,6 +612,10 @@
 
   gEfiCpuTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp|TRUE
 
+!if $(SOURCE_DEBUG_ENABLE)
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug|TRUE
+!endif
+
 [PcdsFixedAtBuild.common]
 !if $(MINNOW2_FSP_BUILD) == TRUE
 # $(FLASH_REGION_VLVMICROCODE_BASE)
@@ -694,6 +694,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|FALSE
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|2
 !endif
 
 [PcdsFixedAtBuild.IA32.PEIM, PcdsFixedAtBuild.IA32.PEI_CORE, PcdsFixedAtBuild.IA32.SEC]

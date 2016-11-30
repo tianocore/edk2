@@ -338,8 +338,9 @@
 
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
   HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
-  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
-  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
+!endif
 
  !if $(MINNOW2_FSP_BUILD) == TRUE
  PlatformFspLib|Vlv2TbltDevicePkg/Library/PlatformFspLib/PlatformFspLib.inf
@@ -437,11 +438,6 @@
 
 !if $(TARGET) != RELEASE
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-!endif
-
-!if $(SOURCE_DEBUG_ENABLE) == TRUE
-  DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
-  TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
 !endif
 
 [LibraryClasses.X64.DXE_RUNTIME_DRIVER]
@@ -616,6 +612,10 @@
 
   gEfiCpuTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp|TRUE
 
+!if $(SOURCE_DEBUG_ENABLE)
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug|TRUE
+!endif
+
 [PcdsFixedAtBuild.common]
 !if $(MINNOW2_FSP_BUILD) == TRUE
 # $(FLASH_REGION_VLVMICROCODE_BASE)
@@ -694,6 +694,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|FALSE
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|2
 !endif
 
 [PcdsFixedAtBuild.IA32.PEIM, PcdsFixedAtBuild.IA32.PEI_CORE, PcdsFixedAtBuild.IA32.SEC]
@@ -1152,9 +1153,12 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 !if $(CAPSULE_ENABLE) == TRUE
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf {
     <LibraryClasses>
-    PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-    MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
-    HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+      MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+      HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+!if $(SOURCE_DEBUG_ENABLE) == TRUE
+      DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
+!endif
   }
 !endif
 
