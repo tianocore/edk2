@@ -1,7 +1,7 @@
 /** @file
   x64 CPU Exception Handler.
 
-  Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -51,25 +51,30 @@ ArchGetIdtHandler (
 /**
   Save CPU exception context when handling EFI_VECTOR_HANDOFF_HOOK_AFTER case.
 
-  @param ExceptionType  Exception type.
-  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionType        Exception type.
+  @param[in] SystemContext        Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionHandlerData Pointer to exception handler data.
 **/
 VOID
 ArchSaveExceptionContext (
-  IN UINTN                ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext 
+  IN UINTN                        ExceptionType,
+  IN EFI_SYSTEM_CONTEXT           SystemContext,
+  IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
   )
 {
   IA32_EFLAGS32           Eflags;
+  RESERVED_VECTORS_DATA   *ReservedVectors;
+
+  ReservedVectors = ExceptionHandlerData->ReservedVectors;
   //
   // Save Exception context in global variable
   //
-  mReservedVectors[ExceptionType].OldSs         = SystemContext.SystemContextX64->Ss;
-  mReservedVectors[ExceptionType].OldSp         = SystemContext.SystemContextX64->Rsp;
-  mReservedVectors[ExceptionType].OldFlags      = SystemContext.SystemContextX64->Rflags;
-  mReservedVectors[ExceptionType].OldCs         = SystemContext.SystemContextX64->Cs;
-  mReservedVectors[ExceptionType].OldIp         = SystemContext.SystemContextX64->Rip;
-  mReservedVectors[ExceptionType].ExceptionData = SystemContext.SystemContextX64->ExceptionData;
+  ReservedVectors[ExceptionType].OldSs         = SystemContext.SystemContextX64->Ss;
+  ReservedVectors[ExceptionType].OldSp         = SystemContext.SystemContextX64->Rsp;
+  ReservedVectors[ExceptionType].OldFlags      = SystemContext.SystemContextX64->Rflags;
+  ReservedVectors[ExceptionType].OldCs         = SystemContext.SystemContextX64->Cs;
+  ReservedVectors[ExceptionType].OldIp         = SystemContext.SystemContextX64->Rip;
+  ReservedVectors[ExceptionType].ExceptionData = SystemContext.SystemContextX64->ExceptionData;
   //
   // Clear IF flag to avoid old IDT handler enable interrupt by IRET
   //
@@ -79,7 +84,7 @@ ArchSaveExceptionContext (
   //
   // Modify the EIP in stack, then old IDT handler will return to the stub code
   //
-  SystemContext.SystemContextX64->Rip = (UINTN) mReservedVectors[ExceptionType].HookAfterStubHeaderCode;
+  SystemContext.SystemContextX64->Rip = (UINTN) ReservedVectors[ExceptionType].HookAfterStubHeaderCode;
 }
 
 /**

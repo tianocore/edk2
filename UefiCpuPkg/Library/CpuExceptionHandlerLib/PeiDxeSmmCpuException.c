@@ -55,7 +55,7 @@ CommonExceptionHandlerWorker (
         // Need to execute old IDT handler before running this exception handler
         //
         ReservedVectors[ExceptionType].ApicId = GetApicId ();
-        ArchSaveExceptionContext (ExceptionType, SystemContext);
+        ArchSaveExceptionContext (ExceptionType, SystemContext, ExceptionHandlerData);
         ExceptionHandlerContext->ExceptionDataFlag = (mErrorCodeFlag & (1 << ExceptionType)) ? TRUE : FALSE;
         ExceptionHandlerContext->OldIdtHandler     = ReservedVectors[ExceptionType].ExceptonHandler;
         return;

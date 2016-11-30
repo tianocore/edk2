@@ -197,14 +197,15 @@ UpdateIdtTable (
 /**
   Save CPU exception context when handling EFI_VECTOR_HANDOFF_HOOK_AFTER case.
 
-  @param[in] ExceptionType  Exception type.
-  @param[in] SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
-
+  @param[in] ExceptionType        Exception type.
+  @param[in] SystemContext        Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionHandlerData Pointer to exception handler data.
 **/
 VOID
 ArchSaveExceptionContext (
-  IN UINTN                ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext 
+  IN UINTN                        ExceptionType,
+  IN EFI_SYSTEM_CONTEXT           SystemContext,
+  IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
   );
 
 /**
