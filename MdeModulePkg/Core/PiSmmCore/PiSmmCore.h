@@ -1109,8 +1109,9 @@ extern LIST_ENTRY  mSmmMemoryMap;
 #define MAX_POOL_INDEX  (MAX_POOL_SHIFT - MIN_POOL_SHIFT + 1)
 
 typedef struct {
-  UINTN        Size;
-  BOOLEAN      Available;
+  UINTN           Size;
+  BOOLEAN         Available;
+  EFI_MEMORY_TYPE Type;
 } POOL_HEADER;
 
 typedef struct {
@@ -1118,6 +1119,12 @@ typedef struct {
   LIST_ENTRY   Link;
 } FREE_POOL_HEADER;
 
-extern LIST_ENTRY  mSmmPoolLists[MAX_POOL_INDEX];
+typedef enum {
+  SmmPoolTypeCode,
+  SmmPoolTypeData,
+  SmmPoolTypeMax,
+} SMM_POOL_TYPE;
+
+extern LIST_ENTRY  mSmmPoolLists[SmmPoolTypeMax][MAX_POOL_INDEX];
 
 #endif

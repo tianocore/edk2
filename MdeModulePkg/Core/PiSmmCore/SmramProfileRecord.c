@@ -1596,6 +1596,7 @@ SmramProfileGetDataSize (
   FREE_POOL_HEADER                  *Pool;
   UINTN                             PoolListIndex;
   UINTN                             Index;
+  UINTN                             SmmPoolTypeIndex;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
@@ -1638,18 +1639,19 @@ SmramProfileGetDataSize (
        Node = Node->BackLink) {
     Index++;
   }
-  for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
-    FreePoolList = &mSmmPoolLists[PoolListIndex];
-    for (Node = FreePoolList->BackLink;
-         Node != FreePoolList;
-         Node = Node->BackLink) {
-      Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
-      if (Pool->Header.Available) {
-        Index++;
+  for (SmmPoolTypeIndex = 0; SmmPoolTypeIndex < SmmPoolTypeMax; SmmPoolTypeIndex++) {
+    for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
+      FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][PoolListIndex];
+      for (Node = FreePoolList->BackLink;
+           Node != FreePoolList;
+           Node = Node->BackLink) {
+        Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
+        if (Pool->Header.Available) {
+          Index++;
+        }
       }
     }
   }
-
 
   TotalSize += (sizeof (MEMORY_PROFILE_FREE_MEMORY) + Index * sizeof (MEMORY_PROFILE_DESCRIPTOR));
   TotalSize += (sizeof (MEMORY_PROFILE_MEMORY_RANGE) + mFullSmramRangeCount * sizeof (MEMORY_PROFILE_DESCRIPTOR));
@@ -1698,6 +1700,7 @@ SmramProfileCopyData (
   UINT64                          RemainingSize;
   UINTN                           PdbSize;
   UINTN                           ActionStringSize;
+  UINTN                           SmmPoolTypeIndex;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
@@ -1785,14 +1788,16 @@ SmramProfileCopyData (
            Node = Node->BackLink) {
         Index++;
       }
-      for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
-        FreePoolList = &mSmmPoolLists[MAX_POOL_INDEX - PoolListIndex - 1];
-        for (Node = FreePoolList->BackLink;
-             Node != FreePoolList;
-             Node = Node->BackLink) {
-          Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
-          if (Pool->Header.Available) {
-            Index++;
+      for (SmmPoolTypeIndex = 0; SmmPoolTypeIndex < SmmPoolTypeMax; SmmPoolTypeIndex++) {
+        for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
+          FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][MAX_POOL_INDEX - PoolListIndex - 1];
+          for (Node = FreePoolList->BackLink;
+               Node != FreePoolList;
+               Node = Node->BackLink) {
+            Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
+            if (Pool->Header.Available) {
+              Index++;
+            }
           }
         }
       }
@@ -1827,29 +1832,31 @@ SmramProfileCopyData (
     }
     Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
   }
-  for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
-    FreePoolList = &mSmmPoolLists[MAX_POOL_INDEX - PoolListIndex - 1];
-    for (Node = FreePoolList->BackLink;
-         Node != FreePoolList;
-         Node = Node->BackLink) {
-      Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
-      if (Pool->Header.Available) {
-        if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
-          if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
-            MemoryProfileDescriptor = ProfileBuffer;
-            MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
-            MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
-            MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
-            MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pool;
-            MemoryProfileDescriptor->Size = Pool->Header.Size;
+  for (SmmPoolTypeIndex = 0; SmmPoolTypeIndex < SmmPoolTypeMax; SmmPoolTypeIndex++) {
+    for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
+      FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][MAX_POOL_INDEX - PoolListIndex - 1];
+      for (Node = FreePoolList->BackLink;
+           Node != FreePoolList;
+           Node = Node->BackLink) {
+        Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
+        if (Pool->Header.Available) {
+          if (*ProfileOffset < (Offset + sizeof (MEMORY_PROFILE_DESCRIPTOR))) {
+            if (RemainingSize >= sizeof (MEMORY_PROFILE_DESCRIPTOR)) {
+              MemoryProfileDescriptor = ProfileBuffer;
+              MemoryProfileDescriptor->Header.Signature = MEMORY_PROFILE_DESCRIPTOR_SIGNATURE;
+              MemoryProfileDescriptor->Header.Length = sizeof (MEMORY_PROFILE_DESCRIPTOR);
+              MemoryProfileDescriptor->Header.Revision = MEMORY_PROFILE_DESCRIPTOR_REVISION;
+              MemoryProfileDescriptor->Address = (PHYSICAL_ADDRESS) (UINTN) Pool;
+              MemoryProfileDescriptor->Size = Pool->Header.Size;
 
-            RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
-            ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
-          } else {
-            goto Done;
+              RemainingSize -= sizeof (MEMORY_PROFILE_DESCRIPTOR);
+              ProfileBuffer = (UINT8 *) ProfileBuffer + sizeof (MEMORY_PROFILE_DESCRIPTOR);
+            } else {
+              goto Done;
+            }
           }
+          Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
         }
-        Offset += sizeof (MEMORY_PROFILE_DESCRIPTOR);
       }
     }
   }
@@ -2577,6 +2584,7 @@ DumpFreePoolList (
   UINTN                         PoolListIndex;
   MEMORY_PROFILE_CONTEXT_DATA   *ContextData;
   BOOLEAN                       SmramProfileGettingStatus;
+  UINTN                         SmmPoolTypeIndex;
 
   ContextData = GetSmramProfileContext ();
   if (ContextData == NULL) {
@@ -2586,23 +2594,25 @@ DumpFreePoolList (
   SmramProfileGettingStatus = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile begin =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
 
-  for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
-    DEBUG ((EFI_D_INFO, "FreePoolList (%d):\n", PoolListIndex));
-    FreePoolList = &mSmmPoolLists[PoolListIndex];
-    for (Node = FreePoolList->BackLink, Index = 0;
-         Node != FreePoolList;
-         Node = Node->BackLink, Index++) {
-      Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
-      DEBUG ((EFI_D_INFO, "  Index - 0x%x\n", Index));
-      DEBUG ((EFI_D_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS) (UINTN) Pool));
-      DEBUG ((EFI_D_INFO, "    Size          - 0x%08x\n", Pool->Header.Size));
-      DEBUG ((EFI_D_INFO, "    Available     - 0x%02x\n", Pool->Header.Available));
+  for (SmmPoolTypeIndex = 0; SmmPoolTypeIndex < SmmPoolTypeMax; SmmPoolTypeIndex++) {
+    for (PoolListIndex = 0; PoolListIndex < MAX_POOL_INDEX; PoolListIndex++) {
+      DEBUG ((DEBUG_INFO, "FreePoolList(%d)(%d):\n", SmmPoolTypeIndex, PoolListIndex));
+      FreePoolList = &mSmmPoolLists[SmmPoolTypeIndex][PoolListIndex];
+      for (Node = FreePoolList->BackLink, Index = 0;
+           Node != FreePoolList;
+           Node = Node->BackLink, Index++) {
+        Pool = BASE_CR (Node, FREE_POOL_HEADER, Link);
+        DEBUG ((DEBUG_INFO, "  Index - 0x%x\n", Index));
+        DEBUG ((DEBUG_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS) (UINTN) Pool));
+        DEBUG ((DEBUG_INFO, "    Size          - 0x%08x\n", Pool->Header.Size));
+        DEBUG ((DEBUG_INFO, "    Available     - 0x%02x\n", Pool->Header.Available));
+      }
     }
   }
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile end =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile end =======\n"));
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
