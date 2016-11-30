@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -411,12 +411,20 @@ EhcPowerOnAllPorts (
   IN PEI_USB2_HC_DEV          *Ehc
   )
 {
-  UINT8 PortNumber;
-  UINT8 Index;
-
+  UINT8     PortNumber;
+  UINT8     Index;
+  UINT32    RegVal;
+  
   PortNumber = (UINT8)(Ehc->HcStructParams & HCSP_NPORTS);
   for (Index = 0; Index < PortNumber; Index++) {
-    EhcSetOpRegBit (Ehc, EHC_PORT_STAT_OFFSET + 4 * Index, PORTSC_POWER);
+    //
+    // Do not clear port status bits on initialization.  Otherwise devices will
+    // not enumerate properly at startup.
+    //
+    RegVal  = EhcReadOpReg(Ehc, EHC_PORT_STAT_OFFSET + 4 * Index);
+    RegVal &= ~PORTSC_CHANGE_MASK;
+    RegVal |= PORTSC_POWER;
+    EhcWriteOpReg (Ehc, EHC_PORT_STAT_OFFSET + 4 * Index, RegVal);
   }
 }
 

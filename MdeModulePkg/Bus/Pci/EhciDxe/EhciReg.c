@@ -591,6 +591,7 @@ EhcInitHC (
 {
   EFI_STATUS              Status;
   UINT32                  Index;
+  UINT32                  RegVal;
 
   // This ASSERT crashes the BeagleBoard. There is some issue in the USB stack.
   // This ASSERT needs to be removed so the BeagleBoard will boot. When we fix
@@ -626,7 +627,14 @@ EhcInitHC (
   //
   if (Ehc->HcStructParams & HCSP_PPC) {
     for (Index = 0; Index < (UINT8) (Ehc->HcStructParams & HCSP_NPORTS); Index++) {
-      EhcSetOpRegBit (Ehc, (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index)), PORTSC_POWER);
+      //
+      // Do not clear port status bits on initialization.  Otherwise devices will
+      // not enumerate properly at startup.
+      //
+      RegVal  = EhcReadOpReg(Ehc, (UINT32)(EHC_PORT_STAT_OFFSET + (4 * Index)));
+      RegVal &= ~PORTSC_CHANGE_MASK;
+      RegVal |= PORTSC_POWER;
+      EhcWriteOpReg (Ehc, (UINT32) (EHC_PORT_STAT_OFFSET + (4 * Index)), RegVal);
     }
   }
 
