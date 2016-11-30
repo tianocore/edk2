@@ -36,6 +36,8 @@
 #include <Protocol/S3SaveState.h>
 #include <Protocol/SmmControl2.h>
 
+#include "SmiFeatures.h"
+
 //
 // Forward declaration.
 //
@@ -54,6 +56,13 @@ OnS3SaveStateInstalled (
 // phase.
 //
 STATIC UINTN mSmiEnable;
+
+//
+// Captures whether SMI feature negotiation is supported. The variable is only
+// used to carry this information from the entry point function to the
+// S3SaveState protocol installation callback.
+//
+STATIC BOOLEAN mSmiFeatureNegotiation;
 
 //
 // Event signaled when an S3SaveState protocol interface is installed.
@@ -229,6 +238,11 @@ SmmControl2DxeEntryPoint (
     goto FatalError;
   }
 
+  //
+  // QEMU can inject SMIs in different ways, negotiate our preferences.
+  //
+  mSmiFeatureNegotiation = NegotiateSmiFeatures ();
+
   if (QemuFwCfgS3Enabled ()) {
     VOID *Registration;
 
@@ -361,6 +375,13 @@ OnS3SaveStateInstalled (
       Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
+  }
+
+  //
+  // Append a boot script fragment that re-selects the negotiated SMI features.
+  //
+  if (mSmiFeatureNegotiation) {
+    SaveSmiFeatures (S3SaveState);
   }
 
   DEBUG ((EFI_D_VERBOSE, "%a: boot script fragment saved\n", __FUNCTION__));
