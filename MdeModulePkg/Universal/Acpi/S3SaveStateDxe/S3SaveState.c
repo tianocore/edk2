@@ -343,15 +343,15 @@ BootScriptWriteMemPoll (
   UINT64                     Address;                                    
   VOID                      *Data;                                    
   VOID                      *DataMask;                                  
-  UINTN                     Delay;                                   
-  UINTN                     LoopTimes;
+  UINT64                    Delay;
+  UINT64                    LoopTimes;
   UINT32                    Remainder;
 
   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);                  
   Address  = VA_ARG (Marker, UINT64);                                    
   Data     = VA_ARG (Marker, VOID *);                                    
   DataMask = VA_ARG (Marker, VOID *);                                    
-  Delay    = (UINTN)VA_ARG (Marker, UINT64);                            
+  Delay    = VA_ARG (Marker, UINT64);
   //
   // According to the spec, the interval between 2 polls is 100ns,
   // but the unit of Duration for S3BootScriptSaveMemPoll() is microsecond(1000ns).
@@ -359,7 +359,7 @@ BootScriptWriteMemPoll (
   // Duration will be minimum 1(microsecond) to be minimum deviation,
   // so LoopTimes = Delay / 10.
   //
-  LoopTimes = (UINTN) DivU64x32Remainder (
+  LoopTimes = DivU64x32Remainder (
                 Delay,
                 10,
                 &Remainder
