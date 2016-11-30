@@ -30,4 +30,17 @@ InternalQemuFwCfgIsAvailable (
   VOID
   );
 
+
+/**
+  Returns a boolean indicating whether QEMU provides the DMA-like access method
+  for fw_cfg.
+
+  @retval    TRUE   The DMA-like access method is available.
+  @retval    FALSE  The DMA-like access method is unavailable.
+**/
+BOOLEAN
+InternalQemuFwCfgDmaIsAvailable (
+  VOID
+  );
+
 #endif

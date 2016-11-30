@@ -99,6 +99,70 @@ QemuFwCfgSelectItem (
 
 
 /**
+  Transfer an array of bytes using the DMA interface.
+
+  @param[in]     Size    Size in bytes to transfer.
+  @param[in,out] Buffer  Buffer to read data into or write data from. May be
+                         NULL if Size is zero.
+  @param[in]     Write   TRUE if writing to fw_cfg from Buffer, FALSE if
+                         reading from fw_cfg into Buffer.
+**/
+VOID
+InternalQemuFwCfgDmaBytes (
+  IN     UINT32   Size,
+  IN OUT VOID     *Buffer OPTIONAL,
+  IN     BOOLEAN  Write
+  )
+{
+  volatile FW_CFG_DMA_ACCESS Access;
+  UINT32                     AccessHigh, AccessLow;
+  UINT32                     Status;
+
+  if (Size == 0) {
+    return;
+  }
+
+  Access.Control = SwapBytes32 (
+                    Write ? FW_CFG_DMA_CTL_WRITE : FW_CFG_DMA_CTL_READ
+                    );
+  Access.Length  = SwapBytes32 (Size);
+  Access.Address = SwapBytes64 ((UINTN)Buffer);
+
+  //
+  // Delimit the transfer from (a) modifications to Access, (b) in case of a
+  // write, from writes to Buffer by the caller.
+  //
+  MemoryFence ();
+
+  //
+  // Start the transfer.
+  //
+  AccessHigh = (UINT32)RShiftU64 ((UINTN)&Access, 32);
+  AccessLow  = (UINT32)(UINTN)&Access;
+  IoWrite32 (0x514, SwapBytes32 (AccessHigh));
+  IoWrite32 (0x518, SwapBytes32 (AccessLow));
+
+  //
+  // Don't look at Access.Control before starting the transfer.
+  //
+  MemoryFence ();
+
+  //
+  // Wait for the transfer to complete.
+  //
+  do {
+    Status = SwapBytes32 (Access.Control);
+    ASSERT ((Status & FW_CFG_DMA_CTL_ERROR) == 0);
+  } while (Status != 0);
+
+  //
+  // After a read, the caller will want to use Buffer.
+  //
+  MemoryFence ();
+}
+
+
+/**
   Reads firmware configuration bytes into a buffer
 
   @param[in] Size - Size in bytes to read
@@ -112,6 +176,10 @@ InternalQemuFwCfgReadBytes (
   IN VOID                   *Buffer  OPTIONAL
   )
 {
+  if (InternalQemuFwCfgDmaIsAvailable () && Size <= MAX_UINT32) {
+    InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FALSE);
+    return;
+  }
   IoReadFifo8 (0x511, Size, Buffer);
 }
 
@@ -160,6 +228,10 @@ QemuFwCfgWriteBytes (
   )
 {
   if (InternalQemuFwCfgIsAvailable ()) {
+    if (InternalQemuFwCfgDmaIsAvailable () && Size <= MAX_UINT32) {
+      InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, TRUE);
+      return;
+    }
     IoWriteFifo8 (0x511, Size, Buffer);
   }
 }
