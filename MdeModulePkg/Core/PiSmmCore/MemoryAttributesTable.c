@@ -268,15 +268,19 @@ EnforceMemoryMapAttribute (
   MemoryMapEntry = MemoryMap;
   MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + MemoryMapSize);
   while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
-    switch (MemoryMapEntry->Type) {
-    case EfiRuntimeServicesCode:
-      MemoryMapEntry->Attribute |= EFI_MEMORY_RO;
-      break;
-    case EfiRuntimeServicesData:
-      MemoryMapEntry->Attribute |= EFI_MEMORY_XP;
-      break;
+    if (MemoryMapEntry->Attribute != 0) {
+      // It is PE image, the attribute is already set.
+    } else {
+      switch (MemoryMapEntry->Type) {
+      case EfiRuntimeServicesCode:
+        MemoryMapEntry->Attribute = EFI_MEMORY_RO;
+        break;
+      case EfiRuntimeServicesData:
+      default:
+        MemoryMapEntry->Attribute |= EFI_MEMORY_XP;
+        break;
+      }
     }
-
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
   }
 
@@ -357,6 +361,21 @@ SetNewRecord (
   CopyMem (&TempRecord, OldRecord, sizeof(EFI_MEMORY_DESCRIPTOR));
   PhysicalEnd = TempRecord.PhysicalStart + EfiPagesToSize(TempRecord.NumberOfPages);
   NewRecordCount = 0;
+
+  //
+  // Always create a new entry for non-PE image record
+  //
+  if (ImageRecord->ImageBase > TempRecord.PhysicalStart) {
+    NewRecord->Type = TempRecord.Type;
+    NewRecord->PhysicalStart = TempRecord.PhysicalStart;
+    NewRecord->VirtualStart  = 0;
+    NewRecord->NumberOfPages = EfiSizeToPages(ImageRecord->ImageBase - TempRecord.PhysicalStart);
+    NewRecord->Attribute     = TempRecord.Attribute;
+    NewRecord = NEXT_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
+    NewRecordCount ++;
+    TempRecord.PhysicalStart = ImageRecord->ImageBase;
+    TempRecord.NumberOfPages = EfiSizeToPages(PhysicalEnd - TempRecord.PhysicalStart);
+  }
 
   ImageRecordCodeSectionList = &ImageRecord->CodeSegmentList;
 
@@ -452,13 +471,9 @@ GetMaxSplitRecordCount (
     if (ImageRecord == NULL) {
       break;
     }
-    SplitRecordCount += (2 * ImageRecord->CodeSegmentCount + 1);
+    SplitRecordCount += (2 * ImageRecord->CodeSegmentCount + 2);
     PhysicalStart = ImageRecord->ImageBase + ImageRecord->ImageSize;
   } while ((ImageRecord != NULL) && (PhysicalStart < PhysicalEnd));
-
-  if (SplitRecordCount != 0) {
-    SplitRecordCount--;
-  }
 
   return SplitRecordCount;
 }
@@ -516,28 +531,16 @@ SplitRecord (
       //
       // No more image covered by this range, stop
       //
-      if ((PhysicalEnd > PhysicalStart) && (ImageRecord != NULL)) {
+      if (PhysicalEnd > PhysicalStart) {
         //
-        // If this is still address in this record, need record.
+        // Always create a new entry for non-PE image record
         //
-        NewRecord = PREVIOUS_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
-        if (NewRecord->Type == EfiRuntimeServicesData) {
-          //
-          // Last record is DATA, just merge it.
-          //
-          NewRecord->NumberOfPages = EfiSizeToPages(PhysicalEnd - NewRecord->PhysicalStart);
-        } else {
-          //
-          // Last record is CODE, create a new DATA entry.
-          //
-          NewRecord = NEXT_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
-          NewRecord->Type = EfiRuntimeServicesData;
-          NewRecord->PhysicalStart = TempRecord.PhysicalStart;
-          NewRecord->VirtualStart  = 0;
-          NewRecord->NumberOfPages = TempRecord.NumberOfPages;
-          NewRecord->Attribute     = TempRecord.Attribute | EFI_MEMORY_XP;
-          TotalNewRecordCount ++;
-        }
+        NewRecord->Type = TempRecord.Type;
+        NewRecord->PhysicalStart = TempRecord.PhysicalStart;
+        NewRecord->VirtualStart  = 0;
+        NewRecord->NumberOfPages = TempRecord.NumberOfPages;
+        NewRecord->Attribute     = TempRecord.Attribute;
+        TotalNewRecordCount ++;
       }
       break;
     }
@@ -580,6 +583,8 @@ SplitRecord (
    ==>
    +---------------+
    | Record X      |
+   +---------------+
+   | Record RtCode |
    +---------------+ ----
    | Record RtData |     |
    +---------------+     |
@@ -587,12 +592,16 @@ SplitRecord (
    +---------------+     |
    | Record RtData |     |
    +---------------+ ----
+   | Record RtCode |
+   +---------------+ ----
    | Record RtData |     |
    +---------------+     |
    | Record RtCode |     |-> PE/COFF2
    +---------------+     |
    | Record RtData |     |
    +---------------+ ----
+   | Record RtCode |
+   +---------------+
    | Record Y      |
    +---------------+
 
@@ -622,7 +631,7 @@ SplitTable (
   UINTN       TotalSplitRecordCount;
   UINTN       AdditionalRecordCount;
 
-  AdditionalRecordCount = (2 * mImagePropertiesPrivateData.CodeSegmentCountMax + 1) * mImagePropertiesPrivateData.ImageRecordCount;
+  AdditionalRecordCount = (2 * mImagePropertiesPrivateData.CodeSegmentCountMax + 2) * mImagePropertiesPrivateData.ImageRecordCount;
 
   TotalSplitRecordCount = 0;
   //
@@ -648,11 +657,13 @@ SplitTable (
     //
     // Adjust IndexNew according to real split.
     //
-    CopyMem (
-      ((UINT8 *)MemoryMap + (IndexNew + MaxSplitRecordCount - RealSplitRecordCount) * DescriptorSize),
-      ((UINT8 *)MemoryMap + IndexNew * DescriptorSize),
-      RealSplitRecordCount * DescriptorSize
-      );
+    if (MaxSplitRecordCount != RealSplitRecordCount) {
+      CopyMem (
+        ((UINT8 *)MemoryMap + (IndexNew + MaxSplitRecordCount - RealSplitRecordCount) * DescriptorSize),
+        ((UINT8 *)MemoryMap + IndexNew * DescriptorSize),
+        (RealSplitRecordCount + 1) * DescriptorSize
+        );
+    }
     IndexNew = IndexNew + MaxSplitRecordCount - RealSplitRecordCount;
     TotalSplitRecordCount += RealSplitRecordCount;
     IndexNew --;
@@ -744,7 +755,7 @@ SmmCoreGetMemoryMapMemoryAttributesTable (
     return EFI_INVALID_PARAMETER;
   }
 
-  AdditionalRecordCount = (2 * mImagePropertiesPrivateData.CodeSegmentCountMax + 1) * mImagePropertiesPrivateData.ImageRecordCount;
+  AdditionalRecordCount = (2 * mImagePropertiesPrivateData.CodeSegmentCountMax + 2) * mImagePropertiesPrivateData.ImageRecordCount;
 
   OldMemoryMapSize = *MemoryMapSize;
   Status = SmmCoreGetMemoryMap (MemoryMapSize, MemoryMap, MapKey, DescriptorSize, DescriptorVersion);
