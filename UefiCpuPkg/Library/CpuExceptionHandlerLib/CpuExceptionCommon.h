@@ -55,7 +55,6 @@ typedef struct {
 extern CONST UINT32                mErrorCodeFlag;
 extern CONST UINTN                 mImageAlignSize;
 extern CONST UINTN                 mDoFarReturnFlag;
-extern RESERVED_VECTORS_DATA       *mReservedVectors;
 
 /**
   Return address map of exception handler template so that C code can generate
