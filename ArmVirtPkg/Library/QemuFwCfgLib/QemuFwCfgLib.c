@@ -75,25 +75,6 @@ typedef struct {
 
 
 /**
-  Returns a boolean indicating if the firmware configuration interface is
-  available for library-internal purposes.
-
-  This function never changes fw_cfg state.
-
-  @retval TRUE   The interface is available internally.
-  @retval FALSE  The interface is not available internally.
-**/
-BOOLEAN
-EFIAPI
-InternalQemuFwCfgIsAvailable (
-  VOID
-  )
-{
-  return (BOOLEAN)(mFwCfgSelectorAddress != 0 && mFwCfgDataAddress != 0);
-}
-
-
-/**
   Returns a boolean indicating if the firmware configuration interface
   is available or not.
 
@@ -109,7 +90,7 @@ QemuFwCfgIsAvailable (
   VOID
   )
 {
-  return InternalQemuFwCfgIsAvailable ();
+  return (BOOLEAN)(mFwCfgSelectorAddress != 0 && mFwCfgDataAddress != 0);
 }
 
 
@@ -187,7 +168,7 @@ QemuFwCfgInitialize (
     FwCfgDmaAddress = 0;
   }
 
-  if (InternalQemuFwCfgIsAvailable ()) {
+  if (QemuFwCfgIsAvailable ()) {
     UINT32 Signature;
 
     QemuFwCfgSelectItem (QemuFwCfgItemSignature);
@@ -231,7 +212,7 @@ QemuFwCfgSelectItem (
   IN FIRMWARE_CONFIG_ITEM QemuFwCfgItem
   )
 {
-  if (InternalQemuFwCfgIsAvailable ()) {
+  if (QemuFwCfgIsAvailable ()) {
     MmioWrite16 (mFwCfgSelectorAddress, SwapBytes16 ((UINT16)QemuFwCfgItem));
   }
 }
@@ -360,7 +341,7 @@ QemuFwCfgReadBytes (
   IN VOID  *Buffer
   )
 {
-  if (InternalQemuFwCfgIsAvailable ()) {
+  if (QemuFwCfgIsAvailable ()) {
     InternalQemuFwCfgReadBytes (Size, Buffer);
   } else {
     ZeroMem (Buffer, Size);
@@ -384,7 +365,7 @@ QemuFwCfgWriteBytes (
   IN VOID                   *Buffer
   )
 {
-  if (InternalQemuFwCfgIsAvailable ()) {
+  if (QemuFwCfgIsAvailable ()) {
     UINTN Idx;
 
     for (Idx = 0; Idx < Size; ++Idx) {
@@ -494,7 +475,7 @@ QemuFwCfgFindFile (
   UINT32 Count;
   UINT32 Idx;
 
-  if (!InternalQemuFwCfgIsAvailable ()) {
+  if (!QemuFwCfgIsAvailable ()) {
     return RETURN_UNSUPPORTED;
   }
 
