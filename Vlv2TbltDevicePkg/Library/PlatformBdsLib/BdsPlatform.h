@@ -1,6 +1,6 @@
 /*++
 
-  Copyright (c) 2004  - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -46,6 +46,7 @@ Abstract:
 #include <Guid/CapsuleVendor.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/DebugAgentGuid.h>
 
 
 #include <Library/DebugLib.h>
@@ -279,6 +280,16 @@ typedef struct {
   PCI_DEVICE_PATH           PciDevice;
   EFI_DEVICE_PATH_PROTOCOL  End;
 } PLATFORM_USB_DEVICE_PATH;
+
+//
+// Debug Agent UART Console device path definition
+//
+typedef struct {
+  VENDOR_DEVICE_PATH        VendorHardware;
+  UART_DEVICE_PATH          Uart;
+  VENDOR_DEVICE_PATH        TerminalType;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} VENDOR_UART_DEVICE_PATH;
 
 //
 // Below is the platform PCI device path

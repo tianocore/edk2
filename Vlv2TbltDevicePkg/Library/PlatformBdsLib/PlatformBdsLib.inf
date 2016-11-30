@@ -50,6 +50,7 @@
   CryptoPkg/CryptoPkg.dec
   SecurityPkg/SecurityPkg.dec
   SignedCapsulePkg/SignedCapsulePkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
 
 [LibraryClasses]
   DxeServicesTableLib
