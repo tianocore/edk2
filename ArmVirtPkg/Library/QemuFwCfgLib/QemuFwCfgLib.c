@@ -53,26 +53,6 @@ STATIC READ_BYTES_FUNCTION DmaReadBytes;
 //
 STATIC READ_BYTES_FUNCTION *InternalQemuFwCfgReadBytes = MmioReadBytes;
 
-//
-// Communication structure for DmaReadBytes(). All fields are encoded in big
-// endian.
-//
-#pragma pack (1)
-typedef struct {
-  UINT32 Control;
-  UINT32 Length;
-  UINT64 Address;
-} FW_CFG_DMA_ACCESS;
-#pragma pack ()
-
-//
-// Macros for the FW_CFG_DMA_ACCESS.Control bitmap (in native encoding).
-//
-#define FW_CFG_DMA_CTL_ERROR  BIT0
-#define FW_CFG_DMA_CTL_READ   BIT1
-#define FW_CFG_DMA_CTL_SKIP   BIT2
-#define FW_CFG_DMA_CTL_SELECT BIT3
-
 
 /**
   Returns a boolean indicating if the firmware configuration interface

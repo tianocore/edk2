@@ -23,6 +23,14 @@
 //
 #define QEMU_FW_CFG_FNAME_SIZE 56
 
+//
+// Macros for the FW_CFG_DMA_ACCESS.Control bitmap (in native encoding).
+//
+#define FW_CFG_DMA_CTL_ERROR  BIT0
+#define FW_CFG_DMA_CTL_READ   BIT1
+#define FW_CFG_DMA_CTL_SKIP   BIT2
+#define FW_CFG_DMA_CTL_SELECT BIT3
+
 typedef enum {
   QemuFwCfgItemSignature            = 0x0000,
   QemuFwCfgItemInterfaceVersion     = 0x0001,
@@ -59,6 +67,17 @@ typedef enum {
 
 } FIRMWARE_CONFIG_ITEM;
 
+//
+// Communication structure for the DMA access method. All fields are encoded in
+// big endian.
+//
+#pragma pack (1)
+typedef struct {
+  UINT32 Control;
+  UINT32 Length;
+  UINT64 Address;
+} FW_CFG_DMA_ACCESS;
+#pragma pack ()
 
 /**
   Returns a boolean indicating if the firmware configuration interface
