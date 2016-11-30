@@ -90,21 +90,26 @@ ArchSaveExceptionContext (
 /**
   Restore CPU exception context when handling EFI_VECTOR_HANDOFF_HOOK_AFTER case.
 
-  @param ExceptionType  Exception type.
-  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionType        Exception type.
+  @param[in] SystemContext        Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionHandlerData Pointer to exception handler data.
 **/
 VOID
 ArchRestoreExceptionContext (
-  IN UINTN                ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext 
+  IN UINTN                        ExceptionType,
+  IN EFI_SYSTEM_CONTEXT           SystemContext,
+  IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
   )
 {
-  SystemContext.SystemContextX64->Ss            = mReservedVectors[ExceptionType].OldSs;
-  SystemContext.SystemContextX64->Rsp           = mReservedVectors[ExceptionType].OldSp;
-  SystemContext.SystemContextX64->Rflags        = mReservedVectors[ExceptionType].OldFlags;
-  SystemContext.SystemContextX64->Cs            = mReservedVectors[ExceptionType].OldCs;
-  SystemContext.SystemContextX64->Rip           = mReservedVectors[ExceptionType].OldIp;
-  SystemContext.SystemContextX64->ExceptionData = mReservedVectors[ExceptionType].ExceptionData;
+  RESERVED_VECTORS_DATA   *ReservedVectors;
+
+  ReservedVectors = ExceptionHandlerData->ReservedVectors;
+  SystemContext.SystemContextX64->Ss            = ReservedVectors[ExceptionType].OldSs;
+  SystemContext.SystemContextX64->Rsp           = ReservedVectors[ExceptionType].OldSp;
+  SystemContext.SystemContextX64->Rflags        = ReservedVectors[ExceptionType].OldFlags;
+  SystemContext.SystemContextX64->Cs            = ReservedVectors[ExceptionType].OldCs;
+  SystemContext.SystemContextX64->Rip           = ReservedVectors[ExceptionType].OldIp;
+  SystemContext.SystemContextX64->ExceptionData = ReservedVectors[ExceptionType].ExceptionData;
 }
 
 /**

@@ -87,19 +87,24 @@ ArchSaveExceptionContext (
 /**
   Restore CPU exception context when handling EFI_VECTOR_HANDOFF_HOOK_AFTER case.
 
-  @param ExceptionType  Exception type.
-  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionType        Exception type.
+  @param[in] SystemContext        Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionHandlerData Pointer to exception handler data.
 **/
 VOID
 ArchRestoreExceptionContext (
-  IN UINTN                ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext 
+  IN UINTN                        ExceptionType,
+  IN EFI_SYSTEM_CONTEXT           SystemContext,
+  IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
   )
 {
-  SystemContext.SystemContextIa32->Eflags        = mReservedVectors[ExceptionType].OldFlags;
-  SystemContext.SystemContextIa32->Cs            = mReservedVectors[ExceptionType].OldCs;
-  SystemContext.SystemContextIa32->Eip           = mReservedVectors[ExceptionType].OldIp;
-  SystemContext.SystemContextIa32->ExceptionData = mReservedVectors[ExceptionType].ExceptionData;
+  RESERVED_VECTORS_DATA   *ReservedVectors;
+
+  ReservedVectors = ExceptionHandlerData->ReservedVectors;
+  SystemContext.SystemContextIa32->Eflags        = ReservedVectors[ExceptionType].OldFlags;
+  SystemContext.SystemContextIa32->Cs            = ReservedVectors[ExceptionType].OldCs;
+  SystemContext.SystemContextIa32->Eip           = ReservedVectors[ExceptionType].OldIp;
+  SystemContext.SystemContextIa32->ExceptionData = ReservedVectors[ExceptionType].ExceptionData;
 }
 
 /**

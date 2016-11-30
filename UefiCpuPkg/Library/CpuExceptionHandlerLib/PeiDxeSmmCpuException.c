@@ -68,7 +68,7 @@ CommonExceptionHandlerWorker (
         // Old IDT handler has been executed, then restore CPU exception content to
         // run new exception handler.
         //
-        ArchRestoreExceptionContext (ExceptionType, SystemContext);
+        ArchRestoreExceptionContext (ExceptionType, SystemContext, ExceptionHandlerData);
         //
         // Rlease spin lock for ApicId
         //
