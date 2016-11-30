@@ -657,7 +657,6 @@ Ikev2CertGenerateAuthPayload (
   UINT8              *Digest;
   UINTN              DigestSize;
   PRF_DATA_FRAGMENT  Fragments[3];
-  UINT8              *KeyBuf;
   IKE_PAYLOAD        *AuthPayload;
   IKEV2_AUTH         *PayloadBuf;
   EFI_STATUS         Status;
@@ -682,7 +681,6 @@ Ikev2CertGenerateAuthPayload (
   //
   // Initial point
   //
-  KeyBuf      = NULL;
   AuthPayload = NULL;
   Digest      = NULL;
   Signature   = NULL;
@@ -696,17 +694,6 @@ Ikev2CertGenerateAuthPayload (
   if (Digest == NULL) {
     return NULL;
   }
-
-  //
-  // Store the AuthKey into KeyBuf
-  //
-  KeyBuf  = AllocateZeroPool (DigestSize);
-  if (KeyBuf == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto EXIT;
-  }
-  
-  CopyMem (KeyBuf, Digest, DigestSize);
 
   //
   // Calculate Prf(SK_Pi/r, IDi/r)
@@ -863,9 +850,6 @@ Ikev2CertGenerateAuthPayload (
   AuthPayload->PayloadType  = IKEV2_PAYLOAD_TYPE_AUTH;
 
 EXIT:
-  if (KeyBuf != NULL) {
-    FreePool (KeyBuf);
-  }
   if (Digest != NULL) {
     FreePool (Digest);
   }
@@ -1492,7 +1476,7 @@ Ikev2ParserNotifyCookiePayload (
                                 in RFC 4306.
   @param[in]  IsRequest         To indicate create Certificate Payload or Certificate
                                 Request Payload. If it is TURE, create Certificate
-                                Payload. Otherwise, create Certificate Request Payload.
+                                Request Payload. Otherwise, create Certificate Payload.
 
   @retval  a Pointer to IKE Payload whose payload buffer containing the Certificate
            payload or Certificated Request payload.
