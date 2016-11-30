@@ -94,9 +94,12 @@ class IdfFileClassObject(object):
             if len(Line) == 0:
                 continue
 
+            LineNo = GetLineNo(FileIn, Line, False)
+            if not Line.startswith('#image '):
+                EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The %s in Line %s of File %s is invalid.' % (Line, LineNo, File.Path))
+
             if Line.find('#image ') >= 0:
                 LineDetails = Line.split()
-                LineNo = GetLineNo(FileIn, Line, False)
                 Len = len(LineDetails)
                 if Len != 3 and Len != 4:
                     EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'The format is not match #image IMAGE_ID [TRANSPARENT] ImageFileName in Line %s of File %s.' % (LineNo, File.Path))
