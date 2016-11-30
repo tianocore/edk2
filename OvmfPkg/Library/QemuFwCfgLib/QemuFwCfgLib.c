@@ -22,6 +22,8 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#include "QemuFwCfgLibInternal.h"
+
 
 /**
   Reads an 8-bit I/O port fifo into a block of memory.

@@ -19,6 +19,7 @@
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
 
+#include "QemuFwCfgLibInternal.h"
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -67,7 +68,6 @@ QemuFwCfgIsAvailable (
   @retval    FALSE  The interface is not available internally.
 **/
 BOOLEAN
-EFIAPI
 InternalQemuFwCfgIsAvailable (
   VOID
   )

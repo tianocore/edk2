@@ -30,6 +30,7 @@
 #
 
 [Sources]
+  QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
   QemuFwCfgSec.c
 

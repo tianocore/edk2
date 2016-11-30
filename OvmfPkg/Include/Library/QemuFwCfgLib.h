@@ -206,22 +206,6 @@ QemuFwCfgFindFile (
 
 
 /**
-  Returns a boolean indicating if the firmware configuration interface is
-  available for library-internal purposes.
-
-  This function never changes fw_cfg state.
-
-  @retval    TRUE   The interface is available internally.
-  @retval    FALSE  The interface is not available internally.
-**/
-BOOLEAN
-EFIAPI
-InternalQemuFwCfgIsAvailable (
-  VOID
-  );
-
-
-/**
   Determine if S3 support is explicitly enabled.
 
   @retval  TRUE   if S3 support is explicitly enabled.

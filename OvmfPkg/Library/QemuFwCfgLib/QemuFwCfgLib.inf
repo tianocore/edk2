@@ -32,6 +32,7 @@
 #
 
 [Sources]
+  QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
   QemuFwCfgPeiDxe.c
 

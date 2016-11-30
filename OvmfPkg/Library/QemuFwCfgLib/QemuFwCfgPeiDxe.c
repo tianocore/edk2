@@ -17,6 +17,8 @@
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
 
+#include "QemuFwCfgLibInternal.h"
+
 STATIC BOOLEAN mQemuFwCfgSupported = FALSE;
 
 
@@ -83,7 +85,6 @@ QemuFwCfgInitialize (
   @retval    FALSE  The interface is not available internally.
 **/
 BOOLEAN
-EFIAPI
 InternalQemuFwCfgIsAvailable (
   VOID
   )
