@@ -303,7 +303,7 @@ S3BootScriptSaveMemPoll (
   IN  VOID                              *BitMask,
   IN  VOID                              *BitValue,
   IN  UINTN                             Duration,
-  IN  UINTN                             LoopTimes
+  IN  UINT64                            LoopTimes
   )
 {
 	return RETURN_SUCCESS;
