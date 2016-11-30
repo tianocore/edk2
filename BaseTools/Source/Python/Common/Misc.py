@@ -74,7 +74,7 @@ def _parseForGCC(lines, efifilepath, varnames):
     status = 0
     sections = []
     varoffset = []
-    for line in lines:
+    for index, line in enumerate(lines):
         line = line.strip()
         # status machine transection
         if status == 0 and line == "Memory Configuration":
@@ -88,14 +88,17 @@ def _parseForGCC(lines, efifilepath, varnames):
             continue
 
         # status handler
-        if status == 2:
+        if status == 3:
             m = re.match('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$', line)
             if m != None:
                 sections.append(m.groups(0))
             for varname in varnames:
-                m = re.match("^([\da-fA-Fx]+) +[_]*(%s)$" % varname, line)
+                m = re.match(".data.(%s)$" % varname, line)
                 if m != None:
-                    varoffset.append((varname, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
+                    if lines[index + 1]:
+                        m = re.match('^([\da-fA-Fx]+) +([\da-fA-Fx]+)', lines[index + 1].strip())
+                        if m != None:
+                            varoffset.append((varname, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
 
     if not varoffset:
         return []

@@ -66,7 +66,7 @@ def _parseForGCC(lines, efifilepath):
     imageBase = -1
     sections = []
     bpcds = []
-    for line in lines:
+    for index, line in enumerate(lines):
         line = line.strip()
         # status machine transection
         if status == 0 and line == "Memory Configuration":
@@ -80,14 +80,18 @@ def _parseForGCC(lines, efifilepath):
             continue
 
         # status handler
-        if status == 2:
+        if status == 3:
             m = re.match('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$', line)
             if m != None:
                 sections.append(m.groups(0))
-        if status == 2:
-            m = re.match("^([\da-fA-Fx]+) +[_]+gPcd_BinaryPatch_([\w_\d]+)$", line)
+        if status == 3:
+            m = re.match('^.data._gPcd_BinaryPatch_([\w_\d]+)$', line)
             if m != None:
-                bpcds.append((m.groups(0)[1], int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
+                if lines[index + 1]:
+                    PcdName = m.groups(0)[0]
+                    m = re.match('^([\da-fA-Fx]+) +([\da-fA-Fx]+)', lines[index + 1].strip())
+                    if m != None:
+                        bpcds.append((PcdName, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
                 
     # get section information from efi file
     efisecs = PeImageClass(efifilepath).SectionHeaderList
