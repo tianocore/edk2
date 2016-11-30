@@ -138,7 +138,7 @@ SmmMemoryAttributesTableConsistencyCheck (
     if (Address != 0) {
       ASSERT (Address == MemoryMap->PhysicalStart);
     }
-    Address = MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE(MemoryMap->NumberOfPages);
+    Address = MemoryMap->PhysicalStart + EfiPagesToSize(MemoryMap->NumberOfPages);
     MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
   }
 }
@@ -1077,7 +1077,7 @@ SmmInsertImageRecord (
   // Step 1: record whole region
   //
   ImageRecord->ImageBase = DriverEntry->ImageBuffer;
-  ImageRecord->ImageSize = EFI_PAGES_TO_SIZE(DriverEntry->NumberOfPage);
+  ImageRecord->ImageSize = EfiPagesToSize(DriverEntry->NumberOfPage);
 
   ImageAddress = (VOID *)(UINTN)DriverEntry->ImageBuffer;
 
@@ -1281,7 +1281,7 @@ SmmRemoveImageRecord (
   DEBUG ((DEBUG_VERBOSE, "SMM RemoveImageRecord - 0x%x\n", DriverEntry));
   DEBUG ((DEBUG_VERBOSE, "SMM RemoveImageRecord - 0x%016lx - 0x%016lx\n", DriverEntry->ImageBuffer, DriverEntry->NumberOfPage));
 
-  ImageRecord = FindImageRecord (DriverEntry->ImageBuffer, EFI_PAGES_TO_SIZE(DriverEntry->NumberOfPage));
+  ImageRecord = FindImageRecord (DriverEntry->ImageBuffer, EfiPagesToSize(DriverEntry->NumberOfPage));
   if (ImageRecord == NULL) {
     DEBUG ((DEBUG_ERROR, "SMM !!!!!!!! ImageRecord not found !!!!!!!!\n"));
     return ;
