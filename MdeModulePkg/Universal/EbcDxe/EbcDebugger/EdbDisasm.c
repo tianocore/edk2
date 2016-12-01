@@ -194,8 +194,8 @@ EdbDisasmJMP (
 //    } else {
 //      EdbPrintInstructionName (L"32");
 //    }
-    if (Modifiers & CONDITION_M_CONDITIONAL) {
-      if (Modifiers & JMP_M_CS) {
+    if ((Modifiers & CONDITION_M_CONDITIONAL) != 0) {
+      if ((Modifiers & JMP_M_CS) != 0) {
         EdbPrintInstructionName (L"cs");
       } else {
         EdbPrintInstructionName (L"cc");
@@ -203,9 +203,9 @@ EdbDisasmJMP (
     }
 
     InstructionAddress += 2;
-    if (Modifiers & OPCODE_M_IMMDATA64) {
+    if ((Modifiers & OPCODE_M_IMMDATA64) != 0) {
       CopyMem (&Data64, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT64));
-      if (Modifiers & OPCODE_M_IMMDATA) {
+      if ((Modifiers & OPCODE_M_IMMDATA) != 0) {
         EdbPrintData64 (Data64);
       } else {
         return 0;
@@ -260,8 +260,8 @@ EdbDisasmJMP8 (
     *DisasmString = EdbPreInstructionString ();
 
     EdbPrintInstructionName (L"JMP8");
-    if (Modifiers & CONDITION_M_CONDITIONAL) {
-      if (Modifiers & JMP_M_CS) {
+    if ((Modifiers & CONDITION_M_CONDITIONAL) != 0) {
+      if ((Modifiers & JMP_M_CS) != 0) {
         EdbPrintInstructionName (L"cs");
       } else {
         EdbPrintInstructionName (L"cc");
@@ -322,7 +322,7 @@ EdbDisasmCALL (
 //    } else {
 //      EdbPrintInstructionName (L"32");
 //    }
-    if (Operands & OPERAND_M_NATIVE_CALL) {
+    if ((Operands & OPERAND_M_NATIVE_CALL) != 0) {
       EdbPrintInstructionName (L"EX");
     }
 //    if ((Operands & OPERAND_M_RELATIVE_ADDR) == 0) {
@@ -330,10 +330,10 @@ EdbDisasmCALL (
 //    }
 
     InstructionAddress += 2;
-    if (Modifiers & OPCODE_M_IMMDATA64) {
+    if ((Modifiers & OPCODE_M_IMMDATA64) != 0) {
       CopyMem (&Data64, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT64));
       Ip = Data64;
-      if (Modifiers & OPCODE_M_IMMDATA) {
+      if ((Modifiers & OPCODE_M_IMMDATA) != 0) {
         Result = EdbFindAndPrintSymbol ((UINTN)Ip);
         if (Result == 0) {
           EdbPrintData64 (Data64);
@@ -342,7 +342,7 @@ EdbDisasmCALL (
         return 0;
       }
     } else {
-      if (Modifiers & OPCODE_M_IMMDATA) {
+      if ((Modifiers & OPCODE_M_IMMDATA) != 0) {
         CopyMem (&Data32, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT32));
       } else {
         Data32 = 0;
@@ -355,20 +355,20 @@ EdbDisasmCALL (
       }
 
       if ((Operands & OPERAND_M_INDIRECT1) == 0) {
-        if (Operands & OPERAND_M_RELATIVE_ADDR) {
+        if ((Operands & OPERAND_M_RELATIVE_ADDR) != 0) {
           Result = EdbFindAndPrintSymbol ((UINTN)(SavedInstructionAddress + Ip + Size));
         } else {
           Result = EdbFindAndPrintSymbol ((UINTN)Ip);
         }
         if (Result == 0) {
           EdbPrintRegister1 (Operands);
-          if (Modifiers & OPCODE_M_IMMDATA) {
+          if ((Modifiers & OPCODE_M_IMMDATA) != 0) {
             EdbPrintImmData32 (Data32);
           }
         }
       } else {
         EdbPrintRegister1 (Operands);
-        if (Modifiers & OPCODE_M_IMMDATA) {
+        if ((Modifiers & OPCODE_M_IMMDATA) != 0) {
           EdbPrintRawIndexData32 (Data32);
         }
       }
@@ -453,7 +453,7 @@ EdbDisasmCMP (
   Opcode     = GET_OPCODE (InstructionAddress);
   Modifiers  = GET_MODIFIERS (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
-  if (Modifiers & OPCODE_M_IMMDATA) {
+  if ((Modifiers & OPCODE_M_IMMDATA) != 0) {
     Size = 4;
   } else {
     Size = 2;
@@ -495,9 +495,9 @@ EdbDisasmCMP (
     EdbPrintComma ();
     EdbPrintRegister2 (Operands);
 
-    if (Modifiers & OPCODE_M_IMMDATA) {
+    if ((Modifiers & OPCODE_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT2) {
+      if ((Operands & OPERAND_M_INDIRECT2) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -552,7 +552,7 @@ EdbDisasmUnsignedDataManip (
   Opcode     = GET_OPCODE (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
   Modifiers  = GET_MODIFIERS (InstructionAddress);
-  if (Modifiers & DATAMANIP_M_IMMDATA) {
+  if ((Modifiers & DATAMANIP_M_IMMDATA) != 0) {
     Size = 4;
   } else {
     Size = 2;
@@ -613,9 +613,9 @@ EdbDisasmUnsignedDataManip (
     EdbPrintRegister2 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & DATAMANIP_M_IMMDATA) {
+    if ((Modifiers & DATAMANIP_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT2) {
+      if ((Operands & OPERAND_M_INDIRECT2) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -665,7 +665,7 @@ EdbDisasmSignedDataManip (
   Opcode     = GET_OPCODE (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
   Modifiers  = GET_MODIFIERS (InstructionAddress);
-  if (Modifiers & DATAMANIP_M_IMMDATA) {
+  if ((Modifiers & DATAMANIP_M_IMMDATA) != 0) {
     Size = 4;
   } else {
     Size = 2;
@@ -711,9 +711,9 @@ EdbDisasmSignedDataManip (
     EdbPrintRegister2 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & DATAMANIP_M_IMMDATA) {
+    if ((Modifiers & DATAMANIP_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT2) {
+      if ((Operands & OPERAND_M_INDIRECT2) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -770,26 +770,26 @@ EdbDisasmMOVxx (
   Modifiers  = GET_MODIFIERS (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
   Size = 2;
-  if (Modifiers & (OPCODE_M_IMMED_OP1 | OPCODE_M_IMMED_OP2)) {
+  if ((Modifiers & (OPCODE_M_IMMED_OP1 | OPCODE_M_IMMED_OP2)) != 0) {
     if ((Opcode <= OPCODE_MOVQW) || (Opcode == OPCODE_MOVNW)) {
-      if (Modifiers & OPCODE_M_IMMED_OP1) {
+      if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
         Size += 2;
       }
-      if (Modifiers & OPCODE_M_IMMED_OP2) {
+      if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
         Size += 2;
       }
-    } else if ((Opcode <= OPCODE_MOVQD) || (Opcode == OPCODE_MOVND)) {
-      if (Modifiers & OPCODE_M_IMMED_OP1) {
+    } else if (((Opcode <= OPCODE_MOVQD) || (Opcode == OPCODE_MOVND)) != 0) {
+      if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
         Size += 4;
       }
-      if (Modifiers & OPCODE_M_IMMED_OP2) {
+      if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
         Size += 4;
       }
     } else if (Opcode == OPCODE_MOVQQ) {
-      if (Modifiers & OPCODE_M_IMMED_OP1) {
+      if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
         Size += 8;
       }
-      if (Modifiers & OPCODE_M_IMMED_OP2) {
+      if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
         Size += 8;
       }
     }
@@ -841,7 +841,7 @@ EdbDisasmMOVxx (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & OPCODE_M_IMMED_OP1) {
+    if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
       if ((Opcode <= OPCODE_MOVQW) || (Opcode == OPCODE_MOVNW)) {
         CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
         InstructionAddress += 2;
@@ -860,7 +860,7 @@ EdbDisasmMOVxx (
     EdbPrintComma ();
     EdbPrintRegister2 (Operands);
 
-    if (Modifiers & OPCODE_M_IMMED_OP2) {
+    if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
       if ((Opcode <= OPCODE_MOVQW) || (Opcode == OPCODE_MOVNW)) {
         CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
         EdbPrintRawIndexData16 (Data16);
@@ -907,10 +907,10 @@ EdbDisasmMOVsnw (
   Modifiers  = GET_MODIFIERS (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
   Size = 2;
-  if (Modifiers & OPCODE_M_IMMED_OP1) {
+  if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
     Size += 2;
   }
-  if (Modifiers & OPCODE_M_IMMED_OP2) {
+  if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
     Size += 2;
   }
 
@@ -925,7 +925,7 @@ EdbDisasmMOVsnw (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & OPCODE_M_IMMED_OP1) {
+    if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
       InstructionAddress += 2;
       EdbPrintRawIndexData16 (Data16);
@@ -934,9 +934,9 @@ EdbDisasmMOVsnw (
     EdbPrintComma ();
     EdbPrintRegister2 (Operands);
 
-    if (Modifiers & OPCODE_M_IMMED_OP2) {
+    if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT2) {
+      if ((Operands & OPERAND_M_INDIRECT2) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -977,10 +977,10 @@ EdbDisasmMOVsnd (
   Modifiers  = GET_MODIFIERS (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
   Size = 2;
-  if (Modifiers & OPCODE_M_IMMED_OP1) {
+  if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
     Size += 4;
   }
-  if (Modifiers & OPCODE_M_IMMED_OP2) {
+  if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
     Size += 4;
   }
 
@@ -995,7 +995,7 @@ EdbDisasmMOVsnd (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & OPCODE_M_IMMED_OP1) {
+    if ((Modifiers & OPCODE_M_IMMED_OP1) != 0) {
       CopyMem (&Data32, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT32));
       InstructionAddress += 4;
       EdbPrintRawIndexData32 (Data32);
@@ -1004,9 +1004,9 @@ EdbDisasmMOVsnd (
     EdbPrintComma ();
     EdbPrintRegister2 (Operands);
 
-    if (Modifiers & OPCODE_M_IMMED_OP2) {
+    if ((Modifiers & OPCODE_M_IMMED_OP2) != 0) {
       CopyMem (&Data32, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT32));
-      if (Operands & OPERAND_M_INDIRECT2) {
+      if ((Operands & OPERAND_M_INDIRECT2) != 0) {
         EdbPrintRawIndexData32 (Data32);
       } else {
         EdbPrintImmDatan (Data32);
@@ -1131,7 +1131,7 @@ EdbDisasmPUSH (
 
   Operands   = GET_OPERANDS (InstructionAddress);
   Modifiers  = GET_MODIFIERS (InstructionAddress);
-  if (Modifiers & PUSHPOP_M_IMMDATA) {
+  if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
     Size = 4;
   } else {
     Size = 2;
@@ -1153,9 +1153,9 @@ EdbDisasmPUSH (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & PUSHPOP_M_IMMDATA) {
+    if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT1) {
+      if ((Operands & OPERAND_M_INDIRECT1) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -1195,7 +1195,7 @@ EdbDisasmPOP (
 
   Operands   = GET_OPERANDS (InstructionAddress);
   Modifiers  = GET_MODIFIERS (InstructionAddress);
-  if (Modifiers & PUSHPOP_M_IMMDATA) {
+  if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
     Size = 4;
   } else {
     Size = 2;
@@ -1217,9 +1217,9 @@ EdbDisasmPOP (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & PUSHPOP_M_IMMDATA) {
+    if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT1) {
+      if ((Operands & OPERAND_M_INDIRECT1) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -1274,10 +1274,10 @@ EdbDisasmCMPI (
   }
 
   Size = 2;
-  if (Operands & OPERAND_M_CMPI_INDEX) {
+  if ((Operands & OPERAND_M_CMPI_INDEX) != 0) {
     Size += 2;
   }
-  if (Modifiers & OPCODE_M_CMPI32_DATA) {
+  if ((Modifiers & OPCODE_M_CMPI32_DATA) != 0) {
     Size += 4;
   } else {
     Size += 2;
@@ -1295,7 +1295,7 @@ EdbDisasmCMPI (
 //    } else {
 //      EdbPrintInstructionName (L"32");
 //    }
-    if (Modifiers & OPCODE_M_CMPI32_DATA) {
+    if ((Modifiers & OPCODE_M_CMPI32_DATA) != 0) {
       EdbPrintInstructionName (L"d");
     } else {
       EdbPrintInstructionName (L"w");
@@ -1321,7 +1321,7 @@ EdbDisasmCMPI (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Operands & OPERAND_M_CMPI_INDEX) {
+    if ((Operands & OPERAND_M_CMPI_INDEX) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
       InstructionAddress += 2;
       EdbPrintRawIndexData16 (Data16);
@@ -1329,7 +1329,7 @@ EdbDisasmCMPI (
 
     EdbPrintComma ();
 
-    if (Modifiers & OPCODE_M_CMPI32_DATA) {
+    if ((Modifiers & OPCODE_M_CMPI32_DATA) != 0) {
       CopyMem (&Data32, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT32));
       EdbPrintDatan (Data32);
     } else {
@@ -1370,7 +1370,7 @@ EdbDisasmPUSHn (
 
   Operands   = GET_OPERANDS (InstructionAddress);
   Modifiers  = GET_MODIFIERS (InstructionAddress);
-  if (Modifiers & PUSHPOP_M_IMMDATA) {
+  if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
     Size = 4;
   } else {
     Size = 2;
@@ -1387,9 +1387,9 @@ EdbDisasmPUSHn (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & PUSHPOP_M_IMMDATA) {
+    if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT1) {
+      if ((Operands & OPERAND_M_INDIRECT1) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -1429,7 +1429,7 @@ EdbDisasmPOPn (
 
   Operands   = GET_OPERANDS (InstructionAddress);
   Modifiers  = GET_MODIFIERS (InstructionAddress);
-  if (Modifiers & PUSHPOP_M_IMMDATA) {
+  if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
     Size = 4;
   } else {
     Size = 2;
@@ -1446,9 +1446,9 @@ EdbDisasmPOPn (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Modifiers & PUSHPOP_M_IMMDATA) {
+    if ((Modifiers & PUSHPOP_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
-      if (Operands & OPERAND_M_INDIRECT1) {
+      if ((Operands & OPERAND_M_INDIRECT1) != 0) {
         EdbPrintRawIndexData16 (Data16);
       } else {
         EdbPrintImmDatan (Data16);
@@ -1491,7 +1491,7 @@ EdbDisasmMOVI (
   Modifiers  = GET_MODIFIERS (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
 
-  if (Operands & MOVI_M_IMMDATA) {
+  if ((Operands & MOVI_M_IMMDATA) != 0) {
     Size    = 4;
   } else {
     Size    = 2;
@@ -1540,7 +1540,7 @@ EdbDisasmMOVI (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Operands & MOVI_M_IMMDATA) {
+    if ((Operands & MOVI_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
       InstructionAddress += 2;
       EdbPrintRawIndexData16 (Data16);
@@ -1599,7 +1599,7 @@ EdbDisasmMOVIn (
   Modifiers  = GET_MODIFIERS (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
 
-  if (Operands & MOVI_M_IMMDATA) {
+  if ((Operands & MOVI_M_IMMDATA) != 0) {
     Size    = 4;
   } else {
     Size    = 2;
@@ -1634,7 +1634,7 @@ EdbDisasmMOVIn (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Operands & MOVI_M_IMMDATA) {
+    if ((Operands & MOVI_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
       InstructionAddress += 2;
       EdbPrintRawIndexData16 (Data16);
@@ -1696,7 +1696,7 @@ EdbDisasmMOVREL (
   Modifiers  = GET_MODIFIERS (InstructionAddress);
   Operands   = GET_OPERANDS (InstructionAddress);
 
-  if (Operands & MOVI_M_IMMDATA) {
+  if ((Operands & MOVI_M_IMMDATA) != 0) {
     Size    = 4;
   } else {
     Size    = 2;
@@ -1733,7 +1733,7 @@ EdbDisasmMOVREL (
     EdbPrintRegister1 (Operands);
 
     InstructionAddress += 2;
-    if (Operands & MOVI_M_IMMDATA) {
+    if ((Operands & MOVI_M_IMMDATA) != 0) {
       CopyMem (&Data16, (VOID *)(UINTN)(InstructionAddress), sizeof(UINT16));
       InstructionAddress += 2;
       EdbPrintRawIndexData16 (Data16);

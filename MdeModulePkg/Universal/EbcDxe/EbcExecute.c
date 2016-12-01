@@ -2987,7 +2987,7 @@ ExecuteCALL (
   Opcode    = GETOPCODE (VmPtr);
   Operands  = GETOPERANDS (VmPtr);
 
-  if (Operands & OPERAND_M_NATIVE_CALL) {
+  if ((Operands & OPERAND_M_NATIVE_CALL) != 0) {
     EbcDebuggerHookCALLEXStart (VmPtr);
   } else {
     EbcDebuggerHookCALLStart (VmPtr);
@@ -3094,7 +3094,7 @@ ExecuteCALL (
     }
   }
 
-  if (Operands & OPERAND_M_NATIVE_CALL) {
+  if ((Operands & OPERAND_M_NATIVE_CALL) != 0) {
     EbcDebuggerHookCALLEXEnd (VmPtr);
   } else {
     EbcDebuggerHookCALLEnd (VmPtr);

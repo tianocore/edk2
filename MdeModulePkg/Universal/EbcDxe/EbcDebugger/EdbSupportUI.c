@@ -50,7 +50,7 @@ WaitForSingleEvent (
   EFI_EVENT   TimerEvent;
   EFI_EVENT   WaitList[2];
 
-  if (Timeout) {
+  if (Timeout != 0) {
     //
     // Create a timer event
     //
@@ -204,7 +204,7 @@ Input (
   ASSERT (ConIn != NULL);
   ASSERT (InStr != NULL);
 
-  if (Prompt) {
+  if (Prompt != NULL) {
     ConOut->OutputString (ConOut, Prompt);
   }
   //
@@ -255,7 +255,7 @@ Input (
       break;
 
     case CHAR_BACKSPACE:
-      if (StrPos) {
+      if (StrPos != 0) {
         //
         // If not move back beyond string beginning, move all characters behind
         // the current position one character forward
@@ -307,7 +307,7 @@ Input (
         //
         // Move characters behind current position one character forward
         //
-        if (Len) {
+        if (Len != 0) {
           Update  = StrPos;
           Delete  = 1;
           CopyMem (InStr + StrPos, InStr + StrPos + 1, sizeof (CHAR16) * (Len - StrPos));
@@ -320,7 +320,7 @@ Input (
         //
         // Adjust current cursor position
         //
-        if (StrPos) {
+        if (StrPos != 0) {
           StrPos -= 1;
           ConMoveCursorBackward (LineLength, &Column, &Row);
         }
@@ -447,7 +447,7 @@ Input (
       EDBPrint (InStr + Update);
       Len = StrLen (InStr);
 
-      if (Delete) {
+      if (Delete != 0) {
         SetMem (InStr + Len, Delete * sizeof (CHAR16), 0x00);
       }
 

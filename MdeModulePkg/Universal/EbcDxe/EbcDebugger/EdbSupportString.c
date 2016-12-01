@@ -37,19 +37,19 @@ Xtoi (
   //
   // skip preceeding white space
   //
-  while (*Str && *Str == ' ') {
+  while (*Str != '\0' && *Str == ' ') {
     Str += 1;
   }
   //
   // skip preceeding zeros
   //
-  while (*Str && *Str == '0') {
+  while (*Str != '\0' && *Str == '0') {
     Str += 1;
   }
   //
   // skip preceeding white space
   //
-  if (*Str && (*Str == 'x' || *Str == 'X')) {
+  if (*Str != '\0' && (*Str == 'x' || *Str == 'X')) {
     Str += 1;
   }
   //
@@ -57,7 +57,7 @@ Xtoi (
   //
   RetVal = 0;
   TempChar = *(Str++);
-  while (TempChar) {
+  while (TempChar != '\0') {
     if (TempChar >= 'a' && TempChar <= 'f') {
       TempChar -= 'a' - 'A';
     }
@@ -102,19 +102,19 @@ LXtoi (
   //
   // skip preceeding white space
   //
-  while (*Str && *Str == ' ') {
+  while (*Str != '\0' && *Str == ' ') {
     Str += 1;
   }
   //
   // skip preceeding zeros
   //
-  while (*Str && *Str == '0') {
+  while (*Str != '\0' && *Str == '0') {
     Str += 1;
   }
   //
   // skip preceeding white space
   //
-  if (*Str && (*Str == 'x' || *Str == 'X')) {
+  if (*Str != '\0' && (*Str == 'x' || *Str == 'X')) {
     Str += 1;
   }
   //
@@ -122,7 +122,7 @@ LXtoi (
   //
   RetVal = 0;
   TempChar = *(Str++);
-  while (TempChar) {
+  while (TempChar != '\0') {
     if (TempChar >= 'a' && TempChar <= 'f') {
       TempChar -= 'a' - 'A';
     }
@@ -169,7 +169,7 @@ Atoi (
   //
   // skip preceeding white space
   //
-  while (*Str && *Str == ' ') {
+  while (*Str != '\0' && *Str == ' ') {
     Str += 1;
   }
   //
@@ -177,7 +177,7 @@ Atoi (
   //
   RetVal = 0;
   TempChar = *(Str++);
-  while (TempChar) {
+  while (TempChar != '\0') {
     if (TempChar >= '0' && TempChar <= '9') {
       if (RetVal > MaxVal || (RetVal == MaxVal && TempChar - '0' > (INTN) ResteVal)) {
         return (UINTN) -1;
@@ -217,19 +217,19 @@ AsciiXtoi (
   //
   // skip preceeding white space
   //
-  while (*Str && *Str == ' ') {
+  while (*Str != '\0' && *Str == ' ') {
     Str += 1;
   }
   //
   // skip preceeding zeros
   //
-  while (*Str && *Str == '0') {
+  while (*Str != '\0' && *Str == '0') {
     Str += 1;
   }
   //
   // skip preceeding white space
   //
-  if (*Str && (*Str == 'x' || *Str == 'X')) {
+  if (*Str != '\0' && (*Str == 'x' || *Str == 'X')) {
     Str += 1;
   }
   //
@@ -237,7 +237,7 @@ AsciiXtoi (
   //
   RetVal = 0;
   TempChar = *(Str++);
-  while (TempChar) {
+  while (TempChar != '\0') {
     if (TempChar >= 'a' && TempChar <= 'f') {
       TempChar -= 'a' - 'A';
     }
@@ -283,7 +283,7 @@ AsciiAtoi (
   //
   // skip preceeding white space
   //
-  while (*Str && *Str == ' ') {
+  while (*Str != '\0' && *Str == ' ') {
     Str += 1;
   }
   //
@@ -291,7 +291,7 @@ AsciiAtoi (
   //
   RetVal = 0;
   TempChar = *(Str++);
-  while (TempChar) {
+  while (TempChar != '\0') {
     if (TempChar >= '0' && TempChar <= '9') {
       if (RetVal > MaxVal || (RetVal == MaxVal && TempChar - '0' > (INTN) ResteVal)) {
         return (UINTN) -1;
@@ -345,7 +345,7 @@ StrCmpUnicodeAndAscii (
   IN CHAR8    *String2
   )
 {
-  while (*String) {
+  while (*String != '\0') {
     if (*String != (CHAR16)*String2) {
       break;
     }
@@ -463,7 +463,7 @@ StrDuplicate (
 
   Size = (StrLen(Src) + 1) * sizeof(CHAR16);
   Dest = AllocateZeroPool (Size);
-  if (Dest) {
+  if (Dest != NULL) {
     CopyMem (Dest, Src, Size);
   }
   return Dest;
@@ -678,7 +678,7 @@ PatchForStrTokenAfter (
   }
   *Str = Patch;
 
-  while (*(Str ++)) {
+  while (*(Str ++) != '\0') {
     if (*Str == 0) {
       *Str = Patch;
     } else {
@@ -703,7 +703,7 @@ PatchForStrTokenBefore (
   }
 
   Str = Buffer;
-  while (*(Str --)) {
+  while (*(Str --) != '\0') {
     if ((*Str == 0) || (*Str == Patch)) {
       *Str = Patch;
     } else {
@@ -920,7 +920,7 @@ PatchForAsciiStrTokenAfter (
   }
   *Str = Patch;
 
-  while (*(Str ++)) {
+  while (*(Str ++) != '\0') {
     if (*Str == 0) {
       *Str = Patch;
     } else {
@@ -945,7 +945,7 @@ PatchForAsciiStrTokenBefore (
   }
 
   Str = Buffer;
-  while (*(Str --)) {
+  while (*(Str --) != '\0') {
     if ((*Str == 0) || (*Str == Patch)) {
       *Str = Patch;
     } else {

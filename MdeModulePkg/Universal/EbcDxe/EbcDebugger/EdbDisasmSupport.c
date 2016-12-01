@@ -270,7 +270,7 @@ EdbPrintRegister1 (
   IN UINT8                  Operands
   )
 {
-  if (Operands & OPERAND_M_INDIRECT1) {
+  if ((Operands & OPERAND_M_INDIRECT1) != 0) {
     EDBSPrintWithOffset (
       mInstructionString.Content,
       EDB_INSTRUCTION_CONTENT_MAX_SIZE,
@@ -305,7 +305,7 @@ EdbPrintRegister2 (
   IN UINT8                  Operands
   )
 {
-  if (Operands & OPERAND_M_INDIRECT2) {
+  if ((Operands & OPERAND_M_INDIRECT2) != 0) {
     EDBSPrintWithOffset (
       mInstructionString.Content,
       EDB_INSTRUCTION_CONTENT_MAX_SIZE,
