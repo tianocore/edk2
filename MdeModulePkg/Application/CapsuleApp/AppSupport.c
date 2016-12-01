@@ -74,7 +74,7 @@ GetArg (
 
 **/
 EFI_STATUS
-StrToBuf (
+InternalStrToBuf (
   OUT UINT8    *Buf,
   IN  UINTN    BufferLength,
   IN  CHAR16   *Str
@@ -135,7 +135,7 @@ StrToBuf (
 
 **/
 EFI_STATUS
-StrToGuid (
+InternalStrToGuid (
   IN  CHAR16   *Str,
   OUT EFI_GUID *Guid
   )
@@ -185,7 +185,7 @@ StrToGuid (
   //
   // Get the following 8 bytes data
   //
-  StrToBuf (&Guid->Data4[0], 2, Str);
+  InternalStrToBuf (&Guid->Data4[0], 2, Str);
   //
   // Skip 2 byte hex chars
   //
@@ -196,7 +196,7 @@ StrToGuid (
   } else {
     return EFI_UNSUPPORTED;
   }
-  StrToBuf (&Guid->Data4[2], 6, Str);
+  InternalStrToBuf (&Guid->Data4[2], 6, Str);
 
   return EFI_SUCCESS;
 }

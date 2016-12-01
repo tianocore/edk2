@@ -155,7 +155,7 @@ WriteFileFromBuffer (
 
 **/
 EFI_STATUS
-StrToGuid (
+InternalStrToGuid (
   IN  CHAR16   *Str,
   OUT EFI_GUID *Guid
   );
@@ -782,7 +782,7 @@ UefiMain (
         //
         // FMP->GetImage()
         //
-        Status = StrToGuid(Argv[3], &ImageTypeId);
+        Status = InternalStrToGuid(Argv[3], &ImageTypeId);
         if (EFI_ERROR(Status)) {
           Print (L"Invalid ImageTypeId - %s\n", Argv[3]);
           return Status;
