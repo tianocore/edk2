@@ -85,7 +85,7 @@ SmmInitializeMemoryServices (
     SmramRanges[CurrentSmramRangesIndex].PhysicalSize = SmramRanges[CurrentSmramRangesIndex].PhysicalSize - SmmCodeSize;
   }
   //
-  // Initialize free SMRAM regions
+  // Add Free SMRAM regions
   // Need add Free memory at first, to let gSmmMemoryMap record data
   //
   for (Index = 0; Index < SmramRangeCount; Index++) {
@@ -100,6 +100,9 @@ SmmInitializeMemoryServices (
       );
   }
 
+  //
+  // Add the allocated SMRAM regions
+  //
   for (Index = 0; Index < SmramRangeCount; Index++) {
     if ((SmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) == 0) {
       continue;
