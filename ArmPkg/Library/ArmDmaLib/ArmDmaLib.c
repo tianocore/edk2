@@ -142,7 +142,7 @@ DmaMap (
         CopyMem (Buffer, HostAddress, *NumberOfBytes);
       }
 
-      *DeviceAddress = HostToDeviceAddress (ConvertToPhysicalAddress ((UINTN)Buffer));
+      *DeviceAddress = HostToDeviceAddress (ConvertToPhysicalAddress (Buffer));
       Map->BufferAddress = Buffer;
     } else {
       Map->DoubleBuffer  = FALSE;
