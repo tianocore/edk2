@@ -1183,11 +1183,13 @@ EdbLoadCodBySymbolByIec (
   VOID                       *BufferEnd;
   UINTN                      Offset;
   EDB_EBC_COD_PARSE_STATE    CodParseState;
-  CHAR8                      Char[2] = {9, 0};
+  CHAR8                      Char[2];
 
   //
   // Init
   //
+  Char[0] = 9;
+  Char[1] = 0;
   LineBuffer = AsciiStrGetNewTokenLine (Buffer, "\n\r");
   Offset = (UINTN)-1;
   BufferStart = NULL;

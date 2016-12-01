@@ -487,7 +487,9 @@ EdbExceptionHandler (
   CHAR16                  *CommandArg;
   EFI_DEBUGGER_COMMAND    DebuggerCommand;
   EFI_DEBUG_STATUS        DebugStatus;
-  STATIC BOOLEAN          mInitialized = FALSE;
+  STATIC BOOLEAN          mInitialized;
+
+  mInitialized = FALSE;
 
   DEBUG ((DEBUG_ERROR, "Hello EBC Debugger!\n"));
 
