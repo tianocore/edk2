@@ -311,6 +311,7 @@ OnS3SaveStateInstalled (
   EFI_STATUS                 Status;
   EFI_S3_SAVE_STATE_PROTOCOL *S3SaveState;
   UINT32                     SmiEnOrMask, SmiEnAndMask;
+  UINT64                     GenPmCon1Address;
   UINT16                     GenPmCon1OrMask, GenPmCon1AndMask;
 
   ASSERT (Event == mS3SaveStateInstalled);
@@ -342,13 +343,15 @@ OnS3SaveStateInstalled (
     CpuDeadLoop ();
   }
 
+  GenPmCon1Address = POWER_MGMT_REGISTER_Q35_EFI_PCI_ADDRESS (
+                       ICH9_GEN_PMCON_1);
   GenPmCon1OrMask  = ICH9_GEN_PMCON_1_SMI_LOCK;
   GenPmCon1AndMask = MAX_UINT16;
   Status = S3SaveState->Write (
                           S3SaveState,
                           EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE,
                           EfiBootScriptWidthUint16,
-                          (UINT64)POWER_MGMT_REGISTER_Q35 (ICH9_GEN_PMCON_1),
+                          GenPmCon1Address,
                           &GenPmCon1OrMask,
                           &GenPmCon1AndMask
                           );
