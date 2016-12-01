@@ -179,7 +179,7 @@
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2F
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000042
     <LibraryClasses>
-      DebugLib|IntelFrameworkModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
+      DebugLib|MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
       ReportStatusCodeLib|DuetPkg/Library/DxeCoreReportStatusCodeLibFromHob/DxeCoreReportStatusCodeLibFromHob.inf
   }
 
@@ -212,7 +212,7 @@
   DuetPkg/EfiLdr/EfiLdr.inf {
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-      NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
   IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
