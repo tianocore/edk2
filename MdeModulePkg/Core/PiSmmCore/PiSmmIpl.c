@@ -973,6 +973,10 @@ ExecuteSmmCoreFromSmram (
       // Since the memory range to load SMM CORE will be cut out in SMM core, so no need to allocate and free this range
       //
       PageCount = 0;
+      //
+      // Reserved Smram Region for SmmCore is not used, and remove it from SmramRangeCount.
+      //
+      gSmmCorePrivate->SmramRangeCount --;
     } else {
       DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR: Loading module at fixed address at address failed\n"));
       //
@@ -1299,6 +1303,7 @@ GetFullSmramRanges (
   UINTN                             Index2;
   EFI_SMRAM_DESCRIPTOR              *FullSmramRanges;
   UINTN                             TempSmramRangeCount;
+  UINTN                             AdditionSmramRangeCount;
   EFI_SMRAM_DESCRIPTOR              *TempSmramRanges;
   UINTN                             SmramRangeCount;
   EFI_SMRAM_DESCRIPTOR              *SmramRanges;
@@ -1332,12 +1337,22 @@ GetFullSmramRanges (
     }
   }
 
+  //
+  // Reserve one entry for SMM Core in the full SMRAM ranges.
+  //
+  AdditionSmramRangeCount = 1;
+  if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
+    //
+    // Reserve two entries for all SMM drivers and SMM Core in the full SMRAM ranges.
+    //
+    AdditionSmramRangeCount = 2;
+  }
+
   if (SmramReservedCount == 0) {
     //
     // No reserved SMRAM entry from SMM Configuration Protocol.
-    // Reserve one entry for SMM Core in the full SMRAM ranges.
     //
-    *FullSmramRangeCount = SmramRangeCount + 1;
+    *FullSmramRangeCount = SmramRangeCount + AdditionSmramRangeCount;
     Size = (*FullSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR);
     FullSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocateZeroPool (Size);
     ASSERT (FullSmramRanges != NULL);
@@ -1449,10 +1464,9 @@ GetFullSmramRanges (
   ASSERT (TempSmramRangeCount <= MaxCount);
 
   //
-  // Sort the entries,
-  // and reserve one entry for SMM Core in the full SMRAM ranges.
+  // Sort the entries
   //
-  FullSmramRanges = AllocateZeroPool ((TempSmramRangeCount + 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
+  FullSmramRanges = AllocateZeroPool ((TempSmramRangeCount + AdditionSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR));
   ASSERT (FullSmramRanges != NULL);
   *FullSmramRangeCount = 0;
   do {
@@ -1472,7 +1486,7 @@ GetFullSmramRanges (
     TempSmramRanges[Index].PhysicalSize = 0;
   } while (*FullSmramRangeCount < TempSmramRangeCount);
   ASSERT (*FullSmramRangeCount == TempSmramRangeCount);
-  *FullSmramRangeCount += 1;
+  *FullSmramRangeCount += AdditionSmramRangeCount;
 
   FreePool (SmramRanges);
   FreePool (SmramReservedRanges);
@@ -1510,6 +1524,7 @@ SmmIplEntry (
   EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    *LMFAConfigurationTable;
   EFI_CPU_ARCH_PROTOCOL           *CpuArch;
   EFI_STATUS                      SetAttrStatus;
+  EFI_SMRAM_DESCRIPTOR            *SmramRangeSmmDriver;
 
   //
   // Fill in the image handle of the SMM IPL so the SMM Core can use this as the 
@@ -1619,6 +1634,19 @@ SmmIplEntry (
         //
         DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: TSEG BASE is %x. \n", LMFAConfigurationTable->SmramBase));
       }
+
+      //
+      // Fill the Smram range for all SMM code
+      //
+      SmramRangeSmmDriver = &gSmmCorePrivate->SmramRanges[gSmmCorePrivate->SmramRangeCount - 2];
+      SmramRangeSmmDriver->CpuStart      = mCurrentSmramRange->CpuStart;
+      SmramRangeSmmDriver->PhysicalStart = mCurrentSmramRange->PhysicalStart;
+      SmramRangeSmmDriver->RegionState   = mCurrentSmramRange->RegionState | EFI_ALLOCATED;
+      SmramRangeSmmDriver->PhysicalSize  = SmmCodeSize;
+
+      mCurrentSmramRange->PhysicalSize  -= SmmCodeSize;
+      mCurrentSmramRange->CpuStart       = mCurrentSmramRange->CpuStart + SmmCodeSize;
+      mCurrentSmramRange->PhysicalStart  = mCurrentSmramRange->PhysicalStart + SmmCodeSize;
     }
     //
     // Load SMM Core into SMRAM and execute it from SMRAM
