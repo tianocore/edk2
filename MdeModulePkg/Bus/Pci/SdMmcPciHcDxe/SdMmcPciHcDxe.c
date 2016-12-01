@@ -638,7 +638,7 @@ SdMmcPciHcDriverBindingStart (
     if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
       continue;
     } else if (!MediaPresent) {
-      DEBUG ((EFI_ERROR, "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n", Slot));
+      DEBUG ((DEBUG_INFO, "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n", Slot));
       continue;
     }
 
