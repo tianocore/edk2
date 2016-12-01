@@ -28,31 +28,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 UINTN
 EFIAPI
 Xtoi (
-  CHAR16  *str
+  CHAR16  *Str
   );
 
 UINT64
 EFIAPI
 LXtoi (
-  CHAR16  *str
+  CHAR16  *Str
   );
 
 UINTN
 EFIAPI
 Atoi (
-  CHAR16  *str
+  CHAR16  *Str
   );
 
 UINTN
 EFIAPI
 AsciiXtoi (
-  CHAR8  *str
+  CHAR8  *Str
   );
 
 UINTN
 EFIAPI
 AsciiAtoi (
-  CHAR8  *str
+  CHAR8  *Str
   );
 
 INTN

@@ -18,294 +18,294 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Convert hex string to uint.
 
-  @param  str  -  The string
+  @param  Str  -  The string
 
 **/
 UINTN
 EFIAPI
 Xtoi (
-  CHAR16  *str
+  CHAR16  *Str
   )
 {
-  UINTN   u;
-  CHAR16  c;
-  UINTN   m;
+  UINTN   RetVal;
+  CHAR16  TempChar;
+  UINTN   MaxVal;
 
-  ASSERT (str != NULL);
+  ASSERT (Str != NULL);
 
-  m = (UINTN) -1 >> 4;
+  MaxVal = (UINTN) -1 >> 4;
   //
   // skip preceeding white space
   //
-  while (*str && *str == ' ') {
-    str += 1;
+  while (*Str && *Str == ' ') {
+    Str += 1;
   }
   //
   // skip preceeding zeros
   //
-  while (*str && *str == '0') {
-    str += 1;
+  while (*Str && *Str == '0') {
+    Str += 1;
   }
   //
   // skip preceeding white space
   //
-  if (*str && (*str == 'x' || *str == 'X')) {
-    str += 1;
+  if (*Str && (*Str == 'x' || *Str == 'X')) {
+    Str += 1;
   }
   //
   // convert hex digits
   //
-  u = 0;
-  c = *(str++);
-  while (c) {
-    if (c >= 'a' && c <= 'f') {
-      c -= 'a' - 'A';
+  RetVal = 0;
+  TempChar = *(Str++);
+  while (TempChar) {
+    if (TempChar >= 'a' && TempChar <= 'f') {
+      TempChar -= 'a' - 'A';
     }
 
-    if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) {
-      if (u > m) {
+    if ((TempChar >= '0' && TempChar <= '9') || (TempChar >= 'A' && TempChar <= 'F')) {
+      if (RetVal > MaxVal) {
         return (UINTN) -1;
       }
 
-      u = (u << 4) | (c - (c >= 'A' ? 'A' - 10 : '0'));
+      RetVal = (RetVal << 4) | (TempChar - (TempChar >= 'A' ? 'A' - 10 : '0'));
     } else {
       break;
     }
 
-    c = *(str++);
+    TempChar = *(Str++);
   }
 
-  return u;
+  return RetVal;
 }
 
 /**
 
   Convert hex string to uint.
 
-  @param  str  -  The string
+  @param  Str  -  The string
 
 **/
 
 UINT64
 EFIAPI
 LXtoi (
-  CHAR16  *str
+  CHAR16  *Str
   )
 {
-  UINT64  u;
-  CHAR16  c;
-  UINT64  m;
+  UINT64  RetVal;
+  CHAR16  TempChar;
+  UINT64  MaxVal;
 
-  ASSERT (str != NULL);
+  ASSERT (Str != NULL);
 
-  m = RShiftU64 ((UINT64) -1, 4);
+  MaxVal = RShiftU64 ((UINT64) -1, 4);
   //
   // skip preceeding white space
   //
-  while (*str && *str == ' ') {
-    str += 1;
+  while (*Str && *Str == ' ') {
+    Str += 1;
   }
   //
   // skip preceeding zeros
   //
-  while (*str && *str == '0') {
-    str += 1;
+  while (*Str && *Str == '0') {
+    Str += 1;
   }
   //
   // skip preceeding white space
   //
-  if (*str && (*str == 'x' || *str == 'X')) {
-    str += 1;
+  if (*Str && (*Str == 'x' || *Str == 'X')) {
+    Str += 1;
   }
   //
   // convert hex digits
   //
-  u = 0;
-  c = *(str++);
-  while (c) {
-    if (c >= 'a' && c <= 'f') {
-      c -= 'a' - 'A';
+  RetVal = 0;
+  TempChar = *(Str++);
+  while (TempChar) {
+    if (TempChar >= 'a' && TempChar <= 'f') {
+      TempChar -= 'a' - 'A';
     }
 
-    if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) {
-      if (u > m) {
+    if ((TempChar >= '0' && TempChar <= '9') || (TempChar >= 'A' && TempChar <= 'F')) {
+      if (RetVal > MaxVal) {
         return (UINT64) -1;
       }
 
-      u = LShiftU64 (u, 4);
-      u = u + (c - (c >= 'A' ? 'A' - 10 : '0'));
+      RetVal = LShiftU64 (RetVal, 4);
+      RetVal = RetVal + (TempChar - (TempChar >= 'A' ? 'A' - 10 : '0'));
     } else {
       break;
     }
 
-    c = *(str++);
+    TempChar = *(Str++);
   }
 
-  return u;
+  return RetVal;
 }
 
 /**
 
   Convert hex string to uint.
 
-  @param str  -  The string
+  @param Str  -  The string
 
 **/
 UINTN
 EFIAPI
 Atoi (
-  CHAR16  *str
+  CHAR16  *Str
   )
 {
-  UINTN   u;
-  CHAR16  c;
-  UINTN   m;
-  UINTN   n;
+  UINTN   RetVal;
+  CHAR16  TempChar;
+  UINTN   MaxVal;
+  UINTN   ResteVal;
 
-  ASSERT (str != NULL);
+  ASSERT (Str != NULL);
 
-  m = (UINTN) -1 / 10;
-  n = (UINTN) -1 % 10;
+  MaxVal = (UINTN) -1 / 10;
+  ResteVal = (UINTN) -1 % 10;
   //
   // skip preceeding white space
   //
-  while (*str && *str == ' ') {
-    str += 1;
+  while (*Str && *Str == ' ') {
+    Str += 1;
   }
   //
   // convert digits
   //
-  u = 0;
-  c = *(str++);
-  while (c) {
-    if (c >= '0' && c <= '9') {
-      if (u > m || (u == m && c - '0' > (INTN) n)) {
+  RetVal = 0;
+  TempChar = *(Str++);
+  while (TempChar) {
+    if (TempChar >= '0' && TempChar <= '9') {
+      if (RetVal > MaxVal || (RetVal == MaxVal && TempChar - '0' > (INTN) ResteVal)) {
         return (UINTN) -1;
       }
 
-      u = (u * 10) + c - '0';
+      RetVal = (RetVal * 10) + TempChar - '0';
     } else {
       break;
     }
 
-    c = *(str++);
+    TempChar = *(Str++);
   }
 
-  return u;
+  return RetVal;
 }
 
 /**
 
   Convert hex string to uint.
 
-  @param  str  -  The string
+  @param  Str  -  The string
 
 **/
 UINTN
 EFIAPI
 AsciiXtoi (
-  CHAR8  *str
+  CHAR8  *Str
   )
 {
-  UINTN   u;
-  CHAR8   c;
-  UINTN   m;
+  UINTN   RetVal;
+  CHAR8   TempChar;
+  UINTN   MaxVal;
 
-  ASSERT (str != NULL);
+  ASSERT (Str != NULL);
 
-  m = (UINTN) -1 >> 4;
+  MaxVal = (UINTN) -1 >> 4;
   //
   // skip preceeding white space
   //
-  while (*str && *str == ' ') {
-    str += 1;
+  while (*Str && *Str == ' ') {
+    Str += 1;
   }
   //
   // skip preceeding zeros
   //
-  while (*str && *str == '0') {
-    str += 1;
+  while (*Str && *Str == '0') {
+    Str += 1;
   }
   //
   // skip preceeding white space
   //
-  if (*str && (*str == 'x' || *str == 'X')) {
-    str += 1;
+  if (*Str && (*Str == 'x' || *Str == 'X')) {
+    Str += 1;
   }
   //
   // convert hex digits
   //
-  u = 0;
-  c = *(str++);
-  while (c) {
-    if (c >= 'a' && c <= 'f') {
-      c -= 'a' - 'A';
+  RetVal = 0;
+  TempChar = *(Str++);
+  while (TempChar) {
+    if (TempChar >= 'a' && TempChar <= 'f') {
+      TempChar -= 'a' - 'A';
     }
 
-    if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) {
-      if (u > m) {
+    if ((TempChar >= '0' && TempChar <= '9') || (TempChar >= 'A' && TempChar <= 'F')) {
+      if (RetVal > MaxVal) {
         return (UINTN) -1;
       }
 
-      u = (u << 4) | (c - (c >= 'A' ? 'A' - 10 : '0'));
+      RetVal = (RetVal << 4) | (TempChar - (TempChar >= 'A' ? 'A' - 10 : '0'));
     } else {
       break;
     }
 
-    c = *(str++);
+    TempChar = *(Str++);
   }
 
-  return u;
+  return RetVal;
 }
 
 /**
 
   Convert hex string to uint.
 
-  @param str  -  The string
+  @param Str  -  The string
 
 **/
 UINTN
 EFIAPI
 AsciiAtoi (
-  CHAR8  *str
+  CHAR8  *Str
   )
 {
-  UINTN   u;
-  CHAR8   c;
-  UINTN   m;
-  UINTN   n;
+  UINTN   RetVal;
+  CHAR8   TempChar;
+  UINTN   MaxVal;
+  UINTN   ResteVal;
 
-  ASSERT (str != NULL);
+  ASSERT (Str != NULL);
 
-  m = (UINTN) -1 / 10;
-  n = (UINTN) -1 % 10;
+  MaxVal = (UINTN) -1 / 10;
+  ResteVal = (UINTN) -1 % 10;
   //
   // skip preceeding white space
   //
-  while (*str && *str == ' ') {
-    str += 1;
+  while (*Str && *Str == ' ') {
+    Str += 1;
   }
   //
   // convert digits
   //
-  u = 0;
-  c = *(str++);
-  while (c) {
-    if (c >= '0' && c <= '9') {
-      if (u > m || (u == m && c - '0' > (INTN) n)) {
+  RetVal = 0;
+  TempChar = *(Str++);
+  while (TempChar) {
+    if (TempChar >= '0' && TempChar <= '9') {
+      if (RetVal > MaxVal || (RetVal == MaxVal && TempChar - '0' > (INTN) ResteVal)) {
         return (UINTN) -1;
       }
 
-      u = (u * 10) + c - '0';
+      RetVal = (RetVal * 10) + TempChar - '0';
     } else {
       break;
     }
 
-    c = *(str++);
+    TempChar = *(Str++);
   }
 
-  return u;
+  return RetVal;
 }
 
 STATIC
