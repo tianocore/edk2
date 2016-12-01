@@ -312,7 +312,7 @@ SmmInternalAllocatePages (
   @param  NumberOfPages          The number of pages to free
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range
-  @retval EFI_INVALID_PARAMETER  Address not aligned
+  @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
   @return EFI_SUCCESS            Pages successfully freed.
 
 **/
@@ -330,7 +330,7 @@ SmmFreePages (
   @param  NumberOfPages          The number of pages to free
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range
-  @retval EFI_INVALID_PARAMETER  Address not aligned
+  @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
   @return EFI_SUCCESS            Pages successfully freed.
 
 **/
