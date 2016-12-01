@@ -1076,6 +1076,7 @@ IScsiConfigUpdateForm (
     mNumberOfIScsiDevices--;
     RemoveEntryList (&ConfigFormEntry->Link);
     FreePool (ConfigFormEntry);
+    mCallbackInfo->Current = NULL;
   }
   //
   // Allocate space for creation of Buffer
