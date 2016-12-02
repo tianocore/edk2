@@ -24,12 +24,20 @@
 #define QEMU_FW_CFG_FNAME_SIZE 56
 
 //
+// If the following bit is set in the UINT32 fw_cfg revision / feature bitmap
+// -- read from key 0x0001 with the basic IO Port or MMIO method --, then the
+// DMA interface is available.
+//
+#define FW_CFG_F_DMA BIT1
+
+//
 // Macros for the FW_CFG_DMA_ACCESS.Control bitmap (in native encoding).
 //
 #define FW_CFG_DMA_CTL_ERROR  BIT0
 #define FW_CFG_DMA_CTL_READ   BIT1
 #define FW_CFG_DMA_CTL_SKIP   BIT2
 #define FW_CFG_DMA_CTL_SELECT BIT3
+#define FW_CFG_DMA_CTL_WRITE  BIT4
 
 typedef enum {
   QemuFwCfgItemSignature            = 0x0000,
