@@ -821,17 +821,156 @@ PlatformEarlyInitEntry (
   EFI_PEI_HOB_POINTERS        Hob;
   EFI_PLATFORM_CPU_INFO       PlatformCpuInfo;
   EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *NewDescriptorBlock;
+  UINTN                           Index;
+  UINTN                           MaxIndex;
+  UINT64                          Base;
   UINT64                          Size;
+  UINT64                          NewSize;
 
   //
-  // Make sure last SMRAM region is aligned
+  // Make sure base and size of the SMRAM region is aligned
   //
   Hob.Raw = GetFirstGuidHob (&gEfiSmmPeiSmramMemoryReserveGuid);
   if (Hob.Raw != NULL) {
     DescriptorBlock = GET_GUID_HOB_DATA (Hob.Raw);
-    Size = DescriptorBlock->Descriptor[DescriptorBlock->NumberOfSmmReservedRegions - 1].PhysicalSize;
-    Size = LShiftU64 (1, HighBitSet64 (Size - 1) + 1);
-    DescriptorBlock->Descriptor[DescriptorBlock->NumberOfSmmReservedRegions - 1].PhysicalSize = Size;
+    DEBUG ((DEBUG_INFO, "SMM PEI SMRAM Memory Reserved HOB\n"));
+    for (Index = 0; Index < DescriptorBlock->NumberOfSmmReservedRegions; Index++) {
+      DEBUG((DEBUG_INFO, "  SMRAM Descriptor[%02x]: Start=%016lx  Size=%016lx  State=%02x\n",
+        Index,
+        DescriptorBlock->Descriptor[Index].PhysicalStart,
+        DescriptorBlock->Descriptor[Index].PhysicalSize,
+        DescriptorBlock->Descriptor[Index].RegionState
+        ));
+    }
+
+    //
+    // Find the largest usable range of SMRAM between 1MB and 4GB
+    //
+    for (Index = 0, MaxIndex = 0, Size = 0; Index < DescriptorBlock->NumberOfSmmReservedRegions; Index++) {
+      //
+      // Skip any SMRAM region that is already allocated, needs testing, or needs ECC initialization
+      //
+      if ((DescriptorBlock->Descriptor[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
+        continue;
+      }
+      //
+      // Skip any SMRAM region below 1MB
+      //
+      if (DescriptorBlock->Descriptor[Index].CpuStart < BASE_1MB) {
+        continue;
+      }
+      //
+      // Skip any SMRAM region that is above 4GB or crosses the 4GB boundary
+      //
+      if ((DescriptorBlock->Descriptor[Index].CpuStart + DescriptorBlock->Descriptor[Index].PhysicalSize) >= BASE_4GB) {
+        continue;
+      }
+      //
+      // Cache the largest SMRAM region index
+      //
+      if (DescriptorBlock->Descriptor[Index].PhysicalSize >= DescriptorBlock->Descriptor[MaxIndex].PhysicalSize) {
+        MaxIndex = Index;
+      }
+    }
+
+    //
+    // Find the extent of the contiguous SMRAM region that surrounds the largest usable SMRAM range
+    //
+    Base = DescriptorBlock->Descriptor[MaxIndex].CpuStart;
+    Size = DescriptorBlock->Descriptor[MaxIndex].PhysicalSize;
+    for (Index = 0; Index < DescriptorBlock->NumberOfSmmReservedRegions; Index++) {
+      if (DescriptorBlock->Descriptor[Index].CpuStart < Base &&
+          Base == (DescriptorBlock->Descriptor[Index].CpuStart + DescriptorBlock->Descriptor[Index].PhysicalSize)) {
+        Base  = DescriptorBlock->Descriptor[Index].CpuStart;
+        Size += DescriptorBlock->Descriptor[Index].PhysicalSize;
+      } else if ((Base + Size) == DescriptorBlock->Descriptor[Index].CpuStart) {
+        Size += DescriptorBlock->Descriptor[Index].PhysicalSize;
+      }
+    }
+
+    //
+    // Round SMRAM region up to nearest power of 2 that is at least 4KB
+    //
+    NewSize = MAX (LShiftU64 (1, HighBitSet64 (Size - 1) + 1), SIZE_4KB);
+    if ((Base & ~(NewSize - 1)) != Base) {
+      //
+      // SMRAM region Base Address has smaller alignment than SMRAM region Size
+      // This is not compatible with SMRR settings
+      //
+      DEBUG((DEBUG_ERROR, "ERROR: SMRAM Region Size has larger alignment than SMRAM Region Base\n"));
+      DEBUG((DEBUG_ERROR, "  SMRAM Region Base=%016lx  Size=%016lx\n", Base, NewSize));
+      ASSERT (FALSE);
+    } else if (Size != NewSize) {
+      //
+      // See if the size difference can be added to an adjacent descriptor that is already allocated
+      //
+      for (Index = 0; Index < DescriptorBlock->NumberOfSmmReservedRegions; Index++) {
+        if ((DescriptorBlock->Descriptor[Index].CpuStart + DescriptorBlock->Descriptor[Index].PhysicalSize) == (Base + Size)) {
+          if (((DescriptorBlock->Descriptor[Index].RegionState) & EFI_ALLOCATED) != 0) {
+            DescriptorBlock->Descriptor[Index].PhysicalSize += (NewSize - Size);
+            Size = NewSize;
+            break;
+          }
+        }
+      }
+
+      if (Size != NewSize) {
+        //
+        // Add an allocated descriptor to the SMM PEI SMRAM Memory Reserved HOB to accomodate the larger size.
+        //
+        Index = DescriptorBlock->NumberOfSmmReservedRegions;
+        NewDescriptorBlock = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
+          &gEfiSmmPeiSmramMemoryReserveGuid,
+          sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + ((Index + 1) * sizeof (EFI_SMRAM_DESCRIPTOR))
+          );
+        ASSERT (NewDescriptorBlock != NULL);
+
+        //
+        // Copy old EFI_SMRAM_HOB_DESCRIPTOR_BLOCK to new allocated region
+        //
+        CopyMem (
+          NewDescriptorBlock,
+          DescriptorBlock,
+          sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (Index * sizeof (EFI_SMRAM_DESCRIPTOR))
+          );
+
+        //
+        // Make sure last descriptor in NewDescriptorBlock contains last descriptor from DescriptorBlock
+        //
+        CopyMem (
+          &NewDescriptorBlock->Descriptor[Index],
+          &NewDescriptorBlock->Descriptor[Index - 1],
+          sizeof (EFI_SMRAM_DESCRIPTOR)
+          );
+
+        //
+        // Fill next to last descriptor with an allocated descriptor that aligns the total size of SMRAM
+        //
+        NewDescriptorBlock->Descriptor[Index - 1].CpuStart      = Base + Size;
+        NewDescriptorBlock->Descriptor[Index - 1].PhysicalStart = Base + Size;
+        NewDescriptorBlock->Descriptor[Index - 1].PhysicalSize  = NewSize - Size;
+        NewDescriptorBlock->Descriptor[Index - 1].RegionState   = DescriptorBlock->Descriptor[MaxIndex].RegionState | EFI_ALLOCATED;
+        NewDescriptorBlock->NumberOfSmmReservedRegions++;
+
+        //
+        // Invalidate the original gEfiSmmPeiSmramMemoryReserveGuid HOB
+        //
+        ZeroMem (&Hob.Guid->Name, sizeof (&Hob.Guid->Name));
+      }
+
+      Hob.Raw = GetFirstGuidHob (&gEfiSmmPeiSmramMemoryReserveGuid);
+      DescriptorBlock = GET_GUID_HOB_DATA (Hob.Raw);
+      DEBUG ((DEBUG_INFO, "SMM PEI SMRAM Memory Reserved HOB - Updated\n"));
+      for (Index = 0; Index < DescriptorBlock->NumberOfSmmReservedRegions; Index++) {
+        DEBUG((DEBUG_INFO, "  SMRAM Descriptor[%02x]: Start=%016lx  Size=%016lx  State=%02x\n",
+          Index,
+          DescriptorBlock->Descriptor[Index].PhysicalStart,
+          DescriptorBlock->Descriptor[Index].PhysicalSize,
+          DescriptorBlock->Descriptor[Index].RegionState
+          ));
+      }
+    }
   }
 
   //
