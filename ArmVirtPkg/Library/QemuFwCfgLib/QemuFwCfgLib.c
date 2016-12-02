@@ -163,7 +163,7 @@ QemuFwCfgInitialize (
 
         QemuFwCfgSelectItem (QemuFwCfgItemInterfaceVersion);
         Features = QemuFwCfgRead32 ();
-        if ((Features & BIT1) != 0) {
+        if ((Features & FW_CFG_F_DMA) != 0) {
           mFwCfgDmaAddress = FwCfgDmaAddress;
           InternalQemuFwCfgReadBytes = DmaReadBytes;
         }
