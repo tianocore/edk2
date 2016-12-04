@@ -1,0 +1,27 @@
+# ReadOnly NTFS filesystem driver
+# From https://efi.akeo.ie/ v1.5
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ntfs
+  FILE_GUID                      = 2282efd0-678b-4753-8d06-200d5940285d
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+VALID_ARCHITECTURES           = X64 IA32
+
+[Binaries.X64]
+  PE32|X64/ntfs_x64.efi|*
+
+[Binaries.IA32]
+  PE32|IA32/ntfs_ia32.efi|*
+
+
