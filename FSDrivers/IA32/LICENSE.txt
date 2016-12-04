@@ -1,0 +1,47 @@
+Licensing for the filesystem drivers is complex. Three different licenses
+apply to various parts of the code:
+
+* Christoph Pfisterer's original file system wrapper (FSW) code is covered
+  by a BSD-style license. Many of the source files with names that take the
+  form fsw_*.[ch] are so licensed, but this is NOT generally true of
+  filesystem-specific files (e.g., fsw_ext2.c or fsw_btrfs.c).
+
+* Certain filesystem drivers are licensed under the GPLv2, either because
+  they borrow code from the Linux kernel or because a developer (typically
+  Oracle) applied the GPLv2 license to them. This is true of the ext2fs,
+  ext4fs, ReiserFS, HFS+, and ISO-9660 drivers.
+
+* At least one filesystem driver (Btrfs) uses code taken from GRUB, and so
+  uses the GPLv3 (or later) license.
+
+Note that the GPLv2 and GPLv3 are, ironically, not compatible licenses.
+Thus, code from GPLv2 and GPLv3 projects should not be mixed. The BSD
+license used by Pfisterer's original code is compatible with both versions
+of the GPL, so the fact that both GPLv2 and GPLv3 drivers is built upon it
+is OK. If you intend to contribute to this project's drivers or use the
+code yourself, please keep this fact in mind.
+
+The below was written by Christoph Pfisterer with respect to his original
+code:
+
+ File System Wrapper License
+=============================
+
+The various parts of the File System Wrapper source code come from
+different sources and may carry different licenses. Here's a quick
+account of the situation:
+
+ * The core code was written from scratch and is covered by a
+   BSD-style license.
+
+ * The EFI host driver was written from scratch, possibly using code
+   from the TianoCore project and Intel's EFI Application Toolkit. It
+   is covered by a BSD-style license.
+
+ * The ext2 and reiserfs file system drivers use definitions from the
+   Linux kernel source. The actual code was written from scratch,
+   using multiple sources for reference. These drivers are covered by
+   the GNU GPL.
+
+For more details, see each file's boilerplate comment. The full text
+of the GNU GPL is in the file LICENSE_GPL.txt.
