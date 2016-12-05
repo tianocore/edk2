@@ -524,11 +524,14 @@ EndList
                                         IncludeFilePath = Match.group(1)
                                         IncludeFilePath = self.ExpandMacros(IncludeFilePath)
                                         PackagesPath = os.getenv("PACKAGES_PATH")
-                                        for PackagePath in PackagesPath.split(os.pathsep):
-                                            IncludeFilePathAbs = os.path.join(os.path.normpath(PackagePath), os.path.normpath(IncludeFilePath))
-                                            if os.path.exists(IncludeFilePathAbs):
-                                                IncludeDsc  = open(IncludeFilePathAbs, "r")
-                                                break
+                                        if PackagesPath:
+                                          for PackagePath in PackagesPath.split(os.pathsep):
+                                              IncludeFilePathAbs = os.path.join(os.path.normpath(PackagePath), os.path.normpath(IncludeFilePath))
+                                              if os.path.exists(IncludeFilePathAbs):
+                                                  IncludeDsc  = open(IncludeFilePathAbs, "r")
+                                                  break
+                                        else:
+                                          IncludeDsc  = open(IncludeFilePath, "r")
                                         if IncludeDsc == None:
                                             print("ERROR: Cannot open file '%s'" % IncludeFilePath)
                                             raise SystemExit
