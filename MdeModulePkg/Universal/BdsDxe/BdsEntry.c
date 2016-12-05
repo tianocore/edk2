@@ -874,6 +874,23 @@ BdsEntry (
     );
 
   //
+  // Initialize ConnectConIn event before calling platform code.
+  //
+  if (PcdGetBool (PcdConInConnectOnDemand)) {
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    BdsDxeOnConnectConInCallBack,
+                    NULL,
+                    &gConnectConInEventGuid,
+                    &gConnectConInEvent
+                    );
+    if (EFI_ERROR (Status)) {
+      gConnectConInEvent = NULL;
+    }
+  }
+
+  //
   // Do the platform init, can be customized by OEM/IBV
   // Possible things that can be done in PlatformBootManagerBeforeConsole:
   // > Update console variable: 1. include hot-plug devices; 2. Clear ConIn and add SOL for AMT
@@ -905,21 +922,9 @@ BdsEntry (
   if (PcdGetBool (PcdConInConnectOnDemand)) {
     EfiBootManagerConnectConsoleVariable (ConOut);
     EfiBootManagerConnectConsoleVariable (ErrOut);
-
     //
-    // Initialize ConnectConIn event
+    // Do not connect ConIn devices when lazy ConIn feature is ON.
     //
-    Status = gBS->CreateEventEx (
-                    EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
-                    BdsDxeOnConnectConInCallBack,
-                    NULL,
-                    &gConnectConInEventGuid,
-                    &gConnectConInEvent
-                    );
-    if (EFI_ERROR (Status)) {
-      gConnectConInEvent = NULL;
-    }
   } else {
     EfiBootManagerConnectAllDefaultConsoles ();
   }
