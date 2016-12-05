@@ -3535,6 +3535,7 @@ SubmitForSystem (
 {
   EFI_STATUS              Status;
   LIST_ENTRY              *Link;
+  LIST_ENTRY              *FormLink;
   LIST_ENTRY              *StorageLink;
   FORMSET_STORAGE         *FormSetStorage;
   FORM_BROWSER_FORM       *Form;
@@ -3625,10 +3626,10 @@ SubmitForSystem (
         }
       }
 
-      Link = GetFirstNode (&LocalFormSet->FormListHead);
-      while (!IsNull (&LocalFormSet->FormListHead, Link)) {
-        Form = FORM_BROWSER_FORM_FROM_LINK (Link);
-        Link = GetNextNode (&LocalFormSet->FormListHead, Link);
+      FormLink = GetFirstNode (&LocalFormSet->FormListHead);
+      while (!IsNull (&LocalFormSet->FormListHead, FormLink)) {
+        Form = FORM_BROWSER_FORM_FROM_LINK (FormLink);
+        FormLink = GetNextNode (&LocalFormSet->FormListHead, FormLink);
         //
         // Call callback with Changed type to inform the driver.
         //
