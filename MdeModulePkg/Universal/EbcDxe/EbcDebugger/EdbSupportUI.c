@@ -14,6 +14,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Edb.h"
 
+/**
+  Set the current coordinates of the cursor position.
+
+  @param  ConOut        Point to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.
+  @param  Column        The position to set the cursor to.
+  @param  Row           The position to set the cursor to.
+  @param  LineLength    Length of a line.
+  @param  TotalRow      Total row of a screen.
+  @param  Str           Point to the string.
+  @param  StrPos        The position of the string.
+  @param  Len           The length of the string.
+
+**/
 VOID
 EFIAPI
 SetCursorPosition (
@@ -166,6 +179,15 @@ ConMoveCursorForward (
 CHAR16 mBackupSpace[EFI_DEBUG_INPUS_BUFFER_SIZE];
 CHAR16 mInputBufferHistory[EFI_DEBUG_INPUS_BUFFER_SIZE];
 
+/**
+
+  Get user input.
+
+  @param  Prompt       The prompt string.
+  @param  InStr        Point to the input string.
+  @param  StrLength    The max length of string user can input.
+
+**/
 VOID
 EFIAPI
 Input (
@@ -514,6 +536,19 @@ Input (
   return ;
 }
 
+/**
+  Set the current coordinates of the cursor position.
+
+  @param  ConOut        Point to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.
+  @param  Column        The position to set the cursor to.
+  @param  Row           The position to set the cursor to.
+  @param  LineLength    Length of a line.
+  @param  TotalRow      Total row of a screen.
+  @param  Str           Point to the string.
+  @param  StrPos        The position of the string.
+  @param  Len           The length of the string.
+
+**/
 VOID
 EFIAPI
 SetCursorPosition (
@@ -551,6 +586,11 @@ SetCursorPosition (
   ConOut->SetCursorPosition (ConOut, 0, 0);
 }
 
+/**
+
+  SetPageBreak.
+
+**/
 BOOLEAN
 EFIAPI
 SetPageBreak (
@@ -620,6 +660,14 @@ SetPageBreak (
   return OmitPrint;
 }
 
+/**
+  Print a Unicode string to the output device.
+
+  @param  Format    A Null-terminated Unicode format string.
+  @param  ...       The variable argument list that contains pointers to Null-
+                    terminated Unicode strings to be printed
+
+**/
 UINTN
 EFIAPI
 EDBPrint (
@@ -645,6 +693,17 @@ EDBPrint (
   return Return;
 }
 
+/**
+  Print a Unicode string to the output buffer.
+
+  @param  Buffer          A pointer to the output buffer for the produced Null-terminated
+                          Unicode string.
+  @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
+  @param  Format          A Null-terminated Unicode format string.
+  @param  ...             The variable argument list that contains pointers to Null-
+                          terminated Unicode strings to be printed
+
+**/
 UINTN
 EFIAPI
 EDBSPrint (
@@ -666,6 +725,18 @@ EDBSPrint (
   return Return;
 }
 
+/**
+  Print a Unicode string to the output buffer with specified offset..
+
+  @param  Buffer          A pointer to the output buffer for the produced Null-terminated
+                          Unicode string.
+  @param  BufferSize      The size, in bytes, of the output buffer specified by StartOfBuffer.
+  @param  Offset          The offset of the buffer.
+  @param  Format          A Null-terminated Unicode format string.
+  @param  ...             The variable argument list that contains pointers to Null-
+                          terminated Unicode strings to be printed
+
+**/
 UINTN
 EFIAPI
 EDBSPrintWithOffset (

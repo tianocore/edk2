@@ -85,7 +85,6 @@ Xtoi (
   @param  Str  -  The string
 
 **/
-
 UINT64
 EFIAPI
 LXtoi (
@@ -308,6 +307,13 @@ AsciiAtoi (
   return RetVal;
 }
 
+/**
+
+  Convert the character to upper case.
+
+  @param  Chr    the character to be converted.
+
+**/
 STATIC
 CHAR16
 UnicodeToUpper (
@@ -317,6 +323,13 @@ UnicodeToUpper (
   return (Chr >= L'a' && Chr <= L'z') ? Chr - (L'a' - L'A') : Chr;
 }
 
+/**
+
+  Convert the character to upper case.
+
+  @param  Chr    the character to be converted.
+
+**/
 STATIC
 CHAR8
 AsciiToUpper (
@@ -520,7 +533,6 @@ StrSpn (
   @param  CharSet   Point to the string to be found.
 
 **/
-
 CHAR16 *
 EFIAPI
 StrBrk (
@@ -589,7 +601,6 @@ StrTokenLine (
   @param  CharSet   Point to the string to be found.
 
 **/
-
 CHAR16 *
 EFIAPI
 StrTokenField (
@@ -621,6 +632,14 @@ StrTokenField (
   return Begin;
 }
 
+/**
+
+  Find the next token after one or more specified characters.
+
+  @param  String    Point to the string where to find the substring.
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR16 *
 EFIAPI
 StrGetNewTokenLine (
@@ -631,6 +650,13 @@ StrGetNewTokenLine (
   return StrTokenLine (String, CharSet);
 }
 
+/**
+
+  Find the next token after one or more specified characters.
+
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR16 *
 EFIAPI
 StrGetNextTokenLine (
@@ -640,6 +666,14 @@ StrGetNextTokenLine (
   return StrTokenLine (NULL, CharSet);
 }
 
+/**
+
+  Find the next token after one specificed characters.
+
+  @param  String    Point to the string where to find the substring.
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR16 *
 EFIAPI
 StrGetNewTokenField (
@@ -650,6 +684,13 @@ StrGetNewTokenField (
   return StrTokenField (String, CharSet);
 }
 
+/**
+
+  Find the next token after one specificed characters.
+
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR16 *
 EFIAPI
 StrGetNextTokenField (
@@ -659,6 +700,14 @@ StrGetNextTokenField (
   return StrTokenField (NULL, CharSet);
 }
 
+/**
+
+  Patch a character to the end of a string.
+
+  @param  Buffer   The string to be patched.
+  @param  Patch    The patch character.
+
+**/
 VOID
 EFIAPI
 PatchForStrTokenAfter (
@@ -689,6 +738,13 @@ PatchForStrTokenAfter (
   return ;
 }
 
+/**
+  Patch a character at the beginning of a string.
+
+  @param  Buffer   The string to be patched.
+  @param  Patch    The patch character.
+
+**/
 VOID
 EFIAPI
 PatchForStrTokenBefore (
@@ -831,7 +887,6 @@ AsciiStrTokenLine (
   @param  CharSet   Point to the string to be found.
 
 **/
-
 CHAR8 *
 EFIAPI
 AsciiStrTokenField (
@@ -863,6 +918,14 @@ AsciiStrTokenField (
   return Begin;
 }
 
+/**
+
+  Find the next token after one or more specified characters.
+
+  @param  String    Point to the string where to find the substring.
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR8 *
 EFIAPI
 AsciiStrGetNewTokenLine (
@@ -873,6 +936,13 @@ AsciiStrGetNewTokenLine (
   return AsciiStrTokenLine (String, CharSet);
 }
 
+/**
+
+  Find the next token after one or more specified characters.
+
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR8 *
 EFIAPI
 AsciiStrGetNextTokenLine (
@@ -882,6 +952,14 @@ AsciiStrGetNextTokenLine (
   return AsciiStrTokenLine (NULL, CharSet);
 }
 
+/**
+
+  Find the next token after one specificed characters.
+
+  @param  String    Point to the string where to find the substring.
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR8 *
 EFIAPI
 AsciiStrGetNewTokenField (
@@ -892,6 +970,13 @@ AsciiStrGetNewTokenField (
   return AsciiStrTokenField (String, CharSet);
 }
 
+/**
+
+  Find the next token after one specificed characters.
+
+  @param  CharSet   Point to the string to be found.
+
+**/
 CHAR8 *
 EFIAPI
 AsciiStrGetNextTokenField (
@@ -901,6 +986,14 @@ AsciiStrGetNextTokenField (
   return AsciiStrTokenField (NULL, CharSet);
 }
 
+/**
+
+  Patch a character to the end of a string.
+
+  @param  Buffer   The string to be patched.
+  @param  Patch    The patch character.
+
+**/
 VOID
 EFIAPI
 PatchForAsciiStrTokenAfter (
@@ -931,6 +1024,13 @@ PatchForAsciiStrTokenAfter (
   return ;
 }
 
+/**
+  Patch a character at the beginning of a string.
+
+  @param  Buffer   The string to be patched.
+  @param  Patch    The patch character.
+
+**/
 VOID
 EFIAPI
 PatchForAsciiStrTokenBefore (

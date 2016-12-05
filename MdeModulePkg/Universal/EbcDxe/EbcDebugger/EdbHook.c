@@ -278,6 +278,14 @@ EbcDebuggerPushStepEntry (
   }
 }
 
+
+/**
+  Notify the callback function when an event is triggered.
+
+  @param  Event                    Indicates the event that invoke this function.
+  @param  Context                  Indicates the calling context.
+
+**/
 VOID
 EFIAPI
 EbcDebuggerBreakEventFunc (
@@ -467,7 +475,6 @@ EbcDebuggerHookUnload (
   @param  Handle           - The EbcImage handle.
 
 **/
-
 VOID
 EbcDebuggerHookEbcUnloadImage (
   IN EFI_HANDLE                  Handle

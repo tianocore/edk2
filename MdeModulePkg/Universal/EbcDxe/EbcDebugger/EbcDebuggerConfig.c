@@ -18,6 +18,11 @@
 #include "EdbCommon.h"
 #include "EdbSupport.h"
 
+/**
+
+  The function that displays the utility usage message.
+
+**/
 VOID
 PrintUsage (
   VOID
@@ -38,6 +43,13 @@ PrintUsage (
   return;
 }
 
+/**
+
+  The function is to show some information.
+
+  @param  DebuggerConfiguration    Point to the EFI_DEBUGGER_CONFIGURATION_PROTOCOL.
+
+**/
 VOID
 EdbShowInfo (
   EFI_DEBUGGER_CONFIGURATION_PROTOCOL *DebuggerConfiguration
@@ -47,6 +59,15 @@ EdbShowInfo (
   return ;
 }
 
+/**
+
+  EdbConfigBreak function.
+
+  @param  DebuggerConfiguration    Point to the EFI_DEBUGGER_CONFIGURATION_PROTOCOL.
+  @param  Command                  Point to the command.
+  @param  CommandArg               The argument for this command.
+
+**/
 VOID
 EdbConfigBreak (
   EFI_DEBUGGER_CONFIGURATION_PROTOCOL *DebuggerConfiguration,

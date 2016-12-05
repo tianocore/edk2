@@ -18,6 +18,14 @@
 
 #include "EbcDebuggerHook.h"
 
+/**
+
+  The hook in InitializeEbcDriver.
+
+  @param Handle           - The EbcDebugProtocol handle.
+  @param EbcDebugProtocol - The EbcDebugProtocol interface.
+
+**/
 VOID
 EbcDebuggerHookInit (
   IN EFI_HANDLE                  Handle,
@@ -27,6 +35,11 @@ EbcDebuggerHookInit (
   return;
 }
 
+/**
+
+The hook in UnloadImage for EBC Interpreter.
+
+**/
 VOID
 EbcDebuggerHookUnload (
   VOID
@@ -35,6 +48,14 @@ EbcDebuggerHookUnload (
   return;
 }
 
+/**
+
+  The hook in EbcUnloadImage.
+  Currently do nothing here.
+
+  @param  Handle          The EbcImage handle.
+
+**/
 VOID
 EbcDebuggerHookEbcUnloadImage (
   IN EFI_HANDLE                  Handle
@@ -43,6 +64,13 @@ EbcDebuggerHookEbcUnloadImage (
   return;
 }
 
+/**
+
+  The hook in ExecuteEbcImageEntryPoint.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookExecuteEbcImageEntryPoint (
   IN VM_CONTEXT *VmPtr
@@ -51,6 +79,13 @@ EbcDebuggerHookExecuteEbcImageEntryPoint (
   return;
 }
 
+/**
+
+  The hook in ExecuteEbcImageEntryPoint.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookEbcInterpret (
   IN VM_CONTEXT *VmPtr
@@ -59,6 +94,12 @@ EbcDebuggerHookEbcInterpret (
   return;
 }
 
+/**
+  The hook in EbcExecute, before ExecuteFunction.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookExecuteStart (
   IN VM_CONTEXT *VmPtr
@@ -67,6 +108,12 @@ EbcDebuggerHookExecuteStart (
   return;
 }
 
+/**
+  The hook in EbcExecute, after ExecuteFunction.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookExecuteEnd (
   IN VM_CONTEXT *VmPtr
@@ -75,6 +122,13 @@ EbcDebuggerHookExecuteEnd (
   return;
 }
 
+/**
+
+  The hook in ExecuteCALL, before move IP.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookCALLStart (
   IN VM_CONTEXT *VmPtr
@@ -83,6 +137,13 @@ EbcDebuggerHookCALLStart (
   return;
 }
 
+/**
+
+  The hook in ExecuteCALL, after move IP.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookCALLEnd (
   IN VM_CONTEXT *VmPtr
@@ -91,6 +152,13 @@ EbcDebuggerHookCALLEnd (
   return;
 }
 
+/**
+
+  The hook in ExecuteCALL, before call EbcLLCALLEX.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookCALLEXStart (
   IN VM_CONTEXT *VmPtr
@@ -99,6 +167,13 @@ EbcDebuggerHookCALLEXStart (
   return;
 }
 
+/**
+
+  The hook in ExecuteCALL, after call EbcLLCALLEX.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookCALLEXEnd (
   IN VM_CONTEXT *VmPtr
@@ -107,6 +182,13 @@ EbcDebuggerHookCALLEXEnd (
   return;
 }
 
+/**
+
+  The hook in ExecuteRET, before move IP.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookRETStart (
   IN VM_CONTEXT *VmPtr
@@ -115,6 +197,13 @@ EbcDebuggerHookRETStart (
   return;
 }
 
+/**
+
+  The hook in ExecuteRET, after move IP.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookRETEnd (
   IN VM_CONTEXT *VmPtr
@@ -123,6 +212,13 @@ EbcDebuggerHookRETEnd (
   return;
 }
 
+/**
+
+  The hook in ExecuteJMP, before move IP.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookJMPStart (
   IN VM_CONTEXT *VmPtr
@@ -131,6 +227,13 @@ EbcDebuggerHookJMPStart (
   return;
 }
 
+/**
+
+  The hook in ExecuteJMP, after move IP.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookJMPEnd (
   IN VM_CONTEXT *VmPtr
@@ -139,6 +242,13 @@ EbcDebuggerHookJMPEnd (
   return;
 }
 
+/**
+
+  The hook in ExecuteJMP8, before move IP.
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookJMP8Start (
   IN VM_CONTEXT *VmPtr
@@ -147,6 +257,13 @@ EbcDebuggerHookJMP8Start (
   return;
 }
 
+/**
+
+  The hook in ExecuteJMP8, after move IP..
+
+  @param  VmPtr - pointer to VM context.
+
+**/
 VOID
 EbcDebuggerHookJMP8End (
   IN VM_CONTEXT *VmPtr
