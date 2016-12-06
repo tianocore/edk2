@@ -1040,6 +1040,7 @@ FileInterfaceEnvClose(
   UINTN       NewSize;
   EFI_STATUS  Status;
   BOOLEAN     Volatile;
+  UINTN       TotalSize;
 
   //
   // Most if not all UEFI commands will have an '\r\n' at the end of any output. 
@@ -1049,6 +1050,7 @@ FileInterfaceEnvClose(
   //
   NewBuffer   = NULL;
   NewSize     = 0;
+  TotalSize   = 0;
 
   Status = IsVolatileEnv (((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &Volatile);
   if (EFI_ERROR (Status)) {
@@ -1057,7 +1059,8 @@ FileInterfaceEnvClose(
 
   Status = SHELL_GET_ENVIRONMENT_VARIABLE(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &NewSize, NewBuffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    NewBuffer = AllocateZeroPool(NewSize + sizeof(CHAR16));
+    TotalSize = NewSize + sizeof (CHAR16);
+    NewBuffer = AllocateZeroPool (TotalSize);
     if (NewBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }  
@@ -1066,17 +1069,43 @@ FileInterfaceEnvClose(
   
   if (!EFI_ERROR(Status) && NewBuffer != NULL) {
     
-    if (StrSize(NewBuffer) > 6)
-    {
-      if ((((CHAR16*)NewBuffer)[(StrSize(NewBuffer)/2) - 2] == CHAR_LINEFEED) 
-           && (((CHAR16*)NewBuffer)[(StrSize(NewBuffer)/2) - 3] == CHAR_CARRIAGE_RETURN)) {
-        ((CHAR16*)NewBuffer)[(StrSize(NewBuffer)/2) - 3] = CHAR_NULL;   
+    if (TotalSize / sizeof (CHAR16) >= 3) {
+      if ( (((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 2] == CHAR_LINEFEED) &&
+           (((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 3] == CHAR_CARRIAGE_RETURN)
+         ) {
+        ((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 3] = CHAR_NULL;
       }
 
       if (Volatile) {
-        Status = SHELL_SET_ENVIRONMENT_VARIABLE_V(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, StrSize(NewBuffer), NewBuffer);
+        Status = SHELL_SET_ENVIRONMENT_VARIABLE_V (
+                   ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+                   TotalSize - sizeof (CHAR16),
+                   NewBuffer
+                   );
+
+        if (!EFI_ERROR(Status)) {
+          Status = ShellAddEnvVarToList (
+                     ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+                     NewBuffer,
+                     TotalSize,
+                     EFI_VARIABLE_BOOTSERVICE_ACCESS
+                     );
+        }
       } else {
-        Status = SHELL_SET_ENVIRONMENT_VARIABLE_NV(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, StrSize(NewBuffer), NewBuffer);
+        Status = SHELL_SET_ENVIRONMENT_VARIABLE_NV (
+                   ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+                   TotalSize - sizeof (CHAR16),
+                   NewBuffer
+                   );
+
+        if (!EFI_ERROR(Status)) {
+          Status = ShellAddEnvVarToList (
+                     ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+                     NewBuffer,
+                     TotalSize,
+                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+                     );
+        }
       }
     }
   } 
@@ -1128,12 +1157,14 @@ FileInterfaceEnvRead(
 
 /**
   File style interface for Volatile Environment Variable (Write).
+  This function also caches the environment variable into gShellEnvVarList.
   
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
   
-  @retval EFI_SUCCESS   The data was read.
+  @retval EFI_SUCCESS             The data was successfully write to variable.
+  @retval SHELL_OUT_OF_RESOURCES  A memory allocation failed.
 **/
 EFI_STATUS
 EFIAPI
@@ -1146,41 +1177,71 @@ FileInterfaceEnvVolWrite(
   VOID*       NewBuffer;
   UINTN       NewSize;
   EFI_STATUS  Status;
+  UINTN       TotalSize;
 
   NewBuffer   = NULL;
   NewSize     = 0;
+  TotalSize   = 0;
 
   Status = SHELL_GET_ENVIRONMENT_VARIABLE(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &NewSize, NewBuffer);
-  if (Status == EFI_BUFFER_TOO_SMALL){
-    NewBuffer = AllocateZeroPool(NewSize + *BufferSize + sizeof(CHAR16));
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    TotalSize = NewSize + *BufferSize + sizeof (CHAR16);
+  } else if (Status == EFI_NOT_FOUND) {
+    TotalSize = *BufferSize + sizeof(CHAR16);
+  } else {
+    return Status;
+  }
+
+  NewBuffer = AllocateZeroPool (TotalSize);
+  if (NewBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
     Status = SHELL_GET_ENVIRONMENT_VARIABLE(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &NewSize, NewBuffer);
   }
-  if (!EFI_ERROR(Status) && NewBuffer != NULL) {
-    while (((CHAR16*)NewBuffer)[NewSize/2] == CHAR_NULL) {
-      //
-      // We want to overwrite the CHAR_NULL
-      //
-      NewSize -= 2;
-    }
-    CopyMem((UINT8*)NewBuffer + NewSize + 2, Buffer, *BufferSize);
-    Status = SHELL_SET_ENVIRONMENT_VARIABLE_V(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, StrSize(NewBuffer), NewBuffer);
-    FreePool(NewBuffer);
-    return (Status);
-  } else {
-    SHELL_FREE_NON_NULL(NewBuffer);
-    return (SHELL_SET_ENVIRONMENT_VARIABLE_V(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, *BufferSize, Buffer));
+
+  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
+    FreePool (NewBuffer);
+    return Status;
   }
+
+  CopyMem ((UINT8*)NewBuffer + NewSize, Buffer, *BufferSize);
+  Status = ShellAddEnvVarToList (
+             ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+             NewBuffer,
+             TotalSize,
+             EFI_VARIABLE_BOOTSERVICE_ACCESS
+             );
+  if (EFI_ERROR(Status)) {
+    FreePool (NewBuffer);
+    return Status;
+  }
+
+  Status = SHELL_SET_ENVIRONMENT_VARIABLE_V (
+             ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+             TotalSize - sizeof (CHAR16),
+             NewBuffer
+             );
+  if (EFI_ERROR(Status)) {
+    ShellRemvoeEnvVarFromList (((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name);
+  }
+
+  FreePool (NewBuffer);
+  return Status;
 }
 
 
 /**
   File style interface for Non Volatile Environment Variable (Write).
+  This function also caches the environment variable into gShellEnvVarList.
   
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
   @param[in, out] BufferSize   Size in bytes of Buffer.
   @param[in] Buffer            The pointer to the buffer to write.
   
-  @retval EFI_SUCCESS   The data was read.
+  @retval EFI_SUCCESS             The data was successfully write to variable.
+  @retval SHELL_OUT_OF_RESOURCES  A memory allocation failed.
 **/
 EFI_STATUS
 EFIAPI
@@ -1193,27 +1254,58 @@ FileInterfaceEnvNonVolWrite(
   VOID*       NewBuffer;
   UINTN       NewSize;
   EFI_STATUS  Status;
+  UINTN       TotalSize;
 
   NewBuffer   = NULL;
   NewSize     = 0;
+  TotalSize   = 0;
 
   Status = SHELL_GET_ENVIRONMENT_VARIABLE(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &NewSize, NewBuffer);
-  if (Status == EFI_BUFFER_TOO_SMALL){
-    NewBuffer = AllocateZeroPool(NewSize + *BufferSize);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    TotalSize = NewSize + *BufferSize + sizeof (CHAR16);
+  } else if (Status == EFI_NOT_FOUND) {
+    TotalSize = *BufferSize + sizeof (CHAR16);
+  } else {
+    return Status;
+  }
+
+  NewBuffer = AllocateZeroPool (TotalSize);
+  if (NewBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  if (Status == EFI_BUFFER_TOO_SMALL) {
     Status = SHELL_GET_ENVIRONMENT_VARIABLE(((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name, &NewSize, NewBuffer);
   }
-  if (!EFI_ERROR(Status)) {
-    CopyMem((UINT8*)NewBuffer + NewSize, Buffer, *BufferSize);
-    return (SHELL_SET_ENVIRONMENT_VARIABLE_NV(
-    ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
-    NewSize + *BufferSize,
-    NewBuffer));
-  } else {
-    return (SHELL_SET_ENVIRONMENT_VARIABLE_NV(
-    ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
-    *BufferSize,
-    Buffer));
+
+  if (EFI_ERROR(Status) && Status != EFI_NOT_FOUND) {
+    FreePool (NewBuffer);
+    return Status;
   }
+
+  CopyMem ((UINT8*) NewBuffer + NewSize, Buffer, *BufferSize);
+  Status = ShellAddEnvVarToList (
+             ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+             NewBuffer,
+             TotalSize,
+             EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS
+             );
+  if (EFI_ERROR (Status)) {
+    FreePool (NewBuffer);
+    return Status;
+  }
+
+  Status = SHELL_SET_ENVIRONMENT_VARIABLE_NV (
+             ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+             TotalSize - sizeof (CHAR16),
+             NewBuffer
+             );
+  if (EFI_ERROR (Status)) {
+    ShellRemvoeEnvVarFromList (((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name);
+  }
+
+  FreePool (NewBuffer);
+  return Status;
 }
 
 /**

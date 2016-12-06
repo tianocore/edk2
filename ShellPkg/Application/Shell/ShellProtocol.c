@@ -2872,8 +2872,8 @@ InternalEfiShellSetEnv(
                );
     if (!EFI_ERROR (Status)) {
       Status = Volatile
-             ? SHELL_SET_ENVIRONMENT_VARIABLE_V(Name, StrSize(Value), Value)
-             : SHELL_SET_ENVIRONMENT_VARIABLE_NV(Name, StrSize(Value), Value);
+             ? SHELL_SET_ENVIRONMENT_VARIABLE_V (Name, StrSize (Value) - sizeof (CHAR16), Value)
+             : SHELL_SET_ENVIRONMENT_VARIABLE_NV (Name, StrSize (Value) - sizeof (CHAR16), Value);
       if (EFI_ERROR (Status)) {
         ShellRemvoeEnvVarFromList(Name);
       }

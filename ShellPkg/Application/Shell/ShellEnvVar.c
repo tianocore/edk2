@@ -178,7 +178,10 @@ GetEnvironmentVariableList(
         Status = EFI_OUT_OF_RESOURCES;
       } else {
         ValSize = ValBufferSize;
-        VarList->Val = AllocateZeroPool(ValSize);
+        //
+        // We need another CHAR16 to save '\0' in VarList->Val.
+        //
+        VarList->Val = AllocateZeroPool (ValSize + sizeof (CHAR16));
         if (VarList->Val == NULL) {
             SHELL_FREE_NON_NULL(VarList);
             Status = EFI_OUT_OF_RESOURCES;
@@ -188,7 +191,10 @@ GetEnvironmentVariableList(
         if (Status == EFI_BUFFER_TOO_SMALL){
           ValBufferSize = ValSize > ValBufferSize * 2 ? ValSize : ValBufferSize * 2;
           SHELL_FREE_NON_NULL (VarList->Val);
-          VarList->Val = AllocateZeroPool(ValBufferSize);
+          //
+          // We need another CHAR16 to save '\0' in VarList->Val.
+          //
+          VarList->Val = AllocateZeroPool (ValBufferSize + sizeof (CHAR16));
           if (VarList->Val == NULL) {
             SHELL_FREE_NON_NULL(VarList);
             Status = EFI_OUT_OF_RESOURCES;
@@ -272,7 +278,7 @@ SetEnvironmentVariableList(
       ; !IsNull(ListHead, &Node->Link)
       ; Node = (ENV_VAR_LIST*)GetNextNode(ListHead, &Node->Link)
      ){
-    Size = StrSize(Node->Val);
+    Size = StrSize (Node->Val) - sizeof (CHAR16);
     if (Node->Atts & EFI_VARIABLE_NON_VOLATILE) {
       Status = SHELL_SET_ENVIRONMENT_VARIABLE_NV(Node->Key, Size, Node->Val);
     } else {
