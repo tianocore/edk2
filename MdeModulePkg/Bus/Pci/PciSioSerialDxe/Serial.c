@@ -931,7 +931,7 @@ SerialControllerDriverStart (
         return Status;
       }
     }
-  }
+  }
 
   if (RemainingDevicePath != NULL) {
     Uart = (UART_DEVICE_PATH *) SkipControllerDevicePathNode (RemainingDevicePath, &ContainsControllerNode, &ControllerNumber);
