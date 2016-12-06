@@ -22,6 +22,7 @@
 #include <Library/XenHypercallLib.h>
 
 UINT64
+EFIAPI
 XenHypercallHvmGetParam (
   IN UINT32        Index
   )
@@ -43,6 +44,7 @@ XenHypercallHvmGetParam (
 }
 
 INTN
+EFIAPI
 XenHypercallMemoryOp (
   IN     UINTN Operation,
   IN OUT VOID *Arguments
@@ -53,6 +55,7 @@ XenHypercallMemoryOp (
 }
 
 INTN
+EFIAPI
 XenHypercallEventChannelOp (
   IN     INTN Operation,
   IN OUT VOID *Arguments

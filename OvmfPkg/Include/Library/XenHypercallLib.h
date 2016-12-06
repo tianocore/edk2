@@ -58,6 +58,7 @@ XenHypercall2 (
   @return   The value of the asked parameter or 0 in case of error.
 **/
 UINT64
+EFIAPI
 XenHypercallHvmGetParam (
   UINT32 Index
   );
@@ -72,6 +73,7 @@ XenHypercallHvmGetParam (
            otherwise, an error code.
 **/
 INTN
+EFIAPI
 XenHypercallMemoryOp (
   IN     UINTN Operation,
   IN OUT VOID *Arguments
@@ -87,6 +89,7 @@ XenHypercallMemoryOp (
            otherwise, an error code.
 **/
 INTN
+EFIAPI
 XenHypercallEventChannelOp (
   IN     INTN Operation,
   IN OUT VOID *Arguments
