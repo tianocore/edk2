@@ -687,6 +687,14 @@ InstallSmiHandler (
 {
   PROCESSOR_SMM_DESCRIPTOR  *Psd;
 
+  //
+  // Initialize PROCESSOR_SMM_DESCRIPTOR
+  //
+  Psd = (PROCESSOR_SMM_DESCRIPTOR *)(VOID *)(UINTN)(SmBase + SMM_PSD_OFFSET);
+  CopyMem (Psd, &gcPsd, sizeof (gcPsd));
+  Psd->SmmGdtPtr = (UINT64)GdtBase;
+  Psd->SmmGdtSize = (UINT32)GdtSize;
+
   if (SmmCpuFeaturesGetSmiHandlerSize () != 0) {
     //
     // Install SMI handler provided by library
@@ -704,14 +712,6 @@ InstallSmiHandler (
       );
     return;
   }
-
-  //
-  // Initialize PROCESSOR_SMM_DESCRIPTOR
-  //
-  Psd = (PROCESSOR_SMM_DESCRIPTOR *)(VOID *)(UINTN)(SmBase + SMM_PSD_OFFSET);
-  CopyMem (Psd, &gcPsd, sizeof (gcPsd));
-  Psd->SmmGdtPtr = (UINT64)GdtBase;
-  Psd->SmmGdtSize = (UINT32)GdtSize;
 
   //
   // Initialize values in template before copy
