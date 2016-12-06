@@ -20,7 +20,6 @@
 #------------------------------------------------------------------------------
 
 ASM_GLOBAL  ASM_PFX(SmiPFHandler)
-ASM_GLOBAL  ASM_PFX(gSmiMtrrs)
 ASM_GLOBAL  ASM_PFX(gcSmiIdtr)
 ASM_GLOBAL  ASM_PFX(gcSmiGdtr)
 ASM_GLOBAL  ASM_PFX(gcPsd)
@@ -113,7 +112,7 @@ ASM_PFX(gcPsd):
             .long      GDT_SIZE
             .long 0
             .space 24, 0
-            .quad      ASM_PFX(gSmiMtrrs)
+            .quad      0
 .equ  PSD_SIZE,  . - ASM_PFX(gcPsd)
 
 #

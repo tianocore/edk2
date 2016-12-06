@@ -19,7 +19,6 @@
 ;-------------------------------------------------------------------------------
 
 extern  ASM_PFX(FeaturePcdGet (PcdCpuSmmProfileEnable))
-extern  ASM_PFX(gSmiMtrrs)
 extern  ASM_PFX(SmiPFHandler)
 
 global  ASM_PFX(gcSmiIdtr)
@@ -243,7 +242,7 @@ ASM_PFX(gcPsd):
             DD      0
             times   24 DB 0
             DD      0
-            DD      ASM_PFX(gSmiMtrrs)
+            DD      0
 PSD_SIZE  equ $ - ASM_PFX(gcPsd)
 
 ASM_PFX(gcSmiGdtr):

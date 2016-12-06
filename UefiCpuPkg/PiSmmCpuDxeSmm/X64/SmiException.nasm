@@ -19,7 +19,6 @@
 ;-------------------------------------------------------------------------------
 
 extern  ASM_PFX(SmiPFHandler)
-extern  ASM_PFX(gSmiMtrrs)
 
 global  ASM_PFX(gcSmiIdtr)
 global  ASM_PFX(gcSmiGdtr)
@@ -130,7 +129,7 @@ ASM_PFX(gcPsd):
             DD      GDT_SIZE
             DD      0
             times   24 DB 0
-            DQ      ASM_PFX(gSmiMtrrs)
+            DQ      0
 PSD_SIZE  equ $ -   ASM_PFX(gcPsd)
 
 ;

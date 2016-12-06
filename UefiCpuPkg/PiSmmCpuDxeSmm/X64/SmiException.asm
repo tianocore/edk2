@@ -19,7 +19,6 @@
 ;-------------------------------------------------------------------------------
 
 EXTERNDEF   SmiPFHandler:PROC
-EXTERNDEF   gSmiMtrrs:QWORD
 EXTERNDEF   gcSmiIdtr:FWORD
 EXTERNDEF   gcSmiGdtr:FWORD
 EXTERNDEF   gcPsd:BYTE
@@ -129,7 +128,7 @@ gcPsd     LABEL   BYTE
             DD      GDT_SIZE
             DD      0
             DB      24 dup (0)
-            DQ      offset gSmiMtrrs
+            DQ      0
 PSD_SIZE  = $ - offset gcPsd
 
 ;

@@ -23,7 +23,6 @@
 
 EXTERNDEF   SmiPFHandler:PROC
 EXTERNDEF   PageFaultStubFunction:PROC
-EXTERNDEF   gSmiMtrrs:QWORD
 EXTERNDEF   gcSmiIdtr:FWORD
 EXTERNDEF   gcSmiGdtr:FWORD
 EXTERNDEF   gTaskGateDescriptor:QWORD
@@ -245,7 +244,7 @@ gcPsd     LABEL   BYTE
             DD      GDT_SIZE
             DD      0
             DB      24 dup (0)
-            DQ      offset gSmiMtrrs
+            DQ      0
 PSD_SIZE  = $ - offset gcPsd
 
 gcSmiGdtr   LABEL   FWORD

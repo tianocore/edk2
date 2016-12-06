@@ -21,7 +21,6 @@
 
 ASM_GLOBAL  ASM_PFX(SmiPFHandler)
 ASM_GLOBAL  ASM_PFX(PageFaultStubFunction)
-ASM_GLOBAL  ASM_PFX(gSmiMtrrs)
 ASM_GLOBAL  ASM_PFX(gcSmiIdtr)
 ASM_GLOBAL  ASM_PFX(gcSmiGdtr)
 ASM_GLOBAL  ASM_PFX(gTaskGateDescriptor)
@@ -230,7 +229,7 @@ ASM_PFX(gcPsd):
             .long      GDT_SIZE
             .long 0
             .space 24, 0
-            .long      ASM_PFX(gSmiMtrrs)
+            .long 0
             .long 0
 .equ  PSD_SIZE,  . - ASM_PFX(gcPsd)
 
