@@ -1233,7 +1233,7 @@ ScanTableInSDT (
 
     if (Table == NULL) {
       continue;
-    }
+    }
 
     if (Table->Signature == Signature) {
       return Table;
