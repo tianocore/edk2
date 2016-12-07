@@ -520,7 +520,19 @@ typedef union {
   field of #MSR_IA32_SMM_MONITOR_CTL_REGISTER.
 **/
 typedef struct {
+  ///
+  /// Different processors may use different MSEG revision identifiers. These
+  /// identifiers enable software to avoid using an MSEG header formatted for
+  /// one processor on a processor that uses a different format. Software can
+  /// discover the MSEG revision identifier that a processor uses by reading
+  /// the VMX capability MSR IA32_VMX_MISC.
+  //
   UINT32  MsegHeaderRevision;
+  ///
+  /// Bits 31:1 of this field are reserved and must be zero. Bit 0 of the field
+  /// is the IA-32e mode SMM feature bit. It indicates whether the logical
+  /// processor will be in IA-32e mode after the STM is activated.
+  ///
   UINT32  MonitorFeatures;
   UINT32  GdtrLimit;
   UINT32  GdtrBaseOffset;
@@ -528,12 +540,19 @@ typedef struct {
   UINT32  EipOffset;
   UINT32  EspOffset;
   UINT32  Cr3Offset;
-  //
-  // Pad header so total size is 2KB
-  //
+  ///
+  /// Pad header so total size is 2KB
+  ///
   UINT8   Reserved[SIZE_2KB - 8 * sizeof (UINT32)];
 } MSEG_HEADER;
 
+///
+/// @{ Define values for the MonitorFeatures field of #MSEG_HEADER
+///
+#define STM_FEATURES_IA32E 0x1
+///
+/// @}
+///
 
 /**
   Base address of the logical processor's SMRAM image (RO, SMM only). If
