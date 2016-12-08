@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Section 35-14.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.15.
 
 **/
 
@@ -146,28 +146,28 @@ typedef union {
 
 
 /**
-  See Table 35-2. See Section 18.2.2.3, "Full-Width Writes to Performance
-  Counter Registers.".
+  See Table 35-2. See Section 18.2.4, "Architectural Performance Monitoring
+  Version 4.".
 
-  @param  ECX  MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS (0x0000038E)
+  @param  ECX  MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS (0x0000038E)
   @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS_REGISTER.
+               Described by the type MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_REGISTER.
   @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS_REGISTER.
+               Described by the type MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_REGISTER.
 
   <b>Example usage</b>
   @code
-  MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS_REGISTER  Msr;
+  MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_REGISTER  Msr;
 
-  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS);
-  AsmWriteMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS, Msr.Uint64);
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS);
+  AsmWriteMsr64 (MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS, Msr.Uint64);
   @endcode
-  @note MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS is defined as IA32_PERF_GLOBAL_STAUS in SDM.
+  @note MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS is defined as IA32_PERF_GLOBAL_STATUS in SDM.
 **/
-#define MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS       0x0000038E
+#define MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS      0x0000038E
 
 /**
-  MSR information returned for MSR index #MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS
+  MSR information returned for MSR index #MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS
 **/
 typedef union {
   ///
@@ -254,12 +254,12 @@ typedef union {
   /// All bit fields as a 64-bit value
   ///
   UINT64  Uint64;
-} MSR_SKYLAKE_IA32_PERF_GLOBAL_STAUS_REGISTER;
+} MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_REGISTER;
 
 
 /**
-  See Table 35-2. See Section 18.2.2.3, "Full-Width Writes to Performance
-  Counter Registers.".
+  See Table 35-2. See Section 18.2.4, "Architectural Performance Monitoring
+  Version 4.".
 
   @param  ECX  MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_RESET (0x00000390)
   @param  EAX  Lower 32-bits of MSR value.
@@ -371,8 +371,8 @@ typedef union {
 
 
 /**
-  See Table 35-2. See Section 18.2.2.3, "Full-Width Writes to Performance
-  Counter Registers.".
+  See Table 35-2. See Section 18.2.4, "Architectural Performance Monitoring
+  Version 4.".
 
   @param  ECX  MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_SET (0x00000391)
   @param  EAX  Lower 32-bits of MSR value.
@@ -541,6 +541,25 @@ typedef union {
 
 
 /**
+  Package. PP0 Energy Status (R/O)  See Section 14.9.4, "PP0/PP1 RAPL
+  Domains.".
+
+  @param  ECX  MSR_SKYLAKE_PP0_ENERGY_STATUS (0x00000639)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_PP0_ENERGY_STATUS);
+  @endcode
+  @note MSR_SKYLAKE_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
+**/
+#define MSR_SKYLAKE_PP0_ENERGY_STATUS            0x00000639
+
+
+/**
   Platform*. Platform Energy Counter. (R/O). This MSR is valid only if both
   platform vendor hardware implementation and BIOS enablement support it. This
   MSR will read 0 if not valid.
@@ -608,6 +627,187 @@ typedef union {
   @note MSR_SKYLAKE_PPERF is defined as MSR_PPERF in SDM.
 **/
 #define MSR_SKYLAKE_PPERF                        0x0000064E
+
+
+/**
+  Package. Indicator of Frequency Clipping in Processor Cores (R/W) (frequency
+  refers to processor core frequency).
+
+  @param  ECX  MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS (0x0000064F)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS);
+  AsmWriteMsr64 (MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS, Msr.Uint64);
+  @endcode
+  @note MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS is defined as MSR_CORE_PERF_LIMIT_REASONS in SDM.
+**/
+#define MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS      0x0000064F
+
+/**
+  MSR information returned for MSR index #MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] PROCHOT Status (R0) When set, frequency is reduced below the
+    /// operating system request due to assertion of external PROCHOT.
+    ///
+    UINT32  PROCHOT_Status:1;
+    ///
+    /// [Bit 1] Thermal Status (R0) When set, frequency is reduced below the
+    /// operating system request due to a thermal event.
+    ///
+    UINT32  ThermalStatus:1;
+    UINT32  Reserved1:2;
+    ///
+    /// [Bit 4] Residency State Regulation Status (R0) When set, frequency is
+    /// reduced below the operating system request due to residency state
+    /// regulation limit.
+    ///
+    UINT32  ResidencyStateRegulationStatus:1;
+    ///
+    /// [Bit 5] Running Average Thermal Limit Status (R0) When set, frequency
+    /// is reduced below the operating system request due to Running Average
+    /// Thermal Limit (RATL).
+    ///
+    UINT32  RunningAverageThermalLimitStatus:1;
+    ///
+    /// [Bit 6] VR Therm Alert Status (R0) When set, frequency is reduced
+    /// below the operating system request due to a thermal alert from a
+    /// processor Voltage Regulator (VR).
+    ///
+    UINT32  VRThermAlertStatus:1;
+    ///
+    /// [Bit 7] VR Therm Design Current Status (R0) When set, frequency is
+    /// reduced below the operating system request due to VR thermal design
+    /// current limit.
+    ///
+    UINT32  VRThermDesignCurrentStatus:1;
+    ///
+    /// [Bit 8] Other Status (R0) When set, frequency is reduced below the
+    /// operating system request due to electrical or other constraints.
+    ///
+    UINT32  OtherStatus:1;
+    UINT32  Reserved2:1;
+    ///
+    /// [Bit 10] Package/Platform-Level Power Limiting PL1 Status (R0) When
+    /// set, frequency is reduced below the operating system request due to
+    /// package/platform-level power limiting PL1.
+    ///
+    UINT32  PL1Status:1;
+    ///
+    /// [Bit 11] Package/Platform-Level PL2 Power Limiting Status (R0) When
+    /// set, frequency is reduced below the operating system request due to
+    /// package/platform-level power limiting PL2/PL3.
+    ///
+    UINT32  PL2Status:1;
+    ///
+    /// [Bit 12] Max Turbo Limit Status (R0) When set, frequency is reduced
+    /// below the operating system request due to multi-core turbo limits.
+    ///
+    UINT32  MaxTurboLimitStatus:1;
+    ///
+    /// [Bit 13] Turbo Transition Attenuation Status (R0) When set, frequency
+    /// is reduced below the operating system request due to Turbo transition
+    /// attenuation. This prevents performance degradation due to frequent
+    /// operating ratio changes.
+    ///
+    UINT32  TurboTransitionAttenuationStatus:1;
+    UINT32  Reserved3:2;
+    ///
+    /// [Bit 16] PROCHOT Log  When set, indicates that the PROCHOT Status bit
+    /// has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PROCHOT_Log:1;
+    ///
+    /// [Bit 17] Thermal Log  When set, indicates that the Thermal Status bit
+    /// has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  ThermalLog:1;
+    UINT32  Reserved4:2;
+    ///
+    /// [Bit 20] Residency State Regulation Log  When set, indicates that the
+    /// Residency State Regulation Status bit has asserted since the log bit
+    /// was last cleared. This log bit will remain set until cleared by
+    /// software writing 0.
+    ///
+    UINT32  ResidencyStateRegulationLog:1;
+    ///
+    /// [Bit 21] Running Average Thermal Limit Log  When set, indicates that
+    /// the RATL Status bit has asserted since the log bit was last cleared.
+    /// This log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  RunningAverageThermalLimitLog:1;
+    ///
+    /// [Bit 22] VR Therm Alert Log  When set, indicates that the VR Therm
+    /// Alert Status bit has asserted since the log bit was last cleared. This
+    /// log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  VRThermAlertLog:1;
+    ///
+    /// [Bit 23] VR Thermal Design Current Log  When set, indicates that the
+    /// VR TDC Status bit has asserted since the log bit was last cleared.
+    /// This log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  VRThermalDesignCurrentLog:1;
+    ///
+    /// [Bit 24] Other Log  When set, indicates that the Other Status bit has
+    /// asserted since the log bit was last cleared. This log bit will remain
+    /// set until cleared by software writing 0.
+    ///
+    UINT32  OtherLog:1;
+    UINT32  Reserved5:1;
+    ///
+    /// [Bit 26] Package/Platform-Level PL1 Power Limiting Log  When set,
+    /// indicates that the Package or Platform Level PL1 Power Limiting Status
+    /// bit has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PL1Log:1;
+    ///
+    /// [Bit 27] Package/Platform-Level PL2 Power Limiting Log When set,
+    /// indicates that the Package or Platform Level PL2/PL3 Power Limiting
+    /// Status bit has asserted since the log bit was last cleared. This log
+    /// bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  PL2Log:1;
+    ///
+    /// [Bit 28] Max Turbo Limit Log When set, indicates that the Max Turbo
+    /// Limit Status bit has asserted since the log bit was last cleared. This
+    /// log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  MaxTurboLimitLog:1;
+    ///
+    /// [Bit 29] Turbo Transition Attenuation Log When set, indicates that the
+    /// Turbo Transition Attenuation Status bit has asserted since the log bit
+    /// was last cleared. This log bit will remain set until cleared by
+    /// software writing 0.
+    ///
+    UINT32  TurboTransitionAttenuationLog:1;
+    UINT32  Reserved6:2;
+    UINT32  Reserved7:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_CORE_PERF_LIMIT_REASONS_REGISTER;
 
 
 /**
@@ -899,7 +1099,7 @@ typedef union {
   Thread. Last Branch Record n From IP (R/W) One of 32 triplets of last
   branch record registers on the last branch record stack. This part of the
   stack contains pointers to the source instruction. See also: -  Last Branch
-  Record Stack TOS at 1C9H -  Section 17.9.
+  Record Stack TOS at 1C9H -  Section 17.10.
 
   @param  ECX  MSR_SKYLAKE_LASTBRANCH_n_FROM_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -948,11 +1148,307 @@ typedef union {
 #define MSR_SKYLAKE_LASTBRANCH_31_FROM_IP        0x0000069F
 /// @}
 
+
+/**
+  Package. Indicator of Frequency Clipping in the Processor Graphics (R/W)
+  (frequency refers to processor graphics frequency).
+
+  @param  ECX  MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS (0x000006B0)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS);
+  AsmWriteMsr64 (MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS, Msr.Uint64);
+  @endcode
+  @note MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS is defined as MSR_GRAPHICS_PERF_LIMIT_REASONS in SDM.
+**/
+#define MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS  0x000006B0
+
+/**
+  MSR information returned for MSR index
+  #MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] PROCHOT Status (R0) When set, frequency is reduced due to
+    /// assertion of external PROCHOT.
+    ///
+    UINT32  PROCHOT_Status:1;
+    ///
+    /// [Bit 1] Thermal Status (R0) When set, frequency is reduced due to a
+    /// thermal event.
+    ///
+    UINT32  ThermalStatus:1;
+    UINT32  Reserved1:3;
+    ///
+    /// [Bit 5] Running Average Thermal Limit Status (R0) When set, frequency
+    /// is reduced due to running average thermal limit.
+    ///
+    UINT32  RunningAverageThermalLimitStatus:1;
+    ///
+    /// [Bit 6] VR Therm Alert Status (R0) When set, frequency is reduced due
+    /// to a thermal alert from a processor Voltage Regulator.
+    ///
+    UINT32  VRThermAlertStatus:1;
+    ///
+    /// [Bit 7] VR Thermal Design Current Status (R0) When set, frequency is
+    /// reduced due to VR TDC limit.
+    ///
+    UINT32  VRThermalDesignCurrentStatus:1;
+    ///
+    /// [Bit 8] Other Status (R0) When set, frequency is reduced due to
+    /// electrical or other constraints.
+    ///
+    UINT32  OtherStatus:1;
+    UINT32  Reserved2:1;
+    ///
+    /// [Bit 10] Package/Platform-Level Power Limiting PL1 Status (R0) When
+    /// set, frequency is reduced due to package/platform-level power limiting
+    /// PL1.
+    ///
+    UINT32  PL1Status:1;
+    ///
+    /// [Bit 11] Package/Platform-Level PL2 Power Limiting Status (R0) When
+    /// set, frequency is reduced due to package/platform-level power limiting
+    /// PL2/PL3.
+    ///
+    UINT32  PL2Status:1;
+    ///
+    /// [Bit 12] Inefficient Operation Status (R0) When set, processor
+    /// graphics frequency is operating below target frequency.
+    ///
+    UINT32  InefficientOperationStatus:1;
+    UINT32  Reserved3:3;
+    ///
+    /// [Bit 16] PROCHOT Log  When set, indicates that the PROCHOT Status bit
+    /// has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PROCHOT_Log:1;
+    ///
+    /// [Bit 17] Thermal Log  When set, indicates that the Thermal Status bit
+    /// has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  ThermalLog:1;
+    UINT32  Reserved4:3;
+    ///
+    /// [Bit 21] Running Average Thermal Limit Log  When set, indicates that
+    /// the RATL Status bit has asserted since the log bit was last cleared.
+    /// This log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  RunningAverageThermalLimitLog:1;
+    ///
+    /// [Bit 22] VR Therm Alert Log  When set, indicates that the VR Therm
+    /// Alert Status bit has asserted since the log bit was last cleared. This
+    /// log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  VRThermAlertLog:1;
+    ///
+    /// [Bit 23] VR Thermal Design Current Log  When set, indicates that the
+    /// VR Therm Alert Status bit has asserted since the log bit was last
+    /// cleared. This log bit will remain set until cleared by software
+    /// writing 0.
+    ///
+    UINT32  VRThermalDesignCurrentLog:1;
+    ///
+    /// [Bit 24] Other Log  When set, indicates that the OTHER Status bit has
+    /// asserted since the log bit was last cleared. This log bit will remain
+    /// set until cleared by software writing 0.
+    ///
+    UINT32  OtherLog:1;
+    UINT32  Reserved5:1;
+    ///
+    /// [Bit 26] Package/Platform-Level PL1 Power Limiting Log  When set,
+    /// indicates that the Package/Platform Level PL1 Power Limiting Status
+    /// bit has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PL1Log:1;
+    ///
+    /// [Bit 27] Package/Platform-Level PL2 Power Limiting Log When set,
+    /// indicates that the Package/Platform Level PL2 Power Limiting Status
+    /// bit has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PL2Log:1;
+    ///
+    /// [Bit 28] Inefficient Operation Log When set, indicates that the
+    /// Inefficient Operation Status bit has asserted since the log bit was
+    /// last cleared. This log bit will remain set until cleared by software
+    /// writing 0.
+    ///
+    UINT32  InefficientOperationLog:1;
+    UINT32  Reserved6:3;
+    UINT32  Reserved7:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_GRAPHICS_PERF_LIMIT_REASONS_REGISTER;
+
+
+/**
+  Package. Indicator of Frequency Clipping in the Ring Interconnect (R/W)
+  (frequency refers to ring interconnect in the uncore).
+
+  @param  ECX  MSR_SKYLAKE_RING_PERF_LIMIT_REASONS (0x000006B1)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_RING_PERF_LIMIT_REASONS_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_RING_PERF_LIMIT_REASONS_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_RING_PERF_LIMIT_REASONS_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_RING_PERF_LIMIT_REASONS);
+  AsmWriteMsr64 (MSR_SKYLAKE_RING_PERF_LIMIT_REASONS, Msr.Uint64);
+  @endcode
+  @note MSR_SKYLAKE_RING_PERF_LIMIT_REASONS is defined as MSR_RING_PERF_LIMIT_REASONS in SDM.
+**/
+#define MSR_SKYLAKE_RING_PERF_LIMIT_REASONS      0x000006B1
+
+/**
+  MSR information returned for MSR index #MSR_SKYLAKE_RING_PERF_LIMIT_REASONS
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] PROCHOT Status (R0) When set, frequency is reduced due to
+    /// assertion of external PROCHOT.
+    ///
+    UINT32  PROCHOT_Status:1;
+    ///
+    /// [Bit 1] Thermal Status (R0) When set, frequency is reduced due to a
+    /// thermal event.
+    ///
+    UINT32  ThermalStatus:1;
+    UINT32  Reserved1:3;
+    ///
+    /// [Bit 5] Running Average Thermal Limit Status (R0) When set, frequency
+    /// is reduced due to running average thermal limit.
+    ///
+    UINT32  RunningAverageThermalLimitStatus:1;
+    ///
+    /// [Bit 6] VR Therm Alert Status (R0) When set, frequency is reduced due
+    /// to a thermal alert from a processor Voltage Regulator.
+    ///
+    UINT32  VRThermAlertStatus:1;
+    ///
+    /// [Bit 7] VR Thermal Design Current Status (R0) When set, frequency is
+    /// reduced due to VR TDC limit.
+    ///
+    UINT32  VRThermalDesignCurrentStatus:1;
+    ///
+    /// [Bit 8] Other Status (R0) When set, frequency is reduced due to
+    /// electrical or other constraints.
+    ///
+    UINT32  OtherStatus:1;
+    UINT32  Reserved2:1;
+    ///
+    /// [Bit 10] Package/Platform-Level Power Limiting PL1 Status (R0) When
+    /// set, frequency is reduced due to package/Platform-level power limiting
+    /// PL1.
+    ///
+    UINT32  PL1Status:1;
+    ///
+    /// [Bit 11] Package/Platform-Level PL2 Power Limiting Status (R0) When
+    /// set, frequency is reduced due to package/Platform-level power limiting
+    /// PL2/PL3.
+    ///
+    UINT32  PL2Status:1;
+    UINT32  Reserved3:4;
+    ///
+    /// [Bit 16] PROCHOT Log  When set, indicates that the PROCHOT Status bit
+    /// has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PROCHOT_Log:1;
+    ///
+    /// [Bit 17] Thermal Log  When set, indicates that the Thermal Status bit
+    /// has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  ThermalLog:1;
+    UINT32  Reserved4:3;
+    ///
+    /// [Bit 21] Running Average Thermal Limit Log  When set, indicates that
+    /// the RATL Status bit has asserted since the log bit was last cleared.
+    /// This log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  RunningAverageThermalLimitLog:1;
+    ///
+    /// [Bit 22] VR Therm Alert Log  When set, indicates that the VR Therm
+    /// Alert Status bit has asserted since the log bit was last cleared. This
+    /// log bit will remain set until cleared by software writing 0.
+    ///
+    UINT32  VRThermAlertLog:1;
+    ///
+    /// [Bit 23] VR Thermal Design Current Log  When set, indicates that the
+    /// VR Therm Alert Status bit has asserted since the log bit was last
+    /// cleared. This log bit will remain set until cleared by software
+    /// writing 0.
+    ///
+    UINT32  VRThermalDesignCurrentLog:1;
+    ///
+    /// [Bit 24] Other Log  When set, indicates that the OTHER Status bit has
+    /// asserted since the log bit was last cleared. This log bit will remain
+    /// set until cleared by software writing 0.
+    ///
+    UINT32  OtherLog:1;
+    UINT32  Reserved5:1;
+    ///
+    /// [Bit 26] Package/Platform-Level PL1 Power Limiting Log  When set,
+    /// indicates that the Package/Platform Level PL1 Power Limiting Status
+    /// bit has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PL1Log:1;
+    ///
+    /// [Bit 27] Package/Platform-Level PL2 Power Limiting Log When set,
+    /// indicates that the Package/Platform Level PL2 Power Limiting Status
+    /// bit has asserted since the log bit was last cleared. This log bit will
+    /// remain set until cleared by software writing 0.
+    ///
+    UINT32  PL2Log:1;
+    UINT32  Reserved6:4;
+    UINT32  Reserved7:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_RING_PERF_LIMIT_REASONS_REGISTER;
+
+
 /**
   Thread. Last Branch Record n To IP (R/W) One of 32 triplets of last branch
   record registers on the last branch record stack. This part of the stack
   contains pointers to the destination instruction. See also: -  Last Branch
-  Record Stack TOS at 1C9H -  Section 17.9.
+  Record Stack TOS at 1C9H -  Section 17.10.
 
   @param  ECX  MSR_SKYLAKE_LASTBRANCH_n_TO_IP
   @param  EAX  Lower 32-bits of MSR value.
@@ -1006,7 +1502,7 @@ typedef union {
   Thread. Last Branch Record n Additional Information (R/W) One of 32 triplet
   of last branch record registers on the last branch record stack. This part
   of the stack contains flag, TSX-related and elapsed cycle information. See
-  also: -  Last Branch Record Stack TOS at 1C9H -  Section 17.6.1, "LBR
+  also: -  Last Branch Record Stack TOS at 1C9H -  Section 17.7.1, "LBR
   Stack.".
 
   @param  ECX  MSR_SKYLAKE_LBR_INFO_n
@@ -1087,5 +1583,658 @@ typedef union {
 #define MSR_SKYLAKE_LBR_INFO_30                  0x00000DDE
 #define MSR_SKYLAKE_LBR_INFO_31                  0x00000DDF
 /// @}
+
+
+/**
+  Package. Uncore fixed counter control (R/W).
+
+  @param  ECX  MSR_SKYLAKE_UNC_PERF_FIXED_CTRL (0x00000394)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_FIXED_CTRL_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_FIXED_CTRL_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_UNC_PERF_FIXED_CTRL_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_UNC_PERF_FIXED_CTRL);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_PERF_FIXED_CTRL, Msr.Uint64);
+  @endcode
+  @note MSR_SKYLAKE_UNC_PERF_FIXED_CTRL is defined as MSR_UNC_PERF_FIXED_CTRL in SDM.
+**/
+#define MSR_SKYLAKE_UNC_PERF_FIXED_CTRL          0x00000394
+
+/**
+  MSR information returned for MSR index #MSR_SKYLAKE_UNC_PERF_FIXED_CTRL
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    UINT32  Reserved1:20;
+    ///
+    /// [Bit 20] Enable overflow propagation.
+    ///
+    UINT32  EnableOverflow:1;
+    UINT32  Reserved2:1;
+    ///
+    /// [Bit 22] Enable counting.
+    ///
+    UINT32  EnableCounting:1;
+    UINT32  Reserved3:9;
+    UINT32  Reserved4:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_UNC_PERF_FIXED_CTRL_REGISTER;
+
+
+/**
+  Package. Uncore fixed counter.
+
+  @param  ECX  MSR_SKYLAKE_UNC_PERF_FIXED_CTR (0x00000395)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_FIXED_CTR_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_FIXED_CTR_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_UNC_PERF_FIXED_CTR_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_UNC_PERF_FIXED_CTR);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_PERF_FIXED_CTR, Msr.Uint64);
+  @endcode
+  @note MSR_SKYLAKE_UNC_PERF_FIXED_CTR is defined as MSR_UNC_PERF_FIXED_CTR in SDM.
+**/
+#define MSR_SKYLAKE_UNC_PERF_FIXED_CTR           0x00000395
+
+/**
+  MSR information returned for MSR index #MSR_SKYLAKE_UNC_PERF_FIXED_CTR
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 31:0] Current count.
+    ///
+    UINT32  CurrentCount:32;
+    ///
+    /// [Bits 43:32] Current count.
+    ///
+    UINT32  CurrentCountHi:12;
+    UINT32  Reserved:20;
+  } Bits;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_UNC_PERF_FIXED_CTR_REGISTER;
+
+
+/**
+  Package. Uncore C-Box configuration information (R/O).
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_CONFIG (0x00000396)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_CBO_CONFIG_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_CBO_CONFIG_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_UNC_CBO_CONFIG_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_CONFIG);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_CONFIG is defined as MSR_UNC_CBO_CONFIG in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_CONFIG               0x00000396
+
+/**
+  MSR information returned for MSR index #MSR_SKYLAKE_UNC_CBO_CONFIG
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 3:0] Specifies the number of C-Box units with programmable
+    /// counters (including processor cores and processor graphics),.
+    ///
+    UINT32  CBox:4;
+    UINT32  Reserved1:28;
+    UINT32  Reserved2:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_UNC_CBO_CONFIG_REGISTER;
+
+
+/**
+  Package. Uncore Arb unit, performance counter 0.
+
+  @param  ECX  MSR_SKYLAKE_UNC_ARB_PERFCTR0 (0x000003B0)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_ARB_PERFCTR0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_ARB_PERFCTR0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_ARB_PERFCTR0 is defined as MSR_UNC_ARB_PERFCTR0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_ARB_PERFCTR0             0x000003B0
+
+
+/**
+  Package. Uncore Arb unit, performance counter 1.
+
+  @param  ECX  MSR_SKYLAKE_UNC_ARB_PERFCTR1 (0x000003B1)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_ARB_PERFCTR1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_ARB_PERFCTR1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_ARB_PERFCTR1 is defined as MSR_UNC_ARB_PERFCTR1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_ARB_PERFCTR1             0x000003B1
+
+
+/**
+  Package. Uncore Arb unit, counter 0 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_ARB_PERFEVTSEL0 (0x000003B2)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_ARB_PERFEVTSEL0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_ARB_PERFEVTSEL0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_ARB_PERFEVTSEL0 is defined as MSR_UNC_ARB_PERFEVTSEL0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_ARB_PERFEVTSEL0          0x000003B2
+
+
+/**
+  Package. Uncore Arb unit, counter 1 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_ARB_PERFEVTSEL1 (0x000003B3)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_ARB_PERFEVTSEL1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_ARB_PERFEVTSEL1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_ARB_PERFEVTSEL1 is defined as MSR_SKYLAKE_UNC_ARB_PERFEVTSEL1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_ARB_PERFEVTSEL1          0x000003B3
+
+
+/**
+  Package. Uncore C-Box 0, counter 0 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL0 (0x00000700)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL0 is defined as MSR_UNC_CBO_0_PERFEVTSEL0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL0        0x00000700
+
+
+/**
+  Package. Uncore C-Box 0, counter 1 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL1 (0x00000701)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL1 is defined as MSR_UNC_CBO_0_PERFEVTSEL1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_0_PERFEVTSEL1        0x00000701
+
+
+/**
+  Package. Uncore C-Box 0, performance counter 0.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_0_PERFCTR0 (0x00000706)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFCTR0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFCTR0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_0_PERFCTR0 is defined as MSR_UNC_CBO_0_PERFCTR0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_0_PERFCTR0           0x00000706
+
+
+/**
+  Package. Uncore C-Box 0, performance counter 1.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_0_PERFCTR1 (0x00000707)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFCTR1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_0_PERFCTR1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_0_PERFCTR1 is defined as MSR_UNC_CBO_0_PERFCTR1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_0_PERFCTR1           0x00000707
+
+
+/**
+  Package. Uncore C-Box 1, counter 0 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL0 (0x00000710)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL0 is defined as MSR_UNC_CBO_1_PERFEVTSEL0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL0        0x00000710
+
+
+/**
+  Package. Uncore C-Box 1, counter 1 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL1 (0x00000711)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL1 is defined as MSR_UNC_CBO_1_PERFEVTSEL1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_1_PERFEVTSEL1        0x00000711
+
+
+/**
+  Package. Uncore C-Box 1, performance counter 0.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_1_PERFCTR0 (0x00000716)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFCTR0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFCTR0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_1_PERFCTR0 is defined as MSR_UNC_CBO_1_PERFCTR0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_1_PERFCTR0           0x00000716
+
+
+/**
+  Package. Uncore C-Box 1, performance counter 1.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_1_PERFCTR1 (0x00000717)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFCTR1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_1_PERFCTR1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_1_PERFCTR1 is defined as MSR_UNC_CBO_1_PERFCTR1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_1_PERFCTR1           0x00000717
+
+
+/**
+  Package. Uncore C-Box 2, counter 0 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL0 (0x00000720)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL0 is defined as MSR_UNC_CBO_2_PERFEVTSEL0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL0        0x00000720
+
+
+/**
+  Package. Uncore C-Box 2, counter 1 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL1 (0x00000721)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL1 is defined as MSR_UNC_CBO_2_PERFEVTSEL1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_2_PERFEVTSEL1        0x00000721
+
+
+/**
+  Package. Uncore C-Box 2, performance counter 0.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_2_PERFCTR0 (0x00000726)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFCTR0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFCTR0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_2_PERFCTR0 is defined as MSR_UNC_CBO_2_PERFCTR0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_2_PERFCTR0           0x00000726
+
+
+/**
+  Package. Uncore C-Box 2, performance counter 1.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_2_PERFCTR1 (0x00000727)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFCTR1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_2_PERFCTR1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_2_PERFCTR1 is defined as MSR_UNC_CBO_2_PERFCTR1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_2_PERFCTR1           0x00000727
+
+
+/**
+  Package. Uncore C-Box 3, counter 0 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL0 (0x00000730)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL0 is defined as MSR_UNC_CBO_3_PERFEVTSEL0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL0        0x00000730
+
+
+/**
+  Package. Uncore C-Box 3, counter 1 event select MSR.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL1 (0x00000731)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL1 is defined as MSR_UNC_CBO_3_PERFEVTSEL1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_3_PERFEVTSEL1        0x00000731
+
+
+/**
+  Package. Uncore C-Box 3, performance counter 0.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_3_PERFCTR0 (0x00000736)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFCTR0);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFCTR0, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_3_PERFCTR0 is defined as MSR_UNC_CBO_3_PERFCTR0 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_3_PERFCTR0           0x00000736
+
+
+/**
+  Package. Uncore C-Box 3, performance counter 1.
+
+  @param  ECX  MSR_SKYLAKE_UNC_CBO_3_PERFCTR1 (0x00000737)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFCTR1);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_CBO_3_PERFCTR1, Msr);
+  @endcode
+  @note MSR_SKYLAKE_UNC_CBO_3_PERFCTR1 is defined as MSR_UNC_CBO_3_PERFCTR1 in SDM.
+**/
+#define MSR_SKYLAKE_UNC_CBO_3_PERFCTR1           0x00000737
+
+
+/**
+  Package. Uncore PMU global control.
+
+  @param  ECX  MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL (0x00000E01)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL, Msr.Uint64);
+  @endcode
+  @note MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL is defined as MSR_UNC_PERF_GLOBAL_CTRL in SDM.
+**/
+#define MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL         0x00000E01
+
+/**
+  MSR information returned for MSR index #MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Slice 0 select.
+    ///
+    UINT32  PMI_Sel_Slice0:1;
+    ///
+    /// [Bit 1] Slice 1 select.
+    ///
+    UINT32  PMI_Sel_Slice1:1;
+    ///
+    /// [Bit 2] Slice 2 select.
+    ///
+    UINT32  PMI_Sel_Slice2:1;
+    ///
+    /// [Bit 3] Slice 3 select.
+    ///
+    UINT32  PMI_Sel_Slice3:1;
+    ///
+    /// [Bit 4] Slice 4select.
+    ///
+    UINT32  PMI_Sel_Slice4:1;
+    UINT32  Reserved1:14;
+    UINT32  Reserved2:10;
+    ///
+    /// [Bit 29] Enable all uncore counters.
+    ///
+    UINT32  EN:1;
+    ///
+    /// [Bit 30] Enable wake on PMI.
+    ///
+    UINT32  WakePMI:1;
+    ///
+    /// [Bit 31] Enable Freezing counter when overflow.
+    ///
+    UINT32  FREEZE:1;
+    UINT32  Reserved3:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_UNC_PERF_GLOBAL_CTRL_REGISTER;
+
+
+/**
+  Package. Uncore PMU main status.
+
+  @param  ECX  MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS (0x00000E02)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS);
+  AsmWriteMsr64 (MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS, Msr.Uint64);
+  @endcode
+  @note MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS is defined as MSR_UNC_PERF_GLOBAL_STATUS in SDM.
+**/
+#define MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS       0x00000E02
+
+/**
+  MSR information returned for MSR index #MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Fixed counter overflowed.
+    ///
+    UINT32  Fixed:1;
+    ///
+    /// [Bit 1] An ARB counter overflowed.
+    ///
+    UINT32  ARB:1;
+    UINT32  Reserved1:1;
+    ///
+    /// [Bit 3] A CBox counter overflowed (on any slice).
+    ///
+    UINT32  CBox:1;
+    UINT32  Reserved2:28;
+    UINT32  Reserved3:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SKYLAKE_UNC_PERF_GLOBAL_STATUS_REGISTER;
 
 #endif
