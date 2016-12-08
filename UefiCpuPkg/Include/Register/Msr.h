@@ -17,7 +17,7 @@
 
   @par Specification Reference:
   Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  December 2015, Chapter 35 Model-Specific-Registers (MSR), Chapter 35.
+  September 2016, Chapter 35 Model-Specific-Registers (MSR), Chapter 35.
 
 **/
 
@@ -28,6 +28,7 @@
 #include <Register/Msr/Core2Msr.h>
 #include <Register/Msr/AtomMsr.h>
 #include <Register/Msr/SilvermontMsr.h>
+#include <Register/Msr/GoldmontMsr.h>
 #include <Register/Msr/NehalemMsr.h>
 #include <Register/Msr/Xeon5600Msr.h>
 #include <Register/Msr/XeonE7Msr.h>
