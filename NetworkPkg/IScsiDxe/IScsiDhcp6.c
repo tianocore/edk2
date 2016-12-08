@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP6 related configuration routines.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -150,13 +150,26 @@ IScsiDhcp6ExtractRootPath (
     IpMode = ConfigData->AutoConfigureMode;
   }
 
-  Status = IScsiAsciiStrToIp (Field->Str, IpMode, &Ip);
-  CopyMem (&ConfigNvData->TargetIp, &Ip, sizeof (EFI_IP_ADDRESS));
+  //
+  // Server name is expressed as domain name, just save it.
+  //
+  if ((!NET_IS_DIGIT (*(Field->Str))) && (*(Field->Str) != '[')) {
+    ConfigNvData->DnsMode = TRUE;
+    if (Field->Len > sizeof (ConfigNvData->TargetUrl)) {
+      return EFI_INVALID_PARAMETER;
+    }
+    CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
+    ConfigNvData->TargetUrl[Field->Len + 1] = '\0';
+  } else {
+    ZeroMem(&ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));
+    Status = IScsiAsciiStrToIp (Field->Str, IpMode, &Ip);
+    CopyMem (&ConfigNvData->TargetIp, &Ip, sizeof (EFI_IP_ADDRESS));
 
-
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
   }
+
   //
   // Check the protocol type.
   //

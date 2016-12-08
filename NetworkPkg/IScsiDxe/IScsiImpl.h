@@ -1,7 +1,7 @@
 /** @file
   The shared head file for iSCSI driver.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,8 +28,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Ip6.h>
 #include <Protocol/Dhcp4.h>
 #include <Protocol/Dhcp6.h>
+#include <Protocol/Dns4.h>
+#include <Protocol/Dns6.h>
 #include <Protocol/Tcp4.h>
 #include <Protocol/Tcp6.h>
+#include <Protocol/Ip4Config2.h>
+#include <Protocol/Ip6Config.h>
 
 #include <Protocol/AuthenticationInfo.h>
 #include <Protocol/IScsiInitiatorName.h>
@@ -62,8 +66,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IScsiCHAP.h"
 #include "IScsiDhcp.h"
 #include "IScsiDhcp6.h"
+
 #include "IScsiIbft.h"
 #include "IScsiMisc.h"
+#include "IScsiDns.h"
 #include "IScsiConfig.h"
 
 #define ISCSI_AUTH_INITIAL        0

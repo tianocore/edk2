@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to iSCSI.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -366,6 +366,7 @@ IScsiConvertAttemptConfigDataToIfrNvData (
   ISCSI_SESSION_CONFIG_NVDATA   *SessionConfigData;
   ISCSI_CHAP_AUTH_CONFIG_NVDATA *AuthConfigData;
   EFI_IP_ADDRESS                Ip;
+  BOOLEAN                       DnsMode;
 
   //
   // Normal session configuration parameters.
@@ -373,6 +374,7 @@ IScsiConvertAttemptConfigDataToIfrNvData (
   SessionConfigData                 = &Attempt->SessionConfigData;
   IfrNvData->Enabled                = SessionConfigData->Enabled;
   IfrNvData->IpMode                 = SessionConfigData->IpMode;
+  DnsMode                           = SessionConfigData->DnsMode;
 
   IfrNvData->InitiatorInfoFromDhcp  = SessionConfigData->InitiatorInfoFromDhcp;
   IfrNvData->TargetInfoFromDhcp     = SessionConfigData->TargetInfoFromDhcp;
@@ -385,12 +387,17 @@ IScsiConvertAttemptConfigDataToIfrNvData (
     IScsiIpToStr (&Ip, FALSE, IfrNvData->SubnetMask);
     CopyMem (&Ip.v4, &SessionConfigData->Gateway, sizeof (EFI_IPv4_ADDRESS));
     IScsiIpToStr (&Ip, FALSE, IfrNvData->Gateway);
-    CopyMem (&Ip.v4, &SessionConfigData->TargetIp, sizeof (EFI_IPv4_ADDRESS));
-    IScsiIpToStr (&Ip, FALSE, IfrNvData->TargetIp);
+    if (SessionConfigData->TargetIp.v4.Addr[0] != '\0') {
+      CopyMem (&Ip.v4, &SessionConfigData->TargetIp, sizeof (EFI_IPv4_ADDRESS));
+      IScsiIpToStr (&Ip, FALSE, IfrNvData->TargetIp);
+    }
+
   } else if (IfrNvData->IpMode == IP_MODE_IP6) {
     ZeroMem (IfrNvData->TargetIp, sizeof (IfrNvData->TargetIp));
-    IP6_COPY_ADDRESS (&Ip.v6, &SessionConfigData->TargetIp);
-    IScsiIpToStr (&Ip, TRUE, IfrNvData->TargetIp);
+    if (SessionConfigData->TargetIp.v6.Addr[0] != '\0') {
+      IP6_COPY_ADDRESS (&Ip.v6, &SessionConfigData->TargetIp);
+      IScsiIpToStr (&Ip, TRUE, IfrNvData->TargetIp);
+    }
   }
 
   AsciiStrToUnicodeStrS (
@@ -398,6 +405,15 @@ IScsiConvertAttemptConfigDataToIfrNvData (
     IfrNvData->TargetName,
     sizeof (IfrNvData->TargetName) / sizeof (IfrNvData->TargetName[0])
     );
+
+  if (DnsMode) {
+    AsciiStrToUnicodeStrS (
+      SessionConfigData->TargetUrl,
+      IfrNvData->TargetIp,
+      sizeof (IfrNvData->TargetIp) / sizeof (IfrNvData->TargetIp[0])
+      );
+  }
+
   IScsiLunToUnicodeStr (SessionConfigData->BootLun, IfrNvData->BootLun);
   IScsiConvertIsIdToString (IfrNvData->IsId, SessionConfigData->IsId);
 
@@ -559,14 +575,26 @@ IScsiConvertIfrNvDataToAttemptConfigData (
     // Validate target configuration if DHCP isn't deployed.
     //
     if (!Attempt->SessionConfigData.TargetInfoFromDhcp && Attempt->SessionConfigData.IpMode < IP_MODE_AUTOCONFIG) {
-      if (!IpIsUnicast (&Attempt->SessionConfigData.TargetIp, IfrNvData->IpMode)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Target IP is invalid!",
-          NULL
-          );
-        return EFI_INVALID_PARAMETER;
+      if (!Attempt->SessionConfigData.DnsMode) {
+        if (!IpIsUnicast (&Attempt->SessionConfigData.TargetIp, IfrNvData->IpMode)) {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"Target IP is invalid!",
+            NULL
+            );
+          return EFI_INVALID_PARAMETER;
+        }
+      } else {
+        if (Attempt->SessionConfigData.TargetUrl[0] == '\0') {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"iSCSI target Url should not be NULL!",
+            NULL
+            );
+          return EFI_INVALID_PARAMETER;
+        }
       }
 
       //
@@ -2136,7 +2164,7 @@ IScsiFormCallback (
   ISCSI_FORM_CALLBACK_INFO    *Private;
   UINTN                       BufferSize;
   CHAR8                       *IScsiName;
-  CHAR8                       IpString[IP_STR_MAX_SIZE];
+  CHAR8                       IpString[ISCSI_NAME_MAX_SIZE];
   CHAR8                       LunString[ISCSI_LUN_STR_MAX_LEN];
   UINT64                      Lun;
   EFI_IP_ADDRESS              HostIp;
@@ -2335,14 +2363,8 @@ IScsiFormCallback (
     case KEY_IP_MODE:
       switch (Value->u8) {
       case IP_MODE_IP6:
-        ZeroMem (IfrNvData->TargetIp, sizeof (IfrNvData->TargetIp));
-        IScsiIpToStr (&Private->Current->SessionConfigData.TargetIp, TRUE, IfrNvData->TargetIp);
-        Private->Current->AutoConfigureMode = 0;
-        break;
-
       case IP_MODE_IP4:
         ZeroMem (IfrNvData->TargetIp, sizeof (IfrNvData->TargetIp));
-        IScsiIpToStr (&Private->Current->SessionConfigData.TargetIp, FALSE, IfrNvData->TargetIp);
         Private->Current->AutoConfigureMode = 0;
 
         break;
@@ -2408,15 +2430,15 @@ IScsiFormCallback (
     case KEY_TARGET_IP:
       UnicodeStrToAsciiStrS (IfrNvData->TargetIp, IpString, sizeof (IpString));
       Status = IScsiAsciiStrToIp (IpString, IfrNvData->IpMode, &HostIp);
-      if (EFI_ERROR (Status) || IP4_IS_LOCAL_BROADCAST (EFI_NTOHL(HostIp.v4)) || IP4_IS_UNSPECIFIED (EFI_NTOHL(HostIp.v4))) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid IP address!",
-          NULL
-          );       
-        Status = EFI_INVALID_PARAMETER;
+      if (EFI_ERROR (Status) || !IpIsUnicast (&HostIp, IfrNvData->IpMode)) {
+      //
+      // The target is expressed in URL format or an invalid Ip address, just save.
+      //
+      Private->Current->SessionConfigData.DnsMode = TRUE;
+      ZeroMem (&Private->Current->SessionConfigData.TargetIp, sizeof (Private->Current->SessionConfigData.TargetIp));
+      UnicodeStrToAsciiStrS (IfrNvData->TargetIp, Private->Current->SessionConfigData.TargetUrl, ISCSI_NAME_MAX_SIZE);
       } else {
+        Private->Current->SessionConfigData.DnsMode = FALSE;
         CopyMem (&Private->Current->SessionConfigData.TargetIp, &HostIp, sizeof (HostIp));
       }
 

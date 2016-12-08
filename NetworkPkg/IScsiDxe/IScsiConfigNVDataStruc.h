@@ -1,7 +1,7 @@
 /** @file
   Define NVData structures used by the iSCSI configuration component.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -135,6 +135,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ISID_CONFIGURABLE_MAX_LEN 12
 #define ISID_CONFIGURABLE_STORAGE 13
 
+///
+/// Macro used for target Url.
+///
+#define ISCSI_TARGET_URI_MIN_SIZE     0
+#define ISCSI_TARGET_URI_MAX_SIZE     255
+
 #pragma pack(1)
 typedef struct _ISCSI_CONFIG_IFR_NVDATA {
   CHAR16  InitiatorName[ISCSI_NAME_MAX_SIZE];
@@ -154,7 +160,7 @@ typedef struct _ISCSI_CONFIG_IFR_NVDATA {
   CHAR16  Gateway[IP4_STR_MAX_SIZE];
 
   CHAR16  TargetName[ISCSI_NAME_MAX_SIZE];
-  CHAR16  TargetIp[IP_STR_MAX_SIZE];
+  CHAR16  TargetIp[ISCSI_TARGET_URI_MAX_SIZE];
   UINT16  TargetPort;
   CHAR16  BootLun[ISCSI_LUN_STR_MAX_LEN];
 

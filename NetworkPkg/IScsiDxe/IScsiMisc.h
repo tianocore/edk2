@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous definitions for iSCSI driver.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,6 +33,7 @@ typedef struct _ISCSI_DRIVER_DATA ISCSI_DRIVER_DATA;
 ///
 #define IP6_OLD_IPADDRESS_OFFSET      42
 
+
 #pragma pack(1)
 typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
   UINT16            TargetPort;
@@ -45,6 +46,7 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
 
   BOOLEAN           InitiatorInfoFromDhcp;
   BOOLEAN           TargetInfoFromDhcp;
+
   CHAR8             TargetName[ISCSI_NAME_MAX_SIZE];
   EFI_IP_ADDRESS    TargetIp;
   UINT8             PrefixLength;
@@ -57,6 +59,9 @@ typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
   BOOLEAN           RedirectFlag;
   UINT16            OriginalTargetPort;     // The port of proxy/virtual target.
   EFI_IP_ADDRESS    OriginalTargetIp;       // The address of proxy/virtual target.
+
+  BOOLEAN           DnsMode;  // Flag indicate whether the Target address is expressed as URL format.
+  CHAR8             TargetUrl[ISCSI_TARGET_URI_MAX_SIZE];
   
 } ISCSI_SESSION_CONFIG_NVDATA;
 #pragma pack()
@@ -336,6 +341,20 @@ BOOLEAN
 IScsiDhcpIsConfigured (
   IN EFI_HANDLE  Controller,
   IN UINT8       IpVersion
+  );
+
+/**
+  Check wheather the Controller handle is configured to use DNS protocol.
+
+  @param[in]  Controller           The handle of the controller.
+  
+  @retval TRUE                     The handle of the controller need the DNS protocol.
+  @retval FALSE                    The handle of the controller does not need the DNS protocol.
+  
+**/
+BOOLEAN
+IScsiDnsIsConfigured (
+  IN EFI_HANDLE  Controller
   );
 
 /**

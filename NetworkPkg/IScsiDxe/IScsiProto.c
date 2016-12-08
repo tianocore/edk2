@@ -1,7 +1,7 @@
 /** @file
   The implementation of iSCSI protocol based on RFC3720.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -254,6 +254,23 @@ IScsiCreateConnection (
   Conn->MaxRecvDataSegmentLength  = DEFAULT_MAX_RECV_DATA_SEG_LEN;
   Conn->HeaderDigest              = IScsiDigestNone;
   Conn->DataDigest                = IScsiDigestNone;
+
+  if (NvData->DnsMode) {
+    //
+    // perform dns process if target address expressed by domain name.
+    //
+    if (!Conn->Ipv6Flag) {
+      Status = IScsiDns4 (Private->Image, Private->Controller, NvData);
+    } else {
+      Status = IScsiDns6 (Private->Image, Private->Controller, NvData);
+    }
+
+    if (EFI_ERROR(Status)) {
+      DEBUG ((EFI_D_ERROR, "The configuration of Target address or DNS server address is invalid!\n"));
+      FreePool (Conn);
+      return NULL;
+    }
+  }
 
   if (!Conn->Ipv6Flag) {
     Tcp4IoConfig = &TcpIoConfig.Tcp4IoConfigData;
@@ -1131,8 +1148,13 @@ IScsiUpdateTargetAddress (
     } else {
       //
       // The domainname of the target is presented in the format of a DNS host name.
-      // Temporary not supported.
-      continue;
+      //
+      IpStr = TargetAddress;
+
+      while ((*TargetAddress != '\0') && (*TargetAddress != ':') && (*TargetAddress != ',')) {
+        TargetAddress++;
+      }
+      NvData->DnsMode = TRUE;
     }
 
     //
@@ -1178,17 +1200,28 @@ IScsiUpdateTargetAddress (
       IpMode = Session->ConfigData->AutoConfigureMode;
     }
 
-    Status = IScsiAsciiStrToIp (
-               IpStr,
-               IpMode,
-               &Session->ConfigData->SessionConfigData.TargetIp
-               );
-
-    if (EFI_ERROR (Status)) {
-      continue;
+    if (NvData->DnsMode) {
+      //
+      // Target address is expressed as URL format, just save it and
+      // do DNS resolution when creating a TCP connection.
+      //
+      if (AsciiStrSize (IpStr) > sizeof (Session->ConfigData->SessionConfigData.TargetUrl)){
+        return EFI_INVALID_PARAMETER;
+      }
+      CopyMem (&Session->ConfigData->SessionConfigData.TargetUrl, IpStr, AsciiStrSize (IpStr));
     } else {
-      NvData->RedirectFlag = TRUE;
-      break;
+      Status = IScsiAsciiStrToIp (
+                 IpStr,
+                 IpMode,
+                 &Session->ConfigData->SessionConfigData.TargetIp
+                 );
+
+      if (EFI_ERROR (Status)) {
+        continue;
+      } else {
+        NvData->RedirectFlag = TRUE;
+        break;
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 // *++
 //
-// Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -63,7 +63,8 @@
 #string STR_ISCSI_IP_ADDRESS_HELP       #language en-US "Enter IP address in dotted-decimal notation."
 #string STR_ISCSI_TARGET_NAME           #language en-US "  Target Name"
 #string STR_ISCSI_TARGET_NAME_HELP      #language en-US "The worldwide unique name of the target. Only iqn. format is accepted."
-#string STR_ISCSI_TARGET_IP_ADDRESS     #language en-US "  Target IP Address"
+#string STR_ISCSI_TARGET_ADDRESS        #language en-US "  Target Address"
+#string STR_ISCSI_TARGET_ADDRESS_HELP   #language en-US "Enter Target address in IPv4,IPv6 or URL format.You need to configure DNS server address in advance if input a URL string."
 #string STR_ISCSI_TARGET_PORT           #language en-US "  Target Port"
 #string STR_ISCSI_BOOT_LUN              #language en-US "  Boot LUN"
 #string STR_ISCSI_BOOT_LUN_HELP         #language en-US "Hexadecimal representation of the LU number. Examples are: 4752-3A4F-6b7e-2F99, 6734-9-156f-127, 4186-9"

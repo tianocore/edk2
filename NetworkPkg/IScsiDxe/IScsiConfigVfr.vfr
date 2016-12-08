@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the iSCSI configuration component.
   
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -249,12 +249,12 @@ formset
     endstring;
 
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.TargetIp,
-            prompt  = STRING_TOKEN(STR_ISCSI_TARGET_IP_ADDRESS),
-            help    = STRING_TOKEN(STR_ISCSI_IP_ADDRESS_HELP),
+            prompt  = STRING_TOKEN(STR_ISCSI_TARGET_ADDRESS),
+            help    = STRING_TOKEN(STR_ISCSI_TARGET_ADDRESS_HELP),
             flags   = INTERACTIVE,
             key     = KEY_TARGET_IP,
-            minsize = IP_MIN_SIZE,
-            maxsize = IP_MAX_SIZE,
+            minsize = ISCSI_TARGET_URI_MIN_SIZE,
+            maxsize = ISCSI_TARGET_URI_MAX_SIZE,
     endstring;
 
     numeric varid   = ISCSI_CONFIG_IFR_NVDATA.TargetPort,
