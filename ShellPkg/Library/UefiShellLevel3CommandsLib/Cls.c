@@ -82,6 +82,7 @@ ShellCommandRunCls (
       } else {
         Background = (gST->ConOut->Mode->Attribute >> 4) & 0x7;
         Foreground = gST->ConOut->Mode->Attribute & 0x0F;
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_SFO_HEADER), gShellLevel3HiiHandle, L"cls");
         ShellPrintHiiEx (
           -1,
           -1,

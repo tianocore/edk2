@@ -43,6 +43,7 @@
 #string STR_GEN_DIR_NF            #language en-US "%H%s%N: Directory not found - '%H%s%N'\r\n"
 #string STR_GEN_FILE_NF           #language en-US "%H%s%N: File not found - '%H%s%N'\r\n"
 #string STR_GEN_IS_DIR            #language en-US "%H%s%N: '%H%s%N' is a directory\r\n"
+#string STR_GEN_SFO_HEADER        #language en-US "ShellCommand,"%s"\r\n"
 #string STR_NO_SCRIPT             #language en-US "The command '%H%s%N' is not allowed outside of a script\r\n"
 
 #string STR_TYP_ERROR             #language en-US "%H%s%N: Operation was not successful on '%H%s%N'\r\n"
