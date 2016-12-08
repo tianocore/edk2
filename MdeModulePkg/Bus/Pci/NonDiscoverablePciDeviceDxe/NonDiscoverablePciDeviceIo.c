@@ -43,7 +43,7 @@ GetBarResource (
     return EFI_NOT_FOUND;
   }
 
-  BarIndex -= Dev->BarOffset;
+  BarIndex -= (UINT8)Dev->BarOffset;
 
   for (Desc = Dev->Device->Resources;
        Desc->Desc != ACPI_END_TAG_DESCRIPTOR;
@@ -61,6 +61,7 @@ GetBarResource (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoPollMem (
   IN  EFI_PCI_IO_PROTOCOL         *This,
   IN  EFI_PCI_IO_PROTOCOL_WIDTH   Width,
@@ -78,6 +79,7 @@ PciIoPollMem (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoPollIo (
   IN  EFI_PCI_IO_PROTOCOL         *This,
   IN  EFI_PCI_IO_PROTOCOL_WIDTH   Width,
@@ -95,6 +97,7 @@ PciIoPollIo (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoMemRW (
   IN  EFI_PCI_IO_PROTOCOL_WIDTH   Width,
   IN  UINTN                       Count,
@@ -145,6 +148,7 @@ PciIoMemRW (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoMemRead (
   IN     EFI_PCI_IO_PROTOCOL          *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
@@ -211,6 +215,7 @@ PciIoMemRead (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoMemWrite (
   IN     EFI_PCI_IO_PROTOCOL          *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
@@ -277,6 +282,7 @@ PciIoMemWrite (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoIoRead (
   IN EFI_PCI_IO_PROTOCOL              *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
@@ -292,6 +298,7 @@ PciIoIoRead (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoIoWrite (
   IN     EFI_PCI_IO_PROTOCOL          *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
@@ -307,6 +314,7 @@ PciIoIoWrite (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoPciRead (
   IN     EFI_PCI_IO_PROTOCOL        *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH  Width,
@@ -342,6 +350,7 @@ PciIoPciRead (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoPciWrite (
   IN EFI_PCI_IO_PROTOCOL              *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
@@ -369,6 +378,7 @@ PciIoPciWrite (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoCopyMem (
   IN EFI_PCI_IO_PROTOCOL              *This,
   IN     EFI_PCI_IO_PROTOCOL_WIDTH    Width,
@@ -385,6 +395,7 @@ PciIoCopyMem (
 
 STATIC
 EFI_STATUS
+EFIAPI
 CoherentPciIoMap (
   IN     EFI_PCI_IO_PROTOCOL            *This,
   IN     EFI_PCI_IO_PROTOCOL_OPERATION  Operation,
@@ -450,6 +461,7 @@ CoherentPciIoMap (
 
 STATIC
 EFI_STATUS
+EFIAPI
 CoherentPciIoUnmap (
   IN  EFI_PCI_IO_PROTOCOL          *This,
   IN  VOID                         *Mapping
@@ -472,6 +484,7 @@ CoherentPciIoUnmap (
 
 STATIC
 EFI_STATUS
+EFIAPI
 CoherentPciIoAllocateBuffer (
   IN  EFI_PCI_IO_PROTOCOL         *This,
   IN  EFI_ALLOCATE_TYPE           Type,
@@ -513,6 +526,7 @@ CoherentPciIoAllocateBuffer (
 
 STATIC
 EFI_STATUS
+EFIAPI
 CoherentPciIoFreeBuffer (
   IN  EFI_PCI_IO_PROTOCOL         *This,
   IN  UINTN                       Pages,
@@ -526,6 +540,7 @@ CoherentPciIoFreeBuffer (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoFlush (
   IN EFI_PCI_IO_PROTOCOL          *This
   )
@@ -535,6 +550,7 @@ PciIoFlush (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoGetLocation (
   IN   EFI_PCI_IO_PROTOCOL  *This,
   OUT  UINTN                *SegmentNumber,
@@ -560,6 +576,7 @@ PciIoGetLocation (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoAttributes (
   IN  EFI_PCI_IO_PROTOCOL                      *This,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
@@ -616,6 +633,7 @@ PciIoAttributes (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoGetBarAttributes (
   IN EFI_PCI_IO_PROTOCOL             *This,
   IN  UINT8                          BarIndex,
@@ -666,6 +684,7 @@ PciIoGetBarAttributes (
 
 STATIC
 EFI_STATUS
+EFIAPI
 PciIoSetBarAttributes (
   IN     EFI_PCI_IO_PROTOCOL          *This,
   IN     UINT64                       Attributes,
