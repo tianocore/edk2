@@ -1330,9 +1330,12 @@ ParseDnsResponse (
   //
   while (AnswerSectionNum < DnsHeader->AnswersNum) {
     //
-    // Answer name should be PTR.
+    // Answer name should be PTR, else EFI_UNSUPPORTED returned.
     //
-    ASSERT ((*(UINT8 *) AnswerName & 0xC0) == 0xC0);
+    if ((*(UINT8 *) AnswerName & 0xC0) != 0xC0) {
+      Status = EFI_UNSUPPORTED;
+      goto ON_EXIT;
+    }
     
     //
     // Get Answer section.
@@ -1408,7 +1411,12 @@ ParseDnsResponse (
         //
         // This is address entry, get Data.
         //
-        ASSERT (Dns4TokenEntry != NULL && AnswerSection->DataLength == 4);
+        ASSERT (Dns4TokenEntry != NULL);
+
+        if (AnswerSection->DataLength != 4) {
+          Status = EFI_ABORTED;
+          goto ON_EXIT;
+        }
         
         HostAddr4 = Dns4TokenEntry->Token->RspData.H2AData->IpList;
         AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
@@ -1462,7 +1470,12 @@ ParseDnsResponse (
         //
         // This is address entry, get Data.
         //
-        ASSERT (Dns6TokenEntry != NULL && AnswerSection->DataLength == 16);
+        ASSERT (Dns6TokenEntry != NULL);
+
+        if (AnswerSection->DataLength != 16) {
+          Status = EFI_ABORTED;
+          goto ON_EXIT;
+        }
         
         HostAddr6 = Dns6TokenEntry->Token->RspData.H2AData->IpList;
         AnswerData = (UINT8 *) AnswerSection + sizeof (*AnswerSection);
