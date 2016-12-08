@@ -59,7 +59,7 @@ Returns:
   PossibleShortName = TRUE;
   SeparateDot       = NULL;
   SetMem (File8Dot3Name, FAT_NAME_LEN, ' ');
-  for (TempName = FileName; *TempName; TempName++) {
+  for (TempName = FileName; *TempName != '\0'; TempName++) {
     if (*TempName == L'.') {
       SeparateDot = TempName;
     }
@@ -453,7 +453,7 @@ Returns:
   UINT8 Sum;
   Sum = 0;
   for (ShortNameLen = FAT_NAME_LEN; ShortNameLen != 0; ShortNameLen--) {
-    Sum = (UINT8)(((Sum & 1) ? 0x80 : 0) + (Sum >> 1) + *ShortNameString++);
+    Sum = (UINT8)((((Sum & 1) != 0) ? 0x80 : 0) + (Sum >> 1) + *ShortNameString++);
   }
 
   return Sum;
