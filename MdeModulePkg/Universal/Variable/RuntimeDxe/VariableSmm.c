@@ -349,9 +349,10 @@ SmmVariableGetStatistics (
   )
 {
   VARIABLE_INFO_ENTRY                                  *VariableInfo;
-  UINTN                                                NameLength;
+  UINTN                                                NameSize;
   UINTN                                                StatisticsInfoSize;
   CHAR16                                               *InfoName;
+  UINTN                                                InfoNameMaxSize;
   EFI_GUID                                             VendorGuid;
 
   if (InfoEntry == NULL) {
@@ -363,12 +364,13 @@ SmmVariableGetStatistics (
     return EFI_UNSUPPORTED;
   }
 
-  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
+  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY);
   if (*InfoSize < StatisticsInfoSize) {
     *InfoSize = StatisticsInfoSize;
     return EFI_BUFFER_TOO_SMALL;
   }
   InfoName = (CHAR16 *)(InfoEntry + 1);
+  InfoNameMaxSize = (*InfoSize - sizeof (VARIABLE_INFO_ENTRY));
 
   CopyGuid (&VendorGuid, &InfoEntry->VendorGuid);
 
@@ -376,8 +378,14 @@ SmmVariableGetStatistics (
     //
     // Return the first variable info
     //
+    NameSize = StrSize (VariableInfo->Name);
+    StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + NameSize;
+    if (*InfoSize < StatisticsInfoSize) {
+      *InfoSize = StatisticsInfoSize;
+      return EFI_BUFFER_TOO_SMALL;
+    }
     CopyMem (InfoEntry, VariableInfo, sizeof (VARIABLE_INFO_ENTRY));
-    CopyMem (InfoName, VariableInfo->Name, StrSize (VariableInfo->Name));
+    CopyMem (InfoName, VariableInfo->Name, NameSize);
     *InfoSize = StatisticsInfoSize;
     return EFI_SUCCESS;
   }
@@ -387,9 +395,9 @@ SmmVariableGetStatistics (
   //
   while (VariableInfo != NULL) {
     if (CompareGuid (&VariableInfo->VendorGuid, &VendorGuid)) {
-      NameLength = StrSize (VariableInfo->Name);
-      if (NameLength == StrSize (InfoName)) {
-        if (CompareMem (VariableInfo->Name, InfoName, NameLength) == 0) {
+      NameSize = StrSize (VariableInfo->Name);
+      if (NameSize <= InfoNameMaxSize) {
+        if (CompareMem (VariableInfo->Name, InfoName, NameSize) == 0) {
           //
           // Find the match one
           //
@@ -409,14 +417,15 @@ SmmVariableGetStatistics (
   //
   // Output the new variable info
   //
-  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
+  NameSize = StrSize (VariableInfo->Name);
+  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + NameSize;
   if (*InfoSize < StatisticsInfoSize) {
     *InfoSize = StatisticsInfoSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
   CopyMem (InfoEntry, VariableInfo, sizeof (VARIABLE_INFO_ENTRY));
-  CopyMem (InfoName, VariableInfo->Name, StrSize (VariableInfo->Name));
+  CopyMem (InfoName, VariableInfo->Name, NameSize);
   *InfoSize = StatisticsInfoSize;
 
   return EFI_SUCCESS;
