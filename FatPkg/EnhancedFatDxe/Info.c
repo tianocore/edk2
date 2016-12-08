@@ -16,6 +16,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Fat.h"
 
+/**
+
+  Get the volume's info into Buffer.
+
+  @param  Volume                - FAT file system volume.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing volume info.
+
+  @retval EFI_SUCCESS           - Get the volume info successfully.
+  @retval EFI_BUFFER_TOO_SMALL  - The buffer is too small.
+
+**/
 EFI_STATUS
 FatGetVolumeInfo (
   IN FAT_VOLUME       *Volume,
@@ -23,6 +35,20 @@ FatGetVolumeInfo (
   OUT VOID            *Buffer
   );
 
+/**
+
+  Set the volume's info.
+
+  @param  Volume                - FAT file system volume.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing the new volume info.
+
+  @retval EFI_SUCCESS           - Set the volume info successfully.
+  @retval EFI_BAD_BUFFER_SIZE   - The buffer size is error.
+  @retval EFI_WRITE_PROTECTED   - The volume is read only.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 FatSetVolumeInfo (
   IN FAT_VOLUME       *Volume,
@@ -30,6 +56,20 @@ FatSetVolumeInfo (
   IN VOID            *Buffer
   );
 
+/**
+
+  Set or Get the some types info of the file into Buffer.
+
+  @param  IsSet      - TRUE:The access is set, else is get
+  @param  FHand      - The handle of file
+  @param  Type       - The type of the info
+  @param  BufferSize - Size of Buffer
+  @param  Buffer     - Buffer containing volume info
+
+  @retval EFI_SUCCESS       - Get the info successfully
+  @retval EFI_DEVICE_ERROR  - Can not find the OFile for the file
+
+**/
 EFI_STATUS
 FatSetOrGetInfo (
   IN BOOLEAN              IsSet,

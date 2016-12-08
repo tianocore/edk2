@@ -702,11 +702,50 @@ FatWriteEx (
 //
 // DiskCache.c
 //
+/**
+
+  Initialize the disk cache according to Volume's FatType.
+
+  @param  Volume                - FAT file system volume.
+
+  @retval EFI_SUCCESS           - The disk cache is successfully initialized.
+  @retval EFI_OUT_OF_RESOURCES  - Not enough memory to allocate disk cache.
+
+**/
 EFI_STATUS
 FatInitializeDiskCache (
   IN FAT_VOLUME              *Volume
   );
 
+/**
+
+  Read BufferSize bytes from the position of Offset into Buffer,
+  or write BufferSize bytes from Buffer into the position of Offset.
+
+  Base on the parameter of CACHE_DATA_TYPE, the data access will be divided into
+  the access of FAT cache (CACHE_FAT) and the access of Data cache (CACHE_DATA):
+
+  1. Access of FAT cache (CACHE_FAT): Access the data in the FAT cache, if there is cache
+     page hit, just return the cache page; else update the related cache page and return
+     the right cache page.
+  2. Access of Data cache (CACHE_DATA):
+     The access data will be divided into UnderRun data, Aligned data and OverRun data;
+     The UnderRun data and OverRun data will be accessed by the Data cache,
+     but the Aligned data will be accessed with disk directly.
+
+  @param  Volume                - FAT file system volume.
+  @param  CacheDataType         - The type of cache: CACHE_DATA or CACHE_FAT.
+  @param  IoMode                - Indicate the type of disk access.
+  @param  Offset                - The starting byte offset to read from.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing cache data.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - The data was accessed correctly.
+  @retval EFI_MEDIA_CHANGED     - The MediaId does not match the current device.
+  @return Others                - An error occurred when accessing cache.
+
+**/
 EFI_STATUS
 FatAccessCache (
   IN     FAT_VOLUME          *Volume,
@@ -718,6 +757,17 @@ FatAccessCache (
   IN     FAT_TASK            *Task
   );
 
+/**
+
+  Flush all the dirty cache back, include the FAT cache and the Data cache.
+
+  @param  Volume                - FAT file system volume.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - Flush all the dirty cache back successfully
+  @return other                 - An error occurred when writing the data into the disk
+
+**/
 EFI_STATUS
 FatVolumeFlushCache (
   IN FAT_VOLUME              *Volume,
@@ -727,27 +777,83 @@ FatVolumeFlushCache (
 //
 // Flush.c
 //
+/**
+
+  Flush the data associated with an open file.
+  In this implementation, only last Mod/Access time is updated.
+
+  @param  OFile                 - The open file.
+
+  @retval EFI_SUCCESS           - The OFile is flushed successfully.
+  @return Others                - An error occurred when flushing this OFile.
+
+**/
 EFI_STATUS
 FatOFileFlush (
   IN FAT_OFILE          *OFile
   );
 
+/**
+
+  Check the references of the OFile.
+  If the OFile (that is checked) is no longer
+  referenced, then it is freed.
+
+  @param  OFile                 - The OFile to be checked.
+
+  @retval TRUE                  - The OFile is not referenced and freed.
+  @retval FALSE                 - The OFile is kept.
+
+**/
 BOOLEAN
 FatCheckOFileRef (
   IN FAT_OFILE          *OFile
   );
 
+/**
+
+  Set the OFile and its child OFile with the error Status
+
+  @param  OFile                 - The OFile whose permanent error code is to be set.
+  @param  Status                - Error code to be set.
+
+**/
 VOID
 FatSetVolumeError (
   IN FAT_OFILE          *OFile,
   IN EFI_STATUS         Status
   );
 
+/**
+
+  Close the open file instance.
+
+  @param  IFile                 - Open file instance.
+
+  @retval EFI_SUCCESS           - Closed the file successfully.
+
+**/
 EFI_STATUS
 FatIFileClose (
   FAT_IFILE             *IFile
   );
 
+/**
+
+  Set error status for a specific OFile, reference checking the volume.
+  If volume is already marked as invalid, and all resources are freed
+  after reference checking, the file system protocol is uninstalled and
+  the volume structure is freed.
+
+  @param  Volume                - the Volume that is to be reference checked and unlocked.
+  @param  OFile                 - the OFile whose permanent error code is to be set.
+  @param  EfiStatus             - error code to be set.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - Clean up the volume successfully.
+  @return Others                - Cleaning up of the volume is failed.
+
+**/
 EFI_STATUS
 FatCleanupVolume (
   IN FAT_VOLUME         *Volume,
@@ -759,29 +865,86 @@ FatCleanupVolume (
 //
 // FileSpace.c
 //
+/**
+
+  Shrink the end of the open file base on the file size.
+
+  @param  OFile                 - The open file.
+
+  @retval EFI_SUCCESS           - Shrinked sucessfully.
+  @retval EFI_VOLUME_CORRUPTED  - There are errors in the file's clusters.
+
+**/
 EFI_STATUS
 FatShrinkEof (
   IN FAT_OFILE          *OFile
   );
 
+/**
+
+  Grow the end of the open file base on the NewSizeInBytes.
+
+  @param  OFile                 - The open file.
+  @param  NewSizeInBytes        - The new size in bytes of the open file.
+
+  @retval EFI_SUCCESS           - The file is grown sucessfully.
+  @retval EFI_UNSUPPORTED       - The file size is larger than 4GB.
+  @retval EFI_VOLUME_CORRUPTED  - There are errors in the files' clusters.
+  @retval EFI_VOLUME_FULL       - The volume is full and can not grow the file.
+
+**/
 EFI_STATUS
 FatGrowEof (
   IN FAT_OFILE          *OFile,
   IN UINT64             NewSizeInBytes
   );
 
+/**
+
+  Get the size of directory of the open file.
+
+  @param  Volume                - The File System Volume.
+  @param  Cluster               - The Starting cluster.
+
+  @return The physical size of the file starting at the input cluster, if there is error in the
+  cluster chain, the return value is 0.
+
+**/
 UINTN
 FatPhysicalDirSize (
   IN FAT_VOLUME         *Volume,
   IN UINTN              Cluster
   );
 
+/**
+
+  Get the physical size of a file on the disk.
+
+  @param  Volume                - The file system volume.
+  @param  RealSize              - The real size of a file.
+
+  @return The physical size of a file on the disk.
+
+**/
 UINT64
 FatPhysicalFileSize (
   IN FAT_VOLUME         *Volume,
   IN UINTN              RealSize
   );
 
+/**
+
+  Seek OFile to requested position, and calculate the number of
+  consecutive clusters from the position in the file
+
+  @param  OFile                 - The open file.
+  @param  Position              - The file's position which will be accessed.
+  @param  PosLimit              - The maximum length current reading/writing may access
+
+  @retval EFI_SUCCESS           - Set the info successfully.
+  @retval EFI_VOLUME_CORRUPTED  - Cluster chain corrupt.
+
+**/
 EFI_STATUS
 FatOFilePosition (
   IN FAT_OFILE            *OFile,
@@ -789,6 +952,13 @@ FatOFilePosition (
   IN UINTN                PosLimit
   );
 
+/**
+
+  Update the free cluster info of FatInfoSector of the volume.
+
+  @param  Volume                - FAT file system volume.
+
+**/
 VOID
 FatComputeFreeInfo (
   IN FAT_VOLUME         *Volume
@@ -797,6 +967,21 @@ FatComputeFreeInfo (
 //
 // Init.c
 //
+/**
+
+  Allocates volume structure, detects FAT file system, installs protocol,
+  and initialize cache.
+
+  @param  Handle                - The handle of parent device.
+  @param  DiskIo                - The DiskIo of parent device.
+  @param  DiskIo2               - The DiskIo2 of parent device.
+  @param  BlockIo               - The BlockIo of parent devicel
+
+  @retval EFI_SUCCESS           - Allocate a new volume successfully.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
+  @return Others                - Allocating a new volume failed.
+
+**/
 EFI_STATUS
 FatAllocateVolume (
   IN  EFI_HANDLE                     Handle,
@@ -805,11 +990,32 @@ FatAllocateVolume (
   IN  EFI_BLOCK_IO_PROTOCOL          *BlockIo
   );
 
+/**
+
+  Detects FAT file system on Disk and set relevant fields of Volume.
+
+  @param Volume                - The volume structure.
+
+  @retval EFI_SUCCESS           - The Fat File System is detected successfully
+  @retval EFI_UNSUPPORTED       - The volume is not FAT file system.
+  @retval EFI_VOLUME_CORRUPTED  - The volume is corrupted.
+
+**/
 EFI_STATUS
 FatOpenDevice (
   IN OUT FAT_VOLUME     *Volume
   );
 
+/**
+
+  Called by FatDriverBindingStop(), Abandon the volume.
+
+  @param  Volume                - The volume to be abandoned.
+
+  @retval EFI_SUCCESS           - Abandoned the volume successfully.
+  @return Others                - Can not uninstall the protocol interfaces.
+
+**/
 EFI_STATUS
 FatAbandonVolume (
   IN FAT_VOLUME         *Volume
@@ -818,33 +1024,89 @@ FatAbandonVolume (
 //
 // Misc.c
 //
+/**
+
+  Create the task
+
+  @param  IFile                 - The instance of the open file.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @return FAT_TASK *            - Return the task instance.
+
+**/
 FAT_TASK *
 FatCreateTask (
   FAT_IFILE           *IFile,
   EFI_FILE_IO_TOKEN   *Token
   );
 
+/**
+
+  Destroy the task.
+
+  @param  Task                  - The task to be destroyed.
+
+**/
 VOID
 FatDestroyTask (
   FAT_TASK            *Task
   );
 
+/**
+
+  Wait all non-blocking requests complete.
+
+  @param  IFile                 - The instance of the open file.
+
+**/
 VOID
 FatWaitNonblockingTask (
   FAT_IFILE           *IFile
   );
 
+/**
+
+  Remove the subtask from subtask list.
+
+  @param  Subtask               - The subtask to be removed.
+
+  @return LIST_ENTRY *          - The next node in the list.
+
+**/
 LIST_ENTRY *
 FatDestroySubtask (
   FAT_SUBTASK         *Subtask
   );
 
+/**
+
+  Execute the task.
+
+  @param  IFile                 - The instance of the open file.
+  @param  Task                  - The task to be executed.
+
+  @retval EFI_SUCCESS           - The task was executed sucessfully.
+  @return other                 - An error occurred when executing the task.
+
+**/
 EFI_STATUS
 FatQueueTask (
   IN FAT_IFILE        *IFile,
   IN FAT_TASK         *Task
   );
 
+/**
+
+  Set the volume as dirty or not.
+
+  @param  Volume                - FAT file system volume.
+  @param  IoMode                - The access mode.
+  @param  DirtyValue            - Set the volume as dirty or not.
+
+  @retval EFI_SUCCESS           - Set the new FAT entry value sucessfully.
+  @return other                 - An error occurred when operation the FAT entries.
+
+**/
 EFI_STATUS
 FatAccessVolumeDirty (
   IN FAT_VOLUME         *Volume,
@@ -852,6 +1114,22 @@ FatAccessVolumeDirty (
   IN VOID               *DirtyValue
   );
 
+/**
+
+  General disk access function.
+
+  @param  Volume                - FAT file system volume.
+  @param  IoMode                - The access mode (disk read/write or cache access).
+  @param  Offset                - The starting byte offset to read from.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing read data.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - The operation is performed successfully.
+  @retval EFI_VOLUME_CORRUPTED  - The accesss is
+  @return Others                - The status of read/write the disk
+
+**/
 EFI_STATUS
 FatDiskIo (
   IN FAT_VOLUME         *Volume,
@@ -862,48 +1140,115 @@ FatDiskIo (
   IN FAT_TASK           *Task
   );
 
+/**
+
+  Lock the volume.
+
+**/
 VOID
 FatAcquireLock (
   VOID
   );
 
+/**
+
+  Unlock the volume.
+
+**/
 VOID
 FatReleaseLock (
   VOID
   );
 
+/**
+
+  Lock the volume.
+  If the lock is already in the acquired state, then EFI_ACCESS_DENIED is returned.
+  Otherwise, EFI_SUCCESS is returned.
+
+  @retval EFI_SUCCESS           - The volume is locked.
+  @retval EFI_ACCESS_DENIED     - The volume could not be locked because it is already locked.
+
+**/
 EFI_STATUS
 FatAcquireLockOrFail (
   VOID
   );
 
+/**
+
+  Free directory entry.
+
+  @param  DirEnt                - The directory entry to be freed.
+
+**/
 VOID
 FatFreeDirEnt (
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Free volume structure (including the contents of directory cache and disk cache).
+
+  @param  Volume                - The volume structure to be freed.
+
+**/
 VOID
 FatFreeVolume (
   IN FAT_VOLUME         *Volume
   );
 
+/**
+
+  Translate EFI time to FAT time.
+
+  @param  ETime                 - The time of EFI_TIME.
+  @param  FTime                 - The time of FAT_DATE_TIME.
+
+**/
 VOID
 FatEfiTimeToFatTime (
   IN EFI_TIME           *ETime,
   OUT FAT_DATE_TIME     *FTime
   );
 
+/**
+
+  Translate Fat time to EFI time.
+
+  @param  FTime                 - The time of FAT_DATE_TIME.
+  @param  ETime                 - The time of EFI_TIME..
+
+**/
 VOID
 FatFatTimeToEfiTime (
   IN FAT_DATE_TIME      *FTime,
   OUT EFI_TIME          *ETime
   );
 
+/**
+
+  Get Current FAT time.
+
+  @param  FatTime               - Current FAT time.
+
+**/
 VOID
 FatGetCurrentFatTime (
   OUT FAT_DATE_TIME     *FatTime
   );
 
+/**
+
+  Check whether a time is valid.
+
+  @param  Time                  - The time of EFI_TIME.
+
+  @retval TRUE                  - The time is valid.
+  @retval FALSE                 - The time is not valid.
+
+**/
 BOOLEAN
 FatIsValidTime (
   IN EFI_TIME           *Time
@@ -912,11 +1257,34 @@ FatIsValidTime (
 //
 // UnicodeCollation.c
 //
+/**
+  Initialize Unicode Collation support.
+
+  It tries to locate Unicode Collation 2 protocol and matches it with current
+  platform language code. If for any reason the first attempt fails, it then tries to
+  use Unicode Collation Protocol.
+
+  @param  AgentHandle          The handle used to open Unicode Collation (2) protocol.
+
+  @retval EFI_SUCCESS          The Unicode Collation (2) protocol has been successfully located.
+  @retval Others               The Unicode Collation (2) protocol has not been located.
+
+**/
 EFI_STATUS
 InitializeUnicodeCollationSupport (
   IN EFI_HANDLE    AgentHandle
   );
 
+/**
+  Convert FAT string to unicode string.
+
+  @param  FatSize               The size of FAT string.
+  @param  Fat                   The FAT string.
+  @param  String                The unicode string.
+
+  @return None.
+
+**/
 VOID
 FatFatToStr (
   IN UINTN              FatSize,
@@ -924,6 +1292,17 @@ FatFatToStr (
   OUT CHAR16            *String
   );
 
+/**
+  Convert unicode string to Fat string.
+
+  @param  String                The unicode string.
+  @param  FatSize               The size of the FAT string.
+  @param  Fat                   The FAT string.
+
+  @retval TRUE                  Convert successfully.
+  @retval FALSE                 Convert error.
+
+**/
 BOOLEAN
 FatStrToFat (
   IN  CHAR16            *String,
@@ -931,16 +1310,38 @@ FatStrToFat (
   OUT CHAR8             *Fat
   );
 
+/**
+  Lowercase a string
+
+  @param  Str                   The string which will be lower-cased.
+
+**/
 VOID
 FatStrLwr (
   IN CHAR16             *Str
   );
 
+/**
+  Uppercase a string.
+
+  @param  Str                   The string which will be upper-cased.
+
+**/
 VOID
 FatStrUpr (
   IN CHAR16             *Str
   );
 
+/**
+  Performs a case-insensitive comparison of two Null-terminated Unicode strings.
+
+  @param  Str1                   A pointer to a Null-terminated Unicode string.
+  @param  Str2                   A pointer to a Null-terminated Unicode string.
+
+  @retval 0                    S1 is equivalent to S2.
+  @retval >0                   S1 is lexically greater than S2.
+  @retval <0                   S1 is lexically less than S2.
+**/
 INTN
 FatStriCmp (
   IN CHAR16             *Str1,
@@ -950,6 +1351,29 @@ FatStriCmp (
 //
 // Open.c
 //
+
+/**
+
+  Open a file for a file name relative to an existing OFile.
+  The IFile of the newly opened file is passed out.
+
+  @param  OFile                 - The file that serves as a starting reference point.
+  @param  NewIFile              - The newly generated IFile instance.
+  @param  FileName              - The file name relative to the OFile.
+  @param  OpenMode              - Open mode.
+  @param  Attributes            - Attributes to set if the file is created.
+
+
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @retval EFI_INVALID_PARAMETER - The open mode is conflict with the attributes
+                          or the file name is not valid.
+  @retval EFI_NOT_FOUND         - Conficts between dir intention and attribute.
+  @retval EFI_WRITE_PROTECTED   - Can't open for write if the volume is read only.
+  @retval EFI_ACCESS_DENIED     - If the file's attribute is read only, and the
+                          open is for read-write fail it.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
+
+**/
 EFI_STATUS
 FatOFileOpen (
   IN FAT_OFILE          *OFile,
@@ -959,6 +1383,18 @@ FatOFileOpen (
   IN UINT8              Attributes
   );
 
+/**
+
+  Create an Open instance for the existing OFile.
+  The IFile of the newly opened file is passed out.
+
+  @param  OFile                 - The file that serves as a starting reference point.
+  @param  PtrIFile              - The newly generated IFile instance.
+
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory for the IFile
+  @retval EFI_SUCCESS           - Create the new IFile for the OFile successfully
+
+**/
 EFI_STATUS
 FatAllocateIFile (
   IN FAT_OFILE          *OFile,
@@ -968,6 +1404,18 @@ FatAllocateIFile (
 //
 // OpenVolume.c
 //
+/**
+
+  Implements Simple File System Protocol interface function OpenVolume().
+
+  @param  This                  - Calling context.
+  @param  File                  - the Root Directory of the volume.
+
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
+  @retval EFI_VOLUME_CORRUPTED  - The FAT type is error.
+  @retval EFI_SUCCESS           - Open the volume successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 FatOpenVolume (
@@ -978,6 +1426,22 @@ FatOpenVolume (
 //
 // ReadWrite.c
 //
+/**
+
+  This function reads data from a file or writes data to a file.
+  It uses OFile->PosRem to determine how much data can be accessed in one time.
+
+  @param  OFile                 - The open file.
+  @param  IoMode                - Indicate whether the access mode is reading or writing.
+  @param  Position              - The position where data will be accessed.
+  @param  DataBufferSize        - Size of Buffer.
+  @param  UserBuffer            - Buffer containing data.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - Access the data successfully.
+  @return other                 - An error occurred when operating on the disk.
+
+**/
 EFI_STATUS
 FatAccessOFile (
   IN FAT_OFILE          *OFile,
@@ -988,18 +1452,52 @@ FatAccessOFile (
   IN FAT_TASK           *Task
   );
 
+/**
+
+  Expand OFile by appending zero bytes at the end of OFile.
+
+  @param  OFile                 - The open file.
+  @param  ExpandedSize          - The number of zero bytes appended at the end of the file.
+
+  @retval EFI_SUCCESS           - The file is expanded successfully.
+  @return other                 - An error occurred when expanding file.
+
+**/
 EFI_STATUS
 FatExpandOFile (
   IN FAT_OFILE          *OFile,
   IN UINT64             ExpandedSize
   );
 
+/**
+
+  Write zero pool from the WritePos to the end of OFile.
+
+  @param  OFile                 - The open file to write zero pool.
+  @param  WritePos              - The number of zero bytes written.
+
+  @retval EFI_SUCCESS           - Write the zero pool successfully.
+  @retval EFI_OUT_OF_RESOURCES  - Not enough memory to perform the operation.
+  @return other                 - An error occurred when writing disk.
+
+**/
 EFI_STATUS
 FatWriteZeroPool (
   IN FAT_OFILE          *OFile,
   IN UINTN              WritePos
   );
 
+/**
+
+  Truncate the OFile to smaller file size.
+
+  @param  OFile                 - The open file.
+  @param  TruncatedSize         - The new file size.
+
+  @retval EFI_SUCCESS           - The file is truncated successfully.
+  @return other                 - An error occurred when truncating file.
+
+**/
 EFI_STATUS
 FatTruncateOFile (
   IN FAT_OFILE          *OFile,
@@ -1009,29 +1507,83 @@ FatTruncateOFile (
 //
 // DirectoryManage.c
 //
+/**
+
+  Set the OFile's current directory cursor to the list head.
+
+  @param OFile                 - The directory OFile whose directory cursor is reset.
+
+**/
 VOID
 FatResetODirCursor (
   IN FAT_OFILE          *OFile
   );
 
+/**
+
+  Set the directory's cursor to the next and get the next directory entry.
+
+  @param  OFile                 - The parent OFile.
+  @param PtrDirEnt             - The next directory entry.
+
+  @retval EFI_SUCCESS           - We get the next directory entry successfully.
+  @return other                 - An error occurred when get next directory entry.
+
+**/
 EFI_STATUS
 FatGetNextDirEnt (
   IN  FAT_OFILE         *OFile,
   OUT FAT_DIRENT        **PtrDirEnt
   );
 
+/**
+
+  Remove this directory entry node from the list of directory entries and hash table.
+
+  @param  OFile                - The parent OFile.
+  @param  DirEnt               - The directory entry to be removed.
+
+  @retval EFI_SUCCESS          - The directory entry is successfully removed.
+  @return other                - An error occurred when removing the directory entry.
+
+**/
 EFI_STATUS
 FatRemoveDirEnt (
   IN FAT_OFILE          *OFile,
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Save the directory entry to disk.
+
+  @param  OFile                 - The parent OFile which needs to update.
+  @param  DirEnt                - The directory entry to be saved.
+
+  @retval EFI_SUCCESS           - Store the directory entry successfully.
+  @return other                 - An error occurred when writing the directory entry.
+
+**/
 EFI_STATUS
 FatStoreDirEnt (
   IN FAT_OFILE          *OFile,
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Create a directory entry in the parent OFile.
+
+  @param  OFile                 - The parent OFile.
+  @param  FileName              - The filename of the newly-created directory entry.
+  @param  Attributes            - The attribute of the newly-created directory entry.
+  @param  PtrDirEnt             - The pointer to the newly-created directory entry.
+
+  @retval EFI_SUCCESS           - The directory entry is successfully created.
+  @retval EFI_OUT_OF_RESOURCES  - Not enough memory to create the directory entry.
+  @return other                 - An error occurred when creating the directory entry.
+
+**/
 EFI_STATUS
 FatCreateDirEnt (
   IN  FAT_OFILE         *OFile,
@@ -1040,22 +1592,60 @@ FatCreateDirEnt (
   OUT FAT_DIRENT        **PtrDirEnt
   );
 
+/**
+
+  Determine whether the directory entry is "." or ".." entry.
+
+  @param  DirEnt               - The corresponding directory entry.
+
+  @retval TRUE                 - The directory entry is "." or ".." directory entry
+  @retval FALSE                - The directory entry is not "." or ".." directory entry
+
+**/
 BOOLEAN
 FatIsDotDirEnt (
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Set the OFile's cluster and size info in its directory entry.
+
+  @param  OFile                 - The corresponding OFile.
+
+**/
 VOID
 FatUpdateDirEntClusterSizeInfo (
   IN FAT_OFILE          *OFile
   );
 
+/**
+
+  Copy all the information of DirEnt2 to DirEnt1 except for 8.3 name.
+
+  @param  DirEnt1               - The destination directory entry.
+  @param  DirEnt2               - The source directory entry.
+
+**/
 VOID
 FatCloneDirEnt (
   IN  FAT_DIRENT        *DirEnt1,
   IN  FAT_DIRENT        *DirEnt2
   );
 
+/**
+
+  Get the directory entry's info into Buffer.
+
+  @param  Volume                - FAT file system volume.
+  @param  DirEnt                - The corresponding directory entry.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing file info.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_BUFFER_TOO_SMALL  - The buffer is too small.
+
+**/
 EFI_STATUS
 FatGetDirEntInfo (
   IN FAT_VOLUME         *Volume,
@@ -1064,22 +1654,71 @@ FatGetDirEntInfo (
   OUT VOID              *Buffer
   );
 
+/**
+
+  Open the directory entry to get the OFile.
+
+  @param  Parent                - The parent OFile.
+  @param  DirEnt                - The directory entry to be opened.
+
+  @retval EFI_SUCCESS           - The directory entry is successfully opened.
+  @retval EFI_OUT_OF_RESOURCES  - not enough memory to allocate a new OFile.
+  @return other                 - An error occurred when opening the directory entry.
+
+**/
 EFI_STATUS
 FatOpenDirEnt (
   IN FAT_OFILE          *OFile,
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Create "." and ".." directory entries in the newly-created parent OFile.
+
+  @param  OFile                 - The parent OFile.
+
+  @retval EFI_SUCCESS           - The dot directory entries are successfully created.
+  @return other                 - An error occurred when creating the directory entry.
+
+**/
 EFI_STATUS
 FatCreateDotDirEnts (
   IN FAT_OFILE          *OFile
   );
 
+/**
+
+  Close the directory entry and free the OFile.
+
+  @param  DirEnt               - The directory entry to be closed.
+
+**/
 VOID
 FatCloseDirEnt (
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Traverse filename and open all OFiles that can be opened.
+  Update filename pointer to the component that can't be opened.
+  If more than one name component remains, returns an error;
+  otherwise, return the remaining name component so that the caller might choose to create it.
+
+  @param  PtrOFile              - As input, the reference OFile; as output, the located OFile.
+  @param  FileName              - The file name relevant to the OFile.
+  @param  Attributes            - The attribute of the destination OFile.
+  @param  NewFileName           - The remaining file name.
+
+  @retval EFI_NOT_FOUND         - The file name can't be opened and there is more than one
+                          components within the name left (this means the name can
+                          not be created either).
+  @retval EFI_INVALID_PARAMETER - The parameter is not valid.
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @return other                 - An error occured when locating the OFile.
+
+**/
 EFI_STATUS
 FatLocateOFile (
   IN OUT FAT_OFILE      **PtrOFile,
@@ -1088,12 +1727,35 @@ FatLocateOFile (
      OUT CHAR16         *NewFileName
   );
 
+/**
+
+  Get the directory entry for the volume.
+
+  @param  Volume                - FAT file system volume.
+  @param  Name                  - The file name of the volume.
+
+  @retval EFI_SUCCESS           - Update the volume with the directory entry sucessfully.
+  @return others                - An error occurred when getting volume label.
+
+**/
 EFI_STATUS
 FatGetVolumeEntry (
   IN FAT_VOLUME         *Volume,
   IN CHAR16             *Name
   );
 
+/**
+
+  Set the relevant directory entry into disk for the volume.
+
+  @param  Volume              - FAT file system volume.
+  @param  Name                - The new file name of the volume.
+
+  @retval EFI_SUCCESS         - Update the Volume sucessfully.
+  @retval EFI_UNSUPPORTED     - The input label is not a valid volume label.
+  @return other               - An error occurred when setting volume label.
+
+**/
 EFI_STATUS
 FatSetVolumeEntry (
   IN FAT_VOLUME         *Volume,
@@ -1103,24 +1765,60 @@ FatSetVolumeEntry (
 //
 // Hash.c
 //
+/**
+
+  Search the long name hash table for the directory entry.
+
+  @param  ODir                  - The directory to be searched.
+  @param  LongNameString        - The long name string to search.
+
+  @return The previous long name hash node of the directory entry.
+
+**/
 FAT_DIRENT **
 FatLongNameHashSearch (
   IN FAT_ODIR           *ODir,
   IN CHAR16             *LongNameString
   );
 
+/**
+
+  Search the short name hash table for the directory entry.
+
+  @param  ODir                  - The directory to be searched.
+  @param  ShortNameString       - The short name string to search.
+
+  @return The previous short name hash node of the directory entry.
+
+**/
 FAT_DIRENT **
 FatShortNameHashSearch (
   IN FAT_ODIR           *ODir,
   IN CHAR8              *ShortNameString
   );
 
+/**
+
+  Insert directory entry to hash table.
+
+  @param  ODir                  - The parent directory.
+  @param  DirEnt                - The directory entry node.
+
+**/
 VOID
 FatInsertToHashTable (
   IN FAT_ODIR           *ODir,
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Delete directory entry from hash table.
+
+  @param  ODir                  - The parent directory.
+  @param  DirEnt                - The directory entry node.
+
+**/
 VOID
 FatDeleteFromHashTable (
   IN FAT_ODIR           *ODir,
@@ -1130,18 +1828,50 @@ FatDeleteFromHashTable (
 //
 // FileName.c
 //
+/**
+
+  This function checks whether the input FileName is a valid 8.3 short name.
+  If the input FileName is a valid 8.3, the output is the 8.3 short name;
+  otherwise, the output is the base tag of 8.3 short name.
+
+  @param  FileName              - The input unicode filename.
+  @param  File8Dot3Name         - The output ascii 8.3 short name or base tag of 8.3 short name.
+
+  @retval TRUE                  - The input unicode filename is a valid 8.3 short name.
+  @retval FALSE                 - The input unicode filename is not a valid 8.3 short name.
+
+**/
 BOOLEAN
 FatCheckIs8Dot3Name (
   IN CHAR16             *FileName,
   OUT CHAR8             *File8Dot3Name
   );
 
+/**
+
+  This function generates 8Dot3 name from user specified name for a newly created file.
+
+  @param  Parent                - The parent directory.
+  @param  DirEnt                - The directory entry whose 8Dot3Name needs to be generated.
+
+**/
 VOID
 FatCreate8Dot3Name (
   IN FAT_OFILE          *Parent,
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Convert the ascii fat name to the unicode string and strip trailing spaces,
+  and if necessary, convert the unicode string to lower case.
+
+  @param  FatName               - The Char8 string needs to be converted.
+  @param  Len                   - The length of the fat name.
+  @param  LowerCase             - Indicate whether to convert the string to lower case.
+  @param  Str                   - The result of the convertion.
+
+**/
 VOID
 FatNameToStr (
   IN CHAR8              *FatName,
@@ -1150,11 +1880,27 @@ FatNameToStr (
   IN CHAR16             *Str
   );
 
+/**
+
+  Set the caseflag value for the directory entry.
+
+  @param DirEnt                - The logical directory entry whose caseflag value is to be set.
+
+**/
 VOID
 FatSetCaseFlag (
   IN FAT_DIRENT         *DirEnt
   );
 
+/**
+
+  Convert the 8.3 ASCII fat name to cased Unicode string according to case flag.
+
+  @param  DirEnt                - The corresponding directory entry.
+  @param  FileString            - The output Unicode file name.
+  @param  FileStringMax           The max length of FileString.
+
+**/
 VOID
 FatGetFileNameViaCaseFlag (
   IN     FAT_DIRENT     *DirEnt,
@@ -1162,17 +1908,51 @@ FatGetFileNameViaCaseFlag (
   IN     UINTN          FileStringMax
   );
 
+/**
+
+  Get the Check sum for a short name.
+
+  @param  ShortNameString       - The short name for a file.
+
+  @retval Sum                   - UINT8 checksum.
+
+**/
 UINT8
 FatCheckSum (
   IN CHAR8              *ShortNameString
   );
 
+/**
+
+  Takes Path as input, returns the next name component
+  in Name, and returns the position after Name (e.g., the
+  start of the next name component)
+
+  @param  Path                  - The path of one file.
+  @param  Name                  - The next name component in Path.
+
+  The position after Name in the Path
+
+**/
 CHAR16*
 FatGetNextNameComponent (
   IN  CHAR16            *Path,
   OUT CHAR16            *Name
   );
 
+/**
+
+  Check whether the IFileName is valid long file name. If the IFileName is a valid
+  long file name, then we trim the possible leading blanks and leading/trailing dots.
+  the trimmed filename is stored in OutputFileName
+
+  @param  InputFileName         - The input file name.
+  @param  OutputFileName        - The output file name.
+
+  @retval TRUE                  - The InputFileName is a valid long file name.
+  @retval FALSE                 - The InputFileName is not a valid long file name.
+
+**/
 BOOLEAN
 FatFileNameIsValid (
   IN  CHAR16  *InputFileName,
@@ -1182,16 +1962,40 @@ FatFileNameIsValid (
 //
 // DirectoryCache.c
 //
+/**
+
+  Discard the directory structure when an OFile will be freed.
+  Volume will cache this directory if the OFile does not represent a deleted file.
+
+  @param  OFile                 - The OFile whose directory structure is to be discarded.
+
+**/
 VOID
 FatDiscardODir (
   IN FAT_OFILE    *OFile
   );
 
+/**
+
+  Request the directory structure when an OFile is newly generated.
+  If the directory structure is cached by volume, then just return this directory;
+  Otherwise, allocate a new one for OFile.
+
+  @param  OFile                 - The OFile which requests directory structure.
+
+**/
 VOID
 FatRequestODir (
   IN FAT_OFILE    *OFile
   );
 
+/**
+
+  Clean up all the cached directory structures when the volume is going to be abandoned.
+
+  @param  Volume                - FAT file system volume.
+
+**/
 VOID
 FatCleanupODirCache (
   IN FAT_VOLUME   *Volume
