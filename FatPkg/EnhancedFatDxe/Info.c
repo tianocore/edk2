@@ -34,8 +34,8 @@ FatGetVolumeInfo (
 EFI_STATUS
 FatSetVolumeInfo (
   IN FAT_VOLUME       *Volume,
-  IN OUT UINTN        BufferSize,
-  OUT VOID            *Buffer
+  IN UINTN            BufferSize,
+  IN VOID            *Buffer
   );
 
 EFI_STATUS
