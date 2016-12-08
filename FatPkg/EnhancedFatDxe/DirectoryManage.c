@@ -60,7 +60,7 @@ Returns:
     //
     // End of directory
     //
-    ASSERT (IoMode == READ_DATA);
+    ASSERT (IoMode == ReadData);
     ((FAT_DIRECTORY_ENTRY *) Entry)->FileName[0] = EMPTY_ENTRY_MARK;
     ((FAT_DIRECTORY_ENTRY *) Entry)->Attributes  = 0;
     return EFI_SUCCESS;
@@ -106,7 +106,7 @@ Returns:
   //
   // Write directory entry
   //
-  Status = FatAccessEntry (OFile, WRITE_DATA, EntryPos, &DirEnt->Entry);
+  Status = FatAccessEntry (OFile, WriteData, EntryPos, &DirEnt->Entry);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -147,7 +147,7 @@ Returns:
         LfnEntry.Ordinal = DELETE_ENTRY_MARK;
       }
 
-      Status = FatAccessEntry (OFile, WRITE_DATA, EntryPos, &LfnEntry);
+      Status = FatAccessEntry (OFile, WriteData, EntryPos, &LfnEntry);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -322,7 +322,7 @@ Returns:
     }
 
     EntryPos--;
-    Status = FatAccessEntry (Parent, READ_DATA, EntryPos, &LfnEntry);
+    Status = FatAccessEntry (Parent, ReadData, EntryPos, &LfnEntry);
     if (EFI_ERROR (Status) ||
         LfnEntry.Attributes != FAT_ATTRIBUTE_LFN ||
         LfnEntry.MustBeZero != 0 ||
@@ -442,7 +442,7 @@ Returns:
     //
     // Read the next directory entry until we find a valid directory entry (excluding lfn entry)
     //
-    Status = FatAccessEntry (OFile, READ_DATA, ODir->CurrentEndPos, &Entry);
+    Status = FatAccessEntry (OFile, ReadData, ODir->CurrentEndPos, &Entry);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -462,7 +462,7 @@ Returns:
     // Although FAT spec states this field is always 0 for FAT12 & FAT16, some applications
     // might use it for some special usage, it is safer to zero it in memory for FAT12 & FAT16.
     //
-    if (OFile->Volume->FatType != FAT32) {
+    if (OFile->Volume->FatType != Fat32) {
       Entry.FileClusterHigh = 0;
     }
 
@@ -857,7 +857,7 @@ Returns:
   Entry           = &DirEnt->Entry;
   DirEnt->Invalid = TRUE;
   do {
-    Status = FatAccessEntry (Root, READ_DATA, EntryPos, Entry);
+    Status = FatAccessEntry (Root, ReadData, EntryPos, Entry);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1335,7 +1335,7 @@ Returns:
       Volume                = VOLUME_FROM_ROOT_DIRENT (DirEnt);
       Volume->Root          = OFile;
       OFile->FileCluster    = Volume->RootCluster;
-      if (Volume->FatType  != FAT32) {
+      if (Volume->FatType  != Fat32) {
         OFile->IsFixedRootDir  = TRUE;
       }
     }

@@ -59,11 +59,11 @@ Returns:
   // Compute buffer position needed
   //
   switch (Volume->FatType) {
-  case FAT12:
+  case Fat12:
     Pos = FAT_POS_FAT12 (Index);
     break;
 
-  case FAT16:
+  case Fat16:
     Pos = FAT_POS_FAT16 (Index);
     break;
 
@@ -76,7 +76,7 @@ Returns:
   Volume->FatEntryPos = Volume->FatPos + Pos;
   Status = FatDiskIo (
              Volume,
-             READ_FAT,
+             ReadFat,
              Volume->FatEntryPos,
              Volume->FatEntrySize,
              &Volume->FatEntryBuffer,
@@ -113,9 +113,9 @@ Returns:
 --*/
 {
   VOID    *Pos;
-  UINT8   *E12;
-  UINT16  *E16;
-  UINT32  *E32;
+  UINT8   *En12;
+  UINT16  *En16;
+  UINT32  *En32;
   UINTN   Accum;
 
   Pos = FatLoadFatEntry (Volume, Index);
@@ -125,22 +125,22 @@ Returns:
   }
 
   switch (Volume->FatType) {
-  case FAT12:
-    E12   = Pos;
-    Accum = E12[0] | (E12[1] << 8);
+  case Fat12:
+    En12   = Pos;
+    Accum = En12[0] | (En12[1] << 8);
     Accum = FAT_ODD_CLUSTER_FAT12 (Index) ? (Accum >> 4) : (Accum & FAT_CLUSTER_MASK_FAT12);
     Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT12) ? FAT_CLUSTER_SPECIAL_EXT : 0);
     break;
 
-  case FAT16:
-    E16   = Pos;
-    Accum = *E16;
+  case Fat16:
+    En16   = Pos;
+    Accum = *En16;
     Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT16) ? FAT_CLUSTER_SPECIAL_EXT : 0);
     break;
 
   default:
-    E32   = Pos;
-    Accum = *E32 & FAT_CLUSTER_MASK_FAT32;
+    En32   = Pos;
+    Accum = *En32 & FAT_CLUSTER_MASK_FAT32;
     Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT32) ? FAT_CLUSTER_SPECIAL_EXT : 0);
   }
 
@@ -175,9 +175,9 @@ Returns:
 --*/
 {
   VOID        *Pos;
-  UINT8       *E12;
-  UINT16      *E16;
-  UINT32      *E32;
+  UINT8       *En12;
+  UINT16      *En16;
+  UINT32      *En32;
   UINTN       Accum;
   EFI_STATUS  Status;
   UINTN       OriginalVal;
@@ -206,9 +206,9 @@ Returns:
   // Update the value
   //
   switch (Volume->FatType) {
-  case FAT12:
-    E12   = Pos;
-    Accum = E12[0] | (E12[1] << 8);
+  case Fat12:
+    En12   = Pos;
+    Accum = En12[0] | (En12[1] << 8);
     Value = Value & FAT_CLUSTER_MASK_FAT12;
 
     if (FAT_ODD_CLUSTER_FAT12 (Index)) {
@@ -217,25 +217,25 @@ Returns:
       Accum = Value | (Accum & FAT_CLUSTER_UNMASK_FAT12);
     }
 
-    E12[0]  = (UINT8) (Accum & 0xFF);
-    E12[1]  = (UINT8) (Accum >> 8);
+    En12[0]  = (UINT8) (Accum & 0xFF);
+    En12[1]  = (UINT8) (Accum >> 8);
     break;
 
-  case FAT16:
-    E16   = Pos;
-    *E16  = (UINT16) Value;
+  case Fat16:
+    En16   = Pos;
+    *En16  = (UINT16) Value;
     break;
 
   default:
-    E32   = Pos;
-    *E32  = (*E32 & FAT_CLUSTER_UNMASK_FAT32) | (UINT32) (Value & FAT_CLUSTER_MASK_FAT32);
+    En32   = Pos;
+    *En32  = (*En32 & FAT_CLUSTER_UNMASK_FAT32) | (UINT32) (Value & FAT_CLUSTER_MASK_FAT32);
   }
   //
   // If the volume's dirty bit is not set, set it now
   //
-  if (!Volume->FatDirty && Volume->FatType != FAT12) {
+  if (!Volume->FatDirty && Volume->FatType != Fat12) {
     Volume->FatDirty = TRUE;
-    FatAccessVolumeDirty (Volume, WRITE_FAT, &Volume->DirtyValue);
+    FatAccessVolumeDirty (Volume, WriteFat, &Volume->DirtyValue);
   }
   //
   // Write the updated fat entry value to the volume
@@ -244,7 +244,7 @@ Returns:
   //
   Status = FatDiskIo (
              Volume,
-             WRITE_FAT,
+             WriteFat,
              Volume->FatEntryPos,
              Volume->FatEntrySize,
              &Volume->FatEntryBuffer,

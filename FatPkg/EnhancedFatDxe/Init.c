@@ -265,7 +265,7 @@ Returns:
   SectorsPerFat = FatBs.FatBsb.SectorsPerFat;
   if (SectorsPerFat == 0) {
     SectorsPerFat = FatBs.FatBse.Fat32Bse.LargeSectorsPerFat;
-    FatType       = FAT32;
+    FatType       = Fat32;
   }
   //
   // Is boot sector a fat sector?
@@ -305,7 +305,7 @@ Returns:
   //
   // Initialize fields the volume information for this FatType
   //
-  if (FatType != FAT32) {
+  if (FatType != Fat32) {
     if (FatBs.FatBsb.RootEntries == 0) {
       return EFI_UNSUPPORTED;
     }
@@ -350,12 +350,12 @@ Returns:
   //
   // If this is not a fat32, determine if it's a fat16 or fat12
   //
-  if (FatType != FAT32) {
+  if (FatType != Fat32) {
     if (Volume->MaxCluster >= FAT_MAX_FAT16_CLUSTER) {
       return EFI_VOLUME_CORRUPTED;
     }
 
-    FatType = Volume->MaxCluster < FAT_MAX_FAT12_CLUSTER ? FAT12 : FAT16;
+    FatType = Volume->MaxCluster < FAT_MAX_FAT12_CLUSTER ? Fat12 : Fat16;
     //
     // fat12 & fat16 fat-entries are 2 bytes
     //
@@ -376,8 +376,8 @@ Returns:
   // We should keep the initial value as the NotDirtyValue
   // in case the volume is dirty already
   //
-  if (FatType != FAT12) {
-    Status = FatAccessVolumeDirty (Volume, READ_DISK, &Volume->NotDirtyValue);
+  if (FatType != Fat12) {
+    Status = FatAccessVolumeDirty (Volume, ReadDisk, &Volume->NotDirtyValue);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -387,10 +387,10 @@ Returns:
   //
   // If present, read the fat hint info
   //
-  if (FatType == FAT32) {
+  if (FatType == Fat32) {
     Volume->FreeInfoPos = FatBs.FatBse.Fat32Bse.FsInfoSector * BlockSize;
     if (FatBs.FatBse.Fat32Bse.FsInfoSector != 0) {
-      FatDiskIo (Volume, READ_DISK, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector, NULL);
+      FatDiskIo (Volume, ReadDisk, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector, NULL);
       if (Volume->FatInfoSector.Signature == FAT_INFO_SIGNATURE &&
           Volume->FatInfoSector.InfoBeginSignature == FAT_INFO_BEGIN_SIGNATURE &&
           Volume->FatInfoSector.InfoEndSignature == FAT_INFO_END_SIGNATURE &&

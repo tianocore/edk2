@@ -70,7 +70,7 @@ Returns:
   CACHE_TAG   *CacheTag;
   UINT8       *BaseAddress;
 
-  DiskCache     = &Volume->DiskCache[CACHE_DATA];
+  DiskCache     = &Volume->DiskCache[CacheData];
   BaseAddress   = DiskCache->CacheBase;
   GroupMask     = DiskCache->GroupMask;
   PageAlignment = DiskCache->PageAlignment;
@@ -85,7 +85,7 @@ Returns:
       // in cache is in this rang, this data in the Buffer need to
       // be updated with the cache's dirty data.
       //
-      if (IoMode == READ_DISK) {
+      if (IoMode == ReadDisk) {
         if (CacheTag->Dirty) {
           CopyMem (
             Buffer + ((PageNo - StartPageNo) << PageAlignment),
@@ -150,7 +150,7 @@ Returns:
   PageAddress   = DiskCache->CacheBase + (GroupNo << PageAlignment);
   EntryPos      = DiskCache->BaseAddress + LShiftU64 (PageNo, PageAlignment);
   RealSize      = CacheTag->RealSize;
-  if (IoMode == READ_DISK) {
+  if (IoMode == ReadDisk) {
     RealSize  = (UINTN)1 << PageAlignment;
     MaxSize   = DiskCache->LimitAddress - EntryPos;
     if (MaxSize < RealSize) {
@@ -160,7 +160,7 @@ Returns:
   }
 
   WriteCount = 1;
-  if (DataType == CACHE_FAT && IoMode == WRITE_DISK) {
+  if (DataType == CacheFat && IoMode == WriteDisk) {
     WriteCount = Volume->NumFats;
   }
 
@@ -224,7 +224,7 @@ Returns:
   // Write dirty cache page back to disk
   //
   if (CacheTag->RealSize > 0 && CacheTag->Dirty) {
-    Status = FatExchangeCachePage (Volume, CacheDataType, WRITE_DISK, CacheTag, NULL);
+    Status = FatExchangeCachePage (Volume, CacheDataType, WriteDisk, CacheTag, NULL);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -233,7 +233,7 @@ Returns:
   // Load new data from disk;
   //
   CacheTag->PageNo  = PageNo;
-  Status            = FatExchangeCachePage (Volume, CacheDataType, READ_DISK, CacheTag, NULL);
+  Status            = FatExchangeCachePage (Volume, CacheDataType, ReadDisk, CacheTag, NULL);
 
   return Status;
 }
@@ -286,7 +286,7 @@ Returns:
   if (!EFI_ERROR (Status)) {
     Source      = DiskCache->CacheBase + (GroupNo << DiskCache->PageAlignment) + Offset;
     Destination = Buffer;
-    if (IoMode != READ_DISK) {
+    if (IoMode != ReadDisk) {
       CacheTag->Dirty   = TRUE;
       DiskCache->Dirty  = TRUE;
       Destination       = Source;
@@ -391,7 +391,7 @@ Returns:
     //
     // Accessing fat table cannot have alignment data
     //
-    ASSERT (CacheDataType == CACHE_DATA);
+    ASSERT (CacheDataType == CacheData);
 
     EntryPos    = Volume->RootPos + LShiftU64 (PageNo, PageAlignment);
     AlignedSize = AlignedPageCount << PageAlignment;
@@ -450,7 +450,7 @@ Returns:
   DISK_CACHE      *DiskCache;
   CACHE_TAG       *CacheTag;
 
-  for (CacheDataType = (CACHE_DATA_TYPE) 0; CacheDataType < CACHE_MAX_TYPE; CacheDataType++) {
+  for (CacheDataType = (CACHE_DATA_TYPE) 0; CacheDataType < CacheMaxType; CacheDataType++) {
     DiskCache = &Volume->DiskCache[CacheDataType];
     if (DiskCache->Dirty) {
       //
@@ -463,7 +463,7 @@ Returns:
           //
           // Write back all Dirty Data Cache Page to disk
           //
-          Status = FatExchangeCachePage (Volume, CacheDataType, WRITE_DISK, CacheTag, Task);
+          Status = FatExchangeCachePage (Volume, CacheDataType, WriteDisk, CacheTag, Task);
           if (EFI_ERROR (Status)) {
             return Status;
           }
@@ -511,24 +511,24 @@ Returns:
   //
   // Configure the parameters of disk cache
   //
-  if (Volume->FatType == FAT12) {
+  if (Volume->FatType == Fat12) {
     FatCacheGroupCount                  = FAT_FATCACHE_GROUP_MIN_COUNT;
-    DiskCache[CACHE_FAT].PageAlignment  = FAT_FATCACHE_PAGE_MIN_ALIGNMENT;
-    DiskCache[CACHE_DATA].PageAlignment = FAT_DATACACHE_PAGE_MIN_ALIGNMENT;
+    DiskCache[CacheFat].PageAlignment  = FAT_FATCACHE_PAGE_MIN_ALIGNMENT;
+    DiskCache[CacheData].PageAlignment = FAT_DATACACHE_PAGE_MIN_ALIGNMENT;
   } else {
     FatCacheGroupCount                  = FAT_FATCACHE_GROUP_MAX_COUNT;
-    DiskCache[CACHE_FAT].PageAlignment  = FAT_FATCACHE_PAGE_MAX_ALIGNMENT;
-    DiskCache[CACHE_DATA].PageAlignment = FAT_DATACACHE_PAGE_MAX_ALIGNMENT;
+    DiskCache[CacheFat].PageAlignment  = FAT_FATCACHE_PAGE_MAX_ALIGNMENT;
+    DiskCache[CacheData].PageAlignment = FAT_DATACACHE_PAGE_MAX_ALIGNMENT;
   }
 
-  DiskCache[CACHE_DATA].GroupMask     = FAT_DATACACHE_GROUP_COUNT - 1;
-  DiskCache[CACHE_DATA].BaseAddress   = Volume->RootPos;
-  DiskCache[CACHE_DATA].LimitAddress  = Volume->VolumeSize;
-  DiskCache[CACHE_FAT].GroupMask      = FatCacheGroupCount - 1;
-  DiskCache[CACHE_FAT].BaseAddress    = Volume->FatPos;
-  DiskCache[CACHE_FAT].LimitAddress   = Volume->FatPos + Volume->FatSize;
-  FatCacheSize                        = FatCacheGroupCount << DiskCache[CACHE_FAT].PageAlignment;
-  DataCacheSize                       = FAT_DATACACHE_GROUP_COUNT << DiskCache[CACHE_DATA].PageAlignment;
+  DiskCache[CacheData].GroupMask     = FAT_DATACACHE_GROUP_COUNT - 1;
+  DiskCache[CacheData].BaseAddress   = Volume->RootPos;
+  DiskCache[CacheData].LimitAddress  = Volume->VolumeSize;
+  DiskCache[CacheFat].GroupMask      = FatCacheGroupCount - 1;
+  DiskCache[CacheFat].BaseAddress    = Volume->FatPos;
+  DiskCache[CacheFat].LimitAddress   = Volume->FatPos + Volume->FatSize;
+  FatCacheSize                        = FatCacheGroupCount << DiskCache[CacheFat].PageAlignment;
+  DataCacheSize                       = FAT_DATACACHE_GROUP_COUNT << DiskCache[CacheData].PageAlignment;
   //
   // Allocate the Fat Cache buffer
   //
@@ -538,7 +538,7 @@ Returns:
   }
 
   Volume->CacheBuffer             = CacheBuffer;
-  DiskCache[CACHE_FAT].CacheBase  = CacheBuffer;
-  DiskCache[CACHE_DATA].CacheBase = CacheBuffer + FatCacheSize;
+  DiskCache[CacheFat].CacheBase  = CacheBuffer;
+  DiskCache[CacheData].CacheBase = CacheBuffer + FatCacheSize;
   return EFI_SUCCESS;
 }

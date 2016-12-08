@@ -397,7 +397,7 @@ Returns:
         // Blocking access
         //
         DiskIo      = Volume->DiskIo;
-        IoFunction  = (IoMode == READ_DISK) ? DiskIo->ReadDisk : DiskIo->WriteDisk;
+        IoFunction  = (IoMode == ReadDisk) ? DiskIo->ReadDisk : DiskIo->WriteDisk;
         Status      = IoFunction (DiskIo, Volume->MediaId, Offset, BufferSize, Buffer);
       } else {
         //
@@ -409,7 +409,7 @@ Returns:
         } else {
           Subtask->Signature  = FAT_SUBTASK_SIGNATURE;
           Subtask->Task       = Task;
-          Subtask->Write      = (BOOLEAN) (IoMode == WRITE_DISK);
+          Subtask->Write      = (BOOLEAN) (IoMode == WriteDisk);
           Subtask->Offset     = Offset;
           Subtask->Buffer     = Buffer;
           Subtask->BufferSize = BufferSize;

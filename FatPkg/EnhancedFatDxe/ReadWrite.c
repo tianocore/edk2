@@ -253,7 +253,7 @@ Returns:
   //
   // Write to a directory is unsupported
   //
-  if ((OFile->ODir != NULL) && (IoMode == WRITE_DATA)) {
+  if ((OFile->ODir != NULL) && (IoMode == WriteData)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -261,7 +261,7 @@ Returns:
     return EFI_DEVICE_ERROR;
   }
 
-  if (IoMode == READ_DATA) {
+  if (IoMode == ReadData) {
     //
     // If position is at EOF, then return device error
     //
@@ -305,7 +305,7 @@ Returns:
       //
       // Read a directory is supported
       //
-      ASSERT (IoMode == READ_DATA);
+      ASSERT (IoMode == ReadData);
       Status = FatIFileReadDir (IFile, BufferSize, Buffer);
       OFile = NULL;
     } else {
@@ -317,7 +317,7 @@ Returns:
         //
         // The position goes beyond the end of file
         //
-        if (IoMode == READ_DATA) {
+        if (IoMode == ReadData) {
           //
           // Adjust the actual size read
           //
@@ -401,7 +401,7 @@ Returns:
 
 --*/
 {
-  return FatIFileAccess (FHand, READ_DATA, BufferSize, Buffer, NULL);
+  return FatIFileAccess (FHand, ReadData, BufferSize, Buffer, NULL);
 }
 
 EFI_STATUS
@@ -430,7 +430,7 @@ Returns:
 
 --*/
 {
-  return FatIFileAccess (FHand, READ_DATA, &Token->BufferSize, Token->Buffer, Token);
+  return FatIFileAccess (FHand, ReadData, &Token->BufferSize, Token->Buffer, Token);
 }
 
 EFI_STATUS
@@ -464,7 +464,7 @@ Returns:
 
 --*/
 {
-  return FatIFileAccess (FHand, WRITE_DATA, BufferSize, Buffer, NULL);
+  return FatIFileAccess (FHand, WriteData, BufferSize, Buffer, NULL);
 }
 
 EFI_STATUS
@@ -493,7 +493,7 @@ Returns:
 
 --*/
 {
-  return FatIFileAccess (FHand, WRITE_DATA, &Token->BufferSize, Token->Buffer, Token);
+  return FatIFileAccess (FHand, WriteData, &Token->BufferSize, Token->Buffer, Token);
 }
 
 EFI_STATUS
@@ -563,7 +563,7 @@ Returns:
     Position   += Len;
     UserBuffer += Len;
     BufferSize -= Len;
-    if (IoMode == WRITE_DATA) {
+    if (IoMode == WriteData) {
       OFile->Dirty    = TRUE;
       OFile->Archive  = TRUE;
     }
@@ -664,7 +664,7 @@ Returns:
   do {
     WriteSize     = AppendedSize > BufferSize ? BufferSize : (UINTN) AppendedSize;
     AppendedSize -= WriteSize;
-    Status = FatAccessOFile (OFile, WRITE_DATA, WritePos, &WriteSize, ZeroBuffer, NULL);
+    Status = FatAccessOFile (OFile, WriteData, WritePos, &WriteSize, ZeroBuffer, NULL);
     if (EFI_ERROR (Status)) {
       break;
     }

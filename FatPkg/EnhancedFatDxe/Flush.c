@@ -462,7 +462,7 @@ Returns:
     // indicates this a FAT32 volume
     //
     if (Volume->FreeInfoValid && Volume->FatDirty && Volume->FreeInfoPos) {
-      Status = FatDiskIo (Volume, WRITE_DISK, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector, Task);
+      Status = FatDiskIo (Volume, WriteDisk, Volume->FreeInfoPos, sizeof (FAT_INFO_SECTOR), &Volume->FatInfoSector, Task);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -470,9 +470,9 @@ Returns:
     //
     // Update that the volume is not dirty
     //
-    if (Volume->FatDirty && Volume->FatType != FAT12) {
+    if (Volume->FatDirty && Volume->FatType != Fat12) {
       Volume->FatDirty  = FALSE;
-      Status            = FatAccessVolumeDirty (Volume, WRITE_FAT, &Volume->NotDirtyValue);
+      Status            = FatAccessVolumeDirty (Volume, WriteFat, &Volume->NotDirtyValue);
       if (EFI_ERROR (Status)) {
         return Status;
       }

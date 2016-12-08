@@ -128,28 +128,28 @@ typedef CHAR8                   LC_ISO_639_2;
 // The fat types we support
 //
 typedef enum {
-  FAT12,
-  FAT16,
-  FAT32,
+  Fat12,
+  Fat16,
+  Fat32,
   FatUndefined
 } FAT_VOLUME_TYPE;
 
 typedef enum {
-  CACHE_FAT,
-  CACHE_DATA,
-  CACHE_MAX_TYPE
+  CacheFat,
+  CacheData,
+  CacheMaxType
 } CACHE_DATA_TYPE;
 
 //
 // Used in FatDiskIo
 //
 typedef enum {
-  READ_DISK     = 0,  // raw disk read
-  WRITE_DISK    = 1,  // raw disk write
-  READ_FAT      = 2,  // read fat cache
-  WRITE_FAT     = 3,  // write fat cache
-  READ_DATA     = 6,  // read data cache
-  WRITE_DATA    = 7   // write data cache
+  ReadDisk     = 0,  // raw disk read
+  WriteDisk    = 1,  // raw disk write
+  ReadFat      = 2,  // read fat cache
+  WriteFat     = 3,  // write fat cache
+  ReadData     = 6,  // read data cache
+  WriteData    = 7   // write data cache
 } IO_MODE;
 
 #define CACHE_ENABLED(a)  ((a) >= 2)
@@ -384,7 +384,7 @@ typedef struct _FAT_VOLUME {
   // Disk Cache for this volume
   //
   VOID                            *CacheBuffer;
-  DISK_CACHE                      DiskCache[CACHE_MAX_TYPE];
+  DISK_CACHE                      DiskCache[CacheMaxType];
 } FAT_VOLUME;
 
 //
@@ -1100,7 +1100,7 @@ FatResetODirCursor (
 
 EFI_STATUS
 FatGetNextDirEnt (
-  IN  FAT_OFILE         *OFILE,
+  IN  FAT_OFILE         *OFile,
   OUT FAT_DIRENT        **PtrDirEnt
   );
 
