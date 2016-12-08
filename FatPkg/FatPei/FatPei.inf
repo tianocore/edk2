@@ -61,9 +61,9 @@
 
 
 [Ppis]
-  gEfiPeiVirtualBlockIoPpiGuid                  # PPI_NOTIFY SOMETIMES_CONSUMED
-  gEfiPeiVirtualBlockIo2PpiGuid                 # PPI_NOTIFY SOMETIMES_CONSUMED
-  gEfiPeiDeviceRecoveryModulePpiGuid            # SOMETIMES_PRODUCED
+  gEfiPeiVirtualBlockIoPpiGuid                  ## SOMETIMES_CONSUMES PPI_NOTIFY
+  gEfiPeiVirtualBlockIo2PpiGuid                 ## SOMETIMES_CONSUMES PPI_NOTIFY
+  gEfiPeiDeviceRecoveryModulePpiGuid            ## SOMETIMES_PRODUCES
 
 
 [FeaturePcd]

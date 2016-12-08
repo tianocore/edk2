@@ -1,5 +1,5 @@
 ## @file
-#  Component description file for FAT module.
+#  Component Description File for FAT module.
 #
 #  This UEFI driver detects the FAT file system in the disk.
 #  It also produces the Simple File System protocol for the consumer to

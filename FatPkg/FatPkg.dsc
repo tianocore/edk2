@@ -1,6 +1,5 @@
 ## @file
-#
-#  Build Binary Enhanced Fat Driver Modules
+#  Build Binary Enhanced Fat Driver Modules.
 #
 #  This Platform file is used to generate the Binary Fat Drivers
 #  for EDK II Prime release.
