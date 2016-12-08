@@ -146,12 +146,14 @@ typedef struct {
   CHAR8   SystemId[8];
 } FAT32_BOOT_SECTOR_EXT;
 
-typedef struct {
-  FAT_BOOT_SECTOR_BASIC   FatBsb;
-  union {
+typedef union {
     FAT_BOOT_SECTOR_EXT   FatBse;
     FAT32_BOOT_SECTOR_EXT Fat32Bse;
-  } FatBse;
+  } FAT_BSE;
+
+typedef struct {
+  FAT_BOOT_SECTOR_BASIC   FatBsb;
+  FAT_BSE  FatBse;
 } FAT_BOOT_SECTOR;
 
 //

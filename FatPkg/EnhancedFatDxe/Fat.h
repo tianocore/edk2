@@ -184,20 +184,26 @@ typedef struct {
 //
 // The directory entry for opened directory
 //
-typedef struct _FAT_DIRENT {
+
+typedef struct _FAT_DIRENT FAT_DIRENT;
+typedef struct _FAT_ODIR FAT_ODIR;
+typedef struct _FAT_OFILE FAT_OFILE;
+typedef struct _FAT_VOLUME FAT_VOLUME;
+
+struct _FAT_DIRENT {
   UINTN               Signature;
   UINT16              EntryPos;               // The position of this directory entry in the parent directory file
   UINT8               EntryCount;             // The count of the directory entry in the parent directory file
   BOOLEAN             Invalid;                // Indicate whether this directory entry is valid
   CHAR16              *FileString;            // The unicode long file name for this directory entry
-  struct _FAT_OFILE   *OFile;                 // The OFile of the corresponding directory entry
-  struct _FAT_DIRENT  *ShortNameForwardLink;  // Hash successor link for short filename
-  struct _FAT_DIRENT  *LongNameForwardLink;   // Hash successor link for long filename
+  FAT_OFILE           *OFile;                 // The OFile of the corresponding directory entry
+  FAT_DIRENT          *ShortNameForwardLink;  // Hash successor link for short filename
+  FAT_DIRENT          *LongNameForwardLink;   // Hash successor link for long filename
   LIST_ENTRY          Link;                   // Connection of every directory entry
   FAT_DIRECTORY_ENTRY Entry;                  // The physical directory entry stored in disk
-} FAT_DIRENT;
+};
 
-typedef struct _FAT_ODIR {
+struct _FAT_ODIR {
   UINTN               Signature;
   UINT32              CurrentEndPos;          // Current end position of the directory
   UINT32              CurrentPos;             // Current position of the directory
@@ -208,14 +214,14 @@ typedef struct _FAT_ODIR {
   UINTN               DirCacheTag;            // The identification of the directory when in directory cache
   FAT_DIRENT          *LongNameHashTable[HASH_TABLE_SIZE];
   FAT_DIRENT          *ShortNameHashTable[HASH_TABLE_SIZE];
-} FAT_ODIR;
+};
 
 typedef struct {
   UINTN               Signature;
   EFI_FILE_PROTOCOL   Handle;
   UINT64              Position;
   BOOLEAN             ReadOnly;
-  struct _FAT_OFILE   *OFile;
+  FAT_OFILE          *OFile;
   LIST_ENTRY          Tasks;                  // List of all FAT_TASKs
   LIST_ENTRY          Link;                   // Link to other IFiles
 } FAT_IFILE;
@@ -242,9 +248,9 @@ typedef struct {
 //
 // FAT_OFILE - Each opened file
 //
-typedef struct _FAT_OFILE {
+struct _FAT_OFILE {
   UINTN               Signature;
-  struct _FAT_VOLUME  *Volume;
+  FAT_VOLUME          *Volume;
   //
   // A permanant error code to return to all accesses to
   // this opened file
@@ -284,7 +290,7 @@ typedef struct _FAT_OFILE {
   //
   // The opened parent, full path length and currently opened child files
   //
-  struct _FAT_OFILE   *Parent;
+  FAT_OFILE           *Parent;
   UINTN               FullPathLen;
   LIST_ENTRY          ChildHead;
   LIST_ENTRY          ChildLink;
@@ -303,9 +309,9 @@ typedef struct _FAT_OFILE {
   // Link in Volume's reference list
   //
   LIST_ENTRY          CheckLink;
-} FAT_OFILE;
+};
 
-typedef struct _FAT_VOLUME {
+struct _FAT_VOLUME {
   UINTN                           Signature;
 
   EFI_HANDLE                      Handle;
@@ -366,7 +372,7 @@ typedef struct _FAT_VOLUME {
   // File Name of root OFile, it is empty string
   //
   CHAR16                          RootFileString[1];
-  struct _FAT_OFILE               *Root;
+  FAT_OFILE                       *Root;
 
   //
   // New OFiles are added to this list so they
@@ -385,7 +391,7 @@ typedef struct _FAT_VOLUME {
   //
   VOID                            *CacheBuffer;
   DISK_CACHE                      DiskCache[CacheMaxType];
-} FAT_VOLUME;
+};
 
 //
 // Function Prototypes
