@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, file path functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -208,6 +208,34 @@ StrnLenS (
   );
 
 /**
+  Returns the size of a Null-terminated Unicode string in bytes, including the
+  Null terminator.
+
+  This function returns the size of the Null-terminated Unicode string
+  specified by String in bytes, including the Null terminator.
+
+  If String is not aligned on a 16-bit boundary, then ASSERT().
+
+  @param  String   A pointer to a Null-terminated Unicode string.
+  @param  MaxSize  The maximum number of Destination Unicode
+                   char, including the Null terminator.
+
+  @retval 0  If String is NULL.
+  @retval (sizeof (CHAR16) * (MaxSize + 1))
+             If there is no Null terminator in the first MaxSize characters of
+             String.
+  @return The size of the Null-terminated Unicode string in bytes, including
+          the Null terminator.
+
+**/
+UINTN
+EFIAPI
+StrnSizeS (
+  IN CONST CHAR16              *String,
+  IN UINTN                     MaxSize
+  );
+
+/**
   Copies the string pointed to by Source (including the terminating null char)
   to the array pointed to by Destination.
 
@@ -378,6 +406,32 @@ StrnCatS (
 UINTN
 EFIAPI
 AsciiStrnLenS (
+  IN CONST CHAR8               *String,
+  IN UINTN                     MaxSize
+  );
+
+/**
+  Returns the size of a Null-terminated Ascii string in bytes, including the
+  Null terminator.
+
+  This function returns the size of the Null-terminated Ascii string specified
+  by String in bytes, including the Null terminator.
+
+  @param  String   A pointer to a Null-terminated Ascii string.
+  @param  MaxSize  The maximum number of Destination Ascii
+                   char, including the Null terminator.
+
+  @retval 0  If String is NULL.
+  @retval (sizeof (CHAR8) * (MaxSize + 1))
+             If there is no Null terminator in the first MaxSize characters of
+             String.
+  @return The size of the Null-terminated Ascii string in bytes, including the
+          Null terminator.
+
+**/
+UINTN
+EFIAPI
+AsciiStrnSizeS (
   IN CONST CHAR8               *String,
   IN UINTN                     MaxSize
   );
