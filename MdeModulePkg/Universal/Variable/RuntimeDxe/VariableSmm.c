@@ -695,11 +695,10 @@ SmmVariableHandler (
       // It is covered by previous CommBuffer check
       //
 
-      if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBufferSize, sizeof(UINTN))) {
-        DEBUG ((EFI_D_ERROR, "GetStatistics: SMM communication buffer in SMRAM!\n"));
-        Status = EFI_ACCESS_DENIED;
-        goto EXIT;
-      }
+      //
+      // Do not need to check CommBufferSize buffer as it should point to SMRAM
+      // that was used by SMM core to cache CommSize from SmmCommunication protocol.
+      //
 
       Status = SmmVariableGetStatistics (VariableInfo, &InfoSize);
       *CommBufferSize = InfoSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
