@@ -80,7 +80,7 @@
 
 [LibraryClasses.common.DXE_DRIVER]
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
-
+  NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
 
 [LibraryClasses.ARM]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf

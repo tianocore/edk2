@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -167,6 +168,7 @@ FvNameGuid         = d0dd3e90-343d-4cb3-8f69-772214989282
   #
 
   INF Omap35xxPkg/PciEmulation/PciEmulation.inf
+  INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
   INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf

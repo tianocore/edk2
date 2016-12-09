@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -22,33 +23,23 @@
   ENTRY_POINT                     = PciEmulationEntryPoint
 
 [Sources.common]
-  PciRootBridgeIo.c
   PciEmulation.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  IntelFrameworkPkg/IntelFrameworkPkg.dec
-  ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   Omap35xxPkg/Omap35xxPkg.dec
 
 [LibraryClasses]
   BaseLib
-  DxeServicesTableLib
-  UefiLib
+  DebugLib
+  IoLib
+  NonDiscoverableDeviceRegistrationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  UefiRuntimeServicesTableLib
-  IoLib
-  OmapDmaLib
-  DmaLib
 
 [Protocols]
-  gEfiPciRootBridgeIoProtocolGuid
-  gEfiDevicePathProtocolGuid
-  gEfiPciHostBridgeResourceAllocationProtocolGuid
-  gEfiPciIoProtocolGuid
   gEmbeddedExternalDeviceProtocolGuid
 
 [Depex]
