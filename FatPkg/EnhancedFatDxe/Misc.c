@@ -23,6 +23,7 @@ Revision History
 --*/
 
 #include "Fat.h"
+UINT8  mMonthDays[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 FAT_TASK *
 FatCreateTask (
@@ -698,7 +699,6 @@ Returns:
 
 --*/
 {
-  static UINT8  MonthDays[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
   UINTN         Day;
   BOOLEAN       ValidTime;
 
@@ -725,7 +725,7 @@ Returns:
     //
     // Perform a more specific check of the day of the month
     //
-    Day = MonthDays[Time->Month - 1];
+    Day = mMonthDays[Time->Month - 1];
     if (Time->Month == 2 && IS_LEAP_YEAR (Time->Year)) {
       Day += 1;
       //
