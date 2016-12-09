@@ -204,7 +204,10 @@
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_PROMPT  #language en-US "Version of Physical Presence interface supported by platform."
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_HELP  #language en-US "Null-terminated string of the Version of Physical Presence interface supported by platform."
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_HELP  #language en-US "Null-terminated string of the Version of Physical Presence interface supported by platform.<BR><BR>\n"
+                                                                                                   "To support configuring from setup page, this PCD can be DynamicHii type and map to a setup option.<BR>\n"
+                                                                                                   "For example, map to TCG2_VERSION.PpiVersion to be configured by Tcg2ConfigDxe driver.<BR>\n"
+                                                                                                   "gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L\"TCG2_VERSION\"|gTcg2ConfigFormSetGuid|0x0|\"1.3\"|NV,BS<BR>"
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdUserPhysicalPresence_PROMPT
 #language en-US

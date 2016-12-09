@@ -32,6 +32,12 @@ formset
     name  = TCG2_CONFIGURATION,
     guid  = TCG2_CONFIG_FORM_SET_GUID;
 
+  efivarstore TCG2_VERSION,
+    varid = TCG2_VERSION_VARSTORE_ID,
+    attribute = 0x03,  // EFI variable attribures  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE
+    name  = TCG2_VERSION,
+    guid  = TCG2_CONFIG_FORM_SET_GUID;
+
   form formid = TCG2_CONFIGURATION_FORM_ID,
     title = STRING_TOKEN(STR_TCG2_TITLE);
 
@@ -103,6 +109,20 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
     subtitle text = STRING_TOKEN(STR_TCG2_PP_OPERATION);
+
+    text
+      help   = STRING_TOKEN(STR_TCG2_PPI_VERSION_STATE_HELP),
+      text   = STRING_TOKEN(STR_TCG2_PPI_VERSION_STATE_PROMPT),
+        text   = STRING_TOKEN(STR_TCG2_PPI_VERSION_STATE_CONTENT);
+
+    oneof varid  = TCG2_VERSION.PpiVersion,
+          questionid = KEY_TCG2_PPI_VERSION,
+          prompt = STRING_TOKEN(STR_TCG2_PPI_VERSION_PROMPT),
+          help   = STRING_TOKEN(STR_TCG2_PPI_VERSION_HELP),
+          flags  = INTERACTIVE,
+            option text = STRING_TOKEN(STR_TCG2_PPI_VERSION_1_2), value = TCG2_PPI_VERSION_1_2, flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TCG2_PPI_VERSION_1_3), value = TCG2_PPI_VERSION_1_3, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+    endoneof;
 
     oneof name = Tpm2Operation,
           questionid = KEY_TPM2_OPERATION,

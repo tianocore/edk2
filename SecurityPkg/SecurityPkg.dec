@@ -5,7 +5,7 @@
 #  It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 #  and libraries instances, which are used for those features.
 #
-# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -299,10 +299,6 @@
   # @ValidList  0x80000003 | 0x010D0000
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice|0x010D0000|UINT32|0x00000007
 
-  ## Null-terminated string of the Version of Physical Presence interface supported by platform.
-  # @Prompt Version of Physical Presence interface supported by platform.
-  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|"1.3"|VOID*|0x00000008
-
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Indicates the presence or absence of the platform operator during firmware booting.
   #  If platform operator is not physical presence during boot. TPM will be locked and the TPM commands 
@@ -419,6 +415,13 @@
   ## This PCD defines length(in bytes) of the TCG2 Final event log area.
   # @Prompt Length(in bytes) of the TCG2 Final event log area.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2FinalLogAreaLen|0x8000|UINT32|0x00010018
+
+  ## Null-terminated string of the Version of Physical Presence interface supported by platform.<BR><BR>
+  # To support configuring from setup page, this PCD can be DynamicHii type and map to a setup option.<BR>
+  # For example, map to TCG2_VERSION.PpiVersion to be configured by Tcg2ConfigDxe driver.<BR>
+  # gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS<BR>
+  # @Prompt Version of Physical Presence interface supported by platform.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|"1.3"|VOID*|0x00000008
 
   ## Indicate whether a physical presence user exist.
   # When it is configured to Dynamic or DynamicEx, it can be set through detection using 

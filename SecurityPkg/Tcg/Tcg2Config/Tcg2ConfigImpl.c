@@ -456,6 +456,62 @@ GetTpm2HID(
 }
 
 /**
+  This function processes the results of changes in configuration
+  for TCG2 version information.
+
+  @param[in] Action             Specifies the type of action taken by the browser.
+                                ASSERT if the Action is not EFI_BROWSER_ACTION_SUBMITTED.
+  @param[in] QuestionId         A unique value which is sent to the original
+                                exporting driver so that it can identify the type
+                                of data to expect.
+  @param[in] Type               The type of value for the question.
+  @param[in] Value              A pointer to the data being sent to the original
+                                exporting driver.
+
+  @retval EFI_SUCCESS           The callback successfully handled the action.
+
+**/
+EFI_STATUS
+Tcg2VersionInfoCallback (
+  IN EFI_BROWSER_ACTION         Action,
+  IN EFI_QUESTION_ID            QuestionId,
+  IN UINT8                      Type,
+  IN EFI_IFR_TYPE_VALUE         *Value
+  )
+{
+  EFI_INPUT_KEY                 Key;
+  UINT64                        PcdTcg2PpiVersion;
+
+  ASSERT (Action == EFI_BROWSER_ACTION_SUBMITTED);
+
+  if (QuestionId == KEY_TCG2_PPI_VERSION) {
+    //
+    // Get the PCD value after EFI_BROWSER_ACTION_SUBMITTED,
+    // the SetVariable to TCG2_VERSION_NAME should have been done.
+    // If the PCD value is not equal to the value set to variable,
+    // the PCD is not DynamicHii type and maps to the setup option.
+    //
+    PcdTcg2PpiVersion = 0;
+    CopyMem (
+      &PcdTcg2PpiVersion,
+      PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
+      AsciiStrSize (PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+      );
+    if (PcdTcg2PpiVersion != Value->u64) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and maps to this option!",
+        L"The version configuring by this setup option will not work!",
+        NULL
+        );
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   This function processes the results of changes in configuration.
 
   @param[in]  This               Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
@@ -546,7 +602,13 @@ Tcg2Callback (
       return SaveTcg2PpRequestParameter (Value->u32);
     }
     if ((QuestionId >= KEY_TPM2_PCR_BANKS_REQUEST_0) && (QuestionId <= KEY_TPM2_PCR_BANKS_REQUEST_4)) {
-      SaveTcg2PCRBanksRequest (QuestionId - KEY_TPM2_PCR_BANKS_REQUEST_0, Value->b);
+      return SaveTcg2PCRBanksRequest (QuestionId - KEY_TPM2_PCR_BANKS_REQUEST_0, Value->b);
+    }
+  }
+
+  if (Action == EFI_BROWSER_ACTION_SUBMITTED) {
+    if (QuestionId == KEY_TCG2_PPI_VERSION) {
+      return Tcg2VersionInfoCallback (Action, QuestionId, Type, Value);
     }
   }
 

@@ -1,7 +1,7 @@
 /** @file
   Header file for NV data structure definition.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define TCG2_CONFIGURATION_VARSTORE_ID  0x0001
 #define TCG2_CONFIGURATION_INFO_VARSTORE_ID  0x0002
+#define TCG2_VERSION_VARSTORE_ID        0x0003
 #define TCG2_CONFIGURATION_FORM_ID      0x0001
 
 #define KEY_TPM_DEVICE                                 0x2000
@@ -41,6 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define KEY_TPM2_PCR_BANKS_REQUEST_3            0x2006
 #define KEY_TPM2_PCR_BANKS_REQUEST_4            0x2007
 #define KEY_TPM_DEVICE_INTERFACE                       0x2008
+#define KEY_TCG2_PPI_VERSION                    0x2009
 
 #define TPM_DEVICE_NULL           0
 #define TPM_DEVICE_1_2            1
@@ -58,12 +60,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TCG2_PROTOCOL_VERSION_DEFAULT        0x0001
 #define EFI_TCG2_EVENT_LOG_FORMAT_DEFAULT    EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2
 
+#define TCG2_PPI_VERSION_1_2                    0x322E31  // "1.2"
+#define TCG2_PPI_VERSION_1_3                    0x332E31  // "1.3" 
+
 //
 // Nv Data structure referenced by IFR, TPM device user desired
 //
 typedef struct {
   UINT8   TpmDevice;
 } TCG2_CONFIGURATION;
+
+typedef struct {
+  UINT64  PpiVersion;
+} TCG2_VERSION;
 
 typedef struct {
   BOOLEAN  Sha1Supported;
@@ -87,6 +96,7 @@ typedef struct {
 #define TCG2_STORAGE_NAME           L"TCG2_CONFIGURATION"
 #define TCG2_STORAGE_INFO_NAME      L"TCG2_CONFIGURATION_INFO"
 #define TCG2_DEVICE_DETECTION_NAME  L"TCG2_DEVICE_DETECTION"
+#define TCG2_VERSION_NAME           L"TCG2_VERSION"
 
 #define TPM_INSTANCE_ID_LIST  { \
   {TPM_DEVICE_INTERFACE_NONE,           TPM_DEVICE_NULL},      \

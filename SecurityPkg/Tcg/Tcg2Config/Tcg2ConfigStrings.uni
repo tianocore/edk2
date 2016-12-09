@@ -25,6 +25,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_TCG2_DEVICE_HELP                #language en-US "Attempt TPM Device: TPM1.2, or TPM2.0"
 #string STR_TCG2_DEVICE_CONTENT             #language en-US ""
 
+#string STR_TCG2_PPI_VERSION_STATE_PROMPT   #language en-US "Current PPI Version"
+#string STR_TCG2_PPI_VERSION_STATE_HELP     #language en-US "Current PPI Version: 1.2 or 1.3"
+#string STR_TCG2_PPI_VERSION_STATE_CONTENT  #language en-US ""
+
+#string STR_TCG2_PPI_VERSION_PROMPT         #language en-US "Attempt PPI Version"
+#string STR_TCG2_PPI_VERSION_HELP           #language en-US "Attempt PPI Version: 1.2 or 1.3\n"
+                                                            "PcdTcgPhysicalPresenceInterfaceVer needs to be DynamicHii type and map to this option\n"
+                                                            "Otherwise the version configuring by this setup option will not work"
+
 #string STR_TPM2_ACPI_HID_PROMPT                  #language en-US "HID from TPM2 ACPI Table"
 #string STR_TPM2_ACPI_HID_HELP                    #language en-US "HID from TPM2 ACPI Table: ManufacturerID + FirmwareVersion_1"
 #string STR_TPM2_ACPI_HID_CONTENT                 #language en-US ""
@@ -64,6 +73,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #string STR_TCG2_TPM_1_2                   #language en-US "TPM 1.2"
 #string STR_TCG2_TPM_2_0_DTPM              #language en-US "TPM 2.0"
+
+#string STR_TCG2_PPI_VERSION_1_2           #language en-US "1.2"
+#string STR_TCG2_PPI_VERSION_1_3           #language en-US "1.3"
 
 #string STR_TPM2_ACTIVE_HASH_ALGO                 #language en-US "TPM2 Active PCR Hash Algorithm"
 #string STR_TPM2_ACTIVE_HASH_ALGO_HELP            #language en-US "TPM2 Active PCR Hash Algorithm: SHA1, SHA256, SHA384, SHA512, SM3_256"

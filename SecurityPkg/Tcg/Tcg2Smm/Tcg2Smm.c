@@ -439,6 +439,12 @@ PublishAcpiTable (
   Status = UpdatePPVersion(Table, (CHAR8 *)PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer));
   ASSERT_EFI_ERROR (Status);
 
+  DEBUG ((
+    DEBUG_INFO,
+    "Current physical presence interface version - %a\n",
+    (CHAR8 *) PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer)
+    ));
+
   //
   // Update TPM2 HID before measuring it to PCR
   //

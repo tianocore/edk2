@@ -1,7 +1,7 @@
 /** @file
   The module entry point for Tcg2 configuration module.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -58,6 +58,154 @@ UpdateDefaultPCRBanks (
     break;
   }
   return ;
+}
+
+/**
+  Initialize TCG2 version information.
+
+  This function will initialize efi varstore configuration data for
+  TCG2_VERSION_NAME variable, check the value of related PCD with
+  the variable value and set string for the version state content
+  according to the PCD value.
+
+  @param[in] PrivateData    Points to TCG2 configuration private data.
+
+**/
+VOID
+InitializeTcg2VersionInfo (
+  IN TCG2_CONFIG_PRIVATE_DATA   *PrivateData
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_STRING                    ConfigRequestHdr;
+  BOOLEAN                       ActionFlag;
+  TCG2_VERSION                  Tcg2Version;
+  UINTN                         DataSize;
+  UINT64                        PcdTcg2PpiVersion;
+
+  //
+  // Get the PCD value before initializing efi varstore configuration data.
+  //
+  PcdTcg2PpiVersion = 0;
+  CopyMem (
+    &PcdTcg2PpiVersion,
+    PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
+    AsciiStrSize (PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+    );
+
+  //
+  // Initialize efi varstore configuration data.
+  //
+  ZeroMem (&Tcg2Version, sizeof (Tcg2Version));
+  ConfigRequestHdr = HiiConstructConfigHdr (
+                       &gTcg2ConfigFormSetGuid,
+                       TCG2_VERSION_NAME,
+                       PrivateData->DriverHandle
+                       );
+  ASSERT (ConfigRequestHdr != NULL);
+  DataSize = sizeof (Tcg2Version);
+  Status = gRT->GetVariable (
+                  TCG2_VERSION_NAME,
+                  &gTcg2ConfigFormSetGuid,
+                  NULL,
+                  &DataSize,
+                  &Tcg2Version
+                  );
+  if (!EFI_ERROR (Status)) {
+    //
+    // EFI variable does exist and validate current setting.
+    //
+    ActionFlag = HiiValidateSettings (ConfigRequestHdr);
+    if (!ActionFlag) {
+      //
+      // Current configuration is invalid, reset to defaults.
+      //
+      ActionFlag = HiiSetToDefaults (ConfigRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
+      ASSERT (ActionFlag);
+      //
+      // Get the default values from variable.
+      //
+      DataSize = sizeof (Tcg2Version);
+      Status = gRT->GetVariable (
+                      TCG2_VERSION_NAME,
+                      &gTcg2ConfigFormSetGuid,
+                      NULL,
+                      &DataSize,
+                      &Tcg2Version
+                      );
+      ASSERT_EFI_ERROR (Status);
+    }
+  } else {
+    //
+    // EFI variable doesn't exist.
+    //
+
+    //
+    // Store zero data Buffer Storage to EFI variable.
+    //
+    Status = gRT->SetVariable (
+                    TCG2_VERSION_NAME,
+                    &gTcg2ConfigFormSetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (Tcg2Version),
+                    &Tcg2Version
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_VERSION_NAME\n"));
+      return;
+    } else {
+      //
+      // Build this variable based on default values stored in IFR.
+      //
+      ActionFlag = HiiSetToDefaults (ConfigRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
+      ASSERT (ActionFlag);
+      //
+      // Get the default values from variable.
+      //
+      DataSize = sizeof (Tcg2Version);
+      Status = gRT->GetVariable (
+                      TCG2_VERSION_NAME,
+                      &gTcg2ConfigFormSetGuid,
+                      NULL,
+                      &DataSize,
+                      &Tcg2Version
+                      );
+      ASSERT_EFI_ERROR (Status);
+      if (PcdTcg2PpiVersion != Tcg2Version.PpiVersion) {
+        DEBUG ((DEBUG_WARN, "WARNING: PcdTcgPhysicalPresenceInterfaceVer default value is not same with the default value in VFR\n"));
+        DEBUG ((DEBUG_WARN, "WARNING: The default value in VFR has be chosen\n"));
+      }
+    }
+  }
+  FreePool (ConfigRequestHdr);
+
+  //
+  // Get the PCD value again.
+  // If the PCD value is not equal to the value in variable,
+  // the PCD is not DynamicHii type and maps to the setup option.
+  //
+  PcdTcg2PpiVersion = 0;
+  CopyMem (
+    &PcdTcg2PpiVersion,
+    PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
+    AsciiStrSize (PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+    );
+  if (PcdTcg2PpiVersion != Tcg2Version.PpiVersion) {
+    DEBUG ((DEBUG_WARN, "WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and maps to TCG2_VERSION.PpiVersion\n"));
+    DEBUG ((DEBUG_WARN, "WARNING: The TCG2 PPI version configuring from setup page will not work\n"));
+  }
+
+  switch (PcdTcg2PpiVersion) {
+    case TCG2_PPI_VERSION_1_2:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_PPI_VERSION_STATE_CONTENT), L"1.2", NULL);
+      break;
+    case TCG2_PPI_VERSION_1_3:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_PPI_VERSION_STATE_CONTENT), L"1.3", NULL);
+      break;
+    default:
+      ASSERT (FALSE);
+      break;
+  }
 }
 
 /**
@@ -228,6 +376,8 @@ Tcg2ConfigDriverEntryPoint (
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
+
+  InitializeTcg2VersionInfo (PrivateData);
 
   return EFI_SUCCESS;
 
