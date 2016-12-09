@@ -15,6 +15,8 @@
 #ifndef __NON_DISCOVERABLE_PCI_DEVICE_IO_H__
 #define __NON_DISCOVERABLE_PCI_DEVICE_IO_H__
 
+#include <PiDxe.h>
+
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -25,6 +27,7 @@
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/NonDiscoverableDevice.h>
+#include <Protocol/Cpu.h>
 #include <Protocol/PciIo.h>
 
 #define NON_DISCOVERABLE_PCI_DEVICE_SIG SIGNATURE_32 ('P', 'P', 'I', 'D')
@@ -37,6 +40,27 @@
 #define PCI_ID_DEVICE_DONTCARE        0x0000
 
 #define PCI_MAX_BARS                  6
+
+extern EFI_CPU_ARCH_PROTOCOL      *mCpu;
+
+typedef struct {
+  //
+  // The linked-list next pointer
+  //
+  LIST_ENTRY          List;
+  //
+  // The address of the uncached allocation
+  //
+  VOID                *HostAddress;
+  //
+  // The number of pages in the allocation
+  //
+  UINTN               NumPages;
+  //
+  // The attributes of the allocation
+  //
+  UINT64              Attributes;
+} NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION;
 
 typedef struct {
   UINT32                    Signature;
@@ -71,6 +95,11 @@ typedef struct {
   // Whether this device has been enabled
   //
   BOOLEAN                   Enabled;
+  //
+  // Linked list to keep track of uncached allocations performed
+  // on behalf of this device
+  //
+  LIST_ENTRY                UncachedAllocationList;
 } NON_DISCOVERABLE_PCI_DEVICE;
 
 VOID

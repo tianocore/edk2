@@ -16,6 +16,8 @@
 
 #include <Protocol/DriverBinding.h>
 
+EFI_CPU_ARCH_PROTOCOL      *mCpu;
+
 //
 // We only support the following device types
 //
@@ -69,14 +71,7 @@ NonDiscoverablePciDeviceSupported (
     return Status;
   }
 
-  //
-  // Restricted to DMA coherent for now
-  //
   Status = EFI_UNSUPPORTED;
-  if (Device->DmaType != NonDiscoverableDeviceDmaTypeCoherent) {
-    goto CloseProtocol;
-  }
-
   for (Idx = 0; Idx < ARRAY_SIZE (SupportedNonDiscoverableDevices); Idx++) {
     if (CompareGuid (Device->Type, SupportedNonDiscoverableDevices [Idx])) {
       Status = EFI_SUCCESS;
@@ -224,6 +219,11 @@ NonDiscoverablePciDeviceDxeEntryPoint (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
+  EFI_STATUS      Status;
+
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
+  ASSERT_EFI_ERROR(Status);
+
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
            SystemTable,

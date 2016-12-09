@@ -32,6 +32,7 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
+  DxeServicesTableLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
@@ -40,6 +41,7 @@
 [Protocols]
   gEfiPciIoProtocolGuid                         ## BY_START
   gEdkiiNonDiscoverableDeviceProtocolGuid       ## TO_START
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
 
 [Guids]
   gEdkiiNonDiscoverableAhciDeviceGuid

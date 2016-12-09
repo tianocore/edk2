@@ -15,6 +15,8 @@
 
 #include "NonDiscoverablePciDeviceIo.h"
 
+#include <Library/DxeServicesTableLib.h>
+
 #include <IndustryStandard/Acpi.h>
 
 #include <Protocol/PciRootBridgeIo.h>
@@ -537,6 +539,324 @@ CoherentPciIoFreeBuffer (
   return EFI_SUCCESS;
 }
 
+STATIC
+EFI_STATUS
+EFIAPI
+NonCoherentPciIoFreeBuffer (
+  IN  EFI_PCI_IO_PROTOCOL         *This,
+  IN  UINTN                       Pages,
+  IN  VOID                        *HostAddress
+  )
+{
+  NON_DISCOVERABLE_PCI_DEVICE                   *Dev;
+  LIST_ENTRY                                    *Entry;
+  EFI_STATUS                                    Status;
+  NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION   *Alloc;
+  BOOLEAN                                       Found;
+
+  Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO(This);
+
+  Found = FALSE;
+
+  //
+  // Find the uncached allocation list entry associated
+  // with this allocation
+  //
+  for (Entry = Dev->UncachedAllocationList.ForwardLink;
+       Entry != &Dev->UncachedAllocationList;
+       Entry = Entry->ForwardLink) {
+
+    Alloc = BASE_CR (Entry, NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION, List);
+    if (Alloc->HostAddress == HostAddress && Alloc->NumPages == Pages) {
+      //
+      // We are freeing the exact allocation we were given
+      // before by AllocateBuffer()
+      //
+      Found = TRUE;
+      break;
+    }
+  }
+
+  if (!Found) {
+    ASSERT_EFI_ERROR (EFI_NOT_FOUND);
+    return EFI_NOT_FOUND;
+  }
+
+  RemoveEntryList (&Alloc->List);
+
+  Status = gDS->SetMemorySpaceAttributes (
+                  (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
+                  EFI_PAGES_TO_SIZE (Pages),
+                  Alloc->Attributes);
+  if (EFI_ERROR (Status)) {
+    goto FreeAlloc;
+  }
+
+  //
+  // If we fail to restore the original attributes, it is better to leak the
+  // memory than to return it to the heap
+  //
+  FreePages (HostAddress, Pages);
+
+FreeAlloc:
+  FreePool (Alloc);
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NonCoherentPciIoAllocateBuffer (
+  IN  EFI_PCI_IO_PROTOCOL         *This,
+  IN  EFI_ALLOCATE_TYPE           Type,
+  IN  EFI_MEMORY_TYPE             MemoryType,
+  IN  UINTN                       Pages,
+  OUT VOID                        **HostAddress,
+  IN  UINT64                      Attributes
+  )
+{
+  NON_DISCOVERABLE_PCI_DEVICE                 *Dev;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR             GcdDescriptor;
+  EFI_STATUS                                  Status;
+  UINT64                                      MemType;
+  NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION *Alloc;
+  VOID                                        *AllocAddress;
+
+  Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO(This);
+
+  Status = CoherentPciIoAllocateBuffer (This, Type, MemoryType, Pages,
+             &AllocAddress, Attributes);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gDS->GetMemorySpaceDescriptor (
+                  (EFI_PHYSICAL_ADDRESS)(UINTN)AllocAddress,
+                  &GcdDescriptor);
+  if (EFI_ERROR (Status)) {
+    goto FreeBuffer;
+  }
+
+  if ((GcdDescriptor.Capabilities & (EFI_MEMORY_WC | EFI_MEMORY_UC)) == 0) {
+    Status = EFI_UNSUPPORTED;
+    goto FreeBuffer;
+  }
+
+  //
+  // Set the preferred memory attributes
+  //
+  if ((Attributes & EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE) != 0 ||
+      (GcdDescriptor.Capabilities & EFI_MEMORY_UC) == 0) {
+    //
+    // Use write combining if it was requested, or if it is the only
+    // type supported by the region.
+    //
+    MemType = EFI_MEMORY_WC;
+  } else {
+    MemType = EFI_MEMORY_UC;
+  }
+
+  Alloc = AllocatePool (sizeof *Alloc);
+  if (Alloc == NULL) {
+    goto FreeBuffer;
+  }
+
+  Alloc->HostAddress = AllocAddress;
+  Alloc->NumPages = Pages;
+  Alloc->Attributes = GcdDescriptor.Attributes;
+
+  //
+  // Record this allocation in the linked list, so we
+  // can restore the memory space attributes later
+  //
+  InsertHeadList (&Dev->UncachedAllocationList, &Alloc->List);
+
+  Status = gDS->SetMemorySpaceAttributes (
+                  (EFI_PHYSICAL_ADDRESS)(UINTN)AllocAddress,
+                  EFI_PAGES_TO_SIZE (Pages),
+                  MemType);
+  if (EFI_ERROR (Status)) {
+    goto RemoveList;
+  }
+
+  Status = mCpu->FlushDataCache (
+                   mCpu,
+                   (EFI_PHYSICAL_ADDRESS)(UINTN)AllocAddress,
+                   EFI_PAGES_TO_SIZE (Pages),
+                   EfiCpuFlushTypeInvalidate);
+  if (EFI_ERROR (Status)) {
+    goto RemoveList;
+  }
+
+  *HostAddress = AllocAddress;
+
+  return EFI_SUCCESS;
+
+RemoveList:
+  RemoveEntryList (&Alloc->List);
+  FreePool (Alloc);
+
+FreeBuffer:
+  CoherentPciIoFreeBuffer (This, Pages, AllocAddress);
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NonCoherentPciIoMap (
+  IN     EFI_PCI_IO_PROTOCOL            *This,
+  IN     EFI_PCI_IO_PROTOCOL_OPERATION  Operation,
+  IN     VOID                           *HostAddress,
+  IN OUT UINTN                          *NumberOfBytes,
+  OUT    EFI_PHYSICAL_ADDRESS           *DeviceAddress,
+  OUT    VOID                           **Mapping
+  )
+{
+  NON_DISCOVERABLE_PCI_DEVICE           *Dev;
+  EFI_STATUS                            Status;
+  NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo;
+  UINTN                                 AlignMask;
+  VOID                                  *AllocAddress;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR       GcdDescriptor;
+  BOOLEAN                               Bounce;
+
+  MapInfo = AllocatePool (sizeof *MapInfo);
+  if (MapInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  MapInfo->HostAddress = HostAddress;
+  MapInfo->Operation = Operation;
+  MapInfo->NumberOfBytes = *NumberOfBytes;
+
+  Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO(This);
+
+  //
+  // If this device does not support 64-bit DMA addressing, we need to allocate
+  // a bounce buffer and copy over the data in case HostAddress >= 4 GB.
+  //
+  Bounce = ((Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0 &&
+            (UINTN)HostAddress + *NumberOfBytes > SIZE_4GB);
+
+  if (!Bounce) {
+    switch (Operation) {
+    case EfiPciIoOperationBusMasterRead:
+    case EfiPciIoOperationBusMasterWrite:
+      //
+      // For streaming DMA, it is sufficient if the buffer is aligned to
+      // the CPUs DMA buffer alignment.
+      //
+      AlignMask = mCpu->DmaBufferAlignment - 1;
+      if ((((UINTN) HostAddress | *NumberOfBytes) & AlignMask) == 0) {
+        break;
+      }
+      // fall through
+
+    case EfiPciIoOperationBusMasterCommonBuffer:
+      //
+      // Check whether the host address refers to an uncached mapping.
+      //
+      Status = gDS->GetMemorySpaceDescriptor (
+                      (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
+                      &GcdDescriptor);
+      if (EFI_ERROR (Status) ||
+          (GcdDescriptor.Attributes & (EFI_MEMORY_WB|EFI_MEMORY_WT)) != 0) {
+        Bounce = TRUE;
+      }
+      break;
+
+    default:
+      ASSERT (FALSE);
+    }
+  }
+
+  if (Bounce) {
+    if (Operation == EfiPciIoOperationBusMasterCommonBuffer) {
+      Status = EFI_DEVICE_ERROR;
+      goto FreeMapInfo;
+    }
+
+    Status = NonCoherentPciIoAllocateBuffer (This, AllocateAnyPages,
+               EfiBootServicesData, EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes),
+               &AllocAddress, EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE);
+    if (EFI_ERROR (Status)) {
+      goto FreeMapInfo;
+    }
+    MapInfo->AllocAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocAddress;
+    if (Operation == EfiPciIoOperationBusMasterRead) {
+      gBS->CopyMem (AllocAddress, HostAddress, *NumberOfBytes);
+    }
+    *DeviceAddress = MapInfo->AllocAddress;
+  } else {
+    MapInfo->AllocAddress = 0;
+    *DeviceAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
+
+    //
+    // We are not using a bounce buffer: the mapping is sufficiently
+    // aligned to allow us to simply flush the caches. Note that cleaning
+    // the caches is necessary for both data directions:
+    // - for bus master read, we want the latest data to be present
+    //   in main memory
+    // - for bus master write, we don't want any stale dirty cachelines that
+    //   may be written back unexpectedly, and clobber the data written to
+    //   main memory by the device.
+    //
+    mCpu->FlushDataCache (mCpu, (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
+            *NumberOfBytes, EfiCpuFlushTypeWriteBack);
+  }
+
+  *Mapping = MapInfo;
+  return EFI_SUCCESS;
+
+FreeMapInfo:
+  FreePool (MapInfo);
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+NonCoherentPciIoUnmap (
+  IN  EFI_PCI_IO_PROTOCOL          *This,
+  IN  VOID                         *Mapping
+  )
+{
+  NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo;
+
+  if (Mapping == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  MapInfo = Mapping;
+  if (MapInfo->AllocAddress != 0) {
+    //
+    // We are using a bounce buffer: copy back the data if necessary,
+    // and free the buffer.
+    //
+    if (MapInfo->Operation == EfiPciIoOperationBusMasterWrite) {
+      gBS->CopyMem (MapInfo->HostAddress, (VOID *)(UINTN)MapInfo->AllocAddress,
+             MapInfo->NumberOfBytes);
+    }
+    NonCoherentPciIoFreeBuffer (This,
+      EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes),
+      (VOID *)(UINTN)MapInfo->AllocAddress);
+  } else {
+    //
+    // We are *not* using a bounce buffer: if this is a bus master write,
+    // we have to invalidate the caches so the CPU will see the uncached
+    // data written by the device.
+    //
+    if (MapInfo->Operation == EfiPciIoOperationBusMasterWrite) {
+      mCpu->FlushDataCache (mCpu,
+              (EFI_PHYSICAL_ADDRESS)(UINTN)MapInfo->HostAddress,
+              MapInfo->NumberOfBytes, EfiCpuFlushTypeInvalidate);
+    }
+  }
+  FreePool (MapInfo);
+  return EFI_SUCCESS;
+}
 
 STATIC
 EFI_STATUS
@@ -726,11 +1046,20 @@ InitializePciIoProtocol (
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR   *Desc;
   INTN                                Idx;
 
+  InitializeListHead (&Dev->UncachedAllocationList);
+
   Dev->ConfigSpace.Hdr.VendorId = PCI_ID_VENDOR_UNKNOWN;
   Dev->ConfigSpace.Hdr.DeviceId = PCI_ID_DEVICE_DONTCARE;
 
   // Copy protocol structure
   CopyMem(&Dev->PciIo, &PciIoTemplate, sizeof PciIoTemplate);
+
+  if (Dev->Device->DmaType == NonDiscoverableDeviceDmaTypeNonCoherent) {
+    Dev->PciIo.AllocateBuffer   = NonCoherentPciIoAllocateBuffer;
+    Dev->PciIo.FreeBuffer       = NonCoherentPciIoFreeBuffer;
+    Dev->PciIo.Map              = NonCoherentPciIoMap;
+    Dev->PciIo.Unmap            = NonCoherentPciIoUnmap;
+  }
 
   if (CompareGuid (Dev->Device->Type, &gEdkiiNonDiscoverableAhciDeviceGuid)) {
     Dev->ConfigSpace.Hdr.ClassCode[0] = PCI_IF_MASS_STORAGE_AHCI;
