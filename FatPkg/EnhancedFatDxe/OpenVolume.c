@@ -1,4 +1,5 @@
-/*++
+/** @file
+  OpenVolume() function of Simple File System Protocol.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,45 +10,28 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  OpenVolume.c
-
-Abstract:
-
-  OpenVolume() function of Simple File System Protocol
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Implements Simple File System Protocol interface function OpenVolume().
+
+  @param  This                  - Calling context.
+  @param  File                  - the Root Directory of the volume.
+
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
+  @retval EFI_VOLUME_CORRUPTED  - The FAT type is error.
+  @retval EFI_SUCCESS           - Open the volume successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 FatOpenVolume (
   IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *This,
   OUT EFI_FILE_PROTOCOL                **File
   )
-/*++
-
-Routine Description:
-
-  Implements Simple File System Protocol interface function OpenVolume().
-
-Arguments:
-
-  This                  - Calling context.
-  File                  - the Root Directory of the volume.
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
-  EFI_VOLUME_CORRUPTED  - The FAT type is error.
-  EFI_SUCCESS           - Open the volume successfully.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_VOLUME  *Volume;

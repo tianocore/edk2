@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Functions for performing directory entry io.
 
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,21 +10,23 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  DirectoryManage.c
-
-Abstract:
-
-  Functions for performing directory entry io
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Get a directory entry from disk for the Ofile.
+
+  @param  Parent                - The parent of the OFile which need to update.
+  @param  IoMode                - Indicate whether to read directory entry or write directroy entry.
+  @param  EntryPos              - The position of the directory entry to be accessed.
+  @param  Entry                 - The directory entry read or written.
+
+  @retval EFI_SUCCESS           - Access the directory entry sucessfully.
+  @return other                 - An error occurred when reading the directory entry.
+
+**/
 STATIC
 EFI_STATUS
 FatAccessEntry (
@@ -32,25 +35,6 @@ FatAccessEntry (
   IN     UINTN                EntryPos,
   IN OUT VOID                 *Entry
   )
-/*++
-
-Routine Description:
-
-  Get a directory entry from disk for the Ofile.
-
-Arguments:
-
-  Parent                - The parent of the OFile which need to update.
-  IoMode                - Indicate whether to read directory entry or write directroy entry.
-  EntryPos              - The position of the directory entry to be accessed.
-  Entry                 - The directory entry read or written.
-
-Returns:
-
-  EFI_SUCCESS           - Access the directory entry sucessfully.
-  other                 - An error occurred when reading the directory entry.
-
---*/
 {
   UINTN Position;
   UINTN BufferSize;
@@ -70,28 +54,22 @@ Returns:
   return FatAccessOFile (Parent, IoMode, Position, &BufferSize, Entry, NULL);
 }
 
+/**
+
+  Save the directory entry to disk.
+
+  @param  OFile                 - The parent OFile which needs to update.
+  @param  DirEnt                - The directory entry to be saved.
+
+  @retval EFI_SUCCESS           - Store the directory entry successfully.
+  @return other                 - An error occurred when writing the directory entry.
+
+**/
 EFI_STATUS
 FatStoreDirEnt (
   IN FAT_OFILE            *OFile,
   IN FAT_DIRENT           *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Save the directory entry to disk.
-
-Arguments:
-
-  OFile                 - The parent OFile which needs to update.
-  DirEnt                - The directory entry to be saved.
-
-Returns:
-
-  EFI_SUCCESS           - Store the directory entry successfully.
-  other                 - An error occurred when writing the directory entry.
-
---*/
 {
   EFI_STATUS        Status;
   FAT_DIRECTORY_LFN LfnEntry;
@@ -157,26 +135,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Determine whether the directory entry is "." or ".." entry.
+
+  @param  DirEnt               - The corresponding directory entry.
+
+  @retval TRUE                 - The directory entry is "." or ".." directory entry
+  @retval FALSE                - The directory entry is not "." or ".." directory entry
+
+**/
 BOOLEAN
 FatIsDotDirEnt (
   IN FAT_DIRENT  *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Determine whether the directory entry is "." or ".." entry.
-
-Arguments:
-
-  DirEnt               - The corresponding directory entry.
-
-Returns:
-
-  TRUE                 - The directory entry is "." or ".." directory entry
-  FALSE                - The directory entry is not "." or ".." directory entry
-
---*/
 {
   CHAR16  *FileString;
   FileString = DirEnt->FileString;
@@ -187,26 +159,18 @@ Returns:
   return FALSE;
 }
 
+/**
+
+  Set the OFile's cluster info in its directory entry.
+
+  @param  OFile                 - The corresponding OFile.
+
+**/
 STATIC
 VOID
 FatSetDirEntCluster (
   IN FAT_OFILE    *OFile
   )
-/*++
-
-Routine Description:
-
-  Set the OFile's cluster info in its directory entry.
-
-Arguments:
-
-  OFile                 - The corresponding OFile.
-
-Returns:
-
-  None.
-
---*/
 {
   UINTN       Cluster;
   FAT_DIRENT  *DirEnt;
@@ -217,52 +181,36 @@ Returns:
   DirEnt->Entry.FileCluster     = (UINT16) Cluster;
 }
 
+/**
+
+  Set the OFile's cluster and size info in its directory entry.
+
+  @param  OFile                 - The corresponding OFile.
+
+**/
 VOID
 FatUpdateDirEntClusterSizeInfo (
   IN FAT_OFILE    *OFile
   )
-/*++
-
-Routine Description:
-
-  Set the OFile's cluster and size info in its directory entry.
-
-Arguments:
-
-  OFile                 - The corresponding OFile.
-
-Returns:
-
-  None.
-
---*/
 {
   ASSERT (OFile->ODir == NULL);
   OFile->DirEnt->Entry.FileSize = (UINT32) OFile->FileSize;
   FatSetDirEntCluster (OFile);
 }
 
+/**
+
+  Copy all the information of DirEnt2 to DirEnt1 except for 8.3 name.
+
+  @param  DirEnt1               - The destination directory entry.
+  @param  DirEnt2               - The source directory entry.
+
+**/
 VOID
 FatCloneDirEnt (
   IN  FAT_DIRENT          *DirEnt1,
   IN  FAT_DIRENT          *DirEnt2
   )
-/*++
-
-Routine Description:
-
-  Copy all the information of DirEnt2 to DirEnt1 except for 8.3 name.
-
-Arguments:
-
-  DirEnt1               - The destination directory entry.
-  DirEnt2               - The source directory entry.
-
-Returns:
-
-  None.
-
---*/
 {
   UINT8 *Entry1;
   UINT8 *Entry2;
@@ -275,28 +223,20 @@ Returns:
     );
 }
 
+/**
+
+  Get the LFN for the directory entry.
+
+  @param  Parent                - The parent directory.
+  @param  DirEnt                - The directory entry to get LFN.
+
+**/
 STATIC
 VOID
 FatLoadLongNameEntry (
   IN FAT_OFILE           *Parent,
   IN FAT_DIRENT          *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Get the LFN for the directory entry.
-
-Arguments:
-
-  Parent                - The parent directory.
-  DirEnt                - The directory entry to get LFN.
-
-Returns:
-
-  None.
-
---*/
 {
   CHAR16            LfnBuffer[MAX_LFN_ENTRIES * LFN_CHAR_TOTAL + 1];
   CHAR16            *LfnBufferPointer;
@@ -367,28 +307,20 @@ Returns:
   DirEnt->FileString = AllocateCopyPool (StrSize (LfnBuffer), LfnBuffer);
 }
 
+/**
+
+  Add this directory entry node to the list of directory entries and hash table.
+
+  @param  ODir                  - The parent OFile which needs to be updated.
+  @param  DirEnt                - The directory entry to be added.
+
+**/
 STATIC
 VOID
 FatAddDirEnt (
   IN FAT_ODIR             *ODir,
   IN FAT_DIRENT           *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Add this directory entry node to the list of directory entries and hash table.
-
-Arguments:
-
-  ODir                  - The parent OFile which needs to be updated.
-  DirEnt                - The directory entry to be added.
-
-Returns:
-
-  None.
-
---*/
 {
   if (DirEnt->Link.BackLink == NULL) {
     DirEnt->Link.BackLink = &ODir->ChildList;
@@ -397,30 +329,24 @@ Returns:
   FatInsertToHashTable (ODir, DirEnt);
 }
 
+/**
+
+  Load from disk the next directory entry at current end of directory position.
+
+  @param  OFile                 - The parent OFile.
+  @param  PtrDirEnt             - The directory entry that is loaded.
+
+  @retval EFI_SUCCESS           - Load the directory entry successfully.
+  @retval EFI_OUT_OF_RESOURCES  - Out of resource.
+  @return other                 - An error occurred when reading the directory entries.
+
+**/
 STATIC
 EFI_STATUS
 FatLoadNextDirEnt (
   IN  FAT_OFILE           *OFile,
   OUT FAT_DIRENT          **PtrDirEnt
   )
-/*++
-
-Routine Description:
-
-  Load from disk the next directory entry at current end of directory position
-
-Arguments:
-
-  OFile                 - The parent OFile.
-  PtrDirEnt             - The directory entry that is loaded.
-
-Returns:
-
-  EFI_SUCCESS           - Load the directory entry successfully.
-  EFI_OUT_OF_RESOURCES  - Out of resource.
-  other                 - An error occurred when reading the directory entries.
-
---*/
 {
   EFI_STATUS          Status;
   FAT_DIRENT          *DirEnt;
@@ -505,6 +431,19 @@ Done:
   return Status;
 }
 
+/**
+
+  Get the directory entry's info into Buffer.
+
+  @param  Volume                - FAT file system volume.
+  @param  DirEnt                - The corresponding directory entry.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing file info.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_BUFFER_TOO_SMALL  - The buffer is too small.
+
+**/
 EFI_STATUS
 FatGetDirEntInfo (
   IN     FAT_VOLUME         *Volume,
@@ -512,25 +451,6 @@ FatGetDirEntInfo (
   IN OUT UINTN              *BufferSize,
      OUT VOID               *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the directory entry's info into Buffer.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  DirEnt                - The corresponding directory entry.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing file info.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_BUFFER_TOO_SMALL  - The buffer is too small.
-
---*/
 {
   UINTN               Size;
   UINTN               NameSize;
@@ -575,6 +495,18 @@ Returns:
   return Status;
 }
 
+/**
+
+  Search the directory for the directory entry whose filename is FileNameString.
+
+  @param  OFile                 - The parent OFile whose directory is to be searched.
+  @param  FileNameString        - The filename to be searched.
+  @param  PtrDirEnt             - pointer to the directory entry if found.
+
+  @retval EFI_SUCCESS           - Find the directory entry or not found.
+  @return other                 - An error occurred when reading the directory entries.
+
+**/
 STATIC
 EFI_STATUS
 FatSearchODir (
@@ -582,24 +514,6 @@ FatSearchODir (
   IN  CHAR16         *FileNameString,
   OUT FAT_DIRENT     **PtrDirEnt
   )
-/*++
-
-Routine Description:
-
-  Search the directory for the directory entry whose filename is FileNameString.
-
-Arguments:
-
-  OFile                 - The parent OFile whose directory is to be searched.
-  FileNameString        - The filename to be searched.
-  PtrDirEnt             - pointer to the directory entry if found.
-
-Returns:
-
-  EFI_SUCCESS           - Find the directory entry or not found.
-  other                 - An error occurred when reading the directory entries.
-
---*/
 {
   BOOLEAN     PossibleShortName;
   CHAR8       File8Dot3Name[FAT_NAME_LEN];
@@ -647,25 +561,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Set the OFile's current directory cursor to the list head.
+
+  @param OFile                 - The directory OFile whose directory cursor is reset.
+
+**/
 VOID
 FatResetODirCursor (
   IN FAT_OFILE    *OFile
   )
-/*++
-
-Routine Description:
-
-  Set the OFile's current directory cursor to the list head.
-
-Arguments:
-
-  OFile                 - The directory OFile whose directory cursor is reset.
-
-Returns:
-
-  None.
-
---*/
 {
   FAT_ODIR  *ODir;
 
@@ -675,28 +581,22 @@ Returns:
   ODir->CurrentPos    = 0;
 }
 
+/**
+
+  Set the directory's cursor to the next and get the next directory entry.
+
+  @param  OFile                 - The parent OFile.
+  @param PtrDirEnt             - The next directory entry.
+
+  @retval EFI_SUCCESS           - We get the next directory entry successfully.
+  @return other                 - An error occurred when get next directory entry.
+
+**/
 EFI_STATUS
 FatGetNextDirEnt (
   IN  FAT_OFILE     *OFile,
   OUT FAT_DIRENT    **PtrDirEnt
   )
-/*++
-
-Routine Description:
-
-  Set the directory's cursor to the next and get the next directory entry.
-
-Arguments:
-
-  OFile                 - The parent OFile.
-  PtrDirEnt             - The next directory entry.
-
-Returns:
-
-  EFI_SUCCESS           - We get the next directory entry successfully.
-  other                 - An error occurred when get next directory entry.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_DIRENT  *DirEnt;
@@ -735,28 +635,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Set the directory entry count according to the filename.
+
+  @param  OFile                 - The corresponding OFile.
+  @param  DirEnt                - The directory entry to be set.
+
+**/
 STATIC
 VOID
 FatSetEntryCount (
   IN FAT_OFILE    *OFile,
   IN FAT_DIRENT   *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Set the directory entry count according to the filename.
-
-Arguments:
-
-  OFile                 - The corresponding OFile.
-  DirEnt                - The directory entry to be set.
-
-Returns:
-
-  None.
-
---*/
 {
   CHAR16  *FileString;
   CHAR8   *File8Dot3Name;
@@ -800,54 +692,42 @@ Returns:
   }
 }
 
+/**
+
+  Append a zero cluster to the current OFile.
+
+  @param  OFile        - The directory OFile which needs to be updated.
+
+  @retval EFI_SUCCESS  - Append a zero cluster to the OFile successfully.
+  @return other        - An error occurred when appending the zero cluster.
+
+**/
 STATIC
 EFI_STATUS
 FatExpandODir (
   IN FAT_OFILE  *OFile
   )
-/*++
-
-Routine Description:
-
-  Append a zero cluster to the current OFile.
-
-Arguments:
-
-  OFile        - The directory OFile which needs to be updated.
-
-Returns:
-
-  EFI_SUCCESS  - Append a zero cluster to the OFile successfully.
-  other        - An error occurred when appending the zero cluster.
-
---*/
 {
   return FatExpandOFile (OFile, OFile->FileSize + OFile->Volume->ClusterSize);
 }
 
+/**
+
+  Search the Root OFile for the possible volume label.
+
+  @param  Root                  - The Root OFile.
+  @param  DirEnt                - The returned directory entry of volume label.
+
+  @retval EFI_SUCCESS           - The search process is completed successfully.
+  @return other                 - An error occurred when searching volume label.
+
+**/
 STATIC
 EFI_STATUS
 FatSeekVolumeId (
   IN  FAT_OFILE            *Root,
   OUT FAT_DIRENT           *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Search the Root OFile for the possible volume label.
-
-Arguments:
-
-  Root                  - The Root OFile.
-  DirEnt                - The returned directory entry of volume label.
-
-Returns:
-
-  EFI_SUCCESS           - The search process is completed successfully.
-  other                 - An error occurred when searching volume label.
-
---*/
 {
   EFI_STATUS          Status;
   UINTN               EntryPos;
@@ -874,33 +754,27 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
-EFI_STATUS
-FatFirstFitInsertDirEnt (
-  IN FAT_OFILE    *OFile,
-  IN FAT_DIRENT   *DirEnt
-  )
-/*++
-
-Routine Description:
+/**
 
   Use First Fit Algorithm to insert directory entry.
   Only this function will erase "E5" entries in a directory.
   In view of safest recovery, this function will only be triggered
   when maximum directory entry number has reached.
 
-Arguments:
+  @param  OFile                 - The corresponding OFile.
+  @param  DirEnt                - The directory entry to be inserted.
 
-  OFile                 - The corresponding OFile.
-  DirEnt                - The directory entry to be inserted.
+  @retval EFI_SUCCESS           - The directory entry has been successfully inserted.
+  @retval EFI_VOLUME_FULL       - The directory can not hold more directory entries.
+  @return Others                - Some error occurred when inserting new directory entries.
 
-Returns:
-
-  EFI_SUCCESS           - The directory entry has been successfully inserted.
-  EFI_VOLUME_FULL       - The directory can not hold more directory entries.
-  Others                - Some error occurred when inserting new directory entries.
-
---*/
+**/
+STATIC
+EFI_STATUS
+FatFirstFitInsertDirEnt (
+  IN FAT_OFILE    *OFile,
+  IN FAT_DIRENT   *DirEnt
+  )
 {
   EFI_STATUS      Status;
   FAT_ODIR        *ODir;
@@ -956,30 +830,24 @@ Done:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Find the new directory entry position for the directory entry.
+
+  @param  OFile                 - The corresponding OFile.
+  @param  DirEnt                - The directory entry whose new position is to be set.
+
+  @retval EFI_SUCCESS           - The new directory entry position is successfully found.
+  @retval EFI_VOLUME_FULL       - The directory has reach its maximum capacity.
+  @return other                 - An error occurred when reading the directory entry.
+
+**/
 STATIC
 EFI_STATUS
 FatNewEntryPos (
   IN FAT_OFILE    *OFile,
   IN FAT_DIRENT   *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Find the new directory entry position for the directory entry.
-
-Arguments:
-
-  OFile                 - The corresponding OFile.
-  DirEnt                - The directory entry whose new position is to be set.
-
-Returns:
-
-  EFI_SUCCESS           - The new directory entry position is successfully found.
-  EFI_VOLUME_FULL       - The directory has reach its maximum capacity.
-  other                 - An error occurred when reading the directory entry.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_ODIR    *ODir;
@@ -1027,28 +895,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Get the directory entry for the volume.
+
+  @param  Volume                - FAT file system volume.
+  @param  Name                  - The file name of the volume.
+
+  @retval EFI_SUCCESS           - Update the volume with the directory entry sucessfully.
+  @return others                - An error occurred when getting volume label.
+
+**/
 EFI_STATUS
 FatGetVolumeEntry (
   IN FAT_VOLUME           *Volume,
   IN CHAR16               *Name
   )
-/*++
-
-Routine Description:
-
-  Get the directory entry for the volume.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  Name                  - The file name of the volume.
-
-Returns:
-
-  EFI_SUCCESS           - Update the volume with the directory entry sucessfully.
-  others                - An error occurred when getting volume label.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_DIRENT  LabelDirEnt;
@@ -1064,29 +926,23 @@ Returns:
   return Status;
 }
 
+/**
+
+  Set the relevant directory entry into disk for the volume.
+
+  @param  Volume              - FAT file system volume.
+  @param  Name                - The new file name of the volume.
+
+  @retval EFI_SUCCESS         - Update the Volume sucessfully.
+  @retval EFI_UNSUPPORTED     - The input label is not a valid volume label.
+  @return other               - An error occurred when setting volume label.
+
+**/
 EFI_STATUS
 FatSetVolumeEntry (
   IN FAT_VOLUME           *Volume,
   IN CHAR16               *Name
   )
-/*++
-
-Routine Description:
-
-  Set the relevant directory entry into disk for the volume.
-
-Arguments:
-
-  Volume              - FAT file system volume.
-  Name                - The new file name of the volume.
-
-Returns:
-
-  EFI_SUCCESS         - Update the Volume sucessfully.
-  EFI_UNSUPPORTED     - The input label is not a valid volume label.
-  other               - An error occurred when setting volume label.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_DIRENT  LabelDirEnt;
@@ -1121,26 +977,20 @@ Returns:
   return FatStoreDirEnt (Root, &LabelDirEnt);
 }
 
+/**
+
+  Create "." and ".." directory entries in the newly-created parent OFile.
+
+  @param  OFile                 - The parent OFile.
+
+  @retval EFI_SUCCESS           - The dot directory entries are successfully created.
+  @return other                 - An error occurred when creating the directory entry.
+
+**/
 EFI_STATUS
 FatCreateDotDirEnts (
   IN FAT_OFILE          *OFile
   )
-/*++
-
-Routine Description:
-
-  Create "." and ".." directory entries in the newly-created parent OFile.
-
-Arguments:
-
-  OFile                 - The parent OFile.
-
-Returns:
-
-  EFI_SUCCESS           - The dot directory entries are successfully created.
-  other                 - An error occurred when creating the directory entry.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_DIRENT  *DirEnt;
@@ -1165,6 +1015,20 @@ Returns:
   return Status;
 }
 
+/**
+
+  Create a directory entry in the parent OFile.
+
+  @param  OFile                 - The parent OFile.
+  @param  FileName              - The filename of the newly-created directory entry.
+  @param  Attributes            - The attribute of the newly-created directory entry.
+  @param  PtrDirEnt             - The pointer to the newly-created directory entry.
+
+  @retval EFI_SUCCESS           - The directory entry is successfully created.
+  @retval EFI_OUT_OF_RESOURCES  - Not enough memory to create the directory entry.
+  @return other                 - An error occurred when creating the directory entry.
+
+**/
 EFI_STATUS
 FatCreateDirEnt (
   IN  FAT_OFILE         *OFile,
@@ -1172,26 +1036,6 @@ FatCreateDirEnt (
   IN  UINT8             Attributes,
   OUT FAT_DIRENT        **PtrDirEnt
   )
-/*++
-
-Routine Description:
-
-  Create a directory entry in the parent OFile.
-
-Arguments:
-
-  OFile                 - The parent OFile.
-  FileName              - The filename of the newly-created directory entry.
-  Attributes            - The attribute of the newly-created directory entry.
-  PtrDirEnt             - The pointer to the newly-created directory entry.
-
-Returns:
-
-  EFI_SUCCESS           - The directory entry is successfully created.
-  EFI_OUT_OF_RESOURCES  - Not enough memory to create the directory entry.
-  other                 - An error occurred when creating the directory entry.
-
---*/
 {
   FAT_DIRENT  *DirEnt;
   FAT_ODIR    *ODir;
@@ -1234,28 +1078,22 @@ Done:
   return Status;
 }
 
+/**
+
+  Remove this directory entry node from the list of directory entries and hash table.
+
+  @param  OFile                - The parent OFile.
+  @param  DirEnt               - The directory entry to be removed.
+
+  @retval EFI_SUCCESS          - The directory entry is successfully removed.
+  @return other                - An error occurred when removing the directory entry.
+
+**/
 EFI_STATUS
 FatRemoveDirEnt (
   IN FAT_OFILE    *OFile,
   IN FAT_DIRENT   *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Remove this directory entry node from the list of directory entries and hash table.
-
-Arguments:
-
-  OFile                - The parent OFile.
-  DirEnt               - The directory entry to be removed.
-
-Returns:
-
-  EFI_SUCCESS          - The directory entry is successfully removed.
-  other                - An error occurred when removing the directory entry.
-
---*/
 {
   FAT_ODIR  *ODir;
 
@@ -1279,29 +1117,23 @@ Returns:
   return FatStoreDirEnt (OFile, DirEnt);
 }
 
+/**
+
+  Open the directory entry to get the OFile.
+
+  @param  Parent                - The parent OFile.
+  @param  DirEnt                - The directory entry to be opened.
+
+  @retval EFI_SUCCESS           - The directory entry is successfully opened.
+  @retval EFI_OUT_OF_RESOURCES  - not enough memory to allocate a new OFile.
+  @return other                 - An error occurred when opening the directory entry.
+
+**/
 EFI_STATUS
 FatOpenDirEnt (
   IN FAT_OFILE         *Parent,
   IN FAT_DIRENT        *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Open the directory entry to get the OFile.
-
-Arguments:
-
-  OFile                 - The parent OFile.
-  DirEnt                - The directory entry to be opened.
-
-Returns:
-
-  EFI_SUCCESS           - The directory entry is successfully opened.
-  EFI_OUT_OF_RESOURCES  - not enough memory to allocate a new OFile.
-  other                 - An error occurred when opening the directory entry.
-
---*/
 {
   FAT_OFILE   *OFile;
   FAT_VOLUME  *Volume;
@@ -1364,26 +1196,17 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Close the directory entry and free the OFile.
+
+  @param  DirEnt               - The directory entry to be closed.
+
+**/
 VOID
 FatCloseDirEnt (
   IN FAT_DIRENT        *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Close the directory entry and free the OFile.
-
-Arguments:
-
-  DirEnt               - The directory entry to be closed.
-
-Returns:
-
-  EFI_SUCCESS          - The directory entry is successfully opened.
-  Other                - An error occurred when opening the directory entry.
-
---*/
 {
   FAT_OFILE   *OFile;
   FAT_VOLUME  *Volume;
@@ -1412,6 +1235,26 @@ Returns:
   }
 }
 
+/**
+
+  Traverse filename and open all OFiles that can be opened.
+  Update filename pointer to the component that can't be opened.
+  If more than one name component remains, returns an error;
+  otherwise, return the remaining name component so that the caller might choose to create it.
+
+  @param  PtrOFile              - As input, the reference OFile; as output, the located OFile.
+  @param  FileName              - The file name relevant to the OFile.
+  @param  Attributes            - The attribute of the destination OFile.
+  @param  NewFileName           - The remaining file name.
+
+  @retval EFI_NOT_FOUND         - The file name can't be opened and there is more than one
+                          components within the name left (this means the name can
+                          not be created either).
+  @retval EFI_INVALID_PARAMETER - The parameter is not valid.
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @return other                 - An error occured when locating the OFile.
+
+**/
 EFI_STATUS
 FatLocateOFile (
   IN OUT FAT_OFILE        **PtrOFile,
@@ -1419,31 +1262,6 @@ FatLocateOFile (
   IN     UINT8            Attributes,
      OUT CHAR16           *NewFileName
   )
-/*++
-
-Routine Description:
-
-  Traverse filename and open all OFiles that can be opened.
-  Update filename pointer to the component that can't be opened.
-  If more than one name component remains, returns an error;
-  otherwise, return the remaining name component so that the caller might choose to create it.
-
-Arguments:
-  PtrOFile              - As input, the reference OFile; as output, the located OFile.
-  FileName              - The file name relevant to the OFile.
-  Attributes            - The attribute of the destination OFile.
-  NewFileName           - The remaining file name.
-
-Returns:
-
-  EFI_NOT_FOUND         - The file name can't be opened and there is more than one
-                          components within the name left (this means the name can
-                          not be created either).
-  EFI_INVALID_PARAMETER - The parameter is not valid.
-  EFI_SUCCESS           - Open the file successfully.
-  other                 - An error occured when locating the OFile.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_VOLUME  *Volume;

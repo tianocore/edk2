@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Routines that check references and flush OFiles
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -10,45 +11,29 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
-Module Name:
-
-  flush.c
-
-Abstract:
-
-  Routines that check references and flush OFiles
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Flushes all data associated with the file handle.
+
+  @param  FHand                 - Handle to file to flush.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS           - Flushed the file successfully.
+  @retval EFI_WRITE_PROTECTED   - The volume is read only.
+  @retval EFI_ACCESS_DENIED     - The file is read only.
+  @return Others                - Flushing of the file failed.
+
+**/
 EFI_STATUS
 EFIAPI
 FatFlushEx (
   IN EFI_FILE_PROTOCOL  *FHand,
   IN EFI_FILE_IO_TOKEN  *Token
   )
-/*++
-
-Routine Description:
-
-  Flushes all data associated with the file handle.
-
-Arguments:
-
-  FHand                 - Handle to file to flush.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_SUCCESS           - Flushed the file successfully.
-  EFI_WRITE_PROTECTED   - The volume is read only.
-  EFI_ACCESS_DENIED     - The file is read only.
-  Others                - Flushing of the file failed.
-
---*/
 {
   FAT_IFILE   *IFile;
   FAT_OFILE   *OFile;
@@ -113,53 +98,41 @@ Returns:
   return Status;
 }
 
+/**
+
+  Flushes all data associated with the file handle.
+
+  @param  FHand                 - Handle to file to flush.
+
+  @retval EFI_SUCCESS           - Flushed the file successfully.
+  @retval EFI_WRITE_PROTECTED   - The volume is read only.
+  @retval EFI_ACCESS_DENIED     - The file is read only.
+  @return Others                - Flushing of the file failed.
+
+**/
 EFI_STATUS
 EFIAPI
 FatFlush (
   IN EFI_FILE_PROTOCOL  *FHand
   )
-/*++
-
-Routine Description:
-
-  Flushes all data associated with the file handle.
-
-Arguments:
-
-  FHand                 - Handle to file to flush.
-
-Returns:
-
-  EFI_SUCCESS           - Flushed the file successfully.
-  EFI_WRITE_PROTECTED   - The volume is read only.
-  EFI_ACCESS_DENIED     - The file is read only.
-  Others                - Flushing of the file failed.
-
---*/
 {
   return FatFlushEx (FHand, NULL);
 }
 
+/**
+
+  Flushes & Closes the file handle.
+
+  @param  FHand                 - Handle to the file to delete.
+
+  @retval EFI_SUCCESS           - Closed the file successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 FatClose (
   IN EFI_FILE_PROTOCOL  *FHand
   )
-/*++
-
-Routine Description:
-
-  Flushes & Closes the file handle.
-
-Arguments:
-
-  FHand                 - Handle to the file to delete.
-
-Returns:
-
-  EFI_SUCCESS           - Closed the file successfully.
-
---*/
 {
   FAT_IFILE   *IFile;
   FAT_OFILE   *OFile;
@@ -191,25 +164,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Close the open file instance.
+
+  @param  IFile                 - Open file instance.
+
+  @retval EFI_SUCCESS           - Closed the file successfully.
+
+**/
 EFI_STATUS
 FatIFileClose (
   FAT_IFILE           *IFile
   )
-/*++
-
-Routine Description:
-
-  Close the open file instance.
-
-Arguments:
-
-  IFile                 - Open file instance.
-
-Returns:
-
-  EFI_SUCCESS           - Closed the file successfully.
-
---*/
 {
   FAT_OFILE   *OFile;
   FAT_VOLUME  *Volume;
@@ -239,27 +206,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-FatOFileFlush (
-  IN FAT_OFILE    *OFile
-  )
-/*++
-
-Routine Description:
+/**
 
   Flush the data associated with an open file.
   In this implementation, only last Mod/Access time is updated.
 
-Arguments:
+  @param  OFile                 - The open file.
 
-  OFile                 - The open file.
+  @retval EFI_SUCCESS           - The OFile is flushed successfully.
+  @return Others                - An error occurred when flushing this OFile.
 
-Returns:
-
-  EFI_SUCCESS           - The OFile is flushed successfully.
-  Others                - An error occurred when flushing this OFile.
-
---*/
+**/
+EFI_STATUS
+FatOFileFlush (
+  IN FAT_OFILE    *OFile
+  )
 {
   EFI_STATUS    Status;
   FAT_OFILE     *Parent;
@@ -318,28 +279,22 @@ Returns:
   return EFI_SUCCESS;
 }
 
-BOOLEAN
-FatCheckOFileRef (
-  IN FAT_OFILE   *OFile
-  )
-/*++
-
-Routine Description:
+/**
 
   Check the references of the OFile.
   If the OFile (that is checked) is no longer
   referenced, then it is freed.
 
-Arguments:
+  @param  OFile                 - The OFile to be checked.
 
-  OFile                 - The OFile to be checked.
+  @retval TRUE                  - The OFile is not referenced and freed.
+  @retval FALSE                 - The OFile is kept.
 
-Returns:
-
-  TRUE                  - The OFile is not referenced and freed.
-  FALSE                 - The OFile is kept.
-
---*/
+**/
+BOOLEAN
+FatCheckOFileRef (
+  IN FAT_OFILE   *OFile
+  )
 {
   //
   // If the OFile is on the check ref list, remove it
@@ -366,29 +321,21 @@ Returns:
   return TRUE;
 }
 
-STATIC
-VOID
-FatCheckVolumeRef (
-  IN FAT_VOLUME   *Volume
-  )
-/*++
-
-Routine Description:
+/**
 
   Check the references of all open files on the volume.
   Any open file (that is checked) that is no longer
   referenced, is freed - and it's parent open file
   is then referenced checked.
 
-Arguments:
+  @param  Volume                - The volume to check the pending open file list.
 
-  Volume                - The volume to check the pending open file list.
-
-Returns:
-
-  None
-
---*/
+**/
+STATIC
+VOID
+FatCheckVolumeRef (
+  IN FAT_VOLUME   *Volume
+  )
 {
   FAT_OFILE *OFile;
   FAT_OFILE *Parent;
@@ -414,6 +361,22 @@ Returns:
   }
 }
 
+/**
+
+  Set error status for a specific OFile, reference checking the volume.
+  If volume is already marked as invalid, and all resources are freed
+  after reference checking, the file system protocol is uninstalled and
+  the volume structure is freed.
+
+  @param  Volume                - the Volume that is to be reference checked and unlocked.
+  @param  OFile                 - the OFile whose permanent error code is to be set.
+  @param  EfiStatus             - error code to be set.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - Clean up the volume successfully.
+  @return Others                - Cleaning up of the volume is failed.
+
+**/
 EFI_STATUS
 FatCleanupVolume (
   IN FAT_VOLUME       *Volume,
@@ -421,27 +384,6 @@ FatCleanupVolume (
   IN EFI_STATUS       EfiStatus,
   IN FAT_TASK         *Task
   )
-/*++
-
-Routine Description:
-
-  Set error status for a specific OFile, reference checking the volume.
-  If volume is already marked as invalid, and all resources are freed
-  after reference checking, the file system protocol is uninstalled and
-  the volume structure is freed.
-
-Arguments:
-
-  Volume                - the Volume that is to be reference checked and unlocked.
-  OFile                 - the OFile whose permanent error code is to be set.
-  EfiStatus             - error code to be set.
-
-Returns:
-
-  EFI_SUCCESS           - Clean up the volume successfully.
-  Others                - Cleaning up of the volume is failed.
-
---*/
 {
   EFI_STATUS  Status;
   //
@@ -499,27 +441,19 @@ Returns:
   return EfiStatus;
 }
 
+/**
+
+  Set the OFile and its child OFile with the error Status
+
+  @param  OFile                 - The OFile whose permanent error code is to be set.
+  @param  Status                - Error code to be set.
+
+**/
 VOID
 FatSetVolumeError (
   IN FAT_OFILE            *OFile,
   IN EFI_STATUS           Status
   )
-/*++
-
-Routine Description:
-
-  Set the OFile and its child OFile with the error Status
-
-Arguments:
-
-  OFile                 - The OFile whose permanent error code is to be set.
-  Status                - Error code to be set.
-
-Returns:
-
-  None
-
---*/
 {
   LIST_ENTRY      *Link;
   FAT_OFILE       *ChildOFile;

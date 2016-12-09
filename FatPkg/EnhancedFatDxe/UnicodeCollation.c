@@ -189,9 +189,8 @@ FatStriCmp (
 /**
   Uppercase a string.
 
-  @param  Str                   The string which will be upper-cased.
+  @param  String                   The string which will be upper-cased.
 
-  @return None.
 
 **/
 VOID
@@ -209,9 +208,8 @@ FatStrUpr (
 /**
   Lowercase a string
 
-  @param  Str                   The string which will be lower-cased.
+  @param  String                   The string which will be lower-cased.
 
-  @return None
 
 **/
 VOID

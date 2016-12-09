@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Debug functions for fat driver
 
 Copyright (c) 2005, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,40 +10,21 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  debug.c
-
-Abstract:
-
-  Debug functions for fat driver
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Dump all the FAT Entry of the FAT table in the volume.
+
+  @param  Volume - The volume whose FAT info will be dumped
+
+**/
 VOID
 FatDumpFatTable (
   IN FAT_VOLUME   *Volume
   )
-/*++
-
-Routine Description:
-
-  Dump all the FAT Entry of the FAT table in the volume
-
-Arguments:
-
-  Volume - The volume whose FAT info will be dumped
-
-Returns:
-
-  None
-
---*/
 {
   UINTN   EntryValue;
   UINTN   MaxIndex;

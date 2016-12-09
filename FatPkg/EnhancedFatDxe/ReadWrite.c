@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Functions that perform file read/write.
 
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -10,44 +11,29 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
-Module Name:
-
-  ReadWrite.c
-
-Abstract:
-
-  Functions that perform file read/write
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Get the file's position of the file.
+
+
+  @param  FHand                 - The handle of file.
+  @param  Position              - The file's position of the file.
+
+  @retval EFI_SUCCESS           - Get the info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_UNSUPPORTED       - The open file is not a file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatGetPosition (
   IN  EFI_FILE_PROTOCOL *FHand,
   OUT UINT64            *Position
   )
-/*++
-
-Routine Description:
-
-  Get the file's position of the file.
-
-Arguments:
-
-  FHand                 - The handle of file.
-  Position              - The file's position of the file.
-
-Returns:
-
-  EFI_SUCCESS           - Get the info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_UNSUPPORTED       - The open file is not a file.
-
---*/
 {
   FAT_IFILE *IFile;
   FAT_OFILE *OFile;
@@ -67,30 +53,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Set the file's position of the file.
+
+  @param  FHand                 - The handle of file.
+  @param  Position              - The file's position of the file.
+
+  @retval EFI_SUCCESS           - Set the info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_UNSUPPORTED       - Set a directory with a not-zero position.
+
+**/
 EFI_STATUS
 EFIAPI
 FatSetPosition (
   IN EFI_FILE_PROTOCOL  *FHand,
   IN UINT64             Position
   )
-/*++
-
-Routine Description:
-
-  Set the file's position of the file.
-
-Arguments:
-
-  FHand                 - The handle of file.
-  Position              - The file's position of the file.
-
-Returns:
-
-  EFI_SUCCESS           - Set the info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_UNSUPPORTED       - Set a directory with a not-zero position.
-
---*/
 {
   FAT_IFILE *IFile;
   FAT_OFILE *OFile;
@@ -130,30 +110,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Get the file info from the open file of the IFile into Buffer.
+
+  @param  IFile                 - The instance of the open file.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing read data.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 FatIFileReadDir (
   IN     FAT_IFILE              *IFile,
   IN OUT UINTN                  *BufferSize,
      OUT VOID                   *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the file info from the open file of the IFile into Buffer.
-
-Arguments:
-
-  IFile                 - The instance of the open file.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing read data.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_OFILE   *OFile;
@@ -205,6 +179,24 @@ Done:
   return Status;
 }
 
+/**
+
+  Get the file info from the open file of the IFile into Buffer.
+
+  @param FHand                 - The file handle to access.
+  @param  IoMode                - Indicate whether the access mode is reading or writing.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing read data.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  @retval EFI_WRITE_PROTECTED   - The disk is write protect.
+  @retval EFI_ACCESS_DENIED     - The file is read-only.
+  @return other                 - An error occurred when operating on the disk.
+
+**/
 EFI_STATUS
 FatIFileAccess (
   IN     EFI_FILE_PROTOCOL     *FHand,
@@ -213,30 +205,6 @@ FatIFileAccess (
   IN OUT VOID                  *Buffer,
   IN     EFI_FILE_IO_TOKEN     *Token
   )
-/*++
-
-Routine Description:
-
-  Get the file info from the open file of the IFile into Buffer.
-
-Arguments:
-
-  FHand                 - The file handle to access.
-  IoMode                - Indicate whether the access mode is reading or writing.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing read data.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
-  EFI_WRITE_PROTECTED   - The disk is write protect.
-  EFI_ACCESS_DENIED     - The file is read-only.
-  other                 - An error occurred when operating on the disk.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_IFILE   *IFile;
@@ -373,6 +341,21 @@ Done:
   return Status;
 }
 
+/**
+
+  Get the file info.
+
+  @param  FHand                 - The handle of the file.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing read data.
+
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 EFIAPI
 FatRead (
@@ -380,59 +363,50 @@ FatRead (
   IN OUT UINTN              *BufferSize,
      OUT VOID               *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the file info.
-
-Arguments:
-
-  FHand                 - The handle of the file.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing read data.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   return FatIFileAccess (FHand, ReadData, BufferSize, Buffer, NULL);
 }
 
+/**
+
+  Get the file info.
+
+  @param  FHand                 - The handle of the file.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 EFIAPI
 FatReadEx (
   IN     EFI_FILE_PROTOCOL  *FHand,
   IN OUT EFI_FILE_IO_TOKEN  *Token
   )
-/*++
-
-Routine Description:
-
-  Get the file info.
-
-Arguments:
-
-  FHand                 - The handle of the file.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   return FatIFileAccess (FHand, ReadData, &Token->BufferSize, Token->Buffer, Token);
 }
 
+/**
+
+  Write the content of buffer into files.
+
+  @param  FHand                 - The handle of the file.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing write data.
+
+  @retval EFI_SUCCESS           - Set the file info successfully.
+  @retval EFI_WRITE_PROTECTED   - The disk is write protect.
+  @retval EFI_ACCESS_DENIED     - The file is read-only.
+  @retval EFI_DEVICE_ERROR      - The OFile is not valid.
+  @retval EFI_UNSUPPORTED       - The open file is not a file.
+                        - The writing file size is larger than 4GB.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 EFIAPI
 FatWrite (
@@ -440,62 +414,49 @@ FatWrite (
   IN OUT UINTN              *BufferSize,
   IN     VOID               *Buffer
   )
-/*++
-
-Routine Description:
-
-  Write the content of buffer into files.
-
-Arguments:
-
-  FHand                 - The handle of the file.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing write data.
-
-Returns:
-
-  EFI_SUCCESS           - Set the file info successfully.
-  EFI_WRITE_PROTECTED   - The disk is write protect.
-  EFI_ACCESS_DENIED     - The file is read-only.
-  EFI_DEVICE_ERROR      - The OFile is not valid.
-  EFI_UNSUPPORTED       - The open file is not a file.
-                        - The writing file size is larger than 4GB.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   return FatIFileAccess (FHand, WriteData, BufferSize, Buffer, NULL);
 }
 
+/**
+
+  Get the file info.
+
+  @param  FHand                 - The handle of the file.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 EFIAPI
 FatWriteEx (
   IN     EFI_FILE_PROTOCOL  *FHand,
   IN OUT EFI_FILE_IO_TOKEN  *Token
   )
-/*++
-
-Routine Description:
-
-  Get the file info.
-
-Arguments:
-
-  FHand                 - The handle of the file.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   return FatIFileAccess (FHand, WriteData, &Token->BufferSize, Token->Buffer, Token);
 }
 
+/**
+
+  This function reads data from a file or writes data to a file.
+  It uses OFile->PosRem to determine how much data can be accessed in one time.
+
+  @param  OFile                 - The open file.
+  @param  IoMode                - Indicate whether the access mode is reading or writing.
+  @param  Position              - The position where data will be accessed.
+  @param  DataBufferSize        - Size of Buffer.
+  @param  UserBuffer            - Buffer containing data.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - Access the data successfully.
+  @return other                 - An error occurred when operating on the disk.
+
+**/
 EFI_STATUS
 FatAccessOFile (
   IN     FAT_OFILE      *OFile,
@@ -505,27 +466,6 @@ FatAccessOFile (
   IN OUT UINT8          *UserBuffer,
   IN FAT_TASK           *Task
   )
-/*++
-
-Routine Description:
-
-  This function reads data from a file or writes data to a file.
-  It uses OFile->PosRem to determine how much data can be accessed in one time.
-
-Arguments:
-
-  OFile                 - The open file.
-  IoMode                - Indicate whether the access mode is reading or writing.
-  Position              - The position where data will be accessed.
-  DataBufferSize        - Size of Buffer.
-  UserBuffer            - Buffer containing data.
-
-Returns:
-
-  EFI_SUCCESS           - Access the data successfully.
-  other                 - An error occurred when operating on the disk.
-
---*/
 {
   FAT_VOLUME  *Volume;
   UINTN       Len;
@@ -579,28 +519,22 @@ Returns:
   return Status;
 }
 
+/**
+
+  Expand OFile by appending zero bytes at the end of OFile.
+
+  @param  OFile                 - The open file.
+  @param  ExpandedSize          - The number of zero bytes appended at the end of the file.
+
+  @retval EFI_SUCCESS           - The file is expanded successfully.
+  @return other                 - An error occurred when expanding file.
+
+**/
 EFI_STATUS
 FatExpandOFile (
   IN FAT_OFILE          *OFile,
   IN UINT64             ExpandedSize
   )
-/*++
-
-Routine Description:
-
-  Expand OFile by appending zero bytes at the end of OFile.
-
-Arguments:
-
-  OFile                 - The open file.
-  ExpandedSize          - The number of zero bytes appended at the end of the file.
-
-Returns:
-
-  EFI_SUCCESS           - The file is expanded successfully.
-  other                 - An error occurred when expanding file.
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       WritePos;
@@ -614,29 +548,23 @@ Returns:
   return Status;
 }
 
+/**
+
+  Write zero pool from the WritePos to the end of OFile.
+
+  @param  OFile                 - The open file to write zero pool.
+  @param  WritePos              - The number of zero bytes written.
+
+  @retval EFI_SUCCESS           - Write the zero pool successfully.
+  @retval EFI_OUT_OF_RESOURCES  - Not enough memory to perform the operation.
+  @return other                 - An error occurred when writing disk.
+
+**/
 EFI_STATUS
 FatWriteZeroPool (
   IN FAT_OFILE  *OFile,
   IN UINTN      WritePos
   )
-/*++
-
-Routine Description:
-
-  Write zero pool from the WritePos to the end of OFile.
-
-Arguments:
-
-  OFile                 - The open file to write zero pool.
-  WritePos              - The number of zero bytes written.
-
-Returns:
-
-  EFI_SUCCESS           - Write the zero pool successfully.
-  EFI_OUT_OF_RESOURCES  - Not enough memory to perform the operation.
-  other                 - An error occurred when writing disk.
-
---*/
 {
   EFI_STATUS  Status;
   VOID        *ZeroBuffer;
@@ -676,28 +604,22 @@ Returns:
   return Status;
 }
 
+/**
+
+  Truncate the OFile to smaller file size.
+
+  @param  OFile                 - The open file.
+  @param  TruncatedSize         - The new file size.
+
+  @retval EFI_SUCCESS           - The file is truncated successfully.
+  @return other                 - An error occurred when truncating file.
+
+**/
 EFI_STATUS
 FatTruncateOFile (
   IN FAT_OFILE          *OFile,
   IN UINTN              TruncatedSize
   )
-/*++
-
-Routine Description:
-
-  Truncate the OFile to smaller file size.
-
-Arguments:
-
-  OFile                 - The open file.
-  TruncatedSize         - The new file size.
-
-Returns:
-
-  EFI_SUCCESS           - The file is truncated successfully.
-  other                 - An error occurred when truncating file.
-
---*/
 {
   OFile->FileSize = TruncatedSize;
   return FatShrinkEof (OFile);

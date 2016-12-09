@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Global data in the FAT Filesystem driver.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,18 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  Data.c
-
-Abstract:
-
-  Global data in the FAT Filesystem driver
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 

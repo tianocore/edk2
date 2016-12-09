@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Initialization routines.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,19 +10,25 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  Init.c
-
-Abstract:
-
-  Initialization routines
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Allocates volume structure, detects FAT file system, installs protocol,
+  and initialize cache.
+
+  @param  Handle                - The handle of parent device.
+  @param  DiskIo                - The DiskIo of parent device.
+  @param  DiskIo2               - The DiskIo2 of parent device.
+  @param  BlockIo               - The BlockIo of parent devicel
+
+  @retval EFI_SUCCESS           - Allocate a new volume successfully.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
+  @return Others                - Allocating a new volume failed.
+
+**/
 EFI_STATUS
 FatAllocateVolume (
   IN  EFI_HANDLE                Handle,
@@ -29,26 +36,6 @@ FatAllocateVolume (
   IN  EFI_DISK_IO2_PROTOCOL     *DiskIo2,
   IN  EFI_BLOCK_IO_PROTOCOL     *BlockIo
   )
-/*++
-
-Routine Description:
-
-  Allocates volume structure, detects FAT file system, installs protocol,
-  and initialize cache.
-
-Arguments:
-
-  Handle                - The handle of parent device.
-  DiskIo                - The DiskIo of parent device.
-  BlockIo               - The BlockIo of parent devicel
-
-Returns:
-
-  EFI_SUCCESS           - Allocate a new volume successfully.
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
-  Others                - Allocating a new volume failed.
-
---*/
 {
   EFI_STATUS  Status;
   FAT_VOLUME  *Volume;
@@ -120,26 +107,20 @@ Done:
   return Status;
 }
 
+/**
+
+  Called by FatDriverBindingStop(), Abandon the volume.
+
+  @param  Volume                - The volume to be abandoned.
+
+  @retval EFI_SUCCESS           - Abandoned the volume successfully.
+  @return Others                - Can not uninstall the protocol interfaces.
+
+**/
 EFI_STATUS
 FatAbandonVolume (
   IN FAT_VOLUME *Volume
   )
-/*++
-
-Routine Description:
-
-  Called by FatDriverBindingStop(), Abandon the volume.
-
-Arguments:
-
-  Volume                - The volume to be abandoned.
-
-Returns:
-
-  EFI_SUCCESS           - Abandoned the volume successfully.
-  Others                - Can not uninstall the protocol interfaces.
-
---*/
 {
   EFI_STATUS  Status;
   BOOLEAN     LockedByMe;
@@ -202,27 +183,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Detects FAT file system on Disk and set relevant fields of Volume.
+
+  @param Volume                - The volume structure.
+
+  @retval EFI_SUCCESS           - The Fat File System is detected successfully
+  @retval EFI_UNSUPPORTED       - The volume is not FAT file system.
+  @retval EFI_VOLUME_CORRUPTED  - The volume is corrupted.
+
+**/
 EFI_STATUS
 FatOpenDevice (
   IN OUT FAT_VOLUME           *Volume
   )
-/*++
-
-Routine Description:
-
-  Detects FAT file system on Disk and set relevant fields of Volume
-
-Arguments:
-
-  Volume                - The volume structure.
-
-Returns:
-
-  EFI_SUCCESS           - The Fat File System is detected successfully
-  EFI_UNSUPPORTED       - The volume is not FAT file system.
-  EFI_VOLUME_CORRUPTED  - The volume is corrupted.
-
---*/
 {
   EFI_STATUS            Status;
   UINT32                BlockSize;

@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Definitions for on-disk FAT structures.
 
 Copyright (c) 2005, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -10,17 +11,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
-Module Name:
-
-  FatFileSystem.h
-
-Abstract:
-
-  Definitions for on-disk FAT structures
-
-Revision History
-
---*/
+**/
 
 #ifndef _FATFILESYSTEM_H_
 #define _FATFILESYSTEM_H_

@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Fat File System driver routines that support EFI driver model.
 
 Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,16 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  Fat.c
-
-Abstract:
-
-  Fat File System driver routines that support EFI driver model
-
---*/
+**/
 
 #include "Fat.h"
 
@@ -72,29 +64,23 @@ EFI_DRIVER_BINDING_PROTOCOL gFatDriverBinding = {
   NULL
 };
 
+/**
+
+  Register Driver Binding protocol for this driver.
+
+  @param  ImageHandle           - Handle for the image of this driver.
+  @param  SystemTable           - Pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS           - Driver loaded.
+  @return other                 - Driver not loaded.
+
+**/
 EFI_STATUS
 EFIAPI
 FatEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-/*++
-
-Routine Description:
-
-  Register Driver Binding protocol for this driver.
-
-Arguments:
-
-  ImageHandle           - Handle for the image of this driver.
-  SystemTable           - Pointer to the EFI System Table.
-
-Returns:
-
-  EFI_SUCCESS           - Driver loaded.
-  other                 - Driver not loaded.
-
---*/
 {
   EFI_STATUS                Status;
 
@@ -114,27 +100,21 @@ Returns:
   return Status;
 }
 
+/**
+
+  Unload function for this image. Uninstall DriverBinding protocol.
+
+  @param ImageHandle           - Handle for the image of this driver.
+
+  @retval EFI_SUCCESS           - Driver unloaded successfully.
+  @return other                 - Driver can not unloaded.
+
+**/
 EFI_STATUS
 EFIAPI
 FatUnload (
   IN EFI_HANDLE  ImageHandle
   )
-/*++
-
-Routine Description:
-
-  Unload function for this image. Uninstall DriverBinding protocol.
-
-Arguments:
-
-  ImageHandle           - Handle for the image of this driver.
-
-Returns:
-
-  EFI_SUCCESS           - Driver unloaded successfully.
-  other                 - Driver can not unloaded.
-
---*/
 {
   EFI_STATUS  Status;
   EFI_HANDLE  *DeviceHandleBuffer;
@@ -224,6 +204,20 @@ Returns:
   return Status;
 }
 
+/**
+
+  Test to see if this driver can add a file system to ControllerHandle.
+  ControllerHandle must support both Disk IO and Block IO protocols.
+
+  @param  This                  - Protocol instance pointer.
+  @param  ControllerHandle      - Handle of device to test.
+  @param  RemainingDevicePath   - Not used.
+
+  @retval EFI_SUCCESS           - This driver supports this device.
+  @retval EFI_ALREADY_STARTED   - This driver is already running on this device.
+  @return other                 - This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 FatDriverBindingSupported (
@@ -231,26 +225,6 @@ FatDriverBindingSupported (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  Test to see if this driver can add a file system to ControllerHandle.
-  ControllerHandle must support both Disk IO and Block IO protocols.
-
-Arguments:
-
-  This                  - Protocol instance pointer.
-  ControllerHandle      - Handle of device to test.
-  RemainingDevicePath   - Not used.
-
-Returns:
-
-  EFI_SUCCESS           - This driver supports this device.
-  EFI_ALREADY_STARTED   - This driver is already running on this device.
-  other                 - This driver does not support this device.
-
---*/
 {
   EFI_STATUS            Status;
   EFI_DISK_IO_PROTOCOL  *DiskIo;
@@ -295,6 +269,22 @@ Returns:
   return Status;
 }
 
+/**
+
+  Start this driver on ControllerHandle by opening a Block IO and Disk IO
+  protocol, reading Device Path. Add a Simple File System protocol to
+  ControllerHandle if the media contains a valid file system.
+
+  @param  This                  - Protocol instance pointer.
+  @param  ControllerHandle      - Handle of device to bind driver to.
+  @param  RemainingDevicePath   - Not used.
+
+  @retval EFI_SUCCESS           - This driver is added to DeviceHandle.
+  @retval EFI_ALREADY_STARTED   - This driver is already running on DeviceHandle.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
+  @return other                 - This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 FatDriverBindingStart (
@@ -302,28 +292,6 @@ FatDriverBindingStart (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-  Start this driver on ControllerHandle by opening a Block IO and Disk IO
-  protocol, reading Device Path. Add a Simple File System protocol to
-  ControllerHandle if the media contains a valid file system.
-
-Arguments:
-
-  This                  - Protocol instance pointer.
-  ControllerHandle      - Handle of device to bind driver to.
-  RemainingDevicePath   - Not used.
-
-Returns:
-
-  EFI_SUCCESS           - This driver is added to DeviceHandle.
-  EFI_ALREADY_STARTED   - This driver is already running on DeviceHandle.
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
-  other                 - This driver does not support this device.
-
---*/
 {
   EFI_STATUS            Status;
   EFI_BLOCK_IO_PROTOCOL *BlockIo;
@@ -430,6 +398,19 @@ Exit:
   return Status;
 }
 
+/**
+
+  Stop this driver on ControllerHandle.
+
+  @param  This                  - Protocol instance pointer.
+  @param  ControllerHandle      - Handle of device to stop driver on.
+  @param  NumberOfChildren      - Not used.
+  @param  ChildHandleBuffer     - Not used.
+
+  @retval EFI_SUCCESS           - This driver is removed DeviceHandle.
+  @return other                 - This driver was not removed from this device.
+
+**/
 EFI_STATUS
 EFIAPI
 FatDriverBindingStop (
@@ -438,22 +419,6 @@ FatDriverBindingStop (
   IN  UINTN                         NumberOfChildren,
   IN  EFI_HANDLE                    *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-  Stop this driver on ControllerHandle.
-
-Arguments:
-  This                  - Protocol instance pointer.
-  ControllerHandle      - Handle of device to stop driver on.
-  NumberOfChildren      - Not used.
-  ChildHandleBuffer     - Not used.
-
-Returns:
-  EFI_SUCCESS           - This driver is removed DeviceHandle.
-  other                 - This driver was not removed from this device.
-
---*/
 {
   EFI_STATUS                      Status;
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FileSystem;

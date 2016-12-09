@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Main header file for EFI FAT file system driver.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,18 +10,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  Fat.h
-
-Abstract:
-
-  Main header file for EFI FAT file system driver
-
-Revision History
-
---*/
+**/
 
 #ifndef _FAT_H_
 #define _FAT_H_
@@ -396,6 +386,26 @@ struct _FAT_VOLUME {
 //
 // Function Prototypes
 //
+
+/**
+
+  Implements Open() of Simple File System Protocol.
+
+  @param  FHand                 - File handle of the file serves as a starting reference point.
+  @param  NewHandle             - Handle of the file that is newly opened.
+  @param  FileName              - File name relative to FHand.
+  @param  OpenMode              - Open mode.
+  @param  Attributes            - Attributes to set if the file is created.
+
+
+  @retval EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
+                          The OpenMode is not supported.
+                          The Attributes is not the valid attributes.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @return Others                - The status of open file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatOpen (
@@ -405,31 +415,27 @@ FatOpen (
   IN  UINT64            OpenMode,
   IN  UINT64            Attributes
   )
-/*++
-Routine Description:
-
-  Implements Open() of Simple File System Protocol.
-
-Arguments:
-
-  FHand                 - File handle of the file serves as a starting reference point.
-  NewHandle             - Handle of the file that is newly opened.
-  FileName              - File name relative to FHand.
-  OpenMode              - Open mode.
-  Attributes            - Attributes to set if the file is created.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
-                          The OpenMode is not supported.
-                          The Attributes is not the valid attributes.
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
-  EFI_SUCCESS           - Open the file successfully.
-  Others                - The status of open file.
-
---*/
 ;
 
+/**
+
+  Implements OpenEx() of Simple File System Protocol.
+
+  @param  FHand                 - File handle of the file serves as a starting reference point.
+  @param  NewHandle             - Handle of the file that is newly opened.
+  @param  FileName              - File name relative to FHand.
+  @param  OpenMode              - Open mode.
+  @param  Attributes            - Attributes to set if the file is created.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @retval EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
+                          The OpenMode is not supported.
+                          The Attributes is not the valid attributes.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @return Others                - The status of open file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatOpenEx (
@@ -440,58 +446,41 @@ FatOpenEx (
   IN  UINT64                  Attributes,
   IN OUT EFI_FILE_IO_TOKEN    *Token
   )
-/*++
-Routine Description:
-
-  Implements OpenEx() of Simple File System Protocol.
-
-Arguments:
-
-  FHand                 - File handle of the file serves as a starting reference point.
-  NewHandle             - Handle of the file that is newly opened.
-  FileName              - File name relative to FHand.
-  OpenMode              - Open mode.
-  Attributes            - Attributes to set if the file is created.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
-                          The OpenMode is not supported.
-                          The Attributes is not the valid attributes.
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
-  EFI_SUCCESS           - Open the file successfully.
-  Others                - The status of open file.
-
---*/
 ;
 
+/**
+
+  Get the file's position of the file
+
+  @param  FHand                 - The handle of file.
+  @param  Position              - The file's position of the file.
+
+  @retval EFI_SUCCESS           - Get the info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_UNSUPPORTED       - The open file is not a file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatGetPosition (
   IN  EFI_FILE_PROTOCOL *FHand,
   OUT UINT64            *Position
   )
-/*++
-
-Routine Description:
-
-  Get the file's position of the file
-
-Arguments:
-
-  FHand                 - The handle of file.
-  Position              - The file's position of the file.
-
-Returns:
-
-  EFI_SUCCESS           - Get the info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_UNSUPPORTED       - The open file is not a file.
-
---*/
 ;
 
+/**
+
+  Get the some types info of the file into Buffer
+
+  @param  FHand                 - The handle of file.
+  @param  Type                  - The type of the info.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing volume info.
+
+  @retval EFI_SUCCESS           - Get the info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatGetInfo (
@@ -500,27 +489,21 @@ FatGetInfo (
   IN OUT UINTN                  *BufferSize,
      OUT VOID                   *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the some types info of the file into Buffer
-
-Arguments:
-
-  FHand                 - The handle of file.
-  Type                  - The type of the info.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing volume info.
-
-Returns:
-
-  EFI_SUCCESS           - Get the info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-
---*/
 ;
 
+/**
+
+  Set the some types info of the file into Buffer.
+
+  @param  FHand                 - The handle of file.
+  @param  Type                  - The type of the info.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing volume info.
+
+  @retval EFI_SUCCESS           - Set the info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatSetInfo (
@@ -529,151 +512,116 @@ FatSetInfo (
   IN UINTN              BufferSize,
   IN VOID               *Buffer
   )
-/*++
-
-Routine Description:
-
-  Set the some types info of the file into Buffer
-
-Arguments:
-
-  FHand                 - The handle of file.
-  Type                  - The type of the info.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing volume info.
-
-Returns:
-
-  EFI_SUCCESS           - Set the info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-
---*/
 ;
 
+/**
+
+  Flushes all data associated with the file handle.
+
+  @param  FHand                 - Handle to file to flush
+
+  @retval EFI_SUCCESS           - Flushed the file successfully
+  @retval EFI_WRITE_PROTECTED   - The volume is read only
+  @retval EFI_ACCESS_DENIED     - The volume is not read only
+                          but the file is read only
+  @return Others                - Flushing of the file is failed
+
+**/
 EFI_STATUS
 EFIAPI
 FatFlush (
   IN EFI_FILE_PROTOCOL  *FHand
   )
-/*++
-
-Routine Description:
-
-  Flushes all data associated with the file handle
-
-Arguments:
-
-  FHand                 - Handle to file to flush
-
-Returns:
-
-  EFI_SUCCESS           - Flushed the file successfully
-  EFI_WRITE_PROTECTED   - The volume is read only
-  EFI_ACCESS_DENIED     - The volume is not read only
-                          but the file is read only
-  Others                - Flushing of the file is failed
-
---*/
 ;
 
+/**
+
+  Flushes all data associated with the file handle.
+
+  @param  FHand                 - Handle to file to flush.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS           - Flushed the file successfully.
+  @retval EFI_WRITE_PROTECTED   - The volume is read only.
+  @retval EFI_ACCESS_DENIED     - The file is read only.
+  @return Others                - Flushing of the file failed.
+
+**/
 EFI_STATUS
 EFIAPI
 FatFlushEx (
   IN EFI_FILE_PROTOCOL  *FHand,
   IN EFI_FILE_IO_TOKEN  *Token
   )
-/*++
-
-Routine Description:
-
-  Flushes all data associated with the file handle.
-
-Arguments:
-
-  FHand                 - Handle to file to flush.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_SUCCESS           - Flushed the file successfully.
-  EFI_WRITE_PROTECTED   - The volume is read only.
-  EFI_ACCESS_DENIED     - The file is read only.
-  Others                - Flushing of the file failed.
-
---*/
 ;
 
+/**
+
+  Flushes & Closes the file handle.
+
+  @param  FHand                 - Handle to the file to delete.
+
+  @retval EFI_SUCCESS           - Closed the file successfully.
+
+**/
 EFI_STATUS
 EFIAPI
 FatClose (
   IN EFI_FILE_PROTOCOL  *FHand
   )
-/*++
-
-Routine Description:
-
-  Flushes & Closes the file handle.
-
-Arguments:
-
-  FHand                 - Handle to the file to delete.
-
-Returns:
-
-  EFI_SUCCESS           - Closed the file successfully.
-
---*/
 ;
 
+/**
+
+  Deletes the file & Closes the file handle.
+
+  @param  FHand                    - Handle to the file to delete.
+
+  @retval EFI_SUCCESS              - Delete the file successfully.
+  @retval EFI_WARN_DELETE_FAILURE  - Fail to delete the file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatDelete (
   IN EFI_FILE_PROTOCOL  *FHand
   )
-/*++
-
-Routine Description:
-
-  Deletes the file & Closes the file handle.
-
-Arguments:
-
-  FHand                    - Handle to the file to delete.
-
-Returns:
-
-  EFI_SUCCESS              - Delete the file successfully.
-  EFI_WARN_DELETE_FAILURE  - Fail to delete the file.
-
---*/
 ;
 
+/**
+
+  Set the file's position of the file.
+
+  @param  FHand                 - The handle of file
+  @param  Position              - The file's position of the file
+
+  @retval EFI_SUCCESS           - Set the info successfully
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file
+  @retval EFI_UNSUPPORTED       - Set a directory with a not-zero position
+
+**/
 EFI_STATUS
 EFIAPI
 FatSetPosition (
   IN EFI_FILE_PROTOCOL  *FHand,
   IN UINT64             Position
   )
-/*++
-
-Routine Description:
-
-  Set the file's position of the file
-
-Arguments:
-
-  FHand                 - The handle of file
-  Position              - The file's position of the file
-
-Returns:
-
-  EFI_SUCCESS           - Set the info successfully
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file
-  EFI_UNSUPPORTED       - Set a directory with a not-zero position
-
---*/
 ;
 
+/**
+
+  Get the file info.
+
+  @param FHand                 - The handle of the file.
+  @param BufferSize            - Size of Buffer.
+  @param Buffer                - Buffer containing read data.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 EFIAPI
 FatRead (
@@ -681,55 +629,46 @@ FatRead (
   IN OUT UINTN                *BufferSize,
      OUT VOID                 *Buffer
   )
-/*++
+;
 
-Routine Description:
+/**
 
   Get the file info.
 
-Arguments:
+  @param FHand                 - The handle of the file.
+  @param Token                 - A pointer to the token associated with the transaction.
 
-  FHand                 - The handle of the file.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing read data.
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  @return other                 - An error occurred when operation the disk.
 
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
-  other                 - An error occurred when operation the disk.
-
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 FatReadEx (
   IN     EFI_FILE_PROTOCOL  *FHand,
   IN OUT EFI_FILE_IO_TOKEN  *Token
   )
-/*++
-
-Routine Description:
-
-  Get the file info.
-
-Arguments:
-
-  FHand                 - The handle of the file.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
-  other                 - An error occurred when operation the disk.
-
---*/
 ;
 
+/**
+
+  Set the file info.
+
+  @param  FHand                 - The handle of the file.
+  @param  BufferSize            - Size of Buffer.
+  @param Buffer                - Buffer containing write data.
+
+  @retval EFI_SUCCESS           - Set the file info successfully.
+  @retval EFI_WRITE_PROTECTED   - The disk is write protected.
+  @retval EFI_ACCESS_DENIED     - The file is read-only.
+  @retval EFI_DEVICE_ERROR      - The OFile is not valid.
+  @retval EFI_UNSUPPORTED       - The open file is not a file.
+                        - The writing file size is larger than 4GB.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 EFIAPI
 FatWrite (
@@ -737,56 +676,27 @@ FatWrite (
   IN OUT UINTN                  *BufferSize,
   IN     VOID                   *Buffer
   )
-/*++
-
-Routine Description:
-
-  Set the file info.
-
-Arguments:
-
-  FHand                 - The handle of the file.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing write data.
-
-Returns:
-
-  EFI_SUCCESS           - Set the file info successfully.
-  EFI_WRITE_PROTECTED   - The disk is write protected.
-  EFI_ACCESS_DENIED     - The file is read-only.
-  EFI_DEVICE_ERROR      - The OFile is not valid.
-  EFI_UNSUPPORTED       - The open file is not a file.
-                        - The writing file size is larger than 4GB.
-  other                 - An error occurred when operation the disk.
-
---*/
 ;
 
+/**
+
+  Get the file info.
+
+  @param  FHand                 - The handle of the file.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+  @retval EFI_VOLUME_CORRUPTED  - The file type of open file is error.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 EFIAPI
 FatWriteEx (
   IN     EFI_FILE_PROTOCOL  *FHand,
   IN OUT EFI_FILE_IO_TOKEN  *Token
   )
-/*++
-
-Routine Description:
-
-  Get the file info.
-
-Arguments:
-
-  FHand                 - The handle of the file.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-  EFI_VOLUME_CORRUPTED  - The file type of open file is error.
-  other                 - An error occurred when operation the disk.
-
---*/
 ;
 
 //

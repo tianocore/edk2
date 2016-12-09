@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Miscellaneous functions.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -10,40 +11,26 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
-Module Name:
-
-  Misc.c
-
-Abstract:
-
-  Miscellaneous functions
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 UINT8  mMonthDays[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
+/**
+
+  Create the task
+
+  @param  IFile                 - The instance of the open file.
+  @param  Token                 - A pointer to the token associated with the transaction.
+
+  @return FAT_TASK *            - Return the task instance.
+
+**/
 FAT_TASK *
 FatCreateTask (
   FAT_IFILE           *IFile,
   EFI_FILE_IO_TOKEN   *Token
   )
-/*++
-
-Routine Description:
-
-  Create the task
-
-Arguments:
-
-  IFile                 - The instance of the open file.
-  Token                 - A pointer to the token associated with the transaction.
-
-Return:
-  FAT_TASK *            - Return the task instance.
-**/
 {
   FAT_TASK            *Task;
 
@@ -58,20 +45,17 @@ Return:
   return Task;
 }
 
+/**
+
+  Destroy the task.
+
+  @param  Task                  - The task to be destroyed.
+
+**/
 VOID
 FatDestroyTask (
   FAT_TASK            *Task
   )
-/*++
-
-Routine Description:
-
-  Destroy the task
-
-Arguments:
-
-  Task                  - The task to be destroyed.
-**/
 {
   LIST_ENTRY          *Link;
   FAT_SUBTASK         *Subtask;
@@ -84,20 +68,17 @@ Arguments:
   FreePool (Task);
 }
 
+/**
+
+  Wait all non-blocking requests complete.
+
+  @param  IFile                 - The instance of the open file.
+
+**/
 VOID
 FatWaitNonblockingTask (
   FAT_IFILE           *IFile
   )
-/*++
-
-Routine Description:
-
-  Wait all non-blocking requests complete.
-
-Arguments:
-
-  IFile                 - The instance of the open file.
-**/
 {
   BOOLEAN             TaskQueueEmpty;
 
@@ -108,25 +89,19 @@ Arguments:
   } while (!TaskQueueEmpty);
 }
 
+/**
+
+  Remove the subtask from subtask list.
+
+  @param  Subtask               - The subtask to be removed.
+
+  @return LIST_ENTRY *          - The next node in the list.
+
+**/
 LIST_ENTRY *
 FatDestroySubtask (
   FAT_SUBTASK         *Subtask
   )
-/*++
-
-Routine Description:
-
-  Remove the subtask from subtask list.
-
-Arguments:
-
-  Subtask               - The subtask to be removed.
-
-Returns:
-
-  LIST_ENTRY *          - The next node in the list.
-
---*/
 {
   LIST_ENTRY          *Link;
 
@@ -138,28 +113,22 @@ Returns:
   return Link;
 }
 
+/**
+
+  Execute the task.
+
+  @param  IFile                 - The instance of the open file.
+  @param  Task                  - The task to be executed.
+
+  @retval EFI_SUCCESS           - The task was executed sucessfully.
+  @return other                 - An error occurred when executing the task.
+
+**/
 EFI_STATUS
 FatQueueTask (
   IN FAT_IFILE        *IFile,
   IN FAT_TASK         *Task
   )
-/*++
-
-Routine Description:
-
-  Execute the task
-
-Arguments:
-
-  IFile                 - The instance of the open file.
-  Task                  - The task to be executed.
-
-Returns:
-
-  EFI_SUCCESS           - The task was executed sucessfully.
-  other                 - An error occurred when executing the task.
-
---*/
 {
   EFI_STATUS          Status;
   LIST_ENTRY          *Link;
@@ -239,30 +208,24 @@ Returns:
   return Status;
 }
 
+/**
+
+  Set the volume as dirty or not.
+
+  @param  Volume                - FAT file system volume.
+  @param  IoMode                - The access mode.
+  @param  DirtyValue            - Set the volume as dirty or not.
+
+  @retval EFI_SUCCESS           - Set the new FAT entry value sucessfully.
+  @return other                 - An error occurred when operation the FAT entries.
+
+**/
 EFI_STATUS
 FatAccessVolumeDirty (
   IN FAT_VOLUME       *Volume,
   IN IO_MODE          IoMode,
   IN VOID             *DirtyValue
   )
-/*++
-
-Routine Description:
-
-  Set the volume as dirty or not
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  IoMode                - The access mode.
-  DirtyValue            - Set the volume as dirty or not.
-
-Returns:
-
-  EFI_SUCCESS           - Set the new FAT entry value sucessfully.
-  other                 - An error occurred when operation the FAT entries.
-
---*/
 {
   UINTN WriteCount;
 
@@ -271,7 +234,7 @@ Returns:
 }
 
 /**
-  Invoke a notification event
+  Invoke a notification event.
 
   @param  Event                 Event whose notification function is being invoked.
   @param  Context               The pointer to the notification function's context,
@@ -284,22 +247,6 @@ FatOnAccessComplete (
   IN  EFI_EVENT                Event,
   IN  VOID                     *Context
   )
-/*++
-
-Routine Description:
-
-  Invoke a notification event
-  case #1. some subtasks are not completed when the FatOpenEx checks the Task->Subtasks
-           - sets Task->SubtaskCollected so callback to signal the event and free the task.
-  case #2. all subtasks are completed when the FatOpenEx checks the Task->Subtasks
-           - FatOpenEx signal the event and free the task.
-Arguments:
-
-  Event                 - Event whose notification function is being invoked.
-  Context               - The pointer to the notification function's context,
-                          which is implementation-dependent.
-
---*/
 {
   EFI_STATUS             Status;
   FAT_SUBTASK            *Subtask;
@@ -342,6 +289,22 @@ Arguments:
   }
 }
 
+/**
+
+  General disk access function.
+
+  @param  Volume                - FAT file system volume.
+  @param  IoMode                - The access mode (disk read/write or cache access).
+  @param  Offset                - The starting byte offset to read from.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing read data.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - The operation is performed successfully.
+  @retval EFI_VOLUME_CORRUPTED  - The accesss is
+  @return Others                - The status of read/write the disk
+
+**/
 EFI_STATUS
 FatDiskIo (
   IN     FAT_VOLUME       *Volume,
@@ -351,27 +314,6 @@ FatDiskIo (
   IN OUT VOID             *Buffer,
   IN     FAT_TASK         *Task
   )
-/*++
-
-Routine Description:
-
-  General disk access function
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  IoMode                - The access mode (disk read/write or cache access).
-  Offset                - The starting byte offset to read from.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing read data.
-
-Returns:
-
-  EFI_SUCCESS           - The operation is performed successfully.
-  EFI_VOLUME_CORRUPTED  - The accesss is
-  Others                - The status of read/write the disk
-
---*/
 {
   EFI_STATUS            Status;
   EFI_DISK_IO_PROTOCOL  *DiskIo;
@@ -438,97 +380,61 @@ Returns:
   return Status;
 }
 
+/**
+
+  Lock the volume.
+
+**/
 VOID
 FatAcquireLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Lock the volume.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  None.
-
---*/
 {
   EfiAcquireLock (&FatFsLock);
 }
 
-EFI_STATUS
-FatAcquireLockOrFail (
-  VOID
-  )
-/*++
-
-Routine Description:
+/**
 
   Lock the volume.
   If the lock is already in the acquired state, then EFI_ACCESS_DENIED is returned.
   Otherwise, EFI_SUCCESS is returned.
 
-Arguments:
+  @retval EFI_SUCCESS           - The volume is locked.
+  @retval EFI_ACCESS_DENIED     - The volume could not be locked because it is already locked.
 
-  None.
-
-Returns:
-
-  EFI_SUCCESS           - The volume is locked.
-  EFI_ACCESS_DENIED     - The volume could not be locked because it is already locked.
-
---*/
+**/
+EFI_STATUS
+FatAcquireLockOrFail (
+  VOID
+  )
 {
   return EfiAcquireLockOrFail (&FatFsLock);
 }
 
+/**
+
+  Unlock the volume.
+
+**/
 VOID
 FatReleaseLock (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Unlock the volume.
-
-Arguments:
-
-  Null.
-
-Returns:
-
-  None.
-
---*/
 {
   EfiReleaseLock (&FatFsLock);
 }
 
+/**
+
+  Free directory entry.
+
+  @param  DirEnt                - The directory entry to be freed.
+
+**/
 VOID
 FatFreeDirEnt (
   IN FAT_DIRENT       *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Free directory entry.
-
-Arguments:
-
-  DirEnt                - The directory entry to be freed.
-
-Returns:
-
-  None.
-
---*/
 {
   if (DirEnt->FileString != NULL) {
     FreePool (DirEnt->FileString);
@@ -537,25 +443,17 @@ Returns:
   FreePool (DirEnt);
 }
 
+/**
+
+  Free volume structure (including the contents of directory cache and disk cache).
+
+  @param  Volume                - The volume structure to be freed.
+
+**/
 VOID
 FatFreeVolume (
   IN FAT_VOLUME       *Volume
   )
-/*++
-
-Routine Description:
-
-  Free volume structure (including the contents of directory cache and disk cache).
-
-Arguments:
-
-  Volume                - The volume structure to be freed.
-
-Returns:
-
-  None.
-
---*/
 {
   //
   // Free disk cache
@@ -570,27 +468,19 @@ Returns:
   FreePool (Volume);
 }
 
+/**
+
+  Translate EFI time to FAT time.
+
+  @param  ETime                 - The time of EFI_TIME.
+  @param  FTime                 - The time of FAT_DATE_TIME.
+
+**/
 VOID
 FatEfiTimeToFatTime (
   IN  EFI_TIME        *ETime,
   OUT FAT_DATE_TIME   *FTime
   )
-/*++
-
-Routine Description:
-
-  Translate EFI time to FAT time.
-
-Arguments:
-
-  ETime                 - The time of EFI_TIME.
-  FTime                 - The time of FAT_DATE_TIME.
-
-Returns:
-
-  None.
-
---*/
 {
   //
   // ignores timezone info in source ETime
@@ -610,27 +500,19 @@ Returns:
   FTime->Time.DoubleSecond  = (UINT16) (ETime->Second / 2);
 }
 
+/**
+
+  Translate Fat time to EFI time.
+
+  @param  FTime                 - The time of FAT_DATE_TIME.
+  @param  ETime                 - The time of EFI_TIME..
+
+**/
 VOID
 FatFatTimeToEfiTime (
   IN  FAT_DATE_TIME     *FTime,
   OUT EFI_TIME          *ETime
   )
-/*++
-
-Routine Description:
-
-  Translate Fat time to EFI time.
-
-Arguments:
-
-  FTime                 - The time of FAT_DATE_TIME.
-  ETime                 - The time of EFI_TIME.
-
-Returns:
-
-  None.
-
---*/
 {
   ETime->Year       = (UINT16) (FTime->Date.Year + 1980);
   ETime->Month      = (UINT8) FTime->Date.Month;
@@ -643,25 +525,17 @@ Returns:
   ETime->Daylight   = 0;
 }
 
+/**
+
+  Get Current FAT time.
+
+  @param  FatNow                - Current FAT time.
+
+**/
 VOID
 FatGetCurrentFatTime (
   OUT FAT_DATE_TIME   *FatNow
   )
-/*++
-
-Routine Description:
-
-  Get Current FAT time.
-
-Arguments:
-
-  FatNow                - Current FAT time.
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_STATUS Status;
   EFI_TIME   Now;
@@ -678,26 +552,20 @@ Returns:
   }
 }
 
+/**
+
+  Check whether a time is valid.
+
+  @param  Time                  - The time of EFI_TIME.
+
+  @retval TRUE                  - The time is valid.
+  @retval FALSE                 - The time is not valid.
+
+**/
 BOOLEAN
 FatIsValidTime (
   IN EFI_TIME         *Time
   )
-/*++
-
-Routine Description:
-
-  Check whether a time is valid.
-
-Arguments:
-
-  Time                  - The time of EFI_TIME.
-
-Returns:
-
-  TRUE                  - The time is valid.
-  FALSE                 - The time is not valid.
-
---*/
 {
   UINTN         Day;
   BOOLEAN       ValidTime;

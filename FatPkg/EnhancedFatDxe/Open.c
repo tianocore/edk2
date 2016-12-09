@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Routines dealing with file open.
 
 Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,44 +10,27 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  open.c
-
-Abstract:
-
-  Routines dealing with file open
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Create an Open instance for the existing OFile.
+  The IFile of the newly opened file is passed out.
+
+  @param  OFile                 - The file that serves as a starting reference point.
+  @param  PtrIFile              - The newly generated IFile instance.
+
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory for the IFile
+  @retval EFI_SUCCESS           - Create the new IFile for the OFile successfully
+
+**/
 EFI_STATUS
 FatAllocateIFile (
   IN FAT_OFILE    *OFile,
   OUT FAT_IFILE   **PtrIFile
   )
-/*++
-
-Routine Description:
-
-  Create an Open instance for the existing OFile.
-  The IFile of the newly opened file is passed out.
-
-Arguments:
-
-  OFile                 - The file that serves as a starting reference point.
-  PtrIFile              - The newly generated IFile instance.
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory for the IFile
-  EFI_SUCCESS           - Create the new IFile for the OFile successfully
-
---*/
 {
   FAT_IFILE *IFile;
 
@@ -81,6 +65,28 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Open a file for a file name relative to an existing OFile.
+  The IFile of the newly opened file is passed out.
+
+  @param  OFile                 - The file that serves as a starting reference point.
+  @param  NewIFile              - The newly generated IFile instance.
+  @param  FileName              - The file name relative to the OFile.
+  @param  OpenMode              - Open mode.
+  @param  Attributes            - Attributes to set if the file is created.
+
+
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @retval EFI_INVALID_PARAMETER - The open mode is conflict with the attributes
+                          or the file name is not valid.
+  @retval EFI_NOT_FOUND         - Conficts between dir intention and attribute.
+  @retval EFI_WRITE_PROTECTED   - Can't open for write if the volume is read only.
+  @retval EFI_ACCESS_DENIED     - If the file's attribute is read only, and the
+                          open is for read-write fail it.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
+
+**/
 EFI_STATUS
 FatOFileOpen (
   IN  FAT_OFILE            *OFile,
@@ -89,33 +95,6 @@ FatOFileOpen (
   IN  UINT64               OpenMode,
   IN  UINT8                Attributes
   )
-/*++
-
-Routine Description:
-
-  Open a file for a file name relative to an existing OFile.
-  The IFile of the newly opened file is passed out.
-
-Arguments:
-
-  OFile                 - The file that serves as a starting reference point.
-  NewIFile              - The newly generated IFile instance.
-  FileName              - The file name relative to the OFile.
-  OpenMode              - Open mode.
-  Attributes            - Attributes to set if the file is created.
-
-Returns:
-
-  EFI_SUCCESS           - Open the file successfully.
-  EFI_INVALID_PARAMETER - The open mode is conflict with the attributes
-                          or the file name is not valid.
-  EFI_NOT_FOUND         - Conficts between dir intention and attribute.
-  EFI_WRITE_PROTECTED   - Can't open for write if the volume is read only.
-  EFI_ACCESS_DENIED     - If the file's attribute is read only, and the
-                          open is for read-write fail it.
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory.
-
---*/
 {
   FAT_VOLUME  *Volume;
   EFI_STATUS  Status;
@@ -199,6 +178,25 @@ Returns:
   return FatOFileFlush (OFile);
 }
 
+/**
+
+  Implements OpenEx() of Simple File System Protocol.
+
+  @param  FHand                 - File handle of the file serves as a starting reference point.
+  @param  NewHandle             - Handle of the file that is newly opened.
+  @param  FileName              - File name relative to FHand.
+  @param  OpenMode              - Open mode.
+  @param  Attributes            - Attributes to set if the file is created.
+  @param  Token                 - A pointer to the token associated with the transaction.:
+
+  @retval EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
+                          The OpenMode is not supported.
+                          The Attributes is not the valid attributes.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @return Others                - The status of open file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatOpenEx (
@@ -209,30 +207,6 @@ FatOpenEx (
   IN  UINT64                  Attributes,
   IN OUT EFI_FILE_IO_TOKEN    *Token
   )
-/*++
-Routine Description:
-
-  Implements OpenEx() of Simple File System Protocol.
-
-Arguments:
-
-  FHand                 - File handle of the file serves as a starting reference point.
-  NewHandle             - Handle of the file that is newly opened.
-  FileName              - File name relative to FHand.
-  OpenMode              - Open mode.
-  Attributes            - Attributes to set if the file is created.
-  Token                 - A pointer to the token associated with the transaction.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
-                          The OpenMode is not supported.
-                          The Attributes is not the valid attributes.
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
-  EFI_SUCCESS           - Open the file successfully.
-  Others                - The status of open file.
-
---*/
 {
   FAT_IFILE   *IFile;
   FAT_IFILE   *NewIFile;
@@ -319,6 +293,25 @@ Returns:
   return Status;
 }
 
+/**
+
+  Implements Open() of Simple File System Protocol.
+
+
+  @param   FHand                 - File handle of the file serves as a starting reference point.
+  @param   NewHandle             - Handle of the file that is newly opened.
+  @param   FileName              - File name relative to FHand.
+  @param   OpenMode              - Open mode.
+  @param   Attributes            - Attributes to set if the file is created.
+
+  @retval EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
+                          The OpenMode is not supported.
+                          The Attributes is not the valid attributes.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
+  @retval EFI_SUCCESS           - Open the file successfully.
+  @return Others                - The status of open file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatOpen (
@@ -328,29 +321,6 @@ FatOpen (
   IN  UINT64              OpenMode,
   IN  UINT64              Attributes
   )
-/*++
-Routine Description:
-
-  Implements Open() of Simple File System Protocol.
-
-Arguments:
-
-  FHand                 - File handle of the file serves as a starting reference point.
-  NewHandle             - Handle of the file that is newly opened.
-  FileName              - File name relative to FHand.
-  OpenMode              - Open mode.
-  Attributes            - Attributes to set if the file is created.
-
-Returns:
-
-  EFI_INVALID_PARAMETER - The FileName is NULL or the file string is empty.
-                          The OpenMode is not supported.
-                          The Attributes is not the valid attributes.
-  EFI_OUT_OF_RESOURCES  - Can not allocate the memory for file string.
-  EFI_SUCCESS           - Open the file successfully.
-  Others                - The status of open file.
-
---*/
 {
   return FatOpenEx (FHand, NewHandle, FileName, OpenMode, Attributes, NULL);
 }

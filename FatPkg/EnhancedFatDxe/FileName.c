@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Functions for manipulating file names.
 
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,45 +10,28 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  FileName.c
-
-Abstract:
-
-  Functions for manipulating file names
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
-BOOLEAN
-FatCheckIs8Dot3Name (
-  IN  CHAR16    *FileName,
-  OUT CHAR8     *File8Dot3Name
-  )
-/*++
-
-Routine Description:
+/**
 
   This function checks whether the input FileName is a valid 8.3 short name.
   If the input FileName is a valid 8.3, the output is the 8.3 short name;
   otherwise, the output is the base tag of 8.3 short name.
 
-Arguments:
+  @param  FileName              - The input unicode filename.
+  @param  File8Dot3Name         - The output ascii 8.3 short name or base tag of 8.3 short name.
 
-  FileName              - The input unicode filename.
-  File8Dot3Name         - The output ascii 8.3 short name or base tag of 8.3 short name.
+  @retval TRUE                  - The input unicode filename is a valid 8.3 short name.
+  @retval FALSE                 - The input unicode filename is not a valid 8.3 short name.
 
-Returns:
-
-  TRUE                  - The input unicode filename is a valid 8.3 short name.
-  FALSE                 - The input unicode filename is not a valid 8.3 short name.
-
---*/
+**/
+BOOLEAN
+FatCheckIs8Dot3Name (
+  IN  CHAR16    *FileName,
+  OUT CHAR8     *File8Dot3Name
+  )
 {
   BOOLEAN PossibleShortName;
   CHAR16  *TempName;
@@ -118,28 +102,22 @@ Returns:
   return PossibleShortName;
 }
 
+/**
+
+  Trim the trailing blanks of fat name.
+
+  @param  Name                  - The Char8 string needs to be trimed.
+  @param  Len                   - The length of the fat name.
+
+  The real length of the fat name after the trailing blanks are trimmed.
+
+**/
 STATIC
 UINTN
 FatTrimAsciiTrailingBlanks (
   IN CHAR8        *Name,
   IN UINTN        Len
   )
-/*++
-
-Routine Description:
-
-  Trim the trailing blanks of fat name.
-
-Arguments:
-
-  Name                  - The Char8 string needs to be trimed.
-  Len                   - The length of the fat name.
-
-Returns:
-
-  The real length of the fat name after the trailing blanks are trimmed.
-
---*/
 {
   while (Len > 0 && Name[Len - 1] == ' ') {
     Len--;
@@ -148,6 +126,17 @@ Returns:
   return Len;
 }
 
+/**
+
+  Convert the ascii fat name to the unicode string and strip trailing spaces,
+  and if necessary, convert the unicode string to lower case.
+
+  @param  FatName               - The Char8 string needs to be converted.
+  @param  Len                   - The length of the fat name.
+  @param  LowerCase             - Indicate whether to convert the string to lower case.
+  @param  Str                   - The result of the convertion.
+
+**/
 VOID
 FatNameToStr (
   IN  CHAR8            *FatName,
@@ -155,25 +144,6 @@ FatNameToStr (
   IN  UINTN            LowerCase,
   OUT CHAR16           *Str
   )
-/*++
-
-Routine Description:
-
-  Convert the ascii fat name to the unicode string and strip trailing spaces,
-  and if necessary, convert the unicode string to lower case.
-
-Arguments:
-
-  FatName               - The Char8 string needs to be converted.
-  Len                   - The length of the fat name.
-  LowerCase             - Indicate whether to convert the string to lower case.
-  Str                   - The result of the convertion.
-
-Returns:
-
-  None.
-
---*/
 {
   //
   // First, trim the trailing blanks
@@ -192,27 +162,19 @@ Returns:
   }
 }
 
+/**
+
+  This function generates 8Dot3 name from user specified name for a newly created file.
+
+  @param  Parent                - The parent directory.
+  @param  DirEnt                - The directory entry whose 8Dot3Name needs to be generated.
+
+**/
 VOID
 FatCreate8Dot3Name (
   IN FAT_OFILE    *Parent,
   IN FAT_DIRENT   *DirEnt
   )
-/*++
-
-Routine Description:
-
-  This function generates 8Dot3 name from user specified name for a newly created file.
-
-Arguments:
-
-  Parent                - The parent directory.
-  DirEnt                - The directory entry whose 8Dot3Name needs to be generated.
-
-Returns:
-
-  None.
-
---*/
 {
   CHAR8 *ShortName;
   CHAR8 *ShortNameChar;
@@ -275,29 +237,23 @@ Returns:
   }
 }
 
+/**
+
+  Check the string is lower case or upper case
+  and it is used by fatname to dir entry count
+
+  @param Str                   - The string which needs to be checked.
+  @param InCaseFlag            - The input case flag which is returned when the string is lower case.
+
+  @retval OutCaseFlag           - The output case flag.
+
+**/
 STATIC
 UINT8
 FatCheckNameCase (
   IN CHAR16           *Str,
   IN UINT8            InCaseFlag
   )
-/*++
-
-Routine Description:
-
-  Check the string is lower case or upper case
-  and it is used by fatname to dir entry count
-
-Arguments:
-
-  Str                   - The string which needs to be checked.
-  InCaseFlag            - The input case flag which is returned when the string is lower case.
-
-Returns:
-
-  OutCaseFlag           - The output case flag.
-
---*/
 {
   CHAR16  Buffer[FAT_MAIN_NAME_LEN + 1 + FAT_EXTEND_NAME_LEN + 1];
   UINT8   OutCaseFlag;
@@ -328,25 +284,17 @@ Returns:
   return OutCaseFlag;
 }
 
+/**
+
+  Set the caseflag value for the directory entry.
+
+  @param DirEnt                - The logical directory entry whose caseflag value is to be set.
+
+**/
 VOID
 FatSetCaseFlag (
   IN FAT_DIRENT   *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Set the caseflag value for the directory entry.
-
-Arguments:
-
-  DirEnt                - The logical directory entry whose caseflag value is to be set.
-
-Returns:
-
-  None.
-
---*/
 {
   CHAR16  LfnBuffer[FAT_MAIN_NAME_LEN + 1 + FAT_EXTEND_NAME_LEN + 1];
   CHAR16  *TempCharPtr;
@@ -389,28 +337,21 @@ Returns:
   }
 }
 
+/**
+
+  Convert the 8.3 ASCII fat name to cased Unicode string according to case flag.
+
+  @param  DirEnt                - The corresponding directory entry.
+  @param  FileString            - The output Unicode file name.
+  @param  FileStringMax           The max length of FileString.
+
+**/
 VOID
 FatGetFileNameViaCaseFlag (
   IN     FAT_DIRENT   *DirEnt,
   IN OUT CHAR16       *FileString,
   IN     UINTN        FileStringMax
   )
-/*++
-
-Routine Description:
-
-  Convert the 8.3 ASCII fat name to cased Unicode string according to case flag.
-
-Arguments:
-
-  DirEnt                - The corresponding directory entry.
-  FileString            - The output Unicode file name.
-
-Returns:
-
-  None.
-
---*/
 {
   UINT8   CaseFlag;
   CHAR8   *File8Dot3Name;
@@ -429,25 +370,19 @@ Returns:
   }
 }
 
+/**
+
+  Get the Check sum for a short name.
+
+  @param  ShortNameString       - The short name for a file.
+
+  @retval Sum                   - UINT8 checksum.
+
+**/
 UINT8
 FatCheckSum (
   IN CHAR8  *ShortNameString
   )
-/*++
-
-Routine Description:
-
-  Get the Check sum for a short name.
-
-Arguments:
-
-  ShortNameString       - The short name for a file.
-
-Returns:
-
-  Sum                   - UINT8 checksum.
-
---*/
 {
   UINTN ShortNameLen;
   UINT8 Sum;
@@ -459,29 +394,23 @@ Returns:
   return Sum;
 }
 
-CHAR16 *
-FatGetNextNameComponent (
-  IN  CHAR16      *Path,
-  OUT CHAR16      *Name
-  )
-/*++
-
-Routine Description:
+/**
 
   Takes Path as input, returns the next name component
   in Name, and returns the position after Name (e.g., the
   start of the next name component)
 
-Arguments:
-
-  Path                  - The path of one file.
-  Name                  - The next name component in Path.
-
-Returns:
+  @param  Path                  - The path of one file.
+  @param  Name                  - The next name component in Path.
 
   The position after Name in the Path
 
---*/
+**/
+CHAR16 *
+FatGetNextNameComponent (
+  IN  CHAR16      *Path,
+  OUT CHAR16      *Name
+  )
 {
   while (*Path != 0 && *Path != PATH_NAME_SEPARATOR) {
     *Name++ = *Path++;
@@ -497,31 +426,24 @@ Returns:
   return Path;
 }
 
-BOOLEAN
-FatFileNameIsValid (
-  IN  CHAR16  *InputFileName,
-  OUT CHAR16  *OutputFileName
-  )
-/*++
-
-Routine Description:
+/**
 
   Check whether the IFileName is valid long file name. If the IFileName is a valid
   long file name, then we trim the possible leading blanks and leading/trailing dots.
   the trimmed filename is stored in OutputFileName
 
-Arguments:
+  @param  InputFileName         - The input file name.
+  @param  OutputFileName        - The output file name.
 
-  InputFileName         - The input file name.
-  OutputFileName        - The output file name.
+  @retval TRUE                  - The InputFileName is a valid long file name.
+  @retval FALSE                 - The InputFileName is not a valid long file name.
 
-
-Returns:
-
-  TRUE                  - The InputFileName is a valid long file name.
-  FALSE                 - The InputFileName is not a valid long file name.
-
---*/
+**/
+BOOLEAN
+FatFileNameIsValid (
+  IN  CHAR16  *InputFileName,
+  OUT CHAR16  *OutputFileName
+  )
 {
   CHAR16  *TempNamePointer;
   CHAR16  TempChar;

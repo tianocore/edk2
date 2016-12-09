@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Hash table operations.
 
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,41 +10,24 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  Hash.c
-
-Abstract:
-
-  Hash table operations
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
+/**
+
+  Get hash value for long name.
+
+  @param  LongNameString        - The long name string to be hashed.
+
+  @return HashValue.
+
+**/
 STATIC
 UINT32
 FatHashLongName (
   IN CHAR16   *LongNameString
   )
-/*++
-
-Routine Description:
-
-  Get hash value for long name.
-
-Arguments:
-
-  LongNameString        - The long name string to be hashed.
-
-Returns:
-
-  HashValue.
-
---*/
 {
   UINT32  HashValue;
   CHAR16  UpCasedLongFileName[EFI_PATH_STRING_LENGTH];
@@ -58,53 +42,41 @@ Returns:
   return (HashValue & HASH_TABLE_MASK);
 }
 
+/**
+
+  Get hash value for short name.
+
+  @param  ShortNameString       - The short name string to be hashed.
+
+  @return HashValue
+
+**/
 STATIC
 UINT32
 FatHashShortName (
   IN CHAR8   *ShortNameString
   )
-/*++
-
-Routine Description:
-
-  Get hash value for short name.
-
-Arguments:
-
-  ShortNameString       - The short name string to be hashed.
-
-Returns:
-
-  HashValue
-
---*/
 {
   UINT32  HashValue;
   gBS->CalculateCrc32 (ShortNameString, FAT_NAME_LEN, &HashValue);
   return (HashValue & HASH_TABLE_MASK);
 }
 
+/**
+
+  Search the long name hash table for the directory entry.
+
+  @param  ODir                  - The directory to be searched.
+  @param  LongNameString        - The long name string to search.
+
+  @return The previous long name hash node of the directory entry.
+
+**/
 FAT_DIRENT **
 FatLongNameHashSearch (
   IN FAT_ODIR       *ODir,
   IN CHAR16         *LongNameString
   )
-/*++
-
-Routine Description:
-
-  Search the long name hash table for the directory entry.
-
-Arguments:
-
-  ODir                  - The directory to be searched.
-  LongNameString        - The long name string to search.
-
-Returns:
-
-  The previous long name hash node of the directory entry.
-
---*/
 {
   FAT_DIRENT  **PreviousHashNode;
   for (PreviousHashNode   = &ODir->LongNameHashTable[FatHashLongName (LongNameString)];
@@ -119,27 +91,21 @@ Returns:
   return PreviousHashNode;
 }
 
+/**
+
+  Search the short name hash table for the directory entry.
+
+  @param  ODir                  - The directory to be searched.
+  @param  ShortNameString       - The short name string to search.
+
+  @return The previous short name hash node of the directory entry.
+
+**/
 FAT_DIRENT **
 FatShortNameHashSearch (
   IN FAT_ODIR      *ODir,
   IN CHAR8         *ShortNameString
   )
-/*++
-
-Routine Description:
-
-  Search the short name hash table for the directory entry.
-
-Arguments:
-
-  ODir                  - The directory to be searched.
-  ShortNameString       - The short name string to search.
-
-Returns:
-
-  The previous short name hash node of the directory entry.
-
---*/
 {
   FAT_DIRENT  **PreviousHashNode;
   for (PreviousHashNode   = &ODir->ShortNameHashTable[FatHashShortName (ShortNameString)];
@@ -154,27 +120,19 @@ Returns:
   return PreviousHashNode;
 }
 
+/**
+
+  Insert directory entry to hash table.
+
+  @param  ODir                  - The parent directory.
+  @param  DirEnt                - The directory entry node.
+
+**/
 VOID
 FatInsertToHashTable (
   IN FAT_ODIR     *ODir,
   IN FAT_DIRENT   *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Insert directory entry to hash table.
-
-Arguments:
-
-  ODir                  - The parent directory.
-  DirEnt                - The directory entry node.
-
-Returns:
-
-  None.
-
---*/
 {
   FAT_DIRENT  **HashTable;
   UINT32      HashTableIndex;
@@ -195,27 +153,19 @@ Returns:
   HashTable[HashTableIndex]     = DirEnt;
 }
 
+/**
+
+  Delete directory entry from hash table.
+
+  @param  ODir                  - The parent directory.
+  @param  DirEnt                - The directory entry node.
+
+**/
 VOID
 FatDeleteFromHashTable (
   IN FAT_ODIR     *ODir,
   IN FAT_DIRENT   *DirEnt
   )
-/*++
-
-Routine Description:
-
-  Delete directory entry from hash table.
-
-Arguments:
-
-  ODir                  - The parent directory.
-  DirEnt                - The directory entry node.
-
-Returns:
-
-  None.
-
---*/
 {
   *FatShortNameHashSearch (ODir, DirEnt->Entry.FileName) = DirEnt->ShortNameForwardLink;
   *FatLongNameHashSearch (ODir, DirEnt->FileString)      = DirEnt->LongNameForwardLink;

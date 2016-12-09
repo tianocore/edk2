@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Cache implementation for EFI FAT File system driver.
 
 Copyright (c) 2005 - 2013, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -9,33 +10,11 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-
-Module Name:
-
-  DiskCache.c
-
-Abstract:
-
-  Cache implementation for EFI FAT File system driver
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
-STATIC
-VOID
-FatFlushDataCacheRange (
-  IN  FAT_VOLUME         *Volume,
-  IN  IO_MODE            IoMode,
-  IN  UINTN              StartPageNo,
-  IN  UINTN              EndPageNo,
-  OUT UINT8              *Buffer
-  )
-/*++
-
-Routine Description:
+/**
 
   This function is used by the Data Cache.
 
@@ -46,20 +25,23 @@ Routine Description:
   is dirty, it means that the relative info directly readed from media is older than
   than the info in the cache; So need to update the relative info in the Buffer.
 
-Arguments:
-
-  Volume                - FAT file system volume.
-  IoMode                - This function is called by read command or write command
-  StartPageNo           - First PageNo to be checked in the cache.
-  EndPageNo             - Last PageNo to be checked in the cache.
-  Buffer                - The user buffer need to update. Only when doing the read command
+  @param  Volume                - FAT file system volume.
+  @param  IoMode                - This function is called by read command or write command
+  @param  StartPageNo           - First PageNo to be checked in the cache.
+  @param  EndPageNo             - Last PageNo to be checked in the cache.
+  @param  Buffer                - The user buffer need to update. Only when doing the read command
                           and there is dirty cache in the cache range, this parameter will be used.
 
-Returns:
-
-  None.
-
---*/
+**/
+STATIC
+VOID
+FatFlushDataCacheRange (
+  IN  FAT_VOLUME         *Volume,
+  IN  IO_MODE            IoMode,
+  IN  UINTN              StartPageNo,
+  IN  UINTN              EndPageNo,
+  OUT UINT8              *Buffer
+  )
 {
   UINTN       PageNo;
   UINTN       GroupNo;
@@ -103,6 +85,20 @@ Returns:
   }
 }
 
+/**
+
+  Exchange the cache page with the image on the disk
+
+  @param  Volume                - FAT file system volume.
+  @param  DataType              - Indicate the cache type.
+  @param  IoMode                - Indicate whether to load this page from disk or store this page to disk.
+  @param  CacheTag              - The Cache Tag for the current cache page.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - Cache page exchanged successfully.
+  @return Others                - An error occurred when exchanging cache page.
+
+**/
 STATIC
 EFI_STATUS
 FatExchangeCachePage (
@@ -112,25 +108,6 @@ FatExchangeCachePage (
   IN CACHE_TAG          *CacheTag,
   IN FAT_TASK           *Task
   )
-/*++
-
-Routine Description:
-
-  Exchange the cache page with the image on the disk
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  DataType              - Indicate the cache type.
-  IoMode                - Indicate whether to load this page from disk or store this page to disk.
-  CacheTag              - The Cache Tag for the current cache page.
-
-Returns:
-
-  EFI_SUCCESS           - Cache page exchanged successfully.
-  Others                - An error occurred when exchanging cache page.
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       GroupNo;
@@ -181,6 +158,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+
+  Get one cache page by specified PageNo.
+
+  @param  Volume                - FAT file system volume.
+  @param  CacheDataType         - The cache type: CACHE_FAT or CACHE_DATA.
+  @param  PageNo                - PageNo to match with the cache.
+  @param  CacheTag              - The Cache Tag for the current cache page.
+
+  @retval EFI_SUCCESS           - Get the cache page successfully.
+  @return other                 - An error occurred when accessing data.
+
+**/
 STATIC
 EFI_STATUS
 FatGetCachePage (
@@ -189,25 +179,6 @@ FatGetCachePage (
   IN UINTN              PageNo,
   IN CACHE_TAG          *CacheTag
   )
-/*++
-
-Routine Description:
-
-  Get one cache page by specified PageNo.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  CacheDataType         - The cache type: CACHE_FAT or CACHE_DATA.
-  PageNo                - PageNo to match with the cache.
-  CacheTag              - The Cache Tag for the current cache page.
-
-Returns:
-
-  EFI_SUCCESS           - Get the cache page successfully.
-  other                 - An error occurred when accessing data.
-
---*/
 {
   EFI_STATUS  Status;
   UINTN       OldPageNo;
@@ -238,6 +209,23 @@ Returns:
   return Status;
 }
 
+/**
+
+  Read Length bytes from the position of Offset into Buffer, or
+  write Length bytes from Buffer into the position of Offset.
+
+  @param  Volume                - FAT file system volume.
+  @param  CacheDataType         - The type of cache: CACHE_DATA or CACHE_FAT.
+  @param  IoMode                - Indicate the type of disk access.
+  @param  PageNo                - The number of unaligned cache page.
+  @param  Offset                - The starting byte of cache page.
+  @param  Length                - The number of bytes that is read or written
+  @param  Buffer                - Buffer containing cache data.
+
+  @retval EFI_SUCCESS           - The data was accessed correctly.
+  @return Others                - An error occurred when accessing unaligned cache page.
+
+**/
 STATIC
 EFI_STATUS
 FatAccessUnalignedCachePage (
@@ -249,28 +237,6 @@ FatAccessUnalignedCachePage (
   IN     UINTN             Length,
   IN OUT VOID              *Buffer
   )
-/*++
-Routine Description:
-
-  Read Length bytes from the position of Offset into Buffer, or
-  write Length bytes from Buffer into the position of Offset.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  CacheDataType         - The type of cache: CACHE_DATA or CACHE_FAT.
-  IoMode                - Indicate the type of disk access.
-  PageNo                - The number of unaligned cache page.
-  Offset                - The starting byte of cache page.
-  Length                - The number of bytes that is read or written
-  Buffer                - Buffer containing cache data.
-
-Returns:
-
-  EFI_SUCCESS           - The data was accessed correctly.
-  Others                - An error occurred when accessing unaligned cache page.
-
---*/
 {
   EFI_STATUS  Status;
   VOID        *Source;
@@ -299,18 +265,7 @@ Returns:
   return Status;
 }
 
-EFI_STATUS
-FatAccessCache (
-  IN     FAT_VOLUME         *Volume,
-  IN     CACHE_DATA_TYPE    CacheDataType,
-  IN     IO_MODE            IoMode,
-  IN     UINT64             Offset,
-  IN     UINTN              BufferSize,
-  IN OUT UINT8              *Buffer,
-  IN     FAT_TASK           *Task
-  )
-/*++
-Routine Description:
+/**
 
   Read BufferSize bytes from the position of Offset into Buffer,
   or write BufferSize bytes from Buffer into the position of Offset.
@@ -326,22 +281,29 @@ Routine Description:
      The UnderRun data and OverRun data will be accessed by the Data cache,
      but the Aligned data will be accessed with disk directly.
 
-Arguments:
+  @param  Volume                - FAT file system volume.
+  @param  CacheDataType         - The type of cache: CACHE_DATA or CACHE_FAT.
+  @param  IoMode                - Indicate the type of disk access.
+  @param  Offset                - The starting byte offset to read from.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing cache data.
+  @param  Task                    point to task instance.
 
-  Volume                - FAT file system volume.
-  CacheDataType         - The type of cache: CACHE_DATA or CACHE_FAT.
-  IoMode                - Indicate the type of disk access.
-  Offset                - The starting byte offset to read from.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing cache data.
+  @retval EFI_SUCCESS           - The data was accessed correctly.
+  @retval EFI_MEDIA_CHANGED     - The MediaId does not match the current device.
+  @return Others                - An error occurred when accessing cache.
 
-Returns:
-
-  EFI_SUCCESS           - The data was accessed correctly.
-  EFI_MEDIA_CHANGED     - The MediaId does not match the current device.
-  Others                - An error occurred when accessing cache.
-
---*/
+**/
+EFI_STATUS
+FatAccessCache (
+  IN     FAT_VOLUME         *Volume,
+  IN     CACHE_DATA_TYPE    CacheDataType,
+  IN     IO_MODE            IoMode,
+  IN     UINT64             Offset,
+  IN     UINTN              BufferSize,
+  IN OUT UINT8              *Buffer,
+  IN     FAT_TASK           *Task
+  )
 {
   EFI_STATUS  Status;
   UINTN       PageSize;
@@ -421,27 +383,22 @@ Returns:
   return Status;
 }
 
+/**
+
+  Flush all the dirty cache back, include the FAT cache and the Data cache.
+
+  @param  Volume                - FAT file system volume.
+  @param  Task                    point to task instance.
+
+  @retval EFI_SUCCESS           - Flush all the dirty cache back successfully
+  @return other                 - An error occurred when writing the data into the disk
+
+**/
 EFI_STATUS
 FatVolumeFlushCache (
   IN FAT_VOLUME         *Volume,
   IN FAT_TASK           *Task
   )
-/*++
-
-Routine Description:
-
-  Flush all the dirty cache back, include the FAT cache and the Data cache.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-
-Returns:
-
-  EFI_SUCCESS           - Flush all the dirty cache back successfully
-  other                 - An error occurred when writing the data into the disk
-
---*/
 {
   EFI_STATUS      Status;
   CACHE_DATA_TYPE CacheDataType;
@@ -480,26 +437,20 @@ Returns:
   return Status;
 }
 
+/**
+
+  Initialize the disk cache according to Volume's FatType.
+
+  @param  Volume                - FAT file system volume.
+
+  @retval EFI_SUCCESS           - The disk cache is successfully initialized.
+  @retval EFI_OUT_OF_RESOURCES  - Not enough memory to allocate disk cache.
+
+**/
 EFI_STATUS
 FatInitializeDiskCache (
   IN FAT_VOLUME         *Volume
   )
-/*++
-
-Routine Description:
-
-  Initialize the disk cache according to Volume's FatType.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-
-Returns:
-
-  EFI_SUCCESS           - The disk cache is successfully initialized.
-  EFI_OUT_OF_RESOURCES  - Not enough memory to allocate disk cache.
-
---*/
 {
   DISK_CACHE  *DiskCache;
   UINTN       FatCacheGroupCount;

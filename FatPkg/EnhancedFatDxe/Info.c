@@ -1,4 +1,5 @@
-/*++
+/** @file
+  Routines dealing with setting/getting file/volume info
 
 Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
@@ -10,17 +11,8 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
-Module Name:
 
-  Info.c
-
-Abstract:
-
-  Routines dealing with setting/getting file/volume info
-
-Revision History
-
---*/
+**/
 
 #include "Fat.h"
 
@@ -47,58 +39,46 @@ FatSetOrGetInfo (
   IN OUT VOID             *Buffer
   );
 
+/**
+
+  Get the open file's info into Buffer.
+
+  @param  OFile                 - The open file.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing file info.
+
+  @retval EFI_SUCCESS           - Get the file info successfully.
+  @retval EFI_BUFFER_TOO_SMALL  - The buffer is too small.
+
+**/
 EFI_STATUS
 FatGetFileInfo (
   IN FAT_OFILE        *OFile,
   IN OUT UINTN        *BufferSize,
   OUT VOID            *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the open file's info into Buffer.
-
-Arguments:
-
-  OFile                 - The open file.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing file info.
-
-Returns:
-
-  EFI_SUCCESS           - Get the file info successfully.
-  EFI_BUFFER_TOO_SMALL  - The buffer is too small.
-
---*/
 {
   return FatGetDirEntInfo (OFile->Volume, OFile->DirEnt, BufferSize, Buffer);
 }
 
+/**
+
+  Get the volume's info into Buffer.
+
+  @param  Volume                - FAT file system volume.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing volume info.
+
+  @retval EFI_SUCCESS           - Get the volume info successfully.
+  @retval EFI_BUFFER_TOO_SMALL  - The buffer is too small.
+
+**/
 EFI_STATUS
 FatGetVolumeInfo (
   IN     FAT_VOLUME     *Volume,
   IN OUT UINTN          *BufferSize,
      OUT VOID           *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the volume's info into Buffer.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing volume info.
-
-Returns:
-
-  EFI_SUCCESS           - Get the volume info successfully.
-  EFI_BUFFER_TOO_SMALL  - The buffer is too small.
-
---*/
 {
   UINTN                 Size;
   UINTN                 NameSize;
@@ -141,30 +121,24 @@ Returns:
   return Status;
 }
 
+/**
+
+  Get the volume's label info into Buffer.
+
+  @param  Volume                - FAT file system volume.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing volume's label info.
+
+  @retval EFI_SUCCESS           - Get the volume's label info successfully.
+  @retval EFI_BUFFER_TOO_SMALL  - The buffer is too small.
+
+**/
 EFI_STATUS
 FatGetVolumeLabelInfo (
   IN FAT_VOLUME       *Volume,
   IN OUT UINTN        *BufferSize,
   OUT VOID            *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the volume's label info into Buffer.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing volume's label info.
-
-Returns:
-
-  EFI_SUCCESS           - Get the volume's label info successfully.
-  EFI_BUFFER_TOO_SMALL  - The buffer is too small.
-
---*/
 {
   UINTN                             Size;
   UINTN                             NameSize;
@@ -187,32 +161,26 @@ Returns:
   return Status;
 }
 
+/**
+
+  Set the volume's info.
+
+  @param  Volume                - FAT file system volume.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing the new volume info.
+
+  @retval EFI_SUCCESS           - Set the volume info successfully.
+  @retval EFI_BAD_BUFFER_SIZE   - The buffer size is error.
+  @retval EFI_WRITE_PROTECTED   - The volume is read only.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 FatSetVolumeInfo (
   IN FAT_VOLUME       *Volume,
   IN UINTN            BufferSize,
   IN VOID             *Buffer
   )
-/*++
-
-Routine Description:
-
-  Set the volume's info.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing the new volume info.
-
-Returns:
-
-  EFI_SUCCESS           - Set the volume info successfully.
-  EFI_BAD_BUFFER_SIZE   - The buffer size is error.
-  EFI_WRITE_PROTECTED   - The volume is read only.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   EFI_FILE_SYSTEM_INFO  *Info;
 
@@ -225,32 +193,26 @@ Returns:
   return FatSetVolumeEntry (Volume, Info->VolumeLabel);
 }
 
+/**
+
+  Set the volume's label info.
+
+  @param  Volume                - FAT file system volume.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing the new volume label info.
+
+  @retval EFI_SUCCESS           - Set the volume label info successfully.
+  @retval EFI_WRITE_PROTECTED   - The disk is write protected.
+  @retval EFI_BAD_BUFFER_SIZE   - The buffer size is error.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 FatSetVolumeLabelInfo (
   IN FAT_VOLUME       *Volume,
   IN UINTN            BufferSize,
   IN VOID             *Buffer
   )
-/*++
-
-Routine Description:
-
-  Set the volume's label info
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing the new volume label info.
-
-Returns:
-
-  EFI_SUCCESS           - Set the volume label info successfully.
-  EFI_WRITE_PROTECTED   - The disk is write protected.
-  EFI_BAD_BUFFER_SIZE   - The buffer size is error.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   EFI_FILE_SYSTEM_VOLUME_LABEL *Info;
 
@@ -263,6 +225,30 @@ Returns:
   return FatSetVolumeEntry (Volume, Info->VolumeLabel);
 }
 
+/**
+
+  Set the file info.
+
+  @param  Volume                - FAT file system volume.
+  @param  IFile                 - The instance of the open file.
+  @param  OFile                 - The open file.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing the new file info.
+
+  @retval EFI_SUCCESS           - Set the file info successfully.
+  @retval EFI_ACCESS_DENIED     - It is the root directory
+                          or the directory attribute bit can not change
+                          or try to change a directory size
+                          or something else.
+  @retval EFI_UNSUPPORTED       - The new file size is larger than 4GB.
+  @retval EFI_WRITE_PROTECTED   - The disk is write protected.
+  @retval EFI_BAD_BUFFER_SIZE   - The buffer size is error.
+  @retval EFI_INVALID_PARAMETER - The time info or attributes info is error.
+  @retval EFI_OUT_OF_RESOURCES  - Can not allocate new memory.
+  @retval EFI_VOLUME_CORRUPTED  - The volume is corrupted.
+  @return other                 - An error occurred when operation the disk.
+
+**/
 EFI_STATUS
 FatSetFileInfo (
   IN FAT_VOLUME       *Volume,
@@ -271,36 +257,6 @@ FatSetFileInfo (
   IN UINTN            BufferSize,
   IN VOID             *Buffer
   )
-/*++
-
-Routine Description:
-
-  Set the file info.
-
-Arguments:
-
-  Volume                - FAT file system volume.
-  IFile                 - The instance of the open file.
-  OFile                 - The open file.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing the new file info.
-
-Returns:
-
-  EFI_SUCCESS           - Set the file info successfully.
-  EFI_ACCESS_DENIED     - It is the root directory
-                          or the directory attribute bit can not change
-                          or try to change a directory size
-                          or something else.
-  EFI_UNSUPPORTED       - The new file size is larger than 4GB.
-  EFI_WRITE_PROTECTED   - The disk is write protected.
-  EFI_BAD_BUFFER_SIZE   - The buffer size is error.
-  EFI_INVALID_PARAMETER - The time info or attributes info is error.
-  EFI_OUT_OF_RESOURCES  - Can not allocate new memory.
-  EFI_VOLUME_CORRUPTED  - The volume is corrupted.
-  other                 - An error occurred when operation the disk.
-
---*/
 {
   EFI_STATUS    Status;
   EFI_FILE_INFO *NewInfo;
@@ -472,6 +428,20 @@ Returns:
   return FatOFileFlush (OFile);
 }
 
+/**
+
+  Set or Get the some types info of the file into Buffer.
+
+  @param  IsSet      - TRUE:The access is set, else is get
+  @param  FHand      - The handle of file
+  @param  Type       - The type of the info
+  @param  BufferSize - Size of Buffer
+  @param  Buffer     - Buffer containing volume info
+
+  @retval EFI_SUCCESS       - Get the info successfully
+  @retval EFI_DEVICE_ERROR  - Can not find the OFile for the file
+
+**/
 EFI_STATUS
 FatSetOrGetInfo (
   IN     BOOLEAN            IsSet,
@@ -480,26 +450,6 @@ FatSetOrGetInfo (
   IN OUT UINTN              *BufferSize,
   IN OUT VOID               *Buffer
   )
-/*++
-
-Routine Description:
-
-  Set or Get the some types info of the file into Buffer
-
-Arguments:
-
-  IsSet      - TRUE:The access is set, else is get
-  FHand      - The handle of file
-  Type       - The type of the info
-  BufferSize - Size of Buffer
-  Buffer     - Buffer containing volume info
-
-Returns:
-
-  EFI_SUCCESS       - Get the info successfully
-  EFI_DEVICE_ERROR  - Can not find the OFile for the file
-
---*/
 {
   FAT_IFILE   *IFile;
   FAT_OFILE   *OFile;
@@ -560,6 +510,19 @@ Returns:
   return Status;
 }
 
+/**
+
+  Get the some types info of the file into Buffer.
+
+  @param  FHand                 - The handle of file.
+  @param  Type                  - The type of the info.
+  @param  BufferSize            - Size of Buffer.
+  @param  Buffer                - Buffer containing volume info.
+
+  @retval EFI_SUCCESS           - Get the info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatGetInfo (
@@ -568,29 +531,23 @@ FatGetInfo (
   IN OUT UINTN               *BufferSize,
      OUT VOID                *Buffer
   )
-/*++
-
-Routine Description:
-
-  Get the some types info of the file into Buffer.
-
-Arguments:
-
-  FHand                 - The handle of file.
-  Type                  - The type of the info.
-  BufferSize            - Size of Buffer.
-  Buffer                - Buffer containing volume info.
-
-Returns:
-
-  EFI_SUCCESS           - Get the info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-
---*/
 {
   return FatSetOrGetInfo (FALSE, FHand, Type, BufferSize, Buffer);
 }
 
+/**
+
+  Set the some types info of the file into Buffer.
+
+  @param  FHand                 - The handle of file.
+  @param  Type                  - The type of the info.
+  @param  BufferSize            - Size of Buffer
+  @param  Buffer                - Buffer containing volume info.
+
+  @retval EFI_SUCCESS           - Set the info successfully.
+  @retval EFI_DEVICE_ERROR      - Can not find the OFile for the file.
+
+**/
 EFI_STATUS
 EFIAPI
 FatSetInfo (
@@ -599,25 +556,6 @@ FatSetInfo (
   IN UINTN              BufferSize,
   IN VOID               *Buffer
   )
-/*++
-
-Routine Description:
-
-  Set the some types info of the file into Buffer.
-
-Arguments:
-
-  FHand                 - The handle of file.
-  Type                  - The type of the info.
-  BufferSize            - Size of Buffer
-  Buffer                - Buffer containing volume info.
-
-Returns:
-
-  EFI_SUCCESS           - Set the info successfully.
-  EFI_DEVICE_ERROR      - Can not find the OFile for the file.
-
---*/
 {
   return FatSetOrGetInfo (TRUE, FHand, Type, &BufferSize, Buffer);
 }
