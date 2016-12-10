@@ -1008,7 +1008,7 @@ ProcessFmpCapsuleImage (
 
           if (IsFmpCapsuleProcessed(CapsuleHeader, Index - FmpCapsuleHeader->EmbeddedDriverCount, ImageHeader)) {
             DEBUG((DEBUG_INFO, "FMP Capsule already processed (%g):", CapsuleHeader));
-            DEBUG((DEBUG_INFO, "ImageTypeId - %g, ", ImageHeader->UpdateImageTypeId));
+            DEBUG((DEBUG_INFO, "ImageTypeId - %g, ", &ImageHeader->UpdateImageTypeId));
             DEBUG((DEBUG_INFO, "PayloadIndex - 0x%x, ImageIndex - 0x%x\n", Index - FmpCapsuleHeader->EmbeddedDriverCount, ImageHeader->UpdateImageIndex));
             continue;
           }
