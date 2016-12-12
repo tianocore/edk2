@@ -84,8 +84,8 @@ GetAttrType (
 /**
   Convert binary to hex format string.
 
-  @param[in]  BufferSize        The size in bytes of the binary data.
   @param[in]  Buffer            The binary data.
+  @param[in]  BufferSize        The size in bytes of the binary data.
   @param[in, out] HexString     Hex format string.
   @param[in]      HexStringSize The size in bytes of the string.
 
@@ -423,6 +423,7 @@ CascadeProcessVariables (
   UINTN                     NameSize;
   CHAR16                    *AttrString;
   CHAR16                    *HexString;
+  EFI_STATUS                SetStatus;
 
   if (ShellGetExecutionBreakFlag()) {
     return (SHELL_ABORTED);
@@ -548,7 +549,7 @@ CascadeProcessVariables (
       //
       // We only need name to delete it...
       //
-      EFI_STATUS SetStatus = gRT->SetVariable (FoundVarName, &FoundVarGuid, Atts, 0, NULL);
+      SetStatus = gRT->SetVariable (FoundVarName, &FoundVarGuid, Atts, 0, NULL);
       if (StandardFormatOutput) {
         if (SetStatus == EFI_SUCCESS) {
           ShellPrintHiiEx (
