@@ -46,4 +46,4 @@
   BaseCryptLib
 
 [Guids]
-  gEfiCertPkcs7Guid
+  gEfiCertPkcs7Guid        ## CONSUMES
