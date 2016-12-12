@@ -12,10 +12,7 @@
 
 **/
 
-#include <Base.h>
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
-#include <Library/BaseLib.h>
+#include "BaseLibInternals.h"
 
 #define RSIZE_MAX  (PcdGet32 (PcdMaximumUnicodeStringLength))
 
@@ -585,6 +582,498 @@ StrnCatS (
 }
 
 /**
+  Convert a Null-terminated Unicode decimal string to a value of type UINTN.
+
+  This function outputs a value of type UINTN by interpreting the contents of
+  the Unicode string specified by String as a decimal number. The format of the
+  input Unicode string String is:
+
+                  [spaces] [decimal digits].
+
+  The valid decimal digit character is in the range [0-9]. The function will
+  ignore the pad space, which includes spaces or tab characters, before
+  [decimal digits]. The running zero in the beginning of [decimal digits] will
+  be ignored. Then, the function stops at the first character that is a not a
+  valid decimal character or a Null-terminator, whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid decimal digits in the above format, then 0 is stored
+  at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINTN, then
+  MAX_UINTN is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  decimal digits right after the optional pad spaces, the value of String is
+  stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumUnicodeStringLength is not
+                                   zero, and String contains more than
+                                   PcdMaximumUnicodeStringLength Unicode
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINTN.
+
+**/
+RETURN_STATUS
+EFIAPI
+StrDecimalToUintnS (
+  IN  CONST CHAR16             *String,
+  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       UINTN              *Data
+  )
+{
+  ASSERT (((UINTN) String & BIT0) == 0);
+
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than RSIZE_MAX.
+  //
+  if (RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((StrnLenS (String, RSIZE_MAX + 1) <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINTN, then MAX_UINTN is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > ((MAX_UINTN - (*String - L'0')) / 10)) {
+      *Data = MAX_UINTN;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR16 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = *Data * 10 + (*String - L'0');
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated Unicode decimal string to a value of type UINT64.
+
+  This function outputs a value of type UINT64 by interpreting the contents of
+  the Unicode string specified by String as a decimal number. The format of the
+  input Unicode string String is:
+
+                  [spaces] [decimal digits].
+
+  The valid decimal digit character is in the range [0-9]. The function will
+  ignore the pad space, which includes spaces or tab characters, before
+  [decimal digits]. The running zero in the beginning of [decimal digits] will
+  be ignored. Then, the function stops at the first character that is a not a
+  valid decimal character or a Null-terminator, whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid decimal digits in the above format, then 0 is stored
+  at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINT64, then
+  MAX_UINT64 is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  decimal digits right after the optional pad spaces, the value of String is
+  stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumUnicodeStringLength is not
+                                   zero, and String contains more than
+                                   PcdMaximumUnicodeStringLength Unicode
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINT64.
+
+**/
+RETURN_STATUS
+EFIAPI
+StrDecimalToUint64S (
+  IN  CONST CHAR16             *String,
+  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       UINT64             *Data
+  )
+{
+  ASSERT (((UINTN) String & BIT0) == 0);
+
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than RSIZE_MAX.
+  //
+  if (RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((StrnLenS (String, RSIZE_MAX + 1) <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINT64, then MAX_UINT64 is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > DivU64x32 (MAX_UINT64 - (*String - L'0'), 10)) {
+      *Data = MAX_UINT64;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR16 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = MultU64x32 (*Data, 10) + (*String - L'0');
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated Unicode hexadecimal string to a value of type
+  UINTN.
+
+  This function outputs a value of type UINTN by interpreting the contents of
+  the Unicode string specified by String as a hexadecimal number. The format of
+  the input Unicode string String is:
+
+                  [spaces][zeros][x][hexadecimal digits].
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix.
+  If "x" appears in the input string, it must be prefixed with at least one 0.
+  The function will ignore the pad space, which includes spaces or tab
+  characters, before [zeros], [x] or [hexadecimal digit]. The running zero
+  before [x] or [hexadecimal digit] will be ignored. Then, the decoding starts
+  after [x] or the first valid hexadecimal digit. Then, the function stops at
+  the first character that is a not a valid hexadecimal character or NULL,
+  whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid hexadecimal digits in the above format, then 0 is
+  stored at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINTN, then
+  MAX_UINTN is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  hexadecimal digits right after the optional pad spaces, the value of String
+  is stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumUnicodeStringLength is not
+                                   zero, and String contains more than
+                                   PcdMaximumUnicodeStringLength Unicode
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINTN.
+
+**/
+RETURN_STATUS
+EFIAPI
+StrHexToUintnS (
+  IN  CONST CHAR16             *String,
+  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       UINTN              *Data
+  )
+{
+  ASSERT (((UINTN) String & BIT0) == 0);
+
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than RSIZE_MAX.
+  //
+  if (RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((StrnLenS (String, RSIZE_MAX + 1) <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  if (InternalCharToUpper (*String) == L'X') {
+    if (*(String - 1) != L'0') {
+      *Data = 0;
+      return RETURN_SUCCESS;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINTN, then MAX_UINTN is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > ((MAX_UINTN - InternalHexCharToUintn (*String)) >> 4)) {
+      *Data = MAX_UINTN;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR16 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = (*Data << 4) + InternalHexCharToUintn (*String);
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated Unicode hexadecimal string to a value of type
+  UINT64.
+
+  This function outputs a value of type UINT64 by interpreting the contents of
+  the Unicode string specified by String as a hexadecimal number. The format of
+  the input Unicode string String is:
+
+                  [spaces][zeros][x][hexadecimal digits].
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix.
+  If "x" appears in the input string, it must be prefixed with at least one 0.
+  The function will ignore the pad space, which includes spaces or tab
+  characters, before [zeros], [x] or [hexadecimal digit]. The running zero
+  before [x] or [hexadecimal digit] will be ignored. Then, the decoding starts
+  after [x] or the first valid hexadecimal digit. Then, the function stops at
+  the first character that is a not a valid hexadecimal character or NULL,
+  whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid hexadecimal digits in the above format, then 0 is
+  stored at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINT64, then
+  MAX_UINT64 is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  hexadecimal digits right after the optional pad spaces, the value of String
+  is stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumUnicodeStringLength is not
+                                   zero, and String contains more than
+                                   PcdMaximumUnicodeStringLength Unicode
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINT64.
+
+**/
+RETURN_STATUS
+EFIAPI
+StrHexToUint64S (
+  IN  CONST CHAR16             *String,
+  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       UINT64             *Data
+  )
+{
+  ASSERT (((UINTN) String & BIT0) == 0);
+
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than RSIZE_MAX.
+  //
+  if (RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((StrnLenS (String, RSIZE_MAX + 1) <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == L' ') || (*String == L'\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == L'0') {
+    String++;
+  }
+
+  if (InternalCharToUpper (*String) == L'X') {
+    if (*(String - 1) != L'0') {
+      *Data = 0;
+      return RETURN_SUCCESS;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINT64, then MAX_UINT64 is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > RShiftU64 (MAX_UINT64 - InternalHexCharToUintn (*String), 4)) {
+      *Data = MAX_UINT64;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR16 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = LShiftU64 (*Data, 4) + InternalHexCharToUintn (*String);
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR16 *) String;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
   Returns the length of a Null-terminated Ascii string.
 
   This function is similar as strlen_s defined in C11.
@@ -1037,6 +1526,484 @@ AsciiStrnCatS (
   }
   *Destination = 0;
 
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated Ascii decimal string to a value of type UINTN.
+
+  This function outputs a value of type UINTN by interpreting the contents of
+  the Ascii string specified by String as a decimal number. The format of the
+  input Ascii string String is:
+
+                  [spaces] [decimal digits].
+
+  The valid decimal digit character is in the range [0-9]. The function will
+  ignore the pad space, which includes spaces or tab characters, before
+  [decimal digits]. The running zero in the beginning of [decimal digits] will
+  be ignored. Then, the function stops at the first character that is a not a
+  valid decimal character or a Null-terminator, whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than
+  PcdMaximumAsciiStringLength Ascii characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid decimal digits in the above format, then 0 is stored
+  at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINTN, then
+  MAX_UINTN is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  decimal digits right after the optional pad spaces, the value of String is
+  stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Ascii string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumAsciiStringLength is not zero,
+                                   and String contains more than
+                                   PcdMaximumAsciiStringLength Ascii
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINTN.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrDecimalToUintnS (
+  IN  CONST CHAR8              *String,
+  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       UINTN              *Data
+  )
+{
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than ASCII_RSIZE_MAX.
+  //
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((AsciiStrnLenS (String, ASCII_RSIZE_MAX + 1) <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINTN, then MAX_UINTN is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > ((MAX_UINTN - (*String - '0')) / 10)) {
+      *Data = MAX_UINTN;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR8 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = *Data * 10 + (*String - '0');
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated Ascii decimal string to a value of type UINT64.
+
+  This function outputs a value of type UINT64 by interpreting the contents of
+  the Ascii string specified by String as a decimal number. The format of the
+  input Ascii string String is:
+
+                  [spaces] [decimal digits].
+
+  The valid decimal digit character is in the range [0-9]. The function will
+  ignore the pad space, which includes spaces or tab characters, before
+  [decimal digits]. The running zero in the beginning of [decimal digits] will
+  be ignored. Then, the function stops at the first character that is a not a
+  valid decimal character or a Null-terminator, whichever one comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than
+  PcdMaximumAsciiStringLength Ascii characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid decimal digits in the above format, then 0 is stored
+  at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINT64, then
+  MAX_UINT64 is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  decimal digits right after the optional pad spaces, the value of String is
+  stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Ascii string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumAsciiStringLength is not zero,
+                                   and String contains more than
+                                   PcdMaximumAsciiStringLength Ascii
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINT64.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrDecimalToUint64S (
+  IN  CONST CHAR8              *String,
+  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       UINT64             *Data
+  )
+{
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than ASCII_RSIZE_MAX.
+  //
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((AsciiStrnLenS (String, ASCII_RSIZE_MAX + 1) <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINT64, then MAX_UINT64 is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > DivU64x32 (MAX_UINT64 - (*String - '0'), 10)) {
+      *Data = MAX_UINT64;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR8 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = MultU64x32 (*Data, 10) + (*String - '0');
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated Ascii hexadecimal string to a value of type UINTN.
+
+  This function outputs a value of type UINTN by interpreting the contents of
+  the Ascii string specified by String as a hexadecimal number. The format of
+  the input Ascii string String is:
+
+                  [spaces][zeros][x][hexadecimal digits].
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If
+  "x" appears in the input string, it must be prefixed with at least one 0. The
+  function will ignore the pad space, which includes spaces or tab characters,
+  before [zeros], [x] or [hexadecimal digits]. The running zero before [x] or
+  [hexadecimal digits] will be ignored. Then, the decoding starts after [x] or
+  the first valid hexadecimal digit. Then, the function stops at the first
+  character that is a not a valid hexadecimal character or Null-terminator,
+  whichever on comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than
+  PcdMaximumAsciiStringLength Ascii characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid hexadecimal digits in the above format, then 0 is
+  stored at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINTN, then
+  MAX_UINTN is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  hexadecimal digits right after the optional pad spaces, the value of String
+  is stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Ascii string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumAsciiStringLength is not zero,
+                                   and String contains more than
+                                   PcdMaximumAsciiStringLength Ascii
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINTN.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrHexToUintnS (
+  IN  CONST CHAR8              *String,
+  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       UINTN              *Data
+  )
+{
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than ASCII_RSIZE_MAX.
+  //
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((AsciiStrnLenS (String, ASCII_RSIZE_MAX + 1) <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
+    if (*(String - 1) != '0') {
+      *Data = 0;
+      return RETURN_SUCCESS;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalAsciiIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINTN, then MAX_UINTN is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > ((MAX_UINTN - InternalAsciiHexCharToUintn (*String)) >> 4)) {
+      *Data = MAX_UINTN;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR8 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = (*Data << 4) + InternalAsciiHexCharToUintn (*String);
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated Ascii hexadecimal string to a value of type UINT64.
+
+  This function outputs a value of type UINT64 by interpreting the contents of
+  the Ascii string specified by String as a hexadecimal number. The format of
+  the input Ascii string String is:
+
+                  [spaces][zeros][x][hexadecimal digits].
+
+  The valid hexadecimal digit character is in the range [0-9], [a-f] and [A-F].
+  The prefix "0x" is optional. Both "x" and "X" is allowed in "0x" prefix. If
+  "x" appears in the input string, it must be prefixed with at least one 0. The
+  function will ignore the pad space, which includes spaces or tab characters,
+  before [zeros], [x] or [hexadecimal digits]. The running zero before [x] or
+  [hexadecimal digits] will be ignored. Then, the decoding starts after [x] or
+  the first valid hexadecimal digit. Then, the function stops at the first
+  character that is a not a valid hexadecimal character or Null-terminator,
+  whichever on comes first.
+
+  If String is NULL, then ASSERT().
+  If Data is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and String contains more than
+  PcdMaximumAsciiStringLength Ascii characters, not including the
+  Null-terminator, then ASSERT().
+
+  If String has no valid hexadecimal digits in the above format, then 0 is
+  stored at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINT64, then
+  MAX_UINT64 is stored at the location pointed to by Data.
+
+  If EndPointer is not NULL, a pointer to the character that stopped the scan
+  is stored at the location pointed to by EndPointer. If String has no valid
+  hexadecimal digits right after the optional pad spaces, the value of String
+  is stored at the location pointed to by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Ascii string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Data                     Pointer to the converted value.
+
+  @retval RETURN_SUCCESS           Value is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If PcdMaximumAsciiStringLength is not zero,
+                                   and String contains more than
+                                   PcdMaximumAsciiStringLength Ascii
+                                   characters, not including the
+                                   Null-terminator.
+  @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
+                                   the range defined by UINT64.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrHexToUint64S (
+  IN  CONST CHAR8              *String,
+  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       UINT64             *Data
+  )
+{
+  //
+  // 1. Neither String nor Data shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. The length of String shall not be greater than ASCII_RSIZE_MAX.
+  //
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((AsciiStrnLenS (String, ASCII_RSIZE_MAX + 1) <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
+
+  //
+  // Ignore the pad spaces (space or tab)
+  //
+  while ((*String == ' ') || (*String == '\t')) {
+    String++;
+  }
+
+  //
+  // Ignore leading Zeros after the spaces
+  //
+  while (*String == '0') {
+    String++;
+  }
+
+  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
+    if (*(String - 1) != '0') {
+      *Data = 0;
+      return RETURN_SUCCESS;
+    }
+    //
+    // Skip the 'X'
+    //
+    String++;
+  }
+
+  *Data = 0;
+
+  while (InternalAsciiIsHexaDecimalDigitCharacter (*String)) {
+    //
+    // If the number represented by String overflows according to the range
+    // defined by UINT64, then MAX_UINT64 is stored in *Data and
+    // RETURN_UNSUPPORTED is returned.
+    //
+    if (*Data > RShiftU64 (MAX_UINT64 - InternalAsciiHexCharToUintn (*String), 4)) {
+      *Data = MAX_UINT64;
+      if (EndPointer != NULL) {
+        *EndPointer = (CHAR8 *) String;
+      }
+      return RETURN_UNSUPPORTED;
+    }
+
+    *Data = LShiftU64 (*Data, 4) + InternalAsciiHexCharToUintn (*String);
+    String++;
+  }
+
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) String;
+  }
   return RETURN_SUCCESS;
 }
 
