@@ -98,6 +98,8 @@
   ## SOMETIMES_PRODUCES   ## GUID # Install protocol
   gEdkiiSmmMemoryProfileGuid
   gEdkiiPiSmmMemoryAttributesTableGuid          ## SOMETIMES_PRODUCES   ## SystemTable
+  ## SOMETIMES_CONSUMES   ## SystemTable
+  gLoadFixedAddressConfigurationTableGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PiSmmCoreExtra.uni

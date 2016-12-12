@@ -37,6 +37,7 @@
 #include <Guid/EventGroup.h>
 #include <Guid/EventLegacyBios.h>
 #include <Guid/MemoryProfile.h>
+#include <Guid/LoadModuleAtFixedAddress.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>

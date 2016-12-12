@@ -59,10 +59,9 @@ SmmInitializeMemoryServices (
   )
 {
   UINTN                  Index;
-  UINT64                 SmmCodeSize;
-  UINTN                  CurrentSmramRangesIndex;
-  UINT64                 MaxSize;
+  EFI_STATUS             Status;
   UINTN                  SmmPoolTypeIndex;
+  EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE *LMFAConfigurationTable;
 
   //
   // Initialize Pool list
@@ -72,45 +71,15 @@ SmmInitializeMemoryServices (
       InitializeListHead (&mSmmPoolLists[SmmPoolTypeIndex][Index]);
     }
   }
-  CurrentSmramRangesIndex = 0;
-  //
-  // If Loading Module At fixed Address feature is enabled, cache the SMRAM base here
-  //
-  if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
-    //
-    // Build tool will calculate the smm code size and then patch the PcdLoadFixAddressSmmCodePageNumber
-    //
-    SmmCodeSize = LShiftU64 (PcdGet32(PcdLoadFixAddressSmmCodePageNumber), EFI_PAGE_SHIFT);
-    
-    //
-    // Find the largest SMRAM range between 1MB and 4GB that is at least 256KB - 4K in size
-    //
-    for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < SmramRangeCount; Index++) {
-      //
-      // Skip any SMRAM region that is already allocated, needs testing, or needs ECC initialization
-      //
-      if ((SmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
-        continue;
-      }
 
-      if (SmramRanges[Index].CpuStart >= BASE_1MB) {
-        if ((SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize - 1) <= MAX_ADDRESS) {
-          if (SmramRanges[Index].PhysicalSize >= MaxSize) {
-            MaxSize = SmramRanges[Index].PhysicalSize;
-            CurrentSmramRangesIndex = Index;
-          }
-        }
-      }
-    }
-    gLoadModuleAtFixAddressSmramBase = SmramRanges[CurrentSmramRangesIndex].CpuStart;
-    
-    //
-    // cut out a memory range from this SMRAM range with the size SmmCodeSize to hold SMM driver code
-    // A notable thing is that SMM core is already loaded into this range.
-    //
-    SmramRanges[CurrentSmramRangesIndex].CpuStart     = SmramRanges[CurrentSmramRangesIndex].CpuStart + SmmCodeSize; 
-    SmramRanges[CurrentSmramRangesIndex].PhysicalSize = SmramRanges[CurrentSmramRangesIndex].PhysicalSize - SmmCodeSize;
+  Status = EfiGetSystemConfigurationTable (
+            &gLoadFixedAddressConfigurationTableGuid,
+           (VOID **) &LMFAConfigurationTable
+           );
+  if (!EFI_ERROR (Status) && LMFAConfigurationTable != NULL) {
+    gLoadModuleAtFixAddressSmramBase = LMFAConfigurationTable->SmramBase;
   }
+
   //
   // Add Free SMRAM regions
   // Need add Free memory at first, to let gSmmMemoryMap record data
