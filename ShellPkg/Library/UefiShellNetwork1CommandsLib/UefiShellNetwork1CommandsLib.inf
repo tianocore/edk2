@@ -55,7 +55,7 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## CONSUMES
-  gEfiTimerArchProtocolGuid
+  gEfiTimerArchProtocolGuid                     ## CONSUMES
   gEfiIp6ProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiIp6ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiIp6ConfigProtocolGuid                     ## SOMETIMES_CONSUMES
