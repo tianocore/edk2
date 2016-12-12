@@ -1174,9 +1174,9 @@ HiiPasswordEntered(
 }
 
 /**
-  Update block sid info.
+  Send BlockSid request through TPM physical presence module.
 
-  @param      Enable         Enable/disable BlockSid.
+  @param   PpRequest         TPM physical presence operation request.
 
   @retval  EFI_SUCCESS       Do the required action success.
   @retval  Others            Other error occur.
