@@ -1394,9 +1394,8 @@ SetupEventLog (
   for (Index = 0; Index < sizeof(mTcg2EventInfo)/sizeof(mTcg2EventInfo[0]); Index++) {
     if ((mTcgDxeData.BsCap.SupportedEventLogs & mTcg2EventInfo[Index].LogFormat) != 0) {
       mTcgDxeData.EventLogAreaStruct[Index].EventLogFormat = mTcg2EventInfo[Index].LogFormat;
-      Lasa = (EFI_PHYSICAL_ADDRESS) (SIZE_4GB - 1);
       Status = gBS->AllocatePages (
-                      AllocateMaxAddress,
+                      AllocateAnyPages,
                       EfiBootServicesData,
                       EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcgLogAreaMinLen)),
                       &Lasa
@@ -1496,9 +1495,8 @@ SetupEventLog (
   for (Index = 0; Index < sizeof(mTcg2EventInfo)/sizeof(mTcg2EventInfo[0]); Index++) {
     if ((mTcgDxeData.BsCap.SupportedEventLogs & mTcg2EventInfo[Index].LogFormat) != 0) {
       if (mTcg2EventInfo[Index].LogFormat == EFI_TCG2_EVENT_LOG_FORMAT_TCG_2) {
-        Lasa = (EFI_PHYSICAL_ADDRESS) (SIZE_4GB - 1);
         Status = gBS->AllocatePages (
-                        AllocateMaxAddress,
+                        AllocateAnyPages,
                         EfiACPIMemoryNVS,
                         EFI_SIZE_TO_PAGES (PcdGet32 (PcdTcg2FinalLogAreaLen)),
                         &Lasa
