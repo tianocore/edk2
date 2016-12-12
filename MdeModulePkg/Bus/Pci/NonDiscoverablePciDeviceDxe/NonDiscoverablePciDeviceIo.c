@@ -189,22 +189,22 @@ PciIoMemRead (
   }
 
   switch (Width) {
-  case EfiPciWidthUint8:
-  case EfiPciWidthUint16:
-  case EfiPciWidthUint32:
-  case EfiPciWidthUint64:
+  case EfiPciIoWidthUint8:
+  case EfiPciIoWidthUint16:
+  case EfiPciIoWidthUint32:
+  case EfiPciIoWidthUint64:
     return PciIoMemRW (Width, Count, 1, Buffer, 1, Address);
 
-  case EfiPciWidthFifoUint8:
-  case EfiPciWidthFifoUint16:
-  case EfiPciWidthFifoUint32:
-  case EfiPciWidthFifoUint64:
+  case EfiPciIoWidthFifoUint8:
+  case EfiPciIoWidthFifoUint16:
+  case EfiPciIoWidthFifoUint32:
+  case EfiPciIoWidthFifoUint64:
     return PciIoMemRW (Width, Count, 1, Buffer, 0, Address);
 
-  case EfiPciWidthFillUint8:
-  case EfiPciWidthFillUint16:
-  case EfiPciWidthFillUint32:
-  case EfiPciWidthFillUint64:
+  case EfiPciIoWidthFillUint8:
+  case EfiPciIoWidthFillUint16:
+  case EfiPciIoWidthFillUint32:
+  case EfiPciIoWidthFillUint64:
     return PciIoMemRW (Width, Count, 0, Buffer, 1, Address);
 
   default:
@@ -256,22 +256,22 @@ PciIoMemWrite (
   }
 
   switch (Width) {
-  case EfiPciWidthUint8:
-  case EfiPciWidthUint16:
-  case EfiPciWidthUint32:
-  case EfiPciWidthUint64:
+  case EfiPciIoWidthUint8:
+  case EfiPciIoWidthUint16:
+  case EfiPciIoWidthUint32:
+  case EfiPciIoWidthUint64:
     return PciIoMemRW (Width, Count, 1, Address, 1, Buffer);
 
-  case EfiPciWidthFifoUint8:
-  case EfiPciWidthFifoUint16:
-  case EfiPciWidthFifoUint32:
-  case EfiPciWidthFifoUint64:
+  case EfiPciIoWidthFifoUint8:
+  case EfiPciIoWidthFifoUint16:
+  case EfiPciIoWidthFifoUint32:
+  case EfiPciIoWidthFifoUint64:
     return PciIoMemRW (Width, Count, 0, Address, 1, Buffer);
 
-  case EfiPciWidthFillUint8:
-  case EfiPciWidthFillUint16:
-  case EfiPciWidthFillUint32:
-  case EfiPciWidthFillUint64:
+  case EfiPciIoWidthFillUint8:
+  case EfiPciIoWidthFillUint16:
+  case EfiPciIoWidthFillUint32:
+  case EfiPciIoWidthFillUint64:
     return PciIoMemRW (Width, Count, 1, Address, 0, Buffer);
 
   default:
