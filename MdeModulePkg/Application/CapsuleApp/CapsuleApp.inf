@@ -40,22 +40,22 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [Guids]
-  gEfiFileInfoGuid
-  gEfiPartTypeSystemPartGuid
-  gEfiGlobalVariableGuid
-  gEfiCapsuleReportGuid
-  gEfiFmpCapsuleGuid
-  gWindowsUxCapsuleGuid
-  gEfiCertTypeRsa2048Sha256Guid
-  gEfiCertPkcs7Guid
-  gEfiSystemResourceTableGuid
+  gEfiFileInfoGuid                       ## CONSUMES
+  gEfiPartTypeSystemPartGuid             ## CONSUMES
+  gEfiGlobalVariableGuid                 ## CONSUMES
+  gEfiCapsuleReportGuid                  ## CONSUMES
+  gEfiFmpCapsuleGuid                     ## CONSUMES
+  gWindowsUxCapsuleGuid                  ## CONSUMES
+  gEfiCertTypeRsa2048Sha256Guid          ## CONSUMES
+  gEfiCertPkcs7Guid                      ## CONSUMES
+  gEfiSystemResourceTableGuid            ## CONSUMES
 
 [Protocols]
-  gEfiLoadedImageProtocolGuid
-  gEfiSimpleFileSystemProtocolGuid
-  gEfiGraphicsOutputProtocolGuid
-  gEfiFirmwareManagementProtocolGuid
-  gEfiShellParametersProtocolGuid
+  gEfiLoadedImageProtocolGuid            ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid       ## CONSUMES
+  gEfiGraphicsOutputProtocolGuid         ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid     ## CONSUMES
+  gEfiShellParametersProtocolGuid        ## CONSUMES
 
 [LibraryClasses]
   BaseLib
