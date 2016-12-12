@@ -180,6 +180,7 @@
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRsa2048Sha256PublicKeyBuffer_PROMPT  #language en-US "One or more SHA 256 Hashes of RSA 2048 bit public keys used to verify Recovery and Capsule Update images"
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRsa2048Sha256PublicKeyBuffer_HELP  #language en-US "Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images\n"
+                                                                                                "WARNING: The default value is treated as test key. Please do not use default value in the production."
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2NumberOfPCRBanks_PROMPT  #language en-US "OEM configurated number of PCR banks."
 
@@ -214,3 +215,9 @@
 "Indicate whether a physical presence user exist. "
 "When it is configured to Dynamic or DynamicEx, it can be set through detection using "
 "a platform-specific method (e.g. Button pressed) in a actual platform in early boot phase.<BR><BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPkcs7CertBuffer_PROMPT  #language en-US "One PKCS7 cert used to verify Recovery and Capsule Update images"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPkcs7CertBuffer_HELP  #language en-US "Provides one PKCS7 cert used to verify Recovery and Capsule Update images\n"
+                                                                                   "WARNING: The default value is treated as test key. Please do not use default value in the production."
+
