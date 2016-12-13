@@ -31,6 +31,7 @@
 #
 
 [Sources]
+  RecoveryModuleLoadPei.h
   RecoveryModuleLoadPei.c
   ParseConfigProfile.c
 
