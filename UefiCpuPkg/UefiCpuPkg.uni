@@ -147,3 +147,11 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuApTargetCstate_HELP  #language en-US "Specifies the AP target C-state for Mwait during POST phase."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStaticPageTable_PROMPT  #language en-US "Use static page table for all memory in SMM."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStaticPageTable_HELP  #language en-US "Indicates if SMM uses static page table.\n"
+                                                                                     "If enabled, SMM will not use on-demand paging. SMM will build static page table for all memory.<BR><BR>\n"
+                                                                                     "This flag only impacts X64 build, because SMM alway builds static page table for IA32.\n"
+                                                                                     "TRUE  - SMM uses static page table for all memory.<BR>\n"
+                                                                                     "FALSE - SMM uses static page table for below 4G memory and use on-demand paging for above 4G memory.<BR>"
+
