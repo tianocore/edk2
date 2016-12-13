@@ -47,15 +47,15 @@
   FmpAuthenticationLib
 
 [Pcd]
-  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor
-  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid
-  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer
-  gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor    ## CONSUMES
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid           ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer               ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer                            ## CONSUMES
 
 [Guids]
-  gEdkiiSystemFirmwareImageDescriptorFileGuid
-  gEdkiiSystemFmpCapsuleConfigFileGuid
-  gEdkiiSystemFmpCapsuleDriverFvFileGuid
-  gEfiCertPkcs7Guid
-  gEfiCertTypeRsa2048Sha256Guid
+  gEdkiiSystemFirmwareImageDescriptorFileGuid          ## CONSUMES   ## GUID
+  gEdkiiSystemFmpCapsuleConfigFileGuid                 ## CONSUMES   ## GUID
+  gEdkiiSystemFmpCapsuleDriverFvFileGuid               ## CONSUMES   ## GUID
+  gEfiCertPkcs7Guid                                    ## CONSUMES   ## GUID
+  gEfiCertTypeRsa2048Sha256Guid                        ## CONSUMES   ## GUID
 
