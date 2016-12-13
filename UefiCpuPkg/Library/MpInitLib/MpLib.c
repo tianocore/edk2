@@ -337,8 +337,8 @@ ApInitializeSync (
 /**
   Find the current Processor number by APIC ID.
 
-  @param[in] CpuMpData         Pointer to PEI CPU MP Data
-  @param[in] ProcessorNumber   Return the pocessor number found
+  @param[in]  CpuMpData         Pointer to PEI CPU MP Data
+  @param[out] ProcessorNumber   Return the pocessor number found
 
   @retval EFI_SUCCESS          ProcessorNumber is found and returned.
   @retval EFI_NOT_FOUND        ProcessorNumber is not found.
@@ -420,12 +420,13 @@ CollectProcessorCount (
   return CpuMpData->CpuCount;
 }
 
-/*
+/**
   Initialize CPU AP Data when AP is wakeup at the first time.
 
   @param[in, out] CpuMpData        Pointer to PEI CPU MP Data
   @param[in]      ProcessorNumber  The handle number of processor
   @param[in]      BistData         Processor BIST data
+  @param[in]      ApTopOfStack     Top of AP stack
 
 **/
 VOID
@@ -1706,7 +1707,7 @@ MpInitLibGetNumberOfProcessors (
                                       simultaneously.
   @param[in]  WaitEvent               The event created by the caller with CreateEvent()
                                       service.
-  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+  @param[in]  TimeoutInMicroseconds   Indicates the time limit in microseconds for
                                       APs to return from Procedure, either for
                                       blocking or non-blocking mode.
   @param[in]  ProcedureArgument       The parameter passed into Procedure for
@@ -1860,7 +1861,7 @@ StartupAllAPsWorker (
   @param[in]  ProcessorNumber         The handle number of the AP.
   @param[in]  WaitEvent               The event created by the caller with CreateEvent()
                                       service.
-  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+  @param[in]  TimeoutInMicroseconds   Indicates the time limit in microseconds for
                                       APs to return from Procedure, either for
                                       blocking or non-blocking mode.
   @param[in]  ProcedureArgument       The parameter passed into Procedure for

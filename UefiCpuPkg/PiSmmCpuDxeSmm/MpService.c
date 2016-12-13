@@ -899,7 +899,7 @@ SetCacheability (
 
   @param[in]       Procedure                The address of the procedure to run
   @param[in]       CpuIndex                 Target CPU Index
-  @param[in, OUT]  ProcArguments            The parameter to pass to the procedure
+  @param[in, out]  ProcArguments            The parameter to pass to the procedure
   @param[in]       BlockingMode             Startup AP in blocking mode or not
 
   @retval EFI_INVALID_PARAMETER    CpuNumber not valid

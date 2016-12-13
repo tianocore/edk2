@@ -365,7 +365,7 @@ InitMpGlobalData (
                                       simultaneously.
   @param[in]  WaitEvent               The event created by the caller with CreateEvent()
                                       service.
-  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+  @param[in]  TimeoutInMicroseconds   Indicates the time limit in microseconds for
                                       APs to return from Procedure, either for
                                       blocking or non-blocking mode.
   @param[in]  ProcedureArgument       The parameter passed into Procedure for
@@ -402,7 +402,7 @@ StartupAllAPsWorker (
   @param[in]  ProcessorNumber         The handle number of the AP.
   @param[in]  WaitEvent               The event created by the caller with CreateEvent()
                                       service.
-  @param[in]  TimeoutInMicrosecsond   Indicates the time limit in microseconds for
+  @param[in]  TimeoutInMicroseconds   Indicates the time limit in microseconds for
                                       APs to return from Procedure, either for
                                       blocking or non-blocking mode.
   @param[in]  ProcedureArgument       The parameter passed into Procedure for
