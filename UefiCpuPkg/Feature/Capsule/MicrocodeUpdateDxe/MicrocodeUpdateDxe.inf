@@ -30,6 +30,7 @@
 #
 
 [Sources]
+  MicrocodeUpdate.h
   MicrocodeFmp.c
   MicrocodeUpdate.c
 
@@ -51,10 +52,10 @@
   MicrocodeFlashAccessLib
 
 [Guids]
-  gMicrocodeFmpImageTypeIdGuid
+  gMicrocodeFmpImageTypeIdGuid                  ## CONSUMES   ## GUID
 
 [Protocols]
-  gEfiFirmwareManagementProtocolGuid            ## SOMTIMES_PRODUCE
+  gEfiFirmwareManagementProtocolGuid            ## PRODUCES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress            ## CONSUMES
