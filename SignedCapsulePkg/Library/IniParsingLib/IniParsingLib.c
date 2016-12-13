@@ -50,8 +50,8 @@
 // This is default allocation. Reallocation will happen if it is not enough.
 #define MAX_LINE_LENGTH           512
 
-typedef struct _SECTION_ITEM SECTION_ITEM;
-struct _SECTION_ITEM {
+typedef struct _INI_SECTION_ITEM SECTION_ITEM;
+struct _INI_SECTION_ITEM {
   CHAR8                           *PtrSection;
   UINTN                           SecNameLen;
   CHAR8                           *PtrEntry;
@@ -59,8 +59,8 @@ struct _SECTION_ITEM {
   SECTION_ITEM                    *PtrNext;
 };
 
-typedef struct _COMMENT_LINE COMMENT_LINE;
-struct _COMMENT_LINE {
+typedef struct _INI_COMMENT_LINE COMMENT_LINE;
+struct _INI_COMMENT_LINE {
   CHAR8                           *PtrComment;
   COMMENT_LINE                    *PtrNext;
 };
