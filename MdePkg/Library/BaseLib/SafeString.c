@@ -2108,6 +2108,128 @@ UnicodeStrToAsciiStrS (
   return RETURN_SUCCESS;
 }
 
+/**
+  Convert not more than Length successive characters from a Null-terminated
+  Unicode string to a Null-terminated Ascii string. If no null char is copied
+  from Source, then Destination[Length] is always set to null.
+
+  This function converts not more than Length successive characters from the
+  Unicode string Source to the Ascii string Destination by copying the lower 8
+  bits of each Unicode character. The function terminates the Ascii string
+  Destination by appending a Null-terminator character at the end.
+
+  The caller is responsible to make sure Destination points to a buffer with
+  size not smaller than ((MIN(StrLen(Source), Length) + 1) * sizeof (CHAR8))
+  in bytes.
+
+  If any Unicode characters in Source contain non-zero value in the upper 8
+  bits, then ASSERT().
+  If Source is not aligned on a 16-bit boundary, then ASSERT().
+  If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then Destination and DestinationLength are
+  unmodified.
+
+  @param  Source             The pointer to a Null-terminated Unicode string.
+  @param  Length             The maximum number of Unicode characters to
+                             convert.
+  @param  Destination        The pointer to a Null-terminated Ascii string.
+  @param  DestMax            The maximum number of Destination Ascii char,
+                             including terminating null char.
+  @param  DestinationLength  The number of Unicode characters converted.
+
+  @retval RETURN_SUCCESS            String is converted.
+  @retval RETURN_INVALID_PARAMETER  If Destination is NULL.
+                                    If Source is NULL.
+                                    If DestinationLength is NULL.
+                                    If PcdMaximumAsciiStringLength is not zero,
+                                    and Length or DestMax is greater than
+                                    PcdMaximumAsciiStringLength.
+                                    If PcdMaximumUnicodeStringLength is not
+                                    zero, and Length or DestMax is greater than
+                                    PcdMaximumUnicodeStringLength.
+                                    If DestMax is 0.
+  @retval RETURN_BUFFER_TOO_SMALL   If DestMax is NOT greater than
+                                    MIN(StrLen(Source), Length).
+  @retval RETURN_ACCESS_DENIED      If Source and Destination overlap.
+
+**/
+RETURN_STATUS
+EFIAPI
+UnicodeStrnToAsciiStrS (
+  IN      CONST CHAR16              *Source,
+  IN      UINTN                     Length,
+  OUT     CHAR8                     *Destination,
+  IN      UINTN                     DestMax,
+  OUT     UINTN                     *DestinationLength
+  )
+{
+  UINTN            SourceLen;
+
+  ASSERT (((UINTN) Source & BIT0) == 0);
+
+  //
+  // 1. None of Destination, Source or DestinationLength shall be a null
+  // pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((Destination != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Source != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((DestinationLength != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. Neither Length nor DestMax shall be greater than ASCII_RSIZE_MAX or
+  // RSIZE_MAX.
+  //
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((Length <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+    SAFE_STRING_CONSTRAINT_CHECK ((DestMax <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+  if (RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((Length <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+    SAFE_STRING_CONSTRAINT_CHECK ((DestMax <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  //
+  // 3. DestMax shall not equal zero.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((DestMax != 0), RETURN_INVALID_PARAMETER);
+
+  //
+  // 4. If Length is not less than DestMax, then DestMax shall be greater than
+  // StrnLenS(Source, DestMax).
+  //
+  SourceLen = StrnLenS (Source, DestMax);
+  if (Length >= DestMax) {
+    SAFE_STRING_CONSTRAINT_CHECK ((DestMax > SourceLen), RETURN_BUFFER_TOO_SMALL);
+  }
+
+  //
+  // 5. Copying shall not take place between objects that overlap.
+  //
+  if (SourceLen > Length) {
+    SourceLen = Length;
+  }
+  SAFE_STRING_CONSTRAINT_CHECK (!InternalSafeStringIsOverlap (Destination, DestMax, (VOID *)Source, (SourceLen + 1) * sizeof(CHAR16)), RETURN_ACCESS_DENIED);
+
+  *DestinationLength = 0;
+
+  //
+  // Convert string
+  //
+  while ((*Source != 0) && (SourceLen > 0)) {
+    //
+    // If any Unicode characters in Source contain non-zero value in the upper
+    // 8 bits, then ASSERT().
+    //
+    ASSERT (*Source < 0x100);
+    *(Destination++) = (CHAR8) *(Source++);
+    SourceLen--;
+    (*DestinationLength)++;
+  }
+  *Destination = 0;
+
+  return RETURN_SUCCESS;
+}
 
 /**
   Convert one Null-terminated ASCII string to a Null-terminated
@@ -2197,6 +2319,121 @@ AsciiStrToUnicodeStrS (
     *(Destination++) = (CHAR16)*(Source++);
   }
   *Destination = '\0';
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert not more than Length successive characters from a Null-terminated
+  Ascii string to a Null-terminated Unicode string. If no null char is copied
+  from Source, then Destination[Length] is always set to null.
+
+  This function converts not more than Length successive characters from the
+  Ascii string Source to the Unicode string Destination. The function
+  terminates the Unicode string Destination by appending a Null-terminator
+  character at the end.
+
+  The caller is responsible to make sure Destination points to a buffer with
+  size not smaller than
+  ((MIN(AsciiStrLen(Source), Length) + 1) * sizeof (CHAR8)) in bytes.
+
+  If Destination is not aligned on a 16-bit boundary, then ASSERT().
+  If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then Destination and DestinationLength are
+  unmodified.
+
+  @param  Source             The pointer to a Null-terminated Ascii string.
+  @param  Length             The maximum number of Ascii characters to convert.
+  @param  Destination        The pointer to a Null-terminated Unicode string.
+  @param  DestMax            The maximum number of Destination Unicode char,
+                             including terminating null char.
+  @param  DestinationLength  The number of Ascii characters converted.
+
+  @retval RETURN_SUCCESS            String is converted.
+  @retval RETURN_INVALID_PARAMETER  If Destination is NULL.
+                                    If Source is NULL.
+                                    If DestinationLength is NULL.
+                                    If PcdMaximumUnicodeStringLength is not
+                                    zero, and Length or DestMax is greater than
+                                    PcdMaximumUnicodeStringLength.
+                                    If PcdMaximumAsciiStringLength is not zero,
+                                    and Length or DestMax is greater than
+                                    PcdMaximumAsciiStringLength.
+                                    If DestMax is 0.
+  @retval RETURN_BUFFER_TOO_SMALL   If DestMax is NOT greater than
+                                    MIN(AsciiStrLen(Source), Length).
+  @retval RETURN_ACCESS_DENIED      If Source and Destination overlap.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrnToUnicodeStrS (
+  IN      CONST CHAR8               *Source,
+  IN      UINTN                     Length,
+  OUT     CHAR16                    *Destination,
+  IN      UINTN                     DestMax,
+  OUT     UINTN                     *DestinationLength
+  )
+{
+  UINTN            SourceLen;
+
+  ASSERT (((UINTN) Destination & BIT0) == 0);
+
+  //
+  // 1. None of Destination, Source or DestinationLength shall be a null
+  // pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((Destination != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Source != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((DestinationLength != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. Neither Length nor DestMax shall be greater than ASCII_RSIZE_MAX or
+  // RSIZE_MAX.
+  //
+  if (RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((Length <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+    SAFE_STRING_CONSTRAINT_CHECK ((DestMax <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((Length <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+    SAFE_STRING_CONSTRAINT_CHECK ((DestMax <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  //
+  // 3. DestMax shall not equal zero.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((DestMax != 0), RETURN_INVALID_PARAMETER);
+
+  //
+  // 4. If Length is not less than DestMax, then DestMax shall be greater than
+  // AsciiStrnLenS(Source, DestMax).
+  //
+  SourceLen = AsciiStrnLenS (Source, DestMax);
+  if (Length >= DestMax) {
+    SAFE_STRING_CONSTRAINT_CHECK ((DestMax > SourceLen), RETURN_BUFFER_TOO_SMALL);
+  }
+
+  //
+  // 5. Copying shall not take place between objects that overlap.
+  //
+  if (SourceLen > Length) {
+    SourceLen = Length;
+  }
+  SAFE_STRING_CONSTRAINT_CHECK (!InternalSafeStringIsOverlap (Destination, DestMax * sizeof(CHAR16), (VOID *)Source, SourceLen + 1), RETURN_ACCESS_DENIED);
+
+  *DestinationLength = 0;
+
+  //
+  // Convert string
+  //
+  while ((*Source != 0) && (SourceLen > 0)) {
+    *(Destination++) = (CHAR16)*(Source++);
+    SourceLen--;
+    (*DestinationLength)++;
+  }
+  *Destination = 0;
 
   return RETURN_SUCCESS;
 }

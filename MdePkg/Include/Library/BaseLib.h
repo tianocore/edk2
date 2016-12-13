@@ -1631,6 +1631,60 @@ UnicodeStrToAsciiStrS (
   IN      UINTN                     DestMax
   );
 
+/**
+  Convert not more than Length successive characters from a Null-terminated
+  Unicode string to a Null-terminated Ascii string. If no null char is copied
+  from Source, then Destination[Length] is always set to null.
+
+  This function converts not more than Length successive characters from the
+  Unicode string Source to the Ascii string Destination by copying the lower 8
+  bits of each Unicode character. The function terminates the Ascii string
+  Destination by appending a Null-terminator character at the end.
+
+  The caller is responsible to make sure Destination points to a buffer with size
+  equal or greater than ((StrLen (Source) + 1) * sizeof (CHAR8)) in bytes.
+
+  If any Unicode characters in Source contain non-zero value in the upper 8
+  bits, then ASSERT().
+  If Source is not aligned on a 16-bit boundary, then ASSERT().
+  If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then the Destination is unmodified.
+
+  @param  Source             The pointer to a Null-terminated Unicode string.
+  @param  Length             The maximum number of Unicode characters to
+                             convert.
+  @param  Destination        The pointer to a Null-terminated Ascii string.
+  @param  DestMax            The maximum number of Destination Ascii
+                             char, including terminating null char.
+  @param  DestinationLength  The number of Unicode characters converted.
+
+  @retval RETURN_SUCCESS            String is converted.
+  @retval RETURN_INVALID_PARAMETER  If Destination is NULL.
+                                    If Source is NULL.
+                                    If DestinationLength is NULL.
+                                    If PcdMaximumAsciiStringLength is not zero,
+                                    and Length or DestMax is greater than
+                                    PcdMaximumAsciiStringLength.
+                                    If PcdMaximumUnicodeStringLength is not
+                                    zero, and Length or DestMax is greater than
+                                    PcdMaximumUnicodeStringLength.
+                                    If DestMax is 0.
+  @retval RETURN_BUFFER_TOO_SMALL   If DestMax is NOT greater than
+                                    MIN(StrLen(Source), Length).
+  @retval RETURN_ACCESS_DENIED      If Source and Destination overlap.
+
+**/
+RETURN_STATUS
+EFIAPI
+UnicodeStrnToAsciiStrS (
+  IN      CONST CHAR16              *Source,
+  IN      UINTN                     Length,
+  OUT     CHAR8                     *Destination,
+  IN      UINTN                     DestMax,
+  OUT     UINTN                     *DestinationLength
+  );
+
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
@@ -2216,6 +2270,59 @@ AsciiStrToUnicodeStrS (
   IN      CONST CHAR8               *Source,
   OUT     CHAR16                    *Destination,
   IN      UINTN                     DestMax
+  );
+
+/**
+  Convert not more than Length successive characters from a Null-terminated
+  Ascii string to a Null-terminated Unicode string. If no null char is copied
+  from Source, then Destination[Length] is always set to null.
+
+  This function converts not more than Length successive characters from the
+  Ascii string Source to the Unicode string Destination. The function
+  terminates the Unicode string Destination by appending a Null-terminator
+  character at the end.
+
+  The caller is responsible to make sure Destination points to a buffer with
+  size not smaller than
+  ((MIN(AsciiStrLen(Source), Length) + 1) * sizeof (CHAR8)) in bytes.
+
+  If Destination is not aligned on a 16-bit boundary, then ASSERT().
+  If an error would be returned, then the function will also ASSERT().
+
+  If an error is returned, then Destination and DestinationLength are
+  unmodified.
+
+  @param  Source             The pointer to a Null-terminated Ascii string.
+  @param  Length             The maximum number of Ascii characters to convert.
+  @param  Destination        The pointer to a Null-terminated Unicode string.
+  @param  DestMax            The maximum number of Destination Unicode char,
+                             including terminating null char.
+  @param  DestinationLength  The number of Ascii characters converted.
+
+  @retval RETURN_SUCCESS            String is converted.
+  @retval RETURN_INVALID_PARAMETER  If Destination is NULL.
+                                    If Source is NULL.
+                                    If DestinationLength is NULL.
+                                    If PcdMaximumUnicodeStringLength is not
+                                    zero, and Length or DestMax is greater than
+                                    PcdMaximumUnicodeStringLength.
+                                    If PcdMaximumAsciiStringLength is not zero,
+                                    and Length or DestMax is greater than
+                                    PcdMaximumAsciiStringLength.
+                                    If DestMax is 0.
+  @retval RETURN_BUFFER_TOO_SMALL   If DestMax is NOT greater than
+                                    MIN(AsciiStrLen(Source), Length).
+  @retval RETURN_ACCESS_DENIED      If Source and Destination overlap.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrnToUnicodeStrS (
+  IN      CONST CHAR8               *Source,
+  IN      UINTN                     Length,
+  OUT     CHAR16                    *Destination,
+  IN      UINTN                     DestMax,
+  OUT     UINTN                     *DestinationLength
   );
 
 /**
