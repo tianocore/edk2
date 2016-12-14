@@ -8,6 +8,7 @@ copy crypto\opensslconf.h       include\openssl
 copy crypto\ebcdic.h            include\openssl
 copy crypto\symhacks.h          include\openssl
 copy crypto\ossl_typ.h          include\openssl
+copy crypto\o_dir.h             include
 copy crypto\objects\objects.h   include\openssl
 copy crypto\objects\obj_mac.h   include\openssl
 copy crypto\md4\md4.h           include\openssl

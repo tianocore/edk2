@@ -10,6 +10,7 @@ cp crypto/opensslconf.h       include/openssl
 cp crypto/ebcdic.h            include/openssl
 cp crypto/symhacks.h          include/openssl
 cp crypto/ossl_typ.h          include/openssl
+cp crypto/o_dir.h             include
 cp crypto/objects/objects.h   include/openssl
 cp crypto/objects/obj_mac.h   include/openssl
 cp crypto/md4/md4.h           include/openssl

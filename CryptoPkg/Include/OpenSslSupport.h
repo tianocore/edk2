@@ -1,7 +1,7 @@
 /** @file
   Root include file to support building OpenSSL Crypto Library.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -118,6 +118,8 @@ typedef UINT16         nlink_t;
 typedef int            pid_t;
 typedef void           *DIR;
 typedef void           __sighandler_t (int);
+typedef UINT8          __uint8_t;
+typedef UINT8          sa_family_t;
 
 //
 // Structures from EFI Application Toolkit required to build Open SSL
@@ -170,6 +172,12 @@ struct stat {
   UINT32   st_gen;          /* file generation number */
   INT32    st_lspare;
   INT64    st_qspare[2];
+};
+
+struct sockaddr {
+  __uint8_t sa_len;         /* total length */
+  sa_family_t sa_family;    /* address family */
+  char    sa_data[14];      /* actually longer; address value */
 };
 
 //
@@ -273,5 +281,6 @@ extern FILE  *stdout;
 #define localtime(timer)                  NULL
 #define gmtime_r(timer,result)            (result = NULL)
 #define atoi(nptr)                        AsciiStrDecimalToUintn(nptr)
+#define gettimeofday(tvp,tz)              do { (tvp)->tv_sec = time(NULL); (tvp)->tv_usec = 0; } while (0)
 
 #endif
