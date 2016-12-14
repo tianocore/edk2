@@ -31,6 +31,10 @@
   ##
   BaseCryptLib|Include/Library/BaseCryptLib.h
 
+  ##  @libraryclass  Provides TLS library functions for EFI TLS protocol.
+  ##
+  TlsLib|Include/Library/TlsLib.h
+
 [Protocols]
   ## Include/Protocol/RuntimeCrypt.h
   gEfiRuntimeCryptProtocolGuid = { 0xe1475e0c, 0x1746, 0x4802, {0x86, 0x2e, 0x1, 0x1c, 0x2c, 0x2d, 0x9d, 0x86 }}
