@@ -1,7 +1,7 @@
 ## @file
 #  Implementation of EFI HTTP protocol interfaces.
 #
-#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -26,6 +26,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 [Sources]
   ComponentName.h
@@ -38,10 +39,13 @@
   HttpImpl.c
   HttpProto.h
   HttpProto.c
+  HttpsSupport.h
+  HttpsSupport.c
 
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
   MemoryAllocationLib
   BaseLib
   UefiLib
@@ -64,6 +68,12 @@
   gEfiDns6ProtocolGuid                             ## SOMETIMES_CONSUMES
   gEfiIp4Config2ProtocolGuid                       ## SOMETIMES_CONSUMES
   gEfiIp6ConfigProtocolGuid                        ## SOMETIMES_CONSUMES
+  gEfiTlsServiceBindingProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiTlsProtocolGuid                              ## SOMETIMES_CONSUMES
+  gEfiTlsConfigurationProtocolGuid                 ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiTlsCaCertificateGuid                         ## CONSUMES  ## GUID
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpDxeExtra.uni

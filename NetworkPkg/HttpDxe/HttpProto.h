@@ -83,6 +83,13 @@ typedef struct {
   EFI_HTTP_METHOD               Method;
 } HTTP_TCP_TOKEN_WRAP;
 
+typedef struct {
+  EFI_TLS_VERSION               Version;
+  EFI_TLS_CONNECTION_END        ConnectionEnd;
+  EFI_TLS_VERIFY                VerifyMethod;
+  EFI_TLS_SESSION_STATE         SessionState;
+} TLS_CONFIG_DATA;
+
 typedef struct _HTTP_PROTOCOL {
   UINT32                        Signature;
   EFI_HTTP_PROTOCOL             Http;
@@ -153,6 +160,35 @@ typedef struct _HTTP_PROTOCOL {
   NET_MAP                       RxTokens;
 
   CHAR8                         *Url;
+
+  //
+  // Https Support
+  //
+  BOOLEAN                          UseHttps;
+  
+  EFI_HANDLE                       TlsChildHandle; /// Tls ChildHandle
+  TLS_CONFIG_DATA                  TlsConfigData;
+  EFI_TLS_PROTOCOL                 *Tls;
+  EFI_TLS_CONFIGURATION_PROTOCOL   *TlsConfiguration;
+  EFI_TLS_SESSION_STATE            TlsSessionState;
+
+  //
+  // TlsTxData used for transmitting TLS related messages.
+  //
+  EFI_TCP4_IO_TOKEN                Tcp4TlsTxToken;
+  EFI_TCP4_TRANSMIT_DATA           Tcp4TlsTxData;
+  EFI_TCP6_IO_TOKEN                Tcp6TlsTxToken;
+  EFI_TCP6_TRANSMIT_DATA           Tcp6TlsTxData;
+  BOOLEAN                          TlsIsTxDone;
+
+  //
+  // TlsRxData used for receiving TLS related messages.
+  //
+  EFI_TCP4_IO_TOKEN                Tcp4TlsRxToken;
+  EFI_TCP4_RECEIVE_DATA            Tcp4TlsRxData;
+  EFI_TCP6_IO_TOKEN                Tcp6TlsRxToken;
+  EFI_TCP6_RECEIVE_DATA            Tcp6TlsRxData;
+  BOOLEAN                          TlsIsRxDone;
 } HTTP_PROTOCOL;
 
 typedef struct {
@@ -352,7 +388,8 @@ HttpConfigureTcp6 (
   );
 
 /**
-  Check existing TCP connection, if in error state, receover TCP4 connection.
+  Check existing TCP connection, if in error state, recover TCP4 connection. Then, 
+  connect one TLS session if required.
 
   @param[in]  HttpInstance       The HTTP instance private data.
 
@@ -367,7 +404,8 @@ HttpConnectTcp4 (
   );
 
 /**
-  Check existing TCP connection, if in error state, recover TCP6 connection.
+  Check existing TCP connection, if in error state, recover TCP6 connection. Then, 
+  connect one TLS session if required.
 
   @param[in]  HttpInstance       The HTTP instance private data.
 
@@ -382,7 +420,7 @@ HttpConnectTcp6 (
   );
 
 /**
-  Send the HTTP message through TCP4 or TCP6.
+  Send the HTTP or HTTPS message through TCP4 or TCP6.
 
   @param[in]  HttpInstance       The HTTP instance private data.
   @param[in]  Wrap               The HTTP token's wrap data.
@@ -443,25 +481,27 @@ HttpTcpNotReady (
   );
 
 /**
-  Initialize TCP related data.
+  Initialize Http session.
 
   @param[in]  HttpInstance       The HTTP instance private data.
   @param[in]  Wrap               The HTTP token's wrap data.
-  @param[in]  Configure          The Flag indicates whether the first time to initialize Tcp.
+  @param[in]  Configure          The Flag indicates whether need to initialize session.
+  @param[in]  TlsConfigure       The Flag indicates whether it's the new Tls session.
 
-  @retval EFI_SUCCESS            The initialization of TCP instance is done. 
+  @retval EFI_SUCCESS            The initialization of session is done. 
   @retval Others                 Other error as indicated.
 
 **/
 EFI_STATUS
-HttpInitTcp (
+HttpInitSession (
   IN  HTTP_PROTOCOL    *HttpInstance,
   IN  HTTP_TOKEN_WRAP  *Wrap,
-  IN  BOOLEAN          Configure
+  IN  BOOLEAN          Configure,
+  IN  BOOLEAN          TlsConfigure
   );
 
 /**
-  Transmit the HTTP mssage by processing the associated HTTP token.
+  Transmit the HTTP or HTTPS mssage by processing the associated HTTP token.
 
   @param[in]  Map                The container of TxToken or Tx6Token.
   @param[in]  Item               Current item to check against.
