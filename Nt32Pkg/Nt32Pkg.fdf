@@ -262,6 +262,10 @@ INF  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 INF  NetworkPkg/DnsDxe/DnsDxe.inf
 INF  NetworkPkg/HttpDxe/HttpDxe.inf
 INF  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
+!if $(TLS_ENABLE) == TRUE
+INF  NetworkPkg/TlsDxe/TlsDxe.inf
+INF  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
+!endif
 INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 ################################################################################
 #
