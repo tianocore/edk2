@@ -1395,7 +1395,7 @@ StrStr (
   If String has no pad spaces or valid decimal digits,
   then 0 is returned.
   If the number represented by String overflows according
-  to the range defined by UINTN, then ASSERT().
+  to the range defined by UINTN, then MAX_UINTN is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains
   more than PcdMaximumUnicodeStringLength Unicode characters not including
@@ -1435,7 +1435,7 @@ StrDecimalToUintn (
   If String has no pad spaces or valid decimal digits,
   then 0 is returned.
   If the number represented by String overflows according
-  to the range defined by UINT64, then ASSERT().
+  to the range defined by UINT64, then MAX_UINT64 is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains
   more than PcdMaximumUnicodeStringLength Unicode characters not including
@@ -1477,7 +1477,7 @@ StrDecimalToUint64 (
   If String has no leading pad spaces, leading zeros or valid hexadecimal digits,
   then zero is returned.
   If the number represented by String overflows according to the range defined by
-  UINTN, then ASSERT().
+  UINTN, then MAX_UINTN is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator,
@@ -1519,7 +1519,7 @@ StrHexToUintn (
   If String has no leading pad spaces, leading zeros or valid hexadecimal digits,
   then zero is returned.
   If the number represented by String overflows according to the range defined by
-  UINT64, then ASSERT().
+  UINT64, then MAX_UINT64 is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
   PcdMaximumUnicodeStringLength Unicode characters not including the Null-terminator,
@@ -1997,7 +1997,7 @@ AsciiStrStr (
   If String has only pad spaces, then 0 is returned.
   If String has no pad spaces or valid decimal digits, then 0 is returned.
   If the number represented by String overflows according to the range defined by
-  UINTN, then ASSERT().
+  UINTN, then MAX_UINTN is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and String contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
@@ -2034,7 +2034,7 @@ AsciiStrDecimalToUintn (
   If String has only pad spaces, then 0 is returned.
   If String has no pad spaces or valid decimal digits, then 0 is returned.
   If the number represented by String overflows according to the range defined by
-  UINT64, then ASSERT().
+  UINT64, then MAX_UINT64 is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and String contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
@@ -2075,7 +2075,7 @@ AsciiStrDecimalToUint64 (
   0 is returned.
 
   If the number represented by String overflows according to the range defined by UINTN,
-  then ASSERT().
+  then MAX_UINTN is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero,
   and String contains more than PcdMaximumAsciiStringLength ASCII characters not including
@@ -2116,7 +2116,7 @@ AsciiStrHexToUintn (
   0 is returned.
 
   If the number represented by String overflows according to the range defined by UINT64,
-  then ASSERT().
+  then MAX_UINT64 is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero,
   and String contains more than PcdMaximumAsciiStringLength ASCII characters not including

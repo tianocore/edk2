@@ -1,7 +1,7 @@
 /** @file
   Unicode and ASCII string primitives.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -638,7 +638,7 @@ InternalIsHexaDecimalDigitCharacter (
   If String has no pad spaces or valid decimal digits,
   then 0 is returned.
   If the number represented by String overflows according
-  to the range defined by UINTN, then ASSERT().
+  to the range defined by UINTN, then MAX_UINTN is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains
   more than PcdMaximumUnicodeStringLength Unicode characters, not including
@@ -656,40 +656,8 @@ StrDecimalToUintn (
   )
 {
   UINTN     Result;
-  
-  //
-  // ASSERT String is less long than PcdMaximumUnicodeStringLength.
-  // Length tests are performed inside StrLen().
-  //
-  ASSERT (StrSize (String) != 0);
 
-  //
-  // Ignore the pad spaces (space or tab)
-  //
-  while ((*String == L' ') || (*String == L'\t')) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == L'0') {
-    String++;
-  }
-
-  Result = 0;
-
-  while (InternalIsDecimalDigitCharacter (*String)) {
-    //
-    // If the number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= ((((UINTN) ~0) - (*String - L'0')) / 10));
-
-    Result = Result * 10 + (*String - L'0');
-    String++;
-  }
-  
+  StrDecimalToUintnS (String, (CHAR16 **) NULL, &Result);
   return Result;
 }
 
@@ -717,7 +685,7 @@ StrDecimalToUintn (
   If String has no pad spaces or valid decimal digits,
   then 0 is returned.
   If the number represented by String overflows according
-  to the range defined by UINT64, then ASSERT().
+  to the range defined by UINT64, then MAX_UINT64 is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains
   more than PcdMaximumUnicodeStringLength Unicode characters, not including
@@ -736,39 +704,7 @@ StrDecimalToUint64 (
 {
   UINT64     Result;
   
-  //
-  // ASSERT String is less long than PcdMaximumUnicodeStringLength.
-  // Length tests are performed inside StrLen().
-  //
-  ASSERT (StrSize (String) != 0);
-
-  //
-  // Ignore the pad spaces (space or tab)
-  //
-  while ((*String == L' ') || (*String == L'\t')) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == L'0') {
-    String++;
-  }
-
-  Result = 0;
-
-  while (InternalIsDecimalDigitCharacter (*String)) {
-    //
-    // If the number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= DivU64x32 (((UINT64) ~0) - (*String - L'0') , 10));
-
-    Result = MultU64x32 (Result, 10) + (*String - L'0');
-    String++;
-  }
-  
+  StrDecimalToUint64S (String, (CHAR16 **) NULL, &Result);
   return Result;
 }
 
@@ -796,7 +732,7 @@ StrDecimalToUint64 (
   If String has no leading pad spaces, leading zeros or valid hexadecimal digits,
   then zero is returned.
   If the number represented by String overflows according to the range defined by
-  UINTN, then ASSERT().
+  UINTN, then MAX_UINTN is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
   PcdMaximumUnicodeStringLength Unicode characters, not including the Null-terminator,
@@ -815,49 +751,7 @@ StrHexToUintn (
 {
   UINTN     Result;
 
-  //
-  // ASSERT String is less long than PcdMaximumUnicodeStringLength.
-  // Length tests are performed inside StrLen().
-  //
-  ASSERT (StrSize (String) != 0);
-  
-  //
-  // Ignore the pad spaces (space or tab) 
-  //
-  while ((*String == L' ') || (*String == L'\t')) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == L'0') {
-    String++;
-  }
-
-  if (InternalCharToUpper (*String) == L'X') {
-    if (*(String - 1) != L'0') {
-      return 0;
-    }
-    //
-    // Skip the 'X'
-    //
-    String++;
-  }
-
-  Result = 0;
-  
-  while (InternalIsHexaDecimalDigitCharacter (*String)) {
-    //
-    // If the Hex Number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= ((((UINTN) ~0) - InternalHexCharToUintn (*String)) >> 4));
-
-    Result = (Result << 4) + InternalHexCharToUintn (*String);
-    String++;
-  }
-
+  StrHexToUintnS (String, (CHAR16 **) NULL, &Result);
   return Result;
 }
 
@@ -886,7 +780,7 @@ StrHexToUintn (
   If String has no leading pad spaces, leading zeros or valid hexadecimal digits,
   then zero is returned.
   If the number represented by String overflows according to the range defined by
-  UINT64, then ASSERT().
+  UINT64, then MAX_UINT64 is returned.
 
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
   PcdMaximumUnicodeStringLength Unicode characters, not including the Null-terminator,
@@ -905,51 +799,7 @@ StrHexToUint64 (
 {
   UINT64    Result;
 
-  //
-  // ASSERT String is less long than PcdMaximumUnicodeStringLength.
-  // Length tests are performed inside StrLen().
-  //
-  ASSERT (StrSize (String) != 0);
-  
-  //
-  // Ignore the pad spaces (space or tab) 
-  //
-  while ((*String == L' ') || (*String == L'\t')) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == L'0') {
-    String++;
-  }
-
-  if (InternalCharToUpper (*String) == L'X') {
-    ASSERT (*(String - 1) == L'0');
-    if (*(String - 1) != L'0') {
-      return 0;
-    }
-    //
-    // Skip the 'X'
-    //
-    String++;
-  }
-
-  Result = 0;
-  
-  while (InternalIsHexaDecimalDigitCharacter (*String)) {
-    //
-    // If the Hex Number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= RShiftU64 (((UINT64) ~0) - InternalHexCharToUintn (*String) , 4));
-
-    Result = LShiftU64 (Result, 4);
-    Result = Result + InternalHexCharToUintn (*String);
-    String++;
-  }
-
+  StrHexToUint64S (String, (CHAR16 **) NULL, &Result);
   return Result;
 }
 
@@ -1681,7 +1531,7 @@ AsciiStrStr (
   If String has only pad spaces, then 0 is returned.
   If String has no pad spaces or valid decimal digits, then 0 is returned.
   If the number represented by String overflows according to the range defined by
-  UINTN, then ASSERT().
+  UINTN, then MAX_UINTN is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and String contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
@@ -1700,38 +1550,7 @@ AsciiStrDecimalToUintn (
 {
   UINTN     Result;
   
-  //
-  // ASSERT Strings is less long than PcdMaximumAsciiStringLength
-  //
-  ASSERT (AsciiStrSize (String) != 0);
-
-  //
-  // Ignore the pad spaces (space or tab)
-  //
-  while ((*String == ' ') || (*String == '\t' )) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == '0') {
-    String++;
-  }
-
-  Result = 0;
-
-  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
-    //
-    // If the number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= ((((UINTN) ~0) - (*String - L'0')) / 10));
-
-    Result = Result * 10 + (*String - '0');
-    String++;
-  }
-  
+  AsciiStrDecimalToUintnS (String, (CHAR8 **) NULL, &Result);
   return Result;
 }
 
@@ -1755,7 +1574,7 @@ AsciiStrDecimalToUintn (
   If String has only pad spaces, then 0 is returned.
   If String has no pad spaces or valid decimal digits, then 0 is returned.
   If the number represented by String overflows according to the range defined by
-  UINT64, then ASSERT().
+  UINT64, then MAX_UINT64 is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and String contains more than
   PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
@@ -1774,38 +1593,7 @@ AsciiStrDecimalToUint64 (
 {
   UINT64     Result;
   
-  //
-  // ASSERT Strings is less long than PcdMaximumAsciiStringLength
-  //
-  ASSERT (AsciiStrSize (String) != 0);
-
-  //
-  // Ignore the pad spaces (space or tab)
-  //
-  while ((*String == ' ') || (*String == '\t' )) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == '0') {
-    String++;
-  }
-
-  Result = 0;
-
-  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
-    //
-    // If the number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= DivU64x32 (((UINT64) ~0) - (*String - L'0') , 10));
-
-    Result = MultU64x32 (Result, 10) + (*String - '0');
-    String++;
-  }
-  
+  AsciiStrDecimalToUint64S (String, (CHAR8 **) NULL, &Result);
   return Result;
 }
 
@@ -1832,7 +1620,7 @@ AsciiStrDecimalToUint64 (
   0 is returned.
 
   If the number represented by String overflows according to the range defined by UINTN,
-  then ASSERT().
+  then MAX_UINTN is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero,
   and String contains more than PcdMaximumAsciiStringLength ASCII characters not including
@@ -1851,49 +1639,7 @@ AsciiStrHexToUintn (
 {
   UINTN     Result;
 
-  //
-  // ASSERT Strings is less long than PcdMaximumAsciiStringLength
-  //
-  ASSERT (AsciiStrSize (String) != 0);
-  
-  //
-  // Ignore the pad spaces (space or tab) 
-  //
-  while ((*String == ' ') || (*String == '\t' )) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == '0') {
-    String++;
-  }
-
-  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
-    ASSERT (*(String - 1) == '0');
-    if (*(String - 1) != '0') {
-      return 0;
-    }
-    //
-    // Skip the 'X'
-    //
-    String++;
-  }
-
-  Result = 0;
-  
-  while (InternalAsciiIsHexaDecimalDigitCharacter (*String)) {
-    //
-    // If the Hex Number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= ((((UINTN) ~0) - InternalHexCharToUintn (*String)) >> 4));
-
-    Result = (Result << 4) + InternalAsciiHexCharToUintn (*String);
-    String++;
-  }
-
+  AsciiStrHexToUintnS (String, (CHAR8 **) NULL, &Result);
   return Result;
 }
 
@@ -1921,7 +1667,7 @@ AsciiStrHexToUintn (
   0 is returned.
 
   If the number represented by String overflows according to the range defined by UINT64,
-  then ASSERT().
+  then MAX_UINT64 is returned.
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero,
   and String contains more than PcdMaximumAsciiStringLength ASCII characters not including
@@ -1940,53 +1686,7 @@ AsciiStrHexToUint64 (
 {
   UINT64    Result;
 
-  //
-  // ASSERT Strings is less long than PcdMaximumAsciiStringLength
-  //
-  ASSERT (AsciiStrSize (String) != 0);
-  
-  //
-  // Ignore the pad spaces (space or tab) and leading Zeros
-  //
-  //
-  // Ignore the pad spaces (space or tab) 
-  //
-  while ((*String == ' ') || (*String == '\t' )) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == '0') {
-    String++;
-  }
-
-  if (InternalBaseLibAsciiToUpper (*String) == 'X') {
-    ASSERT (*(String - 1) == '0');
-    if (*(String - 1) != '0') {
-      return 0;
-    }
-    //
-    // Skip the 'X'
-    //
-    String++;
-  }
-
-  Result = 0;
-  
-  while (InternalAsciiIsHexaDecimalDigitCharacter (*String)) {
-    //
-    // If the Hex Number represented by String overflows according 
-    // to the range defined by UINTN, then ASSERT().
-    //
-    ASSERT (Result <= RShiftU64 (((UINT64) ~0) - InternalHexCharToUintn (*String) , 4));
-
-    Result = LShiftU64 (Result, 4);
-    Result = Result + InternalAsciiHexCharToUintn (*String);
-    String++;
-  }
-
+  AsciiStrHexToUint64S (String, (CHAR8 **) NULL, &Result);
   return Result;
 }
 
