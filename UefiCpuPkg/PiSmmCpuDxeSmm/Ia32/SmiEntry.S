@@ -28,6 +28,7 @@ ASM_GLOBAL  ASM_PFX(mXdSupported)
 ASM_GLOBAL  ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))
 ASM_GLOBAL  ASM_PFX(gSmiHandlerIdtr)
 
+.equ            MSR_IA32_MISC_ENABLE, 0x1A0
 .equ            MSR_EFER, 0xc0000080
 .equ            MSR_EFER_XD, 0x800
 

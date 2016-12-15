@@ -202,7 +202,7 @@ _SmiHandler PROC
     call    eax
     add     esp, 4
 
-    mov     eax, mXdSupported
+    mov     eax, offset mXdSupported
     mov     al, [eax]
     cmp     al, 0
     jz      @f

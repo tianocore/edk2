@@ -222,7 +222,7 @@ _SmiHandler:
 
     add     rsp, 200h
 
-    mov     rax, ASM_PFX(mXdSupported)
+    mov     rax, offset ASM_PFX(mXdSupported)
     mov     al, [rax]
     cmp     al, 0
     jz      @f

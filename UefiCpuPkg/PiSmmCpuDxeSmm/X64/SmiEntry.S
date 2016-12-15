@@ -158,7 +158,7 @@ L13:
     rdmsr
     orw     $MSR_EFER_XD,%ax            # enable NXE
     wrmsr
-    jmp     @NxeDone
+    jmp     NxeDone
 SkipNxe:
     subl    $8, %esp
 NxeDone:
