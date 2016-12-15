@@ -28,9 +28,14 @@ typedef struct {
   UINTN                           NumberOfBytes;
 } NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO;
 
-//
-// Get the resource associated with BAR number 'BarIndex'.
-//
+/**
+  Get the resource associated with BAR number 'BarIndex'.
+
+  @param  Dev           Point to the NON_DISCOVERABLE_PCI_DEVICE instance.
+  @param  BarIndex      The BAR index of the standard PCI Configuration header to use as the
+                        base address for the memory operation to perform.
+  @param  Descriptor    Points to the address space descriptor
+**/
 STATIC
 EFI_STATUS
 GetBarResource (
@@ -61,6 +66,21 @@ GetBarResource (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Reads from the memory space of a PCI controller. Returns either when the polling exit criteria is
+  satisfied or after a defined duration.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory operation to perform.
+  @param  Offset                The offset within the selected BAR to start the memory operation.
+  @param  Mask                  Mask used for the polling criteria.
+  @param  Value                 The comparison value used for the polling exit criteria.
+  @param  Delay                 The number of 100 ns units to poll.
+  @param  Result                Pointer to the last value read from the memory location.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -79,6 +99,21 @@ PciIoPollMem (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Reads from the memory space of a PCI controller. Returns either when the polling exit criteria is
+  satisfied or after a defined duration.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory operation to perform.
+  @param  Offset                The offset within the selected BAR to start the memory operation.
+  @param  Mask                  Mask used for the polling criteria.
+  @param  Value                 The comparison value used for the polling exit criteria.
+  @param  Delay                 The number of 100 ns units to poll.
+  @param  Result                Pointer to the last value read from the memory location.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -97,6 +132,22 @@ PciIoPollIo (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
+
+  @param  Width         Signifies the width of the memory or I/O operations.
+  @param  Count         The number of memory or I/O operations to perform.
+  @param  DstStride     The stride of the destination buffer.
+  @param  Dst           For read operations, the destination buffer to store the results. For write
+                        operations, the destination buffer to write data to.
+  @param  SrcStride     The stride of the source buffer.
+  @param  Src           For read operations, the source buffer to read data from. For write
+                        operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS            The data was read from or written to the PCI controller.
+  @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -148,6 +199,26 @@ PciIoMemRW (
   return EFI_SUCCESS;
 }
 
+/**
+  Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory or I/O operation to perform.
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.
+  @param  Count                 The number of memory or I/O operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results. For write
+                                operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the PCI controller.
+  @retval EFI_UNSUPPORTED       BarIndex not valid for this PCI controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the PCI BAR specified by BarIndex.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -215,6 +286,26 @@ PciIoMemRead (
   return EFI_INVALID_PARAMETER;
 }
 
+/**
+  Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory or I/O operation to perform.
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.
+  @param  Count                 The number of memory or I/O operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results. For write
+                                operations, the source buffer to write data from.
+
+  @retval EFI_SUCCESS           The data was read from or written to the PCI controller.
+  @retval EFI_UNSUPPORTED       BarIndex not valid for this PCI controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the PCI BAR specified by BarIndex.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -282,6 +373,19 @@ PciIoMemWrite (
   return EFI_INVALID_PARAMETER;
 }
 
+/**
+  Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory or I/O operation to perform.
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.
+  @param  Count                 The number of memory or I/O operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results. For write
+                                operations, the source buffer to write data from.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -298,6 +402,19 @@ PciIoIoRead (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Enable a PCI driver to access PCI controller registers in the PCI memory or I/O space.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for the memory or I/O operation to perform.
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.
+  @param  Count                 The number of memory or I/O operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results. For write
+                                operations, the source buffer to write data from.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -314,6 +431,17 @@ PciIoIoWrite (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Enable a PCI driver to access PCI config space.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.
+  @param  Count                 The number of memory or I/O operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results. For write
+                                operations, the source buffer to write data from.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -350,6 +478,22 @@ PciIoPciRead (
   return PciIoMemRW (Width, Count, 1, Buffer, 1, Address);
 }
 
+/**
+  Enable a PCI driver to access PCI config space.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory or I/O operations.
+  @param  Offset                The offset within the selected BAR to start the memory or I/O operation.
+  @param  Count                 The number of memory or I/O operations to perform.
+  @param  Buffer                For read operations, the destination buffer to store the results. For write
+                                operations, the source buffer to write data from
+
+  @retval EFI_SUCCESS           The data was read from or written to the PCI controller.
+  @retval EFI_UNSUPPORTED       The address range specified by Offset, Width, and Count is not
+                                valid for the PCI BAR specified by BarIndex.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -378,6 +522,24 @@ PciIoPciWrite (
   return PciIoMemRW (Width, Count, 1, Address, 1, Buffer);
 }
 
+/**
+  Enables a PCI driver to copy one region of PCI memory space to another region of PCI
+  memory space.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Width                 Signifies the width of the memory operations.
+  @param  DestBarIndex          The BAR index in the standard PCI Configuration header to use as the
+                                base address for the memory operation to perform.
+  @param  DestOffset            The destination offset within the BAR specified by DestBarIndex to
+                                start the memory writes for the copy operation.
+  @param  SrcBarIndex           The BAR index in the standard PCI Configuration header to use as the
+                                base address for the memory operation to perform.
+  @param  SrcOffset             The source offset within the BAR specified by SrcBarIndex to start
+                                the memory reads for the copy operation.
+  @param  Count                 The number of memory operations to perform. Bytes moved is Width
+                                size * Count, starting at DestOffset and SrcOffset.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -395,6 +557,25 @@ PciIoCopyMem (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Provides the PCI controller-specific addresses needed to access system memory.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Operation             Indicates if the bus master is going to read or write to system memory.
+  @param  HostAddress           The system memory address to map to the PCI controller.
+  @param  NumberOfBytes         On input the number of bytes to map. On output the number of bytes
+                                that were mapped.
+  @param  DeviceAddress         The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
+  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -461,6 +642,15 @@ CoherentPciIoMap (
   return EFI_SUCCESS;
 }
 
+/**
+  Completes the Map() operation and releases any corresponding resources.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Mapping               The mapping value returned from Map().
+
+  @retval EFI_SUCCESS           The range was unmapped.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -484,6 +674,25 @@ CoherentPciIoUnmap (
   return EFI_SUCCESS;
 }
 
+/**
+  Allocates pages.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Type                  This parameter is not used and must be ignored.
+  @param  MemoryType            The type of memory to allocate, EfiBootServicesData or
+                                EfiRuntimeServicesData.
+  @param  Pages                 The number of pages to allocate.
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+  @param  Attributes            The requested bit mask of attributes for the allocated range.
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -526,6 +735,16 @@ CoherentPciIoAllocateBuffer (
   return Status;
 }
 
+/**
+  Frees memory that was allocated in function CoherentPciIoAllocateBuffer ().
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Pages                 The number of pages to free.
+  @param  HostAddress           The base system memory address of the allocated range.
+
+  @retval EFI_SUCCESS           The requested memory pages were freed.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -539,6 +758,17 @@ CoherentPciIoFreeBuffer (
   return EFI_SUCCESS;
 }
 
+/**
+  Frees memory that was allocated in function NonCoherentPciIoAllocateBuffer ().
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Pages                 The number of pages to free.
+  @param  HostAddress           The base system memory address of the allocated range.
+
+  @retval EFI_SUCCESS           The requested memory pages were freed.
+  @retval others                The operation contain some errors.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -604,6 +834,25 @@ FreeAlloc:
   return Status;
 }
 
+/**
+  Allocates pages.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Type                  This parameter is not used and must be ignored.
+  @param  MemoryType            The type of memory to allocate, EfiBootServicesData or
+                                EfiRuntimeServicesData.
+  @param  Pages                 The number of pages to allocate.
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+  @param  Attributes            The requested bit mask of attributes for the allocated range.
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -702,6 +951,25 @@ FreeBuffer:
   return Status;
 }
 
+/**
+  Provides the PCI controller-specific addresses needed to access system memory.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Operation             Indicates if the bus master is going to read or write to system memory.
+  @param  HostAddress           The system memory address to map to the PCI controller.
+  @param  NumberOfBytes         On input the number of bytes to map. On output the number of bytes
+                                that were mapped.
+  @param  DeviceAddress         The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
+  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -816,6 +1084,15 @@ FreeMapInfo:
   return Status;
 }
 
+/**
+  Completes the Map() operation and releases any corresponding resources.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Mapping               The mapping value returned from Map().
+
+  @retval EFI_SUCCESS           The range was unmapped.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -859,6 +1136,12 @@ NonCoherentPciIoUnmap (
   return EFI_SUCCESS;
 }
 
+/**
+  Flushes all PCI posted write transactions from a PCI host bridge to system memory.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -869,6 +1152,19 @@ PciIoFlush (
   return EFI_SUCCESS;
 }
 
+/**
+  Retrieves this PCI controller's current PCI bus number, device number, and function number.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  SegmentNumber         The PCI controller's current PCI segment number.
+  @param  BusNumber             The PCI controller's current PCI bus number.
+  @param  DeviceNumber          The PCI controller's current PCI device number.
+  @param  FunctionNumber        The PCI controller's current PCI function number.
+
+  @retval EFI_SUCCESS           The PCI controller location was returned.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -895,6 +1191,25 @@ PciIoGetLocation (
   return EFI_SUCCESS;
 }
 
+/**
+  Performs an operation on the attributes that this PCI controller supports. The operations include
+  getting the set of supported attributes, retrieving the current attributes, setting the current
+  attributes, enabling attributes, and disabling attributes.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Operation             The operation to perform on the attributes for this PCI controller.
+  @param  Attributes            The mask of attributes that are used for Set, Enable, and Disable
+                                operations.
+  @param  Result                A pointer to the result mask of attributes that are returned for the Get
+                                and Supported operations.
+
+  @retval EFI_SUCCESS           The operation on the PCI controller's attributes was completed.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_UNSUPPORTED       one or more of the bits set in
+                                Attributes are not supported by this PCI controller or one of
+                                its parent bridges when Operation is Set, Enable or Disable.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -952,6 +1267,28 @@ PciIoAttributes (
   return EFI_SUCCESS;
 }
 
+/**
+  Gets the attributes that this PCI controller supports setting on a BAR using
+  SetBarAttributes(), and retrieves the list of resource descriptors for a BAR.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for resource range. The legal range for this field is 0..5.
+  @param  Supports              A pointer to the mask of attributes that this PCI controller supports
+                                setting for this BAR with SetBarAttributes().
+  @param  Resources             A pointer to the ACPI 2.0 resource descriptors that describe the current
+                                configuration of this BAR of the PCI controller.
+
+  @retval EFI_SUCCESS           If Supports is not NULL, then the attributes that the PCI
+                                controller supports are returned in Supports. If Resources
+                                is not NULL, then the ACPI 2.0 resource descriptors that the PCI
+                                controller is currently using are returned in Resources.
+  @retval EFI_INVALID_PARAMETER Both Supports and Attributes are NULL.
+  @retval EFI_UNSUPPORTED       BarIndex not valid for this PCI controller.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to allocate
+                                Resources.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -1003,6 +1340,19 @@ PciIoGetBarAttributes (
   return EFI_SUCCESS;
 }
 
+/**
+  Sets the attributes for a range of a BAR on a PCI controller.
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
+  @param  Attributes            The mask of attributes to set for the resource range specified by
+                                BarIndex, Offset, and Length.
+  @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
+                                base address for resource range. The legal range for this field is 0..5.
+  @param  Offset                A pointer to the BAR relative base address of the resource range to be
+                                modified by the attributes specified by Attributes.
+  @param  Length                A pointer to the length of the resource range to be modified by the
+                                attributes specified by Attributes.
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -1039,6 +1389,12 @@ STATIC CONST EFI_PCI_IO_PROTOCOL PciIoTemplate =
   0
 };
 
+/**
+  Initialize PciIo Protocol.
+
+  @param  Dev      Point to NON_DISCOVERABLE_PCI_DEVICE instance.
+
+**/
 VOID
 InitializePciIoProtocol (
   NON_DISCOVERABLE_PCI_DEVICE     *Dev

@@ -1,4 +1,6 @@
 ## @file
+# PCI I/O driver for non-discoverable devices.
+#
 # Copyright (C) 2016, Linaro Ltd.
 #
 # This program and the accompanying materials are licensed and made available
@@ -44,11 +46,11 @@
   gEfiCpuArchProtocolGuid                       ## CONSUMES
 
 [Guids]
-  gEdkiiNonDiscoverableAhciDeviceGuid
-  gEdkiiNonDiscoverableEhciDeviceGuid
-  gEdkiiNonDiscoverableNvmeDeviceGuid
-  gEdkiiNonDiscoverableOhciDeviceGuid
-  gEdkiiNonDiscoverableSdhciDeviceGuid
-  gEdkiiNonDiscoverableUfsDeviceGuid
-  gEdkiiNonDiscoverableUhciDeviceGuid
-  gEdkiiNonDiscoverableXhciDeviceGuid
+  gEdkiiNonDiscoverableAhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableEhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableNvmeDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableOhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableSdhciDeviceGuid      ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableUfsDeviceGuid        ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableUhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableXhciDeviceGuid       ## CONSUMES ## GUID

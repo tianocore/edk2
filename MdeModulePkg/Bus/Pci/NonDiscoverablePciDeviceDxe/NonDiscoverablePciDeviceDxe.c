@@ -49,6 +49,19 @@ SupportedNonDiscoverableDevices [] = {
 //   -  6.3 Protocol Handler Services
 //
 
+/**
+  Supported function of Driver Binding protocol for this driver.
+  Test to see if this driver supports ControllerHandle.
+
+  @param This                   Protocol instance pointer.
+  @param DeviceHandle           Handle of device to test.
+  @param RemainingDevicePath    A pointer to the device path.
+                                it should be ignored by device driver.
+
+  @retval EFI_SUCCESS           This driver supports this device.
+  @retval other                 This driver does not support this device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -103,6 +116,19 @@ CloseProtocol:
   return Status;
 }
 
+/**
+  This routine is called right after the .Supported() called and
+  Start this driver on ControllerHandle.
+
+  @param This                   Protocol instance pointer.
+  @param DeviceHandle           Handle of device to bind driver to.
+  @param RemainingDevicePath    A pointer to the device path.
+                                it should be ignored by device driver.
+
+  @retval EFI_SUCCESS           This driver is added to this device.
+  @retval other                 Some error occurs when binding this driver to this device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -153,7 +179,18 @@ FreeDev:
   return Status;
 }
 
+/**
+  Stop this driver on ControllerHandle.
 
+  @param This               Protocol instance pointer.
+  @param DeviceHandle       Handle of device to stop driver on.
+  @param NumberOfChildren   Not used.
+  @param ChildHandleBuffer  Not used.
+
+  @retval EFI_SUCCESS   This driver is removed from this device.
+  @retval other         Some error occurs when removing this driver from this device.
+
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -209,9 +246,16 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
   NULL
 };
 
-//
-// Entry point of this driver.
-//
+/**
+  Entry point of this driver.
+
+  @param  ImageHandle     Image handle this driver.
+  @param  SystemTable     Pointer to the System Table.
+
+  @retval EFI_SUCCESS     The entry point is executed successfully.
+  @retval other           Some error occurred when executing this entry point.
+
+**/
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciDeviceDxeEntryPoint (

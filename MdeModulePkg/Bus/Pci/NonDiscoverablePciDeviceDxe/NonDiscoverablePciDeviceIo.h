@@ -102,6 +102,12 @@ typedef struct {
   LIST_ENTRY                UncachedAllocationList;
 } NON_DISCOVERABLE_PCI_DEVICE;
 
+/**
+  Initialize PciIo Protocol.
+
+  @param  Device      Point to NON_DISCOVERABLE_PCI_DEVICE instance.
+
+**/
 VOID
 InitializePciIoProtocol (
   NON_DISCOVERABLE_PCI_DEVICE     *Device
