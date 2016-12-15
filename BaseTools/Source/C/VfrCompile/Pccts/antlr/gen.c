@@ -3911,7 +3911,7 @@ int file;
 	}
 #endif
 	/* ###WARNING: This will have to change when SetWordSize changes */
-	if ( !GenCC ) _gen1("#define zzSET_SIZE %d\n", NumWords(TokenNum-1)*sizeof(unsigned));
+	if ( !GenCC ) _gen1("#define zzSET_SIZE %lu\n", NumWords(TokenNum-1)*sizeof(unsigned));
     if (TraceGen) {
       _gen("#ifndef zzTRACE_RULES\n");  /* MR20 */
       _gen("#define zzTRACE_RULES\n");  /* MR20 */
@@ -4125,7 +4125,7 @@ char * gate;                                    /* MR10 */
 	if ( LexGen ) fprintf(f, "#define zzEOF_TOKEN %d\n", (TokenInd!=NULL?TokenInd[EofToken]:EofToken));
 #endif
 	/* ###WARNING: This will have to change when SetWordSize changes */
-	fprintf(f, "#define zzSET_SIZE %d\n", NumWords(TokenNum-1)*sizeof(unsigned));
+	fprintf(f, "#define zzSET_SIZE %lu\n", NumWords(TokenNum-1)*sizeof(unsigned));
     if (TraceGen) {
       fprintf(f,"#ifndef zzTRACE_RULES\n");  /* MR20 */
       fprintf(f,"#define zzTRACE_RULES\n");  /* MR20 */
