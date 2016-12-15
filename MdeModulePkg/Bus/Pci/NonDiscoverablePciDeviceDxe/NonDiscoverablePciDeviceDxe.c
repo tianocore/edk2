@@ -23,7 +23,7 @@ EFI_CPU_ARCH_PROTOCOL      *mCpu;
 //
 STATIC
 CONST EFI_GUID * CONST
-SupportedNonDiscoverableDevices [] = {
+SupportedNonDiscoverableDevices[] = {
   &gEdkiiNonDiscoverableAhciDeviceGuid,
   &gEdkiiNonDiscoverableEhciDeviceGuid,
   &gEdkiiNonDiscoverableNvmeDeviceGuid,

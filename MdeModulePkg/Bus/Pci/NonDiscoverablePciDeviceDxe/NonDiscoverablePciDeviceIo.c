@@ -1300,7 +1300,8 @@ PciIoGetBarAttributes (
   )
 {
   NON_DISCOVERABLE_PCI_DEVICE       *Dev;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor, *BarDesc;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *BarDesc;
   EFI_ACPI_END_TAG_DESCRIPTOR       *End;
   EFI_STATUS                        Status;
 
