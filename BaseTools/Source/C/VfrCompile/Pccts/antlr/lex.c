@@ -706,7 +706,7 @@ FILE *output;
 /* MR26 */			if (! (isalpha(*t) || isdigit(*t) || *t == '_' || *t == '$')) break;
 /* MR26 */		}
 /* MR26 */	}
-/* MR26 */	fprintf(output,strBetween(pSymbol, t, pSeparator));
+/* MR26 */	fprintf(output, "%s", strBetween(pSymbol, t, pSeparator));
 
     *q = p;
     return (*pSeparator  == 0);
@@ -771,7 +771,7 @@ FILE *f;
 				  &pValue,
 				  &pSeparator,
 				  &nest);
-	fprintf(f,strBetween(pDataType, pSymbol, pSeparator));
+	fprintf(f, "%s", strBetween(pDataType, pSymbol, pSeparator));
 }
 
 /* check to see if string e is a word in string s */
@@ -852,9 +852,9 @@ int i;
 					  &pSeparator,
 					  &nest);
 		fprintf(f,"\t");
-		fprintf(f,strBetween(pDataType, pSymbol, pSeparator));
+		fprintf(f, "%s", strBetween(pDataType, pSymbol, pSeparator));
 		fprintf(f," ");
-		fprintf(f,strBetween(pSymbol, pEqualSign, pSeparator));
+		fprintf(f, "%s", strBetween(pSymbol, pEqualSign, pSeparator));
 		fprintf(f,";\n");
     }
 	fprintf(f,"};\n");

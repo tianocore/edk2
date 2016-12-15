@@ -3866,7 +3866,7 @@ int file;
 /* MR10 */    _gen(" *  ");
 /* MR10 */    for (i=0 ; i < Save_argc ; i++) {
 /* MR10 */      _gen(" ");
-/* MR10 */      _gen(Save_argv[i]);
+/* MR10 */      _gen1("%s", Save_argv[i]);
 /* MR10 */    };
 	_gen("\n");
 	_gen(" *\n");
