@@ -1365,7 +1365,7 @@ CIfrRecordInfoDB::IfrUpdateRecordInfoForDynamicOpcode (
   // Base on the original offset info to update the record list.
   //
   if (!IfrAdjustDynamicOpcodeInRecords(CreateOpcodeAfterParsingVfr)) {
-    gCVfrErrorHandle.PrintMsg (0, "Error", "Can not find the adjust offset in the record.");
+    gCVfrErrorHandle.PrintMsg (0, (CHAR8 *)"Error", (CHAR8 *)"Can not find the adjust offset in the record.");
   }
 
   //
