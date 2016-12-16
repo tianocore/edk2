@@ -820,6 +820,7 @@ InitUSBKeyboard (
 
   InitQueue (&UsbKeyboardDevice->UsbKeyQueue, sizeof (USB_KEY));
   InitQueue (&UsbKeyboardDevice->EfiKeyQueue, sizeof (EFI_KEY_DATA));
+  InitQueue (&UsbKeyboardDevice->EfiKeyQueueForNotify, sizeof (EFI_KEY_DATA));
 
   //
   // Use the config out of the descriptor
@@ -1665,19 +1666,24 @@ UsbKeyCodeToEfiInputKey (
     KeyData->KeyState.KeyToggleState |= EFI_KEY_STATE_EXPOSED;
   }
   //
-  // Invoke notification functions if the key is registered.
+  // Signal KeyNotify process event if this key pressed matches any key registered.
   //
   NotifyList = &UsbKeyboardDevice->NotifyList;
   for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList, Link); Link = GetNextNode (NotifyList, Link)) {
     CurrentNotify = CR (Link, KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
     if (IsKeyRegistered (&CurrentNotify->KeyData, KeyData)) {
-      CurrentNotify->KeyNotificationFn (KeyData);
+      //
+      // The key notification function needs to run at TPL_CALLBACK
+      // while current TPL is TPL_NOTIFY. It will be invoked in
+      // KeyNotifyProcessHandler() which runs at TPL_CALLBACK.
+      //
+      Enqueue (&UsbKeyboardDevice->EfiKeyQueueForNotify, KeyData, sizeof (*KeyData));
+      gBS->SignalEvent (UsbKeyboardDevice->KeyNotifyProcessEvent);
     }
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Create the queue.
