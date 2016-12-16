@@ -220,17 +220,24 @@ HttpBootParseDhcp4Options (
   @param[in]  Dst          Pointer to the cache buffer for DHCPv4 packet.
   @param[in]  Src          Pointer to the DHCPv4 packet to be cached.
 
+  @retval     EFI_SUCCESS                Packet is copied.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 HttpBootCacheDhcp4Packet (
   IN EFI_DHCP4_PACKET     *Dst,
   IN EFI_DHCP4_PACKET     *Src
   )
 {
-  ASSERT (Dst->Size >= Src->Length);
+  if (Dst->Size < Src->Length) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
 
   CopyMem (&Dst->Dhcp4, &Src->Dhcp4, Src->Length);
   Dst->Length = Src->Length;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -429,8 +436,10 @@ HttpBootParseDhcp4Packet (
   @param[in]  Private               Pointer to HTTP boot driver private data.
   @param[in]  RcvdOffer             Pointer to the received offer packet.
 
+  @retval     EFI_SUCCESS      Cache and parse the packet successfully.
+  @retval     Others           Operation failed.
 **/
-VOID
+EFI_STATUS
 HttpBootCacheDhcp4Offer (
   IN HTTP_BOOT_PRIVATE_DATA  *Private,
   IN EFI_DHCP4_PACKET        *RcvdOffer
@@ -439,6 +448,7 @@ HttpBootCacheDhcp4Offer (
   HTTP_BOOT_DHCP4_PACKET_CACHE  *Cache4;
   EFI_DHCP4_PACKET              *Offer;
   HTTP_BOOT_OFFER_TYPE          OfferType;
+  EFI_STATUS                    Status;
 
   ASSERT (Private->OfferNum < HTTP_BOOT_OFFER_MAX_NUM);
   Cache4 = &Private->OfferBuffer[Private->OfferNum].Dhcp4;
@@ -447,13 +457,16 @@ HttpBootCacheDhcp4Offer (
   //
   // Cache the content of DHCPv4 packet firstly.
   //
-  HttpBootCacheDhcp4Packet (Offer, RcvdOffer);
+  Status = HttpBootCacheDhcp4Packet (Offer, RcvdOffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Validate the DHCPv4 packet, and parse the options and offer type.
   //
   if (EFI_ERROR (HttpBootParseDhcp4Packet (Cache4))) {
-    return;
+    return EFI_ABORTED;
   }
 
   //
@@ -465,6 +478,8 @@ HttpBootCacheDhcp4Offer (
   Private->OfferIndex[OfferType][Private->OfferCount[OfferType]] = Private->OfferNum;
   Private->OfferCount[OfferType]++;
   Private->OfferNum++;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -618,10 +633,17 @@ HttpBootDhcp4CallBack (
   switch (Dhcp4Event) {
   case Dhcp4RcvdOffer:
     Status = EFI_NOT_READY;
+    if (Packet->Length > HTTP_BOOT_DHCP4_PACKET_MAX_SIZE) {
+      //
+      // Ignore the incoming packets which exceed the maximum length.
+      //
+      break;
+    }
     if (Private->OfferNum < HTTP_BOOT_OFFER_MAX_NUM) {
       //
       // Cache the DHCPv4 offers to OfferBuffer[] for select later, and record
       // the OfferIndex and OfferCount.
+      // If error happens, just ignore this packet and continue to wait more offer.
       //
       HttpBootCacheDhcp4Offer (Private, Packet);
     }

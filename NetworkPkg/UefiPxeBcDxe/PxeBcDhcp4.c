@@ -424,17 +424,24 @@ PxeBcSeedDhcp4Packet (
   @param[in]  Dst          Pointer to the cache buffer for DHCPv4 packet.
   @param[in]  Src          Pointer to the DHCPv4 packet to be cached.
 
+  @retval     EFI_SUCCESS                Packet is copied.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 PxeBcCacheDhcp4Packet (
   IN EFI_DHCP4_PACKET     *Dst,
   IN EFI_DHCP4_PACKET     *Src
   )
 {
-  ASSERT (Dst->Size >= Src->Length);
-
+  if (Dst->Size < Src->Length) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
+  
   CopyMem (&Dst->Dhcp4, &Src->Dhcp4, Src->Length);
   Dst->Length = Src->Length;
+
+  return EFI_SUCCESS;
 }
 
 
@@ -620,8 +627,11 @@ PxeBcParseDhcp4Packet (
   @param[in]  Ack                 Pointer to the DHCPv4 ack packet.
   @param[in]  Verified            If TRUE, parse the ACK packet and store info into mode data.
 
+  @retval     EFI_SUCCESS                Cache and parse the packet successfully.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 PxeBcCopyDhcp4Ack (
   IN PXEBC_PRIVATE_DATA   *Private,
   IN EFI_DHCP4_PACKET     *Ack,
@@ -629,10 +639,14 @@ PxeBcCopyDhcp4Ack (
   )
 {
   EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_STATUS              Status;
 
   Mode = Private->PxeBc.Mode;
 
-  PxeBcCacheDhcp4Packet (&Private->DhcpAck.Dhcp4.Packet.Ack, Ack);
+  Status = PxeBcCacheDhcp4Packet (&Private->DhcpAck.Dhcp4.Packet.Ack, Ack);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (Verified) {
     //
@@ -642,6 +656,8 @@ PxeBcCopyDhcp4Ack (
     CopyMem (&Mode->DhcpAck.Dhcpv4, &Ack->Dhcp4, Ack->Length);
     Mode->DhcpAckReceived = TRUE;
   }
+  
+  return EFI_SUCCESS;
 }
 
 
@@ -651,8 +667,11 @@ PxeBcCopyDhcp4Ack (
   @param[in]  Private               Pointer to PxeBc private data.
   @param[in]  OfferIndex            The received order of offer packets.
 
+  @retval     EFI_SUCCESS                Cache and parse the packet successfully.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 PxeBcCopyProxyOffer (
   IN PXEBC_PRIVATE_DATA   *Private,
   IN UINT32               OfferIndex
@@ -660,6 +679,7 @@ PxeBcCopyProxyOffer (
 {
   EFI_PXE_BASE_CODE_MODE  *Mode;
   EFI_DHCP4_PACKET        *Offer;
+  EFI_STATUS              Status;
 
   ASSERT (OfferIndex < Private->OfferNum);
   ASSERT (OfferIndex < PXEBC_OFFER_MAX_NUM);
@@ -670,7 +690,11 @@ PxeBcCopyProxyOffer (
   //
   // Cache the proxy offer packet and parse it.
   //
-  PxeBcCacheDhcp4Packet (&Private->ProxyOffer.Dhcp4.Packet.Offer, Offer);
+  Status = PxeBcCacheDhcp4Packet (&Private->ProxyOffer.Dhcp4.Packet.Offer, Offer);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+  
   PxeBcParseDhcp4Packet (&Private->ProxyOffer.Dhcp4);
 
   //
@@ -678,6 +702,8 @@ PxeBcCopyProxyOffer (
   //
   CopyMem (&Mode->ProxyOffer.Dhcpv4, &Offer->Dhcp4, Offer->Length);
   Mode->ProxyOfferReceived = TRUE;
+
+  return EFI_SUCCESS;
 }
 
 
@@ -780,8 +806,11 @@ PxeBcRetryBinlOffer (
   @param[in]  Private               Pointer to PxeBc private data.
   @param[in]  RcvdOffer             Pointer to the received offer packet.
 
+  @retval     EFI_SUCCESS      Cache and parse the packet successfully.
+  @retval     Others           Operation failed.
+
 **/
-VOID
+EFI_STATUS
 PxeBcCacheDhcp4Offer (
   IN PXEBC_PRIVATE_DATA     *Private,
   IN EFI_DHCP4_PACKET       *RcvdOffer
@@ -790,6 +819,7 @@ PxeBcCacheDhcp4Offer (
   PXEBC_DHCP4_PACKET_CACHE  *Cache4;
   EFI_DHCP4_PACKET          *Offer;
   PXEBC_OFFER_TYPE          OfferType;
+  EFI_STATUS                Status;
 
   ASSERT (Private->OfferNum < PXEBC_OFFER_MAX_NUM);
   Cache4 = &Private->OfferBuffer[Private->OfferNum].Dhcp4;
@@ -798,13 +828,16 @@ PxeBcCacheDhcp4Offer (
   //
   // Cache the content of DHCPv4 packet firstly.
   //
-  PxeBcCacheDhcp4Packet (Offer, RcvdOffer);
+  Status = PxeBcCacheDhcp4Packet (Offer, RcvdOffer);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
 
   //
   // Validate the DHCPv4 packet, and parse the options and offer type.
   //
   if (EFI_ERROR (PxeBcParseDhcp4Packet (Cache4))) {
-    return;
+    return EFI_ABORTED;
   }
 
   //
@@ -821,7 +854,7 @@ PxeBcCacheDhcp4Offer (
       Private->OfferIndex[OfferType][0] = Private->OfferNum;
       Private->OfferCount[OfferType]    = 1;
     } else {
-      return;
+      return EFI_ABORTED;
     }
   } else {
     ASSERT (Private->OfferCount[OfferType] < PXEBC_OFFER_MAX_NUM);
@@ -844,7 +877,7 @@ PxeBcCacheDhcp4Offer (
         Private->OfferIndex[OfferType][0] = Private->OfferNum;
         Private->OfferCount[OfferType]    = 1;
       } else {
-        return ;
+        return EFI_ABORTED;
       }
     } else {
       //
@@ -856,6 +889,8 @@ PxeBcCacheDhcp4Offer (
   }
 
   Private->OfferNum++;
+
+  return EFI_SUCCESS;
 }
 
 
@@ -980,11 +1015,12 @@ PxeBcSelectDhcp4Offer (
 /**
   Handle the DHCPv4 offer packet.
 
-  @param[in]  Private             Pointer to PxeBc private data.
+  @param[in]  Private               Pointer to PxeBc private data.
 
-  @retval     EFI_SUCCESS         Handled the DHCPv4 offer packet successfully.
-  @retval     EFI_NO_RESPONSE     No response to the following request packet.
-  @retval     EFI_NOT_FOUND       No boot filename received.
+  @retval     EFI_SUCCESS           Handled the DHCPv4 offer packet successfully.
+  @retval     EFI_NO_RESPONSE       No response to the following request packet.
+  @retval     EFI_NOT_FOUND         No boot filename received.
+  @retval     EFI_BUFFER_TOO_SMALL  Can't cache the offer pacet.
 
 **/
 EFI_STATUS
@@ -1089,7 +1125,7 @@ PxeBcHandleDhcp4Offer (
         //
         // Success to try to request by a ProxyPxe10 or ProxyWfm11a offer, copy and parse it.
         //
-        PxeBcCopyProxyOffer (Private, ProxyIndex);
+        Status = PxeBcCopyProxyOffer (Private, ProxyIndex);
       }
     } else {
       //
@@ -1116,7 +1152,10 @@ PxeBcHandleDhcp4Offer (
       Ack = Offer;
     }
 
-    PxeBcCopyDhcp4Ack (Private, Ack, TRUE);
+    Status = PxeBcCopyDhcp4Ack (Private, Ack, TRUE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
     Mode->DhcpDiscoverValid = TRUE;
   }
 
@@ -1258,6 +1297,7 @@ PxeBcDhcp4CallBack (
       //
       // Cache the DHCPv4 offers to OfferBuffer[] for select later, and record
       // the OfferIndex and OfferCount.
+      // If error happens, just ignore this packet and continue to wait more offer.
       //
       PxeBcCacheDhcp4Offer (Private, Packet);
     }
@@ -1278,21 +1318,16 @@ PxeBcDhcp4CallBack (
     break;
 
   case Dhcp4RcvdAck:
-    if (Packet->Length > PXEBC_DHCP4_PACKET_MAX_SIZE) {
-      //
-      // Abort the DHCP if the ACK packet exceeds the maximum length.
-      //
-	  Status = EFI_ABORTED;
-	  break;
-    }
-
     //
     // Cache the DHCPv4 ack to Private->Dhcp4Ack, but it's not the final ack in mode data
     // without verification.
     //
     ASSERT (Private->SelectIndex != 0);
 
-    PxeBcCopyDhcp4Ack (Private, Packet, FALSE);
+    Status = PxeBcCopyDhcp4Ack (Private, Packet, FALSE);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+    }
     break;
 
   default:
@@ -1491,6 +1526,12 @@ PxeBcDhcp4Discover (
     // Find the right PXE Reply according to server address.
     //
     while (RepIndex < Token.ResponseCount) {
+      if (Response->Length > PXEBC_DHCP4_PACKET_MAX_SIZE) {
+        SrvIndex = 0;
+        RepIndex++;
+        Response = (EFI_DHCP4_PACKET *) ((UINT8 *) Response + Response->Size);
+        continue;
+      }
 
       while (SrvIndex < IpCount) {
         if (SrvList[SrvIndex].AcceptAnyResponse) {
@@ -1509,7 +1550,6 @@ PxeBcDhcp4Discover (
 
       SrvIndex = 0;
       RepIndex++;
-
       Response = (EFI_DHCP4_PACKET *) ((UINT8 *) Response + Response->Size);
     }
 
@@ -1519,10 +1559,16 @@ PxeBcDhcp4Discover (
       // Especially for PXE discover packet, store it into mode data here.
       //
       if (Private->IsDoDiscover) {
-        PxeBcCacheDhcp4Packet (&Private->PxeReply.Dhcp4.Packet.Ack, Response);
+        Status = PxeBcCacheDhcp4Packet (&Private->PxeReply.Dhcp4.Packet.Ack, Response);
+        if (EFI_ERROR(Status)) {
+          goto ON_EXIT;
+        }
         CopyMem (&Mode->PxeDiscover, &Token.Packet->Dhcp4, Token.Packet->Length);
       } else {
-        PxeBcCacheDhcp4Packet (&Private->ProxyOffer.Dhcp4.Packet.Offer, Response);
+        Status = PxeBcCacheDhcp4Packet (&Private->ProxyOffer.Dhcp4.Packet.Offer, Response);
+        if (EFI_ERROR(Status)) {
+          goto ON_EXIT;
+        }
       }
     } else {
       //
@@ -1530,12 +1576,15 @@ PxeBcDhcp4Discover (
       //
       Status = EFI_NOT_FOUND;
     }
-    if (Token.ResponseList != NULL) {
-      FreePool (Token.ResponseList);
-    }
   }
-
-  FreePool (Token.Packet);
+ON_EXIT:
+  
+  if (Token.ResponseList != NULL) {
+    FreePool (Token.ResponseList);
+  }
+  if (Token.Packet != NULL) {
+    FreePool (Token.Packet);
+  }
   return Status;
 }
 

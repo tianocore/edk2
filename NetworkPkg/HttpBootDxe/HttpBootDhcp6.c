@@ -329,17 +329,24 @@ HttpBootParseDhcp6Packet (
   @param[in]  Dst          The pointer to the cache buffer for DHCPv6 packet.
   @param[in]  Src          The pointer to the DHCPv6 packet to be cached.
 
+  @retval     EFI_SUCCESS                Packet is copied.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 HttpBootCacheDhcp6Packet (
   IN EFI_DHCP6_PACKET          *Dst,
   IN EFI_DHCP6_PACKET          *Src
   )
 {
-  ASSERT (Dst->Size >= Src->Length);
+  if (Dst->Size < Src->Length) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
 
   CopyMem (&Dst->Dhcp6, &Src->Dhcp6, Src->Length);
   Dst->Length = Src->Length;
+  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -348,8 +355,11 @@ HttpBootCacheDhcp6Packet (
   @param[in]  Private               The pointer to HTTP_BOOT_PRIVATE_DATA.
   @param[in]  RcvdOffer             The pointer to the received offer packet.
 
+  @retval     EFI_SUCCESS      Cache and parse the packet successfully.
+  @retval     Others           Operation failed.
+
 **/
-VOID
+EFI_STATUS
 HttpBootCacheDhcp6Offer (
   IN HTTP_BOOT_PRIVATE_DATA  *Private,
   IN EFI_DHCP6_PACKET        *RcvdOffer
@@ -358,6 +368,7 @@ HttpBootCacheDhcp6Offer (
   HTTP_BOOT_DHCP6_PACKET_CACHE   *Cache6;
   EFI_DHCP6_PACKET               *Offer;
   HTTP_BOOT_OFFER_TYPE           OfferType;
+  EFI_STATUS                     Status;
 
   Cache6 = &Private->OfferBuffer[Private->OfferNum].Dhcp6;
   Offer  = &Cache6->Packet.Offer;
@@ -365,13 +376,16 @@ HttpBootCacheDhcp6Offer (
   //
   // Cache the content of DHCPv6 packet firstly.
   //
-  HttpBootCacheDhcp6Packet(Offer, RcvdOffer);
+  Status = HttpBootCacheDhcp6Packet(Offer, RcvdOffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Validate the DHCPv6 packet, and parse the options and offer type.
   //
   if (EFI_ERROR (HttpBootParseDhcp6Packet (Cache6))) {
-    return ;
+    return EFI_ABORTED;
   }
 
   //
@@ -382,7 +396,9 @@ HttpBootCacheDhcp6Offer (
   ASSERT (Private->OfferCount[OfferType] < HTTP_BOOT_OFFER_MAX_NUM);
   Private->OfferIndex[OfferType][Private->OfferCount[OfferType]] = Private->OfferNum;
   Private->OfferCount[OfferType]++;
-  Private->OfferNum++;  
+  Private->OfferNum++;
+  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -437,6 +453,7 @@ HttpBootDhcp6CallBack (
        //
        // Cache the dhcp offers to OfferBuffer[] for select later, and record
        // the OfferIndex and OfferCount.
+       // If error happens, just ignore this packet and continue to wait more offer.
        //
        HttpBootCacheDhcp6Offer (Private, Packet);
      }
