@@ -2,7 +2,7 @@
   Functions implementation related with DHCPv6 for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -180,17 +180,24 @@ PxeBcBuildDhcp6Options (
   @param[in]  Dst          The pointer to the cache buffer for DHCPv6 packet.
   @param[in]  Src          The pointer to the DHCPv6 packet to be cached.
 
+  @retval     EFI_SUCCESS                Packet is copied.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 PxeBcCacheDhcp6Packet (
   IN EFI_DHCP6_PACKET          *Dst,
   IN EFI_DHCP6_PACKET          *Src
   )
 {
-  ASSERT (Dst->Size >= Src->Length);
+  if (Dst->Size < Src->Length) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
 
   CopyMem (&Dst->Dhcp6, &Src->Dhcp6, Src->Length);
   Dst->Length = Src->Length;
+
+  return EFI_SUCCESS;
 }
 
 
@@ -545,8 +552,11 @@ PxeBcParseDhcp6Packet (
   @param[in]  Ack                 The pointer to the DHCPv6 ack packet.
   @param[in]  Verified            If TRUE, parse the ACK packet and store info into mode data.
 
+  @retval     EFI_SUCCESS                Cache and parse the packet successfully.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 PxeBcCopyDhcp6Ack (
   IN PXEBC_PRIVATE_DATA   *Private,
   IN EFI_DHCP6_PACKET     *Ack,
@@ -554,10 +564,14 @@ PxeBcCopyDhcp6Ack (
   )
 {
   EFI_PXE_BASE_CODE_MODE  *Mode;
+  EFI_STATUS              Status;
 
   Mode = Private->PxeBc.Mode;
 
-  PxeBcCacheDhcp6Packet (&Private->DhcpAck.Dhcp6.Packet.Ack, Ack);
+  Status = PxeBcCacheDhcp6Packet (&Private->DhcpAck.Dhcp6.Packet.Ack, Ack);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (Verified) {
     //
@@ -567,6 +581,8 @@ PxeBcCopyDhcp6Ack (
     CopyMem (&Mode->DhcpAck.Dhcpv6, &Ack->Dhcp6, Ack->Length);
     Mode->DhcpAckReceived = TRUE;
   }
+
+  return EFI_SUCCESS;
 }
 
 
@@ -576,8 +592,11 @@ PxeBcCopyDhcp6Ack (
   @param[in]  Private               The pointer to PxeBc private data.
   @param[in]  OfferIndex            The received order of offer packets.
 
+  @retval     EFI_SUCCESS                Cache and parse the packet successfully.
+  @retval     EFI_BUFFER_TOO_SMALL       Cache buffer is not big enough to hold the packet.
+
 **/
-VOID
+EFI_STATUS
 PxeBcCopyDhcp6Proxy (
   IN PXEBC_PRIVATE_DATA     *Private,
   IN UINT32                 OfferIndex
@@ -585,6 +604,7 @@ PxeBcCopyDhcp6Proxy (
 {
   EFI_PXE_BASE_CODE_MODE    *Mode;
   EFI_DHCP6_PACKET          *Offer;
+  EFI_STATUS              Status;
 
   ASSERT (OfferIndex < Private->OfferNum);
   ASSERT (OfferIndex < PXEBC_OFFER_MAX_NUM);
@@ -595,7 +615,10 @@ PxeBcCopyDhcp6Proxy (
   //
   // Cache the proxy offer packet and parse it.
   //
-  PxeBcCacheDhcp6Packet (&Private->ProxyOffer.Dhcp6.Packet.Offer, Offer);
+  Status = PxeBcCacheDhcp6Packet (&Private->ProxyOffer.Dhcp6.Packet.Offer, Offer);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
   PxeBcParseDhcp6Packet (&Private->ProxyOffer.Dhcp6);
 
   //
@@ -603,6 +626,8 @@ PxeBcCopyDhcp6Proxy (
   //
   CopyMem (&Mode->ProxyOffer.Dhcpv6, &Offer->Dhcp6, Offer->Length);
   Mode->ProxyOfferReceived = TRUE;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -916,8 +941,10 @@ PxeBcRetryDhcp6Binl (
   @param[in]  Private               The pointer to PXEBC_PRIVATE_DATA.
   @param[in]  RcvdOffer             The pointer to the received offer packet.
 
+  @retval     EFI_SUCCESS      Cache and parse the packet successfully.
+  @retval     Others           Operation failed.
 **/
-VOID
+EFI_STATUS
 PxeBcCacheDhcp6Offer (
   IN PXEBC_PRIVATE_DATA     *Private,
   IN EFI_DHCP6_PACKET       *RcvdOffer
@@ -926,6 +953,7 @@ PxeBcCacheDhcp6Offer (
   PXEBC_DHCP6_PACKET_CACHE  *Cache6;
   EFI_DHCP6_PACKET          *Offer;
   PXEBC_OFFER_TYPE          OfferType;
+  EFI_STATUS                Status;
 
   Cache6 = &Private->OfferBuffer[Private->OfferNum].Dhcp6;
   Offer  = &Cache6->Packet.Offer;
@@ -933,13 +961,16 @@ PxeBcCacheDhcp6Offer (
   //
   // Cache the content of DHCPv6 packet firstly.
   //
-  PxeBcCacheDhcp6Packet (Offer, RcvdOffer);
+  Status = PxeBcCacheDhcp6Packet (Offer, RcvdOffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Validate the DHCPv6 packet, and parse the options and offer type.
   //
   if (EFI_ERROR (PxeBcParseDhcp6Packet (Cache6))) {
-    return ;
+    return EFI_ABORTED;
   }
 
   //
@@ -968,7 +999,7 @@ PxeBcCacheDhcp6Offer (
       Private->OfferIndex[OfferType][0] = Private->OfferNum;
       Private->OfferCount[OfferType]    = 1;
     } else {
-      return;
+      return EFI_ABORTED;
     }
   } else {
     //
@@ -979,6 +1010,8 @@ PxeBcCacheDhcp6Offer (
   }
 
   Private->OfferNum++;
+
+  return EFI_SUCCESS;
 }
 
 
@@ -1093,8 +1126,10 @@ PxeBcSelectDhcp6Offer (
 
   @param[in]  Private             The pointer to PXEBC_PRIVATE_DATA.
 
-  @retval     EFI_SUCCESS         Handled the DHCPv6 offer packet successfully.
-  @retval     EFI_NO_RESPONSE     No response to the following request packet.
+  @retval     EFI_SUCCESS           Handled the DHCPv6 offer packet successfully.
+  @retval     EFI_NO_RESPONSE       No response to the following request packet.
+  @retval     EFI_OUT_OF_RESOURCES  Failed to allocate resources.
+  @retval     EFI_BUFFER_TOO_SMALL  Can't cache the offer pacet.
 
 **/
 EFI_STATUS
@@ -1193,7 +1228,7 @@ PxeBcHandleDhcp6Offer (
         //
         // Success to try to request by a ProxyPxe10 or ProxyWfm11a offer, copy and parse it.
         //
-        PxeBcCopyDhcp6Proxy (Private, ProxyIndex);
+        Status = PxeBcCopyDhcp6Proxy (Private, ProxyIndex);
       }
     } else {
       //
@@ -1207,7 +1242,7 @@ PxeBcHandleDhcp6Offer (
     //
     // All PXE boot information is ready by now.
     //
-    PxeBcCopyDhcp6Ack (Private, &Private->DhcpAck.Dhcp6.Packet.Ack, TRUE);
+    Status = PxeBcCopyDhcp6Ack (Private, &Private->DhcpAck.Dhcp6.Packet.Ack, TRUE);
     Private->PxeBc.Mode->DhcpDiscoverValid = TRUE;
   }
 
@@ -1780,19 +1815,15 @@ PxeBcDhcp6CallBack (
     break;
 
   case Dhcp6RcvdReply:
-    if (Packet->Length > PXEBC_DHCP6_PACKET_MAX_SIZE) {
-      //
-      // Abort the DHCP if the Peply packet exceeds the maximum length.
-      //
-	  Status = EFI_ABORTED;
-      break;
-    }
     //
     // Cache the dhcp ack to Private->Dhcp6Ack, but it's not the final ack in mode data
     // without verification.
     //
     ASSERT (Private->SelectIndex != 0);
-    PxeBcCopyDhcp6Ack (Private, Packet, FALSE);
+    Status = PxeBcCopyDhcp6Ack (Private, Packet, FALSE);
+    if (EFI_ERROR (Status)) {
+      Status = EFI_ABORTED;
+    }
     break;
 
   default:
