@@ -1,7 +1,7 @@
 /** @file
   ConsoleOut Routines that speak VGA.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -272,6 +272,8 @@ BiosKeyboardDriverBindingStart (
   
   BiosKeyboardPrivate->Queue.Front                = 0;
   BiosKeyboardPrivate->Queue.Rear                 = 0;
+  BiosKeyboardPrivate->QueueForNotify.Front       = 0;
+  BiosKeyboardPrivate->QueueForNotify.Rear        = 0;
   BiosKeyboardPrivate->SimpleTextInputEx.Reset               = BiosKeyboardResetEx;
   BiosKeyboardPrivate->SimpleTextInputEx.ReadKeyStrokeEx     = BiosKeyboardReadKeyStrokeEx;
   BiosKeyboardPrivate->SimpleTextInputEx.SetState            = BiosKeyboardSetState;
@@ -339,7 +341,20 @@ BiosKeyboardDriverBindingStart (
     StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR;
     goto Done;
   }
-  
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  KeyNotifyProcessHandler,
+                  BiosKeyboardPrivate,
+                  &BiosKeyboardPrivate->KeyNotifyProcessEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    Status      = EFI_OUT_OF_RESOURCES;
+    StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR;
+    goto Done;
+  }
+
   //
   // Report a Progress Code for an attempt to detect the precense of the keyboard device in the system
   //
@@ -462,6 +477,11 @@ Done:
       if ((BiosKeyboardPrivate->SimpleTextInputEx).WaitForKeyEx != NULL) {
         gBS->CloseEvent ((BiosKeyboardPrivate->SimpleTextInputEx).WaitForKeyEx);    
       }
+
+      if (BiosKeyboardPrivate->KeyNotifyProcessEvent != NULL) {
+        gBS->CloseEvent (BiosKeyboardPrivate->KeyNotifyProcessEvent);
+      }
+
       BiosKeyboardFreeNotifyList (&BiosKeyboardPrivate->NotifyList);
 
       if (BiosKeyboardPrivate->TimerEvent != NULL) {
@@ -566,6 +586,7 @@ BiosKeyboardDriverBindingStop (
   gBS->CloseEvent ((BiosKeyboardPrivate->SimpleTextIn).WaitForKey);
   gBS->CloseEvent (BiosKeyboardPrivate->TimerEvent);
   gBS->CloseEvent (BiosKeyboardPrivate->SimpleTextInputEx.WaitForKeyEx);
+  gBS->CloseEvent (BiosKeyboardPrivate->KeyNotifyProcessEvent);
   BiosKeyboardFreeNotifyList (&BiosKeyboardPrivate->NotifyList);
 
   FreePool (BiosKeyboardPrivate);
@@ -1941,7 +1962,7 @@ BiosKeyboardTimerHandler (
   }
 
   //
-  // Invoke notification functions if exist
+  // Signal KeyNotify process event if this key pressed matches any key registered.
   //
   for (Link = BiosKeyboardPrivate->NotifyList.ForwardLink; Link != &BiosKeyboardPrivate->NotifyList; Link = Link->ForwardLink) {
     CurrentNotify = CR (
@@ -1950,8 +1971,14 @@ BiosKeyboardTimerHandler (
                       NotifyEntry, 
                       BIOS_KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                       );
-    if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) { 
-      CurrentNotify->KeyNotificationFn (&KeyData);
+    if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) {
+      //
+      // The key notification function needs to run at TPL_CALLBACK
+      // while current TPL is TPL_NOTIFY. It will be invoked in
+      // KeyNotifyProcessHandler() which runs at TPL_CALLBACK.
+      //
+      Enqueue (&BiosKeyboardPrivate->QueueForNotify, &KeyData);
+      gBS->SignalEvent (BiosKeyboardPrivate->KeyNotifyProcessEvent);
     }
   }
 
@@ -1962,6 +1989,55 @@ BiosKeyboardTimerHandler (
   gBS->RestoreTPL (OldTpl);
 
   return ;  
+}
+
+/**
+  Process key notify.
+
+  @param  Event                 Indicates the event that invoke this function.
+  @param  Context               Indicates the calling context.
+**/
+VOID
+EFIAPI
+KeyNotifyProcessHandler (
+  IN  EFI_EVENT                 Event,
+  IN  VOID                      *Context
+  )
+{
+  EFI_STATUS                            Status;
+  BIOS_KEYBOARD_DEV                     *BiosKeyboardPrivate;
+  EFI_KEY_DATA                          KeyData;
+  LIST_ENTRY                            *Link;
+  LIST_ENTRY                            *NotifyList;
+  BIOS_KEYBOARD_CONSOLE_IN_EX_NOTIFY    *CurrentNotify;
+  EFI_TPL                               OldTpl;
+
+  BiosKeyboardPrivate = (BIOS_KEYBOARD_DEV *) Context;
+
+  //
+  // Invoke notification functions.
+  //
+  NotifyList = &BiosKeyboardPrivate->NotifyList;
+  while (TRUE) {
+    //
+    // Enter critical section
+    //  
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    Status = Dequeue (&BiosKeyboardPrivate->QueueForNotify, &KeyData);
+    //
+    // Leave critical section
+    //
+    gBS->RestoreTPL (OldTpl);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+    for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList, Link); Link = GetNextNode (NotifyList, Link)) {
+      CurrentNotify = CR (Link, BIOS_KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, BIOS_KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
+      if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) {
+        CurrentNotify->KeyNotificationFn (&KeyData);
+      }
+    }
+  }
 }
 
 /**
