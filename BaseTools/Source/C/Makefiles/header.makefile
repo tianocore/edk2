@@ -52,7 +52,7 @@ else
 BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-unused-result -nostdlib -c -g
 endif
 BUILD_LFLAGS =
-BUILD_CXXFLAGS =
+BUILD_CXXFLAGS = -Wno-unused-result
 
 ifeq ($(ARCH), IA32)
 #
