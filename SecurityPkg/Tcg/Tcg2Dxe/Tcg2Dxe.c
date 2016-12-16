@@ -856,7 +856,7 @@ TcgDxeLogEvent (
       //
       (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents ++;
       DEBUG ((EFI_D_INFO, "FinalEventsTable->NumberOfEvents - 0x%x\n", (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents));
-      DEBUG ((EFI_D_INFO, "  Size - 0x%x\n", (UINTN)EventLogAreaStruct->LastEvent - (UINTN)mTcgDxeData.FinalEventsTable[Index]));
+      DEBUG ((EFI_D_INFO, "  Size - 0x%x\n", (UINTN)EventLogAreaStruct->EventLogSize));
     }
   }
 
