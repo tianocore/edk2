@@ -291,8 +291,9 @@ PxeBcParseCachedDhcpPacket (
 
   @param  Private          Pointer to PxeBc private data.
 
-  @retval EFI_SUCCESS      Operational successful.
-  @retval EFI_NO_RESPONSE  Offer dhcp service failed.
+  @retval EFI_SUCCESS                Operational successful.
+  @retval EFI_NO_RESPONSE            Offer dhcp service failed.
+  @retval EFI_BUFFER_TOO_SMALL       Failed to copy the packet to Pxe base code mode.
 
 **/
 EFI_STATUS
