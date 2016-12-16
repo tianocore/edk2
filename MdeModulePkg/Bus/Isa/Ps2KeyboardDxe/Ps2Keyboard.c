@@ -351,6 +351,19 @@ KbdControllerDriverStart (
     goto ErrorExit;
   }
 
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  KeyNotifyProcessHandler,
+                  ConsoleIn,
+                  &ConsoleIn->KeyNotifyProcessEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    Status      = EFI_OUT_OF_RESOURCES;
+    StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR;
+    goto ErrorExit;
+  }
+
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
     EFI_PERIPHERAL_KEYBOARD | EFI_P_PC_PRESENCE_DETECT,
@@ -429,6 +442,9 @@ ErrorExit:
   }
   if ((ConsoleIn != NULL) && (ConsoleIn->ConInEx.WaitForKeyEx != NULL)) {
     gBS->CloseEvent (ConsoleIn->ConInEx.WaitForKeyEx);
+  }
+  if ((ConsoleIn != NULL) && (ConsoleIn->KeyNotifyProcessEvent != NULL)) {
+    gBS->CloseEvent (ConsoleIn->KeyNotifyProcessEvent);
   }
   KbdFreeNotifyList (&ConsoleIn->NotifyList);
   if ((ConsoleIn != NULL) && (ConsoleIn->ControllerNameTable != NULL)) {
@@ -569,6 +585,10 @@ KbdControllerDriverStop (
   if (ConsoleIn->ConInEx.WaitForKeyEx != NULL) {
     gBS->CloseEvent (ConsoleIn->ConInEx.WaitForKeyEx);
     ConsoleIn->ConInEx.WaitForKeyEx = NULL;
+  }
+  if (ConsoleIn->KeyNotifyProcessEvent != NULL) {
+    gBS->CloseEvent (ConsoleIn->KeyNotifyProcessEvent);
+    ConsoleIn->KeyNotifyProcessEvent = NULL;
   }
   KbdFreeNotifyList (&ConsoleIn->NotifyList);
   FreeUnicodeStringTable (ConsoleIn->ControllerNameTable);

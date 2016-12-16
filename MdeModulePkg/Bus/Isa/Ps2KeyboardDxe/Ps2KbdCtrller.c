@@ -1420,7 +1420,7 @@ KeyGetchar (
   }
 
   //
-  // Invoke notification functions if exist
+  // Signal KeyNotify process event if this key pressed matches any key registered.
   //
   for (Link = GetFirstNode (&ConsoleIn->NotifyList); !IsNull (&ConsoleIn->NotifyList, Link); Link = GetNextNode (&ConsoleIn->NotifyList, Link)) {
     CurrentNotify = CR (
@@ -1430,7 +1430,13 @@ KeyGetchar (
                       KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                       );
     if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) {
-      CurrentNotify->KeyNotificationFn (&KeyData);
+      //
+      // The key notification function needs to run at TPL_CALLBACK
+      // while current TPL is TPL_NOTIFY. It will be invoked in
+      // KeyNotifyProcessHandler() which runs at TPL_CALLBACK.
+      //
+      PushEfikeyBufTail (&ConsoleIn->EfiKeyQueueForNotify, &KeyData);
+      gBS->SignalEvent (ConsoleIn->KeyNotifyProcessEvent);
     }
   }
 
@@ -1629,6 +1635,8 @@ InitKeyboard (
   ConsoleIn->ScancodeQueue.Tail = 0;
   ConsoleIn->EfiKeyQueue.Head   = 0;
   ConsoleIn->EfiKeyQueue.Tail   = 0;
+  ConsoleIn->EfiKeyQueueForNotify.Head = 0;
+  ConsoleIn->EfiKeyQueueForNotify.Tail = 0;
 
   //
   // Reset the status indicators

@@ -681,3 +681,52 @@ Exit:
   return Status;
 }
 
+/**
+  Process key notify.
+
+  @param  Event                 Indicates the event that invoke this function.
+  @param  Context               Indicates the calling context.
+**/
+VOID
+EFIAPI
+KeyNotifyProcessHandler (
+  IN  EFI_EVENT                 Event,
+  IN  VOID                      *Context
+  )
+{
+  EFI_STATUS                    Status;
+  KEYBOARD_CONSOLE_IN_DEV       *ConsoleIn;
+  EFI_KEY_DATA                  KeyData;
+  LIST_ENTRY                    *Link;
+  LIST_ENTRY                    *NotifyList;
+  KEYBOARD_CONSOLE_IN_EX_NOTIFY *CurrentNotify;
+  EFI_TPL                       OldTpl;
+
+  ConsoleIn = (KEYBOARD_CONSOLE_IN_DEV *) Context;
+
+  //
+  // Invoke notification functions.
+  //
+  NotifyList = &ConsoleIn->NotifyList;
+  while (TRUE) {
+    //
+    // Enter critical section
+    //  
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    Status = PopEfikeyBufHead (&ConsoleIn->EfiKeyQueueForNotify, &KeyData);
+    //
+    // Leave critical section
+    //
+    gBS->RestoreTPL (OldTpl);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+    for (Link = GetFirstNode (NotifyList); !IsNull (NotifyList, Link); Link = GetNextNode (NotifyList, Link)) {
+      CurrentNotify = CR (Link, KEYBOARD_CONSOLE_IN_EX_NOTIFY, NotifyEntry, KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE);
+      if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) {
+        CurrentNotify->KeyNotificationFn (&KeyData);
+      }
+    }
+  }
+}
+
