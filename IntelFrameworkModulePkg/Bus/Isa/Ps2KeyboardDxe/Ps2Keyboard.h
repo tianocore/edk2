@@ -104,6 +104,7 @@ typedef struct {
   //
   SCAN_CODE_QUEUE                     ScancodeQueue;
   EFI_KEY_QUEUE                       EfiKeyQueue;
+  EFI_KEY_QUEUE                       EfiKeyQueueForNotify;
 
   //
   // Error state
@@ -117,6 +118,7 @@ typedef struct {
   // Notification Function List
   //
   LIST_ENTRY                          NotifyList;
+  EFI_EVENT                           KeyNotifyProcessEvent;
 } KEYBOARD_CONSOLE_IN_DEV;
 
 #define KEYBOARD_CONSOLE_IN_DEV_FROM_THIS(a)  CR (a, KEYBOARD_CONSOLE_IN_DEV, ConIn, KEYBOARD_CONSOLE_IN_DEV_SIGNATURE)
@@ -265,6 +267,19 @@ KeyboardRead (
 VOID
 KeyGetchar (
   IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  );
+
+/**
+  Process key notify.
+
+  @param  Event                 Indicates the event that invoke this function.
+  @param  Context               Indicates the calling context.
+**/
+VOID
+EFIAPI
+KeyNotifyProcessHandler (
+  IN  EFI_EVENT                 Event,
+  IN  VOID                      *Context
   );
 
 /**

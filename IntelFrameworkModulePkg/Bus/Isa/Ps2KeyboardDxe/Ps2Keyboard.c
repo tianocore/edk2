@@ -3,7 +3,7 @@
   PS/2 Keyboard driver. Routines that interacts with callers,
   conforming to EFI driver model
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -306,6 +306,7 @@ KbdControllerDriverStart (
     StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR;
     goto ErrorExit;
   }
+  
   // Setup a periodic timer, used for reading keystrokes at a fixed interval
   //
   Status = gBS->CreateEvent (
@@ -325,6 +326,19 @@ KbdControllerDriverStart (
                   ConsoleIn->TimerEvent,
                   TimerPeriodic,
                   KEYBOARD_TIMER_INTERVAL
+                  );
+  if (EFI_ERROR (Status)) {
+    Status      = EFI_OUT_OF_RESOURCES;
+    StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR;
+    goto ErrorExit;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  KeyNotifyProcessHandler,
+                  ConsoleIn,
+                  &ConsoleIn->KeyNotifyProcessEvent
                   );
   if (EFI_ERROR (Status)) {
     Status      = EFI_OUT_OF_RESOURCES;
@@ -410,6 +424,9 @@ ErrorExit:
   }
   if ((ConsoleIn != NULL) && (ConsoleIn->ConInEx.WaitForKeyEx != NULL)) {
     gBS->CloseEvent (ConsoleIn->ConInEx.WaitForKeyEx);
+  }
+  if ((ConsoleIn != NULL) && (ConsoleIn->KeyNotifyProcessEvent != NULL)) {
+    gBS->CloseEvent (ConsoleIn->KeyNotifyProcessEvent);
   }
   KbdFreeNotifyList (&ConsoleIn->NotifyList);
   if ((ConsoleIn != NULL) && (ConsoleIn->ControllerNameTable != NULL)) {
@@ -564,6 +581,10 @@ KbdControllerDriverStop (
   if (ConsoleIn->ConInEx.WaitForKeyEx != NULL) {
     gBS->CloseEvent (ConsoleIn->ConInEx.WaitForKeyEx);
     ConsoleIn->ConInEx.WaitForKeyEx = NULL;
+  }
+  if (ConsoleIn->KeyNotifyProcessEvent != NULL) {
+    gBS->CloseEvent (ConsoleIn->KeyNotifyProcessEvent);
+    ConsoleIn->KeyNotifyProcessEvent = NULL;
   }
   KbdFreeNotifyList (&ConsoleIn->NotifyList);
   FreeUnicodeStringTable (ConsoleIn->ControllerNameTable);

@@ -1,7 +1,7 @@
 /** @file
   Routines that access 8042 keyboard controller
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1456,7 +1456,7 @@ KeyGetchar (
   }
 
   //
-  // Invoke notification functions if exist
+  // Signal KeyNotify process event if this key pressed matches any key registered.
   //
   for (Link = GetFirstNode (&ConsoleIn->NotifyList); !IsNull (&ConsoleIn->NotifyList, Link); Link = GetNextNode (&ConsoleIn->NotifyList, Link)) {
     CurrentNotify = CR (
@@ -1466,7 +1466,13 @@ KeyGetchar (
                       KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                       );
     if (IsKeyRegistered (&CurrentNotify->KeyData, &KeyData)) {
-      CurrentNotify->KeyNotificationFn (&KeyData);
+      //
+      // The key notification function needs to run at TPL_CALLBACK
+      // while current TPL is TPL_NOTIFY. It will be invoked in
+      // KeyNotifyProcessHandler() which runs at TPL_CALLBACK.
+      //
+      PushEfikeyBufTail (&ConsoleIn->EfiKeyQueueForNotify, &KeyData);
+      gBS->SignalEvent (ConsoleIn->KeyNotifyProcessEvent);
     }
   }
 
@@ -1665,6 +1671,8 @@ InitKeyboard (
   ConsoleIn->ScancodeQueue.Tail = 0;
   ConsoleIn->EfiKeyQueue.Head   = 0;
   ConsoleIn->EfiKeyQueue.Tail   = 0;
+  ConsoleIn->EfiKeyQueueForNotify.Head = 0;
+  ConsoleIn->EfiKeyQueueForNotify.Tail = 0;
 
   //
   // Reset the status indicators
