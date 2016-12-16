@@ -557,6 +557,7 @@ NonCoherentPciIoFreeBuffer (
   Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO(This);
 
   Found = FALSE;
+  Alloc = NULL;
 
   //
   // Find the uncached allocation list entry associated
