@@ -40,15 +40,15 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [Guids]
-  gEfiFileInfoGuid                       ## CONSUMES
-  gEfiPartTypeSystemPartGuid             ## CONSUMES
-  gEfiGlobalVariableGuid                 ## CONSUMES
-  gEfiCapsuleReportGuid                  ## CONSUMES
-  gEfiFmpCapsuleGuid                     ## CONSUMES
-  gWindowsUxCapsuleGuid                  ## CONSUMES
-  gEfiCertTypeRsa2048Sha256Guid          ## CONSUMES
-  gEfiCertPkcs7Guid                      ## CONSUMES
-  gEfiSystemResourceTableGuid            ## CONSUMES
+  gEfiFileInfoGuid                       ## CONSUMES   ## GUID
+  gEfiPartTypeSystemPartGuid             ## CONSUMES   ## GUID
+  gEfiGlobalVariableGuid                 ## CONSUMES   ## GUID
+  gEfiCapsuleReportGuid                  ## CONSUMES   ## GUID
+  gEfiFmpCapsuleGuid                     ## CONSUMES   ## GUID
+  gWindowsUxCapsuleGuid                  ## CONSUMES   ## GUID
+  gEfiCertTypeRsa2048Sha256Guid          ## CONSUMES   ## GUID
+  gEfiCertPkcs7Guid                      ## CONSUMES   ## GUID
+  gEfiSystemResourceTableGuid            ## CONSUMES   ## GUID
 
 [Protocols]
   gEfiLoadedImageProtocolGuid            ## CONSUMES
