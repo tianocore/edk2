@@ -1,7 +1,7 @@
 /** @file
   Print Library internal worker functions.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,20 @@
 
 #define WARNING_STATUS_NUMBER         5
 #define ERROR_STATUS_NUMBER           33
+
+//
+// Safe print checks
+//
+#define RSIZE_MAX             (PcdGet32 (PcdMaximumUnicodeStringLength))
+#define ASCII_RSIZE_MAX       (PcdGet32 (PcdMaximumAsciiStringLength))
+
+#define SAFE_PRINT_CONSTRAINT_CHECK(Expression, RetVal)  \
+  do { \
+    ASSERT (Expression); \
+    if (!(Expression)) { \
+      return RetVal; \
+    } \
+  } while (FALSE)
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
@@ -352,6 +366,56 @@ BasePrintLibSPrintMarker (
   // DxePrintLibPrint2Protocol (both PrintLib instances).
   //
 
+  //
+  // 1. Buffer shall not be a null pointer when both BufferSize > 0 and
+  //    COUNT_ONLY_NO_PRINT is not set in Flags.
+  //
+  if ((BufferSize > 0) && ((Flags & COUNT_ONLY_NO_PRINT) == 0)) {
+    SAFE_PRINT_CONSTRAINT_CHECK ((Buffer != NULL), 0);
+  }
+
+  //
+  // 2. Format shall not be a null pointer when BufferSize > 0 or when
+  //    COUNT_ONLY_NO_PRINT is set in Flags.
+  //
+  if ((BufferSize > 0) || ((Flags & COUNT_ONLY_NO_PRINT) != 0)) {
+    SAFE_PRINT_CONSTRAINT_CHECK ((Format != NULL), 0);
+  }
+
+  //
+  // 3. BufferSize shall not be greater than RSIZE_MAX for Unicode output or
+  //    ASCII_RSIZE_MAX for Ascii output.
+  //
+  if ((Flags & OUTPUT_UNICODE) != 0) {
+    if (RSIZE_MAX != 0) {
+      SAFE_PRINT_CONSTRAINT_CHECK ((BufferSize <= RSIZE_MAX), 0);
+    }
+    BytesPerOutputCharacter = 2;
+  } else {
+    if (ASCII_RSIZE_MAX != 0) {
+      SAFE_PRINT_CONSTRAINT_CHECK ((BufferSize <= ASCII_RSIZE_MAX), 0);
+    }
+    BytesPerOutputCharacter = 1;
+  }
+
+  //
+  // 4. Format shall not contain more than RSIZE_MAX Unicode characters or
+  //    ASCII_RSIZE_MAX Ascii characters.
+  //
+  if ((Flags & FORMAT_UNICODE) != 0) {
+    if (RSIZE_MAX != 0) {
+      SAFE_PRINT_CONSTRAINT_CHECK ((StrnLenS ((CHAR16 *)Format, RSIZE_MAX + 1) <= RSIZE_MAX), 0);
+    }
+    BytesPerFormatCharacter = 2;
+    FormatMask = 0xffff;
+  } else {
+    if (ASCII_RSIZE_MAX != 0) {
+      SAFE_PRINT_CONSTRAINT_CHECK ((AsciiStrnLenS (Format, ASCII_RSIZE_MAX + 1) <= ASCII_RSIZE_MAX), 0);
+    }
+    BytesPerFormatCharacter = 1;
+    FormatMask = 0xff;
+  }
+
   if ((Flags & COUNT_ONLY_NO_PRINT) != 0) {
     if (BufferSize == 0) {
       Buffer = NULL;
@@ -363,13 +427,6 @@ BasePrintLibSPrintMarker (
     if (BufferSize == 0) {
       return 0;
     }
-    ASSERT (Buffer != NULL);
-  }
-
-  if ((Flags & OUTPUT_UNICODE) != 0) {
-    BytesPerOutputCharacter = 2;
-  } else {
-    BytesPerOutputCharacter = 1;
   }
 
   LengthToReturn = 0;
@@ -387,24 +444,6 @@ BasePrintLibSPrintMarker (
     // Set the tag for the end of the input Buffer.
     //
     EndBuffer = Buffer + BufferSize * BytesPerOutputCharacter;
-  }
-
-  if ((Flags & FORMAT_UNICODE) != 0) {
-    //
-    // Make sure format string cannot contain more than PcdMaximumUnicodeStringLength
-    // Unicode characters if PcdMaximumUnicodeStringLength is not zero. 
-    //
-    ASSERT (StrSize ((CHAR16 *) Format) != 0);
-    BytesPerFormatCharacter = 2;
-    FormatMask = 0xffff;
-  } else {
-    //
-    // Make sure format string cannot contain more than PcdMaximumAsciiStringLength
-    // Ascii characters if PcdMaximumAsciiStringLength is not zero. 
-    //
-    ASSERT (AsciiStrSize (Format) != 0);
-    BytesPerFormatCharacter = 1;
-    FormatMask = 0xff;
   }
 
   //
@@ -975,16 +1014,6 @@ BasePrintLibSPrintMarker (
   // Null terminate the Unicode or ASCII string
   //
   BasePrintLibFillBuffer (Buffer, EndBuffer + BytesPerOutputCharacter, 1, 0, BytesPerOutputCharacter);
-  //
-  // Make sure output buffer cannot contain more than PcdMaximumUnicodeStringLength
-  // Unicode characters if PcdMaximumUnicodeStringLength is not zero. 
-  //
-  ASSERT ((((Flags & OUTPUT_UNICODE) == 0)) || (StrSize ((CHAR16 *) OriginalBuffer) != 0));
-  //
-  // Make sure output buffer cannot contain more than PcdMaximumAsciiStringLength
-  // ASCII characters if PcdMaximumAsciiStringLength is not zero. 
-  //
-  ASSERT ((((Flags & OUTPUT_UNICODE) != 0)) || (AsciiStrSize (OriginalBuffer) != 0));
 
   return ((Buffer - OriginalBuffer) / BytesPerOutputCharacter);
 }
