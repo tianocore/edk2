@@ -32,7 +32,7 @@ typedef enum {
 /**
   Register a non-discoverable MMIO device
 
-  @param[in]      DeviceType          The type of non-discoverable device
+  @param[in]      Type                The type of non-discoverable device
   @param[in]      DmaType             Whether the device is DMA coherent
   @param[in]      InitFunc            Initialization routine to be invoked when
                                       the device is enabled
@@ -43,6 +43,8 @@ typedef enum {
   @param[in]      NumMmioResources    The number of UINTN base/size pairs that
                                       follow, each describing an MMIO region
                                       owned by the device
+  @param[in]  ...                     The variable argument list which contains the
+                                      info about MmioResources.
 
   @retval EFI_SUCCESS                 The registration succeeded.
   @retval Other                       The registration failed.

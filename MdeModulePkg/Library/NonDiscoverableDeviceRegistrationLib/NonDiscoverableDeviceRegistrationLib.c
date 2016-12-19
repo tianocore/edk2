@@ -25,6 +25,14 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/NonDiscoverableDevice.h>
 
+/**
+  Get Guid form the type of non-discoverable device.
+
+  @param[in]  Type    The type of non-discoverable device.
+
+  @retval   Return the Guid.
+
+**/
 STATIC
 CONST EFI_GUID *
 GetGuidFromType (
@@ -74,9 +82,9 @@ typedef struct {
 #pragma pack ()
 
 /**
-  Register a non-discoverable MMIO device
+  Register a non-discoverable MMIO device.
 
-  @param[in]      DeviceType          The type of non-discoverable device
+  @param[in]      Type                The type of non-discoverable device
   @param[in]      DmaType             Whether the device is DMA coherent
   @param[in]      InitFunc            Initialization routine to be invoked when
                                       the device is enabled
@@ -87,6 +95,8 @@ typedef struct {
   @param[in]      NumMmioResources    The number of UINTN base/size pairs that
                                       follow, each describing an MMIO region
                                       owned by the device
+  @param[in]  ...                     The variable argument list which contains the
+                                      info about MmioResources.
 
   @retval EFI_SUCCESS                 The registration succeeded.
   @retval EFI_INVALID_PARAMETER       An invalid argument was given

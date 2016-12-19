@@ -1,4 +1,6 @@
 # @file
+# Component Description File for NonDiscoverableDeviceRegistrationLib.
+#
 # Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -32,15 +34,15 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEdkiiNonDiscoverableDeviceProtocolGuid
+  gEdkiiNonDiscoverableDeviceProtocolGuid    ## PRODUCES
 
 [Guids]
-  gEdkiiNonDiscoverableAhciDeviceGuid
-  gEdkiiNonDiscoverableAmbaDeviceGuid
-  gEdkiiNonDiscoverableEhciDeviceGuid
-  gEdkiiNonDiscoverableNvmeDeviceGuid
-  gEdkiiNonDiscoverableOhciDeviceGuid
-  gEdkiiNonDiscoverableSdhciDeviceGuid
-  gEdkiiNonDiscoverableUfsDeviceGuid
-  gEdkiiNonDiscoverableUhciDeviceGuid
-  gEdkiiNonDiscoverableXhciDeviceGuid
+  gEdkiiNonDiscoverableAhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableAmbaDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableEhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableNvmeDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableOhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableSdhciDeviceGuid   ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableUfsDeviceGuid     ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableUhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableXhciDeviceGuid    ## CONSUMES   ## GUID
