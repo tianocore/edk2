@@ -166,7 +166,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
 //  EDBPrint (L"  0xFFFFFFFF00000000 ( F) TestMain\n");
     EDBPrint (
       L"  0x%016lx %s %a\n",
-      (UINT64)Entry->RVA + Object->BaseAddress,
+      (UINT64)Entry->Rva + Object->BaseAddress,
       EdbSymbolTypeToStr (Entry->Type),
       Entry->Name
       );
@@ -176,7 +176,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
 //  EDBPrint (L"  0xFFFF0000 ( F) TestMain\n");
     EDBPrint (
       L"  0x%08x %s %a\n",
-      Entry->RVA + Object->BaseAddress,
+      Entry->Rva + Object->BaseAddress,
       EdbSymbolTypeToStr (Entry->Type),
       Entry->Name
       );
@@ -273,7 +273,7 @@ DebuggerDisplaySymbolAccrodingToName (
       if (sizeof(UINTN) == sizeof(UINT64)) {
         EDBPrint (
           L"  0x%016lx %s %a (%a)\n",
-          (UINT64)Entry->RVA + Object->BaseAddress,
+          (UINT64)Entry->Rva + Object->BaseAddress,
           EdbSymbolTypeToStr (Entry->Type),
           Entry->Name,
           Entry->ObjName
@@ -281,7 +281,7 @@ DebuggerDisplaySymbolAccrodingToName (
       } else {
         EDBPrint (
           L"  0x%08x %s %a (%a)\n",
-          Entry->RVA + Object->BaseAddress,
+          Entry->Rva + Object->BaseAddress,
           EdbSymbolTypeToStr (Entry->Type),
           Entry->Name,
           Entry->ObjName

@@ -90,7 +90,7 @@ typedef enum {
 
 typedef struct {
   CHAR8                      Name[EFI_DEBUGGER_SYMBOL_NAME_MAX];
-  UINTN                      RVA;
+  UINTN                      Rva;
   EFI_DEBUGGER_SYMBOL_TYPE   Type;
   CHAR8                      ObjName[EFI_DEBUGGER_SYMBOL_NAME_MAX];
   CHAR8                      *CodBuffer;

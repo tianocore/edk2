@@ -67,7 +67,7 @@ EdbLoadSymbolSingleEntry (
   if (ObjName != NULL) {
     AsciiStrnCpyS (Entry->ObjName, sizeof(Entry->ObjName), ObjName, sizeof(Entry->ObjName) - 1);
   }
-  Entry->RVA = Address % EFI_DEBUGGER_DEFAULT_LINK_IMAGEBASE;
+  Entry->Rva = Address % EFI_DEBUGGER_DEFAULT_LINK_IMAGEBASE;
   Entry->Type = Type;
 
   //
@@ -515,16 +515,16 @@ EbdFindSymbolAddress (
     //
     Entry = Object->Entry;
     for (SubIndex = 0; SubIndex < Object->EntryCount; SubIndex++, Entry++) {
-      if (Address != Entry->RVA + Object->BaseAddress) {
+      if (Address != Entry->Rva + Object->BaseAddress) {
         //
         // Check for nearest address
         //
-        if (Address > Entry->RVA + Object->BaseAddress) {
+        if (Address > Entry->Rva + Object->BaseAddress) {
           //
           // Record it if Current RVA < Address
           //
-          if (CandidateLowerAddress < Entry->RVA + Object->BaseAddress) {
-            CandidateLowerAddress = Entry->RVA + Object->BaseAddress;
+          if (CandidateLowerAddress < Entry->Rva + Object->BaseAddress) {
+            CandidateLowerAddress = Entry->Rva + Object->BaseAddress;
             LowEntry = Entry;
             LowObject = Object;
           }
@@ -532,8 +532,8 @@ EbdFindSymbolAddress (
           //
           // Record it if Current RVA > Address
           //
-          if (CandidateUpperAddress > Entry->RVA + Object->BaseAddress) {
-            CandidateUpperAddress = Entry->RVA + Object->BaseAddress;
+          if (CandidateUpperAddress > Entry->Rva + Object->BaseAddress) {
+            CandidateUpperAddress = Entry->Rva + Object->BaseAddress;
             UpperEntry = Entry;
             UpperObject = Object;
           }
@@ -1712,7 +1712,7 @@ FindSymbolStr (
       //
       // if Address match, return Name
       //
-      if (Address == (Entry[EntryIndex].RVA + Object[ObjectIndex].BaseAddress)) {
+      if (Address == (Entry[EntryIndex].Rva + Object[ObjectIndex].BaseAddress)) {
         return Entry[EntryIndex].Name;
       }
     }
@@ -2219,7 +2219,7 @@ Symboltoi (
           //
           // record Address
           //
-          *Address = (Entry[EntryIndex].RVA + Object[ObjectIndex].BaseAddress);
+          *Address = (Entry[EntryIndex].Rva + Object[ObjectIndex].BaseAddress);
         }
       }
     }
