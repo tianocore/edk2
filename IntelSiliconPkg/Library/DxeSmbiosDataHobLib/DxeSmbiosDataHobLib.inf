@@ -37,7 +37,7 @@ HobLib
 UefiLib
 
 [Guids]
-gIntelSmbiosDataHobGuid ## CONSUMES
+gIntelSmbiosDataHobGuid ## CONSUMES   ## GUID
 
 [Depex]
 gEfiSmbiosProtocolGuid

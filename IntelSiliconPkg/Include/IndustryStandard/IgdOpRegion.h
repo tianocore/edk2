@@ -31,7 +31,7 @@
   Sub-structures define the different parts of the OpRegion followed by the
   main structure representing the entire OpRegion.
 
-  @note: These structures are packed to 1 byte offsets because the exact
+  @note These structures are packed to 1 byte offsets because the exact
   data location is required by the supporting design specification due to
   the fact that the data is used by ASL and Graphics driver code compiled
   separately.

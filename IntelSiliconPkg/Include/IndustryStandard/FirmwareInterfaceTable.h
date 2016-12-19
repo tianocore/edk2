@@ -1,7 +1,7 @@
 /** @file
   FirmwareInterfaceTable (FIT) related definitions.
 
-  @todo: update document/spec reference
+  @todo update document/spec reference
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
