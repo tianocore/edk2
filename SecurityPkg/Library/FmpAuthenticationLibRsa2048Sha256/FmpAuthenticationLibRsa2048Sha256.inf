@@ -49,5 +49,5 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer     ## CONSUMES
 
 [Guids]
-  gEfiCertTypeRsa2048Sha256Guid         ## CONSUMES
-  gEfiHashAlgorithmSha256Guid           ## CONSUMES
+  gEfiCertTypeRsa2048Sha256Guid         ## CONSUMES   ## GUID
+  gEfiHashAlgorithmSha256Guid           ## CONSUMES   ## GUID
