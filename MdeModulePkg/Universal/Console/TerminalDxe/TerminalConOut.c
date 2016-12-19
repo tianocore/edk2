@@ -188,6 +188,7 @@ TerminalConOutOutputString (
   CHAR8                       AsciiChar;
   EFI_STATUS                  Status;
   UINT8                       ValidBytes;
+  CHAR8                       CrLfStr[2];
   //
   //  flag used to indicate whether condition happens which will cause
   //  return EFI_WARN_UNKNOWN_GLYPH
@@ -326,7 +327,8 @@ TerminalConOutOutputString (
           // the driver, but only if we're not in the middle of
           // printing an escape sequence.
           //
-          CHAR8 CrLfStr[] = {'\r', '\n'};
+          CrLfStr[0] = '\r';
+          CrLfStr[1] = '\n';
 
           Length = sizeof(CrLfStr);
 
