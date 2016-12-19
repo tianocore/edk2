@@ -2,7 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -75,6 +75,7 @@ TERMINAL_DEV  mTerminalDevTemplate = {
   NULL, // RawFifo
   NULL, // UnicodeFiFo
   NULL, // EfiKeyFiFo
+  NULL, // EfiKeyFiFoForNotify
 
   NULL, // ControllerNameTable
   NULL, // TimerEvent
@@ -99,7 +100,8 @@ TERMINAL_DEV  mTerminalDevTemplate = {
   {   // NotifyList
     NULL,
     NULL,
-  }
+  },
+  NULL // KeyNotifyProcessEvent
 };
 
 TERMINAL_CONSOLE_MODE_DATA mTerminalConsoleModeData[] = {
@@ -791,6 +793,10 @@ TerminalDriverBindingStart (
     if (TerminalDevice->EfiKeyFiFo == NULL) {
       goto Error;
     }
+    TerminalDevice->EfiKeyFiFoForNotify = AllocateZeroPool (sizeof (EFI_KEY_FIFO));
+    if (TerminalDevice->EfiKeyFiFoForNotify == NULL) {
+      goto Error;
+    }
 
     //
     // Set the timeout value of serial buffer for
@@ -997,6 +1003,15 @@ TerminalDriverBindingStart (
                     NULL,
                     NULL,
                     &TerminalDevice->TwoSecondTimeOut
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    KeyNotifyProcessHandler,
+                    TerminalDevice,
+                    &TerminalDevice->KeyNotifyProcessEvent
                     );
     ASSERT_EFI_ERROR (Status);
 
@@ -1222,7 +1237,10 @@ Error:
       if (TerminalDevice->EfiKeyFiFo != NULL) {
         FreePool (TerminalDevice->EfiKeyFiFo);
       }
-
+      if (TerminalDevice->EfiKeyFiFoForNotify != NULL) {
+        FreePool (TerminalDevice->EfiKeyFiFoForNotify);
+      }
+  
       if (TerminalDevice->ControllerNameTable != NULL) {
         FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
       }
@@ -1400,6 +1418,7 @@ TerminalDriverBindingStop (
         gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
         gBS->CloseEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
+        gBS->CloseEvent (TerminalDevice->KeyNotifyProcessEvent);
         TerminalFreeNotifyList (&TerminalDevice->NotifyList);
         FreePool (TerminalDevice->DevicePath);
         if (TerminalDevice->TerminalConsoleModeData != NULL) {

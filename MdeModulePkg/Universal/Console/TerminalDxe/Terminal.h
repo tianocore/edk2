@@ -1,7 +1,7 @@
 /** @file
   Header file for Terminal driver.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -95,6 +95,7 @@ typedef struct {
   RAW_DATA_FIFO                       *RawFiFo;
   UNICODE_FIFO                        *UnicodeFiFo;
   EFI_KEY_FIFO                        *EfiKeyFiFo;
+  EFI_KEY_FIFO                        *EfiKeyFiFoForNotify;
   EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
   EFI_EVENT                           TimerEvent;
   EFI_EVENT                           TwoSecondTimeOut;
@@ -113,6 +114,7 @@ typedef struct {
   BOOLEAN                             OutputEscChar;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL   SimpleInputEx;
   LIST_ENTRY                          NotifyList;
+  EFI_EVENT                           KeyNotifyProcessEvent;
 } TERMINAL_DEV;
 
 #define INPUT_STATE_DEFAULT               0x00
@@ -944,6 +946,67 @@ IsRawFiFoFull (
 /**
   Insert one pre-fetched key into the FIFO buffer.
 
+  @param  EfiKeyFiFo            Pointer to instance of EFI_KEY_FIFO.
+  @param  Input                 The key will be input.
+
+  @retval TRUE                  If insert successfully.
+  @retval FALSE                 If FIFO buffer is full before key insertion,
+                                and the key is lost.
+
+**/
+BOOLEAN
+EfiKeyFiFoForNotifyInsertOneKey (
+  EFI_KEY_FIFO                  *EfiKeyFiFo,
+  EFI_INPUT_KEY                 *Input
+  );
+
+/**
+  Remove one pre-fetched key out of the FIFO buffer.
+
+  @param  EfiKeyFiFo            Pointer to instance of EFI_KEY_FIFO.
+  @param  Output                The key will be removed.
+
+  @retval TRUE                  If insert successfully.
+  @retval FALSE                 If FIFO buffer is empty before remove operation.
+
+**/
+BOOLEAN
+EfiKeyFiFoForNotifyRemoveOneKey (
+  EFI_KEY_FIFO                  *EfiKeyFiFo,
+  EFI_INPUT_KEY                 *Output
+  );
+
+/**
+  Clarify whether FIFO buffer is empty.
+
+  @param  EfiKeyFiFo            Pointer to instance of EFI_KEY_FIFO.
+
+  @retval TRUE                  If FIFO buffer is empty.
+  @retval FALSE                 If FIFO buffer is not empty.
+
+**/
+BOOLEAN
+IsEfiKeyFiFoForNotifyEmpty (
+  IN EFI_KEY_FIFO               *EfiKeyFiFo
+  );
+
+/**
+  Clarify whether FIFO buffer is full.
+
+  @param  EfiKeyFiFo            Pointer to instance of EFI_KEY_FIFO.
+
+  @retval TRUE                  If FIFO buffer is full.
+  @retval FALSE                 If FIFO buffer is not full.
+
+**/
+BOOLEAN
+IsEfiKeyFiFoForNotifyFull (
+  EFI_KEY_FIFO                  *EfiKeyFiFo
+  );
+
+/**
+  Insert one pre-fetched key into the FIFO buffer.
+
   @param  TerminalDevice       Terminal driver private structure.
   @param  Key                  The key will be input.
 
@@ -1360,4 +1423,19 @@ TerminalConInTimerHandler (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
   );
+
+
+/**
+  Process key notify.
+
+  @param  Event                 Indicates the event that invoke this function.
+  @param  Context               Indicates the calling context.
+**/
+VOID
+EFIAPI
+KeyNotifyProcessHandler (
+  IN  EFI_EVENT                 Event,
+  IN  VOID                      *Context
+  );
+
 #endif
