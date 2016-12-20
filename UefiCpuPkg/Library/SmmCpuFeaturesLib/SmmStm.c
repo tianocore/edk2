@@ -190,7 +190,7 @@ SmmCpuFeaturesLibStmConstructor (
 
 /**
   Internal worker function that is called to complete CPU initialization at the
-  end of SmmCpuFeaturesInitializeProcessor()
+  end of SmmCpuFeaturesInitializeProcessor().
 
 **/
 VOID

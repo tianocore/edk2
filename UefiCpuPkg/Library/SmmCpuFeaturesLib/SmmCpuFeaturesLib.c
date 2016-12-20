@@ -43,7 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Internal worker function that is called to complete CPU initialization at the
-  end of SmmCpuFeaturesInitializeProcessor()
+  end of SmmCpuFeaturesInitializeProcessor().
 
 **/
 VOID
