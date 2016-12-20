@@ -4014,7 +4014,7 @@ typedef union {
     /// [Bit 14] If read as 1, Intel(R) Processor Trace (Intel PT) can be used
     /// in VMX operation. If the processor supports Intel PT but does not allow
     /// it to be used in VMX operation, execution of VMXON clears
-    /// IA32_RTIT_CTL.TraceEn (see “VMXON—Enter VMX Operation” in Chapter 30);
+    /// IA32_RTIT_CTL.TraceEn (see "VMXON-Enter VMX Operation" in Chapter 30);
     /// any attempt to set that bit while in VMX operation (including VMX root
     /// operation) using the WRMSR instruction causes a general-protection
     /// exception.
