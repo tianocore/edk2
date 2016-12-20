@@ -155,3 +155,11 @@
                                                                                      "TRUE  - SMM uses static page table for all memory.<BR>\n"
                                                                                      "FALSE - SMM uses static page table for below 4G memory and use on-demand paging for above 4G memory.<BR>"
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStmExceptionStackSize_PROMPT  #language en-US "STM exception stack size."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStmExceptionStackSize_HELP  #language en-US "Specifies buffer size in bytes for STM exception stack. The value should be a multiple of 4KB."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMsegSize_PROMPT  #language en-US "MSEG size."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMsegSize_HELP  #language en-US "Specifies buffer size in bytes of MSEG. The value should be a multiple of 4KB."
+
