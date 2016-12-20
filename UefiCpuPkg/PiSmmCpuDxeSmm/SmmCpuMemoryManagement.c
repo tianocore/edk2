@@ -1011,6 +1011,10 @@ GetUefiMemoryMap (
     }
   } while (Status == EFI_BUFFER_TOO_SMALL);
 
+  if (MemoryMap == NULL) {
+    return ;
+  }
+
   SortMemoryMap (MemoryMap, UefiMemoryMapSize, mUefiDescriptorSize);
   MergeMemoryMapForNotPresentEntry (MemoryMap, &UefiMemoryMapSize, mUefiDescriptorSize);
 
@@ -1079,6 +1083,10 @@ IsSmmCommBufferForbiddenAddress (
   EFI_MEMORY_DESCRIPTOR *MemoryMap;
   UINTN                 MemoryMapEntryCount;
   UINTN                 Index;
+
+  if (mUefiMemoryMap == NULL) {
+    return FALSE;
+  }
 
   MemoryMap = mUefiMemoryMap;
   MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
