@@ -154,7 +154,7 @@ formset
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_0,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA1),
             help       = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA1_HELP),
-            flags      = INTERACTIVE,
+            flags      = INTERACTIVE | RESET_REQUIRED,
             default    = 1,
     endcheckbox;
   endif;
@@ -164,7 +164,7 @@ formset
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_1,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA256),
             help       = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA256_HELP),
-            flags      = INTERACTIVE,
+            flags      = INTERACTIVE | RESET_REQUIRED,
             default    = 0,
     endcheckbox;
   endif;
@@ -174,7 +174,7 @@ formset
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_2,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA384),
             help       = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA384_HELP),
-            flags      = INTERACTIVE,
+            flags      = INTERACTIVE | RESET_REQUIRED,
             default    = 0,
     endcheckbox;
   endif;
@@ -184,7 +184,7 @@ formset
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_3,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA512),
             help       = STRING_TOKEN(STR_TCG2_PCR_BANK_SHA512_HELP),
-            flags      = INTERACTIVE,
+            flags      = INTERACTIVE | RESET_REQUIRED,
             default    = 0,
     endcheckbox;
   endif;
@@ -194,7 +194,7 @@ formset
             questionid = KEY_TPM2_PCR_BANKS_REQUEST_4,
             prompt     = STRING_TOKEN(STR_TCG2_PCR_BANK_SM3_256),
             help       = STRING_TOKEN(STR_TCG2_PCR_BANK_SM3_256_HELP),
-            flags      = INTERACTIVE,
+            flags      = INTERACTIVE | RESET_REQUIRED,
             default    = 0,
     endcheckbox;
   endif;
