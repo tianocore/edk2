@@ -68,61 +68,51 @@ CHAR16*
 EFIAPI
 PathCleanUpDirectories(
   IN CHAR16 *Path
-  )
+)
 {
   CHAR16  *TempString;
-  UINTN   TempSize;
 
-  if (Path==NULL) {
-    return(NULL);
+  if (Path == NULL) {
+    return NULL;
   }
+
   //
-  // Fix up the '/' vs '\'
+  // Replace the '/' with '\'
   //
-  for (TempString = Path ; TempString != NULL && *TempString != CHAR_NULL ; TempString++) {
+  for (TempString = Path; *TempString != CHAR_NULL; TempString++) {
     if (*TempString == L'/') {
       *TempString = L'\\';
     }
   }
+
   //
-  // Fix up the ..
+  // Remove all the "\.". E.g.: fs0:\abc\.\def\.
   //
-  while ((TempString = StrStr(Path, L"\\..\\")) != NULL) {
-    *TempString = CHAR_NULL;
-    TempString  += 4;
-    PathRemoveLastItem(Path);
-    TempSize = StrSize(TempString);
-    CopyMem(Path+StrLen(Path), TempString, TempSize);
+  while ((TempString = StrStr (Path, L"\\.\\")) != NULL) {
+    CopyMem (TempString, TempString + 2, StrSize (TempString + 2));
   }
-  if ((TempString = StrStr(Path, L"\\..")) != NULL && *(TempString + 3) == CHAR_NULL) {
-    *TempString = CHAR_NULL;
-    if (!PathRemoveLastItem(Path)) {
-      *TempString = L'\\';
-    }
+  if (StrCmp (Path + StrLen (Path) - 2, L"\\.") == 0) {
+    Path[StrLen (Path) - 1] = CHAR_NULL;
   }
+
   //
-  // Fix up the .
+  // Remove all the "\..". E.g.: fs0:\abc\..\def\..
   //
-  while ((TempString = StrStr(Path, L"\\.\\")) != NULL) {
-    *TempString = CHAR_NULL;
-    TempString  += 2;
-    TempSize = StrSize(TempString);
-    CopyMem(Path+StrLen(Path), TempString, TempSize);
-  }
-  if ((TempString = StrStr(Path, L"\\.")) != NULL && *(TempString + 2) == CHAR_NULL) {
+  while (((TempString = StrStr(Path, L"\\..")) != NULL) &&
+         ((*(TempString + 3) == L'\\') || (*(TempString + 3) == CHAR_NULL))
+        ) {
     *(TempString + 1) = CHAR_NULL;
+    PathRemoveLastItem(Path);
+    CopyMem (Path + StrLen (Path), TempString + 3, StrSize (TempString + 3));
   }
 
-  while ((TempString = StrStr(Path, L"\\\\")) != NULL) {
-    *TempString = CHAR_NULL;
-    TempString  += 1;
-    TempSize = StrSize(TempString);
-    CopyMem(Path+StrLen(Path), TempString, TempSize);
-  }
-  if ((TempString = StrStr(Path, L"\\\\")) != NULL && *(TempString + 1) == CHAR_NULL) {
-    *(TempString) = CHAR_NULL;
+  //
+  // Replace the "\\" with "\"
+  //
+  while ((TempString = StrStr (Path, L"\\\\")) != NULL) {
+    CopyMem (TempString, TempString + 1, StrSize (TempString + 1));
   }
 
-  return (Path);
+  return Path;
 }
 
