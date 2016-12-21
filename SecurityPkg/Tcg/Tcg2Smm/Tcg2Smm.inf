@@ -48,7 +48,7 @@
   DebugLib
   DxeServicesLib
   TpmMeasurementLib
-  Tpm2DeviceLib
+  Tpm2CommandLib
   Tcg2PhysicalPresenceLib
   IoLib
 
