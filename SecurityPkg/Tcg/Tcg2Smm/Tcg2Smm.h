@@ -35,9 +35,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Library/TpmMeasurementLib.h>
-#include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2CommandLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Library/IoLib.h>
+#include <Library/PrintLib.h>
 
 #include <IndustryStandard/TpmPtp.h>
 
@@ -93,5 +94,12 @@ typedef struct {
 //
 #define PHYSICAL_PRESENCE_VERSION_TAG                              "$PV"
 #define PHYSICAL_PRESENCE_VERSION_SIZE                             4
+
+//
+// PNP _HID for TPM2 device
+//
+#define TPM_HID_TAG                                                "NNN0000"
+#define TPM_HID_PNP_SIZE                                           8
+#define TPM_HID_ACPI_SIZE                                          9
 
 #endif  // __TCG_SMM_H__

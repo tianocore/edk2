@@ -303,6 +303,108 @@ UpdatePPVersion (
 }
 
 /**
+  Patch TPM2 device HID string.  The initial string tag in TPM2 ACPI table is "NNN0000".
+
+  @param[in, out] Table          The TPM2 SSDT ACPI table.
+
+  @return                               HID Update status.
+
+**/
+EFI_STATUS
+UpdateHID (
+  EFI_ACPI_DESCRIPTION_HEADER    *Table
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       *DataPtr;
+  CHAR8       HID[TPM_HID_ACPI_SIZE];
+  UINT32      ManufacturerID;
+  UINT32      FirmwareVersion1;
+  UINT32      FirmwareVersion2;
+  BOOLEAN     PnpHID;
+
+  PnpHID = TRUE;
+
+  //
+  // Initialize HID with Default PNP string
+  //
+  ZeroMem(HID, TPM_HID_ACPI_SIZE);
+  CopyMem(HID, TPM_HID_TAG, TPM_HID_PNP_SIZE);
+
+  //
+  // Get Manufacturer ID
+  //
+  Status = Tpm2GetCapabilityManufactureID(&ManufacturerID);
+  if (!EFI_ERROR(Status)) {
+    DEBUG((EFI_D_INFO, "TPM_PT_MANUFACTURER 0x%08x\n", ManufacturerID));
+    //
+    // ManfacturerID defined in TCG Vendor ID Registry 
+    // may tailed with 0x00 or 0x20
+    //
+    if ((ManufacturerID >> 24) == 0x00 || ((ManufacturerID >> 24) == 0x20)) {
+      //
+      //  HID containing PNP ID "NNN####"
+      //   NNN is uppercase letter for Vendor ID specified by manufacturer
+      //
+      CopyMem(HID, &ManufacturerID, 3);
+    } else {
+      //
+      //  HID containing ACP ID "NNNN####"
+      //   NNNN is uppercase letter for Vendor ID specified by manufacturer
+      //
+      CopyMem(HID, &ManufacturerID, 4);
+      PnpHID = FALSE;
+    }
+  } else {
+    DEBUG ((EFI_D_ERROR, "Get TPM_PT_MANUFACTURER failed %x!\n", Status));
+    ASSERT(FALSE);
+    return Status;
+  }
+
+  Status = Tpm2GetCapabilityFirmwareVersion(&FirmwareVersion1, &FirmwareVersion2);
+  if (!EFI_ERROR(Status)) {
+    DEBUG((EFI_D_INFO, "TPM_PT_FIRMWARE_VERSION_1 0x%x\n", FirmwareVersion1));
+    DEBUG((EFI_D_INFO, "TPM_PT_FIRMWARE_VERSION_2 0x%x\n", FirmwareVersion2));
+    //
+    //   #### is Firmware Version 1
+    //
+    if (PnpHID) {
+      AsciiSPrint(HID + 3, TPM_HID_PNP_SIZE - 3, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
+    } else {
+      AsciiSPrint(HID + 4, TPM_HID_ACPI_SIZE - 4, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
+    }
+    
+  } else {
+    DEBUG ((EFI_D_ERROR, "Get TPM_PT_FIRMWARE_VERSION_X failed %x!\n", Status));
+    ASSERT(FALSE);
+    return Status;
+  }
+
+  //
+  // Patch HID in ASL code before loading the SSDT.
+  //
+  for (DataPtr  = (UINT8 *)(Table + 1);
+       DataPtr <= (UINT8 *) ((UINT8 *) Table + Table->Length - TPM_HID_PNP_SIZE);
+       DataPtr += 1) {
+    if (AsciiStrCmp((CHAR8 *)DataPtr,  TPM_HID_TAG) == 0) {
+      if (PnpHID) {
+        CopyMem(DataPtr, HID, TPM_HID_PNP_SIZE);
+      } else {
+        //
+        // NOOP will be patched to '\0'
+        //
+        CopyMem(DataPtr, HID, TPM_HID_ACPI_SIZE);
+      }
+      DEBUG((EFI_D_INFO, "TPM2 ACPI _HID updated to %a\n", HID));
+      return Status;
+    }
+  }
+
+  DEBUG((EFI_D_ERROR, "TPM2 ACPI HID TAG for patch not found!\n"));
+  return EFI_NOT_FOUND;
+}
+
+/**
   Initialize and publish TPM items in ACPI table.
 
   @retval   EFI_SUCCESS     The TCG ACPI table is published successfully.
@@ -334,6 +436,14 @@ PublishAcpiTable (
   //
   Status = UpdatePPVersion(Table, (CHAR8 *)PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer));
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Update TPM2 HID before measuring it to PCR
+  //
+  Status = UpdateHID(Table);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
 
   //
   // Measure to PCR[0] with event EV_POST_CODE ACPI DATA

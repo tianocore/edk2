@@ -30,8 +30,14 @@ DefinitionBlock (
       //
       // TCG2
       //
-      Name (_HID, "MSFT0101")
-      
+      Name (_HID, "NNN0000")
+      //
+      // Reserve 1 more byte for ACPI HID
+      //
+      Noop
+
+      Name (_CID, "MSFT0101")
+
       //
       // Readable name of this device, don't know if this way is correct yet
       //
