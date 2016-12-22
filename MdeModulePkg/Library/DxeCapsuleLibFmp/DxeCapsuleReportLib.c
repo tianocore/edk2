@@ -104,7 +104,7 @@ IsFmpCapsuleProcessed (
     CapsuleResult = &mCapsuleResultVariableCache[Index].CapsuleResultHeader;
     if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER)) {
       if (CompareGuid(&CapsuleResult->CapsuleGuid, &gEfiFmpCapsuleGuid)) {
-        if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP)) {
+        if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16) * 2) {
           CapsuleResultFmp = (EFI_CAPSULE_RESULT_VARIABLE_FMP *)(CapsuleResult + 1);
           if (CompareGuid(&CapsuleResultFmp->UpdateImageTypeId, &ImageHeader->UpdateImageTypeId) &&
               (CapsuleResultFmp->UpdateImageIndex == ImageHeader->UpdateImageIndex) &&
@@ -256,6 +256,7 @@ RecordCapsuleStatusVariable (
   EFI_STATUS                          Status;
 
   CapsuleResultVariable.VariableTotalSize = sizeof(CapsuleResultVariable);
+  CapsuleResultVariable.Reserved = 0;
   CopyGuid (&CapsuleResultVariable.CapsuleGuid, &CapsuleHeader->CapsuleGuid);
   ZeroMem(&CapsuleResultVariable.CapsuleProcessed, sizeof(CapsuleResultVariable.CapsuleProcessed));
   gRT->GetTime(&CapsuleResultVariable.CapsuleProcessed, NULL);
@@ -298,13 +299,17 @@ RecordFmpCapsuleStatusVariable (
   UINT32                              CapsuleResultVariableSize;
 
   CapsuleResultVariable     = NULL;
-  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP);
-  CapsuleResultVariable     = AllocatePool (CapsuleResultVariableSize);
+  //
+  // Allocate zero CHAR16 for CapsuleFileName and CapsuleTarget.
+  //
+  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16) * 2;
+  CapsuleResultVariable     = AllocateZeroPool (CapsuleResultVariableSize);
   if (CapsuleResultVariable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   CapsuleResultVariableHeader = (VOID *)CapsuleResultVariable;
   CapsuleResultVariableHeader->VariableTotalSize = CapsuleResultVariableSize;
+  CapsuleResultVariableHeader->Reserved = 0;
   CopyGuid(&CapsuleResultVariableHeader->CapsuleGuid, &CapsuleHeader->CapsuleGuid);
   ZeroMem(&CapsuleResultVariableHeader->CapsuleProcessed, sizeof(CapsuleResultVariableHeader->CapsuleProcessed));
   gRT->GetTime(&CapsuleResultVariableHeader->CapsuleProcessed, NULL);
