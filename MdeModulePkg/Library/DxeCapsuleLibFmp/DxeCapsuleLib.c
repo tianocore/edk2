@@ -1013,8 +1013,7 @@ ProcessFmpCapsuleImage (
             continue;
           }
 
-          if (CompareGuid(&ImageHeader->UpdateImageTypeId, &TempFmpImageInfo->ImageTypeId) &&
-              ImageHeader->UpdateImageIndex == TempFmpImageInfo->ImageIndex) {
+          if (CompareGuid(&ImageHeader->UpdateImageTypeId, &TempFmpImageInfo->ImageTypeId)) {
             AbortReason = NULL;
             if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
               if(ImageHeader->UpdateHardwareInstance != 0){
