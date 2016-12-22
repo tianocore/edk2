@@ -306,6 +306,11 @@ AuthenticateFmpImage (
     return RETURN_UNSUPPORTED;
   }
 
+  if ((PublicKeyDataLength % SHA256_DIGEST_SIZE) != 0) {
+    DEBUG ((DEBUG_ERROR, "PublicKeyDataLength is not multiple SHA256 size\n"));
+    return RETURN_UNSUPPORTED;
+  }
+
   if (ImageSize < sizeof(EFI_FIRMWARE_IMAGE_AUTHENTICATION)) {
     DEBUG((DEBUG_ERROR, "AuthenticateFmpImage - ImageSize too small\n"));
     return RETURN_INVALID_PARAMETER;
