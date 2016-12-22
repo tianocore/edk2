@@ -415,6 +415,8 @@ ExtractAuthenticatedImage (
   } else {
     return FALSE;
   }
+  ASSERT (PublicKeyData != NULL);
+  ASSERT (PublicKeyDataLength != 0);
 
   Status = AuthenticateFmpImage(
              ImageAuth,
