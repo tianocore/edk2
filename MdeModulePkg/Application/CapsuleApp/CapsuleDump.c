@@ -293,6 +293,8 @@ DmpCapsuleStatusVariable (
   UINTN                               CapsuleFileNameSize;
   CHAR16                              CapsuleIndexData[12];
   CHAR16                              *CapsuleIndex;
+  CHAR16                              *CapsuleFileName;
+  CHAR16                              *CapsuleTarget;
 
   Status = GetVariable2(
              L"CapsuleMax",
@@ -353,19 +355,17 @@ DmpCapsuleStatusVariable (
     }
 
     if (CompareGuid(&CapsuleResult->CapsuleGuid, &gEfiFmpCapsuleGuid)) {
-      if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP)) {
+      if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16) * 2) {
         CapsuleResultFmp = (EFI_CAPSULE_RESULT_VARIABLE_FMP *)(CapsuleResult + 1);
         Print(L"  Capsule FMP Version: 0x%x\n", CapsuleResultFmp->Version);
         Print(L"  Capsule FMP PayloadIndex: 0x%x\n", CapsuleResultFmp->PayloadIndex);
         Print(L"  Capsule FMP UpdateImageIndex: 0x%x\n", CapsuleResultFmp->UpdateImageIndex);
         Print(L"  Capsule FMP UpdateImageTypeId: %g\n", &CapsuleResultFmp->UpdateImageTypeId);
-        if (CapsuleResult->VariableTotalSize > sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP)) {
-          Print(L"  Capsule FMP CapsuleFileName: %s\n", (CapsuleResultFmp + 1));
-          CapsuleFileNameSize = StrSize((CHAR16 *)(CapsuleResultFmp + 1));
-          if (CapsuleResult->VariableTotalSize > sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + CapsuleFileNameSize) {
-            Print(L"  Capsule FMP CapsuleTarget: %s\n", (UINT8 *)(CapsuleResultFmp + 1) + CapsuleFileNameSize);
-          }
-        }
+        CapsuleFileName = (CHAR16 *)(CapsuleResultFmp + 1);
+        Print(L"  Capsule FMP CapsuleFileName: \"%s\"\n", CapsuleFileName);
+        CapsuleFileNameSize = StrSize(CapsuleFileName);
+        CapsuleTarget = (CHAR16 *)((UINTN)CapsuleFileName + CapsuleFileNameSize);
+        Print(L"  Capsule FMP CapsuleTarget: \"%s\"\n", CapsuleTarget);
       }
     }
 
