@@ -591,9 +591,11 @@ EfiHttpRequest (
 
   Status = HttpGenRequestMessage (HttpMsg, FileUrl, &RequestMsg, &RequestMsgSize);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || NULL == RequestMsg) {
     goto Error3;
   }
+
+  ASSERT (RequestMsg != NULL);
 
   //
   // Every request we insert a TxToken and a response call would remove the TxToken.

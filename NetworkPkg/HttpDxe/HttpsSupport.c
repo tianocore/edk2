@@ -401,32 +401,36 @@ TlsConfigCertificate (
                    NULL
                    );
 
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    //
-    // Allocate buffer and read the config variable.
-    //
-    CACert = AllocatePool (CACertSize);
-    if (CACert == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Status = gRT->GetVariable (
-                    EFI_TLS_CA_CERTIFICATE_VARIABLE,
-                    &gEfiTlsCaCertificateGuid,
-                    NULL,
-                    &CACertSize,
-                    CACert
-                    );
-    if (EFI_ERROR (Status)) {
-      //
-      // GetVariable still error or the variable is corrupted.
-      // Fall back to the default value.
-      //
-      FreePool (CACert);
-
-      return EFI_NOT_FOUND;
-    }
+  if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
+    return Status;
   }
+
+  //
+  // Allocate buffer and read the config variable.
+  //
+  CACert = AllocatePool (CACertSize);
+  if (CACert == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gRT->GetVariable (
+                  EFI_TLS_CA_CERTIFICATE_VARIABLE,
+                  &gEfiTlsCaCertificateGuid,
+                  NULL,
+                  &CACertSize,
+                  CACert
+                  );
+  if (EFI_ERROR (Status)) {
+    //
+    // GetVariable still error or the variable is corrupted.
+    // Fall back to the default value.
+    //
+    FreePool (CACert);
+
+    return EFI_NOT_FOUND;
+  }
+
+  ASSERT (CACert != NULL);
 
   //
   // Enumerate all data and erasing the target item.
@@ -1037,6 +1041,11 @@ TlsConnectSession (
   //
   PacketOut = NetbufAlloc ((UINT32) BufferOutSize);
   DataOut = NetbufAllocSpace (PacketOut, (UINT32) BufferOutSize, NET_BUF_TAIL);
+  if (DataOut == NULL) {
+    FreePool (BufferOut);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
   CopyMem (DataOut, BufferOut, BufferOutSize);
   Status = TlsCommonTransmit (HttpInstance, PacketOut);
 
@@ -1107,6 +1116,7 @@ TlsConnectSession (
     FreePool (BufferIn);
 
     if (EFI_ERROR (Status)) {
+      FreePool (BufferOut);
       return Status;
     }
 
@@ -1116,6 +1126,11 @@ TlsConnectSession (
       //
       PacketOut = NetbufAlloc ((UINT32) BufferOutSize);
       DataOut = NetbufAllocSpace (PacketOut, (UINT32) BufferOutSize, NET_BUF_TAIL);
+      if (DataOut == NULL) {
+        FreePool (BufferOut);
+        return EFI_OUT_OF_RESOURCES;
+      }
+      
       CopyMem (DataOut, BufferOut, BufferOutSize);
 
       Status = TlsCommonTransmit (HttpInstance, PacketOut);
@@ -1267,6 +1282,11 @@ TlsCloseSession (
 
   PacketOut = NetbufAlloc ((UINT32) BufferOutSize);
   DataOut = NetbufAllocSpace (PacketOut, (UINT32) BufferOutSize, NET_BUF_TAIL);
+  if (DataOut == NULL) {
+    FreePool (BufferOut);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  
   CopyMem (DataOut, BufferOut, BufferOutSize);
 
   Status = TlsCommonTransmit (HttpInstance, PacketOut);
@@ -1540,6 +1560,11 @@ HttpsReceive (
         if (BufferOutSize != 0) {
           PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
           DataOut = NetbufAllocSpace (PacketOut, (UINT32) BufferOutSize, NET_BUF_TAIL);
+          if (DataOut == NULL) {
+            FreePool (BufferOut);
+            return EFI_OUT_OF_RESOURCES;
+          }
+          
           CopyMem (DataOut, BufferOut, BufferOutSize);
 
           Status = TlsCommonTransmit (HttpInstance, PacketOut);
@@ -1627,6 +1652,11 @@ HttpsReceive (
     if (BufferOutSize != 0) {
       PacketOut = NetbufAlloc ((UINT32) BufferOutSize);
       DataOut = NetbufAllocSpace (PacketOut, (UINT32) BufferOutSize, NET_BUF_TAIL);
+      if (DataOut == NULL) {
+        FreePool (BufferOut);
+        return EFI_OUT_OF_RESOURCES;
+      }
+      
       CopyMem (DataOut, BufferOut, BufferOutSize);
 
       Status = TlsCommonTransmit (HttpInstance, PacketOut);

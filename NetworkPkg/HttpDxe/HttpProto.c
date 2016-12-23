@@ -1655,6 +1655,8 @@ HttpTcpTransmit (
   UINTN                     UrlSize;
   UINTN                     RequestMsgSize;
 
+  RequestMsg = NULL;
+
   ValueInItem = (HTTP_TOKEN_WRAP *) Item->Value;
   if (ValueInItem->TcpWrap.IsTxDone) {
     return EFI_SUCCESS;
@@ -1682,9 +1684,11 @@ HttpTcpTransmit (
                  );
   FreePool (Url);
 
-  if (EFI_ERROR (Status)){
+  if (EFI_ERROR (Status) || NULL == RequestMsg){
     return Status;
   }
+
+  ASSERT (RequestMsg != NULL);
 
   //
   // Transmit the request message.
