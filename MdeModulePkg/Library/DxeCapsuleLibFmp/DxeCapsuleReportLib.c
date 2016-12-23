@@ -35,17 +35,6 @@
 
 #include <IndustryStandard/WindowsUxCapsule.h>
 
-typedef struct {
-  EFI_CAPSULE_RESULT_VARIABLE_HEADER  CapsuleResultHeader;
-  EFI_CAPSULE_RESULT_VARIABLE_FMP     CapsuleResultFmp;
-} CAPSULE_RESULT_VARIABLE_CACHE;
-
-#define CAPSULE_RESULT_VARIABLE_CACHE_COUNT   0x10
-
-CAPSULE_RESULT_VARIABLE_CACHE *mCapsuleResultVariableCache;
-UINTN                         mCapsuleResultVariableCacheMaxCount;
-UINTN                         mCapsuleResultVariableCacheCount;
-
 /**
   Get current capsule last variable index.
 
@@ -75,92 +64,6 @@ GetCurrentCapsuleLastIndex (
   }
   CurrentIndex = (UINT16)StrHexToUintn(&CapsuleLastStr[sizeof("Capsule") - 1]);
   return CurrentIndex;
-}
-
-/**
-  Check if this FMP capsule is processed.
-
-  @param[in] CapsuleHeader  The capsule image header
-  @param[in] PayloadIndex   FMP payload index
-  @param[in] ImageHeader    FMP image header
-
-  @retval TRUE  This FMP capsule is processed.
-  @retval FALSE This FMP capsule is not processed.
-**/
-BOOLEAN
-IsFmpCapsuleProcessed (
-  IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
-  IN UINTN                                         PayloadIndex,
-  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
-  )
-{
-  UINTN                               Index;
-  EFI_CAPSULE_RESULT_VARIABLE_HEADER  *CapsuleResult;
-  EFI_CAPSULE_RESULT_VARIABLE_FMP     *CapsuleResultFmp;
-
-  for (Index = 0; Index < mCapsuleResultVariableCacheCount; Index++) {
-    //
-    // Check
-    //
-    CapsuleResult = &mCapsuleResultVariableCache[Index].CapsuleResultHeader;
-    if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER)) {
-      if (CompareGuid(&CapsuleResult->CapsuleGuid, &gEfiFmpCapsuleGuid)) {
-        if (CapsuleResult->VariableTotalSize >= sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16) * 2) {
-          CapsuleResultFmp = (EFI_CAPSULE_RESULT_VARIABLE_FMP *)(CapsuleResult + 1);
-          if (CompareGuid(&CapsuleResultFmp->UpdateImageTypeId, &ImageHeader->UpdateImageTypeId) &&
-              (CapsuleResultFmp->UpdateImageIndex == ImageHeader->UpdateImageIndex) &&
-              (CapsuleResultFmp->PayloadIndex == PayloadIndex) ) {
-            return TRUE;
-          }
-        }
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  Write a new capsule status variable cache.
-
-  @param[in] CapsuleResult      The capsule status variable
-  @param[in] CapsuleResultSize  The size of the capsule stauts variable in bytes
-
-  @retval EFI_SUCCESS          The capsule status variable is cached.
-  @retval EFI_OUT_OF_RESOURCES No resource to cache the capsule status variable.
-**/
-EFI_STATUS
-WriteNewCapsuleResultVariableCache (
-  IN VOID    *CapsuleResult,
-  IN UINTN   CapsuleResultSize
-  )
-{
-  if (CapsuleResultSize > sizeof(CAPSULE_RESULT_VARIABLE_CACHE)) {
-    CapsuleResultSize = sizeof(CAPSULE_RESULT_VARIABLE_CACHE);
-  }
-
-  if (mCapsuleResultVariableCacheCount == mCapsuleResultVariableCacheMaxCount) {
-    mCapsuleResultVariableCache = ReallocatePool(
-                                    mCapsuleResultVariableCacheMaxCount * sizeof(CAPSULE_RESULT_VARIABLE_CACHE),
-                                    (mCapsuleResultVariableCacheMaxCount + CAPSULE_RESULT_VARIABLE_CACHE_COUNT) * sizeof(CAPSULE_RESULT_VARIABLE_CACHE),
-                                    mCapsuleResultVariableCache
-                                    );
-    if (mCapsuleResultVariableCache == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    mCapsuleResultVariableCacheMaxCount += CAPSULE_RESULT_VARIABLE_CACHE_COUNT;
-  }
-
-  ASSERT(mCapsuleResultVariableCacheCount < mCapsuleResultVariableCacheMaxCount);
-  ASSERT(mCapsuleResultVariableCache != NULL);
-  CopyMem(
-    &mCapsuleResultVariableCache[mCapsuleResultVariableCacheCount],
-    CapsuleResult,
-    CapsuleResultSize
-    );
-  mCapsuleResultVariableCacheCount++;
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -262,11 +165,7 @@ RecordCapsuleStatusVariable (
   gRT->GetTime(&CapsuleResultVariable.CapsuleProcessed, NULL);
   CapsuleResultVariable.CapsuleStatus = CapsuleStatus;
 
-  //
-  // Save Local Cache
-  //
-  Status = WriteNewCapsuleResultVariableCache(&CapsuleResultVariable, sizeof(CapsuleResultVariable));
-
+  Status = EFI_SUCCESS;
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     Status = WriteNewCapsuleResultVariable(&CapsuleResultVariable, sizeof(CapsuleResultVariable));
   }
@@ -338,11 +237,7 @@ RecordFmpCapsuleStatusVariable (
     DevicePathStr = NULL;
   }
 
-  //
-  // Save Local Cache
-  //
-  Status = WriteNewCapsuleResultVariableCache(CapsuleResultVariable, CapsuleResultVariableSize);
-
+  Status = EFI_SUCCESS;
   if ((CapsuleHeader->Flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) != 0) {
     Status = WriteNewCapsuleResultVariable(CapsuleResultVariable, CapsuleResultVariableSize);
   }
