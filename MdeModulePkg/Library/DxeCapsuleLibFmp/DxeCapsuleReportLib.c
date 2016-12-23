@@ -30,6 +30,7 @@
 #include <Library/HobLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/CapsuleLib.h>
 
 #include <IndustryStandard/WindowsUxCapsule.h>
@@ -280,6 +281,7 @@ RecordCapsuleStatusVariable (
   @param[in] CapsuleStatus  The capsule process stauts
   @param[in] PayloadIndex   FMP payload index
   @param[in] ImageHeader    FMP image header
+  @param[in] FmpDevicePath  DevicePath associated with the FMP producer
 
   @retval EFI_SUCCESS          The capsule status variable is recorded.
   @retval EFI_OUT_OF_RESOURCES No resource to record the capsule status variable.
@@ -289,26 +291,37 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
-  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
+  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
+  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath OPTIONAL
   )
 {
   EFI_CAPSULE_RESULT_VARIABLE_HEADER  *CapsuleResultVariableHeader;
   EFI_CAPSULE_RESULT_VARIABLE_FMP     *CapsuleResultVariableFmp;
   EFI_STATUS                          Status;
   UINT8                               *CapsuleResultVariable;
-  UINT32                              CapsuleResultVariableSize;
+  UINTN                               CapsuleResultVariableSize;
+  CHAR16                              *DevicePathStr;
+  UINTN                               DevicePathStrSize;
 
-  CapsuleResultVariable     = NULL;
+  DevicePathStr = NULL;
+  if (FmpDevicePath != NULL) {
+    DevicePathStr = ConvertDevicePathToText (FmpDevicePath, FALSE, FALSE);
+  }
+  if (DevicePathStr != NULL) {
+    DevicePathStrSize = StrSize(DevicePathStr);
+  } else {
+    DevicePathStrSize = sizeof(CHAR16);
+  }
   //
-  // Allocate zero CHAR16 for CapsuleFileName and CapsuleTarget.
+  // Allocate zero CHAR16 for CapsuleFileName.
   //
-  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16) * 2;
+  CapsuleResultVariableSize = sizeof(EFI_CAPSULE_RESULT_VARIABLE_HEADER) + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16) + DevicePathStrSize;
   CapsuleResultVariable     = AllocateZeroPool (CapsuleResultVariableSize);
   if (CapsuleResultVariable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
   CapsuleResultVariableHeader = (VOID *)CapsuleResultVariable;
-  CapsuleResultVariableHeader->VariableTotalSize = CapsuleResultVariableSize;
+  CapsuleResultVariableHeader->VariableTotalSize = (UINT32)CapsuleResultVariableSize;
   CapsuleResultVariableHeader->Reserved = 0;
   CopyGuid(&CapsuleResultVariableHeader->CapsuleGuid, &CapsuleHeader->CapsuleGuid);
   ZeroMem(&CapsuleResultVariableHeader->CapsuleProcessed, sizeof(CapsuleResultVariableHeader->CapsuleProcessed));
@@ -320,6 +333,11 @@ RecordFmpCapsuleStatusVariable (
   CapsuleResultVariableFmp->PayloadIndex = (UINT8)PayloadIndex;
   CapsuleResultVariableFmp->UpdateImageIndex = ImageHeader->UpdateImageIndex;
   CopyGuid (&CapsuleResultVariableFmp->UpdateImageTypeId, &ImageHeader->UpdateImageTypeId);
+  if (DevicePathStr != NULL) {
+    CopyMem ((UINT8 *)CapsuleResultVariableFmp + sizeof(EFI_CAPSULE_RESULT_VARIABLE_FMP) + sizeof(CHAR16), DevicePathStr, DevicePathStrSize);
+    FreePool (DevicePathStr);
+    DevicePathStr = NULL;
+  }
 
   //
   // Save Local Cache

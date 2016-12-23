@@ -100,6 +100,7 @@ RecordCapsuleStatusVariable (
   @param[in] CapsuleStatus  The capsule process stauts
   @param[in] PayloadIndex   FMP payload index
   @param[in] ImageHeader    FMP image header
+  @param[in] FmpDevicePath  DevicePath associated with the FMP producer
 
   @retval EFI_SUCCESS          The capsule status variable is recorded.
   @retval EFI_OUT_OF_RESOURCES No resource to record the capsule status variable.
@@ -109,7 +110,8 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
-  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader
+  IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
+  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath OPTIONAL
   );
 
 /**
@@ -818,6 +820,7 @@ ProcessFmpCapsuleImage (
   UINTN                                         Index2;
   MEMMAP_DEVICE_PATH                            MemMapNode;
   EFI_DEVICE_PATH_PROTOCOL                      *DriverDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath;
   ESRT_MANAGEMENT_PROTOCOL                      *EsrtProtocol;
   EFI_SYSTEM_RESOURCE_ENTRY                     EsrtEntry;
   VOID                                          *VendorCode;
@@ -941,6 +944,13 @@ ProcessFmpCapsuleImage (
         continue;
       }
 
+      FmpDevicePath = NULL;
+      gBS->HandleProtocol(
+             HandleBuffer[Index1],
+             &gEfiDevicePathProtocolGuid,
+             (VOID **)&FmpDevicePath
+             );
+
       ImageInfoSize = 0;
       Status = Fmp->GetImageInfo (
                       Fmp,
@@ -1060,7 +1070,8 @@ ProcessFmpCapsuleImage (
               CapsuleHeader,                                 // CapsuleGuid
               Status,                                        // CapsuleStatus
               Index - FmpCapsuleHeader->EmbeddedDriverCount, // PayloadIndex
-              ImageHeader                                    // ImageHeader
+              ImageHeader,                                   // ImageHeader
+              FmpDevicePath                                  // FmpDevicePath
               );
             if (StatusRet != EFI_SUCCESS) {
               StatusRet = Status;
