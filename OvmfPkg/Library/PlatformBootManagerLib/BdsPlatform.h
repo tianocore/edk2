@@ -1,7 +1,7 @@
 /** @file
   Platform BDS customizations include file.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -65,6 +65,7 @@ Abstract:
 #include <Guid/HobList.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/EventGroup.h>
+#include <Guid/DebugAgentGuid.h>
 
 #include <OvmfPlatforms.h>
 
@@ -142,6 +143,16 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
       } \
     }, \
     DEVICE_PATH_MESSAGING_PC_ANSI \
+  }
+
+#define gEndEntire \
+  { \
+    END_DEVICE_PATH_TYPE, \
+    END_ENTIRE_DEVICE_PATH_SUBTYPE, \
+    { \
+      END_DEVICE_PATH_LENGTH, \
+      0 \
+    } \
   }
 
 #define PCI_CLASS_SCC          0x07
