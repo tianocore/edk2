@@ -44,6 +44,10 @@
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
+  # Note: Secure Boot feature highly depends on the OpenSSL building. To enable this 
+  #       feature, please follow the instructions found in the file "Patch-HOWTO.txt" 
+  #       located in CryptoPkg\Library\OpensslLib to enable the OpenSSL building first.
+  #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   
   #
@@ -51,7 +55,11 @@
   # These can be changed on the command line.
   # -D FLAG=VALUE
   #
-  DEFINE TLS_ENABLE      = TRUE
+  # Note: TLS feature highly depends on the OpenSSL building. To enable this 
+  #       feature, please follow the instructions found in the file "Patch-HOWTO.txt" 
+  #       located in CryptoPkg\Library\OpensslLib to enable the OpenSSL building first.
+  #
+  DEFINE TLS_ENABLE      = FALSE
 
 ################################################################################
 #
