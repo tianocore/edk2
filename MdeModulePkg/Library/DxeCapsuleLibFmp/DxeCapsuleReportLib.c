@@ -167,7 +167,7 @@ WriteNewCapsuleResultVariableCache (
   Get a new capsule status variable index.
 
   @return A new capsule status variable index.
-  @retval -1  No new capsule status variable index.
+  @retval 0  No new capsule status variable index. Rolling over.
 **/
 INTN
 GetNewCapsuleResultIndex (
@@ -178,7 +178,8 @@ GetNewCapsuleResultIndex (
 
   CurrentIndex = GetCurrentCapsuleLastIndex();
   if (CurrentIndex >= PcdGet16(PcdCapsuleMax)) {
-    return -1;
+    DEBUG((DEBUG_INFO, "  CapsuleResult variable Rolling Over!\n"));
+    return 0;
   }
 
   return CurrentIndex + 1;
@@ -206,9 +207,7 @@ WriteNewCapsuleResultVariable (
 
   CapsuleResultIndex = GetNewCapsuleResultIndex();
   DEBUG((DEBUG_INFO, "New CapsuleResultIndex - 0x%x\n", CapsuleResultIndex));
-  if (CapsuleResultIndex == -1) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+
   UnicodeSPrint(
     CapsuleResultStr,
     sizeof(CapsuleResultStr),
