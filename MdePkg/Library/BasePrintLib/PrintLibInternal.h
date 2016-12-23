@@ -213,4 +213,65 @@ BasePrintLibConvertValueToString (
   IN UINTN       Increment
   );
 
+/**
+  Internal function that converts a decimal value to a Null-terminated string.
+
+  Converts the decimal number specified by Value to a Null-terminated string
+  specified by Buffer containing at most Width characters. If Width is 0 then a
+  width of MAXIMUM_VALUE_CHARACTERS is assumed. If the conversion contains more
+  than Width characters, then only the first Width characters are placed in
+  Buffer. Additional conversion parameters are specified in Flags.
+  The Flags bit LEFT_JUSTIFY is always ignored.
+  All conversions are left justified in Buffer.
+  If Width is 0, PREFIX_ZERO is ignored in Flags.
+  If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and
+  commas are inserted every 3rd digit starting from the right.
+  If Value is < 0, then the fist character in Buffer is a '-'.
+  If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored,
+  then Buffer is padded with '0' characters so the combination of the optional
+  '-' sign character, '0' characters, digit characters for Value, and the
+  Null-terminator add up to Width characters.
+
+  If an error would be returned, the function will ASSERT().
+
+  @param  Buffer      The pointer to the output buffer for the produced
+                      Null-terminated string.
+  @param  BufferSize  The size of Buffer in bytes, including the
+                      Null-terminator.
+  @param  Flags       The bitmask of flags that specify left justification,
+                      zero pad, and commas.
+  @param  Value       The 64-bit signed value to convert to a string.
+  @param  Width       The maximum number of characters to place in Buffer,
+                      not including the Null-terminator.
+  @param  Increment   The character increment in Buffer.
+
+  @retval RETURN_SUCCESS           The decimal value is converted.
+  @retval RETURN_BUFFER_TOO_SMALL  If BufferSize cannot hold the converted
+                                   value.
+  @retval RETURN_INVALID_PARAMETER If Buffer is NULL.
+                                   If Increment is 1 and
+                                   PcdMaximumAsciiStringLength is not zero,
+                                   BufferSize is greater than
+                                   PcdMaximumAsciiStringLength.
+                                   If Increment is not 1 and
+                                   PcdMaximumUnicodeStringLength is not zero,
+                                   BufferSize is greater than
+                                   (PcdMaximumUnicodeStringLength *
+                                   sizeof (CHAR16) + 1).
+                                   If unsupported bits are set in Flags.
+                                   If both COMMA_TYPE and RADIX_HEX are set in
+                                   Flags.
+                                   If Width >= MAXIMUM_VALUE_CHARACTERS.
+
+**/
+RETURN_STATUS
+BasePrintLibConvertValueToStringS (
+  IN OUT CHAR8   *Buffer,
+  IN UINTN       BufferSize,
+  IN UINTN       Flags,
+  IN INT64       Value,
+  IN UINTN       Width,
+  IN UINTN       Increment
+  );
+
 #endif
