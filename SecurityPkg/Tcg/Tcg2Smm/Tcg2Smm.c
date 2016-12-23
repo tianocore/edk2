@@ -77,13 +77,14 @@ EFI_TPM2_ACPI_TABLE  mTpm2AcpiTemplate = {
   {
     EFI_ACPI_5_0_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE,
     sizeof (mTpm2AcpiTemplate),
-    EFI_TPM2_ACPI_TABLE_REVISION,
+    EFI_TPM2_ACPI_TABLE_REVISION_4,
     //
     // Compiler initializes the remaining bytes to 0
     // These fields should be filled in in production
     //
   },
-  0, // Flags
+  0, // 16-bit PlatformClass
+  0, // 16-bit Reserved
   0, // Control Area
   EFI_TPM2_ACPI_TABLE_START_METHOD_TIS, // StartMethod
 };
@@ -507,6 +508,9 @@ PublishTpm2 (
   UINT64                         OemTableId;
   EFI_TPM2_ACPI_CONTROL_AREA     *ControlArea;
   PTP_INTERFACE_TYPE             InterfaceType;
+
+  mTpm2AcpiTemplate.Header.Revision = PcdGet8(PcdTpm2AcpiTableRev);
+  DEBUG((DEBUG_INFO, "Tpm2 ACPI table revision is %d\n", mTpm2AcpiTemplate.Header.Revision));
 
   //
   // Measure to PCR[0] with event EV_POST_CODE ACPI DATA

@@ -481,6 +481,7 @@ Tcg2VersionInfoCallback (
 {
   EFI_INPUT_KEY                 Key;
   UINT64                        PcdTcg2PpiVersion;
+  UINT8                         PcdTpm2AcpiTableRev;
 
   ASSERT (Action == EFI_BROWSER_ACTION_SUBMITTED);
 
@@ -503,6 +504,24 @@ Tcg2VersionInfoCallback (
         &Key,
         L"WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and does not map to this option!",
         L"The version configuring by this setup option will not work!",
+        NULL
+        );
+    }
+  } else if (QuestionId == KEY_TPM2_ACPI_REVISION){
+    //
+    // Get the PCD value after EFI_BROWSER_ACTION_SUBMITTED,
+    // the SetVariable to TCG2_VERSION_NAME should have been done.
+    // If the PCD value is not equal to the value set to variable,
+    // the PCD is not DynamicHii type and does not map to the setup option.
+    //
+    PcdTpm2AcpiTableRev = PcdGet8 (PcdTpm2AcpiTableRev);
+
+    if (PcdTpm2AcpiTableRev != Value->u8) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"WARNING: PcdTpm2AcpiTableRev is not DynamicHii type and does not map to this option!",
+        L"The Revision configuring by this setup option will not work!",
         NULL
         );
     }
@@ -607,7 +626,7 @@ Tcg2Callback (
   }
 
   if (Action == EFI_BROWSER_ACTION_SUBMITTED) {
-    if (QuestionId == KEY_TCG2_PPI_VERSION) {
+    if (QuestionId == KEY_TCG2_PPI_VERSION || QuestionId == KEY_TPM2_ACPI_REVISION) {
       return Tcg2VersionInfoCallback (Action, QuestionId, Type, Value);
     }
   }
@@ -971,6 +990,7 @@ InstallTcg2ConfigForm (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_INFO_NAME\n"));
   }
+
   return EFI_SUCCESS;  
 }
 

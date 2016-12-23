@@ -227,4 +227,10 @@
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2PhysicalPresenceFlags_PROMPT  #language en-US " Initial setting of TCG2 Persistent Firmware Management Flags"
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2PhysicalPresenceFlags_HELP  #language en-US "This PCD defines initial setting of TCG2 Persistent Firmware Management Flags\n"
-                                                                                   "PCD can be configured for different settings in different scenarios."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableRev_PROMPT  #language en-US "The revision of TPM2 ACPI table"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableRev_HELP  #language en-US "This PCD defines initial revision of TPM2 ACPI table\n"
+                                                                                    "To support configuring from setup page, this PCD can be DynamicHii type and map to a setup option.<BR>\n"
+                                                                                    "For example, map to TCG2_VERSION.Tpm2AcpiTableRev to be configured by Tcg2ConfigDxe driver.<BR>\n"
+                                                                                    "gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L\"TCG2_VERSION\"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS<BR>"

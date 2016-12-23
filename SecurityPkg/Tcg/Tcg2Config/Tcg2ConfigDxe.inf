@@ -78,6 +78,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap    ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress             ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev           ## CONSUMES
 
 [Depex]
   gEfiTcg2ProtocolGuid              AND

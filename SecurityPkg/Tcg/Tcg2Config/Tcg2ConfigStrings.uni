@@ -38,6 +38,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_TPM2_ACPI_HID_HELP                    #language en-US "HID from TPM2 ACPI Table: ManufacturerID + FirmwareVersion_1"
 #string STR_TPM2_ACPI_HID_CONTENT                 #language en-US ""
 
+#string STR_TPM2_ACPI_REVISION_STATE_PROMPT   #language en-US "Current Rev of TPM2 ACPI Table"
+#string STR_TPM2_ACPI_REVISION_STATE_HELP     #language en-US "Current Rev of TPM2 ACPI Table: Rev 3 or Rev 4"
+#string STR_TPM2_ACPI_REVISION_STATE_CONTENT  #language en-US ""
+
+#string STR_TPM2_ACPI_REVISION_PROMPT          #language en-US "Attempt Rev of TPM2 ACPI Table"
+#string STR_TPM2_ACPI_REVISION_HELP            #language en-US "Rev 3 or Rev 4 (Rev 4 is defined in TCG ACPI Spec 00.37)"
+                                                               "PcdTpm2AcpiTableRev needs to be DynamicHii type and map to this option\n"
+                                                               "Otherwise the version configuring by this setup option will not work"
+
 #string STR_TCG2_DEVICE_INTERFACE_STATE_PROMPT         #language en-US "Current TPM Device Interface"
 #string STR_TCG2_DEVICE_INTERFACE_STATE_HELP           #language en-US "Current TPM Device Interface: TIS, PTP FIFO, PTP CRB"
 #string STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT        #language en-US ""
@@ -73,6 +82,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #string STR_TCG2_TPM_1_2                   #language en-US "TPM 1.2"
 #string STR_TCG2_TPM_2_0_DTPM              #language en-US "TPM 2.0"
+
+#string STR_TPM2_ACPI_REVISION_3           #language en-US "Rev 3"
+#string STR_TPM2_ACPI_REVISION_4           #language en-US "Rev 4"
 
 #string STR_TCG2_PPI_VERSION_1_2           #language en-US "1.2"
 #string STR_TCG2_PPI_VERSION_1_3           #language en-US "1.3"

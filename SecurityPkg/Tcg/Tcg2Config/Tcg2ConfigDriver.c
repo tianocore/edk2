@@ -82,6 +82,7 @@ InitializeTcg2VersionInfo (
   TCG2_VERSION                  Tcg2Version;
   UINTN                         DataSize;
   UINT64                        PcdTcg2PpiVersion;
+  UINT8                         PcdTpm2AcpiTableRev;
 
   //
   // Get the PCD value before initializing efi varstore configuration data.
@@ -92,6 +93,8 @@ InitializeTcg2VersionInfo (
     PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
     AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
     );
+
+  PcdTpm2AcpiTableRev = PcdGet8 (PcdTpm2AcpiTableRev);
 
   //
   // Initialize efi varstore configuration data.
@@ -175,6 +178,10 @@ InitializeTcg2VersionInfo (
         DEBUG ((DEBUG_WARN, "WARNING: PcdTcgPhysicalPresenceInterfaceVer default value is not same with the default value in VFR\n"));
         DEBUG ((DEBUG_WARN, "WARNING: The default value in VFR has be chosen\n"));
       }
+      if (PcdTpm2AcpiTableRev != Tcg2Version.Tpm2AcpiTableRev) {
+        DEBUG ((DEBUG_WARN, "WARNING: PcdTpm2AcpiTableRev default value is not same with the default value in VFR\n"));
+        DEBUG ((DEBUG_WARN, "WARNING: The default value in VFR has be chosen\n"));
+      }
     }
   }
   FreePool (ConfigRequestHdr);
@@ -201,6 +208,29 @@ InitializeTcg2VersionInfo (
       break;
     case TCG2_PPI_VERSION_1_3:
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_PPI_VERSION_STATE_CONTENT), L"1.3", NULL);
+      break;
+    default:
+      ASSERT (FALSE);
+      break;
+  }
+
+  //
+  // Get the PcdTpm2AcpiTableRev value again.
+  // If the PCD value is not equal to the value in variable,
+  // the PCD is not DynamicHii type and does not map to TCG2_VERSION Variable.
+  //
+  PcdTpm2AcpiTableRev = PcdGet8 (PcdTpm2AcpiTableRev);
+  if (PcdTpm2AcpiTableRev != Tcg2Version.Tpm2AcpiTableRev) {
+    DEBUG ((DEBUG_WARN, "WARNING: PcdTpm2AcpiTableRev is not DynamicHii type and does not map to TCG2_VERSION.Tpm2AcpiTableRev\n"));
+    DEBUG ((DEBUG_WARN, "WARNING: The Tpm2 ACPI Revision configuring from setup page will not work\n"));
+  }
+
+  switch (PcdTpm2AcpiTableRev) {
+    case EFI_TPM2_ACPI_TABLE_REVISION_3:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TPM2_ACPI_REVISION_STATE_CONTENT), L"Rev 3", NULL);
+      break;
+    case EFI_TPM2_ACPI_TABLE_REVISION_4:
+      HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TPM2_ACPI_REVISION_STATE_CONTENT), L"Rev 4", NULL);
       break;
     default:
       ASSERT (FALSE);
