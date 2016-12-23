@@ -6,7 +6,7 @@
   protocol related to this implementation, not in the public spec. So, this 
   library instance is only for this code base.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -71,7 +71,8 @@ PrintLibConstructor (
   @param  BaseListMarker  BASE_LIST style variable argument list consumed by processing Format.
   @param  Size            The size, in bytes, of the BaseListMarker buffer.
 
-  @return The number of bytes in BaseListMarker.  0 if BaseListMarker is too small.
+  @return TRUE   The VA_LIST has been converted to BASE_LIST.
+  @return FALSE  The VA_LIST has not been converted to BASE_LIST.
 
 **/
 BOOLEAN
@@ -205,6 +206,7 @@ DxePrintLibPrint2ProtocolVaListToBaseList (
     // If BASE_LIST is larger than Size, then return FALSE
     //
     if ((UINTN)((UINT8 *)BaseListMarker - (UINT8 *)BaseListStart) > Size) {
+      DEBUG ((DEBUG_ERROR, "The input variable argument list is too long. Please consider breaking into multiple print calls.\n"));
       return FALSE;
     }
 
@@ -264,15 +266,19 @@ UnicodeVSPrint (
   IN  VA_LIST       Marker
   )
 {
-  UINT64  BaseListMarker[256 / sizeof (UINT64)];
+  UINT64   BaseListMarker[256 / sizeof (UINT64)];
+  BOOLEAN  Converted;
 
-  DxePrintLibPrint2ProtocolVaListToBaseList (
-    FALSE, 
-    (CHAR8 *)FormatString, 
-    Marker, 
-    (BASE_LIST)BaseListMarker, 
-    sizeof (BaseListMarker) - 8
-    );
+  Converted = DxePrintLibPrint2ProtocolVaListToBaseList (
+                FALSE,
+                (CHAR8 *)FormatString,
+                Marker,
+                (BASE_LIST)BaseListMarker,
+                sizeof (BaseListMarker) - 8
+                );
+  if (!Converted) {
+    return 0;
+  }
 
   return UnicodeBSPrint (StartOfBuffer, BufferSize, FormatString, (BASE_LIST)BaseListMarker);
 }
@@ -417,15 +423,19 @@ UnicodeVSPrintAsciiFormat (
   IN  VA_LIST      Marker
   )
 {
-  UINT64  BaseListMarker[256 / sizeof (UINT64)];
+  UINT64   BaseListMarker[256 / sizeof (UINT64)];
+  BOOLEAN  Converted;
 
-  DxePrintLibPrint2ProtocolVaListToBaseList (
-    TRUE, 
-    FormatString, 
-    Marker, 
-    (BASE_LIST)BaseListMarker, 
-    sizeof (BaseListMarker) - 8
-    );
+  Converted = DxePrintLibPrint2ProtocolVaListToBaseList (
+                TRUE,
+                FormatString,
+                Marker,
+                (BASE_LIST)BaseListMarker,
+                sizeof (BaseListMarker) - 8
+                );
+  if (!Converted) {
+    return 0;
+  }
 
   return UnicodeBSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, (BASE_LIST)BaseListMarker);
 }
@@ -621,15 +631,19 @@ AsciiVSPrint (
   IN  VA_LIST       Marker
   )
 {
-  UINT64  BaseListMarker[256 / sizeof (UINT64)];
+  UINT64   BaseListMarker[256 / sizeof (UINT64)];
+  BOOLEAN  Converted;
 
-  DxePrintLibPrint2ProtocolVaListToBaseList (
-    TRUE, 
-    FormatString, 
-    Marker, 
-    (BASE_LIST)BaseListMarker, 
-    sizeof (BaseListMarker) - 8
-    );
+  Converted = DxePrintLibPrint2ProtocolVaListToBaseList (
+                TRUE,
+                FormatString,
+                Marker,
+                (BASE_LIST)BaseListMarker,
+                sizeof (BaseListMarker) - 8
+                );
+  if (!Converted) {
+    return 0;
+  }
 
   return AsciiBSPrint (StartOfBuffer, BufferSize, FormatString, (BASE_LIST)BaseListMarker);
 }
@@ -771,15 +785,19 @@ AsciiVSPrintUnicodeFormat (
   IN  VA_LIST       Marker
   )
 {
-  UINT64  BaseListMarker[256 / sizeof (UINT64)];
+  UINT64   BaseListMarker[256 / sizeof (UINT64)];
+  BOOLEAN  Converted;
 
-  DxePrintLibPrint2ProtocolVaListToBaseList (
-    FALSE, 
-    (CHAR8 *)FormatString, 
-    Marker, 
-    (BASE_LIST)BaseListMarker, 
-    sizeof (BaseListMarker) - 8
-    );
+  Converted = DxePrintLibPrint2ProtocolVaListToBaseList (
+                FALSE,
+                (CHAR8 *)FormatString,
+                Marker,
+                (BASE_LIST)BaseListMarker,
+                sizeof (BaseListMarker) - 8
+                );
+  if (!Converted) {
+    return 0;
+  }
 
   return AsciiBSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, (BASE_LIST)BaseListMarker);
 }
