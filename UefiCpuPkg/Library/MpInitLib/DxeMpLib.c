@@ -18,6 +18,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
 
+#include <Protocol/Timer.h>
+
 #define  AP_CHECK_INTERVAL     (EFI_TIMER_PERIOD_MILLISECONDS (100))
 #define  AP_SAFE_STACK_SIZE    128
 
@@ -645,10 +647,37 @@ MpInitLibSwitchBSP (
   IN BOOLEAN                   EnableOldBSP
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS                   Status;
+  EFI_TIMER_ARCH_PROTOCOL      *Timer;
+  UINT64                       TimerPeriod;
 
+  //
+  // Locate Timer Arch Protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiTimerArchProtocolGuid, NULL, (VOID **) &Timer);
+  if (EFI_ERROR (Status)) {
+    Timer = NULL;
+  }
+
+  if (Timer != NULL) {
+    //
+    // Save current rate of DXE Timer
+    //
+    Timer->GetTimerPeriod (Timer, &TimerPeriod);
+    //
+    // Disable DXE Timer and drain pending interrupts
+    //
+    Timer->SetTimerPeriod (Timer, 0);
+  }
 
   Status = SwitchBSPWorker (ProcessorNumber, EnableOldBSP);
+
+  if (Timer != NULL) {
+    //
+    // Enable and restore rate of DXE Timer
+    //
+    Timer->SetTimerPeriod (Timer, TimerPeriod);
+  }
 
   return Status;
 }

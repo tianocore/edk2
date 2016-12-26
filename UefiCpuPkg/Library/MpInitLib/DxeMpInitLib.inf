@@ -57,6 +57,9 @@
   UefiBootServicesTableLib
   DebugAgentLib
 
+[Protocols]
+  gEfiTimerArchProtocolGuid                     ## SOMETIMES_CONSUMES
+
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
   gEfiEventLegacyBootGuid                       ## CONSUMES  ## Event
