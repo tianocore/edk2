@@ -1512,7 +1512,13 @@ SwitchBSPWorker (
   CPU_STATE                    State;
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
   BOOLEAN                      OldInterruptState;
+  BOOLEAN                      OldTimerInterruptState;
 
+  //
+  // Save and Disable Local APIC timer interrupt
+  //
+  OldTimerInterruptState = GetApicTimerInterruptState ();
+  DisableApicTimerInterrupt ();
   //
   // Before send both BSP and AP to a procedure to exchange their roles,
   // interrupt must be disabled. This is because during the exchange role
@@ -1613,6 +1619,9 @@ SwitchBSPWorker (
   //
   SetInterruptState (OldInterruptState);
 
+  if (OldTimerInterruptState) {
+    EnableApicTimerInterrupt ();
+  }
 
   return EFI_SUCCESS;
 }
