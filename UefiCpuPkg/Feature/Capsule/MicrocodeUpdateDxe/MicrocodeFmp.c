@@ -174,7 +174,7 @@ FmpGetImage (
   )
 {
   MICROCODE_FMP_PRIVATE_DATA *MicrocodeFmpPrivate;
-  EFI_STATUS                 Status;
+  MICROCODE_INFO             *MicrocodeInfo;
 
   if (Image == NULL || ImageSize == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -186,8 +186,16 @@ FmpGetImage (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = MicrocodeRead(ImageIndex, (VOID *)Image, ImageSize);
-  return Status;
+  MicrocodeInfo = &MicrocodeFmpPrivate->MicrocodeInfo[ImageIndex - 1];
+
+  if (*ImageSize < MicrocodeInfo->TotalSize) {
+    *ImageSize = MicrocodeInfo->TotalSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  *ImageSize = MicrocodeInfo->TotalSize;
+  CopyMem (Image, MicrocodeInfo->MicrocodeEntryPoint, MicrocodeInfo->TotalSize);
+  return EFI_SUCCESS;
 }
 
 /**
@@ -263,7 +271,7 @@ FmpSetImage (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = MicrocodeWrite(ImageIndex, (VOID *)Image, ImageSize, &MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, &MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus, AbortReason);
+  Status = MicrocodeWrite(MicrocodeFmpPrivate, (VOID *)Image, ImageSize, &MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, &MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus, AbortReason);
   DEBUG((DEBUG_INFO, "SetImage - LastAttemp Version - 0x%x, State - 0x%x\n", MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus));
   VarStatus = gRT->SetVariable(
                      MICROCODE_FMP_LAST_ATTEMPT_VARIABLE_NAME,
@@ -417,17 +425,22 @@ InitializeMicrocodeDescriptor (
   IN MICROCODE_FMP_PRIVATE_DATA *MicrocodeFmpPrivate
   )
 {
-  UINT8  CurrentMicrocodeCount;
+  UINT8    CurrentMicrocodeCount;
 
-  CurrentMicrocodeCount = (UINT8)GetMicrocodeInfo(NULL, 0);
+  CurrentMicrocodeCount = (UINT8)GetMicrocodeInfo (MicrocodeFmpPrivate, 0, NULL, NULL);
 
   if (CurrentMicrocodeCount > MicrocodeFmpPrivate->DescriptorCount) {
     if (MicrocodeFmpPrivate->ImageDescriptor != NULL) {
       FreePool(MicrocodeFmpPrivate->ImageDescriptor);
       MicrocodeFmpPrivate->ImageDescriptor = NULL;
     }
+    if (MicrocodeFmpPrivate->MicrocodeInfo != NULL) {
+      FreePool(MicrocodeFmpPrivate->MicrocodeInfo);
+      MicrocodeFmpPrivate->MicrocodeInfo = NULL;
+    }
   } else {
     ZeroMem(MicrocodeFmpPrivate->ImageDescriptor, MicrocodeFmpPrivate->DescriptorCount * sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR));
+    ZeroMem(MicrocodeFmpPrivate->MicrocodeInfo, MicrocodeFmpPrivate->DescriptorCount * sizeof(MICROCODE_INFO));
   }
 
   MicrocodeFmpPrivate->DescriptorCount = CurrentMicrocodeCount;
@@ -438,8 +451,14 @@ InitializeMicrocodeDescriptor (
       return EFI_OUT_OF_RESOURCES;
     }
   }
+  if (MicrocodeFmpPrivate->MicrocodeInfo == NULL) {
+    MicrocodeFmpPrivate->MicrocodeInfo = AllocateZeroPool(MicrocodeFmpPrivate->DescriptorCount * sizeof(MICROCODE_INFO));
+    if (MicrocodeFmpPrivate->MicrocodeInfo == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
 
-  CurrentMicrocodeCount = (UINT8)GetMicrocodeInfo(MicrocodeFmpPrivate->ImageDescriptor, MicrocodeFmpPrivate->DescriptorCount);
+  CurrentMicrocodeCount = (UINT8)GetMicrocodeInfo (MicrocodeFmpPrivate, MicrocodeFmpPrivate->DescriptorCount, MicrocodeFmpPrivate->ImageDescriptor, MicrocodeFmpPrivate->MicrocodeInfo);
   ASSERT(CurrentMicrocodeCount == MicrocodeFmpPrivate->DescriptorCount);
 
   return EFI_SUCCESS;
@@ -460,6 +479,7 @@ InitializePrivateData (
   EFI_STATUS       Status;
   EFI_STATUS       VarStatus;
   UINTN            VarSize;
+  BOOLEAN          Result;
 
   MicrocodeFmpPrivate->Signature       = MICROCODE_FMP_PRIVATE_DATA_SIGNATURE;
   MicrocodeFmpPrivate->Handle          = NULL;
@@ -480,6 +500,12 @@ InitializePrivateData (
                      );
   DEBUG((DEBUG_INFO, "GetLastAttemp - %r\n", VarStatus));
   DEBUG((DEBUG_INFO, "GetLastAttemp Version - 0x%x, State - 0x%x\n", MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus));
+
+  Result = GetMicrocodeRegion(&MicrocodeFmpPrivate->MicrocodePatchAddress, &MicrocodeFmpPrivate->MicrocodePatchRegionSize);
+  if (!Result) {
+    DEBUG((DEBUG_ERROR, "Fail to get Microcode Region\n"));
+    return EFI_NOT_FOUND;
+  }
 
   Status = InitializeMicrocodeDescriptor(MicrocodeFmpPrivate);
 
