@@ -1511,6 +1511,21 @@ SwitchBSPWorker (
   UINTN                        CallerNumber;
   CPU_STATE                    State;
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
+  BOOLEAN                      OldInterruptState;
+
+  //
+  // Before send both BSP and AP to a procedure to exchange their roles,
+  // interrupt must be disabled. This is because during the exchange role
+  // process, 2 CPU may use 1 stack. If interrupt happens, the stack will
+  // be corrupted, since interrupt return address will be pushed to stack
+  // by hardware.
+  //
+  OldInterruptState = SaveAndDisableInterrupts ();
+
+  //
+  // Mask LINT0 & LINT1 for the old BSP
+  //
+  DisableLvtInterrupts ();
 
   CpuMpData = GetCpuMpData ();
 
@@ -1592,6 +1607,12 @@ SwitchBSPWorker (
   // Save new BSP number
   //
   CpuMpData->BspNumber = (UINT32) ProcessorNumber;
+
+  //
+  // Restore interrupt state.
+  //
+  SetInterruptState (OldInterruptState);
+
 
   return EFI_SUCCESS;
 }
