@@ -1608,6 +1608,8 @@ SwitchBSPWorker (
   //
   if (!EnableOldBSP) {
     SetApState (&CpuMpData->CpuData[CallerNumber], CpuStateDisabled);
+  } else {
+    SetApState (&CpuMpData->CpuData[CallerNumber], CpuStateIdle);
   }
   //
   // Save new BSP number
