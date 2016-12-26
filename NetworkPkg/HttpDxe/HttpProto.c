@@ -1475,6 +1475,8 @@ HttpTransmitTcp (
 
   Status                = EFI_SUCCESS;
   Buffer                = NULL;
+  TempFragment.Len      = 0;
+  TempFragment.Bulk     = NULL;
 
   //
   // Need to encrypt data.

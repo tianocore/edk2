@@ -1718,7 +1718,7 @@ TlsAuthConfigAccessCallback (
       }
       if (QuestionId == KEY_TLS_AUTH_CONFIG_CLIENT_CERT) {
         LabelId = TLS_AUTH_CONFIG_FORMID3_FORM;
-      } else if (QuestionId == KEY_TLS_AUTH_CONFIG_SERVER_CA) {
+      } else {
         LabelId = TLS_AUTH_CONFIG_FORMID4_FORM;
       }
 
