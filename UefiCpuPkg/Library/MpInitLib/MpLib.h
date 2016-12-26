@@ -227,6 +227,12 @@ struct _CPU_MP_DATA {
   UINT16                         PmCodeSegment;
   CPU_AP_DATA                    *CpuData;
   volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
+
+  UINT32                         CurrentTimerCount;
+  UINTN                          DivideValue;
+  UINT8                          Vector;
+  BOOLEAN                        PeriodicMode;
+  BOOLEAN                        TimerInterruptState;
 };
 
 extern EFI_GUID mCpuInitMpLibHobGuid;

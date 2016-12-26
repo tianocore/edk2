@@ -110,6 +110,53 @@ SetApState (
 }
 
 /**
+  Save BSP's local APIC timer setting
+
+  @param[in] CpuMpData          Pointer to CPU MP Data
+**/
+VOID
+SaveLocalApicTimerSetting (
+  IN CPU_MP_DATA   *CpuMpData
+  )
+{
+  //
+  // Record the current local APIC timer setting of BSP
+  //
+  GetApicTimerState (
+    &CpuMpData->DivideValue,
+    &CpuMpData->PeriodicMode,
+    &CpuMpData->Vector
+    );
+  CpuMpData->CurrentTimerCount   = GetApicTimerCurrentCount ();
+  CpuMpData->TimerInterruptState = GetApicTimerInterruptState ();
+}
+
+/**
+  Sync local APIC timer setting from BSP to AP.
+
+  @param[in] CpuMpData          Pointer to CPU MP Data
+**/
+VOID
+SyncLocalApicTimerSetting (
+  IN CPU_MP_DATA   *CpuMpData
+  )
+{
+  //
+  // Sync local APIC timer setting from BSP to AP
+  //
+  InitializeApicTimer (
+    CpuMpData->DivideValue,
+    CpuMpData->CurrentTimerCount,
+    CpuMpData->PeriodicMode,
+    CpuMpData->Vector
+    );
+  //
+  // Disable AP's local APIC timer interrupt
+  //
+  DisableApicTimerInterrupt ();
+}
+
+/**
   Save the volatile registers required to be restored following INIT IPI.
 
   @param[out]  VolatileRegisters    Returns buffer saved the volatile resisters
@@ -488,7 +535,12 @@ ApWakeupFunction (
   //
   CpuMpData = ExchangeInfo->CpuMpData;
 
-  ProgramVirtualWireMode (); 
+  //
+  // AP's local APIC settings will be lost after received INIT IPI
+  // We need to re-initialize them at here
+  //
+  ProgramVirtualWireMode ();
+  SyncLocalApicTimerSetting (CpuMpData);
 
   while (TRUE) {
     if (CpuMpData->InitFlag == ApInitConfig) {
@@ -736,6 +788,7 @@ WakeUpAP (
     ResetVectorRequired = TRUE;
     AllocateResetVector (CpuMpData);
     FillExchangeInfoData (CpuMpData);
+    SaveLocalApicTimerSetting (CpuMpData);
   } else if (CpuMpData->ApLoopMode == ApInMwaitLoop) {
     //
     // Get AP target C-state each time when waking up AP,
