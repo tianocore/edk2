@@ -43,6 +43,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
@@ -54,6 +55,7 @@
   CpuLib
   UefiCpuLib
   UefiBootServicesTableLib
+  DebugAgentLib
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event

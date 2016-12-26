@@ -539,6 +539,10 @@ ApWakeupFunction (
         if (Procedure != NULL) {
           SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateBusy);
           //
+          // Enable source debugging on AP function
+          //         
+          EnableDebugAgent ();
+          //
           // Invoke AP function here
           //
           Procedure (Parameter);

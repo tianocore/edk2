@@ -16,6 +16,7 @@
 
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/DebugAgentLib.h>
 
 #define  AP_CHECK_INTERVAL     (EFI_TIMER_PERIOD_MILLISECONDS (100))
 #define  AP_SAFE_STACK_SIZE    128
@@ -28,6 +29,21 @@ volatile BOOLEAN mStopCheckAllApsStatus = TRUE;
 VOID             *mReservedApLoopFunc = NULL;
 UINTN            mReservedTopOfApStack;
 volatile UINT32  mNumberToFinish = 0;
+
+/**
+  Enable Debug Agent to support source debugging on AP function.
+
+**/
+VOID
+EnableDebugAgent (
+  VOID
+  )
+{
+  //
+  // Initialize Debug Agent to support source level debug in DXE phase
+  //
+  InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_AP, NULL, NULL);
+}
 
 /**
   Get the pointer to CPU MP Data structure.

@@ -25,6 +25,18 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mMpInitLibNotifyList = {
   CpuMpEndOfPeiCallback
 };
 
+
+/**
+  Enable Debug Agent to support source debugging on AP function.
+
+**/
+VOID
+EnableDebugAgent (
+  VOID
+  )
+{
+}
+
 /**
   Get pointer to CPU MP Data structure.
 
