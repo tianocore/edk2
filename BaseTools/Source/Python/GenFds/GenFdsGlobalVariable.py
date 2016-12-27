@@ -429,11 +429,18 @@ class GenFdsGlobalVariable:
     def GenerateFfs(Output, Input, Type, Guid, Fixed=False, CheckSum=False, Align=None,
                     SectionAlign=None):
         Cmd = ["GenFfs", "-t", Type, "-g", Guid]
+        mFfsValidAlign = ["0", "8", "16", "128", "512", "1K", "4K", "32K", "64K"]
         if Fixed == True:
             Cmd += ["-x"]
         if CheckSum:
             Cmd += ["-s"]
         if Align not in [None, '']:
+            if Align not in mFfsValidAlign:
+                Align = GenFdsGlobalVariable.GetAlignment (Align)
+                for index in range(0, len(mFfsValidAlign) - 1):
+                    if ((Align > GenFdsGlobalVariable.GetAlignment(mFfsValidAlign[index])) and (Align <= GenFdsGlobalVariable.GetAlignment(mFfsValidAlign[index + 1]))):
+                        break
+                Align = mFfsValidAlign[index + 1]
             Cmd += ["-a", Align]
 
         Cmd += ["-o", Output]
