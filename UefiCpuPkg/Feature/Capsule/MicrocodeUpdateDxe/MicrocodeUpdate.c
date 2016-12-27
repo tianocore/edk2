@@ -21,36 +21,6 @@
 
 #include "MicrocodeUpdate.h"
 
-
-/**
-  Verify Microcode.
-
-  Caution: This function may receive untrusted input.
-
-  @param[in]  Image              The Microcode image buffer.
-  @param[in]  ImageSize          The size of Microcode image buffer in bytes.
-  @param[in]  TryLoad            Try to load Microcode or not.
-  @param[out] LastAttemptStatus  The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
-  @param[out] AbortReason        A pointer to a pointer to a null-terminated string providing more
-                                 details for the aborted operation. The buffer is allocated by this function
-                                 with AllocatePool(), and it is the caller's responsibility to free it with a
-                                 call to FreePool().
-
-  @retval EFI_SUCCESS               The Microcode image passes verification.
-  @retval EFI_VOLUME_CORRUPTED      The Microcode image is corrupt.
-  @retval EFI_INCOMPATIBLE_VERSION  The Microcode image version is incorrect.
-  @retval EFI_UNSUPPORTED           The Microcode ProcessorSignature or ProcessorFlags is incorrect.
-  @retval EFI_SECURITY_VIOLATION    The Microcode image fails to load.
-**/
-EFI_STATUS
-VerifyMicrocode (
-  IN VOID    *Image,
-  IN UINTN   ImageSize,
-  IN BOOLEAN TryLoad,
-  OUT UINT32 *LastAttemptStatus,
-  OUT CHAR16 **AbortReason
-  );
-
 /**
   Get Microcode Region.
 
@@ -144,46 +114,92 @@ LoadMicrocode (
 }
 
 /**
-  If the Microcode is used by current processor.
+  Load Microcode on an Application Processor.
+  The function prototype for invoking a function on an Application Processor.
 
-  @param[in]  MicrocodeEntryPoint  The Microcode buffer
-
-  @retval TRUE  The Microcode is used by current processor.
-  @retval FALSE The Microcode is NOT used by current processor.
+  @param[in,out] Buffer  The pointer to private data buffer.
 **/
-BOOLEAN
-IsMicrocodeInUse (
-  IN CPU_MICROCODE_HEADER                    *MicrocodeEntryPoint
+VOID
+EFIAPI
+MicrocodeLoadAp (
+  IN OUT VOID  *Buffer
   )
 {
-  UINT32      AttemptStatus;
-  UINTN       TotalSize;
-  EFI_STATUS  Status;
+  MICROCODE_LOAD_BUFFER                *MicrocodeLoadBuffer;
 
-  if (MicrocodeEntryPoint->HeaderVersion == 0x1 && MicrocodeEntryPoint->LoaderRevision == 0x1) {
-    //
-    // It is the microcode header. It is not the padding data between microcode patches
-    // becasue the padding data should not include 0x00000001 and it should be the repeated
-    // byte format (like 0xXYXYXYXY....).
-    //
-    if (MicrocodeEntryPoint->DataSize == 0) {
-      TotalSize = 2048;
-    } else {
-      TotalSize = MicrocodeEntryPoint->TotalSize;
-    }
-    Status = VerifyMicrocode(MicrocodeEntryPoint, TotalSize, FALSE, &AttemptStatus, NULL);
-    if (!EFI_ERROR(Status)) {
-      return TRUE;
-    }
+  MicrocodeLoadBuffer = Buffer;
+  MicrocodeLoadBuffer->Revision = LoadMicrocode (MicrocodeLoadBuffer->Address);
+}
+
+/**
+  Load new Microcode on this processor
+
+  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
+  @param[in]  CpuIndex                   The index of the processor.
+  @param[in]  Address                    The address of new Microcode.
+
+  @return  Loaded Microcode signature.
+
+**/
+UINT32
+LoadMicrocodeOnThis (
+  IN  MICROCODE_FMP_PRIVATE_DATA  *MicrocodeFmpPrivate,
+  IN  UINTN                       CpuIndex,
+  IN  UINT64                      Address
+  )
+{
+  EFI_STATUS                           Status;
+  EFI_MP_SERVICES_PROTOCOL             *MpService;
+  MICROCODE_LOAD_BUFFER                MicrocodeLoadBuffer;
+
+  if (CpuIndex == MicrocodeFmpPrivate->BspIndex) {
+    return LoadMicrocode (Address);
+  } else {
+    MpService = MicrocodeFmpPrivate->MpService;
+    MicrocodeLoadBuffer.Address = Address;
+    MicrocodeLoadBuffer.Revision = 0;
+    Status = MpService->StartupThisAP (
+                          MpService,
+                          MicrocodeLoadAp,
+                          CpuIndex,
+                          NULL,
+                          0,
+                          &MicrocodeLoadBuffer,
+                          NULL
+                          );
+    ASSERT_EFI_ERROR(Status);
+    return MicrocodeLoadBuffer.Revision;
   }
-  return FALSE;
+}
+
+/**
+  Collect processor information.
+  The function prototype for invoking a function on an Application Processor.
+
+  @param[in,out] Buffer  The pointer to private data buffer.
+**/
+VOID
+EFIAPI
+CollectProcessorInfo (
+  IN OUT VOID  *Buffer
+  )
+{
+  PROCESSOR_INFO  *ProcessorInfo;
+
+  ProcessorInfo = Buffer;
+  ProcessorInfo->ProcessorSignature = GetCurrentProcessorSignature();
+  ProcessorInfo->PlatformId = GetCurrentPlatformId();
+  ProcessorInfo->MicrocodeRevision = GetCurrentMicrocodeSignature();
 }
 
 /**
   Get current Microcode information.
 
-  NOTE: The DescriptorCount/ImageDescriptor/MicrocodeInfo in MicrocodeFmpPrivate
-  are not avaiable in this function.
+  The ProcessorInformation (BspIndex/ProcessorCount/ProcessorInfo)
+  in MicrocodeFmpPrivate must be initialized.
+
+  The MicrocodeInformation (DescriptorCount/ImageDescriptor/MicrocodeInfo)
+  in MicrocodeFmpPrivate may not be avaiable in this function.
 
   @param[in]   MicrocodeFmpPrivate        The Microcode driver private data
   @param[in]   DescriptorCount            The count of Microcode ImageDescriptor allocated.
@@ -208,6 +224,9 @@ GetMicrocodeInfo (
   UINTN                                   Count;
   UINT64                                  ImageAttributes;
   BOOLEAN                                 IsInUse;
+  EFI_STATUS                              Status;
+  UINT32                                  AttemptStatus;
+  UINTN                                   TargetCpuIndex;
 
   MicrocodePatchAddress = MicrocodeFmpPrivate->MicrocodePatchAddress;
   MicrocodePatchRegionSize = MicrocodeFmpPrivate->MicrocodePatchRegionSize;
@@ -231,7 +250,15 @@ GetMicrocodeInfo (
         TotalSize = MicrocodeEntryPoint->TotalSize;
       }
 
-      IsInUse = IsMicrocodeInUse (MicrocodeEntryPoint);
+      TargetCpuIndex = (UINTN)-1;
+      Status = VerifyMicrocode(MicrocodeFmpPrivate, MicrocodeEntryPoint, TotalSize, FALSE, &AttemptStatus, NULL, &TargetCpuIndex);
+      if (!EFI_ERROR(Status)) {
+        IsInUse = TRUE;
+        ASSERT (TargetCpuIndex < MicrocodeFmpPrivate->ProcessorCount);
+        MicrocodeFmpPrivate->ProcessorInfo[TargetCpuIndex].MicrocodeIndex = Count;
+      } else {
+        IsInUse = FALSE;
+      }
 
       if (ImageDescriptor != NULL && DescriptorCount > Count) {
         ImageDescriptor[Count].ImageIndex = (UINT8)(Count + 1);
@@ -283,18 +310,62 @@ GetMicrocodeInfo (
 }
 
 /**
+  Return matched processor information.
+
+  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
+  @param[in]  ProcessorSignature         The processor signature to be matched
+  @param[in]  ProcessorFlags             The processor flags to be matched
+  @param[in, out] TargetCpuIndex         On input, the index of target CPU which tries to match the Microcode. (UINTN)-1 means to try all.
+                                         On output, the index of target CPU which matches the Microcode.
+
+  @return matched processor information.
+**/
+PROCESSOR_INFO *
+GetMatchedProcessor (
+  IN MICROCODE_FMP_PRIVATE_DATA  *MicrocodeFmpPrivate,
+  IN UINT32                      ProcessorSignature,
+  IN UINT32                      ProcessorFlags,
+  IN OUT UINTN                   *TargetCpuIndex
+  )
+{
+  UINTN  Index;
+
+  if (*TargetCpuIndex != (UINTN)-1) {
+    Index = *TargetCpuIndex;
+    if ((ProcessorSignature == MicrocodeFmpPrivate->ProcessorInfo[Index].ProcessorSignature) &&
+        ((ProcessorFlags & (1 << MicrocodeFmpPrivate->ProcessorInfo[Index].PlatformId)) != 0)) {
+      return &MicrocodeFmpPrivate->ProcessorInfo[Index];
+    } else {
+      return NULL;
+    }
+  }
+
+  for (Index = 0; Index < MicrocodeFmpPrivate->ProcessorCount; Index++) {
+    if ((ProcessorSignature == MicrocodeFmpPrivate->ProcessorInfo[Index].ProcessorSignature) &&
+        ((ProcessorFlags & (1 << MicrocodeFmpPrivate->ProcessorInfo[Index].PlatformId)) != 0)) {
+      *TargetCpuIndex = Index;
+      return &MicrocodeFmpPrivate->ProcessorInfo[Index];
+    }
+  }
+  return NULL;
+}
+
+/**
   Verify Microcode.
 
   Caution: This function may receive untrusted input.
 
-  @param[in]  Image              The Microcode image buffer.
-  @param[in]  ImageSize          The size of Microcode image buffer in bytes.
-  @param[in]  TryLoad            Try to load Microcode or not.
-  @param[out] LastAttemptStatus  The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
-  @param[out] AbortReason        A pointer to a pointer to a null-terminated string providing more
-                                 details for the aborted operation. The buffer is allocated by this function
-                                 with AllocatePool(), and it is the caller's responsibility to free it with a
-                                 call to FreePool().
+  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
+  @param[in]  Image                      The Microcode image buffer.
+  @param[in]  ImageSize                  The size of Microcode image buffer in bytes.
+  @param[in]  TryLoad                    Try to load Microcode or not.
+  @param[out] LastAttemptStatus          The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[out] AbortReason                A pointer to a pointer to a null-terminated string providing more
+                                         details for the aborted operation. The buffer is allocated by this function
+                                         with AllocatePool(), and it is the caller's responsibility to free it with a
+                                         call to FreePool().
+  @param[in, out] TargetCpuIndex         On input, the index of target CPU which tries to match the Microcode. (UINTN)-1 means to try all.
+                                         On output, the index of target CPU which matches the Microcode.
 
   @retval EFI_SUCCESS               The Microcode image passes verification.
   @retval EFI_VOLUME_CORRUPTED      The Microcode image is corrupt.
@@ -304,11 +375,13 @@ GetMicrocodeInfo (
 **/
 EFI_STATUS
 VerifyMicrocode (
-  IN VOID    *Image,
-  IN UINTN   ImageSize,
-  IN BOOLEAN TryLoad,
-  OUT UINT32 *LastAttemptStatus,
-  OUT CHAR16 **AbortReason
+  IN  MICROCODE_FMP_PRIVATE_DATA  *MicrocodeFmpPrivate,
+  IN  VOID                        *Image,
+  IN  UINTN                       ImageSize,
+  IN  BOOLEAN                     TryLoad,
+  OUT UINT32                      *LastAttemptStatus,
+  OUT CHAR16                      **AbortReason,   OPTIONAL
+  IN OUT UINTN                    *TargetCpuIndex
   )
 {
   UINTN                                   Index;
@@ -316,8 +389,7 @@ VerifyMicrocode (
   UINTN                                   TotalSize;
   UINTN                                   DataSize;
   UINT32                                  CurrentRevision;
-  UINT32                                  CurrentProcessorSignature;
-  UINT8                                   CurrentPlatformId;
+  PROCESSOR_INFO                          *ProcessorInfo;
   UINT32                                  CheckSum32;
   UINTN                                   ExtendedTableLength;
   UINT32                                  ExtendedTableCount;
@@ -409,11 +481,10 @@ VerifyMicrocode (
   //
   // Check ProcessorSignature/ProcessorFlags
   //
-  CorrectMicrocode = FALSE;
-  CurrentProcessorSignature = GetCurrentProcessorSignature();
-  CurrentPlatformId = GetCurrentPlatformId();
-  if ((MicrocodeEntryPoint->ProcessorSignature.Uint32 != CurrentProcessorSignature) ||
-      ((MicrocodeEntryPoint->ProcessorFlags & (1 << CurrentPlatformId)) == 0)) {
+
+  ProcessorInfo = GetMatchedProcessor (MicrocodeFmpPrivate, MicrocodeEntryPoint->ProcessorSignature.Uint32, MicrocodeEntryPoint->ProcessorFlags, TargetCpuIndex);
+  if (ProcessorInfo == NULL) {
+    CorrectMicrocode = FALSE;
     ExtendedTableLength = TotalSize - (DataSize + sizeof(CPU_MICROCODE_HEADER));
     if (ExtendedTableLength != 0) {
       //
@@ -438,8 +509,8 @@ VerifyMicrocode (
                 //
                 // Verify Header
                 //
-                if ((ExtendedTable->ProcessorSignature.Uint32 == CurrentProcessorSignature) &&
-                    (ExtendedTable->ProcessorFlag & (1 << CurrentPlatformId))) {
+                ProcessorInfo = GetMatchedProcessor (MicrocodeFmpPrivate, ExtendedTable->ProcessorSignature.Uint32, ExtendedTable->ProcessorFlag, TargetCpuIndex);
+                if (ProcessorInfo != NULL) {
                   //
                   // Find one
                   //
@@ -459,11 +530,7 @@ VerifyMicrocode (
       }
       *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INCORRECT_VERSION;
       if (AbortReason != NULL) {
-        if (MicrocodeEntryPoint->ProcessorSignature.Uint32 != CurrentProcessorSignature) {
-          *AbortReason = AllocateCopyPool(sizeof(L"UnsupportedProcessSignature"), L"UnsupportedProcessSignature");
-        } else {
-          *AbortReason = AllocateCopyPool(sizeof(L"UnsupportedProcessorFlags"), L"UnsupportedProcessorFlags");
-        }
+        *AbortReason = AllocateCopyPool(sizeof(L"UnsupportedProcessSignature/ProcessorFlags"), L"UnsupportedProcessSignature/ProcessorFlags");
       }
       return EFI_UNSUPPORTED;
     }
@@ -472,8 +539,9 @@ VerifyMicrocode (
   //
   // Check UpdateRevision
   //
-  CurrentRevision = GetCurrentMicrocodeSignature();
-  if (MicrocodeEntryPoint->UpdateRevision < CurrentRevision) {
+  CurrentRevision = ProcessorInfo->MicrocodeRevision;
+  if ((MicrocodeEntryPoint->UpdateRevision < CurrentRevision) ||
+      (TryLoad && (MicrocodeEntryPoint->UpdateRevision == CurrentRevision))) {
     if (TryLoad) {
       DEBUG((DEBUG_ERROR, "VerifyMicrocode - fail on UpdateRevision\n"));
     }
@@ -488,7 +556,7 @@ VerifyMicrocode (
   // try load MCU
   //
   if (TryLoad) {
-    CurrentRevision = LoadMicrocode((UINTN)MicrocodeEntryPoint + sizeof(CPU_MICROCODE_HEADER));
+    CurrentRevision = LoadMicrocodeOnThis(MicrocodeFmpPrivate, ProcessorInfo->CpuIndex, (UINTN)MicrocodeEntryPoint + sizeof(CPU_MICROCODE_HEADER));
     if (MicrocodeEntryPoint->UpdateRevision != CurrentRevision) {
       DEBUG((DEBUG_ERROR, "VerifyMicrocode - fail on LoadMicrocode\n"));
       *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_AUTH_ERROR;
@@ -500,31 +568,6 @@ VerifyMicrocode (
   }
 
   return EFI_SUCCESS;
-}
-
-/**
-  Get current Microcode in used.
-
-  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
-
-  @return current Microcode in used.
-**/
-VOID *
-GetCurrentMicrocodeInUse (
-  IN MICROCODE_FMP_PRIVATE_DATA              *MicrocodeFmpPrivate
-  )
-{
-  UINTN                                   Index;
-
-  for (Index = 0; Index < MicrocodeFmpPrivate->DescriptorCount; Index++) {
-    if (!MicrocodeFmpPrivate->MicrocodeInfo[Index].InUse) {
-      continue;
-    }
-    if (IsMicrocodeInUse (MicrocodeFmpPrivate->MicrocodeInfo[Index].MicrocodeEntryPoint)) {
-      return MicrocodeFmpPrivate->MicrocodeInfo[Index].MicrocodeEntryPoint;
-    }
-  }
-  return NULL;
 }
 
 /**
@@ -622,7 +665,7 @@ UpdateMicrocode (
   Update Microcode flash region.
 
   @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
-  @param[in]  CurrentMicrocodeEntryPoint Current Microcode entrypoint
+  @param[in]  TargetMicrocodeEntryPoint  Target Microcode entrypoint to be updated
   @param[in]  Image                      The Microcode image buffer.
   @param[in]  ImageSize                  The size of Microcode image buffer in bytes.
   @param[out] LastAttemptStatus          The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
@@ -633,7 +676,7 @@ UpdateMicrocode (
 EFI_STATUS
 UpdateMicrocodeFlashRegion (
   IN  MICROCODE_FMP_PRIVATE_DATA              *MicrocodeFmpPrivate,
-  IN  CPU_MICROCODE_HEADER                    *CurrentMicrocodeEntryPoint,
+  IN  CPU_MICROCODE_HEADER                    *TargetMicrocodeEntryPoint,
   IN  VOID                                    *Image,
   IN  UINTN                                   ImageSize,
   OUT UINT32                                  *LastAttemptStatus
@@ -641,7 +684,7 @@ UpdateMicrocodeFlashRegion (
 {
   VOID                                    *MicrocodePatchAddress;
   UINTN                                   MicrocodePatchRegionSize;
-  UINTN                                   CurrentTotalSize;
+  UINTN                                   TargetTotalSize;
   UINTN                                   UsedRegionSize;
   EFI_STATUS                              Status;
   VOID                                    *MicrocodePatchScratchBuffer;
@@ -669,38 +712,38 @@ UpdateMicrocodeFlashRegion (
   ScratchBufferSize = 0;
 
   //
-  // Current data collection
+  // Target data collection
   //
-  CurrentTotalSize = 0;
+  TargetTotalSize = 0;
   AvailableSize = 0;
   NextMicrocodeEntryPoint = NULL;
-  if (CurrentMicrocodeEntryPoint != NULL) {
-    if (CurrentMicrocodeEntryPoint->DataSize == 0) {
-      CurrentTotalSize = 2048;
+  if (TargetMicrocodeEntryPoint != NULL) {
+    if (TargetMicrocodeEntryPoint->DataSize == 0) {
+      TargetTotalSize = 2048;
     } else {
-      CurrentTotalSize = CurrentMicrocodeEntryPoint->TotalSize;
+      TargetTotalSize = TargetMicrocodeEntryPoint->TotalSize;
     }
-    DEBUG((DEBUG_INFO, "  CurrentTotalSize - 0x%x\n", CurrentTotalSize));
-    NextMicrocodeEntryPoint = GetNextMicrocode(MicrocodeFmpPrivate, CurrentMicrocodeEntryPoint);
+    DEBUG((DEBUG_INFO, "  TargetTotalSize - 0x%x\n", TargetTotalSize));
+    NextMicrocodeEntryPoint = GetNextMicrocode(MicrocodeFmpPrivate, TargetMicrocodeEntryPoint);
     DEBUG((DEBUG_INFO, "  NextMicrocodeEntryPoint - 0x%x\n", NextMicrocodeEntryPoint));
     if (NextMicrocodeEntryPoint != NULL) {
-      ASSERT ((UINTN)NextMicrocodeEntryPoint >= ((UINTN)CurrentMicrocodeEntryPoint + CurrentTotalSize));
-      AvailableSize = (UINTN)NextMicrocodeEntryPoint - (UINTN)CurrentMicrocodeEntryPoint;
+      ASSERT ((UINTN)NextMicrocodeEntryPoint >= ((UINTN)TargetMicrocodeEntryPoint + TargetTotalSize));
+      AvailableSize = (UINTN)NextMicrocodeEntryPoint - (UINTN)TargetMicrocodeEntryPoint;
     } else {
-      AvailableSize = (UINTN)MicrocodePatchAddress + MicrocodePatchRegionSize - (UINTN)CurrentMicrocodeEntryPoint;
+      AvailableSize = (UINTN)MicrocodePatchAddress + MicrocodePatchRegionSize - (UINTN)TargetMicrocodeEntryPoint;
     }
     DEBUG((DEBUG_INFO, "  AvailableSize - 0x%x\n", AvailableSize));
   }
-  ASSERT (AvailableSize >= CurrentTotalSize);
+  ASSERT (AvailableSize >= TargetTotalSize);
   UsedRegionSize = GetCurrentMicrocodeUsedRegionSize(MicrocodeFmpPrivate);
   DEBUG((DEBUG_INFO, "  UsedRegionSize - 0x%x\n", UsedRegionSize));
-  ASSERT (UsedRegionSize >= CurrentTotalSize);
-  if (CurrentMicrocodeEntryPoint != NULL) {
-    ASSERT ((UINTN)MicrocodePatchAddress + UsedRegionSize >= ((UINTN)CurrentMicrocodeEntryPoint + CurrentTotalSize));
+  ASSERT (UsedRegionSize >= TargetTotalSize);
+  if (TargetMicrocodeEntryPoint != NULL) {
+    ASSERT ((UINTN)MicrocodePatchAddress + UsedRegionSize >= ((UINTN)TargetMicrocodeEntryPoint + TargetTotalSize));
   }
   //
   // Total Size means the Microcode data size.
-  // Available Size means the Microcode data size plus the pad till next (1) Microcode or (2) the end.
+  // Available Size means the Microcode data size plus the pad till (1) next Microcode or (2) the end.
   //
   // (1)
   // +------+-----------+-----+------+===================+
@@ -740,23 +783,23 @@ UpdateMicrocodeFlashRegion (
     // 1.1. Copy new image
     CopyMem (ScratchBufferPtr, Image, ImageSize);
     ScratchBufferSize += ImageSize;
-    ScratchBufferPtr = (UINT8 *)ScratchBufferPtr + ScratchBufferSize;
+    ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
     // 1.2. Pad 0xFF
     RestSize = AvailableSize - ImageSize;
     if (RestSize > 0) {
       SetMem (ScratchBufferPtr, RestSize, 0xFF);
       ScratchBufferSize += RestSize;
-      ScratchBufferPtr = (UINT8 *)ScratchBufferPtr + ScratchBufferSize;
+      ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
     }
-    Status = UpdateMicrocode((UINTN)CurrentMicrocodeEntryPoint, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
+    Status = UpdateMicrocode((UINTN)TargetMicrocodeEntryPoint, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
     return Status;
   }
 
   //
   // 2. If there is enough space to remove old one and add new one, reorg and replace old microcode.
   //
-  if (MicrocodePatchRegionSize - (UsedRegionSize - CurrentTotalSize) >= ImageSize) {
-    if (CurrentMicrocodeEntryPoint == NULL) {
+  if (MicrocodePatchRegionSize - (UsedRegionSize - TargetTotalSize) >= ImageSize) {
+    if (TargetMicrocodeEntryPoint == NULL) {
       DEBUG((DEBUG_INFO, "Append new microcode\n"));
       //
       // +------+------------+------+===================+
@@ -780,17 +823,17 @@ UpdateMicrocodeFlashRegion (
       // +------+---------------+------+================+
       //
       // 2.1. Copy new image
-      CopyMem (MicrocodePatchScratchBuffer, Image, ImageSize);
+      CopyMem (ScratchBufferPtr, Image, ImageSize);
       ScratchBufferSize += ImageSize;
-      ScratchBufferPtr = (UINT8 *)ScratchBufferPtr + ScratchBufferSize;
+      ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
       // 2.2. Copy rest images after the old image.
       if (NextMicrocodeEntryPoint != 0) {
         RestSize = (UINTN)MicrocodePatchAddress + UsedRegionSize - ((UINTN)NextMicrocodeEntryPoint);
-        CopyMem (ScratchBufferPtr, (UINT8 *)CurrentMicrocodeEntryPoint + CurrentTotalSize, RestSize);
+        CopyMem (ScratchBufferPtr, (UINT8 *)TargetMicrocodeEntryPoint + TargetTotalSize, RestSize);
         ScratchBufferSize += RestSize;
-        ScratchBufferPtr = (UINT8 *)ScratchBufferPtr + ScratchBufferSize;
+        ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
       }
-      Status = UpdateMicrocode((UINTN)CurrentMicrocodeEntryPoint, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
+      Status = UpdateMicrocode((UINTN)TargetMicrocodeEntryPoint, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
     }
     return Status;
   }
@@ -815,21 +858,21 @@ UpdateMicrocodeFlashRegion (
     MicrocodeInfo = MicrocodeFmpPrivate->MicrocodeInfo;
 
     // 3.1. Copy new image
-    CopyMem (MicrocodePatchScratchBuffer, Image, ImageSize);
+    CopyMem (ScratchBufferPtr, Image, ImageSize);
     ScratchBufferSize += ImageSize;
-    ScratchBufferPtr = (UINT8 *)ScratchBufferPtr + ScratchBufferSize;
+    ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
     // 3.2. Copy some others to rest buffer
     for (Index = 0; Index < MicrocodeCount; Index++) {
       if (!MicrocodeInfo[Index].InUse) {
         continue;
       }
-      if (MicrocodeInfo[Index].MicrocodeEntryPoint == CurrentMicrocodeEntryPoint) {
+      if (MicrocodeInfo[Index].MicrocodeEntryPoint == TargetMicrocodeEntryPoint) {
         continue;
       }
       if (MicrocodeInfo[Index].TotalSize <= MicrocodePatchRegionSize - ScratchBufferSize) {
         CopyMem (ScratchBufferPtr, MicrocodeInfo[Index].MicrocodeEntryPoint, MicrocodeInfo[Index].TotalSize);
         ScratchBufferSize += MicrocodeInfo[Index].TotalSize;
-        ScratchBufferPtr = (UINT8 *)ScratchBufferPtr + ScratchBufferSize;
+        ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
       }
     }
     // 3.3. Pad 0xFF
@@ -837,7 +880,7 @@ UpdateMicrocodeFlashRegion (
     if (RestSize > 0) {
       SetMem (ScratchBufferPtr, RestSize, 0xFF);
       ScratchBufferSize += RestSize;
-      ScratchBufferPtr = (UINT8 *)ScratchBufferPtr + ScratchBufferSize;
+      ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
     }
     Status = UpdateMicrocode((UINTN)MicrocodePatchAddress, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
     return Status;
@@ -886,14 +929,9 @@ MicrocodeWrite (
 {
   EFI_STATUS                              Status;
   VOID                                    *AlignedImage;
-  CPU_MICROCODE_HEADER                    *CurrentMicrocodeEntryPoint;
-
-  //
-  // We must get Current MicrocodeEntrypoint *before* VerifyMicrocode,
-  // because the MicrocodeSignature might be updated in VerifyMicrocode.
-  //
-  CurrentMicrocodeEntryPoint = GetCurrentMicrocodeInUse(MicrocodeFmpPrivate);
-  DEBUG((DEBUG_INFO, "  CurrentMicrocodeEntryPoint - 0x%x\n", CurrentMicrocodeEntryPoint));
+  CPU_MICROCODE_HEADER                    *TargetMicrocodeEntryPoint;
+  UINTN                                   TargetCpuIndex;
+  UINTN                                   TargetMicrcodeIndex;
 
   //
   // MCU must be 16 bytes aligned
@@ -906,7 +944,8 @@ MicrocodeWrite (
   }
 
   *LastAttemptVersion = ((CPU_MICROCODE_HEADER *)Image)->UpdateRevision;
-  Status = VerifyMicrocode(AlignedImage, ImageSize, TRUE, LastAttemptStatus, AbortReason);
+  TargetCpuIndex = (UINTN)-1;
+  Status = VerifyMicrocode(MicrocodeFmpPrivate, AlignedImage, ImageSize, TRUE, LastAttemptStatus, AbortReason, &TargetCpuIndex);
   if (EFI_ERROR(Status)) {
     DEBUG((DEBUG_ERROR, "Fail to verify Microcode Region\n"));
     FreePool(AlignedImage);
@@ -914,9 +953,21 @@ MicrocodeWrite (
   }
   DEBUG((DEBUG_INFO, "Pass VerifyMicrocode\n"));
 
+  DEBUG((DEBUG_INFO, "  TargetCpuIndex - 0x%x\n", TargetCpuIndex));
+  ASSERT (TargetCpuIndex < MicrocodeFmpPrivate->ProcessorCount);
+  TargetMicrcodeIndex = MicrocodeFmpPrivate->ProcessorInfo[TargetCpuIndex].MicrocodeIndex;
+  DEBUG((DEBUG_INFO, "  TargetMicrcodeIndex - 0x%x\n", TargetMicrcodeIndex));
+  if (TargetMicrcodeIndex != (UINTN)-1) {
+    ASSERT (TargetMicrcodeIndex < MicrocodeFmpPrivate->DescriptorCount);
+    TargetMicrocodeEntryPoint = MicrocodeFmpPrivate->MicrocodeInfo[TargetMicrcodeIndex].MicrocodeEntryPoint;
+  } else {
+    TargetMicrocodeEntryPoint = NULL;
+  }
+  DEBUG((DEBUG_INFO, "  TargetMicrocodeEntryPoint - 0x%x\n", TargetMicrocodeEntryPoint));
+
   Status = UpdateMicrocodeFlashRegion(
              MicrocodeFmpPrivate,
-             CurrentMicrocodeEntryPoint,
+             TargetMicrocodeEntryPoint,
              AlignedImage,
              ImageSize,
              LastAttemptStatus

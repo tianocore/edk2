@@ -56,13 +56,15 @@
 
 [Protocols]
   gEfiFirmwareManagementProtocolGuid            ## PRODUCES
+  gEfiMpServiceProtocolGuid                     ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress            ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
 
 [Depex]
-  gEfiVariableArchProtocolGuid
+  gEfiVariableArchProtocolGuid AND
+  gEfiMpServiceProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   MicrocodeUpdateDxeExtra.uni

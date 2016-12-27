@@ -284,6 +284,7 @@ FmpSetImage (
 
   if (!EFI_ERROR(Status)) {
     InitializeMicrocodeDescriptor(MicrocodeFmpPrivate);
+    DumpPrivateInfo (MicrocodeFmpPrivate);
   }
 
   return Status;
@@ -414,6 +415,47 @@ FmpSetPackageInfo (
 }
 
 /**
+  Initialize Processor Microcode Index.
+
+  @param[in] MicrocodeFmpPrivate private data structure to be initialized.
+**/
+VOID
+InitializedProcessorMicrocodeIndex (
+  IN MICROCODE_FMP_PRIVATE_DATA *MicrocodeFmpPrivate
+  )
+{
+  UINTN       CpuIndex;
+  UINTN       MicrocodeIndex;
+  UINTN       TargetCpuIndex;
+  UINT32      AttemptStatus;
+  EFI_STATUS  Status;
+
+  for (CpuIndex = 0; CpuIndex < MicrocodeFmpPrivate->ProcessorCount; CpuIndex++) {
+    if (MicrocodeFmpPrivate->ProcessorInfo[CpuIndex].MicrocodeIndex != (UINTN)-1) {
+      continue;
+    }
+    for (MicrocodeIndex = 0; MicrocodeIndex < MicrocodeFmpPrivate->DescriptorCount; MicrocodeIndex++) {
+      if (!MicrocodeFmpPrivate->MicrocodeInfo[MicrocodeIndex].InUse) {
+        continue;
+      }
+      TargetCpuIndex = CpuIndex;
+      Status = VerifyMicrocode(
+                 MicrocodeFmpPrivate,
+                 MicrocodeFmpPrivate->MicrocodeInfo[MicrocodeIndex].MicrocodeEntryPoint,
+                 MicrocodeFmpPrivate->MicrocodeInfo[MicrocodeIndex].TotalSize,
+                 FALSE,
+                 &AttemptStatus,
+                 NULL,
+                 &TargetCpuIndex
+                 );
+      if (!EFI_ERROR(Status)) {
+        MicrocodeFmpPrivate->ProcessorInfo[CpuIndex].MicrocodeIndex = MicrocodeIndex;
+      }
+    }
+  }
+}
+
+/**
   Initialize Microcode Descriptor.
 
   @param[in] MicrocodeFmpPrivate private data structure to be initialized.
@@ -461,7 +503,138 @@ InitializeMicrocodeDescriptor (
   CurrentMicrocodeCount = (UINT8)GetMicrocodeInfo (MicrocodeFmpPrivate, MicrocodeFmpPrivate->DescriptorCount, MicrocodeFmpPrivate->ImageDescriptor, MicrocodeFmpPrivate->MicrocodeInfo);
   ASSERT(CurrentMicrocodeCount == MicrocodeFmpPrivate->DescriptorCount);
 
+  InitializedProcessorMicrocodeIndex (MicrocodeFmpPrivate);
+
   return EFI_SUCCESS;
+}
+
+/**
+  Initialize MicrocodeFmpDriver multiprocessor information.
+
+  @param[in] MicrocodeFmpPrivate private data structure to be initialized.
+
+  @return EFI_SUCCESS private data is initialized.
+**/
+EFI_STATUS
+InitializeProcessorInfo (
+  IN MICROCODE_FMP_PRIVATE_DATA  *MicrocodeFmpPrivate
+  )
+{
+  EFI_STATUS                           Status;
+  EFI_MP_SERVICES_PROTOCOL             *MpService;
+  UINTN                                NumberOfProcessors;
+  UINTN                                NumberOfEnabledProcessors;
+  UINTN                                Index;
+  UINTN                                BspIndex;
+
+  Status = gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpService);
+  ASSERT_EFI_ERROR(Status);
+
+  MicrocodeFmpPrivate->MpService = MpService;
+  MicrocodeFmpPrivate->ProcessorCount = 0;
+  MicrocodeFmpPrivate->ProcessorInfo = NULL;
+
+  Status = MpService->GetNumberOfProcessors (MpService, &NumberOfProcessors, &NumberOfEnabledProcessors);
+  ASSERT_EFI_ERROR(Status);
+  MicrocodeFmpPrivate->ProcessorCount = NumberOfProcessors;
+
+  Status = MpService->WhoAmI (MpService, &BspIndex);
+  ASSERT_EFI_ERROR(Status);
+  MicrocodeFmpPrivate->BspIndex = BspIndex;
+
+  MicrocodeFmpPrivate->ProcessorInfo = AllocateZeroPool (sizeof(PROCESSOR_INFO) * MicrocodeFmpPrivate->ProcessorCount);
+  if (MicrocodeFmpPrivate->ProcessorInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Index = 0; Index < NumberOfProcessors; Index++) {
+    MicrocodeFmpPrivate->ProcessorInfo[Index].CpuIndex = Index;
+    MicrocodeFmpPrivate->ProcessorInfo[Index].MicrocodeIndex = (UINTN)-1;
+    if (Index == BspIndex) {
+      CollectProcessorInfo (&MicrocodeFmpPrivate->ProcessorInfo[Index]);
+    } else {
+      Status = MpService->StartupThisAP (
+                            MpService,
+                            CollectProcessorInfo,
+                            Index,
+                            NULL,
+                            0,
+                            &MicrocodeFmpPrivate->ProcessorInfo[Index],
+                            NULL
+                            );
+      ASSERT_EFI_ERROR(Status);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Dump private information.
+
+  @param[in] MicrocodeFmpPrivate private data structure.
+**/
+VOID
+DumpPrivateInfo (
+  IN MICROCODE_FMP_PRIVATE_DATA  *MicrocodeFmpPrivate
+  )
+{
+  UINTN                                Index;
+  PROCESSOR_INFO                       *ProcessorInfo;
+  MICROCODE_INFO                       *MicrocodeInfo;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR        *ImageDescriptor;
+
+  DEBUG ((DEBUG_INFO, "ProcessorInfo:\n"));
+  DEBUG ((DEBUG_INFO, "  ProcessorCount - 0x%x\n", MicrocodeFmpPrivate->ProcessorCount));
+  DEBUG ((DEBUG_INFO, "  BspIndex - 0x%x\n", MicrocodeFmpPrivate->BspIndex));
+
+  ProcessorInfo = MicrocodeFmpPrivate->ProcessorInfo;
+  for (Index = 0; Index < MicrocodeFmpPrivate->ProcessorCount; Index++) {
+    DEBUG ((
+      DEBUG_INFO,
+      "  ProcessorInfo[0x%x] - 0x%08x, 0x%02x, 0x%08x, (0x%x)\n",
+      ProcessorInfo[Index].CpuIndex,
+      ProcessorInfo[Index].ProcessorSignature,
+      ProcessorInfo[Index].PlatformId,
+      ProcessorInfo[Index].MicrocodeRevision,
+      ProcessorInfo[Index].MicrocodeIndex
+      ));
+  }
+
+  DEBUG ((DEBUG_INFO, "MicrocodeInfo:\n"));
+  MicrocodeInfo = MicrocodeFmpPrivate->MicrocodeInfo;
+  DEBUG ((DEBUG_INFO, "  MicrocodeRegion - 0x%x - 0x%x\n", MicrocodeFmpPrivate->MicrocodePatchAddress, MicrocodeFmpPrivate->MicrocodePatchRegionSize));
+  DEBUG ((DEBUG_INFO, "  MicrocodeCount - 0x%x\n", MicrocodeFmpPrivate->DescriptorCount));
+  for (Index = 0; Index < MicrocodeFmpPrivate->DescriptorCount; Index++) {
+    DEBUG ((
+      DEBUG_INFO,
+      "  MicrocodeInfo[0x%x] - 0x%08x, 0x%08x, (0x%x)\n",
+      Index,
+      MicrocodeInfo[Index].MicrocodeEntryPoint,
+      MicrocodeInfo[Index].TotalSize,
+      MicrocodeInfo[Index].InUse
+      ));
+  }
+
+  ImageDescriptor = MicrocodeFmpPrivate->ImageDescriptor;
+  DEBUG ((DEBUG_VERBOSE, "ImageDescriptor:\n"));
+  for (Index = 0; Index < MicrocodeFmpPrivate->DescriptorCount; Index++) {
+    DEBUG((DEBUG_VERBOSE, "  ImageDescriptor (%d)\n", Index));
+    DEBUG((DEBUG_VERBOSE, "    ImageIndex                  - 0x%x\n", ImageDescriptor[Index].ImageIndex));
+    DEBUG((DEBUG_VERBOSE, "    ImageTypeId                 - %g\n", &ImageDescriptor[Index].ImageTypeId));
+    DEBUG((DEBUG_VERBOSE, "    ImageId                     - 0x%lx\n", ImageDescriptor[Index].ImageId));
+    DEBUG((DEBUG_VERBOSE, "    ImageIdName                 - %s\n", ImageDescriptor[Index].ImageIdName));
+    DEBUG((DEBUG_VERBOSE, "    Version                     - 0x%x\n", ImageDescriptor[Index].Version));
+    DEBUG((DEBUG_VERBOSE, "    VersionName                 - %s\n", ImageDescriptor[Index].VersionName));
+    DEBUG((DEBUG_VERBOSE, "    Size                        - 0x%x\n", ImageDescriptor[Index].Size));
+    DEBUG((DEBUG_VERBOSE, "    AttributesSupported         - 0x%lx\n", ImageDescriptor[Index].AttributesSupported));
+    DEBUG((DEBUG_VERBOSE, "    AttributesSetting           - 0x%lx\n", ImageDescriptor[Index].AttributesSetting));
+    DEBUG((DEBUG_VERBOSE, "    Compatibilities             - 0x%lx\n", ImageDescriptor[Index].Compatibilities));
+    DEBUG((DEBUG_VERBOSE, "    LowestSupportedImageVersion - 0x%x\n", ImageDescriptor[Index].LowestSupportedImageVersion));
+    DEBUG((DEBUG_VERBOSE, "    LastAttemptVersion          - 0x%x\n", ImageDescriptor[Index].LastAttemptVersion));
+    DEBUG((DEBUG_VERBOSE, "    LastAttemptStatus           - 0x%x\n", ImageDescriptor[Index].LastAttemptStatus));
+    DEBUG((DEBUG_VERBOSE, "    HardwareInstance            - 0x%lx\n", ImageDescriptor[Index].HardwareInstance));
+  }
 }
 
 /**
@@ -507,7 +680,19 @@ InitializePrivateData (
     return EFI_NOT_FOUND;
   }
 
+  Status = InitializeProcessorInfo (MicrocodeFmpPrivate);
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_ERROR, "InitializeProcessorInfo - %r\n", Status));
+    return Status;
+  }
+
   Status = InitializeMicrocodeDescriptor(MicrocodeFmpPrivate);
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_ERROR, "InitializeMicrocodeDescriptor - %r\n", Status));
+    return Status;
+  }
+
+  DumpPrivateInfo (MicrocodeFmpPrivate);
 
   return Status;
 }
