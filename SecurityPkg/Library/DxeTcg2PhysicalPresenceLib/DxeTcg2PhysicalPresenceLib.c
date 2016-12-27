@@ -932,7 +932,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
                   &PpiFlags
                   );
   if (EFI_ERROR (Status)) {
-    PpiFlags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
+    PpiFlags.PPFlags = PcdGet32(PcdTcg2PhysicalPresenceFlags);
     Status   = gRT->SetVariable (
                       TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
                       &gEfiTcg2PhysicalPresenceGuid,
@@ -944,6 +944,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
       DEBUG ((EFI_D_ERROR, "[TPM2] Set physical presence flag failed, Status = %r\n", Status));
       return ;
     }
+    DEBUG((DEBUG_INFO, "[TPM2] Initial physical presence flags value is 0x%x\n", PpiFlags.PPFlags));
   }
   
   //
