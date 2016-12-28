@@ -115,8 +115,6 @@
   NetworkPkg/HttpDxe/HttpDxe.inf
   NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
   NetworkPkg/HttpBootDxe/HttpBootDxe.inf
-  NetworkPkg/TlsDxe/TlsDxe.inf
-  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
 
   NetworkPkg/Application/IfConfig6/IfConfig6.inf
   NetworkPkg/Application/IpsecConfig/IpSecConfig.inf
@@ -126,6 +124,9 @@
   NetworkPkg/IpSecDxe/IpSecDxe.inf
   NetworkPkg/IScsiDxe/IScsiDxe.inf
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  NetworkPkg/TlsDxe/TlsDxe.inf
+  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
+  
   NetworkPkg/Application/Ping6/Ping6.inf
 
 [BuildOptions]
