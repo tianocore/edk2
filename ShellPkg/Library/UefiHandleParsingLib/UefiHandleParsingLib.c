@@ -3079,3 +3079,55 @@ GetHandleListByProtocolList (
 
   return (HandleList);
 }
+
+/**
+  Return all supported GUIDs.
+
+  @param[out]     Guids  The buffer to return all supported GUIDs.
+  @param[in, out] Count  On input, the count of GUIDs the buffer can hold,
+                         On output, the count of GUIDs to return.
+
+  @retval EFI_INVALID_PARAMETER Count is NULL.
+  @retval EFI_BUFFER_TOO_SMALL  Buffer is not enough to hold all GUIDs.
+  @retval EFI_SUCCESS           GUIDs are returned successfully.
+**/
+EFI_STATUS
+EFIAPI
+GetAllMappingGuids (
+  OUT EFI_GUID *Guids,
+  IN OUT UINTN *Count
+  )
+{
+  UINTN GuidCount;
+  UINTN NtGuidCount
+  UINTN Index;
+
+  if (Count == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NtGuidCount = 0;
+  if (PcdGetBool (PcdShellIncludeNtGuids)) {
+    NtGuidCount = ARRAY_SIZE (mGuidStringListNT) - 1;
+  }
+  GuidCount   = ARRAY_SIZE (mGuidStringList) - 1;
+
+  if (*Count < NtGuidCount + GuidCount + mGuidListCount) {
+    *Count = NtGuidCount + GuidCount + mGuidListCount;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  for (Index = 0; Index < NtGuidCount; Index++) {
+    CopyGuid (&Guids[Index], mGuidStringListNT[Index].GuidId);
+  }
+
+  for (Index = 0; Index < GuidCount; Index++) {
+    CopyGuid (&Guids[NtGuidCount + Index], mGuidStringList[Index].GuidId);
+  }
+
+  for (Index = 0; Index < mGuidListCount; Index++) {
+    CopyGuid (&Guids[NtGuidCount + GuidCount + Index], mGuidList[Index].GuidId);
+  }
+
+  return EFI_SUCCESS;
+}

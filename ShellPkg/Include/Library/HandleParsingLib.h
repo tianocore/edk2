@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -386,6 +386,25 @@ EFI_HANDLE*
 EFIAPI
 GetHandleListByProtocolList (
   IN CONST EFI_GUID **ProtocolGuids
+  );
+
+
+/**
+  Return all supported GUIDs.
+
+  @param[out]     Guids  The buffer to return all supported GUIDs.
+  @param[in out]  Count  On input, the count of GUIDs the buffer can hold,
+                         On output, the count of GUIDs to return.
+
+  @retval EFI_INVALID_PARAMETER Count is NULL.
+  @retval EFI_BUFFER_TOO_SMALL  Buffer is not enough to hold all GUIDs.
+  @retval EFI_SUCCESS           GUIDs are returned successfully.
+**/
+EFI_STATUS
+EFIAPI
+GetAllMappingGuids (
+  OUT EFI_GUID *Guids,
+  IN OUT UINTN *Count
   );
 
 #endif // __HANDLE_PARSING_LIB__
