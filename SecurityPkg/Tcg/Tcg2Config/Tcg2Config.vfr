@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the TCG2 configuration component.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -52,6 +52,14 @@ formset
     endoneof;
 
     suppressif ideqvallist TCG2_CONFIGURATION.TpmDevice == TPM_DEVICE_NULL TPM_DEVICE_1_2;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    text
+      help   = STRING_TOKEN(STR_TPM2_ACPI_HID_HELP),
+      text   = STRING_TOKEN(STR_TPM2_ACPI_HID_PROMPT),
+        text   = STRING_TOKEN(STR_TPM2_ACPI_HID_CONTENT);
+
     text
       help   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_STATE_HELP),
       text   = STRING_TOKEN(STR_TCG2_DEVICE_INTERFACE_STATE_PROMPT),

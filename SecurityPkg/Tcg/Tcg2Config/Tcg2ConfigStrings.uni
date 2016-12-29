@@ -1,7 +1,7 @@
 /** @file
   String definitions for TCG2 configuration form.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -24,6 +24,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_TCG2_DEVICE_PROMPT              #language en-US "Attempt TPM Device"
 #string STR_TCG2_DEVICE_HELP                #language en-US "Attempt TPM Device: TPM1.2, or TPM2.0"
 #string STR_TCG2_DEVICE_CONTENT             #language en-US ""
+
+#string STR_TPM2_ACPI_HID_PROMPT                  #language en-US "HID from TPM2 ACPI Table"
+#string STR_TPM2_ACPI_HID_HELP                    #language en-US "HID from TPM2 ACPI Table: ManufacturerID + FirmwareVersion_1"
+#string STR_TPM2_ACPI_HID_CONTENT                 #language en-US ""
 
 #string STR_TCG2_DEVICE_INTERFACE_STATE_PROMPT         #language en-US "Current TPM Device Interface"
 #string STR_TCG2_DEVICE_INTERFACE_STATE_HELP           #language en-US "Current TPM Device Interface: TIS, PTP FIFO, PTP CRB"

@@ -337,7 +337,7 @@ UpdateHID (
   if (!EFI_ERROR(Status)) {
     DEBUG((EFI_D_INFO, "TPM_PT_MANUFACTURER 0x%08x\n", ManufacturerID));
     //
-    // ManfacturerID defined in TCG Vendor ID Registry 
+    // ManufacturerID defined in TCG Vendor ID Registry 
     // may tailed with 0x00 or 0x20
     //
     if ((ManufacturerID >> 24) == 0x00 || ((ManufacturerID >> 24) == 0x20)) {
@@ -396,7 +396,8 @@ UpdateHID (
 
         CopyMem(DataPtr, HID, TPM_HID_ACPI_SIZE);
       }
-      DEBUG((EFI_D_INFO, "TPM2 ACPI _HID updated to %a\n", HID));
+      DEBUG((DEBUG_INFO, "TPM2 ACPI _HID is patched to %a\n", DataPtr));
+
       return Status;
     }
   }
