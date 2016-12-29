@@ -3,7 +3,7 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 @REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
@@ -126,7 +126,7 @@ if /I "%1"=="/?" goto Usage
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
       echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
       echo. 
-      goto end
+      goto check_build_environment
     )
   )
   set PATH=%EDK_TOOLS_BIN%;%PATH%
@@ -144,7 +144,7 @@ if /I "%1"=="/?" goto Usage
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
       echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
       echo. 
-      goto end
+      goto check_build_environment
     )
   )
   set PATH=%EDK_TOOLS_BIN%;%PATH%
@@ -280,7 +280,7 @@ goto check_python_tools
   echo.
   echo !!! ERROR !!! Binary C tools are missing. They are requried to be built from BaseTools Source.
   echo.
-  goto end
+  goto check_build_environment
 
 :check_python_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\build.exe" goto check_build_environment
@@ -307,7 +307,7 @@ goto end
       set PYTHON_HOME=%PYTHONHOME%
     ) else (
       echo.
-      echo  !!! ERROR !!! Binary python tools are missing. PYTHON_HOME environment variable is not set. 
+      echo !!! ERROR !!! Binary python tools are missing. PYTHON_HOME environment variable is not set. 
       echo PYTHON_HOME is required to build or execute the python tools.
       echo.
       goto end
