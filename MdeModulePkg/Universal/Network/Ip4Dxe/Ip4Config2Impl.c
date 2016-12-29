@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv4 Configuration II Protocol.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -741,13 +741,17 @@ Ip4Config2SetDnsServerWorker (
       //
       // The dns server address must be unicast.
       //
-      FreePool (Tmp);
+      if (Tmp != NULL) {
+        FreePool (Tmp);
+      }
       return EFI_INVALID_PARAMETER;
     }
 
     for (Index1 = NewIndex + 1; Index1 < NewDnsCount; Index1++) {
       if (EFI_IP4_EQUAL (NewDns + NewIndex, NewDns + Index1)) {
-        FreePool (Tmp);
+        if (Tmp != NULL) {
+          FreePool (Tmp);
+        }
         return EFI_INVALID_PARAMETER;
       }
     }
