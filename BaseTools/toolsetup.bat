@@ -121,6 +121,7 @@ if /I "%1"=="/?" goto Usage
     if exist %EDK_TOOLS_PATH%\Bin\Win32 (
       set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
     ) else (
+      set "PATH=%EDK_TOOLS_PATH%\Bin\Win32;%PATH%"
       echo.
       echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
@@ -139,6 +140,7 @@ if /I "%1"=="/?" goto Usage
     if exist %EDK_TOOLS_PATH%\Bin\Win32 (
       set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
     ) else (
+      set "PATH=%EDK_TOOLS_PATH%\Bin\Win32;%PATH%"
       echo.
       echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
