@@ -651,6 +651,7 @@ MpInitLibSwitchBSP (
   EFI_TIMER_ARCH_PROTOCOL      *Timer;
   UINT64                       TimerPeriod;
 
+  TimerPeriod = 0;
   //
   // Locate Timer Arch Protocol
   //
