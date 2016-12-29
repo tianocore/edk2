@@ -2,7 +2,7 @@
   The header file of HII Config Access protocol implementation of TCG2
   configuration module.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -73,6 +73,8 @@ extern TCG2_CONFIG_PRIVATE_DATA      *mTcg2ConfigPrivateDate;
 #define TCG2_CONFIG_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('T', 'r', 'E', 'D')
 #define TCG2_CONFIG_PRIVATE_DATA_FROM_THIS(a)  CR (a, TCG2_CONFIG_PRIVATE_DATA, ConfigAccess, TCG2_CONFIG_PRIVATE_DATA_SIGNATURE)
 
+#define TPM_HID_PNP_SIZE                                           8
+#define TPM_HID_ACPI_SIZE                                          9
 
 /**
   This function publish the TCG2 configuration Form for TPM device.

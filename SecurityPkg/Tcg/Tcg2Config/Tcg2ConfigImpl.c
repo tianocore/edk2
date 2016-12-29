@@ -2,7 +2,7 @@
   HII Config Access protocol implementation of TCG2 configuration module.
   NOTE: This module is only for reference only, each platform should have its own setup page.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -379,6 +379,83 @@ Tcg2RouteConfig (
 }
 
 /**
+  Get HID string of TPM2 ACPI device object
+
+  @param[in]  HID               Points to HID String Buffer.
+  @param[in]  Size              HID String size in bytes. Must >= TPM_HID_ACPI_SIZE
+
+  @return                       HID String get status.
+
+**/
+EFI_STATUS
+GetTpm2HID(
+   CHAR8 *HID,
+   UINTN  Size
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      ManufacturerID;
+  UINT32      FirmwareVersion1;
+  UINT32      FirmwareVersion2;
+  BOOLEAN     PnpHID;
+
+  PnpHID = TRUE;
+
+  ZeroMem(HID, Size);
+
+  //
+  // Get Manufacturer ID
+  //
+  Status = Tpm2GetCapabilityManufactureID(&ManufacturerID);
+  if (!EFI_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "TPM_PT_MANUFACTURER 0x%08x\n", ManufacturerID));
+    //
+    // ManufacturerID defined in TCG Vendor ID Registry
+    // may tailed with 0x00 or 0x20
+    //
+    if ((ManufacturerID >> 24) == 0x00 || ((ManufacturerID >> 24) == 0x20)) {
+      //
+      //  HID containing PNP ID "NNN####"
+      //   NNN is uppercase letter for Vendor ID specified by manufacturer
+      //
+      CopyMem(HID, &ManufacturerID, 3);
+    } else {
+      //
+      //  HID containing ACP ID "NNNN####"
+      //   NNNN is uppercase letter for Vendor ID specified by manufacturer
+      //
+      CopyMem(HID, &ManufacturerID, 4);
+      PnpHID = FALSE;
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "Get TPM_PT_MANUFACTURER failed %x!\n", Status));
+    ASSERT(FALSE);
+    return Status;
+  }
+
+  Status = Tpm2GetCapabilityFirmwareVersion(&FirmwareVersion1, &FirmwareVersion2);
+  if (!EFI_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "TPM_PT_FIRMWARE_VERSION_1 0x%x\n", FirmwareVersion1));
+    DEBUG((DEBUG_INFO, "TPM_PT_FIRMWARE_VERSION_2 0x%x\n", FirmwareVersion2));
+    //
+    //   #### is Firmware Version 1
+    //
+    if (PnpHID) {
+      AsciiSPrint(HID + 3, TPM_HID_PNP_SIZE - 3, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
+    } else {
+      AsciiSPrint(HID + 4, TPM_HID_ACPI_SIZE - 4, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
+    }
+
+  } else {
+    DEBUG ((DEBUG_ERROR, "Get TPM_PT_FIRMWARE_VERSION_X failed %x!\n", Status));
+    ASSERT(FALSE);
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   This function processes the results of changes in configuration.
 
   @param[in]  This               Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
@@ -411,10 +488,36 @@ Tcg2Callback (
      OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
-  EFI_INPUT_KEY               Key;
+  EFI_STATUS                 Status;
+  EFI_INPUT_KEY              Key;
+  CHAR8                      HidStr[16];
+  CHAR16                     UnHidStr[16];
+  TCG2_CONFIG_PRIVATE_DATA   *Private;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  Private = TCG2_CONFIG_PRIVATE_DATA_FROM_THIS (This);
+
+  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
+    //
+    // Update TPM2 HID info
+    //
+    if (QuestionId == KEY_TPM_DEVICE) {
+      Status = GetTpm2HID(HidStr, 16);
+
+      if (EFI_ERROR(Status)) {
+        //
+        //  Fail to get TPM2 HID
+        //
+        HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_TPM2_ACPI_HID_CONTENT), L"Unknown", NULL);
+      } else {
+        AsciiStrToUnicodeStrS(HidStr, UnHidStr, 16);
+        HiiSetString (Private->HiiHandle, STRING_TOKEN (STR_TPM2_ACPI_HID_CONTENT), UnHidStr, NULL);
+      }
+    }
+    return EFI_SUCCESS;
   }
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
