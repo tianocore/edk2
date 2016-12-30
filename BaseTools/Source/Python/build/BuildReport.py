@@ -4,7 +4,7 @@
 # This module contains the functionality to generate build report after
 # build all target completes successfully.
 #
-# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -885,6 +885,15 @@ class PcdReport(object):
                 #
                 TypeName, DecType = gPcdTypeMap.get(Type, ("", Type))
                 for Pcd in PcdDict[Key][Type]:
+                    PcdTokenCName = Pcd.TokenCName
+                    MixedPcdFlag = False
+                    if GlobalData.MixedPcd:
+                        for PcdKey in GlobalData.MixedPcd:
+                            if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdKey]:
+                                PcdTokenCName = PcdKey[0]
+                                MixedPcdFlag = True
+                        if MixedPcdFlag and not ModulePcdSet:
+                            continue
                     #
                     # Get PCD default value and their override relationship
                     #
@@ -957,17 +966,17 @@ class PcdReport(object):
                     # Report PCD item according to their override relationship
                     #
                     if BuildOptionMatch:
-                        FileWrite(File, ' *B %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                        FileWrite(File, ' *B %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                     elif DecMatch and InfMatch:
-                        FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                        FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                     else:
                         if DscMatch:
                             if (Pcd.TokenCName, Key) in self.FdfPcdSet:
-                                FileWrite(File, ' *F %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                                FileWrite(File, ' *F %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                             else:
-                                FileWrite(File, ' *P %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                                FileWrite(File, ' *P %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                         else:
-                            FileWrite(File, ' *M %-*s: %6s %10s = %-22s' % (self.MaxLen, Pcd.TokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                            FileWrite(File, ' *M %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
 
                     if TypeName in ('DYNHII', 'DEXHII', 'DYNVPD', 'DEXVPD'):
                         for SkuInfo in Pcd.SkuInfoList.values():
