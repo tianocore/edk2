@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv6 Configuration Protocol.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1366,13 +1366,17 @@ Ip6ConfigSetDnsServer (
       //
       // The dns server address must be unicast.
       //
-      FreePool (Tmp);
+      if (Tmp != NULL) {
+        FreePool (Tmp);
+      }
       return EFI_INVALID_PARAMETER;
     }
 
     for (Index1 = NewIndex + 1; Index1 < NewDnsCount; Index1++) {
       if (EFI_IP6_EQUAL (NewDns + NewIndex, NewDns + Index1)) {
-        FreePool (Tmp);
+        if (Tmp != NULL) {
+          FreePool (Tmp);
+        }
         return EFI_INVALID_PARAMETER;
       }
     }
