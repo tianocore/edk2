@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  This program and the accompanying materials
@@ -3239,13 +3239,10 @@ class FdfParser:
 
         if (FmpData.MonotonicCount and not FmpData.Certificate_Guid) or (not FmpData.MonotonicCount and FmpData.Certificate_Guid):
             EdkLogger.error("FdfParser", FORMAT_INVALID, "CERTIFICATE_GUID and MONOTONIC_COUNT must be work as a pair.")
-        # remove CERTIFICATE_GUID and MONOTONIC_COUNT from FmpKeyList, since these keys are optional
-        if 'CERTIFICATE_GUID' in FmpKeyList:
-            FmpKeyList.remove('CERTIFICATE_GUID')
-        if 'MONOTONIC_COUNT' in FmpKeyList:
-            FmpKeyList.remove('MONOTONIC_COUNT')
-        if FmpKeyList:
-            raise Warning("Missing keywords %s in FMP payload section." % ', '.join(FmpKeyList), self.FileName, self.CurrentLineNumber)
+
+        # Only the IMAGE_TYPE_ID is required item
+        if FmpKeyList and 'IMAGE_TYPE_ID' in FmpKeyList:
+            raise Warning("Missing keywords IMAGE_TYPE_ID in FMP payload section.", self.FileName, self.CurrentLineNumber)
         # get the Image file and Vendor code file
         self.__GetFMPCapsuleData(FmpData)
         if not FmpData.ImageFile:

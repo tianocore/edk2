@@ -1,7 +1,7 @@
 ## @file
 # generate capsule
 #
-#  Copyright (c) 2007-2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -186,7 +186,11 @@ class CapsulePayload(CapsuleData):
 
     def GenCapsuleSubItem(self, AuthData=[]):
         if not self.Version:
-            self.Version = 0x00000002
+            self.Version = '0x00000002'
+        if not self.ImageIndex:
+            self.ImageIndex = '0x1'
+        if not self.HardwareInstance:
+            self.HardwareInstance = '0x0'
         ImageFileSize = os.path.getsize(self.ImageFile)
         if AuthData:
             # the ImageFileSize need include the full authenticated info size. From first bytes of MonotonicCount to last bytes of certificate.
