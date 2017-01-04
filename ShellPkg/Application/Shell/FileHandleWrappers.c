@@ -3,7 +3,7 @@
   StdIn, StdOut, StdErr, etc...).
 
   Copyright 2016 Dell Inc.
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1074,6 +1074,10 @@ FileInterfaceEnvClose(
            (((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 3] == CHAR_CARRIAGE_RETURN)
          ) {
         ((CHAR16*)NewBuffer)[TotalSize / sizeof (CHAR16) - 3] = CHAR_NULL;
+        //
+        // If the NewBuffer end with \r\n\0, We will repace '\r' by '\0' and then update TotalSize.
+        //
+        TotalSize -= sizeof(CHAR16) * 2;
       }
 
       if (Volatile) {
