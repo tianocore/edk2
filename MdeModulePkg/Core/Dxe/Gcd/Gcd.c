@@ -3,7 +3,7 @@
   The GCD services are used to manage the memory and I/O regions that
   are accessible to the CPU that is executing the DXE core.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1337,7 +1337,11 @@ CoreAllocateMemorySpace (
   IN     EFI_HANDLE             DeviceHandle OPTIONAL
   )
 {
-  DEBUG ((DEBUG_GCD, "GCD:AllocateMemorySpace(Base=%016lx,Length=%016lx)\n", *BaseAddress, Length));
+  if (BaseAddress != NULL) {
+    DEBUG ((DEBUG_GCD, "GCD:AllocateMemorySpace(Base=%016lx,Length=%016lx)\n", *BaseAddress, Length));
+  } else {
+    DEBUG ((DEBUG_GCD, "GCD:AllocateMemorySpace(Base=<NULL>,Length=%016lx)\n", Length));
+  }
   DEBUG ((DEBUG_GCD, "  GcdAllocateType = %a\n", mGcdAllocationTypeNames[MIN (GcdAllocateType, EfiGcdMaxAllocateType)]));
   DEBUG ((DEBUG_GCD, "  GcdMemoryType   = %a\n", mGcdMemoryTypeNames[MIN (GcdMemoryType, EfiGcdMemoryTypeMaximum)]));
   DEBUG ((DEBUG_GCD, "  Alignment       = %016lx\n", LShiftU64 (1, Alignment)));
@@ -1761,7 +1765,11 @@ CoreAllocateIoSpace (
   IN     EFI_HANDLE             DeviceHandle OPTIONAL
   )
 {
-  DEBUG ((DEBUG_GCD, "GCD:AllocateIoSpace(Base=%016lx,Length=%016lx)\n", *BaseAddress, Length));
+  if (BaseAddress != NULL) {
+    DEBUG ((DEBUG_GCD, "GCD:AllocateIoSpace(Base=%016lx,Length=%016lx)\n", *BaseAddress, Length));
+  } else {
+    DEBUG ((DEBUG_GCD, "GCD:AllocateIoSpace(Base=<NULL>,Length=%016lx)\n", Length));
+  }
   DEBUG ((DEBUG_GCD, "  GcdAllocateType = %a\n", mGcdAllocationTypeNames[MIN (GcdAllocateType, EfiGcdMaxAllocateType)]));
   DEBUG ((DEBUG_GCD, "  GcdIoType       = %a\n", mGcdIoTypeNames[MIN (GcdIoType, EfiGcdIoTypeMaximum)]));
   DEBUG ((DEBUG_GCD, "  Alignment       = %016lx\n", LShiftU64 (1, Alignment)));
