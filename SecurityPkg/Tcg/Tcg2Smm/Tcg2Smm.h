@@ -1,7 +1,7 @@
 /** @file
   The header file for Tcg2 SMM driver.
   
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -98,7 +98,7 @@ typedef struct {
 //
 // PNP _HID for TPM2 device
 //
-#define TPM_HID_TAG                                                "NNN0000"
+#define TPM_HID_TAG                                                "NNNN0000"
 #define TPM_HID_PNP_SIZE                                           8
 #define TPM_HID_ACPI_SIZE                                          9
 

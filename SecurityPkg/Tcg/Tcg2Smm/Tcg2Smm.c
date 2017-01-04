@@ -9,7 +9,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -329,7 +329,6 @@ UpdateHID (
   // Initialize HID with Default PNP string
   //
   ZeroMem(HID, TPM_HID_ACPI_SIZE);
-  CopyMem(HID, TPM_HID_TAG, TPM_HID_PNP_SIZE);
 
   //
   // Get Manufacturer ID
@@ -389,10 +388,12 @@ UpdateHID (
     if (AsciiStrCmp((CHAR8 *)DataPtr,  TPM_HID_TAG) == 0) {
       if (PnpHID) {
         CopyMem(DataPtr, HID, TPM_HID_PNP_SIZE);
+        //
+        // if HID is PNP ID, patch the last byte in HID TAG to Noop
+        //
+        *(DataPtr + TPM_HID_PNP_SIZE) = AML_NOOP_OP;
       } else {
-        //
-        // NOOP will be patched to '\0'
-        //
+
         CopyMem(DataPtr, HID, TPM_HID_ACPI_SIZE);
       }
       DEBUG((EFI_D_INFO, "TPM2 ACPI _HID updated to %a\n", HID));
