@@ -110,7 +110,7 @@ SetApState (
 }
 
 /**
-  Save BSP's local APIC timer setting
+  Save BSP's local APIC timer setting.
 
   @param[in] CpuMpData          Pointer to CPU MP Data
 **/
