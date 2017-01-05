@@ -1,7 +1,7 @@
 /** @file
   The Miscellaneous Routines for TlsDxe driver.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -105,7 +105,7 @@ TlsEncryptPacket (
   while ((UINTN) BufferInPtr < (UINTN) BufferIn + BufferInSize) {
     RecordHeaderIn = (TLS_RECORD_HEADER *) BufferInPtr;
     
-    if (RecordHeaderIn->ContentType != TLS_CONTENT_TYPE_APPLICATION_DATA) {
+    if (RecordHeaderIn->ContentType != TlsContentTypeApplicationData) {
       Status = EFI_INVALID_PARAMETER;
       goto ERROR;
     }
@@ -256,7 +256,7 @@ TlsDecryptPacket (
   while ((UINTN) BufferInPtr < (UINTN) BufferIn + BufferInSize) {
     RecordHeaderIn = (TLS_RECORD_HEADER *) BufferInPtr;
 
-    if (RecordHeaderIn->ContentType != TLS_CONTENT_TYPE_APPLICATION_DATA) {
+    if (RecordHeaderIn->ContentType != TlsContentTypeApplicationData) {
       Status = EFI_INVALID_PARAMETER;
       goto ERROR;
     }

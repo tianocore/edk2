@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for HttpDxe driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1491,7 +1491,7 @@ HttpTransmitTcp (
       Status = EFI_OUT_OF_RESOURCES;
       return Status;
     }
-    ((TLS_RECORD_HEADER *) Buffer)->ContentType = TLS_CONTENT_TYPE_APPLICATION_DATA;
+    ((TLS_RECORD_HEADER *) Buffer)->ContentType = TlsContentTypeApplicationData;
     ((TLS_RECORD_HEADER *) Buffer)->Version.Major = HttpInstance->TlsConfigData.Version.Major;
     ((TLS_RECORD_HEADER *) Buffer)->Version.Minor = HttpInstance->TlsConfigData.Version.Minor;
     ((TLS_RECORD_HEADER *) Buffer)->Length = (UINT16) (TxStringLen);

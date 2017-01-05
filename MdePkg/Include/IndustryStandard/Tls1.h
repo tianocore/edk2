@@ -3,7 +3,7 @@
 
   This file contains common TLS 1.0/1.1/1.2 definitions from RFC 2246/4346/5246 
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -72,10 +72,10 @@
 /// TLS Content Type, refers to A.1 of rfc-2246, rfc-4346 and rfc-5246.
 ///
 typedef enum {
-  TLS_CONTENT_TYPE_CHANGE_CIPHER_SPEC = 20,
-  TLS_CONTENT_TYPE_ALERT              = 21,
-  TLS_CONTENT_TYPE_HANDSHAKE          = 22,
-  TLS_CONTENT_TYPE_APPLICATION_DATA   = 23,
+  TlsContentTypeChangeCipherSpec = 20,
+  TlsContentTypeAlert            = 21,
+  TlsContentTypeHandshake        = 22,
+  TlsContentTypeApplicationData  = 23,
 } TLS_CONTENT_TYPE;
 
 ///

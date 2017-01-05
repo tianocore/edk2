@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI TLS Protocol Interfaces.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -523,7 +523,7 @@ TlsBuildResponsePacket (
       //
       // Must be alert message, Decrypt it and build the ResponsePacket.
       //
-      ASSERT (((TLS_RECORD_HEADER *) RequestBuffer)->ContentType == TLS_CONTENT_TYPE_ALERT);
+      ASSERT (((TLS_RECORD_HEADER *) RequestBuffer)->ContentType == TlsContentTypeAlert);
 
       Status = TlsHandleAlert (
                  Instance->TlsConn,

@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines specific to Https for HttpDxe driver.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -883,10 +883,10 @@ TlsReceiveOnePdu (
   }
 
   RecordHeader = *(TLS_RECORD_HEADER *) Header;
-  if ((RecordHeader.ContentType == TLS_CONTENT_TYPE_HANDSHAKE ||
-    RecordHeader.ContentType == TLS_CONTENT_TYPE_ALERT ||
-    RecordHeader.ContentType == TLS_CONTENT_TYPE_CHANGE_CIPHER_SPEC ||
-    RecordHeader.ContentType == TLS_CONTENT_TYPE_APPLICATION_DATA) &&
+  if ((RecordHeader.ContentType == TlsContentTypeHandshake ||
+    RecordHeader.ContentType == TlsContentTypeAlert ||
+    RecordHeader.ContentType == TlsContentTypeChangeCipherSpec ||
+    RecordHeader.ContentType == TlsContentTypeApplicationData) &&
     (RecordHeader.Version.Major == 0x03) && /// Major versions are same.
     (RecordHeader.Version.Minor == TLS10_PROTOCOL_VERSION_MINOR ||
     RecordHeader.Version.Minor ==TLS11_PROTOCOL_VERSION_MINOR ||
@@ -1497,7 +1497,7 @@ HttpsReceive (
   //
   RecordHeader = *(TLS_RECORD_HEADER *) BufferIn;
 
-  if ((RecordHeader.ContentType == TLS_CONTENT_TYPE_APPLICATION_DATA) &&
+  if ((RecordHeader.ContentType == TlsContentTypeApplicationData) &&
     (RecordHeader.Version.Major == 0x03) &&
     (RecordHeader.Version.Minor == TLS10_PROTOCOL_VERSION_MINOR ||
     RecordHeader.Version.Minor == TLS11_PROTOCOL_VERSION_MINOR ||
@@ -1587,7 +1587,7 @@ HttpsReceive (
     //
     // Parsing buffer.
     //
-    ASSERT (((TLS_RECORD_HEADER *) (TempFragment.Bulk))->ContentType == TLS_CONTENT_TYPE_APPLICATION_DATA);
+    ASSERT (((TLS_RECORD_HEADER *) (TempFragment.Bulk))->ContentType == TlsContentTypeApplicationData);
 
     BufferInSize = ((TLS_RECORD_HEADER *) (TempFragment.Bulk))->Length;
     BufferIn = AllocateZeroPool (BufferInSize);
@@ -1603,7 +1603,7 @@ HttpsReceive (
     //
     FreePool (TempFragment.Bulk);
 
-  } else if ((RecordHeader.ContentType == TLS_CONTENT_TYPE_ALERT) &&
+  } else if ((RecordHeader.ContentType == TlsContentTypeAlert) &&
     (RecordHeader.Version.Major == 0x03) &&
     (RecordHeader.Version.Minor == TLS10_PROTOCOL_VERSION_MINOR ||
     RecordHeader.Version.Minor == TLS11_PROTOCOL_VERSION_MINOR ||
