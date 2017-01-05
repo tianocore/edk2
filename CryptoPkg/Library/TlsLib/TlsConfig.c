@@ -1,7 +1,7 @@
 /** @file
   SSL/TLS Configuration Library Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -422,7 +422,7 @@ TlsSetCaCertificate (
   TLS_CONNECTION  *TlsConn;
   SSL_CTX         *SslCtx;
   INTN            Ret;
-  unsigned long   ErrorCode;
+  UINTN           ErrorCode;
 
   BioCert   = NULL;
   Cert      = NULL;

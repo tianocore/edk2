@@ -2,7 +2,7 @@
   SSL/TLS Process Library Wrapper Implementation over OpenSSL.
   The process includes the TLS handshake and packet I/O.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -87,7 +87,7 @@ TlsDoHandshake (
   TLS_CONNECTION  *TlsConn;
   UINTN           PendingBufferSize;
   INTN            Ret;
-  unsigned long   ErrorCode;
+  UINTN           ErrorCode;
 
   TlsConn           = (TLS_CONNECTION *) Tls;
   PendingBufferSize = 0;
