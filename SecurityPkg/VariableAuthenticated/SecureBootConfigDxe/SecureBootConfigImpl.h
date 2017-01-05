@@ -2,7 +2,7 @@
   The header file of HII Config Access protocol implementation of SecureBoot
   configuration module.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -67,10 +67,7 @@ extern  EFI_IFR_GUID_LABEL         *mEndLabel;
 #define MAX_CHAR              480
 #define TWO_BYTE_ENCODE       0x82
 
-//
-// SHA-1 digest size in bytes.
-//
-#define SHA1_DIGEST_SIZE    20
+
 //
 // SHA-256 digest size in bytes
 //
@@ -94,7 +91,6 @@ extern  EFI_IFR_GUID_LABEL         *mEndLabel;
 //
 // Support hash types
 //
-#define HASHALG_SHA1                           0x00000000
 #define HASHALG_SHA224                         0x00000001
 #define HASHALG_SHA256                         0x00000002
 #define HASHALG_SHA384                         0x00000003

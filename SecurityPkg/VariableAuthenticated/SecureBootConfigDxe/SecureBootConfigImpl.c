@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of SecureBoot configuration module.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -63,7 +63,6 @@ UINT8 mHashOidValue[] = {
   };
 
 HASH_TABLE mHash[] = {
-  { L"SHA1",   20, &mHashOidValue[8],  5, Sha1GetContextSize,   Sha1Init,   Sha1Update,   Sha1Final  },
   { L"SHA224", 28, &mHashOidValue[13], 9, NULL,                 NULL,       NULL,         NULL       },
   { L"SHA256", 32, &mHashOidValue[22], 9, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Final},
   { L"SHA384", 48, &mHashOidValue[31], 9, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Final},
@@ -1786,7 +1785,7 @@ HashPeImage (
   SectionHeader = NULL;
   Status        = FALSE;
 
-  if ((HashAlg != HASHALG_SHA1) && (HashAlg != HASHALG_SHA256)) {
+  if (HashAlg != HASHALG_SHA256) {
     return FALSE;
   }
 
@@ -1795,13 +1794,8 @@ HashPeImage (
   //
   ZeroMem (mImageDigest, MAX_DIGEST_SIZE);
 
-  if (HashAlg == HASHALG_SHA1) {
-    mImageDigestSize  = SHA1_DIGEST_SIZE;
-    mCertType         = gEfiCertSha1Guid;
-  } else if (HashAlg == HASHALG_SHA256) {
-    mImageDigestSize  = SHA256_DIGEST_SIZE;
-    mCertType         = gEfiCertSha256Guid;
-  }
+  mImageDigestSize  = SHA256_DIGEST_SIZE;
+  mCertType         = gEfiCertSha256Guid;
 
   CtxSize   = mHash[HashAlg].GetContextSize();
 

@@ -12,7 +12,7 @@
   may not be modified without authorization. If platform fails to protect these resources,
   the authentication service provided in this driver will be broken, and the behavior is undefined.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,6 +36,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
+
+#define TWO_BYTE_ENCODE       0x82
 
 ///
 /// Struct to record signature requirement defined by UEFI spec.

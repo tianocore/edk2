@@ -18,7 +18,7 @@
   They will do basic validation for authentication data structure, then call crypto library
   to verify the signature.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,6 +35,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Public Exponent of RSA Key.
 //
 CONST UINT8 mRsaE[] = { 0x01, 0x00, 0x01 };
+
+CONST UINT8 mSha256OidValue[] = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01 };
 
 //
 // Requirement for different signature type which have been defined in UEFI spec.
@@ -2243,6 +2245,29 @@ VerifyTimeBasedPayload (
   //
   SigData = CertData->AuthInfo.CertData;
   SigDataSize = CertData->AuthInfo.Hdr.dwLength - (UINT32) (OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData));
+
+  //
+  // SignedData.digestAlgorithms shall contain the digest algorithm used when preparing the
+  // signature. Only a digest algorithm of SHA-256 is accepted.
+  //
+  //    According to PKCS#7 Definition:
+  //        SignedData ::= SEQUENCE {
+  //            version Version,
+  //            digestAlgorithms DigestAlgorithmIdentifiers,
+  //            contentInfo ContentInfo,
+  //            .... }
+  //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm 
+  //    in VARIABLE_AUTHENTICATION_2 descriptor.
+  //    This field has the fixed offset (+13) and be calculated based on two bytes of length encoding.
+  //
+  if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    if (SigDataSize >= (13 + sizeof (mSha256OidValue))) {
+      if (((*(SigData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) || 
+           (CompareMem (SigData + 13, &mSha256OidValue, sizeof (mSha256OidValue)) != 0)) {
+          return EFI_SECURITY_VIOLATION;
+        }
+    }
+  }
 
   //
   // Find out the new data payload which follows Pkcs7 SignedData directly.
