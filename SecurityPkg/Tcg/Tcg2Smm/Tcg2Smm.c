@@ -317,7 +317,7 @@ UpdateHID (
 {
   EFI_STATUS  Status;
   UINT8       *DataPtr;
-  CHAR8       HID[TPM_HID_ACPI_SIZE];
+  CHAR8       Hid[TPM_HID_ACPI_SIZE];
   UINT32      ManufacturerID;
   UINT32      FirmwareVersion1;
   UINT32      FirmwareVersion2;
@@ -328,7 +328,7 @@ UpdateHID (
   //
   // Initialize HID with Default PNP string
   //
-  ZeroMem(HID, TPM_HID_ACPI_SIZE);
+  ZeroMem(Hid, TPM_HID_ACPI_SIZE);
 
   //
   // Get Manufacturer ID
@@ -345,13 +345,13 @@ UpdateHID (
       //  HID containing PNP ID "NNN####"
       //   NNN is uppercase letter for Vendor ID specified by manufacturer
       //
-      CopyMem(HID, &ManufacturerID, 3);
+      CopyMem(Hid, &ManufacturerID, 3);
     } else {
       //
       //  HID containing ACP ID "NNNN####"
       //   NNNN is uppercase letter for Vendor ID specified by manufacturer
       //
-      CopyMem(HID, &ManufacturerID, 4);
+      CopyMem(Hid, &ManufacturerID, 4);
       PnpHID = FALSE;
     }
   } else {
@@ -368,9 +368,9 @@ UpdateHID (
     //   #### is Firmware Version 1
     //
     if (PnpHID) {
-      AsciiSPrint(HID + 3, TPM_HID_PNP_SIZE - 3, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
+      AsciiSPrint(Hid + 3, TPM_HID_PNP_SIZE - 3, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
     } else {
-      AsciiSPrint(HID + 4, TPM_HID_ACPI_SIZE - 4, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
+      AsciiSPrint(Hid + 4, TPM_HID_ACPI_SIZE - 4, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 && 0x0000FFFF));
     }
     
   } else {
@@ -387,14 +387,14 @@ UpdateHID (
        DataPtr += 1) {
     if (AsciiStrCmp((CHAR8 *)DataPtr,  TPM_HID_TAG) == 0) {
       if (PnpHID) {
-        CopyMem(DataPtr, HID, TPM_HID_PNP_SIZE);
+        CopyMem(DataPtr, Hid, TPM_HID_PNP_SIZE);
         //
         // if HID is PNP ID, patch the last byte in HID TAG to Noop
         //
         *(DataPtr + TPM_HID_PNP_SIZE) = AML_NOOP_OP;
       } else {
 
-        CopyMem(DataPtr, HID, TPM_HID_ACPI_SIZE);
+        CopyMem(DataPtr, Hid, TPM_HID_ACPI_SIZE);
       }
       DEBUG((DEBUG_INFO, "TPM2 ACPI _HID is patched to %a\n", DataPtr));
 
