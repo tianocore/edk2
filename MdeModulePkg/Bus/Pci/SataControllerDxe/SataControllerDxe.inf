@@ -1,6 +1,5 @@
 ## @file
-#  
-#    SataController driver to manage SATA compliance IDE/AHCI host controllers.
+#  SataController driver to manage SATA compliance IDE/AHCI host controllers.
 #
 #  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
