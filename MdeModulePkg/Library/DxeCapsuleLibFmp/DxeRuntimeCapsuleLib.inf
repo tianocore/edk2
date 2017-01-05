@@ -19,7 +19,7 @@
   BASE_NAME                      = DxeRuntimeCapsuleLib
   MODULE_UNI_FILE                = DxeRuntimeCapsuleLib.uni
   FILE_GUID                      = 19BE1E4B-1A9A-44c1-8F12-32DD0470516A
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = CapsuleLib|DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = DxeCapsuleLibConstructor
