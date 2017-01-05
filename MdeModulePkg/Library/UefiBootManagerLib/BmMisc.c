@@ -1,7 +1,7 @@
 /** @file
   Misc library functions.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -205,8 +205,11 @@ BmSetMemoryTypeInformationVariable (
     //
     return;
   }
-  PreviousMemoryTypeInformation = GET_GUID_HOB_DATA (GuidHob);
-  VariableSize = GET_GUID_HOB_DATA_SIZE (GuidHob);
+  VariableSize                  = GET_GUID_HOB_DATA_SIZE (GuidHob);
+  PreviousMemoryTypeInformation = AllocateCopyPool (VariableSize, GET_GUID_HOB_DATA (GuidHob));
+  if (PreviousMemoryTypeInformation == NULL) {
+    return;
+  }
 
   //
   // Use a heuristic to adjust the Memory Type Information for the next boot
@@ -278,14 +281,18 @@ BmSetMemoryTypeInformationVariable (
       // then reset the platform so the new Memory Type Information setting will be used to guarantee that an S4
       // entry/resume cycle will not fail.
       //
-      if (MemoryTypeInformationModified && Boot && PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
-        DEBUG ((EFI_D_INFO, "Memory Type Information settings change. Warm Reset!!!\n"));
-        gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+      if (MemoryTypeInformationModified) {
+        DEBUG ((EFI_D_INFO, "Memory Type Information settings change.\n"));
+        if (Boot && PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
+          DEBUG ((EFI_D_INFO, "...Warm Reset!!!\n"));
+          gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+        }
       }
     } else {
       DEBUG ((EFI_D_ERROR, "Memory Type Information settings cannot be saved. OS S4 may fail!\n"));
     }
   }
+  FreePool (PreviousMemoryTypeInformation);
 }
 
 /**
