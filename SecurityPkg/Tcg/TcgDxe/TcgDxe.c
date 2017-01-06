@@ -8,7 +8,7 @@ buffer overflow, integer overflow.
 
 TcgDxePassThroughToTpm() will receive untrusted input and do basic validation.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
@@ -395,7 +395,7 @@ TpmCommLogEvent (
   //
   // Prevent Event Overflow
   //
-  if (NewEventHdr->EventSize > (UINTN)(~0) - sizeof (*NewEventHdr)) {
+  if ((UINTN) NewEventHdr->EventSize > MAX_UINTN - sizeof (*NewEventHdr)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
