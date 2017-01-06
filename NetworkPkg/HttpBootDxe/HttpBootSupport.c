@@ -1,7 +1,7 @@
 /** @file
   Support functions implementation for UEFI HTTP boot driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
@@ -984,6 +984,57 @@ HttpIoRecvResponse (
   ResponseData->HeaderCount = HttpIo->RspToken.Message->HeaderCount;
   ResponseData->Headers     = HttpIo->RspToken.Message->Headers;
   ResponseData->BodyLength  = HttpIo->RspToken.Message->BodyLength;
+
+  return Status;
+}
+
+/**
+  This function checks the HTTP(S) URI scheme.
+
+  @param[in]    Uri              The pointer to the URI string.
+  
+  @retval EFI_SUCCESS            The URI scheme is valid.
+  @retval EFI_INVALID_PARAMETER  The URI scheme is not HTTP or HTTPS.
+  @retval EFI_ACCESS_DENIED      HTTP is disabled and the URI is HTTP.
+
+**/
+EFI_STATUS
+HttpBootCheckUriScheme (
+  IN      CHAR8                  *Uri
+  )
+{
+  UINTN                Index;
+  EFI_STATUS           Status;
+
+  Status = EFI_SUCCESS;
+
+  //
+  // Convert the scheme to all lower case.
+  //
+  for (Index = 0; Index < AsciiStrLen (Uri); Index++) {
+    if (Uri[Index] == ':') {
+      break;
+    }
+    if (Uri[Index] >= 'A' && Uri[Index] <= 'Z') {
+      Uri[Index] -= (CHAR8)('A' - 'a');
+    }
+  }
+
+  //
+  // Return EFI_INVALID_PARAMETER if the URI is not HTTP or HTTPS.
+  //
+  if ((AsciiStrnCmp (Uri, "http://", 7) != 0) && (AsciiStrnCmp (Uri, "https://", 8) != 0)) {
+    DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: Invalid Uri.\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // HTTP is disabled, return EFI_ACCESS_DENIED if the URI is HTTP.
+  //
+  if (!PcdGetBool (PcdAllowHttpConnections) && (AsciiStrnCmp (Uri, "http://", 7) == 0)) {
+    DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: HTTP is disabled.\n"));
+    return EFI_ACCESS_DENIED;
+  }
 
   return Status;
 }

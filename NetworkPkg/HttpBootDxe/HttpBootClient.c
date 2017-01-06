@@ -1,7 +1,7 @@
 /** @file
   Implementation of the boot file download function.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
@@ -192,6 +192,15 @@ HttpBootDhcp4ExtractUriInfo (
   }
 
   //
+  // Check the URI scheme.
+  //
+  Status = HttpBootCheckUriScheme (Private->BootFileUri);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "HttpBootDhcp4ExtractUriInfo: %r.\n", Status));
+    return Status;
+  }
+
+  //
   // Configure the default DNS server if server assigned.
   //
   if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || 
@@ -292,6 +301,15 @@ HttpBootDhcp6ExtractUriInfo (
     //
     Private->BootFileUriParser = Private->FilePathUriParser;
     Private->BootFileUri = Private->FilePathUri;
+  }
+
+  //
+  // Check the URI scheme.
+  //
+  Status = HttpBootCheckUriScheme (Private->BootFileUri);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "HttpBootDhcp6ExtractUriInfo: %r.\n", Status));
+    return Status;
   }
 
   //

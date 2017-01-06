@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to HTTP Boot.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -446,9 +446,16 @@ HttpBootFormCallback (
   )
 {
   EFI_INPUT_KEY                   Key;
-  UINTN                           Index;
   CHAR16                          *Uri;
+  UINTN                           UriLen;
+  CHAR8                           *AsciiUri;
   HTTP_BOOT_FORM_CALLBACK_INFO    *CallbackInfo;
+  EFI_STATUS                      Status;
+
+  Uri      = NULL;
+  UriLen   = 0;
+  AsciiUri = NULL;
+  Status   = EFI_SUCCESS;
   
   if (This == NULL || Value == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -466,49 +473,63 @@ HttpBootFormCallback (
     // Get user input URI string
     //
     Uri = HiiGetString (CallbackInfo->RegisteredHandle, Value->string, NULL);
-    if (Uri == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-
-    //
-    // Convert the scheme to all lower case.
-    //
-    for (Index = 0; Index < StrLen (Uri); Index++) {
-      if (Uri[Index] == L':') {
-        break;
-      }
-      if (Uri[Index] >= L'A' && Uri[Index] <= L'Z') {
-        Uri[Index] -= (CHAR16)(L'A' - L'a');
-      }
-    }
-
-    //
-    // Set the converted URI string back
-    //
-    HiiSetString (CallbackInfo->RegisteredHandle, Value->string, Uri, NULL);
 
     //
     // The URI should be either an empty string (for corporate environment) ,or http(s) for home environment.
-    // Pop up a message box for other unsupported URI.
+    // Pop up a message box for the unsupported URI.
     //
-    if ((StrLen (Uri) != 0) && (StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 8) != 0)) {
-      CreatePopUp (
-        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-        &Key,
-        L"ERROR: Unsupported URI!",
-        L"Only supports HTTP and HTTPS",
-        NULL
-        );
+    if (StrLen (Uri) != 0) {
+      UriLen = StrLen (Uri) + 1;
+      AsciiUri = AllocateZeroPool (UriLen);
+      if (AsciiUri == NULL) {
+        FreePool (Uri);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      UnicodeStrToAsciiStrS (Uri, AsciiUri, UriLen);
+
+      Status = HttpBootCheckUriScheme (AsciiUri);
+      
+      if (Status == EFI_INVALID_PARAMETER) {
+
+        DEBUG ((EFI_D_ERROR, "HttpBootFormCallback: %r.\n", Status));
+
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"ERROR: Unsupported URI!",
+          L"Only supports HTTP and HTTPS",
+          NULL
+          ); 
+      } else if (Status == EFI_ACCESS_DENIED) {
+      
+        DEBUG ((EFI_D_ERROR, "HttpBootFormCallback: %r.\n", Status));
+      
+        CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"ERROR: Unsupported URI!",
+          L"HTTP is disabled",
+          NULL
+          );
+      }
     }
 
-    FreePool (Uri);
+    if (Uri != NULL) {
+      FreePool (Uri);
+    }
+
+    if (AsciiUri != NULL) {
+      FreePool (AsciiUri);
+    }   
+    
     break;
 
   default:
     break;
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**

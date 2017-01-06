@@ -1,7 +1,7 @@
 /** @file
   Support functions declaration for UEFI HTTP boot driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -329,6 +329,21 @@ HttpIoRecvResponse (
   IN      HTTP_IO                  *HttpIo,
   IN      BOOLEAN                  RecvMsgHeader,
      OUT  HTTP_IO_RESPONSE_DATA    *ResponseData
+  );
+
+/**
+  This function checks the HTTP(S) URI scheme.
+
+  @param[in]    Uri              The pointer to the URI string.
+  
+  @retval EFI_SUCCESS            The URI scheme is valid.
+  @retval EFI_INVALID_PARAMETER  The URI scheme is not HTTP or HTTPS.
+  @retval EFI_ACCESS_DENIED      HTTP is disabled and the URI is HTTP.
+
+**/
+EFI_STATUS
+HttpBootCheckUriScheme (
+  IN      CHAR8                  *Uri
   );
 
 /**

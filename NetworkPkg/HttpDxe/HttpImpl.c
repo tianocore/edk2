@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -353,6 +353,16 @@ EfiHttpRequest (
     // be able to determine whether to use http or https.
     //
     HttpInstance->UseHttps = IsHttpsUrl (Url);
+
+    //
+    // HTTP is disabled, return directly if the URI is not HTTPS.
+    //
+    if (!PcdGetBool (PcdAllowHttpConnections) && !(HttpInstance->UseHttps)) {
+      
+      DEBUG ((EFI_D_ERROR, "EfiHttpRequest: HTTP is disabled.\n"));
+
+      return EFI_ACCESS_DENIED;
+    }
 
     //
     // Check whether we need to create Tls child and open the TLS protocol.

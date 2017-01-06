@@ -4,7 +4,7 @@
 # This package provides network modules that conform to UEFI 2.4 specification.
 #
 # (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -78,6 +78,12 @@
   ## Private Key's size.
   # @Prompt Private Key's size.
   gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCertificateKeySize|0x3d5|UINT32|0x00000006
+
+  ## Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
+  # TRUE  - HTTP connections are allowed. Both the "https://" and "http://" URI schemes are permitted.
+  # FALSE - HTTP connections are denied. Only the "https://" URI scheme is permitted.
+  # @Prompt Indicates whether HTTP connections are permitted or not.
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|FALSE|BOOLEAN|0x00000008
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
