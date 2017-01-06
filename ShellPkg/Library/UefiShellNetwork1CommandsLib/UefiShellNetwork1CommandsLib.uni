@@ -1,7 +1,7 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -66,6 +66,7 @@
 #string STR_IFCONFIG_LACK_COMMAND             #language en-US    "Lack interface config option.\n"
 #string STR_IFCONFIG_INVALID_INTERFACE        #language en-US    "Invalid interface name.\n"
 #string STR_IFCONFIG_INVALID_IPADDRESS        #language en-US    "Invalid ipv4 address: '%H%s%N'\n"
+#string STR_IFCONFIG_INVALID_GATEWAY          #language en-US    "Invalid gateway address: '%H%s%N'\n"
 #string STR_IFCONFIG_DUPLICATE_COMMAND        #language en-US    "Duplicate commands. Bad command %H%s%N is skipped.\n"
 #string STR_IFCONFIG_CONFLICT_COMMAND         #language en-US    "Conflict commands. Bad command %H%s%N is skipped.\n"
 #string STR_IFCONFIG_UNKNOWN_COMMAND          #language en-US    "Unknown commands. Bad command %H%s%N is skipped.\n"
