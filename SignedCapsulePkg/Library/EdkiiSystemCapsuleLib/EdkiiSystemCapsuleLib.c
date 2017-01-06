@@ -6,7 +6,7 @@
   CapsuleAuthenticateSystemFirmware(), ExtractAuthenticatedImage() will receive
   untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -386,7 +386,7 @@ ExtractAuthenticatedImage (
     DEBUG((DEBUG_ERROR, "ExtractAuthenticatedImage - dwLength too small\n"));
     return FALSE;
   }
-  if (ImageAuth->AuthInfo.Hdr.dwLength > MAX_UINTN - sizeof(UINT64)) {
+  if ((UINTN) ImageAuth->AuthInfo.Hdr.dwLength > MAX_UINTN - sizeof(UINT64)) {
     DEBUG((DEBUG_ERROR, "ExtractAuthenticatedImage - dwLength too big\n"));
     return FALSE;
   }
