@@ -1,7 +1,7 @@
 /** @file
   This is THE shell (application)
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1042,9 +1042,29 @@ ProcessCommandLine(
         continue;
       }
 
-      ShellInfoObject.ShellInitSettings.FileName = AllocateCopyPool(StrSize(CurrentArg), CurrentArg);
+      ShellInfoObject.ShellInitSettings.FileName = NULL;
+      Size = 0;
+      //
+      // If first argument contains a space, then add double quotes before the argument
+      //
+      if (StrStr (CurrentArg, L" ") != NULL) {
+        StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileName, &Size, L"\"", 0);
+        if (ShellInfoObject.ShellInitSettings.FileName == NULL) {
+          return (EFI_OUT_OF_RESOURCES);
+        }
+      }
+      StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileName, &Size, CurrentArg, 0);
       if (ShellInfoObject.ShellInitSettings.FileName == NULL) {
         return (EFI_OUT_OF_RESOURCES);
+      }
+      //
+      // If first argument contains a space, then add double quotes after the argument
+      //
+      if (StrStr (CurrentArg, L" ") != NULL) {
+        StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileName, &Size, L"\"", 0);
+        if (ShellInfoObject.ShellInitSettings.FileName == NULL) {
+          return (EFI_OUT_OF_RESOURCES);
+        }
       }
       //
       // We found `file-name`.
@@ -1055,13 +1075,28 @@ ProcessCommandLine(
       // Add `file-name-options`
       for (Size = 0 ; LoopVar < gEfiShellParametersProtocol->Argc ; LoopVar++) {
         ASSERT((ShellInfoObject.ShellInitSettings.FileOptions == NULL && Size == 0) || (ShellInfoObject.ShellInitSettings.FileOptions != NULL));
-        StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
-                    &Size,
-                    L" ",
-                    0);
-        if (ShellInfoObject.ShellInitSettings.FileOptions == NULL) {
-          SHELL_FREE_NON_NULL(ShellInfoObject.ShellInitSettings.FileName);
-          return (EFI_OUT_OF_RESOURCES);
+        //
+        // Add a space between arguments
+        //
+        if (ShellInfoObject.ShellInitSettings.FileOptions != NULL) {
+          StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions, &Size, L" ", 0);
+          if (ShellInfoObject.ShellInitSettings.FileOptions == NULL) {
+            SHELL_FREE_NON_NULL(ShellInfoObject.ShellInitSettings.FileName);
+            return (EFI_OUT_OF_RESOURCES);
+          }
+        }
+        //
+        // If an argumnent contains a space, then add double quotes before the argument
+        //
+        if (StrStr (gEfiShellParametersProtocol->Argv[LoopVar], L" ") != NULL) {
+          StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
+                      &Size,
+                      L"\"",
+                      0);
+          if (ShellInfoObject.ShellInitSettings.FileOptions == NULL) {
+            SHELL_FREE_NON_NULL(ShellInfoObject.ShellInitSettings.FileName);
+            return (EFI_OUT_OF_RESOURCES);
+          }
         }
         StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
                     &Size,
@@ -1070,6 +1105,19 @@ ProcessCommandLine(
         if (ShellInfoObject.ShellInitSettings.FileOptions == NULL) {
           SHELL_FREE_NON_NULL(ShellInfoObject.ShellInitSettings.FileName);
           return (EFI_OUT_OF_RESOURCES);
+        }
+        //
+        // If an argumnent contains a space, then add double quotes after the argument
+        //
+        if (StrStr (gEfiShellParametersProtocol->Argv[LoopVar], L" ") != NULL) {
+          StrnCatGrow(&ShellInfoObject.ShellInitSettings.FileOptions,
+                      &Size,
+                      L"\"",
+                      0);
+          if (ShellInfoObject.ShellInitSettings.FileOptions == NULL) {
+            SHELL_FREE_NON_NULL(ShellInfoObject.ShellInitSettings.FileName);
+            return (EFI_OUT_OF_RESOURCES);
+          }
         }
       }
     }
