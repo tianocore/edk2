@@ -4,7 +4,7 @@
 # The Emulation Platform can be used to debug individual modules, prior to creating
 #    a real platform. This also provides an example for how an DSC is created.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
@@ -59,7 +59,17 @@
   #       feature, please follow the instructions found in the file "Patch-HOWTO.txt" 
   #       located in CryptoPkg\Library\OpensslLib to enable the OpenSSL building first.
   #
-  DEFINE TLS_ENABLE      = FALSE
+  DEFINE TLS_ENABLE = FALSE
+  
+  #
+  # Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
+  # -D FLAG=VALUE
+  #
+  # Note: If ALLOW_HTTP_CONNECTIONS is TRUE, HTTP connections are allowed. Both 
+  #       the "https://" and "http://" URI schemes are permitted. Otherwise, HTTP 
+  #       connections are denied. Only the "https://" URI scheme is permitted.
+  #
+  DEFINE ALLOW_HTTP_CONNECTIONS = TRUE
 
 ################################################################################
 #
@@ -252,6 +262,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
 !if $(SECURE_BOOT_ENABLE) == TRUE || $(TLS_ENABLE) == TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
+!endif
+
+!if $(ALLOW_HTTP_CONNECTIONS) == TRUE
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
 !endif
 
 !ifndef $(USE_OLD_SHELL)
