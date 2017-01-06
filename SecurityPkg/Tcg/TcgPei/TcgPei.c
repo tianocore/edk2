@@ -1,7 +1,7 @@
 /** @file
   Initialize TPM device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -591,6 +591,7 @@ PhysicalPresencePpiNotifyCallback (
     // Lock TPM LifetimeLock is required, and LifetimeLock is not locked yet. 
     //
     PhysicalPresenceValue = TPM_PHYSICAL_PRESENCE_LIFETIME_LOCK;
+    TpmPermanentFlags.physicalPresenceLifetimeLock = TRUE;
 
     if (PcdGetBool (PcdPhysicalPresenceCmdEnable)) {
       PhysicalPresenceValue |= TPM_PHYSICAL_PRESENCE_CMD_ENABLE;
