@@ -522,7 +522,6 @@ Tcg2Callback (
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
     if (QuestionId == KEY_TPM_DEVICE_INTERFACE) {
-      EFI_STATUS  Status;
       Status = SetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress), Value->u8);
       if (EFI_ERROR (Status)) {
         CreatePopUp (
