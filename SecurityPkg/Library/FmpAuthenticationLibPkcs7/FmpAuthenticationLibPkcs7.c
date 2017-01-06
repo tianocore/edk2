@@ -10,7 +10,7 @@
   FmpAuthenticatedHandlerPkcs7(), AuthenticateFmpImage() will receive
   untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -181,7 +181,7 @@ AuthenticateFmpImage (
     DEBUG((DEBUG_ERROR, "AuthenticateFmpImage - dwLength too small\n"));
     return RETURN_INVALID_PARAMETER;
   }
-  if (Image->AuthInfo.Hdr.dwLength > MAX_UINTN - sizeof(UINT64)) {
+  if ((UINTN) Image->AuthInfo.Hdr.dwLength > MAX_UINTN - sizeof(UINT64)) {
     DEBUG((DEBUG_ERROR, "AuthenticateFmpImage - dwLength too big\n"));
     return RETURN_INVALID_PARAMETER;
   }
