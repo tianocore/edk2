@@ -137,7 +137,7 @@ InitializeTcg2VersionInfo (
     }
   } else {
     //
-    // EFI variable doesn't exist.
+    // EFI variable doesn't exist or variable size is not expected.
     //
 
     //
@@ -182,7 +182,7 @@ InitializeTcg2VersionInfo (
   //
   // Get the PCD value again.
   // If the PCD value is not equal to the value in variable,
-  // the PCD is not DynamicHii type and maps to the setup option.
+  // the PCD is not DynamicHii type and does not map to the setup option.
   //
   PcdTcg2PpiVersion = 0;
   CopyMem (
@@ -191,7 +191,7 @@ InitializeTcg2VersionInfo (
     AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
     );
   if (PcdTcg2PpiVersion != Tcg2Version.PpiVersion) {
-    DEBUG ((DEBUG_WARN, "WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and maps to TCG2_VERSION.PpiVersion\n"));
+    DEBUG ((DEBUG_WARN, "WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and does not map to TCG2_VERSION.PpiVersion\n"));
     DEBUG ((DEBUG_WARN, "WARNING: The TCG2 PPI version configuring from setup page will not work\n"));
   }
 

@@ -489,7 +489,7 @@ Tcg2VersionInfoCallback (
     // Get the PCD value after EFI_BROWSER_ACTION_SUBMITTED,
     // the SetVariable to TCG2_VERSION_NAME should have been done.
     // If the PCD value is not equal to the value set to variable,
-    // the PCD is not DynamicHii type and maps to the setup option.
+    // the PCD is not DynamicHii type and does not map to the setup option.
     //
     PcdTcg2PpiVersion = 0;
     CopyMem (
@@ -501,7 +501,7 @@ Tcg2VersionInfoCallback (
       CreatePopUp (
         EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
         &Key,
-        L"WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and maps to this option!",
+        L"WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and does not map to this option!",
         L"The version configuring by this setup option will not work!",
         NULL
         );
