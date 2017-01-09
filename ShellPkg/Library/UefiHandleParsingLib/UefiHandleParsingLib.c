@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
@@ -19,8 +19,8 @@
 
 EFI_HANDLE        mHandleParsingHiiHandle = NULL;
 HANDLE_INDEX_LIST mHandleList = {{{NULL,NULL},0,0},0};
-GUID_INFO_BLOCK   *GuidList;
-UINTN             GuidListCount;
+GUID_INFO_BLOCK   *mGuidList;
+UINTN             mGuidListCount;
 /**
   Function to translate the EFI_MEMORY_TYPE into a string.
 
@@ -98,8 +98,8 @@ HandleParsingLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  GuidListCount = 0;
-  GuidList      = NULL;
+  mGuidListCount = 0;
+  mGuidList      = NULL;
 
   //
   // Do nothing with mHandleParsingHiiHandle.  Initialize HII as needed.
@@ -137,11 +137,11 @@ HandleParsingLibDestructor (
 {
   UINTN                 LoopCount;
 
-  for (LoopCount = 0; GuidList != NULL && LoopCount < GuidListCount; LoopCount++) {
-    SHELL_FREE_NON_NULL(GuidList[LoopCount].GuidId);
+  for (LoopCount = 0; mGuidList != NULL && LoopCount < mGuidListCount; LoopCount++) {
+    SHELL_FREE_NON_NULL(mGuidList[LoopCount].GuidId);
   }
 
-  SHELL_FREE_NON_NULL(GuidList);
+  SHELL_FREE_NON_NULL(mGuidList);
   if (mHandleParsingHiiHandle != NULL) {
     HiiRemovePackages(mHandleParsingHiiHandle);
   }
@@ -1838,7 +1838,7 @@ InternalShellGetNodeFromGuid(
 
   ASSERT(Guid != NULL);
 
-  for (LoopCount = 0, ListWalker = GuidList; GuidList != NULL && LoopCount < GuidListCount; LoopCount++, ListWalker++) {
+  for (LoopCount = 0, ListWalker = mGuidList; mGuidList != NULL && LoopCount < mGuidListCount; LoopCount++, ListWalker++) {
     if (CompareGuid(ListWalker->GuidId, Guid)) {
       return (ListWalker);
     }
@@ -1881,18 +1881,18 @@ InsertNewGuidNameMapping(
   ASSERT(Guid   != NULL);
   ASSERT(NameID != 0);
 
-  GuidList = ReallocatePool(GuidListCount * sizeof(GUID_INFO_BLOCK), GuidListCount+1 * sizeof(GUID_INFO_BLOCK), GuidList);
-  if (GuidList == NULL) {
-    GuidListCount = 0;
+  mGuidList = ReallocatePool(mGuidListCount * sizeof(GUID_INFO_BLOCK), mGuidListCount+1 * sizeof(GUID_INFO_BLOCK), mGuidList);
+  if (mGuidList == NULL) {
+    mGuidListCount = 0;
     return (EFI_OUT_OF_RESOURCES);
   }
-  GuidListCount++;
+  mGuidListCount++;
 
-  GuidList[GuidListCount - 1].GuidId   = AllocateCopyPool(sizeof(EFI_GUID), Guid);
-  GuidList[GuidListCount - 1].StringId = NameID;
-  GuidList[GuidListCount - 1].DumpInfo = DumpFunc;
+  mGuidList[mGuidListCount - 1].GuidId   = AllocateCopyPool(sizeof(EFI_GUID), Guid);
+  mGuidList[mGuidListCount - 1].StringId = NameID;
+  mGuidList[mGuidListCount - 1].DumpInfo = DumpFunc;
 
-  if (GuidList[GuidListCount - 1].GuidId == NULL) {
+  if (mGuidList[mGuidListCount - 1].GuidId == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
 
@@ -2061,7 +2061,7 @@ GetGuidFromStringName(
     }
   }
 
-  for (LoopCount = 0, ListWalker = GuidList; GuidList != NULL && LoopCount < GuidListCount; LoopCount++, ListWalker++) {
+  for (LoopCount = 0, ListWalker = mGuidList; mGuidList != NULL && LoopCount < mGuidListCount; LoopCount++, ListWalker++) {
     String = HiiGetString(mHandleParsingHiiHandle, ListWalker->StringId, Lang);
     if (Name != NULL && String != NULL && StringNoCaseCompare (&Name, &String) == 0) {
       *Guid = ListWalker->GuidId;
