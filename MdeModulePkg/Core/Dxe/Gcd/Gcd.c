@@ -1628,7 +1628,7 @@ CoreSetMemorySpaceCapabilities (
 
   Status = CoreConvertSpace (GCD_SET_CAPABILITIES_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, Capabilities, 0);
   if (!EFI_ERROR(Status)) {
-    CoreUpdateMemoryAttributes(BaseAddress, RShiftU64(Length, EFI_PAGE_SHIFT), Capabilities);
+    CoreUpdateMemoryAttributes(BaseAddress, RShiftU64(Length, EFI_PAGE_SHIFT), Capabilities & (~EFI_MEMORY_RUNTIME));
   }
 
   return Status;
