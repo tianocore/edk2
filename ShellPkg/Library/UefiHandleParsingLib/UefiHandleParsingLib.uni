@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
@@ -158,8 +158,6 @@
 #string STR_WINNT_THUNK           #language en-US "WinNTThunk"
 #string STR_WINNT_DRIVER_IO       #language en-US "WinNTDriverIO"
 #string STR_WINNT_SERIAL_PORT     #language en-US "WinNTSerialPort"
-
-#string STR_UNKNOWN_DEVICE        #language en-US "UnknownDevice"
 
 // deprecated protocols
 #string STR_SHELL_INTERFACE       #language en-US "ShellInterface"

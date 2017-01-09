@@ -933,25 +933,22 @@ AdapterInformationDumpInformation (
       } else {
 
         GuidStr = GetStringNameFromGuid (&InfoTypesBuffer[GuidIndex], NULL);
+        if (GuidStr == NULL) {
+          TempRetVal = CatSPrint (RetVal, TempStr, L"UnknownInfoType");
+          SHELL_FREE_NON_NULL (RetVal);
+          RetVal = TempRetVal;
 
-        if (GuidStr != NULL) {
-          if (StrCmp(GuidStr, L"UnknownDevice") == 0) {
-            TempRetVal = CatSPrint (RetVal, TempStr, L"UnknownInfoType");
-            SHELL_FREE_NON_NULL (RetVal);
-            RetVal = TempRetVal;
-
-            SHELL_FREE_NON_NULL (TempStr);
-            SHELL_FREE_NON_NULL(GuidStr);
-            //
-            // So that we never have to pass this UnknownInfoType to the parsing function "GetInformation" service of AIP
-            //
-            continue;
-          } else {
-            TempRetVal = CatSPrint (RetVal, TempStr, GuidStr);
-            SHELL_FREE_NON_NULL (RetVal);
-            RetVal = TempRetVal;
-            SHELL_FREE_NON_NULL(GuidStr);
-          }
+          SHELL_FREE_NON_NULL (TempStr);
+          SHELL_FREE_NON_NULL(GuidStr);
+          //
+          // So that we never have to pass this UnknownInfoType to the parsing function "GetInformation" service of AIP
+          //
+          continue;
+        } else {
+          TempRetVal = CatSPrint (RetVal, TempStr, GuidStr);
+          SHELL_FREE_NON_NULL (RetVal);
+          RetVal = TempRetVal;
+          SHELL_FREE_NON_NULL(GuidStr);
         }
       }
 
@@ -1500,7 +1497,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringListNT[] = {
   {STRING_TOKEN(STR_WINNT_THUNK),           (EFI_GUID*)&WinNtThunkProtocolGuid,               NULL},
   {STRING_TOKEN(STR_WINNT_DRIVER_IO),       (EFI_GUID*)&WinNtIoProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_WINNT_SERIAL_PORT),     (EFI_GUID*)&WinNtSerialPortGuid,                  NULL},
-  {STRING_TOKEN(STR_UNKNOWN_DEVICE),        NULL,                                             NULL},
+  {0,                                       NULL,                                             NULL},
 };
 
 STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
@@ -1816,7 +1813,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
 //
 // terminator
 //
-  {STRING_TOKEN(STR_UNKNOWN_DEVICE),        NULL,                                             NULL},
+  {0,                                       NULL,                                             NULL},
 };
 
 /**
@@ -1964,7 +1961,10 @@ GetStringNameFromGuid(
   HandleParsingHiiInit();
 
   Id = InternalShellGetNodeFromGuid(Guid);
-  return (HiiGetString(mHandleParsingHiiHandle, Id==NULL?STRING_TOKEN(STR_UNKNOWN_DEVICE):Id->StringId, Lang));
+  if (Id == NULL) {
+    return NULL;
+  }
+  return HiiGetString (mHandleParsingHiiHandle, Id->StringId, Lang);
 }
 
 /**

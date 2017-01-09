@@ -2,7 +2,7 @@
   Main file for Dh shell Driver1 function.
 
   (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -153,6 +153,7 @@ GetProtocolInfoString(
   CHAR16                    *RetVal;
   UINTN                     Size;
   CHAR16                    *Temp;
+  CHAR16                    GuidStr[40];
 
   ProtocolGuidArray = NULL;
   RetVal            = NULL;
@@ -166,16 +167,19 @@ GetProtocolInfoString(
   if (!EFI_ERROR (Status)) {
     for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
       Temp = GetStringNameFromGuid(ProtocolGuidArray[ProtocolIndex], Language);
-      if (Temp != NULL) {
-        ASSERT((RetVal == NULL && Size == 0) || (RetVal != NULL));
-        if (Size != 0) {
-          StrnCatGrow(&RetVal, &Size, Separator, 0);
-        }
-        StrnCatGrow(&RetVal, &Size, L"%H", 0);
+      ASSERT((RetVal == NULL && Size == 0) || (RetVal != NULL));
+      if (Size != 0) {
+        StrnCatGrow(&RetVal, &Size, Separator, 0);
+      }
+      StrnCatGrow(&RetVal, &Size, L"%H", 0);
+      if (Temp == NULL) {
+        UnicodeSPrint (GuidStr, sizeof (GuidStr), L"%g", ProtocolGuidArray[ProtocolIndex]);
+        StrnCatGrow (&RetVal, &Size, GuidStr, 0);
+      } else {
         StrnCatGrow(&RetVal, &Size, Temp, 0);
-        StrnCatGrow(&RetVal, &Size, L"%N", 0);
         FreePool(Temp);
       }
+      StrnCatGrow(&RetVal, &Size, L"%N", 0);
       if (ExtraInfo) {
         Temp = GetProtocolInformationDump(TheHandle, ProtocolGuidArray[ProtocolIndex], Verbose);
         if (Temp != NULL) {
