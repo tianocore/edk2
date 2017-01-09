@@ -29,6 +29,19 @@
 
 #include <IndustryStandard/Acpi.h>
 
+#define ACPI_SPECFLAG_PREFETCHABLE    0x06
+#define JUNO_MARVELL_YUKON_ID         0x438011AB /* Juno Marvell PCI Dev ID */
+#define TST_CFG_WRITE_ENABLE          0x02       /* Enable Config Write */
+#define TST_CFG_WRITE_DISABLE         0x00       /* Disable Config Write */
+#define CS_RESET_CLR                  0x02       /* SW Reset Clear */
+#define CS_RESET_SET                  0x00       /* SW Reset Set */
+#define R_CONTROL_STATUS              0x0004     /* Control/Status Register */
+#define R_MAC                         0x0100     /* MAC Address */
+#define R_MAC_MAINT                   0x0110     /* MAC Address Maintenance */
+#define R_MAC_LOW                     0x04       /* MAC Address Low Register Offset */
+#define R_TST_CTRL_1                  0x0158     /* Test Control Register 1 */
+
+
 EFI_STATUS
 PciEmulationEntryPoint (
   VOID
