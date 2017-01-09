@@ -495,7 +495,7 @@ Tcg2VersionInfoCallback (
     CopyMem (
       &PcdTcg2PpiVersion,
       PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
-      AsciiStrSize (PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+      AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
       );
     if (PcdTcg2PpiVersion != Value->u64) {
       CreatePopUp (

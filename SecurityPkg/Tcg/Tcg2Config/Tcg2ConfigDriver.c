@@ -90,7 +90,7 @@ InitializeTcg2VersionInfo (
   CopyMem (
     &PcdTcg2PpiVersion,
     PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
-    AsciiStrSize (PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+    AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
     );
 
   //
@@ -188,7 +188,7 @@ InitializeTcg2VersionInfo (
   CopyMem (
     &PcdTcg2PpiVersion,
     PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
-    AsciiStrSize (PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+    AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
     );
   if (PcdTcg2PpiVersion != Tcg2Version.PpiVersion) {
     DEBUG ((DEBUG_WARN, "WARNING: PcdTcgPhysicalPresenceInterfaceVer is not DynamicHii type and maps to TCG2_VERSION.PpiVersion\n"));
