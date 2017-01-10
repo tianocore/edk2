@@ -1356,19 +1356,14 @@ TerminalDriverBindingStop (
               );
       } else {
 
-        if (TerminalDevice->ControllerNameTable != NULL) {
-          FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
-        }
-
+        FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
         StopTerminalStateMachine (TerminalDevice);
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
         gBS->CloseEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
         gBS->CloseEvent (TerminalDevice->KeyNotifyProcessEvent);
         TerminalFreeNotifyList (&TerminalDevice->NotifyList);
         FreePool (TerminalDevice->DevicePath);
-        if (TerminalDevice->TerminalConsoleModeData != NULL) {
-          FreePool (TerminalDevice->TerminalConsoleModeData);
-        }
+        FreePool (TerminalDevice->TerminalConsoleModeData);
         FreePool (TerminalDevice);
       }
     }
