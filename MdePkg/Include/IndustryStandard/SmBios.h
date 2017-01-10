@@ -468,7 +468,18 @@ typedef struct {
   UINT8                       NumberofPowerCords;
   UINT8                       ContainedElementCount;
   UINT8                       ContainedElementRecordLength;
+  //
+  // Can have 0 to (ContainedElementCount * ContainedElementRecordLength) contained elements
+  //
   CONTAINED_ELEMENT           ContainedElements[1];
+  //
+  // Add for smbios 2.7
+  //
+  // Since ContainedElements has a variable number of entries, must not define SKUNumber in
+  // the structure.  Need to reference it by starting at offset 0x15 and adding
+  // (ContainedElementCount * ContainedElementRecordLength) bytes.
+  //
+  // SMBIOS_TABLE_STRING         SKUNumber;
 } SMBIOS_TABLE_TYPE3;
 
 ///
