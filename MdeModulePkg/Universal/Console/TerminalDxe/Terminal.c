@@ -113,6 +113,8 @@ TERMINAL_DEV  mTerminalDevTemplate = {
 };
 
 TERMINAL_CONSOLE_MODE_DATA mTerminalConsoleModeData[] = {
+  {80,  25},
+  {80,  50},
   {100, 31},
   //
   // New modes can be added here.
@@ -450,97 +452,39 @@ TerminalFreeNotifyList (
   It returns information for available text modes that the terminal can support.
 
   @param[out] TextModeCount      The total number of text modes that terminal console supports.
-  @param[out] TextModeData       The buffer to the text modes column and row information.
-                                 Caller is responsible to free it when it's non-NULL.
 
-  @retval EFI_SUCCESS            The supporting mode information is returned.
-  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
+  @return   The buffer to the text modes column and row information.
+            Caller is responsible to free it when it's non-NULL.
 
 **/
-EFI_STATUS
+TERMINAL_CONSOLE_MODE_DATA *
 InitializeTerminalConsoleTextMode (
-  OUT UINTN                         *TextModeCount,
-  OUT TERMINAL_CONSOLE_MODE_DATA    **TextModeData
-  )
+  OUT INT32                         *TextModeCount
+)
 {
-  UINTN                       Index;
-  UINTN                       Count;
-  TERMINAL_CONSOLE_MODE_DATA  *ModeBuffer;
-  TERMINAL_CONSOLE_MODE_DATA  *NewModeBuffer;
-  UINTN                       ValidCount;
-  UINTN                       ValidIndex;
-  
-  if ((TextModeCount == NULL) || (TextModeData == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-  
-  Count = sizeof (mTerminalConsoleModeData) / sizeof (TERMINAL_CONSOLE_MODE_DATA);
-  
-  //
-  // Get defined mode buffer pointer.
-  //
-  ModeBuffer = mTerminalConsoleModeData;
-    
+  TERMINAL_CONSOLE_MODE_DATA  *TextModeData;
+
+  ASSERT (TextModeCount != NULL);
+
   //
   // Here we make sure that the final mode exposed does not include the duplicated modes,
   // and does not include the invalid modes which exceed the max column and row.
   // Reserve 2 modes for 80x25, 80x50 of terminal console.
   //
-  NewModeBuffer = AllocateZeroPool (sizeof (TERMINAL_CONSOLE_MODE_DATA) * (Count + 2));
-  ASSERT (NewModeBuffer != NULL);
-
-  //
-  // Mode 0 and mode 1 is for 80x25, 80x50 according to UEFI spec.
-  //
-  ValidCount = 0;  
-
-  NewModeBuffer[ValidCount].Columns = 80;
-  NewModeBuffer[ValidCount].Rows    = 25;
-  ValidCount++;
-
-  NewModeBuffer[ValidCount].Columns = 80;
-  NewModeBuffer[ValidCount].Rows    = 50;
-  ValidCount++;
-  
-  //
-  // Start from mode 2 to put the valid mode other than 80x25 and 80x50 in the output mode buffer.
-  //
-  for (Index = 0; Index < Count; Index++) {
-    if ((ModeBuffer[Index].Columns == 0) || (ModeBuffer[Index].Rows == 0)) {
-      //
-      // Skip the pre-defined mode which is invalid.
-      //
-      continue;
-    }
-    for (ValidIndex = 0; ValidIndex < ValidCount; ValidIndex++) {
-      if ((ModeBuffer[Index].Columns == NewModeBuffer[ValidIndex].Columns) &&
-          (ModeBuffer[Index].Rows == NewModeBuffer[ValidIndex].Rows)) {
-        //
-        // Skip the duplicated mode.
-        //
-        break;
-      }
-    }
-    if (ValidIndex == ValidCount) {
-      NewModeBuffer[ValidCount].Columns = ModeBuffer[Index].Columns;
-      NewModeBuffer[ValidCount].Rows    = ModeBuffer[Index].Rows;
-      ValidCount++;
-    }
+  TextModeData = AllocateCopyPool (sizeof (mTerminalConsoleModeData), mTerminalConsoleModeData);
+  if (TextModeData == NULL) {
+    return NULL;
   }
- 
+  *TextModeCount = ARRAY_SIZE (mTerminalConsoleModeData);
+
   DEBUG_CODE (
-    for (Index = 0; Index < ValidCount; Index++) {
-      DEBUG ((EFI_D_INFO, "Terminal - Mode %d, Column = %d, Row = %d\n", 
-                           Index, NewModeBuffer[Index].Columns, NewModeBuffer[Index].Rows));  
+    INT32 Index;
+    for (Index = 0; Index < *TextModeCount; Index++) {
+      DEBUG ((DEBUG_INFO, "Terminal - Mode %d, Column = %d, Row = %d\n",
+              Index, TextModeData[Index].Columns, TextModeData[Index].Rows));
     }
   );
-  
-  //
-  // Return valid mode count and mode information buffer.
-  //
-  *TextModeCount = ValidCount;
-  *TextModeData  = NewModeBuffer;
-  return EFI_SUCCESS;
+  return TextModeData;
 }
 
 /**
@@ -632,7 +576,6 @@ TerminalDriverBindingStart (
   BOOLEAN                             SimTxtInInstalled;
   BOOLEAN                             SimTxtOutInstalled;
   BOOLEAN                             FirstEnter;
-  UINTN                               ModeCount;
 
   TerminalDevice     = NULL;
   ConInSelected      = FALSE;
@@ -896,12 +839,13 @@ TerminalDriverBindingStart (
                          );
     SimpleTextOutput->Mode = &TerminalDevice->SimpleTextOutputMode;
     
-    Status = InitializeTerminalConsoleTextMode (&ModeCount, &TerminalDevice->TerminalConsoleModeData);
-    if (EFI_ERROR (Status)) {
+    TerminalDevice->TerminalConsoleModeData = InitializeTerminalConsoleTextMode (
+                                                &SimpleTextOutput->Mode->MaxMode
+                                                );
+    if (TerminalDevice->TerminalConsoleModeData == NULL) {
       goto ReportError;
     }
-    TerminalDevice->SimpleTextOutputMode.MaxMode = (INT32) ModeCount;
-    
+
     //
     // For terminal devices, cursor is always visible
     //
