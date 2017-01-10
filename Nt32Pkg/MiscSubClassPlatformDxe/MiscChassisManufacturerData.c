@@ -1,6 +1,7 @@
 /**@file
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -39,7 +40,9 @@ MISC_SMBIOS_TABLE_DATA(EFI_MISC_CHASSIS_MANUFACTURER_DATA, MiscChassisManufactur
   EfiChassisStateOther,           // ChassisPowerSupplyState
   EfiChassisStateOther,           // ChassisThermalState
   EfiChassisSecurityStatusOther,  // ChassisSecurityState
-  0                               // ChassisOemDefined
+  0,                              // ChassisOemDefined
+  1,                              // Height
+  1                               // NumberofPowerCords
 };
 
 /* eof - MiscChassisManufacaturerData.c */
