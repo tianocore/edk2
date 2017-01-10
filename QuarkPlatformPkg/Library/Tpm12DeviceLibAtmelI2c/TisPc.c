@@ -355,6 +355,7 @@ Tpm12SubmitCommand (
 
   TpmOutSize = SwapBytes32 (ReadUnaligned32 (&ResponseHeader->paramSize));
   if (TpmOutSize == sizeof (TPM_RSP_COMMAND_HDR)) {
+    *OutputParameterBlockSize = TpmOutSize;
     Status = EFI_SUCCESS;
     goto Done;
   }
