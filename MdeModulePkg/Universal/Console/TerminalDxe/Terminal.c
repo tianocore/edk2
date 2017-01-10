@@ -488,6 +488,63 @@ InitializeTerminalConsoleTextMode (
 }
 
 /**
+  Stop the terminal state machine.
+
+  @param TerminalDevice    The terminal device.
+**/
+VOID
+StopTerminalStateMachine (
+  TERMINAL_DEV             *TerminalDevice
+  )
+{
+  EFI_TPL                  OriginalTpl;
+
+  OriginalTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  gBS->CloseEvent (TerminalDevice->TimerEvent);
+  gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
+
+  gBS->RestoreTPL (OriginalTpl);
+}
+
+/**
+  Start the terminal state machine.
+
+  @param TerminalDevice    The terminal device.
+**/
+VOID
+StartTerminalStateMachine (
+  TERMINAL_DEV             *TerminalDevice
+  )
+{
+  EFI_STATUS               Status;
+  Status = gBS->CreateEvent (
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  TerminalConInTimerHandler,
+                  TerminalDevice,
+                  &TerminalDevice->TimerEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->SetTimer (
+                  TerminalDevice->TimerEvent,
+                  TimerPeriodic,
+                  KEYBOARD_TIMER_INTERVAL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEvent (
+                  EVT_TIMER,
+                  TPL_CALLBACK,
+                  NULL,
+                  NULL,
+                  &TerminalDevice->TwoSecondTimeOut
+                  );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
   Initialize the controller name table.
 
   @param TerminalType        The terminal type.
@@ -893,30 +950,7 @@ TerminalDriverBindingStart (
       goto ReportError;
     }
 
-    Status = gBS->CreateEvent (
-                    EVT_TIMER | EVT_NOTIFY_SIGNAL,
-                    TPL_NOTIFY,
-                    TerminalConInTimerHandler,
-                    TerminalDevice,
-                    &TerminalDevice->TimerEvent
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    Status = gBS->SetTimer (
-                    TerminalDevice->TimerEvent,
-                    TimerPeriodic,
-                    KEYBOARD_TIMER_INTERVAL
-                    );
-    ASSERT_EFI_ERROR (Status);
-
-    Status = gBS->CreateEvent (
-                    EVT_TIMER,
-                    TPL_CALLBACK,
-                    NULL,
-                    NULL,
-                    &TerminalDevice->TwoSecondTimeOut
-                    );
-    ASSERT_EFI_ERROR (Status);
+    StartTerminalStateMachine (TerminalDevice);
 
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
@@ -1326,8 +1360,7 @@ TerminalDriverBindingStop (
           FreeUnicodeStringTable (TerminalDevice->ControllerNameTable);
         }
 
-        gBS->CloseEvent (TerminalDevice->TimerEvent);
-        gBS->CloseEvent (TerminalDevice->TwoSecondTimeOut);
+        StopTerminalStateMachine (TerminalDevice);
         gBS->CloseEvent (TerminalDevice->SimpleInput.WaitForKey);
         gBS->CloseEvent (TerminalDevice->SimpleInputEx.WaitForKeyEx);
         gBS->CloseEvent (TerminalDevice->KeyNotifyProcessEvent);
