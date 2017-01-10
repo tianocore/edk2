@@ -38,6 +38,14 @@ EFI_GUID  *mTerminalType[] = {
 };
 
 
+CHAR16 *mSerialConsoleNames[] = {
+  L"PC-ANSI Serial Console",
+  L"VT-100 Serial Console",
+  L"VT-100+ Serial Console",
+  L"VT-UTF8 Serial Console",
+  L"Tty Terminal Serial Console"
+};
+
 TERMINAL_DEV  mTerminalDevTemplate = {
   TERMINAL_DEV_SIGNATURE,
   NULL,
@@ -536,6 +544,51 @@ InitializeTerminalConsoleTextMode (
 }
 
 /**
+  Initialize the controller name table.
+
+  @param TerminalType        The terminal type.
+  @param ControllerNameTable The controller name table.
+
+  @retval EFI_SUCCESS  The controller name table is initialized successfully.
+  @retval others       Return status of AddUnicodeString2 ().
+**/
+EFI_STATUS
+InitializeControllerNameTable (
+  TERMINAL_TYPE             TerminalType,
+  EFI_UNICODE_STRING_TABLE  **ControllerNameTable
+)
+{
+  EFI_STATUS                Status;
+  EFI_UNICODE_STRING_TABLE  *Table;
+
+  ASSERT (TerminalType < ARRAY_SIZE (mTerminalType));
+  Table = NULL;
+  Status = AddUnicodeString2 (
+             "eng",
+             gTerminalComponentName.SupportedLanguages,
+             &Table,
+             mSerialConsoleNames[TerminalType],
+             TRUE
+             );
+  if (!EFI_ERROR (Status)) {
+    Status = AddUnicodeString2 (
+               "en",
+               gTerminalComponentName2.SupportedLanguages,
+               &Table,
+               mSerialConsoleNames[TerminalType],
+               FALSE
+               );
+    if (EFI_ERROR (Status)) {
+      FreeUnicodeStringTable (Table);
+    }
+  }
+  if (!EFI_ERROR (Status)) {
+    *ControllerNameTable = Table;
+  }
+  return Status;
+}
+
+/**
   Start this driver on Controller by opening a Serial IO protocol,
   reading Device Path, and creating a child handle with a Simple Text In,
   Simple Text In Ex and Simple Text Out protocol, and device path protocol.
@@ -864,97 +917,9 @@ TerminalDriverBindingStart (
     //
     // Build the component name for the child device
     //
-    TerminalDevice->ControllerNameTable = NULL;
-    switch (TerminalDevice->TerminalType) {
-    case TerminalTypePcAnsi:
-      AddUnicodeString2 (
-        "eng",
-        gTerminalComponentName.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"PC-ANSI Serial Console",
-        TRUE
-        );
-      AddUnicodeString2 (
-        "en",
-        gTerminalComponentName2.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"PC-ANSI Serial Console",
-        FALSE
-        );
-
-      break;
-
-    case TerminalTypeVt100:
-      AddUnicodeString2 (
-        "eng",
-        gTerminalComponentName.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"VT-100 Serial Console",
-        TRUE
-        );
-      AddUnicodeString2 (
-        "en",
-        gTerminalComponentName2.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"VT-100 Serial Console",
-        FALSE
-        );
-
-      break;
-
-    case TerminalTypeVt100Plus:
-      AddUnicodeString2 (
-        "eng",
-        gTerminalComponentName.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"VT-100+ Serial Console",
-        TRUE
-        );
-      AddUnicodeString2 (
-        "en",
-        gTerminalComponentName2.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"VT-100+ Serial Console",
-        FALSE
-        );
-
-      break;
-
-    case TerminalTypeVtUtf8:
-      AddUnicodeString2 (
-        "eng",
-        gTerminalComponentName.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"VT-UTF8 Serial Console",
-        TRUE
-        );
-      AddUnicodeString2 (
-        "en",
-        gTerminalComponentName2.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"VT-UTF8 Serial Console",
-        FALSE
-        );
-
-      break;
-
-    case TerminalTypeTtyTerm:
-      AddUnicodeString2 (
-        "eng",
-        gTerminalComponentName.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"Tty Terminal Serial Console",
-        TRUE
-        );
-      AddUnicodeString2 (
-        "en",
-        gTerminalComponentName2.SupportedLanguages,
-        &TerminalDevice->ControllerNameTable,
-        (CHAR16 *)L"Tty Terminal Serial Console",
-        FALSE
-        );
-
-      break;
+    Status = InitializeControllerNameTable (TerminalDevice->TerminalType, &TerminalDevice->ControllerNameTable);
+    if (EFI_ERROR (Status)) {
+      goto Error;
     }
 
     //
