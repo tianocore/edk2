@@ -2,7 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -255,7 +255,7 @@ BuildTerminalDevpath  (
   )
 {
   EFI_DEVICE_PATH_PROTOCOL          *TerminalDevicePath;
-  UINT8                             TerminalType;
+  TERMINAL_TYPE                     TerminalType;
   VENDOR_DEVICE_PATH                *Node;
   EFI_STATUS                        Status;
 
@@ -270,23 +270,23 @@ BuildTerminalDevpath  (
 
   } else if (CompareGuid (&Node->Guid, &gEfiPcAnsiGuid)) {
 
-    TerminalType = PCANSITYPE;
+    TerminalType = TerminalTypePcAnsi;
 
   } else if (CompareGuid (&Node->Guid, &gEfiVT100Guid)) {
 
-    TerminalType = VT100TYPE;
+    TerminalType = TerminalTypeVt100;
 
   } else if (CompareGuid (&Node->Guid, &gEfiVT100PlusGuid)) {
 
-    TerminalType = VT100PLUSTYPE;
+    TerminalType = TerminalTypeVt100Plus;
 
   } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
 
-    TerminalType = VTUTF8TYPE;
+    TerminalType = TerminalTypeVtUtf8;
 
   } else if (CompareGuid (&Node->Guid, &gEfiTtyTermGuid)) {
 
-    TerminalType = TTYTERMTYPE;
+    TerminalType = TerminalTypeTtyTerm;
 
   } else {
     return NULL;
@@ -549,7 +549,7 @@ TerminalDriverBindingStart (
   EFI_SERIAL_IO_MODE                  *Mode;
   UINTN                               SerialInTimeOut;
   TERMINAL_DEV                        *TerminalDevice;
-  UINT8                               TerminalType;
+  TERMINAL_TYPE                       TerminalType;
   EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfoBuffer;
   UINTN                               EntryCount;
   UINTN                               Index;
@@ -713,9 +713,9 @@ TerminalDriverBindingStart (
     if (RemainingDevicePath == NULL) {
       TerminalType = PcdGet8 (PcdDefaultTerminalType);
       //
-      // Must be between PCANSITYPE (0) and TTYTERMTYPE (4)
+      // Must be between TerminalTypePcAnsi (0) and TerminalTypeTtyTerm (4)
       //
-      ASSERT (TerminalType <= TTYTERMTYPE);
+      ASSERT (TerminalType <= TerminalTypeTtyTerm);
     } else if (!IsDevicePathEnd (RemainingDevicePath)) {
       //
       // If RemainingDevicePath isn't the End of Device Path Node,
@@ -723,15 +723,15 @@ TerminalDriverBindingStart (
       //
       Node = (VENDOR_DEVICE_PATH *)RemainingDevicePath;
       if (CompareGuid (&Node->Guid, &gEfiPcAnsiGuid)) {
-        TerminalType = PCANSITYPE;
+        TerminalType = TerminalTypePcAnsi;
       } else if (CompareGuid (&Node->Guid, &gEfiVT100Guid)) {
-        TerminalType = VT100TYPE;
+        TerminalType = TerminalTypeVt100;
       } else if (CompareGuid (&Node->Guid, &gEfiVT100PlusGuid)) {
-        TerminalType = VT100PLUSTYPE;
+        TerminalType = TerminalTypeVt100Plus;
       } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
-        TerminalType = VTUTF8TYPE;
+        TerminalType = TerminalTypeVtUtf8;
       } else if (CompareGuid (&Node->Guid, &gEfiTtyTermGuid)) {
-        TerminalType = TTYTERMTYPE;
+        TerminalType = TerminalTypeTtyTerm;
       } else {
         goto Error;
       }
@@ -863,7 +863,7 @@ TerminalDriverBindingStart (
     //
     TerminalDevice->ControllerNameTable = NULL;
     switch (TerminalDevice->TerminalType) {
-    case PCANSITYPE:
+    case TerminalTypePcAnsi:
       AddUnicodeString2 (
         "eng",
         gTerminalComponentName.SupportedLanguages,
@@ -881,7 +881,7 @@ TerminalDriverBindingStart (
 
       break;
 
-    case VT100TYPE:
+    case TerminalTypeVt100:
       AddUnicodeString2 (
         "eng",
         gTerminalComponentName.SupportedLanguages,
@@ -899,7 +899,7 @@ TerminalDriverBindingStart (
 
       break;
 
-    case VT100PLUSTYPE:
+    case TerminalTypeVt100Plus:
       AddUnicodeString2 (
         "eng",
         gTerminalComponentName.SupportedLanguages,
@@ -917,7 +917,7 @@ TerminalDriverBindingStart (
 
       break;
 
-    case VTUTF8TYPE:
+    case TerminalTypeVtUtf8:
       AddUnicodeString2 (
         "eng",
         gTerminalComponentName.SupportedLanguages,
@@ -935,7 +935,7 @@ TerminalDriverBindingStart (
 
       break;
 
-    case TTYTERMTYPE:
+    case TerminalTypeTtyTerm:
       AddUnicodeString2 (
         "eng",
         gTerminalComponentName.SupportedLanguages,
@@ -1456,7 +1456,7 @@ TerminalUpdateConsoleDevVariable (
   EFI_STATUS                Status;
   UINTN                     NameSize;
   UINTN                     VariableSize;
-  UINT8                     TerminalType;
+  TERMINAL_TYPE             TerminalType;
   EFI_DEVICE_PATH_PROTOCOL  *Variable;
   EFI_DEVICE_PATH_PROTOCOL  *NewVariable;
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
@@ -1473,7 +1473,7 @@ TerminalUpdateConsoleDevVariable (
   //
   // Append terminal device path onto the variable.
   //
-  for (TerminalType = PCANSITYPE; TerminalType <= TTYTERMTYPE; TerminalType++) {
+  for (TerminalType = TerminalTypePcAnsi; TerminalType <= TerminalTypeTtyTerm; TerminalType++) {
     SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
     NewVariable = AppendDevicePathInstance (Variable, TempDevicePath);
     ASSERT (NewVariable != NULL);
@@ -1548,7 +1548,7 @@ TerminalRemoveConsoleDevVariable (
   BOOLEAN                   Match;
   UINTN                     VariableSize;
   UINTN                     InstanceSize;
-  UINT8                     TerminalType;
+  TERMINAL_TYPE             TerminalType;
   EFI_DEVICE_PATH_PROTOCOL  *Instance;
   EFI_DEVICE_PATH_PROTOCOL  *Variable;
   EFI_DEVICE_PATH_PROTOCOL  *OriginalVariable;
@@ -1586,7 +1586,7 @@ TerminalRemoveConsoleDevVariable (
     // Loop through all the terminal types that this driver supports
     //
     Match = FALSE;
-    for (TerminalType = PCANSITYPE; TerminalType <= TTYTERMTYPE; TerminalType++) {
+    for (TerminalType = TerminalTypePcAnsi; TerminalType <= TerminalTypeTtyTerm; TerminalType++) {
 
       SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
 
@@ -1658,7 +1658,7 @@ TerminalRemoveConsoleDevVariable (
 **/
 EFI_STATUS
 SetTerminalDevicePath (
-  IN  UINT8                       TerminalType,
+  IN  TERMINAL_TYPE               TerminalType,
   IN  EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath,
   OUT EFI_DEVICE_PATH_PROTOCOL    **TerminalDevicePath
   )
@@ -1674,23 +1674,23 @@ SetTerminalDevicePath (
   //
   switch (TerminalType) {
 
-  case PCANSITYPE:
+  case TerminalTypePcAnsi:
     CopyGuid (&Node.Guid, &gEfiPcAnsiGuid);
     break;
 
-  case VT100TYPE:
+  case TerminalTypeVt100:
     CopyGuid (&Node.Guid, &gEfiVT100Guid);
     break;
 
-  case VT100PLUSTYPE:
+  case TerminalTypeVt100Plus:
     CopyGuid (&Node.Guid, &gEfiVT100PlusGuid);
     break;
 
-  case VTUTF8TYPE:
+  case TerminalTypeVtUtf8:
     CopyGuid (&Node.Guid, &gEfiVTUTF8Guid);
     break;
 
-  case TTYTERMTYPE:
+  case TerminalTypeTtyTerm:
     CopyGuid (&Node.Guid, &gEfiTtyTermGuid);
     break;
 

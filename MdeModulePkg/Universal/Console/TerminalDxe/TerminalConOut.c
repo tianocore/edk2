@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -224,10 +224,10 @@ TerminalConOutOutputString (
 
     switch (TerminalDevice->TerminalType) {
 
-    case PCANSITYPE:
-    case VT100TYPE:
-    case VT100PLUSTYPE:
-    case TTYTERMTYPE:
+    case TerminalTypePcAnsi:
+    case TerminalTypeVt100:
+    case TerminalTypeVt100Plus:
+    case TerminalTypeTtyTerm:
 
       if (!TerminalIsValidTextGraphics (*WString, &GraphicChar, &AsciiChar)) {
         //
@@ -253,7 +253,7 @@ TerminalConOutOutputString (
 
       }
 
-      if (TerminalDevice->TerminalType != PCANSITYPE) {
+      if (TerminalDevice->TerminalType != TerminalTypePcAnsi) {
         GraphicChar = AsciiChar;
       }
 
@@ -271,7 +271,7 @@ TerminalConOutOutputString (
 
       break;
 
-    case VTUTF8TYPE:
+    case TerminalTypeVtUtf8:
       UnicodeToUtf8 (*WString, &Utf8Char, &ValidBytes);
       Length = ValidBytes;
       Status = TerminalDevice->SerialIo->Write (
@@ -317,7 +317,7 @@ TerminalConOutOutputString (
           Mode->CursorRow++;
         }
 
-        if (TerminalDevice->TerminalType == TTYTERMTYPE &&
+        if (TerminalDevice->TerminalType == TerminalTypeTtyTerm &&
             !TerminalDevice->OutputEscChar) {
           //
           // We've written the last character on the line.  The
@@ -398,14 +398,14 @@ TerminalConOutTestString (
 
   switch (TerminalDevice->TerminalType) {
 
-  case PCANSITYPE:
-  case VT100TYPE:
-  case VT100PLUSTYPE:
-  case TTYTERMTYPE:
+  case TerminalTypePcAnsi:
+  case TerminalTypeVt100:
+  case TerminalTypeVt100Plus:
+  case TerminalTypeTtyTerm:
     Status = AnsiTestString (TerminalDevice, WString);
     break;
 
-  case VTUTF8TYPE:
+  case TerminalTypeVtUtf8:
     Status = VTUTF8TestString (TerminalDevice, WString);
     break;
 
@@ -791,7 +791,7 @@ TerminalConOutSetCursorPosition (
   // within the current line if possible, and don't output anyting if
   // it isn't necessary.
   //
-  if (TerminalDevice->TerminalType == TTYTERMTYPE &&
+  if (TerminalDevice->TerminalType == TerminalTypeTtyTerm &&
       (UINTN)Mode->CursorRow == Row) {
     if ((UINTN)Mode->CursorColumn > Column) {
       mCursorBackwardString[FW_BACK_OFFSET + 0] = (CHAR16) ('0' + ((Mode->CursorColumn - Column) / 10));

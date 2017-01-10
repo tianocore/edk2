@@ -1,7 +1,7 @@
 /** @file
   Header file for Terminal driver.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -81,10 +81,19 @@ typedef struct _TERMINAL_CONSOLE_IN_EX_NOTIFY {
   EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
   LIST_ENTRY                            NotifyEntry;
 } TERMINAL_CONSOLE_IN_EX_NOTIFY;
+
+typedef enum {
+  TerminalTypePcAnsi,
+  TerminalTypeVt100,
+  TerminalTypeVt100Plus,
+  TerminalTypeVtUtf8,
+  TerminalTypeTtyTerm
+} TERMINAL_TYPE;
+
 typedef struct {
   UINTN                               Signature;
   EFI_HANDLE                          Handle;
-  UINT8                               TerminalType;
+  TERMINAL_TYPE                       TerminalType;
   EFI_SERIAL_IO_PROTOCOL              *SerialIo;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL      SimpleInput;
@@ -138,12 +147,6 @@ typedef union {
   UINT8 Utf8_2[2];
   UINT8 Utf8_3[3];
 } UTF8_CHAR;
-
-#define PCANSITYPE                0
-#define VT100TYPE                 1
-#define VT100PLUSTYPE             2
-#define VTUTF8TYPE                3
-#define TTYTERMTYPE               4
 
 #define LEFTOPENBRACKET           0x5b  // '['
 #define ACAP                      0x41
@@ -859,7 +862,7 @@ TerminalRemoveConsoleDevVariable (
 **/
 EFI_STATUS
 SetTerminalDevicePath (
-  IN  UINT8                       TerminalType,
+  IN  TERMINAL_TYPE               TerminalType,
   IN  EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath,
   OUT EFI_DEVICE_PATH_PROTOCOL    **TerminalDevicePath
   );

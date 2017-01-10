@@ -2,7 +2,7 @@
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -453,15 +453,15 @@ TranslateRawDataToEfiKey (
 {
   switch (TerminalDevice->TerminalType) {
 
-  case PCANSITYPE:
-  case VT100TYPE:
-  case VT100PLUSTYPE:
-  case TTYTERMTYPE:
+  case TerminalTypePcAnsi:
+  case TerminalTypeVt100:
+  case TerminalTypeVt100Plus:
+  case TerminalTypeTtyTerm:
     AnsiRawDataToUnicode (TerminalDevice);
     UnicodeToEfiKey (TerminalDevice);
     break;
 
-  case VTUTF8TYPE:
+  case TerminalTypeVtUtf8:
     //
     // Process all the raw data in the RawFIFO,
     // put the processed key into UnicodeFIFO.
@@ -1405,8 +1405,8 @@ UnicodeToEfiKey (
         continue;
       }
 
-      if (UnicodeChar == 'O' && (TerminalDevice->TerminalType == VT100TYPE ||
-                                 TerminalDevice->TerminalType == TTYTERMTYPE)) {
+      if (UnicodeChar == 'O' && (TerminalDevice->TerminalType == TerminalTypeVt100 ||
+                                 TerminalDevice->TerminalType == TerminalTypeTtyTerm)) {
         TerminalDevice->InputState |= INPUT_STATE_O;
         TerminalDevice->ResetState = RESET_STATE_DEFAULT;
         continue;
@@ -1414,8 +1414,8 @@ UnicodeToEfiKey (
 
       Key.ScanCode = SCAN_NULL;
 
-      if (TerminalDevice->TerminalType == VT100PLUSTYPE ||
-          TerminalDevice->TerminalType == VTUTF8TYPE) {
+      if (TerminalDevice->TerminalType == TerminalTypeVt100Plus ||
+          TerminalDevice->TerminalType == TerminalTypeVtUtf8) {
         switch (UnicodeChar) {
         case '1':
           Key.ScanCode = SCAN_F1;
@@ -1519,7 +1519,7 @@ UnicodeToEfiKey (
 
       Key.ScanCode = SCAN_NULL;
 
-      if (TerminalDevice->TerminalType == VT100TYPE) {
+      if (TerminalDevice->TerminalType == TerminalTypeVt100) {
         switch (UnicodeChar) {
         case 'P':
           Key.ScanCode = SCAN_F1;
@@ -1554,7 +1554,7 @@ UnicodeToEfiKey (
         default :
           break;
         }
-      } else if (TerminalDevice->TerminalType == TTYTERMTYPE) {
+      } else if (TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
         /* Also accept VT100 escape codes for F1-F4, HOME and END for TTY term */
         switch (UnicodeChar) {
         case 'P':
@@ -1596,11 +1596,11 @@ UnicodeToEfiKey (
 
       Key.ScanCode = SCAN_NULL;
 
-      if (TerminalDevice->TerminalType == PCANSITYPE    ||
-          TerminalDevice->TerminalType == VT100TYPE     ||
-          TerminalDevice->TerminalType == VT100PLUSTYPE ||
-          TerminalDevice->TerminalType == VTUTF8TYPE    ||
-          TerminalDevice->TerminalType == TTYTERMTYPE) {
+      if (TerminalDevice->TerminalType == TerminalTypePcAnsi    ||
+          TerminalDevice->TerminalType == TerminalTypeVt100     ||
+          TerminalDevice->TerminalType == TerminalTypeVt100Plus ||
+          TerminalDevice->TerminalType == TerminalTypeVtUtf8    ||
+          TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
         switch (UnicodeChar) {
         case 'A':
           Key.ScanCode = SCAN_UP;
@@ -1615,104 +1615,104 @@ UnicodeToEfiKey (
           Key.ScanCode = SCAN_LEFT;
           break;
         case 'H':
-          if (TerminalDevice->TerminalType == PCANSITYPE ||
-              TerminalDevice->TerminalType == VT100TYPE  ||
-              TerminalDevice->TerminalType == TTYTERMTYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeVt100  ||
+              TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
             Key.ScanCode = SCAN_HOME;
           }
           break;
         case 'F':
-          if (TerminalDevice->TerminalType == PCANSITYPE ||
-              TerminalDevice->TerminalType == TTYTERMTYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
             Key.ScanCode = SCAN_END;
           }
           break;
         case 'K':
-          if (TerminalDevice->TerminalType == VT100TYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypeVt100) {
             Key.ScanCode = SCAN_END;
           }
           break;
         case 'L':
         case '@':
-          if (TerminalDevice->TerminalType == PCANSITYPE ||
-              TerminalDevice->TerminalType == VT100TYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi ||
+              TerminalDevice->TerminalType == TerminalTypeVt100) {
             Key.ScanCode = SCAN_INSERT;
           }
           break;
         case 'X':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_DELETE;
           }
           break;
         case 'P':
-          if (TerminalDevice->TerminalType == VT100TYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypeVt100) {
             Key.ScanCode = SCAN_DELETE;
-          } else if (TerminalDevice->TerminalType == PCANSITYPE) {
+          } else if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F4;
           }
           break;
         case 'I':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_PAGE_UP;
           }
           break;
         case 'V':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F10;
           }
           break;
         case '?':
-          if (TerminalDevice->TerminalType == VT100TYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypeVt100) {
             Key.ScanCode = SCAN_PAGE_UP;
           }
           break;
         case 'G':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_PAGE_DOWN;
           }
           break;
         case 'U':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F9;
           }
           break;
         case '/':
-          if (TerminalDevice->TerminalType == VT100TYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypeVt100) {
             Key.ScanCode = SCAN_PAGE_DOWN;
           }
           break;
         case 'M':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F1;
           }
           break;
         case 'N':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F2;
           }
           break;
         case 'O':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F3;
           }
           break;
         case 'Q':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F5;
           }
           break;
         case 'R':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F6;
           }
           break;
         case 'S':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F7;
           }
           break;
         case 'T':
-          if (TerminalDevice->TerminalType == PCANSITYPE) {
+          if (TerminalDevice->TerminalType == TerminalTypePcAnsi) {
             Key.ScanCode = SCAN_F8;
           }
           break;
@@ -1726,7 +1726,7 @@ UnicodeToEfiKey (
        * numeric codes, and there are no ambiguous prefixes shared with
        * other terminal types.
        */
-      if (TerminalDevice->TerminalType == TTYTERMTYPE &&
+      if (TerminalDevice->TerminalType == TerminalTypeTtyTerm &&
           Key.ScanCode == SCAN_NULL &&
           UnicodeChar >= '0' &&
           UnicodeChar <= '9') {
@@ -1755,7 +1755,7 @@ UnicodeToEfiKey (
        * state is only used by the TTY terminal type.
        */
       Key.ScanCode = SCAN_NULL;
-      if (TerminalDevice->TerminalType == TTYTERMTYPE) {
+      if (TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
 
         if (UnicodeChar == '~' && TerminalDevice->TtyEscapeIndex <= 2) {
           UINT16 EscCode;
@@ -1851,7 +1851,7 @@ UnicodeToEfiKey (
     }
 
     if (UnicodeChar == DEL) {
-      if (TerminalDevice->TerminalType == TTYTERMTYPE) {
+      if (TerminalDevice->TerminalType == TerminalTypeTtyTerm) {
         Key.ScanCode    = SCAN_NULL;
         Key.UnicodeChar = CHAR_BACKSPACE;
       }
