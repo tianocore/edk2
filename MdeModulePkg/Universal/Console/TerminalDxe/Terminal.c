@@ -29,7 +29,7 @@ EFI_DRIVER_BINDING_PROTOCOL gTerminalDriverBinding = {
 };
 
 
-EFI_GUID  *gTerminalType[] = {
+EFI_GUID  *mTerminalType[] = {
   &gEfiPcAnsiGuid,
   &gEfiVT100Guid,
   &gEfiVT100PlusGuid,
@@ -112,6 +112,28 @@ TERMINAL_CONSOLE_MODE_DATA mTerminalConsoleModeData[] = {
 };
 
 /**
+  Convert the GUID representation of terminal type to enum type.
+
+  @param Guid  The GUID representation of terminal type.
+
+  @return  The terminal type in enum type.
+**/
+TERMINAL_TYPE
+TerminalTypeFromGuid (
+  IN EFI_GUID                     *Guid
+)
+{
+  TERMINAL_TYPE                   Type;
+
+  for (Type = 0; Type < ARRAY_SIZE (mTerminalType); Type++) {
+    if (CompareGuid (Guid, mTerminalType[Type])) {
+      break;
+    }
+  }
+  return Type;
+}
+
+/**
   Test to see if this driver supports Controller.
 
   @param  This                Protocol instance pointer.
@@ -163,12 +185,7 @@ TerminalDriverBindingSupported (
       //
       // only supports PC ANSI, VT100, VT100+, VT-UTF8, and TtyTerm terminal types
       //
-      if (!CompareGuid (&Node->Guid, &gEfiPcAnsiGuid) &&
-          !CompareGuid (&Node->Guid, &gEfiVT100Guid) &&
-          !CompareGuid (&Node->Guid, &gEfiVT100PlusGuid) &&
-          !CompareGuid (&Node->Guid, &gEfiVTUTF8Guid) &&
-          !CompareGuid (&Node->Guid, &gEfiTtyTermGuid)) {
-
+      if (TerminalTypeFromGuid (&Node->Guid) == ARRAY_SIZE (mTerminalType)) {
         return EFI_UNSUPPORTED;
       }
     }
@@ -712,29 +729,13 @@ TerminalDriverBindingStart (
     //
     if (RemainingDevicePath == NULL) {
       TerminalType = PcdGet8 (PcdDefaultTerminalType);
-      //
-      // Must be between TerminalTypePcAnsi (0) and TerminalTypeTtyTerm (4)
-      //
-      ASSERT (TerminalType <= TerminalTypeTtyTerm);
     } else if (!IsDevicePathEnd (RemainingDevicePath)) {
       //
       // If RemainingDevicePath isn't the End of Device Path Node,
       // Use the RemainingDevicePath to determine the terminal type
       //
       Node = (VENDOR_DEVICE_PATH *)RemainingDevicePath;
-      if (CompareGuid (&Node->Guid, &gEfiPcAnsiGuid)) {
-        TerminalType = TerminalTypePcAnsi;
-      } else if (CompareGuid (&Node->Guid, &gEfiVT100Guid)) {
-        TerminalType = TerminalTypeVt100;
-      } else if (CompareGuid (&Node->Guid, &gEfiVT100PlusGuid)) {
-        TerminalType = TerminalTypeVt100Plus;
-      } else if (CompareGuid (&Node->Guid, &gEfiVTUTF8Guid)) {
-        TerminalType = TerminalTypeVtUtf8;
-      } else if (CompareGuid (&Node->Guid, &gEfiTtyTermGuid)) {
-        TerminalType = TerminalTypeTtyTerm;
-      } else {
-        goto Error;
-      }
+      TerminalType = TerminalTypeFromGuid (&Node->Guid);
     } else {
       //
       // If RemainingDevicePath is the End of Device Path Node,
@@ -742,6 +743,8 @@ TerminalDriverBindingStart (
       //
       return EFI_SUCCESS;
     }
+
+    ASSERT (TerminalType < ARRAY_SIZE (mTerminalType));
 
     //
     // Initialize the Terminal Dev
@@ -1473,7 +1476,7 @@ TerminalUpdateConsoleDevVariable (
   //
   // Append terminal device path onto the variable.
   //
-  for (TerminalType = TerminalTypePcAnsi; TerminalType <= TerminalTypeTtyTerm; TerminalType++) {
+  for (TerminalType = 0; TerminalType < ARRAY_SIZE (mTerminalType); TerminalType++) {
     SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
     NewVariable = AppendDevicePathInstance (Variable, TempDevicePath);
     ASSERT (NewVariable != NULL);
@@ -1586,7 +1589,7 @@ TerminalRemoveConsoleDevVariable (
     // Loop through all the terminal types that this driver supports
     //
     Match = FALSE;
-    for (TerminalType = TerminalTypePcAnsi; TerminalType <= TerminalTypeTtyTerm; TerminalType++) {
+    for (TerminalType = 0; TerminalType < ARRAY_SIZE (mTerminalType); TerminalType++) {
 
       SetTerminalDevicePath (TerminalType, ParentDevicePath, &TempDevicePath);
 
