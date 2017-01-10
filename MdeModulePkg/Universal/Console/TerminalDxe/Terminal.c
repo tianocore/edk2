@@ -1577,46 +1577,11 @@ SetTerminalDevicePath (
 {
   VENDOR_DEVICE_PATH  Node;
 
-  *TerminalDevicePath = NULL;
+  ASSERT (TerminalType < ARRAY_SIZE (mTerminalType));
   Node.Header.Type    = MESSAGING_DEVICE_PATH;
   Node.Header.SubType = MSG_VENDOR_DP;
-
-  //
-  // Generate terminal device path node according to terminal type.
-  //
-  switch (TerminalType) {
-
-  case TerminalTypePcAnsi:
-    CopyGuid (&Node.Guid, &gEfiPcAnsiGuid);
-    break;
-
-  case TerminalTypeVt100:
-    CopyGuid (&Node.Guid, &gEfiVT100Guid);
-    break;
-
-  case TerminalTypeVt100Plus:
-    CopyGuid (&Node.Guid, &gEfiVT100PlusGuid);
-    break;
-
-  case TerminalTypeVtUtf8:
-    CopyGuid (&Node.Guid, &gEfiVTUTF8Guid);
-    break;
-
-  case TerminalTypeTtyTerm:
-    CopyGuid (&Node.Guid, &gEfiTtyTermGuid);
-    break;
-
-  default:
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Get VENDOR_DEVCIE_PATH size and put into Node.Header
-  //
-  SetDevicePathNodeLength (
-    &Node.Header,
-    sizeof (VENDOR_DEVICE_PATH)
-    );
+  SetDevicePathNodeLength (&Node, sizeof (VENDOR_DEVICE_PATH));
+  CopyGuid (&Node.Guid, mTerminalType[TerminalType]);
 
   //
   // Append the terminal node onto parent device path
