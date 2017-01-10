@@ -59,6 +59,8 @@ WriteTpmBufferMultiple (
   UINTN                   Index;
   UINTN                   PartialLength;
 
+  Status = EFI_SUCCESS;
+
   I2CDeviceAddr.I2CDeviceAddress = ATMEL_I2C_TPM_SLAVE_ADDRESS;
 
   DEBUG ((EFI_D_VERBOSE, "WriteTpmBufferMultiple: Addr=%02x  Length=%02x\n", I2CDeviceAddr.I2CDeviceAddress, Length));
@@ -111,6 +113,8 @@ ReadTpmBufferMultiple (
   UINTN                   WriteLength;
   UINTN                   Index;
   UINTN                   PartialLength;
+
+  Status = EFI_SUCCESS;
 
   I2CDeviceAddr.I2CDeviceAddress = ATMEL_I2C_TPM_SLAVE_ADDRESS;
   WriteLength = 0;
@@ -263,6 +267,13 @@ Tpm12SubmitCommand (
   INT64                Delta;
 
   //
+  // Initialize local variables
+  //
+  Start   = 0;
+  End     = 0;
+  Total   = 0;
+
+  //
   // Make sure response buffer is big enough to hold a response header
   //
   if (*OutputParameterBlockSize < sizeof (TPM_RSP_COMMAND_HDR)) {
@@ -274,13 +285,6 @@ Tpm12SubmitCommand (
   // Get the current timer value
   //
   Current = GetPerformanceCounter();
-
-  //
-  // Initialize local variables
-  //
-  Start = 0;
-  End   = 0;
-  Total = 0;
 
   //
   // Retrieve the performance counter properties and compute the number of
