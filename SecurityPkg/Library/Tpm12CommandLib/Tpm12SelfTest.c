@@ -1,7 +1,7 @@
 /** @file
   Implement TPM1.2 NV Self Test related commands.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved. <BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiPei.h>
 #include <Library/Tpm12CommandLib.h>
 #include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/Tpm12DeviceLib.h>
 
 /**
@@ -33,6 +34,7 @@ Tpm12ContinueSelfTest (
   VOID
   )
 {
+  EFI_STATUS           Status;
   TPM_RQU_COMMAND_HDR  Command;
   TPM_RSP_COMMAND_HDR  Response;
   UINT32               Length;
@@ -44,5 +46,15 @@ Tpm12ContinueSelfTest (
   Command.paramSize = SwapBytes32 (sizeof (Command));
   Command.ordinal   = SwapBytes32 (TPM_ORD_ContinueSelfTest);
   Length = sizeof (Response);
-  return Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length, (UINT8 *)&Response);
+  Status = Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length, (UINT8 *)&Response);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (SwapBytes32 (Response.returnCode) != TPM_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm12ContinueSelfTest: Response Code error! 0x%08x\r\n", SwapBytes32 (Response.returnCode)));
+    return EFI_DEVICE_ERROR;
+  }
+
+  return Status;
 }
