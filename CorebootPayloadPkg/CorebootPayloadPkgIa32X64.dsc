@@ -89,8 +89,6 @@
 
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
-  GCC:DEBUG_*_*_CC_FLAGS         = -Og -flto
-  GCC:DEBUG_*_*_DLINK_FLAGS      = -flto
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
