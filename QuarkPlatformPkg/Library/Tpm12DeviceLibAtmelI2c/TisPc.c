@@ -1,7 +1,7 @@
 /** @file
   Basic TIS (TPM Interface Specification) functions for Atmel I2C TPM.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,6 @@
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/I2cLib.h>
-#include <Library/Tpm12CommandLib.h>
 
 //
 // Atmel I2C TPM slave address
@@ -223,15 +222,6 @@ Tpm12RequestUseTpm (
       return Status;
     }
   } while (EFI_ERROR (Status));
-
-  //
-  // Send Physical Presence Command to Atmel I2C TPM
-  //
-  Status = Tpm12PhysicalPresence (TPM_PHYSICAL_PRESENCE_PRESENT);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Atmel I2C TPM failed to submit physical presence command: %r\n", Status));
-    return Status;
-  }
 
   return EFI_SUCCESS;
 }
