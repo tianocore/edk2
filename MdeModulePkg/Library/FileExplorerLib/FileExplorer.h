@@ -1,7 +1,7 @@
 /** @file
    File explorer lib.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/DevicePathToText.h>
-#include <Protocol/LoadFile.h>
 #include <Protocol/FormBrowser2.h>
 
 #include <Library/DebugLib.h>

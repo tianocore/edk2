@@ -1,7 +1,7 @@
 /** @file
 File explorer related functions.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -699,9 +699,7 @@ LibFindFileSystem (
   )
 {
   UINTN                        NoSimpleFsHandles;
-  UINTN                        NoLoadFileHandles;
   EFI_HANDLE                   *SimpleFsHandle;
-  EFI_HANDLE                   *LoadFileHandle;
   UINT16                       *VolumeLabel;
   UINTN                        Index;
   EFI_STATUS                   Status;
@@ -711,7 +709,6 @@ LibFindFileSystem (
   EFI_FILE_SYSTEM_VOLUME_LABEL *Info;
 
   NoSimpleFsHandles = 0;
-  NoLoadFileHandles = 0;
   OptionNumber      = 0;
 
   //
@@ -794,57 +791,6 @@ LibFindFileSystem (
 
   if (NoSimpleFsHandles != 0) {
     FreePool (SimpleFsHandle);
-  }
-
-  //
-  // Searching for handles that support Load File protocol
-  //
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiLoadFileProtocolGuid,
-                  NULL,
-                  &NoLoadFileHandles,
-                  &LoadFileHandle
-                  );
-
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < NoLoadFileHandles; Index++) {
-      MenuEntry = LibCreateMenuEntry ();
-      if (NULL == MenuEntry) {
-        FreePool (LoadFileHandle);
-        return EFI_OUT_OF_RESOURCES;
-      }
-
-      FileContext = (FILE_CONTEXT *) MenuEntry->VariableContext;
-      FileContext->DeviceHandle = LoadFileHandle[Index];
-      FileContext->IsRoot = TRUE;
-
-      FileContext->DevicePath = DevicePathFromHandle (FileContext->DeviceHandle);
-      FileContext->FileName = LibDevicePathToStr (FileContext->DevicePath);
-
-      MenuEntry->HelpString = LibDevicePathToStr (FileContext->DevicePath);
-      MenuEntry->DisplayString = AllocateZeroPool (MAX_CHAR);
-      ASSERT (MenuEntry->DisplayString != NULL);
-      UnicodeSPrint (
-        MenuEntry->DisplayString,
-        MAX_CHAR,
-        L"Load File [%s]",
-        MenuEntry->HelpString
-        );
-      MenuEntry->DisplayStringToken = HiiSetString (
-                                           gFileExplorerPrivate.FeHiiHandle,
-                                           0,
-                                           MenuEntry->DisplayString,
-                                           NULL
-                                           );
-
-      OptionNumber++;
-      InsertTailList (&gFileExplorerPrivate.FsOptionMenu->Head, &MenuEntry->Link);
-    }
-  }
-
-  if (NoLoadFileHandles != 0) {
-    FreePool (LoadFileHandle);
   }
 
   gFileExplorerPrivate.FsOptionMenu->MenuNumber = OptionNumber;
