@@ -26,12 +26,12 @@ struct FRAME_BUFFER_CONFIGURE {
   UINTN                           BytesPerPixel;
   UINTN                           WidthInPixels;
   UINTN                           Height;
-  UINT8                           LineBuffer[SIZE_4KB * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)];
   UINT8                           *FrameBuffer;
   EFI_GRAPHICS_PIXEL_FORMAT       PixelFormat;
   EFI_PIXEL_BITMASK               PixelMasks;
   INT8                            PixelShl[4]; // R-G-B-Rsvd
   INT8                            PixelShr[4]; // R-G-B-Rsvd
+  UINT8                           LineBuffer[0];
 };
 
 CONST EFI_PIXEL_BITMASK mRgbPixelMasks = {
@@ -123,15 +123,6 @@ FrameBufferBltConfigure (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if (*ConfigureSize < sizeof (FRAME_BUFFER_CONFIGURE)) {
-    *ConfigureSize = sizeof (FRAME_BUFFER_CONFIGURE);
-    return RETURN_BUFFER_TOO_SMALL;
-  }
-
-  if (Configure == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
   switch (FrameBufferInfo->PixelFormat) {
   case PixelRedGreenBlueReserved8BitPerColor:
     BitMask = &mRgbPixelMasks;
@@ -156,6 +147,17 @@ FrameBufferBltConfigure (
 
   FrameBufferBltLibConfigurePixelFormat (BitMask, &BytesPerPixel, PixelShl, PixelShr);
 
+  if (*ConfigureSize < sizeof (FRAME_BUFFER_CONFIGURE)
+                     + FrameBufferInfo->HorizontalResolution * BytesPerPixel) {
+    *ConfigureSize = sizeof (FRAME_BUFFER_CONFIGURE)
+                   + FrameBufferInfo->HorizontalResolution * BytesPerPixel;
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  if (Configure == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
   CopyMem (&Configure->PixelMasks, BitMask,  sizeof (*BitMask));
   CopyMem (Configure->PixelShl,    PixelShl, sizeof (PixelShl));
   CopyMem (Configure->PixelShr,    PixelShr, sizeof (PixelShr));
@@ -165,8 +167,6 @@ FrameBufferBltConfigure (
   Configure->WidthInPixels = (UINTN) FrameBufferInfo->HorizontalResolution;
   Configure->Height        = (UINTN) FrameBufferInfo->VerticalResolution;
   Configure->WidthInBytes  = Configure->WidthInPixels * Configure->BytesPerPixel;
-
-  ASSERT (Configure->WidthInBytes < sizeof (Configure->LineBuffer));
 
   return RETURN_SUCCESS;
 }
