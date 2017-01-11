@@ -598,7 +598,7 @@ CoherentPciIoMap (
   //
   Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO(This);
   if ((Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0 &&
-      (UINTN)HostAddress + *NumberOfBytes > SIZE_4GB) {
+      (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress + *NumberOfBytes > SIZE_4GB) {
 
     //
     // Bounce buffering is not possible for consistent mappings
@@ -1006,7 +1006,7 @@ NonCoherentPciIoMap (
   // a bounce buffer and copy over the data in case HostAddress >= 4 GB.
   //
   Bounce = ((Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0 &&
-            (UINTN)HostAddress + *NumberOfBytes > SIZE_4GB);
+            (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress + *NumberOfBytes > SIZE_4GB);
 
   if (!Bounce) {
     switch (Operation) {
