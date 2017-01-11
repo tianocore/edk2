@@ -21,11 +21,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define EFI_TPM2_ACPI_TABLE_REVISION_3  3
 #define EFI_TPM2_ACPI_TABLE_REVISION_4  4
+#define EFI_TPM2_ACPI_TABLE_REVISION    EFI_TPM2_ACPI_TABLE_REVISION_4
 
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER Header;
-  UINT16                      PlatformClass;
-  UINT16                      Reserved;
+  // Flags field is replaced in version 4 and above
+  //    BIT0~15:  PlatformClass      This field is only valid for version 4 and above
+  //    BIT16~31: Reserved
+  UINT32                      Flags;
   UINT64                      AddressOfControlArea;
   UINT32                      StartMethod;
 //UINT8                       PlatformSpecificParameters[];
