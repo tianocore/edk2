@@ -3099,7 +3099,7 @@ GetAllMappingGuids (
   )
 {
   UINTN GuidCount;
-  UINTN NtGuidCount
+  UINTN NtGuidCount;
   UINTN Index;
 
   if (Count == NULL) {
