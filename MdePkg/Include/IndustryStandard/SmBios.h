@@ -2,7 +2,7 @@
   Industry Standard Definitions of SMBIOS Table Specification v3.0.0.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -97,6 +97,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SMBIOS_TYPE_ADDITIONAL_INFORMATION               40
 #define SMBIOS_TYPE_ONBOARD_DEVICES_EXTENDED_INFORMATION 41
 #define SMBIOS_TYPE_MANAGEMENT_CONTROLLER_HOST_INTERFACE 42
+#define SMBIOS_TYPE_TPM_DEVICE                           43
 
 ///
 /// Inactive type is added from SMBIOS 2.2. Reference SMBIOS 2.6, chapter 3.3.43.
@@ -2359,6 +2360,21 @@ typedef struct {
 } SMBIOS_TABLE_TYPE42;
 
 ///
+/// TPM Device (Type 43).
+///
+typedef struct {
+  SMBIOS_STRUCTURE                  Hdr;
+  UINT8                             VendorID[4];
+  UINT8                             MajorSpecVersion;
+  UINT8                             MinorSpecVersion;
+  UINT32                            FirmwareVersion1;
+  UINT32                            FirmwareVersion2;
+  SMBIOS_TABLE_STRING               Description;
+  UINT64                            Characteristics;
+  UINT32                            OemDefined;
+} SMBIOS_TABLE_TYPE43;
+
+///
 /// Inactive (Type 126)
 ///
 typedef struct {
@@ -2420,6 +2436,7 @@ typedef union {
   SMBIOS_TABLE_TYPE40   *Type40;
   SMBIOS_TABLE_TYPE41   *Type41;
   SMBIOS_TABLE_TYPE42   *Type42;
+  SMBIOS_TABLE_TYPE43   *Type43;
   SMBIOS_TABLE_TYPE126  *Type126;
   SMBIOS_TABLE_TYPE127  *Type127;
   UINT8                 *Raw;
