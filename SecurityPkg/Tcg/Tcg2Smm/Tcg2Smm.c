@@ -77,14 +77,14 @@ EFI_TPM2_ACPI_TABLE  mTpm2AcpiTemplate = {
   {
     EFI_ACPI_5_0_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE,
     sizeof (mTpm2AcpiTemplate),
-    EFI_TPM2_ACPI_TABLE_REVISION_4,
+    EFI_TPM2_ACPI_TABLE_REVISION,
     //
     // Compiler initializes the remaining bytes to 0
     // These fields should be filled in in production
     //
   },
-  0, // 16-bit PlatformClass
-  0, // 16-bit Reserved
+  0, // BIT0~15:  PlatformClass
+     // BIT16~31: Reserved
   0, // Control Area
   EFI_TPM2_ACPI_TABLE_START_METHOD_TIS, // StartMethod
 };
