@@ -1,7 +1,7 @@
 /** @file
   FrameBufferBltLib - Library to perform blt operations on a frame buffer.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,8 +30,8 @@ struct FRAME_BUFFER_CONFIGURE {
   UINT8                           *FrameBuffer;
   EFI_GRAPHICS_PIXEL_FORMAT       PixelFormat;
   EFI_PIXEL_BITMASK               PixelMasks;
-  INTN                            PixelShl[4]; // R-G-B-Rsvd
-  INTN                            PixelShr[4]; // R-G-B-Rsvd
+  INT8                            PixelShl[4]; // R-G-B-Rsvd
+  INT8                            PixelShr[4]; // R-G-B-Rsvd
 };
 
 CONST EFI_PIXEL_BITMASK mRgbPixelMasks = {
@@ -45,43 +45,47 @@ CONST EFI_PIXEL_BITMASK mBgrPixelMasks = {
 /**
   Initialize the bit mask in frame buffer configure.
 
-  @param Configure  The frame buffer configure.
-  @param BitMask    The bit mask of pixel.
+  @param BitMask       The bit mask of pixel.
+  @param BytesPerPixel Size in bytes of pixel.
+  @param PixelShl      Left shift array.
+  @param PixelShr      Right shift array.
 **/
 VOID
-ConfigurePixelBitMaskFormat (
-  IN FRAME_BUFFER_CONFIGURE     *Configure,
-  IN CONST EFI_PIXEL_BITMASK    *BitMask
+FrameBufferBltLibConfigurePixelFormat (
+  IN CONST EFI_PIXEL_BITMASK    *BitMask,
+  OUT UINTN                     *BytesPerPixel,
+  OUT INT8                      *PixelShl,
+  OUT INT8                      *PixelShr
   )
 {
-  UINTN   Loop;
+  UINT8   Index;
   UINT32  *Masks;
   UINT32  MergedMasks;
 
+  ASSERT (BytesPerPixel != NULL);
+
   MergedMasks = 0;
   Masks = (UINT32*) BitMask;
-  for (Loop = 0; Loop < 3; Loop++) {
-    ASSERT ((Loop == 3) || (Masks[Loop] != 0));
-    ASSERT ((MergedMasks & Masks[Loop]) == 0);
-    Configure->PixelShl[Loop] = HighBitSet32 (Masks[Loop]) - 23 + (Loop * 8);
-    if (Configure->PixelShl[Loop] < 0) {
-      Configure->PixelShr[Loop] = -Configure->PixelShl[Loop];
-      Configure->PixelShl[Loop] = 0;
+  for (Index = 0; Index < 3; Index++) {
+    ASSERT ((MergedMasks & Masks[Index]) == 0);
+
+    PixelShl[Index] = (INT8) HighBitSet32 (Masks[Index]) - 23 + (Index * 8);
+    if (PixelShl[Index] < 0) {
+      PixelShr[Index] = -PixelShl[Index];
+      PixelShl[Index] = 0;
     } else {
-      Configure->PixelShr[Loop] = 0;
+      PixelShr[Index] = 0;
     }
-    MergedMasks = (UINT32) (MergedMasks | Masks[Loop]);
-    DEBUG ((EFI_D_VERBOSE, "%d: shl:%d shr:%d mask:%x\n", Loop,
-            Configure->PixelShl[Loop], Configure->PixelShr[Loop], Masks[Loop]));
+    DEBUG ((DEBUG_INFO, "%d: shl:%d shr:%d mask:%x\n", Index,
+            PixelShl[Index], PixelShr[Index], Masks[Index]));
+
+    MergedMasks = (UINT32) (MergedMasks | Masks[Index]);
   }
   MergedMasks = (UINT32) (MergedMasks | Masks[3]);
 
   ASSERT (MergedMasks != 0);
-  Configure->BytesPerPixel = (UINTN) ((HighBitSet32 (MergedMasks) + 7) / 8);
-
-  DEBUG ((EFI_D_VERBOSE, "Bytes per pixel: %d\n", Configure->BytesPerPixel));
-
-  CopyMem (&Configure->PixelMasks, BitMask, sizeof (*BitMask));
+  *BytesPerPixel = (UINTN) ((HighBitSet32 (MergedMasks) + 7) / 8);
+  DEBUG ((DEBUG_INFO, "Bytes per pixel: %d\n", *BytesPerPixel));
 }
 
 /**
@@ -110,6 +114,11 @@ FrameBufferBltConfigure (
   IN OUT UINTN                                 *ConfigureSize
   )
 {
+  CONST EFI_PIXEL_BITMASK                      *BitMask;
+  UINTN                                        BytesPerPixel;
+  INT8                                         PixelShl[4];
+  INT8                                         PixelShr[4];
+
   if (ConfigureSize == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
@@ -125,15 +134,15 @@ FrameBufferBltConfigure (
 
   switch (FrameBufferInfo->PixelFormat) {
   case PixelRedGreenBlueReserved8BitPerColor:
-    ConfigurePixelBitMaskFormat (Configure, &mRgbPixelMasks);
+    BitMask = &mRgbPixelMasks;
     break;
 
   case PixelBlueGreenRedReserved8BitPerColor:
-    ConfigurePixelBitMaskFormat (Configure, &mBgrPixelMasks);
+    BitMask = &mBgrPixelMasks;
     break;
 
   case PixelBitMask:
-    ConfigurePixelBitMaskFormat (Configure, &(FrameBufferInfo->PixelInformation));
+    BitMask = &FrameBufferInfo->PixelInformation;
     break;
 
   case PixelBltOnly:
@@ -145,6 +154,12 @@ FrameBufferBltConfigure (
     return RETURN_INVALID_PARAMETER;
   }
 
+  FrameBufferBltLibConfigurePixelFormat (BitMask, &BytesPerPixel, PixelShl, PixelShr);
+
+  CopyMem (&Configure->PixelMasks, BitMask,  sizeof (*BitMask));
+  CopyMem (Configure->PixelShl,    PixelShl, sizeof (PixelShl));
+  CopyMem (Configure->PixelShr,    PixelShr, sizeof (PixelShr));
+  Configure->BytesPerPixel = BytesPerPixel;
   Configure->PixelFormat   = FrameBufferInfo->PixelFormat;
   Configure->FrameBuffer   = (UINT8*) FrameBuffer;
   Configure->WidthInPixels = (UINTN) FrameBufferInfo->HorizontalResolution;
