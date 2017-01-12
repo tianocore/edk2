@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
@@ -999,6 +999,7 @@
 "       40 - Additional Information\r\n"
 "       41 - Onboard Devices Extended Information\r\n"
 "       42 - Management Controller Host Interface\r\n"
+"       43 - TPM Device\r\n"
 "  2. Enter the SmbiosHandle parameter in hexadecimal format.\r\n"
 "     Do not use the '0x' prefix format for hexadecimal values.\r\n"
 "  3. Internal commands:\r\n"

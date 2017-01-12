@@ -260,6 +260,22 @@ TABLE_ITEM  SystemEnclosureTypeTable[] = {
     0x20,
     L"  Detachable"
   },
+  {
+    0x21,
+    L"  IoT Gateway"
+  },
+  {
+    0x22,
+    L"  Embedded PC"
+  },
+  {
+    0x23,
+    L"  Mini PC"
+  },
+  {
+    0x24,
+    L"  Stick PC"
+  },
 };
 
 TABLE_ITEM  SystemEnclosureStatusTable[] = {
@@ -531,6 +547,34 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x30,
     L"Socket BGA1364"
+  },
+  {
+    0x31,
+    L"Socket AM4"
+  },
+  {
+    0x32,
+    L"Socket LGA1151"
+  },
+  {
+    0x33,
+    L"Socket BGA1356"
+  },
+  {
+    0x34,
+    L"Socket BGA1440"
+  },
+  {
+    0x35,
+    L"Socket BGA1515"
+  },
+  {
+    0x36,
+    L"Socket LGA3647-1"
+  },
+  {
+    0x37,
+    L"Socket SP3"
   }
 };
 
@@ -1345,6 +1389,18 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
   {
     0x20,
     L"PCI Express Gen 3 SFF-8639"
+  },
+  {
+    0x21,
+    L"PCI Express Mini 52-pin (CEM spec. 2.0) with bottom-side keep-outs"
+  },
+  {
+    0x22,
+    L"PCI Express Mini 52-pin (CEM spec. 2.0) without bottom-side keep-outs"
+  },
+  {
+    0x23,
+    L"PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card"
   },
   {
     0xA0,

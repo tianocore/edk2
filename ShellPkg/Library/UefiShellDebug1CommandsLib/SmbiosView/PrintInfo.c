@@ -335,7 +335,17 @@ SmbiosPrintStructure (
       PRINT_STRUCT_VALUE (Struct, Type0, EmbeddedControllerFirmwareMajorRelease);
       PRINT_STRUCT_VALUE (Struct, Type0, EmbeddedControllerFirmwareMinorRelease);
     }
-
+    if (AE_SMBIOS_VERSION (0x3, 0x1) && (Struct->Hdr->Length > 0x18)) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_EXTENDED_BIOS_SIZE),
+        gShellDebug1HiiHandle,
+        Struct->Type0->ExtendedBiosSize.Size,
+        (Struct->Type0->ExtendedBiosSize.Unit == 0x0) ? L"MB": L"GB"
+        );
+    }
     break;
 
   //
@@ -510,6 +520,10 @@ SmbiosPrintStructure (
     DisplayCacheErrCorrectingType (Struct->Type7->ErrorCorrectionType, Option);
     DisplayCacheSystemCacheType (Struct->Type7->SystemCacheType, Option);
     DisplayCacheAssociativity (Struct->Type7->Associativity, Option);
+    if (AE_SMBIOS_VERSION (0x3, 0x1) && (Struct->Hdr->Length > 0x13)) {
+      PRINT_STRUCT_VALUE_H (Struct, Type7, MaximumCacheSize2);
+      PRINT_STRUCT_VALUE_H (Struct, Type7, InstalledSize2);
+    }
     break;
 
   //
@@ -1584,6 +1598,18 @@ DisplayProcessorFamily (
     Print (L"Intel(R) Core(TM) M processor\n");
     break;
 
+  case 0x2D:
+    Print (L"Intel(R) Core(TM) m3 processor\n");
+    break;
+
+  case 0x2E:
+    Print (L"Intel(R) Core(TM) m5 processor\n");
+    break;
+
+  case 0x2F:
+    Print (L"Intel(R) Core(TM) m7 processor\n");
+    break;
+
   case 0x30:
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ALPHA_FAMILY_2), gShellDebug1HiiHandle);
     break;
@@ -1782,6 +1808,14 @@ DisplayProcessorFamily (
 
   case 0x68:
     Print (L"AMD Opteron(TM) X2000 Series APU\n");
+    break;
+
+  case 0x69:
+    Print (L"AMD Opteron(TM) A-Series Processor\n");
+    break;
+
+  case 0x6A:
+    Print (L"AMD Opteron(TM) X3000 Series APU\n");
     break;
 
   case 0x70:
@@ -2215,6 +2249,14 @@ DisplayProcessorFamily2 (
   // Use switch to check
   //
   switch (Family2) {
+    case 0x100:
+      Print (L"ARMv7\n");
+      break;
+
+    case 0x101:
+      Print (L"ARMv8\n");
+      break;
+
     case 0x104:
       Print (L"SH-3\n");
       break;

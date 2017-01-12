@@ -380,6 +380,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_POWER_SUPPLY_REPLACE           #language en-US "Power supply is hot replaceable\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_POWER_SUPPLY_NOT_REPLACE       #language en-US "Power supply is not hot replaceable\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE                      #language en-US "BiosSize:  %d KB\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_EXTENDED_BIOS_SIZE             #language en-US "ExtendedBiosSize:  %d %s\r\n"
 #string STR_SMBIOSVIEW_QUERYTABLE_NO_INFO                       #language en-US "No Info"
 #string STR_SMBIOSVIEW_QUERYTABLE_RSVD_BITS_SET                 #language en-US "\r\nIt also has reserved bits set 1 --- reserved bits: 0x%x"
 #string STR_SMBIOSVIEW_QUERYTABLE_SYSTEM_WAKEUP_TYPE            #language en-US "System Wakeup Type:"
