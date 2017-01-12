@@ -513,6 +513,16 @@ PublishTpm2 (
   DEBUG((DEBUG_INFO, "Tpm2 ACPI table revision is %d\n", mTpm2AcpiTemplate.Header.Revision));
 
   //
+  // PlatformClass is only valid for version 4 and above
+  //    BIT0~15:  PlatformClass 
+  //    BIT16~31: Reserved
+  //
+  if (mTpm2AcpiTemplate.Header.Revision >= EFI_TPM2_ACPI_TABLE_REVISION_4) {
+    mTpm2AcpiTemplate.Flags = (mTpm2AcpiTemplate.Flags & 0xFFFF0000) | PcdGet8(PcdTpmPlatformClass);
+    DEBUG((DEBUG_INFO, "Tpm2 ACPI table PlatformClass is %d\n", (mTpm2AcpiTemplate.Flags & 0x0000FFFF)));
+  }
+
+  //
   // Measure to PCR[0] with event EV_POST_CODE ACPI DATA
   //
   TpmMeasureAndLogData(

@@ -74,6 +74,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress               ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev                 ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass                 ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiAcpiTableProtocolGuid AND
