@@ -1317,20 +1317,21 @@ IfConfig6SetInterfaceInfo (
 
       VarArg= VarArg->Next;
 
-      if (StrCmp (VarArg->Arg, L"host") == 0) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_IP_CONFIG), gShellNetwork2HiiHandle, Status);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
-      } else if (StrCmp (VarArg->Arg, L"gw") == 0) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_GW_CONFIG), gShellNetwork2HiiHandle, Status);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
-      } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_DNS_CONFIG), gShellNetwork2HiiHandle, Status);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        goto ON_EXIT;
+      if (VarArg != NULL) {
+        if (StrCmp (VarArg->Arg, L"host") == 0) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_IP_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto ON_EXIT;
+        } else if (StrCmp (VarArg->Arg, L"gw") == 0) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_GW_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto ON_EXIT;
+        } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_DNS_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto ON_EXIT;
+        }
       }
-
     } else if (StrCmp (VarArg->Arg, L"man") == 0) {
       //
       // Set manual config policy.
