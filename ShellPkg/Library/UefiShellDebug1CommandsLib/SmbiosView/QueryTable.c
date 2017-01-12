@@ -248,6 +248,18 @@ TABLE_ITEM  SystemEnclosureTypeTable[] = {
     0x1D,
     L"  Blade Enclosure"
   },
+  {
+    0x1E,
+    L"  Tablet"
+  },
+  {
+    0x1F,
+    L"  Convertible"
+  },
+  {
+    0x20,
+    L"  Detachable"
+  },
 };
 
 TABLE_ITEM  SystemEnclosureStatusTable[] = {
@@ -503,6 +515,22 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x2C,
     L"Socket LGA1356-3"
+  },
+  {
+    0x2D,
+    L"Socket LGA1150"
+  },
+  {
+    0x2E,
+    L"Socket BGA1168"
+  },
+  {
+    0x2F,
+    L"Socket BGA1234"
+  },
+  {
+    0x30,
+    L"Socket BGA1364"
   }
 };
 
@@ -1265,6 +1293,58 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
   {
     0x13,
     L"AGP 8X"
+  },
+  {
+    0x14,
+    L"M.2 Socket 1-DP (Mechanical Key A)"
+  },
+  {
+    0x15,
+    L"M.2 Socket 1-SD (Mechanical Key E)"
+  },
+  {
+    0x16,
+    L"M.2 Socket 2 (Mechanical Key B)"
+  },
+  {
+    0x17,
+    L"M.2 Socket 3 (Mechanical Key M)"
+  },
+  {
+    0x18,
+    L"MXM Type I"
+  },
+  {
+    0x19,
+    L"MXM Type II"
+  },
+  {
+    0x1A,
+    L"MXM Type III (standard connector)"
+  },
+  {
+    0x1B,
+    L"MXM Type III (HE connector)"
+  },
+  {
+    0x1C,
+    L"MXM Type IV"
+  },
+  {
+    0x1D,
+    L"MXM 3.0 Type A"
+  },
+  {
+    0x1E,
+    L"MXM 3.0 Type B"
+  },
+  {
+    0x1F,
+    L"PCI Express Gen 2 SFF-8639"
+  },
+  {
+    0x20,
+    L"PCI Express Gen 3 SFF-8639"
   },
   {
     0xA0,

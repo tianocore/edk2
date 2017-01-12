@@ -1,7 +1,7 @@
 /** @file
   Module for clarifying the content of the smbios structure element information.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>  
   (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
@@ -1580,6 +1580,10 @@ DisplayProcessorFamily (
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_INTEL_ATOM), gShellDebug1HiiHandle);
     break;
 
+  case 0x2C:
+    Print (L"Intel(R) Core(TM) M processor\n");
+    break;
+
   case 0x30:
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ALPHA_FAMILY_2), gShellDebug1HiiHandle);
     break;
@@ -1766,6 +1770,18 @@ DisplayProcessorFamily (
 
   case 0x65:
     Print (L"68030\n");
+    break;
+
+  case 0x66:
+    Print (L"AMD Athlon(TM) X4 Quad-Core Processor Family\n");
+    break;
+
+  case 0x67:
+    Print (L"AMD Opteron(TM) X1000 Series Processor\n");
+    break;
+
+  case 0x68:
+    Print (L"AMD Opteron(TM) X2000 Series APU\n");
     break;
 
   case 0x70:
