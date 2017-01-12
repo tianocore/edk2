@@ -1096,6 +1096,20 @@ SmbiosPrintStructure (
     break;
 
   //
+  // TPM Device (Type 43)
+  //
+  case 43:
+    PRINT_BIT_FIELD (Struct, Type43, VendorID, 4);
+    PRINT_STRUCT_VALUE_H (Struct, Type43, MajorSpecVersion);
+    PRINT_STRUCT_VALUE_H (Struct, Type43, MinorSpecVersion);
+    PRINT_STRUCT_VALUE_H (Struct, Type43, FirmwareVersion1);
+    PRINT_STRUCT_VALUE_H (Struct, Type43, FirmwareVersion2);
+    PRINT_PENDING_STRING (Struct, Type43, Description);
+    DisplayTpmDeviceCharacteristics (ReadUnaligned64 ((UINT64 *) (UINTN) &(Struct->Type43->Characteristics)), Option);
+    PRINT_STRUCT_VALUE_H (Struct, Type43, OemDefined);
+    break;
+
+  //
   // Inactive (Type 126)
   //
   case 126:
@@ -3237,4 +3251,60 @@ DisplaySPSCharacteristics (
   } else {
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_POWER_SUPPLY_NOT_REPLACE), gShellDebug1HiiHandle);
   }
+}
+
+/**
+  Display TPM Device (Type 43) Characteristics.
+
+  @param[in] Chara    The information bits.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayTpmDeviceCharacteristics (
+  IN UINT64  Chara,
+  IN UINT8   Option
+  )
+{
+  //
+  // Print header
+  //
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CHAR), gShellDebug1HiiHandle);
+  //
+  // print option
+  //
+  PRINT_INFO_OPTION (Chara, Option);
+
+  //
+  // Check all the bits and print information
+  // This function does not use Table because table of bits
+  //   are designed not to deal with UINT64
+  //
+  if (BIT (Chara, 0) != 0) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_RESERVED_BIT), gShellDebug1HiiHandle);
+  }
+
+  if (BIT (Chara, 1) != 0) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_RESERVED_BIT), gShellDebug1HiiHandle);
+  }
+  if (BIT (Chara, 2) != 0) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CHAR_NOT_SUPPORTED), gShellDebug1HiiHandle);
+  }
+
+  if (BIT (Chara, 3) != 0) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_FWU), gShellDebug1HiiHandle);
+  }
+
+  if (BIT (Chara, 4) != 0) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_PLAT_SW), gShellDebug1HiiHandle);
+  }
+
+  if (BIT (Chara, 5) != 0) {
+    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_OEM), gShellDebug1HiiHandle);
+  }
+
+  //
+  // Just print the Reserved
+  //
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BITS_06_63), gShellDebug1HiiHandle);
+
 }

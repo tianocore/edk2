@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-// (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+// (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -488,4 +488,10 @@
 #string STR_SMBIOSVIEW_SMBIOSVIEW_SMBIOS_TABLE                  #language en-US "SmbiosView: SMBIOS table damaged\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_OUT_OF_MEM                    #language en-US "SmbiosView: Out of memory\r\n"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_CANNOT_ACCESS_STATS           #language en-US "SmbiosView: Cannot access statistics table\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CHAR                #language en-US "TPM Device Characteristics: \r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CHAR_NOT_SUPPORTED  #language en-US "TPM Device Characteristics Not Supported\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_FWU          #language en-US "Family configurable via firmware update\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_PLAT_SW      #language en-US "Family configurable via platform software support\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_TPM_DEVICE_CONFIG_OEM          #language en-US "Family configurable via OEM proprietary mechanism\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_BITS_06_63                     #language en-US "Bits 6:63 are reserved\r\n"
 
