@@ -1,7 +1,7 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v3.0.0.
+  Industry Standard Definitions of SMBIOS Table Specification v3.1.0.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
@@ -268,6 +268,14 @@ typedef struct {
 } MISC_BIOS_CHARACTERISTICS_EXTENSION;
 
 ///
+/// Extended BIOS ROM size.
+///
+typedef struct {
+  UINT16 Size           :14;
+  UINT16 Unit           :2;
+} EXTENDED_BIOS_ROM_SIZE;
+
+///
 /// BIOS Information (Type 0).
 ///
 typedef struct {
@@ -283,6 +291,10 @@ typedef struct {
   UINT8                     SystemBiosMinorRelease;
   UINT8                     EmbeddedControllerFirmwareMajorRelease;
   UINT8                     EmbeddedControllerFirmwareMinorRelease;
+  //
+  // Add for smbios 3.1.0
+  //
+  EXTENDED_BIOS_ROM_SIZE    ExtendedBiosSize;
 } SMBIOS_TABLE_TYPE0;
 
 ///
@@ -407,7 +419,11 @@ typedef enum {
   MiscChassisBladeEnclosure           = 0x1D,
   MiscChassisTablet                   = 0x1E,
   MiscChassisConvertible              = 0x1F,
-  MiscChassisDetachable               = 0x20
+  MiscChassisDetachable               = 0x20,
+  MiscChassisIoTGateway               = 0x21,
+  MiscChassisEmbeddedPc               = 0x22,
+  MiscChassisMiniPc                   = 0x23,
+  MiscChassisStickPc                  = 0x24
 } MISC_CHASSIS_TYPE;
 
 ///
@@ -540,6 +556,9 @@ typedef enum {
   ProcessorFamilyIntelCoreSoloMobile    = 0x2A,
   ProcessorFamilyIntelAtom              = 0x2B,
   ProcessorFamilyIntelCoreM             = 0x2C,
+  ProcessorFamilyIntelCorem3            = 0x2D,
+  ProcessorFamilyIntelCorem5            = 0x2E,
+  ProcessorFamilyIntelCorem7            = 0x2F,
   ProcessorFamilyAlpha                  = 0x30,
   ProcessorFamilyAlpha21064             = 0x31,
   ProcessorFamilyAlpha21066             = 0x32,
@@ -590,6 +609,8 @@ typedef enum {
   ProcessorFamilyAmdAthlonX4QuadCore    = 0x66,
   ProcessorFamilyAmdOpteronX1000Series  = 0x67,
   ProcessorFamilyAmdOpteronX2000Series  = 0x68,
+  ProcessorFamilyAmdOpteronASeries      = 0x69,
+  ProcessorFamilyAmdOpteronX3000Series  = 0x6A,
   ProcessorFamilyHobbit                 = 0x70,
   ProcessorFamilyCrusoeTM5000           = 0x78,
   ProcessorFamilyCrusoeTM3000           = 0x79,
@@ -699,6 +720,8 @@ typedef enum {
 /// Processor Information2 - Processor Family2.
 ///
 typedef enum {
+  ProcessorFamilyARMv7                 = 0x0100,
+  ProcessorFamilyARMv8                 = 0x0101,
   ProcessorFamilySH3                   = 0x0104,
   ProcessorFamilySH4                   = 0x0105,
   ProcessorFamilyARM                   = 0x0118,
@@ -774,7 +797,14 @@ typedef enum {
   ProcessorUpgradeSocketLGA1150   = 0x2D,
   ProcessorUpgradeSocketBGA1168   = 0x2E,
   ProcessorUpgradeSocketBGA1234   = 0x2F,
-  ProcessorUpgradeSocketBGA1364   = 0x30
+  ProcessorUpgradeSocketBGA1364   = 0x30,
+  ProcessorUpgradeSocketAM4       = 0x31,
+  ProcessorUpgradeSocketLGA1151   = 0x32,
+  ProcessorUpgradeSocketBGA1356   = 0x33,
+  ProcessorUpgradeSocketBGA1440   = 0x34,
+  ProcessorUpgradeSocketBGA1515   = 0x35,
+  ProcessorUpgradeSocketLGA3647_1 = 0x36,
+  ProcessorUpgradeSocketSP3       = 0x37
 } PROCESSOR_UPGRADE;
 
 ///
@@ -1081,6 +1111,11 @@ typedef struct {
   UINT8                     ErrorCorrectionType;            ///< The enumeration value from CACHE_ERROR_TYPE_DATA.
   UINT8                     SystemCacheType;                ///< The enumeration value from CACHE_TYPE_DATA.
   UINT8                     Associativity;                  ///< The enumeration value from CACHE_ASSOCIATIVITY_DATA.
+  //
+  // Add for smbios 3.1.0
+  //
+  UINT32                    MaximumCacheSize2;
+  UINT32                    InstalledSize2;
 } SMBIOS_TABLE_TYPE7;
 
 ///
@@ -1225,6 +1260,9 @@ typedef enum {
   SlotTypeMxm30TypeB                   = 0x1E,
   SlotTypePciExpressGen2Sff_8639       = 0x1F,
   SlotTypePciExpressGen3Sff_8639       = 0x20,
+  SlotTypePciExpressMini52pinWithBSKO  = 0x21,      ///< PCI Express Mini 52-pin (CEM spec. 2.0) with bottom-side keep-outs.
+  SlotTypePciExpressMini52pinWithoutBSKO = 0x22,    ///< PCI Express Mini 52-pin (CEM spec. 2.0) without bottom-side keep-outs.
+  SlotTypePciExpressMini76pin          = 0x23,      ///< PCI Express Mini 76-pin (CEM spec. 2.0) Corresponds to Display-Mini card.
   SlotTypePC98C20                      = 0xA0,
   SlotTypePC98C24                      = 0xA1,
   SlotTypePC98E                        = 0xA2,
