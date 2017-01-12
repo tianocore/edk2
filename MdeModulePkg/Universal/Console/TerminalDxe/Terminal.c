@@ -1221,7 +1221,7 @@ SetTerminalDevicePath (
   ASSERT (TerminalType < ARRAY_SIZE (mTerminalType));
   Node.Header.Type    = MESSAGING_DEVICE_PATH;
   Node.Header.SubType = MSG_VENDOR_DP;
-  SetDevicePathNodeLength (&Node, sizeof (VENDOR_DEVICE_PATH));
+  SetDevicePathNodeLength (&Node.Header, sizeof (VENDOR_DEVICE_PATH));
   CopyGuid (&Node.Guid, mTerminalType[TerminalType]);
 
   //
