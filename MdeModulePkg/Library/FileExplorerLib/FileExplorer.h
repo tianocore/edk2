@@ -114,6 +114,10 @@ extern UINT8    FileExplorerVfrBin[];
 #define FILE_OPTION_OFFSET      0x8000
 #define FILE_OPTION_MASK        0x7FFF
 #define QUESTION_ID_UPDATE_STEP 200
+#define MAX_FILE_NAME_LEN       20
+#define MAX_FOLDER_NAME_LEN     20
+#define NEW_FILE_QUESTION_ID_BASE   0x5000;
+#define NEW_FOLDER_QUESTION_ID_BASE 0x6000;
 
 /**
   This function processes the results of changes in configuration.

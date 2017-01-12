@@ -1,7 +1,7 @@
 /** @file
 Formset guids, form id and VarStore data structure for File explorer library.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -23,6 +23,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   }
 
 #define FORM_FILE_EXPLORER_ID                0x1000
+#define FORM_ADD_NEW_FILE_ID                 0x2000
+#define NEW_FILE_NAME_ID                     0x2001
+#define KEY_VALUE_CREATE_FILE_AND_EXIT       0x2002
+#define KEY_VALUE_NO_CREATE_FILE_AND_EXIT    0x2003
+#define FORM_ADD_NEW_FOLDER_ID               0x3000
+#define NEW_FOLDER_NAME_ID                   0x3001
+#define KEY_VALUE_CREATE_FOLDER_AND_EXIT     0x3002
+#define KEY_VALUE_NO_CREATE_FOLDER_AND_EXIT  0x3003
+
 #define LABEL_END                            0xffff
 
 #endif
