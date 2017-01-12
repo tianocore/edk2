@@ -113,7 +113,7 @@ extern UINT8    FileExplorerVfrBin[];
 #define MAX_CHAR                480
 #define FILE_OPTION_OFFSET      0x8000
 #define FILE_OPTION_MASK        0x7FFF
-
+#define QUESTION_ID_UPDATE_STEP 200
 
 /**
   This function processes the results of changes in configuration.

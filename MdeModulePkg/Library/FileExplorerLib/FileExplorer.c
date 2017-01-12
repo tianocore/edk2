@@ -72,6 +72,7 @@ VOID                *mLibStartOpCodeHandle = NULL;
 VOID                *mLibEndOpCodeHandle = NULL;
 EFI_IFR_GUID_LABEL  *mLibStartLabel = NULL;
 EFI_IFR_GUID_LABEL  *mLibEndLabel = NULL;
+UINT16              mQuestionIdUpdate;
 
 /**
   This function allows a caller to extract the current configuration for one
@@ -1183,6 +1184,8 @@ LibUpdateFileExplorePage (
   LibRefreshUpdateData ();
   MenuOption = gFileExplorerPrivate.FsOptionMenu;
 
+  mQuestionIdUpdate += QUESTION_ID_UPDATE_STEP;
+
   for (Index = 0; Index < MenuOption->MenuNumber; Index++) {
     NewMenuEntry    = LibGetMenuEntry (MenuOption, Index);
     NewFileContext  = (FILE_CONTEXT *) NewMenuEntry->VariableContext;
@@ -1193,7 +1196,7 @@ LibUpdateFileExplorePage (
       //
       HiiCreateActionOpCode (
         mLibStartOpCodeHandle,
-        (UINT16) (FILE_OPTION_OFFSET + Index),
+        (UINT16) (FILE_OPTION_OFFSET + Index + mQuestionIdUpdate),
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
         EFI_IFR_FLAG_CALLBACK,
@@ -1209,7 +1212,7 @@ LibUpdateFileExplorePage (
         NewMenuEntry->DisplayStringToken,
         STRING_TOKEN (STR_NULL_STRING),
         EFI_IFR_FLAG_CALLBACK,
-        (UINT16) (FILE_OPTION_OFFSET + Index)
+        (UINT16) (FILE_OPTION_OFFSET + Index + mQuestionIdUpdate)
         );
     }
   }
@@ -1244,7 +1247,7 @@ LibUpdateFileExplorer (
   EFI_FILE_HANDLE FileHandle;
 
   Status = EFI_SUCCESS;
-  FileOptionMask = (UINT16) (FILE_OPTION_MASK & KeyValue);
+  FileOptionMask = (UINT16) (FILE_OPTION_MASK & KeyValue) - mQuestionIdUpdate;
   NewMenuEntry   = LibGetMenuEntry (gFileExplorerPrivate.FsOptionMenu, FileOptionMask);
   NewFileContext = (FILE_CONTEXT *) NewMenuEntry->VariableContext;
 
@@ -1279,7 +1282,7 @@ LibGetDevicePath (
   MENU_ENTRY      *NewMenuEntry;
   FILE_CONTEXT    *NewFileContext;
 
-  FileOptionMask    = (UINT16) (FILE_OPTION_MASK & KeyValue);
+  FileOptionMask    = (UINT16) (FILE_OPTION_MASK & KeyValue) - mQuestionIdUpdate;
 
   NewMenuEntry = LibGetMenuEntry (gFileExplorerPrivate.FsOptionMenu, FileOptionMask);
 
@@ -1328,6 +1331,7 @@ ChooseFile (
     return EFI_INVALID_PARAMETER;
   }
 
+  mQuestionIdUpdate = 0;
   FileName = NULL;
 
   gFileExplorerPrivate.RetDevicePath = NULL;
