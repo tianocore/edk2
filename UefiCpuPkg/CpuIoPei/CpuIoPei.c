@@ -2,6 +2,8 @@
   Produces the CPU I/O PPI.
 
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -375,6 +377,31 @@ CpuIoServiceRead (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
+  if (InStride == 0) {
+    switch (OperationWidth) {
+    case EfiPeiCpuIoWidthUint8:
+      IoReadFifo8 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint16:
+      IoReadFifo16 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint32:
+      IoReadFifo32 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    default:
+      //
+      // The CpuIoCheckParameter call above will ensure that this
+      // path is not taken.
+      //
+      ASSERT (FALSE);
+      break;
+    }
+  }
+
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -447,6 +474,31 @@ CpuIoServiceWrite (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
+  if (InStride == 0) {
+    switch (OperationWidth) {
+    case EfiPeiCpuIoWidthUint8:
+      IoWriteFifo8 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint16:
+      IoWriteFifo16 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiPeiCpuIoWidthUint32:
+      IoWriteFifo32 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    default:
+      //
+      // The CpuIoCheckParameter call above will ensure that this
+      // path is not taken.
+      //
+      ASSERT (FALSE);
+      break;
+    }
+  }
+
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
