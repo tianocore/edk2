@@ -2,6 +2,8 @@
   I/O Library basic function implementation and worker functions.
 
   Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,8 +20,10 @@
   Reads registers in the EFI CPU I/O space.
 
   Reads the I/O port specified by Port with registers width specified by Width.
-  The read value is returned. If such operations are not supported, then ASSERT().
+  The read value is returned.
+
   This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
 
   @param  Port          The base address of the I/O operation.
                         The caller is responsible for aligning the Address if required.
@@ -60,8 +64,10 @@ IoReadWorker (
   Writes registers in the EFI CPU I/O space.
 
   Writes the I/O port specified by Port with registers width and value specified by Width
-  and Data respectively.  Data is returned. If such operations are not supported, then ASSERT().
+  and Data respectively. Data is returned.
+
   This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
 
   @param  Port          The base address of the I/O operation.
                         The caller is responsible for aligning the Address if required.
@@ -95,6 +101,90 @@ IoWriteWorker (
                 );
   ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
   return Data;
+}
+
+/**
+  Reads registers in the EFI CPU I/O space.
+
+  Reads the I/O port specified by Port with registers width specified by Width.
+  The port is read Count times, and the read data is stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
+
+  @param  Port          The base address of the I/O operation.
+                        The caller is responsible for aligning the Address if required.
+  @param  Width         The width of the I/O operation.
+  @param  Count         The number of times to read I/O port.
+  @param  Buffer        The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifoWorker (
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN      UINTN                      Count,
+  IN      VOID                       *Buffer
+  )
+{
+  SAL_RETURN_REGS  ReturnReg;
+
+  ReturnReg = EsalCall (
+                EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
+                EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
+                IoReadFunctionId, 
+                (UINT64)Width, 
+                Port, 
+                Count, 
+                (UINT64)Buffer, 
+                0, 
+                0, 
+                0
+                );
+  ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
+}
+
+/**
+  Writes registers in the EFI CPU I/O space.
+
+  Writes the I/O port specified by Port with registers width specified by Width.
+  The port is written Count times, and the write data is retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are serialized.
+  If such operations are not supported, then ASSERT().
+
+  @param  Port          The base address of the I/O operation.
+                        The caller is responsible for aligning the Address if required.
+  @param  Width         The width of the I/O operation.
+  @param  Count         The number of times to write I/O port.
+  @param  Buffer        The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoWriteFifoWorker (
+  IN      UINTN                      Port,
+  IN      EFI_CPU_IO_PROTOCOL_WIDTH  Width,
+  IN      UINTN                      Count,
+  IN      VOID                       *Buffer
+  )
+{
+  SAL_RETURN_REGS  ReturnReg;
+
+  ReturnReg = EsalCall (
+                EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
+                EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
+                IoWriteFunctionId, 
+                (UINT64)Width, 
+                Port, 
+                Count, 
+                (UINT64)Buffer, 
+                0, 
+                0, 
+                0
+                );
+  ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
 }
 
 /**
@@ -394,6 +484,190 @@ IoWrite64 (
   //
   ASSERT ((Port & 7) == 0);
   return IoWriteWorker (Port, EfiCpuIoWidthUint64, Value);
+}
+
+/**
+  Reads an 8-bit I/O port fifo into a block of memory.
+
+  Reads the 8-bit I/O fifo port specified by Port.
+  The port is read Count times, and the read data is
+  stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to read.
+  @param  Count   The number of times to read I/O port.
+  @param  Buffer  The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifo8 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  OUT     VOID                      *Buffer
+  )
+{
+  IoReadFifoWorker (Port, EfiCpuIoWidthFifoUint8, Count, Buffer);
+}
+
+/**
+  Writes a block of memory into an 8-bit I/O port fifo.
+
+  Writes the 8-bit I/O fifo port specified by Port.
+  The port is written Count times, and the write data is
+  retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O write and write operations are
+  serialized.
+
+  If 8-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to write.
+  @param  Count   The number of times to write I/O port.
+  @param  Buffer  The buffer to retrieve the write data from.
+
+**/
+VOID
+EFIAPI
+IoWriteFifo8 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  IN      VOID                      *Buffer
+  )
+{
+  IoWriteFifoWorker (Port, EfiCpuIoWidthFifoUint8, Count, Buffer);
+}
+
+/**
+  Reads a 16-bit I/O port fifo into a block of memory.
+
+  Reads the 16-bit I/O fifo port specified by Port.
+  The port is read Count times, and the read data is
+  stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 16-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to read.
+  @param  Count   The number of times to read I/O port.
+  @param  Buffer  The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifo16 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  OUT     VOID                      *Buffer
+  )
+{
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
+  IoReadFifoWorker (Port, EfiCpuIoWidthFifoUint16, Count, Buffer);
+}
+
+/**
+  Writes a block of memory into a 16-bit I/O port fifo.
+
+  Writes the 16-bit I/O fifo port specified by Port.
+  The port is written Count times, and the write data is
+  retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O write and write operations are
+  serialized.
+
+  If 16-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to write.
+  @param  Count   The number of times to write I/O port.
+  @param  Buffer  The buffer to retrieve the write data from.
+
+**/
+VOID
+EFIAPI
+IoWriteFifo16 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  IN      VOID                      *Buffer
+  )
+{
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
+  IoWriteFifoWorker (Port, EfiCpuIoWidthFifoUint16, Count, Buffer);
+}
+
+/**
+  Reads a 32-bit I/O port fifo into a block of memory.
+
+  Reads the 32-bit I/O fifo port specified by Port.
+  The port is read Count times, and the read data is
+  stored in the provided Buffer.
+
+  This function must guarantee that all I/O read and write operations are
+  serialized.
+
+  If 32-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to read.
+  @param  Count   The number of times to read I/O port.
+  @param  Buffer  The buffer to store the read data into.
+
+**/
+VOID
+EFIAPI
+IoReadFifo32 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  OUT     VOID                      *Buffer
+  )
+{
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
+  IoReadFifoWorker (Port, EfiCpuIoWidthFifoUint32, Count, Buffer);
+}
+
+/**
+  Writes a block of memory into a 32-bit I/O port fifo.
+
+  Writes the 32-bit I/O fifo port specified by Port.
+  The port is written Count times, and the write data is
+  retrieved from the provided Buffer.
+
+  This function must guarantee that all I/O write and write operations are
+  serialized.
+
+  If 32-bit I/O port operations are not supported, then ASSERT().
+
+  @param  Port    The I/O port to write.
+  @param  Count   The number of times to write I/O port.
+  @param  Buffer  The buffer to retrieve the write data from.
+
+**/
+VOID
+EFIAPI
+IoWriteFifo32 (
+  IN      UINTN                     Port,
+  IN      UINTN                     Count,
+  IN      VOID                      *Buffer
+  )
+{
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
+  IoWriteFifoWorker (Port, EfiCpuIoWidthFifoUint32, Count, Buffer);
 }
 
 /**
