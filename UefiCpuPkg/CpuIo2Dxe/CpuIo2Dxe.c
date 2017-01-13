@@ -2,6 +2,8 @@
   Produces the CPU I/O 2 Protocol.
 
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -13,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "CpuIo2Dxe.h"
-#include "IoFifo.h"
 
 //
 // Handle for the CPU I/O 2 Protocol
@@ -412,7 +413,9 @@ CpuIoServiceRead (
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
   if (InStride == 0) {
     switch (OperationWidth) {
     case EfiCpuIoWidthUint8:
@@ -433,7 +436,6 @@ CpuIoServiceRead (
       break;
     }
   }
-#endif
 
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
@@ -518,7 +520,9 @@ CpuIoServiceWrite (
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
   if (InStride == 0) {
     switch (OperationWidth) {
     case EfiCpuIoWidthUint8:
@@ -539,7 +543,6 @@ CpuIoServiceWrite (
       break;
     }
   }
-#endif
 
   for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
