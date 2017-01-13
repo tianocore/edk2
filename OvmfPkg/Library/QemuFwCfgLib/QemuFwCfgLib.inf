@@ -4,6 +4,7 @@
 #
 #  Copyright (C) 2013, Red Hat, Inc.
 #  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -35,12 +36,6 @@
   QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
   QemuFwCfgPeiDxe.c
-
-[Sources.IA32]
-  Ia32/IoLibExAsm.nasm
-
-[Sources.X64]
-  X64/IoLibExAsm.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
