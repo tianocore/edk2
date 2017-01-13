@@ -2,7 +2,7 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016-2017 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1261,6 +1261,10 @@ TABLE_ITEM  SystemSlotTypeTable[] = {
   {
     0x12,
     L"PCI-X"
+  },
+  {
+    0x13,
+    L"AGP 8X"
   },
   {
     0xA0,
