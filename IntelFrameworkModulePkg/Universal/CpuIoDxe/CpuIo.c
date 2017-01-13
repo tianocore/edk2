@@ -2,6 +2,8 @@
   Uses the services of the I/O Library to produce the CPU I/O Protocol
 
 Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -410,6 +412,31 @@ CpuIoServiceRead (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
+
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
+  if (InStride == 0) {
+    switch (OperationWidth) {
+    case EfiCpuIoWidthUint8:
+      IoReadFifo8 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiCpuIoWidthUint16:
+      IoReadFifo16 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiCpuIoWidthUint32:
+      IoReadFifo32 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    default:
+      //
+      // The CpuIoCheckParameter call above will ensure that this
+      // path is not taken.
+      //
+      ASSERT (FALSE);
+      break;
+    }
+  }
+
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
       *Uint8Buffer = IoRead8 ((UINTN)Address);
@@ -492,6 +519,31 @@ CpuIoServiceWrite (
   InStride = mInStride[Width];
   OutStride = mOutStride[Width];
   OperationWidth = (EFI_CPU_IO_PROTOCOL_WIDTH) (Width & 0x03);
+
+  //
+  // Fifo operations supported for (mInStride[Width] == 0)
+  //
+  if (InStride == 0) {
+    switch (OperationWidth) {
+    case EfiCpuIoWidthUint8:
+      IoWriteFifo8 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiCpuIoWidthUint16:
+      IoWriteFifo16 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    case EfiCpuIoWidthUint32:
+      IoWriteFifo32 ((UINTN)Address, Count, Buffer);
+      return EFI_SUCCESS;
+    default:
+      //
+      // The CpuIoCheckParameter call above will ensure that this
+      // path is not taken.
+      //
+      ASSERT (FALSE);
+      break;
+    }
+  }
+
   for (Uint8Buffer = (UINT8 *)Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiCpuIoWidthUint8) {
       IoWrite8 ((UINTN)Address, *Uint8Buffer);
