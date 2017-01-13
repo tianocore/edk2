@@ -318,11 +318,6 @@ InitializeTerminalConsoleTextMode (
 
   ASSERT (TextModeCount != NULL);
 
-  //
-  // Here we make sure that the final mode exposed does not include the duplicated modes,
-  // and does not include the invalid modes which exceed the max column and row.
-  // Reserve 2 modes for 80x25, 80x50 of terminal console.
-  //
   TextModeData = AllocateCopyPool (sizeof (mTerminalConsoleModeData), mTerminalConsoleModeData);
   if (TextModeData == NULL) {
     return NULL;
