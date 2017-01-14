@@ -267,6 +267,26 @@ typedef struct {
 #define LOADED_IMAGE_PRIVATE_DATA_FROM_THIS(a) \
           CR(a, LOADED_IMAGE_PRIVATE_DATA, Info, LOADED_IMAGE_PRIVATE_DATA_SIGNATURE)
 
+#define IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE SIGNATURE_32 ('I','P','R','C')
+
+typedef struct {
+  UINT32                 Signature;
+  LIST_ENTRY             Link;
+  EFI_PHYSICAL_ADDRESS   CodeSegmentBase;
+  UINT64                 CodeSegmentSize;
+} IMAGE_PROPERTIES_RECORD_CODE_SECTION;
+
+#define IMAGE_PROPERTIES_RECORD_SIGNATURE SIGNATURE_32 ('I','P','R','D')
+
+typedef struct {
+  UINT32                 Signature;
+  LIST_ENTRY             Link;
+  EFI_PHYSICAL_ADDRESS   ImageBase;
+  UINT64                 ImageSize;
+  UINTN                  CodeSegmentCount;
+  LIST_ENTRY             CodeSegmentList;
+} IMAGE_PROPERTIES_RECORD;
+
 //
 // DXE Core Global Variables
 //
@@ -2859,6 +2879,15 @@ CoreInitializeMemoryAttributesTable (
   );
 
 /**
+  Initialize Memory Protection support.
+**/
+VOID
+EFIAPI
+CoreInitializeMemoryProtection (
+  VOID
+  );
+
+/**
   Install MemoryAttributesTable on memory allocation.
 
   @param[in] MemoryType EFI memory type.
@@ -2886,6 +2915,38 @@ InsertImageRecord (
 VOID
 RemoveImageRecord (
   IN EFI_RUNTIME_IMAGE_ENTRY  *RuntimeImage
+  );
+
+/**
+  Protect UEFI image.
+
+  @param[in]  LoadedImage              The loaded image protocol
+  @param[in]  LoadedImageDevicePath    The loaded image device path protocol
+**/
+VOID
+ProtectUefiImage (
+  IN EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage,
+  IN EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath
+  );
+
+/**
+  Unprotect UEFI image.
+
+  @param[in]  LoadedImage              The loaded image protocol
+  @param[in]  LoadedImageDevicePath    The loaded image device path protocol
+**/
+VOID
+UnprotectUefiImage (
+  IN EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage,
+  IN EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath
+  );
+
+/**
+  ExitBootServices Callback function for memory protection.
+**/
+VOID
+MemoryProtectionExitBootServicesCallback (
+  VOID
   );
 
 #endif
