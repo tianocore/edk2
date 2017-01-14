@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module to produce CPU ARCH Protocol.
 
-  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,10 @@
 
 #include "CpuDxe.h"
 #include "CpuMp.h"
+#include "CpuPageTable.h"
+
+#define CACHE_ATTRIBUTE_MASK   (EFI_MEMORY_UC | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB | EFI_MEMORY_UCE | EFI_MEMORY_WP)
+#define MEMORY_ATTRIBUTE_MASK  (EFI_MEMORY_RP | EFI_MEMORY_XP | EFI_MEMORY_RO)
 
 //
 // Global Variables
@@ -368,10 +372,9 @@ CpuSetMemoryAttributes (
   EFI_STATUS                MpStatus;
   EFI_MP_SERVICES_PROTOCOL  *MpService;
   MTRR_SETTINGS             MtrrSettings;
-
-  if (!IsMtrrSupported ()) {
-    return EFI_UNSUPPORTED;
-  }
+  UINT64                    CacheAttributes;
+  UINT64                    MemoryAttributes;
+  MTRR_MEMORY_CACHE_TYPE    CurrentCacheType;
 
   //
   // If this function is called because GCD SetMemorySpaceAttributes () is called
@@ -384,69 +387,87 @@ CpuSetMemoryAttributes (
     return EFI_SUCCESS;
   }
 
-  switch (Attributes) {
-  case EFI_MEMORY_UC:
-    CacheType = CacheUncacheable;
-    break;
 
-  case EFI_MEMORY_WC:
-    CacheType = CacheWriteCombining;
-    break;
+  CacheAttributes = Attributes & CACHE_ATTRIBUTE_MASK;
+  MemoryAttributes = Attributes & MEMORY_ATTRIBUTE_MASK;
 
-  case EFI_MEMORY_WT:
-    CacheType = CacheWriteThrough;
-    break;
-
-  case EFI_MEMORY_WP:
-    CacheType = CacheWriteProtected;
-    break;
-
-  case EFI_MEMORY_WB:
-    CacheType = CacheWriteBack;
-    break;
-
-  case EFI_MEMORY_UCE:
-  case EFI_MEMORY_RP:
-  case EFI_MEMORY_XP:
-  case EFI_MEMORY_RUNTIME:
-    return EFI_UNSUPPORTED;
-
-  default:
+  if (Attributes != (CacheAttributes | MemoryAttributes)) {
     return EFI_INVALID_PARAMETER;
   }
-  //
-  // call MTRR libary function
-  //
-  Status = MtrrSetMemoryAttribute (
-             BaseAddress,
-             Length,
-             CacheType
-             );
 
-  if (!RETURN_ERROR (Status)) {
-    MpStatus = gBS->LocateProtocol (
-                      &gEfiMpServiceProtocolGuid,
-                      NULL,
-                      (VOID **)&MpService
-                      );
-    //
-    // Synchronize the update with all APs
-    //
-    if (!EFI_ERROR (MpStatus)) {
-      MtrrGetAllMtrrs (&MtrrSettings);
-      MpStatus = MpService->StartupAllAPs (
-                              MpService,          // This
-                              SetMtrrsFromBuffer, // Procedure
-                              FALSE,              // SingleThread
-                              NULL,               // WaitEvent
-                              0,                  // TimeoutInMicrosecsond
-                              &MtrrSettings,      // ProcedureArgument
-                              NULL                // FailedCpuList
-                              );
-      ASSERT (MpStatus == EFI_SUCCESS || MpStatus == EFI_NOT_STARTED);
+  if (CacheAttributes != 0) {
+    if (!IsMtrrSupported ()) {
+      return EFI_UNSUPPORTED;
+    }
+
+    switch (CacheAttributes) {
+    case EFI_MEMORY_UC:
+      CacheType = CacheUncacheable;
+      break;
+
+    case EFI_MEMORY_WC:
+      CacheType = CacheWriteCombining;
+      break;
+
+    case EFI_MEMORY_WT:
+      CacheType = CacheWriteThrough;
+      break;
+
+    case EFI_MEMORY_WP:
+      CacheType = CacheWriteProtected;
+      break;
+
+    case EFI_MEMORY_WB:
+      CacheType = CacheWriteBack;
+      break;
+
+    default:
+      return EFI_INVALID_PARAMETER;
+    }
+    CurrentCacheType = MtrrGetMemoryAttribute(BaseAddress);
+    if (CurrentCacheType != CacheType) {
+      //
+      // call MTRR libary function
+      //
+      Status = MtrrSetMemoryAttribute (
+                 BaseAddress,
+                 Length,
+                 CacheType
+                 );
+
+      if (!RETURN_ERROR (Status)) {
+        MpStatus = gBS->LocateProtocol (
+                          &gEfiMpServiceProtocolGuid,
+                          NULL,
+                          (VOID **)&MpService
+                          );
+        //
+        // Synchronize the update with all APs
+        //
+        if (!EFI_ERROR (MpStatus)) {
+          MtrrGetAllMtrrs (&MtrrSettings);
+          MpStatus = MpService->StartupAllAPs (
+                                  MpService,          // This
+                                  SetMtrrsFromBuffer, // Procedure
+                                  FALSE,              // SingleThread
+                                  NULL,               // WaitEvent
+                                  0,                  // TimeoutInMicrosecsond
+                                  &MtrrSettings,      // ProcedureArgument
+                                  NULL                // FailedCpuList
+                                  );
+          ASSERT (MpStatus == EFI_SUCCESS || MpStatus == EFI_NOT_STARTED);
+        }
+      }
+      if (EFI_ERROR(Status)) {
+        return Status;
+      }
     }
   }
-  return (EFI_STATUS) Status;
+
+  //
+  // Set memory attribute by page table
+  //
+  return AssignMemoryPageAttributes (NULL, BaseAddress, Length, MemoryAttributes, AllocatePages);
 }
 
 /**
@@ -888,6 +909,8 @@ InitializeCpu (
 {
   EFI_STATUS  Status;
   EFI_EVENT   IdleLoopEvent;
+  
+  InitializePageTableLib();
 
   InitializeFloatingPointUnits ();
 
