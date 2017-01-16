@@ -842,7 +842,7 @@ UfsRwDeviceDesc (
   // Wait for the completion of the transfer request.
   //  
   Address = Private->UfsHcBase + UFS_HC_UTRLDBR_OFFSET;  
-  Status = UfsWaitMemSet (Address, BIT0, 0, Packet.Timeout);
+  Status = UfsWaitMemSet (Address, BIT0 << Slot, 0, Packet.Timeout);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -956,7 +956,7 @@ UfsRwAttributes (
   // Wait for the completion of the transfer request.
   //  
   Address = Private->UfsHcBase + UFS_HC_UTRLDBR_OFFSET;  
-  Status = UfsWaitMemSet (Address, BIT0, 0, Packet.Timeout);
+  Status = UfsWaitMemSet (Address, BIT0 << Slot, 0, Packet.Timeout);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -1070,7 +1070,7 @@ UfsRwFlags (
   // Wait for the completion of the transfer request.
   //  
   Address = Private->UfsHcBase + UFS_HC_UTRLDBR_OFFSET;  
-  Status = UfsWaitMemSet (Address, BIT0, 0, Packet.Timeout);
+  Status = UfsWaitMemSet (Address, BIT0 << Slot, 0, Packet.Timeout);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -1228,7 +1228,7 @@ UfsExecNopCmds (
   // Wait for the completion of the transfer request.
   //  
   Address = Private->UfsHcBase + UFS_HC_UTRLDBR_OFFSET;  
-  Status = UfsWaitMemSet (Address, BIT0, 0, UFS_TIMEOUT);
+  Status = UfsWaitMemSet (Address, BIT0 << Slot, 0, UFS_TIMEOUT);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -1312,7 +1312,7 @@ UfsExecScsiCmds (
   // Wait for the completion of the transfer request.
   //  
   Address = Private->UfsHcBase + UFS_HC_UTRLDBR_OFFSET;  
-  Status = UfsWaitMemSet (Address, BIT0, 0, Packet->Timeout);
+  Status = UfsWaitMemSet (Address, BIT0 << Slot, 0, Packet->Timeout);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
