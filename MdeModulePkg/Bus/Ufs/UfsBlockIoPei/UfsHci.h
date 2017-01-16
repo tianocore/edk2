@@ -77,6 +77,12 @@
 #define UFS_HC_UTRLRSR             BIT0
 
 //
+// The initial value of the OCS field of UTP TRD or TMRD descriptor
+// defined in JEDEC JESD223 specification
+//
+#define UFS_HC_TRD_OCS_INIT_VALUE  0x0F
+
+//
 // A maximum of length of 256KB is supported by PRDT entry
 //
 #define UFS_MAX_DATA_LEN_PER_PRD   0x40000
