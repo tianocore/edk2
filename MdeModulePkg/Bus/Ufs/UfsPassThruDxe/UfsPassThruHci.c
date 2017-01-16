@@ -1749,9 +1749,9 @@ UfsAllocateAlignCommonBuffer (
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
 
   if ((Private->Capabilities & UFS_HC_CAP_64ADDR) == UFS_HC_CAP_64ADDR) {
-    Is32BitAddr = TRUE;
-  } else {
     Is32BitAddr = FALSE;
+  } else {
+    Is32BitAddr = TRUE;
   }
 
   UfsHc  = Private->UfsHostController;
