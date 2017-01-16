@@ -392,8 +392,8 @@ GetHandleListByProtocolList (
 /**
   Return all supported GUIDs.
 
-  @param[out]     Guids  The buffer to return all supported GUIDs.
-  @param[in out]  Count  On input, the count of GUIDs the buffer can hold,
+  @param[out]      Guids  The buffer to return all supported GUIDs.
+  @param[in, out]  Count  On input, the count of GUIDs the buffer can hold,
                          On output, the count of GUIDs to return.
 
   @retval EFI_INVALID_PARAMETER Count is NULL.
