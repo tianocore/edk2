@@ -1,7 +1,7 @@
 /** @file
   HOB Library implemenation for Dxe Phase.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,35 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 VOID  *mHobList = NULL;
 
 /**
-  The constructor function caches the pointer to HOB list.
-  
-  The constructor function gets the start address of HOB list from system configuration table.
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
-
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS   The constructor successfully gets HobList.
-  @retval Other value   The constructor can't get HobList.
-
-**/
-EFI_STATUS
-EFIAPI
-HobLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &mHobList);
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (mHobList != NULL);
-
-  return Status;
-}
-
-/**
   Returns the pointer to the HOB list.
 
   This function returns the pointer to first HOB in the list.
@@ -62,9 +33,11 @@ HobLibConstructor (
   Since the System Configuration Table does not exist that the time the DXE Core is 
   launched, the DXE Core uses a global variable from the DXE Core Entry Point Library 
   to manage the pointer to the HOB list.
-  
+
   If the pointer to the HOB list is NULL, then ASSERT().
-  
+
+  This function also caches the pointer to the HOB list retrieved.
+
   @return The pointer to the HOB list.
 
 **/
@@ -74,8 +47,36 @@ GetHobList (
   VOID
   )
 {
-  ASSERT (mHobList != NULL);
+  EFI_STATUS  Status;
+
+  if (mHobList == NULL) {
+    Status = EfiGetSystemConfigurationTable (&gEfiHobListGuid, &mHobList);
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (mHobList != NULL);
+  }
   return mHobList;
+}
+
+/**
+  The constructor function caches the pointer to HOB list by calling GetHobList()
+  and will always return EFI_SUCCESS. 
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The constructor successfully gets HobList.
+
+**/
+EFI_STATUS
+EFIAPI
+HobLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  GetHobList ();
+
+  return EFI_SUCCESS;
 }
 
 /**
