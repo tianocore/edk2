@@ -1218,6 +1218,7 @@ UpdatePage(
   @retval FALSE  Not exit caller function.
 **/
 BOOLEAN
+EFIAPI
 UpdateCAFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
   )
@@ -1728,7 +1729,7 @@ TlsAuthConfigAccessCallback (
       CleanUpPage (LabelId, Private);
       break;
     case KEY_TLS_AUTH_CONFIG_ENROLL_CERT_FROM_FILE:
-      ChooseFile( NULL, NULL, (CHOOSE_HANDLER) UpdateCAFromFile, &File);
+      ChooseFile( NULL, NULL, UpdateCAFromFile, &File);
       break;
 
     case KEY_TLS_AUTH_CONFIG_VALUE_SAVE_AND_EXIT:
