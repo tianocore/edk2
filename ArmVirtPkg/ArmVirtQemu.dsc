@@ -390,6 +390,7 @@
   #
   # ACPI Support
   #
+  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   OvmfPkg/AcpiPlatformDxe/QemuFwCfgAcpiPlatformDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
