@@ -191,7 +191,11 @@
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2HashAlgorithmBitmap_HELP  #language en-US "This PCD indicated final BIOS supported Hash mask.\n"
                                                                                            "Bios may choose to register a subset of PcdTpm2HashMask.\n"
-                                                                                           "So this PCD is final value of how many hash algo is extended to PCR."
+                                                                                           "So this PCD is final value of how many hash algo is extended to PCR.\n"
+                                                                                           "If software HashLib(HashLibBaseCryptoRouter) solution is chosen, this PCD\n"
+                                                                                           "has no need to be configured in platform dsc and will be set to correct\n"
+                                                                                           "value by the HashLib instance according to the HashInstanceLib instances\n"
+                                                                                           "linked, and the value of this PCD should be got in module entrypoint."
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgLogAreaMinLen_PROMPT  #language en-US "Minimum length(in bytes) of the system preboot TCG event log area(LAML)."
 

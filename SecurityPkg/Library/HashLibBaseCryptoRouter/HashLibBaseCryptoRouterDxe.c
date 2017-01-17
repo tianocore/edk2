@@ -3,7 +3,7 @@
   hash handler registerd, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,6 +28,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 HASH_INTERFACE   mHashInterface[HASH_COUNT] = {{{0}, NULL, NULL, NULL}};
 UINTN            mHashInterfaceCount = 0;
 
+UINT32           mSupportedHashMaskLast = 0;
+UINT32           mSupportedHashMaskCurrent = 0;
+
+/**
+  Check mismatch of supported HashMask between modules
+  that may link different HashInstanceLib instances.
+
+**/
+VOID
+CheckSupportedHashMaskMismatch (
+  VOID
+  )
+{
+  if (mSupportedHashMaskCurrent != mSupportedHashMaskLast) {
+    DEBUG ((
+      DEBUG_WARN,
+      "WARNING: There is mismatch of supported HashMask (0x%x - 0x%x) between modules\n",
+      mSupportedHashMaskCurrent,
+      mSupportedHashMaskLast
+      ));
+    DEBUG ((DEBUG_WARN, "that are linking different HashInstanceLib instances!\n"));
+  }
+}
+
 /**
   Start hash sequence.
 
@@ -49,6 +73,8 @@ HashStart (
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
   }
+
+  CheckSupportedHashMaskMismatch ();
 
   HashCtx = AllocatePool (sizeof(*HashCtx) * mHashInterfaceCount);
   ASSERT (HashCtx != NULL);
@@ -89,6 +115,8 @@ HashUpdate (
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
   }
+
+  CheckSupportedHashMaskMismatch ();
 
   HashCtx = (HASH_HANDLE *)HashHandle;
 
@@ -132,6 +160,8 @@ HashCompleteAndExtend (
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
   }
+
+  CheckSupportedHashMaskMismatch ();
 
   HashCtx = (HASH_HANDLE *)HashHandle;
   ZeroMem (DigestList, sizeof(*DigestList));
@@ -180,6 +210,8 @@ HashAndExtend (
     return EFI_UNSUPPORTED;
   }
 
+  CheckSupportedHashMaskMismatch ();
+
   HashStart (&HashHandle);
   HashUpdate (HashHandle, DataToHash, DataToHashLen);
   Status = HashCompleteAndExtend (HashHandle, PcrIndex, NULL, 0, DigestList);
@@ -204,7 +236,6 @@ RegisterHashInterfaceLib (
 {
   UINTN              Index;
   UINT32             HashMask;
-  UINT32             BiosSupportedHashMask;
   EFI_STATUS         Status;
 
   //
@@ -218,21 +249,58 @@ RegisterHashInterfaceLib (
   if (mHashInterfaceCount >= sizeof(mHashInterface)/sizeof(mHashInterface[0])) {
     return EFI_OUT_OF_RESOURCES;
   }
-  BiosSupportedHashMask = PcdGet32 (PcdTcg2HashAlgorithmBitmap);
-  Status = PcdSet32S (PcdTcg2HashAlgorithmBitmap, BiosSupportedHashMask | HashMask);
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Check duplication
   //
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
     if (CompareGuid (&mHashInterface[Index].HashGuid, &HashInterface->HashGuid)) {
+      DEBUG ((DEBUG_ERROR, "Hash Interface (%g) has been registered\n", &HashInterface->HashGuid));
       return EFI_ALREADY_STARTED;
     }
   }
 
+  //
+  // Record hash algorithm bitmap of CURRENT module which consumes HashLib.
+  //
+  mSupportedHashMaskCurrent = PcdGet32 (PcdTcg2HashAlgorithmBitmap) | HashMask;
+  Status = PcdSet32S (PcdTcg2HashAlgorithmBitmap, mSupportedHashMaskCurrent);
+  ASSERT_EFI_ERROR (Status);
+
   CopyMem (&mHashInterface[mHashInterfaceCount], HashInterface, sizeof(*HashInterface));
   mHashInterfaceCount ++;
   
+  return EFI_SUCCESS;
+}
+
+/**
+  The constructor function of HashLibBaseCryptoRouterDxe.
+  
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor executed correctly.
+
+**/
+EFI_STATUS
+EFIAPI
+HashLibBaseCryptoRouterDxeConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+
+  //
+  // Record hash algorithm bitmap of LAST module which also consumes HashLib.
+  //
+  mSupportedHashMaskLast = PcdGet32 (PcdTcg2HashAlgorithmBitmap);
+
+  //
+  // Set PcdTcg2HashAlgorithmBitmap to 0 in CONSTRUCTOR for CURRENT module.
+  //
+  Status = PcdSet32S (PcdTcg2HashAlgorithmBitmap, 0);
+  ASSERT_EFI_ERROR (Status);
+
   return EFI_SUCCESS;
 }

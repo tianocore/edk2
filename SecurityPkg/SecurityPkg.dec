@@ -462,6 +462,10 @@
   ## This PCD indicated final BIOS supported Hash mask.
   #    Bios may choose to register a subset of PcdTpm2HashMask.
   #    So this PCD is final value of how many hash algo is extended to PCR.
+  # If software HashLib(HashLibBaseCryptoRouter) solution is chosen, this PCD
+  # has no need to be configured in platform dsc and will be set to correct
+  # value by the HashLib instance according to the HashInstanceLib instances
+  # linked, and the value of this PCD should be got in module entrypoint.
   # @Prompt Hash Algorithm bitmap.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap|0xFFFFFFFF|UINT32|0x00010016
   

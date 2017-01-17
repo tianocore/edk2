@@ -5,7 +5,7 @@
 #  hash handler registered, such as SHA1, SHA256. Platform can use PcdTpm2HashMask to 
 #  mask some hash engines.
 #
-# Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -23,6 +23,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = HashLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  CONSTRUCTOR                    = HashLibBaseCryptoRouterDxeConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
