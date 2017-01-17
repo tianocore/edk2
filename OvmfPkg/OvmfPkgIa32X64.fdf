@@ -326,6 +326,10 @@ INF MdeModulePkg/Logo/LogoDxe.inf
   INF  NetworkPkg/HttpDxe/HttpDxe.inf
   INF  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 !endif
+!if $(TLS_ENABLE) == TRUE
+  INF  NetworkPkg/TlsDxe/TlsDxe.inf
+  INF  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
+!endif
   INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
 
 #
