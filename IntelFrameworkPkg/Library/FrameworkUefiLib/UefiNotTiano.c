@@ -45,7 +45,7 @@ EfiCreateEventLegacyBoot (
 {
   return EfiCreateEventLegacyBootEx (
            TPL_CALLBACK,
-           InternalEmptyFunction,
+           EfiEventEmptyFunction,
            NULL,
            LegacyBootEvent
            );
@@ -135,7 +135,7 @@ EfiCreateEventReadyToBoot (
 {
   return EfiCreateEventReadyToBootEx (
            TPL_CALLBACK,
-           InternalEmptyFunction,
+           EfiEventEmptyFunction,
            NULL,
            ReadyToBootEvent
            );

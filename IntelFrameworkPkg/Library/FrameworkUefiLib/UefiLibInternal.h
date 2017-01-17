@@ -1,7 +1,7 @@
 /** @file
   Internal include file for UefiLib.
 
-  Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
    This program and the accompanying materials
    are licensed and made available under the terms and conditions of the BSD License
    which accompanies this distribution. The full text of the license may be found at
@@ -40,23 +40,5 @@
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
-
-/**
-  An empty function to pass error checking of CreateEventEx ().
-
-  This empty function ensures that EVT_NOTIFY_SIGNAL_ALL is error
-  checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
-
-  @param  Event                 Event whose notification function is being invoked.
-  @param  Context               Pointer to the notification function's context,
-                                which is implementation-dependent.
-
-**/
-VOID
-EFIAPI
-InternalEmptyFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  );
 
 #endif
