@@ -314,11 +314,7 @@ INF MdeModulePkg/Logo/LogoDxe.inf
   INF  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
   INF  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
   INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-!if $(SECURE_BOOT_ENABLE) == TRUE
   INF  NetworkPkg/IScsiDxe/IScsiDxe.inf
-!else
-  INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-!endif
 !else
   INF  MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   INF  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
