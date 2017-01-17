@@ -2,7 +2,7 @@
 #  Implementation for PlatformBdsLib library class interfaces.
 #  using ARM Platform framework.
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -50,6 +50,7 @@
   UefiBootServicesTableLib
   PcdLib
   GenericBdsLib
+  UefiLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
