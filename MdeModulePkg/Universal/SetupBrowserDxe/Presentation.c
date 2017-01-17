@@ -1,7 +1,7 @@
 /** @file
 Utility functions for UI presentation.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -68,22 +68,6 @@ EvaluateFormExpressions (
   }
 
   return EFI_SUCCESS;
-}
-
-/**
-  Add empty function for event process function.
-
-  @param Event    The Event need to be process
-  @param Context  The context of the event.
-
-**/
-VOID
-EFIAPI
-SetupBrowserEmptyFunction (
-  IN  EFI_EVENT    Event,
-  IN  VOID         *Context
-  )
-{
 }
 
 /**
@@ -718,7 +702,7 @@ InitializeDisplayFormData (
   Status = gBS->CreateEvent (
         EVT_NOTIFY_WAIT, 
         TPL_CALLBACK,
-        SetupBrowserEmptyFunction,
+        EfiEventEmptyFunction,
         NULL,
         &mValueChangedEvent
         );

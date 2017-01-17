@@ -1,7 +1,7 @@
 /** @file
   Hotkey library functions.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -218,21 +218,6 @@ BmGetKeyOptions (
   *Count = Param.KeyOptionCount;
 
   return Param.KeyOptions;
-}
-
-/**
-  Callback function for event.
-  
-  @param    Event          Event for this callback function.
-  @param    Context        Context pass to this function.
-**/
-VOID
-EFIAPI
-BmEmptyFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  )
-{
 }
 
 /**
@@ -901,7 +886,7 @@ EfiBootManagerStartHotkeyService (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_CALLBACK,
-                  BmEmptyFunction,
+                  EfiEventEmptyFunction,
                   NULL,
                   &mBmHotkeyTriggered
                   );

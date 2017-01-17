@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -392,25 +392,6 @@ CoreTrust (
   return EFI_NOT_FOUND;
 }
 
-
-/**
-  An empty function to pass error checking of CreateEventEx ().
-
-  @param  Event                 Event whose notification function is being invoked.
-  @param  Context               Pointer to the notification function's context,
-                                which is implementation-dependent.
-
-**/
-VOID
-EFIAPI
-CoreEmptyCallbackFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  )
-{
-  return;
-}
-
 /**
   This is the main Dispatcher for DXE and it exits when there are no more
   drivers to run. Drain the mScheduledQueue and load and start a PE
@@ -451,7 +432,7 @@ CoreDispatcher (
   Status = CoreCreateEventEx (
              EVT_NOTIFY_SIGNAL,
              TPL_NOTIFY,
-             CoreEmptyCallbackFunction,
+             EfiEventEmptyFunction,
              NULL,
              &gEfiEventDxeDispatchGuid,
              &DxeDispatchEvent

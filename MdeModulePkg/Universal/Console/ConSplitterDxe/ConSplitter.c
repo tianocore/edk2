@@ -16,7 +16,7 @@
   never removed. Such design ensures sytem function well during none console
   device situation.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -711,7 +711,7 @@ ConSplitterTextInConstructor (
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
-                  ConSplitterEmptyCallbackFunction,
+                  EfiEventEmptyFunction,
                   NULL,
                   &gConnectConInEventGuid,
                   &ConInPrivate->ConnectConInEvent
@@ -4978,22 +4978,4 @@ ConSplitterTextOutEnableCursor (
   Private->TextOutMode.CursorVisible = Visible;
 
   return ReturnStatus;
-}
-
-
-/**
-  An empty function to pass error checking of CreateEventEx ().
-
-  @param  Event                 Event whose notification function is being invoked.
-  @param  Context               Pointer to the notification function's context,
-                                which is implementation-dependent.
-
-**/
-VOID
-EFIAPI
-ConSplitterEmptyCallbackFunction (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
-  )
-{
 }

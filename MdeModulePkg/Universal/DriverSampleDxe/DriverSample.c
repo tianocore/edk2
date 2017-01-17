@@ -2,7 +2,7 @@
 This is an example of how a driver might export data to the HII protocol to be
 later utilized by the Setup Protocol
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -108,22 +108,6 @@ SetArrayData (
   default:
     break;
   }
-}
-
-/**
-  Add empty function for event process function.
-
-  @param Event    The Event need to be process
-  @param Context  The context of the event.
-
-**/
-VOID
-EFIAPI
-DriverSampleInternalEmptyFunction (
-  IN  EFI_EVENT Event,
-  IN  VOID      *Context
-  )
-{
 }
 
 /**
@@ -1972,7 +1956,7 @@ DriverSampleInit (
   Status = gBS->CreateEventEx (
         EVT_NOTIFY_SIGNAL, 
         TPL_NOTIFY,
-        DriverSampleInternalEmptyFunction,
+        EfiEventEmptyFunction,
         NULL,
         &gEfiIfrRefreshIdOpGuid,
         &mEvent
