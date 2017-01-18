@@ -12,7 +12,7 @@
   DxeImageVerificationHandler(), HashPeImageByType(), HashPeImage() function will accept
   untrusted PE/COFF image and validate its data structure within this image buffer before use.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1026,7 +1026,12 @@ IsSignatureFoundInDatabase (
           // Find the signature in database.
           //
           IsFound = TRUE;
-          SecureBootHook (VariableName, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, Cert);
+          //
+          // Entries in UEFI_IMAGE_SECURITY_DATABASE that are used to validate image should be measured
+          //
+          if (StrCmp(VariableName, EFI_IMAGE_SECURITY_DATABASE) == 0) {
+            SecureBootHook (VariableName, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, Cert);
+          }
           break;
         }
 
@@ -1309,7 +1314,6 @@ IsForbiddenByDbx (
                         mImageDigestSize
                         );
         if (IsForbidden) {
-          SecureBootHook (EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid, CertList->SignatureSize, CertData);
           DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature is forbidden by DBX.\n"));
           goto Done;
         }
