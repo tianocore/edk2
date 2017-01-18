@@ -1,7 +1,7 @@
 /** @file
   Perform the platform memory test
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -155,7 +155,7 @@ PlatformBootManagerMemoryTest (
                               TempData
                               );
       if (TestPercent != PreviousValue) {
-        UnicodeValueToString (StrPercent, 0, TestPercent, 0);
+        UnicodeValueToStringS (StrPercent, sizeof (StrPercent), 0, TestPercent, 0);
         TmpStr = HiiGetString (gStringPackHandle, STRING_TOKEN (STR_MEMORY_TEST_PERCENT), NULL);
         if (TmpStr != NULL) {
           //
@@ -223,7 +223,7 @@ PlatformBootManagerMemoryTest (
 
 Done:
   if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
-    UnicodeValueToString (StrTotalMemory, COMMA_TYPE, TotalMemorySize, 0);
+    UnicodeValueToStringS (StrTotalMemory, StrTotalMemorySize, COMMA_TYPE, TotalMemorySize, 0);
     if (StrTotalMemory[0] == L',') {
       StrTotalMemory++;
       StrTotalMemorySize -= sizeof (CHAR16);
