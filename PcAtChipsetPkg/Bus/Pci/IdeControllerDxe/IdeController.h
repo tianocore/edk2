@@ -59,7 +59,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL gIdeControllerComponentName2;
                                 driver but used by bus driver
 
   @retval EFI_SUCCESS           Driver loaded.
-  @retval !EFI_SUCESS           Driver not loaded.
+  @retval !EFI_SUCCESS          Driver not loaded.
 **/
 EFI_STATUS
 EFIAPI
@@ -100,7 +100,7 @@ IdeControllerStart (
   @param NumberOfChildren   Not used
   @param ChildHandleBuffer  Not used
 
-  @retval EFI_SUCESS        This driver is removed DeviceHandle
+  @retval EFI_SUCCESS       This driver is removed DeviceHandle
   @retval !EFI_SUCCESS      This driver was not removed from this device
 **/
 EFI_STATUS

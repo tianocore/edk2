@@ -60,7 +60,7 @@ UINT8   gBreakSet = 0;
   Initialize the serial device hardware.
   
   If no initialization is required, then return RETURN_SUCCESS.
-  If the serial device was successfuly initialized, then return RETURN_SUCCESS.
+  If the serial device was successfully initialized, then return RETURN_SUCCESS.
   If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
   
   @retval RETURN_SUCCESS        The serial device was initialized.

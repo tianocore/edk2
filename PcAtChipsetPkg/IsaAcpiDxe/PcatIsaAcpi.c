@@ -32,7 +32,7 @@ EFI_DRIVER_BINDING_PROTOCOL gPcatIsaAcpiDriverBinding = {
   @param ImageHandle     Handle for driver image
   @param SystemTable     Point to EFI_SYSTEM_TABLE
 
-  @return Sucess or not for installing driver binding protocol
+  @return Success or not for installing driver binding protocol
 **/
 EFI_STATUS
 EFIAPI

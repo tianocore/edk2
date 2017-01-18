@@ -139,7 +139,7 @@ Interrupt8259SetVectorBase (
 
     //
     // Preserve interrtup mask register before initialization sequence
-    // because it will be cleared during intialization
+    // because it will be cleared during initialization
     //
     Mask = IoRead8 (LEGACY_8259_MASK_REGISTER_SLAVE);
 
@@ -181,7 +181,7 @@ Interrupt8259SetVectorBase (
 
     //
     // Preserve interrtup mask register before initialization sequence
-    // because it will be cleared during intialization
+    // because it will be cleared during initialization
     //
     Mask = IoRead8 (LEGACY_8259_MASK_REGISTER_MASTER);
 

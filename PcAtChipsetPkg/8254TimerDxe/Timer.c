@@ -71,8 +71,8 @@ SetPitCount (
 /**
   8254 Timer #0 Interrupt Handler.
 
-  @param InterruptType    The type of interrupt that occured
-  @param SystemContext    A pointer to the system context when the interrupt occured
+  @param InterruptType    The type of interrupt that occurred
+  @param SystemContext    A pointer to the system context when the interrupt occurred
 **/
 VOID
 EFIAPI
@@ -332,7 +332,7 @@ TimerDriverGenerateSoftInterrupt (
 
   @retval EFI_SUCCESS            Timer Architectural Protocol created
   @retval EFI_OUT_OF_RESOURCES   Not enough resources available to initialize driver.
-  @retval EFI_DEVICE_ERROR       A device error occured attempting to initialize the driver.
+  @retval EFI_DEVICE_ERROR       A device error occurred attempting to initialize the driver.
 
 **/
 EFI_STATUS

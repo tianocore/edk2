@@ -190,8 +190,8 @@ IsaDeviceLookup (
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
   @param Device          Point to device ID instance 
 
-  @retval EFI_NOT_FOUND Can not found the next Isa device.
-  @retval EFI_SUCESS    Success retrieve the next Isa device for enumration.
+  @retval EFI_NOT_FOUND  Can not found the next Isa device.
+  @retval EFI_SUCCESS    Success retrieve the next Isa device for enumration.
 
 **/
 EFI_STATUS
@@ -221,7 +221,7 @@ IsaDeviceEnumerate (
   @param OnOff           TRUE for setting isa device power on,
                          FALSE for setting isa device power off
 
-  @return EFI_SUCCESS    Sucess to change power status for isa device.
+  @return EFI_SUCCESS    Success to change power status for isa device.
 **/
 EFI_STATUS
 EFIAPI
@@ -286,7 +286,7 @@ IsaGetPossibleResource (
   @param Device          Point to device ID instance 
   @param ResourceList    Point to resources instances for given isa device
 
-  @return EFI_SUCESS  Success to set resource.
+  @return EFI_SUCCESS  Success to set resource.
 
 **/
 EFI_STATUS
@@ -307,7 +307,7 @@ IsaSetResource (
   @param Device          Point to device ID instance 
   @param Enable          Enable/Disable
 
-  @return EFI_SUCESS  Success to enable/disable.
+  @return EFI_SUCCESS  Success to enable/disable.
 
 **/
 EFI_STATUS
@@ -327,7 +327,7 @@ IsaEnableDevice (
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
   @param Device          Point to device ID instance 
 
-  @return EFI_SUCESS  Success to initialize.
+  @return EFI_SUCCESS  Success to initialize.
 
 **/
 EFI_STATUS
@@ -346,7 +346,7 @@ IsaInitDevice (
 
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
 
-  @return EFI_SUCESS  Success to initialize ISA interface.
+  @return EFI_SUCCESS  Success to initialize ISA interface.
 
 **/
 EFI_STATUS
