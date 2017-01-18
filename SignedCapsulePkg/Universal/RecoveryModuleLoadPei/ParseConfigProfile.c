@@ -2,7 +2,7 @@
   Parse the INI configuration file and pass the information to the recovery driver
   so that the driver can perform recovery accordingly.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -85,7 +85,13 @@ ParseRecoveryDataFile (
     // Get the section name of each update
     //
     AsciiStrCpyS (Entry, MAX_LINE_LENGTH, "Recovery");
-    AsciiValueToString(Entry + AsciiStrLen(Entry), 0, Index, 0);
+    AsciiValueToStringS (
+      Entry + AsciiStrnLenS (Entry, MAX_LINE_LENGTH),
+      MAX_LINE_LENGTH - AsciiStrnLenS (Entry, MAX_LINE_LENGTH),
+      0,
+      Index,
+      0
+      );
     Status = GetStringFromDataFile(
                Context,
                "Head",
