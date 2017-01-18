@@ -3,7 +3,7 @@
   the PCI operations to be replayed during an S3 resume. This library class
   maps directly on top of the PciLib class. 
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -25,7 +25,7 @@
 #include <Library/S3PciLib.h>
 
 #define PCILIB_TO_COMMON_ADDRESS(Address) \
-        ((UINT64) ((((UINTN) ((Address>>20) & 0xff)) << 24) + (((UINTN) ((Address>>15) & 0x1f)) << 16) + (((UINTN) ((Address>>12) & 0x07)) << 8) + ((UINTN) (Address & 0xfff ))))
+        ((((UINTN) ((Address>>20) & 0xff)) << 24) + (((UINTN) ((Address>>15) & 0x1f)) << 16) + (((UINTN) ((Address>>12) & 0x07)) << 8) + ((UINTN) (Address & 0xfff )))
 
 /**
   Saves a PCI configuration value to the boot script.
