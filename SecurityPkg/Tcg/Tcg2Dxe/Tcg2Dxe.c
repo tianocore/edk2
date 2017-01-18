@@ -1,7 +1,7 @@
 /** @file
   This module implements Tcg2 Protocol.
   
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
@@ -115,6 +115,7 @@ VARIABLE_TYPE  mVariableType[] = {
   {EFI_KEY_EXCHANGE_KEY_NAME,    &gEfiGlobalVariableGuid},
   {EFI_IMAGE_SECURITY_DATABASE,  &gEfiImageSecurityDatabaseGuid},
   {EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid},
+  {EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid},
 };
 
 EFI_HANDLE mImageHandle;
