@@ -1,7 +1,7 @@
 /** @file
 Utility functions for expression evaluation.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -3143,7 +3143,14 @@ EvaluateExpression (
             TempBuffer = (UINT8 *) &Value->Value + OpCode->ValueWidth - 1;
             StrPtr = NameValue;
             for (Index = 0; Index < OpCode->ValueWidth; Index ++, TempBuffer --) {
-              StrPtr += UnicodeValueToString (StrPtr, PREFIX_ZERO | RADIX_HEX, *TempBuffer, 2);
+              UnicodeValueToStringS (
+                StrPtr,
+                (OpCode->ValueWidth * 2 + 1) * sizeof (CHAR16) - ((UINTN)StrPtr - (UINTN)NameValue),
+                PREFIX_ZERO | RADIX_HEX,
+                *TempBuffer,
+                2
+                );
+              StrPtr += StrnLenS (StrPtr, OpCode->ValueWidth * 2 + 1 - ((UINTN)StrPtr - (UINTN)NameValue) / sizeof (CHAR16));
             }
             Status = SetValueByName (OpCode->VarStorage, OpCode->ValueName, NameValue, GetSetValueWithEditBuffer, NULL);
             FreePool (NameValue);

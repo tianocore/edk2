@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -776,7 +776,14 @@ HiiConstructConfigHdr (
     // Append Guid converted to <HexCh>32
     //
     for (Index = 0, Buffer = (UINT8 *)Guid; Index < sizeof (EFI_GUID); Index++) {
-      String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *(Buffer++), 2);
+      UnicodeValueToStringS (
+        String,
+        MaxLen * sizeof (CHAR16) - ((UINTN)String - (UINTN)ReturnString),
+        PREFIX_ZERO | RADIX_HEX,
+        *(Buffer++),
+        2
+        );
+      String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
     }
   }
   
@@ -791,7 +798,14 @@ HiiConstructConfigHdr (
     // Append Name converted to <Char>NameLength
     //
     for (; *Name != L'\0'; Name++) {
-      String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *Name, 4);
+      UnicodeValueToStringS (
+        String,
+        sizeof (CHAR16) * MaxLen - ((UINTN)String - (UINTN)ReturnString),
+        PREFIX_ZERO | RADIX_HEX,
+        *Name,
+        4
+        );
+      String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
     }
   }
 
@@ -805,7 +819,14 @@ HiiConstructConfigHdr (
   // Append the device path associated with DriverHandle converted to <HexChar>DevicePathSize
   //
   for (Index = 0, Buffer = (UINT8 *)DevicePath; Index < DevicePathSize; Index++) {
-    String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *(Buffer++), 2);
+    UnicodeValueToStringS (
+      String,
+      sizeof (CHAR16) * MaxLen - ((UINTN)String - (UINTN)ReturnString),
+      PREFIX_ZERO | RADIX_HEX,
+      *(Buffer++),
+      2
+      );
+    String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
   }
 
   //

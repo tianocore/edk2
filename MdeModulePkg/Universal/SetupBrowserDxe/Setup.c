@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1972,7 +1972,14 @@ SetQuestionValue (
         TemName = (CHAR16 *) Src;
         TemString = Value;
         for (; *TemName != L'\0'; TemName++) {
-          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+          UnicodeValueToStringS (
+            TemString,
+            BufferLen - ((UINTN)TemString - (UINTN)Value),
+            PREFIX_ZERO | RADIX_HEX,
+            *TemName,
+            4
+            );
+          TemString += StrnLenS (TemString, (BufferLen - ((UINTN)TemString - (UINTN)Value)) / sizeof (CHAR16));
         }
       } else {
         BufferLen = StorageWidth * 2 + 1;
@@ -1984,7 +1991,14 @@ SetQuestionValue (
         TemBuffer = Src + StorageWidth - 1;
         TemString = Value;
         for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
-          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+          UnicodeValueToStringS (
+            TemString,
+            BufferLen * sizeof (CHAR16) - ((UINTN)TemString - (UINTN)Value),
+            PREFIX_ZERO | RADIX_HEX,
+            *TemBuffer,
+            2
+            );
+          TemString += StrnLenS (TemString, BufferLen - ((UINTN)TemString - (UINTN)Value) / sizeof (CHAR16));
         }
       }
 
@@ -2034,7 +2048,14 @@ SetQuestionValue (
       TemName = (CHAR16 *) Src;
       TemString = Value;
       for (; *TemName != L'\0'; TemName++) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+        UnicodeValueToStringS (
+          TemString,
+          MaxLen * sizeof (CHAR16) - ((UINTN)TemString - (UINTN)ConfigResp),
+          PREFIX_ZERO | RADIX_HEX,
+          *TemName,
+          4
+          );
+        TemString += StrnLenS (TemString, MaxLen - ((UINTN)TemString - (UINTN)ConfigResp) / sizeof (CHAR16));
       }
     } else {
       //
@@ -2043,7 +2064,14 @@ SetQuestionValue (
       TemBuffer = Src + StorageWidth - 1;
       TemString = Value;
       for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+        UnicodeValueToStringS (
+          TemString,
+          MaxLen * sizeof (CHAR16) - ((UINTN)TemString - (UINTN)ConfigResp),
+          PREFIX_ZERO | RADIX_HEX,
+          *TemBuffer,
+          2
+          );
+        TemString += StrnLenS (TemString, MaxLen - ((UINTN)TemString - (UINTN)ConfigResp) / sizeof (CHAR16));
       }
     }
 

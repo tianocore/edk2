@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of VLAN configuration module.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -417,14 +417,22 @@ VlanUpdateForm (
     //
     // Pad VlanId string up to 4 characters with space
     //
-    DigitalCount = UnicodeValueToString (VlanIdStr, 0, VlanData[Index].VlanId, 5);
+    UnicodeValueToStringS (VlanIdStr, sizeof (VlanIdStr), 0, VlanData[Index].VlanId, 5);
+    DigitalCount = StrnLenS (VlanIdStr, ARRAY_SIZE (VlanIdStr));
     SetMem16 (String, (4 - DigitalCount) * sizeof (CHAR16), L' ');
     StrCpyS (String + 4 - DigitalCount, (sizeof (VlanStr) /sizeof (CHAR16)) - 10 - (4 - DigitalCount), VlanIdStr);
     String += 4;
 
     StrCpyS (String,  (sizeof (VlanStr) /sizeof (CHAR16)) - 10 - (4 - DigitalCount) - 4, L", Priority:");
     String += 11;
-    String += UnicodeValueToString (String, 0, VlanData[Index].Priority, 4);
+    UnicodeValueToStringS (
+      String,
+      sizeof (VlanStr) - ((UINTN)String - (UINTN)VlanStr),
+      0,
+      VlanData[Index].Priority,
+      4
+      );
+    String += StrnLenS (String, ARRAY_SIZE (VlanStr) - ((UINTN)String - (UINTN)VlanStr) / sizeof (CHAR16));
     *String = 0;
 
     StringId = HiiSetString (PrivateData->HiiHandle, 0, VlanStr, NULL);

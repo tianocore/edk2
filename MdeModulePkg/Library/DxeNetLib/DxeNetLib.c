@@ -2225,6 +2225,7 @@ NetLibGetMacString (
   UINT16                       VlanId;
   CHAR16                       *String;
   UINTN                        Index;
+  UINTN                        BufferSize;
 
   ASSERT (MacString != NULL);
 
@@ -2241,7 +2242,8 @@ NetLibGetMacString (
   // If VLAN is configured, it will need extra 5 characters like "\0005".
   // Plus one unicode character for the null-terminator.
   //
-  String = AllocateZeroPool ((2 * HwAddressSize + 5 + 1) * sizeof (CHAR16));
+  BufferSize = (2 * HwAddressSize + 5 + 1) * sizeof (CHAR16);
+  String = AllocateZeroPool (BufferSize);
   if (String == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -2252,7 +2254,14 @@ NetLibGetMacString (
   //
   HwAddress = &MacAddress.Addr[0];
   for (Index = 0; Index < HwAddressSize; Index++) {
-    String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *(HwAddress++), 2);
+    UnicodeValueToStringS (
+      String,
+      BufferSize - ((UINTN)String - (UINTN)*MacString),
+      PREFIX_ZERO | RADIX_HEX,
+      *(HwAddress++),
+      2
+      );
+    String += StrnLenS (String, (BufferSize - ((UINTN)String - (UINTN)*MacString)) / sizeof (CHAR16));
   }
 
   //
@@ -2261,7 +2270,14 @@ NetLibGetMacString (
   VlanId = NetLibGetVlanId (ServiceHandle);
   if (VlanId != 0) {
     *String++ = L'\\';
-    String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, VlanId, 4);
+    UnicodeValueToStringS (
+      String,
+      BufferSize - ((UINTN)String - (UINTN)*MacString),
+      PREFIX_ZERO | RADIX_HEX,
+      VlanId,
+      4
+      );
+    String += StrnLenS (String, (BufferSize - ((UINTN)String - (UINTN)*MacString)) / sizeof (CHAR16));
   }
 
   //

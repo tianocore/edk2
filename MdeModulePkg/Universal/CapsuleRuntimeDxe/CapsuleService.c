@@ -4,7 +4,7 @@
   It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
   the capsule runtime services are ready.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -205,7 +205,13 @@ UpdateCapsule (
   StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CHAR16), EFI_CAPSULE_VARIABLE_NAME);
   TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
   if (mTimes > 0) {
-    UnicodeValueToString (TempVarName, 0, mTimes, 0);
+    UnicodeValueToStringS (
+      TempVarName,
+      sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName),
+      0,
+      mTimes,
+      0
+      );
   }
 
   //

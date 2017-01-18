@@ -1,7 +1,7 @@
 /** @file
   Capsule update PEIM for UEFI2.0
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -777,7 +777,13 @@ GetCapsuleDescriptors (
           return EFI_SUCCESS;
         }
       } else {
-        UnicodeValueToString (TempVarName, 0, Index, 0);
+        UnicodeValueToStringS (
+          TempVarName,
+          sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName),
+          0,
+          Index,
+          0
+          );
         Status = PPIVariableServices->GetVariable (
                                         PPIVariableServices,
                                         CapsuleVarName,
@@ -900,7 +906,13 @@ CapsuleCoalesce (
   TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
   while (TRUE) {
     if (Index > 0) {
-      UnicodeValueToString (TempVarName, 0, Index, 0);
+      UnicodeValueToStringS (
+        TempVarName,
+        sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName),
+        0,
+        Index,
+        0
+        );
     }
     Status = PPIVariableServices->GetVariable (
                                     PPIVariableServices,

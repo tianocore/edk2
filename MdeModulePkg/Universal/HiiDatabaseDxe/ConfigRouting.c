@@ -264,7 +264,14 @@ GenerateSubStr (
     //
     TemBuffer = ((UINT8 *) Buffer);
     for (Index = 0; Index < BufferLen; Index ++, TemBuffer ++) {
-      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+      UnicodeValueToStringS (
+        TemString,
+        sizeof (CHAR16) * (Length - StrnLenS (Str, Length)),
+        PREFIX_ZERO | RADIX_HEX,
+        *TemBuffer,
+        2
+        );
+      TemString += StrnLenS (TemString, Length - StrnLenS (Str, Length));
     }
     break;
   case 2:
@@ -277,7 +284,14 @@ GenerateSubStr (
     // Convert Unicode String to Config String, e.g. "ABCD" => "0041004200430044"
     //
     for (; *TemName != L'\0'; TemName++) {
-      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+      UnicodeValueToStringS (
+        TemString,
+        sizeof (CHAR16) * (Length - StrnLenS (Str, Length)),
+        PREFIX_ZERO | RADIX_HEX,
+        *TemName,
+        4
+        );
+      TemString += StrnLenS (TemString, Length - StrnLenS (Str, Length));
     }
     break;
   case 3:
@@ -286,7 +300,14 @@ GenerateSubStr (
     //
     TemBuffer = ((UINT8 *) Buffer) + BufferLen - 1;
     for (Index = 0; Index < BufferLen; Index ++, TemBuffer --) {
-      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+      UnicodeValueToStringS (
+        TemString,
+        sizeof (CHAR16) * (Length - StrnLenS (Str, Length)),
+        PREFIX_ZERO | RADIX_HEX,
+        *TemBuffer,
+        2
+        );
+      TemString += StrnLenS (TemString, Length - StrnLenS (Str, Length));
     }
     break;
   default:
@@ -3712,7 +3733,14 @@ GenerateAltConfigResp (
           TmpBuffer = (UINT8 *) &(DefaultValueData->Value);
         }
         for (; Width > 0 && (TmpBuffer != NULL); Width--) {
-          StringPtr += UnicodeValueToString (StringPtr, PREFIX_ZERO | RADIX_HEX, TmpBuffer[Width - 1], 2);
+          UnicodeValueToStringS (
+            StringPtr,
+            Length * sizeof (CHAR16) - ((UINTN)StringPtr - (UINTN)*DefaultAltCfgResp),
+            PREFIX_ZERO | RADIX_HEX,
+            TmpBuffer[Width - 1],
+            2
+            );
+          StringPtr += StrnLenS (StringPtr, Length - ((UINTN)StringPtr - (UINTN)*DefaultAltCfgResp) / sizeof (CHAR16));
         }
         if (DefaultString != NULL){
           FreePool(DefaultString);
@@ -5403,7 +5431,14 @@ HiiBlockToConfig (
     TemString = ValueStr;
     TemBuffer = Value + Width - 1;
     for (Index = 0; Index < Width; Index ++, TemBuffer --) {
-      TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+      UnicodeValueToStringS (
+        TemString,
+        Length  * sizeof (CHAR16) - ((UINTN)TemString - (UINTN)ValueStr),
+        PREFIX_ZERO | RADIX_HEX,
+        *TemBuffer,
+        2
+        );
+      TemString += StrnLenS (TemString, Length - ((UINTN)TemString - (UINTN)ValueStr) / sizeof (CHAR16));
     }
 
     FreePool (Value);

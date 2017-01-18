@@ -1,7 +1,7 @@
 /** @file
 Dynamically update the pages.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -734,11 +734,17 @@ UpdateConModePage (
     //
     // Build mode string Column x Row
     //
-    UnicodeValueToString (ModeString, 0, Col, 0);
+    UnicodeValueToStringS (ModeString, sizeof (ModeString), 0, Col, 0);
     PStr = &ModeString[0];
     StrnCatS (PStr, ARRAY_SIZE (ModeString), L" x ", StrLen(L" x ") + 1);
     PStr = PStr + StrLen (PStr);
-    UnicodeValueToString (PStr , 0, Row, 0);
+    UnicodeValueToStringS (
+      PStr,
+      sizeof (ModeString) - ((UINTN)PStr - (UINTN)&ModeString[0]),
+      0,
+      Row,
+      0
+      );
 
     ModeToken[Index] = HiiSetString (CallbackData->BmmHiiHandle, 0, ModeString, NULL);
 

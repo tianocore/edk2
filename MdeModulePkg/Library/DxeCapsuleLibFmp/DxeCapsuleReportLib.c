@@ -1,7 +1,7 @@
 /** @file
   DXE capsule report related function.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -377,7 +377,13 @@ InitCapsuleUpdateVariable (
   Index = 0;
   while (TRUE) {
     if (Index > 0) {
-      UnicodeValueToString (TempVarName, 0, Index, 0);
+      UnicodeValueToStringS (
+        TempVarName,
+        sizeof (CapsuleVarName) - ((UINTN)TempVarName - (UINTN)CapsuleVarName),
+        0,
+        Index,
+        0
+        );
     }
     Status = gRT->SetVariable (
                     CapsuleVarName,

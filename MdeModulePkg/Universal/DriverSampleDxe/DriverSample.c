@@ -725,12 +725,14 @@ ExtractConfig (
 
       BackupChar = Value[ValueStrLen];
       *Value++   = L'=';
-      Value += UnicodeValueToString (
-                 Value, 
-                 PREFIX_ZERO | RADIX_HEX, 
-                 PrivateData->Configuration.NameValueVar0, 
-                 sizeof (PrivateData->Configuration.NameValueVar0) * 2
-                 );
+      UnicodeValueToStringS (
+        Value,
+        BufferSize - ((UINTN)Value - (UINTN)*Results),
+        PREFIX_ZERO | RADIX_HEX,
+        PrivateData->Configuration.NameValueVar0,
+        sizeof (PrivateData->Configuration.NameValueVar0) * 2
+        );
+      Value += StrnLenS (Value, (BufferSize - ((UINTN)Value - (UINTN)*Results)) / sizeof (CHAR16));
       *Value = BackupChar;
     }
 
@@ -744,12 +746,14 @@ ExtractConfig (
 
       BackupChar = Value[ValueStrLen];
       *Value++   = L'=';
-      Value += UnicodeValueToString (
-                Value, 
-                PREFIX_ZERO | RADIX_HEX, 
-                PrivateData->Configuration.NameValueVar1, 
-                sizeof (PrivateData->Configuration.NameValueVar1) * 2
-                );
+      UnicodeValueToStringS (
+        Value,
+        BufferSize - ((UINTN)Value - (UINTN)*Results),
+        PREFIX_ZERO | RADIX_HEX,
+        PrivateData->Configuration.NameValueVar1,
+        sizeof (PrivateData->Configuration.NameValueVar1) * 2
+        );
+      Value += StrnLenS (Value, (BufferSize - ((UINTN)Value - (UINTN)*Results)) / sizeof (CHAR16));
       *Value = BackupChar;
     }
 
@@ -767,7 +771,14 @@ ExtractConfig (
       //
       StrPointer = (CHAR16 *) PrivateData->Configuration.NameValueVar2;
       for (; *StrPointer != L'\0'; StrPointer++) {
-        Value += UnicodeValueToString (Value, PREFIX_ZERO | RADIX_HEX, *StrPointer, 4);
+        UnicodeValueToStringS (
+          Value,
+          BufferSize - ((UINTN)Value - (UINTN)*Results),
+          PREFIX_ZERO | RADIX_HEX,
+          *StrPointer,
+          4
+          );
+        Value += StrnLenS (Value, (BufferSize - ((UINTN)Value - (UINTN)*Results)) / sizeof (CHAR16));
       }
     }
     
