@@ -3449,19 +3449,24 @@ PrintBitsInfo (
 
   UINTN   Index;
   UINT32  Value;
-  BOOLEAN NoInfo;
+  BOOLEAN FirstInfo;
 
-  NoInfo  = TRUE;
+  FirstInfo = TRUE;
   Value   = Bits;
   //
   // query the table and print information
   //
   for (Index = 0; Index < Number; Index++) {
     if (BIT (Value, Table[Index].Key) != 0) {
+      if (!FirstInfo) {
+        //
+        // If it is not first info, print the separator first.
+        //
+        Print (L" | ");
+      }
       Print (Table[Index].Info);
-      Print (L" | ");
 
-      NoInfo = FALSE;
+      FirstInfo = FALSE;
       //
       // clear the bit, for reserved bits test
       //
@@ -3469,7 +3474,10 @@ PrintBitsInfo (
     }
   }
 
-  if (NoInfo) {
+  //
+  // There is no any info if FirstInfo is still TRUE.
+  //
+  if (FirstInfo) {
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_NO_INFO), gShellDebug1HiiHandle);
   }
 
