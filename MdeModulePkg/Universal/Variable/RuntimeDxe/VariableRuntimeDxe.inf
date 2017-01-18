@@ -9,7 +9,7 @@
 #  This external input must be validated carefully to avoid security issues such as
 #  buffer overflow or integer overflow.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -94,6 +94,9 @@
   ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
   ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
   ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"PK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"KEK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SecureBoot"
   gEfiGlobalVariableGuid
 
   gEfiMemoryOverwriteControlDataGuid            ## SOMETIMES_CONSUMES   ## Variable:L"MemoryOverwriteRequestControl"
@@ -108,8 +111,9 @@
   ## SOMETIMES_PRODUCES   ## Variable:L"VarErrorFlag"
   gEdkiiVarErrorFlagGuid
 
-  ## SOMETIMES_CONSUMES   ## Variable:L"DB"
-  ## SOMETIMES_CONSUMES   ## Variable:L"DBX"
+  ## SOMETIMES_CONSUMES   ## Variable:L"db"
+  ## SOMETIMES_CONSUMES   ## Variable:L"dbx"
+  ## SOMETIMES_CONSUMES   ## Variable:L"dbt"
   gEfiImageSecurityDatabaseGuid
 
 [Pcd]

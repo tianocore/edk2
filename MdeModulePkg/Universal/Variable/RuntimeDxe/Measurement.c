@@ -1,7 +1,7 @@
 /** @file
   Measure TrEE required variable.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,7 +36,15 @@ VARIABLE_TYPE  mVariableType[] = {
   {EFI_KEY_EXCHANGE_KEY_NAME,    &gEfiGlobalVariableGuid},
   {EFI_IMAGE_SECURITY_DATABASE,  &gEfiImageSecurityDatabaseGuid},
   {EFI_IMAGE_SECURITY_DATABASE1, &gEfiImageSecurityDatabaseGuid},
+  {EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid},
 };
+
+//
+// "SecureBoot" may update following PK Del/Add
+//  Cache its value to detect value update
+//
+UINT8       *mSecureBootVarData    = NULL;
+UINTN       mSecureBootVarDataSize = 0;
 
 /**
   This function will return if this variable is SecureBootPolicy Variable.
@@ -251,5 +259,77 @@ SecureBootHook (
     FreePool (VariableData);
   }
 
+  //
+  // "SecureBoot" is 8bit & read-only. It can only be changed according to PK update
+  //
+  if ((StrCmp (VariableName, EFI_PLATFORM_KEY_NAME) == 0) &&
+       CompareGuid (VendorGuid, &gEfiGlobalVariableGuid)) {
+     Status = InternalGetVariable (
+                EFI_SECURE_BOOT_MODE_NAME,
+                &gEfiGlobalVariableGuid,
+                &VariableData,
+                &VariableDataSize
+                );
+     if (EFI_ERROR (Status)) {
+       return;
+     }
+
+     //
+     // If PK update is successful. "SecureBoot" shall always exist ever since variable write service is ready
+     //
+     ASSERT(mSecureBootVarData != NULL);
+
+     if (CompareMem(mSecureBootVarData, VariableData, VariableDataSize) != 0) {
+       FreePool(mSecureBootVarData);
+       mSecureBootVarData     = VariableData;
+       mSecureBootVarDataSize = VariableDataSize;
+
+       DEBUG((DEBUG_INFO, "%s variable updated according to PK change. Remeasure the value!\n", EFI_SECURE_BOOT_MODE_NAME));
+       Status = MeasureVariable (
+                  EFI_SECURE_BOOT_MODE_NAME,
+                  &gEfiGlobalVariableGuid,
+                  mSecureBootVarData,
+                  mSecureBootVarDataSize
+                  );
+       DEBUG ((DEBUG_INFO, "MeasureBootPolicyVariable - %r\n", Status));
+     } else {
+       //
+       // "SecureBoot" variable is not changed
+       //
+       FreePool(VariableData);
+     }
+  }
+
   return ;
+}
+
+/**
+  Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
+  Record their initial State when variable write service is ready.
+
+**/
+VOID
+EFIAPI
+RecordSecureBootPolicyVarData(
+  VOID
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // Record initial "SecureBoot" variable value.
+  // It is used to detect SecureBoot variable change in SecureBootHook.
+  //
+  Status = InternalGetVariable (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             (VOID **)&mSecureBootVarData,
+             &mSecureBootVarDataSize
+             );
+  if (EFI_ERROR(Status)) {
+    //
+    // Read could fail when Auth Variable solution is not supported
+    //
+    DEBUG((DEBUG_INFO, "RecordSecureBootPolicyVarData GetVariable %s Status %x\n", EFI_SECURE_BOOT_MODE_NAME, Status));
+  }
 }

@@ -3,7 +3,7 @@
   and volatile storage space and install variable architecture protocol.
 
 Copyright (C) 2013, Red Hat, Inc.
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -30,6 +30,17 @@ EDKII_VARIABLE_LOCK_PROTOCOL        mVariableLock              = { VariableLockR
 EDKII_VAR_CHECK_PROTOCOL            mVarCheck                  = { VarCheckRegisterSetVariableCheckHandler,
                                                                     VarCheckVariablePropertySet,
                                                                     VarCheckVariablePropertyGet };
+
+/**
+  Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
+  Record their initial State when variable write service is ready.
+
+**/
+VOID
+EFIAPI
+RecordSecureBootPolicyVarData(
+  VOID
+  );
 
 /**
   Return TRUE if ExitBootServices () has been called.
@@ -413,6 +424,12 @@ FtwNotificationEvent (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
   }
+
+  //
+  // Some Secure Boot Policy Var (SecureBoot, etc) updates following other
+  // Secure Boot Policy Variable change. Record their initial value.
+  //
+  RecordSecureBootPolicyVarData();
 
   //
   // Install the Variable Write Architectural protocol.
