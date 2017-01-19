@@ -1075,9 +1075,6 @@ XenStoreInit (
 
   /* Initialize the shared memory rings to talk to xenstored */
   Status = XenStoreInitComms (&xs);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   return Status;
 }

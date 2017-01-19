@@ -77,9 +77,6 @@ GetNvVarsFile (
                      ),
                    0
                    );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   return Status;
 }
