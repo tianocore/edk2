@@ -2520,9 +2520,6 @@ EmmcPeimSwitchToHighSpeed (
 
   HsTiming = 1;
   Status = EmmcPeimSwitchClockFreq (Slot, Rca, HsTiming, ClockFreq);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   return Status;
 }

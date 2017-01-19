@@ -783,9 +783,6 @@ EmmcSwitchToHighSpeed (
 
   HsTiming = 1;
   Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, ClockFreq);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   return Status;
 }

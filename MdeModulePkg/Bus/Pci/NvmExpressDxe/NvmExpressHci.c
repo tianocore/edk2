@@ -1046,9 +1046,6 @@ NvmeControllerInit (
   // One for blocking I/O, one for non-blocking I/O.
   //
   Status = NvmeCreateIoSubmissionQueue (Private);
-  if (EFI_ERROR(Status)) {
-   return Status;
-  }
 
   return Status;
 }

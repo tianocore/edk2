@@ -1465,9 +1465,6 @@ ConSplitterStdErrDriverBindingStart (
   //
   Status = ConSplitterTextOutAddDevice (&mStdErr, TextOut, NULL, NULL);
   ConSplitterTextOutSetAttribute (&mStdErr.TextOut, EFI_TEXT_ATTR (EFI_MAGENTA, EFI_BLACK));
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   return Status;
 }
