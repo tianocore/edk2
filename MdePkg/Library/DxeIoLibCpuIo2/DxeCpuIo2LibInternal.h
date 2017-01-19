@@ -135,7 +135,6 @@ IoWriteFifoWorker (
   @param  Address       The MMIO register to read.
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
-  @param  Count         The number of times to write I/O port.
 
   @return Data read from registers in the EFI system memory space.
 

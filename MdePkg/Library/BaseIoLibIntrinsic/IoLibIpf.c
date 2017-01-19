@@ -282,7 +282,7 @@ IoReadFifo8 (
   UINT8 *Buffer8;
 
   Buffer8 = (UINT8 *)Buffer;
-  while (Count--) {
+  while (Count-- > 0) {
     *Buffer8++ = IoRead8 (Port);
   }
 }
@@ -315,7 +315,7 @@ IoReadFifo16 (
   UINT16 *Buffer16;
 
   Buffer16 = (UINT16 *)Buffer;
-  while (Count--) {
+  while (Count-- > 0) {
     *Buffer16++ = IoRead16 (Port);
   }
 }
@@ -348,7 +348,7 @@ IoReadFifo32 (
   UINT32 *Buffer32;
 
   Buffer32 = (UINT32 *)Buffer;
-  while (Count--) {
+  while (Count-- > 0) {
     *Buffer32++ = IoRead32 (Port);
   }
 }
@@ -381,7 +381,7 @@ IoWriteFifo8 (
   UINT8 *Buffer8;
 
   Buffer8 = (UINT8 *)Buffer;
-  while (Count--) {
+  while (Count-- > 0) {
     IoWrite8 (Port, *Buffer8++);
   }
 }
@@ -414,7 +414,7 @@ IoWriteFifo16 (
   UINT16 *Buffer16;
 
   Buffer16 = (UINT16 *)Buffer;
-  while (Count--) {
+  while (Count-- > 0) {
     IoWrite16 (Port, *Buffer16++);
   }
 }
@@ -447,7 +447,7 @@ IoWriteFifo32 (
   UINT32 *Buffer32;
 
   Buffer32 = (UINT32 *)Buffer;
-  while (Count--) {
+  while (Count-- > 0) {
     IoWrite32 (Port, *Buffer32++);
   }
 }
