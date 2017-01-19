@@ -1294,10 +1294,6 @@ TlsCloseSession (
   FreePool (BufferOut);
   NetbufFree (PacketOut);
 
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   return Status;
 }
 
