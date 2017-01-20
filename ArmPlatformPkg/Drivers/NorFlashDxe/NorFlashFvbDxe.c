@@ -719,6 +719,29 @@ NorFlashFvbInitialize (
   UINTN       RuntimeMmioRegionSize;
 
   DEBUG((DEBUG_BLKIO,"NorFlashFvbInitialize\n"));
+  ASSERT((Instance != NULL));
+
+  //
+  // Declare the Non-Volatile storage as EFI_MEMORY_RUNTIME
+  //
+
+  // Note: all the NOR Flash region needs to be reserved into the UEFI Runtime memory;
+  //       even if we only use the small block region at the top of the NOR Flash.
+  //       The reason is when the NOR Flash memory is set into program mode, the command
+  //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
+  RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
+
+  Status = gDS->AddMemorySpace (
+      EfiGcdMemoryTypeMemoryMappedIo,
+      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
+      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+      );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->SetMemorySpaceAttributes (
+      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
+      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+  ASSERT_EFI_ERROR (Status);
 
   Instance->Initialized = TRUE;
   mFlashNvStorageVariableBase = FixedPcdGet32 (PcdFlashNvStorageVariableBase);
@@ -755,28 +778,6 @@ NorFlashFvbInitialize (
       return Status;
     }
   }
-
-  //
-  // Declare the Non-Volatile storage as EFI_MEMORY_RUNTIME
-  //
-
-  // Note: all the NOR Flash region needs to be reserved into the UEFI Runtime memory;
-  //       even if we only use the small block region at the top of the NOR Flash.
-  //       The reason is when the NOR Flash memory is set into program mode, the command
-  //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
-  RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
-
-  Status = gDS->AddMemorySpace (
-      EfiGcdMemoryTypeMemoryMappedIo,
-      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
-      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
-      );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gDS->SetMemorySpaceAttributes (
-      Instance->DeviceBaseAddress, RuntimeMmioRegionSize,
-      EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Register for the virtual address change event
