@@ -587,4 +587,132 @@ ArmUnsetCpuActlrBit (
   IN  UINTN    Bits
   );
 
+//
+// Accessors for the architected generic timer registers
+//
+
+#define ARM_ARCH_TIMER_ENABLE           (1 << 0)
+#define ARM_ARCH_TIMER_IMASK            (1 << 1)
+#define ARM_ARCH_TIMER_ISTATUS          (1 << 2)
+
+UINTN
+EFIAPI
+ArmReadCntFrq (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntFrq (
+  UINTN   FreqInHz
+  );
+
+UINT64
+EFIAPI
+ArmReadCntPct (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadCntkCtl (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntkCtl (
+  UINTN   Val
+  );
+
+UINTN
+EFIAPI
+ArmReadCntpTval (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntpTval (
+  UINTN   Val
+  );
+
+UINTN
+EFIAPI
+ArmReadCntpCtl (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntpCtl (
+  UINTN   Val
+  );
+
+UINTN
+EFIAPI
+ArmReadCntvTval (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntvTval (
+  UINTN   Val
+  );
+
+UINTN
+EFIAPI
+ArmReadCntvCtl (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntvCtl (
+  UINTN   Val
+  );
+
+UINT64
+EFIAPI
+ArmReadCntvCt (
+  VOID
+  );
+
+UINT64
+EFIAPI
+ArmReadCntpCval (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntpCval (
+  UINT64   Val
+  );
+
+UINT64
+EFIAPI
+ArmReadCntvCval (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntvCval (
+  UINT64   Val
+  );
+
+UINT64
+EFIAPI
+ArmReadCntvOff (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmWriteCntvOff (
+  UINT64   Val
+  );
+
 #endif // __ARM_LIB__

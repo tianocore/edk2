@@ -27,7 +27,6 @@
 
 [Sources.ARM]
   Arm/ArmV7Lib.c
-  Arm/ArmV7ArchTimer.c
 
   Arm/ArmLibSupport.S           | GCC
   Arm/ArmLibSupportV7.S         | GCC
@@ -41,7 +40,6 @@
 
 [Sources.AARCH64]
   AArch64/AArch64Lib.c
-  AArch64/AArch64ArchTimer.c
 
   AArch64/ArmLibSupport.S
   AArch64/ArmLibSupportV8.S

@@ -17,7 +17,6 @@
 #define __AARCH64_H__
 
 #include <Chipset/AArch64Mmu.h>
-#include <Chipset/ArmArchTimer.h>
 
 // ARM Interrupt ID in Exception Table
 #define ARM_ARCH_EXCEPTION_IRQ            EXCEPT_AARCH64_IRQ

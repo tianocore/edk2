@@ -14,7 +14,7 @@
 **/
 
 #include <Library/ArmGenericTimerCounterLib.h>
-#include <Library/ArmArchTimer.h>
+#include <Library/ArmLib.h>
 
 VOID
 EFIAPI
@@ -24,9 +24,9 @@ ArmGenericTimerEnableTimer (
 {
   UINTN TimerCtrlReg;
 
-  ArmArchTimerReadReg (CntpCtl, (VOID *)&TimerCtrlReg);
+  TimerCtrlReg = ArmReadCntpCtl ();
   TimerCtrlReg |= ARM_ARCH_TIMER_ENABLE;
-  ArmArchTimerWriteReg (CntpCtl, (VOID *)&TimerCtrlReg);
+  ArmWriteCntpCtl (TimerCtrlReg);
 }
 
 VOID
@@ -37,9 +37,9 @@ ArmGenericTimerDisableTimer (
 {
   UINTN TimerCtrlReg;
 
-  ArmArchTimerReadReg (CntpCtl, (VOID *)&TimerCtrlReg);
+  TimerCtrlReg = ArmReadCntpCtl ();
   TimerCtrlReg &= ~ARM_ARCH_TIMER_ENABLE;
-  ArmArchTimerWriteReg (CntpCtl, (VOID *)&TimerCtrlReg);
+  ArmWriteCntpCtl (TimerCtrlReg);
 }
 
 VOID
@@ -48,7 +48,7 @@ ArmGenericTimerSetTimerFreq (
   IN   UINTN  FreqInHz
   )
 {
-  ArmArchTimerWriteReg (CntFrq, (VOID *)&FreqInHz);
+  ArmWriteCntFrq (FreqInHz);
 }
 
 UINTN
@@ -57,9 +57,7 @@ ArmGenericTimerGetTimerFreq (
   VOID
   )
 {
-  UINTN ArchTimerFreq = 0;
-  ArmArchTimerReadReg (CntFrq, (VOID *)&ArchTimerFreq);
-  return ArchTimerFreq;
+  return ArmReadCntFrq ();
 }
 
 UINTN
@@ -68,10 +66,7 @@ ArmGenericTimerGetTimerVal (
   VOID
   )
 {
-  UINTN ArchTimerValue;
-  ArmArchTimerReadReg (CntpTval, (VOID *)&ArchTimerValue);
-
-  return ArchTimerValue;
+  return ArmReadCntpTval ();
 }
 
 
@@ -81,7 +76,7 @@ ArmGenericTimerSetTimerVal (
   IN   UINTN   Value
   )
 {
-  ArmArchTimerWriteReg (CntpTval, (VOID *)&Value);
+  ArmWriteCntpTval (Value);
 }
 
 UINT64
@@ -90,10 +85,7 @@ ArmGenericTimerGetSystemCount (
   VOID
   )
 {
-  UINT64 SystemCount;
-  ArmArchTimerReadReg (CntPct, (VOID *)&SystemCount);
-
-  return SystemCount;
+  return ArmReadCntPct ();
 }
 
 UINTN
@@ -102,10 +94,7 @@ ArmGenericTimerGetTimerCtrlReg (
   VOID
   )
 {
-  UINTN  Value;
-  ArmArchTimerReadReg (CntpCtl, (VOID *)&Value);
-
-  return Value;
+  return ArmReadCntpCtl ();
 }
 
 VOID
@@ -114,7 +103,7 @@ ArmGenericTimerSetTimerCtrlReg (
   UINTN Value
   )
 {
-  ArmArchTimerWriteReg (CntpCtl, (VOID *)&Value);
+  ArmWriteCntpCtl (Value);
 }
 
 UINT64
@@ -123,10 +112,7 @@ ArmGenericTimerGetCompareVal (
   VOID
   )
 {
-  UINT64  Value;
-  ArmArchTimerReadReg (CntpCval, (VOID *)&Value);
-
-  return Value;
+  return ArmReadCntpCval ();
 }
 
 VOID
@@ -135,5 +121,5 @@ ArmGenericTimerSetCompareVal (
   IN   UINT64   Value
   )
 {
-  ArmArchTimerWriteReg (CntpCval, (VOID *)&Value);
+  ArmWriteCntpCval (Value);
 }

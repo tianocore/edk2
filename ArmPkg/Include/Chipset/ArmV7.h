@@ -17,7 +17,6 @@
 #define __ARM_V7_H__
 
 #include <Chipset/ArmV7Mmu.h>
-#include <Chipset/ArmArchTimer.h>
 
 // ARM Interrupt ID in Exception Table
 #define ARM_ARCH_EXCEPTION_IRQ            EXCEPT_ARM_IRQ
