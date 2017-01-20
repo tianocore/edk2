@@ -1,7 +1,7 @@
 ## @file
 # This module provide an SMM CIS compliant implementation of SMM Core.
 #
-# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -39,6 +39,7 @@
   InstallConfigurationTable.c
   SmramProfileRecord.c
   MemoryAttributesTable.c
+  SmiHandlerProfile.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -63,6 +64,7 @@
   TimerLib
   HobLib
   SmmMemLib
+  DxeServicesLib
 
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -78,12 +80,22 @@
   gEdkiiSmmLegacyBootProtocolGuid               ## SOMETIMES_PRODUCES
   gEdkiiSmmReadyToBootProtocolGuid              ## PRODUCES
 
+  gEfiSmmSwDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiSmmSxDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiSmmPowerButtonDispatch2ProtocolGuid       ## SOMETIMES_CONSUMES
+  gEfiSmmStandbyButtonDispatch2ProtocolGuid     ## SOMETIMES_CONSUMES
+  gEfiSmmPeriodicTimerDispatch2ProtocolGuid     ## SOMETIMES_CONSUMES
+  gEfiSmmGpiDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiSmmIoTrapDispatch2ProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiSmmUsbDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable        ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType             ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileDriverPath             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmiHandlerProfilePropertyMask       ## CONSUMES
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
@@ -100,6 +112,9 @@
   gEdkiiPiSmmMemoryAttributesTableGuid          ## SOMETIMES_PRODUCES   ## SystemTable
   ## SOMETIMES_CONSUMES   ## SystemTable
   gLoadFixedAddressConfigurationTableGuid
+  ## SOMETIMES_PRODUCES   ## GUID # Install protocol
+  ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
+  gSmiHandlerProfileGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PiSmmCoreExtra.uni

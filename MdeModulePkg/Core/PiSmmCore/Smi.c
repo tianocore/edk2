@@ -1,7 +1,7 @@
 /** @file
   SMI management.
 
-  Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -14,31 +14,14 @@
 
 #include "PiSmmCore.h"
 
-//
-// SMM_HANDLER - used for each SMM handler
-//
-
-#define SMI_ENTRY_SIGNATURE  SIGNATURE_32('s','m','i','e')
-
- typedef struct {
-  UINTN       Signature;
-  LIST_ENTRY  AllEntries;  // All entries
-
-  EFI_GUID    HandlerType; // Type of interrupt
-  LIST_ENTRY  SmiHandlers; // All handlers
-} SMI_ENTRY;
-
-#define SMI_HANDLER_SIGNATURE  SIGNATURE_32('s','m','i','h')
-
- typedef struct {
-  UINTN                         Signature;
-  LIST_ENTRY                    Link;        // Link on SMI_ENTRY.SmiHandlers
-  EFI_SMM_HANDLER_ENTRY_POINT2  Handler;     // The smm handler's entry point
-  SMI_ENTRY                     *SmiEntry;
-} SMI_HANDLER;
-
-LIST_ENTRY  mRootSmiHandlerList = INITIALIZE_LIST_HEAD_VARIABLE (mRootSmiHandlerList);
 LIST_ENTRY  mSmiEntryList       = INITIALIZE_LIST_HEAD_VARIABLE (mSmiEntryList);
+
+SMI_ENTRY   mRootSmiEntry = {
+  SMI_ENTRY_SIGNATURE,
+  INITIALIZE_LIST_HEAD_VARIABLE (mRootSmiEntry.AllEntries),
+  {0},
+  INITIALIZE_LIST_HEAD_VARIABLE (mRootSmiEntry.SmiHandlers),
+};
 
 /**
   Finds the SMI entry for the requested handler type.
@@ -137,8 +120,7 @@ SmiManage (
     //
     // Root SMI handler
     //
-
-    Head = &mRootSmiHandlerList;
+    SmiEntry = &mRootSmiEntry;
   } else {
     //
     // Non-root SMI handler
@@ -150,9 +132,8 @@ SmiManage (
       //
       return Status;
     }
-
-    Head = &SmiEntry->SmiHandlers;
   }
+  Head = &SmiEntry->SmiHandlers;
 
   for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
     SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
@@ -252,13 +233,13 @@ SmiHandlerRegister (
 
   SmiHandler->Signature = SMI_HANDLER_SIGNATURE;
   SmiHandler->Handler = Handler;
+  SmiHandler->CallerAddr = (UINTN)RETURN_ADDRESS (0);
 
   if (HandlerType == NULL) {
     //
     // This is root SMI handler
     //
-    SmiEntry = NULL;
-    List = &mRootSmiHandlerList;
+    SmiEntry = &mRootSmiEntry;
   } else {
     //
     // None root SMI handler
@@ -267,9 +248,8 @@ SmiHandlerRegister (
     if (SmiEntry == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-
-    List = &SmiEntry->SmiHandlers;
   }
+  List = &SmiEntry->SmiHandlers;
 
   SmiHandler->SmiEntry = SmiEntry;
   InsertTailList (List, &SmiHandler->Link);

@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by SmmCore module.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -38,6 +38,7 @@
 #include <Guid/EventLegacyBios.h>
 #include <Guid/MemoryProfile.h>
 #include <Guid/LoadModuleAtFixedAddress.h>
+#include <Guid/SmiHandlerProfile.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -68,6 +69,32 @@ typedef struct {
   EFI_HANDLE                    DispatchHandle;
   BOOLEAN                       UnRegister;
 } SMM_CORE_SMI_HANDLERS;
+
+//
+// SMM_HANDLER - used for each SMM handler
+//
+
+#define SMI_ENTRY_SIGNATURE  SIGNATURE_32('s','m','i','e')
+
+ typedef struct {
+  UINTN       Signature;
+  LIST_ENTRY  AllEntries;  // All entries
+
+  EFI_GUID    HandlerType; // Type of interrupt
+  LIST_ENTRY  SmiHandlers; // All handlers
+} SMI_ENTRY;
+
+#define SMI_HANDLER_SIGNATURE  SIGNATURE_32('s','m','i','h')
+
+ typedef struct {
+  UINTN                         Signature;
+  LIST_ENTRY                    Link;        // Link on SMI_ENTRY.SmiHandlers
+  EFI_SMM_HANDLER_ENTRY_POINT2  Handler;     // The smm handler's entry point
+  UINTN                         CallerAddr;  // The address of caller who register the SMI handler.
+  SMI_ENTRY                     *SmiEntry;
+  VOID                          *Context;    // for profile
+  UINTN                         ContextSize; // for profile
+} SMI_HANDLER;
 
 //
 // Structure for recording the state of an SMM Driver
@@ -1062,6 +1089,66 @@ SmmCoreGetMemoryMap (
   OUT UINTN                     *MapKey,
   OUT UINTN                     *DescriptorSize,
   OUT UINT32                    *DescriptorVersion
+  );
+
+/**
+  Initialize SmiHandler profile feature.
+**/
+VOID
+SmmCoreInitializeSmiHandlerProfile (
+  VOID
+  );
+
+/**
+  This function is called by SmmChildDispatcher module to report
+  a new SMI handler is registered, to SmmCore.
+
+  @param This            The protocol instance
+  @param HandlerGuid     The GUID to identify the type of the handler.
+                         For the SmmChildDispatch protocol, the HandlerGuid
+                         must be the GUID of SmmChildDispatch protocol.
+  @param Handler         The SMI handler.
+  @param CallerAddress   The address of the module who registers the SMI handler.
+  @param Context         The context of the SMI handler.
+                         For the SmmChildDispatch protocol, the Context
+                         must match the one defined for SmmChildDispatch protocol.
+  @param ContextSize     The size of the context in bytes.
+                         For the SmmChildDispatch protocol, the Context
+                         must match the one defined for SmmChildDispatch protocol.
+
+  @retval EFI_SUCCESS           The information is recorded.
+  @retval EFI_OUT_OF_RESOURCES  There is no enough resource to record the information.
+**/
+EFI_STATUS
+EFIAPI
+SmiHandlerProfileRegisterHandler (
+  IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
+  IN EFI_GUID                       *HandlerGuid,
+  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
+  IN PHYSICAL_ADDRESS               CallerAddress,
+  IN VOID                           *Context, OPTIONAL
+  IN UINTN                          ContextSize OPTIONAL
+  );
+
+/**
+  This function is called by SmmChildDispatcher module to report
+  an existing SMI handler is unregistered, to SmmCore.
+
+  @param This            The protocol instance
+  @param HandlerGuid     The GUID to identify the type of the handler.
+                         For the SmmChildDispatch protocol, the HandlerGuid
+                         must be the GUID of SmmChildDispatch protocol.
+  @param Handler         The SMI handler.
+
+  @retval EFI_SUCCESS           The original record is removed.
+  @retval EFI_NOT_FOUND         There is no record for the HandlerGuid and handler.
+**/
+EFI_STATUS
+EFIAPI
+SmiHandlerProfileUnregisterHandler (
+  IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
+  IN EFI_GUID                       *HandlerGuid,
+  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler
   );
 
 ///
