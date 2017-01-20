@@ -553,12 +553,10 @@ ArmConfigureMmu (
   )
 {
   VOID*                         TranslationTable;
-  VOID*                         TranslationTableBuffer;
   UINT32                        TranslationTableAttribute;
   UINT64                        MaxAddress;
   UINTN                         T0SZ;
   UINTN                         RootTableEntryCount;
-  UINTN                         RootTableEntrySize;
   UINT64                        TCR;
   RETURN_STATUS                 Status;
 
@@ -643,19 +641,8 @@ ArmConfigureMmu (
   // Set TCR
   ArmSetTCR (TCR);
 
-  // Allocate pages for translation table. Pool allocations are 8 byte aligned,
-  // but we may require a higher alignment based on the size of the root table.
-  RootTableEntrySize = RootTableEntryCount * sizeof(UINT64);
-  if (RootTableEntrySize < EFI_PAGE_SIZE / 2) {
-    TranslationTableBuffer = AllocatePool (2 * RootTableEntrySize - 8);
-    //
-    // Naturally align the root table. Preserves possible NULL value
-    //
-    TranslationTable = (VOID *)((UINTN)(TranslationTableBuffer - 1) | (RootTableEntrySize - 1)) + 1;
-  } else {
-    TranslationTable = AllocatePages (1);
-    TranslationTableBuffer = NULL;
-  }
+  // Allocate pages for translation table
+  TranslationTable = AllocatePages (1);
   if (TranslationTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
@@ -669,10 +656,10 @@ ArmConfigureMmu (
   }
 
   if (TranslationTableSize != NULL) {
-    *TranslationTableSize = RootTableEntrySize;
+    *TranslationTableSize = RootTableEntryCount * sizeof(UINT64);
   }
 
-  ZeroMem (TranslationTable, RootTableEntrySize);
+  ZeroMem (TranslationTable, RootTableEntryCount * sizeof(UINT64));
 
   // Disable MMU and caches. ArmDisableMmu() also invalidates the TLBs
   ArmDisableMmu ();
@@ -689,7 +676,7 @@ ArmConfigureMmu (
     DEBUG_CODE_BEGIN ();
       // Find the memory attribute for the Translation Table
       if ((UINTN)TranslationTable >= MemoryTable->PhysicalBase &&
-          (UINTN)TranslationTable + RootTableEntrySize <= MemoryTable->PhysicalBase +
+          (UINTN)TranslationTable + EFI_PAGE_SIZE <= MemoryTable->PhysicalBase +
                                                           MemoryTable->Length) {
         TranslationTableAttribute = MemoryTable->Attributes;
       }
@@ -718,11 +705,7 @@ ArmConfigureMmu (
   return RETURN_SUCCESS;
 
 FREE_TRANSLATION_TABLE:
-  if (TranslationTableBuffer != NULL) {
-    FreePool (TranslationTableBuffer);
-  } else {
-    FreePages (TranslationTable, 1);
-  }
+  FreePages (TranslationTable, 1);
   return Status;
 }
 
