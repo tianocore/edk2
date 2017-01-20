@@ -71,6 +71,22 @@ TZPCClearDecProtBits (
 #define TZASC_REGION_SECURITY_NSW   1
 #define TZASC_REGION_SECURITY_NSRW  (TZASC_REGION_SECURITY_NSR|TZASC_REGION_SECURITY_NSW)
 
+/* Some useful masks */
+#define TZASC_REGION_SETUP_LO_ADDR_MASK   0xFFFF8000
+
+#define TZASC_REGION_ATTR_SECURITY_MASK   0xF
+#define TZASC_REGION_ATTR_SUBREG_DIS_MASK 0xFF
+#define TZASC_REGION_ATTR_SIZE_MASK       0x3F
+#define TZASC_REGION_ATTR_EN_MASK         0x1
+
+#define TZASC_REGION_SETUP_LO_ADDR(x)  ((x) & TZASC_REGION_SETUP_LO_ADDR_MASK)
+
+#define TZASC_REGION_ATTR_SECURITY(x)  (((x) & TZASC_REGION_ATTR_SECURITY_MASK) << 28)
+#define TZASC_REGION_ATTR_SUBREG_DISABLE(x) \
+                                       (((x) & TZASC_REGION_ATTR_SUBREG_DIS_MASK) << 8)
+#define TZASC_REGION_ATTR_SIZE(x)      (((x) & TZASC_REGION_ATTR_SIZE_MASK) << 1)
+#define TZASC_REGION_ATTR_ENABLE(x)    ((x) & TZASC_REGION_ATTR_EN_MASK)
+
 /**
     FIXME: Need documentation
 **/
@@ -82,7 +98,8 @@ TZASCSetRegion (
   IN  UINTN LowAddress,
   IN  UINTN HighAddress,
   IN  UINTN Size,
-  IN  UINTN Security
+  IN  UINTN Security,
+  IN  UINTN SubregionDisableMask
   );
 
 #endif

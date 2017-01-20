@@ -87,20 +87,27 @@ TZASCSetRegion (
   IN  UINTN LowAddress,
   IN  UINTN HighAddress,
   IN  UINTN Size,
-  IN  UINTN Security
+  IN  UINTN Security,
+  IN  UINTN SubregionDisableMask
   )
 {
   UINT32*     Region;
+  UINT32      RegionAttributes;
 
   if (RegionId > TZASCGetNumRegions(TzascBase)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  RegionAttributes = TZASC_REGION_ATTR_SECURITY(Security) |
+                     TZASC_REGION_ATTR_SUBREG_DISABLE(SubregionDisableMask) |
+                     TZASC_REGION_ATTR_SIZE(Size) |
+                     TZASC_REGION_ATTR_ENABLE(Enabled);
+
   Region = (UINT32*)((UINTN)TzascBase + TZASC_REGIONS_REG + (RegionId * 0x10));
 
-  MmioWrite32((UINTN)(Region), LowAddress&0xFFFF8000);
+  MmioWrite32((UINTN)(Region), TZASC_REGION_SETUP_LO_ADDR(LowAddress));
   MmioWrite32((UINTN)(Region+1), HighAddress);
-  MmioWrite32((UINTN)(Region+2), ((Security & 0xF) <<28) | ((Size & 0x3F) << 1) | (Enabled & 0x1));
+  MmioWrite32((UINTN)(Region+2), RegionAttributes);
 
   return EFI_SUCCESS;
 }
