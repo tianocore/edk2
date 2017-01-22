@@ -1,7 +1,7 @@
 /*++ @file
 Vfr Syntax
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,8 +33,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "AToken.h"
 
 #define GET_LINENO(Obj)       ((Obj)->getLine())
-#define SET_LINE_INFO(Obj, L) {(Obj).SetLineNo((L)->getLine());} while (0)
-#define CRT_END_OP(Obj)       {CIfrEnd EObj; if (Obj != NULL) EObj.SetLineNo ((Obj)->getLine());} while (0)
+#define SET_LINE_INFO(Obj, L) do {(Obj).SetLineNo((L)->getLine());} while (0)
+#define CRT_END_OP(Obj)       do {CIfrEnd EObj; if (Obj != NULL) EObj.SetLineNo ((Obj)->getLine());} while (0)
 
 typedef ANTLRCommonToken ANTLRToken;
 
