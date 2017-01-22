@@ -611,6 +611,7 @@ typedef enum {
   ProcessorFamilyAmdOpteronX2000Series  = 0x68,
   ProcessorFamilyAmdOpteronASeries      = 0x69,
   ProcessorFamilyAmdOpteronX3000Series  = 0x6A,
+  ProcessorFamilyAmdZen                 = 0x6B,
   ProcessorFamilyHobbit                 = 0x70,
   ProcessorFamilyCrusoeTM5000           = 0x78,
   ProcessorFamilyCrusoeTM3000           = 0x79,
@@ -804,7 +805,8 @@ typedef enum {
   ProcessorUpgradeSocketBGA1440   = 0x34,
   ProcessorUpgradeSocketBGA1515   = 0x35,
   ProcessorUpgradeSocketLGA3647_1 = 0x36,
-  ProcessorUpgradeSocketSP3       = 0x37
+  ProcessorUpgradeSocketSP3       = 0x37,
+  ProcessorUpgradeSocketSP3r2     = 0x38
 } PROCESSOR_UPGRADE;
 
 ///
@@ -2386,6 +2388,25 @@ typedef struct {
 } SMBIOS_TABLE_TYPE41;
 
 ///
+/// Management Controller Host Interface - Interface Types.
+/// 00h - 3Fh: MCTP Host Interfaces
+///
+typedef enum{
+  MCHostInterfaceTypeNetworkHostInterface       = 0x40,
+  MCHostInterfaceTypeOemDefined                 = 0xF0
+} MC_HOST_INTERFACE_TYPE;
+
+///
+/// Management Controller Host Interface - Protocol Types.
+///
+typedef enum{
+  MCHostInterfaceProtocolTypeIPMI               = 0x02,
+  MCHostInterfaceProtocolTypeMCTP               = 0x03,
+  MCHostInterfaceProtocolTypeRedfishOverIP      = 0x04,
+  MCHostInterfaceProtocolTypeOemDefined         = 0xF0
+} MC_HOST_INTERFACE_PROTOCOL_TYPE;
+
+///
 /// Management Controller Host Interface (Type 42).
 ///
 /// The information in this structure defines the attributes of a Management
@@ -2404,7 +2425,7 @@ typedef struct {
 ///
 typedef struct {
   SMBIOS_STRUCTURE                  Hdr;
-  UINT8                             InterfaceType;
+  UINT8                             InterfaceType;          ///< The enumeration value from MC_HOST_INTERFACE_TYPE
   UINT8                             MCHostInterfaceData[1]; ///< This field has a minimum of four bytes
 } SMBIOS_TABLE_TYPE42;
 
