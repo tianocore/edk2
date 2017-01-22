@@ -249,6 +249,7 @@ EfiHttpRequest (
   HTTP_TOKEN_WRAP               *Wrap;
   CHAR8                         *FileUrl;
   UINTN                         RequestMsgSize;
+  EFI_HANDLE                    ImageHandle;
 
   //
   // Initializations
@@ -371,8 +372,14 @@ EfiHttpRequest (
       //
       // Use TlsSb to create Tls child and open the TLS protocol.
       //
+      if (HttpInstance->LocalAddressIsIPv6) {
+        ImageHandle = HttpInstance->Service->Ip6DriverBindingHandle;
+      } else {
+        ImageHandle = HttpInstance->Service->Ip4DriverBindingHandle;
+      }
+
       HttpInstance->TlsChildHandle = TlsCreateChild (
-                                       HttpInstance->Service->ImageHandle,
+                                       ImageHandle,
                                        &(HttpInstance->Tls),
                                        &(HttpInstance->TlsConfiguration)
                                        );

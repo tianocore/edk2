@@ -642,7 +642,7 @@ HttpInitProtocol (
     //
     Status = NetLibCreateServiceChild (
                HttpInstance->Service->ControllerHandle,
-               HttpInstance->Service->ImageHandle,
+               HttpInstance->Service->Ip4DriverBindingHandle,
                &gEfiTcp4ServiceBindingProtocolGuid,
                &HttpInstance->Tcp4ChildHandle
                );
@@ -655,7 +655,7 @@ HttpInitProtocol (
                     HttpInstance->Tcp4ChildHandle,
                     &gEfiTcp4ProtocolGuid,
                     (VOID **) &Interface,
-                    HttpInstance->Service->ImageHandle,
+                    HttpInstance->Service->Ip4DriverBindingHandle,
                     HttpInstance->Service->ControllerHandle,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
                     );
@@ -668,7 +668,7 @@ HttpInitProtocol (
                     HttpInstance->Tcp4ChildHandle,
                     &gEfiTcp4ProtocolGuid,
                     (VOID **) &HttpInstance->Tcp4,
-                    HttpInstance->Service->ImageHandle,
+                    HttpInstance->Service->Ip4DriverBindingHandle,
                     HttpInstance->Handle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
@@ -680,7 +680,7 @@ HttpInitProtocol (
                     HttpInstance->Service->Tcp4ChildHandle,
                     &gEfiTcp4ProtocolGuid,
                     (VOID **) &Interface,
-                    HttpInstance->Service->ImageHandle,
+                    HttpInstance->Service->Ip4DriverBindingHandle,
                     HttpInstance->Handle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
@@ -693,7 +693,7 @@ HttpInitProtocol (
     //
     Status = NetLibCreateServiceChild (
                HttpInstance->Service->ControllerHandle,
-               HttpInstance->Service->ImageHandle,
+               HttpInstance->Service->Ip6DriverBindingHandle,
                &gEfiTcp6ServiceBindingProtocolGuid,
                &HttpInstance->Tcp6ChildHandle
                );
@@ -706,7 +706,7 @@ HttpInitProtocol (
                     HttpInstance->Tcp6ChildHandle,
                     &gEfiTcp6ProtocolGuid,
                     (VOID **) &Interface,
-                    HttpInstance->Service->ImageHandle,
+                    HttpInstance->Service->Ip6DriverBindingHandle,
                     HttpInstance->Service->ControllerHandle,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
                     );
@@ -719,7 +719,7 @@ HttpInitProtocol (
                     HttpInstance->Tcp6ChildHandle,
                     &gEfiTcp6ProtocolGuid,
                     (VOID **) &HttpInstance->Tcp6,
-                    HttpInstance->Service->ImageHandle,
+                    HttpInstance->Service->Ip6DriverBindingHandle,
                     HttpInstance->Handle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
@@ -732,7 +732,7 @@ HttpInitProtocol (
                     HttpInstance->Service->Tcp6ChildHandle,
                     &gEfiTcp6ProtocolGuid,
                     (VOID **) &Interface,
-                    HttpInstance->Service->ImageHandle,
+                    HttpInstance->Service->Ip6DriverBindingHandle,
                     HttpInstance->Handle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
@@ -756,20 +756,20 @@ ON_ERROR:
     gBS->CloseProtocol (
            HttpInstance->Tcp4ChildHandle,
            &gEfiTcp4ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip4DriverBindingHandle,
            HttpInstance->Service->ControllerHandle
            );
 
     gBS->CloseProtocol (
            HttpInstance->Tcp4ChildHandle,
            &gEfiTcp4ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip4DriverBindingHandle,
            HttpInstance->Handle
            );    
     
     NetLibDestroyServiceChild (
       HttpInstance->Service->ControllerHandle,
-      HttpInstance->Service->ImageHandle,
+      HttpInstance->Service->Ip4DriverBindingHandle,
       &gEfiTcp4ServiceBindingProtocolGuid,
       HttpInstance->Tcp4ChildHandle
       );
@@ -779,7 +779,7 @@ ON_ERROR:
     gBS->CloseProtocol (
            HttpInstance->Service->Tcp4ChildHandle,
            &gEfiTcp4ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip4DriverBindingHandle,
            HttpInstance->Handle
            );
   }
@@ -788,20 +788,20 @@ ON_ERROR:
     gBS->CloseProtocol (
            HttpInstance->Tcp6ChildHandle,
            &gEfiTcp6ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip6DriverBindingHandle,
            HttpInstance->Service->ControllerHandle
            );
 
     gBS->CloseProtocol (
            HttpInstance->Tcp6ChildHandle,
            &gEfiTcp6ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip6DriverBindingHandle,
            HttpInstance->Handle
            );
     
     NetLibDestroyServiceChild (
       HttpInstance->Service->ControllerHandle,
-      HttpInstance->Service->ImageHandle,
+      HttpInstance->Service->Ip6DriverBindingHandle,
       &gEfiTcp6ServiceBindingProtocolGuid,
       HttpInstance->Tcp6ChildHandle
       );
@@ -811,7 +811,7 @@ ON_ERROR:
     gBS->CloseProtocol (
            HttpInstance->Service->Tcp6ChildHandle,
            &gEfiTcp6ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip6DriverBindingHandle,
            HttpInstance->Handle
            );
   }
@@ -868,20 +868,20 @@ HttpCleanProtocol (
     gBS->CloseProtocol (
            HttpInstance->Tcp4ChildHandle,
            &gEfiTcp4ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip4DriverBindingHandle,
            HttpInstance->Service->ControllerHandle
            );
 
     gBS->CloseProtocol (
            HttpInstance->Tcp4ChildHandle,
            &gEfiTcp4ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip4DriverBindingHandle,
            HttpInstance->Handle
            );
     
     NetLibDestroyServiceChild (
       HttpInstance->Service->ControllerHandle,
-      HttpInstance->Service->ImageHandle,
+      HttpInstance->Service->Ip4DriverBindingHandle,
       &gEfiTcp4ServiceBindingProtocolGuid,
       HttpInstance->Tcp4ChildHandle
       );
@@ -891,7 +891,7 @@ HttpCleanProtocol (
     gBS->CloseProtocol (
            HttpInstance->Service->Tcp4ChildHandle,
            &gEfiTcp4ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip4DriverBindingHandle,
            HttpInstance->Handle
            );
   }  
@@ -900,20 +900,20 @@ HttpCleanProtocol (
     gBS->CloseProtocol (
            HttpInstance->Tcp6ChildHandle,
            &gEfiTcp6ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip6DriverBindingHandle,
            HttpInstance->Service->ControllerHandle
            );
 
     gBS->CloseProtocol (
            HttpInstance->Tcp6ChildHandle,
            &gEfiTcp6ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip6DriverBindingHandle,
            HttpInstance->Handle
            );
     
     NetLibDestroyServiceChild (
       HttpInstance->Service->ControllerHandle,
-      HttpInstance->Service->ImageHandle,
+      HttpInstance->Service->Ip6DriverBindingHandle,
       &gEfiTcp6ServiceBindingProtocolGuid,
       HttpInstance->Tcp6ChildHandle
       );
@@ -923,7 +923,7 @@ HttpCleanProtocol (
     gBS->CloseProtocol (
            HttpInstance->Service->Tcp6ChildHandle,
            &gEfiTcp6ProtocolGuid,
-           HttpInstance->Service->ImageHandle,
+           HttpInstance->Service->Ip6DriverBindingHandle,
            HttpInstance->Handle
            );
   }

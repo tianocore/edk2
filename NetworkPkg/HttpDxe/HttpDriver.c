@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for HttpDxe driver.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -45,7 +45,6 @@ EFI_DRIVER_BINDING_PROTOCOL gHttpDxeIp6DriverBinding = {
 
   @param[in]  Controller         The controller that has TCP4 service binding
                                  installed.
-  @param[in]  ImageHandle        The HTTP driver's image handle.
   @param[out] ServiceData        Point to HTTP driver private instance.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
@@ -55,7 +54,6 @@ EFI_DRIVER_BINDING_PROTOCOL gHttpDxeIp6DriverBinding = {
 EFI_STATUS
 HttpCreateService (
   IN  EFI_HANDLE            Controller,
-  IN  EFI_HANDLE            ImageHandle,
   OUT HTTP_SERVICE          **ServiceData
   )
 {
@@ -72,7 +70,6 @@ HttpCreateService (
   HttpService->Signature = HTTP_SERVICE_SIGNATURE;
   HttpService->ServiceBinding.CreateChild = HttpServiceBindingCreateChild;
   HttpService->ServiceBinding.DestroyChild = HttpServiceBindingDestroyChild;
-  HttpService->ImageHandle = ImageHandle;
   HttpService->ControllerHandle = Controller;
   HttpService->ChildrenNumber = 0;
   InitializeListHead (&HttpService->ChildrenList);
@@ -104,13 +101,13 @@ HttpCleanService (
       gBS->CloseProtocol (
              HttpService->Tcp4ChildHandle,
              &gEfiTcp4ProtocolGuid,
-             HttpService->ImageHandle,
+             HttpService->Ip4DriverBindingHandle,
              HttpService->ControllerHandle
              );
     
       NetLibDestroyServiceChild (
         HttpService->ControllerHandle,
-        HttpService->ImageHandle,
+        HttpService->Ip4DriverBindingHandle,
         &gEfiTcp4ServiceBindingProtocolGuid,
         HttpService->Tcp4ChildHandle
         );
@@ -122,13 +119,13 @@ HttpCleanService (
       gBS->CloseProtocol (
              HttpService->Tcp6ChildHandle,
              &gEfiTcp6ProtocolGuid,
-             HttpService->ImageHandle,
+             HttpService->Ip6DriverBindingHandle,
              HttpService->ControllerHandle
              );
     
       NetLibDestroyServiceChild (
         HttpService->ControllerHandle,
-        HttpService->ImageHandle,
+        HttpService->Ip6DriverBindingHandle,
         &gEfiTcp6ServiceBindingProtocolGuid,
         HttpService->Tcp6ChildHandle
         );
@@ -382,7 +379,7 @@ HttpDxeStart (
   if (!EFI_ERROR (Status)) {
     HttpService = HTTP_SERVICE_FROM_PROTOCOL (ServiceBinding);
   } else {
-    Status = HttpCreateService (ControllerHandle, This->DriverBindingHandle, &HttpService);
+    Status = HttpCreateService (ControllerHandle, &HttpService);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -405,7 +402,8 @@ HttpDxeStart (
   }
 
   if (IpVersion == IP_VERSION_4) {
-    
+    HttpService->Ip4DriverBindingHandle = This->DriverBindingHandle;
+
     if (HttpService->Tcp4ChildHandle == NULL) {
       //
       // Create a TCP4 child instance, but do not configure it. This will establish the parent-child relationship.
@@ -440,7 +438,8 @@ HttpDxeStart (
 
   } else {
     UsingIpv6 = TRUE;
-    
+    HttpService->Ip6DriverBindingHandle = This->DriverBindingHandle;
+
     if (HttpService->Tcp6ChildHandle == NULL) {
       //
       // Create a TCP6 child instance, but do not configure it. This will establish the parent-child relationship.

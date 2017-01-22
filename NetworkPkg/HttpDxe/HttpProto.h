@@ -1,7 +1,7 @@
 /** @file
   The header files of miscellaneous routines for HttpDxe driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -59,7 +59,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _HTTP_SERVICE {
   UINT32                        Signature;
   EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
-  EFI_HANDLE                    ImageHandle;
+  EFI_HANDLE                    Ip4DriverBindingHandle;
+  EFI_HANDLE                    Ip6DriverBindingHandle;
   EFI_HANDLE                    ControllerHandle;
   EFI_HANDLE                    Tcp4ChildHandle;
   EFI_HANDLE                    Tcp6ChildHandle;
