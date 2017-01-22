@@ -3,7 +3,7 @@
   a TPM DXE Driver. A GUIDed HOB is generated for each measurement 
   made in the PEI Phase.
     
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -43,5 +43,16 @@ extern EFI_GUID gTcgEvent2EntryHobGuid;
   }
 
 extern EFI_GUID gTpmErrorHobGuid;
+
+///
+/// The Global ID of a GUIDed HOB used to record TPM2 Startup Locality.
+/// HOB payload is UINT8 according to Startup Locality Event.
+///
+#define EFI_TPM2_STARTUP_LOCALITY_HOB_GUID \
+  { \
+    0xef598499, 0xb25e, 0x473a, { 0xbf, 0xaf, 0xe7, 0xe5, 0x7d, 0xce, 0x82, 0xc4 } \
+  }
+
+extern EFI_GUID gTpm2StartupLocalityHobGuid;
 
 #endif

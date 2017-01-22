@@ -1381,11 +1381,12 @@ SetupEventLog (
   UINT32                          HashAlgorithmMaskCopied;
   TCG_EfiSpecIDEventStruct        *TcgEfiSpecIdEventStruct;
   UINT8                           TempBuf[sizeof(TCG_EfiSpecIDEventStruct) + sizeof(UINT32) + (HASH_COUNT * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8)];
-  TCG_PCR_EVENT_HDR               FirstPcrEvent;
+  TCG_PCR_EVENT_HDR               NoActionEvent;
   TCG_EfiSpecIdEventAlgorithmSize *DigestSize;
   TCG_EfiSpecIdEventAlgorithmSize *TempDigestSize;
   UINT8                           *VendorInfoSize;
   UINT32                          NumberOfAlgorithms;
+  TCG_EfiStartupLocalityEvent     StartupLocalityEvent;
 
   DEBUG ((EFI_D_INFO, "SetupEventLog\n"));
 
@@ -1468,24 +1469,53 @@ SetupEventLog (
         VendorInfoSize = (UINT8 *)TempDigestSize;
         *VendorInfoSize = 0;
 
-        //
-        // FirstPcrEvent
-        //
-        FirstPcrEvent.PCRIndex = 0;
-        FirstPcrEvent.EventType = EV_NO_ACTION;
-        ZeroMem (&FirstPcrEvent.Digest, sizeof(FirstPcrEvent.Digest));
-        FirstPcrEvent.EventSize = (UINT32)GetTcgEfiSpecIdEventStructSize (TcgEfiSpecIdEventStruct);
+        NoActionEvent.PCRIndex = 0;
+        NoActionEvent.EventType = EV_NO_ACTION;
+        ZeroMem (&NoActionEvent.Digest, sizeof(NoActionEvent.Digest));
+        NoActionEvent.EventSize = (UINT32)GetTcgEfiSpecIdEventStructSize (TcgEfiSpecIdEventStruct);
 
         //
-        // Record
+        // Log TcgEfiSpecIdEventStruct as the first Event
+        //   TCG PC Client PFP spec. Section 9.2 Measurement Event Entries and Log
         //
         Status = TcgDxeLogEvent (
                    mTcg2EventInfo[Index].LogFormat,
-                   &FirstPcrEvent,
-                   sizeof(FirstPcrEvent),
+                   &NoActionEvent,
+                   sizeof(NoActionEvent),
                    (UINT8 *)TcgEfiSpecIdEventStruct,
-                   FirstPcrEvent.EventSize
+                   NoActionEvent.EventSize
                    );
+
+        //
+        // EfiStartupLocalityEvent
+        //
+        GuidHob.Guid = GetFirstGuidHob (&gTpm2StartupLocalityHobGuid);
+        if (GuidHob.Guid != NULL) {
+          //
+          // Get Locality Indicator from StartupLocality HOB
+          //
+          StartupLocalityEvent.StartupLocality = *(UINT8 *)(GET_GUID_HOB_DATA (GuidHob.Guid));
+          CopyMem (StartupLocalityEvent.Signature, TCG_EfiStartupLocalityEvent_SIGNATURE, sizeof(StartupLocalityEvent.Signature));
+
+          NoActionEvent.PCRIndex = 0;
+          NoActionEvent.EventType = EV_NO_ACTION;
+          ZeroMem (&NoActionEvent.Digest, sizeof(NoActionEvent.Digest));
+          NoActionEvent.EventSize = sizeof(StartupLocalityEvent);
+
+          DEBUG ((DEBUG_INFO, "SetupEventLog: Set Locality from HOB into StartupLocalityEvent 0x%02x\n", StartupLocalityEvent.StartupLocality));
+
+          //
+          // Log EfiStartupLocalityEvent as the second Event
+          //   TCG PC Client PFP spec. Section 9.3.4.3 Startup Locality Event
+          //
+          Status = TcgDxeLogEvent (
+                     mTcg2EventInfo[Index].LogFormat,
+                     &NoActionEvent,
+                     sizeof(NoActionEvent),
+                     (UINT8 *)&StartupLocalityEvent,
+                     NoActionEvent.EventSize
+                     );
+        }
       }
     }
   }
