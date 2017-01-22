@@ -1106,7 +1106,7 @@ SmbiosPrintStructure (
   // Management Controller Host Interface (Type 42)
   //
   case 42:
-    PRINT_STRUCT_VALUE_H (Struct, Type42, InterfaceType);
+    DisplayMCHostInterfaceType (Struct->Type42->InterfaceType, Option);
     break;
 
   //
@@ -1816,6 +1816,10 @@ DisplayProcessorFamily (
 
   case 0x6A:
     Print (L"AMD Opteron(TM) X3000 Series APU\n");
+    break;
+
+  case 0x6B:
+    Print (L"AMD Zen Processor Family\n");
     break;
 
   case 0x70:

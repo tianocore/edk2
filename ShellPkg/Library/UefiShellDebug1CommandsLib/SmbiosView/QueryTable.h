@@ -2,7 +2,7 @@
   Build a table, each item is (key, info) pair.
   and give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -775,6 +775,18 @@ DisplayMemoryChannelType (
 **/
 VOID
 DisplayIPMIDIBMCInterfaceType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  );
+
+/**
+  Display Management Controller Host Interface (Type 42) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMCHostInterfaceType (
   IN UINT8 Key,
   IN UINT8 Option
   );

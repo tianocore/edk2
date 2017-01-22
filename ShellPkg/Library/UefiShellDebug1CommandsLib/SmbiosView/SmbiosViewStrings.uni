@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
@@ -444,6 +444,7 @@
 #string STR_SMBIOSVIEW_QUERYTABLE_MANAGEMENT_DEV_ADDR_TYPE      #language en-US "Management Device - Address Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_CHANNEL_TYPE              #language en-US "Memory Channel Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_BMC_INTERFACE_TYPE            #language en-US "BMC Interface Type:"
+#string STR_SMBIOSVIEW_QUERYTABLE_MC_HOST_INTERFACE_TYPE        #language en-US "MC Host Interface Type:"
 #string STR_SMBIOSVIEW_QUERYTABLE_STRUCT_TYPE                   #language en-US "Structure Type:"
 #string STR_SMBIOSVIEW_SMBIOSVIEW_ONE_VAR_ARGV                  #language en-US "%s "
 #string STR_SMBIOSVIEW_SMBIOSVIEW_QUERY_STRUCT_COND             #language en-US "Query Structure, conditions are:\r\n"

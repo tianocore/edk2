@@ -575,6 +575,10 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x37,
     L"Socket SP3"
+  },
+  {
+    0x38,
+    L"Socket SP3r2"
   }
 };
 
@@ -3156,6 +3160,22 @@ TABLE_ITEM  IPMIDIBMCInterfaceTypeTable[] = {
   },
 };
 
+TABLE_ITEM  MCHostInterfaceTypeTable[] = {
+  {
+    0x3F00,
+    L" MCTP Host Interface "
+  },
+  {
+    0x40,
+    L" Network Host Interface "
+  },
+  {
+    0xF0,
+    L" OEM defined "
+  },
+};
+
+
 TABLE_ITEM  StructureTypeInfoTable[] = {
   {
     0,
@@ -4522,6 +4542,23 @@ DisplayIPMIDIBMCInterfaceType (
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_BMC_INTERFACE_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
   PRINT_TABLE_ITEM (IPMIDIBMCInterfaceTypeTable, Key);
+}
+
+/**
+  Display Management Controller Host Interface (Type 42) information.
+
+  @param[in] Key      The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMCHostInterfaceType (
+  IN UINT8 Key,
+  IN UINT8 Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MC_HOST_INTERFACE_TYPE), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Key, Option);
+  PRINT_TABLE_ITEM (MCHostInterfaceTypeTable, Key);
 }
 
 /**
