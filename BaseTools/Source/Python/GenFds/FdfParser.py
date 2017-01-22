@@ -620,27 +620,46 @@ class FdfParser:
     def PreprocessIncludeFile(self):
 	    # nested include support
         Processed = False
+        MacroDict = {}
         while self.__GetNextToken():
 
-            if self.__Token == '!include':
+            if self.__Token == 'DEFINE':
+                if not self.__GetNextToken():
+                    raise Warning("expected Macro name", self.FileName, self.CurrentLineNumber)
+                Macro = self.__Token
+                if not self.__IsToken( "="):
+                    raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
+                Value = self.__GetExpression()
+                MacroDict[Macro] = Value
+
+            elif self.__Token == '!include':
                 Processed = True
                 IncludeLine = self.CurrentLineNumber
                 IncludeOffset = self.CurrentOffsetWithinLine - len('!include')
                 if not self.__GetNextToken():
                     raise Warning("expected include file name", self.FileName, self.CurrentLineNumber)
                 IncFileName = self.__Token
-                __IncludeMacros = {}
-                for Macro in ['WORKSPACE', 'ECP_SOURCE', 'EFI_SOURCE', 'EDK_SOURCE']:
+                PreIndex = 0
+                StartPos = IncFileName.find('$(', PreIndex)
+                EndPos = IncFileName.find(')', StartPos+2)
+                while StartPos != -1 and EndPos != -1:
+                    Macro = IncFileName[StartPos+2 : EndPos]
                     MacroVal = self.__GetMacroValue(Macro)
-                    if MacroVal:
-                        __IncludeMacros[Macro] = MacroVal
+                    if not MacroVal:
+                        if Macro in MacroDict:
+                            MacroVal = MacroDict[Macro]
+                    if MacroVal != None:
+                        IncFileName = IncFileName.replace('$(' + Macro + ')', MacroVal, 1)
+                        if MacroVal.find('$(') != -1:
+                            PreIndex = StartPos
+                        else:
+                            PreIndex = StartPos + len(MacroVal)
+                    else:
+                        raise Warning("The Macro %s is not defined" %Macro, self.FileName, self.CurrentLineNumber)
+                    StartPos = IncFileName.find('$(', PreIndex)
+                    EndPos = IncFileName.find(')', StartPos+2)
 
-                try:
-                    IncludedFile = NormPath(ReplaceMacro(IncFileName, __IncludeMacros, RaiseError=True))
-                except:
-                    raise Warning("only these system environment variables are permitted to start the path of the included file: "
-                                  "$(WORKSPACE), $(ECP_SOURCE), $(EFI_SOURCE), $(EDK_SOURCE)",
-                                  self.FileName, self.CurrentLineNumber)
+                IncludedFile = NormPath(IncFileName)
                 #
                 # First search the include file under the same directory as FDF file
                 #
