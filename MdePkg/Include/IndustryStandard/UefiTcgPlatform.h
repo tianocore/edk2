@@ -1,7 +1,7 @@
 /** @file
   TCG EFI Platform Definition in TCG_EFI_Platform_1_20_Final
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -267,6 +267,33 @@ typedef struct {
   //
 //UINT8               vendorInfo[vendorInfoSize];
 } TCG_EfiSpecIDEventStruct;
+
+
+
+#define TCG_EfiStartupLocalityEvent_SIGNATURE      "StartupLocality"
+
+
+//
+// PC Client PTP spec Table 8 Relationship between Locality and Locality Attribute
+//
+#define LOCALITY_0_INDICATOR        0x01
+#define LOCALITY_1_INDICATOR        0x02
+#define LOCALITY_2_INDICATOR        0x03
+#define LOCALITY_3_INDICATOR        0x04
+#define LOCALITY_4_INDICATOR        0x05
+
+
+//
+// Startup Locality Event
+//
+typedef struct tdTCG_EfiStartupLocalityEvent{
+  UINT8       Signature[16];
+  //
+  // The Locality Indicator which sent the TPM2_Startup command
+  //
+  UINT8       StartupLocality;
+} TCG_EfiStartupLocalityEvent;
+
 
 //
 // Restore original structure alignment
