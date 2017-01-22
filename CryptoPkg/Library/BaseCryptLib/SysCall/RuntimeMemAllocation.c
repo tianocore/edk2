@@ -2,7 +2,7 @@
   Light-weight Memory Management Routines for OpenSSL-based Crypto
   Library at Runtime Phase.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -282,7 +282,7 @@ RuntimeFreeMem (
   UINTN  StartOffset;
   UINTN  StartPageIndex;
 
-  StartOffset    = (UINTN) ((UINT8 *)Buffer - mRTPageTable->DataAreaBase);
+  StartOffset    = (UINTN)Buffer - (UINTN)mRTPageTable->DataAreaBase;
   StartPageIndex = RT_SIZE_TO_PAGES (mRTPageTable->Pages[RT_SIZE_TO_PAGES(StartOffset)].StartPageOffset);
 
   while (StartPageIndex < mRTPageTable->PageCount) {
@@ -403,7 +403,7 @@ void *realloc (void *ptr, size_t size)
   //
   // Get Original Size of ptr
   //
-  StartOffset    = (UINTN) ((UINT8 *)ptr - mRTPageTable->DataAreaBase);
+  StartOffset    = (UINTN)ptr - (UINTN)mRTPageTable->DataAreaBase;
   StartPageIndex = RT_SIZE_TO_PAGES (mRTPageTable->Pages[RT_SIZE_TO_PAGES (StartOffset)].StartPageOffset);
   PageCount      = 0;
   while (StartPageIndex < mRTPageTable->PageCount) {
