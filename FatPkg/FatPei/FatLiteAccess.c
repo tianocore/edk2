@@ -1,7 +1,7 @@
 /** @file
   FAT file system access routines for FAT recovery PEIM
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -393,7 +393,7 @@ FatReadFile (
   } else {
 
     if ((File->Attributes & FAT_ATTR_DIRECTORY) == 0) {
-      Size = Size < (File->FileSize - File->CurrentPos) ? Size : (UINTN) (File->FileSize - File->CurrentPos);
+      Size = Size < (File->FileSize - File->CurrentPos) ? Size : (File->FileSize - File->CurrentPos);
     }
     //
     // This is a normal cluster based file
