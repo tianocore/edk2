@@ -1607,10 +1607,10 @@ typedef struct {
   (sizeof (NET_BUF) + ((BlockOpNum) - 1) * sizeof (NET_BLOCK_OP))
 
 #define NET_HEADSPACE(BlockOp)  \
-  (UINTN)((BlockOp)->Head - (BlockOp)->BlockHead)
+  ((UINTN)((BlockOp)->Head) - (UINTN)((BlockOp)->BlockHead))
 
 #define NET_TAILSPACE(BlockOp)  \
-  (UINTN)((BlockOp)->BlockTail - (BlockOp)->Tail)
+  ((UINTN)((BlockOp)->BlockTail) - (UINTN)((BlockOp)->Tail))
 
 /**
   Allocate a single block NET_BUF. Upon allocation, all the

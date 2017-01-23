@@ -226,7 +226,7 @@ DxePrintLibPrint2ProtocolVaListToBaseList (
     //
     // If BASE_LIST is larger than Size, then return FALSE
     //
-    if ((UINTN)((UINT8 *)BaseListMarker - (UINT8 *)BaseListStart) > Size) {
+    if (((UINTN)BaseListMarker - (UINTN)BaseListStart) > Size) {
       DEBUG ((DEBUG_ERROR, "The input variable argument list is too long. Please consider breaking into multiple print calls.\n"));
       return FALSE;
     }

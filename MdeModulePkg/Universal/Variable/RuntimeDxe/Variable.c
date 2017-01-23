@@ -16,7 +16,7 @@
   VariableServiceSetVariable() should also check authenticate data to avoid buffer overflow,
   integer overflow. It should also check attribute to avoid authentication bypass.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1170,7 +1170,7 @@ Reclaim (
   // Install the new variable if it is not NULL.
   //
   if (NewVariable != NULL) {
-    if ((UINTN) (CurrPtr - ValidBuffer) + NewVariableSize > VariableStoreHeader->Size) {
+    if (((UINTN) CurrPtr - (UINTN) ValidBuffer) + NewVariableSize > VariableStoreHeader->Size) {
       //
       // No enough space to store the new variable.
       //
@@ -1211,8 +1211,8 @@ Reclaim (
     // If volatile variable store, just copy valid buffer.
     //
     SetMem ((UINT8 *) (UINTN) VariableBase, VariableStoreHeader->Size, 0xff);
-    CopyMem ((UINT8 *) (UINTN) VariableBase, ValidBuffer, (UINTN) (CurrPtr - ValidBuffer));
-    *LastVariableOffset = (UINTN) (CurrPtr - ValidBuffer);
+    CopyMem ((UINT8 *) (UINTN) VariableBase, ValidBuffer, (UINTN) CurrPtr - (UINTN) ValidBuffer);
+    *LastVariableOffset = (UINTN) CurrPtr - (UINTN) ValidBuffer;
     Status  = EFI_SUCCESS;
   } else {
     //
@@ -1223,7 +1223,7 @@ Reclaim (
               (VARIABLE_STORE_HEADER *) ValidBuffer
               );
     if (!EFI_ERROR (Status)) {
-      *LastVariableOffset = (UINTN) (CurrPtr - ValidBuffer);
+      *LastVariableOffset = (UINTN) CurrPtr - (UINTN) ValidBuffer;
       mVariableModuleGlobal->HwErrVariableTotalSize = HwErrVariableTotalSize;
       mVariableModuleGlobal->CommonVariableTotalSize = CommonVariableTotalSize;
       mVariableModuleGlobal->CommonUserVariableTotalSize = CommonUserVariableTotalSize;

@@ -1,7 +1,7 @@
 /** @file
   Save the S3 data to S3 boot script.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -2025,7 +2025,7 @@ S3BootScriptCalculateInsertAddress (
    // calculate the Position offset
    //
    if (Position != NULL) {
-     PositionOffset = (UINTN) ((UINT8 *)Position - S3TableBase);
+     PositionOffset = (UINTN)Position - (UINTN)S3TableBase;
 
      //
      // If the BeforeOrAfter is FALSE, that means to insert the node right after the node.

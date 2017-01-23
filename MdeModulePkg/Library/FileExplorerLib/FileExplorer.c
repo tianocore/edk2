@@ -728,7 +728,7 @@ LibAppendFileName (
       // that overlap.
       //
       StrCpyS (TmpStr, MaxLen, Ptr + 3);
-      StrCpyS (LastSlash, MaxLen - (UINTN) (LastSlash - Str), TmpStr);
+      StrCpyS (LastSlash, MaxLen - ((UINTN) LastSlash - (UINTN) Str) / sizeof (CHAR16), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
@@ -740,7 +740,7 @@ LibAppendFileName (
       // that overlap.
       //
       StrCpyS (TmpStr, MaxLen, Ptr + 2);
-      StrCpyS (Ptr, MaxLen - (UINTN) (Ptr - Str), TmpStr);
+      StrCpyS (Ptr, MaxLen - ((UINTN) Ptr - (UINTN) Str) / sizeof (CHAR16), TmpStr);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;

@@ -2,7 +2,7 @@
 Implementation for EFI_HII_IMAGE_PROTOCOL.
 
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1124,7 +1124,7 @@ HiiSetImage (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Part1Size = (UINT32) (UINTN) ((UINT8 *) CurrentImageBlock - (UINT8 *) ImagePackage->ImageBlock);
+  Part1Size = (UINT32) ((UINTN) CurrentImageBlock - (UINTN) ImagePackage->ImageBlock);
   Part2Size = ImagePackage->ImageBlockSize - Part1Size - OldBlockSize;
   CopyMem (ImageBlocks, ImagePackage->ImageBlock, Part1Size);
 

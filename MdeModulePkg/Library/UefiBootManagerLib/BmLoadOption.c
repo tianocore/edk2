@@ -1,7 +1,7 @@
 /** @file
   Load option library functions which relate with creating and processing load options.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -912,7 +912,7 @@ EfiBootManagerVariableToLoadOptionEx (
   FilePath = (EFI_DEVICE_PATH_PROTOCOL *) VariablePtr;
   VariablePtr += FilePathSize;
 
-  OptionalDataSize = (UINT32) (VariableSize - (UINTN) (VariablePtr - Variable));
+  OptionalDataSize = (UINT32) (VariableSize - ((UINTN) VariablePtr - (UINTN) Variable));
   if (OptionalDataSize == 0) {
     OptionalData = NULL;
   } else {
