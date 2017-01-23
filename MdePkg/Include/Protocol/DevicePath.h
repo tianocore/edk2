@@ -818,6 +818,22 @@ typedef struct {
 } NVME_NAMESPACE_DEVICE_PATH;
 
 ///
+/// DNS Device Path SubType
+///
+#define MSG_DNS_DP                0x1F
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  ///
+  /// Indicates the DNS server address is IPv4 or IPv6 address.
+  ///
+  UINT8                           IsIPv6;
+  ///
+  /// Instance of the DNS server address.
+  ///
+  EFI_IP_ADDRESS                  DnsServerIp[];
+} DNS_DEVICE_PATH;
+
+///
 /// Uniform Resource Identifiers (URI) Device Path SubType
 ///
 #define MSG_URI_DP                0x18
@@ -1252,6 +1268,7 @@ typedef union {
   SAS_DEVICE_PATH                            Sas;
   SASEX_DEVICE_PATH                          SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 NvmeNamespace;
+  DNS_DEVICE_PATH                            Dns; 
   URI_DEVICE_PATH                            Uri;
   BLUETOOTH_DEVICE_PATH                      Bluetooth;
   WIFI_DEVICE_PATH                           WiFi;
@@ -1309,6 +1326,7 @@ typedef union {
   SAS_DEVICE_PATH                            *Sas;
   SASEX_DEVICE_PATH                          *SasEx;
   NVME_NAMESPACE_DEVICE_PATH                 *NvmeNamespace;
+  DNS_DEVICE_PATH                            *Dns;
   URI_DEVICE_PATH                            *Uri;
   BLUETOOTH_DEVICE_PATH                      *Bluetooth;
   WIFI_DEVICE_PATH                           *WiFi;
