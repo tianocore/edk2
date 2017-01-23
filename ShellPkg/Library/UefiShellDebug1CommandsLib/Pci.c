@@ -2370,7 +2370,7 @@ PCI_CONFIG_SPACE  *mConfigSpace = NULL;
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-s", TypeValue},
   {L"-i", TypeFlag},
-  {L"-_e", TypeValue},
+  {L"-ec", TypeValue},
   {NULL, TypeMax}
   };
 
@@ -2513,6 +2513,11 @@ ShellCommandRunPci (
 
     if (ShellCommandLineGetCount(Package) > 4) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"pci");  
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+    if (ShellCommandLineGetFlag(Package, L"-ec") && ShellCommandLineGetValue(Package, L"-ec") == NULL) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"pci", L"-ec");  
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -2878,13 +2883,11 @@ ShellCommandRunPci (
     // If "-i" appears in command line, interpret data in configuration space
     //
     if (ExplainData) {
-      EnhancedDump = 0;
-      if (ShellCommandLineGetFlag(Package, L"-_e")) {
-        EnhancedDump = 0xFFFF;
-        Temp = ShellCommandLineGetValue(Package, L"-_e");
-        if (Temp != NULL) {
-          EnhancedDump = (UINT16) ShellHexStrToUintn (Temp);
-        }
+      EnhancedDump = 0xFFFF;
+      if (ShellCommandLineGetFlag(Package, L"-ec")) {
+        Temp = ShellCommandLineGetValue(Package, L"-ec");
+        ASSERT (Temp != NULL);
+        EnhancedDump = (UINT16) ShellHexStrToUintn (Temp);
       }
       Status = PciExplainData (&ConfigSpace, Address, IoDev, EnhancedDump);
     }
@@ -5829,39 +5832,25 @@ PciExplainPciExpress (
     return EFI_UNSUPPORTED;
   }
 
-  if (EnhancedDump == 0) {
+  ExtHdr = (PCI_EXP_EXT_HDR*)ExRegBuffer;
+  while (ExtHdr->CapabilityId != 0 && ExtHdr->CapabilityVersion != 0) {
     //
-    // Print the PciEx extend space in raw bytes ( 0xFF-0xFFF)
+    // Process this item
     //
-    ShellPrintEx (-1, -1, L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
+    if (EnhancedDump == 0xFFFF || EnhancedDump == ExtHdr->CapabilityId) {
+      //
+      // Print this item
+      //
+      PrintPciExtendedCapabilityDetails((PCI_EXP_EXT_HDR*)ExRegBuffer, ExtHdr, &PciExpressCap);
+    }
 
-    DumpHex (
-      2,
-      EFI_PCIE_CAPABILITY_BASE_OFFSET,
-      ExtendRegSize,
-      (VOID *) (ExRegBuffer)
-      );
-  } else {
-    ExtHdr = (PCI_EXP_EXT_HDR*)ExRegBuffer;
-    while (ExtHdr->CapabilityId != 0 && ExtHdr->CapabilityVersion != 0) {
-      //
-      // Process this item
-      //
-      if (EnhancedDump == 0xFFFF || EnhancedDump == ExtHdr->CapabilityId) {
-        //
-        // Print this item
-        //
-        PrintPciExtendedCapabilityDetails((PCI_EXP_EXT_HDR*)ExRegBuffer, ExtHdr, &PciExpressCap);
-      }
-
-      //
-      // Advance to the next item if it exists
-      //
-      if (ExtHdr->NextCapabilityOffset != 0) {
-        ExtHdr = (PCI_EXP_EXT_HDR*)((UINT8*)ExRegBuffer + ExtHdr->NextCapabilityOffset - EFI_PCIE_CAPABILITY_BASE_OFFSET);
-      } else {
-        break;
-      }
+    //
+    // Advance to the next item if it exists
+    //
+    if (ExtHdr->NextCapabilityOffset != 0) {
+      ExtHdr = (PCI_EXP_EXT_HDR*)((UINT8*)ExRegBuffer + ExtHdr->NextCapabilityOffset - EFI_PCIE_CAPABILITY_BASE_OFFSET);
+    } else {
+      break;
     }
   }
   SHELL_FREE_NON_NULL(ExRegBuffer);
