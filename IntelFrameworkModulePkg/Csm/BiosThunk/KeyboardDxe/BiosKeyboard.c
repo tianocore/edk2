@@ -1,7 +1,7 @@
 /** @file
   ConsoleOut Routines that speak VGA.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -418,7 +418,7 @@ BiosKeyboardDriverBindingStart (
     // Check bit 6 of Feature Byte 2.
     // If it is set, then Int 16 Func 09 is supported
     //
-    if (*(UINT8 *)(UINTN) ((Regs.X.ES << 4) + Regs.X.BX + 0x06) & 0x40) {
+    if (*(UINT8 *) (((UINTN) Regs.X.ES << 4) + Regs.X.BX + 0x06) & 0x40) {
       //
       // Get Keyboard Functionality
       //

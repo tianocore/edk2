@@ -1,7 +1,7 @@
 /** @file
   Helper Routines that use a PXE-enabled NIC option ROM.
  
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -49,7 +49,7 @@ CacheVectorAddress (
 {
   UINT32  *Address;
 
-  Address                          = (UINT32 *)(UINTN) (IVT_BASE + VectorNumber * 4);
+  Address                          = (UINT32 *) ((UINTN) IVT_BASE + VectorNumber * 4);
   CachedVectorAddress[VectorNumber] = *Address;
   return EFI_SUCCESS;
 }
@@ -68,7 +68,7 @@ RestoreCachedVectorAddress (
 {
   UINT32  *Address;
 
-  Address  = (UINT32 *)(UINTN) (IVT_BASE + VectorNumber * 4);
+  Address  = (UINT32 *) ((UINTN) IVT_BASE + VectorNumber * 4);
   *Address = CachedVectorAddress[VectorNumber];
   return EFI_SUCCESS;
 }
@@ -469,7 +469,7 @@ LaunchBaseCode (
 
   RomIdTableAddress = (UNDI_ROMID_T *) (RomAddress + OPTION_ROM_PTR->PxeRomIdOffset);
 
-  if ((UINTN) (OPTION_ROM_PTR->PxeRomIdOffset + RomIdTableAddress->StructLength) > RomLength) {
+  if (((UINT32)OPTION_ROM_PTR->PxeRomIdOffset + RomIdTableAddress->StructLength) > RomLength) {
     DEBUG ((DEBUG_ERROR, "ROM ID Offset Error\n\r"));
     return EFI_NOT_FOUND;
   }
@@ -754,10 +754,10 @@ LaunchBaseCode (
   Print_Undi_Loader_Table (UndiLoaderTable);
 
   DEBUG ((DEBUG_NET, "Display the PXENV+ and !PXE tables exported by NIC\n\r"));
-  Print_PXENV_Table ((VOID *)(UINTN)((UndiLoaderTable->PXENVptr.Segment << 4) | UndiLoaderTable->PXENVptr.Offset));
-  Print_PXE_Table ((VOID *)(UINTN)((UndiLoaderTable->PXEptr.Segment << 4) + UndiLoaderTable->PXEptr.Offset));
+  Print_PXENV_Table ((VOID *)(((UINTN)UndiLoaderTable->PXENVptr.Segment << 4) | UndiLoaderTable->PXENVptr.Offset));
+  Print_PXE_Table ((VOID *)(((UINTN)UndiLoaderTable->PXEptr.Segment << 4) + UndiLoaderTable->PXEptr.Offset));
 
-  Pxe = (PXE_T *)(UINTN)((UndiLoaderTable->PXEptr.Segment << 4) + UndiLoaderTable->PXEptr.Offset);
+  Pxe = (PXE_T *)(((UINTN)UndiLoaderTable->PXEptr.Segment << 4) + UndiLoaderTable->PXEptr.Offset);
   SimpleNetworkDevice->Nii.Id = (UINT64)(UINTN) Pxe;
 
   gBS->FreePool (Buffer);

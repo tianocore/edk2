@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -91,7 +91,7 @@ PrintBbsTable (
     //
     // Print DescString
     //
-    String = (CHAR8 *)(UINTN)((BbsTable[Index].DescStringSegment << 4) + BbsTable[Index].DescStringOffset);
+    String = (CHAR8 *)(((UINTN)BbsTable[Index].DescStringSegment << 4) + BbsTable[Index].DescStringOffset);
     if (String != NULL) {
       DEBUG ((EFI_D_INFO," ("));
       for (SubIndex = 0; String[SubIndex] != 0; SubIndex++) {

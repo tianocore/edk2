@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1858,7 +1858,7 @@ Undi16SimpleNetworkIsr (
 
       CopyMem (
         Frame,
-        (VOID *)(UINTN) ((SimpleNetworkDevice->Isr.FrameSegSel << 4) + SimpleNetworkDevice->Isr.FrameOffset),
+        (VOID *) (((UINTN) SimpleNetworkDevice->Isr.FrameSegSel << 4) + SimpleNetworkDevice->Isr.FrameOffset),
         SimpleNetworkDevice->Isr.BufferLength
         );
       Frame = Frame + SimpleNetworkDevice->Isr.BufferLength;

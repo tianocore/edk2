@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -144,7 +144,7 @@ LegacyBiosGetLegacyRegion (
      );
 
   if (Regs.X.AX == 0) {
-    *LegacyMemoryAddress  = (VOID *) (UINTN) ((Regs.X.DS << 4) + Regs.X.BX);
+    *LegacyMemoryAddress  = (VOID *) (((UINTN) Regs.X.DS << 4) + Regs.X.BX);
     Status = EFI_SUCCESS;
   } else {
     Status = EFI_OUT_OF_RESOURCES;
@@ -728,7 +728,7 @@ InstallSmbiosEventCallback (
   }
   
   if ((mStructureTableAddress != 0) && 
-      (mStructureTablePages < (UINTN) EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength))) {
+      (mStructureTablePages < EFI_SIZE_TO_PAGES ((UINT32)EntryPointStructure->TableLength))) {
     //
     // If original buffer is not enough for the new SMBIOS table, free original buffer and re-allocate
     //

@@ -176,7 +176,7 @@ LegacyBmBuildLegacyDevNameString (
   //
   // If current BBS entry has its description then use it.
   //
-  StringDesc = (CHAR8 *) (UINTN) ((CurBBSEntry->DescStringSegment << 4) + CurBBSEntry->DescStringOffset);
+  StringDesc = (CHAR8 *) (((UINTN) CurBBSEntry->DescStringSegment << 4) + CurBBSEntry->DescStringOffset);
   if (NULL != StringDesc) {
     //
     // Only get fisrt 32 characters, this is suggested by BBS spec
