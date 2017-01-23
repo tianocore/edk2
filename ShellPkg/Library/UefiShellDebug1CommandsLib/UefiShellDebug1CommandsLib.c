@@ -302,12 +302,21 @@ EditorClearLine (
   IN UINTN LastRow
   )
 {
-  CHAR16 Line[200];
+  CHAR16 Buffer[400];
+  CHAR16 *Line = Buffer;
 
   if (Row == 0) {
     Row = 1;
   }
 
+  // If we there are more than columns than our buffer, allocate new buffer
+  if (LastCol >= (sizeof (Buffer) / sizeof (CHAR16))) {
+	  Line = AllocateZeroPool (LastCol*(sizeof(CHAR16) + 1));
+    if (Line == NULL) {
+      return;
+    }
+  }
+  
   //
   // prepare a blank line
   //
@@ -326,6 +335,10 @@ EditorClearLine (
   // print out the blank line
   //
   ShellPrintEx (0, ((INT32)Row) - 1, Line);
+  
+  // Free if allocated
+  if (Line != Buffer)
+	  FreePool (Line);
 }
 
 /**
