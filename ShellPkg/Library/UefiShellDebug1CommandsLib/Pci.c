@@ -1,7 +1,7 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>  
   This program and the accompanying materials
@@ -1928,7 +1928,7 @@ PciExplainData (
 **/
 EFI_STATUS
 PciExplainDeviceData (
-  IN PCI_DEVICE_HEADER                      *Device,
+  IN PCI_DEVICE_HEADER_TYPE_REGION          *Device,
   IN UINT64                                 Address,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
   );
@@ -1944,7 +1944,7 @@ PciExplainDeviceData (
 **/
 EFI_STATUS
 PciExplainBridgeData (
-  IN  PCI_BRIDGE_HEADER                     *Bridge,
+  IN  PCI_BRIDGE_CONTROL_REGISTER           *Bridge,
   IN  UINT64                                Address,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL       *IoDev
   );
@@ -1980,7 +1980,7 @@ PciExplainBar (
 **/
 EFI_STATUS
 PciExplainCardBusData (
-  IN PCI_CARDBUS_HEADER                     *CardBus,
+  IN PCI_CARDBUS_CONTROL_REGISTER           *CardBus,
   IN UINT64                                 Address,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
   );
@@ -2075,7 +2075,7 @@ PciExplainPciExpress (
 **/
 EFI_STATUS
 ExplainPcieCapReg (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2087,7 +2087,7 @@ ExplainPcieCapReg (
 **/
 EFI_STATUS
 ExplainPcieDeviceCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2099,7 +2099,7 @@ ExplainPcieDeviceCap (
 **/
 EFI_STATUS
 ExplainPcieDeviceControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2111,7 +2111,7 @@ ExplainPcieDeviceControl (
 **/
 EFI_STATUS
 ExplainPcieDeviceStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2123,7 +2123,7 @@ ExplainPcieDeviceStatus (
 **/
 EFI_STATUS
 ExplainPcieLinkCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2135,7 +2135,7 @@ ExplainPcieLinkCap (
 **/
 EFI_STATUS
 ExplainPcieLinkControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2147,7 +2147,7 @@ ExplainPcieLinkControl (
 **/
 EFI_STATUS
 ExplainPcieLinkStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2159,7 +2159,7 @@ ExplainPcieLinkStatus (
 **/
 EFI_STATUS
 ExplainPcieSlotCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2171,7 +2171,7 @@ ExplainPcieSlotCap (
 **/
 EFI_STATUS
 ExplainPcieSlotControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2183,7 +2183,7 @@ ExplainPcieSlotControl (
 **/
 EFI_STATUS
 ExplainPcieSlotStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2195,7 +2195,7 @@ ExplainPcieSlotStatus (
 **/
 EFI_STATUS
 ExplainPcieRootControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2207,7 +2207,7 @@ ExplainPcieRootControl (
 **/
 EFI_STATUS
 ExplainPcieRootCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
 /**
@@ -2219,10 +2219,10 @@ ExplainPcieRootCap (
 **/
 EFI_STATUS
 ExplainPcieRootStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   );
 
-typedef EFI_STATUS (*PCIE_EXPLAIN_FUNCTION) (IN PCIE_CAP_STRUCTURE *PciExpressCap);
+typedef EFI_STATUS (*PCIE_EXPLAIN_FUNCTION) (IN PCI_CAPABILITY_PCIEXP *PciExpressCap);
 
 typedef enum {
   FieldWidthUINT8,
@@ -2452,7 +2452,7 @@ ShellCommandRunPci (
   UINT64                            Address;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   *IoDev;
   EFI_STATUS                        Status;
-  PCI_COMMON_HEADER                 PciHeader;
+  PCI_DEVICE_INDEPENDENT_REGION     PciHeader;
   PCI_CONFIG_SPACE                  ConfigSpace;
   UINTN                             ScreenCount;
   UINTN                             TempColumn;
@@ -2631,7 +2631,7 @@ ShellCommandRunPci (
                   ShellStatus = SHELL_ABORTED;
                   goto Done;
                 }
-                Address = CALC_EFI_PCI_ADDRESS (Bus, Device, Func, 0);
+                Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
                 IoDev->Pci.Read (
                             IoDev,
                             EfiPciWidthUint16,
@@ -2756,7 +2756,7 @@ ShellCommandRunPci (
         goto Done;
       }
 
-      if (Bus > MAX_BUS_NUMBER) {
+      if (Bus > PCI_MAX_BUS) {
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
@@ -2775,7 +2775,7 @@ ShellCommandRunPci (
         goto Done;
       }
 
-      if (Device > MAX_DEVICE_NUMBER){
+      if (Device > PCI_MAX_DEVICE){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
@@ -2795,7 +2795,7 @@ ShellCommandRunPci (
         goto Done;
       }
 
-      if (Func > MAX_FUNCTION_NUMBER){
+      if (Func > PCI_MAX_FUNC){
         ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
@@ -2824,7 +2824,7 @@ ShellCommandRunPci (
       goto Done;
     }
 
-    Address = CALC_EFI_PCI_ADDRESS (Bus, Device, Func, 0);
+    Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
     Status = IoDev->Pci.Read (
                           IoDev,
                           EfiPciWidthUint8,
@@ -3092,10 +3092,10 @@ PciExplainData (
   IN CONST UINT16                           EnhancedDump
   )
 {
-  PCI_COMMON_HEADER *Common;
-  PCI_HEADER_TYPE   HeaderType;
-  EFI_STATUS        Status;
-  UINT8             CapPtr;
+  PCI_DEVICE_INDEPENDENT_REGION *Common;
+  PCI_HEADER_TYPE               HeaderType;
+  EFI_STATUS                    Status;
+  UINT8                         CapPtr;
 
   Common = &(ConfigSpace->Common);
 
@@ -3126,16 +3126,16 @@ PciExplainData (
   //
   ShellPrintEx(-1, -1, L"\r\n");
   ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_LINE_RID), gShellDebug1HiiHandle,
-    INDEX_OF (&(Common->RevisionId)),
-    Common->RevisionId
+    INDEX_OF (&(Common->RevisionID)),
+    Common->RevisionID
    );
 
   //
   // Print register BIST
   //
-  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_LINE_BIST), gShellDebug1HiiHandle, INDEX_OF (&(Common->Bist)));
-  if ((Common->Bist & PCI_BIT_7) != 0) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_LINE_CAP), gShellDebug1HiiHandle, 0x0f & Common->Bist);
+  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_LINE_BIST), gShellDebug1HiiHandle, INDEX_OF (&(Common->BIST)));
+  if ((Common->BIST & BIT7) != 0) {
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_LINE_CAP), gShellDebug1HiiHandle, 0x0f & Common->BIST);
   } else {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_LINE_CAP_NO), gShellDebug1HiiHandle);
   }
@@ -3155,8 +3155,8 @@ PciExplainData (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_LATENCY_TIMER),
     gShellDebug1HiiHandle,
-    INDEX_OF (&(Common->PrimaryLatencyTimer)),
-    Common->PrimaryLatencyTimer
+    INDEX_OF (&(Common->LatencyTimer)),
+    Common->LatencyTimer
    );
 
   //
@@ -3169,7 +3169,7 @@ PciExplainData (
     Common->HeaderType
    );
 
-  if ((Common->HeaderType & PCI_BIT_7) != 0) {
+  if ((Common->HeaderType & BIT7) != 0) {
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_MULTI_FUNCTION), gShellDebug1HiiHandle);
 
   } else {
@@ -3219,7 +3219,7 @@ PciExplainData (
               Address,
               IoDev
              );
-    CapPtr = ConfigSpace->NonCommon.Device.CapabilitiesPtr;
+    CapPtr = ConfigSpace->NonCommon.Device.CapabilityPtr;
     break;
 
   case PciP2pBridge:
@@ -3228,7 +3228,7 @@ PciExplainData (
               Address,
               IoDev
              );
-    CapPtr = ConfigSpace->NonCommon.Bridge.CapabilitiesPtr;
+    CapPtr = ConfigSpace->NonCommon.Bridge.CapabilityPtr;
     break;
 
   case PciCardBusBridge:
@@ -3237,7 +3237,7 @@ PciExplainData (
               Address,
               IoDev
              );
-    CapPtr = ConfigSpace->NonCommon.CardBus.CapabilitiesPtr;
+    CapPtr = ConfigSpace->NonCommon.CardBus.Cap_Ptr;
     break;
   case PciUndefined:
   default:
@@ -3264,7 +3264,7 @@ PciExplainData (
 **/
 EFI_STATUS
 PciExplainDeviceData (
-  IN PCI_DEVICE_HEADER                      *Device,
+  IN PCI_DEVICE_HEADER_TYPE_REGION          *Device,
   IN UINT64                                 Address,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
   )
@@ -3317,15 +3317,15 @@ PciExplainDeviceData (
   //
   // Print register Expansion ROM Base Address
   //
-  if ((Device->ROMBar & PCI_BIT_0) == 0) {
-    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_EXPANSION_ROM_DISABLED), gShellDebug1HiiHandle, INDEX_OF (&(Device->ROMBar)));
+  if ((Device->ExpansionRomBar & BIT0) == 0) {
+    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_EXPANSION_ROM_DISABLED), gShellDebug1HiiHandle, INDEX_OF (&(Device->ExpansionRomBar)));
 
   } else {
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_EXPANSION_ROM_BASE),
       gShellDebug1HiiHandle,
-      INDEX_OF (&(Device->ROMBar)),
-      Device->ROMBar
+      INDEX_OF (&(Device->ExpansionRomBar)),
+      Device->ExpansionRomBar
      );
   }
   //
@@ -3334,8 +3334,8 @@ PciExplainDeviceData (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_CARDBUS_CIS),
     gShellDebug1HiiHandle,
-    INDEX_OF (&(Device->CardBusCISPtr)),
-    Device->CardBusCISPtr
+    INDEX_OF (&(Device->CISPtr)),
+    Device->CISPtr
    );
 
   //
@@ -3344,15 +3344,15 @@ PciExplainDeviceData (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_SUB_VENDOR_ID),
     gShellDebug1HiiHandle,
-    INDEX_OF (&(Device->SubVendorId)),
-    Device->SubVendorId
+    INDEX_OF (&(Device->SubsystemVendorID)),
+    Device->SubsystemVendorID
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_SUBSYSTEM_ID),
     gShellDebug1HiiHandle,
-    INDEX_OF (&(Device->SubSystemId)),
-    Device->SubSystemId
+    INDEX_OF (&(Device->SubsystemID)),
+    Device->SubsystemID
    );
 
   //
@@ -3361,8 +3361,8 @@ PciExplainDeviceData (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_CAPABILITIES_PTR),
     gShellDebug1HiiHandle,
-    INDEX_OF (&(Device->CapabilitiesPtr)),
-    Device->CapabilitiesPtr
+    INDEX_OF (&(Device->CapabilityPtr)),
+    Device->CapabilityPtr
    );
 
   //
@@ -3413,7 +3413,7 @@ PciExplainDeviceData (
 **/
 EFI_STATUS
 PciExplainBridgeData (
-  IN  PCI_BRIDGE_HEADER                     *Bridge,
+  IN  PCI_BRIDGE_CONTROL_REGISTER           *Bridge,
   IN  UINT64                                Address,
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL       *IoDev
   )
@@ -3467,15 +3467,15 @@ PciExplainBridgeData (
   //
   // Expansion register ROM Base Address
   //
-  if ((Bridge->ROMBar & PCI_BIT_0) == 0) {
-    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_NO_EXPANSION_ROM), gShellDebug1HiiHandle, INDEX_OF (&(Bridge->ROMBar)));
+  if ((Bridge->ExpansionRomBAR & BIT0) == 0) {
+    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_NO_EXPANSION_ROM), gShellDebug1HiiHandle, INDEX_OF (&(Bridge->ExpansionRomBAR)));
 
   } else {
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_EXPANSION_ROM_BASE_2),
       gShellDebug1HiiHandle,
-      INDEX_OF (&(Bridge->ROMBar)),
-      Bridge->ROMBar
+      INDEX_OF (&(Bridge->ExpansionRomBAR)),
+      Bridge->ExpansionRomBAR
      );
   }
   //
@@ -3521,7 +3521,7 @@ PciExplainBridgeData (
   //
   // IO Base & Limit
   //
-  IoAddress32 = (Bridge->IoBaseUpper << 16 | Bridge->IoBase << 8);
+  IoAddress32 = (Bridge->IoBaseUpper16 << 16 | Bridge->IoBase << 8);
   IoAddress32 &= 0xfffff000;
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_TWO_VARS),
@@ -3530,7 +3530,7 @@ PciExplainBridgeData (
     IoAddress32
    );
 
-  IoAddress32 = (Bridge->IoLimitUpper << 16 | Bridge->IoLimit << 8);
+  IoAddress32 = (Bridge->IoLimitUpper16 << 16 | Bridge->IoLimit << 8);
   IoAddress32 |= 0x00000fff;
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_ONE_VAR), gShellDebug1HiiHandle, IoAddress32);
 
@@ -3556,16 +3556,16 @@ PciExplainBridgeData (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_PREFETCHABLE),
     gShellDebug1HiiHandle,
-    INDEX_OF (&(Bridge->PrefetchableMemBase)),
-    Bridge->PrefetchableBaseUpper,
-    (Bridge->PrefetchableMemBase << 16) & 0xfff00000
+    INDEX_OF (&(Bridge->PrefetchableMemoryBase)),
+    Bridge->PrefetchableBaseUpper32,
+    (Bridge->PrefetchableMemoryBase << 16) & 0xfff00000
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_TWO_VARS_2),
     gShellDebug1HiiHandle,
-    Bridge->PrefetchableLimitUpper,
-    (Bridge->PrefetchableMemLimit << 16) | 0x000fffff
+    Bridge->PrefetchableLimitUpper32,
+    (Bridge->PrefetchableMemoryLimit << 16) | 0x000fffff
    );
 
   //
@@ -3574,8 +3574,8 @@ PciExplainBridgeData (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_CAPABILITIES_PTR_2),
     gShellDebug1HiiHandle,
-    INDEX_OF (&(Bridge->CapabilitiesPtr)),
-    Bridge->CapabilitiesPtr
+    INDEX_OF (&(Bridge->CapabilityPtr)),
+    Bridge->CapabilityPtr
    );
 
   //
@@ -3643,18 +3643,18 @@ PciExplainBar (
   // According the bar type, list detail about this bar, for example: 32 or
   // 64 bits; pre-fetchable or not.
   //
-  if ((*Bar & PCI_BIT_0) == 0) {
+  if ((*Bar & BIT0) == 0) {
     //
     // This bar is of memory type
     //
     IsMem = TRUE;
 
-    if ((*Bar & PCI_BIT_1) == 0 && (*Bar & PCI_BIT_2) == 0) {
+    if ((*Bar & BIT1) == 0 && (*Bar & BIT2) == 0) {
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_BAR), gShellDebug1HiiHandle, *Bar & 0xfffffff0);
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_MEM), gShellDebug1HiiHandle);
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_32_BITS), gShellDebug1HiiHandle);
 
-    } else if ((*Bar & PCI_BIT_1) == 0 && (*Bar & PCI_BIT_2) != 0) {
+    } else if ((*Bar & BIT1) == 0 && (*Bar & BIT2) != 0) {
       Bar64 = 0x0;
       CopyMem (&Bar64, Bar, sizeof (UINT64));
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_ONE_VAR_2), gShellDebug1HiiHandle, (UINT32) RShiftU64 ((Bar64 & 0xfffffffffffffff0ULL), 32));
@@ -3672,7 +3672,7 @@ PciExplainBar (
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_MEM_2), gShellDebug1HiiHandle);
     }
 
-    if ((*Bar & PCI_BIT_3) == 0) {
+    if ((*Bar & BIT3) == 0) {
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_NO), gShellDebug1HiiHandle);
 
     } else {
@@ -3787,7 +3787,7 @@ PciExplainBar (
 **/
 EFI_STATUS
 PciExplainCardBusData (
-  IN PCI_CARDBUS_HEADER                     *CardBus,
+  IN PCI_CARDBUS_CONTROL_REGISTER           *CardBus,
   IN UINT64                                 Address,
   IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
   )
@@ -3845,7 +3845,7 @@ PciExplainCardBusData (
     STRING_TOKEN (STR_PCI2_MEM_3),
     gShellDebug1HiiHandle,
     INDEX_OF (&(CardBus->MemoryBase0)),
-    CardBus->BridgeControl & PCI_BIT_8 ? L"    Prefetchable" : L"Non-Prefetchable",
+    CardBus->BridgeControl & BIT8 ? L"    Prefetchable" : L"Non-Prefetchable",
     CardBus->MemoryBase0 & 0xfffff000,
     CardBus->MemoryLimit0 | 0x00000fff
    );
@@ -3854,12 +3854,12 @@ PciExplainCardBusData (
     STRING_TOKEN (STR_PCI2_MEM_3),
     gShellDebug1HiiHandle,
     INDEX_OF (&(CardBus->MemoryBase1)),
-    CardBus->BridgeControl & PCI_BIT_9 ? L"    Prefetchable" : L"Non-Prefetchable",
+    CardBus->BridgeControl & BIT9 ? L"    Prefetchable" : L"Non-Prefetchable",
     CardBus->MemoryBase1 & 0xfffff000,
     CardBus->MemoryLimit1 | 0x00000fff
    );
 
-  Io32Bit = (BOOLEAN) (CardBus->IoBase0 & PCI_BIT_0);
+  Io32Bit = (BOOLEAN) (CardBus->IoBase0 & BIT0);
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_IO_2),
     gShellDebug1HiiHandle,
@@ -3869,7 +3869,7 @@ PciExplainCardBusData (
     (CardBus->IoLimit0 & (Io32Bit ? 0xffffffff : 0x0000ffff)) | 0x00000003
    );
 
-  Io32Bit = (BOOLEAN) (CardBus->IoBase1 & PCI_BIT_0);
+  Io32Bit = (BOOLEAN) (CardBus->IoBase1 & BIT0);
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_IO_2),
     gShellDebug1HiiHandle,
@@ -3901,7 +3901,7 @@ PciExplainCardBusData (
   // bridge. Fields include: Sub VendorId, Subsystem ID, and Legacy Mode Base
   // Address.
   //
-  CardBusData = (PCI_CARDBUS_DATA *) ((UINT8 *) CardBus + sizeof (PCI_CARDBUS_HEADER));
+  CardBusData = (PCI_CARDBUS_DATA *) ((UINT8 *) CardBus + sizeof (PCI_CARDBUS_CONTROL_REGISTER));
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_SUB_VENDOR_ID_2),
@@ -3947,32 +3947,32 @@ PciExplainStatus (
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_SECONDARY_STATUS), gShellDebug1HiiHandle, INDEX_OF (Status), *Status);
   }
 
-  ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_NEW_CAPABILITIES), gShellDebug1HiiHandle, (*Status & PCI_BIT_4) != 0);
+  ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_NEW_CAPABILITIES), gShellDebug1HiiHandle, (*Status & BIT4) != 0);
 
   //
   // Bit 5 is meaningless for CardBus Bridge
   //
   if (HeaderType == PciCardBusBridge) {
-    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_66_CAPABLE), gShellDebug1HiiHandle, (*Status & PCI_BIT_5) != 0);
+    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_66_CAPABLE), gShellDebug1HiiHandle, (*Status & BIT5) != 0);
 
   } else {
-    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_66_CAPABLE_2), gShellDebug1HiiHandle, (*Status & PCI_BIT_5) != 0);
+    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_66_CAPABLE_2), gShellDebug1HiiHandle, (*Status & BIT5) != 0);
   }
 
-  ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_FAST_BACK), gShellDebug1HiiHandle, (*Status & PCI_BIT_7) != 0);
+  ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_FAST_BACK), gShellDebug1HiiHandle, (*Status & BIT7) != 0);
 
-  ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_MASTER_DATA), gShellDebug1HiiHandle, (*Status & PCI_BIT_8) != 0);
+  ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_MASTER_DATA), gShellDebug1HiiHandle, (*Status & BIT8) != 0);
   //
   // Bit 9 and bit 10 together decides the DEVSEL timing
   //
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_DEVSEL_TIMING), gShellDebug1HiiHandle);
-  if ((*Status & PCI_BIT_9) == 0 && (*Status & PCI_BIT_10) == 0) {
+  if ((*Status & BIT9) == 0 && (*Status & BIT10) == 0) {
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_FAST), gShellDebug1HiiHandle);
 
-  } else if ((*Status & PCI_BIT_9) != 0 && (*Status & PCI_BIT_10) == 0) {
+  } else if ((*Status & BIT9) != 0 && (*Status & BIT10) == 0) {
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_MEDIUM), gShellDebug1HiiHandle);
 
-  } else if ((*Status & PCI_BIT_9) == 0 && (*Status & PCI_BIT_10) != 0) {
+  } else if ((*Status & BIT9) == 0 && (*Status & BIT10) != 0) {
     ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_SLOW), gShellDebug1HiiHandle);
 
   } else {
@@ -3982,40 +3982,40 @@ PciExplainStatus (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_SIGNALED_TARGET),
     gShellDebug1HiiHandle,
-    (*Status & PCI_BIT_11) != 0
+    (*Status & BIT11) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_RECEIVED_TARGET),
     gShellDebug1HiiHandle,
-    (*Status & PCI_BIT_12) != 0
+    (*Status & BIT12) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_RECEIVED_MASTER),
     gShellDebug1HiiHandle,
-    (*Status & PCI_BIT_13) != 0
+    (*Status & BIT13) != 0
    );
 
   if (MainStatus) {
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_SIGNALED_ERROR),
       gShellDebug1HiiHandle,
-      (*Status & PCI_BIT_14) != 0
+      (*Status & BIT14) != 0
      );
 
   } else {
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_RECEIVED_ERROR),
       gShellDebug1HiiHandle,
-      (*Status & PCI_BIT_14) != 0
+      (*Status & BIT14) != 0
      );
   }
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_DETECTED_ERROR),
     gShellDebug1HiiHandle,
-    (*Status & PCI_BIT_15) != 0
+    (*Status & BIT15) != 0
    );
 
   return EFI_SUCCESS;
@@ -4044,61 +4044,61 @@ PciExplainCommand (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_SPACE_ACCESS_DENIED),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_0) != 0
+    (*Command & BIT0) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_MEMORY_SPACE),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_1) != 0
+    (*Command & BIT1) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_BEHAVE_BUS_MASTER),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_2) != 0
+    (*Command & BIT2) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_MONITOR_SPECIAL_CYCLE),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_3) != 0
+    (*Command & BIT3) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_MEM_WRITE_INVALIDATE),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_4) != 0
+    (*Command & BIT4) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_PALETTE_SNOOPING),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_5) != 0
+    (*Command & BIT5) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_ASSERT_PERR),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_6) != 0
+    (*Command & BIT6) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_DO_ADDR_STEPPING),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_7) != 0
+    (*Command & BIT7) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_SERR_DRIVER),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_8) != 0
+    (*Command & BIT8) != 0
    );
 
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_FAST_BACK_2),
     gShellDebug1HiiHandle,
-    (*Command & PCI_BIT_9) != 0
+    (*Command & BIT9) != 0
    );
 
   return EFI_SUCCESS;
@@ -4128,27 +4128,27 @@ PciExplainBridgeControl (
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_PARITY_ERROR),
     gShellDebug1HiiHandle,
-    (*BridgeControl & PCI_BIT_0) != 0
+    (*BridgeControl & BIT0) != 0
    );
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_SERR_ENABLE),
     gShellDebug1HiiHandle,
-    (*BridgeControl & PCI_BIT_1) != 0
+    (*BridgeControl & BIT1) != 0
    );
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_ISA_ENABLE),
     gShellDebug1HiiHandle,
-    (*BridgeControl & PCI_BIT_2) != 0
+    (*BridgeControl & BIT2) != 0
    );
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_VGA_ENABLE),
     gShellDebug1HiiHandle,
-    (*BridgeControl & PCI_BIT_3) != 0
+    (*BridgeControl & BIT3) != 0
    );
   ShellPrintHiiEx(-1, -1, NULL,
     STRING_TOKEN (STR_PCI2_MASTER_ABORT),
     gShellDebug1HiiHandle,
-    (*BridgeControl & PCI_BIT_5) != 0
+    (*BridgeControl & BIT5) != 0
    );
 
   //
@@ -4159,49 +4159,49 @@ PciExplainBridgeControl (
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_SECONDARY_BUS_RESET),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_6) != 0
+      (*BridgeControl & BIT6) != 0
      );
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_FAST_ENABLE),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_7) != 0
+      (*BridgeControl & BIT7) != 0
      );
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_PRIMARY_DISCARD_TIMER),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_8)!=0 ? L"2^10" : L"2^15"
+      (*BridgeControl & BIT8)!=0 ? L"2^10" : L"2^15"
      );
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_SECONDARY_DISCARD_TIMER),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_9)!=0 ? L"2^10" : L"2^15"
+      (*BridgeControl & BIT9)!=0 ? L"2^10" : L"2^15"
      );
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_DISCARD_TIMER_STATUS),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_10) != 0
+      (*BridgeControl & BIT10) != 0
      );
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_DISCARD_TIMER_SERR),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_11) != 0
+      (*BridgeControl & BIT11) != 0
      );
 
   } else {
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_CARDBUS_RESET),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_6) != 0
+      (*BridgeControl & BIT6) != 0
      );
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_IREQ_ENABLE),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_7) != 0
+      (*BridgeControl & BIT7) != 0
      );
     ShellPrintHiiEx(-1, -1, NULL,
       STRING_TOKEN (STR_PCI2_WRITE_POSTING_ENABLE),
       gShellDebug1HiiHandle,
-      (*BridgeControl & PCI_BIT_10) != 0
+      (*BridgeControl & BIT10) != 0
      );
   }
 
@@ -4267,19 +4267,17 @@ PciExplainCapabilityStruct (
 **/
 EFI_STATUS
 ExplainPcieCapReg (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieCapReg;
   CHAR16 *DevicePortType;
 
-  PcieCapReg = PciExpressCap->PcieCapReg;
   ShellPrintEx (-1, -1,
     L"  Capability Version(3:0):          %E0x%04x%N\r\n",
-    PCIE_CAP_VERSION (PcieCapReg)
+    PciExpressCap->Capability.Bits.Version
    );
-  if ((UINT8) PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) < PCIE_DEVICE_PORT_TYPE_MAX) {
-    DevicePortType = DevicePortTypeTable[PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg)];
+  if (PciExpressCap->Capability.Bits.DevicePortType < ARRAY_SIZE (DevicePortTypeTable)) {
+    DevicePortType = DevicePortTypeTable[PciExpressCap->Capability.Bits.DevicePortType];
   } else {
     DevicePortType = L"Unknown Type";
   }
@@ -4292,16 +4290,16 @@ ExplainPcieCapReg (
   // a) Root Port of PCI Express Root Complex, or
   // b) Downstream Port of PCI Express Switch
   //
-  if (PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) == PCIE_ROOT_COMPLEX_ROOT_PORT ||
-      PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) == PCIE_SWITCH_DOWNSTREAM_PORT) {
+  if (PciExpressCap->Capability.Bits.DevicePortType== PCIE_DEVICE_PORT_TYPE_ROOT_PORT ||
+      PciExpressCap->Capability.Bits.DevicePortType == PCIE_DEVICE_PORT_TYPE_DOWNSTREAM_PORT) {
     ShellPrintEx (-1, -1,
       L"  Slot Implemented(8):              %E%d%N\r\n",
-      PCIE_CAP_SLOT_IMPLEMENTED (PcieCapReg)
+      PciExpressCap->Capability.Bits.SlotImplemented
      );
   }
   ShellPrintEx (-1, -1,
     L"  Interrupt Message Number(13:9):   %E0x%05x%N\r\n",
-    PCIE_CAP_INT_MSG_NUM (PcieCapReg)
+    PciExpressCap->Capability.Bits.InterruptMessageNumber
    );
   return EFI_SUCCESS;
 }
@@ -4315,38 +4313,34 @@ ExplainPcieCapReg (
 **/
 EFI_STATUS
 ExplainPcieDeviceCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieCapReg;
-  UINT32 PcieDeviceCap;
   UINT8  DevicePortType;
   UINT8  L0sLatency;
   UINT8  L1Latency;
 
-  PcieCapReg     = PciExpressCap->PcieCapReg;
-  PcieDeviceCap  = PciExpressCap->PcieDeviceCap;
-  DevicePortType = (UINT8) PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg);
+  DevicePortType = (UINT8)PciExpressCap->Capability.Bits.DevicePortType;
   ShellPrintEx (-1, -1, L"  Max_Payload_Size Supported(2:0):          ");
-  if (PCIE_CAP_MAX_PAYLOAD (PcieDeviceCap) < 6) {
-    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PCIE_CAP_MAX_PAYLOAD (PcieDeviceCap) + 7));
+  if (PciExpressCap->DeviceCapability.Bits.MaxPayloadSize < 6) {
+    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceCapability.Bits.MaxPayloadSize + 7));
   } else {
     ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
   }
   ShellPrintEx (-1, -1,
     L"  Phantom Functions Supported(4:3):         %E%d%N\r\n",
-    PCIE_CAP_PHANTOM_FUNC (PcieDeviceCap)
+    PciExpressCap->DeviceCapability.Bits.PhantomFunctions
    );
   ShellPrintEx (-1, -1,
     L"  Extended Tag Field Supported(5):          %E%d-bit Tag field supported%N\r\n",
-    PCIE_CAP_EXTENDED_TAG (PcieDeviceCap) ? 8 : 5
+    PciExpressCap->DeviceCapability.Bits.ExtendedTagField ? 8 : 5
    );
   //
   // Endpoint L0s and L1 Acceptable Latency is only valid for Endpoint
   //
   if (IS_PCIE_ENDPOINT (DevicePortType)) {
-    L0sLatency = (UINT8) PCIE_CAP_L0SLATENCY (PcieDeviceCap);
-    L1Latency  = (UINT8) PCIE_CAP_L1LATENCY (PcieDeviceCap);
+    L0sLatency = (UINT8)PciExpressCap->DeviceCapability.Bits.EndpointL0sAcceptableLatency;
+    L1Latency  = (UINT8)PciExpressCap->DeviceCapability.Bits.EndpointL1AcceptableLatency;
     ShellPrintEx (-1, -1, L"  Endpoint L0s Acceptable Latency(8:6):     ");
     if (L0sLatency < 4) {
       ShellPrintEx (-1, -1, L"%EMaximum of %d ns%N\r\n", 1 << (L0sLatency + 6));
@@ -4366,21 +4360,21 @@ ExplainPcieDeviceCap (
   }
   ShellPrintEx (-1, -1,
     L"  Role-based Error Reporting(15):           %E%d%N\r\n",
-    PCIE_CAP_ERR_REPORTING (PcieDeviceCap)
+    PciExpressCap->DeviceCapability.Bits.RoleBasedErrorReporting
    );
   //
   // Only valid for Upstream Port:
   // a) Captured Slot Power Limit Value
   // b) Captured Slot Power Scale
   //
-  if (DevicePortType == PCIE_SWITCH_UPSTREAM_PORT) {
+  if (DevicePortType == PCIE_DEVICE_PORT_TYPE_UPSTREAM_PORT) {
     ShellPrintEx (-1, -1,
       L"  Captured Slot Power Limit Value(25:18):   %E0x%02x%N\r\n",
-      PCIE_CAP_SLOT_POWER_VALUE (PcieDeviceCap)
+      PciExpressCap->DeviceCapability.Bits.CapturedSlotPowerLimitValue
      );
     ShellPrintEx (-1, -1,
       L"  Captured Slot Power Limit Scale(27:26):   %E%s%N\r\n",
-      SlotPwrLmtScaleTable[PCIE_CAP_SLOT_POWER_SCALE (PcieDeviceCap)]
+      SlotPwrLmtScaleTable[PciExpressCap->DeviceCapability.Bits.CapturedSlotPowerLimitScale]
      );
   }
   //
@@ -4389,7 +4383,7 @@ ExplainPcieDeviceCap (
   if (IS_PCIE_ENDPOINT (DevicePortType)) {
     ShellPrintEx (-1, -1,
       L"  Function Level Reset Capability(28):      %E%d%N\r\n",
-      PCIE_CAP_FUNC_LEVEL_RESET (PcieDeviceCap)
+      PciExpressCap->DeviceCapability.Bits.FunctionLevelReset
      );
   }
   return EFI_SUCCESS;
@@ -4404,69 +4398,64 @@ ExplainPcieDeviceCap (
 **/
 EFI_STATUS
 ExplainPcieDeviceControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieCapReg;
-  UINT16 PcieDeviceControl;
-
-  PcieCapReg        = PciExpressCap->PcieCapReg;
-  PcieDeviceControl = PciExpressCap->DeviceControl;
   ShellPrintEx (-1, -1,
     L"  Correctable Error Reporting Enable(0):    %E%d%N\r\n",
-    PCIE_CAP_COR_ERR_REPORTING_ENABLE (PcieDeviceControl)
-   );
+    PciExpressCap->DeviceControl.Bits.CorrectableError
+    );
   ShellPrintEx (-1, -1,
     L"  Non-Fatal Error Reporting Enable(1):      %E%d%N\r\n",
-    PCIE_CAP_NONFAT_ERR_REPORTING_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.NonFatalError
    );
   ShellPrintEx (-1, -1,
     L"  Fatal Error Reporting Enable(2):          %E%d%N\r\n",
-    PCIE_CAP_FATAL_ERR_REPORTING_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.FatalError
    );
   ShellPrintEx (-1, -1,
     L"  Unsupported Request Reporting Enable(3):  %E%d%N\r\n",
-    PCIE_CAP_UNSUP_REQ_REPORTING_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.UnsupportedRequest
    );
   ShellPrintEx (-1, -1,
     L"  Enable Relaxed Ordering(4):               %E%d%N\r\n",
-    PCIE_CAP_RELAXED_ORDERING_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.RelaxedOrdering
    );
   ShellPrintEx (-1, -1, L"  Max_Payload_Size(7:5):                    ");
-  if (PCIE_CAP_MAX_PAYLOAD_SIZE (PcieDeviceControl) < 6) {
-    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PCIE_CAP_MAX_PAYLOAD_SIZE (PcieDeviceControl) + 7));
+  if (PciExpressCap->DeviceControl.Bits.MaxPayloadSize < 6) {
+    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceControl.Bits.MaxPayloadSize + 7));
   } else {
     ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
   }
   ShellPrintEx (-1, -1,
     L"  Extended Tag Field Enable(8):             %E%d%N\r\n",
-    PCIE_CAP_EXTENDED_TAG_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.ExtendedTagField
    );
   ShellPrintEx (-1, -1,
     L"  Phantom Functions Enable(9):              %E%d%N\r\n",
-    PCIE_CAP_PHANTOM_FUNC_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.PhantomFunctions
    );
   ShellPrintEx (-1, -1,
     L"  Auxiliary (AUX) Power PM Enable(10):      %E%d%N\r\n",
-    PCIE_CAP_AUX_PM_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.AuxPower
    );
   ShellPrintEx (-1, -1,
     L"  Enable No Snoop(11):                      %E%d%N\r\n",
-    PCIE_CAP_NO_SNOOP_ENABLE (PcieDeviceControl)
+    PciExpressCap->DeviceControl.Bits.NoSnoop
    );
   ShellPrintEx (-1, -1, L"  Max_Read_Request_Size(14:12):             ");
-  if (PCIE_CAP_MAX_READ_REQ_SIZE (PcieDeviceControl) < 6) {
-    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PCIE_CAP_MAX_READ_REQ_SIZE (PcieDeviceControl) + 7));
+  if (PciExpressCap->DeviceControl.Bits.MaxReadRequestSize < 6) {
+    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceControl.Bits.MaxReadRequestSize + 7));
   } else {
     ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
   }
   //
   // Read operation is only valid for PCI Express to PCI/PCI-X Bridges
   //
-  if (PCIE_CAP_DEVICEPORT_TYPE (PcieCapReg) == PCIE_PCIE_TO_PCIX_BRIDGE) {
+  if (PciExpressCap->Capability.Bits.DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE) {
     ShellPrintEx (-1, -1,
       L"  Bridge Configuration Retry Enable(15):  %E%d%N\r\n",
-      PCIE_CAP_BRG_CONF_RETRY (PcieDeviceControl)
+      PciExpressCap->DeviceControl.Bits.BridgeConfigurationRetryOrFunctionLevelReset
      );
   }
   return EFI_SUCCESS;
@@ -4481,35 +4470,32 @@ ExplainPcieDeviceControl (
 **/
 EFI_STATUS
 ExplainPcieDeviceStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieDeviceStatus;
-
-  PcieDeviceStatus = PciExpressCap->DeviceStatus;
   ShellPrintEx (-1, -1,
     L"  Correctable Error Detected(0):            %E%d%N\r\n",
-    PCIE_CAP_COR_ERR_DETECTED (PcieDeviceStatus)
+    PciExpressCap->DeviceStatus.Bits.CorrectableError
    );
   ShellPrintEx (-1, -1,
     L"  Non-Fatal Error Detected(1):              %E%d%N\r\n",
-    PCIE_CAP_NONFAT_ERR_DETECTED (PcieDeviceStatus)
+    PciExpressCap->DeviceStatus.Bits.NonFatalError
    );
   ShellPrintEx (-1, -1,
     L"  Fatal Error Detected(2):                  %E%d%N\r\n",
-    PCIE_CAP_FATAL_ERR_DETECTED (PcieDeviceStatus)
+    PciExpressCap->DeviceStatus.Bits.FatalError
    );
   ShellPrintEx (-1, -1,
     L"  Unsupported Request Detected(3):          %E%d%N\r\n",
-    PCIE_CAP_UNSUP_REQ_DETECTED (PcieDeviceStatus)
+    PciExpressCap->DeviceStatus.Bits.UnsupportedRequest
    );
   ShellPrintEx (-1, -1,
     L"  AUX Power Detected(4):                    %E%d%N\r\n",
-    PCIE_CAP_AUX_POWER_DETECTED (PcieDeviceStatus)
+    PciExpressCap->DeviceStatus.Bits.AuxPower
    );
   ShellPrintEx (-1, -1,
     L"  Transactions Pending(5):                  %E%d%N\r\n",
-    PCIE_CAP_TRANSACTION_PENDING (PcieDeviceStatus)
+    PciExpressCap->DeviceStatus.Bits.TransactionsPending
    );
   return EFI_SUCCESS;
 }
@@ -4523,15 +4509,13 @@ ExplainPcieDeviceStatus (
 **/
 EFI_STATUS
 ExplainPcieLinkCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT32 PcieLinkCap;
   CHAR16 *MaxLinkSpeed;
   CHAR16 *AspmValue;
 
-  PcieLinkCap = PciExpressCap->LinkCap;
-  switch (PCIE_CAP_MAX_LINK_SPEED (PcieLinkCap)) {
+  switch (PciExpressCap->LinkCapability.Bits.MaxLinkSpeed) {
     case 1:
       MaxLinkSpeed = L"2.5 GT/s";
       break;
@@ -4551,9 +4535,9 @@ ExplainPcieLinkCap (
    );
   ShellPrintEx (-1, -1,
     L"  Maximum Link Width(9:4):                            %Ex%d%N\r\n",
-    PCIE_CAP_MAX_LINK_WIDTH (PcieLinkCap)
+    PciExpressCap->LinkCapability.Bits.MaxLinkWidth
    );
-  switch (PCIE_CAP_ASPM_SUPPORT (PcieLinkCap)) {
+  switch (PciExpressCap->LinkCapability.Bits.Aspm) {
     case 0:
       AspmValue = L"Not";
       break;
@@ -4576,31 +4560,31 @@ ExplainPcieLinkCap (
    );
   ShellPrintEx (-1, -1,
     L"  L0s Exit Latency(14:12):                            %E%s%N\r\n",
-    L0sLatencyStrTable[PCIE_CAP_L0S_LATENCY (PcieLinkCap)]
+    L0sLatencyStrTable[PciExpressCap->LinkCapability.Bits.L0sExitLatency]
    );
   ShellPrintEx (-1, -1,
     L"  L1 Exit Latency(17:15):                             %E%s%N\r\n",
-    L1LatencyStrTable[PCIE_CAP_L0S_LATENCY (PcieLinkCap)]
+    L1LatencyStrTable[PciExpressCap->LinkCapability.Bits.L1ExitLatency]
    );
   ShellPrintEx (-1, -1,
     L"  Clock Power Management(18):                         %E%d%N\r\n",
-    PCIE_CAP_CLOCK_PM (PcieLinkCap)
+    PciExpressCap->LinkCapability.Bits.ClockPowerManagement
    );
   ShellPrintEx (-1, -1,
     L"  Surprise Down Error Reporting Capable(19):          %E%d%N\r\n",
-    PCIE_CAP_SUP_DOWN_ERR_REPORTING (PcieLinkCap)
+    PciExpressCap->LinkCapability.Bits.SurpriseDownError
    );
   ShellPrintEx (-1, -1,
     L"  Data Link Layer Link Active Reporting Capable(20):  %E%d%N\r\n",
-    PCIE_CAP_LINK_ACTIVE_REPORTING (PcieLinkCap)
+    PciExpressCap->LinkCapability.Bits.DataLinkLayerLinkActive
    );
   ShellPrintEx (-1, -1,
     L"  Link Bandwidth Notification Capability(21):         %E%d%N\r\n",
-    PCIE_CAP_LINK_BWD_NOTIF_CAP (PcieLinkCap)
+    PciExpressCap->LinkCapability.Bits.LinkBandwidthNotification
    );
   ShellPrintEx (-1, -1,
     L"  Port Number(31:24):                                 %E0x%02x%N\r\n",
-    PCIE_CAP_PORT_NUMBER (PcieLinkCap)
+    PciExpressCap->LinkCapability.Bits.PortNumber
    );
   return EFI_SUCCESS;
 }
@@ -4614,17 +4598,15 @@ ExplainPcieLinkCap (
 **/
 EFI_STATUS
 ExplainPcieLinkControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieLinkControl;
   UINT8  DevicePortType;
 
-  PcieLinkControl = PciExpressCap->LinkControl;
-  DevicePortType  = (UINT8) PCIE_CAP_DEVICEPORT_TYPE (PciExpressCap->PcieCapReg);
+  DevicePortType  = (UINT8)PciExpressCap->Capability.Bits.DevicePortType;
   ShellPrintEx (-1, -1,
     L"  Active State Power Management Control(1:0):         %E%s%N\r\n",
-    ASPMCtrlStrTable[PCIE_CAP_ASPM_CONTROL (PcieLinkControl)]
+    ASPMCtrlStrTable[PciExpressCap->LinkControl.Bits.AspmControl]
    );
   //
   // RCB is not applicable to switches
@@ -4632,7 +4614,7 @@ ExplainPcieLinkControl (
   if (!IS_PCIE_SWITCH(DevicePortType)) {
     ShellPrintEx (-1, -1,
       L"  Read Completion Boundary (RCB)(3):                  %E%d byte%N\r\n",
-      1 << (PCIE_CAP_RCB (PcieLinkControl) + 6)
+      1 << (PciExpressCap->LinkControl.Bits.ReadCompletionBoundary + 6)
      );
   }
   //
@@ -4642,36 +4624,36 @@ ExplainPcieLinkControl (
   // c) Upstream Ports of Switches
   //
   if (!IS_PCIE_ENDPOINT (DevicePortType) &&
-      DevicePortType != PCIE_SWITCH_UPSTREAM_PORT &&
-      DevicePortType != PCIE_PCIE_TO_PCIX_BRIDGE) {
+      DevicePortType != PCIE_DEVICE_PORT_TYPE_UPSTREAM_PORT &&
+      DevicePortType != PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE) {
     ShellPrintEx (-1, -1,
       L"  Link Disable(4):                                    %E%d%N\r\n",
-      PCIE_CAP_LINK_DISABLE (PcieLinkControl)
+      PciExpressCap->LinkControl.Bits.LinkDisable
      );
   }
   ShellPrintEx (-1, -1,
     L"  Common Clock Configuration(6):                      %E%d%N\r\n",
-    PCIE_CAP_COMMON_CLK_CONF (PcieLinkControl)
+    PciExpressCap->LinkControl.Bits.CommonClockConfiguration
    );
   ShellPrintEx (-1, -1,
     L"  Extended Synch(7):                                  %E%d%N\r\n",
-    PCIE_CAP_EXT_SYNC (PcieLinkControl)
+    PciExpressCap->LinkControl.Bits.ExtendedSynch
    );
   ShellPrintEx (-1, -1,
     L"  Enable Clock Power Management(8):                   %E%d%N\r\n",
-    PCIE_CAP_CLK_PWR_MNG (PcieLinkControl)
+    PciExpressCap->LinkControl.Bits.ClockPowerManagement
    );
   ShellPrintEx (-1, -1,
     L"  Hardware Autonomous Width Disable(9):               %E%d%N\r\n",
-    PCIE_CAP_HW_AUTO_WIDTH_DISABLE (PcieLinkControl)
+    PciExpressCap->LinkControl.Bits.HardwareAutonomousWidthDisable
    );
   ShellPrintEx (-1, -1,
     L"  Link Bandwidth Management Interrupt Enable(10):     %E%d%N\r\n",
-    PCIE_CAP_LINK_BDW_MNG_INT_EN (PcieLinkControl)
+    PciExpressCap->LinkControl.Bits.LinkBandwidthManagementInterrupt
    );
   ShellPrintEx (-1, -1,
     L"  Link Autonomous Bandwidth Interrupt Enable(11):     %E%d%N\r\n",
-    PCIE_CAP_LINK_AUTO_BDW_INT_EN (PcieLinkControl)
+    PciExpressCap->LinkControl.Bits.LinkAutonomousBandwidthInterrupt
    );
   return EFI_SUCCESS;
 }
@@ -4685,14 +4667,12 @@ ExplainPcieLinkControl (
 **/
 EFI_STATUS
 ExplainPcieLinkStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieLinkStatus;
   CHAR16 *CurLinkSpeed;
 
-  PcieLinkStatus = PciExpressCap->LinkStatus;
-  switch (PCIE_CAP_CUR_LINK_SPEED (PcieLinkStatus)) {
+  switch (PciExpressCap->LinkStatus.Bits.CurrentLinkSpeed) {
     case 1:
       CurLinkSpeed = L"2.5 GT/s";
       break;
@@ -4712,27 +4692,27 @@ ExplainPcieLinkStatus (
    );
   ShellPrintEx (-1, -1,
     L"  Negotiated Link Width(9:4):                         %Ex%d%N\r\n",
-    PCIE_CAP_NEGO_LINK_WIDTH (PcieLinkStatus)
+    PciExpressCap->LinkStatus.Bits.NegotiatedLinkWidth
    );
   ShellPrintEx (-1, -1,
     L"  Link Training(11):                                  %E%d%N\r\n",
-    PCIE_CAP_LINK_TRAINING (PcieLinkStatus)
+    PciExpressCap->LinkStatus.Bits.LinkTraining
    );
   ShellPrintEx (-1, -1,
     L"  Slot Clock Configuration(12):                       %E%d%N\r\n",
-    PCIE_CAP_SLOT_CLK_CONF (PcieLinkStatus)
+    PciExpressCap->LinkStatus.Bits.SlotClockConfiguration
    );
   ShellPrintEx (-1, -1,
     L"  Data Link Layer Link Active(13):                    %E%d%N\r\n",
-    PCIE_CAP_DATA_LINK_ACTIVE (PcieLinkStatus)
+    PciExpressCap->LinkStatus.Bits.DataLinkLayerLinkActive
    );
   ShellPrintEx (-1, -1,
     L"  Link Bandwidth Management Status(14):               %E%d%N\r\n",
-    PCIE_CAP_LINK_BDW_MNG_STAT (PcieLinkStatus)
+    PciExpressCap->LinkStatus.Bits.LinkBandwidthManagement
    );
   ShellPrintEx (-1, -1,
     L"  Link Autonomous Bandwidth Status(15):               %E%d%N\r\n",
-    PCIE_CAP_LINK_AUTO_BDW_STAT (PcieLinkStatus)
+    PciExpressCap->LinkStatus.Bits.LinkAutonomousBandwidth
    );
   return EFI_SUCCESS;
 }
@@ -4746,60 +4726,56 @@ ExplainPcieLinkStatus (
 **/
 EFI_STATUS
 ExplainPcieSlotCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT32 PcieSlotCap;
-
-  PcieSlotCap = PciExpressCap->SlotCap;
-
   ShellPrintEx (-1, -1,
     L"  Attention Button Present(0):                        %E%d%N\r\n",
-    PCIE_CAP_ATT_BUT_PRESENT (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.AttentionButton
    );
   ShellPrintEx (-1, -1,
     L"  Power Controller Present(1):                        %E%d%N\r\n",
-    PCIE_CAP_PWR_CTRLLER_PRESENT (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.PowerController
    );
   ShellPrintEx (-1, -1,
     L"  MRL Sensor Present(2):                              %E%d%N\r\n",
-    PCIE_CAP_MRL_SENSOR_PRESENT (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.MrlSensor
    );
   ShellPrintEx (-1, -1,
     L"  Attention Indicator Present(3):                     %E%d%N\r\n",
-    PCIE_CAP_ATT_IND_PRESENT (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.AttentionIndicator
    );
   ShellPrintEx (-1, -1,
     L"  Power Indicator Present(4):                         %E%d%N\r\n",
-    PCIE_CAP_PWD_IND_PRESENT (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.PowerIndicator
    );
   ShellPrintEx (-1, -1,
     L"  Hot-Plug Surprise(5):                               %E%d%N\r\n",
-    PCIE_CAP_HOTPLUG_SUPPRISE (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.HotPlugSurprise
    );
   ShellPrintEx (-1, -1,
     L"  Hot-Plug Capable(6):                                %E%d%N\r\n",
-    PCIE_CAP_HOTPLUG_CAPABLE (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.HotPlugCapable
    );
   ShellPrintEx (-1, -1,
     L"  Slot Power Limit Value(14:7):                       %E0x%02x%N\r\n",
-    PCIE_CAP_SLOT_PWR_LIMIT_VALUE (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.SlotPowerLimitValue
    );
   ShellPrintEx (-1, -1,
     L"  Slot Power Limit Scale(16:15):                      %E%s%N\r\n",
-    SlotPwrLmtScaleTable[PCIE_CAP_SLOT_PWR_LIMIT_SCALE (PcieSlotCap)]
+    SlotPwrLmtScaleTable[PciExpressCap->SlotCapability.Bits.SlotPowerLimitScale]
    );
   ShellPrintEx (-1, -1,
     L"  Electromechanical Interlock Present(17):            %E%d%N\r\n",
-    PCIE_CAP_ELEC_INTERLOCK_PRESENT (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.ElectromechanicalInterlock
    );
   ShellPrintEx (-1, -1,
     L"  No Command Completed Support(18):                   %E%d%N\r\n",
-    PCIE_CAP_NO_COMM_COMPLETED_SUP (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.NoCommandCompleted
    );
   ShellPrintEx (-1, -1,
     L"  Physical Slot Number(31:19):                        %E%d%N\r\n",
-    PCIE_CAP_PHY_SLOT_NUM (PcieSlotCap)
+    PciExpressCap->SlotCapability.Bits.PhysicalSlotNumber
    );
 
   return EFI_SUCCESS;
@@ -4814,57 +4790,56 @@ ExplainPcieSlotCap (
 **/
 EFI_STATUS
 ExplainPcieSlotControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieSlotControl;
-
-  PcieSlotControl = PciExpressCap->SlotControl;
   ShellPrintEx (-1, -1,
     L"  Attention Button Pressed Enable(0):                 %E%d%N\r\n",
-    PCIE_CAP_ATT_BUT_ENABLE (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.AttentionButtonPressed
    );
   ShellPrintEx (-1, -1,
     L"  Power Fault Detected Enable(1):                     %E%d%N\r\n",
-    PCIE_CAP_PWR_FLT_DETECT_ENABLE (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.PowerFaultDetected
    );
   ShellPrintEx (-1, -1,
     L"  MRL Sensor Changed Enable(2):                       %E%d%N\r\n",
-    PCIE_CAP_MRL_SENSOR_CHANGE_ENABLE (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.MrlSensorChanged
    );
   ShellPrintEx (-1, -1,
     L"  Presence Detect Changed Enable(3):                  %E%d%N\r\n",
-    PCIE_CAP_PRES_DETECT_CHANGE_ENABLE (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.PresenceDetectChanged
    );
   ShellPrintEx (-1, -1,
     L"  Command Completed Interrupt Enable(4):              %E%d%N\r\n",
-    PCIE_CAP_COMM_CMPL_INT_ENABLE (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.CommandCompletedInterrupt
    );
   ShellPrintEx (-1, -1,
     L"  Hot-Plug Interrupt Enable(5):                       %E%d%N\r\n",
-    PCIE_CAP_HOTPLUG_INT_ENABLE (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.HotPlugInterrupt
    );
   ShellPrintEx (-1, -1,
     L"  Attention Indicator Control(7:6):                   %E%s%N\r\n",
-    IndicatorTable[PCIE_CAP_ATT_IND_CTRL (PcieSlotControl)]
+    IndicatorTable[
+    PciExpressCap->SlotControl.Bits.AttentionIndicator]
    );
   ShellPrintEx (-1, -1,
     L"  Power Indicator Control(9:8):                       %E%s%N\r\n",
-    IndicatorTable[PCIE_CAP_PWR_IND_CTRL (PcieSlotControl)]
+    IndicatorTable[PciExpressCap->SlotControl.Bits.PowerIndicator]
    );
   ShellPrintEx (-1, -1, L"  Power Controller Control(10):                       %EPower ");
-  if (PCIE_CAP_PWR_CTRLLER_CTRL (PcieSlotControl)) {
+  if (
+    PciExpressCap->SlotControl.Bits.PowerController) {
     ShellPrintEx (-1, -1, L"Off%N\r\n");
   } else {
     ShellPrintEx (-1, -1, L"On%N\r\n");
   }
   ShellPrintEx (-1, -1,
     L"  Electromechanical Interlock Control(11):            %E%d%N\r\n",
-    PCIE_CAP_ELEC_INTERLOCK_CTRL (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.ElectromechanicalInterlock
    );
   ShellPrintEx (-1, -1,
     L"  Data Link Layer State Changed Enable(12):           %E%d%N\r\n",
-    PCIE_CAP_DLINK_STAT_CHANGE_ENABLE (PcieSlotControl)
+    PciExpressCap->SlotControl.Bits.DataLinkLayerStateChanged
    );
   return EFI_SUCCESS;
 }
@@ -4878,54 +4853,53 @@ ExplainPcieSlotControl (
 **/
 EFI_STATUS
 ExplainPcieSlotStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieSlotStatus;
-
-  PcieSlotStatus = PciExpressCap->SlotStatus;
-
   ShellPrintEx (-1, -1,
     L"  Attention Button Pressed(0):           %E%d%N\r\n",
-    PCIE_CAP_ATT_BUT_PRESSED (PcieSlotStatus)
+    PciExpressCap->SlotStatus.Bits.AttentionButtonPressed
    );
   ShellPrintEx (-1, -1,
     L"  Power Fault Detected(1):               %E%d%N\r\n",
-    PCIE_CAP_PWR_FLT_DETECTED (PcieSlotStatus)
+    PciExpressCap->SlotStatus.Bits.PowerFaultDetected
    );
   ShellPrintEx (-1, -1,
     L"  MRL Sensor Changed(2):                 %E%d%N\r\n",
-    PCIE_CAP_MRL_SENSOR_CHANGED (PcieSlotStatus)
+    PciExpressCap->SlotStatus.Bits.MrlSensorChanged
    );
   ShellPrintEx (-1, -1,
     L"  Presence Detect Changed(3):            %E%d%N\r\n",
-    PCIE_CAP_PRES_DETECT_CHANGED (PcieSlotStatus)
+    PciExpressCap->SlotStatus.Bits.PresenceDetectChanged
    );
   ShellPrintEx (-1, -1,
     L"  Command Completed(4):                  %E%d%N\r\n",
-    PCIE_CAP_COMM_COMPLETED (PcieSlotStatus)
+    PciExpressCap->SlotStatus.Bits.CommandCompleted
    );
   ShellPrintEx (-1, -1, L"  MRL Sensor State(5):                   %EMRL ");
-  if (PCIE_CAP_MRL_SENSOR_STATE (PcieSlotStatus)) {
+  if (
+    PciExpressCap->SlotStatus.Bits.MrlSensor) {
     ShellPrintEx (-1, -1, L" Opened%N\r\n");
   } else {
     ShellPrintEx (-1, -1, L" Closed%N\r\n");
   }
   ShellPrintEx (-1, -1, L"  Presence Detect State(6):              ");
-  if (PCIE_CAP_PRES_DETECT_STATE (PcieSlotStatus)) {
+  if (
+    PciExpressCap->SlotStatus.Bits.PresenceDetect) {
     ShellPrintEx (-1, -1, L"%ECard Present in slot%N\r\n");
   } else {
     ShellPrintEx (-1, -1, L"%ESlot Empty%N\r\n");
   }
   ShellPrintEx (-1, -1, L"  Electromechanical Interlock Status(7): %EElectromechanical Interlock ");
-  if (PCIE_CAP_ELEC_INTERLOCK_STATE (PcieSlotStatus)) {
+  if (
+    PciExpressCap->SlotStatus.Bits.ElectromechanicalInterlock) {
     ShellPrintEx (-1, -1, L"Engaged%N\r\n");
   } else {
     ShellPrintEx (-1, -1, L"Disengaged%N\r\n");
   }
   ShellPrintEx (-1, -1,
     L"  Data Link Layer State Changed(8):      %E%d%N\r\n",
-    PCIE_CAP_DLINK_STAT_CHANGED (PcieSlotStatus)
+    PciExpressCap->SlotStatus.Bits.DataLinkLayerStateChanged
    );
   return EFI_SUCCESS;
 }
@@ -4939,32 +4913,28 @@ ExplainPcieSlotStatus (
 **/
 EFI_STATUS
 ExplainPcieRootControl (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieRootControl;
-
-  PcieRootControl = PciExpressCap->RootControl;
-
   ShellPrintEx (-1, -1,
     L"  System Error on Correctable Error Enable(0):  %E%d%N\r\n",
-    PCIE_CAP_SYSERR_ON_CORERR_EN (PcieRootControl)
+    PciExpressCap->RootControl.Bits.SystemErrorOnCorrectableError
    );
   ShellPrintEx (-1, -1,
     L"  System Error on Non-Fatal Error Enable(1):    %E%d%N\r\n",
-    PCIE_CAP_SYSERR_ON_NONFATERR_EN (PcieRootControl)
+    PciExpressCap->RootControl.Bits.SystemErrorOnNonFatalError
    );
   ShellPrintEx (-1, -1,
     L"  System Error on Fatal Error Enable(2):        %E%d%N\r\n",
-    PCIE_CAP_SYSERR_ON_FATERR_EN (PcieRootControl)
+    PciExpressCap->RootControl.Bits.SystemErrorOnFatalError
    );
   ShellPrintEx (-1, -1,
     L"  PME Interrupt Enable(3):                      %E%d%N\r\n",
-    PCIE_CAP_PME_INT_ENABLE (PcieRootControl)
+    PciExpressCap->RootControl.Bits.PmeInterrupt
    );
   ShellPrintEx (-1, -1,
     L"  CRS Software Visibility Enable(4):            %E%d%N\r\n",
-    PCIE_CAP_CRS_SW_VIS_ENABLE (PcieRootControl)
+    PciExpressCap->RootControl.Bits.CrsSoftwareVisibility
    );
 
   return EFI_SUCCESS;
@@ -4979,16 +4949,12 @@ ExplainPcieRootControl (
 **/
 EFI_STATUS
 ExplainPcieRootCap (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT16 PcieRootCap;
-
-  PcieRootCap = PciExpressCap->RsvdP;
-
   ShellPrintEx (-1, -1,
     L"  CRS Software Visibility(0):                   %E%d%N\r\n",
-    PCIE_CAP_CRS_SW_VIS (PcieRootCap)
+    PciExpressCap->RootCapability.Bits.CrsSoftwareVisibility
    );
 
   return EFI_SUCCESS;
@@ -5003,24 +4969,20 @@ ExplainPcieRootCap (
 **/
 EFI_STATUS
 ExplainPcieRootStatus (
-  IN PCIE_CAP_STRUCTURE *PciExpressCap
+  IN PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
-  UINT32 PcieRootStatus;
-
-  PcieRootStatus = PciExpressCap->RootStatus;
-
   ShellPrintEx (-1, -1,
     L"  PME Requester ID(15:0):                       %E0x%04x%N\r\n",
-    PCIE_CAP_PME_REQ_ID (PcieRootStatus)
+    PciExpressCap->RootStatus.Bits.PmeRequesterId
    );
   ShellPrintEx (-1, -1,
     L"  PME Status(16):                               %E%d%N\r\n",
-    PCIE_CAP_PME_STATUS (PcieRootStatus)
+    PciExpressCap->RootStatus.Bits.PmeStatus
    );
   ShellPrintEx (-1, -1,
     L"  PME Pending(17):                              %E%d%N\r\n",
-    PCIE_CAP_PME_PENDING (PcieRootStatus)
+    PciExpressCap->RootStatus.Bits.PmePending
    );
   return EFI_SUCCESS;
 }
@@ -5466,7 +5428,7 @@ EFI_STATUS
 PrintInterpretedExtendedCompatibilityMulticast (
   IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
   IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress,
-  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
+  IN CONST PCI_CAPABILITY_PCIEXP *PciExpressCapPtr
   )
 {
   CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_MULTICAST *Header;
@@ -5634,7 +5596,7 @@ EFI_STATUS
 PrintInterpretedExtendedCompatibilitySecondary (
   IN CONST PCI_EXP_EXT_HDR *HeaderAddress,
   IN CONST PCI_EXP_EXT_HDR *HeadersBaseAddress,
-  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
+  IN CONST PCI_CAPABILITY_PCIEXP *PciExpressCap
   )
 {
   CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_SECONDARY_PCIE *Header;
@@ -5644,20 +5606,21 @@ PrintInterpretedExtendedCompatibilitySecondary (
     -1, -1, NULL, 
     STRING_TOKEN (STR_PCI_EXT_CAP_SECONDARY), 
     gShellDebug1HiiHandle, 
-    Header->LinkControl3,
+    Header->LinkControl3.Uint32,
     Header->LaneErrorStatus
     );
   DumpHex (
     8,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)Header->EqualizationControl - (UINT8*)HeadersBaseAddress),
-    PCIE_CAP_MAX_LINK_WIDTH(PciExpressCapPtr->LinkCap),
+    PciExpressCap->LinkCapability.Bits.MaxLinkWidth * sizeof (PCI_EXPRESS_REG_LANE_EQUALIZATION_CONTROL),
     (VOID *)Header->EqualizationControl
     );
 
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
-    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_TPH) - sizeof(Header->EqualizationControl) + PCIE_CAP_MAX_LINK_WIDTH(PciExpressCapPtr->LinkCap),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_SECONDARY_PCIE) - sizeof (Header->EqualizationControl)
+      + PciExpressCap->LinkCapability.Bits.MaxLinkWidth * sizeof (PCI_EXPRESS_REG_LANE_EQUALIZATION_CONTROL),
     (VOID *) (HeaderAddress)
     );
 
@@ -5675,7 +5638,7 @@ EFI_STATUS
 PrintPciExtendedCapabilityDetails(
   IN CONST PCI_EXP_EXT_HDR    *HeadersBaseAddress, 
   IN CONST PCI_EXP_EXT_HDR    *HeaderAddress,
-  IN CONST PCIE_CAP_STRUCTURE *PciExpressCapPtr
+  IN CONST PCI_CAPABILITY_PCIEXP *PciExpressCapPtr
   )
 {
   switch (HeaderAddress->CapabilityId){
@@ -5744,21 +5707,20 @@ PciExplainPciExpress (
   IN CONST UINT16                            EnhancedDump
   )
 {
-
-  PCIE_CAP_STRUCTURE  PciExpressCap;
-  EFI_STATUS          Status;
-  UINT64              CapRegAddress;
-  UINT8               Bus;
-  UINT8               Dev;
-  UINT8               Func;
-  UINT8               *ExRegBuffer;
-  UINTN               ExtendRegSize;
-  UINT64              Pciex_Address;
-  UINT8               DevicePortType;
-  UINTN               Index;
-  UINT8               *RegAddr;
-  UINTN               RegValue;
-  PCI_EXP_EXT_HDR     *ExtHdr;
+  PCI_CAPABILITY_PCIEXP PciExpressCap;
+  EFI_STATUS            Status;
+  UINT64                CapRegAddress;
+  UINT8                 Bus;
+  UINT8                 Dev;
+  UINT8                 Func;
+  UINT8                 *ExRegBuffer;
+  UINTN                 ExtendRegSize;
+  UINT64                Pciex_Address;
+  UINT8                 DevicePortType;
+  UINTN                 Index;
+  UINT8                 *RegAddr;
+  UINTN                 RegValue;
+  PCI_EXP_EXT_HDR       *ExtHdr;
 
   CapRegAddress = Address + CapabilityPtr;
   IoDev->Pci.Read (
@@ -5769,7 +5731,7 @@ PciExplainPciExpress (
               &PciExpressCap
              );
 
-  DevicePortType = (UINT8) PCIE_CAP_DEVICEPORT_TYPE (PciExpressCap.PcieCapReg);
+  DevicePortType = (UINT8)PciExpressCap.Capability.Bits.DevicePortType;
 
   ShellPrintEx (-1, -1, L"\r\nPci Express device capability structure:\r\n");
 
@@ -5808,8 +5770,8 @@ PciExplainPciExpress (
         // a) Root Complex Integrated Endpoint
         // b) Root Complex Event Collector
         //
-        if (DevicePortType == PCIE_ROOT_COMPLEX_INTEGRATED_PORT ||
-            DevicePortType == PCIE_ROOT_COMPLEX_EVENT_COLLECTOR) {
+        if (DevicePortType == PCIE_DEVICE_PORT_TYPE_ROOT_COMPLEX_INTEGRATED_ENDPOINT ||
+            DevicePortType == PCIE_DEVICE_PORT_TYPE_ROOT_COMPLEX_EVENT_COLLECTOR) {
           continue;
         }
         break;
@@ -5820,9 +5782,9 @@ PciExplainPciExpress (
         // b) Downstream Port of PCI Express Switch
         // and when SlotImplemented bit is set in PCIE cap register.
         //
-        if ((DevicePortType != PCIE_ROOT_COMPLEX_ROOT_PORT &&
-             DevicePortType != PCIE_SWITCH_DOWNSTREAM_PORT) ||
-            !PCIE_CAP_SLOT_IMPLEMENTED (PciExpressCap.PcieCapReg)) {
+        if ((DevicePortType != PCIE_DEVICE_PORT_TYPE_ROOT_PORT &&
+             DevicePortType != PCIE_DEVICE_PORT_TYPE_DOWNSTREAM_PORT) ||
+             !PciExpressCap.Capability.Bits.SlotImplemented) {
           continue;
         }
         break;
@@ -5831,7 +5793,7 @@ PciExplainPciExpress (
         // Root registers are only valid for
         // Root Port of PCI Express Root Complex
         //
-        if (DevicePortType != PCIE_ROOT_COMPLEX_ROOT_PORT) {
+        if (DevicePortType != PCIE_DEVICE_PORT_TYPE_ROOT_PORT) {
           continue;
         }
         break;
@@ -5845,7 +5807,7 @@ PciExplainPciExpress (
   Dev           = (UINT8) (RShiftU64 (Address, 16));
   Func          = (UINT8) (RShiftU64 (Address, 8));
 
-  Pciex_Address = CALC_EFI_PCIEX_ADDRESS (Bus, Dev, Func, EFI_PCIE_CAPABILITY_BASE_OFFSET);
+  Pciex_Address = EFI_PCI_ADDRESS (Bus, Dev, Func, EFI_PCIE_CAPABILITY_BASE_OFFSET);
 
   ExtendRegSize = 0x1000 - EFI_PCIE_CAPABILITY_BASE_OFFSET;
 
