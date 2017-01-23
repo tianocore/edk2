@@ -202,6 +202,8 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   EFI_IP_ADDRESS                            GatewayIp;
   EFI_IP_ADDRESS                            ServerIp;
   UINT16                                    Port;
+  UINT32                                    DnsServerCount;
+  EFI_IP_ADDRESS                            *DnsServerIp;
 
   //
   // The URI string attempt to download through HTTP, may point to

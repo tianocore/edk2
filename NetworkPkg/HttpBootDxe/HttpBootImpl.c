@@ -465,6 +465,11 @@ HttpBootStop (
     }
   }
 
+  if (Private->DnsServerIp != NULL) {
+    FreePool (Private->DnsServerIp);
+    Private->DnsServerIp = NULL;
+  }
+
   if (Private->FilePathUri!= NULL) {
     FreePool (Private->FilePathUri);
     HttpUrlFreeParser (Private->FilePathUriParser);
