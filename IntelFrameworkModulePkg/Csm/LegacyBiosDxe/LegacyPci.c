@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -318,7 +318,7 @@ GetPciLegacyRom (
       break;
     }
 
-    if ((UINTN)(RomHeader.Raw - (UINT8 *) *Rom) + Pcir->ImageLength * 512 > *ImageSize) {
+    if (((UINTN)RomHeader.Raw - (UINTN)*Rom) + Pcir->ImageLength * 512 > *ImageSize) {
       break;
     }
     

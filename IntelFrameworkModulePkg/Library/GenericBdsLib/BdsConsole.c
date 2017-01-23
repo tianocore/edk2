@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which contain all the code to connect console device
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -873,7 +873,7 @@ ConvertBmpToGopBlt (
 
     }
 
-    ImageIndex = (UINTN) (Image - ImageHeader);
+    ImageIndex = (UINTN)Image - (UINTN)ImageHeader;
     if ((ImageIndex % 4) != 0) {
       //
       // Bmp Image starts each row on a 32-bit boundary!
