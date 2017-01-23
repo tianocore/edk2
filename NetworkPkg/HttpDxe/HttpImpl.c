@@ -1342,7 +1342,7 @@ HttpResponseWorker (
     // We receive part of header of next HTTP msg.
     //
     if (HttpInstance->NextMsg != NULL) {
-      HttpMsg->BodyLength = MIN ((UINTN) (HttpInstance->NextMsg - (CHAR8 *) Fragment.Bulk), HttpMsg->BodyLength);
+      HttpMsg->BodyLength = MIN ((UINTN) HttpInstance->NextMsg - (UINTN) Fragment.Bulk, HttpMsg->BodyLength);
       CopyMem (HttpMsg->Body, Fragment.Bulk, HttpMsg->BodyLength);
       
       HttpInstance->CacheLen = Fragment.Len - HttpMsg->BodyLength;
@@ -1360,7 +1360,7 @@ HttpResponseWorker (
         CopyMem (HttpInstance->CacheBody, Fragment.Bulk + HttpMsg->BodyLength, HttpInstance->CacheLen);
         HttpInstance->CacheOffset = 0;
 
-        HttpInstance->NextMsg = HttpInstance->CacheBody + (UINTN) (HttpInstance->NextMsg - (CHAR8 *) (Fragment.Bulk + HttpMsg->BodyLength));
+        HttpInstance->NextMsg = HttpInstance->CacheBody + ((UINTN) HttpInstance->NextMsg - (UINTN) (Fragment.Bulk + HttpMsg->BodyLength));
       }
     } else {
       HttpMsg->BodyLength = MIN (Fragment.Len, (UINT32) HttpMsg->BodyLength);
