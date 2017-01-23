@@ -2,7 +2,7 @@
   Tools of clarify the content of the smbios table.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -700,7 +700,7 @@ CalculateSmbios64BitStructureCountAndLength (
     //
     // Length = Next structure head - this structure head
     //
-    (*Smbios64TableLength) += (UINTN) (Smbios.Raw - Raw);
+    (*Smbios64TableLength) += ((UINTN) Smbios.Raw - (UINTN) Raw);
     if ((*Smbios64TableLength) > Smbios64EntryPoint->TableMaximumSize) {
     	//
     	// The actual table length exceeds maximum table size,

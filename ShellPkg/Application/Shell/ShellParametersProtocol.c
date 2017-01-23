@@ -5,7 +5,7 @@
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (C) 2014, Red Hat, Inc.
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1034,9 +1034,9 @@ UpdateStdInStdOutStdErr(
   StrnCpyS(CommandLineCopy, StrSize(CommandLineCopy)/sizeof(CHAR16), NewCommandLine, StrLen(NewCommandLine));
 
   if (FirstLocation != CommandLineCopy + StrLen(CommandLineCopy)
-    && ((UINTN)(FirstLocation - CommandLineCopy) < StrLen(NewCommandLine))
+    && (((UINTN)FirstLocation - (UINTN)CommandLineCopy)/sizeof(CHAR16) < StrLen(NewCommandLine))
     ){
-    *(NewCommandLine + (UINTN)(FirstLocation - CommandLineCopy)) = CHAR_NULL;
+    *(NewCommandLine + ((UINTN)FirstLocation - (UINTN)CommandLineCopy)/sizeof(CHAR16)) = CHAR_NULL;
   }
 
   if (!EFI_ERROR(Status)) {

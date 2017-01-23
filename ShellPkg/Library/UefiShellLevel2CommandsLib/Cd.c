@@ -99,10 +99,10 @@ IsCurrentFileSystem (
 
   Splitter2 = StrStr (Cwd, L":");
 
-  if ((UINTN) (Splitter1 - FullPath) != (UINTN) (Splitter2 - Cwd)) {
+  if (((UINTN) Splitter1 - (UINTN) FullPath) != ((UINTN) Splitter2 - (UINTN) Cwd)) {
     return FALSE;
   } else {
-    if (StrniCmp (FullPath, Cwd, (UINTN) (Splitter1 - FullPath)) == NULL) {
+    if (StrniCmp (FullPath, Cwd, ((UINTN) Splitter1 - (UINTN) FullPath) / sizeof (CHAR16)) == NULL) {
       return TRUE;
     } else {
       return FALSE;

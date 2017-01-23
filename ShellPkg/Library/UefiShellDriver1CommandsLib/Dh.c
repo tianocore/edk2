@@ -75,7 +75,7 @@ IsValidGuidString(
        ) {
       Walker++;
     } else {
-      if (*Walker == L'-' && (UINTN)(Walker - PrevWalker) == mGuidDataLen[Index]) {
+      if (*Walker == L'-' && (((UINTN)Walker - (UINTN)PrevWalker) / sizeof (CHAR16)) == mGuidDataLen[Index]) {
         Walker++;
         PrevWalker = Walker;
         Index++;
@@ -85,7 +85,7 @@ IsValidGuidString(
     }
   }
 
-  if ((UINTN)(Walker - PrevWalker) == mGuidDataLen[Index]) {
+  if ((((UINTN)Walker - (UINTN)PrevWalker) / sizeof (CHAR16)) == mGuidDataLen[Index]) {
     return TRUE;
   } else {
     return FALSE;
