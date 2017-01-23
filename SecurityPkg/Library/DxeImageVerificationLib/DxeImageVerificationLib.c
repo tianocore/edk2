@@ -391,13 +391,13 @@ HashPeImage (
     //
     // Use PE32 offset.
     //
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.CheckSum) - HashBase);
+    HashSize = (UINTN) (&mNtHeader.Pe32->OptionalHeader.CheckSum) - (UINTN) HashBase;
     NumberOfRvaAndSizes = mNtHeader.Pe32->OptionalHeader.NumberOfRvaAndSizes;
   } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
     //
     // Use PE32+ offset.
     //
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.CheckSum) - HashBase);
+    HashSize = (UINTN) (&mNtHeader.Pe32Plus->OptionalHeader.CheckSum) - (UINTN) HashBase;
     NumberOfRvaAndSizes = mNtHeader.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
   } else {
     //
@@ -425,13 +425,13 @@ HashPeImage (
       // Use PE32 offset.
       //
       HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
-      HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+      HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - ((UINTN) HashBase - (UINTN) mImageBase);
     } else {
       //
       // Use PE32+ offset.
       //
       HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
-      HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+      HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - ((UINTN) HashBase - (UINTN) mImageBase);
     }
 
     if (HashSize != 0) {
@@ -449,13 +449,13 @@ HashPeImage (
       // Use PE32 offset.
       //
       HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
-      HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+      HashSize = (UINTN) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - (UINTN) HashBase;
     } else {
       //
       // Use PE32+ offset.
       //
       HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
-      HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+      HashSize = (UINTN) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - (UINTN) HashBase;
     }
 
     if (HashSize != 0) {
@@ -474,13 +474,13 @@ HashPeImage (
       // Use PE32 offset
       //
       HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-      HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+      HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - ((UINTN) HashBase - (UINTN) mImageBase);
     } else {
       //
       // Use PE32+ offset.
       //
       HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-      HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - mImageBase);
+      HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - ((UINTN) HashBase - (UINTN) mImageBase);
     }
 
     if (HashSize != 0) {

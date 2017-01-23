@@ -1837,12 +1837,12 @@ HashPeImage (
     //
     // Use PE32 offset.
     //
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.CheckSum) - HashBase);
+    HashSize = (UINTN) (&mNtHeader.Pe32->OptionalHeader.CheckSum) - (UINTN) HashBase;
   } else {
     //
     // Use PE32+ offset.
     //
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.CheckSum) - HashBase);
+    HashSize = (UINTN) (&mNtHeader.Pe32Plus->OptionalHeader.CheckSum) - (UINTN) HashBase;
   }
 
   Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
@@ -1859,13 +1859,13 @@ HashPeImage (
     // Use PE32 offset.
     //
     HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.CheckSum + sizeof (UINT32);
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    HashSize = (UINTN) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - (UINTN) HashBase;
   } else {
     //
     // Use PE32+ offset.
     //
     HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
-    HashSize = (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - HashBase);
+    HashSize = (UINTN) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - (UINTN) HashBase;
   }
 
   Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
@@ -1881,13 +1881,13 @@ HashPeImage (
     // Use PE32 offset
     //
     HashBase = (UINT8 *) &mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-    HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - (UINTN) ((UINT8 *) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - mImageBase);
+    HashSize = mNtHeader.Pe32->OptionalHeader.SizeOfHeaders - ((UINTN) (&mNtHeader.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINTN) mImageBase);
   } else {
     //
     // Use PE32+ offset.
     //
     HashBase = (UINT8 *) &mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
-    HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) ((UINT8 *) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - mImageBase);
+    HashSize = mNtHeader.Pe32Plus->OptionalHeader.SizeOfHeaders - ((UINTN) (&mNtHeader.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1]) - (UINTN) mImageBase);
   }
 
   Status  = mHash[HashAlg].HashUpdate(HashCtx, HashBase, HashSize);
