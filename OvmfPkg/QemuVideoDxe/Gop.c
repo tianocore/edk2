@@ -1,7 +1,7 @@
 /** @file
   Graphics Output Protocol functions for the QEMU video controller.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -189,30 +189,35 @@ Routine Description:
   QemuVideoCompleteModeData (Private, This->Mode);
 
   //
-  // Allocate when using first time.
+  // Re-initialize the frame buffer configure when mode changes.
   //
-  if (Private->FrameBufferBltConfigure == NULL) {
-    Status = FrameBufferBltConfigure (
-               (VOID*) (UINTN) This->Mode->FrameBufferBase,
-               This->Mode->Info,
-               Private->FrameBufferBltConfigure,
-               &Private->FrameBufferBltConfigureSize
-               );
-    ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
+  Status = FrameBufferBltConfigure (
+             (VOID*) (UINTN) This->Mode->FrameBufferBase,
+             This->Mode->Info,
+             Private->FrameBufferBltConfigure,
+             &Private->FrameBufferBltConfigureSize
+             );
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    //
+    // Frame buffer configure may be larger in new mode.
+    //
+    if (Private->FrameBufferBltConfigure != NULL) {
+      FreePool (Private->FrameBufferBltConfigure);
+    }
     Private->FrameBufferBltConfigure =
       AllocatePool (Private->FrameBufferBltConfigureSize);
-  }
+    ASSERT (Private->FrameBufferBltConfigure != NULL);
 
-  //
-  // Create the configuration for FrameBufferBltLib
-  //
-  ASSERT (Private->FrameBufferBltConfigure != NULL);
-  Status = FrameBufferBltConfigure (
-              (VOID*) (UINTN) This->Mode->FrameBufferBase,
-              This->Mode->Info,
-              Private->FrameBufferBltConfigure,
-              &Private->FrameBufferBltConfigureSize
-              );
+    //
+    // Create the configuration for FrameBufferBltLib
+    //
+    Status = FrameBufferBltConfigure (
+                (VOID*) (UINTN) This->Mode->FrameBufferBase,
+                This->Mode->Info,
+                Private->FrameBufferBltConfigure,
+                &Private->FrameBufferBltConfigureSize
+                );
+  }
   ASSERT (Status == RETURN_SUCCESS);
 
   return EFI_SUCCESS;
