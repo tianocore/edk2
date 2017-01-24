@@ -378,6 +378,7 @@ OnEndOfDxe (
   EFI_DEVICE_PATH_PROTOCOL* PciRootComplexDevicePath;
   EFI_HANDLE                Handle;
   EFI_STATUS                Status;
+  UINT32                    JunoRevision;
 
   //
   // PCI Root Complex initialization
@@ -393,8 +394,14 @@ OnEndOfDxe (
   Status = gBS->ConnectController (Handle, NULL, PciRootComplexDevicePath, FALSE);
   ASSERT_EFI_ERROR (Status);
 
-  Status = ArmJunoSetNicMacAddress ();
-  ASSERT_EFI_ERROR (Status);
+  GetJunoRevision (JunoRevision);
+
+  if (JunoRevision != JUNO_REVISION_R0) {
+    Status = ArmJunoSetNicMacAddress ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "ArmJunoDxe: Failed to set Marvell Yukon NIC MAC address\n"));
+    }
+  }
 }
 
 STATIC
