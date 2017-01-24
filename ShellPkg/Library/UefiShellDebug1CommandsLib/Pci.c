@@ -5505,7 +5505,8 @@ PrintInterpretedExtendedCompatibilityVirtualChannel (
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
-    sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_VIRTUAL_CHANNEL_VC) + (Header->ExtendedVcCount - 1) * sizeof(PCI_EXPRESS_EXTENDED_CAPABILITIES_VIRTUAL_CHANNEL_CAPABILITY),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_VIRTUAL_CHANNEL_CAPABILITY)
+    + Header->ExtendedVcCount * sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_VIRTUAL_CHANNEL_VC),
     (VOID *) (HeaderAddress)
     );
 
