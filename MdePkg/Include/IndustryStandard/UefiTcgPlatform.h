@@ -151,6 +151,7 @@ typedef struct tdEFI_HANDOFF_TABLE_POINTERS {
 /// This structure serves as the header for measuring variables. The name of the
 /// variable (in Unicode format) should immediately follow, then the variable
 /// data.
+/// This is defined in TCG EFI Platform Spec for TPM1.1 or 1.2 V1.22
 ///
 typedef struct tdEFI_VARIABLE_DATA {
   EFI_GUID                          VariableName;
@@ -159,6 +160,22 @@ typedef struct tdEFI_VARIABLE_DATA {
   CHAR16                            UnicodeName[1];
   INT8                              VariableData[1];  ///< Driver or platform-specific data
 } EFI_VARIABLE_DATA;
+
+///
+/// UEFI_VARIABLE_DATA
+///
+/// This structure serves as the header for measuring variables. The name of the
+/// variable (in Unicode format) should immediately follow, then the variable
+/// data.
+/// This is defined in TCG PC Client Firmware Profile Spec 00.21
+///
+typedef struct tdUEFI_VARIABLE_DATA {
+  EFI_GUID                          VariableName;
+  UINT64                            UnicodeNameLength;
+  UINT64                            VariableDataLength;
+  CHAR16                            UnicodeName[1];
+  INT8                              VariableData[1];  ///< Driver or platform-specific data
+} UEFI_VARIABLE_DATA;
 
 //
 // For TrEE1.0 compatibility
