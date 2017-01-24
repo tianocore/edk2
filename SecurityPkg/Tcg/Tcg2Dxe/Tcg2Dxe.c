@@ -1787,7 +1787,7 @@ MeasureVariable (
   EFI_STATUS                        Status;
   TCG_PCR_EVENT_HDR                 TcgEvent;
   UINTN                             VarNameLength;
-  EFI_VARIABLE_DATA_TREE            *VarLog;
+  UEFI_VARIABLE_DATA                *VarLog;
 
   DEBUG ((EFI_D_INFO, "Tcg2Dxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)PCRIndex, (UINTN)EventType));
   DEBUG ((EFI_D_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
@@ -1799,7 +1799,7 @@ MeasureVariable (
   TcgEvent.EventSize = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
                         - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
 
-  VarLog = (EFI_VARIABLE_DATA_TREE *)AllocatePool (TcgEvent.EventSize);
+  VarLog = (UEFI_VARIABLE_DATA *)AllocatePool (TcgEvent.EventSize);
   if (VarLog == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1822,7 +1822,7 @@ MeasureVariable (
 
   if (EventType == EV_EFI_VARIABLE_DRIVER_CONFIG) {
     //
-    // Digest is the event data (EFI_VARIABLE_DATA)
+    // Digest is the event data (UEFI_VARIABLE_DATA)
     //
     Status = TcgDxeHashLogExtendEvent (
                0,
