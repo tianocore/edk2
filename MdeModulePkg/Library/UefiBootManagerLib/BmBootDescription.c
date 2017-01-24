@@ -387,8 +387,8 @@ BmGetNetworkDescription (
   //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)
   //
   // The HTTP device path is like:
-  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)/Uri(...)
-  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(...)
   //
   while (!IsDevicePathEnd (DevicePath) &&
          ((DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH) ||
@@ -436,6 +436,15 @@ BmGetNetworkDescription (
     DevicePath = NextDevicePathNode (DevicePath);
   } else {
     Ip = NULL;
+  }
+  
+  //
+  // Skip the optional DNS node
+  //
+  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+      (DevicePathSubType (DevicePath) == MSG_DNS_DP)
+      ) {
+    DevicePath = NextDevicePathNode (DevicePath);
   }
 
   //
