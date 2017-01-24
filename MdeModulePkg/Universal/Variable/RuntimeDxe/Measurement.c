@@ -1,5 +1,5 @@
 /** @file
-  Measure TrEE required variable.
+  Measure TCG required variable.
 
 Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 #include <Guid/ImageAuthentication.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
-#include <Protocol/TrEEProtocol.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -96,7 +95,7 @@ MeasureVariable (
 {
   EFI_STATUS                        Status;
   UINTN                             VarNameLength;
-  EFI_VARIABLE_DATA_TREE            *VarLog;
+  UEFI_VARIABLE_DATA                *VarLog;
   UINT32                            VarLogSize;
 
   ASSERT ((VarSize == 0 && VarData == NULL) || (VarSize != 0 && VarData != NULL));
@@ -105,7 +104,7 @@ MeasureVariable (
   VarLogSize = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
                         - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
 
-  VarLog = (EFI_VARIABLE_DATA_TREE *) AllocateZeroPool (VarLogSize);
+  VarLog = (UEFI_VARIABLE_DATA *) AllocateZeroPool (VarLogSize);
   if (VarLog == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
