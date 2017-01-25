@@ -473,7 +473,7 @@ CreateSerialDevice (
   // For PCI serial device, use the information from PCD
   //
   if (PciSerialParameter != NULL) {
-    BarIndex = (PciSerialParameter->BarIndex == PCI_BAR_ALL) ? 0 : PciSerialParameter->BarIndex;
+    BarIndex = (PciSerialParameter->BarIndex == MAX_UINT8) ? 0 : PciSerialParameter->BarIndex;
     Offset = PciSerialParameter->Offset;
     if (PciSerialParameter->RegisterStride != 0) {
       SerialDevice->RegisterStride = PciSerialParameter->RegisterStride;
