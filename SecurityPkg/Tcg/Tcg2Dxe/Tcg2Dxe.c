@@ -1648,8 +1648,9 @@ SetupEventLog (
 }
 
 /**
-  Measure and log an action string, and extend the measurement result into PCR[5].
+  Measure and log an action string, and extend the measurement result into PCR[PCRIndex].
 
+  @param[in] PCRIndex         PCRIndex to extend
   @param[in] String           A specific string that indicates an Action event.  
   
   @retval EFI_SUCCESS         Operation completed successfully.
@@ -1658,12 +1659,13 @@ SetupEventLog (
 **/
 EFI_STATUS
 TcgMeasureAction (
-  IN      CHAR8                     *String
+  IN      TPM_PCRINDEX       PCRIndex,
+  IN      CHAR8              *String
   )
 {
   TCG_PCR_EVENT_HDR                 TcgEvent;
 
-  TcgEvent.PCRIndex  = 5;
+  TcgEvent.PCRIndex  = PCRIndex;
   TcgEvent.EventType = EV_EFI_ACTION;
   TcgEvent.EventSize = (UINT32)AsciiStrLen (String);
   return TcgDxeHashLogExtendEvent (
@@ -2180,6 +2182,7 @@ OnReadyToBoot (
     // 1. This is the first boot attempt.
     //
     Status = TcgMeasureAction (
+               4,
                EFI_CALLING_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
@@ -2213,10 +2216,23 @@ OnReadyToBoot (
     // 6. Not first attempt, meaning a return from last attempt
     //
     Status = TcgMeasureAction (
+               4,
                EFI_RETURNING_FROM_EFI_APPLICATOIN
                );
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATOIN));
+    }
+
+    //
+    // 7. Next boot attempt, measure "Calling EFI Application from Boot Option" again
+    // TCG PC Client PFP spec Section 2.4.4.5 Step 4
+    //
+    Status = TcgMeasureAction (
+               4,
+               EFI_CALLING_EFI_APPLICATION
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
     }
   }
 
@@ -2250,6 +2266,7 @@ OnExitBootServices (
   // Measure invocation of ExitBootServices,
   //
   Status = TcgMeasureAction (
+             5,
              EFI_EXIT_BOOT_SERVICES_INVOCATION
              );
   if (EFI_ERROR (Status)) {
@@ -2260,6 +2277,7 @@ OnExitBootServices (
   // Measure success of ExitBootServices
   //
   Status = TcgMeasureAction (
+             5,
              EFI_EXIT_BOOT_SERVICES_SUCCEEDED
              );
   if (EFI_ERROR (Status)) {
@@ -2289,6 +2307,7 @@ OnExitBootServicesFailed (
   // Measure Failure of ExitBootServices,
   //
   Status = TcgMeasureAction (
+             5,
              EFI_EXIT_BOOT_SERVICES_FAILED
              );
   if (EFI_ERROR (Status)) {
