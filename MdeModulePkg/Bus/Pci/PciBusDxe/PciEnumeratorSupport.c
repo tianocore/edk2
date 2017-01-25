@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -16,6 +16,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciBus.h"
 
 extern CHAR16  *mBarTypeStr[];
+
+#define OLD_ALIGN   0xFFFFFFFFFFFFFFFFULL
+#define EVEN_ALIGN  0xFFFFFFFFFFFFFFFEULL
+#define SQUAD_ALIGN 0xFFFFFFFFFFFFFFFDULL
+#define DQUAD_ALIGN 0xFFFFFFFFFFFFFFFCULL
 
 /**
   This routine is used to check whether the pci device is present.
@@ -1335,8 +1340,8 @@ UpdatePciInfo (
   )
 {
   EFI_STATUS                        Status;
-  UINTN                             BarIndex;
-  UINTN                             BarEndIndex;
+  UINT64                            BarIndex;
+  UINT64                            BarEndIndex;
   BOOLEAN                           SetFlag;
   VOID                              *Configuration;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Ptr;
@@ -1390,18 +1395,19 @@ UpdatePciInfo (
       break;
     }
 
-    BarIndex    = (UINTN) Ptr->AddrTranslationOffset;
+    BarIndex    = Ptr->AddrTranslationOffset;
     BarEndIndex = BarIndex;
 
     //
     // Update all the bars in the device
+    // Compare against 0xFF is to keep backward compatibility.
     //
-    if (BarIndex == PCI_BAR_ALL) {
+    if ((BarIndex == MAX_UINT64) || (BarIndex == 0xFF)) {
       BarIndex    = 0;
       BarEndIndex = PCI_MAX_BAR - 1;
     }
 
-    if (BarIndex > PCI_MAX_BAR) {
+    if (BarIndex >= PCI_MAX_BAR) {
       Ptr++;
       continue;
     }
@@ -1472,7 +1478,7 @@ UpdatePciInfo (
         //
         // Update the new length for the device
         //
-        if (Ptr->AddrLen != PCI_BAR_NOCHANGE) {
+        if (Ptr->AddrLen != 0) {
           PciIoDevice->PciBar[BarIndex].Length = Ptr->AddrLen;
         }
       }
@@ -1488,6 +1494,8 @@ UpdatePciInfo (
 
 /**
   This routine will update the alignment with the new alignment.
+  Compare with OLD_ALIGN/EVEN_ALIGN/SQUAD_ALIGN/DQUAD_ALIGN is to keep
+  backward compatibility.
 
   @param Alignment    Input Old alignment. Output updated alignment.
   @param NewAlignment New alignment.
@@ -1506,15 +1514,15 @@ SetNewAlign (
   // The new alignment is the same as the original,
   // so skip it
   //
-  if (NewAlignment == PCI_BAR_OLD_ALIGN) {
+  if ((NewAlignment == 0) || (NewAlignment == OLD_ALIGN)) {
     return ;
   }
   //
   // Check the validity of the parameter
   //
-   if (NewAlignment != PCI_BAR_EVEN_ALIGN  &&
-       NewAlignment != PCI_BAR_SQUAD_ALIGN &&
-       NewAlignment != PCI_BAR_DQUAD_ALIGN ) {
+   if (NewAlignment != EVEN_ALIGN  &&
+       NewAlignment != SQUAD_ALIGN &&
+       NewAlignment != DQUAD_ALIGN ) {
     *Alignment = NewAlignment;
     return ;
   }
@@ -1533,15 +1541,15 @@ SetNewAlign (
   //
   // Adjust the alignment to even, quad or double quad boundary
   //
-  if (NewAlignment == PCI_BAR_EVEN_ALIGN) {
+  if (NewAlignment == EVEN_ALIGN) {
     if ((OldAlignment & 0x01) != 0) {
       OldAlignment = OldAlignment + 2 - (OldAlignment & 0x01);
     }
-  } else if (NewAlignment == PCI_BAR_SQUAD_ALIGN) {
+  } else if (NewAlignment == SQUAD_ALIGN) {
     if ((OldAlignment & 0x03) != 0) {
       OldAlignment = OldAlignment + 4 - (OldAlignment & 0x03);
     }
-  } else if (NewAlignment == PCI_BAR_DQUAD_ALIGN) {
+  } else if (NewAlignment == DQUAD_ALIGN) {
     if ((OldAlignment & 0x07) != 0) {
       OldAlignment = OldAlignment + 8 - (OldAlignment & 0x07);
     }
