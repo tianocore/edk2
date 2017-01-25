@@ -7,7 +7,7 @@
     PC Card Standard, 8.0
     PCI Power Management Interface Specifiction, Revision 1.2
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2014 - 2015, Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -780,14 +780,24 @@ typedef struct {
   ///
 } EFI_PCI_CAPABILITY_HOTPLUG;
 
-#define DEVICE_ID_NOCARE    0xFFFF
+///
+/// Below macros (till PCI_BAR_NOCHANGE) were used by EfiIncompatiblePciDeviceSupport Protocol.
+///
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
-#define PCI_ACPI_UNUSED     0
-#define PCI_BAR_NOCHANGE    0
-#define PCI_BAR_OLD_ALIGN   0xFFFFFFFFFFFFFFFFULL
-#define PCI_BAR_EVEN_ALIGN  0xFFFFFFFFFFFFFFFEULL
-#define PCI_BAR_SQUAD_ALIGN 0xFFFFFFFFFFFFFFFDULL
-#define PCI_BAR_DQUAD_ALIGN 0xFFFFFFFFFFFFFFFCULL
+///
+/// [ATTENTION] These macros are deprecated because they don't match Spec or not defined in Spec.
+///
+#define DEVICE_ID_NOCARE    0xFFFF                 ///< Deprecated. Value doesn't match Spec.
+#define PCI_BAR_OLD_ALIGN   0xFFFFFFFFFFFFFFFFULL  ///< Deprecated. Value isn't defined in Spec.
+#define PCI_BAR_EVEN_ALIGN  0xFFFFFFFFFFFFFFFEULL  ///< Deprecated. Value isn't defined in Spec.
+#define PCI_BAR_SQUAD_ALIGN 0xFFFFFFFFFFFFFFFDULL  ///< Deprecated. Value isn't defined in Spec.
+#define PCI_BAR_DQUAD_ALIGN 0xFFFFFFFFFFFFFFFCULL  ///< Deprecated. Value isn't defined in Spec.
+#define PCI_BAR_ALL         0xFF                   ///< Deprecated. Value doesn't match Spec.
+#define PCI_ACPI_UNUSED     0                      ///< Deprecated. Macro name is too general.
+#define PCI_BAR_NOCHANGE    0                      ///< Deprecated. Macro name is too general.
+
+#endif
 
 #define PCI_BAR_IDX0        0x00
 #define PCI_BAR_IDX1        0x01
@@ -795,7 +805,6 @@ typedef struct {
 #define PCI_BAR_IDX3        0x03
 #define PCI_BAR_IDX4        0x04
 #define PCI_BAR_IDX5        0x05
-#define PCI_BAR_ALL         0xFF
 
 ///
 /// EFI PCI Option ROM definitions
