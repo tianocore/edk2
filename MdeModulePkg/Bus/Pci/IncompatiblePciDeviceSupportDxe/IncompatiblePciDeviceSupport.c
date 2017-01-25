@@ -1,11 +1,11 @@
 /** @file
   This module is one template module for Incompatible PCI Device Support protocol.
-  It includes one incompatile pci devices list template.
+  It includes one incompatible pci devices list template.
   
   Incompatible PCI Device Support protocol allows the PCI bus driver to support
   resource allocation for some PCI devices that do not comply with the PCI Specification.
 
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -48,13 +48,11 @@ typedef struct {
 #define PCI_DEVICE_ID(VendorId, DeviceId, Revision, SubVendorId, SubDeviceId) \
     VendorId, DeviceId, Revision, SubVendorId, SubDeviceId
 
-#define PCI_BAR_TYPE_IO   ACPI_ADDRESS_SPACE_TYPE_IO
-#define PCI_BAR_TYPE_MEM  ACPI_ADDRESS_SPACE_TYPE_MEM
-
 #define DEVICE_INF_TAG    0xFFF2
 #define DEVICE_RES_TAG    0xFFF1
 #define LIST_END_TAG      0x0000
 
+#define EVEN_ALIGN        0xFFFFFFFFFFFFFFFEULL
 
 /**
   Returns a list of ACPI resource descriptors that detail the special
@@ -114,72 +112,72 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINT64 mIncompatiblePciDeviceList[] = {
   // Device Adaptec 9004
   //
   DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x9004, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  PCI_DEVICE_ID(0x9004, MAX_UINT64, MAX_UINT64, MAX_UINT64, MAX_UINT64),
   DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
+  ACPI_ADDRESS_SPACE_TYPE_IO,
+  0,
+  0,
+  0,
+  0,
+  EVEN_ALIGN,
+  MAX_UINT64,
+  0,
   //
   // Device Adaptec 9005
   //
   DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x9005, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  PCI_DEVICE_ID(0x9005, MAX_UINT64, MAX_UINT64, MAX_UINT64, MAX_UINT64),
   DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
+  ACPI_ADDRESS_SPACE_TYPE_IO,
+  0,
+  0,
+  0,
+  0,
+  EVEN_ALIGN,
+  MAX_UINT64,
+  0,
   //
   // Device QLogic  1007
   //
   DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x1077, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  PCI_DEVICE_ID(0x1077, MAX_UINT64, MAX_UINT64, MAX_UINT64, MAX_UINT64),
   DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
+  ACPI_ADDRESS_SPACE_TYPE_IO,
+  0,
+  0,
+  0,
+  0,
+  EVEN_ALIGN,
+  MAX_UINT64,
+  0,
   //
   // Device Agilent 103C
   //
   DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x103C, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  PCI_DEVICE_ID(0x103C, MAX_UINT64, MAX_UINT64, MAX_UINT64, MAX_UINT64),
   DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
+  ACPI_ADDRESS_SPACE_TYPE_IO,
+  0,
+  0,
+  0,
+  0,
+  EVEN_ALIGN,
+  MAX_UINT64,
+  0,
   //
   // Device Agilent 15BC
   //
   DEVICE_INF_TAG,
-  PCI_DEVICE_ID(0x15BC, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE, DEVICE_ID_NOCARE),
+  PCI_DEVICE_ID(0x15BC, MAX_UINT64, MAX_UINT64, MAX_UINT64, MAX_UINT64),
   DEVICE_RES_TAG,
-  PCI_BAR_TYPE_IO,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_ACPI_UNUSED,
-  PCI_BAR_EVEN_ALIGN,
-  PCI_BAR_ALL,
-  PCI_BAR_NOCHANGE,
+  ACPI_ADDRESS_SPACE_TYPE_IO,
+  0,
+  0,
+  0,
+  0,
+  EVEN_ALIGN,
+  MAX_UINT64,
+  0,
   //
   // The end of the list
   //
@@ -285,31 +283,31 @@ PCheckDevice (
       //
       // See if the Header matches the parameters passed in
       //
-      if (Header->VendorId != DEVICE_ID_NOCARE) {
+      if (Header->VendorId != MAX_UINT64) {
         if (Header->VendorId != VendorId) {
           continue;
         }
       }
 
-      if (Header->DeviceId != DEVICE_ID_NOCARE) {
+      if (Header->DeviceId != MAX_UINT64) {
         if (DeviceId != Header->DeviceId) {
           continue;
         }
       }
 
-      if (Header->RevisionId != DEVICE_ID_NOCARE) {
+      if (Header->RevisionId != MAX_UINT64) {
         if (RevisionId != Header->RevisionId) {
           continue;
         }
       }
 
-      if (Header->SubsystemVendorId != DEVICE_ID_NOCARE) {
+      if (Header->SubsystemVendorId != MAX_UINT64) {
         if (SubsystemVendorId != Header->SubsystemVendorId) {
           continue;
         }
       }
 
-      if (Header->SubsystemDeviceId != DEVICE_ID_NOCARE) {
+      if (Header->SubsystemDeviceId != MAX_UINT64) {
         if (SubsystemDeviceId != Header->SubsystemDeviceId) {
           continue;
         }
