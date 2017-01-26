@@ -283,31 +283,31 @@ PCheckDevice (
       //
       // See if the Header matches the parameters passed in
       //
-      if (Header->VendorId != MAX_UINT64) {
+      if ((Header->VendorId != MAX_UINT64) && (VendorId != MAX_UINTN)) {
         if (Header->VendorId != VendorId) {
           continue;
         }
       }
 
-      if (Header->DeviceId != MAX_UINT64) {
+      if ((Header->DeviceId != MAX_UINT64) && (DeviceId != MAX_UINTN)) {
         if (DeviceId != Header->DeviceId) {
           continue;
         }
       }
 
-      if (Header->RevisionId != MAX_UINT64) {
+      if ((Header->RevisionId != MAX_UINT64) && (RevisionId != MAX_UINTN)) {
         if (RevisionId != Header->RevisionId) {
           continue;
         }
       }
 
-      if (Header->SubsystemVendorId != MAX_UINT64) {
+      if ((Header->SubsystemVendorId != MAX_UINT64) && (SubsystemVendorId != MAX_UINTN)) {
         if (SubsystemVendorId != Header->SubsystemVendorId) {
           continue;
         }
       }
 
-      if (Header->SubsystemDeviceId != MAX_UINT64) {
+      if ((Header->SubsystemDeviceId != MAX_UINT64) && (SubsystemDeviceId != MAX_UINTN)) {
         if (SubsystemDeviceId != Header->SubsystemDeviceId) {
           continue;
         }
