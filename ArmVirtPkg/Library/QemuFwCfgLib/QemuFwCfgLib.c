@@ -42,16 +42,32 @@ VOID (EFIAPI READ_BYTES_FUNCTION) (
   IN VOID  *Buffer OPTIONAL
   );
 
+/**
+  Writes bytes from a buffer to firmware configuration
+
+  @param[in] Size    Size in bytes to write
+  @param[in] Buffer  Buffer to transfer data from (OPTIONAL if Size is 0)
+
+**/
+typedef
+VOID (EFIAPI WRITE_BYTES_FUNCTION) (
+  IN UINTN Size,
+  IN VOID  *Buffer OPTIONAL
+  );
+
 //
 // Forward declaration of the two implementations we have.
 //
 STATIC READ_BYTES_FUNCTION MmioReadBytes;
+STATIC WRITE_BYTES_FUNCTION MmioWriteBytes;
 STATIC READ_BYTES_FUNCTION DmaReadBytes;
+STATIC WRITE_BYTES_FUNCTION DmaWriteBytes;
 
 //
-// This points to the one we detect at runtime.
+// These correspond to the implementation we detect at runtime.
 //
 STATIC READ_BYTES_FUNCTION *InternalQemuFwCfgReadBytes = MmioReadBytes;
+STATIC WRITE_BYTES_FUNCTION *InternalQemuFwCfgWriteBytes = MmioWriteBytes;
 
 
 /**
@@ -166,6 +182,7 @@ QemuFwCfgInitialize (
         if ((Features & FW_CFG_F_DMA) != 0) {
           mFwCfgDmaAddress = FwCfgDmaAddress;
           InternalQemuFwCfgReadBytes = DmaReadBytes;
+          InternalQemuFwCfgWriteBytes = DmaWriteBytes;
         }
       }
     } else {
@@ -358,6 +375,41 @@ QemuFwCfgReadBytes (
   }
 }
 
+
+/**
+  Slow WRITE_BYTES_FUNCTION.
+**/
+STATIC
+VOID
+EFIAPI
+MmioWriteBytes (
+  IN UINTN Size,
+  IN VOID  *Buffer OPTIONAL
+  )
+{
+  UINTN Idx;
+
+  for (Idx = 0; Idx < Size; ++Idx) {
+    MmioWrite8 (mFwCfgDataAddress, ((UINT8 *)Buffer)[Idx]);
+  }
+}
+
+
+/**
+  Fast WRITE_BYTES_FUNCTION.
+**/
+STATIC
+VOID
+EFIAPI
+DmaWriteBytes (
+  IN UINTN Size,
+  IN VOID  *Buffer OPTIONAL
+  )
+{
+  DmaTransferBytes (Size, Buffer, FW_CFG_DMA_CTL_WRITE);
+}
+
+
 /**
   Write firmware configuration bytes from a buffer
 
@@ -376,11 +428,7 @@ QemuFwCfgWriteBytes (
   )
 {
   if (QemuFwCfgIsAvailable ()) {
-    UINTN Idx;
-
-    for (Idx = 0; Idx < Size; ++Idx) {
-      MmioWrite8 (mFwCfgDataAddress, ((UINT8 *)Buffer)[Idx]);
-    }
+    InternalQemuFwCfgWriteBytes (Size, Buffer);
   }
 }
 
