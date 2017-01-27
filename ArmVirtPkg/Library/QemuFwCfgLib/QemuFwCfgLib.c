@@ -250,18 +250,33 @@ MmioReadBytes (
 
 
 /**
-  Fast READ_BYTES_FUNCTION.
+  Transfer an array of bytes, or skip a number of bytes, using the DMA
+  interface.
+
+  @param[in]     Size     Size in bytes to transfer or skip.
+
+  @param[in,out] Buffer   Buffer to read data into or write data from. Ignored,
+                          and may be NULL, if Size is zero, or Control is
+                          FW_CFG_DMA_CTL_SKIP.
+
+  @param[in]     Control  One of the following:
+                          FW_CFG_DMA_CTL_WRITE - write to fw_cfg from Buffer.
+                          FW_CFG_DMA_CTL_READ  - read from fw_cfg into Buffer.
+                          FW_CFG_DMA_CTL_SKIP  - skip bytes in fw_cfg.
 **/
 STATIC
 VOID
-EFIAPI
-DmaReadBytes (
-  IN UINTN Size,
-  IN VOID  *Buffer OPTIONAL
+DmaTransferBytes (
+  IN     UINTN  Size,
+  IN OUT VOID   *Buffer OPTIONAL,
+  IN     UINT32 Control
   )
 {
   volatile FW_CFG_DMA_ACCESS Access;
   UINT32                     Status;
+
+  ASSERT (Control == FW_CFG_DMA_CTL_WRITE || Control == FW_CFG_DMA_CTL_READ ||
+    Control == FW_CFG_DMA_CTL_SKIP);
 
   if (Size == 0) {
     return;
@@ -269,7 +284,7 @@ DmaReadBytes (
 
   ASSERT (Size <= MAX_UINT32);
 
-  Access.Control = SwapBytes32 (FW_CFG_DMA_CTL_READ);
+  Access.Control = SwapBytes32 (Control);
   Access.Length  = SwapBytes32 ((UINT32)Size);
   Access.Address = SwapBytes64 ((UINT64)(UINTN)Buffer);
 
@@ -301,6 +316,21 @@ DmaReadBytes (
   // The caller will want to access the transferred data.
   //
   MemoryFence ();
+}
+
+
+/**
+  Fast READ_BYTES_FUNCTION.
+**/
+STATIC
+VOID
+EFIAPI
+DmaReadBytes (
+  IN UINTN Size,
+  IN VOID  *Buffer OPTIONAL
+  )
+{
+  DmaTransferBytes (Size, Buffer, FW_CFG_DMA_CTL_READ);
 }
 
 
