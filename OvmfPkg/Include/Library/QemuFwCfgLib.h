@@ -159,6 +159,22 @@ QemuFwCfgWriteBytes (
 
 
 /**
+  Skip bytes in the firmware configuration item.
+
+  Increase the offset of the firmware configuration item without transferring
+  bytes between the item and a caller-provided buffer. Subsequent read, write
+  or skip operations will commence at the increased offset.
+
+  @param[in] Size  Number of bytes to skip.
+**/
+VOID
+EFIAPI
+QemuFwCfgSkipBytes (
+  IN UINTN                  Size
+  );
+
+
+/**
   Reads a UINT8 firmware configuration value
 
   @return    Value of Firmware Configuration item read

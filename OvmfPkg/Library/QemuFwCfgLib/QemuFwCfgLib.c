@@ -193,6 +193,50 @@ QemuFwCfgWriteBytes (
 
 
 /**
+  Skip bytes in the firmware configuration item.
+
+  Increase the offset of the firmware configuration item without transferring
+  bytes between the item and a caller-provided buffer. Subsequent read, write
+  or skip operations will commence at the increased offset.
+
+  @param[in] Size  Number of bytes to skip.
+**/
+VOID
+EFIAPI
+QemuFwCfgSkipBytes (
+  IN UINTN                  Size
+  )
+{
+  UINTN ChunkSize;
+  UINT8 SkipBuffer[256];
+
+  if (!InternalQemuFwCfgIsAvailable ()) {
+    return;
+  }
+
+  if (InternalQemuFwCfgDmaIsAvailable () && Size <= MAX_UINT32) {
+    InternalQemuFwCfgDmaBytes ((UINT32)Size, NULL, FW_CFG_DMA_CTL_SKIP);
+    return;
+  }
+
+  //
+  // Emulate the skip by reading data in chunks, and throwing it away. The
+  // implementation below is suitable even for phases where RAM or dynamic
+  // allocation is not available or appropriate. It also doesn't affect the
+  // static data footprint for client modules. Large skips are not expected,
+  // therefore this fallback is not performance critical. The size of
+  // SkipBuffer is thought not to exert a large pressure on the stack in any
+  // phase.
+  //
+  while (Size > 0) {
+    ChunkSize = MIN (Size, sizeof SkipBuffer);
+    IoReadFifo8 (0x511, ChunkSize, SkipBuffer);
+    Size -= ChunkSize;
+  }
+}
+
+
+/**
   Reads a UINT8 firmware configuration value
 
   @return    Value of Firmware Configuration item read
