@@ -55,19 +55,33 @@ VOID (EFIAPI WRITE_BYTES_FUNCTION) (
   IN VOID  *Buffer OPTIONAL
   );
 
+/**
+  Skips bytes in firmware configuration
+
+  @param[in] Size  Size in bytes to skip
+
+**/
+typedef
+VOID (EFIAPI SKIP_BYTES_FUNCTION) (
+  IN UINTN Size
+  );
+
 //
 // Forward declaration of the two implementations we have.
 //
 STATIC READ_BYTES_FUNCTION MmioReadBytes;
 STATIC WRITE_BYTES_FUNCTION MmioWriteBytes;
+STATIC SKIP_BYTES_FUNCTION MmioSkipBytes;
 STATIC READ_BYTES_FUNCTION DmaReadBytes;
 STATIC WRITE_BYTES_FUNCTION DmaWriteBytes;
+STATIC SKIP_BYTES_FUNCTION DmaSkipBytes;
 
 //
 // These correspond to the implementation we detect at runtime.
 //
 STATIC READ_BYTES_FUNCTION *InternalQemuFwCfgReadBytes = MmioReadBytes;
 STATIC WRITE_BYTES_FUNCTION *InternalQemuFwCfgWriteBytes = MmioWriteBytes;
+STATIC SKIP_BYTES_FUNCTION *InternalQemuFwCfgSkipBytes = MmioSkipBytes;
 
 
 /**
@@ -183,6 +197,7 @@ QemuFwCfgInitialize (
           mFwCfgDmaAddress = FwCfgDmaAddress;
           InternalQemuFwCfgReadBytes = DmaReadBytes;
           InternalQemuFwCfgWriteBytes = DmaWriteBytes;
+          InternalQemuFwCfgSkipBytes = DmaSkipBytes;
         }
       }
     } else {
@@ -429,6 +444,69 @@ QemuFwCfgWriteBytes (
 {
   if (QemuFwCfgIsAvailable ()) {
     InternalQemuFwCfgWriteBytes (Size, Buffer);
+  }
+}
+
+
+/**
+  Slow SKIP_BYTES_FUNCTION.
+**/
+STATIC
+VOID
+EFIAPI
+MmioSkipBytes (
+  IN UINTN Size
+  )
+{
+  UINTN ChunkSize;
+  UINT8 SkipBuffer[256];
+
+  //
+  // Emulate the skip by reading data in chunks, and throwing it away. The
+  // implementation below doesn't affect the static data footprint for client
+  // modules. Large skips are not expected, therefore this fallback is not
+  // performance critical. The size of SkipBuffer is thought not to exert a
+  // large pressure on the stack.
+  //
+  while (Size > 0) {
+    ChunkSize = MIN (Size, sizeof SkipBuffer);
+    MmioReadBytes (ChunkSize, SkipBuffer);
+    Size -= ChunkSize;
+  }
+}
+
+
+/**
+  Fast SKIP_BYTES_FUNCTION.
+**/
+STATIC
+VOID
+EFIAPI
+DmaSkipBytes (
+  IN UINTN Size
+  )
+{
+  DmaTransferBytes (Size, NULL, FW_CFG_DMA_CTL_SKIP);
+}
+
+
+/**
+  Skip bytes in the firmware configuration item.
+
+  Increase the offset of the firmware configuration item without transferring
+  bytes between the item and a caller-provided buffer. Subsequent read, write
+  or skip operations will commence at the increased offset.
+
+  @param[in] Size  Number of bytes to skip.
+**/
+VOID
+EFIAPI
+QemuFwCfgSkipBytes (
+  IN UINTN Size
+  )
+{
+  if (QemuFwCfgIsAvailable ()) {
+    InternalQemuFwCfgSkipBytes (Size);
   }
 }
 
