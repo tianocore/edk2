@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -155,6 +155,7 @@
   MdePkg/Library/SmmMemLib/SmmMemLib.inf
   MdePkg/Library/BaseRngLib/BaseRngLib.inf
   MdePkg/Library/SmmPciExpressLib/SmmPciExpressLib.inf
+  MdePkg/Library/SmiHandlerProfileLibNull/SmiHandlerProfileLibNull.inf
 
 [Components.IPF]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
