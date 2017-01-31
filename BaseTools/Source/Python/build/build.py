@@ -1036,7 +1036,7 @@ class Build():
                 os.remove(self.PlatformBuildPath)
             if sys.platform == "win32":
                 args = ' && '.join((self.Prebuild, 'set > ' + PrebuildEnvFile))
-                Process = Popen(args, stdout=PIPE, stderr=PIPE)
+                Process = Popen(args, stdout=PIPE, stderr=PIPE, shell=True)
             else:
                 args = ' && '.join((self.Prebuild, 'env > ' + PrebuildEnvFile))
                 Process = Popen(args, stdout=PIPE, stderr=PIPE, shell=True)
@@ -1079,7 +1079,7 @@ class Build():
         if self.Postbuild:
             EdkLogger.info("\n- Postbuild Start -\n")
             if sys.platform == "win32":
-                Process = Popen(self.Postbuild, stdout=PIPE, stderr=PIPE)
+                Process = Popen(self.Postbuild, stdout=PIPE, stderr=PIPE, shell=True)
             else:
                 Process = Popen(self.Postbuild, stdout=PIPE, stderr=PIPE, shell=True)
             # launch two threads to read the STDOUT and STDERR
