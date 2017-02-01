@@ -430,6 +430,51 @@ ReallocateAcpiTableBuffer (
   mEfiAcpiMaxNumTables = NewMaxTableNumber;
   return EFI_SUCCESS;
 }
+
+/**
+  Determine whether the FADT table passed in as parameter requires mutual
+  exclusion between the DSDT and X_DSDT fields. (That is, whether there exists
+  an explicit requirement that at most one of those fields is permitted to be
+  nonzero.)
+
+  @param[in] Fadt  The EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE object to
+                   check.
+
+  @retval TRUE     Fadt requires mutual exclusion between DSDT and X_DSDT.
+  @retval FALSE    Otherwise.
+**/
+BOOLEAN
+RequireDsdtXDsdtExclusion (
+  IN EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *Fadt
+  )
+{
+  //
+  // Mantis ticket #1393 was addressed in ACPI 5.1 Errata B. Unfortunately, we
+  // can't tell apart 5.1 Errata A and 5.1 Errata B just from looking at the
+  // FADT table. Therefore let's require exclusion for table versions >= 5.1.
+  //
+  // While this needlessly covers 5.1 and 5.1A too, it is safer to require
+  // DSDT<->X_DSDT exclusion for lax (5.1, 5.1A) versions of the spec than to
+  // permit DSDT<->X_DSDT duplication for strict (5.1B) versions of the spec.
+  //
+  // The same applies to 6.0 vs. 6.0A. While 6.0 does not require the
+  // exclusion, 6.0A and 6.1 do. Since we cannot distinguish 6.0 from 6.0A
+  // based on just the FADT, we lump 6.0 in with the rest of >= 5.1.
+  //
+  if ((Fadt->Header.Revision < 5) ||
+      ((Fadt->Header.Revision == 5) &&
+       (((EFI_ACPI_5_1_FIXED_ACPI_DESCRIPTION_TABLE *)Fadt)->MinorVersion == 0))) {
+    //
+    // version <= 5.0
+    //
+    return FALSE;
+  }
+  //
+  // version >= 5.1
+  //
+  return TRUE;
+}
+
 /**
   This function adds an ACPI table to the table list.  It will detect FACS and
   allocate the correct type of memory and properly align the table.
@@ -647,12 +692,16 @@ AddTableToList (
       }
       if ((UINT64)(UINTN)AcpiTableInstance->Dsdt3 < BASE_4GB) {
         AcpiTableInstance->Fadt3->Dsdt = (UINT32) (UINTN) AcpiTableInstance->Dsdt3;
-        ZeroMem (&AcpiTableInstance->Fadt3->XDsdt, sizeof (UINT64));
+        if (RequireDsdtXDsdtExclusion (AcpiTableInstance->Fadt3)) {
+          Buffer64 = 0;
+        } else {
+          Buffer64 = AcpiTableInstance->Fadt3->Dsdt;
+        }
       } else {
         AcpiTableInstance->Fadt3->Dsdt = 0;
         Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Dsdt3;
-        CopyMem (&AcpiTableInstance->Fadt3->XDsdt, &Buffer64, sizeof (UINT64));
       }
+      CopyMem (&AcpiTableInstance->Fadt3->XDsdt, &Buffer64, sizeof (UINT64));
 
       //
       // RSDP OEM information is updated to match the FADT OEM information
@@ -847,8 +896,15 @@ AddTableToList (
       if (AcpiTableInstance->Fadt3 != NULL) {
         if ((UINT64)(UINTN)AcpiTableInstance->Dsdt3 < BASE_4GB) {
           AcpiTableInstance->Fadt3->Dsdt = (UINT32) (UINTN) AcpiTableInstance->Dsdt3;
+          if (RequireDsdtXDsdtExclusion (AcpiTableInstance->Fadt3)) {
+            Buffer64 = 0;
+          } else {
+            Buffer64 = AcpiTableInstance->Fadt3->Dsdt;
+          }
+        } else {
+          AcpiTableInstance->Fadt3->Dsdt = 0;
+          Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Dsdt3;
         }
-        Buffer64 = (UINT64) (UINTN) AcpiTableInstance->Dsdt3;
         CopyMem (&AcpiTableInstance->Fadt3->XDsdt, &Buffer64, sizeof (UINT64));
 
         //
