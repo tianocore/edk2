@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -223,7 +223,9 @@ if [ -z "$PLATFORMFILE" ]; then
 fi
 
 if [[ "$RUN_QEMU" == "yes" ]]; then
-  qemu_version=$($QEMU_COMMAND -version 2>&1 | tail -1 | awk '{print $4}')
+  qemu_version=$($QEMU_COMMAND -version 2>&1 | \
+                   grep -o -E 'version [0-9]+\.[0-9]+\.[0-9]+' | \
+                     awk '{print $2}')
   case $qemu_version in
     1.[6-9].*|1.[1-9][0-9].*|2.*.*)
       ENABLE_FLASH=yes
