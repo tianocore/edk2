@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core dispatch services
   
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1111,6 +1111,13 @@ PeiDispatcher (
                   PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
                   PeimEntryPoint (PeimFileHandle, (const EFI_PEI_SERVICES **) PeiServices);
                   Private->PeimDispatchOnThisPass = TRUE;
+                } else {
+                  //
+                  // The related GuidedSectionExtraction PPI for the
+                  // signed PEIM image section may be installed in the rest
+                  // of this do-while loop, so need to make another pass.
+                  //
+                  Private->PeimNeedingDispatch = TRUE;
                 }
 
                 REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
