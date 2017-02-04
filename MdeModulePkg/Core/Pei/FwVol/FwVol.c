@@ -2,7 +2,7 @@
   Pei Core Firmware File System service routines.
   
 Copyright (c) 2015 HP Development Company, L.P.
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -913,17 +913,19 @@ ProcessSection (
         }
 
         if (!EFI_ERROR (Status)) {
-          //
-          // Update cache section data.
-          //
-          if (PrivateData->CacheSection.AllSectionCount < CACHE_SETION_MAX_NUMBER) {
-            PrivateData->CacheSection.AllSectionCount ++;
+          if ((Authentication & EFI_AUTH_STATUS_NOT_TESTED) == 0) {
+            //
+            // Update cache section data.
+            //
+            if (PrivateData->CacheSection.AllSectionCount < CACHE_SETION_MAX_NUMBER) {
+              PrivateData->CacheSection.AllSectionCount ++;
+            }
+            PrivateData->CacheSection.Section [PrivateData->CacheSection.SectionIndex]     = Section;
+            PrivateData->CacheSection.SectionData [PrivateData->CacheSection.SectionIndex] = PpiOutput;
+            PrivateData->CacheSection.SectionSize [PrivateData->CacheSection.SectionIndex] = PpiOutputSize;
+            PrivateData->CacheSection.AuthenticationStatus [PrivateData->CacheSection.SectionIndex] = Authentication;
+            PrivateData->CacheSection.SectionIndex = (PrivateData->CacheSection.SectionIndex + 1)%CACHE_SETION_MAX_NUMBER;
           }
-          PrivateData->CacheSection.Section [PrivateData->CacheSection.SectionIndex]     = Section;
-          PrivateData->CacheSection.SectionData [PrivateData->CacheSection.SectionIndex] = PpiOutput;
-          PrivateData->CacheSection.SectionSize [PrivateData->CacheSection.SectionIndex] = PpiOutputSize;
-          PrivateData->CacheSection.AuthenticationStatus [PrivateData->CacheSection.SectionIndex] = Authentication;
-          PrivateData->CacheSection.SectionIndex = (PrivateData->CacheSection.SectionIndex + 1)%CACHE_SETION_MAX_NUMBER;
 
           TempAuthenticationStatus = 0;
           Status = ProcessSection (
