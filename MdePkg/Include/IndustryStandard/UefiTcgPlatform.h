@@ -206,6 +206,17 @@ typedef struct tdTCG_PCR_EVENT2 {
 } TCG_PCR_EVENT2;
 
 //
+// TCG PCR Event2 Header
+// Follow TCG EFI Protocol Spec 5.2 Crypto Agile Log Entry Format
+//
+typedef struct tdTCG_PCR_EVENT2_HDR{
+  TCG_PCRINDEX        PCRIndex;
+  TCG_EVENTTYPE       EventType;
+  TPML_DIGEST_VALUES  Digests;
+  UINT32              EventSize;
+} TCG_PCR_EVENT2_HDR;
+
+//
 // Log Header Entry Data
 //
 typedef struct {
