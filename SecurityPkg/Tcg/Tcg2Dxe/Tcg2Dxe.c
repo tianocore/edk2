@@ -169,6 +169,82 @@ InternalDumpData (
 
 /**
 
+  This function initialize TCG_PCR_EVENT2_HDR for EV_NO_ACTION Event Type other than EFI Specification ID event
+  The behavior is defined by TCG PC Client PFP Spec. Section 9.3.4 EV_NO_ACTION Event Types
+
+  @param[in, out]   NoActionEvent  Event Header of EV_NO_ACTION Event
+  @param[in]        EventSize      Event Size of the EV_NO_ACTION Event
+
+**/
+VOID
+InitNoActionEvent (
+  IN OUT TCG_PCR_EVENT2_HDR  *NoActionEvent,
+  IN UINT32                  EventSize
+ )
+{
+  UINT32          DigestListCount;
+  TPMI_ALG_HASH   HashAlgId;
+  UINT8           *DigestBuffer;
+
+  DigestBuffer    = (UINT8 *)NoActionEvent->Digests.digests;
+  DigestListCount = 0;
+
+  NoActionEvent->PCRIndex  = 0;
+  NoActionEvent->EventType = EV_NO_ACTION;
+
+  //
+  // Set Hash count & hashAlg accordingly, while Digest.digests[n].digest to all 0
+  //
+  ZeroMem (&NoActionEvent->Digests, sizeof(NoActionEvent->Digests));
+
+  if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
+     HashAlgId = TPM_ALG_SHA1;
+     CopyMem (DigestBuffer, &HashAlgId, sizeof(TPMI_ALG_HASH));
+     DigestBuffer += sizeof(TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+     DigestListCount++;
+  }
+
+  if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
+     HashAlgId = TPM_ALG_SHA256;
+     CopyMem (DigestBuffer, &HashAlgId, sizeof(TPMI_ALG_HASH));
+     DigestBuffer += sizeof(TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+     DigestListCount++;
+  }
+
+  if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
+    HashAlgId = TPM_ALG_SHA384;
+    CopyMem (DigestBuffer, &HashAlgId, sizeof(TPMI_ALG_HASH));
+    DigestBuffer += sizeof(TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestListCount++;
+  }
+
+  if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
+    HashAlgId = TPM_ALG_SHA512;
+    CopyMem (DigestBuffer, &HashAlgId, sizeof(TPMI_ALG_HASH));
+    DigestBuffer += sizeof(TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestListCount++;
+  }
+
+  if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
+    HashAlgId = TPM_ALG_SM3_256;
+    CopyMem (DigestBuffer, &HashAlgId, sizeof(TPMI_ALG_HASH));
+    DigestBuffer += sizeof(TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestListCount++;
+  }
+
+  //
+  // Set Digests Count
+  //
+  WriteUnaligned32 ((UINT32 *)&NoActionEvent->Digests.count, DigestListCount);
+
+  //
+  // Set Event Size
+  //
+  WriteUnaligned32((UINT32 *)DigestBuffer, EventSize);
+}
+
+/**
+
   This function dump raw data with colume format.
 
   @param  Data  raw data
@@ -1381,7 +1457,8 @@ SetupEventLog (
   UINT32                          HashAlgorithmMaskCopied;
   TCG_EfiSpecIDEventStruct        *TcgEfiSpecIdEventStruct;
   UINT8                           TempBuf[sizeof(TCG_EfiSpecIDEventStruct) + sizeof(UINT32) + (HASH_COUNT * sizeof(TCG_EfiSpecIdEventAlgorithmSize)) + sizeof(UINT8)];
-  TCG_PCR_EVENT_HDR               NoActionEvent;
+  TCG_PCR_EVENT_HDR               SpecIdEvent;
+  TCG_PCR_EVENT2_HDR              NoActionEvent;
   TCG_EfiSpecIdEventAlgorithmSize *DigestSize;
   TCG_EfiSpecIdEventAlgorithmSize *TempDigestSize;
   UINT8                           *VendorInfoSize;
@@ -1469,25 +1546,26 @@ SetupEventLog (
         VendorInfoSize = (UINT8 *)TempDigestSize;
         *VendorInfoSize = 0;
 
-        NoActionEvent.PCRIndex = 0;
-        NoActionEvent.EventType = EV_NO_ACTION;
-        ZeroMem (&NoActionEvent.Digest, sizeof(NoActionEvent.Digest));
-        NoActionEvent.EventSize = (UINT32)GetTcgEfiSpecIdEventStructSize (TcgEfiSpecIdEventStruct);
+        SpecIdEvent.PCRIndex = 0;
+        SpecIdEvent.EventType = EV_NO_ACTION;
+        ZeroMem (&SpecIdEvent.Digest, sizeof(SpecIdEvent.Digest));
+        SpecIdEvent.EventSize = (UINT32)GetTcgEfiSpecIdEventStructSize (TcgEfiSpecIdEventStruct);
 
         //
-        // Log TcgEfiSpecIdEventStruct as the first Event
+        // Log TcgEfiSpecIdEventStruct as the first Event. Event format is TCG_PCR_EVENT.
+        //   TCG EFI Protocol Spec. Section 5.3 Event Log Header
         //   TCG PC Client PFP spec. Section 9.2 Measurement Event Entries and Log
         //
         Status = TcgDxeLogEvent (
                    mTcg2EventInfo[Index].LogFormat,
-                   &NoActionEvent,
-                   sizeof(NoActionEvent),
+                   &SpecIdEvent,
+                   sizeof(SpecIdEvent),
                    (UINT8 *)TcgEfiSpecIdEventStruct,
-                   NoActionEvent.EventSize
+                   SpecIdEvent.EventSize
                    );
 
         //
-        // EfiStartupLocalityEvent
+        // EfiStartupLocalityEvent. Event format is TCG_PCR_EVENT2
         //
         GuidHob.Guid = GetFirstGuidHob (&gTpm2StartupLocalityHobGuid);
         if (GuidHob.Guid != NULL) {
@@ -1496,13 +1574,12 @@ SetupEventLog (
           //
           StartupLocalityEvent.StartupLocality = *(UINT8 *)(GET_GUID_HOB_DATA (GuidHob.Guid));
           CopyMem (StartupLocalityEvent.Signature, TCG_EfiStartupLocalityEvent_SIGNATURE, sizeof(StartupLocalityEvent.Signature));
-
-          NoActionEvent.PCRIndex = 0;
-          NoActionEvent.EventType = EV_NO_ACTION;
-          ZeroMem (&NoActionEvent.Digest, sizeof(NoActionEvent.Digest));
-          NoActionEvent.EventSize = sizeof(StartupLocalityEvent);
-
           DEBUG ((DEBUG_INFO, "SetupEventLog: Set Locality from HOB into StartupLocalityEvent 0x%02x\n", StartupLocalityEvent.StartupLocality));
+
+          //
+          // Initialize StartupLocalityEvent
+          //
+          InitNoActionEvent(&NoActionEvent, sizeof(StartupLocalityEvent));
 
           //
           // Log EfiStartupLocalityEvent as the second Event
@@ -1511,10 +1588,11 @@ SetupEventLog (
           Status = TcgDxeLogEvent (
                      mTcg2EventInfo[Index].LogFormat,
                      &NoActionEvent,
-                     sizeof(NoActionEvent),
+                     sizeof(NoActionEvent.PCRIndex) + sizeof(NoActionEvent.EventType) + GetDigestListBinSize (&NoActionEvent.Digests) + sizeof(NoActionEvent.EventSize),
                      (UINT8 *)&StartupLocalityEvent,
-                     NoActionEvent.EventSize
+                     sizeof(StartupLocalityEvent)
                      );
+
         }
       }
     }
