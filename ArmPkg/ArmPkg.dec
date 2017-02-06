@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2015, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2017, ARM Limited. All rights reserved.
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -252,8 +252,8 @@
   # ARM Generic Watchdog
   #
 
-  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0x2A440000|UINT32|0x00000007
-  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0x2A450000|UINT32|0x00000008
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0x2A440000|UINT64|0x00000007
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0x2A450000|UINT64|0x00000008
   gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|93|UINT32|0x00000009
 
   #
