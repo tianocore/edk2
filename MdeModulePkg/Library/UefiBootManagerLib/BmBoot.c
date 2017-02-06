@@ -991,9 +991,13 @@ BmExpandMediaDevicePath (
     return FileBuffer;
   }
 
+  Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &TempDevicePath, &Handle);
+  ASSERT_EFI_ERROR (Status);
+
   //
-  // For device boot option only pointing to the removable device handle, 
-  // should make sure all its children handles (its child partion or media handles) are created and connected. 
+  // For device boot option only pointing to the removable device handle,
+  // should make sure all its children handles (its child partion or media handles)
+  // are created and connected.
   //
   gBS->ConnectController (Handle, NULL, NULL, TRUE);
 
@@ -1004,8 +1008,6 @@ BmExpandMediaDevicePath (
   // returned. After the Block IO protocol is reinstalled, subsequent
   // Block IO read/write will success.
   //
-  Status = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &TempDevicePath, &Handle);
-  ASSERT_EFI_ERROR (Status);
   Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **) &BlockIo);
   ASSERT_EFI_ERROR (Status);
   Buffer = AllocatePool (BlockIo->Media->BlockSize);
