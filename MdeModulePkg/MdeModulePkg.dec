@@ -1050,6 +1050,12 @@
   # @Expression  0x80000002 | (gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask & 0x7C) == 0
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask|0x0|UINT8|0x30001041
 
+  ## The mask is used to control SmiHandlerProfile behavior.<BR><BR>
+  #  BIT0 - Enable SmiHandlerProfile.<BR>
+  # @Prompt SmiHandlerProfile Property.
+  # @Expression  0x80000002 | (gEfiMdeModulePkgTokenSpaceGuid.PcdSmiHandlerProfilePropertyMask & 0xFE) == 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmiHandlerProfilePropertyMask|0|UINT8|0x00000108
+
   ## This flag is to control which memory types of alloc info will be recorded by DxeCore & SmmCore.<BR><BR>
   # For SmmCore, only EfiRuntimeServicesCode and EfiRuntimeServicesData are valid.<BR>
   #
