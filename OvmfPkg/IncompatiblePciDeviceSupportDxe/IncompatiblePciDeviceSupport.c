@@ -4,6 +4,7 @@
   is not present), conserving 32-bit MMIO aperture for 32-bit BARs.
 
   Copyright (C) 2016, Red Hat, Inc.
+  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -66,19 +67,19 @@ STATIC CONST MMIO64_PREFERENCE mConfiguration = {
         )
       ),
     ACPI_ADDRESS_SPACE_TYPE_MEM,                   // ResType
-    PCI_ACPI_UNUSED,                               // GenFlag
-    PCI_ACPI_UNUSED,                               // SpecificFlag
+    0,                                             // GenFlag
+    0,                                             // SpecificFlag
     64,                                            // AddrSpaceGranularity:
                                                    //   aperture selection hint
                                                    //   for BAR allocation
-    PCI_ACPI_UNUSED,                               // AddrRangeMin
-    PCI_BAR_OLD_ALIGN,                             // AddrRangeMax:
+    0,                                             // AddrRangeMin
+    0,                                             // AddrRangeMax:
                                                    //   no special alignment
                                                    //   for affected BARs
-    PCI_BAR_ALL,                                   // AddrTranslationOffset:
+    MAX_UINT64,                                    // AddrTranslationOffset:
                                                    //   hint covers all
                                                    //   eligible BARs
-    PCI_BAR_NOCHANGE                               // AddrLen:
+    0                                              // AddrLen:
                                                    //   use probed BAR size
   },
   //
