@@ -1088,6 +1088,16 @@
   # @Prompt Memory profile driver path.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileDriverPath|{0x0}|VOID*|0x00001043
 
+  ## Set image protection policy. The policy is bitwise.
+  #  If a bit is set, the image will be protected by DxeCore if it is aligned.
+  #   The code section becomes read-only, and the data section becomes non-executable.
+  #  If a bit is clear, the image will not be protected.<BR><BR>
+  #    BIT0       - Image from unknown device. <BR>
+  #    BIT1       - Image from firmware volume.<BR>
+  # @Prompt Set image protection policy.
+  # @ValidRange 0x80000002 | 0x00000000 - 0x0000001F
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000002|UINT32|0x00001047
+
   ## PCI Serial Device Info. It is an array of Device, Function, and Power Management
   #  information that describes the path that contains zero or more PCI to PCI briges
   #  followed by a PCI serial device.  Each array entry is 4-bytes in length.  The
