@@ -643,7 +643,7 @@ CapsuleAuthenticateSystemFirmware (
       return EFI_SECURITY_VIOLATION;
     }
   } else {
-    if (CurrentImageFmpInfo->Version < ImageFmpInfo->LowestSupportedImageVersion) {
+    if (ImageFmpInfo->Version < CurrentImageFmpInfo->LowestSupportedImageVersion) {
       *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INCORRECT_VERSION;
       DEBUG((DEBUG_INFO, "LowestSupportedImageVersion check - fail\n"));
       return EFI_SECURITY_VIOLATION;
