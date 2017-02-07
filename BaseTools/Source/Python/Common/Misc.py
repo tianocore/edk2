@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -93,10 +93,16 @@ def _parseForGCC(lines, efifilepath, varnames):
             if m != None:
                 sections.append(m.groups(0))
             for varname in varnames:
-                m = re.match(".data.(%s)$" % varname, line)
+                Str = ''
+                m = re.match("^.data.(%s)" % varname, line)
                 if m != None:
-                    if lines[index + 1]:
-                        m = re.match('^([\da-fA-Fx]+) +([\da-fA-Fx]+)', lines[index + 1].strip())
+                    m = re.match(".data.(%s)$" % varname, line)
+                    if m != None:
+                        Str = lines[index + 1]
+                    else:
+                        Str = line[len(".data.%s" % varname):]
+                    if Str:
+                        m = re.match('^([\da-fA-Fx]+) +([\da-fA-Fx]+)', Str.strip())
                         if m != None:
                             varoffset.append((varname, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
 
