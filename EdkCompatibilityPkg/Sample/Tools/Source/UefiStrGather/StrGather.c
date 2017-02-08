@@ -854,7 +854,7 @@ GetLangCode (
   }
 
   //
-  // Convert the language accoring to the table.
+  // Convert the language according to the table.
   //
   for (Index = 0; LanguageConvertTable[Index].ISO639 != NULL; Index++) {
     if (wcscmp(LanguageConvertTable[Index].ISO639, Lang) == 0) {
