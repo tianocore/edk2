@@ -352,6 +352,143 @@ ProcessCmdAddChecksum (
 }
 
 
+/**
+  Process a QEMU_LOADER_WRITE_POINTER command.
+
+  @param[in] WritePointer   The QEMU_LOADER_WRITE_POINTER command to process.
+
+  @param[in] Tracker        The ORDERED_COLLECTION tracking the BLOB user
+                            structures created thus far.
+
+  @retval EFI_PROTOCOL_ERROR  Malformed fw_cfg file name(s) have been found in
+                              WritePointer. Or, the WritePointer command
+                              references a file unknown to Tracker or the
+                              fw_cfg directory. Or, the pointer object to
+                              rewrite has invalid location, size, or initial
+                              relative value. Or, the pointer value to store
+                              does not fit in the given pointer size.
+
+  @retval EFI_SUCCESS         The pointer object inside the writeable fw_cfg
+                              file has been written.
+**/
+STATIC
+EFI_STATUS
+ProcessCmdWritePointer (
+  IN     CONST QEMU_LOADER_WRITE_POINTER *WritePointer,
+  IN     CONST ORDERED_COLLECTION        *Tracker
+  )
+{
+  RETURN_STATUS            Status;
+  FIRMWARE_CONFIG_ITEM     PointerItem;
+  UINTN                    PointerItemSize;
+  ORDERED_COLLECTION_ENTRY *PointeeEntry;
+  BLOB                     *PointeeBlob;
+  UINT64                   PointerValue;
+
+  if (WritePointer->PointerFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0' ||
+      WritePointer->PointeeFile[QEMU_LOADER_FNAME_SIZE - 1] != '\0') {
+    DEBUG ((DEBUG_ERROR, "%a: malformed file name\n", __FUNCTION__));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  Status = QemuFwCfgFindFile ((CONST CHAR8 *)WritePointer->PointerFile,
+             &PointerItem, &PointerItemSize);
+  PointeeEntry = OrderedCollectionFind (Tracker, WritePointer->PointeeFile);
+  if (RETURN_ERROR (Status) || PointeeEntry == NULL) {
+    DEBUG ((DEBUG_ERROR,
+      "%a: invalid fw_cfg file or blob reference \"%a\" / \"%a\"\n",
+      __FUNCTION__, WritePointer->PointerFile, WritePointer->PointeeFile));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  if ((WritePointer->PointerSize != 1 && WritePointer->PointerSize != 2 &&
+       WritePointer->PointerSize != 4 && WritePointer->PointerSize != 8) ||
+      (PointerItemSize < WritePointer->PointerSize) ||
+      (PointerItemSize - WritePointer->PointerSize <
+       WritePointer->PointerOffset)) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid pointer location or size in \"%a\"\n",
+      __FUNCTION__, WritePointer->PointerFile));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  PointeeBlob = OrderedCollectionUserStruct (PointeeEntry);
+  PointerValue = WritePointer->PointeeOffset;
+  if (PointerValue >= PointeeBlob->Size) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid PointeeOffset\n", __FUNCTION__));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // The memory allocation system ensures that the address of the byte past the
+  // last byte of any allocated object is expressible (no wraparound).
+  //
+  ASSERT ((UINTN)PointeeBlob->Base <= MAX_ADDRESS - PointeeBlob->Size);
+
+  PointerValue += (UINT64)(UINTN)PointeeBlob->Base;
+  if (RShiftU64 (
+        RShiftU64 (PointerValue, WritePointer->PointerSize * 8 - 1), 1) != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: pointer value unrepresentable in \"%a\"\n",
+      __FUNCTION__, WritePointer->PointerFile));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  QemuFwCfgSelectItem (PointerItem);
+  QemuFwCfgSkipBytes (WritePointer->PointerOffset);
+  QemuFwCfgWriteBytes (WritePointer->PointerSize, &PointerValue);
+
+  //
+  // Because QEMU has now learned PointeeBlob->Base, we must mark PointeeBlob
+  // as unreleasable, for the case when the whole linker/loader script is
+  // handled successfully.
+  //
+  PointeeBlob->HostsOnlyTableData = FALSE;
+
+  DEBUG ((DEBUG_VERBOSE, "%a: PointerFile=\"%a\" PointeeFile=\"%a\" "
+    "PointerOffset=0x%x PointeeOffset=0x%x PointerSize=%d\n", __FUNCTION__,
+    WritePointer->PointerFile, WritePointer->PointeeFile,
+    WritePointer->PointerOffset, WritePointer->PointeeOffset,
+    WritePointer->PointerSize));
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Undo a QEMU_LOADER_WRITE_POINTER command.
+
+  This function revokes (zeroes out) a guest memory reference communicated to
+  QEMU earlier. The caller is responsible for invoking this function only on
+  such QEMU_LOADER_WRITE_POINTER commands that have been successfully processed
+  by ProcessCmdWritePointer().
+
+  @param[in] WritePointer  The QEMU_LOADER_WRITE_POINTER command to undo.
+**/
+STATIC
+VOID
+UndoCmdWritePointer (
+  IN CONST QEMU_LOADER_WRITE_POINTER *WritePointer
+  )
+{
+  RETURN_STATUS        Status;
+  FIRMWARE_CONFIG_ITEM PointerItem;
+  UINTN                PointerItemSize;
+  UINT64               PointerValue;
+
+  Status = QemuFwCfgFindFile ((CONST CHAR8 *)WritePointer->PointerFile,
+             &PointerItem, &PointerItemSize);
+  ASSERT_RETURN_ERROR (Status);
+
+  PointerValue = 0;
+  QemuFwCfgSelectItem (PointerItem);
+  QemuFwCfgSkipBytes (WritePointer->PointerOffset);
+  QemuFwCfgWriteBytes (WritePointer->PointerSize, &PointerValue);
+
+  DEBUG ((DEBUG_VERBOSE,
+    "%a: PointerFile=\"%a\" PointerOffset=0x%x PointerSize=%d\n", __FUNCTION__,
+    WritePointer->PointerFile, WritePointer->PointerOffset,
+    WritePointer->PointerSize));
+}
+
+
 //
 // We'll be saving the keys of installed tables so that we can roll them back
 // in case of failure. 128 tables should be enough for anyone (TM).
@@ -561,6 +698,7 @@ InstallQemuFwCfgTables (
   UINTN                    FwCfgSize;
   QEMU_LOADER_ENTRY        *LoaderStart;
   CONST QEMU_LOADER_ENTRY  *LoaderEntry, *LoaderEnd;
+  CONST QEMU_LOADER_ENTRY  *WritePointerSubsetEnd;
   ORIGINAL_ATTRIBUTES      *OriginalPciAttributes;
   UINTN                    OriginalPciAttributesCount;
   ORDERED_COLLECTION       *Tracker;
@@ -597,6 +735,11 @@ InstallQemuFwCfgTables (
   //
   // first pass: process the commands
   //
+  // "WritePointerSubsetEnd" points one past the last successful
+  // QEMU_LOADER_WRITE_POINTER command. Now when we're about to start the first
+  // pass, no such command has been encountered yet.
+  //
+  WritePointerSubsetEnd = LoaderStart;
   for (LoaderEntry = LoaderStart; LoaderEntry < LoaderEnd; ++LoaderEntry) {
     switch (LoaderEntry->Type) {
     case QemuLoaderCmdAllocate:
@@ -613,6 +756,14 @@ InstallQemuFwCfgTables (
                  Tracker);
       break;
 
+    case QemuLoaderCmdWritePointer:
+        Status = ProcessCmdWritePointer (&LoaderEntry->Command.WritePointer,
+                   Tracker);
+        if (!EFI_ERROR (Status)) {
+          WritePointerSubsetEnd = LoaderEntry + 1;
+        }
+        break;
+
     default:
       DEBUG ((EFI_D_VERBOSE, "%a: unknown loader command: 0x%x\n",
         __FUNCTION__, LoaderEntry->Type));
@@ -620,14 +771,14 @@ InstallQemuFwCfgTables (
     }
 
     if (EFI_ERROR (Status)) {
-      goto FreeTracker;
+      goto RollbackWritePointersAndFreeTracker;
     }
   }
 
   InstalledKey = AllocatePool (INSTALLED_TABLES_MAX * sizeof *InstalledKey);
   if (InstalledKey == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto FreeTracker;
+    goto RollbackWritePointersAndFreeTracker;
   }
 
   //
@@ -658,7 +809,21 @@ InstallQemuFwCfgTables (
 
   FreePool (InstalledKey);
 
-FreeTracker:
+RollbackWritePointersAndFreeTracker:
+  //
+  // In case of failure, revoke any allocation addresses that were communicated
+  // to QEMU previously, before we release all the blobs.
+  //
+  if (EFI_ERROR (Status)) {
+    LoaderEntry = WritePointerSubsetEnd;
+    while (LoaderEntry > LoaderStart) {
+      --LoaderEntry;
+      if (LoaderEntry->Type == QemuLoaderCmdWritePointer) {
+        UndoCmdWritePointer (&LoaderEntry->Command.WritePointer);
+      }
+    }
+  }
+
   //
   // Tear down the tracker infrastructure. Each fw_cfg blob will be left in
   // place only if we're exiting with success and the blob hosts data that is
