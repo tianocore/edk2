@@ -22,6 +22,6 @@
 #string STR_HTTP_BOOT_IP_VERSION_4            #language en-US "IP4"
 #string STR_HTTP_BOOT_IP_VERSION_6            #language en-US "IP6"
 #string STR_BOOT_URI_PROMPT                   #language en-US "Boot URI"
-#string STR_BOOT_URI_HELP                     #language en-US "A new Boot Option will be created accroding to this Boot URI."
+#string STR_BOOT_URI_HELP                     #language en-US "A new Boot Option will be created according to this Boot URI."
 #string STR_BOOT_DESCRIPTION_PROMPT           #language en-US "Input the description"
 #string STR_NULL_STRING                       #language en-US ""
