@@ -27,7 +27,7 @@
 typedef enum {
   QemuLoaderCmdAllocate = 1,
   QemuLoaderCmdAddPointer,
-  QemuLoaderCmdAddChecksum
+  QemuLoaderCmdAddChecksum,
 } QEMU_LOADER_COMMAND_TYPE;
 
 typedef enum {
@@ -75,10 +75,10 @@ typedef struct {
 typedef struct {
   UINT32 Type;                             // QEMU_LOADER_COMMAND_TYPE values
   union {
-    QEMU_LOADER_ALLOCATE     Allocate;
-    QEMU_LOADER_ADD_POINTER  AddPointer;
-    QEMU_LOADER_ADD_CHECKSUM AddChecksum;
-    UINT8                    Padding[124];
+    QEMU_LOADER_ALLOCATE      Allocate;
+    QEMU_LOADER_ADD_POINTER   AddPointer;
+    QEMU_LOADER_ADD_CHECKSUM  AddChecksum;
+    UINT8                     Padding[124];
   } Command;
 } QEMU_LOADER_ENTRY;
 #pragma pack ()
