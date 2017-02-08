@@ -36,11 +36,11 @@
   PcdLib
 
 [Protocols]
-  gEfiPrint2ProtocolGuid                         ## CONSUMES
+  gEfiPrint2SProtocolGuid                        ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength     ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength   ## SOMETIMES_CONSUMES
 
 [Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SAL_DRIVER, Depex.common.DXE_SMM_DRIVER]
-  gEfiPrint2ProtocolGuid
+  gEfiPrint2SProtocolGuid

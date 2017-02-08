@@ -1,8 +1,8 @@
 /** @file
-  Instance of Print Library based on gEfiPrint2ProtocolGuid.
+  Instance of Print Library based on gEfiPrint2SProtocolGuid.
 
   Implement the print library instance by wrap the interface 
-  provided in the Print2 protocol. This protocol is defined as the internal
+  provided in the Print2S protocol. This protocol is defined as the internal
   protocol related to this implementation, not in the public spec. So, this 
   library instance is only for this code base.
 
@@ -43,12 +43,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     } \
   } while (FALSE)
 
-EFI_PRINT2_PROTOCOL  *mPrint2Protocol = NULL;
+EFI_PRINT2S_PROTOCOL  *mPrint2SProtocol = NULL;
 
 /**
-  The constructor function caches the pointer to Print2 protocol.
+  The constructor function caches the pointer to Print2S protocol.
   
-  The constructor function locates Print2 protocol from protocol database.
+  The constructor function locates Print2S protocol from protocol database.
   It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
@@ -67,12 +67,12 @@ PrintLibConstructor (
   EFI_STATUS                   Status;
 
   Status = SystemTable->BootServices->LocateProtocol (
-                                        &gEfiPrint2ProtocolGuid,
+                                        &gEfiPrint2SProtocolGuid,
                                         NULL,
-                                        (VOID**) &mPrint2Protocol
+                                        (VOID**) &mPrint2SProtocol
                                         );
   ASSERT_EFI_ERROR (Status);
-  ASSERT (mPrint2Protocol != NULL);
+  ASSERT (mPrint2SProtocol != NULL);
 
   return Status;
 }
@@ -362,7 +362,7 @@ UnicodeBSPrint (
 {
   ASSERT_UNICODE_BUFFER (StartOfBuffer);
   ASSERT_UNICODE_BUFFER (FormatString);
-  return mPrint2Protocol->UnicodeBSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2SProtocol->UnicodeBSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -537,7 +537,7 @@ UnicodeBSPrintAsciiFormat (
   )
 {
   ASSERT_UNICODE_BUFFER (StartOfBuffer);
-  return mPrint2Protocol->UnicodeBSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2SProtocol->UnicodeBSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -648,7 +648,21 @@ UnicodeValueToString (
   IN UINTN       Width
   )
 {
-  return mPrint2Protocol->UnicodeValueToString (Buffer, Flags, Value, Width);
+  RETURN_STATUS  Status;
+  UINTN          BufferSize;
+
+  if (Width == 0) {
+    BufferSize = (MAXIMUM_VALUE_CHARACTERS + 1) * sizeof (CHAR16);
+  } else {
+    BufferSize = (Width + 1) * sizeof (CHAR16);
+  }
+
+  Status = mPrint2SProtocol->UnicodeValueToStringS (Buffer, BufferSize, Flags, Value, Width);
+  if (RETURN_ERROR (Status)) {
+    return 0;
+  }
+
+  return StrnLenS (Buffer, BufferSize / sizeof (CHAR16));
 }
 
 /**
@@ -758,7 +772,7 @@ AsciiBSPrint (
   IN  BASE_LIST     Marker
   )
 {
-  return mPrint2Protocol->AsciiBSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2SProtocol->AsciiBSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -931,7 +945,7 @@ AsciiBSPrintUnicodeFormat (
   )
 {
   ASSERT_UNICODE_BUFFER (FormatString);
-  return mPrint2Protocol->AsciiBSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
+  return mPrint2SProtocol->AsciiBSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
@@ -1042,7 +1056,21 @@ AsciiValueToString (
   IN  UINTN      Width
   )
 {
-  return mPrint2Protocol->AsciiValueToString (Buffer, Flags, Value, Width);
+  RETURN_STATUS  Status;
+  UINTN          BufferSize;
+
+  if (Width == 0) {
+    BufferSize = (MAXIMUM_VALUE_CHARACTERS + 1) * sizeof (CHAR8);
+  } else {
+    BufferSize = (Width + 1) * sizeof (CHAR8);
+  }
+
+  Status = mPrint2SProtocol->AsciiValueToStringS (Buffer, BufferSize, Flags, Value, Width);
+  if (RETURN_ERROR (Status)) {
+    return 0;
+  }
+
+  return AsciiStrnLenS (Buffer, BufferSize / sizeof (CHAR8));
 }
 
 #define PREFIX_SIGN           BIT1
