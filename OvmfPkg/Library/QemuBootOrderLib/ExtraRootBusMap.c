@@ -308,6 +308,6 @@ MapRootBusPosToBusNr (
   if (RootBusPos > ExtraRootBusMap->Count) {
     return EFI_NOT_FOUND;
   }
-  *RootBusNr = ExtraRootBusMap->BusNumbers[RootBusPos - 1];
+  *RootBusNr = ExtraRootBusMap->BusNumbers[(UINTN)RootBusPos - 1];
   return EFI_SUCCESS;
 }
