@@ -1,7 +1,8 @@
 /** @file
 
-  This print protocol defines six basic print functions to 
-  print the format unicode and ascii string.
+  Produces EFI_PRINT2_PROTOCOL and EFI_PRINT2S_PROTOCOL.
+  These protocols define basic print functions to  print the format unicode and
+  ascii string.
 
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
@@ -514,5 +515,150 @@ struct _EFI_PRINT2_PROTOCOL {
 };
 
 extern EFI_GUID gEfiPrint2ProtocolGuid;
+
+
+#define EFI_PRINT2S_PROTOCOL_GUID  \
+  { 0xcc252d2, 0xc106, 0x4661, { 0xb5, 0xbd, 0x31, 0x47, 0xa4, 0xf8, 0x1f, 0x92 } }
+
+//
+// Forward reference for pure ANSI compatability
+//
+typedef struct _EFI_PRINT2S_PROTOCOL  EFI_PRINT2S_PROTOCOL;
+
+/**
+  Converts a decimal value to a Null-terminated Unicode string.
+
+  Converts the decimal number specified by Value to a Null-terminated Unicode
+  string specified by Buffer containing at most Width characters. No padding of
+  spaces is ever performed. If Width is 0 then a width of
+  MAXIMUM_VALUE_CHARACTERS is assumed. If the conversion contains more than
+  Width characters, then only the first Width characters are placed in Buffer.
+  Additional conversion parameters are specified in Flags.
+
+  The Flags bit LEFT_JUSTIFY is always ignored.
+  All conversions are left justified in Buffer.
+  If Width is 0, PREFIX_ZERO is ignored in Flags.
+  If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and
+  commas are inserted every 3rd digit starting from the right.
+  If RADIX_HEX is set in Flags, then the output buffer will be formatted in
+  hexadecimal format.
+  If Value is < 0 and RADIX_HEX is not set in Flags, then the fist character in
+  Buffer is a '-'.
+  If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored, then
+  Buffer is padded with '0' characters so the combination of the optional '-'
+  sign character, '0' characters, digit characters for Value, and the
+  Null-terminator add up to Width characters.
+
+  If Buffer is not aligned on a 16-bit boundary, then ASSERT().
+  If an error would be returned, then the function will also ASSERT().
+
+  @param  Buffer      The pointer to the output buffer for the produced
+                      Null-terminated Unicode string.
+  @param  BufferSize  The size of Buffer in bytes, including the
+                      Null-terminator.
+  @param  Flags       The bitmask of flags that specify left justification,
+                      zero pad, and commas.
+  @param  Value       The 64-bit signed value to convert to a string.
+  @param  Width       The maximum number of Unicode characters to place in
+                      Buffer, not including the Null-terminator.
+
+  @retval RETURN_SUCCESS           The decimal value is converted.
+  @retval RETURN_BUFFER_TOO_SMALL  If BufferSize cannot hold the converted
+                                   value.
+  @retval RETURN_INVALID_PARAMETER If Buffer is NULL.
+                                   If PcdMaximumUnicodeStringLength is not
+                                   zero, and BufferSize is greater than
+                                   (PcdMaximumUnicodeStringLength *
+                                   sizeof (CHAR16) + 1).
+                                   If unsupported bits are set in Flags.
+                                   If both COMMA_TYPE and RADIX_HEX are set in
+                                   Flags.
+                                   If Width >= MAXIMUM_VALUE_CHARACTERS.
+
+**/
+typedef
+RETURN_STATUS
+(EFIAPI *UNICODE_VALUE_TO_STRING_S)(
+  IN OUT CHAR16  *Buffer,
+  IN UINTN       BufferSize,
+  IN UINTN       Flags,
+  IN INT64       Value,
+  IN UINTN       Width
+  );
+
+/**
+  Converts a decimal value to a Null-terminated Ascii string.
+
+  Converts the decimal number specified by Value to a Null-terminated Ascii
+  string specified by Buffer containing at most Width characters. No padding of
+  spaces is ever performed. If Width is 0 then a width of
+  MAXIMUM_VALUE_CHARACTERS is assumed. If the conversion contains more than
+  Width characters, then only the first Width characters are placed in Buffer.
+  Additional conversion parameters are specified in Flags.
+
+  The Flags bit LEFT_JUSTIFY is always ignored.
+  All conversions are left justified in Buffer.
+  If Width is 0, PREFIX_ZERO is ignored in Flags.
+  If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and
+  commas are inserted every 3rd digit starting from the right.
+  If RADIX_HEX is set in Flags, then the output buffer will be formatted in
+  hexadecimal format.
+  If Value is < 0 and RADIX_HEX is not set in Flags, then the fist character in
+  Buffer is a '-'.
+  If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored, then
+  Buffer is padded with '0' characters so the combination of the optional '-'
+  sign character, '0' characters, digit characters for Value, and the
+  Null-terminator add up to Width characters.
+
+  If Buffer is not aligned on a 16-bit boundary, then ASSERT().
+  If an error would be returned, then the function will also ASSERT().
+
+  @param  Buffer      The pointer to the output buffer for the produced
+                      Null-terminated Ascii string.
+  @param  BufferSize  The size of Buffer in bytes, including the
+                      Null-terminator.
+  @param  Flags       The bitmask of flags that specify left justification,
+                      zero pad, and commas.
+  @param  Value       The 64-bit signed value to convert to a string.
+  @param  Width       The maximum number of Ascii characters to place in
+                      Buffer, not including the Null-terminator.
+
+  @retval RETURN_SUCCESS           The decimal value is converted.
+  @retval RETURN_BUFFER_TOO_SMALL  If BufferSize cannot hold the converted
+                                   value.
+  @retval RETURN_INVALID_PARAMETER If Buffer is NULL.
+                                   If PcdMaximumAsciiStringLength is not
+                                   zero, and BufferSize is greater than
+                                   PcdMaximumAsciiStringLength.
+                                   If unsupported bits are set in Flags.
+                                   If both COMMA_TYPE and RADIX_HEX are set in
+                                   Flags.
+                                   If Width >= MAXIMUM_VALUE_CHARACTERS.
+
+**/
+typedef
+RETURN_STATUS
+(EFIAPI *ASCII_VALUE_TO_STRING_S)(
+  IN OUT CHAR8   *Buffer,
+  IN  UINTN      BufferSize,
+  IN  UINTN      Flags,
+  IN  INT64      Value,
+  IN  UINTN      Width
+  );
+
+struct _EFI_PRINT2S_PROTOCOL {
+  UNICODE_BS_PRINT                     UnicodeBSPrint;
+  UNICODE_S_PRINT                      UnicodeSPrint;
+  UNICODE_BS_PRINT_ASCII_FORMAT        UnicodeBSPrintAsciiFormat;
+  UNICODE_S_PRINT_ASCII_FORMAT         UnicodeSPrintAsciiFormat;
+  UNICODE_VALUE_TO_STRING_S            UnicodeValueToStringS;
+  ASCII_BS_PRINT                       AsciiBSPrint;
+  ASCII_S_PRINT                        AsciiSPrint;
+  ASCII_BS_PRINT_UNICODE_FORMAT        AsciiBSPrintUnicodeFormat;
+  ASCII_S_PRINT_UNICODE_FORMAT         AsciiSPrintUnicodeFormat;
+  ASCII_VALUE_TO_STRING_S              AsciiValueToStringS;
+};
+
+extern EFI_GUID gEfiPrint2SProtocolGuid;
 
 #endif
