@@ -3,7 +3,7 @@
 //
 // This package provides network modules that conform to UEFI 2.4 specification.
 //
-// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License which accompanies this distribution.
@@ -45,6 +45,12 @@
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateKeySize_PROMPT  #language en-US "Private Key's size."
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateKeySize_HELP  #language en-US "Private Key's size."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdAllowHttpConnections_PROMPT  #language en-US "Indicates whether HTTP connections are permitted or not."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdAllowHttpConnections_HELP  #language en-US "Indicates whether HTTP connections are permitted or not.\n"
+                                                                                       "TRUE  - HTTP connections are allowed.\n"
+                                                                                       "FALSE - HTTP connections are denied."
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecCertificateEnabled_PROMPT  #language en-US "Enable IPsec IKEv2 Certificate Authentication."
 
