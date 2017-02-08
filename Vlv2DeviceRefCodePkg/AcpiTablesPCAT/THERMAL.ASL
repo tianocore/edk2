@@ -5,7 +5,7 @@
 ;*    Family of Customer Reference Boards.                                *;
 ;*                                                                        *;
 ;*                                                                        *;
-;*    Copyright (c)  1999  - 2014, Intel Corporation. All rights reserved   *;
+;*    Copyright (c)  1999  - 2017, Intel Corporation. All rights reserved   *;
 ;
 ; This program and the accompanying materials are licensed and made available under
 ; the terms and conditions of the BSD License that accompanies this distribution.
@@ -69,7 +69,12 @@ Scope(\_TZ)
         {
           Store(DTS1,Local0)
         }
-        Return(Add(2732,Multiply(Local0,10)))
+        If (LEqual(And(Local0, 0x80), 0)) {
+          Return(Add(2732,Multiply(Local0,10)))
+        } else {
+          Add(Subtract(255, Local0), 1, Local0)
+          Return(Subtract(2732,Multiply(Local0,10)))
+        }
         //
         // Else return a static value if both EC and DTS are unavailable.
         //
