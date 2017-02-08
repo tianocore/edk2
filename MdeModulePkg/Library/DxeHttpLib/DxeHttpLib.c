@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to parse the HTTP message byte stream.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -721,9 +721,8 @@ HttpUrlGetPort (
   }
 
   PortString[ResultLength] = '\0';
-  *Port = (UINT16) AsciiStrDecimalToUintn (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset);
 
-  return  EFI_SUCCESS;
+  return AsciiStrDecimalToUintnS (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset, (CHAR8 **) NULL, (UINTN *) Port);
 }
 
 /**
@@ -932,8 +931,7 @@ HttpIoParseContentLengthHeader (
     return EFI_NOT_FOUND;
   }
 
-  *ContentLength = AsciiStrDecimalToUintn (Header->FieldValue);
-  return EFI_SUCCESS;
+  return AsciiStrDecimalToUintnS (Header->FieldValue, (CHAR8 **) NULL, ContentLength);
 }
 
 /**
