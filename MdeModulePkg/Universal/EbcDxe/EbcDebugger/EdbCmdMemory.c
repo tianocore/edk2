@@ -37,7 +37,7 @@ EdbDisplayMemoryUnit (
   UINT64 Data64;
 
   //
-  // Print accroding to width
+  // Print according to width
   //
   switch (Width) {
   case EdbWidthUint8:

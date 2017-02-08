@@ -1178,7 +1178,7 @@ EdbShowDisasm (
 
 /**
 
-  Get register value accroding to the system context, and register index.
+  Get register value according to the system context, and register index.
 
   @param  SystemContext   - EBC system context.
   @param  Index           - EBC register index

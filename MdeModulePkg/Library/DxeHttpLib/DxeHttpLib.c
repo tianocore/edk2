@@ -396,7 +396,7 @@ HttpParseUrl (
   FoundAt = FALSE;
   for (Char = Url; Char < Url + Length; Char++) {
     //
-    // Update state machine accoring to next char.
+    // Update state machine according to next char.
     //
     State = NetHttpParseUrlChar (*Char, State);
 

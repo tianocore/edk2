@@ -1215,7 +1215,7 @@ Dhcp4InstanceConfigUdpIo (
     // UEFI spec, while in classless addressing network, the netmask must be explicitly
     // provided together with the station address.
     // If the DHCP instance haven't be configured with a valid netmask, we could only
-    // compute it accroding to the classful addressing rule.
+    // compute it according to the classful addressing rule.
     //
     Class = NetGetIpClass (ClientAddr);
     ASSERT (Class < IP4_ADDR_CLASSE);

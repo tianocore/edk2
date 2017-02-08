@@ -785,7 +785,7 @@ SmmCoreGetMemoryMapMemoryAttributesTable (
 //
 
 /**
-  Set MemoryProtectionAttribute accroding to PE/COFF image section alignment.
+  Set MemoryProtectionAttribute according to PE/COFF image section alignment.
 
   @param[in]  SectionAlignment    PE/COFF section alignment
 **/
@@ -1225,7 +1225,7 @@ Finish:
 }
 
 /**
-  Find image record accroding to image base and size.
+  Find image record according to image base and size.
 
   @param[in]  ImageBase    Base of PE image
   @param[in]  ImageSize    Size of PE image

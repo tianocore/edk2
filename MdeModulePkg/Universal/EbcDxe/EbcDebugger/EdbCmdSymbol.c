@@ -70,7 +70,7 @@ GetDirNameFromFullPath (
 
 /**
 
-  Construct full path accroding to dir and file path.
+  Construct full path according to dir and file path.
 
   @param  DirPath         - dir path
   @param  FilePath        - file path
@@ -127,7 +127,7 @@ EdbSymbolTypeToStr (
 
 /**
 
-  Find the symbol accroding to address and display symbol.
+  Find the symbol according to address and display symbol.
 
   @param  Address         - SymbolAddress
   @param  DebuggerPrivate - EBC Debugger private data structure
@@ -190,7 +190,7 @@ DebuggerDisplaySymbolAccrodingToAddress (
 
 /**
 
-  Find the symbol accroding to name and display symbol.
+  Find the symbol according to name and display symbol.
 
   @param  SymbolFileName  - The Symbol File Name, NULL means for all
   @param  SymbolName      - The Symbol Name, NULL means for all
