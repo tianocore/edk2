@@ -360,6 +360,11 @@ ProcessCmdAddChecksum (
   @param[in] Tracker        The ORDERED_COLLECTION tracking the BLOB user
                             structures created thus far.
 
+  @param[in,out] S3Context  The S3_CONTEXT object capturing the fw_cfg actions
+                            of successfully processed QEMU_LOADER_WRITE_POINTER
+                            commands, to be replayed at S3 resume. S3Context
+                            may be NULL if S3 is disabled.
+
   @retval EFI_PROTOCOL_ERROR  Malformed fw_cfg file name(s) have been found in
                               WritePointer. Or, the WritePointer command
                               references a file unknown to Tracker or the
@@ -369,13 +374,21 @@ ProcessCmdAddChecksum (
                               does not fit in the given pointer size.
 
   @retval EFI_SUCCESS         The pointer object inside the writeable fw_cfg
-                              file has been written.
+                              file has been written. If S3Context is not NULL,
+                              then WritePointer has been condensed into
+                              S3Context.
+
+  @return                     Error codes propagated from
+                              SaveCondensedWritePointerToS3Context(). The
+                              pointer object inside the writeable fw_cfg file
+                              has not been written.
 **/
 STATIC
 EFI_STATUS
 ProcessCmdWritePointer (
   IN     CONST QEMU_LOADER_WRITE_POINTER *WritePointer,
-  IN     CONST ORDERED_COLLECTION        *Tracker
+  IN     CONST ORDERED_COLLECTION        *Tracker,
+  IN OUT       S3_CONTEXT                *S3Context OPTIONAL
   )
 {
   RETURN_STATUS            Status;
@@ -430,6 +443,25 @@ ProcessCmdWritePointer (
     DEBUG ((DEBUG_ERROR, "%a: pointer value unrepresentable in \"%a\"\n",
       __FUNCTION__, WritePointer->PointerFile));
     return EFI_PROTOCOL_ERROR;
+  }
+
+  //
+  // If S3 is enabled, we have to capture the below fw_cfg actions in condensed
+  // form, to be replayed during S3 resume.
+  //
+  if (S3Context != NULL) {
+    EFI_STATUS SaveStatus;
+
+    SaveStatus = SaveCondensedWritePointerToS3Context (
+                   S3Context,
+                   (UINT16)PointerItem,
+                   WritePointer->PointerSize,
+                   WritePointer->PointerOffset,
+                   PointerValue
+                   );
+    if (EFI_ERROR (SaveStatus)) {
+      return SaveStatus;
+    }
   }
 
   QemuFwCfgSelectItem (PointerItem);
@@ -701,6 +733,7 @@ InstallQemuFwCfgTables (
   CONST QEMU_LOADER_ENTRY  *WritePointerSubsetEnd;
   ORIGINAL_ATTRIBUTES      *OriginalPciAttributes;
   UINTN                    OriginalPciAttributesCount;
+  S3_CONTEXT               *S3Context;
   ORDERED_COLLECTION       *Tracker;
   UINTN                    *InstalledKey;
   INT32                    Installed;
@@ -726,10 +759,22 @@ InstallQemuFwCfgTables (
   RestorePciDecoding (OriginalPciAttributes, OriginalPciAttributesCount);
   LoaderEnd = LoaderStart + FwCfgSize / sizeof *LoaderEntry;
 
+  S3Context = NULL;
+  if (QemuFwCfgS3Enabled ()) {
+    //
+    // Size the allocation pessimistically, assuming that all commands in the
+    // script are QEMU_LOADER_WRITE_POINTER commands.
+    //
+    Status = AllocateS3Context (&S3Context, LoaderEnd - LoaderStart);
+    if (EFI_ERROR (Status)) {
+      goto FreeLoader;
+    }
+  }
+
   Tracker = OrderedCollectionInit (BlobCompare, BlobKeyCompare);
   if (Tracker == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto FreeLoader;
+    goto FreeS3Context;
   }
 
   //
@@ -758,7 +803,7 @@ InstallQemuFwCfgTables (
 
     case QemuLoaderCmdWritePointer:
         Status = ProcessCmdWritePointer (&LoaderEntry->Command.WritePointer,
-                   Tracker);
+                   Tracker, S3Context);
         if (!EFI_ERROR (Status)) {
           WritePointerSubsetEnd = LoaderEntry + 1;
         }
@@ -790,11 +835,21 @@ InstallQemuFwCfgTables (
       Status = Process2ndPassCmdAddPointer (&LoaderEntry->Command.AddPointer,
                  Tracker, AcpiProtocol, InstalledKey, &Installed);
       if (EFI_ERROR (Status)) {
-        break;
+        goto UninstallAcpiTables;
       }
     }
   }
 
+  //
+  // Translating the condensed QEMU_LOADER_WRITE_POINTER commands to ACPI S3
+  // Boot Script opcodes has to be the last operation in this function, because
+  // if it succeeds, it cannot be undone.
+  //
+  if (S3Context != NULL) {
+    Status = TransferS3ContextToBootScript (S3Context);
+  }
+
+UninstallAcpiTables:
   if (EFI_ERROR (Status)) {
     //
     // roll back partial installation
@@ -846,6 +901,11 @@ RollbackWritePointersAndFreeTracker:
     FreePool (Blob);
   }
   OrderedCollectionUninit (Tracker);
+
+FreeS3Context:
+  if (S3Context != NULL) {
+    ReleaseS3Context (S3Context);
+  }
 
 FreeLoader:
   FreePool (LoaderStart);

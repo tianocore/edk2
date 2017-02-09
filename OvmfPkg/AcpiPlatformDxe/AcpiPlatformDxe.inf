@@ -33,6 +33,7 @@
   Xen.c
   EntryPoint.c
   PciDecoding.c
+  BootScript.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -59,6 +60,7 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
+  gEfiS3SaveStateProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
   gEfiXenInfoGuid
