@@ -3,6 +3,7 @@
 *
 *  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
 *  Copyright (c) 2016, Linaro Limited. All rights reserved.
+*  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -89,7 +90,7 @@ PageAttributeToGcdAttribute (
   // Determine protection attributes
   if (((PageAttributes & TT_AP_MASK) == TT_AP_NO_RO) || ((PageAttributes & TT_AP_MASK) == TT_AP_RO_RO)) {
     // Read only cases map to write-protect
-    GcdAttributes |= EFI_MEMORY_WP;
+    GcdAttributes |= EFI_MEMORY_RO;
   }
 
   // Process eXecute Never attribute

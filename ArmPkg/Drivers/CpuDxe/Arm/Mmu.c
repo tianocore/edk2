@@ -3,6 +3,7 @@
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
 Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -62,7 +63,7 @@ SectionToGcdAttributes (
   // determine protection attributes
   switch(SectionAttributes & TT_DESCRIPTOR_SECTION_AP_MASK) {
     case TT_DESCRIPTOR_SECTION_AP_NO_NO: // no read, no write
-      //*GcdAttributes |= EFI_MEMORY_WP | EFI_MEMORY_RP;
+      //*GcdAttributes |= EFI_MEMORY_RO | EFI_MEMORY_RP;
       break;
 
     case TT_DESCRIPTOR_SECTION_AP_RW_NO:
@@ -73,7 +74,7 @@ SectionToGcdAttributes (
     // read only cases map to write-protect
     case TT_DESCRIPTOR_SECTION_AP_RO_NO:
     case TT_DESCRIPTOR_SECTION_AP_RO_RO:
-      *GcdAttributes |= EFI_MEMORY_WP;
+      *GcdAttributes |= EFI_MEMORY_RO;
       break;
 
     default:
@@ -126,7 +127,7 @@ PageToGcdAttributes (
   // determine protection attributes
   switch(PageAttributes & TT_DESCRIPTOR_PAGE_AP_MASK) {
     case TT_DESCRIPTOR_PAGE_AP_NO_NO: // no read, no write
-      //*GcdAttributes |= EFI_MEMORY_WP | EFI_MEMORY_RP;
+      //*GcdAttributes |= EFI_MEMORY_RO | EFI_MEMORY_RP;
       break;
 
     case TT_DESCRIPTOR_PAGE_AP_RW_NO:
@@ -137,7 +138,7 @@ PageToGcdAttributes (
     // read only cases map to write-protect
     case TT_DESCRIPTOR_PAGE_AP_RO_NO:
     case TT_DESCRIPTOR_PAGE_AP_RO_RO:
-      *GcdAttributes |= EFI_MEMORY_WP;
+      *GcdAttributes |= EFI_MEMORY_RO;
       break;
 
     default:
@@ -730,9 +731,6 @@ EfiAttributeToArmAttribute (
       ArmAttributes = TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
       break;
 
-    case EFI_MEMORY_WP:
-    case EFI_MEMORY_XP:
-    case EFI_MEMORY_RP:
     case EFI_MEMORY_UCE:
     default:
       // Cannot be implemented UEFI definition unclear for ARM
@@ -743,7 +741,7 @@ EfiAttributeToArmAttribute (
   }
 
   // Determine protection attributes
-  if (EfiAttributes & EFI_MEMORY_WP) {
+  if (EfiAttributes & EFI_MEMORY_RO) {
     ArmAttributes |= TT_DESCRIPTOR_SECTION_AP_RO_RO;
   } else {
     ArmAttributes |= TT_DESCRIPTOR_SECTION_AP_RW_RW;

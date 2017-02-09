@@ -1,6 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -236,7 +237,7 @@ CpuConvertPagesToUncachedVirtualAddress (
   // be the PCI address. Code should always use the CPU address, and we will or in VirtualMask
   // to that address.
   //
-  Status = SetMemoryAttributes (Address, Length, EFI_MEMORY_WP, 0);
+  Status = SetMemoryAttributes (Address, Length, EFI_MEMORY_RO, 0);
   if (!EFI_ERROR (Status)) {
     Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_UC, VirtualMask);
   }
@@ -264,7 +265,7 @@ CpuReconvertPages (
   //
   // Unmap the aliased Address
   //
-  Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_WP, 0);
+  Status = SetMemoryAttributes (Address | VirtualMask, Length, EFI_MEMORY_RO, 0);
   if (!EFI_ERROR (Status)) {
     //
     // Restore atttributes
