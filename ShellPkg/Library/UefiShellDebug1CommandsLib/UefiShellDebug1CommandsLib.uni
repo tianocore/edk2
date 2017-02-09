@@ -39,7 +39,7 @@
 #string STR_GEN_PCIRBIO_NF        #language en-US "%H%s%N: Protocol - PciRootBridgeIo not found.\r\n"
 #string STR_GEN_PCIRBIO_ER        #language en-US "%H%s%N: Problem accessing the data using Protocol - PciRootBridgeIo\r\n"
 #string STR_GEN_PARAM_INV         #language en-US "%H%s%N: Invalid argument - '%H%s%N'\r\n"
-#string STR_GEN_PARAM_INV_HEX     #language en-US "%H%s%N: Invalid parameter - '%H%s%N:'.  Must be hexadecimal.\r\n"
+#string STR_GEN_PARAM_INV_HEX     #language en-US "%H%s%N: Invalid parameter - '%H%s%N'. Must be hexadecimal.\r\n"
 #string STR_GEN_PARAM_CONFLICT    #language en-US "%H%s%N: Flags conflict with - '%H%s%N' and '%H%s%N'\r\n"
 #string STR_GEN_OUT_MEM           #language en-US "%H%s%N: Memory allocation was not successful.\r\n"
 #string STR_GEN_MAP_PROTOCOL      #language en-US "%H%s%N: Mapped device '%B%s%N' does not have protocol %B%s%N\r\n"

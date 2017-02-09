@@ -2726,6 +2726,7 @@ ShellCommandRunPci (
     Bus                           = 0;
     Device                        = 0;
     Func                          = 0;
+    EnhancedDump                  = 0xFFFF;
     if (ShellCommandLineGetFlag(Package, L"-i")) {
       ExplainData = TRUE;
     }
@@ -2807,6 +2808,20 @@ ShellCommandRunPci (
       }
     }
 
+    Temp = ShellCommandLineGetValue (Package, L"-ec");
+    if (Temp != NULL) {
+      //
+      // Input converted to hexadecimal number.
+      //
+      if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
+        EnhancedDump = (UINT16) RetVal;
+      } else {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+    }
+
     //
     // Find the protocol interface who's in charge of current segment, and its
     // bus range covers the current bus
@@ -2883,12 +2898,6 @@ ShellCommandRunPci (
     // If "-i" appears in command line, interpret data in configuration space
     //
     if (ExplainData) {
-      EnhancedDump = 0xFFFF;
-      if (ShellCommandLineGetFlag(Package, L"-ec")) {
-        Temp = ShellCommandLineGetValue(Package, L"-ec");
-        ASSERT (Temp != NULL);
-        EnhancedDump = (UINT16) ShellHexStrToUintn (Temp);
-      }
       Status = PciExplainData (&ConfigSpace, Address, IoDev, EnhancedDump);
     }
   }
