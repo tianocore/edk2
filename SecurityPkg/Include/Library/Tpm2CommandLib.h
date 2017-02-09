@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to send TPM2 command.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -957,6 +957,26 @@ EFIAPI
 Tpm2PolicyGetDigest (
   IN      TPMI_SH_POLICY            PolicySession,
      OUT  TPM2B_DIGEST              *PolicyHash
+  );
+
+/**
+  This command allows access to the public area of a loaded object.
+
+  @param[in]  ObjectHandle            TPM handle of an object
+  @param[out] OutPublic               Structure containing the public area of an object
+  @param[out] Name                    Name of the object
+  @param[out] QualifiedName           The Qualified Name of the object
+
+  @retval EFI_SUCCESS      Operation completed successfully.
+  @retval EFI_DEVICE_ERROR Unexpected device behavior.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2ReadPublic (
+  IN  TPMI_DH_OBJECT            ObjectHandle,
+  OUT TPM2B_PUBLIC              *OutPublic,
+  OUT TPM2B_NAME                *Name,
+  OUT TPM2B_NAME                *QualifiedName
   );
 
 //
