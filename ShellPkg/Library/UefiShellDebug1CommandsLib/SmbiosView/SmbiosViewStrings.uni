@@ -133,7 +133,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_SELECTED_BOOT_SUPPORTED        #language en-US "Selectable Boot is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BIOS_ROM_SOCKETED              #language en-US "BIOS ROM is socketed\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BOOT_FROM_PC_CARD              #language en-US "Boot From PC Card(PCMCIA)is supported\r\n"
-#string STR_SMBIOSVIEW_PRINTINFO_EDD_ENHANCED_DRIVER            #language en-US "EDD Enhanced Disk Driver) Specification is supported\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_EDD_ENHANCED_DRIVER            #language en-US "EDD (Enhanced Disk Driver) Specification is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_JAPANESE_FLOPPY_NEC            #language en-US "Int 13h - Japanese Floppy for NEC 9800 1.2mb (3.5\",1k Bytes/Sector, 360 RPM) is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_JAPANESE_FLOPPY_TOSHIBA        #language en-US "Int 13h - Japanese Floppy for Toshiba 1.2mn (3.5\", 360 RPM) is supported\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_FLOPPY_SERVICES_SUPPORTED      #language en-US "Int 13h - 5.25\"/360KB Floppy Services are supported\r\n"

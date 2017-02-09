@@ -166,7 +166,7 @@ TABLE_ITEM  SystemEnclosureTypeTable[] = {
   },
   {
     0x09,
-    L"  LapTop"
+    L"  Laptop"
   },
   {
     0x0A,
