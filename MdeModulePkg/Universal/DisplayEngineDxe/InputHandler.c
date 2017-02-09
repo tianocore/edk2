@@ -1,7 +1,7 @@
 /** @file
 Implementation for handling user input from the User Interfaces.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -524,6 +524,7 @@ GetNumericInput (
 
   Question      = MenuOption->ThisTag;
   QuestionValue = &Question->CurrentValue;
+  ZeroMem (InputText, MAX_NUMERIC_INPUT_WIDTH * sizeof (CHAR16));
 
   //
   // Only two case, user can enter to this function: Enter and +/- case.
@@ -690,16 +691,17 @@ GetNumericInput (
       if (MenuOption->Sequence == 0) {
         InputText[0] = LEFT_NUMERIC_DELIMITER;
         SetUnicodeMem (InputText + 1, InputWidth, L' ');
+        InputText[InputWidth + 1] = DATE_SEPARATOR;
+        InputText[InputWidth + 2] = L'\0';
+      } else  if (MenuOption->Sequence == 1){
+        SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = DATE_SEPARATOR;
+        InputText[InputWidth + 1] = L'\0';
       } else {
         SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = RIGHT_NUMERIC_DELIMITER;
+        InputText[InputWidth + 1] = L'\0';
       }
-
-      if (MenuOption->Sequence == 2) {
-        InputText[InputWidth + 1] = RIGHT_NUMERIC_DELIMITER;
-      } else {
-        InputText[InputWidth + 1] = DATE_SEPARATOR;
-      }
-      InputText[InputWidth + 2] = L'\0';
 
       PrintStringAt (Column, Row, InputText);
       if (MenuOption->Sequence == 0) {
@@ -713,16 +715,17 @@ GetNumericInput (
       if (MenuOption->Sequence == 0) {
         InputText[0] = LEFT_NUMERIC_DELIMITER;
         SetUnicodeMem (InputText + 1, InputWidth, L' ');
+        InputText[InputWidth + 1] = TIME_SEPARATOR;
+        InputText[InputWidth + 2] = L'\0';
+      } else if (MenuOption->Sequence == 1){
+        SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = TIME_SEPARATOR;
+        InputText[InputWidth + 1] = L'\0';
       } else {
         SetUnicodeMem (InputText, InputWidth, L' ');
+        InputText[InputWidth] = RIGHT_NUMERIC_DELIMITER;
+        InputText[InputWidth + 1] = L'\0';
       }
-
-      if (MenuOption->Sequence == 2) {
-        InputText[InputWidth + 1] = RIGHT_NUMERIC_DELIMITER;
-      } else {
-        InputText[InputWidth + 1] = TIME_SEPARATOR;
-      }
-      InputText[InputWidth + 2] = L'\0';
 
       PrintStringAt (Column, Row, InputText);
       if (MenuOption->Sequence == 0) {
