@@ -1,7 +1,7 @@
 /** @file
   SMM IPL that produces SMM related runtime protocols and load the SMM Core into SMRAM
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -521,7 +521,7 @@ SmmCommunicationCommunicate (
   gSmmCorePrivate->InSmm = TRUE;
 
   //
-  // Already in SMM and before SetVirtualAddressMap(), so call SmiManage() directly.
+  // Before SetVirtualAddressMap(), we are in SMM or SMRAM is open and unlocked, call SmiManage() directly.
   //
   CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommBuffer;
   *CommSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
