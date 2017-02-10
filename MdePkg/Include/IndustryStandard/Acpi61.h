@@ -1,7 +1,7 @@
 /** @file   
   ACPI 6.1 definitions from the ACPI Specification Revision 6.1 January, 2016.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -2284,9 +2284,9 @@ typedef struct {
 #define EFI_ACPI_6_1_ISCSI_BOOT_FIRMWARE_TABLE_SIGNATURE  SIGNATURE_32('i', 'B', 'F', 'T')
 
 ///
-/// "IORT" Interrupt Source Override
+/// "IORT" I/O Remapping Table
 ///
-#define EFI_ACPI_6_1_INTERRUPT_SOURCE_OVERRIDE_SIGNATURE  SIGNATURE_32('I', 'O', 'R', 'T')
+#define EFI_ACPI_6_1_IO_REMAPPING_TABLE_SIGNATURE  SIGNATURE_32('I', 'O', 'R', 'T')
 
 ///
 /// "IVRS" I/O Virtualization Reporting Structure
