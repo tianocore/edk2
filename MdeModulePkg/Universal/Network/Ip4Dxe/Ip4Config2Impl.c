@@ -1492,11 +1492,12 @@ Ip4Config2InitIfInfo (
   OUT EFI_IP4_CONFIG2_INTERFACE_INFO *IfInfo
   )
 {
-  IfInfo->Name[0] = L'e';
-  IfInfo->Name[1] = L't';
-  IfInfo->Name[2] = L'h';
-  IfInfo->Name[3] = (CHAR16) (L'0' + IpSb->Ip4Config2Instance.IfIndex);
-  IfInfo->Name[4] = 0;
+  UnicodeSPrint (
+    IfInfo->Name,
+    EFI_IP4_CONFIG2_INTERFACE_INFO_NAME_SIZE,
+    L"eth%x",
+    IpSb->Ip4Config2Instance.IfIndex
+  );
 
   IfInfo->IfType        = IpSb->SnpMode.IfType;
   IfInfo->HwAddressSize = IpSb->SnpMode.HwAddressSize;
