@@ -1438,11 +1438,12 @@ Ip6ConfigInitIfInfo (
   OUT EFI_IP6_CONFIG_INTERFACE_INFO  *IfInfo
   )
 {
-  IfInfo->Name[0] = L'e';
-  IfInfo->Name[1] = L't';
-  IfInfo->Name[2] = L'h';
-  IfInfo->Name[3] = (CHAR16) (L'0' + IpSb->Ip6ConfigInstance.IfIndex);
-  IfInfo->Name[4] = 0;
+  UnicodeSPrint (
+    IfInfo->Name,
+    sizeof (IfInfo->Name),
+    L"eth%x",
+    IpSb->Ip6ConfigInstance.IfIndex
+  );
 
   IfInfo->IfType        = IpSb->SnpMode.IfType;
   IfInfo->HwAddressSize = IpSb->SnpMode.HwAddressSize;
