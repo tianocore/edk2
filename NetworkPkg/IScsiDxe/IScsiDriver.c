@@ -2,6 +2,8 @@
   The entry point of IScsi driver.
 
 Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -419,7 +421,11 @@ IScsiStart (
   }
 
   NetworkBootPolicy = PcdGet8 (PcdIScsiAIPNetworkBootPolicy);
-  if (NetworkBootPolicy != ALWAYS_USE_UEFI_ISCSI_AND_IGNORE_AIP) {
+  if (NetworkBootPolicy == ALWAYS_USE_ISCSI_HBA_AND_IGNORE_UEFI_ISCSI) {
+    return EFI_ABORTED;
+  }
+
+  if (NetworkBootPolicy != ALWAYS_USE_UEFI_ISCSI_AND_IGNORE_ISCSI_HBA) {
     //
     // Check existing iSCSI AIP.
     //

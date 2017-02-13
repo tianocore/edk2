@@ -2,6 +2,8 @@
   The header file of IScsiDriver.c.
 
 Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,14 +31,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define IP_MODE_AUTOCONFIG_IP4     3
 #define IP_MODE_AUTOCONFIG_IP6     4
-#define ALWAYS_USE_UEFI_ISCSI_AND_IGNORE_AIP    0x00
-#define STOP_UEFI_ISCSI_IF_HBA_INSTALL_AIP      0x01
-#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP4      0x02
-#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP6      0x04
-#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_OFFLOAD  0x08
-#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_MPIO     0x10
-#define STOP_UEFI_ISCSI_IF_AIP_CONFIGURED_IP4   0x20
-#define STOP_UEFI_ISCSI_IF_AIP_CONFIGURED_IP6   0x40
+#define ALWAYS_USE_UEFI_ISCSI_AND_IGNORE_ISCSI_HBA  0x00
+#define STOP_UEFI_ISCSI_IF_HBA_INSTALL_AIP          0x01
+#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP4          0x02
+#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP6          0x04
+#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_OFFLOAD      0x08
+#define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_MPIO         0x10
+#define STOP_UEFI_ISCSI_IF_AIP_CONFIGURED_IP4       0x20
+#define STOP_UEFI_ISCSI_IF_AIP_CONFIGURED_IP6       0x40
+#define ALWAYS_USE_ISCSI_HBA_AND_IGNORE_UEFI_ISCSI  0xFF
 
 extern EFI_COMPONENT_NAME2_PROTOCOL       gIScsiComponentName2;
 extern EFI_COMPONENT_NAME_PROTOCOL        gIScsiComponentName;
