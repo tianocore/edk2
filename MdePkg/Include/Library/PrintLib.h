@@ -491,7 +491,11 @@ UnicodeSPrintAsciiFormat (
   ...
   );
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Converts a decimal value to a Null-terminated Unicode string.
   
   Converts the decimal number specified by Value to a Null-terminated Unicode 
@@ -540,6 +544,8 @@ UnicodeValueToString (
   IN INT64       Value,
   IN UINTN       Width
   );
+
+#endif
 
 /**
   Converts a decimal value to a Null-terminated Unicode string.
@@ -882,7 +888,11 @@ AsciiSPrintUnicodeFormat (
   ...
   );
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Converts a decimal value to a Null-terminated ASCII string.
   
   Converts the decimal number specified by Value to a Null-terminated ASCII string 
@@ -930,6 +940,8 @@ AsciiValueToString (
   IN  INT64      Value,
   IN  UINTN      Width
   );
+
+#endif
 
 /**
   Converts a decimal value to a Null-terminated Ascii string.

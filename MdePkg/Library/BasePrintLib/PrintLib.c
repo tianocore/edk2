@@ -349,7 +349,11 @@ UnicodeSPrintAsciiFormat (
   return NumberOfPrinted;
 }
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Converts a decimal value to a Null-terminated Unicode string.
   
   Converts the decimal number specified by Value to a Null-terminated Unicode 
@@ -402,6 +406,8 @@ UnicodeValueToString (
   ASSERT_UNICODE_BUFFER(Buffer);
   return BasePrintLibConvertValueToString ((CHAR8 *)Buffer, Flags, Value, Width, 2);
 }
+
+#endif
 
 /**
   Converts a decimal value to a Null-terminated Unicode string.
@@ -781,7 +787,11 @@ AsciiSPrintUnicodeFormat (
 }
 
 
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
 /**
+  [ATTENTION] This function is deprecated for security reason.
+
   Converts a decimal value to a Null-terminated ASCII string.
   
   Converts the decimal number specified by Value to a Null-terminated ASCII string 
@@ -832,6 +842,8 @@ AsciiValueToString (
 {
   return BasePrintLibConvertValueToString (Buffer, Flags, Value, Width, 1);
 }
+
+#endif
 
 /**
   Converts a decimal value to a Null-terminated Ascii string.
