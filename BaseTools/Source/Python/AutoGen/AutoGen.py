@@ -1,7 +1,7 @@
 ## @file
 # Generate AutoGen.h, AutoGen.c and *.depex files
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -2591,6 +2591,7 @@ class ModuleAutoGen(AutoGen):
         self._IncludePathLength = 0
         self._AutoGenFileList = None
         self._UnicodeFileList = None
+        self._VfrFileList = None
         self._IdfFileList = None
         self._SourceFileList  = None
         self._ObjectFileList  = None
@@ -3115,6 +3116,15 @@ class ModuleAutoGen(AutoGen):
             else:
                 self._UnicodeFileList = []
         return self._UnicodeFileList
+
+    ## Return the list of vfr files
+    def _GetVfrFileList(self):
+        if self._VfrFileList == None:
+            if TAB_VFR_FILE in self.FileTypes:
+                self._VfrFileList = self.FileTypes[TAB_VFR_FILE]
+            else:
+                self._VfrFileList = []
+        return self._VfrFileList
 
     ## Return the list of Image Definition files
     def _GetIdfFileList(self):
@@ -4080,6 +4090,7 @@ class ModuleAutoGen(AutoGen):
     IncludePathLength = property(_GetIncludePathLength)
     AutoGenFileList = property(_GetAutoGenFileList)
     UnicodeFileList = property(_GetUnicodeFileList)
+    VfrFileList     = property(_GetVfrFileList)
     SourceFileList  = property(_GetSourceFileList)
     BinaryFileList  = property(_GetBinaryFiles) # FileType : [File List]
     Targets         = property(_GetTargets)

@@ -1,7 +1,7 @@
 ## @file
 # Routines for generating AutoGen.h and AutoGen.c
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1960,6 +1960,29 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, 
             GuidMacros.append('#define %s %s' % (Guid, Info.Module.Guids[Guid]))
         for Guid, Value in Info.Module.Protocols.items() + Info.Module.Ppis.items():
             GuidMacros.append('#define %s %s' % (Guid, Value))
+        # supports FixedAtBuild usage in VFR file
+        if Info.VfrFileList and Info.ModulePcdList:
+            GuidMacros.append('#define %s %s' % ('FixedPcdGetBool(TokenName)', '_PCD_VALUE_##TokenName'))
+            GuidMacros.append('#define %s %s' % ('FixedPcdGet8(TokenName)', '_PCD_VALUE_##TokenName'))
+            GuidMacros.append('#define %s %s' % ('FixedPcdGet16(TokenName)', '_PCD_VALUE_##TokenName'))
+            GuidMacros.append('#define %s %s' % ('FixedPcdGet32(TokenName)', '_PCD_VALUE_##TokenName'))
+            GuidMacros.append('#define %s %s' % ('FixedPcdGet64(TokenName)', '_PCD_VALUE_##TokenName'))
+            for Pcd in Info.ModulePcdList:
+                if Pcd.Type == TAB_PCDS_FIXED_AT_BUILD:
+                    TokenCName = Pcd.TokenCName
+                    Value = Pcd.DefaultValue
+                    if Pcd.DatumType == 'BOOLEAN':
+                        BoolValue = Value.upper()
+                        if BoolValue == 'TRUE':
+                            Value = '1'
+                        elif BoolValue == 'FALSE':
+                            Value = '0'
+                    for PcdItem in GlobalData.MixedPcd:
+                        if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
+                            TokenCName = PcdItem[0]
+                            break
+                    GuidMacros.append('#define %s %s' % ('_PCD_VALUE_'+TokenCName, Value))
+
         if GuidMacros:
             StringH.Append('\n#ifdef VFRCOMPILE\n%s\n#endif\n' % '\n'.join(GuidMacros))
 
