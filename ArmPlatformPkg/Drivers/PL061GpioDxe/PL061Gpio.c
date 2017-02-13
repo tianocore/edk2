@@ -186,7 +186,7 @@ Get (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (PL061GetPins (RegisterBase + PL061_GPIO_DATA_REG, Offset)) {
+  if (PL061GetPins (RegisterBase, Offset)) {
     *Value = 1;
   } else {
     *Value = 0;
@@ -239,14 +239,14 @@ Set (
       // Set the corresponding direction bit to HIGH for output
       MmioOr8 (RegisterBase + PL061_GPIO_DIR_REG, GPIO_PIN_MASK(Offset));
       // Set the corresponding data bit to LOW for 0
-      PL061SetPins (RegisterBase + PL061_GPIO_DATA_REG, GPIO_PIN_MASK(Offset), 0);
+      PL061SetPins (RegisterBase, GPIO_PIN_MASK(Offset), 0);
       break;
 
     case GPIO_MODE_OUTPUT_1:
       // Set the corresponding direction bit to HIGH for output
       MmioOr8 (RegisterBase + PL061_GPIO_DIR_REG, GPIO_PIN_MASK(Offset));
       // Set the corresponding data bit to HIGH for 1
-      PL061SetPins (RegisterBase + PL061_GPIO_DATA_REG, GPIO_PIN_MASK(Offset), 0xff);
+      PL061SetPins (RegisterBase, GPIO_PIN_MASK(Offset), 0xff);
       break;
 
     default:
@@ -297,7 +297,7 @@ GetMode (
   // Check if it is input or output
   if (MmioRead8 (RegisterBase + PL061_GPIO_DIR_REG) & GPIO_PIN_MASK(Offset)) {
     // Pin set to output
-    if (PL061GetPins (RegisterBase + PL061_GPIO_DATA_REG, GPIO_PIN_MASK(Offset))) {
+    if (PL061GetPins (RegisterBase, GPIO_PIN_MASK(Offset))) {
       *Mode = GPIO_MODE_OUTPUT_1;
     } else {
       *Mode = GPIO_MODE_OUTPUT_0;
