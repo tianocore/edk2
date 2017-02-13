@@ -3372,7 +3372,7 @@ CVfrStringDB::GetVarStoreNameFormStringId (
   UINT8       BlockType;
   EFI_HII_STRING_PACKAGE_HDR *PkgHeader;
   
-  if (mStringFileName == '\0' ) {
+  if (mStringFileName == NULL) {
     return NULL;
   }
 
