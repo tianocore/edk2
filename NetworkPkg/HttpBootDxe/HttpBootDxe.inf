@@ -60,6 +60,7 @@
   HttpLib
   HiiLib
   PrintLib
+  DpcLib
   UefiHiiServicesLib
   UefiBootManagerLib
 

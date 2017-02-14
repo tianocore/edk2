@@ -625,6 +625,39 @@ HttpBootSetHeader (
 }
 
 /**
+  Notify the callback function when an event is triggered.
+
+  @param[in]  Context         The opaque parameter to the function.
+
+**/
+VOID
+HttpIoNotifyDpc (
+  IN VOID                *Context
+  )
+{
+  *((BOOLEAN *) Context) = TRUE;
+}
+
+/**
+  Request HttpIoNotifyDpc as a DPC at TPL_CALLBACK.
+
+  @param[in]  Event                 The event signaled.
+  @param[in]  Context               The opaque parameter to the function.
+
+**/
+VOID
+HttpIoNotify (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+{
+  //
+  // Request HttpIoNotifyDpc as a DPC at TPL_CALLBACK
+  //
+  QueueDpc (TPL_CALLBACK, HttpIoNotifyDpc, Context);
+}
+
+/**
   Create a HTTP_IO to access the HTTP service. It will create and configure
   a HTTP child handle.
 
@@ -730,7 +763,7 @@ HttpIoCreateIo (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  HttpBootCommonNotify,
+                  HttpIoNotify,
                   &HttpIo->IsTxDone,
                   &Event
                   );
@@ -743,7 +776,7 @@ HttpIoCreateIo (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
-                  HttpBootCommonNotify,
+                  HttpIoNotify,
                   &HttpIo->IsRxDone,
                   &Event
                   );
