@@ -128,9 +128,9 @@ StrnLenS (
   ASSERT (((UINTN) String & BIT0) == 0);
 
   //
-  // If String is a null pointer, then the StrnLenS function returns zero.
+  // If String is a null pointer or MaxSize is 0, then the StrnLenS function returns zero.
   //
-  if (String == NULL) {
+  if ((String == NULL) || (MaxSize == 0)) {
     return 0;
   }
 
@@ -1097,9 +1097,9 @@ AsciiStrnLenS (
   UINTN                             Length;
 
   //
-  // If String is a null pointer, then the AsciiStrnLenS function returns zero.
+  // If String is a null pointer or MaxSize is 0, then the AsciiStrnLenS function returns zero.
   //
-  if (String == NULL) {
+  if ((String == NULL) || (MaxSize == 0)) {
     return 0;
   }
 
