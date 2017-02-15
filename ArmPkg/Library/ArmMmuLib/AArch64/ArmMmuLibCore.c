@@ -101,27 +101,6 @@ PageAttributeToGcdAttribute (
   return GcdAttributes;
 }
 
-ARM_MEMORY_REGION_ATTRIBUTES
-GcdAttributeToArmAttribute (
-  IN UINT64 GcdAttributes
-  )
-{
-  switch (GcdAttributes & 0xFF) {
-  case EFI_MEMORY_UC:
-    return ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-  case EFI_MEMORY_WC:
-    return ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
-  case EFI_MEMORY_WT:
-    return ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH;
-  case EFI_MEMORY_WB:
-    return ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
-  default:
-    DEBUG ((EFI_D_ERROR, "GcdAttributeToArmAttribute: 0x%lX attributes is not supported.\n", GcdAttributes));
-    ASSERT (0);
-    return ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-  }
-}
-
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
 
@@ -425,6 +404,48 @@ FillTranslationTable (
            );
 }
 
+STATIC
+UINT64
+GcdAttributeToPageAttribute (
+  IN UINT64 GcdAttributes
+  )
+{
+  UINT64 PageAttributes;
+
+  switch (GcdAttributes & EFI_MEMORY_CACHETYPE_MASK) {
+  case EFI_MEMORY_UC:
+    PageAttributes = TT_ATTR_INDX_DEVICE_MEMORY;
+    break;
+  case EFI_MEMORY_WC:
+    PageAttributes = TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
+    break;
+  case EFI_MEMORY_WT:
+    PageAttributes = TT_ATTR_INDX_MEMORY_WRITE_THROUGH | TT_SH_INNER_SHAREABLE;
+    break;
+  case EFI_MEMORY_WB:
+    PageAttributes = TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE;
+    break;
+  default:
+    PageAttributes = TT_ATTR_INDX_MASK;
+    break;
+  }
+
+  if ((GcdAttributes & EFI_MEMORY_XP) != 0 ||
+      (GcdAttributes & EFI_MEMORY_CACHETYPE_MASK) == EFI_MEMORY_UC) {
+    if (ArmReadCurrentEL () == AARCH64_EL2) {
+      PageAttributes |= TT_XN_MASK;
+    } else {
+      PageAttributes |= TT_UXN_MASK | TT_PXN_MASK;
+    }
+  }
+
+  if ((GcdAttributes & EFI_MEMORY_RO) != 0) {
+    PageAttributes |= TT_AP_RO_RO;
+  }
+
+  return PageAttributes | TT_AF;
+}
+
 RETURN_STATUS
 SetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS      BaseAddress,
@@ -434,17 +455,31 @@ SetMemoryAttributes (
   )
 {
   RETURN_STATUS                Status;
-  ARM_MEMORY_REGION_DESCRIPTOR MemoryRegion;
   UINT64                      *TranslationTable;
+  UINT64                       PageAttributes;
+  UINT64                       PageAttributeMask;
 
-  MemoryRegion.PhysicalBase = BaseAddress;
-  MemoryRegion.VirtualBase = BaseAddress;
-  MemoryRegion.Length = Length;
-  MemoryRegion.Attributes = GcdAttributeToArmAttribute (Attributes);
+  PageAttributes = GcdAttributeToPageAttribute (Attributes);
+  PageAttributeMask = 0;
+
+  if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
+    //
+    // No memory type was set in Attributes, so we are going to update the
+    // permissions only.
+    //
+    PageAttributes &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK;
+    PageAttributeMask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK |
+                          TT_PXN_MASK | TT_XN_MASK);
+  }
 
   TranslationTable = ArmGetTTBR0BaseAddress ();
 
-  Status = FillTranslationTable (TranslationTable, &MemoryRegion);
+  Status = UpdateRegionMapping (
+             TranslationTable,
+             BaseAddress,
+             Length,
+             PageAttributes,
+             PageAttributeMask);
   if (RETURN_ERROR (Status)) {
     return Status;
   }

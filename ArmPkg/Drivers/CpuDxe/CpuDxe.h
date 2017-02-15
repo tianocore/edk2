@@ -39,14 +39,6 @@
 #include <Protocol/LoadedImage.h>
 
 
-#define EFI_MEMORY_CACHETYPE_MASK     (EFI_MEMORY_UC  | \
-                                       EFI_MEMORY_WC  | \
-                                       EFI_MEMORY_WT  | \
-                                       EFI_MEMORY_WB  | \
-                                       EFI_MEMORY_UCE   \
-                                       )
-
-
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor
   interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the

@@ -26,6 +26,10 @@
  #error "Unknown chipset."
 #endif
 
+#define EFI_MEMORY_CACHETYPE_MASK   (EFI_MEMORY_UC | EFI_MEMORY_WC | \
+                                     EFI_MEMORY_WT | EFI_MEMORY_WB | \
+                                     EFI_MEMORY_UCE)
+
 /**
  * The UEFI firmware must not use the ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_* attributes.
  *
