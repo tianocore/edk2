@@ -1,7 +1,7 @@
 /** @file
   Provide FSP API related function.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -98,7 +98,7 @@ CallFspInit (
   EFI_STATUS          Status;
   BOOLEAN             InterruptState;
 
-  FspInitApi = (FSP_INIT)(UINTN)(FspHeader->ImageBase + FspHeader->FspInitEntryOffset);
+  FspInitApi = (FSP_INIT)((UINTN)FspHeader->ImageBase + FspHeader->FspInitEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)FspInitApi, (UINTN)FspInitParams);
   SetInterruptState (InterruptState);
@@ -125,7 +125,7 @@ CallFspNotifyPhase (
   EFI_STATUS          Status;
   BOOLEAN             InterruptState;
 
-  NotifyPhaseApi = (FSP_NOTIFY_PHASE)(UINTN)(FspHeader->ImageBase + FspHeader->NotifyPhaseEntryOffset);
+  NotifyPhaseApi = (FSP_NOTIFY_PHASE)((UINTN)FspHeader->ImageBase + FspHeader->NotifyPhaseEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)NotifyPhaseApi, (UINTN)NotifyPhaseParams);
   SetInterruptState (InterruptState);
@@ -152,7 +152,7 @@ CallFspMemoryInit (
   EFI_STATUS          Status;
   BOOLEAN             InterruptState;
 
-  FspMemoryInitApi = (FSP_MEMORY_INIT)(UINTN)(FspHeader->ImageBase + FspHeader->FspMemoryInitEntryOffset);
+  FspMemoryInitApi = (FSP_MEMORY_INIT)((UINTN)FspHeader->ImageBase + FspHeader->FspMemoryInitEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)FspMemoryInitApi, (UINTN)FspMemoryInitParams);
   SetInterruptState (InterruptState);
@@ -179,7 +179,7 @@ CallTempRamExit (
   EFI_STATUS          Status;
   BOOLEAN             InterruptState;
 
-  TempRamExitApi = (FSP_TEMP_RAM_EXIT)(UINTN)(FspHeader->ImageBase + FspHeader->TempRamExitEntryOffset);
+  TempRamExitApi = (FSP_TEMP_RAM_EXIT)((UINTN)FspHeader->ImageBase + FspHeader->TempRamExitEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)TempRamExitApi, (UINTN)TempRamExitParam);
   SetInterruptState (InterruptState);
@@ -206,7 +206,7 @@ CallFspSiliconInit (
   EFI_STATUS          Status;
   BOOLEAN             InterruptState;
 
-  FspSiliconInitApi = (FSP_SILICON_INIT)(UINTN)(FspHeader->ImageBase + FspHeader->FspSiliconInitEntryOffset);
+  FspSiliconInitApi = (FSP_SILICON_INIT)((UINTN)FspHeader->ImageBase + FspHeader->FspSiliconInitEntryOffset);
   InterruptState = SaveAndDisableInterrupts ();
   Status = Execute32BitCode ((UINTN)FspSiliconInitApi, (UINTN)FspSiliconInitParam);
   SetInterruptState (InterruptState);
