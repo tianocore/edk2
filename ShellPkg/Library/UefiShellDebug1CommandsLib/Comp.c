@@ -2,7 +2,7 @@
   Main file for Comp shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,11 +31,14 @@ ShellCommandRunComp (
   EFI_STATUS          Status;
   LIST_ENTRY          *Package;
   CHAR16              *ProblemParam;
+  CHAR16              *FileName1;
+  CHAR16              *FileName2;
+  CONST CHAR16        *TempParam;
   SHELL_STATUS        ShellStatus;
   UINTN               LoopVar;
   SHELL_FILE_HANDLE   FileHandle1;
   SHELL_FILE_HANDLE   FileHandle2;
-  UINT8               ErrorCount;
+  UINT8               DifferentCount;
   UINT64              Size1;
   UINT64              Size2;
   UINT8               DataFromFile1;
@@ -48,12 +51,9 @@ ShellCommandRunComp (
   UINT8               ADF_File23;
   UINTN               DataSizeFromFile1;
   UINTN               DataSizeFromFile2;
-  CHAR16              *FileName1;
-  CHAR16              *FileName2;
-  CONST CHAR16        *TempParam;
-  UINTN               ErrorAddress;
+  UINTN               DiffPointAddress;
 
-  ErrorCount          = 0;
+  DifferentCount          = 0;
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
   FileName1           = NULL;
@@ -125,12 +125,12 @@ ShellCommandRunComp (
         ASSERT_EFI_ERROR(Status);
         if (Size1 != Size2) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_SIZE_FAIL), gShellDebug1HiiHandle);
-          ErrorCount++;
+          DifferentCount++;
           ShellStatus = SHELL_NOT_EQUAL;
         }
       }
       if (ShellStatus == SHELL_SUCCESS) {
-        for (LoopVar = 0 ; LoopVar < Size1 && ErrorCount <= 10 ; LoopVar++) {
+        for (LoopVar = 0 ; LoopVar < Size1 && DifferentCount <= 10 ; LoopVar++) {
           DataSizeFromFile1 = 1;
           DataSizeFromFile2 = 1;
           Status = gEfiShellProtocol->ReadFile(FileHandle1, &DataSizeFromFile1, &DataFromFile1);
@@ -138,7 +138,7 @@ ShellCommandRunComp (
           Status = gEfiShellProtocol->ReadFile(FileHandle2, &DataSizeFromFile2, &DataFromFile2);
           ASSERT_EFI_ERROR(Status);
           if (DataFromFile1 != DataFromFile2) {
-            ErrorAddress = LoopVar;
+            DiffPointAddress = LoopVar;
             ADF_File11 = 0;
             ADF_File12 = 0;
             ADF_File13 = 0;
@@ -188,13 +188,13 @@ ShellCommandRunComp (
                 NULL,
                 STRING_TOKEN (STR_COMP_SPOT_FAIL4),
                 gShellDebug1HiiHandle,
-                ++ErrorCount,
+                ++DifferentCount,
                 FileName1,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile1, ADF_File11, ADF_File12, ADF_File13,
                 DataFromFile1, ADF_File11, ADF_File12, ADF_File13,
                 FileName2,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile2, ADF_File21, ADF_File22, ADF_File23,
                 DataFromFile2, ADF_File21, ADF_File22, ADF_File23
                );
@@ -205,13 +205,13 @@ ShellCommandRunComp (
                 NULL,
                 STRING_TOKEN (STR_COMP_SPOT_FAIL3),
                 gShellDebug1HiiHandle,
-                ++ErrorCount,
+                ++DifferentCount,
                 FileName1,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile1, ADF_File11, ADF_File12,
                 DataFromFile1, ADF_File11, ADF_File12,
                 FileName2,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile2, ADF_File21, ADF_File22,
                 DataFromFile2, ADF_File21, ADF_File22
                );
@@ -222,13 +222,13 @@ ShellCommandRunComp (
                 NULL,
                 STRING_TOKEN (STR_COMP_SPOT_FAIL2),
                 gShellDebug1HiiHandle,
-                ++ErrorCount,
+                ++DifferentCount,
                 FileName1,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile1, ADF_File11,
                 DataFromFile1, ADF_File11,
                 FileName2,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile2, ADF_File21,
                 DataFromFile2, ADF_File21
                );
@@ -239,13 +239,13 @@ ShellCommandRunComp (
                 NULL,
                 STRING_TOKEN (STR_COMP_SPOT_FAIL1),
                 gShellDebug1HiiHandle,
-                ++ErrorCount,
+                ++DifferentCount,
                 FileName1,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile1,
                 DataFromFile1,
                 FileName2,
-                ErrorAddress,
+                DiffPointAddress,
                 DataFromFile2,
                 DataFromFile2
                );
@@ -253,7 +253,7 @@ ShellCommandRunComp (
             ShellStatus = SHELL_NOT_EQUAL;
           }
         }
-        if (ErrorCount == 0) {
+        if (DifferentCount == 0) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_PASS), gShellDebug1HiiHandle);
         } else {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_FAIL), gShellDebug1HiiHandle);
