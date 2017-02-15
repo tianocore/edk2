@@ -1718,7 +1718,10 @@ class PlatformAutoGen(AutoGen):
                         if self.BuildOption[Tool][Attr].startswith('='):
                             Value = self.BuildOption[Tool][Attr][1:]
                         else:
-                            Value += " " + self.BuildOption[Tool][Attr]
+                            if Attr != 'PATH':
+                                Value += " " + self.BuildOption[Tool][Attr]
+                            else:
+                                Value = self.BuildOption[Tool][Attr]
 
                     if Attr == "PATH":
                         # Don't put MAKE definition in the file
@@ -2381,8 +2384,11 @@ class PlatformAutoGen(AutoGen):
                         if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or Options[Key].startswith('='):
                             BuildOptions[Tool][Attr] = Options[Key]
                         else:
-                            # append options for the same tool
-                            BuildOptions[Tool][Attr] += " " + Options[Key]
+                            # append options for the same tool except PATH
+                            if Attr != 'PATH':
+                                BuildOptions[Tool][Attr] += " " + Options[Key]
+                            else:
+                                BuildOptions[Tool][Attr] = Options[Key]
         # Build Option Family has been checked, which need't to be checked again for family.
         if FamilyMatch or FamilyIsNull:
             return BuildOptions
@@ -2413,8 +2419,11 @@ class PlatformAutoGen(AutoGen):
                         if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or Options[Key].startswith('='):
                             BuildOptions[Tool][Attr] = Options[Key]
                         else:
-                            # append options for the same tool
-                            BuildOptions[Tool][Attr] += " " + Options[Key]
+                            # append options for the same tool except PATH
+                            if Attr != 'PATH':
+                                BuildOptions[Tool][Attr] += " " + Options[Key]
+                            else:
+                                BuildOptions[Tool][Attr] = Options[Key]
         return BuildOptions
 
     ## Append build options in platform to a module
@@ -2473,7 +2482,10 @@ class PlatformAutoGen(AutoGen):
                         BuildOptions[Tool][Attr] = ToolPath
                     else:
                         Value = mws.handleWsMacro(Value)
-                        BuildOptions[Tool][Attr] += " " + Value
+                        if Attr != 'PATH':
+                            BuildOptions[Tool][Attr] += " " + Value
+                        else:
+                            BuildOptions[Tool][Attr] = Value
         if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag != None:
             #
             # Override UNI flag only for EDK module.
