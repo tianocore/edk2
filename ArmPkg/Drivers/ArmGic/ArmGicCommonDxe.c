@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2013-2017, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -28,14 +28,10 @@ ExitBootServicesEvent (
   IN VOID       *Context
   );
 
-//
 // Making this global saves a few bytes in image size
-//
 EFI_HANDLE  gHardwareInterruptHandle = NULL;
 
-//
 // Notifications
-//
 EFI_EVENT EfiExitBootServicesEvent      = (EFI_EVENT)NULL;
 
 // Maximum Number of Interrupts
@@ -94,48 +90,55 @@ InstallAndRegisterInterruptService (
 {
   EFI_STATUS               Status;
   EFI_CPU_ARCH_PROTOCOL   *Cpu;
+  CONST UINTN              RihArraySize =
+    (sizeof(HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
 
   // Initialize the array for the Interrupt Handlers
-  gRegisteredInterruptHandlers = (HARDWARE_INTERRUPT_HANDLER*)AllocateZeroPool (sizeof(HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
+  gRegisteredInterruptHandlers = AllocateZeroPool (RihArraySize);
   if (gRegisteredInterruptHandlers == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gHardwareInterruptHandle,
-                  &gHardwareInterruptProtocolGuid, InterruptProtocol,
+                  &gHardwareInterruptProtocolGuid,
+                  InterruptProtocol,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  //
   // Get the CPU protocol that this driver requires.
-  //
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  //
   // Unregister the default exception handler.
-  //
   Status = Cpu->RegisterInterruptHandler (Cpu, ARM_ARCH_EXCEPTION_IRQ, NULL);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  //
   // Register to receive interrupts
-  //
-  Status = Cpu->RegisterInterruptHandler (Cpu, ARM_ARCH_EXCEPTION_IRQ, InterruptHandler);
+  Status = Cpu->RegisterInterruptHandler (
+                  Cpu,
+                  ARM_ARCH_EXCEPTION_IRQ,
+                  InterruptHandler
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   // Register for an ExitBootServicesEvent
-  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_NOTIFY,
+                  ExitBootServicesEvent,
+                  NULL,
+                  &EfiExitBootServicesEvent
+                  );
 
   return Status;
 }

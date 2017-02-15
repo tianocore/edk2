@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2013-2017, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -28,9 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern UINTN                        mGicNumInterrupts;
 extern HARDWARE_INTERRUPT_HANDLER  *gRegisteredInterruptHandlers;
 
-//
 // Common API
-//
 EFI_STATUS
 InstallAndRegisterInterruptService (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL   *InterruptProtocol,
@@ -46,18 +44,14 @@ RegisterInterruptSource (
   IN HARDWARE_INTERRUPT_HANDLER         Handler
   );
 
-//
 // GicV2 API
-//
 EFI_STATUS
 GicV2DxeInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   );
 
-//
 // GicV3 API
-//
 EFI_STATUS
 GicV3DxeInitialize (
   IN EFI_HANDLE         ImageHandle,
