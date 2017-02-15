@@ -680,6 +680,13 @@ SetMemoryAttributes (
 {
   EFI_STATUS    Status;
 
+  //
+  // Ignore invocations that only modify permission bits
+  //
+  if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
+    return EFI_SUCCESS;
+  }
+
   if(((BaseAddress & 0xFFFFF) == 0) && ((Length & 0xFFFFF) == 0)) {
     // Is the base and length a multiple of 1 MB?
     DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU section 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
