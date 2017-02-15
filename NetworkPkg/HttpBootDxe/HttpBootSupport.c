@@ -1178,12 +1178,20 @@ HttpBootCheckImageType (
 
   //
   // Determine the image type by the HTTP Content-Type header field first.
-  //   "application/efi" -> EFI Image
+  //   "application/efi"         -> EFI Image
+  //   "application/vnd.efi-iso" -> CD/DVD Image
+  //   "application/vnd.efi-img" -> Virtual Disk Image
   //
   Header = HttpFindHeader (HeaderCount, Headers, HTTP_HEADER_CONTENT_TYPE);
   if (Header != NULL) {
     if (AsciiStriCmp (Header->FieldValue, HTTP_CONTENT_TYPE_APP_EFI) == 0) {
       *ImageType = ImageTypeEfi;
+      return EFI_SUCCESS;
+    } else if (AsciiStriCmp (Header->FieldValue, HTTP_CONTENT_TYPE_APP_ISO) == 0) {
+      *ImageType = ImageTypeVirtualCd;
+      return EFI_SUCCESS;
+    } else if (AsciiStriCmp (Header->FieldValue, HTTP_CONTENT_TYPE_APP_IMG) == 0) {
+      *ImageType = ImageTypeVirtualDisk;
       return EFI_SUCCESS;
     }
   }

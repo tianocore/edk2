@@ -74,10 +74,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HTTP_BOOT_DXE_VERSION  0xa
 
 //
-// Provisional Standard Media Types defined in 
-// http://www.iana.org/assignments/provisional-standard-media-types/provisional-standard-media-types.xhtml
+// Standard Media Types defined in 
+// http://www.iana.org/assignments/media-types
 //
 #define HTTP_CONTENT_TYPE_APP_EFI           "application/efi"
+#define HTTP_CONTENT_TYPE_APP_IMG           "application/vnd.efi-img"
+#define HTTP_CONTENT_TYPE_APP_ISO           "application/vnd.efi-iso"
 
 //
 // Protocol instances
