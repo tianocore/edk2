@@ -216,9 +216,7 @@ EfiAttributeToArmAttribute (
     ArmAttributes = TT_ATTR_INDX_MEMORY_WRITE_BACK;
     break;
   default:
-    DEBUG ((EFI_D_ERROR, "EfiAttributeToArmAttribute: 0x%lX attributes is not supported.\n", EfiAttributes));
-    ASSERT (0);
-    ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY;
+    ArmAttributes = TT_ATTR_INDX_MASK;
   }
 
   // Set the access flag to match the block attributes

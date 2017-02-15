@@ -733,10 +733,7 @@ EfiAttributeToArmAttribute (
 
     case EFI_MEMORY_UCE:
     default:
-      // Cannot be implemented UEFI definition unclear for ARM
-      // Cause a page fault if these ranges are accessed.
       ArmAttributes = TT_DESCRIPTOR_SECTION_TYPE_FAULT;
-      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): Unsupported attribute %x will page fault on access\n", EfiAttributes));
       break;
   }
 
