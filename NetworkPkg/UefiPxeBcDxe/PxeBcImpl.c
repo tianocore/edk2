@@ -1,7 +1,7 @@
 /** @file
   This implementation of EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -95,8 +95,8 @@ EfiPxeBcStart (
     //
     // Configure block size for TFTP as a default value to handle all link layers.
     //
-    Private->BlockSize = (UINTN) (Private->Ip6MaxPacketSize -
-                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE);
+    Private->BlockSize = Private->Ip6MaxPacketSize -
+                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE;
 
     //
     // PXE over IPv6 starts here, initialize the fields and list header.
@@ -148,8 +148,8 @@ EfiPxeBcStart (
     //
     // Configure block size for TFTP as a default value to handle all link layers.
     //
-    Private->BlockSize = (UINTN) (Private->Ip4MaxPacketSize -
-                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE);
+    Private->BlockSize = Private->Ip4MaxPacketSize -
+                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE;
 
     //
     // PXE over IPv4 starts here, initialize the fields.

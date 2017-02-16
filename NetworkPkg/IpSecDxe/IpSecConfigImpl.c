@@ -1,7 +1,7 @@
 /** @file
   The implementation of IPSEC_CONFIG_PROTOCOL.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1152,7 +1152,7 @@ SetSpdEntry (
   // Do Padding for the different Arch.
   //
   SpdEntrySize  = ALIGN_VARIABLE (sizeof (IPSEC_SPD_ENTRY));
-  SpdEntrySize  = ALIGN_VARIABLE (SpdEntrySize + (UINTN)SIZE_OF_SPD_SELECTOR (SpdSel));
+  SpdEntrySize  = ALIGN_VARIABLE (SpdEntrySize + SIZE_OF_SPD_SELECTOR (SpdSel));
   SpdEntrySize += IpSecGetSizeOfEfiSpdData (SpdData);
 
   SpdEntry = AllocateZeroPool (SpdEntrySize);
@@ -1357,7 +1357,7 @@ SetSadEntry (
   }
 
   if (SaData->SpdSelector != NULL) {
-    SadEntrySize += SadEntrySize + (UINTN)SIZE_OF_SPD_SELECTOR (SaData->SpdSelector);
+    SadEntrySize += SadEntrySize + SIZE_OF_SPD_SELECTOR (SaData->SpdSelector);
   }
   SadEntry      = AllocateZeroPool (SadEntrySize);
 
@@ -1458,7 +1458,7 @@ SetSadEntry (
       SadEntry->Data->SpdEntry = SpdEntry;
       SadEntry->Data->SpdSelector = (EFI_IPSEC_SPD_SELECTOR *)((UINT8 *)SadEntry +
                                                                 SadEntrySize -
-                                                                (UINTN)SIZE_OF_SPD_SELECTOR (SaData->SpdSelector)
+                                                                SIZE_OF_SPD_SELECTOR (SaData->SpdSelector)
                                                                 );
       DuplicateSpdSelector (
        (EFI_IPSEC_CONFIG_SELECTOR *) SadEntry->Data->SpdSelector,

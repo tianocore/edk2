@@ -2,7 +2,7 @@
   The implementation of Payloads Creation.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1748,7 +1748,7 @@ Ikev2EncodeSa (
       Transform->Header.NextPayload   = IKE_TRANSFORM_NEXT_PAYLOAD_MORE;
       Transform->Header.PayloadLength = HTONS ((UINT16)TransformSize);
 
-      if (TransformIndex == (UINTN)(ProposalData->NumTransforms - 1)) {
+      if (TransformIndex == ((UINT32)ProposalData->NumTransforms - 1)) {
         Transform->Header.NextPayload = IKE_TRANSFORM_NEXT_PAYLOAD_NONE;
       }
 
