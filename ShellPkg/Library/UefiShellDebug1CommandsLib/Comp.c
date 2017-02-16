@@ -15,6 +15,71 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 
+STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
+  {L"-n", TypeValue},
+  {L"-s", TypeValue},
+  {NULL,  TypeMax}
+  };
+
+typedef enum {
+  OutOfDiffPoint,
+  InDiffPoint,
+  InPrevDiffPoint
+} READ_STATUS;
+
+/**
+  Function to print differnt point data.
+
+  @param[in]  FileName        File name
+  @param[in]  Buffer          Data buffer to be printed.
+  @param[in]  BufferSize      Size of the data to be printed.
+  @param[in]  Address         Address of the differnt point.
+  @param[in]  DifferentBytes  Total size of the buffer.
+
+**/
+VOID
+PrintDifferentPoint(
+  CONST CHAR16  *FileName,
+  UINT8         *Buffer,
+  UINT64        DataSize,
+  UINTN         Address,
+  UINT64        BufferSize
+  )
+{
+  UINTN Index;
+
+  ShellPrintEx (-1, -1, L"%s: %s\r\n  %08x:", L"File1", FileName, Address);
+
+  //
+  // Print data in hex-format.
+  //
+  for (Index = 0; Index < DataSize; Index++) {
+    ShellPrintEx (-1, -1, L" %02x", Buffer[Index]);
+  }
+
+  if (DataSize < BufferSize) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_END_OF_FILE), gShellDebug1HiiHandle);
+  }
+
+  ShellPrintEx (-1, -1, L"    *");
+
+  //
+  // Print data in char-format.
+  //
+  for (Index = 0; Index < DataSize; Index++) {
+    if (Buffer[Index] >= 0x20 && Buffer[Index] <= 0x7E) {
+      ShellPrintEx (-1, -1, L"%c", Buffer[Index]);
+    } else {
+      //
+      // Print dots for control characters
+      //
+      ShellPrintEx (-1, -1, L".");
+    }
+  }
+
+  ShellPrintEx (-1, -1, L"*\r\n");
+}
+
 /**
   Function for 'comp' command.
 
@@ -35,32 +100,41 @@ ShellCommandRunComp (
   CHAR16              *FileName2;
   CONST CHAR16        *TempParam;
   SHELL_STATUS        ShellStatus;
-  UINTN               LoopVar;
   SHELL_FILE_HANDLE   FileHandle1;
   SHELL_FILE_HANDLE   FileHandle2;
-  UINT8               DifferentCount;
   UINT64              Size1;
   UINT64              Size2;
-  UINT8               DataFromFile1;
-  UINT8               DataFromFile2;
-  UINT8               ADF_File11;
-  UINT8               ADF_File12;
-  UINT8               ADF_File13;
-  UINT8               ADF_File21;
-  UINT8               ADF_File22;
-  UINT8               ADF_File23;
+  UINT64              DifferentBytes;
+  UINT64              DifferentCount;
+  UINT8               DiffPointNumber;
+  UINT8               OneByteFromFile1;
+  UINT8               OneByteFromFile2;
+  UINT8               *DataFromFile1;
+  UINT8               *DataFromFile2;
+  UINTN               InsertPosition1;
+  UINTN               InsertPosition2;
   UINTN               DataSizeFromFile1;
   UINTN               DataSizeFromFile2;
+  UINTN               TempAddress;
+  UINTN               Index;
   UINTN               DiffPointAddress;
+  READ_STATUS         ReadStatus;
 
-  DifferentCount          = 0;
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
   FileName1           = NULL;
   FileName2           = NULL;
   FileHandle1         = NULL;
   FileHandle2         = NULL;
-  Size1               = 0;
+  DataFromFile1       = NULL;
+  DataFromFile2       = NULL;
+  ReadStatus          = OutOfDiffPoint;
+  DifferentCount      = 10;
+  DifferentBytes      = 4;
+  DiffPointNumber     = 0;
+  InsertPosition1     = 0;
+  InsertPosition2     = 0;
+  TempAddress         = 0;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -74,7 +148,7 @@ ShellCommandRunComp (
   //
   // parse the command line
   //
-  Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"comp", ProblemParam);  
@@ -118,142 +192,165 @@ ShellCommandRunComp (
         }
       }
       if (ShellStatus == SHELL_SUCCESS) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_HEADER), gShellDebug1HiiHandle, FileName1, FileName2);
         Status = gEfiShellProtocol->GetFileSize(FileHandle1, &Size1);
         ASSERT_EFI_ERROR(Status);
         Status = gEfiShellProtocol->GetFileSize(FileHandle2, &Size2);
         ASSERT_EFI_ERROR(Status);
-        if (Size1 != Size2) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_SIZE_FAIL), gShellDebug1HiiHandle);
-          DifferentCount++;
-          ShellStatus = SHELL_NOT_EQUAL;
+
+        if (ShellCommandLineGetFlag (Package, L"-n")) {
+          TempParam = ShellCommandLineGetValue (Package, L"-n");
+          if (TempParam == NULL) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"comp", L"-n");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TempParam, L"all") == 0) {
+              DifferentCount = MAX_UINTN;
+            } else {
+              Status = ShellConvertStringToUint64 (TempParam, &DifferentCount, FALSE, TRUE);
+              if (EFI_ERROR(Status) || DifferentCount == 0) {
+                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"comp", TempParam, L"-n");
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              }
+            }
+          }
+        }
+
+        if (ShellCommandLineGetFlag (Package, L"-s")) {
+          TempParam = ShellCommandLineGetValue (Package, L"-s");
+          if (TempParam == NULL) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"comp", L"-s");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            Status = ShellConvertStringToUint64 (TempParam, &DifferentBytes, FALSE, TRUE);
+            if (EFI_ERROR(Status) || DifferentBytes == 0) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellDebug1HiiHandle, L"comp", TempParam, L"-s");
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              if (DifferentBytes > MAX (Size1, Size2)) {
+                DifferentBytes = MAX (Size1, Size2);
+              }
+            }
+          }
         }
       }
+
       if (ShellStatus == SHELL_SUCCESS) {
-        for (LoopVar = 0 ; LoopVar < Size1 && DifferentCount <= 10 ; LoopVar++) {
+        DataFromFile1 = AllocateZeroPool ((UINTN)DifferentBytes);
+        DataFromFile2 = AllocateZeroPool ((UINTN)DifferentBytes);
+        if (DataFromFile1 == NULL || DataFromFile2 == NULL) {
+          ShellStatus = SHELL_OUT_OF_RESOURCES;
+          SHELL_FREE_NON_NULL (DataFromFile1);
+          SHELL_FREE_NON_NULL (DataFromFile2);
+        }
+      }
+
+      if (ShellStatus == SHELL_SUCCESS) {
+        while (DiffPointNumber < DifferentCount) {
           DataSizeFromFile1 = 1;
           DataSizeFromFile2 = 1;
-          Status = gEfiShellProtocol->ReadFile(FileHandle1, &DataSizeFromFile1, &DataFromFile1);
-          ASSERT_EFI_ERROR(Status);
-          Status = gEfiShellProtocol->ReadFile(FileHandle2, &DataSizeFromFile2, &DataFromFile2);
-          ASSERT_EFI_ERROR(Status);
-          if (DataFromFile1 != DataFromFile2) {
-            DiffPointAddress = LoopVar;
-            ADF_File11 = 0;
-            ADF_File12 = 0;
-            ADF_File13 = 0;
-            ADF_File21 = 0;
-            ADF_File22 = 0;
-            ADF_File23 = 0;
+          OneByteFromFile1 = 0;
+          OneByteFromFile2 = 0;
+          Status = gEfiShellProtocol->ReadFile (FileHandle1, &DataSizeFromFile1, &OneByteFromFile1);
+          ASSERT_EFI_ERROR (Status);
+          Status = gEfiShellProtocol->ReadFile (FileHandle2, &DataSizeFromFile2, &OneByteFromFile2);
+          ASSERT_EFI_ERROR (Status);
+
+          TempAddress++;
+
+          //
+          // 1.When end of file and no chars in DataFromFile buffer, then break while.
+          // 2.If no more char in File1 or File2, The ReadStatus is InPrevDiffPoint forever.
+          //   So the previous different point is the last one, then break the while block.
+          //
+          if ( (DataSizeFromFile1 == 0 && InsertPosition1 == 0 && DataSizeFromFile2 == 0 && InsertPosition2 == 0) ||
+               (ReadStatus == InPrevDiffPoint && (DataSizeFromFile1 == 0 || DataSizeFromFile2 == 0))
+             ) {
+            break;
+          }
+
+          if (ReadStatus == OutOfDiffPoint) {
+            if (OneByteFromFile1 != OneByteFromFile2) {
+              ReadStatus = InDiffPoint;
+              DiffPointAddress = TempAddress;
+              if (DataSizeFromFile1 == 1) {
+                DataFromFile1[InsertPosition1++] = OneByteFromFile1;
+              }
+              if (DataSizeFromFile2 == 1) {
+                DataFromFile2[InsertPosition2++] = OneByteFromFile2;
+              }
+            }
+          } else if (ReadStatus == InDiffPoint) {
+            if (DataSizeFromFile1 == 1) {
+              DataFromFile1[InsertPosition1++] = OneByteFromFile1;
+            }
+            if (DataSizeFromFile2 == 1) {
+              DataFromFile2[InsertPosition2++] = OneByteFromFile2;
+            }
+          } else if (ReadStatus == InPrevDiffPoint) {
+            if (OneByteFromFile1 == OneByteFromFile2) {
+              ReadStatus = OutOfDiffPoint;
+            }
+          }
+
+          //
+          // ReadStatus should be always equal InDiffPoint.
+          //
+          if ( InsertPosition1 == DifferentBytes ||
+               InsertPosition2 == DifferentBytes ||
+               (DataSizeFromFile1 == 0 && DataSizeFromFile2 == 0)
+             ) {
+
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_DIFFERENCE_POINT), gShellDebug1HiiHandle, ++DiffPointNumber);
+            PrintDifferentPoint (FileName1, DataFromFile1, InsertPosition1, DiffPointAddress, DifferentBytes);
+            PrintDifferentPoint (FileName2, DataFromFile2, InsertPosition2, DiffPointAddress, DifferentBytes);
 
             //
-            // Now check the next 3 bytes if possible.  This will make output
-            // cleaner when there are a sequence of differences.
+            // One of two buffuers is empty, it means this is the last different point.
             //
-            if (LoopVar + 1 < Size1) {
-              LoopVar++;
-              DataSizeFromFile1 = 1;
-              DataSizeFromFile2 = 1;
-              Status = gEfiShellProtocol->ReadFile(FileHandle1, &DataSizeFromFile1, &ADF_File11);
-              ASSERT_EFI_ERROR(Status);
-              Status = gEfiShellProtocol->ReadFile(FileHandle2, &DataSizeFromFile2, &ADF_File21);
-              ASSERT_EFI_ERROR(Status);
-              if (LoopVar + 1 < Size1) {
-                LoopVar++;
-                DataSizeFromFile1 = 1;
-                DataSizeFromFile2 = 1;
-                Status = gEfiShellProtocol->ReadFile(FileHandle1, &DataSizeFromFile1, &ADF_File12);
-                ASSERT_EFI_ERROR(Status);
-                Status = gEfiShellProtocol->ReadFile(FileHandle2, &DataSizeFromFile2, &ADF_File22);
-                ASSERT_EFI_ERROR(Status);
-                if (LoopVar + 1 < Size1) {
-                  LoopVar++;
-                  DataSizeFromFile1 = 1;
-                  DataSizeFromFile2 = 1;
-                  Status = gEfiShellProtocol->ReadFile(FileHandle1, &DataSizeFromFile1, &ADF_File13);
-                  ASSERT_EFI_ERROR(Status);
-                  Status = gEfiShellProtocol->ReadFile(FileHandle2, &DataSizeFromFile2, &ADF_File23);
-                  ASSERT_EFI_ERROR(Status);
-                }
+            if (InsertPosition1 == 0 || InsertPosition2 == 0) {
+              break;
+            }
+
+            for (Index = 1; Index < InsertPosition1 && Index < InsertPosition2; Index++) {
+              if (DataFromFile1[Index] == DataFromFile2[Index]) {
+                ReadStatus = OutOfDiffPoint;
+                break;
               }
             }
 
-            //
-            // Print out based on highest of the 4 bytes that are different.
-            //
-            if (ADF_File13 != ADF_File23) {
-              ShellPrintHiiEx(
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_COMP_SPOT_FAIL4),
-                gShellDebug1HiiHandle,
-                ++DifferentCount,
-                FileName1,
-                DiffPointAddress,
-                DataFromFile1, ADF_File11, ADF_File12, ADF_File13,
-                DataFromFile1, ADF_File11, ADF_File12, ADF_File13,
-                FileName2,
-                DiffPointAddress,
-                DataFromFile2, ADF_File21, ADF_File22, ADF_File23,
-                DataFromFile2, ADF_File21, ADF_File22, ADF_File23
-               );
-            } else if (ADF_File12 != ADF_File22) {
-              ShellPrintHiiEx(
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_COMP_SPOT_FAIL3),
-                gShellDebug1HiiHandle,
-                ++DifferentCount,
-                FileName1,
-                DiffPointAddress,
-                DataFromFile1, ADF_File11, ADF_File12,
-                DataFromFile1, ADF_File11, ADF_File12,
-                FileName2,
-                DiffPointAddress,
-                DataFromFile2, ADF_File21, ADF_File22,
-                DataFromFile2, ADF_File21, ADF_File22
-               );
-            } else if (ADF_File11 != ADF_File21) {
-              ShellPrintHiiEx(
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_COMP_SPOT_FAIL2),
-                gShellDebug1HiiHandle,
-                ++DifferentCount,
-                FileName1,
-                DiffPointAddress,
-                DataFromFile1, ADF_File11,
-                DataFromFile1, ADF_File11,
-                FileName2,
-                DiffPointAddress,
-                DataFromFile2, ADF_File21,
-                DataFromFile2, ADF_File21
-               );
+            if (ReadStatus == OutOfDiffPoint) {
+              //
+              // Try to find a new different point in the rest of DataFromFile.
+              //
+              for (; Index < MAX (InsertPosition1,InsertPosition2); Index++) {
+                if (DataFromFile1[Index] != DataFromFile2[Index]) {
+                  ReadStatus = InDiffPoint;
+                  DiffPointAddress += Index;
+                  break;
+                }
+              }
             } else {
-              ShellPrintHiiEx(
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_COMP_SPOT_FAIL1),
-                gShellDebug1HiiHandle,
-                ++DifferentCount,
-                FileName1,
-                DiffPointAddress,
-                DataFromFile1,
-                DataFromFile1,
-                FileName2,
-                DiffPointAddress,
-                DataFromFile2,
-                DataFromFile2
-               );
+              //
+              // Doesn't find a new different point, still in the same different point.
+              //
+              ReadStatus = InPrevDiffPoint;
             }
-            ShellStatus = SHELL_NOT_EQUAL;
+
+            CopyMem (DataFromFile1, DataFromFile1 + Index, InsertPosition1 - Index);
+            CopyMem (DataFromFile2, DataFromFile2 + Index, InsertPosition2 - Index);
+
+            SetMem (DataFromFile1 + InsertPosition1 - Index, (UINTN)DifferentBytes - InsertPosition1 + Index, 0);
+            SetMem (DataFromFile2 + InsertPosition2 - Index, (UINTN)DifferentBytes - InsertPosition2 + Index, 0);
+
+            InsertPosition1 -= Index;
+            InsertPosition2 -= Index;
           }
         }
-        if (DifferentCount == 0) {
+
+        SHELL_FREE_NON_NULL (DataFromFile1);
+        SHELL_FREE_NON_NULL (DataFromFile2);
+
+        if (DiffPointNumber == 0) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_PASS), gShellDebug1HiiHandle);
         } else {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_COMP_FOOTER_FAIL), gShellDebug1HiiHandle);
