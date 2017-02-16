@@ -1340,8 +1340,8 @@ UpdatePciInfo (
   )
 {
   EFI_STATUS                        Status;
-  UINT64                            BarIndex;
-  UINT64                            BarEndIndex;
+  UINTN                             BarIndex;
+  UINTN                             BarEndIndex;
   BOOLEAN                           SetFlag;
   VOID                              *Configuration;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Ptr;
@@ -1395,16 +1395,16 @@ UpdatePciInfo (
       break;
     }
 
-    BarIndex    = Ptr->AddrTranslationOffset;
-    BarEndIndex = BarIndex;
-
-    //
-    // Update all the bars in the device
-    // Compare against 0xFF is to keep backward compatibility.
-    //
-    if ((BarIndex == MAX_UINT64) || (BarIndex == 0xFF)) {
+    if ((Ptr->AddrTranslationOffset == MAX_UINT64) || (Ptr->AddrTranslationOffset == MAX_UINT8)) {
+      //
+      // Update all the bars in the device
+      // Compare against MAX_UINT8 is to keep backward compatibility.
+      //
       BarIndex    = 0;
       BarEndIndex = PCI_MAX_BAR - 1;
+    } else {
+      BarIndex    = (UINTN) Ptr->AddrTranslationOffset;
+      BarEndIndex = BarIndex;
     }
 
     if (BarIndex >= PCI_MAX_BAR) {
