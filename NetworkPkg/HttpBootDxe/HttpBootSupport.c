@@ -631,6 +631,7 @@ HttpBootSetHeader (
 
 **/
 VOID
+EFIAPI
 HttpIoNotifyDpc (
   IN VOID                *Context
   )
@@ -646,6 +647,7 @@ HttpIoNotifyDpc (
 
 **/
 VOID
+EFIAPI
 HttpIoNotify (
   IN EFI_EVENT              Event,
   IN VOID                   *Context
