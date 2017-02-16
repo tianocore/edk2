@@ -1,7 +1,7 @@
 /** @file
 Header file for boot maintenance module.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1047,6 +1047,18 @@ VOID
 DiscardChangeHandler (
   IN  BMM_CALLBACK_DATA               *Private,
   IN  BMM_FAKE_NV_DATA                *CurrentFakeNVMap
+  );
+
+
+/**
+  This function is to clean some useless data before submit changes.
+
+  @param Private            The BMM context data.
+
+**/
+VOID
+CleanUselessBeforeSubmit (
+  IN  BMM_CALLBACK_DATA               *Private
   );
 
 /**

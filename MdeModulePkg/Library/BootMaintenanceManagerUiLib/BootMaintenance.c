@@ -1,7 +1,7 @@
 /** @file
 The functions for Boot Maintainence Main menu.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1214,9 +1214,11 @@ BootMaintCallback (
     }
    
     if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_BOOT) {
+      CleanUselessBeforeSubmit (Private);
       CurrentFakeNVMap->BootOptionChanged = FALSE;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
     } else if (QuestionId == KEY_VALUE_SAVE_AND_EXIT_DRIVER) {
+      CleanUselessBeforeSubmit (Private);
       CurrentFakeNVMap->DriverOptionChanged = FALSE;
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
     } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER) {
@@ -1269,6 +1271,7 @@ BootMaintCallback (
       case KEY_VALUE_SAVE_AND_EXIT:
       case KEY_VALUE_NO_SAVE_AND_EXIT:
         if (QuestionId == KEY_VALUE_SAVE_AND_EXIT) {
+          CleanUselessBeforeSubmit (Private);
           *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
         } else if (QuestionId == KEY_VALUE_NO_SAVE_AND_EXIT) {
           DiscardChangeHandler (Private, CurrentFakeNVMap);
@@ -1367,6 +1370,36 @@ DiscardChangeHandler (
 
   default:
     break;
+  }
+}
+
+/**
+  This function is to clean some useless data before submit changes.
+
+  @param Private            The BMM context data.
+
+**/
+VOID
+CleanUselessBeforeSubmit (
+  IN  BMM_CALLBACK_DATA               *Private
+  )
+{
+  UINT16  Index;
+  if (Private->BmmPreviousPageId != FORM_BOOT_DEL_ID) {
+    for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
+      if (Private->BmmFakeNvData.BootOptionDel[Index] && !Private->BmmFakeNvData.BootOptionDelMark[Index]) {
+        Private->BmmFakeNvData.BootOptionDel[Index] = FALSE;
+        Private->BmmOldFakeNVData.BootOptionDel[Index] = FALSE;
+      }
+    }
+  }
+  if (Private->BmmPreviousPageId != FORM_DRV_DEL_ID) {
+    for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
+      if (Private->BmmFakeNvData.DriverOptionDel[Index] && !Private->BmmFakeNvData.DriverOptionDelMark[Index]) {
+        Private->BmmFakeNvData.DriverOptionDel[Index] = FALSE;
+        Private->BmmOldFakeNVData.DriverOptionDel[Index] = FALSE;
+      }
+    }
   }
 }
 
