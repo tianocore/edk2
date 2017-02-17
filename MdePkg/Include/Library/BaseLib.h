@@ -1536,6 +1536,237 @@ StrHexToUint64 (
   IN      CONST CHAR16             *String
   );
 
+/**
+  Convert a Null-terminated Unicode string to IPv6 address and prefix length.
+
+  This function outputs a value of type IPv6_ADDRESS and may output a value
+  of type UINT8 by interpreting the contents of the Unicode string specified
+  by String. The format of the input Unicode string String is as follows:
+
+                  X:X:X:X:X:X:X:X[/P]
+
+  X contains one to four hexadecimal digit characters in the range [0-9], [a-f] and
+  [A-F]. X is converted to a value of type UINT16, whose low byte is stored in low
+  memory address and high byte is stored in high memory address. P contains decimal
+  digit characters in the range [0-9]. The running zero in the beginning of P will
+  be ignored. /P is optional.
+
+  When /P is not in the String, the function stops at the first character that is
+  not a valid hexadecimal digit character after eight X's are converted.
+
+  When /P is in the String, the function stops at the first character that is not
+  a valid decimal digit character after P is converted.
+
+  "::" can be used to compress one or more groups of X when X contains only 0.
+  The "::" can only appear once in the String.
+
+  If String is NULL, then ASSERT().
+
+  If Address is NULL, then ASSERT().
+
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters, not including the
+  Null-terminator, then ASSERT().
+
+  If EndPointer is not NULL and Address is translated from String, a pointer
+  to the character that stopped the scan is stored at the location pointed to
+  by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Address                  Pointer to the converted IPv6 address.
+  @param  PrefixLength             Pointer to the converted IPv6 address prefix
+                                   length. MAX_UINT8 is returned when /P is
+                                   not in the String.
+
+  @retval RETURN_SUCCESS           Address is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+  @retval RETURN_UNSUPPORTED       If X contains more than four hexadecimal
+                                    digit characters.
+                                   If String contains "::" and number of X
+                                    is not less than 8.
+                                   If P starts with character that is not a
+                                    valid decimal digit character.
+                                   If the decimal number converted from P
+                                    exceeds 128.
+
+**/
+RETURN_STATUS
+EFIAPI
+StrToIpv6Address (
+  IN  CONST CHAR16       *String,
+  OUT CHAR16             **EndPointer, OPTIONAL
+  OUT IPv6_ADDRESS       *Address,
+  OUT UINT8              *PrefixLength OPTIONAL
+  );
+
+/**
+  Convert a Null-terminated Unicode string to IPv4 address and prefix length.
+
+  This function outputs a value of type IPv4_ADDRESS and may output a value
+  of type UINT8 by interpreting the contents of the Unicode string specified
+  by String. The format of the input Unicode string String is as follows:
+
+                  D.D.D.D[/P]
+
+  D and P are decimal digit characters in the range [0-9]. The running zero in
+  the beginning of D and P will be ignored. /P is optional.
+
+  When /P is not in the String, the function stops at the first character that is
+  not a valid decimal digit character after four D's are converted.
+
+  When /P is in the String, the function stops at the first character that is not
+  a valid decimal digit character after P is converted.
+
+  If String is NULL, then ASSERT().
+
+  If Address is NULL, then ASSERT().
+
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+
+  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
+  PcdMaximumUnicodeStringLength Unicode characters, not including the
+  Null-terminator, then ASSERT().
+
+  If EndPointer is not NULL and Address is translated from String, a pointer
+  to the character that stopped the scan is stored at the location pointed to
+  by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Address                  Pointer to the converted IPv4 address.
+  @param  PrefixLength             Pointer to the converted IPv4 address prefix
+                                   length. MAX_UINT8 is returned when /P is
+                                   not in the String.
+
+  @retval RETURN_SUCCESS           Address is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+  @retval RETURN_UNSUPPORTED       If String is not in the correct format.
+                                   If any decimal number converted from D
+                                    exceeds 255.
+                                   If the decimal number converted from P
+                                    exceeds 32.
+
+**/
+RETURN_STATUS
+EFIAPI
+StrToIpv4Address (
+  IN  CONST CHAR16       *String,
+  OUT CHAR16             **EndPointer, OPTIONAL
+  OUT IPv4_ADDRESS       *Address,
+  OUT UINT8              *PrefixLength OPTIONAL
+  );
+
+#define GUID_STRING_LENGTH  36
+
+/**
+  Convert a Null-terminated Unicode GUID string to a value of type
+  EFI_GUID.
+
+  This function outputs a GUID value by interpreting the contents of
+  the Unicode string specified by String. The format of the input
+  Unicode string String consists of 36 characters, as follows:
+
+                  aabbccdd-eeff-gghh-iijj-kkllmmnnoopp
+
+  The pairs aa - pp are two characters in the range [0-9], [a-f] and
+  [A-F], with each pair representing a single byte hexadecimal value.
+
+  The mapping between String and the EFI_GUID structure is as follows:
+                  aa          Data1[24:31]
+                  bb          Data1[16:23]
+                  cc          Data1[8:15]
+                  dd          Data1[0:7]
+                  ee          Data2[8:15]
+                  ff          Data2[0:7]
+                  gg          Data3[8:15]
+                  hh          Data3[0:7]
+                  ii          Data4[0:7]
+                  jj          Data4[8:15]
+                  kk          Data4[16:23]
+                  ll          Data4[24:31]
+                  mm          Data4[32:39]
+                  nn          Data4[40:47]
+                  oo          Data4[48:55]
+                  pp          Data4[56:63]
+
+  If String is NULL, then ASSERT().
+  If Guid is NULL, then ASSERT().
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  Guid                     Pointer to the converted GUID.
+
+  @retval RETURN_SUCCESS           Guid is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+  @retval RETURN_UNSUPPORTED       If String is not as the above format.
+
+**/
+RETURN_STATUS
+EFIAPI
+StrToGuid (
+  IN  CONST CHAR16       *String,
+  OUT GUID               *Guid
+  );
+
+/**
+  Convert a Null-terminated Unicode hexadecimal string to a byte array.
+
+  This function outputs a byte array by interpreting the contents of
+  the Unicode string specified by String in hexadecimal format. The format of
+  the input Unicode string String is:
+
+                  [XX]*
+
+  X is a hexadecimal digit character in the range [0-9], [a-f] and [A-F].
+  The function decodes every two hexadecimal digit characters as one byte. The
+  decoding stops after Length of characters and outputs Buffer containing
+  (Length / 2) bytes.
+
+  If String is not aligned in a 16-bit boundary, then ASSERT().
+
+  If String is NULL, then ASSERT().
+
+  If Buffer is NULL, then ASSERT().
+
+  If Length is not multiple of 2, then ASSERT().
+
+  If PcdMaximumUnicodeStringLength is not zero and Length is greater than
+  PcdMaximumUnicodeStringLength, then ASSERT().
+
+  If MaxBufferSize is less than (Length / 2), then ASSERT().
+
+  @param  String                   Pointer to a Null-terminated Unicode string.
+  @param  Length                   The number of Unicode characters to decode.
+  @param  Buffer                   Pointer to the converted bytes array.
+  @param  MaxBufferSize            The maximum size of Buffer.
+
+  @retval RETURN_SUCCESS           Buffer is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If Length is not multiple of 2.
+                                   If PcdMaximumUnicodeStringLength is not zero,
+                                    and Length is greater than
+                                    PcdMaximumUnicodeStringLength.
+  @retval RETURN_UNSUPPORTED       If Length of characters from String contain
+                                    a character that is not valid hexadecimal
+                                    digit characters, or a Null-terminator.
+  @retval RETURN_BUFFER_TOO_SMALL  If MaxBufferSize is less than (Length / 2).
+**/
+RETURN_STATUS
+EFIAPI
+StrHexToBytes (
+  IN  CONST CHAR16       *String,
+  IN  UINTN              Length,
+  OUT UINT8              *Buffer,
+  IN  UINTN              MaxBufferSize
+  );
+
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
 /**
