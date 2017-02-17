@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -397,7 +397,7 @@ StrToBuf (
 
 **/
 EFI_STATUS
-StrToGuid (
+DevicePathLibStrToGuid (
   IN  CHAR16   *Str,
   OUT EFI_GUID *Guid
   )
@@ -740,7 +740,7 @@ ConvertFromTextVendor (
                                      (UINT16) (sizeof (VENDOR_DEVICE_PATH) + Length)
                                      );
 
-  StrToGuid (GuidStr, &Vendor->Guid);
+  DevicePathLibStrToGuid (GuidStr, &Vendor->Guid);
   StrToBuf (((UINT8 *) Vendor) + sizeof (VENDOR_DEVICE_PATH), Length, DataStr);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
@@ -1453,7 +1453,7 @@ DevPathFromTextInfiniband (
                                             );
 
   InfiniBand->ResourceFlags = (UINT32) Strtoi (FlagsStr);
-  StrToGuid (GuidStr, &PortGid);
+  DevicePathLibStrToGuid (GuidStr, &PortGid);
   CopyMem (InfiniBand->PortGid, &PortGid, sizeof (EFI_GUID));
   Strtoi64 (SidStr, &InfiniBand->ServiceId);
   Strtoi64 (TidStr, &InfiniBand->TargetPortId);
@@ -2976,7 +2976,7 @@ DevPathFromTextHD (
     Hd->SignatureType = SIGNATURE_TYPE_GUID;
     Hd->MBRType       = 0x02;
 
-    StrToGuid (SignatureStr, &SignatureGuid);
+    DevicePathLibStrToGuid (SignatureStr, &SignatureGuid);
     CopyMem (Hd->Signature, &SignatureGuid, sizeof (EFI_GUID));
   } else {
     Hd->SignatureType = (UINT8) Strtoi (TypeStr);
@@ -3091,7 +3091,7 @@ DevPathFromTextMedia (
                                              (UINT16) sizeof (MEDIA_PROTOCOL_DEVICE_PATH)
                                              );
 
-  StrToGuid (GuidStr, &Media->Protocol);
+  DevicePathLibStrToGuid (GuidStr, &Media->Protocol);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Media;
 }
@@ -3119,7 +3119,7 @@ DevPathFromTextFv (
                                            (UINT16) sizeof (MEDIA_FW_VOL_DEVICE_PATH)
                                            );
 
-  StrToGuid (GuidStr, &Fv->FvName);
+  DevicePathLibStrToGuid (GuidStr, &Fv->FvName);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Fv;
 }
@@ -3147,7 +3147,7 @@ DevPathFromTextFvFile (
                                                     (UINT16) sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH)
                                                     );
 
-  StrToGuid (GuidStr, &FvFile->FvFileName);
+  DevicePathLibStrToGuid (GuidStr, &FvFile->FvFileName);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) FvFile;
 }
@@ -3219,7 +3219,7 @@ DevPathFromTextRamDisk (
   Strtoi64 (EndingAddrStr, &EndingAddr);
   WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
   RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
-  StrToGuid (TypeGuidStr, &RamDisk->TypeGuid);
+  DevicePathLibStrToGuid (TypeGuidStr, &RamDisk->TypeGuid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) RamDisk;
 }
