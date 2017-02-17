@@ -326,187 +326,6 @@ Strtoi64 (
 }
 
 /**
-  Converts a list of string to a specified buffer.
-
-  @param Buf             The output buffer that contains the string.
-  @param BufferLength    The length of the buffer
-  @param Str             The input string that contains the hex number
-
-  @retval EFI_SUCCESS    The string was successfully converted to the buffer.
-
-**/
-EFI_STATUS
-StrToBuf (
-  OUT UINT8    *Buf,
-  IN  UINTN    BufferLength,
-  IN  CHAR16   *Str
-  )
-{
-  UINTN       Index;
-  UINTN       StrLength;
-  UINT8       Digit;
-  UINT8       Byte;
-
-  Digit = 0;
-
-  //
-  // Two hex char make up one byte
-  //
-  StrLength = BufferLength * sizeof (CHAR16);
-
-  for(Index = 0; Index < StrLength; Index++, Str++) {
-
-    if ((*Str >= L'a') && (*Str <= L'f')) {
-      Digit = (UINT8) (*Str - L'a' + 0x0A);
-    } else if ((*Str >= L'A') && (*Str <= L'F')) {
-      Digit = (UINT8) (*Str - L'A' + 0x0A);
-    } else if ((*Str >= L'0') && (*Str <= L'9')) {
-      Digit = (UINT8) (*Str - L'0');
-    } else {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // For odd characters, write the upper nibble for each buffer byte,
-    // and for even characters, the lower nibble.
-    //
-    if ((Index & 1) == 0) {
-      Byte = (UINT8) (Digit << 4);
-    } else {
-      Byte = Buf[Index / 2];
-      Byte &= 0xF0;
-      Byte = (UINT8) (Byte | Digit);
-    }
-
-    Buf[Index / 2] = Byte;
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Converts a string to GUID value.
-  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
-  @param Str              The registry format GUID string that contains the GUID value.
-  @param Guid             A pointer to the converted GUID value.
-
-  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
-  @retval EFI_UNSUPPORTED The input string is not in registry format.
-  @return others          Some error occurred when converting part of GUID value.
-
-**/
-EFI_STATUS
-DevicePathLibStrToGuid (
-  IN  CHAR16   *Str,
-  OUT EFI_GUID *Guid
-  )
-{
-  //
-  // Get the first UINT32 data
-  //
-  Guid->Data1 = (UINT32) StrHexToUint64  (Str);
-  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
-    Str ++;
-  }
-  
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-  
-  //
-  // Get the second UINT16 data
-  //
-  Guid->Data2 = (UINT16) StrHexToUint64  (Str);
-  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
-    Str ++;
-  }
-
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-  
-  //
-  // Get the third UINT16 data
-  //
-  Guid->Data3 = (UINT16) StrHexToUint64  (Str);
-  while (!IS_HYPHEN (*Str) && !IS_NULL (*Str)) {
-    Str ++;
-  }
-
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Get the following 8 bytes data
-  //  
-  StrToBuf (&Guid->Data4[0], 2, Str);
-  //
-  // Skip 2 byte hex chars
-  //
-  Str += 2 * 2;
-
-  if (IS_HYPHEN (*Str)) {
-    Str++;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
-  StrToBuf (&Guid->Data4[2], 6, Str);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Converts a string to IPv4 address
-
-  @param Str             A string representation of IPv4 address.
-  @param IPv4Addr        A pointer to the converted IPv4 address.
-
-**/
-VOID
-StrToIPv4Addr (
-  IN OUT CHAR16           **Str,
-  OUT    EFI_IPv4_ADDRESS *IPv4Addr
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < 4; Index++) {
-    IPv4Addr->Addr[Index] = (UINT8) Strtoi (SplitStr (Str, L'.'));
-  }
-}
-
-/**
-  Converts a string to IPv4 address
-
-  @param Str             A string representation of IPv6 address.
-  @param IPv6Addr        A pointer to the converted IPv6 address.
-
-**/
-VOID
-StrToIPv6Addr (
-  IN OUT CHAR16           **Str,
-  OUT    EFI_IPv6_ADDRESS *IPv6Addr
-  )
-{
-  UINTN  Index;
-  UINT16 Data;
-
-  for (Index = 0; Index < 8; Index++) {
-    Data = (UINT16) StrHexToUintn (SplitStr (Str, L':'));
-    IPv6Addr->Addr[Index * 2] = (UINT8) (Data >> 8);
-    IPv6Addr->Addr[Index * 2 + 1] = (UINT8) (Data & 0xff);
-  }
-}
-
-/**
   Converts a Unicode string to ASCII string.
 
   @param Str             The equivalent Unicode string
@@ -567,9 +386,7 @@ DevPathFromTextGenericPath (
            (UINT16) (sizeof (EFI_DEVICE_PATH_PROTOCOL) + DataLength)
            );
 
-  if (DataLength != 0) {
-    StrToBuf ((UINT8 *) (Node + 1), DataLength, DataStr);
-  }
+  StrHexToBytes (DataStr, DataLength * 2, (UINT8 *) (Node + 1), DataLength);
   return Node;
 }
 
@@ -740,8 +557,8 @@ ConvertFromTextVendor (
                                      (UINT16) (sizeof (VENDOR_DEVICE_PATH) + Length)
                                      );
 
-  DevicePathLibStrToGuid (GuidStr, &Vendor->Guid);
-  StrToBuf (((UINT8 *) Vendor) + sizeof (VENDOR_DEVICE_PATH), Length, DataStr);
+  StrToGuid (GuidStr, &Vendor->Guid);
+  StrHexToBytes (DataStr, Length * 2, (UINT8 *) (Vendor + 1), Length);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
@@ -1438,7 +1255,6 @@ DevPathFromTextInfiniband (
   CHAR16                  *SidStr;
   CHAR16                  *TidStr;
   CHAR16                  *DidStr;
-  EFI_GUID                PortGid;
   INFINIBAND_DEVICE_PATH  *InfiniBand;
 
   FlagsStr   = GetNextParamStr (&TextDeviceNode);
@@ -1453,8 +1269,7 @@ DevPathFromTextInfiniband (
                                             );
 
   InfiniBand->ResourceFlags = (UINT32) Strtoi (FlagsStr);
-  DevicePathLibStrToGuid (GuidStr, &PortGid);
-  CopyMem (InfiniBand->PortGid, &PortGid, sizeof (EFI_GUID));
+  StrToGuid (GuidStr, (EFI_GUID *) InfiniBand->PortGid);
   Strtoi64 (SidStr, &InfiniBand->ServiceId);
   Strtoi64 (TidStr, &InfiniBand->TargetPortId);
   Strtoi64 (DidStr, &InfiniBand->DeviceId);
@@ -1985,7 +1800,7 @@ DevPathFromTextMAC (
   MACDevPath->IfType   = (UINT8) Strtoi (IfTypeStr);
 
   Length = sizeof (EFI_MAC_ADDRESS);
-  StrToBuf (&MACDevPath->MacAddress.Addr[0], Length, AddressStr);
+  StrHexToBytes (AddressStr, Length * 2, MACDevPath->MacAddress.Addr, Length);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) MACDevPath;
 }
@@ -2049,7 +1864,7 @@ DevPathFromTextIPv4 (
                                                  (UINT16) sizeof (IPv4_DEVICE_PATH)
                                                  );
 
-  StrToIPv4Addr (&RemoteIPStr, &IPv4->RemoteIpAddress);
+  StrToIpv4Address (RemoteIPStr, NULL, &IPv4->RemoteIpAddress, NULL);
   IPv4->Protocol = (UINT16) NetworkProtocolFromText (ProtocolStr);
   if (StrCmp (TypeStr, L"Static") == 0) {
     IPv4->StaticIpAddress = TRUE;
@@ -2057,10 +1872,10 @@ DevPathFromTextIPv4 (
     IPv4->StaticIpAddress = FALSE;
   }
 
-  StrToIPv4Addr (&LocalIPStr, &IPv4->LocalIpAddress);
+  StrToIpv4Address (LocalIPStr, NULL, &IPv4->LocalIpAddress, NULL);
   if (!IS_NULL (*GatewayIPStr) && !IS_NULL (*SubnetMaskStr)) {
-    StrToIPv4Addr (&GatewayIPStr,  &IPv4->GatewayIpAddress);
-    StrToIPv4Addr (&SubnetMaskStr, &IPv4->SubnetMask);
+    StrToIpv4Address (GatewayIPStr,  NULL, &IPv4->GatewayIpAddress, NULL);
+    StrToIpv4Address (SubnetMaskStr, NULL, &IPv4->SubnetMask,       NULL);
   } else {
     ZeroMem (&IPv4->GatewayIpAddress, sizeof (IPv4->GatewayIpAddress));
     ZeroMem (&IPv4->SubnetMask,    sizeof (IPv4->SubnetMask));
@@ -2105,7 +1920,7 @@ DevPathFromTextIPv6 (
                                                  (UINT16) sizeof (IPv6_DEVICE_PATH)
                                                  );
 
-  StrToIPv6Addr (&RemoteIPStr, &IPv6->RemoteIpAddress);
+  StrToIpv6Address (RemoteIPStr, NULL, &IPv6->RemoteIpAddress, NULL);
   IPv6->Protocol        = (UINT16) NetworkProtocolFromText (ProtocolStr);
   if (StrCmp (TypeStr, L"Static") == 0) {
     IPv6->IpAddressOrigin = 0;
@@ -2115,9 +1930,9 @@ DevPathFromTextIPv6 (
     IPv6->IpAddressOrigin = 2;
   }
 
-  StrToIPv6Addr (&LocalIPStr, &IPv6->LocalIpAddress);
+  StrToIpv6Address (LocalIPStr, NULL, &IPv6->LocalIpAddress, NULL);
   if (!IS_NULL (*GatewayIPStr) && !IS_NULL (*PrefixLengthStr)) {
-    StrToIPv6Addr (&GatewayIPStr, &IPv6->GatewayIpAddress);
+    StrToIpv6Address (GatewayIPStr, NULL, &IPv6->GatewayIpAddress, NULL);
     IPv6->PrefixLength = (UINT8) Strtoi (PrefixLengthStr);
   } else {
     ZeroMem (&IPv6->GatewayIpAddress, sizeof (IPv6->GatewayIpAddress));
@@ -2947,7 +2762,6 @@ DevPathFromTextHD (
   CHAR16                *StartStr;
   CHAR16                *SizeStr;
   UINT32                Signature32;
-  EFI_GUID              SignatureGuid;
   HARDDRIVE_DEVICE_PATH *Hd;
 
   PartitionStr        = GetNextParamStr (&TextDeviceNode);
@@ -2976,8 +2790,7 @@ DevPathFromTextHD (
     Hd->SignatureType = SIGNATURE_TYPE_GUID;
     Hd->MBRType       = 0x02;
 
-    DevicePathLibStrToGuid (SignatureStr, &SignatureGuid);
-    CopyMem (Hd->Signature, &SignatureGuid, sizeof (EFI_GUID));
+    StrToGuid (SignatureStr, (EFI_GUID *) Hd->Signature);
   } else {
     Hd->SignatureType = (UINT8) Strtoi (TypeStr);
   }
@@ -3091,7 +2904,7 @@ DevPathFromTextMedia (
                                              (UINT16) sizeof (MEDIA_PROTOCOL_DEVICE_PATH)
                                              );
 
-  DevicePathLibStrToGuid (GuidStr, &Media->Protocol);
+  StrToGuid (GuidStr, &Media->Protocol);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Media;
 }
@@ -3119,7 +2932,7 @@ DevPathFromTextFv (
                                            (UINT16) sizeof (MEDIA_FW_VOL_DEVICE_PATH)
                                            );
 
-  DevicePathLibStrToGuid (GuidStr, &Fv->FvName);
+  StrToGuid (GuidStr, &Fv->FvName);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Fv;
 }
@@ -3147,7 +2960,7 @@ DevPathFromTextFvFile (
                                                     (UINT16) sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH)
                                                     );
 
-  DevicePathLibStrToGuid (GuidStr, &FvFile->FvFileName);
+  StrToGuid (GuidStr, &FvFile->FvFileName);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) FvFile;
 }
@@ -3219,7 +3032,7 @@ DevPathFromTextRamDisk (
   Strtoi64 (EndingAddrStr, &EndingAddr);
   WriteUnaligned64 ((UINT64 *) &(RamDisk->EndingAddr[0]), EndingAddr);
   RamDisk->Instance = (UINT16) Strtoi (InstanceStr);
-  DevicePathLibStrToGuid (TypeGuidStr, &RamDisk->TypeGuid);
+  StrToGuid (TypeGuidStr, &RamDisk->TypeGuid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) RamDisk;
 }
