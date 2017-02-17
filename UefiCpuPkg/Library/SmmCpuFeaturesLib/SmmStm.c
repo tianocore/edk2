@@ -1,7 +1,7 @@
 /** @file
   SMM STM support functions
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -276,8 +276,8 @@ SmmCpuFeaturesInstallSmiHandler (
   UINT32                         RegEdx;
   EFI_PROCESSOR_INFORMATION      ProcessorInfo;
 
-  CopyMem ((VOID *)(UINTN)(SmBase + TXT_SMM_PSD_OFFSET), &gcStmPsd, sizeof (gcStmPsd));
-  Psd = (TXT_PROCESSOR_SMM_DESCRIPTOR *)(VOID *)(UINTN)(SmBase + TXT_SMM_PSD_OFFSET);
+  CopyMem ((VOID *)((UINTN)SmBase + TXT_SMM_PSD_OFFSET), &gcStmPsd, sizeof (gcStmPsd));
+  Psd = (TXT_PROCESSOR_SMM_DESCRIPTOR *)(VOID *)((UINTN)SmBase + TXT_SMM_PSD_OFFSET);
   Psd->SmmGdtPtr = GdtBase;
   Psd->SmmGdtSize = (UINT32)GdtSize;
 
@@ -317,7 +317,7 @@ SmmCpuFeaturesInstallSmiHandler (
   // Copy template to CPU specific SMI handler location
   //
   CopyMem (
-    (VOID*)(UINTN)(SmBase + SMM_HANDLER_OFFSET),
+    (VOID*)((UINTN)SmBase + SMM_HANDLER_OFFSET),
     (VOID*)gcStmSmiHandlerTemplate,
     gcStmSmiHandlerSize
     );

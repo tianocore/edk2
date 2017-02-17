@@ -1,7 +1,7 @@
 /** @file
   Produces the CPU I/O 2 Protocol.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials                          
@@ -141,7 +141,7 @@ CpuIoCheckParameter (
   //
   // Check to see if Address is aligned
   //
-  if ((Address & (UINT64)(mInStride[Width] - 1)) != 0) {
+  if ((Address & ((UINT64)mInStride[Width] - 1)) != 0) {
     return EFI_UNSUPPORTED;
   }
 

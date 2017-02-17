@@ -1,7 +1,7 @@
 /** @file
   Produces the SMM CPU I/O Protocol.
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -126,7 +126,7 @@ CpuIoCheckParameter (
   //
   // Check to see if Address is aligned
   //
-  if ((Address & (UINT64)(mStride[Width] - 1)) != 0) {
+  if ((Address & ((UINT64)mStride[Width] - 1)) != 0) {
     return EFI_UNSUPPORTED;
   }
 
