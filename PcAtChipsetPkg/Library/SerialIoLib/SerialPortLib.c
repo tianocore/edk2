@@ -1,7 +1,7 @@
 /** @file
   UART Serial Port library functions
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -91,19 +91,19 @@ SerialPortInitialize (
   // Set communications format
   //
   OutputData = (UINT8) ((DLAB << 7) | (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
-  IoWrite8 ((UINTN) (gUartBase + LCR_OFFSET), OutputData);
+  IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   //
   // Configure baud rate
   //
-  IoWrite8 ((UINTN) (gUartBase + BAUD_HIGH_OFFSET), (UINT8) (Divisor >> 8));
-  IoWrite8 ((UINTN) (gUartBase + BAUD_LOW_OFFSET), (UINT8) (Divisor & 0xff));
+  IoWrite8 (gUartBase + BAUD_HIGH_OFFSET, (UINT8) (Divisor >> 8));
+  IoWrite8 (gUartBase + BAUD_LOW_OFFSET, (UINT8) (Divisor & 0xff));
 
   //
   // Switch back to bank 0
   //
   OutputData = (UINT8) ((~DLAB << 7) | (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
-  IoWrite8 ((UINTN) (gUartBase + LCR_OFFSET), OutputData);
+  IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   return RETURN_SUCCESS;
 }
@@ -470,19 +470,19 @@ SerialPortSetAttributes (
   // Set communications format
   //
   OutputData = (UINT8) ((DLAB << 7) | (gBreakSet << 6) | (LcrParity << 3) | (LcrStop << 2) | LcrData);
-  IoWrite8 ((UINTN) (gUartBase + LCR_OFFSET), OutputData);
+  IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   //
   // Configure baud rate
   //
-  IoWrite8 ((UINTN) (gUartBase + BAUD_HIGH_OFFSET), (UINT8) (Divisor >> 8));
-  IoWrite8 ((UINTN) (gUartBase + BAUD_LOW_OFFSET), (UINT8) (Divisor & 0xff));
+  IoWrite8 (gUartBase + BAUD_HIGH_OFFSET, (UINT8) (Divisor >> 8));
+  IoWrite8 (gUartBase + BAUD_LOW_OFFSET, (UINT8) (Divisor & 0xff));
 
   //
   // Switch back to bank 0
   //
   OutputData = (UINT8) ((~DLAB << 7) | (gBreakSet << 6) | (LcrParity << 3) | (LcrStop << 2) | LcrData);
-  IoWrite8 ((UINTN) (gUartBase + LCR_OFFSET), OutputData);
+  IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   return RETURN_SUCCESS;
 }
