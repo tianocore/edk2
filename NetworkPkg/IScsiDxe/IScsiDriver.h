@@ -1,7 +1,7 @@
 /** @file
   The header file of IScsiDriver.c.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 
 This program and the accompanying materials
@@ -68,7 +68,6 @@ typedef struct {
   LIST_ENTRY      AttemptConfigs;       // User configured Attempt list.
   CHAR8           InitiatorName[ISCSI_NAME_MAX_SIZE];
   UINTN           InitiatorNameLength;
-  VOID            *NewAttempt;          // Attempt is created but not saved.
 } ISCSI_PRIVATE_DATA;
 
 extern ISCSI_PRIVATE_DATA                 *mPrivate;

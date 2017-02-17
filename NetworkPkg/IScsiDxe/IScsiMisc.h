@@ -244,6 +244,44 @@ IScsiRemoveNic (
   );
 
 /**
+  Create and initialize the Attempts.
+
+  @param[in]  AttemptNum          The number of Attempts will be created.
+
+  @retval EFI_SUCCESS             The Attempts have been created successfully.
+  @retval Others                  Failed to create the Attempt.
+
+**/
+EFI_STATUS
+IScsiCreateAttempts (
+  IN UINTN            AttemptNum
+  );
+
+/**
+  Create the iSCSI configuration Keywords for each attempt.
+
+  @param[in]  KeywordNum          The number Sets of Keywords will be created.
+
+  @retval EFI_SUCCESS             The operation is completed.
+  @retval Others                  Failed to create the Keywords.
+
+**/
+EFI_STATUS
+IScsiCreateKeywords (
+  IN UINTN            KeywordNum
+  );
+
+/**
+
+  Free the attempt configure data variable.
+
+**/
+VOID
+IScsiCleanAttemptVariable (
+  IN   VOID
+  );
+
+/**
   Get the recorded NIC information from a global structure by the Index.
 
   @param[in]  NicIndex          The index indicates the position of NIC info.

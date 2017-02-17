@@ -45,7 +45,11 @@
   
   # Include/Guid/TlsAuthentication.h
   gEfiTlsCaCertificateGuid      = { 0xfd2340D0, 0x3dab, 0x4349, { 0xa6, 0xc7, 0x3b, 0x4f, 0x12, 0xb4, 0x8e, 0xae }}
-  
+
+[PcdsFixedAtBuild]
+  ## The max attempt number will be created by iSCSI driver.
+  # @Prompt Max attempt number.
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber|0x08|UINT8|0x0000000D
 
 [PcdsFeatureFlag]
   ## Indicates if the IPsec IKEv2 Certificate Authentication feature is enabled or not.<BR><BR>

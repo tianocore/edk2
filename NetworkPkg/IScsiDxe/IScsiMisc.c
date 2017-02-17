@@ -643,17 +643,787 @@ IScsiRemoveNic (
     }
   }
 
-  //
-  // Free attempt is created but not saved to system.
-  //
-  if (mPrivate->NewAttempt != NULL) {
-    FreePool (mPrivate->NewAttempt);
-    mPrivate->NewAttempt = NULL;
+  return EFI_SUCCESS;
+}
+
+/**
+  Create and initialize the Attempts.
+
+  @param[in]  AttemptNum          The number of Attempts will be created.
+
+  @retval EFI_SUCCESS             The Attempts have been created successfully.
+  @retval Others                  Failed to create the Attempt.
+
+**/
+EFI_STATUS
+IScsiCreateAttempts (
+  IN UINTN            AttemptNum
+)
+{
+  ISCSI_ATTEMPT_CONFIG_NVDATA   *AttemptConfigData;
+  ISCSI_SESSION_CONFIG_NVDATA   *ConfigData;
+  UINT8                         *AttemptConfigOrder;
+  UINTN                         AttemptConfigOrderSize;
+  UINT8                         *AttemptOrderTmp;
+  UINTN                         TotalNumber;
+  UINT8                         Index;
+  EFI_STATUS                    Status;
+
+  for (Index = 1; Index <= AttemptNum; Index ++) {
+    //
+    // Get the initialized attempt order. This is used to essure creating attempts by order.
+    //
+    AttemptConfigOrder = IScsiGetVariableAndSize (
+                           L"InitialAttemptOrder",
+                           &gIScsiConfigGuid,
+                           &AttemptConfigOrderSize
+                           );
+    TotalNumber = AttemptConfigOrderSize / sizeof (UINT8);
+    if (TotalNumber == AttemptNum) {
+      Status = EFI_SUCCESS;
+      break;
+    }
+    TotalNumber++;
+
+    //
+    // Append the new created attempt to the end.
+    //
+    AttemptOrderTmp = AllocateZeroPool (TotalNumber * sizeof (UINT8));
+    if (AttemptOrderTmp == NULL) {
+      if (AttemptConfigOrder != NULL) {
+        FreePool (AttemptConfigOrder);
+      }
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    if (AttemptConfigOrder != NULL) {
+      CopyMem (AttemptOrderTmp, AttemptConfigOrder, AttemptConfigOrderSize);
+      FreePool (AttemptConfigOrder);
+    }
+
+    AttemptOrderTmp[TotalNumber - 1] = Index;
+    AttemptConfigOrder               = AttemptOrderTmp;
+    AttemptConfigOrderSize           = TotalNumber * sizeof (UINT8);
+
+    Status = gRT->SetVariable (
+                    L"InitialAttemptOrder",
+                    &gIScsiConfigGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                    AttemptConfigOrderSize,
+                    AttemptConfigOrder
+                    );
+    FreePool (AttemptConfigOrder);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Create new Attempt
+    //
+    AttemptConfigData = AllocateZeroPool (sizeof (ISCSI_ATTEMPT_CONFIG_NVDATA));
+    if (AttemptConfigData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    ConfigData                    = &AttemptConfigData->SessionConfigData;
+    ConfigData->TargetPort        = ISCSI_WELL_KNOWN_PORT;
+    ConfigData->ConnectTimeout    = CONNECT_DEFAULT_TIMEOUT;
+    ConfigData->ConnectRetryCount = CONNECT_MIN_RETRY;
+
+    AttemptConfigData->AuthenticationType           = ISCSI_AUTH_TYPE_CHAP;
+    AttemptConfigData->AuthConfigData.CHAP.CHAPType = ISCSI_CHAP_UNI;
+    //
+    // Configure the Attempt index and set variable.
+    //
+    AttemptConfigData->AttemptConfigIndex = Index;
+
+    //
+    // Set the attempt name according to the order.
+    //
+    UnicodeSPrint (
+      mPrivate->PortString,
+      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      L"Attempt %d",
+      (UINTN) AttemptConfigData->AttemptConfigIndex
+      );
+    UnicodeStrToAsciiStrS (mPrivate->PortString, AttemptConfigData->AttemptName, ATTEMPT_NAME_SIZE);
+
+    Status = gRT->SetVariable (
+                    mPrivate->PortString,
+                    &gEfiIScsiInitiatorNameProtocolGuid,
+                    ISCSI_CONFIG_VAR_ATTR,
+                    sizeof (ISCSI_ATTEMPT_CONFIG_NVDATA),
+                    AttemptConfigData
+                    );
+    FreePool (AttemptConfigData);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   return EFI_SUCCESS;
 }
 
+/**
+  Create the iSCSI configuration Keywords for each attempt. You can find the keywords
+  defined in the "x-UEFI-ns" namespace (http://www.uefi.org/confignamespace).
+
+  @param[in]  KeywordNum          The number Sets of Keywords will be created.
+
+  @retval EFI_SUCCESS             The operation is completed.
+  @retval Others                  Failed to create the Keywords.
+
+**/
+EFI_STATUS
+IScsiCreateKeywords (
+  IN UINTN            KeywordNum
+)
+{
+  VOID                          *StartOpCodeHandle;
+  EFI_IFR_GUID_LABEL            *StartLabel;
+  VOID                          *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL            *EndLabel;
+  UINTN                         Index;
+  EFI_STRING_ID                 StringToken;
+  CHAR16                        StringId[64];
+  CHAR16                        KeywordId[32];
+  EFI_STATUS                    Status;
+
+  Status = IScsiCreateOpCode (
+             KEYWORD_ENTRY_LABEL,
+             &StartOpCodeHandle,
+             &StartLabel,
+             &EndOpCodeHandle,
+             &EndLabel
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Index = 1; Index <= KeywordNum; Index ++) {
+    //
+    // Create iSCSIAttemptName Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_ATTEMPTT_NAME_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIAttemptName:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_ATTEMPT_NAME_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_ATTEMPT_NAME_VAR_OFFSET + ATTEMPT_NAME_SIZE * (Index - 1) * sizeof (CHAR16)),
+      StringToken,
+      StringToken,
+      EFI_IFR_FLAG_READ_ONLY,
+      0,
+      0,
+      ATTEMPT_NAME_SIZE,
+      NULL
+      );
+
+    //
+    // Create iSCSIBootEnable Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_MODE_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIBootEnable:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_BOOTENABLE_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_BOOTENABLE_VAR_OFFSET + (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      EFI_IFR_NUMERIC_SIZE_1,
+      0,
+      2,
+      0,
+      NULL
+      );
+
+    //
+    // Create iSCSIIpAddressType Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_IP_MODE_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIIpAddressType:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_ADDRESS_TYPE_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_ADDRESS_TYPE_VAR_OFFSET + (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      EFI_IFR_NUMERIC_SIZE_1,
+      0,
+      2,
+      0,
+      NULL
+      );
+
+    //
+    // Create iSCSIConnectRetry Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_CONNECT_RETRY_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIConnectRetry:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_CONNECT_RETRY_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_CONNECT_RETRY_VAR_OFFSET + (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      EFI_IFR_NUMERIC_SIZE_1,
+      0,
+      16,
+      0,
+      NULL
+      );
+
+    //
+    // Create iSCSIConnectTimeout Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_CONNECT_TIMEOUT_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIConnectTimeout:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_CONNECT_TIMEOUT_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_CONNECT_TIMEOUT_VAR_OFFSET + 2 * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      EFI_IFR_NUMERIC_SIZE_2,
+      CONNECT_MIN_TIMEOUT,
+      CONNECT_MAX_TIMEOUT,
+      0,
+      NULL
+      );
+
+    //
+    // Create ISID Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_ISID_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIISID:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_ISID_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_ISID_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      ISID_CONFIGURABLE_MIN_LEN,
+      ISID_CONFIGURABLE_STORAGE,
+      NULL
+      );
+
+    //
+    // Create iSCSIInitiatorInfoViaDHCP Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_INITIATOR_VIA_DHCP_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIInitiatorInfoViaDHCP:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+    StartOpCodeHandle,
+    (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_VIA_DHCP_QUESTION_ID + (Index - 1)),
+    CONFIGURATION_VARSTORE_ID,
+    (UINT16) (ATTEMPT_INITIATOR_VIA_DHCP_VAR_OFFSET + (Index - 1)),
+    StringToken,
+    StringToken,
+    0,
+    0,
+    0,
+    1,
+    0,
+    NULL
+    );
+
+    //
+    // Create iSCSIInitiatorIpAddress Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_INITIATOR_IP_ADDRESS_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIInitiatorIpAddress:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_IP_ADDRESS_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_INITIATOR_IP_ADDRESS_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      IP4_MIN_SIZE,
+      IP4_MAX_SIZE,
+      NULL
+      );
+
+    //
+    // Create iSCSIInitiatorNetmask Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_INITIATOR_NET_MASK_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIInitiatorNetmask:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_NET_MASK_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_INITIATOR_NET_MASK_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      IP4_MIN_SIZE,
+      IP4_MAX_SIZE,
+      NULL
+      );
+
+    //
+    // Create iSCSIInitiatorGateway Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_INITIATOR_GATE_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIInitiatorGateway:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_INITIATOR_GATE_WAY_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_INITIATOR_GATE_WAY_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      IP4_MIN_SIZE,
+      IP4_MAX_SIZE,
+      NULL
+      );
+
+    //
+    // Create iSCSITargetInfoViaDHCP Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_TARGET_VIA_DHCP_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSITargetInfoViaDHCP:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+    StartOpCodeHandle,
+    (EFI_QUESTION_ID) (ATTEMPT_TARGET_VIA_DHCP_QUESTION_ID + (Index - 1)),
+    CONFIGURATION_VARSTORE_ID,
+    (UINT16) (ATTEMPT_TARGET_VIA_DHCP_VAR_OFFSET + (Index - 1)),
+    StringToken,
+    StringToken,
+    0,
+    0,
+    0,
+    1,
+    0,
+    NULL
+    );
+
+    //
+    // Create iSCSITargetTcpPort Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_TARGET_TCP_PORT_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSITargetTcpPort:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_TARGET_TCP_PORT_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_TARGET_TCP_PORT_VAR_OFFSET + 2 * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      EFI_IFR_NUMERIC_SIZE_2,
+      TARGET_PORT_MIN_NUM,
+      TARGET_PORT_MAX_NUM,
+      0,
+      NULL
+      );
+
+    //
+    // Create iSCSITargetName Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_TARGET_NAME_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSITargetName:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_TARGET_NAME_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_TARGET_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      ISCSI_NAME_IFR_MIN_SIZE,
+      ISCSI_NAME_IFR_MAX_SIZE,
+      NULL
+      );
+
+    //
+    // Create iSCSITargetIpAddress Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_TARGET_IP_ADDRESS_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSITargetIpAddress:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_TARGET_IP_ADDRESS_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_TARGET_IP_ADDRESS_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      IP_MIN_SIZE,
+      IP_MAX_SIZE,
+      NULL
+      );
+
+    //
+    // Create iSCSILUN Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_LUN_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSILUN:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_LUN_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_LUN_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      LUN_MIN_SIZE,
+      LUN_MAX_SIZE,
+      NULL
+      );
+
+    //
+    // Create iSCSIAuthenticationMethod Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_AUTHENTICATION_METHOD_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIAuthenticationMethod:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+    StartOpCodeHandle,
+    (EFI_QUESTION_ID) (ATTEMPT_AUTHENTICATION_METHOD_QUESTION_ID + (Index - 1)),
+    CONFIGURATION_VARSTORE_ID,
+    (UINT16) (ATTEMPT_AUTHENTICATION_METHOD_VAR_OFFSET + (Index - 1)),
+    StringToken,
+    StringToken,
+    0,
+    0,
+    0,
+    1,
+    0,
+    NULL
+    );
+
+    //
+    // Create iSCSIChapType Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_CHARTYPE_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIChapType:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateNumericOpCode (
+    StartOpCodeHandle,
+    (EFI_QUESTION_ID) (ATTEMPT_CHARTYPE_QUESTION_ID + (Index - 1)),
+    CONFIGURATION_VARSTORE_ID,
+    (UINT16) (ATTEMPT_CHARTYPE_VAR_OFFSET + (Index - 1)),
+    StringToken,
+    StringToken,
+    0,
+    0,
+    0,
+    1,
+    0,
+    NULL
+    );
+
+    //
+    // Create iSCSIChapUsername Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_CHAR_USER_NAME_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIChapUsername:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_CHAR_USER_NAME_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_CHAR_USER_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      0,
+      ISCSI_CHAP_NAME_MAX_LEN,
+      NULL
+      );
+
+    //
+    // Create iSCSIChapSecret Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_CHAR_SECRET_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIChapSecret:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_CHAR_SECRET_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_CHAR_SECRET_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      ISCSI_CHAP_SECRET_MIN_LEN,
+      ISCSI_CHAP_SECRET_MAX_LEN,
+      NULL
+      );
+
+    //
+    // Create iSCSIReverseChapUsername Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_CHAR_REVERSE_USER_NAME_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIReverseChapUsername:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_CHAR_REVERSE_USER_NAME_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_CHAR_REVERSE_USER_NAME_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      0,
+      ISCSI_CHAP_NAME_MAX_LEN,
+      NULL
+      );
+
+    //
+    // Create iSCSIReverseChapSecret Keyword.
+    //
+    UnicodeSPrint (StringId, sizeof (StringId), L"STR_ISCSI_CHAR_REVERSE_SECRET_PROMPT%d", Index);
+    StringToken =  HiiSetString (
+                     mCallbackInfo->RegisteredHandle,
+                     0,
+                     StringId,
+                     NULL
+                     );
+    UnicodeSPrint (KeywordId, sizeof (KeywordId), L"iSCSIReverseChapSecret:%d", Index);
+    HiiSetString (mCallbackInfo->RegisteredHandle, StringToken, KeywordId, "x-UEFI-ns");
+    HiiCreateStringOpCode (
+      StartOpCodeHandle,
+      (EFI_QUESTION_ID) (ATTEMPT_CHAR_REVERSE_SECRET_QUESTION_ID + (Index - 1)),
+      CONFIGURATION_VARSTORE_ID,
+      (UINT16) (ATTEMPT_CHAR_REVERSE_SECRET_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
+      StringToken,
+      StringToken,
+      0,
+      0,
+      ISCSI_CHAP_SECRET_MIN_LEN,
+      ISCSI_CHAP_SECRET_MAX_LEN,
+      NULL
+      );
+  }
+
+  Status = HiiUpdateForm (
+             mCallbackInfo->RegisteredHandle, // HII handle
+             &gIScsiConfigGuid,               // Formset GUID
+             FORMID_ATTEMPT_FORM,             // Form ID
+             StartOpCodeHandle,               // Label for where to insert opcodes
+             EndOpCodeHandle                  // Replace data
+             );
+
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
+
+  return Status;
+}
+
+/**
+
+  Free the attempt configure data variable.
+
+**/
+VOID
+IScsiCleanAttemptVariable (
+  IN   VOID
+)
+{
+  ISCSI_ATTEMPT_CONFIG_NVDATA   *AttemptConfigData;
+  UINT8                         *AttemptConfigOrder;
+  UINTN                         AttemptConfigOrderSize;
+  UINTN                         Index;
+
+  //
+  // Get the initialized attempt order.
+  //
+  AttemptConfigOrder = IScsiGetVariableAndSize (
+                         L"InitialAttemptOrder",
+                         &gIScsiConfigGuid,
+                         &AttemptConfigOrderSize
+                         );
+  if (AttemptConfigOrder == NULL || AttemptConfigOrderSize == 0) {
+    return;
+  }
+
+  for (Index = 1; Index < AttemptConfigOrderSize / sizeof (UINT8); Index++) {
+    UnicodeSPrint (
+      mPrivate->PortString,
+      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      L"Attempt %d",
+      Index
+      );
+
+    GetVariable2 (
+      mPrivate->PortString,
+      &gEfiIScsiInitiatorNameProtocolGuid,
+      (VOID**)&AttemptConfigData,
+      NULL
+      );
+
+    if (AttemptConfigData != NULL) {
+      gRT->SetVariable (
+             mPrivate->PortString,
+             &gEfiIScsiInitiatorNameProtocolGuid,
+             0,
+             0,
+             NULL
+             );
+    }
+  }
+  return;
+}
 
 /**
   Get the recorded NIC info from global structure by the Index.
@@ -931,6 +1701,7 @@ IScsiDhcpIsConfigured (
   UINTN                       HwAddressSize;
   UINT16                      VlanId;
   CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
   CHAR16                      AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
   
   AttemptConfigOrder = IScsiGetVariableAndSize (
@@ -959,8 +1730,7 @@ IScsiDhcpIsConfigured (
     UnicodeSPrint (
       AttemptName,
       (UINTN) 128,
-      L"%s%d",
-      MacString,
+      L"Attempt %d",
       (UINTN) AttemptConfigOrder[Index]
       );
     Status = GetVariable2 (
@@ -985,7 +1755,13 @@ IScsiDhcpIsConfigured (
       FreePool (AttemptTmp);
       continue;
     }
-    
+
+    AsciiStrToUnicodeStrS (AttemptTmp->MacString, AttemptMacString, sizeof (AttemptMacString) / sizeof (AttemptMacString[0]));
+
+    if (AttemptTmp->Actived == ISCSI_ACTIVE_DISABLED || StrCmp (MacString, AttemptMacString)) {
+      continue;
+    }
+
     if(AttemptTmp->SessionConfigData.IpMode == IP_MODE_AUTOCONFIG ||
        AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp == TRUE ||
        AttemptTmp->SessionConfigData.TargetInfoFromDhcp == TRUE) { 
@@ -1106,6 +1882,7 @@ IScsiGetConfigData (
 {
   EFI_STATUS                  Status;
   CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
+  CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
   UINTN                       Index;
   ISCSI_NIC_INFO              *NicInfo;
   ISCSI_ATTEMPT_CONFIG_NVDATA *AttemptConfigData;
@@ -1197,12 +1974,10 @@ IScsiGetConfigData (
           //
           // Refresh the state of this attempt to NVR.
           //
-          AsciiStrToUnicodeStrS (AttemptTmp->MacString, MacString, ARRAY_SIZE (MacString));
           UnicodeSPrint (
             mPrivate->PortString,
             (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
-            L"%s%d",
-            MacString,
+            L"Attempt %d",
             (UINTN) AttemptTmp->AttemptConfigIndex
             );
 
@@ -1236,12 +2011,10 @@ IScsiGetConfigData (
         //
         // Refresh the state of this attempt to NVR.
         //
-        AsciiStrToUnicodeStrS (AttemptTmp->MacString, MacString, ARRAY_SIZE (MacString));
         UnicodeSPrint (
           mPrivate->PortString,
           (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
-          L"%s%d",
-          MacString,
+          L"Attempt %d",
           (UINTN) AttemptTmp->AttemptConfigIndex
           );
 
@@ -1269,9 +2042,8 @@ IScsiGetConfigData (
     IScsiMacAddrToStr (&NicInfo->PermanentAddress, NicInfo->HwAddressSize, NicInfo->VlanId, MacString);
     UnicodeSPrint (
       mPrivate->PortString,
-      (UINTN) 128,
-      L"%s%d",
-      MacString,
+      (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
+      L"Attempt %d",
       (UINTN) AttemptConfigOrder[Index]
       );
 
@@ -1281,8 +2053,10 @@ IScsiGetConfigData (
       (VOID**)&AttemptConfigData,
       NULL
       );
+    AsciiStrToUnicodeStrS (AttemptConfigData->MacString, AttemptMacString, sizeof (AttemptMacString) / sizeof (AttemptMacString[0]));
 
-    if (AttemptConfigData == NULL) {
+    if (AttemptConfigData == NULL || AttemptConfigData->Actived == ISCSI_ACTIVE_DISABLED ||
+        StrCmp (MacString, AttemptMacString)) {
       continue;
     }
 
@@ -1327,12 +2101,10 @@ IScsiGetConfigData (
       //
       // Refresh the state of this attempt to NVR.
       //
-      AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, ARRAY_SIZE (MacString));
       UnicodeSPrint (
         mPrivate->PortString,
         (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
-        L"%s%d",
-        MacString,
+        L"Attempt %d",
         (UINTN) AttemptConfigData->AttemptConfigIndex
         );
 

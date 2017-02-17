@@ -373,7 +373,6 @@ IScsiStart (
   EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
   EFI_GUID                        *IScsiPrivateGuid;
   EFI_GUID                        *TcpServiceBindingGuid;
-  CHAR16                          MacString[ISCSI_MAX_MAC_STRING_LEN];
   BOOLEAN                         NeedUpdate;
   VOID                            *Interface;
   EFI_GUID                        *ProtocolGuid;
@@ -697,12 +696,10 @@ IScsiStart (
     Session->ConfigData = AttemptConfigData;
     Session->AuthType   = AttemptConfigData->AuthenticationType;
 
-    AsciiStrToUnicodeStrS (AttemptConfigData->MacString, MacString, ARRAY_SIZE (MacString));
     UnicodeSPrint (
       mPrivate->PortString,
       (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
-      L"%s%d",
-      MacString,
+      L"Attempt %d",
       (UINTN) AttemptConfigData->AttemptConfigIndex
       );
 
@@ -1804,6 +1801,22 @@ IScsiDriverEntryPoint (
   }
 
   //
+  // Create the Maximum Attempts.
+  //
+  Status = IScsiCreateAttempts (PcdGet8 (PcdMaxIScsiAttemptNumber));
+  if (EFI_ERROR (Status)) {
+    goto Error5;
+  }
+
+  //
+  // Create Keywords for all the Attempts.
+  //
+  Status = IScsiCreateKeywords (PcdGet8 (PcdMaxIScsiAttemptNumber));
+  if (EFI_ERROR (Status)) {
+    goto Error5;
+  }
+
+  //
   // There should be only one EFI_AUTHENTICATION_INFO_PROTOCOL. If already exists,
   // do not produce the protocol instance.
   //
@@ -1820,14 +1833,17 @@ IScsiDriverEntryPoint (
                     &gIScsiAuthenticationInfo
                     );
     if (EFI_ERROR (Status)) {
-      goto Error5;
+      goto Error6;
     }    
   }
 
   return EFI_SUCCESS;
 
-Error5:
+Error6:
   IScsiConfigFormUnload (gIScsiIp4DriverBinding.DriverBindingHandle);
+
+Error5:
+  IScsiCleanAttemptVariable ();
 
 Error4:
   FreePool (mPrivate);

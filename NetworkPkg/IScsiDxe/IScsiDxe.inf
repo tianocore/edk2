@@ -128,6 +128,8 @@
   
   ## SOMETIMES_PRODUCES ## Variable:L"AttemptOrder"
   ## SOMETIMES_CONSUMES ## Variable:L"AttemptOrder"
+  ## SOMETIMES_PRODUCES ## Variable:L"InitialAttemptOrder"
+  ## SOMETIMES_CONSUMES ## Variable:L"InitialAttemptOrder"
   ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mVendorStorageName
   ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr mVendorStorageName
   ## SOMETIMES_PRODUCES ## UNDEFINED # HiiGetBrowserData     mVendorStorageName
@@ -137,6 +139,7 @@
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdIScsiAIPNetworkBootPolicy ## CONSUMES
-  
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber     ## CONSUMES
+
 [UserExtensions.TianoCore."ExtraFiles"]
   IScsiDxeExtra.uni

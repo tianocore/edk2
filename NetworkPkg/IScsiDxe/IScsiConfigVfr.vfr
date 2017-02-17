@@ -121,10 +121,10 @@ formset
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.AttemptName,
             prompt  = STRING_TOKEN(STR_ISCSI_ATTEMPT_NAME),
             help    = STRING_TOKEN(STR_ISCSI_ATTEMPT_NAME_HELP),
-            flags   = INTERACTIVE,
+            flags   = READ_ONLY,
             key     = KEY_ATTEMPT_NAME,
             minsize = 0,
-            maxsize = ATTEMPT_NAME_MAX_SIZE,
+            maxsize = ATTEMPT_NAME_SIZE,
     endstring;
 
     subtitle text = STRING_TOKEN(STR_NULL);
@@ -340,6 +340,48 @@ formset
             maxsize  = ISCSI_CHAP_SECRET_MAX_LEN,
     endstring;
 
+    endif;
+
+    suppressif TRUE;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIMacAddr,
+            prompt  = STRING_TOKEN(STR_ISCSI_MAC_PROMPT),
+            help    = STRING_TOKEN(STR_ISCSI_MAC_PROMPT),
+            minsize = 0,
+            maxsize = ISCSI_MAX_MAC_STRING_LEN,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIAttemptOrder,
+            prompt  = STRING_TOKEN(STR_ISCSI_ATTEMPT_ORDER),
+            help    = STRING_TOKEN(STR_ISCSI_ATTEMPT_ORDER),
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIAddAttemptList,
+            prompt  = STRING_TOKEN(STR_ISCSI_ADD_ATTEMPTS),
+            help    = STRING_TOKEN(STR_ISCSI_ADD_ATTEMPTS),
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIDeleteAttemptList,
+            prompt  = STRING_TOKEN(STR_ISCSI_DELETE_ATTEMPTS),
+            help    = STRING_TOKEN(STR_ISCSI_DELETE_ATTEMPTS),
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    string  varid   = ISCSI_CONFIG_IFR_NVDATA.ISCSIDisplayAttemptList,
+            prompt  = STRING_TOKEN(STR_ISCSI_DISPLAY_ATTEMPTS),
+            help    = STRING_TOKEN(STR_ISCSI_DISPLAY_ATTEMPTS),
+            flags   = READ_ONLY,
+            minsize = 0,
+            maxsize = ATTEMPT_NAME_LIST_SIZE,
+    endstring;
+
+    label KEYWORD_ENTRY_LABEL;
+    label LABEL_END;
     endif;
 
     subtitle text = STRING_TOKEN(STR_NULL);
