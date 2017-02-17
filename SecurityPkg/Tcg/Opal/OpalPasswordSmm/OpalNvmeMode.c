@@ -1,7 +1,7 @@
 /** @file
   Provide functions to initialize NVME controller and perform NVME commands
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -52,7 +52,7 @@ enum {
 ///
 /// All of base memories are 4K(0x1000) alignment
 ///
-#define NVME_MEM_BASE(Nvme)                 (Nvme->BaseMem)
+#define NVME_MEM_BASE(Nvme)                 ((UINTN)(Nvme->BaseMem))
 #define NVME_CONTROL_DATA_BASE(Nvme)        (ALIGN (NVME_MEM_BASE(Nvme) + ((NvmeGetBaseMemPages (BASEMEM_CONTROLLER_DATA))                        * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
 #define NVME_NAMESPACE_DATA_BASE(Nvme)      (ALIGN (NVME_MEM_BASE(Nvme) + ((NvmeGetBaseMemPages (BASEMEM_IDENTIFY_DATA))                          * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
 #define NVME_ASQ_BASE(Nvme)                 (ALIGN (NVME_MEM_BASE(Nvme) + ((NvmeGetBaseMemPages (BASEMEM_ASQ))                                    * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
