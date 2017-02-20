@@ -27,6 +27,7 @@ EFI_HANDLE                mCpuHandle = NULL;
 BOOLEAN                   mIsFlushingGCD;
 UINT64                    mValidMtrrAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
 UINT64                    mValidMtrrBitsMask    = MTRR_LIB_MSR_VALID_MASK;
+UINT64                    mTimerPeriod = 0;
 
 FIXED_MTRR    mFixedMtrrTable[] = {
   {
@@ -297,6 +298,9 @@ CpuGetTimerValue (
   OUT UINT64                    *TimerPeriod OPTIONAL
   )
 {
+  UINT64          BeginValue;
+  UINT64          EndValue;
+
   if (TimerValue == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -308,10 +312,26 @@ CpuGetTimerValue (
   *TimerValue = AsmReadTsc ();
 
   if (TimerPeriod != NULL) {
+    if (mTimerPeriod == 0) {
       //
-      // BugBug: Hard coded. Don't know how to do this generically
+      // Read time stamp counter before and after delay of 100 microseconds
       //
-      *TimerPeriod = 1000000000;
+      BeginValue = AsmReadTsc ();
+      MicroSecondDelay (100);
+      EndValue   = AsmReadTsc ();
+      //
+      // Calculate the actual frequency
+      //
+      mTimerPeriod = DivU64x64Remainder (
+                       MultU64x32 (
+                         1000 * 1000 * 1000,
+                         100
+                         ),
+                       EndValue - BeginValue,
+                       NULL
+                       );
+    }
+    *TimerPeriod = mTimerPeriod;
   }
 
   return EFI_SUCCESS;

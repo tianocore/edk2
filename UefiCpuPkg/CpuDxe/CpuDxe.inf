@@ -43,6 +43,7 @@
   HobLib
   ReportStatusCodeLib
   MpInitLib
+  TimerLib
 
 [Sources]
   CpuDxe.c
