@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -3581,6 +3581,7 @@ GenerateAltConfigResp (
   UINTN                 Width;
   UINT8                 *TmpBuffer;
   CHAR16                *DefaultString;
+  UINTN                 StrSize;
 
   BlockData     = NULL;
   DataExist     = FALSE;
@@ -3698,7 +3699,15 @@ GenerateAltConfigResp (
         //
         if (BlockData->OpCode == EFI_IFR_STRING_OP){
           DefaultString   = InternalGetString(HiiHandle, DefaultValueData->Value.string);
-          TmpBuffer = (UINT8 *) DefaultString;
+          TmpBuffer = AllocateZeroPool (Width);
+          ASSERT (TmpBuffer != NULL);
+          if (DefaultString != NULL) {
+            StrSize = StrLen(DefaultString)* sizeof (CHAR16);
+            if (StrSize > Width) {
+              StrSize = Width;
+            }
+            CopyMem (TmpBuffer, (UINT8 *) DefaultString, StrSize);
+          }
         } else {
           TmpBuffer = (UINT8 *) &(DefaultValueData->Value);
         }
@@ -3708,6 +3717,10 @@ GenerateAltConfigResp (
         if (DefaultString != NULL){
           FreePool(DefaultString);
           DefaultString = NULL;
+        }
+        if (BlockData->OpCode == EFI_IFR_STRING_OP && TmpBuffer != NULL) {
+          FreePool(TmpBuffer);
+          TmpBuffer  = NULL;
         }
       }
     }
