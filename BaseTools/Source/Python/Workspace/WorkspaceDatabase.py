@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -1830,6 +1830,8 @@ class InfBuildData(ModuleBuildClassObject):
             if self.AutoGenVersion < 0x00010005:
                 self.__Macros.update(GlobalData.gEdkGlobal)
                 self.__Macros.update(GlobalData.gGlobalDefines)
+            else:
+                self.__Macros.update(self.Defines)
         return self.__Macros
 
     ## Get architecture
