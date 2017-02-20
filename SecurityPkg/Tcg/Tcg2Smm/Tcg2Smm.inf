@@ -79,7 +79,8 @@
 [Depex]
   gEfiAcpiTableProtocolGuid AND
   gEfiSmmSwDispatch2ProtocolGuid AND
-  gEfiSmmVariableProtocolGuid
+  gEfiSmmVariableProtocolGuid AND
+  gEfiTcg2ProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   Tcg2SmmExtra.uni
