@@ -2,7 +2,7 @@
   This file provides a definition of the EFI IPv6 Configuration
   Protocol.
 
-Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -66,7 +66,9 @@ typedef enum {
   /// The station addresses set manually for the EFI 
   /// IPv6 network stack. It is only configurable when the policy is 
   /// Ip6ConfigPolicyManual. The corresponding Data is a 
-  /// pointer to an array of EFI_IPv6_ADDRESS instances.
+  /// pointer to an array of EFI_IPv6_ADDRESS instances. When 
+  /// DataSize is 0 and Data is NULL, the existing configuration 
+  /// is cleared from the EFI IPv6 Configuration Protocol instance.
   /// 
   Ip6ConfigDataTypeManualAddress,
   /// 
@@ -76,6 +78,8 @@ typedef enum {
   /// the policy is Ip6ConfigPolicyAutomatic. The gateway 
   /// addresses must be unicast IPv6 addresses. The corresponding 
   /// Data is a pointer to an array of EFI_IPv6_ADDRESS instances.
+  /// When DataSize is 0 and Data is NULL, the existing configuration 
+  /// is cleared from the EFI IPv6 Configuration Protocol instance.
   /// 
   Ip6ConfigDataTypeGateway,
   /// 
@@ -85,6 +89,8 @@ typedef enum {
   /// policy is Ip6ConfigPolicyAutomatic.The DNS server 
   /// addresses must be unicast IPv6 addresses. The corresponding 
   /// Data is a pointer to an array of EFI_IPv6_ADDRESS instances.
+  /// When DataSize is 0 and Data is NULL, the existing configuration 
+  /// is cleared from the EFI IPv6 Configuration Protocol instance.
   /// 
   Ip6ConfigDataTypeDnsServer,
   ///
@@ -228,9 +234,8 @@ typedef struct {
                                 network stack is set successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following are TRUE:
                                 - This is NULL.
-                                - Data is NULL.
-                                - One or more fields in Data do not match the requirement of the 
-                                  data type indicated by DataType. 
+                                - One or more fields in Data and DataSize do not match the 
+                                  requirement of the data type indicated by DataType. 
   @retval EFI_WRITE_PROTECTED   The specified configuration data is read-only or the specified 
                                 configuration data can not be set under the current policy
   @retval EFI_ACCESS_DENIED     Another set operation on the specified configuration 
