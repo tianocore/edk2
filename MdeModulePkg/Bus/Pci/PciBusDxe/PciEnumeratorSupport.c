@@ -1341,7 +1341,6 @@ UpdatePciInfo (
 {
   EFI_STATUS                        Status;
   UINTN                             BarIndex;
-  UINTN                             BarEndIndex;
   BOOLEAN                           SetFlag;
   VOID                              *Configuration;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Ptr;
@@ -1395,24 +1394,19 @@ UpdatePciInfo (
       break;
     }
 
-    if ((Ptr->AddrTranslationOffset == MAX_UINT64) || (Ptr->AddrTranslationOffset == MAX_UINT8)) {
-      //
-      // Update all the bars in the device
-      // Compare against MAX_UINT8 is to keep backward compatibility.
-      //
-      BarIndex    = 0;
-      BarEndIndex = PCI_MAX_BAR - 1;
-    } else {
-      BarIndex    = (UINTN) Ptr->AddrTranslationOffset;
-      BarEndIndex = BarIndex;
-    }
+    for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
+      if ((Ptr->AddrTranslationOffset != MAX_UINT64) &&
+          (Ptr->AddrTranslationOffset != MAX_UINT8) &&
+          (Ptr->AddrTranslationOffset != BarIndex)
+          ) {
+        //
+        // Skip updating when AddrTranslationOffset is not MAX_UINT64 or MAX_UINT8 (wide match).
+        // Skip updating when current BarIndex doesn't equal to AddrTranslationOffset.
+        // Comparing against MAX_UINT8 is to keep backward compatibility.
+        //
+        continue;
+      }
 
-    if (BarIndex >= PCI_MAX_BAR) {
-      Ptr++;
-      continue;
-    }
-
-    for (; BarIndex <= BarEndIndex; BarIndex++) {
       SetFlag = FALSE;
       switch (Ptr->ResType) {
       case ACPI_ADDRESS_SPACE_TYPE_MEM:
