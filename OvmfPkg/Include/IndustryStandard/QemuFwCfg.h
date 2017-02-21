@@ -48,6 +48,7 @@
 //
 #define FW_CFG_IO_SELECTOR    0x510
 #define FW_CFG_IO_DATA        0x511
+#define FW_CFG_IO_DMA_ADDRESS 0x514
 
 //
 // Numerically defined keys.

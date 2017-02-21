@@ -240,7 +240,7 @@ SaveSmiFeatures (
                           S3SaveState,                     // This
                           EFI_BOOT_SCRIPT_IO_WRITE_OPCODE, // OpCode
                           EfiBootScriptWidthUint32,        // Width
-                          (UINT64)0x514,                   // Address
+                          (UINT64)FW_CFG_IO_DMA_ADDRESS,   // Address
                           (UINTN)2,                        // Count
                           &AccessAddress                   // Buffer
                           );
