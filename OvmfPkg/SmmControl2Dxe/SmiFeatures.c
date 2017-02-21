@@ -303,7 +303,7 @@ SaveSmiFeatures (
                      S3SaveState,                    // This
                      EFI_BOOT_SCRIPT_IO_POLL_OPCODE, // OpCode
                      EfiBootScriptWidthUint8,        // Width
-                     (UINT64)(UINTN)0x511,           // Address
+                     (UINT64)(UINTN)FW_CFG_IO_DATA,  // Address
                      &FeaturesOkData,                // Data
                      &FeaturesOkMask,                // DataMask
                      MAX_UINT64                      // Delay

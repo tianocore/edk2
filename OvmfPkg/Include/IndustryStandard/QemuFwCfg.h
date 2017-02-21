@@ -47,6 +47,7 @@
 // platforms (Ia32 and X64).
 //
 #define FW_CFG_IO_SELECTOR    0x510
+#define FW_CFG_IO_DATA        0x511
 
 //
 // Numerically defined keys.

@@ -135,7 +135,7 @@ InternalQemuFwCfgReadBytes (
     InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FW_CFG_DMA_CTL_READ);
     return;
   }
-  IoReadFifo8 (0x511, Size, Buffer);
+  IoReadFifo8 (FW_CFG_IO_DATA, Size, Buffer);
 }
 
 
@@ -187,7 +187,7 @@ QemuFwCfgWriteBytes (
       InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FW_CFG_DMA_CTL_WRITE);
       return;
     }
-    IoWriteFifo8 (0x511, Size, Buffer);
+    IoWriteFifo8 (FW_CFG_IO_DATA, Size, Buffer);
   }
 }
 
@@ -230,7 +230,7 @@ QemuFwCfgSkipBytes (
   //
   while (Size > 0) {
     ChunkSize = MIN (Size, sizeof SkipBuffer);
-    IoReadFifo8 (0x511, ChunkSize, SkipBuffer);
+    IoReadFifo8 (FW_CFG_IO_DATA, ChunkSize, SkipBuffer);
     Size -= ChunkSize;
   }
 }
