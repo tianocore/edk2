@@ -1038,6 +1038,36 @@ FreeMemorySpaceMap:
 }
 
 /**
+  Add and allocate CPU local APIC memory mapped space. 
+
+  @param[in]ImageHandle     Image handle this driver.
+
+**/
+VOID
+AddLocalApicMemorySpace (
+  IN EFI_HANDLE               ImageHandle
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PHYSICAL_ADDRESS    BaseAddress;
+
+  BaseAddress = (EFI_PHYSICAL_ADDRESS) GetLocalApicBaseAddress();
+  Status = AddMemoryMappedIoSpace (BaseAddress, SIZE_4KB, EFI_MEMORY_UC);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->AllocateMemorySpace (
+                  EfiGcdAllocateAddress,
+                  EfiGcdMemoryTypeMemoryMappedIo,
+                  0,
+                  SIZE_4KB,
+                  &BaseAddress,
+                  ImageHandle,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
   Initialize the state information for the CPU Architectural Protocol.
 
   @param ImageHandle     Image handle this driver.
@@ -1096,6 +1126,11 @@ InitializeCpu (
   // Refresh GCD memory space map according to MTRR value.
   //
   RefreshGcdMemoryAttributes ();
+
+  //
+  // Add and allocate local APIC memory mapped space
+  //
+  AddLocalApicMemorySpace (ImageHandle);
 
   //
   // Setup a callback for idle events
