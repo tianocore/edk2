@@ -475,26 +475,6 @@ Int2OctStr (
   IN     UINTN             OSSizeInBytes
   );
 
-
-/**
-  Convert a String to Guid Value.
-
-  @param[in]   Str        Specifies the String to be converted.
-  @param[in]   StrLen     Number of Unicode Characters of String (exclusive \0)
-  @param[out]  Guid       Return the result Guid value.
-
-  @retval    EFI_SUCCESS           The operation is finished successfully.
-  @retval    EFI_NOT_FOUND         Invalid string.
-
-**/
-EFI_STATUS
-StringToGuid (
-  IN   CHAR16           *Str,
-  IN   UINTN            StrLen,
-  OUT  EFI_GUID         *Guid
-  );
-
-
 /**
   Worker function that prints an EFI_GUID into specified Buffer.
 

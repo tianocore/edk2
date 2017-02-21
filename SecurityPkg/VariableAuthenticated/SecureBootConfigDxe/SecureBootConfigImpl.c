@@ -3248,6 +3248,7 @@ SecureBootCallback (
 {
   EFI_INPUT_KEY                   Key;
   EFI_STATUS                      Status;
+  RETURN_STATUS                   RStatus;
   SECUREBOOT_CONFIG_PRIVATE_DATA  *Private;
   UINTN                           BufferSize;
   SECUREBOOT_CONFIGURATION        *IfrNvData;
@@ -3630,12 +3631,9 @@ SecureBootCallback (
     case KEY_SECURE_BOOT_SIGNATURE_GUID_DBX:
     case KEY_SECURE_BOOT_SIGNATURE_GUID_DBT:
       ASSERT (Private->SignatureGUID != NULL);
-      Status = StringToGuid (
-                 IfrNvData->SignatureGuid,
-                 StrLen (IfrNvData->SignatureGuid),
-                 Private->SignatureGUID
-                 );
-      if (EFI_ERROR (Status)) {
+      RStatus = StrToGuid (IfrNvData->SignatureGuid, Private->SignatureGUID);
+      if (RETURN_ERROR (RStatus) || (IfrNvData->SignatureGuid[GUID_STRING_LENGTH] != L'\0')) {
+        Status = EFI_INVALID_PARAMETER;
         break;
       }
 
