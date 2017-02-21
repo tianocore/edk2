@@ -25,7 +25,7 @@
   OpenIniFile(), PreProcessDataFile(), ProfileGetSection(), ProfileGetEntry()
   will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -933,7 +933,7 @@ AsciiStrToBuf (
 
 **/
 EFI_STATUS
-AsciiStrToGuid (
+IniAsciiStrToGuid (
   IN  CHAR8    *Str,
   OUT EFI_GUID *Guid
   )
@@ -1261,7 +1261,7 @@ GetGuidFromDataFile (
   if (!IsValidGuid(Value, AsciiStrLen(Value))) {
     return EFI_NOT_FOUND;
   }
-  Status = AsciiStrToGuid(Value, Guid);
+  Status = IniAsciiStrToGuid(Value, Guid);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
