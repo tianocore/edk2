@@ -2,7 +2,7 @@
   This library is only intended to be used by UEFI network stack modules.
   It provides basic functions for the UEFI network stack.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -1391,7 +1391,6 @@ NetLibAsciiStrToIp6 (
 
   @retval EFI_SUCCESS            Converted to an IPv4 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is mal-formatted or Ip4Address is NULL.
-  @retval EFI_OUT_OF_RESOURCES   Failed to perform the operation due to lack of resources.
 
 **/
 EFI_STATUS
@@ -1410,7 +1409,6 @@ NetLibStrToIp4 (
 
   @retval EFI_SUCCESS            Converted to an IPv6 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is malformatted or Ip6Address is NULL.
-  @retval EFI_OUT_OF_RESOURCES   Failed to perform the operation due to a lack of resources.
 
 **/
 EFI_STATUS
@@ -1431,7 +1429,6 @@ NetLibStrToIp6 (
 
   @retval EFI_SUCCESS            Converted to an  IPv6 address successfully.
   @retval EFI_INVALID_PARAMETER  The string is malformatted, or Ip6Address is NULL.
-  @retval EFI_OUT_OF_RESOURCES   Failed to perform the operation due to a lack of resources.
 
 **/
 EFI_STATUS
