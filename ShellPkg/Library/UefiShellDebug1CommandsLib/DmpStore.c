@@ -2,7 +2,7 @@
   Main file for DmpStore shell Debug1 function.
    
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -676,6 +676,7 @@ ShellCommandRunDmpStore (
   )
 {
   EFI_STATUS        Status;
+  RETURN_STATUS     RStatus;
   LIST_ENTRY        *Package;
   CHAR16            *ProblemParam;
   SHELL_STATUS      ShellStatus;
@@ -728,8 +729,8 @@ ShellCommandRunDmpStore (
       if (!ShellCommandLineGetFlag(Package, L"-all")) {
         GuidStr = ShellCommandLineGetValue(Package, L"-guid");
         if (GuidStr != NULL) {
-          Status = ConvertStringToGuid(GuidStr, &GuidData);
-          if (EFI_ERROR(Status)) {
+          RStatus = StrToGuid (GuidStr, &GuidData);
+          if (RETURN_ERROR (RStatus) || (GuidStr[GUID_STRING_LENGTH] != L'\0')) {
             ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmpstore", GuidStr);  
             ShellStatus = SHELL_INVALID_PARAMETER;
           }

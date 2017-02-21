@@ -2,7 +2,7 @@
   Main file for SetVar shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -65,6 +65,7 @@ ShellCommandRunSetVar (
   )
 {
   EFI_STATUS          Status;
+  RETURN_STATUS       RStatus;
   LIST_ENTRY          *Package;
   CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
@@ -120,8 +121,8 @@ ShellCommandRunSetVar (
         CopyGuid(&Guid, &gEfiGlobalVariableGuid);
       } else {
         StringGuid = ShellCommandLineGetValue(Package, L"-guid");
-        Status = ConvertStringToGuid(StringGuid, &Guid);
-        if (EFI_ERROR(Status)) {
+        RStatus = StrToGuid (StringGuid, &Guid);
+        if (RETURN_ERROR (RStatus) || (StringGuid[GUID_STRING_LENGTH] != L'\0')) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);  
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
@@ -207,10 +208,7 @@ ShellCommandRunSetVar (
             if (Buffer == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
             } else {
-              for (LoopVar = 0 ; LoopVar < (StrLen(Data) / 2) ; LoopVar++) {
-                ((UINT8*)Buffer)[LoopVar] = (UINT8)(HexCharToUintn(Data[LoopVar*2]) * 16);
-                ((UINT8*)Buffer)[LoopVar] = (UINT8)(((UINT8*)Buffer)[LoopVar] + HexCharToUintn(Data[LoopVar*2+1]));
-              }
+              StrHexToBytes (Data, StrLen (Data), Buffer, StrLen (Data) / 2);
               Status = gRT->SetVariable((CHAR16*)VariableName, &Guid, Attributes, StrLen(Data) / 2, Buffer);
             }
             if (EFI_ERROR(Status)) {

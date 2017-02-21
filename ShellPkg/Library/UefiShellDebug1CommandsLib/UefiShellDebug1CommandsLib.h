@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for Profile1 shell command functions.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -74,36 +74,6 @@ EFI_STATUS
 GetSystemConfigurationTable (
   IN EFI_GUID *TableGuid,
   IN OUT VOID **Table
-  );
-
-/**
-  Convert a string representation of a GUID to the GUID value.
-
-  @param[in]  StringGuid   The pointer to the string containing a GUID printed.
-  @param[in, out] Guid     The pointer to the buffer to get the GUID value.
-**/
-EFI_STATUS
-ConvertStringToGuid (
-  IN CONST CHAR16 *StringGuid,
-  IN OUT EFI_GUID *Guid
-  );
-
-/**
-  Convert a Unicode character to numerical value.
-
-  This internal function only deal with Unicode character
-  which maps to a valid hexadecimal ASII character, i.e.
-  L'0' to L'9', L'a' to L'f' or L'A' to L'F'. For other
-  Unicode character, the value returned does not make sense.
-
-  @param  Char  The character to convert.
-
-  @return The numerical value converted.
-
-**/
-UINTN
-HexCharToUintn (
-  IN      CHAR16                    Char
   );
 
 /**
