@@ -1,7 +1,7 @@
 /** @file
   A shell application that triggers capsule update process.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -140,24 +140,6 @@ WriteFileFromBuffer (
   IN  CHAR16                               *FileName,
   IN  UINTN                                BufferSize,
   IN  VOID                                 *Buffer
-  );
-
-/**
-  Converts a string to GUID value.
-  Guid Format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
-  @param[in]  Str              The registry format GUID string that contains the GUID value.
-  @param[out] Guid             A pointer to the converted GUID value.
-
-  @retval EFI_SUCCESS     The GUID string was successfully converted to the GUID value.
-  @retval EFI_UNSUPPORTED The input string is not in registry format.
-  @return others          Some error occurred when converting part of GUID value.
-
-**/
-EFI_STATUS
-InternalStrToGuid (
-  IN  CHAR16   *Str,
-  OUT EFI_GUID *Guid
   );
 
 /**
@@ -731,6 +713,7 @@ UefiMain (
   )
 {
   EFI_STATUS                    Status;
+  RETURN_STATUS                 RStatus;
   UINTN                         FileSize[MAX_CAPSULE_NUM];
   VOID                          *CapsuleBuffer[MAX_CAPSULE_NUM];
   EFI_CAPSULE_BLOCK_DESCRIPTOR  *BlockDescriptors;
@@ -782,10 +765,10 @@ UefiMain (
         //
         // FMP->GetImage()
         //
-        Status = InternalStrToGuid(Argv[3], &ImageTypeId);
-        if (EFI_ERROR(Status)) {
+        RStatus = StrToGuid (Argv[3], &ImageTypeId);
+        if (RETURN_ERROR (RStatus) || (Argv[3][GUID_STRING_LENGTH] != L'\0')) {
           Print (L"Invalid ImageTypeId - %s\n", Argv[3]);
-          return Status;
+          return EFI_INVALID_PARAMETER;
         }
         ImageIndex = StrDecimalToUintn(Argv[4]);
         if (StrCmp(Argv[5], L"-O") == 0) {
