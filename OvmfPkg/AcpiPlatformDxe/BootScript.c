@@ -29,6 +29,7 @@ typedef struct {
   UINT8  PointerSize;   // copied as-is from QEMU_LOADER_WRITE_POINTER
   UINT32 PointerOffset; // copied as-is from QEMU_LOADER_WRITE_POINTER
   UINT64 PointerValue;  // resolved from QEMU_LOADER_WRITE_POINTER.PointeeFile
+                        //   and QEMU_LOADER_WRITE_POINTER.PointeeOffset
 } CONDENSED_WRITE_POINTER;
 
 
@@ -159,7 +160,8 @@ ReleaseS3Context (
 
   @param[in] PointerValue   The base address of the allocated / downloaded
                             fw_cfg blob that is identified by
-                            QEMU_LOADER_WRITE_POINTER.PointeeFile.
+                            QEMU_LOADER_WRITE_POINTER.PointeeFile, plus
+                            QEMU_LOADER_WRITE_POINTER.PointeeOffset.
 
   @retval EFI_SUCCESS           The information derived from
                                 QEMU_LOADER_WRITE_POINTER has been successfully
@@ -271,9 +273,9 @@ TransferS3ContextToBootScript (
   // (2) call QEMU with the FW_CFG_DMA_ACCESS object,
   // (3) wait for the select+skip to finish,
   // (4) restore a SCRATCH_BUFFER object in reserved memory that writes
-  //     PointerValue (base address of the allocated / downloaded PointeeFile),
-  //     of size PointerSize, into the fw_cfg file selected in (1), at the
-  //     offset sought to in (1),
+  //     PointerValue (base address of the allocated / downloaded PointeeFile,
+  //     plus PointeeOffset), of size PointerSize, into the fw_cfg file
+  //     selected in (1), at the offset sought to in (1),
   // (5) call QEMU with the FW_CFG_DMA_ACCESS object,
   // (6) wait for the write to finish.
   //
@@ -346,8 +348,8 @@ TransferS3ContextToBootScript (
     //
     // (4) restore a SCRATCH_BUFFER object in reserved memory that writes
     //     PointerValue (base address of the allocated / downloaded
-    //     PointeeFile), of size PointerSize, into the fw_cfg file selected in
-    //     (1), at the offset sought to in (1),
+    //     PointeeFile, plus PointeeOffset), of size PointerSize, into the
+    //     fw_cfg file selected in (1), at the offset sought to in (1),
     //
     Access->Control = SwapBytes32 (FW_CFG_DMA_CTL_WRITE);
     Access->Length = SwapBytes32 (Condensed->PointerSize);
