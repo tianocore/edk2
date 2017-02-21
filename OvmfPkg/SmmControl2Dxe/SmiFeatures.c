@@ -281,7 +281,7 @@ SaveSmiFeatures (
                           S3SaveState,                     // This
                           EFI_BOOT_SCRIPT_IO_WRITE_OPCODE, // OpCode
                           EfiBootScriptWidthUint16,        // Width
-                          (UINT64)0x510,                   // Address
+                          (UINT64)FW_CFG_IO_SELECTOR,      // Address
                           (UINTN)1,                        // Count
                           &FeaturesOkItemAsUint16          // Buffer
                           );
