@@ -3050,3 +3050,594 @@ AsciiStrnToUnicodeStrS (
 
   return RETURN_SUCCESS;
 }
+
+/**
+  Convert a Null-terminated ASCII string to IPv6 address and prefix length.
+
+  This function outputs a value of type IPv6_ADDRESS and may output a value
+  of type UINT8 by interpreting the contents of the ASCII string specified
+  by String. The format of the input ASCII string String is as follows:
+
+                  X:X:X:X:X:X:X:X[/P]
+
+  X contains one to four hexadecimal digit characters in the range [0-9], [a-f] and
+  [A-F]. X is converted to a value of type UINT16, whose low byte is stored in low
+  memory address and high byte is stored in high memory address. P contains decimal
+  digit characters in the range [0-9]. The running zero in the beginning of P will
+  be ignored. /P is optional.
+
+  When /P is not in the String, the function stops at the first character that is
+  not a valid hexadecimal digit character after eight X's are converted.
+
+  When /P is in the String, the function stops at the first character that is not
+  a valid decimal digit character after P is converted.
+
+  "::" can be used to compress one or more groups of X when X contains only 0.
+  The "::" can only appear once in the String.
+
+  If String is NULL, then ASSERT().
+
+  If Address is NULL, then ASSERT().
+
+  If EndPointer is not NULL and Address is translated from String, a pointer
+  to the character that stopped the scan is stored at the location pointed to
+  by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated ASCII string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Address                  Pointer to the converted IPv6 address.
+  @param  PrefixLength             Pointer to the converted IPv6 address prefix
+                                   length. MAX_UINT8 is returned when /P is
+                                   not in the String.
+
+  @retval RETURN_SUCCESS           Address is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+  @retval RETURN_UNSUPPORTED       If X contains more than four hexadecimal
+                                    digit characters.
+                                   If String contains "::" and number of X
+                                    is not less than 8.
+                                   If P starts with character that is not a
+                                    valid decimal digit character.
+                                   If the decimal number converted from P
+                                    exceeds 128.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrToIpv6Address (
+  IN  CONST CHAR8        *String,
+  OUT CHAR8              **EndPointer, OPTIONAL
+  OUT IPv6_ADDRESS       *Address,
+  OUT UINT8              *PrefixLength OPTIONAL
+  )
+{
+  RETURN_STATUS          Status;
+  UINTN                  AddressIndex;
+  UINTN                  Uintn;
+  IPv6_ADDRESS           LocalAddress;
+  UINT8                  LocalPrefixLength;
+  CONST CHAR8            *Pointer;
+  CHAR8                  *End;
+  UINTN                  CompressStart;
+  BOOLEAN                ExpectPrefix;
+
+  LocalPrefixLength = MAX_UINT8;
+  CompressStart     = ARRAY_SIZE (Address->Addr);
+  ExpectPrefix      = FALSE;
+
+  //
+  // None of String or Address shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Address != NULL), RETURN_INVALID_PARAMETER);
+
+  for (Pointer = String, AddressIndex = 0; AddressIndex < ARRAY_SIZE (Address->Addr) + 1;) {
+    if (!InternalAsciiIsHexaDecimalDigitCharacter (*Pointer)) {
+      if (*Pointer != ':') {
+        //
+        // ":" or "/" should be followed by digit characters.
+        //
+        return RETURN_UNSUPPORTED;
+      }
+
+      //
+      // Meet second ":" after previous ":" or "/"
+      // or meet first ":" in the beginning of String.
+      //
+      if (ExpectPrefix) {
+        //
+        // ":" shall not be after "/"
+        //
+        return RETURN_UNSUPPORTED;
+      }
+
+      if (CompressStart != ARRAY_SIZE (Address->Addr) || AddressIndex == ARRAY_SIZE (Address->Addr)) {
+        //
+        // "::" can only appear once.
+        // "::" can only appear when address is not full length.
+        //
+        return RETURN_UNSUPPORTED;
+      } else {
+        //
+        // Remember the start of zero compressing.
+        //
+        CompressStart = AddressIndex;
+        Pointer++;
+
+        if (CompressStart == 0) {
+          if (*Pointer != ':') {
+            //
+            // Single ":" shall not be in the beginning of String.
+            //
+            return RETURN_UNSUPPORTED;
+          }
+          Pointer++;
+        }
+      }
+    }
+
+    if (!InternalAsciiIsHexaDecimalDigitCharacter (*Pointer)) {
+      if (*Pointer == '/') {
+        //
+        // Might be optional "/P" after "::".
+        //
+        if (CompressStart != AddressIndex) {
+          return RETURN_UNSUPPORTED;
+        }
+      } else {
+        break;
+      }
+    } else {
+      if (!ExpectPrefix) {
+        //
+        // Get X.
+        //
+        Status = AsciiStrHexToUintnS (Pointer, &End, &Uintn);
+        if (RETURN_ERROR (Status) || End - Pointer > 4) {
+          //
+          // Number of hexadecimal digit characters is no more than 4.
+          //
+          return RETURN_UNSUPPORTED;
+        }
+        Pointer = End;
+        //
+        // Uintn won't exceed MAX_UINT16 if number of hexadecimal digit characters is no more than 4.
+        //
+        LocalAddress.Addr[AddressIndex] = (UINT8) ((UINT16) Uintn >> 8);
+        LocalAddress.Addr[AddressIndex + 1] = (UINT8) Uintn;
+        AddressIndex += 2;
+      } else {
+        //
+        // Get P, then exit the loop.
+        //
+        Status = AsciiStrDecimalToUintnS (Pointer, &End, &Uintn);
+        if (RETURN_ERROR (Status) || End == Pointer || Uintn > 128) {
+          //
+          // Prefix length should not exceed 128.
+          //
+          return RETURN_UNSUPPORTED;
+        }
+        LocalPrefixLength = (UINT8) Uintn;
+        Pointer = End;
+        break;
+      }
+    }
+
+    //
+    // Skip ':' or "/"
+    //
+    if (*Pointer == '/') {
+      ExpectPrefix = TRUE;
+    } else if (*Pointer == ':') {
+      if (AddressIndex == ARRAY_SIZE (Address->Addr)) {
+        //
+        // Meet additional ":" after all 8 16-bit address
+        //
+        break;
+      }
+    } else {
+      //
+      // Meet other character that is not "/" or ":" after all 8 16-bit address
+      //
+      break;
+    }
+    Pointer++;
+  }
+
+  if ((AddressIndex == ARRAY_SIZE (Address->Addr) && CompressStart != ARRAY_SIZE (Address->Addr)) ||
+    (AddressIndex != ARRAY_SIZE (Address->Addr) && CompressStart == ARRAY_SIZE (Address->Addr))
+      ) {
+    //
+    // Full length of address shall not have compressing zeros.
+    // Non-full length of address shall have compressing zeros.
+    //
+    return RETURN_UNSUPPORTED;
+  }
+  CopyMem (&Address->Addr[0], &LocalAddress.Addr[0], CompressStart);
+  ZeroMem (&Address->Addr[CompressStart], ARRAY_SIZE (Address->Addr) - AddressIndex);
+  CopyMem (
+    &Address->Addr[CompressStart + ARRAY_SIZE (Address->Addr) - AddressIndex],
+    &LocalAddress.Addr[CompressStart],
+    AddressIndex - CompressStart
+    );
+
+  if (PrefixLength != NULL) {
+    *PrefixLength = LocalPrefixLength;
+  }
+  if (EndPointer != NULL) {
+    *EndPointer = (CHAR8 *) Pointer;
+  }
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated ASCII string to IPv4 address and prefix length.
+
+  This function outputs a value of type IPv4_ADDRESS and may output a value
+  of type UINT8 by interpreting the contents of the ASCII string specified
+  by String. The format of the input ASCII string String is as follows:
+
+                  D.D.D.D[/P]
+
+  D and P are decimal digit characters in the range [0-9]. The running zero in
+  the beginning of D and P will be ignored. /P is optional.
+
+  When /P is not in the String, the function stops at the first character that is
+  not a valid decimal digit character after four D's are converted.
+
+  When /P is in the String, the function stops at the first character that is not
+  a valid decimal digit character after P is converted.
+
+  If String is NULL, then ASSERT().
+
+  If Address is NULL, then ASSERT().
+
+  If EndPointer is not NULL and Address is translated from String, a pointer
+  to the character that stopped the scan is stored at the location pointed to
+  by EndPointer.
+
+  @param  String                   Pointer to a Null-terminated ASCII string.
+  @param  EndPointer               Pointer to character that stops scan.
+  @param  Address                  Pointer to the converted IPv4 address.
+  @param  PrefixLength             Pointer to the converted IPv4 address prefix
+                                   length. MAX_UINT8 is returned when /P is
+                                   not in the String.
+
+  @retval RETURN_SUCCESS           Address is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+  @retval RETURN_UNSUPPORTED       If String is not in the correct format.
+                                   If any decimal number converted from D
+                                    exceeds 255.
+                                   If the decimal number converted from P
+                                    exceeds 32.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrToIpv4Address (
+  IN  CONST CHAR8        *String,
+  OUT CHAR8              **EndPointer, OPTIONAL
+  OUT IPv4_ADDRESS       *Address,
+  OUT UINT8              *PrefixLength OPTIONAL
+  )
+{
+  RETURN_STATUS          Status;
+  UINTN                  AddressIndex;
+  UINTN                  Uintn;
+  IPv4_ADDRESS           LocalAddress;
+  UINT8                  LocalPrefixLength;
+  CHAR8                  *Pointer;
+
+  LocalPrefixLength = MAX_UINT8;
+
+  //
+  // None of String or Address shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Address != NULL), RETURN_INVALID_PARAMETER);
+
+  for (Pointer = (CHAR8 *) String, AddressIndex = 0; AddressIndex < ARRAY_SIZE (Address->Addr) + 1;) {
+    if (!InternalAsciiIsDecimalDigitCharacter (*Pointer)) {
+      //
+      // D or P contains invalid characters.
+      //
+      break;
+    }
+
+    //
+    // Get D or P.
+    //
+    Status = AsciiStrDecimalToUintnS ((CONST CHAR8 *) Pointer, &Pointer, &Uintn);
+    if (RETURN_ERROR (Status)) {
+      return RETURN_UNSUPPORTED;
+    }
+    if (AddressIndex == ARRAY_SIZE (Address->Addr)) {
+      //
+      // It's P.
+      //
+      if (Uintn > 32) {
+        return RETURN_UNSUPPORTED;
+      }
+      LocalPrefixLength = (UINT8) Uintn;
+    } else {
+      //
+      // It's D.
+      //
+      if (Uintn > MAX_UINT8) {
+        return RETURN_UNSUPPORTED;
+      }
+      LocalAddress.Addr[AddressIndex] = (UINT8) Uintn;
+      AddressIndex++;
+    }
+
+    //
+    // Check the '.' or '/', depending on the AddressIndex.
+    //
+    if (AddressIndex == ARRAY_SIZE (Address->Addr)) {
+      if (*Pointer == '/') {
+        //
+        // '/P' is in the String.
+        // Skip "/" and get P in next loop.
+        //
+        Pointer++;
+      } else {
+        //
+        // '/P' is not in the String.
+        //
+        break;
+      }
+    } else if (AddressIndex < ARRAY_SIZE (Address->Addr)) {
+      if (*Pointer == '.') {
+        //
+        // D should be followed by '.'
+        //
+        Pointer++;
+      } else {
+        return RETURN_UNSUPPORTED;
+      }
+    }
+  }
+
+  if (AddressIndex < ARRAY_SIZE (Address->Addr)) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  CopyMem (Address, &LocalAddress, sizeof (*Address));
+  if (PrefixLength != NULL) {
+    *PrefixLength = LocalPrefixLength;
+  }
+  if (EndPointer != NULL) {
+    *EndPointer = Pointer;
+  }
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated ASCII GUID string to a value of type
+  EFI_GUID.
+
+  This function outputs a GUID value by interpreting the contents of
+  the ASCII string specified by String. The format of the input
+  ASCII string String consists of 36 characters, as follows:
+
+                  aabbccdd-eeff-gghh-iijj-kkllmmnnoopp
+
+  The pairs aa - pp are two characters in the range [0-9], [a-f] and
+  [A-F], with each pair representing a single byte hexadecimal value.
+
+  The mapping between String and the EFI_GUID structure is as follows:
+                  aa          Data1[24:31]
+                  bb          Data1[16:23]
+                  cc          Data1[8:15]
+                  dd          Data1[0:7]
+                  ee          Data2[8:15]
+                  ff          Data2[0:7]
+                  gg          Data3[8:15]
+                  hh          Data3[0:7]
+                  ii          Data4[0:7]
+                  jj          Data4[8:15]
+                  kk          Data4[16:23]
+                  ll          Data4[24:31]
+                  mm          Data4[32:39]
+                  nn          Data4[40:47]
+                  oo          Data4[48:55]
+                  pp          Data4[56:63]
+
+  If String is NULL, then ASSERT().
+  If Guid is NULL, then ASSERT().
+
+  @param  String                   Pointer to a Null-terminated ASCII string.
+  @param  Guid                     Pointer to the converted GUID.
+
+  @retval RETURN_SUCCESS           Guid is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+  @retval RETURN_UNSUPPORTED       If String is not as the above format.
+
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrToGuid (
+  IN  CONST CHAR8        *String,
+  OUT GUID               *Guid
+  )
+{
+  RETURN_STATUS          Status;
+  GUID                   LocalGuid;
+
+  //
+  // None of String or Guid shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Guid != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // Get aabbccdd in big-endian.
+  //
+  Status = AsciiStrHexToBytes (String, 2 * sizeof (LocalGuid.Data1), (UINT8 *) &LocalGuid.Data1, sizeof (LocalGuid.Data1));
+  if (RETURN_ERROR (Status) || String[2 * sizeof (LocalGuid.Data1)] != '-') {
+    return RETURN_UNSUPPORTED;
+  }
+  //
+  // Convert big-endian to little-endian.
+  //
+  LocalGuid.Data1 = SwapBytes32 (LocalGuid.Data1);
+  String += 2 * sizeof (LocalGuid.Data1) + 1;
+
+  //
+  // Get eeff in big-endian.
+  //
+  Status = AsciiStrHexToBytes (String, 2 * sizeof (LocalGuid.Data2), (UINT8 *) &LocalGuid.Data2, sizeof (LocalGuid.Data2));
+  if (RETURN_ERROR (Status) || String[2 * sizeof (LocalGuid.Data2)] != '-') {
+    return RETURN_UNSUPPORTED;
+  }
+  //
+  // Convert big-endian to little-endian.
+  //
+  LocalGuid.Data2 = SwapBytes16 (LocalGuid.Data2);
+  String += 2 * sizeof (LocalGuid.Data2) + 1;
+
+  //
+  // Get gghh in big-endian.
+  //
+  Status = AsciiStrHexToBytes (String, 2 * sizeof (LocalGuid.Data3), (UINT8 *) &LocalGuid.Data3, sizeof (LocalGuid.Data3));
+  if (RETURN_ERROR (Status) || String[2 * sizeof (LocalGuid.Data3)] != '-') {
+    return RETURN_UNSUPPORTED;
+  }
+  //
+  // Convert big-endian to little-endian.
+  //
+  LocalGuid.Data3 = SwapBytes16 (LocalGuid.Data3);
+  String += 2 * sizeof (LocalGuid.Data3) + 1;
+
+  //
+  // Get iijj.
+  //
+  Status = AsciiStrHexToBytes (String, 2 * 2, &LocalGuid.Data4[0], 2);
+  if (RETURN_ERROR (Status) || String[2 * 2] != '-') {
+    return RETURN_UNSUPPORTED;
+  }
+  String += 2 * 2 + 1;
+
+  //
+  // Get kkllmmnnoopp.
+  //
+  Status = AsciiStrHexToBytes (String, 2 * 6, &LocalGuid.Data4[2], 6);
+  if (RETURN_ERROR (Status)) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  CopyGuid (Guid, &LocalGuid);
+  return RETURN_SUCCESS;
+}
+
+/**
+  Convert a Null-terminated ASCII hexadecimal string to a byte array.
+
+  This function outputs a byte array by interpreting the contents of
+  the ASCII string specified by String in hexadecimal format. The format of
+  the input ASCII string String is:
+
+                  [XX]*
+
+  X is a hexadecimal digit character in the range [0-9], [a-f] and [A-F].
+  The function decodes every two hexadecimal digit characters as one byte. The
+  decoding stops after Length of characters and outputs Buffer containing
+  (Length / 2) bytes.
+
+  If String is NULL, then ASSERT().
+
+  If Buffer is NULL, then ASSERT().
+
+  If Length is not multiple of 2, then ASSERT().
+
+  If PcdMaximumAsciiStringLength is not zero and Length is greater than
+  PcdMaximumAsciiStringLength, then ASSERT().
+
+  If MaxBufferSize is less than (Length / 2), then ASSERT().
+
+  @param  String                   Pointer to a Null-terminated ASCII string.
+  @param  Length                   The number of ASCII characters to decode.
+  @param  Buffer                   Pointer to the converted bytes array.
+  @param  MaxBufferSize            The maximum size of Buffer.
+
+  @retval RETURN_SUCCESS           Buffer is translated from String.
+  @retval RETURN_INVALID_PARAMETER If String is NULL.
+                                   If Data is NULL.
+                                   If Length is not multiple of 2.
+                                   If PcdMaximumAsciiStringLength is not zero,
+                                    and Length is greater than
+                                    PcdMaximumAsciiStringLength.
+  @retval RETURN_UNSUPPORTED       If Length of characters from String contain
+                                    a character that is not valid hexadecimal
+                                    digit characters, or a Null-terminator.
+  @retval RETURN_BUFFER_TOO_SMALL  If MaxBufferSize is less than (Length / 2).
+**/
+RETURN_STATUS
+EFIAPI
+AsciiStrHexToBytes (
+  IN  CONST CHAR8        *String,
+  IN  UINTN              Length,
+  OUT UINT8              *Buffer,
+  IN  UINTN              MaxBufferSize
+  )
+{
+  UINTN                  Index;
+
+  //
+  // 1. None of String or Buffer shall be a null pointer.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
+  SAFE_STRING_CONSTRAINT_CHECK ((Buffer != NULL), RETURN_INVALID_PARAMETER);
+
+  //
+  // 2. Length shall not be greater than ASCII_RSIZE_MAX.
+  //
+  if (ASCII_RSIZE_MAX != 0) {
+    SAFE_STRING_CONSTRAINT_CHECK ((Length <= ASCII_RSIZE_MAX), RETURN_INVALID_PARAMETER);
+  }
+
+  //
+  // 3. Length shall not be odd.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK (((Length & BIT0) == 0), RETURN_INVALID_PARAMETER);
+
+  //
+  // 4. MaxBufferSize shall equal to or greater than Length / 2.
+  //
+  SAFE_STRING_CONSTRAINT_CHECK ((MaxBufferSize >= Length / 2), RETURN_BUFFER_TOO_SMALL);
+
+  //
+  // 5. String shall not contains invalid hexadecimal digits.
+  //
+  for (Index = 0; Index < Length; Index++) {
+    if (!InternalAsciiIsHexaDecimalDigitCharacter (String[Index])) {
+      break;
+    }
+  }
+  if (Index != Length) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  //
+  // Convert the hex string to bytes.
+  //
+  for(Index = 0; Index < Length; Index++) {
+
+    //
+    // For even characters, write the upper nibble for each buffer byte,
+    // and for even characters, the lower nibble.
+    //
+    if ((Index & BIT0) == 0) {
+      Buffer[Index / 2]  = (UINT8) InternalAsciiHexCharToUintn (String[Index]) << 4;
+    } else {
+      Buffer[Index / 2] |= (UINT8) InternalAsciiHexCharToUintn (String[Index]);
+    }
+  }
+  return RETURN_SUCCESS;
+}
+
