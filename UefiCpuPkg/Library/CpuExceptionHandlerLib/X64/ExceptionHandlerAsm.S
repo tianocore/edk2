@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------ ;
-# Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -36,7 +36,8 @@ ASM_GLOBAL ASM_PFX(CommonExceptionHandler)
 .macro IDT_MACRO arg
   push    \arg
 #endif
-  jmp    ASM_PFX(CommonInterruptEntry)
+  .byte   0xe9      # jmp     ASM_PFX(CommonInterruptEntry)
+  .long   ASM_PFX(CommonInterruptEntry) - . - 4
 .endm
 
 AsmIdtVectorBegin:
