@@ -277,8 +277,8 @@ ProcessCmdAddPointer (
   ASSERT ((UINTN)Blob2->Base <= MAX_ADDRESS - Blob2->Size);
 
   PointerValue += (UINT64)(UINTN)Blob2->Base;
-  if (RShiftU64 (
-        RShiftU64 (PointerValue, AddPointer->PointerSize * 8 - 1), 1) != 0) {
+  if (AddPointer->PointerSize < 8 &&
+      RShiftU64 (PointerValue, AddPointer->PointerSize * 8) != 0) {
     DEBUG ((EFI_D_ERROR, "%a: relocated pointer value unrepresentable in "
       "\"%a\"\n", __FUNCTION__, AddPointer->PointerFile));
     return EFI_PROTOCOL_ERROR;
@@ -438,8 +438,8 @@ ProcessCmdWritePointer (
   ASSERT ((UINTN)PointeeBlob->Base <= MAX_ADDRESS - PointeeBlob->Size);
 
   PointerValue += (UINT64)(UINTN)PointeeBlob->Base;
-  if (RShiftU64 (
-        RShiftU64 (PointerValue, WritePointer->PointerSize * 8 - 1), 1) != 0) {
+  if (WritePointer->PointerSize < 8 &&
+      RShiftU64 (PointerValue, WritePointer->PointerSize * 8) != 0) {
     DEBUG ((DEBUG_ERROR, "%a: pointer value unrepresentable in \"%a\"\n",
       __FUNCTION__, WritePointer->PointerFile));
     return EFI_PROTOCOL_ERROR;
