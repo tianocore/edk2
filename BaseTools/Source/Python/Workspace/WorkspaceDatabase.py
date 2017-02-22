@@ -1830,8 +1830,6 @@ class InfBuildData(ModuleBuildClassObject):
             if self.AutoGenVersion < 0x00010005:
                 self.__Macros.update(GlobalData.gEdkGlobal)
                 self.__Macros.update(GlobalData.gGlobalDefines)
-            else:
-                self.__Macros.update(self.Defines)
         return self.__Macros
 
     ## Get architecture
@@ -1896,6 +1894,7 @@ class InfBuildData(ModuleBuildClassObject):
                 if self._Defs == None:
                     self._Defs = sdict()
                 self._Defs[Name] = Value
+                self._Macros[Name] = Value
             # some special items in [Defines] section need special treatment
             elif Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION', 'EDK_RELEASE_VERSION', 'PI_SPECIFICATION_VERSION'):
                 if Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION'):
@@ -1956,6 +1955,7 @@ class InfBuildData(ModuleBuildClassObject):
                 if self._Defs == None:
                     self._Defs = sdict()
                 self._Defs[Name] = Value
+                self._Macros[Name] = Value
 
         #
         # Retrieve information in sections specific to Edk.x modules
