@@ -35,6 +35,10 @@
   #
   QemuFwCfgLib|Include/Library/QemuFwCfgLib.h
 
+  ##  @libraryclass  S3 support for QEMU fw_cfg
+  #
+  QemuFwCfgS3Lib|Include/Library/QemuFwCfgS3Lib.h
+
   ##  @libraryclass  Rewrite the BootOrder NvVar based on QEMU's "bootorder"
   #                  fw_cfg file.
   #
