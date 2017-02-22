@@ -734,6 +734,7 @@ ArmConfigureMmu (
               MAIR_ATTR(TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK));       // mapped to EFI_MEMORY_WB
 
   ArmDisableAlignmentCheck ();
+  ArmEnableStackAlignmentCheck ();
   ArmEnableInstructionCache ();
   ArmEnableDataCache ();
 
