@@ -22,13 +22,13 @@
 //  );
 ASM_FUNC(ArmPlatformStackSet)
   // Save parameters
-  mov   x6, x3
-  mov   x5, x2
-  mov   x4, x1
-  mov   x3, x0
+  mov   x26, x3
+  mov   x25, x2
+  mov   x24, x1
+  mov   x23, x0
 
   // Save the Link register
-  mov   x7, x30
+  mov   x27, x30
 
   // Identify Stack
   mov   x0, x1
@@ -36,13 +36,13 @@ ASM_FUNC(ArmPlatformStackSet)
   cmp   x0, #1
 
   // Restore parameters
-  mov   x0, x3
-  mov   x1, x4
-  mov   x2, x5
-  mov   x3, x6
+  mov   x0, x23
+  mov   x1, x24
+  mov   x2, x25
+  mov   x3, x26
 
   // Restore the Link register
-  mov   x30, x7
+  mov   x30, x27
 
   b.ne  0f
 
@@ -57,10 +57,7 @@ ASM_FUNC(ArmPlatformStackSet)
 //  IN UINTN SecondaryStackSize
 //  );
 ASM_FUNC(ArmPlatformStackSetPrimary)
-  // Save the Link register
-  mov   x4, x30
-
-  // Add stack of primary stack to StackBase
+  // Add size of primary stack to StackBase
   add   x0, x0, x2
 
   // Compute SecondaryCoresCount * SecondaryCoreStackSize
@@ -70,7 +67,7 @@ ASM_FUNC(ArmPlatformStackSetPrimary)
   // Set Primary Stack ((StackBase + PrimaryStackSize) + (SecondaryCoresCount * SecondaryCoreStackSize))
   add   sp, x0, x3
 
-  br    x4
+  ret
 
 //VOID
 //ArmPlatformStackSetSecondary (
@@ -81,30 +78,28 @@ ASM_FUNC(ArmPlatformStackSetPrimary)
 //  );
 ASM_FUNC(ArmPlatformStackSetSecondary)
   // Save the Link register
-  mov   x4, x30
+  mov   x24, x30
   mov   sp, x0
 
   // Get Core Position
   mov   x0, x1
   bl    ASM_PFX(ArmPlatformGetCorePosition)
-  mov   x5, x0
+  mov   x25, x0
 
   // Get Primary Core Position
   bl    ASM_PFX(ArmPlatformGetPrimaryCoreMpId)
   bl    ASM_PFX(ArmPlatformGetCorePosition)
 
   // Get Secondary Core Position. We should get consecutive secondary stack number from 1...(CoreCount-1)
-  cmp   x5, x0
-  b.ls  1f
+  cmp   x25, x0
+
   // Decrement the position if after the primary core
-  sub   x5, x5, #1
-1:
-  add   x5, x5, #1
+  cinc  x25, x25, ls
 
   // Compute top of the secondary stack
-  mul   x3, x3, x5
+  mul   x3, x3, x25
 
   // Set stack
   add   sp, sp, x3
 
-  br    x4
+  ret   x24
