@@ -194,6 +194,18 @@ ArmEnableAlignmentCheck (
 
 VOID
 EFIAPI
+ArmDisableStackAlignmentCheck (
+  VOID
+  );
+
+VOID
+EFIAPI
+ArmEnableStackAlignmentCheck (
+  VOID
+  );
+
+VOID
+EFIAPI
 ArmDisableAllExceptions (
   VOID
   );

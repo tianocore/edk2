@@ -20,6 +20,7 @@
 .set CTRL_M_BIT,      (1 << 0)
 .set CTRL_A_BIT,      (1 << 1)
 .set CTRL_C_BIT,      (1 << 2)
+.set CTRL_SA_BIT,     (1 << 3)
 .set CTRL_I_BIT,      (1 << 12)
 .set CTRL_V_BIT,      (1 << 12)
 .set CPACR_VFP_BITS,  (3 << 20)
@@ -249,6 +250,39 @@ ASM_FUNC(ArmDisableAlignmentCheck)
    b       4f
 3: mrs     x0, sctlr_el3        // Get control register EL3
 4: and     x0, x0, #~CTRL_A_BIT  // Clear A (alignment check) bit
+   EL1_OR_EL2_OR_EL3(x1)
+1: msr     sctlr_el1, x0        // Write back control register
+   b       4f
+2: msr     sctlr_el2, x0        // Write back control register
+   b       4f
+3: msr     sctlr_el3, x0        // Write back control register
+4: dsb     sy
+   isb
+   ret
+
+ASM_FUNC(ArmEnableStackAlignmentCheck)
+   EL1_OR_EL2(x1)
+1: mrs     x0, sctlr_el1        // Get control register EL1
+   b       3f
+2: mrs     x0, sctlr_el2        // Get control register EL2
+3: orr     x0, x0, #CTRL_SA_BIT // Set SA (stack alignment check) bit
+   EL1_OR_EL2(x1)
+1: msr     sctlr_el1, x0        // Write back control register
+   b       3f
+2: msr     sctlr_el2, x0        // Write back control register
+3: dsb     sy
+   isb
+   ret
+
+
+ASM_FUNC(ArmDisableStackAlignmentCheck)
+   EL1_OR_EL2_OR_EL3(x1)
+1: mrs     x0, sctlr_el1        // Get control register EL1
+   b       4f
+2: mrs     x0, sctlr_el2        // Get control register EL2
+   b       4f
+3: mrs     x0, sctlr_el3        // Get control register EL3
+4: bic     x0, x0, #CTRL_SA_BIT // Clear SA (stack alignment check) bit
    EL1_OR_EL2_OR_EL3(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
