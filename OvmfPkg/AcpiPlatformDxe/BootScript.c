@@ -15,7 +15,7 @@
 
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
-#include <Protocol/S3SaveState.h>
+#include <Library/QemuFwCfgS3Lib.h>
 
 #include "AcpiPlatform.h"
 
@@ -53,19 +53,11 @@ struct S3_CONTEXT {
 
 //
 // Scratch buffer, allocated in EfiReservedMemoryType type memory, for the ACPI
-// S3 Boot Script opcodes to work on. We use the buffer to compose and to
-// replay several fw_cfg select+skip and write operations, using the DMA access
-// method. The fw_cfg operations will implement the actions dictated by
-// CONDENSED_WRITE_POINTER objects.
+// S3 Boot Script opcodes to work on.
 //
 #pragma pack (1)
-typedef struct {
-  FW_CFG_DMA_ACCESS Access;       // filled in from
-                                  //   CONDENSED_WRITE_POINTER.PointerItem,
-                                  //   CONDENSED_WRITE_POINTER.PointerSize,
-                                  //   CONDENSED_WRITE_POINTER.PointerOffset
-  UINT64            PointerValue; // filled in from
-                                  //   CONDENSED_WRITE_POINTER.PointerValue
+typedef union {
+  UINT64 PointerValue; // filled in from CONDENSED_WRITE_POINTER.PointerValue
 } SCRATCH_BUFFER;
 #pragma pack ()
 
@@ -197,220 +189,78 @@ SaveCondensedWritePointerToS3Context (
 
 
 /**
+  FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION provided to QemuFwCfgS3Lib.
+**/
+STATIC
+VOID
+EFIAPI
+AppendFwCfgBootScript (
+  IN OUT VOID *Context,              OPTIONAL
+  IN OUT VOID *ExternalScratchBuffer
+  )
+{
+  S3_CONTEXT     *S3Context;
+  SCRATCH_BUFFER *ScratchBuffer;
+  UINTN          Index;
+
+  S3Context = Context;
+  ScratchBuffer = ExternalScratchBuffer;
+
+  for (Index = 0; Index < S3Context->Used; ++Index) {
+    CONST CONDENSED_WRITE_POINTER *Condensed;
+    RETURN_STATUS                 Status;
+
+    Condensed = &S3Context->WritePointers[Index];
+
+    Status = QemuFwCfgS3ScriptSkipBytes (Condensed->PointerItem,
+               Condensed->PointerOffset);
+    if (RETURN_ERROR (Status)) {
+      goto FatalError;
+    }
+
+    ScratchBuffer->PointerValue = Condensed->PointerValue;
+    Status = QemuFwCfgS3ScriptWriteBytes (-1, Condensed->PointerSize);
+    if (RETURN_ERROR (Status)) {
+      goto FatalError;
+    }
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "%a: boot script fragment saved\n", __FUNCTION__));
+
+  ReleaseS3Context (S3Context);
+  return;
+
+FatalError:
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+}
+
+
+/**
   Translate and append the information from an S3_CONTEXT object to the ACPI S3
   Boot Script.
 
   The effects of a successful call to this function cannot be undone.
 
   @param[in] S3Context  The S3_CONTEXT object to translate to ACPI S3 Boot
-                        Script opcodes.
+                        Script opcodes. If the function returns successfully,
+                        the caller must set the S3Context pointer -- originally
+                        returned by AllocateS3Context() -- immediately to NULL,
+                        because the ownership of S3Context has been transfered.
 
-  @retval EFI_OUT_OF_RESOURCES  Out of memory.
+  @retval EFI_SUCCESS The translation of S3Context to ACPI S3 Boot Script
+                      opcodes has been successfully executed or queued.
 
-  @retval EFI_SUCCESS           The translation of S3Context to ACPI S3 Boot
-                                Script opcodes has been successful.
-
-  @return                       Error codes from underlying functions.
+  @return             Error codes from underlying functions.
 **/
 EFI_STATUS
 TransferS3ContextToBootScript (
-  IN CONST S3_CONTEXT *S3Context
+  IN S3_CONTEXT *S3Context
   )
 {
-  EFI_STATUS                 Status;
-  EFI_S3_SAVE_STATE_PROTOCOL *S3SaveState;
-  SCRATCH_BUFFER             *ScratchBuffer;
-  FW_CFG_DMA_ACCESS          *Access;
-  UINT64                     BigEndianAddressOfAccess;
-  UINT32                     ControlPollData;
-  UINT32                     ControlPollMask;
-  UINTN                      Index;
+  RETURN_STATUS Status;
 
-  //
-  // If the following protocol lookup fails, it shall not happen due to an
-  // unexpected DXE driver dispatch order.
-  //
-  // Namely, this function is only invoked on QEMU. Therefore it is only
-  // reached after Platform BDS signals gRootBridgesConnectedEventGroupGuid
-  // (see OnRootBridgesConnected() in "EntryPoint.c"). Hence, because
-  // TransferS3ContextToBootScript() is invoked in BDS, all DXE drivers,
-  // including S3SaveStateDxe (producing EFI_S3_SAVE_STATE_PROTOCOL), have been
-  // dispatched by the time we get here. (S3SaveStateDxe is not expected to
-  // have any stricter-than-TRUE DEPEX -- not a DEPEX that gets unblocked only
-  // within BDS anyway.)
-  //
-  // Reaching this function also depends on QemuFwCfgS3Enabled(). That implies
-  // S3SaveStateDxe has not exited immediately due to S3 being disabled. Thus
-  // EFI_S3_SAVE_STATE_PROTOCOL can only be missing for genuinely unforeseeable
-  // reasons.
-  //
-  Status = gBS->LocateProtocol (&gEfiS3SaveStateProtocolGuid,
-                  NULL /* Registration */, (VOID **)&S3SaveState);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: LocateProtocol(): %r\n", __FUNCTION__, Status));
-    return Status;
-  }
-
-  ScratchBuffer = AllocateReservedPool (sizeof *ScratchBuffer);
-  if (ScratchBuffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Set up helper variables that we'll use identically for all
-  // CONDENSED_WRITE_POINTER elements.
-  //
-  Access = &ScratchBuffer->Access;
-  BigEndianAddressOfAccess = SwapBytes64 ((UINTN)Access);
-  ControlPollData = 0;
-  ControlPollMask = MAX_UINT32;
-
-  //
-  // For each CONDENSED_WRITE_POINTER, we need six ACPI S3 Boot Script opcodes:
-  // (1) restore an FW_CFG_DMA_ACCESS object in reserved memory that selects
-  //     the writeable fw_cfg file PointerFile (through PointerItem), and skips
-  //     to PointerOffset in it,
-  // (2) call QEMU with the FW_CFG_DMA_ACCESS object,
-  // (3) wait for the select+skip to finish,
-  // (4) restore a SCRATCH_BUFFER object in reserved memory that writes
-  //     PointerValue (base address of the allocated / downloaded PointeeFile,
-  //     plus PointeeOffset), of size PointerSize, into the fw_cfg file
-  //     selected in (1), at the offset sought to in (1),
-  // (5) call QEMU with the FW_CFG_DMA_ACCESS object,
-  // (6) wait for the write to finish.
-  //
-  // EFI_S3_SAVE_STATE_PROTOCOL does not allow rolling back opcode additions,
-  // therefore we treat any failure here as fatal.
-  //
-  for (Index = 0; Index < S3Context->Used; ++Index) {
-    CONST CONDENSED_WRITE_POINTER *Condensed;
-
-    Condensed = &S3Context->WritePointers[Index];
-
-    //
-    // (1) restore an FW_CFG_DMA_ACCESS object in reserved memory that selects
-    //     the writeable fw_cfg file PointerFile (through PointerItem), and
-    //     skips to PointerOffset in it,
-    //
-    Access->Control = SwapBytes32 ((UINT32)Condensed->PointerItem << 16 |
-                        FW_CFG_DMA_CTL_SELECT | FW_CFG_DMA_CTL_SKIP);
-    Access->Length = SwapBytes32 (Condensed->PointerOffset);
-    Access->Address = 0;
-    Status = S3SaveState->Write (
-                            S3SaveState,                      // This
-                            EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE, // OpCode
-                            EfiBootScriptWidthUint8,          // Width
-                            (UINT64)(UINTN)Access,            // Address
-                            sizeof *Access,                   // Count
-                            Access                            // Buffer
-                            );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Index %Lu opcode 1: %r\n", __FUNCTION__,
-        (UINT64)Index, Status));
-      goto FatalError;
-    }
-
-    //
-    // (2) call QEMU with the FW_CFG_DMA_ACCESS object,
-    //
-    Status = S3SaveState->Write (
-                            S3SaveState,                     // This
-                            EFI_BOOT_SCRIPT_IO_WRITE_OPCODE, // OpCode
-                            EfiBootScriptWidthUint32,        // Width
-                            (UINT64)FW_CFG_IO_DMA_ADDRESS,   // Address
-                            (UINTN)2,                        // Count
-                            &BigEndianAddressOfAccess        // Buffer
-                            );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Index %Lu opcode 2: %r\n", __FUNCTION__,
-        (UINT64)Index, Status));
-      goto FatalError;
-    }
-
-    //
-    // (3) wait for the select+skip to finish,
-    //
-    Status = S3SaveState->Write (
-                            S3SaveState,                     // This
-                            EFI_BOOT_SCRIPT_MEM_POLL_OPCODE, // OpCode
-                            EfiBootScriptWidthUint32,        // Width
-                            (UINT64)(UINTN)&Access->Control, // Address
-                            &ControlPollData,                // Data
-                            &ControlPollMask,                // DataMask
-                            MAX_UINT64                       // Delay
-                            );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Index %Lu opcode 3: %r\n", __FUNCTION__,
-        (UINT64)Index, Status));
-      goto FatalError;
-    }
-
-    //
-    // (4) restore a SCRATCH_BUFFER object in reserved memory that writes
-    //     PointerValue (base address of the allocated / downloaded
-    //     PointeeFile, plus PointeeOffset), of size PointerSize, into the
-    //     fw_cfg file selected in (1), at the offset sought to in (1),
-    //
-    Access->Control = SwapBytes32 (FW_CFG_DMA_CTL_WRITE);
-    Access->Length = SwapBytes32 (Condensed->PointerSize);
-    Access->Address = SwapBytes64 ((UINTN)&ScratchBuffer->PointerValue);
-    ScratchBuffer->PointerValue = Condensed->PointerValue;
-    Status = S3SaveState->Write (
-                            S3SaveState,                      // This
-                            EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE, // OpCode
-                            EfiBootScriptWidthUint8,          // Width
-                            (UINT64)(UINTN)ScratchBuffer,     // Address
-                            sizeof *ScratchBuffer,            // Count
-                            ScratchBuffer                     // Buffer
-                            );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Index %Lu opcode 4: %r\n", __FUNCTION__,
-        (UINT64)Index, Status));
-      goto FatalError;
-    }
-
-    //
-    // (5) call QEMU with the FW_CFG_DMA_ACCESS object,
-    //
-    Status = S3SaveState->Write (
-                            S3SaveState,                     // This
-                            EFI_BOOT_SCRIPT_IO_WRITE_OPCODE, // OpCode
-                            EfiBootScriptWidthUint32,        // Width
-                            (UINT64)FW_CFG_IO_DMA_ADDRESS,   // Address
-                            (UINTN)2,                        // Count
-                            &BigEndianAddressOfAccess        // Buffer
-                            );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Index %Lu opcode 5: %r\n", __FUNCTION__,
-        (UINT64)Index, Status));
-      goto FatalError;
-    }
-
-    //
-    // (6) wait for the write to finish.
-    //
-    Status = S3SaveState->Write (
-                            S3SaveState,                     // This
-                            EFI_BOOT_SCRIPT_MEM_POLL_OPCODE, // OpCode
-                            EfiBootScriptWidthUint32,        // Width
-                            (UINT64)(UINTN)&Access->Control, // Address
-                            &ControlPollData,                // Data
-                            &ControlPollMask,                // DataMask
-                            MAX_UINT64                       // Delay
-                            );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Index %Lu opcode 6: %r\n", __FUNCTION__,
-        (UINT64)Index, Status));
-      goto FatalError;
-    }
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "%a: boot script fragment saved, ScratchBuffer=%p\n",
-    __FUNCTION__, (VOID *)ScratchBuffer));
-  return EFI_SUCCESS;
-
-FatalError:
-  ASSERT (FALSE);
-  CpuDeadLoop ();
-  return Status;
+  Status = QemuFwCfgS3CallWhenBootScriptReady (AppendFwCfgBootScript,
+             S3Context, sizeof (SCRATCH_BUFFER));
+  return (EFI_STATUS)Status;
 }

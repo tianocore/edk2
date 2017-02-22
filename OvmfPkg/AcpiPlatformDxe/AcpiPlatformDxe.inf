@@ -61,7 +61,6 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
-  gEfiS3SaveStateProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
   gEfiXenInfoGuid

@@ -115,7 +115,7 @@ SaveCondensedWritePointerToS3Context (
 
 EFI_STATUS
 TransferS3ContextToBootScript (
-  IN CONST S3_CONTEXT *S3Context
+  IN S3_CONTEXT *S3Context
   );
 
 #endif

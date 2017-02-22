@@ -848,6 +848,13 @@ InstallQemuFwCfgTables (
   //
   if (S3Context != NULL) {
     Status = TransferS3ContextToBootScript (S3Context);
+    if (EFI_ERROR (Status)) {
+      goto UninstallAcpiTables;
+    }
+    //
+    // Ownership of S3Context has been transfered.
+    //
+    S3Context = NULL;
   }
 
 UninstallAcpiTables:
