@@ -31,6 +31,8 @@
 #
 
 [Sources]
+  QemuFwCfgS3BasePei.c
+  QemuFwCfgS3Pei.c
   QemuFwCfgS3PeiDxe.c
 
 [Packages]
@@ -38,4 +40,5 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  DebugLib
   QemuFwCfgLib
