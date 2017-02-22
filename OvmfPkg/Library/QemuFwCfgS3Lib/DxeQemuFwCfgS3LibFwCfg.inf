@@ -28,6 +28,7 @@
 #
 
 [Sources]
+  QemuFwCfgS3Dxe.c
   QemuFwCfgS3PeiDxe.c
 
 [Packages]
@@ -35,4 +36,11 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
   QemuFwCfgLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiS3SaveStateProtocolGuid ## SOMETIMES_CONSUMES
