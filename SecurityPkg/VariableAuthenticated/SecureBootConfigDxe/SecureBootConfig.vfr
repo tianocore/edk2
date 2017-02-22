@@ -459,13 +459,13 @@ formset
           varid       = SECUREBOOT_CONFIGURATION.CertificateFormat,
           prompt      = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),
           help        = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_HELP),
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA256), value = 0x2, flags = DEFAULT;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA384), value = 0x3, flags = 0;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA512), value = 0x4, flags = 0;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_RAW), value = 0x5, flags = 0;
+          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA256), value = 0x1, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA384), value = 0x2, flags = 0;
+          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA512), value = 0x3, flags = 0;
+          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_RAW), value = 0x4, flags = 0;
     endoneof;
 
-    suppressif ideqval SECUREBOOT_CONFIGURATION.CertificateFormat == 5;
+    suppressif ideqval SECUREBOOT_CONFIGURATION.CertificateFormat == 4;
         checkbox varid  = SECUREBOOT_CONFIGURATION.AlwaysRevocation,
                prompt = STRING_TOKEN(STR_ALWAYS_CERTIFICATE_REVOCATION_PROMPT),
                help   = STRING_TOKEN(STR_ALWAYS_CERTIFICATE_REVOCATION_HELP),

@@ -91,12 +91,12 @@ extern  EFI_IFR_GUID_LABEL         *mEndLabel;
 //
 // Support hash types
 //
-#define HASHALG_SHA224                         0x00000001
-#define HASHALG_SHA256                         0x00000002
-#define HASHALG_SHA384                         0x00000003
-#define HASHALG_SHA512                         0x00000004
-#define HASHALG_RAW                            0x00000005
-#define HASHALG_MAX                            0x00000005
+#define HASHALG_SHA224                         0x00000000
+#define HASHALG_SHA256                         0x00000001
+#define HASHALG_SHA384                         0x00000002
+#define HASHALG_SHA512                         0x00000003
+#define HASHALG_RAW                            0x00000004
+#define HASHALG_MAX                            0x00000004
 
 
 typedef struct {
