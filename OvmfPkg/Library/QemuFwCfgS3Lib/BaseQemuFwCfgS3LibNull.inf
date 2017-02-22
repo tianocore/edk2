@@ -33,7 +33,11 @@
 
 [Sources]
   QemuFwCfgS3Base.c
+  QemuFwCfgS3BasePei.c
 
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
