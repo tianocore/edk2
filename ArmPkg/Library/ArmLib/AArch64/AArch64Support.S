@@ -273,7 +273,8 @@ ASM_FUNC(ArmDisableBranchPrediction)
 ASM_FUNC(AArch64AllDataCachesOperation)
 // We can use regs 0-7 and 9-15 without having to save/restore.
 // Save our link register on the stack. - The stack must always be quad-word aligned
-  str   x30, [sp, #-16]!
+  stp   x29, x30, [sp, #-16]!
+  mov   x29, sp
   mov   x1, x0                  // Save Function call in x1
   mrs   x6, clidr_el1           // Read EL1 CLIDR
   and   x3, x6, #0x7000000      // Mask out all but Level of Coherency (LoC)
@@ -324,7 +325,7 @@ L_Skip:
 L_Finished:
   dsb   sy
   isb
-  ldr   x30, [sp], #0x10
+  ldp   x29, x30, [sp], #0x10
   ret
 
 
