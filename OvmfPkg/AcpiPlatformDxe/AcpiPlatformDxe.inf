@@ -52,6 +52,7 @@
   UefiDriverEntryPoint
   HobLib
   QemuFwCfgLib
+  QemuFwCfgS3Lib
   MemoryAllocationLib
   BaseLib
   DxeServicesTableLib

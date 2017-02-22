@@ -19,6 +19,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Protocol/LockBox.h>
 #include <LockBoxLib.h>
 

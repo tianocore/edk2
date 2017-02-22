@@ -56,6 +56,7 @@
   PcdLib
   PciLib
   QemuFwCfgLib
+  QemuFwCfgS3Lib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 

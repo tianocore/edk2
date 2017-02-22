@@ -48,6 +48,7 @@ Abstract:
 #include <Library/IoLib.h>
 #include <Library/NvVarsFileLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/QemuBootOrderLib.h>
 
 #include <Protocol/Decompress.h>

@@ -32,6 +32,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/S3SaveState.h>
 #include <Protocol/SmmControl2.h>

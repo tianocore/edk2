@@ -32,6 +32,7 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>

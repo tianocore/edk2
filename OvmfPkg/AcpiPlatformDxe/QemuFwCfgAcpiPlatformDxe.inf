@@ -44,6 +44,7 @@
   MemoryAllocationLib
   OrderedCollectionLib
   QemuFwCfgLib
+  QemuFwCfgS3Lib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 

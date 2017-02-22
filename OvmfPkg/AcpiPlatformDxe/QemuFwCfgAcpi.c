@@ -19,6 +19,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/OrderedCollectionLib.h>

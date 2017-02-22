@@ -52,6 +52,7 @@
   PciLib
   NvVarsFileLib
   QemuFwCfgLib
+  QemuFwCfgS3Lib
   LoadLinuxLib
   QemuBootOrderLib
   UefiLib
