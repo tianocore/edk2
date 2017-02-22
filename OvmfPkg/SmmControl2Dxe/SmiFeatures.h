@@ -37,13 +37,10 @@ NegotiateSmiFeatures (
 /**
   Append a boot script fragment that will re-select the previously negotiated
   SMI features during S3 resume.
-
-  @param[in] S3SaveState  The EFI_S3_SAVE_STATE_PROTOCOL instance to append to
-                          the S3 boot script with.
 **/
 VOID
 SaveSmiFeatures (
-  IN EFI_S3_SAVE_STATE_PROTOCOL *S3SaveState
+  VOID
   );
 
 #endif

@@ -18,6 +18,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 
 #include "SmiFeatures.h"
 
@@ -29,29 +30,26 @@
 
 //
 // Provides a scratch buffer (allocated in EfiReservedMemoryType type memory)
-// for the S3 boot script fragment to write to and read from. The buffer
-// captures a combined fw_cfg item selection + write command using the DMA
-// access method. Note that we don't trust the runtime OS to preserve the
-// contents of the buffer, the boot script will first rewrite it.
+// for the S3 boot script fragment to write to and read from.
 //
 #pragma pack (1)
-typedef struct {
-  FW_CFG_DMA_ACCESS Access;
-  UINT64            Features;
+typedef union {
+  UINT64 Features;
+  UINT8  FeaturesOk;
 } SCRATCH_BUFFER;
 #pragma pack ()
 
 //
 // These carry the selector keys of the "etc/smi/requested-features" and
 // "etc/smi/features-ok" fw_cfg files from NegotiateSmiFeatures() to
-// SaveSmiFeatures().
+// AppendFwCfgBootScript().
 //
 STATIC FIRMWARE_CONFIG_ITEM mRequestedFeaturesItem;
 STATIC FIRMWARE_CONFIG_ITEM mFeaturesOkItem;
 
 //
 // Carries the negotiated SMI features from NegotiateSmiFeatures() to
-// SaveSmiFeatures().
+// AppendFwCfgBootScript().
 //
 STATIC UINT64 mSmiFeatures;
 
@@ -168,157 +166,81 @@ FatalError:
 }
 
 /**
-  Append a boot script fragment that will re-select the previously negotiated
-  SMI features during S3 resume.
-
-  @param[in] S3SaveState  The EFI_S3_SAVE_STATE_PROTOCOL instance to append to
-                          the S3 boot script with.
+  FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION provided to QemuFwCfgS3Lib.
 **/
+STATIC
 VOID
-SaveSmiFeatures (
-  IN EFI_S3_SAVE_STATE_PROTOCOL *S3SaveState
+EFIAPI
+AppendFwCfgBootScript (
+  IN OUT VOID *Context,              OPTIONAL
+  IN OUT VOID *ExternalScratchBuffer
   )
 {
   SCRATCH_BUFFER *ScratchBuffer;
-  EFI_STATUS     Status;
-  UINT64         AccessAddress;
-  UINT32         ControlPollData;
-  UINT32         ControlPollMask;
-  UINT16         FeaturesOkItemAsUint16;
-  UINT8          FeaturesOkData;
-  UINT8          FeaturesOkMask;
+  RETURN_STATUS  Status;
 
-  ScratchBuffer = AllocateReservedPool (sizeof *ScratchBuffer);
-  if (ScratchBuffer == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: scratch buffer allocation failed\n",
-      __FUNCTION__));
+  ScratchBuffer = ExternalScratchBuffer;
+
+  //
+  // Write the negotiated feature bitmap into "etc/smi/requested-features".
+  //
+  ScratchBuffer->Features = mSmiFeatures;
+  Status = QemuFwCfgS3ScriptWriteBytes (mRequestedFeaturesItem,
+             sizeof ScratchBuffer->Features);
+  if (RETURN_ERROR (Status)) {
     goto FatalError;
   }
 
   //
-  // Populate the scratch buffer with a select + write fw_cfg DMA command that
-  // will write the negotiated feature bitmap into
-  // "etc/smi/requested-features".
+  // Read back "etc/smi/features-ok". This invokes the feature validation &
+  // lockdown. (The validation succeeded at first boot.)
   //
-  ScratchBuffer->Access.Control = SwapBytes32 (
-                                    (UINT32)mRequestedFeaturesItem << 16 |
-                                    FW_CFG_DMA_CTL_SELECT |
-                                    FW_CFG_DMA_CTL_WRITE
-                                    );
-  ScratchBuffer->Access.Length = SwapBytes32 (
-                                   (UINT32)sizeof ScratchBuffer->Features);
-  ScratchBuffer->Access.Address = SwapBytes64 (
-                                    (UINTN)&ScratchBuffer->Features);
-  ScratchBuffer->Features       = mSmiFeatures;
-
-  //
-  // Copy the scratch buffer into the boot script. When replayed, this
-  // EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE will restore the current contents of the
-  // scratch buffer, in-place.
-  //
-  Status = S3SaveState->Write (
-                          S3SaveState,                      // This
-                          EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE, // OpCode
-                          EfiBootScriptWidthUint8,          // Width
-                          (UINT64)(UINTN)ScratchBuffer,     // Address
-                          sizeof *ScratchBuffer,            // Count
-                          (VOID*)ScratchBuffer              // Buffer
-                          );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a:%d: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
-      __FUNCTION__, __LINE__, Status));
+  Status = QemuFwCfgS3ScriptReadBytes (mFeaturesOkItem,
+             sizeof ScratchBuffer->FeaturesOk);
+  if (RETURN_ERROR (Status)) {
     goto FatalError;
   }
 
   //
-  // Append an opcode that will write the address of the scratch buffer to the
-  // fw_cfg DMA address register, which consists of two 32-bit IO ports. The
-  // second (highest address, least significant) write will start the transfer.
+  // If "etc/smi/features-ok" read as 1, we're good. Otherwise, hang the S3
+  // resume process.
   //
-  AccessAddress = SwapBytes64 ((UINTN)&ScratchBuffer->Access);
-  Status = S3SaveState->Write (
-                          S3SaveState,                     // This
-                          EFI_BOOT_SCRIPT_IO_WRITE_OPCODE, // OpCode
-                          EfiBootScriptWidthUint32,        // Width
-                          (UINT64)FW_CFG_IO_DMA_ADDRESS,   // Address
-                          (UINTN)2,                        // Count
-                          &AccessAddress                   // Buffer
-                          );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a:%d: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
-      __FUNCTION__, __LINE__, Status));
+  Status = QemuFwCfgS3ScriptCheckValue (&ScratchBuffer->FeaturesOk,
+             sizeof ScratchBuffer->FeaturesOk, MAX_UINT8, 1);
+  if (RETURN_ERROR (Status)) {
     goto FatalError;
   }
 
-  //
-  // The EFI_BOOT_SCRIPT_MEM_POLL_OPCODE will wait until the Control word reads
-  // as zero (transfer complete). As timeout we use MAX_UINT64 * 100ns, which
-  // is approximately 58494 years.
-  //
-  ControlPollData = 0;
-  ControlPollMask = MAX_UINT32;
-  Status = S3SaveState->Write (
-                     S3SaveState,                                   // This
-                     EFI_BOOT_SCRIPT_MEM_POLL_OPCODE,               // OpCode
-                     EfiBootScriptWidthUint32,                      // Width
-                     (UINT64)(UINTN)&ScratchBuffer->Access.Control, // Address
-                     &ControlPollData,                              // Data
-                     &ControlPollMask,                              // DataMask
-                     MAX_UINT64                                     // Delay
-                     );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a:%d: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
-      __FUNCTION__, __LINE__, Status));
-    goto FatalError;
-  }
-
-  //
-  // Select the "etc/smi/features-ok" fw_cfg file, which invokes the feature
-  // validation & lockdown. (The validation succeeded at first boot.)
-  //
-  FeaturesOkItemAsUint16 = (UINT16)mFeaturesOkItem;
-  Status = S3SaveState->Write (
-                          S3SaveState,                     // This
-                          EFI_BOOT_SCRIPT_IO_WRITE_OPCODE, // OpCode
-                          EfiBootScriptWidthUint16,        // Width
-                          (UINT64)FW_CFG_IO_SELECTOR,      // Address
-                          (UINTN)1,                        // Count
-                          &FeaturesOkItemAsUint16          // Buffer
-                          );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a:%d: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
-      __FUNCTION__, __LINE__, Status));
-    goto FatalError;
-  }
-
-  //
-  // Read the contents (one byte) of "etc/smi/features-ok". If the value is
-  // one, we're good. Otherwise, continue reading the data port: QEMU returns 0
-  // past the end of the fw_cfg item, so this will hang the resume process,
-  // which matches our intent.
-  //
-  FeaturesOkData = 1;
-  FeaturesOkMask = MAX_UINT8;
-  Status = S3SaveState->Write (
-                     S3SaveState,                    // This
-                     EFI_BOOT_SCRIPT_IO_POLL_OPCODE, // OpCode
-                     EfiBootScriptWidthUint8,        // Width
-                     (UINT64)(UINTN)FW_CFG_IO_DATA,  // Address
-                     &FeaturesOkData,                // Data
-                     &FeaturesOkMask,                // DataMask
-                     MAX_UINT64                      // Delay
-                     );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a:%d: EFI_BOOT_SCRIPT_IO_POLL_OPCODE: %r\n",
-      __FUNCTION__, __LINE__, Status));
-    goto FatalError;
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "%a: ScratchBuffer@%p\n", __FUNCTION__,
-    (VOID *)ScratchBuffer));
+  DEBUG ((DEBUG_VERBOSE, "%a: SMI feature negotiation boot script saved\n",
+    __FUNCTION__));
   return;
 
 FatalError:
   ASSERT (FALSE);
   CpuDeadLoop ();
+}
+
+
+/**
+  Append a boot script fragment that will re-select the previously negotiated
+  SMI features during S3 resume.
+**/
+VOID
+SaveSmiFeatures (
+  VOID
+  )
+{
+  RETURN_STATUS Status;
+
+  //
+  // We are already running at TPL_CALLBACK, on the stack of
+  // OnS3SaveStateInstalled(). But that's okay, we can easily queue more
+  // notification functions while executing a notification function.
+  //
+  Status = QemuFwCfgS3CallWhenBootScriptReady (AppendFwCfgBootScript, NULL,
+             sizeof (SCRATCH_BUFFER));
+  if (RETURN_ERROR (Status)) {
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
 }

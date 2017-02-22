@@ -378,14 +378,15 @@ OnS3SaveStateInstalled (
     CpuDeadLoop ();
   }
 
+  DEBUG ((DEBUG_VERBOSE, "%a: chipset boot script saved\n", __FUNCTION__));
+
   //
   // Append a boot script fragment that re-selects the negotiated SMI features.
   //
   if (mSmiFeatureNegotiation) {
-    SaveSmiFeatures (S3SaveState);
+    SaveSmiFeatures ();
   }
 
-  DEBUG ((EFI_D_VERBOSE, "%a: boot script fragment saved\n", __FUNCTION__));
   gBS->CloseEvent (Event);
   mS3SaveStateInstalled = NULL;
 }
