@@ -403,7 +403,7 @@ CpuSetMemoryAttributes (
   // to avoid unnecessary computing.
   //
   if (mIsFlushingGCD) {
-    DEBUG((EFI_D_INFO, "  Flushing GCD\n"));
+    DEBUG((DEBUG_INFO, "  Flushing GCD\n"));
     return EFI_SUCCESS;
   }
 
@@ -979,13 +979,13 @@ IntersectMemoryDescriptor (
                     IntersectionBase, IntersectionEnd - IntersectionBase,
                     Capabilities);
 
-    DEBUG ((EFI_ERROR (Status) ? EFI_D_ERROR : EFI_D_VERBOSE,
+    DEBUG ((EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
       "%a: %a: add [%Lx, %Lx): %r\n", gEfiCallerBaseName, __FUNCTION__,
       IntersectionBase, IntersectionEnd, Status));
     return Status;
   }
 
-  DEBUG ((EFI_D_ERROR, "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
+  DEBUG ((DEBUG_ERROR, "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
     "with aperture [%Lx, %Lx) cap %Lx\n", gEfiCallerBaseName, __FUNCTION__,
     Descriptor->BaseAddress, Descriptor->BaseAddress + Descriptor->Length,
     (UINT32)Descriptor->GcdMemoryType, Descriptor->Capabilities,
@@ -1018,7 +1018,7 @@ AddMemoryMappedIoSpace (
 
   Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: %a: GetMemorySpaceMap(): %r\n",
+    DEBUG ((DEBUG_ERROR, "%a: %a: GetMemorySpaceMap(): %r\n",
       gEfiCallerBaseName, __FUNCTION__, Status));
     return Status;
   }

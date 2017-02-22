@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module to produce CPU MP Protocol.
 
-  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -571,7 +571,7 @@ CollectBistDataFromHob (
       BspCpuInstance.InfoRecord.IA32HealthFlags.Uint32  = SecPlatformInformation->IA32HealthFlags.Uint32;
       CpuInstance = &BspCpuInstance;
     } else {
-      DEBUG ((EFI_D_INFO, "Does not find any HOB stored CPU BIST information!\n"));
+      DEBUG ((DEBUG_INFO, "Does not find any HOB stored CPU BIST information!\n"));
       //
       // Does not find any HOB stored BIST information
       //
@@ -622,7 +622,7 @@ InitializeMpSupport (
 
   MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
   mNumberOfProcessors = NumberOfProcessors;
-  DEBUG ((EFI_D_ERROR, "Detect CPU count: %d\n", mNumberOfProcessors));
+  DEBUG ((DEBUG_ERROR, "Detect CPU count: %d\n", mNumberOfProcessors));
 
   //
   // Update CPU healthy information from Guided HOB
