@@ -112,11 +112,12 @@ GetImageReadFunction (
   IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  PEI_CORE_INSTANCE  *Private;
-  VOID*  MemoryBuffer;
+  PEI_CORE_INSTANCE     *Private;
+  EFI_PHYSICAL_ADDRESS  MemoryBuffer;
 
   Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
-  
+  MemoryBuffer = 0;
+
   if (Private->PeiMemoryInstalled  && (((Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnBoot)) || 
       ((Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot))) &&
       (EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_X64) || EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_IA32))) {
@@ -125,9 +126,9 @@ GetImageReadFunction (
     //  compilers that have been tested
     //
     if (Private->ShadowedImageRead == NULL) {
-      MemoryBuffer = AllocatePages (0x400 / EFI_PAGE_SIZE + 1);
-      ASSERT (MemoryBuffer != NULL);
-      CopyMem (MemoryBuffer, (CONST VOID *) (UINTN) PeiImageReadForShadow, 0x400);
+      PeiServicesAllocatePages (EfiBootServicesCode, 0x400 / EFI_PAGE_SIZE + 1, &MemoryBuffer);
+      ASSERT (MemoryBuffer != 0);
+      CopyMem ((VOID *)(UINTN)MemoryBuffer, (CONST VOID *) (UINTN) PeiImageReadForShadow, 0x400);
       Private->ShadowedImageRead = (PE_COFF_LOADER_READ_FILE) (UINTN) MemoryBuffer;
     }
 
@@ -453,12 +454,16 @@ LoadAndRelocatePeCoffImage (
         //
         // The PEIM is not assiged valid address, try to allocate page to load it.
         //
-        ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize));
+        Status = PeiServicesAllocatePages (EfiBootServicesCode,
+                                           EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize),
+                                           &ImageContext.ImageAddress);
       }
     } else {
-      ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) AllocatePages (EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize));
+      Status = PeiServicesAllocatePages (EfiBootServicesCode,
+                                         EFI_SIZE_TO_PAGES ((UINT32) AlignImageSize),
+                                         &ImageContext.ImageAddress);
     }
-    if (ImageContext.ImageAddress != 0) {
+    if (!EFI_ERROR (Status)) {
       //
       // Adjust the Image Address to make sure it is section alignment.
       //
