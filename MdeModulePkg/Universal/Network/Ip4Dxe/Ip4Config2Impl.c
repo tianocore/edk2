@@ -705,7 +705,6 @@ Ip4Config2SetDnsServerWorker (
 {
   UINTN                 OldIndex;
   UINTN                 NewIndex;
-  UINTN                 Index1;
   EFI_IPv4_ADDRESS      *OldDns;
   EFI_IPv4_ADDRESS      *NewDns;
   UINTN                 OldDnsCount;
@@ -745,15 +744,6 @@ Ip4Config2SetDnsServerWorker (
         FreePool (Tmp);
       }
       return EFI_INVALID_PARAMETER;
-    }
-
-    for (Index1 = NewIndex + 1; Index1 < NewDnsCount; Index1++) {
-      if (EFI_IP4_EQUAL (NewDns + NewIndex, NewDns + Index1)) {
-        if (Tmp != NULL) {
-          FreePool (Tmp);
-        }
-        return EFI_INVALID_PARAMETER;
-      }
     }
 
     if (OneAdded) {
