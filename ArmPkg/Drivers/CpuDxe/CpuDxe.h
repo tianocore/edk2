@@ -35,7 +35,6 @@
 #include <Protocol/Cpu.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/DebugSupportPeriodicCallback.h>
-#include <Protocol/VirtualUncachedPages.h>
 #include <Protocol/LoadedImage.h>
 
 
@@ -168,7 +167,5 @@ SetGcdMemorySpaceAttributes (
   IN UINT64                              Length,
   IN UINT64                              Attributes
   );
-
-extern VIRTUAL_UNCACHED_PAGES_PROTOCOL  gVirtualUncachedPages;
 
 #endif // __CPU_DXE_ARM_EXCEPTION_H__

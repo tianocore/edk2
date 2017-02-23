@@ -61,7 +61,6 @@
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiDebugSupportPeriodicCallbackProtocolGuid
-  gVirtualUncachedPagesProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid

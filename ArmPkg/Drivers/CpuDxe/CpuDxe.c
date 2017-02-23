@@ -253,7 +253,6 @@ CpuDxeInitialize (
   Status = gBS->InstallMultipleProtocolInterfaces (
                 &mCpuHandle,
                 &gEfiCpuArchProtocolGuid,           &mCpu,
-                &gVirtualUncachedPagesProtocolGuid, &gVirtualUncachedPages,
                 NULL
                 );
 
