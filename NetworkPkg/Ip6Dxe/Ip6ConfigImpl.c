@@ -1327,7 +1327,6 @@ Ip6ConfigSetDnsServer (
 {
   UINTN                 OldIndex;
   UINTN                 NewIndex;
-  UINTN                 Index1;
   EFI_IPv6_ADDRESS      *OldDns;
   EFI_IPv6_ADDRESS      *NewDns;
   UINTN                 OldDnsCount;
@@ -1370,15 +1369,6 @@ Ip6ConfigSetDnsServer (
         FreePool (Tmp);
       }
       return EFI_INVALID_PARAMETER;
-    }
-
-    for (Index1 = NewIndex + 1; Index1 < NewDnsCount; Index1++) {
-      if (EFI_IP6_EQUAL (NewDns + NewIndex, NewDns + Index1)) {
-        if (Tmp != NULL) {
-          FreePool (Tmp);
-        }
-        return EFI_INVALID_PARAMETER;
-      }
     }
 
     if (OneAdded) {
