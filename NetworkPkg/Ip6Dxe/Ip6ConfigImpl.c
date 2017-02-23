@@ -1441,7 +1441,7 @@ Ip6ConfigInitIfInfo (
   UnicodeSPrint (
     IfInfo->Name,
     sizeof (IfInfo->Name),
-    L"eth%x",
+    L"eth%d",
     IpSb->Ip6ConfigInstance.IfIndex
   );
 
