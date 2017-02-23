@@ -32,11 +32,14 @@ SECTIONS {
     *(.got .got.*)
 
     /*
-     * The contents of AutoGen.c files are constant from the POV of the program,
-     * but most of its contents end up in .data or .bss by default since few of
+     * The contents of AutoGen.c files are mostly constant from the POV of the
+     * program, but most of it ends up in .data or .bss by default since few of
      * the variable definitions that get emitted are declared as CONST.
+     * Unfortunately, we cannot pull it into the .text section entirely, since
+     * patchable PCDs are also emitted here, but we can at least move all of the
+     * emitted GUIDs here.
      */
-    *:AutoGen.obj(.data .data.* .bss .bss.*)
+    *:AutoGen.obj(.data.g*Guid)
   }
 
   /*
