@@ -2,7 +2,7 @@
   Main file for BCFG command.
 
   (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -41,6 +41,7 @@
 #include <Library/PrintLib.h>
 #include <Library/HandleParsingLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/UefiBootManagerLib.h>
 
 STATIC CONST CHAR16 mFileName[] = L"ShellCommands";
 STATIC EFI_HANDLE gShellBcfgHiiHandle  = NULL;
@@ -59,7 +60,11 @@ typedef enum {
   BcfgTypeRm         = 4,
   BcfgTypeMv         = 5,
   BcfgTypeOpt        = 6,
-  BcfgTypeMax        = 7
+  BcfgTypeMod        = 7,
+  BcfgTypeModf       = 8,
+  BcfgTypeModp       = 9,
+  BcfgTypeModh       = 10,
+  BcfgTypeMax        = 11
 } BCFG_OPERATION_TYPE;
 
 typedef struct {
@@ -272,6 +277,247 @@ GetDevicePathForDriverHandle (
                 NULL);
   }
   return (Status);
+}
+
+/**
+  Functino to get Device Path by a handle.
+
+  @param[in]        TheHandle   Use it to get DevicePath.
+  @param[in]        Target      Boot option target.
+  @param[in, out]   DevicePath  On a sucessful return the device path to the handle.
+
+  @retval   SHELL_INVALID_PARAMETER The handle was NULL.
+  @retval   SHELL_NOT_FOUND         Not found device path by handle.
+  @retval   SHELL_SUCCESS           Get device path successfully.
+**/
+SHELL_STATUS
+GetDevicePathByHandle(
+  IN     EFI_HANDLE               TheHandle,
+  IN     BCFG_OPERATION_TARGET    Target,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL **DevicePath
+  )
+{
+  EFI_STATUS   Status;
+  SHELL_STATUS ShellStatus;
+
+  UINTN DriverBindingHandleCount;
+  UINTN ParentControllerHandleCount;
+  UINTN ChildControllerHandleCount;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  if (TheHandle == NULL) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", L"Handle Number");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (TheHandle, &DriverBindingHandleCount, NULL);
+  if (EFI_ERROR(Status)) {
+    DriverBindingHandleCount = 0;
+  }
+
+  Status = PARSE_HANDLE_DATABASE_PARENTS (TheHandle, &ParentControllerHandleCount, NULL);
+  if (EFI_ERROR (Status)) {
+    ParentControllerHandleCount = 0;
+  }
+
+  Status = ParseHandleDatabaseForChildControllers (TheHandle, &ChildControllerHandleCount, NULL);
+  if (EFI_ERROR (Status)) {
+    ChildControllerHandleCount = 0;
+  }
+
+  Status = gBS->HandleProtocol (TheHandle, &gEfiDevicePathProtocolGuid, (VOID**)DevicePath);
+
+  if ( DriverBindingHandleCount    > 0 ||
+       ParentControllerHandleCount > 0 ||
+       ChildControllerHandleCount  > 0 ||
+       !EFI_ERROR(Status)
+     ) {
+    //
+    // The handle points to a real controller which has a device path.
+    //
+    if (Target == BcfgTargetDriverOrder) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,STRING_TOKEN (STR_GEN_PARAM_INV),
+        gShellBcfgHiiHandle,
+        L"bcfg",
+        L"Handle should point to driver image."
+      );
+      ShellStatus = SHELL_NOT_FOUND;
+    }
+  } else {
+    //
+    // The handle points to a driver image.
+    //
+    if (Target == BcfgTargetBootOrder) {
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_GEN_PARAM_INV),
+        gShellBcfgHiiHandle,
+        L"bcfg",
+        L"Handle should point to controller."
+      );
+      ShellStatus = SHELL_NOT_FOUND;
+    } else {
+      if (EFI_ERROR (GetDevicePathForDriverHandle (TheHandle, DevicePath))) {
+        ShellStatus = SHELL_NOT_FOUND;
+      }
+    }
+  }
+
+  return (ShellStatus);
+}
+
+/**
+  Function to modify an option.
+
+  @param[in] BcfgOperation  Pointer to BCFG operation.
+  @param[in] OrderCount     The number if items in CurrentOrder.
+
+  @retval SHELL_SUCCESS             The operation was successful.
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_OUT_OF_RESOUCES     A memory allocation failed.
+**/
+SHELL_STATUS
+BcfgMod (
+  IN CONST BGFG_OPERATION   *BcfgOperation,
+  IN CONST UINTN            OrderCount
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_HANDLE                    CurHandle;
+  SHELL_STATUS                  ShellStatus;
+  CHAR16                        OptionStr[40];
+  EFI_SHELL_FILE_INFO           *FileList;
+  EFI_SHELL_FILE_INFO           *Arg;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePathBuffer;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePathWalker;
+  EFI_BOOT_MANAGER_LOAD_OPTION  LoadOption;
+
+  ShellStatus       = SHELL_SUCCESS;
+  FileList          = NULL;
+  DevicePath        = NULL;
+
+  ZeroMem (&LoadOption, sizeof(EFI_BOOT_MANAGER_LOAD_OPTION));
+
+  if ( (BcfgOperation->Type == BcfgTypeMod  && BcfgOperation->Description == NULL)  ||
+       (BcfgOperation->Type == BcfgTypeModf && BcfgOperation->FileName == NULL)     ||
+       (BcfgOperation->Type == BcfgTypeModp && BcfgOperation->FileName == NULL)     ||
+       (BcfgOperation->Type == BcfgTypeModh && BcfgOperation->HandleIndex == 0)     ||
+       (BcfgOperation->Number1 > OrderCount)
+     ) {
+    return (SHELL_INVALID_PARAMETER);
+  }
+
+  if (BcfgOperation->Type == BcfgTypeModh) {
+    CurHandle = ConvertHandleIndexToHandle (BcfgOperation->HandleIndex);
+    ShellStatus = GetDevicePathByHandle (CurHandle, BcfgOperation->Target, &DevicePathBuffer);
+    if (ShellStatus == SHELL_SUCCESS) {
+      DevicePath = DuplicateDevicePath (DevicePathBuffer);
+    }
+  } else if (BcfgOperation->Type == BcfgTypeModf || BcfgOperation->Type == BcfgTypeModp) {
+    //
+    // Get Device Path by FileName.
+    //
+    ShellOpenFileMetaArg ((CHAR16 *)BcfgOperation->FileName, EFI_FILE_MODE_READ, &FileList);
+    if (FileList == NULL) {
+      //
+      // The name of file matched nothing.
+      //
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellBcfgHiiHandle, L"bcfg", BcfgOperation->FileName);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+    else if (FileList->Link.ForwardLink != FileList->Link.BackLink) {
+      //
+      // If the name of file expanded to multiple names, it's fail.
+      //
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_FILE), gShellBcfgHiiHandle, L"bcfg", BcfgOperation->FileName);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      Arg = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link);
+      if (EFI_ERROR (Arg->Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_FILE_OPEN), gShellBcfgHiiHandle, L"bcfg", BcfgOperation->FileName);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        DevicePathBuffer = gEfiShellProtocol->GetDevicePathFromFilePath (Arg->FullName);
+        if (DevicePathBuffer == NULL) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_FILE_DP), gShellBcfgHiiHandle, L"bcfg", Arg->FullName);
+          ShellStatus = SHELL_UNSUPPORTED;
+        }
+      }
+    }
+
+    if (ShellStatus == SHELL_SUCCESS) {
+      if (BcfgOperation->Type == BcfgTypeModp) {
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        DevicePathWalker = DevicePathBuffer;
+        while (!IsDevicePathEnd (DevicePathWalker)) {
+          if ( DevicePathType (DevicePathWalker) == MEDIA_DEVICE_PATH &&
+               DevicePathSubType (DevicePathWalker) == MEDIA_HARDDRIVE_DP
+             ) {
+            //
+            // We found the portion of device path starting with the hard driver partition.
+            //
+            ShellStatus = SHELL_SUCCESS;
+            DevicePath = DuplicateDevicePath (DevicePathWalker);
+            break;
+          } else {
+            DevicePathWalker = NextDevicePathNode (DevicePathWalker);
+          }
+        }
+      } else {
+        DevicePath = DuplicateDevicePath (DevicePathBuffer);
+      }
+
+      FreePool (DevicePathBuffer);
+    }
+  }
+
+  if (ShellStatus == SHELL_SUCCESS) {
+    if (BcfgOperation->Target == BcfgTargetBootOrder) {
+      UnicodeSPrint (OptionStr, sizeof (OptionStr), L"Boot%04x", BcfgOperation->Order[BcfgOperation->Number1]);
+    } else {
+      UnicodeSPrint (OptionStr, sizeof (OptionStr), L"Driver%04x", BcfgOperation->Order[BcfgOperation->Number1]);
+    }
+    Status = EfiBootManagerVariableToLoadOption (OptionStr, &LoadOption);
+    if (EFI_ERROR(Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_NONE), gShellBcfgHiiHandle);
+      ShellStatus = SHELL_NOT_FOUND;
+    }
+  }
+
+  if (ShellStatus == SHELL_SUCCESS) {
+    if (BcfgOperation->Type == BcfgTypeMod) {
+      SHELL_FREE_NON_NULL (LoadOption.Description);
+      LoadOption.Description = AllocateCopyPool (StrSize (BcfgOperation->Description), BcfgOperation->Description);
+    } else {
+      SHELL_FREE_NON_NULL (LoadOption.FilePath);
+      LoadOption.FilePath = DuplicateDevicePath (DevicePath);
+    }
+
+    Status = EfiBootManagerLoadOptionToVariable (&LoadOption);
+    if (EFI_ERROR(Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_SET_VAR_FAIL), gShellBcfgHiiHandle, L"bcfg", OptionStr);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+  }
+
+  EfiBootManagerFreeLoadOption (&LoadOption);
+
+  if (DevicePath != NULL) {
+    FreePool (DevicePath);
+  }
+
+  if (FileList != NULL) {
+    ShellCloseFileMetaArg (&FileList);
+  }
+
+  return (ShellStatus);
 }
 
 /**
@@ -1404,6 +1650,102 @@ ShellCommandRunBcfg (
               }
             }
           }
+        }
+        else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)CurrentParam, L"mod") == 0) {
+          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            CurrentOperation.Type = BcfgTypeMod;
+            CurrentParam = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+            if (CurrentParam == NULL || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              Status = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+              CurrentOperation.Number1 = (UINT16)Intermediate;
+              if (CurrentOperation.Number1 >= Count) {
+                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                ASSERT (CurrentOperation.Description == NULL);
+                CurrentOperation.Description = StrnCatGrow (&CurrentOperation.Description, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+              }
+            }
+          }
+        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)CurrentParam, L"modf") == 0) {
+          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            CurrentOperation.Type = BcfgTypeModf;
+            CurrentParam = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+            if (CurrentParam == NULL || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              Status = ShellConvertStringToUint64  (CurrentParam, &Intermediate, TRUE, FALSE);
+              CurrentOperation.Number1 = (UINT16)Intermediate;
+              if (CurrentOperation.Number1 >= Count) {
+                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                ASSERT (CurrentOperation.FileName == NULL);
+                CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+              }
+            }
+          }
+        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)CurrentParam, L"modp") == 0) {
+          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            CurrentOperation.Type = BcfgTypeModp;
+            CurrentParam = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+            if (CurrentParam == NULL || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              Status = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+              CurrentOperation.Number1 = (UINT16)Intermediate;
+              if (CurrentOperation.Number1 >= Count) {
+                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                ASSERT (CurrentOperation.FileName == NULL);
+                CurrentOperation.FileName = StrnCatGrow (&CurrentOperation.FileName, NULL, ShellCommandLineGetRawValue (Package, ++ParamNumber), 0);
+              }
+            }
+          }
+        } else if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)CurrentParam, L"modh") == 0) {
+          if ((ParamNumber + 2) >= ShellCommandLineGetCount (Package)) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellBcfgHiiHandle, L"bcfg");
+            ShellStatus = SHELL_INVALID_PARAMETER;
+          } else {
+            CurrentOperation.Type = BcfgTypeModh;
+            CurrentParam = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+            if (CurrentParam == NULL || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            }
+            else {
+              Status = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+              CurrentOperation.Number1 = (UINT16)Intermediate;
+              if (CurrentOperation.Number1 >= Count) {
+                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_NUMB_RANGE), gShellBcfgHiiHandle, L"bcfg", Count);
+                ShellStatus = SHELL_INVALID_PARAMETER;
+              } else {
+                CurrentParam = ShellCommandLineGetRawValue (Package, ++ParamNumber);
+                if (CurrentParam == NULL || !ShellIsHexOrDecimalNumber (CurrentParam, TRUE, FALSE)) {
+                  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);
+                  ShellStatus = SHELL_INVALID_PARAMETER;
+                } else {
+                  Status = ShellConvertStringToUint64 (CurrentParam, &Intermediate, TRUE, FALSE);
+                  CurrentOperation.HandleIndex = (UINT16)Intermediate;
+                }
+              }
+            }
+          }
         } else {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellBcfgHiiHandle, L"bcfg", CurrentParam);  
           ShellStatus = SHELL_INVALID_PARAMETER;
@@ -1450,6 +1792,12 @@ ShellCommandRunBcfg (
             (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddh),
             (BOOLEAN)(CurrentOperation.Type == BcfgTypeAddp),
             CurrentOperation.HandleIndex);
+          break;
+        case   BcfgTypeMod:
+        case   BcfgTypeModf:
+        case   BcfgTypeModp:
+        case   BcfgTypeModh:
+          ShellStatus = BcfgMod (&CurrentOperation, Count);
           break;
         case   BcfgTypeOpt:
           ShellStatus = BcfgAddOpt(
