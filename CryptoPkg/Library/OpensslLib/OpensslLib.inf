@@ -516,6 +516,7 @@
   $(OPENSSL_PATH)/ssl/ssl_asn1.c
   $(OPENSSL_PATH)/ssl/ssl_txt.c
   $(OPENSSL_PATH)/ssl/ssl_algs.c
+  $(OPENSSL_PATH)/ssl/ssl_conf.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
   $(OPENSSL_PATH)/ssl/ssl_err.c
   $(OPENSSL_PATH)/ssl/kssl.c
