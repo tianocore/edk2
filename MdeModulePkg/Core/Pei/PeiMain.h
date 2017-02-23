@@ -233,6 +233,10 @@ struct _PEI_CORE_INSTANCE {
   BOOLEAN                            HeapOffsetPositive;
   UINTN                              StackOffset;
   BOOLEAN                            StackOffsetPositive;
+  //
+  // Information for migrating memory pages allocated in pre-memory phase.
+  //
+  HOLE_MEMORY_DATA                   MemoryPages;
   PEICORE_FUNCTION_POINTER           ShadowedPeiCore;
   CACHE_SECTION_DATA                 CacheSection;
   //
@@ -263,7 +267,7 @@ struct _PEI_CORE_INSTANCE {
 
   //
   // Temp Memory Range is not covered by PeiTempMem and Stack.
-  // Those Memory Range will be migrated into phisical memory. 
+  // Those Memory Range will be migrated into physical memory.
   //
   HOLE_MEMORY_DATA                  HoleData[HOLE_MAX_NUMBER];
 };
@@ -423,7 +427,7 @@ InitializePpiServices (
 
 /**
 
-  Migrate the Hob list from the temporary memory stack to PEI installed memory.
+  Migrate the Hob list from the temporary memory to PEI installed memory.
 
   @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
                          and location of temporary RAM, the stack location and the BFV location.
@@ -877,30 +881,81 @@ PeiInstallPeiMemory (
   );
 
 /**
+  Migrate memory pages allocated in pre-memory phase.
+  Copy memory pages at temporary heap top to permanent heap top.
 
-  Memory allocation service on permanent memory,
-  not usable prior to the memory installation.
+  @param[in] Private                Pointer to the private data passed in from caller.
+  @param[in] TemporaryRamMigrated   Temporary memory has been migrated to permanent memory.
 
+**/
+VOID
+MigrateMemoryPages (
+  IN PEI_CORE_INSTANCE      *Private,
+  IN BOOLEAN                TemporaryRamMigrated
+  );
 
-  @param PeiServices               An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
-  @param MemoryType                Type of memory to allocate.
-  @param Pages                     Number of pages to allocate.
-  @param Memory                    Pointer of memory allocated.
+/**
+  Migrate MemoryBaseAddress in memory allocation HOBs
+  from the temporary memory to PEI installed memory.
 
-  @retval EFI_SUCCESS              The allocation was successful
-  @retval EFI_INVALID_PARAMETER    Only AllocateAnyAddress is supported.
-  @retval EFI_NOT_AVAILABLE_YET    Called with permanent memory not available
-  @retval EFI_OUT_OF_RESOURCES     There is not enough HOB heap to satisfy the requirement
-                                   to allocate the number of pages.
+  @param[in] PrivateData        Pointer to PeiCore's private data structure.
+
+**/
+VOID
+ConvertMemoryAllocationHobs (
+  IN PEI_CORE_INSTANCE          *PrivateData
+  );
+
+/**
+  The purpose of the service is to publish an interface that allows
+  PEIMs to allocate memory ranges that are managed by the PEI Foundation.
+
+  Prior to InstallPeiMemory() being called, PEI will allocate pages from the heap.
+  After InstallPeiMemory() is called, PEI will allocate pages within the region
+  of memory provided by InstallPeiMemory() service in a best-effort fashion.
+  Location-specific allocations are not managed by the PEI foundation code.
+
+  @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param  MemoryType       The type of memory to allocate.
+  @param  Pages            The number of contiguous 4 KB pages to allocate.
+  @param  Memory           Pointer to a physical address. On output, the address is set to the base
+                           of the page range that was allocated.
+
+  @retval EFI_SUCCESS           The memory range was successfully allocated.
+  @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
+  @retval EFI_INVALID_PARAMETER Type is not equal to EfiLoaderCode, EfiLoaderData, EfiRuntimeServicesCode,
+                                EfiRuntimeServicesData, EfiBootServicesCode, EfiBootServicesData,
+                                EfiACPIReclaimMemory, EfiReservedMemoryType, or EfiACPIMemoryNVS.
 
 **/
 EFI_STATUS
 EFIAPI
 PeiAllocatePages (
-  IN CONST EFI_PEI_SERVICES           **PeiServices,
-  IN EFI_MEMORY_TYPE            MemoryType,
-  IN UINTN                      Pages,
-  OUT EFI_PHYSICAL_ADDRESS      *Memory
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
+  IN       EFI_MEMORY_TYPE      MemoryType,
+  IN       UINTN                Pages,
+  OUT      EFI_PHYSICAL_ADDRESS *Memory
+  );
+
+/**
+  Frees memory pages.
+
+  @param[in] PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param[in] Memory             The base physical address of the pages to be freed.
+  @param[in] Pages              The number of contiguous 4 KB pages to free.
+
+  @retval EFI_SUCCESS           The requested pages were freed.
+  @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or Pages is invalid.
+  @retval EFI_NOT_FOUND         The requested memory pages were not allocated with
+                                AllocatePages().
+
+**/
+EFI_STATUS
+EFIAPI
+PeiFreePages (
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
+  IN EFI_PHYSICAL_ADDRESS       Memory,
+  IN UINTN                      Pages
   );
 
 /**

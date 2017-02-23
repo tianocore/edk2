@@ -103,7 +103,7 @@ ConvertSinglePpiPointer (
 
 /**
 
-  Migrate PPI Pointers from the temporary memory stack to PEI installed memory.
+  Migrate PPI Pointers from the temporary memory to PEI installed memory.
 
   @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
                          and location of temporary RAM, the stack location and the BFV location.
@@ -121,6 +121,20 @@ ConvertPpiPointers (
 
   for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
     if (Index < PrivateData->PpiData.PpiListEnd || Index > PrivateData->PpiData.NotifyListEnd) {
+      if (PrivateData->MemoryPages.Size != 0) {
+        //
+        // Convert PPI pointer in old memory pages
+        // It needs to be done before Convert PPI pointer in old Heap
+        //
+        ConvertSinglePpiPointer (
+          &PrivateData->PpiData.PpiListPtrs[Index],
+          (UINTN)PrivateData->MemoryPages.Base,
+          (UINTN)PrivateData->MemoryPages.Base + PrivateData->MemoryPages.Size,
+          PrivateData->MemoryPages.Offset,
+          PrivateData->MemoryPages.OffsetPositive
+          );
+      }
+
       //
       // Convert PPI pointer in old Heap
       //

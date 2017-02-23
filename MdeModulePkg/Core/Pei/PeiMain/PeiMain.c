@@ -64,7 +64,8 @@ EFI_PEI_SERVICES  gPs = {
   PeiRegisterForShadow,
   PeiFfsFindSectionData3,
   PeiFfsGetFileInfo2,
-  PeiResetSystem2
+  PeiResetSystem2,
+  PeiFreePages,
 };
 
 /**
@@ -230,6 +231,11 @@ PeiCore (
       HandoffInformationTable->EfiMemoryBottom     = OldCoreData->PhysicalMemoryBegin;
       HandoffInformationTable->EfiFreeMemoryTop    = OldCoreData->FreePhysicalMemoryTop;
       HandoffInformationTable->EfiFreeMemoryBottom = HandoffInformationTable->EfiEndOfHobList + sizeof (EFI_HOB_GENERIC_HEADER);
+
+      //
+      // We need convert MemoryBaseAddress in memory allocation HOBs
+      //
+      ConvertMemoryAllocationHobs (OldCoreData);
 
       //
       // We need convert the PPI descriptor's pointer

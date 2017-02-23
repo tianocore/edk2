@@ -682,13 +682,13 @@ PeiCheckAndSwitchStack (
            && (*StackPointer == INIT_CAR_VALUE);
            StackPointer ++);
 
-      DEBUG ((EFI_D_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
-      DEBUG ((EFI_D_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", Private->HobList.Raw, (UINT32)((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryTop - (UINTN) Private->HobList.Raw)));
-      DEBUG ((EFI_D_INFO, "Total temporary memory:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
-      DEBUG ((EFI_D_INFO, "  temporary memory stack ever used: %d bytes.\n",
+      DEBUG ((DEBUG_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
+      DEBUG ((DEBUG_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", SecCoreData->PeiTemporaryRamBase, (UINT32)SecCoreData->PeiTemporaryRamSize));
+      DEBUG ((DEBUG_INFO, "Total temporary memory:    %d bytes.\n", (UINT32)SecCoreData->TemporaryRamSize));
+      DEBUG ((DEBUG_INFO, "  temporary memory stack ever used:       %d bytes.\n",
              (UINT32)(SecCoreData->StackSize - ((UINTN) StackPointer - (UINTN)SecCoreData->StackBase))
             ));
-      DEBUG ((EFI_D_INFO, "  temporary memory heap used:       %d bytes.\n",
+      DEBUG ((DEBUG_INFO, "  temporary memory heap used for HobList: %d bytes.\n",
              (UINT32)((UINTN)Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - (UINTN)Private->HobList.Raw)
             ));
     DEBUG_CODE_END ();
@@ -801,15 +801,27 @@ PeiCheckAndSwitchStack (
                                 );
 
       //
+      // Migrate memory pages allocated in pre-memory phase.
+      // It could not be called before calling TemporaryRamSupportPpi->TemporaryRamMigration()
+      // as the migrated memory pages may be overridden by TemporaryRamSupportPpi->TemporaryRamMigration().
+      //
+      MigrateMemoryPages (Private, TRUE);
+
+      //
       // Entry PEI Phase 2
       //
       PeiCore (SecCoreData, NULL, Private);
     } else {
       //
+      // Migrate memory pages allocated in pre-memory phase.
+      //
+      MigrateMemoryPages (Private, FALSE);
+
+      //
       // Migrate the PEI Services Table pointer from temporary RAM to permanent RAM.
       //
       MigratePeiServicesTablePointer ();
-                
+
       //
       // Heap Offset
       //
@@ -837,7 +849,7 @@ PeiCheckAndSwitchStack (
       //
       HeapTemporaryRamSize = (UINTN) (Private->HobList.HandoffInformationTable->EfiFreeMemoryBottom - Private->HobList.HandoffInformationTable->EfiMemoryBottom);
       ASSERT (BaseOfNewHeap + HeapTemporaryRamSize <= Private->FreePhysicalMemoryTop);
-      CopyMem ((UINT8 *) (UINTN) BaseOfNewHeap, (UINT8 *) PeiTemporaryRamBase, HeapTemporaryRamSize);
+      CopyMem ((UINT8 *) (UINTN) BaseOfNewHeap, PeiTemporaryRamBase, HeapTemporaryRamSize);
 
       //
       // Migrate Stack
@@ -846,7 +858,6 @@ PeiCheckAndSwitchStack (
 
       //
       // Copy Hole Range Data
-      // Convert PPI from Hole. 
       //
       if (HoleMemSize != 0) {
         //
