@@ -1495,7 +1495,7 @@ Ip4Config2InitIfInfo (
   UnicodeSPrint (
     IfInfo->Name,
     EFI_IP4_CONFIG2_INTERFACE_INFO_NAME_SIZE,
-    L"eth%x",
+    L"eth%d",
     IpSb->Ip4Config2Instance.IfIndex
   );
 
