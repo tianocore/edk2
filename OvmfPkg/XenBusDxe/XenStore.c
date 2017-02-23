@@ -1304,6 +1304,7 @@ XenStoreTransactionEnd (
 }
 
 XENSTORE_STATUS
+EFIAPI
 XenStoreVSPrint (
   IN CONST XENSTORE_TRANSACTION *Transaction,
   IN CONST CHAR8           *DirectoryPath,
