@@ -159,7 +159,11 @@
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+!if $(TLS_ENABLE) == TRUE
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+!else
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+!endif
   
 !if $(SECURE_BOOT_ENABLE) == TRUE
   PlatformSecureLib|Nt32Pkg/Library/PlatformSecureLib/PlatformSecureLib.inf
