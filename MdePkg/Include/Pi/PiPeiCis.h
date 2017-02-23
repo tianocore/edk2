@@ -452,6 +452,11 @@ EFI_STATUS
   The purpose of the service is to publish an interface that allows 
   PEIMs to allocate memory ranges that are managed by the PEI Foundation.
 
+  Prior to InstallPeiMemory() being called, PEI will allocate pages from the heap.
+  After InstallPeiMemory() is called, PEI will allocate pages within the region
+  of memory provided by InstallPeiMemory() service in a best-effort fashion.
+  Location-specific allocations are not managed by the PEI foundation code.
+
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  MemoryType       The type of memory to allocate.
   @param  Pages            The number of contiguous 4 KB pages to allocate.
@@ -472,6 +477,27 @@ EFI_STATUS
   IN EFI_MEMORY_TYPE            MemoryType,
   IN UINTN                      Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Memory
+  );
+
+/**
+  Frees memory pages.
+
+  @param[in] PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param[in] Memory             The base physical address of the pages to be freed.
+  @param[in] Pages              The number of contiguous 4 KB pages to free.
+
+  @retval EFI_SUCCESS           The requested pages were freed.
+  @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or Pages is invalid.
+  @retval EFI_NOT_FOUND         The requested memory pages were not allocated with
+                                AllocatePages().
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EFI_PEI_FREE_PAGES) (
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
+  IN EFI_PHYSICAL_ADDRESS       Memory,
+  IN UINTN                      Pages
   );
 
 /**
@@ -929,6 +955,7 @@ struct _EFI_PEI_SERVICES {
   EFI_PEI_FFS_FIND_SECTION_DATA3  FindSectionData3;
   EFI_PEI_FFS_GET_FILE_INFO2      FfsGetFileInfo2;
   EFI_PEI_RESET2_SYSTEM           ResetSystem2;
+  EFI_PEI_FREE_PAGES              FreePages;
 };
 
 
