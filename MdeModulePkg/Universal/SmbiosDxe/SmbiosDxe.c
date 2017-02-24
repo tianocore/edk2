@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing 
   SMBIOS table into system table.
   
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1138,7 +1138,7 @@ SmbiosCreateTable (
     EntryPointStructure->MaxStructureSize = (UINT16) sizeof (EndStructure);
   }
 
-  if ((UINTN) EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength) > mPreAllocatedPages) {
+  if (EFI_SIZE_TO_PAGES ((UINT32) EntryPointStructure->TableLength) > mPreAllocatedPages) {
     //
     // If new SMBIOS table size exceeds the previous allocated page, 
     // it is time to re-allocate memory (below 4GB).
@@ -1307,7 +1307,7 @@ SmbiosCreate64BitTable (
   EndStructure.Tailing[1] = 0;
   Smbios30EntryPointStructure->TableMaximumSize = (UINT32) (Smbios30EntryPointStructure->TableMaximumSize + sizeof (EndStructure));
 
-  if ((UINTN) EFI_SIZE_TO_PAGES (Smbios30EntryPointStructure->TableMaximumSize) > mPre64BitAllocatedPages) {
+  if (EFI_SIZE_TO_PAGES (Smbios30EntryPointStructure->TableMaximumSize) > mPre64BitAllocatedPages) {
     //
     // If new SMBIOS table size exceeds the previous allocated page, 
     // it is time to re-allocate memory at anywhere.

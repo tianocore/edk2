@@ -399,7 +399,7 @@ ConvertProcessorToString (
 
   if (Base10Exponent >= 6) {
     FreqMhz = ProcessorFrequency;
-    for (Index = 0; Index < (UINTN) (Base10Exponent - 6); Index++) {
+    for (Index = 0; Index < (UINT32) Base10Exponent - 6; Index++) {
       FreqMhz *= 10;
     }
   } else {

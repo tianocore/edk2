@@ -1,7 +1,7 @@
 /** @file
   Var Check Hii handler.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -94,7 +94,7 @@ VarCheckHiiQuestion (
   UINT8    Index;
   UINT8    MaxContainers;
 
-  if ((UINTN) (HiiQuestion->VarOffset + HiiQuestion->StorageWidth) > DataSize) {
+  if (((UINT32) HiiQuestion->VarOffset + HiiQuestion->StorageWidth) > DataSize) {
     DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, DataSize));
     return FALSE;
   }
@@ -155,7 +155,7 @@ VarCheckHiiQuestion (
 
     case EFI_IFR_ORDERED_LIST_OP:
       MaxContainers = ((VAR_CHECK_HII_QUESTION_ORDEREDLIST *) HiiQuestion)->MaxContainers;
-      if ((UINTN) (HiiQuestion->VarOffset + HiiQuestion->StorageWidth * MaxContainers) > DataSize) {
+      if (((UINT32) HiiQuestion->VarOffset + HiiQuestion->StorageWidth * MaxContainers) > DataSize) {
         DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x) * MaxContainers(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, MaxContainers, DataSize));
         return FALSE;
       }

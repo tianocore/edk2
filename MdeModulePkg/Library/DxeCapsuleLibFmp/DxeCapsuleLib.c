@@ -585,7 +585,7 @@ DisplayCapsuleImage (
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
 
   ImagePayload = (DISPLAY_DISPLAY_PAYLOAD *)(CapsuleHeader + 1);
-  PayloadSize = (UINTN)(CapsuleHeader->CapsuleImageSize - sizeof(EFI_CAPSULE_HEADER));
+  PayloadSize = CapsuleHeader->CapsuleImageSize - sizeof(EFI_CAPSULE_HEADER);
 
   if (ImagePayload->Version != 1) {
     return EFI_UNSUPPORTED;
@@ -733,7 +733,7 @@ DumpFmpCapsule (
   for (Index = 0; Index < FmpCapsuleHeader->EmbeddedDriverCount; Index++) {
     DEBUG((DEBUG_VERBOSE, "  ItemOffsetList[%d]      - 0x%lx\n", Index, ItemOffsetList[Index]));
   }
-  for (; Index < (UINTN)(FmpCapsuleHeader->EmbeddedDriverCount + FmpCapsuleHeader->PayloadItemCount); Index++) {
+  for (; Index < (UINT32)FmpCapsuleHeader->EmbeddedDriverCount + FmpCapsuleHeader->PayloadItemCount; Index++) {
     DEBUG((DEBUG_VERBOSE, "  ItemOffsetList[%d]      - 0x%lx\n", Index, ItemOffsetList[Index]));
     ImageHeader = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER *)((UINT8 *)FmpCapsuleHeader + ItemOffsetList[Index]);
 

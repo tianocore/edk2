@@ -2,7 +2,7 @@
 
   The XHCI register operation routines.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -112,7 +112,7 @@ XhcReadOpReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->CapLength + Offset),
+                             Xhc->CapLength + Offset,
                              1,
                              &Data
                              );
@@ -148,7 +148,7 @@ XhcWriteOpReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->CapLength + Offset),
+                             Xhc->CapLength + Offset,
                              1,
                              &Data
                              );
@@ -181,7 +181,7 @@ XhcWriteOpReg16 (
                              Xhc->PciIo,
                              EfiPciIoWidthUint16,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->CapLength + Offset),
+                             Xhc->CapLength + Offset,
                              1,
                              &Data
                              );
@@ -215,7 +215,7 @@ XhcReadDoorBellReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->DBOff + Offset),
+                             Xhc->DBOff + Offset,
                              1,
                              &Data
                              );
@@ -251,7 +251,7 @@ XhcWriteDoorBellReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->DBOff + Offset),
+                             Xhc->DBOff + Offset,
                              1,
                              &Data
                              );
@@ -285,7 +285,7 @@ XhcReadRuntimeReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->RTSOff + Offset),
+                             Xhc->RTSOff + Offset,
                              1,
                              &Data
                              );
@@ -321,7 +321,7 @@ XhcWriteRuntimeReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->RTSOff + Offset),
+                             Xhc->RTSOff + Offset,
                              1,
                              &Data
                              );
@@ -355,7 +355,7 @@ XhcReadExtCapReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->ExtCapRegBase + Offset),
+                             Xhc->ExtCapRegBase + Offset,
                              1,
                              &Data
                              );
@@ -391,7 +391,7 @@ XhcWriteExtCapReg (
                              Xhc->PciIo,
                              EfiPciIoWidthUint32,
                              XHC_BAR_INDEX,
-                             (UINT64) (Xhc->ExtCapRegBase + Offset),
+                             Xhc->ExtCapRegBase + Offset,
                              1,
                              &Data
                              );

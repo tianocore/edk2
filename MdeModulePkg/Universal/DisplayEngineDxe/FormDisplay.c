@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -540,7 +540,7 @@ GetLineByWidth (
   //
   // Need extra glyph info and '\0' info, so +2.
   //
-  *OutputString = AllocateZeroPool (((UINTN) (StrOffset + 2) * sizeof(CHAR16)));
+  *OutputString = AllocateZeroPool ((StrOffset + 2) * sizeof(CHAR16));
   if (*OutputString == NULL) {
     return 0;
   }
@@ -2972,7 +2972,7 @@ UiDisplayMenu (
         gST->ConOut->SetAttribute (gST->ConOut, GetInfoTextColor ());
         for (Index = 0; Index < HelpHeaderLine; Index++) {
           ASSERT (HelpHeaderLine == 1);
-          ASSERT (GetStringWidth (HelpHeaderString) / 2 < (UINTN) (gHelpBlockWidth - 1));
+          ASSERT (GetStringWidth (HelpHeaderString) / 2 < ((UINT32) gHelpBlockWidth - 1));
           PrintStringAtWithWidth (
             gStatementDimensions.RightColumn - gHelpBlockWidth,
             Index + TopRow,
@@ -3053,7 +3053,7 @@ UiDisplayMenu (
         gST->ConOut->SetAttribute (gST->ConOut, GetInfoTextColor ());
         for (Index = 0; Index < HelpBottomLine; Index++) {
           ASSERT (HelpBottomLine == 1);
-          ASSERT (GetStringWidth (HelpBottomString) / 2 < (UINTN) (gHelpBlockWidth - 1)); 
+          ASSERT (GetStringWidth (HelpBottomString) / 2 < ((UINT32) gHelpBlockWidth - 1));
           PrintStringAtWithWidth (
             gStatementDimensions.RightColumn - gHelpBlockWidth,
             BottomRow + Index - HelpBottomLine + 1,

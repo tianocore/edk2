@@ -846,12 +846,10 @@ GetPeCoffImageFixLoadingAssignedAddress(
    // Get PeHeader pointer
    //
    ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
-   SectionHeaderOffset = (UINTN)(
-                                 ImageContext->PeCoffHeaderOffset +
-                                 sizeof (UINT32) +
-                                 sizeof (EFI_IMAGE_FILE_HEADER) +
-                                 ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
-                                 );
+   SectionHeaderOffset = ImageContext->PeCoffHeaderOffset +
+                         sizeof (UINT32) +
+                         sizeof (EFI_IMAGE_FILE_HEADER) +
+                         ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader;
    NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
 
    //
@@ -1022,7 +1020,7 @@ ExecuteSmmCoreFromSmram (
   }
   
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
+  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
 
   //
   // Print debug message showing SMM Core load address.

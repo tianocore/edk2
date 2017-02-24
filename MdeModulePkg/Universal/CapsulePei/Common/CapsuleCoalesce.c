@@ -10,7 +10,7 @@
   into memory.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1247,7 +1247,7 @@ CapsuleDataCoalesce (
         //
         ASSERT (PrivateDataPtr->Signature == EFI_CAPSULE_PEIM_PRIVATE_DATA_SIGNATURE);
         ASSERT ((UINTN)DestPtr >= (UINTN)CapsuleImageBase);
-        PrivateDataPtr->CapsuleOffset[CapsuleIndex++] = (UINT64)((UINTN)DestPtr - (UINTN)CapsuleImageBase);
+        PrivateDataPtr->CapsuleOffset[CapsuleIndex++] = (UINTN)DestPtr - (UINTN)CapsuleImageBase;
       }
 
       //

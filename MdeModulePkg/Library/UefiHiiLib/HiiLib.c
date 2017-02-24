@@ -1874,7 +1874,7 @@ GetBlockDataInfo (
     //
     // Check whether VarBuffer is enough
     //
-    if ((UINTN) (Offset + Width) > MaxBufferSize) {
+    if ((UINT32)Offset + Width > MaxBufferSize) {
       DataBuffer = ReallocatePool (
                     MaxBufferSize,
                     Offset + Width + HII_LIB_DEFAULT_VARSTORE_SIZE,

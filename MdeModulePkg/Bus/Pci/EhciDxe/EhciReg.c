@@ -2,7 +2,7 @@
 
   The EHCI register operation routines.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -76,7 +76,7 @@ EhcReadDbgRegister (
                              Ehc->PciIo,
                              EfiPciIoWidthUint32,
                              Ehc->DebugPortBarNum,
-                             (UINT64) (Ehc->DebugPortOffset + Offset),
+                             Ehc->DebugPortOffset + Offset,
                              1,
                              &Data
                              );
@@ -115,7 +115,7 @@ EhcReadOpReg (
                              Ehc->PciIo,
                              EfiPciIoWidthUint32,
                              EHC_BAR_INDEX,
-                             (UINT64) (Ehc->CapLen + Offset),
+                             Ehc->CapLen + Offset,
                              1,
                              &Data
                              );
@@ -152,7 +152,7 @@ EhcWriteOpReg (
                              Ehc->PciIo,
                              EfiPciIoWidthUint32,
                              EHC_BAR_INDEX,
-                             (UINT64) (Ehc->CapLen + Offset),
+                             Ehc->CapLen + Offset,
                              1,
                              &Data
                              );

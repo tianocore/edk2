@@ -305,7 +305,7 @@ GetOpRomInfo (
     return EFI_NOT_FOUND;
   }
 
-  PciIoDevice->RomSize = (UINT64) ((~AllOnes) + 1);
+  PciIoDevice->RomSize = (~AllOnes) + 1;
   return EFI_SUCCESS;
 }
 

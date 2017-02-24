@@ -1,7 +1,7 @@
 /** @file
   Interface routines for PxeBc.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -353,8 +353,8 @@ EfiPxeBcStart (
   //
   // Configure block size for TFTP as a default value to handle all link layers.
   // 
-  Private->BlockSize   = (UINTN) (MIN (Private->Ip4MaxPacketSize, PXEBC_DEFAULT_PACKET_SIZE) - 
-                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE);
+  Private->BlockSize   = MIN (Private->Ip4MaxPacketSize, PXEBC_DEFAULT_PACKET_SIZE) -
+                           PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE;
   //
   // If PcdTftpBlockSize is set to non-zero, override the default value.
   //

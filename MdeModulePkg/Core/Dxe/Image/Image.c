@@ -313,8 +313,8 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
    //
    // Test if the memory is avalaible or not.
    // 
-   BaseOffsetPageNumber = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase - DxeCodeBase));
-   TopOffsetPageNumber  = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - DxeCodeBase));
+   BaseOffsetPageNumber = EFI_SIZE_TO_PAGES((UINT32)(ImageBase - DxeCodeBase));
+   TopOffsetPageNumber  = EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - DxeCodeBase));
    for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
      if ((mDxeCodeMemoryRangeUsageBitMap[Index / 64] & LShiftU64(1, (Index % 64))) != 0) {
        //
@@ -366,12 +366,10 @@ GetPeCoffImageFixLoadingAssignedAddress(
    //
    Handle = (IMAGE_FILE_HANDLE*)ImageContext->Handle;
    ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )Handle->Source + ImageContext->PeCoffHeaderOffset);
-   SectionHeaderOffset = (UINTN)(
-                                 ImageContext->PeCoffHeaderOffset +
-                                 sizeof (UINT32) +
-                                 sizeof (EFI_IMAGE_FILE_HEADER) +
-                                 ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
-                                 );
+   SectionHeaderOffset = ImageContext->PeCoffHeaderOffset +
+                         sizeof (UINT32) +
+                         sizeof (EFI_IMAGE_FILE_HEADER) +
+                         ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader;
    NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
 
    //

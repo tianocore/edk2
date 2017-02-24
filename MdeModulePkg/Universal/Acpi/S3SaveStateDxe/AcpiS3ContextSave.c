@@ -1,7 +1,7 @@
 /** @file
   This is the implementation to save ACPI S3 Context.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -401,9 +401,9 @@ S3AllocatePageTablesBuffer (
     // We need calculate whole page size then allocate once, because S3 restore page table does not know each page in Nvs.
     //
     if (!Page1GSupport) {
-      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded);
+      TotalPageTableSize = 1 + NumberOfPml4EntriesNeeded + NumberOfPml4EntriesNeeded * NumberOfPdpEntriesNeeded;
     } else {
-      TotalPageTableSize = (UINTN)(1 + NumberOfPml4EntriesNeeded);
+      TotalPageTableSize = 1 + NumberOfPml4EntriesNeeded;
     }
 
     TotalPageTableSize += ExtraPageTablePages;

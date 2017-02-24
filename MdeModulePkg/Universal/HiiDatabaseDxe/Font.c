@@ -2,7 +2,7 @@
 Implementation for EFI_HII_FONT_PROTOCOL.
 
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -411,7 +411,7 @@ GlyphToBlt (
   // The glyph's upper left hand corner pixel is the most significant bit of the
   // first bitmap byte.
   //
-  for (Ypos = 0; Ypos < Cell->Height && ((UINTN) (Ypos + YposOffset) < RowHeight); Ypos++) {
+  for (Ypos = 0; Ypos < Cell->Height && (((UINT32) Ypos + YposOffset) < RowHeight); Ypos++) {
     OffsetY = BITMAP_LEN_1_BIT (Cell->Width, Ypos);
 
     //
@@ -419,7 +419,7 @@ GlyphToBlt (
     //
     for (Xpos = 0; Xpos < Cell->Width / 8; Xpos++) {
       Data  = *(GlyphBuffer + OffsetY + Xpos);
-      for (Index = 0; Index < 8 && ((UINTN) (Xpos * 8 + Index + Cell->OffsetX) < RowWidth); Index++) {
+      for (Index = 0; Index < 8 && (((UINT32) Xpos * 8 + Index + Cell->OffsetX) < RowWidth); Index++) {
         if ((Data & (1 << (8 - Index - 1))) != 0) {
           BltBuffer[Ypos * ImageWidth + Xpos * 8 + Index] = Foreground;
         } else {
@@ -435,7 +435,7 @@ GlyphToBlt (
       // There are some padding bits in this byte. Ignore them.
       //
       Data  = *(GlyphBuffer + OffsetY + Xpos);
-      for (Index = 0; Index < Cell->Width % 8 && ((UINTN) (Xpos * 8 + Index + Cell->OffsetX) < RowWidth); Index++) {
+      for (Index = 0; Index < Cell->Width % 8 && (((UINT32) Xpos * 8 + Index + Cell->OffsetX) < RowWidth); Index++) {
         if ((Data & (1 << (8 - Index - 1))) != 0) {
           BltBuffer[Ypos * ImageWidth + Xpos * 8 + Index] = Foreground;
         } else {
@@ -1927,7 +1927,7 @@ HiiStringToImage (
     // If this character is the last character of a row, we need not
     // draw its (AdvanceX - Width - OffsetX) for next character.
     //
-    LineWidth -= (UINTN) (Cell[Index].AdvanceX - Cell[Index].Width - Cell[Index].OffsetX);
+    LineWidth -= (Cell[Index].AdvanceX - Cell[Index].Width - Cell[Index].OffsetX);
 
     //
     // Clip the right-most character if cannot fit when EFI_HII_OUT_FLAG_CLEAN_X is set.
@@ -1950,8 +1950,8 @@ HiiStringToImage (
         //
         // Don't draw the last char on this row. And, don't draw the second last char (AdvanceX - Width - OffsetX).
         //
-        LineWidth -= (UINTN) (Cell[Index].Width + Cell[Index].OffsetX);
-        LineWidth -= (UINTN) (Cell[Index - 1].AdvanceX - Cell[Index - 1].Width - Cell[Index - 1].OffsetX);
+        LineWidth -= (Cell[Index].Width + Cell[Index].OffsetX);
+        LineWidth -= (Cell[Index - 1].AdvanceX - Cell[Index - 1].Width - Cell[Index - 1].OffsetX);
         RowInfo[RowIndex].EndIndex       = Index - 1;
         RowInfo[RowIndex].LineWidth      = LineWidth;
         RowInfo[RowIndex].LineHeight     = LineHeight;
@@ -2008,7 +2008,7 @@ HiiStringToImage (
           if (Index1 == RowInfo[RowIndex].StartIndex) {
             LineWidth = 0;
           } else {
-            LineWidth -= (UINTN) (Cell[Index1 - 1].AdvanceX - Cell[Index1 - 1].Width - Cell[Index1 - 1].OffsetX);
+            LineWidth -= (Cell[Index1 - 1].AdvanceX - Cell[Index1 - 1].Width - Cell[Index1 - 1].OffsetX);
           }
           RowInfo[RowIndex].LineWidth = LineWidth;
         }
@@ -2025,8 +2025,8 @@ HiiStringToImage (
             //
             // Don't draw the last char on this row. And, don't draw the second last char (AdvanceX - Width - OffsetX).
             //
-            LineWidth -= (UINTN) (Cell[Index1].Width + Cell[Index1].OffsetX);
-            LineWidth -= (UINTN) (Cell[Index1 - 1].AdvanceX - Cell[Index1 - 1].Width - Cell[Index1 - 1].OffsetX);
+            LineWidth -= (Cell[Index1].Width + Cell[Index1].OffsetX);
+            LineWidth -= (Cell[Index1 - 1].AdvanceX - Cell[Index1 - 1].Width - Cell[Index1 - 1].OffsetX);
             RowInfo[RowIndex].EndIndex       = Index1 - 1;
             RowInfo[RowIndex].LineWidth      = LineWidth;
           } else {

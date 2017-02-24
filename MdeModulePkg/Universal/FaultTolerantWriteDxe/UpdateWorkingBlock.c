@@ -2,7 +2,7 @@
 
    Internal functions to operate Working Block Space.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -55,7 +55,7 @@ InitializeLocalWorkSpaceHeader (
     &gEdkiiWorkingBlockSignatureGuid,
     sizeof (EFI_GUID)
     );
-  mWorkingBlockHeader.WriteQueueSize = (UINT64) (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
+  mWorkingBlockHeader.WriteQueueSize = PcdGet32 (PcdFlashNvStorageFtwWorkingSize) - sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER);
 
   //
   // Crc is calculated with all the fields except Crc and STATE, so leave them as FTW_ERASED_BYTE.

@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -251,12 +251,10 @@ GetPeCoffImageFixLoadingAssignedAddress(
      SectionHeaderOffset = sizeof (EFI_TE_IMAGE_HEADER);
      NumberOfSections = ImgHdr->Te.NumberOfSections;
    } else {
-     SectionHeaderOffset = (UINTN)(
-                                 ImageContext->PeCoffHeaderOffset +
-                                 sizeof (UINT32) +
-                                 sizeof (EFI_IMAGE_FILE_HEADER) +
-                                 ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
-                                 );
+     SectionHeaderOffset = ImageContext->PeCoffHeaderOffset +
+                           sizeof (UINT32) +
+                           sizeof (EFI_IMAGE_FILE_HEADER) +
+                           ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader;
       NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
    }
    //

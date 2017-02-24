@@ -3,7 +3,7 @@
   on DxeCore Memory Allocation services for DxeCore,
   with memory profile support.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -258,7 +258,7 @@ InternalAllocateAlignedPages (
       Status = CoreFreePages (Memory, UnalignedPages);
       ASSERT_EFI_ERROR (Status);
     }
-    Memory         = (EFI_PHYSICAL_ADDRESS) (AlignedMemory + EFI_PAGES_TO_SIZE (Pages));
+    Memory         = AlignedMemory + EFI_PAGES_TO_SIZE (Pages);
     UnalignedPages = RealPages - Pages - UnalignedPages;
     if (UnalignedPages > 0) {
       //

@@ -5,7 +5,7 @@ ATA controllers in the platform.
 This PPI can be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
 for Atapi CD ROM device.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -593,7 +593,7 @@ AtapiEnumerateDevices (
       //
       // Pata & Sata, Primary & Secondary channel, Master & Slave device
       //
-      DevicePosition = (UINTN) (Index1 * 2 + Index2);
+      DevicePosition = Index1 * 2 + Index2;
 
       if (DiscoverAtapiDevice (AtapiBlkIoDev, DevicePosition, &MediaInfo, &MediaInfo2)) {
         //

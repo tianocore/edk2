@@ -1,7 +1,7 @@
 /** @file
   Contains code that implements the virtual machine.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2867,7 +2867,7 @@ ExecutePOPn (
   if (OPERAND1_INDIRECT (Operands)) {
     VmWriteMemN (VmPtr, (UINTN) (VmPtr->Gpr[OPERAND1_REGNUM (Operands)] + Index16), DataN);
   } else {
-    VmPtr->Gpr[OPERAND1_REGNUM (Operands)] = (INT64) (UINT64) ((UINTN) DataN + Index16);
+    VmPtr->Gpr[OPERAND1_REGNUM (Operands)] = (INT64) (UINT64) (UINTN) (DataN + Index16);
   }
 
   return EFI_SUCCESS;
@@ -3592,7 +3592,7 @@ ExecuteSUB (
   if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return (UINT64) ((INT64) ((INT64) Op1 - (INT64) Op2));
   } else {
-    return (UINT64) ((INT64) ((INT32) Op1 - (INT32) Op2));
+    return (UINT64) ((INT64) ((INT32) ((INT32) Op1 - (INT32) Op2)));
   }
 }
 
@@ -3620,7 +3620,7 @@ ExecuteMUL (
   if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return MultS64x64 ((INT64)Op1, (INT64)Op2);
   } else {
-    return (UINT64) ((INT64) ((INT32) Op1 * (INT32) Op2));
+    return (UINT64) ((INT64) ((INT32) ((INT32) Op1 * (INT32) Op2)));
   }
 }
 
@@ -3648,7 +3648,7 @@ ExecuteMULU (
   if ((*VmPtr->Ip & DATAMANIP_M_64) != 0) {
     return MultU64x64 (Op1, Op2);
   } else {
-    return (UINT64) ((UINT32) Op1 * (UINT32) Op2);
+    return (UINT64) ((UINT32) ((UINT32) Op1 * (UINT32) Op2));
   }
 }
 

@@ -413,11 +413,11 @@ BmCharToUint (
   )
 {
   if ((Char >= L'0') && (Char <= L'9')) {
-    return (UINTN) (Char - L'0');
+    return (Char - L'0');
   }
 
   if ((Char >= L'A') && (Char <= L'F')) {
-    return (UINTN) (Char - L'A' + 0xA);
+    return (Char - L'A' + 0xA);
   }
 
   ASSERT (FALSE);

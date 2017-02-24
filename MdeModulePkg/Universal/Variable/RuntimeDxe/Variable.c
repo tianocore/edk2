@@ -3754,8 +3754,8 @@ InitNonVolatileVariableStore (
     return EFI_VOLUME_CORRUPTED;
   }
 
-  VariableStoreBase = (EFI_PHYSICAL_ADDRESS) ((UINTN) FvHeader + FvHeader->HeaderLength);
-  VariableStoreLength = (UINT64) (NvStorageSize - FvHeader->HeaderLength);
+  VariableStoreBase = (UINTN) FvHeader + FvHeader->HeaderLength;
+  VariableStoreLength = NvStorageSize - FvHeader->HeaderLength;
 
   mNvFvHeaderCache = FvHeader;
   mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
@@ -4099,7 +4099,7 @@ VariableCommonInitialize (
   GuidHob = GetFirstGuidHob (VariableGuid);
   if (GuidHob != NULL) {
     VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
-    VariableStoreLength = (UINT64) (GuidHob->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE));
+    VariableStoreLength = GuidHob->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE);
     if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
       mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
       if (mVariableModuleGlobal->VariableGlobal.HobVariableBase == 0) {

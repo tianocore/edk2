@@ -28,7 +28,7 @@
   Depex - Dependency Expresion.
 
   Copyright (c) 2014, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -183,8 +183,8 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
    //
    // Test if the memory is avalaible or not.
    // 
-   BaseOffsetPageNumber = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase - SmmCodeBase));
-   TopOffsetPageNumber  = (UINTN)EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - SmmCodeBase));
+   BaseOffsetPageNumber = EFI_SIZE_TO_PAGES((UINT32)(ImageBase - SmmCodeBase));
+   TopOffsetPageNumber  = EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - SmmCodeBase));
    for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
      if ((mSmmCodeMemoryRangeUsageBitMap[Index / 64] & LShiftU64(1, (Index % 64))) != 0) {
        //
@@ -234,12 +234,10 @@ GetPeCoffImageFixLoadingAssignedAddress(
   // Get PeHeader pointer
   //
   ImgHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8* )ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
-  SectionHeaderOffset = (UINTN)(
-                                 ImageContext->PeCoffHeaderOffset +
-                                 sizeof (UINT32) +
-                                 sizeof (EFI_IMAGE_FILE_HEADER) +
-                                 ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
-                                 );
+  SectionHeaderOffset = ImageContext->PeCoffHeaderOffset +
+                        sizeof (UINT32) +
+                        sizeof (EFI_IMAGE_FILE_HEADER) +
+                        ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader;
   NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
 
   //
@@ -520,7 +518,7 @@ SmmLoadImage (
   // Align buffer on section boundary
   //
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
+  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
 
   //
   // Load the image to our new buffer
