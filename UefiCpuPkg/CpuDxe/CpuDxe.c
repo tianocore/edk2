@@ -1075,6 +1075,11 @@ AddLocalApicMemorySpace (
   Status = AddMemoryMappedIoSpace (BaseAddress, SIZE_4KB, EFI_MEMORY_UC);
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Try to allocate APIC memory mapped space, does not check return 
+  // status because it may be allocated by other driver, or DXE Core if
+  // this range is built into Memory Allocation HOB.
+  //
   Status = gDS->AllocateMemorySpace (
                   EfiGcdAllocateAddress,
                   EfiGcdMemoryTypeMemoryMappedIo,
@@ -1084,7 +1089,10 @@ AddLocalApicMemorySpace (
                   ImageHandle,
                   NULL
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a: %a: AllocateMemorySpace() Status - %r\n",
+                         gEfiCallerBaseName, __FUNCTION__, Status));
+  }
 }
 
 /**
