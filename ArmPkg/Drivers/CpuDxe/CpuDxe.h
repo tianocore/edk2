@@ -37,6 +37,7 @@
 #include <Protocol/DebugSupportPeriodicCallback.h>
 #include <Protocol/LoadedImage.h>
 
+extern BOOLEAN mIsFlushingGCD;
 
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor

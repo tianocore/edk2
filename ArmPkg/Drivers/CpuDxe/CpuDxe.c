@@ -17,6 +17,7 @@
 
 #include <Guid/IdleLoopEvent.h>
 
+BOOLEAN                   mIsFlushingGCD;
 
 /**
   This function flushes the range of addresses from Start to Start+Length
@@ -261,7 +262,9 @@ CpuDxeInitialize (
   // and that calls EFI_CPU_ARCH_PROTOCOL.SetMemoryAttributes, so this code needs to go
   // after the protocol is installed
   //
+  mIsFlushingGCD = TRUE;
   SyncCacheConfig (&mCpu);
+  mIsFlushingGCD = FALSE;
 
   // If the platform is a MPCore system then install the Configuration Table describing the
   // secondary core states

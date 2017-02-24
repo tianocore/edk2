@@ -188,6 +188,10 @@ CpuSetMemoryAttributes (
   UINTN       RegionLength;
   UINTN       RegionArmAttributes;
 
+  if (mIsFlushingGCD) {
+    return EFI_SUCCESS;
+  }
+
   if ((BaseAddress & (SIZE_4KB - 1)) != 0) {
     // Minimum granularity is SIZE_4KB (4KB on ARM)
     DEBUG ((EFI_D_PAGE, "CpuSetMemoryAttributes(%lx, %lx, %lx): Minimum ganularity is SIZE_4KB\n", BaseAddress, Length, EfiAttributes));
