@@ -535,7 +535,7 @@ DxeCorePerformanceLibConstructor (
 
   InternalGetPeiPerformance ();
 
-  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, &PerformanceProperty);
+  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
   if (EFI_ERROR (Status)) {
     //
     // Install configuration table for performance property.
