@@ -368,11 +368,6 @@
   # Shell.
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
 
-  #
-  # ARM Pcds
-  #
-  gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
   # GUID of the UEFI Shell

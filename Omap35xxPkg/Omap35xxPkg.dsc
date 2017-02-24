@@ -162,11 +162,6 @@
   # OMAP Interrupt Controller
   gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress|0x48200000
 
-  #
-  # ARM Pcds
-  #
-  gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
