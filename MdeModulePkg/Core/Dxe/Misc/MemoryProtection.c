@@ -533,7 +533,15 @@ ProtectUefiImageCommon (
       Name[7]
       ));
 
-    if ((Section[Index].Characteristics & EFI_IMAGE_SCN_CNT_CODE) != 0) {
+    //
+    // Instead of assuming that a PE/COFF section of type EFI_IMAGE_SCN_CNT_CODE
+    // can always be mapped read-only, classify a section as a code section only
+    // if it has the executable attribute set and the writable attribute cleared.
+    //
+    // This adheres more closely to the PE/COFF spec, and avoids issues with
+    // Linux OS loaders that may consist of a single read/write/execute section.
+    //
+    if ((Section[Index].Characteristics & (EFI_IMAGE_SCN_MEM_WRITE | EFI_IMAGE_SCN_MEM_EXECUTE)) == EFI_IMAGE_SCN_MEM_EXECUTE) {
       DEBUG ((DEBUG_VERBOSE, "  VirtualSize          - 0x%08x\n", Section[Index].Misc.VirtualSize));
       DEBUG ((DEBUG_VERBOSE, "  VirtualAddress       - 0x%08x\n", Section[Index].VirtualAddress));
       DEBUG ((DEBUG_VERBOSE, "  SizeOfRawData        - 0x%08x\n", Section[Index].SizeOfRawData));
