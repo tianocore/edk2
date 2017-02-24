@@ -4797,6 +4797,10 @@ class FdfParser:
 
         return False
 
+    def GetAllIncludedFile (self):
+        global AllIncludeFileList
+        return AllIncludeFileList
+
 if __name__ == "__main__":
     import sys
     try:

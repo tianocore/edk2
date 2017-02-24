@@ -42,6 +42,7 @@ from GenPcdDb import CreatePcdDatabaseCode
 from Workspace.MetaFileCommentParser import UsageList
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import InfSectionParser
+import datetime
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -640,6 +641,41 @@ class WorkspaceAutoGen(AutoGen):
         self._MakeFileDir = None
         self._BuildCommand = None
 
+        #
+        # Create BuildOptions Macro & PCD metafile.
+        #
+        content = 'gCommandLineDefines: '
+        content += str(GlobalData.gCommandLineDefines)
+        content += os.linesep
+        content += 'BuildOptionPcd: '
+        content += str(GlobalData.BuildOptionPcd)
+        SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
+
+        #
+        # Get set of workspace metafiles
+        #
+        AllWorkSpaceMetaFiles = self._GetMetaFiles(Target, Toolchain, Arch)
+
+        #
+        # Retrieve latest modified time of all metafiles
+        #
+        SrcTimeStamp = 0
+        for f in AllWorkSpaceMetaFiles:
+            if os.stat(f)[8] > SrcTimeStamp:
+                SrcTimeStamp = os.stat(f)[8]
+        self._SrcTimeStamp = SrcTimeStamp
+
+        #
+        # Write metafile list to build directory
+        #
+        AutoGenFilePath = os.path.join(self.BuildDir, 'AutoGen')
+        if os.path.exists (AutoGenFilePath):
+            os.remove(AutoGenFilePath)
+        if not os.path.exists(self.BuildDir):
+            os.makedirs(self.BuildDir)
+        with open(os.path.join(self.BuildDir, 'AutoGen'), 'w+') as file:
+            for f in AllWorkSpaceMetaFiles:
+                print >> file, f
         return True
 
     def _BuildOptionPcdValueFormat(self, TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
@@ -667,6 +703,45 @@ class WorkspaceAutoGen(AutoGen):
             elif Value == 'FALSE' or Value == '0':
                 Value = '0'
         return  Value
+
+    def _GetMetaFiles(self, Target, Toolchain, Arch):
+        AllWorkSpaceMetaFiles = set()
+        #
+        # add fdf
+        #
+        if self.FdfFile:
+            AllWorkSpaceMetaFiles.add (self.FdfFile.Path)
+            if self.FdfFile:
+                FdfFiles = GlobalData.gFdfParser.GetAllIncludedFile()
+                for f in FdfFiles:
+                    AllWorkSpaceMetaFiles.add (f.FileName)
+        #
+        # add dsc
+        #
+        AllWorkSpaceMetaFiles.add(self.MetaFile.Path)
+
+        #
+        # add BuildOption metafile
+        #
+        AllWorkSpaceMetaFiles.add(os.path.join(self.BuildDir, 'BuildOptions'))
+
+        for Arch in self.ArchList:
+            Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
+            PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
+
+            #
+            # add dec
+            #
+            for Package in PGen.PackageList:
+                AllWorkSpaceMetaFiles.add(Package.MetaFile.Path)
+
+            #
+            # add included dsc
+            #
+            for filePath in Platform._RawData.IncludedFiles:
+                AllWorkSpaceMetaFiles.add(filePath.Path)
+
+        return AllWorkSpaceMetaFiles
 
     ## _CheckDuplicateInFV() method
     #
@@ -2532,6 +2607,10 @@ class PlatformAutoGen(AutoGen):
 # to the [depex] section in module's inf file.
 #
 class ModuleAutoGen(AutoGen):
+    ## Cache the timestamps of metafiles of every module in a class variable
+    #
+    TimeDict = {}
+
     ## The real constructor of ModuleAutoGen
     #
     #  This method is not supposed to be called by users of ModuleAutoGen. It's
@@ -2632,6 +2711,11 @@ class ModuleAutoGen(AutoGen):
         self._FinalBuildTargetList    = None
         self._FileTypes               = None
         self._BuildRules              = None
+
+        self._TimeStampPath           = None
+
+        self.AutoGenDepSet = set()
+
         
         ## The Modules referenced to this Library
         #  Only Library has this attribute
@@ -3968,6 +4052,8 @@ class ModuleAutoGen(AutoGen):
 
         if self.IsMakeFileCreated:
             return
+        if self.CanSkip():
+            return
 
         if not self.IsLibrary and CreateLibraryMakeFile:
             for LibraryAutoGen in self.LibraryAutoGenList:
@@ -3984,6 +4070,7 @@ class ModuleAutoGen(AutoGen):
             EdkLogger.debug(EdkLogger.DEBUG_9, "Skipped the generation of makefile for module %s [%s]" %
                             (self.Name, self.Arch))
 
+        self.CreateTimeStamp(Makefile)
         self.IsMakeFileCreated = True
 
     def CopyBinaryFiles(self):
@@ -3998,6 +4085,8 @@ class ModuleAutoGen(AutoGen):
     #
     def CreateCodeFile(self, CreateLibraryCodeFile=True):
         if self.IsCodeFileCreated:
+            return
+        if self.CanSkip():
             return
 
         # Need to generate PcdDatabase even PcdDriver is binarymodule
@@ -4077,6 +4166,53 @@ class ModuleAutoGen(AutoGen):
                     for Lib in La.CodaTargetList:
                         self._ApplyBuildRule(Lib.Target, TAB_UNKNOWN_FILE)
         return self._LibraryAutoGenList
+
+    ## Decide whether we can skip the ModuleAutoGen process
+    #  If any source file is newer than the modeule than we cannot skip
+    #
+    def CanSkip(self):
+        if not os.path.exists(self.GetTimeStampPath()):
+            return False
+        #last creation time of the module
+        DstTimeStamp = os.stat(self.GetTimeStampPath())[8]
+
+        SrcTimeStamp = self.Workspace._SrcTimeStamp
+        if SrcTimeStamp > DstTimeStamp:
+            return False
+
+        with open(self.GetTimeStampPath(),'r') as f:
+            for source in f:
+                source = source.rstrip('\n')
+                if source not in ModuleAutoGen.TimeDict :
+                    ModuleAutoGen.TimeDict[source] = os.stat(source)[8]
+                if ModuleAutoGen.TimeDict[source] > DstTimeStamp:
+                    return False
+        return True
+
+    def GetTimeStampPath(self):
+        if self._TimeStampPath == None:
+            self._TimeStampPath = os.path.join(self.MakeFileDir, 'AutoGenTimeStamp')
+        return self._TimeStampPath
+    def CreateTimeStamp(self, Makefile):
+
+        FileSet = set()
+
+        FileSet.add (self.MetaFile.Path)
+
+        for SourceFile in self.Module.Sources:
+            FileSet.add (SourceFile.Path)
+
+        for Lib in self.DependentLibraryList:
+            FileSet.add (Lib.MetaFile.Path)
+
+        for f in self.AutoGenDepSet:
+            FileSet.add (f.Path)
+
+        if os.path.exists (self.GetTimeStampPath()):
+            os.remove (self.GetTimeStampPath())
+        with open(self.GetTimeStampPath(), 'w+') as file:
+            for f in FileSet:
+                print >> file, f
 
     Module          = property(_GetModule)
     Name            = property(_GetBaseName)

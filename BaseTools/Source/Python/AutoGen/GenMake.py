@@ -801,6 +801,9 @@ cleanlib:
             if not self.FileDependency[File]:
                 self.FileDependency[File] = ['$(FORCE_REBUILD)']
                 continue
+
+            self._AutoGenObject.AutoGenDepSet |= set(self.FileDependency[File])
+
             # skip non-C files
             if File.Ext not in [".c", ".C"] or File.Name == "AutoGen.c":
                 continue

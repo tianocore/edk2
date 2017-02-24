@@ -859,6 +859,8 @@ class DscParser(MetaFileParser):
 
     SymbolPattern = ValueExpression.SymbolPattern
 
+    IncludedFiles = set()
+
     ## Constructor of DscParser
     #
     #  Initialize object of DscParser
@@ -1500,6 +1502,8 @@ class DscParser(MetaFileParser):
             Owner = self._Content[self._ContentIndex - 1][0]
             Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
                                Owner=Owner, From=Owner)
+
+            self.IncludedFiles.add (IncludedFile1)
 
             # Does not allow lower level included file to include upper level included file
             if Parser._From != Owner and int(Owner) > int (Parser._From):
