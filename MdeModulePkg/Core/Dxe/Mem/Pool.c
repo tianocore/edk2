@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeMain.h"
 #include "Imem.h"
 
+STATIC EFI_LOCK mPoolMemoryLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+
 #define POOL_FREE_SIGNATURE   SIGNATURE_32('p','f','r','0')
 typedef struct {
   UINT32          Signature;
@@ -239,13 +241,13 @@ CoreInternalAllocatePool (
   //
   // Acquire the memory lock and make the allocation
   //
-  Status = CoreAcquireLockOrFail (&gMemoryLock);
+  Status = CoreAcquireLockOrFail (&mPoolMemoryLock);
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   *Buffer = CoreAllocatePoolI (PoolType, Size);
-  CoreReleaseMemoryLock ();
+  CoreReleaseLock (&mPoolMemoryLock);
   return (*Buffer != NULL) ? EFI_SUCCESS : EFI_OUT_OF_RESOURCES;
 }
 
@@ -289,6 +291,28 @@ CoreAllocatePool (
   return Status;
 }
 
+STATIC
+VOID *
+CoreAllocatePoolPagesI (
+  IN EFI_MEMORY_TYPE    PoolType,
+  IN UINTN              NoPages,
+  IN UINTN              Granularity
+  )
+{
+  VOID        *Buffer;
+  EFI_STATUS  Status;
+
+  Status = CoreAcquireLockOrFail (&gMemoryLock);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  Buffer = CoreAllocatePoolPages (PoolType, NoPages, Granularity);
+  CoreReleaseMemoryLock ();
+
+  return Buffer;
+}
+
 /**
   Internal function to allocate pool of a particular type.
   Caller must have the memory lock held
@@ -317,7 +341,7 @@ CoreAllocatePoolI (
   UINTN       NoPages;
   UINTN       Granularity;
 
-  ASSERT_LOCKED (&gMemoryLock);
+  ASSERT_LOCKED (&mPoolMemoryLock);
 
   if  (PoolType == EfiACPIReclaimMemory   ||
        PoolType == EfiACPIMemoryNVS       ||
@@ -355,7 +379,7 @@ CoreAllocatePoolI (
   if (Index >= SIZE_TO_LIST (Granularity)) {
     NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
     NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
-    Head = CoreAllocatePoolPages (PoolType, NoPages, Granularity);
+    Head = CoreAllocatePoolPagesI (PoolType, NoPages, Granularity);
     goto Done;
   }
 
@@ -383,7 +407,7 @@ CoreAllocatePoolI (
     //
     // Get another page
     //
-    NewPage = CoreAllocatePoolPages(PoolType, EFI_SIZE_TO_PAGES (Granularity), Granularity);
+    NewPage = CoreAllocatePoolPagesI (PoolType, EFI_SIZE_TO_PAGES (Granularity), Granularity);
     if (NewPage == NULL) {
       goto Done;
     }
@@ -486,9 +510,9 @@ CoreInternalFreePool (
     return EFI_INVALID_PARAMETER;
   }
 
-  CoreAcquireMemoryLock ();
+  CoreAcquireLock (&mPoolMemoryLock);
   Status = CoreFreePoolI (Buffer, PoolType);
-  CoreReleaseMemoryLock ();
+  CoreReleaseLock (&mPoolMemoryLock);
   return Status;
 }
 
@@ -523,6 +547,19 @@ CoreFreePool (
     InstallMemoryAttributesTableOnMemoryAllocation (PoolType);
   }
   return Status;
+}
+
+STATIC
+VOID
+CoreFreePoolPagesI (
+  IN EFI_MEMORY_TYPE        PoolType,
+  IN EFI_PHYSICAL_ADDRESS   Memory,
+  IN UINTN                  NoPages
+  )
+{
+  CoreAcquireMemoryLock ();
+  CoreFreePoolPages (Memory, NoPages);
+  CoreReleaseMemoryLock ();
 }
 
 /**
@@ -573,7 +610,7 @@ CoreFreePoolI (
   //
   ASSERT (Tail->Signature == POOL_TAIL_SIGNATURE);
   ASSERT (Head->Size == Tail->Size);
-  ASSERT_LOCKED (&gMemoryLock);
+  ASSERT_LOCKED (&mPoolMemoryLock);
 
   if (Tail->Signature != POOL_TAIL_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
@@ -624,7 +661,7 @@ CoreFreePoolI (
     //
     NoPages = EFI_SIZE_TO_PAGES(Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
     NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
-    CoreFreePoolPages ((EFI_PHYSICAL_ADDRESS) (UINTN) Head, NoPages);
+    CoreFreePoolPagesI (Pool->MemoryType, (EFI_PHYSICAL_ADDRESS) (UINTN) Head, NoPages);
 
   } else {
 
@@ -680,7 +717,8 @@ CoreFreePoolI (
         //
         // Free the page
         //
-        CoreFreePoolPages ((EFI_PHYSICAL_ADDRESS) (UINTN)NewPage, EFI_SIZE_TO_PAGES (Granularity));
+        CoreFreePoolPagesI (Pool->MemoryType, (EFI_PHYSICAL_ADDRESS) (UINTN)NewPage,
+          EFI_SIZE_TO_PAGES (Granularity));
       }
     }
   }
