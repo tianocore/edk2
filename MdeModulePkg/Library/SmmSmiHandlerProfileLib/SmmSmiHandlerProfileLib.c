@@ -99,7 +99,7 @@ SmmSmiHandlerProfileLibConstructor (
   gSmst->SmmLocateProtocol (
            &gSmiHandlerProfileGuid,
            NULL,
-           &mSmiHandlerProfile
+           (VOID **) &mSmiHandlerProfile
            );
   return EFI_SUCCESS;
 }
