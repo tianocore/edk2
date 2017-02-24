@@ -5,7 +5,7 @@
 #  and other configuration parameters from DHCPv6 servers.
 #
 #  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -74,6 +74,8 @@
   gEfiDhcp6ProtocolGuid                              ## BY_START
   gEfiIp6ConfigProtocolGuid                          ## TO_START
 
+[Guids]  
+  gZeroGuid                   ## SOMETIMES_CONSUMES   ## GUID
  
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType       ## SOMETIMES_CONSUMES
