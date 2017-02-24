@@ -64,7 +64,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define DO_NOT_PROTECT                         0x00000000
 #define PROTECT_IF_ALIGNED_ELSE_ALLOW          0x00000001
 
+#define MEMORY_TYPE_OS_RESERVED_MIN            0x80000000
+#define MEMORY_TYPE_OEM_RESERVED_MIN           0x70000000
+
+#define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
+  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
+
 UINT32   mImageProtectionPolicy;
+
+extern LIST_ENTRY         mGcdMemorySpaceMap;
 
 /**
   Sort code section in image record, based upon CodeSegmentBase from low to high.
@@ -647,6 +655,251 @@ UnprotectUefiImage (
 }
 
 /**
+  Return the EFI memory permission attribute associated with memory
+  type 'MemoryType' under the configured DXE memory protection policy.
+**/
+STATIC
+UINT64
+GetPermissionAttributeForMemoryType (
+  IN EFI_MEMORY_TYPE    MemoryType
+  )
+{
+  UINT64 TestBit;
+
+  if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
+    TestBit = BIT63;
+  } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
+    TestBit = BIT62;
+  } else {
+    TestBit = LShiftU64 (1, MemoryType);
+  }
+
+  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
+    return EFI_MEMORY_XP;
+  } else {
+    return 0;
+  }
+}
+
+/**
+  Sort memory map entries based upon PhysicalStart, from low to high.
+
+  @param  MemoryMap              A pointer to the buffer in which firmware places
+                                 the current memory map.
+  @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
+  @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+**/
+STATIC
+VOID
+SortMemoryMap (
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  IN UINTN                      MemoryMapSize,
+  IN UINTN                      DescriptorSize
+  )
+{
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *NextMemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEnd;
+  EFI_MEMORY_DESCRIPTOR       TempMemoryMap;
+
+  MemoryMapEntry = MemoryMap;
+  NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + MemoryMapSize);
+  while (MemoryMapEntry < MemoryMapEnd) {
+    while (NextMemoryMapEntry < MemoryMapEnd) {
+      if (MemoryMapEntry->PhysicalStart > NextMemoryMapEntry->PhysicalStart) {
+        CopyMem (&TempMemoryMap, MemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
+        CopyMem (MemoryMapEntry, NextMemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
+        CopyMem (NextMemoryMapEntry, &TempMemoryMap, sizeof(EFI_MEMORY_DESCRIPTOR));
+      }
+
+      NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+    }
+
+    MemoryMapEntry      = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+    NextMemoryMapEntry  = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  }
+}
+
+/**
+  Merge adjacent memory map entries if they use the same memory protection policy
+
+  @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
+                                          the current memory map.
+  @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
+                                          MemoryMap buffer. On input, this is the size of
+                                          the current memory map.  On output,
+                                          it is the size of new memory map after merge.
+  @param[in]       DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+**/
+STATIC
+VOID
+MergeMemoryMapForProtectionPolicy (
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  IN OUT UINTN                  *MemoryMapSize,
+  IN UINTN                      DescriptorSize
+  )
+{
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *MemoryMapEnd;
+  UINT64                      MemoryBlockLength;
+  EFI_MEMORY_DESCRIPTOR       *NewMemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR       *NextMemoryMapEntry;
+  UINT64                      Attributes;
+
+  SortMemoryMap (MemoryMap, *MemoryMapSize, DescriptorSize);
+
+  MemoryMapEntry = MemoryMap;
+  NewMemoryMapEntry = MemoryMap;
+  MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + *MemoryMapSize);
+  while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
+    CopyMem (NewMemoryMapEntry, MemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
+    NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+
+    do {
+      MemoryBlockLength = (UINT64) (EFI_PAGES_TO_SIZE((UINTN)MemoryMapEntry->NumberOfPages));
+      Attributes = GetPermissionAttributeForMemoryType (MemoryMapEntry->Type);
+
+      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
+          Attributes == GetPermissionAttributeForMemoryType (NextMemoryMapEntry->Type) &&
+          ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart)) {
+        MemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        if (NewMemoryMapEntry != MemoryMapEntry) {
+          NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        }
+
+        NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        continue;
+      } else {
+        MemoryMapEntry = PREVIOUS_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        break;
+      }
+    } while (TRUE);
+
+    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+    NewMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NewMemoryMapEntry, DescriptorSize);
+  }
+
+  *MemoryMapSize = (UINTN)NewMemoryMapEntry - (UINTN)MemoryMap;
+
+  return ;
+}
+
+
+/**
+  Remove exec permissions from all regions whose type is identified by
+  PcdDxeNxMemoryProtectionPolicy
+**/
+STATIC
+VOID
+InitializeDxeNxMemoryProtectionPolicy (
+  VOID
+  )
+{
+  UINTN                             MemoryMapSize;
+  UINTN                             MapKey;
+  UINTN                             DescriptorSize;
+  UINT32                            DescriptorVersion;
+  EFI_MEMORY_DESCRIPTOR             *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR             *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR             *MemoryMapEnd;
+  EFI_STATUS                        Status;
+  UINT64                            Attributes;
+  LIST_ENTRY                        *Link;
+  EFI_GCD_MAP_ENTRY                 *Entry;
+
+  //
+  // Get the EFI memory map.
+  //
+  MemoryMapSize = 0;
+  MemoryMap     = NULL;
+
+  Status = gBS->GetMemoryMap (
+                  &MemoryMapSize,
+                  MemoryMap,
+                  &MapKey,
+                  &DescriptorSize,
+                  &DescriptorVersion
+                  );
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  do {
+    MemoryMap = (EFI_MEMORY_DESCRIPTOR *) AllocatePool (MemoryMapSize);
+    ASSERT (MemoryMap != NULL);
+    Status = gBS->GetMemoryMap (
+                    &MemoryMapSize,
+                    MemoryMap,
+                    &MapKey,
+                    &DescriptorSize,
+                    &DescriptorVersion
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (MemoryMap);
+    }
+  } while (Status == EFI_BUFFER_TOO_SMALL);
+  ASSERT_EFI_ERROR (Status);
+
+  DEBUG((DEBUG_ERROR, "%a: applying strict permissions to active memory regions\n",
+    __FUNCTION__));
+
+  MergeMemoryMapForProtectionPolicy (MemoryMap, &MemoryMapSize, DescriptorSize);
+
+  MemoryMapEntry = MemoryMap;
+  MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *) ((UINT8 *) MemoryMap + MemoryMapSize);
+  while ((UINTN) MemoryMapEntry < (UINTN) MemoryMapEnd) {
+
+    Attributes = GetPermissionAttributeForMemoryType (MemoryMapEntry->Type);
+    if (Attributes != 0) {
+      SetUefiImageMemoryAttributes (
+        MemoryMapEntry->PhysicalStart,
+        EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages),
+        Attributes);
+    }
+    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  }
+  FreePool (MemoryMap);
+
+  //
+  // Apply the policy for RAM regions that we know are present and
+  // accessible, but have not been added to the UEFI memory map (yet).
+  //
+  if (GetPermissionAttributeForMemoryType (EfiConventionalMemory) != 0) {
+    DEBUG((DEBUG_ERROR,
+      "%a: applying strict permissions to inactive memory regions\n",
+      __FUNCTION__));
+
+    CoreAcquireGcdMemoryLock ();
+
+    Link = mGcdMemorySpaceMap.ForwardLink;
+    while (Link != &mGcdMemorySpaceMap) {
+
+      Entry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
+
+      if (Entry->GcdMemoryType == EfiGcdMemoryTypeReserved &&
+          Entry->EndAddress < MAX_ADDRESS &&
+          (Entry->Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+            (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)) {
+
+        Attributes = GetPermissionAttributeForMemoryType (EfiConventionalMemory) |
+                     (Entry->Attributes & CACHE_ATTRIBUTE_MASK);
+
+        DEBUG ((DEBUG_INFO,
+          "Untested GCD memory space region: - 0x%016lx - 0x%016lx (0x%016lx)\n",
+          Entry->BaseAddress, Entry->EndAddress - Entry->BaseAddress + 1,
+          Attributes));
+
+        ASSERT(gCpu != NULL);
+        gCpu->SetMemoryAttributes (gCpu, Entry->BaseAddress,
+          Entry->EndAddress - Entry->BaseAddress + 1, Attributes);
+      }
+
+      Link = Link->ForwardLink;
+    }
+    CoreReleaseGcdMemoryLock ();
+  }
+}
+
+
+/**
   A notification for CPU_ARCH protocol.
 
   @param[in]  Event                 Event whose notification function is being invoked.
@@ -671,6 +924,17 @@ MemoryProtectionCpuArchProtocolNotify (
   DEBUG ((DEBUG_INFO, "MemoryProtectionCpuArchProtocolNotify:\n"));
   Status = CoreLocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
   if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Apply the memory protection policy on non-BScode/RTcode regions.
+  //
+  if (PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0) {
+    InitializeDxeNxMemoryProtectionPolicy ();
+  }
+
+  if (mImageProtectionPolicy == 0) {
     return;
   }
 
@@ -753,7 +1017,19 @@ CoreInitializeMemoryProtection (
 
   mImageProtectionPolicy = PcdGet32(PcdImageProtectionPolicy);
 
-  if (mImageProtectionPolicy != 0) {
+  //
+  // Sanity check the PcdDxeNxMemoryProtectionPolicy setting:
+  // - code regions should have no EFI_MEMORY_XP attribute
+  // - EfiConventionalMemory and EfiBootServicesData should use the
+  //   same attribute
+  //
+  ASSERT ((GetPermissionAttributeForMemoryType (EfiBootServicesCode) & EFI_MEMORY_XP) == 0);
+  ASSERT ((GetPermissionAttributeForMemoryType (EfiRuntimeServicesCode) & EFI_MEMORY_XP) == 0);
+  ASSERT ((GetPermissionAttributeForMemoryType (EfiLoaderCode) & EFI_MEMORY_XP) == 0);
+  ASSERT (GetPermissionAttributeForMemoryType (EfiBootServicesData) ==
+          GetPermissionAttributeForMemoryType (EfiConventionalMemory));
+
+  if (mImageProtectionPolicy != 0 || PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0) {
     Status = CoreCreateEvent (
                EVT_NOTIFY_SIGNAL,
                TPL_CALLBACK,
@@ -774,4 +1050,97 @@ CoreInitializeMemoryProtection (
     ASSERT_EFI_ERROR(Status);
   }
   return ;
+}
+
+/**
+  Returns whether we are currently executing in SMM mode
+**/
+STATIC
+BOOLEAN
+IsInSmm (
+  VOID
+  )
+{
+  BOOLEAN     InSmm;
+
+  InSmm = FALSE;
+  if (gSmmBase2 != NULL) {
+    gSmmBase2->InSmm (gSmmBase2, &InSmm);
+  }
+  return InSmm;
+}
+
+/**
+  Manage memory permission attributes on a memory range, according to the
+  configured DXE memory protection policy.
+
+  @param  OldType           The old memory type of the range
+  @param  NewType           The new memory type of the range
+  @param  Memory            The base address of the range
+  @param  Length            The size of the range (in bytes)
+
+  @return EFI_SUCCESS       If we are executing in SMM mode. No permission attributes
+                            are updated in this case
+  @return EFI_SUCCESS       If the the CPU arch protocol is not installed yet
+  @return EFI_SUCCESS       If no DXE memory protection policy has been configured
+  @return EFI_SUCCESS       If OldType and NewType use the same permission attributes
+  @return other             Return value of gCpu->SetMemoryAttributes()
+
+**/
+EFI_STATUS
+EFIAPI
+ApplyMemoryProtectionPolicy (
+  IN  EFI_MEMORY_TYPE       OldType,
+  IN  EFI_MEMORY_TYPE       NewType,
+  IN  EFI_PHYSICAL_ADDRESS  Memory,
+  IN  UINT64                Length
+  )
+{
+  UINT64  OldAttributes;
+  UINT64  NewAttributes;
+
+  //
+  // The policy configured in PcdDxeNxMemoryProtectionPolicy
+  // does not apply to allocations performed in SMM mode.
+  //
+  if (IsInSmm ()) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // If the CPU arch protocol is not installed yet, we cannot manage memory
+  // permission attributes, and it is the job of the driver that installs this
+  // protocol to set the permissions on existing allocations.
+  //
+  if (gCpu == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Check if a DXE memory protection policy has been configured
+  //
+  if (PcdGet64 (PcdDxeNxMemoryProtectionPolicy) == 0) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Update the executable permissions according to the DXE memory
+  // protection policy, but only if
+  // - the policy is different between the old and the new type, or
+  // - this is a newly added region (OldType == EfiMaxMemoryType)
+  //
+  NewAttributes = GetPermissionAttributeForMemoryType (NewType);
+
+  if (OldType != EfiMaxMemoryType) {
+    OldAttributes = GetPermissionAttributeForMemoryType (OldType);
+    if (OldAttributes == NewAttributes) {
+      // policy is the same between OldType and NewType
+      return EFI_SUCCESS;
+    }
+  } else if (NewAttributes == 0) {
+    // newly added region of a type that does not require protection
+    return EFI_SUCCESS;
+  }
+
+  return gCpu->SetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
 }

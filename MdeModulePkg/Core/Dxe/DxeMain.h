@@ -2949,4 +2949,28 @@ MemoryProtectionExitBootServicesCallback (
   VOID
   );
 
+/**
+  Manage memory permission attributes on a memory range, according to the
+  configured DXE memory protection policy.
+
+  @param  OldType           The old memory type of the range
+  @param  NewType           The new memory type of the range
+  @param  Memory            The base address of the range
+  @param  Length            The size of the range (in bytes)
+
+  @return EFI_SUCCESS       If the the CPU arch protocol is not installed yet
+  @return EFI_SUCCESS       If no DXE memory protection policy has been configured
+  @return EFI_SUCCESS       If OldType and NewType use the same permission attributes
+  @return other             Return value of gCpu->SetMemoryAttributes()
+
+**/
+EFI_STATUS
+EFIAPI
+ApplyMemoryProtectionPolicy (
+  IN  EFI_MEMORY_TYPE       OldType,
+  IN  EFI_MEMORY_TYPE       NewType,
+  IN  EFI_PHYSICAL_ADDRESS  Memory,
+  IN  UINT64                Length
+  );
+
 #endif

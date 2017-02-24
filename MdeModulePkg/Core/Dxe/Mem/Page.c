@@ -553,6 +553,9 @@ CoreAddMemoryDescriptor (
   CoreFreeMemoryMapStack ();
   CoreReleaseMemoryLock ();
 
+  ApplyMemoryProtectionPolicy (EfiMaxMemoryType, Type, Start,
+    EFI_PAGES_TO_SIZE (NumberOfPages));
+
   //
   // If Loading Module At Fixed Address feature is enabled. try to allocate memory with Runtime code & Boot time code type
   //
@@ -1344,6 +1347,8 @@ CoreAllocatePages (
       NULL
       );
     InstallMemoryAttributesTableOnMemoryAllocation (MemoryType);
+    ApplyMemoryProtectionPolicy (EfiConventionalMemory, MemoryType, *Memory,
+      EFI_PAGES_TO_SIZE (NumberOfPages));
   }
   return Status;
 }
@@ -1460,6 +1465,8 @@ CoreFreePages (
       NULL
       );
     InstallMemoryAttributesTableOnMemoryAllocation (MemoryType);
+    ApplyMemoryProtectionPolicy (MemoryType, EfiConventionalMemory, Memory,
+      EFI_PAGES_TO_SIZE (NumberOfPages));
   }
   return Status;
 }

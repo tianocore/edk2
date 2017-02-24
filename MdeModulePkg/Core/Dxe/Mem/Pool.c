@@ -310,6 +310,10 @@ CoreAllocatePoolPagesI (
   Buffer = CoreAllocatePoolPages (PoolType, NoPages, Granularity);
   CoreReleaseMemoryLock ();
 
+  if (Buffer != NULL) {
+    ApplyMemoryProtectionPolicy (EfiConventionalMemory, PoolType,
+      (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, EFI_PAGES_TO_SIZE (NoPages));
+  }
   return Buffer;
 }
 
@@ -560,6 +564,9 @@ CoreFreePoolPagesI (
   CoreAcquireMemoryLock ();
   CoreFreePoolPages (Memory, NoPages);
   CoreReleaseMemoryLock ();
+
+  ApplyMemoryProtectionPolicy (PoolType, EfiConventionalMemory,
+    (EFI_PHYSICAL_ADDRESS)(UINTN)Memory, EFI_PAGES_TO_SIZE (NoPages));
 }
 
 /**
