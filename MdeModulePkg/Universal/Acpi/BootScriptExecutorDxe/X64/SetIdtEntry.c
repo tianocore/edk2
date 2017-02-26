@@ -4,6 +4,8 @@
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -200,14 +202,15 @@ AcquirePage (
   //
   // Cut the previous uplink if it exists and wasn't overwritten.
   //
-  if ((mPageFaultUplink[mPageFaultIndex] != NULL) && ((*mPageFaultUplink[mPageFaultIndex] & mPhyMask) == Address)) {
+  if ((mPageFaultUplink[mPageFaultIndex] != NULL) &&
+     ((*mPageFaultUplink[mPageFaultIndex] & ~mAddressEncMask & mPhyMask) == Address)) {
     *mPageFaultUplink[mPageFaultIndex] = 0;
   }
 
   //
   // Link & Record the current uplink.
   //
-  *Uplink = Address | IA32_PG_P | IA32_PG_RW;
+  *Uplink = Address | mAddressEncMask | IA32_PG_P | IA32_PG_RW;
   mPageFaultUplink[mPageFaultIndex] = Uplink;
 
   mPageFaultIndex = (mPageFaultIndex + 1) % EXTRA_PAGE_TABLE_PAGES;
@@ -245,19 +248,19 @@ PageFaultHandler (
   if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
     AcquirePage (&PageTable[PTIndex]);
   }
-  PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & mPhyMask);
+  PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & mPhyMask);
   PTIndex = BitFieldRead64 (PFAddress, 30, 38);
   // PDPTE
   if (mPage1GSupport) {
-    PageTable[PTIndex] = (PFAddress & ~((1ull << 30) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
+    PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & ~((1ull << 30) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
   } else {
     if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
       AcquirePage (&PageTable[PTIndex]);
     }
-    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & mPhyMask);
+    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & mPhyMask);
     PTIndex = BitFieldRead64 (PFAddress, 21, 29);
     // PD
-    PageTable[PTIndex] = (PFAddress & ~((1ull << 21) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
+    PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & ~((1ull << 21) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
   }
 
   return TRUE;

@@ -5,6 +5,7 @@
   in the entry point. The functionality is to interpret and restore the S3 boot script 
   
 Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -44,6 +45,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/DxeSmmReadyToLock.h>
 #include <IndustryStandard/Acpi.h>
+
+#define PAGING_1G_ADDRESS_MASK_64  0x000FFFFFC0000000ull
+
 /**
   a ASM function to transfer control to OS.
   
@@ -87,5 +91,6 @@ SetIdtEntry (
 extern UINT32 AsmFixAddress16;
 extern UINT32 AsmJmpAddr32;
 extern BOOLEAN mPage1GSupport;
+extern UINT64 mAddressEncMask;
 
 #endif //_BOOT_SCRIPT_EXECUTOR_H_

@@ -5,6 +5,7 @@
   in the entry point. The functionality is to interpret and restore the S3 boot script
 
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -23,6 +24,7 @@ EFI_GUID              mBootScriptExecutorImageGuid = {
 };
 
 BOOLEAN               mPage1GSupport = FALSE;
+UINT64                mAddressEncMask = 0;
 
 /**
   Entry function of Boot script exector. This function will be executed in
@@ -406,6 +408,11 @@ BootScriptExecutorEntryPoint (
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
   }
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field.
+  //
+  mAddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   //
   // Test if the gEfiCallerIdGuid of this image is already installed. if not, the entry
