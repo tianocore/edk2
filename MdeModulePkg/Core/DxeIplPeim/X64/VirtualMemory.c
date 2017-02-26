@@ -16,6 +16,8 @@
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
+
 
 /**
   Enable Execute Disable Bit.
@@ -65,20 +68,27 @@ Split2MPageTo4K (
   EFI_PHYSICAL_ADDRESS                  PhysicalAddress4K;
   UINTN                                 IndexOfPageTableEntries;
   PAGE_TABLE_4K_ENTRY                   *PageTableEntry;
+  UINT64                                AddressEncMask;
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageTableEntry = AllocatePages (1);
   ASSERT (PageTableEntry != NULL);
+
   //
   // Fill in 2M page entry.
   //
-  *PageEntry2M = (UINT64) (UINTN) PageTableEntry | IA32_PG_P | IA32_PG_RW;
+  *PageEntry2M = (UINT64) (UINTN) PageTableEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
 
   PhysicalAddress4K = PhysicalAddress;
   for (IndexOfPageTableEntries = 0; IndexOfPageTableEntries < 512; IndexOfPageTableEntries++, PageTableEntry++, PhysicalAddress4K += SIZE_4KB) {
     //
     // Fill in the Page Table entries
     //
-    PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K;
+    PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K | AddressEncMask;
     PageTableEntry->Bits.ReadWrite = 1;
     PageTableEntry->Bits.Present = 1;
     if ((PhysicalAddress4K >= StackBase) && (PhysicalAddress4K < StackBase + StackSize)) {
@@ -110,13 +120,20 @@ Split1GPageTo2M (
   EFI_PHYSICAL_ADDRESS                  PhysicalAddress2M;
   UINTN                                 IndexOfPageDirectoryEntries;
   PAGE_TABLE_ENTRY                      *PageDirectoryEntry;
+  UINT64                                AddressEncMask;
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageDirectoryEntry = AllocatePages (1);
   ASSERT (PageDirectoryEntry != NULL);
+
   //
   // Fill in 1G page entry.
   //
-  *PageEntry1G = (UINT64) (UINTN) PageDirectoryEntry | IA32_PG_P | IA32_PG_RW;
+  *PageEntry1G = (UINT64) (UINTN) PageDirectoryEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
@@ -129,7 +146,7 @@ Split1GPageTo2M (
       //
       // Fill in the Page Directory entries
       //
-      PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress2M;
+      PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress2M | AddressEncMask;
       PageDirectoryEntry->Bits.ReadWrite = 1;
       PageDirectoryEntry->Bits.Present = 1;
       PageDirectoryEntry->Bits.MustBe1 = 1;
@@ -171,6 +188,12 @@ CreateIdentityMappingPageTables (
   VOID                                          *Hob;
   BOOLEAN                                       Page1GSupport;
   PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
+  UINT64                                        AddressEncMask;
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   Page1GSupport = FALSE;
   if (PcdGetBool(PcdUse1GPageTable)) {
@@ -248,7 +271,7 @@ CreateIdentityMappingPageTables (
     //
     // Make a PML4 Entry
     //
-    PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry;
+    PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
     PageMapLevel4Entry->Bits.ReadWrite = 1;
     PageMapLevel4Entry->Bits.Present = 1;
 
@@ -262,7 +285,7 @@ CreateIdentityMappingPageTables (
           //
           // Fill in the Page Directory entries
           //
-          PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
+          PageDirectory1GEntry->Uint64 = (UINT64)PageAddress | AddressEncMask;
           PageDirectory1GEntry->Bits.ReadWrite = 1;
           PageDirectory1GEntry->Bits.Present = 1;
           PageDirectory1GEntry->Bits.MustBe1 = 1;
@@ -280,7 +303,7 @@ CreateIdentityMappingPageTables (
         //
         // Fill in a Page Directory Pointer Entries
         //
-        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
+        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
         PageDirectoryPointerEntry->Bits.ReadWrite = 1;
         PageDirectoryPointerEntry->Bits.Present = 1;
 
@@ -294,7 +317,7 @@ CreateIdentityMappingPageTables (
             //
             // Fill in the Page Directory entries
             //
-            PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
+            PageDirectoryEntry->Uint64 = (UINT64)PageAddress | AddressEncMask;
             PageDirectoryEntry->Bits.ReadWrite = 1;
             PageDirectoryEntry->Bits.Present = 1;
             PageDirectoryEntry->Bits.MustBe1 = 1;

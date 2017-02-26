@@ -8,6 +8,8 @@
     4) AMD64 Architecture Programmer's Manual Volume 2: System Programming
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #define SYS_CODE64_SEL 0x38
+
 
 #pragma pack(1)
 
@@ -147,6 +150,8 @@ typedef union {
 
 #define IA32_PG_P                   BIT0
 #define IA32_PG_RW                  BIT1
+
+#define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
 
 /**
   Enable Execute Disable Bit.

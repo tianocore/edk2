@@ -6,6 +6,8 @@
 #  needed to run the DXE Foundation.
 #
 #  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -111,7 +113,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress ## CONSUMES
 
 [Pcd.IA32,Pcd.X64]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
 
 [Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES

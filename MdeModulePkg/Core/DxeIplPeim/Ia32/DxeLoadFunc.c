@@ -2,6 +2,8 @@
   Ia32-specific functionality for DxeLoad.
 
 Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -82,6 +84,12 @@ Create4GPageTablesIa32Pae (
   PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
   UINTN                                         TotalPagesNum;
   UINTN                                         PageAddress;
+  UINT64                                        AddressEncMask;
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PhysicalAddressBits = 32;
 
@@ -111,7 +119,7 @@ Create4GPageTablesIa32Pae (
     //
     // Fill in a Page Directory Pointer Entries
     //
-    PageDirectoryPointerEntry->Uint64 = (UINT64) (UINTN) PageDirectoryEntry;
+    PageDirectoryPointerEntry->Uint64 = (UINT64) (UINTN) PageDirectoryEntry | AddressEncMask;
     PageDirectoryPointerEntry->Bits.Present = 1;
 
     for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress += SIZE_2MB) {
@@ -124,7 +132,7 @@ Create4GPageTablesIa32Pae (
         //
         // Fill in the Page Directory entries
         //
-        PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress;
+        PageDirectoryEntry->Uint64 = (UINT64) PhysicalAddress | AddressEncMask;
         PageDirectoryEntry->Bits.ReadWrite = 1;
         PageDirectoryEntry->Bits.Present = 1;
         PageDirectoryEntry->Bits.MustBe1 = 1;
