@@ -2,6 +2,8 @@
   Common header file.
 
 Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +21,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // 8 extra pages for PF handler.
 //
 #define EXTRA_PAGE_TABLE_PAGES      8
+
+#define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
 
 //
 // This capsule PEIM puts its private data at the start of the
@@ -60,6 +64,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  MemoryBase64Ptr;
   EFI_PHYSICAL_ADDRESS  MemorySize64Ptr;
   BOOLEAN               Page1GSupport;
+  UINT64                AddressEncMask;
 } SWITCH_32_TO_64_CONTEXT;
 
 typedef struct {

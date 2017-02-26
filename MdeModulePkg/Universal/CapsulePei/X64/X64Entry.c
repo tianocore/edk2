@@ -2,6 +2,8 @@
   The X64 entrypoint is used to process capsule in long mode.
 
 Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,6 +31,7 @@ typedef struct _PAGE_FAULT_CONTEXT {
   UINT64                        PhyMask;
   UINTN                         PageFaultBuffer;
   UINTN                         PageFaultIndex;
+  UINT64                        AddressEncMask;
   //
   // Store the uplink information for each page being used.
   //
@@ -114,21 +117,25 @@ AcquirePage (
   )
 {
   UINTN             Address;
+  UINT64            AddressEncMask;
 
   Address = PageFaultContext->PageFaultBuffer + EFI_PAGES_TO_SIZE (PageFaultContext->PageFaultIndex);
   ZeroMem ((VOID *) Address, EFI_PAGES_TO_SIZE (1));
 
+  AddressEncMask = PageFaultContext->AddressEncMask;
+
   //
   // Cut the previous uplink if it exists and wasn't overwritten.
   //
-  if ((PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] != NULL) && ((*PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] & PageFaultContext->PhyMask) == Address)) {
+  if ((PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] != NULL) &&
+     ((*PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] & ~AddressEncMask & PageFaultContext->PhyMask) == Address)) {
     *PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] = 0;
   }
 
   //
   // Link & Record the current uplink.
   //
-  *Uplink = Address | IA32_PG_P | IA32_PG_RW;
+  *Uplink = Address | AddressEncMask | IA32_PG_P | IA32_PG_RW;
   PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] = Uplink;
 
   PageFaultContext->PageFaultIndex = (PageFaultContext->PageFaultIndex + 1) % EXTRA_PAGE_TABLE_PAGES;
@@ -153,6 +160,7 @@ PageFaultHandler (
   UINT64                    *PageTable;
   UINT64                    PFAddress;
   UINTN                     PTIndex;
+  UINT64                    AddressEncMask;
 
   //
   // Get the IDT Descriptor.
@@ -163,6 +171,7 @@ PageFaultHandler (
   //
   PageFaultContext = (PAGE_FAULT_CONTEXT *) (UINTN) (Idtr.Base - sizeof (PAGE_FAULT_CONTEXT));
   PhyMask = PageFaultContext->PhyMask;
+  AddressEncMask = PageFaultContext->AddressEncMask;
 
   PFAddress = AsmReadCr2 ();
   DEBUG ((EFI_D_ERROR, "CapsuleX64 - PageFaultHandler: Cr2 - %lx\n", PFAddress));
@@ -179,19 +188,19 @@ PageFaultHandler (
   if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
     AcquirePage (PageFaultContext, &PageTable[PTIndex]);
   }
-  PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & PhyMask);
+  PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
   PTIndex = BitFieldRead64 (PFAddress, 30, 38);
   // PDPTE
   if (PageFaultContext->Page1GSupport) {
-    PageTable[PTIndex] = (PFAddress & ~((1ull << 30) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
+    PageTable[PTIndex] = ((PFAddress | AddressEncMask) & ~((1ull << 30) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
   } else {
     if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
       AcquirePage (PageFaultContext, &PageTable[PTIndex]);
     }
-    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & PhyMask);
+    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
     PTIndex = BitFieldRead64 (PFAddress, 21, 29);
     // PD
-    PageTable[PTIndex] = (PFAddress & ~((1ull << 21) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
+    PageTable[PTIndex] = ((PFAddress | AddressEncMask) & ~((1ull << 21) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
   }
 
   return NULL;
@@ -244,6 +253,7 @@ _ModuleEntryPoint (
   // Hook page fault handler to handle >4G request.
   //
   PageFaultIdtTable.PageFaultContext.Page1GSupport = EntrypointContext->Page1GSupport;
+  PageFaultIdtTable.PageFaultContext.AddressEncMask = EntrypointContext->AddressEncMask;
   IdtEntry = (IA32_IDT_GATE_DESCRIPTOR *) (X64Idtr.Base + (14 * sizeof (IA32_IDT_GATE_DESCRIPTOR)));
   HookPageFaultHandler (IdtEntry, &(PageFaultIdtTable.PageFaultContext));
 

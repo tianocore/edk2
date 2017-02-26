@@ -2,6 +2,7 @@
   Capsule update PEIM for UEFI2.0
 
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -40,6 +41,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST IA32_DESCRIPTOR mGdt = {
   sizeof (mGdtEntries) - 1,
   (UINTN) mGdtEntries
   };
+
 
 /**
   The function will check if 1G page is supported.
@@ -145,6 +147,12 @@ Create4GPageTables (
   PAGE_TABLE_ENTRY                              *PageDirectoryEntry;
   UINTN                                         BigPageAddress;
   PAGE_TABLE_1G_ENTRY                           *PageDirectory1GEntry;
+  UINT64                                        AddressEncMask;
+
+  //
+  // Make sure AddressEncMask is contained to smallest supported address field.
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   //
   // Create 4G page table by default,
@@ -187,7 +195,7 @@ Create4GPageTables (
     //
     // Make a PML4 Entry
     //
-    PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry;
+    PageMapLevel4Entry->Uint64 = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
     PageMapLevel4Entry->Bits.ReadWrite = 1;
     PageMapLevel4Entry->Bits.Present = 1;
 
@@ -198,7 +206,7 @@ Create4GPageTables (
         //
         // Fill in the Page Directory entries
         //
-        PageDirectory1GEntry->Uint64 = (UINT64)PageAddress;
+        PageDirectory1GEntry->Uint64 = (UINT64)PageAddress | AddressEncMask;
         PageDirectory1GEntry->Bits.ReadWrite = 1;
         PageDirectory1GEntry->Bits.Present = 1;
         PageDirectory1GEntry->Bits.MustBe1 = 1;
@@ -215,7 +223,7 @@ Create4GPageTables (
         //
         // Fill in a Page Directory Pointer Entries
         //
-        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry;
+        PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
         PageDirectoryPointerEntry->Bits.ReadWrite = 1;
         PageDirectoryPointerEntry->Bits.Present = 1;
 
@@ -223,7 +231,7 @@ Create4GPageTables (
           //
           // Fill in the Page Directory entries
           //
-          PageDirectoryEntry->Uint64 = (UINT64)PageAddress;
+          PageDirectoryEntry->Uint64 = (UINT64)PageAddress | AddressEncMask;
           PageDirectoryEntry->Bits.ReadWrite = 1;
           PageDirectoryEntry->Bits.Present = 1;
           PageDirectoryEntry->Bits.MustBe1 = 1;
@@ -443,6 +451,7 @@ ModeSwitch (
   Context.MemoryBase64Ptr       = (EFI_PHYSICAL_ADDRESS)(UINTN)&MemoryBase64;
   Context.MemorySize64Ptr       = (EFI_PHYSICAL_ADDRESS)(UINTN)&MemorySize64;
   Context.Page1GSupport         = Page1GSupport;
+  Context.AddressEncMask        = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   //
   // Prepare data for return back
