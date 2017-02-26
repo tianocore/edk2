@@ -2,6 +2,8 @@
 SMM MP service implementation
 
 Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -781,7 +783,8 @@ Gen4GPageTable (
   // Set Page Directory Pointers
   //
   for (Index = 0; Index < 4; Index++) {
-    Pte[Index] = (UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1) + (Is32BitPageTable ? IA32_PAE_PDPTE_ATTRIBUTE_BITS : PAGE_ATTRIBUTE_BITS);
+    Pte[Index] = (UINT64)((UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1)) | mAddressEncMask |
+                   (Is32BitPageTable ? IA32_PAE_PDPTE_ATTRIBUTE_BITS : PAGE_ATTRIBUTE_BITS);
   }
   Pte += EFI_PAGE_SIZE / sizeof (*Pte);
 
@@ -789,7 +792,7 @@ Gen4GPageTable (
   // Fill in Page Directory Entries
   //
   for (Index = 0; Index < EFI_PAGE_SIZE * 4 / sizeof (*Pte); Index++) {
-    Pte[Index] = (Index << 21) | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
+    Pte[Index] = (Index << 21) | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
   }
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
@@ -797,8 +800,8 @@ Gen4GPageTable (
     GuardPage = mSmmStackArrayBase + EFI_PAGE_SIZE;
     Pdpte = (UINT64*)PageTable;
     for (PageIndex = Low2MBoundary; PageIndex <= High2MBoundary; PageIndex += SIZE_2MB) {
-      Pte = (UINT64*)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~(EFI_PAGE_SIZE - 1));
-      Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages | PAGE_ATTRIBUTE_BITS;
+      Pte = (UINT64*)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
+      Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
       //
       // Fill in Page Table Entries
       //
@@ -809,13 +812,13 @@ Gen4GPageTable (
           //
           // Mark the guard page as non-present
           //
-          Pte[Index] = PageAddress;
+          Pte[Index] = PageAddress | mAddressEncMask;
           GuardPage += mSmmStackSize;
           if (GuardPage > mSmmStackArrayEnd) {
             GuardPage = 0;
           }
         } else {
-          Pte[Index] = PageAddress | PAGE_ATTRIBUTE_BITS;
+          Pte[Index] = PageAddress | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
         }
         PageAddress+= EFI_PAGE_SIZE;
       }
@@ -824,74 +827,6 @@ Gen4GPageTable (
   }
 
   return (UINT32)(UINTN)PageTable;
-}
-
-/**
-  Set memory cache ability.
-
-  @param    PageTable              PageTable Address
-  @param    Address                Memory Address to change cache ability
-  @param    Cacheability           Cache ability to set
-
-**/
-VOID
-SetCacheability (
-  IN      UINT64                    *PageTable,
-  IN      UINTN                     Address,
-  IN      UINT8                     Cacheability
-  )
-{
-  UINTN   PTIndex;
-  VOID    *NewPageTableAddress;
-  UINT64  *NewPageTable;
-  UINTN   Index;
-
-  ASSERT ((Address & EFI_PAGE_MASK) == 0);
-
-  if (sizeof (UINTN) == sizeof (UINT64)) {
-    PTIndex = (UINTN)RShiftU64 (Address, 39) & 0x1ff;
-    ASSERT (PageTable[PTIndex] & IA32_PG_P);
-    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & gPhyMask);
-  }
-
-  PTIndex = (UINTN)RShiftU64 (Address, 30) & 0x1ff;
-  ASSERT (PageTable[PTIndex] & IA32_PG_P);
-  PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & gPhyMask);
-
-  //
-  // A perfect implementation should check the original cacheability with the
-  // one being set, and break a 2M page entry into pieces only when they
-  // disagreed.
-  //
-  PTIndex = (UINTN)RShiftU64 (Address, 21) & 0x1ff;
-  if ((PageTable[PTIndex] & IA32_PG_PS) != 0) {
-    //
-    // Allocate a page from SMRAM
-    //
-    NewPageTableAddress = AllocatePageTableMemory (1);
-    ASSERT (NewPageTableAddress != NULL);
-
-    NewPageTable = (UINT64 *)NewPageTableAddress;
-
-    for (Index = 0; Index < 0x200; Index++) {
-      NewPageTable[Index] = PageTable[PTIndex];
-      if ((NewPageTable[Index] & IA32_PG_PAT_2M) != 0) {
-        NewPageTable[Index] &= ~((UINT64)IA32_PG_PAT_2M);
-        NewPageTable[Index] |= (UINT64)IA32_PG_PAT_4K;
-      }
-      NewPageTable[Index] |= (UINT64)(Index << EFI_PAGE_SHIFT);
-    }
-
-    PageTable[PTIndex] = ((UINTN)NewPageTableAddress & gPhyMask) | PAGE_ATTRIBUTE_BITS;
-  }
-
-  ASSERT (PageTable[PTIndex] & IA32_PG_P);
-  PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & gPhyMask);
-
-  PTIndex = (UINTN)RShiftU64 (Address, 12) & 0x1ff;
-  ASSERT (PageTable[PTIndex] & IA32_PG_P);
-  PageTable[PTIndex] &= ~((UINT64)((IA32_PG_PAT_4K | IA32_PG_CD | IA32_PG_WT)));
-  PageTable[PTIndex] |= (UINT64)Cacheability;
 }
 
 /**

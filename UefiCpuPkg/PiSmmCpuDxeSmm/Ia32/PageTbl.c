@@ -2,6 +2,8 @@
 Page table manipulation functions for IA-32 processors
 
 Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -204,7 +206,7 @@ SetPageTableAttributes (
     PageTableSplitted = (PageTableSplitted || IsSplitted);
 
     for (Index3 = 0; Index3 < 4; Index3++) {
-      L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & PAGING_4K_ADDRESS_MASK_64);
+      L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
       if (L2PageTable == NULL) {
         continue;
       }
@@ -217,7 +219,7 @@ SetPageTableAttributes (
           // 2M
           continue;
         }
-        L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & PAGING_4K_ADDRESS_MASK_64);
+        L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & ~mAddressEncMask & PAGING_4K_ADDRESS_MASK_64);
         if (L1PageTable == NULL) {
           continue;
         }

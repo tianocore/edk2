@@ -2,6 +2,8 @@
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
 Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -183,7 +185,6 @@ extern EFI_SMM_CPU_PROTOCOL   mSmmCpu;
 /// The mode of the CPU at the time an SMI occurs
 ///
 extern UINT8  mSmmSaveStateRegisterLma;
-
 
 //
 // SMM CPU Protocol function prototypes.
@@ -414,6 +415,11 @@ extern UINTN                               mSemaphoreSize;
 extern SPIN_LOCK                           *mPFLock;
 extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
 extern SPIN_LOCK                           *mMemoryMappedLock;
+
+//
+// Copy of the PcdPteMemoryEncryptionAddressOrMask
+//
+extern UINT64  mAddressEncMask;
 
 /**
   Create 4G PageTable in SMRAM.

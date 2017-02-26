@@ -2,6 +2,8 @@
 Enable SMM profile.
 
 Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -513,7 +515,7 @@ InitPaging (
         //
         continue;
       }
-      Pde = (UINT64 *)(UINTN)(Pml4[Level1] & PHYSICAL_ADDRESS_MASK);
+      Pde = (UINT64 *)(UINTN)(Pml4[Level1] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
     } else {
       Pde = (UINT64*)(UINTN)mSmmProfileCr3;
     }
@@ -530,7 +532,7 @@ InitPaging (
         //
         continue;
       }
-      Pte = (UINT64 *)(UINTN)(*Pde & PHYSICAL_ADDRESS_MASK);
+      Pte = (UINT64 *)(UINTN)(*Pde & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
       if (Pte == 0) {
         continue;
       }
@@ -557,9 +559,9 @@ InitPaging (
 
           // Split it
           for (Level4 = 0; Level4 < SIZE_4KB / sizeof(*Pt); Level4++) {
-            Pt[Level4] = Address + ((Level4 << 12) | PAGE_ATTRIBUTE_BITS);
+            Pt[Level4] = Address + ((Level4 << 12) | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
           } // end for PT
-          *Pte = (UINTN)Pt | PAGE_ATTRIBUTE_BITS;
+          *Pte = (UINT64)(UINTN)Pt | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
         } // end if IsAddressSplit
       } // end for PTE
     } // end for PDE
@@ -577,7 +579,7 @@ InitPaging (
         //
         continue;
       }
-      Pde = (UINT64 *)(UINTN)(Pml4[Level1] & PHYSICAL_ADDRESS_MASK);
+      Pde = (UINT64 *)(UINTN)(Pml4[Level1] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
     } else {
       Pde = (UINT64*)(UINTN)mSmmProfileCr3;
     }
@@ -597,7 +599,7 @@ InitPaging (
         }
         continue;
       }
-      Pte = (UINT64 *)(UINTN)(*Pde & PHYSICAL_ADDRESS_MASK);
+      Pte = (UINT64 *)(UINTN)(*Pde & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
       if (Pte == 0) {
         continue;
       }
@@ -624,7 +626,7 @@ InitPaging (
           }
         } else {
           // 4KB page
-          Pt = (UINT64 *)(UINTN)(*Pte & PHYSICAL_ADDRESS_MASK);
+          Pt = (UINT64 *)(UINTN)(*Pte & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
           if (Pt == 0) {
             continue;
           }
