@@ -403,7 +403,7 @@ EbcCreateThunks (
   //
   Size      = EBC_THUNK_SIZE + EBC_THUNK_ALIGNMENT - 1;
   ThunkSize = Size;
-  Ptr = AllocatePool (Size);
+  Ptr = EbcAllocatePoolForThunk (Size);
 
   if (Ptr == NULL) {
     return EFI_OUT_OF_RESOURCES;

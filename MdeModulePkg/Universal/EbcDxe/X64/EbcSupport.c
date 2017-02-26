@@ -441,7 +441,7 @@ EbcCreateThunks (
 
   ThunkSize = sizeof(mInstructionBufferTemplate);
 
-  Ptr = AllocatePool (sizeof(mInstructionBufferTemplate));
+  Ptr = EbcAllocatePoolForThunk (sizeof(mInstructionBufferTemplate));
 
   if (Ptr == NULL) {
     return EFI_OUT_OF_RESOURCES;

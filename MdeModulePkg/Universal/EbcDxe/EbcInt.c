@@ -1410,3 +1410,26 @@ EbcVmTestUnsupported (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Allocates a buffer of type EfiBootServicesCode.
+
+  @param  AllocationSize        The number of bytes to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+EbcAllocatePoolForThunk (
+  IN UINTN  AllocationSize
+  )
+{
+  VOID        *Buffer;
+  EFI_STATUS  Status;
+
+  Status = gBS->AllocatePool (EfiBootServicesCode, AllocationSize, &Buffer);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  return Buffer;
+}

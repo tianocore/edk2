@@ -246,4 +246,18 @@ typedef struct {
       CR(a, EBC_PROTOCOL_PRIVATE_DATA, EbcProtocol, EBC_PROTOCOL_PRIVATE_DATA_SIGNATURE)
 
 
+/**
+  Allocates a buffer of type EfiBootServicesCode.
+
+  @param  AllocationSize        The number of bytes to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+EbcAllocatePoolForThunk (
+  IN UINTN  AllocationSize
+  );
+
 #endif // #ifndef _EBC_INT_H_

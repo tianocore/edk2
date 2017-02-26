@@ -383,7 +383,7 @@ EbcCreateThunks (
     return EFI_INVALID_PARAMETER;
   }
 
-  InstructionBuffer = AllocatePool (sizeof (EBC_INSTRUCTION_BUFFER));
+  InstructionBuffer = EbcAllocatePoolForThunk (sizeof (EBC_INSTRUCTION_BUFFER));
   if (InstructionBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
