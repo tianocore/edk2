@@ -6,6 +6,8 @@
 # Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -1733,6 +1735,12 @@
   #  FMP capsule is a system FMP.
   # @Prompt A list of system FMP ImageTypeId GUIDs
   gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid|{0x0}|VOID*|0x30001046
+
+  ## This PCD holds the address mask for page table entries when memory encryption is
+  #  enabled on AMD processors supporting the Secure Encrypted Virtualization (SEV) feature.
+  #  This mask should be applied when creating 1:1 virtual to physical mapping tables.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0|UINT64|0x30001047
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
