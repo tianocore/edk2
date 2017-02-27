@@ -383,6 +383,13 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x3
 
+  #
+  # Enable NX memory protection for all non-code regions, including OEM and OS
+  # reserved ones, with the exception of LoaderData regions, of which OS loaders
+  # (i.e., GRUB) may assume that its contents are executable.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD1
+
 [Components.common]
   #
   # Networking stack
