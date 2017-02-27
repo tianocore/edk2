@@ -21,6 +21,9 @@
 #string STR_PACKAGE_DESCRIPTION         #language en-US "This package provides network modules that conform to UEFI 2.4 specification."
 
 
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdMaxIScsiAttemptNumber_PROMPT  #language en-US "Max attempt number."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdMaxIScsiAttemptNumber_HELP  #language en-US "Max attempt number created by iSCSI."
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCaFile_PROMPT  #language en-US "CA file."
 
