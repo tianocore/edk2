@@ -31,7 +31,6 @@ extern ISCSI_FORM_CALLBACK_INFO    *mCallbackInfo;
 #define QUESTION_ID(Field)   \
   ((UINT16) (VAR_OFFSET (Field) + CONFIG_OPTION_OFFSET))
 
-
 #define DYNAMIC_ONE_OF_VAR_OFFSET           VAR_OFFSET  (Enabled)
 #define DYNAMIC_ORDERED_LIST_QUESTION_ID    QUESTION_ID (DynamicOrderedList)
 #define DYNAMIC_ORDERED_LIST_VAR_OFFSET     VAR_OFFSET  (DynamicOrderedList)
@@ -43,6 +42,7 @@ extern ISCSI_FORM_CALLBACK_INFO    *mCallbackInfo;
 //
 // Define QuestionId and OffSet for Keywords.
 //
+#define ATTEMPT_MAC_ADDR_VAR_OFFSET                  VAR_OFFSET  (ISCSIMacAddr)
 #define ATTEMPT_ATTEMPT_NAME_QUESTION_ID             QUESTION_ID (ISCSIAttemptName)
 #define ATTEMPT_ATTEMPT_NAME_VAR_OFFSET              VAR_OFFSET  (ISCSIAttemptName)
 #define ATTEMPT_BOOTENABLE_QUESTION_ID               QUESTION_ID (ISCSIBootEnableList)
