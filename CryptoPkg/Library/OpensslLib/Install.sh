@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd openssl-1.0.2j
+cd openssl-1.0.2k
 cp ../opensslconf.h           crypto
 mkdir -p                      include/openssl
 cp e_os2.h                    include/openssl
