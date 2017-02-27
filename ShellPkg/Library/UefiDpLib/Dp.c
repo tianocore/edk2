@@ -272,7 +272,7 @@ ShellCommandRunDp (
   //      EndCount = Value counter counts to before it needs to be reset
   //
   Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (PerformanceProperty == NULL)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PERF_PROPERTY_NOT_FOUND), gDpHiiHandle);
     goto Done;
   }
