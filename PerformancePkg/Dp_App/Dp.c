@@ -400,7 +400,7 @@ InitializeDp (
       //      EndCount = Value counter counts to before it needs to be reset
       //
       Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
-      if (EFI_ERROR (Status)) {
+      if (EFI_ERROR (Status) || (PerformanceProperty == NULL)) {
         PrintToken (STRING_TOKEN (STR_PERF_PROPERTY_NOT_FOUND));
         goto Done;
       }
