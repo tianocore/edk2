@@ -19,7 +19,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SmmSmiHandlerProfileLib
   MODULE_UNI_FILE                = SmmSmiHandlerProfileLib.uni
-  FILE_GUID                      = B43D1B52-6251-4E6F-82EC-A599A5EE94C1
+  FILE_GUID                      = FC38CEAE-FB74-4049-A51C-68F0BA69DA7D
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SmiHandlerProfileLib|DXE_SMM_DRIVER

@@ -245,7 +245,7 @@ GetShortPdbFileName (
     2. FFS UI section
     3. Image GUID
 
-  @param[in] DriverInfo Pointer to memory profile driver info.
+  @param[in] ImageStruct  Point to the image structure.
 
   @return The resulting Ascii name string is stored in the mNameString global array.
 
