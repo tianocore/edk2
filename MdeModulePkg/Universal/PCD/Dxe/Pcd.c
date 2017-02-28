@@ -3,7 +3,7 @@
   produce the implementation of native PCD protocol and EFI_PCD_PROTOCOL defined in
   PI 1.4a Vol3.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -272,19 +272,38 @@ DxePcdSetSku (
   SKU_ID    *SkuIdTable;
   UINTN     Index;
 
+  if (SkuId == mPcdDatabase.DxeDb->SystemSkuId) {
+    //
+    // The input SKU Id is equal to current SKU Id, return directly.
+    //
+    return;
+  }
+
+  if (mPcdDatabase.DxeDb->SystemSkuId != (SKU_ID) 0) {
+    DEBUG ((DEBUG_ERROR, "PcdDxe - The SKU Id could be changed only once."));
+    DEBUG ((
+      DEBUG_ERROR,
+      "PcdDxe - The SKU Id was set to 0x%lx already, it could not be set to 0x%lx any more.",
+      mPcdDatabase.DxeDb->SystemSkuId,
+      (SKU_ID) SkuId
+      ));
+    ASSERT (FALSE);
+    return;
+  }
+
   SkuIdTable = (SKU_ID *) ((UINT8 *) mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SkuIdTableOffset);
   for (Index = 0; Index < SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
+      DEBUG ((EFI_D_INFO, "PcdDxe - Set current SKU Id to 0x%lx.\n", (SKU_ID) SkuId));
       mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID) SkuId;
       return;
     }
   }
 
   //
-  // Invalid input SkuId, the default SKU Id will be used for the system.
+  // Invalid input SkuId, the default SKU Id will be still used for the system.
   //
-  DEBUG ((EFI_D_INFO, "PcdDxe - Invalid input SkuId, the default SKU Id will be used.\n"));
-  mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID) 0;
+  DEBUG ((EFI_D_INFO, "PcdDxe - Invalid input SkuId, the default SKU Id will be still used.\n"));
   return;
 }
 

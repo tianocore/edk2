@@ -1,7 +1,7 @@
 /** @file 
   All Pcd Ppi services are implemented here.
   
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -262,19 +262,39 @@ PeiPcdSetSku (
   UINTN             Index;
 
   PeiPcdDb = GetPcdDatabase();
+
+  if (SkuId == PeiPcdDb->SystemSkuId) {
+    //
+    // The input SKU Id is equal to current SKU Id, return directly.
+    //
+    return;
+  }
+
+  if (PeiPcdDb->SystemSkuId != (SKU_ID) 0) {
+    DEBUG ((DEBUG_ERROR, "PcdPei - The SKU Id could be changed only once."));
+    DEBUG ((
+      DEBUG_ERROR,
+      "PcdPei - The SKU Id was set to 0x%lx already, it could not be set to 0x%lx any more.",
+      PeiPcdDb->SystemSkuId,
+      (SKU_ID) SkuId
+      ));
+    ASSERT (FALSE);
+    return;
+  }
+
   SkuIdTable = (SKU_ID *) ((UINT8 *) PeiPcdDb + PeiPcdDb->SkuIdTableOffset);
   for (Index = 0; Index < SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
+      DEBUG ((EFI_D_INFO, "PcdPei - Set current SKU Id to 0x%lx.\n", (SKU_ID) SkuId));
       PeiPcdDb->SystemSkuId = (SKU_ID) SkuId;
       return;
     }
   }
 
   //
-  // Invalid input SkuId, the default SKU Id will be used for the system.
+  // Invalid input SkuId, the default SKU Id will be still used for the system.
   //
-  DEBUG ((EFI_D_INFO, "PcdPei - Invalid input SkuId, the default SKU Id will be used.\n"));
-  PeiPcdDb->SystemSkuId = (SKU_ID) 0;
+  DEBUG ((EFI_D_INFO, "PcdPei - Invalid input SkuId, the default SKU Id will be still used.\n"));
   return;
 }
 
