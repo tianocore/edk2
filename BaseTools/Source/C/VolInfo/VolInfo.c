@@ -1,7 +1,7 @@
 /** @file
 The tool dumps the contents of a firmware volume
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2242,8 +2242,7 @@ Returns:
 {
   FILE              *Fptr;
   CHAR8             Line[MAX_LINE_LEN];
-  CHAR8             *FormatString;
-  INTN              FormatLength;
+  CHAR8             FormatString[MAX_LINE_LEN];
   GUID_TO_BASENAME  *GPtr;
 
   if ((Fptr = fopen (LongFilePath (FileName), "r")) == NULL) {
@@ -2254,23 +2253,8 @@ Returns:
   //
   // Generate the format string for fscanf
   //
-  FormatLength = snprintf (
-                   NULL,
-                   0,
-                   "%%%us %%%us",
-                   (unsigned) sizeof (GPtr->Guid) - 1,
-                   (unsigned) sizeof (GPtr->BaseName) - 1
-                   ) + 1;
-
-  FormatString = (CHAR8 *) malloc (FormatLength);
-  if (FormatString == NULL) {
-    fclose (Fptr);
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  snprintf (
+  sprintf (
     FormatString,
-    FormatLength,
     "%%%us %%%us",
     (unsigned) sizeof (GPtr->Guid) - 1,
     (unsigned) sizeof (GPtr->BaseName) - 1
@@ -2282,7 +2266,6 @@ Returns:
     //
     GPtr = malloc (sizeof (GUID_TO_BASENAME));
     if (GPtr == NULL) {
-      free (FormatString);
       fclose (Fptr);
       return EFI_OUT_OF_RESOURCES;
     }
@@ -2299,7 +2282,6 @@ Returns:
     }
   }
 
-  free (FormatString);
   fclose (Fptr);
   return EFI_SUCCESS;
 }

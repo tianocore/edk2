@@ -2,7 +2,7 @@
 This file contains functions required to generate a boot strap file (BSF) also 
 known as the Volume Top File (VTF)
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -1045,7 +1045,6 @@ Arguments:
 Returns:
 
   EFI_INVALID_PARAMETER  - The parameter is invalid
-  EFI_OUT_OF_RESOURCES   - Resource can not be allocated
   EFI_SUCCESS            - The function completed successfully
 
 --*/
@@ -1063,8 +1062,7 @@ Returns:
   CHAR8   Buff4[10];
   CHAR8   Buff5[10];
   CHAR8   Token[50];
-  CHAR8   *FormatString;
-  INTN    FormatLength;
+  CHAR8   FormatString[MAX_LINE_LEN];
 
   Fp = fopen (LongFilePath (VtfInfo->CompSymName), "rb");
 
@@ -1076,30 +1074,8 @@ Returns:
   //
   // Generate the format string for fscanf
   //
-  FormatLength = snprintf (
-                   NULL,
-                   0,
-                   "%%%us %%%us %%%us %%%us %%%us %%%us %%%us",
-                   (unsigned) sizeof (Buff1) - 1,
-                   (unsigned) sizeof (Buff2) - 1,
-                   (unsigned) sizeof (OffsetStr) - 1,
-                   (unsigned) sizeof (Buff3) - 1,
-                   (unsigned) sizeof (Buff4) - 1,
-                   (unsigned) sizeof (Buff5) - 1,
-                   (unsigned) sizeof (Token) - 1
-                   ) + 1;
-
-  FormatString = (CHAR8 *) malloc (FormatLength);
-  if (FormatString == NULL) {
-    fclose (Fp);
-
-    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  snprintf (
+  sprintf (
     FormatString,
-    FormatLength,
     "%%%us %%%us %%%us %%%us %%%us %%%us %%%us",
     (unsigned) sizeof (Buff1) - 1,
     (unsigned) sizeof (Buff2) - 1,
@@ -1135,10 +1111,6 @@ Returns:
   GetRelativeAddressInVtfBuffer (SalEntryAdd, &RelativeAddress, FIRST_VTF);
 
   memcpy ((VOID *) RelativeAddress, (VOID *) CompStartAddress, sizeof (UINT64));
-
-  if (FormatString != NULL) {
-    free (FormatString);
-  }
 
   if (Fp != NULL) {
     fclose (Fp);
@@ -2242,8 +2214,7 @@ Returns:
   CHAR8   Section[MAX_LONG_FILE_PATH];
   CHAR8   Token[MAX_LONG_FILE_PATH];
   CHAR8   BaseToken[MAX_LONG_FILE_PATH];
-  CHAR8   *FormatString;
-  INTN    FormatLength;
+  CHAR8   FormatString[MAX_LINE_LEN];
   UINT64  TokenAddress;
   long    StartLocation;
 
@@ -2324,27 +2295,8 @@ Returns:
   //
   // Generate the format string for fscanf
   //
-  FormatLength = snprintf (
-                   NULL,
-                   0,
-                   "%%%us | %%%us | %%%us | %%%us\n",
-                   (unsigned) sizeof (Type) - 1,
-                   (unsigned) sizeof (Address) - 1,
-                   (unsigned) sizeof (Section) - 1,
-                   (unsigned) sizeof (Token) - 1
-                   ) + 1;
-
-  FormatString = (CHAR8 *) malloc (FormatLength);
-  if (FormatString == NULL) {
-    fclose (SourceFile);
-    fclose (DestFile);
-    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
-    return EFI_ABORTED;
-  }
-
-  snprintf (
+  sprintf (
     FormatString,
-    FormatLength,
     "%%%us | %%%us | %%%us | %%%us\n",
     (unsigned) sizeof (Type) - 1,
     (unsigned) sizeof (Address) - 1,
@@ -2383,7 +2335,6 @@ Returns:
     }
   }
 
-  free (FormatString);
   fclose (SourceFile);
   fclose (DestFile);
   return EFI_SUCCESS;
