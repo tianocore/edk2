@@ -154,7 +154,8 @@ AllocatePagesFromList (
     return Status;
   }
 
-  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages), EFI_MEMORY_WC);
+  Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages),
+                  EFI_MEMORY_WC | EFI_MEMORY_XP);
   if (EFI_ERROR (Status)) {
     gBS->FreePages (Memory, Pages);
     return Status;
