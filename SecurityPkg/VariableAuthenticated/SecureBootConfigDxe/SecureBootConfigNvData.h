@@ -1,7 +1,7 @@
 /** @file
   Header file for NV data structure definition.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -107,6 +107,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SECURE_BOOT_GUID_SIZE                 36
 #define SECURE_BOOT_GUID_STORAGE_SIZE         37
 
+#define UNKNOWN_FILE_TYPE                     0
+#define X509_CERT_FILE_TYPE                   1
+#define PE_IMAGE_FILE_TYPE                    2
+#define AUTHENTICATION_2_FILE_TYPE            3
 
 //
 // Nv Data structure referenced by IFR
@@ -123,6 +127,7 @@ typedef struct {
   UINT8   CertificateFormat;   // The type of the certificate
   EFI_HII_DATE RevocationDate; // The revocation date of the certificate
   EFI_HII_TIME RevocationTime; // The revocation time of the certificate
+  UINT8   FileEnrollType;      // File type of sigunature enroll
 } SECUREBOOT_CONFIGURATION;
 
 #endif

@@ -97,6 +97,35 @@ CHAR16* mSupportX509Suffix = L"*.cer/der/crt";
 SECUREBOOT_CONFIG_PRIVATE_DATA  *gSecureBootPrivateData = NULL;
 
 /**
+  This code cleans up enrolled file by closing file & free related resources attached to
+  enrolled file
+
+  @param[in] FileSuffix            The suffix of the input certificate file
+
+  @retval    TRUE           It's a DER-encoded certificate.
+  @retval    FALSE          It's NOT a DER-encoded certificate.
+
+**/
+
+VOID
+CloseEnrolledFile(
+  IN SECUREBOOT_FILE_CONTEXT *FileContext
+)
+{
+  if (FileContext->FHandle != NULL) {
+    CloseFile (FileContext->FHandle);
+    FileContext->FHandle = NULL;
+  }
+
+  if (FileContext->FileName != NULL){
+    FreePool(FileContext->FileName);
+    FileContext->FileName = NULL;
+  }
+  FileContext->FileType = UNKNOWN_FILE_TYPE;
+
+}
+
+/**
   This code checks if the FileSuffix is one of the possible DER-encoded certificate suffix.
 
   @param[in] FileSuffix            The suffix of the input certificate file
@@ -117,6 +146,61 @@ IsDerEncodeCertificate (
     }
   }
   return FALSE;
+}
+
+/**
+  This code checks if the file content complies with EFI_VARIABLE_AUTHENTICATION_2 format
+The function reads file content but won't open/close given FileHandle.
+
+  @param[in] FileHandle            The FileHandle to be checked
+
+  @retval    TRUE            The content is EFI_VARIABLE_AUTHENTICATION_2 format.
+  @retval    FALSE          The content is NOT a EFI_VARIABLE_AUTHENTICATION_2 format.
+
+**/
+BOOLEAN
+IsAuthentication2Format (
+  IN   EFI_FILE_HANDLE    FileHandle
+)
+{
+  EFI_STATUS                     Status;
+  EFI_VARIABLE_AUTHENTICATION_2  *Auth2;
+  BOOLEAN                        IsAuth2Format;
+
+  IsAuth2Format = FALSE;
+
+  //
+  // Read the whole file content
+  //
+  Status = ReadFileContent(
+             FileHandle,
+             (VOID **) &mImageBase,
+             &mImageSize,
+             0
+             );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+
+  Auth2 = (EFI_VARIABLE_AUTHENTICATION_2 *)mImageBase;
+  if (Auth2->AuthInfo.Hdr.wCertificateType != WIN_CERT_TYPE_EFI_GUID) {
+    goto ON_EXIT;
+  }
+
+  if (CompareGuid(&gEfiCertPkcs7Guid, &Auth2->AuthInfo.CertType)) {
+    IsAuth2Format = TRUE;
+  }
+
+ON_EXIT:
+  //
+  // Do not close File. simply check file content
+  //
+  if (mImageBase != NULL) {
+    FreePool (mImageBase);
+    mImageBase = NULL;
+  }
+
+  return IsAuth2Format;
 }
 
 /**
@@ -474,10 +558,7 @@ ON_EXIT:
     FreePool(PkCert);
   }
 
-  if (Private->FileContext->FHandle != NULL) {
-    CloseFile (Private->FileContext->FHandle);
-    Private->FileContext->FHandle = NULL;
-  }
+  CloseEnrolledFile(Private->FileContext);
 
   return Status;
 }
@@ -654,13 +735,7 @@ EnrollRsa2048ToKek (
 
 ON_EXIT:
 
-  CloseFile (Private->FileContext->FHandle);
-  Private->FileContext->FHandle = NULL;
-
-  if (Private->FileContext->FileName != NULL){
-    FreePool(Private->FileContext->FileName);
-    Private->FileContext->FileName = NULL;
-  }
+  CloseEnrolledFile(Private->FileContext);
 
   if (Private->SignatureGUID != NULL) {
     FreePool (Private->SignatureGUID);
@@ -781,13 +856,7 @@ EnrollX509ToKek (
 
 ON_EXIT:
 
-  CloseFile (Private->FileContext->FHandle);
-  if (Private->FileContext->FileName != NULL){
-    FreePool(Private->FileContext->FileName);
-    Private->FileContext->FileName = NULL;
-  }
-
-  Private->FileContext->FHandle = NULL;
+  CloseEnrolledFile(Private->FileContext);
 
   if (Private->SignatureGUID != NULL) {
     FreePool (Private->SignatureGUID);
@@ -821,7 +890,7 @@ EnrollKeyExchangeKey (
   EFI_STATUS  Status;
   UINTN       NameLength;
 
-  if ((Private->FileContext->FileName == NULL) || (Private->SignatureGUID == NULL)) {
+  if ((Private->FileContext->FHandle == NULL) || (Private->FileContext->FileName == NULL) || (Private->SignatureGUID == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -844,6 +913,11 @@ EnrollKeyExchangeKey (
   } else if (CompareMem (FilePostFix, L".pbk",4) == 0) {
     return EnrollRsa2048ToKek (Private);
   } else {
+    //
+    // File type is wrong, simply close it
+    //
+    CloseEnrolledFile(Private->FileContext);
+
     return EFI_INVALID_PARAMETER;
   }
 }
@@ -955,13 +1029,7 @@ EnrollX509toSigDB (
 
 ON_EXIT:
 
-  CloseFile (Private->FileContext->FHandle);
-  if (Private->FileContext->FileName != NULL){
-    FreePool(Private->FileContext->FileName);
-    Private->FileContext->FileName = NULL;
-  }
-
-  Private->FileContext->FHandle = NULL;
+  CloseEnrolledFile(Private->FileContext);
 
   if (Private->SignatureGUID != NULL) {
     FreePool (Private->SignatureGUID);
@@ -1519,13 +1587,8 @@ EnrollX509HashtoSigDB (
   }
 
 ON_EXIT:
-  CloseFile (Private->FileContext->FHandle);
-  if (Private->FileContext->FileName != NULL){
-    FreePool(Private->FileContext->FileName);
-    Private->FileContext->FileName = NULL;
-  }
 
-  Private->FileContext->FHandle = NULL;
+  CloseEnrolledFile(Private->FileContext);
 
   if (Private->SignatureGUID != NULL) {
     FreePool (Private->SignatureGUID);
@@ -2081,6 +2144,107 @@ HashPeImageByType (
 
 **/
 EFI_STATUS
+EnrollAuthentication2Descriptor (
+  IN SECUREBOOT_CONFIG_PRIVATE_DATA *Private,
+  IN CHAR16                         *VariableName
+  )
+{
+  EFI_STATUS                        Status;
+  VOID                              *Data;
+  UINTN                             DataSize;
+  UINT32                            Attr;
+
+  Data = NULL;
+
+  //
+  // DBT only support DER-X509 Cert Enrollment
+  //
+  if (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE2) == 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Read the whole file content
+  //
+  Status = ReadFileContent(
+             Private->FileContext->FHandle,
+             (VOID **) &mImageBase,
+             &mImageSize,
+             0
+             );
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
+  ASSERT (mImageBase != NULL);
+
+  Attr = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS
+         | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
+
+  //
+  // Check if SigDB variable has been already existed.
+  // If true, use EFI_VARIABLE_APPEND_WRITE attribute to append the
+  // new signature data to original variable
+  //
+  DataSize = 0;
+  Status = gRT->GetVariable(
+                  VariableName,
+                  &gEfiImageSecurityDatabaseGuid,
+                  NULL,
+                  &DataSize,
+                  NULL
+                  );
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    Attr |= EFI_VARIABLE_APPEND_WRITE;
+  } else if (Status != EFI_NOT_FOUND) {
+    goto ON_EXIT;
+  }
+
+  //
+  // Diretly set AUTHENTICATION_2 data to SetVariable
+  //
+  Status = gRT->SetVariable(
+                  VariableName,
+                  &gEfiImageSecurityDatabaseGuid,
+                  Attr,
+                  mImageSize,
+                  mImageBase
+                  );
+
+  DEBUG((DEBUG_INFO, "Enroll AUTH_2 data to Var:%s Status: %x\n", VariableName, Status));
+
+ON_EXIT:
+
+  CloseEnrolledFile(Private->FileContext);
+
+  if (Data != NULL) {
+    FreePool (Data);
+  }
+
+  if (mImageBase != NULL) {
+    FreePool (mImageBase);
+    mImageBase = NULL;
+  }
+
+  return Status;
+
+}
+
+
+/**
+  Enroll a new executable's signature into Signature Database.
+
+  @param[in] PrivateData     The module's private data.
+  @param[in] VariableName    Variable name of signature database, must be
+                             EFI_IMAGE_SECURITY_DATABASE, EFI_IMAGE_SECURITY_DATABASE1
+                             or EFI_IMAGE_SECURITY_DATABASE2.
+
+  @retval   EFI_SUCCESS            New signature is enrolled successfully.
+  @retval   EFI_INVALID_PARAMETER  The parameter is invalid.
+  @retval   EFI_UNSUPPORTED        Unsupported command.
+  @retval   EFI_OUT_OF_RESOURCES   Could not allocate needed resources.
+
+**/
+EFI_STATUS
 EnrollImageSignatureToSigDB (
   IN SECUREBOOT_CONFIG_PRIVATE_DATA *Private,
   IN CHAR16                         *VariableName
@@ -2235,13 +2399,7 @@ EnrollImageSignatureToSigDB (
 
 ON_EXIT:
 
-  CloseFile (Private->FileContext->FHandle);
-  Private->FileContext->FHandle = NULL;
-
-  if (Private->FileContext->FileName != NULL){
-    FreePool(Private->FileContext->FileName);
-    Private->FileContext->FileName = NULL;
-  }
+  CloseEnrolledFile(Private->FileContext);
 
   if (Private->SignatureGUID != NULL) {
     FreePool (Private->SignatureGUID);
@@ -2305,9 +2463,11 @@ EnrollSignatureDatabase (
     // Supports DER-encoded X509 certificate.
     //
     return EnrollX509toSigDB (Private, VariableName);
+  } else if (IsAuthentication2Format(Private->FileContext->FHandle)){
+    return EnrollAuthentication2Descriptor(Private, VariableName);
+  } else {
+    return EnrollImageSignatureToSigDB (Private, VariableName);
   }
-
-  return EnrollImageSignatureToSigDB (Private, VariableName);
 }
 
 /**
@@ -2936,11 +3096,13 @@ UpdateSecureBootString(
 /**
   This function extracts configuration from variable.
 
+  @param[in]       Private      Point to SecureBoot configuration driver private data.
   @param[in, out]  ConfigData   Point to SecureBoot configuration private data.
 
 **/
 VOID
 SecureBootExtractConfigFromVariable (
+  IN SECUREBOOT_CONFIG_PRIVATE_DATA  *Private,
   IN OUT SECUREBOOT_CONFIGURATION    *ConfigData
   )
 {
@@ -2965,7 +3127,11 @@ SecureBootExtractConfigFromVariable (
   ConfigData->RevocationTime.Hour   = CurrTime.Hour;
   ConfigData->RevocationTime.Minute = CurrTime.Minute;
   ConfigData->RevocationTime.Second = 0;
-
+  if (Private->FileContext->FHandle != NULL) {
+    ConfigData->FileEnrollType = Private->FileContext->FileType;
+  } else {
+    ConfigData->FileEnrollType = UNKNOWN_FILE_TYPE;
+  }
 
   //
   // If it is Physical Presence User, set the PhysicalPresent to true.
@@ -3088,10 +3254,12 @@ SecureBootExtractConfig (
     return EFI_NOT_FOUND;
   }
 
+  ZeroMem(&Configuration, sizeof(SECUREBOOT_CONFIGURATION));
+
   //
   // Get Configuration from Variable.
   //
-  SecureBootExtractConfigFromVariable (&Configuration);
+  SecureBootExtractConfigFromVariable (PrivateData, &Configuration);
 
   BufferSize = sizeof (SECUREBOOT_CONFIGURATION);
   ConfigRequest = Request;
@@ -3166,9 +3334,10 @@ SecureBootRouteConfig (
        OUT EFI_STRING                          *Progress
   )
 {
-  SECUREBOOT_CONFIGURATION   IfrNvData;
-  UINTN                      BufferSize;
-  EFI_STATUS                 Status;
+  SECUREBOOT_CONFIGURATION          IfrNvData;
+  UINTN                             BufferSize;
+  SECUREBOOT_CONFIG_PRIVATE_DATA    *PrivateData;
+  EFI_STATUS                        Status;
 
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -3179,10 +3348,12 @@ SecureBootRouteConfig (
     return EFI_NOT_FOUND;
   }
 
+  PrivateData = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
+
   //
   // Get Configuration from Variable.
   //
-  SecureBootExtractConfigFromVariable (&IfrNvData);
+  SecureBootExtractConfigFromVariable (PrivateData, &IfrNvData);
 
   //
   // Map the Configuration to the configuration block.
@@ -3259,6 +3430,9 @@ SecureBootCallback (
   UINT8                           *SetupMode;
   CHAR16                          PromptString[100];
   EFI_DEVICE_PATH_PROTOCOL        *File;
+  UINTN                           NameLength;
+  UINT16                          *FilePostFix;
+  SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData;
 
   Status           = EFI_SUCCESS;
   SecureBootEnable = NULL;
@@ -3291,8 +3465,20 @@ SecureBootCallback (
       // Update secure boot strings when opening this form
       //
       Status = UpdateSecureBootString(Private);
-      SecureBootExtractConfigFromVariable (IfrNvData);
+      SecureBootExtractConfigFromVariable (Private, IfrNvData);
       mIsEnterSecureBootForm = TRUE;
+    } else {
+      //
+      // When entering SecureBoot OPTION Form
+      // always close opened file & free resource
+      //
+      if ((QuestionId == KEY_SECURE_BOOT_PK_OPTION) ||
+          (QuestionId == KEY_SECURE_BOOT_KEK_OPTION) ||
+          (QuestionId == KEY_SECURE_BOOT_DB_OPTION) ||
+          (QuestionId == KEY_SECURE_BOOT_DBX_OPTION) ||
+          (QuestionId == KEY_SECURE_BOOT_DBT_OPTION)) {
+        CloseEnrolledFile(Private->FileContext);
+      }
     }
     goto EXIT;
   }
@@ -3346,6 +3532,7 @@ SecureBootCallback (
     case KEY_SECURE_BOOT_DB_OPTION:
     case KEY_SECURE_BOOT_DBX_OPTION:
     case KEY_SECURE_BOOT_DBT_OPTION:
+      PrivateData = SECUREBOOT_CONFIG_PRIVATE_FROM_THIS (This);
       //
       // Clear Signature GUID.
       //
@@ -3356,6 +3543,11 @@ SecureBootCallback (
           return EFI_OUT_OF_RESOURCES;
         }
       }
+
+      //
+      // Cleanup VFRData once leaving PK/KEK/DB/DBX/DBT enroll/delete page
+      //
+      SecureBootExtractConfigFromVariable (PrivateData, IfrNvData);
 
       if (QuestionId == KEY_SECURE_BOOT_DB_OPTION) {
         LabelId = SECUREBOOT_ENROLL_SIGNATURE_TO_DB;
@@ -3394,6 +3586,38 @@ SecureBootCallback (
 
     case SECUREBOOT_ENROLL_SIGNATURE_TO_DBX:
       ChooseFile (NULL, NULL, UpdateDBXFromFile, &File);
+
+      if (Private->FileContext->FHandle != NULL) {
+        //
+        // Parse the file's postfix.
+        //
+        NameLength = StrLen (Private->FileContext->FileName);
+        if (NameLength <= 4) {
+          return FALSE;
+        }
+        FilePostFix = Private->FileContext->FileName + NameLength - 4;
+
+        if (IsDerEncodeCertificate (FilePostFix)) {
+          //
+          // Supports DER-encoded X509 certificate.
+          //
+          IfrNvData->FileEnrollType = X509_CERT_FILE_TYPE;
+        } else if (IsAuthentication2Format(Private->FileContext->FHandle)){
+          IfrNvData->FileEnrollType = AUTHENTICATION_2_FILE_TYPE;
+        } else {
+          IfrNvData->FileEnrollType = PE_IMAGE_FILE_TYPE;
+        }
+        Private->FileContext->FileType = IfrNvData->FileEnrollType;
+
+        //
+        // Clean up Certificate Format if File type is not X509 DER
+        //
+        if (IfrNvData->FileEnrollType != X509_CERT_FILE_TYPE) {
+          IfrNvData->CertificateFormat = HASHALG_RAW;
+        }
+        DEBUG((DEBUG_ERROR, "IfrNvData->FileEnrollType %d\n", Private->FileContext->FileType));
+      }
+
       break;
 
     case SECUREBOOT_ENROLL_SIGNATURE_TO_DBT:
@@ -3503,7 +3727,12 @@ SecureBootCallback (
           L"Enrollment failed! Same certificate had already been in the dbx!",
           NULL
           );
-          break;
+
+        //
+        // Cert already exists in DBX. Close opened file before exit.
+        //
+        CloseEnrolledFile(Private->FileContext);
+        break;
       }
 
       if ((IfrNvData != NULL) && (IfrNvData->CertificateFormat < HASHALG_MAX)) {
@@ -3514,6 +3743,7 @@ SecureBootCallback (
                    &IfrNvData->RevocationTime,
                    IfrNvData->AlwaysRevocation
                    );
+        IfrNvData->CertificateFormat = HASHALG_RAW;
       } else {
         Status = EnrollSignatureDatabase (Private, EFI_IMAGE_SECURITY_DATABASE1);
       }
@@ -3522,7 +3752,7 @@ SecureBootCallback (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
           L"ERROR: Unsupported file type!",
-          L"Only supports DER-encoded X509 certificate and executable EFI image",
+          L"Only supports DER-encoded X509 certificate, AUTH_2 format data & executable EFI image",
           NULL
           );
       }
@@ -3603,14 +3833,7 @@ SecureBootCallback (
     case KEY_VALUE_NO_SAVE_AND_EXIT_DB:
     case KEY_VALUE_NO_SAVE_AND_EXIT_DBX:
     case KEY_VALUE_NO_SAVE_AND_EXIT_DBT:
-      if (Private->FileContext->FHandle != NULL) {
-        CloseFile (Private->FileContext->FHandle);
-        Private->FileContext->FHandle = NULL;
-        if (Private->FileContext->FileName!= NULL){
-          FreePool(Private->FileContext->FileName);
-          Private->FileContext->FileName = NULL;
-        }
-      }
+      CloseEnrolledFile(Private->FileContext);
 
       if (Private->SignatureGUID != NULL) {
         FreePool (Private->SignatureGUID);
@@ -3639,7 +3862,6 @@ SecureBootCallback (
 
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
       break;
-
     case KEY_SECURE_BOOT_DELETE_PK:
       GetVariable2 (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid, (VOID**)&SetupMode, NULL);
       if (SetupMode == NULL || (*SetupMode) == SETUP_MODE) {

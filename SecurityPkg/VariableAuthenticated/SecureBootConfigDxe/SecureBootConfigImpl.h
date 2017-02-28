@@ -47,6 +47,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Guid/ImageAuthentication.h>
 #include <Guid/FileInfo.h>
+#include <Guid/WinCertificate.h>
 
 #include "SecureBootConfigNvData.h"
 
@@ -108,6 +109,7 @@ typedef struct {
 typedef struct {
   EFI_FILE_HANDLE                   FHandle;
   UINT16                            *FileName;
+  UINT8                             FileType;
 } SECUREBOOT_FILE_CONTEXT;
 
 

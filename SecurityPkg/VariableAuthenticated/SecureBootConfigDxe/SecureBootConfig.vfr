@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the SecureBoot configuration component.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -446,24 +446,42 @@ formset
     label LABEL_END;
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    string  varid   = SECUREBOOT_CONFIGURATION.SignatureGuid,
-            prompt  = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID),
-            help    = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID_HELP),
-            flags   = INTERACTIVE,
-            key     = KEY_SECURE_BOOT_SIGNATURE_GUID_DBX,
-            minsize = SECURE_BOOT_GUID_SIZE,
-            maxsize = SECURE_BOOT_GUID_SIZE,
-    endstring;
+    grayoutif ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 3;
+      string  varid   = SECUREBOOT_CONFIGURATION.SignatureGuid,
+              prompt  = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID),
+              help    = STRING_TOKEN(STR_SECURE_BOOT_SIGNATURE_GUID_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_SECURE_BOOT_SIGNATURE_GUID_DBX,
+              minsize = SECURE_BOOT_GUID_SIZE,
+              maxsize = SECURE_BOOT_GUID_SIZE,
+      endstring;
+    endif;
 
-    oneof name = SignatureFormatInDbx,
-          varid       = SECUREBOOT_CONFIGURATION.CertificateFormat,
-          prompt      = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),
-          help        = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_HELP),
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA256), value = 0x1, flags = DEFAULT;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA384), value = 0x2, flags = 0;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA512), value = 0x3, flags = 0;
-          option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_RAW), value = 0x4, flags = 0;
-    endoneof;
+    disableif NOT ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 1;
+      oneof name = X509SignatureFormatInDbx,
+            varid       = SECUREBOOT_CONFIGURATION.CertificateFormat,
+            prompt      = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),
+            help        = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_HELP),
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA256), value = 0x1, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA384), value = 0x2, flags = 0;
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_SHA512), value = 0x3, flags = 0;
+            option text = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_RAW), value = 0x4, flags = 0;
+      endoneof;
+    endif;
+
+    disableif NOT ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 2;
+      text
+        help   = STRING_TOKEN(STR_DBX_PE_IMAGE_FORMAT_HELP),          // Help string
+        text   = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),     // Prompt string
+        text   = STRING_TOKEN(STR_DBX_PE_FORMAT_SHA256);              // PE image type
+    endif;
+
+    disableif NOT ideqval SECUREBOOT_CONFIGURATION.FileEnrollType == 3;
+      text
+        help   = STRING_TOKEN(STR_DBX_AUTH_2_FORMAT_HELP),            // Help string
+        text   = STRING_TOKEN(STR_DBX_CERTIFICATE_FORMAT_PROMPT),     // Prompt string
+        text   = STRING_TOKEN(STR_DBX_AUTH_2_FORMAT);                 // AUTH_2 image type
+    endif;
 
     suppressif ideqval SECUREBOOT_CONFIGURATION.CertificateFormat == 4;
         checkbox varid  = SECUREBOOT_CONFIGURATION.AlwaysRevocation,
