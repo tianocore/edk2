@@ -545,7 +545,7 @@ UncachedInternalAllocatePool (
   IN UINTN            AllocationSize
   )
 {
-  UINTN CacheLineLength = ArmDataCacheLineLength ();
+  UINTN CacheLineLength = ArmCacheWritebackGranule ();
   return UncachedInternalAllocateAlignedPool (MemoryType, AllocationSize, CacheLineLength);
 }
 
