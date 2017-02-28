@@ -135,6 +135,7 @@ ShellCommandRunComp (
   InsertPosition1     = 0;
   InsertPosition2     = 0;
   TempAddress         = 0;
+  DiffPointAddress    = 0;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
