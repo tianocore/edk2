@@ -37,6 +37,7 @@ InitializeHighMemDxe (
   UINTN                 AddressCells, SizeCells;
   UINT64                CurBase;
   UINT64                CurSize;
+  UINT64                Attributes;
 
   Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
                   (VOID **)&FdtClient);
@@ -77,8 +78,21 @@ InitializeHighMemDxe (
           continue;
         }
 
-        Status = gDS->SetMemorySpaceAttributes (CurBase, CurSize,
-                        EFI_MEMORY_WB);
+        //
+        // Take care not to strip any permission attributes that will have been
+        // set by DxeCore on the region we just added if a strict permission
+        // policy is in effect for EfiConventionalMemory regions.
+        // Unfortunately, we cannot interrogate the GCD memory space map for
+        // those permissions, since they are not recorded there (for historical
+        // reasons), so check the policy directly.
+        //
+        Attributes = EFI_MEMORY_WB;
+        if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) &
+             (1U << (UINT32)EfiConventionalMemory)) != 0) {
+          Attributes |= EFI_MEMORY_XP;
+        }
+
+        Status = gDS->SetMemorySpaceAttributes (CurBase, CurSize, Attributes);
 
         if (EFI_ERROR (Status)) {
           DEBUG ((EFI_D_ERROR,

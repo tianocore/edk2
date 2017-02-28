@@ -45,6 +45,7 @@
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [Depex]
   gEfiCpuArchProtocolGuid AND gFdtClientProtocolGuid
