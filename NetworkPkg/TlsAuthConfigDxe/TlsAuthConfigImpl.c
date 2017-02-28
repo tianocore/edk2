@@ -1,7 +1,7 @@
 /** @file
   The Miscellaneous Routines for TlsAuthConfigDxe driver.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -105,144 +105,6 @@ GuidToString (
            Guid
            );
 }
-
-/**
-  Convert a String to Guid Value.
-
-  @param[in]   Str        Specifies the String to be converted.
-  @param[in]   StrLen     Number of Unicode Characters of String (exclusive \0)
-  @param[out]  Guid       Return the result Guid value.
-
-  @retval    EFI_SUCCESS           The operation is finished successfully.
-  @retval    EFI_NOT_FOUND         Invalid string.
-
-**/
-EFI_STATUS
-StringToGuid (
-  IN   CHAR16           *Str, 
-  IN   UINTN            StrLen, 
-  OUT  EFI_GUID         *Guid
-  )
-{
-  CHAR16             *PtrBuffer;
-  CHAR16             *PtrPosition;
-  UINT16             *Buffer;
-  UINTN              Data;
-  UINTN              Index;
-  UINT16             Digits[3];
-
-  Buffer = (CHAR16 *) AllocateZeroPool (sizeof (CHAR16) * (StrLen + 1));
-  if (Buffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  StrCpyS (Buffer, (StrLen + 1), Str);
-
-  //
-  // Data1
-  //
-  PtrBuffer       = Buffer;
-  PtrPosition     = PtrBuffer; 
-  while (*PtrBuffer != L'\0') {
-    if (*PtrBuffer == L'-') {
-      break;
-    }
-    PtrBuffer++;
-  }
-  if (*PtrBuffer == L'\0') {
-    FreePool (Buffer);
-    return EFI_NOT_FOUND;
-  }
-
-  *PtrBuffer      = L'\0';
-  Data            = StrHexToUintn (PtrPosition);
-  Guid->Data1     = (UINT32)Data;
-
-  //
-  // Data2
-  //
-  PtrBuffer++;
-  PtrPosition     = PtrBuffer;
-  while (*PtrBuffer != L'\0') {
-    if (*PtrBuffer == L'-') {
-      break;
-    }
-    PtrBuffer++;
-  }
-  if (*PtrBuffer == L'\0') {
-    FreePool (Buffer);
-    return EFI_NOT_FOUND;
-  }
-  *PtrBuffer      = L'\0';
-  Data            = StrHexToUintn (PtrPosition);
-  Guid->Data2     = (UINT16)Data;
-
-  //
-  // Data3
-  //
-  PtrBuffer++;
-  PtrPosition     = PtrBuffer;
-  while (*PtrBuffer != L'\0') {
-    if (*PtrBuffer == L'-') {
-      break;
-    }
-    PtrBuffer++;
-  }
-  if (*PtrBuffer == L'\0') {
-    FreePool (Buffer);
-    return EFI_NOT_FOUND;
-  }
-  *PtrBuffer      = L'\0';
-  Data            = StrHexToUintn (PtrPosition);
-  Guid->Data3     = (UINT16)Data;
-
-  //
-  // Data4[0..1]
-  //
-  for ( Index = 0 ; Index < 2 ; Index++) {
-    PtrBuffer++;
-    if ((*PtrBuffer == L'\0') || ( *(PtrBuffer + 1) == L'\0')) {
-      FreePool (Buffer);
-      return EFI_NOT_FOUND;
-    }
-    Digits[0]     = *PtrBuffer;
-    PtrBuffer++;
-    Digits[1]     = *PtrBuffer;
-    Digits[2]     = L'\0';
-    Data          = StrHexToUintn (Digits);
-    Guid->Data4[Index] = (UINT8)Data;
-  }
-
-  //
-  // skip the '-'
-  //
-  PtrBuffer++;
-  if ((*PtrBuffer != L'-' ) || ( *PtrBuffer == L'\0')) {
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Data4[2..7]
-  //
-  for ( ; Index < 8; Index++) {
-    PtrBuffer++;
-    if ((*PtrBuffer == L'\0') || ( *(PtrBuffer + 1) == L'\0')) {
-      FreePool (Buffer);
-      return EFI_NOT_FOUND;
-    }
-    Digits[0]     = *PtrBuffer;
-    PtrBuffer++;
-    Digits[1]     = *PtrBuffer;
-    Digits[2]     = L'\0';
-    Data          = StrHexToUintn (Digits);
-    Guid->Data4[Index] = (UINT8)Data;
-  }
-
-  FreePool (Buffer);
-  
-  return EFI_SUCCESS;
-}
-
 
 /**
   List all cert in specified database by GUID in the page 
@@ -1669,6 +1531,7 @@ TlsAuthConfigAccessCallback (
 {
   EFI_INPUT_KEY                   Key;
   EFI_STATUS                      Status;
+  RETURN_STATUS                   RStatus;
   TLS_AUTH_CONFIG_PRIVATE_DATA    *Private;
   UINTN                           BufferSize;
   TLS_AUTH_CONFIG_IFR_NVDATA      *IfrNvData;
@@ -1790,12 +1653,12 @@ TlsAuthConfigAccessCallback (
     switch (QuestionId) {
     case KEY_TLS_AUTH_CONFIG_CERT_GUID:
       ASSERT (Private->CertGuid != NULL);
-      Status = StringToGuid (
-                 IfrNvData->CertGuid,
-                 StrLen (IfrNvData->CertGuid),
-                 Private->CertGuid
-                 );
-      if (EFI_ERROR (Status)) {
+      RStatus = StrToGuid (
+                  IfrNvData->CertGuid,
+                  Private->CertGuid
+                  );
+      if (RETURN_ERROR (RStatus) || (IfrNvData->CertGuid[GUID_STRING_LENGTH] != L'\0')) {
+        Status = EFI_INVALID_PARAMETER;
         break;
       }
 
