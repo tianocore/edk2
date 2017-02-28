@@ -42,11 +42,6 @@ UncachedInternalAllocateAlignedPages (
 
 
 
-//
-// Assume all of memory has the same cache attributes, unless we do our magic
-//
-UINT64  gAttributes;
-
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Base;
   VOID                  *Allocation;
@@ -54,6 +49,7 @@ typedef struct {
   EFI_MEMORY_TYPE       MemoryType;
   BOOLEAN               Allocated;
   LIST_ENTRY            Link;
+  UINT64                Attributes;
 } FREE_PAGE_NODE;
 
 STATIC LIST_ENTRY  mPageList = INITIALIZE_LIST_HEAD_VARIABLE (mPageList);
@@ -153,10 +149,7 @@ AllocatePagesFromList (
   }
 
   Status = gDS->GetMemorySpaceDescriptor (Memory, &Descriptor);
-  if (!EFI_ERROR (Status)) {
-    // We are making an assumption that all of memory has the same default attributes
-    gAttributes = Descriptor.Attributes;
-  } else {
+  if (EFI_ERROR (Status)) {
     gBS->FreePages (Memory, Pages);
     return Status;
   }
@@ -181,6 +174,7 @@ AllocatePagesFromList (
   NewNode->Pages      = Pages;
   NewNode->Allocated  = TRUE;
   NewNode->MemoryType = MemoryType;
+  NewNode->Attributes = Descriptor.Attributes;
 
   InsertTailList (&mPageList, &NewNode->Link);
 
@@ -266,6 +260,10 @@ UncachedMemoryAllocationLibDestructor (
     // We only free the non-allocated buffer
     if (OldNode->Allocated == FALSE) {
       gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)OldNode->Base, OldNode->Pages);
+
+      gDS->SetMemorySpaceAttributes ((EFI_PHYSICAL_ADDRESS)(UINTN)OldNode->Base,
+             EFI_PAGES_TO_SIZE (OldNode->Pages), OldNode->Attributes);
+
       RemoveEntryList (&OldNode->Link);
       FreePool (OldNode);
     }
