@@ -163,8 +163,6 @@
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
-
   # KVM limits it IPA space to 40 bits (1 TB), so there is no need to
   # support anything bigger, even if the host hardware does
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40

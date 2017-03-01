@@ -386,6 +386,11 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD1
 
+  #
+  # Enable the non-executable DXE stack. (This gets set up by DxeIpl)
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
+
 [PcdsFixedAtBuild.ARM]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
 
