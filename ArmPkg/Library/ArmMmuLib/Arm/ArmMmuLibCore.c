@@ -406,40 +406,41 @@ ArmConfigureMmu (
   return RETURN_SUCCESS;
 }
 
-RETURN_STATUS
+
+EFI_STATUS
 ArmSetMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
   )
 {
-  return RETURN_UNSUPPORTED;
+  return EFI_UNSUPPORTED;
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArmClearMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
   )
 {
-  return RETURN_UNSUPPORTED;
+  return EFI_UNSUPPORTED;
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArmSetMemoryRegionReadOnly (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
   )
 {
-  return RETURN_UNSUPPORTED;
+  return EFI_UNSUPPORTED;
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArmClearMemoryRegionReadOnly (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
   )
 {
-  return RETURN_UNSUPPORTED;
+  return EFI_UNSUPPORTED;
 }
 
 RETURN_STATUS

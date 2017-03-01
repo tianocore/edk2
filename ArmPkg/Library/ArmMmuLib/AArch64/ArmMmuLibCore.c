@@ -329,7 +329,7 @@ GetBlockEntryListFromAddress (
 }
 
 STATIC
-RETURN_STATUS
+EFI_STATUS
 UpdateRegionMapping (
   IN  UINT64  *RootTable,
   IN  UINT64  RegionStart,
@@ -347,7 +347,7 @@ UpdateRegionMapping (
   // Ensure the Length is aligned on 4KB boundary
   if ((RegionLength == 0) || ((RegionLength & (SIZE_4KB - 1)) != 0)) {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
-    return RETURN_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   do {
@@ -357,7 +357,7 @@ UpdateRegionMapping (
     BlockEntry = GetBlockEntryListFromAddress (RootTable, RegionStart, &TableLevel, &BlockEntrySize, &LastBlockEntry);
     if (BlockEntry == NULL) {
       // GetBlockEntryListFromAddress() return NULL when it fails to allocate new pages from the Translation Tables
-      return RETURN_OUT_OF_RESOURCES;
+      return EFI_OUT_OF_RESOURCES;
     }
 
     if (TableLevel != 3) {
@@ -385,11 +385,11 @@ UpdateRegionMapping (
     } while ((RegionLength >= BlockEntrySize) && (BlockEntry <= LastBlockEntry));
   } while (RegionLength != 0);
 
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 STATIC
-RETURN_STATUS
+EFI_STATUS
 FillTranslationTable (
   IN  UINT64                        *RootTable,
   IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
@@ -446,7 +446,7 @@ GcdAttributeToPageAttribute (
   return PageAttributes | TT_AF;
 }
 
-RETURN_STATUS
+EFI_STATUS
 SetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN UINT64                    Length,
@@ -454,7 +454,7 @@ SetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS      VirtualMask
   )
 {
-  RETURN_STATUS                Status;
+  EFI_STATUS                   Status;
   UINT64                      *TranslationTable;
   UINT64                       PageAttributes;
   UINT64                       PageAttributeMask;
@@ -480,18 +480,18 @@ SetMemoryAttributes (
              Length,
              PageAttributes,
              PageAttributeMask);
-  if (RETURN_ERROR (Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
   // Invalidate all TLB entries so changes are synced
   ArmInvalidateTlb ();
 
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 STATIC
-RETURN_STATUS
+EFI_STATUS
 SetMemoryRegionAttribute (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length,
@@ -499,23 +499,23 @@ SetMemoryRegionAttribute (
   IN  UINT64                    BlockEntryMask
   )
 {
-  RETURN_STATUS                Status;
+  EFI_STATUS                   Status;
   UINT64                       *RootTable;
 
   RootTable = ArmGetTTBR0BaseAddress ();
 
   Status = UpdateRegionMapping (RootTable, BaseAddress, Length, Attributes, BlockEntryMask);
-  if (RETURN_ERROR (Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
   // Invalidate all TLB entries so changes are synced
   ArmInvalidateTlb ();
 
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArmSetMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
@@ -536,7 +536,7 @@ ArmSetMemoryRegionNoExec (
            ~TT_ADDRESS_MASK_BLOCK_ENTRY);
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArmClearMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
@@ -554,7 +554,7 @@ ArmClearMemoryRegionNoExec (
            Mask);
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArmSetMemoryRegionReadOnly (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
@@ -567,7 +567,7 @@ ArmSetMemoryRegionReadOnly (
            ~TT_ADDRESS_MASK_BLOCK_ENTRY);
 }
 
-RETURN_STATUS
+EFI_STATUS
 ArmClearMemoryRegionReadOnly (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length
@@ -580,7 +580,7 @@ ArmClearMemoryRegionReadOnly (
            ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK));
 }
 
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 ArmConfigureMmu (
   IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable,
@@ -594,11 +594,11 @@ ArmConfigureMmu (
   UINTN                         T0SZ;
   UINTN                         RootTableEntryCount;
   UINT64                        TCR;
-  RETURN_STATUS                 Status;
+  EFI_STATUS                    Status;
 
   if(MemoryTable == NULL) {
     ASSERT (MemoryTable != NULL);
-    return RETURN_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   // Cover the entire GCD memory space
@@ -632,7 +632,7 @@ ArmConfigureMmu (
     } else {
       DEBUG ((EFI_D_ERROR, "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n", MaxAddress));
       ASSERT (0); // Bigger than 48-bit memory space are not supported
-      return RETURN_UNSUPPORTED;
+      return EFI_UNSUPPORTED;
     }
   } else if (ArmReadCurrentEL () == AARCH64_EL1) {
     // Due to Cortex-A57 erratum #822227 we must set TG1[1] == 1, regardless of EPD1.
@@ -654,11 +654,11 @@ ArmConfigureMmu (
     } else {
       DEBUG ((EFI_D_ERROR, "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n", MaxAddress));
       ASSERT (0); // Bigger than 48-bit memory space are not supported
-      return RETURN_UNSUPPORTED;
+      return EFI_UNSUPPORTED;
     }
   } else {
     ASSERT (0); // UEFI is only expected to run at EL2 and EL1, not EL3.
-    return RETURN_UNSUPPORTED;
+    return EFI_UNSUPPORTED;
   }
 
   //
@@ -680,7 +680,7 @@ ArmConfigureMmu (
   // Allocate pages for translation table
   TranslationTable = AllocatePages (1);
   if (TranslationTable == NULL) {
-    return RETURN_OUT_OF_RESOURCES;
+    return EFI_OUT_OF_RESOURCES;
   }
   // We set TTBR0 just after allocating the table to retrieve its location from the subsequent
   // functions without needing to pass this value across the functions. The MMU is only enabled
@@ -719,7 +719,7 @@ ArmConfigureMmu (
     DEBUG_CODE_END ();
 
     Status = FillTranslationTable (TranslationTable, MemoryTable);
-    if (RETURN_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
       goto FREE_TRANSLATION_TABLE;
     }
     MemoryTable++;
@@ -739,7 +739,7 @@ ArmConfigureMmu (
   ArmEnableDataCache ();
 
   ArmEnableMmu ();
-  return RETURN_SUCCESS;
+  return EFI_SUCCESS;
 
 FREE_TRANSLATION_TABLE:
   FreePages (TranslationTable, 1);
