@@ -210,7 +210,7 @@ CpuSetMemoryAttributes (
   if (EFI_ERROR (Status) || (RegionArmAttributes != ArmAttributes) ||
       ((BaseAddress + Length) > (RegionBaseAddress + RegionLength)))
   {
-    return ArmSetMemoryAttributes (BaseAddress, Length, EfiAttributes, 0);
+    return ArmSetMemoryAttributes (BaseAddress, Length, EfiAttributes);
   } else {
     return EFI_SUCCESS;
   }

@@ -471,7 +471,6 @@ UpdatePageEntries (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN  UINT64                    Length,
   IN  UINT64                    Attributes,
-  IN  EFI_PHYSICAL_ADDRESS      VirtualMask,
   OUT BOOLEAN                   *FlushTlbs OPTIONAL
   )
 {
@@ -587,11 +586,6 @@ UpdatePageEntries (
     // Mask in new attributes and/or permissions
     PageTableEntry |= EntryValue;
 
-    if (VirtualMask != 0) {
-      // Make this virtual address point at a physical page
-      PageTableEntry &= ~VirtualMask;
-    }
-
     if (CurrentPageTableEntry  != PageTableEntry) {
       Mva = (VOID *)(UINTN)((((UINTN)FirstLevelIdx) << TT_DESCRIPTOR_SECTION_BASE_SHIFT) + (PageTableIndex << TT_DESCRIPTOR_PAGE_BASE_SHIFT));
 
@@ -619,8 +613,7 @@ EFI_STATUS
 UpdateSectionEntries (
   IN EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN UINT64                    Length,
-  IN UINT64                    Attributes,
-  IN EFI_PHYSICAL_ADDRESS      VirtualMask
+  IN UINT64                    Attributes
   )
 {
   EFI_STATUS    Status = EFI_SUCCESS;
@@ -704,7 +697,6 @@ UpdateSectionEntries (
                  (FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT,
                  TT_DESCRIPTOR_SECTION_SIZE,
                  Attributes,
-                 VirtualMask,
                  NULL);
     } else {
       // still a section entry
@@ -714,9 +706,6 @@ UpdateSectionEntries (
 
       // mask in new attributes and/or permissions
       Descriptor |= EntryValue;
-      if (VirtualMask != 0) {
-        Descriptor &= ~VirtualMask;
-      }
 
       if (CurrentDescriptor  != Descriptor) {
         Mva = (VOID *)(UINTN)(((UINTN)FirstLevelTable) << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
@@ -743,8 +732,7 @@ EFI_STATUS
 ArmSetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN UINT64                    Length,
-  IN UINT64                    Attributes,
-  IN EFI_PHYSICAL_ADDRESS      VirtualMask
+  IN UINT64                    Attributes
   )
 {
   EFI_STATUS    Status;
@@ -766,8 +754,7 @@ ArmSetMemoryAttributes (
         "SetMemoryAttributes(): MMU section 0x%lx length 0x%lx to %lx\n",
         BaseAddress, ChunkLength, Attributes));
 
-      Status = UpdateSectionEntries (BaseAddress, ChunkLength, Attributes,
-                 VirtualMask);
+      Status = UpdateSectionEntries (BaseAddress, ChunkLength, Attributes);
 
       FlushTlbs = TRUE;
     } else {
@@ -787,7 +774,7 @@ ArmSetMemoryAttributes (
         BaseAddress, ChunkLength, Attributes));
 
       Status = UpdatePageEntries (BaseAddress, ChunkLength, Attributes,
-                 VirtualMask, &FlushTlbs);
+                 &FlushTlbs);
     }
 
     if (EFI_ERROR (Status)) {
