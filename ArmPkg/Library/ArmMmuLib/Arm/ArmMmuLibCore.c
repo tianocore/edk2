@@ -37,6 +37,8 @@
 #define ID_MMFR0_SHR_IMP_HW_COHERENT   1
 #define ID_MMFR0_SHR_IGNORED         0xf
 
+#define __EFI_MEMORY_RWX               0    // no restrictions
+
 #define CACHE_ATTRIBUTE_MASK   (EFI_MEMORY_UC | \
                                 EFI_MEMORY_WC | \
                                 EFI_MEMORY_WT | \
@@ -797,7 +799,7 @@ ArmSetMemoryRegionNoExec (
   IN  UINT64                    Length
   )
 {
-  return EFI_UNSUPPORTED;
+  return ArmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_XP);
 }
 
 EFI_STATUS
@@ -806,7 +808,7 @@ ArmClearMemoryRegionNoExec (
   IN  UINT64                    Length
   )
 {
-  return EFI_UNSUPPORTED;
+  return ArmSetMemoryAttributes (BaseAddress, Length, __EFI_MEMORY_RWX);
 }
 
 EFI_STATUS
@@ -815,7 +817,7 @@ ArmSetMemoryRegionReadOnly (
   IN  UINT64                    Length
   )
 {
-  return EFI_UNSUPPORTED;
+  return ArmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RO);
 }
 
 EFI_STATUS
@@ -824,7 +826,7 @@ ArmClearMemoryRegionReadOnly (
   IN  UINT64                    Length
   )
 {
-  return EFI_UNSUPPORTED;
+  return ArmSetMemoryAttributes (BaseAddress, Length, __EFI_MEMORY_RWX);
 }
 
 RETURN_STATUS
