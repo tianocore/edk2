@@ -1,7 +1,7 @@
 @REM ## @file
 @REM # Makefile
 @REM #
-@REM # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+@REM # Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 @REM # This program and the accompanying materials
 @REM # are licensed and made available under the terms and conditions of the BSD License
 @REM # which accompanies this distribution.    The full text of the license may be found at
@@ -12,8 +12,8 @@
 @REM # 
 
 @echo off
-@set TOOL_ERROR=0
 setlocal
+set TOOL_ERROR=0
 SET NMAKE_COMMAND=%1
 SHIFT
 
@@ -39,7 +39,6 @@ goto exit
 :error
 popd
 set /A TOOL_ERROR=%TOOL_ERROR%+%ERRORLEVEL%
-ENDLOCAL
 ECHO Error while making %1!
 VERIFY OTHER 2>NUL
 
