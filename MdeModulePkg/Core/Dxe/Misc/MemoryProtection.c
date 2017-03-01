@@ -851,7 +851,7 @@ InitializeDxeNxMemoryProtectionPolicy (
     if (Attributes != 0) {
       SetUefiImageMemoryAttributes (
         MemoryMapEntry->PhysicalStart,
-        EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages),
+        LShiftU64 (MemoryMapEntry->NumberOfPages, EFI_PAGE_SHIFT),
         Attributes);
     }
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);

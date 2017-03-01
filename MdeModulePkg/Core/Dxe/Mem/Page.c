@@ -554,7 +554,7 @@ CoreAddMemoryDescriptor (
   CoreReleaseMemoryLock ();
 
   ApplyMemoryProtectionPolicy (EfiMaxMemoryType, Type, Start,
-    EFI_PAGES_TO_SIZE (NumberOfPages));
+    LShiftU64 (NumberOfPages, EFI_PAGE_SHIFT));
 
   //
   // If Loading Module At Fixed Address feature is enabled. try to allocate memory with Runtime code & Boot time code type
