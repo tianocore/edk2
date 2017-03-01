@@ -1,7 +1,7 @@
 ## @file
 # Build description file to generate Shell DP application.
 #
-# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -45,7 +45,7 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
-  PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+  PerformanceLib|MdeModulePkg/Library/DxeSmmPerformanceLib/DxeSmmPerformanceLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
@@ -55,23 +55,6 @@
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
-
-[LibraryClasses.IA32, LibraryClasses.X64]
-  # This library instance mapping needs adjusting based on platform.
-  # The TimerLib instance must match the TimerLib the platform was built with.
-  # If the platform was built with more than one TimerLib type, then this utility
-  # will produce invalid results for any measurements done with a TimerLib instance
-  # that is different than the one below.
-  #
-  # TimerLib|MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-  TimerLib|PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
-
-[LibraryClasses.IPF]
-  PalLib|MdePkg/Library/UefiPalLib/UefiPalLib.inf
-  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-
-[LibraryClasses.EBC]
-  TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
 
 [Components.IA32, Components.X64]
   PerformancePkg/Library/TscTimerLib/DxeTscTimerLib.inf
