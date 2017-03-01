@@ -19,6 +19,7 @@
 #include <Uefi.h>
 
 #include <Library/ArmLib.h>
+#include <Library/ArmMmuLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -112,11 +113,6 @@ SyncCacheConfig (
   IN  EFI_CPU_ARCH_PROTOCOL *CpuProtocol
   );
 
-EFI_STATUS
-ConvertSectionToPages (
-  IN EFI_PHYSICAL_ADDRESS  BaseAddress
-  );
-
 /**
  * Publish ARM Processor Data table in UEFI SYSTEM Table.
  * @param  HobStart               Pointer to the beginning of the HOB List from PEI.
@@ -130,14 +126,6 @@ VOID
 EFIAPI
 PublishArmProcessorTable(
   VOID
-  );
-
-EFI_STATUS
-SetMemoryAttributes (
-  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN UINT64                    Length,
-  IN UINT64                    Attributes,
-  IN EFI_PHYSICAL_ADDRESS      VirtualMask
   );
 
 // The ARM Attributes might be defined on 64-bit (case of the long format description table)

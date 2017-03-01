@@ -447,7 +447,7 @@ GcdAttributeToPageAttribute (
 }
 
 EFI_STATUS
-SetMemoryAttributes (
+ArmSetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS      BaseAddress,
   IN UINT64                    Length,
   IN UINT64                    Attributes,

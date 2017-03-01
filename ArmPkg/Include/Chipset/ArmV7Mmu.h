@@ -229,6 +229,12 @@
                                                         TT_DESCRIPTOR_PAGE_AP_RW_RW                                                       | \
                                                         TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE)
 
+// First Level Descriptors
+typedef UINT32    ARM_FIRST_LEVEL_DESCRIPTOR;
+
+// Second Level Descriptors
+typedef UINT32    ARM_PAGE_TABLE_ENTRY;
+
 UINT32
 ConvertSectionAttributesToPageAttributes (
   IN UINT32   SectionAttributes,

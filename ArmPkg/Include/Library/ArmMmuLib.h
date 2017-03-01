@@ -62,4 +62,12 @@ ArmReplaceLiveTranslationEntry (
   IN  UINT64  Value
   );
 
+EFI_STATUS
+ArmSetMemoryAttributes (
+  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN UINT64                    Length,
+  IN UINT64                    Attributes,
+  IN EFI_PHYSICAL_ADDRESS      VirtualMask
+  );
+
 #endif
