@@ -1428,11 +1428,12 @@ def Main():
             else:
                 OutFile = sys.argv[4]
                 Start = 5
-            GenCfgOpt.ParseBuildMode(sys.argv[3])
-            if GenCfgOpt.ParseMacros(sys.argv[Start:]) != 0:
-                print "ERROR: Macro parsing failed !"
-                return 3
+            if argc > Start:
+                if GenCfgOpt.ParseMacros(sys.argv[Start:]) != 0:
+                    print "ERROR: Macro parsing failed !"
+                    return 3
 
+        GenCfgOpt.ParseBuildMode(sys.argv[3])
         FvDir = sys.argv[3]
         if not os.path.exists(FvDir):
             os.makedirs(FvDir)
