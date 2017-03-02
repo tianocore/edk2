@@ -2,6 +2,8 @@
   Page table management support.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -271,6 +273,7 @@ GetPageTableEntry (
   UINT64                *L2PageTable;
   UINT64                *L3PageTable;
   UINT64                *L4PageTable;
+  UINT64                AddressEncMask;
 
   ASSERT (PagingContext != NULL);
 
@@ -279,6 +282,10 @@ GetPageTableEntry (
   Index2 = ((UINTN)Address >> 21) & PAGING_PAE_INDEX_MASK;
   Index1 = ((UINTN)Address >> 12) & PAGING_PAE_INDEX_MASK;
 
+  // Make sure AddressEncMask is contained to smallest supported address field.
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
+
   if (PagingContext->MachineType == IMAGE_FILE_MACHINE_X64) {
     L4PageTable = (UINT64 *)(UINTN)PagingContext->ContextData.X64.PageTableBase;
     if (L4PageTable[Index4] == 0) {
@@ -286,7 +293,7 @@ GetPageTableEntry (
       return NULL;
     }
 
-    L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & PAGING_4K_ADDRESS_MASK_64);
+    L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
   } else {
     ASSERT((PagingContext->ContextData.Ia32.Attributes & PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE) != 0);
     L3PageTable = (UINT64 *)(UINTN)PagingContext->ContextData.Ia32.PageTableBase;
@@ -301,7 +308,7 @@ GetPageTableEntry (
     return &L3PageTable[Index3];
   }
 
-  L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & PAGING_4K_ADDRESS_MASK_64);
+  L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
   if (L2PageTable[Index2] == 0) {
     *PageAttribute = PageNone;
     return NULL;
@@ -313,7 +320,7 @@ GetPageTableEntry (
   }
 
   // 4k
-  L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & PAGING_4K_ADDRESS_MASK_64);
+  L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
   if ((L1PageTable[Index1] == 0) && (Address != 0)) {
     *PageAttribute = PageNone;
     return NULL;
@@ -499,10 +506,15 @@ SplitPage (
   UINT64   BaseAddress;
   UINT64   *NewPageEntry;
   UINTN    Index;
+  UINT64   AddressEncMask;
 
   ASSERT (PageAttribute == Page2M || PageAttribute == Page1G);
 
   ASSERT (AllocatePagesFunc != NULL);
+
+  // Make sure AddressEncMask is contained to smallest supported address field.
+  //
+  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   if (PageAttribute == Page2M) {
     //
@@ -515,11 +527,11 @@ SplitPage (
       if (NewPageEntry == NULL) {
         return RETURN_OUT_OF_RESOURCES;
       }
-      BaseAddress = *PageEntry & PAGING_2M_ADDRESS_MASK_64;
+      BaseAddress = *PageEntry & ~AddressEncMask & PAGING_2M_ADDRESS_MASK_64;
       for (Index = 0; Index < SIZE_4KB / sizeof(UINT64); Index++) {
-        NewPageEntry[Index] = BaseAddress + SIZE_4KB * Index + ((*PageEntry) & PAGE_PROGATE_BITS);
+        NewPageEntry[Index] = (BaseAddress + SIZE_4KB * Index) | AddressEncMask | ((*PageEntry) & PAGE_PROGATE_BITS);
       }
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry + ((*PageEntry) & PAGE_PROGATE_BITS);
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | ((*PageEntry) & PAGE_PROGATE_BITS);
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
@@ -536,11 +548,11 @@ SplitPage (
       if (NewPageEntry == NULL) {
         return RETURN_OUT_OF_RESOURCES;
       }
-      BaseAddress = *PageEntry & PAGING_1G_ADDRESS_MASK_64;
+      BaseAddress = *PageEntry & ~AddressEncMask  & PAGING_1G_ADDRESS_MASK_64;
       for (Index = 0; Index < SIZE_4KB / sizeof(UINT64); Index++) {
-        NewPageEntry[Index] = BaseAddress + SIZE_2MB * Index + IA32_PG_PS + ((*PageEntry) & PAGE_PROGATE_BITS);
+        NewPageEntry[Index] = (BaseAddress + SIZE_2MB * Index) | AddressEncMask | IA32_PG_PS | ((*PageEntry) & PAGE_PROGATE_BITS);
       }
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry + ((*PageEntry) & PAGE_PROGATE_BITS);
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | ((*PageEntry) & PAGE_PROGATE_BITS);
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
