@@ -679,6 +679,11 @@ SetMemoryAttributes (
   )
 {
   EFI_STATUS    Status;
+  UINT64        ChunkLength;
+
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
 
   //
   // Ignore invocations that only modify permission bits
@@ -687,14 +692,44 @@ SetMemoryAttributes (
     return EFI_SUCCESS;
   }
 
-  if(((BaseAddress & 0xFFFFF) == 0) && ((Length & 0xFFFFF) == 0)) {
-    // Is the base and length a multiple of 1 MB?
-    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU section 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
-    Status = UpdateSectionEntries (BaseAddress, Length, Attributes, VirtualMask);
-  } else {
-    // Base and/or length is not a multiple of 1 MB
-    DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): MMU page 0x%x length 0x%x to %lx\n", (UINTN)BaseAddress, (UINTN)Length, Attributes));
-    Status = UpdatePageEntries (BaseAddress, Length, Attributes, VirtualMask);
+  while (Length > 0) {
+    if ((BaseAddress % TT_DESCRIPTOR_SECTION_SIZE == 0) &&
+        Length >= TT_DESCRIPTOR_SECTION_SIZE) {
+
+      ChunkLength = Length - Length % TT_DESCRIPTOR_SECTION_SIZE;
+
+      DEBUG ((DEBUG_PAGE,
+        "SetMemoryAttributes(): MMU section 0x%lx length 0x%lx to %lx\n",
+        BaseAddress, ChunkLength, Attributes));
+
+      Status = UpdateSectionEntries (BaseAddress, ChunkLength, Attributes,
+                 VirtualMask);
+    } else {
+
+      //
+      // Process page by page until the next section boundary, but only if
+      // we have more than a section's worth of area to deal with after that.
+      //
+      ChunkLength = TT_DESCRIPTOR_SECTION_SIZE -
+                    (BaseAddress % TT_DESCRIPTOR_SECTION_SIZE);
+      if (ChunkLength + TT_DESCRIPTOR_SECTION_SIZE > Length) {
+        ChunkLength = Length;
+      }
+
+      DEBUG ((DEBUG_PAGE,
+        "SetMemoryAttributes(): MMU page 0x%lx length 0x%lx to %lx\n",
+        BaseAddress, ChunkLength, Attributes));
+
+      Status = UpdatePageEntries (BaseAddress, ChunkLength, Attributes,
+                 VirtualMask);
+    }
+
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    BaseAddress += ChunkLength;
+    Length -= ChunkLength;
   }
 
   // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
