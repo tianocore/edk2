@@ -19,6 +19,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include "CpuDxe.h"
 
+#define CACHE_ATTRIBUTE_MASK   (EFI_MEMORY_UC | \
+                                EFI_MEMORY_WC | \
+                                EFI_MEMORY_WT | \
+                                EFI_MEMORY_WB | \
+                                EFI_MEMORY_UCE | \
+                                EFI_MEMORY_WP)
+
 // First Level Descriptors
 typedef UINT32    ARM_FIRST_LEVEL_DESCRIPTOR;
 
@@ -374,50 +381,48 @@ UpdatePageEntries (
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
-  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK;
-  EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
-  // Although the PI spec is unclear on this the GCD guarantees that only
-  // one Attribute bit is set at a time, so we can safely use a switch statement
-  switch (Attributes) {
-    case EFI_MEMORY_UC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // map to strongly ordered
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
-      break;
+  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK;
+  if ((Attributes & EFI_MEMORY_XP) != 0) {
+    EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE_XN;
+  } else {
+    EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
+  }
 
-    case EFI_MEMORY_WC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // map to normal non-cachable
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
-      break;
+  // Although the PI spec is unclear on this, the GCD guarantees that only
+  // one Attribute bit is set at a time, so the order of the conditionals below
+  // is irrelevant. If no memory attribute is specified, we preserve whatever
+  // memory type is set in the page tables, and update the permission attributes
+  // only.
+  if (Attributes & EFI_MEMORY_UC) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
+    // map to strongly ordered
+    EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
+  } else if (Attributes & EFI_MEMORY_WC) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
+    // map to normal non-cachable
+    EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
+  } else if (Attributes & EFI_MEMORY_WT) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
+    // write through with no-allocate
+    EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
+  } else if (Attributes & EFI_MEMORY_WB) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
+    // write back (with allocate)
+    EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
+  } else if (Attributes & CACHE_ATTRIBUTE_MASK) {
+    // catch unsupported memory type attributes
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
 
-    case EFI_MEMORY_WT:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // write through with no-allocate
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
-      break;
-
-    case EFI_MEMORY_WB:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-      // write back (with allocate)
-      EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
-      break;
-
-    case EFI_MEMORY_WP:
-    case EFI_MEMORY_XP:
-    case EFI_MEMORY_UCE:
-      // cannot be implemented UEFI definition unclear for ARM
-      // Cause a page fault if these ranges are accessed.
-      EntryValue = TT_DESCRIPTOR_PAGE_TYPE_FAULT;
-      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): setting page %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
-      break;
-
-    default:
-      return EFI_UNSUPPORTED;
+  if ((Attributes & EFI_MEMORY_RO) != 0) {
+    EntryValue |= TT_DESCRIPTOR_PAGE_AP_RO_RO;
+  } else {
+    EntryValue |= TT_DESCRIPTOR_PAGE_AP_RW_RW;
   }
 
   // Obtain page table base
@@ -520,53 +525,49 @@ UpdateSectionEntries (
   // EntryValue: values at bit positions specified by EntryMask
 
   // Make sure we handle a section range that is unmapped
-  EntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK;
+  EntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK | TT_DESCRIPTOR_SECTION_XN_MASK |
+              TT_DESCRIPTOR_SECTION_AP_MASK;
   EntryValue = TT_DESCRIPTOR_SECTION_TYPE_SECTION;
 
-  // Although the PI spec is unclear on this the GCD guarantees that only
-  // one Attribute bit is set at a time, so we can safely use a switch statement
-  switch(Attributes) {
-    case EFI_MEMORY_UC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // map to strongly ordered
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
-      break;
+  // Although the PI spec is unclear on this, the GCD guarantees that only
+  // one Attribute bit is set at a time, so the order of the conditionals below
+  // is irrelevant. If no memory attribute is specified, we preserve whatever
+  // memory type is set in the page tables, and update the permission attributes
+  // only.
+  if (Attributes & EFI_MEMORY_UC) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
+    // map to strongly ordered
+    EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_STRONGLY_ORDERED; // TEX[2:0] = 0, C=0, B=0
+  } else if (Attributes & EFI_MEMORY_WC) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
+    // map to normal non-cachable
+    EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
+  } else if (Attributes & EFI_MEMORY_WT) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
+    // write through with no-allocate
+    EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
+  } else if (Attributes & EFI_MEMORY_WB) {
+    // modify cacheability attributes
+    EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
+    // write back (with allocate)
+    EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
+  } else if (Attributes & CACHE_ATTRIBUTE_MASK) {
+    // catch unsupported memory type attributes
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
 
-    case EFI_MEMORY_WC:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // map to normal non-cachable
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
-      break;
+  if (Attributes & EFI_MEMORY_RO) {
+    EntryValue |= TT_DESCRIPTOR_SECTION_AP_RO_RO;
+  } else {
+    EntryValue |= TT_DESCRIPTOR_SECTION_AP_RW_RW;
+  }
 
-    case EFI_MEMORY_WT:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // write through with no-allocate
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_THROUGH_NO_ALLOC; // TEX [2:0] = 0, C=1, B=0
-      break;
-
-    case EFI_MEMORY_WB:
-      // modify cacheability attributes
-      EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-      // write back (with allocate)
-      EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_WRITE_BACK_ALLOC; // TEX [2:0] = 001, C=1, B=1
-      break;
-
-    case EFI_MEMORY_WP:
-    case EFI_MEMORY_XP:
-    case EFI_MEMORY_RP:
-    case EFI_MEMORY_UCE:
-      // cannot be implemented UEFI definition unclear for ARM
-      // Cause a page fault if these ranges are accessed.
-      EntryValue = TT_DESCRIPTOR_SECTION_TYPE_FAULT;
-      DEBUG ((EFI_D_PAGE, "SetMemoryAttributes(): setting section %lx with unsupported attribute %x will page fault on access\n", BaseAddress, Attributes));
-      break;
-
-
-    default:
-      return EFI_UNSUPPORTED;
+  if (Attributes & EFI_MEMORY_XP) {
+    EntryValue |= TT_DESCRIPTOR_SECTION_XN_MASK;
   }
 
   // obtain page table base
@@ -694,13 +695,6 @@ SetMemoryAttributes (
   BOOLEAN       FlushTlbs;
 
   if (Length == 0) {
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Ignore invocations that only modify permission bits
-  //
-  if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
     return EFI_SUCCESS;
   }
 
