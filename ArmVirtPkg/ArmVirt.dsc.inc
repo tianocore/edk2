@@ -18,7 +18,7 @@
   DEFINE TTY_TERMINAL            = FALSE
 
 [BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION]
-  GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x1000
+  GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
@@ -373,10 +373,6 @@
   gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x80, 0x6d, 0x91, 0x7d, 0xb1, 0x5b, 0x8c, 0x45, 0xa4, 0x8f, 0xe2, 0x5f, 0xdd, 0x51, 0xef, 0x94}
 !endif
 
-[PcdsFixedAtBuild.ARM]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
-
-[PcdsFixedAtBuild.AARCH64]
   #
   # Enable strict image permissions for all images. (This applies
   # only to images that were built with >= 4 KB section alignment.)
@@ -389,6 +385,9 @@
   # (i.e., GRUB) may assume that its contents are executable.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD1
+
+[PcdsFixedAtBuild.ARM]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
 
 [Components.common]
   #
