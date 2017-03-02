@@ -347,10 +347,11 @@ SyncCacheConfig (
 
 EFI_STATUS
 UpdatePageEntries (
-  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN UINT64                    Length,
-  IN UINT64                    Attributes,
-  IN EFI_PHYSICAL_ADDRESS      VirtualMask
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length,
+  IN  UINT64                    Attributes,
+  IN  EFI_PHYSICAL_ADDRESS      VirtualMask,
+  OUT BOOLEAN                   *FlushTlbs OPTIONAL
   )
 {
   EFI_STATUS    Status;
@@ -446,6 +447,9 @@ UpdatePageEntries (
 
       // Re-read descriptor
       Descriptor = FirstLevelTable[FirstLevelIdx];
+      if (FlushTlbs != NULL) {
+        *FlushTlbs = TRUE;
+      }
     }
 
     // Obtain page table base address
@@ -471,15 +475,16 @@ UpdatePageEntries (
 
     if (CurrentPageTableEntry  != PageTableEntry) {
       Mva = (VOID *)(UINTN)((((UINTN)FirstLevelIdx) << TT_DESCRIPTOR_SECTION_BASE_SHIFT) + (PageTableIndex << TT_DESCRIPTOR_PAGE_BASE_SHIFT));
-      if ((CurrentPageTableEntry & TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) == TT_DESCRIPTOR_PAGE_CACHEABLE_MASK) {
-        // The current section mapping is cacheable so Clean/Invalidate the MVA of the page
-        // Note assumes switch(Attributes), not ARMv7 possibilities
-        WriteBackInvalidateDataCacheRange (Mva, TT_DESCRIPTOR_PAGE_SIZE);
-      }
 
       // Only need to update if we are changing the entry
       PageTable[PageTableIndex] = PageTableEntry;
       ArmUpdateTranslationTableEntry ((VOID *)&PageTable[PageTableIndex], Mva);
+
+      // Clean/invalidate the cache for this page, but only
+      // if we are modifying the memory type attributes
+      if (((CurrentPageTableEntry ^ PageTableEntry) & TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK) != 0) {
+        WriteBackInvalidateDataCacheRange (Mva, TT_DESCRIPTOR_PAGE_SIZE);
+      }
     }
 
     Status = EFI_SUCCESS;
@@ -581,7 +586,12 @@ UpdateSectionEntries (
     // has this descriptor already been coverted to pages?
     if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(CurrentDescriptor)) {
       // forward this 1MB range to page table function instead
-      Status = UpdatePageEntries ((FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT, TT_DESCRIPTOR_SECTION_SIZE, Attributes, VirtualMask);
+      Status = UpdatePageEntries (
+                 (FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT,
+                 TT_DESCRIPTOR_SECTION_SIZE,
+                 Attributes,
+                 VirtualMask,
+                 NULL);
     } else {
       // still a section entry
 
@@ -596,15 +606,16 @@ UpdateSectionEntries (
 
       if (CurrentDescriptor  != Descriptor) {
         Mva = (VOID *)(UINTN)(((UINTN)FirstLevelTable) << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
-        if ((CurrentDescriptor & TT_DESCRIPTOR_SECTION_CACHEABLE_MASK) == TT_DESCRIPTOR_SECTION_CACHEABLE_MASK) {
-          // The current section mapping is cacheable so Clean/Invalidate the MVA of the section
-          // Note assumes switch(Attributes), not ARMv7 possabilities
-          WriteBackInvalidateDataCacheRange (Mva, SIZE_1MB);
-        }
 
         // Only need to update if we are changing the descriptor
         FirstLevelTable[FirstLevelIdx + i] = Descriptor;
         ArmUpdateTranslationTableEntry ((VOID *)&FirstLevelTable[FirstLevelIdx + i], Mva);
+
+        // Clean/invalidate the cache for this section, but only
+        // if we are modifying the memory type attributes
+        if (((CurrentDescriptor ^ Descriptor) & TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK) != 0) {
+          WriteBackInvalidateDataCacheRange (Mva, SIZE_1MB);
+        }
       }
 
       Status = EFI_SUCCESS;
@@ -680,6 +691,7 @@ SetMemoryAttributes (
 {
   EFI_STATUS    Status;
   UINT64        ChunkLength;
+  BOOLEAN       FlushTlbs;
 
   if (Length == 0) {
     return EFI_SUCCESS;
@@ -692,6 +704,7 @@ SetMemoryAttributes (
     return EFI_SUCCESS;
   }
 
+  FlushTlbs = FALSE;
   while (Length > 0) {
     if ((BaseAddress % TT_DESCRIPTOR_SECTION_SIZE == 0) &&
         Length >= TT_DESCRIPTOR_SECTION_SIZE) {
@@ -704,6 +717,8 @@ SetMemoryAttributes (
 
       Status = UpdateSectionEntries (BaseAddress, ChunkLength, Attributes,
                  VirtualMask);
+
+      FlushTlbs = TRUE;
     } else {
 
       //
@@ -721,7 +736,7 @@ SetMemoryAttributes (
         BaseAddress, ChunkLength, Attributes));
 
       Status = UpdatePageEntries (BaseAddress, ChunkLength, Attributes,
-                 VirtualMask);
+                 VirtualMask, &FlushTlbs);
     }
 
     if (EFI_ERROR (Status)) {
@@ -732,16 +747,9 @@ SetMemoryAttributes (
     Length -= ChunkLength;
   }
 
-  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  // flush and invalidate pages
-  //TODO: Do we really need to invalidate the caches everytime we change the memory attributes ?
-  ArmCleanInvalidateDataCache ();
-
-  ArmInvalidateInstructionCache ();
-
-  // Invalidate all TLB entries so changes are synced
-  ArmInvalidateTlb ();
-
+  if (FlushTlbs) {
+    ArmInvalidateTlb ();
+  }
   return Status;
 }
 
