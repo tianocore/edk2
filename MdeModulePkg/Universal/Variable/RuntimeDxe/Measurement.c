@@ -242,8 +242,17 @@ SecureBootHook (
              &VariableDataSize
              );
   if (EFI_ERROR (Status)) {
-    VariableData     = NULL;
-    VariableDataSize = 0;
+    //
+    // Measure DBT only if present and not empty
+    //
+    if (StrCmp (VariableName, EFI_IMAGE_SECURITY_DATABASE2) == 0 &&
+        CompareGuid (VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
+      DEBUG((DEBUG_INFO, "Skip measuring variable %s since it's deleted\n", EFI_IMAGE_SECURITY_DATABASE2));
+      return;
+    } else {
+      VariableData     = NULL;
+      VariableDataSize = 0;
+    }
   }
 
   Status = MeasureVariable (
