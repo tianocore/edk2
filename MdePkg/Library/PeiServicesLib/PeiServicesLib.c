@@ -1,7 +1,7 @@
 /** @file
   Implementation for PEI Services Library.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -357,16 +357,16 @@ PeiServicesInstallPeiMemory (
 }
 
 /**
-  This service enables PEIMs to allocate memory after the permanent memory has been
-   installed by a PEIM.
+  This service enables PEIMs to allocate memory.
 
   @param  MemoryType            Type of memory to allocate.
   @param  Pages                 The number of pages to allocate.
   @param  Memory                Pointer of memory allocated.
 
   @retval EFI_SUCCESS           The memory range was successfully allocated.
-  @retval EFI_INVALID_PARAMETER Type is not equal to AllocateAnyPages.
-  @retval EFI_NOT_AVAILABLE_YET Called with permanent memory not available.
+  @retval EFI_INVALID_PARAMETER Type is not equal to EfiLoaderCode, EfiLoaderData, EfiRuntimeServicesCode,
+                                EfiRuntimeServicesData, EfiBootServicesCode, EfiBootServicesData,
+                                EfiACPIReclaimMemory, EfiReservedMemoryType, or EfiACPIMemoryNVS.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
 
 **/
@@ -382,6 +382,31 @@ PeiServicesAllocatePages (
 
   PeiServices = GetPeiServicesTablePointer ();
   return (*PeiServices)->AllocatePages (PeiServices, MemoryType, Pages, Memory);
+}
+
+/**
+  This service enables PEIMs to free memory.
+
+  @param Memory                 Memory to be freed.
+  @param Pages                  The number of pages to free.
+
+  @retval EFI_SUCCESS           The requested pages were freed.
+  @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or Pages is invalid.
+  @retval EFI_NOT_FOUND         The requested memory pages were not allocated with
+                                AllocatePages().
+
+**/
+EFI_STATUS
+EFIAPI
+PeiServicesFreePages (
+  IN EFI_PHYSICAL_ADDRESS       Memory,
+  IN UINTN                      Pages
+  )
+{
+  CONST EFI_PEI_SERVICES **PeiServices;
+
+  PeiServices = GetPeiServicesTablePointer ();
+  return (*PeiServices)->FreePages (PeiServices, Memory, Pages);
 }
 
 /**
