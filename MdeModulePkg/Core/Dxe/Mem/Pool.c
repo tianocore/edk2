@@ -291,6 +291,17 @@ CoreAllocatePool (
   return Status;
 }
 
+/**
+  Internal function.  Used by the pool functions to allocate pages
+  to back pool allocation requests.
+
+  @param  PoolType               The type of memory for the new pool pages
+  @param  NoPages                No of pages to allocate
+  @param  Granularity            Bits to align.
+
+  @return The allocated memory, or NULL
+
+**/
 STATIC
 VOID *
 CoreAllocatePoolPagesI (
@@ -553,6 +564,14 @@ CoreFreePool (
   return Status;
 }
 
+/**
+  Internal function.  Frees pool pages allocated via CoreAllocatePoolPagesI().
+
+  @param  PoolType               The type of memory for the pool pages
+  @param  Memory                 The base address to free
+  @param  NoPages                The number of pages to free
+
+**/
 STATIC
 VOID
 CoreFreePoolPagesI (

@@ -657,6 +657,8 @@ UnprotectUefiImage (
 /**
   Return the EFI memory permission attribute associated with memory
   type 'MemoryType' under the configured DXE memory protection policy.
+
+  @param MemoryType       Memory type.
 **/
 STATIC
 UINT64
@@ -788,7 +790,7 @@ MergeMemoryMapForProtectionPolicy (
 
 /**
   Remove exec permissions from all regions whose type is identified by
-  PcdDxeNxMemoryProtectionPolicy
+  PcdDxeNxMemoryProtectionPolicy.
 **/
 STATIC
 VOID
@@ -1053,7 +1055,7 @@ CoreInitializeMemoryProtection (
 }
 
 /**
-  Returns whether we are currently executing in SMM mode
+  Returns whether we are currently executing in SMM mode.
 **/
 STATIC
 BOOLEAN
