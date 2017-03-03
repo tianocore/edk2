@@ -1739,7 +1739,7 @@
   ## This PCD holds the address mask for page table entries when memory encryption is
   #  enabled on AMD processors supporting the Secure Encrypted Virtualization (SEV) feature.
   #  This mask should be applied when creating 1:1 virtual to physical mapping tables.
-  #
+  # @Prompt The address mask when memory encryption is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0|UINT64|0x30001047
 
 [PcdsPatchableInModule]
