@@ -140,6 +140,8 @@ PeiAllocatePages (
   EFI_PHYSICAL_ADDRESS                    *FreeMemoryTop;
   EFI_PHYSICAL_ADDRESS                    *FreeMemoryBottom;
   UINTN                                   RemainingPages;
+  UINTN                                   Granularity;
+  UINTN                                   Padding;
 
   if ((MemoryType != EfiLoaderCode) &&
       (MemoryType != EfiLoaderData) &&
@@ -151,6 +153,20 @@ PeiAllocatePages (
       (MemoryType != EfiReservedMemoryType) &&
       (MemoryType != EfiACPIMemoryNVS)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+
+  if  (RUNTIME_PAGE_ALLOCATION_GRANULARITY > DEFAULT_PAGE_ALLOCATION_GRANULARITY &&
+       (MemoryType == EfiACPIReclaimMemory   ||
+        MemoryType == EfiACPIMemoryNVS       ||
+        MemoryType == EfiRuntimeServicesCode ||
+        MemoryType == EfiRuntimeServicesData)) {
+
+    Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+
+    DEBUG ((DEBUG_INFO, "AllocatePages: aligning allocation to %d KB\n",
+      Granularity / SIZE_1KB));
   }
 
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
@@ -176,9 +192,27 @@ PeiAllocatePages (
   }
 
   //
-  // Check to see if on 4k boundary, If not aligned, make the allocation aligned.
+  // Check to see if on correct boundary for the memory type.
+  // If not aligned, make the allocation aligned.
   //
-  *(FreeMemoryTop) -= *(FreeMemoryTop) & 0xFFF;
+  Padding = *(FreeMemoryTop) & (Granularity - 1);
+  if ((UINTN) (*FreeMemoryTop - *FreeMemoryBottom) < Padding) {
+    DEBUG ((DEBUG_ERROR, "AllocatePages failed: Out of space after padding.\n"));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  *(FreeMemoryTop) -= Padding;
+  if (Padding >= EFI_PAGE_SIZE) {
+    //
+    // Create a memory allocation HOB to cover
+    // the pages that we will lose to rounding
+    //
+    BuildMemoryAllocationHob (
+      *(FreeMemoryTop),
+      Padding & ~(UINTN)EFI_PAGE_MASK,
+      EfiConventionalMemory
+      );
+  }
 
   //
   // Verify that there is sufficient memory to satisfy the allocation.
@@ -192,6 +226,7 @@ PeiAllocatePages (
   //
   // The number of remaining pages needs to be greater than or equal to that of the request pages.
   //
+  Pages = ALIGN_VALUE (Pages, EFI_SIZE_TO_PAGES (Granularity));
   if (RemainingPages < Pages) {
     DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64) Pages));
     DEBUG ((EFI_D_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64) RemainingPages));
