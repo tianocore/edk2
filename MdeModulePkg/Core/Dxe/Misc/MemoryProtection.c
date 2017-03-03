@@ -344,12 +344,12 @@ IsMemoryProtectionSectionAligned (
   switch (MemoryType) {
   case EfiRuntimeServicesCode:
   case EfiACPIMemoryNVS:
-    PageAlignment = EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT;
+    PageAlignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
     break;
   case EfiRuntimeServicesData:
   case EfiACPIReclaimMemory:
     ASSERT (FALSE);
-    PageAlignment = EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT;
+    PageAlignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
     break;
   case EfiBootServicesCode:
   case EfiLoaderCode:

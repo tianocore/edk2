@@ -352,9 +352,9 @@ CoreAllocatePoolI (
        PoolType == EfiRuntimeServicesCode ||
        PoolType == EfiRuntimeServicesData) {
 
-    Granularity = EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT;
+    Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
   } else {
-    Granularity = DEFAULT_PAGE_ALLOCATION;
+    Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
   }
 
   //
@@ -643,9 +643,9 @@ CoreFreePoolI (
        Head->Type == EfiRuntimeServicesCode ||
        Head->Type == EfiRuntimeServicesData) {
 
-    Granularity = EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT;
+    Granularity = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
   } else {
-    Granularity = DEFAULT_PAGE_ALLOCATION;
+    Granularity = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
   }
 
   if (PoolType != NULL) {

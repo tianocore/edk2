@@ -104,7 +104,7 @@ InstallMemoryAttributesTable (
 
   if ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
     DEBUG ((EFI_D_VERBOSE, "MemoryProtectionAttribute NON_EXECUTABLE_PE_DATA is not set, "));
-    DEBUG ((EFI_D_VERBOSE, "because Runtime Driver Section Alignment is not %dK.\n", EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT >> 10));
+    DEBUG ((EFI_D_VERBOSE, "because Runtime Driver Section Alignment is not %dK.\n", RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
     return ;
   }
 
