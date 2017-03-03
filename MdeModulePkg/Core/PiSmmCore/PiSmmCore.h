@@ -1151,12 +1151,6 @@ SmiHandlerProfileUnregisterHandler (
   IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler
   );
 
-///
-/// For generic EFI machines make the default allocations 4K aligned
-///
-#define EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT  (EFI_PAGE_SIZE)
-#define DEFAULT_PAGE_ALLOCATION                     (EFI_PAGE_SIZE)
-
 extern UINTN                    mFullSmramRangeCount;
 extern EFI_SMRAM_DESCRIPTOR     *mFullSmramRanges;
 

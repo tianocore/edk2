@@ -795,7 +795,7 @@ SetMemoryAttributesTableSectionAlignment (
   IN UINT32  SectionAlignment
   )
 {
-  if (((SectionAlignment & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) &&
+  if (((SectionAlignment & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) &&
       ((mMemoryProtectionAttribute & EFI_MEMORY_ATTRIBUTES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) != 0)) {
     DEBUG ((DEBUG_VERBOSE, "SMM SetMemoryAttributesTableSectionAlignment - Clear\n"));
     mMemoryProtectionAttribute &= ~((UINT64)EFI_MEMORY_ATTRIBUTES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA);
@@ -1125,9 +1125,9 @@ SmmInsertImageRecord (
   }
 
   SetMemoryAttributesTableSectionAlignment (SectionAlignment);
-  if ((SectionAlignment & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) {
+  if ((SectionAlignment & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) {
     DEBUG ((DEBUG_WARN, "SMM !!!!!!!!  InsertImageRecord - Section Alignment(0x%x) is not %dK  !!!!!!!!\n",
-      SectionAlignment, EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT >> 10));
+      SectionAlignment, RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
     PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageAddress);
     if (PdbPointer != NULL) {
       DEBUG ((DEBUG_WARN, "SMM !!!!!!!!  Image - %a  !!!!!!!!\n", PdbPointer));

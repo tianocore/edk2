@@ -110,7 +110,7 @@ AllocateMemoryMapEntry (
     Status = SmmInternalAllocatePagesEx (
                AllocateAnyPages,
                EfiRuntimeServicesData,
-               EFI_SIZE_TO_PAGES(DEFAULT_PAGE_ALLOCATION),
+               EFI_SIZE_TO_PAGES (RUNTIME_PAGE_ALLOCATION_GRANULARITY),
                &Mem,
                TRUE
                );
@@ -121,7 +121,7 @@ AllocateMemoryMapEntry (
       //
       // Enque the free memmory map entries into the list
       //
-      for (Index = 0; Index< DEFAULT_PAGE_ALLOCATION / sizeof(MEMORY_MAP); Index++) {
+      for (Index = 0; Index< RUNTIME_PAGE_ALLOCATION_GRANULARITY / sizeof(MEMORY_MAP); Index++) {
         FreeDescriptorEntries[Index].Signature = MEMORY_MAP_SIGNATURE;
         InsertTailList (&mFreeMemoryMapEntryList, &FreeDescriptorEntries[Index].Link);
       }
