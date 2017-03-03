@@ -271,6 +271,12 @@ typedef INT64   INTN;
 ///
 #define CPU_STACK_ALIGNMENT   16
 
+///
+/// Page allocation granularity for x64
+///
+#define DEFAULT_PAGE_ALLOCATION_GRANULARITY   (0x1000)
+#define RUNTIME_PAGE_ALLOCATION_GRANULARITY   (0x1000)
+
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
