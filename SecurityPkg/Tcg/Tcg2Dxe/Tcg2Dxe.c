@@ -1982,7 +1982,8 @@ ReadAndMeasureVariable (
 }
 
 /**
-  Read then Measure and log an EFI boot variable, and extend the measurement result into PCR[5].
+  Read then Measure and log an EFI boot variable, and extend the measurement result into PCR[1].
+according to TCG PC Client PFP spec 0021 Section 2.4.4.2
 
   @param[in]   VarName          A Null-terminated string that is the name of the vendor's variable.
   @param[in]   VendorGuid       A unique identifier for the vendor.
@@ -2003,7 +2004,7 @@ ReadAndMeasureBootVariable (
   )
 {
   return ReadAndMeasureVariable (
-           5,
+           1,
            EV_EFI_VARIABLE_BOOT,
            VarName,
            VendorGuid,
