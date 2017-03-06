@@ -780,25 +780,6 @@ typedef struct {
   ///
 } EFI_PCI_CAPABILITY_HOTPLUG;
 
-///
-/// Below macros (till PCI_BAR_NOCHANGE) were used by EfiIncompatiblePciDeviceSupport Protocol.
-///
-#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
-
-///
-/// [ATTENTION] These macros are deprecated because they don't match Spec or not defined in Spec.
-///
-#define DEVICE_ID_NOCARE    0xFFFF                 ///< Deprecated. Value doesn't match Spec.
-#define PCI_BAR_OLD_ALIGN   0xFFFFFFFFFFFFFFFFULL  ///< Deprecated. Value isn't defined in Spec.
-#define PCI_BAR_EVEN_ALIGN  0xFFFFFFFFFFFFFFFEULL  ///< Deprecated. Value isn't defined in Spec.
-#define PCI_BAR_SQUAD_ALIGN 0xFFFFFFFFFFFFFFFDULL  ///< Deprecated. Value isn't defined in Spec.
-#define PCI_BAR_DQUAD_ALIGN 0xFFFFFFFFFFFFFFFCULL  ///< Deprecated. Value isn't defined in Spec.
-#define PCI_BAR_ALL         0xFF                   ///< Deprecated. Value doesn't match Spec.
-#define PCI_ACPI_UNUSED     0                      ///< Deprecated. Macro name is too general.
-#define PCI_BAR_NOCHANGE    0                      ///< Deprecated. Macro name is too general.
-
-#endif
-
 #define PCI_BAR_IDX0        0x00
 #define PCI_BAR_IDX1        0x01
 #define PCI_BAR_IDX2        0x02
