@@ -1,7 +1,7 @@
 /** @file
 Elf32 Convert solution
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <io.h>
 #endif
 #include <assert.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -304,23 +303,27 @@ GetSymName (
   Elf_Sym *Sym
   )
 {
+  Elf_Shdr *StrtabShdr;
+  UINT8    *StrtabContents;
+  BOOLEAN  foundEnd;
+  UINT32   i;
+
   if (Sym->st_name == 0) {
     return NULL;
   }
 
-  Elf_Shdr *StrtabShdr = FindStrtabShdr();
+  StrtabShdr = FindStrtabShdr();
   if (StrtabShdr == NULL) {
     return NULL;
   }
 
   assert(Sym->st_name < StrtabShdr->sh_size);
 
-  UINT8* StrtabContents = (UINT8*)mEhdr + StrtabShdr->sh_offset;
+  StrtabContents = (UINT8*)mEhdr + StrtabShdr->sh_offset;
 
-  bool foundEnd = false;
-  UINT32 i;
+  foundEnd = FALSE;
   for (i = Sym->st_name; (i < StrtabShdr->sh_size) && !foundEnd; i++) {
-    foundEnd = StrtabContents[i] == 0;
+    foundEnd = (BOOLEAN)(StrtabContents[i] == 0);
   }
   assert(foundEnd);
 
