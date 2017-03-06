@@ -1590,9 +1590,11 @@ CombinePath (
 )
 {
   UINT32 DefaultPathLen;
+  UINT64 Index;
+
   DefaultPathLen = strlen(DefaultPath);
   strcpy(NewPath, DefaultPath);
-  UINT64 Index = 0;
+  Index = 0;
   for (; Index < DefaultPathLen; Index ++) {
     if (NewPath[Index] == '\\' || NewPath[Index] == '/') {
       if (NewPath[Index + 1] != '\0') {
