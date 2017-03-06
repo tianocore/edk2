@@ -41,9 +41,9 @@ VOID
 PrintDifferentPoint(
   CONST CHAR16  *FileName,
   UINT8         *Buffer,
-  UINT64        DataSize,
+  UINT64        BufferSize,
   UINTN         Address,
-  UINT64        BufferSize
+  UINT64        DifferentBytes
   )
 {
   UINTN Index;
@@ -53,11 +53,11 @@ PrintDifferentPoint(
   //
   // Print data in hex-format.
   //
-  for (Index = 0; Index < DataSize; Index++) {
+  for (Index = 0; Index < BufferSize; Index++) {
     ShellPrintEx (-1, -1, L" %02x", Buffer[Index]);
   }
 
-  if (DataSize < BufferSize) {
+  if (BufferSize < DifferentBytes) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_END_OF_FILE), gShellDebug1HiiHandle);
   }
 
@@ -66,7 +66,7 @@ PrintDifferentPoint(
   //
   // Print data in char-format.
   //
-  for (Index = 0; Index < DataSize; Index++) {
+  for (Index = 0; Index < BufferSize; Index++) {
     if (Buffer[Index] >= 0x20 && Buffer[Index] <= 0x7E) {
       ShellPrintEx (-1, -1, L"%c", Buffer[Index]);
     } else {
