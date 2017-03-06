@@ -2703,9 +2703,11 @@ Returns:
     }
     SymFileName = VTF_SYM_FILE;
   } else {
-    assert (OutFileName1);
-    INTN OutFileNameLen = strlen(OutFileName1);
+    INTN OutFileNameLen;
     INTN NewIndex;
+
+    assert (OutFileName1);
+    OutFileNameLen = strlen(OutFileName1);
 
     for (NewIndex = OutFileNameLen; NewIndex > 0; --NewIndex) {
       if (OutFileName1[NewIndex] == '/' || OutFileName1[NewIndex] == '\\') {
