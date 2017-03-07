@@ -1,7 +1,7 @@
 ## @file
 # Collect all defined strings in multiple uni files.
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -558,7 +558,16 @@ class UniFileClassObject(object):
                                     Message="Cannot find include file", 
                                     ExtraData=str(IncList[0]))
                 continue
-            
+
+            #
+            # Check if single line has correct '"'
+            #
+            if Line.startswith(u'#string') and Line.find(u'#language') > -1 and Line.find('"') > Line.find(u'#language'):
+                if not Line.endswith('"'):
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                    ExtraData='''The line %s misses '"' at the end of it in file %s'''
+                                                 % (LineCount, File.Path))
+
             #
             # Between Name entry and Language entry can not contain line feed
             #
