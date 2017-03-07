@@ -610,8 +610,7 @@ RETURN_STATUS
   sign character, '0' characters, digit characters for Value, and the
   Null-terminator add up to Width characters.
 
-  If Buffer is not aligned on a 16-bit boundary, then ASSERT().
-  If an error would be returned, then the function will also ASSERT().
+  If an error would be returned, then the function will ASSERT().
 
   @param  Buffer      The pointer to the output buffer for the produced
                       Null-terminated Ascii string.
