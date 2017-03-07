@@ -1,7 +1,7 @@
 ## @file  UefiCpuPkg.dec
 # This Package provides UEFI compatible CPU modules and libraries.
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
@@ -181,6 +181,10 @@
   # @Prompt MSEG size.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMsegSize|0x200000|UINT32|0x32132112
 
+  ## Specifies the supported CPU features bit in array
+  # @Prompt Supported CPU features
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport|{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}|VOID*|0x00000016
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies max supported number of Logical Processors.
   # @Prompt Configure max supported number of Logical Processors
@@ -226,6 +230,10 @@
   # @Prompt SMM CPU Synchronization Method.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00|UINT8|0x60000014
 
+  ## Specifies user's desired settings for enabling/disabling processor features.
+  # @Prompt User settings for enabling/disabling processor features.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesUserConfiguration|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000017
+
 [PcdsDynamic, PcdsDynamicEx]
   ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
   # @Prompt The pointer to a CPU S3 data buffer.
@@ -236,6 +244,16 @@
   # @Prompt The pointer to CPU Hot Plug Data.
   # @ValidList   0x80000001 | 0
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress|0x0|UINT64|0x60000011
+
+  ## Indicates processor feature capabilities, each bit corresponding to a specific feature.
+  # @Prompt Processor feature capabilities.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesCapability|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000018
+
+  ## Specifies actual settings for processor features, each bit corresponding to a specific feature.
+  # @Prompt Actual processor feature settings.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSetting|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000019
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
