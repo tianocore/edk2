@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -783,7 +783,7 @@ Gen4GPageTable (
   // Set Page Directory Pointers
   //
   for (Index = 0; Index < 4; Index++) {
-    Pte[Index] = (UINT64)((UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1)) | mAddressEncMask |
+    Pte[Index] = ((UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1)) | mAddressEncMask |
                    (Is32BitPageTable ? IA32_PAE_PDPTE_ATTRIBUTE_BITS : PAGE_ATTRIBUTE_BITS);
   }
   Pte += EFI_PAGE_SIZE / sizeof (*Pte);
