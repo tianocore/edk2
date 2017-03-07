@@ -245,6 +245,17 @@
   # @Prompt User settings for enabling/disabling processor features.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesUserConfiguration|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000017
 
+  ## Specifies the On-demand clock modulation duty cycle when ACPI feature is enabled.
+  # @Prompt The encoded values for target duty cycle modulation.
+  # @ValidRange  0x80000001 | 0 - 15
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle|0x0|UINT8|0x0000001A
+
+  ## Indicates if the current boot is a power-on reset.<BR><BR>
+  #   TRUE  - Current boot is a power-on reset.<BR>
+  #   FALSE - Current boot is not a power-on reset.<BR>
+  # @Prompt Current boot is a power-on reset.
+  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset|FALSE|BOOLEAN|0x0000001B
+
 [PcdsDynamic, PcdsDynamicEx]
   ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
   # @Prompt The pointer to a CPU S3 data buffer.
