@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,27 @@
 #define __P6_MSR_H__
 
 #include <Register/ArchitecturalMsr.h>
+
+/**
+  Is P6 Family Processors?
+
+  @param   DisplayFamily  Display Family ID
+  @param   DisplayModel   Display Model ID
+
+  @retval  TRUE   Yes, it is.
+  @retval  FALSE  No, it isn't.
+**/
+#define IS_P6_PROCESSOR(DisplayFamily, DisplayModel) \
+  (DisplayFamily == 0x06 && \
+   (                        \
+    DisplayModel == 0x03 || \
+    DisplayModel == 0x05 || \
+    DisplayModel == 0x07 || \
+    DisplayModel == 0x08 || \
+    DisplayModel == 0x0A || \
+    DisplayModel == 0x0B \
+    ) \
+   )
 
 /**
   See Section 35.22, "MSRs in Pentium Processors.".
