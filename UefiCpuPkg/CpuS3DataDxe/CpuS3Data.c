@@ -160,10 +160,16 @@ CpuS3DataInitialize (
   VOID                       *Gdt;
   VOID                       *Idt;
   EFI_EVENT                  Event;
+  ACPI_CPU_DATA              *OldAcpiCpuData;
 
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
   }
+
+  //
+  // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure
+  //
+  OldAcpiCpuData = (ACPI_CPU_DATA *) (UINTN) PcdGet64 (PcdCpuS3DataAddress);
 
   //
   // Allocate ACPI NVS memory below 4G memory for use on ACPI S3 resume.
@@ -229,32 +235,38 @@ CpuS3DataInitialize (
   AcpiCpuDataEx->GdtrProfile.Base = (UINTN)Gdt;
   AcpiCpuDataEx->IdtrProfile.Base = (UINTN)Idt;
 
-  //
-  // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
-  //
-  TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
-  RegisterTable = (CPU_REGISTER_TABLE *)AllocateAcpiNvsMemoryBelow4G (TableSize);
-  ASSERT (RegisterTable != NULL);
-  for (Index = 0; Index < NumberOfCpus; Index++) {
-    Status = MpServices->GetProcessorInfo (
+  if (OldAcpiCpuData != NULL) {
+    AcpiCpuData->RegisterTable           = OldAcpiCpuData->RegisterTable;
+    AcpiCpuData->PreSmmInitRegisterTable = OldAcpiCpuData->PreSmmInitRegisterTable;
+  } else {
+    //
+    // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
+    //
+    TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
+    RegisterTable = (CPU_REGISTER_TABLE *)AllocateAcpiNvsMemoryBelow4G (TableSize);
+    ASSERT (RegisterTable != NULL);
+
+    for (Index = 0; Index < NumberOfCpus; Index++) {
+      Status = MpServices->GetProcessorInfo (
                            MpServices,
                            Index,
                            &ProcessorInfoBuffer
                            );
-    ASSERT_EFI_ERROR (Status);
+      ASSERT_EFI_ERROR (Status);
 
-    RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-    RegisterTable[Index].TableLength        = 0;
-    RegisterTable[Index].AllocatedSize      = 0;
-    RegisterTable[Index].RegisterTableEntry = 0;
+      RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      RegisterTable[Index].TableLength        = 0;
+      RegisterTable[Index].AllocatedSize      = 0;
+      RegisterTable[Index].RegisterTableEntry = 0;
 
-    RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-    RegisterTable[NumberOfCpus + Index].TableLength        = 0;
-    RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
-    RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
+      RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      RegisterTable[NumberOfCpus + Index].TableLength        = 0;
+      RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
+      RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
+    }
+    AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
+    AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
   }
-  AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
-  AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
 
   //
   // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure
