@@ -2,7 +2,7 @@
 #
 # This file contained the logical of transfer package object to INF files.
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -169,15 +169,16 @@ def ModuleToInf(ModuleObject, PackageObject=None, DistHeader=None):
     Content += GenGuidSections(ModuleObject.GetGuidList())
     Content += GenBinaries(ModuleObject)
     Content += GenDepex(ModuleObject)
-    Content += GenUserExtensions(ModuleObject)
+    __UserExtensionsContent = GenUserExtensions(ModuleObject)
+    Content += __UserExtensionsContent
     if ModuleObject.GetEventList() or ModuleObject.GetBootModeList() or ModuleObject.GetHobList():
         Content += '\n'
     #
     # generate [Event], [BootMode], [Hob] section
     #
-    Content += GenSpecialSections(ModuleObject.GetEventList(), 'Event')
-    Content += GenSpecialSections(ModuleObject.GetBootModeList(), 'BootMode')
-    Content += GenSpecialSections(ModuleObject.GetHobList(), 'Hob')
+    Content += GenSpecialSections(ModuleObject.GetEventList(), 'Event', __UserExtensionsContent)
+    Content += GenSpecialSections(ModuleObject.GetBootModeList(), 'BootMode', __UserExtensionsContent)
+    Content += GenSpecialSections(ModuleObject.GetHobList(), 'Hob', __UserExtensionsContent)
     SaveFileOnChange(ContainerFile, Content, False)
     if DistHeader.ReadOnly:
         os.chmod(ContainerFile, stat.S_IRUSR|stat.S_IRGRP|stat.S_IROTH)
@@ -979,7 +980,7 @@ def GenAsBuiltPcdExSections(ModuleObject):
 ## GenSpecialSections
 #  generate special sections for Event/BootMode/Hob
 #
-def GenSpecialSections(ObjectList, SectionName):
+def GenSpecialSections(ObjectList, SectionName, UserExtensionsContent=''):
     #
     # generate section
     #
@@ -1002,6 +1003,11 @@ def GenSpecialSections(ObjectList, SectionName):
         else:
             assert(SectionName)
         Usage = Obj.GetUsage()
+
+        # If the content already in UserExtensionsContent then ignore
+        if '[%s]' % SectionName in UserExtensionsContent and Type in UserExtensionsContent:
+            return ''
+
         Statement = ' ' + Type + ' ## ' + Usage
         if CommentStr in ['#\n', '#\n#\n']:
             CommentStr = '#\n#\n#\n'
