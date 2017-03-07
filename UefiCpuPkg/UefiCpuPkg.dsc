@@ -114,6 +114,14 @@
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
+  UefiCpuPkg/CpuFeatures/CpuFeaturesPei.inf {
+    <LibraryClasses>
+      NULL|UefiCpuPkg/Library/CpuCommonFeaturesLib/CpuCommonFeaturesLib.inf
+  }
+  UefiCpuPkg/CpuFeatures/CpuFeaturesDxe.inf {
+    <LibraryClasses>
+      NULL|UefiCpuPkg/Library/CpuCommonFeaturesLib/CpuCommonFeaturesLib.inf
+  }
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
   UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf

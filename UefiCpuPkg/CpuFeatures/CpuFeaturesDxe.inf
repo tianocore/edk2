@@ -1,0 +1,53 @@
+## @file
+#  CPU Features DXE driver.
+#
+#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuFeaturesDxe
+  MODULE_UNI_FILE                = CpuFeaturesDxe.uni
+  FILE_GUID                      = 63EB1B62-10C9-4693-88AC-AE0999EA87F8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = CpuFeaturesDxeInitialize
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  RegisterCpuFeaturesLib
+
+[Sources]
+  CpuFeaturesDxe.c
+
+[Guids]
+  gEdkiiCpuFeaturesInitDoneGuid                                   ## PRODUCES
+
+[Protocols]
+  gEfiSmmConfigurationProtocolGuid                                ## SOMETIME_CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitAfterSmmRelocation  ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuFeaturesDxeExtra.uni

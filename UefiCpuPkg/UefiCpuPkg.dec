@@ -196,6 +196,14 @@
   # @Prompt Supported CPU features
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport|{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}|VOID*|0x00000016
 
+  ## Specifies if CPU features will be initialized after SMM relocation
+  # @Prompt if CPU features will be initialized after SMM relocation
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitAfterSmmRelocation|FALSE|BOOLEAN|0x0000001C
+
+  ## Specifies if CPU features will be initialized during S3 resume
+  # @Prompt if CPU features will be initialized during S3 resume
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume|FALSE|BOOLEAN|0x0000001D
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Specifies max supported number of Logical Processors.
   # @Prompt Configure max supported number of Logical Processors
