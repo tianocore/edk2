@@ -9,7 +9,7 @@ number of CPUs reported by the MP Services Protocol, so this module does not
 support hot plug CPUs.  This module can be copied into a CPU specific package
 and customized if these additional features are required.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2015, Red Hat, Inc.
 
 This program and the accompanying materials
@@ -246,12 +246,12 @@ CpuS3DataInitialize (
     RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
     RegisterTable[Index].TableLength        = 0;
     RegisterTable[Index].AllocatedSize      = 0;
-    RegisterTable[Index].RegisterTableEntry = NULL;
+    RegisterTable[Index].RegisterTableEntry = 0;
 
     RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
     RegisterTable[NumberOfCpus + Index].TableLength        = 0;
     RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
-    RegisterTable[NumberOfCpus + Index].RegisterTableEntry = NULL;
+    RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
   }
   AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
   AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);

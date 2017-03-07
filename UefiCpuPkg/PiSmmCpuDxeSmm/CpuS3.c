@@ -1,7 +1,7 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -826,13 +826,12 @@ CopyRegisterTable (
 
   CopyMem (DestinationRegisterTableList, SourceRegisterTableList, NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
   for (Index = 0; Index < NumberOfCpus; Index++) {
-    DestinationRegisterTableList[Index].RegisterTableEntry = AllocatePool (DestinationRegisterTableList[Index].AllocatedSize);
-    ASSERT (DestinationRegisterTableList[Index].RegisterTableEntry != NULL);
-    CopyMem (DestinationRegisterTableList[Index].RegisterTableEntry, SourceRegisterTableList[Index].RegisterTableEntry, DestinationRegisterTableList[Index].AllocatedSize);
+    RegisterTableEntry = AllocatePool (DestinationRegisterTableList[Index].AllocatedSize);
+    ASSERT (RegisterTableEntry != NULL);
+    CopyMem (RegisterTableEntry, (VOID *)(UINTN)SourceRegisterTableList[Index].RegisterTableEntry, DestinationRegisterTableList[Index].AllocatedSize);
     //
     // Go though all MSRs in register table to initialize MSR spin lock
     //
-    RegisterTableEntry = DestinationRegisterTableList[Index].RegisterTableEntry;
     for (Index1 = 0; Index1 < DestinationRegisterTableList[Index].TableLength; Index1++, RegisterTableEntry++) {
       if ((RegisterTableEntry->RegisterType == Msr) && (RegisterTableEntry->ValidBitLength < 64)) {
         //
@@ -841,6 +840,7 @@ CopyRegisterTable (
         InitMsrSpinLockByIndex (RegisterTableEntry->Index);
       }
     }
+    DestinationRegisterTableList[Index].RegisterTableEntry = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTableEntry;
   }
 }
 
