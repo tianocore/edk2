@@ -4,7 +4,7 @@
 # The Emulation Platform can be used to debug individual modules, prior to creating
 # a real platform. This also provides an example for how an DSC is created.
 #
-# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -391,6 +391,7 @@
       ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
       FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
       SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+      UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
       PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
 #      SafeBlockIoLib|ShellPkg/Library/SafeBlockIoLib/SafeBlockIoLib.inf
 #      SafeOpenProtocolLib|ShellPkg/Library/SafeOpenProtocolLib/SafeOpenProtocolLib.inf
