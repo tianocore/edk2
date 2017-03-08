@@ -29,6 +29,7 @@ STATIC VOID  *mDeviceTreeBase;
 
 STATIC
 EFI_STATUS
+EFIAPI
 GetNodeProperty (
   IN  FDT_CLIENT_PROTOCOL     *This,
   IN  INT32                   Node,
@@ -55,6 +56,7 @@ GetNodeProperty (
 
 STATIC
 EFI_STATUS
+EFIAPI
 SetNodeProperty (
   IN  FDT_CLIENT_PROTOCOL     *This,
   IN  INT32                   Node,
@@ -267,6 +269,7 @@ FindMemoryNodeReg (
 
 STATIC
 EFI_STATUS
+EFIAPI
 GetOrInsertChosenNode (
   IN  FDT_CLIENT_PROTOCOL     *This,
   OUT INT32                   *Node
