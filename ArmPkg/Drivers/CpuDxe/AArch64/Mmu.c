@@ -204,16 +204,20 @@ EfiAttributeToArmAttribute (
 
   switch (EfiAttributes & EFI_MEMORY_CACHETYPE_MASK) {
   case EFI_MEMORY_UC:
-    ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY;
+    if (ArmReadCurrentEL () == AARCH64_EL2) {
+      ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY | TT_XN_MASK;
+    } else {
+      ArmAttributes = TT_ATTR_INDX_DEVICE_MEMORY | TT_UXN_MASK | TT_PXN_MASK;
+    }
     break;
   case EFI_MEMORY_WC:
     ArmAttributes = TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
     break;
   case EFI_MEMORY_WT:
-    ArmAttributes = TT_ATTR_INDX_MEMORY_WRITE_THROUGH;
+    ArmAttributes = TT_ATTR_INDX_MEMORY_WRITE_THROUGH | TT_SH_INNER_SHAREABLE;
     break;
   case EFI_MEMORY_WB:
-    ArmAttributes = TT_ATTR_INDX_MEMORY_WRITE_BACK;
+    ArmAttributes = TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE;
     break;
   default:
     ArmAttributes = TT_ATTR_INDX_MASK;
