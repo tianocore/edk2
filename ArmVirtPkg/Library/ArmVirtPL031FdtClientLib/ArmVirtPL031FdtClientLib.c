@@ -66,18 +66,16 @@ ArmVirtPL031FdtClientLibConstructor (
 
   DEBUG ((EFI_D_INFO, "Found PL031 RTC @ 0x%Lx\n", RegBase));
 
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    //
-    // UEFI takes ownership of the RTC hardware, and exposes its functionality
-    // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
-    // need to disable it in the device tree to prevent the OS from attaching
-    // its device driver as well.
-    //
-    Status = FdtClient->SetNodeProperty (FdtClient, Node, "status",
-                          "disabled", sizeof ("disabled"));
-    if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
-    }
+  //
+  // UEFI takes ownership of the RTC hardware, and exposes its functionality
+  // through the UEFI Runtime Services GetTime, SetTime, etc. This means we
+  // need to disable it in the device tree to prevent the OS from attaching
+  // its device driver as well.
+  //
+  Status = FdtClient->SetNodeProperty (FdtClient, Node, "status",
+                        "disabled", sizeof ("disabled"));
+  if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_WARN, "Failed to set PL031 status to 'disabled'\n"));
   }
 
   return EFI_SUCCESS;
