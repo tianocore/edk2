@@ -37,17 +37,16 @@
   HobLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  UefiLib
 
 [Protocols]
   gFdtClientProtocolGuid                  ## PRODUCES
 
 [Guids]
+  gEfiAcpi20TableGuid
   gEfiEventReadyToBootGuid
   gFdtHobGuid
   gFdtTableGuid
-
-[FeaturePcd]
-  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot
 
 [Depex]
   TRUE

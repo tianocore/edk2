@@ -58,13 +58,3 @@
   # EFI_VT_100_GUID.
   #
   gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x65, 0x60, 0xA6, 0xDF, 0x19, 0xB4, 0xD3, 0x11, 0x9A, 0x2D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D}|VOID*|0x00000007
-
-[PcdsFeatureFlag]
-  #
-  # Pure ACPI boot
-  #
-  # Inhibit installation of the FDT as a configuration table if this feature
-  # PCD is TRUE. Otherwise, the OS is presented with both a DT and an ACPI
-  # description of the platform, and it is up to the OS to choose.
-  #
-  gArmVirtTokenSpaceGuid.PcdPureAcpiBoot|FALSE|BOOLEAN|0x0000000a
