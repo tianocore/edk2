@@ -1778,7 +1778,7 @@ IScsiDhcpIsConfigured (
 }
 
 /**
-  Check wheather the Controller handle is configured to use DNS protocol.
+  Check whether the Controller handle is configured to use DNS protocol.
 
   @param[in]  Controller           The handle of the controller.
   
@@ -1799,6 +1799,7 @@ IScsiDnsIsConfigured (
   EFI_MAC_ADDRESS             MacAddr;
   UINTN                       HwAddressSize;
   UINT16                      VlanId;
+  CHAR16                      AttemptMacString[ISCSI_MAX_MAC_STRING_LEN];
   CHAR16                      MacString[ISCSI_MAX_MAC_STRING_LEN];
   CHAR16                      AttemptName[ISCSI_NAME_IFR_MAX_SIZE];
   
@@ -1828,10 +1829,10 @@ IScsiDnsIsConfigured (
     UnicodeSPrint (
       AttemptName,
       (UINTN) 128,
-      L"%s%d",
-      MacString,
+      L"Attempt %d",
       (UINTN) AttemptConfigOrder[Index]
       );
+
     Status = GetVariable2 (
                AttemptName,
                &gEfiIScsiInitiatorNameProtocolGuid,
@@ -1844,7 +1845,9 @@ IScsiDnsIsConfigured (
     
     ASSERT (AttemptConfigOrder[Index] == AttemptTmp->AttemptConfigIndex);
 
-    if (AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED) {
+    AsciiStrToUnicodeStrS (AttemptTmp->MacString, AttemptMacString, sizeof (AttemptMacString) / sizeof (AttemptMacString[0]));
+
+    if (AttemptTmp->SessionConfigData.Enabled == ISCSI_DISABLED || StrCmp (MacString, AttemptMacString)) {
       FreePool (AttemptTmp);
       continue;
     }
