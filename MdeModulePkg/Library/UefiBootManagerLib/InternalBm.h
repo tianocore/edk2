@@ -1,7 +1,7 @@
 /** @file
   BDS library definition, include the file and data structure
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -22,6 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/PeImage.h>
 #include <IndustryStandard/Atapi.h>
 #include <IndustryStandard/Scsi.h>
+#include <IndustryStandard/Nvme.h>
 
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/BlockIo.h>
@@ -38,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/UsbIo.h>
 #include <Protocol/DiskInfo.h>
+#include <Protocol/NvmExpressPassthru.h>
 #include <Protocol/IdeControllerInit.h>
 #include <Protocol/BootLogo.h>
 #include <Protocol/DriverHealth.h>

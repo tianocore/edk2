@@ -109,6 +109,7 @@
   gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiUsbIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiNvmExpressPassThruProtocolGuid            ## SOMETIMES_CONSUMES
   gEfiDiskInfoProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiDriverHealthProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiFormBrowser2ProtocolGuid                  ## SOMETIMES_CONSUMES
