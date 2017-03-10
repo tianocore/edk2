@@ -40,3 +40,6 @@
   PeCoffGetEntryPointLib
   ArmDisassemblerLib
   SerialPortLib
+
+[Guids]
+  gEfiDebugImageInfoTableGuid
