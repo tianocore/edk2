@@ -2,7 +2,7 @@
 #
 # This file is the main entry for UPT 
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -179,15 +179,16 @@ def Main():
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
         return XExcept.args[0]
 
-    # Start *********************************************
     # Support WORKSPACE is a long path
-    # Only work well on windows
-    # Linux Solution TBD
+    # Only works for windows system
     if pf.system() == 'Windows':
-        os.system('@echo off\nsubst b: /D')
-        os.system('subst b: "%s"' % GlobalData.gWORKSPACE)
-        GlobalData.gWORKSPACE = 'B:\\'
-    # End ***********************************************
+        Vol = 'B:'
+        for Index in range(90, 65, -1):
+            Vol = chr(Index) + ':'
+            if not os.path.isdir(Vol):
+                os.system('subst %s "%s"' % (Vol, GlobalData.gWORKSPACE))
+                break
+        GlobalData.gWORKSPACE = '%s\\' % Vol
 
     WorkspaceDir = GlobalData.gWORKSPACE
 
@@ -304,8 +305,9 @@ def Main():
         except StandardError:
             Logger.Quiet(ST.MSG_RECOVER_FAIL)
         GlobalData.gDB.CloseDb()
+
         if pf.system() == 'Windows':
-            os.system('subst b: /D')
+            os.system('subst %s /D' % GlobalData.gWORKSPACE.replace('\\',''))
 
     return ReturnCode
 

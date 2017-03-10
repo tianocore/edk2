@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for [Guids], [Ppis], [Protocols] sections in INF file 
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -217,8 +217,9 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
         for Line in SectionString:
             LineContent = Line[0]
 
-            if LineContent.strip() == '':
-                continue
+# Comment the code to support user extension without any statement just the section header in []
+#             if LineContent.strip() == '':
+#                 continue
 
             UserExtensionContent += LineContent + DT.END_OF_LINE
             continue
