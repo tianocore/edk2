@@ -1089,6 +1089,40 @@ SmmCoreFindHardwareSmiEntry (
 }
 
 /**
+  Convert EFI_SMM_USB_REGISTER_CONTEXT to SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT.
+
+  @param UsbContext                   A pointer to EFI_SMM_USB_REGISTER_CONTEXT
+  @param UsbContextSize               The size of EFI_SMM_USB_REGISTER_CONTEXT in bytes
+  @param SmiHandlerUsbContextSize     The size of SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT in bytes
+
+  @return SmiHandlerUsbContext  A pointer to SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT
+**/
+SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *
+ConvertSmiHandlerUsbContext (
+  IN EFI_SMM_USB_REGISTER_CONTEXT   *UsbContext,
+  IN UINTN                          UsbContextSize,
+  OUT UINTN                         *SmiHandlerUsbContextSize
+  )
+{
+  UINTN                                     DevicePathSize;
+  SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT  *SmiHandlerUsbContext;
+
+  ASSERT (UsbContextSize == sizeof(EFI_SMM_USB_REGISTER_CONTEXT));
+
+  DevicePathSize = GetDevicePathSize (UsbContext->Device);
+  SmiHandlerUsbContext = AllocatePool (sizeof (SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT) + DevicePathSize);
+  if (SmiHandlerUsbContext == NULL) {
+    *SmiHandlerUsbContextSize = 0;
+    return NULL;
+  }
+  SmiHandlerUsbContext->Type = UsbContext->Type;
+  SmiHandlerUsbContext->DevicePathSize = (UINT32)DevicePathSize;
+  CopyMem (SmiHandlerUsbContext + 1, UsbContext->Device, DevicePathSize);
+  *SmiHandlerUsbContextSize = sizeof (SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT) + DevicePathSize;
+  return SmiHandlerUsbContext;
+}
+
+/**
   This function is called by SmmChildDispatcher module to report
   a new SMI handler is registered, to SmmCore.
 
@@ -1123,6 +1157,11 @@ SmiHandlerProfileRegisterHandler (
   SMI_ENTRY    *SmiEntry;
   LIST_ENTRY   *List;
 
+  if (((ContextSize == 0) && (Context != NULL)) ||
+      ((ContextSize != 0) && (Context == NULL))) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   SmiHandler = AllocateZeroPool (sizeof (SMI_HANDLER));
   if (SmiHandler == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1131,33 +1170,24 @@ SmiHandlerProfileRegisterHandler (
   SmiHandler->Signature = SMI_HANDLER_SIGNATURE;
   SmiHandler->Handler = Handler;
   SmiHandler->CallerAddr = (UINTN)CallerAddress;
-  if (ContextSize != 0 && Context != NULL) {
+  SmiHandler->Context = Context;
+  SmiHandler->ContextSize = ContextSize;
+
+  if (Context != NULL) {
     if (CompareGuid (HandlerGuid, &gEfiSmmUsbDispatch2ProtocolGuid)) {
-      EFI_SMM_USB_REGISTER_CONTEXT              *UsbContext;
-      UINTN                                     DevicePathSize;
-      SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT  *SmiHandlerUsbContext;
-
-      ASSERT (ContextSize == sizeof(EFI_SMM_USB_REGISTER_CONTEXT));
-
-      UsbContext = (EFI_SMM_USB_REGISTER_CONTEXT *)Context;
-      DevicePathSize = GetDevicePathSize (UsbContext->Device);
-      SmiHandlerUsbContext = AllocatePool (sizeof (SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT) + DevicePathSize);
-      if (SmiHandlerUsbContext != NULL) {
-        SmiHandlerUsbContext->Type = UsbContext->Type;
-        SmiHandlerUsbContext->DevicePathSize = (UINT32)DevicePathSize;
-        CopyMem (SmiHandlerUsbContext + 1, UsbContext->Device, DevicePathSize);
-        SmiHandler->Context = SmiHandlerUsbContext;
-      }
+      SmiHandler->Context = ConvertSmiHandlerUsbContext (Context, ContextSize, &SmiHandler->ContextSize);
     } else {
       SmiHandler->Context = AllocateCopyPool (ContextSize, Context);
     }
   }
-  if (SmiHandler->Context != NULL) {
-    SmiHandler->ContextSize = ContextSize;
+  if (SmiHandler->Context == NULL) {
+    SmiHandler->ContextSize = 0;
   }
 
   SmiEntry = SmmCoreFindHardwareSmiEntry (HandlerGuid, TRUE);
   if (SmiEntry == NULL) {
+    FreePool (SmiHandler->Context);
+    FreePool (SmiHandler);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1178,6 +1208,10 @@ SmiHandlerProfileRegisterHandler (
                          For the SmmChildDispatch protocol, the HandlerGuid
                          must be the GUID of SmmChildDispatch protocol.
   @param Handler         The SMI handler.
+  @param Context         The context of the SMI handler.
+                         If it is NOT NULL, it will be used to check what is registered.
+  @param ContextSize     The size of the context in bytes.
+                         If Context is NOT NULL, it will be used to check what is registered.
 
   @retval EFI_SUCCESS           The original record is removed.
   @retval EFI_NOT_FOUND         There is no record for the HandlerGuid and handler.
@@ -1187,7 +1221,9 @@ EFIAPI
 SmiHandlerProfileUnregisterHandler (
   IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
   IN EFI_GUID                       *HandlerGuid,
-  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler
+  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
+  IN VOID                           *Context, OPTIONAL
+  IN UINTN                          ContextSize OPTIONAL
   )
 {
   LIST_ENTRY   *Link;
@@ -1195,10 +1231,25 @@ SmiHandlerProfileUnregisterHandler (
   SMI_HANDLER  *SmiHandler;
   SMI_ENTRY    *SmiEntry;
   SMI_HANDLER  *TargetSmiHandler;
+  VOID         *SearchContext;
+  UINTN        SearchContextSize;
+
+  if (((ContextSize == 0) && (Context != NULL)) ||
+      ((ContextSize != 0) && (Context == NULL))) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   SmiEntry = SmmCoreFindHardwareSmiEntry (HandlerGuid, FALSE);
   if (SmiEntry == NULL) {
     return EFI_NOT_FOUND;
+  }
+
+  SearchContext = Context;
+  SearchContextSize = ContextSize;
+  if (Context != NULL) {
+    if (CompareGuid (HandlerGuid, &gEfiSmmUsbDispatch2ProtocolGuid)) {
+      SearchContext = ConvertSmiHandlerUsbContext (Context, ContextSize, &SearchContextSize);
+    }
   }
 
   TargetSmiHandler = NULL;
@@ -1206,10 +1257,20 @@ SmiHandlerProfileUnregisterHandler (
   for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
     SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
     if (SmiHandler->Handler == Handler) {
-      TargetSmiHandler = SmiHandler;
-      break;
+      if ((SearchContext == NULL) ||
+          ((SearchContextSize == SmiHandler->ContextSize) && (CompareMem (SearchContext, SmiHandler->Context, SearchContextSize) == 0))) {
+        TargetSmiHandler = SmiHandler;
+        break;
+      }
     }
   }
+
+  if (SearchContext != NULL) {
+    if (CompareGuid (HandlerGuid, &gEfiSmmUsbDispatch2ProtocolGuid)) {
+      FreePool (SearchContext);
+    }
+  }
+
   if (TargetSmiHandler == NULL) {
     return EFI_NOT_FOUND;
   }

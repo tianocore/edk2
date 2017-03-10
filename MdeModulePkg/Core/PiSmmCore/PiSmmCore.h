@@ -1139,6 +1139,10 @@ SmiHandlerProfileRegisterHandler (
                          For the SmmChildDispatch protocol, the HandlerGuid
                          must be the GUID of SmmChildDispatch protocol.
   @param Handler         The SMI handler.
+  @param Context         The context of the SMI handler.
+                         If it is NOT NULL, it will be used to check what is registered.
+  @param ContextSize     The size of the context in bytes.
+                         If Context is NOT NULL, it will be used to check what is registered.
 
   @retval EFI_SUCCESS           The original record is removed.
   @retval EFI_NOT_FOUND         There is no record for the HandlerGuid and handler.
@@ -1148,7 +1152,9 @@ EFIAPI
 SmiHandlerProfileUnregisterHandler (
   IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
   IN EFI_GUID                       *HandlerGuid,
-  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler
+  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
+  IN VOID                           *Context, OPTIONAL
+  IN UINTN                          ContextSize OPTIONAL
   );
 
 extern UINTN                    mFullSmramRangeCount;
