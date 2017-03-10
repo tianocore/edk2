@@ -342,6 +342,10 @@ InitCapsuleLastVariable (
                         0,
                         NULL
                         );
+      } else {
+        if (CapsuleResult != NULL) {
+          FreePool (CapsuleResult);
+        }
       }
     }
 
