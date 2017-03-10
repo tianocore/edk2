@@ -3,7 +3,7 @@
 #
 #  Capsule library instance for DXE_DRIVER module types.
 #
-#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -23,6 +23,7 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = CapsuleLib|DXE_DRIVER UEFI_APPLICATION
   CONSTRUCTOR                    = DxeCapsuleLibConstructor
+  DESTRUCTOR                     = DxeCapsuleLibDestructor
 
 #
 # The following information is for reference only and not required by the build tools.

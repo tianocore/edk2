@@ -47,9 +47,8 @@
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/DevicePath.h>
 
-EFI_SYSTEM_RESOURCE_TABLE *mEsrtTable              = NULL;
-BOOLEAN                   mIsVirtualAddrConverted  = FALSE;
-BOOLEAN                   mDxeCapsuleLibEndOfDxe   = FALSE;
+BOOLEAN                   mDxeCapsuleLibEndOfDxe       = FALSE;
+EFI_EVENT                 mDxeCapsuleLibEndOfDxeEvent  = NULL;
 
 /**
   Initialize capsule related variables.
@@ -1654,7 +1653,6 @@ DxeCapsuleLibConstructor (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_EVENT     EndOfDxeEvent;
   EFI_STATUS    Status;
 
   Status = gBS->CreateEventEx (
@@ -1663,11 +1661,37 @@ DxeCapsuleLibConstructor (
                   DxeCapsuleLibEndOfDxe,
                   NULL,
                   &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent
+                  &mDxeCapsuleLibEndOfDxeEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
   InitCapsuleVariable();
+
+  return EFI_SUCCESS;
+}
+
+/**
+  The destructor function closes the End of DXE event.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The destructor completed successfully.
+**/
+EFI_STATUS
+EFIAPI
+DxeCapsuleLibDestructor (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+
+  //
+  // Close the End of DXE event.
+  //
+  Status = gBS->CloseEvent (mDxeCapsuleLibEndOfDxeEvent);
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }
