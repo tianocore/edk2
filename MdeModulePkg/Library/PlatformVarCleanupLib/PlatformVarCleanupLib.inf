@@ -1,7 +1,7 @@
 ## @file
 #  Sample platform variable cleanup library instance.
 #
-#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions
@@ -23,6 +23,7 @@
   VERSION_STRING                = 1.0
   LIBRARY_CLASS                 = PlatformVarCleanupLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                   = PlatformVarCleanupLibConstructor
+  DESTRUCTOR                    = PlatformVarCleanupLibDestructor
 
 #
 # The following information is for reference only and not required by the build tools.
