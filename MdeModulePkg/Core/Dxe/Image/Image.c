@@ -23,6 +23,15 @@ LOAD_PE32_IMAGE_PRIVATE_DATA  mLoadPe32PrivateData = {
   }
 };
 
+typedef struct {
+  LIST_ENTRY                            Link;
+  EDKII_PECOFF_IMAGE_EMULATOR_PROTOCOL  *Emulator;
+  UINT16                                MachineType;
+} EMULATOR_ENTRY;
+
+STATIC LIST_ENTRY                       mAvailableEmulators;
+STATIC EFI_EVENT                        mPeCoffEmuProtocolRegistrationEvent;
+STATIC VOID                             *mPeCoffEmuProtocolNotifyRegistration;
 
 //
 // This code is needed to build the Image handle for the DXE Core
@@ -61,6 +70,7 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
   NULL,                       // JumpContext
   0,                          // Machine
   NULL,                       // Ebc
+  NULL,                       // PeCoffEmu
   NULL,                       // RuntimeData
   NULL                        // LoadedImageDevicePath
 };
@@ -110,6 +120,61 @@ GetMachineTypeName (
   }
 
   return L"<Unknown>";
+}
+
+/**
+  Notification event handler registered by CoreInitializeImageServices () to
+  keep track of which PE/COFF image emulators are available.
+
+  @param  Event          The Event that is being processed, not used.
+  @param  Context        Event Context, not used.
+
+**/
+STATIC
+VOID
+EFIAPI
+PeCoffEmuProtocolNotify (
+  IN  EFI_EVENT       Event,
+  IN  VOID            *Context
+  )
+{
+  EFI_STATUS          Status;
+  UINTN               BufferSize;
+  EFI_HANDLE          EmuHandle;
+  EMULATOR_ENTRY      *Entry;
+
+  EmuHandle = NULL;
+
+  while (TRUE) {
+    BufferSize = sizeof (EmuHandle);
+    Status = CoreLocateHandle (
+               ByRegisterNotify,
+               NULL,
+               mPeCoffEmuProtocolNotifyRegistration,
+               &BufferSize,
+               &EmuHandle
+               );
+    if (EFI_ERROR (Status)) {
+      //
+      // If no more notification events exit
+      //
+      return;
+    }
+
+    Entry = AllocateZeroPool (sizeof (*Entry));
+    ASSERT (Entry != NULL);
+
+    Status = CoreHandleProtocol (
+               EmuHandle,
+               &gEdkiiPeCoffImageEmulatorProtocolGuid,
+               (VOID **)&Entry->Emulator
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    Entry->MachineType = Entry->Emulator->MachineType;
+
+    InsertTailList (&mAvailableEmulators, &Entry->Link);
+  }
 }
 
 /**
@@ -185,6 +250,30 @@ CoreInitializeImageServices (
   mDxeCoreImageMachineType = PeCoffLoaderGetMachineType (Image->Info.ImageBase);
   gDxeCoreImageHandle = Image->Handle;
   gDxeCoreLoadedImage = &Image->Info;
+
+  //
+  // Create the PE/COFF emulator protocol registration event
+  //
+  Status = CoreCreateEvent (
+             EVT_NOTIFY_SIGNAL,
+             TPL_CALLBACK,
+             PeCoffEmuProtocolNotify,
+             NULL,
+             &mPeCoffEmuProtocolRegistrationEvent
+             );
+  ASSERT_EFI_ERROR(Status);
+
+  //
+  // Register for protocol notifications on this event
+  //
+  Status = CoreRegisterProtocolNotify (
+             &gEdkiiPeCoffImageEmulatorProtocolGuid,
+             mPeCoffEmuProtocolRegistrationEvent,
+             &mPeCoffEmuProtocolNotifyRegistration
+             );
+  ASSERT_EFI_ERROR(Status);
+
+  InitializeListHead (&mAvailableEmulators);
 
   if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
     //
@@ -419,6 +508,49 @@ GetPeCoffImageFixLoadingAssignedAddress(
    DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status = %r \n", (VOID *)(UINTN)(ImageContext->ImageAddress), Status));
    return Status;
 }
+
+/**
+  Decides whether a PE/COFF image can execute on this system, either natively
+  or via emulation/interpretation. In the latter case, the PeCoffEmu member
+  of the LOADED_IMAGE_PRIVATE_DATA struct pointer is populated with a pointer
+  to the emulator protocol that supports this image.
+
+  @param[in, out]   Image         LOADED_IMAGE_PRIVATE_DATA struct pointer
+
+  @retval           TRUE          The image is supported
+  @retval           FALSE         The image is not supported
+
+**/
+STATIC
+BOOLEAN
+CoreIsImageTypeSupported (
+  IN OUT LOADED_IMAGE_PRIVATE_DATA  *Image
+  )
+{
+  LIST_ENTRY                        *Link;
+  EMULATOR_ENTRY                    *Entry;
+
+  for (Link = GetFirstNode (&mAvailableEmulators);
+       !IsNull (&mAvailableEmulators, Link);
+       Link = GetNextNode (&mAvailableEmulators, Link)) {
+
+    Entry = BASE_CR (Link, EMULATOR_ENTRY, Link);
+    if (Entry->MachineType != Image->ImageContext.Machine) {
+      continue;
+    }
+
+    if (Entry->Emulator->IsImageSupported (Entry->Emulator,
+                           Image->ImageContext.ImageType,
+                           Image->Info.FilePath)) {
+      Image->PeCoffEmu = Entry->Emulator;
+      return TRUE;
+    }
+  }
+
+  return EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->ImageContext.Machine) ||
+         EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED (Image->ImageContext.Machine);
+}
+
 /**
   Loads, relocates, and invokes a PE/COFF image
 
@@ -467,16 +599,15 @@ CoreLoadPeImage (
     return Status;
   }
 
-  if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->ImageContext.Machine)) {
-    if (!EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED (Image->ImageContext.Machine)) {
-      //
-      // The PE/COFF loader can support loading image types that can be executed.
-      // If we loaded an image type that we can not execute return EFI_UNSUPORTED.
-      //
-      DEBUG ((EFI_D_ERROR, "Image type %s can't be loaded ", GetMachineTypeName(Image->ImageContext.Machine)));
-      DEBUG ((EFI_D_ERROR, "on %s UEFI system.\n", GetMachineTypeName(mDxeCoreImageMachineType)));
-      return EFI_UNSUPPORTED;
-    }
+  if (!CoreIsImageTypeSupported (Image)) {
+    //
+    // The PE/COFF loader can support loading image types that can be executed.
+    // If we loaded an image type that we can not execute return EFI_UNSUPPORTED.
+    //
+    DEBUG ((DEBUG_ERROR, "Image type %s can't be loaded on %s UEFI system.\n",
+      GetMachineTypeName (Image->ImageContext.Machine),
+      GetMachineTypeName (mDxeCoreImageMachineType)));
+    return EFI_UNSUPPORTED;
   }
 
   //
@@ -681,6 +812,16 @@ CoreLoadPeImage (
     if (EFI_ERROR(Status)) {
       goto Done;
     }
+  } else if (Image->PeCoffEmu != NULL) {
+    Status = Image->PeCoffEmu->RegisterImage (Image->PeCoffEmu,
+                                 Image->ImageBasePage,
+                                 EFI_PAGES_TO_SIZE (Image->NumberOfPages),
+                                 &Image->EntryPoint);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_LOAD | DEBUG_ERROR,
+        "CoreLoadPeImage: Failed to register foreign image with emulator.\n"));
+      goto Done;
+    }
   }
 
   //
@@ -866,6 +1007,13 @@ CoreUnloadAndCloseImage (
     // If EBC protocol exists we must perform cleanups for this image.
     //
     Image->Ebc->UnloadImage (Image->Ebc, Image->Handle);
+  }
+
+  if (Image->PeCoffEmu != NULL) {
+    //
+    // If the PE/COFF Emulator protocol exists we must unregister the image.
+    //
+    Image->PeCoffEmu->UnregisterImage (Image->PeCoffEmu, Image->ImageBasePage);
   }
 
   //
@@ -1593,7 +1741,8 @@ CoreStartImage (
   //
   // The image to be started must have the machine type supported by DxeCore.
   //
-  if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->Machine)) {
+  if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->Machine) &&
+      Image->PeCoffEmu == NULL) {
     //
     // Do not ASSERT here, because image might be loaded via EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED
     // But it can not be started.

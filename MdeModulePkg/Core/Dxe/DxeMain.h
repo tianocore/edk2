@@ -47,6 +47,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/TcgService.h>
 #include <Protocol/HiiPackageList.h>
 #include <Protocol/SmmBase2.h>
+#include <Protocol/PeCoffImageEmulator.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/FirmwareFileSystem3.h>
@@ -222,6 +223,8 @@ typedef struct {
   UINT16                      Machine;
   /// EBC Protocol pointer
   EFI_EBC_PROTOCOL            *Ebc;
+  /// PE/COFF Image Emulator Protocol pointer
+  EDKII_PECOFF_IMAGE_EMULATOR_PROTOCOL  *PeCoffEmu;
   /// Runtime image list
   EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;
   /// Pointer to Loaded Image Device Path Protocol
