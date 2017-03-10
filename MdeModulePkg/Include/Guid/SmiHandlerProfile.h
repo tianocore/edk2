@@ -150,6 +150,26 @@ extern EFI_GUID gSmiHandlerProfileGuid;
 
 typedef struct _SMI_HANDLER_PROFILE_PROTOCOL  SMI_HANDLER_PROFILE_PROTOCOL;
 
+/**
+  This function is called by SmmChildDispatcher module to report
+  a new SMI handler is registered, to SmmCore.
+
+  @param This            The protocol instance
+  @param HandlerGuid     The GUID to identify the type of the handler.
+                         For the SmmChildDispatch protocol, the HandlerGuid
+                         must be the GUID of SmmChildDispatch protocol.
+  @param Handler         The SMI handler.
+  @param CallerAddress   The address of the module who registers the SMI handler.
+  @param Context         The context of the SMI handler.
+                         For the SmmChildDispatch protocol, the Context
+                         must match the one defined for SmmChildDispatch protocol.
+  @param ContextSize     The size of the context in bytes.
+                         For the SmmChildDispatch protocol, the Context
+                         must match the one defined for SmmChildDispatch protocol.
+
+  @retval EFI_SUCCESS           The information is recorded.
+  @retval EFI_OUT_OF_RESOURCES  There is no enough resource to record the information.
+**/
 typedef
 EFI_STATUS
 (EFIAPI  *SMI_HANDLER_PROFILE_REGISTER_HANDLER) (
@@ -161,12 +181,31 @@ EFI_STATUS
   IN UINTN                          ContextSize OPTIONAL
   );
 
+/**
+  This function is called by SmmChildDispatcher module to report
+  an existing SMI handler is unregistered, to SmmCore.
+
+  @param This            The protocol instance
+  @param HandlerGuid     The GUID to identify the type of the handler.
+                         For the SmmChildDispatch protocol, the HandlerGuid
+                         must be the GUID of SmmChildDispatch protocol.
+  @param Handler         The SMI handler.
+  @param Context         The context of the SMI handler.
+                         If it is NOT NULL, it will be used to check what is registered.
+  @param ContextSize     The size of the context in bytes.
+                         If Context is NOT NULL, it will be used to check what is registered.
+
+  @retval EFI_SUCCESS           The original record is removed.
+  @retval EFI_NOT_FOUND         There is no record for the HandlerGuid and handler.
+**/
 typedef
 EFI_STATUS
 (EFIAPI  *SMI_HANDLER_PROFILE_UNREGISTER_HANDLER) (
   IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
   IN EFI_GUID                       *HandlerGuid,
-  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler
+  IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
+  IN VOID                           *Context, OPTIONAL
+  IN UINTN                          ContextSize OPTIONAL
   );
 
 struct _SMI_HANDLER_PROFILE_PROTOCOL {
