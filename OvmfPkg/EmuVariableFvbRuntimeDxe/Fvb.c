@@ -626,75 +626,6 @@ InitializeFvAndVariableStoreHeaders (
   )
 {
   //
-  // Templates for standard (non-authenticated) variable FV header
-  //
-  STATIC FVB_FV_HDR_AND_VARS_TEMPLATE FvAndVarTemplate = {
-    { // EFI_FIRMWARE_VOLUME_HEADER FvHdr;
-      // UINT8                     ZeroVector[16];
-      { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-
-      // EFI_GUID                  FileSystemGuid;
-      EFI_SYSTEM_NV_DATA_FV_GUID,
-
-      // UINT64                    FvLength;
-      EMU_FVB_SIZE,
-
-      // UINT32                    Signature;
-      EFI_FVH_SIGNATURE,
-
-      // EFI_FVB_ATTRIBUTES_2      Attributes;
-      0x4feff,
-
-      // UINT16                    HeaderLength;
-      EMU_FV_HEADER_LENGTH,
-
-      // UINT16                    Checksum;
-      0,
-
-      // UINT16                    ExtHeaderOffset;
-      0,
-
-      // UINT8                     Reserved[1];
-      {0},
-
-      // UINT8                     Revision;
-      EFI_FVH_REVISION,
-
-      // EFI_FV_BLOCK_MAP_ENTRY    BlockMap[1];
-      { 
-        {
-          2, // UINT32 NumBlocks;
-          EMU_FVB_BLOCK_SIZE  // UINT32 Length;
-        }
-      }
-    },
-    // EFI_FV_BLOCK_MAP_ENTRY     EndBlockMap;
-    { 0, 0 }, // End of block map
-    { // VARIABLE_STORE_HEADER      VarHdr;
-      // EFI_GUID  Signature;
-      EFI_VARIABLE_GUID,
-
-      // UINT32  Size;
-      (
-        FixedPcdGet32 (PcdVariableStoreSize) -
-        OFFSET_OF (FVB_FV_HDR_AND_VARS_TEMPLATE, VarHdr)
-      ),
-
-      // UINT8   Format;
-      VARIABLE_STORE_FORMATTED,
-
-      // UINT8   State;
-      VARIABLE_STORE_HEALTHY,
-
-      // UINT16  Reserved;
-      0,
-
-      // UINT32  Reserved1;
-      0
-    }
-  };
-
-  //
   // Templates for authenticated variable FV header
   //
   STATIC FVB_FV_HDR_AND_VARS_TEMPLATE FvAndAuthenticatedVarTemplate = {
@@ -768,11 +699,11 @@ InitializeFvAndVariableStoreHeaders (
   //
   // Copy the template structure into the location
   //
-  if (FeaturePcdGet (PcdSecureBootEnable) == FALSE) {
-    CopyMem (Ptr, (VOID*)&FvAndVarTemplate, sizeof (FvAndVarTemplate));
-  } else {
-    CopyMem (Ptr, (VOID*)&FvAndAuthenticatedVarTemplate, sizeof (FvAndAuthenticatedVarTemplate));
-  }
+  CopyMem (
+    Ptr,
+    &FvAndAuthenticatedVarTemplate,
+    sizeof FvAndAuthenticatedVarTemplate
+    );
 
   //
   // Update the checksum for the FV header

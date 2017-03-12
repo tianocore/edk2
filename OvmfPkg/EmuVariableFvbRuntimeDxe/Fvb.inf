@@ -68,9 +68,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
 
-[FeaturePcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable
-
 [Depex]
   TRUE
 
