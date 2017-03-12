@@ -261,6 +261,7 @@
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
+  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -575,32 +576,19 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  }
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-  OvmfPkg/PlatformPei/PlatformPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  }
+  OvmfPkg/PlatformPei/PlatformPei.inf
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
-      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
 !if $(SMM_REQUIRE) == TRUE
       LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxPeiLib.inf
 !endif
   }
 !if $(SMM_REQUIRE) == TRUE
-  OvmfPkg/SmmAccess/SmmAccessPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  }
+  OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
-  UefiCpuPkg/CpuMpPei/CpuMpPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  }
+  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 [Components.X64]
   #
