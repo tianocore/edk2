@@ -672,7 +672,9 @@ InitializePlatform (
   mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
 
   if (mBootMode != BOOT_ON_S3_RESUME) {
-    ReserveEmuVariableNvStore ();
+    if (!FeaturePcdGet (PcdSmmSmramRequire)) {
+      ReserveEmuVariableNvStore ();
+    }
     PeiFvInitialization ();
     MemMapInitialization ();
     NoexecDxeInitialization ();
