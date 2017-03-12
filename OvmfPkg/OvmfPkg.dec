@@ -136,7 +136,6 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x27
 
 [PcdsFeatureFlag]
-  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootEnable|FALSE|BOOLEAN|3
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d
 
