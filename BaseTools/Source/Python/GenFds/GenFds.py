@@ -303,6 +303,25 @@ def main():
         """Modify images from build output if the feature of loading driver at fixed address is on."""
         if GenFdsGlobalVariable.FixedLoadAddress:
             GenFds.PreprocessImage(BuildWorkSpace, GenFdsGlobalVariable.ActivePlatform)
+
+        # Record the FV Region info that may specific in the FD
+        if FdfParserObj.Profile.FvDict and FdfParserObj.Profile.FdDict:
+            for Fv in FdfParserObj.Profile.FvDict:
+                FvObj = FdfParserObj.Profile.FvDict[Fv]
+                for Fd in FdfParserObj.Profile.FdDict:
+                    FdObj = FdfParserObj.Profile.FdDict[Fd]
+                    for RegionObj in FdObj.RegionList:
+                        if RegionObj.RegionType != 'FV':
+                            continue
+                        for RegionData in RegionObj.RegionDataList:
+                            if FvObj.UiFvName.upper() == RegionData.upper():
+                                if FvObj.FvRegionInFD:
+                                    if FvObj.FvRegionInFD != RegionObj.Size:
+                                        EdkLogger.error("GenFds", FORMAT_INVALID, "The FV %s's region is specified in multiple FD with different value." %FvObj.UiFvName)
+                                else:
+                                    FvObj.FvRegionInFD = RegionObj.Size
+                                    RegionObj.BlockInfoOfRegion(FdObj.BlockSizeList, FvObj)
+
         """Call GenFds"""
         GenFds.GenFd('', FdfParserObj, BuildWorkSpace, ArchList)
 
