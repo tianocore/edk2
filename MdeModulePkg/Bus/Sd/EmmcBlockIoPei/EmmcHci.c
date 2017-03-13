@@ -2827,6 +2827,7 @@ EmmcPeimIdentification (
   EFI_STATUS                     Status;
   UINT32                         Ocr;
   UINT32                         Rca;
+  UINTN                          Retry;
 
   Status = EmmcPeimReset (Slot);
   if (EFI_ERROR (Status)) {
@@ -2834,13 +2835,20 @@ EmmcPeimIdentification (
     return Status;
   }
 
-  Ocr = 0;
+  Ocr   = 0;
+  Retry = 0;
   do {
     Status = EmmcPeimGetOcr (Slot, &Ocr);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "EmmcPeimIdentification: EmmcPeimGetOcr fails with %r\n", Status));
       return Status;
     }
+
+    if (Retry++ == 100) {
+      DEBUG ((EFI_D_ERROR, "EmmcPeimIdentification: EmmcPeimGetOcr fails too many times\n"));
+      return EFI_DEVICE_ERROR;
+    }
+    MicroSecondDelay (10 * 1000);
   } while ((Ocr & BIT31) == 0);
 
   Status = EmmcPeimGetAllCid (Slot);

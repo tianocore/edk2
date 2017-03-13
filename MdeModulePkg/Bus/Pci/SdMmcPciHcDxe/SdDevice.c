@@ -1017,6 +1017,7 @@ SdCardIdentification (
   UINT8                          PowerCtrl;
   UINT32                         PresentState;
   UINT8                          HostCtrl2;
+  UINTN                          Retry;
 
   PciIo    = Private->PciIo;
   PassThru = &Private->PassThru;
@@ -1097,12 +1098,20 @@ SdCardIdentification (
   //    Note here we only support the cards complied with SD physical
   //    layer simplified spec version 2.0 and version 3.0 and above.
   //
+  Ocr   = 0;
+  Retry = 0;
   do {
     Status = SdCardSendOpCond (PassThru, Slot, 0, Ocr, S18r, Xpc, TRUE, &Ocr);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "SdCardIdentification: SdCardSendOpCond fails with %r Ocr %x, S18r %x, Xpc %x\n", Status, Ocr, S18r, Xpc));
       return EFI_DEVICE_ERROR;
     }
+
+    if (Retry++ == 100) {
+      DEBUG ((DEBUG_ERROR, "SdCardIdentification: SdCardSendOpCond fails too many times\n"));
+      return EFI_DEVICE_ERROR;
+    }
+    gBS->Stall(10 * 1000);
   } while ((Ocr & BIT31) == 0);
 
   //
