@@ -6,7 +6,7 @@
 #
 # This tool has been tested with OpenSSL.
 #
-# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -109,7 +109,7 @@ if __name__ == '__main__':
   # Verify that Open SSL command is available
   #
   try:
-    Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   except:
     print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
     sys.exit(1)
