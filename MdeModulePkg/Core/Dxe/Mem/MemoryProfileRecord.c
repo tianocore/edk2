@@ -63,11 +63,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA mMemoryProfileContext 
 };
 GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA *mMemoryProfileContextPtr = NULL;
 
-EFI_LOCK mMemoryProfileLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
-BOOLEAN mMemoryProfileGettingStatus = FALSE;
-BOOLEAN mMemoryProfileRecordingEnable = MEMORY_PROFILE_RECORDING_DISABLE;
-EFI_DEVICE_PATH_PROTOCOL *mMemoryProfileDriverPath;
-UINTN                    mMemoryProfileDriverPathSize;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_LOCK mMemoryProfileLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mMemoryProfileGettingStatus = FALSE;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mMemoryProfileRecordingEnable = MEMORY_PROFILE_RECORDING_DISABLE;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_PROTOCOL *mMemoryProfileDriverPath;
+GLOBAL_REMOVE_IF_UNREFERENCED UINTN                    mMemoryProfileDriverPathSize;
 
 /**
   Get memory profile data.
@@ -209,7 +209,7 @@ ProfileProtocolRecord (
   IN CHAR8                              *ActionString OPTIONAL
   );
 
-EDKII_MEMORY_PROFILE_PROTOCOL mProfileProtocol = {
+GLOBAL_REMOVE_IF_UNREFERENCED EDKII_MEMORY_PROFILE_PROTOCOL mProfileProtocol = {
   ProfileProtocolGetData,
   ProfileProtocolRegisterImage,
   ProfileProtocolUnregisterImage,
