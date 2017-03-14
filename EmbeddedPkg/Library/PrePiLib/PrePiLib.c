@@ -28,6 +28,37 @@ SecWinNtPeiLoadFile (
   IN  EFI_PHYSICAL_ADDRESS    *EntryPoint
   );
 
+STATIC
+VOID*
+EFIAPI
+AllocateCodePages (
+  IN  UINTN     Pages
+  )
+{
+  VOID                    *Alloc;
+  EFI_PEI_HOB_POINTERS    Hob;
+
+  Alloc = AllocatePages (Pages);
+  if (Alloc == NULL) {
+    return NULL;
+  }
+
+  // find the HOB we just created, and change the type to EfiBootServicesCode
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  while (Hob.Raw != NULL) {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == (UINTN)Alloc) {
+      Hob.MemoryAllocation->AllocDescriptor.MemoryType = EfiBootServicesCode;
+      return Alloc;
+    }
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (Hob));
+  }
+
+  ASSERT (FALSE);
+
+  FreePages (Alloc, Pages);
+  return NULL;
+}
+
 
 EFI_STATUS
 EFIAPI
@@ -54,7 +85,7 @@ LoadPeCoffImage (
   //
   // Allocate Memory for the image
   //
-  Buffer = AllocatePages (EFI_SIZE_TO_PAGES((UINT32)ImageContext.ImageSize));
+  Buffer = AllocateCodePages (EFI_SIZE_TO_PAGES((UINT32)ImageContext.ImageSize));
   ASSERT (Buffer != 0);
 
 

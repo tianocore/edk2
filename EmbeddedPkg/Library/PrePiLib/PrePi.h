@@ -26,6 +26,7 @@
 #include <Library/UefiDecompressLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/CacheMaintenanceLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PerformanceLib.h>
 
