@@ -27,6 +27,10 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CacheMaintenanceLib.h>
 
+#include <Protocol/Cpu.h>
+
+STATIC EFI_CPU_ARCH_PROTOCOL    *mCpu;
+
 VOID *
 UncachedInternalAllocatePages (
   IN EFI_MEMORY_TYPE  MemoryType,
@@ -150,15 +154,25 @@ AllocatePagesFromList (
 
   Status = gDS->GetMemorySpaceDescriptor (Memory, &Descriptor);
   if (EFI_ERROR (Status)) {
-    gBS->FreePages (Memory, Pages);
-    return Status;
+    goto FreePages;
   }
 
   Status = gDS->SetMemorySpaceAttributes (Memory, EFI_PAGES_TO_SIZE (Pages),
-                  EFI_MEMORY_WC | EFI_MEMORY_XP);
+                  EFI_MEMORY_WC);
   if (EFI_ERROR (Status)) {
-    gBS->FreePages (Memory, Pages);
-    return Status;
+    goto FreePages;
+  }
+
+  //
+  // EFI_CPU_ARCH_PROTOCOL::SetMemoryAttributes() will preserve the original
+  // memory type attribute if no memory type is passed. Permission attributes
+  // will be replaced, so EFI_MEMORY_RO will be removed if present (although
+  // it would be a bug if that were the case for an AllocatePages() allocation)
+  //
+  Status = mCpu->SetMemoryAttributes (mCpu, Memory, EFI_PAGES_TO_SIZE (Pages),
+                   EFI_MEMORY_XP);
+  if (EFI_ERROR (Status)) {
+    goto FreePages;
   }
 
   InvalidateDataCacheRange ((VOID *)(UINTN)Memory, EFI_PAGES_TO_SIZE (Pages));
@@ -166,8 +180,8 @@ AllocatePagesFromList (
   NewNode = AllocatePool (sizeof (FREE_PAGE_NODE));
   if (NewNode == NULL) {
     ASSERT (FALSE);
-    gBS->FreePages (Memory, Pages);
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreePages;
   }
 
   NewNode->Base       = Memory;
@@ -181,6 +195,10 @@ AllocatePagesFromList (
 
   *Allocation = NewNode->Allocation;
   return EFI_SUCCESS;
+
+FreePages:
+  gBS->FreePages (Memory, Pages);
+  return Status;
 }
 
 /**
@@ -236,6 +254,16 @@ FreePagesFromList (
  * This function is not responsible to free allocated buffer (eg: case of memory leak,
  * runtime allocation).
  */
+EFI_STATUS
+EFIAPI
+UncachedMemoryAllocationLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  return gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
+}
+
 EFI_STATUS
 EFIAPI
 UncachedMemoryAllocationLibDestructor (
