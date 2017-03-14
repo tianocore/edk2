@@ -402,6 +402,7 @@ BcfgMod (
   ShellStatus       = SHELL_SUCCESS;
   FileList          = NULL;
   DevicePath        = NULL;
+  DevicePathBuffer  = NULL;
 
   ZeroMem (&LoadOption, sizeof(EFI_BOOT_MANAGER_LOAD_OPTION));
 
