@@ -1,7 +1,7 @@
 /** @file
   Support routines for SMRAM profile.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -77,11 +77,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA mSmramProfileContext =
 };
 GLOBAL_REMOVE_IF_UNREFERENCED MEMORY_PROFILE_CONTEXT_DATA *mSmramProfileContextPtr = NULL;
 
-BOOLEAN mSmramReadyToLock;
-BOOLEAN mSmramProfileGettingStatus = FALSE;
-BOOLEAN mSmramProfileRecordingEnable = MEMORY_PROFILE_RECORDING_DISABLE;
-EFI_DEVICE_PATH_PROTOCOL *mSmramProfileDriverPath;
-UINTN                    mSmramProfileDriverPathSize;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mSmramReadyToLock;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mSmramProfileGettingStatus = FALSE;
+GLOBAL_REMOVE_IF_UNREFERENCED BOOLEAN mSmramProfileRecordingEnable = MEMORY_PROFILE_RECORDING_DISABLE;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_DEVICE_PATH_PROTOCOL *mSmramProfileDriverPath;
+GLOBAL_REMOVE_IF_UNREFERENCED UINTN                    mSmramProfileDriverPathSize;
 
 /**
   Dump SMRAM infromation.
@@ -232,7 +232,7 @@ SmramProfileProtocolRecord (
   IN CHAR8                              *ActionString OPTIONAL
   );
 
-EDKII_SMM_MEMORY_PROFILE_PROTOCOL mSmmProfileProtocol = {
+GLOBAL_REMOVE_IF_UNREFERENCED EDKII_SMM_MEMORY_PROFILE_PROTOCOL mSmmProfileProtocol = {
   SmramProfileProtocolGetData,
   SmramProfileProtocolRegisterImage,
   SmramProfileProtocolUnregisterImage,
@@ -2630,7 +2630,7 @@ typedef struct {
   CHAR8                 *String;
 } ACTION_STRING;
 
-ACTION_STRING mExtActionString[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED ACTION_STRING mExtActionString[] = {
   {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_PAGES,                    "Lib:AllocatePages"},
   {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_PAGES,            "Lib:AllocateRuntimePages"},
   {MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RESERVED_PAGES,           "Lib:AllocateReservedPages"},
@@ -2653,8 +2653,6 @@ ACTION_STRING mExtActionString[] = {
   {MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RUNTIME_POOL,           "Lib:ReallocateRuntimePool"},
   {MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RESERVED_POOL,          "Lib:ReallocateReservedPool"},
 };
-
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 mUserDefinedActionString[] = {"UserDefined-0x80000000"};
 
 typedef struct {
   EFI_MEMORY_TYPE   MemoryType;
