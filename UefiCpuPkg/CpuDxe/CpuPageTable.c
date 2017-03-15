@@ -193,12 +193,9 @@ GetCurrentPagingContext (
     AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
     if ((RegEdx & BIT20) != 0) {
       // XD supported
-      if ((AsmReadMsr64 (0x000001A0) & BIT34) == 0) {
-        // XD enabled
-        if ((AsmReadMsr64 (0xC0000080) & BIT11) != 0) {
-          // XD activated
-          PagingContext->ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_XD_ACTIVATED;
-        }
+      if ((AsmReadMsr64 (0xC0000080) & BIT11) != 0) {
+        // XD activated
+        PagingContext->ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_XD_ACTIVATED;
       }
     }
     if ((RegEdx & BIT26) != 0) {
