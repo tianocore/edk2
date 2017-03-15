@@ -246,6 +246,10 @@
   #
   SmmMemLib|Include/Library/SmmMemLib.h
 
+  ##  @libraryclass  Provides services for Smm IO Operation.
+  #
+  SmmIoLib|Include/Library/SmmIoLib.h
+
   ##  @libraryclass  Provides services to enable/disable periodic SMI handlers.
   #
   SmmPeriodicSmiLib|Include/Library/SmmPeriodicSmiLib.h
