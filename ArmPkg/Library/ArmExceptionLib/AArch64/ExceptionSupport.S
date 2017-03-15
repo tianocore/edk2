@@ -100,6 +100,7 @@
 
 GCC_ASM_EXPORT(ExceptionHandlersEnd)
 GCC_ASM_EXPORT(CommonCExceptionHandler)
+GCC_ASM_EXPORT(RegisterEl0Stack)
 
 .text
 
@@ -122,35 +123,53 @@ ASM_PFX(ExceptionHandlersStart):
 VECTOR_BASE(ExceptionHandlersStart)
 #endif
 
-  .macro  ExceptionEntry, val
+  .macro  ExceptionEntry, val, sp=SPx
+  //
+  // Our backtrace and register dump code is written in C and so it requires
+  // a stack. This makes it difficult to produce meaningful diagnostics when
+  // the stack pointer has been corrupted. So in such cases (i.e., when taking
+  // synchronous exceptions), this macro is expanded with \sp set to SP0, in
+  // which case we switch to the SP_EL0 stack pointer, which has been
+  // initialized to point to a buffer that has been set aside for this purpose.
+  //
+  // Since 'sp' may no longer refer to the stack frame that was active when
+  // the exception was taken, we may have to switch back and forth between
+  // SP_EL0 and SP_ELx to record the correct value for SP in the context struct.
+  //
+  .ifnc   \sp, SPx
+  msr     SPsel, xzr
+  .endif
+
   // Move the stackpointer so we can reach our structure with the str instruction.
   sub sp, sp, #(FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
 
-  // Push some GP registers so we can record the exception context
+  // Push the GP registers so we can record the exception context
   stp      x0, x1, [sp, #-GP_CONTEXT_SIZE]!
   stp      x2, x3, [sp, #0x10]
   stp      x4, x5, [sp, #0x20]
   stp      x6, x7, [sp, #0x30]
+  stp      x8,  x9,  [sp, #0x40]
+  stp      x10, x11, [sp, #0x50]
+  stp      x12, x13, [sp, #0x60]
+  stp      x14, x15, [sp, #0x70]
+  stp      x16, x17, [sp, #0x80]
+  stp      x18, x19, [sp, #0x90]
+  stp      x20, x21, [sp, #0xa0]
+  stp      x22, x23, [sp, #0xb0]
+  stp      x24, x25, [sp, #0xc0]
+  stp      x26, x27, [sp, #0xd0]
+  stp      x28, x29, [sp, #0xe0]
+  add      x28, sp, #(GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE)
 
-  EL1_OR_EL2_OR_EL3(x1)
-1:mrs      x2, elr_el1   // Exception Link Register
-  mrs      x3, spsr_el1  // Saved Processor Status Register 32bit
-  mrs      x5, esr_el1   // EL1 Exception syndrome register 32bit
-  mrs      x6, far_el1   // EL1 Fault Address Register
-  b        4f
+  .ifnc    \sp, SPx
+  msr      SPsel, #1
+  mov      x7, sp
+  msr      SPsel, xzr
+  .else
+  mov      x7, x28
+  .endif
 
-2:mrs      x2, elr_el2   // Exception Link Register
-  mrs      x3, spsr_el2  // Saved Processor Status Register 32bit
-  mrs      x5, esr_el2   // EL2 Exception syndrome register 32bit
-  mrs      x6, far_el2   // EL2 Fault Address Register
-  b        4f
-
-3:mrs      x2, elr_el3   // Exception Link Register
-  mrs      x3, spsr_el3  // Saved Processor Status Register 32bit
-  mrs      x5, esr_el3   // EL3 Exception syndrome register 32bit
-  mrs      x6, far_el3   // EL3 Fault Address Register
-
-4:mrs      x4, fpsr      // Floating point Status Register  32bit
+  stp      x30,  x7, [sp, #0xf0]
 
   // Record the type of exception that occurred.
   mov       x0, #\val
@@ -189,7 +208,7 @@ ASM_PFX(SErrorSP0):
 //
 VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SPx_SYNC)
 ASM_PFX(SynchronousExceptionSPx):
-  ExceptionEntry  EXCEPT_AARCH64_SYNCHRONOUS_EXCEPTIONS
+  ExceptionEntry  EXCEPT_AARCH64_SYNCHRONOUS_EXCEPTIONS, SP0
 
 VECTOR_ENTRY(ExceptionHandlersStart, ARM_VECTOR_CUR_SPx_IRQ)
 ASM_PFX(IrqSPx):
@@ -248,20 +267,25 @@ ASM_PFX(ExceptionHandlersEnd):
 
 ASM_PFX(CommonExceptionEntry):
 
-  // Stack the remaining GP registers
-  stp      x8,  x9,  [sp, #0x40]
-  stp      x10, x11, [sp, #0x50]
-  stp      x12, x13, [sp, #0x60]
-  stp      x14, x15, [sp, #0x70]
-  stp      x16, x17, [sp, #0x80]
-  stp      x18, x19, [sp, #0x90]
-  stp      x20, x21, [sp, #0xa0]
-  stp      x22, x23, [sp, #0xb0]
-  stp      x24, x25, [sp, #0xc0]
-  stp      x26, x27, [sp, #0xd0]
-  stp      x28, x29, [sp, #0xe0]
-  add      x28, sp, #GP_CONTEXT_SIZE + FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE
-  stp      x30, x28, [sp, #0xf0]
+  EL1_OR_EL2_OR_EL3(x1)
+1:mrs      x2, elr_el1   // Exception Link Register
+  mrs      x3, spsr_el1  // Saved Processor Status Register 32bit
+  mrs      x5, esr_el1   // EL1 Exception syndrome register 32bit
+  mrs      x6, far_el1   // EL1 Fault Address Register
+  b        4f
+
+2:mrs      x2, elr_el2   // Exception Link Register
+  mrs      x3, spsr_el2  // Saved Processor Status Register 32bit
+  mrs      x5, esr_el2   // EL2 Exception syndrome register 32bit
+  mrs      x6, far_el2   // EL2 Fault Address Register
+  b        4f
+
+3:mrs      x2, elr_el3   // Exception Link Register
+  mrs      x3, spsr_el3  // Saved Processor Status Register 32bit
+  mrs      x5, esr_el3   // EL3 Exception syndrome register 32bit
+  mrs      x6, far_el3   // EL3 Fault Address Register
+
+4:mrs      x4, fpsr      // Floating point Status Register  32bit
 
   // Save the SYS regs
   stp      x2,  x3,  [x28, #-SYS_CONTEXT_SIZE]!
@@ -368,3 +392,7 @@ ASM_PFX(CommonExceptionEntry):
   add      sp, sp, #FP_CONTEXT_SIZE + SYS_CONTEXT_SIZE
 
   eret
+
+ASM_PFX(RegisterEl0Stack):
+  msr     sp_el0, x0
+  ret

@@ -53,10 +53,11 @@
 
 [LibraryClasses]
   ArmLib
-  DebugLib
-  DefaultExceptionHandlerLib
   BaseMemoryLib
   CacheMaintenanceLib
+  DebugLib
+  DefaultExceptionHandlerLib
+  MemoryAllocationLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
