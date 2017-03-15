@@ -1453,30 +1453,41 @@ IsNestedFmpCapsule (
   EFI_SYSTEM_RESOURCE_ENTRY  Entry;
 
   EsrtGuidFound = FALSE;
-
-  //
-  // Check ESRT protocol
-  //
-  Status = gBS->LocateProtocol(&gEsrtManagementProtocolGuid, NULL, (VOID **)&EsrtProtocol);
-  if (!EFI_ERROR(Status)) {
-    Status = EsrtProtocol->GetEsrtEntry(&CapsuleHeader->CapsuleGuid, &Entry);
-    if (!EFI_ERROR(Status)) {
-      EsrtGuidFound = TRUE;
-    }
-  }
-
-  //
-  // Check ESRT configuration table
-  //
-  if (!EsrtGuidFound) {
-    Status = EfiGetSystemConfigurationTable(&gEfiSystemResourceTableGuid, (VOID **)&Esrt);
-    if (!EFI_ERROR(Status)) {
-      ASSERT (Esrt != NULL);
-      EsrtEntry = (VOID *)(Esrt + 1);
-      for (Index = 0; Index < Esrt->FwResourceCount; Index++, EsrtEntry++) {
+  if (mIsVirtualAddrConverted) {
+    if(mEsrtTable != NULL) {
+      EsrtEntry = (EFI_SYSTEM_RESOURCE_ENTRY *)(mEsrtTable + 1);
+      for (Index = 0; Index < mEsrtTable->FwResourceCount ; Index++, EsrtEntry++) {
         if (CompareGuid(&EsrtEntry->FwClass, &CapsuleHeader->CapsuleGuid)) {
           EsrtGuidFound = TRUE;
           break;
+        }
+      }
+    }
+  } else {
+    //
+    // Check ESRT protocol
+    //
+    Status = gBS->LocateProtocol(&gEsrtManagementProtocolGuid, NULL, (VOID **)&EsrtProtocol);
+    if (!EFI_ERROR(Status)) {
+      Status = EsrtProtocol->GetEsrtEntry(&CapsuleHeader->CapsuleGuid, &Entry);
+      if (!EFI_ERROR(Status)) {
+        EsrtGuidFound = TRUE;
+      }
+    }
+
+    //
+    // Check ESRT configuration table
+    //
+    if (!EsrtGuidFound) {
+      Status = EfiGetSystemConfigurationTable(&gEfiSystemResourceTableGuid, (VOID **)&Esrt);
+      if (!EFI_ERROR(Status)) {
+        ASSERT (Esrt != NULL);
+        EsrtEntry = (VOID *)(Esrt + 1);
+        for (Index = 0; Index < Esrt->FwResourceCount; Index++, EsrtEntry++) {
+          if (CompareGuid(&EsrtEntry->FwClass, &CapsuleHeader->CapsuleGuid)) {
+            EsrtGuidFound = TRUE;
+            break;
+          }
         }
       }
     }
