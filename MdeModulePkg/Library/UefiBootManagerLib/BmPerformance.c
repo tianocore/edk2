@@ -3,7 +3,7 @@
   performance, all the function will only include if the performance
   switch is set.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -49,7 +49,7 @@ BmGetShortPdbFileName (
       ;
 
     for (Index = 0; PdbFileName[Index] != 0; Index++) {
-      if (PdbFileName[Index] == '\\') {
+      if ((PdbFileName[Index] == '\\') || (PdbFileName[Index] == '/')) {
         StartIndex = Index + 1;
       }
 
