@@ -1,6 +1,6 @@
 ## @ GenCfgOpt.py
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -1239,6 +1239,7 @@ EndList
         return 0
 
     def WriteBsfStruct  (self, BsfFd, Item):
+        LogExpr = CLogicalExpression()
         if Item['type'] == "None":
             Space = "gPlatformFspPkgTokenSpaceGuid"
         else:
@@ -1260,6 +1261,9 @@ EndList
                 for Option in OptList:
                     Option = Option.strip()
                     (OpVal, OpStr) = Option.split(':')
+                    test = LogExpr.getNumber (OpVal)
+                    if test is None:
+                        raise Exception("Selection Index '%s' is not a number" % OpVal)
                     TmpList.append((OpVal, OpStr))
         return  TmpList
 
