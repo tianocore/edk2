@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -142,7 +142,12 @@ SockDestroyChild (
   IN OUT SOCKET *Sock
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS       Status;
+  TCP_PROTO_DATA   *ProtoData;
+  TCP_CB           *Tcb;
+  EFI_GUID         *IpProtocolGuid;
+  EFI_GUID         *TcpProtocolGuid;
+  VOID             *SockProtocol;
 
   ASSERT ((Sock != NULL) && (Sock->ProtoHandler != NULL));
 
@@ -151,6 +156,18 @@ SockDestroyChild (
   }
 
   Sock->InDestroy = TRUE;
+
+  if (Sock->IpVersion == IP_VERSION_4) {
+    IpProtocolGuid = &gEfiIp4ProtocolGuid;
+    TcpProtocolGuid = &gEfiTcp4ProtocolGuid;
+  } else {
+    IpProtocolGuid = &gEfiIp6ProtocolGuid;
+    TcpProtocolGuid = &gEfiTcp6ProtocolGuid;
+  }
+  ProtoData = (TCP_PROTO_DATA *) Sock->ProtoReserved;
+  Tcb       = ProtoData->TcpPcb;
+
+  ASSERT (Tcb != NULL);
 
   Status            = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
@@ -163,6 +180,51 @@ SockDestroyChild (
 
     return EFI_ACCESS_DENIED;
   }
+
+  //
+  // Close the IP protocol.
+  //
+  gBS->CloseProtocol (
+         Tcb->IpInfo->ChildHandle,
+         IpProtocolGuid,
+         ProtoData->TcpService->IpIo->Image,
+         Sock->SockHandle
+         );
+
+  if (Sock->DestroyCallback != NULL) {
+    Sock->DestroyCallback (Sock, Sock->Context);
+  }
+
+  //
+  // Retrieve the protocol installed on this sock
+  //
+  Status = gBS->OpenProtocol (
+                  Sock->SockHandle,
+                  TcpProtocolGuid,
+                  &SockProtocol,
+                  Sock->DriverBinding,
+                  Sock->SockHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR (Status)) {
+
+    DEBUG (
+      (EFI_D_ERROR,
+      "SockDestroyChild: Open protocol installed on socket failed with %r\n",
+      Status)
+      );
+  }
+
+  //
+  // Uninstall the protocol installed on this sock
+  //
+  gBS->UninstallMultipleProtocolInterfaces (
+        Sock->SockHandle,
+        TcpProtocolGuid,
+        SockProtocol,
+        NULL
+        );
 
   //
   // force protocol layer to detach the PCB
@@ -213,6 +275,8 @@ SockCreateChild (
 {
   SOCKET      *Sock;
   EFI_STATUS  Status;
+  VOID        *SockProtocol;
+  EFI_GUID    *TcpProtocolGuid;
 
   //
   // create a new socket
@@ -236,9 +300,7 @@ SockCreateChild (
       "SockCreateChild: Get the lock to access socket failed with %r\n",
       Status)
       );
-
-    SockDestroy (Sock);
-    return NULL;
+    goto ERROR;
   }
   //
   // inform the protocol layer to attach the socket
@@ -253,12 +315,42 @@ SockCreateChild (
       "SockCreateChild: Protocol failed to attach a socket with %r\n",
       Status)
       );
-
-    SockDestroy (Sock);
-    Sock = NULL;
+    goto ERROR;
   }
 
   return Sock;
+
+ERROR:
+
+  if (Sock->DestroyCallback != NULL) {
+    Sock->DestroyCallback (Sock, Sock->Context);
+  }
+
+  if (Sock->IpVersion == IP_VERSION_4) {
+    TcpProtocolGuid = &gEfiTcp4ProtocolGuid;
+  } else {
+    TcpProtocolGuid = &gEfiTcp6ProtocolGuid;
+  }
+
+  gBS->OpenProtocol (
+         Sock->SockHandle,
+         TcpProtocolGuid,
+         &SockProtocol,
+         Sock->DriverBinding,
+         Sock->SockHandle,
+         EFI_OPEN_PROTOCOL_GET_PROTOCOL
+         );
+  //
+  // Uninstall the protocol installed on this sock
+  //
+  gBS->UninstallMultipleProtocolInterfaces (
+        Sock->SockHandle,
+        TcpProtocolGuid,
+        SockProtocol,
+        NULL
+        );
+   SockDestroy (Sock);
+   return NULL;
 }
 
 /**

@@ -2,7 +2,7 @@
   The implementation of a dispatch routine for processing TCP requests.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -423,30 +423,13 @@ TcpDetachPcb (
 {
   TCP_PROTO_DATA   *ProtoData;
   TCP_CB           *Tcb;
-  EFI_GUID         *IpProtocolGuid;
 
-  if (Sk->IpVersion == IP_VERSION_4) {
-    IpProtocolGuid = &gEfiIp4ProtocolGuid;
-  } else {
-    IpProtocolGuid = &gEfiIp6ProtocolGuid;
-  }
-  
   ProtoData = (TCP_PROTO_DATA *) Sk->ProtoReserved;
   Tcb       = ProtoData->TcpPcb;
 
   ASSERT (Tcb != NULL);
 
   TcpFlushPcb (Tcb);
-
-  //
-  // Close the IP protocol.
-  //
-  gBS->CloseProtocol (
-         Tcb->IpInfo->ChildHandle,
-         IpProtocolGuid,
-         ProtoData->TcpService->IpIo->Image,
-         Sk->SockHandle
-         );
   
   IpIoRemoveIp (ProtoData->TcpService->IpIo, Tcb->IpInfo);
 

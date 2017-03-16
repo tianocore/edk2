@@ -1,7 +1,7 @@
 /** @file
   The function declaration that provided for Socket Interface.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,7 @@
 #define _SOCK_IMPL_H_
 
 #include "Socket.h"
+#include "TcpMain.h"
 
 /**
   Signal a event with the given status.
