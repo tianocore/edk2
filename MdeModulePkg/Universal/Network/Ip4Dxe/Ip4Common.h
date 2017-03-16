@@ -1,7 +1,7 @@
 /** @file
   Common definition for IP4.
   
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -199,6 +199,25 @@ Ip4GetMulticastMac (
 IP4_HEAD *
 Ip4NtohHead (
   IN IP4_HEAD           *Head
+  );
+
+
+/**
+  Validate that Ip/Netmask pair is OK to be used as station
+  address. Only continuous netmasks are supported. and check
+  that StationAddress is a unicast address on the newtwork.
+
+  @param[in]  Ip                 The IP address to validate.
+  @param[in]  Netmask            The netmaks of the IP.
+
+  @retval TRUE                   The Ip/Netmask pair is valid.
+  @retval FALSE                  The Ip/Netmask pair is invalid.
+
+**/
+BOOLEAN
+Ip4StationAddressValid (
+  IN IP4_ADDR               Ip,
+  IN IP4_ADDR               Netmask
   );
 
 #endif
