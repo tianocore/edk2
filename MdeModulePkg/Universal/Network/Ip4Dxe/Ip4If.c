@@ -1,7 +1,7 @@
 /** @file
   Implement IP4 pesudo interface.
   
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -560,14 +560,8 @@ Ip4SetAddress (
 {
   EFI_ARP_CONFIG_DATA       ArpConfig;
   EFI_STATUS                Status;
-  INTN                      Len;
 
   NET_CHECK_SIGNATURE (Interface, IP4_INTERFACE_SIGNATURE);
-
-  Len = NetGetMaskLength (SubnetMask);
-  if (Len == IP4_MASK_NUM) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   //
   // Set the ip/netmask, then compute the subnet broadcast

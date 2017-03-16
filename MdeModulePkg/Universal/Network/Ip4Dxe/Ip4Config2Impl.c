@@ -609,6 +609,13 @@ Ip4Config2SetDefaultIf (
 
   IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
+  //
+  // Check whether the StationAddress/SubnetMask pair is valid.
+  //
+  if (!Ip4StationAddressValid (StationAddress, SubnetMask)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1252,7 +1259,10 @@ Ip4Config2SetMaunualAddress (
   StationAddress = EFI_NTOHL (NewAddress.Address);
   SubnetMask = EFI_NTOHL (NewAddress.SubnetMask);
 
-  if (NetGetMaskLength (SubnetMask) == IP4_MASK_NUM) {
+  //
+  // Check whether the StationAddress/SubnetMask pair is valid.
+  //
+  if (!Ip4StationAddressValid (StationAddress, SubnetMask)) {
     return EFI_INVALID_PARAMETER;
   }
 
