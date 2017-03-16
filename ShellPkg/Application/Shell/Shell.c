@@ -1022,7 +1022,7 @@ ProcessCommandLine(
       }
     } else if (UnicodeCollation->StriColl (
                                    UnicodeCollation,
-                                   L"-_exit",
+                                   L"-exit",
                                    CurrentArg
                                    ) == 0) {
       ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit         = TRUE;

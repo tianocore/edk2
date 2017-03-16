@@ -4,7 +4,7 @@
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1781,7 +1781,7 @@ EfiShellExecute(
     Temp = NULL;
     Size = 0;
     ASSERT((Temp == NULL && Size == 0) || (Temp != NULL));
-    StrnCatGrow(&Temp, &Size, L"Shell.efi -_exit ", 0);
+    StrnCatGrow(&Temp, &Size, L"Shell.efi -exit ", 0);
     StrnCatGrow(&Temp, &Size, CommandLine, 0);
 
     Status = InternalShellExecuteDevicePath(
