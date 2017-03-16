@@ -139,8 +139,8 @@ S3SaveStateInstalledNotify (
 
   @return                          Error codes from underlying functions.
 **/
-EFIAPI
 RETURN_STATUS
+EFIAPI
 QemuFwCfgS3CallWhenBootScriptReady (
   IN     FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION *Callback,
   IN OUT VOID                                 *Context,          OPTIONAL
@@ -280,8 +280,8 @@ FreeDmaAccess:
 
   @return                           Error codes from underlying functions.
 **/
-EFIAPI
 RETURN_STATUS
+EFIAPI
 QemuFwCfgS3ScriptWriteBytes (
   IN INT32 FirmwareConfigItem,
   IN UINTN NumberOfBytes
@@ -428,8 +428,8 @@ QemuFwCfgS3ScriptWriteBytes (
 
   @return                           Error codes from underlying functions.
 **/
-EFIAPI
 RETURN_STATUS
+EFIAPI
 QemuFwCfgS3ScriptReadBytes (
   IN INT32 FirmwareConfigItem,
   IN UINTN NumberOfBytes
@@ -566,8 +566,8 @@ QemuFwCfgS3ScriptReadBytes (
 
   @return                           Error codes from underlying functions.
 **/
-EFIAPI
 RETURN_STATUS
+EFIAPI
 QemuFwCfgS3ScriptSkipBytes (
   IN INT32 FirmwareConfigItem,
   IN UINTN NumberOfBytes
@@ -716,8 +716,8 @@ QemuFwCfgS3ScriptSkipBytes (
 
   @return                           Error codes from underlying functions.
 **/
-EFIAPI
 RETURN_STATUS
+EFIAPI
 QemuFwCfgS3ScriptCheckValue (
   IN VOID   *ScratchData,
   IN UINT8  ValueSize,
