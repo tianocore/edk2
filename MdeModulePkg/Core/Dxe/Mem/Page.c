@@ -755,6 +755,17 @@ CoreConvertPagesEx (
     }
 
     //
+    // If we are converting the type of the range from EfiConventionalMemory to
+    // another type, we have to ensure that the entire range is covered by a
+    // single entry.
+    //
+    if (ChangingType && (NewType != EfiConventionalMemory)) {
+      if (Entry->End < End) {
+        DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ConvertPages: range %lx - %lx covers multiple entries\n", Start, End));
+        return EFI_NOT_FOUND;
+      }
+    }
+    //
     // Convert range to the end, or to the end of the descriptor
     // if that's all we've got
     //
