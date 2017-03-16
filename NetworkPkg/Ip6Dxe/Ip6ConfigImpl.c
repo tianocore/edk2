@@ -756,7 +756,7 @@ Ip6ConfigSetDadXmits (
 /**
   The callback function for Ip6SetAddr. The prototype is defined
   as IP6_DAD_CALLBACK. It is called after Duplicate Address Detection is performed
-  for the manual address set by Ip6ConfigSetMaunualAddress.
+  for the manual address set by Ip6ConfigSetManualAddress.
 
   @param[in]     IsDadPassed   If TRUE, Duplicate Address Detection passed.
   @param[in]     TargetAddress The tentative IPv6 address to be checked.
@@ -896,7 +896,7 @@ Ip6ManualAddrDadCallback (
 
 **/
 EFI_STATUS
-Ip6ConfigSetMaunualAddress (
+Ip6ConfigSetManualAddress (
   IN IP6_CONFIG_INSTANCE  *Instance,
   IN UINTN                DataSize,
   IN VOID                 *Data
@@ -2218,7 +2218,7 @@ Ip6ConfigInitInstance (
   SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED);
 
   DataItem           = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
-  DataItem->SetData  = Ip6ConfigSetMaunualAddress;
+  DataItem->SetData  = Ip6ConfigSetManualAddress;
   DataItem->Status   = EFI_NOT_FOUND;
 
   DataItem           = &Instance->DataItem[Ip6ConfigDataTypeGateway];
