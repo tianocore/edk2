@@ -550,6 +550,7 @@ Ip4InitProtocol (
   IpInstance->Signature = IP4_PROTOCOL_SIGNATURE;
   CopyMem (&IpInstance->Ip4Proto, &mEfiIp4ProtocolTemplete, sizeof (IpInstance->Ip4Proto));
   IpInstance->State     = IP4_STATE_UNCONFIGED;
+  IpInstance->InDestroy   = FALSE;
   IpInstance->Service   = IpSb;
 
   InitializeListHead (&IpInstance->Link);
@@ -936,8 +937,7 @@ EfiIp4Configure (
     Status = Ip4CleanProtocol (IpInstance);
 
     //
-    // Don't change the state if it is DESTROY, consider the following
-    // valid sequence: Mnp is unloaded-->Ip Stopped-->Udp Stopped,
+    // Consider the following valid sequence: Mnp is unloaded-->Ip Stopped-->Udp Stopped,
     // Configure (ThisIp, NULL). If the state is changed to UNCONFIGED,
     // the unload fails miserably.
     //

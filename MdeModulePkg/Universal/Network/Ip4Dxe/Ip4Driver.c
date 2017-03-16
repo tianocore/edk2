@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP4 driver.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 This program and the accompanying materials
@@ -922,7 +922,6 @@ Ip4ServiceBindingDestroyChild (
   IP4_PROTOCOL              *IpInstance;
   EFI_IP4_PROTOCOL          *Ip4;
   EFI_TPL                   OldTpl;
-  INTN                      State;
 
   if ((This == NULL) || (ChildHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -960,13 +959,12 @@ Ip4ServiceBindingDestroyChild (
   // when UDP driver is being stopped, it will destroy all
   // the IP child it opens.
   //
-  if (IpInstance->State == IP4_STATE_DESTROY) {
+  if (IpInstance->InDestroy) {
     gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
-  State             = IpInstance->State;
-  IpInstance->State = IP4_STATE_DESTROY;
+  IpInstance->InDestroy = TRUE;
 
   //
   // Close the Managed Network protocol.
@@ -1009,6 +1007,7 @@ Ip4ServiceBindingDestroyChild (
                   );
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   if (EFI_ERROR (Status)) {
+    IpInstance->InDestroy = FALSE;
     goto ON_ERROR;
   }
 
@@ -1033,7 +1032,6 @@ Ip4ServiceBindingDestroyChild (
   return EFI_SUCCESS;
 
 ON_ERROR:
-  IpInstance->State = State;
   gBS->RestoreTPL (OldTpl);
 
   return Status;

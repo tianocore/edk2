@@ -1,7 +1,7 @@
 /** @file
   Ip4 internal functions and type defintions.
   
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 This program and the accompanying materials
@@ -64,12 +64,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // The state of IP4 protocol. It starts from UNCONFIGED. if it is
 // successfully configured, it goes to CONFIGED. if configure NULL
-// is called, it becomes UNCONFIGED again. If (partly) destroyed, it
-// becomes DESTROY.
+// is called, it becomes UNCONFIGED again.
 //
 #define IP4_STATE_UNCONFIGED    0
 #define IP4_STATE_CONFIGED      1
-#define IP4_STATE_DESTROY       2
 
 //
 // The state of IP4 service. It starts from UNSTARTED. It transits
@@ -135,6 +133,8 @@ struct _IP4_PROTOCOL {
   EFI_IP4_PROTOCOL          Ip4Proto;
   EFI_HANDLE                Handle;
   INTN                      State;
+
+  BOOLEAN                   InDestroy;                      
 
   IP4_SERVICE               *Service;
   LIST_ENTRY                Link;       // Link to all the IP protocol from the service

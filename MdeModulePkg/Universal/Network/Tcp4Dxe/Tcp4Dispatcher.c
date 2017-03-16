@@ -2,7 +2,7 @@
   Tcp request dispatcher implementation.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -332,16 +332,6 @@ Tcp4DetachPcb (
   ASSERT (Tcb != NULL);
 
   Tcp4FlushPcb (Tcb);
-
-  //
-  // Close the IP protocol.
-  //
-  gBS->CloseProtocol (
-         Tcb->IpInfo->ChildHandle,
-         &gEfiIp4ProtocolGuid,
-         ProtoData->TcpService->IpIo->Image,
-         Sk->SockHandle
-         );
   
   IpIoRemoveIp (ProtoData->TcpService->IpIo, Tcb->IpInfo);
 
