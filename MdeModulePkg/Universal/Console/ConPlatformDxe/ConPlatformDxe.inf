@@ -4,7 +4,7 @@
 # Console Platfrom DXE Driver that specifies whether device can be used as console
 # input/output device or error output device and update global variables accordingly.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -56,6 +56,7 @@
   UefiLib
   UefiDriverEntryPoint
   DebugLib
+  UefiBootManagerLib
 
 [Guids]
   #
