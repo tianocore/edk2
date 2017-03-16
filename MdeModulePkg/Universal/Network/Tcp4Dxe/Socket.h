@@ -373,7 +373,7 @@ typedef enum {
 ///
 typedef struct _SOCK_BUFFER {
   UINT32        HighWater;  ///< The buffersize upper limit of sock_buffer
-  UINT32        LowWater;   ///< The low warter mark of sock_buffer
+  UINT32        LowWater;   ///< The low water mark of sock_buffer
   NET_BUF_QUEUE *DataQueue; ///< The queue to buffer data
 } SOCK_BUFFER;
 
@@ -593,8 +593,8 @@ typedef struct _SOCK_INIT_DATA {
 
   SOCKET      *Parent;        ///< The parent of this socket
   UINT32      BackLog;        ///< The connection limit for listening socket
-  UINT32      SndBufferSize;  ///< The high warter mark of send buffer
-  UINT32      RcvBufferSize;  ///< The high warter mark of receive buffer
+  UINT32      SndBufferSize;  ///< The high water mark of send buffer
+  UINT32      RcvBufferSize;  ///< The high water mark of receive buffer
   VOID        *Protocol;      ///< The pointer to protocol function template
                               ///< wanted to install on socket
 

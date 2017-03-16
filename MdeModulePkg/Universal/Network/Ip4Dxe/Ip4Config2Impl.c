@@ -1228,7 +1228,7 @@ Ip4Config2SetPolicy (
 
 **/
 EFI_STATUS
-Ip4Config2SetMaunualAddress (
+Ip4Config2SetManualAddress (
   IN IP4_CONFIG2_INSTANCE *Instance,
   IN UINTN                DataSize,
   IN VOID                 *Data
@@ -1928,7 +1928,7 @@ Ip4Config2InitInstance (
   SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED);
 
   DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
-  DataItem->SetData  = Ip4Config2SetMaunualAddress;
+  DataItem->SetData  = Ip4Config2SetManualAddress;
   DataItem->Status   = EFI_NOT_FOUND;
 
   DataItem           = &Instance->DataItem[Ip4Config2DataTypeGateway];
