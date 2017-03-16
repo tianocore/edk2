@@ -692,6 +692,7 @@ HttpUrlGetPort (
 {
   CHAR8         *PortString;
   EFI_STATUS    Status;
+  UINTN         Data;
   UINT32        ResultLength;
   HTTP_URL_PARSER      *Parser;
 
@@ -722,7 +723,10 @@ HttpUrlGetPort (
 
   PortString[ResultLength] = '\0';
 
-  return AsciiStrDecimalToUintnS (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset, (CHAR8 **) NULL, (UINTN *) Port);
+  Status =  AsciiStrDecimalToUintnS (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset, (CHAR8 **) NULL, &Data);
+
+  *Port = (UINT16) Data;
+  return Status;
 }
 
 /**
