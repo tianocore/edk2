@@ -17,11 +17,9 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <libfdt.h>
 
-#include <Guid/Acpi.h>
 #include <Guid/EventGroup.h>
 #include <Guid/Fdt.h>
 #include <Guid/FdtHob.h>
@@ -318,16 +316,12 @@ OnReadyToBoot (
   )
 {
   EFI_STATUS      Status;
-  VOID            *Table;
 
-  //
-  // Only install the FDT as a configuration table if we are not exposing
-  // ACPI 2.0 (or later) tables. Note that the legacy ACPI table GUID has
-  // no meaning on ARM since we need at least ACPI 5.0 support, and the
-  // 64-bit ACPI 2.0 table GUID is mandatory in that case.
-  //
-  Status = EfiGetSystemConfigurationTable (&gEfiAcpi20TableGuid, &Table);
-  if (EFI_ERROR (Status) || Table == NULL) {
+  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
+    //
+    // Only install the FDT as a configuration table if we want to leave it up
+    // to the OS to decide whether it prefers ACPI over DT.
+    //
     Status = gBS->InstallConfigurationTable (&gFdtTableGuid, mDeviceTreeBase);
     ASSERT_EFI_ERROR (Status);
   }
