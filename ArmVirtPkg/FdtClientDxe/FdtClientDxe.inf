@@ -42,7 +42,6 @@
   gFdtClientProtocolGuid                  ## PRODUCES
 
 [Guids]
-  gEfiEventReadyToBootGuid
   gFdtHobGuid
   gFdtTableGuid
 

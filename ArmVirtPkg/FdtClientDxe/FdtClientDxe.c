@@ -20,7 +20,6 @@
 #include <Library/HobLib.h>
 #include <libfdt.h>
 
-#include <Guid/EventGroup.h>
 #include <Guid/Fdt.h>
 #include <Guid/FdtHob.h>
 
@@ -307,30 +306,6 @@ STATIC FDT_CLIENT_PROTOCOL mFdtClientProtocol = {
   GetOrInsertChosenNode,
 };
 
-STATIC
-VOID
-EFIAPI
-OnReadyToBoot (
-  EFI_EVENT       Event,
-  VOID            *Context
-  )
-{
-  EFI_STATUS      Status;
-
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    //
-    // Only install the FDT as a configuration table if we want to leave it up
-    // to the OS to decide whether it prefers ACPI over DT.
-    //
-    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, mDeviceTreeBase);
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  gBS->CloseEvent (Event);
-}
-
-STATIC EFI_EVENT         mReadyToBootEvent;
-
 EFI_STATUS
 EFIAPI
 InitializeFdtClientDxe (
@@ -358,21 +333,15 @@ InitializeFdtClientDxe (
 
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
 
-  Status = gBS->InstallProtocolInterface (&ImageHandle, &gFdtClientProtocolGuid,
-                  EFI_NATIVE_INTERFACE, &mFdtClientProtocol);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
+    //
+    // Only install the FDT as a configuration table if we want to leave it up
+    // to the OS to decide whether it prefers ACPI over DT.
+    //
+    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
+    ASSERT_EFI_ERROR (Status);
   }
 
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  OnReadyToBoot,
-                  NULL,
-                  &gEfiEventReadyToBootGuid,
-                  &mReadyToBootEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  return EFI_SUCCESS;
+  return gBS->InstallProtocolInterface (&ImageHandle, &gFdtClientProtocolGuid,
+                EFI_NATIVE_INTERFACE, &mFdtClientProtocol);
 }
