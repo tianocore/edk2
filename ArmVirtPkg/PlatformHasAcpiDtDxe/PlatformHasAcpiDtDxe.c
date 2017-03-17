@@ -17,7 +17,7 @@
 #include <Guid/PlatformHasDeviceTree.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
+#include <Library/QemuFwCfgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 EFI_STATUS
@@ -27,18 +27,27 @@ PlatformHasAcpiDt (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
-  EFI_STATUS Status;
-
-  Status = EFI_SUCCESS;
+  EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM FwCfgItem;
+  UINTN                FwCfgSize;
 
   //
   // If we fail to install any of the necessary protocols below, the OS will be
   // unbootable anyway (due to lacking hardware description), so tolerate no
   // errors here.
   //
-  // Always make ACPI available on 64-bit systems.
-  //
-  if (MAX_UINTN == MAX_UINT64) {
+  if (MAX_UINTN == MAX_UINT64 &&
+      !EFI_ERROR (
+         QemuFwCfgFindFile (
+           "etc/table-loader",
+           &FwCfgItem,
+           &FwCfgSize
+           )
+         )) {
+    //
+    // Only make ACPI available on 64-bit systems, and only if QEMU generates
+    // (a subset of) the ACPI tables.
+    //
     Status = gBS->InstallProtocolInterface (
                     &ImageHandle,
                     &gEdkiiPlatformHasAcpiGuid,
@@ -48,21 +57,21 @@ PlatformHasAcpiDt (
     if (EFI_ERROR (Status)) {
       goto Failed;
     }
+
+    return Status;
   }
 
   //
-  // Expose the Device Tree unless PcdPureAcpiBoot is set.
+  // Expose the Device Tree otherwise.
   //
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    Status = gBS->InstallProtocolInterface (
-                    &ImageHandle,
-                    &gEdkiiPlatformHasDeviceTreeGuid,
-                    EFI_NATIVE_INTERFACE,
-                    NULL
-                    );
-    if (EFI_ERROR (Status)) {
-      goto Failed;
-    }
+  Status = gBS->InstallProtocolInterface (
+                  &ImageHandle,
+                  &gEdkiiPlatformHasDeviceTreeGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    goto Failed;
   }
 
   return Status;
