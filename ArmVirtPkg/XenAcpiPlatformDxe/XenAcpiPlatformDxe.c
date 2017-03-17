@@ -73,7 +73,8 @@ GetXenArmAcpiRsdp (
   ASSERT (RegSize == 2 * sizeof (UINT64));
 
   RegBase = SwapBytes64(Reg[0]);
-  RsdpStructurePtr = (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)RegBase;
+  RsdpStructurePtr =
+    (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)(UINTN)RegBase;
 
   if (RsdpStructurePtr && RsdpStructurePtr->Revision >= 2) {
     Sum = CalculateSum8 ((CONST UINT8 *)RsdpStructurePtr,
