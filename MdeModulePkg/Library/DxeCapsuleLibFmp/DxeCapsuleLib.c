@@ -47,6 +47,9 @@
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/DevicePath.h>
 
+extern EFI_SYSTEM_RESOURCE_TABLE *mEsrtTable;
+extern BOOLEAN                   mIsVirtualAddrConverted;
+
 BOOLEAN                   mDxeCapsuleLibEndOfDxe       = FALSE;
 EFI_EVENT                 mDxeCapsuleLibEndOfDxeEvent  = NULL;
 
