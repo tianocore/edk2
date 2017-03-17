@@ -670,7 +670,7 @@ PrintUsage (
   )
 {
   Print(L"CapsuleApp:  usage\n");
-  Print(L"  CapsuleApp <Capsule...>\n");
+  Print(L"  CapsuleApp <Capsule...> [-NR]\n");
   Print(L"  CapsuleApp -S\n");
   Print(L"  CapsuleApp -C\n");
   Print(L"  CapsuleApp -P\n");
@@ -680,6 +680,8 @@ PrintUsage (
   Print(L"  CapsuleApp -D <Capsule>\n");
   Print(L"  CapsuleApp -P GET <ImageTypeId> <Index> -O <FileName>\n");
   Print(L"Parameter:\n");
+  Print(L"  -NR: No reset will be triggered for the capsule\n");
+  Print(L"       with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET.\n");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_RPORT_GUID),\n");
@@ -721,6 +723,7 @@ UefiMain (
   UINT64                         MaxCapsuleSize;
   EFI_RESET_TYPE                 ResetType;
   BOOLEAN                        NeedReset;
+  BOOLEAN                        NoReset;
   CHAR16                         *CapsuleName;
   UINTN                          CapsuleNum;
   UINTN                          Index;
@@ -783,7 +786,13 @@ UefiMain (
     return EFI_SUCCESS;
   }
   CapsuleFirstIndex = 1;
-  CapsuleLastIndex = Argc - 1;
+  NoReset = FALSE;
+  if ((Argc > 1) && (StrCmp(Argv[Argc - 1], L"-NR") == 0)) {
+    NoReset = TRUE;
+    CapsuleLastIndex = Argc - 2;
+  } else {
+    CapsuleLastIndex = Argc - 1;
+  }
   CapsuleNum = CapsuleLastIndex - CapsuleFirstIndex + 1;
 
   if (CapsuleFirstIndex > CapsuleLastIndex) {
@@ -855,10 +864,19 @@ UefiMain (
       goto Done;
     }
     //
-    // For capsule who has reset flag, after calling UpdateCapsule service,triger a
-    // system reset to process capsule persist across a system reset.
+    // For capsule with CAPSULE_FLAGS_PERSIST_ACROSS_RESET + CAPSULE_FLAGS_INITIATE_RESET,
+    // a system reset should have been triggered by gRT->UpdateCapsule() calling above.
     //
-    gRT->ResetSystem (ResetType, EFI_SUCCESS, 0, NULL);
+    // For capsule with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET,
+    // check if -NR (no-reset) has been specified or not.
+    //
+    if (!NoReset) {
+      //
+      // For capsule who has reset flag and no -NR (no-reset) has been specified, after calling UpdateCapsule service,
+      // trigger a system reset to process capsule persist across a system reset.
+      //
+      gRT->ResetSystem (ResetType, EFI_SUCCESS, 0, NULL);
+    }
   } else {
     //
     // For capsule who has no reset flag, only call UpdateCapsule Service without a
