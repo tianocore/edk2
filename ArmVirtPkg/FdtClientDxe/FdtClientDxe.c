@@ -22,6 +22,7 @@
 
 #include <Guid/Fdt.h>
 #include <Guid/FdtHob.h>
+#include <Guid/PlatformHasDeviceTree.h>
 
 #include <Protocol/FdtClient.h>
 
@@ -306,6 +307,40 @@ STATIC FDT_CLIENT_PROTOCOL mFdtClientProtocol = {
   GetOrInsertChosenNode,
 };
 
+STATIC
+VOID
+EFIAPI
+OnPlatformHasDeviceTree (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  EFI_STATUS Status;
+  VOID       *Interface;
+  VOID       *DeviceTreeBase;
+
+  Status = gBS->LocateProtocol (
+                  &gEdkiiPlatformHasDeviceTreeGuid,
+                  NULL,                             // Registration
+                  &Interface
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  DeviceTreeBase = Context;
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: exposing DTB @ 0x%p to OS\n",
+    __FUNCTION__,
+    DeviceTreeBase
+    ));
+  Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
+  ASSERT_EFI_ERROR (Status);
+
+  gBS->CloseEvent (Event);
+}
+
 EFI_STATUS
 EFIAPI
 InitializeFdtClientDxe (
@@ -316,6 +351,8 @@ InitializeFdtClientDxe (
   VOID              *Hob;
   VOID              *DeviceTreeBase;
   EFI_STATUS        Status;
+  EFI_EVENT         PlatformHasDeviceTreeEvent;
+  VOID              *Registration;
 
   Hob = GetFirstGuidHob (&gFdtHobGuid);
   if (Hob == NULL || GET_GUID_HOB_DATA_SIZE (Hob) != sizeof (UINT64)) {
@@ -333,15 +370,65 @@ InitializeFdtClientDxe (
 
   DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
 
-  if (!FeaturePcdGet (PcdPureAcpiBoot)) {
-    //
-    // Only install the FDT as a configuration table if we want to leave it up
-    // to the OS to decide whether it prefers ACPI over DT.
-    //
-    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
-    ASSERT_EFI_ERROR (Status);
+  //
+  // Register a protocol notify for the EDKII Platform Has Device Tree
+  // Protocol.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  OnPlatformHasDeviceTree,
+                  DeviceTreeBase,             // Context
+                  &PlatformHasDeviceTreeEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: CreateEvent(): %r\n", __FUNCTION__, Status));
+    return Status;
   }
 
-  return gBS->InstallProtocolInterface (&ImageHandle, &gFdtClientProtocolGuid,
-                EFI_NATIVE_INTERFACE, &mFdtClientProtocol);
+  Status = gBS->RegisterProtocolNotify (
+                  &gEdkiiPlatformHasDeviceTreeGuid,
+                  PlatformHasDeviceTreeEvent,
+                  &Registration
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: RegisterProtocolNotify(): %r\n",
+      __FUNCTION__,
+      Status
+      ));
+    goto CloseEvent;
+  }
+
+  //
+  // Kick the event; the protocol could be available already.
+  //
+  Status = gBS->SignalEvent (PlatformHasDeviceTreeEvent);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: SignalEvent(): %r\n", __FUNCTION__, Status));
+    goto CloseEvent;
+  }
+
+  Status = gBS->InstallProtocolInterface (
+                  &ImageHandle,
+                  &gFdtClientProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mFdtClientProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: InstallProtocolInterface(): %r\n",
+      __FUNCTION__,
+      Status
+      ));
+    goto CloseEvent;
+  }
+
+  return Status;
+
+CloseEvent:
+  gBS->CloseEvent (PlatformHasDeviceTreeEvent);
+  return Status;
 }
