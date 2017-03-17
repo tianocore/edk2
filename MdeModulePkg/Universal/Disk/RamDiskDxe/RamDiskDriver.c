@@ -74,7 +74,7 @@ RamDiskAcpiCheck (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       EFI_D_INFO,
-      "RamDiskAcpiCheck: Cannot locate the EFI ACPI Table Protocol,",
+      "RamDiskAcpiCheck: Cannot locate the EFI ACPI Table Protocol, "
       "unable to publish RAM disks to NFIT.\n"
       ));
     return;
@@ -91,7 +91,7 @@ RamDiskAcpiCheck (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       EFI_D_INFO,
-      "RamDiskAcpiCheck: Cannot locate the EFI ACPI Sdt Protocol,",
+      "RamDiskAcpiCheck: Cannot locate the EFI ACPI Sdt Protocol, "
       "unable to publish RAM disks to NFIT.\n"
       ));
     mAcpiTableProtocol = NULL;
