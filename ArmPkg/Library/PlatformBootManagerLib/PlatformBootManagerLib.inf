@@ -39,6 +39,7 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -59,7 +60,6 @@
 
 [FixedPcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
@@ -75,6 +75,7 @@
   gEfiFileSystemVolumeLabelInfoIdGuid
   gEfiEndOfDxeEventGroupGuid
   gEfiTtyTermGuid
+  gUefiShellFileGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid

@@ -33,7 +33,6 @@
 
 #define DP_NODE_LEN(Type) { (UINT8)sizeof (Type), (UINT8)(sizeof (Type) >> 8) }
 
-
 #pragma pack (1)
 typedef struct {
   VENDOR_DEVICE_PATH         SerialDxe;
@@ -327,7 +326,7 @@ AddOutput (
 STATIC
 VOID
 PlatformRegisterFvBootOption (
-  EFI_GUID                         *FileGuid,
+  CONST EFI_GUID                   *FileGuid,
   CHAR16                           *Description,
   UINT32                           Attributes
   )
@@ -535,7 +534,7 @@ PlatformBootManagerAfterConsole (
   // Register UEFI Shell
   //
   PlatformRegisterFvBootOption (
-    PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE
+    &gUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE
     );
 }
 
