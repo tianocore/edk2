@@ -227,43 +227,6 @@ BgrtAcpiTableChecksum (
 }
 
 /**
-  Allocate EfiBootServicesData below 4G memory address.
-
-  This function allocates EfiBootServicesData below 4G memory address.
-
-  @param[in]  Size   Size of memory to allocate.
-
-  @return Allocated address for output.
-
-**/
-VOID *
-BgrtAllocateBsDataMemoryBelow4G (
-  IN UINTN       Size
-  )
-{
-  UINTN                 Pages;
-  EFI_PHYSICAL_ADDRESS  Address;
-  EFI_STATUS            Status;
-  VOID                  *Buffer;
-
-  Pages   = EFI_SIZE_TO_PAGES (Size);
-  Address = 0xffffffff;
-
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiBootServicesData,
-                  Pages,
-                  &Address
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  Buffer = (VOID *) (UINTN) Address;
-  ZeroMem (Buffer, Size);
-
-  return Buffer;
-}
-
-/**
   Install Boot Graphics Resource Table to ACPI table.
 
   @return Status code.
@@ -358,10 +321,12 @@ InstallBootGraphicsResourceTable (
     // The image should be stored in EfiBootServicesData, allowing the system to reclaim the memory
     //
     BmpSize = (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER);
-    ImageBuffer = BgrtAllocateBsDataMemoryBelow4G (BmpSize);
+    ImageBuffer = AllocatePages (EFI_SIZE_TO_PAGES (BmpSize));
     if (ImageBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
+    ZeroMem (ImageBuffer, BmpSize);
 
     mBmpImageHeaderTemplate.Size = (UINT32) BmpSize;
     mBmpImageHeaderTemplate.ImageSize = (UINT32) BmpSize - sizeof (BMP_IMAGE_HEADER);
