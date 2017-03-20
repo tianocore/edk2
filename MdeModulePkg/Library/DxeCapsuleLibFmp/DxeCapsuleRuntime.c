@@ -26,8 +26,8 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-EFI_SYSTEM_RESOURCE_TABLE *mEsrtTable                                     = NULL;
-BOOLEAN                   mIsVirtualAddrConverted                         = FALSE;
+extern EFI_SYSTEM_RESOURCE_TABLE *mEsrtTable;
+extern BOOLEAN                   mIsVirtualAddrConverted;
 EFI_EVENT                 mDxeRuntimeCapsuleLibVirtualAddressChangeEvent  = NULL;
 
 /**
