@@ -1,7 +1,7 @@
 /** @file
   SMM Memory pool management functions.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -136,6 +136,7 @@ InternalAllocPoolByIndex (
   EFI_PHYSICAL_ADDRESS  Address;
   SMM_POOL_TYPE         SmmPoolType;
 
+  Address     = 0;
   SmmPoolType = UefiMemoryTypeToSmmPoolType(PoolType);
 
   ASSERT (PoolIndex <= MAX_POOL_INDEX);
@@ -226,6 +227,8 @@ SmmInternalAllocatePool (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Address;
   UINTN                 PoolIndex;
+
+  Address = 0;
 
   if (PoolType != EfiRuntimeServicesCode &&
       PoolType != EfiRuntimeServicesData) {
