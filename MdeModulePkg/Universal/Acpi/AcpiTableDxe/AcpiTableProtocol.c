@@ -290,24 +290,27 @@ UninstallAcpiTable (
 {
   EFI_ACPI_TABLE_INSTANCE   *AcpiTableInstance;
   EFI_STATUS                Status;
+  EFI_ACPI_TABLE_VERSION    Version;
 
   //
   // Get the instance of the ACPI table protocol
   //
   AcpiTableInstance = EFI_ACPI_TABLE_INSTANCE_FROM_THIS (This);
 
+  Version = PcdGet32 (PcdAcpiExposedTableVersions);
+
   //
   // Uninstall the ACPI table
   //
   Status = RemoveTableFromList (
              AcpiTableInstance,
-             EFI_ACPI_TABLE_VERSION_1_0B | ACPI_TABLE_VERSION_GTE_2_0,
+             Version,
              TableKey
              );
   if (!EFI_ERROR (Status)) {
     Status = PublishTables (
                AcpiTableInstance,
-               EFI_ACPI_TABLE_VERSION_1_0B | ACPI_TABLE_VERSION_GTE_2_0
+               Version
                );
   }
 
