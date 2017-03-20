@@ -292,6 +292,11 @@ typedef struct {
 
   EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET *Packet;
   UINT16                                   CommandId;
+  VOID                                     *MapPrpList;
+  UINTN                                    PrpListNo;
+  VOID                                     *PrpListHost;
+  VOID                                     *MapData;
+  VOID                                     *MapMeta;
   EFI_EVENT                                CallerEvent;
 } NVME_PASS_THRU_ASYNC_REQ;
 

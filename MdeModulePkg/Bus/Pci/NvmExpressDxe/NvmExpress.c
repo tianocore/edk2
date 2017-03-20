@@ -548,6 +548,7 @@ ProcessAsyncTaskList (
   QueueId    = 2;
   Cq         = Private->CqBuffer[QueueId] + Private->CqHdbl[QueueId].Cqh;
   HasNewItem = FALSE;
+  PciIo      = Private->PciIo;
 
   //
   // Submit asynchronous subtasks to the NVMe Submission Queue
@@ -644,6 +645,26 @@ ProcessAsyncTaskList (
           sizeof(EFI_NVM_EXPRESS_COMPLETION)
           );
 
+        //
+        // Free the resources allocated before cmd submission
+        //
+        if (AsyncRequest->MapData != NULL) {
+          PciIo->Unmap (PciIo, AsyncRequest->MapData);
+        }
+        if (AsyncRequest->MapMeta != NULL) {
+          PciIo->Unmap (PciIo, AsyncRequest->MapMeta);
+        }
+        if (AsyncRequest->MapPrpList != NULL) {
+          PciIo->Unmap (PciIo, AsyncRequest->MapPrpList);
+        }
+        if (AsyncRequest->PrpListHost != NULL) {
+          PciIo->FreeBuffer (
+                   PciIo,
+                   AsyncRequest->PrpListNo,
+                   AsyncRequest->PrpListHost
+                   );
+        }
+
         RemoveEntryList (Link);
         gBS->SignalEvent (AsyncRequest->CallerEvent);
         FreePool (AsyncRequest);
@@ -666,7 +687,6 @@ ProcessAsyncTaskList (
   }
 
   if (HasNewItem) {
-    PciIo = Private->PciIo;
     Data  = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
     PciIo->Mem.Write (
                  PciIo,

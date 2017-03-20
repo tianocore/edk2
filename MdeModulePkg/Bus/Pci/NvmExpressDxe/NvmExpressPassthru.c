@@ -627,6 +627,11 @@ NvmExpressPassThru (
     AsyncRequest->Packet        = Packet;
     AsyncRequest->CommandId     = Sq->Cid;
     AsyncRequest->CallerEvent   = Event;
+    AsyncRequest->MapData       = MapData;
+    AsyncRequest->MapMeta       = MapMeta;
+    AsyncRequest->MapPrpList    = MapPrpList;
+    AsyncRequest->PrpListNo     = PrpListNo;
+    AsyncRequest->PrpListHost   = PrpListHost;
 
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     InsertTailList (&Private->AsyncPassThruQueue, &AsyncRequest->Link);
