@@ -580,10 +580,18 @@ ProtectUefiImageCommon (
   }
 
   if (ImageRecord->CodeSegmentCount == 0) {
-    DEBUG ((DEBUG_ERROR, "!!!!!!!!  ProtectUefiImageCommon - CodeSegmentCount is 0  !!!!!!!!\n"));
+    //
+    // If a UEFI executable consists of a single read+write+exec PE/COFF
+    // section, that isn't actually an error. The image can be launched
+    // alright, only image protection cannot be applied to it fully.
+    //
+    // One example that elicits this is (some) Linux kernels (with the EFI stub
+    // of course).
+    //
+    DEBUG ((DEBUG_WARN, "!!!!!!!!  ProtectUefiImageCommon - CodeSegmentCount is 0  !!!!!!!!\n"));
     PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageAddress);
     if (PdbPointer != NULL) {
-      DEBUG ((DEBUG_ERROR, "!!!!!!!!  Image - %a  !!!!!!!!\n", PdbPointer));
+      DEBUG ((DEBUG_WARN, "!!!!!!!!  Image - %a  !!!!!!!!\n", PdbPointer));
     }
     goto Finish;
   }
