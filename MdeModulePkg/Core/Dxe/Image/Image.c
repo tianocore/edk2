@@ -1647,6 +1647,12 @@ CoreStartImage (
     //
     PERF_START (NULL, "StartImage:", NULL, Tick);
     PERF_END (NULL, "StartImage:", NULL, 0);
+
+    //
+    // Pop the current start image context
+    //
+    mCurrentImage = LastImage;
+
     return EFI_OUT_OF_RESOURCES;
   }
   Image->JumpContext = ALIGN_POINTER (Image->JumpBuffer, BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT);
