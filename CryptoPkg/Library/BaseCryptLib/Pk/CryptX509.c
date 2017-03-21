@@ -1,7 +1,7 @@
 /** @file
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,7 @@ X509ConstructCertificate (
   @param           ...        A list of DER-encoded single certificate data followed
                               by certificate size. A NULL terminates the list. The
                               pairs are the arguments to X509ConstructCertificate().
-                                 
+
   @retval     TRUE            The X509 stack construction succeeded.
   @retval     FALSE           The construction operation failed.
 
@@ -82,7 +82,7 @@ BOOLEAN
 EFIAPI
 X509ConstructCertificateStack (
   IN OUT  UINT8  **X509Stack,
-  ...  
+  ...
   )
 {
   UINT8           *Cert;
@@ -175,14 +175,14 @@ EFIAPI
 X509Free (
   IN  VOID  *X509Cert
   )
-{ 
+{
   //
   // Check input parameters.
   //
   if (X509Cert == NULL) {
     return;
   }
-  
+
   //
   // Free OpenSSL X509 object.
   //
@@ -209,7 +209,7 @@ X509StackFree (
   if (X509Stack == NULL) {
     return;
   }
-  
+
   //
   // Free OpenSSL X509 stack object.
   //
@@ -324,7 +324,7 @@ RsaGetPublicKeyFromX509 (
   BOOLEAN   Status;
   EVP_PKEY  *Pkey;
   X509      *X509Cert;
-  
+
   //
   // Check input parameters.
   //
@@ -350,14 +350,14 @@ RsaGetPublicKeyFromX509 (
   // Retrieve and check EVP_PKEY data from X509 Certificate.
   //
   Pkey = X509_get_pubkey (X509Cert);
-  if ((Pkey == NULL) || (Pkey->type != EVP_PKEY_RSA)) {
+  if ((Pkey == NULL) || (EVP_PKEY_id (Pkey) != EVP_PKEY_RSA)) {
     goto _Exit;
   }
 
   //
   // Duplicate RSA Context from the retrieved EVP_PKEY.
   //
-  if ((*RsaContext = RSAPublicKey_dup (Pkey->pkey.rsa)) != NULL) {
+  if ((*RsaContext = RSAPublicKey_dup (EVP_PKEY_get0_RSA (Pkey))) != NULL) {
     Status = TRUE;
   }
 
@@ -371,7 +371,7 @@ _Exit:
 
   if (Pkey != NULL) {
     EVP_PKEY_free (Pkey);
-  }  
+  }
 
   return Status;
 }
@@ -405,8 +405,8 @@ X509VerifyCert (
   X509            *X509Cert;
   X509            *X509CACert;
   X509_STORE      *CertStore;
-  X509_STORE_CTX  CertCtx;
-  
+  X509_STORE_CTX  *CertCtx;
+
   //
   // Check input parameters.
   //
@@ -418,6 +418,7 @@ X509VerifyCert (
   X509Cert   = NULL;
   X509CACert = NULL;
   CertStore  = NULL;
+  CertCtx    = NULL;
 
   //
   // Register & Initialize necessary digest algorithms for certificate verification.
@@ -473,15 +474,19 @@ X509VerifyCert (
   //
   // Set up X509_STORE_CTX for the subsequent verification operation.
   //
-  if (!X509_STORE_CTX_init (&CertCtx, CertStore, X509Cert, NULL)) {
+  CertCtx = X509_STORE_CTX_new ();
+  if (CertCtx == NULL) {
+    goto _Exit;
+  }
+  if (!X509_STORE_CTX_init (CertCtx, CertStore, X509Cert, NULL)) {
     goto _Exit;
   }
 
   //
   // X509 Certificate Verification.
   //
-  Status = (BOOLEAN) X509_verify_cert (&CertCtx);
-  X509_STORE_CTX_cleanup (&CertCtx);
+  Status = (BOOLEAN) X509_verify_cert (CertCtx);
+  X509_STORE_CTX_cleanup (CertCtx);
 
 _Exit:
   //
@@ -498,7 +503,9 @@ _Exit:
   if (CertStore != NULL) {
     X509_STORE_free (CertStore);
   }
-  
+
+  X509_STORE_CTX_free (CertCtx);
+
   return Status;
 }
 
@@ -575,6 +582,6 @@ X509GetTBSCert (
   }
 
   *TBSCertSize = Length + (Temp - *TBSCert);
-  
+
   return TRUE;
 }

@@ -1,7 +1,7 @@
 /** @file
   Diffie-Hellman Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalCryptLib.h"
 #include <openssl/bn.h>
 #include <openssl/dh.h>
-
 
 /**
   Allocates and Initializes one Diffie-Hellman Context for subsequent use.
@@ -88,6 +87,7 @@ DhGenerateParameter (
   )
 {
   BOOLEAN RetVal;
+  BIGNUM  *BnP;
 
   //
   // Check input parameters.
@@ -105,7 +105,8 @@ DhGenerateParameter (
     return FALSE;
   }
 
-  BN_bn2bin (((DH *) DhContext)->p, Prime);
+  DH_get0_pqg (DhContext, (const BIGNUM **)&BnP, NULL, NULL);
+  BN_bn2bin (BnP, Prime);
 
   return TRUE;
 }
@@ -141,7 +142,8 @@ DhSetParameter (
   )
 {
   DH      *Dh;
-  BIGNUM  *Bn;
+  BIGNUM  *BnP;
+  BIGNUM  *BnG;
 
   //
   // Check input parameters.
@@ -149,50 +151,27 @@ DhSetParameter (
   if (DhContext == NULL || Prime == NULL || PrimeLength > INT_MAX) {
     return FALSE;
   }
-  
+
   if (Generator != DH_GENERATOR_2 && Generator != DH_GENERATOR_5) {
     return FALSE;
   }
 
-  Bn = NULL;
-
-  Dh = (DH *) DhContext;
-  Dh->g = NULL;
-  Dh->p = BN_new ();
-  if (Dh->p == NULL) {
-    goto Error;
-  }
-  
-  Dh->g = BN_new ();
-  if (Dh->g == NULL) {
-    goto Error;
-  }
-
-  Bn = BN_bin2bn (Prime, (UINT32) (PrimeLength / 8), Dh->p);
-  if (Bn == NULL) {
-    goto Error;
-  }
-
-  if (BN_set_word (Dh->g, (UINT32) Generator) == 0) {
+  //
+  // Set the generator and prime parameters for DH object.
+  //
+  Dh  = (DH *)DhContext;
+  BnP = BN_bin2bn ((const unsigned char *)Prime, (int)(PrimeLength / 8), NULL);
+  BnG = BN_bin2bn ((const unsigned char *)&Generator, 1, NULL);
+  if ((BnP == NULL) || (BnG == NULL) || !DH_set0_pqg (Dh, BnP, NULL, BnG)) {
     goto Error;
   }
 
   return TRUE;
 
 Error:
+  BN_free (BnP);
+  BN_free (BnG);
 
-  if (Dh->p != NULL) {
-    BN_free (Dh->p);
-  }
-
-  if (Dh->g != NULL) {
-    BN_free (Dh->g);
-  }
-
-  if (Bn != NULL) {
-    BN_free (Bn);
-  }
-  
   return FALSE;
 }
 
@@ -228,6 +207,7 @@ DhGenerateKey (
 {
   BOOLEAN RetVal;
   DH      *Dh;
+  BIGNUM  *DhPubKey;
   INTN    Size;
 
   //
@@ -240,22 +220,19 @@ DhGenerateKey (
   if (PublicKey == NULL && *PublicKeySize != 0) {
     return FALSE;
   }
-  
+
   Dh = (DH *) DhContext;
 
   RetVal = (BOOLEAN) DH_generate_key (DhContext);
   if (RetVal) {
-    Size = BN_num_bytes (Dh->pub_key);
-    if (Size <= 0) {
-      *PublicKeySize = 0;
-      return FALSE;
-    }
-    if (*PublicKeySize < (UINTN) Size) {
+    DH_get0_key (Dh, (const BIGNUM **)&DhPubKey, NULL);
+    Size = BN_num_bytes (DhPubKey);
+    if ((Size > 0) && (*PublicKeySize < (UINTN) Size)) {
       *PublicKeySize = Size;
       return FALSE;
     }
-    
-    BN_bn2bin (Dh->pub_key, PublicKey);
+
+    BN_bn2bin (DhPubKey, PublicKey);
     *PublicKeySize = Size;
   }
 

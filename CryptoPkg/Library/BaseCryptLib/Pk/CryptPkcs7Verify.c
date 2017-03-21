@@ -10,7 +10,7 @@
   WrapPkcs7Data(), Pkcs7GetSigners(), Pkcs7Verify() will get UEFI Authenticated
   Variable and will do basic check for data structure.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -163,6 +163,7 @@ X509PopCertificate (
   STACK_OF(X509)  *CertStack;
   BOOLEAN         Status;
   INT32           Result;
+  BUF_MEM         *Ptr;
   INT32           Length;
   VOID            *Buffer;
 
@@ -192,7 +193,8 @@ X509PopCertificate (
     goto _Exit;
   }
 
-  Length = (INT32)(((BUF_MEM *) CertBio->ptr)->length);
+  BIO_get_mem_ptr (CertBio, &Ptr);
+  Length = (INT32)(Ptr->length);
   if (Length <= 0) {
     goto _Exit;
   }
@@ -463,12 +465,15 @@ Pkcs7GetCertificatesList (
   BOOLEAN          Wrapped;
   UINT8            Index;
   PKCS7            *Pkcs7;
-  X509_STORE_CTX   CertCtx;
+  X509_STORE_CTX   *CertCtx;
+  STACK_OF(X509)   *CtxChain;
+  STACK_OF(X509)   *CtxUntrusted;
+  X509             *CtxCert;
   STACK_OF(X509)   *Signers;
   X509             *Signer;
   X509             *Cert;
-  X509             *TempCert;
   X509             *Issuer;
+  X509_NAME        *IssuerName;
   UINT8            *CertBuf;
   UINT8            *OldBuf;
   UINTN            BufferSize;
@@ -482,8 +487,11 @@ Pkcs7GetCertificatesList (
   Status         = FALSE;
   NewP7Data      = NULL;
   Pkcs7          = NULL;
+  CertCtx        = NULL;
+  CtxChain       = NULL;
+  CtxCert        = NULL;
+  CtxUntrusted   = NULL;
   Cert           = NULL;
-  TempCert       = NULL;
   SingleCert     = NULL;
   CertBuf        = NULL;
   OldBuf         = NULL;
@@ -531,19 +539,26 @@ Pkcs7GetCertificatesList (
   }
   Signer = sk_X509_value (Signers, 0);
 
-  if (!X509_STORE_CTX_init (&CertCtx, NULL, Signer, Pkcs7->d.sign->cert)) {
+  CertCtx = X509_STORE_CTX_new ();
+  if (CertCtx == NULL) {
+    goto _Error;
+  }
+  if (!X509_STORE_CTX_init (CertCtx, NULL, Signer, Pkcs7->d.sign->cert)) {
     goto _Error;
   }
   //
   // Initialize Chained & Untrusted stack
   //
-  if (CertCtx.chain == NULL) {
-    if (((CertCtx.chain = sk_X509_new_null ()) == NULL) ||
-        (!sk_X509_push (CertCtx.chain, CertCtx.cert))) {
+  CtxChain = X509_STORE_CTX_get0_chain (CertCtx);
+  CtxCert  = X509_STORE_CTX_get0_cert (CertCtx);
+  if (CtxChain == NULL) {
+    if (((CtxChain = sk_X509_new_null ()) == NULL) ||
+        (!sk_X509_push (CtxChain, CtxCert))) {
       goto _Error;
     }
   }
-  (VOID)sk_X509_delete_ptr (CertCtx.untrusted, Signer);
+  CtxUntrusted = X509_STORE_CTX_get0_untrusted (CertCtx);
+  (VOID)sk_X509_delete_ptr (CtxUntrusted, Signer);
 
   //
   // Build certificates stack chained from Signer's certificate.
@@ -553,27 +568,25 @@ Pkcs7GetCertificatesList (
     //
     // Self-Issue checking
     //
-    if (CertCtx.check_issued (&CertCtx, Cert, Cert)) {
-      break;
+    Issuer = NULL;
+    if (X509_STORE_CTX_get1_issuer (&Issuer, CertCtx, Cert) == 1) {
+      if (X509_cmp (Issuer, Cert) == 0) {
+        break;
+      }
     }
 
     //
     // Found the issuer of the current certificate
     //
-    if (CertCtx.untrusted != NULL) {
+    if (CtxUntrusted != NULL) {
       Issuer = NULL;
-      for (Index = 0; Index < sk_X509_num (CertCtx.untrusted); Index++) {
-        TempCert = sk_X509_value (CertCtx.untrusted, Index);
-        if (CertCtx.check_issued (&CertCtx, Cert, TempCert)) {
-          Issuer = TempCert;
-          break;
-        }
-      }
+      IssuerName = X509_get_issuer_name (Cert);
+      Issuer     = X509_find_by_subject (CtxUntrusted, IssuerName);
       if (Issuer != NULL) {
-        if (!sk_X509_push (CertCtx.chain, Issuer)) {
+        if (!sk_X509_push (CtxChain, Issuer)) {
           goto _Error;
         }
-        (VOID)sk_X509_delete_ptr (CertCtx.untrusted, Issuer);
+        (VOID)sk_X509_delete_ptr (CtxUntrusted, Issuer);
 
         Cert = Issuer;
         continue;
@@ -595,13 +608,13 @@ Pkcs7GetCertificatesList (
   //      UINT8  Certn[];
   //
 
-  if (CertCtx.chain != NULL) {
+  if (CtxChain != NULL) {
     BufferSize = sizeof (UINT8);
     OldSize    = BufferSize;
     CertBuf    = NULL;
 
     for (Index = 0; ; Index++) {
-      Status = X509PopCertificate (CertCtx.chain, &SingleCert, &CertSize);
+      Status = X509PopCertificate (CtxChain, &SingleCert, &CertSize);
       if (!Status) {
         break;
       }
@@ -639,13 +652,13 @@ Pkcs7GetCertificatesList (
     }
   }
 
-  if (CertCtx.untrusted != NULL) {
+  if (CtxUntrusted != NULL) {
     BufferSize = sizeof (UINT8);
     OldSize    = BufferSize;
     CertBuf    = NULL;
 
     for (Index = 0; ; Index++) {
-      Status = X509PopCertificate (CertCtx.untrusted, &SingleCert, &CertSize);
+      Status = X509PopCertificate (CtxUntrusted, &SingleCert, &CertSize);
       if (!Status) {
         break;
       }
@@ -698,7 +711,8 @@ _Error:
   }
   sk_X509_free (Signers);
 
-  X509_STORE_CTX_cleanup (&CertCtx);
+  X509_STORE_CTX_cleanup (CertCtx);
+  X509_STORE_CTX_free (CertCtx);
 
   if (SingleCert != NULL) {
     free (SingleCert);

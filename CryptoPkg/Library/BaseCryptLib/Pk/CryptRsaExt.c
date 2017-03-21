@@ -7,7 +7,7 @@
   3) RsaCheckKey
   4) RsaPkcs1Sign
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,6 +74,7 @@ RsaGetKey (
   RsaKey  = (RSA *) RsaContext;
   Size    = *BnSize;
   *BnSize = 0;
+  BnKey   = NULL;
 
   switch (KeyTag) {
 
@@ -81,83 +82,63 @@ RsaGetKey (
   // RSA Public Modulus (N)
   //
   case RsaKeyN:
-    if (RsaKey->n == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->n;
+    RSA_get0_key (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
     break;
 
   //
   // RSA Public Exponent (e)
   //
   case RsaKeyE:
-    if (RsaKey->e == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->e;
+    RSA_get0_key (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
     break;
 
   //
   // RSA Private Exponent (d)
   //
   case RsaKeyD:
-    if (RsaKey->d == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->d;
+    RSA_get0_key (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
     break;
 
   //
   // RSA Secret Prime Factor of Modulus (p)
   //
   case RsaKeyP:
-    if (RsaKey->p == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->p;
+    RSA_get0_factors (RsaKey, (const BIGNUM **)&BnKey, NULL);
     break;
 
   //
   // RSA Secret Prime Factor of Modules (q)
   //
   case RsaKeyQ:
-    if (RsaKey->q == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->q;
+    RSA_get0_factors (RsaKey, NULL, (const BIGNUM **)&BnKey);
     break;
 
   //
   // p's CRT Exponent (== d mod (p - 1))
   //
   case RsaKeyDp:
-    if (RsaKey->dmp1 == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->dmp1;
+    RSA_get0_crt_params (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
     break;
 
   //
   // q's CRT Exponent (== d mod (q - 1))
   //
   case RsaKeyDq:
-    if (RsaKey->dmq1 == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->dmq1;
+    RSA_get0_crt_params (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
     break;
 
   //
   // The CRT Coefficient (== 1/q mod p)
   //
   case RsaKeyQInv:
-    if (RsaKey->iqmp == NULL) {
-      return TRUE;
-    }
-    BnKey = RsaKey->iqmp;
+    RSA_get0_crt_params (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
     break;
 
   default:
+    return FALSE;
+  }
+
+  if (BnKey == NULL) {
     return FALSE;
   }
 
@@ -170,10 +151,11 @@ RsaGetKey (
   }
 
   if (BigNumber == NULL) {
-    return FALSE;
+    *BnSize = Size;
+    return TRUE;
   }
   *BnSize = BN_bn2bin (BnKey, BigNumber) ;
-  
+
   return TRUE;
 }
 
@@ -216,14 +198,14 @@ RsaGenerateKey (
   if (RsaContext == NULL || ModulusLength > INT_MAX || PublicExponentSize > INT_MAX) {
     return FALSE;
   }
-  
+
   KeyE = BN_new ();
   if (KeyE == NULL) {
     return FALSE;
   }
 
   RetVal = FALSE;
-  
+
   if (PublicExponent == NULL) {
     if (BN_set_word (KeyE, 0x10001) == 0) {
       goto _Exit;
@@ -276,7 +258,7 @@ RsaCheckKey (
   if (RsaContext == NULL) {
     return FALSE;
   }
-  
+
   if  (RSA_check_key ((RSA *) RsaContext) != 1) {
     Reason = ERR_GET_REASON (ERR_peek_last_error ());
     if (Reason == RSA_R_P_NOT_PRIME ||
@@ -337,17 +319,17 @@ RsaPkcs1Sign (
   }
 
   Rsa = (RSA *) RsaContext;
-  Size = BN_num_bytes (Rsa->n);
+  Size = RSA_size (Rsa);
 
   if (*SigSize < Size) {
     *SigSize = Size;
     return FALSE;
   }
-  
+
   if (Signature == NULL) {
     return FALSE;
   }
-  
+
   //
   // Determine the message digest algorithm according to digest size.
   //   Only MD5, SHA-1 or SHA-256 algorithm is supported. 
@@ -356,18 +338,18 @@ RsaPkcs1Sign (
   case MD5_DIGEST_SIZE:
     DigestType = NID_md5;
     break;
-    
+
   case SHA1_DIGEST_SIZE:
     DigestType = NID_sha1;
     break;
-    
+
   case SHA256_DIGEST_SIZE:
     DigestType = NID_sha256;
     break;
 
   default:
     return FALSE;
-  }  
+  }
 
   return (BOOLEAN) RSA_sign (
                      DigestType,
