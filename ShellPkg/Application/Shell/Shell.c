@@ -1132,6 +1132,58 @@ ProcessCommandLine(
 }
 
 /**
+  Function try to find location of the Startup.nsh file.
+  
+  The buffer is callee allocated and should be freed by the caller.
+
+  @param    ImagePath             The path to the image for shell.  first place to look for the startup script
+  @param    FilePath              The path to the file for shell.  second place to look for the startup script.
+
+  @retval   NULL                  No Startup.nsh file was found.
+  @return   !=NULL                Pointer to NULL-terminated path.
+**/
+CHAR16 *
+LocateStartupScript (
+  IN EFI_DEVICE_PATH_PROTOCOL *ImageDevicePath,
+  IN EFI_DEVICE_PATH_PROTOCOL *FileDevicePath
+  )
+{
+  CHAR16          *StartupScriptPath;
+  CHAR16          *TempSpot;
+  CONST CHAR16    *MapName;
+  UINTN           Size;
+
+  StartupScriptPath = NULL;
+  Size              = 0;
+
+  //
+  // Try to find 'Startup.nsh' in the directory where the shell itself was launched.
+  //
+  MapName = ShellInfoObject.NewEfiShellProtocol->GetMapFromDevicePath (&ImageDevicePath);
+  if (MapName != NULL) {   
+    StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, MapName, 0);
+    TempSpot = StrStr (StartupScriptPath, L";");
+    if (TempSpot != NULL) {
+      *TempSpot = CHAR_NULL;
+    }
+
+    StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, ((FILEPATH_DEVICE_PATH *)FileDevicePath)->PathName, 0);
+    PathRemoveLastItem (StartupScriptPath);
+    StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, mStartupScript, 0);
+  }
+
+  //
+  // Try to find 'Startup.nsh' in the execution path defined by the envrionment variable PATH.
+  //
+  if ((StartupScriptPath == NULL) || EFI_ERROR (ShellIsFile (StartupScriptPath))) {
+    SHELL_FREE_NON_NULL (StartupScriptPath);
+    StartupScriptPath = ShellFindFilePath (mStartupScript);
+  }
+
+  return StartupScriptPath;
+}
+
+/**
   Handles all interaction with the default startup script.
 
   this will check that the correct command line parameters were passed, handle the delay, and then start running the script.
@@ -1151,17 +1203,11 @@ DoStartupScript(
   EFI_STATUS                    CalleeStatus;
   UINTN                         Delay;
   EFI_INPUT_KEY                 Key;
-  SHELL_FILE_HANDLE             FileHandle;
-  EFI_DEVICE_PATH_PROTOCOL      *NewPath;
-  EFI_DEVICE_PATH_PROTOCOL      *NamePath;
   CHAR16                        *FileStringPath;
-  CHAR16                        *TempSpot;
   UINTN                         NewSize;
-  CONST CHAR16                  *MapName;
 
   Key.UnicodeChar = CHAR_NULL;
   Key.ScanCode    = 0;
-  FileHandle      = NULL;
 
   if (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.Startup && ShellInfoObject.ShellInitSettings.FileName != NULL) {
     //
@@ -1223,59 +1269,11 @@ DoStartupScript(
     return (EFI_SUCCESS);
   }
 
-  //
-  // Try the first location (must be file system)
-  //
-  MapName = ShellInfoObject.NewEfiShellProtocol->GetMapFromDevicePath(&ImagePath);
-  if (MapName != NULL) {
-    FileStringPath = NULL;
-    NewSize = 0;
-    FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, MapName, 0);
-    if (FileStringPath == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-    } else {
-      TempSpot = StrStr(FileStringPath, L";");
-      if (TempSpot != NULL) {
-        *TempSpot = CHAR_NULL;
-      }
-      FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, ((FILEPATH_DEVICE_PATH*)FilePath)->PathName, 0);
-      PathRemoveLastItem(FileStringPath);
-      FileStringPath = StrnCatGrow(&FileStringPath, &NewSize, mStartupScript, 0);
-      Status = ShellInfoObject.NewEfiShellProtocol->OpenFileByName(FileStringPath, &FileHandle, EFI_FILE_MODE_READ);
-      FreePool(FileStringPath);
-    }
+  FileStringPath = LocateStartupScript (ImagePath, FilePath);
+  if (FileStringPath != NULL) {
+    Status = RunScriptFile (FileStringPath, NULL, L"", ShellInfoObject.NewShellParametersProtocol);
+    FreePool (FileStringPath);
   }
-  if (EFI_ERROR(Status)) {
-    NamePath = FileDevicePath (NULL, mStartupScript);
-    NewPath = AppendDevicePathNode (ImagePath, NamePath);
-    FreePool(NamePath);
-
-    //
-    // Try the location
-    //
-    Status = InternalOpenFileDevicePath(NewPath, &FileHandle, EFI_FILE_MODE_READ, 0);
-    FreePool(NewPath);
-  }
-  //
-  // If we got a file, run it
-  //
-  if (!EFI_ERROR(Status) && FileHandle != NULL) {
-    Status = RunScriptFile (mStartupScript, FileHandle, L"", ShellInfoObject.NewShellParametersProtocol);
-    ShellInfoObject.NewEfiShellProtocol->CloseFile(FileHandle);
-  } else {
-    FileStringPath = ShellFindFilePath(mStartupScript);
-    if (FileStringPath == NULL) {
-      //
-      // we return success since we don't need to have a startup script
-      //
-      Status = EFI_SUCCESS;
-      ASSERT(FileHandle == NULL);
-    } else {
-      Status = RunScriptFile(FileStringPath, NULL, L"", ShellInfoObject.NewShellParametersProtocol);
-      FreePool(FileStringPath);
-    }
-  }
-
 
   return (Status);
 }
