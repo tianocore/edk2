@@ -1,7 +1,7 @@
 /** @file
 Implementation of EFI_DNS4_PROTOCOL and EFI_DNS6_PROTOCOL interfaces.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -246,7 +246,7 @@ Dns4Configure (
     Netmask  = NTOHL (Netmask);
 
     if (!DnsConfigData->UseDefaultSetting &&
-       ((!IP4_IS_VALID_NETMASK (Netmask) || !NetIp4IsUnicast (Ip, Netmask)))) {
+        ((!IP4_IS_VALID_NETMASK (Netmask) || (Netmask != 0 && !NetIp4IsUnicast (Ip, Netmask))))) {
       Status = EFI_INVALID_PARAMETER;
       goto ON_EXIT;
     }
