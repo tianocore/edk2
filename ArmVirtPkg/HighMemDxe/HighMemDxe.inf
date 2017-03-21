@@ -45,7 +45,6 @@
   gFdtClientProtocolGuid                  ## CONSUMES
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdSystemMemoryBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [Depex]

@@ -30,16 +30,17 @@ InitializeHighMemDxe (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  FDT_CLIENT_PROTOCOL   *FdtClient;
-  EFI_CPU_ARCH_PROTOCOL *Cpu;
-  EFI_STATUS            Status, FindNodeStatus;
-  INT32                 Node;
-  CONST UINT32          *Reg;
-  UINT32                RegSize;
-  UINTN                 AddressCells, SizeCells;
-  UINT64                CurBase;
-  UINT64                CurSize;
-  UINT64                Attributes;
+  FDT_CLIENT_PROTOCOL               *FdtClient;
+  EFI_CPU_ARCH_PROTOCOL             *Cpu;
+  EFI_STATUS                        Status, FindNodeStatus;
+  INT32                             Node;
+  CONST UINT32                      *Reg;
+  UINT32                            RegSize;
+  UINTN                             AddressCells, SizeCells;
+  UINT64                            CurBase;
+  UINT64                            CurSize;
+  UINT64                            Attributes;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR   GcdDescriptor;
 
   Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
                   (VOID **)&FdtClient);
@@ -73,7 +74,14 @@ InitializeHighMemDxe (
       }
       RegSize -= (AddressCells + SizeCells) * sizeof (UINT32);
 
-      if (PcdGet64 (PcdSystemMemoryBase) != CurBase) {
+      Status = gDS->GetMemorySpaceDescriptor (CurBase, &GcdDescriptor);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN,
+          "%a: Region 0x%lx - 0x%lx not found in the GCD memory space map\n",
+          __FUNCTION__, CurBase, CurBase + CurSize - 1));
+          continue;
+      }
+      if (GcdDescriptor.GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
         Status = gDS->AddMemorySpace (EfiGcdMemoryTypeSystemMemory, CurBase,
                         CurSize, EFI_MEMORY_WB);
 
