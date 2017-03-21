@@ -41,6 +41,7 @@
   UefiDriverEntryPoint
 
 [Protocols]
+  gEfiCpuArchProtocolGuid                 ## CONSUMES
   gFdtClientProtocolGuid                  ## CONSUMES
 
 [Pcd]

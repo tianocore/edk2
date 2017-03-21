@@ -20,6 +20,7 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
+#include <Protocol/Cpu.h>
 #include <Protocol/FdtClient.h>
 
 EFI_STATUS
@@ -30,6 +31,7 @@ InitializeHighMemDxe (
   )
 {
   FDT_CLIENT_PROTOCOL   *FdtClient;
+  EFI_CPU_ARCH_PROTOCOL *Cpu;
   EFI_STATUS            Status, FindNodeStatus;
   INT32                 Node;
   CONST UINT32          *Reg;
@@ -41,6 +43,10 @@ InitializeHighMemDxe (
 
   Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
                   (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL,
+                  (VOID **)&Cpu);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -78,13 +84,24 @@ InitializeHighMemDxe (
           continue;
         }
 
+        Status = gDS->SetMemorySpaceAttributes (CurBase, CurSize,
+                        EFI_MEMORY_WB);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN,
+            "%a: gDS->SetMemorySpaceAttributes() failed on region 0x%lx - 0x%lx (%r)\n",
+            __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
+        }
+
         //
-        // Take care not to strip any permission attributes that will have been
-        // set by DxeCore on the region we just added if a strict permission
-        // policy is in effect for EfiConventionalMemory regions.
-        // Unfortunately, we cannot interrogate the GCD memory space map for
-        // those permissions, since they are not recorded there (for historical
-        // reasons), so check the policy directly.
+        // Due to the ambiguous nature of the RO/XP GCD memory space attributes,
+        // it is impossible to add a memory space with the XP attribute in a way
+        // that does not result in the XP attribute being set on *all* UEFI
+        // memory map entries that are carved from it, including code regions
+        // that require executable permissions.
+        //
+        // So instead, we never set the RO/XP attributes in the GCD memory space
+        // capabilities or attribute fields, and apply any protections directly
+        // on the page table mappings by going through the cpu arch protocol.
         //
         Attributes = EFI_MEMORY_WB;
         if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) &
@@ -92,7 +109,7 @@ InitializeHighMemDxe (
           Attributes |= EFI_MEMORY_XP;
         }
 
-        Status = gDS->SetMemorySpaceAttributes (CurBase, CurSize, Attributes);
+        Status = Cpu->SetMemoryAttributes (Cpu, CurBase, CurSize, Attributes);
 
         if (EFI_ERROR (Status)) {
           DEBUG ((EFI_D_ERROR,
