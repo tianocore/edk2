@@ -157,34 +157,34 @@ DumpUicCmdExecResult (
       case 0x00:
         break;
       case 0x01:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - INVALID_MIB_ATTRIBUTE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - INVALID_MIB_ATTRIBUTE\n"));
         break;
       case 0x02:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - INVALID_MIB_ATTRIBUTE_VALUE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - INVALID_MIB_ATTRIBUTE_VALUE\n"));
         break;
       case 0x03:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - READ_ONLY_MIB_ATTRIBUTE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - READ_ONLY_MIB_ATTRIBUTE\n"));
         break;
       case 0x04:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - WRITE_ONLY_MIB_ATTRIBUTE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - WRITE_ONLY_MIB_ATTRIBUTE\n"));
         break;
       case 0x05:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - BAD_INDEX\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - BAD_INDEX\n"));
         break;
       case 0x06:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - LOCKED_MIB_ATTRIBUTE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - LOCKED_MIB_ATTRIBUTE\n"));
         break;
       case 0x07:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - BAD_TEST_FEATURE_INDEX\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - BAD_TEST_FEATURE_INDEX\n"));
         break;
       case 0x08:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - PEER_COMMUNICATION_FAILURE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - PEER_COMMUNICATION_FAILURE\n"));
         break; 
       case 0x09:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - BUSY\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - BUSY\n"));
         break;
       case 0x0A:
-        DEBUG ((EFI_D_VERBOSE, "UIC configuration command fails - DME_FAILURE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC configuration command fails - DME_FAILURE\n"));
         break;        
       default :
         ASSERT (FALSE);
@@ -195,7 +195,7 @@ DumpUicCmdExecResult (
       case 0x00:
         break;
       case 0x01:
-        DEBUG ((EFI_D_VERBOSE, "UIC control command fails - FAILURE\n"));
+        DEBUG ((DEBUG_VERBOSE, "UIC control command fails - FAILURE\n"));
         break;     
       default :
         ASSERT (FALSE);
@@ -217,34 +217,34 @@ DumpQueryResponseResult (
 {
   switch (Result) {
     case 0xF6:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Parameter Not Readable\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Parameter Not Readable\n"));
       break;
     case 0xF7:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Parameter Not Writeable\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Parameter Not Writeable\n"));
       break;
     case 0xF8:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Parameter Already Written\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Parameter Already Written\n"));
       break;
     case 0xF9:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Invalid Length\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Invalid Length\n"));
       break;
     case 0xFA:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Invalid Value\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Invalid Value\n"));
       break;
     case 0xFB:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Invalid Selector\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Invalid Selector\n"));
       break;
     case 0xFC:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Invalid Index\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Invalid Index\n"));
       break;
     case 0xFD:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Invalid Idn\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Invalid Idn\n"));
       break;
     case 0xFE:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with Invalid Opcode\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with Invalid Opcode\n"));
       break; 
     case 0xFF:
-      DEBUG ((EFI_D_VERBOSE, "Query Response with General Failure\n"));
+      DEBUG ((DEBUG_VERBOSE, "Query Response with General Failure\n"));
       break;
     default :
       ASSERT (FALSE);
@@ -402,7 +402,7 @@ UfsInitUtpPrdt (
 
   if ((BufferSize & (BIT0 | BIT1)) != 0) {
     BufferSize &= ~(BIT0 | BIT1);
-    DEBUG ((EFI_D_WARN, "UfsInitUtpPrdt: The BufferSize [%d] is not dword-aligned!\n", BufferSize));
+    DEBUG ((DEBUG_WARN, "UfsInitUtpPrdt: The BufferSize [%d] is not dword-aligned!\n", BufferSize));
   }
 
   if (BufferSize == 0) {
@@ -1559,7 +1559,7 @@ UfsExecScsiCmds (
   //
   Packet->TargetStatus = Response->Status;
   if (Response->Response != 0) {
-    DEBUG ((EFI_D_ERROR, "UfsExecScsiCmds() fails with Target Failure\n"));
+    DEBUG ((DEBUG_ERROR, "UfsExecScsiCmds() fails with Target Failure\n"));
     Status = EFI_DEVICE_ERROR;
     goto Exit;
   }
@@ -1717,7 +1717,7 @@ UfsExecUicCommands (
     return EFI_NOT_FOUND;
   }
 
-  DEBUG ((EFI_D_INFO, "UfsPassThruDxe: found a attached UFS device\n"));
+  DEBUG ((DEBUG_INFO, "UfsPassThruDxe: found a attached UFS device\n"));
 
   return EFI_SUCCESS;
 }
@@ -2084,29 +2084,29 @@ UfsControllerInit (
 
   Status = UfsEnableHostController (Private);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UfsControllerInit: Enable Host Controller Fails, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UfsControllerInit: Enable Host Controller Fails, Status = %r\n", Status));
     return Status;
   }
 
   Status = UfsDeviceDetection (Private);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UfsControllerInit: Device Detection Fails, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UfsControllerInit: Device Detection Fails, Status = %r\n", Status));
     return Status;
   }
 
   Status = UfsInitTaskManagementRequestList (Private);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UfsControllerInit: Task management list initialization Fails, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UfsControllerInit: Task management list initialization Fails, Status = %r\n", Status));
     return Status;
   }
 
   Status = UfsInitTransferRequestList (Private);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UfsControllerInit: Transfer list initialization Fails, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UfsControllerInit: Transfer list initialization Fails, Status = %r\n", Status));
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "UfsControllerInit Finished\n"));
+  DEBUG ((DEBUG_INFO, "UfsControllerInit Finished\n"));
   return EFI_SUCCESS;
 }
 
@@ -2167,7 +2167,7 @@ UfsControllerStop (
     return EFI_DEVICE_ERROR;
   }
 
-  DEBUG ((EFI_D_INFO, "UfsController is stopped\n"));
+  DEBUG ((DEBUG_INFO, "UfsController is stopped\n"));
 
   return EFI_SUCCESS;
 }
@@ -2274,7 +2274,7 @@ ProcessAsyncTaskList (
         // case.
         //
         Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_PHASE_ERROR;
-        DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p UfsMmioRead32() Error.\n", TransReq->CallerEvent));
+        DEBUG ((DEBUG_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p UfsMmioRead32() Error.\n", TransReq->CallerEvent));
         SignalCallerEvent (Private, TransReq);
         continue;
       }
@@ -2291,7 +2291,7 @@ ProcessAsyncTaskList (
           // Timeout occurs.
           //
           Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_TIMEOUT_COMMAND;
-          DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p EFI_TIMEOUT.\n", TransReq->CallerEvent));
+          DEBUG ((DEBUG_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p EFI_TIMEOUT.\n", TransReq->CallerEvent));
           SignalCallerEvent (Private, TransReq);
           continue;
         }
@@ -2316,7 +2316,7 @@ ProcessAsyncTaskList (
         //
         Packet->TargetStatus = Response->Status;
         if (Response->Response != 0) {
-          DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Target Failure.\n", TransReq->CallerEvent));
+          DEBUG ((DEBUG_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Target Failure.\n", TransReq->CallerEvent));
           SignalCallerEvent (Private, TransReq);
           continue;
         }
@@ -2336,12 +2336,12 @@ ProcessAsyncTaskList (
             }
           }
         } else {
-          DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Target Device Error.\n", TransReq->CallerEvent));
+          DEBUG ((DEBUG_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Target Device Error.\n", TransReq->CallerEvent));
           SignalCallerEvent (Private, TransReq);
           continue;
         }
 
-        DEBUG ((EFI_D_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Success.\n", TransReq->CallerEvent));
+        DEBUG ((DEBUG_VERBOSE, "ProcessAsyncTaskList(): Signal Event %p Success.\n", TransReq->CallerEvent));
         SignalCallerEvent (Private, TransReq);
       }
     }
