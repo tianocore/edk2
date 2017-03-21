@@ -674,10 +674,8 @@ gModuleTypeHeaderFile = {
 def DynExPcdTokenNumberMapping(Info, AutoGenH):
     ExTokenCNameList = []
     PcdExList        = []
-    if Info.IsLibrary:
-        PcdList = Info.LibraryPcdList
-    else:
-        PcdList = Info.ModulePcdList
+    # Even it is the Library, the PCD is saved in the ModulePcdList
+    PcdList = Info.ModulePcdList
     for Pcd in PcdList:
         if Pcd.Type in gDynamicExPcd:
             ExTokenCNameList.append(Pcd.TokenCName)
@@ -1155,7 +1153,7 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
             AutoGenH.Append('// Disabled the macros, as PcdToken and PcdGet/Set are not allowed in the case that more than one DynamicEx Pcds are different Guids but same CName.\n')
             AutoGenH.Append('// #define %s  %s\n' % (PcdTokenName, PcdExTokenName))
             AutoGenH.Append('// #define %s  LibPcdGetEx%s(&%s, %s)\n' % (GetModeName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
-            AutoGenH.Append('// #define %s  LibPcdGetExSize(&%s, %s \n' % (GetModeSizeName,Pcd.TokenSpaceGuidCName, PcdTokenName))
+            AutoGenH.Append('// #define %s  LibPcdGetExSize(&%s, %s)\n' % (GetModeSizeName,Pcd.TokenSpaceGuidCName, PcdTokenName))
             if Pcd.DatumType == 'VOID*':
                 AutoGenH.Append('// #define %s(SizeOfBuffer, Buffer)  LibPcdSetEx%s(&%s, %s, (SizeOfBuffer), (Buffer))\n' % (SetModeName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
                 AutoGenH.Append('// #define %s(SizeOfBuffer, Buffer)  LibPcdSetEx%sS(&%s, %s, (SizeOfBuffer), (Buffer))\n' % (SetModeStatusName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
