@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -122,16 +122,13 @@ typedef struct {
 
 typedef struct _UFS_DEVICE_MANAGEMENT_REQUEST_PACKET {
   UINT64           Timeout;
-  VOID             *InDataBuffer;
-  VOID             *OutDataBuffer;
+  VOID             *DataBuffer;
   UINT8            Opcode;
   UINT8            DescId;
   UINT8            Index;
   UINT8            Selector;
-  UINT32           InTransferLength;
-  UINT32           OutTransferLength;
+  UINT32           TransferLength;
   UINT8            DataDirection;
-  UINT8            Ocs;
 } UFS_DEVICE_MANAGEMENT_REQUEST_PACKET;
 
 //
@@ -717,6 +714,25 @@ UfsSetFlag (
   );
 
 /**
+  Read specified flag from a UFS device.
+
+  @param[in]  Private           The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
+  @param[in]  FlagId            The ID of flag to be read.
+  @param[out] Value             The flag's value.
+
+  @retval EFI_SUCCESS           The flag was read successfully.
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to read the flag.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of reading the flag.
+
+**/
+EFI_STATUS
+UfsReadFlag (
+  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
+  IN     UINT8                        FlagId,
+     OUT UINT8                        *Value
+  );
+
+/**
   Read or write specified device descriptor of a UFS device.
 
   @param[in]      Private       The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
@@ -741,6 +757,31 @@ UfsRwDeviceDesc (
   IN     UINT8                        Selector,
   IN OUT VOID                         *Descriptor,
   IN     UINT32                       DescSize
+  );
+
+/**
+  Read or write specified attribute of a UFS device.
+
+  @param[in]      Private       The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
+  @param[in]      Read          The boolean variable to show r/w direction.
+  @param[in]      AttrId        The ID of Attribute.
+  @param[in]      Index         The Index of Attribute.
+  @param[in]      Selector      The Selector of Attribute.
+  @param[in, out] Attributes    The value of Attribute to be read or written.
+
+  @retval EFI_SUCCESS           The Attribute was read/written successfully.
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the Attribute.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the Attribute.
+
+**/
+EFI_STATUS
+UfsRwAttributes (
+  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
+  IN     BOOLEAN                      Read,
+  IN     UINT8                        AttrId,
+  IN     UINT8                        Index,
+  IN     UINT8                        Selector,
+  IN OUT UINT32                       *Attributes
   );
 
 /**
