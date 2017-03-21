@@ -1,7 +1,7 @@
 /** @file
   Implementation of TCP4 protocol services.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -183,7 +183,8 @@ Tcp4Configure (
 
       CopyMem (&Ip, &TcpConfigData->AccessPoint.StationAddress, sizeof (IP4_ADDR));
       CopyMem (&SubnetMask, &TcpConfigData->AccessPoint.SubnetMask, sizeof (IP4_ADDR));
-      if (!IP4_IS_VALID_NETMASK (NTOHL (SubnetMask)) || !NetIp4IsUnicast (NTOHL (Ip), NTOHL (SubnetMask))) {
+      if (!IP4_IS_VALID_NETMASK (NTOHL (SubnetMask)) || 
+          (SubnetMask != 0 && !NetIp4IsUnicast (NTOHL (Ip), NTOHL (SubnetMask)))) {
         return EFI_INVALID_PARAMETER;
       }
     }

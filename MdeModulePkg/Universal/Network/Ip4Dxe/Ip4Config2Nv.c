@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to Ip4.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -615,13 +615,16 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
     }
 
     Status = Ip4Config2StrToIp (IfrFormNvData->StationAddress, &StationAddress.v4);
-    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), NTOHL (SubnetMask.Addr[0]))) {
+    if (EFI_ERROR (Status) || 
+        (SubnetMask.Addr[0] != 0 && !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), NTOHL (SubnetMask.Addr[0]))) || 
+        !Ip4StationAddressValid (NTOHL (StationAddress.Addr[0]), NTOHL (SubnetMask.Addr[0]))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
       return EFI_INVALID_PARAMETER;
     }
     
     Status = Ip4Config2StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
-    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), NTOHL (SubnetMask.Addr[0])))) {
+    if (EFI_ERROR (Status) || 
+        (Gateway.Addr[0] != 0 && SubnetMask.Addr[0] != 0 && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), NTOHL (SubnetMask.Addr[0])))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
       return EFI_INVALID_PARAMETER;
     }

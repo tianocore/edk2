@@ -2321,7 +2321,7 @@ EfiPxeBcSetStationIP (
   if (NewStationIp != NULL) {
     if (IP4_IS_UNSPECIFIED(NTOHL (NewStationIp->Addr[0])) || 
         IP4_IS_LOCAL_BROADCAST(NTOHL (NewStationIp->Addr[0])) ||
-        (NewSubnetMask != NULL && !NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), NTOHL (NewSubnetMask->Addr[0])))) {
+        (NewSubnetMask != NULL && NewSubnetMask->Addr[0] != 0 && !NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), NTOHL (NewSubnetMask->Addr[0])))) {
       return EFI_INVALID_PARAMETER;
     }
   }

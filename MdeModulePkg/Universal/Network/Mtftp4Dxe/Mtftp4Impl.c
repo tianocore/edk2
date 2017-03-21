@@ -208,7 +208,7 @@ Mtftp4OverrideValid (
     Netmask = NTOHL (Netmask);
     Ip      = NTOHL (Ip);
 
-    if (!NetIp4IsUnicast (Gateway, Netmask) || !IP4_NET_EQUAL (Gateway, Ip, Netmask)) {
+    if ((Netmask != 0 && !NetIp4IsUnicast (Gateway, Netmask)) || !IP4_NET_EQUAL (Gateway, Ip, Netmask)) {
       return FALSE;
     }
   }
@@ -668,13 +668,13 @@ EfiMtftp4Configure (
     ServerIp = NTOHL (ServerIp);
 
     if (!ConfigData->UseDefaultSetting &&
-       ((!IP4_IS_VALID_NETMASK (Netmask) || !NetIp4IsUnicast (Ip, Netmask)))) {
+        ((!IP4_IS_VALID_NETMASK (Netmask) || (Netmask != 0 && !NetIp4IsUnicast (Ip, Netmask))))) {
 
       return EFI_INVALID_PARAMETER;
     }
 
-    if ((Gateway != 0) &&
-        (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || !NetIp4IsUnicast (Gateway, Netmask))) {
+    if ((Gateway != 0) && 
+        (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || (Netmask != 0 && !NetIp4IsUnicast (Gateway, Netmask)))) {
 
       return EFI_INVALID_PARAMETER;
     }
