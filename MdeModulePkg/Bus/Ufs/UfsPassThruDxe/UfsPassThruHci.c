@@ -602,32 +602,13 @@ UfsCreateDMCommandDesc (
   }
 
   DataDirection = Packet->DataDirection;
-  if (DataDirection == UfsDataIn) {
-    DataSize = Packet->InTransferLength;
-    Data     = Packet->InDataBuffer;
-  } else if (DataDirection == UfsDataOut) {
-    DataSize = Packet->OutTransferLength;
-    Data     = Packet->OutDataBuffer;
-  } else {
-    DataSize = 0;
-    Data     = NULL;
-  }
-
-  if (((Opcode != UtpQueryFuncOpcodeSetFlag) && (Opcode != UtpQueryFuncOpcodeClrFlag) && (Opcode != UtpQueryFuncOpcodeTogFlag))
-    && ((DataSize == 0) || (Data == NULL))) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (((Opcode == UtpQueryFuncOpcodeSetFlag) || (Opcode == UtpQueryFuncOpcodeClrFlag) || (Opcode == UtpQueryFuncOpcodeTogFlag))
-    && ((DataSize != 0) || (Data != NULL))) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((Opcode == UtpQueryFuncOpcodeWrAttr) && (DataSize != sizeof (UINT32))) {
-    return EFI_INVALID_PARAMETER;
-  }
+  DataSize      = Packet->TransferLength;
+  Data          = Packet->DataBuffer;
 
   if ((Opcode == UtpQueryFuncOpcodeWrDesc) || (Opcode == UtpQueryFuncOpcodeRdDesc)) {
+    if (DataSize == 0 || Data == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
     TotalLen = ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)) + ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU)) + ROUNDUP8 (DataSize);
   } else {
     TotalLen = ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)) + ROUNDUP8 (sizeof (UTP_QUERY_RESP_UPIU));
@@ -868,6 +849,183 @@ UfsStopExecCmd (
 }
 
 /**
+  Extracts return data from query response upiu.
+
+  @param[in] Packet     Pointer to the UFS_DEVICE_MANAGEMENT_REQUEST_PACKET.
+  @param[in] QueryResp  Pointer to the query response.
+
+  @retval EFI_INVALID_PARAMETER Packet or QueryResp are empty or opcode is invalid.
+  @retval EFI_SUCCESS           Data extracted.
+
+**/
+EFI_STATUS
+UfsGetReturnDataFromQueryResponse (
+  IN UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  *Packet,
+  IN UTP_QUERY_RESP_UPIU                   *QueryResp
+  )
+{
+  UINT16  ReturnDataSize;
+  UINT32  ReturnData;
+
+  if (Packet == NULL || QueryResp == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (Packet->Opcode) {
+    case UtpQueryFuncOpcodeRdDesc:
+      ReturnDataSize = QueryResp->Tsf.Length;
+      SwapLittleEndianToBigEndian ((UINT8*)&ReturnDataSize, sizeof (UINT16));
+      CopyMem (Packet->DataBuffer, (QueryResp + 1), ReturnDataSize);
+      Packet->TransferLength = ReturnDataSize;
+      break;
+    case UtpQueryFuncOpcodeWrDesc:
+      ReturnDataSize = QueryResp->Tsf.Length;
+      SwapLittleEndianToBigEndian ((UINT8*)&ReturnDataSize, sizeof (UINT16));
+      Packet->TransferLength = ReturnDataSize;
+      break;
+    case UtpQueryFuncOpcodeRdFlag:
+    case UtpQueryFuncOpcodeSetFlag:
+    case UtpQueryFuncOpcodeClrFlag:
+    case UtpQueryFuncOpcodeTogFlag:
+      CopyMem (Packet->DataBuffer, &QueryResp->Tsf.Value, sizeof (UINT8));
+      break;
+    case UtpQueryFuncOpcodeRdAttr:
+    case UtpQueryFuncOpcodeWrAttr:
+      ReturnData = QueryResp->Tsf.Value;
+      SwapLittleEndianToBigEndian ((UINT8*) &ReturnData, sizeof (UINT32));
+      CopyMem (Packet->DataBuffer, &ReturnData, sizeof (UINT32));
+      break;
+    default:
+      return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Creates Transfer Request descriptor and sends Query Request to the device.
+
+  @param[in] Private Pointer to the UFS_PASS_THRU_PRIVATE_DATA.
+  @param[in] Packet  Pointer to the UFS_DEVICE_MANAGEMENT_REQUEST_PACKET.
+
+  @retval EFI_SUCCESS           The device descriptor was read/written successfully.
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the device descriptor.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the device descriptor.
+
+**/
+EFI_STATUS
+UfsSendDmRequestRetry (
+  IN UFS_PASS_THRU_PRIVATE_DATA            *Private,
+  IN UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  *Packet
+  )
+{
+  UINT8                               Slot;
+  UTP_TRD                             *Trd;
+  VOID                                *CmdDescHost;
+  VOID                                *CmdDescMapping;
+  UINT32                              CmdDescSize;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHc;
+  UTP_QUERY_RESP_UPIU                 *QueryResp;
+  EFI_STATUS                          Status;
+
+  //
+  // Find out which slot of transfer request list is available.
+  //
+  Status = UfsFindAvailableSlotInTrl (Private, &Slot);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  
+  Trd = ((UTP_TRD*)Private->UtpTrlBase) + Slot;
+  //
+  // Fill transfer request descriptor to this slot.
+  //
+  Status = UfsCreateDMCommandDesc (Private, Packet, Trd, &CmdDescHost, &CmdDescMapping);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to create DM command descriptor\n"));
+    return Status;
+  }
+
+  UfsHc       = Private->UfsHostController;
+  QueryResp   = (UTP_QUERY_RESP_UPIU*)((UINT8*)CmdDescHost + Trd->RuO * sizeof (UINT32));
+  ASSERT (QueryResp != NULL);
+  CmdDescSize = Trd->RuO * sizeof (UINT32) + Trd->RuL * sizeof (UINT32);
+
+  //
+  // Start to execute the transfer request.
+  //
+  UfsStartExecCmd (Private, Slot);
+
+  //
+  // Wait for the completion of the transfer request.
+  //
+  Status = UfsWaitMemSet (Private, UFS_HC_UTRLDBR_OFFSET, BIT0, 0, Packet->Timeout);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  if (Trd->Ocs != 0 || QueryResp->QueryResp != UfsUtpQueryResponseSuccess) {
+    DEBUG ((DEBUG_ERROR, "Failed to send query request, OCS = %X, QueryResp = %X\n", Trd->Ocs, QueryResp->QueryResp));
+    DumpQueryResponseResult (QueryResp->QueryResp);
+    Status = EFI_DEVICE_ERROR;
+    goto Exit;
+  }
+
+  Status = UfsGetReturnDataFromQueryResponse (Packet, QueryResp);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to get return data from query response\n"));
+    goto Exit;
+  }
+
+Exit:
+  UfsHc->Flush (UfsHc);
+
+  UfsStopExecCmd (Private, Slot);
+
+  if (CmdDescMapping != NULL) {
+    UfsHc->Unmap (UfsHc, CmdDescMapping);
+  }
+  if (CmdDescHost != NULL) {
+    UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (CmdDescSize), CmdDescHost);
+  }
+
+  return Status;
+}
+
+/**
+  Sends Query Request to the device. Query is sent until device responds correctly or counter runs out.
+
+  @param[in] Private Pointer to the UFS_PASS_THRU_PRIVATE_DATA.
+  @param[in] Packet  Pointer to the UFS_DEVICE_MANAGEMENT_PACKET.
+
+  @retval EFI_SUCCESS           The device responded correctly to the Query request.
+  @retval EFI_DEVICE_ERROR      A device error occurred while waiting for the response from the device.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of the operation.
+
+**/
+EFI_STATUS
+UfsSendDmRequest (
+  IN UFS_PASS_THRU_PRIVATE_DATA            *Private,
+  IN UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  *Packet
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       Retry;
+
+  Status = EFI_SUCCESS;
+
+  for (Retry = 0; Retry < 5; Retry ++) {
+    Status = UfsSendDmRequestRetry (Private, Packet);
+    if (!EFI_ERROR (Status)) {
+      return EFI_SUCCESS;
+    }
+  }
+
+  DEBUG ((DEBUG_ERROR, "Failed to get response from the device after %d retries\n", Retry));
+  return Status;
+}
+
+/**
   Read or write specified device descriptor of a UFS device.
 
   @param[in]      Private       The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
@@ -894,106 +1052,25 @@ UfsRwDeviceDesc (
   IN     UINT32                       DescSize
   )
 {
-  EFI_STATUS                           Status;
   UFS_DEVICE_MANAGEMENT_REQUEST_PACKET Packet;
-  UINT8                                Slot;
-  UTP_TRD                              *Trd;
-  UTP_QUERY_RESP_UPIU                  *QueryResp;
-  UINT32                               CmdDescSize;
-  UINT16                               ReturnDataSize;
-  VOID                                 *CmdDescHost;
-  VOID                                 *CmdDescMapping;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
 
   ZeroMem (&Packet, sizeof (UFS_DEVICE_MANAGEMENT_REQUEST_PACKET));
 
   if (Read) {
     Packet.DataDirection     = UfsDataIn;
-    Packet.InDataBuffer      = Descriptor;
-    Packet.InTransferLength  = DescSize;
     Packet.Opcode            = UtpQueryFuncOpcodeRdDesc;
   } else {
     Packet.DataDirection     = UfsDataOut;
-    Packet.OutDataBuffer     = Descriptor;
-    Packet.OutTransferLength = DescSize;
     Packet.Opcode            = UtpQueryFuncOpcodeWrDesc;
   }
+  Packet.DataBuffer          = Descriptor;
+  Packet.TransferLength      = DescSize;
   Packet.DescId              = DescId;
   Packet.Index               = Index;
   Packet.Selector            = Selector;
   Packet.Timeout             = UFS_TIMEOUT;
 
-  //
-  // Find out which slot of transfer request list is available.
-  //
-  Status = UfsFindAvailableSlotInTrl (Private, &Slot);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  
-  Trd = ((UTP_TRD*)Private->UtpTrlBase) + Slot;
-  //
-  // Fill transfer request descriptor to this slot.
-  //
-  Status = UfsCreateDMCommandDesc (Private, &Packet, Trd, &CmdDescHost, &CmdDescMapping);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Check the transfer request result.
-  //
-  UfsHc       = Private->UfsHostController;
-  QueryResp   = (UTP_QUERY_RESP_UPIU*)((UINT8*)CmdDescHost + Trd->RuO * sizeof (UINT32));
-  ASSERT (QueryResp != NULL);
-  CmdDescSize = Trd->RuO * sizeof (UINT32) + Trd->RuL * sizeof (UINT32);
-
-  //
-  // Start to execute the transfer request.
-  //
-  UfsStartExecCmd (Private, Slot);
-
-  //
-  // Wait for the completion of the transfer request.
-  //  
-  Status = UfsWaitMemSet (Private, UFS_HC_UTRLDBR_OFFSET, BIT0 << Slot, 0, Packet.Timeout);
-  if (EFI_ERROR (Status)) {
-    goto Exit;
-  }
-
-  if (QueryResp->QueryResp != 0) {
-    DumpQueryResponseResult (QueryResp->QueryResp);
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
-  }
-
-  if (Trd->Ocs == 0) {
-    ReturnDataSize = QueryResp->Tsf.Length;
-    SwapLittleEndianToBigEndian ((UINT8*)&ReturnDataSize, sizeof (UINT16));
-
-    if (Read) {
-      CopyMem (Packet.InDataBuffer, (QueryResp + 1), ReturnDataSize);
-      Packet.InTransferLength = ReturnDataSize;
-    } else {
-      Packet.OutTransferLength = ReturnDataSize;
-    }
-  } else {
-    Status = EFI_DEVICE_ERROR;
-  }
-
-Exit:
-  UfsHc->Flush (UfsHc);
-
-  UfsStopExecCmd (Private, Slot);
-
-  if (CmdDescMapping != NULL) {
-    UfsHc->Unmap (UfsHc, CmdDescMapping);
-  }
-  if (CmdDescHost != NULL) {
-    UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (CmdDescSize), CmdDescHost);
-  }
-
-  return Status;
+  return UfsSendDmRequest (Private, &Packet);
 }
 
 /**
@@ -1021,16 +1098,7 @@ UfsRwAttributes (
   IN OUT UINT32                       *Attributes
   )
 {
-  EFI_STATUS                           Status;
   UFS_DEVICE_MANAGEMENT_REQUEST_PACKET Packet;
-  UINT8                                Slot;
-  UTP_TRD                              *Trd;
-  UTP_QUERY_RESP_UPIU                  *QueryResp;
-  UINT32                               CmdDescSize;
-  UINT32                               ReturnData;
-  VOID                                 *CmdDescHost;
-  VOID                                 *CmdDescMapping;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
 
   ZeroMem (&Packet, sizeof (UFS_DEVICE_MANAGEMENT_REQUEST_PACKET));
 
@@ -1041,77 +1109,13 @@ UfsRwAttributes (
     Packet.DataDirection     = UfsDataOut;
     Packet.Opcode            = UtpQueryFuncOpcodeWrAttr;
   }
+  Packet.DataBuffer          = Attributes;
   Packet.DescId              = AttrId;
   Packet.Index               = Index;
   Packet.Selector            = Selector;
   Packet.Timeout             = UFS_TIMEOUT;
 
-  //
-  // Find out which slot of transfer request list is available.
-  //
-  Status = UfsFindAvailableSlotInTrl (Private, &Slot);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  
-  Trd = ((UTP_TRD*)Private->UtpTrlBase) + Slot;
-  //
-  // Fill transfer request descriptor to this slot.
-  //
-  Status = UfsCreateDMCommandDesc (Private, &Packet, Trd, &CmdDescHost, &CmdDescMapping);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Check the transfer request result.
-  //
-  UfsHc       = Private->UfsHostController;
-  QueryResp   = (UTP_QUERY_RESP_UPIU*)((UINT8*)CmdDescHost + Trd->RuO * sizeof (UINT32));
-  ASSERT (QueryResp != NULL);
-  CmdDescSize = Trd->RuO * sizeof (UINT32) + Trd->RuL * sizeof (UINT32);
-
-  //
-  // Start to execute the transfer request.
-  //
-  UfsStartExecCmd (Private, Slot);
-
-  //
-  // Wait for the completion of the transfer request.
-  //  
-  Status = UfsWaitMemSet (Private, UFS_HC_UTRLDBR_OFFSET, BIT0 << Slot, 0, Packet.Timeout);
-  if (EFI_ERROR (Status)) {
-    goto Exit;
-  }
-
-  if (QueryResp->QueryResp != 0) {
-    DumpQueryResponseResult (QueryResp->QueryResp);
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
-  }
-
-  if (Trd->Ocs == 0) {
-    ReturnData = QueryResp->Tsf.Value;
-    SwapLittleEndianToBigEndian ((UINT8*)&ReturnData, sizeof (UINT32));
-    *Attributes = ReturnData;
-  } else {
-    Status = EFI_DEVICE_ERROR;
-  }
-
-Exit:
-  UfsHc->Flush (UfsHc);
-
-  UfsStopExecCmd (Private, Slot);
-
-  if (CmdDescMapping != NULL) {
-    UfsHc->Unmap (UfsHc, CmdDescMapping);
-  }
-
-  if (CmdDescHost != NULL) {
-    UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (CmdDescSize), CmdDescHost);
-  }
-
-  return Status;
+  return UfsSendDmRequest (Private, &Packet);
 }
 
 /**
@@ -1135,15 +1139,7 @@ UfsRwFlags (
   IN OUT UINT8                        *Value
   )
 {
-  EFI_STATUS                           Status;
   UFS_DEVICE_MANAGEMENT_REQUEST_PACKET Packet;
-  UINT8                                Slot;
-  UTP_TRD                              *Trd;
-  UTP_QUERY_RESP_UPIU                  *QueryResp;
-  UINT32                               CmdDescSize;
-  VOID                                 *CmdDescHost;
-  VOID                                 *CmdDescMapping;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL   *UfsHc;
 
   if (Value == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1165,74 +1161,13 @@ UfsRwFlags (
       return EFI_INVALID_PARAMETER;
     }
   }
+  Packet.DataBuffer          = Value;
   Packet.DescId              = FlagId;
   Packet.Index               = 0;
   Packet.Selector            = 0;
   Packet.Timeout             = UFS_TIMEOUT;
 
-  //
-  // Find out which slot of transfer request list is available.
-  //
-  Status = UfsFindAvailableSlotInTrl (Private, &Slot);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Fill transfer request descriptor to this slot.
-  //
-  Trd    = ((UTP_TRD*)Private->UtpTrlBase) + Slot;
-  Status = UfsCreateDMCommandDesc (Private, &Packet, Trd, &CmdDescHost, &CmdDescMapping);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Check the transfer request result.
-  //
-  UfsHc       = Private->UfsHostController;
-  QueryResp   = (UTP_QUERY_RESP_UPIU*)((UINT8*)CmdDescHost + Trd->RuO * sizeof (UINT32));
-  ASSERT (QueryResp != NULL);
-  CmdDescSize = Trd->RuO * sizeof (UINT32) + Trd->RuL * sizeof (UINT32);
-
-  //
-  // Start to execute the transfer request.
-  //
-  UfsStartExecCmd (Private, Slot);
-
-  //
-  // Wait for the completion of the transfer request.
-  //  
-  Status = UfsWaitMemSet (Private, UFS_HC_UTRLDBR_OFFSET, BIT0 << Slot, 0, Packet.Timeout);
-  if (EFI_ERROR (Status)) {
-    goto Exit;
-  }
-
-  if (QueryResp->QueryResp != 0) {
-    DumpQueryResponseResult (QueryResp->QueryResp);
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
-  }
-
-  if (Trd->Ocs == 0) {
-    *Value = (UINT8)QueryResp->Tsf.Value;
-  } else {
-    Status = EFI_DEVICE_ERROR;
-  }
-
-Exit:
-  UfsHc->Flush (UfsHc);
-
-  UfsStopExecCmd (Private, Slot);
-
-  if (CmdDescMapping != NULL) {
-    UfsHc->Unmap (UfsHc, CmdDescMapping);
-  }
-  if (CmdDescHost != NULL) {
-    UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (CmdDescSize), CmdDescHost);
-  }
-
-  return Status;
+  return UfsSendDmRequest (Private, &Packet);
 }
 
 /**

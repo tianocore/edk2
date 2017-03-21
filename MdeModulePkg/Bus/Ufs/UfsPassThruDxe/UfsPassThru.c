@@ -730,6 +730,48 @@ UfsPassThruDriverBindingSupported (
 }
 
 /**
+  Finishes device initialization by setting fDeviceInit flag and waiting untill device responds by
+  clearing it.
+
+  @param[in] Private  Pointer to the UFS_PASS_THRU_PRIVATE_DATA.
+
+  @retval EFI_SUCCESS  The operation succeeds.
+  @retval Others       The operation fails.
+
+**/
+EFI_STATUS
+UfsFinishDeviceInitialization (
+  IN UFS_PASS_THRU_PRIVATE_DATA  *Private
+  )
+{
+  EFI_STATUS  Status;
+  UINT8  DeviceInitStatus;
+  UINT8  Timeout;
+
+  DeviceInitStatus = 0xFF;
+
+  //
+  // The host enables the device initialization completion by setting fDeviceInit flag.
+  //
+  Status = UfsSetFlag (Private, UfsFlagDevInit);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Timeout = 5;
+  do {
+    Status = UfsReadFlag (Private, UfsFlagDevInit, &DeviceInitStatus);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    MicroSecondDelay (1);
+    Timeout--;
+  } while (DeviceInitStatus != 0 && Timeout != 0);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Starts a device controller or a bus controller.
 
   The Start() function is designed to be invoked from the EFI boot service ConnectController().
@@ -777,7 +819,7 @@ UfsPassThruDriverBindingStart (
   UFS_PASS_THRU_PRIVATE_DATA            *Private;
   UINTN                                 UfsHcBase;
   UINT32                                Index;
-  UFS_CONFIG_DESC                       Config;
+  UFS_UNIT_DESC                         UnitDescriptor;
 
   Status    = EFI_SUCCESS;
   UfsHc     = NULL;
@@ -844,21 +886,9 @@ UfsPassThruDriverBindingStart (
     goto Error;
   }
 
-  //
-  // The host enables the device initialization completion by setting fDeviceInit flag.
-  //
-  Status = UfsSetFlag (Private, UfsFlagDevInit);
+  Status = UfsFinishDeviceInitialization (Private);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Ufs Set fDeviceInit Flag Error, Status = %r\n", Status));
-    goto Error;
-  }
-
-  //
-  // Get Ufs Device's Lun Info by reading Configuration Descriptor.
-  //
-  Status = UfsRwDeviceDesc (Private, TRUE, UfsConfigDesc, 0, 0, &Config, sizeof (UFS_CONFIG_DESC));
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Ufs Get Configuration Descriptor Error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Device failed to finish initialization, Status = %r\n", Status));
     goto Error;
   }
 
@@ -867,9 +897,14 @@ UfsPassThruDriverBindingStart (
   // TODO: Parse device descriptor to decide if exposing RPMB LUN to upper layer for authentication access.
   //
   for (Index = 0; Index < 8; Index++) {
-    if (Config.UnitDescConfParams[Index].LunEn != 0) {
+    Status = UfsRwDeviceDesc (Private, TRUE, UfsUnitDesc, (UINT8) Index, 0, &UnitDescriptor, sizeof (UFS_UNIT_DESC));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failed to read unit descriptor, index = %X, status = %r\n", Index, Status));
+      continue;
+    }
+    if (UnitDescriptor.LunEn == 0x1) {
+      DEBUG ((DEBUG_INFO, "UFS LUN %X is enabled\n", Index));
       Private->Luns.BitMask |= (BIT0 << Index);
-      DEBUG ((DEBUG_INFO, "Ufs Lun %d is enabled\n", Index));
     }
   }
 
