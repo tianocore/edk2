@@ -35,11 +35,11 @@
   QemuKernel.c
 
 [Packages]
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
-  ArmVirtPkg/ArmVirtPkg.dec
+  ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -58,7 +58,6 @@
   UefiRuntimeServicesTableLib
 
 [FixedPcd]
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
@@ -74,6 +73,7 @@
   gEfiFileSystemVolumeLabelInfoIdGuid
   gEfiEndOfDxeEventGroupGuid
   gRootBridgesConnectedEventGroupGuid
+  gUefiShellFileGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid
