@@ -17,7 +17,7 @@
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = Shell
-  FILE_GUID                      = 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1
+  FILE_GUID                      = 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1 # gUefiShellFileGuid
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = UefiMain
