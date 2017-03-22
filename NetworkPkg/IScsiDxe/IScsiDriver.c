@@ -1813,7 +1813,7 @@ IScsiDriverEntryPoint (
   //
   Status = IScsiCreateKeywords (PcdGet8 (PcdMaxIScsiAttemptNumber));
   if (EFI_ERROR (Status)) {
-    goto Error5;
+    goto Error6;
   }
 
   //
@@ -1840,13 +1840,16 @@ IScsiDriverEntryPoint (
   return EFI_SUCCESS;
 
 Error6:
-  IScsiConfigFormUnload (gIScsiIp4DriverBinding.DriverBindingHandle);
-
-Error5:
   IScsiCleanAttemptVariable ();
 
+Error5:
+  IScsiConfigFormUnload (gIScsiIp4DriverBinding.DriverBindingHandle);
+
 Error4:
-  FreePool (mPrivate);
+  if (mPrivate != NULL) {
+    FreePool (mPrivate);
+    mPrivate = NULL;
+  }
 
 Error3:
   gBS->UninstallMultipleProtocolInterfaces (
