@@ -40,6 +40,7 @@
   SourceLevelDebugPkg/SourceLevelDebugPkg.dec
   QuarkPlatformPkg/QuarkPlatformPkg.dec
   SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
   SignedCapsulePkg/SignedCapsulePkg.dec
 
 [LibraryClasses]
@@ -70,6 +71,7 @@
   gEfiVTUTF8Guid
   gEfiTtyTermGuid
   gEfiEndOfDxeEventGroupGuid
+  gUefiShellFileGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
