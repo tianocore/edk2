@@ -576,6 +576,11 @@ SplitRecord (
     TempRecord.NumberOfPages = EfiSizeToPages (PhysicalEnd - PhysicalStart);
   } while ((ImageRecord != NULL) && (PhysicalStart < PhysicalEnd));
 
+  //
+  // The logic in function SplitTable() ensures that TotalNewRecordCount will not be zero if the
+  // code reaches here.
+  //
+  ASSERT (TotalNewRecordCount != 0);
   return TotalNewRecordCount - 1;
 }
 
