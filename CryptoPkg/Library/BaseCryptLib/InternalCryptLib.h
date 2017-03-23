@@ -1,4 +1,4 @@
-/** @file  
+/** @file
   Internal include file for BaseCryptLib.
 
 Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
@@ -14,6 +14,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __INTERNAL_CRYPT_LIB_H__
 #define __INTERNAL_CRYPT_LIB_H__
+
+#undef _WIN32
+#undef _WIN64
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -31,4 +34,3 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #endif
 
 #endif
-

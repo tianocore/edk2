@@ -6,7 +6,7 @@
 #  This external input must be validated carefully to avoid security issues such as
 #  buffer overflow or integer overflow.
 #
-#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -93,9 +93,12 @@
 # Remove these [BuildOptions] after this library is cleaned up
 #
 [BuildOptions]
+  #
   # suppress the following warnings so we do not break the build with warnings-as-errors:
-  #   C4305: truncation from type1 to type2 (Introduced by RFC3161 Timestamp ASN.1 declarations)
-  MSFT:*_*_*_CC_FLAGS = /wd4305
+  # C4090: 'function' : different 'const' qualifiers
+  #
+  MSFT:*_*_*_CC_FLAGS = /wd4090
+
   GCC:*_GCC44_IA32_CC_FLAGS = "-D__cdecl=__attribute__((cdecl))" "-D__declspec(t)=__attribute__((t))"
 
   # -JCryptoPkg/Include : To disable the use of the system includes provided by RVCT
