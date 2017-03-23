@@ -506,7 +506,7 @@ CpuRegisterTableWriteWorker (
   IN BOOLEAN                 PreSmmFlag,
   IN UINTN                   ProcessorNumber,
   IN REGISTER_TYPE           RegisterType,
-  IN UINT32                  Index,
+  IN UINT64                  Index,
   IN UINT8                   ValidBitStart,
   IN UINT8                   ValidBitLength,
   IN UINT64                  Value
@@ -550,7 +550,7 @@ CpuRegisterTableWriteWorker (
   //
   RegisterTableEntry = (CPU_REGISTER_TABLE_ENTRY *) (UINTN) RegisterTable->RegisterTableEntry;
   RegisterTableEntry[RegisterTable->TableLength].RegisterType   = RegisterType;
-  RegisterTableEntry[RegisterTable->TableLength].Index          = Index;
+  RegisterTableEntry[RegisterTable->TableLength].Index          = (UINT32) Index;
   RegisterTableEntry[RegisterTable->TableLength].ValidBitStart  = ValidBitStart;
   RegisterTableEntry[RegisterTable->TableLength].ValidBitLength = ValidBitLength;
   RegisterTableEntry[RegisterTable->TableLength].Value          = Value;
@@ -577,7 +577,7 @@ EFIAPI
 CpuRegisterTableWrite (
   IN UINTN               ProcessorNumber,
   IN REGISTER_TYPE       RegisterType,
-  IN UINT32              Index,
+  IN UINT64              Index,
   IN UINT64              ValueMask,
   IN UINT64              Value
   )
@@ -611,7 +611,7 @@ EFIAPI
 PreSmmCpuRegisterTableWrite (
   IN UINTN               ProcessorNumber,
   IN REGISTER_TYPE       RegisterType,
-  IN UINT32              Index,
+  IN UINT64              Index,
   IN UINT64              ValueMask,
   IN UINT64              Value
   )

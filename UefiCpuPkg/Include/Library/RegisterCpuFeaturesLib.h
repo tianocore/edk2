@@ -366,7 +366,7 @@ EFIAPI
 CpuRegisterTableWrite (
   IN UINTN               ProcessorNumber,
   IN REGISTER_TYPE       RegisterType,
-  IN UINT32              Index,
+  IN UINT64              Index,
   IN UINT64              ValueMask,
   IN UINT64              Value
   );
@@ -390,7 +390,7 @@ EFIAPI
 PreSmmCpuRegisterTableWrite (
   IN UINTN               ProcessorNumber,
   IN REGISTER_TYPE       RegisterType,
-  IN UINT32              Index,
+  IN UINT64              Index,
   IN UINT64              ValueMask,
   IN UINT64              Value
   );
