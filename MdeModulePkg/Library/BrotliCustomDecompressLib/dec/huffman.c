@@ -8,7 +8,7 @@
 
 #include "./huffman.h"
 
-#include <string.h>  /* memcpy, memset */
+//#include <string.h>  /* memcpy, memset */
 
 #include "../common/constants.h"
 #include "../common/types.h"

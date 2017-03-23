@@ -11,6 +11,7 @@
 
 #include "../common/types.h"
 #include "./port.h"
+#include <BrotliDecompressLibInternal.h>
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {

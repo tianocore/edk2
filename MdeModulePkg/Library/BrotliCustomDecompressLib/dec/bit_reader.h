@@ -9,7 +9,8 @@
 #ifndef BROTLI_DEC_BIT_READER_H_
 #define BROTLI_DEC_BIT_READER_H_
 
-#include <string.h>  /* memcpy */
+//#include <string.h>  /* memcpy */
+#include <BrotliDecompressLibInternal.h>
 
 #include "../common/types.h"
 #include "./port.h"

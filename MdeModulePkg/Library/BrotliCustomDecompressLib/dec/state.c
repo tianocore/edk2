@@ -6,7 +6,8 @@
 
 #include "./state.h"
 
-#include <stdlib.h>  /* free, malloc */
+//#include <stdlib.h>  /* free, malloc */
+#include <BrotliDecompressLibInternal.h>
 
 #include "../common/types.h"
 #include "./huffman.h"

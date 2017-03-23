@@ -10,8 +10,9 @@
 #include <arm_neon.h>
 #endif
 
-#include <stdlib.h>  /* free, malloc */
-#include <string.h>  /* memcpy, memset */
+//#include <stdlib.h>  /* free, malloc */
+//#include <string.h>  /* memcpy, memset */
+#include <BrotliDecompressLibInternal.h>
 
 #include "../common/constants.h"
 #include "../common/dictionary.h"

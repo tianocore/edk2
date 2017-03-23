@@ -9,7 +9,13 @@
 #ifndef BROTLI_COMMON_TYPES_H_
 #define BROTLI_COMMON_TYPES_H_
 
-#include <stddef.h>  /* for size_t */
+//#include <stddef.h>  /* for size_t */
+#ifndef _SIZE_T_DEFINED
+#if !defined(_WIN64) || defined(__GNUC__)
+typedef unsigned int size_t;
+#endif
+#endif
+
 
 #if defined(_MSC_VER) && (_MSC_VER < 1600)
 typedef __int8 int8_t;
@@ -21,7 +27,15 @@ typedef unsigned __int32 uint32_t;
 typedef unsigned __int64 uint64_t;
 typedef __int64 int64_t;
 #else
-#include <stdint.h>
+//#include <stdint.h>
+typedef INT8     int8_t;
+typedef INT16    int16_t;
+typedef INT32    int32_t;
+typedef INT64    int64_t;
+typedef UINT8    uint8_t;
+typedef UINT16   uint16_t;
+typedef UINT32   uint32_t;
+typedef UINT64   uint64_t;
 #endif  /* defined(_MSC_VER) && (_MSC_VER < 1600) */
 
 #if (!defined(_MSC_VER) || (_MSC_VER >= 1800)) && \

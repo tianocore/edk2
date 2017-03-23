@@ -34,7 +34,7 @@ BROTLI_BOOL BrotliWarmupBitReader(BrotliBitReader* const br) {
     }
   }
 
-  while ((((size_t)br->next_in) & aligned_read_mask) != 0) {
+  while ((((size_t)(*br->next_in)) & aligned_read_mask) != 0) {
     if (!BrotliPullByte(br)) {
       /* If we consumed all the input, we don't care about the alignment. */
       return BROTLI_TRUE;

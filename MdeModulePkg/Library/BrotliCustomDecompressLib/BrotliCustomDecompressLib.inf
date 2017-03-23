@@ -1,0 +1,56 @@
+## @file
+#  BrotliCustomDecompressLib produces BROTLI custom decompression algorithm.
+#
+#  It is based on the Brotli v0.5.2.
+#  Brotli was released on the website https://github.com/google/brotli.
+#
+#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BrotliDecompressLib
+  MODULE_UNI_FILE                = BrotliDecompressLib.uni
+  FILE_GUID                      = 69EC7DB2-B0DD-493A-963A-C5F330131BAA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = BrotliDecompressLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  GuidedSectionExtraction.c
+  BrotliDecompress.c
+  BrotliDecompressLibInternal.h
+  common/dictionary.c
+  dec/bit_reader.c
+  dec/decode.c
+  dec/huffman.c
+  dec/state.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Guids]
+  gBrotliCustomDecompressGuid  ## PRODUCES  ## UNDEFINED # specifies BROTLI custom decompress algorithm.
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  ExtractGuidedSectionLib
