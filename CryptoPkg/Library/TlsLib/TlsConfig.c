@@ -128,24 +128,30 @@ TlsSetVersion (
 
   ProtoVersion = (MajorVer << 8) | MinorVer;
 
+  //
+  // Bound TLS method to the particular specified version.
+  //
   switch (ProtoVersion) {
   case TLS1_VERSION:
     //
     // TLS 1.0
     //
-    SSL_set_ssl_method (TlsConn->Ssl, TLSv1_method ());
+    SSL_set_min_proto_version (TlsConn->Ssl, TLS1_VERSION);
+    SSL_set_max_proto_version (TlsConn->Ssl, TLS1_VERSION);
     break;
   case TLS1_1_VERSION:
     //
     // TLS 1.1
     //
-    SSL_set_ssl_method (TlsConn->Ssl, TLSv1_1_method ());
+    SSL_set_min_proto_version (TlsConn->Ssl, TLS1_1_VERSION);
+    SSL_set_max_proto_version (TlsConn->Ssl, TLS1_1_VERSION);
     break;
   case TLS1_2_VERSION:
     //
     // TLS 1.2
     //
-    SSL_set_ssl_method (TlsConn->Ssl, TLSv1_2_method ());
+    SSL_set_min_proto_version (TlsConn->Ssl, TLS1_2_VERSION);
+    SSL_set_max_proto_version (TlsConn->Ssl, TLS1_2_VERSION);
     break;
   default:
     //
@@ -384,8 +390,7 @@ TlsSetSessionId (
     return EFI_UNSUPPORTED;
   }
 
-  Session->session_id_length = SessionIdLen;
-  CopyMem (Session->session_id, SessionId, Session->session_id_length);
+  SSL_SESSION_set1_id (Session, (const unsigned char *)SessionId, SessionIdLen);
 
   return EFI_SUCCESS;
 }
@@ -847,7 +852,7 @@ TlsGetClientRandom (
     return;
   }
 
-  CopyMem (ClientRandom, TlsConn->Ssl->s3->client_random, SSL3_RANDOM_SIZE);
+  SSL_get_client_random (TlsConn->Ssl, ClientRandom, SSL3_RANDOM_SIZE);
 }
 
 /**
@@ -876,7 +881,7 @@ TlsGetServerRandom (
     return;
   }
 
-  CopyMem (ServerRandom, TlsConn->Ssl->s3->server_random, SSL3_RANDOM_SIZE);
+  SSL_get_server_random (TlsConn->Ssl, ServerRandom, SSL3_RANDOM_SIZE);
 }
 
 /**
@@ -916,7 +921,7 @@ TlsGetKeyMaterial (
     return EFI_UNSUPPORTED;
   }
 
-  CopyMem (KeyMaterial, Session->master_key, Session->master_key_length);
+  SSL_SESSION_get_master_key (Session, KeyMaterial, SSL3_MASTER_SECRET_SIZE);
 
   return EFI_SUCCESS;
 }

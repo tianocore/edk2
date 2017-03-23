@@ -1,7 +1,7 @@
 /** @file
   SSL/TLS Initialization Library Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -33,14 +33,10 @@ TlsInitialize (
   // Performs initialization of crypto and ssl library, and loads required
   // algorithms.
   //
-  SSL_library_init ();
-
-  //
-  // Loads error strings from both crypto and ssl library.
-  //
-  SSL_load_error_strings ();
-
-  /// OpenSSL_add_all_algorithms();
+  OPENSSL_init_ssl (
+    OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS,
+    NULL
+    );
 
   //
   // Initialize the pseudorandom number generator.
@@ -103,34 +99,10 @@ TlsCtxNew (
   SSL_CTX_set_options (TlsCtx, SSL_OP_NO_SSLv3);
 
   //
-  // Treat as minimum accepted versions.  Client can use higher
-  // TLS version if server supports it
+  // Treat as minimum accepted versions by setting the minimal bound.
+  // Client can use higher TLS version if server supports it
   //
-  switch (ProtoVersion) {
-  case TLS1_VERSION:
-    //
-    // TLS 1.0
-    //
-    break;
-  case TLS1_1_VERSION:
-    //
-    // TLS 1.1
-    //
-    SSL_CTX_set_options (TlsCtx, SSL_OP_NO_TLSv1);
-    break;
-  case TLS1_2_VERSION:
-    //
-    // TLS 1.2
-    //
-    SSL_CTX_set_options (TlsCtx, SSL_OP_NO_TLSv1);
-    SSL_CTX_set_options (TlsCtx, SSL_OP_NO_TLSv1_1);
-    break;
-  default:
-    //
-    // Unsupported TLS/SSL Protocol Version.
-    //
-    break;
-  }
+  SSL_CTX_set_min_proto_version (TlsCtx, ProtoVersion);
 
   return (VOID *) TlsCtx;
 }
@@ -218,6 +190,11 @@ TlsNew (
     TlsFree ((VOID *) TlsConn);
     return NULL;
   }
+
+  //
+  // This retains compatibility with previous version of OpenSSL.
+  //
+  SSL_set_security_level (TlsConn->Ssl, 0);
 
   //
   // Initialize the created SSL Object
