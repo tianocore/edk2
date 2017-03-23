@@ -1,7 +1,7 @@
 /** @file  
   Internal include file for BaseCryptLib.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseCryptLib.h>
 
-#include "OpenSslSupport.h"
+#include "CrtLibSupport.h"
 
 #include <openssl/opensslv.h>
 

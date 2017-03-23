@@ -13,9 +13,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <OpenSslSupport.h>
+#include <CrtLibSupport.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Guid/EventGroup.h>
 
 //----------------------------------------------------------------
