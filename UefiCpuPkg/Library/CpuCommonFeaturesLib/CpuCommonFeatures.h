@@ -25,7 +25,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/LocalApicLib.h>
 
-#include <Register/CpuId.h>
+#include <Register/Cpuid.h>
 #include <Register/Msr.h>
 
 /**
