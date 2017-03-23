@@ -1,0 +1,53 @@
+
+=============================================================================
+                             Introduction
+=============================================================================
+  OpenSSL is a well-known open source implementation of SSL/TLS protocols.
+The core library implements the cryptographic and SSL/TLS functions and
+also provides various utility functions. The OpenSSL library is widely used
+in variety of security products development as base crypto provider.
+(See http://www.openssl.org/ for more information about OpenSSL).
+  UEFI (Unified Extensible Firmware Interface) is a specification detailing
+the interfaces between OS and platform firmware. Several security features
+were introduced (e.g. Authenticated Variable Service, Driver Signing, etc)
+from UEFI 2.2 (http://www.uefi.org/). These security features highly depend
+on the cryptography.
+  This HOWTO documents OpenSSL building under UEFI/EDKII environment.
+
+=============================================================================
+                             OpenSSL-Version
+=============================================================================
+  EDKII supports building with the latest release of OpenSSL.
+  The latest official release is OpenSSL-1.1.0e (Released at 2017-Feb-16).
+  NOTE: Only latest release version was fully validated.
+        And no guarantees on build & functionality if using other versions.
+
+=============================================================================
+                      HOW to Install OpenSSL for UEFI Building
+=============================================================================
+1. Clone the latest official OpenSSL release into the directory
+     CryptoPkg/Library/OpensslLib/openssl/
+
+   Use OpenSSL-1.1.0e release as one example:
+     (OpenSSL_1_1_0e below is the tag name for the OpenSSL-1.1.0e release)
+     > cd CryptoPkg/Library/OpensslLib
+     > git clone -b OpenSSL_1_1_0e https://github.com/openssl/openssl openssl
+     or
+     > git clone https://github.com/openssl/openssl openssl
+     > git checkout OpenSSL_1_1_0e
+Or
+2. Download the latest OpenSSL release package from the official website:
+     https://www.openssl.org/source/
+   and unpack the OpenSSL source into:
+     CryptoPkg/Library/OpensslLib/openssl/
+
+=============================================================================
+                      About process_files.pl
+=============================================================================
+  "process_files.pl" is one Perl script which runs the OpenSSL Configure,
+then processes the resulting file list into our local OpensslLib.inf and
+OpensslLibCrypto.inf.
+  This only needs to be done once by the maintainer / developer when
+updating to a new version of OpenSSL (or changing options, etc.).
+Normal users do not need do this, since the results are already stored in
+the EDKII git repository for them.
