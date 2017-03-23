@@ -1106,7 +1106,9 @@ Dns6Configure (
     //
     // Config UDP
     //
+    gBS->RestoreTPL (OldTpl);
     Status = Dns6ConfigUdp (Instance, Instance->UdpIo);
+    OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
     if (EFI_ERROR (Status)) {
       if (Instance->Dns6CfgData.DnsServerList != NULL) {
         FreePool (Instance->Dns6CfgData.DnsServerList);

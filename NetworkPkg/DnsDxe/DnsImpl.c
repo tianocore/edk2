@@ -1,7 +1,7 @@
 /** @file
 DnsDxe support functions implementation.
   
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -643,9 +643,11 @@ Dns6GetMapping (
         FreePool (Ip6Mode.IcmpTypeList);
       }
 
-      if (Ip6Mode.IsConfigured) {
+      if (!Ip6Mode.IsStarted || Ip6Mode.IsConfigured) {
         Udp->Configure (Udp, NULL);
-        return (BOOLEAN) (Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS);
+        if (Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS) {
+          return TRUE;
+        }
       }
     }
   }

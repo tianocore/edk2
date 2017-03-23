@@ -1,7 +1,7 @@
 /** @file
 The driver binding and service binding protocol for DnsDxe driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -279,18 +279,16 @@ DnsCreateService (
   // Create the timer used to time out the procedure which is used to
   // get the default IP address.
   //
-  if (DnsSb->IpVersion == IP_VERSION_4) {
-    Status = gBS->CreateEvent (
-                    EVT_TIMER,
-                    TPL_CALLBACK,
-                    NULL,
-                    NULL,
-                    &DnsSb->TimerToGetMap
-                    );
-    if (EFI_ERROR (Status)) {
-      FreePool (DnsSb);
-      return Status;
-    }
+  Status = gBS->CreateEvent (
+                  EVT_TIMER,
+                  TPL_CALLBACK,
+                  NULL,
+                  NULL,
+                  &DnsSb->TimerToGetMap
+                  );
+  if (EFI_ERROR (Status)) {
+    FreePool (DnsSb);
+    return Status;
   }
   
   //
