@@ -21,6 +21,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 
+#define OPENSSLDIR ""
+#define ENGINESDIR ""
+
 #define MAX_STRING_SIZE  0x1000
 
 //
@@ -90,6 +93,7 @@ typedef VOID  *FILE;
 #define LOG_DEBUG    7                /* debug-level messages */
 #define LOG_PID      0x01             /* log the pid with each message */
 #define LOG_CONS     0x02             /* log on the console if errors in sending */
+#define CHAR_BIT     8                /* Number of bits in a char */
 
 //
 // Macros from EFI Application Toolkit required to build Open SSL
@@ -216,6 +220,9 @@ int            strncmp     (const char *, const char *, size_t);
 char           *strrchr    (const char *, int);
 unsigned long  strtoul     (const char *, char **, int);
 long           strtol      (const char *, char **, int);
+char           *strerror   (int);
+size_t         strspn      (const char *, const char *);
+size_t         strcspn     (const char *, const char *);
 int            printf      (const char *, ...);
 int            sscanf      (const char *, const char *, ...);
 int            open        (const char *, int, ...);
