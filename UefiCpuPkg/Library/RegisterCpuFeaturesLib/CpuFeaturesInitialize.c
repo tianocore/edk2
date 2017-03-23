@@ -370,9 +370,9 @@ DumpRegisterTableOnProcessor (
     case MemoryMapped:
       DEBUG ((
         DebugPrintErrorLevel,
-        "Processor: %d:  MMIO: %x, Bit Start: %d, Bit Length: %d, Value: %lx\r\n",
+        "Processor: %d:  MMIO: %lx, Bit Start: %d, Bit Length: %d, Value: %lx\r\n",
         ProcessorNumber,
-        RegisterTableEntry->Index,
+        RegisterTableEntry->Index | LShiftU64 (RegisterTableEntry->HighIndex, 32),
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitLength,
         RegisterTableEntry->Value
@@ -628,7 +628,7 @@ ProgramProcessorRegister (
     case MemoryMapped:
       AcquireSpinLock (&CpuFeaturesData->MemoryMappedLock);
       MmioBitFieldWrite32 (
-        RegisterTableEntry->Index,
+        (UINTN)(RegisterTableEntry->Index | LShiftU64 (RegisterTableEntry->HighIndex, 32)),
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
         (UINT32)RegisterTableEntry->Value

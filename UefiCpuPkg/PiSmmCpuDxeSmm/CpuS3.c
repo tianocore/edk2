@@ -315,7 +315,7 @@ SetProcessorRegister (
     case MemoryMapped:
       AcquireSpinLock (mMemoryMappedLock);
       MmioBitFieldWrite32 (
-        RegisterTableEntry->Index,
+        (UINTN)(RegisterTableEntry->Index | LShiftU64 (RegisterTableEntry->HighIndex, 32)),
         RegisterTableEntry->ValidBitStart,
         RegisterTableEntry->ValidBitStart + RegisterTableEntry->ValidBitLength - 1,
         (UINT32)RegisterTableEntry->Value

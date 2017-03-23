@@ -551,6 +551,7 @@ CpuRegisterTableWriteWorker (
   RegisterTableEntry = (CPU_REGISTER_TABLE_ENTRY *) (UINTN) RegisterTable->RegisterTableEntry;
   RegisterTableEntry[RegisterTable->TableLength].RegisterType   = RegisterType;
   RegisterTableEntry[RegisterTable->TableLength].Index          = (UINT32) Index;
+  RegisterTableEntry[RegisterTable->TableLength].HighIndex      = (UINT32) RShiftU64 (Index, 32);
   RegisterTableEntry[RegisterTable->TableLength].ValidBitStart  = ValidBitStart;
   RegisterTableEntry[RegisterTable->TableLength].ValidBitLength = ValidBitLength;
   RegisterTableEntry[RegisterTable->TableLength].Value          = Value;

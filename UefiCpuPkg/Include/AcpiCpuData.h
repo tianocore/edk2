@@ -29,11 +29,13 @@ typedef enum {
 // Element of register table entry
 //
 typedef struct {
-  REGISTER_TYPE  RegisterType;
-  UINT32         Index;
-  UINT8          ValidBitStart;
-  UINT8          ValidBitLength;
-  UINT64         Value;
+  REGISTER_TYPE  RegisterType;          // offset 0 - 3
+  UINT32         Index;                 // offset 4 - 7
+  UINT8          ValidBitStart;         // offset 8
+  UINT8          ValidBitLength;        // offset 9
+  UINT16         Reserved;              // offset 10 - 11
+  UINT32         HighIndex;             // offset 12-15, only valid for MemoryMapped
+  UINT64         Value;                 // offset 16-23
 } CPU_REGISTER_TABLE_ENTRY;
 
 //
