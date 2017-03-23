@@ -272,6 +272,7 @@ RegisterCpuFeatureWorker (
   ASSERT (CpuFeaturesData->BitMaskSize == BitMaskSize);
 
   FeatureExist = FALSE;
+  CpuFeatureEntry = NULL;
   Entry = GetFirstNode (&CpuFeaturesData->FeatureList);
   while (!IsNull (&CpuFeaturesData->FeatureList, Entry)) {
     CpuFeatureEntry = CPU_FEATURE_ENTRY_FROM_LINK (Entry);
@@ -293,6 +294,7 @@ RegisterCpuFeatureWorker (
   } else {
     DEBUG ((DEBUG_INFO, "[OVERRIDE] "));
     DumpCpuFeature (CpuFeature);
+    ASSERT (CpuFeatureEntry != NULL);
     //
     // Overwrite original parameters of CPU feature
     //
