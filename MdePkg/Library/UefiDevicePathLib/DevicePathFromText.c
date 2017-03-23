@@ -3500,6 +3500,7 @@ UefiDevicePathLibConvertTextToDevicePath (
       DeviceNode = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
       ASSERT (DeviceNode != NULL);
       SetDevicePathEndNode (DeviceNode);
+      DeviceNode->SubType = END_INSTANCE_DEVICE_PATH_SUBTYPE;
 
       NewDevicePath = AppendDevicePathNode (DevicePath, DeviceNode);
       FreePool (DevicePath);
