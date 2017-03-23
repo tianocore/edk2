@@ -2,7 +2,7 @@
   Mde UEFI library API implementation.
   Print to StdErr or ConOut defined in EFI_SYSTEM_TABLE
 
-  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -474,7 +474,14 @@ InternalPrintGraphic (
   } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
     ASSERT (UgaDraw!= NULL);
 
-    Blt->Image.Bitmap = AllocateZeroPool (Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+    //
+    // Ensure Width * Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) doesn't overflow.
+    //
+    if (Blt->Width > DivU64x32 (MAX_UINTN, Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) {
+      goto Error;
+    }
+
+    Blt->Image.Bitmap = AllocateZeroPool ((UINT32) Blt->Width * Blt->Height * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     ASSERT (Blt->Image.Bitmap != NULL);
 
     //
