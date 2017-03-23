@@ -1,7 +1,7 @@
 /** @file
   HMAC-MD5 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,8 +15,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "InternalCryptLib.h"
 #include <openssl/hmac.h>
 
+#define HMAC_MD5_CTX_SIZE    sizeof(void *) * 4 + sizeof(unsigned int) + \
+                             sizeof(unsigned char) * HMAC_MAX_MD_CBLOCK
+
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-MD5 operations.
+  (NOTE: This API is deprecated.
+         Use HmacMd5New() / HmacMd5Free() for HMAC-MD5 Context operations.)
 
   @return  The size, in bytes, of the context buffer required for HMAC-MD5 operations.
 
@@ -29,8 +34,49 @@ HmacMd5GetContextSize (
 {
   //
   // Retrieves the OpenSSL HMAC-MD5 Context Size
+  // NOTE: HMAC_CTX object was made opaque in openssl-1.1.x, here we just use the
+  //       fixed size as a workaround to make this API work for compatibility.
+  //       We should retire HmacMd5GetContextSize() in future, and use HmacMd5New()
+  //       and HmacMd5Free() for context allocation and release.
   //
-  return (UINTN) (sizeof (HMAC_CTX));
+  return (UINTN) HMAC_MD5_CTX_SIZE;
+}
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacMd5New() returns NULL.
+
+**/
+VOID *
+EFIAPI
+HmacMd5New (
+  VOID
+  )
+{
+  //
+  // Allocates & Initializes HMAC_CTX Context by OpenSSL HMAC_CTX_new()
+  //
+  return (VOID *) HMAC_CTX_new ();
+}
+
+/**
+  Release the specified HMAC_CTX context.
+
+  @param[in]  HmacMd5Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacMd5Free (
+  IN  VOID  *HmacMd5Ctx
+  )
+{
+  //
+  // Free OpenSSL HMAC_CTX Context
+  //
+  HMAC_CTX_free ((HMAC_CTX *)HmacMd5Ctx);
 }
 
 /**
@@ -65,8 +111,13 @@ HmacMd5Init (
   //
   // OpenSSL HMAC-MD5 Context Initialization
   //
-  HMAC_CTX_init (HmacMd5Context);
-  HMAC_Init_ex (HmacMd5Context, Key, (UINT32) KeySize, EVP_md5(), NULL);
+  memset(HmacMd5Context, 0, HMAC_MD5_CTX_SIZE);
+  if (HMAC_CTX_reset ((HMAC_CTX *)HmacMd5Context) != 1) {
+    return FALSE;
+  }
+  if (HMAC_Init_ex ((HMAC_CTX *)HmacMd5Context, Key, (UINT32) KeySize, EVP_md5(), NULL) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -97,8 +148,10 @@ HmacMd5Duplicate (
   if (HmacMd5Context == NULL || NewHmacMd5Context == NULL) {
     return FALSE;
   }
-  
-  CopyMem (NewHmacMd5Context, HmacMd5Context, sizeof (HMAC_CTX));
+
+  if (HMAC_CTX_copy ((HMAC_CTX *)NewHmacMd5Context, (HMAC_CTX *)HmacMd5Context) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -146,7 +199,9 @@ HmacMd5Update (
   //
   // OpenSSL HMAC-MD5 digest update
   //
-  HMAC_Update (HmacMd5Context, Data, DataSize);
+  if (HMAC_Update ((HMAC_CTX *)HmacMd5Context, Data, DataSize) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -190,8 +245,12 @@ HmacMd5Final (
   //
   // OpenSSL HMAC-MD5 digest finalization
   //
-  HMAC_Final (HmacMd5Context, HmacValue, &Length);
-  HMAC_CTX_cleanup (HmacMd5Context);
+  if (HMAC_Final ((HMAC_CTX *)HmacMd5Context, HmacValue, &Length) != 1) {
+    return FALSE;
+  }
+  if (HMAC_CTX_reset ((HMAC_CTX *)HmacMd5Context) != 1) {
+    return FALSE;
+  }
 
   return TRUE;
 }

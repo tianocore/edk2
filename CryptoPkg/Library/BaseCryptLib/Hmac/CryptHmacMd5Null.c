@@ -1,7 +1,7 @@
 /** @file
   HMAC-MD5 Wrapper Implementation which does not provide real capabilities.
 
-Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-MD5 operations.
+  (NOTE: This API is deprecated.
+         Use HmacMd5New() / HmacMd5Free() for HMAC-MD5 Context operations.)
 
   Return zero to indicate this interface is not supported.
 
@@ -30,6 +32,42 @@ HmacMd5GetContextSize (
 {
   ASSERT (FALSE);
   return 0;
+}
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.
+
+  Return NULL to indicate this interface is not supported.
+
+  @retval NULL  This interface is not supported.
+
+**/
+VOID *
+EFIAPI
+HmacMd5New (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Release the specified HMAC_CTX context.
+
+  This function will do nothing.
+
+  @param[in]  HmacMd5Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacMd5Free (
+  IN  VOID  *HmacMd5Ctx
+  )
+{
+  ASSERT (FALSE);
+  return;
 }
 
 /**

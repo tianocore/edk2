@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -897,6 +897,8 @@ Sha512HashAll (
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-MD5 operations.
+  (NOTE: This API is deprecated.
+         Use HmacMd5New() / HmacMd5Free() for HMAC-MD5 Context operations.)
 
   If this interface is not supported, then return zero.
 
@@ -908,6 +910,36 @@ UINTN
 EFIAPI
 HmacMd5GetContextSize (
   VOID
+  );
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-MD5 use.
+
+  If this interface is not supported, then return NULL.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacMd5New() returns NULL.
+  @retval  NULL  This interface is not supported.
+
+**/
+VOID *
+EFIAPI
+HmacMd5New (
+  VOID
+  );
+
+/**
+  Release the specified HMAC_CTX context.
+
+  If this interface is not supported, then do nothing.
+
+  @param[in]  HmacMd5Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacMd5Free (
+  IN  VOID  *HmacMd5Ctx
   );
 
 /**
@@ -1015,6 +1047,8 @@ HmacMd5Final (
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-SHA1 operations.
+  (NOTE: This API is deprecated.
+         Use HmacSha1New() / HmacSha1Free() for HMAC-SHA1 Context operations.)
 
   If this interface is not supported, then return zero.
 
@@ -1026,6 +1060,36 @@ UINTN
 EFIAPI
 HmacSha1GetContextSize (
   VOID
+  );
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA1 use.
+
+  If this interface is not supported, then return NULL.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha1New() returns NULL.
+  @return  NULL   This interface is not supported.
+
+**/
+VOID *
+EFIAPI
+HmacSha1New (
+  VOID
+  );
+
+/**
+  Release the specified HMAC_CTX context.
+
+  If this interface is not supported, then do nothing.
+
+  @param[in]  HmacSha1Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacSha1Free (
+  IN  VOID  *HmacSha1Ctx
   );
 
 /**
@@ -1133,6 +1197,8 @@ HmacSha1Final (
 
 /**
   Retrieves the size, in bytes, of the context buffer required for HMAC-SHA256 operations.
+  (NOTE: This API is deprecated.
+         Use HmacSha256New() / HmacSha256Free() for HMAC-SHA256 Context operations.)
 
   If this interface is not supported, then return zero.
 
@@ -1144,6 +1210,31 @@ UINTN
 EFIAPI
 HmacSha256GetContextSize (
   VOID
+  );
+
+/**
+  Allocates and initializes one HMAC_CTX context for subsequent HMAC-SHA256 use.
+
+  @return  Pointer to the HMAC_CTX context that has been initialized.
+           If the allocations fails, HmacSha256New() returns NULL.
+
+**/
+VOID *
+EFIAPI
+HmacSha256New (
+  VOID
+  );
+
+/**
+  Release the specified HMAC_CTX context.
+
+  @param[in]  HmacSha256Ctx  Pointer to the HMAC_CTX context to be released.
+
+**/
+VOID
+EFIAPI
+HmacSha256Free (
+  IN  VOID  *HmacSha256Ctx
   );
 
 /**
