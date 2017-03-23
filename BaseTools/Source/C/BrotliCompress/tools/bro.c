@@ -73,6 +73,7 @@ static void ParseArgv(int argc, char **argv,
                       char **dictionary_path,
                       int *force,
                       int *quality,
+                      int *gapmem,
                       int *decompress,
                       int *repeat,
                       int *verbose,
@@ -160,6 +161,13 @@ static void ParseArgv(int argc, char **argv,
         }
         ++k;
         continue;
+      } else if (!strcmp("--gap", argv[k]) ||
+                  !strcmp("-g", argv[k])) {
+        if (!ParseQuality(argv[k + 1], gapmem)) {
+          goto error;
+        }
+        ++k;
+        continue;
       }
     }
     goto error;
@@ -167,7 +175,7 @@ static void ParseArgv(int argc, char **argv,
   return;
 error:
   fprintf(stderr,
-          "Usage: %s [--force] [--quality n] [--decompress]"
+          "Usage: %s [--force] [--quality n] [--gap n] [--decompress]"
           " [--input filename] [--output filename] [--repeat iters]"
           " [--verbose] [--window n] [--custom-dictionary filename]\n",
           argv[0]);
@@ -225,9 +233,20 @@ static int64_t FileSize(const char *path) {
   return retval;
 }
 
+/* Brotli specified memory allocate function */
+static void *BrAlloc (void *memsize, size_t size) {
+  *(int64_t *)memsize += size;
+  return malloc(size);
+}
+
+/* Brotli specified memory free function */
+static void BrFree (void *memsize, void *ptr) {
+  free(ptr);
+}
+
 /* Result ownersip is passed to caller.
    |*dictionary_size| is set to resulting buffer size. */
-static uint8_t* ReadDictionary(const char* path, size_t* dictionary_size) {
+static uint8_t* ReadDictionary(const char* path, size_t* dictionary_size, void *memsize) {
   static const int kMaxDictionarySize = (1 << 24) - 16;
   FILE *f = fopen(path, "rb");
   int64_t file_size_64;
@@ -252,7 +271,7 @@ static uint8_t* ReadDictionary(const char* path, size_t* dictionary_size) {
   }
   *dictionary_size = (size_t)file_size_64;
 
-  buffer = (uint8_t*)malloc(*dictionary_size);
+  buffer = (uint8_t *)BrAlloc(memsize, *dictionary_size);
   if (!buffer) {
     fprintf(stderr, "could not read dictionary: out of memory\n");
     exit(1);
@@ -268,7 +287,7 @@ static uint8_t* ReadDictionary(const char* path, size_t* dictionary_size) {
 
 static const size_t kFileBufferSize = 65536;
 
-static int Decompress(FILE* fin, FILE* fout, const char* dictionary_path) {
+static int Decompress(FILE* fin, FILE* fout, const char* dictionary_path, void *memsize) {
   /* Dictionary should be kept during first rounds of decompression. */
   uint8_t* dictionary = NULL;
   uint8_t* input;
@@ -279,18 +298,18 @@ static int Decompress(FILE* fin, FILE* fout, const char* dictionary_path) {
   size_t available_out = kFileBufferSize;
   uint8_t* next_out;
   BrotliResult result = BROTLI_RESULT_ERROR;
-  BrotliState* s = BrotliCreateState(NULL, NULL, NULL);
+  BrotliState* s = BrotliCreateState(BrAlloc, BrFree, memsize);
   if (!s) {
     fprintf(stderr, "out of memory\n");
     return 0;
   }
   if (dictionary_path != NULL) {
     size_t dictionary_size = 0;
-    dictionary = ReadDictionary(dictionary_path, &dictionary_size);
+    dictionary = ReadDictionary(dictionary_path, &dictionary_size, memsize);
     BrotliSetCustomDictionary(dictionary_size, dictionary, s);
   }
-  input = (uint8_t*)malloc(kFileBufferSize);
-  output = (uint8_t*)malloc(kFileBufferSize);
+  input = (uint8_t*)BrAlloc(memsize, kFileBufferSize);
+  output = (uint8_t*)BrAlloc(memsize, kFileBufferSize);
   if (!input || !output) {
     fprintf(stderr, "out of memory\n");
     goto end;
@@ -331,17 +350,17 @@ static int Decompress(FILE* fin, FILE* fout, const char* dictionary_path) {
   }
 
 end:
-  free(dictionary);
-  free(input);
-  free(output);
+  BrFree(memsize, dictionary);
+  BrFree(memsize, input);
+  BrFree(memsize, output);
   BrotliDestroyState(s);
   return (result == BROTLI_RESULT_SUCCESS) ? 1 : 0;
 }
 
 static int Compress(int quality, int lgwin, FILE* fin, FILE* fout,
-    const char *dictionary_path) {
-  BrotliEncoderState* s = BrotliEncoderCreateInstance(0, 0, 0);
-  uint8_t* buffer = (uint8_t*)malloc(kFileBufferSize << 1);
+    const char *dictionary_path, void *memsize) {
+  BrotliEncoderState* s = BrotliEncoderCreateInstance(BrAlloc, BrFree, memsize);
+  uint8_t* buffer = (uint8_t*)BrAlloc(memsize, kFileBufferSize << 1);
   uint8_t* input = buffer;
   uint8_t* output = buffer + kFileBufferSize;
   size_t available_in = 0;
@@ -360,9 +379,9 @@ static int Compress(int quality, int lgwin, FILE* fin, FILE* fout,
   BrotliEncoderSetParameter(s, BROTLI_PARAM_LGWIN, (uint32_t)lgwin);
   if (dictionary_path != NULL) {
     size_t dictionary_size = 0;
-    uint8_t* dictionary = ReadDictionary(dictionary_path, &dictionary_size);
+    uint8_t* dictionary = ReadDictionary(dictionary_path, &dictionary_size, memsize);
     BrotliEncoderSetCustomDictionary(s, dictionary_size, dictionary);
-    free(dictionary);
+    BrFree(memsize, dictionary);
   }
 
   while (1) {
@@ -392,7 +411,7 @@ static int Compress(int quality, int lgwin, FILE* fin, FILE* fout,
   }
 
 finish:
-  free(buffer);
+  BrFree(memsize, buffer);
   BrotliEncoderDestroyInstance(s);
 
   if (!is_ok) {
@@ -409,29 +428,41 @@ finish:
   return 1;
 }
 
+#define GAP_MEM_BLOCK  4096
+
 int main(int argc, char** argv) {
   char *input_path = 0;
   char *output_path = 0;
   char *dictionary_path = 0;
   int force = 0;
   int quality = 11;
+  int gmem = 1;
   int decompress = 0;
   int repeat = 1;
   int verbose = 0;
   int lgwin = 0;
   clock_t clock_start;
   int i;
+  int64_t originsize = 0;
+  int64_t msize = 0;
   ParseArgv(argc, argv, &input_path, &output_path, &dictionary_path, &force,
-            &quality, &decompress, &repeat, &verbose, &lgwin);
+            &quality, &gmem, &decompress, &repeat, &verbose, &lgwin);
   clock_start = clock();
   for (i = 0; i < repeat; ++i) {
     FILE* fin = OpenInputFile(input_path);
     FILE* fout = OpenOutputFile(output_path, force || repeat);
     int is_ok = 0;
     if (decompress) {
-      is_ok = Decompress(fin, fout, dictionary_path);
+      if (fseek(fin, 16, SEEK_SET) != 0) {
+        fclose(fin);
+        return -1;
+      }
+      is_ok = Decompress(fin, fout, dictionary_path, (void *)&msize);
     } else {
-      is_ok = Compress(quality, lgwin, fin, fout, dictionary_path);
+      originsize = FileSize(input_path);  /* get original file size */
+      fwrite(&originsize, 1, sizeof(int64_t), fout); /* add in original binary file size */
+      fwrite(&msize, 1, sizeof(int64_t), fout); /* add in dummy decompression required memory size */
+      is_ok = Compress(quality, lgwin, fin, fout, dictionary_path, (void *)&msize);
     }
     if (!is_ok) {
       unlink(output_path);
@@ -444,6 +475,41 @@ int main(int argc, char** argv) {
     if (fclose(fout) != 0) {
       perror("fclose");
       exit(1);
+    }
+    /* after compression operation then execute decompression operation
+       to get decompression required memory size. */
+    if (decompress == 0) {
+      fin = OpenInputFile(output_path);
+      fout = tmpfile ();
+      msize = 0;
+      if (fseek(fin, 16, SEEK_SET) != 0) {
+        fclose(fin);
+        return -1;
+      }
+      is_ok = Decompress(fin, fout, dictionary_path, (void *)&msize);
+      if (!is_ok) {
+        exit(1);
+      }
+      if (fclose(fin) != 0) {
+        perror("fclose");
+        exit(1);
+      }
+      if (fclose(fout) != 0) {
+        perror("fclose");
+        exit(1);
+      }
+      fout = fopen(output_path, "rb+");  /* open output_path file and add in head info */
+      /* seek to the offset of decompression required memory size */
+      if (fseek(fout, 8, SEEK_SET) != 0) {
+        fclose(fout);
+        return -1;
+      }
+      msize += gmem * GAP_MEM_BLOCK;  /* there is a memory gap between IA32 and X64 environment*/
+      fwrite(&msize, 1, sizeof(int64_t), fout); /* update final decompression required memory size */
+      if (fclose(fout) != 0) {
+        perror("fclose");
+        exit(1);
+      }
     }
   }
   if (verbose) {

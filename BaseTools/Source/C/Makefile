@@ -17,6 +17,7 @@ ARCH = IA32
 LIBRARIES = Common
 APPLICATIONS = \
   BootSectImage \
+  BrotliCompress \
   EfiLdrImage \
   EfiRom \
   GenBootSector \

@@ -52,6 +52,7 @@ LIBRARIES = Common
 APPLICATIONS = \
   GnuGenBootSector \
   BootSectImage \
+  BrotliCompress \
   EfiLdrImage \
   EfiRom \
   GenFfs \

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# This script will exec Brotli tool.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+LVL="--quality 9"
+
+while [ $# != 0 ];do
+  case $1 in
+    -d)
+      ARGS+="--decompress "
+    ;;
+    -e)
+    ;;
+    -g)
+      ARGS+="--gap $2 "
+      shift
+    ;;
+    -l)
+      LVL="--quality $2 "
+      shift
+    ;;
+    -o)
+      ARGS+="--output $2 "
+      shift
+    ;;
+    *)
+      ARGS+="--input $1 "
+  esac
+
+shift
+done
+
+exec Brotli $ARGS $LVL
