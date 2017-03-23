@@ -65,6 +65,7 @@ GetSupportPcds (
 
   BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
   SupportBitMask = AllocateZeroPool (BitMaskSize);
+  ASSERT (SupportBitMask != NULL);
   SupportBitMask = (UINT8 *) PcdGetPtr (PcdCpuFeaturesSupport);
 
   return SupportBitMask;
@@ -85,6 +86,7 @@ GetConfigurationPcds (
 
   BitMaskSize = PcdGetSize (PcdCpuFeaturesUserConfiguration);
   SupportBitMask = AllocateZeroPool (BitMaskSize);
+  ASSERT (SupportBitMask != NULL);
   SupportBitMask = (UINT8 *) PcdGetPtr (PcdCpuFeaturesUserConfiguration);
 
   return SupportBitMask;
@@ -165,6 +167,7 @@ CpuInitDataInitialize (
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
     InitOrder = &CpuFeaturesData->InitOrder[ProcessorNumber];
     InitOrder->FeaturesSupportedMask = AllocateZeroPool (CpuFeaturesData->BitMaskSize);
+    ASSERT (InitOrder->FeaturesSupportedMask != NULL);
     InitializeListHead (&InitOrder->OrderList);
     Status = GetProcessorInformation (ProcessorNumber, &ProcessorInfoBuffer);
     ASSERT_EFI_ERROR (Status);
@@ -417,6 +420,7 @@ AnalysisProcessorFeatures (
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuFeaturesData->CapabilityPcds = AllocatePool (CpuFeaturesData->BitMaskSize);
+  ASSERT (CpuFeaturesData->CapabilityPcds != NULL);
   SetMem (CpuFeaturesData->CapabilityPcds, CpuFeaturesData->BitMaskSize, 0xFF);
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
     CpuInitOrder = &CpuFeaturesData->InitOrder[ProcessorNumber];
@@ -430,6 +434,7 @@ AnalysisProcessorFeatures (
   //
 
   CpuFeaturesData->SettingPcds = AllocateCopyPool (CpuFeaturesData->BitMaskSize, CpuFeaturesData->CapabilityPcds);
+  ASSERT (CpuFeaturesData->SettingPcds != NULL);
   SupportedMaskAnd (CpuFeaturesData->SettingPcds, CpuFeaturesData->ConfigurationPcds);
 
   //
@@ -478,6 +483,7 @@ AnalysisProcessorFeatures (
       CpuFeature = CPU_FEATURE_ENTRY_FROM_LINK (Entry);
       if (IsBitMaskMatch (CpuFeature->FeatureMask, CpuFeaturesData->CapabilityPcds)) {
         CpuFeatureInOrder = AllocateCopyPool (sizeof (CPU_FEATURES_ENTRY), CpuFeature);
+        ASSERT (CpuFeatureInOrder != NULL);
         InsertTailList (&CpuInitOrder->OrderList, &CpuFeatureInOrder->Link);
       }
       Entry = Entry->ForwardLink;
