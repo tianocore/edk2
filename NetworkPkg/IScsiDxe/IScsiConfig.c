@@ -628,10 +628,13 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
   ISCSI_SESSION_CONFIG_NVDATA   *SessionConfigData;
   ISCSI_CHAP_AUTH_CONFIG_NVDATA *AuthConfigData;
   CHAR16                        AttemptNameList[ATTEMPT_NAME_LIST_SIZE];
+  ISCSI_NIC_INFO                *NicInfo;
+  CHAR16                        MacString[ISCSI_MAX_MAC_STRING_LEN];
   EFI_IP_ADDRESS                Ip;
   UINTN                         Index;
   UINTN                         StringLen;
 
+  NicInfo = NULL;
   ZeroMem (AttemptNameList, sizeof (AttemptNameList));
 
   if ((mPrivate != NULL) && (mPrivate->AttemptCount != 0)) {
@@ -702,8 +705,8 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
       if (SessionConfigData->DnsMode) {
         AsciiStrToUnicodeStrS (
           SessionConfigData->TargetUrl,
-          IfrNvData->TargetIp,
-          sizeof (IfrNvData->TargetIp) / sizeof (IfrNvData->TargetIp[0])
+          IfrNvData->Keyword[Index].ISCSITargetIpAddress,
+          sizeof (IfrNvData->Keyword[Index].ISCSITargetIpAddress) / sizeof (IfrNvData->Keyword[Index].ISCSITargetIpAddress[0])
           );
       }
 
@@ -740,9 +743,25 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
           );
       }
     }
-
     CopyMem(IfrNvData->ISCSIDisplayAttemptList, AttemptNameList, ATTEMPT_NAME_LIST_SIZE);
   }
+
+  NET_LIST_FOR_EACH (Entry, &mPrivate->NicInfoList) {
+    NicInfo = NET_LIST_USER_STRUCT (Entry, ISCSI_NIC_INFO, Link);
+    IScsiMacAddrToStr (
+    &NicInfo->PermanentAddress,
+    NicInfo->HwAddressSize,
+    NicInfo->VlanId,
+    MacString
+    );
+    CopyMem (
+      IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr),
+      MacString,
+      StrLen (MacString) * sizeof (CHAR16)
+      );
+
+    *(IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr)) = L'/';
+   }
 }
 
 /**
@@ -1195,6 +1214,8 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
   ISCSI_ATTEMPT_CONFIG_NVDATA      *Attempt;
   UINT8                            AttemptIndex;
   UINT8                            Index;
+  UINT8                            ChapSecretLen;
+  UINT8                            ReverseChapSecretLen;
   CHAR16                           *AttemptName1;
   CHAR16                           *AttemptName2;
   ISCSI_ATTEMPT_CONFIG_NVDATA      *SameNicAttempt;
@@ -1344,10 +1365,17 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
     if (Attempt == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-    Attempt->SessionConfigData.ConnectRetryCount = IfrNvData->ISCSIConnectRetry[AttemptIndex - 1];
-    if (Attempt->SessionConfigData.ConnectRetryCount == 0) {
-      Attempt->SessionConfigData.ConnectRetryCount = CONNECT_MIN_RETRY;
+
+    if (IfrNvData->ISCSIConnectRetry[AttemptIndex - 1] > CONNECT_MAX_RETRY) {
+      CreatePopUp (
+          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+          &Key,
+          L"The minimum value is 0 and the maximum is 16. 0 means no retry.",
+          NULL
+          );
+      return EFI_INVALID_PARAMETER;
     }
+    Attempt->SessionConfigData.ConnectRetryCount = IfrNvData->ISCSIConnectRetry[AttemptIndex - 1];
 
   } else if ((OffSet >= ATTEMPT_CONNECT_TIMEOUT_VAR_OFFSET) && (OffSet < ATTEMPT_INITIATOR_VIA_DHCP_VAR_OFFSET)) {
     AttemptIndex = (UINT8) ((OffSet - ATTEMPT_CONNECT_TIMEOUT_VAR_OFFSET) / 2 + 1);
@@ -1355,21 +1383,21 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
     if (Attempt == NULL) {
       return EFI_INVALID_PARAMETER;
     }
+
+    if ((IfrNvData->ISCSIConnectTimeout[AttemptIndex - 1] < CONNECT_MIN_TIMEOUT) ||
+        (IfrNvData->ISCSIConnectTimeout[AttemptIndex - 1] > CONNECT_MAX_TIMEOUT)) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        L"The minimum value is 100 milliseconds and the maximum is 20 seconds.",
+        NULL
+        );
+      return EFI_INVALID_PARAMETER;
+    }
+
     Attempt->SessionConfigData.ConnectTimeout = IfrNvData->ISCSIConnectTimeout[AttemptIndex - 1];
     if (Attempt->SessionConfigData.ConnectTimeout == 0) {
       Attempt->SessionConfigData.ConnectTimeout = CONNECT_DEFAULT_TIMEOUT;
-    }
-
-    if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-      if (Attempt->SessionConfigData.ConnectTimeout < CONNECT_MIN_TIMEOUT) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Connection Establishing Timeout is less than minimum value 100ms.",
-          NULL
-          );
-        return EFI_INVALID_PARAMETER;
-      }
     }
 
   } else if ((OffSet >= ATTEMPT_INITIATOR_VIA_DHCP_VAR_OFFSET) && (OffSet < ATTEMPT_TARGET_VIA_DHCP_VAR_OFFSET)) {
@@ -1623,7 +1651,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           );
 
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->CHAPName[0] == L'\0') {
+          if (IfrNvData->Keyword[Index].ISCSIChapUsername[0] == L'\0') {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
@@ -1645,6 +1673,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
 
     } else if ((OffSet >= ATTEMPT_CHAR_SECRET_VAR_OFFSET) && (OffSet < ATTEMPT_CHAR_REVERSE_USER_NAME_VAR_OFFSET)) {
       if (Attempt->AuthenticationType == ISCSI_AUTH_TYPE_CHAP) {
+        ChapSecretLen = (UINT8)StrLen (IfrNvData->Keyword[Index].ISCSIChapSecret);
         UnicodeStrToAsciiStrS (
           IfrNvData->Keyword[Index].ISCSIChapSecret,
           Attempt->AuthConfigData.CHAP.CHAPSecret,
@@ -1652,11 +1681,11 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           );
 
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->CHAPSecret[0] == L'\0') {
+          if ((ChapSecretLen < ISCSI_CHAP_SECRET_MIN_LEN) || (ChapSecretLen > ISCSI_CHAP_SECRET_MAX_LEN)) {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
-              L"CHAP Secret is invalid!",
+              L"The Chap Secret minimum length is 12 bytes and the maximum length is 16 bytes.",
               NULL
               );
             return EFI_INVALID_PARAMETER;
@@ -1680,7 +1709,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           ISCSI_CHAP_NAME_STORAGE
           );
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->ReverseCHAPName[0] == L'\0') {
+          if (IfrNvData->Keyword[Index].ISCSIReverseChapUsername[0] == L'\0') {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
@@ -1702,6 +1731,7 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
 
     } else if (OffSet >= ATTEMPT_CHAR_REVERSE_SECRET_VAR_OFFSET) {
       if (Attempt->AuthConfigData.CHAP.CHAPType == ISCSI_CHAP_MUTUAL) {
+        ReverseChapSecretLen = (UINT8)StrLen (IfrNvData->Keyword[Index].ISCSIReverseChapSecret);
         UnicodeStrToAsciiStrS (
           IfrNvData->Keyword[Index].ISCSIReverseChapSecret,
           Attempt->AuthConfigData.CHAP.ReverseCHAPSecret,
@@ -1709,11 +1739,11 @@ IScsiConvertlfrNvDataToAttemptConfigDataByKeyword (
           );
 
         if (Attempt->SessionConfigData.Enabled != ISCSI_DISABLED) {
-          if (IfrNvData->ReverseCHAPSecret[0] == L'\0') {
+          if ((ReverseChapSecretLen < ISCSI_CHAP_SECRET_MIN_LEN) || (ReverseChapSecretLen > ISCSI_CHAP_SECRET_MAX_LEN)) {
             CreatePopUp (
               EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
               &Key,
-              L"Reverse CHAP Secret is invalid!",
+              L"The Reverse CHAP Secret minimum length is 12 bytes and the maximum length is 16 bytes.",
               NULL
               );
             return EFI_INVALID_PARAMETER;
