@@ -2581,7 +2581,14 @@ DevPathFromTextiSCSI (
 
   ISCSIDevPath->LoginOption      = (UINT16) Options;
 
-  ISCSIDevPath->NetworkProtocol  = (UINT16) StrCmp (ProtocolStr, L"TCP");
+  if (StrCmp (ProtocolStr, L"TCP") == 0) {
+    ISCSIDevPath->NetworkProtocol = 0;
+  } else {
+    //
+    // Undefined and reserved.
+    //
+    ISCSIDevPath->NetworkProtocol = 1;
+  }
 
   return (EFI_DEVICE_PATH_PROTOCOL *) ISCSIDevPath;
 }
