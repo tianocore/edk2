@@ -18,7 +18,7 @@
   Worker function to save PcdCpuFeaturesCapability.
 
   @param[in]  SupportedFeatureMask  The pointer to CPU feature bits mask buffer
-*/
+**/
 VOID
 SetCapabilityPcd (
   IN UINT8               *SupportedFeatureMask

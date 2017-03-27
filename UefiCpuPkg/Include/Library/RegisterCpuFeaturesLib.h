@@ -257,35 +257,37 @@ RETURN_STATUS
 /**
   Registers a CPU Feature.
 
-  @param  GetConfigDataFunc  CPU feature get configuration data function.  This
-                             is an optional parameter that may be NULL.  If NULL,
-                             then the most recently registered function for the
-                             CPU feature is used.  If no functions are registered
-                             for a CPU feature, then the CPU configuration data
-                             for the registered feature is NULL.
-  @param  SupportFunc        CPU feature support function.  This is an optional
-                             parameter that may be NULL.  If NULL, then the most
-                             recently registered function for the CPU feature is
-                             used. If no functions are registered for a CPU
-                             feature, then the CPU feature is assumed to be
-                             supported by all CPUs.
-  @param  InitializeFunc     CPU feature initialize function.  This is an optional
-                             parameter that may be NULL.  If NULL, then the most
-                             recently registered function for the CPU feature is
-                             used. If no functions are registered for a CPU
-                             feature, then the CPU feature initialization is
-                             skipped.
-  @param  ...                Variable argument list of UINT32 CPU feature value.
-                             Values with no modifiers are the features provided
-                             by the registered functions.
-                             Values with CPU_FEATURE_BEFORE modifier are features
-                             that must be initialized after the features provided
-                             by the registered functions are used.
-                             Values with CPU_FEATURE_AFTER modifier are features
-                             that must be initialized before the features provided
-                             by the registered functions are used.
-                             The last argument in this variable argument list must
-                             always be CPU_FEATURE_END.
+  @param[in]  FeatureName        A Null-terminated Ascii string indicates CPU feature
+                                 name.
+  @param[in]  GetConfigDataFunc  CPU feature get configuration data function.  This
+                                 is an optional parameter that may be NULL.  If NULL,
+                                 then the most recently registered function for the
+                                 CPU feature is used.  If no functions are registered
+                                 for a CPU feature, then the CPU configuration data
+                                 for the registered feature is NULL.
+  @param[in]  SupportFunc        CPU feature support function.  This is an optional
+                                 parameter that may be NULL.  If NULL, then the most
+                                 recently registered function for the CPU feature is
+                                 used. If no functions are registered for a CPU
+                                 feature, then the CPU feature is assumed to be
+                                 supported by all CPUs.
+  @param[in]  InitializeFunc     CPU feature initialize function.  This is an optional
+                                 parameter that may be NULL.  If NULL, then the most
+                                 recently registered function for the CPU feature is
+                                 used. If no functions are registered for a CPU
+                                 feature, then the CPU feature initialization is
+                                 skipped.
+  @param[in]  ...                Variable argument list of UINT32 CPU feature value.
+                                 Values with no modifiers are the features provided
+                                 by the registered functions.
+                                 Values with CPU_FEATURE_BEFORE modifier are features
+                                 that must be initialized after the features provided
+                                 by the registered functions are used.
+                                 Values with CPU_FEATURE_AFTER modifier are features
+                                 that must be initialized before the features provided
+                                 by the registered functions are used.
+                                 The last argument in this variable argument list must
+                                 always be CPU_FEATURE_END.
 
   @retval  RETURN_SUCCESS           The CPU feature was successfully registered.
   @retval  RETURN_OUT_OF_RESOURCES  There are not enough resources to register

@@ -147,7 +147,7 @@ StartupAPsWorker (
 /**
   Worker function to retrieve the number of logical processor in the platform.
 
-  @param[out] NumberOfProcessors          Pointer to the total number of logical
+  @param[out] NumberOfCpus                Pointer to the total number of logical
                                           processors in the system, including the BSP
                                           and disabled APs.
   @param[out] NumberOfEnabledProcessors   Pointer to the number of enabled logical
