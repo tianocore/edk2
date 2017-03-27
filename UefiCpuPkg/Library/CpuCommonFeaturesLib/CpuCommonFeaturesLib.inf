@@ -19,7 +19,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = CpuCommonFeaturesLib
   MODULE_UNI_FILE                = CpuCommonFeaturesLib.uni
-  FILE_GUID                      = 387A2490-81FC-4E7C-8E0A-3E58C30FCD0B
+  FILE_GUID                      = 6D69F79F-9535-4893-9DD7-93929898252C
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL
