@@ -1186,7 +1186,9 @@ SmiHandlerProfileRegisterHandler (
 
   SmiEntry = SmmCoreFindHardwareSmiEntry (HandlerGuid, TRUE);
   if (SmiEntry == NULL) {
-    FreePool (SmiHandler->Context);
+    if (SmiHandler->Context != NULL) {
+      FreePool (SmiHandler->Context);
+    }
     FreePool (SmiHandler);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1277,6 +1279,9 @@ SmiHandlerProfileUnregisterHandler (
   SmiHandler = TargetSmiHandler;
 
   RemoveEntryList (&SmiHandler->Link);
+  if (SmiHandler->Context != NULL) {
+    FreePool (SmiHandler->Context);
+  }
   FreePool (SmiHandler);
 
   if (IsListEmpty (&SmiEntry->SmiHandlers)) {
