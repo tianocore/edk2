@@ -1,7 +1,7 @@
 /** @file
 Header file for HttpLib.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -49,6 +49,9 @@ Header file for HttpLib.
 #define   HTTP_URI_FIELD_HOST             6
 #define   HTTP_URI_FIELD_PORT             7
 #define   HTTP_URI_FIELD_MAX              8
+
+#define   HTTP_URI_PORT_MIN_NUM           0
+#define   HTTP_URI_PORT_MAX_NUM           65535
 
 //
 // Structure to store the parse result of a HTTP URL.
