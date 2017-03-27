@@ -38,10 +38,10 @@
   CpuFeaturesDxe.c
 
 [Guids]
-  gEdkiiCpuFeaturesInitDoneGuid                                   ## PRODUCES
+  gEdkiiCpuFeaturesInitDoneGuid                       ## PRODUCES ## UNDEFINED # protocol GUID installed
 
 [Protocols]
-  gEfiSmmConfigurationProtocolGuid                                ## SOMETIME_CONSUMES
+  gEfiSmmConfigurationProtocolGuid                                ## NOTIFY
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitAfterSmmRelocation  ## CONSUMES

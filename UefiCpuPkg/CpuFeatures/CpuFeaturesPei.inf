@@ -37,7 +37,7 @@
   CpuFeaturesPei.c
 
 [Guids]
-  gEdkiiCpuFeaturesInitDoneGuid                                   ## PRODUCES
+  gEdkiiCpuFeaturesInitDoneGuid                       ## PRODUCES ## UNDEFINED # PPI GUID installed
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume          ## CONSUMES

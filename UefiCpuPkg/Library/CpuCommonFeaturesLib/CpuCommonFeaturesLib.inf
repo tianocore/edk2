@@ -62,7 +62,7 @@
   LocalApicLib
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport            # CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle   # SOMETIME_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset                # SOMETIME_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport            ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset                ## SOMETIMES_CONSUMES
 
