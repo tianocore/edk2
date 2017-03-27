@@ -19,7 +19,7 @@
 #include "RegisterCpuFeatures.h"
 
 CPU_FEATURES_DATA          mCpuFeaturesData = {0};
-static EFI_MP_SERVICES_PROTOCOL   *mMpServices = NULL;
+EFI_MP_SERVICES_PROTOCOL   *mCpuFeaturesMpServices = NULL;
 
 /**
   Worker function to get CPU_FEATURES_DATA pointer.
@@ -46,20 +46,20 @@ GetMpProtocol (
 {
   EFI_STATUS             Status;
 
-  if (mMpServices == NULL) {
+  if (mCpuFeaturesMpServices == NULL) {
     //
     // Get MP Services Protocol
     //
     Status = gBS->LocateProtocol (
                   &gEfiMpServiceProtocolGuid,
                   NULL,
-                  (VOID **)&mMpServices
+                  (VOID **)&mCpuFeaturesMpServices
                   );
     ASSERT_EFI_ERROR (Status);
   }
 
-  ASSERT (mMpServices != NULL);
-  return mMpServices;
+  ASSERT (mCpuFeaturesMpServices != NULL);
+  return mCpuFeaturesMpServices;
 }
 
 /**
