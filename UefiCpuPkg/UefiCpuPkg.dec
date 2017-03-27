@@ -192,16 +192,16 @@
   # @Prompt MSEG size.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMsegSize|0x200000|UINT32|0x32132112
 
-  ## Specifies the supported CPU features bit in array
-  # @Prompt Supported CPU features
+  ## Specifies the supported CPU features bit in array.
+  # @Prompt Supported CPU features.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport|{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}|VOID*|0x00000016
 
-  ## Specifies if CPU features will be initialized after SMM relocation
-  # @Prompt if CPU features will be initialized after SMM relocation
+  ## Specifies if CPU features will be initialized after SMM relocation.
+  # @Prompt If CPU features will be initialized after SMM relocation.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitAfterSmmRelocation|FALSE|BOOLEAN|0x0000001C
 
-  ## Specifies if CPU features will be initialized during S3 resume
-  # @Prompt if CPU features will be initialized during S3 resume
+  ## Specifies if CPU features will be initialized during S3 resume.
+  # @Prompt If CPU features will be initialized during S3 resume.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume|FALSE|BOOLEAN|0x0000001D
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]

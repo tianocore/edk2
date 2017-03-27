@@ -163,3 +163,34 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuMsegSize_HELP  #language en-US "Specifies buffer size in bytes of MSEG. The value should be a multiple of 4KB."
 
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSupport_PROMPT  #language en-US "Supported CPU features."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSupport_HELP  #language en-US "Specifies the supported CPU features bit in array."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitAfterSmmRelocation_PROMPT  #language en-US "If CPU features will be initialized after SMM relocation."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitAfterSmmRelocation_HELP  #language en-US "Specifies if CPU features will be initialized after SMM relocation."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitOnS3Resume_PROMPT  #language en-US "If CPU features will be initialized during S3 resume."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesInitOnS3Resume_HELP  #language en-US "Specifies if CPU features will be initialized during S3 resume."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesUserConfiguration_PROMPT  #language en-US "User settings for enabling/disabling processor features."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesUserConfiguration_HELP  #language en-US "Specifies user's desired settings for enabling/disabling processor features."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuClockModulationDutyCycle_PROMPT  #language en-US "The encoded values for target duty cycle modulation."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuClockModulationDutyCycle_HELP  #language en-US "Specifies the On-demand clock modulation duty cycle when ACPI feature is enabled."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdIsPowerOnReset_PROMPT  #language en-US "Current boot is a power-on reset."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdIsPowerOnReset_HELP  #language en-US "Indicates if the current boot is a power-on reset."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesCapability_PROMPT  #language en-US "Processor feature capabilities."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesCapability_HELP  #language en-US "Indicates processor feature capabilities, each bit corresponding to a specific feature."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSetting_PROMPT  #language en-US "Actual processor feature settings."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSetting_HELP  #language en-US "Specifies actual settings for processor features, each bit corresponding to a specific feature."
