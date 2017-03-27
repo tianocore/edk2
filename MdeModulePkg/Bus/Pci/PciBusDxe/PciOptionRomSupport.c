@@ -694,13 +694,6 @@ ProcessOpRomImage (
     }
 
     //
-    // Skip the EFI PCI Option ROM image if its machine type is not supported
-    //
-    if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EfiRomHeader->EfiMachineType)) {
-      goto NextImage;
-    }
-
-    //
     // Ignore the EFI PCI Option ROM image if it is an EFI application
     //
     if (EfiRomHeader->EfiSubsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
