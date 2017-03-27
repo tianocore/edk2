@@ -112,6 +112,7 @@ GetImageReadFunction (
   IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   PEI_CORE_INSTANCE     *Private;
   EFI_PHYSICAL_ADDRESS  MemoryBuffer;
 
@@ -119,8 +120,7 @@ GetImageReadFunction (
   MemoryBuffer = 0;
 
   if (Private->PeiMemoryInstalled  && (((Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnBoot)) || 
-      ((Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot))) &&
-      (EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_X64) || EFI_IMAGE_MACHINE_TYPE_SUPPORTED(EFI_IMAGE_MACHINE_IA32))) {
+      ((Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
     // 
     // Shadow algorithm makes lots of non ANSI C assumptions and only works for IA32 and X64 
     //  compilers that have been tested
@@ -136,7 +136,9 @@ GetImageReadFunction (
   } else {
     ImageContext->ImageRead = PeiImageRead;
   }
-
+#else
+  ImageContext->ImageRead = PeiImageRead;
+#endif
   return EFI_SUCCESS;
 }
 /**
