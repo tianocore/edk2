@@ -384,7 +384,7 @@ FreeImageRecord (
 }
 
 /**
-  Protect UEFI PE/COFF image
+  Protect UEFI PE/COFF image.
 
   @param[in]  LoadedImage              The loaded image protocol
   @param[in]  LoadedImageDevicePath    The loaded image device path protocol
