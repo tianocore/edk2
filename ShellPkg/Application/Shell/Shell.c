@@ -1162,6 +1162,12 @@ LocateStartupScript (
   MapName = ShellInfoObject.NewEfiShellProtocol->GetMapFromDevicePath (&ImageDevicePath);
   if (MapName != NULL) {   
     StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, MapName, 0);
+    if (StartupScriptPath == NULL) {
+      //
+      // Do not locate the startup script in sys path when out of resource.
+      //
+      return NULL;
+    }
     TempSpot = StrStr (StartupScriptPath, L";");
     if (TempSpot != NULL) {
       *TempSpot = CHAR_NULL;
