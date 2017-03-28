@@ -148,7 +148,7 @@ if __name__ == '__main__':
   #
   # Extract public key from private key into STDOUT
   #
-  Process = subprocess.Popen('%s rsa -in "%s" -modulus -noout' % (OpenSslCommand, args.PrivateKeyFileName), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  Process = subprocess.Popen('%s rsa -in "%s" -modulus -noout' % (OpenSslCommand, args.PrivateKeyFileName), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   PublicKeyHexString = Process.communicate()[0].split('=')[1].strip()
   PublicKey = ''
   while len(PublicKeyHexString) > 0:
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     # 
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
-    Process = subprocess.Popen('%s sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    Process = subprocess.Popen('%s sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
     if Process.returncode <> 0:
       sys.exit(Process.returncode)
@@ -223,7 +223,7 @@ if __name__ == '__main__':
     #
     # Verify signature
     #    
-    Process = subprocess.Popen('%s sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    Process = subprocess.Popen('%s sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=FullInputFileBuffer)
     if Process.returncode <> 0:
       print 'ERROR: Verification failed'
