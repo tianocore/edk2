@@ -83,6 +83,12 @@ MEMORY_PROTECTION_RANGE mProtectionMemRangeTemplate[] = {
   {{0x00000000, 0x00000000},TRUE,TRUE},
 
   //
+  // SMRAM ranges not covered by mCpuHotPlugData.SmrrBase/mCpuHotPlugData.SmrrSiz (to be fixed in runtime).
+  // It is always present and instruction fetches are allowed.
+  // {{0x00000000, 0x00000000},TRUE,FALSE},
+  //
+
+  //
   // Future extended range could be added here.
   //
 
@@ -360,7 +366,7 @@ InitProtectedMemRange (
 {
   UINTN                            Index;
   UINTN                            NumberOfDescriptors;
-  UINTN                            NumberOfMmioDescriptors;
+  UINTN                            NumberOfAddedDescriptors;
   UINTN                            NumberOfProtectRange;
   UINTN                            NumberOfSpliteRange;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
@@ -373,7 +379,7 @@ InitProtectedMemRange (
   UINT64                           Low4KBPageSize;
 
   NumberOfDescriptors      = 0;
-  NumberOfMmioDescriptors  = 0;
+  NumberOfAddedDescriptors = mSmmCpuSmramRangeCount;
   NumberOfSpliteRange      = 0;
   MemorySpaceMap           = NULL;
 
@@ -386,12 +392,12 @@ InitProtectedMemRange (
        );
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
-      NumberOfMmioDescriptors++;
+      NumberOfAddedDescriptors++;
     }
   }
 
-  if (NumberOfMmioDescriptors != 0) {
-    TotalSize = NumberOfMmioDescriptors * sizeof (MEMORY_PROTECTION_RANGE) + sizeof (mProtectionMemRangeTemplate);
+  if (NumberOfAddedDescriptors != 0) {
+    TotalSize = NumberOfAddedDescriptors * sizeof (MEMORY_PROTECTION_RANGE) + sizeof (mProtectionMemRangeTemplate);
     mProtectionMemRange = (MEMORY_PROTECTION_RANGE *) AllocateZeroPool (TotalSize);
     ASSERT (mProtectionMemRange != NULL);
     mProtectionMemRangeCount = TotalSize / sizeof (MEMORY_PROTECTION_RANGE);
@@ -409,9 +415,27 @@ InitProtectedMemRange (
     ASSERT (mSplitMemRange != NULL);
 
     //
+    // Create SMM ranges which are set to present and execution-enable.
+    //
+    NumberOfProtectRange = sizeof (mProtectionMemRangeTemplate) / sizeof (MEMORY_PROTECTION_RANGE);
+    for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+      if (mSmmCpuSmramRanges[Index].CpuStart >= mProtectionMemRange[0].Range.Base &&
+          mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize < mProtectionMemRange[0].Range.Top) {
+        //
+        // If the address have been already covered by mCpuHotPlugData.SmrrBase/mCpuHotPlugData.SmrrSiz
+        //
+        break;
+      }
+      mProtectionMemRange[NumberOfProtectRange].Range.Base = mSmmCpuSmramRanges[Index].CpuStart;
+      mProtectionMemRange[NumberOfProtectRange].Range.Top  = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
+      mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
+      mProtectionMemRange[NumberOfProtectRange].Nx         = FALSE;
+      NumberOfProtectRange++;
+    }
+
+    //
     // Create MMIO ranges which are set to present and execution-disable.
     //
-    NumberOfProtectRange    = sizeof (mProtectionMemRangeTemplate) / sizeof (MEMORY_PROTECTION_RANGE);
     for (Index = 0; Index < NumberOfDescriptors; Index++) {
       if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
         continue;
@@ -422,6 +446,12 @@ InitProtectedMemRange (
       mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
       NumberOfProtectRange++;
     }
+
+    //
+    // Check and updated actual protected memory ranges count
+    //
+    ASSERT (NumberOfProtectRange <= mProtectionMemRangeCount);
+    mProtectionMemRangeCount = NumberOfProtectRange;
   }
 
   //
