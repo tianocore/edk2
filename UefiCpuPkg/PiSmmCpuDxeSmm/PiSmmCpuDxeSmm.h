@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -104,6 +104,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PAGING_4K_ADDRESS_MASK_64 0x000FFFFFFFFFF000ull
 #define PAGING_2M_ADDRESS_MASK_64 0x000FFFFFFFE00000ull
 #define PAGING_1G_ADDRESS_MASK_64 0x000FFFFFC0000000ull
+
+#define SMRR_MAX_ADDRESS       BASE_4GB
 
 typedef enum {
   PageNone,
@@ -415,6 +417,8 @@ extern UINTN                               mSemaphoreSize;
 extern SPIN_LOCK                           *mPFLock;
 extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
 extern SPIN_LOCK                           *mMemoryMappedLock;
+extern EFI_SMRAM_DESCRIPTOR                *mSmmCpuSmramRanges;
+extern UINTN                               mSmmCpuSmramRangeCount;
 
 //
 // Copy of the PcdPteMemoryEncryptionAddressOrMask

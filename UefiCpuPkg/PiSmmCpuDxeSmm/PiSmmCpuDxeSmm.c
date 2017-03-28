@@ -108,6 +108,12 @@ UINT64                   mAddressEncMask = 0;
 //
 SPIN_LOCK                *mConfigSmmCodeAccessCheckLock = NULL;
 
+//
+// Saved SMM ranges information
+//
+EFI_SMRAM_DESCRIPTOR     *mSmmCpuSmramRanges;
+UINTN                    mSmmCpuSmramRangeCount;
+
 /**
   Initialize IDT to setup exception handlers for SMM.
 
@@ -971,8 +977,6 @@ FindSmramInfo (
   UINTN                             Size;
   EFI_SMM_ACCESS2_PROTOCOL          *SmmAccess;
   EFI_SMRAM_DESCRIPTOR              *CurrentSmramRange;
-  EFI_SMRAM_DESCRIPTOR              *SmramRanges;
-  UINTN                             SmramRangeCount;
   UINTN                             Index;
   UINT64                            MaxSize;
   BOOLEAN                           Found;
@@ -990,31 +994,31 @@ FindSmramInfo (
   Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
 
-  SmramRanges = (EFI_SMRAM_DESCRIPTOR *)AllocatePool (Size);
-  ASSERT (SmramRanges != NULL);
+  mSmmCpuSmramRanges = (EFI_SMRAM_DESCRIPTOR *)AllocatePool (Size);
+  ASSERT (mSmmCpuSmramRanges != NULL);
 
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, SmramRanges);
+  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmmCpuSmramRanges);
   ASSERT_EFI_ERROR (Status);
 
-  SmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+  mSmmCpuSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
 
   //
   // Find the largest SMRAM range between 1MB and 4GB that is at least 256K - 4K in size
   //
   CurrentSmramRange = NULL;
-  for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < SmramRangeCount; Index++) {
+  for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < mSmmCpuSmramRangeCount; Index++) {
     //
     // Skip any SMRAM region that is already allocated, needs testing, or needs ECC initialization
     //
-    if ((SmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
+    if ((mSmmCpuSmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
       continue;
     }
 
-    if (SmramRanges[Index].CpuStart >= BASE_1MB) {
-      if ((SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize) <= BASE_4GB) {
-        if (SmramRanges[Index].PhysicalSize >= MaxSize) {
-          MaxSize = SmramRanges[Index].PhysicalSize;
-          CurrentSmramRange = &SmramRanges[Index];
+    if (mSmmCpuSmramRanges[Index].CpuStart >= BASE_1MB) {
+      if ((mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize) <= SMRR_MAX_ADDRESS) {
+        if (mSmmCpuSmramRanges[Index].PhysicalSize >= MaxSize) {
+          MaxSize = mSmmCpuSmramRanges[Index].PhysicalSize;
+          CurrentSmramRange = &mSmmCpuSmramRanges[Index];
         }
       }
     }
@@ -1027,19 +1031,19 @@ FindSmramInfo (
 
   do {
     Found = FALSE;
-    for (Index = 0; Index < SmramRangeCount; Index++) {
-      if (SmramRanges[Index].CpuStart < *SmrrBase && *SmrrBase == (SmramRanges[Index].CpuStart + SmramRanges[Index].PhysicalSize)) {
-        *SmrrBase = (UINT32)SmramRanges[Index].CpuStart;
-        *SmrrSize = (UINT32)(*SmrrSize + SmramRanges[Index].PhysicalSize);
+    for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+      if (mSmmCpuSmramRanges[Index].CpuStart < *SmrrBase &&
+          *SmrrBase == (mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize)) {
+        *SmrrBase = (UINT32)mSmmCpuSmramRanges[Index].CpuStart;
+        *SmrrSize = (UINT32)(*SmrrSize + mSmmCpuSmramRanges[Index].PhysicalSize);
         Found = TRUE;
-      } else if ((*SmrrBase + *SmrrSize) == SmramRanges[Index].CpuStart && SmramRanges[Index].PhysicalSize > 0) {
-        *SmrrSize = (UINT32)(*SmrrSize + SmramRanges[Index].PhysicalSize);
+      } else if ((*SmrrBase + *SmrrSize) == mSmmCpuSmramRanges[Index].CpuStart && mSmmCpuSmramRanges[Index].PhysicalSize > 0) {
+        *SmrrSize = (UINT32)(*SmrrSize + mSmmCpuSmramRanges[Index].PhysicalSize);
         Found = TRUE;
       }
     }
   } while (Found);
 
-  FreePool (SmramRanges);
   DEBUG ((EFI_D_INFO, "SMRR Base: 0x%x, SMRR Size: 0x%x\n", *SmrrBase, *SmrrSize));
 }
 
