@@ -1,7 +1,7 @@
 /** @file
 Enable SMM profile.
 
-Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -247,6 +247,33 @@ DebugExceptionHandler (
 }
 
 /**
+  Check if the input address is in SMM ranges.
+
+  @param[in]  Address       The input address.
+
+  @retval TRUE     The input address is in SMM.
+  @retval FALSE    The input address is not in SMM.
+**/
+BOOLEAN
+IsInSmmRanges (
+  IN EFI_PHYSICAL_ADDRESS   Address
+  )
+{
+  UINTN  Index;
+
+  if ((Address < mCpuHotPlugData.SmrrBase) || (Address >= mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
+    return TRUE;
+  }
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    if (Address >= mSmmCpuSmramRanges[Index].CpuStart &&
+        Address < mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
   Check if the memory address will be mapped by 4KB-page.
 
   @param  Address  The address of Memory.
@@ -261,7 +288,6 @@ IsAddressValid (
 {
   UINTN  Index;
 
-  *Nx = FALSE;
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     //
     // Check configuration
@@ -276,9 +302,9 @@ IsAddressValid (
     return FALSE;
 
   } else {
-    if ((Address < mCpuHotPlugData.SmrrBase) ||
-        (Address >= mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
-      *Nx = TRUE;
+    *Nx = TRUE;
+    if (IsInSmmRanges (Address)) {
+      *Nx = FALSE;
     }
     return TRUE;
   }
