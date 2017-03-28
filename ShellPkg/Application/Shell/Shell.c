@@ -1136,8 +1136,8 @@ ProcessCommandLine(
   
   The buffer is callee allocated and should be freed by the caller.
 
-  @param    ImagePath             The path to the image for shell.  first place to look for the startup script
-  @param    FilePath              The path to the file for shell.  second place to look for the startup script.
+  @param    ImageDevicePath       The path to the image for shell.  first place to look for the startup script
+  @param    FileDevicePath        The path to the file for shell.  second place to look for the startup script.
 
   @retval   NULL                  No Startup.nsh file was found.
   @return   !=NULL                Pointer to NULL-terminated path.
