@@ -9,7 +9,7 @@
   ProcessRecoveryCapsule(), ProcessFmpCapsuleImage(), ProcessRecoveryImage(),
   ValidateFmpCapsule() will receive untrusted input and do basic validation.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -467,7 +467,7 @@ CreateHobForRecoveryCapsule (
   DEBUG((DEBUG_INFO, "BuildFvHob (FV in recovery) - 0x%lx - 0x%lx\n", (UINT64)(UINTN)FvHeader, FvHeader->FvLength));
 
   PeiServicesInstallFvInfoPpi(
-    NULL,
+    &FvHeader->FileSystemGuid,
     (VOID *)FvHeader,
     (UINT32)FvHeader->FvLength,
     NULL,
