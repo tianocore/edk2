@@ -310,23 +310,6 @@ BmSetVariableAndReportStatusCodeOnError (
   );
 
 /**
-  Return whether the PE header of the load option is valid or not.
-
-  @param[in] Type       The load option type.
-  @param[in] FileBuffer The PE file buffer of the load option.
-  @param[in] FileSize   The size of the load option file.
-
-  @retval TRUE  The PE header of the load option is valid.
-  @retval FALSE The PE header of the load option is not valid.
-**/
-BOOLEAN
-BmIsLoadOptionPeHeaderValid (
-  IN EFI_BOOT_MANAGER_LOAD_OPTION_TYPE Type,
-  IN VOID                              *FileBuffer,
-  IN UINTN                             FileSize
-  );
-
-/**
   Function compares a device path data structure to that of all the nodes of a
   second device path instance.
 
@@ -425,16 +408,83 @@ BmMakeBootOptionDescriptionUnique (
 
   @param LoadFileHandle The specified Load File instance.
   @param FilePath       The file path which will pass to LoadFile().
-  @param FullPath       Return the full device path pointing to the load option.
-  @param FileSize       Return the size of the load option.
 
-  @return  The load option buffer or NULL if fails.
+  @return  The full device path pointing to the load option buffer.
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+BmExpandLoadFile (
+  IN  EFI_HANDLE                      LoadFileHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath
+  );
+
+/**
+  Return the RAM Disk device path created by LoadFile.
+
+  @param FilePath  The source file path.
+
+  @return Callee-to-free RAM Disk device path
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+BmGetRamDiskDevicePath (
+  IN EFI_DEVICE_PATH_PROTOCOL *FilePath
+  );
+
+/**
+  Destroy the RAM Disk.
+
+  The destroy operation includes to call RamDisk.Unregister to
+  unregister the RAM DISK from RAM DISK driver, free the memory
+  allocated for the RAM Disk.
+
+  @param RamDiskDevicePath    RAM Disk device path.
+**/
+VOID
+BmDestroyRamDisk (
+  IN EFI_DEVICE_PATH_PROTOCOL *RamDiskDevicePath
+  );
+
+/**
+  Get the next possible full path pointing to the load option.
+
+  @param FilePath  The device path pointing to a load option.
+                   It could be a short-form device path.
+  @param FullPath  The full path returned by the routine in last call.
+                   Set to NULL in first call.
+
+  @return The next possible full path pointing to the load option.
+          Caller is responsible to free the memory.
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+BmGetNextLoadOptionDevicePath (
+  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL          *FullPath
+  );
+
+/**
+  Return the next matched load option buffer.
+  The routine keeps calling BmGetNextLoadOptionDevicePath() until a valid
+  load option is read.
+
+  @param Type      The load option type.
+                   It's used to check whether the load option is valid.
+                   When it's LoadOptionTypeMax, the routine only guarantees
+                   the load option is a valid PE image but doesn't guarantee
+                   the PE's subsystem type is valid.
+  @param FilePath  The device path pointing to a load option.
+                   It could be a short-form device path.
+  @param FullPath  Return the next full device path of the load option after
+                   short-form device path expanding.
+                   Caller is responsible to free it.
+                   NULL to return the first matched full device path.
+  @param FileSize  Return the load option size.
+
+  @return The load option buffer. Caller is responsible to free the memory.
 **/
 VOID *
-BmGetFileBufferFromLoadFile (
-  EFI_HANDLE                          LoadFileHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath,
-  OUT EFI_DEVICE_PATH_PROTOCOL        **FullPath,
-  OUT UINTN                           *FileSize
+BmGetNextLoadOptionBuffer (
+  IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE Type,
+  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
+  OUT UINTN                             *FileSize
   );
 #endif // _INTERNAL_BM_H_
