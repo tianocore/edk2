@@ -22,12 +22,9 @@
 
 [Sources.common]
   ArmHwDxe.c
-  ArmVExpressCommon.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
