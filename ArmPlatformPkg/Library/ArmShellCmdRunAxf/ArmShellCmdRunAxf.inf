@@ -43,7 +43,6 @@
 [LibraryClasses]
   ArmLib
   BaseLib
-  BdsLib
   DebugLib
   HiiLib
   ShellLib

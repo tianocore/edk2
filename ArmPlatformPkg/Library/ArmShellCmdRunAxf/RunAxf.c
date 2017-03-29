@@ -21,7 +21,6 @@
 #include <Library/DevicePathLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/BdsLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 
@@ -34,6 +33,63 @@
 // Provide arguments to AXF?
 typedef VOID (*ELF_ENTRYPOINT)(UINTN arg0, UINTN arg1,
                                UINTN arg2, UINTN arg3);
+
+STATIC
+EFI_STATUS
+ShutdownUefiBootServices (
+  VOID
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   MemoryMapSize;
+  EFI_MEMORY_DESCRIPTOR   *MemoryMap;
+  UINTN                   MapKey;
+  UINTN                   DescriptorSize;
+  UINT32                  DescriptorVersion;
+  UINTN                   Pages;
+
+  MemoryMap = NULL;
+  MemoryMapSize = 0;
+  Pages = 0;
+
+  do {
+    Status = gBS->GetMemoryMap (
+                    &MemoryMapSize,
+                    MemoryMap,
+                    &MapKey,
+                    &DescriptorSize,
+                    &DescriptorVersion
+                    );
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+
+      Pages = EFI_SIZE_TO_PAGES (MemoryMapSize) + 1;
+      MemoryMap = AllocatePages (Pages);
+
+      //
+      // Get System MemoryMap
+      //
+      Status = gBS->GetMemoryMap (
+                      &MemoryMapSize,
+                      MemoryMap,
+                      &MapKey,
+                      &DescriptorSize,
+                      &DescriptorVersion
+                      );
+    }
+
+    // Don't do anything between the GetMemoryMap() and ExitBootServices()
+    if (!EFI_ERROR(Status)) {
+      Status = gBS->ExitBootServices (gImageHandle, MapKey);
+      if (EFI_ERROR(Status)) {
+        FreePages (MemoryMap, Pages);
+        MemoryMap = NULL;
+        MemoryMapSize = 0;
+      }
+    }
+  } while (EFI_ERROR(Status));
+
+  return Status;
+}
 
 
 STATIC
