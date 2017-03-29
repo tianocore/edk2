@@ -25,6 +25,7 @@
   PlatformHasAcpiDtDxe.c
 
 [Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
@@ -32,6 +33,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  PcdLib
   QemuFwCfgLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
@@ -39,6 +41,9 @@
 [Guids]
   gEdkiiPlatformHasAcpiGuid       ## SOMETIMES_PRODUCES ## PROTOCOL
   gEdkiiPlatformHasDeviceTreeGuid ## SOMETIMES_PRODUCES ## PROTOCOL
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdForceNoAcpi
 
 [Depex]
   TRUE

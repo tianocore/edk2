@@ -17,6 +17,7 @@
 #include <Guid/PlatformHasDeviceTree.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -37,6 +38,7 @@ PlatformHasAcpiDt (
   // errors here.
   //
   if (MAX_UINTN == MAX_UINT64 &&
+      !PcdGetBool (PcdForceNoAcpi) &&
       !EFI_ERROR (
          QemuFwCfgFindFile (
            "etc/table-loader",

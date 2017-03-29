@@ -204,6 +204,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
+[PcdsDynamicHii]
+  gArmVirtTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gArmVirtVariableGuid|0x0|FALSE|NV,BS
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
