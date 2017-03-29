@@ -24,9 +24,6 @@
   ArmFvpDxe.c
   ArmVExpressCommon.c
 
-[Sources.ARM]
-  Arm/ArmFvpDxeArm.c
-
 [Sources.AARCH64]
   AArch64/ArmFvpDxeAArch64.c
 
@@ -60,12 +57,6 @@
 
 [FixedPcd]
   gArmVExpressTokenSpaceGuid.PcdFvpFdtDevicePathsBase
-
-[FixedPcd.ARM]
-  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA9x4
-  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA15x1
-  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA15x2
-  gArmVExpressTokenSpaceGuid.PcdFdtVExpressFvpA15x4
 
 [FixedPcd.AARCH64]
   gArmVExpressTokenSpaceGuid.PcdFdtFvpVExpressAEMv8x4
