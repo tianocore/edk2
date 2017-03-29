@@ -40,7 +40,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
-  DxeServicesLib
+  DtPlatformDtbLoaderLib
   HiiLib
   MemoryAllocationLib
   UefiBootServicesTableLib

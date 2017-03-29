@@ -15,7 +15,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/DxeServicesLib.h>
+#include <Library/DtPlatformDtbLoaderLib.h>
 #include <Library/HiiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -114,17 +114,13 @@ DtPlatformDxeEntryPoint (
   UINTN                           BufferSize;
   VOID                            *Dtb;
   UINTN                           DtbSize;
-  VOID                            *DtbCopy;
 
-  //
-  // Check whether a DTB blob is included in the firmware image.
-  //
   Dtb = NULL;
-  Status = GetSectionFromAnyFv (&gDtPlatformDefaultDtbFileGuid,
-             EFI_SECTION_RAW, 0, &Dtb, &DtbSize);
+  Status = DtPlatformLoadDtb (&Dtb, &DtbSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "%a: no DTB blob found, defaulting to ACPI\n",
-      __FUNCTION__));
+    DEBUG ((DEBUG_WARN,
+      "%a: no DTB blob could be loaded, defaulting to ACPI (Status == %r)\n",
+      __FUNCTION__, Status));
     DtAcpiPref.Pref = DT_ACPI_SELECT_ACPI;
   } else {
     //
@@ -157,7 +153,7 @@ DtPlatformDxeEntryPoint (
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                     sizeof (DtAcpiPref), &DtAcpiPref);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto FreeDtb;
     }
   }
 
@@ -172,23 +168,18 @@ DtPlatformDxeEntryPoint (
       DEBUG ((DEBUG_ERROR,
         "%a: failed to install gEdkiiPlatformHasAcpiGuid as a protocol\n",
         __FUNCTION__));
-      return Status;
+      goto FreeDtb;
     }
   } else if (DtAcpiPref.Pref == DT_ACPI_SELECT_DT) {
     //
     // DT was selected: copy the blob into newly allocated memory and install
     // a reference to it as the FDT configuration table.
     //
-    DtbCopy = AllocateCopyPool (DtbSize, Dtb);
-    if (DtbCopy == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DtbCopy);
+    Status = gBS->InstallConfigurationTable (&gFdtTableGuid, Dtb);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: failed to install FDT configuration table\n",
         __FUNCTION__));
-      FreePool (DtbCopy);
-      return Status;
+      goto FreeDtb;
     }
   } else {
     ASSERT (FALSE);
@@ -210,4 +201,11 @@ DtPlatformDxeEntryPoint (
   // installed in that case.
   //
   return InstallHiiPages ();
+
+FreeDtb:
+  if (Dtb != NULL) {
+    FreePool (Dtb);
+  }
+
+  return Status;
 }
