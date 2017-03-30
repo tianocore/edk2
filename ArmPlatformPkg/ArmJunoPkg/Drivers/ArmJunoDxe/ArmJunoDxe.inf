@@ -21,8 +21,6 @@
 [Sources.common]
   AcpiTables.c
   ArmJunoDxe.c
-  PciEmulation.c
-  PciRootBridgeIo.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -42,6 +40,7 @@
   DmaLib
   DxeServicesTableLib
   IoLib
+  NonDiscoverableDeviceRegistrationLib
   PcdLib
   PrintLib
   SerialPortLib

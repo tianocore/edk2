@@ -42,11 +42,6 @@
 #define R_TST_CTRL_1                  0x0158     /* Test Control Register 1 */
 
 
-EFI_STATUS
-PciEmulationEntryPoint (
-  VOID
-  );
-
 /**
  * Callback called when ACPI Protocol is installed
  */

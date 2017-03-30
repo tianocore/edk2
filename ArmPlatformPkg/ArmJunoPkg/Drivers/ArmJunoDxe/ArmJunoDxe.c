@@ -28,6 +28,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/NonDiscoverableDeviceRegistrationLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/IoLib.h>
 #include <Library/PrintLib.h>
@@ -447,10 +448,31 @@ ArmJunoEntryPoint (
   UINT32                JunoRevision;
   EFI_EVENT             EndOfDxeEvent;
 
-  Status = PciEmulationEntryPoint ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  //
+  // Register the OHCI and EHCI controllers as non-coherent
+  // non-discoverable devices.
+  //
+  Status = RegisterNonDiscoverableMmioDevice (
+             NonDiscoverableDeviceTypeOhci,
+             NonDiscoverableDeviceDmaTypeNonCoherent,
+             NULL,
+             NULL,
+             1,
+             FixedPcdGet32 (PcdSynopsysUsbOhciBaseAddress),
+             SIZE_64KB
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = RegisterNonDiscoverableMmioDevice (
+             NonDiscoverableDeviceTypeEhci,
+             NonDiscoverableDeviceDmaTypeNonCoherent,
+             NULL,
+             NULL,
+             1,
+             FixedPcdGet32 (PcdSynopsysUsbEhciBaseAddress),
+             SIZE_64KB
+             );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // If a hypervisor has been declared then we need to make sure its region is protected at runtime
