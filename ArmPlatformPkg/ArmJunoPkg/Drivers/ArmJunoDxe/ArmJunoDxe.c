@@ -400,34 +400,6 @@ OnEndOfDxe (
   }
 }
 
-STATIC
-BOOLEAN
-AcpiTableJunoR0Check (
-  IN  EFI_ACPI_DESCRIPTION_HEADER *AcpiHeader
-  )
-{
-  return TRUE;
-}
-
-STATIC
-BOOLEAN
-AcpiTableJunoR1Check (
-  IN  EFI_ACPI_DESCRIPTION_HEADER *AcpiHeader
-  )
-{
-  return TRUE;
-}
-
-STATIC
-BOOLEAN
-AcpiTableJunoR2Check (
-  IN  EFI_ACPI_DESCRIPTION_HEADER *AcpiHeader
-  )
-{
-  return TRUE;
-}
-
-
 EFI_STATUS
 EFIAPI
 ArmJunoEntryPoint (
@@ -517,14 +489,7 @@ ArmJunoEntryPoint (
   //
   // Try to install the ACPI Tables
   //
-  if (JunoRevision == JUNO_REVISION_R0) {
-    Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR0Check);
-  } else if (JunoRevision == JUNO_REVISION_R1) {
-    Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR1Check);
-  } else if (JunoRevision == JUNO_REVISION_R2) {
-    Status = LocateAndInstallAcpiFromFvConditional (&mJunoAcpiTableFile, AcpiTableJunoR2Check);
-  }
-
+  Status = LocateAndInstallAcpiFromFv (&mJunoAcpiTableFile);
   ASSERT_EFI_ERROR (Status);
 
   //
