@@ -89,8 +89,9 @@
   #
   # suppress the following warnings so we do not break the build with warnings-as-errors:
   # C4090: 'function' : different 'const' qualifiers
+  # C4718: 'function call' : recursive call has no side effects, deleting
   #
-  MSFT:*_*_*_CC_FLAGS = /wd4090
+  MSFT:*_*_*_CC_FLAGS = /wd4090 /wd4718
 
   GCC:*_GCC44_IA32_CC_FLAGS = "-D__cdecl=__attribute__((cdecl))" "-D__declspec(t)=__attribute__((t))"
 
