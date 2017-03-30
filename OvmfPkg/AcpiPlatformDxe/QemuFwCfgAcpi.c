@@ -100,6 +100,39 @@ BlobCompare (
 
 
 /**
+  Comparator function for two opaque pointers, ordering on (unsigned) pointer
+  value itself.
+  Can be used as both Key and UserStruct comparator.
+
+  @param[in] Pointer1  First pointer.
+
+  @param[in] Pointer2  Second pointer.
+
+  @retval <0  If Pointer1 compares less than Pointer2.
+
+  @retval  0  If Pointer1 compares equal to Pointer2.
+
+  @retval >0  If Pointer1 compares greater than Pointer2.
+**/
+STATIC
+INTN
+EFIAPI
+PointerCompare (
+  IN CONST VOID *Pointer1,
+  IN CONST VOID *Pointer2
+  )
+{
+  if (Pointer1 == Pointer2) {
+    return 0;
+  }
+  if ((UINTN)Pointer1 < (UINTN)Pointer2) {
+    return -1;
+  }
+  return 1;
+}
+
+
+/**
   Process a QEMU_LOADER_ALLOCATE command.
 
   @param[in] Allocate     The QEMU_LOADER_ALLOCATE command to process.
@@ -557,6 +590,16 @@ UndoCmdWritePointer (
                                command identified an ACPI table that is
                                different from RSDT and XSDT.
 
+  @param[in,out] SeenPointers  The ORDERED_COLLECTION tracking the absolute
+                               target addresses that have been pointed-to by
+                               QEMU_LOADER_ADD_POINTER commands thus far. If a
+                               target address is encountered for the first
+                               time, and it identifies an ACPI table that is
+                               different from RDST and XSDT, the table is
+                               installed. If a target address is seen for the
+                               second or later times, it is skipped without
+                               taking any action.
+
   @retval EFI_INVALID_PARAMETER  NumInstalled was outside the allowed range on
                                  input.
 
@@ -564,14 +607,15 @@ UndoCmdWritePointer (
                                  table different from RSDT and XSDT, but there
                                  was no more room in InstalledKey.
 
-  @retval EFI_SUCCESS            AddPointer has been processed. Either an ACPI
-                                 table different from RSDT and XSDT has been
-                                 installed (reflected by InstalledKey and
-                                 NumInstalled), or RSDT or XSDT has been
-                                 identified but not installed, or the fw_cfg
-                                 blob pointed-into by AddPointer has been
-                                 marked as hosting something else than just
-                                 direct ACPI table contents.
+  @retval EFI_SUCCESS            AddPointer has been processed. Either its
+                                 absolute target address has been encountered
+                                 before, or an ACPI table different from RSDT
+                                 and XSDT has been installed (reflected by
+                                 InstalledKey and NumInstalled), or RSDT or
+                                 XSDT has been identified but not installed, or
+                                 the fw_cfg blob pointed-into by AddPointer has
+                                 been marked as hosting something else than
+                                 just direct ACPI table contents.
 
   @return                        Error codes returned by
                                  AcpiProtocol->InstallAcpiTable().
@@ -584,11 +628,13 @@ Process2ndPassCmdAddPointer (
   IN     CONST ORDERED_COLLECTION      *Tracker,
   IN     EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
   IN OUT UINTN                         InstalledKey[INSTALLED_TABLES_MAX],
-  IN OUT INT32                         *NumInstalled
+  IN OUT INT32                         *NumInstalled,
+  IN OUT ORDERED_COLLECTION            *SeenPointers
   )
 {
   CONST ORDERED_COLLECTION_ENTRY                     *TrackerEntry;
   CONST ORDERED_COLLECTION_ENTRY                     *TrackerEntry2;
+  ORDERED_COLLECTION_ENTRY                           *SeenPointerEntry;
   CONST BLOB                                         *Blob;
   BLOB                                               *Blob2;
   CONST UINT8                                        *PointerField;
@@ -619,6 +665,27 @@ Process2ndPassCmdAddPointer (
   ASSERT(PointerValue >= Blob2Remaining);
   Blob2Remaining += Blob2->Size;
   ASSERT (PointerValue < Blob2Remaining);
+
+  Status = OrderedCollectionInsert (
+             SeenPointers,
+             &SeenPointerEntry, // for reverting insertion in error case
+             (VOID *)(UINTN)PointerValue
+             );
+  if (EFI_ERROR (Status)) {
+    if (Status == RETURN_ALREADY_STARTED) {
+      //
+      // Already seen this pointer, don't try to process it again.
+      //
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: PointerValue=0x%Lx already processed, skipping.\n",
+        __FUNCTION__,
+        PointerValue
+        ));
+      Status = EFI_SUCCESS;
+    }
+    return Status;
+  }
 
   Blob2Remaining -= (UINTN) PointerValue;
   DEBUG ((EFI_D_VERBOSE, "%a: checking for ACPI header in \"%a\" at 0x%Lx "
@@ -682,7 +749,8 @@ Process2ndPassCmdAddPointer (
   if (*NumInstalled == INSTALLED_TABLES_MAX) {
     DEBUG ((EFI_D_ERROR, "%a: can't install more than %d tables\n",
       __FUNCTION__, INSTALLED_TABLES_MAX));
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto RollbackSeenPointer;
   }
 
   Status = AcpiProtocol->InstallAcpiTable (AcpiProtocol,
@@ -691,10 +759,14 @@ Process2ndPassCmdAddPointer (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "%a: InstallAcpiTable(): %r\n", __FUNCTION__,
       Status));
-    return Status;
+    goto RollbackSeenPointer;
   }
   ++*NumInstalled;
   return EFI_SUCCESS;
+
+RollbackSeenPointer:
+  OrderedCollectionDelete (SeenPointers, SeenPointerEntry, NULL);
+  return Status;
 }
 
 
@@ -739,6 +811,8 @@ InstallQemuFwCfgTables (
   UINTN                    *InstalledKey;
   INT32                    Installed;
   ORDERED_COLLECTION_ENTRY *TrackerEntry, *TrackerEntry2;
+  ORDERED_COLLECTION       *SeenPointers;
+  ORDERED_COLLECTION_ENTRY *SeenPointerEntry, *SeenPointerEntry2;
 
   Status = QemuFwCfgFindFile ("etc/table-loader", &FwCfgItem, &FwCfgSize);
   if (EFI_ERROR (Status)) {
@@ -827,14 +901,26 @@ InstallQemuFwCfgTables (
     goto RollbackWritePointersAndFreeTracker;
   }
 
+  SeenPointers = OrderedCollectionInit (PointerCompare, PointerCompare);
+  if (SeenPointers == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeKeys;
+  }
+
   //
   // second pass: identify and install ACPI tables
   //
   Installed = 0;
   for (LoaderEntry = LoaderStart; LoaderEntry < LoaderEnd; ++LoaderEntry) {
     if (LoaderEntry->Type == QemuLoaderCmdAddPointer) {
-      Status = Process2ndPassCmdAddPointer (&LoaderEntry->Command.AddPointer,
-                 Tracker, AcpiProtocol, InstalledKey, &Installed);
+      Status = Process2ndPassCmdAddPointer (
+                 &LoaderEntry->Command.AddPointer,
+                 Tracker,
+                 AcpiProtocol,
+                 InstalledKey,
+                 &Installed,
+                 SeenPointers
+                 );
       if (EFI_ERROR (Status)) {
         goto UninstallAcpiTables;
       }
@@ -870,6 +956,15 @@ UninstallAcpiTables:
     DEBUG ((EFI_D_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
   }
 
+  for (SeenPointerEntry = OrderedCollectionMin (SeenPointers);
+       SeenPointerEntry != NULL;
+       SeenPointerEntry = SeenPointerEntry2) {
+    SeenPointerEntry2 = OrderedCollectionNext (SeenPointerEntry);
+    OrderedCollectionDelete (SeenPointers, SeenPointerEntry, NULL);
+  }
+  OrderedCollectionUninit (SeenPointers);
+
+FreeKeys:
   FreePool (InstalledKey);
 
 RollbackWritePointersAndFreeTracker:
