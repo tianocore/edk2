@@ -836,7 +836,7 @@ MtrrLibGetMtrrNumber (
   IN UINT64                 Alignment0,
   OUT UINT32                *SubLeft, // subtractive from BaseAddress to get more aligned address, to save MTRR
   OUT UINT32                *SubRight // subtractive from BaseAddress + Length, to save MTRR
-)
+  )
 {
   UINT64  Alignment;
   UINT32  LeastLeftMtrrNumber;
@@ -859,6 +859,8 @@ MtrrLibGetMtrrNumber (
   // Get the optimal left subtraction solution.
   //
   if (BaseAddress != 0) {
+    SubtractiveBaseAddress = 0;
+    SubtractiveLength      = 0;
     //
     // Get the MTRR number needed without left subtraction.
     //
@@ -1371,6 +1373,8 @@ MtrrLibSetMemoryType (
   UINT32                           EndIndex;
   UINT32                           DeltaCount;
 
+  LengthRight = 0;
+  LengthLeft  = 0;
   Limit = BaseAddress + Length;
   StartIndex = *Count;
   EndIndex = *Count;
@@ -1847,6 +1851,8 @@ MtrrSetMemoryAttributeWorker (
   if (((BaseAddress & ~MtrrValidAddressMask) != 0) || (Length & ~MtrrValidAddressMask) != 0) {
     return RETURN_UNSUPPORTED;
   }
+  OriginalVariableMtrrCount = 0;
+  VariableSettings          = NULL;
 
   ZeroMem (&WorkingFixedSettings, sizeof (WorkingFixedSettings));
   for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
@@ -2048,7 +2054,7 @@ MtrrSetMemoryAttributeWorker (
     if (VariableSettingModified[Index]) {
       if (OriginalVariableMtrr[Index].Valid) {
         VariableSettings->Mtrr[Index].Base = (OriginalVariableMtrr[Index].BaseAddress & MtrrValidAddressMask) | (UINT8) OriginalVariableMtrr[Index].Type;
-        VariableSettings->Mtrr[Index].Mask = (~(OriginalVariableMtrr[Index].Length - 1)) & MtrrValidAddressMask | BIT11;
+        VariableSettings->Mtrr[Index].Mask = ((~(OriginalVariableMtrr[Index].Length - 1)) & MtrrValidAddressMask) | BIT11;
       } else {
         VariableSettings->Mtrr[Index].Base = 0;
         VariableSettings->Mtrr[Index].Mask = 0;
@@ -2081,6 +2087,8 @@ Done:
 
   //
   // Write variable MTRRs
+  // When only fixed MTRRs were changed, below loop doesn't run
+  // because OriginalVariableMtrrCount equals to 0.
   //
   for (Index = 0; Index < OriginalVariableMtrrCount; Index++) {
     if (VariableSettingModified[Index]) {
@@ -2102,7 +2110,7 @@ Done:
     MtrrLibPostMtrrChange (&MtrrContext);
   }
 
-  return Status;
+  return RETURN_SUCCESS;
 }
 
 /**
