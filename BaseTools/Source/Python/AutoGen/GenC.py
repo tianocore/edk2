@@ -1981,6 +1981,9 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, 
                             break
                     GuidMacros.append('#define %s %s' % ('_PCD_VALUE_'+TokenCName, Value))
 
+        if Info.IdfFileList:
+            GuidMacros.append('#include "%sImgDefs.h"' % Info.Name)
+
         if GuidMacros:
             StringH.Append('\n#ifdef VFRCOMPILE\n%s\n#endif\n' % '\n'.join(GuidMacros))
 
