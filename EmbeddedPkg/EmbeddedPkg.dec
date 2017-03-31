@@ -45,6 +45,7 @@
   GdbSerialLib|Include/Library/GdbSerialLib.h
   DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
 
+  DtPlatformDtbLoaderLib|Include/Library/DtPlatformDtbLoaderLib.h
 
 [Guids.common]
   gEmbeddedTokenSpaceGuid       = { 0xe0d8ca17, 0x4276, 0x4386, { 0xbb, 0x79, 0x48, 0xcb, 0x81, 0x3d, 0x3c, 0x4f }}
