@@ -31,8 +31,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 time_t time (time_t *timer)
 {
-  *timer = 0;
-  return *timer;
+  if (timer != NULL) {
+    *timer = 0;
+  }
+  return 0;
 }
 
 struct tm * gmtime (const time_t *timer)
