@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse and evaluate expression in directive or PCD value.
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -129,7 +129,7 @@ class ValueExpression(object):
         'IN' : 'in'
     }
 
-    NonLetterOpLst = ['+', '-', '&', '|', '^', '!', '=', '>', '<']
+    NonLetterOpLst = ['+', '-', '*', '/', '%', '&', '|', '^', '~', '<<', '>>', '!', '=', '>', '<']
 
     PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
     HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
@@ -162,6 +162,10 @@ class ValueExpression(object):
             if type(Oprand1) == type(''):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             EvalStr = 'not Oprand1'
+        elif Operator in ["~"]:
+            if type(Oprand1) == type(''):
+                raise BadExpression(ERR_STRING_EXPR % Operator)
+            EvalStr = '~ Oprand1'
         else:
             if Operator in ["+", "-"] and (type(True) in [type(Oprand1), type(Oprand2)]):
                 # Boolean in '+'/'-' will be evaluated but raise warning
@@ -353,11 +357,18 @@ class ValueExpression(object):
 
     # A [ > B]*
     def _RelExpr(self):
-        return self._ExprFuncTemplate(self._AddExpr, ["<=", ">=", "<", ">", "LE", "GE", "LT", "GT"])
+        return self._ExprFuncTemplate(self._ShiftExpr, ["<=", ">=", "<", ">", "LE", "GE", "LT", "GT"])
+
+    def _ShiftExpr(self):
+        return self._ExprFuncTemplate(self._AddExpr, ["<<", ">>"])
 
     # A [ + B]*
     def _AddExpr(self):
-        return self._ExprFuncTemplate(self._UnaryExpr, ["+", "-"])
+        return self._ExprFuncTemplate(self._MulExpr, ["+", "-"])
+
+    # A [ * B]*
+    def _MulExpr(self):
+        return self._ExprFuncTemplate(self._UnaryExpr, ["*", "/", "%"])
 
     # [!]*A
     def _UnaryExpr(self):
@@ -365,6 +376,13 @@ class ValueExpression(object):
             Val = self._UnaryExpr()
             try:
                 return self.Eval('not', Val)
+            except WrnExpression, Warn:
+                self._WarnExcept = Warn
+                return Warn.result
+        if self._IsOperator(["~"]):
+            Val = self._UnaryExpr()
+            try:
+                return self.Eval('~', Val)
             except WrnExpression, Warn:
                 self._WarnExcept = Warn
                 return Warn.result
@@ -537,7 +555,7 @@ class ValueExpression(object):
 
     @staticmethod
     def __IsIdChar(Ch):
-        return Ch in '._/:' or Ch.isalnum()
+        return Ch in '._:' or Ch.isalnum()
 
     # Parse operand
     def _GetSingleToken(self):
