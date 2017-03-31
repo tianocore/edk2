@@ -496,21 +496,26 @@
   #   C4244: conversion from type1 to type2, possible loss of data
   #   C4245: conversion from type1 to type2, signed/unsigned mismatch
   #   C4267: conversion from size_t to type, possible loss of data
+  #   C4306: 'identifier' : conversion from 'type1' to 'type2' of greater size
   #   C4389: 'operator' : signed/unsigned mismatch (xxxx)
   #   C4702: unreachable code
   #   C4706: assignment within conditional expression
   #
   MSFT:*_*_IA32_CC_FLAGS   = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) /wd4090 /wd4244 /wd4245 /wd4267 /wd4389 /wd4702 /wd4706
-  MSFT:*_*_X64_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) /wd4090 /wd4244 /wd4245 /wd4267 /wd4389 /wd4702 /wd4706
-  MSFT:*_*_IPF_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) /wd4090 /wd4244 /wd4245 /wd4267 /wd4389 /wd4702 /wd4706
+  MSFT:*_*_X64_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) /wd4090 /wd4244 /wd4245 /wd4267 /wd4306 /wd4389 /wd4702 /wd4706
+  MSFT:*_*_IPF_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) /wd4090 /wd4244 /wd4245 /wd4267 /wd4306 /wd4389 /wd4702 /wd4706
 
   INTEL:*_*_IA32_CC_FLAGS  = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) /w
   INTEL:*_*_X64_CC_FLAGS   = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) /w
   INTEL:*_*_IPF_CC_FLAGS   = -U_WIN32 -U_WIN64 -U_MSC_VER -U__ICC $(OPENSSL_FLAGS) /w
 
-  GCC:*_*_IA32_CC_FLAGS    = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS)
-  GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -DNO_MSABI_VA_FUNCS
-  GCC:*_*_IPF_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS)
+  #
+  # Suppress the following build warnings in openssl so we don't break the build with -Werror
+  #   -Werror=maybe-uninitialized: there exist some other paths for which the variable is not initialized.
+  #
+  GCC:*_*_IA32_CC_FLAGS    = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized
+  GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized -DNO_MSABI_VA_FUNCS
+  GCC:*_*_IPF_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized
   GCC:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS)
   GCC:*_*_AARCH64_CC_FLAGS = $(OPENSSL_FLAGS)
 
