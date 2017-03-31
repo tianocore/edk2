@@ -2,7 +2,7 @@
   EFI Shell protocol as defined in the UEFI Shell 2.0 specification including errata.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1262,7 +1262,7 @@ extern EFI_GUID gEfiShellProtocolGuid;
 
 enum ShellVersion {
   SHELL_MAJOR_VERSION = 2,
-  SHELL_MINOR_VERSION = 1
+  SHELL_MINOR_VERSION = 2
 };
 
 #endif
