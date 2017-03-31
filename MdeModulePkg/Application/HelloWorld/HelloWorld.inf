@@ -6,7 +6,7 @@
 #
 #  It demos how to use EDKII PCD mechanism to make code more flexible.
 #
-#  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -55,8 +55,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable   ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString || gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable    ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes  || gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintEnable    ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintString   ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHelloWorldPrintTimes    ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HelloWorldExtra.uni

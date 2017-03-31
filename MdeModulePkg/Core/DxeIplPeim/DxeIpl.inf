@@ -5,7 +5,7 @@
 #  PPI to discover and dispatch the DXE Foundation and components that are
 #  needed to run the DXE Foundation.
 #
-#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -39,12 +39,12 @@
   DxeLoad.c
 
 [Sources.Ia32]
-  X64/VirtualMemory.h  ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
-  X64/VirtualMemory.c  ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
   Ia32/DxeLoadFunc.c
-  Ia32/IdtVectorAsm.nasm||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
-  Ia32/IdtVectorAsm.asm||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
-  Ia32/IdtVectorAsm.S  ||||gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  Ia32/IdtVectorAsm.nasm
+  Ia32/IdtVectorAsm.asm
+  Ia32/IdtVectorAsm.S
 
 [Sources.X64]
   X64/VirtualMemory.h
