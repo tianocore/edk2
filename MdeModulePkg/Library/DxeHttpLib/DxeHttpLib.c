@@ -736,7 +736,7 @@ HttpUrlGetPort (
 
   Status =  AsciiStrDecimalToUintnS (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset, (CHAR8 **) NULL, &Data);
 
-  if (Data > HTTP_URI_PORT_MAX_NUM || Data < HTTP_URI_PORT_MIN_NUM) {
+  if (Data > HTTP_URI_PORT_MAX_NUM) {
     return EFI_INVALID_PARAMETER;
   }
 

@@ -50,7 +50,6 @@ Header file for HttpLib.
 #define   HTTP_URI_FIELD_PORT             7
 #define   HTTP_URI_FIELD_MAX              8
 
-#define   HTTP_URI_PORT_MIN_NUM           0
 #define   HTTP_URI_PORT_MAX_NUM           65535
 
 //
