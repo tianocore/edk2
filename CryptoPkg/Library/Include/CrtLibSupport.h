@@ -133,6 +133,7 @@ void           *malloc     (size_t);
 void           *realloc    (void *, size_t);
 void           free        (void *);
 void           *memset     (void *, int, size_t);
+int            memcmp      (const void *, const void *, size_t);
 int            isdigit     (int);
 int            isspace     (int);
 int            isxdigit    (int);

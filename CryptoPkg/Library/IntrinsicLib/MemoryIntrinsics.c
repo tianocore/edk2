@@ -17,12 +17,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 
+typedef UINTN  size_t;
+
 /* OpenSSL will use floating point support, and C compiler produces the _fltused
    symbol by default. Simply define this symbol here to satisfy the linker. */
 int _fltused = 1;
 
 /* Sets buffers to a specified character */
-void * memset (void *dest, char ch, unsigned int count)
+void * memset (void *dest, char ch, size_t count)
 {
   //
   // NOTE: Here we use one base implementation for memset, instead of the direct
@@ -44,6 +46,12 @@ void * memset (void *dest, char ch, unsigned int count)
   }
   
   return dest;
+}
+
+/* Compare bytes in two buffers. */
+int memcmp (const void *buf1, const void *buf2, size_t count)
+{
+  return (int)CompareMem(buf1, buf2, count);
 }
 
 int strcmp (const char *s1, const char *s2)
