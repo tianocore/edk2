@@ -1,7 +1,7 @@
 /** @file
   CPU exception handler library implementation for PEIM module.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -18,10 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-//
-// Image Alignment size for PEI phase
-//
-CONST UINTN    mImageAlignSize   = 4;
 CONST UINTN    mDoFarReturnFlag  = 0;
 
 EFI_GUID mCpuExceptrionHandlerLibHobGuid = CPU_EXCEPTION_HANDLER_LIB_HOB_GUID;

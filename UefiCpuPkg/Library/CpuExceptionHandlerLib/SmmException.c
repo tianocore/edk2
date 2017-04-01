@@ -1,7 +1,7 @@
 /** @file
   CPU exception handler library implemenation for SMM modules.
 
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,11 +21,6 @@ CONST UINTN   mDoFarReturnFlag   = 1;
 // Spin lock for CPU information display
 //
 SPIN_LOCK        mDisplayMessageSpinLock;
-
-//
-// Image align size for DXE/SMM
-//
-CONST UINTN      mImageAlignSize = SIZE_4KB;
 
 RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
 EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];

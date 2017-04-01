@@ -1,7 +1,7 @@
 /** @file
   CPU exception handler library implemenation for SEC/PEIM modules.
 
-Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -15,10 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiPei.h>
 #include "CpuExceptionCommon.h"
 
-//
-// Image Aglinment size for SEC/PEI phase
-//
-CONST UINTN    mImageAlignSize   = 4;
 CONST UINTN    mDoFarReturnFlag  = 0;
 
 /**
@@ -37,7 +33,7 @@ CommonExceptionHandler (
   //
   // Display ExceptionType, CPU information and Image information
   //  
-  DumpCpuContent (ExceptionType, SystemContext);
+  DumpImageAndCpuContent (ExceptionType, SystemContext);
   
   //
   // Enter a dead loop.

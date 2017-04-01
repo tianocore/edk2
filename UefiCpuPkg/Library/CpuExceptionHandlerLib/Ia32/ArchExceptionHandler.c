@@ -1,7 +1,7 @@
 /** @file
   IA32 CPU Exception Handler functons.
 
-  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -108,39 +108,49 @@ ArchRestoreExceptionContext (
 }
 
 /**
-  Display CPU information.
+  Display processor context.
 
-  @param ExceptionType  Exception type.
-  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+  @param[in] ExceptionType  Exception type.
+  @param[in] SystemContext  Processor context to be display.
 **/
 VOID
-DumpCpuContent (
+EFIAPI
+DumpCpuContext (
   IN EFI_EXCEPTION_TYPE   ExceptionType,
   IN EFI_SYSTEM_CONTEXT   SystemContext
   )
 {
-  UINTN                   ImageBase;
-  UINTN                   EntryPoint;
-
   InternalPrintMessage (
     "!!!! IA32 Exception Type - %02x(%a)  CPU Apic ID - %08x !!!!\n",
     ExceptionType,
     GetExceptionNameStr (ExceptionType),
     GetApicId ()
     );
-
+  if ((mErrorCodeFlag & (1 << ExceptionType)) != 0) {
+    InternalPrintMessage (
+      "ExceptionData - %08x",
+      SystemContext.SystemContextIa32->ExceptionData
+      );
+    if (ExceptionType == EXCEPT_IA32_PAGE_FAULT) {
+      InternalPrintMessage (
+        "  I:%x R:%x U:%x W:%x P:%x PK:%x S:%x",
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID)   != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_RSVD) != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_US)   != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_WR)   != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_P)    != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_PK)   != 0,
+        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_SGX)  != 0
+        );
+    }
+    InternalPrintMessage ("\n");
+  }
   InternalPrintMessage (
     "EIP  - %08x, CS  - %08x, EFLAGS - %08x\n",
     SystemContext.SystemContextIa32->Eip,
     SystemContext.SystemContextIa32->Cs,
     SystemContext.SystemContextIa32->Eflags
     );
-  if ((mErrorCodeFlag & (1 << ExceptionType)) != 0) {
-    InternalPrintMessage (
-      "ExceptionData - %08x\n",
-      SystemContext.SystemContextIa32->ExceptionData
-      );
-  }
   InternalPrintMessage (
     "EAX  - %08x, ECX - %08x, EDX - %08x, EBX - %08x\n",
     SystemContext.SystemContextIa32->Eax,
@@ -198,16 +208,23 @@ DumpCpuContent (
     "FXSAVE_STATE - %08x\n",
     &SystemContext.SystemContextIa32->FxSaveState
     );
+}
 
+/**
+  Display CPU information.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+**/
+VOID
+DumpImageAndCpuContent (
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  )
+{
+  DumpCpuContext (ExceptionType, SystemContext);
   //
-  // Find module image base and module entry point by RIP
+  // Dump module image base and module entry point by EIP
   //
-  ImageBase = FindModuleImageBase (SystemContext.SystemContextIa32->Eip, &EntryPoint);
-  if (ImageBase != 0) {
-    InternalPrintMessage (
-      " (ImageBase=%08x, EntryPoint=%08x) !!!!\n",
-      ImageBase,
-      EntryPoint
-      );
-  }
+  DumpModuleImageInfo (SystemContext.SystemContextIa32->Eip);
 }
