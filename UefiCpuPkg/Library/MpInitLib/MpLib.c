@@ -382,13 +382,13 @@ ApInitializeSync (
 
   CpuMpData = (CPU_MP_DATA *) Buffer;
   //
-  // Sync BSP's MTRR table to AP
-  //
-  MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
-  //
   // Load microcode on AP
   //
   MicrocodeDetect (CpuMpData);
+  //
+  // Sync BSP's MTRR table to AP
+  //
+  MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
 }
 
 /**
