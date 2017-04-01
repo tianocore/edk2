@@ -4,7 +4,7 @@
   read/write debug packet to communication with HOST based on transfer
   protocol.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -201,55 +201,17 @@ FindAndReportModuleImageInfo (
   )
 {
   UINTN                                Pe32Data;
-  EFI_IMAGE_DOS_HEADER                 *DosHdr;
-  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
   PE_COFF_LOADER_IMAGE_CONTEXT         ImageContext;
 
   //
   // Find Image Base
   //
-  Pe32Data = ((UINTN)mErrorMsgVersionAlert) & ~(AlignSize - 1);
-  while (Pe32Data != 0) {
-    DosHdr = (EFI_IMAGE_DOS_HEADER *) Pe32Data;
-    if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-      //
-      // DOS image header is present, so read the PE header after the DOS image header.
-      //
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
-      //
-      // Make sure PE header address does not overflow and is less than the initial address.
-      //
-      if (((UINTN)Hdr.Pe32 > Pe32Data) && ((UINTN)Hdr.Pe32 < (UINTN)mErrorMsgVersionAlert)) {
-        if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
-          //
-          // It's PE image.
-          //
-          break;
-        }
-      }
-    } else {
-      //
-      // DOS image header is not present, TE header is at the image base.
-      //
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
-      if ((Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) &&
-          ((Hdr.Te->Machine == IMAGE_FILE_MACHINE_I386) || Hdr.Te->Machine == IMAGE_FILE_MACHINE_X64)) {
-        //
-        // It's TE image, it TE header and Machine type match
-        //
-        break;
-      }
-    }
-
-    //
-    // Not found the image base, check the previous aligned address
-    //
-    Pe32Data -= AlignSize;
+  Pe32Data = PeCoffSerachImageBase ((UINTN) mErrorMsgVersionAlert);
+  if (Pe32Data != 0) {
+    ImageContext.ImageAddress = Pe32Data;
+    ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
+    PeCoffLoaderRelocateImageExtraAction (&ImageContext);
   }
-
-  ImageContext.ImageAddress = Pe32Data;
-  ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);
-  PeCoffLoaderRelocateImageExtraAction (&ImageContext);
 }
 
 /**
