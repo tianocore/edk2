@@ -2,7 +2,7 @@
 #
 # This file contained the miscellaneous routines for GenMetaFile usage.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -108,33 +108,28 @@ def ObtainPcdName(Packages, TokenSpaceGuidValue, Token):
         TokenSpaceGuidName = ''
         PcdCName = ''
         TokenSpaceGuidNameFound = False
-        PcdCNameFound = False
 
         #
         # Get TokenSpaceGuidCName from Guids section 
         #
         for GuidKey in DecGuidsDict:
             GuidList = DecGuidsDict[GuidKey]
-            if TokenSpaceGuidNameFound:
-                break
             for GuidItem in GuidList:
                 if TokenSpaceGuidValue.upper() == GuidItem.GuidString.upper():
                     TokenSpaceGuidName = GuidItem.GuidCName
                     TokenSpaceGuidNameFound = True
                     break
-
+            if TokenSpaceGuidNameFound:
+                break
         #
         # Retrieve PcdCName from Pcds Section
         #
         for PcdKey in DecPcdsDict:
             PcdList = DecPcdsDict[PcdKey]
-            if PcdCNameFound:
-                return TokenSpaceGuidName, PcdCName
             for PcdItem in PcdList:
                 if TokenSpaceGuidName == PcdItem.TokenSpaceGuidCName and Token == PcdItem.TokenValue:
                     PcdCName = PcdItem.TokenCName
-                    PcdCNameFound = True
-                    break
+                    return TokenSpaceGuidName, PcdCName
 
     return TokenSpaceGuidName, PcdCName
 

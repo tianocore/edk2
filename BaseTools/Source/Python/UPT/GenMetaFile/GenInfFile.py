@@ -568,8 +568,9 @@ def GenUserExtensions(ModuleObject):
         if UserExtension.GetIdentifier() == 'Depex':
             continue
         Statement = UserExtension.GetStatement()
-        if not Statement:
-            continue
+# Comment the code to support user extension without any statement just the section header in []
+#         if not Statement:
+#             continue
         ArchList = UserExtension.GetSupArchList()
         for Index in xrange(0, len(ArchList)):
             ArchList[Index] = ConvertArchForInstall(ArchList[Index])
