@@ -2,7 +2,7 @@
   CPU Exception library provides the default CPU interrupt/exception handler.
   It also provides capability to register user interrupt/exception handler.
 
-  Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -93,4 +93,17 @@ RegisterCpuInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
   );
 
+/**
+  Display processor context.
+
+  @param[in] ExceptionType  Exception type.
+  @param[in] SystemContext  Processor context to be display.
+**/
+VOID
+EFIAPI
+DumpCpuContext (
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  );
+  
 #endif

@@ -1,7 +1,7 @@
 /** @file
   CPU Exception Handler library implementition with empty functions.
 
-  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -97,3 +97,17 @@ RegisterCpuInterruptHandler (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  Display processor context.
+
+  @param[in] ExceptionType  Exception type.
+  @param[in] SystemContext  Processor context to be display.
+**/
+VOID
+EFIAPI
+DumpCpuContext (
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  )
+{
+}
