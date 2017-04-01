@@ -173,48 +173,17 @@ DumpModuleInfoByIp (
   )
 {
   UINTN                                Pe32Data;
-  EFI_IMAGE_DOS_HEADER                 *DosHdr;
-  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
   VOID                                 *PdbPointer;
-  UINT64                               DumpIpAddress;
 
   //
   // Find Image Base
   //
-  Pe32Data = CallerIpAddress & ~(SIZE_4KB - 1);
-  while (Pe32Data != 0) {
-    DosHdr = (EFI_IMAGE_DOS_HEADER *) Pe32Data;
-    if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-      //
-      // DOS image header is present, so read the PE header after the DOS image header.
-      //
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
-      //
-      // Make sure PE header address does not overflow and is less than the initial address.
-      //
-      if (((UINTN)Hdr.Pe32 > Pe32Data) && ((UINTN)Hdr.Pe32 < CallerIpAddress)) {
-        if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
-          //
-          // It's PE image.
-          //
-          break;
-        }
-      }
-    }
-
-    //
-    // Not found the image base, check the previous aligned address
-    //
-    Pe32Data -= SIZE_4KB;
-  }
-
-  DumpIpAddress = CallerIpAddress;
-  DEBUG ((EFI_D_ERROR, "It is invoked from the instruction before IP(0x%lx)", DumpIpAddress));
-
+  Pe32Data = PeCoffSerachImageBase (CallerIpAddress);
   if (Pe32Data != 0) {
+    DEBUG ((DEBUG_ERROR, "It is invoked from the instruction before IP(0x%p)", (VOID *) CallerIpAddress));
     PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *) Pe32Data);
     if (PdbPointer != NULL) {
-      DEBUG ((EFI_D_ERROR, " in module (%a)", PdbPointer));
+      DEBUG ((DEBUG_ERROR, " in module (%a)\n", PdbPointer));
     }
   }
 }

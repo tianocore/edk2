@@ -1,7 +1,7 @@
 /** @file
 Page table manipulation functions for IA-32 processors
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -88,8 +88,8 @@ SmiDefaultPFHandler (
 VOID
 EFIAPI
 SmiPFHandler (
-    IN EFI_EXCEPTION_TYPE   InterruptType,
-    IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
   )
 {
   UINTN             PFAddress;
@@ -108,6 +108,7 @@ SmiPFHandler (
   //
   if ((PFAddress >= mCpuHotPlugData.SmrrBase) &&
       (PFAddress < (mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize))) {
+    DumpCpuContext (InterruptType, SystemContext);
     CpuIndex = GetCpuIndex ();
     GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * mSmmStackSize);
     if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
@@ -115,15 +116,6 @@ SmiPFHandler (
         (PFAddress < (GuardPageAddress + EFI_PAGE_SIZE))) {
       DEBUG ((DEBUG_ERROR, "SMM stack overflow!\n"));
     } else {
-      DEBUG ((DEBUG_ERROR, "SMM exception data - 0x%x(", SystemContext.SystemContextIa32->ExceptionData));
-      DEBUG ((DEBUG_ERROR, "I:%x, R:%x, U:%x, W:%x, P:%x",
-        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID) != 0,
-        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_RSVD) != 0,
-        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_US) != 0,
-        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_WR) != 0,
-        (SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_P) != 0
-        ));
-      DEBUG ((DEBUG_ERROR, ")\n"));
       if ((SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID) != 0) {
         DEBUG ((DEBUG_ERROR, "SMM exception at execution (0x%x)\n", PFAddress));
         DEBUG_CODE (
@@ -144,6 +136,7 @@ SmiPFHandler (
   //
   if ((PFAddress < mCpuHotPlugData.SmrrBase) ||
       (PFAddress >= mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
+    DumpCpuContext (InterruptType, SystemContext);
     if ((SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID) != 0) {
       DEBUG ((DEBUG_ERROR, "Code executed on IP(0x%x) out of SMM range after SMM is locked!\n", PFAddress));
       DEBUG_CODE (
@@ -166,6 +159,7 @@ SmiPFHandler (
       SystemContext.SystemContextIa32->ExceptionData
       );
   } else {
+    DumpCpuContext (InterruptType, SystemContext);
     SmiDefaultPFHandler ();
   }
 

@@ -694,8 +694,8 @@ SmmRelocateBases (
 VOID
 EFIAPI
 SmiPFHandler (
-    IN EFI_EXCEPTION_TYPE   InterruptType,
-    IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
   );
 
 /**
