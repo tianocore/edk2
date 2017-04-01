@@ -1,7 +1,7 @@
 /** @file
   Provides a service to retrieve the PE/COFF entry point from a PE/COFF image.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -99,6 +99,24 @@ UINT32
 EFIAPI
 PeCoffGetSizeOfHeaders (
   IN VOID     *Pe32Data
+  );
+
+/**
+  Returns PE/COFF image base specified by the address in this PE/COFF image.
+
+  On DEBUG build, searches the PE/COFF image base forward the address in this
+  PE/COFF image and returns it.
+
+  @param  Address    Address located in one PE/COFF image.
+
+  @retval 0          RELEASE build or cannot find the PE/COFF image base.
+  @retval others     PE/COFF image base found.
+
+**/
+UINTN
+EFIAPI
+PeCoffSerachImageBase (
+  IN UINTN    Address
   );
 
 #endif

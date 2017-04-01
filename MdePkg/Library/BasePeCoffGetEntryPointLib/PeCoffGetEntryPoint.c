@@ -2,7 +2,7 @@
   Provides the services to get the entry point to a PE/COFF image that has either been 
   loaded into memory or is executing at it's linked address.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,8 @@
 #include <Library/DebugLib.h>
 
 #include <IndustryStandard/PeImage.h>
+
+#define PE_COFF_IMAGE_ALIGN_SIZE        4
 
 /**
   Retrieves and returns a pointer to the entry point to a PE/COFF image that has been loaded
@@ -316,3 +318,71 @@ PeCoffGetSizeOfHeaders (
   return (UINT32) SizeOfHeaders;
 }
 
+/**
+  Returns PE/COFF image base is loaded in system memory where the input address is in.
+
+  On DEBUG build, searches the PE/COFF image base forward the input address and
+  returns it.
+
+  @param  Address    Address located in one PE/COFF image.
+
+  @retval 0          RELEASE build or cannot find the PE/COFF image base.
+  @retval others     PE/COFF image base found.
+
+**/
+UINTN
+EFIAPI
+PeCoffSerachImageBase (
+  IN UINTN    Address
+  )
+{
+  UINTN                                Pe32Data;
+
+  Pe32Data = 0;
+
+  DEBUG_CODE (
+    EFI_IMAGE_DOS_HEADER                 *DosHdr;
+    EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+
+    //
+    // Find Image Base
+    //
+    Pe32Data = Address & ~(PE_COFF_IMAGE_ALIGN_SIZE - 1);
+    while (Pe32Data != 0) {
+      DosHdr = (EFI_IMAGE_DOS_HEADER *) Pe32Data;
+      if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+        //
+        // DOS image header is present, so read the PE header after the DOS image header.
+        //
+        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Pe32Data + (UINTN) ((DosHdr->e_lfanew) & 0x0ffff));
+        //
+        // Make sure PE header address does not overflow and is less than the initial address.
+        //
+        if (((UINTN)Hdr.Pe32 > Pe32Data) && ((UINTN)Hdr.Pe32 < Address)) {
+          if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
+            break;
+          }
+        }
+      } else {
+        //
+        // DOS image header is not present, TE header is at the image base.
+        //
+        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
+        if ((Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) &&
+            ((Hdr.Te->Machine == IMAGE_FILE_MACHINE_I386)  || (Hdr.Te->Machine == IMAGE_FILE_MACHINE_IA64) ||
+             (Hdr.Te->Machine == IMAGE_FILE_MACHINE_EBC)   || (Hdr.Te->Machine == IMAGE_FILE_MACHINE_X64)  ||
+             (Hdr.Te->Machine == IMAGE_FILE_MACHINE_ARM64) || (Hdr.Te->Machine == IMAGE_FILE_MACHINE_ARMTHUMB_MIXED))
+             ) {
+          break;
+        }
+      }
+
+      //
+      // Not found the image base, check the previous aligned address
+      //
+      Pe32Data -= PE_COFF_IMAGE_ALIGN_SIZE;
+    }
+  );
+
+  return Pe32Data;
+}
