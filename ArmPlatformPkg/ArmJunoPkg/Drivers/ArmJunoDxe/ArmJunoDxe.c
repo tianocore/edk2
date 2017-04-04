@@ -379,7 +379,6 @@ OnEndOfDxe (
   EFI_DEVICE_PATH_PROTOCOL* PciRootComplexDevicePath;
   EFI_HANDLE                Handle;
   EFI_STATUS                Status;
-  UINT32                    JunoRevision;
 
   //
   // PCI Root Complex initialization
@@ -395,13 +394,9 @@ OnEndOfDxe (
   Status = gBS->ConnectController (Handle, NULL, PciRootComplexDevicePath, FALSE);
   ASSERT_EFI_ERROR (Status);
 
-  GetJunoRevision (JunoRevision);
-
-  if (JunoRevision != JUNO_REVISION_R0) {
-    Status = ArmJunoSetNicMacAddress ();
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "ArmJunoDxe: Failed to set Marvell Yukon NIC MAC address\n"));
-    }
+  Status = ArmJunoSetNicMacAddress ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "ArmJunoDxe: Failed to set Marvell Yukon NIC MAC address\n"));
   }
 }
 
@@ -511,22 +506,6 @@ ArmJunoEntryPoint (
     }
   }
 
-  //
-  // Create an event belonging to the "gEfiEndOfDxeEventGroupGuid" group.
-  // The "OnEndOfDxe()" function is declared as the call back function.
-  // It will be called at the end of the DXE phase when an event of the
-  // same group is signalled to inform about the end of the DXE phase.
-  // Install the INSTALL_FDT_PROTOCOL protocol.
-  //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  OnEndOfDxe,
-                  NULL,
-                  &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent
-                  );
-
   // Install dynamic Shell command to run baremetal binaries.
   Status = ShellDynCmdRunAxfInstall (ImageHandle);
   if (EFI_ERROR (Status)) {
@@ -554,6 +533,22 @@ ArmJunoEntryPoint (
   if (JunoRevision != JUNO_REVISION_R0) {
     // Enable PCI enumeration
     PcdSetBool (PcdPciDisableBusEnumeration, FALSE);
+
+    //
+    // Create an event belonging to the "gEfiEndOfDxeEventGroupGuid" group.
+    // The "OnEndOfDxe()" function is declared as the call back function.
+    // It will be called at the end of the DXE phase when an event of the
+    // same group is signalled to inform about the end of the DXE phase.
+    // Install the INSTALL_FDT_PROTOCOL protocol.
+    //
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    OnEndOfDxe,
+                    NULL,
+                    &gEfiEndOfDxeEventGroupGuid,
+                    &EndOfDxeEvent
+                    );
 
     // Declare the related ACPI Tables
     EfiCreateProtocolNotifyEvent (
