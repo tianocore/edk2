@@ -39,7 +39,9 @@ PlatformPeim (
   INT32              Node, Prev;
   CONST CHAR8        *Compatible;
   CONST CHAR8        *CompItem;
+  CONST CHAR8        *NodeStatus;
   INT32              Len;
+  INT32              StatusLen;
   CONST UINT64       *RegProp;
   UINT64             UartBase;
 
@@ -83,6 +85,11 @@ PlatformPeim (
       CompItem += 1 + AsciiStrLen (CompItem)) {
 
       if (AsciiStrCmp (CompItem, "arm,pl011") == 0) {
+        NodeStatus = fdt_getprop (Base, Node, "status", &StatusLen);
+        if (NodeStatus != NULL && AsciiStrCmp (NodeStatus, "okay") != 0) {
+          continue;
+        }
+
         RegProp = fdt_getprop (Base, Node, "reg", &Len);
         ASSERT (Len == 16);
 
