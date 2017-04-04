@@ -210,6 +210,7 @@ FindNextMemoryNodeReg (
 {
   INT32          Prev, Next;
   CONST CHAR8    *DeviceType;
+  CONST CHAR8    *NodeStatus;
   INT32          Len;
   EFI_STATUS     Status;
 
@@ -220,6 +221,13 @@ FindNextMemoryNodeReg (
     Next = fdt_next_node (mDeviceTreeBase, Prev, NULL);
     if (Next < 0) {
       break;
+    }
+
+    NodeStatus = fdt_getprop (mDeviceTreeBase, Next, "status", &Len);
+    if (NodeStatus != NULL && AsciiStrCmp (NodeStatus, "okay") != 0) {
+      DEBUG ((DEBUG_WARN, "%a: ignoring memory node with status \"%a\"\n",
+        __FUNCTION__, NodeStatus));
+      continue;
     }
 
     DeviceType = fdt_getprop (mDeviceTreeBase, Next, "device_type", &Len);
