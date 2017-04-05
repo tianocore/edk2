@@ -702,6 +702,7 @@ MtrrLibGetPositiveMtrrNumber (
   BOOLEAN        UseLeastAlignment;
 
   UseLeastAlignment = TRUE;
+  SubLength = 0;
 
   //
   // Calculate the alignment of the base address.
@@ -854,6 +855,7 @@ MtrrLibGetMtrrNumber (
   *SubLeft = 0;
   *SubRight = 0;
   LeastSubtractiveMtrrNumber = 0;
+  BaseAlignment = 0;
 
   //
   // Get the optimal left subtraction solution.
@@ -1626,6 +1628,8 @@ MtrrLibSetMemoryAttributeInVariableMtrr (
   UINT32                    SubtractiveLeft;
   UINT32                    SubtractiveRight;
   BOOLEAN                   UseLeastAlignment;
+
+  Alignment = 0;
 
   MtrrNumber = MtrrLibGetMtrrNumber (Ranges, RangeCount, VariableMtrr, *VariableMtrrCount,
                                      BaseAddress, Length, Type, Alignment0, &SubtractiveLeft, &SubtractiveRight);
