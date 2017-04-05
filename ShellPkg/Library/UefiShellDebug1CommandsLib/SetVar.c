@@ -1,4 +1,4 @@
-﻿/** @file
+/** @file
   Main file for SetVar shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
@@ -279,6 +279,7 @@ GetVariableDataFromParameter (
 
   for (Index = 2; Index < ShellCommandLineGetCount (Package); Index++) {
     TempData = ShellCommandLineGetRawValue (Package, Index);
+    ASSERT (TempData != NULL);
 
     if (TempData[0] != L'=') {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", TempData);
