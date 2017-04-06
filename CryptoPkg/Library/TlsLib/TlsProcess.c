@@ -460,3 +460,4 @@ TlsWrite (
   //
   return SSL_write (TlsConn->Ssl, Buffer, (UINT32) BufferSize);
 }
+
