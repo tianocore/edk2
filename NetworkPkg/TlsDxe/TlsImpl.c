@@ -51,7 +51,7 @@ TlsEncryptPacket (
   UINT32              BufferOutSize;
   UINT8               *BufferOut;
   INTN                Ret;
-  
+
   Status           = EFI_SUCCESS;
   BytesCopied      = 0;
   BufferInSize     = 0;
@@ -104,16 +104,16 @@ TlsEncryptPacket (
   TempRecordHeader = (TLS_RECORD_HEADER *) BufferOut;
   while ((UINTN) BufferInPtr < (UINTN) BufferIn + BufferInSize) {
     RecordHeaderIn = (TLS_RECORD_HEADER *) BufferInPtr;
-    
+
     if (RecordHeaderIn->ContentType != TlsContentTypeApplicationData) {
       Status = EFI_INVALID_PARAMETER;
       goto ERROR;
     }
-    
+
     ThisPlainMessageSize = RecordHeaderIn->Length;
 
     TlsWrite (TlsInstance->TlsConn, (UINT8 *) (RecordHeaderIn + 1), ThisPlainMessageSize);
-    
+
     Ret = TlsCtrlTrafficOut (TlsInstance->TlsConn, (UINT8 *)(TempRecordHeader), MAX_BUFFER_SIZE - BufferOutSize);
 
     if (Ret > 0) {
@@ -123,7 +123,7 @@ TlsEncryptPacket (
       // No data was successfully encrypted, continue to encrypt other messages.
       //
       DEBUG ((EFI_D_WARN, "TlsEncryptPacket: No data read from TLS object.\n"));
-    
+
       ThisMessageSize = 0;
     }
 
@@ -152,7 +152,7 @@ TlsEncryptPacket (
   return Status;
 
 ERROR:
-  
+
   if (BufferIn != NULL) {
     FreePool (BufferIn);
     BufferIn = NULL;
@@ -162,7 +162,7 @@ ERROR:
     FreePool (BufferOut);
     BufferOut = NULL;
   }
-  
+
   return Status;
 }
 
@@ -260,7 +260,7 @@ TlsDecryptPacket (
       Status = EFI_INVALID_PARAMETER;
       goto ERROR;
     }
-    
+
     ThisCipherMessageSize = NTOHS (RecordHeaderIn->Length);
 
     Ret = TlsCtrlTrafficIn (TlsInstance->TlsConn, (UINT8 *) (RecordHeaderIn), RECORD_HEADER_LEN + ThisCipherMessageSize);
@@ -280,7 +280,7 @@ TlsDecryptPacket (
       // No data was successfully decrypted, continue to decrypt other messages.
       //
       DEBUG ((EFI_D_WARN, "TlsDecryptPacket: No data read from TLS object.\n"));
-    
+
       ThisPlainMessageSize = 0;
     }
 
@@ -311,7 +311,7 @@ TlsDecryptPacket (
   return Status;
 
 ERROR:
-  
+
   if (BufferIn != NULL) {
     FreePool (BufferIn);
     BufferIn = NULL;
@@ -321,6 +321,7 @@ ERROR:
     FreePool (BufferOut);
     BufferOut = NULL;
   }
-  
-  return Status;  
+
+  return Status;
 }
+

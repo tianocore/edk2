@@ -12,8 +12,8 @@
 //
 // **/
 
-#string STR_PROPERTIES_MODULE_NAME 
-#language en-US 
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US
 "TLS Auth Config DXE"
 
 

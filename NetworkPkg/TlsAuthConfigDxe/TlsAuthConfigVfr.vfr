@@ -31,7 +31,7 @@ formset
     title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_TITLE);
 
     subtitle text = STRING_TOKEN(STR_NULL);
-    
+
     //
     // Display Server CA configration
     //
@@ -53,7 +53,7 @@ formset
          flags  = INTERACTIVE,
          key    = KEY_TLS_AUTH_CONFIG_CLIENT_CERT;
     endif;
-  endform; 
+  endform;
 
   //
   // ##2 Form2: CA configuration
@@ -83,7 +83,7 @@ formset
   //
   form formid = TLS_AUTH_CONFIG_FORMID3_FORM,
     title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_CLIENT_CERT);
-    
+
     subtitle text = STRING_TOKEN(STR_NULL);
 
   //
@@ -96,7 +96,7 @@ formset
   //
   form formid = TLS_AUTH_CONFIG_FORMID4_FORM,
     title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_ENROLL_CERT);
-    
+
     subtitle text = STRING_TOKEN(STR_NULL);
 
     goto TLS_AUTH_CONFIG_FORMID4_FORM,
@@ -133,7 +133,7 @@ formset
          help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_NO_SAVE_AND_EXIT),
          flags  = INTERACTIVE,
          key    = KEY_TLS_AUTH_CONFIG_VALUE_NO_SAVE_AND_EXIT;
-         
+
   endform;
 
   //
@@ -144,9 +144,10 @@ formset
 
     label LABEL_CA_DELETE;
     label LABEL_END;
-    
+
     subtitle text = STRING_TOKEN(STR_NULL);
 
   endform;
-  
+
 endformset;
+

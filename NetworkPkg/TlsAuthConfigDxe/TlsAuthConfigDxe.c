@@ -24,7 +24,7 @@
   @retval EFI_INVALID_PARAMETER ImageHandle is not a valid image handle.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 TlsAuthConfigDxeUnload (
   IN EFI_HANDLE  ImageHandle
@@ -37,11 +37,11 @@ TlsAuthConfigDxeUnload (
                   ImageHandle,
                   &gEfiCallerIdGuid,
                   (VOID **) &PrivateData
-                  );  
+                  );
   if (EFI_ERROR (Status)) {
-    return Status;  
+    return Status;
   }
-  
+
   ASSERT (PrivateData->Signature == TLS_AUTH_CONFIG_PRIVATE_DATA_SIGNATURE);
 
   gBS->UninstallMultipleProtocolInterfaces (
@@ -50,7 +50,7 @@ TlsAuthConfigDxeUnload (
          PrivateData,
          NULL
          );
-  
+
   TlsAuthConfigFormUnload (PrivateData);
 
   return EFI_SUCCESS;
@@ -79,7 +79,7 @@ TlsAuthConfigDxeDriverEntryPoint (
   TLS_AUTH_CONFIG_PRIVATE_DATA   *PrivateData;
 
   PrivateData = NULL;
-  
+
   //
   // If already started, return.
   //
@@ -113,7 +113,7 @@ TlsAuthConfigDxeDriverEntryPoint (
 
   //
   // Install private GUID.
-  //    
+  //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
                   &gEfiCallerIdGuid,
@@ -123,7 +123,7 @@ TlsAuthConfigDxeDriverEntryPoint (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   return EFI_SUCCESS;
 
 ON_ERROR:

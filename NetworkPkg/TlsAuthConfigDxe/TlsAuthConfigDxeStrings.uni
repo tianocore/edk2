@@ -17,14 +17,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_TLS_AUTH_CONFIG_TITLE                    #language en-US "Tls Auth Configuration"
 #string STR_TLS_AUTH_CONFIG_HELP                     #language en-US "Press <Enter> to select Tls Auth Configuration."
 
-#string STR_TLS_AUTH_CONFIG_SERVER_CA         		 #language en-US "Server CA Configuration"
-#string STR_TLS_AUTH_CONFIG_SERVER_CA_HELP    		 #language en-US "Press <Enter> to configure Server CA."
-#string STR_TLS_AUTH_CONFIG_CLIENT_CERT         	 #language en-US "Client Cert Configuration"
-#string STR_TLS_AUTH_CONFIG_CLIENT_CERT_HELP    	 #language en-US "Client cert configuration is unsupported currently."
+#string STR_TLS_AUTH_CONFIG_SERVER_CA              #language en-US "Server CA Configuration"
+#string STR_TLS_AUTH_CONFIG_SERVER_CA_HELP         #language en-US "Press <Enter> to configure Server CA."
+#string STR_TLS_AUTH_CONFIG_CLIENT_CERT            #language en-US "Client Cert Configuration"
+#string STR_TLS_AUTH_CONFIG_CLIENT_CERT_HELP       #language en-US "Client cert configuration is unsupported currently."
 
-#string STR_TLS_AUTH_CONFIG_ENROLL_CERT              #language en-US "Enroll Cert"    
+#string STR_TLS_AUTH_CONFIG_ENROLL_CERT              #language en-US "Enroll Cert"
 #string STR_TLS_AUTH_CONFIG_ENROLL_CERT_HELP         #language en-US "Press <Enter> to enroll cert."
-#string STR_TLS_AUTH_CONFIG_DELETE_CERT              #language en-US "Delete Cert"    
+#string STR_TLS_AUTH_CONFIG_DELETE_CERT              #language en-US "Delete Cert"
 #string STR_TLS_AUTH_CONFIG_DELETE_CERT_HELP         #language en-US "Press <Enter> to delete cert."
 
 #string STR_TLS_AUTH_CONFIG_ADD_CERT_FILE            #language en-US "Enroll Cert Using File"

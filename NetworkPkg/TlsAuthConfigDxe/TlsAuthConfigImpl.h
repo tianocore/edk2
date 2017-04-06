@@ -115,7 +115,7 @@ TlsAuthConfigFormInit (
   );
 
 /**
-   
+
   This function allows the caller to request the current
   configuration for one or more named elements. The resulting
   string is in <ConfigAltResp> format. Any and all alternative
@@ -136,12 +136,12 @@ TlsAuthConfigFormInit (
                     includes the routing information as well as
                     the configurable name / value pairs. It is
                     invalid for this string to be in
-                    <MultiConfigRequest> format. 
-                    If a NULL is passed in for the Request field, 
-                    all of the settings being abstracted by this function 
-                    will be returned in the Results field.  In addition, 
-                    if a ConfigHdr is passed in with no request elements, 
-                    all of the settings being abstracted for that particular 
+                    <MultiConfigRequest> format.
+                    If a NULL is passed in for the Request field,
+                    all of the settings being abstracted by this function
+                    will be returned in the Results field.  In addition,
+                    if a ConfigHdr is passed in with no request elements,
+                    all of the settings being abstracted for that particular
                     ConfigHdr reference will be returned in the Results Field.
 
   @param Progress   On return, points to a character in the
@@ -195,7 +195,7 @@ TlsAuthConfigAccessExtractConfig (
   );
 
 /**
-   
+
   This function applies changes in a driver's configuration.
   Input is a Configuration, which has the routing data for this
   driver followed by name / value configuration pairs. The driver
@@ -208,8 +208,8 @@ TlsAuthConfigAccessExtractConfig (
   @param This           Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
 
   @param Configuration  A null-terminated Unicode string in
-                        <ConfigString> format. 
-  
+                        <ConfigString> format.
+
   @param Progress       A pointer to a string filled in with the
                         offset of the most recent '&' before the
                         first failing name / value pair (or the
@@ -220,16 +220,16 @@ TlsAuthConfigAccessExtractConfig (
 
   @retval EFI_SUCCESS             The results have been distributed or are
                                   awaiting distribution.
-  
+
   @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
-  
+
   @retval EFI_INVALID_PARAMETERS  Passing in a NULL for the
                                   Results parameter would result
                                   in this type of error.
-  
+
   @retval EFI_NOT_FOUND           Target for the specified routing data
                                   was not found
 
@@ -240,10 +240,10 @@ TlsAuthConfigAccessRouteConfig (
   IN CONST  EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
   IN CONST  EFI_STRING                      Configuration,
   OUT       EFI_STRING                      *Progress
-  );  
+  );
 
 /**
-   
+
   This function is called to provide results data to the driver.
   This data consists of a unique key that is used to identify
   which data is either being passed back or being asked for.
@@ -252,7 +252,7 @@ TlsAuthConfigAccessRouteConfig (
   @param  Action                 Specifies the type of action taken by the browser.
   @param  QuestionId             A unique value which is sent to the original
                                  exporting driver so that it can identify the type
-                                 of data to expect. The format of the data tends to 
+                                 of data to expect. The format of the data tends to
                                  vary based on the opcode that generated the callback.
   @param  Type                   The type of value for the question.
   @param  Value                  A pointer to the data being sent to the original

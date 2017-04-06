@@ -47,3 +47,4 @@ typedef struct {
 } TLS_AUTH_CONFIG_IFR_NVDATA;
 
 #endif
+

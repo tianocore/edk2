@@ -389,7 +389,7 @@ TlsConfigCertificate (
 
   CACert     = NULL;
   CACertSize = 0;
-  
+
   //
   // Try to read the TlsCaCertificate variable.
   //
@@ -1045,7 +1045,7 @@ TlsConnectSession (
     FreePool (BufferOut);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   CopyMem (DataOut, BufferOut, BufferOutSize);
   Status = TlsCommonTransmit (HttpInstance, PacketOut);
 
@@ -1130,7 +1130,7 @@ TlsConnectSession (
         FreePool (BufferOut);
         return EFI_OUT_OF_RESOURCES;
       }
-      
+
       CopyMem (DataOut, BufferOut, BufferOutSize);
 
       Status = TlsCommonTransmit (HttpInstance, PacketOut);
@@ -1286,7 +1286,7 @@ TlsCloseSession (
     FreePool (BufferOut);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   CopyMem (DataOut, BufferOut, BufferOutSize);
 
   Status = TlsCommonTransmit (HttpInstance, PacketOut);
@@ -1560,7 +1560,7 @@ HttpsReceive (
             FreePool (BufferOut);
             return EFI_OUT_OF_RESOURCES;
           }
-          
+
           CopyMem (DataOut, BufferOut, BufferOutSize);
 
           Status = TlsCommonTransmit (HttpInstance, PacketOut);
@@ -1652,7 +1652,7 @@ HttpsReceive (
         FreePool (BufferOut);
         return EFI_OUT_OF_RESOURCES;
       }
-      
+
       CopyMem (DataOut, BufferOut, BufferOutSize);
 
       Status = TlsCommonTransmit (HttpInstance, PacketOut);
@@ -1717,3 +1717,4 @@ HttpsReceive (
 
   return Status;
 }
+
