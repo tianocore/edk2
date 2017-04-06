@@ -784,6 +784,10 @@ Ip6ManualAddrDadCallback (
   Item       = &Instance->DataItem[Ip6ConfigDataTypeManualAddress];
   ManualAddr = NULL;
 
+  if (Item->DataSize == 0) {
+    return;
+  }
+
   for (Index = 0; Index < Item->DataSize / sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS); Index++) {
     //
     // Find the original tag used to place into the NET_MAP.
