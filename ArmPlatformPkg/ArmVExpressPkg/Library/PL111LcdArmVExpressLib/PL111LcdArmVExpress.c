@@ -17,10 +17,10 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/LcdPlatformLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include <Protocol/Cpu.h>
 #include <Protocol/EdidDiscovered.h>
 #include <Protocol/EdidActive.h>
 
@@ -165,7 +165,6 @@ LcdPlatformGetVram (
   )
 {
   EFI_STATUS              Status;
-  EFI_CPU_ARCH_PROTOCOL  *Cpu;
 
   Status = EFI_SUCCESS;
 
@@ -187,12 +186,9 @@ LcdPlatformGetVram (
       return Status;
     }
 
-    // Ensure the Cpu architectural protocol is already installed
-    Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
-    ASSERT_EFI_ERROR(Status);
-
-    // Mark the VRAM as un-cachable. The VRAM is inside the DRAM, which is cachable.
-    Status = Cpu->SetMemoryAttributes(Cpu, *VramBaseAddress, *VramSize, EFI_MEMORY_UC);
+    // Mark the VRAM as write-combining. The VRAM is inside the DRAM, which is cacheable.
+    Status = gDS->SetMemorySpaceAttributes (*VramBaseAddress, *VramSize,
+                    EFI_MEMORY_WC);
     ASSERT_EFI_ERROR(Status);
     if (EFI_ERROR(Status)) {
       gBS->FreePages (*VramBaseAddress, EFI_SIZE_TO_PAGES(*VramSize));

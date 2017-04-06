@@ -31,8 +31,9 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
-  BaseLib
   ArmPlatformSysConfigLib
+  BaseLib
+  DxeServicesTableLib
 
 [Protocols]
   gEfiEdidDiscoveredProtocolGuid                # Produced
