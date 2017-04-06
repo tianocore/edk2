@@ -1,7 +1,7 @@
 /** @file
-  Transport Layer Security  -- TLS 1.0/1.1/1.2 Standard definitions, from RFC 2246/4346/5246    
+  Transport Layer Security  -- TLS 1.0/1.1/1.2 Standard definitions, from RFC 2246/4346/5246
 
-  This file contains common TLS 1.0/1.1/1.2 definitions from RFC 2246/4346/5246 
+  This file contains common TLS 1.0/1.1/1.2 definitions from RFC 2246/4346/5246
 
   Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -81,7 +81,7 @@ typedef enum {
 ///
 /// TLS Record Header, refers to A.1 of rfc-2246, rfc-4346 and rfc-5246.
 ///
-typedef struct {   
+typedef struct {
   UINT8                   ContentType;
   EFI_TLS_VERSION         Version;
   UINT16                  Length;

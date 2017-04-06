@@ -34,7 +34,7 @@ typedef struct _EFI_TLS_CONFIGURATION_PROTOCOL EFI_TLS_CONFIGURATION_PROTOCOL;
 typedef enum {
   ///
   /// Local host configuration data: public certificate data.
-  /// This data should be DER-encoded binary X.509 certificate 
+  /// This data should be DER-encoded binary X.509 certificate
   /// or PEM-encoded X.509 certificate.
   ///
   EfiTlsConfigDataTypeHostPublicCert,
@@ -43,7 +43,7 @@ typedef enum {
   ///
   EfiTlsConfigDataTypeHostPrivateKey,
   ///
-  /// CA certificate to verify peer. This data should be PEM-encoded 
+  /// CA certificate to verify peer. This data should be PEM-encoded
   /// RSA or PKCS#8 private key.
   ///
   EfiTlsConfigDataTypeCACertificate,
@@ -130,3 +130,4 @@ struct _EFI_TLS_CONFIGURATION_PROTOCOL {
 extern EFI_GUID gEfiTlsConfigurationProtocolGuid;
 
 #endif  //__EFI_TLS_CONFIGURATION_PROTOCOL_H__
+

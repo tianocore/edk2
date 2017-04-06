@@ -458,3 +458,4 @@ extern EFI_GUID gEfiTlsServiceBindingProtocolGuid;
 extern EFI_GUID gEfiTlsProtocolGuid;
 
 #endif  // __EFI_TLS_PROTOCOL_H__
+
