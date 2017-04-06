@@ -146,7 +146,7 @@ LcdPlatformGetVram (
   Status = Cpu->SetMemoryAttributes (Cpu, *VramBaseAddress, *VramSize, EFI_MEMORY_UC);
   ASSERT_EFI_ERROR(Status);
   if (EFI_ERROR(Status)) {
-    gBS->FreePool (VramBaseAddress);
+    gBS->FreePages (*VramBaseAddress, EFI_SIZE_TO_PAGES (*VramSize));
     return Status;
   }
 
