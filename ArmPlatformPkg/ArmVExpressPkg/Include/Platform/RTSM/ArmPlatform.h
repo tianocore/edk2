@@ -40,9 +40,11 @@
 #define ARM_VE_SMB_SRAM_BASE                    0x2E000000
 #define ARM_VE_SMB_SRAM_SZ                      SIZE_64KB
 // USB, Ethernet, VRAM
-#define ARM_VE_SMB_PERIPH_BASE                  0x18000000
-#define PL111_CLCD_VRAM_MOTHERBOARD_BASE        ARM_VE_SMB_PERIPH_BASE
-#define ARM_VE_SMB_PERIPH_SZ                    SIZE_64MB
+#define ARM_VE_SMB_PERIPH_BASE                  0x18800000
+#define ARM_VE_SMB_PERIPH_SZ                    (SIZE_64MB - SIZE_8MB)
+
+#define PL111_CLCD_VRAM_MOTHERBOARD_BASE        0x18000000
+#define PL111_CLCD_VRAM_MOTHERBOARD_SIZE        0x800000
 
 // DRAM
 #define ARM_VE_DRAM_BASE                        PcdGet64 (PcdSystemMemoryBase)
@@ -73,8 +75,5 @@
 #define PL111_CLCD_SITE                         ARM_VE_MOTHERBOARD_SITE
 #define PL111_CLCD_MOTHERBOARD_VIDEO_MODE_OSC_ID  1
 #define PL111_CLCD_CORE_TILE_VIDEO_MODE_OSC_ID  1
-
-// VRAM offset for the PL111 Colour LCD Controller on the motherboard
-#define VRAM_MOTHERBOARD_BASE                     (ARM_VE_SMB_PERIPH_BASE   + 0x00000)
 
 #endif

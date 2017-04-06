@@ -21,7 +21,7 @@
 #include <ArmPlatform.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          8
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          9
 
 // DDR attributes
 #define DDR_ATTRIBUTES_CACHED   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
@@ -129,6 +129,18 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].VirtualBase = ARM_VE_SMB_PERIPH_BASE;
   VirtualMemoryTable[Index].Length = 2 * ARM_VE_SMB_PERIPH_SZ;
   VirtualMemoryTable[Index].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+
+  // VRAM
+  VirtualMemoryTable[++Index].PhysicalBase = PL111_CLCD_VRAM_MOTHERBOARD_BASE;
+  VirtualMemoryTable[Index].VirtualBase = PL111_CLCD_VRAM_MOTHERBOARD_BASE;
+  VirtualMemoryTable[Index].Length = PL111_CLCD_VRAM_MOTHERBOARD_SIZE;
+  //
+  // Map the VRAM region as Normal Non-Cacheable memory and not device memory,
+  // so that we can use the accelerated string routines that may use unaligned
+  // accesses or DC ZVA instructions. The enum identifier is slightly awkward
+  // here, but it maps to a memory type that allows buffering and reordering.
+  //
+  VirtualMemoryTable[Index].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
 
   // Map sparse memory region if present
   if (HasSparseMemory) {
