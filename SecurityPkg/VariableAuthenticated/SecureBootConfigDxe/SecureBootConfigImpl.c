@@ -98,15 +98,11 @@ SECUREBOOT_CONFIG_PRIVATE_DATA  *gSecureBootPrivateData = NULL;
 
 /**
   This code cleans up enrolled file by closing file & free related resources attached to
-  enrolled file
+  enrolled file.
 
-  @param[in] FileSuffix            The suffix of the input certificate file
-
-  @retval    TRUE           It's a DER-encoded certificate.
-  @retval    FALSE          It's NOT a DER-encoded certificate.
+  @param[in] FileContext            FileContext cached in SecureBootConfig driver
 
 **/
-
 VOID
 CloseEnrolledFile(
   IN SECUREBOOT_FILE_CONTEXT *FileContext
