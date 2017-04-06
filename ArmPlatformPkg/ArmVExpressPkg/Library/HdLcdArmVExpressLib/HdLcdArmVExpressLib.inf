@@ -32,8 +32,9 @@ HdLcdArmVExpress.c
   ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
 
 [LibraryClasses]
-  BaseLib
   ArmPlatformSysConfigLib
+  BaseLib
+  DxeServicesTableLib
 
 [Protocols]
   gEfiEdidDiscoveredProtocolGuid                # Produced
