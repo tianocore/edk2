@@ -1,7 +1,7 @@
 ## @file
 #  Intrinsic Routines Wrapper Library Instance.
 #
-#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -81,4 +81,3 @@
    MSFT:DEBUG_*_IPF_CC_FLAGS              == /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32 /Zi
    MSFT:RELEASE_*_IPF_CC_FLAGS            == /nologo /c /WX /GS- /X /W4 /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32
   INTEL:*_*_*_CC_FLAGS                    =  /Oi-
-    GCC:*_*_*_CC_FLAGS                    =  -fno-builtin
