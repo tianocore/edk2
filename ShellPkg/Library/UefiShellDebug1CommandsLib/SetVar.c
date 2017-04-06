@@ -247,7 +247,7 @@ ParseParameterData (
 /**
   Function to get each data from parameters.
 
-  @param[in]    Pacakge               The package of checked values.
+  @param[in]    Package               The package of checked values.
   @param[out]   Buffer                A pointer to a buffer to hold the return data.
   @param[out]   BufferSize            Indicates the size of data in bytes return in Buffer.
 
