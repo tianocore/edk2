@@ -45,8 +45,8 @@
 #define CPU_FEATURE_C1E                             16
 #define CPU_FEATURE_C1_AUTO_DEMOTION                17
 #define CPU_FEATURE_C3_AUTO_DEMOTION                18
-#define CPU_FEATURE_C1_AUTO_UNDEMOTION              19
-#define CPU_FEATURE_C3_AUTO_UNDEMOTION              20
+#define CPU_FEATURE_C1_UNDEMOTION                   19
+#define CPU_FEATURE_C3_UNDEMOTION                   20
 #define CPU_FEATURE_C_STATE                         21
 #define CPU_FEATURE_TM                              22
 #define CPU_FEATURE_TM2                             23
