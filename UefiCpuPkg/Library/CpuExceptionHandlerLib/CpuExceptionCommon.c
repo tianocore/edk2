@@ -1,4 +1,4 @@
-/** @file
+ /** @file
   CPU Exception Handler Library common functions.
 
   Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
@@ -106,11 +106,11 @@ InternalPrintMessage (
 
 /**
   Find and display image base address and return image base and its entry point.
-  
+
   @param CurrentEip      Current instruction pointer.
-  
+
 **/
-VOID 
+VOID
 DumpModuleImageInfo (
   IN  UINTN              CurrentEip
   )

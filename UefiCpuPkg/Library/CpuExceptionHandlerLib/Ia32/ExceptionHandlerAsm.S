@@ -357,7 +357,7 @@ HasErrorCode:
     #
     # Put Vector Number on stack and restore ECX
     #
-    xchgl   (%esp), %ecx 
+    xchgl   (%esp), %ecx
 
 ErrorCodeAndVectorOnStack:
     pushl   %ebp
@@ -384,13 +384,13 @@ ErrorCodeAndVectorOnStack:
     # Align stack to make sure that EFI_FX_SAVE_STATE_IA32 of EFI_SYSTEM_CONTEXT_IA32
     # is 16-byte aligned
     #
-    andl    $0x0fffffff0, %esp 
+    andl    $0x0fffffff0, %esp
     subl    $12, %esp
 
     subl    $8, %esp
     pushl   $0         # check EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
     pushl   $0         # check EXCEPTION_HANDLER_CONTEXT.ExceptionDataFlag
-       
+
 #; UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax;
     pushl   %eax
     pushl   %ecx
@@ -405,7 +405,7 @@ ErrorCodeAndVectorOnStack:
 #; UINT32  Gs, Fs, Es, Ds, Cs, Ss;
     movl    %ss, %eax
     pushl   %eax
-    movzwl  16(%ebp), %eax 
+    movzwl  16(%ebp), %eax
     pushl   %eax
     movl    %ds, %eax
     pushl   %eax
@@ -425,14 +425,14 @@ ErrorCodeAndVectorOnStack:
     sidt    (%esp)
     movl    2(%esp), %eax
     xchgl   (%esp), %eax
-    andl    $0x0FFFF, %eax 
+    andl    $0x0FFFF, %eax
     movl    %eax, 4(%esp)
 
     subl    $8, %esp
     sgdt    (%esp)
     movl    2(%esp), %eax
     xchgl   (%esp), %eax
-    andl    $0x0FFFF, %eax 
+    andl    $0x0FFFF, %eax
     movl    %eax, 4(%esp)
 
 #; UINT32  Ldtr, Tr;
@@ -450,21 +450,21 @@ ErrorCodeAndVectorOnStack:
 ## insure FXSAVE/FXRSTOR is enabled in CR4...
 ## ... while we're at it, make sure DE is also enabled...
     mov     $1, %eax
-    pushl   %ebx                         # temporarily save value of ebx on stack 
+    pushl   %ebx                         # temporarily save value of ebx on stack
     cpuid                                # use CPUID to determine if FXSAVE/FXRESTOR
                                          # and DE are supported
     popl    %ebx                         # retore value of ebx that was overwritten
-                                         # by CPUID 
+                                         # by CPUID
     movl    %cr4, %eax
     pushl   %eax                         # push cr4 firstly
     testl   $BIT24, %edx                 # Test for FXSAVE/FXRESTOR support
     jz      L1
     orl     $BIT9, %eax                  # Set CR4.OSFXSR
-L1:    
+L1:
     testl   $BIT2, %edx                  # Test for Debugging Extensions support
     jz      L2
     orl     $BIT3, %eax                  # Set CR4.DE
-L2:    
+L2:
     movl    %eax, %cr4
     movl    %cr3, %eax
     pushl   %eax
@@ -492,11 +492,11 @@ L2:
 #; FX_SAVE_STATE_IA32 FxSaveState;
     subl    $512, %esp
     movl    %esp, %edi
-    testl   $BIT24, %edx     # Test for FXSAVE/FXRESTOR support.  
+    testl   $BIT24, %edx     # Test for FXSAVE/FXRESTOR support.
                              # edx still contains result from CPUID above
     jz      L3
     .byte      0x0f, 0x0ae, 0x07 #fxsave [edi]
-L3:  
+L3:
 
 #; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
     cld
@@ -523,12 +523,12 @@ L3:
 #; FX_SAVE_STATE_IA32 FxSaveState;
     movl    %esp, %esi
     movl    $1, %eax
-    cpuid                    # use CPUID to determine if FXSAVE/FXRESTOR 
+    cpuid                    # use CPUID to determine if FXSAVE/FXRESTOR
                              # are supported
     testl   $BIT24, %edx     # Test for FXSAVE/FXRESTOR support
     jz      L4
     .byte      0x0f, 0x0ae, 0x0e # fxrstor [esi]
-L4:  
+L4:
     addl    $512, %esp
 
 #; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
@@ -612,30 +612,30 @@ DoIret:
 #---------------------------------------;
 # _AsmGetTemplateAddressMap             ;
 #---------------------------------------;
-# 
+#
 # Protocol prototype
 #   AsmGetTemplateAddressMap (
 #     EXCEPTION_HANDLER_TEMPLATE_MAP *AddressMap
 #   );
-#           
+#
 # Routine Description:
-# 
+#
 #  Return address map of interrupt handler template so that C code can generate
 #  interrupt table.
-# 
+#
 # Arguments:
-# 
-# 
-# Returns: 
-# 
+#
+#
+# Returns:
+#
 #   Nothing
 #
-# 
+#
 # Input:  [ebp][0]  = Original ebp
 #         [ebp][4]  = Return address
-#          
+#
 # Output: Nothing
-#          
+#
 # Destroys: Nothing
 #-----------------------------------------------------------------------------;
 #-------------------------------------------------------------------------------------

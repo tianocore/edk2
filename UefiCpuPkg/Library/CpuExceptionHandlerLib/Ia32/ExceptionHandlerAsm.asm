@@ -53,7 +53,7 @@ AsmIdtVectorEnd:
 HookAfterStubBegin:
     db      6ah        ; push
 VectorNum:
-    db      0          ; 0 will be fixed 
+    db      0          ; 0 will be fixed
     push    eax
     mov     eax, HookAfterStubHeaderEnd
     jmp     eax
@@ -193,7 +193,7 @@ ErrorCodeAndVectorOnStack:
     sub     esp, 8
     push    0            ; clear EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
     push    0            ; clear EXCEPTION_HANDLER_CONTEXT.ExceptionDataFlag
-       
+
 ;; UINT32  Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx, Eax;
     push    eax
     push    ecx
@@ -251,20 +251,20 @@ ErrorCodeAndVectorOnStack:
 
 ;; UINT32  Cr0, Cr1, Cr2, Cr3, Cr4;
     mov     eax, 1
-    push    ebx         ; temporarily save value of ebx on stack 
-    cpuid               ; use CPUID to determine if FXSAVE/FXRESTOR and DE 
+    push    ebx         ; temporarily save value of ebx on stack
+    cpuid               ; use CPUID to determine if FXSAVE/FXRESTOR and DE
                         ; are supported
-    pop     ebx         ; retore value of ebx that was overwritten by CPUID 
+    pop     ebx         ; retore value of ebx that was overwritten by CPUID
     mov     eax, cr4
     push    eax         ; push cr4 firstly
     test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support
     jz      @F
     or      eax, BIT9   ; Set CR4.OSFXSR
-@@:    
+@@:
     test    edx, BIT2   ; Test for Debugging Extensions support
     jz      @F
     or      eax, BIT3   ; Set CR4.DE
-@@:    
+@@:
     mov     cr4, eax
     mov     eax, cr3
     push    eax
@@ -296,7 +296,7 @@ ErrorCodeAndVectorOnStack:
                         ; edx still contains result from CPUID above
     jz      @F
     db      0fh, 0aeh, 07h ;fxsave [edi]
-@@:    
+@@:
 
 ;; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
     cld
@@ -329,7 +329,7 @@ ErrorCodeAndVectorOnStack:
     test    edx, BIT24  ; Test for FXSAVE/FXRESTOR support
     jz      @F
     db      0fh, 0aeh, 0eh ; fxrstor [esi]
-@@:    
+@@:
     add     esp, 512
 
 ;; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
@@ -395,7 +395,7 @@ ErrorCode:
     sub     esp, 4
     jmp     dword ptr [esp - 12]
 
-DoReturn:    
+DoReturn:
     cmp     mDoFarReturnFlag, 0   ; Check if need to do far return instead of IRET
     jz      DoIret
     push    [esp + 8]    ; save EFLAGS
@@ -414,30 +414,30 @@ CommonInterruptEntry ENDP
 ;---------------------------------------;
 ; _AsmGetTemplateAddressMap                  ;
 ;----------------------------------------------------------------------------;
-; 
+;
 ; Protocol prototype
 ;   AsmGetTemplateAddressMap (
 ;     EXCEPTION_HANDLER_TEMPLATE_MAP *AddressMap
 ;   );
-;           
+;
 ; Routine Description:
-; 
+;
 ;  Return address map of interrupt handler template so that C code can generate
 ;  interrupt table.
-; 
+;
 ; Arguments:
-; 
-; 
-; Returns: 
-; 
+;
+;
+; Returns:
+;
 ;   Nothing
 ;
-; 
+;
 ; Input:  [ebp][0]  = Original ebp
 ;         [ebp][4]  = Return address
-;          
+;
 ; Output: Nothing
-;           
+;
 ; Destroys: Nothing
 ;-----------------------------------------------------------------------------;
 AsmGetTemplateAddressMap  proc near public
@@ -449,7 +449,7 @@ AsmGetTemplateAddressMap  proc near public
     mov dword ptr [ebx],      AsmIdtVectorBegin
     mov dword ptr [ebx + 4h], (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
     mov dword ptr [ebx + 8h], HookAfterStubBegin
-  
+
     popad
     pop     ebp
     ret

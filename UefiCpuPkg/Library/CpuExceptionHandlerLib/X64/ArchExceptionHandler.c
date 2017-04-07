@@ -29,7 +29,7 @@ ArchUpdateIdtEntry (
 {
   IdtEntry->Bits.OffsetLow   = (UINT16)(UINTN)InterruptHandler;
   IdtEntry->Bits.OffsetHigh  = (UINT16)((UINTN)InterruptHandler >> 16);
-  IdtEntry->Bits.OffsetUpper = (UINT32)((UINTN)InterruptHandler >> 32);	
+  IdtEntry->Bits.OffsetUpper = (UINT32)((UINTN)InterruptHandler >> 32);
   IdtEntry->Bits.GateType    = IA32_IDT_GATE_TYPE_INTERRUPT_32;
 }
 
@@ -79,7 +79,7 @@ ArchSaveExceptionContext (
   // Clear IF flag to avoid old IDT handler enable interrupt by IRET
   //
   Eflags.UintN = SystemContext.SystemContextX64->Rflags;
-  Eflags.Bits.IF = 0; 
+  Eflags.Bits.IF = 0;
   SystemContext.SystemContextX64->Rflags = Eflags.UintN;
   //
   // Modify the EIP in stack, then old IDT handler will return to the stub code
@@ -236,7 +236,7 @@ DumpCpuContext (
     SystemContext.SystemContextX64->Idtr[1],
     SystemContext.SystemContextX64->Tr
     );
-	InternalPrintMessage (
+  InternalPrintMessage (
     "FXSAVE_STATE - %016lx\n",
     &SystemContext.SystemContextX64->FxSaveState
     );

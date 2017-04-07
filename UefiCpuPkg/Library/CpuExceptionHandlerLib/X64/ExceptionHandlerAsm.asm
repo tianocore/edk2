@@ -47,7 +47,7 @@ AsmIdtVectorEnd:
 HookAfterStubHeaderBegin:
     db      6ah        ; push
 @VectorNum:
-    db      0          ; 0 will be fixed 
+    db      0          ; 0 will be fixed
     push    rax
     mov     rax, HookAfterStubHeaderEnd
     jmp     rax
@@ -89,7 +89,7 @@ HookAfterStubHeaderEnd:
 ; +    RBP              +
 ; +---------------------+ <-- RBP, 16-byte aligned
 ; The follow algorithm is used for the common interrupt routine.
-CommonInterruptEntry PROC PUBLIC  
+CommonInterruptEntry PROC PUBLIC
     cli
     pop     rax
     ;
@@ -111,7 +111,7 @@ NoErrorCode:
     ;
     push    [rsp]
     mov     qword ptr [rsp + 8], 0
-@@:       
+@@:
     push    rbp
     mov     rbp, rsp
     push    0             ; clear EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
@@ -351,7 +351,7 @@ DoReturn:
     jz      DoIret
     push    rax
     mov     rax, rsp          ; save old RSP to rax
-    mov     rsp, [rsp + 20h]   
+    mov     rsp, [rsp + 20h]
     push    [rax + 10h]       ; save CS in new location
     push    [rax + 8h]        ; save EIP in new location
     push    [rax + 18h]       ; save EFLAGS in new location

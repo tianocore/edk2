@@ -24,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 VOID
 CommonExceptionHandlerWorker (
-  IN EFI_EXCEPTION_TYPE          ExceptionType, 
+  IN EFI_EXCEPTION_TYPE          ExceptionType,
   IN EFI_SYSTEM_CONTEXT          SystemContext,
   IN EXCEPTION_HANDLER_DATA      *ExceptionHandlerData
   )
@@ -87,7 +87,7 @@ CommonExceptionHandlerWorker (
     CpuDeadLoop ();
     break;
   }
-  
+
   if (ExternalInterruptHandler != NULL &&
       ExternalInterruptHandler[ExceptionType] != NULL) {
     (ExternalInterruptHandler[ExceptionType]) (ExceptionType, SystemContext);
@@ -100,7 +100,7 @@ CommonExceptionHandlerWorker (
     }
     //
     // Display ExceptionType, CPU information and Image information
-    //  
+    //
     DumpImageAndCpuContent (ExceptionType, SystemContext);
     //
     // Release Spinlock of output message
@@ -192,8 +192,8 @@ UpdateIdtTable (
 
   @param[in]      VectorInfo            Pointer to reserved vector list.
   @param[in, out] ExceptionHandlerData  Pointer to exception handler data.
-  
-  @retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized 
+
+  @retval EFI_SUCCESS           CPU Exception Entries have been successfully initialized
                                 with default exception handlers.
   @retval EFI_INVALID_PARAMETER VectorInfo includes the invalid content if VectorInfo is not NULL.
   @retval EFI_UNSUPPORTED       This function is not supported.
