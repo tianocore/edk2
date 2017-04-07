@@ -41,6 +41,12 @@
 
 [Sources.Ia32, Sources.X64]
   VbeShim.c
+  UnalignedIoGcc.c    | GCC
+  UnalignedIoMsc.c    | MSFT
+  UnalignedIoIcc.c    | INTEL
+
+[Sources.IPF, Sources.EBC, Sources.ARM, Sources.AARCH64]
+  UnalignedIoUnsupported.c
 
 [Packages]
   MdePkg/MdePkg.dec
