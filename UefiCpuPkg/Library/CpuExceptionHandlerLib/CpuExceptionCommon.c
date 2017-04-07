@@ -1,4 +1,4 @@
- /** @file
+/** @file
   CPU Exception Handler Library common functions.
 
   Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
