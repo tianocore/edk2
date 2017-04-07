@@ -1279,6 +1279,11 @@ DoStartupScript(
   if (FileStringPath != NULL) {
     Status = RunScriptFile (FileStringPath, NULL, L"", ShellInfoObject.NewShellParametersProtocol);
     FreePool (FileStringPath);
+  } else {
+    //
+    // we return success since startup script is not mandatory.
+    //
+    Status = EFI_SUCCESS;
   }
 
   return (Status);
