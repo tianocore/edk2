@@ -126,6 +126,7 @@ BrotliDecompress (
   BrotliState *  BroState;
   VOID *         Temp;
 
+  TotalOut = 0;
   AvailableOut = FILE_BUFFER_SIZE;
   Result = BROTLI_RESULT_ERROR;
   BroState = BrotliCreateState(BrAlloc, BrFree, BuffInfo);

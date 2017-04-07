@@ -802,6 +802,7 @@ static BROTLI_INLINE uint32_t ReadBlockLength(const HuffmanCode* table,
   uint32_t code;
   uint32_t nbits;
   code = ReadSymbol(table, br);
+  if (code >= BROTLI_NUM_BLOCK_LEN_SYMBOLS) code = BROTLI_NUM_BLOCK_LEN_SYMBOLS - 1;
   nbits = kBlockLengthPrefixCode[code].nbits; /* nbits == 2..24 */
   return kBlockLengthPrefixCode[code].offset + BrotliReadBits(br, nbits);
 }
@@ -872,13 +873,13 @@ static BROTLI_NOINLINE void InverseMoveToFrontTransform(
   for (i = 0; i < v_len; ++i) {
     int index = v[i];
     uint8_t value = mtf[index];
-    upper_bound |= v[i];
+    upper_bound |= (uint32_t)v[i];
     v[i] = value;
     mtf[-1] = value;
-    do {
+    while (index > 0) {
       index--;
       mtf[index + 1] = mtf[index];
-    } while (index >= 0);
+    }
   }
   /* Remember amount of elements to be reinitialized. */
   state->mtf_upper_bound = upper_bound;
@@ -1498,6 +1499,7 @@ static BROTLI_INLINE BROTLI_BOOL ReadCommandInternal(
       return BROTLI_FALSE;
     }
   }
+  if (cmd_code >= BROTLI_NUM_COMMAND_SYMBOLS) cmd_code = BROTLI_NUM_COMMAND_SYMBOLS - 1;
   v = kCmdLut[cmd_code];
   s->distance_code = v.distance_code;
   s->distance_context = v.context;
@@ -2209,7 +2211,9 @@ BrotliDecoderResult BrotliDecoderDecompressStream(
         }
         s->max_distance = s->max_backward_distance;
         if (s->state == BROTLI_STATE_COMMAND_POST_WRITE_1) {
-          memcpy(s->ringbuffer, s->ringbuffer_end, (size_t)s->pos);
+          if (s->ringbuffer != 0) {
+            memcpy(s->ringbuffer, s->ringbuffer_end, (size_t)s->pos);
+          }
           if (s->meta_block_remaining_len == 0) {
             /* Next metablock, if any */
             s->state = BROTLI_STATE_METABLOCK_DONE;
