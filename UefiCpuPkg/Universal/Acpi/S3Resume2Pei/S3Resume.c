@@ -4,7 +4,7 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -531,7 +531,7 @@ S3ResumeBootOs (
       //
       // X64 long mode waking vector
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         AsmEnablePaging64 (
           0x38,
@@ -557,7 +557,7 @@ S3ResumeBootOs (
       //
       // IA32 protected mode waking vector (Page disabled)
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT) (UINTN) Facs->XFirmwareWakingVector,
         NULL,
@@ -569,7 +569,7 @@ S3ResumeBootOs (
     //
     // 16bit Realmode waking vector
     //
-    DEBUG (( EFI_D_ERROR, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
+    DEBUG ((DEBUG_INFO, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
     AsmTransferControl (Facs->FirmwareWakingVector, 0x0);
   }
 
@@ -630,7 +630,7 @@ RestoreS3PageTables (
     //
     // The assumption is : whole page table is allocated in CONTINUOUS memory and CR3 points to TOP page.
     //
-    DEBUG ((EFI_D_ERROR, "S3NvsPageTableAddress - %x (%x)\n", (UINTN)S3NvsPageTableAddress, (UINTN)Build4GPageTableOnly));
+    DEBUG ((DEBUG_INFO, "S3NvsPageTableAddress - %x (%x)\n", (UINTN)S3NvsPageTableAddress, (UINTN)Build4GPageTableOnly));
 
     //
     // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
@@ -783,7 +783,7 @@ S3ResumeExecuteBootScript (
   PEI_S3_RESUME_STATE        *PeiS3ResumeState;
   BOOLEAN                    InterruptStatus;
 
-  DEBUG ((EFI_D_ERROR, "S3ResumeExecuteBootScript()\n"));
+  DEBUG ((DEBUG_INFO, "S3ResumeExecuteBootScript()\n"));
 
   //
   // Attempt to use content from SMRAM first
@@ -810,13 +810,13 @@ S3ResumeExecuteBootScript (
                               (VOID **) &SmmAccess
                               );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Close all SMRAM regions before executing boot script\n"));
+      DEBUG ((DEBUG_INFO, "Close all SMRAM regions before executing boot script\n"));
   
       for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
         Status = SmmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
       }
 
-      DEBUG ((EFI_D_ERROR, "Lock all SMRAM regions before executing boot script\n"));
+      DEBUG ((DEBUG_INFO, "Lock all SMRAM regions before executing boot script\n"));
   
       for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
         Status = SmmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
@@ -881,7 +881,7 @@ S3ResumeExecuteBootScript (
       );
     ASSERT (FALSE);
   }
-  DEBUG (( EFI_D_ERROR, "PeiS3ResumeState - %x\r\n", PeiS3ResumeState));
+  DEBUG ((DEBUG_INFO, "PeiS3ResumeState - %x\r\n", PeiS3ResumeState));
   PeiS3ResumeState->ReturnCs           = 0x10;
   PeiS3ResumeState->ReturnEntryPoint   = (EFI_PHYSICAL_ADDRESS)(UINTN)S3ResumeBootOs;
   PeiS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
@@ -901,7 +901,7 @@ S3ResumeExecuteBootScript (
     //
     // X64 S3 Resume
     //
-    DEBUG (( EFI_D_ERROR, "Enable X64 and transfer control to Standalone Boot Script Executor\r\n"));
+    DEBUG ((DEBUG_INFO, "Enable X64 and transfer control to Standalone Boot Script Executor\r\n"));
 
     //
     // Switch to long mode to complete resume.
@@ -917,7 +917,7 @@ S3ResumeExecuteBootScript (
     //
     // IA32 S3 Resume
     //
-    DEBUG (( EFI_D_ERROR, "transfer control to Standalone Boot Script Executor\r\n"));
+    DEBUG ((DEBUG_INFO, "transfer control to Standalone Boot Script Executor\r\n"));
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT) (UINTN) EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint,
       (VOID *)AcpiS3Context,
@@ -985,7 +985,7 @@ S3RestoreConfig2 (
   TempAcpiS3Context = 0;
   TempEfiBootScriptExecutorVariable = 0;
 
-  DEBUG ((EFI_D_ERROR, "Enter S3 PEIM\r\n"));
+  DEBUG ((DEBUG_INFO, "Enter S3 PEIM\r\n"));
 
   VarSize = sizeof (EFI_PHYSICAL_ADDRESS);
   Status = RestoreLockBox (
@@ -1023,15 +1023,15 @@ S3RestoreConfig2 (
   EfiBootScriptExecutorVariable = (BOOT_SCRIPT_EXECUTOR_VARIABLE *) (UINTN) TempEfiBootScriptExecutorVariable;
   ASSERT (EfiBootScriptExecutorVariable != NULL);
 
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context = %x\n", AcpiS3Context));
-  DEBUG (( EFI_D_ERROR, "Waking Vector = %x\n", ((EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable)))->FirmwareWakingVector));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->AcpiFacsTable = %x\n", AcpiS3Context->AcpiFacsTable));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->IdtrProfile = %x\n", AcpiS3Context->IdtrProfile));  
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->S3NvsPageTableAddress = %x\n", AcpiS3Context->S3NvsPageTableAddress));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->S3DebugBufferAddress = %x\n", AcpiS3Context->S3DebugBufferAddress));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->BootScriptStackBase = %x\n", AcpiS3Context->BootScriptStackBase));
-  DEBUG (( EFI_D_ERROR, "AcpiS3Context->BootScriptStackSize = %x\n", AcpiS3Context->BootScriptStackSize));
-  DEBUG (( EFI_D_ERROR, "EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint = %x\n", EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context = %x\n", AcpiS3Context));
+  DEBUG (( DEBUG_INFO, "Waking Vector = %x\n", ((EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable)))->FirmwareWakingVector));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->AcpiFacsTable = %x\n", AcpiS3Context->AcpiFacsTable));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->IdtrProfile = %x\n", AcpiS3Context->IdtrProfile));  
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->S3NvsPageTableAddress = %x\n", AcpiS3Context->S3NvsPageTableAddress));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->S3DebugBufferAddress = %x\n", AcpiS3Context->S3DebugBufferAddress));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->BootScriptStackBase = %x\n", AcpiS3Context->BootScriptStackBase));
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->BootScriptStackSize = %x\n", AcpiS3Context->BootScriptStackSize));
+  DEBUG (( DEBUG_INFO, "EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint = %x\n", EfiBootScriptExecutorVariable->BootScriptExecutorEntrypoint));
 
   //
   // Additional step for BootScript integrity - we only handle BootScript and BootScriptExecutor.
@@ -1081,19 +1081,19 @@ S3RestoreConfig2 (
     SmmS3ResumeState->ReturnContext2     = (EFI_PHYSICAL_ADDRESS)(UINTN)EfiBootScriptExecutorVariable;
     SmmS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
 
-    DEBUG (( EFI_D_ERROR, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Stack Size               = %x\n", SmmS3ResumeState->SmmS3StackSize));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Resume Entry Point       = %x\n", SmmS3ResumeState->SmmS3ResumeEntryPoint));
-    DEBUG (( EFI_D_ERROR, "SMM S3 CR0                      = %x\n", SmmS3ResumeState->SmmS3Cr0));
-    DEBUG (( EFI_D_ERROR, "SMM S3 CR3                      = %x\n", SmmS3ResumeState->SmmS3Cr3));
-    DEBUG (( EFI_D_ERROR, "SMM S3 CR4                      = %x\n", SmmS3ResumeState->SmmS3Cr4));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return CS                = %x\n", SmmS3ResumeState->ReturnCs));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Entry Point       = %x\n", SmmS3ResumeState->ReturnEntryPoint));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Context1          = %x\n", SmmS3ResumeState->ReturnContext1));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Context2          = %x\n", SmmS3ResumeState->ReturnContext2));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
-    DEBUG (( EFI_D_ERROR, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
+    DEBUG (( DEBUG_INFO, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
+    DEBUG (( DEBUG_INFO, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
+    DEBUG (( DEBUG_INFO, "SMM S3 Stack Size               = %x\n", SmmS3ResumeState->SmmS3StackSize));
+    DEBUG (( DEBUG_INFO, "SMM S3 Resume Entry Point       = %x\n", SmmS3ResumeState->SmmS3ResumeEntryPoint));
+    DEBUG (( DEBUG_INFO, "SMM S3 CR0                      = %x\n", SmmS3ResumeState->SmmS3Cr0));
+    DEBUG (( DEBUG_INFO, "SMM S3 CR3                      = %x\n", SmmS3ResumeState->SmmS3Cr3));
+    DEBUG (( DEBUG_INFO, "SMM S3 CR4                      = %x\n", SmmS3ResumeState->SmmS3Cr4));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return CS                = %x\n", SmmS3ResumeState->ReturnCs));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Entry Point       = %x\n", SmmS3ResumeState->ReturnEntryPoint));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Context1          = %x\n", SmmS3ResumeState->ReturnContext1));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Context2          = %x\n", SmmS3ResumeState->ReturnContext2));
+    DEBUG (( DEBUG_INFO, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
+    DEBUG (( DEBUG_INFO, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
 
     if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
       SwitchStack (
