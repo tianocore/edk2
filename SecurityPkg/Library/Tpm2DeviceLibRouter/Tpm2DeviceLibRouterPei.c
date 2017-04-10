@@ -3,7 +3,7 @@
   via PcdTpmInstanceGuid. Platform need make choice that which one will be final one.
   At most one TPM2 instance can be finally registered, and other will return unsupported.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -120,7 +120,7 @@ Tpm2RegisterTpm2DeviceLib (
   TPM2_DEVICE_INTERFACE *Tpm2DeviceInterface;
 
   if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &Tpm2Device->ProviderGuid)){
-    DEBUG ((EFI_D_ERROR, "WARNING: Tpm2RegisterTpm2DeviceLib - does not support %g registration\n", &Tpm2Device->ProviderGuid));
+    DEBUG ((DEBUG_WARN, "WARNING: Tpm2RegisterTpm2DeviceLib - does not support %g registration\n", &Tpm2Device->ProviderGuid));
     return EFI_UNSUPPORTED;
   }
 
