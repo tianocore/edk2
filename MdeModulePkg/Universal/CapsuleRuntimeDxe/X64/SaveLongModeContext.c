@@ -2,7 +2,7 @@
   Create the variable to save the base address of page table and stack
   for transferring into long mode in IA32 capsule PEI.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -160,7 +160,7 @@ PrepareContextForCapsulePei (
     TotalPagesNum = NumberOfPml4EntriesNeeded + 1;
   }
   TotalPagesNum += ExtraPageTablePages;
-  DEBUG ((EFI_D_ERROR, "CapsuleRuntimeDxe X64 TotalPagesNum - 0x%x pages\n", TotalPagesNum));
+  DEBUG ((DEBUG_INFO, "CapsuleRuntimeDxe X64 TotalPagesNum - 0x%x pages\n", TotalPagesNum));
 
   LongModeBuffer.PageTableAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedMemoryBelow4G (EFI_PAGES_TO_SIZE (TotalPagesNum));
   ASSERT (LongModeBuffer.PageTableAddress != 0);

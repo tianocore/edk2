@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 
@@ -234,7 +234,7 @@ PageFaultHandler (
   UINTN          PTIndex;
 
   PFAddress = AsmReadCr2 ();
-  DEBUG ((EFI_D_ERROR, "BootScript - PageFaultHandler: Cr2 - %lx\n", PFAddress));
+  DEBUG ((DEBUG_INFO, "BootScript - PageFaultHandler: Cr2 - %lx\n", PFAddress));
 
   if (PFAddress >= mPhyMask + SIZE_4KB) {
     return FALSE;

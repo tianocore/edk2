@@ -407,7 +407,7 @@ S3AllocatePageTablesBuffer (
     }
 
     TotalPageTableSize += ExtraPageTablePages;
-    DEBUG ((EFI_D_ERROR, "AcpiS3ContextSave TotalPageTableSize - 0x%x pages\n", TotalPageTableSize));
+    DEBUG ((DEBUG_INFO, "AcpiS3ContextSave TotalPageTableSize - 0x%x pages\n", TotalPageTableSize));
 
     //
     // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.

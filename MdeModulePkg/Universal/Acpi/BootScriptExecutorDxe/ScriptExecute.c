@@ -103,7 +103,7 @@ S3BootScriptExecutorEntryFunction (
       //
       // X64 S3 Resume
       //
-      DEBUG ((EFI_D_ERROR, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
+      DEBUG ((DEBUG_INFO, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
       PeiS3ResumeState->AsmTransferControl = (EFI_PHYSICAL_ADDRESS)(UINTN)AsmTransferControl32;
 
       if ((Facs != NULL) &&
@@ -128,7 +128,7 @@ S3BootScriptExecutorEntryFunction (
       //
       // IA32 S3 Resume
       //
-      DEBUG ((EFI_D_ERROR, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
+      DEBUG ((DEBUG_INFO, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
       PeiS3ResumeState->AsmTransferControl = (EFI_PHYSICAL_ADDRESS)(UINTN)AsmTransferControl;
 
       SwitchStack (
@@ -160,7 +160,7 @@ S3BootScriptExecutorEntryFunction (
       //
       // X64 long mode waking vector
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 64bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         SwitchStack (
           (SWITCH_STACK_ENTRY_POINT)(UINTN)Facs->XFirmwareWakingVector,
@@ -177,7 +177,7 @@ S3BootScriptExecutorEntryFunction (
       //
       // IA32 protected mode waking vector (Page disabled)
       //
-      DEBUG (( EFI_D_ERROR, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
+      DEBUG ((DEBUG_INFO, "Transfer to 32bit OS waking vector - %x\r\n", (UINTN)Facs->XFirmwareWakingVector));
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         AsmDisablePaging64 (
           0x10,
@@ -199,7 +199,7 @@ S3BootScriptExecutorEntryFunction (
     //
     // 16bit Realmode waking vector
     //
-    DEBUG (( EFI_D_ERROR, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
+    DEBUG ((DEBUG_INFO, "Transfer to 16bit OS waking vector - %x\r\n", (UINTN)Facs->FirmwareWakingVector));
     AsmTransferControl (Facs->FirmwareWakingVector, 0x0);
   }
 
