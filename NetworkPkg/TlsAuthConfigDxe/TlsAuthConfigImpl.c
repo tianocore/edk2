@@ -296,7 +296,7 @@ ON_EXIT:
 /**
   Delete one entry from cert database.
 
-  @param[in]    PrivateData         Module's private data.
+  @param[in]    Private             Module's private data.
   @param[in]    VariableName        The variable name of the database.
   @param[in]    VendorGuid          A unique identifier for the vendor.
   @param[in]    LabelNumber         Label number to insert opcodes.
@@ -477,18 +477,23 @@ ON_EXIT:
 
 
 /**
-  Close an open file handle.
+  Clean the file related resource.
 
-  @param[in] FileHandle           The file handle to close.
+  @param[in]    Private             Module's private data.
 
 **/
 VOID
-CloseFile (
-  IN EFI_FILE_HANDLE   FileHandle
+CleanFileContext (
+  IN TLS_AUTH_CONFIG_PRIVATE_DATA     *Private
   )
 {
-  if (FileHandle != NULL) {
-    FileHandle->Close (FileHandle);
+  if (Private->FileContext->FHandle != NULL) {
+    Private->FileContext->FHandle->Close (Private->FileContext->FHandle);
+    Private->FileContext->FHandle = NULL;
+    if (Private->FileContext->FileName!= NULL){
+      FreePool(Private->FileContext->FileName);
+      Private->FileContext->FileName = NULL;
+    }
   }
 }
 
@@ -873,14 +878,7 @@ EnrollX509toVariable (
   }
 
 ON_EXIT:
-
-  CloseFile (Private->FileContext->FHandle);
-  if (Private->FileContext->FileName != NULL) {
-    FreePool(Private->FileContext->FileName);
-    Private->FileContext->FileName = NULL;
-  }
-
-  Private->FileContext->FHandle = NULL;
+  CleanFileContext (Private);
 
   if (Private->CertGuid != NULL) {
     FreePool (Private->CertGuid);
@@ -1561,7 +1559,8 @@ TlsAuthConfigAccessCallback (
   HiiGetBrowserData (&gTlsAuthConfigGuid, mTlsAuthConfigStorageName, BufferSize, (UINT8 *) IfrNvData);
 
   if ((Action != EFI_BROWSER_ACTION_CHANGED) &&
-      (Action != EFI_BROWSER_ACTION_CHANGING)) {
+      (Action != EFI_BROWSER_ACTION_CHANGING) && 
+      (Action != EFI_BROWSER_ACTION_FORM_CLOSE)) {
     Status = EFI_UNSUPPORTED;
     goto EXIT;
   }
@@ -1592,12 +1591,19 @@ TlsAuthConfigAccessCallback (
       CleanUpPage (LabelId, Private);
       break;
     case KEY_TLS_AUTH_CONFIG_ENROLL_CERT_FROM_FILE:
+      //
+      // If the file is already opened, clean the file related resource first. 
+      //
+      CleanFileContext (Private);
+      
       ChooseFile( NULL, NULL, UpdateCAFromFile, &File);
       break;
 
     case KEY_TLS_AUTH_CONFIG_VALUE_SAVE_AND_EXIT:
       Status = EnrollCertDatabase (Private, EFI_TLS_CA_CERTIFICATE_VARIABLE);
       if (EFI_ERROR (Status)) {
+        CleanFileContext (Private);
+
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
@@ -1608,14 +1614,7 @@ TlsAuthConfigAccessCallback (
       break;
 
     case KEY_TLS_AUTH_CONFIG_VALUE_NO_SAVE_AND_EXIT:
-      if (Private->FileContext->FHandle != NULL) {
-        CloseFile (Private->FileContext->FHandle);
-        Private->FileContext->FHandle = NULL;
-        if (Private->FileContext->FileName!= NULL){
-          FreePool(Private->FileContext->FileName);
-          Private->FileContext->FileName = NULL;
-        }
-      }
+      CleanFileContext (Private);
 
       if (Private->CertGuid!= NULL) {
         FreePool (Private->CertGuid);
@@ -1667,6 +1666,8 @@ TlsAuthConfigAccessCallback (
     default:
       break;
     }
+  } else if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
+    CleanFileContext (Private);
   }
 
 EXIT:
