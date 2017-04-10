@@ -9,7 +9,7 @@
   SmmLockBoxHandler(), SmmLockBoxRestore(), SmmLockBoxUpdate(), SmmLockBoxSave()
   will receive untrusted input and do basic validation.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -267,7 +267,7 @@ SmmLockBoxHandler (
   EFI_SMM_LOCK_BOX_PARAMETER_HEADER *LockBoxParameterHeader;
   UINTN                             TempCommBufferSize;
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox SmmLockBoxHandler Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBox SmmLockBoxHandler Enter\n"));
 
   //
   // If input is invalid, stop processing this SMI
@@ -294,9 +294,9 @@ SmmLockBoxHandler (
 
   LockBoxParameterHeader->ReturnStatus = (UINT64)-1;
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox LockBoxParameterHeader - %x\n", (UINTN)LockBoxParameterHeader));
+  DEBUG ((DEBUG_INFO, "SmmLockBox LockBoxParameterHeader - %x\n", (UINTN)LockBoxParameterHeader));
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox Command - %x\n", (UINTN)LockBoxParameterHeader->Command));
+  DEBUG ((DEBUG_INFO, "SmmLockBox Command - %x\n", (UINTN)LockBoxParameterHeader->Command));
 
   switch (LockBoxParameterHeader->Command) {
   case EFI_SMM_LOCK_BOX_COMMAND_SAVE:
@@ -341,7 +341,7 @@ SmmLockBoxHandler (
 
   LockBoxParameterHeader->Command = (UINT32)-1;
 
-  DEBUG ((EFI_D_ERROR, "SmmLockBox SmmLockBoxHandler Exit\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBox SmmLockBoxHandler Exit\n"));
 
   return EFI_SUCCESS;
 }

@@ -763,7 +763,7 @@ GetCapsuleDescriptors (
                                         (VOID *) &CapsuleDataPtr64
                                         );
         if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR, "Capsule -- capsule variable not set\n"));
+          DEBUG ((DEBUG_INFO, "Capsule -- capsule variable not set\n"));
           return EFI_NOT_FOUND;
         }
         //
