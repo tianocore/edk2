@@ -30,7 +30,6 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  BdsLib
   DebugLib
   DevicePathLib
   DxeServicesTableLib
@@ -45,6 +44,7 @@
 [Protocols]
   gAndroidFastbootTransportProtocolGuid
   gAndroidFastbootPlatformProtocolGuid
+  gEfiLoadedImageProtocolGuid
   gEfiSimpleTextOutProtocolGuid
   gEfiSimpleTextInProtocolGuid
 

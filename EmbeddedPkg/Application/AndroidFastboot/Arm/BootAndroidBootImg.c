@@ -15,6 +15,7 @@
 #include "AndroidFastbootApp.h"
 
 #include <Protocol/DevicePath.h>
+#include <Protocol/LoadedImage.h>
 
 #include <Library/BdsLib.h>
 #include <Library/DevicePathLib.h>
@@ -49,6 +50,60 @@ STATIC CONST MEMORY_DEVICE_PATH MemoryDevicePathTemplate =
     { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 }
   } // End
 };
+
+
+/**
+  Start an EFI Application from a Device Path
+
+  @param  ParentImageHandle     Handle of the calling image
+  @param  DevicePath            Location of the EFI Application
+
+  @retval EFI_SUCCESS           All drivers have been connected
+  @retval EFI_NOT_FOUND         The Linux kernel Device Path has not been found
+  @retval EFI_OUT_OF_RESOURCES  There is not enough resource memory to store the matching results.
+
+**/
+STATIC
+EFI_STATUS
+StartEfiApplication (
+  IN EFI_HANDLE                  ParentImageHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
+  IN UINTN                       LoadOptionsSize,
+  IN VOID*                       LoadOptions
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_HANDLE                   ImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL*   LoadedImage;
+
+  // Load the image from the device path with Boot Services function
+  Status = gBS->LoadImage (TRUE, ParentImageHandle, DevicePath, NULL, 0,
+                  &ImageHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Passed LoadOptions to the EFI Application
+  if (LoadOptionsSize != 0) {
+    Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid,
+                    (VOID **) &LoadedImage);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    LoadedImage->LoadOptionsSize  = LoadOptionsSize;
+    LoadedImage->LoadOptions      = LoadOptions;
+  }
+
+  // Before calling the image, enable the Watchdog Timer for  the 5 Minute period
+  gBS->SetWatchdogTimer (5 * 60, 0x0000, 0x00, NULL);
+  // Start the image
+  Status = gBS->StartImage (ImageHandle, NULL, NULL);
+  // Clear the Watchdog Timer after the image returns
+  gBS->SetWatchdogTimer (0x0000, 0x0000, 0x0000, NULL);
+
+  return Status;
+}
 
 EFI_STATUS
 BootAndroidBootImg (
@@ -100,7 +155,7 @@ BootAndroidBootImg (
     LoadOptions = NewLoadOptions;
   }
 
-  Status = BdsStartEfiApplication (gImageHandle,
+  Status = StartEfiApplication (gImageHandle,
              (EFI_DEVICE_PATH_PROTOCOL *) &KernelDevicePath,
              StrSize (LoadOptions),
              LoadOptions);
