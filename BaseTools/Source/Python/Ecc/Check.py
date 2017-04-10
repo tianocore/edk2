@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define checkpoints used by ECC tool
 #
-# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -941,7 +941,7 @@ class Check(object):
 
     # Check Guid Format in module INF
     def MetaDataFileCheckModuleFileGuidFormat(self):
-        if EccGlobalData.gConfig.MetaDataFileCheckModuleFileGuidFormat or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+        if EccGlobalData.gConfig.MetaDataFileCheckModuleFileGuidFormat == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Check Guid Format in module INF ...")
             Table = EccGlobalData.gDb.TblInf
             SqlCommand = """
@@ -984,7 +984,7 @@ class Check(object):
 
     # Check Protocol Format in module INF
     def MetaDataFileCheckModuleFileProtocolFormat(self):
-        if EccGlobalData.gConfig.MetaDataFileCheckModuleFileProtocolFormat or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+        if EccGlobalData.gConfig.MetaDataFileCheckModuleFileProtocolFormat == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Check Protocol Format in module INF ...")
             Table = EccGlobalData.gDb.TblInf
             SqlCommand = """
@@ -1015,7 +1015,7 @@ class Check(object):
 
     # Check Ppi Format in module INF
     def MetaDataFileCheckModuleFilePpiFormat(self):
-        if EccGlobalData.gConfig.MetaDataFileCheckModuleFilePpiFormat or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+        if EccGlobalData.gConfig.MetaDataFileCheckModuleFilePpiFormat == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Check Ppi Format in module INF ...")
             Table = EccGlobalData.gDb.TblInf
             SqlCommand = """
@@ -1043,7 +1043,7 @@ class Check(object):
 
     # Check Pcd Format in module INF
     def MetaDataFileCheckModuleFilePcdFormat(self):
-        if EccGlobalData.gConfig.MetaDataFileCheckModuleFilePcdFormat or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+        if EccGlobalData.gConfig.MetaDataFileCheckModuleFilePcdFormat == '1' or EccGlobalData.gConfig.MetaDataFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Check Pcd Format in module INF ...")
             Table = EccGlobalData.gDb.TblInf
             SqlCommand = """
@@ -1139,9 +1139,10 @@ class Check(object):
                         FileTable = 'Identifier' + str(Id)
                         self.NamingConventionCheckDefineStatement(FileTable)
                         self.NamingConventionCheckTypedefStatement(FileTable)
-                        self.NamingConventionCheckIfndefStatement(FileTable)
                         self.NamingConventionCheckVariableName(FileTable)
                         self.NamingConventionCheckSingleCharacterVariable(FileTable)
+                        if os.path.splitext(F)[1] in ('.h'):
+                            self.NamingConventionCheckIfndefStatement(FileTable)
 
         self.NamingConventionCheckPathName()
         self.NamingConventionCheckFunctionName()
@@ -1183,7 +1184,7 @@ class Check(object):
 
     # Check whether the #ifndef at the start of an include file uses both prefix and postfix underscore characters, '_'.
     def NamingConventionCheckIfndefStatement(self, FileTable):
-        if EccGlobalData.gConfig.NamingConventionCheckTypedefStatement == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+        if EccGlobalData.gConfig.NamingConventionCheckIfndefStatement == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking naming covention of #ifndef statement ...")
 
             SqlCommand = """select ID, Value from %s where Model = %s""" % (FileTable, MODEL_IDENTIFIER_MACRO_IFNDEF)
