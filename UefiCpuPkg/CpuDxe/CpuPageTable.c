@@ -634,10 +634,10 @@ ConvertMemoryPageAttributes (
   switch(CurrentPagingContext.MachineType) {
   case IMAGE_FILE_MACHINE_I386:
     if (CurrentPagingContext.ContextData.Ia32.PageTableBase == 0) {
-      DEBUG ((DEBUG_ERROR, "PageTable is 0!\n"));
       if (Attributes == 0) {
         return EFI_SUCCESS;
       } else {
+        DEBUG ((DEBUG_ERROR, "PageTable is 0!\n"));
         return EFI_UNSUPPORTED;
       }
     }
