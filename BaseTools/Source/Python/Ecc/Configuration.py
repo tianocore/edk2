@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define class Configuration
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -255,6 +255,11 @@ class Configuration(object):
         self.UniCheckHelpInfo = 1
         # Check PCD whether defined the prompt, help in the DEC file and localized information in the associated UNI file.
         self.UniCheckPCDInfo = 1
+
+        # Check SMM communication function parameter
+        self.SmmCommParaCheckAll = 0
+        # Check if the EFI_SMM_COMMUNICATION_PROTOCOL parameter buffer type is Reserved / ACPI NVS or UEFI RT code/data
+        self.SmmCommParaCheckBufferType = -1
 
         #
         # The check points in this section are reserved
