@@ -1,7 +1,7 @@
 ## @file
 # Standardized Error Hanlding infrastructures.
 #
-# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -105,6 +105,8 @@ ERROR_META_DATA_FILE_CHECK_LIBRARY_NOT_DEFINED = 10022
 
 ERROR_SPELLING_CHECK_ALL = 11000
 
+ERROR_SMM_COMM_PARA_CHECK_BUFFER_TYPE = 12001
+
 gEccErrorMessage = {
     ERROR_GENERAL_CHECK_ALL : "",
     ERROR_GENERAL_CHECK_NO_TAB : "'TAB' character is not allowed in source code, please replace each 'TAB' with two spaces",
@@ -198,5 +200,7 @@ gEccErrorMessage = {
     ERROR_META_DATA_FILE_CHECK_FORMAT_PCD : "Wrong Pcd Format used in Module file",
     ERROR_META_DATA_FILE_CHECK_LIBRARY_NOT_DEFINED : "Not defined LibraryClass used in the Module file.",
     ERROR_SPELLING_CHECK_ALL : "",
+
+    ERROR_SMM_COMM_PARA_CHECK_BUFFER_TYPE : "SMM communication function may use wrong parameter type",
     }
 
