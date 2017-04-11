@@ -386,7 +386,7 @@ ${END}
 #
 clean:
 \t${BEGIN}${clean_command}
-\t${END}
+\t${END}\t$(RM) AutoGenTimeStamp
 
 #
 # clean all generated files
@@ -395,6 +395,7 @@ cleanall:
 ${BEGIN}\t${cleanall_command}
 ${END}\t$(RM) *.pdb *.idb > NUL 2>&1
 \t$(RM) $(BIN_DIR)${separator}$(MODULE_NAME).efi
+\t$(RM) AutoGenTimeStamp
 
 #
 # clean all dependent libraries built
