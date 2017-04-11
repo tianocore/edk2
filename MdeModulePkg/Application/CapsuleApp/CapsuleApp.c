@@ -21,11 +21,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PrintLib.h>
-#include <Protocol/LoadedImage.h>
-#include <Protocol/SimpleFileSystem.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Guid/FileInfo.h>
-#include <Guid/Gpt.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/CapsuleReport.h>
 #include <Guid/SystemResourceTable.h>
@@ -117,7 +113,8 @@ DumpEsrtData (
   @param[out] Buffer          The file buffer
 
   @retval EFI_SUCCESS    Read file successfully
-  @retval EFI_NOT_FOUND  File not found
+  @retval EFI_NOT_FOUND  Shell protocol or file not found
+  @retval others         Read file failed
 **/
 EFI_STATUS
 ReadFileToBuffer (
@@ -134,6 +131,8 @@ ReadFileToBuffer (
   @param[in] Buffer          The file buffer
 
   @retval EFI_SUCCESS    Write file successfully
+  @retval EFI_NOT_FOUND  Shell protocol not found
+  @retval others         Write file failed
 **/
 EFI_STATUS
 WriteFileFromBuffer (
