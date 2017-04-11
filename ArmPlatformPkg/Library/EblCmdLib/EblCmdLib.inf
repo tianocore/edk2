@@ -51,7 +51,6 @@
   ArmDisassemblerLib
   PerformanceLib
   TimerLib
-  BdsLib
   FdtLib
 
 [Protocols]
