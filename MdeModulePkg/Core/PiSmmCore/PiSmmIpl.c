@@ -263,6 +263,7 @@ EFI_PHYSICAL_ADDRESS       mSmramCacheBase;
 UINT64                     mSmramCacheSize;
 
 EFI_SMM_COMMUNICATE_HEADER mCommunicateHeader;
+EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    *mLMFAConfigurationTable = NULL;
 
 //
 // Table of Protocol notification and GUIDed Event notifications that the SMM IPL requires
@@ -841,7 +842,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
  
    FixLoadingAddress = 0;
    Status = EFI_NOT_FOUND;
-   SmramBase = mCurrentSmramRange->CpuStart;
+   SmramBase = mLMFAConfigurationTable->SmramBase;
    //
    // Get PeHeader pointer
    //
@@ -1519,7 +1520,6 @@ SmmIplEntry (
   UINT64                          MaxSize;
   VOID                            *Registration;
   UINT64                          SmmCodeSize;
-  EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE    *LMFAConfigurationTable;
   EFI_CPU_ARCH_PROTOCOL           *CpuArch;
   EFI_STATUS                      SetAttrStatus;
   EFI_SMRAM_DESCRIPTOR            *SmramRangeSmmDriver;
@@ -1623,14 +1623,14 @@ SmmIplEntry (
       //
       Status = EfiGetSystemConfigurationTable (
                 &gLoadFixedAddressConfigurationTableGuid,
-               (VOID **) &LMFAConfigurationTable
+               (VOID **) &mLMFAConfigurationTable
                );
-      if (!EFI_ERROR (Status) && LMFAConfigurationTable != NULL) {
-        LMFAConfigurationTable->SmramBase = mCurrentSmramRange->CpuStart;
+      if (!EFI_ERROR (Status) && mLMFAConfigurationTable != NULL) {
+        mLMFAConfigurationTable->SmramBase = mCurrentSmramRange->CpuStart;
         //
         // Print the SMRAM base
         //
-        DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: TSEG BASE is %x. \n", LMFAConfigurationTable->SmramBase));
+        DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: TSEG BASE is %x. \n", mLMFAConfigurationTable->SmramBase));
       }
 
       //
