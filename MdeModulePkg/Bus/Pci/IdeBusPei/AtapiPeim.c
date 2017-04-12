@@ -2140,7 +2140,7 @@ ReadCapacity (
 
     if (MediaInfo->DeviceType == IdeCDROM) {
 
-      MediaInfo->LastBlock    = (Data.LastLba3 << 24) | (Data.LastLba2 << 16) | (Data.LastLba1 << 8) | Data.LastLba0;
+      MediaInfo->LastBlock    = ((UINT32) Data.LastLba3 << 24) | (Data.LastLba2 << 16) | (Data.LastLba1 << 8) | Data.LastLba0;
       MediaInfo->MediaPresent = TRUE;
       //
       // Because the user data portion in the sector of the Data CD supported
@@ -2161,7 +2161,7 @@ ReadCapacity (
         MediaInfo2->MediaPresent = FALSE;
         MediaInfo2->LastBlock    = 0;
       } else {
-        MediaInfo->LastBlock = (FormatData.LastLba3 << 24) |
+        MediaInfo->LastBlock = ((UINT32) FormatData.LastLba3 << 24) |
           (FormatData.LastLba2 << 16) |
           (FormatData.LastLba1 << 8) |
           FormatData.LastLba0;
