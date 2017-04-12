@@ -105,7 +105,7 @@ GetImageIdOrAddress (
     case EFI_HII_IIBT_IMAGE_8BIT_TRANS:
       Length = sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK) - sizeof (UINT8) +
                BITMAP_LEN_8_BIT (
-                 ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                 (UINT32) ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                  ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                  );
       ImageIdCurrent++;
@@ -115,7 +115,7 @@ GetImageIdOrAddress (
     case EFI_HII_IIBT_IMAGE_24BIT_TRANS:
       Length = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
                BITMAP_LEN_24_BIT (
-                 ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                 (UINT32) ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                  ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                  );
       ImageIdCurrent++;
@@ -453,7 +453,7 @@ Output8bitPixel (
   // Convert the pixel from 8 bits to corresponding color.
   //
   for (Ypos = 0; Ypos < Image->Height; Ypos++) {
-    OffsetY = BITMAP_LEN_8_BIT (Image->Width, Ypos);
+    OffsetY = BITMAP_LEN_8_BIT ((UINT32) Image->Width, Ypos);
     //
     // All bits are meaningful since the bitmap is 8 bits per pixel.
     //
@@ -493,7 +493,7 @@ Output24bitPixel (
   BitMapPtr = Image->Bitmap;
 
   for (Ypos = 0; Ypos < Image->Height; Ypos++) {
-    OffsetY = BITMAP_LEN_8_BIT (Image->Width, Ypos);
+    OffsetY = BITMAP_LEN_8_BIT ((UINT32) Image->Width, Ypos);
     CopyRgbToGopPixel (&BitMapPtr[OffsetY], &Data[OffsetY], Image->Width);
   }
 
@@ -650,7 +650,7 @@ HiiNewImage (
   }
 
   NewBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
-                 BITMAP_LEN_24_BIT (Image->Width, Image->Height);
+                 BITMAP_LEN_24_BIT ((UINT32) Image->Width, Image->Height);
 
   //
   // Get the image package in the package list,
@@ -753,7 +753,7 @@ HiiNewImage (
   }
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Width, Image->Width);
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Height, Image->Height);
-  CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Bitmap, Image->Bitmap, Image->Width * Image->Height);
+  CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) ImageBlocks)->Bitmap.Bitmap, Image->Bitmap, (UINT32) Image->Width * Image->Height);
 
   //
   // Append the block end
@@ -896,7 +896,7 @@ IGetImage (
     //
     CopyMem (&Iibt1bit, CurrentImageBlock, sizeof (EFI_HII_IIBT_IMAGE_1BIT_BLOCK));
     ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) *
-                  (Iibt1bit.Bitmap.Width * Iibt1bit.Bitmap.Height);
+                  ((UINT32) Iibt1bit.Bitmap.Width * Iibt1bit.Bitmap.Height);
     Image->Bitmap = AllocateZeroPool (ImageLength);
     if (Image->Bitmap == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -947,7 +947,7 @@ IGetImage (
   case EFI_HII_IIBT_IMAGE_24BIT:
     Width = ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width);
     Height = ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height);
-    ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * (Width * Height);
+    ImageLength = sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * ((UINT32) Width * Height);
     Image->Bitmap = AllocateZeroPool (ImageLength);
     if (Image->Bitmap == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -1095,7 +1095,7 @@ HiiSetImage (
   case EFI_HII_IIBT_IMAGE_8BIT_TRANS:
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_8BIT_BLOCK) - sizeof (UINT8) +
                    BITMAP_LEN_8_BIT (
-                     ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     (UINT32) ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                      ReadUnaligned16 (&((EFI_HII_IIBT_IMAGE_8BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                      );
     break;
@@ -1103,7 +1103,7 @@ HiiSetImage (
   case EFI_HII_IIBT_IMAGE_24BIT_TRANS:
     OldBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
                    BITMAP_LEN_24_BIT (
-                     ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
+                     (UINT32) ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Width),
                      ReadUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) CurrentImageBlock)->Bitmap.Height)
                      );
     break;
@@ -1115,7 +1115,7 @@ HiiSetImage (
   // Create the new image block according to input image.
   //
   NewBlockSize = sizeof (EFI_HII_IIBT_IMAGE_24BIT_BLOCK) - sizeof (EFI_HII_RGB_PIXEL) +
-                 BITMAP_LEN_24_BIT (Image->Width, Image->Height);
+                 BITMAP_LEN_24_BIT ((UINT32) Image->Width, Image->Height);
   //
   // Adjust the image package to remove the original block firstly then add the new block.
   //
@@ -1140,7 +1140,7 @@ HiiSetImage (
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Width, Image->Width);
   WriteUnaligned16 ((VOID *) &((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Height, Image->Height);
   CopyGopToRgbPixel (((EFI_HII_IIBT_IMAGE_24BIT_BLOCK *) NewImageBlock)->Bitmap.Bitmap,
-                       Image->Bitmap, Image->Width * Image->Height);
+                       Image->Bitmap, (UINT32) Image->Width * Image->Height);
 
   CopyMem ((UINT8 *) NewImageBlock + NewBlockSize, (UINT8 *) CurrentImageBlock + OldBlockSize, Part2Size);
 
