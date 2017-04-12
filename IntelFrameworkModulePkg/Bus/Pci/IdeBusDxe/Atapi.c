@@ -1,7 +1,7 @@
 /** @file
    This file contains all helper functions on the ATAPI command 
   
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -1053,7 +1053,7 @@ AtapiReadCapacity (
 	if (!EFI_ERROR (Status) && *SResult == SenseNoSenseKey) {
       if (IdeDev->Type == IdeCdRom) {
 
-        IdeDev->BlkIo.Media->LastBlock = (Data.LastLba3 << 24) |
+        IdeDev->BlkIo.Media->LastBlock = ((UINT32) Data.LastLba3 << 24) |
           (Data.LastLba2 << 16) |
           (Data.LastLba1 << 8) |
           Data.LastLba0;
@@ -1076,7 +1076,7 @@ AtapiReadCapacity (
           IdeDev->BlkIo.Media->LastBlock    = 0;
         } else {
 
-          IdeDev->BlkIo.Media->LastBlock =  (FormatData.LastLba3 << 24) |
+          IdeDev->BlkIo.Media->LastBlock = ((UINT32) FormatData.LastLba3 << 24) |
             (FormatData.LastLba2 << 16) | 
             (FormatData.LastLba1 << 8)  |
             FormatData.LastLba0;
