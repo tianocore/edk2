@@ -1,7 +1,7 @@
 /** @file
 Pei USB ATATPI command implementations.
 
-Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -274,7 +274,7 @@ PeiUsbReadCapacity (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-  LastBlock = (Data.LastLba3 << 24) | (Data.LastLba2 << 16) | (Data.LastLba1 << 8) | Data.LastLba0;
+  LastBlock = ((UINT32) Data.LastLba3 << 24) | (Data.LastLba2 << 16) | (Data.LastLba1 << 8) | Data.LastLba0;
 
   if (LastBlock == 0xFFFFFFFF) {
     DEBUG ((EFI_D_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
@@ -346,7 +346,7 @@ PeiUsbReadFormattedCapacity (
     PeiBotDevice->Media2.LastBlock     = 0;
 
   } else {
-    LastBlock = (FormatData.LastLba3 << 24) | (FormatData.LastLba2 << 16) | (FormatData.LastLba1 << 8) | FormatData.LastLba0;
+    LastBlock = ((UINT32) FormatData.LastLba3 << 24) | (FormatData.LastLba2 << 16) | (FormatData.LastLba1 << 8) | FormatData.LastLba0;
     if (LastBlock == 0xFFFFFFFF) {
       DEBUG ((EFI_D_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
     }
