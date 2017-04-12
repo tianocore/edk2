@@ -2031,8 +2031,8 @@ HttpTcpReceiveBody (
   
   if (HttpInstance->LocalAddressIsIPv6) {
     Rx6Token = &Wrap->TcpWrap.Rx6Token;
-    Rx6Token ->Packet.RxData->DataLength = (UINT32) HttpMsg->BodyLength;
-    Rx6Token ->Packet.RxData->FragmentTable[0].FragmentLength = (UINT32) HttpMsg->BodyLength;
+    Rx6Token ->Packet.RxData->DataLength = (UINT32) MIN (MAX_UINT32, HttpMsg->BodyLength);
+    Rx6Token ->Packet.RxData->FragmentTable[0].FragmentLength = (UINT32) MIN (MAX_UINT32, HttpMsg->BodyLength);
     Rx6Token ->Packet.RxData->FragmentTable[0].FragmentBuffer = (VOID *) HttpMsg->Body;
     Rx6Token->CompletionToken.Status = EFI_NOT_READY;
 
@@ -2043,8 +2043,8 @@ HttpTcpReceiveBody (
     }
   } else {
     Rx4Token = &Wrap->TcpWrap.Rx4Token;
-    Rx4Token->Packet.RxData->DataLength = (UINT32) HttpMsg->BodyLength;
-    Rx4Token->Packet.RxData->FragmentTable[0].FragmentLength = (UINT32) HttpMsg->BodyLength;
+    Rx4Token->Packet.RxData->DataLength = (UINT32) MIN (MAX_UINT32, HttpMsg->BodyLength);
+    Rx4Token->Packet.RxData->FragmentTable[0].FragmentLength = (UINT32) MIN (MAX_UINT32, HttpMsg->BodyLength);
     Rx4Token->Packet.RxData->FragmentTable[0].FragmentBuffer = (VOID *) HttpMsg->Body;
     
     Rx4Token->CompletionToken.Status = EFI_NOT_READY;
