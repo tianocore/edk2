@@ -292,6 +292,7 @@ StartString:
 ErrorString: 
   .byte 'B', 0x0c, 'E', 0x0c, 'r', 0x0c, 'r', 0x0c, 'o', 0x0c, 'r', 0x0c
 
+
 # ****************************************************************************
 # LBA Offset for BootSector, need patched by tool for HD boot.
 # ****************************************************************************
