@@ -3855,6 +3855,11 @@ class ModuleAutoGen(AutoGen):
           'libraryclasses_item'               : []
         }
 
+        if 'MODULE_UNI_FILE' in MDefs:
+            UNIFile = os.path.join(self.MetaFile.Dir, MDefs['MODULE_UNI_FILE'])
+            if os.path.isfile(UNIFile):
+                shutil.copy2(UNIFile, self.OutputDir)
+
         if self.AutoGenVersion > int(gInfSpecVersion, 0):
             AsBuiltInfDict['module_inf_version'] = '0x%08x' % self.AutoGenVersion
         else:
