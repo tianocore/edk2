@@ -855,6 +855,7 @@ static BROTLI_NOINLINE void InverseMoveToFrontTransform(
   uint32_t i = 4;
   uint32_t upper_bound = state->mtf_upper_bound;
   uint8_t* mtf = &state->mtf[4];  /* Make mtf[-1] addressable. */
+  uint8_t* mtft = &state->mtf[3];
   /* Load endian-aware constant. */
   const uint8_t b0123[4] = {0, 1, 2, 3};
   uint32_t pattern;
@@ -875,10 +876,10 @@ static BROTLI_NOINLINE void InverseMoveToFrontTransform(
     uint8_t value = mtf[index];
     upper_bound |= (uint32_t)v[i];
     v[i] = value;
-    mtf[-1] = value;
-    while (index > 0) {
+    mtft[0] = value;
+    while (index >= 0) {
+      mtft[index + 1] = mtft[index];
       index--;
-      mtf[index + 1] = mtf[index];
     }
   }
   /* Remember amount of elements to be reinitialized. */
