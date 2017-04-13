@@ -14,39 +14,48 @@
 QLT="-q 9"
 INPUTFLAG=0
 
-while [ $# != 0 ];do
-  case $1 in
-    -d)
+for arg; do
+  if [ $1 = -d ]
+    then
       INPUTFLAG=1
-      ARGS+="$1 "
-    ;;
-    -e)
+  fi
+  if [ $1 = -e ]
+    then
       INPUTFLAG=1
-    ;;
-    -g)
+      shift
+      continue;
+  fi
+  if [ $1 = -g ]
+    then
       ARGS+="$1 $2 "
       shift
-    ;;
-    -o)
+      shift
+      continue;
+  fi
+  if [ $1 = -o ]
+    then
       ARGS+="$1 $2 "
       shift
-    ;;
-    -q)
+      shift
+      continue;
+  fi
+  if [ $1 = -q ]
+    then
       QLT="$1 $2 "
       shift
-    ;;
-    *)
-      if [ $INPUTFLAG -eq 1 ]
-      then
-        if [ -z $2 ]
-          then
-            ARGS+="$QLT -i $1 "
-            break;
-        fi
+      shift
+      continue;
+  fi
+  if [ $INPUTFLAG -eq 1 ]
+    then
+      if [ -z $2 ]
+        then
+          ARGS+="$QLT -i $1 "
+          break;
       fi
-      ARGS+="$1 "
-  esac
+  fi
 
+ARGS+="$1 "
 shift
 done
 
