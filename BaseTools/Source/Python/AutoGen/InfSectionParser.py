@@ -62,6 +62,24 @@ class InfSectionParser():
                 SectionData = []
                 SectionLine = ''
     
+    # Get user extension TianoCore data
+    #
+    # @return: a list include some dictionary that key is section and value is a list contain all data.
+    def GetUserExtensionTianoCore(self):
+        UserExtensionTianoCore = []
+        if not self._FileSectionDataList:
+            return UserExtensionTianoCore
+        for SectionDataDict in self._FileSectionDataList:
+            for key in SectionDataDict.keys():
+                if key.lower().startswith("[userextensions") and key.lower().find('.tianocore.') > -1:
+                    SectionLine = key.lstrip(TAB_SECTION_START).rstrip(TAB_SECTION_END)
+                    SubSectionList = [SectionLine]
+                    if str(SectionLine).find(TAB_COMMA_SPLIT) > -1:
+                        SubSectionList = str(SectionLine).split(TAB_COMMA_SPLIT)
+                    for SubSection in SubSectionList:
+                        if SubSection.lower().find('.tianocore.') > -1:
+                            UserExtensionTianoCore.append({SubSection: SectionDataDict[key]})
+        return UserExtensionTianoCore
 
     # Get depex expresion
     #

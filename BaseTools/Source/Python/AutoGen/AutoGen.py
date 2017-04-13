@@ -143,6 +143,8 @@ ${END}
 
 ${depexsection_item}
 
+${userextension_tianocore_item}
+
 ${tail_comments}
 
 [BuildOptions.${module_arch}]
@@ -3088,6 +3090,30 @@ class ModuleAutoGen(AutoGen):
                 self._DepexExpressionList[ModuleType] = DepexExpressionList
         return self._DepexExpressionList
 
+    # Get the tiano core user extension, it is contain dependent library.
+    # @retval: a list contain tiano core userextension.
+    #
+    def _GetTianoCoreUserExtensionList(self):
+        TianoCoreUserExtentionList = []
+        for M in [self.Module] + self.DependentLibraryList:
+            Filename = M.MetaFile.Path
+            InfObj = InfSectionParser.InfSectionParser(Filename)
+            TianoCoreUserExtenList = InfObj.GetUserExtensionTianoCore()
+            for TianoCoreUserExtent in TianoCoreUserExtenList:
+                for Section in TianoCoreUserExtent.keys():
+                    ItemList = Section.split(TAB_SPLIT)
+                    Arch = self.Arch
+                    if len(ItemList) == 4:
+                        Arch = ItemList[3]
+                    if Arch.upper() == TAB_ARCH_COMMON or Arch.upper() == self.Arch.upper():
+                        TianoCoreList = []
+                        TianoCoreList.extend([TAB_SECTION_START + Section + TAB_SECTION_END])
+                        TianoCoreList.extend(TianoCoreUserExtent[Section][:])
+                        TianoCoreList.append('\n')
+                        TianoCoreUserExtentionList.append(TianoCoreList)
+
+        return TianoCoreUserExtentionList
+
     ## Return the list of specification version required for the module
     #
     #   @retval     list    The list of specification defined in module file
@@ -4059,6 +4085,16 @@ class ModuleAutoGen(AutoGen):
         for Library in self.LibraryAutoGenList:
             AsBuiltInfDict['libraryclasses_item'] += [Library.MetaFile.File.replace('\\', '/')]
         
+        # Generated UserExtensions TianoCore section.
+        # All tianocore user extensions are copied.
+        UserExtStr = ''
+        for TianoCore in self._GetTianoCoreUserExtensionList():
+            UserExtStr += '\n'.join(TianoCore)
+            ExtensionFile = os.path.join(self.MetaFile.Dir, TianoCore[1])
+            if os.path.isfile(ExtensionFile):
+                shutil.copy2(ExtensionFile, self.OutputDir)
+        AsBuiltInfDict['userextension_tianocore_item'] = UserExtStr
+
         # Generated depex expression section in comments.
         AsBuiltInfDict['depexsection_item'] = ''
         DepexExpresion = self._GetDepexExpresionString()
