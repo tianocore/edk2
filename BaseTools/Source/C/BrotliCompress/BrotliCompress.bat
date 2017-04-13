@@ -14,48 +14,54 @@
 @echo off
 @setlocal
 
-set LVL=--quality 9
+set QLT=-q 9
+set INPUTFLAG=0
 
 :Begin
 if "%1"=="" goto End
 
 if "%1"=="-d" (
-  set ARGS=%ARGS% --decompress
-  shift
-  goto Begin
+  set INPUTFLAG=1
 )
 
 if "%1"=="-e" (
+  set INPUTFLAG=1
   shift
   goto Begin
 )
 
 if "%1"=="-g" (
-  set ARGS=%ARGS% --gap %2
-  shift
-  shift
-  goto Begin
-)
-
-if "%1"=="-l" (
-  set LVL=--quality %2
+  set ARGS=%ARGS% %1 %2
   shift
   shift
   goto Begin
 )
 
 if "%1"=="-o" (
-  set ARGS=%ARGS% --output %2
-  set INTMP=%2
+  set ARGS=%ARGS% %1 %2
   shift
   shift
   goto Begin
 )
 
-set ARGS=%ARGS% --input %1
+if "%1"=="-q" (
+  set QLT=%1 %2
+  shift
+  shift
+  goto Begin
+)
+
+if %INPUTFLAG%==1 (
+ if "%2"=="" (
+    set ARGS=%ARGS% %QLT% -i %1
+    goto End
+  )
+)
+
+set ARGS=%ARGS% %1
 shift
 goto Begin
 
 :End
-Brotli %ARGS% %LVL%
+Brotli %ARGS%
 @echo on
