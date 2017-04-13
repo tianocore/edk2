@@ -11,32 +11,43 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-LVL="--quality 9"
+QLT="-q 9"
+INPUTFLAG=0
 
 while [ $# != 0 ];do
   case $1 in
     -d)
-      ARGS+="--decompress "
+      INPUTFLAG=1
+      ARGS+="$1 "
     ;;
     -e)
+      INPUTFLAG=1
     ;;
     -g)
-      ARGS+="--gap $2 "
-      shift
-    ;;
-    -l)
-      LVL="--quality $2 "
+      ARGS+="$1 $2 "
       shift
     ;;
     -o)
-      ARGS+="--output $2 "
+      ARGS+="$1 $2 "
+      shift
+    ;;
+    -q)
+      QLT="$1 $2 "
       shift
     ;;
     *)
-      ARGS+="--input $1 "
+      if [ $INPUTFLAG -eq 1 ]
+      then
+        if [ -z $2 ]
+          then
+            ARGS+="$QLT -i $1 "
+            break;
+        fi
+      fi
+      ARGS+="$1 "
   esac
 
 shift
 done
 
-exec Brotli $ARGS $LVL
+exec Brotli $ARGS

@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <time.h>
+#include <Common/BuildVersion.h>
 
 #include "../dec/decode.h"
 #include "../enc/encode.h"
@@ -67,6 +68,11 @@ static int ParseQuality(const char* s, int* quality) {
   return 0;
 }
 
+#define UTILITY_NAME          "Brotli"
+#define UTILITY_MAJOR_VERSION 0
+#define UTILITY_MINOR_VERSION 5
+#define UTILITY_REVERSION     2
+
 static void ParseArgv(int argc, char **argv,
                       char **input_path,
                       char **output_path,
@@ -110,6 +116,15 @@ static void ParseArgv(int argc, char **argv,
       }
       *verbose = 1;
       continue;
+    } else if (!strcmp("--version", argv[k])) {
+      fprintf(stderr,
+              "%s Version %d.%d.%d %s\n",
+              UTILITY_NAME,
+              UTILITY_MAJOR_VERSION,
+              UTILITY_MINOR_VERSION,
+              UTILITY_REVERSION,
+              __BUILD_VERSION);
+      exit(1);
     }
     if (k < argc - 1) {
       if (!strcmp("--input", argv[k]) ||
@@ -177,7 +192,8 @@ error:
   fprintf(stderr,
           "Usage: %s [--force] [--quality n] [--gap n] [--decompress]"
           " [--input filename] [--output filename] [--repeat iters]"
-          " [--verbose] [--window n] [--custom-dictionary filename]\n",
+          " [--verbose] [--window n] [--custom-dictionary filename]"
+          " [--version]\n",
           argv[0]);
   exit(1);
 }
