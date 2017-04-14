@@ -1790,10 +1790,10 @@ Arc4Init (
   If Output is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[in]   Arc4Context  Pointer to the ARC4 context.
-  @param[in]   Input        Pointer to the buffer containing the data to be encrypted.
-  @param[in]   InputSize    Size of the Input buffer in bytes.
-  @param[out]  Output       Pointer to a buffer that receives the ARC4 encryption output.
+  @param[in, out]  Arc4Context  Pointer to the ARC4 context.
+  @param[in]       Input        Pointer to the buffer containing the data to be encrypted.
+  @param[in]       InputSize    Size of the Input buffer in bytes.
+  @param[out]      Output       Pointer to a buffer that receives the ARC4 encryption output.
 
   @retval TRUE   ARC4 encryption succeeded.
   @retval FALSE  ARC4 encryption failed.
@@ -1822,10 +1822,10 @@ Arc4Encrypt (
   If Output is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
-  @param[in]   Arc4Context  Pointer to the ARC4 context.
-  @param[in]   Input        Pointer to the buffer containing the data to be decrypted.
-  @param[in]   InputSize    Size of the Input buffer in bytes.
-  @param[out]  Output       Pointer to a buffer that receives the ARC4 decryption output.
+  @param[in, out]  Arc4Context  Pointer to the ARC4 context.
+  @param[in]       Input        Pointer to the buffer containing the data to be decrypted.
+  @param[in]       InputSize    Size of the Input buffer in bytes.
+  @param[out]      Output       Pointer to a buffer that receives the ARC4 decryption output.
 
   @retval TRUE   ARC4 decryption succeeded.
   @retval FALSE  ARC4 decryption failed.
@@ -2511,7 +2511,7 @@ Pkcs7Verify (
   @retval     TRUE          The P7Data was correctly formatted for processing.
   @retval     FALSE         The P7Data was not correctly formatted for processing.
 
-*/
+**/
 BOOLEAN
 EFIAPI
 Pkcs7GetAttachedContent (
