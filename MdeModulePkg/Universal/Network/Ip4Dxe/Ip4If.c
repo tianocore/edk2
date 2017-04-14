@@ -855,7 +855,7 @@ Ip4OnArpResolvedDpc (
 
     Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
     if (EFI_ERROR (Status)) {
-      RemoveEntryList (Entry);
+      RemoveEntryList (&Token->Link);
       Token->CallBack (Token->IpInstance, Token->Packet, Status, 0, Token->Context);
 
       Ip4FreeLinkTxToken (Token);
@@ -1081,7 +1081,7 @@ SEND_NOW:
   InsertTailList (&Interface->SentFrames, &Token->Link);
   Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
   if (EFI_ERROR (Status)) {
-    RemoveEntryList (&Interface->SentFrames);
+    RemoveEntryList (&Token->Link);
     goto ON_ERROR;
   }
 
