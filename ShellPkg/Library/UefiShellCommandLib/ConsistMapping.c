@@ -1,7 +1,7 @@
 /** @file
   Main file for support of shell consist mapping.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -1610,7 +1610,6 @@ ShellCommandConsistMappingGenMappingName (
   DEVICE_CONSIST_MAPPING_INFO MappingInfo;
   EFI_DEVICE_PATH_PROTOCOL    *HIDevicePath;
   UINTN                       Index;
-  CHAR16                      *NewStr;
 
   ASSERT(DevicePath         != NULL);
   ASSERT(Table  != NULL);
@@ -1667,13 +1666,7 @@ ShellCommandConsistMappingGenMappingName (
     return NULL;
   }
 
-  NewStr = ReallocatePool (Str.Len * sizeof (CHAR16), (Str.Len + 1) * sizeof (CHAR16), Str.Str);
-  if (NewStr == NULL) {
-    SHELL_FREE_NON_NULL (Str.Str);
-    return (NULL);
-  }
-  NewStr[Str.Len] = CHAR_NULL;
-  return NewStr;
+  return Str.Str;
 }
 
 /**
