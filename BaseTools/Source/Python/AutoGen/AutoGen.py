@@ -62,10 +62,10 @@ gMakeTypeMap = {"MSFT":"nmake", "GCC":"gmake"}
 
 
 ## Build rule configuration file
-gDefaultBuildRuleFile = 'Conf/build_rule.txt'
+gDefaultBuildRuleFile = 'build_rule.txt'
 
 ## Tools definition configuration file
-gDefaultToolsDefFile = 'Conf/tools_def.txt'
+gDefaultToolsDefFile = 'tools_def.txt'
 
 ## Build rule default version
 AutoGenReqBuildRuleVerNum = "0.1"
@@ -726,8 +726,8 @@ class WorkspaceAutoGen(AutoGen):
         #
         # add build_rule.txt & tools_def.txt
         #
-        AllWorkSpaceMetaFiles.add(gDefaultBuildRuleFile)
-        AllWorkSpaceMetaFiles.add(gDefaultToolsDefFile)
+        AllWorkSpaceMetaFiles.add(os.path.join(GlobalData.gConfDirectory, gDefaultBuildRuleFile))
+        AllWorkSpaceMetaFiles.add(os.path.join(GlobalData.gConfDirectory, gDefaultToolsDefFile))
 
         # add BuildOption metafile
         #
