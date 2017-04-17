@@ -1031,6 +1031,7 @@ GetConsoleInCheck (
   BM_MENU_ENTRY       *NewMenuEntry; 
   UINT8               *ConInCheck;
   BM_CONSOLE_CONTEXT  *NewConsoleContext;
+  BM_TERMINAL_CONTEXT *NewTerminalContext;
 
   ASSERT (CallbackData != NULL);
 
@@ -1040,6 +1041,13 @@ GetConsoleInCheck (
     NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleInpMenu, Index);
     NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
     ConInCheck[Index] = NewConsoleContext->IsActive;
+  }
+
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    ASSERT (Index + ConsoleInpMenu.MenuNumber < MAX_MENU_NUMBER);
+    ConInCheck[Index + ConsoleInpMenu.MenuNumber] = NewTerminalContext->IsConIn;
   }
 }
 
@@ -1060,7 +1068,8 @@ GetConsoleOutCheck (
   BM_MENU_ENTRY       *NewMenuEntry; 
   UINT8               *ConOutCheck;
   BM_CONSOLE_CONTEXT  *NewConsoleContext;
-  
+  BM_TERMINAL_CONTEXT *NewTerminalContext;
+
   ASSERT (CallbackData != NULL);
   ConOutCheck = &CallbackData->BmmFakeNvData.ConsoleOutCheck[0];
   for (Index = 0; ((Index < ConsoleOutMenu.MenuNumber) && \
@@ -1068,6 +1077,13 @@ GetConsoleOutCheck (
     NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleOutMenu, Index);
     NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
     ConOutCheck[Index] = NewConsoleContext->IsActive;
+  }
+
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    ASSERT (Index + ConsoleOutMenu.MenuNumber < MAX_MENU_NUMBER);
+    ConOutCheck[Index + ConsoleOutMenu.MenuNumber] = NewTerminalContext->IsConOut;
   }
 }
 
@@ -1088,6 +1104,7 @@ GetConsoleErrCheck (
   BM_MENU_ENTRY       *NewMenuEntry; 
   UINT8               *ConErrCheck;
   BM_CONSOLE_CONTEXT  *NewConsoleContext;
+  BM_TERMINAL_CONTEXT *NewTerminalContext;
 
   ASSERT (CallbackData != NULL);
   ConErrCheck = &CallbackData->BmmFakeNvData.ConsoleErrCheck[0];
@@ -1096,6 +1113,13 @@ GetConsoleErrCheck (
     NewMenuEntry      = BOpt_GetMenuEntry (&ConsoleErrMenu, Index);
     NewConsoleContext = (BM_CONSOLE_CONTEXT *) NewMenuEntry->VariableContext;  
     ConErrCheck[Index] = NewConsoleContext->IsActive;
+  }
+
+  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+    NewMenuEntry                = BOpt_GetMenuEntry (&TerminalMenu, Index);
+    NewTerminalContext          = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
+    ASSERT (Index + ConsoleErrMenu.MenuNumber < MAX_MENU_NUMBER);
+    ConErrCheck[Index + ConsoleErrMenu.MenuNumber] = NewTerminalContext->IsStdErr;
   }
 }
 
