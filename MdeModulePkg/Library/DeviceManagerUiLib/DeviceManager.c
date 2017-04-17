@@ -540,12 +540,15 @@ CreateDeviceManagerForm(
   // Update the network device form titile.
   //
   if (NextShowFormId == NETWORK_DEVICE_FORM_ID) {
-    String = HiiGetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NULL);
-    NewStringLen = StrLen(mSelectedMacAddrString) * 2;
-    NewStringLen += (StrLen(String) + 2) * 2;
+    String = HiiGetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE_HEAD), NULL);
+    if (String == NULL) {
+      return;
+    }
+    NewStringLen = StrLen (mSelectedMacAddrString) * 2;
+    NewStringLen += (StrLen (String) + 2) * 2;
     NewStringTitle = AllocatePool (NewStringLen);
     UnicodeSPrint (NewStringTitle, NewStringLen, L"%s %s", String, mSelectedMacAddrString);
-    HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);    
+    HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);
     FreePool (String);
     FreePool (NewStringTitle);
   }
