@@ -1905,16 +1905,12 @@ PciGetNextBusRange (
   @param[in] ConfigSpace     Data in PCI configuration space.
   @param[in] Address         Address used to access configuration space of this PCI device.
   @param[in] IoDev           Handle used to access configuration space of PCI device.
-  @param[in] EnhancedDump    The print format for the dump data.
-
-  @retval EFI_SUCCESS     The command completed successfully.
 **/
-EFI_STATUS
-PciExplainData (
+VOID
+PciExplainPci (
   IN PCI_CONFIG_SPACE                       *ConfigSpace,
   IN UINT64                                 Address,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev,
-  IN CONST UINT16                           EnhancedDump
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
   );
 
 /**
@@ -2030,40 +2026,31 @@ PciExplainBridgeControl (
   );
 
 /**
-  Print each capability structure.
+  Locate capability register block per capability ID.
 
-  @param[in] IoDev            The pointer to the deivce.
-  @param[in] Address          The address to start at.
-  @param[in] CapPtr           The offset from the address.
-  @param[in] EnhancedDump     The print format for the dump data.
+  @param[in] ConfigSpace       Data in PCI configuration space.
+  @param[in] CapabilityId      The capability ID.
 
-  @retval EFI_SUCCESS         The operation was successful.
+  @return   The offset of the register block per capability ID.
 **/
-EFI_STATUS
-PciExplainCapabilityStruct (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
-  IN UINT64                                   Address,
-  IN  UINT8                                   CapPtr,
-  IN CONST UINT16                            EnhancedDump
+UINT8
+LocatePciCapability (
+  IN PCI_CONFIG_SPACE   *ConfigSpace,
+  IN UINT8              CapabilityId
   );
 
 /**
   Display Pcie device structure.
 
-  @param[in] IoDev            The pointer to the root pci protocol.
-  @param[in] Address          The Address to start at.
-  @param[in] CapabilityPtr    The offset from the address to start.
-  @param[in] EnhancedDump     The print format for the dump data.
-  
-  @retval EFI_SUCCESS           The command completed successfully.
-  @retval @retval EFI_SUCCESS   Pci express extend space IO is not suppoted.   
+  @param[in] PciExpressCap       PCI Express capability buffer.
+  @param[in] ExtendedConfigSpace PCI Express extended configuration space.
+  @param[in] ExtendedCapability  PCI Express extended capability ID to explain.
 **/
-EFI_STATUS
+VOID
 PciExplainPciExpress (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
-  IN  UINT64                                  Address,
-  IN  UINT8                                   CapabilityPtr,
-  IN CONST UINT16                            EnhancedDump
+  IN  PCI_CAPABILITY_PCIEXP                  *PciExpressCap,
+  IN  UINT8                                  *ExtendedConfigSpace,
+  IN CONST UINT16                            ExtendedCapability
   );
 
 /**
@@ -2473,7 +2460,10 @@ ShellCommandRunPci (
   SHELL_STATUS                      ShellStatus;
   CONST CHAR16                      *Temp;
   UINT64                            RetVal;
-  UINT16                            EnhancedDump;
+  UINT16                            ExtendedCapability;
+  UINT8                             PcieCapabilityPtr;
+  UINT8                             *ExtendedConfigSpace;
+  UINTN                             ExtendedConfigSize;
 
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
@@ -2726,7 +2716,7 @@ ShellCommandRunPci (
     Bus                           = 0;
     Device                        = 0;
     Func                          = 0;
-    EnhancedDump                  = 0xFFFF;
+    ExtendedCapability          = 0xFFFF;
     if (ShellCommandLineGetFlag(Package, L"-i")) {
       ExplainData = TRUE;
     }
@@ -2814,7 +2804,7 @@ ShellCommandRunPci (
       // Input converted to hexadecimal number.
       //
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
-        EnhancedDump = (UINT16) RetVal;
+        ExtendedCapability = (UINT16) RetVal;
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -2894,11 +2884,51 @@ ShellCommandRunPci (
       ConfigSpace.Data
      );
 
+    ExtendedConfigSpace = NULL;
+    PcieCapabilityPtr = LocatePciCapability (&ConfigSpace, EFI_PCI_CAPABILITY_ID_PCIEXP);
+    if (PcieCapabilityPtr != 0) {
+      ExtendedConfigSize  = 0x1000 - EFI_PCIE_CAPABILITY_BASE_OFFSET;
+      ExtendedConfigSpace = AllocatePool (ExtendedConfigSize);
+      if (ExtendedConfigSpace != NULL) {
+        Status = IoDev->Pci.Read (
+                              IoDev,
+                              EfiPciWidthUint32,
+                              EFI_PCI_ADDRESS (Bus, Device, Func, EFI_PCIE_CAPABILITY_BASE_OFFSET),
+                              ExtendedConfigSize / sizeof (UINT32),
+                              ExtendedConfigSpace
+                              );
+        if (EFI_ERROR (Status)) {
+          SHELL_FREE_NON_NULL (ExtendedConfigSpace);
+        }
+      }
+    }
+
+    if ((ExtendedConfigSpace != NULL) && !ShellGetExecutionBreakFlag ()) {
+      //
+      // Print the PciEx extend space in raw bytes ( 0xFF-0xFFF)
+      //
+      ShellPrintEx (-1, -1, L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
+
+      DumpHex (
+        2,
+        EFI_PCIE_CAPABILITY_BASE_OFFSET,
+        ExtendedConfigSize,
+        ExtendedConfigSpace
+        );
+    }
+
     //
     // If "-i" appears in command line, interpret data in configuration space
     //
     if (ExplainData) {
-      Status = PciExplainData (&ConfigSpace, Address, IoDev, EnhancedDump);
+      PciExplainPci (&ConfigSpace, Address, IoDev);
+      if ((PcieCapabilityPtr != 0) && !ShellGetExecutionBreakFlag ()) {
+        PciExplainPciExpress (
+          (PCI_CAPABILITY_PCIEXP *) ((UINT8 *) &ConfigSpace + PcieCapabilityPtr),
+          ExtendedConfigSpace,
+          ExtendedCapability
+          );
+      }
     }
   }
 Done:
@@ -3092,22 +3122,16 @@ PciGetNextBusRange (
   @param[in] ConfigSpace     Data in PCI configuration space.
   @param[in] Address         Address used to access configuration space of this PCI device.
   @param[in] IoDev           Handle used to access configuration space of PCI device.
-  @param[in] EnhancedDump    The print format for the dump data.
-
-  @retval EFI_SUCCESS     The command completed successfully.
 **/
-EFI_STATUS
-PciExplainData (
+VOID
+PciExplainPci (
   IN PCI_CONFIG_SPACE                       *ConfigSpace,
   IN UINT64                                 Address,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev,
-  IN CONST UINT16                           EnhancedDump
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *IoDev
   )
 {
   PCI_DEVICE_INDEPENDENT_REGION *Common;
   PCI_HEADER_TYPE               HeaderType;
-  EFI_STATUS                    Status;
-  UINT8                         CapPtr;
 
   Common = &(ConfigSpace->Common);
 
@@ -3213,56 +3237,6 @@ PciExplainData (
   ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_PCI2_CLASS), gShellDebug1HiiHandle);
   PciPrintClassCode ((UINT8 *) Common->ClassCode, TRUE);
   ShellPrintEx (-1, -1, L"\r\n");
-
-  if (ShellGetExecutionBreakFlag()) {
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Interpret remaining part of PCI configuration header depending on
-  // HeaderType
-  //
-  CapPtr  = 0;
-  Status  = EFI_SUCCESS;
-  switch (HeaderType) {
-  case PciDevice:
-    Status = PciExplainDeviceData (
-              &(ConfigSpace->NonCommon.Device),
-              Address,
-              IoDev
-             );
-    CapPtr = ConfigSpace->NonCommon.Device.CapabilityPtr;
-    break;
-
-  case PciP2pBridge:
-    Status = PciExplainBridgeData (
-              &(ConfigSpace->NonCommon.Bridge),
-              Address,
-              IoDev
-             );
-    CapPtr = ConfigSpace->NonCommon.Bridge.CapabilityPtr;
-    break;
-
-  case PciCardBusBridge:
-    Status = PciExplainCardBusData (
-              &(ConfigSpace->NonCommon.CardBus),
-              Address,
-              IoDev
-             );
-    CapPtr = ConfigSpace->NonCommon.CardBus.Cap_Ptr;
-    break;
-  case PciUndefined:
-  default:
-    break;
-  }
-  //
-  // If Status bit4 is 1, dump or explain capability structure
-  //
-  if ((Common->Status) & EFI_PCI_STATUS_CAPABILITY) {
-    PciExplainCapabilityStruct (IoDev, Address, CapPtr, EnhancedDump);
-  }
-
-  return Status;
 }
 
 /**
@@ -4221,53 +4195,62 @@ PciExplainBridgeControl (
 }
 
 /**
-  Print each capability structure.
+  Locate capability register block per capability ID.
 
-  @param[in] IoDev            The pointer to the deivce.
-  @param[in] Address          The address to start at.
-  @param[in] CapPtr           The offset from the address.
-  @param[in] EnhancedDump     The print format for the dump data.
+  @param[in] ConfigSpace       Data in PCI configuration space.
+  @param[in] CapabilityId      The capability ID.
 
-  @retval EFI_SUCCESS     The operation was successful.
+  @return   The offset of the register block per capability ID,
+            or 0 if the register block cannot be found.
 **/
-EFI_STATUS
-PciExplainCapabilityStruct (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
-  IN UINT64                                   Address,
-  IN  UINT8                                   CapPtr,
-  IN CONST UINT16                            EnhancedDump
+UINT8
+LocatePciCapability (
+  IN PCI_CONFIG_SPACE   *ConfigSpace,
+  IN UINT8              CapabilityId
   )
 {
-  UINT8   CapabilityPtr;
-  UINT16  CapabilityEntry;
-  UINT8   CapabilityID;
-  UINT64  RegAddress;
-
-  CapabilityPtr = CapPtr;
+  UINT8                   CapabilityPtr;
+  EFI_PCI_CAPABILITY_HDR  *CapabilityEntry;
 
   //
-  // Go through the Capability list
+  // To check the cpability of this device supports
   //
-  while ((CapabilityPtr >= 0x40) && ((CapabilityPtr & 0x03) == 0x00)) {
-    RegAddress = Address + CapabilityPtr;
-    IoDev->Pci.Read (IoDev, EfiPciWidthUint16, RegAddress, 1, &CapabilityEntry);
-
-    CapabilityID = (UINT8) CapabilityEntry;
-
-    //
-    // Explain PciExpress data
-    //
-    if (EFI_PCI_CAPABILITY_ID_PCIEXP == CapabilityID) {
-      PciExplainPciExpress (IoDev, Address, CapabilityPtr, EnhancedDump);
-      return EFI_SUCCESS;
-    }
-    //
-    // Explain other capabilities here
-    //
-    CapabilityPtr = (UINT8) (CapabilityEntry >> 8);
+  if ((ConfigSpace->Common.Status & EFI_PCI_STATUS_CAPABILITY) == 0) {
+    return 0;
   }
 
-  return EFI_SUCCESS;
+  switch ((PCI_HEADER_TYPE)(ConfigSpace->Common.HeaderType & 0x7f)) {
+    case PciDevice:
+      CapabilityPtr = ConfigSpace->NonCommon.Device.CapabilityPtr;
+      break;
+    case PciP2pBridge:
+      CapabilityPtr = ConfigSpace->NonCommon.Bridge.CapabilityPtr;
+      break;
+    case PciCardBusBridge:
+      CapabilityPtr = ConfigSpace->NonCommon.CardBus.Cap_Ptr;
+      break;
+    default:
+      return 0;
+  }
+
+  while ((CapabilityPtr >= 0x40) && ((CapabilityPtr & 0x03) == 0x00)) {
+    CapabilityEntry = (EFI_PCI_CAPABILITY_HDR *) ((UINT8 *) ConfigSpace + CapabilityPtr);
+    if (CapabilityEntry->CapabilityID == CapabilityId) {
+      return CapabilityPtr;
+    }
+
+    //
+    // Certain PCI device may incorrectly have capability pointing to itself,
+    // break to avoid dead loop.
+    //
+    if (CapabilityPtr == CapabilityEntry->NextItemPtr) {
+      break;
+    }
+
+    CapabilityPtr = CapabilityEntry->NextItemPtr;
+  }
+
+  return 0;
 }
 
 /**
@@ -5706,53 +5689,32 @@ PrintPciExtendedCapabilityDetails(
 /**
   Display Pcie device structure.
 
-  @param[in] IoDev          The pointer to the root pci protocol.
-  @param[in] Address        The Address to start at.
-  @param[in] CapabilityPtr  The offset from the address to start.
-  @param[in] EnhancedDump   The print format for the dump data.
-  
+  @param[in] PciExpressCap       PCI Express capability buffer.
+  @param[in] ExtendedConfigSpace PCI Express extended configuration space.
+  @param[in] ExtendedCapability  PCI Express extended capability ID to explain.
 **/
-EFI_STATUS
+VOID
 PciExplainPciExpress (
-  IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL         *IoDev,
-  IN  UINT64                                  Address,
-  IN  UINT8                                   CapabilityPtr,
-  IN CONST UINT16                            EnhancedDump
+  IN  PCI_CAPABILITY_PCIEXP                  *PciExpressCap,
+  IN  UINT8                                  *ExtendedConfigSpace,
+  IN CONST UINT16                            ExtendedCapability
   )
 {
-  PCI_CAPABILITY_PCIEXP PciExpressCap;
-  EFI_STATUS            Status;
-  UINT64                CapRegAddress;
-  UINT8                 Bus;
-  UINT8                 Dev;
-  UINT8                 Func;
-  UINT8                 *ExRegBuffer;
-  UINTN                 ExtendRegSize;
-  UINT64                Pciex_Address;
   UINT8                 DevicePortType;
   UINTN                 Index;
   UINT8                 *RegAddr;
   UINTN                 RegValue;
   PCI_EXP_EXT_HDR       *ExtHdr;
 
-  CapRegAddress = Address + CapabilityPtr;
-  IoDev->Pci.Read (
-              IoDev,
-              EfiPciWidthUint32,
-              CapRegAddress,
-              sizeof (PciExpressCap) / sizeof (UINT32),
-              &PciExpressCap
-             );
-
-  DevicePortType = (UINT8)PciExpressCap.Capability.Bits.DevicePortType;
+  DevicePortType = (UINT8)PciExpressCap->Capability.Bits.DevicePortType;
 
   ShellPrintEx (-1, -1, L"\r\nPci Express device capability structure:\r\n");
 
   for (Index = 0; PcieExplainList[Index].Type < PcieExplainTypeMax; Index++) {
     if (ShellGetExecutionBreakFlag()) {
-      goto Done;
+      return;
     }
-    RegAddr = ((UINT8 *) &PciExpressCap) + PcieExplainList[Index].Offset;
+    RegAddr = (UINT8 *) PciExpressCap + PcieExplainList[Index].Offset;
     switch (PcieExplainList[Index].Width) {
       case FieldWidthUINT8:
         RegValue = *(UINT8 *) RegAddr;
@@ -5797,7 +5759,7 @@ PciExplainPciExpress (
         //
         if ((DevicePortType != PCIE_DEVICE_PORT_TYPE_ROOT_PORT &&
              DevicePortType != PCIE_DEVICE_PORT_TYPE_DOWNSTREAM_PORT) ||
-             !PciExpressCap.Capability.Bits.SlotImplemented) {
+             !PciExpressCap->Capability.Bits.SlotImplemented) {
           continue;
         }
         break;
@@ -5813,58 +5775,28 @@ PciExplainPciExpress (
       default:
         break;
     }
-    PcieExplainList[Index].Func (&PciExpressCap);
+    PcieExplainList[Index].Func (PciExpressCap);
   }
 
-  Bus           = (UINT8) (RShiftU64 (Address, 24));
-  Dev           = (UINT8) (RShiftU64 (Address, 16));
-  Func          = (UINT8) (RShiftU64 (Address, 8));
-
-  Pciex_Address = EFI_PCI_ADDRESS (Bus, Dev, Func, EFI_PCIE_CAPABILITY_BASE_OFFSET);
-
-  ExtendRegSize = 0x1000 - EFI_PCIE_CAPABILITY_BASE_OFFSET;
-
-  ExRegBuffer   = (UINT8 *) AllocateZeroPool (ExtendRegSize);
-
-  //
-  // PciRootBridgeIo protocol should support pci express extend space IO
-  // (Begins at offset EFI_PCIE_CAPABILITY_BASE_OFFSET)
-  //
-  Status = IoDev->Pci.Read (
-                        IoDev,
-                        EfiPciWidthUint32,
-                        Pciex_Address,
-                        (ExtendRegSize) / sizeof (UINT32),
-                        (VOID *) (ExRegBuffer)
-                       );
-  if (EFI_ERROR (Status) || ExRegBuffer == NULL) {
-    SHELL_FREE_NON_NULL(ExRegBuffer);
-    return EFI_UNSUPPORTED;
-  }
-
-  ExtHdr = (PCI_EXP_EXT_HDR*)ExRegBuffer;
+  ExtHdr = (PCI_EXP_EXT_HDR*)ExtendedConfigSpace;
   while (ExtHdr->CapabilityId != 0 && ExtHdr->CapabilityVersion != 0) {
     //
     // Process this item
     //
-    if (EnhancedDump == 0xFFFF || EnhancedDump == ExtHdr->CapabilityId) {
+    if (ExtendedCapability == 0xFFFF || ExtendedCapability == ExtHdr->CapabilityId) {
       //
       // Print this item
       //
-      PrintPciExtendedCapabilityDetails((PCI_EXP_EXT_HDR*)ExRegBuffer, ExtHdr, &PciExpressCap);
+      PrintPciExtendedCapabilityDetails((PCI_EXP_EXT_HDR*)ExtendedConfigSpace, ExtHdr, PciExpressCap);
     }
 
     //
     // Advance to the next item if it exists
     //
     if (ExtHdr->NextCapabilityOffset != 0) {
-      ExtHdr = (PCI_EXP_EXT_HDR*)((UINT8*)ExRegBuffer + ExtHdr->NextCapabilityOffset - EFI_PCIE_CAPABILITY_BASE_OFFSET);
+      ExtHdr = (PCI_EXP_EXT_HDR*)(ExtendedConfigSpace + ExtHdr->NextCapabilityOffset - EFI_PCIE_CAPABILITY_BASE_OFFSET);
     } else {
       break;
     }
   }
-  SHELL_FREE_NON_NULL(ExRegBuffer);
-
-Done:
-  return EFI_SUCCESS;
 }
