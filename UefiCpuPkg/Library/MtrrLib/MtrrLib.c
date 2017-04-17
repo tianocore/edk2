@@ -1536,6 +1536,7 @@ MtrrLibAddVariableMtrr (
 
   MTRR_LIB_ASSERT_ALIGNED (BaseAddress, Length);
   if (Type == CacheInvalid) {
+    ASSERT (Ranges != NULL);
     for (Index = 0; Index < RangeCount; Index++) {
       if (Ranges[Index].BaseAddress <= BaseAddress && BaseAddress < Ranges[Index].BaseAddress + Ranges[Index].Length) {
 
@@ -2027,25 +2028,27 @@ MtrrSetMemoryAttributeWorker (
   ASSERT (OriginalVariableMtrrCount - FreeVariableMtrrCount <= FirmwareVariableMtrrCount);
 
   //
-  // Move MTRRs after the FirmwraeVariableMtrrCount position to beginning
+  // Move MTRRs after the FirmwareVariableMtrrCount position to beginning
   //
-  WorkingIndex = FirmwareVariableMtrrCount;
-  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if (!OriginalVariableMtrr[Index].Valid) {
-      //
-      // Found an empty MTRR in WorkingIndex position
-      //
-      for (; WorkingIndex < OriginalVariableMtrrCount; WorkingIndex++) {
-        if (OriginalVariableMtrr[WorkingIndex].Valid) {
-          break;
+  if (FirmwareVariableMtrrCount < OriginalVariableMtrrCount) {
+    WorkingIndex = FirmwareVariableMtrrCount;
+    for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
+      if (!OriginalVariableMtrr[Index].Valid) {
+        //
+        // Found an empty MTRR in WorkingIndex position
+        //
+        for (; WorkingIndex < OriginalVariableMtrrCount; WorkingIndex++) {
+          if (OriginalVariableMtrr[WorkingIndex].Valid) {
+            break;
+          }
         }
-      }
 
-      if (WorkingIndex != OriginalVariableMtrrCount) {
-        CopyMem (&OriginalVariableMtrr[Index], &OriginalVariableMtrr[WorkingIndex], sizeof (VARIABLE_MTRR));
-        VariableSettingModified[Index] = TRUE;
-        VariableSettingModified[WorkingIndex] = TRUE;
-        OriginalVariableMtrr[WorkingIndex].Valid = FALSE;
+        if (WorkingIndex != OriginalVariableMtrrCount) {
+          CopyMem (&OriginalVariableMtrr[Index], &OriginalVariableMtrr[WorkingIndex], sizeof (VARIABLE_MTRR));
+          VariableSettingModified[Index] = TRUE;
+          VariableSettingModified[WorkingIndex] = TRUE;
+          OriginalVariableMtrr[WorkingIndex].Valid = FALSE;
+        }
       }
     }
   }
