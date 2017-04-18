@@ -407,7 +407,7 @@ BSPHandler (
   //
   // The BUSY lock is initialized to Acquired state
   //
-  AcquireSpinLockOrFail (mSmmMpSyncData->CpuData[CpuIndex].Busy);
+  AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
 
   //
   // Perform the pre tasks
