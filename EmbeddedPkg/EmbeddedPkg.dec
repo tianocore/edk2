@@ -4,6 +4,7 @@
 # This Package provides headers and libraries that conform to EFI/PI Industry standards.
 # Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2012-2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available under
 #    the terms and conditions of the BSD License which accompanies this distribution.
@@ -159,6 +160,9 @@
   # The default feature mask below disables full duplex negotiation, since full
   # duplex operation is suspected to be broken in the driver.
   gEmbeddedTokenSpaceGuid.PcdLan9118NegotiationFeatureMask|0xFFFFFEBF|UINT32|0x00000028
+
+  # LAN91x Ethernet Driver PCDs
+  gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x0|UINT32|0x00000029
 
   #
   # Android FastBoot
