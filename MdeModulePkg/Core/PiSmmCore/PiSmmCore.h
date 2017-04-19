@@ -1196,11 +1196,27 @@ extern LIST_ENTRY  mSmmMemoryMap;
 //
 #define MAX_POOL_INDEX  (MAX_POOL_SHIFT - MIN_POOL_SHIFT + 1)
 
+#define POOL_HEAD_SIGNATURE   SIGNATURE_32('p','h','d','0')
+
 typedef struct {
-  UINTN           Size;
-  BOOLEAN         Available;
-  EFI_MEMORY_TYPE Type;
+  UINT32            Signature;
+  BOOLEAN           Available;
+  EFI_MEMORY_TYPE   Type;
+  UINTN             Size;
 } POOL_HEADER;
+
+#define POOL_TAIL_SIGNATURE   SIGNATURE_32('p','t','a','l')
+
+typedef struct {
+  UINT32            Signature;
+  UINT32            Reserved;
+  UINTN             Size;
+} POOL_TAIL;
+
+#define POOL_OVERHEAD (sizeof(POOL_HEADER) + sizeof(POOL_TAIL))
+
+#define HEAD_TO_TAIL(a)   \
+  ((POOL_TAIL *) (((CHAR8 *) (a)) + (a)->Size - sizeof(POOL_TAIL)));
 
 typedef struct {
   POOL_HEADER  Header;
