@@ -64,6 +64,8 @@ if __name__ == '__main__':
   try:
     OpenSslPath = os.environ['OPENSSL_PATH']
     OpenSslCommand = os.path.join(OpenSslPath, OpenSslCommand)
+    if ' ' in OpenSslCommand:
+      OpenSslCommand = '"' + OpenSslCommand + '"'
   except:
     pass
 
