@@ -133,6 +133,7 @@ InternalAllocPoolByIndex (
 {
   EFI_STATUS            Status;
   FREE_POOL_HEADER      *Hdr;
+  POOL_TAIL             *Tail;
   EFI_PHYSICAL_ADDRESS  Address;
   SMM_POOL_TYPE         SmmPoolType;
 
@@ -154,18 +155,26 @@ InternalAllocPoolByIndex (
   } else {
     Status = InternalAllocPoolByIndex (PoolType, PoolIndex + 1, &Hdr);
     if (!EFI_ERROR (Status)) {
+      Hdr->Header.Signature = 0;
       Hdr->Header.Size >>= 1;
       Hdr->Header.Available = TRUE;
-      Hdr->Header.Type = PoolType;
+      Hdr->Header.Type = 0;
+      Tail = HEAD_TO_TAIL(&Hdr->Header);
+      Tail->Signature = 0;
+      Tail->Size = 0;
       InsertHeadList (&mSmmPoolLists[SmmPoolType][PoolIndex], &Hdr->Link);
       Hdr = (FREE_POOL_HEADER*)((UINT8*)Hdr + Hdr->Header.Size);
     }
   }
 
   if (!EFI_ERROR (Status)) {
+    Hdr->Header.Signature = POOL_HEAD_SIGNATURE;
     Hdr->Header.Size = MIN_POOL_SIZE << PoolIndex;
     Hdr->Header.Available = FALSE;
     Hdr->Header.Type = PoolType;
+    Tail = HEAD_TO_TAIL(&Hdr->Header);
+    Tail->Signature = POOL_TAIL_SIGNATURE;
+    Tail->Size = Hdr->Header.Size;
   }
 
   *FreePoolHdr = Hdr;
@@ -187,6 +196,7 @@ InternalFreePoolByIndex (
 {
   UINTN                 PoolIndex;
   SMM_POOL_TYPE         SmmPoolType;
+  POOL_TAIL             *PoolTail;
 
   ASSERT ((FreePoolHdr->Header.Size & (FreePoolHdr->Header.Size - 1)) == 0);
   ASSERT (((UINTN)FreePoolHdr & (FreePoolHdr->Header.Size - 1)) == 0);
@@ -195,7 +205,12 @@ InternalFreePoolByIndex (
   SmmPoolType = UefiMemoryTypeToSmmPoolType(FreePoolHdr->Header.Type);
 
   PoolIndex = (UINTN) (HighBitSet32 ((UINT32)FreePoolHdr->Header.Size) - MIN_POOL_SHIFT);
+  FreePoolHdr->Header.Signature = 0;
   FreePoolHdr->Header.Available = TRUE;
+  FreePoolHdr->Header.Type = 0;
+  PoolTail = HEAD_TO_TAIL(&FreePoolHdr->Header);
+  PoolTail->Signature = 0;
+  PoolTail->Size = 0;
   ASSERT (PoolIndex < MAX_POOL_INDEX);
   InsertHeadList (&mSmmPoolLists[SmmPoolType][PoolIndex], &FreePoolHdr->Link);
   return EFI_SUCCESS;
@@ -223,6 +238,7 @@ SmmInternalAllocatePool (
   )
 {
   POOL_HEADER           *PoolHdr;
+  POOL_TAIL             *PoolTail;
   FREE_POOL_HEADER      *FreePoolHdr;
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Address;
@@ -235,7 +251,10 @@ SmmInternalAllocatePool (
     return EFI_INVALID_PARAMETER;
   }
 
-  Size += sizeof (*PoolHdr);
+  //
+  // Adjust the size by the pool header & tail overhead
+  //
+  Size += POOL_OVERHEAD;
   if (Size > MAX_POOL_SIZE) {
     Size = EFI_SIZE_TO_PAGES (Size);
     Status = SmmInternalAllocatePages (AllocateAnyPages, PoolType, Size, &Address);
@@ -244,9 +263,13 @@ SmmInternalAllocatePool (
     }
 
     PoolHdr = (POOL_HEADER*)(UINTN)Address;
+    PoolHdr->Signature = POOL_HEAD_SIGNATURE;
     PoolHdr->Size = EFI_PAGES_TO_SIZE (Size);
     PoolHdr->Available = FALSE;
     PoolHdr->Type = PoolType;
+    PoolTail = HEAD_TO_TAIL(PoolHdr);
+    PoolTail->Signature = POOL_TAIL_SIGNATURE;
+    PoolTail->Size = PoolHdr->Size;
     *Buffer = PoolHdr + 1;
     return Status;
   }
@@ -317,13 +340,30 @@ SmmInternalFreePool (
   )
 {
   FREE_POOL_HEADER  *FreePoolHdr;
+  POOL_TAIL         *PoolTail;
 
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   FreePoolHdr = (FREE_POOL_HEADER*)((POOL_HEADER*)Buffer - 1);
+  ASSERT (FreePoolHdr->Header.Signature == POOL_HEAD_SIGNATURE);
   ASSERT (!FreePoolHdr->Header.Available);
+  PoolTail = HEAD_TO_TAIL(&FreePoolHdr->Header);
+  ASSERT (PoolTail->Signature == POOL_TAIL_SIGNATURE);
+  ASSERT (FreePoolHdr->Header.Size == PoolTail->Size);
+
+  if (FreePoolHdr->Header.Signature != POOL_HEAD_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (PoolTail->Signature != POOL_TAIL_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (FreePoolHdr->Header.Size != PoolTail->Size) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (FreePoolHdr->Header.Size > MAX_POOL_SIZE) {
     ASSERT (((UINTN)FreePoolHdr & EFI_PAGE_MASK) == 0);
