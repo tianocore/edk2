@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for PEI phase.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -129,10 +129,8 @@ CpuMpEndOfPeiCallback (
       }
       Hob.Raw = GET_NEXT_HOB (Hob);
     }
-  } else {
-    CpuMpData->SaveRestoreFlag = TRUE;
-    RestoreWakeupBuffer (CpuMpData);
   }
+
   return EFI_SUCCESS;
 }
 
@@ -286,12 +284,8 @@ AllocateResetVector (
     CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSize);
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *) (UINTN)
                     (CpuMpData->WakeupBuffer + CpuMpData->AddressMap.RendezvousFunnelSize);
-    BackupAndPrepareWakeupBuffer (CpuMpData);
   }
-
-  if (CpuMpData->SaveRestoreFlag) {
-    BackupAndPrepareWakeupBuffer (CpuMpData);
-  }
+  BackupAndPrepareWakeupBuffer (CpuMpData);
 }
 
 /**
@@ -304,9 +298,7 @@ FreeResetVector (
   IN CPU_MP_DATA              *CpuMpData
   )
 {
-  if (CpuMpData->SaveRestoreFlag) {
-    RestoreWakeupBuffer (CpuMpData);
-  }
+  RestoreWakeupBuffer (CpuMpData);
 }
 
 /**
