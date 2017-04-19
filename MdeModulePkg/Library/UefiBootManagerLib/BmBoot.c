@@ -1546,26 +1546,35 @@ BmGetNextLoadOptionDevicePath (
     //
     return BmExpandUriDevicePath (FilePath, FullPath);
   } else {
-    for (Node = FilePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
-      if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) &&
-          ((DevicePathSubType (Node) == MSG_USB_CLASS_DP) || (DevicePathSubType (Node) == MSG_USB_WWID_DP))) {
-        break;
+    Node = FilePath;
+    Status = gBS->LocateDevicePath (&gEfiUsbIoProtocolGuid, &Node, &Handle);
+    if (EFI_ERROR (Status)) {
+      //
+      // Only expand the USB WWID/Class device path
+      // when FilePath doesn't point to a physical UsbIo controller.
+      // Otherwise, infinite recursion will happen.
+      //
+      for (Node = FilePath; !IsDevicePathEnd (Node); Node = NextDevicePathNode (Node)) {
+        if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) &&
+            ((DevicePathSubType (Node) == MSG_USB_CLASS_DP) || (DevicePathSubType (Node) == MSG_USB_WWID_DP))) {
+          break;
+        }
       }
-    }
 
-    //
-    // Expand the USB WWID/Class device path
-    //
-    if (!IsDevicePathEnd (Node)) {
-      if (FilePath == Node) {
-        //
-        // Boot Option device path starts with USB Class or USB WWID device path.
-        // For Boot Option device path which doesn't begin with the USB Class or
-        // USB WWID device path, it's not needed to connect again here.
-        //
-        BmConnectUsbShortFormDevicePath (FilePath);
+      //
+      // Expand the USB WWID/Class device path
+      //
+      if (!IsDevicePathEnd (Node)) {
+        if (FilePath == Node) {
+          //
+          // Boot Option device path starts with USB Class or USB WWID device path.
+          // For Boot Option device path which doesn't begin with the USB Class or
+          // USB WWID device path, it's not needed to connect again here.
+          //
+          BmConnectUsbShortFormDevicePath (FilePath);
+        }
+        return BmExpandUsbDevicePath (FilePath, FullPath, Node);
       }
-      return BmExpandUsbDevicePath (FilePath, FullPath, Node);
     }
   }
 
