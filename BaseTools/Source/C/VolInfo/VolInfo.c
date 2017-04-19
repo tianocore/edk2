@@ -331,7 +331,10 @@ Returns:
       if (OpenSslEnv == NULL) {
         OpenSslPath = OpenSslCommand;
       } else {
-        OpenSslPath = malloc(strlen(OpenSslEnv)+strlen(OpenSslCommand)+1);
+        //
+        // We add quotes to the Openssl Path in case it has space characters
+        //
+        OpenSslPath = malloc(2+strlen(OpenSslEnv)+strlen(OpenSslCommand)+1);
         if (OpenSslPath == NULL) {
           Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
           return GetUtilityStatus ();
@@ -1591,11 +1594,12 @@ CombinePath (
 {
   UINT32 DefaultPathLen;
   UINT64 Index;
-
+  CHAR8  QuotesStr[] = "\"";
+  strcpy(NewPath, QuotesStr);
   DefaultPathLen = strlen(DefaultPath);
-  strcpy(NewPath, DefaultPath);
+  strcat(NewPath, DefaultPath);
   Index = 0;
-  for (; Index < DefaultPathLen; Index ++) {
+  for (; Index < DefaultPathLen + 1; Index ++) {
     if (NewPath[Index] == '\\' || NewPath[Index] == '/') {
       if (NewPath[Index + 1] != '\0') {
         NewPath[Index] = '/';
@@ -1607,6 +1611,7 @@ CombinePath (
     NewPath[Index + 1] = '\0';
   }
   strcat(NewPath, AppendPath);
+  strcat(NewPath, QuotesStr);
   return EFI_SUCCESS;
 }
 
