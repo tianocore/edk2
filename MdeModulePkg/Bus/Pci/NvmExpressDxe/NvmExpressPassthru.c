@@ -603,7 +603,7 @@ NvmExpressPassThru (
     Private->SqTdbl[QueueId].Sqt ^= 1;
   }
   Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[QueueId]);
-  PciIo->Mem.Write (
+  Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
@@ -611,6 +611,10 @@ NvmExpressPassThru (
                1,
                &Data
                );
+
+  if (EFI_ERROR (Status)) {
+    goto EXIT;
+  }
 
   //
   // For non-blocking requests, return directly if the command is placed
@@ -695,7 +699,7 @@ NvmExpressPassThru (
   }
 
   Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
-  PciIo->Mem.Write (
+  Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
