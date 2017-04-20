@@ -382,13 +382,13 @@ BmGetNetworkDescription (
 
   //
   // The PXE device path is like:
-  //   ....../Mac(...)[/Vlan(...)]
-  //   ....../Mac(...)[/Vlan(...)]/IPv4(...)
-  //   ....../Mac(...)[/Vlan(...)]/IPv6(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)
   //
   // The HTTP device path is like:
-  //   ....../Mac(...)[/Vlan(...)]/IPv4(...)/Uri(...)
-  //   ....../Mac(...)[/Vlan(...)]/IPv6(...)/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)/Uri(...)
+  //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)/Uri(...)
   //
   while (!IsDevicePathEnd (DevicePath) &&
          ((DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH) ||
@@ -404,6 +404,9 @@ BmGetNetworkDescription (
   Mac = (MAC_ADDR_DEVICE_PATH *) DevicePath;
   DevicePath = NextDevicePathNode (DevicePath);
 
+  //
+  // Locate the optional Vlan node
+  //
   if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
       (DevicePathSubType (DevicePath) == MSG_VLAN_DP)
       ) {
@@ -413,6 +416,18 @@ BmGetNetworkDescription (
     Vlan = NULL;
   }
 
+  //
+  // Skip the optional Wi-Fi node
+  //
+  if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
+      (DevicePathSubType (DevicePath) == MSG_WIFI_DP)
+      ) {
+    DevicePath = NextDevicePathNode (DevicePath);
+  }
+
+  //
+  // Locate the IP node
+  //
   if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
       ((DevicePathSubType (DevicePath) == MSG_IPv4_DP) ||
        (DevicePathSubType (DevicePath) == MSG_IPv6_DP))
@@ -423,6 +438,9 @@ BmGetNetworkDescription (
     Ip = NULL;
   }
 
+  //
+  // Locate the URI node
+  //
   if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
       (DevicePathSubType (DevicePath) == MSG_URI_DP)
       ) {
