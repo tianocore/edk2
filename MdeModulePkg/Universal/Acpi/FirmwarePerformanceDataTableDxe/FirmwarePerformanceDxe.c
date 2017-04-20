@@ -5,7 +5,7 @@
   for Firmware Basic Boot Performance Record and other boot performance records, 
   and install FPDT to ACPI table.
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -876,7 +876,7 @@ FirmwarePerformanceDxeEntryPoint (
     //
     // SEC Performance Data Hob not found, ResetEnd in ACPI FPDT table will be 0.
     //
-    DEBUG ((EFI_D_ERROR, "FPDT: WARNING: SEC Performance Data Hob not found, ResetEnd will be set to 0!\n"));
+    DEBUG ((DEBUG_WARN, "FPDT: WARNING: SEC Performance Data Hob not found, ResetEnd will be set to 0!\n"));
   }
 
   if (FeaturePcdGet (PcdFirmwarePerformanceDataTableS3Support)) {
