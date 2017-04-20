@@ -2885,6 +2885,7 @@ ShellCommandRunPci (
      );
 
     ExtendedConfigSpace = NULL;
+    ExtendedConfigSize  = 0;
     PcieCapabilityPtr = LocatePciCapability (&ConfigSpace, EFI_PCI_CAPABILITY_ID_PCIEXP);
     if (PcieCapabilityPtr != 0) {
       ExtendedConfigSize  = 0x1000 - EFI_PCIE_CAPABILITY_BASE_OFFSET;
@@ -2922,7 +2923,7 @@ ShellCommandRunPci (
     //
     if (ExplainData) {
       PciExplainPci (&ConfigSpace, Address, IoDev);
-      if ((PcieCapabilityPtr != 0) && !ShellGetExecutionBreakFlag ()) {
+      if ((ExtendedConfigSpace != NULL) && !ShellGetExecutionBreakFlag ()) {
         PciExplainPciExpress (
           (PCI_CAPABILITY_PCIEXP *) ((UINT8 *) &ConfigSpace + PcieCapabilityPtr),
           ExtendedConfigSpace,
