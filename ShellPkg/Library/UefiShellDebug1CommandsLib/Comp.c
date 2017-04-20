@@ -30,7 +30,8 @@ typedef enum {
 /**
   Function to print differnt point data.
 
-  @param[in]  FileName        File name
+  @param[in]  FileName        File name.
+  @param[in]  FileTag         File tag name.
   @param[in]  Buffer          Data buffer to be printed.
   @param[in]  BufferSize      Size of the data to be printed.
   @param[in]  Address         Address of the differnt point.
@@ -40,6 +41,7 @@ typedef enum {
 VOID
 PrintDifferentPoint(
   CONST CHAR16  *FileName,
+  CHAR16        *FileTag,
   UINT8         *Buffer,
   UINT64        BufferSize,
   UINTN         Address,
@@ -48,7 +50,7 @@ PrintDifferentPoint(
 {
   UINTN Index;
 
-  ShellPrintEx (-1, -1, L"%s: %s\r\n  %08x:", L"File1", FileName, Address);
+  ShellPrintEx (-1, -1, L"%s: %s\r\n  %08x:", FileTag, FileName, Address);
 
   //
   // Print data in hex-format.
@@ -302,8 +304,8 @@ ShellCommandRunComp (
              ) {
 
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_COMP_DIFFERENCE_POINT), gShellDebug1HiiHandle, ++DiffPointNumber);
-            PrintDifferentPoint (FileName1, DataFromFile1, InsertPosition1, DiffPointAddress, DifferentBytes);
-            PrintDifferentPoint (FileName2, DataFromFile2, InsertPosition2, DiffPointAddress, DifferentBytes);
+            PrintDifferentPoint (FileName1, L"File1", DataFromFile1, InsertPosition1, DiffPointAddress, DifferentBytes);
+            PrintDifferentPoint (FileName2, L"File2", DataFromFile2, InsertPosition2, DiffPointAddress, DifferentBytes);
 
             //
             // One of two buffuers is empty, it means this is the last different point.
