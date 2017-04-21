@@ -1136,11 +1136,6 @@ InitializeCpu (
   InitInterruptDescriptorTable ();
 
   //
-  // Enable the local APIC for Virtual Wire Mode.
-  //
-  ProgramVirtualWireMode ();
-
-  //
   // Install CPU Architectural Protocol
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
