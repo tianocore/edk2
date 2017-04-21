@@ -1028,6 +1028,12 @@ IpIoListenHandlerDpc (
   }
 
   if (IpIo->IpVersion == IP_VERSION_4) {
+    if (IP4_IS_LOCAL_BROADCAST (EFI_IP4 (RxData->Ip4RxData.Header->SourceAddress))) {
+      //
+      // The source address is a broadcast address, discard it.
+      //
+      goto CleanUp;
+    }
     if ((EFI_IP4 (RxData->Ip4RxData.Header->SourceAddress) != 0) &&
         (IpIo->SubnetMask != 0) &&
         IP4_NET_EQUAL (IpIo->StationIp, EFI_NTOHL (((EFI_IP4_RECEIVE_DATA *) RxData)->Header->SourceAddress), IpIo->SubnetMask) &&
