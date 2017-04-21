@@ -185,18 +185,19 @@ InternalAllocPoolByIndex (
   Internal Function. Free a pool by specified PoolIndex.
 
   @param  FreePoolHdr           The pool to free.
+  @param  PoolTail              The pointer to the pool tail.
 
   @retval EFI_SUCCESS           Pool successfully freed.
 
 **/
 EFI_STATUS
 InternalFreePoolByIndex (
-  IN FREE_POOL_HEADER  *FreePoolHdr
+  IN FREE_POOL_HEADER  *FreePoolHdr,
+  IN POOL_TAIL         *PoolTail
   )
 {
   UINTN                 PoolIndex;
   SMM_POOL_TYPE         SmmPoolType;
-  POOL_TAIL             *PoolTail;
 
   ASSERT ((FreePoolHdr->Header.Size & (FreePoolHdr->Header.Size - 1)) == 0);
   ASSERT (((UINTN)FreePoolHdr & (FreePoolHdr->Header.Size - 1)) == 0);
@@ -208,7 +209,6 @@ InternalFreePoolByIndex (
   FreePoolHdr->Header.Signature = 0;
   FreePoolHdr->Header.Available = TRUE;
   FreePoolHdr->Header.Type = 0;
-  PoolTail = HEAD_TO_TAIL(&FreePoolHdr->Header);
   PoolTail->Signature = 0;
   PoolTail->Size = 0;
   ASSERT (PoolIndex < MAX_POOL_INDEX);
@@ -373,7 +373,7 @@ SmmInternalFreePool (
              EFI_SIZE_TO_PAGES (FreePoolHdr->Header.Size)
              );
   }
-  return InternalFreePoolByIndex (FreePoolHdr);
+  return InternalFreePoolByIndex (FreePoolHdr, PoolTail);
 }
 
 /**
