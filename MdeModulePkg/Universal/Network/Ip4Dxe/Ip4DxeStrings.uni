@@ -1,7 +1,7 @@
 // /** @file
 //   String definitions for Ip4Config2 formset
 
-// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@
 #string STR_IP4_DEVICE_FORM_TITLE     #language en-US ""
 #string STR_IP4_DEVICE_FORM_HELP      #language en-US ""
 #string STR_IP4_CONFIGURE             #language en-US "Configured"
+#string STR_IP4_CONFIGURE_HELP        #language en-US "Indicate whether network address configured successfully or not."
 #string STR_IP4_ENABLE_DHCP           #language en-US "Enable DHCP"
 #string STR_IP4_LOCAL_IP_ADDRESS      #language en-US "Local IP Address"
 #string STR_IP4_IP_ADDRESS_HELP       #language en-US "Enter IP address in dotted-decimal notation. Example: 192.168.10.12\r\n"
