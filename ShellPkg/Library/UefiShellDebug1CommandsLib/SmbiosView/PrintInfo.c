@@ -316,7 +316,7 @@ SmbiosPrintStructure (
   case 0:
     PRINT_PENDING_STRING (Struct, Type0, Vendor);
     PRINT_PENDING_STRING (Struct, Type0, BiosVersion);
-    PRINT_STRUCT_VALUE (Struct, Type0, BiosSegment);
+    PRINT_STRUCT_VALUE_H (Struct, Type0, BiosSegment);
     PRINT_PENDING_STRING (Struct, Type0, BiosReleaseDate);
     ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
 
