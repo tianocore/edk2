@@ -2,7 +2,7 @@
   Interface routine for Mtftp4.
   
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -666,6 +666,10 @@ EfiMtftp4Configure (
     Netmask  = NTOHL (Netmask);
     Gateway  = NTOHL (Gateway);
     ServerIp = NTOHL (ServerIp);
+
+    if (ServerIp == 0 || IP4_IS_LOCAL_BROADCAST (ServerIp)) {
+      return EFI_INVALID_PARAMETER;
+    }
 
     if (!ConfigData->UseDefaultSetting &&
         ((!IP4_IS_VALID_NETMASK (Netmask) || (Netmask != 0 && !NetIp4IsUnicast (Ip, Netmask))))) {
