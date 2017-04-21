@@ -1,7 +1,7 @@
 /** @file
   Provides the basic UNID functions.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1276,6 +1276,7 @@ UNDI_Receive (
 **/
 // TODO:    cdb - add argument and description to function comment
 VOID
+EFIAPI
 UNDI_APIEntry_new (
   IN  UINT64 cdb
   )

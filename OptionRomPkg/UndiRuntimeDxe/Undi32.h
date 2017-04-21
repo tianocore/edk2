@@ -1,7 +1,7 @@
 /** @file
   EFI internal structures for the EFI UNDI driver.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -338,7 +338,7 @@ UNDI_Receive (
   IN  NIC_DATA_INSTANCE *AdapterInfo
   );
 
-VOID UNDI_APIEntry_new(UINT64);
+VOID EFIAPI UNDI_APIEntry_new(UINT64);
 VOID UNDI_APIEntry_Common(UINT64);
 
 PXE_IPV4 convert_mcip(PXE_MAC_ADDR *);
