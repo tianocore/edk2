@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -539,26 +539,6 @@ MicrocodeDetect (
 BOOLEAN
 IsMwaitSupport (
   VOID
-  );
-
-/**
-  Notify function on End Of PEI PPI.
-
-  On S3 boot, this function will restore wakeup buffer data.
-  On normal boot, this function will flag wakeup buffer to be un-used type.
-
-  @param[in]  PeiServices        The pointer to the PEI Services Table.
-  @param[in]  NotifyDescriptor   Address of the notification descriptor data structure.
-  @param[in]  Ppi                Address of the PPI that was installed.
-
-  @retval EFI_SUCCESS        When everything is OK.
-**/
-EFI_STATUS
-EFIAPI
-CpuMpEndOfPeiCallback (
-  IN EFI_PEI_SERVICES             **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR    *NotifyDescriptor,
-  IN VOID                         *Ppi
   );
 
 /**
