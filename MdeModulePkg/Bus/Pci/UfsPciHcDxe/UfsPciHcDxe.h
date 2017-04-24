@@ -2,7 +2,7 @@
   UfsHcDxe driver is used to provide platform-dependent info, mainly UFS host controller
   MMIO base, to upper layer UFS drivers.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -49,11 +49,10 @@ extern EFI_COMPONENT_NAME2_PROTOCOL               gUfsHcComponentName2;
 typedef struct _UFS_HOST_CONTROLLER_PRIVATE_DATA  UFS_HOST_CONTROLLER_PRIVATE_DATA;
 
 //
-// Nvme private data structure.
+// Ufs host controller private data structure.
 //
 struct _UFS_HOST_CONTROLLER_PRIVATE_DATA {
   UINT32                             Signature;
-  EFI_HANDLE                         Handle;
 
   EDKII_UFS_HOST_CONTROLLER_PROTOCOL UfsHc;
   EFI_PCI_IO_PROTOCOL                *PciIo;  
