@@ -671,13 +671,12 @@ Done:
       //
       // Restore original PCI attributes
       //
-      Status = PciIo->Attributes (
-                        PciIo,
-                        EfiPciIoAttributeOperationSet,
-                        Private->PciAttributes,
-                        NULL
-                        );
-      ASSERT_EFI_ERROR (Status);
+      PciIo->Attributes (
+               PciIo,
+               EfiPciIoAttributeOperationSet,
+               Private->PciAttributes,
+               NULL
+               );
     }
     gBS->CloseProtocol (
           Controller,
