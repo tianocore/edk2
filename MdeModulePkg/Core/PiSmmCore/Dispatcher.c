@@ -596,7 +596,7 @@ SmmLoadImage (
   }
   CopyMem (DriverEntry->LoadedImage->FilePath, FilePath, GetDevicePathSize (FilePath));
 
-  DriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)DriverEntry->ImageBuffer;
+  DriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN) ImageContext.ImageAddress;
   DriverEntry->LoadedImage->ImageSize     = ImageContext.ImageSize;
   DriverEntry->LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
   DriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;
@@ -615,7 +615,7 @@ SmmLoadImage (
   }
   CopyMem (DriverEntry->SmmLoadedImage.FilePath, FilePath, GetDevicePathSize(FilePath));
 
-  DriverEntry->SmmLoadedImage.ImageBase = (VOID *)(UINTN)DriverEntry->ImageBuffer;
+  DriverEntry->SmmLoadedImage.ImageBase = (VOID *)(UINTN) ImageContext.ImageAddress;
   DriverEntry->SmmLoadedImage.ImageSize = ImageContext.ImageSize;
   DriverEntry->SmmLoadedImage.ImageCodeType = EfiRuntimeServicesCode;
   DriverEntry->SmmLoadedImage.ImageDataType = EfiRuntimeServicesData;
