@@ -120,7 +120,7 @@ DumpModuleImageInfo (
   VOID                                 *PdbPointer;
   VOID                                 *EntryPoint;
 
-  Pe32Data = PeCoffSerachImageBase (CurrentEip);
+  Pe32Data = PeCoffSearchImageBase (CurrentEip);
   if (Pe32Data == 0) {
     InternalPrintMessage ("!!!! Can't find image information. !!!!\n");
   } else {

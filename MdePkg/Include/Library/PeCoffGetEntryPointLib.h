@@ -115,7 +115,7 @@ PeCoffGetSizeOfHeaders (
 **/
 UINTN
 EFIAPI
-PeCoffSerachImageBase (
+PeCoffSearchImageBase (
   IN UINTN    Address
   );
 
