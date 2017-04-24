@@ -241,6 +241,11 @@
   ##  @libraryclass  provides EFI_FILE_HANDLE services
   FileHandleLib|Include/Library/FileHandleLib.h
 
+  ## @libraryclass provides helper functions to prevent integer overflow during
+  #                type conversion, addition, subtraction, and multiplication.
+  ##
+  SafeIntLib|Include/Library/SafeIntLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##

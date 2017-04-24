@@ -267,6 +267,11 @@ typedef INT64   INTN;
 #define MAX_UINTN  ((UINTN)0xFFFFFFFFFFFFFFFFULL)
 
 ///
+/// Minimum legal x64 INTN value.
+///
+#define MIN_INTN   (((INTN)-9223372036854775807LL) - 1)
+
+///
 /// The stack alignment required for x64
 ///
 #define CPU_STACK_ALIGNMENT   16

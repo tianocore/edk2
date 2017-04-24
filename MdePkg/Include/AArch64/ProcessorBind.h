@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for AArch64.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
@@ -98,6 +98,11 @@ typedef INT64   INTN;
 ///
 #define MAX_INTN   ((INTN)0x7FFFFFFFFFFFFFFFULL)
 #define MAX_UINTN  ((UINTN)0xFFFFFFFFFFFFFFFFULL)
+
+///
+/// Minimum legal AArch64 INTN value.
+///
+#define MIN_INTN   (((INTN)-9223372036854775807LL) - 1)
 
 ///
 /// The stack alignment required for AARCH64

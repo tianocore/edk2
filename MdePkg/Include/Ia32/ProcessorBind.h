@@ -253,6 +253,11 @@ typedef INT32   INTN;
 #define MAX_UINTN  ((UINTN)0xFFFFFFFF)
 
 ///
+/// Minimum legal IA-32 INTN value.
+///
+#define MIN_INTN   (((INTN)-2147483647) - 1)
+
+///
 /// The stack alignment required for IA-32.
 ///
 #define CPU_STACK_ALIGNMENT   sizeof(UINTN)
