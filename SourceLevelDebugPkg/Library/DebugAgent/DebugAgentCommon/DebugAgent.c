@@ -206,7 +206,7 @@ FindAndReportModuleImageInfo (
   //
   // Find Image Base
   //
-  Pe32Data = PeCoffSerachImageBase ((UINTN) mErrorMsgVersionAlert);
+  Pe32Data = PeCoffSearchImageBase ((UINTN) mErrorMsgVersionAlert);
   if (Pe32Data != 0) {
     ImageContext.ImageAddress = Pe32Data;
     ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageContext.ImageAddress);

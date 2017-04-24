@@ -178,7 +178,7 @@ DumpModuleInfoByIp (
   //
   // Find Image Base
   //
-  Pe32Data = PeCoffSerachImageBase (CallerIpAddress);
+  Pe32Data = PeCoffSearchImageBase (CallerIpAddress);
   if (Pe32Data != 0) {
     DEBUG ((DEBUG_ERROR, "It is invoked from the instruction before IP(0x%p)", (VOID *) CallerIpAddress));
     PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *) Pe32Data);
