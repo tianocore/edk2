@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for ARM.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -104,6 +104,11 @@ typedef INT32   INTN;
 ///
 #define MAX_INTN   ((INTN)0x7FFFFFFF)
 #define MAX_UINTN  ((UINTN)0xFFFFFFFF)
+
+///
+/// Minimum legal ARM INTN value.
+///
+#define MIN_INTN   (((INTN)-2147483647) - 1)
 
 ///
 /// The stack alignment required for ARM

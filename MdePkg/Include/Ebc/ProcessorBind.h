@@ -4,7 +4,7 @@
   We currently only have one EBC compiler so there may be some Intel compiler
   specific functions in this file.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -91,23 +91,28 @@ typedef unsigned long         UINTN;
 /// A value of native width with the highest bit set.
 /// Scalable macro to set the most significant bit in a natural number.
 ///
-#define MAX_BIT     (1ULL << (sizeof (INTN) * 8 - 1)) 
+#define MAX_BIT     ((UINTN)((1ULL << (sizeof (INTN) * 8 - 1))))
 ///
 /// A value of native width with the two highest bits set.
 /// Scalable macro to set the most 2 significant bits in a natural number.
 ///
-#define MAX_2_BITS  (3ULL << (sizeof (INTN) * 8 - 2))
+#define MAX_2_BITS  ((UINTN)(3ULL << (sizeof (INTN) * 8 - 2)))
 
 ///
 /// Maximum legal EBC address
 ///
-#define MAX_ADDRESS   ((UINTN) ~0)
+#define MAX_ADDRESS   ((UINTN)(~0ULL >> (64 - sizeof (INTN) * 8)))
 
 ///
 /// Maximum legal EBC INTN and UINTN values.
 ///
-#define MAX_UINTN  ((UINTN) ~0)
-#define MAX_INTN   ((INTN)~MAX_BIT)
+#define MAX_UINTN  ((UINTN)(~0ULL >> (64 - sizeof (INTN) * 8)))
+#define MAX_INTN   ((INTN)(~0ULL >> (65 - sizeof (INTN) * 8)))
+
+///
+/// Minimum legal EBC INTN value.
+///
+#define MIN_INTN   (((INTN)-MAX_INTN) - 1)
 
 ///
 /// The stack alignment required for EBC
