@@ -1810,7 +1810,6 @@ RunSplitCommand(
   }
   if (Split->SplitStdIn != NULL) {
     ShellInfoObject.NewEfiShellProtocol->CloseFile (Split->SplitStdIn);
-    FreePool (Split->SplitStdIn);
   }
 
   FreePool(Split);
