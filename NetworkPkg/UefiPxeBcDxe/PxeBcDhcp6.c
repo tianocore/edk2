@@ -93,11 +93,12 @@ PxeBcBuildDhcp6Options (
   // Append client option request option
   //
   OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ORO);
-  OptList[Index]->OpLen      = HTONS (6);
+  OptList[Index]->OpLen      = HTONS (8);
   OptEnt.Oro                 = (PXEBC_DHCP6_OPTION_ORO *) OptList[Index]->Data;
   OptEnt.Oro->OpCode[0]      = HTONS(DHCP6_OPT_BOOT_FILE_URL);
   OptEnt.Oro->OpCode[1]      = HTONS(DHCP6_OPT_BOOT_FILE_PARAM);
   OptEnt.Oro->OpCode[2]      = HTONS(DHCP6_OPT_DNS_SERVERS);
+  OptEnt.Oro->OpCode[3]      = HTONS(DHCP6_OPT_VENDOR_CLASS);
   Index++;
   OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
@@ -907,12 +908,12 @@ PxeBcRequestBootService (
   UINT16                              OpCode;
   UINT16                              OpLen;
   EFI_STATUS                          Status;
-  EFI_DHCP6_PACKET                    *ProxyOffer;
+  EFI_DHCP6_PACKET                    *IndexOffer;
   UINT8                               *Option;
 
   PxeBc       = &Private->PxeBc;
   Request     = Private->Dhcp6Request;
-  ProxyOffer = &Private->OfferBuffer[Index].Dhcp6.Packet.Offer;
+  IndexOffer  = &Private->OfferBuffer[Index].Dhcp6.Packet.Offer;
   SrcPort     = PXEBC_BS_DISCOVER_PORT;
   DestPort    = PXEBC_BS_DISCOVER_PORT;
   OpFlags     = 0;
@@ -929,7 +930,7 @@ PxeBcRequestBootService (
   //
   // Build the request packet by the cached request packet before.
   //
-  Discover->TransactionId = ProxyOffer->Dhcp6.Header.TransactionId;
+  Discover->TransactionId = IndexOffer->Dhcp6.Header.TransactionId;
   Discover->MessageType   = Request->Dhcp6.Header.MessageType;
   RequestOpt              = Request->Dhcp6.Option;
   DiscoverOpt             = Discover->DhcpOptions;
@@ -939,22 +940,24 @@ PxeBcRequestBootService (
   //
   // Find Server ID Option from ProxyOffer.
   //
-  Option = PxeBcDhcp6SeekOption (
-             ProxyOffer->Dhcp6.Option,
-             ProxyOffer->Length - 4,
-             DHCP6_OPT_SERVER_ID
-             );
-  if (Option == NULL) {
-    return EFI_NOT_FOUND;
-  }
+  if (Private->OfferBuffer[Index].Dhcp6.OfferType == PxeOfferTypeProxyBinl) {  
+    Option = PxeBcDhcp6SeekOption (
+               IndexOffer->Dhcp6.Option,
+               IndexOffer->Length - 4,
+               DHCP6_OPT_SERVER_ID
+               );
+    if (Option == NULL) {
+      return EFI_NOT_FOUND;
+    }
   
-  //
-  // Add Server ID Option.
-  //
-  OpLen = NTOHS (((EFI_DHCP6_PACKET_OPTION *) Option)->OpLen);
-  CopyMem (DiscoverOpt, Option, OpLen + 4);
-  DiscoverOpt += (OpLen + 4);
-  DiscoverLen += (OpLen + 4);
+    //
+    // Add Server ID Option.
+    //
+    OpLen = NTOHS (((EFI_DHCP6_PACKET_OPTION *) Option)->OpLen);
+    CopyMem (DiscoverOpt, Option, OpLen + 4);
+    DiscoverOpt += (OpLen + 4);
+    DiscoverLen += (OpLen + 4);
+  }
 
   while (RequestLen < Request->Length) {
     OpCode = NTOHS (((EFI_DHCP6_PACKET_OPTION *) RequestOpt)->OpCode);
@@ -1078,7 +1081,7 @@ PxeBcRetryDhcp6Binl (
   Mode                  = Private->PxeBc.Mode;
   Private->IsDoDiscover = FALSE;
   Offer                 = &Private->OfferBuffer[Index].Dhcp6;
-  if (Offer->OfferType == PxeOfferTypeDhcpBinl) {
+  if (Offer->OptList[PXEBC_DHCP6_IDX_BOOT_FILE_URL] == NULL) {
     //
     // There is no BootFileUrl option in dhcp6 offer, so use servers multi-cast address instead.
     //
