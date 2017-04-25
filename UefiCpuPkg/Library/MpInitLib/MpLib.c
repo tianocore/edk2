@@ -434,6 +434,8 @@ CollectProcessorCount (
   IN CPU_MP_DATA         *CpuMpData
   )
 {
+  UINTN                  Index;
+
   //
   // Send 1st broadcast IPI to APs to wakeup APs
   //
@@ -465,6 +467,12 @@ CollectProcessorCount (
     // Enable x2APIC on BSP
     //
     SetApicMode (LOCAL_APIC_MODE_X2APIC);
+    //
+    // Set BSP/Aps state to IDLE
+    //
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+    }
   }
   DEBUG ((DEBUG_INFO, "APIC MODE is %d\n", GetApicMode ()));
   //
