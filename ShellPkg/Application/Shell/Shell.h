@@ -63,8 +63,8 @@ extern CONST CHAR16 mNoNestingFalse[];
 
 typedef struct {
   LIST_ENTRY        Link;           ///< Standard linked list handler.
-  SHELL_FILE_HANDLE *SplitStdOut;   ///< ConsoleOut for use in the split.
-  SHELL_FILE_HANDLE *SplitStdIn;    ///< ConsoleIn for use in the split.
+  SHELL_FILE_HANDLE SplitStdOut;    ///< ConsoleOut for use in the split.
+  SHELL_FILE_HANDLE SplitStdIn;     ///< ConsoleIn for use in the split.
 } SPLIT_LIST;
 
 typedef struct {
