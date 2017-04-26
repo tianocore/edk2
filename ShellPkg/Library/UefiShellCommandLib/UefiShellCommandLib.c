@@ -1745,7 +1745,7 @@ DumpHex (
       Val[Index * 3 + 0]  = Hex[TempByte >> 4];
       Val[Index * 3 + 1]  = Hex[TempByte & 0xF];
       Val[Index * 3 + 2]  = (CHAR8) ((Index == 7) ? '-' : ' ');
-      Str[Index]          = (CHAR8) ((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
+      Str[Index]          = (CHAR8) ((TempByte < ' ' || TempByte > '~') ? '.' : TempByte);
     }
 
     Val[Index * 3]  = 0;
