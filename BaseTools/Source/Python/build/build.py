@@ -989,7 +989,6 @@ class Build():
                 self.PostbuildScript = PostbuildList[0]
                 self.Postbuild = ' '.join(PostbuildList)
                 self.Postbuild += self.PassCommandOption(self.BuildTargetList, self.ArchList, self.ToolChainList)
-                #self.LanuchPostbuild()
             else:
                 EdkLogger.error("Postbuild", POSTBUILD_ERROR, "the postbuild script %s is not exist.\n If you'd like to disable the Postbuild process, please use the format: -D POSTBUILD=\"\" " %(PostbuildList[0]))
 
@@ -1076,7 +1075,7 @@ class Build():
                 os.environ.update(dict(envs))
             EdkLogger.info("\n- Prebuild Done -\n")
 
-    def LanuchPostbuild(self):
+    def LaunchPostbuild(self):
         if self.Postbuild:
             EdkLogger.info("\n- Postbuild Start -\n")
             if sys.platform == "win32":
@@ -2331,7 +2330,7 @@ def Main():
 
     if ReturnCode == 0:
         try:
-            MyBuild.LanuchPostbuild()
+            MyBuild.LaunchPostbuild()
             Conclusion = "Done"
         except:
             Conclusion = "Failed"
