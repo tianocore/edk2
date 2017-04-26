@@ -526,15 +526,15 @@ dtoa
         Bfree(b);
         b = b1;
         }
-      if (( j = b5 - m5 )!=0)
-        b = pow5mult(b, j);
+        if (( j = b5 - m5 )!=0)
+          b = pow5mult(b, j);
         if (b == NULL)
           return NULL;
       }
     else
       b = pow5mult(b, b5);
-      if (b == NULL)
-        return NULL;
+    if (b == NULL)
+      return NULL;
     }
   S = i2b(1);
   if (S == NULL)

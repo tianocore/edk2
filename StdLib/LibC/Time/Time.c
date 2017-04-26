@@ -464,11 +464,11 @@ time1(
   for (i = 0; i < sp->typecnt; ++i)
     seen[i] = FALSE;
   nseen = 0;
-  for (i = sp->timecnt - 1; i >= 0; --i)
-    if (!seen[sp->types[i]]) {
-    seen[sp->types[i]] = TRUE;
-    types[nseen++] = sp->types[i];
-    }
+    for (i = sp->timecnt - 1; i >= 0; --i)
+      if (!seen[sp->types[i]]) {
+        seen[sp->types[i]] = TRUE;
+        types[nseen++] = sp->types[i];
+      }
     for (sameind = 0; sameind < nseen; ++sameind) {
       samei = types[sameind];
       if (sp->ttis[samei].tt_isdst != tmp->tm_isdst)
