@@ -3925,6 +3925,13 @@ class ModuleAutoGen(AutoGen):
                 else:
                     continue
                 PcdValue = ''
+                if Pcd.DatumType == 'BOOLEAN':
+                    BoolValue = Pcd.DefaultValue.upper()
+                    if BoolValue == 'TRUE':
+                        Pcd.DefaultValue = '1'
+                    elif BoolValue == 'FALSE':
+                        Pcd.DefaultValue = '0'
+
                 if Pcd.DatumType != 'VOID*':
                     HexFormat = '0x%02x'
                     if Pcd.DatumType == 'UINT16':
