@@ -50,7 +50,7 @@ IScsiDhcp6ExtractRootPath (
   UINT8                       IpMode;  
 
   ConfigNvData = &ConfigData->SessionConfigData;
-
+  ConfigNvData->DnsMode = FALSE;
   //
   // "iscsi:"<servername>":"<protocol>":"<port>":"<LUN>":"<targetname>
   //
@@ -82,23 +82,36 @@ IScsiDhcp6ExtractRootPath (
   // Extract SERVERNAME field in the Root Path option.
   //
   if (TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_START_DELIMITER) {
-    Status = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
+    //
+    // The servername is expressed as domain name.
+    //
+    ConfigNvData->DnsMode = TRUE;
   } else {
     Index++;
   }
 
   Fields[RP_FIELD_IDX_SERVERNAME].Str = &TmpStr[Index];
 
-  while ((TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER) && (Index < Length)) {
-    Index++;
-  }
+  if (!ConfigNvData->DnsMode) {
+    while ((TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER)&& (Index < Length)) {
+      Index++;
+    }
 
-  //
-  // Skip ']' and ':'.
-  //
-  TmpStr[Index] = '\0';
-  Index += 2;
+    //
+    // Skip ']' and ':'.
+    //
+    TmpStr[Index] = '\0';
+    Index += 2;
+  } else {
+    while ((TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) && (Index < Length)) {
+      Index++;
+    }
+    //
+    // Skip ':'.
+    //
+    TmpStr[Index] = '\0';
+    Index += 1;
+  }
 
   Fields[RP_FIELD_IDX_SERVERNAME].Len = (UINT8) AsciiStrLen (Fields[RP_FIELD_IDX_SERVERNAME].Str);
 
@@ -153,8 +166,7 @@ IScsiDhcp6ExtractRootPath (
   //
   // Server name is expressed as domain name, just save it.
   //
-  if ((!NET_IS_DIGIT (*(Field->Str))) && (*(Field->Str) != '[')) {
-    ConfigNvData->DnsMode = TRUE;
+  if (ConfigNvData->DnsMode) {
     if (Field->Len > sizeof (ConfigNvData->TargetUrl)) {
       return EFI_INVALID_PARAMETER;
     }
