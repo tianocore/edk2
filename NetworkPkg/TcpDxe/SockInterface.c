@@ -169,18 +169,6 @@ SockDestroyChild (
 
   ASSERT (Tcb != NULL);
 
-  Status            = EfiAcquireLockOrFail (&(Sock->Lock));
-  if (EFI_ERROR (Status)) {
-
-    DEBUG (
-      (EFI_D_ERROR,
-      "SockDestroyChild: Get the lock to access socket failed with %r\n",
-      Status)
-      );
-
-    return EFI_ACCESS_DENIED;
-  }
-
   //
   // Close the IP protocol.
   //
@@ -225,6 +213,19 @@ SockDestroyChild (
         SockProtocol,
         NULL
         );
+
+
+  Status            = EfiAcquireLockOrFail (&(Sock->Lock));
+  if (EFI_ERROR (Status)) {
+
+    DEBUG (
+      (EFI_D_ERROR,
+      "SockDestroyChild: Get the lock to access socket failed with %r\n",
+      Status)
+      );
+
+    return EFI_ACCESS_DENIED;
+  }
 
   //
   // force protocol layer to detach the PCB
