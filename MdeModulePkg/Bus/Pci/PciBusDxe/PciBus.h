@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/IncompatiblePciDeviceSupport.h>
 #include <Protocol/PciOverride.h>
 #include <Protocol/PciEnumerationComplete.h>
+#include <Protocol/IoMmu.h>
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>

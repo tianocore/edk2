@@ -42,6 +42,7 @@ UINT64                                        gAllZero             = 0;
 
 EFI_PCI_PLATFORM_PROTOCOL                     *gPciPlatformProtocol;
 EFI_PCI_OVERRIDE_PROTOCOL                     *gPciOverrideProtocol;
+EDKII_IOMMU_PROTOCOL                          *mIoMmuProtocol;
 
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL mPciHotPlugRequest = {
@@ -283,6 +284,14 @@ PciBusDriverBindingStart (
           (VOID **) &gPciOverrideProtocol
           );
   }  
+
+  if (mIoMmuProtocol == NULL) {
+    gBS->LocateProtocol (
+          &gEdkiiIoMmuProtocolGuid,
+          NULL,
+          (VOID **) &mIoMmuProtocol
+          );
+  }
 
   if (PcdGetBool (PcdPciDisableBusEnumeration)) {
     gFullEnumeration = FALSE;

@@ -14,6 +14,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PciBus.h"
 
+extern EDKII_IOMMU_PROTOCOL                          *mIoMmuProtocol;
+
 //
 // Pci Io Protocol Interface
 //
@@ -965,8 +967,10 @@ PciIoMap (
   OUT    VOID                           **Mapping
   )
 {
-  EFI_STATUS    Status;
-  PCI_IO_DEVICE *PciIoDevice;
+  EFI_STATUS                                 Status;
+  PCI_IO_DEVICE                              *PciIoDevice;
+  UINT64                                     IoMmuAttribute;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION  RootBridgeIoOperation;
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
 
@@ -978,13 +982,14 @@ PciIoMap (
     return EFI_INVALID_PARAMETER;
   }
 
+  RootBridgeIoOperation = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION)Operation;
   if ((PciIoDevice->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) != 0) {
-    Operation = (EFI_PCI_IO_PROTOCOL_OPERATION) (Operation + EfiPciOperationBusMasterRead64);
+    RootBridgeIoOperation = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION)(Operation + EfiPciOperationBusMasterRead64);
   }
 
   Status = PciIoDevice->PciRootBridgeIo->Map (
                                           PciIoDevice->PciRootBridgeIo,
-                                          (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION) Operation,
+                                          RootBridgeIoOperation,
                                           HostAddress,
                                           NumberOfBytes,
                                           DeviceAddress,
@@ -997,6 +1002,31 @@ PciIoMap (
       EFI_IO_BUS_PCI | EFI_IOB_EC_CONTROLLER_ERROR,
       PciIoDevice->DevicePath
       );
+  }
+
+  if (mIoMmuProtocol != NULL) {
+    if (!EFI_ERROR (Status)) {
+      switch (Operation) {
+      case EfiPciIoOperationBusMasterRead:
+        IoMmuAttribute = EDKII_IOMMU_ACCESS_READ;
+        break;
+      case EfiPciIoOperationBusMasterWrite:
+        IoMmuAttribute = EDKII_IOMMU_ACCESS_WRITE;
+        break;
+      case EfiPciIoOperationBusMasterCommonBuffer:
+        IoMmuAttribute = EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE;
+        break;
+      default:
+        ASSERT(FALSE);
+        return EFI_INVALID_PARAMETER;
+      }
+      mIoMmuProtocol->SetAttribute (
+                        mIoMmuProtocol,
+                        PciIoDevice->Handle,
+                        *Mapping,
+                        IoMmuAttribute
+                        );
+    }
   }
 
   return Status;
@@ -1023,6 +1053,15 @@ PciIoUnmap (
   PCI_IO_DEVICE *PciIoDevice;
 
   PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS (This);
+
+  if (mIoMmuProtocol != NULL) {
+    mIoMmuProtocol->SetAttribute (
+                      mIoMmuProtocol,
+                      PciIoDevice->Handle,
+                      Mapping,
+                      0
+                      );
+  }
 
   Status = PciIoDevice->PciRootBridgeIo->Unmap (
                                           PciIoDevice->PciRootBridgeIo,
