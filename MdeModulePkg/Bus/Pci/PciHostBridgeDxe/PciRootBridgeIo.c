@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciRootBridge.h"
 #include "PciHostResource.h"
 
+extern EDKII_IOMMU_PROTOCOL        *mIoMmuProtocol;
+
 #define NO_MAPPING  (VOID *) (UINTN) -1
 
 //
@@ -1072,6 +1074,26 @@ RootBridgeIoMap (
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
+  if (mIoMmuProtocol != NULL) {
+    if (!RootBridge->DmaAbove4G) {
+      //
+      // Clear 64bit support
+      //
+      if (Operation > EfiPciOperationBusMasterCommonBuffer) {
+        Operation = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION) (Operation - EfiPciOperationBusMasterRead64);
+      }
+    }
+    Status = mIoMmuProtocol->Map (
+                               mIoMmuProtocol,
+                               Operation,
+                               HostAddress,
+                               NumberOfBytes,
+                               DeviceAddress,
+                               Mapping
+                               );
+    return Status;
+  }
+
   PhysicalAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
   if ((!RootBridge->DmaAbove4G ||
        (Operation != EfiPciOperationBusMasterRead64 &&
@@ -1194,8 +1216,18 @@ RootBridgeIoUnmap (
   MAP_INFO                 *MapInfo;
   LIST_ENTRY               *Link;
   PCI_ROOT_BRIDGE_INSTANCE *RootBridge;
+  EFI_STATUS                Status;
+
+  if (mIoMmuProtocol != NULL) {
+    Status = mIoMmuProtocol->Unmap (
+                               mIoMmuProtocol,
+                               Mapping
+                               );
+    return Status;
+  }
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
+
   //
   // See if the Map() operation associated with this Unmap() required a mapping
   // buffer. If a mapping buffer was not required, then this function simply
@@ -1312,6 +1344,24 @@ RootBridgeIoAllocateBuffer (
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
+  if (mIoMmuProtocol != NULL) {
+    if (!RootBridge->DmaAbove4G) {
+      //
+      // Clear DUAL_ADDRESS_CYCLE
+      //
+      Attributes &= ~EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE;
+    }
+    Status = mIoMmuProtocol->AllocateBuffer (
+                               mIoMmuProtocol,
+                               Type,
+                               MemoryType,
+                               Pages,
+                               HostAddress,
+                               Attributes
+                               );
+    return Status;
+  }
+
   AllocateType = AllocateAnyPages;
   if (!RootBridge->DmaAbove4G ||
       (Attributes & EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0) {
@@ -1356,6 +1406,17 @@ RootBridgeIoFreeBuffer (
   OUT VOID                             *HostAddress
   )
 {
+  EFI_STATUS                Status;
+
+  if (mIoMmuProtocol != NULL) {
+    Status = mIoMmuProtocol->FreeBuffer (
+                               mIoMmuProtocol,
+                               Pages,
+                               HostAddress
+                               );
+    return Status;
+  }
+
   return gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress, Pages);
 }
 

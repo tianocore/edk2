@@ -27,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/CpuIo2.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/PciRootBridgeIo.h>
+#include <Protocol/IoMmu.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -34,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PciSegmentLib.h>
+#include <Library/UefiLib.h>
 #include "PciHostResource.h"
 
 
