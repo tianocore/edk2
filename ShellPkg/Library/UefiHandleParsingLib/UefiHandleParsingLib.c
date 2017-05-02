@@ -2331,7 +2331,9 @@ ConvertHandleIndexToHandle(
       // Verify that LinkWalker->TheHandle is valid handle
       //
       Status = gBS->ProtocolsPerHandle(ListWalker->TheHandle, &ProtocolBuffer, &ProtocolCount);
-      if (EFI_ERROR (Status)) {
+      if (!EFI_ERROR (Status)) {
+        FreePool (ProtocolBuffer);
+      } else {
         //
         // TheHandle is not valid, so do not add to handle list
         //
