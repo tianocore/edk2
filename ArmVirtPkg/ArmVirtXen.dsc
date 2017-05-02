@@ -212,7 +212,7 @@
   #
   # ACPI support
   #
-!if $(ARCH) == AARCH64
   ArmVirtPkg/XenPlatformHasAcpiDtDxe/XenPlatformHasAcpiDtDxe.inf
+!if $(ARCH) == AARCH64
   ArmVirtPkg/XenAcpiPlatformDxe/XenAcpiPlatformDxe.inf
 !endif
