@@ -15,18 +15,11 @@
 #
 ##
 
-#
-# Default flash size is 2MB.
-#
-# Defining FD_SIZE_1MB on the build command line can override this.
-#
-
 DEFINE BLOCK_SIZE        = 0x1000
 DEFINE VARS_SIZE         = 0x20000
 DEFINE VARS_BLOCKS       = 0x20
 
-!ifdef $(FD_SIZE_1MB)
-
+!if $(FD_SIZE_IN_KB) == 1024
 DEFINE FW_BASE_ADDRESS   = 0xFFF00000
 DEFINE FW_SIZE           = 0x00100000
 DEFINE FW_BLOCKS         = 0x100
@@ -36,9 +29,9 @@ DEFINE CODE_BLOCKS       = 0xE0
 DEFINE FVMAIN_SIZE       = 0x000CC000
 DEFINE SECFV_OFFSET      = 0x000EC000
 DEFINE SECFV_SIZE        = 0x14000
+!endif
 
-!else
-
+!if $(FD_SIZE_IN_KB) == 2048
 DEFINE FW_BASE_ADDRESS   = 0xFFE00000
 DEFINE FW_SIZE           = 0x00200000
 DEFINE FW_BLOCKS         = 0x200
@@ -48,7 +41,6 @@ DEFINE CODE_BLOCKS       = 0x1E0
 DEFINE FVMAIN_SIZE       = 0x001AC000
 DEFINE SECFV_OFFSET      = 0x001CC000
 DEFINE SECFV_SIZE        = 0x34000
-
 !endif
 
 SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress     = $(FW_BASE_ADDRESS)

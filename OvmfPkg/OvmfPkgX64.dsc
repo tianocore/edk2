@@ -40,6 +40,21 @@
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE TLS_ENABLE              = FALSE
 
+  #
+  # Flash size selection. Setting FD_SIZE_IN_KB on the command line directly to
+  # one of the supported values, in place of any of the convenience macros, is
+  # permitted.
+  #
+!ifdef $(FD_SIZE_1MB)
+  DEFINE FD_SIZE_IN_KB           = 1024
+!else
+!ifdef $(FD_SIZE_2MB)
+  DEFINE FD_SIZE_IN_KB           = 2048
+!else
+  DEFINE FD_SIZE_IN_KB           = 2048
+!endif
+!endif
+
 [BuildOptions]
   GCC:*_UNIXGCC_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
