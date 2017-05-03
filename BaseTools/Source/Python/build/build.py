@@ -1039,7 +1039,7 @@ class Build():
                 Process = Popen(args, stdout=PIPE, stderr=PIPE)
             else:
                 args = ' && '.join((self.Prebuild, 'env > ' + PrebuildEnvFile))
-                Process = Popen(args, stdout=PIPE, stderr=PIPE, shell=True, executable="/bin/bash")
+                Process = Popen(args, stdout=PIPE, stderr=PIPE, shell=True)
 
             # launch two threads to read the STDOUT and STDERR
             EndOfProcedure = Event()
@@ -1081,7 +1081,7 @@ class Build():
             if sys.platform == "win32":
                 Process = Popen(self.Postbuild, stdout=PIPE, stderr=PIPE)
             else:
-                Process = Popen(self.Postbuild, stdout=PIPE, stderr=PIPE, shell=True, executable="/bin/bash")
+                Process = Popen(self.Postbuild, stdout=PIPE, stderr=PIPE, shell=True)
             # launch two threads to read the STDOUT and STDERR
             EndOfProcedure = Event()
             EndOfProcedure.clear()
