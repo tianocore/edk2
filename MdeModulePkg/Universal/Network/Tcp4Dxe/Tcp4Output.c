@@ -1,7 +1,7 @@
 /** @file
   TCP output process routines.
     
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -671,17 +671,39 @@ TcpRetransmit (
   // 2. must in the current send window
   // 3. will not change the boundaries of queued segments.
   //
-  if (TCP_SEQ_LT (Tcb->SndWl2 + Tcb->SndWnd, Seq)) {
-    DEBUG ((EFI_D_WARN, "TcpRetransmit: retransmission cancelled "
-      "because send window too small for TCB %p\n", Tcb));
+
+  //
+  // Handle the Window Retraction if TCP window scale is enabled according to RFC7323:
+  //   On first retransmission, or if the sequence number is out of
+  //   window by less than 2^Rcv.Wind.Shift, then do normal
+  //   retransmission(s) without regard to the receiver window as long
+  //   as the original segment was in window when it was sent.
+  //
+  if ((Tcb->SndWndScale != 0) &&
+      (TCP_SEQ_GT (Seq, Tcb->RetxmitSeqMax) || TCP_SEQ_BETWEEN (Tcb->SndWl2 + Tcb->SndWnd, Seq, Tcb->SndWl2 + Tcb->SndWnd + (1 << Tcb->SndWndScale)))) {
+    Len = TCP_SUB_SEQ (Tcb->SndNxt, Seq);
+    DEBUG (
+      (EFI_D_WARN,
+      "TcpRetransmit: retransmission without regard to the receiver window for TCB %p\n",
+      Tcb)
+      );
+    
+  } else if (TCP_SEQ_GEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq)) {
+    Len = TCP_SUB_SEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq);
+    
+  } else {
+    DEBUG (
+      (EFI_D_WARN,
+      "TcpRetransmit: retransmission cancelled because send window too small for TCB %p\n",
+      Tcb)
+      );
 
     return 0;
   }
+  
+  Len = MIN (Len, Tcb->SndMss);
 
-  Len   = TCP_SUB_SEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq);
-  Len   = MIN (Len, Tcb->SndMss);
-
-  Nbuf  = TcpGetSegmentSndQue (Tcb, Seq, Len);
+  Nbuf = TcpGetSegmentSndQue (Tcb, Seq, Len);
   if (Nbuf == NULL) {
     return -1;
   }
@@ -690,6 +712,10 @@ TcpRetransmit (
 
   if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
     goto OnError;
+  }
+  
+  if (TCP_SEQ_GT (Seq, Tcb->RetxmitSeqMax)) {
+    Tcb->RetxmitSeqMax = Seq;
   }
 
   //
