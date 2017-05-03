@@ -164,6 +164,10 @@
   # LAN91x Ethernet Driver PCDs
   gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x0|UINT32|0x00000029
 
+  # DwEmmc Driver PCDs
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x0|UINT32|0x00000035
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|0x0|UINT32|0x00000036
+
   #
   # Android FastBoot
   #
