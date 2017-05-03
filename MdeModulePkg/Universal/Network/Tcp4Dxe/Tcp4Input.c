@@ -1,7 +1,7 @@
 /** @file
   TCP input process routines.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -703,7 +703,8 @@ TcpInput (
   TCP_SEG     *Seg;
   TCP_SEQNO   Right;
   TCP_SEQNO   Urg;
-
+  INT32       Usable;
+  
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
   Parent  = NULL;
@@ -1187,9 +1188,27 @@ TcpInput (
       }
 
       if (TCP_SEQ_LT (Right, Tcb->SndNxt)) {
-
-        Tcb->SndNxt = Right;
-
+        //
+        // Check for Window Retraction in RFC7923 section 2.4.
+        // The lower n bits of the peer's actual receive window is wiped out if TCP
+        // window scale is enabled, it will look like the peer is shrinking the window.
+        // Check whether the SndNxt is out of the advertised receive window by more than
+        // 2^Rcv.Wind.Shift before moving the SndNxt to the left.
+        //
+        DEBUG (
+          (EFI_D_WARN,
+          "TcpInput: peer advise negative useable window for connected TCB %p\n",
+          Tcb)
+          );
+        Usable = TCP_SUB_SEQ (Tcb->SndNxt, Right);
+        if ((Usable >> Tcb->SndWndScale) > 0) {
+          DEBUG (
+            (EFI_D_WARN,
+            "TcpInput: SndNxt is out of window by more than window scale for TCB %p\n",
+            Tcb)
+            );
+          Tcb->SndNxt = Right;
+        }
         if (Right == Tcb->SndUna) {
 
           TcpClearTimer (Tcb, TCP_TIMER_REXMIT);
