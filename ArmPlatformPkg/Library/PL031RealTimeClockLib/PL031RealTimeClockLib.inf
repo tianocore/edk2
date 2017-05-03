@@ -36,6 +36,7 @@
   PcdLib
   ArmPlatformSysConfigLib
   DxeServicesTableLib
+  TimeBaseLib
   UefiRuntimeLib
 
 [Guids]

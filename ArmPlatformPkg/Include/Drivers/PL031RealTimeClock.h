@@ -42,15 +42,4 @@
 
 #define PL031_COUNTS_PER_SECOND                         1
 
-// Define EPOCH (1970-JANUARY-01) in the Julian Date representation
-#define EPOCH_JULIAN_DATE                               2440588
-
-// Seconds per unit
-#define SEC_PER_MIN                                     ((UINTN)    60)
-#define SEC_PER_HOUR                                    ((UINTN)  3600)
-#define SEC_PER_DAY                                     ((UINTN) 86400)
-
-#define SEC_PER_MONTH                                   ((UINTN)  2,592,000)
-#define SEC_PER_YEAR                                    ((UINTN) 31,536,000)
-
 #endif
