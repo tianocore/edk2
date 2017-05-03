@@ -152,8 +152,8 @@ M: Giri P Mudusuru <giri.p.mudusuru@intel.com>
 
 MdeModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
-M: Feng Tian <feng.tian@intel.com>
 M: Star Zeng <star.zeng@intel.com>
+M: Eric Dong <eric.dong@intel.com>
 
 MdePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
