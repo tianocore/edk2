@@ -504,6 +504,22 @@ class WorkspaceAutoGen(AutoGen):
                                 SourcePcdDict['FixedAtBuild'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                 else:
                     pass
+            #
+            # A PCD can only use one type for all source modules
+            #
+            for i in SourcePcdDict_Keys:
+                for j in SourcePcdDict_Keys:
+                    if i != j:
+                        IntersectionList = list(set(SourcePcdDict[i]).intersection(set(SourcePcdDict[j])))
+                        if len(IntersectionList) > 0:
+                            EdkLogger.error(
+                            'build',
+                            FORMAT_INVALID,
+                            "Building modules from source INFs, following PCD use %s and %s access method. It must be corrected to use only one access method." % (i, j),
+                            ExtraData="%s" % '\n\t'.join([str(P[1]+'.'+P[0]) for P in IntersectionList])
+                            )
+                    else:
+                        pass
 
             #
             # intersection the BinaryPCD for Mixed PCD
