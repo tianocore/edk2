@@ -1023,34 +1023,6 @@ GetAhciBarSize (
 }
 
 /**
-  This function check if the memory region is in GCD MMIO region.
-
-  @param Addr  The memory region start address to be checked.
-  @param Size  The memory region length to be checked.
-
-  @retval TRUE  This memory region is in GCD MMIO region.
-  @retval FALSE This memory region is not in GCD MMIO region.
-**/
-BOOLEAN
-EFIAPI
-OpalIsValidMmioSpace (
-  IN  EFI_PHYSICAL_ADDRESS       Addr,
-  IN  UINTN                      Size
-  )
-{
-  UINTN                           Index;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Desc;
-
-  for (Index = 0; Index < mNumberOfDescriptors; Index ++) {
-    Desc = &mGcdMemSpace[Index];
-    if ((Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) && (Addr >= Desc->BaseAddress) && ((Addr + Size) <= (Desc->BaseAddress + Desc->Length))) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-/**
   Get AHCI mode base address registers' Value.
 
   @param[in] Bus         The bus number of ata host controller.
@@ -1083,7 +1055,7 @@ GetAhciBaseAddress (
   //
   // Check if the AHCI Bar region is in SMRAM to avoid malicious attack by modifying MMIO Bar to point to SMRAM.
   //
-  if (!OpalIsValidMmioSpace ((EFI_PHYSICAL_ADDRESS)mAhciBar, Size)) {
+  if (!SmmIsMmioValid ((EFI_PHYSICAL_ADDRESS)mAhciBar, Size, NULL)) {
     return EFI_UNSUPPORTED;
   }
 

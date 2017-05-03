@@ -61,9 +61,6 @@ VOID                 *mBuffer = NULL; // DMA can not read/write Data to smram, s
 // NVME
 NVME_CONTEXT         mNvmeContext;
 
-EFI_GCD_MEMORY_SPACE_DESCRIPTOR   *mGcdMemSpace        = NULL;
-UINTN                             mNumberOfDescriptors = 0;
-
 /**
   Add new bridge node or nvme device info to the device list.
 
@@ -648,44 +645,6 @@ S3SleepEntryCallBack (
 }
 
 /**
-  OpalPassword Notification for SMM EndOfDxe protocol.
-
-  @param[in] Protocol   Points to the protocol's unique identifier.
-  @param[in] Interface  Points to the interface instance.
-  @param[in] Handle     The handle on which the interface was installed.
-
-  @retval EFI_SUCCESS   Notification runs successfully.
-**/
-EFI_STATUS
-EFIAPI
-OpalPasswordEndOfDxeNotification (
-  IN CONST EFI_GUID  *Protocol,
-  IN VOID            *Interface,
-  IN EFI_HANDLE      Handle
-  )
-{
-  UINTN                            NumberOfDescriptors;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemSpaceMap;
-  EFI_STATUS                       Status;
-
-  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemSpaceMap);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  mGcdMemSpace = AllocateCopyPool (NumberOfDescriptors * sizeof (EFI_GCD_MEMORY_SPACE_DESCRIPTOR), MemSpaceMap);
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (MemSpaceMap);
-    return Status;
-  }
-
-  mNumberOfDescriptors = NumberOfDescriptors;
-  gBS->FreePool (MemSpaceMap);
-
-  return EFI_SUCCESS;
-}
-
-/**
   Main entry for this driver.
 
   @param ImageHandle     Image handle this driver.
@@ -711,7 +670,6 @@ OpalPasswordSmmInit (
   EFI_SMM_VARIABLE_PROTOCOL             *SmmVariable;
   OPAL_EXTRA_INFO_VAR                   OpalExtraInfo;
   UINTN                                 DataSize;
-  EFI_EVENT                             EndOfDxeEvent;
   EFI_PHYSICAL_ADDRESS                  Address;
 
   mBuffer            = NULL;
@@ -820,15 +778,6 @@ OpalPasswordSmmInit (
   //
   mSwSmiValue = (UINT8) Context.SwSmiInputValue;
 
-  //
-  // Create event to record GCD descriptors at end of dxe for judging AHCI/NVMe PCI Bar
-  // is in MMIO space to avoid attack.
-  //
-  Status = gSmst->SmmRegisterProtocolNotify (&gEfiSmmEndOfDxeProtocolGuid, OpalPasswordEndOfDxeNotification, &EndOfDxeEvent);
-  if (EFI_ERROR (Status)) {
-    DEBUG((DEBUG_ERROR, "OpalPasswordSmm: Register SmmEndOfDxe fail, Status: %r\n", Status));
-    goto EXIT;
-  }
   Status = gSmst->SmmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID**)&SmmVariable);
   if (!EFI_ERROR (Status)) {
     DataSize = sizeof (OPAL_EXTRA_INFO_VAR);
