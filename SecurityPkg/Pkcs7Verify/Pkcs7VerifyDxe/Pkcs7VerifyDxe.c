@@ -5,7 +5,7 @@
   verify data signed using PKCS7 structure. The PKCS7 data to be verified must
   be ASN.1 (DER) encoded.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -801,11 +801,13 @@ VerifyBuffer (
   IN OUT UINTN                    *ContentSize
   )
 {
-  EFI_STATUS  Status;
-  UINT8       *AttachedData;
-  UINTN       AttachedDataSize;
-  UINT8       *DataPtr;
-  UINTN       DataSize;
+  EFI_STATUS          Status;
+  EFI_SIGNATURE_LIST  *SigList;
+  UINTN               Index;
+  UINT8               *AttachedData;
+  UINTN               AttachedDataSize;
+  UINT8               *DataPtr;
+  UINTN               DataSize;
 
   //
   // Parameters Checking
@@ -815,6 +817,58 @@ VerifyBuffer (
   }
   if ((Content != NULL) && (ContentSize == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if any invalid entry format in AllowedDb list contents
+  //
+  for (Index = 0; ; Index++) {
+    SigList = (EFI_SIGNATURE_LIST *)(AllowedDb[Index]);
+
+    if (SigList == NULL) {
+      break;
+    }
+    if (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST) +
+                                     SigList->SignatureHeaderSize +
+                                     SigList->SignatureSize) {
+      return EFI_ABORTED;
+    }
+  }
+
+  //
+  // Check if any invalid entry format in RevokedDb list contents
+  //
+  if (RevokedDb != NULL) {
+    for (Index = 0; ; Index++) {
+      SigList = (EFI_SIGNATURE_LIST *)(RevokedDb[Index]);
+
+      if (SigList == NULL) {
+        break;
+      }
+      if (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST) +
+                                       SigList->SignatureHeaderSize +
+                                       SigList->SignatureSize) {
+        return EFI_ABORTED;
+      }
+    }
+  }
+
+  //
+  // Check if any invalid entry format in TimeStampDb list contents
+  //
+  if (TimeStampDb != NULL) {
+    for (Index = 0; ; Index++) {
+      SigList = (EFI_SIGNATURE_LIST *)(TimeStampDb[Index]);
+
+      if (SigList == NULL) {
+        break;
+      }
+      if (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST) +
+                                       SigList->SignatureHeaderSize +
+                                       SigList->SignatureSize) {
+        return EFI_ABORTED;
+      }
+    }
   }
 
   //
