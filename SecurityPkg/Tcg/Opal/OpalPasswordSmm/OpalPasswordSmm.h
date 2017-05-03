@@ -45,6 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/S3BootScriptLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/SmmIoLib.h>
 
 #include <IndustryStandard/Pci22.h>
 
@@ -70,8 +71,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 extern VOID                              *mBuffer;
 
-extern EFI_GCD_MEMORY_SPACE_DESCRIPTOR   *mGcdMemSpace;
-extern UINTN                             mNumberOfDescriptors;
 #pragma pack(1)
 
 typedef struct {
