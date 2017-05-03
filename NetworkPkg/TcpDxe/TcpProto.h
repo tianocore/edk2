@@ -1,7 +1,7 @@
 /** @file
   TCP protocol header file.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -314,6 +314,12 @@ struct _TCP_CONTROL_BLOCK {
   UINT8             CongestState; ///< The current congestion state(RFC3782).
   UINT8             LossTimes;    ///< Number of retxmit timeouts in a row.
   TCP_SEQNO         LossRecover;  ///< Recover point for retxmit.
+
+  //
+  // RFC7323
+  // Addressing Window Retraction for TCP Window Scale Option.
+  //
+  TCP_SEQNO         RetxmitSeqMax;       ///< Max Seq number in previous retransmission.
 
   //
   // configuration parameters, for EFI_TCP4_PROTOCOL specification
