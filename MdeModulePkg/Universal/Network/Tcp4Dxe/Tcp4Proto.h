@@ -1,7 +1,7 @@
 /** @file
   Tcp Protocol header file.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -249,6 +249,12 @@ struct _TCP_CB {
   UINT32            FinWait2Timeout; ///< The FIN_WAIT_2 time out
   UINT32            TimeWaitTimeout; ///< The TIME_WAIT time out
   UINT32            ConnectTimeout;  ///< The connect establishment time out
+
+  //
+  // RFC7323
+  // Addressing Window Retraction for TCP Window Scale Option.
+  //
+  TCP_SEQNO         RetxmitSeqMax;       ///< Max Seq number in previous retransmission.
 
   //
   // configuration for tcp provided by user
