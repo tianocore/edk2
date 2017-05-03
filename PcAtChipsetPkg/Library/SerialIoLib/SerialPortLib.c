@@ -102,7 +102,7 @@ SerialPortInitialize (
   //
   // Switch back to bank 0
   //
-  OutputData = (UINT8) ((~DLAB << 7) | (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
+  OutputData = (UINT8) ( (gBreakSet << 6) | (gParity << 3) | (gStop << 2) | Data);
   IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   return RETURN_SUCCESS;
@@ -481,7 +481,7 @@ SerialPortSetAttributes (
   //
   // Switch back to bank 0
   //
-  OutputData = (UINT8) ((~DLAB << 7) | (gBreakSet << 6) | (LcrParity << 3) | (LcrStop << 2) | LcrData);
+  OutputData = (UINT8) ((gBreakSet << 6) | (LcrParity << 3) | (LcrStop << 2) | LcrData);
   IoWrite8 (gUartBase + LCR_OFFSET, OutputData);
 
   return RETURN_SUCCESS;
