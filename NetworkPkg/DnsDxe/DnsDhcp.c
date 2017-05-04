@@ -1,7 +1,7 @@
 /** @file
 Functions implementation related with DHCPv4/v6 for DNS driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -462,7 +462,7 @@ GetDns4ServerFromDhcp4 (
   
   ParaList[0]->OpCode  = DHCP4_TAG_TYPE;
   ParaList[0]->Length  = 1;
-  ParaList[0]->Data[0] = DHCP4_MSG_INFORM;
+  ParaList[0]->Data[0] = DHCP4_MSG_REQUEST;
   
   ParaList[1] = AllocateZeroPool (sizeof (EFI_DHCP4_PACKET_OPTION));
   if (ParaList[1] == NULL) {
