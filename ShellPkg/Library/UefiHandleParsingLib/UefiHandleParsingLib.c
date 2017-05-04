@@ -16,11 +16,73 @@
 
 #include "UefiHandleParsingLib.h"
 #include "IndustryStandard/Acpi10.h"
+#include <PiDxe.h>
+#include <Protocol/FirmwareVolume2.h>
 
 EFI_HANDLE        mHandleParsingHiiHandle = NULL;
 HANDLE_INDEX_LIST mHandleList = {{{NULL,NULL},0,0},0};
 GUID_INFO_BLOCK   *mGuidList;
 UINTN             mGuidListCount;
+
+/**
+  Function to find the file name associated with a LoadedImageProtocol.
+
+  @param[in] LoadedImage     An instance of LoadedImageProtocol.
+
+  @retval                    A string representation of the file name associated
+                             with LoadedImage, or NULL if no name can be found.
+**/
+CHAR16*
+FindLoadedImageFileName (
+  IN EFI_LOADED_IMAGE_PROTOCOL *LoadedImage
+  )
+{
+  EFI_GUID                       *NameGuid;
+  EFI_STATUS                     Status;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
+  VOID                           *Buffer;
+  UINTN                          BufferSize;
+  UINT32                         AuthenticationStatus;
+
+  if ((LoadedImage == NULL) || (LoadedImage->FilePath == NULL)) {
+    return NULL;
+  }
+
+  NameGuid = EfiGetNameGuidFromFwVolDevicePathNode((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)LoadedImage->FilePath);
+
+  if (NameGuid == NULL) {
+    return NULL;
+  }
+
+  //
+  // Get the FirmwareVolume2Protocol of the device handle that this image was loaded from.
+  //
+  Status = gBS->HandleProtocol (LoadedImage->DeviceHandle, &gEfiFirmwareVolume2ProtocolGuid, (VOID**) &Fv);
+
+  //
+  // FirmwareVolume2Protocol is PI, and is not required to be available.
+  //
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Read the user interface section of the image.
+  //
+  Buffer = NULL;
+  Status = Fv->ReadSection(Fv, NameGuid, EFI_SECTION_USER_INTERFACE, 0, &Buffer, &BufferSize, &AuthenticationStatus);
+
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // ReadSection returns just the section data, without any section header. For
+  // a user interface section, the only data is the file name.
+  //
+  return Buffer;
+}
+
 /**
   Function to translate the EFI_MEMORY_TYPE into a string.
 
@@ -169,6 +231,7 @@ LoadedImageProtocolDumpInformation(
   EFI_STATUS                        Status;
   CHAR16                            *RetVal;
   CHAR16                            *Temp;
+  CHAR16                            *FileName;
   CHAR16                            *FilePath;
   CHAR16                            *CodeType;
   CHAR16                            *DataType;
@@ -192,6 +255,20 @@ LoadedImageProtocolDumpInformation(
 
   HandleParsingHiiInit();
 
+  FileName = FindLoadedImageFileName(LoadedImage);
+
+  RetVal = NULL;
+  if (FileName != NULL) {
+    Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_LI_DUMP_NAME), NULL);
+
+    if (Temp != NULL) {
+      RetVal = CatSPrint(NULL, Temp, FileName);
+    }
+
+    SHELL_FREE_NON_NULL(Temp);
+    SHELL_FREE_NON_NULL(FileName);
+  }
+
   Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_LI_DUMP_MAIN), NULL);
   if (Temp == NULL) {
     return NULL;
@@ -203,7 +280,7 @@ LoadedImageProtocolDumpInformation(
   CodeType = ConvertMemoryType(LoadedImage->ImageCodeType);
 
   RetVal = CatSPrint(
-             NULL,
+             RetVal,
              Temp,
              LoadedImage->Revision,
              LoadedImage->ParentHandle,
