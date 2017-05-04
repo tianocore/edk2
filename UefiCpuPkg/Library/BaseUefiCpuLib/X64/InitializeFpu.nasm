@@ -41,10 +41,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     ;
     ; Initialize floating point units
     ;
-    ; The following opcodes stand for instruction 'finit'
-    ; to be supported by some 64-bit assemblers
-    ;
-    DB      0x9B, 0xDB, 0xE3
+    finit
     fldcw   [mFpuControlWord]
 
     ;
