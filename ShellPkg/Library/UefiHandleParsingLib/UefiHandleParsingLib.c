@@ -169,6 +169,7 @@ LoadedImageProtocolDumpInformation(
   EFI_STATUS                        Status;
   CHAR16                            *RetVal;
   CHAR16                            *Temp;
+  CHAR16                            *FilePath;
   CHAR16                            *CodeType;
   CHAR16                            *DataType;
 
@@ -197,6 +198,8 @@ LoadedImageProtocolDumpInformation(
     return NULL;
   }
 
+  FilePath = ConvertDevicePathToText(LoadedImage->FilePath, TRUE, TRUE);
+
   DataType = ConvertMemoryType(LoadedImage->ImageDataType);
   CodeType = ConvertMemoryType(LoadedImage->ImageCodeType);
 
@@ -207,7 +210,7 @@ LoadedImageProtocolDumpInformation(
              LoadedImage->ParentHandle,
              LoadedImage->SystemTable,
              LoadedImage->DeviceHandle,
-             LoadedImage->FilePath,
+             FilePath,
              LoadedImage->LoadOptionsSize,
              LoadedImage->LoadOptions,
              LoadedImage->ImageBase,
@@ -219,6 +222,7 @@ LoadedImageProtocolDumpInformation(
 
 
   SHELL_FREE_NON_NULL(Temp);
+  SHELL_FREE_NON_NULL(FilePath);
   SHELL_FREE_NON_NULL(CodeType);
   SHELL_FREE_NON_NULL(DataType);
 
