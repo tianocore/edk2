@@ -348,6 +348,8 @@
 
 
 
+#string STR_LI_DUMP_NAME          #language en-US "     Name..........: %%H%s%%N\r\n"
+
 #string STR_LI_DUMP_MAIN          #language en-US "     Revision......: %%H0x%08x%%N\r\n"
                                                   "     ParentHandle..: %%H%x%%N\r\n"
                                                   "     SystemTable...: %%H%x%%N\r\n"
