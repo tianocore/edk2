@@ -177,13 +177,6 @@ LoadedImageProtocolDumpInformation(
     return (CatSPrint(NULL, L"LoadedImage"));
   }
 
-  HandleParsingHiiInit();
-
-  Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_LI_DUMP_MAIN), NULL);
-  if (Temp == NULL) {
-    return NULL;
-  }
-
   Status = gBS->OpenProtocol (
                 TheHandle,
                 &gEfiLoadedImageProtocolGuid,
@@ -194,7 +187,13 @@ LoadedImageProtocolDumpInformation(
                );
 
   if (EFI_ERROR (Status)) {
-    SHELL_FREE_NON_NULL (Temp);
+    return NULL;
+  }
+
+  HandleParsingHiiInit();
+
+  Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_LI_DUMP_MAIN), NULL);
+  if (Temp == NULL) {
     return NULL;
   }
 
