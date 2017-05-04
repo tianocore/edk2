@@ -352,7 +352,7 @@
                                                   "     ParentHandle..: %%H%x%%N\r\n"
                                                   "     SystemTable...: %%H%x%%N\r\n"
                                                   "     DeviceHandle..: %%H%x%%N\r\n"
-                                                  "     FilePath......: %%H%x%%N\r\n"
+                                                  "     FilePath......: %%H%s%%N\r\n"
                                                   "     OptionsSize...: %%H%x%%N\r\n"
                                                   "     LoadOptions...: %%H%x%%N\r\n"
                                                   "     ImageBase.....: %%H%x%%N\r\n"
