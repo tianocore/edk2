@@ -851,6 +851,8 @@ MtrrLibGetMtrrNumber (
   UINT64  SubtractiveLength;
   UINT64  BaseAlignment;
   UINT32  Index;
+  UINT64  OriginalBaseAddress;
+  UINT64  OriginalLength;
 
   *SubLeft = 0;
   *SubRight = 0;
@@ -861,6 +863,9 @@ MtrrLibGetMtrrNumber (
   // Get the optimal left subtraction solution.
   //
   if (BaseAddress != 0) {
+
+    OriginalBaseAddress    = BaseAddress;
+    OriginalLength         = Length;
     SubtractiveBaseAddress = 0;
     SubtractiveLength      = 0;
     //
@@ -915,7 +920,10 @@ MtrrLibGetMtrrNumber (
     //
     if (*SubLeft != 0) {
       BaseAddress = SubtractiveBaseAddress;
-      Length = SubtractiveLength;
+      Length      = SubtractiveLength;
+    } else {
+      BaseAddress = OriginalBaseAddress;
+      Length      = OriginalLength;
     }
   }
 
