@@ -2,7 +2,7 @@
   MDE DXE Services Library provides functions that simplify the development of DXE Drivers.  
   These functions help access data from sections of FFS files or from file path.
 
-  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -62,6 +62,12 @@ InternalImageHandleToFvHandle (
 
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // The LoadedImage->DeviceHandle may be NULL.
+  // For example for DxeCore, there is LoadedImage protocol installed for it, but the
+  // LoadedImage->DeviceHandle could not be initialized before the FV2 (contain DxeCore)
+  // protocol is installed.
+  //
   return LoadedImage->DeviceHandle;
 
 }
@@ -84,7 +90,6 @@ InternalImageHandleToFvHandle (
   The data and size is returned by Buffer and Size. The caller is responsible to free the Buffer allocated 
   by this function. This function can be only called at TPL_NOTIFY and below.
   
-  If FvHandle is NULL, then ASSERT ();
   If NameGuid is NULL, then ASSERT();
   If Buffer is NULL, then ASSERT();
   If Size is NULL, then ASSERT().
@@ -128,7 +133,12 @@ InternalGetSectionFromFv (
   ASSERT (Buffer != NULL);
   ASSERT (Size != NULL);
   
-  ASSERT (FvHandle != NULL);
+  if (FvHandle == NULL) {
+    //
+    // Return EFI_NOT_FOUND directly for NULL FvHandle.
+    //
+    return EFI_NOT_FOUND;
+  }
 
   Status = gBS->HandleProtocol (
                   FvHandle,
