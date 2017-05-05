@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,9 +44,6 @@ SNPNT32_GLOBAL_DATA         gSnpNt32GlobalData = {
     0,
     EfiLockUninitialized
   },                          //  Lock
-  NULL,                       //  RecycledTxBuf
-  0,                          //  RecycledTxBufCount
-  32,                         //  MaxRecycledTxBuf
   //
   //  Private functions
   //
@@ -396,6 +393,9 @@ SNPNT32_INSTANCE_DATA gSnpNt32InstanceTemplate = {
     NULL,
     NULL
   },                                      //  Entry
+  NULL,                                   //  RecycledTxBuf
+  0,                                      //  RecycledTxBufCount
+  32,                                     //  MaxRecycledTxBuf
   NULL,                                   //  GlobalData
   NULL,                                   //  DeviceHandle
   NULL,                                   //  DevicePath
@@ -865,16 +865,13 @@ SnpNt32GetStatus (
   )
 {
   SNPNT32_INSTANCE_DATA *Instance;
-  SNPNT32_GLOBAL_DATA   *GlobalData;
 
   Instance    = SNP_NT32_INSTANCE_DATA_FROM_SNP_THIS (This);
 
-  GlobalData  = Instance->GlobalData;
-
   if (TxBuffer != NULL) {
-    if (GlobalData->RecycledTxBufCount != 0) {
-      GlobalData->RecycledTxBufCount --;
-      *((UINT8 **) TxBuffer)    = (UINT8 *) (UINTN)GlobalData->RecycledTxBuf[GlobalData->RecycledTxBufCount];
+    if (Instance->RecycledTxBufCount != 0) {
+      Instance->RecycledTxBufCount --;
+      *((UINT8 **) TxBuffer)    = (UINT8 *) (UINTN)Instance->RecycledTxBuf[Instance->RecycledTxBufCount];
     } else {
       *((UINT8 **) TxBuffer)    = NULL;
     }
@@ -961,22 +958,22 @@ SnpNt32Transmit (
   if (ReturnValue < 0) {
     return EFI_DEVICE_ERROR;
   } else {
-    if ((GlobalData->MaxRecycledTxBuf + SNP_TX_BUFFER_INCREASEMENT) >= SNP_MAX_TX_BUFFER_NUM) {
+    if ((Instance->MaxRecycledTxBuf + SNP_TX_BUFFER_INCREASEMENT) >= SNP_MAX_TX_BUFFER_NUM) {
       return EFI_NOT_READY;
     }
 
-    if (GlobalData->RecycledTxBufCount < GlobalData->MaxRecycledTxBuf) {
-      GlobalData->RecycledTxBuf[GlobalData->RecycledTxBufCount] = (UINT64) Buffer;
-      GlobalData->RecycledTxBufCount ++;
+    if (Instance->RecycledTxBufCount < Instance->MaxRecycledTxBuf) {
+      Instance->RecycledTxBuf[Instance->RecycledTxBufCount] = (UINT64) Buffer;
+      Instance->RecycledTxBufCount ++;
     } else {
-      Tmp = AllocatePool (sizeof (UINT64) * (GlobalData->MaxRecycledTxBuf + SNP_TX_BUFFER_INCREASEMENT));
+      Tmp = AllocatePool (sizeof (UINT64) * (Instance->MaxRecycledTxBuf + SNP_TX_BUFFER_INCREASEMENT));
       if (Tmp == NULL) {
         return EFI_DEVICE_ERROR;
       }
-      CopyMem (Tmp, GlobalData->RecycledTxBuf, sizeof (UINT64) * GlobalData->RecycledTxBufCount);
-      FreePool (GlobalData->RecycledTxBuf);
-      GlobalData->RecycledTxBuf    =  Tmp;
-      GlobalData->MaxRecycledTxBuf += SNP_TX_BUFFER_INCREASEMENT;
+      CopyMem (Tmp, Instance->RecycledTxBuf, sizeof (UINT64) * Instance->RecycledTxBufCount);
+      FreePool (Instance->RecycledTxBuf);
+      Instance->RecycledTxBuf    =  Tmp;
+      Instance->MaxRecycledTxBuf += SNP_TX_BUFFER_INCREASEMENT;
     }
   }
 
@@ -1116,11 +1113,6 @@ SnpNt32InitializeGlobalData (
   InitializeListHead (&This->InstanceList);
   EfiInitializeLock (&This->Lock, TPL_CALLBACK);
 
-  This->RecycledTxBuf = AllocatePool (sizeof (UINT64) * This->MaxRecycledTxBuf);
-  if (This->RecycledTxBuf == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
   //
   //  Get the WinNT thunk
   //
@@ -1213,7 +1205,7 @@ SnpNt32InitializeGlobalData (
   //
   for (Index = 0; Index < InterfaceCount; Index++) {
 
-    Instance = AllocatePool (sizeof (SNPNT32_INSTANCE_DATA));
+    Instance = AllocateZeroPool (sizeof (SNPNT32_INSTANCE_DATA));
 
     if (NULL == Instance) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -1223,6 +1215,14 @@ SnpNt32InitializeGlobalData (
     //  Copy the content from a template
     //
     CopyMem (Instance, &gSnpNt32InstanceTemplate, sizeof (SNPNT32_INSTANCE_DATA));
+
+    //
+    // Allocate the RecycledTxBuf.
+    //
+    Instance->RecycledTxBuf = AllocatePool (sizeof (UINT64) * Instance->MaxRecycledTxBuf);
+    if (Instance->RecycledTxBuf == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     //
     //  Set the interface information.

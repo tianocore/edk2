@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -161,20 +161,6 @@ struct _SNPNT32_GLOBAL_DATA {
   EFI_LOCK                          Lock;
 
   //
-  // Array of the recycled transmit buffer address.
-  //
-  UINT64                            *RecycledTxBuf;
-
-  //
-  // Current number of recycled buffer pointers in RecycledTxBuf.
-  //
-  UINT32                             RecycledTxBufCount;
-
-  // The maximum number of recycled buffer pointers in RecycledTxBuf.
-  //
-  UINT32                             MaxRecycledTxBuf;
-
-  //
   //  Private functions
   //
   SNPNT32_INITIALIZE_GLOBAL_DATA    InitializeGlobalData;
@@ -194,6 +180,21 @@ struct _SNPNT32_INSTANCE_DATA {
   //  List entry use for linking with other instance
   //
   LIST_ENTRY                  Entry;
+
+  //
+  // Array of the recycled transmit buffer address.
+  //
+  UINT64                      *RecycledTxBuf;
+
+  //
+  // Current number of recycled buffer pointers in RecycledTxBuf.
+  //
+  UINT32                      RecycledTxBufCount;
+
+  //
+  // The maximum number of recycled buffer pointers in RecycledTxBuf.
+  //
+  UINT32                      MaxRecycledTxBuf;
 
   SNPNT32_GLOBAL_DATA         *GlobalData;
 
