@@ -58,8 +58,14 @@ typedef struct {
 //
 // Constants
 //
-#define EMU_FVB_BLOCK_SIZE (FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize))
-#define EMU_FVB_SIZE (2 * FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize))
+#define EMU_FVB_BLOCK_SIZE \
+  EFI_PAGE_SIZE
+#define EMU_FVB_NUM_SPARE_BLOCKS \
+  EFI_SIZE_TO_PAGES ((UINTN)FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize))
+#define EMU_FVB_NUM_TOTAL_BLOCKS \
+  (2 * EMU_FVB_NUM_SPARE_BLOCKS)
+#define EMU_FVB_SIZE \
+  (EMU_FVB_NUM_TOTAL_BLOCKS * EMU_FVB_BLOCK_SIZE)
 #define FTW_WRITE_QUEUE_SIZE \
   (FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) - \
    sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER))
