@@ -120,14 +120,14 @@ FvbVirtualAddressChangeEvent (
   only for memory-mapped firmware volumes.
 
   @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
-  
+
   @param Address  Pointer to a caller-allocated
                   EFI_PHYSICAL_ADDRESS that, on successful
                   return from GetPhysicalAddress(), contains the
                   base address of the firmware volume.
-  
+
   @retval EFI_SUCCESS       The firmware volume base address is returned.
-  
+
   @retval EFI_NOT_SUPPORTED The firmware volume is not memory mapped.
 
 **/
@@ -168,9 +168,9 @@ FvbProtocolGetPhysicalAddress (
                         blocks in this range have a size of
                         BlockSize.
 
-  
+
   @retval EFI_SUCCESS             The firmware volume base address is returned.
-  
+
   @retval EFI_INVALID_PARAMETER   The requested LBA is out of range.
 
 **/
@@ -246,7 +246,7 @@ FvbProtocolGetAttributes (
                       settings of the firmware volume. Type
                       EFI_FVB_ATTRIBUTES_2 is defined in
                       EFI_FIRMWARE_VOLUME_HEADER.
-  
+
   @retval EFI_SUCCESS           The firmware volume attributes were returned.
 
   @retval EFI_INVALID_PARAMETER The attributes requested are in
@@ -302,7 +302,7 @@ FvbProtocolSetAttributes (
 
   @retval EFI_SUCCESS The erase request was successfully
                       completed.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               WriteDisabled state.
   @retval EFI_DEVICE_ERROR  The block device is not functioning
@@ -311,7 +311,7 @@ FvbProtocolSetAttributes (
                             partially erased.
   @retval EFI_INVALID_PARAMETER One or more of the LBAs listed
                                 in the variable argument list do
-                                not exist in the firmware volume.  
+                                not exist in the firmware volume.
 
 **/
 EFI_STATUS
@@ -420,29 +420,29 @@ FvbProtocolEraseBlocks (
   returns.
 
   @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
-  
+
   @param Lba      The starting logical block index to write to.
-  
+
   @param Offset   Offset into the block at which to begin writing.
-  
+
   @param NumBytes Pointer to a UINTN. At entry, *NumBytes
                   contains the total size of the buffer. At
                   exit, *NumBytes contains the total number of
                   bytes actually written.
-  
+
   @param Buffer   Pointer to a caller-allocated buffer that
                   contains the source for the write.
-  
+
   @retval EFI_SUCCESS         The firmware volume was written successfully.
-  
+
   @retval EFI_BAD_BUFFER_SIZE The write was attempted across an
                               LBA boundary. On output, NumBytes
                               contains the total number of bytes
                               actually written.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               WriteDisabled state.
-  
+
   @retval EFI_DEVICE_ERROR    The block device is malfunctioning
                               and could not be written.
 
@@ -503,7 +503,7 @@ FvbProtocolWrite (
   aware that a read may be partially completed.
 
   @param This     Indicates the EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL instance.
-  
+
   @param Lba      The starting logical block index
                   from which to read.
 
@@ -519,15 +519,15 @@ FvbProtocolWrite (
 
   @retval EFI_SUCCESS         The firmware volume was read successfully
                               and contents are in Buffer.
-  
+
   @retval EFI_BAD_BUFFER_SIZE Read attempted across an LBA
                               boundary. On output, NumBytes
                               contains the total number of bytes
                               returned in Buffer.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               ReadDisabled state.
-  
+
   @retval EFI_DEVICE_ERROR    The block device is not
                               functioning correctly and could
                               not be read.
@@ -715,9 +715,9 @@ InitializeFvAndVariableStoreHeaders (
 /**
   Main entry point.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       Successfully initialized.
 
 **/
