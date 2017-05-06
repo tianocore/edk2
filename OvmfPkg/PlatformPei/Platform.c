@@ -504,7 +504,6 @@ ReserveEmuVariableNvStore (
 {
   EFI_PHYSICAL_ADDRESS VariableStore;
   RETURN_STATUS        PcdStatus;
-  UINT32               Alignment;
 
   //
   // Allocate storage for NV variables early on so it will be
@@ -512,26 +511,15 @@ ReserveEmuVariableNvStore (
   // across reboots, this allows the NV variable storage to survive
   // a VM reboot.
   //
-  Alignment = PcdGet32 (PcdFlashNvStorageFtwSpareSize);
-  if ((Alignment & (Alignment - 1)) != 0) {
-    //
-    // Round up Alignment to the next power of two.
-    //
-    Alignment = GetPowerOfTwo32 (Alignment) << 1;
-  }
-
   VariableStore =
     (EFI_PHYSICAL_ADDRESS)(UINTN)
-      AllocateAlignedRuntimePages (
-        EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)),
-        Alignment
+      AllocateRuntimePages (
+        EFI_SIZE_TO_PAGES (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize))
         );
   DEBUG ((EFI_D_INFO,
-          "Reserved variable store memory: 0x%lX; size: %dkb, "
-          "alignment: 0x%x\n",
+          "Reserved variable store memory: 0x%lX; size: %dkb\n",
           VariableStore,
-          (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024,
-          Alignment
+          (2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)) / 1024
         ));
   PcdStatus = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
   ASSERT_RETURN_ERROR (PcdStatus);
