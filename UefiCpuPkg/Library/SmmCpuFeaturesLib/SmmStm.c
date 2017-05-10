@@ -326,8 +326,8 @@ SmmCpuFeaturesInstallSmiHandler (
   Psd->SmmSmiHandlerRsp = (UINTN)SmiStack + StackSize - sizeof(UINTN);
   Psd->SmmCr3           = Cr3;
 
-  DEBUG((DEBUG_ERROR, "CpuSmmStmExceptionStackSize - %x\n", PcdGet32(PcdCpuSmmStmExceptionStackSize)));
-  DEBUG((DEBUG_ERROR, "Pages - %x\n", EFI_SIZE_TO_PAGES(PcdGet32(PcdCpuSmmStmExceptionStackSize))));
+  DEBUG((DEBUG_INFO, "CpuSmmStmExceptionStackSize - %x\n", PcdGet32(PcdCpuSmmStmExceptionStackSize)));
+  DEBUG((DEBUG_INFO, "Pages - %x\n", EFI_SIZE_TO_PAGES(PcdGet32(PcdCpuSmmStmExceptionStackSize))));
   Psd->StmProtectionExceptionHandler.SpeRsp = (UINT64)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
   Psd->StmProtectionExceptionHandler.SpeRsp += EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
 
@@ -735,7 +735,7 @@ ValidateResource (
   Resource = ResourceList;
 
   for (Index = 0; Index < Count; Index++) {
-    DEBUG ((DEBUG_ERROR, "ValidateResource (%d) - RscType(%x)\n", Index, Resource->Header.RscType));
+    DEBUG ((DEBUG_INFO, "ValidateResource (%d) - RscType(%x)\n", Index, Resource->Header.RscType));
     //
     // Validate resource.
     //
@@ -782,7 +782,7 @@ ValidateResource (
         break;
 
       case PCI_CFG_RANGE:
-        DEBUG ((DEBUG_ERROR, "ValidateResource - PCI (0x%02x, 0x%08x, 0x%02x, 0x%02x)\n", Resource->PciCfg.OriginatingBusNumber, Resource->PciCfg.LastNodeIndex, Resource->PciCfg.PciDevicePath[0].PciDevice, Resource->PciCfg.PciDevicePath[0].PciFunction));
+        DEBUG ((DEBUG_INFO, "ValidateResource - PCI (0x%02x, 0x%08x, 0x%02x, 0x%02x)\n", Resource->PciCfg.OriginatingBusNumber, Resource->PciCfg.LastNodeIndex, Resource->PciCfg.PciDevicePath[0].PciDevice, Resource->PciCfg.PciDevicePath[0].PciFunction));
         if (Resource->Header.Length != sizeof (STM_RSC_PCI_CFG_DESC) + (sizeof(STM_PCI_DEVICE_PATH_NODE) * Resource->PciCfg.LastNodeIndex)) {
           return FALSE;
         }
