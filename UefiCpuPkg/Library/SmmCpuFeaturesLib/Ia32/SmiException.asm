@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -26,10 +26,15 @@ EXTERNDEF   gcStmPsd:BYTE
 EXTERNDEF   SmmStmExceptionHandler:PROC
 EXTERNDEF   SmmStmSetup:PROC
 EXTERNDEF   SmmStmTeardown:PROC
+EXTERNDEF   gStmXdSupported:BYTE
 
 CODE_SEL    = 08h
 DATA_SEL    = 20h
 TSS_SEL     = 40h
+
+MSR_IA32_MISC_ENABLE  EQU     1A0h
+MSR_EFER              EQU     0c0000080h
+MSR_EFER_XD           EQU     0800h
 
     .data
 
@@ -88,7 +93,7 @@ _OnStmSetup PROC
 ; Check XD disable bit
 ;
     xor     esi, esi
-    mov     eax, gStmXdSupported
+    mov     eax, offset gStmXdSupported
     mov     al, [eax]
     cmp     al, 0
     jz      @StmXdDone1
@@ -109,7 +114,7 @@ _OnStmSetup PROC
 
   call SmmStmSetup
 
-    mov     eax, gStmXdSupported
+    mov     eax, offset gStmXdSupported
     mov     al, [eax]
     cmp     al, 0
     jz      @f
@@ -130,7 +135,7 @@ _OnStmTeardown PROC
 ; Check XD disable bit
 ;
     xor     esi, esi
-    mov     eax, gStmXdSupported
+    mov     eax, offset gStmXdSupported
     mov     al, [eax]
     cmp     al, 0
     jz      @StmXdDone2
@@ -151,7 +156,7 @@ _OnStmTeardown PROC
 
   call SmmStmTeardown
 
-    mov     eax, gStmXdSupported
+    mov     eax, offset gStmXdSupported
     mov     al, [eax]
     cmp     al, 0
     jz      @f
