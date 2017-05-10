@@ -1117,7 +1117,12 @@ ConfigSmmCodeAccessCheck (
   //
   for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
     if (Index != gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu) {
-
+      if (gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId == INVALID_APIC_ID) {
+        //
+        // If this processor does not exist
+        //
+        continue;
+      }
       //
       // Acquire Config SMM Code Access Check spin lock.  The AP will release the
       // spin lock when it is done executing ConfigSmmCodeAccessCheckOnCurrentProcessor().
