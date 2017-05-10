@@ -860,6 +860,9 @@ InternalSmmStartupThisAp (
     DEBUG((DEBUG_ERROR, "CpuIndex(%d) == gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu\n", CpuIndex));
     return EFI_INVALID_PARAMETER;
   }
+  if (gSmmCpuPrivate->ProcessorInfo[CpuIndex].ProcessorId == INVALID_APIC_ID) {
+    return EFI_INVALID_PARAMETER;
+  }
   if (!(*(mSmmMpSyncData->CpuData[CpuIndex].Present))) {
     if (mSmmMpSyncData->EffectiveSyncMode == SmmCpuSyncModeTradition) {
       DEBUG((DEBUG_ERROR, "!mSmmMpSyncData->CpuData[%d].Present\n", CpuIndex));
