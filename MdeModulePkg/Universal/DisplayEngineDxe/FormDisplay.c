@@ -877,7 +877,7 @@ UpdateSkipInfoForMenu (
   CHAR16  *OutputString;
   UINT16  GlyphWidth;
 
-  Width         = (UINT16) gOptionBlockWidth;
+  Width         = (UINT16) gOptionBlockWidth - 1;
   GlyphWidth    = 1;
   Row           = 1;
 
