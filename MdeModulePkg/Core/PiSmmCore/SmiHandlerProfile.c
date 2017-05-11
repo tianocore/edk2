@@ -356,6 +356,8 @@ DumpSmiChildContext (
   IN UINTN      ContextSize
   )
 {
+  CHAR16        *Str;
+
   if (CompareGuid (HandlerType, &gEfiSmmSwDispatch2ProtocolGuid)) {
     DEBUG ((DEBUG_INFO, "  SwSmi - 0x%x\n", ((EFI_SMM_SW_REGISTER_CONTEXT *)Context)->SwSmiInputValue));
   } else if (CompareGuid (HandlerType, &gEfiSmmSxDispatch2ProtocolGuid)) {
@@ -376,7 +378,11 @@ DumpSmiChildContext (
     DEBUG ((DEBUG_INFO, "  IoTrapType - 0x%x\n", ((EFI_SMM_IO_TRAP_REGISTER_CONTEXT *)Context)->Type));
   } else if (CompareGuid (HandlerType, &gEfiSmmUsbDispatch2ProtocolGuid)) {
     DEBUG ((DEBUG_INFO, "  UsbType - 0x%x\n", ((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context)->Type));
-    DEBUG ((DEBUG_INFO, "  UsbDevicePath - %s\n", ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL *)(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context) + 1), TRUE, TRUE)));
+    Str = ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL *)(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context) + 1), TRUE, TRUE);
+    DEBUG ((DEBUG_INFO, "  UsbDevicePath - %s\n", Str));
+    if (Str != NULL) {
+      FreePool (Str);
+    }
   } else {
     DEBUG ((DEBUG_INFO, "  Context - "));
     InternalDumpData (Context, ContextSize);
