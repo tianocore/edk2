@@ -267,7 +267,7 @@ IsInSmmRanges (
 {
   UINTN  Index;
 
-  if ((Address < mCpuHotPlugData.SmrrBase) || (Address >= mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
+  if ((Address >= mCpuHotPlugData.SmrrBase) && (Address < mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
     return TRUE;
   }
   for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
