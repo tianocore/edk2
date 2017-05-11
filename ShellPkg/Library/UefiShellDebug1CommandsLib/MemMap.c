@@ -48,6 +48,61 @@ STATIC CONST CHAR16 NameEfiMemoryMappedIOPortSpaceShort[] = L"MMIO_Port";
 
 #include "UefiShellDebug1CommandsLib.h"
 
+typedef struct {
+  UINT32                Type;
+  UINT64                NumberOfPages;
+  LIST_ENTRY            Link;
+} MEMORY_LENGTH_ENTRY;
+
+/**
+  Add the length of the specified type to List.
+
+  @param List          A list to hold all pairs of <Type, NumberOfPages>.
+  @param Type          Memory type.
+  @param NumberOfPages Number of pages.
+**/
+VOID
+AddMemoryLength (
+  LIST_ENTRY            *List,
+  UINT32                Type,
+  UINT64                NumberOfPages
+  )
+{
+  MEMORY_LENGTH_ENTRY   *Entry;
+  MEMORY_LENGTH_ENTRY   *NewEntry;
+  LIST_ENTRY            *Link;
+
+  Entry = NULL;
+  for (Link = GetFirstNode (List); !IsNull (List, Link); Link = GetNextNode (List, Link)) {
+    Entry = BASE_CR (Link, MEMORY_LENGTH_ENTRY, Link);
+    if (Entry->Type >= Type) {
+      break;
+    }
+  }
+
+  if ((Entry != NULL) && (Entry->Type == Type)) {
+    //
+    // The Entry is the one we look for.
+    //
+    NewEntry = Entry;
+  } else {
+    //
+    // The search operation breaks due to:
+    // 1. Type of every entry < Type --> Insert to tail
+    // 2. Type of an entry > Type --> Insert to previous of this entry
+    //
+    NewEntry = AllocatePool (sizeof (*NewEntry));
+    if (NewEntry == NULL) {
+      return;
+    }
+    NewEntry->Type = Type;
+    NewEntry->NumberOfPages = 0;
+    InsertTailList (Link, &NewEntry->Link);
+  }
+
+  NewEntry->NumberOfPages += NumberOfPages;
+}
+
 /**
   Function for 'memmap' command.
 
@@ -104,6 +159,9 @@ ShellCommandRunMemMap (
   UINT64              PersistentPages;
   UINT64              PersistentPagesSize;
   BOOLEAN             Sfo;
+  LIST_ENTRY          MemoryList;
+  MEMORY_LENGTH_ENTRY *Entry;
+  LIST_ENTRY          *Link;
 
   AcpiReclaimPages    = 0;
   AcpiNvsPages        = 0;
@@ -125,6 +183,7 @@ ShellCommandRunMemMap (
   Descriptors         = NULL;
   ShellStatus         = SHELL_SUCCESS;
   Status              = EFI_SUCCESS;
+  InitializeListHead (&MemoryList);
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -248,7 +307,16 @@ ShellCommandRunMemMap (
               PalCodePages += Walker->NumberOfPages;
               break;
             default:
-              ASSERT(FALSE);
+              //
+              // Shell Spec defines the SFO format.
+              // Do not print the OEM/OS memory usage in the SFO format, to avoid conflict with Shell Spec.
+              //
+              if (!Sfo) {
+                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MEMMAP_LIST_ITEM_OTHER), gShellDebug1HiiHandle, Walker->Type, Walker->PhysicalStart, Walker->PhysicalStart + MultU64x64 (SIZE_4KB, Walker->NumberOfPages) - 1, Walker->NumberOfPages, Walker->Attribute);
+              }
+              TotalPages += Walker->NumberOfPages;
+              AddMemoryLength (&MemoryList, Walker->Type, Walker->NumberOfPages);
+              break;
           }
         }
         //
@@ -285,7 +353,20 @@ ShellCommandRunMemMap (
             MmioPortPages, MmioPortPagesSize,
             PalCodePages, PalCodePagesSize,
             AvailPages, AvailPagesSize,
-            PersistentPages, PersistentPagesSize,
+            PersistentPages, PersistentPagesSize
+            );
+
+          //
+          // Print out the total memory usage for OEM/OS types in the order of type.
+          //
+          for (Link = GetFirstNode (&MemoryList); !IsNull (&MemoryList, Link); Link = GetNextNode (&MemoryList, Link)) {
+            Entry = BASE_CR (Link, MEMORY_LENGTH_ENTRY, Link);
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MEMMAP_LIST_SUMM_OTHER), gShellDebug1HiiHandle,
+              Entry->Type, Entry->NumberOfPages, MultU64x64 (SIZE_4KB, Entry->NumberOfPages)
+              );
+          }
+
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MEMMAP_LIST_SUMM2), gShellDebug1HiiHandle,
             DivU64x32(MultU64x64(SIZE_4KB,TotalPages), SIZE_1MB), TotalPagesSize
            );
         } else {
@@ -315,6 +396,13 @@ ShellCommandRunMemMap (
 
   if (Descriptors != NULL) {
     FreePool(Descriptors);
+  }
+
+  //
+  // Free the memory list.
+  //
+  for (Link = GetFirstNode (&MemoryList); !IsNull (&MemoryList, Link); ) {
+    Link = RemoveEntryList (Link);
   }
 
   return (ShellStatus);
