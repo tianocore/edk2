@@ -2759,10 +2759,7 @@ class ModuleAutoGen(AutoGen):
         if self._FixedAtBuildPcds:
             return self._FixedAtBuildPcds
         for Pcd in self.ModulePcdList:
-            if self.IsLibrary:
-                if not (Pcd.Pending == False and Pcd.Type == "FixedAtBuild"):
-                    continue
-            elif Pcd.Type != "FixedAtBuild":
+            if Pcd.Type != "FixedAtBuild":
                 continue
             if Pcd not in self._FixedAtBuildPcds:
                 self._FixedAtBuildPcds.append(Pcd)
