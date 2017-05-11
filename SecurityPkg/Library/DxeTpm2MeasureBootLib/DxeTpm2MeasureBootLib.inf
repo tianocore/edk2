@@ -1,6 +1,9 @@
 ## @file
 #  Provides security service for TPM 2.0 measured boot
 #
+#  Spec Compliance Info:
+#    "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 00.21"
+#
 #  This library instance hooks LoadImage() API to measure every image that 
 #  is not measured in PEI phase. And, it will also measure GPT partition.
 #
@@ -9,7 +12,7 @@
 #  This external input must be validated carefully to avoid security issues such 
 #  as buffer overflow or integer overflow.
 #
-# Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
