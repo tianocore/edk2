@@ -535,6 +535,8 @@ DumpSmiChildContext (
   IN UINTN      ContextSize
   )
 {
+  CHAR16        *Str;
+
   if (CompareGuid (HandlerType, &gEfiSmmSwDispatch2ProtocolGuid)) {
     Print(L" SwSmi=\"0x%x\"", ((EFI_SMM_SW_REGISTER_CONTEXT *)Context)->SwSmiInputValue);
   } else if (CompareGuid (HandlerType, &gEfiSmmSxDispatch2ProtocolGuid)) {
@@ -555,7 +557,11 @@ DumpSmiChildContext (
     Print(L" IoTrapType=\"%a\"", IoTrapTypeToString(((EFI_SMM_IO_TRAP_REGISTER_CONTEXT *)Context)->Type));
   } else if (CompareGuid (HandlerType, &gEfiSmmUsbDispatch2ProtocolGuid)) {
     Print(L" UsbType=\"0x%x\"", UsbTypeToString(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context)->Type));
-    Print(L" UsbDevicePath=\"%s\"", ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL *)(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context) + 1), TRUE, TRUE));
+    Str = ConvertDevicePathToText((EFI_DEVICE_PATH_PROTOCOL *)(((SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT *)Context) + 1), TRUE, TRUE);
+    Print(L" UsbDevicePath=\"%s\"", Str);
+    if (Str != NULL) {
+      FreePool (Str);
+    }
   } else {
     Print(L" Context=\"");
     InternalDumpData (Context, ContextSize);
