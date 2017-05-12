@@ -2062,6 +2062,32 @@ def PackRegistryFormatGuid(Guid):
                 int(Guid[4][-2:], 16)
                 )
 
+def BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
+    if PcdDatumType == 'VOID*':
+        if Value.startswith('L'):
+            if not Value[1]:
+                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
+            Value = Value[0] + '"' + Value[1:] + '"'
+        elif Value.startswith('H'):
+            if not Value[1]:
+                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
+            Value = Value[1:]
+        else:
+            if not Value[0]:
+                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
+            Value = '"' + Value + '"'
+
+    IsValid, Cause = CheckPcdDatum(PcdDatumType, Value)
+    if not IsValid:
+        EdkLogger.error("build", FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
+    if PcdDatumType == 'BOOLEAN':
+        Value = Value.upper()
+        if Value == 'TRUE' or Value == '1':
+            Value = '1'
+        elif Value == 'FALSE' or Value == '0':
+            Value = '0'
+    return  Value
+
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another

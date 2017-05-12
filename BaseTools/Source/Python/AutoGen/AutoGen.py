@@ -416,7 +416,7 @@ class WorkspaceAutoGen(AutoGen):
                             if HasTokenSpace:
                                 if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
                                     PcdDatumType = PcdItem.DatumType
-                                    NewValue = self._BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                                    NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
                                     FoundFlag = True
                             else:
                                 if PcdItem.TokenCName == TokenCName:
@@ -425,7 +425,7 @@ class WorkspaceAutoGen(AutoGen):
                                             TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
                                             PcdDatumType = PcdItem.DatumType
                                             TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
-                                            NewValue = self._BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                                            NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
                                             FoundFlag = True
                                         else:
                                             EdkLogger.error(
@@ -697,31 +697,6 @@ class WorkspaceAutoGen(AutoGen):
                 print >> file, f
         return True
 
-    def _BuildOptionPcdValueFormat(self, TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
-        if PcdDatumType == 'VOID*':
-            if Value.startswith('L'):
-                if not Value[1]:
-                    EdkLogger.error('build', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
-                Value = Value[0] + '"' + Value[1:] + '"'
-            elif Value.startswith('B'):
-                if not Value[1]:
-                    EdkLogger.error('build', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
-                Value = Value[1:]
-            else:
-                if not Value[0]:
-                    EdkLogger.error('build', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
-                Value = '"' + Value + '"'
-
-        IsValid, Cause = CheckPcdDatum(PcdDatumType, Value)
-        if not IsValid:
-            EdkLogger.error('build', FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
-        if PcdDatumType == 'BOOLEAN':
-            Value = Value.upper()
-            if Value == 'TRUE' or Value == '1':
-                Value = '1'
-            elif Value == 'FALSE' or Value == '0':
-                Value = '0'
-        return  Value
 
     def _GetMetaFiles(self, Target, Toolchain, Arch):
         AllWorkSpaceMetaFiles = set()
