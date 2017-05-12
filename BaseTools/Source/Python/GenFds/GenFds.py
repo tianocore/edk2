@@ -39,6 +39,7 @@ from Common.Misc import SaveFileOnChange
 from Common.Misc import ClearDuplicatedInf
 from Common.Misc import GuidStructureStringToGuidString
 from Common.Misc import CheckPcdDatum
+from Common.Misc import BuildOptionPcdValueFormat
 from Common.BuildVersion import gBUILD_VERSION
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 
@@ -408,31 +409,6 @@ def CheckBuildOptionPcd():
 
             GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, NewValue)
 
-def BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
-    if PcdDatumType == 'VOID*':
-        if Value.startswith('L'):
-            if not Value[1]:
-                EdkLogger.error('GenFds', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
-            Value = Value[0] + '"' + Value[1:] + '"'
-        elif Value.startswith('B'):
-            if not Value[1]:
-                EdkLogger.error('GenFds', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
-            Value = Value[1:]
-        else:
-            if not Value[0]:
-                EdkLogger.error('GenFds', OPTION_VALUE_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", B"{...}"')
-            Value = '"' + Value + '"'
-
-    IsValid, Cause = CheckPcdDatum(PcdDatumType, Value)
-    if not IsValid:
-        EdkLogger.error('build', FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
-    if PcdDatumType == 'BOOLEAN':
-        Value = Value.upper()
-        if Value == 'TRUE' or Value == '1':
-            Value = '1'
-        elif Value == 'FALSE' or Value == '0':
-            Value = '0'
-    return  Value
 
 ## FindExtendTool()
 #

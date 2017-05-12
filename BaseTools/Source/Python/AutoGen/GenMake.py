@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1453,7 +1453,15 @@ class TopLevelMakefile(BuildFile):
         if GlobalData.BuildOptionPcd:
             for index, option in enumerate(GlobalData.gCommand):
                 if "--pcd" == option and GlobalData.gCommand[index+1]:
-                    ExtraOption += " --pcd " + GlobalData.gCommand[index+1]
+                    pcdName, pcdValue = GlobalData.gCommand[index+1].split('=')
+                    if pcdValue.startswith('H'):
+                        pcdValue = 'H' + '"' + pcdValue[1:] + '"'
+                        ExtraOption += " --pcd " + pcdName + '=' + pcdValue
+                    elif pcdValue.startswith('L'):
+                        pcdValue = 'L' + '"' + pcdValue[1:] + '"'
+                        ExtraOption += " --pcd " + pcdName + '=' + pcdValue
+                    else:
+                        ExtraOption += " --pcd " + GlobalData.gCommand[index+1]
 
         MakefileName = self._FILE_NAME_[self._FileType]
         SubBuildCommandList = []
