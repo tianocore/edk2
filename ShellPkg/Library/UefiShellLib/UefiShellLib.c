@@ -702,7 +702,7 @@ ShellOpenFileByName(
       // Create the directory to create the file in
       //
       FileNameCopy = AllocateCopyPool (StrSize (FileName), FileName);
-      if (FileName == NULL) {
+      if (FileNameCopy == NULL) {
         return (EFI_OUT_OF_RESOURCES);
       }
       PathCleanUpDirectories (FileNameCopy);
