@@ -1,5 +1,5 @@
 #========================================================================================
-#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -35,6 +35,13 @@ ASM_FUNC(SetupExceptionLevel2)
    msr     hcr_el2, x0            // Write back our settings
 
    msr     cptr_el2, xzr          // Disable copro traps to EL2
+
+   // Enable Timer access for non-secure EL1 and EL0
+   // The cnthctl_el2 register bits are architecturally
+   // UNKNOWN on reset.
+   // Disable event stream as it is not in use at this stage
+   mov     x0, #(CNTHCTL_EL2_EL1PCTEN | CNTHCTL_EL2_EL1PCEN)
+   msr     cnthctl_el2, x0
 
    ret
 
