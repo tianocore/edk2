@@ -480,4 +480,14 @@ ASM_FUNC(ArmReadCurrentEL)
   mrs   x0, CurrentEL
   ret
 
+// UINT32 ArmReadCntHctl(VOID)
+ASM_FUNC(ArmReadCntHctl)
+  mrs   x0, cnthctl_el2
+  ret
+
+// VOID ArmWriteCntHctl(UINT32 CntHctl)
+ASM_FUNC(ArmWriteCntHctl)
+  msr   cnthctl_el2, x0
+  ret
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
