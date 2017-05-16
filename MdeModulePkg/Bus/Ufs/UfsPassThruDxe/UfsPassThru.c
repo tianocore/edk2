@@ -479,10 +479,10 @@ UfsPassThruGetTargetLun (
   }
 
   //
-  // Check whether the DevicePath belongs to SCSI_DEVICE_PATH
+  // Check whether the DevicePath belongs to UFS_DEVICE_PATH
   //
   if ((DevicePath->Type != MESSAGING_DEVICE_PATH) || (DevicePath->SubType != MSG_UFS_DP) ||
-      (DevicePathNodeLength(DevicePath) != sizeof(SCSI_DEVICE_PATH))) {
+      (DevicePathNodeLength(DevicePath) != sizeof(UFS_DEVICE_PATH))) {
     return EFI_UNSUPPORTED;
   }
 
