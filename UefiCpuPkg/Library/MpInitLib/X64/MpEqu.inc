@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -40,4 +40,5 @@ EnableExecuteDisableLocation  equ        LockLocation + 5Ch
 Cr3Location                   equ        LockLocation + 64h
 InitFlagLocation              equ        LockLocation + 6Ch
 CpuInfoLocation               equ        LockLocation + 74h
+InitializeFloatingPointUnitsAddress equ  LockLocation + 84h
 
