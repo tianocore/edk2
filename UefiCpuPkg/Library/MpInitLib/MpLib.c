@@ -751,6 +751,8 @@ FillExchangeInfoData (
 
   ExchangeInfo->EnableExecuteDisable = IsBspExecuteDisableEnabled ();
 
+  ExchangeInfo->InitializeFloatingPointUnitsAddress = (UINTN)InitializeFloatingPointUnits;
+
   //
   // Get the BSP's data of GDT and IDT
   //

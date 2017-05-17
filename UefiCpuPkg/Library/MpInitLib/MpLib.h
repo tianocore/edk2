@@ -177,6 +177,7 @@ typedef struct {
   UINTN                 InitFlag;
   CPU_INFO_IN_HOB       *CpuInfo;
   CPU_MP_DATA           *CpuMpData;
+  UINTN                 InitializeFloatingPointUnitsAddress;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
