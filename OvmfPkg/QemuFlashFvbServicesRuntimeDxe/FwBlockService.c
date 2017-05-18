@@ -645,7 +645,7 @@ FvbProtocolEraseBlocks (
       break;
     }
 
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (args, UINTN);
 
     //
     // Check input parameters
@@ -665,7 +665,7 @@ FvbProtocolEraseBlocks (
       break;
     }
 
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (args, UINTN);
 
     while (NumOfLba > 0) {
       Status = QemuFlashEraseBlock (StartingLba);
