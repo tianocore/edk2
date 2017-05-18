@@ -906,7 +906,7 @@ Returns:
       break;
     }
 
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (args, UINTN);
 
     //
     // Check input parameters
@@ -926,7 +926,7 @@ Returns:
       break;
     }
 
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (args, UINTN);
 
     while (NumOfLba > 0) {
       Status = FvbEraseBlock (FvbDevice->Instance, StartingLba, mFvbModuleGlobal, EfiGoneVirtual ());
