@@ -340,7 +340,7 @@ FvbProtocolEraseBlocks (
       break;
     }
 
-    NumOfLba = VA_ARG (args, UINT32);
+    NumOfLba = VA_ARG (args, UINTN);
 
     //
     // Check input parameters
