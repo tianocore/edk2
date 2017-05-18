@@ -725,7 +725,7 @@ FvbEraseBlocks (
       break;
     }
 
-    NumOfLba = VA_ARG (Marker, UINT32);
+    NumOfLba = VA_ARG (Marker, UINTN);
     if (NumOfLba == 0) {
       return EFI_INVALID_PARAMETER;
     }
@@ -742,7 +742,7 @@ FvbEraseBlocks (
     if (StartingLba == EFI_LBA_LIST_TERMINATOR ) {
       break;
     }
-    NumOfLba = VA_ARG (Marker, UINT32);
+    NumOfLba = VA_ARG (Marker, UINTN);
     Status = EraseBlock (This, StartingLba, NumOfLba);
     if (EFI_ERROR (Status)) {
       break;
