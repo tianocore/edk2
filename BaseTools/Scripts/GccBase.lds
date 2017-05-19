@@ -78,7 +78,7 @@ SECTIONS {
     *(.dynsym)
     *(.dynstr)
     *(.dynamic)
-    *(.hash)
+    *(.hash .gnu.hash)
     *(.comment)
     *(COMMON)
   }
