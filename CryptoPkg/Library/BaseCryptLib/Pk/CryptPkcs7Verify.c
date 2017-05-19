@@ -558,7 +558,9 @@ Pkcs7GetCertificatesList (
     }
   }
   CtxUntrusted = X509_STORE_CTX_get0_untrusted (CertCtx);
-  (VOID)sk_X509_delete_ptr (CtxUntrusted, Signer);
+  if (CtxUntrusted != NULL) {
+    (VOID)sk_X509_delete_ptr (CtxUntrusted, Signer);
+  }
 
   //
   // Build certificates stack chained from Signer's certificate.
@@ -711,8 +713,10 @@ _Error:
   }
   sk_X509_free (Signers);
 
-  X509_STORE_CTX_cleanup (CertCtx);
-  X509_STORE_CTX_free (CertCtx);
+  if (CertCtx != NULL) {
+    X509_STORE_CTX_cleanup (CertCtx);
+    X509_STORE_CTX_free (CertCtx);
+  }
 
   if (SingleCert != NULL) {
     free (SingleCert);
