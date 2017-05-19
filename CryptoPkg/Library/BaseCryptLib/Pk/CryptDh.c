@@ -232,7 +232,9 @@ DhGenerateKey (
       return FALSE;
     }
 
-    BN_bn2bin (DhPubKey, PublicKey);
+    if (PublicKey != NULL) {
+      BN_bn2bin (DhPubKey, PublicKey);
+    }
     *PublicKeySize = Size;
   }
 
