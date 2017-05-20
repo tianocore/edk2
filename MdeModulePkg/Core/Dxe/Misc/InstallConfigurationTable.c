@@ -1,7 +1,7 @@
 /** @file
   UEFI Miscellaneous boot Services InstallConfigurationTable service
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,6 +42,7 @@ CoreInstallConfigurationTable (
 {
   UINTN                   Index;
   EFI_CONFIGURATION_TABLE *EfiConfigurationTable;
+  EFI_CONFIGURATION_TABLE *OldTable;
 
   //
   // If Guid is NULL, then this operation cannot be performed
@@ -68,7 +69,7 @@ CoreInstallConfigurationTable (
     if (Table != NULL) {
       //
       // If Table is not NULL, then this is a modify operation.
-      // Modify the table enty and return.
+      // Modify the table entry and return.
       //
       gDxeCoreST->ConfigurationTable[Index].VendorTable = Table;
 
@@ -134,15 +135,30 @@ CoreInstallConfigurationTable (
           );
 
         //
-        // Free Old Table
+        // Record the old table pointer.
         //
-        CoreFreePool (gDxeCoreST->ConfigurationTable);
-      }
+        OldTable = gDxeCoreST->ConfigurationTable;
 
-      //
-      // Update System Table
-      //
-      gDxeCoreST->ConfigurationTable = EfiConfigurationTable;
+        //
+        // As the CoreInstallConfigurationTable() may be re-entered by CoreFreePool()
+        // in its calling stack, updating System table to the new table pointer must
+        // be done before calling CoreFreePool() to free the old table.
+        // It can make sure the gDxeCoreST->ConfigurationTable point to the new table
+        // and avoid the errors of use-after-free to the old table by the reenter of
+        // CoreInstallConfigurationTable() in CoreFreePool()'s calling stack.
+        //
+        gDxeCoreST->ConfigurationTable = EfiConfigurationTable;
+
+        //
+        // Free the old table after updating System Table to the new table pointer.
+        //
+        CoreFreePool (OldTable);
+      } else {
+        //
+        // Update System Table
+        //
+        gDxeCoreST->ConfigurationTable = EfiConfigurationTable;
+      }
     }
 
     //
