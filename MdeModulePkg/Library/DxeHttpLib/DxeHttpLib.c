@@ -523,6 +523,7 @@ HttpUrlGetHostName (
              &ResultLength
              );
   if (EFI_ERROR (Status)) {
+    FreePool (Name);
     return Status;
   }
 
@@ -582,6 +583,7 @@ HttpUrlGetIp4 (
              &ResultLength
              );
   if (EFI_ERROR (Status)) {
+    FreePool (Ip4String);
     return Status;
   }
 
@@ -657,6 +659,7 @@ HttpUrlGetIp6 (
              &ResultLength
              );
   if (EFI_ERROR (Status)) {
+    FreePool (Ip6String);
     return Status;
   }
   
@@ -722,14 +725,15 @@ HttpUrlGetPort (
              &ResultLength
              );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_EXIT;
   }
 
   PortString[ResultLength] = '\0';
 
   while (Index < ResultLength) {
     if (!NET_IS_DIGIT (PortString[Index])) {
-      return EFI_INVALID_PARAMETER;
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
     }
     Index ++;
   }
@@ -737,10 +741,14 @@ HttpUrlGetPort (
   Status =  AsciiStrDecimalToUintnS (Url + Parser->FieldData[HTTP_URI_FIELD_PORT].Offset, (CHAR8 **) NULL, &Data);
 
   if (Data > HTTP_URI_PORT_MAX_NUM) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto ON_EXIT;
   }
 
   *Port = (UINT16) Data;
+
+ON_EXIT:
+  FreePool (PortString);
   return Status;
 }
 
@@ -795,6 +803,7 @@ HttpUrlGetPath (
              &ResultLength
              );
   if (EFI_ERROR (Status)) {
+    FreePool (PathStr);
     return Status;
   }
 
