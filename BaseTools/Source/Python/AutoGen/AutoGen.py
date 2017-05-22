@@ -671,6 +671,19 @@ class WorkspaceAutoGen(AutoGen):
         SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
 
         #
+        # Create PcdToken Number file for Dynamic/DynamicEx Pcd.
+        #
+        PcdTokenNumber = 'PcdTokenNumber: '
+        if Pa.PcdTokenNumber:
+            if Pa.DynamicPcdList:
+                for Pcd in Pa.DynamicPcdList:
+                    PcdTokenNumber += os.linesep
+                    PcdTokenNumber += str((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
+                    PcdTokenNumber += ' : '
+                    PcdTokenNumber += str(Pa.PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName])
+        SaveFileOnChange(os.path.join(self.BuildDir, 'PcdTokenNumber'), PcdTokenNumber, False)
+
+        #
         # Get set of workspace metafiles
         #
         AllWorkSpaceMetaFiles = self._GetMetaFiles(Target, Toolchain, Arch)
@@ -723,6 +736,10 @@ class WorkspaceAutoGen(AutoGen):
         # add BuildOption metafile
         #
         AllWorkSpaceMetaFiles.add(os.path.join(self.BuildDir, 'BuildOptions'))
+
+        # add PcdToken Number file for Dynamic/DynamicEx Pcd
+        #
+        AllWorkSpaceMetaFiles.add(os.path.join(self.BuildDir, 'PcdTokenNumber'))
 
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
