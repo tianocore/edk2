@@ -338,6 +338,8 @@ EfiPxeBcStart (
     return EFI_UNSUPPORTED;
   }
 
+  AsciiPrint ("\n>>Start PXE over IPv4");
+
   //
   // Configure the udp4 instance to let it receive data
   //
@@ -666,6 +668,11 @@ EfiPxeBcDhcp (
   // finished, set the various Mode members.
   //
   Status = PxeBcCheckSelectedOffer (Private);
+
+  AsciiPrint ("\n  Station IP address is ");
+
+  PxeBcShowIp4Addr (&Private->StationIp.v4);
+  AsciiPrint ("\n");
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
@@ -2740,6 +2747,14 @@ DiscoverBootFile (
 
   Private->FileSize = (UINTN) *BufferSize;
 
+  //
+  // Display all the information: boot server address, boot file name and boot file size.
+  //
+  AsciiPrint ("\n  Server IP address is ");
+  PxeBcShowIp4Addr (&Private->ServerIp.v4);
+  AsciiPrint ("\n  NBP filename is %a", Private->BootFileName);
+  AsciiPrint ("\n  NBP filesize is %d Bytes", Private->FileSize);
+
   return Status;
 }
 
@@ -2855,6 +2870,7 @@ EfiPxeLoadFile (
     if (sizeof (UINTN) < sizeof (UINT64) && (TmpBufSize > 0xFFFFFFFF)) {
       Status = EFI_DEVICE_ERROR;
     } else if (TmpBufSize > 0 && *BufferSize >= (UINTN) TmpBufSize && Buffer != NULL) {
+      AsciiPrint ("\n Downloading NBP file...\n");
       *BufferSize = (UINTN) TmpBufSize;
       Status = PxeBc->Mtftp (
                         PxeBc,
@@ -2879,6 +2895,7 @@ EfiPxeLoadFile (
     //
     // Download the file.
     //
+    AsciiPrint ("\n Downloading NBP file...\n");
     TmpBufSize = (UINT64) (*BufferSize);
     Status = PxeBc->Mtftp (
                       PxeBc,
@@ -2913,6 +2930,7 @@ EfiPxeLoadFile (
   // Check download status
   //
   if (Status == EFI_SUCCESS) {
+    AsciiPrint ("\n  NBP file downloaded successfully.\n");
     //
     // The DHCP4 can have only one configured child instance so we need to stop
     // reset the DHCP4 child before we return. Otherwise the other programs which 
