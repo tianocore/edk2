@@ -130,7 +130,7 @@ DxePrintLibPrint2ProtocolVaListToBaseList (
   //
   // Get the first character from the format string
   //
-  FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+  FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
 
   while (FormatCharacter != 0) {
     if (FormatCharacter == '%') {
@@ -148,7 +148,7 @@ DxePrintLibPrint2ProtocolVaListToBaseList (
         //
         // Get the next character from the format string
         //
-        FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+        FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
 
         switch (FormatCharacter) {
         case '.': 
@@ -239,7 +239,7 @@ DxePrintLibPrint2ProtocolVaListToBaseList (
     //
     // Get the next character from the format string
     //
-    FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+    FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
   }
   return TRUE;
 }
@@ -1596,7 +1596,7 @@ InternalPrintLibSPrintMarker (
   //
   // Get the first character from the format string
   //
-  FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+  FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
 
   //
   // Loop until the end of the format string is reached or the output buffer is full
@@ -1628,7 +1628,7 @@ InternalPrintLibSPrintMarker (
       //
       for (Done = FALSE; !Done; ) {
         Format += BytesPerFormatCharacter;
-        FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+        FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
         switch (FormatCharacter) {
         case '.': 
           Flags |= PRECISION; 
@@ -1681,7 +1681,7 @@ InternalPrintLibSPrintMarker (
           for (Count = 0; ((FormatCharacter >= '0') &&  (FormatCharacter <= '9')); ){
             Count = (Count * 10) + FormatCharacter - '0';
             Format += BytesPerFormatCharacter;
-            FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+            FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
           }
           Format -= BytesPerFormatCharacter;
           if ((Flags & PRECISION) == 0) {
@@ -1960,7 +1960,7 @@ InternalPrintLibSPrintMarker (
 
       case '\r':
         Format += BytesPerFormatCharacter;
-        FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+        FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
         if (FormatCharacter == '\n') {
           //
           // Translate '\r\n' to '\r\n'
@@ -1981,7 +1981,7 @@ InternalPrintLibSPrintMarker (
         //
         ArgumentString = "\r\n";
         Format += BytesPerFormatCharacter;
-        FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+        FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
         if (FormatCharacter != '\r') {
           Format   -= BytesPerFormatCharacter;
         }
@@ -2000,7 +2000,7 @@ InternalPrintLibSPrintMarker (
  
     case '\r':
       Format += BytesPerFormatCharacter;
-      FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+      FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
       if (FormatCharacter == '\n') {
         //
         // Translate '\r\n' to '\r\n'
@@ -2021,7 +2021,7 @@ InternalPrintLibSPrintMarker (
       //
       ArgumentString = "\r\n";
       Format += BytesPerFormatCharacter;
-      FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+      FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
       if (FormatCharacter != '\r') {
         Format   -= BytesPerFormatCharacter;
       }
@@ -2149,7 +2149,7 @@ InternalPrintLibSPrintMarker (
     //
     // Get the next character from the format string
     //
-    FormatCharacter = ((*Format & 0xff) | (*(Format + 1) << 8)) & FormatMask;
+    FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
   }
 
   if ((Flags & COUNT_ONLY_NO_PRINT) != 0) {
