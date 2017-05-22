@@ -1,7 +1,7 @@
 ## @file
 #  MP Initialize Library instance for DXE driver.
 #
-#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -56,6 +56,7 @@
   UefiCpuLib
   UefiBootServicesTableLib
   DebugAgentLib
+  SynchronizationLib
 
 [Protocols]
   gEfiTimerArchProtocolGuid                     ## SOMETIMES_CONSUMES
