@@ -2,7 +2,7 @@
   Support for PxeBc dhcp functions.
 
 Copyright (c) 2013, Red Hat, Inc.
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1845,7 +1845,7 @@ PxeBcSelectBootMenu (
   PXEBC_BOOT_MENU_ENTRY      *MenuArray[PXEBC_MAX_MENU_NUM];
 
   Finish  = FALSE;
-  Select  = 1;
+  Select  = 0;
   Index   = 0;
   *Type   = 0;
 
@@ -1914,7 +1914,7 @@ PxeBcSelectBootMenu (
       gBS->Stall (10 * TICKS_PER_MS);
     }
 
-    if (InputKey.ScanCode != 0) {
+    if (InputKey.ScanCode == 0) {
       switch (InputKey.UnicodeChar) {
       case CTRL ('c'):
         InputKey.ScanCode = SCAN_ESC;
