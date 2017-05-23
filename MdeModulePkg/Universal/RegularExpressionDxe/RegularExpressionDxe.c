@@ -88,7 +88,7 @@ OnigurumaMatch (
   OnigRegion      *Region;
   INT32           OnigResult;
   OnigErrorInfo   ErrorInfo;
-  CHAR8           ErrorMessage[ONIG_MAX_ERROR_MESSAGE_LEN];
+  OnigUChar       ErrorMessage[ONIG_MAX_ERROR_MESSAGE_LEN];
   UINT32          Index;
   OnigUChar       *Start;
   EFI_STATUS      Status;
