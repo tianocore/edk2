@@ -32,7 +32,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_PPI_DESCRIPTOR           mVectorHandoffInf
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList[1] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_NOTIFY_DESCRIPTOR mDebugAgentMemoryDiscoveredNotifyList[1] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiPeiMemoryDiscoveredPpiGuid,
@@ -554,7 +554,7 @@ InitializeDebugAgent (
     // Register for a callback once memory has been initialized.
     // If memery has been ready, the callback funtion will be invoked immediately
     //
-    Status = PeiServicesNotifyPpi (&mMemoryDiscoveredNotifyList[0]);
+    Status = PeiServicesNotifyPpi (&mDebugAgentMemoryDiscoveredNotifyList[0]);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to register memory discovered callback function!\n"));
       CpuDeadLoop ();
