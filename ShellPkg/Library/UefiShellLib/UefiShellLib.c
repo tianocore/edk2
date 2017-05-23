@@ -2828,7 +2828,7 @@ InternalShellPrintWorker(
     // update the attribute
     //
     if (ResumeLocation != NULL) {
-      if (*(ResumeLocation-1) == L'^') {
+      if ((ResumeLocation != mPostReplaceFormat2) && (*(ResumeLocation-1) == L'^')) {
         //
         // Move cursor back 1 position to overwrite the ^
         //
