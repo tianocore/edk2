@@ -661,13 +661,20 @@ class WorkspaceAutoGen(AutoGen):
         self._BuildCommand = None
 
         #
-        # Create BuildOptions Macro & PCD metafile.
+        # Create BuildOptions Macro & PCD metafile, also add the Active Platform and FDF file.
         #
         content = 'gCommandLineDefines: '
         content += str(GlobalData.gCommandLineDefines)
         content += os.linesep
         content += 'BuildOptionPcd: '
         content += str(GlobalData.BuildOptionPcd)
+        content += os.linesep
+        content += 'Active Platform: '
+        content += str(self.Platform)
+        content += os.linesep
+        if self.FdfFile:
+            content += 'Flash Image Definition: '
+            content += str(self.FdfFile)
         SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
 
         #
