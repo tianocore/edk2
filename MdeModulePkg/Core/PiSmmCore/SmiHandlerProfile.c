@@ -651,8 +651,12 @@ GetSmmImageDatabaseData (
     ImageStruct->EntryPoint = mImageStruct[Index].EntryPoint;
     ImageStruct->ImageBase = mImageStruct[Index].ImageBase;
     ImageStruct->ImageSize = mImageStruct[Index].ImageSize;
-    ImageStruct->PdbStringOffset = sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE);
-    CopyMem ((VOID *)((UINTN)ImageStruct + ImageStruct->PdbStringOffset), mImageStruct[Index].PdbString, mImageStruct[Index].PdbStringSize);
+    if (mImageStruct[Index].PdbStringSize != 0) {
+      ImageStruct->PdbStringOffset = sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE);
+      CopyMem ((VOID *)((UINTN)ImageStruct + ImageStruct->PdbStringOffset), mImageStruct[Index].PdbString, mImageStruct[Index].PdbStringSize);
+    } else {
+      ImageStruct->PdbStringOffset = 0;
+    }
     ImageStruct = (SMM_CORE_IMAGE_DATABASE_STRUCTURE *)((UINTN)ImageStruct + ImageStruct->Header.Length);
     Size += sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + mImageStruct[Index].PdbStringSize;
   }
