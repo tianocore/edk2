@@ -1,7 +1,7 @@
 ///**@file
 // Low leve x64 specific debug support functions.
 //
-// Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 // Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -275,7 +275,7 @@ ExtraPushDone:
                 pushq   %rax
                 # CS from application is one entry back in application stack
                 movq    ASM_PFX(AppRsp)(%rip), %rax
-                movzxw  8(%rax), %rax
+                movzwq  8(%rax), %rax
                 pushq   %rax
 
                 mov     %ds, %rax
