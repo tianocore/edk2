@@ -266,8 +266,8 @@ GetDriverNameString (
   //
   // Method 1: Get the name string from image PDB
   //
-  if (ImageStruct->Header.Length > sizeof (SMM_CORE_IMAGE_DATABASE_STRUCTURE)) {
-    GetShortPdbFileName ((CHAR8 *) (ImageStruct + 1), mNameString);
+  if (ImageStruct->PdbStringOffset != 0) {
+    GetShortPdbFileName ((CHAR8 *) ((UINTN) ImageStruct + ImageStruct->PdbStringOffset), mNameString);
     return mNameString;
   }
 
@@ -355,8 +355,10 @@ DumpSmmLoadedImage(
       Print(L" FvFile=\"%g\"", &ImageStruct->FileGuid);
       Print(L" RefId=\"0x%x\"", ImageStruct->ImageRef);
       Print(L">\n");
-      PdbString = (CHAR8 *)((UINTN)ImageStruct + ImageStruct->PdbStringOffset);
-      Print(L"    <Pdb>%a</Pdb>\n", PdbString);
+      if (ImageStruct->PdbStringOffset != 0) {
+        PdbString = (CHAR8 *)((UINTN)ImageStruct + ImageStruct->PdbStringOffset);
+        Print(L"    <Pdb>%a</Pdb>\n", PdbString);
+      }
       Print(L"  </Image>\n");
     }
 
