@@ -25,12 +25,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmSxDispatch2.h>
 #include <Protocol/SmmUsbDispatch2.h>
 
-#pragma pack(1)
-
 typedef struct {
   UINT32                       Signature;
   UINT32                       Length;
   UINT32                       Revision;
+  UINT8                        Reserved[4];
 } SMM_CORE_DATABASE_COMMON_HEADER;
 
 #define SMM_CORE_IMAGE_DATABASE_SIGNATURE SIGNATURE_32 ('S','C','I','D')
@@ -39,12 +38,12 @@ typedef struct {
 typedef struct {
   SMM_CORE_DATABASE_COMMON_HEADER     Header;
   EFI_GUID                            FileGuid;
-  UINTN                               ImageRef;
-  UINTN                               EntryPoint;
-  UINTN                               ImageBase;
-  UINTN                               ImageSize;
+  PHYSICAL_ADDRESS                    EntryPoint;
+  PHYSICAL_ADDRESS                    ImageBase;
+  UINT64                              ImageSize;
+  UINT32                              ImageRef;
   UINT16                              PdbStringOffset;
-  UINT8                               Reserved2[6];
+  UINT8                               Reserved[2];
 //CHAR8                               PdbString[];
 } SMM_CORE_IMAGE_DATABASE_STRUCTURE;
 
@@ -64,7 +63,7 @@ typedef enum {
 //   NULL
 // Context for SmmCoreSmiHandlerCategoryHardwareHandler:
 //   (NOTE: The context field should NOT include any data pointer.)
-//   gEfiSmmSwDispatch2ProtocolGuid:            EFI_SMM_SW_REGISTER_CONTEXT
+//   gEfiSmmSwDispatch2ProtocolGuid:            (EFI_SMM_SW_REGISTER_CONTEXT => SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT)
 //   gEfiSmmSxDispatch2ProtocolGuid:            EFI_SMM_SX_REGISTER_CONTEXT
 //   gEfiSmmPowerButtonDispatch2ProtocolGuid:   EFI_SMM_POWER_BUTTON_REGISTER_CONTEXT
 //   gEfiSmmStandbyButtonDispatch2ProtocolGuid: EFI_SMM_STANDBY_BUTTON_REGISTER_CONTEXT
@@ -81,21 +80,25 @@ typedef struct {
 } SMI_HANDLER_PROFILE_USB_REGISTER_CONTEXT;
 
 typedef struct {
-  UINT32     Length;
-  UINTN      CallerAddr;
-  UINTN      Handler;
-  UINTN      ImageRef;
-  UINT16     ContextBufferOffset;
-  UINT8      Reserved2[2];
-  UINT32     ContextBufferSize;
-//UINT8      ContextBuffer[];
+  UINT64                    SwSmiInputValue;
+} SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT;
+
+typedef struct {
+  UINT32                Length;
+  UINT32                ImageRef;
+  PHYSICAL_ADDRESS      CallerAddr;
+  PHYSICAL_ADDRESS      Handler;
+  UINT16                ContextBufferOffset;
+  UINT8                 Reserved[2];
+  UINT32                ContextBufferSize;
+//UINT8                 ContextBuffer[];
 } SMM_CORE_SMI_HANDLER_STRUCTURE;
 
 typedef struct {
   SMM_CORE_DATABASE_COMMON_HEADER     Header;
-  UINT32                              HandlerCategory;
   EFI_GUID                            HandlerType;
-  UINTN                               HandlerCount;
+  UINT32                              HandlerCategory;
+  UINT32                              HandlerCount;
 //SMM_CORE_SMI_HANDLER_STRUCTURE      Handler[HandlerCount];
 } SMM_CORE_SMI_DATABASE_STRUCTURE;
 
@@ -143,8 +146,6 @@ typedef struct {
 } SMI_HANDLER_PROFILE_PARAMETER_GET_DATA_BY_OFFSET;
 
 #define SMI_HANDLER_PROFILE_GUID {0x49174342, 0x7108, 0x409b, {0x8b, 0xbe, 0x65, 0xfd, 0xa8, 0x53, 0x89, 0xf5}}
-
-#pragma pack()
 
 extern EFI_GUID gSmiHandlerProfileGuid;
 

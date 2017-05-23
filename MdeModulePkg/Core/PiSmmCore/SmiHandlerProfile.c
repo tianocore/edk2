@@ -33,14 +33,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PiSmmCore.h"
 
+#define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
+  ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
+
 typedef struct {
-  EFI_GUID FileGuid;
-  UINTN    ImageRef;
-  UINTN    EntryPoint;
-  UINTN    ImageBase;
-  UINTN    ImageSize;
-  UINTN    PdbStringSize;
-  CHAR8    *PdbString;
+  EFI_GUID            FileGuid;
+  PHYSICAL_ADDRESS    EntryPoint;
+  PHYSICAL_ADDRESS    ImageBase;
+  UINT64              ImageSize;
+  UINT32              ImageRef;
+  UINT16              PdbStringSize;
+  CHAR8               *PdbString;
 } IMAGE_STRUCT;
 
 /**
@@ -89,8 +92,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED LIST_ENTRY      *mSmmCoreSmiEntryList = &mSmiEntry
 GLOBAL_REMOVE_IF_UNREFERENCED LIST_ENTRY      *mSmmCoreHardwareSmiEntryList = &mHardwareSmiEntryList;
 
 GLOBAL_REMOVE_IF_UNREFERENCED IMAGE_STRUCT  *mImageStruct;
-GLOBAL_REMOVE_IF_UNREFERENCED UINTN         mImageStructCountMax;
-GLOBAL_REMOVE_IF_UNREFERENCED UINTN         mImageStructCount;
+GLOBAL_REMOVE_IF_UNREFERENCED UINT32        mImageStructCountMax;
+GLOBAL_REMOVE_IF_UNREFERENCED UINT32        mImageStructCount;
 
 GLOBAL_REMOVE_IF_UNREFERENCED VOID   *mSmiHandlerProfileDatabase;
 GLOBAL_REMOVE_IF_UNREFERENCED UINTN  mSmiHandlerProfileDatabaseSize;
@@ -162,11 +165,11 @@ GetDriverGuid (
 **/
 VOID
 AddImageStruct(
-  IN UINTN     ImageBase,
-  IN UINTN     ImageSize,
-  IN UINTN     EntryPoint,
-  IN EFI_GUID  *Guid,
-  IN CHAR8     *PdbString
+  IN PHYSICAL_ADDRESS       ImageBase,
+  IN UINT64                 ImageSize,
+  IN PHYSICAL_ADDRESS       EntryPoint,
+  IN EFI_GUID               *Guid,
+  IN CHAR8                  *PdbString
   )
 {
   UINTN  PdbStringSize;
@@ -185,7 +188,7 @@ AddImageStruct(
     PdbStringSize = AsciiStrSize(PdbString);
     mImageStruct[mImageStructCount].PdbString = AllocateCopyPool (PdbStringSize, PdbString);
     if (mImageStruct[mImageStructCount].PdbString != NULL) {
-      mImageStruct[mImageStructCount].PdbStringSize = PdbStringSize;
+      mImageStruct[mImageStructCount].PdbStringSize = (UINT16) PdbStringSize;
     }
   }
 
@@ -222,7 +225,7 @@ AddressToImageStruct(
 
   @return image reference index
 **/
-UINTN
+UINT32
 AddressToImageRef(
   IN UINTN  Address
   )
@@ -233,7 +236,7 @@ AddressToImageRef(
   if (ImageStruct != NULL) {
     return ImageStruct->ImageRef;
   }
-  return (UINTN)-1;
+  return (UINT32)-1;
 }
 
 /**
@@ -252,11 +255,11 @@ GetSmmLoadedImage(
   EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
   CHAR16                     *PathStr;
   EFI_SMM_DRIVER_ENTRY       *LoadedImagePrivate;
-  UINTN                      EntryPoint;
+  PHYSICAL_ADDRESS           EntryPoint;
   VOID                       *EntryPointInImage;
   EFI_GUID                   Guid;
   CHAR8                      *PdbString;
-  UINTN                      RealImageBase;
+  PHYSICAL_ADDRESS           RealImageBase;
 
   HandleBufferSize = 0;
   HandleBuffer = NULL;
@@ -286,7 +289,7 @@ GetSmmLoadedImage(
   }
 
   NoHandles = HandleBufferSize/sizeof(EFI_HANDLE);
-  mImageStructCountMax = NoHandles;
+  mImageStructCountMax = (UINT32) NoHandles;
   mImageStruct = AllocateZeroPool(mImageStructCountMax * sizeof(IMAGE_STRUCT));
   if (mImageStruct == NULL) {
     goto Done;
@@ -309,8 +312,8 @@ GetSmmLoadedImage(
     LoadedImagePrivate = BASE_CR(LoadedImage, EFI_SMM_DRIVER_ENTRY, SmmLoadedImage);
     RealImageBase = (UINTN)LoadedImage->ImageBase;
     if (LoadedImagePrivate->Signature == EFI_SMM_DRIVER_ENTRY_SIGNATURE) {
-      EntryPoint = (UINTN)LoadedImagePrivate->ImageEntryPoint;
-      if ((EntryPoint != 0) && ((EntryPoint < (UINTN)LoadedImage->ImageBase) || (EntryPoint >= ((UINTN)LoadedImage->ImageBase + (UINTN)LoadedImage->ImageSize)))) {
+      EntryPoint = LoadedImagePrivate->ImageEntryPoint;
+      if ((EntryPoint != 0) && ((EntryPoint < (UINTN)LoadedImage->ImageBase) || (EntryPoint >= ((UINTN)LoadedImage->ImageBase + LoadedImage->ImageSize)))) {
         //
         // If the EntryPoint is not in the range of image buffer, it should come from emulation environment.
         // So patch ImageBuffer here to align the EntryPoint.
@@ -320,9 +323,9 @@ GetSmmLoadedImage(
         RealImageBase = (UINTN)LoadedImage->ImageBase + EntryPoint - (UINTN)EntryPointInImage;
       }
     }
-    DEBUG ((DEBUG_INFO, "(0x%x - 0x%x", RealImageBase, (UINTN)LoadedImage->ImageSize));
+    DEBUG ((DEBUG_INFO, "(0x%lx - 0x%lx", RealImageBase, LoadedImage->ImageSize));
     if (EntryPoint != 0) {
-      DEBUG ((DEBUG_INFO, ", EntryPoint:0x%x", EntryPoint));
+      DEBUG ((DEBUG_INFO, ", EntryPoint:0x%lx", EntryPoint));
     }
     DEBUG ((DEBUG_INFO, ")\n"));
 
@@ -334,7 +337,7 @@ GetSmmLoadedImage(
     }
     DEBUG ((DEBUG_INFO, "       (%s)\n", PathStr));
 
-    AddImageStruct((UINTN)RealImageBase, (UINTN)LoadedImage->ImageSize, EntryPoint, &Guid, PdbString);
+    AddImageStruct(RealImageBase, LoadedImage->ImageSize, EntryPoint, &Guid, PdbString);
   }
 
 Done:
@@ -359,7 +362,7 @@ DumpSmiChildContext (
   CHAR16        *Str;
 
   if (CompareGuid (HandlerType, &gEfiSmmSwDispatch2ProtocolGuid)) {
-    DEBUG ((DEBUG_INFO, "  SwSmi - 0x%x\n", ((EFI_SMM_SW_REGISTER_CONTEXT *)Context)->SwSmiInputValue));
+    DEBUG ((DEBUG_INFO, "  SwSmi - 0x%lx\n", ((SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT *)Context)->SwSmiInputValue));
   } else if (CompareGuid (HandlerType, &gEfiSmmSxDispatch2ProtocolGuid)) {
     DEBUG ((DEBUG_INFO, "  SxType - 0x%x\n", ((EFI_SMM_SX_REGISTER_CONTEXT *)Context)->Type));
     DEBUG ((DEBUG_INFO, "  SxPhase - 0x%x\n", ((EFI_SMM_SX_REGISTER_CONTEXT *)Context)->Phase));
@@ -422,12 +425,12 @@ DumpSmiHandlerOnSmiEntry(
     }
     DEBUG ((DEBUG_INFO, "  Handler - 0x%x", SmiHandler->Handler));
     if (ImageStruct != NULL) {
-      DEBUG ((DEBUG_INFO, " <== RVA - 0x%x", (UINTN)SmiHandler->Handler - ImageStruct->ImageBase));
+      DEBUG ((DEBUG_INFO, " <== RVA - 0x%x", (UINTN)SmiHandler->Handler - (UINTN) ImageStruct->ImageBase));
     }
     DEBUG ((DEBUG_INFO, "\n"));
     DEBUG ((DEBUG_INFO, "  CallerAddr - 0x%x", SmiHandler->CallerAddr));
     if (ImageStruct != NULL) {
-      DEBUG ((DEBUG_INFO, " <== RVA - 0x%x", SmiHandler->CallerAddr - ImageStruct->ImageBase));
+      DEBUG ((DEBUG_INFO, " <== RVA - 0x%x", SmiHandler->CallerAddr - (UINTN) ImageStruct->ImageBase));
     }
     DEBUG ((DEBUG_INFO, "\n"));
   }
@@ -533,11 +536,11 @@ GetSmmImageDatabaseSize(
   )
 {
   UINTN  Size;
-  UINTN  Index;
+  UINT32 Index;
 
-  Size = (sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE)) * mImageStructCount;
+  Size = 0;
   for (Index = 0; Index < mImageStructCount; Index++) {
-    Size += mImageStruct[Index].PdbStringSize;
+    Size += sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + GET_OCCUPIED_SIZE (mImageStruct[Index].PdbStringSize, sizeof (UINT64));
   }
   return Size;
 }
@@ -564,7 +567,7 @@ GetSmmSmiHandlerSizeOnSmiEntry(
        ListEntry != &SmiEntry->SmiHandlers;
        ListEntry = ListEntry->ForwardLink) {
     SmiHandler = CR(ListEntry, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
-    Size += sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + SmiHandler->ContextSize;
+    Size += sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + GET_OCCUPIED_SIZE (SmiHandler->ContextSize, sizeof (UINT64));
   }
 
   return Size;
@@ -640,11 +643,11 @@ GetSmmImageDatabaseData (
     if (Size >= ExpectedSize) {
       return 0;
     }
-    if (sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + mImageStruct[Index].PdbStringSize > ExpectedSize - Size) {
+    if (sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + GET_OCCUPIED_SIZE (mImageStruct[Index].PdbStringSize, sizeof (UINT64)) > ExpectedSize - Size) {
       return 0;
     }
     ImageStruct->Header.Signature = SMM_CORE_IMAGE_DATABASE_SIGNATURE;
-    ImageStruct->Header.Length = (UINT32)(sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + mImageStruct[Index].PdbStringSize);
+    ImageStruct->Header.Length = (UINT32)(sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + GET_OCCUPIED_SIZE (mImageStruct[Index].PdbStringSize, sizeof (UINT64)));
     ImageStruct->Header.Revision = SMM_CORE_IMAGE_DATABASE_REVISION;
     CopyGuid(&ImageStruct->FileGuid, &mImageStruct[Index].FileGuid);
     ImageStruct->ImageRef = mImageStruct[Index].ImageRef;
@@ -658,7 +661,7 @@ GetSmmImageDatabaseData (
       ImageStruct->PdbStringOffset = 0;
     }
     ImageStruct = (SMM_CORE_IMAGE_DATABASE_STRUCTURE *)((UINTN)ImageStruct + ImageStruct->Header.Length);
-    Size += sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + mImageStruct[Index].PdbStringSize;
+    Size += sizeof(SMM_CORE_IMAGE_DATABASE_STRUCTURE) + GET_OCCUPIED_SIZE (mImageStruct[Index].PdbStringSize, sizeof (UINT64));
   }
 
   if (ExpectedSize != Size) {
@@ -682,7 +685,7 @@ GetSmmSmiHandlerDataOnSmiEntry(
   IN     SMI_ENTRY       *SmiEntry,
   IN OUT VOID            *Data,
   IN     UINTN           MaxSize,
-     OUT UINTN           *Count
+     OUT UINT32          *Count
   )
 {
   SMM_CORE_SMI_HANDLER_STRUCTURE   *SmiHandlerStruct;
@@ -702,11 +705,11 @@ GetSmmSmiHandlerDataOnSmiEntry(
       *Count = 0;
       return 0;
     }
-    if (sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + SmiHandler->ContextSize > MaxSize - Size) {
+    if (sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + GET_OCCUPIED_SIZE (SmiHandler->ContextSize, sizeof (UINT64)) > MaxSize - Size) {
       *Count = 0;
       return 0;
     }
-    SmiHandlerStruct->Length = (UINT32)(sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + SmiHandler->ContextSize);
+    SmiHandlerStruct->Length = (UINT32)(sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + GET_OCCUPIED_SIZE (SmiHandler->ContextSize, sizeof (UINT64)));
     SmiHandlerStruct->CallerAddr = (UINTN)SmiHandler->CallerAddr;
     SmiHandlerStruct->Handler = (UINTN)SmiHandler->Handler;
     SmiHandlerStruct->ImageRef = AddressToImageRef((UINTN)SmiHandler->Handler);
@@ -717,7 +720,7 @@ GetSmmSmiHandlerDataOnSmiEntry(
     } else {
       SmiHandlerStruct->ContextBufferOffset = 0;
     }
-    Size += sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + SmiHandler->ContextSize;
+    Size += sizeof(SMM_CORE_SMI_HANDLER_STRUCTURE) + GET_OCCUPIED_SIZE (SmiHandler->ContextSize, sizeof (UINT64));
     SmiHandlerStruct = (SMM_CORE_SMI_HANDLER_STRUCTURE *)((UINTN)SmiHandlerStruct + SmiHandlerStruct->Length);
     *Count = *Count + 1;
   }
@@ -748,7 +751,7 @@ GetSmmSmiDatabaseData(
   SMI_ENTRY                         *SmiEntry;
   UINTN                             Size;
   UINTN                             SmiHandlerSize;
-  UINTN                             SmiHandlerCount;
+  UINT32                            SmiHandlerCount;
 
   SmiStruct = Data;
   Size = 0;
@@ -1133,6 +1136,36 @@ ConvertSmiHandlerUsbContext (
 }
 
 /**
+  Convert EFI_SMM_SW_REGISTER_CONTEXT to SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT.
+
+  @param SwContext                    A pointer to EFI_SMM_SW_REGISTER_CONTEXT
+  @param SwContextSize                The size of EFI_SMM_SW_REGISTER_CONTEXT in bytes
+  @param SmiHandlerSwContextSize      The size of SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT in bytes
+
+  @return SmiHandlerSwContext   A pointer to SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT
+**/
+SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT *
+ConvertSmiHandlerSwContext (
+  IN EFI_SMM_SW_REGISTER_CONTEXT    *SwContext,
+  IN UINTN                          SwContextSize,
+  OUT UINTN                         *SmiHandlerSwContextSize
+  )
+{
+  SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT  *SmiHandlerSwContext;
+
+  ASSERT (SwContextSize == sizeof(EFI_SMM_SW_REGISTER_CONTEXT));
+
+  SmiHandlerSwContext = AllocatePool (sizeof (SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT));
+  if (SmiHandlerSwContext == NULL) {
+    *SmiHandlerSwContextSize = 0;
+    return NULL;
+  }
+  SmiHandlerSwContext->SwSmiInputValue = SwContext->SwSmiInputValue;
+  *SmiHandlerSwContextSize = sizeof (SMI_HANDLER_PROFILE_SW_REGISTER_CONTEXT);
+  return SmiHandlerSwContext;
+}
+
+/**
   This function is called by SmmChildDispatcher module to report
   a new SMI handler is registered, to SmmCore.
 
@@ -1186,6 +1219,8 @@ SmiHandlerProfileRegisterHandler (
   if (Context != NULL) {
     if (CompareGuid (HandlerGuid, &gEfiSmmUsbDispatch2ProtocolGuid)) {
       SmiHandler->Context = ConvertSmiHandlerUsbContext (Context, ContextSize, &SmiHandler->ContextSize);
+    } else if (CompareGuid (HandlerGuid, &gEfiSmmSwDispatch2ProtocolGuid)) {
+      SmiHandler->Context = ConvertSmiHandlerSwContext (Context, ContextSize, &SmiHandler->ContextSize);
     } else {
       SmiHandler->Context = AllocateCopyPool (ContextSize, Context);
     }
@@ -1261,6 +1296,8 @@ SmiHandlerProfileUnregisterHandler (
   if (Context != NULL) {
     if (CompareGuid (HandlerGuid, &gEfiSmmUsbDispatch2ProtocolGuid)) {
       SearchContext = ConvertSmiHandlerUsbContext (Context, ContextSize, &SearchContextSize);
+    } else if (CompareGuid (HandlerGuid, &gEfiSmmSwDispatch2ProtocolGuid)) {
+      SearchContext = ConvertSmiHandlerSwContext (Context, ContextSize, &SearchContextSize);
     }
   }
 
