@@ -547,6 +547,7 @@ ApWakeupFunction (
   volatile UINT32            *ApStartupSignalBuffer;
   CPU_INFO_IN_HOB            *CpuInfoInHob;
   UINT64                     ApTopOfStack;
+  UINTN                      CurrentApicMode;
 
   //
   // AP finished assembly code and begin to execute C code
@@ -560,6 +561,7 @@ ApWakeupFunction (
   ProgramVirtualWireMode ();
   SyncLocalApicTimerSetting (CpuMpData);
 
+  CurrentApicMode = GetApicMode ();
   while (TRUE) {
     if (CpuMpData->InitFlag == ApInitConfig) {
       //
@@ -627,11 +629,23 @@ ApWakeupFunction (
             ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
             CpuInfoInHob[ProcessorNumber].ApTopOfStack = CpuInfoInHob[CpuMpData->NewBspNumber].ApTopOfStack;
           } else {
-            //
-            // Re-get the CPU APICID and Initial APICID
-            //
-            CpuInfoInHob[ProcessorNumber].ApicId        = GetApicId ();
-            CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
+            if (CpuInfoInHob[ProcessorNumber].ApicId != GetApicId () ||
+                CpuInfoInHob[ProcessorNumber].InitialApicId != GetInitialApicId ()) {
+              if (CurrentApicMode != GetApicMode ()) {
+                //
+                // If APIC mode change happened during AP function execution,
+                // we do not support APIC ID value changed.
+                //
+                ASSERT (FALSE);
+                CpuDeadLoop ();
+              } else {
+                //
+                // Re-get the CPU APICID and Initial APICID if they are changed
+                //
+                CpuInfoInHob[ProcessorNumber].ApicId        = GetApicId ();
+                CpuInfoInHob[ProcessorNumber].InitialApicId = GetInitialApicId ();
+              }
+            }
           }
         }
         SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateFinished);
