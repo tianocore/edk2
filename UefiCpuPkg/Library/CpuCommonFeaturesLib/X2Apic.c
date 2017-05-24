@@ -15,6 +15,28 @@
 #include "CpuCommonFeatures.h"
 
 /**
+  Prepares for the data used by CPU feature detection and initialization.
+
+  @param[in]  NumberOfProcessors  The number of CPUs in the platform.
+
+  @return  Pointer to a buffer of CPU related configuration data.
+
+  @note This service could be called by BSP only.
+**/
+VOID *
+EFIAPI
+X2ApicGetConfigData (
+  IN UINTN  NumberOfProcessors
+  )
+{
+  BOOLEAN                            *ConfigData;
+
+  ConfigData = AllocateZeroPool (sizeof (BOOLEAN) * NumberOfProcessors);
+  ASSERT (ConfigData != NULL);
+  return ConfigData;
+}
+
+/**
   Detects if X2Apci feature supported on current processor.
 
   Detect if X2Apci has been already enabled.
@@ -40,7 +62,16 @@ X2ApicSupport (
   IN VOID                              *ConfigData  OPTIONAL
   )
 {
-  return (GetApicMode () == LOCAL_APIC_MODE_X2APIC);
+  BOOLEAN                            *X2ApicEnabled;
+
+  ASSERT (ConfigData != NULL);
+  X2ApicEnabled = (BOOLEAN *) ConfigData;
+  //
+  // *ConfigData indicates if X2APIC enabled on current processor
+  //
+  X2ApicEnabled[ProcessorNumber] = (GetApicMode () == LOCAL_APIC_MODE_X2APIC) ? TRUE : FALSE;
+
+  return (CpuInfo->CpuIdVersionInfoEcx.Bits.x2APIC == 1);
 }
 
 /**
@@ -69,13 +100,34 @@ X2ApicInitialize (
   IN BOOLEAN                           State
   )
 {
-  PRE_SMM_CPU_REGISTER_TABLE_WRITE_FIELD (
-    ProcessorNumber,
-    Msr,
-    MSR_IA32_APIC_BASE,
-    MSR_IA32_APIC_BASE_REGISTER,
-    Bits.EXTD,
-    (State) ? 1 : 0
-    );
+  BOOLEAN                            *X2ApicEnabled;
+
+  ASSERT (ConfigData != NULL);
+  X2ApicEnabled = (BOOLEAN *) ConfigData;
+  if (X2ApicEnabled[ProcessorNumber]) {
+    PRE_SMM_CPU_REGISTER_TABLE_WRITE_FIELD (
+      ProcessorNumber,
+      Msr,
+      MSR_IA32_APIC_BASE,
+      MSR_IA32_APIC_BASE_REGISTER,
+      Bits.EXTD,
+      1
+      );
+  } else {
+    //
+    // Enable X2APIC mode only if X2APIC is not enabled,
+    // Needn't to disabe X2APIC mode again if X2APIC is not enabled
+    //
+    if (State) {
+      CPU_REGISTER_TABLE_WRITE_FIELD (
+        ProcessorNumber,
+        Msr,
+        MSR_IA32_APIC_BASE,
+        MSR_IA32_APIC_BASE_REGISTER,
+        Bits.EXTD,
+        1
+        );
+    }
+  }
   return RETURN_SUCCESS;
 }
