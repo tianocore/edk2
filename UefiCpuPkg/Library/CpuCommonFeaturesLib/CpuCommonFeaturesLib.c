@@ -211,7 +211,7 @@ CpuCommonFeaturesLibConstructor (
   if (IsCpuFeatureSupported (CPU_FEATURE_X2APIC)) {
     Status = RegisterCpuFeature (
                "X2Apic",
-               NULL,
+               X2ApicGetConfigData,
                X2ApicSupport,
                X2ApicInitialize,
                CPU_FEATURE_X2APIC,

@@ -798,6 +798,21 @@ C1eInitialize (
   );
 
 /**
+  Prepares for the data used by CPU feature detection and initialization.
+
+  @param[in]  NumberOfProcessors  The number of CPUs in the platform.
+
+  @return  Pointer to a buffer of CPU related configuration data.
+
+  @note This service could be called by BSP only.
+**/
+VOID *
+EFIAPI
+X2ApicGetConfigData (
+  IN UINTN  NumberOfProcessors
+  );
+
+/**
   Detects if X2Apci feature supported on current processor.
 
   Detect if X2Apci has been already enabled.
