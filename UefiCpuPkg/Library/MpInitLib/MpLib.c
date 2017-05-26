@@ -451,6 +451,12 @@ CollectProcessorCount (
     CpuPause ();
   }
 
+  if (CpuMpData->CpuCount > 255) {
+    //
+    // If there are more than 255 processor found, force to enable X2APIC
+    //
+    CpuMpData->X2ApicEnable = TRUE;
+  }
   if (CpuMpData->X2ApicEnable) {
     DEBUG ((DEBUG_INFO, "Force x2APIC mode!\n"));
     //
@@ -1412,7 +1418,7 @@ MpInitLibInitialize (
     CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
     for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
       InitializeSpinLock(&CpuMpData->CpuData[Index].ApLock);
-      if (CpuInfoInHob[Index].InitialApicId >= 255) {
+      if (CpuInfoInHob[Index].InitialApicId >= 255 || Index > 254) {
         CpuMpData->X2ApicEnable = TRUE;
       }
       CpuMpData->CpuData[Index].CpuHealthy = (CpuInfoInHob[Index].Health == 0)? TRUE:FALSE;
