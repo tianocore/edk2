@@ -129,7 +129,7 @@ class ValueExpression(object):
         'IN' : 'in'
     }
 
-    NonLetterOpLst = ['+', '-', '*', '/', '%', '&', '|', '^', '~', '<<', '>>', '!', '=', '>', '<']
+    NonLetterOpLst = ['+', '-', '*', '/', '%', '&', '|', '^', '~', '<<', '>>', '!', '=', '>', '<', '?', ':']
 
     PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
     HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
@@ -276,7 +276,7 @@ class ValueExpression(object):
             self._Idx = 0
             self._Token = ''
 
-        Val = self._OrExpr()
+        Val = self._ConExpr()
         RealVal = Val
         if type(Val) == type(''):
             if Val == 'L""':
@@ -312,12 +312,24 @@ class ValueExpression(object):
         Val = EvalFunc()
         while self._IsOperator(OpLst):
             Op = self._Token
+            if Op == '?':
+                Val2 = EvalFunc()
+                if self._IsOperator(':'):
+                    Val3 = EvalFunc()
+                if Val:
+                    Val = Val2
+                else:
+                    Val = Val3
+                continue
             try:
                 Val = self.Eval(Op, Val, EvalFunc())
             except WrnExpression, Warn:
                 self._WarnExcept = Warn
                 Val = Warn.result
         return Val
+    # A [? B]*
+    def _ConExpr(self):
+        return self._ExprFuncTemplate(self._OrExpr, ['?', ':'])
 
     # A [|| B]*
     def _OrExpr(self):
@@ -392,7 +404,7 @@ class ValueExpression(object):
     def _IdenExpr(self):
         Tk = self._GetToken()
         if Tk == '(':
-            Val = self._OrExpr()
+            Val = self._ConExpr()
             try:
                 # _GetToken may also raise BadExpression
                 if self._GetToken() != ')':
@@ -474,7 +486,7 @@ class ValueExpression(object):
     def __GetIdToken(self, IsAlphaOp = False):
         IdToken = ''
         for Ch in self._Expr[self._Idx:]:
-            if not self.__IsIdChar(Ch):
+            if not self.__IsIdChar(Ch) or ('?' in self._Expr and Ch == ':'):
                 break
             self._Idx += 1
             IdToken += Ch
@@ -593,7 +605,7 @@ class ValueExpression(object):
     # Parse operator
     def _GetOperator(self):
         self.__SkipWS()
-        LegalOpLst = ['&&', '||', '!=', '==', '>=', '<='] + self.NonLetterOpLst
+        LegalOpLst = ['&&', '||', '!=', '==', '>=', '<='] + self.NonLetterOpLst + ['?',':']
 
         self._Token = ''
         Expr = self._Expr[self._Idx:]
