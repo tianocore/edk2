@@ -1319,6 +1319,7 @@ XhciDelAsyncIntTransfer (
   LIST_ENTRY              *Next;
   URB                     *Urb;
   EFI_USB_DATA_DIRECTION  Direction;
+  EFI_STATUS              Status;
 
   Direction = ((EpNum & 0x80) != 0) ? EfiUsbDataIn : EfiUsbDataOut;
   EpNum    &= 0x0F;
@@ -1330,6 +1331,15 @@ XhciDelAsyncIntTransfer (
     if ((Urb->Ep.BusAddr == BusAddr) &&
         (Urb->Ep.EpAddr == EpNum) &&
         (Urb->Ep.Direction == Direction)) {
+      //
+      // Device doesn't finish the IntTransfer until real data comes
+      // So the TRB should be removed as well.
+      //
+      Status = XhcDequeueTrbFromEndpoint (Xhc, Urb);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "XhciDelAsyncIntTransfer: XhcDequeueTrbFromEndpoint failed\n"));
+      }
+
       RemoveEntryList (&Urb->UrbList);
       FreePool (Urb->Data);
       XhcFreeUrb (Xhc, Urb);
@@ -1354,9 +1364,20 @@ XhciDelAllAsyncIntTransfers (
   LIST_ENTRY              *Entry;
   LIST_ENTRY              *Next;
   URB                     *Urb;
+  EFI_STATUS              Status;
 
   EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
+
+      //
+      // Device doesn't finish the IntTransfer until real data comes
+      // So the TRB should be removed as well.
+      //
+    Status = XhcDequeueTrbFromEndpoint (Xhc, Urb);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "XhciDelAllAsyncIntTransfers: XhcDequeueTrbFromEndpoint failed\n"));
+    }
+
     RemoveEntryList (&Urb->UrbList);
     FreePool (Urb->Data);
     XhcFreeUrb (Xhc, Urb);
