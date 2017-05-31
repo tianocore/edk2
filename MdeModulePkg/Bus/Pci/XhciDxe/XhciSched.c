@@ -2,7 +2,7 @@
 
   XHCI transfer scheduling routines.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2661,6 +2661,20 @@ XhcInitializeEndpointContext (
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
         //
+        // Get the bInterval from descriptor and init the the interval field of endpoint context.
+        // Refer to XHCI 1.1 spec section 6.2.3.6.
+        //
+        if (DeviceSpeed == EFI_USB_SPEED_FULL) {
+          Interval = EpDesc->Interval;
+          ASSERT (Interval >= 1 && Interval <= 16);
+          InputContext->EP[Dci-1].Interval = Interval + 2;
+        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
+          Interval = EpDesc->Interval;
+          ASSERT (Interval >= 1 && Interval <= 16);
+          InputContext->EP[Dci-1].Interval = Interval - 1;
+        }
+
+        //
         // Do not support isochronous transfer now.
         //
         DEBUG ((EFI_D_INFO, "XhcInitializeEndpointContext: Unsupport ISO EP found, Transfer ring is not allocated.\n"));
@@ -2828,6 +2842,20 @@ XhcInitializeEndpointContext64 (
           InputContext->EP[Dci-1].CErr   = 0;
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
+        //
+        // Get the bInterval from descriptor and init the the interval field of endpoint context.
+        // Refer to XHCI 1.1 spec section 6.2.3.6.
+        //
+        if (DeviceSpeed == EFI_USB_SPEED_FULL) {
+          Interval = EpDesc->Interval;
+          ASSERT (Interval >= 1 && Interval <= 16);
+          InputContext->EP[Dci-1].Interval = Interval + 2;
+        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
+          Interval = EpDesc->Interval;
+          ASSERT (Interval >= 1 && Interval <= 16);
+          InputContext->EP[Dci-1].Interval = Interval - 1;
+        }
+
         //
         // Do not support isochronous transfer now.
         //
