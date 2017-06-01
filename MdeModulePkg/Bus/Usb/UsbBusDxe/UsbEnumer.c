@@ -2,7 +2,7 @@
 
     Usb bus enumeration support.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -53,28 +53,33 @@ UsbGetEndpointDesc (
 
   @param  UsbIf                 The USB interface to free.
 
+  @retval EFI_ACCESS_DENIED     The interface is still occupied.
+  @retval EFI_SUCCESS           The interface is freed.
 **/
-VOID
+EFI_STATUS
 UsbFreeInterface (
   IN USB_INTERFACE        *UsbIf
   )
 {
+  EFI_STATUS              Status;
+
   UsbCloseHostProtoByChild (UsbIf->Device->Bus, UsbIf->Handle);
 
-  gBS->UninstallMultipleProtocolInterfaces (
-         UsbIf->Handle,
-         &gEfiDevicePathProtocolGuid,
-         UsbIf->DevicePath,
-         &gEfiUsbIoProtocolGuid,
-         &UsbIf->UsbIo,
-         NULL
-         );
-
-  if (UsbIf->DevicePath != NULL) {
-    FreePool (UsbIf->DevicePath);
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  UsbIf->Handle,
+                  &gEfiDevicePathProtocolGuid, UsbIf->DevicePath,
+                  &gEfiUsbIoProtocolGuid,      &UsbIf->UsbIo,
+                  NULL
+                  );
+  if (!EFI_ERROR (Status)) {
+    if (UsbIf->DevicePath != NULL) {
+      FreePool (UsbIf->DevicePath);
+    }
+    FreePool (UsbIf);
+  } else {
+    UsbOpenHostProtoByChild (UsbIf->Device->Bus, UsbIf->Handle);
   }
-
-  FreePool (UsbIf);
+  return Status;
 }
 
 
@@ -525,7 +530,13 @@ UsbRemoveConfig (
 
     Status = UsbDisconnectDriver (UsbIf);
     if (!EFI_ERROR (Status)) {
-      UsbFreeInterface (UsbIf);
+      Status = UsbFreeInterface (UsbIf);
+      if (EFI_ERROR (Status)) {
+        UsbConnectDriver (UsbIf);
+      }
+    }
+
+    if (!EFI_ERROR (Status)) {
       Device->Interfaces[Index] = NULL;
     } else {
       ReturnStatus = Status;
