@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 #include <Guid/WinNtSystemConfig.h>
+#include <Guid/EventGroup.h>
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/WinNtThunk.h>
 #include <Protocol/WinNtIo.h>
