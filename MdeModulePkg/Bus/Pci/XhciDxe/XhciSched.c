@@ -1369,10 +1369,10 @@ XhciDelAllAsyncIntTransfers (
   EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
-      //
-      // Device doesn't finish the IntTransfer until real data comes
-      // So the TRB should be removed as well.
-      //
+    //
+    // Device doesn't finish the IntTransfer until real data comes
+    // So the TRB should be removed as well.
+    //
     Status = XhcDequeueTrbFromEndpoint (Xhc, Urb);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "XhciDelAllAsyncIntTransfers: XhcDequeueTrbFromEndpoint failed\n"));
