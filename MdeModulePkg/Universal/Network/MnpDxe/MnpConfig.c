@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol private services.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -235,7 +235,7 @@ MnpAddFreeTxBuf (
 
   Status = EFI_SUCCESS;
   for (Index = 0; Index < Count; Index++) {
-    TxBufWrap = (MNP_TX_BUF_WRAP*) AllocatePool (sizeof (MNP_TX_BUF_WRAP) + MnpDeviceData->BufferLength - 1);
+    TxBufWrap = (MNP_TX_BUF_WRAP*) AllocatePool (OFFSET_OF (MNP_TX_BUF_WRAP, TxBuf) + MnpDeviceData->BufferLength );
     if (TxBufWrap == NULL) {
       DEBUG ((EFI_D_ERROR, "MnpAddFreeTxBuf: TxBuf Alloc failed.\n"));
 
