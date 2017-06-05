@@ -156,7 +156,7 @@ SmmIsMmioValid (
 }
 
 /**
-  Merge continous entries whose type is EfiGcdMemoryTypeMemoryMappedIo.
+  Merge continuous entries whose type is EfiGcdMemoryTypeMemoryMappedIo.
 
   @param[in, out]  GcdMemoryMap           A pointer to the buffer in which firmware places
                                           the current GCD memory map.
@@ -217,7 +217,8 @@ MergeGcdMmioEntry (
   @param[in] Interface  Points to the interface instance.
   @param[in] Handle     The handle on which the interface was installed.
 
-  @retval EFI_SUCCESS   Notification runs successfully.
+  @retval EFI_SUCCESS           Notification runs successfully.
+  @retval EFI_OUT_OF_RESOURCES  No enough resources to save GCD MMIO map.
 **/
 EFI_STATUS
 EFIAPI
@@ -237,10 +238,10 @@ SmmIoLibInternalEndOfDxeNotify (
     MergeGcdMmioEntry (MemSpaceMap, &NumberOfDescriptors);
 
     mSmmIoLibGcdMemSpace = AllocateCopyPool (NumberOfDescriptors * sizeof (EFI_GCD_MEMORY_SPACE_DESCRIPTOR), MemSpaceMap);
-    ASSERT_EFI_ERROR (Status);
-    if (EFI_ERROR (Status)) {
+    ASSERT (mSmmIoLibGcdMemSpace != NULL);
+    if (mSmmIoLibGcdMemSpace == NULL) {
       gBS->FreePool (MemSpaceMap);
-      return Status;
+      return EFI_OUT_OF_RESOURCES;
     }
 
     mSmmIoLibGcdMemNumberOfDesc = NumberOfDescriptors;
