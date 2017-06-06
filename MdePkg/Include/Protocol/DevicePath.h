@@ -5,7 +5,7 @@
   from a software point of view. The path must persist from boot to boot, so 
   it can not contain things like PCI bus numbers that change from boot to boot.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -937,6 +937,15 @@ typedef struct {
   ///
   UINT8                           SSId[32];
 } WIFI_DEVICE_PATH;
+
+///
+/// Bluetooth LE Device Path SubType.
+///
+#define MSG_BLUETOOTH_LE_DP       0x1E
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  BLUETOOTH_LE_ADDRESS            Address;
+} BLUETOOTH_LE_DEVICE_PATH;
 
 //
 // Media Device Path
