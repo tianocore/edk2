@@ -4210,6 +4210,8 @@ class ModuleAutoGen(AutoGen):
         with open(self.GetTimeStampPath(),'r') as f:
             for source in f:
                 source = source.rstrip('\n')
+                if not os.path.exists(source):
+                    return False
                 if source not in ModuleAutoGen.TimeDict :
                     ModuleAutoGen.TimeDict[source] = os.stat(source)[8]
                 if ModuleAutoGen.TimeDict[source] > DstTimeStamp:
