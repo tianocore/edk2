@@ -183,6 +183,8 @@ class CapsulePayload(CapsuleData):
         self.VendorCodeFile = []
         self.Certificate_Guid = None
         self.MonotonicCount = None
+        self.Existed = False
+        self.Buffer = None
 
     def GenCapsuleSubItem(self, AuthData=[]):
         if not self.Version:
@@ -239,4 +241,5 @@ class CapsulePayload(CapsuleData):
             VendorFile = open(self.VendorCodeFile, 'rb')
             Buffer += VendorFile.read()
             VendorFile.close()
+        self.Existed = True
         return Buffer
