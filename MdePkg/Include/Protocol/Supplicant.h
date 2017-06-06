@@ -1,7 +1,7 @@
 /** @file
   This file defines the EFI Supplicant Protocol.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -152,6 +152,10 @@ typedef enum {
   // EFI_SUPPLICANT_GTK_LIST.
   //
   EfiSupplicant80211IGTK,
+  //
+  // 802.11 PMK. The corresponding Data is 32 bytes pairwise master key.
+  //
+  EfiSupplicant80211PMK,
   EfiSupplicantDataTypeMaximum
 } EFI_SUPPLICANT_DATA_TYPE;
 
