@@ -204,7 +204,7 @@ struct _EFI_FTP4_COMMAND_TOKEN {
   /// DataBufferSize, again. If there is no data remained, 
   /// DataBufferSize should be set to 0.
   /// 
-  EFI_FTP4_DATA_CALLBACK                *DataCallback;
+  EFI_FTP4_DATA_CALLBACK                DataCallback;
   /// 
   /// Pointer to the parameter for DataCallback.
   /// 
