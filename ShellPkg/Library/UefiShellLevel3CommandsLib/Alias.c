@@ -2,7 +2,7 @@
   Main file for Alias shell level 3 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -151,6 +151,15 @@ ShellCommandRunAlias (
       // delete an alias
       //
       Status = gEfiShellProtocol->SetAlias(Param1, NULL, TRUE, FALSE);
+      if (EFI_ERROR(Status)) {
+        if (Status == EFI_ACCESS_DENIED) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");  
+          ShellStatus = SHELL_ACCESS_DENIED;
+        } else {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);  
+          ShellStatus = SHELL_DEVICE_ERROR;
+        }
+      }
     } else if (ShellCommandLineGetCount(Package) == 3) {
       //
       // must be adding an alias
