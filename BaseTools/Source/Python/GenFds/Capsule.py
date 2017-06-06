@@ -1,7 +1,7 @@
 ## @file
 # generate capsule
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -141,6 +141,11 @@ class Capsule (CapsuleClassObject) :
             Content.write(File.read())
             File.close()
         for fmp in self.FmpPayloadList:
+            if fmp.Existed:
+                FwMgrHdr.write(pack('=Q', PreSize))
+                PreSize += len(fmp.Buffer)
+                Content.write(fmp.Buffer)
+                continue
             if fmp.ImageFile:
                 for Obj in fmp.ImageFile:
                     fmp.ImageFile = Obj.GenCapsuleSubItem()
@@ -169,12 +174,12 @@ class Capsule (CapsuleClassObject) :
                     dwLength = 4 + 2 + 2 + 16 + 16 + 256 + 256
                 fmp.ImageFile = CapOutputTmp
                 AuthData = [fmp.MonotonicCount, dwLength, WIN_CERT_REVISION, WIN_CERT_TYPE_EFI_GUID, fmp.Certificate_Guid]
-                Buffer = fmp.GenCapsuleSubItem(AuthData)
+                fmp.Buffer = fmp.GenCapsuleSubItem(AuthData)
             else:
-                Buffer = fmp.GenCapsuleSubItem()
+                fmp.Buffer = fmp.GenCapsuleSubItem()
             FwMgrHdr.write(pack('=Q', PreSize))
-            PreSize += len(Buffer)
-            Content.write(Buffer)
+            PreSize += len(fmp.Buffer)
+            Content.write(fmp.Buffer)
         BodySize = len(FwMgrHdr.getvalue()) + len(Content.getvalue())
         Header.write(pack('=I', HdrSize + BodySize))
         #
