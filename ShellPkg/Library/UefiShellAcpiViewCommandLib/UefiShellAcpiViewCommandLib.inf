@@ -1,0 +1,76 @@
+##  @file
+# Provides Shell 'acpiview' command functions
+#
+# Copyright (c) 2016 - 2017, ARM Limited. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellAcpiViewCommandLib
+  FILE_GUID                      = FB5B305E-84F5-461F-940D-82D345757AFA
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ShellAcpiViewCommandLibConstructor
+  DESTRUCTOR                     = ShellAcpiViewCommandLibDestructor
+
+[Sources.common]
+  UefiShellAcpiViewCommandLib.uni
+  UefiShellAcpiViewCommandLib.c
+  UefiShellAcpiViewCommandLib.h
+  AcpiView.c
+  AcpiParser.c
+  AcpiTableParser.c
+  Dbg2Parser.c
+  DsdtParser.c
+  FadtParser.c
+  GtdtParser.c
+  IortParser.c
+  MadtParser.c
+  McfgParser.c
+  RsdpParser.c
+  SlitParser.c
+  SpcrParser.c
+  SratParser.c
+  SsdtParser.c
+  XsdtParser.c
+  BgrtParser.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  PcdLib
+  HiiLib
+  PrintLib
+  FileHandleLib
+
+[BuildOptions] 
+  MSFT:*_*_*_CC_FLAGS     = /wd4204 /wd4028 /wd4090 /wd4244 /wd4457
+
+[FixedPcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask ## CONSUMES
+
+[Guids]
+  gShellAcpiViewHiiGuid           ## CONSUMES ## HII
+  gEfiAcpiTableGuid               ## SOMETIMES_CONSUMES ## SystemTable
