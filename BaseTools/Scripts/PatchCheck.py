@@ -1,7 +1,7 @@
 ## @file
 #  Check a patch for various format issues
 #
-#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials are licensed and made
 #  available under the terms and conditions of the BSD License which
@@ -265,7 +265,7 @@ class GitDiffCheck:
             if line.startswith('@@ '):
                 self.state = PRE_PATCH
             elif len(line) >= 1 and line[0] not in ' -+' and \
-                 not line.startswith(r'\ No newline '):
+                 not line.startswith(r'\ No newline ') and not self.binary:
                 for line in self.lines[self.line_num + 1:]:
                     if line.startswith('diff --git'):
                         self.format_error('diff found after end of patch')
@@ -300,7 +300,7 @@ class GitDiffCheck:
         elif self.state == PATCH:
             if self.binary:
                 pass
-            if line.startswith('-'):
+            elif line.startswith('-'):
                 pass
             elif line.startswith('+'):
                 self.check_added_line(line[1:])
