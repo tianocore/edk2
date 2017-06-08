@@ -1736,12 +1736,15 @@ class Build():
                 MaList = []
                 for Arch in Wa.ArchList:
                     GlobalData.gGlobalDefines['ARCH'] = Arch
-                    Ma = ModuleAutoGen(Wa, self.ModuleFile, BuildTarget, ToolChain, Arch, self.PlatformFile)
-                    if Ma == None: continue
-                    MaList.append(Ma)
-                    self.BuildModules.append(Ma)
-                    if not Ma.IsBinaryModule:
-                        self._Build(self.Target, Ma, BuildModule=True)
+                    Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
+                    for Module in Pa.Platform.Modules:
+                        if self.ModuleFile.Dir == Module.Dir and self.ModuleFile.File == Module.File:
+                            Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
+                            if Ma == None: continue
+                            MaList.append(Ma)
+                            self.BuildModules.append(Ma)
+                            if not Ma.IsBinaryModule:
+                                self._Build(self.Target, Ma, BuildModule=True)
 
                 self.BuildReport.AddPlatformReport(Wa, MaList)
                 if MaList == []:
