@@ -186,6 +186,10 @@ HttpBootPrintErrorMessage (
 
   case HTTP_STATUS_307_TEMPORARY_REDIRECT:
     AsciiPrint ("\n  Redirection: 307 Temporary Redirect");
+    break;
+
+  case HTTP_STATUS_308_PERMANENT_REDIRECT:
+    AsciiPrint ("\n  Redirection: 308 Permanent Redirect");
     break; 
 
   case HTTP_STATUS_400_BAD_REQUEST:
