@@ -1406,9 +1406,7 @@ DriverEntry (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       EFI_D_ERROR,
-      "Line %d in file " __FILE__ ":\n    "
-      "DriverEntry: TPM not working properly\n",
-      __LINE__
+      "DriverEntry: TPM not working properly\n"
       ));
     return Status;
   }
