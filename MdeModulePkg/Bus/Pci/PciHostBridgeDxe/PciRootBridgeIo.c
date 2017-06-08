@@ -1349,7 +1349,7 @@ RootBridgeIoAllocateBuffer (
       //
       // Clear DUAL_ADDRESS_CYCLE
       //
-      Attributes &= ~EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE;
+      Attributes &= ~((UINT64) EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
     }
     Status = mIoMmuProtocol->AllocateBuffer (
                                mIoMmuProtocol,
