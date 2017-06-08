@@ -243,6 +243,7 @@ class GitDiffCheck:
         self.count = len(self.lines)
         self.line_num = 0
         self.state = START
+        self.new_bin = []
         while self.line_num < self.count and self.format_ok:
             line_num = self.line_num
             self.run()
@@ -254,6 +255,11 @@ class GitDiffCheck:
             return
         if self.ok:
             print('The code passed all checks.')
+        if self.new_bin:
+            print('\nWARNING - The following binary files will be added ' +
+                  'into the repository:')
+            for binary in self.new_bin:
+                print('  ' + binary)
 
     def run(self):
         line = self.lines[self.line_num]
@@ -276,21 +282,25 @@ class GitDiffCheck:
         if self.state == START:
             if line.startswith('diff --git'):
                 self.state = PRE_PATCH
-                self.set_filename(None)
+                self.filename = line[13:].split(' ',1)[0]
+                self.is_newfile = False
+                self.force_crlf = not self.filename.endswith('.sh')
             elif len(line.rstrip()) != 0:
                 self.format_error("didn't find diff command")
             self.line_num += 1
         elif self.state == PRE_PATCH:
-            if line.startswith('+++ b/'):
-                self.set_filename(line[6:].rstrip())
             if line.startswith('@@ '):
                 self.state = PATCH
                 self.binary = False
-            elif line.startswith('GIT binary patch'):
+            elif line.startswith('GIT binary patch') or \
+                 line.startswith('Binary files'):
                 self.state = PATCH
                 self.binary = True
+                if self.is_newfile:
+                    self.new_bin.append(self.filename)
             else:
                 ok = False
+                self.is_newfile = self.newfile_prefix_re.match(line)
                 for pfx in self.pre_patch_prefixes:
                     if line.startswith(pfx):
                         ok = True
@@ -320,22 +330,20 @@ class GitDiffCheck:
         'new mode ',
         'similarity index ',
         'rename ',
-        'Binary files ',
         )
 
     line_endings = ('\r\n', '\n\r', '\n', '\r')
 
-    def set_filename(self, filename):
-        self.hunk_filename = filename
-        if filename:
-            self.force_crlf = not filename.endswith('.sh')
-        else:
-            self.force_crlf = True
+    newfile_prefix_re = \
+        re.compile(r'''^
+                       index\ 0+\.\.
+                   ''',
+                   re.VERBOSE)
 
     def added_line_error(self, msg, line):
         lines = [ msg ]
-        if self.hunk_filename is not None:
-            lines.append('File: ' + self.hunk_filename)
+        if self.filename is not None:
+            lines.append('File: ' + self.filename)
         lines.append('Line: ' + line)
 
         self.error(*lines)
