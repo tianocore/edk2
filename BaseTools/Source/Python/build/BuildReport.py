@@ -318,9 +318,9 @@ class LibraryReport(object):
     # @param File            The file object for report
     #
     def GenerateReport(self, File):
-        FileWrite(File, gSubSectionStart)
-        FileWrite(File, TAB_BRG_LIBRARY)
         if len(self.LibraryList) > 0:
+            FileWrite(File, gSubSectionStart)
+            FileWrite(File, TAB_BRG_LIBRARY)
             FileWrite(File, gSubSectionSep)
             for LibraryItem in self.LibraryList:
                 LibInfPath = LibraryItem[0]
@@ -347,7 +347,7 @@ class LibraryReport(object):
                     else:
                         FileWrite(File, "{%s}" % LibClass)
 
-        FileWrite(File, gSubSectionEnd)
+            FileWrite(File, gSubSectionEnd)
 
 ##
 # Reports dependency expression information
@@ -411,9 +411,6 @@ class DepexReport(object):
     #
     def GenerateReport(self, File, GlobalDepexParser):
         if not self.Depex:
-            FileWrite(File, gSubSectionStart)
-            FileWrite(File, TAB_DEPEX)
-            FileWrite(File, gSubSectionEnd)
             return
         FileWrite(File, gSubSectionStart)
         if os.path.isfile(self._DepexFileName):
@@ -866,7 +863,7 @@ class PcdReport(object):
                 FileWrite(File, "  *M  - Module scoped PCD override")
             FileWrite(File, gSectionSep)
         else:
-            if not ReportSubType:
+            if not ReportSubType and ModulePcdSet:
                 #
                 # For module PCD sub-section
                 #
@@ -1011,7 +1008,7 @@ class PcdReport(object):
         if ModulePcdSet == None:
             FileWrite(File, gSectionEnd)
         else:
-            if not ReportSubType:
+            if not ReportSubType and ModulePcdSet:
                 FileWrite(File, gSubSectionEnd)
 
 
