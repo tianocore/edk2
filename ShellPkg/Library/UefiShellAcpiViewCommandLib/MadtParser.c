@@ -22,6 +22,85 @@ STATIC CONST UINT8* MadtInterruptControllerType;
 STATIC CONST UINT8* MadtInterruptControllerLength;
 
 
+/** An ACPI_PARSER array describing the PROCESSOR_LOCAL_APIC
+    Structure.
+
+**/
+STATIC CONST ACPI_PARSER ProcessorLocalApicParser[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"ACPI Processor UID", 1, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"APIC ID", 1, 3, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 4, 4, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+/** An ACPI_PARSER array describing the IO_APIC
+    Structure.
+
+**/
+STATIC CONST ACPI_PARSER IoApicParser[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"I/O APIC ID", 1, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Reserved", 1, 3, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"I/O APIC Address", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Global System Interrupt Base", 4, 8, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+/** An ACPI_PARSER array describing the INTERRUPT_SOURCE_OVERRIDE
+    Structure.
+
+**/
+STATIC CONST ACPI_PARSER InterruptSourceOverrideParser[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"Bus", 1, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Source", 1, 3, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Global System Interrupt Base", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 2, 8, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+/** An ACPI_PARSER array describing the LOCAL_APIC_NMI
+    Structure.
+
+**/
+STATIC CONST ACPI_PARSER LocalApicNMIParser[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"ACPI Processor UID", 1, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 2, 3, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Local APIC LINT#", 1, 5, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+/** An ACPI_PARSER array describing the PROCESSOR_LOCAL_X2APIC
+    Structure.
+
+**/
+STATIC CONST ACPI_PARSER ProcessorLocalX2ApicParser[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"Reserved", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
+
+  {L"X2APIC ID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"ACPI Processor UID", 4, 12, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+
+/** An ACPI_PARSER array describing the LOCAL_X2APIC_NMI
+    Structure.
+
+**/
+STATIC CONST ACPI_PARSER LocalX2ApicNMIParser[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"Flags", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"ACPI Processor UID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Local X2APIC LINT#", 1, 8, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Reserved", 3, 9, L"%x %x %x", Dump3Chars, NULL, NULL, NULL}
+};
+
+
 /** An ACPI_PARSER array describing the GICC Interrupt
     Controller Structure.
 
@@ -195,7 +274,7 @@ ParseAcpiMadt (
       IncrementErrorCount ();
       Print (
          L"ERROR: Invalid Interrupt Controller Length,"
-          " Type = %d, Length = %d",
+          " Type = %d, Length = %d\n",
          *MadtInterruptControllerType,
          *MadtInterruptControllerLength
          );
@@ -203,6 +282,79 @@ ParseAcpiMadt (
     }
 
     switch (*MadtInterruptControllerType) {
+      case EFI_ACPI_6_1_PROCESSOR_LOCAL_APIC: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "PROCESSOR_LOCAL_APIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (ProcessorLocalApicParser)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_1_IO_APIC: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "IO_APIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (IoApicParser)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_1_INTERRUPT_SOURCE_OVERRIDE: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "INTERRUPT_SOURCE_OVERRIDE",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (InterruptSourceOverrideParser)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_1_LOCAL_APIC_NMI: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LOCAL_APIC_NMI",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LocalApicNMIParser)
+          );
+        break;
+      }
+
+
+      case EFI_ACPI_6_1_PROCESSOR_LOCAL_X2APIC: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "PROCESSOR_LOCAL_X2APIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (ProcessorLocalX2ApicParser)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_1_LOCAL_X2APIC_NMI: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LOCAL_X2APIC_NMI",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LocalX2ApicNMIParser)
+          );
+        break;
+      }
+
       case EFI_ACPI_6_1_GIC: {
         ParseAcpi (
           TRUE,
@@ -267,7 +419,7 @@ ParseAcpiMadt (
         IncrementErrorCount ();
         Print (
           L"ERROR: Unknown Interrupt Controller Structure,"
-            " Type = %d, Length = %d",
+            " Type = %d, Length = %d\n",
           *MadtInterruptControllerType,
           *MadtInterruptControllerLength
           );
