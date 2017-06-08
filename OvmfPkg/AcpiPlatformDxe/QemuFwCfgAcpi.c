@@ -1001,6 +1001,7 @@ InstallQemuFwCfgTables (
   RestorePciDecoding (OriginalPciAttributes, OriginalPciAttributesCount);
   LoaderEnd = LoaderStart + FwCfgSize / sizeof *LoaderEntry;
 
+  AllocationsRestrictedTo32Bit = NULL;
   Status = CollectAllocationsRestrictedTo32Bit (
              &AllocationsRestrictedTo32Bit,
              LoaderStart,
