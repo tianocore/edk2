@@ -1943,6 +1943,8 @@ HttpMappingToStatusCode (
     return HTTP_STATUS_305_USE_PROXY;
   case 307:
     return HTTP_STATUS_307_TEMPORARY_REDIRECT;
+  case 308:
+    return HTTP_STATUS_308_PERMANENT_REDIRECT;
   case 400:
     return HTTP_STATUS_400_BAD_REQUEST;
   case 401:
