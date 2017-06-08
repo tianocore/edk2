@@ -5,7 +5,7 @@
   HTTP Protocol (HTTP)
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -103,7 +103,8 @@ typedef enum {
   HTTP_STATUS_502_BAD_GATEWAY,
   HTTP_STATUS_503_SERVICE_UNAVAILABLE,
   HTTP_STATUS_504_GATEWAY_TIME_OUT,
-  HTTP_STATUS_505_HTTP_VERSION_NOT_SUPPORTED
+  HTTP_STATUS_505_HTTP_VERSION_NOT_SUPPORTED,
+  HTTP_STATUS_308_PERMANENT_REDIRECT
 } EFI_HTTP_STATUS_CODE;
 
 ///
