@@ -1,2 +1,2 @@
-Win32  -r 252 https://svn.code.sf.net/p/edk2-toolbinaries/code/trunk/Win32
-GIT: a0e4ce3ba8e5e1fe52bd66225635837cdb172b9f https://github.com/tianocore/edk2-BaseTools-win32.git
+Win32  -r 253 https://svn.code.sf.net/p/edk2-toolbinaries/code/trunk/Win32
+GIT: 0e088c19ab31fccd1d2f55d9e4fe0314b57c0097 https://github.com/tianocore/edk2-BaseTools-win32.git
