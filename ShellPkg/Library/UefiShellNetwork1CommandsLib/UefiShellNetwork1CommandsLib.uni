@@ -2,6 +2,7 @@
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
 // Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
+// (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -157,7 +158,7 @@
 "     interfaces or the specified interface.\r\n"
 "  4. Use '-s <Name> static <IP> <SubnetMask> <GatewayMask>' with \r\n"
 "     static IPv4 address configuration for specified interface.\r\n"
-"  5. Use '-s <Name> dhcp' for DHCP4 to request the IP4 address\r\n"
+"  5. Use '-s <Name> dhcp' for DHCPv4 to request the IPv4 address\r\n"
 "     configuration dynamically for specified interface.\r\n"
 "  6. Use '-s <Name> dns <IP>' must under manual policy.\r\n"
 ".SH EXAMPLES\r\n"
@@ -166,7 +167,7 @@
 "  * To list the configuration for the eth0 interface:\r\n"
 "    fs0:\> ifconfig -l eth0\r\n"
 " \r\n"
-"  * To use DHCP4 to request the IPv4 address configuration dynamically for the\r\n"
+"  * To use DHCPv4 to request the IPv4 address configuration dynamically for the\r\n"
 "    eth0 interface:\r\n"
 "    fs0:\> ifconfig -s eth0 dhcp\r\n"
 " \r\n"
