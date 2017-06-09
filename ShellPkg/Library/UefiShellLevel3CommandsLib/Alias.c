@@ -153,10 +153,13 @@ ShellCommandRunAlias (
       Status = gEfiShellProtocol->SetAlias(Param1, NULL, TRUE, FALSE);
       if (EFI_ERROR(Status)) {
         if (Status == EFI_ACCESS_DENIED) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");
           ShellStatus = SHELL_ACCESS_DENIED;
+        } else if (Status == EFI_NOT_FOUND) {
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_NOT_FOUND), gShellLevel3HiiHandle, L"alias", Param1);
+          ShellStatus = SHELL_NOT_FOUND;
         } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);
           ShellStatus = SHELL_DEVICE_ERROR;
         }
       }
