@@ -1302,7 +1302,7 @@ BootMaintCallback (
     } else if ((QuestionId >= CON_OUT_DEVICE_QUESTION_ID) && (QuestionId < CON_OUT_DEVICE_QUESTION_ID + MAX_MENU_NUMBER)) {
       UpdateConsoleContent (L"ConOut", CurrentFakeNVMap);
     } else if ((QuestionId >= CON_ERR_DEVICE_QUESTION_ID) && (QuestionId < CON_ERR_DEVICE_QUESTION_ID + MAX_MENU_NUMBER)) {
-      UpdateConsoleContent (L"ConErr", CurrentFakeNVMap);
+      UpdateConsoleContent (L"ErrOut", CurrentFakeNVMap);
     }
   }
 
