@@ -296,7 +296,9 @@ SmmCpuFeaturesInitializeProcessor (
   // Intel(R) Core(TM) Processor Family MSRs.
   //
   if (FamilyId == 0x06) {
-    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46) {
+    if (ModelId == 0x3C || ModelId == 0x45 || ModelId == 0x46 ||
+        ModelId == 0x3D || ModelId == 0x47 || ModelId == 0x4E || ModelId == 0x4F ||
+        ModelId == 0x3F || ModelId == 0x56 || ModelId == 0x57 || ModelId == 0x5C) {
       //
       // Check to see if the CPU supports the SMM Code Access Check feature
       // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
