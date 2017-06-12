@@ -254,7 +254,7 @@ InitializeEmmcDevice (
   EFI_MMC_HOST_PROTOCOL *Host;
   EFI_STATUS Status = EFI_SUCCESS;
   ECSD       *ECSDData;
-  UINT32     BusClockFreq, Idx;
+  UINT32     BusClockFreq, Idx, BusMode;
   UINT32     TimingMode[4] = {EMMCHS52DDR1V2, EMMCHS52DDR1V8, EMMCHS52, EMMCHS26};
 
   Host  = MmcHostInstance->MmcHost;
@@ -286,7 +286,19 @@ InitializeEmmcDevice (
     }
     Status = Host->SetIos (Host, BusClockFreq, 8, TimingMode[Idx]);
     if (!EFI_ERROR (Status)) {
-      Status = EmmcSetEXTCSD (MmcHostInstance, EXTCSD_BUS_WIDTH, EMMC_BUS_WIDTH_DDR_8BIT);
+      switch (TimingMode[Idx]) {
+      case EMMCHS52DDR1V2:
+      case EMMCHS52DDR1V8:
+        BusMode = EMMC_BUS_WIDTH_DDR_8BIT;
+        break;
+      case EMMCHS52:
+      case EMMCHS26:
+        BusMode = EMMC_BUS_WIDTH_8BIT;
+        break;
+      default:
+        return EFI_UNSUPPORTED;
+      }
+      Status = EmmcSetEXTCSD (MmcHostInstance, EXTCSD_BUS_WIDTH, BusMode);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "InitializeEmmcDevice(): Failed to set EXTCSD bus width, Status:%r\n", Status));
       }
