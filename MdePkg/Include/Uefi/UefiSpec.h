@@ -1,8 +1,8 @@
 /** @file
   Include file that supports UEFI.
 
-  This include file must contain things defined in the UEFI 2.6 specification.
-  If a code construct is defined in the UEFI 2.6 specification it must be included
+  This include file must contain things defined in the UEFI 2.7 specification.
+  If a code construct is defined in the UEFI 2.7 specification it must be included
   by this include file.
 
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
@@ -1775,6 +1775,7 @@ EFI_STATUS
 // EFI Runtime Services Table
 //
 #define EFI_SYSTEM_TABLE_SIGNATURE      SIGNATURE_64 ('I','B','I',' ','S','Y','S','T')
+#define EFI_2_70_SYSTEM_TABLE_REVISION  ((2 << 16) | (70))
 #define EFI_2_60_SYSTEM_TABLE_REVISION  ((2 << 16) | (60))
 #define EFI_2_50_SYSTEM_TABLE_REVISION  ((2 << 16) | (50))
 #define EFI_2_40_SYSTEM_TABLE_REVISION  ((2 << 16) | (40))
@@ -1785,7 +1786,7 @@ EFI_STATUS
 #define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | (00))
 #define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | (10))
 #define EFI_1_02_SYSTEM_TABLE_REVISION  ((1 << 16) | (02))
-#define EFI_SYSTEM_TABLE_REVISION       EFI_2_60_SYSTEM_TABLE_REVISION
+#define EFI_SYSTEM_TABLE_REVISION       EFI_2_70_SYSTEM_TABLE_REVISION
 #define EFI_SPECIFICATION_VERSION       EFI_SYSTEM_TABLE_REVISION
 
 #define EFI_RUNTIME_SERVICES_SIGNATURE  SIGNATURE_64 ('R','U','N','T','S','E','R','V')
