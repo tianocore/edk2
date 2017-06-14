@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv4 for HTTP boot driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -609,8 +609,13 @@ HttpBootDhcp4CallBack (
   EFI_DHCP4_PACKET_OPTION              *MaxMsgSize;
   UINT16                               Value;
   EFI_STATUS                           Status;
+  BOOLEAN                              Received;
 
-  if ((Dhcp4Event != Dhcp4RcvdOffer) && (Dhcp4Event != Dhcp4SelectOffer)) {
+  if ((Dhcp4Event != Dhcp4SendDiscover) && 
+      (Dhcp4Event != Dhcp4RcvdOffer) && 
+      (Dhcp4Event != Dhcp4SendRequest) && 
+      (Dhcp4Event != Dhcp4RcvdAck) && 
+      (Dhcp4Event != Dhcp4SelectOffer)) {
     return EFI_SUCCESS;
   }
   
@@ -627,6 +632,23 @@ HttpBootDhcp4CallBack (
   if (MaxMsgSize != NULL) {
     Value = HTONS (HTTP_BOOT_DHCP4_PACKET_MAX_SIZE);
     CopyMem (MaxMsgSize->Data, &Value, sizeof (Value));
+  }
+  
+  //
+  // Callback to user if any packets sent or received.
+  //
+  if (Private->HttpBootCallback != NULL && Dhcp4Event != Dhcp4SelectOffer) {
+    Received = (BOOLEAN) (Dhcp4Event == Dhcp4RcvdOffer || Dhcp4Event == Dhcp4RcvdAck);
+    Status = Private->HttpBootCallback->Callback (
+               Private->HttpBootCallback, 
+               HttpBootDhcp4,
+               Received,
+               Packet->Length,
+               &Packet->Dhcp4
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_ABORTED;
+    }
   }
 
   Status = EFI_SUCCESS;

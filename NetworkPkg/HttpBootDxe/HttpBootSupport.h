@@ -145,6 +145,32 @@ HttpBootSetHeader (
   IN  CHAR8                *FieldValue
   );
 
+///
+/// HTTP_IO_CALLBACK_EVENT
+///
+typedef enum {
+  HttpIoRequest,
+  HttpIoResponse
+} HTTP_IO_CALLBACK_EVENT;
+
+/**
+  HttpIo Callback function which will be invoked when specified HTTP_IO_CALLBACK_EVENT happened.
+
+  @param[in]    EventType      Indicate the Event type that occurs in the current callback.
+  @param[in]    Message        HTTP message which will be send to, or just received from HTTP server.
+  @param[in]    Context        The Callback Context pointer.
+  
+  @retval EFI_SUCCESS          Tells the HttpIo to continue the HTTP process.
+  @retval Others               Tells the HttpIo to abort the current HTTP process.
+**/
+typedef
+EFI_STATUS
+(EFIAPI * HTTP_IO_CALLBACK) (
+  IN  HTTP_IO_CALLBACK_EVENT    EventType,
+  IN  EFI_HTTP_MESSAGE          *Message,
+  IN  VOID                      *Context
+  );
+
 //
 // HTTP_IO configuration data for IPv4
 //
@@ -188,6 +214,9 @@ typedef struct {
   EFI_HANDLE                Handle;
   
   EFI_HTTP_PROTOCOL         *Http;
+
+  HTTP_IO_CALLBACK          Callback;
+  VOID                      *Context;
 
   EFI_HTTP_TOKEN            ReqToken;
   EFI_HTTP_MESSAGE          ReqMessage;
@@ -252,6 +281,9 @@ HttpBootCommonNotify (
   @param[in]  Controller     The handle of the controller.
   @param[in]  IpVersion      IP_VERSION_4 or IP_VERSION_6.
   @param[in]  ConfigData     The HTTP_IO configuration data.
+  @param[in]  Callback       Callback function which will be invoked when specified
+                             HTTP_IO_CALLBACK_EVENT happened.
+  @param[in]  Context        The Context data which will be passed to the Callback function.
   @param[out] HttpIo         The HTTP_IO.
   
   @retval EFI_SUCCESS            The HTTP_IO is created and configured.
@@ -268,6 +300,8 @@ HttpIoCreateIo (
   IN EFI_HANDLE             Controller,
   IN UINT8                  IpVersion,
   IN HTTP_IO_CONFIG_DATA    *ConfigData,
+  IN HTTP_IO_CALLBACK       Callback,
+  IN VOID                   *Context,
   OUT HTTP_IO               *HttpIo
   );
 

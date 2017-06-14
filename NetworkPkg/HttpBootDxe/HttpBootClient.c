@@ -233,7 +233,6 @@ HttpBootDhcp4ExtractUriInfo (
   //
   // All boot informations are valid here.
   //
-  AsciiPrint ("\n  URI: %a", Private->BootFileUri);
 
   //
   // Update the device path to include the IP and boot URI information.
@@ -401,7 +400,7 @@ HttpBootDhcp6ExtractUriInfo (
   //
   // All boot informations are valid here.
   //
-  AsciiPrint ("\n  URI: %a", Private->BootFileUri);
+
   //
   // Update the device path to include the IP and boot URI information.
   //
@@ -452,6 +451,40 @@ HttpBootDiscoverBootInfo (
 }
 
 /**
+  HttpIo Callback function which will be invoked when specified HTTP_IO_CALLBACK_EVENT happened.
+
+  @param[in]    EventType      Indicate the Event type that occurs in the current callback.
+  @param[in]    Message        HTTP message which will be send to, or just received from HTTP server.
+  @param[in]    Context        The Callback Context pointer.
+  
+  @retval EFI_SUCCESS          Tells the HttpIo to continue the HTTP process.
+  @retval Others               Tells the HttpIo to abort the current HTTP process.
+**/
+EFI_STATUS
+EFIAPI
+HttpBootHttpIoCallback (
+  IN  HTTP_IO_CALLBACK_EVENT    EventType,
+  IN  EFI_HTTP_MESSAGE          *Message,
+  IN  VOID                      *Context
+  )
+{
+  HTTP_BOOT_PRIVATE_DATA       *Private;
+  EFI_STATUS                   Status;
+  Private = (HTTP_BOOT_PRIVATE_DATA *) Context;
+  if (Private->HttpBootCallback != NULL) {
+    Status = Private->HttpBootCallback->Callback (
+               Private->HttpBootCallback,
+               EventType == HttpIoRequest ? HttpBootHttpRequest : HttpBootHttpResponse,
+               EventType == HttpIoRequest ? FALSE : TRUE,
+               sizeof (EFI_HTTP_MESSAGE),
+               (VOID *) Message
+               );
+    return Status;
+  }
+  return EFI_SUCCESS;
+}
+
+/**
   Create a HttpIo instance for the file download.
 
   @param[in]    Private        The pointer to the driver's private data.
@@ -490,6 +523,8 @@ HttpBootCreateHttpIo (
              Private->Controller,
              Private->UsingIpv6 ? IP_VERSION_6 : IP_VERSION_4,
              &ConfigData,
+             HttpBootHttpIoCallback,
+             (VOID *) Private,
              &Private->HttpIo
              );
   if (EFI_ERROR (Status)) {
@@ -686,6 +721,8 @@ HttpBootGetBootFileCallback (
 {
   HTTP_BOOT_CALLBACK_DATA      *CallbackData;
   HTTP_BOOT_ENTITY_DATA        *NewEntityData;
+  EFI_STATUS                   Status;
+  EFI_HTTP_BOOT_CALLBACK_PROTOCOL   *HttpBootCallback;
 
   //
   // We only care about the entity data.
@@ -695,6 +732,19 @@ HttpBootGetBootFileCallback (
   }
 
   CallbackData = (HTTP_BOOT_CALLBACK_DATA *) Context;
+  HttpBootCallback = CallbackData->Private->HttpBootCallback;
+  if (HttpBootCallback != NULL) {
+    Status = HttpBootCallback->Callback (
+               HttpBootCallback,
+               HttpBootHttpEntityBody,
+               TRUE,
+               (UINT32)Length,
+               Data
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
   //
   // Copy data if caller has provided a buffer.
   //
@@ -977,6 +1027,7 @@ HttpBootGetBootFile (
   Context.Buffer     = Buffer;
   Context.BufferSize = *BufferSize;
   Context.Cache      = Cache;
+  Context.Private    = Private;
   Status = HttpInitMsgParser (
              HeaderOnly? HttpMethodHead : HttpMethodGet,
              ResponseData->Response.StatusCode,
@@ -1032,6 +1083,18 @@ HttpBootGetBootFile (
           goto ERROR_6;
         }
         ReceivedSize += ResponseBody.BodyLength;
+        if (Private->HttpBootCallback != NULL) {
+          Status = Private->HttpBootCallback->Callback (
+                     Private->HttpBootCallback,
+                     HttpBootHttpEntityBody,
+                     TRUE,
+                     (UINT32)ResponseBody.BodyLength,
+                     ResponseBody.Body
+                     );
+          if (EFI_ERROR (Status)) {
+            goto ERROR_6;
+          }
+        }
       }
     } else {
       //

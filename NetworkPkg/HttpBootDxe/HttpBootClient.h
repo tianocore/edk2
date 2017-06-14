@@ -1,7 +1,7 @@
 /** @file
   Declaration of the boot file download function.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
@@ -64,6 +64,8 @@ typedef struct {
   UINTN                      CopyedSize;
   UINTN                      BufferSize;
   UINT8                      *Buffer;
+
+  HTTP_BOOT_PRIVATE_DATA     *Private;
 } HTTP_BOOT_CALLBACK_DATA;
 
 /**

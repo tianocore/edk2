@@ -16,6 +16,84 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "HttpBootDxe.h"
 
 /**
+  Install HTTP Boot Callback Protocol if not installed before.
+
+  @param[in] Private           Pointer to HTTP Boot private data.
+
+  @retval EFI_SUCCESS          HTTP Boot Callback Protocol installed succesfully.
+  @retval Others               Failed to install HTTP Boot Callback Protocol.
+
+**/
+EFI_STATUS
+HttpBootInstallCallback (
+  IN HTTP_BOOT_PRIVATE_DATA           *Private
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HANDLE                  ControllerHandle;
+
+  if (!Private->UsingIpv6) {
+    ControllerHandle = Private->Ip4Nic->Controller;
+  } else {
+    ControllerHandle = Private->Ip6Nic->Controller;
+  }
+
+  //
+  // Check whether gEfiHttpBootCallbackProtocolGuid already installed.
+  //
+  Status = gBS->HandleProtocol (
+                  ControllerHandle,
+                  &gEfiHttpBootCallbackProtocolGuid,
+                  (VOID **) &Private->HttpBootCallback
+                  );
+  if (Status == EFI_UNSUPPORTED) {
+
+    CopyMem (
+      &Private->LoadFileCallback,
+      &gHttpBootDxeHttpBootCallback,
+      sizeof (EFI_HTTP_BOOT_CALLBACK_PROTOCOL)
+      );
+
+    //
+    // Install a default callback if user didn't offer one.
+    //
+    Status = gBS->InstallProtocolInterface (
+                    &ControllerHandle,
+                    &gEfiHttpBootCallbackProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &Private->LoadFileCallback
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    Private->HttpBootCallback = &Private->LoadFileCallback;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Uninstall HTTP Boot Callback Protocol if it's installed by this driver.
+
+  @param[in] Private           Pointer to HTTP Boot private data.
+
+**/
+VOID
+HttpBootUninstallCallback (
+  IN HTTP_BOOT_PRIVATE_DATA           *Private
+  )
+{
+  if (Private->HttpBootCallback == &Private->LoadFileCallback) {
+    gBS->UninstallProtocolInterface (
+          Private->Controller,
+          &gEfiHttpBootCallbackProtocolGuid,
+          &Private->HttpBootCallback
+          );
+    Private->HttpBootCallback = NULL;
+  }
+}
+
+/**
   Enable the use of UEFI HTTP boot function.
 
   If the driver has already been started but not satisfy the requirement (IP stack and 
@@ -144,6 +222,7 @@ HttpBootStart (
     }
   }
   Private->Started   = TRUE;
+  Print (L"\n>>Start HTTP Boot over IPv%d", Private->UsingIpv6 ? 6 : 4);
 
   return EFI_SUCCESS;
 }
@@ -237,7 +316,10 @@ HttpBootLoadFile (
     return EFI_NOT_STARTED;
   }
 
-  Status = EFI_DEVICE_ERROR;
+  Status = HttpBootInstallCallback (Private);
+  if (EFI_ERROR(Status)) {
+    goto ON_EXIT;
+  }
 
   if (Private->BootFileUri == NULL) {
     //
@@ -245,7 +327,7 @@ HttpBootLoadFile (
     //
     Status = HttpBootDiscoverBootInfo (Private);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto ON_EXIT;
     }
   }
 
@@ -255,7 +337,7 @@ HttpBootLoadFile (
     //
     Status = HttpBootCreateHttpIo (Private);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto ON_EXIT;
     }
   }
 
@@ -287,7 +369,7 @@ HttpBootLoadFile (
                  &Private->ImageType
                  );
       if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
-        return Status;
+        goto ON_EXIT;
       }
     }
   }
@@ -295,19 +377,24 @@ HttpBootLoadFile (
   if (*BufferSize < Private->BootFileSize) {
     *BufferSize = Private->BootFileSize;
     *ImageType = Private->ImageType;
-    return EFI_BUFFER_TOO_SMALL;
+    Status = EFI_BUFFER_TOO_SMALL;
+    goto ON_EXIT;
   }
 
   //
   // Load the boot file into Buffer
   //
-  return  HttpBootGetBootFile (
-            Private,
-            FALSE,
-            BufferSize,
-            Buffer,
-            ImageType
-            );
+  Status = HttpBootGetBootFile (
+             Private,
+             FALSE,
+             BufferSize,
+             Buffer,
+             ImageType
+             );
+  
+ON_EXIT:
+  HttpBootUninstallCallback (Private);
+  return Status;
 }
 
 /**
@@ -519,4 +606,114 @@ HttpBootDxeLoadFile (
 GLOBAL_REMOVE_IF_UNREFERENCED 
 EFI_LOAD_FILE_PROTOCOL  gHttpBootDxeLoadFile = {
   HttpBootDxeLoadFile
+};
+
+/**
+  Callback function that is invoked when the HTTP Boot driver is about to transmit or has received a
+  packet.
+
+  This function is invoked when the HTTP Boot driver is about to transmit or has received packet.
+  Parameters DataType and Received specify the type of event and the format of the buffer pointed
+  to by Data. Due to the polling nature of UEFI device drivers, this callback function should not
+  execute for more than 5 ms.
+  The returned status code determines the behavior of the HTTP Boot driver.
+
+  @param[in]  This                Pointer to the EFI_HTTP_BOOT_CALLBACK_PROTOCOL instance.
+  @param[in]  DataType            The event that occurs in the current state.
+  @param[in]  Received            TRUE if the callback is being invoked due to a receive event.
+                                  FALSE if the callback is being invoked due to a transmit event.
+  @param[in]  DataLength          The length in bytes of the buffer pointed to by Data.
+  @param[in]  Data                A pointer to the buffer of data, the data type is specified by
+                                  DataType.
+                                  
+  @retval EFI_SUCCESS             Tells the HTTP Boot driver to continue the HTTP Boot process.
+  @retval EFI_ABORTED             Tells the HTTP Boot driver to abort the current HTTP Boot process.
+**/
+EFI_STATUS
+HttpBootCallback (
+  IN EFI_HTTP_BOOT_CALLBACK_PROTOCOL     *This,
+  IN EFI_HTTP_BOOT_CALLBACK_DATA_TYPE    DataType,
+  IN BOOLEAN                             Received,
+  IN UINT32                              DataLength,
+  IN VOID                                *Data     OPTIONAL
+  )
+{
+  EFI_HTTP_MESSAGE        *HttpMessage;
+  EFI_HTTP_HEADER         *HttpHeader;
+  HTTP_BOOT_PRIVATE_DATA  *Private;
+  UINT32                  Percentage;
+
+  Private = HTTP_BOOT_PRIVATE_DATA_FROM_CALLBACK_PROTOCOL(This);
+
+  switch (DataType) {
+  case HttpBootDhcp4:
+  case HttpBootDhcp6:
+    Print (L".");
+    break;
+
+  case HttpBootHttpRequest:
+    if (Data != NULL) {
+      HttpMessage = (EFI_HTTP_MESSAGE *) Data;
+      if (HttpMessage->Data.Request->Method == HttpMethodGet &&
+          HttpMessage->Data.Request->Url != NULL) {
+        Print (L"\n  URI: %s\n", HttpMessage->Data.Request->Url);
+      }
+    }
+    break;
+
+  case HttpBootHttpResponse:
+    if (Data != NULL) {
+      HttpMessage = (EFI_HTTP_MESSAGE *) Data;
+      HttpHeader = HttpFindHeader (
+                     HttpMessage->HeaderCount,
+                     HttpMessage->Headers,
+                     HTTP_HEADER_CONTENT_LENGTH
+                     );
+      if (HttpHeader != NULL) {
+        Private->FileSize = AsciiStrDecimalToUintn (HttpHeader->FieldValue);
+        Private->ReceivedSize = 0;
+        Private->Percentage   = 0;
+      }
+    }
+    break;
+
+  case HttpBootHttpEntityBody:
+    if (DataLength != 0) {
+      if (Private->FileSize != 0) {
+        //
+        // We already know the file size, print in percentage format.
+        //
+        if (Private->ReceivedSize == 0) {
+          Print (L"  File Size: %lu\n", Private->FileSize);
+        }
+        Private->ReceivedSize += DataLength;
+        Percentage = (UINT32) DivU64x64Remainder (MultU64x32 (Private->ReceivedSize, 100), Private->FileSize, NULL);
+        if (Private->Percentage != Percentage) {
+          Private->Percentage = Percentage;
+          Print (L"\r  Downloading...%d%%", Percentage);
+        }
+      } else {
+        //
+        // In some case we couldn't get the file size from the HTTP header, so we
+        // just print the downloaded file size.
+        //
+        Private->ReceivedSize += DataLength;
+        Print (L"\r  Downloading...%lu Bytes", Private->ReceivedSize);
+      }
+    }
+    break;
+
+  default:
+    break;
+  };
+
+  return EFI_SUCCESS;
+}
+
+///
+/// HTTP Boot Callback Protocol instance
+///
+GLOBAL_REMOVE_IF_UNREFERENCED 
+EFI_HTTP_BOOT_CALLBACK_PROTOCOL  gHttpBootDxeHttpBootCallback = {
+  HttpBootCallback
 };

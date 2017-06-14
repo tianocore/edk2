@@ -1,7 +1,7 @@
 /** @file
   Functions implementation related with DHCPv6 for HTTP boot driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -431,56 +431,78 @@ HttpBootDhcp6CallBack (
   OUT EFI_DHCP6_PACKET             **NewPacket     OPTIONAL
   )
 {
-   HTTP_BOOT_PRIVATE_DATA          *Private;
-   EFI_DHCP6_PACKET                *SelectAd;
-   EFI_STATUS                      Status;
+  HTTP_BOOT_PRIVATE_DATA          *Private;
+  EFI_DHCP6_PACKET                *SelectAd;
+  EFI_STATUS                      Status;
+  BOOLEAN                         Received;
+  
+  if ((Dhcp6Event != Dhcp6SendSolicit) &&
+    (Dhcp6Event != Dhcp6RcvdAdvertise) &&
+    (Dhcp6Event != Dhcp6SendRequest) &&
+    (Dhcp6Event != Dhcp6RcvdReply) &&
+    (Dhcp6Event != Dhcp6SelectAdvertise)) {
+    return EFI_SUCCESS;
+  }
 
-   ASSERT (Packet != NULL);
+  ASSERT (Packet != NULL);
+  
+  Private     = (HTTP_BOOT_PRIVATE_DATA *) Context;
+  Status = EFI_SUCCESS;
+  if (Private->HttpBootCallback != NULL && Dhcp6Event != Dhcp6SelectAdvertise) {
+    Received = (BOOLEAN) (Dhcp6Event == Dhcp6RcvdAdvertise || Dhcp6Event == Dhcp6RcvdReply);
+    Status = Private->HttpBootCallback->Callback (
+               Private->HttpBootCallback, 
+               HttpBootDhcp6,
+               Received,
+               Packet->Length,
+               &Packet->Dhcp6
+               );
+    if (EFI_ERROR (Status)) {
+      return EFI_ABORTED;
+    }
+  }
+  switch (Dhcp6Event) {
    
-   Private     = (HTTP_BOOT_PRIVATE_DATA *) Context;
-   Status = EFI_SUCCESS;
-   switch (Dhcp6Event) {
-    
-   case Dhcp6RcvdAdvertise:
-     Status = EFI_NOT_READY;
+  case Dhcp6RcvdAdvertise:
+    Status = EFI_NOT_READY;
     if (Packet->Length > HTTP_BOOT_DHCP6_PACKET_MAX_SIZE) {
       //
       // Ignore the incoming packets which exceed the maximum length.
       //
       break;
     }
-     if (Private->OfferNum < HTTP_BOOT_OFFER_MAX_NUM) {
-       //
-       // Cache the dhcp offers to OfferBuffer[] for select later, and record
-       // the OfferIndex and OfferCount.
-       // If error happens, just ignore this packet and continue to wait more offer.
-       //
-       HttpBootCacheDhcp6Offer (Private, Packet);
-     }
-     break;
+    if (Private->OfferNum < HTTP_BOOT_OFFER_MAX_NUM) {
+      //
+      // Cache the dhcp offers to OfferBuffer[] for select later, and record
+      // the OfferIndex and OfferCount.
+      // If error happens, just ignore this packet and continue to wait more offer.
+      //
+      HttpBootCacheDhcp6Offer (Private, Packet);
+    }
+    break;
 
-   case Dhcp6SelectAdvertise:
-     //
-     // Select offer by the default policy or by order, and record the SelectIndex
-     // and SelectProxyType.
-     //
-     HttpBootSelectDhcpOffer (Private);
+  case Dhcp6SelectAdvertise:
+    //
+    // Select offer by the default policy or by order, and record the SelectIndex
+    // and SelectProxyType.
+    //
+    HttpBootSelectDhcpOffer (Private);
 
-     if (Private->SelectIndex == 0) {
-       Status = EFI_ABORTED;
-     } else {
-       ASSERT (NewPacket != NULL);
-       SelectAd   = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp6.Packet.Offer;
-       *NewPacket = AllocateZeroPool (SelectAd->Size);
-       if (*NewPacket == NULL) {
-         return EFI_OUT_OF_RESOURCES;
-       }
-       CopyMem (*NewPacket, SelectAd, SelectAd->Size);
-     }
-     break;
+    if (Private->SelectIndex == 0) {
+      Status = EFI_ABORTED;
+    } else {
+      ASSERT (NewPacket != NULL);
+      SelectAd   = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp6.Packet.Offer;
+      *NewPacket = AllocateZeroPool (SelectAd->Size);
+      if (*NewPacket == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      CopyMem (*NewPacket, SelectAd, SelectAd->Size);
+    }
+    break;
      
-   default:
-     break;
+  default:
+    break;
   }
 
   return Status;   

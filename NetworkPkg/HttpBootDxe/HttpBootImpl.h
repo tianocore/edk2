@@ -47,4 +47,6 @@ HttpBootStop (
   IN HTTP_BOOT_PRIVATE_DATA           *Private
   );
 
+extern EFI_HTTP_BOOT_CALLBACK_PROTOCOL  gHttpBootDxeHttpBootCallback;
+
 #endif

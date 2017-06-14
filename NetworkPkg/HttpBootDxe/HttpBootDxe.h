@@ -62,6 +62,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Produced Protocols
 //
 #include <Protocol/LoadFile.h>
+#include <Protocol/HttpBootCallback.h>
 
 //
 // Consumed Guids
@@ -133,6 +134,14 @@ struct _HTTP_BOOT_VIRTUAL_NIC {
   CallbackInfo, \
   HTTP_BOOT_PRIVATE_DATA_SIGNATURE \
   )
+  
+#define HTTP_BOOT_PRIVATE_DATA_FROM_CALLBACK_PROTOCOL(CallbackProtocol) \
+    CR ( \
+    CallbackProtocol, \
+    HTTP_BOOT_PRIVATE_DATA, \
+    LoadFileCallback, \
+    HTTP_BOOT_PRIVATE_DATA_SIGNATURE \
+    )
 
 struct _HTTP_BOOT_PRIVATE_DATA {
   UINT32                                    Signature;
@@ -168,6 +177,11 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   EFI_LOAD_FILE_PROTOCOL                    LoadFile;
   EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
   UINT32                                    Id;
+  EFI_HTTP_BOOT_CALLBACK_PROTOCOL           *HttpBootCallback;
+  EFI_HTTP_BOOT_CALLBACK_PROTOCOL           LoadFileCallback;
+  UINT64                                    FileSize;
+  UINT64                                    ReceivedSize;
+  UINT32                                    Percentage;
 
   //
   // HII callback info block

@@ -671,6 +671,9 @@ HttpIoNotify (
   @param[in]  Controller     The handle of the controller.
   @param[in]  IpVersion      IP_VERSION_4 or IP_VERSION_6.
   @param[in]  ConfigData     The HTTP_IO configuration data.
+  @param[in]  Callback       Callback function which will be invoked when specified
+                             HTTP_IO_CALLBACK_EVENT happened.
+  @param[in]  Context        The Context data which will be passed to the Callback function.
   @param[out] HttpIo         The HTTP_IO.
   
   @retval EFI_SUCCESS            The HTTP_IO is created and configured.
@@ -687,6 +690,8 @@ HttpIoCreateIo (
   IN EFI_HANDLE             Controller,
   IN UINT8                  IpVersion,
   IN HTTP_IO_CONFIG_DATA    *ConfigData,
+  IN HTTP_IO_CALLBACK       Callback,
+  IN VOID                   *Context,
   OUT HTTP_IO               *HttpIo
   )
 {
@@ -739,6 +744,8 @@ HttpIoCreateIo (
   HttpIo->Controller  = Controller;
   HttpIo->IpVersion   = IpVersion;
   HttpIo->Http        = Http;
+  HttpIo->Callback    = Callback;
+  HttpIo->Context     = Context;
 
   ZeroMem (&HttpConfigData, sizeof (EFI_HTTP_CONFIG_DATA));
   HttpConfigData.HttpVersion        = HttpVersion11;
@@ -908,6 +915,17 @@ HttpIoSendRequest (
   HttpIo->ReqToken.Message->BodyLength   = BodyLength;
   HttpIo->ReqToken.Message->Body         = Body;
 
+  if (HttpIo->Callback != NULL) {
+    Status = HttpIo->Callback (
+               HttpIoRequest,
+               HttpIo->ReqToken.Message,
+               HttpIo->Context
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
   //
   // Queue the request token to HTTP instances.
   //
@@ -1014,6 +1032,17 @@ HttpIoRecvResponse (
     return Status;
   } else {
     HttpIo->IsRxDone = FALSE;
+  }
+
+  if (!EFI_ERROR (HttpIo->RspToken.Status) && HttpIo->Callback != NULL) {
+    Status = HttpIo->Callback (
+               HttpIoResponse,
+               HttpIo->RspToken.Message,
+               HttpIo->Context
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   //
