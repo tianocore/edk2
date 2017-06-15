@@ -407,6 +407,9 @@ UfsInitQueryRequestUpiu (
 
   if (Opcode == UtpQueryFuncOpcodeWrDesc) {
     CopyMem (QueryReq + 1, Data, DataSize);
+
+    SwapLittleEndianToBigEndian ((UINT8*)&DataSize, sizeof (UINT16));
+    QueryReq->DataSegLen = (UINT16)DataSize;
   }
 
   return EFI_SUCCESS;
