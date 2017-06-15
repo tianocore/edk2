@@ -1,7 +1,7 @@
 /** @file
   Reset Architectural Protocol implementation
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,11 +14,6 @@
 **/
 
 #include "ResetSystem.h"
-
-//
-// The handle onto which the Reset Architectural Protocol is installed
-//
-EFI_HANDLE  mResetHandle = NULL;
 
 /**
   The driver's entry point.
@@ -40,6 +35,7 @@ InitializeResetSystem (
   )
 {
   EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   //
   // Make sure the Reset Architectural Protocol is not already installed in the system
@@ -54,8 +50,9 @@ InitializeResetSystem (
   //
   // Now install the Reset RT AP on a new handle
   //
+  Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mResetHandle,
+                  &Handle,
                   &gEfiResetArchProtocolGuid,
                   NULL,
                   NULL
