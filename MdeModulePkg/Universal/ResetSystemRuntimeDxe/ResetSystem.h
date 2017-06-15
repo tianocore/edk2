@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,7 @@
 #include <PiDxe.h>
 
 #include <Protocol/Reset.h>
+#include <Protocol/ResetNotification.h>
 #include <Guid/CapsuleVendor.h>
 
 #include <Library/BaseLib.h>
@@ -31,6 +32,24 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/ResetSystemLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/MemoryAllocationLib.h>
+
+typedef struct {
+  UINT32                   Signature;
+  LIST_ENTRY               Link;
+  EFI_RESET_SYSTEM         ResetNotify;
+} RESET_NOTIFY_ENTRY;
+#define RESET_NOTIFY_ENTRY_SIGNATURE    SIGNATURE_32('r', 's', 't', 'n')
+#define RESET_NOTIFY_ENTRY_FROM_LINK(a) CR (a, RESET_NOTIFY_ENTRY, Link, RESET_NOTIFY_ENTRY_SIGNATURE)
+
+typedef struct {
+  UINT32                          Signature;
+  EFI_RESET_NOTIFICATION_PROTOCOL ResetNotification;
+  LIST_ENTRY                      ResetNotifies;
+} RESET_NOTIFICATION_INSTANCE;
+#define RESET_NOTIFICATION_INSTANCE_SIGNATURE    SIGNATURE_32('r', 's', 't', 'i')
+#define RESET_NOTIFICATION_INSTANCE_FROM_THIS(a) \
+  CR (a, RESET_NOTIFICATION_INSTANCE, ResetNotification, RESET_NOTIFICATION_INSTANCE_SIGNATURE)
 
 /**
   The driver's entry point.

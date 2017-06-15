@@ -1,7 +1,7 @@
 ## @file
-# This driver implements Reset Architectural Protocol.
+# This driver implements Reset Architectural and Reset Notification protocols.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -48,7 +48,7 @@
   DebugLib
   BaseLib
   ReportStatusCodeLib
-
+  MemoryAllocationLib
 
 [Guids]
   gEfiCapsuleVendorGuid                         ## SOMETIMES_CONSUMES   ## Variable:L"CapsuleUpdateData"
@@ -56,6 +56,7 @@
 
 [Protocols]
   gEfiResetArchProtocolGuid                     ## PRODUCES
+  gEfiResetNotificationProtocolGuid             ## PRODUCES
 
 
 [Depex]

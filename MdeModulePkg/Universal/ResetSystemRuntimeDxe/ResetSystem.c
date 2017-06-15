@@ -1,5 +1,5 @@
 /** @file
-  Reset Architectural Protocol implementation
+  Reset Architectural and Reset Notification protocols implementation.
 
   Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
@@ -14,6 +14,121 @@
 **/
 
 #include "ResetSystem.h"
+
+/**
+  Register a notification function to be called when ResetSystem() is called.
+
+  The RegisterResetNotify() function registers a notification function that is called when
+  ResetSystem()is called and prior to completing the reset of the platform.
+  The registered functions must not perform a platform reset themselves. These
+  notifications are intended only for the notification of components which may need some
+  special-purpose maintenance prior to the platform resetting.
+  The list of registered reset notification functions are processed if ResetSystem()is called
+  before ExitBootServices(). The list of registered reset notification functions is ignored if
+  ResetSystem()is called after ExitBootServices().
+
+  @param[in]  This              A pointer to the EFI_RESET_NOTIFICATION_PROTOCOL instance.
+  @param[in]  ResetFunction     Points to the function to be called when a ResetSystem() is executed.
+
+  @retval EFI_SUCCESS           The reset notification function was successfully registered.
+  @retval EFI_INVALID_PARAMETER ResetFunction is NULL.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to register the reset notification function.
+  @retval EFI_ALREADY_STARTED   The reset notification function specified by ResetFunction has already been registered.
+
+**/
+EFI_STATUS
+EFIAPI
+RegisterResetNotify (
+  IN EFI_RESET_NOTIFICATION_PROTOCOL *This,
+  IN EFI_RESET_SYSTEM                ResetFunction
+  )
+{
+  RESET_NOTIFICATION_INSTANCE        *Instance;
+  LIST_ENTRY                         *Link;
+  RESET_NOTIFY_ENTRY                 *Entry;
+
+  if (ResetFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = RESET_NOTIFICATION_INSTANCE_FROM_THIS (This);
+
+  for ( Link = GetFirstNode (&Instance->ResetNotifies)
+      ; !IsNull (&Instance->ResetNotifies, Link)
+      ; Link = GetNextNode (&Instance->ResetNotifies, Link)
+      ) {
+    Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+    if (Entry->ResetNotify == ResetFunction) {
+      return EFI_ALREADY_STARTED;
+    }
+  }
+
+  ASSERT (IsNull (&Instance->ResetNotifies, Link));
+  Entry = AllocatePool (sizeof (*Entry));
+  if (Entry == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  Entry->Signature   = RESET_NOTIFY_ENTRY_SIGNATURE;
+  Entry->ResetNotify = ResetFunction;
+  InsertTailList (&Instance->ResetNotifies, &Entry->Link);
+  return EFI_SUCCESS;
+}
+
+/**
+  Unregister a notification function.
+
+  The UnregisterResetNotify() function removes the previously registered
+  notification using RegisterResetNotify().
+
+  @param[in]  This              A pointer to the EFI_RESET_NOTIFICATION_PROTOCOL instance.
+  @param[in]  ResetFunction     The pointer to the ResetFunction being unregistered.
+
+  @retval EFI_SUCCESS           The reset notification function was unregistered.
+  @retval EFI_INVALID_PARAMETER ResetFunction is NULL.
+  @retval EFI_INVALID_PARAMETER The reset notification function specified by ResetFunction was not previously
+                                registered using RegisterResetNotify().
+
+**/
+EFI_STATUS
+EFIAPI
+UnregisterResetNotify (
+  IN EFI_RESET_NOTIFICATION_PROTOCOL *This,
+  IN EFI_RESET_SYSTEM                ResetFunction
+  )
+{
+  RESET_NOTIFICATION_INSTANCE        *Instance;
+  LIST_ENTRY                         *Link;
+  RESET_NOTIFY_ENTRY                 *Entry;
+
+  if (ResetFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Instance = RESET_NOTIFICATION_INSTANCE_FROM_THIS (This);
+
+  for ( Link = GetFirstNode (&Instance->ResetNotifies)
+      ; !IsNull (&Instance->ResetNotifies, Link)
+      ; Link = GetNextNode (&Instance->ResetNotifies, Link)
+      ) {
+    Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+    if (Entry->ResetNotify == ResetFunction) {
+      RemoveEntryList (&Entry->Link);
+      FreePool (Entry);
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_INVALID_PARAMETER;
+}
+
+RESET_NOTIFICATION_INSTANCE mResetNotification = {
+  RESET_NOTIFICATION_INSTANCE_SIGNATURE,
+  {
+    RegisterResetNotify,
+    UnregisterResetNotify
+  },
+  INITIALIZE_LIST_HEAD_VARIABLE (mResetNotification.ResetNotifies)
+};
 
 /**
   The driver's entry point.
@@ -53,8 +168,8 @@ InitializeResetSystem (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiResetArchProtocolGuid,
-                  NULL,
+                  &gEfiResetArchProtocolGuid,         NULL,
+                  &gEfiResetNotificationProtocolGuid, &mResetNotification.ResetNotification,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -102,14 +217,26 @@ ResetSystem (
   IN VOID             *ResetData OPTIONAL
   )
 {
-  EFI_STATUS    Status;
-  UINTN         Size;
-  UINTN         CapsuleDataPtr;
+  EFI_STATUS          Status;
+  UINTN               Size;
+  UINTN               CapsuleDataPtr;
+  LIST_ENTRY          *Link;
+  RESET_NOTIFY_ENTRY  *Entry;
   
   //
   // Indicate reset system runtime service is called.
   //
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_RESET_SYSTEM));
+
+  if (!EfiAtRuntime ()) {
+    for ( Link = GetFirstNode (&mResetNotification.ResetNotifies)
+        ; !IsNull (&mResetNotification.ResetNotifies, Link)
+        ; Link = GetNextNode (&mResetNotification.ResetNotifies, Link)
+        ) {
+      Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+      Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
+    }
+  }
 
   switch (ResetType) {
   case EfiResetWarm:
