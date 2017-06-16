@@ -2,7 +2,7 @@
   Provides library functions for each of the UEFI Runtime Services.
   Only available to DXE and UEFI module types.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -329,9 +329,8 @@ EfiGetNextHighMonotonicCount (
                       Null-terminated Unicode string, optionally followed by additional binary data. The string is a
                       description that the caller may use to further indicate the reason for the system reset. ResetData
                       is only valid if ResetStatus is something other then EFI_SUCCESS. This pointer must be a physical
-                      address. For a ResetType of EfiRestUpdate the data buffer also starts with a Null-terminated string
-                      that is followed by a physical VOID * to an EFI_CAPSULE_HEADER.
-
+                      address. For a ResetType of EfiResetPlatformSpecific the data buffer also starts with a Null-terminated
+                      string that is followed by an EFI_GUID that describes the specific type of reset to perform.
 **/
 VOID
 EFIAPI
