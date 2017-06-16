@@ -18,15 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/HiiImage.h>
 
-
-//
-// In UEFI 2.6 spec,this guid value is duplicate with
-// EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_GUID. Now update this guid value to
-// avoid the duplicate guid issue. So its value is not consistent with
-// UEFI spec definition now. We have proposed to update UEFI spec to
-// use this new guid. After new spec released, we will remove this
-// comments.
-//
 #define EFI_HII_IMAGE_DECODER_PROTOCOL_GUID \
   {0x9e66f251, 0x727c, 0x418c, { 0xbf, 0xd6, 0xc2, 0xb4, 0x25, 0x28, 0x18, 0xea }}
 
