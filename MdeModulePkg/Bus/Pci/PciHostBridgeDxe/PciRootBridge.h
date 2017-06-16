@@ -2,7 +2,7 @@
 
   The PCI Root Bridge header file.
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -554,10 +554,10 @@ RootBridgeIoSetAttributes (
 /**
 
   Retrieves the current resource settings of this PCI root bridge
-  in the form of a set of ACPI 2.0 resource descriptor.
+  in the form of a set of ACPI resource descriptor.
 
   @param This       -  Pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL instance.
-  @param Resources  -  Pointer to the ACPI 2.0 resource descriptor that
+  @param Resources  -  Pointer to the resource descriptor that
                        describe the current configuration of this PCI root
                        bridge.
 

@@ -1560,20 +1560,19 @@ RootBridgeIoSetAttributes (
 
 /**
   Retrieves the current resource settings of this PCI root bridge in the form
-  of a set of ACPI 2.0 resource descriptors.
+  of a set of ACPI resource descriptors.
 
   There are only two resource descriptor types from the ACPI Specification that
   may be used to describe the current resources allocated to a PCI root bridge.
-  These are the QWORD Address Space Descriptor (ACPI 2.0 Section 6.4.3.5.1),
-  and the End Tag (ACPI 2.0 Section 6.4.2.8). The QWORD Address Space
-  Descriptor can describe memory, I/O, and bus number ranges for dynamic or
-  fixed resources. The configuration of a PCI root bridge is described with one
-  or more QWORD Address Space Descriptors followed by an End Tag.
+  These are the QWORD Address Space Descriptor, and the End Tag. The QWORD
+  Address Space Descriptor can describe memory, I/O, and bus number ranges for
+  dynamic or fixed resources. The configuration of a PCI root bridge is described
+  with one or more QWORD Address Space Descriptors followed by an End Tag.
 
   @param[in]   This        A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param[out]  Resources   A pointer to the ACPI 2.0 resource descriptors that
+  @param[out]  Resources   A pointer to the resource descriptors that
                            describe the current configuration of this PCI root
-                           bridge. The storage for the ACPI 2.0 resource
+                           bridge. The storage for the resource
                            descriptors is allocated by this function. The
                            caller must treat the return buffer as read-only
                            data, and the buffer must not be freed by the
