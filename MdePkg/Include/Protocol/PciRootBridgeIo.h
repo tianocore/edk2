@@ -5,7 +5,7 @@
   and PCI Configuration cycles on a PCI Root Bridge. It also provides services to perform 
   defferent types of bus mastering DMA.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -387,18 +387,18 @@ EFI_STATUS
   );
 
 /**                                                                 
-  Retrieves the current resource settings of this PCI root bridge in the form of a set of ACPI 2.0
-  resource descriptors.                                                                           
+  Retrieves the current resource settings of this PCI root bridge in the form of a set of ACPI
+  resource descriptors.
             
   @param  This                  A pointer to the EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL.
-  @param  Resources             A pointer to the ACPI 2.0 resource descriptors that describe the current
-                                configuration of this PCI root bridge.                                  
-                                
+  @param  Resources             A pointer to the resource descriptors that describe the current
+                                configuration of this PCI root bridge.
+
   @retval EFI_SUCCESS           The current configuration of this PCI root bridge was returned in
-                                Resources.                                                                                                                       
+                                Resources.
   @retval EFI_UNSUPPORTED       The current configuration of this PCI root bridge could not be
-                                retrieved.                                                                          
-                                       
+                                retrieved.
+
 **/
 typedef
 EFI_STATUS

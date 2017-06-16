@@ -2,7 +2,7 @@
   EFI PCI I/O Protocol provides the basic Memory, I/O, PCI configuration, 
   and DMA interfaces that a driver uses to access its PCI controller.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -448,27 +448,26 @@ EFI_STATUS
   OUT UINT64                                   *Result OPTIONAL
   );
 
-/**                                                                 
+/**
   Gets the attributes that this PCI controller supports setting on a BAR using
   SetBarAttributes(), and retrieves the list of resource descriptors for a BAR.
-            
-  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.  
+
+  @param  This                  A pointer to the EFI_PCI_IO_PROTOCOL instance.
   @param  BarIndex              The BAR index of the standard PCI Configuration header to use as the
                                 base address for resource range. The legal range for this field is 0..5.
   @param  Supports              A pointer to the mask of attributes that this PCI controller supports
-                                setting for this BAR with SetBarAttributes().                        
-  @param  Resources             A pointer to the ACPI 2.0 resource descriptors that describe the current
-                                configuration of this BAR of the PCI controller.                        
+                                setting for this BAR with SetBarAttributes().
+  @param  Resources             A pointer to the resource descriptors that describe the current
+                                configuration of this BAR of the PCI controller.
                                   
-  @retval EFI_SUCCESS           If Supports is not NULL, then the attributes that the PCI       
-                                controller supports are returned in Supports. If Resources      
-                                is not NULL, then the ACPI 2.0 resource descriptors that the PCI
-                                controller is currently using are returned in Resources.          
+  @retval EFI_SUCCESS           If Supports is not NULL, then the attributes that the PCI
+                                controller supports are returned in Supports. If Resources
+                                is not NULL, then the resource descriptors that the PCI
+                                controller is currently using are returned in Resources.
   @retval EFI_INVALID_PARAMETER Both Supports and Attributes are NULL.
   @retval EFI_UNSUPPORTED       BarIndex not valid for this PCI controller.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to allocate
-                                Resources.                                                 
-                                
+                                Resources.
 **/
 typedef
 EFI_STATUS
