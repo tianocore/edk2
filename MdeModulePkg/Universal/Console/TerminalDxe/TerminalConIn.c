@@ -310,11 +310,14 @@ TerminalConInSetState (
   Register a notification function for a particular keystroke for the input device.
 
   @param  This                     Protocol instance pointer.
-  @param  KeyData                  A pointer to a buffer that is filled in with the
-                                   keystroke information data for the key that was
-                                   pressed.
+  @param  KeyData                  A pointer to a buffer that is filled in with
+                                   the keystroke information for the key that was
+                                   pressed. If KeyData.Key, KeyData.KeyState.KeyToggleState
+                                   and KeyData.KeyState.KeyShiftState are 0, then any incomplete
+                                   keystroke will trigger a notification of the KeyNotificationFunction.
   @param  KeyNotificationFunction  Points to the function to be called when the key
-                                   sequence is typed specified by KeyData.
+                                   sequence is typed specified by KeyData. This notification function
+                                   should be called at <=TPL_CALLBACK.
   @param  NotifyHandle             Points to the unique handle assigned to the
                                    registered notification.
 
