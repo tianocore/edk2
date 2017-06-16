@@ -2313,17 +2313,20 @@ Exit:
 
   @param  This                    Protocol instance pointer.
   @param  KeyData                 A pointer to a buffer that is filled in with the keystroke 
-                                  information data for the key that was pressed.
+                                  information data for the key that was pressed. If KeyData.Key,
+                                  KeyData.KeyState.KeyToggleState and KeyData.KeyState.KeyShiftState
+                                  are 0, then any incomplete keystroke will trigger a notification of
+                                  the KeyNotificationFunction.
   @param  KeyNotificationFunction Points to the function to be called when the key 
-                                  sequence is typed specified by KeyData.                        
-  @param  NotifyHandle            Points to the unique handle assigned to the registered notification.                          
+                                  sequence is typed specified by KeyData. This notification function
+                                  should be called at <=TPL_CALLBACK.
+  @param  NotifyHandle            Points to the unique handle assigned to the registered notification.
 
-  
   @retval EFI_SUCCESS             The notification function was registered successfully.
   @retval EFI_OUT_OF_RESOURCES    Unable to allocate resources for necesssary data structures.
   @retval EFI_INVALID_PARAMETER   KeyData or NotifyHandle is NULL.
-                                                  
-**/   
+
+**/
 EFI_STATUS
 EFIAPI
 BiosKeyboardRegisterKeyNotify (
