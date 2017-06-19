@@ -1,5 +1,5 @@
 /** @file
-  EFI Bluetooth Configuration Protocol as defined in UEFI 2.5.
+  EFI Bluetooth Configuration Protocol as defined in UEFI 2.7.
   This protocol abstracts user interface configuration for Bluetooth device.
 
   Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
@@ -12,7 +12,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:          
-  This Protocol is introduced in UEFI Specification 2.5
+  This Protocol is introduced in UEFI Specification 2.7
 
 **/
 
@@ -273,11 +273,11 @@ EFI_STATUS
   @retval EFI_SUCCESS           The Bluetooth configuration data is returned successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
                                 - DataSize is NULL.
-                                - *DataSize is 0.
-                                - Data is NULL.
+                                - *DataSize is not 0 and Data is NULL.
   @retval EFI_UNSUPPORTED       The DataType is unsupported.
   @retval EFI_NOT_FOUND         The DataType is not found.
   @retval EFI_BUFFER_TOO_SMALL  The buffer is too small to hold the buffer.
+                                *DataSize has been updated with the size needed to complete the request.
 
 **/
 typedef 
@@ -327,11 +327,11 @@ EFI_STATUS
   @retval EFI_SUCCESS           The remote Bluetooth device configuration data is returned successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
                                 - DataSize is NULL.
-                                - *DataSize is 0.
-                                - Data is NULL.
+                                - *DataSize is not 0 and Data is NULL.
   @retval EFI_UNSUPPORTED       The DataType is unsupported.
   @retval EFI_NOT_FOUND         The DataType is not found.
   @retval EFI_BUFFER_TOO_SMALL  The buffer is too small to hold the buffer.
+                                *DataSize has been updated with the size needed to complete the request.
 
 **/
 typedef 
