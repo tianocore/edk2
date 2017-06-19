@@ -1,7 +1,7 @@
 ## @file
 # Description file for the Universal Flash Storage (UFS) Pass Thru driver.
 #
-# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -34,6 +34,7 @@
 
 [Sources]
   ComponentName.c
+  UfsDevConfigProtocol.c
   UfsPassThru.c
   UfsPassThru.h
   UfsPassThruHci.c
@@ -56,6 +57,7 @@
 
 [Protocols]
   gEfiExtScsiPassThruProtocolGuid               ## BY_START
+  gEfiUfsDeviceConfigProtocolGuid               ## BY_START
   gEdkiiUfsHostControllerProtocolGuid           ## TO_START
 
 [UserExtensions.TianoCore."ExtraFiles"]

@@ -34,6 +34,11 @@ UFS_PASS_THRU_PRIVATE_DATA gUfsPassThruTemplate = {
     UfsPassThruResetTargetLun,
     UfsPassThruGetNextTarget
   },
+  {                               // UfsDevConfig
+    UfsRwUfsDescriptor,
+    UfsRwUfsFlag,
+    UfsRwUfsAttribute
+  },
   0,                              // UfsHostController
   0,                              // UfsHcBase
   0,                              // Capabilities
@@ -820,6 +825,7 @@ UfsPassThruDriverBindingStart (
   UINTN                                 UfsHcBase;
   UINT32                                Index;
   UFS_UNIT_DESC                         UnitDescriptor;
+  UINT32                                UnitDescriptorSize;
 
   Status    = EFI_SUCCESS;
   UfsHc     = NULL;
@@ -896,8 +902,9 @@ UfsPassThruDriverBindingStart (
   // Check if 8 common luns are active and set corresponding bit mask.
   // TODO: Parse device descriptor to decide if exposing RPMB LUN to upper layer for authentication access.
   //
+  UnitDescriptorSize = sizeof (UFS_UNIT_DESC);
   for (Index = 0; Index < 8; Index++) {
-    Status = UfsRwDeviceDesc (Private, TRUE, UfsUnitDesc, (UINT8) Index, 0, &UnitDescriptor, sizeof (UFS_UNIT_DESC));
+    Status = UfsRwDeviceDesc (Private, TRUE, UfsUnitDesc, (UINT8) Index, 0, &UnitDescriptor, &UnitDescriptorSize);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failed to read unit descriptor, index = %X, status = %r\n", Index, Status));
       continue;
@@ -933,11 +940,13 @@ UfsPassThruDriverBindingStart (
     goto Error;
   }
 
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &Controller,
                   &gEfiExtScsiPassThruProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &(Private->ExtScsiPassThru)
+                  &(Private->ExtScsiPassThru),
+                  &gEfiUfsDeviceConfigProtocolGuid,
+                  &(Private->UfsDevConfig),
+                  NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -1057,10 +1066,13 @@ UfsPassThruDriverBindingStop (
     }
   }
 
-  Status = gBS->UninstallProtocolInterface (
+  Status = gBS->UninstallMultipleProtocolInterfaces (
                   Controller,
                   &gEfiExtScsiPassThruProtocolGuid,
-                  &(Private->ExtScsiPassThru)
+                  &(Private->ExtScsiPassThru),
+                  &gEfiUfsDeviceConfigProtocolGuid,
+                  &(Private->UfsDevConfig),
+                  NULL
                   );
 
   if (EFI_ERROR (Status)) {

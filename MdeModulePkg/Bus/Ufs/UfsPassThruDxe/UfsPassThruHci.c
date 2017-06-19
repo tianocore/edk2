@@ -909,6 +909,8 @@ UfsGetReturnDataFromQueryResponse (
   @param[in] Packet  Pointer to the UFS_DEVICE_MANAGEMENT_REQUEST_PACKET.
 
   @retval EFI_SUCCESS           The device descriptor was read/written successfully.
+  @retval EFI_INVALID_PARAMETER The DescId, Index and Selector fields in Packet are invalid
+                                combination to point to a type of UFS device descriptor.
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the device descriptor.
   @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the device descriptor.
 
@@ -967,7 +969,14 @@ UfsSendDmRequestRetry (
   if (Trd->Ocs != 0 || QueryResp->QueryResp != UfsUtpQueryResponseSuccess) {
     DEBUG ((DEBUG_ERROR, "Failed to send query request, OCS = %X, QueryResp = %X\n", Trd->Ocs, QueryResp->QueryResp));
     DumpQueryResponseResult (QueryResp->QueryResp);
-    Status = EFI_DEVICE_ERROR;
+
+    if ((QueryResp->QueryResp == UfsUtpQueryResponseInvalidSelector) ||
+        (QueryResp->QueryResp == UfsUtpQueryResponseInvalidIndex) ||
+        (QueryResp->QueryResp == UfsUtpQueryResponseInvalidIdn)) {
+      Status = EFI_INVALID_PARAMETER;
+    } else {
+      Status = EFI_DEVICE_ERROR;
+    }
     goto Exit;
   }
 
@@ -999,6 +1008,8 @@ Exit:
   @param[in] Packet  Pointer to the UFS_DEVICE_MANAGEMENT_PACKET.
 
   @retval EFI_SUCCESS           The device responded correctly to the Query request.
+  @retval EFI_INVALID_PARAMETER The DescId, Index and Selector fields in Packet are invalid
+                                combination to point to a type of UFS device descriptor.
   @retval EFI_DEVICE_ERROR      A device error occurred while waiting for the response from the device.
   @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of the operation.
 
@@ -1034,9 +1045,13 @@ UfsSendDmRequest (
   @param[in]      Index         The Index of device descriptor.
   @param[in]      Selector      The Selector of device descriptor.
   @param[in, out] Descriptor    The buffer of device descriptor to be read or written.
-  @param[in]      DescSize      The size of device descriptor buffer.
+  @param[in, out] DescSize      The size of device descriptor buffer. On input, the size, in bytes,
+                                of the data buffer specified by Descriptor. On output, the number
+                                of bytes that were actually transferred.
 
   @retval EFI_SUCCESS           The device descriptor was read/written successfully.
+  @retval EFI_INVALID_PARAMETER DescId, Index and Selector are invalid combination to point to a
+                                type of UFS device descriptor.
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the device descriptor.
   @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the device descriptor.
 
@@ -1049,10 +1064,15 @@ UfsRwDeviceDesc (
   IN     UINT8                        Index,
   IN     UINT8                        Selector,
   IN OUT VOID                         *Descriptor,
-  IN     UINT32                       DescSize
+  IN OUT UINT32                       *DescSize
   )
 {
   UFS_DEVICE_MANAGEMENT_REQUEST_PACKET Packet;
+  EFI_STATUS                           Status;
+
+  if (DescSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   ZeroMem (&Packet, sizeof (UFS_DEVICE_MANAGEMENT_REQUEST_PACKET));
 
@@ -1064,13 +1084,20 @@ UfsRwDeviceDesc (
     Packet.Opcode            = UtpQueryFuncOpcodeWrDesc;
   }
   Packet.DataBuffer          = Descriptor;
-  Packet.TransferLength      = DescSize;
+  Packet.TransferLength      = *DescSize;
   Packet.DescId              = DescId;
   Packet.Index               = Index;
   Packet.Selector            = Selector;
   Packet.Timeout             = UFS_TIMEOUT;
 
-  return UfsSendDmRequest (Private, &Packet);
+  Status = UfsSendDmRequest (Private, &Packet);
+  if (EFI_ERROR (Status)) {
+    *DescSize = 0;
+  } else {
+    *DescSize = Packet.TransferLength;
+  }
+
+  return Status;
 }
 
 /**
@@ -1084,6 +1111,8 @@ UfsRwDeviceDesc (
   @param[in, out] Attributes    The value of Attribute to be read or written.
 
   @retval EFI_SUCCESS           The Attribute was read/written successfully.
+  @retval EFI_INVALID_PARAMETER AttrId, Index and Selector are invalid combination to point to a
+                                type of UFS device descriptor.
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the Attribute.
   @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the Attribute.
 
@@ -1127,6 +1156,7 @@ UfsRwAttributes (
   @param[in, out] Value         The value to set or clear flag.
 
   @retval EFI_SUCCESS           The flag was read/written successfully.
+  @retval EFI_INVALID_PARAMETER FlagId is an invalid UFS flag ID.
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the flag.
   @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the flag.
 
