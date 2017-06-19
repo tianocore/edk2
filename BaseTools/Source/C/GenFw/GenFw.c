@@ -2770,6 +2770,7 @@ Returns:
 {
   UINT32                           Index;
   UINT32                           DebugDirectoryEntryRva;
+  UINT32                           DebugDirectoryEntrySize;
   UINT32                           DebugDirectoryEntryFileOffset;
   UINT32                           ExportDirectoryEntryRva;
   UINT32                           ExportDirectoryEntryFileOffset;
@@ -2781,12 +2782,14 @@ Returns:
   EFI_IMAGE_OPTIONAL_HEADER64     *Optional64Hdr;
   EFI_IMAGE_SECTION_HEADER        *SectionHeader;
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *DebugEntry;
+  EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY *RsdsEntry;
   UINT32                          *NewTimeStamp;  
 
   //
   // Init variable.
   //
   DebugDirectoryEntryRva           = 0;
+  DebugDirectoryEntrySize          = 0;
   ExportDirectoryEntryRva          = 0;
   ResourceDirectoryEntryRva        = 0;
   DebugDirectoryEntryFileOffset    = 0;
@@ -2822,6 +2825,7 @@ Returns:
     if (Optional32Hdr->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_DEBUG && \
         Optional32Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size != 0) {
       DebugDirectoryEntryRva = Optional32Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress;
+      DebugDirectoryEntrySize = Optional32Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size;
       if (ZeroDebugFlag) {
         Optional32Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = 0;
         Optional32Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = 0;
@@ -2841,6 +2845,7 @@ Returns:
     if (Optional64Hdr->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_DEBUG && \
         Optional64Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size != 0) {
       DebugDirectoryEntryRva = Optional64Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress;
+      DebugDirectoryEntrySize = Optional64Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size;
       if (ZeroDebugFlag) {
         Optional64Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = 0;
         Optional64Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress = 0;
@@ -2886,11 +2891,23 @@ Returns:
 
   if (DebugDirectoryEntryFileOffset != 0) {
     DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) (FileBuffer + DebugDirectoryEntryFileOffset);
-    DebugEntry->TimeDateStamp = 0;
-    mImageTimeStamp = 0;
-    if (ZeroDebugFlag) {
-      memset (FileBuffer + DebugEntry->FileOffset, 0, DebugEntry->SizeOfData);
-      memset (DebugEntry, 0, sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
+    Index = 0;
+    for (Index=0; Index < DebugDirectoryEntrySize / sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY); Index ++, DebugEntry ++) {
+      DebugEntry->TimeDateStamp = 0;
+      if (ZeroDebugFlag || DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
+        memset (FileBuffer + DebugEntry->FileOffset, 0, DebugEntry->SizeOfData);
+        memset (DebugEntry, 0, sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
+      }
+      if (DebugEntry->Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
+        RsdsEntry = (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY *) (FileBuffer + DebugEntry->FileOffset);
+        if (RsdsEntry->Signature == CODEVIEW_SIGNATURE_RSDS) {
+          RsdsEntry->Unknown  = 0;
+          RsdsEntry->Unknown2 = 0;
+          RsdsEntry->Unknown3 = 0;
+          RsdsEntry->Unknown4 = 0;
+          RsdsEntry->Unknown5 = 0;
+        }
+      }
     }
   }
 
