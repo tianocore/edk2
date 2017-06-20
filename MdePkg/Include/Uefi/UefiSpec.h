@@ -1575,6 +1575,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         No protocol instances were found that match Protocol and
                                 Registration.
   @retval EFI_INVALID_PARAMETER Interface is NULL.
+                                Protocol is NULL.
 
 **/
 typedef
