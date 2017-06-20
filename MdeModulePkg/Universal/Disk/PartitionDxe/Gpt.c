@@ -13,7 +13,7 @@
   PartitionValidGptTable(), PartitionCheckGptEntry() routine will accept disk
   partition content and validate the GPT table and GPT entry.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -205,19 +205,20 @@ PartitionInstallGptChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  EFI_STATUS                  Status;
-  UINT32                      BlockSize;
-  EFI_LBA                     LastBlock;
-  MASTER_BOOT_RECORD          *ProtectiveMbr;
-  EFI_PARTITION_TABLE_HEADER  *PrimaryHeader;
-  EFI_PARTITION_TABLE_HEADER  *BackupHeader;
-  EFI_PARTITION_ENTRY         *PartEntry;
-  EFI_PARTITION_ENTRY         *Entry;
-  EFI_PARTITION_ENTRY_STATUS  *PEntryStatus;
-  UINTN                       Index;
-  EFI_STATUS                  GptValidStatus;
-  HARDDRIVE_DEVICE_PATH       HdDev;
-  UINT32                      MediaId;
+  EFI_STATUS                   Status;
+  UINT32                       BlockSize;
+  EFI_LBA                      LastBlock;
+  MASTER_BOOT_RECORD           *ProtectiveMbr;
+  EFI_PARTITION_TABLE_HEADER   *PrimaryHeader;
+  EFI_PARTITION_TABLE_HEADER   *BackupHeader;
+  EFI_PARTITION_ENTRY          *PartEntry;
+  EFI_PARTITION_ENTRY          *Entry;
+  EFI_PARTITION_ENTRY_STATUS   *PEntryStatus;
+  UINTN                        Index;
+  EFI_STATUS                   GptValidStatus;
+  HARDDRIVE_DEVICE_PATH        HdDev;
+  UINT32                       MediaId;
+  EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   ProtectiveMbr = NULL;
   PrimaryHeader = NULL;
@@ -380,16 +381,24 @@ PartitionInstallGptChildHandles (
     }
 
     ZeroMem (&HdDev, sizeof (HdDev));
-    HdDev.Header.Type     = MEDIA_DEVICE_PATH;
-    HdDev.Header.SubType  = MEDIA_HARDDRIVE_DP;
+    HdDev.Header.Type      = MEDIA_DEVICE_PATH;
+    HdDev.Header.SubType   = MEDIA_HARDDRIVE_DP;
     SetDevicePathNodeLength (&HdDev.Header, sizeof (HdDev));
 
-    HdDev.PartitionNumber = (UINT32) Index + 1;
-    HdDev.MBRType         = MBR_TYPE_EFI_PARTITION_TABLE_HEADER;
-    HdDev.SignatureType   = SIGNATURE_TYPE_GUID;
-    HdDev.PartitionStart  = Entry->StartingLBA;
-    HdDev.PartitionSize   = Entry->EndingLBA - Entry->StartingLBA + 1;
+    HdDev.PartitionNumber  = (UINT32) Index + 1;
+    HdDev.MBRType          = MBR_TYPE_EFI_PARTITION_TABLE_HEADER;
+    HdDev.SignatureType    = SIGNATURE_TYPE_GUID;
+    HdDev.PartitionStart   = Entry->StartingLBA;
+    HdDev.PartitionSize    = Entry->EndingLBA - Entry->StartingLBA + 1;
     CopyMem (HdDev.Signature, &Entry->UniquePartitionGUID, sizeof (EFI_GUID));
+
+    ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+    PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+    PartitionInfo.Type     = PARTITION_TYPE_GPT;
+    if (CompareGuid (&Entry->PartitionTypeGUID, &gEfiPartTypeSystemPartGuid)) {
+      PartitionInfo.System = 1;
+    }
+    CopyMem (&PartitionInfo.Info.Gpt, Entry, sizeof (EFI_PARTITION_ENTRY));
 
     DEBUG ((EFI_D_INFO, " Index : %d\n", (UINT32) Index));
     DEBUG ((EFI_D_INFO, " Start LBA : %lx\n", (UINT64) HdDev.PartitionStart));
@@ -407,10 +416,10 @@ PartitionInstallGptChildHandles (
                BlockIo2,
                DevicePath,
                (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+               &PartitionInfo,
                Entry->StartingLBA,
                Entry->EndingLBA,
-               BlockSize,
-               CompareGuid(&Entry->PartitionTypeGUID, &gEfiPartTypeSystemPartGuid)
+               BlockSize
                );
   }
 

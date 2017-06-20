@@ -12,7 +12,7 @@
         the legacy boot strap code.
 
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -129,18 +129,19 @@ PartitionInstallMbrChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  EFI_STATUS                Status;
-  MASTER_BOOT_RECORD        *Mbr;
-  UINT32                    ExtMbrStartingLba;
-  UINT32                    Index;
-  HARDDRIVE_DEVICE_PATH     HdDev;
-  HARDDRIVE_DEVICE_PATH     ParentHdDev;
-  EFI_STATUS                Found;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
-  EFI_DEVICE_PATH_PROTOCOL  *LastDevicePathNode;
-  UINT32                    BlockSize;
-  UINT32                    MediaId;
-  EFI_LBA                   LastBlock;
+  EFI_STATUS                   Status;
+  MASTER_BOOT_RECORD           *Mbr;
+  UINT32                       ExtMbrStartingLba;
+  UINT32                       Index;
+  HARDDRIVE_DEVICE_PATH        HdDev;
+  HARDDRIVE_DEVICE_PATH        ParentHdDev;
+  EFI_STATUS                   Found;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL     *LastDevicePathNode;
+  UINT32                       BlockSize;
+  UINT32                       MediaId;
+  EFI_LBA                      LastBlock;
+  EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   Found           = EFI_NOT_FOUND;
 
@@ -225,6 +226,14 @@ PartitionInstallMbrChildHandles (
       HdDev.PartitionSize   = UNPACK_UINT32 (Mbr->Partition[Index].SizeInLBA);
       CopyMem (HdDev.Signature, &(Mbr->UniqueMbrSignature[0]), sizeof (Mbr->UniqueMbrSignature));
 
+      ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+      PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+      PartitionInfo.Type     = PARTITION_TYPE_MBR;
+      if (Mbr->Partition[Index].OSIndicator == EFI_PARTITION) {
+        PartitionInfo.System = 1;
+      }
+      CopyMem (&PartitionInfo.Info.Mbr, &Mbr->Partition[Index], sizeof (MBR_PARTITION_RECORD));
+
       Status = PartitionInstallChildHandle (
                 This,
                 Handle,
@@ -234,10 +243,10 @@ PartitionInstallMbrChildHandles (
                 BlockIo2,
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+                &PartitionInfo,
                 HdDev.PartitionStart,
                 HdDev.PartitionStart + HdDev.PartitionSize - 1,
-                MBR_SIZE,
-                (BOOLEAN) (Mbr->Partition[Index].OSIndicator == EFI_PARTITION)
+                MBR_SIZE
                 );
 
       if (!EFI_ERROR (Status)) {
@@ -288,6 +297,14 @@ PartitionInstallMbrChildHandles (
       //
       *((UINT32 *) &HdDev.Signature[0]) = 0;
 
+      ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+      PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+      PartitionInfo.Type     = PARTITION_TYPE_MBR;
+      if (Mbr->Partition[0].OSIndicator == EFI_PARTITION) {
+        PartitionInfo.System = 1;
+      }
+      CopyMem (&PartitionInfo.Info.Mbr, &Mbr->Partition[0], sizeof (MBR_PARTITION_RECORD));
+
       Status = PartitionInstallChildHandle (
                  This,
                  Handle,
@@ -297,10 +314,10 @@ PartitionInstallMbrChildHandles (
                  BlockIo2,
                  DevicePath,
                  (EFI_DEVICE_PATH_PROTOCOL *) &HdDev,
+                 &PartitionInfo,
                  HdDev.PartitionStart - ParentHdDev.PartitionStart,
                  HdDev.PartitionStart - ParentHdDev.PartitionStart + HdDev.PartitionSize - 1,
-                 MBR_SIZE,
-                 (BOOLEAN) (Mbr->Partition[0].OSIndicator == EFI_PARTITION)
+                 MBR_SIZE
                  );
       if (!EFI_ERROR (Status)) {
         Found = EFI_SUCCESS;

@@ -4,7 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", Legacy 
   MBR, and GPT partition schemes are supported.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -27,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/DiskIo2.h>
+#include <Protocol/PartitionInfo.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -45,25 +46,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #define PARTITION_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('P', 'a', 'r', 't')
 typedef struct {
-  UINT64                    Signature;
+  UINT64                       Signature;
 
-  EFI_HANDLE                Handle;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_BLOCK_IO_PROTOCOL     BlockIo;
-  EFI_BLOCK_IO2_PROTOCOL    BlockIo2;
-  EFI_BLOCK_IO_MEDIA        Media;
-  EFI_BLOCK_IO_MEDIA        Media2;//For BlockIO2
+  EFI_HANDLE                   Handle;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
+  EFI_BLOCK_IO_PROTOCOL        BlockIo;
+  EFI_BLOCK_IO2_PROTOCOL       BlockIo2;
+  EFI_BLOCK_IO_MEDIA           Media;
+  EFI_BLOCK_IO_MEDIA           Media2;//For BlockIO2
+  EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
-  EFI_DISK_IO_PROTOCOL      *DiskIo;
-  EFI_DISK_IO2_PROTOCOL     *DiskIo2;
-  EFI_BLOCK_IO_PROTOCOL     *ParentBlockIo;
-  EFI_BLOCK_IO2_PROTOCOL    *ParentBlockIo2;
-  UINT64                    Start;
-  UINT64                    End;
-  UINT32                    BlockSize;
-  BOOLEAN                   InStop;
+  EFI_DISK_IO_PROTOCOL         *DiskIo;
+  EFI_DISK_IO2_PROTOCOL        *DiskIo2;
+  EFI_BLOCK_IO_PROTOCOL        *ParentBlockIo;
+  EFI_BLOCK_IO2_PROTOCOL       *ParentBlockIo2;
+  UINT64                       Start;
+  UINT64                       End;
+  UINT32                       BlockSize;
+  BOOLEAN                      InStop;
 
-  EFI_GUID                  *EspGuid;
+  EFI_GUID                     *EspGuid;
 
 } PARTITION_PRIVATE_DATA;
 
@@ -321,10 +323,10 @@ PartitionComponentNameGetControllerName (
   @param[in]  ParentBlockIo2    Parent BlockIo2 interface.
   @param[in]  ParentDevicePath  Parent Device Path.
   @param[in]  DevicePathNode    Child Device Path node.
+  @param[in]  PartitionInfo     Child Partition Information interface.
   @param[in]  Start             Start Block.
   @param[in]  End               End Block.
   @param[in]  BlockSize         Child block size.
-  @param[in]  InstallEspGuid    Flag to install EFI System Partition GUID on handle.
 
   @retval EFI_SUCCESS       A child handle was added.
   @retval other             A child handle was not added.
@@ -340,10 +342,10 @@ PartitionInstallChildHandle (
   IN  EFI_BLOCK_IO2_PROTOCOL       *ParentBlockIo2,
   IN  EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode,
+  IN  EFI_PARTITION_INFO_PROTOCOL  *PartitionInfo,
   IN  EFI_LBA                      Start,
   IN  EFI_LBA                      End,
-  IN  UINT32                       BlockSize,
-  IN  BOOLEAN                      InstallEspGuid
+  IN  UINT32                       BlockSize
   );
 
 /**
