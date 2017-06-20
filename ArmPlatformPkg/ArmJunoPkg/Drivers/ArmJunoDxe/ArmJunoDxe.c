@@ -343,6 +343,7 @@ ArmJunoSetNicMacAddress ()
     return Status;
   }
 
+  PciRegBase = 0;
   Status = InitPciDev (PciIo, &PciRegBase, &OldPciAttr);
   if (EFI_ERROR (Status)) {
     return Status;
