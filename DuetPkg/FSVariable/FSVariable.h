@@ -6,7 +6,7 @@ disk. They can be changed by user. BIOS is not able to protoect those.
 Duet trusts all meta data from disk. If variable code, variable metadata and variable
 data is modified in inproper way, the behavior is undefined.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -129,7 +129,7 @@ DuetGetVariable (
   IN      EFI_GUID          *VendorGuid,
   OUT     UINT32            *Attributes OPTIONAL,
   IN OUT  UINTN             *DataSize,
-  OUT     VOID              *Data
+  OUT     VOID              *Data OPTIONAL
   );
 
 EFI_STATUS
