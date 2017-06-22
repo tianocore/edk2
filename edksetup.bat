@@ -14,10 +14,10 @@
 
 @REM set CYGWIN_HOME=C:\cygwin
 
-@REM usage: 
+@REM usage:
 @REM   edksetup.bat [--nt32] [AntBuild] [Rebuild] [ForceRebuild] [Reconfig]
 @REM if the argument, skip is present, only the paths and the
-@REM test and set of environment settings are performed. 
+@REM test and set of environment settings are performed.
 
 @REM ##############################################################
 @REM # You should not have to modify anything below this line
@@ -72,7 +72,7 @@ if not defined EDK_TOOLS_PATH (
     ) else (
       echo.
       echo !!! ERROR !!! Cannot find BaseTools !!!
-      echo. 
+      echo.
       goto BadBaseTools
     )
   )
@@ -141,11 +141,13 @@ if defined CYGWIN_HOME (
 )
 
 :cygwin_done
+if /I "%1"=="Rebuild" shift
+if /I "%1"=="ForceRebuild" shift
 if "%1"=="" goto end
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [--nt32 [X64]] [Reconfig]"
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [--nt32 [X64]] [Reconfig] [Rebuild] [ForceRebuild]"
   @echo         --nt32 [X64]   If a compiler tool chain is not available in the
   @echo                        environment, call a script to attempt to set one up.
   @echo                        This flag is only required if building the
@@ -157,6 +159,8 @@ if "%1"=="" goto end
   @echo                        rebuild.
   @echo.
   @echo         Reconfig       Reinstall target.txt, tools_def.txt and build_rule.txt.
+  @echo         Rebuild        Perform incremental rebuild of BaseTools binaries.
+  @echo         ForceRebuild   Force a full rebuild of BaseTools binaries.
   @echo.
   @echo  Note that target.template, tools_def.template and build_rules.template
   @echo  will only be copied to target.txt, tools_def.txt and build_rule.txt
@@ -166,4 +170,3 @@ if "%1"=="" goto end
 
 :end
   popd
-
