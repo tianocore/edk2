@@ -661,7 +661,8 @@ EFI_STATUS
 /**
   Enumerates the current variable names.
 
-  @param[in, out]  VariableNameSize The size of the VariableName buffer.
+  @param[in, out]  VariableNameSize The size of the VariableName buffer. The size must be large
+                                    enough to fit input string supplied in VariableName buffer.
   @param[in, out]  VariableName     On input, supplies the last VariableName that was returned
                                     by GetNextVariableName(). On output, returns the Nullterminated
                                     string of the current variable.
@@ -672,9 +673,14 @@ EFI_STATUS
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
   @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the result.
+                                VariableNameSize has been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER VariableNameSize is NULL.
   @retval EFI_INVALID_PARAMETER VariableName is NULL.
   @retval EFI_INVALID_PARAMETER VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER The input values of VariableName and VendorGuid are not a name and
+                                GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER Null-terminator is not found in the first VariableNameSize bytes of
+                                the input VariableName buffer.
   @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
 
 **/
