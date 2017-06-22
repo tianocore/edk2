@@ -1656,6 +1656,7 @@ class DecParser(MetaFileParser):
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
 
+        self._DefinesCount = 0
         for Index in range(0, len(Content)):
             Line, Comment = CleanString2(Content[Index])
             self._CurrentLine = Line
@@ -1671,8 +1672,15 @@ class DecParser(MetaFileParser):
             # section header
             if Line[0] == TAB_SECTION_START and Line[-1] == TAB_SECTION_END:
                 self._SectionHeaderParser()
+                if self._SectionName == TAB_DEC_DEFINES.upper():
+                    self._DefinesCount += 1
                 self._Comments = []
                 continue
+            if self._SectionType == MODEL_UNKNOWN:
+                EdkLogger.error("Parser", FORMAT_INVALID,
+                                ""
+                                "Not able to determine \"%s\" in which section."%self._CurrentLine,
+                                self.MetaFile, self._LineIndex + 1)
             elif len(self._SectionType) == 0:
                 self._Comments = []
                 continue
@@ -1720,6 +1728,10 @@ class DecParser(MetaFileParser):
                         0
                         )
             self._Comments = []
+        if self._DefinesCount > 1:
+            EdkLogger.error('Parser', FORMAT_INVALID, 'Multiple [Defines] section is exist.', self.MetaFile )
+        if self._DefinesCount == 0:
+            EdkLogger.error('Parser', FORMAT_INVALID, 'No [Defines] section exist.',self.MetaFile)
         self._Done()
 
 
@@ -1745,6 +1757,9 @@ class DecParser(MetaFileParser):
 
             # different types of PCD are permissible in one section
             self._SectionName = ItemList[0].upper()
+            if self._SectionName == TAB_DEC_DEFINES.upper() and (len(ItemList) > 1 or len(Line.split(TAB_COMMA_SPLIT)) > 1):
+                EdkLogger.error("Parser", FORMAT_INVALID, "Defines section format is invalid",
+                                self.MetaFile, self._LineIndex + 1, self._CurrentLine)
             if self._SectionName in self.DataType:
                 if self.DataType[self._SectionName] not in self._SectionType:
                     self._SectionType.append(self.DataType[self._SectionName])
