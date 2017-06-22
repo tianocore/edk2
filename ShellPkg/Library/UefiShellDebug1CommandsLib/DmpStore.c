@@ -436,6 +436,7 @@ CascadeProcessVariables (
     StrnCatGrow(&FoundVarName, &NameSize, PrevName, 0);
   } else {
     FoundVarName = AllocateZeroPool(sizeof(CHAR16));
+    NameSize = sizeof(CHAR16);
   }
 
   Status = gRT->GetNextVariableName (&NameSize, FoundVarName, &FoundVarGuid);
