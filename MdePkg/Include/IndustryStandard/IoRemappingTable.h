@@ -1,7 +1,7 @@
 /** @file
-  ACPI IO Remapping Table (IORT) as specified in ARM spec DEN0049B
+  ACPI IO Remapping Table (IORT) as specified in ARM spec DEN0049C
 
-  http://infocenter.arm.com/help/topic/com.arm.doc.den0049b/DEN0049B_IO_Remapping_Table.pdf
+  http://infocenter.arm.com/help/topic/com.arm.doc.den0049c/DEN0049C_IO_Remapping_Table.pdf
 
   Copyright (c) 2017, Linaro Limited. All rights reserved.<BR>
 
@@ -26,6 +26,7 @@
 #define EFI_ACPI_IORT_TYPE_ROOT_COMPLEX             0x2
 #define EFI_ACPI_IORT_TYPE_SMMUv1v2                 0x3
 #define EFI_ACPI_IORT_TYPE_SMMUv3                   0x4
+#define EFI_ACPI_IORT_TYPE_PMCG                     0x5
 
 #define EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA           BIT0
 
@@ -41,6 +42,8 @@
 #define EFI_ACPI_IORT_SMMUv1v2_MODEL_v2             0x1
 #define EFI_ACPI_IORT_SMMUv1v2_MODEL_MMU400         0x2
 #define EFI_ACPI_IORT_SMMUv1v2_MODEL_MMU500         0x3
+#define EFI_ACPI_IORT_SMMUv1v2_MODEL_MMU401         0x4
+#define EFI_ACPI_IORT_SMMUv1v2_MODEL_CAVIUM_THX_v2  0x5
 
 #define EFI_ACPI_IORT_SMMUv1v2_FLAG_DVM             BIT0
 #define EFI_ACPI_IORT_SMMUv1v2_FLAG_COH_WALK        BIT1
@@ -177,6 +180,18 @@ typedef struct {
   UINT32                                  Gerr;
   UINT32                                  Sync;
 } EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE;
+
+///
+/// Node type 5: PMCG node
+///
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_NODE          Node;
+
+  UINT64                                  Base;
+  UINT32                                  OverflowInterruptGsiv;
+  UINT32                                  NodeReference;
+//EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE      OverflowInterruptMsiMapping[1];
+} EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE;
 
 #pragma pack()
 
