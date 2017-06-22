@@ -543,8 +543,11 @@ VariableServiceGetVariable (
   @param[in] VendorGuid     Variable Vendor Guid.
   @param[out] VariablePtr   Pointer to variable header address.
 
-  @return EFI_SUCCESS       Find the specified variable.
-  @return EFI_NOT_FOUND     Not found.
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         The next variable was not found.
+  @retval EFI_INVALID_PARAMETER If VariableName is not an empty string, while VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER The input values of VariableName and VendorGuid are not a name and
+                                GUID of an existing variable.
 
 **/
 EFI_STATUS
@@ -562,14 +565,22 @@ VariableServiceGetNextVariableInternal (
   Caution: This function may receive untrusted input.
   This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
 
-  @param VariableNameSize           Size of the variable name.
+  @param VariableNameSize           The size of the VariableName buffer. The size must be large
+                                    enough to fit input string supplied in VariableName buffer.
   @param VariableName               Pointer to variable name.
   @param VendorGuid                 Variable Vendor Guid.
 
-  @return EFI_INVALID_PARAMETER     Invalid parameter.
-  @return EFI_SUCCESS               Find the specified variable.
-  @return EFI_NOT_FOUND             Not found.
-  @return EFI_BUFFER_TO_SMALL       DataSize is too small for the result.
+  @retval EFI_SUCCESS               The function completed successfully.
+  @retval EFI_NOT_FOUND             The next variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL      The VariableNameSize is too small for the result.
+                                    VariableNameSize has been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER     VariableNameSize is NULL.
+  @retval EFI_INVALID_PARAMETER     VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER     VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER     The input values of VariableName and VendorGuid are not a name and
+                                    GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER     Null-terminator is not found in the first VariableNameSize bytes of
+                                    the input VariableName buffer.
 
 **/
 EFI_STATUS

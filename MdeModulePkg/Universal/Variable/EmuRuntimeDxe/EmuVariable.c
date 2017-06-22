@@ -3,7 +3,7 @@
   Emulation Variable services operate on the runtime volatile memory.
   The nonvolatile variable space doesn't exist.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1233,18 +1233,23 @@ Done:
 
   This code Finds the Next available variable.
 
-  @param  VariableNameSize       Size of the variable.
+  @param  VariableNameSize       The size of the VariableName buffer. The size must be large enough to fit input
+                                 string supplied in VariableName buffer.
   @param  VariableName           On input, supplies the last VariableName that was returned by GetNextVariableName().
                                  On output, returns the Null-terminated Unicode string of the current variable.
   @param  VendorGuid             On input, supplies the last VendorGuid that was returned by GetNextVariableName().
-                                 On output, returns the VendorGuid of the current variable.  
+                                 On output, returns the VendorGuid of the current variable.
   @param  Global                 Pointer to VARIABLE_GLOBAL structure.
 
-  @retval EFI_SUCCESS            The function completed successfully. 
+  @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The next variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL   VariableNameSize is too small for the result. 
+  @retval EFI_BUFFER_TOO_SMALL   The VariableNameSize is too small for the result.
                                  VariableNameSize has been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER  VariableNameSize or VariableName or VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER  The input values of VariableName and VendorGuid are not a name and
+                                 GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER  Null-terminator is not found in the first VariableNameSize bytes of
+                                 the input VariableName buffer.
 
 **/
 EFI_STATUS
@@ -1259,8 +1264,21 @@ EmuGetNextVariableName (
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
+  UINTN                   MaxLen;
 
   if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Calculate the possible maximum length of name string, including the Null terminator.
+  //
+  MaxLen = *VariableNameSize / sizeof (CHAR16);
+  if ((MaxLen == 0) || (StrnLenS (VariableName, MaxLen) == MaxLen)) {
+    //
+    // Null-terminator is not found in the first VariableNameSize bytes of the input VariableName buffer,
+    // follow spec to return EFI_INVALID_PARAMETER.
+    //
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1269,6 +1287,19 @@ EmuGetNextVariableName (
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
+    //
+    // For VariableName is an empty string, FindVariable() will try to find and return
+    // the first qualified variable, and if FindVariable() returns error (EFI_NOT_FOUND)
+    // as no any variable is found, still go to return the error (EFI_NOT_FOUND).
+    //
+    if (VariableName[0] != 0) {
+      //
+      // For VariableName is not an empty string, and FindVariable() returns error as
+      // VariableName and VendorGuid are not a name and GUID of an existing variable,
+      // there is no way to get next variable, follow spec to return EFI_INVALID_PARAMETER.
+      //
+      Status = EFI_INVALID_PARAMETER;
+    }
     goto Done;
   }
 
