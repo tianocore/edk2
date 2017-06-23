@@ -630,6 +630,7 @@ EFI_LOAD_FILE_PROTOCOL  gHttpBootDxeLoadFile = {
   @retval EFI_ABORTED             Tells the HTTP Boot driver to abort the current HTTP Boot process.
 **/
 EFI_STATUS
+EFIAPI
 HttpBootCallback (
   IN EFI_HTTP_BOOT_CALLBACK_PROTOCOL     *This,
   IN EFI_HTTP_BOOT_CALLBACK_DATA_TYPE    DataType,
