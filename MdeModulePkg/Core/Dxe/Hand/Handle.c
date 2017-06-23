@@ -1006,12 +1006,8 @@ CoreOpenProtocol (
   //
   // Check for invalid Interface
   //
-  if (Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL) {
-    if (Interface == NULL) {
-      return EFI_INVALID_PARAMETER;
-    } else {
-      *Interface = NULL;
-    }
+  if ((Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL) && (Interface == NULL)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -1075,15 +1071,13 @@ CoreOpenProtocol (
   Prot = CoreGetProtocolInterface (UserHandle, Protocol);
   if (Prot == NULL) {
     Status = EFI_UNSUPPORTED;
+    if (Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL){
+      //Return NULL Interface if Unsupported Protocol
+      *Interface = NULL;
+    }
     goto Done;
   }
 
-  //
-  // This is the protocol interface entry for this protocol
-  //
-  if (Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL) {
-    *Interface = Prot->Interface;
-  }
   Status = EFI_SUCCESS;
 
   ByDriver        = FALSE;
@@ -1177,6 +1171,14 @@ CoreOpenProtocol (
   }
 
 Done:
+
+  //
+  // This is the protocol interface entry for this protocol.
+  // In case of any Error, Interface should not be updated as per spec.
+  //
+  if (!EFI_ERROR (Status) && (Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL)) {
+    *Interface = Prot->Interface;
+  }
   //
   // Done. Release the database lock are return
   //
