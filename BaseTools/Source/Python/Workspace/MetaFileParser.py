@@ -1139,6 +1139,13 @@ class DscParser(MetaFileParser):
             EdkLogger.error('Parser', FORMAT_INVALID, "The datum type '%s' of PCD is wrong" % ValueList[1],
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
 
+        # Validate the VariableName of DynamicHii and DynamicExHii for PCD Entry must not be an empty string
+        if self._ItemType in [MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII]:
+            DscPcdValueList = GetSplitValueList(TokenList[1], TAB_VALUE_SPLIT, 1)
+            if len(DscPcdValueList[0].replace('L','').replace('"','').strip()) == 0:
+                EdkLogger.error('Parser', FORMAT_INVALID, "The VariableName field in the HII format PCD entry must not be an empty string",
+                            ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
+
         # if value are 'True', 'true', 'TRUE' or 'False', 'false', 'FALSE', replace with integer 1 or 0.
         DscPcdValueList = GetSplitValueList(TokenList[1], TAB_VALUE_SPLIT, 1)
         if DscPcdValueList[0] in ['True', 'true', 'TRUE']:
