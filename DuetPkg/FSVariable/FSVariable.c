@@ -6,7 +6,7 @@ disk. They can be changed by user. BIOS is not able to protoect those.
 Duet trusts all meta data from disk. If variable code, variable metadata and variable
 data is modified in inproper way, the behavior is undefined.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1387,7 +1387,8 @@ Routine Description:
 
 Arguments:
 
-  VariableNameSize            Size of the variable
+  VariableNameSize            The size of the VariableName buffer. The size must be large
+                              enough to fit input string supplied in VariableName buffer.
   VariableName                Pointer to variable name
   VendorGuid                  Variable Vendor Guid
 
@@ -1400,14 +1401,40 @@ Returns:
   VARIABLE_POINTER_TRACK  Variable;
   UINTN                   VarNameSize;
   EFI_STATUS              Status;
+  UINTN                   MaxLen;
 
   if (VariableNameSize == NULL || VariableName == NULL || VendorGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Calculate the possible maximum length of name string, including the Null terminator.
+  //
+  MaxLen = *VariableNameSize / sizeof (CHAR16);
+  if ((MaxLen == 0) || (StrnLenS (VariableName, MaxLen) == MaxLen)) {
+    //
+    // Null-terminator is not found in the first VariableNameSize bytes of the input VariableName buffer,
+    // follow spec to return EFI_INVALID_PARAMETER.
+    //
     return EFI_INVALID_PARAMETER;
   }
 
   Status = FindVariable (VariableName, VendorGuid, &Variable);
 
   if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
+    //
+    // For VariableName is an empty string, FindVariable() will try to find and return
+    // the first qualified variable, and if FindVariable() returns error (EFI_NOT_FOUND)
+    // as no any variable is found, still go to return the error (EFI_NOT_FOUND).
+    //
+    if (VariableName[0] != 0) {
+      //
+      // For VariableName is not an empty string, and FindVariable() returns error as
+      // VariableName and VendorGuid are not a name and GUID of an existing variable,
+      // there is no way to get next variable, follow spec to return EFI_INVALID_PARAMETER.
+      //
+      Status = EFI_INVALID_PARAMETER;
+    }
     return Status;
   }
 
