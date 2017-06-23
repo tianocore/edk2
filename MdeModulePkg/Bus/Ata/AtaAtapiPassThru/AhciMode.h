@@ -41,8 +41,9 @@ typedef union {
 
 //
 // Refer SATA1.0a spec section 5.2, the Phy detection time should be less than 10ms.
+// Add a bit of margin for robustness.
 //
-#define  EFI_AHCI_BUS_PHY_DETECT_TIMEOUT       10
+#define  EFI_AHCI_BUS_PHY_DETECT_TIMEOUT       15
 //
 // Refer SATA1.0a spec, the FIS enable time should be less than 500ms.
 //

@@ -2376,8 +2376,7 @@ AhciModeInitialization (
       AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_CMD_FRE);
 
       //
-      // Wait no longer than 10 ms to wait the Phy to detect the presence of a device.
-      // It's the requirment from SATA1.0a spec section 5.2.
+      // Wait for the Phy to detect the presence of a device.
       //
       PhyDetectDelay = EFI_AHCI_BUS_PHY_DETECT_TIMEOUT;
       Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
