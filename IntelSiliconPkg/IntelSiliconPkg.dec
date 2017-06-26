@@ -33,6 +33,9 @@
   # Generic DXE Library / Driver can locate HOB(s) and add SMBIOS records into SMBIOS table
   gIntelSmbiosDataHobGuid         = { 0x798e722e, 0x15b2, 0x4e13, { 0x8a, 0xe9, 0x6b, 0xa3, 0x0f, 0xf7, 0xf1, 0x67 }}
 
+[Protocols]
+  gEdkiiPlatformVTdPolicyProtocolGuid = { 0x3d17e448, 0x466, 0x4e20, { 0x99, 0x9f, 0xb2, 0xe1, 0x34, 0x88, 0xee, 0x22 }}
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This is the GUID of the FFS which contains the Graphics Video BIOS Table (VBT)
   # The VBT content is stored as a RAW section which is consumed by GOP PEI/UEFI driver.
