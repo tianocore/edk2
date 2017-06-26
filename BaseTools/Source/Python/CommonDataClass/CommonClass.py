@@ -174,7 +174,7 @@ class IncludeStatementClass(object):
 # @var GuidTypeList:   To store value for GuidTypeList, selection scope is in below list
 #                      DATA_HUB_RECORD | EFI_EVENT | EFI_SYSTEM_CONFIGURATION_TABLE | EFI_VARIABLE | GUID | HII_PACKAGE_LIST | HOB | TOKEN_SPACE_GUID
 # @var SupModuleList:  To store value for SupModuleList, selection scope is in below list
-#                      BASE | SEC | PEI_CORE | PEIM | DXE_CORE | DXE_DRIVER | DXE_RUNTIME_DRIVER | DXE_SAL_DRIVER | DXE_SMM_DRIVER | UEFI_DRIVER | UEFI_APPLICATION | USER_DEFINED | SMM_CORE
+#                      BASE | SEC | PEI_CORE | PEIM | DXE_CORE | DXE_DRIVER | DXE_RUNTIME_DRIVER | DXE_SAL_DRIVER | DXE_SMM_DRIVER | UEFI_DRIVER | UEFI_APPLICATION | USER_DEFINED | SMM_CORE | MM_STANDALONE | MM_CORE_STANDALONE
 #
 class GuidProtocolPpiCommonClass(CommonClass):
     def __init__(self):
@@ -202,7 +202,7 @@ class GuidProtocolPpiCommonClass(CommonClass):
 # @var RecommendedInstance:         To store value for RecommendedInstance, selection scope is in below list
 #                                   DATA_HUB_RECORD | EFI_EVENT | EFI_SYSTEM_CONFIGURATION_TABLE | EFI_VARIABLE | GUID | HII_PACKAGE_LIST | HOB | TOKEN_SPACE_GUID
 # @var SupModuleList:               To store value for SupModuleList, selection scope is in below list
-#                                   BASE | SEC | PEI_CORE | PEIM | DXE_CORE | DXE_DRIVER | DXE_RUNTIME_DRIVER | DXE_SAL_DRIVER | DXE_SMM_DRIVER | UEFI_DRIVER | UEFI_APPLICATION | USER_DEFINED | SMM_CORE
+#                                   BASE | SEC | PEI_CORE | PEIM | DXE_CORE | DXE_DRIVER | DXE_RUNTIME_DRIVER | DXE_SAL_DRIVER | DXE_SMM_DRIVER | UEFI_DRIVER | UEFI_APPLICATION | USER_DEFINED | SMM_CORE | MM_STANDALONE | MM_CORE_STANDALONE
 #
 class LibraryClassClass(CommonClass, DefineClass):
     def __init__(self):
@@ -354,7 +354,7 @@ class PcdErrorClass(object):
 # @var SkuInfoList:            To store value for SkuInfoList
 #                              It is a set structure as { [SkuIdName] : SkuInfoClass } 
 # @var SupModuleList:          To store value for SupModuleList, selection scope is in below list
-#                              BASE | SEC | PEI_CORE | PEIM | DXE_CORE | DXE_DRIVER | DXE_RUNTIME_DRIVER | DXE_SAL_DRIVER | DXE_SMM_DRIVER | UEFI_DRIVER | UEFI_APPLICATION | USER_DEFINED | SMM_CORE
+#                              BASE | SEC | PEI_CORE | PEIM | DXE_CORE | DXE_DRIVER | DXE_RUNTIME_DRIVER | DXE_SAL_DRIVER | DXE_SMM_DRIVER | UEFI_DRIVER | UEFI_APPLICATION | USER_DEFINED | SMM_CORE | MM_STANDALONE | MM_CORE_STANDALONE
 #
 class PcdClass(CommonClass):
     def __init__(self, CName = '', Token = '', TokenSpaceGuidCName = '', DatumType = '', MaxDatumSize = '', DefaultValue = '', ItemType = '', ValidUsage = None, SkuInfoList = None, SupModuleList = None):
