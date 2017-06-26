@@ -1499,7 +1499,7 @@ class Build():
                         if IsIpfPlatform and ImageInfo.Image.Size % 0x2000 != 0:
                             ImageInfo.Image.Size = (ImageInfo.Image.Size / 0x2000 + 1) * 0x2000
                         RtSize += ImageInfo.Image.Size
-                    elif Module.ModuleType in ['SMM_CORE', 'DXE_SMM_DRIVER']:
+                    elif Module.ModuleType in ['SMM_CORE', 'DXE_SMM_DRIVER', 'MM_STANDALONE', 'MM_CORE_STANDALONE']:
                         SmmModuleList[Module.MetaFile] = ImageInfo
                         SmmSize += ImageInfo.Image.Size
                         if Module.ModuleType == 'DXE_SMM_DRIVER':
