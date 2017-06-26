@@ -2823,7 +2823,7 @@ class FdfParser(object):
                              "DXE_SMM_DRIVER", "DXE_RUNTIME_DRIVER", \
                              "UEFI_DRIVER", "UEFI_APPLICATION", "USER_DEFINED", "DEFAULT", "BASE", \
                              "SECURITY_CORE", "COMBINED_PEIM_DRIVER", "PIC_PEIM", "RELOCATABLE_PEIM", \
-                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_CORE"):
+                             "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_CORE", "MM_STANDALONE", "MM_CORE_STANDALONE"):
             raise Warning("Unknown Module type At line ", self.FileName, self.CurrentLineNumber)
         return self.__Token
     
@@ -2867,7 +2867,7 @@ class FdfParser(object):
         
         Type = self.__Token.strip().upper()
         if Type not in ("RAW", "FREEFORM", "SEC", "PEI_CORE", "PEIM",\
-                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM", "SMM_CORE"):
+                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM", "SMM_CORE", "MM_STANDALONE"):
             raise Warning("Unknown FV type At line ", self.FileName, self.CurrentLineNumber)
 
         if not self.__IsToken("="):
