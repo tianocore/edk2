@@ -4,7 +4,7 @@
   This file defines common data structures, macro definitions and some module
   internal function header files.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,7 @@
 #include <Protocol/BlockIo.h>
 #include <Protocol/BlockIo2.h>
 #include <Protocol/EraseBlock.h>
+#include <Protocol/DiskInfo.h>
 
 #include <Protocol/DevicePath.h>
 
@@ -39,6 +40,8 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include "SdBlockIo.h"
+#include "SdDiskInfo.h"
+
 //
 // Global Variables
 //
@@ -56,6 +59,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL     gSdDxeComponentName2;
 
 #define SD_DEVICE_DATA_FROM_ERASEBLK(a) \
     CR(a, SD_DEVICE, EraseBlock, SD_DEVICE_SIGNATURE)
+
+#define SD_DEVICE_DATA_FROM_DISKINFO(a) \
+    CR(a, SD_DEVICE, DiskInfo, SD_DEVICE_SIGNATURE)
 
 //
 // Take 2.5 seconds as generic time out value, 1 microsecond as unit.
@@ -100,6 +106,7 @@ struct _SD_DEVICE {
   EFI_BLOCK_IO2_PROTOCOL                BlockIo2;
   EFI_BLOCK_IO_MEDIA                    BlockMedia;
   EFI_ERASE_BLOCK_PROTOCOL              EraseBlock;
+  EFI_DISK_INFO_PROTOCOL                DiskInfo;
 
   LIST_ENTRY                            Queue;
 

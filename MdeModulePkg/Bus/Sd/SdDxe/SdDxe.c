@@ -4,7 +4,7 @@
   It produces BlockIo and BlockIo2 protocols to allow upper layer
   access the SD memory card device.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -68,6 +68,13 @@ SD_DEVICE mSdDeviceTemplate = {
     EFI_ERASE_BLOCK_PROTOCOL_REVISION,
     1,
     SdEraseBlocks
+  },
+  {                            // DiskInfo
+    EFI_DISK_INFO_SD_MMC_INTERFACE_GUID,
+    SdDiskInfoInquiry,
+    SdDiskInfoIdentify,
+    SdDiskInfoSenseData,
+    SdDiskInfoWhichIde
   },
   {                            // Queue
     NULL,
@@ -382,6 +389,8 @@ DiscoverSdDevice (
                   &Device->BlockIo2,
                   &gEfiEraseBlockProtocolGuid,
                   &Device->EraseBlock,
+                  &gEfiDiskInfoProtocolGuid,
+                  &Device->DiskInfo,
                   NULL
                   );
 
@@ -840,6 +849,8 @@ SdDxeDriverBindingStop (
                     &Device->BlockIo2,
                     &gEfiEraseBlockProtocolGuid,
                     &Device->EraseBlock,
+                    &gEfiDiskInfoProtocolGuid,
+                    &Device->DiskInfo,
                     NULL
                     );
     if (EFI_ERROR (Status)) {
