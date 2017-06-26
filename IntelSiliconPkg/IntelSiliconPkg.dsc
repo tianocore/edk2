@@ -23,6 +23,32 @@
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
+[LibraryClasses]
+  BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
+  DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+  ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
+  PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+  IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+  UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
+  SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
+
+[LibraryClasses.common.DXE_DRIVER]
+  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation
@@ -44,3 +70,8 @@
 
 [Components]
   IntelSiliconPkg/Library/DxeSmbiosDataHobLib/DxeSmbiosDataHobLib.inf
+  IntelSiliconPkg/IntelVTdDxe/IntelVTdDxe.inf
+
+[BuildOptions]
+  *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
