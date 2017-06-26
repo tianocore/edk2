@@ -999,6 +999,8 @@ class Ffs(Image):
         0x0B    :   "FIRMWARE_VOLUME_IMAGE",
         0x0C    :   "COMBINED_SMM_DXE",
         0x0D    :   "SMM_CORE",
+        0x0E    :   "MM_STANDALONE",
+        0x0F    :   "MM_CORE_STANDALONE",
         0xc0    :   "OEM_MIN",
         0xdf    :   "OEM_MAX",
         0xe0    :   "DEBUG_MIN",
