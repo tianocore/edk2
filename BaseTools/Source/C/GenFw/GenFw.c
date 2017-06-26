@@ -181,6 +181,7 @@ Returns:
                         PEI_CORE, PEIM, DXE_CORE, DXE_DRIVER, UEFI_APPLICATION,\n\
                         SEC, DXE_SAL_DRIVER, UEFI_DRIVER, DXE_RUNTIME_DRIVER,\n\
                         DXE_SMM_DRIVER, SECURITY_CORE, COMBINED_PEIM_DRIVER,\n\
+                        MM_STANDALONE, MM_CORE_STANDALONE,\n\
                         PIC_PEIM, RELOCATABLE_PEIM, BS_DRIVER, RT_DRIVER,\n\
                         APPLICATION, SAL_RT_DRIVER to support all module types\n\
                         It can only be used together with --keepexceptiontable,\n\
@@ -2009,7 +2010,9 @@ Returns:
         stricmp (ModuleType, "DXE_DRIVER") == 0 ||
         stricmp (ModuleType, "DXE_SMM_DRIVER") == 0  ||
         stricmp (ModuleType, "UEFI_DRIVER") == 0 ||
-        stricmp (ModuleType, "SMM_CORE") == 0) {
+        stricmp (ModuleType, "SMM_CORE") == 0 ||
+        stricmp (ModuleType, "MM_STANDALONE") == 0 ||
+        stricmp (ModuleType, "MM_CORE_STANDALONE") == 0) {
           Type = EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER;
           VerboseMsg ("Efi Image subsystem type is efi boot service driver.");
 
