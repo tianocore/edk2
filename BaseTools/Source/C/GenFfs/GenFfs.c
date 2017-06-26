@@ -43,8 +43,10 @@ STATIC CHAR8 *mFfsFileType[] = {
   "EFI_FV_FILETYPE_SMM",                  // 0x0A
   "EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE",// 0x0B
   "EFI_FV_FILETYPE_COMBINED_SMM_DXE",     // 0x0C
-  "EFI_FV_FILETYPE_SMM_CORE"              // 0x0D
- };
+  "EFI_FV_FILETYPE_SMM_CORE",             // 0x0D
+  "EFI_FV_FILETYPE_MM_STANDALONE",        // 0x0E
+  "EFI_FV_FILETYPE_MM_CORE_STANDALONE"    // 0x0F
+};
 
 STATIC CHAR8 *mAlignName[] = {
   "1", "2", "4", "8", "16", "32", "64", "128", "256", "512",
@@ -130,6 +132,8 @@ Returns:
                         EFI_FV_FILETYPE_DRIVER, EFI_FV_FILETYPE_APPLICATION,\n\
                         EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER,\n\
                         EFI_FV_FILETYPE_SMM, EFI_FV_FILETYPE_SMM_CORE,\n\
+                        EFI_FV_FILETYPE_MM_STANDALONE,\n\
+                        EFI_FV_FILETYPE_MM_CORE_STANDALONE,\n\
                         EFI_FV_FILETYPE_COMBINED_SMM_DXE, \n\
                         EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE.\n");
   fprintf (stdout, "  -g FileGuid, --fileguid FileGuid\n\
