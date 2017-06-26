@@ -1,7 +1,7 @@
 /** @file
   StatusCode related definitions in PI.
 
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -790,6 +790,7 @@ typedef struct {
 #define EFI_SW_DXE_BS_PC_LEGACY_BOOT_EVENT            (EFI_SUBCLASS_SPECIFIC | 0x00000002)
 #define EFI_SW_DXE_BS_PC_EXIT_BOOT_SERVICES_EVENT     (EFI_SUBCLASS_SPECIFIC | 0x00000003)
 #define EFI_SW_DXE_BS_PC_VIRTUAL_ADDRESS_CHANGE_EVENT (EFI_SUBCLASS_SPECIFIC | 0x00000004)
+#define EFI_SW_DXE_BS_PC_ATTEMPT_BOOT_ORDER_EVENT     (EFI_SUBCLASS_SPECIFIC | 0x00000007)
 ///@}
 
 //
