@@ -34,7 +34,9 @@ class Ffs(FDClassObject):
         'DXE_RUNTIME_DRIVER': 'EFI_FV_FILETYPE_DRIVER',
         'UEFI_DRIVER'       : 'EFI_FV_FILETYPE_DRIVER',
         'UEFI_APPLICATION'  : 'EFI_FV_FILETYPE_APPLICATION',
-        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE'
+        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE',
+        'MM_STANDALONE'     : 'EFI_FV_FILETYPE_MM_STANDALONE',
+        'MM_CORE_STANDALONE' : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
     }
     
     # mapping between FILE type in FDF and file type for GenFfs
@@ -50,7 +52,9 @@ class Ffs(FDClassObject):
         'RAW'               : 'EFI_FV_FILETYPE_RAW',
         'PEI_DXE_COMBO'     : 'EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER',
         'SMM'               : 'EFI_FV_FILETYPE_SMM',
-        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE'
+        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE',
+        'MM_STANDALONE'     : 'EFI_FV_FILETYPE_MM_STANDALONE',
+        'MM_CORE_STANDALONE' : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
     }
     
     # mapping between section type in FDF and file suffix

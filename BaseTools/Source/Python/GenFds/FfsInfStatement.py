@@ -224,6 +224,9 @@ class FfsInfStatement(FfsInfStatementClassObject):
         if self.ModuleType == 'SMM_CORE' and int(self.PiSpecVersion, 16) < 0x0001000A:
             EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.InfFileName)      
 
+        if self.ModuleType == 'MM_CORE_STANDALONE' and int(self.PiSpecVersion, 16) < 0x00010032:
+            EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "MM_CORE_STANDALONE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x00010032", File=self.InfFileName)
+
         if Inf._Defs != None and len(Inf._Defs) > 0:
             self.OptRomDefs.update(Inf._Defs)
 
