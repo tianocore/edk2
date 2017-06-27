@@ -224,24 +224,35 @@ longer.)
   basic virtio-net driver, located in OvmfPkg/VirtioNetDxe.
 
 * Also independently of the iPXE NIC drivers, Intel's proprietary E1000 NIC
-  driver (PROEFI) can be embedded in the OVMF image at build time:
+  driver (from the BootUtil distribution) can be embedded in the OVMF image at
+  build time:
 
-  - Download UEFI drivers for the e1000 NIC
-    - http://downloadcenter.intel.com/Detail_Desc.aspx?agr=Y&DwnldID=17515&lang=eng
-    - Install the drivers into a directory called Intel3.5 in your WORKSPACE.
+  - Download BootUtil:
+    - Navigate to
+      https://downloadcenter.intel.com/download/19186/Ethernet-Intel-Ethernet-Connections-Boot-Utility-Preboot-Images-and-EFI-Drivers
+    - Click the download link for "PREBOOT.EXE".
+    - Accept the Intel Software License Agreement that appears.
+    - Unzip "PREBOOT.EXE" into a separate directory (this works with the
+      "unzip" utility on platforms different from Windows as well).
+    - Copy the "APPS/EFI/EFIx64/E3522X2.EFI" driver binary to
+      "Intel3.5/EFIX64/E3522X2.EFI" in your WORKSPACE.
+    - Intel have stopped distributing an IA32 driver binary (which used to
+      match the filename pattern "E35??E2.EFI"), thus this method will only
+      work for the IA32X64 and X64 builds of OVMF.
 
   - Include the driver in OVMF during the build:
-    - Add "-D E1000_ENABLE" to your build command,
+    - Add "-D E1000_ENABLE" to your build command (only when building
+      "OvmfPkg/OvmfPkgIa32X64.dsc" or "OvmfPkg/OvmfPkgX64.dsc").
     - For example: "build -D E1000_ENABLE".
 
 * When a matching iPXE driver is configured for a NIC as described above, it
   takes priority over other drivers that could possibly drive the card too:
 
-                 | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
-    -------------+------------------------------------------------
-    iPXE         |   x       x        x       x           x
-    VirtioNetDxe |                                        x
-    Intel PROEFI |   x
+                         | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
+    ---------------------+------------------------------------------------
+    iPXE                 |   x       x        x       x           x
+    VirtioNetDxe         |                                        x
+    Intel BootUtil (X64) |   x
 
 === OVMF Flash Layout ===
 

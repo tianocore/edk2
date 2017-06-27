@@ -296,7 +296,7 @@ INF MdeModulePkg/Logo/LogoDxe.inf
 #
 !if $(E1000_ENABLE)
   FILE DRIVER = 5D695E11-9B3F-4b83-B25F-4A8D5D69BE07 {
-    SECTION PE32 = Intel3.5/EFIX64/E3507X2.EFI
+    SECTION PE32 = Intel3.5/EFIX64/E3522X2.EFI
   }
 !endif
   INF  MdeModulePkg/Universal/Network/SnpDxe/SnpDxe.inf
