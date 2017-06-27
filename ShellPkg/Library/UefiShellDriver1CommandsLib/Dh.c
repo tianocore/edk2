@@ -3,6 +3,7 @@
 
   (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -664,7 +665,7 @@ DisplayDriverModelHandle (
     -1, 
     -1, 
     NULL, 
-    STRING_TOKEN (STR_DH_OUTPUT_DRIVER6B),
+    STRING_TOKEN (STR_DH_OUTPUT_DRIVER7),
     gShellDriver1HiiHandle,
     ConvertHandleToHandleIndex(Handle),
     DriverName!=NULL?DriverName:L"<Unknown>"
