@@ -168,6 +168,7 @@ INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 ################################################################################
 
 [FV.DXEFV]
+FvForceRebase      = FALSE
 FvNameGuid         = 7CB8BDC9-F8EB-4F34-AAEA-3EE4AF6516A1
 BlockSize          = 0x10000
 FvAlignment        = 16
