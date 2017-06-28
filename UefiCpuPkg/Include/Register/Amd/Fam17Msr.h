@@ -20,8 +20,8 @@
 
 **/
 
-#ifndef __FAM17_MSR_H
-#define __FAM17_MSR_H
+#ifndef __FAM17_MSR_H__
+#define __FAM17_MSR_H__
 
 /**
   Secure Encrypted Virtualization (SEV) status register
