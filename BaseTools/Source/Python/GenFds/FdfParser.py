@@ -167,6 +167,10 @@ class IncludeFileProfile :
             fsock = open(FileName, "rb", 0)
             try:
                 self.FileLinesList = fsock.readlines()
+                for index, line in enumerate(self.FileLinesList):
+                    if not line.endswith('\n'):
+                        self.FileLinesList[index] += '\n'
+
             finally:
                 fsock.close()
 
