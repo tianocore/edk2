@@ -977,6 +977,49 @@ XhcFreeSched (
 }
 
 /**
+  Check if the Trb is a transaction of the URB.
+
+  @param Trb    The TRB to be checked
+  @param Urb    The URB to be checked.
+
+  @retval TRUE  It is a transaction of the URB.
+  @retval FALSE It is not any transaction of the URB.
+
+**/
+BOOLEAN
+IsTransferRingTrb (
+  IN  USB_XHCI_INSTANCE   *Xhc,
+  IN  TRB_TEMPLATE        *Trb,
+  IN  URB                 *Urb
+  )
+{
+  LINK_TRB      *LinkTrb;
+  TRB_TEMPLATE  *CheckedTrb;
+  UINTN         Index;
+  EFI_PHYSICAL_ADDRESS PhyAddr;
+
+  CheckedTrb = Urb->TrbStart;
+  for (Index = 0; Index < Urb->TrbNum; Index++) {
+    if (Trb == CheckedTrb) {
+      return TRUE;
+    }
+    CheckedTrb++;
+    //
+    // If the checked TRB is the link TRB at the end of the transfer ring,
+    // recircle it to the head of the ring.
+    //
+    if (CheckedTrb->Type == TRB_TYPE_LINK) {
+      LinkTrb = (LINK_TRB *) CheckedTrb;
+      PhyAddr = (EFI_PHYSICAL_ADDRESS)(LinkTrb->PtrLo | LShiftU64 ((UINT64) LinkTrb->PtrHi, 32));
+      CheckedTrb = (TRB_TEMPLATE *)(UINTN) UsbHcGetHostAddrForPciAddr (Xhc->MemPool, (VOID *)(UINTN) PhyAddr, sizeof (TRB_TEMPLATE));
+      ASSERT (CheckedTrb == Urb->Ring->RingSeg0);
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Check if the Trb is a transaction of the URBs in XHCI's asynchronous transfer list.
 
   @param Xhc    The XHCI Instance.
@@ -996,64 +1039,19 @@ IsAsyncIntTrb (
 {
   LIST_ENTRY              *Entry;
   LIST_ENTRY              *Next;
-  TRB_TEMPLATE            *CheckedTrb;
   URB                     *CheckedUrb;
-  UINTN                   Index;
 
   EFI_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
     CheckedUrb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
-    CheckedTrb = CheckedUrb->TrbStart;
-    for (Index = 0; Index < CheckedUrb->TrbNum; Index++) {
-      if (Trb == CheckedTrb) {
-        *Urb = CheckedUrb;
-        return TRUE;
-      }
-      CheckedTrb++;
-      //
-      // If the checked TRB is the link TRB at the end of the transfer ring,
-      // recircle it to the head of the ring.
-      //
-      if (CheckedTrb->Type == TRB_TYPE_LINK) {
-        CheckedTrb = (TRB_TEMPLATE*) CheckedUrb->Ring->RingSeg0;
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  Check if the Trb is a transaction of the URB.
-
-  @param Trb    The TRB to be checked
-  @param Urb    The transfer ring to be checked.
-
-  @retval TRUE  It is a transaction of the URB.
-  @retval FALSE It is not any transaction of the URB.
-
-**/
-BOOLEAN
-IsTransferRingTrb (
-  IN  TRB_TEMPLATE        *Trb,
-  IN  URB                 *Urb
-  )
-{
-  TRB_TEMPLATE  *CheckedTrb;
-  UINTN         Index;
-
-  CheckedTrb = Urb->Ring->RingSeg0;
-
-  ASSERT (Urb->Ring->TrbNumber == CMD_RING_TRB_NUMBER || Urb->Ring->TrbNumber == TR_RING_TRB_NUMBER);
-
-  for (Index = 0; Index < Urb->Ring->TrbNumber; Index++) {
-    if (Trb == CheckedTrb) {
+    if (IsTransferRingTrb (Xhc, Trb, CheckedUrb)) {
+      *Urb = CheckedUrb;
       return TRUE;
     }
-    CheckedTrb++;
   }
 
   return FALSE;
 }
+
 
 /**
   Check the URB's execution result and update the URB's
@@ -1131,7 +1129,7 @@ XhcCheckUrbResult (
     // This way is used to avoid that those completed async transfer events don't get
     // handled in time and are flushed by newer coming events.
     //
-    if (IsTransferRingTrb (TRBPtr, Urb)) {
+    if (IsTransferRingTrb (Xhc, TRBPtr, Urb)) {
       CheckedUrb = Urb;
     } else if (IsAsyncIntTrb (Xhc, TRBPtr, &AsyncUrb)) {    
       CheckedUrb = AsyncUrb;
