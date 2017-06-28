@@ -604,8 +604,6 @@ XhcInitSched (
   XhcWriteOpReg (Xhc, XHC_CRCR_OFFSET, XHC_LOW_32BIT(CmdRingPhy));
   XhcWriteOpReg (Xhc, XHC_CRCR_OFFSET + 4, XHC_HIGH_32BIT (CmdRingPhy));
 
-  DEBUG ((EFI_D_INFO, "XhcInitSched:XHC_CRCR=0x%x\n", Xhc->CmdRing.RingSeg0));
-
   //
   // Disable the 'interrupter enable' bit in USB_CMD
   // and clear IE & IP bit in all Interrupter X Management Registers.
@@ -620,7 +618,10 @@ XhcInitSched (
   // Allocate EventRing for Cmd, Ctrl, Bulk, Interrupt, AsynInterrupt transfer
   //
   CreateEventRing (Xhc, &Xhc->EventRing);
-  DEBUG ((EFI_D_INFO, "XhcInitSched:XHC_EVENTRING=0x%x\n", Xhc->EventRing.EventRingSeg0));
+  DEBUG ((DEBUG_INFO, "XhcInitSched: Created CMD ring [%p~%p) EVENT ring [%p~%p)\n",
+    Xhc->CmdRing.RingSeg0,        (UINTN)Xhc->CmdRing.RingSeg0 + sizeof (TRB_TEMPLATE) * CMD_RING_TRB_NUMBER,
+    Xhc->EventRing.EventRingSeg0, (UINTN)Xhc->EventRing.EventRingSeg0 + sizeof (TRB_TEMPLATE) * EVENT_RING_TRB_NUMBER
+    ));
 }
 
 /**
@@ -2668,6 +2669,11 @@ XhcInitializeEndpointContext (
           EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
           Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
           CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+          DEBUG ((DEBUG_INFO, "Endpoint[%x]: Created BULK ring [%p~%p)\n",
+                  EpDesc->EndpointAddress,
+                  EndpointTransferRing->RingSeg0,
+                  (UINTN) EndpointTransferRing->RingSeg0 + TR_RING_TRB_NUMBER * sizeof (TRB_TEMPLATE)
+                  ));
         }
 
         break;
@@ -2736,6 +2742,11 @@ XhcInitializeEndpointContext (
           EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
           Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
           CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+          DEBUG ((DEBUG_INFO, "Endpoint[%x]: Created INT ring [%p~%p)\n",
+                  EpDesc->EndpointAddress,
+                  EndpointTransferRing->RingSeg0,
+                  (UINTN) EndpointTransferRing->RingSeg0 + TR_RING_TRB_NUMBER * sizeof (TRB_TEMPLATE)
+                  ));
         }
         break;
 
@@ -2850,6 +2861,11 @@ XhcInitializeEndpointContext64 (
           EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
           Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
           CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+          DEBUG ((DEBUG_INFO, "Endpoint64[%x]: Created BULK ring [%p~%p)\n",
+                  EpDesc->EndpointAddress,
+                  EndpointTransferRing->RingSeg0,
+                  (UINTN) EndpointTransferRing->RingSeg0 + TR_RING_TRB_NUMBER * sizeof (TRB_TEMPLATE)
+                  ));
         }
 
         break;
@@ -2918,6 +2934,11 @@ XhcInitializeEndpointContext64 (
           EndpointTransferRing = AllocateZeroPool(sizeof (TRANSFER_RING));
           Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *) EndpointTransferRing;
           CreateTransferRing(Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+          DEBUG ((DEBUG_INFO, "Endpoint64[%x]: Created INT ring [%p~%p)\n",
+                  EpDesc->EndpointAddress,
+                  EndpointTransferRing->RingSeg0,
+                  (UINTN) EndpointTransferRing->RingSeg0 + TR_RING_TRB_NUMBER * sizeof (TRB_TEMPLATE)
+                  ));
         }
         break;
 
