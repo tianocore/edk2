@@ -1,7 +1,7 @@
 /** @file
   Pei Core Reset System Support
   
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -63,7 +63,7 @@ PeiResetSystem (
 
   @param[in] ResetType      The type of reset to perform.
   @param[in] ResetStatus    The status code for the reset.
-  @param[in] DataSize       The size, in bytes, of WatchdogData.
+  @param[in] DataSize       The size, in bytes, of ResetData.
   @param[in] ResetData      For a ResetType of EfiResetCold, EfiResetWarm, or EfiResetShutdown
                             the data buffer starts with a Null-terminated string, optionally
                             followed by additional binary data. The string is a description
