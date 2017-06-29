@@ -210,7 +210,7 @@ EmmcIdentificationMode (
   }
 
   // Fetch ECSD
-  Status = Host->SendCommand (Host, MMC_CMD8, RCA);
+  Status = Host->SendCommand (Host, MMC_CMD8, 0);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "EmmcIdentificationMode(): ECSD fetch error, Status=%r.\n", Status));
   }
