@@ -207,6 +207,9 @@ DoS3 (
                                 valid if ResetStatus is something other than EFI_SUCCESS
                                 unless the ResetType is EfiResetPlatformSpecific
                                 where a minimum amount of ResetData is always required.
+                                For a ResetType of EfiResetPlatformSpecific the data buffer
+                                also starts with a Null-terminated string that is followed
+                                by an EFI_GUID that describes the specific type of reset to perform.
 **/
 VOID
 EFIAPI
