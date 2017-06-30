@@ -497,7 +497,7 @@ BuildGatherList (
       goto ERREXIT;
     } else {
       Print (L"CapsuleApp: creating capsule descriptors at 0x%X\n", (UINTN) BlockDescriptors1);
-      Print (L"CapsuleApp: capsule data starts          at 0x%X with size 0x%X\n", (UINTN) CapsuleBuffer, FileSize);
+      Print (L"CapsuleApp: capsule data starts          at 0x%X with size 0x%X\n", (UINTN) CapsuleBuffer[Index], FileSize[Index]);
     }
 
     //
