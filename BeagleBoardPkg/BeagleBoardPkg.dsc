@@ -56,7 +56,7 @@
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
 
-  EfiResetSystemLib|BeagleBoardPkg/Library/ResetSystemLib/ResetSystemLib.inf
+  ResetSystemLib|BeagleBoardPkg/Library/ResetSystemLib/ResetSystemLib.inf
 
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
@@ -421,7 +421,7 @@
 #      SerialPortLib|ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
 #  }
 
-  EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
+  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 

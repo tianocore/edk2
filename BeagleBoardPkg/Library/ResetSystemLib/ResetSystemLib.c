@@ -2,6 +2,7 @@
   Do a generic Cold Reset for OMAP3550 and BeagleBoard specific Warm reset
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -16,150 +17,95 @@
 
 #include <Uefi.h>
 
-#include <Library/ArmLib.h>
-#include <Library/CacheMaintenanceLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/IoLib.h>
-#include <Library/PcdLib.h>
-#include <Library/DebugLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include <Library/ResetSystemLib.h>
 
 #include <Omap3530/Omap3530.h>
 
+/**
+  This function causes a system-wide reset (cold reset), in which
+  all circuitry within the system returns to its initial state. This type of
+  reset is asynchronous to system operation and operates without regard to
+  cycle boundaries.
 
+  If this function returns, it means that the system does not support cold
+  reset.
+**/
 VOID
-ShutdownEfi (
+EFIAPI
+ResetCold (
   VOID
   )
 {
-  EFI_STATUS              Status;
-  UINTN                   MemoryMapSize;
-  EFI_MEMORY_DESCRIPTOR   *MemoryMap;
-  UINTN                   MapKey;
-  UINTN                   DescriptorSize;
-  UINTN                   DescriptorVersion;
-  UINTN                   Pages;
-
-  MemoryMap = NULL;
-  MemoryMapSize = 0;
-  do {
-    Status = gBS->GetMemoryMap (
-                    &MemoryMapSize,
-                    MemoryMap,
-                    &MapKey,
-                    &DescriptorSize,
-                    &DescriptorVersion
-                    );
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-
-      Pages = EFI_SIZE_TO_PAGES (MemoryMapSize) + 1;
-      MemoryMap = AllocatePages (Pages);
-
-      //
-      // Get System MemoryMap
-      //
-      Status = gBS->GetMemoryMap (
-                      &MemoryMapSize,
-                      MemoryMap,
-                      &MapKey,
-                      &DescriptorSize,
-                      &DescriptorVersion
-                      );
-      // Don't do anything between the GetMemoryMap() and ExitBootServices()
-      if (!EFI_ERROR (Status)) {
-        Status = gBS->ExitBootServices (gImageHandle, MapKey);
-        if (EFI_ERROR (Status)) {
-          FreePages (MemoryMap, Pages);
-          MemoryMap = NULL;
-          MemoryMapSize = 0;
-        }
-      }
-    }
-  } while (EFI_ERROR (Status));
-
-  //Clean and invalidate caches.
-  WriteBackInvalidateDataCache();
-  InvalidateInstructionCache();
-
-  //Turning off Caches and MMU
-  ArmDisableDataCache ();
-  ArmDisableInstructionCache ();
-  ArmDisableMmu ();
+  //Perform cold reset of the system.
+  MmioOr32 (PRM_RSTCTRL, RST_DPLL3);
+  while ((MmioRead32(PRM_RSTST) & GLOBAL_COLD_RST) != 0x1);
 }
 
-typedef
+/**
+  This function causes a system-wide initialization (warm reset), in which all
+  processors are set to their initial state. Pending cycles are not corrupted.
+
+  If this function returns, it means that the system does not support warm
+  reset.
+**/
 VOID
-(EFIAPI *CALL_STUB)(
+EFIAPI
+ResetWarm (
   VOID
-);
-
-
-/**
-  Resets the entire platform.
-
-  @param  ResetType             The type of reset to perform.
-  @param  ResetStatus           The status code for the reset.
-  @param  DataSize              The size, in bytes, of WatchdogData.
-  @param  ResetData             For a ResetType of EfiResetCold, EfiResetWarm, or
-                                EfiResetShutdown the data buffer starts with a Null-terminated
-                                Unicode string, optionally followed by additional binary data.
-
-**/
-EFI_STATUS
-EFIAPI
-LibResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN CHAR16           *ResetData OPTIONAL
   )
 {
-  CALL_STUB   StartOfFv;
-
-  if (ResetData != NULL) {
-    DEBUG((EFI_D_ERROR, "%s", ResetData));
-  }
-
-  ShutdownEfi ();
-
-  switch (ResetType) {
-  case EfiResetWarm:
-    //Perform warm reset of the system by jumping to the begining of the FV
-    StartOfFv = (CALL_STUB)(UINTN)PcdGet64 (PcdFvBaseAddress);
-    StartOfFv ();
-    break;
-  case EfiResetCold:
-  case EfiResetShutdown:
-  default:
-    //Perform cold reset of the system.
-    MmioOr32 (PRM_RSTCTRL, RST_DPLL3);
-    while ((MmioRead32(PRM_RSTST) & GLOBAL_COLD_RST) != 0x1);
-    break;
-  }
-
-  // If the reset didn't work, return an error.
-  ASSERT (FALSE);
-  return EFI_DEVICE_ERROR;
+  ResetCold ();
 }
-
-
 
 /**
-  Initialize any infrastructure required for LibResetSystem () to function.
+  This function causes the system to enter a power state equivalent
+  to the ACPI G2/S5 or G3 states.
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-
+  If this function returns, it means that the system does not support shut down
+  reset.
 **/
-EFI_STATUS
+VOID
 EFIAPI
-LibInitializeResetSystem (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+ResetShutdown (
+  VOID
   )
 {
-  return EFI_SUCCESS;
+  // not implemented
 }
 
+/**
+  This function causes the system to enter S3 and then wake up immediately.
+
+  If this function returns, it means that the system does not support S3
+  feature.
+**/
+VOID
+EFIAPI
+EnterS3WithImmediateWake (
+  VOID
+  )
+{
+  // not implemented
+}
+
+/**
+  This function causes a systemwide reset. The exact type of the reset is
+  defined by the EFI_GUID that follows the Null-terminated Unicode string passed
+  into ResetData. If the platform does not recognize the EFI_GUID in ResetData
+  the platform must pick a supported reset type to perform.The platform may
+  optionally log the parameters from any non-normal reset that occurs.
+
+  @param[in]  DataSize   The size, in bytes, of ResetData.
+  @param[in]  ResetData  The data buffer starts with a Null-terminated string,
+                         followed by the EFI_GUID.
+**/
+VOID
+EFIAPI
+ResetPlatformSpecific (
+  IN UINTN   DataSize,
+  IN VOID    *ResetData
+  )
+{
+  ResetCold ();
+}

@@ -115,7 +115,7 @@ FvNameGuid         = d0dd3e90-343d-4cb3-8f69-772214989282
   INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
   INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 
-  INF EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
+  INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 
