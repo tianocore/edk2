@@ -23,7 +23,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/EfiResetSystemLib.h>
+#include <Library/ResetSystemLib.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/ArmHvcLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -67,48 +67,25 @@ ArmPsciResetSystemLibConstructor (
 }
 
 /**
-  Resets the entire platform.
+  This function causes a system-wide reset (cold reset), in which
+  all circuitry within the system returns to its initial state. This type of reset
+  is asynchronous to system operation and operates without regard to
+  cycle boundaries.
 
-  @param  ResetType             The type of reset to perform.
-  @param  ResetStatus           The status code for the reset.
-  @param  DataSize              The size, in bytes, of WatchdogData.
-  @param  ResetData             For a ResetType of EfiResetCold, EfiResetWarm, or
-                                EfiResetShutdown the data buffer starts with a Null-terminated
-                                Unicode string, optionally followed by additional binary data.
-
+  If this function returns, it means that the system does not support cold reset.
 **/
-EFI_STATUS
+VOID
 EFIAPI
-LibResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN CHAR16           *ResetData OPTIONAL
+ResetCold (
+  VOID
   )
 {
   ARM_SMC_ARGS ArmSmcArgs;
   ARM_HVC_ARGS ArmHvcArgs;
 
-  switch (ResetType) {
-
-  case EfiResetPlatformSpecific:
-    // Map the platform specific reset as reboot
-  case EfiResetWarm:
-    // Map a warm reset into a cold reset
-  case EfiResetCold:
-    // Send a PSCI 0.2 SYSTEM_RESET command
-    ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
-    ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
-    break;
-  case EfiResetShutdown:
-    // Send a PSCI 0.2 SYSTEM_OFF command
-    ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
-    ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
-    break;
-  default:
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
+  // Send a PSCI 0.2 SYSTEM_RESET command
+  ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
+  ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
 
   switch (mArmPsciMethod) {
   case 1:
@@ -121,30 +98,90 @@ LibResetSystem (
 
   default:
     DEBUG ((EFI_D_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
-    return EFI_UNSUPPORTED;
   }
-
-  // We should never be here
-  DEBUG ((EFI_D_ERROR, "%a: PSCI Reset failed\n", __FUNCTION__));
-  CpuDeadLoop ();
-  return EFI_UNSUPPORTED;
 }
 
 /**
-  Initialize any infrastructure required for LibResetSystem () to function.
+  This function causes a system-wide initialization (warm reset), in which all processors
+  are set to their initial state. Pending cycles are not corrupted.
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-
+  If this function returns, it means that the system does not support warm reset.
 **/
-EFI_STATUS
+VOID
 EFIAPI
-LibInitializeResetSystem (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+ResetWarm (
+  VOID
   )
 {
-  return EFI_SUCCESS;
+  // Map a warm reset into a cold reset
+  ResetCold ();
+}
+
+/**
+  This function causes the system to enter a power state equivalent
+  to the ACPI G2/S5 or G3 states.
+
+  If this function returns, it means that the system does not support shutdown reset.
+**/
+VOID
+EFIAPI
+ResetShutdown (
+  VOID
+  )
+{
+  ARM_SMC_ARGS ArmSmcArgs;
+  ARM_HVC_ARGS ArmHvcArgs;
+
+  // Send a PSCI 0.2 SYSTEM_OFF command
+  ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
+  ArmHvcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
+
+  switch (mArmPsciMethod) {
+  case 1:
+    ArmCallHvc (&ArmHvcArgs);
+    break;
+
+  case 2:
+    ArmCallSmc (&ArmSmcArgs);
+    break;
+
+  default:
+    DEBUG ((EFI_D_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+  }
+}
+
+/**
+  This function causes the system to enter S3 and then wake up immediately.
+
+  If this function returns, it means that the system does not support S3 feature.
+**/
+VOID
+EFIAPI
+EnterS3WithImmediateWake (
+  VOID
+  )
+{
+  // not implemented
+}
+
+/**
+  This function causes a systemwide reset. The exact type of the reset is
+  defined by the EFI_GUID that follows the Null-terminated Unicode string passed
+  into ResetData. If the platform does not recognize the EFI_GUID in ResetData
+  the platform must pick a supported reset type to perform.The platform may
+  optionally log the parameters from any non-normal reset that occurs.
+
+  @param[in]  DataSize   The size, in bytes, of ResetData.
+  @param[in]  ResetData  The data buffer starts with a Null-terminated string,
+                         followed by the EFI_GUID.
+**/
+VOID
+EFIAPI
+ResetPlatformSpecific (
+  IN UINTN   DataSize,
+  IN VOID    *ResetData
+  )
+{
+  // Map the platform specific reset as reboot
+  ResetCold ();
 }

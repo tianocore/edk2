@@ -20,7 +20,7 @@
   FILE_GUID                      = c81d76ed-66fa-44a3-ac4a-f163120187a9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = EfiResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = ResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = ArmPsciResetSystemLibConstructor
 
 [Sources]
@@ -29,8 +29,8 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   ArmSmcLib
