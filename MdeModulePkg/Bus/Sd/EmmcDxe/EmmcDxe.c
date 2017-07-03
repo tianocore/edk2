@@ -4,7 +4,7 @@
   It produces BlockIo, BlockIo2 and StorageSecurity protocols to allow upper layer
   access the EMMC device.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -72,6 +72,13 @@ EMMC_PARTITION mEmmcPartitionTemplate = {
     EFI_ERASE_BLOCK_PROTOCOL_REVISION,
     1,
     EmmcEraseBlocks
+  },
+  {                            // DiskInfo
+    EFI_DISK_INFO_SD_MMC_INTERFACE_GUID,
+    EmmcDiskInfoInquiry,
+    EmmcDiskInfoIdentify,
+    EmmcDiskInfoSenseData,
+    EmmcDiskInfoWhichIde
   },
   {
     NULL,
@@ -454,6 +461,8 @@ InstallProtocolOnPartition (
                       &Partition->BlockIo2,
                       &gEfiEraseBlockProtocolGuid,
                       &Partition->EraseBlock,
+                      &gEfiDiskInfoProtocolGuid,
+                      &Partition->DiskInfo,
                       NULL
                       );
       if (EFI_ERROR (Status)) {
@@ -481,6 +490,8 @@ InstallProtocolOnPartition (
                  &Partition->BlockIo2,
                  &gEfiEraseBlockProtocolGuid,
                  &Partition->EraseBlock,
+                 &gEfiDiskInfoProtocolGuid,
+                 &Partition->DiskInfo,
                  NULL
                  );
           goto Error;
@@ -1104,6 +1115,8 @@ EmmcDxeDriverBindingStop (
                     &Partition->BlockIo2,
                     &gEfiEraseBlockProtocolGuid,
                     &Partition->EraseBlock,
+                    &gEfiDiskInfoProtocolGuid,
+                    &Partition->DiskInfo,
                     NULL
                     );
     if (EFI_ERROR (Status)) {

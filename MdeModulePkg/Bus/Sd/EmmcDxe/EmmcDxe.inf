@@ -4,7 +4,7 @@
 #  It produces BlockIo, BlockIo2 and StorageSecurity protocols to allow upper layer
 #  access the EMMC device.
 #
-#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -41,6 +41,8 @@
   EmmcDxe.h
   EmmcBlockIo.c
   EmmcBlockIo.h
+  EmmcDiskInfo.c
+  EmmcDiskInfo.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -61,6 +63,7 @@
   gEfiBlockIo2ProtocolGuid                     ## BY_START
   gEfiStorageSecurityCommandProtocolGuid       ## SOMETIMES_PRODUCES
   gEfiEraseBlockProtocolGuid                   ## BY_START
+  gEfiDiskInfoProtocolGuid                     ## BY_START
   ## TO_START
   ## BY_START
   gEfiDevicePathProtocolGuid
