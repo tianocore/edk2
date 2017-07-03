@@ -2,7 +2,7 @@
 
   Provides some data structure definitions used by the XHCI host controller driver.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -243,6 +243,7 @@ struct _USB_XHCI_INSTANCE {
   UINT64                    *DCBAA;
   VOID                      *DCBAAMap;
   UINT32                    MaxSlotsEn;
+  URB                       *PendingUrb;
   //
   // Cmd Transfer Ring
   //

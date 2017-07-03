@@ -780,26 +780,32 @@ XhcTransfer (
 
   Status = XhcExecTransfer (Xhc, FALSE, Urb, Timeout);
 
-  *TransferResult = Urb->Result;
-  *DataLength     = Urb->Completed;
-
   if (Status == EFI_TIMEOUT) {
     //
     // The transfer timed out. Abort the transfer by dequeueing of the TD.
     //
-    RecoveryStatus = XhcDequeueTrbFromEndpoint (Xhc, Urb);
-    if (EFI_ERROR (RecoveryStatus)) {
-      DEBUG((DEBUG_ERROR, "XhcTransfer[Type=%d]: XhcDequeueTrbFromEndpoint failed\n", Type));
-    }
-  } else {
-    if (*TransferResult == EFI_USB_NOERROR) {
+    RecoveryStatus = XhcDequeueTrbFromEndpoint(Xhc, Urb);
+    if (RecoveryStatus == EFI_ALREADY_STARTED) {
+      //
+      // The URB is finished just before stopping endpoint.
+      // Change returning status from EFI_TIMEOUT to EFI_SUCCESS.
+      //
+      ASSERT (Urb->Result == EFI_USB_NOERROR);
       Status = EFI_SUCCESS;
-    } else if (*TransferResult == EFI_USB_ERR_STALL) {
-      RecoveryStatus = XhcRecoverHaltedEndpoint (Xhc, Urb);
-      if (EFI_ERROR (RecoveryStatus)) {
-        DEBUG ((DEBUG_ERROR, "XhcTransfer[Type=%d]: XhcRecoverHaltedEndpoint failed\n", Type));
-      }
-      Status = EFI_DEVICE_ERROR;
+      DEBUG ((DEBUG_ERROR, "XhcTransfer[Type=%d]: pending URB is finished, Length = %d.\n", Type, Urb->Completed));
+    } else if (EFI_ERROR(RecoveryStatus)) {
+      DEBUG((DEBUG_ERROR, "XhcTransfer[Type=%d]: XhcDequeueTrbFromEndpoint failed!\n", Type));
+    }
+  }
+
+  *TransferResult = Urb->Result;
+  *DataLength     = Urb->Completed;
+
+  if (*TransferResult == EFI_USB_ERR_STALL) {
+    ASSERT (Status == EFI_DEVICE_ERROR);
+    RecoveryStatus = XhcRecoverHaltedEndpoint(Xhc, Urb);
+    if (EFI_ERROR (RecoveryStatus)) {
+      DEBUG ((DEBUG_ERROR, "XhcTransfer[Type=%d]: XhcRecoverHaltedEndpoint failed!\n", Type));
     }
   }
 

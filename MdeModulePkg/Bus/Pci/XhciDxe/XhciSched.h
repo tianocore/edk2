@@ -2,7 +2,7 @@
 
   This file contains the definition for XHCI host controller schedule routines.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -80,6 +80,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define TRB_COMPLETION_TRB_ERROR              5
 #define TRB_COMPLETION_STALL_ERROR            6
 #define TRB_COMPLETION_SHORT_PACKET           13
+#define TRB_COMPLETION_STOPPED                26
+#define TRB_COMPLETION_STOPPED_LENGTH_INVALID 27
 
 //
 // The topology string used to present usb device location
@@ -1343,6 +1345,7 @@ XhcDequeueTrbFromEndpoint (
   @param  Xhc                   The XHCI Instance.
   @param  SlotId                The slot id to be configured.
   @param  Dci                   The device context index of endpoint.
+  @param  PendingUrb            The pending URB to check completion status when stopping the end point.
 
   @retval EFI_SUCCESS           Stop endpoint successfully.
   @retval Others                Failed to stop endpoint.
@@ -1353,7 +1356,8 @@ EFIAPI
 XhcStopEndpoint (
   IN USB_XHCI_INSTANCE      *Xhc,
   IN UINT8                  SlotId,
-  IN UINT8                  Dci
+  IN UINT8                  Dci,
+  IN URB                    *PendingUrb  OPTIONAL
   );
 
 /**

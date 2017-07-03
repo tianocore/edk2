@@ -696,6 +696,7 @@ Done:
   @param  Urb                   The urb which doesn't get completed in a specified timeout range.
 
   @retval EFI_SUCCESS           The dequeuing of the TDs is successful.
+  @retval EFI_ALREADY_STARTED   The Urb is finished so no deque is needed.
   @retval Others                Failed to stop the endpoint and dequeue the TDs.
 
 **/
@@ -723,7 +724,7 @@ XhcDequeueTrbFromEndpoint (
   //
   // 1) Send Stop endpoint command to stop xHC from executing of the TDs on the endpoint
   //
-  Status = XhcStopEndpoint(Xhc, SlotId, Dci);
+  Status = XhcStopEndpoint(Xhc, SlotId, Dci, Urb);
   if (EFI_ERROR(Status)) {
     DEBUG ((EFI_D_ERROR, "XhcDequeueTrbFromEndpoint: Stop Endpoint Failed, Status = %r\n", Status));
     goto Done;
@@ -732,10 +733,20 @@ XhcDequeueTrbFromEndpoint (
   //
   // 2)Set dequeue pointer
   //
-  Status = XhcSetTrDequeuePointer(Xhc, SlotId, Dci, Urb);
-  if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcDequeueTrbFromEndpoint: Set Transfer Ring Dequeue Pointer Failed, Status = %r\n", Status));
-    goto Done;
+  if (Urb->Finished && Urb->Result == EFI_USB_NOERROR) {
+    //
+    // Return Already Started to indicate the pending URB is finished.
+    // This fixes BULK data loss when transfer is detected as timeout
+    // but finished just before stopping endpoint.
+    //
+    Status = EFI_ALREADY_STARTED;
+    DEBUG ((DEBUG_INFO, "XhcDequeueTrbFromEndpoint: Pending URB is finished: Length Actual/Expect = %d/%d!\n", Urb->Completed, Urb->DataLen));
+  } else {
+    Status = XhcSetTrDequeuePointer(Xhc, SlotId, Dci, Urb);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "XhcDequeueTrbFromEndpoint: Set Transfer Ring Dequeue Pointer Failed, Status = %r\n", Status));
+      goto Done;
+    }
   }
 
   //
@@ -1125,12 +1136,14 @@ XhcCheckUrbResult (
     TRBPtr = (TRB_TEMPLATE *)(UINTN) UsbHcGetHostAddrForPciAddr (Xhc->MemPool, (VOID *)(UINTN) PhyAddr, sizeof (TRB_TEMPLATE));
 
     //
-    // Update the status of Urb according to the finished event regardless of whether
-    // the urb is current checked one or in the XHCI's async transfer list.
+    // Update the status of URB including the pending URB, the URB that is currently checked,
+    // and URBs in the XHCI's async interrupt transfer list.
     // This way is used to avoid that those completed async transfer events don't get
     // handled in time and are flushed by newer coming events.
     //
-    if (IsTransferRingTrb (Xhc, TRBPtr, Urb)) {
+    if (Xhc->PendingUrb != NULL && IsTransferRingTrb (Xhc, TRBPtr, Xhc->PendingUrb)) {
+      CheckedUrb = Xhc->PendingUrb;
+    } else if (IsTransferRingTrb (Xhc, TRBPtr, Urb)) {
       CheckedUrb = Urb;
     } else if (IsAsyncIntTrb (Xhc, TRBPtr, &AsyncUrb)) {    
       CheckedUrb = AsyncUrb;
@@ -1162,6 +1175,16 @@ XhcCheckUrbResult (
         CheckedUrb->Finished = TRUE;
         DEBUG ((EFI_D_ERROR, "XhcCheckUrbResult: TRANSACTION_ERROR! Completecode = %x\n",EvtTrb->Completecode));
         goto EXIT;
+
+      case TRB_COMPLETION_STOPPED:
+      case TRB_COMPLETION_STOPPED_LENGTH_INVALID:
+        CheckedUrb->Result  |= EFI_USB_ERR_TIMEOUT;
+        CheckedUrb->Finished = TRUE;
+        //
+        // The pending URB is timeout and force stopped when stopping endpoint.
+        // Continue the loop to receive the Command Complete Event for stopping endpoint.
+        //
+        continue;
 
       case TRB_COMPLETION_SHORT_PACKET:
       case TRB_COMPLETION_SUCCESS:
@@ -3155,6 +3178,7 @@ XhcSetConfigCmd64 (
   @param  Xhc                   The XHCI Instance.
   @param  SlotId                The slot id to be configured.
   @param  Dci                   The device context index of endpoint.
+  @param  PendingUrb            The pending URB to check completion status when stopping the end point.
 
   @retval EFI_SUCCESS           Stop endpoint successfully.
   @retval Others                Failed to stop endpoint.
@@ -3165,7 +3189,8 @@ EFIAPI
 XhcStopEndpoint (
   IN USB_XHCI_INSTANCE      *Xhc,
   IN UINT8                  SlotId,
-  IN UINT8                  Dci
+  IN UINT8                  Dci,
+  IN URB                    *PendingUrb  OPTIONAL
   )
 {
   EFI_STATUS                    Status;
@@ -3173,6 +3198,29 @@ XhcStopEndpoint (
   CMD_TRB_STOP_ENDPOINT         CmdTrbStopED;
 
   DEBUG ((EFI_D_INFO, "XhcStopEndpoint: Slot = 0x%x, Dci = 0x%x\n", SlotId, Dci));
+
+  //
+  // When XhcCheckUrbResult waits for the Stop_Endpoint completion, it also checks
+  // the PendingUrb completion status, because it's possible that the PendingUrb is
+  // finished just before stopping the end point, but after the looping check.
+  //
+  // The PendingUrb could be passed to XhcCmdTransfer to XhcExecTransfer to XhcCheckUrbResult
+  // through function parameter, but That will cause every consumer of XhcCmdTransfer,
+  // XhcExecTransfer and XhcCheckUrbResult pass a NULL PendingUrb.
+  // But actually only XhcCheckUrbResult is aware of the PendingUrb.
+  // So we choose to save the PendingUrb into the USB_XHCI_INSTANCE and use it in XhcCheckUrbResult.
+  //
+  ASSERT (Xhc->PendingUrb == NULL);
+  Xhc->PendingUrb = PendingUrb;
+  //
+  // Reset the URB result from Timeout to NoError.
+  // The USB result will be:
+  //   changed to Timeout when Stop/StopInvalidLength Transfer Event is received, or
+  //   remain NoError when Success/ShortPacket Transfer Event is received.
+  //
+  if (PendingUrb != NULL) {
+    PendingUrb->Result = EFI_USB_NOERROR;
+  }
 
   //
   // Send stop endpoint command to transit Endpoint from running to stop state
@@ -3191,6 +3239,8 @@ XhcStopEndpoint (
   if (EFI_ERROR(Status)) {
     DEBUG ((EFI_D_ERROR, "XhcStopEndpoint: Stop Endpoint Failed, Status = %r\n", Status));
   }
+
+  Xhc->PendingUrb = NULL;
 
   return Status;
 }
@@ -3418,7 +3468,7 @@ XhcSetInterface (
       // XHCI 4.3.6 - Setting Alternate Interfaces
       // 1) Stop any Running Transfer Rings affected by the Alternate Interface setting.
       //
-      Status = XhcStopEndpoint (Xhc, SlotId, Dci);
+      Status = XhcStopEndpoint (Xhc, SlotId, Dci, NULL);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -3620,7 +3670,7 @@ XhcSetInterface64 (
       // XHCI 4.3.6 - Setting Alternate Interfaces
       // 1) Stop any Running Transfer Rings affected by the Alternate Interface setting.
       //
-      Status = XhcStopEndpoint (Xhc, SlotId, Dci);
+      Status = XhcStopEndpoint (Xhc, SlotId, Dci, NULL);
       if (EFI_ERROR (Status)) {
         return Status;
       }
