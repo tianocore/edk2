@@ -542,6 +542,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
 
 !if $(SMM_REQUIRE) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes|8
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x01
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
 !endif

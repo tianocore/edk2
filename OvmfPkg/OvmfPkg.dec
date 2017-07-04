@@ -90,13 +90,6 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdVirtioScsiMaxTargetLimit|31|UINT16|6
   gUefiOvmfPkgTokenSpaceGuid.PcdVirtioScsiMaxLunLimit|7|UINT32|7
 
-  ## The following setting controls how many megabytes we configure as TSEG on
-  #  Q35, for SMRAM purposes. Permitted values are: 1, 2, 8. Other values cause
-  #  undefined behavior.
-  #
-  #  This PCD is only consulted if PcdSmmSmramRequire is TRUE (see below).
-  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes|8|UINT16|0x20
-
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogBase|0x0|UINT32|0x8
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize|0x0|UINT32|0x9
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|0x0|UINT32|0xa
@@ -134,6 +127,13 @@
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x26
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x27
+
+  ## The following setting controls how many megabytes we configure as TSEG on
+  #  Q35, for SMRAM purposes. Permitted values are: 1, 2, 8. Other values cause
+  #  undefined behavior.
+  #
+  #  This PCD is only consulted if PcdSmmSmramRequire is TRUE (see below).
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes|8|UINT16|0x20
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
