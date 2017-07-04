@@ -108,4 +108,6 @@ extern UINT8 mPhysMemAddressWidth;
 
 extern UINT32 mMaxCpuCount;
 
+extern UINT16 mHostBridgeDevId;
+
 #endif // _PLATFORM_PEI_H_INCLUDED_

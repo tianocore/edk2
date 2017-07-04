@@ -645,6 +645,11 @@ InitializePlatform (
   AddressWidthInitialization ();
   MaxCpuCountInitialization ();
 
+  //
+  // Query Host Bridge DID
+  //
+  mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
     Q35TsegMbytesInitialization ();
   }
@@ -657,11 +662,6 @@ InitializePlatform (
     DEBUG ((EFI_D_INFO, "Xen was detected\n"));
     InitializeXen ();
   }
-
-  //
-  // Query Host Bridge DID
-  //
-  mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
 
   if (mBootMode != BOOT_ON_S3_RESUME) {
     if (!FeaturePcdGet (PcdSmmSmramRequire)) {

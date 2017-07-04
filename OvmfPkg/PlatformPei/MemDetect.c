@@ -19,16 +19,19 @@ Module Name:
 //
 // The package level header files this module uses
 //
+#include <IndustryStandard/Q35MchIch9.h>
 #include <PiPei.h>
 
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Library/MtrrLib.h>
@@ -49,7 +52,54 @@ Q35TsegMbytesInitialization (
   VOID
   )
 {
-  mQ35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
+  UINT16        ExtendedTsegMbytes;
+  RETURN_STATUS PcdStatus;
+
+  if (mHostBridgeDevId != INTEL_Q35_MCH_DEVICE_ID) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
+      "only DID=0x%04x (Q35) is supported\n",
+      __FUNCTION__,
+      mHostBridgeDevId,
+      INTEL_Q35_MCH_DEVICE_ID
+      ));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  //
+  // Check if QEMU offers an extended TSEG.
+  //
+  // This can be seen from writing MCH_EXT_TSEG_MB_QUERY to the MCH_EXT_TSEG_MB
+  // register, and reading back the register.
+  //
+  // On a QEMU machine type that does not offer an extended TSEG, the initial
+  // write overwrites whatever value a malicious guest OS may have placed in
+  // the (unimplemented) register, before entering S3 or rebooting.
+  // Subsequently, the read returns MCH_EXT_TSEG_MB_QUERY unchanged.
+  //
+  // On a QEMU machine type that offers an extended TSEG, the initial write
+  // triggers an update to the register. Subsequently, the value read back
+  // (which is guaranteed to differ from MCH_EXT_TSEG_MB_QUERY) tells us the
+  // number of megabytes.
+  //
+  PciWrite16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB), MCH_EXT_TSEG_MB_QUERY);
+  ExtendedTsegMbytes = PciRead16 (DRAMC_REGISTER_Q35 (MCH_EXT_TSEG_MB));
+  if (ExtendedTsegMbytes == MCH_EXT_TSEG_MB_QUERY) {
+    mQ35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: QEMU offers an extended TSEG (%d MB)\n",
+    __FUNCTION__,
+    ExtendedTsegMbytes
+    ));
+  PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  mQ35TsegMbytes = ExtendedTsegMbytes;
 }
 
 
