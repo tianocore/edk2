@@ -129,10 +129,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x27
 
   ## The following setting controls how many megabytes we configure as TSEG on
-  #  Q35, for SMRAM purposes. Permitted values are: 1, 2, 8. Other values cause
-  #  undefined behavior.
+  #  Q35, for SMRAM purposes. Permitted defaults are: 1, 2, 8. Other defaults
+  #  cause undefined behavior. During boot, the PCD is updated by PlatformPei
+  #  to reflect the extended TSEG size, if one is advertized by QEMU.
   #
-  #  This PCD is only consulted if PcdSmmSmramRequire is TRUE (see below).
+  #  This PCD is only accessed if PcdSmmSmramRequire is TRUE (see below).
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes|8|UINT16|0x20
 
 [PcdsFeatureFlag]
