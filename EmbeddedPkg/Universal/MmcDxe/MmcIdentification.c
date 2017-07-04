@@ -13,6 +13,7 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/TimerLib.h>
 
 #include "Mmc.h"
@@ -210,15 +211,19 @@ EmmcIdentificationMode (
   }
 
   // Fetch ECSD
+  MmcHostInstance->CardInfo.ECSDData = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (ECSD)));
+  if (MmcHostInstance->CardInfo.ECSDData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   Status = Host->SendCommand (Host, MMC_CMD8, 0);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "EmmcIdentificationMode(): ECSD fetch error, Status=%r.\n", Status));
   }
 
-  Status = Host->ReadBlockData (Host, 0, 512, (UINT32 *)&(MmcHostInstance->CardInfo.ECSDData));
+  Status = Host->ReadBlockData (Host, 0, 512, (UINT32 *)MmcHostInstance->CardInfo.ECSDData);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "EmmcIdentificationMode(): ECSD read error, Status=%r.\n", Status));
-    return Status;
+    goto FreePageExit;
   }
 
   // Make sure device exiting data mode
@@ -226,7 +231,7 @@ EmmcIdentificationMode (
     Status = EmmcGetDeviceState (MmcHostInstance, &State);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "EmmcIdentificationMode(): Failed to get device state, Status=%r.\n", Status));
-      return Status;
+      goto FreePageExit;
     }
   } while (State == EMMC_DATA_STATE);
 
@@ -237,12 +242,16 @@ EmmcIdentificationMode (
   Media->LogicalBlocksPerPhysicalBlock = 1;
   Media->IoAlign = 4;
   // Compute last block using bits [215:212] of the ECSD
-  Media->LastBlock = MmcHostInstance->CardInfo.ECSDData.SECTOR_COUNT - 1; // eMMC isn't supposed to report this for
+  Media->LastBlock = MmcHostInstance->CardInfo.ECSDData->SECTOR_COUNT - 1; // eMMC isn't supposed to report this for
   // Cards <2GB in size, but the model does.
 
   // Setup card type
   MmcHostInstance->CardInfo.CardType = EMMC_CARD;
   return EFI_SUCCESS;
+
+FreePageExit:
+  FreePages (MmcHostInstance->CardInfo.ECSDData, EFI_SIZE_TO_PAGES (sizeof (ECSD)));
+  return Status;
 }
 
 STATIC
@@ -258,7 +267,7 @@ InitializeEmmcDevice (
   UINT32     TimingMode[4] = {EMMCHS52DDR1V2, EMMCHS52DDR1V8, EMMCHS52, EMMCHS26};
 
   Host  = MmcHostInstance->MmcHost;
-  ECSDData = &MmcHostInstance->CardInfo.ECSDData;
+  ECSDData = MmcHostInstance->CardInfo.ECSDData;
   if (ECSDData->DEVICE_TYPE == EMMCBACKWARD)
     return EFI_SUCCESS;
 

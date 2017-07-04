@@ -171,6 +171,9 @@ EFI_STATUS DestroyMmcHostInstance (
   if (MmcHostInstance->BlockIo.Media) {
     FreePool(MmcHostInstance->BlockIo.Media);
   }
+  if (MmcHostInstance->CardInfo.ECSDData) {
+    FreePages (MmcHostInstance->CardInfo.ECSDData, EFI_SIZE_TO_PAGES (sizeof (ECSD)));
+  }
   FreePool (MmcHostInstance);
 
   return Status;
