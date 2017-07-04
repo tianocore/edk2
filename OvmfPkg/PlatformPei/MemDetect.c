@@ -42,6 +42,17 @@ UINT8 mPhysMemAddressWidth;
 STATIC UINT32 mS3AcpiReservedMemoryBase;
 STATIC UINT32 mS3AcpiReservedMemorySize;
 
+STATIC UINT16 mQ35TsegMbytes;
+
+VOID
+Q35TsegMbytesInitialization (
+  VOID
+  )
+{
+  mQ35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
+}
+
+
 UINT32
 GetSystemMemorySizeBelow4gb (
   VOID
@@ -348,7 +359,7 @@ PublishPeiMemory (
     //
     // TSEG is chipped from the end of low RAM
     //
-    LowerMemorySize -= FixedPcdGet16 (PcdQ35TsegMbytes) * SIZE_1MB;
+    LowerMemorySize -= mQ35TsegMbytes * SIZE_1MB;
   }
 
   //
@@ -456,7 +467,7 @@ QemuInitializeRam (
     if (FeaturePcdGet (PcdSmmSmramRequire)) {
       UINT32 TsegSize;
 
-      TsegSize = FixedPcdGet16 (PcdQ35TsegMbytes) * SIZE_1MB;
+      TsegSize = mQ35TsegMbytes * SIZE_1MB;
       AddMemoryRangeHob (BASE_1MB, LowerMemorySize - TsegSize);
       AddReservedMemoryBaseSizeHob (LowerMemorySize - TsegSize, TsegSize,
         TRUE);
@@ -605,7 +616,7 @@ InitializeRamRegions (
       // Make sure the TSEG area that we reported as a reserved memory resource
       // cannot be used for reserved memory allocations.
       //
-      TsegSize = FixedPcdGet16 (PcdQ35TsegMbytes) * SIZE_1MB;
+      TsegSize = mQ35TsegMbytes * SIZE_1MB;
       BuildMemoryAllocationHob (
         GetSystemMemorySizeBelow4gb() - TsegSize,
         TsegSize,

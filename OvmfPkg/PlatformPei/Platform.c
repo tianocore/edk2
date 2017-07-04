@@ -645,6 +645,10 @@ InitializePlatform (
   AddressWidthInitialization ();
   MaxCpuCountInitialization ();
 
+  if (FeaturePcdGet (PcdSmmSmramRequire)) {
+    Q35TsegMbytesInitialization ();
+  }
+
   PublishPeiMemory ();
 
   InitializeRamRegions ();

@@ -53,6 +53,11 @@ AddressWidthInitialization (
   VOID
   );
 
+VOID
+Q35TsegMbytesInitialization (
+  VOID
+  );
+
 EFI_STATUS
 PublishPeiMemory (
   VOID
