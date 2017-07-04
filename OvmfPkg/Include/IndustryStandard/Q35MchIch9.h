@@ -33,6 +33,9 @@
 //
 #define DRAMC_REGISTER_Q35(Offset) PCI_LIB_ADDRESS (0, 0, 0, (Offset))
 
+#define MCH_EXT_TSEG_MB       0x50
+#define MCH_EXT_TSEG_MB_QUERY   0xFFFF
+
 #define MCH_GGC               0x52
 #define MCH_GGC_IVD             BIT1
 
@@ -54,6 +57,7 @@
 #define MCH_ESMRAMC_SM_CACHE    BIT5
 #define MCH_ESMRAMC_SM_L1       BIT4
 #define MCH_ESMRAMC_SM_L2       BIT3
+#define MCH_ESMRAMC_TSEG_EXT    (BIT2 | BIT1)
 #define MCH_ESMRAMC_TSEG_8MB    BIT2
 #define MCH_ESMRAMC_TSEG_2MB    BIT1
 #define MCH_ESMRAMC_TSEG_1MB    0
