@@ -52,7 +52,9 @@ class FD(FDClassObject):
         #
         # Print Information
         #
-        GenFdsGlobalVariable.InfLogger("Fd File Name:%s" %self.FdUiName)
+        FdFileName = os.path.join(GenFdsGlobalVariable.FvDir, self.FdUiName + '.fd')
+        GenFdsGlobalVariable.InfLogger("Fd File Name:%s (%s)" %(self.FdUiName, FdFileName))
+
         Offset = 0x00
         for item in self.BlockSizeList:
             Offset = Offset + item[0]  * item[1]
@@ -124,11 +126,6 @@ class FD(FDClassObject):
             #
             GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
             RegionObj.AddToBuffer (FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
-        #
-        # Create a empty Fd file
-        #
-        GenFdsGlobalVariable.VerboseLogger ('Create an empty Fd file')
-        FdFileName = os.path.join(GenFdsGlobalVariable.FvDir,self.FdUiName + '.fd')
         #
         # Write the buffer contents to Fd file
         #
