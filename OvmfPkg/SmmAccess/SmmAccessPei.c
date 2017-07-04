@@ -330,7 +330,8 @@ SmmAccessPeiEntryPoint (
   EsmramcVal &= ~(UINT32)MCH_ESMRAMC_TSEG_MASK;
   EsmramcVal |= mQ35TsegMbytes == 8 ? MCH_ESMRAMC_TSEG_8MB :
                 mQ35TsegMbytes == 2 ? MCH_ESMRAMC_TSEG_2MB :
-                MCH_ESMRAMC_TSEG_1MB;
+                mQ35TsegMbytes == 1 ? MCH_ESMRAMC_TSEG_1MB :
+                MCH_ESMRAMC_TSEG_EXT;
   EsmramcVal |= MCH_ESMRAMC_T_EN;
   PciWrite8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC), EsmramcVal);
 
