@@ -31,6 +31,19 @@ typedef enum {
   DescIdxCount            = 2
 } DESCRIPTOR_INDEX;
 
+//
+// The value of PcdQ35TsegMbytes is saved into this variable at module startup.
+//
+extern UINT16 mQ35TsegMbytes;
+
+/**
+  Save PcdQ35TsegMbytes into mQ35TsegMbytes.
+**/
+VOID
+InitQ35TsegMbytes (
+  VOID
+  );
+
 /**
   Read the MCH_SMRAM and ESMRAMC registers, and update the LockState and
   OpenState fields in the PEI_SMM_ACCESS_PPI / EFI_SMM_ACCESS2_PROTOCOL object,

@@ -149,6 +149,7 @@ SmmAccess2DxeEntryPoint (
   //
   ASSERT (FeaturePcdGet (PcdSmmSmramRequire));
 
+  InitQ35TsegMbytes ();
   GetStates (&mAccess2.LockState, &mAccess2.OpenState);
   return gBS->InstallMultipleProtocolInterfaces (&ImageHandle,
                 &gEfiSmmAccess2ProtocolGuid, &mAccess2,

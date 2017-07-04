@@ -54,5 +54,8 @@
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes
+
 [Depex]
   TRUE

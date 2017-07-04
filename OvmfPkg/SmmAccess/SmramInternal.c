@@ -17,9 +17,26 @@
 #include <Guid/AcpiS3Context.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PciLib.h>
 
 #include "SmramInternal.h"
+
+//
+// The value of PcdQ35TsegMbytes is saved into this variable at module startup.
+//
+UINT16 mQ35TsegMbytes;
+
+/**
+  Save PcdQ35TsegMbytes into mQ35TsegMbytes.
+**/
+VOID
+InitQ35TsegMbytes (
+  VOID
+  )
+{
+  mQ35TsegMbytes = PcdGet16 (PcdQ35TsegMbytes);
+}
 
 /**
   Read the MCH_SMRAM and ESMRAMC registers, and update the LockState and

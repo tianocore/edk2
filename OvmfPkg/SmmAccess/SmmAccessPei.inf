@@ -59,11 +59,11 @@
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
-[FixedPcd]
+[Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes
 
 [Ppis]
   gPeiSmmAccessPpiGuid           ## PRODUCES
 
 [Depex]
-  TRUE
+  gEfiPeiMemoryDiscoveredPpiGuid
