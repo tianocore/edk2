@@ -319,7 +319,7 @@ SmmAccessPeiEntryPoint (
   // Set TSEG Memory Base.
   //
   PciWrite32 (DRAMC_REGISTER_Q35 (MCH_TSEGMB),
-    (TopOfLowRamMb - FixedPcdGet8 (PcdQ35TsegMbytes)) << MCH_TSEGMB_MB_SHIFT);
+    (TopOfLowRamMb - FixedPcdGet16 (PcdQ35TsegMbytes)) << MCH_TSEGMB_MB_SHIFT);
 
   //
   // Set TSEG size, and disable TSEG visibility outside of SMM. Note that the
@@ -327,8 +327,8 @@ SmmAccessPeiEntryPoint (
   // *restricted* to SMM.
   //
   EsmramcVal &= ~(UINT32)MCH_ESMRAMC_TSEG_MASK;
-  EsmramcVal |= FixedPcdGet8 (PcdQ35TsegMbytes) == 8 ? MCH_ESMRAMC_TSEG_8MB :
-                FixedPcdGet8 (PcdQ35TsegMbytes) == 2 ? MCH_ESMRAMC_TSEG_2MB :
+  EsmramcVal |= FixedPcdGet16 (PcdQ35TsegMbytes) == 8 ? MCH_ESMRAMC_TSEG_8MB :
+                FixedPcdGet16 (PcdQ35TsegMbytes) == 2 ? MCH_ESMRAMC_TSEG_2MB :
                 MCH_ESMRAMC_TSEG_1MB;
   EsmramcVal |= MCH_ESMRAMC_T_EN;
   PciWrite8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC), EsmramcVal);
