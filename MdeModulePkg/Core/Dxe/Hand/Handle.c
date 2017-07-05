@@ -72,15 +72,20 @@ CoreValidateHandle (
   )
 {
   IHANDLE             *Handle;
+  LIST_ENTRY          *Link;
 
-  Handle = (IHANDLE *)UserHandle;
-  if (Handle == NULL) {
+  if (UserHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  if (Handle->Signature != EFI_HANDLE_SIGNATURE) {
-    return EFI_INVALID_PARAMETER;
+
+  for (Link = gHandleList.BackLink; Link != &gHandleList; Link = Link->BackLink) {
+    Handle = CR (Link, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
+    if (Handle == (IHANDLE *) UserHandle) {
+      return EFI_SUCCESS;
+    }
   }
-  return EFI_SUCCESS;
+
+  return EFI_INVALID_PARAMETER;
 }
 
 
@@ -643,19 +648,16 @@ CoreDisconnectControllersUsingProtocolInterface (
   //
   do {
     ItemFound = FALSE;
-    for ( Link = Prot->OpenList.ForwardLink;
-          (Link != &Prot->OpenList) && !ItemFound;
-          Link = Link->ForwardLink ) {
+    for (Link = Prot->OpenList.ForwardLink; Link != &Prot->OpenList; Link = Link->ForwardLink) {
       OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
       if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
-        ItemFound = TRUE;
         CoreReleaseProtocolLock ();
         Status = CoreDisconnectController (UserHandle, OpenData->AgentHandle, NULL);
         CoreAcquireProtocolLock ();
-        if (EFI_ERROR (Status)) {
-           ItemFound = FALSE;
-           break;
+        if (!EFI_ERROR (Status)) {
+          ItemFound = TRUE;
         }
+        break;
       }
     }
   } while (ItemFound);
@@ -664,21 +666,17 @@ CoreDisconnectControllersUsingProtocolInterface (
     //
     // Attempt to remove BY_HANDLE_PROTOOCL and GET_PROTOCOL and TEST_PROTOCOL Open List items
     //
-    do {
-      ItemFound = FALSE;
-      for ( Link = Prot->OpenList.ForwardLink;
-            (Link != &Prot->OpenList) && !ItemFound;
-            Link = Link->ForwardLink ) {
-        OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
-        if ((OpenData->Attributes &
-            (EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL | EFI_OPEN_PROTOCOL_GET_PROTOCOL | EFI_OPEN_PROTOCOL_TEST_PROTOCOL)) != 0) {
-          ItemFound = TRUE;
-          RemoveEntryList (&OpenData->Link);
-          Prot->OpenListCount--;
-          CoreFreePool (OpenData);
-        }
+    for (Link = Prot->OpenList.ForwardLink; Link != &Prot->OpenList;) {
+      OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
+      if ((OpenData->Attributes &
+          (EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL | EFI_OPEN_PROTOCOL_GET_PROTOCOL | EFI_OPEN_PROTOCOL_TEST_PROTOCOL)) != 0) {
+        Link = RemoveEntryList (&OpenData->Link);
+        Prot->OpenListCount--;
+        CoreFreePool (OpenData);
+      } else {
+        Link = Link->ForwardLink;
       }
-    } while (ItemFound);
+    }
   }
 
   //
@@ -1132,7 +1130,7 @@ CoreOpenProtocol (
     if (ByDriver) {
       do {
         Disconnect = FALSE;
-        for ( Link = Prot->OpenList.ForwardLink; (Link != &Prot->OpenList) && (!Disconnect); Link = Link->ForwardLink) {
+        for (Link = Prot->OpenList.ForwardLink; Link != &Prot->OpenList; Link = Link->ForwardLink) {
           OpenData = CR (Link, OPEN_PROTOCOL_DATA, Link, OPEN_PROTOCOL_DATA_SIGNATURE);
           if ((OpenData->Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
             Disconnect = TRUE;
@@ -1142,6 +1140,8 @@ CoreOpenProtocol (
             if (EFI_ERROR (Status)) {
               Status = EFI_ACCESS_DENIED;
               goto Done;
+            } else {
+              break;
             }
           }
         }
