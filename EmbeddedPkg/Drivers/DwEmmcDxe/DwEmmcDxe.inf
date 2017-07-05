@@ -48,6 +48,7 @@
 [Pcd]
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz
 
 [Depex]
   TRUE

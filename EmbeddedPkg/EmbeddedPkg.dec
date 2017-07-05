@@ -167,6 +167,7 @@
   # DwEmmc Driver PCDs
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x0|UINT32|0x00000035
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|0x0|UINT32|0x00000036
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz|0x0|UINT32|0x00000037
 
   #
   # Android FastBoot

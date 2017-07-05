@@ -560,6 +560,10 @@ DwEmmcSetIos (
   EFI_STATUS Status = EFI_SUCCESS;
   UINT32    Data;
 
+  if ((PcdGet32 (PcdDwEmmcDxeMaxClockFreqInHz) != 0) &&
+      (BusClockFreq > PcdGet32 (PcdDwEmmcDxeMaxClockFreqInHz))) {
+    return EFI_UNSUPPORTED;
+  }
   if (TimingMode != EMMCBACKWARD) {
     Data = MmioRead32 (DWEMMC_UHSREG);
     switch (TimingMode) {
