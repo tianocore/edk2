@@ -354,6 +354,7 @@ INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
 INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf
 INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
+INF  OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
 !if $(SMM_REQUIRE) == TRUE
 INF  OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
