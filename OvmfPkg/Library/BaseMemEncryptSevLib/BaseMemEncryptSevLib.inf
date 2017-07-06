@@ -1,0 +1,50 @@
+## @file
+#  Library provides the helper functions for SEV guest
+#
+# Copyright (c) 2017 Advanced Micro Devices. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD
+#  License which accompanies this distribution. The full text of the license
+#  may be found at http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = MemEncryptSevLib
+  FILE_GUID                      = c1594631-3888-4be4-949f-9c630dbc842b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemEncryptSevLib|PEIM DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[Sources.X64]
+  MemEncryptSevLibInternal.c
+  X64/MemEncryptSevLib.c
+  X64/VirtualMemory.c
+
+[Sources.IA32]
+  MemEncryptSevLibInternal.c
+  Ia32/MemEncryptSevLib.c
+
+[LibraryClasses]
+  BaseLib
+  CpuLib
+  CacheMaintenanceLib
+  DebugLib
+  MemoryAllocationLib
