@@ -18,11 +18,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = QemuFwCfgLib
-  FILE_GUID                      = fdd53716-31e1-4acc-9007-8bd5d877c96f
+  BASE_NAME                      = QemuFwCfgPeiLib
+  FILE_GUID                      = ddd4f5f0-5304-42a8-9efa-d14bf11a3533
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = QemuFwCfgLib|PEIM DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = QemuFwCfgLib|PEIM
 
   CONSTRUCTOR                    = QemuFwCfgInitialize
 
@@ -35,7 +35,7 @@
 [Sources]
   QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
-  QemuFwCfgPeiDxe.c
+  QemuFwCfgPei.c
 
 [Packages]
   MdePkg/MdePkg.dec
