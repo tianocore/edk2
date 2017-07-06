@@ -68,7 +68,8 @@ InternalQemuFwCfgDmaBytes (
   IN     UINT32   Control
   )
 {
-  volatile FW_CFG_DMA_ACCESS Access;
+  volatile FW_CFG_DMA_ACCESS LocalAccess;
+  volatile FW_CFG_DMA_ACCESS *Access;
   UINT32                     AccessHigh, AccessLow;
   UINT32                     Status;
 
@@ -79,9 +80,11 @@ InternalQemuFwCfgDmaBytes (
     return;
   }
 
-  Access.Control = SwapBytes32 (Control);
-  Access.Length  = SwapBytes32 (Size);
-  Access.Address = SwapBytes64 ((UINTN)Buffer);
+  Access = &LocalAccess;
+
+  Access->Control = SwapBytes32 (Control);
+  Access->Length  = SwapBytes32 (Size);
+  Access->Address = SwapBytes64 ((UINTN)Buffer);
 
   //
   // Delimit the transfer from (a) modifications to Access, (b) in case of a
@@ -92,8 +95,8 @@ InternalQemuFwCfgDmaBytes (
   //
   // Start the transfer.
   //
-  AccessHigh = (UINT32)RShiftU64 ((UINTN)&Access, 32);
-  AccessLow  = (UINT32)(UINTN)&Access;
+  AccessHigh = (UINT32)RShiftU64 ((UINTN)Access, 32);
+  AccessLow  = (UINT32)(UINTN)Access;
   IoWrite32 (FW_CFG_IO_DMA_ADDRESS,     SwapBytes32 (AccessHigh));
   IoWrite32 (FW_CFG_IO_DMA_ADDRESS + 4, SwapBytes32 (AccessLow));
 
@@ -106,7 +109,7 @@ InternalQemuFwCfgDmaBytes (
   // Wait for the transfer to complete.
   //
   do {
-    Status = SwapBytes32 (Access.Control);
+    Status = SwapBytes32 (Access->Control);
     ASSERT ((Status & FW_CFG_DMA_CTL_ERROR) == 0);
   } while (Status != 0);
 
