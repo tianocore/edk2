@@ -4,6 +4,7 @@
 
   Copyright (C) 2013, Red Hat, Inc.
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, Advanced Micro Devices. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -14,14 +15,36 @@
   WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
+#include <Uefi.h>
+
+#include <Protocol/IoMmu.h>
+
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/MemEncryptSevLib.h>
 
 #include "QemuFwCfgLibInternal.h"
 
 STATIC BOOLEAN mQemuFwCfgSupported = FALSE;
 STATIC BOOLEAN mQemuFwCfgDmaSupported;
 
+STATIC EDKII_IOMMU_PROTOCOL        *mIoMmuProtocol;
+/**
+
+ Returns a boolean indicating whether SEV is enabled
+
+ @retval    TRUE    SEV is enabled
+ @retval    FALSE   SEV is disabled
+**/
+BOOLEAN
+InternalQemuFwCfgSevIsEnabled (
+  VOID
+  )
+{
+  return MemEncryptSevIsEnabled ();
+}
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -79,6 +102,24 @@ QemuFwCfgInitialize (
     mQemuFwCfgDmaSupported = TRUE;
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
   }
+
+  if (mQemuFwCfgDmaSupported && MemEncryptSevIsEnabled ()) {
+    EFI_STATUS   Status;
+
+    //
+    // IoMmuDxe driver must have installed the IOMMU protocol. If we are not
+    // able to locate the protocol then something must have gone wrong.
+    //
+    Status = gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL, (VOID **)&mIoMmuProtocol);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR,
+        "QemuFwCfgSevDma %a:%a Failed to locate IOMMU protocol.\n",
+        gEfiCallerBaseName, __FUNCTION__));
+      ASSERT (FALSE);
+      CpuDeadLoop ();
+    }
+  }
+
   return RETURN_SUCCESS;
 }
 
@@ -113,4 +154,77 @@ InternalQemuFwCfgDmaIsAvailable (
   )
 {
   return mQemuFwCfgDmaSupported;
+}
+
+/**
+ Allocate a bounce buffer for SEV DMA.
+
+  @param[in]     NumPage  Number of pages.
+  @param[out]    Buffer   Allocated DMA Buffer pointer
+
+**/
+VOID
+InternalQemuFwCfgSevDmaAllocateBuffer (
+  OUT    VOID     **Buffer,
+  IN     UINT32   NumPages
+  )
+{
+  EFI_STATUS    Status;
+
+  ASSERT (mIoMmuProtocol != NULL);
+
+  Status = mIoMmuProtocol->AllocateBuffer (
+                            mIoMmuProtocol,
+                            0,
+                            EfiBootServicesData,
+                            NumPages,
+                            Buffer,
+                            EDKII_IOMMU_ATTRIBUTE_MEMORY_CACHED
+                          );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to allocate %u pages\n", gEfiCallerBaseName, __FUNCTION__,
+      NumPages));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  DEBUG ((DEBUG_VERBOSE,
+    "%a:%a buffer 0x%Lx Pages %u\n", gEfiCallerBaseName, __FUNCTION__,
+    (UINT64)(UINTN)Buffer, NumPages));
+}
+
+/**
+ Free the DMA buffer allocated using InternalQemuFwCfgSevDmaAllocateBuffer
+
+  @param[in]     NumPage  Number of pages.
+  @param[in]     Buffer   DMA Buffer pointer
+
+**/
+VOID
+InternalQemuFwCfgSevDmaFreeBuffer (
+  IN     VOID     *Buffer,
+  IN     UINT32   NumPages
+  )
+{
+  EFI_STATUS    Status;
+
+  ASSERT (mIoMmuProtocol != NULL);
+
+  Status = mIoMmuProtocol->FreeBuffer (
+                            mIoMmuProtocol,
+                            NumPages,
+                            Buffer
+                          );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to free buffer 0x%Lx pages %u\n", gEfiCallerBaseName,
+      __FUNCTION__, (UINT64)(UINTN)Buffer, NumPages));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  DEBUG ((DEBUG_VERBOSE,
+    "%a:%a buffer 0x%Lx Pages %u\n", gEfiCallerBaseName,__FUNCTION__,
+    (UINT64)(UINTN)Buffer, NumPages));
 }
