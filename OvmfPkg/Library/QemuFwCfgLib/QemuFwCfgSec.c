@@ -6,6 +6,7 @@
 
   Copyright (C) 2013, Red Hat, Inc.
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, Advanced Micro Devices. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -93,4 +94,60 @@ InternalQemuFwCfgDmaIsAvailable (
   )
 {
   return FALSE;
+}
+
+/**
+
+ Returns a boolean indicating whether SEV is enabled
+
+ @retval    TRUE    SEV is enabled
+ @retval    FALSE   SEV is disabled
+**/
+BOOLEAN
+InternalQemuFwCfgSevIsEnabled (
+  VOID
+  )
+{
+  //
+  // DMA is not supported in SEC phase hence SEV support is irrelevant
+  //
+  return FALSE;
+}
+
+/**
+ Allocate a bounce buffer for SEV DMA.
+
+  @param[in]     NumPage  Number of pages.
+  @param[out]    Buffer   Allocated DMA Buffer pointer
+
+**/
+VOID
+InternalQemuFwCfgSevDmaAllocateBuffer (
+  OUT    VOID     **Buffer,
+  IN     UINT32   NumPages
+  )
+{
+  //
+  // We should never reach here
+  //
+  ASSERT (FALSE);
+}
+
+/**
+ Free the DMA buffer allocated using InternalQemuFwCfgSevDmaAllocateBuffer
+
+  @param[in]     NumPage  Number of pages.
+  @param[in]     Buffer   DMA Buffer pointer
+
+**/
+VOID
+InternalQemuFwCfgSevDmaFreeBuffer (
+  IN     VOID     *Buffer,
+  IN     UINT32   NumPages
+  )
+{
+  //
+  // We should never reach here
+  //
+  ASSERT (FALSE);
 }
