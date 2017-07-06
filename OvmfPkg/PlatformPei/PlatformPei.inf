@@ -29,6 +29,7 @@
 #
 
 [Sources]
+  AmdSev.c
   Cmos.c
   FeatureControl.c
   Fv.c
@@ -60,6 +61,7 @@
   QemuFwCfgLib
   QemuFwCfgS3Lib
   MtrrLib
+  MemEncryptSevLib
   PcdLib
 
 [Pcd]
@@ -93,6 +95,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
   gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds
