@@ -1,0 +1,43 @@
+#/** @file
+#
+#  Driver clears the encryption attribute from MMIO regions when SEV is enabled
+#
+#  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD
+#  License which accompanies this distribution.  The full text of the license may
+#  be found at http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = AmdSevDxe
+  FILE_GUID                      = 2ec9da37-ee35-4de9-86c5-6d9a81dc38a7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AmdSevDxeEntryPoint
+
+[Sources]
+  AmdSevDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+  DebugLib
+  MemEncryptSevLib
+
+[Depex]
+  TRUE

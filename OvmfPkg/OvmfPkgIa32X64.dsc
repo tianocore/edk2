@@ -825,6 +825,7 @@
 !endif
 
   OvmfPkg/PlatformDxe/Platform.inf
+  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
 
 !if $(SMM_REQUIRE) == TRUE
   OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
