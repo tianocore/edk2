@@ -4,6 +4,7 @@
 
   Copyright (C) 2013, Red Hat, Inc.
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, Advanced Micro Devices. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -14,8 +15,10 @@
   WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/MemEncryptSevLib.h>
 
 #include "QemuFwCfgLibInternal.h"
 
@@ -76,8 +79,18 @@ QemuFwCfgInitialize (
   if ((Revision & FW_CFG_F_DMA) == 0) {
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface (IO Port) is supported.\n"));
   } else {
-    mQemuFwCfgDmaSupported = TRUE;
-    DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
+    //
+    // If SEV is enabled then we do not support DMA operations in PEI phase.
+    // This is mainly because DMA in SEV guest requires using bounce buffer
+    // (which need to allocate dynamic memory and allocating a PAGE size'd
+    // buffer can be challenge in PEI phase)
+    //
+    if (InternalQemuFwCfgSevIsEnabled ()) {
+      DEBUG ((DEBUG_INFO, "SEV: QemuFwCfg fallback to IO Port interface.\n"));
+    } else {
+      mQemuFwCfgDmaSupported = TRUE;
+      DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
+    }
   }
   return RETURN_SUCCESS;
 }
@@ -113,4 +126,59 @@ InternalQemuFwCfgDmaIsAvailable (
   )
 {
   return mQemuFwCfgDmaSupported;
+}
+
+/**
+
+ Returns a boolean indicating whether SEV is enabled
+
+ @retval    TRUE    SEV is enabled
+ @retval    FALSE   SEV is disabled
+**/
+BOOLEAN
+InternalQemuFwCfgSevIsEnabled (
+  VOID
+  )
+{
+  return MemEncryptSevIsEnabled ();
+}
+
+/**
+ Allocate a bounce buffer for SEV DMA.
+
+  @param[in]     NumPage  Number of pages.
+  @param[out]    Buffer   Allocated DMA Buffer pointer
+
+**/
+VOID
+InternalQemuFwCfgSevDmaAllocateBuffer (
+  OUT    VOID     **Buffer,
+  IN     UINT32   NumPages
+  )
+{
+  //
+  // We should never reach here
+  //
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+}
+
+/**
+ Free the DMA buffer allocated using InternalQemuFwCfgSevDmaAllocateBuffer
+
+  @param[in]     NumPage  Number of pages.
+  @param[in]     Buffer   DMA Buffer pointer
+
+**/
+VOID
+InternalQemuFwCfgSevDmaFreeBuffer (
+  IN     VOID     *Buffer,
+  IN     UINT32   NumPages
+  )
+{
+  //
+  // We should never reach here
+  //
+  ASSERT (FALSE);
+  CpuDeadLoop ();
 }
