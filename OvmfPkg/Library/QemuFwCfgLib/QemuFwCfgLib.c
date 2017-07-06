@@ -72,6 +72,8 @@ InternalQemuFwCfgDmaBytes (
   volatile FW_CFG_DMA_ACCESS *Access;
   UINT32                     AccessHigh, AccessLow;
   UINT32                     Status;
+  UINT32                     NumPages;
+  VOID                       *DmaBuffer, *BounceBuffer;
 
   ASSERT (Control == FW_CFG_DMA_CTL_WRITE || Control == FW_CFG_DMA_CTL_READ ||
     Control == FW_CFG_DMA_CTL_SKIP);
@@ -80,11 +82,44 @@ InternalQemuFwCfgDmaBytes (
     return;
   }
 
-  Access = &LocalAccess;
+  //
+  // When SEV is enabled then allocate DMA bounce buffer
+  //
+  if (InternalQemuFwCfgSevIsEnabled ()) {
+    UINTN  TotalSize;
+
+    TotalSize = sizeof (*Access);
+    //
+    // Skip operation does not need buffer
+    //
+    if (Control != FW_CFG_DMA_CTL_SKIP) {
+      TotalSize += Size;
+    }
+
+    //
+    // Allocate SEV DMA buffer
+    //
+    NumPages = (UINT32)EFI_SIZE_TO_PAGES (TotalSize);
+    InternalQemuFwCfgSevDmaAllocateBuffer (&BounceBuffer, NumPages);
+
+    Access = BounceBuffer;
+    DmaBuffer = (UINT8*)BounceBuffer + sizeof (*Access);
+
+    //
+    //  Decrypt data from encrypted guest buffer into DMA buffer
+    //
+    if (Control == FW_CFG_DMA_CTL_WRITE) {
+      CopyMem (DmaBuffer, Buffer, Size);
+    }
+  } else {
+    Access = &LocalAccess;
+    DmaBuffer = Buffer;
+    BounceBuffer = NULL;
+  }
 
   Access->Control = SwapBytes32 (Control);
   Access->Length  = SwapBytes32 (Size);
-  Access->Address = SwapBytes64 ((UINTN)Buffer);
+  Access->Address = SwapBytes64 ((UINTN)DmaBuffer);
 
   //
   // Delimit the transfer from (a) modifications to Access, (b) in case of a
@@ -117,6 +152,21 @@ InternalQemuFwCfgDmaBytes (
   // After a read, the caller will want to use Buffer.
   //
   MemoryFence ();
+
+  //
+  // If Bounce buffer was allocated then copy the data into guest buffer and
+  // free the bounce buffer
+  //
+  if (BounceBuffer != NULL) {
+    //
+    //  Encrypt the data from DMA buffer into guest buffer
+    //
+    if (Control == FW_CFG_DMA_CTL_READ) {
+      CopyMem (Buffer, DmaBuffer, Size);
+    }
+
+    InternalQemuFwCfgSevDmaFreeBuffer (BounceBuffer, NumPages);
+  }
 }
 
 
