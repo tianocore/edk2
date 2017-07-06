@@ -1584,7 +1584,7 @@ SwitchBSPWorker (
   //
   MpInitLibWhoAmI (&CallerNumber);
   if (CallerNumber != CpuMpData->BspNumber) {
-    return EFI_SUCCESS;
+    return EFI_DEVICE_ERROR;
   }
 
   if (ProcessorNumber >= CpuMpData->CpuCount) {
