@@ -27,7 +27,7 @@
   APs to help test system memory in parallel with other device initialization.
   Diagnostics applications may also use this protocol for multi-processor.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -491,7 +491,7 @@ EFI_STATUS
   @retval EFI_UNSUPPORTED         Switching the BSP cannot be completed prior to
                                   this service returning.
   @retval EFI_UNSUPPORTED         Switching the BSP is not supported.
-  @retval EFI_SUCCESS             The calling processor is an AP.
+  @retval EFI_DEVICE_ERROR        The calling processor is an AP.
   @retval EFI_NOT_FOUND           The processor with the handle specified by
                                   ProcessorNumber does not exist.
   @retval EFI_INVALID_PARAMETER   ProcessorNumber specifies the current BSP or
