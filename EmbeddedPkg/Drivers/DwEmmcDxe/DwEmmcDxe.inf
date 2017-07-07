@@ -49,6 +49,7 @@
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz
   gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz
+  gEmbeddedTokenSpaceGuid.PcdDwEmmcDxeFifoDepth
 
 [Depex]
   TRUE

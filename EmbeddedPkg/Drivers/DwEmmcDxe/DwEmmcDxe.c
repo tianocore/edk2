@@ -415,6 +415,47 @@ DwEmmcReceiveResponse (
   return EFI_SUCCESS;
 }
 
+VOID
+DwEmmcAdjustFifoThreshold (
+  VOID
+  )
+{
+  /* DMA multiple transaction size map to reg value as array index */
+  CONST UINT32 BurstSize[] = {1, 4, 8, 16, 32, 64, 128, 256};
+  UINT32 BlkDepthInFifo, FifoThreshold, FifoWidth, FifoDepth;
+  UINT32 BlkSize = DWEMMC_BLOCK_SIZE, Idx = 0, RxWatermark = 1, TxWatermark, TxWatermarkInvers;
+
+  /* Skip FIFO adjustment if we do not have platform FIFO depth info */
+  FifoDepth = PcdGet32 (PcdDwEmmcDxeFifoDepth);
+  if (!FifoDepth) {
+    return;
+  }
+
+  TxWatermark = FifoDepth / 2;
+  TxWatermarkInvers = FifoDepth - TxWatermark;
+
+  FifoWidth = DWEMMC_GET_HDATA_WIDTH (MmioRead32 (DWEMMC_HCON));
+  if (!FifoWidth) {
+    FifoWidth = 2;
+  } else if (FifoWidth == 2) {
+    FifoWidth = 8;
+  } else {
+    FifoWidth = 4;
+  }
+
+  BlkDepthInFifo = BlkSize / FifoWidth;
+
+  Idx = ARRAY_SIZE (BurstSize) - 1;
+  while (Idx && ((BlkDepthInFifo % BurstSize[Idx]) || (TxWatermarkInvers % BurstSize[Idx]))) {
+    Idx--;
+  }
+
+  RxWatermark = BurstSize[Idx] - 1;
+  FifoThreshold = DWEMMC_DMA_BURST_SIZE (Idx) | DWEMMC_FIFO_TWMARK (TxWatermark)
+           | DWEMMC_FIFO_RWMARK (RxWatermark);
+  MmioWrite32 (DWEMMC_FIFOTH, FifoThreshold);
+}
+
 EFI_STATUS
 PrepareDmaData (
   IN DWEMMC_IDMAC_DESCRIPTOR*    IdmacDesc,
@@ -633,6 +674,7 @@ DwEmmcDxeInitialize (
 
   Handle = NULL;
 
+  DwEmmcAdjustFifoThreshold ();
   gpIdmacDesc = (DWEMMC_IDMAC_DESCRIPTOR *)AllocatePages (DWEMMC_MAX_DESC_PAGES);
   if (gpIdmacDesc == NULL) {
     return EFI_BUFFER_TOO_SMALL;
