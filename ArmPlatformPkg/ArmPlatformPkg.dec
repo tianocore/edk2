@@ -97,6 +97,7 @@
   gArmPlatformTokenSpaceGuid.PL011UartInteger|0|UINT32|0x00000020
   gArmPlatformTokenSpaceGuid.PL011UartFractional|0|UINT32|0x0000002D
   gArmPlatformTokenSpaceGuid.PL011UartInterrupt|0x00000000|UINT32|0x0000002F
+  gArmPlatformTokenSpaceGuid.PL011UartRegOffsetVariant|0|UINT8|0x0000003E
 
   ## PL011 Serial Debug UART
   gArmPlatformTokenSpaceGuid.PcdSerialDbgRegisterBase|0x00000000|UINT64|0x00000030

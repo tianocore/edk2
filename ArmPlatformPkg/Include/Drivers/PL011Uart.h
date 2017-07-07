@@ -18,7 +18,25 @@
 #include <Uefi.h>
 #include <Protocol/SerialIo.h>
 
+#define PL011_VARIANT_ZTE 1
+
 // PL011 Registers
+#if FixedPcdGet8 (PL011UartRegOffsetVariant) == PL011_VARIANT_ZTE
+#define UARTDR                    0x004
+#define UARTRSR                   0x010
+#define UARTECR                   0x010
+#define UARTFR                    0x014
+#define UARTIBRD                  0x024
+#define UARTFBRD                  0x028
+#define UARTLCR_H                 0x030
+#define UARTCR                    0x034
+#define UARTIFLS                  0x038
+#define UARTIMSC                  0x040
+#define UARTRIS                   0x044
+#define UARTMIS                   0x048
+#define UARTICR                   0x04c
+#define UARTDMACR                 0x050
+#else
 #define UARTDR                    0x000
 #define UARTRSR                   0x004
 #define UARTECR                   0x004
@@ -34,6 +52,7 @@
 #define UARTMIS                   0x040
 #define UARTICR                   0x044
 #define UARTDMACR                 0x048
+#endif
 
 #define UARTPID0                  0xFE0
 #define UARTPID1                  0xFE4
@@ -47,6 +66,17 @@
 #define UART_STATUS_ERROR_MASK    0x0F
 
 // Flag reg bits
+#if FixedPcdGet8 (PL011UartRegOffsetVariant) == PL011_VARIANT_ZTE
+#define PL011_UARTFR_RI           (1 << 0)  // Ring indicator
+#define PL011_UARTFR_TXFE         (1 << 7)  // Transmit FIFO empty
+#define PL011_UARTFR_RXFF         (1 << 6)  // Receive  FIFO full
+#define PL011_UARTFR_TXFF         (1 << 5)  // Transmit FIFO full
+#define PL011_UARTFR_RXFE         (1 << 4)  // Receive  FIFO empty
+#define PL011_UARTFR_BUSY         (1 << 8)  // UART busy
+#define PL011_UARTFR_DCD          (1 << 2)  // Data carrier detect
+#define PL011_UARTFR_DSR          (1 << 3)  // Data set ready
+#define PL011_UARTFR_CTS          (1 << 1)  // Clear to send
+#else
 #define PL011_UARTFR_RI           (1 << 8)  // Ring indicator
 #define PL011_UARTFR_TXFE         (1 << 7)  // Transmit FIFO empty
 #define PL011_UARTFR_RXFF         (1 << 6)  // Receive  FIFO full
@@ -56,6 +86,7 @@
 #define PL011_UARTFR_DCD          (1 << 2)  // Data carrier detect
 #define PL011_UARTFR_DSR          (1 << 1)  // Data set ready
 #define PL011_UARTFR_CTS          (1 << 0)  // Clear to send
+#endif
 
 // Flag reg bits - alternative names
 #define UART_TX_EMPTY_FLAG_MASK   PL011_UARTFR_TXFE

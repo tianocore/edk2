@@ -39,3 +39,4 @@
 
   gArmPlatformTokenSpaceGuid.PL011UartInteger
   gArmPlatformTokenSpaceGuid.PL011UartFractional
+  gArmPlatformTokenSpaceGuid.PL011UartRegOffsetVariant
