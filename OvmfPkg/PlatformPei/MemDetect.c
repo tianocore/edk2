@@ -19,6 +19,7 @@ Module Name:
 //
 // The package level header files this module uses
 //
+#include <IndustryStandard/E820.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <PiPei.h>
 
@@ -103,6 +104,109 @@ Q35TsegMbytesInitialization (
 }
 
 
+/**
+  Iterate over the RAM entries in QEMU's fw_cfg E820 RAM map that start outside
+  of the 32-bit address range.
+
+  Find the highest exclusive >=4GB RAM address, or produce memory resource
+  descriptor HOBs for RAM entries that start at or above 4GB.
+
+  @param[out] MaxAddress  If MaxAddress is NULL, then ScanOrAdd64BitE820Ram()
+                          produces memory resource descriptor HOBs for RAM
+                          entries that start at or above 4GB.
+
+                          Otherwise, MaxAddress holds the highest exclusive
+                          >=4GB RAM address on output. If QEMU's fw_cfg E820
+                          RAM map contains no RAM entry that starts outside of
+                          the 32-bit address range, then MaxAddress is exactly
+                          4GB on output.
+
+  @retval EFI_SUCCESS         The fw_cfg E820 RAM map was found and processed.
+
+  @retval EFI_PROTOCOL_ERROR  The RAM map was found, but its size wasn't a
+                              whole multiple of sizeof(EFI_E820_ENTRY64). No
+                              RAM entry was processed.
+
+  @return                     Error codes from QemuFwCfgFindFile(). No RAM
+                              entry was processed.
+**/
+STATIC
+EFI_STATUS
+ScanOrAdd64BitE820Ram (
+  OUT UINT64 *MaxAddress OPTIONAL
+  )
+{
+  EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM FwCfgItem;
+  UINTN                FwCfgSize;
+  EFI_E820_ENTRY64     E820Entry;
+  UINTN                Processed;
+
+  Status = QemuFwCfgFindFile ("etc/e820", &FwCfgItem, &FwCfgSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  if (FwCfgSize % sizeof E820Entry != 0) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  if (MaxAddress != NULL) {
+    *MaxAddress = BASE_4GB;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  for (Processed = 0; Processed < FwCfgSize; Processed += sizeof E820Entry) {
+    QemuFwCfgReadBytes (sizeof E820Entry, &E820Entry);
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "%a: Base=0x%Lx Length=0x%Lx Type=%u\n",
+      __FUNCTION__,
+      E820Entry.BaseAddr,
+      E820Entry.Length,
+      E820Entry.Type
+      ));
+    if (E820Entry.Type == EfiAcpiAddressRangeMemory &&
+        E820Entry.BaseAddr >= BASE_4GB) {
+      if (MaxAddress == NULL) {
+        UINT64 Base;
+        UINT64 End;
+
+        //
+        // Round up the start address, and round down the end address.
+        //
+        Base = ALIGN_VALUE (E820Entry.BaseAddr, (UINT64)EFI_PAGE_SIZE);
+        End = (E820Entry.BaseAddr + E820Entry.Length) &
+              ~(UINT64)EFI_PAGE_MASK;
+        if (Base < End) {
+          AddMemoryRangeHob (Base, End);
+          DEBUG ((
+            DEBUG_VERBOSE,
+            "%a: AddMemoryRangeHob [0x%Lx, 0x%Lx)\n",
+            __FUNCTION__,
+            Base,
+            End
+            ));
+        }
+      } else {
+        UINT64 Candidate;
+
+        Candidate = E820Entry.BaseAddr + E820Entry.Length;
+        if (Candidate > *MaxAddress) {
+          *MaxAddress = Candidate;
+          DEBUG ((
+            DEBUG_VERBOSE,
+            "%a: MaxAddress=0x%Lx\n",
+            __FUNCTION__,
+            *MaxAddress
+            ));
+        }
+      }
+    }
+  }
+  return EFI_SUCCESS;
+}
+
+
 UINT32
 GetSystemMemorySizeBelow4gb (
   VOID
@@ -170,7 +274,22 @@ GetFirstNonAddress (
   UINT64               HotPlugMemoryEnd;
   RETURN_STATUS        PcdStatus;
 
-  FirstNonAddress = BASE_4GB + GetSystemMemorySizeAbove4gb ();
+  //
+  // set FirstNonAddress to suppress incorrect compiler/analyzer warnings
+  //
+  FirstNonAddress = 0;
+
+  //
+  // If QEMU presents an E820 map, then get the highest exclusive >=4GB RAM
+  // address from it. This can express an address >= 4GB+1TB.
+  //
+  // Otherwise, get the flat size of the memory above 4GB from the CMOS (which
+  // can only express a size smaller than 1TB), and add it to 4GB.
+  //
+  Status = ScanOrAdd64BitE820Ram (&FirstNonAddress);
+  if (EFI_ERROR (Status)) {
+    FirstNonAddress = BASE_4GB + GetSystemMemorySizeAbove4gb ();
+  }
 
   //
   // If DXE is 32-bit, then we're done; PciBusDxe will degrade 64-bit MMIO
@@ -525,7 +644,13 @@ QemuInitializeRam (
       AddMemoryRangeHob (BASE_1MB, LowerMemorySize);
     }
 
-    if (UpperMemorySize != 0) {
+    //
+    // If QEMU presents an E820 map, then create memory HOBs for the >=4GB RAM
+    // entries. Otherwise, create a single memory HOB with the flat >=4GB
+    // memory size read from the CMOS.
+    //
+    Status = ScanOrAdd64BitE820Ram (NULL);
+    if (EFI_ERROR (Status) && UpperMemorySize != 0) {
       AddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
     }
   }
