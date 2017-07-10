@@ -991,6 +991,7 @@ XhcFreeSched (
 /**
   Check if the Trb is a transaction of the URB.
 
+  @param Xhc    The XHCI Instance.
   @param Trb    The TRB to be checked
   @param Urb    The URB to be checked.
 
