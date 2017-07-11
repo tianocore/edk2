@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PeiRegisterCpuFeaturesLib
-  MODULE_UNI_FILE                = PeiRegisterCpuFeaturesLib.uni
+  MODULE_UNI_FILE                = RegisterCpuFeaturesLib.uni
   FILE_GUID                      = D8855DB3-8348-41B5-BDA4-385351767D41
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0

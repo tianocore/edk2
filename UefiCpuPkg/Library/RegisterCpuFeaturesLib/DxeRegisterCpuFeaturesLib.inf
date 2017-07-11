@@ -15,7 +15,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeRegisterCpuFeaturesLib
-  MODULE_UNI_FILE                = DxeRegisterCpuFeaturesLib.uni
+  MODULE_UNI_FILE                = RegisterCpuFeaturesLib.uni
   FILE_GUID                      = ADE8F745-AA2E-49f6-8ED4-746B34867E52
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
