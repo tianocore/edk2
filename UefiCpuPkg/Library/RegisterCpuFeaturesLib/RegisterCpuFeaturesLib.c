@@ -29,7 +29,7 @@ IsCpuFeatureMatch (
   IN UINT8               *SecondFeatureMask
   )
 {
-  UINT32                 BitMaskSize;
+  UINTN                 BitMaskSize;
 
   BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
   if (CompareMem (FirstFeatureMask, SecondFeatureMask, BitMaskSize) == 0) {
@@ -51,7 +51,7 @@ DumpCpuFeatureMask (
 {
   UINTN                  Index;
   UINT8                  *Data8;
-  UINT32                 BitMaskSize;
+  UINTN                  BitMaskSize;
 
   BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
   Data8       = (UINT8 *) FeatureMask;
@@ -258,7 +258,7 @@ RegisterCpuFeatureWorker (
   CPU_FEATURES_DATA          *CpuFeaturesData;
   CPU_FEATURES_ENTRY         *CpuFeatureEntry;
   LIST_ENTRY                 *Entry;
-  UINT32                     BitMaskSize;
+  UINTN                      BitMaskSize;
   BOOLEAN                    FeatureExist;
 
   BitMaskSize     = PcdGetSize (PcdCpuFeaturesSupport);
@@ -267,7 +267,7 @@ RegisterCpuFeatureWorker (
     InitializeListHead (&CpuFeaturesData->FeatureList);
     InitializeSpinLock (&CpuFeaturesData->MsrLock);
     InitializeSpinLock (&CpuFeaturesData->MemoryMappedLock);
-    CpuFeaturesData->BitMaskSize = BitMaskSize;
+    CpuFeaturesData->BitMaskSize = (UINT32) BitMaskSize;
   }
   ASSERT (CpuFeaturesData->BitMaskSize == BitMaskSize);
 
