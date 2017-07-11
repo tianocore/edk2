@@ -642,7 +642,7 @@ CVfrCompiler::PreProcess (
   }
 
   if ((pVfrFile = fopen (LongFilePath (mOptions.VfrFileName), "r")) == NULL) {
-    DebugError (NULL, 0, 0001, "Error opening the input VFR file", mOptions.VfrFileName);
+    DebugError (NULL, 0, 0001, "Error opening the input VFR file", "%s", mOptions.VfrFileName);
     goto Fail;
   }
   fclose (pVfrFile);
@@ -711,7 +711,7 @@ CVfrCompiler::Compile (
   gCVfrErrorHandle.SetWarningAsError(mOptions.WarningAsError);
 
   if ((pInFile = fopen (LongFilePath (InFileName), "r")) == NULL) {
-    DebugError (NULL, 0, 0001, "Error opening the input file", InFileName);
+    DebugError (NULL, 0, 0001, "Error opening the input file", "%s", InFileName);
     goto Fail;
   }
 
@@ -841,7 +841,7 @@ CVfrCompiler::GenBinary (
 
   if (mOptions.CreateIfrPkgFile == TRUE) {
     if ((pFile = fopen (LongFilePath (mOptions.PkgOutputFileName), "wb")) == NULL) {
-      DebugError (NULL, 0, 0001, "Error opening file", mOptions.PkgOutputFileName);
+      DebugError (NULL, 0, 0001, "Error opening file", "%s", mOptions.PkgOutputFileName);
       goto Fail;
     }
     if (gCFormPkg.BuildPkg (pFile, &gRBuffer) != VFR_RETURN_SUCCESS) {
@@ -884,7 +884,7 @@ CVfrCompiler::GenCFile (
   
   if (!mOptions.CreateIfrPkgFile || mOptions.CompatibleMode) {
     if ((pFile = fopen (LongFilePath (mOptions.COutputFileName), "w")) == NULL) {
-      DebugError (NULL, 0, 0001, "Error opening output C file", mOptions.COutputFileName);
+      DebugError (NULL, 0, 0001, "Error opening output C file", "%s", mOptions.COutputFileName);
       goto Fail;
     }
 
@@ -925,18 +925,18 @@ CVfrCompiler::GenRecordListFile (
 
   InFileName = (mOptions.SkipCPreprocessor == TRUE) ? mOptions.VfrFileName : mOptions.PreprocessorOutputFileName;
 
-  if (mOptions.CreateRecordListFile == TRUE) {
+  if (mOptions.CreateRecordListFile == TRUE && InFileName != NULL && mOptions.RecordListFile != NULL) {
     if ((InFileName[0] == '\0') || (mOptions.RecordListFile[0] == '\0')) {
       return;
     }
 
     if ((pInFile = fopen (LongFilePath (InFileName), "r")) == NULL) {
-      DebugError (NULL, 0, 0001, "Error opening the input VFR preprocessor output file", InFileName);
+      DebugError (NULL, 0, 0001, "Error opening the input VFR preprocessor output file", "%s", InFileName);
       return;
     }
 
     if ((pOutFile = fopen (LongFilePath (mOptions.RecordListFile), "w")) == NULL) {
-      DebugError (NULL, 0, 0001, "Error opening the record list file", mOptions.RecordListFile);
+      DebugError (NULL, 0, 0001, "Error opening the record list file", "%s", mOptions.RecordListFile);
       goto Err1;
     }
 
