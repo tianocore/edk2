@@ -83,6 +83,11 @@ InternalQemuFwCfgDmaBytes (
   }
 
   //
+  // set NumPages to suppress incorrect compiler/analyzer warnings
+  //
+  NumPages = 0;
+
+  //
   // When SEV is enabled then allocate DMA bounce buffer
   //
   if (InternalQemuFwCfgSevIsEnabled ()) {
