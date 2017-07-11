@@ -105,25 +105,12 @@ CpuCommonFeaturesLibConstructor (
                );
     ASSERT_EFI_ERROR (Status);
   }
-  if (IsCpuFeatureSupported (CPU_FEATURE_SENTER)) {
-    Status = RegisterCpuFeature (
-               "SENTER",
-               FeatureControlGetConfigData,
-               VmxSupport,
-               SenterInitialize,
-               CPU_FEATURE_SENTER,
-               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_BEFORE,
-               CPU_FEATURE_SMX | CPU_FEATURE_AFTER,
-               CPU_FEATURE_END
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
   if (IsCpuFeatureSupported (CPU_FEATURE_SMX)) {
     Status = RegisterCpuFeature (
                "SMX",
                FeatureControlGetConfigData,
                SmxSupport,
-               VmxInsideSmxInitialize,
+               SmxInitialize,
                CPU_FEATURE_SMX,
                CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_BEFORE,
                CPU_FEATURE_END
@@ -134,8 +121,8 @@ CpuCommonFeaturesLibConstructor (
     Status = RegisterCpuFeature (
                "VMX",
                FeatureControlGetConfigData,
-               SmxSupport,
-               VmxOutsideSmxInitialize,
+               VmxSupport,
+               VmxInitialize,
                CPU_FEATURE_VMX,
                CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_BEFORE,
                CPU_FEATURE_END

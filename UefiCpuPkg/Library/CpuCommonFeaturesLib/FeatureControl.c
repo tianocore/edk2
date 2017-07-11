@@ -69,7 +69,7 @@ VmxSupport (
 }
 
 /**
-  Initializes VMX inside SMX feature to specific state.
+  Initializes VMX feature to specific state.
 
   @param[in]  ProcessorNumber  The index of the CPU executing this function.
   @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
@@ -78,16 +78,16 @@ VmxSupport (
                                by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
                                CPU_FEATURE_GET_CONFIG_DATA was not provided in
                                RegisterCpuFeature().
-  @param[in]  State            If TRUE, then the VMX inside SMX feature must be enabled.
-                               If FALSE, then the VMX inside SMX feature must be disabled.
+  @param[in]  State            If TRUE, then the VMX feature must be enabled.
+                               If FALSE, then the VMX feature must be disabled.
 
-  @retval RETURN_SUCCESS       VMX inside SMX feature is initialized.
+  @retval RETURN_SUCCESS       VMX feature is initialized.
 
   @note This service could be called by BSP only.
 **/
 RETURN_STATUS
 EFIAPI
-VmxInsideSmxInitialize (
+VmxInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
   IN VOID                              *ConfigData,  OPTIONAL
@@ -104,59 +104,7 @@ VmxInsideSmxInitialize (
       Msr,
       MSR_IA32_FEATURE_CONTROL,
       MSR_IA32_FEATURE_CONTROL_REGISTER,
-      Bits.EnableVmxInsideSmx,
-      (State) ? 1 : 0
-      );
-  }
-  return RETURN_SUCCESS;
-}
-
-/**
-  Initializes SENTER feature to specific state.
-
-  @param[in]  ProcessorNumber  The index of the CPU executing this function.
-  @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
-                               structure for the CPU executing this function.
-  @param[in]  ConfigData       A pointer to the configuration buffer returned
-                               by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
-                               CPU_FEATURE_GET_CONFIG_DATA was not provided in
-                               RegisterCpuFeature().
-  @param[in]  State            If TRUE, then the SENTER feature must be enabled.
-                               If FALSE, then the SENTER feature must be disabled.
-
-  @retval RETURN_SUCCESS       SENTER feature is initialized.
-
-  @note This service could be called by BSP only.
-**/
-RETURN_STATUS
-EFIAPI
-SenterInitialize (
-  IN UINTN                             ProcessorNumber,
-  IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
-  IN BOOLEAN                           State
-  )
-{
-  MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
-
-  ASSERT (ConfigData != NULL);
-  MsrRegister = (MSR_IA32_FEATURE_CONTROL_REGISTER *) ConfigData;
-  if (MsrRegister[ProcessorNumber].Bits.Lock == 0) {
-    CPU_REGISTER_TABLE_WRITE_FIELD (
-      ProcessorNumber,
-      Msr,
-      MSR_IA32_FEATURE_CONTROL,
-      MSR_IA32_FEATURE_CONTROL_REGISTER,
-      Bits.SenterLocalFunctionEnables,
-      (State) ? 0x7F : 0
-      );
-
-    CPU_REGISTER_TABLE_WRITE_FIELD (
-      ProcessorNumber,
-      Msr,
-      MSR_IA32_FEATURE_CONTROL,
-      MSR_IA32_FEATURE_CONTROL_REGISTER,
-      Bits.SenterGlobalEnable,
+      Bits.EnableVmxOutsideSmx,
       (State) ? 1 : 0
       );
   }
@@ -271,7 +219,7 @@ SmxSupport (
 }
 
 /**
-  Initializes VMX outside SMX feature to specific state.
+  Initializes SMX feature to specific state.
 
   @param[in]  ProcessorNumber  The index of the CPU executing this function.
   @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
@@ -280,16 +228,17 @@ SmxSupport (
                                by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
                                CPU_FEATURE_GET_CONFIG_DATA was not provided in
                                RegisterCpuFeature().
-  @param[in]  State            If TRUE, then the VMX outside SMX feature must be enabled.
-                               If FALSE, then the VMX outside SMX feature must be disabled.
+  @param[in]  State            If TRUE, then SMX feature must be enabled.
+                               If FALSE, then SMX feature must be disabled.
 
-  @retval RETURN_SUCCESS       VMX outside SMX feature is initialized.
+  @retval RETURN_SUCCESS       SMX feature is initialized.
+  @retval RETURN_UNSUPPORTED   VMX not initialized.
 
   @note This service could be called by BSP only.
 **/
 RETURN_STATUS
 EFIAPI
-VmxOutsideSmxInitialize (
+SmxInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
   IN VOID                              *ConfigData,  OPTIONAL
@@ -297,6 +246,15 @@ VmxOutsideSmxInitialize (
   )
 {
   MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
+  RETURN_STATUS                        Status;
+
+  Status = RETURN_SUCCESS;
+
+  if (State && (!IsCpuFeatureInSetting (CPU_FEATURE_VMX))) {
+    DEBUG ((DEBUG_WARN, "Warning :: Can't enable SMX feature when VMX feature not enabled, disable it.\n"));
+    State = FALSE;
+    Status = RETURN_UNSUPPORTED;
+  }
 
   ASSERT (ConfigData != NULL);
   MsrRegister = (MSR_IA32_FEATURE_CONTROL_REGISTER *) ConfigData;
@@ -306,9 +264,27 @@ VmxOutsideSmxInitialize (
       Msr,
       MSR_IA32_FEATURE_CONTROL,
       MSR_IA32_FEATURE_CONTROL_REGISTER,
-      Bits.EnableVmxOutsideSmx,
+      Bits.SenterLocalFunctionEnables,
+      (State) ? 0x7F : 0
+      );
+
+    CPU_REGISTER_TABLE_WRITE_FIELD (
+      ProcessorNumber,
+      Msr,
+      MSR_IA32_FEATURE_CONTROL,
+      MSR_IA32_FEATURE_CONTROL_REGISTER,
+      Bits.SenterGlobalEnable,
+      (State) ? 1 : 0
+      );
+
+    CPU_REGISTER_TABLE_WRITE_FIELD (
+      ProcessorNumber,
+      Msr,
+      MSR_IA32_FEATURE_CONTROL,
+      MSR_IA32_FEATURE_CONTROL_REGISTER,
+      Bits.EnableVmxInsideSmx,
       (State) ? 1 : 0
       );
   }
-  return RETURN_SUCCESS;
+  return Status;
 }
