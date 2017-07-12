@@ -75,10 +75,13 @@ class CommitMessageCheck:
             count += 1
 
     def check_contributed_under(self):
-        cu_msg='Contributed-under: TianoCore Contribution Agreement 1.0'
+        cu_msg='Contributed-under: TianoCore Contribution Agreement 1.1'
         if self.msg.find(cu_msg) < 0:
-            self.error('Missing Contributed-under! (Note: this must be ' +
-                       'added by the code contributor!)')
+            # Allow 1.0 for now while EDK II community transitions to 1.1
+            cu_msg='Contributed-under: TianoCore Contribution Agreement 1.0'
+            if self.msg.find(cu_msg) < 0:
+                self.error('Missing Contributed-under! (Note: this must be ' +
+                           'added by the code contributor!)')
 
     @staticmethod
     def make_signature_re(sig, re_input=False):
