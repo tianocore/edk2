@@ -541,3 +541,14 @@
   RVCT:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS) --library_interface=aeabi_clib99 --diag_suppress=1296,1295,550,1293,111,68,177,223,144,513,188,128,546,1,3017 -JCryptoPkg/Include
   XCODE:*_*_IA32_CC_FLAGS   = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w
   XCODE:*_*_X64_CC_FLAGS    = -mmmx -msse -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -w
+
+  #
+  # AARCH64 uses strict alignment and avoids SIMD registers for code that may execute
+  # with the MMU off. This involves SEC, PEI_CORE and PEIM modules as well as BASE
+  # libraries, given that they may be included into such modules.
+  # This library, even though of the BASE type, is never used in such cases, and
+  # avoiding the SIMD register file (which is shared with the FPU) prevents the
+  # compiler from successfully building some of the OpenSSL source files that
+  # use floating point types, so clear the flags here.
+  #
+  GCC:*_*_AARCH64_CC_XIPFLAGS ==
