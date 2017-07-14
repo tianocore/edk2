@@ -1,8 +1,8 @@
 /** @file
-  Support for HSTI 1.0 specification, defined at 
+  Support for HSTI 1.1a specification, defined at
   Microsoft Hardware Security Testability Specification.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -72,7 +72,7 @@ typedef struct {
   // which will describe the steps to remediate the failure - a URL to the
   // documentation is recommended.
   //
-//CHAR16	ErrorString[];
+//CHAR16  ErrorString[];
 } ADAPTER_INFO_PLATFORM_SECURITY;
 
 #pragma pack()
