@@ -206,6 +206,17 @@ CpuCommonFeaturesLibConstructor (
                );
     ASSERT_EFI_ERROR (Status);
   }
+  if (IsCpuFeatureSupported (CPU_FEATURE_PPIN)) {
+    Status = RegisterCpuFeature (
+               "PPIN",
+               NULL,
+               PpinSupport,
+               PpinInitialize,
+               CPU_FEATURE_PPIN,
+               CPU_FEATURE_END
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return RETURN_SUCCESS;
 }

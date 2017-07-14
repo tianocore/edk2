@@ -854,4 +854,59 @@ FeatureControlGetConfigData (
   IN UINTN               NumberOfProcessors
   );
 
+/**
+  Detects if Protected Processor Inventory Number feature supported on current 
+  processor.
+
+  @param[in]  ProcessorNumber  The index of the CPU executing this function.
+  @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
+                               structure for the CPU executing this function.
+  @param[in]  ConfigData       A pointer to the configuration buffer returned
+                               by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
+                               CPU_FEATURE_GET_CONFIG_DATA was not provided in
+                               RegisterCpuFeature().
+
+  @retval TRUE     Enhanced Intel SpeedStep feature is supported.
+  @retval FALSE    Enhanced Intel SpeedStep feature is not supported.
+
+  @note This service could be called by BSP/APs.
+**/
+BOOLEAN
+EFIAPI
+PpinSupport (
+  IN UINTN                             ProcessorNumber,
+  IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
+  IN VOID                              *ConfigData  OPTIONAL
+  );
+
+/**
+  Initializes Protected Processor Inventory Number feature to specific state.
+
+  @param[in]  ProcessorNumber  The index of the CPU executing this function.
+  @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
+                               structure for the CPU executing this function.
+  @param[in]  ConfigData       A pointer to the configuration buffer returned
+                               by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
+                               CPU_FEATURE_GET_CONFIG_DATA was not provided in
+                               RegisterCpuFeature().
+  @param[in]  State            If TRUE, then the Protected Processor Inventory 
+                               Number feature must be enabled.
+                               If FALSE, then the Protected Processor Inventory 
+                               Number feature must be disabled.
+
+  @retval RETURN_SUCCESS       Protected Processor Inventory Number feature is 
+                               initialized.
+  @retval RETURN_DEVICE_ERROR  Device can't change state because it has been 
+                               locked.
+
+**/
+RETURN_STATUS
+EFIAPI
+PpinInitialize (
+  IN UINTN                             ProcessorNumber,
+  IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
+  IN VOID                              *ConfigData,  OPTIONAL
+  IN BOOLEAN                           State
+  );
+
 #endif
