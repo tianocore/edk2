@@ -1,4 +1,3 @@
-
 ======================
 = Code Contributions =
 ======================
@@ -12,7 +11,7 @@ To make a contribution to a TianoCore project, follow these steps.
    contribution is made under the terms of the specified
    contribution agreement.  Your "Contributed-under" message
    must include the name of contribution agreement and version.
-   For example: Contributed-under: TianoCore Contribution Agreement 1.0
+   For example: Contributed-under: TianoCore Contribution Agreement 1.1
    The "TianoCore Contribution Agreement" is included below in
    this document.
 4. Submit your code to the TianoCore project using the process
@@ -27,6 +26,10 @@ To make a contribution to a TianoCore project, follow these steps.
    * MIT: http://opensource.org/licenses/MIT
    * Python-2.0: http://opensource.org/licenses/Python-2.0
    * Zlib: http://opensource.org/licenses/Zlib
+
+   For documentation:
+   * FreeBSD Documentation License
+     https://www.freebsd.org/copyright/freebsd-doc-license.html
 
    Contributions of code put into the public domain can also be
    accepted.
@@ -47,11 +50,11 @@ and the "Contributed-under" message.
 === Start of sample patch email message ===
 
 From: Contributor Name <contributor@example.com>
-Subject: [PATCH] CodeModule: Brief-single-line-summary
+Subject: [Repository/Branch PATCH] Module: Brief-single-line-summary
 
 Full-commit-message
 
-Contributed-under: TianoCore Contribution Agreement 1.0
+Contributed-under: TianoCore Contribution Agreement 1.1
 Signed-off-by: Contributor Name <contributor@example.com>
 ---
 
@@ -65,29 +68,37 @@ Patch content inline or attached
 === Notes for sample patch email ===
 
 * The first line of commit message is taken from the email's subject
-  line following [PATCH]. The remaining portion of the commit message
+  line following [Repository/Branch PATCH]. The remaining portion of the commit message
   is the email's content until the '---' line.
 * git format-patch is one way to create this format
 
 === Definitions for sample patch email ===
 
-* "CodeModule" is a short idenfier for the affected code.  For
-  example MdePkg, or MdeModulePkg UsbBusDxe.
+* "Repository" is the identifier of the repository the patch applies.
+  This identifier should only be provided for repositories other than
+  'edk2'. For example 'edk2-BuildSpecification' or 'staging'.
+* "Branch" is the identifier of the branch the patch applies. This
+  identifier should only be provided for branches other than 'edk2/master'.
+  For example 'edk2/UDK2015', 'edk2-BuildSpecification/release/1.27', or
+  'staging/edk2-test'.
+* "Module" is a short identifier for the affected code or documentation. For
+  example 'MdePkg', 'MdeModulePkg/UsbBusDxe', 'Introduction', or
+  'EDK II INF File Format'.
 * "Brief-single-line-summary" is a short summary of the change.
 * The entire first line should be less than ~70 characters.
 * "Full-commit-message" a verbose multiple line comment describing
   the change.  Each line should be less than ~70 characters.
-* "Contributed-under" explicitely states that the contribution is
-  made under the terms of the contribtion agreement.  This
+* "Contributed-under" explicitly states that the contribution is
+  made under the terms of the contribution agreement. This
   agreement is included below in this document.
 * "Signed-off-by" is the contributor's signature identifying them
   by their real/legal name and their email address.
 
 ========================================
-= TianoCore Contribution Agreement 1.0 =
+= TianoCore Contribution Agreement 1.1 =
 ========================================
 
-INTEL CORPORATION ("INTEL") MAKES AVAILABLE SOFTWARE, DOCUMENTATION,
+INTEL CORPORATION ("INTEL") MAKES AVAILABLE SOFTWARE, DOCUMENTATION ("DOCUMENTATION"),
 INFORMATION AND/OR OTHER MATERIALS FOR USE IN THE TIANOCORE OPEN SOURCE
 PROJECT (COLLECTIVELY "CONTENT"). USE OF THE CONTENT IS GOVERNED BY THE
 TERMS AND CONDITIONS OF THIS AGREEMENT BETWEEN YOU AND INTEL AND/OR THE
@@ -100,14 +111,20 @@ AGREEMENT AND THE TERMS AND CONDITIONS OF ANY APPLICABLE LICENSE
 AGREEMENTS OR NOTICES INDICATED OR REFERENCED BELOW, THEN YOU MAY NOT
 USE THE CONTENT.
 
-Unless otherwise indicated, all Content made available on the TianoCore
+Unless otherwise indicated, all Content (except Documentation) made available on the TianoCore
 site is provided to you under the terms and conditions of the BSD
 License ("BSD"). A copy of the BSD License is available at
 http://opensource.org/licenses/bsd-license.php
 or when applicable, in the associated License.txt file.
 
+Unless otherwise indicated, all Documentation made available on the
+TianoCore site is provided to you under the terms and conditions of the
+FreeBSD Documentation License ("FreeBSD"). A copy of the BSD License is
+available at https://www.freebsd.org/copyright/freebsd-doc-license.html or,
+when applicable, in the associated License.txt file.
+
 Certain other content may be made available under other licenses as
-indicated in or with such Content. (For example, in a License.txt file.)
+indicated in or with such Content (for example, in a License.txt file).
 
 You accept and agree to the following terms and conditions for Your
 present and future Contributions submitted to TianoCore site. Except
