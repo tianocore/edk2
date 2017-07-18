@@ -465,11 +465,25 @@ SerialRead (
   )
 {
   UINTN Count;
+  UINTN TimeOut;
 
   Count = 0;
 
-  if (SerialPortPoll ()) {
-    Count = SerialPortRead (Buffer, *BufferSize);
+  while (Count < *BufferSize) {
+    TimeOut = 0;
+    while (TimeOut < mSerialIoMode.Timeout) {
+      if (SerialPortPoll ()) {
+        break;
+      }
+      gBS->Stall (10);
+      TimeOut += 10;
+    }
+    if (TimeOut >= mSerialIoMode.Timeout) {
+      break;
+    }
+    SerialPortRead (Buffer, 1);
+    Count++;
+    Buffer = (VOID *) ((UINT8 *) Buffer + 1);
   }
 
   if (Count != *BufferSize) {
