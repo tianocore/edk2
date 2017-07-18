@@ -71,6 +71,7 @@
 [Components]
   IntelSiliconPkg/Library/DxeSmbiosDataHobLib/DxeSmbiosDataHobLib.inf
   IntelSiliconPkg/IntelVTdDxe/IntelVTdDxe.inf
+  IntelSiliconPkg/PlatformVTdSampleDxe/PlatformVTdSampleDxe.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
