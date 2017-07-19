@@ -128,8 +128,9 @@ EFI_STATUS
 
 ///
 ///  EFI SMM Access PPI is used to control the visibility of the SMRAM on the platform.
-///  It abstracts the location and characteristics of SMRAM.  The expectation is
-///  that the north bridge or memory controller would publish this PPI.
+///  It abstracts the location and characteristics of SMRAM. The platform should report 
+///  all MMRAM via PEI_SMM_ACCESS_PPI. The expectation is that the north bridge or 
+///  memory controller would publish this PPI.
 /// 
 struct _PEI_SMM_ACCESS_PPI {
   PEI_SMM_OPEN          Open;
