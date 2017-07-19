@@ -108,8 +108,9 @@ EFI_STATUS
 
 ///
 ///  EFI SMM Access2 Protocol is used to control the visibility of the SMRAM on the platform.
-///  It abstracts the location and characteristics of SMRAM.  The expectation is
-///  that the north bridge or memory controller would publish this protocol.
+///  It abstracts the location and characteristics of SMRAM. The platform should report all 
+///  MMRAM via EFI_MM_ACCESS_PROTOCOL. The expectation is that the north bridge or memory 
+///  controller would publish this protocol.
 /// 
 struct _EFI_SMM_ACCESS2_PROTOCOL {
   EFI_SMM_OPEN2          Open;
