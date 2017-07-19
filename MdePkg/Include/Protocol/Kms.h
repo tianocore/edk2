@@ -8,7 +8,7 @@
   server over the network, or to a Hardware Security Module (HSM) attached to the system it
   runs on, or anything else that is capable of providing the key management service.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at
@@ -79,6 +79,10 @@ typedef struct _EFI_KMS_PROTOCOL EFI_KMS_PROTOCOL;
 #define EFI_KMS_FORMAT_GENERIC_3072_GUID \
   { \
     0xb9237513, 0x6c44, 0x4411, {0xa9, 0x90, 0x21, 0xe5, 0x56, 0xe0, 0x5a, 0xde } \
+  }
+#define EFI_KMS_FORMAT_GENERIC_DYNAMIC_GUID \
+  { \
+    0x2156e996, 0x66de, 0x4b27, {0x9c, 0xc9, 0xb0, 0x9f, 0xac, 0x4d, 0x2, 0xbe } \
   }
 ///@}
 
@@ -174,6 +178,17 @@ typedef struct _EFI_KMS_PROTOCOL EFI_KMS_PROTOCOL;
 #define EFI_KMS_ATTRIBUTE_TYPE_INTERVAL         0x09
 #define EFI_KMS_ATTRIBUTE_TYPE_STRUCTURE        0x0A
 #define EFI_KMS_ATTRIBUTE_TYPE_DYNAMIC          0x0B
+
+typedef struct {
+  ///
+  /// Length in bytes of the KeyData.
+  ///
+  UINT32        KeySize;
+  ///
+  /// The data of the key.
+  ///
+  UINT8         KeyData[1];
+} EFI_KMS_FORMAT_GENERIC_DYNAMIC;
 
 typedef struct {
   ///
