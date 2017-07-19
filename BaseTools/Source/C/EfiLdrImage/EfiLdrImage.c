@@ -6,7 +6,7 @@ FILE := EFILDR_HEADER
         <PeImageFileContent> +
 The order of EFILDR_IMAGE is same as the order of placing PeImageFileContent.
   
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -84,7 +84,7 @@ Usage (
 {
   printf ("Usage: EfiLdrImage -o OutImage LoaderImage PeImage1 PeImage2 ... PeImageN\n");
   printf ("%s Version %d.%d Build %s\n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
-  printf ("Copyright (c) 1999-2016 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 1999-2017 Intel Corporation. All rights reserved.\n");
   printf ("\n  The EfiLdrImage tool is used to combine PE files into EFILDR image with Efi loader header.\n");
 }
 
@@ -221,7 +221,7 @@ Returns:
       if (strlen(argv[0]) > 2) {
         Status = CountVerboseLevel (&argv[0][2], strlen(argv[0]) - 2, &VerboseLevel);
         if (EFI_ERROR (Status)) {
-          Error (NULL, 0, 1003, "Invalid option value", argv[0]);
+          Error (NULL, 0, 1003, "Invalid option value", "%s", argv[0]);
           return STATUS_ERROR;        
         }
       }
