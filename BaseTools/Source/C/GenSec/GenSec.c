@@ -1,7 +1,7 @@
 /** @file
 Creates output file that is a properly formed section per the PI spec.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -146,7 +146,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -1120,6 +1120,10 @@ Returns:
     }
 
     if ((stricmp (argv[0], "-r") == 0) || (stricmp (argv[0], "--attributes") == 0)) {
+      if (argv[1] == NULL) {
+        Error (NULL, 0, 1003, "Invalid option value", "Guid section attributes can't be NULL");
+        goto Finish;
+      }
       if (stricmp (argv[1], mGUIDedSectionAttribue[EFI_GUIDED_SECTION_PROCESSING_REQUIRED]) == 0) {
         SectGuidAttribute |= EFI_GUIDED_SECTION_PROCESSING_REQUIRED;
       } else if (stricmp (argv[1], mGUIDedSectionAttribue[EFI_GUIDED_SECTION_AUTH_STATUS_VALID]) == 0) {
