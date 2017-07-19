@@ -71,6 +71,7 @@
 #define CPU_FEATURE_APIC_TPR_UPDATE_MESSAGE         (32+9)
 #define CPU_FEATURE_ENERGY_PERFORMANCE_BIAS         (32+10)
 #define CPU_FEATURE_PPIN                            (32+11)
+#define CPU_FEATURE_PROC_TRACE                      (32+12)
 
 #define CPU_FEATURE_BEFORE_ALL                      BIT27
 #define CPU_FEATURE_AFTER_ALL                       BIT28
