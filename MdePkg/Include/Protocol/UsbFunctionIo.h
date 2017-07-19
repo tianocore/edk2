@@ -11,7 +11,7 @@
   or interrupt transfers, alternate interfaces, or USB 3.0 functionality.
   Future revisions of this protocol may support these or additional features.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -273,9 +273,13 @@ EFI_STATUS
                                 as a Unicode string.
 
   @retval EFI_SUCCESS           The function returned successfully.
-  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
+                                BufferSize is NULL.
+                                *BufferSize is not 0 and Buffer is NULL.
+                                Id in invalid.
   @retval EFI_DEVICE_ERROR      The physical device reported an error.
-  @retval EFI_BUFFER_TOO_SMALL  Supplied buffer isn't large enough to hold the request string.
+  @retval EFI_BUFFER_TOO_SMALL  The buffer is too small to hold the buffer.
+                                *BufferSize has been updated with the size needed to hold the request string.
 
 **/
 typedef
