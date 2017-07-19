@@ -285,5 +285,13 @@
   # @ValidList   0x80000001 | 0
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSetting|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000019
 
+  ## Contains the size of memory required when CPU processor trace is enabled.
+  # @Prompt The memory size used for processor trace.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceMemSize|0x10|UINT32|0x60000012
+
+  ## Contains the processor trace output scheme when CPU processor trace is enabled.
+  # @Prompt The processor trace output scheme.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme|0x2|UINT8|0x60000015
+
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
