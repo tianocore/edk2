@@ -1,7 +1,7 @@
 /** @file
 Utility program to create an EFI option ROM image from binary and EFI PE32 files.
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -242,7 +242,7 @@ Returns:
   // Try to open the input file
   //
   if ((InFptr = fopen (LongFilePath (InFile->FileName), "rb")) == NULL) {
-    Error (NULL, 0, 0001, "Error opening file", InFile->FileName);
+    Error (NULL, 0, 0001, "Error opening file", "%s", InFile->FileName);
     return STATUS_ERROR;
   }
   //
@@ -1262,7 +1262,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
