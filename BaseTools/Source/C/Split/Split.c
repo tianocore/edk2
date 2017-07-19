@@ -2,7 +2,7 @@
 
   Split a file into two pieces at the request offset.
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
@@ -80,7 +80,7 @@ Returns:
 --*/
 {
   Version();
-  printf ("Copyright (c) 1999-2016 Intel Corporation. All rights reserved.\n");
+  printf ("Copyright (c) 1999-2017 Intel Corporation. All rights reserved.\n");
   printf ("\n  SplitFile creates two Binary files either in the same directory as the current working\n");
   printf ("  directory or in the specified directory.\n");
   printf ("\nUsage: \n\
@@ -103,12 +103,16 @@ GetSplitValue (
   OUT UINT64 *ReturnValue
 )
 {
-  UINT64 len = strlen(SplitValueString);
+  UINT64 len = 0;
   UINT64 base = 1;
   UINT64 index = 0;
   UINT64 number = 0;
   CHAR8 lastCHAR = 0;
   EFI_STATUS Status = EFI_SUCCESS;
+
+  if (SplitValueString != NULL){
+    len = strlen(SplitValueString);
+  }
 
   if (len == 0) {
     return EFI_ABORTED;
