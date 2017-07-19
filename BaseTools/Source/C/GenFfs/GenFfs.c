@@ -1,7 +1,7 @@
 /** @file
 This file contains functions required to generate a Firmware File System file.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -116,7 +116,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -736,7 +736,7 @@ Returns:
       continue;
     }
 
-    Error (NULL, 0, 1000, "Unknown option", argv[0]);
+    Error (NULL, 0, 1000, "Unknown option", "%s", argv[0]);
     goto Finish;
   }
 
