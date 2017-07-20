@@ -1,12 +1,8 @@
 // /** @file
-// PI SMM Communication SMM driver that installs the SMM Communication ACPI Table.
+// PI SMM Communication SMM driver that saves SMM communication context
+// for use by SMM Communication PEIM in the S3 boot mode.
 //
-// This SMM driver installs the SMM Communication ACPI Table defined in the UEFI spec
-// which provides a mechanism that can be used in the OS present environment by
-// non-firmware agents for inter-mode communication with SMM agents. It also saves
-// SMM communication context for use by SMM Communication PEIM in the S3 boot mode.
-//
-// Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +14,6 @@
 //
 // **/
 
-#string STR_MODULE_ABSTRACT             #language en-US "PI SMM Communication SMM driver that installs the SMM Communication ACPI Table"
+#string STR_MODULE_ABSTRACT             #language en-US "PI SMM Communication SMM driver that saves SMM communication context"
 
-#string STR_MODULE_DESCRIPTION          #language en-US "This SMM driver installs the SMM Communication ACPI Table defined in the UEFI Specification, which provides a mechanism that can be used in the OS-present environment by non-firmware agents for inter-mode communication with SMM agents. It also saves an SMM communication context for use by SMM Communication PEIM in the S3 boot mode."
+#string STR_MODULE_DESCRIPTION          #language en-US "PI SMM Communication SMM driver that saves SMM communication context for use by SMM Communication PEIM in the S3 boot mode."

@@ -1,7 +1,7 @@
 /** @file
 PiSmmCommunication SMM Driver.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,41 +19,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/SmmServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/HobLib.h>
 #include <Library/DebugLib.h>
 #include <Library/SmmMemLib.h>
-#include <Library/PcdLib.h>
 #include <Protocol/SmmSwDispatch2.h>
-#include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCommunication.h>
-#include <Protocol/AcpiTable.h>
 #include <Ppi/SmmCommunication.h>
-#include <Guid/Acpi.h>
 
 #include "PiSmmCommunicationPrivate.h"
 
 EFI_SMM_COMMUNICATION_CONTEXT  mSmmCommunicationContext = {
   SMM_COMMUNICATION_SIGNATURE
-};
-
-EFI_SMM_COMMUNICATION_ACPI_TABLE  mSmmCommunicationAcpiTable = {
-  {
-    {
-      EFI_ACPI_4_0_UEFI_ACPI_DATA_TABLE_SIGNATURE,
-      sizeof (EFI_SMM_COMMUNICATION_ACPI_TABLE),
-      0x1,   // Revision
-      0x0,   // Checksum
-      {0x0}, // OemId[6]
-      0x0,   // OemTableId
-      0x0,   // OemRevision
-      0x0,   // CreatorId
-      0x0    // CreatorRevision
-    },
-    {0x0},                                                      // Identifier
-    OFFSET_OF (EFI_SMM_COMMUNICATION_ACPI_TABLE, SwSmiNumber)   // DataOffset
-  },
-  0x0,                                                   // SwSmiNumber
-  0x0                                                    // BufferPtrAddress
 };
 
 /**
@@ -200,21 +175,7 @@ PiSmmCommunicationSmmEntryPoint (
   EFI_SMM_SW_DISPATCH2_PROTOCOL *SmmSwDispatch2;
   EFI_SMM_SW_REGISTER_CONTEXT   SmmSwDispatchContext;
   EFI_HANDLE                    DispatchHandle;
-  EFI_ACPI_TABLE_PROTOCOL       *AcpiTableProtocol;
-  UINTN                         TableKey;
-  UINT64                        OemTableId;
   EFI_PHYSICAL_ADDRESS          *BufferPtrAddress;
-
-  CopyMem (
-    mSmmCommunicationAcpiTable.UefiAcpiDataTable.Header.OemId,
-    PcdGetPtr (PcdAcpiDefaultOemId),
-    sizeof (mSmmCommunicationAcpiTable.UefiAcpiDataTable.Header.OemId)
-    );
-  OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
-  CopyMem (&mSmmCommunicationAcpiTable.UefiAcpiDataTable.Header.OemTableId, &OemTableId, sizeof (UINT64));
-  mSmmCommunicationAcpiTable.UefiAcpiDataTable.Header.OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
-  mSmmCommunicationAcpiTable.UefiAcpiDataTable.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
-  mSmmCommunicationAcpiTable.UefiAcpiDataTable.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
 
   //
   // Register software SMI handler
@@ -237,32 +198,15 @@ PiSmmCommunicationSmmEntryPoint (
 
   DEBUG ((EFI_D_INFO, "SmmCommunication SwSmi: %x\n", (UINTN)SmmSwDispatchContext.SwSmiInputValue));
 
-  //
-  // Set ACPI table
-  //
-  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **) &AcpiTableProtocol);
-  ASSERT_EFI_ERROR (Status);
-
-  mSmmCommunicationAcpiTable.SwSmiNumber = (UINT32)SmmSwDispatchContext.SwSmiInputValue;
   BufferPtrAddress = AllocateAcpiNvsMemoryBelow4G (sizeof(EFI_PHYSICAL_ADDRESS));
   ASSERT (BufferPtrAddress != NULL);
   DEBUG ((EFI_D_INFO, "SmmCommunication BufferPtrAddress: 0x%016lx, BufferPtr: 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)BufferPtrAddress, *BufferPtrAddress));
-  mSmmCommunicationAcpiTable.BufferPtrAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)BufferPtrAddress;
-  CopyMem (&mSmmCommunicationAcpiTable.UefiAcpiDataTable.Identifier, &gEfiSmmCommunicationProtocolGuid, sizeof(gEfiSmmCommunicationProtocolGuid));
-
-  Status = AcpiTableProtocol->InstallAcpiTable (
-                                AcpiTableProtocol,
-                                &mSmmCommunicationAcpiTable,
-                                sizeof(mSmmCommunicationAcpiTable),
-                                &TableKey
-                                );
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Save context
   //
   mSmmCommunicationContext.SwSmiNumber = (UINT32)SmmSwDispatchContext.SwSmiInputValue;
-  mSmmCommunicationContext.BufferPtrAddress = mSmmCommunicationAcpiTable.BufferPtrAddress;
+  mSmmCommunicationContext.BufferPtrAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)BufferPtrAddress;
   SetCommunicationContext ();
 
   return Status;

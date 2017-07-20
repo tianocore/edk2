@@ -1,7 +1,7 @@
 // /** @file
 // PiSmmCommunicationSmm Localized Strings and Content
 //
-// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -15,4 +15,4 @@
 
 #string STR_PROPERTIES_MODULE_NAME
 #language en-US
-"SMM Communication ACPI Table DXE Driver"
+"SMM Communication SMM Driver"
