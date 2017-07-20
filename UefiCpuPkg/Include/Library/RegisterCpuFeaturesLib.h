@@ -35,7 +35,6 @@
 #define CPU_FEATURE_FASTSTRINGS                     6
 #define CPU_FEATURE_VMX                             7
 #define CPU_FEATURE_SMX                             8
-#define CPU_FEATURE_SENTER                          9
 #define CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER   10
 #define CPU_FEATURE_LIMIT_CPUID_MAX_VAL             11
 #define CPU_FEATURE_MCE                             12
