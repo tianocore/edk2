@@ -4,7 +4,7 @@
   This protocol provides a means of communicating between drivers outside of SMM and SMI 
   handlers inside of SMM.  
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -18,10 +18,28 @@
 #ifndef _SMM_COMMUNICATION_H_
 #define _SMM_COMMUNICATION_H_
 
-//
-// Need include this header file for EFI_SMM_COMMUNICATE_HEADER data structure.
-//
-#include <Uefi/UefiAcpiDataTable.h>
+#pragma pack(1)
+
+///
+/// To avoid confusion in interpreting frames, the communication buffer should always 
+/// begin with EFI_SMM_COMMUNICATE_HEADER
+///
+typedef struct {
+  ///
+  /// Allows for disambiguation of the message format.
+  ///
+  EFI_GUID  HeaderGuid;
+  ///
+  /// Describes the size of Data (in bytes) and does not include the size of the header.
+  ///
+  UINTN     MessageLength;
+  ///
+  /// Designates an array of bytes that is MessageLength in size.
+  ///
+  UINT8     Data[1];
+} EFI_SMM_COMMUNICATE_HEADER;
+
+#pragma pack()
 
 #define EFI_SMM_COMMUNICATION_PROTOCOL_GUID \
   { \

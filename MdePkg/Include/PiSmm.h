@@ -2,7 +2,7 @@
 
   Root include file for Mde Package SMM modules.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Uefi/UefiSpec.h>
 
 #include <Pi/PiSmmCis.h>
-#include <Pi/PiSmmCommunicationAcpiTable.h>
 
 #endif
 
