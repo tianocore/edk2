@@ -196,6 +196,56 @@ AllCpusInSmmWithExceptions (
   return TRUE;
 }
 
+/**
+  Has OS enabled Lmce in the MSR_IA32_MCG_EXT_CTL
+  
+  @retval TRUE     Os enable lmce.
+  @retval FALSE    Os not enable lmce.
+
+**/
+BOOLEAN
+IsLmceOsEnabled (
+  VOID
+  )
+{
+  MSR_IA32_MCG_CAP_REGISTER          McgCap;
+  MSR_IA32_FEATURE_CONTROL_REGISTER  FeatureCtrl;
+  MSR_IA32_MCG_EXT_CTL_REGISTER      McgExtCtrl;
+
+  McgCap.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
+  if (McgCap.Bits.MCG_LMCE_P == 0) {
+    return FALSE;
+  }
+
+  FeatureCtrl.Uint64 = AsmReadMsr64 (MSR_IA32_FEATURE_CONTROL);
+  if (FeatureCtrl.Bits.LmceOn == 0) {
+    return FALSE;
+  }
+
+  McgExtCtrl.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_EXT_CTL);
+  return (BOOLEAN) (McgExtCtrl.Bits.LMCE_EN == 1);
+}
+
+/**
+  Return if Local machine check exception signaled. 
+
+  Indicates (when set) that a local machine check exception was generated. This indicates that the current machine-check event was 
+  delivered to only the logical processor.
+
+  @retval TRUE    LMCE was signaled.
+  @retval FALSE   LMCE was not signaled.
+
+**/
+BOOLEAN
+IsLmceSignaled (
+  VOID
+  )
+{
+  MSR_IA32_MCG_STATUS_REGISTER McgStatus;
+
+  McgStatus.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_STATUS);
+  return (BOOLEAN) (McgStatus.Bits.LMCE_S == 1);
+}
 
 /**
   Given timeout constraint, wait for all APs to arrive, and insure when this function returns, no AP will execute normal mode code before
@@ -209,8 +259,13 @@ SmmWaitForApArrival (
 {
   UINT64                            Timer;
   UINTN                             Index;
+  BOOLEAN                           LmceEn;
+  BOOLEAN                           LmceSignal;
 
   ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
+
+  LmceEn = IsLmceOsEnabled ();
+  LmceSignal = IsLmceSignaled();
 
   //
   // Platform implementor should choose a timeout value appropriately:
@@ -227,7 +282,7 @@ SmmWaitForApArrival (
   // Sync with APs 1st timeout
   //
   for (Timer = StartSyncTimer ();
-       !IsSyncTimerTimeout (Timer) &&
+       !IsSyncTimerTimeout (Timer) && !(LmceEn && LmceSignal) &&
        !AllCpusInSmmWithExceptions (ARRIVAL_EXCEPTION_BLOCKED | ARRIVAL_EXCEPTION_SMI_DISABLED );
        ) {
     CpuPause ();
