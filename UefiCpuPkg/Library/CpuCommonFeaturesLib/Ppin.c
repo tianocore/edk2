@@ -26,8 +26,8 @@
                                CPU_FEATURE_GET_CONFIG_DATA was not provided in
                                RegisterCpuFeature().
 
-  @retval TRUE     Enhanced Intel SpeedStep feature is supported.
-  @retval FALSE    Enhanced Intel SpeedStep feature is not supported.
+  @retval TRUE     Protected Processor Inventory Number feature is supported.
+  @retval FALSE    Protected Processor Inventory Number feature is not supported.
 
   @note This service could be called by BSP/APs.
 **/
