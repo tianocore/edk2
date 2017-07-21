@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/DevicePathToText.h>
+#include <Protocol/FormBrowserEx2.h>
 
 #include <Library/PrintLib.h>
 #include <Library/DebugLib.h>

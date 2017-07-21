@@ -24,6 +24,51 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAX_CHAR            480
 
 /**
+
+  Check whether a reset is needed, if reset is needed, Popup a menu to notice user.
+
+**/
+VOID
+BmmSetupResetReminder (
+  VOID
+  )
+{
+  EFI_INPUT_KEY                 Key;
+  CHAR16                        *StringBuffer1;
+  CHAR16                        *StringBuffer2;
+  EFI_STATUS                    Status;
+  EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL *FormBrowserEx2;
+
+  //
+  // Use BrowserEx2 protocol to check whether reset is required.
+  //
+  Status = gBS->LocateProtocol (&gEdkiiFormBrowserEx2ProtocolGuid, NULL, (VOID **) &FormBrowserEx2);
+
+  //
+  //check any reset required change is applied? if yes, reset system
+  //
+  if (!EFI_ERROR(Status) && FormBrowserEx2->IsResetRequired()) {
+    StringBuffer1 = AllocateZeroPool (MAX_CHAR * sizeof (CHAR16));
+    ASSERT (StringBuffer1 != NULL);
+    StringBuffer2 = AllocateZeroPool (MAX_CHAR * sizeof (CHAR16));
+    ASSERT (StringBuffer2 != NULL);
+    StrCpyS (StringBuffer1, MAX_CHAR, L"Configuration changed. Reset to apply it Now.");
+    StrCpyS (StringBuffer2, MAX_CHAR, L"Press ENTER to reset");
+    //
+    // Popup a menu to notice user
+    //
+    do {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
+    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+
+    FreePool (StringBuffer1);
+    FreePool (StringBuffer2);
+
+    gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+  }
+}
+
+/**
   Create a menu entry by given menu type.
 
   @param MenuType        The Menu type to be created.
@@ -883,6 +928,10 @@ BootFromFile (
     // Since current no boot from removable media directly is allowed */
     //
     gST->ConOut->ClearScreen (gST->ConOut);
+    //
+    // Check whether need to reset system.
+    //
+    BmmSetupResetReminder ();
 
     BmmSetConsoleMode (FALSE);
     EfiBootManagerBoot (&BootOption);
