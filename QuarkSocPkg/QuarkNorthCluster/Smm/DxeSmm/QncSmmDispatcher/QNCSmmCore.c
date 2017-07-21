@@ -2,7 +2,7 @@
 This driver is responsible for the registration of child drivers
 and the abstraction of the QNC SMI sources.
 
-Copyright (c) 2013-2016 Intel Corporation.
+Copyright (c) 2013-2017 Intel Corporation.
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -758,7 +758,7 @@ QNCSmmCoreDispatcher (
             }
           }
 
-          if (RecordInDb->ClearSource == NULL) {
+          if (ActiveRecordInDb.ClearSource == NULL) {
             //
             // Clear the SMI associated w/ the source using the default function
             //
