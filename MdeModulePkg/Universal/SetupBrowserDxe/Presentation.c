@@ -997,7 +997,8 @@ ProcessAction (
   }
 
   if ((Action & BROWSER_ACTION_RESET) == BROWSER_ACTION_RESET) {
-    gResetRequired = TRUE;
+    gResetRequiredFormLevel = TRUE;
+    gResetRequiredSystemLevel = TRUE;
   }
 
   if ((Action & BROWSER_ACTION_EXIT) == BROWSER_ACTION_EXIT) {
@@ -2045,7 +2046,8 @@ ProcessCallBackFunction (
         switch (ActionRequest) {
         case EFI_BROWSER_ACTION_REQUEST_RESET:
           DiscardFormIsRequired = TRUE;
-          gResetRequired = TRUE;
+          gResetRequiredFormLevel = TRUE;
+          gResetRequiredSystemLevel = TRUE;
           NeedExit              = TRUE;
           break;
 
@@ -2544,7 +2546,8 @@ SetupBrowser (
       if ((Status == EFI_SUCCESS) && 
           (Statement->Storage == NULL)) { 
         if ((Statement->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0) {
-          gResetRequired = TRUE;
+          gResetRequiredFormLevel = TRUE;
+          gResetRequiredSystemLevel = TRUE;
         }
 
         if ((Statement->QuestionFlags & EFI_IFR_FLAG_RECONNECT_REQUIRED) != 0) {

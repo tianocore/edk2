@@ -53,7 +53,8 @@ LIST_ENTRY      gBrowserStorageList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserSto
 LIST_ENTRY      gBrowserSaveFailFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserSaveFailFormSetList);
 
 BOOLEAN               mSystemSubmit = FALSE;
-BOOLEAN               gResetRequired;
+BOOLEAN               gResetRequiredFormLevel;
+BOOLEAN               gResetRequiredSystemLevel = FALSE;
 BOOLEAN               gExitRequired;
 BOOLEAN               gFlagReconnect;
 BOOLEAN               gCallbackReconnect;
@@ -499,7 +500,7 @@ SendForm (
   SaveBrowserContext ();
 
   gFlagReconnect = FALSE;
-  gResetRequired = FALSE;
+  gResetRequiredFormLevel = FALSE;
   gExitRequired  = FALSE;
   gCallbackReconnect = FALSE;
   Status         = EFI_SUCCESS;
@@ -579,7 +580,7 @@ SendForm (
 
   if (ActionRequest != NULL) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-    if (gResetRequired) {
+    if (gResetRequiredFormLevel) {
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_RESET;
     }
   }
@@ -2678,7 +2679,8 @@ UpdateFlagForForm (
     //
     if (SetFlag && OldValue && !Question->ValueChanged) {
       if ((Question->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0) {
-        gResetRequired = TRUE;
+        gResetRequiredFormLevel = TRUE;
+        gResetRequiredSystemLevel = TRUE;
       }
 
       if ((Question->QuestionFlags & EFI_IFR_FLAG_RECONNECT_REQUIRED) != 0) {
@@ -5917,7 +5919,7 @@ SaveBrowserContext (
   // Save FormBrowser context
   //
   Context->Selection            = gCurrentSelection;
-  Context->ResetRequired        = gResetRequired;
+  Context->ResetRequired        = gResetRequiredFormLevel;
   Context->FlagReconnect        = gFlagReconnect;
   Context->CallbackReconnect    = gCallbackReconnect;
   Context->ExitRequired         = gExitRequired;
@@ -5990,7 +5992,7 @@ RestoreBrowserContext (
   // Restore FormBrowser context
   //
   gCurrentSelection     = Context->Selection;
-  gResetRequired        = Context->ResetRequired;
+  gResetRequiredFormLevel = Context->ResetRequired;
   gFlagReconnect        = Context->FlagReconnect;
   gCallbackReconnect    = Context->CallbackReconnect;
   gExitRequired         = Context->ExitRequired;
@@ -6465,7 +6467,8 @@ ExecuteAction (
   // Executet the reset action.
   //
   if ((Action & BROWSER_ACTION_RESET) != 0) {
-    gResetRequired = TRUE;
+    gResetRequiredFormLevel = TRUE;
+    gResetRequiredSystemLevel = TRUE;
   }
 
   //
@@ -6565,6 +6568,6 @@ IsResetRequired (
   VOID
   )
 {
-  return gResetRequired;
+  return gResetRequiredSystemLevel;
 }
 
