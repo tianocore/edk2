@@ -167,6 +167,7 @@
   CpuExceptionHandlerLib|MdeModulePkg/Library/CpuExceptionHandlerLibNull/CpuExceptionHandlerLibNull.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  ResetSystemLib|Nt32Pkg/Library/ResetSystemLib/ResetSystemLib.inf
 !if $(TLS_ENABLE) == TRUE
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
 !else
@@ -394,7 +395,7 @@
   }
   Nt32Pkg/MetronomeDxe/MetronomeDxe.inf
   Nt32Pkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
-  Nt32Pkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
+  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   Nt32Pkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf  {
