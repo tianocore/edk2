@@ -68,8 +68,8 @@ Patch content inline or attached
 === Notes for sample patch email ===
 
 * The first line of commit message is taken from the email's subject
-  line following [Repository/Branch PATCH]. The remaining portion of the commit message
-  is the email's content until the '---' line.
+  line following [Repository/Branch PATCH]. The remaining portion of the
+  commit message is the email's content until the '---' line.
 * git format-patch is one way to create this format
 
 === Definitions for sample patch email ===
@@ -98,22 +98,22 @@ Patch content inline or attached
 = TianoCore Contribution Agreement 1.1 =
 ========================================
 
-INTEL CORPORATION ("INTEL") MAKES AVAILABLE SOFTWARE, DOCUMENTATION ("DOCUMENTATION"),
-INFORMATION AND/OR OTHER MATERIALS FOR USE IN THE TIANOCORE OPEN SOURCE
-PROJECT (COLLECTIVELY "CONTENT"). USE OF THE CONTENT IS GOVERNED BY THE
-TERMS AND CONDITIONS OF THIS AGREEMENT BETWEEN YOU AND INTEL AND/OR THE
-TERMS AND CONDITIONS OF LICENSE AGREEMENTS OR NOTICES INDICATED OR
-REFERENCED BELOW. BY USING THE CONTENT, YOU AGREE THAT YOUR USE OF THE
-CONTENT IS GOVERNED BY THIS AGREEMENT AND/OR THE TERMS AND CONDITIONS
-OF ANY APPLICABLE LICENSE AGREEMENTS OR NOTICES INDICATED OR REFERENCED
-BELOW. IF YOU DO NOT AGREE TO THE TERMS AND CONDITIONS OF THIS
+INTEL CORPORATION ("INTEL") MAKES AVAILABLE SOFTWARE, DOCUMENTATION
+("DOCUMENTATION"), INFORMATION AND/OR OTHER MATERIALS FOR USE IN THE
+TIANOCORE OPEN SOURCE PROJECT (COLLECTIVELY "CONTENT"). USE OF THE CONTENT
+IS GOVERNED BY THE TERMS AND CONDITIONS OF THIS AGREEMENT BETWEEN YOU AND
+INTEL AND/OR THE TERMS AND CONDITIONS OF LICENSE AGREEMENTS OR NOTICES
+INDICATED OR REFERENCED BELOW. BY USING THE CONTENT, YOU AGREE THAT YOUR
+USE OF THE CONTENT IS GOVERNED BY THIS AGREEMENT AND/OR THE TERMS AND
+CONDITIONS OF ANY APPLICABLE LICENSE AGREEMENTS OR NOTICES INDICATED OR
+REFERENCED BELOW. IF YOU DO NOT AGREE TO THE TERMS AND CONDITIONS OF THIS
 AGREEMENT AND THE TERMS AND CONDITIONS OF ANY APPLICABLE LICENSE
 AGREEMENTS OR NOTICES INDICATED OR REFERENCED BELOW, THEN YOU MAY NOT
 USE THE CONTENT.
 
-Unless otherwise indicated, all Content (except Documentation) made available on the TianoCore
-site is provided to you under the terms and conditions of the BSD
-License ("BSD"). A copy of the BSD License is available at
+Unless otherwise indicated, all Content (except Documentation) made available
+on the TianoCore site is provided to you under the terms and conditions of the
+BSD License ("BSD"). A copy of the BSD License is available at
 http://opensource.org/licenses/bsd-license.php
 or when applicable, in the associated License.txt file.
 
