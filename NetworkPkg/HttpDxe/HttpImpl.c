@@ -130,7 +130,7 @@ EFI_STATUS
 EFIAPI
 EfiHttpConfigure (
   IN  EFI_HTTP_PROTOCOL         *This,
-  IN  EFI_HTTP_CONFIG_DATA      *HttpConfigData
+  IN  EFI_HTTP_CONFIG_DATA      *HttpConfigData OPTIONAL
   ) 
 {
   HTTP_PROTOCOL                 *HttpInstance;
