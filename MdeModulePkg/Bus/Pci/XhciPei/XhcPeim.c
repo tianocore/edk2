@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -666,7 +666,7 @@ XhcPeiControlTransfer (
   } else {
     if (*TransferResult == EFI_USB_NOERROR) {
       Status = EFI_SUCCESS;
-    } else if (*TransferResult == EFI_USB_ERR_STALL) {
+    } else if ((*TransferResult == EFI_USB_ERR_STALL) || (*TransferResult == EFI_USB_ERR_BABBLE)) {
       RecoveryStatus = XhcPeiRecoverHaltedEndpoint(Xhc, Urb);
       if (EFI_ERROR (RecoveryStatus)) {
         DEBUG ((EFI_D_ERROR, "XhcPeiControlTransfer: XhcPeiRecoverHaltedEndpoint failed\n"));
@@ -988,7 +988,7 @@ XhcPeiBulkTransfer (
   } else {
     if (*TransferResult == EFI_USB_NOERROR) {
       Status = EFI_SUCCESS;
-    } else if (*TransferResult == EFI_USB_ERR_STALL) {
+    } else if ((*TransferResult == EFI_USB_ERR_STALL) || (*TransferResult == EFI_USB_ERR_BABBLE)) {
       RecoveryStatus = XhcPeiRecoverHaltedEndpoint(Xhc, Urb);
       if (EFI_ERROR (RecoveryStatus)) {
         DEBUG ((EFI_D_ERROR, "XhcPeiBulkTransfer: XhcPeiRecoverHaltedEndpoint failed\n"));

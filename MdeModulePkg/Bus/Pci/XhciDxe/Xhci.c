@@ -801,7 +801,7 @@ XhcTransfer (
   *TransferResult = Urb->Result;
   *DataLength     = Urb->Completed;
 
-  if (*TransferResult == EFI_USB_ERR_STALL) {
+  if ((*TransferResult == EFI_USB_ERR_STALL) || (*TransferResult == EFI_USB_ERR_BABBLE)) {
     ASSERT (Status == EFI_DEVICE_ERROR);
     RecoveryStatus = XhcRecoverHaltedEndpoint(Xhc, Urb);
     if (EFI_ERROR (RecoveryStatus)) {
