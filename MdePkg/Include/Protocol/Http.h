@@ -4,7 +4,7 @@
   HTTP Service Binding Protocol (HTTPSB)
   HTTP Protocol (HTTP)
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -318,7 +318,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HTTP_GET_MODE_DATA)(
+(EFIAPI *EFI_HTTP_GET_MODE_DATA)(
   IN  EFI_HTTP_PROTOCOL         *This,
   OUT EFI_HTTP_CONFIG_DATA      *HttpConfigData
   );
@@ -356,9 +356,9 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HTTP_CONFIGURE)(
+(EFIAPI *EFI_HTTP_CONFIGURE)(
   IN  EFI_HTTP_PROTOCOL         *This,
-  IN  EFI_HTTP_CONFIG_DATA      *HttpConfigData
+  IN  EFI_HTTP_CONFIG_DATA      *HttpConfigData OPTIONAL
   );
 
 /**
