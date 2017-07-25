@@ -160,7 +160,7 @@ HttpBootPrintErrorMessage (
   AsciiPrint ("\n");
 
   switch (StatusCode) {
-  case HTTP_STATUS_300_MULTIPLE_CHIOCES:
+  case HTTP_STATUS_300_MULTIPLE_CHOICES:
     AsciiPrint ("\n  Redirection: 300 Multiple Choices");
     break; 
     
