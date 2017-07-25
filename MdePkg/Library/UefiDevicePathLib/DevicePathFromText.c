@@ -2725,6 +2725,98 @@ DevPathFromTextBluetoothLE (
 }
 
 /**
+  Converts a text device path node to DNS device path structure.
+
+  @param TextDeviceNode  The input Text device path node.
+
+  @return A pointer to the newly-created DNS device path structure.
+
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+DevPathFromTextDns (
+  IN CHAR16 *TextDeviceNode
+  )
+{
+  CHAR16            *DeviceNodeStr;
+  CHAR16            *DeviceNodeStrPtr;
+  UINT32            DnsServerIpCount;
+  UINT16            DnsDeviceNodeLength;
+  DNS_DEVICE_PATH   *DnsDeviceNode;
+  UINT32            DnsServerIpIndex;
+  CHAR16            *DnsServerIp;
+
+
+  //
+  // Count the DNS server address number.
+  //
+  DeviceNodeStr = UefiDevicePathLibStrDuplicate (TextDeviceNode);
+  if (DeviceNodeStr == NULL) {
+    return NULL;
+  }
+
+  DeviceNodeStrPtr = DeviceNodeStr;
+  
+  DnsServerIpCount = 0;
+  while (DeviceNodeStrPtr != NULL && *DeviceNodeStrPtr != L'\0') {
+    GetNextParamStr (&DeviceNodeStrPtr);
+    DnsServerIpCount ++; 
+  }
+
+  FreePool (DeviceNodeStr);
+  DeviceNodeStr = NULL;
+
+  //
+  // One or more instances of the DNS server address in EFI_IP_ADDRESS, 
+  // otherwise, NULL will be returned.
+  //
+  if (DnsServerIpCount == 0) {
+    return NULL;
+  }
+
+  //
+  // Create the DNS DeviceNode.
+  //
+  DnsDeviceNodeLength = (UINT16) (sizeof (EFI_DEVICE_PATH_PROTOCOL) + sizeof (UINT8) + DnsServerIpCount * sizeof (EFI_IP_ADDRESS));
+  DnsDeviceNode       = (DNS_DEVICE_PATH *) CreateDeviceNode (
+                                              MESSAGING_DEVICE_PATH,
+                                              MSG_DNS_DP,
+                                              DnsDeviceNodeLength
+                                              );
+  if (DnsDeviceNode == NULL) {
+    return NULL;
+  }
+
+  //
+  // Confirm the DNS server address is IPv4 or IPv6 type.
+  //
+  DeviceNodeStrPtr = TextDeviceNode;
+  while (!IS_NULL (*DeviceNodeStrPtr)) {
+    if (*DeviceNodeStrPtr == L'.') {
+      DnsDeviceNode->IsIPv6 = 0x00;
+      break;
+    }
+
+    if (*DeviceNodeStrPtr == L':') {
+      DnsDeviceNode->IsIPv6 = 0x01;
+      break;
+    }
+
+    DeviceNodeStrPtr++;
+  }
+
+  for (DnsServerIpIndex = 0; DnsServerIpIndex < DnsServerIpCount; DnsServerIpIndex++) {
+    DnsServerIp = GetNextParamStr (&TextDeviceNode);
+    if (DnsDeviceNode->IsIPv6 == 0x00) {
+      StrToIpv4Address (DnsServerIp,  NULL, &(DnsDeviceNode->DnsServerIp[DnsServerIpIndex].v4), NULL);
+    } else {
+      StrToIpv6Address (DnsServerIp, NULL, &(DnsDeviceNode->DnsServerIp[DnsServerIpIndex].v6), NULL);
+    }
+  }
+  
+  return (EFI_DEVICE_PATH_PROTOCOL *) DnsDeviceNode;
+}
+
+/**
   Converts a text device path node to URI device path structure.
 
   @param TextDeviceNode  The input Text device path node.
@@ -3397,6 +3489,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE mUefiDevicePathLibDevP
   {L"Unit",                    DevPathFromTextUnit                    },
   {L"iSCSI",                   DevPathFromTextiSCSI                   },
   {L"Vlan",                    DevPathFromTextVlan                    },
+  {L"Dns",                     DevPathFromTextDns                     },
   {L"Uri",                     DevPathFromTextUri                     },
   {L"Bluetooth",               DevPathFromTextBluetooth               },
   {L"Wi-Fi",                   DevPathFromTextWiFi                    },
