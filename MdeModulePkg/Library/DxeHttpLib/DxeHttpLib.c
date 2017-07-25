@@ -1930,7 +1930,7 @@ HttpMappingToStatusCode (
   case 206:
     return HTTP_STATUS_206_PARTIAL_CONTENT;
   case 300:
-    return HTTP_STATUS_300_MULTIPLE_CHIOCES;
+    return HTTP_STATUS_300_MULTIPLE_CHOICES;
   case 301:
     return HTTP_STATUS_301_MOVED_PERMANENTLY;
   case 302:
