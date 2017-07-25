@@ -1,7 +1,7 @@
 /** @file
   Main file for map shell level 2 command.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   
@@ -980,6 +980,57 @@ STATIC CONST SHELL_PARAM_ITEM MapParamList[] = {
   };
 
 /**
+  The routine issues dummy read for every physical block device to cause
+  the BlockIo re-installed if media change happened.
+**/
+VOID
+ProbeForMediaChange (
+  VOID
+  )
+{
+  EFI_STATUS                            Status;
+  UINTN                                 HandleCount;
+  EFI_HANDLE                            *Handles;
+  EFI_BLOCK_IO_PROTOCOL                 *BlockIo;
+  UINTN                                 Index;
+
+  gBS->LocateHandleBuffer (
+         ByProtocol,
+         &gEfiBlockIoProtocolGuid,
+         NULL,
+         &HandleCount,
+         &Handles
+         );
+  //
+  // Probe for media change for every physical block io
+  //
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (
+                    Handles[Index],
+                    &gEfiBlockIoProtocolGuid,
+                    (VOID **) &BlockIo
+                    );
+    if (!EFI_ERROR (Status)) {
+      if (!BlockIo->Media->LogicalPartition) {
+        //
+        // Per spec:
+        //   The function (ReadBlocks) must return EFI_NO_MEDIA or
+        //   EFI_MEDIA_CHANGED even if LBA, BufferSize, or Buffer are invalid so the caller can probe
+        //   for changes in media state.
+        //
+        BlockIo->ReadBlocks (
+                   BlockIo,
+                   BlockIo->Media->MediaId,
+                   0,
+                   0,
+                   NULL
+                   );
+      }
+    }
+  }
+}
+
+/**
   Function for 'map' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -1087,6 +1138,7 @@ ShellCommandRunMap (
                || ShellCommandLineGetFlag(Package, L"-u")
                || ShellCommandLineGetFlag(Package, L"-t")
               ){
+        ProbeForMediaChange ();
         if ( ShellCommandLineGetFlag(Package, L"-r")) {
           //
           // Do the reset
