@@ -557,6 +557,20 @@ DispatchNotify (
   IN INTN                NotifyStopIndex
   );
 
+/**
+  Process PpiList from SEC phase.
+
+  @param PeiServices    An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PpiList        Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                        These PPI's will be installed and/or immediately signaled if they are notification type.
+
+**/
+VOID
+ProcessPpiListFromSec (
+  IN CONST EFI_PEI_SERVICES         **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR   *PpiList
+  );
+
 //
 // Boot mode support functions
 //

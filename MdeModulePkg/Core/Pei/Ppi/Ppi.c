@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core PPI services
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -171,6 +171,9 @@ ConvertPpiPointers (
 
   @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param PpiList                    Pointer to a list of PEI PPI Descriptors.
+  @param Single                     TRUE if only single entry in the PpiList.
+                                    FALSE if the PpiList is ended with an entry which has the
+                                    EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST flag set in its Flags field.
 
   @retval EFI_SUCCESS              if all PPIs in PpiList are successfully installed.
   @retval EFI_INVALID_PARAMETER    if PpiList is NULL pointer
@@ -179,10 +182,10 @@ ConvertPpiPointers (
 
 **/
 EFI_STATUS
-EFIAPI
-PeiInstallPpi (
+InternalPeiInstallPpi (
   IN CONST EFI_PEI_SERVICES        **PeiServices,
-  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList,
+  IN BOOLEAN                       Single
   )
 {
   PEI_CORE_INSTANCE *PrivateData;
@@ -229,11 +232,16 @@ PeiInstallPpi (
     PrivateData->PpiData.PpiListPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR*) PpiList;
     PrivateData->PpiData.PpiListEnd++;
 
-    //
-    // Continue until the end of the PPI List.
-    //
-    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
-        EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+    if (Single) {
+      //
+      // Only single entry in the PpiList.
+      //
+      break;
+    } else if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
+               EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+      //
+      // Continue until the end of the PPI List.
+      //
       break;
     }
     PpiList++;
@@ -254,6 +262,31 @@ PeiInstallPpi (
 
 
   return EFI_SUCCESS;
+}
+
+/**
+
+  This function installs an interface in the PEI PPI database by GUID. 
+  The purpose of the service is to publish an interface that other parties
+  can use to call additional PEIMs.
+
+  @param PeiServices                An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PpiList                    Pointer to a list of PEI PPI Descriptors.
+
+  @retval EFI_SUCCESS              if all PPIs in PpiList are successfully installed.
+  @retval EFI_INVALID_PARAMETER    if PpiList is NULL pointer
+                                   if any PPI in PpiList is not valid
+  @retval EFI_OUT_OF_RESOURCES     if there is no more memory resource to install PPI
+
+**/
+EFI_STATUS
+EFIAPI
+PeiInstallPpi (
+  IN CONST EFI_PEI_SERVICES        **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList
+  )
+{
+  return InternalPeiInstallPpi (PeiServices, PpiList, FALSE);
 }
 
 /**
@@ -409,17 +442,20 @@ PeiLocatePpi (
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param NotifyList         Pointer to list of Descriptors to notify upon.
+  @param Single             TRUE if only single entry in the NotifyList.
+                            FALSE if the NotifyList is ended with an entry which has the
+                            EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST flag set in its Flags field.
 
   @retval EFI_SUCCESS           if successful
   @retval EFI_OUT_OF_RESOURCES  if no space in the database
-  @retval EFI_INVALID_PARAMETER if not a good decriptor
+  @retval EFI_INVALID_PARAMETER if not a good descriptor
 
 **/
 EFI_STATUS
-EFIAPI
-PeiNotifyPpi (
+InternalPeiNotifyPpi (
   IN CONST EFI_PEI_SERVICES           **PeiServices,
-  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList,
+  IN BOOLEAN                          Single
   )
 {
   PEI_CORE_INSTANCE                *PrivateData;
@@ -474,8 +510,16 @@ PeiNotifyPpi (
 
     PrivateData->PpiData.NotifyListEnd--;
     DEBUG((EFI_D_INFO, "Register PPI Notify: %g\n", NotifyList->Guid));
-    if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
-        EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+    if (Single) {
+      //
+      // Only single entry in the NotifyList.
+      //
+      break;
+    } else if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) ==
+               EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+      //
+      // Continue until the end of the Notify List.
+      //
       break;
     }
     //
@@ -517,6 +561,30 @@ PeiNotifyPpi (
     );
 
   return  EFI_SUCCESS;
+}
+
+/**
+
+  This function installs a notification service to be called back when a given 
+  interface is installed or reinstalled. The purpose of the service is to publish 
+  an interface that other parties can use to call additional PPIs that may materialize later.
+
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param NotifyList         Pointer to list of Descriptors to notify upon.
+
+  @retval EFI_SUCCESS           if successful
+  @retval EFI_OUT_OF_RESOURCES  if no space in the database
+  @retval EFI_INVALID_PARAMETER if not a good descriptor
+
+**/
+EFI_STATUS
+EFIAPI
+PeiNotifyPpi (
+  IN CONST EFI_PEI_SERVICES           **PeiServices,
+  IN CONST EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyList
+  )
+{
+  return InternalPeiNotifyPpi (PeiServices, NotifyList, FALSE);
 }
 
 
@@ -641,6 +709,48 @@ DispatchNotify (
                             );
       }
     }
+  }
+}
+
+/**
+  Process PpiList from SEC phase.
+
+  @param PeiServices    An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param PpiList        Points to a list of one or more PPI descriptors to be installed initially by the PEI core.
+                        These PPI's will be installed and/or immediately signaled if they are notification type.
+
+**/
+VOID
+ProcessPpiListFromSec (
+  IN CONST EFI_PEI_SERVICES         **PeiServices,
+  IN CONST EFI_PEI_PPI_DESCRIPTOR   *PpiList
+  )
+{
+  EFI_STATUS    Status;
+
+  for (;;) {
+    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES) != 0) {
+      //
+      // It is a notification PPI.
+      //
+      Status = InternalPeiNotifyPpi (PeiServices, (CONST EFI_PEI_NOTIFY_DESCRIPTOR *) PpiList, TRUE);
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      //
+      // It is a normal PPI.
+      //
+      Status = InternalPeiInstallPpi (PeiServices, PpiList, TRUE);
+      ASSERT_EFI_ERROR (Status);
+    }
+
+    if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) == EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {
+      //
+      // Continue until the end of the PPI List.
+      //
+      break;
+    }
+
+    PpiList++;
   }
 }
 

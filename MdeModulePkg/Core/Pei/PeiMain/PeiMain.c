@@ -1,7 +1,7 @@
 /** @file
   Pei Core Main Entry Point
   
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -380,11 +380,10 @@ PeiCore (
       );
       
     //
-    // If SEC provided any PPI services to PEI, install them.
+    // If SEC provided the PpiList, process it.
     //
     if (PpiList != NULL) {
-      Status = PeiServicesInstallPpi (PpiList);
-      ASSERT_EFI_ERROR (Status);
+      ProcessPpiListFromSec ((CONST EFI_PEI_SERVICES **) &PrivateData.Ps, PpiList);
     }
   } else {
     //
