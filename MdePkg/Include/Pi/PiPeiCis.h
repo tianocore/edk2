@@ -230,7 +230,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The interface was successfully installed.
   @retval EFI_INVALID_PARAMETER The PpiList pointer is NULL, or any of the PEI PPI descriptors in the 
-                                list do not have the EFI_PEI_PPI_DESCRIPTOR_PPI bit set in the Flags field.
+                                list do not have the EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES bit set in the Flags field.
   @retval EFI_OUT_OF_RESOURCES  There is no additional space in the PPI database.
 
 **/
@@ -1004,13 +1004,14 @@ typedef struct _EFI_SEC_PEI_HAND_OFF {
   allows the SEC phase to pass information about the stack,
   temporary RAM and the Boot Firmware Volume. In addition, it also
   allows the SEC phase to pass services and data forward for use
-  during the PEI phase in the form of one or more PPIs. There is
-  no limit to the number of additional PPIs that can be passed
-  from SEC into the PEI Foundation. As part of its initialization
-  phase, the PEI Foundation will add these SEC-hosted PPIs to its
-  PPI database such that both the PEI Foundation and any modules
-  can leverage the associated service calls and/or code in these
-  early PPIs.
+  during the PEI phase in the form of one or more PPIs. These PPI's
+  will be installed and/or immediately signaled if they are
+  notification type. There is no limit to the number of additional
+  PPIs that can be passed from SEC into the PEI Foundation. As part
+  of its initialization phase, the PEI Foundation will add these
+  SEC-hosted PPIs to its PPI database such that both the PEI
+  Foundation and any modules can leverage the associated service
+  calls and/or code in these early PPIs.
 
   @param SecCoreData    Points to a data structure containing
                         information about the PEI core's
