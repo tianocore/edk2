@@ -273,9 +273,7 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareBlockSize|0x10000
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
-!if $(SECURE_BOOT_ENABLE) == TRUE || $(TLS_ENABLE) == TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
-!endif
 
 !if $(ALLOW_HTTP_CONNECTIONS) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
