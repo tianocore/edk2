@@ -445,4 +445,17 @@ HttpBootRegisterRamDisk (
   IN  VOID                         *Buffer,
   IN  HTTP_BOOT_IMAGE_TYPE         ImageType
   );
+
+/**
+  Indicate if the HTTP status code indicates a redirection.
+  
+  @param[in]  StatusCode      HTTP status code from server.
+
+  @return                     TRUE if it's redirection.
+
+**/
+BOOLEAN
+HttpBootIsHttpRedirectStatusCode (
+  IN   EFI_HTTP_STATUS_CODE        StatusCode
+ );
 #endif

@@ -179,6 +179,10 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   UINT32                                    Id;
   EFI_HTTP_BOOT_CALLBACK_PROTOCOL           *HttpBootCallback;
   EFI_HTTP_BOOT_CALLBACK_PROTOCOL           LoadFileCallback;
+
+  //
+  // Data for the default HTTP Boot callback protocol
+  //
   UINT64                                    FileSize;
   UINT64                                    ReceivedSize;
   UINT32                                    Percentage;

@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI_LOAD_FILE_PROTOCOL for UEFI HTTP boot.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
@@ -665,6 +665,25 @@ HttpBootCallback (
   case HttpBootHttpResponse:
     if (Data != NULL) {
       HttpMessage = (EFI_HTTP_MESSAGE *) Data;
+      
+      if (HttpMessage->Data.Response != NULL) {
+        if (HttpBootIsHttpRedirectStatusCode (HttpMessage->Data.Response->StatusCode)) {
+          //
+          // Server indicates the resource has been redirected to a different URL
+          // according to the section 6.4 of RFC7231 and the RFC 7538.
+          // Display the redirect information on the screen.
+          //
+          HttpHeader = HttpFindHeader (
+                 HttpMessage->HeaderCount,
+                 HttpMessage->Headers,
+                 HTTP_HEADER_LOCATION
+                 );
+          if (HttpHeader != NULL) {
+            Print (L"\n  HTTP ERROR: Resource Redirected.\n  New Location: %a\n", HttpHeader->FieldValue);
+          }
+        }
+      }
+      
       HttpHeader = HttpFindHeader (
                      HttpMessage->HeaderCount,
                      HttpMessage->Headers,
@@ -685,7 +704,7 @@ HttpBootCallback (
         // We already know the file size, print in percentage format.
         //
         if (Private->ReceivedSize == 0) {
-          Print (L"  File Size: %lu\n", Private->FileSize);
+          Print (L"  File Size: %lu Bytes\n", Private->FileSize);
         }
         Private->ReceivedSize += DataLength;
         Percentage = (UINT32) DivU64x64Remainder (MultU64x32 (Private->ReceivedSize, 100), Private->FileSize, NULL);

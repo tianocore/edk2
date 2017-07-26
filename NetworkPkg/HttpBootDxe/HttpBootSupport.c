@@ -1034,7 +1034,8 @@ HttpIoRecvResponse (
     HttpIo->IsRxDone = FALSE;
   }
 
-  if (!EFI_ERROR (HttpIo->RspToken.Status) && HttpIo->Callback != NULL) {
+  if ((HttpIo->Callback != NULL) && 
+      (HttpIo->RspToken.Status == EFI_SUCCESS || HttpIo->RspToken.Status == EFI_HTTP_ERROR)) {
     Status = HttpIo->Callback (
                HttpIoResponse,
                HttpIo->RspToken.Message,
@@ -1319,3 +1320,25 @@ HttpBootRegisterRamDisk (
   return Status;
 }
 
+/**
+  Indicate if the HTTP status code indicates a redirection.
+  
+  @param[in]  StatusCode      HTTP status code from server.
+
+  @return                     TRUE if it's redirection.
+
+**/
+BOOLEAN
+HttpBootIsHttpRedirectStatusCode (
+  IN   EFI_HTTP_STATUS_CODE        StatusCode
+ )
+{
+  if (StatusCode == HTTP_STATUS_301_MOVED_PERMANENTLY ||
+      StatusCode == HTTP_STATUS_302_FOUND ||
+      StatusCode == HTTP_STATUS_307_TEMPORARY_REDIRECT ||
+      StatusCode == HTTP_STATUS_308_PERMANENT_REDIRECT) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
