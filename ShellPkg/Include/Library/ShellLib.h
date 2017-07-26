@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell functionality for shell commands and applications.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,9 +31,6 @@
       (Pointer) = NULL;               \
     }                                 \
   } while(FALSE)
-
-// (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
-#define MAX_FILE_NAME_LEN 512
 
 extern EFI_SHELL_PARAMETERS_PROTOCOL *gEfiShellParametersProtocol;
 extern EFI_SHELL_PROTOCOL            *gEfiShellProtocol;

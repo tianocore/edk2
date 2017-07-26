@@ -18,8 +18,6 @@
 #include <Library/SortLib.h>
 #include <Library/BaseLib.h>
 
-#define FIND_XXXXX_FILE_BUFFER_SIZE (SIZE_OF_EFI_FILE_INFO + MAX_FILE_NAME_LEN)
-
 //
 // globals...
 //
