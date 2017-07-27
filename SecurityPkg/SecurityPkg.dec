@@ -7,6 +7,7 @@
 #
 # Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
+# Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.
 # The full text of the license may be found at
@@ -221,6 +222,9 @@
 
   ## Include/Ppi/FirmwareVolumeInfoMeasurementExcluded.h
   gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid = { 0x6e056ff9, 0xc695, 0x4364, { 0x9e, 0x2c, 0x61, 0x26, 0xf5, 0xce, 0xea, 0xae } }
+
+  ## Include/Ppi/FirmwareVolumeInfoPrehashedFV.h
+  gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid = { 0x3ce1e631, 0x7008, 0x477c, { 0xad, 0xa7, 0x5d, 0xcf, 0xc7, 0xc1, 0x49, 0x4b } }
 
 #
 # [Error.gEfiSecurityPkgTokenSpaceGuid]
@@ -448,9 +452,10 @@
 
 [PcdsDynamic, PcdsDynamicEx]
 
-  ## This PCD indicates Hash mask for TPM 2.0.<BR><BR>
+  ## This PCD indicates Hash mask for TPM 2.0. Bit definition strictly follows TCG Algorithm Registry.<BR><BR>
   #  If this bit is set, that means this algorithm is needed to extend to PCR.<BR>
   #  If this bit is clear, that means this algorithm is NOT needed to extend to PCR.<BR>
+  #  If all the bits are clear, that means hash algorithm is determined by current Active PCR Banks.<BR>
   #    BIT0  -  SHA1.<BR>
   #    BIT1  -  SHA256.<BR>
   #    BIT2  -  SHA384.<BR>
