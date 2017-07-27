@@ -738,6 +738,13 @@ class PcdReport(object):
             for item in Pa.Platform.Pcds:
                 Pcd = Pa.Platform.Pcds[item]
                 if not Pcd.Type:
+                    # check the Pcd in FDF file, whether it is used in module first
+                    for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
+                        PcdList = self.AllPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(T, [])
+                        if Pcd in PcdList:
+                            Pcd.Type = T
+                            break
+                if not Pcd.Type:
                     PcdTypeFlag = False
                     for package in Pa.PackageList:
                         for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
