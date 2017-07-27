@@ -32,6 +32,7 @@
 
 #string STR_GEN_PROBLEM           #language en-US "%H%s%N: Unknown flag - '%H%s%N'\r\n"
 #string STR_GEN_PROBLEM_VAL       #language en-US "%H%s%N: Bad value - '%H%s%N' for flag - '%H%s%N'\r\n"
+#string STR_GEN_DUPLICATE         #language en-US "%H%s%N: Duplicate flag - '%H%s%N'\r\n"
 #string STR_GEN_NO_VALUE          #language en-US "%H%s%N: Missing argument for flag - '%H%s%N'\r\n"
 #string STR_GEN_TOO_FEW           #language en-US "%H%s%N: Too few arguments.\r\n"
 #string STR_GEN_TOO_MANY          #language en-US "%H%s%N: Too many arguments.\r\n"

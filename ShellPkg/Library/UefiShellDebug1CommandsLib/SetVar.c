@@ -384,6 +384,10 @@ ShellCommandRunSetVar (
     } else {
       ASSERT(FALSE);
     }
+  } else if (ShellCommandLineCheckDuplicate (Package,&ProblemParam) != EFI_SUCCESS) {
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_DUPLICATE), gShellDebug1HiiHandle, L"setvar", ProblemParam);  
+      FreePool(ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     if (ShellCommandLineGetCount(Package) < 2) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setvar");  
