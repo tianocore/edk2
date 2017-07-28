@@ -1068,20 +1068,44 @@ PiSmmCoreMemoryAllocationLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS             Status;
   SMM_CORE_PRIVATE_DATA  *SmmCorePrivate;
   UINTN                  Size;
+  VOID                   *BootServicesData;
 
   SmmCorePrivate = (SMM_CORE_PRIVATE_DATA *)ImageHandle;
+
+  //
+  // The FreePool()/FreePages() will need use SmramRanges data to know whether
+  // the buffer to free is in SMRAM range or not. And there may be FreePool()/
+  // FreePages() indrectly during calling SmmInitializeMemoryServices(), but
+  // no SMRAM could be allocated before calling SmmInitializeMemoryServices(),
+  // so temporarily use BootServicesData to hold the SmramRanges data.
+  //
+  mSmmCoreMemoryAllocLibSmramRangeCount = SmmCorePrivate->SmramRangeCount;
+  Size = mSmmCoreMemoryAllocLibSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR);
+  Status = gBS->AllocatePool (EfiBootServicesData, Size, (VOID **) &mSmmCoreMemoryAllocLibSmramRanges);
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (mSmmCoreMemoryAllocLibSmramRanges != NULL);
+  CopyMem (mSmmCoreMemoryAllocLibSmramRanges, SmmCorePrivate->SmramRanges, Size);
+
   //
   // Initialize memory service using free SMRAM
   //
   SmmInitializeMemoryServices (SmmCorePrivate->SmramRangeCount, SmmCorePrivate->SmramRanges);
 
-  mSmmCoreMemoryAllocLibSmramRangeCount = SmmCorePrivate->SmramRangeCount;
-  Size = mSmmCoreMemoryAllocLibSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR);
-  mSmmCoreMemoryAllocLibSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  //
+  // Move the SmramRanges data from BootServicesData to SMRAM.
+  //
+  BootServicesData = mSmmCoreMemoryAllocLibSmramRanges;
+  mSmmCoreMemoryAllocLibSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocateCopyPool (Size, (VOID *) BootServicesData);
   ASSERT (mSmmCoreMemoryAllocLibSmramRanges != NULL);
-  CopyMem (mSmmCoreMemoryAllocLibSmramRanges, SmmCorePrivate->SmramRanges, Size);
+
+  //
+  // Free the temporarily used BootServicesData.
+  //
+  Status = gBS->FreePool (BootServicesData);
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }
