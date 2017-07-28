@@ -119,10 +119,6 @@ CVfrCompiler::OptionInitialization (
         DebugError (NULL, 0, 1001, "Missing option", "-o missing output directory name");
         goto Fail;
       }
-      if (strlen (Argv[Index]) > MAX_PATH - 1) {
-        DebugError (NULL, 0, 1003, "Invalid option value", "Output directory name %s is too long", Argv[Index]);
-        goto Fail;
-      }
 
       mOptions.OutputDirectory = (CHAR8 *) malloc (strlen (Argv[Index]) + strlen ("\\") + 1);
       if (mOptions.OutputDirectory == NULL) {
@@ -186,10 +182,6 @@ CVfrCompiler::OptionInitialization (
     DebugError (NULL, 0, 1001, "Missing option", "VFR file name is not specified.");
     goto Fail;
   } else {
-    if (strlen (Argv[Index]) > MAX_PATH) {
-      DebugError (NULL, 0, 1003, "Invalid option value", "VFR file name %s is too long.", Argv[Index]);
-      goto Fail;
-    }
     mOptions.VfrFileName = (CHAR8 *) malloc (strlen (Argv[Index]) + 1);
     if (mOptions.VfrFileName == NULL) {
       DebugError (NULL, 0, 4001, "Resource: memory can't be allocated", NULL);
@@ -355,10 +347,6 @@ CVfrCompiler::SetBaseFileName (
   }
 
   *pExt = '\0';
-  if (strlen (pFileName) > MAX_PATH - 1) {
-    *pExt = '.';
-    return -1;
-  }
 
   mOptions.VfrBaseFileName = (CHAR8 *) malloc (strlen (pFileName) + 1);
   if (mOptions.VfrBaseFileName == NULL) {
@@ -387,9 +375,6 @@ CVfrCompiler::SetPkgOutputFileName (
            strlen (mOptions.VfrBaseFileName) +
            strlen (VFR_PACKAGE_FILENAME_EXTENSION) +
            1;
-  if (Length > MAX_PATH) {
-    return -1;
-  }
 
   mOptions.PkgOutputFileName = (CHAR8 *) malloc (Length);
   if (mOptions.PkgOutputFileName == NULL) {
@@ -418,9 +403,6 @@ CVfrCompiler::SetCOutputFileName (
            strlen (mOptions.VfrBaseFileName) +
            strlen (".c") +
            1;
-  if (Length > MAX_PATH) {
-    return -1;
-  }
 
   mOptions.COutputFileName = (CHAR8 *) malloc (Length);
   if (mOptions.COutputFileName == NULL) {
@@ -449,9 +431,6 @@ CVfrCompiler::SetPreprocessorOutputFileName (
            strlen (mOptions.VfrBaseFileName) +
            strlen (VFR_PREPROCESS_FILENAME_EXTENSION) +
            1;
-  if (Length > MAX_PATH) {
-    return -1;
-  }
 
   mOptions.PreprocessorOutputFileName = (CHAR8 *) malloc (Length);
   if (mOptions.PreprocessorOutputFileName == NULL) {
@@ -480,9 +459,6 @@ CVfrCompiler::SetRecordListFileName (
            strlen (mOptions.VfrBaseFileName) +
            strlen (VFR_RECORDLIST_FILENAME_EXTENSION) +
            1;
-  if (Length > MAX_PATH) {
-    return -1;
-  }
 
   mOptions.RecordListFile = (CHAR8 *) malloc (Length);
   if (mOptions.RecordListFile == NULL) {

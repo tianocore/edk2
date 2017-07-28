@@ -1,7 +1,7 @@
 /** @file
 Defines and prototypes for the UEFI VFR compiler internal use.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Common/UefiInternalFormRepresentation.h"
 #include "Common/MdeModuleHii.h"
 
-#define MAX_PATH                 255
 #define MAX_VFR_LINE_LEN         4096
 
 #define EFI_IFR_MAX_LENGTH       0xFF
