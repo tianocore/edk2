@@ -2,13 +2,11 @@
 // Firmware Performance Pei Module.
 //
 // In S3 resume boot mode, it updates S3 Resume Performance Record in ACPI Firmware Performance Data Table.
-// In normal boot mode, it consumes SecPerformance PPI produced by SEC phase
-// and build Hob to convey the SEC performance data to DXE phase.
 // 
 // This module register report status code listener to collect performance data
 // for S3 Resume Performance Record on S3 resume boot path.
 //
-// Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -23,5 +21,5 @@
 
 #string STR_MODULE_ABSTRACT             #language en-US "Firmware Performance Pei Module."
 
-#string STR_MODULE_DESCRIPTION          #language en-US "In S3 resume boot mode, it updates S3 Resume Performance Record in ACPI Firmware Performance Data Table. In normal boot mode, it consumes SecPerformance PPI produced by SEC phase and builds a Hob to convey the SEC performance data to DXE phase. This module register report status code listener to collect performance data for S3 Resume Performance Record on S3 resume boot path."
+#string STR_MODULE_DESCRIPTION          #language en-US "In S3 resume boot mode, it updates S3 Resume Performance Record in ACPI Firmware Performance Data Table. This module register report status code listener to collect performance data for S3 Resume Performance Record on S3 resume boot path."
 

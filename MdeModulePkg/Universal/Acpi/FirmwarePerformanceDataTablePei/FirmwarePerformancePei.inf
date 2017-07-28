@@ -2,13 +2,11 @@
 #  Firmware Performance Pei Module.
 #
 #  In S3 resume boot mode, it updates S3 Resume Performance Record in ACPI Firmware Performance Data Table.
-#  In normal boot mode, it consumes SecPerformance PPI produced by SEC phase
-#  and build Hob to convey the SEC performance data to DXE phase.
 #
 #  This module register report status code listener to collect performance data
 #  for S3 Resume Performance Record on S3 resume boot path.
 #
-#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -46,7 +44,6 @@
   PeiServicesLib
   BaseLib
   DebugLib
-  HobLib
   TimerLib
   BaseMemoryLib
   LockBoxLib
@@ -54,12 +51,9 @@
 
 [Ppis]
   gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
-  gPeiSecPerformancePpiGuid                     ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES   ## UNDEFINED # RestoreLockBox
-  ## SOMETIMES_PRODUCES   ## HOB
-  ## SOMETIMES_CONSUMES   ## Variable:L"FirmwarePerformance"
   gEfiFirmwarePerformanceGuid
   gFirmwarePerformanceS3PointerGuid             ## SOMETIMES_CONSUMES ## UNDEFINED # RestoreLockBox
 
