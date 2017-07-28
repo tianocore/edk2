@@ -71,6 +71,13 @@
   ## SOMETIMES_PRODUCES
   gEfiSecPlatformInformation2PpiGuid
   gEfiTemporaryRamDonePpiGuid                          ## PRODUCES
+  ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  gPeiSecPerformancePpiGuid
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## HOB
+  gEfiFirmwarePerformanceGuid
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize  ## CONSUMES

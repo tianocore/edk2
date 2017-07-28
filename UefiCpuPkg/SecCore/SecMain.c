@@ -22,6 +22,14 @@ EFI_SEC_PLATFORM_INFORMATION_PPI  mSecPlatformInformationPpi = { SecPlatformInfo
 
 EFI_PEI_PPI_DESCRIPTOR            mPeiSecPlatformInformationPpi[] = {
   {
+    //
+    // SecPerformance PPI notify descriptor.
+    //
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
+    &gPeiSecPerformancePpiGuid,
+    (VOID *) (UINTN) SecPerformancePpiCallBack
+  },
+  {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamDonePpiGuid,
     &gSecTemporaryRamDonePpi
@@ -54,6 +62,44 @@ EFIAPI
 SecStartupPhase2(
   IN VOID                     *Context
   );
+
+/**
+  Entry point of the notification callback function itself within the PEIM.
+  It is to get SEC performance data and build HOB to convey the SEC performance
+  data to DXE phase.
+
+  @param  PeiServices      Indirect reference to the PEI Services Table.
+  @param  NotifyDescriptor Address of the notification descriptor data structure.
+  @param  Ppi              Address of the PPI that was installed.
+
+  @return Status of the notification.
+          The status code returned from this function is ignored.
+**/
+EFI_STATUS
+EFIAPI
+SecPerformancePpiCallBack (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  EFI_STATUS                    Status;
+  PEI_SEC_PERFORMANCE_PPI       *SecPerf;
+  FIRMWARE_SEC_PERFORMANCE      Performance;
+
+  SecPerf = (PEI_SEC_PERFORMANCE_PPI *) Ppi;
+  Status = SecPerf->GetPerformance ((CONST EFI_PEI_SERVICES **) PeiServices, SecPerf, &Performance);
+  if (!EFI_ERROR (Status)) {
+    BuildGuidDataHob (
+      &gEfiFirmwarePerformanceGuid,
+      &Performance,
+      sizeof (FIRMWARE_SEC_PERFORMANCE)
+    );
+    DEBUG ((DEBUG_INFO, "FPDT: SEC Performance Hob ResetEnd = %ld\n", Performance.ResetEnd));
+  }
+
+  return Status;
+}
 
 /**
 

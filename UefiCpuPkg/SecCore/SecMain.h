@@ -1,7 +1,7 @@
 /** @file
   Master header file for SecCore.
 
-  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,9 @@
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
 #include <Ppi/TemporaryRamDone.h>
+#include <Ppi/SecPerformance.h>
+
+#include <Guid/FirmwarePerformance.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -155,6 +158,26 @@ SecPlatformInformation2Bist (
 VOID
 RepublishSecPlatformInformationPpi (
   VOID
+  );
+
+/**
+  Entry point of the notification callback function itself within the PEIM.
+  It is to get SEC performance data and build HOB to convey the SEC performance
+  data to DXE phase.
+
+  @param  PeiServices      Indirect reference to the PEI Services Table.
+  @param  NotifyDescriptor Address of the notification descriptor data structure.
+  @param  Ppi              Address of the PPI that was installed.
+
+  @return Status of the notification.
+          The status code returned from this function is ignored.
+**/
+EFI_STATUS
+EFIAPI
+SecPerformancePpiCallBack (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
   );
 
 #endif
