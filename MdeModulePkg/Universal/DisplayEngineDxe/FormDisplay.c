@@ -1718,23 +1718,56 @@ IsTopOfScreeMenuOption (
 }
 
 /**
-  Find the Top of screen menu.
+  Calculate the distance between two menus and include the skip value of StartMenu.
 
-  If the input is NULL, base on the record highlight info in
-  gHighligthMenuInfo to find the last highlight menu.
+  @param  StartMenu             The link_entry pointer to start menu.
+  @param  EndMenu               The link_entry pointer to end menu.
 
-  @param  HighLightedStatement      The input highlight statement.
+**/
+UINTN
+GetDistanceBetweenMenus(
+  IN LIST_ENTRY  *StartMenu,
+  IN LIST_ENTRY  *EndMenu
+)
+{
+  LIST_ENTRY                 *Link;
+  UI_MENU_OPTION             *MenuOption;
+  UINTN                      Distance;
 
-  @retval  The highlight menu index.
+  Distance = 0;
+
+  Link = StartMenu;
+  while (Link != EndMenu) {
+    MenuOption = MENU_OPTION_FROM_LINK (Link);
+    if (MenuOption->Row == 0) {
+      UpdateOptionSkipLines (MenuOption);
+    }
+    Distance += MenuOption->Skip;
+    Link = Link->BackLink;
+  }
+  return Distance;
+}
+
+/**
+  Find the top of screen menu base on the previous record menu info.
+
+  @param  HighLightMenu      The link_entry pointer to highlight menu.
+
+  @retval  Return the the link_entry pointer top of screen menu.
 
 **/
 LIST_ENTRY *
 FindTopOfScreenMenuOption (
- VOID
- )
+  IN LIST_ENTRY                   *HighLightMenu
+  )
 {
   LIST_ENTRY                      *NewPos;
   UI_MENU_OPTION                  *MenuOption;
+  UINTN                           TopRow;
+  UINTN                           BottomRow;
+
+  TopRow    = gStatementDimensions.TopRow    + SCROLL_ARROW_HEIGHT;
+  BottomRow = gStatementDimensions.BottomRow - SCROLL_ARROW_HEIGHT;
 
   NewPos = gMenuOption.ForwardLink;
   MenuOption = MENU_OPTION_FROM_LINK (NewPos);
@@ -1754,7 +1787,16 @@ FindTopOfScreenMenuOption (
   // Last time top of screen menu has disappeared.
   //
   if (NewPos == &gMenuOption) {
-    NewPos = NULL;
+    return NULL;
+  }
+  //
+  // Check whether highlight menu and top of screen menu can be shown within one page,
+  // if can't, return NULL to re-calcaulate the top of scrren menu. Because some new menus
+  // may be dynamically inserted between highlightmenu and previous top of screen menu,
+  // So previous record top of screen menu is not appropriate for current display.
+  //
+  if (GetDistanceBetweenMenus (HighLightMenu, NewPos) + 1 > BottomRow - TopRow) {
+    return NULL;
   }
 
   return NewPos;
@@ -1805,7 +1847,7 @@ FindTopMenu (
       //
       // Found the last time highlight menu.
       //
-      *TopOfScreen = FindTopOfScreenMenuOption();
+      *TopOfScreen = FindTopOfScreenMenuOption(*HighlightMenu);
       if (*TopOfScreen != NULL) {
         //
         // Found the last time selectable top of screen menu.
@@ -1858,7 +1900,7 @@ FindTopMenu (
       MenuOption = MENU_OPTION_FROM_LINK (*HighlightMenu);
       UpdateOptionSkipLines (MenuOption);
       
-      *TopOfScreen = FindTopOfScreenMenuOption();
+      *TopOfScreen = FindTopOfScreenMenuOption(*HighlightMenu);
       if (*TopOfScreen == NULL) {
         //
         // Not found last time top of screen menu, so base on current highlight menu
