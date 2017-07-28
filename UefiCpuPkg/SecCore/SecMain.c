@@ -1,7 +1,7 @@
 /** @file
   C functions in SEC
 
-  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -230,6 +230,12 @@ SecStartupPhase2(
     ASSERT (SecCoreData->PeiTemporaryRamSize > Index * sizeof (EFI_PEI_PPI_DESCRIPTOR));
     SecCoreData->PeiTemporaryRamBase = (VOID *)((UINTN) SecCoreData->PeiTemporaryRamBase + Index * sizeof (EFI_PEI_PPI_DESCRIPTOR));
     SecCoreData->PeiTemporaryRamSize = SecCoreData->PeiTemporaryRamSize - Index * sizeof (EFI_PEI_PPI_DESCRIPTOR);
+    //
+    // Adjust the Base and Size to be 8-byte aligned as HOB which has 8byte aligned requirement
+    // will be built based on them in PEI phase.
+    //
+    SecCoreData->PeiTemporaryRamBase = (VOID *)(((UINTN)SecCoreData->PeiTemporaryRamBase + 7) & ~0x07);
+    SecCoreData->PeiTemporaryRamSize &= ~0x07;
   } else {
     //
     // No addition PPI, PpiList directly point to the common PPI list.
