@@ -47,12 +47,17 @@ Ip6ConfigOnPolicyChanged (
   IN EFI_IP6_CONFIG_POLICY  NewPolicy
   )
 {
-  LIST_ENTRY      *Entry;
-  LIST_ENTRY      *Entry2;
-  LIST_ENTRY      *Next;
-  IP6_INTERFACE   *IpIf;
-  IP6_DAD_ENTRY   *DadEntry;
-  IP6_DELAY_JOIN_LIST       *DelayNode;
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Entry2;
+  LIST_ENTRY          *Next;
+  IP6_INTERFACE       *IpIf;
+  IP6_DAD_ENTRY       *DadEntry;
+  IP6_DELAY_JOIN_LIST *DelayNode;
+  IP6_ADDRESS_INFO    *AddrInfo;
+  IP6_PROTOCOL        *Instance;
+  BOOLEAN             Recovery;
+
+  Recovery = FALSE;
   
   //
   // Currently there are only two policies: Manual and Automatic. Regardless of
@@ -80,18 +85,48 @@ Ip6ConfigOnPolicyChanged (
       );
   }
 
-  //
-  // All IPv6 children that use global unicast address as it's source address
-  // should be destryoed now. The survivers are those use the link-local address
-  // or the unspecified address as the source address.
-  // TODO: Conduct a check here.
-  Ip6RemoveAddr (
-    IpSb,
-    &IpSb->DefaultInterface->AddressList,
-    &IpSb->DefaultInterface->AddressCount,
-    NULL,
-    0
-    );
+  if (!IsListEmpty (&IpSb->DefaultInterface->AddressList) && IpSb->DefaultInterface->AddressCount > 0) {
+    //  
+    // If any IPv6 children (Instance) in configured state and use global unicast address, it will be 
+    // destroyed in Ip6RemoveAddr() function later. Then, the upper layer driver's Stop() function will be 
+    // called, which may break the upper layer network stacks. So, the driver should take the responsibility 
+    // for the recovery by using ConnectController() after Ip6RemoveAddr(). 
+    // Here, just check whether need to recover the upper layer network stacks later.
+    //
+    NET_LIST_FOR_EACH (Entry, &IpSb->DefaultInterface->AddressList) { 
+      AddrInfo = NET_LIST_USER_STRUCT_S (Entry, IP6_ADDRESS_INFO, Link, IP6_ADDR_INFO_SIGNATURE);
+      if (!IsListEmpty (&IpSb->Children)) {
+        NET_LIST_FOR_EACH (Entry2, &IpSb->Children) {
+          Instance = NET_LIST_USER_STRUCT_S (Entry2, IP6_PROTOCOL, Link, IP6_PROTOCOL_SIGNATURE);
+          if ((Instance->State == IP6_STATE_CONFIGED) && EFI_IP6_EQUAL (&Instance->ConfigData.StationAddress, &AddrInfo->Address)) {
+            Recovery = TRUE;
+            break;
+          }
+        }
+      }
+    }
+    
+    //
+    // All IPv6 children that use global unicast address as it's source address
+    // should be destroyed now. The survivers are those use the link-local address
+    // or the unspecified address as the source address.
+    // TODO: Conduct a check here.
+    Ip6RemoveAddr (
+      IpSb,
+      &IpSb->DefaultInterface->AddressList,
+      &IpSb->DefaultInterface->AddressCount,
+      NULL,
+      0
+      );
+    
+    if (IpSb->Controller != NULL && Recovery) {
+      //
+      // ConnectController() to recover the upper layer network stacks.
+      //
+      gBS->ConnectController (IpSb->Controller, NULL, NULL, TRUE);
+    }
+  }
+
 
   NET_LIST_FOR_EACH (Entry, &IpSb->Interfaces) {
     //
@@ -130,7 +165,6 @@ Ip6ConfigOnPolicyChanged (
     //
     IpSb->Ticks                   = (UINT32) IP6_GET_TICKS (IP6_ONE_SECOND_IN_MS);
   }
-
 }
 
 /**
