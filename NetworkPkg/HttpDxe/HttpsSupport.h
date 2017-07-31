@@ -1,7 +1,7 @@
 /** @file
   The header files of miscellaneous routines specific to Https for HttpDxe driver.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,6 +37,7 @@ IsHttpsUrl (
   Creates a Tls child handle, open EFI_TLS_PROTOCOL and EFI_TLS_CONFIGURATION_PROTOCOL.
 
   @param[in]  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param[out] TlsSb                 Pointer to the TLS SERVICE_BINDING_PROTOCOL.
   @param[out] TlsProto              Pointer to the EFI_TLS_PROTOCOL instance.
   @param[out] TlsConfiguration      Pointer to the EFI_TLS_CONFIGURATION_PROTOCOL instance.
 
@@ -47,6 +48,7 @@ EFI_HANDLE
 EFIAPI
 TlsCreateChild (
   IN  EFI_HANDLE                     ImageHandle,
+  OUT EFI_SERVICE_BINDING_PROTOCOL   **TlsSb,
   OUT EFI_TLS_PROTOCOL               **TlsProto,
   OUT EFI_TLS_CONFIGURATION_PROTOCOL **TlsConfiguration
   );

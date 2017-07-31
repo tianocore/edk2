@@ -140,6 +140,7 @@ IsHttpsUrl (
   Creates a Tls child handle, open EFI_TLS_PROTOCOL and EFI_TLS_CONFIGURATION_PROTOCOL.
 
   @param[in]  ImageHandle           The firmware allocated handle for the UEFI image.
+  @param[out] TlsSb                 Pointer to the TLS SERVICE_BINDING_PROTOCOL.
   @param[out] TlsProto              Pointer to the EFI_TLS_PROTOCOL instance.
   @param[out] TlsConfiguration      Pointer to the EFI_TLS_CONFIGURATION_PROTOCOL instance.
 
@@ -150,15 +151,14 @@ EFI_HANDLE
 EFIAPI
 TlsCreateChild (
   IN  EFI_HANDLE                     ImageHandle,
+  OUT EFI_SERVICE_BINDING_PROTOCOL   **TlsSb,
   OUT EFI_TLS_PROTOCOL               **TlsProto,
   OUT EFI_TLS_CONFIGURATION_PROTOCOL **TlsConfiguration
   )
 {
   EFI_STATUS                    Status;
-  EFI_SERVICE_BINDING_PROTOCOL  *TlsSb;
   EFI_HANDLE                    TlsChildHandle;
 
-  TlsSb          = NULL;
   TlsChildHandle = 0;
 
   //
@@ -167,13 +167,13 @@ TlsCreateChild (
   gBS->LocateProtocol (
      &gEfiTlsServiceBindingProtocolGuid,
      NULL,
-     (VOID **) &TlsSb
+     (VOID **) TlsSb
      );
-  if (TlsSb == NULL) {
+  if (*TlsSb == NULL) {
     return NULL;
   }
 
-  Status = TlsSb->CreateChild (TlsSb, &TlsChildHandle);
+  Status = (*TlsSb)->CreateChild (*TlsSb, &TlsChildHandle);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -187,7 +187,7 @@ TlsCreateChild (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    TlsSb->DestroyChild (TlsSb, TlsChildHandle);
+    (*TlsSb)->DestroyChild (*TlsSb, TlsChildHandle);
     return NULL;
   }
 
@@ -200,7 +200,7 @@ TlsCreateChild (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    TlsSb->DestroyChild (TlsSb, TlsChildHandle);
+    (*TlsSb)->DestroyChild (*TlsSb, TlsChildHandle);
     return NULL;
   }
 

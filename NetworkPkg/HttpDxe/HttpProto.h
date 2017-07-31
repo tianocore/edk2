@@ -166,7 +166,8 @@ typedef struct _HTTP_PROTOCOL {
   // Https Support
   //
   BOOLEAN                          UseHttps;
-  
+
+  EFI_SERVICE_BINDING_PROTOCOL     *TlsSb;
   EFI_HANDLE                       TlsChildHandle; /// Tls ChildHandle
   TLS_CONFIG_DATA                  TlsConfigData;
   EFI_TLS_PROTOCOL                 *Tls;

@@ -380,6 +380,7 @@ EfiHttpRequest (
 
       HttpInstance->TlsChildHandle = TlsCreateChild (
                                        ImageHandle,
+                                       &(HttpInstance->TlsSb),
                                        &(HttpInstance->Tls),
                                        &(HttpInstance->TlsConfiguration)
                                        );

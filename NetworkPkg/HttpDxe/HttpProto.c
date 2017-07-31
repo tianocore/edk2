@@ -864,6 +864,13 @@ HttpCleanProtocol (
   NetMapClean (&HttpInstance->TxTokens);
   NetMapClean (&HttpInstance->RxTokens);
 
+  if (HttpInstance->TlsSb != NULL && HttpInstance->TlsChildHandle != NULL) {
+    //
+    // Destroy the TLS instance.   
+    //
+    HttpInstance->TlsSb->DestroyChild (HttpInstance->TlsSb, HttpInstance->TlsChildHandle);
+  }
+
   if (HttpInstance->Tcp4ChildHandle != NULL) {
     gBS->CloseProtocol (
            HttpInstance->Tcp4ChildHandle,
