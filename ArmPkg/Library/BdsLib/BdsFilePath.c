@@ -24,9 +24,6 @@
 #include <Protocol/Dhcp4.h>
 #include <Protocol/Mtftp4.h>
 
-
-#define IS_DEVICE_PATH_NODE(node,type,subtype) (((node)->Type == (type)) && ((node)->SubType == (subtype)))
-
 /* Type and defines to set up the DHCP4 options */
 
 typedef struct {

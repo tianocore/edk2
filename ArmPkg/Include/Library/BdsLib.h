@@ -15,6 +15,9 @@
 #ifndef __BDS_ENTRY_H__
 #define __BDS_ENTRY_H__
 
+#define IS_DEVICE_PATH_NODE(node,type,subtype)    \
+        (((node)->Type == (type)) && ((node)->SubType == (subtype)))
+
 /**
   This is defined by the UEFI specs, don't change it
 **/
