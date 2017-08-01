@@ -158,7 +158,7 @@ InvalidateVtdIOTLBDomain (
 
   Reg64 &= ((~B_IOTLB_REG_IVT) & (~B_IOTLB_REG_IIRG_MASK));
   Reg64 |= (B_IOTLB_REG_IVT | V_IOTLB_REG_IIRG_DOMAIN);
-  Reg64 |= DomainIdentifier;
+  Reg64 |= LShiftU64 (DomainIdentifier, 32);
   MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG, Reg64);
 
   do {
