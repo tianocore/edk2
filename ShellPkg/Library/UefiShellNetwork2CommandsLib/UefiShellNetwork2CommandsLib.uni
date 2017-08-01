@@ -2,6 +2,7 @@
 
   String definitions for UEFI Shell network 2 commands
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -92,7 +93,7 @@
                                                                   "Hint: Please type 'IfConfig6 -?' for help info.\r\n"
 #string STR_IFCONFIG6_ERR_UNKNOWN_COMMAND      #language en-US    "Unknown commands. Bad command %H%s%N is skipped.\r\n"
                                                                   "Hint: Please type 'IfConfig6 -?' for help info.\r\n"
-#string STR_IFCONFIG6_ERR_ADDRESS_FAILED       #language en-US    "It failed to set .\r\n"
+#string STR_IFCONFIG6_ERR_ADDRESS_FAILED       #language en-US    "Failed to configure IPv6 address: "
 
 
 #string STR_GET_HELP_PING6                     #language en-US ""

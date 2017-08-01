@@ -2,6 +2,7 @@
   The implementation for Shell command IfConfig6.
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1490,6 +1491,7 @@ IfConfig6SetInterfaceInfo (
             &CfgManAddr[Index].Address,
             &CfgManAddr[Index].PrefixLength
             );
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
         }
       }
 
