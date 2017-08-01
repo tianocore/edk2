@@ -2,7 +2,7 @@
   Main file for Dblk shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,6 +37,7 @@ DisplayTheBlocks(
   EFI_STATUS                Status;
   SHELL_STATUS              ShellStatus;
   UINT8                     *Buffer;
+  UINT8                     *OriginalBuffer;
   UINTN                     BufferSize;
 
   ShellStatus = SHELL_SUCCESS;
@@ -52,11 +53,17 @@ DisplayTheBlocks(
   }
 
   BufferSize = BlockIo->Media->BlockSize * BlockCount;
+  if(BlockIo->Media->IoAlign == 0) {
+    BlockIo->Media->IoAlign = 1;
+  }
+
   if (BufferSize > 0) {
-    Buffer     = AllocateZeroPool(BufferSize);
+    OriginalBuffer = AllocateZeroPool(BufferSize + BlockIo->Media->IoAlign);
+    Buffer         = ALIGN_POINTER (OriginalBuffer,BlockIo->Media->IoAlign);
   } else {
     ShellPrintEx(-1,-1,L"  BlockSize: 0x%08x, BlockCount: 0x%08x\r\n", BlockIo->Media->BlockSize, BlockCount);
-    Buffer    = NULL;
+    OriginalBuffer = NULL;
+    Buffer         = NULL;
   }
 
   Status = BlockIo->ReadBlocks(BlockIo, BlockIo->Media->MediaId, Lba, BufferSize, Buffer);
@@ -78,8 +85,8 @@ DisplayTheBlocks(
     ShellStatus = SHELL_DEVICE_ERROR;
   }
 
-  if (Buffer != NULL) {
-    FreePool(Buffer);
+  if (OriginalBuffer != NULL) {
+    FreePool (OriginalBuffer);
   }
 
   gBS->CloseProtocol(BlockIoHandle, &gEfiBlockIoProtocolGuid, gImageHandle, NULL);
