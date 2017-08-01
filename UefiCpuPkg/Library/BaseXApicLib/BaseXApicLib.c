@@ -48,7 +48,7 @@ StandardSignatureIsAuthenticAMD (
   UINT32  RegEcx;
   UINT32  RegEdx;
 
-  AsmCpuid(CPUID_SIGNATURE, NULL, &RegEbx, &RegEcx, &RegEdx);
+  AsmCpuid (CPUID_SIGNATURE, NULL, &RegEbx, &RegEcx, &RegEdx);
   return (RegEbx == CPUID_SIGNATURE_AUTHENTIC_AMD_EBX &&
           RegEcx == CPUID_SIGNATURE_AUTHENTIC_AMD_ECX &&
           RegEdx == CPUID_SIGNATURE_AUTHENTIC_AMD_EDX);
@@ -1000,7 +1000,6 @@ GetProcessorLocationByApicId (
   CPUID_EXTENDED_TOPOLOGY_ECX         ExtendedTopologyEcx;
   CPUID_AMD_EXTENDED_CPU_SIG_ECX      AmdExtendedCpuSigEcx;
   CPUID_AMD_PROCESSOR_TOPOLOGY_EBX    AmdProcessorTopologyEbx;
-  CPUID_AMD_PROCESSOR_TOPOLOGY_ECX    AmdProcessorTopologyEcx;
   CPUID_AMD_VIR_PHY_ADDRESS_SIZE_ECX  AmdVirPhyAddressSizeEcx;
   UINT32                              MaxStandardCpuIdIndex;
   UINT32                              MaxExtendedCpuIdIndex;
@@ -1008,18 +1007,13 @@ GetProcessorLocationByApicId (
   UINTN                               LevelType;
   UINT32                              MaxLogicProcessorsPerPackage;
   UINT32                              MaxCoresPerPackage;
-  UINT32                              MaxThreadPerPackageMask;
-  UINT32                              ActualThreadPerPackageMask;
-  UINT32                              MaxCoresPerNode;
-  UINT32                              CorePerNodeMask;
-  UINT32                              ApicIdShift;
   UINTN                               ThreadBits;
   UINTN                               CoreBits;
 
   //
   // Check if the processor is capable of supporting more than one logical processor.
   //
-  AsmCpuid(CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
   if (VersionInfoEdx.Bits.HTT == 0) {
     if (Thread != NULL) {
       *Thread = 0;
@@ -1042,8 +1036,8 @@ GetProcessorLocationByApicId (
   //
   // Get max index of CPUID
   //
-  AsmCpuid(CPUID_SIGNATURE, &MaxStandardCpuIdIndex, NULL, NULL, NULL);
-  AsmCpuid(CPUID_EXTENDED_FUNCTION, &MaxExtendedCpuIdIndex, NULL, NULL, NULL);
+  AsmCpuid (CPUID_SIGNATURE, &MaxStandardCpuIdIndex, NULL, NULL, NULL);
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedCpuIdIndex, NULL, NULL, NULL);
 
   //
   // If the extended topology enumeration leaf is available, it
@@ -1072,7 +1066,7 @@ GetProcessorLocationByApicId (
       // the SMT sub-field of x2APIC ID.
       //
       LevelType = ExtendedTopologyEcx.Bits.LevelType;
-      ASSERT(LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT);
+      ASSERT (LevelType == CPUID_EXTENDED_TOPOLOGY_LEVEL_TYPE_SMT);
       ThreadBits = ExtendedTopologyEax.Bits.ApicIdShift;
 
       //
@@ -1081,7 +1075,7 @@ GetProcessorLocationByApicId (
       //
       SubIndex = 1;
       do {
-        AsmCpuidEx(
+        AsmCpuidEx (
           CPUID_EXTENDED_TOPOLOGY,
           SubIndex,
           &ExtendedTopologyEax.Uint32,
@@ -1103,7 +1097,7 @@ GetProcessorLocationByApicId (
     //
     // Get logical processor count
     //
-    AsmCpuid(CPUID_VERSION_INFO, NULL, &VersionInfoEbx.Uint32, NULL, NULL);
+    AsmCpuid (CPUID_VERSION_INFO, NULL, &VersionInfoEbx.Uint32, NULL, NULL);
     MaxLogicProcessorsPerPackage = VersionInfoEbx.Bits.MaximumAddressableIdsForLogicalProcessors;
 
     //
@@ -1116,45 +1110,19 @@ GetProcessorLocationByApicId (
     //
     if (StandardSignatureIsAuthenticAMD()) {
       if (MaxExtendedCpuIdIndex >= CPUID_AMD_PROCESSOR_TOPOLOGY) {
-        AsmCpuid(CPUID_EXTENDED_CPU_SIG, NULL, NULL, &AmdExtendedCpuSigEcx.Uint32, NULL);
+        AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, &AmdExtendedCpuSigEcx.Uint32, NULL);
         if (AmdExtendedCpuSigEcx.Bits.TopologyExtensions != 0) {
-          AsmCpuid(CPUID_AMD_PROCESSOR_TOPOLOGY, NULL, &AmdProcessorTopologyEbx.Uint32,
-            &AmdProcessorTopologyEcx.Uint32, NULL);
+          //
+          // Account for max possible thread count to decode ApicId
+          //
+          AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, NULL, NULL, &AmdVirPhyAddressSizeEcx.Uint32, NULL);
+          MaxLogicProcessorsPerPackage = 1 << AmdVirPhyAddressSizeEcx.Bits.ApicIdCoreIdSize;
+
           //
           // Get cores per processor package
           //
+          AsmCpuid (CPUID_AMD_PROCESSOR_TOPOLOGY, NULL, &AmdProcessorTopologyEbx.Uint32, NULL, NULL);
           MaxCoresPerPackage = MaxLogicProcessorsPerPackage / (AmdProcessorTopologyEbx.Bits.ThreadsPerCore + 1);
-
-          //
-          // Account for actual thread count (e.g., SMT disabled)
-          //
-          AsmCpuid(CPUID_VIR_PHY_ADDRESS_SIZE, NULL, NULL, &AmdVirPhyAddressSizeEcx.Uint32, NULL);
-          MaxThreadPerPackageMask = 1 << AmdVirPhyAddressSizeEcx.Bits.ApicIdCoreIdSize;
-          ActualThreadPerPackageMask = 1;
-          while (ActualThreadPerPackageMask < MaxLogicProcessorsPerPackage) {
-            ActualThreadPerPackageMask <<= 1;
-          }
-
-          //
-          // Adjust APIC Id to report concatenation of Package|Core|Thread.
-          //
-          if (ActualThreadPerPackageMask < MaxThreadPerPackageMask) {
-            MaxCoresPerNode = MaxCoresPerPackage / (AmdProcessorTopologyEcx.Bits.NodesPerProcessor + 1);
-
-            CorePerNodeMask = 1;
-            while (CorePerNodeMask < MaxCoresPerNode) {
-              CorePerNodeMask <<= 1;
-            }
-            CorePerNodeMask -= 1;
-
-            ApicIdShift = 0;
-            do {
-              ApicIdShift += 1;
-              ActualThreadPerPackageMask <<= 1;
-            } while (ActualThreadPerPackageMask < MaxThreadPerPackageMask);
-
-            InitialApicId = ((InitialApicId & ~CorePerNodeMask) >> ApicIdShift) | (InitialApicId & CorePerNodeMask);
-          }
         }
       }
     }
@@ -1163,7 +1131,7 @@ GetProcessorLocationByApicId (
       // Extract core count based on CACHE information
       //
       if (MaxStandardCpuIdIndex >= CPUID_CACHE_PARAMS) {
-        AsmCpuidEx(CPUID_CACHE_PARAMS, 0, &CacheParamsEax.Uint32, NULL, NULL, NULL);
+        AsmCpuidEx (CPUID_CACHE_PARAMS, 0, &CacheParamsEax.Uint32, NULL, NULL, NULL);
         if (CacheParamsEax.Uint32 != 0) {
           MaxCoresPerPackage = CacheParamsEax.Bits.MaximumAddressableIdsForLogicalProcessors + 1;
         }
