@@ -726,7 +726,9 @@ ProcessPpiListFromSec (
   IN CONST EFI_PEI_PPI_DESCRIPTOR   *PpiList
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS                Status;
+  EFI_SEC_HOB_DATA_PPI      *SecHobDataPpi;
+  EFI_HOB_GENERIC_HEADER    *SecHobList;
 
   for (;;) {
     if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES) != 0) {
@@ -751,6 +753,21 @@ ProcessPpiListFromSec (
     }
 
     PpiList++;
+  }
+
+  //
+  // If the EFI_SEC_HOB_DATA_PPI is in the list of PPIs passed to the PEI entry point,
+  // the PEI Foundation will call the GetHobs() member function and install all HOBs
+  // returned into the HOB list. It does this after installing all PPIs passed from SEC
+  // into the PPI database and before dispatching any PEIMs.
+  //
+  Status = PeiLocatePpi (PeiServices, &gEfiSecHobDataPpiGuid, 0, NULL, (VOID **) &SecHobDataPpi);
+  if (!EFI_ERROR (Status)) {
+    Status = SecHobDataPpi->GetHobs (SecHobDataPpi, &SecHobList);
+    if (!EFI_ERROR (Status)) {
+      Status = PeiInstallSecHobData (PeiServices, SecHobList);
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 }
 

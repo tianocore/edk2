@@ -6,7 +6,7 @@
 # 2) Dispatch PEIM from discovered FV.
 # 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
 #
-# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -101,6 +101,7 @@
   gEfiTemporaryRamSupportPpiGuid                ## SOMETIMES_CONSUMES
   gEfiTemporaryRamDonePpiGuid                   ## SOMETIMES_CONSUMES
   gEfiPeiReset2PpiGuid                          ## SOMETIMES_CONSUMES
+  gEfiSecHobDataPpiGuid                         ## SOMETIMES_CONSUMES
 
 [Pcd]  
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported                   ## CONSUMES

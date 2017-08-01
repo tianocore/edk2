@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/Security2.h>
 #include <Ppi/TemporaryRamSupport.h>
 #include <Ppi/TemporaryRamDone.h>
+#include <Ppi/SecHobData.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -719,6 +720,22 @@ PeiCoreBuildHobHandoffInfoTable (
   IN EFI_BOOT_MODE         BootMode,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64                MemoryLength
+  );
+
+/**
+  Install SEC HOB data to the HOB List.
+
+  @param PeiServices    An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param SecHobList     Pointer to SEC HOB List.
+
+  @return EFI_SUCCESS           Success to install SEC HOB data.
+  @retval EFI_OUT_OF_RESOURCES  If there is no more memory to grow the Hoblist.
+
+**/
+EFI_STATUS
+PeiInstallSecHobData (
+  IN CONST EFI_PEI_SERVICES     **PeiServices,
+  IN EFI_HOB_GENERIC_HEADER     *SecHobList
   );
 
 
