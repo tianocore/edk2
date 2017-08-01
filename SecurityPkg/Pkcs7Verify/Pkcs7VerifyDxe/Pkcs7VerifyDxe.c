@@ -1457,8 +1457,17 @@ Pkcs7VerifyDriverEntry (
   IN EFI_SYSTEM_TABLE    *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    Handle;
+  EFI_STATUS                 Status;
+  EFI_HANDLE                 Handle;
+  EFI_PKCS7_VERIFY_PROTOCOL  Useless;
+
+  //
+  // Avoid loading a second copy if this is built as an external module
+  //
+  Status = gBS->LocateProtocol (&gEfiPkcs7VerifyProtocolGuid, NULL, (VOID **)&Useless);
+  if (!EFI_ERROR (Status)) {
+    return EFI_ABORTED;
+  }
 
   //
   // Install UEFI Pkcs7 Verification Protocol
