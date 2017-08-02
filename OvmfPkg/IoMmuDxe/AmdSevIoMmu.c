@@ -25,7 +25,7 @@ typedef struct {
   UINTN                                     NumberOfBytes;
   UINTN                                     NumberOfPages;
   EFI_PHYSICAL_ADDRESS                      HostAddress;
-  EFI_PHYSICAL_ADDRESS                      DeviceAddress;
+  EFI_PHYSICAL_ADDRESS                      PlainTextAddress;
 } MAP_INFO;
 
 #define NO_MAPPING             (VOID *) (UINTN) -1
@@ -145,7 +145,7 @@ IoMmuMap (
   MapInfo->NumberOfBytes     = *NumberOfBytes;
   MapInfo->NumberOfPages     = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
   MapInfo->HostAddress       = PhysicalAddress;
-  MapInfo->DeviceAddress     = DmaMemoryTop;
+  MapInfo->PlainTextAddress  = DmaMemoryTop;
 
   //
   // Allocate a buffer to map the transfer to.
@@ -154,7 +154,7 @@ IoMmuMap (
                   AllocateType,
                   EfiBootServicesData,
                   MapInfo->NumberOfPages,
-                  &MapInfo->DeviceAddress
+                  &MapInfo->PlainTextAddress
                   );
   if (EFI_ERROR (Status)) {
     FreePool (MapInfo);
@@ -167,7 +167,7 @@ IoMmuMap (
   //
   Status = MemEncryptSevClearPageEncMask (
              0,
-             MapInfo->DeviceAddress,
+             MapInfo->PlainTextAddress,
              MapInfo->NumberOfPages,
              TRUE
              );
@@ -181,7 +181,7 @@ IoMmuMap (
   if (Operation == EdkiiIoMmuOperationBusMasterRead ||
       Operation == EdkiiIoMmuOperationBusMasterRead64) {
     CopyMem (
-      (VOID *) (UINTN) MapInfo->DeviceAddress,
+      (VOID *) (UINTN) MapInfo->PlainTextAddress,
       (VOID *) (UINTN) MapInfo->HostAddress,
       MapInfo->NumberOfBytes
       );
@@ -190,7 +190,7 @@ IoMmuMap (
   //
   // The DeviceAddress is the address of the maped buffer below 4GB
   //
-  *DeviceAddress = MapInfo->DeviceAddress;
+  *DeviceAddress = MapInfo->PlainTextAddress;
 
   //
   // Return a pointer to the MAP_INFO structure in Mapping
@@ -199,9 +199,9 @@ IoMmuMap (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a Device 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
+    "%a PlainText 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
     __FUNCTION__,
-    MapInfo->DeviceAddress,
+    MapInfo->PlainTextAddress,
     MapInfo->HostAddress,
     MapInfo->NumberOfPages,
     MapInfo->NumberOfBytes
@@ -256,16 +256,16 @@ IoMmuUnmap (
       MapInfo->Operation == EdkiiIoMmuOperationBusMasterWrite64) {
     CopyMem (
       (VOID *) (UINTN) MapInfo->HostAddress,
-      (VOID *) (UINTN) MapInfo->DeviceAddress,
+      (VOID *) (UINTN) MapInfo->PlainTextAddress,
       MapInfo->NumberOfBytes
       );
   }
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a Device 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
+    "%a PlainText 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
     __FUNCTION__,
-    MapInfo->DeviceAddress,
+    MapInfo->PlainTextAddress,
     MapInfo->HostAddress,
     MapInfo->NumberOfPages,
     MapInfo->NumberOfBytes
@@ -275,7 +275,7 @@ IoMmuUnmap (
   //
   Status = MemEncryptSevSetPageEncMask (
              0,
-             MapInfo->DeviceAddress,
+             MapInfo->PlainTextAddress,
              MapInfo->NumberOfPages,
              TRUE
              );
@@ -284,7 +284,7 @@ IoMmuUnmap (
   //
   // Free the mapped buffer and the MAP_INFO structure.
   //
-  gBS->FreePages (MapInfo->DeviceAddress, MapInfo->NumberOfPages);
+  gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
   FreePool (Mapping);
   return EFI_SUCCESS;
 }
