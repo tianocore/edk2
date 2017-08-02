@@ -237,7 +237,7 @@ class DscBuildData(PlatformBuildClassObject):
                         EdkLogger.error('build', FORMAT_INVALID, 'Missing double quotes in the end of %s statement.' % TAB_DSC_PREBUILD,
                                     File=self.MetaFile, Line=Record[-1])
                     PrebuildValue = Record[2][1:-1]
-                self._Prebuild = PathClass(NormPath(PrebuildValue, self._Macros), GlobalData.gWorkspace)
+                self._Prebuild = PrebuildValue
             elif Name == TAB_DSC_POSTBUILD:
                 PostbuildValue = Record[2]
                 if Record[2][0] == '"':
@@ -245,7 +245,7 @@ class DscBuildData(PlatformBuildClassObject):
                         EdkLogger.error('build', FORMAT_INVALID, 'Missing double quotes in the end of %s statement.' % TAB_DSC_POSTBUILD,
                                     File=self.MetaFile, Line=Record[-1])
                     PostbuildValue = Record[2][1:-1]
-                self._Postbuild = PathClass(NormPath(PostbuildValue, self._Macros), GlobalData.gWorkspace)
+                self._Postbuild = PostbuildValue
             elif Name == TAB_DSC_DEFINES_SUPPORTED_ARCHITECTURES:
                 self._SupArchList = GetSplitValueList(Record[2], TAB_VALUE_SPLIT)
             elif Name == TAB_DSC_DEFINES_BUILD_TARGETS:

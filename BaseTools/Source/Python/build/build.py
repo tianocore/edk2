@@ -796,8 +796,6 @@ class Build():
         self.BuildModules = []
         self.Db_Flag = False
         self.LaunchPrebuildFlag = False
-        self.PrebuildScript = ''
-        self.PostbuildScript = ''
         self.PlatformBuildPath = os.path.join(GlobalData.gConfDirectory,'.cache', '.PlatformBuild')
         if BuildOptions.CommandLength:
             GlobalData.gCommandMaxLength = BuildOptions.CommandLength
@@ -819,11 +817,11 @@ class Build():
         EdkLogger.quiet("%-16s = %s" % ("CONF_PATH", GlobalData.gConfDirectory))
         self.InitPreBuild()
         self.InitPostBuild()
-        if self.PrebuildScript:
-            EdkLogger.quiet("%-16s = %s" % ("PREBUILD", self.PrebuildScript))
-        if self.PostbuildScript:
-            EdkLogger.quiet("%-16s = %s" % ("POSTBUILD", self.PostbuildScript))
-        if self.PrebuildScript:
+        if self.Prebuild:
+            EdkLogger.quiet("%-16s = %s" % ("PREBUILD", self.Prebuild))
+        if self.Postbuild:
+            EdkLogger.quiet("%-16s = %s" % ("POSTBUILD", self.Postbuild))
+        if self.Prebuild:
             self.LaunchPrebuild()
             self.TargetTxt = TargetTxtClassObject()
             self.ToolDef   = ToolDefClassObject()
@@ -964,16 +962,37 @@ class Build():
             Platform = self.Db._MapPlatform(str(self.PlatformFile))
             self.Prebuild = str(Platform.Prebuild)
         if self.Prebuild:
-            PrebuildList = self.Prebuild.split()
-            if not os.path.isabs(PrebuildList[0]):
-                PrebuildList[0] = mws.join(self.WorkspaceDir, PrebuildList[0])
-            if os.path.isfile(PrebuildList[0]):
-                self.PrebuildScript = PrebuildList[0]
-                self.Prebuild = ' '.join(PrebuildList)
-                self.Prebuild += self.PassCommandOption(self.BuildTargetList, self.ArchList, self.ToolChainList)
-                #self.LaunchPrebuild()
-            else:
-                EdkLogger.error("Prebuild", PREBUILD_ERROR, "the prebuild script %s is not exist.\n If you'd like to disable the Prebuild process, please use the format: -D PREBUILD=\"\" " %(PrebuildList[0]))
+            PrebuildList = []
+            #
+            # Evaluate all arguments and convert arguments that are WORKSPACE
+            # relative paths to absolute paths.  Filter arguments that look like
+            # flags or do not follow the file/dir naming rules to avoid false
+            # positives on this conversion.
+            #
+            for Arg in self.Prebuild.split():
+                #
+                # Do not modify Arg if it looks like a flag or an absolute file path
+                #
+                if Arg.startswith('-')  or os.path.isabs(Arg):
+                    PrebuildList.append(Arg)
+                    continue
+                #
+                # Do not modify Arg if it does not look like a Workspace relative
+                # path that starts with a valid package directory name
+                #
+                if not Arg[0].isalpha() or os.path.dirname(Arg) == '':
+                    PrebuildList.append(Arg)
+                    continue
+                #
+                # If Arg looks like a WORKSPACE relative path, then convert to an
+                # absolute path and check to see if the file exists.
+                #
+                Temp = mws.join(self.WorkspaceDir, Arg)
+                if os.path.isfile(Temp):
+                    Arg = Temp
+                PrebuildList.append(Arg)
+            self.Prebuild       = ' '.join(PrebuildList)
+            self.Prebuild += self.PassCommandOption(self.BuildTargetList, self.ArchList, self.ToolChainList, self.PlatformFile, self.Target)
 
     def InitPostBuild(self):
         if 'POSTBUILD' in GlobalData.gCommandLineDefines.keys():
@@ -982,23 +1001,46 @@ class Build():
             Platform = self.Db._MapPlatform(str(self.PlatformFile))
             self.Postbuild = str(Platform.Postbuild)
         if self.Postbuild:
-            PostbuildList = self.Postbuild.split()
-            if not os.path.isabs(PostbuildList[0]):
-                PostbuildList[0] = mws.join(self.WorkspaceDir, PostbuildList[0])
-            if os.path.isfile(PostbuildList[0]):
-                self.PostbuildScript = PostbuildList[0]
-                self.Postbuild = ' '.join(PostbuildList)
-                self.Postbuild += self.PassCommandOption(self.BuildTargetList, self.ArchList, self.ToolChainList)
-            else:
-                EdkLogger.error("Postbuild", POSTBUILD_ERROR, "the postbuild script %s is not exist.\n If you'd like to disable the Postbuild process, please use the format: -D POSTBUILD=\"\" " %(PostbuildList[0]))
+            PostbuildList = []
+            #
+            # Evaluate all arguments and convert arguments that are WORKSPACE
+            # relative paths to absolute paths.  Filter arguments that look like
+            # flags or do not follow the file/dir naming rules to avoid false
+            # positives on this conversion.
+            #
+            for Arg in self.Postbuild.split():
+                #
+                # Do not modify Arg if it looks like a flag or an absolute file path
+                #
+                if Arg.startswith('-')  or os.path.isabs(Arg):
+                    PostbuildList.append(Arg)
+                    continue
+                #
+                # Do not modify Arg if it does not look like a Workspace relative
+                # path that starts with a valid package directory name
+                #
+                if not Arg[0].isalpha() or os.path.dirname(Arg) == '':
+                    PostbuildList.append(Arg)
+                    continue
+                #
+                # If Arg looks like a WORKSPACE relative path, then convert to an
+                # absolute path and check to see if the file exists.
+                #
+                Temp = mws.join(self.WorkspaceDir, Arg)
+                if os.path.isfile(Temp):
+                    Arg = Temp
+                PostbuildList.append(Arg)
+            self.Postbuild       = ' '.join(PostbuildList)
+            self.Postbuild += self.PassCommandOption(self.BuildTargetList, self.ArchList, self.ToolChainList, self.PlatformFile, self.Target)
 
-    def PassCommandOption(self, BuildTarget, TargetArch, ToolChain):
+    def PassCommandOption(self, BuildTarget, TargetArch, ToolChain, PlatformFile, Target):
         BuildStr = ''
         if GlobalData.gCommand and isinstance(GlobalData.gCommand, list):
             BuildStr += ' ' + ' '.join(GlobalData.gCommand)
         TargetFlag = False
         ArchFlag = False
         ToolChainFlag = False
+        PlatformFileFlag = False
 
         if GlobalData.gOptions and not GlobalData.gOptions.BuildTarget:
             TargetFlag = True
@@ -1006,6 +1048,8 @@ class Build():
             ArchFlag = True
         if GlobalData.gOptions and not GlobalData.gOptions.ToolChain:
             ToolChainFlag = True
+        if GlobalData.gOptions and not GlobalData.gOptions.PlatformFile:
+            PlatformFileFlag = True
 
         if TargetFlag and BuildTarget:
             if isinstance(BuildTarget, list) or isinstance(BuildTarget, tuple):
@@ -1022,6 +1066,14 @@ class Build():
                 BuildStr += ' -t ' + ' -t '.join(ToolChain)
             elif isinstance(ToolChain, str):
                 BuildStr += ' -t ' + ToolChain
+        if PlatformFileFlag and PlatformFile:
+            if isinstance(PlatformFile, list) or isinstance(PlatformFile, tuple):
+                BuildStr += ' -p ' + ' -p '.join(PlatformFile)
+            elif isinstance(PlatformFile, str):
+                BuildStr += ' -p' + PlatformFile
+        BuildStr += ' --conf=' + GlobalData.gConfDirectory
+        if Target:
+            BuildStr += ' ' + Target
 
         return BuildStr
 
