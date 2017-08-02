@@ -28,7 +28,31 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS                      PlainTextAddress;
 } MAP_INFO;
 
-#define NO_MAPPING             (VOID *) (UINTN) -1
+#define COMMON_BUFFER_SIG SIGNATURE_64 ('C', 'M', 'N', 'B', 'U', 'F', 'F', 'R')
+
+//
+// The following structure enables Map() and Unmap() to perform in-place
+// decryption and encryption, respectively, for BusMasterCommonBuffer[64]
+// operations, without dynamic memory allocation or release.
+//
+// Both COMMON_BUFFER_HEADER and COMMON_BUFFER_HEADER.StashBuffer are allocated
+// by AllocateBuffer() and released by FreeBuffer().
+//
+#pragma pack (1)
+typedef struct {
+  UINT64 Signature;
+
+  //
+  // Always allocated from EfiBootServicesData type memory, and always
+  // encrypted.
+  //
+  VOID *StashBuffer;
+
+  //
+  // Followed by the actual common buffer, starting at the next page.
+  //
+} COMMON_BUFFER_HEADER;
+#pragma pack ()
 
 /**
   Provides the controller-specific addresses required to access system memory
@@ -74,6 +98,8 @@ IoMmuMap (
   EFI_STATUS                                        Status;
   MAP_INFO                                          *MapInfo;
   EFI_ALLOCATE_TYPE                                 AllocateType;
+  COMMON_BUFFER_HEADER                              *CommonBufferHeader;
+  VOID                                              *DecryptionSource;
 
   if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL ||
       Mapping == NULL) {
@@ -100,10 +126,11 @@ IoMmuMap (
 
   //
   // In the switch statement below, we point "MapInfo->PlainTextAddress" to the
-  // plaintext buffer, according to Operation.
+  // plaintext buffer, according to Operation. We also set "DecryptionSource".
   //
   MapInfo->PlainTextAddress = MAX_ADDRESS;
   AllocateType = AllocateAnyPages;
+  DecryptionSource = (VOID *)(UINTN)MapInfo->CryptedAddress;
   switch (Operation) {
   //
   // For BusMasterRead[64] and BusMasterWrite[64] operations, a bounce buffer
@@ -135,9 +162,10 @@ IoMmuMap (
     break;
 
   //
-  // For BusMasterCommonBuffer[64] operations, a plaintext buffer has been
-  // allocated already, with AllocateBuffer(). We only check whether the
-  // address is low enough for the requested operation.
+  // For BusMasterCommonBuffer[64] operations, a to-be-plaintext buffer and a
+  // stash buffer (for in-place decryption) have been allocated already, with
+  // AllocateBuffer(). We only check whether the address of the to-be-plaintext
+  // buffer is low enough for the requested operation.
   //
   case EdkiiIoMmuOperationBusMasterCommonBuffer:
     if ((MapInfo->CryptedAddress > BASE_4GB) ||
@@ -156,18 +184,27 @@ IoMmuMap (
     //
   case EdkiiIoMmuOperationBusMasterCommonBuffer64:
     //
-    // The buffer at MapInfo->CryptedAddress comes from AllocateBuffer(),
-    // and it is already decrypted.
+    // The buffer at MapInfo->CryptedAddress comes from AllocateBuffer().
     //
     MapInfo->PlainTextAddress = MapInfo->CryptedAddress;
-
     //
-    // Therefore no mapping is necessary.
+    // Stash the crypted data.
     //
-    *DeviceAddress = MapInfo->PlainTextAddress;
-    *Mapping       = NO_MAPPING;
-    FreePool (MapInfo);
-    return EFI_SUCCESS;
+    CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
+                           (UINTN)MapInfo->CryptedAddress - EFI_PAGE_SIZE
+                           );
+    ASSERT (CommonBufferHeader->Signature == COMMON_BUFFER_SIG);
+    CopyMem (
+      CommonBufferHeader->StashBuffer,
+      (VOID *)(UINTN)MapInfo->CryptedAddress,
+      MapInfo->NumberOfBytes
+      );
+    //
+    // Point "DecryptionSource" to the stash buffer so that we decrypt
+    // it to the original location, after the switch statement.
+    //
+    DecryptionSource = CommonBufferHeader->StashBuffer;
+    break;
 
   default:
     //
@@ -193,11 +230,16 @@ IoMmuMap (
   // then copy the contents of the real buffer into the mapped buffer
   // so the Bus Master can read the contents of the real buffer.
   //
+  // For BusMasterCommonBuffer[64] operations, the CopyMem() below will decrypt
+  // the original data (from the stash buffer) back to the original location.
+  //
   if (Operation == EdkiiIoMmuOperationBusMasterRead ||
-      Operation == EdkiiIoMmuOperationBusMasterRead64) {
+      Operation == EdkiiIoMmuOperationBusMasterRead64 ||
+      Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
+      Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
     CopyMem (
       (VOID *) (UINTN) MapInfo->PlainTextAddress,
-      (VOID *) (UINTN) MapInfo->CryptedAddress,
+      DecryptionSource,
       MapInfo->NumberOfBytes
       );
   }
@@ -249,34 +291,58 @@ IoMmuUnmap (
 {
   MAP_INFO                 *MapInfo;
   EFI_STATUS               Status;
+  COMMON_BUFFER_HEADER     *CommonBufferHeader;
+  VOID                     *EncryptionTarget;
 
   if (Mapping == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // See if the Map() operation associated with this Unmap() required a mapping
-  // buffer. If a mapping buffer was not required, then this function simply
-  // buffer. If a mapping buffer was not required, then this function simply
-  //
-  if (Mapping == NO_MAPPING) {
-    return EFI_SUCCESS;
-  }
-
   MapInfo = (MAP_INFO *)Mapping;
 
   //
-  // If this is a write operation from the Bus Master's point of view,
-  // then copy the contents of the mapped buffer into the real buffer
-  // so the processor can read the contents of the real buffer.
+  // set CommonBufferHeader to suppress incorrect compiler/analyzer warnings
   //
-  if (MapInfo->Operation == EdkiiIoMmuOperationBusMasterWrite ||
-      MapInfo->Operation == EdkiiIoMmuOperationBusMasterWrite64) {
+  CommonBufferHeader = NULL;
+
+  //
+  // For BusMasterWrite[64] operations and BusMasterCommonBuffer[64] operations
+  // we have to encrypt the results, ultimately to the original place (i.e.,
+  // "MapInfo->CryptedAddress").
+  //
+  // For BusMasterCommonBuffer[64] operations however, this encryption has to
+  // land in-place, so divert the encryption to the stash buffer first.
+  //
+  EncryptionTarget = (VOID *)(UINTN)MapInfo->CryptedAddress;
+
+  switch (MapInfo->Operation) {
+  case EdkiiIoMmuOperationBusMasterCommonBuffer:
+  case EdkiiIoMmuOperationBusMasterCommonBuffer64:
+    ASSERT (MapInfo->PlainTextAddress == MapInfo->CryptedAddress);
+
+    CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
+                           (UINTN)MapInfo->PlainTextAddress - EFI_PAGE_SIZE
+                           );
+    ASSERT (CommonBufferHeader->Signature == COMMON_BUFFER_SIG);
+    EncryptionTarget = CommonBufferHeader->StashBuffer;
+    //
+    // fall through
+    //
+
+  case EdkiiIoMmuOperationBusMasterWrite:
+  case EdkiiIoMmuOperationBusMasterWrite64:
     CopyMem (
-      (VOID *) (UINTN) MapInfo->CryptedAddress,
+      EncryptionTarget,
       (VOID *) (UINTN) MapInfo->PlainTextAddress,
       MapInfo->NumberOfBytes
       );
+    break;
+
+  default:
+    //
+    // nothing to encrypt after BusMasterRead[64] operations
+    //
+    break;
   }
 
   DEBUG ((
@@ -288,8 +354,10 @@ IoMmuUnmap (
     (UINT64)MapInfo->NumberOfPages,
     (UINT64)MapInfo->NumberOfBytes
     ));
+
   //
-  // Restore the memory encryption mask
+  // Restore the memory encryption mask on the area we used to hold the
+  // plaintext.
   //
   Status = MemEncryptSevSetPageEncMask (
              0,
@@ -298,15 +366,32 @@ IoMmuUnmap (
              TRUE
              );
   ASSERT_EFI_ERROR(Status);
-  ZeroMem (
-    (VOID*)(UINTN)MapInfo->PlainTextAddress,
-    EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages)
-    );
 
   //
-  // Free the mapped buffer and the MAP_INFO structure.
+  // For BusMasterCommonBuffer[64] operations, copy the stashed data to the
+  // original (now encrypted) location.
   //
-  gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
+  // For all other operations, fill the late bounce buffer (which existed as
+  // plaintext at some point) with zeros, and then release it.
+  //
+  if (MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
+      MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
+    CopyMem (
+      (VOID *)(UINTN)MapInfo->CryptedAddress,
+      CommonBufferHeader->StashBuffer,
+      MapInfo->NumberOfBytes
+      );
+  } else {
+    ZeroMem (
+      (VOID *)(UINTN)MapInfo->PlainTextAddress,
+      EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages)
+      );
+    gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
+  }
+
+  //
+  // Free the MAP_INFO structure.
+  //
   FreePool (Mapping);
   return EFI_SUCCESS;
 }
@@ -346,6 +431,9 @@ IoMmuAllocateBuffer (
 {
   EFI_STATUS                Status;
   EFI_PHYSICAL_ADDRESS      PhysicalAddress;
+  VOID                      *StashBuffer;
+  UINTN                     CommonBufferPages;
+  COMMON_BUFFER_HEADER      *CommonBufferHeader;
 
   //
   // Validate Attributes
@@ -370,6 +458,32 @@ IoMmuAllocateBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // We'll need a header page for the COMMON_BUFFER_HEADER structure.
+  //
+  if (Pages > MAX_UINTN - 1) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  CommonBufferPages = Pages + 1;
+
+  //
+  // Allocate the stash in EfiBootServicesData type memory.
+  //
+  // Map() will temporarily save encrypted data in the stash for
+  // BusMasterCommonBuffer[64] operations, so the data can be decrypted to the
+  // original location.
+  //
+  // Unmap() will temporarily save plaintext data in the stash for
+  // BusMasterCommonBuffer[64] operations, so the data can be encrypted to the
+  // original location.
+  //
+  // StashBuffer always resides in encrypted memory.
+  //
+  StashBuffer = AllocatePages (Pages);
+  if (StashBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   PhysicalAddress = (UINTN)-1;
   if ((Attributes & EDKII_IOMMU_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0) {
     //
@@ -380,18 +494,20 @@ IoMmuAllocateBuffer (
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
                   MemoryType,
-                  Pages,
+                  CommonBufferPages,
                   &PhysicalAddress
                   );
-  if (!EFI_ERROR (Status)) {
-    *HostAddress = (VOID *) (UINTN) PhysicalAddress;
-
-    //
-    // Clear memory encryption mask
-    //
-    Status = MemEncryptSevClearPageEncMask (0, PhysicalAddress, Pages, TRUE);
-    ASSERT_EFI_ERROR(Status);
+  if (EFI_ERROR (Status)) {
+    goto FreeStashBuffer;
   }
+
+  CommonBufferHeader = (VOID *)(UINTN)PhysicalAddress;
+  PhysicalAddress += EFI_PAGE_SIZE;
+
+  CommonBufferHeader->Signature = COMMON_BUFFER_SIG;
+  CommonBufferHeader->StashBuffer = StashBuffer;
+
+  *HostAddress = (VOID *)(UINTN)PhysicalAddress;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -400,6 +516,10 @@ IoMmuAllocateBuffer (
     PhysicalAddress,
     (UINT64)Pages
     ));
+  return EFI_SUCCESS;
+
+FreeStashBuffer:
+  FreePages (StashBuffer, Pages);
   return Status;
 }
 
@@ -424,19 +544,27 @@ IoMmuFreeBuffer (
   IN  VOID                                     *HostAddress
   )
 {
-  EFI_STATUS  Status;
+  UINTN                CommonBufferPages;
+  COMMON_BUFFER_HEADER *CommonBufferHeader;
+
+  CommonBufferPages = Pages + 1;
+  CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
+                         (UINTN)HostAddress - EFI_PAGE_SIZE
+                         );
 
   //
-  // Set memory encryption mask
+  // Check the signature.
   //
-  Status = MemEncryptSevSetPageEncMask (
-             0,
-             (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
-             Pages,
-             TRUE
-             );
-  ASSERT_EFI_ERROR(Status);
-  ZeroMem (HostAddress, EFI_PAGES_TO_SIZE (Pages));
+  ASSERT (CommonBufferHeader->Signature == COMMON_BUFFER_SIG);
+  if (CommonBufferHeader->Signature != COMMON_BUFFER_SIG) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Free the stash buffer. This buffer was always encrypted, so no need to
+  // zero it.
+  //
+  FreePages (CommonBufferHeader->StashBuffer, Pages);
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -445,7 +573,12 @@ IoMmuFreeBuffer (
     (UINT64)(UINTN)HostAddress,
     (UINT64)Pages
     ));
-  return gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress, Pages);
+
+  //
+  // Release the common buffer itself. Unmap() has re-encrypted it in-place, so
+  // no need to zero it.
+  //
+  return gBS->FreePages ((UINTN)CommonBufferHeader, CommonBufferPages);
 }
 
 
