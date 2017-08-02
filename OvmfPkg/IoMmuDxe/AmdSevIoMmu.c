@@ -24,7 +24,7 @@ typedef struct {
   EDKII_IOMMU_OPERATION                     Operation;
   UINTN                                     NumberOfBytes;
   UINTN                                     NumberOfPages;
-  EFI_PHYSICAL_ADDRESS                      HostAddress;
+  EFI_PHYSICAL_ADDRESS                      CryptedAddress;
   EFI_PHYSICAL_ADDRESS                      PlainTextAddress;
 } MAP_INFO;
 
@@ -144,7 +144,7 @@ IoMmuMap (
   MapInfo->Operation         = Operation;
   MapInfo->NumberOfBytes     = *NumberOfBytes;
   MapInfo->NumberOfPages     = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
-  MapInfo->HostAddress       = PhysicalAddress;
+  MapInfo->CryptedAddress    = PhysicalAddress;
   MapInfo->PlainTextAddress  = DmaMemoryTop;
 
   //
@@ -182,7 +182,7 @@ IoMmuMap (
       Operation == EdkiiIoMmuOperationBusMasterRead64) {
     CopyMem (
       (VOID *) (UINTN) MapInfo->PlainTextAddress,
-      (VOID *) (UINTN) MapInfo->HostAddress,
+      (VOID *) (UINTN) MapInfo->CryptedAddress,
       MapInfo->NumberOfBytes
       );
   }
@@ -199,10 +199,10 @@ IoMmuMap (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a PlainText 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
+    "%a PlainText 0x%Lx Crypted 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
     __FUNCTION__,
     MapInfo->PlainTextAddress,
-    MapInfo->HostAddress,
+    MapInfo->CryptedAddress,
     MapInfo->NumberOfPages,
     MapInfo->NumberOfBytes
     ));
@@ -255,7 +255,7 @@ IoMmuUnmap (
   if (MapInfo->Operation == EdkiiIoMmuOperationBusMasterWrite ||
       MapInfo->Operation == EdkiiIoMmuOperationBusMasterWrite64) {
     CopyMem (
-      (VOID *) (UINTN) MapInfo->HostAddress,
+      (VOID *) (UINTN) MapInfo->CryptedAddress,
       (VOID *) (UINTN) MapInfo->PlainTextAddress,
       MapInfo->NumberOfBytes
       );
@@ -263,10 +263,10 @@ IoMmuUnmap (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a PlainText 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
+    "%a PlainText 0x%Lx Crypted 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
     __FUNCTION__,
     MapInfo->PlainTextAddress,
-    MapInfo->HostAddress,
+    MapInfo->CryptedAddress,
     MapInfo->NumberOfPages,
     MapInfo->NumberOfBytes
     ));
