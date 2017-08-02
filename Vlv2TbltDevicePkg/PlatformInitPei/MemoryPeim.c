@@ -70,6 +70,34 @@ GetMemorySize (
   );
 
 
+/**
+  Initializes the valid address mask for MTRRs.
+
+  This function initializes the valid bits mask and valid address mask for MTRRs.
+
+**/
+UINT64
+InitializeAddressMtrrMask (
+  VOID
+  )
+{
+  UINT32                    RegEax;
+  UINT8                     PhysicalAddressBits; 
+  UINT64                    ValidMtrrBitsMask;
+
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+
+  if (RegEax >= 0x80000008) {
+    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+
+    PhysicalAddressBits = (UINT8) RegEax;
+  } else {
+    PhysicalAddressBits = 36;
+  }
+
+  ValidMtrrBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
+  return (ValidMtrrBitsMask & 0xfffffffffffff000ULL);
+}
 
 EFI_STATUS
 EFIAPI
@@ -89,6 +117,7 @@ SetPeiCacheMode (
   UINT64                  HighMemoryLength;
   UINT8                   Index;
   MTRR_SETTINGS           MtrrSetting;
+  UINT64                  ValidMtrrAddressMask;
 
   //
   // Load Cache PPI
@@ -123,6 +152,8 @@ SetPeiCacheMode (
                              PeiServices,
                              &BootMode
                              );
+
+  ValidMtrrAddressMask = InitializeAddressMtrrMask ();
 
   //
   // Determine memory usage
@@ -166,15 +197,15 @@ SetPeiCacheMode (
   //
   Index = 0;
   MtrrSetting.Variables.Mtrr[0].Base = (FixedPcdGet32 (PcdFlashAreaBaseAddress) | CacheWriteProtected);
-  MtrrSetting.Variables.Mtrr[0].Mask = ((~((UINT64)(FixedPcdGet32 (PcdFlashAreaSize) - 1))) & MTRR_LIB_CACHE_VALID_ADDRESS) | MTRR_LIB_CACHE_MTRR_ENABLED;
+  MtrrSetting.Variables.Mtrr[0].Mask = ((~((UINT64)(FixedPcdGet32 (PcdFlashAreaSize) - 1))) & ValidMtrrAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED;
   Index ++;
 
   MemOverflow =0;
   while (MaxMemoryLength > MemOverflow){
-    MtrrSetting.Variables.Mtrr[Index].Base = (MemOverflow & MTRR_LIB_CACHE_VALID_ADDRESS) | CacheWriteBack;
+    MtrrSetting.Variables.Mtrr[Index].Base = (MemOverflow & ValidMtrrAddressMask) | CacheWriteBack;
     MemoryLength = MaxMemoryLength - MemOverflow;
     MemoryLength = GetPowerOfTwo64 (MemoryLength);
-    MtrrSetting.Variables.Mtrr[Index].Mask = ((~(MemoryLength - 1)) & MTRR_LIB_CACHE_VALID_ADDRESS) | MTRR_LIB_CACHE_MTRR_ENABLED;
+    MtrrSetting.Variables.Mtrr[Index].Mask = ((~(MemoryLength - 1)) & ValidMtrrAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED;
 
     MemOverflow += MemoryLength;
     Index++;
@@ -185,15 +216,15 @@ SetPeiCacheMode (
   while (MaxMemoryLength != MemoryLength) {
     MemoryLengthUc = GetPowerOfTwo64 (MaxMemoryLength - MemoryLength);
 
-    MtrrSetting.Variables.Mtrr[Index].Base = ((MaxMemoryLength - MemoryLengthUc) & MTRR_LIB_CACHE_VALID_ADDRESS) | CacheUncacheable;
-    MtrrSetting.Variables.Mtrr[Index].Mask= ((~(MemoryLengthUc   - 1)) & MTRR_LIB_CACHE_VALID_ADDRESS) | MTRR_LIB_CACHE_MTRR_ENABLED;
+    MtrrSetting.Variables.Mtrr[Index].Base = ((MaxMemoryLength - MemoryLengthUc) & ValidMtrrAddressMask) | CacheUncacheable;
+    MtrrSetting.Variables.Mtrr[Index].Mask= ((~(MemoryLengthUc   - 1)) & ValidMtrrAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED;
     MaxMemoryLength -= MemoryLengthUc;
     Index++;
   }
 
   MemOverflow =0x100000000;
   while (HighMemoryLength > 0) {
-    MtrrSetting.Variables.Mtrr[Index].Base = (MemOverflow & MTRR_LIB_CACHE_VALID_ADDRESS) | CacheWriteBack;
+    MtrrSetting.Variables.Mtrr[Index].Base = (MemOverflow & ValidMtrrAddressMask) | CacheWriteBack;
     MemoryLength = HighMemoryLength;
     MemoryLength = GetPowerOfTwo64 (MemoryLength);
 
@@ -201,7 +232,7 @@ SetPeiCacheMode (
       MemoryLength = MemOverflow;
     }
 
-    MtrrSetting.Variables.Mtrr[Index].Mask = ((~(MemoryLength - 1)) & MTRR_LIB_CACHE_VALID_ADDRESS) | MTRR_LIB_CACHE_MTRR_ENABLED;
+    MtrrSetting.Variables.Mtrr[Index].Mask = ((~(MemoryLength - 1)) & ValidMtrrAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED;
 
     MemOverflow += MemoryLength;
     HighMemoryLength -= MemoryLength;
