@@ -38,7 +38,8 @@
 #define IS_IVY_BRIDGE_PROCESSOR(DisplayFamily, DisplayModel) \
   (DisplayFamily == 0x06 && \
    (                        \
-    DisplayModel == 0x3A    \
+    DisplayModel == 0x3A || \
+    DisplayModel == 0x3E    \
     )                       \
    )
 
