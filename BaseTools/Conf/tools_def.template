@@ -7580,4 +7580,4 @@ RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_F
 #################
 # Build rule order
 #################
-*_*_*_*_BUILDRULEORDER = nasm asm Asm ASM S s
+*_*_*_*_BUILDRULEORDER = nasm asm Asm ASM S s nasmb asm16
