@@ -1036,13 +1036,12 @@ MtrrLibInitializeMtrrMask (
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
 
     PhysicalAddressBits = (UINT8) RegEax;
-
-    *MtrrValidBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
-    *MtrrValidAddressMask = *MtrrValidBitsMask & 0xfffffffffffff000ULL;
   } else {
-    *MtrrValidBitsMask    = MTRR_LIB_MSR_VALID_MASK;
-    *MtrrValidAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
+    PhysicalAddressBits = 36;
   }
+
+  *MtrrValidBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
+  *MtrrValidAddressMask = *MtrrValidBitsMask & 0xfffffffffffff000ULL;
 }
 
 
