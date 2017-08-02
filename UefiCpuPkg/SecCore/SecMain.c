@@ -281,7 +281,7 @@ SecStartupPhase2(
     // will be built based on them in PEI phase.
     //
     SecCoreData->PeiTemporaryRamBase = (VOID *)(((UINTN)SecCoreData->PeiTemporaryRamBase + 7) & ~0x07);
-    SecCoreData->PeiTemporaryRamSize &= ~0x07;
+    SecCoreData->PeiTemporaryRamSize &= ~(UINTN)0x07;
   } else {
     //
     // No addition PPI, PpiList directly point to the common PPI list.
