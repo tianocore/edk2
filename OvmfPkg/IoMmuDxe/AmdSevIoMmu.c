@@ -1,9 +1,9 @@
 /** @file
 
-  The protocol provides support to allocate, free, map and umap a DMA buffer for
-  bus master (e.g PciHostBridge). When SEV is enabled, the DMA operations must
-  be performed on unencrypted buffer hence we use a bounce buffer to map the guest
-  buffer into an unencrypted DMA buffer.
+  The protocol provides support to allocate, free, map and umap a DMA buffer
+  for bus master (e.g PciHostBridge). When SEV is enabled, the DMA operations
+  must be performed on unencrypted buffer hence we use a bounce buffer to map
+  the guest buffer into an unencrypted DMA buffer.
 
   Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
@@ -31,29 +31,33 @@ typedef struct {
 #define NO_MAPPING             (VOID *) (UINTN) -1
 
 /**
-  Provides the controller-specific addresses required to access system memory from a
-  DMA bus master. On SEV guest, the DMA operations must be performed on shared
-  buffer hence we allocate a bounce buffer to map the HostAddress to a DeviceAddress.
-  The Encryption attribute is removed from the DeviceAddress buffer.
+  Provides the controller-specific addresses required to access system memory
+  from a DMA bus master. On SEV guest, the DMA operations must be performed on
+  shared buffer hence we allocate a bounce buffer to map the HostAddress to a
+  DeviceAddress. The Encryption attribute is removed from the DeviceAddress
+  buffer.
 
   @param  This                  The protocol instance pointer.
   @param  Operation             Indicates if the bus master is going to read or
                                 write to system memory.
-  @param  HostAddress           The system memory address to map to the PCI controller.
+  @param  HostAddress           The system memory address to map to the PCI
+                                controller.
   @param  NumberOfBytes         On input the number of bytes to map. On output
-                                the number of bytes
-                                that were mapped.
-  @param  DeviceAddress         The resulting map address for the bus master PCI
-                                controller to use to
-                                access the hosts HostAddress.
+                                the number of bytes that were mapped.
+  @param  DeviceAddress         The resulting map address for the bus master
+                                PCI controller to use to access the hosts
+                                HostAddress.
   @param  Mapping               A resulting value to pass to Unmap().
 
-  @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
-  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_SUCCESS           The range was mapped for the returned
+                                NumberOfBytes.
+  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common
+                                buffer.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
-  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
-                                of resources.
-  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a
+                                lack of resources.
+  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested
+                                address.
 
 **/
 EFI_STATUS
@@ -105,8 +109,8 @@ IoMmuMap (
         Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
         //
         // Common Buffer operations can not be remapped.  If the common buffer
-        // if above 4GB, then it is not possible to generate a mapping, so return
-        // an error.
+        // if above 4GB, then it is not possible to generate a mapping, so
+        // return an error.
         //
         return EFI_UNSUPPORTED;
     }
@@ -161,7 +165,12 @@ IoMmuMap (
   //
   // Clear the memory encryption mask from the device buffer
   //
-  Status = MemEncryptSevClearPageEncMask (0, MapInfo->DeviceAddress, MapInfo->NumberOfPages, TRUE);
+  Status = MemEncryptSevClearPageEncMask (
+             0,
+             MapInfo->DeviceAddress,
+             MapInfo->NumberOfPages,
+             TRUE
+             );
   ASSERT_EFI_ERROR(Status);
 
   //
@@ -188,9 +197,15 @@ IoMmuMap (
   //
   *Mapping       = MapInfo;
 
-  DEBUG ((DEBUG_VERBOSE, "%a Device 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
-        __FUNCTION__, MapInfo->DeviceAddress, MapInfo->HostAddress,
-        MapInfo->NumberOfPages, MapInfo->NumberOfBytes));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a Device 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
+    __FUNCTION__,
+    MapInfo->DeviceAddress,
+    MapInfo->HostAddress,
+    MapInfo->NumberOfPages,
+    MapInfo->NumberOfBytes
+    ));
 
   return EFI_SUCCESS;
 }
@@ -202,8 +217,10 @@ IoMmuMap (
   @param  Mapping               The mapping value returned from Map().
 
   @retval EFI_SUCCESS           The range was unmapped.
-  @retval EFI_INVALID_PARAMETER Mapping is not a value that was returned by Map().
-  @retval EFI_DEVICE_ERROR      The data was not committed to the target system memory.
+  @retval EFI_INVALID_PARAMETER Mapping is not a value that was returned by
+                                Map().
+  @retval EFI_DEVICE_ERROR      The data was not committed to the target system
+                                memory.
 **/
 EFI_STATUS
 EFIAPI
@@ -244,13 +261,24 @@ IoMmuUnmap (
       );
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a Device 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
-        __FUNCTION__, MapInfo->DeviceAddress, MapInfo->HostAddress,
-        MapInfo->NumberOfPages, MapInfo->NumberOfBytes));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a Device 0x%Lx Host 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
+    __FUNCTION__,
+    MapInfo->DeviceAddress,
+    MapInfo->HostAddress,
+    MapInfo->NumberOfPages,
+    MapInfo->NumberOfBytes
+    ));
   //
   // Restore the memory encryption mask
   //
-  Status = MemEncryptSevSetPageEncMask (0, MapInfo->DeviceAddress, MapInfo->NumberOfPages, TRUE);
+  Status = MemEncryptSevSetPageEncMask (
+             0,
+             MapInfo->DeviceAddress,
+             MapInfo->NumberOfPages,
+             TRUE
+             );
   ASSERT_EFI_ERROR(Status);
 
   //
@@ -267,16 +295,18 @@ IoMmuUnmap (
 
   @param  This                  The protocol instance pointer.
   @param  Type                  This parameter is not used and must be ignored.
-  @param  MemoryType            The type of memory to allocate, EfiBootServicesData
-                                or EfiRuntimeServicesData.
+  @param  MemoryType            The type of memory to allocate,
+                                EfiBootServicesData or EfiRuntimeServicesData.
   @param  Pages                 The number of pages to allocate.
-  @param  HostAddress           A pointer to store the base system memory address
-                                of the allocated range.
-  @param  Attributes            The requested bit mask of attributes for the allocated range.
+  @param  HostAddress           A pointer to store the base system memory
+                                address of the allocated range.
+  @param  Attributes            The requested bit mask of attributes for the
+                                allocated range.
 
   @retval EFI_SUCCESS           The requested memory pages were allocated.
-  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute
-                                bits are MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal
+                                attribute bits are MEMORY_WRITE_COMBINE and
+                                MEMORY_CACHED.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
 
@@ -341,7 +371,13 @@ IoMmuAllocateBuffer (
     ASSERT_EFI_ERROR(Status);
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a Address 0x%Lx Pages 0x%Lx\n", __FUNCTION__, PhysicalAddress, Pages));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a Address 0x%Lx Pages 0x%Lx\n",
+    __FUNCTION__,
+    PhysicalAddress,
+    Pages
+    ));
   return Status;
 }
 
@@ -350,11 +386,12 @@ IoMmuAllocateBuffer (
 
   @param  This                  The protocol instance pointer.
   @param  Pages                 The number of pages to free.
-  @param  HostAddress           The base system memory address of the allocated range.
+  @param  HostAddress           The base system memory address of the allocated
+                                range.
 
   @retval EFI_SUCCESS           The requested memory pages were freed.
-  @retval EFI_INVALID_PARAMETER The memory range specified by HostAddress and Pages
-                                was not allocated with AllocateBuffer().
+  @retval EFI_INVALID_PARAMETER The memory range specified by HostAddress and
+                                Pages was not allocated with AllocateBuffer().
 
 **/
 EFI_STATUS
@@ -370,10 +407,21 @@ IoMmuFreeBuffer (
   //
   // Set memory encryption mask
   //
-  Status = MemEncryptSevSetPageEncMask (0, (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress, Pages, TRUE);
+  Status = MemEncryptSevSetPageEncMask (
+             0,
+             (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
+             Pages,
+             TRUE
+             );
   ASSERT_EFI_ERROR(Status);
 
-  DEBUG ((DEBUG_VERBOSE, "%a Address 0x%Lx Pages 0x%Lx\n", __FUNCTION__, (UINTN)HostAddress, Pages));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a Address 0x%Lx Pages 0x%Lx\n",
+    __FUNCTION__,
+    (UINTN)HostAddress,
+    Pages
+    ));
   return gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress, Pages);
 }
 
@@ -389,30 +437,41 @@ IoMmuFreeBuffer (
   attribute to request DMA access (read and/or write).
 
   The DeviceHandle is used to identify which device submits the request.
-  The IOMMU implementation need translate the device path to an IOMMU device ID,
-  and set IOMMU hardware register accordingly.
+  The IOMMU implementation need translate the device path to an IOMMU device
+  ID, and set IOMMU hardware register accordingly.
   1) DeviceHandle can be a standard PCI device.
      The memory for BusMasterRead need set EDKII_IOMMU_ACCESS_READ.
      The memory for BusMasterWrite need set EDKII_IOMMU_ACCESS_WRITE.
-     The memory for BusMasterCommonBuffer need set EDKII_IOMMU_ACCESS_READ|EDKII_IOMMU_ACCESS_WRITE.
-     After the memory is used, the memory need set 0 to keep it being protected.
+     The memory for BusMasterCommonBuffer need set
+     EDKII_IOMMU_ACCESS_READ|EDKII_IOMMU_ACCESS_WRITE.
+     After the memory is used, the memory need set 0 to keep it being
+     protected.
   2) DeviceHandle can be an ACPI device (ISA, I2C, SPI, etc).
-     The memory for DMA access need set EDKII_IOMMU_ACCESS_READ and/or EDKII_IOMMU_ACCESS_WRITE.
+     The memory for DMA access need set EDKII_IOMMU_ACCESS_READ and/or
+     EDKII_IOMMU_ACCESS_WRITE.
 
   @param[in]  This              The protocol instance pointer.
-  @param[in]  DeviceHandle      The device who initiates the DMA access request.
+  @param[in]  DeviceHandle      The device who initiates the DMA access
+                                request.
   @param[in]  Mapping           The mapping value returned from Map().
   @param[in]  IoMmuAccess       The IOMMU access.
 
-  @retval EFI_SUCCESS            The IoMmuAccess is set for the memory range specified by DeviceAddress and Length.
+  @retval EFI_SUCCESS            The IoMmuAccess is set for the memory range
+                                 specified by DeviceAddress and Length.
   @retval EFI_INVALID_PARAMETER  DeviceHandle is an invalid handle.
-  @retval EFI_INVALID_PARAMETER  Mapping is not a value that was returned by Map().
-  @retval EFI_INVALID_PARAMETER  IoMmuAccess specified an illegal combination of access.
+  @retval EFI_INVALID_PARAMETER  Mapping is not a value that was returned by
+                                 Map().
+  @retval EFI_INVALID_PARAMETER  IoMmuAccess specified an illegal combination
+                                 of access.
   @retval EFI_UNSUPPORTED        DeviceHandle is unknown by the IOMMU.
-  @retval EFI_UNSUPPORTED        The bit mask of IoMmuAccess is not supported by the IOMMU.
-  @retval EFI_UNSUPPORTED        The IOMMU does not support the memory range specified by Mapping.
-  @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to modify the IOMMU access.
-  @retval EFI_DEVICE_ERROR       The IOMMU device reported an error while attempting the operation.
+  @retval EFI_UNSUPPORTED        The bit mask of IoMmuAccess is not supported
+                                 by the IOMMU.
+  @retval EFI_UNSUPPORTED        The IOMMU does not support the memory range
+                                 specified by Mapping.
+  @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to
+                                 modify the IOMMU access.
+  @retval EFI_DEVICE_ERROR       The IOMMU device reported an error while
+                                 attempting the operation.
 
 **/
 EFI_STATUS
