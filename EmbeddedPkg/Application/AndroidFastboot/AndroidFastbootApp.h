@@ -15,6 +15,7 @@
 #ifndef __ANDROID_FASTBOOT_APP_H__
 #define __ANDROID_FASTBOOT_APP_H__
 
+#include <Library/AndroidBootImgLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>

@@ -112,7 +112,7 @@ BootAndroidBootImg (
   )
 {
   EFI_STATUS                          Status;
-  CHAR8                               KernelArgs[BOOTIMG_KERNEL_ARGS_SIZE];
+  CHAR8                               KernelArgs[ANDROID_BOOTIMG_KERNEL_ARGS_SIZE];
   VOID                               *Kernel;
   UINTN                               KernelSize;
   VOID                               *Ramdisk;
