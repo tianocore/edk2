@@ -499,7 +499,7 @@ EDKII_IOMMU_PROTOCOL  mAmdSev = {
   Initialize Iommu Protocol.
 
 **/
-VOID
+EFI_STATUS
 EFIAPI
 AmdSevInstallIoMmuProtocol (
   VOID
@@ -514,5 +514,5 @@ AmdSevInstallIoMmuProtocol (
                   &gEdkiiIoMmuProtocolGuid, &mAmdSev,
                   NULL
                   );
-  ASSERT_EFI_ERROR (Status);
+  return Status;
 }

@@ -36,14 +36,12 @@ IoMmuDxeEntryPoint (
   EFI_STATUS    Status;
   EFI_HANDLE    Handle;
 
-  Status = EFI_SUCCESS;
-
   //
   // When SEV is enabled, install IoMmu protocol otherwise install the
   // placeholder protocol so that other dependent module can run.
   //
   if (MemEncryptSevIsEnabled ()) {
-    AmdSevInstallIoMmuProtocol ();
+    Status = AmdSevInstallIoMmuProtocol ();
   } else {
     Handle = NULL;
 

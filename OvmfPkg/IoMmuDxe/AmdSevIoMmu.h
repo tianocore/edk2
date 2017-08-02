@@ -35,7 +35,7 @@
   MemEncryptSevLib.
 
 **/
-VOID
+EFI_STATUS
 EFIAPI
 AmdSevInstallIoMmuProtocol (
   VOID
