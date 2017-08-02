@@ -203,8 +203,8 @@ IoMmuMap (
     __FUNCTION__,
     MapInfo->PlainTextAddress,
     MapInfo->CryptedAddress,
-    MapInfo->NumberOfPages,
-    MapInfo->NumberOfBytes
+    (UINT64)MapInfo->NumberOfPages,
+    (UINT64)MapInfo->NumberOfBytes
     ));
 
   return EFI_SUCCESS;
@@ -267,8 +267,8 @@ IoMmuUnmap (
     __FUNCTION__,
     MapInfo->PlainTextAddress,
     MapInfo->CryptedAddress,
-    MapInfo->NumberOfPages,
-    MapInfo->NumberOfBytes
+    (UINT64)MapInfo->NumberOfPages,
+    (UINT64)MapInfo->NumberOfBytes
     ));
   //
   // Restore the memory encryption mask
@@ -376,7 +376,7 @@ IoMmuAllocateBuffer (
     "%a Address 0x%Lx Pages 0x%Lx\n",
     __FUNCTION__,
     PhysicalAddress,
-    Pages
+    (UINT64)Pages
     ));
   return Status;
 }
@@ -419,8 +419,8 @@ IoMmuFreeBuffer (
     DEBUG_VERBOSE,
     "%a Address 0x%Lx Pages 0x%Lx\n",
     __FUNCTION__,
-    (UINTN)HostAddress,
-    Pages
+    (UINT64)(UINTN)HostAddress,
+    (UINT64)Pages
     ));
   return gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress, Pages);
 }
