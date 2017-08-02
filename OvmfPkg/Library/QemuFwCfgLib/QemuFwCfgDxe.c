@@ -20,6 +20,7 @@
 #include <Protocol/IoMmu.h>
 
 #include <Library/BaseLib.h>
+#include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -31,20 +32,6 @@ STATIC BOOLEAN mQemuFwCfgSupported = FALSE;
 STATIC BOOLEAN mQemuFwCfgDmaSupported;
 
 STATIC EDKII_IOMMU_PROTOCOL        *mIoMmuProtocol;
-/**
-
- Returns a boolean indicating whether SEV is enabled
-
- @retval    TRUE    SEV is enabled
- @retval    FALSE   SEV is disabled
-**/
-BOOLEAN
-InternalQemuFwCfgSevIsEnabled (
-  VOID
-  )
-{
-  return MemEncryptSevIsEnabled ();
-}
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -110,7 +97,8 @@ QemuFwCfgInitialize (
     // IoMmuDxe driver must have installed the IOMMU protocol. If we are not
     // able to locate the protocol then something must have gone wrong.
     //
-    Status = gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL, (VOID **)&mIoMmuProtocol);
+    Status = gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL,
+                    (VOID **)&mIoMmuProtocol);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR,
         "QemuFwCfgSevDma %a:%a Failed to locate IOMMU protocol.\n",
@@ -157,74 +145,308 @@ InternalQemuFwCfgDmaIsAvailable (
 }
 
 /**
- Allocate a bounce buffer for SEV DMA.
-
-  @param[in]     NumPage  Number of pages.
-  @param[out]    Buffer   Allocated DMA Buffer pointer
+  Function is used for allocating a bi-directional FW_CFG_DMA_ACCESS used
+  between Host and device to exchange the information. The buffer must be free'd
+  using FreeFwCfgDmaAccessBuffer ().
 
 **/
+STATIC
 VOID
-InternalQemuFwCfgSevDmaAllocateBuffer (
-  OUT    VOID     **Buffer,
-  IN     UINT32   NumPages
+AllocFwCfgDmaAccessBuffer (
+  OUT   VOID     **Access,
+  OUT   VOID     **MapInfo
   )
 {
-  EFI_STATUS    Status;
+  UINTN                 Size;
+  UINTN                 NumPages;
+  EFI_STATUS            Status;
+  VOID                  *HostAddress;
+  EFI_PHYSICAL_ADDRESS  DmaAddress;
+  VOID                  *Mapping;
 
-  ASSERT (mIoMmuProtocol != NULL);
+  Size = sizeof (FW_CFG_DMA_ACCESS);
+  NumPages = EFI_SIZE_TO_PAGES (Size);
 
+  //
+  // As per UEFI spec, in order to map a host address with
+  // BusMasterCommomBuffer64, the buffer must be allocated using the IOMMU
+  // AllocateBuffer()
+  //
   Status = mIoMmuProtocol->AllocateBuffer (
-                            mIoMmuProtocol,
-                            0,
-                            EfiBootServicesData,
-                            NumPages,
-                            Buffer,
-                            EDKII_IOMMU_ATTRIBUTE_MEMORY_CACHED
-                          );
+                             mIoMmuProtocol,
+                             AllocateAnyPages,
+                             EfiBootServicesData,
+                             NumPages,
+                             &HostAddress,
+                             EDKII_IOMMU_ATTRIBUTE_DUAL_ADDRESS_CYCLE
+                             );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR,
-      "%a:%a failed to allocate %u pages\n", gEfiCallerBaseName, __FUNCTION__,
-      NumPages));
+      "%a:%a failed to allocate FW_CFG_DMA_ACCESS\n", gEfiCallerBaseName,
+      __FUNCTION__));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
 
-  DEBUG ((DEBUG_VERBOSE,
-    "%a:%a buffer 0x%Lx Pages %u\n", gEfiCallerBaseName, __FUNCTION__,
-    (UINT64)(UINTN)Buffer, NumPages));
+  //
+  // Map the host buffer with BusMasterCommonBuffer64
+  //
+  Status = mIoMmuProtocol->Map (
+                             mIoMmuProtocol,
+                             EdkiiIoMmuOperationBusMasterCommonBuffer64,
+                             HostAddress,
+                             &Size,
+                             &DmaAddress,
+                             &Mapping
+                             );
+  if (EFI_ERROR (Status)) {
+    mIoMmuProtocol->FreeBuffer (mIoMmuProtocol, NumPages, HostAddress);
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to Map() FW_CFG_DMA_ACCESS\n", gEfiCallerBaseName,
+      __FUNCTION__));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  if (Size < sizeof (FW_CFG_DMA_ACCESS)) {
+    mIoMmuProtocol->Unmap (mIoMmuProtocol, Mapping);
+    mIoMmuProtocol->FreeBuffer (mIoMmuProtocol, NumPages, HostAddress);
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to Map() - requested 0x%Lx got 0x%Lx\n", gEfiCallerBaseName,
+      __FUNCTION__, (UINT64)sizeof (FW_CFG_DMA_ACCESS), (UINT64)Size));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  *Access = HostAddress;
+  *MapInfo = Mapping;
 }
 
 /**
- Free the DMA buffer allocated using InternalQemuFwCfgSevDmaAllocateBuffer
-
-  @param[in]     NumPage  Number of pages.
-  @param[in]     Buffer   DMA Buffer pointer
+  Function is to used for freeing the Access buffer allocated using
+  AllocFwCfgDmaAccessBuffer()
 
 **/
+STATIC
 VOID
-InternalQemuFwCfgSevDmaFreeBuffer (
-  IN     VOID     *Buffer,
-  IN     UINT32   NumPages
+FreeFwCfgDmaAccessBuffer (
+  IN  VOID    *Access,
+  IN  VOID    *Mapping
   )
 {
-  EFI_STATUS    Status;
+  UINTN       NumPages;
+  EFI_STATUS  Status;
 
-  ASSERT (mIoMmuProtocol != NULL);
+  NumPages = EFI_SIZE_TO_PAGES (sizeof (FW_CFG_DMA_ACCESS));
 
-  Status = mIoMmuProtocol->FreeBuffer (
-                            mIoMmuProtocol,
-                            NumPages,
-                            Buffer
-                          );
+  Status = mIoMmuProtocol->Unmap (mIoMmuProtocol, Mapping);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR,
-      "%a:%a failed to free buffer 0x%Lx pages %u\n", gEfiCallerBaseName,
-      __FUNCTION__, (UINT64)(UINTN)Buffer, NumPages));
+      "%a:%a failed to UnMap() Mapping 0x%Lx\n", gEfiCallerBaseName,
+      __FUNCTION__, (UINT64)(UINTN)Mapping));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
 
-  DEBUG ((DEBUG_VERBOSE,
-    "%a:%a buffer 0x%Lx Pages %u\n", gEfiCallerBaseName,__FUNCTION__,
-    (UINT64)(UINTN)Buffer, NumPages));
+  Status = mIoMmuProtocol->FreeBuffer (mIoMmuProtocol, NumPages, Access);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to Free() 0x%Lx\n", gEfiCallerBaseName, __FUNCTION__,
+      (UINT64)(UINTN)Access));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+}
+
+/**
+  Function is used for mapping host address to device address. The buffer must
+  be unmapped with UnmapDmaDataBuffer ().
+
+**/
+STATIC
+VOID
+MapFwCfgDmaDataBuffer (
+  IN  BOOLEAN               IsWrite,
+  IN  VOID                  *HostAddress,
+  IN  UINT32                Size,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **MapInfo
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   NumberOfBytes;
+  VOID                    *Mapping;
+  EFI_PHYSICAL_ADDRESS    PhysicalAddress;
+
+  NumberOfBytes = Size;
+  Status = mIoMmuProtocol->Map (
+                             mIoMmuProtocol,
+                             (IsWrite ?
+                              EdkiiIoMmuOperationBusMasterRead64 :
+                              EdkiiIoMmuOperationBusMasterWrite64),
+                             HostAddress,
+                             &NumberOfBytes,
+                             &PhysicalAddress,
+                             &Mapping
+                             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to Map() Address 0x%Lx Size 0x%Lx\n", gEfiCallerBaseName,
+      __FUNCTION__, (UINT64)(UINTN)HostAddress, (UINT64)Size));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  if (NumberOfBytes < Size) {
+    mIoMmuProtocol->Unmap (mIoMmuProtocol, Mapping);
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to Map() - requested 0x%x got 0x%Lx\n", gEfiCallerBaseName,
+      __FUNCTION__, Size, (UINT64)NumberOfBytes));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  *DeviceAddress = PhysicalAddress;
+  *MapInfo = Mapping;
+}
+
+STATIC
+VOID
+UnmapFwCfgDmaDataBuffer (
+  IN  VOID  *Mapping
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = mIoMmuProtocol->Unmap (mIoMmuProtocol, Mapping);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a:%a failed to UnMap() Mapping 0x%Lx\n", gEfiCallerBaseName,
+      __FUNCTION__, (UINT64)(UINTN)Mapping));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+}
+
+/**
+  Transfer an array of bytes, or skip a number of bytes, using the DMA
+  interface.
+
+  @param[in]     Size     Size in bytes to transfer or skip.
+
+  @param[in,out] Buffer   Buffer to read data into or write data from. Ignored,
+                          and may be NULL, if Size is zero, or Control is
+                          FW_CFG_DMA_CTL_SKIP.
+
+  @param[in]     Control  One of the following:
+                          FW_CFG_DMA_CTL_WRITE - write to fw_cfg from Buffer.
+                          FW_CFG_DMA_CTL_READ  - read from fw_cfg into Buffer.
+                          FW_CFG_DMA_CTL_SKIP  - skip bytes in fw_cfg.
+**/
+VOID
+InternalQemuFwCfgDmaBytes (
+  IN     UINT32   Size,
+  IN OUT VOID     *Buffer OPTIONAL,
+  IN     UINT32   Control
+  )
+{
+  volatile FW_CFG_DMA_ACCESS LocalAccess;
+  volatile FW_CFG_DMA_ACCESS *Access;
+  UINT32                     AccessHigh, AccessLow;
+  UINT32                     Status;
+  VOID                       *AccessMapping, *DataMapping;
+  VOID                       *DataBuffer;
+
+  ASSERT (Control == FW_CFG_DMA_CTL_WRITE || Control == FW_CFG_DMA_CTL_READ ||
+    Control == FW_CFG_DMA_CTL_SKIP);
+
+  if (Size == 0) {
+    return;
+  }
+
+  Access = &LocalAccess;
+  AccessMapping = NULL;
+  DataMapping = NULL;
+  DataBuffer = Buffer;
+
+  //
+  // When SEV is enabled, map Buffer to DMA address before issuing the DMA
+  // request
+  //
+  if (MemEncryptSevIsEnabled ()) {
+    VOID                  *AccessBuffer;
+    EFI_PHYSICAL_ADDRESS  DataBufferAddress;
+
+    //
+    // Allocate DMA Access buffer
+    //
+    AllocFwCfgDmaAccessBuffer (&AccessBuffer, &AccessMapping);
+
+    Access = AccessBuffer;
+
+    //
+    // Map actual data buffer
+    //
+    if (Control != FW_CFG_DMA_CTL_SKIP) {
+      MapFwCfgDmaDataBuffer (
+        Control == FW_CFG_DMA_CTL_WRITE,
+        Buffer,
+        Size,
+        &DataBufferAddress,
+        &DataMapping
+        );
+
+      DataBuffer = (VOID *) (UINTN) DataBufferAddress;
+    }
+  }
+
+  Access->Control = SwapBytes32 (Control);
+  Access->Length  = SwapBytes32 (Size);
+  Access->Address = SwapBytes64 ((UINTN)DataBuffer);
+
+  //
+  // Delimit the transfer from (a) modifications to Access, (b) in case of a
+  // write, from writes to Buffer by the caller.
+  //
+  MemoryFence ();
+
+  //
+  // Start the transfer.
+  //
+  AccessHigh = (UINT32)RShiftU64 ((UINTN)Access, 32);
+  AccessLow  = (UINT32)(UINTN)Access;
+  IoWrite32 (FW_CFG_IO_DMA_ADDRESS,     SwapBytes32 (AccessHigh));
+  IoWrite32 (FW_CFG_IO_DMA_ADDRESS + 4, SwapBytes32 (AccessLow));
+
+  //
+  // Don't look at Access.Control before starting the transfer.
+  //
+  MemoryFence ();
+
+  //
+  // Wait for the transfer to complete.
+  //
+  do {
+    Status = SwapBytes32 (Access->Control);
+    ASSERT ((Status & FW_CFG_DMA_CTL_ERROR) == 0);
+  } while (Status != 0);
+
+  //
+  // After a read, the caller will want to use Buffer.
+  //
+  MemoryFence ();
+
+  //
+  // If Access buffer was dynamically allocated then free it.
+  //
+  if (AccessMapping != NULL) {
+    FreeFwCfgDmaAccessBuffer ((VOID *)Access, AccessMapping);
+  }
+
+  //
+  // If DataBuffer was mapped then unmap it.
+  //
+  if (DataMapping != NULL) {
+    UnmapFwCfgDmaDataBuffer (DataMapping);
+  }
 }

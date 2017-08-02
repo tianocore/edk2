@@ -45,39 +45,25 @@ InternalQemuFwCfgDmaIsAvailable (
   );
 
 /**
- Returns a boolean indicating whether SEV support is enabled
+  Transfer an array of bytes, or skip a number of bytes, using the DMA
+  interface.
 
- @retval    TRUE    SEV is enabled
- @retval    FALSE   SEV is disabled
-**/
-BOOLEAN
-InternalQemuFwCfgSevIsEnabled (
-  VOID
-  );
+  @param[in]     Size     Size in bytes to transfer or skip.
 
-/**
- Allocate a bounce buffer for SEV DMA.
+  @param[in,out] Buffer   Buffer to read data into or write data from. Ignored,
+                          and may be NULL, if Size is zero, or Control is
+                          FW_CFG_DMA_CTL_SKIP.
 
-  @param[out]    Buffer   Allocated DMA Buffer pointer
-  @param[in]     NumPage  Number of pages.
-
+  @param[in]     Control  One of the following:
+                          FW_CFG_DMA_CTL_WRITE - write to fw_cfg from Buffer.
+                          FW_CFG_DMA_CTL_READ  - read from fw_cfg into Buffer.
+                          FW_CFG_DMA_CTL_SKIP  - skip bytes in fw_cfg.
 **/
 VOID
-InternalQemuFwCfgSevDmaAllocateBuffer (
-  OUT    VOID     **Buffer,
-  IN     UINT32   NumPages
+InternalQemuFwCfgDmaBytes (
+  IN     UINT32   Size,
+  IN OUT VOID     *Buffer OPTIONAL,
+  IN     UINT32   Control
   );
 
-/**
- Free the DMA buffer allocated using InternalQemuFwCfgSevDmaAllocateBuffer
-
-  @param[in]     NumPage  Number of pages.
-  @param[in]     Buffer   DMA Buffer pointer
-
-**/
-VOID
-InternalQemuFwCfgSevDmaFreeBuffer (
-  IN     VOID     *Buffer,
-  IN     UINT32   NumPages
-  );
 #endif

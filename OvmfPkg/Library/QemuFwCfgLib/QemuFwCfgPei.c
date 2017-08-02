@@ -16,6 +16,7 @@
 **/
 
 #include <Library/BaseLib.h>
+#include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/MemEncryptSevLib.h>
@@ -85,7 +86,7 @@ QemuFwCfgInitialize (
     // (which need to allocate dynamic memory and allocating a PAGE size'd
     // buffer can be challenge in PEI phase)
     //
-    if (InternalQemuFwCfgSevIsEnabled ()) {
+    if (MemEncryptSevIsEnabled ()) {
       DEBUG ((DEBUG_INFO, "SEV: QemuFwCfg fallback to IO Port interface.\n"));
     } else {
       mQemuFwCfgDmaSupported = TRUE;
@@ -129,56 +130,78 @@ InternalQemuFwCfgDmaIsAvailable (
 }
 
 /**
+  Transfer an array of bytes, or skip a number of bytes, using the DMA
+  interface.
 
- Returns a boolean indicating whether SEV is enabled
+  @param[in]     Size     Size in bytes to transfer or skip.
 
- @retval    TRUE    SEV is enabled
- @retval    FALSE   SEV is disabled
-**/
-BOOLEAN
-InternalQemuFwCfgSevIsEnabled (
-  VOID
-  )
-{
-  return MemEncryptSevIsEnabled ();
-}
+  @param[in,out] Buffer   Buffer to read data into or write data from. Ignored,
+                          and may be NULL, if Size is zero, or Control is
+                          FW_CFG_DMA_CTL_SKIP.
 
-/**
- Allocate a bounce buffer for SEV DMA.
-
-  @param[in]     NumPage  Number of pages.
-  @param[out]    Buffer   Allocated DMA Buffer pointer
-
+  @param[in]     Control  One of the following:
+                          FW_CFG_DMA_CTL_WRITE - write to fw_cfg from Buffer.
+                          FW_CFG_DMA_CTL_READ  - read from fw_cfg into Buffer.
+                          FW_CFG_DMA_CTL_SKIP  - skip bytes in fw_cfg.
 **/
 VOID
-InternalQemuFwCfgSevDmaAllocateBuffer (
-  OUT    VOID     **Buffer,
-  IN     UINT32   NumPages
+InternalQemuFwCfgDmaBytes (
+  IN     UINT32   Size,
+  IN OUT VOID     *Buffer OPTIONAL,
+  IN     UINT32   Control
   )
 {
+  volatile FW_CFG_DMA_ACCESS Access;
+  UINT32                     AccessHigh, AccessLow;
+  UINT32                     Status;
+
+  ASSERT (Control == FW_CFG_DMA_CTL_WRITE || Control == FW_CFG_DMA_CTL_READ ||
+    Control == FW_CFG_DMA_CTL_SKIP);
+
+  if (Size == 0) {
+    return;
+  }
+
   //
-  // We should never reach here
+  // SEV does not support DMA operations in PEI stage, we should
+  // not have reached here.
   //
-  ASSERT (FALSE);
-  CpuDeadLoop ();
+  ASSERT (!MemEncryptSevIsEnabled ());
+
+  Access.Control = SwapBytes32 (Control);
+  Access.Length  = SwapBytes32 (Size);
+  Access.Address = SwapBytes64 ((UINTN)Buffer);
+
+  //
+  // Delimit the transfer from (a) modifications to Access, (b) in case of a
+  // write, from writes to Buffer by the caller.
+  //
+  MemoryFence ();
+
+  //
+  // Start the transfer.
+  //
+  AccessHigh = (UINT32)RShiftU64 ((UINTN)&Access, 32);
+  AccessLow  = (UINT32)(UINTN)&Access;
+  IoWrite32 (FW_CFG_IO_DMA_ADDRESS,     SwapBytes32 (AccessHigh));
+  IoWrite32 (FW_CFG_IO_DMA_ADDRESS + 4, SwapBytes32 (AccessLow));
+
+  //
+  // Don't look at Access.Control before starting the transfer.
+  //
+  MemoryFence ();
+
+  //
+  // Wait for the transfer to complete.
+  //
+  do {
+    Status = SwapBytes32 (Access.Control);
+    ASSERT ((Status & FW_CFG_DMA_CTL_ERROR) == 0);
+  } while (Status != 0);
+
+  //
+  // After a read, the caller will want to use Buffer.
+  //
+  MemoryFence ();
 }
 
-/**
- Free the DMA buffer allocated using InternalQemuFwCfgSevDmaAllocateBuffer
-
-  @param[in]     NumPage  Number of pages.
-  @param[in]     Buffer   DMA Buffer pointer
-
-**/
-VOID
-InternalQemuFwCfgSevDmaFreeBuffer (
-  IN     VOID     *Buffer,
-  IN     UINT32   NumPages
-  )
-{
-  //
-  // We should never reach here
-  //
-  ASSERT (FALSE);
-  CpuDeadLoop ();
-}
