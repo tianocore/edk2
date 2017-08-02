@@ -25,8 +25,8 @@
 BOOLEAN                   InterruptState = FALSE;
 EFI_HANDLE                mCpuHandle = NULL;
 BOOLEAN                   mIsFlushingGCD;
-UINT64                    mValidMtrrAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
-UINT64                    mValidMtrrBitsMask    = MTRR_LIB_MSR_VALID_MASK;
+UINT64                    mValidMtrrAddressMask;
+UINT64                    mValidMtrrBitsMask;
 UINT64                    mTimerPeriod = 0;
 
 FIXED_MTRR    mFixedMtrrTable[] = {
@@ -510,13 +510,12 @@ InitializeMtrrMask (
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
 
     PhysicalAddressBits = (UINT8) RegEax;
-
-    mValidMtrrBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
-    mValidMtrrAddressMask = mValidMtrrBitsMask & 0xfffffffffffff000ULL;
   } else {
-    mValidMtrrBitsMask    = MTRR_LIB_MSR_VALID_MASK;
-    mValidMtrrAddressMask = MTRR_LIB_CACHE_VALID_ADDRESS;
+    PhysicalAddressBits = 36;
   }
+
+  mValidMtrrBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
+  mValidMtrrAddressMask = mValidMtrrBitsMask & 0xfffffffffffff000ULL;
 }
 
 /**
