@@ -280,6 +280,10 @@ IoMmuUnmap (
              TRUE
              );
   ASSERT_EFI_ERROR(Status);
+  ZeroMem (
+    (VOID*)(UINTN)MapInfo->PlainTextAddress,
+    EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages)
+    );
 
   //
   // Free the mapped buffer and the MAP_INFO structure.
@@ -414,6 +418,7 @@ IoMmuFreeBuffer (
              TRUE
              );
   ASSERT_EFI_ERROR(Status);
+  ZeroMem (HostAddress, EFI_PAGES_TO_SIZE (Pages));
 
   DEBUG ((
     DEBUG_VERBOSE,
