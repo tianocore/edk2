@@ -223,7 +223,10 @@ IoMmuMap (
              MapInfo->NumberOfPages,
              TRUE
              );
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    CpuDeadLoop ();
+  }
 
   //
   // If this is a read operation from the Bus Master's point of view,
@@ -365,7 +368,10 @@ IoMmuUnmap (
              MapInfo->NumberOfPages,
              TRUE
              );
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    CpuDeadLoop ();
+  }
 
   //
   // For BusMasterCommonBuffer[64] operations, copy the stashed data to the
