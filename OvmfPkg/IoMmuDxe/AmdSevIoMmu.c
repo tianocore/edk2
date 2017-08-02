@@ -72,9 +72,7 @@ IoMmuMap (
   )
 {
   EFI_STATUS                                        Status;
-  EFI_PHYSICAL_ADDRESS                              PhysicalAddress;
   MAP_INFO                                          *MapInfo;
-  EFI_PHYSICAL_ADDRESS                              DmaMemoryTop;
   EFI_ALLOCATE_TYPE                                 AllocateType;
 
   if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL ||
@@ -83,87 +81,104 @@ IoMmuMap (
   }
 
   //
-  // Make sure that Operation is valid
-  //
-  if ((UINT32) Operation >= EdkiiIoMmuOperationMaximum) {
-    return EFI_INVALID_PARAMETER;
-  }
-  PhysicalAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
-
-  DmaMemoryTop = (UINTN)-1;
-  AllocateType = AllocateAnyPages;
-
-  if (((Operation != EdkiiIoMmuOperationBusMasterRead64 &&
-        Operation != EdkiiIoMmuOperationBusMasterWrite64 &&
-        Operation != EdkiiIoMmuOperationBusMasterCommonBuffer64)) &&
-      ((PhysicalAddress + *NumberOfBytes) > SIZE_4GB)) {
-    //
-    // If the root bridge or the device cannot handle performing DMA above
-    // 4GB but any part of the DMA transfer being mapped is above 4GB, then
-    // map the DMA transfer to a buffer below 4GB.
-    //
-    DmaMemoryTop = SIZE_4GB - 1;
-    AllocateType = AllocateMaxAddress;
-
-    if (Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
-        Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
-        //
-        // Common Buffer operations can not be remapped.  If the common buffer
-        // if above 4GB, then it is not possible to generate a mapping, so
-        // return an error.
-        //
-        return EFI_UNSUPPORTED;
-    }
-  }
-
-  //
-  // CommandBuffer was allocated by us (AllocateBuffer) and is already in
-  // unencryted buffer so no need to create bounce buffer
-  //
-  if (Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
-      Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
-    *Mapping = NO_MAPPING;
-    *DeviceAddress = PhysicalAddress;
-
-    return EFI_SUCCESS;
-  }
-
-  //
   // Allocate a MAP_INFO structure to remember the mapping when Unmap() is
   // called later.
   //
   MapInfo = AllocatePool (sizeof (MAP_INFO));
   if (MapInfo == NULL) {
-    *NumberOfBytes = 0;
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Failed;
   }
 
   //
-  // Initialize the MAP_INFO structure
+  // Initialize the MAP_INFO structure, except the PlainTextAddress field
   //
   MapInfo->Operation         = Operation;
   MapInfo->NumberOfBytes     = *NumberOfBytes;
   MapInfo->NumberOfPages     = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
-  MapInfo->CryptedAddress    = PhysicalAddress;
-  MapInfo->PlainTextAddress  = DmaMemoryTop;
+  MapInfo->CryptedAddress    = (UINTN)HostAddress;
 
   //
-  // Allocate a buffer to map the transfer to.
+  // In the switch statement below, we point "MapInfo->PlainTextAddress" to the
+  // plaintext buffer, according to Operation.
   //
-  Status = gBS->AllocatePages (
-                  AllocateType,
-                  EfiBootServicesData,
-                  MapInfo->NumberOfPages,
-                  &MapInfo->PlainTextAddress
-                  );
-  if (EFI_ERROR (Status)) {
+  MapInfo->PlainTextAddress = MAX_ADDRESS;
+  AllocateType = AllocateAnyPages;
+  switch (Operation) {
+  //
+  // For BusMasterRead[64] and BusMasterWrite[64] operations, a bounce buffer
+  // is necessary regardless of whether the original (crypted) buffer crosses
+  // the 4GB limit or not -- we have to allocate a separate plaintext buffer.
+  // The only variable is whether the plaintext buffer should be under 4GB.
+  //
+  case EdkiiIoMmuOperationBusMasterRead:
+  case EdkiiIoMmuOperationBusMasterWrite:
+    MapInfo->PlainTextAddress = BASE_4GB - 1;
+    AllocateType = AllocateMaxAddress;
+    //
+    // fall through
+    //
+  case EdkiiIoMmuOperationBusMasterRead64:
+  case EdkiiIoMmuOperationBusMasterWrite64:
+    //
+    // Allocate the implicit plaintext bounce buffer.
+    //
+    Status = gBS->AllocatePages (
+                    AllocateType,
+                    EfiBootServicesData,
+                    MapInfo->NumberOfPages,
+                    &MapInfo->PlainTextAddress
+                    );
+    if (EFI_ERROR (Status)) {
+      goto FreeMapInfo;
+    }
+    break;
+
+  //
+  // For BusMasterCommonBuffer[64] operations, a plaintext buffer has been
+  // allocated already, with AllocateBuffer(). We only check whether the
+  // address is low enough for the requested operation.
+  //
+  case EdkiiIoMmuOperationBusMasterCommonBuffer:
+    if ((MapInfo->CryptedAddress > BASE_4GB) ||
+        (EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages) >
+         BASE_4GB - MapInfo->CryptedAddress)) {
+      //
+      // CommonBuffer operations cannot be remapped. If the common buffer is
+      // above 4GB, then it is not possible to generate a mapping, so return an
+      // error.
+      //
+      Status = EFI_UNSUPPORTED;
+      goto FreeMapInfo;
+    }
+    //
+    // fall through
+    //
+  case EdkiiIoMmuOperationBusMasterCommonBuffer64:
+    //
+    // The buffer at MapInfo->CryptedAddress comes from AllocateBuffer(),
+    // and it is already decrypted.
+    //
+    MapInfo->PlainTextAddress = MapInfo->CryptedAddress;
+
+    //
+    // Therefore no mapping is necessary.
+    //
+    *DeviceAddress = MapInfo->PlainTextAddress;
+    *Mapping       = NO_MAPPING;
     FreePool (MapInfo);
-    *NumberOfBytes = 0;
-    return Status;
+    return EFI_SUCCESS;
+
+  default:
+    //
+    // Operation is invalid
+    //
+    Status = EFI_INVALID_PARAMETER;
+    goto FreeMapInfo;
   }
 
   //
-  // Clear the memory encryption mask from the device buffer
+  // Clear the memory encryption mask on the plaintext buffer.
   //
   Status = MemEncryptSevClearPageEncMask (
              0,
@@ -188,13 +203,9 @@ IoMmuMap (
   }
 
   //
-  // The DeviceAddress is the address of the maped buffer below 4GB
+  // Populate output parameters.
   //
   *DeviceAddress = MapInfo->PlainTextAddress;
-
-  //
-  // Return a pointer to the MAP_INFO structure in Mapping
-  //
   *Mapping       = MapInfo;
 
   DEBUG ((
@@ -208,6 +219,13 @@ IoMmuMap (
     ));
 
   return EFI_SUCCESS;
+
+FreeMapInfo:
+  FreePool (MapInfo);
+
+Failed:
+  *NumberOfBytes = 0;
+  return Status;
 }
 
 /**
