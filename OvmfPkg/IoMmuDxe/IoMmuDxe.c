@@ -33,8 +33,10 @@ IoMmuDxeEntryPoint (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS    Status = EFI_SUCCESS;
-  EFI_HANDLE    Handle = NULL;
+  EFI_STATUS    Status;
+  EFI_HANDLE    Handle;
+
+  Status = EFI_SUCCESS;
 
   //
   // When SEV is enabled, install IoMmu protocol otherwise install the
@@ -43,6 +45,8 @@ IoMmuDxeEntryPoint (
   if (MemEncryptSevIsEnabled ()) {
     AmdSevInstallIoMmuProtocol ();
   } else {
+    Handle = NULL;
+
     Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
                   &gIoMmuAbsentProtocolGuid,
