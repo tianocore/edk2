@@ -35,12 +35,12 @@
 
 [LibraryClasses]
   BaseLib
-  UefiLib
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  DxeServicesTableLib
+  BaseMemoryLib
   DebugLib
   MemEncryptSevLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                     ## SOMETIME_PRODUCES

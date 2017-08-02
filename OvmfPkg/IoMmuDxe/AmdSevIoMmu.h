@@ -24,11 +24,11 @@
 #include <Protocol/IoMmu.h>
 
 #include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/MemEncryptSevLib.h>
 
 /**
   Install IOMMU protocol to provide the DMA support for PciHostBridge and

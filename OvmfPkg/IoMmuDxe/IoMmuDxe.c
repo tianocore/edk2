@@ -15,15 +15,6 @@
 
 **/
 
-#include <PiDxe.h>
-
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/MemEncryptSevLib.h>
-
 #include "AmdSevIoMmu.h"
 
 EFI_STATUS
