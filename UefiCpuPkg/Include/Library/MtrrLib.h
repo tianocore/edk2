@@ -31,33 +31,6 @@
 #define  RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER  2
 
 #define  MTRR_NUMBER_OF_FIXED_MTRR      11
-//
-// Below macro is deprecated, and should not be used.
-//
-#define  FIRMWARE_VARIABLE_MTRR_NUMBER  6
-#define  MTRR_LIB_IA32_MTRR_CAP                      0x0FE
-#define  MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK            0x0FF
-#define  MTRR_LIB_IA32_MTRR_FIX64K_00000             0x250
-#define  MTRR_LIB_IA32_MTRR_FIX16K_80000             0x258
-#define  MTRR_LIB_IA32_MTRR_FIX16K_A0000             0x259
-#define  MTRR_LIB_IA32_MTRR_FIX4K_C0000              0x268
-#define  MTRR_LIB_IA32_MTRR_FIX4K_C8000              0x269
-#define  MTRR_LIB_IA32_MTRR_FIX4K_D0000              0x26A
-#define  MTRR_LIB_IA32_MTRR_FIX4K_D8000              0x26B
-#define  MTRR_LIB_IA32_MTRR_FIX4K_E0000              0x26C
-#define  MTRR_LIB_IA32_MTRR_FIX4K_E8000              0x26D
-#define  MTRR_LIB_IA32_MTRR_FIX4K_F0000              0x26E
-#define  MTRR_LIB_IA32_MTRR_FIX4K_F8000              0x26F
-#define  MTRR_LIB_IA32_VARIABLE_MTRR_BASE            0x200
-//
-// Below macro is deprecated, and should not be used.
-//
-#define  MTRR_LIB_IA32_VARIABLE_MTRR_END             0x20F
-#define  MTRR_LIB_IA32_MTRR_DEF_TYPE                 0x2FF
-#define  MTRR_LIB_MSR_VALID_MASK                     0xFFFFFFFFFULL
-#define  MTRR_LIB_CACHE_VALID_ADDRESS                0xFFFFFF000ULL
-#define  MTRR_LIB_CACHE_MTRR_ENABLED                 0x800
-#define  MTRR_LIB_CACHE_FIXED_MTRR_ENABLED           0x400
 
 //
 // Structure to describe a fixed MTRR
