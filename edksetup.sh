@@ -54,7 +54,7 @@ function SetWorkspace()
     return 0
   fi
 
-  if [ ! ${BASH_SOURCE[0]} -ef ./edksetup.sh ]
+  if [ ! ${BASH_SOURCE[0]} -ef ./edksetup.sh ] && [ -z "$PACKAGES_PATH" ]
   then
     echo Run this script from the base of your tree.  For example:
     echo "  cd /Path/To/Edk/Root"
