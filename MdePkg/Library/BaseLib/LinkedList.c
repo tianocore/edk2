@@ -15,25 +15,47 @@
 #include "BaseLibInternals.h"
 
 /**
-  Worker function that locates the Node in the List.
+  If PcdVerifyNodeInList is TRUE, ASSERTs when SecondEntry is or is not part of
+  the same doubly-linked list as FirstEntry depending on the value of InList.
+  Independent of PcdVerifyNodeInList, ASSERTs when FirstEntry is not part of a
+  valid list.
 
-  By searching the List, finds the location of the Node in List. At the same time,
-  verifies the validity of this list.
+  If FirstEntry is NULL, then ASSERT().
+  If FirstEntry->ForwardLink is NULL, then ASSERT().
+  If FirstEntry->BackLink is NULL, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and List contains more than
+  PcdMaximumLinkedListLength nodes, then ASSERT().
+  If PcdVerifyNodeInList is TRUE and SecondEntry is NULL, then ASSERT().
+
+  @param  FirstEntry   A pointer to a node in a linked list.
+  @param  SecondEntry  A pointer to the node to locate.
+  @param  InList       Defines whether to check if SecondEntry is or is not part
+                       of the same doubly-linked list as FirstEntry.
+
+**/
+#if !defined (MDEPKG_NDEBUG)
+  #define ASSERT_VERIFY_NODE_IN_VALID_LIST(FirstEntry, SecondEntry, InList)  \
+    do {                                                                     \
+      if (FeaturePcdGet (PcdVerifyNodeInList)) {                             \
+        ASSERT (InList == IsNodeInList ((FirstEntry), (SecondEntry)));       \
+      } else {                                                               \
+        ASSERT (InternalBaseLibIsListValid (FirstEntry));                    \
+      }                                                                      \
+    } while (FALSE)
+#else
+  #define ASSERT_VERIFY_NODE_IN_VALID_LIST(FirstEntry, SecondEntry, InList)
+#endif
+
+/**
+  Worker function that verifies the validity of this list.
 
   If List is NULL, then ASSERT().
   If List->ForwardLink is NULL, then ASSERT().
-  If List->backLink is NULL, then ASSERT().
-  If Node is NULL, then ASSERT().
-  If PcdVerifyNodeInList is TRUE and DoMembershipCheck is TRUE and Node 
-  is in not a member of List, then return FALSE
+  If List->BackLink is NULL, then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and List contains more than
   PcdMaximumLinkedListLength nodes, then ASSERT().
 
   @param  List              A pointer to a node in a linked list.
-  @param  Node              A pointer to a node in a linked list.
-  @param  VerifyNodeInList  TRUE if a check should be made to see if Node is a 
-                            member of List.  FALSE if no membership test should 
-                            be performed.
 
   @retval   TRUE if PcdVerifyNodeInList is FALSE
   @retval   TRUE if DoMembershipCheck is FALSE
@@ -45,10 +67,8 @@
 **/
 BOOLEAN
 EFIAPI
-InternalBaseLibIsNodeInList (
-  IN CONST LIST_ENTRY  *List,
-  IN CONST LIST_ENTRY  *Node,
-  IN BOOLEAN           VerifyNodeInList
+InternalBaseLibIsListValid (
+  IN CONST LIST_ENTRY  *List
   )
 {
   UINTN             Count;
@@ -60,40 +80,11 @@ InternalBaseLibIsNodeInList (
   ASSERT (List != NULL);
   ASSERT (List->ForwardLink != NULL);
   ASSERT (List->BackLink != NULL);
-  ASSERT (Node != NULL);
-
-  Count = 0;
-  Ptr   = List;
-
-  if (FeaturePcdGet (PcdVerifyNodeInList) && VerifyNodeInList) {
-    //
-    // Check to see if Node is a member of List.  
-    // Exit early if the number of nodes in List >= PcdMaximumLinkedListLength
-    //
-    do {
-      Ptr = Ptr->ForwardLink;
-      if (PcdGet32 (PcdMaximumLinkedListLength) > 0) {
-        Count++;
-        //
-        // ASSERT() if the linked list is too long
-        //
-        ASSERT (Count < PcdGet32 (PcdMaximumLinkedListLength));
-
-        //
-        // Return if the linked list is too long
-        //
-        if (Count >= PcdGet32 (PcdMaximumLinkedListLength)) {
-          return (BOOLEAN)(Ptr == Node);
-        }
-      }
-    } while ((Ptr != List) && (Ptr != Node)); 
-
-    if (Ptr != Node) {
-      return FALSE;
-    }
-  }
 
   if (PcdGet32 (PcdMaximumLinkedListLength) > 0) {
+    Count = 0;
+    Ptr   = List;
+
     //
     // Count the total number of nodes in List.
     // Exit early if the number of nodes in List >= PcdMaximumLinkedListLength
@@ -104,9 +95,9 @@ InternalBaseLibIsNodeInList (
     } while ((Ptr != List) && (Count < PcdGet32 (PcdMaximumLinkedListLength)));
 
     //
-    // ASSERT() if the linked list is too long
+    // return whether linked list is too long
     //
-    ASSERT (Count < PcdGet32 (PcdMaximumLinkedListLength));
+    return (BOOLEAN)(Count < PcdGet32 (PcdMaximumLinkedListLength));
   }
 
   return TRUE;
@@ -238,7 +229,7 @@ InsertHeadList (
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (ListHead, Entry, FALSE));
+  ASSERT_VERIFY_NODE_IN_VALID_LIST (ListHead, Entry, FALSE);
   
   Entry->ForwardLink = ListHead->ForwardLink;
   Entry->BackLink = ListHead;
@@ -279,7 +270,7 @@ InsertTailList (
   //
   // ASSERT List not too long and Entry is not one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (ListHead, Entry, FALSE));
+  ASSERT_VERIFY_NODE_IN_VALID_LIST (ListHead, Entry, FALSE);
   
   Entry->ForwardLink = ListHead;
   Entry->BackLink = ListHead->BackLink;
@@ -317,7 +308,7 @@ GetFirstNode (
   //
   // ASSERT List not too long
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, List, FALSE));
+  ASSERT (InternalBaseLibIsListValid (List));
 
   return List->ForwardLink;
 }
@@ -353,7 +344,7 @@ GetNextNode (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
+  ASSERT_VERIFY_NODE_IN_VALID_LIST (List, Node, TRUE);
 
   return Node->ForwardLink;
 }
@@ -389,7 +380,7 @@ GetPreviousNode (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
+  ASSERT_VERIFY_NODE_IN_VALID_LIST (List, Node, TRUE);
  
   return Node->BackLink;
 }
@@ -422,7 +413,7 @@ IsListEmpty (
   //
   // ASSERT List not too long
   //
-  ASSERT (InternalBaseLibIsNodeInList (ListHead, ListHead, FALSE));
+  ASSERT (InternalBaseLibIsListValid (ListHead));
   
   return (BOOLEAN)(ListHead->ForwardLink == ListHead);
 }
@@ -463,7 +454,7 @@ IsNull (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
+  ASSERT_VERIFY_NODE_IN_VALID_LIST (List, Node, TRUE);
   
   return (BOOLEAN)(Node == List);
 }
@@ -501,7 +492,7 @@ IsNodeAtEnd (
   //
   // ASSERT List not too long and Node is one of the nodes of List
   //
-  ASSERT (InternalBaseLibIsNodeInList (List, Node, TRUE));
+  ASSERT_VERIFY_NODE_IN_VALID_LIST (List, Node, TRUE);
   
   return (BOOLEAN)(!IsNull (List, Node) && List->BackLink == Node);
 }
@@ -548,7 +539,7 @@ SwapListEntries (
   //
   // ASSERT Entry1 and Entry2 are in the same linked list
   //
-  ASSERT (InternalBaseLibIsNodeInList (FirstEntry, SecondEntry, TRUE));
+  ASSERT_VERIFY_NODE_IN_VALID_LIST (FirstEntry, SecondEntry, TRUE);
   
   //
   // Ptr is the node pointed to by FirstEntry->ForwardLink
