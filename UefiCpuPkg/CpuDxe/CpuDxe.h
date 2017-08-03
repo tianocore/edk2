@@ -19,6 +19,7 @@
 
 #include <Protocol/Cpu.h>
 #include <Protocol/MpService.h>
+#include <Register/Msr.h>
 
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
