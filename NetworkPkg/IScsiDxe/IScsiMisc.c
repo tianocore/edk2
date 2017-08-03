@@ -952,7 +952,7 @@ IScsiCreateKeywords (
       CONFIGURATION_VARSTORE_ID,
       (UINT16) (ATTEMPT_ISID_VAR_OFFSET + sizeof (KEYWORD_STR) * (Index - 1)),
       StringToken,
-      StringToken,
+      STRING_TOKEN (STR_ISCSI_ISID_HELP),
       0,
       0,
       ISID_CONFIGURABLE_MIN_LEN,

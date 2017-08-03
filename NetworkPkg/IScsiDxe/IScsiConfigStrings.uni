@@ -99,3 +99,4 @@
                                         #language x-UEFI-ns "iSCSIDisplayAttemptList"
 #string STR_ISCSI_ATTEMPT_ORDER         #language en-US "New Attempt Order"
                                         #language x-UEFI-ns "iSCSIAttemptOrder"
+#string STR_ISCSI_ISID_HELP             #language en-US "The iSCSI ISID. Default value are derived from MAC address. Only last 3 bytes are configurable."

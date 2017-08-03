@@ -205,11 +205,11 @@ IScsiParseIsIdFromString (
 
   IsIdStr = (CHAR16 *) String;
 
-  if (StrLen (IsIdStr) != 6) {
+  if (StrLen (IsIdStr) != 6 && StrLen (IsIdStr) != 12) {
     UnicodeSPrint (
       PortString,
       (UINTN) ISCSI_NAME_IFR_MAX_SIZE,
-      L"Error! Input is incorrect, please input 6 hex numbers!\n"
+      L"Error! Only last 3 bytes are configurable, please input 6 hex numbers for last 3 bytes only or 12 hex numbers for full SSID!\n"
       );
 
     CreatePopUp (
@@ -220,6 +220,10 @@ IScsiParseIsIdFromString (
       );
 
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (StrLen (IsIdStr) == 12) {
+    IsIdStr += 6;
   }
 
   for (Index = 3; Index < 6; Index++) {
