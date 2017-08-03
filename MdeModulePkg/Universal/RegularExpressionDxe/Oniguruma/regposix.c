@@ -255,8 +255,7 @@ reg_set_encoding(int mb_code)
     break;
 
   default:
-    return ;
-    break;
+    return;
   }
 
   onigenc_set_default_encoding(enc);

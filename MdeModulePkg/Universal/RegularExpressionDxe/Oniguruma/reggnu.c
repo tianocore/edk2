@@ -161,8 +161,7 @@ re_mbcinit(int mb_code)
     enc = ONIG_ENCODING_UTF8;
     break;
   default:
-    return ;
-    break;
+    return;
   }
 
   onigenc_set_default_encoding(enc);
