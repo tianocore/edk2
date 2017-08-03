@@ -13,7 +13,7 @@
 **/
     
 
-#include "../UefiShellDebug1CommandsLib.h"
+#include "UefiShellDebug1CommandsLib.h"
 #include <Guid/SmBios.h>
 #include "LibSmbiosView.h"
 #include "SmbiosView.h"

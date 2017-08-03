@@ -14,7 +14,7 @@
 
 **/
 
-#include "../UefiShellDebug1CommandsLib.h"
+#include "UefiShellDebug1CommandsLib.h"
 #include "QueryTable.h"
 #include "PrintInfo.h"
 

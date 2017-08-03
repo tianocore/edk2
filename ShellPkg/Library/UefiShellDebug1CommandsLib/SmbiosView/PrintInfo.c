@@ -14,7 +14,7 @@
 
 **/
 
-#include "../UefiShellDebug1CommandsLib.h"
+#include "UefiShellDebug1CommandsLib.h"
 #include "PrintInfo.h"
 #include "LibSmbiosView.h"
 #include "QueryTable.h"

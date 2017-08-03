@@ -12,7 +12,7 @@
 
 **/
 
-#include "../UefiShellDebug1CommandsLib.h"
+#include "UefiShellDebug1CommandsLib.h"
 #include "PrintInfo.h"
 #include "QueryTable.h"
 #include "EventLogInfo.h"
