@@ -2869,6 +2869,33 @@ PathCleanUpDirectories(
 
 
 /**
+  Checks whether FirstEntry and SecondEntry are part of the same doubly-linked
+  list.
+
+  If FirstEntry is NULL, then ASSERT().
+  If FirstEntry->ForwardLink is NULL, then ASSERT().
+  If FirstEntry->BackLink is NULL, then ASSERT().
+  If SecondEntry is NULL, then ASSERT();
+  If PcdMaximumLinkedListLength is not zero, and List contains more than
+  PcdMaximumLinkedListLength nodes, then ASSERT().
+
+  @param  FirstEntry   A pointer to a node in a linked list.
+  @param  SecondEntry  A pointer to the node to locate.
+
+  @retval TRUE   SecondEntry is in the same doubly-linked list as FirstEntry.
+  @retval FALSE  SecondEntry isn't in the same doubly-linked list as FirstEntry,
+                 or FirstEntry is invalid.
+
+**/
+BOOLEAN
+EFIAPI
+IsNodeInList (
+  IN      CONST LIST_ENTRY      *FirstEntry,
+  IN      CONST LIST_ENTRY      *SecondEntry
+  );
+
+
+/**
   Initializes the head node of a doubly linked list, and returns the pointer to
   the head node of the doubly linked list.
 

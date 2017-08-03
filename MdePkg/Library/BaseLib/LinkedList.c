@@ -1,7 +1,7 @@
 /** @file
   Linked List Library Functions.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -110,6 +110,70 @@ InternalBaseLibIsNodeInList (
   }
 
   return TRUE;
+}
+
+/**
+  Checks whether FirstEntry and SecondEntry are part of the same doubly-linked
+  list.
+
+  If FirstEntry is NULL, then ASSERT().
+  If FirstEntry->ForwardLink is NULL, then ASSERT().
+  If FirstEntry->BackLink is NULL, then ASSERT().
+  If SecondEntry is NULL, then ASSERT();
+  If PcdMaximumLinkedListLength is not zero, and List contains more than
+  PcdMaximumLinkedListLength nodes, then ASSERT().
+
+  @param  FirstEntry   A pointer to a node in a linked list.
+  @param  SecondEntry  A pointer to the node to locate.
+
+  @retval TRUE   SecondEntry is in the same doubly-linked list as FirstEntry.
+  @retval FALSE  SecondEntry isn't in the same doubly-linked list as FirstEntry,
+                 or FirstEntry is invalid.
+
+**/
+BOOLEAN
+EFIAPI
+IsNodeInList (
+  IN      CONST LIST_ENTRY      *FirstEntry,
+  IN      CONST LIST_ENTRY      *SecondEntry
+  )
+{
+  UINTN             Count;
+  CONST LIST_ENTRY  *Ptr;
+
+  //
+  // ASSERT List not too long
+  //
+  ASSERT (InternalBaseLibIsListValid (FirstEntry));
+
+  ASSERT (SecondEntry != NULL);
+
+  Count = 0;
+  Ptr   = FirstEntry;
+
+  //
+  // Check to see if SecondEntry is a member of FirstEntry.  
+  // Exit early if the number of nodes in List >= PcdMaximumLinkedListLength
+  //
+  do {
+    Ptr = Ptr->ForwardLink;
+    if (PcdGet32 (PcdMaximumLinkedListLength) > 0) {
+      Count++;
+
+      //
+      // Return if the linked list is too long
+      //
+      if (Count == PcdGet32 (PcdMaximumLinkedListLength)) {
+        return (BOOLEAN)(Ptr == SecondEntry);
+      }
+    }
+
+    if (Ptr == SecondEntry) {
+      return TRUE;
+    }
+  } while (Ptr != FirstEntry);
+
+  return FALSE;
 }
 
 /**
