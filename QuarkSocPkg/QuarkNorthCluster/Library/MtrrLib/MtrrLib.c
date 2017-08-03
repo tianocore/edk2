@@ -23,6 +23,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define QUARK_SOC_CPUID_FAMILY_MODEL_STEPPING         0x590
 
+#define CACHE_MTRR_ENABLED                            0x800
+#define CACHE_FIXED_MTRR_ENABLED                      0x400
+#define IA32_MTRR_CAP_VCNT_MASK                       0xFF
+
 //
 // Context to save and restore when MTRRs are programmed
 //
@@ -121,7 +125,7 @@ GetVariableMtrrCountWorker (
 {
   UINT32  VariableMtrrCount;
 
-  VariableMtrrCount = (UINT32)(MtrrRegisterRead (QUARK_NC_HOST_BRIDGE_IA32_MTRR_CAP) & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK);
+  VariableMtrrCount = (UINT32)(MtrrRegisterRead (QUARK_NC_HOST_BRIDGE_IA32_MTRR_CAP) & IA32_MTRR_CAP_VCNT_MASK);
   ASSERT (VariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
   return VariableMtrrCount;
 }
@@ -558,7 +562,7 @@ MtrrGetMemoryAttributeInVariableMtrrWorker (
 
   ZeroMem (VariableMtrr, sizeof (VARIABLE_MTRR) * MTRR_NUMBER_OF_VARIABLE_MTRR);
   for (Index = 0, UsedMtrr = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if ((VariableSettings->Mtrr[Index].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) != 0) {
+    if ((VariableSettings->Mtrr[Index].Mask & CACHE_MTRR_ENABLED) != 0) {
       VariableMtrr[Index].Msr         = (UINT32)Index;
       VariableMtrr[Index].BaseAddress = (VariableSettings->Mtrr[Index].Base & MtrrValidAddressMask);
       VariableMtrr[Index].Length      = ((~(VariableSettings->Mtrr[Index].Mask & MtrrValidAddressMask)) & MtrrValidBitsMask) + 1;
@@ -969,7 +973,7 @@ ProgramVariableMtrr (
   // MTRR Physical Mask
   //
   TempQword = ~(Length - 1);
-  VariableSettings->Mtrr[MtrrNumber].Mask = (TempQword & MtrrValidAddressMask) | MTRR_LIB_CACHE_MTRR_ENABLED;
+  VariableSettings->Mtrr[MtrrNumber].Mask = (TempQword & MtrrValidAddressMask) | CACHE_MTRR_ENABLED;
 }
 
 
@@ -1157,7 +1161,7 @@ MtrrGetMemoryAttributeByAddressWorker (
   }
   MtrrType = MTRR_CACHE_INVALID_TYPE;
 
-  if ((TempQword & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+  if ((TempQword & CACHE_MTRR_ENABLED) == 0) {
     return CacheUncacheable;
   }
 
@@ -1165,7 +1169,7 @@ MtrrGetMemoryAttributeByAddressWorker (
   // If address is less than 1M, then try to go through the fixed MTRR
   //
   if (Address < BASE_1MB) {
-    if ((TempQword & MTRR_LIB_CACHE_FIXED_MTRR_ENABLED) != 0) {
+    if ((TempQword & CACHE_FIXED_MTRR_ENABLED) != 0) {
       //
       // Go through the fixed MTRR
       //
@@ -1539,7 +1543,7 @@ MtrrSetMemoryAttributeWorker (
       }
       if (MtrrSetting != NULL) {
         MtrrSetting->Fixed.Mtrr[MsrNum] = (MtrrSetting->Fixed.Mtrr[MsrNum] & ~ClearMask) | OrMask;
-        MtrrSetting->MtrrDefType |= MTRR_LIB_CACHE_FIXED_MTRR_ENABLED;
+        MtrrSetting->MtrrDefType |= CACHE_FIXED_MTRR_ENABLED;
       } else {
         if (!FixedSettingsValid[MsrNum]) {
           WorkingFixedSettings.Mtrr[MsrNum] = MtrrRegisterRead (mMtrrLibFixedMtrrTable[MsrNum].Msr);
@@ -1654,7 +1658,7 @@ MtrrSetMemoryAttributeWorker (
   // Find first unused MTRR
   //
   for (MsrNum = 0; MsrNum < VariableMtrrCount; MsrNum++) {
-    if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+    if ((VariableSettings->Mtrr[MsrNum].Mask & CACHE_MTRR_ENABLED) == 0) {
       break;
     }
   }
@@ -1674,7 +1678,7 @@ MtrrSetMemoryAttributeWorker (
       // Find unused MTRR
       //
       for (; MsrNum < VariableMtrrCount; MsrNum++) {
-        if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+        if ((VariableSettings->Mtrr[MsrNum].Mask & CACHE_MTRR_ENABLED) == 0) {
           break;
         }
       }
@@ -1705,7 +1709,7 @@ MtrrSetMemoryAttributeWorker (
     // Find unused MTRR
     //
     for (; MsrNum < VariableMtrrCount; MsrNum++) {
-      if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+      if ((VariableSettings->Mtrr[MsrNum].Mask & CACHE_MTRR_ENABLED) == 0) {
         break;
       }
     }
@@ -1728,7 +1732,7 @@ MtrrSetMemoryAttributeWorker (
     // Find unused MTRR
     //
     for (; MsrNum < VariableMtrrCount; MsrNum++) {
-      if ((VariableSettings->Mtrr[MsrNum].Mask & MTRR_LIB_CACHE_MTRR_ENABLED) == 0) {
+      if ((VariableSettings->Mtrr[MsrNum].Mask & CACHE_MTRR_ENABLED) == 0) {
         break;
       }
     }
@@ -1801,7 +1805,7 @@ Done:
   DEBUG((DEBUG_CACHE, "  Status = %r\n", Status));
   if (!RETURN_ERROR (Status)) {
     if (MtrrSetting != NULL) {
-      MtrrSetting->MtrrDefType |= MTRR_LIB_CACHE_MTRR_ENABLED;
+      MtrrSetting->MtrrDefType |= CACHE_MTRR_ENABLED;
     }
     MtrrDebugPrintAllMtrrsWorker (MtrrSetting);
   }
