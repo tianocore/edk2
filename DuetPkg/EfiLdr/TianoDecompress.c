@@ -93,11 +93,11 @@ Returns: (VOID)
 
 --*/
 {
-  Sd->mBitBuf = (UINT32) (Sd->mBitBuf << NumOfBits);
+  Sd->mBitBuf = (UINT32) LShiftU64 (((UINT64)Sd->mBitBuf), NumOfBits);
 
   while (NumOfBits > Sd->mBitCount) {
-
-    Sd->mBitBuf |= (UINT32) (Sd->mSubBitBuf << (NumOfBits = (UINT16) (NumOfBits - Sd->mBitCount)));
+    NumOfBits = (UINT16) (NumOfBits - Sd->mBitCount);
+    Sd->mBitBuf |= (UINT32) LShiftU64 (((UINT64)Sd->mSubBitBuf), NumOfBits);
 
     if (Sd->mCompSize > 0) {
       //
