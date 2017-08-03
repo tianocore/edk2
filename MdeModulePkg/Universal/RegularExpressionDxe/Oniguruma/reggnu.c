@@ -151,15 +151,6 @@ re_mbcinit(int mb_code)
   case RE_MBCTYPE_ASCII:
     enc = ONIG_ENCODING_ASCII;
     break;
-  case RE_MBCTYPE_EUC:
-    enc = ONIG_ENCODING_EUC_JP;
-    break;
-  case RE_MBCTYPE_SJIS:
-    enc = ONIG_ENCODING_SJIS;
-    break;
-  case RE_MBCTYPE_UTF8:
-    enc = ONIG_ENCODING_UTF8;
-    break;
   default:
     return;
   }
