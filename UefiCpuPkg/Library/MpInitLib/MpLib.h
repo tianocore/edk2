@@ -201,7 +201,6 @@ struct _CPU_MP_DATA {
   UINTN                          WakeupBuffer;
   UINTN                          BackupBuffer;
   UINTN                          BackupBufferSize;
-  BOOLEAN                        SaveRestoreFlag;
 
   volatile UINT32                StartCount;
   volatile UINT32                FinishedCount;
@@ -310,24 +309,18 @@ SaveCpuMpData (
   IN CPU_MP_DATA   *CpuMpData
   );
 
-/**
-  Allocate reset vector buffer.
-
-  @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
-**/
-VOID
-AllocateResetVector (
-  IN OUT CPU_MP_DATA          *CpuMpData
-  );
 
 /**
-  Free AP reset vector buffer.
+  Get available system memory below 1MB by specified size.
 
-  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+  @param[in] WakeupBufferSize   Wakeup buffer size required
+
+  @retval other   Return wakeup buffer address below 1MB.
+  @retval -1      Cannot find free memory below 1MB.
 **/
-VOID
-FreeResetVector (
-  IN CPU_MP_DATA              *CpuMpData
+UINTN
+GetWakeupBuffer (
+  IN UINTN                WakeupBufferSize
   );
 
 /**
@@ -540,26 +533,6 @@ MicrocodeDetect (
 BOOLEAN
 IsMwaitSupport (
   VOID
-  );
-
-/**
-  Get available system memory below 1MB by specified size.
-
-  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
-**/
-VOID
-BackupAndPrepareWakeupBuffer(
-  IN CPU_MP_DATA              *CpuMpData
-  );
-
-/**
-  Restore wakeup buffer data.
-
-  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
-**/
-VOID
-RestoreWakeupBuffer(
-  IN CPU_MP_DATA              *CpuMpData
   );
 
 /**

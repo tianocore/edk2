@@ -796,6 +796,81 @@ TimedWaitForApFinish (
   );
 
 /**
+  Get available system memory below 1MB by specified size.
+
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+BackupAndPrepareWakeupBuffer(
+  IN CPU_MP_DATA              *CpuMpData
+  )
+{
+  CopyMem (
+    (VOID *) CpuMpData->BackupBuffer,
+    (VOID *) CpuMpData->WakeupBuffer,
+    CpuMpData->BackupBufferSize
+    );
+  CopyMem (
+    (VOID *) CpuMpData->WakeupBuffer,
+    (VOID *) CpuMpData->AddressMap.RendezvousFunnelAddress,
+    CpuMpData->AddressMap.RendezvousFunnelSize
+    );
+}
+
+/**
+  Restore wakeup buffer data.
+
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+RestoreWakeupBuffer(
+  IN CPU_MP_DATA              *CpuMpData
+  )
+{
+  CopyMem (
+    (VOID *) CpuMpData->WakeupBuffer,
+    (VOID *) CpuMpData->BackupBuffer,
+    CpuMpData->BackupBufferSize
+    );
+}
+
+/**
+  Allocate reset vector buffer.
+
+  @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AllocateResetVector (
+  IN OUT CPU_MP_DATA          *CpuMpData
+  )
+{
+  UINTN           ApResetVectorSize;
+
+  if (CpuMpData->WakeupBuffer == (UINTN) -1) {
+    ApResetVectorSize = CpuMpData->AddressMap.RendezvousFunnelSize +
+                          sizeof (MP_CPU_EXCHANGE_INFO);
+
+    CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSize);
+    CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *) (UINTN)
+                    (CpuMpData->WakeupBuffer + CpuMpData->AddressMap.RendezvousFunnelSize);
+  }
+  BackupAndPrepareWakeupBuffer (CpuMpData);
+}
+
+/**
+  Free AP reset vector buffer.
+
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+FreeResetVector (
+  IN CPU_MP_DATA              *CpuMpData
+  )
+{
+  RestoreWakeupBuffer (CpuMpData);
+}
+
+/**
   This function will be called by BSP to wakeup AP.
 
   @param[in] CpuMpData          Pointer to CPU MP Data
@@ -1353,7 +1428,6 @@ MpInitLibInitialize (
   CpuMpData->CpuApStackSize   = ApStackSize;
   CpuMpData->BackupBuffer     = BackupBufferAddr;
   CpuMpData->BackupBufferSize = ApResetVectorSize;
-  CpuMpData->SaveRestoreFlag  = FALSE;
   CpuMpData->WakeupBuffer     = (UINTN) -1;
   CpuMpData->CpuCount         = 1;
   CpuMpData->BspNumber        = 0;
@@ -2120,41 +2194,3 @@ GetCpuMpDataFromGuidedHob (
   return CpuMpData;
 }
 
-/**
-  Get available system memory below 1MB by specified size.
-
-  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
-**/
-VOID
-BackupAndPrepareWakeupBuffer(
-  IN CPU_MP_DATA              *CpuMpData
-  )
-{
-  CopyMem (
-    (VOID *) CpuMpData->BackupBuffer,
-    (VOID *) CpuMpData->WakeupBuffer,
-    CpuMpData->BackupBufferSize
-    );
-  CopyMem (
-    (VOID *) CpuMpData->WakeupBuffer,
-    (VOID *) CpuMpData->AddressMap.RendezvousFunnelAddress,
-    CpuMpData->AddressMap.RendezvousFunnelSize
-    );
-}
-
-/**
-  Restore wakeup buffer data.
-
-  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
-**/
-VOID
-RestoreWakeupBuffer(
-  IN CPU_MP_DATA              *CpuMpData
-  )
-{
-  CopyMem (
-    (VOID *) CpuMpData->WakeupBuffer,
-    (VOID *) CpuMpData->BackupBuffer,
-    CpuMpData->BackupBufferSize
-    );
-}
