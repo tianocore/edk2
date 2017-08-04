@@ -40,6 +40,8 @@ PciDevicePresent (
 {
   UINT64      Address;
   EFI_STATUS  Status;
+  UINT32      Dummy;
+  Dummy = 0xFFFFFFFF;
 
   //
   // Create PCI address map in terms of Bus, Device and Func
@@ -56,6 +58,28 @@ PciDevicePresent (
                                   1,
                                   Pci
                                   );
+
+  if ((Pci->Hdr).VendorId == 0xffff) {
+	  /// PCIe card could have been assigned a temporary bus number.
+	  /// An write cycle can be used to try to rewrite the Bus number in the card
+	  /// Try to write the Vendor Id register, and recheck if the card is present.
+	  Status = PciRootBridgeIo->Pci.Write(
+		  PciRootBridgeIo,
+		  EfiPciWidthUint32,
+		  Address,
+		  1,
+		  &Dummy
+		  );
+
+	  // Retry the previous read after the PCI cycle has been tried.
+	  Status = PciRootBridgeIo->Pci.Read(
+		  PciRootBridgeIo,
+		  EfiPciWidthUint32,
+		  Address,
+		  1,
+		  Pci
+		  );
+  }
 
   if (!EFI_ERROR (Status) && (Pci->Hdr).VendorId != 0xffff) {
     //
