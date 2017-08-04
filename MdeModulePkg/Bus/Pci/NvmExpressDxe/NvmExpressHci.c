@@ -2,7 +2,7 @@
   NvmExpressDxe driver is used to manage non-volatile memory subsystem which follows
   NVM Express specification.
 
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,14 @@
 **/
 
 #include "NvmExpress.h"
+
+#define NVME_SHUTDOWN_PROCESS_TIMEOUT 45
+
+//
+// The number of NVME controllers managed by this driver, used by
+// NvmeRegisterShutdownNotification() and NvmeUnregisterShutdownNotification().
+//
+UINTN                           mNvmeControllerNumber = 0;
 
 /**
   Read Nvm Express controller capability register.
@@ -1050,3 +1058,174 @@ NvmeControllerInit (
   return Status;
 }
 
+/**
+ This routine is called to properly shutdown the Nvm Express controller per NVMe spec.
+
+  @param[in]  ResetType         The type of reset to perform.
+  @param[in]  ResetStatus       The status code for the reset.
+  @param[in]  DataSize          The size, in bytes, of ResetData.
+  @param[in]  ResetData         For a ResetType of EfiResetCold, EfiResetWarm, or
+                                EfiResetShutdown the data buffer starts with a Null-terminated
+                                string, optionally followed by additional binary data.
+                                The string is a description that the caller may use to further
+                                indicate the reason for the system reset. ResetData is only
+                                valid if ResetStatus is something other than EFI_SUCCESS
+                                unless the ResetType is EfiResetPlatformSpecific
+                                where a minimum amount of ResetData is always required.
+                                For a ResetType of EfiResetPlatformSpecific the data buffer
+                                also starts with a Null-terminated string that is followed
+                                by an EFI_GUID that describes the specific type of reset to perform.
+**/
+VOID
+EFIAPI
+NvmeShutdownAllControllers (
+  IN EFI_RESET_TYPE           ResetType,
+  IN EFI_STATUS               ResetStatus,
+  IN UINTN                    DataSize,
+  IN VOID                     *ResetData OPTIONAL
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          *Handles;
+  UINTN                               HandleCount;
+  UINTN                               HandleIndex;
+  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY *OpenInfos;
+  UINTN                               OpenInfoCount;
+  UINTN                               OpenInfoIndex;
+  EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL  *NvmePassThru;
+  NVME_CC                             Cc;
+  NVME_CSTS                           Csts;
+  UINTN                               Index;
+  NVME_CONTROLLER_PRIVATE_DATA        *Private;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiPciIoProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &Handles
+                  );
+  if (EFI_ERROR (Status)) {
+    HandleCount = 0;
+  }
+
+  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
+    Status = gBS->OpenProtocolInformation (
+                    Handles[HandleIndex],
+                    &gEfiPciIoProtocolGuid,
+                    &OpenInfos,
+                    &OpenInfoCount
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
+      //
+      // Find all the NVME controller managed by this driver.
+      // gImageHandle equals to DriverBinding handle for this driver.
+      //
+      if (((OpenInfos[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) &&
+          (OpenInfos[OpenInfoIndex].AgentHandle == gImageHandle)) {
+        Status = gBS->OpenProtocol (
+                        OpenInfos[OpenInfoIndex].ControllerHandle,
+                        &gEfiNvmExpressPassThruProtocolGuid,
+                        (VOID **) &NvmePassThru,
+                        NULL,
+                        NULL,
+                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                        );
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+        Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (NvmePassThru);
+
+        //
+        // Read Controller Configuration Register.
+        //
+        Status = ReadNvmeControllerConfiguration (Private, &Cc);
+        if (EFI_ERROR(Status)) {
+          continue;
+        }
+        //
+        // The host should set the Shutdown Notification (CC.SHN) field to 01b
+        // to indicate a normal shutdown operation.
+        //
+        Cc.Shn = NVME_CC_SHN_NORMAL_SHUTDOWN;
+        Status = WriteNvmeControllerConfiguration (Private, &Cc);
+        if (EFI_ERROR(Status)) {
+          continue;
+        }
+
+        //
+        // The controller indicates when shutdown processing is completed by updating the
+        // Shutdown Status (CSTS.SHST) field to 10b.
+        // Wait up to 45 seconds (break down to 4500 x 10ms) for the shutdown to complete.
+        //
+        for (Index = 0; Index < NVME_SHUTDOWN_PROCESS_TIMEOUT * 100; Index++) {
+          Status = ReadNvmeControllerStatus (Private, &Csts);
+          if (!EFI_ERROR(Status) && (Csts.Shst == NVME_CSTS_SHST_SHUTDOWN_COMPLETED)) {
+            DEBUG((DEBUG_INFO, "NvmeShutdownController: shutdown processing is completed after %dms.\n", Index * 10));
+            break;
+          }
+          //
+          // Stall for 10ms
+          //
+          gBS->Stall (10 * 1000);
+        }
+
+        if (Index == NVME_SHUTDOWN_PROCESS_TIMEOUT * 100) {
+          DEBUG((DEBUG_ERROR, "NvmeShutdownController: shutdown processing is timed out\n"));
+        }
+      }
+    }
+  }
+}
+
+/**
+  Register the shutdown notification through the ResetNotification protocol.
+
+  Register the shutdown notification when mNvmeControllerNumber increased from 0 to 1.
+**/
+VOID
+NvmeRegisterShutdownNotification (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_RESET_NOTIFICATION_PROTOCOL *ResetNotify;
+
+  mNvmeControllerNumber++;
+  if (mNvmeControllerNumber == 1) {
+    Status = gBS->LocateProtocol (&gEfiResetNotificationProtocolGuid, NULL, (VOID **) &ResetNotify);
+    if (!EFI_ERROR (Status)) {
+      Status = ResetNotify->RegisterResetNotify (ResetNotify, NvmeShutdownAllControllers);
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      DEBUG ((DEBUG_WARN, "NVME: ResetNotification absent! Shutdown notification cannot be performed!\n"));
+    }
+  }
+}
+
+/**
+  Unregister the shutdown notification through the ResetNotification protocol.
+
+  Unregister the shutdown notification when mNvmeControllerNumber decreased from 1 to 0.
+**/
+VOID
+NvmeUnregisterShutdownNotification (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_RESET_NOTIFICATION_PROTOCOL *ResetNotify;
+
+  mNvmeControllerNumber--;
+  if (mNvmeControllerNumber == 0) {
+    Status = gBS->LocateProtocol (&gEfiResetNotificationProtocolGuid, NULL, (VOID **) &ResetNotify);
+    if (!EFI_ERROR (Status)) {
+      Status = ResetNotify->UnregisterResetNotify (ResetNotify, NvmeShutdownAllControllers);
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+}

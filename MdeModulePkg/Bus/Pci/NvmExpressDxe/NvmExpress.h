@@ -3,7 +3,7 @@
   NVM Express specification.
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -34,6 +34,7 @@
 #include <Protocol/DiskInfo.h>
 #include <Protocol/DriverSupportedEfiVersion.h>
 #include <Protocol/StorageSecurityCommand.h>
+#include <Protocol/ResetNotification.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -719,6 +720,26 @@ NvmExpressBuildDevicePath (
 VOID
 NvmeDumpStatus (
   IN NVME_CQ             *Cq
+  );
+
+/**
+  Register the shutdown notification through the ResetNotification protocol.
+
+  Register the shutdown notification when mNvmeControllerNumber increased from 0 to 1.
+**/
+VOID
+NvmeRegisterShutdownNotification (
+  VOID
+  );
+
+/**
+  Unregister the shutdown notification through the ResetNotification protocol.
+
+  Unregister the shutdown notification when mNvmeControllerNumber decreased from 1 to 0.
+**/
+VOID
+NvmeUnregisterShutdownNotification (
+  VOID
   );
 
 #endif
