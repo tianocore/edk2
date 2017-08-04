@@ -36,7 +36,7 @@
 #define MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME L"MemoryOverwriteRequestControl"
 
 ///
-/// 0 = Firmware MUST clear the MOR bi
+/// 0 = Firmware MUST clear the MOR bit
 /// 1 = Firmware MUST set the MOR bit 
 ///
 #define MOR_CLEAR_MEMORY_BIT_MASK        0x01
