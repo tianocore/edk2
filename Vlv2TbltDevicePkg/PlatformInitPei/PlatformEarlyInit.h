@@ -84,6 +84,7 @@ Abstract:
 #include <Guid/PlatformCpuInfo.h>
 #include <Guid/OsSelection.h>
 #include <Guid/SmramMemoryReserve.h>
+#include <Register/Msr.h>
 
 #define SMC_LAN_ON       0x46
 #define SMC_LAN_OFF    0x47
