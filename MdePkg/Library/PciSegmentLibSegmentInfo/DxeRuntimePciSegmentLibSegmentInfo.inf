@@ -1,0 +1,55 @@
+## @file
+# Instance of Runtime PCI Segment Library that support multi-segment PCI configuration access.
+#
+# PCI Segment Library that consumes segment information provided by PciSegmentInfoLib to
+#  support multi-segment PCI configuration access through enhanced configuration access mechanism.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRuntimePciSegmentLibSegmentInfo
+  MODULE_UNI_FILE                = DxeRuntimePciSegmentLibSegmentInfo.uni
+  FILE_GUID                      = F73EB3DE-F4E3-47CB-9F18-97796AE06314
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciSegmentLib|DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = DxeRuntimePciSegmentLibConstructor
+  DESTRUCTOR                     = DxeRuntimePciSegmentLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  PciSegmentLibCommon.h
+  PciSegmentLibCommon.c
+  DxeRuntimePciSegmentLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  DebugLib
+  PciSegmentInfoLib
+  UefiRuntimeLib
+  MemoryAllocationLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid         ## CONSUMES ## Event
