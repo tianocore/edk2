@@ -1,7 +1,7 @@
 /** @file
   Support for the latest PCI standard.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>  
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
@@ -17,6 +17,23 @@
 #define _PCIEXPRESS21_H_
 
 #include <IndustryStandard/Pci30.h>
+
+/**
+  Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an
+  ECAM (Enhanced Configuration Access Mechanism) address. The unused upper bits
+  of Bus, Device, Function and Register are stripped prior to the generation of
+  the address.
+
+  @param  Bus       PCI Bus number. Range 0..255.
+  @param  Device    PCI Device number. Range 0..31.
+  @param  Function  PCI Function number. Range 0..7.
+  @param  Register  PCI Register number. Range 0..4095.
+
+  @return The encode ECAM address.
+
+**/
+#define PCI_ECAM_ADDRESS(Bus,Device,Function,Offset) \
+  (((Offset) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 #pragma pack(1)
 ///
