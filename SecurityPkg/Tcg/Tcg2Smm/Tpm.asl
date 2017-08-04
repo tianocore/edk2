@@ -43,13 +43,8 @@ DefinitionBlock (
       Name (_STR, Unicode ("TPM 2.0 Device"))
 
       //
-      // Return the resource consumed by TPM device
-      //
-      Name (_CRS, ResourceTemplate () {
-        Memory32Fixed (ReadOnly, 0xfed40000, 0x5000)
-      })
 
-      //
+
       // Operational region for Smi port access
       //
       OperationRegion (SMIP, SystemIO, 0xB2, 1)
@@ -64,7 +59,19 @@ DefinitionBlock (
       OperationRegion (TPMR, SystemMemory, 0xfed40000, 0x5000)
       Field (TPMR, AnyAcc, NoLock, Preserve)
       {
-        ACC0, 8,
+        ACC0, 8,  // TPM_ACCESS_0
+        Offset(0x8),
+        INTE, 32, // TPM_INT_ENABLE_0
+        INTV, 8,  // TPM_INT_VECTOR_0
+        Offset(0x10),
+        INTS, 32, // TPM_INT_STATUS_0
+        INTF, 32, // TPM_INTF_CAPABILITY_0
+        STS0, 32, // TPM_STS_0
+        Offset(0x24),
+        FIFO, 32, // TPM_DATA_FIFO_0
+        Offset(0x30),
+        TID0, 32, // TPM_INTERFACE_ID_0
+                  // ignore the rest
       }
 
       //
@@ -86,6 +93,97 @@ DefinitionBlock (
         MORD,   32, //   Memory Overwrite Request Data
         MRET,   32  //   Memory Overwrite function return code
       }
+
+      Name(RESO, ResourceTemplate () {
+        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000, REGS)
+        Interrupt(ResourceConsumer, Level, ActiveLow, Shared, , , IRQ) {12}
+      })
+
+      //
+      // Return the resource consumed by TPM device.
+      //
+      Method(_CRS,0,Serialized)
+      {
+        Return(RESO)
+      }
+
+      //
+      // Set resources consumed by the TPM device. This is used to
+      // assign an interrupt number to the device. The input byte stream
+      // has to be the same as returned by _CRS (according to ACPI spec).
+      //
+      Method(_SRS,1,Serialized)
+      {
+        //
+        // Update resource descriptor
+        // Use the field name to identify the offsets in the argument
+        // buffer and RESO buffer.
+        //
+        CreateDWordField(Arg0, ^IRQ._INT, IRQ0)
+        CreateDWordField(RESO, ^IRQ._INT, LIRQ)
+        Store(IRQ0, LIRQ)
+
+        CreateBitField(Arg0, ^IRQ._HE, ITRG)
+        CreateBitField(RESO, ^IRQ._HE, LTRG)
+        Store(ITRG, LTRG)
+
+        CreateBitField(Arg0, ^IRQ._LL, ILVL)
+        CreateBitField(RESO, ^IRQ._LL, LLVL)
+        Store(ILVL, LLVL)
+
+        //
+        // Update TPM FIFO PTP/TIS interface only, identified by TPM_INTERFACE_ID_x lowest
+        // nibble.
+        // 0000 - FIFO interface as defined in PTP for TPM 2.0 is active
+        // 1111 - FIFO interface as defined in TIS1.3 is active
+        //
+        If (LOr(LEqual (And (TID0, 0x0F), 0x00), LEqual (And (TID0, 0x0F), 0x0F))) {
+          //
+          // If FIFO interface, interrupt vector register is
+          // available. TCG PTP specification allows only
+          // values 1..15 in this field. For other interrupts
+          // the field should stay 0.
+          //
+          If (LLess (IRQ0, 16)) {
+            Store (And(IRQ0, 0xF), INTV)
+          }
+          //
+          // Interrupt enable register (TPM_INT_ENABLE_x) bits 3:4
+          // contains settings for interrupt polarity.
+          // The other bits of the byte enable individual interrupts.
+          // They should be all be zero, but to avoid changing the
+          // configuration, the other bits are be preserved.
+          // 00 - high level
+          // 01 - low level
+          // 10 - rising edge
+          // 11 - falling edge
+          //
+          // ACPI spec definitions:
+          // _HE: '1' is Edge, '0' is Level
+          // _LL: '1' is ActiveHigh, '0' is ActiveLow (inverted from TCG spec)
+          //
+          If (LEqual (ITRG, 1)) {
+            Or(INTE, 0x00000010, INTE)
+          } Else {
+            And(INTE, 0xFFFFFFEF, INTE)
+          }
+          if (LEqual (ILVL, 0)) {
+            Or(INTE, 0x00000008, INTE)
+          } Else {
+            And(INTE, 0xFFFFFFF7, INTE)
+          }
+        }
+      }
+
+      //
+      // Possible resource settings.
+      // The format of the data has to follow the same format as
+      // _CRS (according to ACPI spec).
+      //
+      Name (_PRS, ResourceTemplate() {
+        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000)
+        Interrupt(ResourceConsumer, Level, ActiveLow, Shared, , , SIRQ) {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+      })
 
       Method (PTS, 1, Serialized)
       {  
