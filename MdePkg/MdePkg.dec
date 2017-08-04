@@ -131,6 +131,9 @@
   ##  @libraryclass  Provides a service to retrieve the PE/COFF entry point from a PE/COFF image.
   PeCoffGetEntryPointLib|Include/Library/PeCoffGetEntryPointLib.h
 
+  ##  @libraryclass  Provides services to return the PCI segment information.
+  PciSegmentInfoLib|Include/Library/PciSegmentInfoLib.h
+
   ##  @libraryclass  Provides services to access PCI Configuration Space on a platform with multiple PCI segments.
   PciSegmentLib|Include/Library/PciSegmentLib.h
 

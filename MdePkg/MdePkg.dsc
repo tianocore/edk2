@@ -69,6 +69,7 @@
   MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
+  MdePkg/Library/BasePciSegmentInfoLibNull/BasePciSegmentInfoLibNull.inf
   MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
