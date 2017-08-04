@@ -61,6 +61,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  ServerPlatformPkg/PlatformPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -104,6 +105,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
+  gCpPlatTokenSpaceGuid.PcdUefiOptimizedBootEx
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni
