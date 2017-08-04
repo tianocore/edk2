@@ -48,6 +48,7 @@
   PendingBreak.c
   X2Apic.c
   Ppin.c
+  Lmce.c
 
 [Packages]
   MdePkg/MdePkg.dec

@@ -217,6 +217,18 @@ CpuCommonFeaturesLibConstructor (
                );
     ASSERT_EFI_ERROR (Status);
   }
+  if (IsCpuFeatureSupported (CPU_FEATURE_LMCE)) {
+    Status = RegisterCpuFeature (
+               "LMCE",
+               NULL,
+               LmceSupport,
+               LmceInitialize,
+               CPU_FEATURE_LMCE,
+               CPU_FEATURE_LOCK_FEATURE_CONTROL_REGISTER | CPU_FEATURE_BEFORE,
+               CPU_FEATURE_END
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return RETURN_SUCCESS;
 }
