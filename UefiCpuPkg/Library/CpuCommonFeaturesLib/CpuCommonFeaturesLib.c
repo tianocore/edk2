@@ -229,6 +229,17 @@ CpuCommonFeaturesLibConstructor (
                );
     ASSERT_EFI_ERROR (Status);
   }
+  if (IsCpuFeatureSupported (CPU_FEATURE_PROC_TRACE)) {
+    Status = RegisterCpuFeature (
+               "Proc Trace",
+               ProcTraceGetConfigData,
+               ProcTraceSupport,
+               ProcTraceInitialize,
+               CPU_FEATURE_PROC_TRACE,
+               CPU_FEATURE_END
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return RETURN_SUCCESS;
 }

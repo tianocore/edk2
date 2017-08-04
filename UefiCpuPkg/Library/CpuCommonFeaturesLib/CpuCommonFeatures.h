@@ -961,4 +961,70 @@ LmceInitialize (
   IN BOOLEAN                           State
   );
 
+/**
+  Prepares for the data used by CPU feature detection and initialization.
+
+  @param[in]  NumberOfProcessors  The number of CPUs in the platform.
+
+  @return  Pointer to a buffer of CPU related configuration data.
+
+  @note This service could be called by BSP only.
+**/
+VOID *
+EFIAPI
+ProcTraceGetConfigData (
+  IN UINTN  NumberOfProcessors
+  );
+
+/**
+  Detects if Intel Processor Trace feature supported on current processor.
+
+  @param[in]  ProcessorNumber  The index of the CPU executing this function.
+  @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
+                               structure for the CPU executing this function.
+  @param[in]  ConfigData       A pointer to the configuration buffer returned
+                               by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
+                               CPU_FEATURE_GET_CONFIG_DATA was not provided in
+                               RegisterCpuFeature().
+
+  @retval TRUE     Processor Trace feature is supported.
+  @retval FALSE    Processor Trace feature is not supported.
+
+  @note This service could be called by BSP/APs.
+**/
+BOOLEAN
+EFIAPI
+ProcTraceSupport (
+  IN UINTN                             ProcessorNumber,
+  IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
+  IN VOID                              *ConfigData  OPTIONAL
+  );
+
+/**
+  Initializes Intel Processor Trace feature to specific state.
+
+  @param[in]  ProcessorNumber  The index of the CPU executing this function.
+  @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
+                               structure for the CPU executing this function.
+  @param[in]  ConfigData       A pointer to the configuration buffer returned
+                               by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
+                               CPU_FEATURE_GET_CONFIG_DATA was not provided in
+                               RegisterCpuFeature().
+  @param[in]  State            If TRUE, then the Processor Trace feature must be
+                               enabled.
+                               If FALSE, then the Processor Trace feature must be
+                               disabled.
+
+  @retval RETURN_SUCCESS       Intel Processor Trace feature is initialized.
+
+**/
+RETURN_STATUS
+EFIAPI
+ProcTraceInitialize (
+  IN UINTN                             ProcessorNumber,
+  IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
+  IN VOID                              *ConfigData,  OPTIONAL
+  IN BOOLEAN                           State
+  );
+
 #endif
