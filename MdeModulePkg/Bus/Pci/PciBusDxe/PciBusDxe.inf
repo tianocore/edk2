@@ -93,6 +93,9 @@
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
 
+[Guids]
+  gEfiAfterPlatformLocksEventGuid
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBridgeIoAlignmentProbe       ## CONSUMES

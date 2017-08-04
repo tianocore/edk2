@@ -43,6 +43,56 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL mPciHotPlugReques
   PciHotPlugRequestNotify
 };
 
+VOID
+EFIAPI
+PciBusInstallPendingOproms (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  UINTN                         HandleCount;
+  EFI_HANDLE                    *HandleBuffer;
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  EFI_PCI_IO_PROTOCOL           *PciIoProtocol;
+  PCI_IO_DEVICE                 *PciIoDevice;
+  BOOLEAN                       AllOpRomProcessed;
+  BOOLEAN                       PciContainEfiImage;
+
+  DEBUG((EFI_D_INFO, "Installing all pending UEFI Option ROMs...\n"));
+  HandleBuffer = NULL;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiPciIoProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  ASSERT_EFI_ERROR(Status);
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID **)&PciIoProtocol);
+    ASSERT_EFI_ERROR(Status);
+    PciIoDevice = PCI_IO_DEVICE_FROM_PCI_IO_THIS(PciIoProtocol);
+    AllOpRomProcessed = PciIoDevice->AllOpRomProcessed;
+    PciContainEfiImage = ContainEfiImage(PciIoDevice->PciIo.RomImage, PciIoDevice->PciIo.RomSize);
+    if (!AllOpRomProcessed && PciContainEfiImage) {
+      PciIoDevice->AllOpRomProcessed = TRUE;
+      //
+      // Start the OpRom image
+      //
+      DEBUG((EFI_D_INFO, "Installing Option ROM for B0x%x D0x%x F0x%x\n", PciIoDevice->BusNumber, PciIoDevice->DeviceNumber, PciIoDevice->FunctionNumber));
+      ProcessOpRomImage(PciIoDevice);
+    }
+  }
+
+  if (HandleBuffer != NULL) {
+    gBS->FreePool(HandleBuffer);
+  }
+  DEBUG((EFI_D_INFO, "All pending Option ROMs installed!\n")); 
+  return; 
+}
+
 /**
   The Entry Point for PCI Bus module. The user code starts with this function.
 
@@ -67,6 +117,7 @@ PciBusEntryPoint (
 {
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
+  EFI_EVENT             Registration;
 
   //
   // Initializes PCI devices pool
@@ -98,6 +149,15 @@ PciBusEntryPoint (
                     &mPciHotPlugRequest
                     );
   }
+
+  Status = gBS->CreateEventEx (
+      EVT_NOTIFY_SIGNAL,
+      TPL_CALLBACK,
+      PciBusInstallPendingOproms,
+      NULL,
+      &gEfiAfterPlatformLocksEventGuid,
+      &Registration
+      );
 
   return Status;
 }
