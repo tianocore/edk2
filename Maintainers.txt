@@ -231,7 +231,7 @@ M: Jaben Carsey <jaben.carsey@intel.com>
 
 UefiCpuPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
-M: Jeff Fan <jeff.fan@intel.com>
+M: Eric Dong <eric.dong@intel.com>
 
 UnixPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/UnixPkg
