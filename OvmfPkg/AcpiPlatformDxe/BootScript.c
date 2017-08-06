@@ -249,7 +249,10 @@ FatalError:
                         because the ownership of S3Context has been transfered.
 
   @retval EFI_SUCCESS The translation of S3Context to ACPI S3 Boot Script
-                      opcodes has been successfully executed or queued.
+                      opcodes has been successfully executed or queued. (This
+                      includes the case when S3Context was empty on input and
+                      no ACPI S3 Boot Script opcodes have been necessary to
+                      produce.)
 
   @return             Error codes from underlying functions.
 **/
@@ -259,6 +262,11 @@ TransferS3ContextToBootScript (
   )
 {
   RETURN_STATUS Status;
+
+  if (S3Context->Used == 0) {
+    ReleaseS3Context (S3Context);
+    return EFI_SUCCESS;
+  }
 
   Status = QemuFwCfgS3CallWhenBootScriptReady (AppendFwCfgBootScript,
              S3Context, sizeof (SCRATCH_BUFFER));
