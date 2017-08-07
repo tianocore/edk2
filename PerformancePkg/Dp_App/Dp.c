@@ -382,7 +382,7 @@ InitializeDp (
   if (CustomCumulativeToken != NULL) {
     CustomCumulativeData = AllocateZeroPool (sizeof (PERF_CUM_DATA));
     ASSERT (CustomCumulativeData != NULL);
-    CustomCumulativeData->MinDur = 0;
+    CustomCumulativeData->MinDur = PERF_MAXDUR;
     CustomCumulativeData->MaxDur = 0;
     CustomCumulativeData->Count  = 0;
     CustomCumulativeData->Duration = 0;
