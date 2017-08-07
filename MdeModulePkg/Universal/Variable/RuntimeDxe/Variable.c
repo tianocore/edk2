@@ -16,7 +16,7 @@
   VariableServiceSetVariable() should also check authenticate data to avoid buffer overflow,
   integer overflow. It should also check attribute to avoid authentication bypass.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -262,13 +262,12 @@ UpdateVariableStore (
   UINT8                       *CurrBuffer;
   EFI_LBA                     LbaNumber;
   UINTN                       Size;
-  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
   VARIABLE_STORE_HEADER       *VolatileBase;
   EFI_PHYSICAL_ADDRESS        FvVolHdr;
   EFI_PHYSICAL_ADDRESS        DataPtr;
   EFI_STATUS                  Status;
 
-  FwVolHeader = NULL;
+  FvVolHdr    = 0;
   DataPtr     = DataPtrIndex;
 
   //
@@ -281,7 +280,6 @@ UpdateVariableStore (
     Status = Fvb->GetPhysicalAddress(Fvb, &FvVolHdr);
     ASSERT_EFI_ERROR (Status);
 
-    FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvVolHdr);
     //
     // Data Pointer should point to the actual Address where data is to be
     // written.
@@ -290,7 +288,7 @@ UpdateVariableStore (
       DataPtr += mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
     }
 
-    if ((DataPtr + DataSize) > ((EFI_PHYSICAL_ADDRESS) (UINTN) ((UINT8 *) FwVolHeader + FwVolHeader->FvLength))) {
+    if ((DataPtr + DataSize) > (FvVolHdr + mNvFvHeaderCache->FvLength)) {
       return EFI_OUT_OF_RESOURCES;
     }
   } else {
@@ -317,7 +315,7 @@ UpdateVariableStore (
   //
   // If we are here we are dealing with Non-Volatile Variables.
   //
-  LinearOffset  = (UINTN) FwVolHeader;
+  LinearOffset  = (UINTN) FvVolHdr;
   CurrWritePtr  = (UINTN) DataPtr;
   CurrWriteSize = DataSize;
   CurrBuffer    = Buffer;
@@ -2739,7 +2737,7 @@ UpdateVariable (
       }
     }
 
-    State = Variable->CurrPtr->State;
+    State = CacheVariable->CurrPtr->State;
     State &= VAR_DELETED;
 
     Status = UpdateVariableStore (

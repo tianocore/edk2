@@ -3,7 +3,7 @@
   and volatile storage space and install variable architecture protocol.
 
 Copyright (C) 2013, Red Hat, Inc.
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -402,8 +402,8 @@ FtwNotificationEvent (
   //
   // Mark the variable storage region of the FLASH as RUNTIME.
   //
-  VariableStoreBase   = NvStorageVariableBase + (((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)(NvStorageVariableBase))->HeaderLength);
-  VariableStoreLength = ((VARIABLE_STORE_HEADER *)(UINTN)VariableStoreBase)->Size;
+  VariableStoreBase   = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
+  VariableStoreLength = mNvVariableCache->Size;
   BaseAddress = VariableStoreBase & (~EFI_PAGE_MASK);
   Length      = VariableStoreLength + (VariableStoreBase - BaseAddress);
   Length      = (Length + EFI_PAGE_SIZE - 1) & (~EFI_PAGE_MASK);
