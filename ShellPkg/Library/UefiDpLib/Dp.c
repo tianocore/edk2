@@ -250,7 +250,7 @@ ShellCommandRunDp (
     if (CustomCumulativeData == NULL) {
       return SHELL_OUT_OF_RESOURCES;
     }
-    CustomCumulativeData->MinDur = 0;
+    CustomCumulativeData->MinDur = PERF_MAXDUR;
     CustomCumulativeData->MaxDur = 0;
     CustomCumulativeData->Count  = 0;
     CustomCumulativeData->Duration = 0;
