@@ -269,6 +269,8 @@ ShellCommandRunDrivers (
   EFI_HANDLE          *HandleWalker;
   UINTN               ChildCount;
   UINTN               DeviceCount;
+  CHAR16              ChildCountStr[3];
+  CHAR16              DeviceCountStr[3];
   CHAR16              *Temp2;
   CONST CHAR16        *FullDriverName;
   CHAR16              *TruncatedDriverName;
@@ -363,26 +365,45 @@ ShellCommandRunDrivers (
         FullDriverName = GetStringNameFromHandle(*HandleWalker, Language);
         ImageName      = GetImageNameFromHandle (*HandleWalker);
 
+        UnicodeValueToStringS (ChildCountStr,  sizeof (ChildCountStr),  0, ChildCount,  0);
+        UnicodeValueToStringS (DeviceCountStr, sizeof (DeviceCountStr), 0, DeviceCount, 0);
         TruncatedDriverName = NULL;
         if (!SfoFlag && (FullDriverName != NULL)) {
           TruncatedDriverName = AllocateZeroPool ((MAX_LEN_DRIVER_NAME + 1) * sizeof (CHAR16));
           StrnCpyS (TruncatedDriverName, MAX_LEN_DRIVER_NAME + 1, FullDriverName, MAX_LEN_DRIVER_NAME);
         }
 
-        ShellPrintEx(
-          -1,
-          -1,
-          FormatString,
-          ConvertHandleToHandleIndex(*HandleWalker),
-          DriverVersion,
-          ChildCount > 0?L'B':(DeviceCount > 0?L'D':L'?'),
-          DriverConfig?L'Y':L'N',
-          DriverDiag?L'Y':L'N',
-          DeviceCount,
-          ChildCount,
-          SfoFlag?FullDriverName:TruncatedDriverName,
-          SfoFlag ? (Temp2 == NULL ? L"" : Temp2) : (ImageName == NULL ? L"" : ImageName)
-          );
+        if (!SfoFlag) {
+          ShellPrintEx (
+            -1,
+            -1,
+            FormatString,
+            ConvertHandleToHandleIndex (*HandleWalker),
+            DriverVersion,
+            ChildCount > 0 ? L'B' : (DeviceCount > 0 ? L'D' : L'?'),
+            DriverConfig ? L'X' : L'-',
+            DriverDiag ? L'X' : L'-',
+            DeviceCount > 0 ? DeviceCountStr : L"-",
+            ChildCount  > 0 ? ChildCountStr : L"-",
+            TruncatedDriverName,
+            ImageName == NULL ? L"" : ImageName
+            );
+        } else {
+          ShellPrintEx (
+            -1,
+            -1,
+            FormatString,
+            ConvertHandleToHandleIndex (*HandleWalker),
+            DriverVersion,
+            ChildCount > 0 ? L'B' : (DeviceCount > 0 ? L'D' : L'?'),
+            DriverConfig ? L'Y' : L'N',
+            DriverDiag ? L'Y' : L'N',
+            DeviceCount,
+            ChildCount,
+            FullDriverName,
+            Temp2 == NULL ? L"" : Temp2
+            );
+        }
         if (TruncatedDriverName != NULL) {
           FreePool (TruncatedDriverName);
         }

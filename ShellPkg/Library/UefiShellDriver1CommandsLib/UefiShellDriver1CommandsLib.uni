@@ -90,12 +90,12 @@
 #string STR_DEVICES_ITEM_LINE_SFO #language en-US "DevicesInfo,"%x","%c","%c","%c","%d","%d","%d","%s"\r\n"
 
 #string STR_DRIVERS_HEADER_LINES  #language en-US "%N"
-"             T   D\r\n"
-"             Y C I\r\n"
-"             P F A\r\n"
-"DRV VERSION  E G G #D  #C  DRIVER NAME                         IMAGE NAME\r\n"
-"=== ======== = = = === === =================================== ==========\r\n"
-#string STR_DRIVERS_ITEM_LINE     #language en-US "%H%3x%N %08x %1c %1c %1c %3d %3d %-35s %s\r\n"
+"%H            T   D%N\r\n"
+"%HD           Y C I%N\r\n"
+"%HR           P F A%N\r\n"
+"%HV  VERSION  E G G #D #C DRIVER NAME                         IMAGE NAME%N\r\n"
+"== ======== = = = == == =================================== ==========\r\n"
+#string STR_DRIVERS_ITEM_LINE     #language en-US "%H%2x%N %08x %1c %1c %1c %2s %2s %-35s %s\r\n"
 #string STR_DRIVERS_ITEM_LINE_SFO #language en-US "DriversInfo,"%x","%x","%c","%c","%c","%d","%d","%s","%s"\r\n"
 
 #string STR_DH_OUTPUT_DECODE      #language en-US "%s: %g\r\n"
