@@ -1331,7 +1331,7 @@ HttpBootRegisterRamDisk (
 BOOLEAN
 HttpBootIsHttpRedirectStatusCode (
   IN   EFI_HTTP_STATUS_CODE        StatusCode
- )
+  )
 {
   if (StatusCode == HTTP_STATUS_301_MOVED_PERMANENTLY ||
       StatusCode == HTTP_STATUS_302_FOUND ||

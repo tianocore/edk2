@@ -457,5 +457,5 @@ HttpBootRegisterRamDisk (
 BOOLEAN
 HttpBootIsHttpRedirectStatusCode (
   IN   EFI_HTTP_STATUS_CODE        StatusCode
- );
+  );
 #endif
