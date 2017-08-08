@@ -1,7 +1,7 @@
 /** @file
   The helper functions for BlockIo and BlockIo2 protocol.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1851,6 +1851,14 @@ EmmcEraseBlock (
   EraseBlock->SdMmcCmdBlk.CommandIndex = EMMC_ERASE;
   EraseBlock->SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAc;
   EraseBlock->SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1b;
+  if ((Device->ExtCsd.SecFeatureSupport & BIT4) != 0) {
+    //
+    // Perform a Trim operation which applies the erase operation to write blocks
+    // instead of erase groups. (Spec JESD84-B51, eMMC Electrical Standard 5.1,
+    // Section 6.6.10 and 6.10.4)
+    //
+    EraseBlock->SdMmcCmdBlk.CommandArgument = 1;
+  }
 
   EraseBlock->IsEnd = IsEnd;
   EraseBlock->Token = Token;
@@ -1903,6 +1911,43 @@ Error:
 }
 
 /**
+  Write zeros to specified blocks.
+
+  @param[in]  Partition         A pointer to the EMMC_PARTITION instance.
+  @param[in]  StartLba          The starting logical block address to write zeros.
+  @param[in]  Size              The size in bytes to fill with zeros. This must be a multiple of
+                                the physical block size of the device.
+
+  @retval EFI_SUCCESS           The request is executed successfully.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be executed due to a lack of resources.
+  @retval Others                The request could not be executed successfully.
+
+**/
+EFI_STATUS
+EmmcWriteZeros (
+  IN  EMMC_PARTITION            *Partition,
+  IN  EFI_LBA                   StartLba,
+  IN  UINTN                     Size
+  )
+{
+  EFI_STATUS                           Status;
+  UINT8                                *Buffer;
+  UINT32                               MediaId;
+
+  Buffer = AllocateZeroPool (Size);
+  if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  MediaId = Partition->BlockMedia.MediaId;
+
+  Status = EmmcReadWrite (Partition, MediaId, StartLba, Buffer, Size, FALSE, NULL);
+  FreePool (Buffer);
+
+  return Status;
+}
+
+/**
   Erase a specified number of device blocks.
 
   @param[in]       This           Indicates a pointer to the calling context.
@@ -1943,7 +1988,13 @@ EmmcEraseBlocks (
   EFI_BLOCK_IO_MEDIA                    *Media;
   UINTN                                 BlockSize;
   UINTN                                 BlockNum;
+  EFI_LBA                               FirstLba;
   EFI_LBA                               LastLba;
+  EFI_LBA                               StartGroupLba;
+  EFI_LBA                               EndGroupLba;
+  UINT32                                EraseGroupSize;
+  UINT32                                Remainder;
+  UINTN                                 WriteZeroSize;
   UINT8                                 PartitionConfig;
   EMMC_PARTITION                        *Partition;
   EMMC_DEVICE                           *Device;
@@ -1978,7 +2029,8 @@ EmmcEraseBlocks (
     Token->TransactionStatus = EFI_SUCCESS;
   }
 
-  LastLba = Lba + BlockNum - 1;
+  FirstLba = Lba;
+  LastLba  = Lba + BlockNum - 1;
 
   //
   // Check if needs to switch partition access.
@@ -1994,7 +2046,96 @@ EmmcEraseBlocks (
     Device->ExtCsd.PartitionConfig = PartitionConfig;
   }
 
-  Status = EmmcEraseBlockStart (Partition, Lba, (EFI_BLOCK_IO2_TOKEN*)Token, FALSE);
+  if ((Device->ExtCsd.SecFeatureSupport & BIT4) == 0) {
+    //
+    // If the Trim operation is not supported by the device, handle the erase
+    // of blocks that do not form a complete erase group separately.
+    //
+    EraseGroupSize = This->EraseLengthGranularity;
+
+    DivU64x32Remainder (FirstLba, EraseGroupSize, &Remainder);
+    StartGroupLba = (Remainder == 0) ? FirstLba : (FirstLba + EraseGroupSize - Remainder);
+
+    DivU64x32Remainder (LastLba + 1, EraseGroupSize, &Remainder);
+    EndGroupLba = LastLba + 1 - Remainder;
+
+    //
+    // If the size to erase is smaller than the erase group size, the whole
+    // erase operation is performed by writting zeros.
+    //
+    if (BlockNum < EraseGroupSize) {
+      Status = EmmcWriteZeros (Partition, FirstLba, Size);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      DEBUG ((
+        DEBUG_INFO,
+        "EmmcEraseBlocks(): Lba 0x%x BlkNo 0x%x Event %p with %r\n",
+        Lba,
+        BlockNum,
+        (Token != NULL) ? Token->Event : NULL,
+        Status
+        ));
+
+      if ((Token != NULL) && (Token->Event != NULL)) {
+        Token->TransactionStatus = EFI_SUCCESS;
+        gBS->SignalEvent (Token->Event);
+      }
+      return EFI_SUCCESS;
+    }
+
+    //
+    // If the starting LBA to erase is not aligned with the start of an erase
+    // group, write zeros to erase the data from starting LBA to the end of the
+    // current erase group.
+    //
+    if (StartGroupLba > FirstLba) {
+      WriteZeroSize = (UINTN)(StartGroupLba - FirstLba) * BlockSize;
+      Status = EmmcWriteZeros (Partition, FirstLba, WriteZeroSize);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+
+    //
+    // If the ending LBA to erase is not aligned with the end of an erase
+    // group, write zeros to erase the data from the start of the erase group
+    // to the ending LBA.
+    //
+    if (EndGroupLba <= LastLba) {
+      WriteZeroSize = (UINTN)(LastLba + 1 - EndGroupLba) * BlockSize;
+      Status = EmmcWriteZeros (Partition, EndGroupLba, WriteZeroSize);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+
+    //
+    // Check whether there is erase group to erase.
+    //
+    if (EndGroupLba <= StartGroupLba) {
+      DEBUG ((
+        DEBUG_INFO,
+        "EmmcEraseBlocks(): Lba 0x%x BlkNo 0x%x Event %p with %r\n",
+        Lba,
+        BlockNum,
+        (Token != NULL) ? Token->Event : NULL,
+        Status
+        ));
+
+      if ((Token != NULL) && (Token->Event != NULL)) {
+        Token->TransactionStatus = EFI_SUCCESS;
+        gBS->SignalEvent (Token->Event);
+      }
+      return EFI_SUCCESS;
+    }
+
+    FirstLba = StartGroupLba;
+    LastLba  = EndGroupLba - 1;
+  }
+
+  Status = EmmcEraseBlockStart (Partition, FirstLba, (EFI_BLOCK_IO2_TOKEN*)Token, FALSE);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -2009,7 +2150,14 @@ EmmcEraseBlocks (
     return Status;
   }
 
-  DEBUG ((EFI_D_ERROR, "EmmcEraseBlocks(): Lba 0x%x BlkNo 0x%x Event %p with %r\n", Lba, BlockNum, Token->Event, Status));
+  DEBUG ((
+    DEBUG_INFO,
+    "EmmcEraseBlocks(): Lba 0x%x BlkNo 0x%x Event %p with %r\n",
+    Lba,
+    BlockNum,
+    (Token != NULL) ? Token->Event : NULL,
+    Status
+    ));
 
   return Status;
 }
