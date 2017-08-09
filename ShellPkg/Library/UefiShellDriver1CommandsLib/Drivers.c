@@ -2,7 +2,7 @@
   Main file for Drivers shell Driver1 function.
 
   (C) Copyright 2012-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -161,6 +161,92 @@ ReturnDriverVersion(
 }
 
 /**
+  Get image name from Image Handle.
+
+  @param[in] Handle      Image Handle
+
+  @return         A pointer to the image name as a string.
+**/
+CHAR16 *
+GetImageNameFromHandle (
+  IN CONST EFI_HANDLE Handle
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_DRIVER_BINDING_PROTOCOL       *DriverBinding;
+  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL          *DevPathNode;
+  EFI_GUID                          *NameGuid;
+  CHAR16                            *ImageName;
+  UINTN                             BufferSize;
+  UINT32                            AuthenticationStatus;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL     *Fv2;
+
+  LoadedImage   = NULL;
+  DriverBinding = NULL;
+  ImageName     = NULL;
+
+  Status = gBS->OpenProtocol (
+                  Handle,
+                  &gEfiDriverBindingProtocolGuid,
+                  (VOID **) &DriverBinding,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+      return NULL;
+  }
+  Status = gBS->OpenProtocol (
+                  DriverBinding->ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID**)&LoadedImage,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (!EFI_ERROR (Status)) {
+    DevPathNode = LoadedImage->FilePath;
+    if (DevPathNode == NULL) {
+      return NULL;
+    }
+    while (!IsDevicePathEnd (DevPathNode)) {
+      NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)DevPathNode);
+      if (NameGuid != NULL) {
+        Status = gBS->HandleProtocol (
+                        LoadedImage->DeviceHandle,
+                        &gEfiFirmwareVolume2ProtocolGuid,
+                        &Fv2
+                        );
+        if (!EFI_ERROR (Status)) {
+          Status = Fv2->ReadSection (
+                          Fv2,
+                          NameGuid,
+                          EFI_SECTION_USER_INTERFACE,
+                          0,
+                          (VOID **)&ImageName,
+                          &BufferSize,
+                          &AuthenticationStatus
+                          );
+          if (!EFI_ERROR (Status)) {
+            break;
+          }
+          ImageName = NULL;
+        }
+      }
+      //
+      // Next device path node
+      //
+      DevPathNode = NextDevicePathNode (DevPathNode);
+    }
+    if (ImageName == NULL) {
+      ImageName = ConvertDevicePathToText (LoadedImage->FilePath, TRUE, TRUE);
+    }
+  }
+  return ImageName;
+}
+
+/**
   Function for 'drivers' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -186,6 +272,7 @@ ShellCommandRunDrivers (
   CHAR16              *Temp2;
   CONST CHAR16        *FullDriverName;
   CHAR16              *TruncatedDriverName;
+  CHAR16              *ImageName;
   CHAR16              *FormatString;
   UINT32              DriverVersion;
   BOOLEAN             DriverConfig;
@@ -274,6 +361,7 @@ ShellCommandRunDrivers (
         DriverConfig   = ReturnDriverConfig(*HandleWalker);
         DriverDiag     = ReturnDriverDiag  (*HandleWalker);
         FullDriverName = GetStringNameFromHandle(*HandleWalker, Language);
+        ImageName      = GetImageNameFromHandle (*HandleWalker);
 
         TruncatedDriverName = NULL;
         if (!SfoFlag && (FullDriverName != NULL)) {
@@ -293,15 +381,18 @@ ShellCommandRunDrivers (
           DeviceCount,
           ChildCount,
           SfoFlag?FullDriverName:TruncatedDriverName,
-          Temp2==NULL?L"":Temp2
-         );
+          SfoFlag ? (Temp2 == NULL ? L"" : Temp2) : (ImageName == NULL ? L"" : ImageName)
+          );
         if (TruncatedDriverName != NULL) {
           FreePool (TruncatedDriverName);
         }
         if (Temp2 != NULL) {
           FreePool(Temp2);
         }
-        
+        if (ImageName != NULL) {
+          FreePool (ImageName);
+        }
+
         if (ShellGetExecutionBreakFlag ()) {
           ShellStatus = SHELL_ABORTED;
           break;

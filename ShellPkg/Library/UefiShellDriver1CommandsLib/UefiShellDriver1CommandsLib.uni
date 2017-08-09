@@ -93,7 +93,7 @@
 "             T   D\r\n"
 "             Y C I\r\n"
 "             P F A\r\n"
-"DRV VERSION  E G G #D  #C  DRIVER NAME                         IMAGE PATH\r\n"
+"DRV VERSION  E G G #D  #C  DRIVER NAME                         IMAGE NAME\r\n"
 "=== ======== = = = === === =================================== ==========\r\n"
 #string STR_DRIVERS_ITEM_LINE     #language en-US "%H%3x%N %08x %1c %1c %1c %3d %3d %-35s %s\r\n"
 #string STR_DRIVERS_ITEM_LINE_SFO #language en-US "DriversInfo,"%x","%x","%c","%c","%c","%d","%d","%s","%s"\r\n"

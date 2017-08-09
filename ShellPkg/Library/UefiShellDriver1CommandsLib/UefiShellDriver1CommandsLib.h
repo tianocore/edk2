@@ -24,6 +24,10 @@
 
 #include <IndustryStandard/Pci.h>
 
+#include <Pi/PiFirmwareVolume.h>
+#include <Pi/PiFirmwareFile.h>
+#include <Protocol/FirmwareVolume2.h>
+
 #include <Protocol/Shell.h>
 #include <Protocol/ShellParameters.h>
 #include <Protocol/DevicePath.h>
