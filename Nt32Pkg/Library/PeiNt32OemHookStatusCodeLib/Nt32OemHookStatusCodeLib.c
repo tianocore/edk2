@@ -65,8 +65,9 @@ OemHookStatusCodeInitialize (
               NULL,
               (VOID **) &NtThunkPpi
               );
-
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   mWinNt  = (EFI_WIN_NT_THUNK_PROTOCOL *) NtThunkPpi->NtThunk ();
 
