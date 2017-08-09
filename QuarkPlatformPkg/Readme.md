@@ -46,57 +46,13 @@
   - Install
 * ASL compiler: Available from http://www.acpica.org
   - Install into ```C:\ASL``` to match default tools_def.txt configuration.
+* Python 2.7: Available from http://www.python.org
 
 Create a new directory for an EDK II WORKSPACE.
 
 The code block below shows the GIT clone operations required to pull the EDK II
-source tree, the FatPkg sources, the pre-built versions of BaseTools as WIN32
-binaries, and the edk2-non-osi repository that provides a binary file for the
+source tree and the edk2-non-osi repository that provides a binary file for the
 Quark Remote Management Unit (RMU).
-
-Next it sets environment variables that must be set before running
-```edksetup.bat```. Since content is being pulled from multiple repositories,
-the EDK II [Multiple Workspace](
-https://github.com/tianocore/tianocore.github.io/wiki/Multiple_Workspace)
-feature is used.
-
-Next, the ```edksetup.bat``` file is run to complete the initialization of an
-EDK II build environment.  Two example build commands are shown.  The first one
-in ```QuarkPlatformPlg/Quark.dsc``` builds a full UEFI firmware image that is
-able to boot the built-in UEFI Shell and Linux from a micro SD FLASH card.  The
-second one in ```QuarkPlatformPkg/QuarkMin.dsc``` builds a minimal firmware
-image that is useful for initial power-on and debug of new features.
-
-```cmd
-git clone https://github.com/tianocore/edk2.git
-git clone https://github.com/tianocore/edk2-FatPkg.git FatPkg
-git clone https://github.com/tianocore/edk2-BaseTools-win32.git
-git clone https://github.com/tianocore/edk2-non-osi.git
-
-set WORKSPACE=%CD%
-set PACKAGES_PATH=%WORKSPACE%\edk2;%WORKSPACE%\edk2-non-osi
-set EDK_TOOLS_BIN=%WORKSPACE%\edk2-BaseTools-win32
-
-cd edk2
-edksetup.bat
-
-build -a IA32 -t VS2015x86 -p QuarkPlatformPkg/Quark.dsc
-build -a IA32 -t VS2015x86 -p QuarkPlatformPkg/QuarkMin.dsc
-```
-
-## **Linux Build Instructions**
-
-### Pre-requisites
-
-* GIT client
-* GCC 4.9 compiler
-* ASL compiler: Available from http://www.acpica.org.
-
-Create a new directory for an EDK II WORKSPACE.
-
-The code block below shows the GIT clone operations required to pull the EDK II
-source tree, the FatPkg sources, and the edk2-non-osi repository that provides a
-binary file for the Quark Remote Management Unit (RMU).
 
 Next it sets environment variables that must be set before running
 ```edksetup.bat```. Since content is being pulled from multiple repositories,
@@ -113,18 +69,64 @@ able to boot the built-in UEFI Shell and Linux from a micro SD FLASH card.  The
 second one in ```QuarkPlatformPkg/QuarkMin.dsc``` builds a minimal firmware
 image that is useful for initial power-on and debug of new features.
 
+```cmd
+git clone https://github.com/tianocore/edk2.git
+git clone https://github.com/tianocore/edk2-non-osi.git
+
+set PYTHON_HOME=c:\Python27
+set WORKSPACE=%CD%
+set PACKAGES_PATH=%WORKSPACE%\edk2;%WORKSPACE%\edk2-non-osi\Silicon\Intel
+set EDK_TOOLS_PATH=%WORKSPACE%\edk2\BaseTools
+cd %WORKSPACE%\edk2
+
+BaseTools\toolsetup.bat Rebuild
+
+edksetup.bat Rebuild
+
+build -a IA32 -t VS2015x86 -p QuarkPlatformPkg/Quark.dsc
+build -a IA32 -t VS2015x86 -p QuarkPlatformPkg/QuarkMin.dsc
+```
+
+## **Linux Build Instructions**
+
+### Pre-requisites
+
+* GIT client
+* GCC 4.9 compiler
+* ASL compiler: Available from http://www.acpica.org.
+* Python 2.7
+
+Create a new directory for an EDK II WORKSPACE.
+
+The code block below shows the GIT clone operations required to pull the EDK II
+source tree and the edk2-non-osi repository that provides a binary file for the
+Quark Remote Management Unit (RMU).
+
+Next it sets environment variables that must be set before running
+```edksetup.bat```. Since content is being pulled from multiple repositories,
+the EDK II [Multiple Workspace](
+https://github.com/tianocore/tianocore.github.io/wiki/Multiple_Workspace)
+feature is used.
+
+Next, the EDK II BaseTools required to build firmware images are built.
+
+Next, the ```edksetup.sh``` file is run to complete the initialization of an
+EDK II build environment.  Two example build commands are shown.  The first one
+in ```QuarkPlatformPlg/Quark.dsc``` builds a full UEFI firmware image that is
+able to boot the built-in UEFI Shell and Linux from a micro SD FLASH card.  The
+second one in ```QuarkPlatformPkg/QuarkMin.dsc``` builds a minimal firmware
+image that is useful for initial power-on and debug of new features.
+
 ```sh
 git clone https://github.com/tianocore/edk2.git
-git clone https://github.com/tianocore/edk2-FatPkg.git FatPkg
 git clone https://github.com/tianocore/edk2-non-osi.git
 
 export WORKSPACE=$PWD
-export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-non-osi
+export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-non-osi/Silicon/Intel
 export EDK_TOOLS_PATH=$WORKSPACE/edk2/BaseTools
-
-make -C edk2/BaseTools
-
 cd $WORKSPACE/edk2
+
+make -C BaseTools
 
 . edksetup.sh BaseTools
 
