@@ -3,7 +3,7 @@
 #
 # Main executable file of NT32 Emulator that loads PEI core after initialization finished.
 #
-#  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -26,6 +26,7 @@
   WinNtThunk.c
   FwVol.c
   SecMain.c
+  CmdLineArgs.c
 
 [Sources.ia32]
   Stack.asm
@@ -37,6 +38,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   Nt32Pkg/Nt32Pkg.dec
+  SimulationPkg/SimulationPkg.dec
 
 [LibraryClasses]
   DebugLib
@@ -54,6 +56,7 @@
   gPeiNtAutoScanPpiGuid                         # PPI ALWAYS_PRODUCED
   gPeiNtThunkPpiGuid                            # PPI ALWAYS_PRODUCED
   gEfiTemporaryRamSupportPpiGuid
+  gSimCmdLineArgsPpiGuid
 
 [Pcd]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode
@@ -61,6 +64,7 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
+  gEfiNt32PkgTokenSpaceGuid.PcdSerialLogFileName
 
 [BuildOptions]
   MSFT:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
