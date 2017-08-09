@@ -24,6 +24,7 @@ Abstract:
 #include <Ppi/StatusCode.h>
 #include <Ppi/NtFwh.h>
 #include <Ppi/TemporaryRamSupport.h>
+#include <Ppi/SimCmdLineArgs.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
@@ -32,7 +33,7 @@ Abstract:
 
 #include <IndustryStandard/PeImage.h>
 
-#define STACK_SIZE                0x20000      
+#define STACK_SIZE                0x2000000      
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Address;
@@ -547,6 +548,12 @@ SecTemporaryRamSupport (
   IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
   IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
   IN UINTN                    CopySize
+  );
+
+EFI_STATUS
+SimInitCmdLineArgsPpi (
+  IN  INTN  Argc,
+  IN  CHAR8 **Argv
   );
 
 
