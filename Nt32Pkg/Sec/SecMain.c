@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,7 +12,7 @@ Abstract:
   WinNt emulator of SEC phase. It's really a Win32 application, but this is
   Ok since all the other modules for NT32 are NOT Win32 applications.
 
-  This program gets NT32 PCD setting and figures out what the memory layout 
+  This program gets NT32 PCD setting and figures out what the memory layout
   will be, how may FD's will be loaded and also what the boot mode is.
 
   The SEC registers a set of services with the SEC core. gPrivateDispatchTable
@@ -41,6 +41,8 @@ NT_FWH_PPI                                mSecFwhInformationPpi = { SecWinNtFdAd
 
 EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI         mSecTemporaryRamSupportPpi = {SecTemporaryRamSupport};
 
+SIM_CMD_LINE_ARGS_PPI                     mSimCmdLineArgsPpi;
+
 EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
@@ -68,9 +70,14 @@ EFI_PEI_PPI_DESCRIPTOR  gPrivateDispatchTable[] = {
     &mSecTemporaryRamSupportPpi
   },
   {
-    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gNtFwhPpiGuid,
     &mSecFwhInformationPpi
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    &gSimCmdLineArgsPpiGuid,
+    &mSimCmdLineArgsPpi
   }
 };
 
@@ -93,6 +100,12 @@ NT_FD_INFO                                *gFdInfo;
 UINTN                                     gSystemMemoryCount = 0;
 NT_SYSTEM_MEMORY                          *gSystemMemory;
 
+//
+// Handle for serial log.
+//
+
+HANDLE gSerialLogHandle = NULL;
+
 VOID
 EFIAPI
 SecSwitchStack (
@@ -114,6 +127,77 @@ PeiSwitchStacks (
   IN      VOID                      *NewStack
   );
 
+STATIC
+EFI_STATUS
+InitializeSerialLogFileHandle ()
+{
+  CHAR16 *FileName;
+
+  FileName = (CHAR16 *) PcdGetPtr (PcdSerialLogFileName);
+
+  gSerialLogHandle = CreateFileW (FileName,
+                                  GENERIC_READ | GENERIC_WRITE,
+                                  FILE_SHARE_READ,
+                                  NULL,
+                                  CREATE_ALWAYS,
+                                  FILE_ATTRIBUTE_NORMAL,
+                                  NULL);
+  if (gSerialLogHandle == INVALID_HANDLE_VALUE) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+
+} // InitializeSerialLogFileHandle
+
+STATIC
+EFI_STATUS
+SecPrinttOSerialLog (
+  CHAR8 *Buffer,
+  UINTN CharCount
+  )
+{
+  EFI_STATUS Status;
+  DWORD BytesWritten;
+
+  //
+  // If the handle == INVALID_HANDLE_VALUE, that
+  // means we have tried to open the file and failed
+  // already, so skip trying again for performance reasons.
+  //
+
+  if (gSerialLogHandle == INVALID_HANDLE_VALUE) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // If the handle == NULL, try to open the file.
+  //
+
+  if ((gSerialLogHandle == NULL)) {
+
+    Status = InitializeSerialLogFileHandle ();
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    }
+
+  }
+
+  //
+  // Don't worry about failure here, since
+  // we cannot do anything about it.
+  //
+
+  WriteFile ( gSerialLogHandle,
+              Buffer,
+              (DWORD)CharCount,
+              &BytesWritten,
+              NULL);
+
+  return EFI_SUCCESS;
+
+} // SecPrinttOSerialLog
+
 VOID
 SecPrint (
   CHAR8  *Format,
@@ -125,19 +209,26 @@ SecPrint (
   CHAR8    Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE];
 
   va_start (Marker, Format);
-  
+
   _vsnprintf (Buffer, sizeof (Buffer), Format, Marker);
 
   va_end (Marker);
 
   CharCount = strlen (Buffer);
   WriteFile (
-    GetStdHandle (STD_OUTPUT_HANDLE), 
+    GetStdHandle (STD_OUTPUT_HANDLE),
     Buffer,
     (DWORD)CharCount,
     (LPDWORD)&CharCount,
     NULL
     );
+
+  //
+  // Print to serial log also
+  //
+
+  SecPrinttOSerialLog (Buffer, CharCount);
+
 }
 
 INTN
@@ -178,10 +269,16 @@ Returns:
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
-  UINT32                ProcessAffinityMask;
-  UINT32                SystemAffinityMask;
-  INT32                 LowBit;
 
+  //
+  // Initialize the Cmd Line Args PPI.
+  //
+
+  Status = SimInitCmdLineArgsPpi (Argc, Argv);
+  if (EFI_ERROR (Status)) {
+    SecPrint ("SimInitCmdLineArgsPpi failed, Status = %r\n", Status);
+    exit (1);
+  }
 
   //
   // Enable the privilege so that RTC driver can successfully run SetTime()
@@ -197,20 +294,6 @@ Returns:
   FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdWinNtFirmwareVolume);
 
   SecPrint ("\nEDK II SEC Main NT Emulation Environment from www.TianoCore.org\n");
-
-  //
-  // Determine the first thread available to this process.
-  //
-  if (GetProcessAffinityMask (GetCurrentProcess (), &ProcessAffinityMask, &SystemAffinityMask)) {
-    LowBit = (INT32)LowBitSet32 (ProcessAffinityMask);
-    if (LowBit != -1) {
-      //
-      // Force the system to bind the process to a single thread to work
-      // around odd semaphore type crashes.
-      //
-      SetProcessAffinityMask (GetCurrentProcess (), (INTN)(BIT0 << LowBit));
-    }
-  }
 
   //
   // Make some Windows calls to Set the process to the highest priority in the
@@ -259,7 +342,7 @@ Returns:
        StackPointer ++) {
     *StackPointer = PcdGet32 (PcdInitValueInTempStack);
   }
-  
+
   SecPrint ("  SEC passing in %d bytes of temp RAM to PEI\n", InitialStackMemorySize);
 
   //
@@ -299,7 +382,7 @@ Returns:
       exit (1);
     }
 
-    SecPrint ("  FD loaded from");
+    SecPrint ("  FD loaded from ");
     //
     // printf can't print filenames directly as the \ gets interpreted as an
     //  escape character.
@@ -402,7 +485,7 @@ Returns:
   NtFileHandle = CreateFile (
                   FileName,
                   GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE,
-                  FILE_SHARE_READ,
+                  FILE_SHARE_READ | FILE_SHARE_WRITE,
                   NULL,
                   CreationDisposition,
                   FILE_ATTRIBUTE_NORMAL,
@@ -519,7 +602,7 @@ Returns:
 
   } else if (ReportStatusCodeExtractDebugInfo (Data, &ErrorLevel, &Marker, &Format)) {
     //
-    // Process DEBUG () macro 
+    // Process DEBUG () macro
     //
     AsciiBSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
     SecPrint (PrintBuffer);
@@ -562,7 +645,7 @@ PeiSwitchStacks (
   )
 {
   BASE_LIBRARY_JUMP_BUFFER  JumpBuffer;
-  
+
   ASSERT (EntryPoint != NULL);
   ASSERT (NewStack != NULL);
 
@@ -579,12 +662,12 @@ PeiSwitchStacks (
   ((VOID**)JumpBuffer.Esp)[3] = Context3;
 
   LongJump (&JumpBuffer, (UINTN)-1);
-  
+
 
   //
   // InternalSwitchStack () will never return
   //
-  ASSERT (FALSE);  
+  ASSERT (FALSE);
 }
 #endif
 
@@ -632,12 +715,12 @@ Returns:
   // |           |
   // |  Stack    |
   // |-----------| <---- TemporaryRamBase
-  // 
+  //
   TopOfStack  = (VOID *)(LargestRegion + PeiStackSize);
 
   //
   // Reservet space for storing PeiCore's parament in stack.
-  // 
+  //
   TopOfStack  = (VOID *)((UINTN)TopOfStack - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
   TopOfStack  = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
@@ -648,7 +731,7 @@ Returns:
   SecCoreData->DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
   SecCoreData->BootFirmwareVolumeBase = (VOID*)BootFirmwareVolumeBase;
   SecCoreData->BootFirmwareVolumeSize = PcdGet32(PcdWinNtFirmwareFdSize);
-  SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)LargestRegion; 
+  SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)LargestRegion;
   SecCoreData->TemporaryRamSize       = STACK_SIZE;
   SecCoreData->StackBase              = SecCoreData->TemporaryRamBase;
   SecCoreData->StackSize              = PeiStackSize;
@@ -667,7 +750,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return ;
   }
-  
+
   //
   // Transfer control to the PEI Core
   //
@@ -698,7 +781,7 @@ Routine Description:
   It allows discontinuous memory regions to be supported by the emulator.
   It uses gSystemMemory[] and gSystemMemoryCount that were created by
   parsing PcdWinNtMemorySizeForSecMain value.
-  The size comes from the Pcd value and the address comes from the memory space 
+  The size comes from the Pcd value and the address comes from the memory space
   with ReadWrite and Execute attributes allocated by VirtualAlloc() API.
 
 Arguments:
@@ -715,15 +798,15 @@ Returns:
   if (Index >= gSystemMemoryCount) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
-  // Allocate enough memory space for emulator 
+  // Allocate enough memory space for emulator
   //
   gSystemMemory[Index].Memory = (EFI_PHYSICAL_ADDRESS) (UINTN) VirtualAlloc (NULL, (SIZE_T) (gSystemMemory[Index].Size), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
   if (gSystemMemory[Index].Memory == 0) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   *MemoryBase = gSystemMemory[Index].Memory;
   *MemorySize = gSystemMemory[Index].Size;
 
@@ -1003,10 +1086,10 @@ SecNt32PeCoffRelocateImage (
   //
   // If we load our own PE COFF images the Windows debugger can not source
   //  level debug our code. If a valid PDB pointer exists usw it to load
-  //  the *.dll file as a library using Windows* APIs. This allows 
+  //  the *.dll file as a library using Windows* APIs. This allows
   //  source level debug. The image is still loaded and relocated
   //  in the Framework memory space like on a real system (by the code above),
-  //  but the entry point points into the DLL loaded by the code bellow. 
+  //  but the entry point points into the DLL loaded by the code bellow.
   //
 
   DllEntryPoint = NULL;
@@ -1042,7 +1125,7 @@ SecNt32PeCoffRelocateImage (
     DllFileName[Index - 1]  = 'L';
 
     //
-    // Load the .DLL file into the user process's address space for source 
+    // Load the .DLL file into the user process's address space for source
     // level debug
     //
     Library = LoadLibraryEx (DllFileName, NULL, DONT_RESOLVE_DLL_REFERENCES);
@@ -1051,8 +1134,8 @@ SecNt32PeCoffRelocateImage (
       // InitializeDriver is the entry point we put in all our EFI DLL's. The
       // DONT_RESOLVE_DLL_REFERENCES argument to LoadLIbraryEx() suppresses the 
       // normal DLL entry point of DllMain, and prevents other modules that are
-      // referenced in side the DllFileName from being loaded. There is no error 
-      // checking as the we can point to the PE32 image loaded by Tiano. This 
+      // referenced in side the DllFileName from being loaded. There is no error
+      // checking as the we can point to the PE32 image loaded by Tiano. This
       // step is only needed for source level debugging
       //
       DllEntryPoint = (VOID *) (UINTN) GetProcAddress (Library, "InitializeDriver");
@@ -1098,10 +1181,10 @@ SecTemporaryRamSupport (
 {
   //
   // Migrate the whole temporary memory to permanent memory.
-  // 
+  //
   CopyMem (
-    (VOID*)(UINTN)PermanentMemoryBase, 
-    (VOID*)(UINTN)TemporaryMemoryBase, 
+    (VOID*)(UINTN)PermanentMemoryBase,
+    (VOID*)(UINTN)TemporaryMemoryBase,
     CopySize
     );
 
@@ -1109,22 +1192,22 @@ SecTemporaryRamSupport (
   // SecSwitchStack function must be invoked after the memory migration
   // immediately, also we need fixup the stack change caused by new call into 
   // permanent memory.
-  // 
+  //
   SecSwitchStack (
     (UINT32) TemporaryMemoryBase,
     (UINT32) PermanentMemoryBase
     );
 
   //
-  // We need *not* fix the return address because currently, 
+  // We need *not* fix the return address because currently,
   // The PeiCore is executed in flash.
   //
 
   //
   // Simulate to invalid temporary memory, terminate temporary memory
-  // 
+  //
   //ZeroMem ((VOID*)(UINTN)TemporaryMemoryBase, CopySize);
-  
+
   return EFI_SUCCESS;
 }
 
