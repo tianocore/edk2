@@ -124,6 +124,7 @@ CreateContextEntry (
       RootEntry->Bits.ContextTablePointerHi  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 32);
       RootEntry->Bits.Present = 1;
       Buffer = (UINT8 *)Buffer + EFI_PAGES_TO_SIZE (ContextPages);
+      FlushPageTableMemory (VtdIndex, (UINTN)RootEntry, sizeof(*RootEntry));
     }
 
     ContextEntryTable = (VTD_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(RootEntry->Bits.ContextTablePointerLo, RootEntry->Bits.ContextTablePointerHi) ;
@@ -142,6 +143,7 @@ CreateContextEntry (
       ContextEntry->Bits.AddressWidth = 0x2;
       break;
     }
+    FlushPageTableMemory (VtdIndex, (UINTN)ContextEntry, sizeof(*ContextEntry));
   }
 
   return EFI_SUCCESS;
@@ -250,8 +252,11 @@ CreateSecondLevelPagingEntryTable (
           goto Done;
         }
       }
+      FlushPageTableMemory (VtdIndex, (UINTN)Lvl2PtEntry, SIZE_4KB);
     }
+    FlushPageTableMemory (VtdIndex, (UINTN)&Lvl3PtEntry[Lvl3Start], (UINTN)&Lvl3PtEntry[Lvl3End + 1] - (UINTN)&Lvl3PtEntry[Lvl3Start]);
   }
+  FlushPageTableMemory (VtdIndex, (UINTN)&Lvl4PtEntry[Lvl4Start], (UINTN)&Lvl4PtEntry[Lvl4End + 1] - (UINTN)&Lvl4PtEntry[Lvl4Start]);
 
 Done:
   return SecondLevelPagingEntry;
@@ -429,9 +434,10 @@ InvalidatePageEntry (
   IN UINTN                 VtdIndex
   )
 {
-  if (mVtdUnitInformation[VtdIndex].HasDirtyPages) {
+  if (mVtdUnitInformation[VtdIndex].HasDirtyContext || mVtdUnitInformation[VtdIndex].HasDirtyPages) {
     InvalidateVtdIOTLBGlobal (VtdIndex);
   }
+  mVtdUnitInformation[VtdIndex].HasDirtyContext = FALSE;
   mVtdUnitInformation[VtdIndex].HasDirtyPages = FALSE;
 }
 
@@ -498,6 +504,7 @@ PageAttributeToLength (
 /**
   Return page table entry to match the address.
 
+  @param[in]   VtdIndex                 The index used to identify a VTd engine.
   @param[in]   SecondLevelPagingEntry   The second level paging entry in VTd table for the device.
   @param[in]   Address                  The address to be checked.
   @param[out]  PageAttributes           The page attribute of the page entry.
@@ -506,6 +513,7 @@ PageAttributeToLength (
 **/
 VOID *
 GetSecondLevelPageTableEntry (
+  IN  UINTN                         VtdIndex,
   IN  VTD_SECOND_LEVEL_PAGING_ENTRY *SecondLevelPagingEntry,
   IN  PHYSICAL_ADDRESS              Address,
   OUT PAGE_ATTRIBUTE                *PageAttribute
@@ -535,6 +543,7 @@ GetSecondLevelPageTableEntry (
       return NULL;
     }
     SetSecondLevelPagingEntryAttribute ((VTD_SECOND_LEVEL_PAGING_ENTRY *)&L4PageTable[Index4], EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
+    FlushPageTableMemory (VtdIndex, (UINTN)&L4PageTable[Index4], sizeof(L4PageTable[Index4]));
   }
 
   L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & PAGING_4K_ADDRESS_MASK_64);
@@ -547,6 +556,7 @@ GetSecondLevelPageTableEntry (
       return NULL;
     }
     SetSecondLevelPagingEntryAttribute ((VTD_SECOND_LEVEL_PAGING_ENTRY *)&L3PageTable[Index3], EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
+    FlushPageTableMemory (VtdIndex, (UINTN)&L3PageTable[Index3], sizeof(L3PageTable[Index3]));
   }
   if ((L3PageTable[Index3] & VTD_PG_PS) != 0) {
     // 1G
@@ -559,6 +569,7 @@ GetSecondLevelPageTableEntry (
     L2PageTable[Index2] = Address & PAGING_2M_ADDRESS_MASK_64;
     SetSecondLevelPagingEntryAttribute ((VTD_SECOND_LEVEL_PAGING_ENTRY *)&L2PageTable[Index2], 0);
     L2PageTable[Index2] |= VTD_PG_PS;
+    FlushPageTableMemory (VtdIndex, (UINTN)&L2PageTable[Index2], sizeof(L2PageTable[Index2]));
   }
   if ((L2PageTable[Index2] & VTD_PG_PS) != 0) {
     // 2M
@@ -579,12 +590,14 @@ GetSecondLevelPageTableEntry (
 /**
   Modify memory attributes of page entry.
 
+  @param[in]   VtdIndex         The index used to identify a VTd engine.
   @param[in]   PageEntry        The page entry.
   @param[in]   IoMmuAccess      The IOMMU access.
   @param[out]  IsModified       TRUE means page table modified. FALSE means page table not modified.
 **/
 VOID
 ConvertSecondLevelPageEntryAttribute (
+  IN  UINTN                             VtdIndex,
   IN  VTD_SECOND_LEVEL_PAGING_ENTRY     *PageEntry,
   IN  UINT64                            IoMmuAccess,
   OUT BOOLEAN                           *IsModified
@@ -595,6 +608,7 @@ ConvertSecondLevelPageEntryAttribute (
 
   CurrentPageEntry = PageEntry->Uint64;
   SetSecondLevelPagingEntryAttribute (PageEntry, IoMmuAccess);
+  FlushPageTableMemory (VtdIndex, (UINTN)PageEntry, sizeof(*PageEntry));
   NewPageEntry = PageEntry->Uint64;
   if (CurrentPageEntry != NewPageEntry) {
     *IsModified = TRUE;
@@ -639,6 +653,7 @@ NeedSplitPage (
 /**
   This function splits one page entry to small page entries.
 
+  @param[in]  VtdIndex         The index used to identify a VTd engine.
   @param[in]  PageEntry        The page entry to be splitted.
   @param[in]  PageAttribute    The page attribute of the page entry.
   @param[in]  SplitAttribute   How to split the page entry.
@@ -649,6 +664,7 @@ NeedSplitPage (
 **/
 RETURN_STATUS
 SplitSecondLevelPage (
+  IN  UINTN                             VtdIndex,
   IN  VTD_SECOND_LEVEL_PAGING_ENTRY     *PageEntry,
   IN  PAGE_ATTRIBUTE                    PageAttribute,
   IN  PAGE_ATTRIBUTE                    SplitAttribute
@@ -675,8 +691,11 @@ SplitSecondLevelPage (
       for (Index = 0; Index < SIZE_4KB / sizeof(UINT64); Index++) {
         NewPageEntry[Index] = (BaseAddress + SIZE_4KB * Index) | (PageEntry->Uint64 & PAGE_PROGATE_BITS);
       }
+      FlushPageTableMemory (VtdIndex, (UINTN)NewPageEntry, SIZE_4KB);
+
       PageEntry->Uint64 = (UINT64)(UINTN)NewPageEntry;
       SetSecondLevelPagingEntryAttribute (PageEntry, EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
+      FlushPageTableMemory (VtdIndex, (UINTN)PageEntry, sizeof(*PageEntry));
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
@@ -697,8 +716,11 @@ SplitSecondLevelPage (
       for (Index = 0; Index < SIZE_4KB / sizeof(UINT64); Index++) {
         NewPageEntry[Index] = (BaseAddress + SIZE_2MB * Index) | VTD_PG_PS | (PageEntry->Uint64 & PAGE_PROGATE_BITS);
       }
+      FlushPageTableMemory (VtdIndex, (UINTN)NewPageEntry, SIZE_4KB);
+
       PageEntry->Uint64 = (UINT64)(UINTN)NewPageEntry;
       SetSecondLevelPagingEntryAttribute (PageEntry, EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
+      FlushPageTableMemory (VtdIndex, (UINTN)PageEntry, sizeof(*PageEntry));
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
@@ -730,6 +752,7 @@ SplitSecondLevelPage (
 EFI_STATUS
 SetSecondLevelPagingAttribute (
   IN UINTN                         VtdIndex,
+  IN UINT16                        DomainIdentifier,
   IN VTD_SECOND_LEVEL_PAGING_ENTRY *SecondLevelPagingEntry,
   IN UINT64                        BaseAddress,
   IN UINT64                        Length,
@@ -756,7 +779,7 @@ SetSecondLevelPagingAttribute (
   }
 
   while (Length != 0) {
-    PageEntry = GetSecondLevelPageTableEntry (SecondLevelPagingEntry, BaseAddress, &PageAttribute);
+    PageEntry = GetSecondLevelPageTableEntry (VtdIndex, SecondLevelPagingEntry, BaseAddress, &PageAttribute);
     if (PageEntry == NULL) {
       DEBUG ((DEBUG_ERROR, "PageEntry - NULL\n"));
       return RETURN_UNSUPPORTED;
@@ -764,7 +787,7 @@ SetSecondLevelPagingAttribute (
     PageEntryLength = PageAttributeToLength (PageAttribute);
     SplitAttribute = NeedSplitPage (BaseAddress, Length, PageAttribute);
     if (SplitAttribute == PageNone) {
-      ConvertSecondLevelPageEntryAttribute (PageEntry, IoMmuAccess, &IsEntryModified);
+      ConvertSecondLevelPageEntryAttribute (VtdIndex, PageEntry, IoMmuAccess, &IsEntryModified);
       if (IsEntryModified) {
         mVtdUnitInformation[VtdIndex].HasDirtyPages = TRUE;
       }
@@ -774,7 +797,7 @@ SetSecondLevelPagingAttribute (
       BaseAddress += PageEntryLength;
       Length -= PageEntryLength;
     } else {
-      Status = SplitSecondLevelPage (PageEntry, PageAttribute, SplitAttribute);
+      Status = SplitSecondLevelPage (VtdIndex, PageEntry, PageAttribute, SplitAttribute);
       if (RETURN_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "SplitSecondLevelPage - %r\n", Status));
         return RETURN_UNSUPPORTED;
@@ -786,8 +809,6 @@ SetSecondLevelPagingAttribute (
       //
     }
   }
-
-  InvalidatePageEntry (VtdIndex);
 
   return EFI_SUCCESS;
 }
@@ -814,6 +835,7 @@ SetSecondLevelPagingAttribute (
 EFI_STATUS
 SetPageAttribute (
   IN UINTN                         VtdIndex,
+  IN UINT16                        DomainIdentifier,
   IN VTD_SECOND_LEVEL_PAGING_ENTRY *SecondLevelPagingEntry,
   IN UINT64                        BaseAddress,
   IN UINT64                        Length,
@@ -823,7 +845,7 @@ SetPageAttribute (
   EFI_STATUS Status;
   Status = EFI_NOT_FOUND;
   if (SecondLevelPagingEntry != NULL) {
-    Status = SetSecondLevelPagingAttribute (VtdIndex, SecondLevelPagingEntry, BaseAddress, Length, IoMmuAccess);
+    Status = SetSecondLevelPagingAttribute (VtdIndex, DomainIdentifier, SecondLevelPagingEntry, BaseAddress, Length, IoMmuAccess);
   }
   return Status;
 }
@@ -862,6 +884,8 @@ SetAccessAttribute (
   VTD_CONTEXT_ENTRY             *ContextEntry;
   VTD_SECOND_LEVEL_PAGING_ENTRY *SecondLevelPagingEntry;
   UINT64                        Pt;
+  UINTN                         PciDescriptorIndex;
+  UINT16                        DomainIdentifier;
 
   SecondLevelPagingEntry = NULL;
 
@@ -873,6 +897,13 @@ SetAccessAttribute (
     return EFI_DEVICE_ERROR;
   }
 
+  PciDescriptorIndex = GetPciDescriptor (VtdIndex, Segment, SourceId);
+  mVtdUnitInformation[VtdIndex].PciDeviceInfo.AccessCount[PciDescriptorIndex]++;
+  //
+  // DomainId should not be 0.
+  //
+  DomainIdentifier = (UINT16)(PciDescriptorIndex + 1);
+
   if (ExtContextEntry != NULL) {
     if (ExtContextEntry->Bits.Present == 0) {
       SecondLevelPagingEntry = CreateSecondLevelPagingEntry (VtdIndex, 0);
@@ -881,9 +912,11 @@ SetAccessAttribute (
 
       ExtContextEntry->Bits.SecondLevelPageTranslationPointerLo = (UINT32) Pt;
       ExtContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
-      ExtContextEntry->Bits.DomainIdentifier = (UINT16) GetPciDescriptor (VtdIndex, Segment, SourceId);
+      ExtContextEntry->Bits.DomainIdentifier = DomainIdentifier;
       ExtContextEntry->Bits.Present = 1;
+      FlushPageTableMemory (VtdIndex, (UINTN)ExtContextEntry, sizeof(*ExtContextEntry));
       DumpDmarExtContextEntryTable (mVtdUnitInformation[VtdIndex].ExtRootEntryTable);
+      mVtdUnitInformation[VtdIndex].HasDirtyContext = TRUE;
     } else {
       SecondLevelPagingEntry = (VOID *)(UINTN)VTD_64BITS_ADDRESS(ExtContextEntry->Bits.SecondLevelPageTranslationPointerLo, ExtContextEntry->Bits.SecondLevelPageTranslationPointerHi);
       DEBUG ((DEBUG_VERBOSE,"SecondLevelPagingEntry - 0x%x (S%04x B%02x D%02x F%02x)\n", SecondLevelPagingEntry, Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
@@ -896,9 +929,11 @@ SetAccessAttribute (
 
       ContextEntry->Bits.SecondLevelPageTranslationPointerLo = (UINT32) Pt;
       ContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
-      ContextEntry->Bits.DomainIdentifier = (UINT16) GetPciDescriptor (VtdIndex, Segment, SourceId);
+      ContextEntry->Bits.DomainIdentifier = DomainIdentifier;
       ContextEntry->Bits.Present = 1;
+      FlushPageTableMemory (VtdIndex, (UINTN)ContextEntry, sizeof(*ContextEntry));
       DumpDmarContextEntryTable (mVtdUnitInformation[VtdIndex].RootEntryTable);
+      mVtdUnitInformation[VtdIndex].HasDirtyContext = TRUE;
     } else {
       SecondLevelPagingEntry = (VOID *)(UINTN)VTD_64BITS_ADDRESS(ContextEntry->Bits.SecondLevelPageTranslationPointerLo, ContextEntry->Bits.SecondLevelPageTranslationPointerHi);
       DEBUG ((DEBUG_VERBOSE,"SecondLevelPagingEntry - 0x%x (S%04x B%02x D%02x F%02x)\n", SecondLevelPagingEntry, Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
@@ -911,6 +946,7 @@ SetAccessAttribute (
   if (SecondLevelPagingEntry != mVtdUnitInformation[VtdIndex].FixedSecondLevelPagingEntry) {
     Status = SetPageAttribute (
                VtdIndex,
+               DomainIdentifier,
                SecondLevelPagingEntry,
                BaseAddress,
                Length,
@@ -921,6 +957,8 @@ SetAccessAttribute (
       return Status;
     }
   }
+
+  InvalidatePageEntry (VtdIndex);
 
   return EFI_SUCCESS;
 }
@@ -965,11 +1003,13 @@ AlwaysEnablePageAttribute (
     ExtContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
     ExtContextEntry->Bits.DomainIdentifier = ((1 << (UINT8)((UINTN)mVtdUnitInformation[VtdIndex].CapReg.Bits.ND * 2 + 4)) - 1);
     ExtContextEntry->Bits.Present = 1;
+    FlushPageTableMemory (VtdIndex, (UINTN)ExtContextEntry, sizeof(*ExtContextEntry));
   } else if (ContextEntry != NULL) {
     ContextEntry->Bits.SecondLevelPageTranslationPointerLo = (UINT32) Pt;
     ContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
     ContextEntry->Bits.DomainIdentifier = ((1 << (UINT8)((UINTN)mVtdUnitInformation[VtdIndex].CapReg.Bits.ND * 2 + 4)) - 1);
     ContextEntry->Bits.Present = 1;
+    FlushPageTableMemory (VtdIndex, (UINTN)ContextEntry, sizeof(*ContextEntry));
   }
 
   return EFI_SUCCESS;

@@ -20,6 +20,106 @@ VTD_UNIT_INFORMATION             *mVtdUnitInformation;
 BOOLEAN  mVtdEnabled;
 
 /**
+  Flush VTD page table and context table memory.
+
+  This action is to make sure the IOMMU engine can get final data in memory.
+
+  @param[in]  VtdIndex          The index used to identify a VTd engine.
+  @param[in]  Base              The base address of memory to be flushed.
+  @param[in]  Size              The size of memory in bytes to be flushed.
+**/
+VOID
+FlushPageTableMemory (
+  IN UINTN  VtdIndex,
+  IN UINTN  Base,
+  IN UINTN  Size
+  )
+{
+  if (mVtdUnitInformation[VtdIndex].ECapReg.Bits.C == 0) {
+    WriteBackDataCacheRange ((VOID *)Base, Size);
+  }
+}
+
+/**
+  Flush VTd engine write buffer.
+
+  @param[in]  VtdIndex          The index used to identify a VTd engine.
+**/
+VOID
+FlushWriteBuffer (
+  IN UINTN  VtdIndex
+  )
+{
+  UINT32  Reg32;
+
+  if (mVtdUnitInformation[VtdIndex].CapReg.Bits.RWBF != 0) {
+    Reg32 = MmioRead32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GSTS_REG);
+    MmioWrite32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GCMD_REG, Reg32 | B_GMCD_REG_WBF);
+    do {
+      Reg32 = MmioRead32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GSTS_REG);
+    } while ((Reg32 & B_GSTS_REG_WBF) != 0);
+  }
+}
+
+/**
+  Invalidate VTd context cache.
+
+  @param[in]  VtdIndex          The index used to identify a VTd engine.
+**/
+EFI_STATUS
+InvalidateContextCache (
+  IN UINTN  VtdIndex
+  )
+{
+  UINT64  Reg64;
+
+  Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG);
+  if ((Reg64 & B_CCMD_REG_ICC) != 0) {
+    DEBUG ((DEBUG_ERROR,"ERROR: InvalidateContextCache: B_CCMD_REG_ICC is set for VTD(%d)\n",VtdIndex));
+    return EFI_DEVICE_ERROR;
+  }
+
+  Reg64 &= ((~B_CCMD_REG_ICC) & (~B_CCMD_REG_CIRG_MASK));
+  Reg64 |= (B_CCMD_REG_ICC | V_CCMD_REG_CIRG_GLOBAL);
+  MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG, Reg64);
+
+  do {
+    Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG);
+  } while ((Reg64 & B_CCMD_REG_ICC) != 0);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Invalidate VTd IOTLB.
+
+  @param[in]  VtdIndex          The index used to identify a VTd engine.
+**/
+EFI_STATUS
+InvalidateIOTLB (
+  IN UINTN  VtdIndex
+  )
+{
+  UINT64  Reg64;
+
+  Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
+  if ((Reg64 & B_IOTLB_REG_IVT) != 0) {
+    DEBUG ((DEBUG_ERROR,"ERROR: InvalidateIOTLB: B_IOTLB_REG_IVT is set for VTD(%d)\n", VtdIndex));
+    return EFI_DEVICE_ERROR;
+  }
+
+  Reg64 &= ((~B_IOTLB_REG_IVT) & (~B_IOTLB_REG_IIRG_MASK));
+  Reg64 |= (B_IOTLB_REG_IVT | V_IOTLB_REG_IIRG_GLOBAL);
+  MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG, Reg64);
+
+  do {
+    Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
+  } while ((Reg64 & B_IOTLB_REG_IVT) != 0);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Invalid VTd global IOTLB.
 
   @param[in]  VtdIndex              The index of VTd engine.
@@ -32,190 +132,29 @@ InvalidateVtdIOTLBGlobal (
   IN UINTN  VtdIndex
   )
 {
-  UINT64  Reg64;
-  UINT32  Reg32;
-
   if (!mVtdEnabled) {
     return EFI_SUCCESS;
   }
 
   DEBUG((DEBUG_VERBOSE, "InvalidateVtdIOTLBGlobal(%d)\n", VtdIndex));
 
-  AsmWbinvd();
-
   //
   // Write Buffer Flush before invalidation
   //
-  Reg32 = MmioRead32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CAP_REG);
-  if ((Reg32 & B_CAP_REG_RWBF) != 0) {
-    MmioWrite32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GCMD_REG, B_GMCD_REG_WBF);
-  }
+  FlushWriteBuffer (VtdIndex);
 
   //
   // Invalidate the context cache
   //
-  Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG);
-  if ((Reg64 & B_CCMD_REG_ICC) != 0) {
-    DEBUG ((DEBUG_ERROR,"ERROR: InvalidateVtdIOTLBGlobal: B_CCMD_REG_ICC is set for VTD(%d)\n",VtdIndex));
-    return EFI_DEVICE_ERROR;
+  if (mVtdUnitInformation[VtdIndex].HasDirtyContext) {
+    InvalidateContextCache (VtdIndex);
   }
-
-  Reg64 &= ((~B_CCMD_REG_ICC) & (~B_CCMD_REG_CIRG_MASK));
-  Reg64 |= (B_CCMD_REG_ICC | V_CCMD_REG_CIRG_GLOBAL);
-  MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG, Reg64);
-
-  do {
-    Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG);
-  } while ((Reg64 & B_CCMD_REG_ICC) != 0);
 
   //
   // Invalidate the IOTLB cache
   //
-
-  Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-  if ((Reg64 & B_IOTLB_REG_IVT) != 0) {
-    DEBUG ((DEBUG_ERROR,"ERROR: InvalidateVtdIOTLBGlobal: B_IOTLB_REG_IVT is set for VTD(%d)\n", VtdIndex));
-    return EFI_DEVICE_ERROR;
-  }
-
-  Reg64 &= ((~B_IOTLB_REG_IVT) & (~B_IOTLB_REG_IIRG_MASK));
-  Reg64 |= (B_IOTLB_REG_IVT | V_IOTLB_REG_IIRG_GLOBAL);
-  MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG, Reg64);
-
-  do {
-    Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-  } while ((Reg64 & B_IOTLB_REG_IVT) != 0);
-
-  //
-  // Disable VTd
-  //
-  MmioWrite32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GCMD_REG, B_GMCD_REG_SRTP);
-  do {
-    Reg32 = MmioRead32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GSTS_REG);
-  } while((Reg32 & B_GSTS_REG_RTPS) == 0);
-
-  //
-  // Enable VTd
-  //
-  MmioWrite32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GCMD_REG, B_GMCD_REG_TE);
-  do {
-    Reg32 = MmioRead32 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_GSTS_REG);
-  } while ((Reg32 & B_GSTS_REG_TE) == 0);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Invalid VTd IOTLB domain.
-
-  @param[in]  VtdIndex              The index of VTd engine.
-  @param[in]  DomainIdentifier      The domain ID of the source.
-
-  @retval EFI_SUCCESS           VTd IOTLB domain is invalidated.
-  @retval EFI_DEVICE_ERROR      VTd IOTLB domain is not invalidated.
-**/
-EFI_STATUS
-InvalidateVtdIOTLBDomain (
-  IN UINTN  VtdIndex,
-  IN UINT16 DomainIdentifier
-  )
-{
-  UINT64  Reg64;
-
-  if (!mVtdEnabled) {
-    return EFI_SUCCESS;
-  }
-
-  DEBUG((DEBUG_VERBOSE, "InvalidateVtdIOTLBDomain(%d): 0x%016lx (0x%04x)\n", VtdIndex, DomainIdentifier));
-
-  //
-  // Invalidate the context cache
-  //
-  Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG);
-  if ((Reg64 & B_CCMD_REG_ICC) != 0) {
-    DEBUG ((DEBUG_ERROR,"ERROR: InvalidateVtdIOTLBDomain: B_CCMD_REG_ICC is set for VTD(%d)\n",VtdIndex));
-    return EFI_DEVICE_ERROR;
-  }
-
-  Reg64 &= ((~B_CCMD_REG_ICC) & (~B_CCMD_REG_CIRG_MASK));
-  Reg64 |= (B_CCMD_REG_ICC | V_CCMD_REG_CIRG_DOMAIN);
-  Reg64 |= (B_CCMD_REG_ICC | V_CCMD_REG_CIRG_DOMAIN);
-  MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG, Reg64);
-
-  do {
-    Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + R_CCMD_REG);
-  } while ((Reg64 & B_CCMD_REG_ICC) != 0);
-
-  //
-  // Invalidate the IOTLB cache
-  //
-
-  Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-  if ((Reg64 & B_IOTLB_REG_IVT) != 0) {
-    DEBUG ((DEBUG_ERROR,"ERROR: InvalidateVtdIOTLBDomain: B_IOTLB_REG_IVT is set for VTD(%d)\n", VtdIndex));
-    return EFI_DEVICE_ERROR;
-  }
-
-  Reg64 &= ((~B_IOTLB_REG_IVT) & (~B_IOTLB_REG_IIRG_MASK));
-  Reg64 |= (B_IOTLB_REG_IVT | V_IOTLB_REG_IIRG_DOMAIN);
-  Reg64 |= LShiftU64 (DomainIdentifier, 32);
-  MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG, Reg64);
-
-  do {
-    Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-  } while ((Reg64 & B_IOTLB_REG_IVT) != 0);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Invalid VTd IOTLB page.
-
-  @param[in]  VtdIndex              The index of VTd engine.
-  @param[in]  Address               The address of IOTLB page.
-  @param[in]  AddressMode           The address mode of IOTLB page.
-  @param[in]  DomainIdentifier      The domain ID of the source.
-
-  @retval EFI_SUCCESS           VTd IOTLB page is invalidated.
-  @retval EFI_DEVICE_ERROR      VTd IOTLB page is not invalidated.
-**/
-EFI_STATUS
-InvalidateVtdIOTLBPage (
-  IN UINTN  VtdIndex,
-  IN UINT64 Address,
-  IN UINT8  AddressMode,
-  IN UINT16 DomainIdentifier
-  )
-{
-  UINT64  Reg64;
-  UINT64  Data64;
-
-  if (!mVtdEnabled) {
-    return EFI_SUCCESS;
-  }
-
-  DEBUG((DEBUG_VERBOSE, "InvalidateVtdIOTLBPage(%d): 0x%016lx (0x%02x)\n", VtdIndex, Address, AddressMode));
-
-  if (mVtdUnitInformation[VtdIndex].CapReg.Bits.PSI != 0) {
-    Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-    if ((Reg64 & B_IOTLB_REG_IVT) != 0) {
-      DEBUG ((DEBUG_ERROR,"ERROR: InvalidateVtdIOTLBPage: B_IOTLB_REG_IVT is set for VTD(%d)\n", VtdIndex));
-      return EFI_DEVICE_ERROR;
-    }
-
-    Data64 = Address | AddressMode;
-    MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IVA_REG, Data64);
-
-    Reg64 &= ((~B_IOTLB_REG_IVT) & (~B_IOTLB_REG_IIRG_MASK));
-    Reg64 |= (B_IOTLB_REG_IVT | V_IOTLB_REG_IIRG_PAGE);
-    Reg64 |= LShiftU64 (DomainIdentifier, 32);
-    MmioWrite64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG, Reg64);
-
-    do {
-      Reg64 = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + (mVtdUnitInformation[VtdIndex].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-    } while ((Reg64 & B_IOTLB_REG_IVT) != 0);
-  } else {
-    InvalidateVtdIOTLBGlobal (VtdIndex);
+  if (mVtdUnitInformation[VtdIndex].HasDirtyContext || mVtdUnitInformation[VtdIndex].HasDirtyPages) {
+    InvalidateIOTLB (VtdIndex);
   }
 
   return EFI_SUCCESS;
@@ -268,10 +207,7 @@ EnableDmar (
   )
 {
   UINTN     Index;
-  UINT64    Reg64;
   UINT32    Reg32;
-
-  AsmWbinvd();
 
   for (Index = 0; Index < mVtdUnitNumber; Index++) {
     DEBUG((DEBUG_INFO, ">>>>>>EnableDmar() for engine [%d] \n", Index));
@@ -299,48 +235,17 @@ EnableDmar (
     //
     // Write Buffer Flush before invalidation
     //
-    Reg32 = MmioRead32 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_CAP_REG);
-    if ((Reg32 & B_CAP_REG_RWBF) != 0) {
-      MmioWrite32 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_GCMD_REG, B_GMCD_REG_WBF);
-    }
+    FlushWriteBuffer (Index);
 
     //
     // Invalidate the context cache
     //
-    Reg64 = MmioRead64 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_CCMD_REG);
-    if ((Reg64 & B_CCMD_REG_ICC) != 0) {
-      DEBUG ((DEBUG_INFO,"ERROR: EnableDmar: B_CCMD_REG_ICC is set for VTD(%d)\n",Index));
-      return EFI_DEVICE_ERROR;
-    }
-
-    Reg64 &= ((~B_CCMD_REG_ICC) & (~B_CCMD_REG_CIRG_MASK));
-    Reg64 |= (B_CCMD_REG_ICC | V_CCMD_REG_CIRG_GLOBAL);
-    MmioWrite64 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_CCMD_REG, Reg64);
-
-    DEBUG((DEBUG_INFO, "EnableDmar: Waiting B_CCMD_REG_ICC ...\n"));
-    do {
-      Reg64 = MmioRead64 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_CCMD_REG);
-    } while ((Reg64 & B_CCMD_REG_ICC) != 0);
+    InvalidateContextCache (Index);
 
     //
     // Invalidate the IOTLB cache
     //
-    DEBUG((DEBUG_INFO, "EnableDmar: IRO 0x%x\n", mVtdUnitInformation[Index].ECapReg.Bits.IRO));
-
-    Reg64 = MmioRead64 (mVtdUnitInformation[Index].VtdUnitBaseAddress + (mVtdUnitInformation[Index].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-    if ((Reg64 & B_IOTLB_REG_IVT) != 0) {
-      DEBUG ((DEBUG_INFO,"ERROR: EnableDmar: B_IOTLB_REG_IVT is set for VTD(%d)\n", Index));
-      return EFI_DEVICE_ERROR;
-    }
-
-    Reg64 &= ((~B_IOTLB_REG_IVT) & (~B_IOTLB_REG_IIRG_MASK));
-    Reg64 |= (B_IOTLB_REG_IVT | V_IOTLB_REG_IIRG_GLOBAL);
-    MmioWrite64 (mVtdUnitInformation[Index].VtdUnitBaseAddress + (mVtdUnitInformation[Index].ECapReg.Bits.IRO * 16) + R_IOTLB_REG, Reg64);
-
-    DEBUG((DEBUG_INFO, "EnableDmar: Waiting B_IOTLB_REG_IVT ...\n"));
-    do {
-      Reg64 = MmioRead64 (mVtdUnitInformation[Index].VtdUnitBaseAddress + (mVtdUnitInformation[Index].ECapReg.Bits.IRO * 16) + R_IOTLB_REG);
-    } while ((Reg64 & B_IOTLB_REG_IVT) != 0);
+    InvalidateIOTLB (Index);
 
     //
     // Enable VTd
@@ -371,9 +276,8 @@ DisableDmar (
   )
 {
   UINTN     Index;
+  UINTN     SubIndex;
   UINT32    Reg32;
-
-  AsmWbinvd();
 
   for (Index = 0; Index < mVtdUnitNumber; Index++) {
     DEBUG((DEBUG_INFO, ">>>>>>DisableDmar() for engine [%d] \n", Index));
@@ -381,10 +285,7 @@ DisableDmar (
     //
     // Write Buffer Flush before invalidation
     //
-    Reg32 = MmioRead32 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_CAP_REG);
-    if ((Reg32 & B_CAP_REG_RWBF) != 0) {
-      MmioWrite32 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_GCMD_REG, B_GMCD_REG_WBF);
-    }
+    FlushWriteBuffer (Index);
 
     //
     // Disable VTd
@@ -401,6 +302,19 @@ DisableDmar (
   }
 
   mVtdEnabled = FALSE;
+
+  for (Index = 0; Index < mVtdUnitNumber; Index++) {
+    DEBUG((DEBUG_INFO, "engine [%d] access\n", Index));
+    for (SubIndex = 0; SubIndex < mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptorNumber; SubIndex++) {
+      DEBUG ((DEBUG_INFO, "  PCI S%04X B%02x D%02x F%02x - %d\n",
+        mVtdUnitInformation[Index].Segment,
+        mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptors[SubIndex].Bits.Bus,
+        mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptors[SubIndex].Bits.Device,
+        mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptors[SubIndex].Bits.Function,
+        mVtdUnitInformation[Index].PciDeviceInfo.AccessCount[SubIndex]
+        ));
+    }
+  }
 
   return EFI_SUCCESS;
 }
