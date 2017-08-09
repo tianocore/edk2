@@ -151,6 +151,10 @@ EfiHttpConfigure (
 
   if (HttpConfigData != NULL) {
 
+    if (HttpConfigData->HttpVersion >= HttpVersionUnsupported) {
+      return EFI_UNSUPPORTED;
+    }
+
     //
     // Now configure this HTTP instance.
     //
