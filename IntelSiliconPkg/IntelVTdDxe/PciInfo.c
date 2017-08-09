@@ -77,6 +77,7 @@ RegisterPciDevice (
   UINTN                   Index;
   BOOLEAN                 *NewIsRealPciDevice;
   VTD_SOURCE_ID           *NewPciDescriptors;
+  UINTN                   *NewAccessCount;
 
   PciDeviceInfo = &mVtdUnitInformation[VtdIndex].PciDeviceInfo;
 
@@ -112,6 +113,12 @@ RegisterPciDevice (
         FreePool (NewIsRealPciDevice);
         return EFI_OUT_OF_RESOURCES;
       }
+      NewAccessCount = AllocateZeroPool (sizeof(*NewAccessCount) * (PciDeviceInfo->PciDescriptorMaxNumber + MAX_PCI_DESCRIPTORS));
+      if (NewAccessCount == NULL) {
+        FreePool (NewIsRealPciDevice);
+        FreePool (NewPciDescriptors);
+        return EFI_OUT_OF_RESOURCES;
+      }
       PciDeviceInfo->PciDescriptorMaxNumber += MAX_PCI_DESCRIPTORS;
       if (PciDeviceInfo->IsRealPciDevice != NULL) {
         CopyMem (NewIsRealPciDevice, PciDeviceInfo->IsRealPciDevice, sizeof(*NewIsRealPciDevice) * PciDeviceInfo->PciDescriptorNumber);
@@ -123,6 +130,11 @@ RegisterPciDevice (
         FreePool (PciDeviceInfo->PciDescriptors);
       }
       PciDeviceInfo->PciDescriptors = NewPciDescriptors;
+      if (PciDeviceInfo->AccessCount != NULL) {
+        CopyMem (NewAccessCount, PciDeviceInfo->AccessCount, sizeof(*NewAccessCount) * PciDeviceInfo->PciDescriptorNumber);
+        FreePool (PciDeviceInfo->AccessCount);
+      }
+      PciDeviceInfo->AccessCount = NewAccessCount;
     }
 
     ASSERT (PciDeviceInfo->PciDescriptorNumber < PciDeviceInfo->PciDescriptorMaxNumber);

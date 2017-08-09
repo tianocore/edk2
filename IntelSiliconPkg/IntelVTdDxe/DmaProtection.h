@@ -25,6 +25,9 @@
 #include <Library/PciSegmentLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
+#include <Library/CacheMaintenanceLib.h>
+#include <Library/PerformanceLib.h>
+#include <Library/PrintLib.h>
 
 #include <Guid/EventGroup.h>
 #include <Guid/Acpi.h>
@@ -58,6 +61,8 @@ typedef struct {
   UINTN                  PciDescriptorMaxNumber;
   BOOLEAN                *IsRealPciDevice;
   VTD_SOURCE_ID          *PciDescriptors;
+  // for statistic analysis
+  UINTN                  *AccessCount;
 } PCI_DEVICE_INFORMATION;
 
 typedef struct {
@@ -68,6 +73,7 @@ typedef struct {
   VTD_ROOT_ENTRY                   *RootEntryTable;
   VTD_EXT_ROOT_ENTRY               *ExtRootEntryTable;
   VTD_SECOND_LEVEL_PAGING_ENTRY    *FixedSecondLevelPagingEntry;
+  BOOLEAN                          HasDirtyContext;
   BOOLEAN                          HasDirtyPages;
   PCI_DEVICE_INFORMATION           PciDeviceInfo;
 } VTD_UNIT_INFORMATION;
@@ -122,40 +128,6 @@ EnableDmar (
 EFI_STATUS
 DisableDmar (
   VOID
-  );
-
-/**
-  Invalid VTd IOTLB page.
-
-  @param[in]  VtdIndex              The index of VTd engine.
-  @param[in]  Address               The address of IOTLB page.
-  @param[in]  AddressMode           The address mode of IOTLB page.
-  @param[in]  DomainIdentifier      The domain ID of the source.
-
-  @retval EFI_SUCCESS           VTd IOTLB page is invalidated.
-  @retval EFI_DEVICE_ERROR      VTd IOTLB page is not invalidated.
-**/
-EFI_STATUS
-InvalidateVtdIOTLBPage (
-  IN UINTN  VtdIndex,
-  IN UINT64 Address,
-  IN UINT8  AddressMode,
-  IN UINT16 DomainIdentifier
-  );
-
-/**
-  Invalid VTd IOTLB domain.
-
-  @param[in]  VtdIndex              The index of VTd engine.
-  @param[in]  DomainIdentifier      The domain ID of the source.
-
-  @retval EFI_SUCCESS           VTd IOTLB domain is invalidated.
-  @retval EFI_DEVICE_ERROR      VTd IOTLB domain is not invalidated.
-**/
-EFI_STATUS
-InvalidateVtdIOTLBDomain (
-  IN UINTN  VtdIndex,
-  IN UINT16 DomainIdentifier
   );
 
 /**
@@ -362,6 +334,7 @@ DumpSecondLevelPagingEntry (
 EFI_STATUS
 SetPageAttribute (
   IN UINTN                         VtdIndex,
+  IN UINT16                        DomainIdentifier,
   IN VTD_SECOND_LEVEL_PAGING_ENTRY *SecondLevelPagingEntry,
   IN UINT64                        BaseAddress,
   IN UINT64                        Length,
@@ -498,6 +471,22 @@ VOID *
 EFIAPI
 AllocateZeroPages (
   IN UINTN  Pages
+  );
+
+/**
+  Flush VTD page table and context table memory.
+
+  This action is to make sure the IOMMU engine can get final data in memory.
+
+  @param[in]  VtdIndex          The index used to identify a VTd engine.
+  @param[in]  Base              The base address of memory to be flushed.
+  @param[in]  Size              The size of memory in bytes to be flushed.
+**/
+VOID
+FlushPageTableMemory (
+  IN UINTN  VtdIndex,
+  IN UINTN  Base,
+  IN UINTN  Size
   );
 
 #endif
