@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,6 +22,8 @@ EMU_THUNK_PPI mSecEmuThunkPpi = {
   GasketSecUnixFdAddress,
   GasketSecEmuThunkAddress
 };
+
+SIM_CMD_LINE_ARGS_PPI mSimCmdLineArgsPpi;
 
 char *gGdbWorkingFileName = NULL;
 unsigned int mScriptSymbolChangesCount = 0;
@@ -71,7 +73,72 @@ SecGdbConfigBreak (
 {
 }
 
+/*++
+  Get the directory of the Host binary
 
+**/
+
+EFI_STATUS
+GetHostDirectory (
+  CHAR8 *Buffer
+  )
+{
+  char path[PATH_MAX];
+  char dest[PATH_MAX];
+  struct stat info;
+
+  pid_t pid = getpid ();
+
+  sprintf(path, "/proc/%d/exe", pid);
+
+  if (readlink(path, dest, PATH_MAX) == -1) {
+
+    return EFI_NOT_FOUND;
+
+  }
+
+  strncpy (Buffer, dest, strlen(dest) - strlen ("/Host"));
+
+  return EFI_SUCCESS;
+
+} // GetHostDirectory
+
+/*++
+  Set the full path to the Firmware volume
+
+**/
+
+EFI_STATUS
+SetFileNameFullPath (
+  IN OUT CHAR8 *Buffer
+  )
+{
+  EFI_STATUS Status;
+  CHAR8	HostDir[PATH_MAX];
+  CHAR8	FileName[PATH_MAX];
+
+  memset (&HostDir, 0, PATH_MAX);
+  memset (&FileName, 0, PATH_MAX);
+
+  //
+  // Save a copy of the file name
+  //
+
+  strncpy (FileName, Buffer, PATH_MAX);
+
+  Status = GetHostDirectory (&HostDir);
+  if (EFI_ERROR (Status)) {
+    printf ("ERROR : Can not get the full path to the firmware volume\n");
+    exit (1);
+  }
+      
+  strncpy (Buffer, HostDir, strlen(HostDir));
+  strcat (Buffer, "/");
+  strcat (Buffer, FileName);
+
+  return EFI_SUCCESS;
+
+} // SetFileNameFullPath
 
 /*++
 
@@ -110,6 +177,18 @@ main (
   CHAR16                *FirmwareVolumesStr;
   UINTN                 *StackPointer;
   FILE                  *GdbTempFile;
+  CHAR8                 HostDir[PATH_MAX];
+  CHAR8                 FvFileName[PATH_MAX];
+
+  //
+  // Initialize the Cmd Line Args PPI.
+  //
+
+  Status = SimInitCmdLineArgsPpi (Argc, Argv);
+  if (EFI_ERROR (Status)) {
+    printf ("SimInitCmdLineArgsPpi failed, Status = 0x%x\n", Status);
+    exit (1);
+  }
 
   //
   // Xcode does not support sourcing gdb scripts directly, so the Xcode XML
@@ -161,6 +240,16 @@ main (
   // Emulator other Thunks
   //
   AddThunkProtocol (&gPthreadThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuApCount), FALSE);
+
+  //
+  // Dynamic Load PPI
+  //
+  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuDynamicLoadProtocolGuid, &gDynamicLoad);
+
+  //
+  // Cmd Line Args PPI
+  //
+  AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gSimCmdLineArgsPpiGuid, &mSimCmdLineArgsPpi);
 
   // EmuSecLibConstructor ();
 
@@ -216,7 +305,7 @@ main (
   //
   // Open All the firmware volumes and remember the info in the gFdInfo global
   //
-  FileName = (CHAR8 *) AllocatePool (StrLen (FirmwareVolumesStr) + 1);
+  FileName = (CHAR8 *) AllocatePool (PATH_MAX);
   if (FileName == NULL) {
     printf ("ERROR : Can not allocate memory for firmware volume string\n");
     exit (1);
@@ -233,6 +322,18 @@ main (
       Index2++;
     }
     FileName[Index1]  = '\0';
+
+    //
+    // Set full path to the firmware volume, not a relative path. This is
+    // so that we can run Host from any directory, not just the directory it
+    // resides in
+    //
+
+    Status = SetFileNameFullPath (FileName);
+    if (EFI_ERROR (Status)) {
+      printf ("ERROR : Can not get the full path to the firmware volume\n");
+      exit (1);
+    }
 
     if (Index == 0) {
       // Map FV Recovery Read Only and other areas Read/Write
@@ -440,7 +541,7 @@ MapFd0 (
   res = mmap (
           (void *)(UINTN)FixedPcdGet64 (PcdEmuFlashFvRecoveryBase),
           FvSize,
-          PROT_READ | PROT_EXEC,
+          PROT_READ | PROT_WRITE | PROT_EXEC,
           MAP_PRIVATE,
           fd,
           0
