@@ -73,9 +73,11 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|0x0|UINT32|0x00001016
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress|0x0|UINT32|0x00001017
 
+  gEfiNt32PkgTokenSpaceGuid.PcdSerialLogFileName|L"SerialLog.txt"|VOID*|0x00001018
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtBootMode|1|UINT32|0x00001006
-  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume|L"..\\Fv\\SECPEI.fd"|VOID*|0x00001009
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain|L"64!64"|VOID*|0x0000100c
 
 [PcdsDynamic, PcdsDynamicEx]
