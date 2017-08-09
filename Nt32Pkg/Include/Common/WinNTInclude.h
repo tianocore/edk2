@@ -28,11 +28,7 @@ Abstract:
 #define GUID  _WINNT_DUP_GUID_____
 #define _LIST_ENTRY  _WINNT_DUP_LIST_ENTRY_FORWARD
 #define LIST_ENTRY   _WINNT_DUP_LIST_ENTRY
-#if defined (MDE_CPU_IA32) && (_MSC_VER < 1800)
-#define InterlockedIncrement _WINNT_DUP_InterlockedIncrement
-#define InterlockedDecrement _WINNT_DUP_InterlockedDecrement
-#define InterlockedCompareExchange64 _WINNT_DUP_InterlockedCompareExchange64
-#endif
+
 #undef UNALIGNED
 #undef CONST
 #undef VOID
