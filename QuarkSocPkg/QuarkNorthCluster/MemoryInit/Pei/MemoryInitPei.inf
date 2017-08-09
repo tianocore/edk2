@@ -1,7 +1,7 @@
 ## @file
 # This is the Memory Initialization Driver for Quark
 #
-# Copyright (c) 2013-2015 Intel Corporation.
+# Copyright (c) 2013-2017 Intel Corporation.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -74,7 +74,3 @@
 
 [Depex]
   TRUE
-
-[BuildOptions]
-  # /Oi option to use the intrinsic memset function in source code.
-  MSFT:*_*_*_CC_FLAGS = /Oi

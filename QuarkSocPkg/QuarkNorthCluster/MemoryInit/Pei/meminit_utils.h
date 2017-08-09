@@ -1,6 +1,6 @@
 /************************************************************************
  *
- * Copyright (c) 2013-2015 Intel Corporation.
+ * Copyright (c) 2013-2017 Intel Corporation.
  *
 * This program and the accompanying materials
 * are licensed and made available under the terms and conditions of the BSD License
@@ -90,8 +90,12 @@ void restore_timings(MRCParams_t *mrc_params);
 void default_timings(MRCParams_t *mrc_params);
 
 #ifndef SIM
-void *memset(void *d, int c, size_t n);
-void *memcpy(void *d, const void *s, size_t n);
+//
+// Map memset() and memcpy() to BaseMemoryLib functions
+//
+#include <Library/BaseMemoryLib.h>
+#define memset(d,c,n) ((c) == 0) ? ZeroMem ((d), (n)) : SetMem ((d), (n), (c))
+#define memcpy(d,s,n) CopyMem ((d), (s), (n))
 #endif
 
 #endif // _MEMINIT_UTILS_H_
