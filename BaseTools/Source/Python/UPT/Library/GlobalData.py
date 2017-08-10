@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common static strings and global data used by UPT
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -87,7 +87,7 @@ gWARNING_AS_ERROR = False
 #
 # Used to specify the temp directory to hold the unpacked distribution files
 #
-gUNPACK_DIR = None
+gUNPACK_DIR = []
 
 #
 # Flag used to mark whether the INF file is Binary INF or not.
@@ -109,3 +109,8 @@ gPackageDict = {}
 # {FilePath: FileObj}
 #
 gLIBINSTANCEDICT = {}
+
+#
+# Store the list of DIST
+#
+gTO_BE_INSTALLED_DIST_LIST = []

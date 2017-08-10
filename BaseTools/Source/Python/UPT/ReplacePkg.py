@@ -1,7 +1,7 @@
 ## @file
 # Replace distribution package.
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -99,9 +99,9 @@ def Main(Options = None):
             DistFile.Close()
         if ContentZipFile:
             ContentZipFile.Close()
-        if GlobalData.gUNPACK_DIR:
-            rmtree(GlobalData.gUNPACK_DIR)
-            GlobalData.gUNPACK_DIR = None
+        for TempDir in GlobalData.gUNPACK_DIR:
+            rmtree(TempDir)
+        GlobalData.gUNPACK_DIR = []
         Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)        
 
     if ReturnCode == 0:

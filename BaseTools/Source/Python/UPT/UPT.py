@@ -120,7 +120,7 @@ def Main():
 
     Parser.add_option("-q", "--quiet", action="store_true", dest="opt_quiet", help=ST.HLP_RETURN_AND_DISPLAY)
 
-    Parser.add_option("-i", "--install", action="store", type="string", dest="Install_Distribution_Package_File",
+    Parser.add_option("-i", "--install", action="append", type="string", dest="Install_Distribution_Package_File",
                       help=ST.HLP_SPECIFY_PACKAGE_NAME_INSTALL)
 
     Parser.add_option("-c", "--create", action="store", type="string", dest="Create_Distribution_Package_File",
@@ -228,12 +228,14 @@ def Main():
             RunModule = MkPkg.Main
 
         elif Opt.PackFileToInstall:
-            if not Opt.PackFileToInstall.endswith('.dist'):
-                Logger.Error("InstallPkg", FILE_TYPE_MISMATCH, ExtraData=ST.ERR_DIST_EXT_ERROR % Opt.PackFileToInstall)
+            AbsPath = []
+            for Item in Opt.PackFileToInstall:
+                if not Item.endswith('.dist'):
+                    Logger.Error("InstallPkg", FILE_TYPE_MISMATCH, ExtraData=ST.ERR_DIST_EXT_ERROR % Item)
 
-            AbsPath = GetFullPathDist(Opt.PackFileToInstall, WorkspaceDir)
-            if not AbsPath:
-                Logger.Error("InstallPkg", FILE_NOT_FOUND, ST.ERR_INSTALL_DIST_NOT_FOUND % Opt.PackFileToInstall)
+                AbsPath.append(GetFullPathDist(Item, WorkspaceDir))
+                if not AbsPath:
+                    Logger.Error("InstallPkg", FILE_NOT_FOUND, ST.ERR_INSTALL_DIST_NOT_FOUND % Item)
 
             Opt.PackFileToInstall = AbsPath
             setattr(Opt, 'PackageFile', Opt.PackFileToInstall)

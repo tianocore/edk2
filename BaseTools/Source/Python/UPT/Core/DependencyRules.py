@@ -44,12 +44,24 @@ DEPEX_CHECK_PACKAGE_NOT_FOUND, DEPEX_CHECK_DP_NOT_FOUND) = (0, 1, 2, 3)
 # @param object:      Inherited from object class
 #
 class DependencyRules(object):
-    def __init__(self, Datab):
+    def __init__(self, Datab, ToBeInstalledPkgList=None):
         self.IpiDb = Datab
         self.WsPkgList = GetWorkspacePackage()
         self.WsModuleList = GetWorkspaceModule()
-        self.PkgsToBeDepend = []
+
+        self.PkgsToBeDepend = [(PkgInfo[1], PkgInfo[2]) for PkgInfo in self.WsPkgList]
+
+        # Add package info from the DIST to be installed.
+        self.PkgsToBeDepend.extend(self.GenToBeInstalledPkgList(ToBeInstalledPkgList))
         
+    def GenToBeInstalledPkgList(self, ToBeInstalledPkgList):
+        RtnList = []
+        for Dist in ToBeInstalledPkgList:
+            for Package in Dist.PackageSurfaceArea:
+                RtnList.append((Package[0], Package[1]))
+
+        return RtnList
+
     ## Check whether a module exists by checking the Guid+Version+Name+Path combination
     #
     # @param Guid:  Guid of a module
@@ -182,7 +194,6 @@ class DependencyRules(object):
     #          False else
     #
     def CheckInstallDpDepexSatisfied(self, DpObj):
-        self.PkgsToBeDepend = [(PkgInfo[1], PkgInfo[2]) for PkgInfo in self.WsPkgList]
         return self.CheckDpDepexSatisfied(DpObj)
 
     # # Check whether multiple DP depex satisfied by current workspace for Install
@@ -192,7 +203,6 @@ class DependencyRules(object):
     #          False else
     #
     def CheckTestInstallPdDepexSatisfied(self, DpObjList):
-        self.PkgsToBeDepend = [(PkgInfo[1], PkgInfo[2]) for PkgInfo in self.WsPkgList]
         for DpObj in DpObjList:
             if self.CheckDpDepexSatisfied(DpObj):
                 for PkgKey in DpObj.PackageSurfaceArea.keys():

@@ -79,6 +79,10 @@ def AddExternToDefineSec(SectionDict, Arch, ExternList):
 # Using TokenSpaceGuidValue and Token to obtain PcdName from DEC file
 #
 def ObtainPcdName(Packages, TokenSpaceGuidValue, Token):
+    TokenSpaceGuidName = ''
+    PcdCName = ''
+    TokenSpaceGuidNameFound = False
+
     for PackageDependency in Packages:
         #
         # Generate generic comment
@@ -86,6 +90,7 @@ def ObtainPcdName(Packages, TokenSpaceGuidValue, Token):
         Guid = PackageDependency.GetGuid()
         Version = PackageDependency.GetVersion()
 
+        Path = None
         #
         # find package path/name
         # 
@@ -95,41 +100,58 @@ def ObtainPcdName(Packages, TokenSpaceGuidValue, Token):
                     Path = PkgInfo[3]
                     break
 
-        DecFile = None
-        if Path not in GlobalData.gPackageDict:
-            DecFile = Dec(Path)
-            GlobalData.gPackageDict[Path] = DecFile
-        else:
-            DecFile = GlobalData.gPackageDict[Path]
+        # The dependency package in workspace
+        if Path:
+            DecFile = None
+            if Path not in GlobalData.gPackageDict:
+                DecFile = Dec(Path)
+                GlobalData.gPackageDict[Path] = DecFile
+            else:
+                DecFile = GlobalData.gPackageDict[Path]
 
-        DecGuidsDict = DecFile.GetGuidSectionObject().ValueDict
-        DecPcdsDict = DecFile.GetPcdSectionObject().ValueDict
+            DecGuidsDict = DecFile.GetGuidSectionObject().ValueDict
+            DecPcdsDict = DecFile.GetPcdSectionObject().ValueDict
 
-        TokenSpaceGuidName = ''
-        PcdCName = ''
-        TokenSpaceGuidNameFound = False
+            TokenSpaceGuidName = ''
+            PcdCName = ''
+            TokenSpaceGuidNameFound = False
 
-        #
-        # Get TokenSpaceGuidCName from Guids section 
-        #
-        for GuidKey in DecGuidsDict:
-            GuidList = DecGuidsDict[GuidKey]
-            for GuidItem in GuidList:
-                if TokenSpaceGuidValue.upper() == GuidItem.GuidString.upper():
-                    TokenSpaceGuidName = GuidItem.GuidCName
-                    TokenSpaceGuidNameFound = True
+            #
+            # Get TokenSpaceGuidCName from Guids section
+            #
+            for GuidKey in DecGuidsDict:
+                GuidList = DecGuidsDict[GuidKey]
+                for GuidItem in GuidList:
+                    if TokenSpaceGuidValue.upper() == GuidItem.GuidString.upper():
+                        TokenSpaceGuidName = GuidItem.GuidCName
+                        TokenSpaceGuidNameFound = True
+                        break
+                if TokenSpaceGuidNameFound:
                     break
-            if TokenSpaceGuidNameFound:
-                break
-        #
-        # Retrieve PcdCName from Pcds Section
-        #
-        for PcdKey in DecPcdsDict:
-            PcdList = DecPcdsDict[PcdKey]
-            for PcdItem in PcdList:
-                if TokenSpaceGuidName == PcdItem.TokenSpaceGuidCName and Token == PcdItem.TokenValue:
-                    PcdCName = PcdItem.TokenCName
-                    return TokenSpaceGuidName, PcdCName
+            #
+            # Retrieve PcdCName from Pcds Section
+            #
+            for PcdKey in DecPcdsDict:
+                PcdList = DecPcdsDict[PcdKey]
+                for PcdItem in PcdList:
+                    if TokenSpaceGuidName == PcdItem.TokenSpaceGuidCName and Token == PcdItem.TokenValue:
+                        PcdCName = PcdItem.TokenCName
+                        return TokenSpaceGuidName, PcdCName
+
+        # The dependency package in ToBeInstalledDist
+        else:
+            for Dist in GlobalData.gTO_BE_INSTALLED_DIST_LIST:
+                for Package in Dist.PackageSurfaceArea.values():
+                    if Guid == Package.Guid:
+                        for GuidItem in Package.GuidList:
+                            if TokenSpaceGuidValue.upper() == GuidItem.Guid.upper():
+                                TokenSpaceGuidName = GuidItem.CName
+                                TokenSpaceGuidNameFound = True
+                                break
+                        for PcdItem in Package.PcdList:
+                            if TokenSpaceGuidName == PcdItem.TokenSpaceGuidCName and Token == PcdItem.Token:
+                                PcdCName = PcdItem.CName
+                                return TokenSpaceGuidName, PcdCName
 
     return TokenSpaceGuidName, PcdCName
 

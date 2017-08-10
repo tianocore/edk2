@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define strings used in the UPT tool
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -785,7 +785,7 @@ WRN_MODULE_EXISTED        = _("This module already exists: %s")
 WRN_FILE_EXISTED          = _("This file already exists: %s")
 WRN_FILE_NOT_OVERWRITTEN  = \
 _("This file already exist and cannot be overwritten: %s")
-WRN_DIST_PKG_INSTALLED = _("This distribution package has previously been installed.")
+WRN_DIST_PKG_INSTALLED = _("This distribution package %s has previously been installed.")
 WRN_DIST_NOT_FOUND         = _(
     "Distribution is not found at location %s")
 WRN_MULTI_PCD_RANGES      = _(

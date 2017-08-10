@@ -1,7 +1,7 @@
 ## @file
 # Install distribution package.
 #
-# Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -133,16 +133,16 @@ def InstallNewFile(WorkspaceDir, File):
 #
 # UnZipDp
 #
-def UnZipDp(WorkspaceDir, DpPkgFileName):
+def UnZipDp(WorkspaceDir, DpPkgFileName, Index=1):
     ContentZipFile = None
     Logger.Quiet(ST.MSG_UZIP_PARSE_XML)
     DistFile = PackageFile(DpPkgFileName)
     
     DpDescFileName, ContentFileName = GetDPFile(DistFile.GetZipFile())
     
-    GlobalData.gUNPACK_DIR = os.path.normpath(os.path.join(WorkspaceDir, ".tmp"))
-    DistPkgFile = DistFile.UnpackFile(DpDescFileName,
-        os.path.normpath(os.path.join(GlobalData.gUNPACK_DIR, DpDescFileName)))
+    TempDir = os.path.normpath(os.path.join(WorkspaceDir, "Conf/.tmp%s" % str(Index)))
+    GlobalData.gUNPACK_DIR.append(TempDir)
+    DistPkgFile = DistFile.UnpackFile(DpDescFileName, os.path.normpath(os.path.join(TempDir, DpDescFileName)))
     if not DistPkgFile:
         Logger.Error("InstallPkg", FILE_NOT_FOUND, ST.ERR_FILE_BROKEN %DpDescFileName)
     
@@ -159,23 +159,15 @@ def UnZipDp(WorkspaceDir, DpPkgFileName):
     #
     # unzip contents.zip file
     #
-    ContentFile = DistFile.UnpackFile(ContentFileName,
-        os.path.normpath(os.path.join(GlobalData.gUNPACK_DIR, ContentFileName)))
+    ContentFile = DistFile.UnpackFile(ContentFileName, os.path.normpath(os.path.join(TempDir, ContentFileName)))
     if not ContentFile:
         Logger.Error("InstallPkg", FILE_NOT_FOUND,
             ST.ERR_FILE_BROKEN % ContentFileName)
 
-    FilePointer = __FileHookOpen__(ContentFile, "rb")
-    #
-    # Assume no archive comment.
-    #
-    FilePointer.seek(0, SEEK_SET)
-    FilePointer.seek(0, SEEK_END)
     #
     # Get file size
     #                
-    FileSize = FilePointer.tell()
-    FilePointer.close()
+    FileSize = os.path.getsize(ContentFile)
                
     if FileSize != 0:        
         ContentZipFile = PackageFile(ContentFile)
@@ -202,8 +194,8 @@ def GetPackageList(DistPkg, Dep, WorkspaceDir, Options, ContentZipFile, ModuleLi
         PackagePath = Path
         Package = DistPkg.PackageSurfaceArea[Guid, Version, Path]
         Logger.Info(ST.MSG_INSTALL_PACKAGE % Package.GetName())
-        if Dep.CheckPackageExists(Guid, Version):
-            Logger.Info(ST.WRN_PACKAGE_EXISTED %(Guid, Version))
+#         if Dep.CheckPackageExists(Guid, Version):
+#             Logger.Info(ST.WRN_PACKAGE_EXISTED %(Guid, Version))
         if Options.UseGuidedPkgPath:
             GuidedPkgPath = "%s_%s_%s" % (Package.GetName(), Guid, Version)
             NewPackagePath = InstallNewPackage(WorkspaceDir, GuidedPkgPath, Options.CustomPath)
@@ -509,29 +501,40 @@ def GenToolMisc(DistPkg, WorkspaceDir, ContentZipFile):
 # @param  Options: command Options
 #
 def Main(Options = None):
-    ContentZipFile, DistFile = None, None
-
     try:
         DataBase = GlobalData.gDB
         WorkspaceDir = GlobalData.gWORKSPACE
         if not Options.PackageFile:
             Logger.Error("InstallPkg", OPTION_MISSING, ExtraData=ST.ERR_SPECIFY_PACKAGE)
         
-        #
-        # unzip dist.pkg file
-        #
-        DistPkg, ContentZipFile, DpPkgFileName, DistFile = UnZipDp(WorkspaceDir, Options.PackageFile)
+        # Get all Dist Info
+        DistInfoList = []
+        DistPkgList = []
+        Index = 1
+        for ToBeInstalledDist in Options.PackageFile:
+            #
+            # unzip dist.pkg file
+            #
+            DistInfoList.append(UnZipDp(WorkspaceDir, ToBeInstalledDist, Index))
+            DistPkgList.append(DistInfoList[-1][0])
+            Index += 1
 
-        #
-        # check dependency
-        #
-        Dep = DependencyRules(DataBase)
-        CheckInstallDpx(Dep, DistPkg)
+            #
+            # Add dist
+            #
+            GlobalData.gTO_BE_INSTALLED_DIST_LIST.append(DistInfoList[-1][0])
 
-        #
-        # Install distribution
-        #
-        InstallDp(DistPkg, DpPkgFileName, ContentZipFile, Options, Dep, WorkspaceDir, DataBase)
+        # Check for dependency
+        Dep = DependencyRules(DataBase, DistPkgList)
+
+        for ToBeInstalledDist in DistInfoList:
+            CheckInstallDpx(Dep, ToBeInstalledDist[0], ToBeInstalledDist[2])
+
+            #
+            # Install distribution
+            #
+            InstallDp(ToBeInstalledDist[0], ToBeInstalledDist[2], ToBeInstalledDist[1],
+                      Options, Dep, WorkspaceDir, DataBase)
         ReturnCode = 0
         
     except FatalError, XExcept:
@@ -556,16 +559,16 @@ def Main(Options = None):
         Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(),
             platform) + format_exc())
     finally:
-        if ReturnCode != UPT_ALREADY_INSTALLED_ERROR:
-            Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_STARTED)
-            if DistFile:
-                DistFile.Close()
-            if ContentZipFile:
-                ContentZipFile.Close()
-            if GlobalData.gUNPACK_DIR:
-                rmtree(GlobalData.gUNPACK_DIR)
-                GlobalData.gUNPACK_DIR = None
-            Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)
+        Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_STARTED)
+        for ToBeInstalledDist in DistInfoList:
+            if ToBeInstalledDist[3]:
+                ToBeInstalledDist[3].Close()
+            if ToBeInstalledDist[1]:
+                ToBeInstalledDist[1].Close()
+        for TempDir in GlobalData.gUNPACK_DIR:
+            rmtree(TempDir)
+        GlobalData.gUNPACK_DIR = []
+        Logger.Quiet(ST.MSG_REMOVE_TEMP_FILE_DONE)
     if ReturnCode == 0:
         Logger.Quiet(ST.MSG_FINISH)
     return ReturnCode
@@ -609,14 +612,15 @@ def BackupDist(DpPkgFileName, Guid, Version, WorkspaceDir):
 #   @param  Dep: the DependencyRules instance that used to check dependency
 #   @param  DistPkg: the distribution object
 #
-def CheckInstallDpx(Dep, DistPkg):
+def CheckInstallDpx(Dep, DistPkg, DistPkgFileName):
     #
     # Check distribution package installed or not
     #
     if Dep.CheckDpExists(DistPkg.Header.GetGuid(),
         DistPkg.Header.GetVersion()):
-        Logger.Error("InstallPkg", UPT_ALREADY_INSTALLED_ERROR,
-            ST.WRN_DIST_PKG_INSTALLED)
+        Logger.Error("InstallPkg",
+                     UPT_ALREADY_INSTALLED_ERROR,
+                     ST.WRN_DIST_PKG_INSTALLED % os.path.basename(DistPkgFileName))
     #
     # Check distribution dependency (all module dependency should be
     # satisfied)
