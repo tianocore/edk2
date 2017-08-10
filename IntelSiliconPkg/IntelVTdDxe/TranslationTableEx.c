@@ -67,14 +67,16 @@ CreateExtContextEntry (
 
     ExtRootEntry = &mVtdUnitInformation[VtdIndex].ExtRootEntryTable[SourceId.Index.RootIndex];
     if (ExtRootEntry->Bits.LowerPresent == 0) {
-      ExtRootEntry->Bits.LowerContextTablePointer  = RShiftU64 ((UINT64)(UINTN)Buffer, 12);
+      ExtRootEntry->Bits.LowerContextTablePointerLo  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 12);
+      ExtRootEntry->Bits.LowerContextTablePointerHi  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 32);
       ExtRootEntry->Bits.LowerPresent = 1;
-      ExtRootEntry->Bits.UpperContextTablePointer  = RShiftU64 ((UINT64)(UINTN)Buffer, 12) + 1;
+      ExtRootEntry->Bits.UpperContextTablePointerLo  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 12) + 1;
+      ExtRootEntry->Bits.UpperContextTablePointerHi  = (UINT32) RShiftU64 (RShiftU64 ((UINT64)(UINTN)Buffer, 12) + 1, 20);
       ExtRootEntry->Bits.UpperPresent = 1;
       Buffer = (UINT8 *)Buffer + EFI_PAGES_TO_SIZE (ContextPages);
     }
 
-    ExtContextEntryTable = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)LShiftU64(ExtRootEntry->Bits.LowerContextTablePointer, 12) ;
+    ExtContextEntryTable = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(ExtRootEntry->Bits.LowerContextTablePointerLo, ExtRootEntry->Bits.LowerContextTablePointerHi) ;
     ExtContextEntry = &ExtContextEntryTable[SourceId.Index.ContextIndex];
     ExtContextEntry->Bits.TranslationType = 0;
     ExtContextEntry->Bits.FaultProcessingDisable = 0;
@@ -122,7 +124,7 @@ DumpDmarExtContextEntryTable (
     if (ExtRootEntry[Index].Bits.LowerPresent == 0) {
       continue;
     }
-    ExtContextEntry = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)LShiftU64 (ExtRootEntry[Index].Bits.LowerContextTablePointer, 12);
+    ExtContextEntry = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(ExtRootEntry[Index].Bits.LowerContextTablePointerLo, ExtRootEntry[Index].Bits.LowerContextTablePointerHi);
     for (Index2 = 0; Index2 < VTD_CONTEXT_ENTRY_NUMBER/2; Index2++) {
       if ((ExtContextEntry[Index2].Uint256.Uint64_1 != 0) || (ExtContextEntry[Index2].Uint256.Uint64_2 != 0) ||
           (ExtContextEntry[Index2].Uint256.Uint64_3 != 0) || (ExtContextEntry[Index2].Uint256.Uint64_4 != 0)) {
@@ -137,7 +139,7 @@ DumpDmarExtContextEntryTable (
     if (ExtRootEntry[Index].Bits.UpperPresent == 0) {
       continue;
     }
-    ExtContextEntry = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)LShiftU64 (ExtRootEntry[Index].Bits.UpperContextTablePointer, 12);
+    ExtContextEntry = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(ExtRootEntry[Index].Bits.UpperContextTablePointerLo, ExtRootEntry[Index].Bits.UpperContextTablePointerHi);
     for (Index2 = 0; Index2 < VTD_CONTEXT_ENTRY_NUMBER/2; Index2++) {
       if ((ExtContextEntry[Index2].Uint256.Uint64_1 != 0) || (ExtContextEntry[Index2].Uint256.Uint64_2 != 0) ||
           (ExtContextEntry[Index2].Uint256.Uint64_3 != 0) || (ExtContextEntry[Index2].Uint256.Uint64_4 != 0)) {
