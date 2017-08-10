@@ -26,9 +26,10 @@
 
 typedef union {
   struct {
-    UINT64  Present:1;
-    UINT64  Reserved_1:11;
-    UINT64  ContextTablePointer:52;
+    UINT32  Present:1;
+    UINT32  Reserved_1:11;
+    UINT32  ContextTablePointerLo:20;
+    UINT32  ContextTablePointerHi:32;
 
     UINT64  Reserved_64;
   } Bits;
@@ -40,13 +41,15 @@ typedef union {
 
 typedef union {
   struct {
-    UINT64  LowerPresent:1;
-    UINT64  Reserved_1:11;
-    UINT64  LowerContextTablePointer:52;
+    UINT32  LowerPresent:1;
+    UINT32  Reserved_1:11;
+    UINT32  LowerContextTablePointerLo:20;
+    UINT32  LowerContextTablePointerHi:32;
 
-    UINT64  UpperPresent:1;
-    UINT64  Reserved_65:11;
-    UINT64  UpperContextTablePointer:52;
+    UINT32  UpperPresent:1;
+    UINT32  Reserved_65:11;
+    UINT32  UpperContextTablePointerLo:20;
+    UINT32  UpperContextTablePointerHi:32;
   } Bits;
   struct {
     UINT64  Uint64Lo;
@@ -56,17 +59,19 @@ typedef union {
 
 typedef union {
   struct {
-    UINT64  Present:1;
-    UINT64  FaultProcessingDisable:1;
-    UINT64  TranslationType:2;
-    UINT64  Reserved_4:8;
-    UINT64  SecondLevelPageTranslationPointer:52;
+    UINT32  Present:1;
+    UINT32  FaultProcessingDisable:1;
+    UINT32  TranslationType:2;
+    UINT32  Reserved_4:8;
+    UINT32  SecondLevelPageTranslationPointerLo:20;
+    UINT32  SecondLevelPageTranslationPointerHi:32;
 
-    UINT64  AddressWidth:3;
-    UINT64  Ignored_67:4;
-    UINT64  Reserved_71:1;
-    UINT64  DomainIdentifier:16;
-    UINT64  Reserved_88:40;
+    UINT32  AddressWidth:3;
+    UINT32  Ignored_67:4;
+    UINT32  Reserved_71:1;
+    UINT32  DomainIdentifier:16;
+    UINT32  Reserved_88:8;
+    UINT32  Reserved_96:32;
   } Bits;
   struct {
     UINT64  Uint64Lo;
@@ -76,51 +81,54 @@ typedef union {
 
 typedef union {
   struct {
-    UINT64  Present:1;
-    UINT64  FaultProcessingDisable:1;
-    UINT64  TranslationType:3;
-    UINT64  ExtendedMemoryType:3;
-    UINT64  DeferredInvalidateEnable:1;
-    UINT64  PageRequestEnable:1;
-    UINT64  NestedTranslationEnable:1;
-    UINT64  PASIDEnable:1;
-    UINT64  SecondLevelPageTranslationPointer:52;
+    UINT32  Present:1;
+    UINT32  FaultProcessingDisable:1;
+    UINT32  TranslationType:3;
+    UINT32  ExtendedMemoryType:3;
+    UINT32  DeferredInvalidateEnable:1;
+    UINT32  PageRequestEnable:1;
+    UINT32  NestedTranslationEnable:1;
+    UINT32  PASIDEnable:1;
+    UINT32  SecondLevelPageTranslationPointerLo:20;
+    UINT32  SecondLevelPageTranslationPointerHi:32;
 
-    UINT64  AddressWidth:3;
-    UINT64  PageGlobalEnable:1;
-    UINT64  NoExecuteEnable:1;
-    UINT64  WriteProtectEnable:1;
-    UINT64  CacheDisable:1;
-    UINT64  ExtendedMemoryTypeEnable:1;
-    UINT64  DomainIdentifier:16;
-    UINT64  SupervisorModeExecuteProtection:1;
-    UINT64  ExtendedAccessedFlagEnable:1;
-    UINT64  ExecuteRequestsEnable:1;
-    UINT64  SecondLevelExecuteEnable:1;
-    UINT64  Reserved_92:4;
-    UINT64  PageAttributeTable0:3;
-    UINT64  Reserved_Pat0:1;
-    UINT64  PageAttributeTable1:3;
-    UINT64  Reserved_Pat1:1;
-    UINT64  PageAttributeTable2:3;
-    UINT64  Reserved_Pat2:1;
-    UINT64  PageAttributeTable3:3;
-    UINT64  Reserved_Pat3:1;
-    UINT64  PageAttributeTable4:3;
-    UINT64  Reserved_Pat4:1;
-    UINT64  PageAttributeTable5:3;
-    UINT64  Reserved_Pat5:1;
-    UINT64  PageAttributeTable6:3;
-    UINT64  Reserved_Pat6:1;
-    UINT64  PageAttributeTable7:3;
-    UINT64  Reserved_Pat7:1;
+    UINT32  AddressWidth:3;
+    UINT32  PageGlobalEnable:1;
+    UINT32  NoExecuteEnable:1;
+    UINT32  WriteProtectEnable:1;
+    UINT32  CacheDisable:1;
+    UINT32  ExtendedMemoryTypeEnable:1;
+    UINT32  DomainIdentifier:16;
+    UINT32  SupervisorModeExecuteProtection:1;
+    UINT32  ExtendedAccessedFlagEnable:1;
+    UINT32  ExecuteRequestsEnable:1;
+    UINT32  SecondLevelExecuteEnable:1;
+    UINT32  Reserved_92:4;
+    UINT32  PageAttributeTable0:3;
+    UINT32  Reserved_Pat0:1;
+    UINT32  PageAttributeTable1:3;
+    UINT32  Reserved_Pat1:1;
+    UINT32  PageAttributeTable2:3;
+    UINT32  Reserved_Pat2:1;
+    UINT32  PageAttributeTable3:3;
+    UINT32  Reserved_Pat3:1;
+    UINT32  PageAttributeTable4:3;
+    UINT32  Reserved_Pat4:1;
+    UINT32  PageAttributeTable5:3;
+    UINT32  Reserved_Pat5:1;
+    UINT32  PageAttributeTable6:3;
+    UINT32  Reserved_Pat6:1;
+    UINT32  PageAttributeTable7:3;
+    UINT32  Reserved_Pat7:1;
 
-    UINT64  PASIDTableSize:4;
-    UINT64  Reserved_132:8;
-    UINT64  PASIDTablePointer:52;
+    UINT32  PASIDTableSize:4;
+    UINT32  Reserved_132:8;
+    UINT32  PASIDTablePointerLo:20;
+    UINT32  PASIDTablePointerHi:32;
 
-    UINT64  Reserved_192:12;
-    UINT64  PASIDStateTablePointer:52;
+    UINT32  Reserved_192:12;
+    UINT32  PASIDStateTablePointerLo:20;
+    UINT32  PASIDStateTablePointerHi:32;
   } Bits;
   struct {
     UINT64  Uint64_1;
@@ -132,63 +140,66 @@ typedef union {
 
 typedef union {
   struct {
-    UINT64  Present:1;
-    UINT64  Reserved_1:2;
-    UINT64  PageLevelCacheDisable:1;
-    UINT64  PageLevelWriteThrough:1;
-    UINT64  Reserved_5:6;
-    UINT64  SupervisorRequestsEnable:1;
-    UINT64  FirstLevelPageTranslationPointer:52;
+    UINT32  Present:1;
+    UINT32  Reserved_1:2;
+    UINT32  PageLevelCacheDisable:1;
+    UINT32  PageLevelWriteThrough:1;
+    UINT32  Reserved_5:6;
+    UINT32  SupervisorRequestsEnable:1;
+    UINT32  FirstLevelPageTranslationPointerLo:20;
+    UINT32  FirstLevelPageTranslationPointerHi:32;
   } Bits;
   UINT64    Uint64;
 } VTD_PASID_ENTRY;
 
 typedef union {
   struct {
-    UINT64  Reserved_0:32;
-    UINT64  ActiveReferenceCount:16;
-    UINT64  Reserved_48:15;
-    UINT64  DeferredInvalidate:1;
+    UINT32  Reserved_0:32;
+    UINT32  ActiveReferenceCount:16;
+    UINT32  Reserved_48:15;
+    UINT32  DeferredInvalidate:1;
   } Bits;
   UINT64    Uint64;
 } VTD_PASID_STATE_ENTRY;
 
 typedef union {
   struct {
-    UINT64  Present:1;
-    UINT64  ReadWrite:1;
-    UINT64  UserSupervisor:1;
-    UINT64  PageLevelWriteThrough:1;
-    UINT64  PageLevelCacheDisable:1;
-    UINT64  Accessed:1;
-    UINT64  Dirty:1;
-    UINT64  PageSize:1; // It is PageAttribute:1 for 4K page entry
-    UINT64  Global:1;
-    UINT64  Ignored_9:1;
-    UINT64  ExtendedAccessed:1;
-    UINT64  Ignored_11:1;
+    UINT32  Present:1;
+    UINT32  ReadWrite:1;
+    UINT32  UserSupervisor:1;
+    UINT32  PageLevelWriteThrough:1;
+    UINT32  PageLevelCacheDisable:1;
+    UINT32  Accessed:1;
+    UINT32  Dirty:1;
+    UINT32  PageSize:1; // It is PageAttribute:1 for 4K page entry
+    UINT32  Global:1;
+    UINT32  Ignored_9:1;
+    UINT32  ExtendedAccessed:1;
+    UINT32  Ignored_11:1;
     // NOTE: There is PageAttribute:1 as bit12 for 1G page entry and 2M page entry
-    UINT64  Address:40;
-    UINT64  Ignored_52:11;
-    UINT64  ExecuteDisable:1;
+    UINT32  AddressLo:20;
+    UINT32  AddressHi:20;
+    UINT32  Ignored_52:11;
+    UINT32  ExecuteDisable:1;
   } Bits;
   UINT64    Uint64;
 } VTD_FIRST_LEVEL_PAGING_ENTRY;
 
 typedef union {
   struct {
-    UINT64  Read:1;
-    UINT64  Write:1;
-    UINT64  Execute:1;
-    UINT64  ExtendedMemoryType:3;
-    UINT64  IgnorePAT:1;
-    UINT64  PageSize:1;
-    UINT64  Ignored_8:3;
-    UINT64  Snoop:1;
-    UINT64  Address:40;
-    UINT64  Ignored_52:10;
-    UINT64  TransientMapping:1;
-    UINT64  Ignored_63:1;
+    UINT32  Read:1;
+    UINT32  Write:1;
+    UINT32  Execute:1;
+    UINT32  ExtendedMemoryType:3;
+    UINT32  IgnorePAT:1;
+    UINT32  PageSize:1;
+    UINT32  Ignored_8:3;
+    UINT32  Snoop:1;
+    UINT32  AddressLo:20;
+    UINT32  AddressHi:20;
+    UINT32  Ignored_52:10;
+    UINT32  TransientMapping:1;
+    UINT32  Ignored_63:1;
   } Bits;
   UINT64    Uint64;
 } VTD_SECOND_LEVEL_PAGING_ENTRY;
@@ -299,7 +310,6 @@ typedef union {
     UINT32        NWFS:1; // No Write Flag Support
     UINT32        EAFS:1; // Extended Accessed Flag Support
     UINT32        PSS:5; // PASID Size Supported
-
     UINT32        Rsvd_40:24;
   } Bits;
   UINT64     Uint64;
@@ -307,8 +317,9 @@ typedef union {
 
 typedef union {
   struct {
-    UINT64   Rsvd_0:12;
-    UINT64   FI:52;        // FaultInfo
+    UINT32   Rsvd_0:12;
+    UINT32   FILo:20;      // FaultInfo
+    UINT32   FIHi:32;      // FaultInfo
 
     UINT32   SID:16;       // Source Identifier
     UINT32   Rsvd_80:13;

@@ -120,12 +120,13 @@ CreateContextEntry (
 
     RootEntry = &mVtdUnitInformation[VtdIndex].RootEntryTable[SourceId.Index.RootIndex];
     if (RootEntry->Bits.Present == 0) {
-      RootEntry->Bits.ContextTablePointer  = RShiftU64 ((UINT64)(UINTN)Buffer, 12);
+      RootEntry->Bits.ContextTablePointerLo  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 12);
+      RootEntry->Bits.ContextTablePointerHi  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 32);
       RootEntry->Bits.Present = 1;
       Buffer = (UINT8 *)Buffer + EFI_PAGES_TO_SIZE (ContextPages);
     }
 
-    ContextEntryTable = (VTD_CONTEXT_ENTRY *)(UINTN)LShiftU64(RootEntry->Bits.ContextTablePointer, 12) ;
+    ContextEntryTable = (VTD_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(RootEntry->Bits.ContextTablePointerLo, RootEntry->Bits.ContextTablePointerHi) ;
     ContextEntry = &ContextEntryTable[SourceId.Index.ContextIndex];
     ContextEntry->Bits.TranslationType = 0;
     ContextEntry->Bits.FaultProcessingDisable = 0;
@@ -227,7 +228,7 @@ CreateSecondLevelPagingEntryTable (
     }
     DEBUG ((DEBUG_INFO,"  Lvl4(0x%x): Lvl3Start - 0x%x, Lvl3End - 0x%x\n", Index4, Lvl3Start, Lvl3End));
 
-    Lvl3PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)LShiftU64 (Lvl4PtEntry[Index4].Bits.Address, 12);
+    Lvl3PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(Lvl4PtEntry[Index4].Bits.AddressLo, Lvl4PtEntry[Index4].Bits.AddressHi);
     for (Index3 = Lvl3Start; Index3 <= Lvl3End; Index3++) {
       if (Lvl3PtEntry[Index3].Uint64 == 0) {
         Lvl3PtEntry[Index3].Uint64 = (UINT64)(UINTN)AllocateZeroPages (1);
@@ -239,7 +240,7 @@ CreateSecondLevelPagingEntryTable (
         SetSecondLevelPagingEntryAttribute (&Lvl3PtEntry[Index3], EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
       }
 
-      Lvl2PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)LShiftU64 (Lvl3PtEntry[Index3].Bits.Address, 12);
+      Lvl2PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(Lvl3PtEntry[Index3].Bits.AddressLo, Lvl3PtEntry[Index3].Bits.AddressHi);
       for (Index2 = 0; Index2 < SIZE_4KB/sizeof(VTD_SECOND_LEVEL_PAGING_ENTRY); Index2++) {
         Lvl2PtEntry[Index2].Uint64 = BaseAddress;
         SetSecondLevelPagingEntryAttribute (&Lvl2PtEntry[Index2], IoMmuAccess);
@@ -341,7 +342,7 @@ DumpDmarContextEntryTable (
     if (RootEntry[Index].Bits.Present == 0) {
       continue;
     }
-    ContextEntry = (VTD_CONTEXT_ENTRY *)(UINTN)LShiftU64 (RootEntry[Index].Bits.ContextTablePointer, 12);
+    ContextEntry = (VTD_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(RootEntry[Index].Bits.ContextTablePointerLo, RootEntry[Index].Bits.ContextTablePointerHi);
     for (Index2 = 0; Index2 < VTD_CONTEXT_ENTRY_NUMBER; Index2++) {
       if ((ContextEntry[Index2].Uint128.Uint64Lo != 0) || (ContextEntry[Index2].Uint128.Uint64Hi != 0)) {
         DEBUG ((DEBUG_INFO,"    ContextEntry(0x%02x) D%02xF%02x - 0x%016lx %016lx\n",
@@ -350,7 +351,7 @@ DumpDmarContextEntryTable (
       if (ContextEntry[Index2].Bits.Present == 0) {
         continue;
       }
-      DumpSecondLevelPagingEntry ((VOID *)(UINTN)LShiftU64 (ContextEntry[Index2].Bits.SecondLevelPageTranslationPointer, 12));
+      DumpSecondLevelPagingEntry ((VOID *)(UINTN)VTD_64BITS_ADDRESS(ContextEntry[Index2].Bits.SecondLevelPageTranslationPointerLo, ContextEntry[Index2].Bits.SecondLevelPageTranslationPointerHi));
     }
   }
   DEBUG ((DEBUG_INFO,"=========================\n"));
@@ -387,7 +388,7 @@ DumpSecondLevelPagingEntry (
     if (Lvl4PtEntry[Index4].Uint64 == 0) {
       continue;
     }
-    Lvl3PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)LShiftU64 (Lvl4PtEntry[Index4].Bits.Address, 12);
+    Lvl3PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(Lvl4PtEntry[Index4].Bits.AddressLo, Lvl4PtEntry[Index4].Bits.AddressHi);
     for (Index3 = 0; Index3 < SIZE_4KB/sizeof(VTD_SECOND_LEVEL_PAGING_ENTRY); Index3++) {
       if (Lvl3PtEntry[Index3].Uint64 != 0) {
         DEBUG ((DEBUG_VERBOSE,"    Lvl3Pt Entry(0x%03x) - 0x%016lx\n", Index3, Lvl3PtEntry[Index3].Uint64));
@@ -396,7 +397,7 @@ DumpSecondLevelPagingEntry (
         continue;
       }
 
-      Lvl2PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)LShiftU64 (Lvl3PtEntry[Index3].Bits.Address, 12);
+      Lvl2PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(Lvl3PtEntry[Index3].Bits.AddressLo, Lvl3PtEntry[Index3].Bits.AddressHi);
       for (Index2 = 0; Index2 < SIZE_4KB/sizeof(VTD_SECOND_LEVEL_PAGING_ENTRY); Index2++) {
         if (Lvl2PtEntry[Index2].Uint64 != 0) {
           DEBUG ((DEBUG_VERBOSE,"      Lvl2Pt Entry(0x%03x) - 0x%016lx\n", Index2, Lvl2PtEntry[Index2].Uint64));
@@ -405,7 +406,7 @@ DumpSecondLevelPagingEntry (
           continue;
         }
         if (Lvl2PtEntry[Index2].Bits.PageSize == 0) {
-          Lvl1PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)LShiftU64 (Lvl2PtEntry[Index2].Bits.Address, 12);
+          Lvl1PtEntry = (VTD_SECOND_LEVEL_PAGING_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(Lvl2PtEntry[Index2].Bits.AddressLo, Lvl2PtEntry[Index2].Bits.AddressHi);
           for (Index1 = 0; Index1 < SIZE_4KB/sizeof(VTD_SECOND_LEVEL_PAGING_ENTRY); Index1++) {
             if (Lvl1PtEntry[Index1].Uint64 != 0) {
               DEBUG ((DEBUG_VERBOSE,"        Lvl1Pt Entry(0x%03x) - 0x%016lx\n", Index1, Lvl1PtEntry[Index1].Uint64));
@@ -878,12 +879,13 @@ SetAccessAttribute (
       DEBUG ((DEBUG_VERBOSE,"SecondLevelPagingEntry - 0x%x (S%04x B%02x D%02x F%02x) New\n", SecondLevelPagingEntry, Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
       Pt = (UINT64)RShiftU64 ((UINT64)(UINTN)SecondLevelPagingEntry, 12);
 
-      ExtContextEntry->Bits.SecondLevelPageTranslationPointer = Pt;
-      ExtContextEntry->Bits.DomainIdentifier = GetPciDescriptor (VtdIndex, Segment, SourceId);
+      ExtContextEntry->Bits.SecondLevelPageTranslationPointerLo = (UINT32) Pt;
+      ExtContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
+      ExtContextEntry->Bits.DomainIdentifier = (UINT16) GetPciDescriptor (VtdIndex, Segment, SourceId);
       ExtContextEntry->Bits.Present = 1;
       DumpDmarExtContextEntryTable (mVtdUnitInformation[VtdIndex].ExtRootEntryTable);
     } else {
-      SecondLevelPagingEntry = (VOID *)(UINTN)LShiftU64 (ExtContextEntry->Bits.SecondLevelPageTranslationPointer, 12);
+      SecondLevelPagingEntry = (VOID *)(UINTN)VTD_64BITS_ADDRESS(ExtContextEntry->Bits.SecondLevelPageTranslationPointerLo, ExtContextEntry->Bits.SecondLevelPageTranslationPointerHi);
       DEBUG ((DEBUG_VERBOSE,"SecondLevelPagingEntry - 0x%x (S%04x B%02x D%02x F%02x)\n", SecondLevelPagingEntry, Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
     }
   } else if (ContextEntry != NULL) {
@@ -892,12 +894,13 @@ SetAccessAttribute (
       DEBUG ((DEBUG_VERBOSE,"SecondLevelPagingEntry - 0x%x (S%04x B%02x D%02x F%02x) New\n", SecondLevelPagingEntry, Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
       Pt = (UINT64)RShiftU64 ((UINT64)(UINTN)SecondLevelPagingEntry, 12);
 
-      ContextEntry->Bits.SecondLevelPageTranslationPointer = Pt;
-      ContextEntry->Bits.DomainIdentifier = GetPciDescriptor (VtdIndex, Segment, SourceId);
+      ContextEntry->Bits.SecondLevelPageTranslationPointerLo = (UINT32) Pt;
+      ContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
+      ContextEntry->Bits.DomainIdentifier = (UINT16) GetPciDescriptor (VtdIndex, Segment, SourceId);
       ContextEntry->Bits.Present = 1;
       DumpDmarContextEntryTable (mVtdUnitInformation[VtdIndex].RootEntryTable);
     } else {
-      SecondLevelPagingEntry = (VOID *)(UINTN)LShiftU64 (ContextEntry->Bits.SecondLevelPageTranslationPointer, 12);
+      SecondLevelPagingEntry = (VOID *)(UINTN)VTD_64BITS_ADDRESS(ContextEntry->Bits.SecondLevelPageTranslationPointerLo, ContextEntry->Bits.SecondLevelPageTranslationPointerHi);
       DEBUG ((DEBUG_VERBOSE,"SecondLevelPagingEntry - 0x%x (S%04x B%02x D%02x F%02x)\n", SecondLevelPagingEntry, Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
     }
   }
@@ -958,11 +961,13 @@ AlwaysEnablePageAttribute (
   SecondLevelPagingEntry = mVtdUnitInformation[VtdIndex].FixedSecondLevelPagingEntry;
   Pt = (UINT64)RShiftU64 ((UINT64)(UINTN)SecondLevelPagingEntry, 12);
   if (ExtContextEntry != NULL) {
-    ExtContextEntry->Bits.SecondLevelPageTranslationPointer = Pt;
+    ExtContextEntry->Bits.SecondLevelPageTranslationPointerLo = (UINT32) Pt;
+    ExtContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
     ExtContextEntry->Bits.DomainIdentifier = ((1 << (UINT8)((UINTN)mVtdUnitInformation[VtdIndex].CapReg.Bits.ND * 2 + 4)) - 1);
     ExtContextEntry->Bits.Present = 1;
   } else if (ContextEntry != NULL) {
-    ContextEntry->Bits.SecondLevelPageTranslationPointer = Pt;
+    ContextEntry->Bits.SecondLevelPageTranslationPointerLo = (UINT32) Pt;
+    ContextEntry->Bits.SecondLevelPageTranslationPointerHi = (UINT32) RShiftU64(Pt, 20);
     ContextEntry->Bits.DomainIdentifier = ((1 << (UINT8)((UINTN)mVtdUnitInformation[VtdIndex].CapReg.Bits.ND * 2 + 4)) - 1);
     ContextEntry->Bits.Present = 1;
   }

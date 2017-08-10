@@ -289,7 +289,7 @@ FindVtdIndexByPciDevice (
 
     if (mVtdUnitInformation[VtdIndex].ExtRootEntryTable != 0) {
       ExtRootEntry = &mVtdUnitInformation[VtdIndex].ExtRootEntryTable[SourceId.Index.RootIndex];
-      ExtContextEntryTable = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)LShiftU64 (ExtRootEntry->Bits.LowerContextTablePointer, 12) ;
+      ExtContextEntryTable = (VTD_EXT_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(ExtRootEntry->Bits.LowerContextTablePointerLo, ExtRootEntry->Bits.LowerContextTablePointerHi) ;
       ThisExtContextEntry  = &ExtContextEntryTable[SourceId.Index.ContextIndex];
       if (ThisExtContextEntry->Bits.AddressWidth == 0) {
         continue;
@@ -298,7 +298,7 @@ FindVtdIndexByPciDevice (
       *ContextEntry    = NULL;
     } else {
       RootEntry = &mVtdUnitInformation[VtdIndex].RootEntryTable[SourceId.Index.RootIndex];
-      ContextEntryTable = (VTD_CONTEXT_ENTRY *)(UINTN)LShiftU64 (RootEntry->Bits.ContextTablePointer, 12) ;
+      ContextEntryTable = (VTD_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(RootEntry->Bits.ContextTablePointerLo, RootEntry->Bits.ContextTablePointerHi) ;
       ThisContextEntry  = &ContextEntryTable[SourceId.Index.ContextIndex];
       if (ThisContextEntry->Bits.AddressWidth == 0) {
         continue;

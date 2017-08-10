@@ -526,7 +526,7 @@ DumpVtdRegs (
     FrcdReg.Uint64[1] = MmioRead64 (mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress + ((CapReg.Bits.FRO * 16) + (Index * 16) + R_FRCD_REG + sizeof(UINT64)));
     DEBUG((DEBUG_INFO, "  FRCD_REG[%d] - 0x%016lx %016lx\n", Index, FrcdReg.Uint64[1], FrcdReg.Uint64[0]));
     if (FrcdReg.Uint64[1] != 0 || FrcdReg.Uint64[0] != 0) {
-      DEBUG((DEBUG_INFO, "    Fault Info - 0x%016lx\n", LShiftU64(FrcdReg.Bits.FI, 12)));
+      DEBUG((DEBUG_INFO, "    Fault Info - 0x%016lx\n", VTD_64BITS_ADDRESS(FrcdReg.Bits.FILo, FrcdReg.Bits.FIHi)));
       SourceId.Uint16 = (UINT16)FrcdReg.Bits.SID;
       DEBUG((DEBUG_INFO, "    Source - B%02x D%02x F%02x\n", SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
       DEBUG((DEBUG_INFO, "    Type - %x (%a)\n", FrcdReg.Bits.T, FrcdReg.Bits.T ? "read" : "write"));
