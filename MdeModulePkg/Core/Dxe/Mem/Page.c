@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory page management functions.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -788,7 +788,12 @@ CoreConvertPagesEx (
       // Debug code - verify conversion is allowed
       //
       if (!(NewType == EfiConventionalMemory ? 1 : 0) ^ (Entry->Type == EfiConventionalMemory ? 1 : 0)) {
-        DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ConvertPages: Incompatible memory types\n"));
+        DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ConvertPages: Incompatible memory types, "));
+        if (Entry->Type == EfiConventionalMemory) {
+          DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "the pages to free have been freed\n"));
+        } else {
+          DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "the pages to allocate have been allocated\n"));
+        }
         return EFI_NOT_FOUND;
       }
 
