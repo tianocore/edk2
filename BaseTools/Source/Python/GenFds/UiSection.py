@@ -1,7 +1,7 @@
 ## @file
 # process UI section generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -66,7 +66,6 @@ class UiSection (UiSectionClassObject):
             FileNameStr = GenFdsGlobalVariable.MacroExtend(FileNameStr, Dict)
             FileObj = open(FileNameStr, 'r')
             NameString = FileObj.read()
-            NameString = '\"' + NameString + "\""
             FileObj.close()
         else:
             NameString = ''
