@@ -5,7 +5,8 @@ This file provides information about the primary maintainers for
 EDK II.
 
 In general, you should not privately email the maintainer. You should
-email the edk2-devel list, but you can also Cc the maintainer.
+email the edk2-devel list, and Cc the package maintainers and
+reviewers.
 
 Descriptions of section entries:
 
@@ -13,6 +14,8 @@ Descriptions of section entries:
      Patches and questions should be sent to the email list.
   M: Package Maintainer: Cc address for patches and questions. Responsible
      for reviewing and pushing package changes to source control.
+  R: Package Reviewer: Cc address for patches and questions. Reviewers help
+     maintainers review code, but don't have push access.
   W: Web-page with status/info
   T: SCM tree type and location.  Type is one of: git, svn.
   S: Status, one of the following:
