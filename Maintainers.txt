@@ -11,7 +11,8 @@ Descriptions of section entries:
 
   L: Mailing list that is relevant to this area (default is edk2-devel)
      Patches and questions should be sent to the email list.
-  M: Cc address for patches and questions (ie, the package maintainer)
+  M: Package Maintainer: Cc address for patches and questions. Responsible
+     for reviewing and pushing package changes to source control.
   W: Web-page with status/info
   T: SCM tree type and location.  Type is one of: git, svn.
   S: Status, one of the following:
