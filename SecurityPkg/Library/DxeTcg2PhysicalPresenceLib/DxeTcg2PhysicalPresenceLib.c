@@ -26,12 +26,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PrintLib.h>
 #include <Library/HiiLib.h>
 #include <Library/HobLib.h>
+#include <Library/TimerLib.h>
+#include <Library/BeepLib.h>
 #include <Guid/EventGroup.h>
 #include <Guid/Tcg2PhysicalPresenceData.h>
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Library/Tcg2PpVendorLib.h>
 
+#define PPI_USER_CONFIRMATION_TIME_OUT_M    2       // M, Max wait time in Minutes for User Response
+#define PPI_USER_CONFORMATION_INTERVAL_S    5       // S, Delay in Seconds between successive checking for User Response
+                                // where S <> 0 and 0 < S <= 60
 #define CONFIRM_BUFFER_SIZE         4096
 
 EFI_HII_HANDLE mTcg2PpStringPackHandle;
@@ -250,6 +255,31 @@ Tcg2ExecutePhysicalPresence (
   }
 }
 
+/**
+  Calculate the time-out count with the defined checking-interval.
+
+  @param    *toc    *UINTN: Ptr to time-out count
+  @param    *ci     *UINTN: Ptr to checking-interval in micro-seconds
+
+  @retval   None
+
+**/
+VOID
+Tcg2CalculateTimeOutCount (
+  IN OUT UINTN    *toc,
+  IN OUT UINTN    *ci
+  )
+{
+  // Local data
+  UINTN    i, n;
+
+  i = PPI_USER_CONFORMATION_INTERVAL_S;          // Checking-interval in seconds
+  if (i == 0) { i = 1; }                         // Assume Checking-interval as 1 second
+  n = (PPI_USER_CONFIRMATION_TIME_OUT_M * 60)/i; // Time-Out count
+  if (n == 0) { n = 60; i = 1; }                 // Time-out count = 60, Checking-interval = 1 second
+
+  *toc = n; *ci = (i * 1000000);                 // Return time-out count, checking-interval in micro-seconds
+}
 
 /**
   Read the specified key for user confirmation.
@@ -267,30 +297,28 @@ Tcg2ReadUserKey (
 {
   EFI_STATUS                        Status;
   EFI_INPUT_KEY                     Key;
-  UINT16                            InputKey;
 
-  InputKey = 0;
-  do {
-    Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
-    if (!EFI_ERROR (Status)) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (Key.ScanCode == SCAN_ESC) {
-        InputKey = Key.ScanCode;
-      }
-      if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-      if ((Key.ScanCode == SCAN_F12) && CautionKey) {
-        InputKey = Key.ScanCode;
-      }
+  UINT16    ConfirmKey;
+  UINTN     ci, i, toc;
+
+  ConfirmKey = SCAN_F10;                        // Scan code for Confirmation
+  if (CautionKey) { ConfirmKey = SCAN_F12; }
+
+  Tcg2CalculateTimeOutCount (&toc, &ci);                // Time-Out Count and checking-interval in miro-seconds
+
+  // Wait for user response within the time-out
+  for (i = 0; i < toc; i++) {
+    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);      // Read User Response
+    if (Status == EFI_SUCCESS) {                    // If success
+      if (Key.ScanCode == ConfirmKey) { return TRUE; }          //   User Confirmation
+      if (Key.ScanCode == SCAN_ESC) { return FALSE; }           //   User Rejection
     }
-  } while (InputKey == 0);
-
-  if (InputKey != SCAN_ESC) {
-    return TRUE;
+    if (Status == EFI_DEVICE_ERROR) { return FALSE; }           // If error, assume User Rejection
+    MicroSecondDelay (ci);                  // Give delay between successive checking
+    Beep (1);                               // Give Beep between successive checking
   }
 
-  return FALSE;
+  return FALSE;                             // Time-Out, assume User Rejection
 }
 
 /**
@@ -767,7 +795,7 @@ Tcg2ExecutePendingTpmRequest (
   if (TcgPpData->PPRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
     NewFlags = *Flags;
     NewPPFlags = NewFlags.PPFlags;
-    TcgPpData->PPResponse = Tcg2PpVendorLibExecutePendingRequest (PlatformAuth, TcgPpData->PPRequest, &NewPPFlags, &ResetRequired);
+    TcgPpData->PPResponse = Tcg2PpVendorLibExecutePendingRequest (PlatformAuth, TcgPpData, &NewPPFlags, &ResetRequired);
     NewFlags.PPFlags = NewPPFlags;
   } else {
     if (!RequestConfirmed) {
@@ -980,7 +1008,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "[TPM2] Flags=%x, PPRequest=%x (LastPPRequest=%x)\n", PpiFlags.PPFlags, TcgPpData.PPRequest, TcgPpData.LastPPRequest));
+  DEBUG ((EFI_D_INFO, "[TPM2] Flags=%x, Function Index = %x, Operation = %x (Last Operation = %x), Operation Parameter = %x\n", PpiFlags.PPFlags, TcgPpData.PPFunction, TcgPpData.PPRequest, TcgPpData.LastPPRequest, TcgPpData.PPRequestParameter));
 
   //
   // Execute pending TPM request.
@@ -1071,6 +1099,59 @@ Tcg2PhysicalPresenceLibNeedUserConfirm(
   return FALSE;
 }
 
+/**
+  Check if a PPI request is pending.
+
+  @retval   Result  BOOLEAN: TRUE/FALSE, PPI request yes/not pending
+
+**/
+BOOLEAN
+Tcg2PhysicalPresenceLibIfRequestPending (
+  )
+{
+  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
+  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
+  EFI_TCG2_PHYSICAL_PRESENCE        PpiData;
+  EFI_STATUS                        Status;
+  UINTN                             DataSize;
+  BOOLEAN                           b, RequestConfirmed;
+
+  DEBUG ((EFI_D_ERROR, "[TPM20] Tcg2PhysicalPresenceLibIfRequestPending()  {\n"));
+  b = FALSE; RequestConfirmed = FALSE;                                  // Assume PPI request not pending
+  ZeroMem ((UINT8*)(UINTN) &PpiData, sizeof(EFI_TCG2_PHYSICAL_PRESENCE));
+  ZeroMem ((UINT8*)(UINTN) &PpiFlags, sizeof(EFI_TCG2_PHYSICAL_PRESENCE_FLAGS));
+
+  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID**) &Tcg2Protocol);   // Find protocol
+  if (Status == EFI_SUCCESS) {                              // If success
+    if (GetBootModeHob() == BOOT_ON_S4_RESUME) {            //   If S4 resume
+      Status = EFI_DEVICE_ERROR;                            //     Assume PPI request not pending
+      DEBUG ((EFI_D_INFO, "         S4 Resume: Ignore PPI request\n"));
+    }
+  }
+
+  if (Status == EFI_SUCCESS) {                              // Read PPI Data
+    DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE);
+    Status = gRT->GetVariable (TCG2_PHYSICAL_PRESENCE_VARIABLE, &gEfiTcg2PhysicalPresenceGuid,
+                  NULL, &DataSize, &PpiData);
+  }
+
+  if (Status == EFI_SUCCESS) {                              // Read PPI Flags
+    DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE_FLAGS);
+    Status = gRT->GetVariable (TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE, &gEfiTcg2PhysicalPresenceGuid,
+                  NULL, &DataSize, &PpiFlags);
+  }
+
+  if ((Status == EFI_SUCCESS) && (PpiData.PPRequest != TCG2_PHYSICAL_PRESENCE_NO_ACTION)) {// If success AND some PPI request
+    b = Tcg2HaveValidTpmRequest (&PpiData, PpiFlags, &RequestConfirmed);       //   TRUE/FALSE: Valid PPI request yes/not pending
+  }
+
+  DEBUG ((EFI_D_ERROR, "        Valid PPI Request Pending? "));
+  if (b) { DEBUG ((EFI_D_ERROR, "Yes\n")); }
+  else { DEBUG ((EFI_D_ERROR, "No\n")); }
+  DEBUG ((EFI_D_ERROR, "[TPM20] Tcg2PhysicalPresenceLibIfRequestPending()  }\n"));
+
+  return b;
+}
 
 /**
   The handler for TPM physical presence function:
@@ -1125,6 +1206,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
 
   Caution: This function may receive untrusted input.
 
+  @param[in]      FunctionIndex    TPM physical presence Function Index.
   @param[in]      OperationRequest TPM physical presence operation request.
   @param[in]      RequestParameter TPM physical presence operation request parameter.
 
@@ -1134,6 +1216,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
 UINT32
 EFIAPI
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
+  IN UINT32                 FunctionIndex,
   IN UINT32                 OperationRequest,
   IN UINT32                 RequestParameter
   )
@@ -1166,8 +1249,8 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
     return TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
   }
 
-  if ((PpData.PPRequest != OperationRequest) ||
-      (PpData.PPRequestParameter != RequestParameter)) {
+  if (PpData.PPRequest != OperationRequest) {
+    PpData.PPFunction = (UINT8)FunctionIndex;
     PpData.PPRequest = (UINT8)OperationRequest;
     PpData.PPRequestParameter = RequestParameter;
     DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE);
@@ -1196,7 +1279,8 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
     if (EFI_ERROR (Status)) {
       Flags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
     }
-    return Tcg2PpVendorLibSubmitRequestToPreOSFunction (OperationRequest, Flags.PPFlags, RequestParameter);
+
+    return Tcg2PpVendorLibSubmitRequestToPreOSFunction (&PpData, Flags.PPFlags);
   }
 
   return TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS;

@@ -64,6 +64,7 @@ PhysicalPresenceCallback (
 {
   UINT32                MostRecentRequest;
   UINT32                Response;
+  UINT32                FunctionIndex;
   UINT32                OperationRequest;
   UINT32                RequestParameter;
 
@@ -79,12 +80,15 @@ PhysicalPresenceCallback (
   } else if ((mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS)
           || (mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2)) {
 
+    FunctionIndex = mTcgNvs->PhysicalPresence.Parameter;
     OperationRequest = mTcgNvs->PhysicalPresence.Request;
     RequestParameter = mTcgNvs->PhysicalPresence.RequestParameter;
     mTcgNvs->PhysicalPresence.ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
-                                             &OperationRequest,
-                                             &RequestParameter
+                                             &FunctionIndex,    // Arg2, Function Index (2 or 7)
+                                             &OperationRequest, // Arg3, Integer1 (Operation value, valid for both Function Index 2 and 7)
+                                             &RequestParameter  // Arg3, Integer2 (Operation Parameter, valid for Function Index 7 only)
                                              );
+    mTcgNvs->PhysicalPresence.Parameter = FunctionIndex;
     mTcgNvs->PhysicalPresence.Request = OperationRequest;
     mTcgNvs->PhysicalPresence.RequestParameter = RequestParameter;
   } else if (mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST) {
