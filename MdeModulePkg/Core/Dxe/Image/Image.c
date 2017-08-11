@@ -788,6 +788,8 @@ Done:
 
   if (DstBufAlocated) {
     CoreFreePages (Image->ImageContext.ImageAddress, Image->NumberOfPages);
+    Image->ImageContext.ImageAddress = 0;
+    Image->ImageBasePage = 0;
   }
 
   if (Image->ImageContext.FixupData != NULL) {
