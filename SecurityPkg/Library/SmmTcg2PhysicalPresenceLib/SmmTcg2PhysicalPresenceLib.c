@@ -89,6 +89,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
 
   Caution: This function may receive untrusted input.
 
+  @param[in, out]  Pointer to FunctionIndex TPM physical presence Function Index.
   @param[in, out]  Pointer to OperationRequest TPM physical presence operation request.
   @param[in, out]  Pointer to RequestParameter TPM physical presence operation request parameter.
 
@@ -97,6 +98,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   **/
 UINT32
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
+  IN OUT UINT32               *FunctionIndex,
   IN OUT UINT32               *OperationRequest,
   IN OUT UINT32               *RequestParameter
   )
@@ -133,8 +135,8 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
     goto EXIT;
   }
 
-  if ((PpData.PPRequest != *OperationRequest) ||
-      (PpData.PPRequestParameter != *RequestParameter)) {
+  if (PpData.PPRequest != *OperationRequest) {
+    PpData.PPFunction = (UINT8)*FunctionIndex;
     PpData.PPRequest = (UINT8)*OperationRequest;
     PpData.PPRequestParameter = *RequestParameter;
     DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE);
@@ -164,7 +166,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
     if (EFI_ERROR (Status)) {
       Flags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
     }
-    ReturnCode = Tcg2PpVendorLibSubmitRequestToPreOSFunction (*OperationRequest, Flags.PPFlags, *RequestParameter);
+    ReturnCode = Tcg2PpVendorLibSubmitRequestToPreOSFunction (&PpData, Flags.PPFlags);
   }
 
 EXIT:
@@ -198,6 +200,7 @@ EXIT:
 
   Caution: This function may receive untrusted input.
 
+  @param[in]      FunctionIndex TPM physical presence Function Index.
   @param[in]      OperationRequest TPM physical presence operation request.
   @param[in]      RequestParameter TPM physical presence operation request parameter.
 
@@ -207,17 +210,20 @@ EXIT:
 UINT32
 EFIAPI
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
+  IN UINT32                 FunctionIndex,
   IN UINT32                 OperationRequest,
   IN UINT32                 RequestParameter
   )
 {
+  UINT32                 TempFunctionIndex;
   UINT32                 TempOperationRequest;
   UINT32                 TempRequestParameter;
 
+  TempFunctionIndex    = FunctionIndex;
   TempOperationRequest = OperationRequest;
   TempRequestParameter = RequestParameter;
 
-  return Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx(&TempOperationRequest, &TempRequestParameter);
+  return Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx(&TempFunctionIndex, &TempOperationRequest, &TempRequestParameter);
 }
 
 /**
