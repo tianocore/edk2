@@ -216,7 +216,7 @@ GetImageNameFromHandle (
         Status = gBS->HandleProtocol (
                         LoadedImage->DeviceHandle,
                         &gEfiFirmwareVolume2ProtocolGuid,
-                        &Fv2
+                        (VOID **)&Fv2
                         );
         if (!EFI_ERROR (Status)) {
           Status = Fv2->ReadSection (
