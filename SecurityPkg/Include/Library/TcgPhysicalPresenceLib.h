@@ -45,4 +45,26 @@ TcgPhysicalPresenceLibNeedUserConfirm(
   VOID
   );
 
+/**
+  Check if a PPI request is pending.
+
+  @retval   Result  BOOLEAN: TRUE/FALSE, PPI request yes/not pending
+
+**/
+BOOLEAN
+TcgPhysicalPresenceLibIfRequestPending (
+  );
+
+/**
+  Lock physical presence in TPM1.2.
+
+  This must be executed before any 3rd party code is invoked.
+
+  @retval    None
+
+**/
+VOID
+TcgPhysicalPresenceLock (
+  );
+
 #endif
