@@ -1754,7 +1754,7 @@ class DecParser(MetaFileParser):
         self._SectionType = []
         ArchList = set()
         PrivateList = set()
-        Line = self._CurrentLine.replace("%s%s" % (TAB_COMMA_SPLIT, TAB_SPACE_SPLIT), TAB_COMMA_SPLIT)
+        Line = re.sub(',[\s]*', TAB_COMMA_SPLIT, self._CurrentLine)
         for Item in Line[1:-1].split(TAB_COMMA_SPLIT):
             if Item == '':
                 EdkLogger.error("Parser", FORMAT_UNKNOWN_ERROR,
