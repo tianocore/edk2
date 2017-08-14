@@ -96,15 +96,15 @@ VirtioPciGetQueueSize (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueAlignment (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT32                         Alignment
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT32                         Alignment
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetPageSize (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT32                         PageSize
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT32                         PageSize
   );
 
 EFI_STATUS
@@ -131,29 +131,29 @@ VirtioPciSetQueueAddress (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueSel (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT16                         Sel
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT16                         Sel
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueNotify (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT16                         Index
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT16                         Index
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueSize (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT16                         Size
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT16                         Size
   );
 
 EFI_STATUS
 EFIAPI
 VirtioPciSetDeviceStatus (
-  VIRTIO_DEVICE_PROTOCOL         *This,
-  UINT8                          DeviceStatus
+  IN  VIRTIO_DEVICE_PROTOCOL         *This,
+  IN  UINT8                          DeviceStatus
   );
 
 #endif // _VIRTIO_PCI_DEVICE_DXE_H_

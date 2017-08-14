@@ -196,8 +196,8 @@ VirtioPciSetQueueAddress (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueSel (
-  VIRTIO_DEVICE_PROTOCOL    *This,
-  UINT16                    Sel
+  IN  VIRTIO_DEVICE_PROTOCOL    *This,
+  IN  UINT16                    Sel
   )
 {
   VIRTIO_PCI_DEVICE *Dev;
@@ -211,8 +211,8 @@ VirtioPciSetQueueSel (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueAlignment (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  Alignment
+  IN  VIRTIO_DEVICE_PROTOCOL *This,
+  IN  UINT32                  Alignment
   )
 {
   return EFI_SUCCESS;
@@ -221,8 +221,8 @@ VirtioPciSetQueueAlignment (
 EFI_STATUS
 EFIAPI
 VirtioPciSetPageSize (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  PageSize
+  IN  VIRTIO_DEVICE_PROTOCOL *This,
+  IN  UINT32                  PageSize
   )
 {
   return (PageSize == EFI_PAGE_SIZE) ? EFI_SUCCESS : EFI_UNSUPPORTED;
@@ -231,8 +231,8 @@ VirtioPciSetPageSize (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueNotify (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT16                 Index
+  IN  VIRTIO_DEVICE_PROTOCOL *This,
+  IN  UINT16                 Index
   )
 {
   VIRTIO_PCI_DEVICE *Dev;
@@ -246,8 +246,8 @@ VirtioPciSetQueueNotify (
 EFI_STATUS
 EFIAPI
 VirtioPciSetQueueSize (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT16                 Size
+  IN  VIRTIO_DEVICE_PROTOCOL *This,
+  IN  UINT16                 Size
   )
 {
   //
@@ -260,8 +260,8 @@ VirtioPciSetQueueSize (
 EFI_STATUS
 EFIAPI
 VirtioPciSetDeviceStatus (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT8                  DeviceStatus
+  IN  VIRTIO_DEVICE_PROTOCOL *This,
+  IN  UINT8                  DeviceStatus
   )
 {
   VIRTIO_PCI_DEVICE *Dev;
