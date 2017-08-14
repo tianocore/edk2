@@ -21,7 +21,9 @@
 
 #include <IndustryStandard/Virtio.h>
 
-// VirtIo Specification Revision: Major[31:24].Minor[23:16].Revision[15:0
+//
+// VirtIo Specification Revision: Major[31:24].Minor[23:16].Revision[15:0]
+//
 #define VIRTIO_SPEC_REVISION(major,minor,revision) \
   ((((major) & 0xFF) << 24) | (((minor) & 0xFF) << 16) | ((revision) & 0xFFFF))
 
@@ -327,9 +329,13 @@ EFI_STATUS
 ///  outside of the EDK II tree.
 ///
 struct _VIRTIO_DEVICE_PROTOCOL {
-  /// VirtIo Specification Revision encoded with VIRTIO_SPEC_REVISION()
+  //
+  // VirtIo Specification Revision encoded with VIRTIO_SPEC_REVISION()
+  //
   UINT32                      Revision;
-  /// From the Virtio Spec
+  //
+  // From the Virtio Spec
+  //
   INT32                       SubSystemDeviceId;
 
   VIRTIO_GET_DEVICE_FEATURES  GetDeviceFeatures;
@@ -350,7 +356,9 @@ struct _VIRTIO_DEVICE_PROTOCOL {
   VIRTIO_GET_DEVICE_STATUS    GetDeviceStatus;
   VIRTIO_SET_DEVICE_STATUS    SetDeviceStatus;
 
+  //
   // Functions to read/write Device Specific headers
+  //
   VIRTIO_DEVICE_WRITE         WriteDevice;
   VIRTIO_DEVICE_READ          ReadDevice;
 };
