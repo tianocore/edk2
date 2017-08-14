@@ -85,29 +85,29 @@ VirtioMmioGetDeviceStatus (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueSize (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT16                  QueueSize
+  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN UINT16                  QueueSize
   );
 
 EFI_STATUS
 EFIAPI
 VirtioMmioSetDeviceStatus (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT8                   DeviceStatus
+  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN UINT8                   DeviceStatus
   );
 
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueNotify (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT16                  QueueNotify
+  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN UINT16                  QueueNotify
   );
 
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueSel (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT16                  Sel
+  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN UINT16                  Sel
   );
 
 EFI_STATUS
@@ -119,22 +119,22 @@ VirtioMmioSetQueueAddress (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueAlignment (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  Alignment
+  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN UINT32                  Alignment
   );
 
 EFI_STATUS
 EFIAPI
 VirtioMmioSetPageSize (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT32                  PageSize
+  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN UINT32                  PageSize
   );
 
 EFI_STATUS
 EFIAPI
 VirtioMmioSetGuestFeatures (
-  VIRTIO_DEVICE_PROTOCOL *This,
-  UINT64                  Features
+  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN UINT64                  Features
   );
 
 #endif // _VIRTIO_MMIO_DEVICE_INTERNAL_H_
