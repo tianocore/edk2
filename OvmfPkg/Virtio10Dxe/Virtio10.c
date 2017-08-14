@@ -906,7 +906,7 @@ Virtio10BindingStart (
     goto ClosePciIo;
   }
 
-  SetAttributes = 0;
+  SetAttributes = EFI_PCI_IO_ATTRIBUTE_BUS_MASTER;
   UpdateAttributes (&Device->CommonConfig, &SetAttributes);
   UpdateAttributes (&Device->NotifyConfig, &SetAttributes);
   UpdateAttributes (&Device->SpecificConfig, &SetAttributes);
