@@ -194,3 +194,33 @@
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSetting_PROMPT  #language en-US "Actual processor feature settings."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuFeaturesSetting_HELP  #language en-US "Specifies actual settings for processor features, each bit corresponding to a specific feature."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceMemSize_PROMPT  #language en-US "Memory size used by Processor Trace feature."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceMemSize_HELP  #language en-US "User input the memory size can be used by processor trace feature.<BR><BR>\n"
+                                                                                   "Default value is 0x10 which disables the processor memory trace.<BR>\n"
+                                                                                   "0x0  -  4K.<BR>\n"
+                                                                                   "0x1  -  8K.<BR>\n"
+                                                                                   "0x2  -  16K.<BR>\n"
+                                                                                   "0x3  -  32K.<BR>\n"
+                                                                                   "0x4  -  64K.<BR>\n"
+                                                                                   "0x5  -  128K.<BR>\n"
+                                                                                   "0x6  -  256K.<BR>\n"
+                                                                                   "0x7  -  512K.<BR>\n"
+                                                                                   "0x8  -  1M.<BR>\n"
+                                                                                   "0x9  -  2M.<BR>\n"
+                                                                                   "0xA  -  4M.<BR>\n"
+                                                                                   "0xB  -  8M.<BR>\n"
+                                                                                   "0xC  -  16M.<BR>\n"
+                                                                                   "0xD  -  32M.<BR>\n"
+                                                                                   "0xE  -  64M.<BR>\n"
+                                                                                   "0xF  -  128M.<BR>\n"
+                                                                                   "0x10 -  ProcTraceMemDisable.<BR>\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceOutputScheme_PROMPT  #language en-US "Processor Trace output scheme type."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceOutputScheme_HELP  #language en-US "User input the processor trace output scheme type.<BR><BR>\n"
+                                                                                        "Default value is 2 which disables the processor memory trace.<BR>\n"
+                                                                                        "0 - Single Range output scheme.<BR>\n"
+                                                                                        "1 - ToPA(Table of physical address) scheme.<BR>\n"
+                                                                                        "2 - Invalid scheme.<BR>\n"
