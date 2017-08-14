@@ -2,7 +2,7 @@
   Defined the platform specific device path which will be filled to
   ConIn/ConOut variables.
    
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -137,19 +137,19 @@ NT_ISA_SERIAL_DEVICE_PATH   gNtSerialDevicePath1 = {
 PLATFORM_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gNtSerialDevicePath0,
-    (CONSOLE_OUT | CONSOLE_IN)
+    (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
   },
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gNtSerialDevicePath1,
-    (CONSOLE_OUT | CONSOLE_IN)
+    (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
   },
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath0,
-    (CONSOLE_OUT | CONSOLE_IN)
+    (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
   },
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gGopDevicePath1,
-    (CONSOLE_OUT | CONSOLE_IN)
+    (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
   },
   {
     NULL,
