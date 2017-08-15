@@ -528,9 +528,9 @@ AnalysisProcessorFeatures (
           //
           SupportedMaskCleanBit (CpuFeaturesData->SettingPcds, CpuFeatureInOrder->FeatureMask);
           if (CpuFeatureInOrder->FeatureName != NULL) {
-            DEBUG ((DEBUG_WARN, "Warning :: Failed to enable Feature Name = %a.\n", CpuFeatureInOrder->FeatureName));
+            DEBUG ((DEBUG_WARN, "Warning :: Failed to enable Feature: Name = %a.\n", CpuFeatureInOrder->FeatureName));
           } else {
-            DEBUG ((DEBUG_WARN, "Warning :: Failed to enable Feature Mask = "));
+            DEBUG ((DEBUG_WARN, "Warning :: Failed to enable Feature: Mask = "));
             DumpCpuFeatureMask (CpuFeatureInOrder->FeatureMask);
           }
         }
@@ -538,9 +538,9 @@ AnalysisProcessorFeatures (
         Status = CpuFeatureInOrder->InitializeFunc (ProcessorNumber, CpuInfo, CpuFeatureInOrder->ConfigData, FALSE);
         if (EFI_ERROR (Status)) {
           if (CpuFeatureInOrder->FeatureName != NULL) {
-            DEBUG ((DEBUG_WARN, "Warning :: Failed to enable Feature Name = %a.\n", CpuFeatureInOrder->FeatureName));
+            DEBUG ((DEBUG_WARN, "Warning :: Failed to disable Feature: Name = %a.\n", CpuFeatureInOrder->FeatureName));
           } else {
-            DEBUG ((DEBUG_WARN, "Warning :: Failed to enable Feature Mask = "));
+            DEBUG ((DEBUG_WARN, "Warning :: Failed to disable Feature: Mask = "));
             DumpCpuFeatureMask (CpuFeatureInOrder->FeatureMask);
           }
         }
