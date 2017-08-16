@@ -27,6 +27,7 @@ SMM_CPU_SEMAPHORES                          mSmmCpuSemaphores;
 UINTN                                       mSemaphoreSize;
 SPIN_LOCK                                   *mPFLock = NULL;
 SMM_CPU_SYNC_MODE                           mCpuSmmSyncMode;
+BOOLEAN                                     mMachineCheckSupported = FALSE;
 
 /**
   Performs an atomic compare exchange operation to get semaphore.
@@ -264,8 +265,12 @@ SmmWaitForApArrival (
 
   ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
 
-  LmceEn = IsLmceOsEnabled ();
-  LmceSignal = IsLmceSignaled();
+  LmceEn     = FALSE;
+  LmceSignal = FALSE;
+  if (mMachineCheckSupported) {
+    LmceEn     = IsLmceOsEnabled ();
+    LmceSignal = IsLmceSignaled();
+  }
 
   //
   // Platform implementor should choose a timeout value appropriately:
@@ -1366,6 +1371,13 @@ InitializeMpServiceData (
   UINTN                     Index;
   UINT8                     *GdtTssTables;
   UINTN                     GdtTableStepSize;
+  CPUID_VERSION_INFO_EDX    RegEdx;
+
+  //
+  // Determine if this CPU supports machine check
+  //
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &RegEdx.Uint32);
+  mMachineCheckSupported = (BOOLEAN)(RegEdx.Bits.MCA == 1);
 
   //
   // Allocate memory for all locks and semaphores
