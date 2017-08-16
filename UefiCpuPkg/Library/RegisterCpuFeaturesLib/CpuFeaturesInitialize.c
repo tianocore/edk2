@@ -60,13 +60,13 @@ GetSupportPcds (
   VOID
   )
 {
-  UINTN                  BitMaskSize;
   UINT8                  *SupportBitMask;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesSupport);
-  SupportBitMask = AllocateZeroPool (BitMaskSize);
+  SupportBitMask = AllocateCopyPool (
+          PcdGetSize (PcdCpuFeaturesSupport), 
+          PcdGetPtr (PcdCpuFeaturesSupport)
+          );
   ASSERT (SupportBitMask != NULL);
-  SupportBitMask = (UINT8 *) PcdGetPtr (PcdCpuFeaturesSupport);
 
   return SupportBitMask;
 }
@@ -81,13 +81,13 @@ GetConfigurationPcds (
   VOID
   )
 {
-  UINTN                  BitMaskSize;
   UINT8                  *SupportBitMask;
 
-  BitMaskSize = PcdGetSize (PcdCpuFeaturesUserConfiguration);
-  SupportBitMask = AllocateZeroPool (BitMaskSize);
+  SupportBitMask = AllocateCopyPool (
+          PcdGetSize (PcdCpuFeaturesUserConfiguration), 
+          PcdGetPtr (PcdCpuFeaturesUserConfiguration)
+          );
   ASSERT (SupportBitMask != NULL);
-  SupportBitMask = (UINT8 *) PcdGetPtr (PcdCpuFeaturesUserConfiguration);
 
   return SupportBitMask;
 }
