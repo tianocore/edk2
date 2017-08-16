@@ -1,7 +1,7 @@
 /** @file
   Supporting functions implementaion for PCI devices management.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -711,7 +711,12 @@ StartPciDevicesOnBridge (
                              0,
                              &Supports
                              );
-        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+        //
+        // By default every bridge's IO and MMIO spaces are enabled.
+        // Bridge's Bus Master will be enabled when any device behind it requests
+        // to enable Bus Master.
+        //
+        Supports &= (UINT64) (EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),
                              EfiPciIoAttributeOperationEnable,
@@ -763,7 +768,12 @@ StartPciDevicesOnBridge (
                              0,
                              &Supports
                              );
-        Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+        //
+        // By default every bridge's IO and MMIO spaces are enabled.
+        // Bridge's Bus Master will be enabled when any device behind it requests
+        // to enable Bus Master.
+        //
+        Supports &= (UINT64) (EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY);
         PciIoDevice->PciIo.Attributes (
                              &(PciIoDevice->PciIo),
                              EfiPciIoAttributeOperationEnable,
