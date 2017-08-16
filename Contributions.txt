@@ -119,7 +119,7 @@ or when applicable, in the associated License.txt file.
 
 Unless otherwise indicated, all Documentation made available on the
 TianoCore site is provided to you under the terms and conditions of the
-FreeBSD Documentation License ("FreeBSD"). A copy of the BSD License is
+FreeBSD Documentation License ("FreeBSD"). A copy of the license is
 available at https://www.freebsd.org/copyright/freebsd-doc-license.html or,
 when applicable, in the associated License.txt file.
 
