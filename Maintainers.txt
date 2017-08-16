@@ -131,12 +131,12 @@ T: git - https://github.com/tianocore/edk2-FatPkg.git
 
 IntelFrameworkModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkModulePkg
-M: Jeff Fan <jeff.fan@intel.com>
+M: Liming Gao <liming.gao@intel.com>
 
 IntelFrameworkPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkPkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
-M: Jeff Fan <jeff.fan@intel.com>
+M: Liming Gao <liming.gao@intel.com>
 
 IntelFsp2Pkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
