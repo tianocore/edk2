@@ -231,7 +231,6 @@ M: Jiewen Yao <jiewen.yao@intel.com>
 
 SourceLevelDebugPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
-M: Jeff Fan <jeff.fan@intel.com>
 M: Hao Wu <hao.a.wu@intel.com>
 
 StdLib, StdLibPrivateInternalFiles
