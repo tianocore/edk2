@@ -1466,7 +1466,7 @@ Ip6ConfigSetDnsServer (
   Item   = NULL;
   Tmp    = NULL;
 
-  if ((DataSize == 0) && (DataSize % sizeof (EFI_IPv6_ADDRESS) != 0)) {
+  if ((DataSize != 0) && (DataSize % sizeof (EFI_IPv6_ADDRESS) != 0)) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
