@@ -734,6 +734,7 @@ SplitSecondLevelPage (
   Set VTd attribute for a system memory on second level page entry
 
   @param[in]  VtdIndex                The index used to identify a VTd engine.
+  @param[in]  DomainIdentifier        The domain ID of the source.
   @param[in]  SecondLevelPagingEntry  The second level paging entry in VTd table for the device.
   @param[in]  BaseAddress             The base of device memory address to be used as the DMA memory.
   @param[in]  Length                  The length of device memory address to be used as the DMA memory.
@@ -817,6 +818,7 @@ SetSecondLevelPagingAttribute (
   Set VTd attribute for a system memory.
 
   @param[in]  VtdIndex                The index used to identify a VTd engine.
+  @param[in]  DomainIdentifier        The domain ID of the source.
   @param[in]  SecondLevelPagingEntry  The second level paging entry in VTd table for the device.
   @param[in]  BaseAddress             The base of device memory address to be used as the DMA memory.
   @param[in]  Length                  The length of device memory address to be used as the DMA memory.
