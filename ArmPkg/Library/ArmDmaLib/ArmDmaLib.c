@@ -2,6 +2,7 @@
   Generic ARM implementation of DmaLib.h
 
   Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Linaro, Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -80,6 +81,7 @@ DmaMap (
   MAP_INFO_INSTANCE               *Map;
   VOID                            *Buffer;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
+  UINTN                           AllocSize;
 
   if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL || Mapping == NULL ) {
     return EFI_INVALID_PARAMETER;
@@ -104,8 +106,9 @@ DmaMap (
     return  EFI_OUT_OF_RESOURCES;
   }
 
-  if ((((UINTN)HostAddress & (mCpu->DmaBufferAlignment - 1)) != 0) ||
-      ((*NumberOfBytes & (mCpu->DmaBufferAlignment - 1)) != 0)) {
+  if (Operation != MapOperationBusMasterRead &&
+      ((((UINTN)HostAddress & (mCpu->DmaBufferAlignment - 1)) != 0) ||
+       ((*NumberOfBytes & (mCpu->DmaBufferAlignment - 1)) != 0))) {
 
     // Get the cacheability of the region
     Status = gDS->GetMemorySpaceDescriptor ((UINTN)HostAddress, &GcdDescriptor);
@@ -129,21 +132,31 @@ DmaMap (
       }
 
       //
-      // If the buffer does not fill entire cache lines we must double buffer into
-      // uncached memory. Device (PCI) address becomes uncached page.
+      // If the buffer does not fill entire cache lines we must double buffer
+      // into a suitably aligned allocation that allows us to invalidate the
+      // cache without running the risk of corrupting adjacent unrelated data.
+      // Note that pool allocations are guaranteed to be 8 byte aligned, so
+      // we only have to add (alignment - 8) worth of padding.
       //
-      Map->DoubleBuffer  = TRUE;
-      Status = DmaAllocateBuffer (EfiBootServicesData, EFI_SIZE_TO_PAGES (*NumberOfBytes), &Buffer);
-      if (EFI_ERROR (Status)) {
+      Map->DoubleBuffer = TRUE;
+      AllocSize = ALIGN_VALUE (*NumberOfBytes, mCpu->DmaBufferAlignment) +
+                  (mCpu->DmaBufferAlignment - 8);
+      Map->BufferAddress = AllocatePool (AllocSize);
+      if (Map->BufferAddress == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
         goto FreeMapInfo;
       }
 
-      if (Operation == MapOperationBusMasterRead) {
-        CopyMem (Buffer, HostAddress, *NumberOfBytes);
-      }
-
+      Buffer = ALIGN_POINTER (Map->BufferAddress, mCpu->DmaBufferAlignment);
       *DeviceAddress = HostToDeviceAddress (ConvertToPhysicalAddress (Buffer));
-      Map->BufferAddress = Buffer;
+
+      //
+      // Get rid of any dirty cachelines covering the double buffer. This
+      // prevents them from being written back unexpectedly, potentially
+      // overwriting the data we receive from the device.
+      //
+      mCpu->FlushDataCache (mCpu, (UINTN)Buffer, *NumberOfBytes,
+              EfiCpuFlushTypeWriteBack);
     } else {
       Map->DoubleBuffer  = FALSE;
     }
@@ -207,6 +220,7 @@ DmaUnmap (
 {
   MAP_INFO_INSTANCE *Map;
   EFI_STATUS        Status;
+  VOID              *Buffer;
 
   if (Mapping == NULL) {
     ASSERT (FALSE);
@@ -217,17 +231,20 @@ DmaUnmap (
 
   Status = EFI_SUCCESS;
   if (Map->DoubleBuffer) {
-    ASSERT (Map->Operation != MapOperationBusMasterCommonBuffer);
+    ASSERT (Map->Operation == MapOperationBusMasterWrite);
 
-    if (Map->Operation == MapOperationBusMasterCommonBuffer) {
+    if (Map->Operation != MapOperationBusMasterWrite) {
       Status = EFI_INVALID_PARAMETER;
-    } else if (Map->Operation == MapOperationBusMasterWrite) {
-      CopyMem ((VOID *)(UINTN)Map->HostAddress, Map->BufferAddress,
-        Map->NumberOfBytes);
+    } else {
+      Buffer = ALIGN_POINTER (Map->BufferAddress, mCpu->DmaBufferAlignment);
+
+      mCpu->FlushDataCache (mCpu, (UINTN)Buffer, Map->NumberOfBytes,
+              EfiCpuFlushTypeInvalidate);
+
+      CopyMem ((VOID *)(UINTN)Map->HostAddress, Buffer, Map->NumberOfBytes);
+
+      FreePool (Map->BufferAddress);
     }
-
-    DmaFreeBuffer (EFI_SIZE_TO_PAGES (Map->NumberOfBytes), Map->BufferAddress);
-
   } else {
     if (Map->Operation == MapOperationBusMasterWrite) {
       //
