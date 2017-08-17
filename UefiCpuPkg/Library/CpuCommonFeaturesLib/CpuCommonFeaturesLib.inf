@@ -48,7 +48,6 @@
   PendingBreak.c
   X2Apic.c
   Ppin.c
-  Lmce.c
   ProcTrace.c
 
 [Packages]
