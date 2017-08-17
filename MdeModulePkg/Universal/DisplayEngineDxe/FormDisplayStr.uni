@@ -1,6 +1,6 @@
 // *++
 //
-// Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -103,6 +103,10 @@
                                        #language fr-FR  "Y (y)"
 #string CONFIRM_OPTION_NO              #language en-US  "N (n)"
                                        #language fr-FR  "N (n)"
+#string CONFIRM_OPTION_OK              #language en-US  "O (o)"
+                                       #language fr-FR  "O (o)"
+#string CONFIRM_OPTION_CANCEL          #language en-US  "C (c)"
+                                       #language fr-FR  "C (c)"
 #string CONFIRM_OPTION_CONNECT         #language en-US  " and "
                                        #language fr-FR  " and "
 #string CONFIRM_OPTION_END             #language en-US  "?"
@@ -119,4 +123,18 @@
                                        #language fr-FR  " Get data/time fail, display ??."
 #string PASSWORD_NOT_SUPPORTED         #language en-US  "Unsupported! Because no interactieve flag or no ConfigAccess protocol!"
                                        #language fr-FR  "Unsupported! Because no interactieve flag or no ConfigAccess protocol!"
+#string OK_SELECTABLE_OPTION           #language en-US  "[ Ok ]"
+                                       #language fr-FR  "[ Ok ]"
+#string CANCEL_SELECTABLE_OPTION       #language en-US  "[Cancel]"
+                                       #language fr-FR  "[Cancel]"
+#string YES_SELECTABLE_OPTION          #language en-US  "[ Yes ]"
+                                       #language fr-FR  "[ Yes ]"
+#string NO_SELECTABLE_OPTION           #language en-US  "[ No ]"
+                                       #language fr-FR  "[ No ]"
+#string ERROR_POPUP_STRING             #language en-US  "ERROR"
+                                       #language fr-FR  "ERROR"
+#string WARNING_POPUP_STRING           #language en-US  "WARNING"
+                                       #language fr-FR  "WARNING"
+#string INFO_POPUP_STRING              #language en-US  "INFO"
+                                       #language fr-FR  "INFO"
 

@@ -151,6 +151,15 @@ CHAR16            *gConfirmExitMsg2nd;
 CHAR16            *gConfirmOpt;
 CHAR16            *gConfirmOptYes;
 CHAR16            *gConfirmOptNo;
+CHAR16            *gConfirmOptOk;
+CHAR16            *gConfirmOptCancel;
+CHAR16            *gYesOption;
+CHAR16            *gNoOption;
+CHAR16            *gOkOption;
+CHAR16            *gCancelOption;
+CHAR16            *gErrorPopup;
+CHAR16            *gWarningPopup;
+CHAR16            *gInfoPopup;
 CHAR16            *gConfirmMsgConnect;
 CHAR16            *gConfirmMsgEnd;
 CHAR16            *gPasswordUnsupported;
@@ -167,6 +176,10 @@ FORM_DISPLAY_DRIVER_PRIVATE_DATA  mPrivateData = {
     FormDisplay,
     DriverClearDisplayPage,
     ConfirmDataChange
+  },
+  {
+    EFI_HII_POPUP_PROTOCOL_REVISION,
+    CreatePopup
   }
 };
 
@@ -247,6 +260,15 @@ InitializeDisplayStrings (
   gConfirmOpt           = GetToken (STRING_TOKEN (CONFIRM_OPTION), gHiiHandle);
   gConfirmOptYes        = GetToken (STRING_TOKEN (CONFIRM_OPTION_YES), gHiiHandle);
   gConfirmOptNo         = GetToken (STRING_TOKEN (CONFIRM_OPTION_NO), gHiiHandle);
+  gConfirmOptOk         = GetToken (STRING_TOKEN (CONFIRM_OPTION_OK), gHiiHandle);
+  gConfirmOptCancel     = GetToken (STRING_TOKEN (CONFIRM_OPTION_CANCEL), gHiiHandle);
+  gYesOption            = GetToken (STRING_TOKEN (YES_SELECTABLE_OPTION), gHiiHandle);
+  gNoOption             = GetToken (STRING_TOKEN (NO_SELECTABLE_OPTION), gHiiHandle);
+  gOkOption             = GetToken (STRING_TOKEN (OK_SELECTABLE_OPTION), gHiiHandle);
+  gCancelOption         = GetToken (STRING_TOKEN (CANCEL_SELECTABLE_OPTION), gHiiHandle);
+  gErrorPopup           = GetToken (STRING_TOKEN (ERROR_POPUP_STRING), gHiiHandle);
+  gWarningPopup         = GetToken (STRING_TOKEN (WARNING_POPUP_STRING), gHiiHandle);
+  gInfoPopup            = GetToken (STRING_TOKEN (INFO_POPUP_STRING), gHiiHandle);
   gConfirmMsgConnect    = GetToken (STRING_TOKEN (CONFIRM_OPTION_CONNECT), gHiiHandle);
   gConfirmMsgEnd        = GetToken (STRING_TOKEN (CONFIRM_OPTION_END), gHiiHandle);
   gPasswordUnsupported  = GetToken (STRING_TOKEN (PASSWORD_NOT_SUPPORTED ), gHiiHandle);
@@ -301,6 +323,15 @@ FreeDisplayStrings (
   FreePool (gConfirmOpt);
   FreePool (gConfirmOptYes);
   FreePool (gConfirmOptNo);
+  FreePool (gConfirmOptOk);
+  FreePool (gConfirmOptCancel);
+  FreePool (gYesOption);
+  FreePool (gNoOption);
+  FreePool (gOkOption);
+  FreePool (gCancelOption);
+  FreePool (gErrorPopup);
+  FreePool (gWarningPopup);
+  FreePool (gInfoPopup);
   FreePool (gConfirmMsgConnect);
   FreePool (gConfirmMsgEnd);
   FreePool (gPasswordUnsupported);
@@ -4159,6 +4190,17 @@ InitializeDisplayEngine (
                   EFI_NATIVE_INTERFACE,
                   &mPrivateData.FromDisplayProt
                   );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Install HII Popup Protocol.
+  //
+  Status = gBS->InstallProtocolInterface (
+                 &mPrivateData.Handle,
+                 &gEfiHiiPopupProtocolGuid,
+                 EFI_NATIVE_INTERFACE,
+                 &mPrivateData.HiiPopup
+                );
   ASSERT_EFI_ERROR (Status);
 
   InitializeDisplayStrings();
