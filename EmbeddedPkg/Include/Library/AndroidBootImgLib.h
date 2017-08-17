@@ -55,4 +55,17 @@ typedef struct {
  * and larger than boot header */
 #define IS_VALID_ANDROID_PAGE_SIZE(Val)   \
              (IS_POWER_OF_2(Val) && (Val > sizeof(ANDROID_BOOTIMG_HEADER)))
+
+EFI_STATUS
+AndroidBootImgGetImgSize (
+  IN  VOID    *BootImg,
+  OUT UINTN   *ImgSize
+  );
+
+EFI_STATUS
+AndroidBootImgBoot (
+  IN VOID                   *Buffer,
+  IN UINTN                   BufferSize
+  );
+
 #endif /* __ABOOTIMG_H__ */
