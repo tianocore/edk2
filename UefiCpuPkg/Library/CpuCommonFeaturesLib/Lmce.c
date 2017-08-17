@@ -41,6 +41,10 @@ LmceSupport (
 {
   MSR_IA32_MCG_CAP_REGISTER    McgCap;
 
+  if (!McaSupport (ProcessorNumber, CpuInfo, ConfigData)) {
+    return FALSE;
+  }
+
   McgCap.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
   if (ProcessorNumber == 0) {
     DEBUG ((EFI_D_INFO, "LMCE eanble = %x\n", (BOOLEAN) (McgCap.Bits.MCG_LMCE_P != 0)));
