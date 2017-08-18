@@ -1349,17 +1349,9 @@ DiscoverScsiDevice (
   //
   // Retrieved inquiry data successfully
   //
-  if ((InquiryData->Peripheral_Qualifier != 0) &&
-      (InquiryData->Peripheral_Qualifier != 3)) {
+  if (InquiryData->Peripheral_Qualifier != 0) {
     ScsiDeviceFound = FALSE;
     goto Done;
-  }
-
-  if (InquiryData->Peripheral_Qualifier == 3) {
-    if (InquiryData->Peripheral_Type != 0x1f) {
-      ScsiDeviceFound = FALSE;
-      goto Done;
-    }
   }
 
   if (0x1e >= InquiryData->Peripheral_Type && InquiryData->Peripheral_Type >= 0xa) {
