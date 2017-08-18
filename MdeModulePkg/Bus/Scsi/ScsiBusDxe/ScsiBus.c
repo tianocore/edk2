@@ -1298,15 +1298,26 @@ DiscoverScsiDevice (
   UINT8                 HostAdapterStatus;
   UINT8                 TargetStatus;
   EFI_SCSI_INQUIRY_DATA *InquiryData;
+  EFI_SCSI_SENSE_DATA   *SenseData;
   UINT8                 MaxRetry;
   UINT8                 Index;
   BOOLEAN               ScsiDeviceFound;
 
   HostAdapterStatus = 0;
   TargetStatus      = 0;
+  SenseData         = NULL;
 
   InquiryData = AllocateAlignedBuffer (ScsiIoDevice, sizeof (EFI_SCSI_INQUIRY_DATA));
   if (InquiryData == NULL) {
+    ScsiDeviceFound = FALSE;
+    goto Done;
+  }
+
+  SenseData = AllocateAlignedBuffer (
+                ScsiIoDevice,
+                sizeof (EFI_SCSI_SENSE_DATA)
+                );
+  if (SenseData == NULL) {
     ScsiDeviceFound = FALSE;
     goto Done;
   }
@@ -1315,15 +1326,16 @@ DiscoverScsiDevice (
   // Using Inquiry command to scan for the device
   //
   InquiryDataLength = sizeof (EFI_SCSI_INQUIRY_DATA);
-  SenseDataLength   = 0;
+  SenseDataLength   = sizeof (EFI_SCSI_SENSE_DATA);
   ZeroMem (InquiryData, InquiryDataLength);
+  ZeroMem (SenseData, SenseDataLength);
 
   MaxRetry = 2;
   for (Index = 0; Index < MaxRetry; Index++) {
     Status = ScsiInquiryCommand (
               &ScsiIoDevice->ScsiIo,
               SCSI_BUS_TIMEOUT,
-              NULL,
+              SenseData,
               &SenseDataLength,
               &HostAdapterStatus,
               &TargetStatus,
@@ -1332,6 +1344,13 @@ DiscoverScsiDevice (
               FALSE
               );
     if (!EFI_ERROR (Status)) {
+      if ((HostAdapterStatus == EFI_SCSI_IO_STATUS_HOST_ADAPTER_OK) &&
+          (TargetStatus == EFI_SCSI_IO_STATUS_TARGET_CHECK_CONDITION) &&
+          (SenseData->Error_Code == 0x70) &&
+          (SenseData->Sense_Key == EFI_SCSI_SK_ILLEGAL_REQUEST)) {
+        ScsiDeviceFound = FALSE;
+        goto Done;
+      }
       break;
     }
     if ((Status == EFI_BAD_BUFFER_SIZE) ||
@@ -1377,6 +1396,7 @@ DiscoverScsiDevice (
   ScsiDeviceFound = TRUE;
 
 Done:
+  FreeAlignedBuffer (SenseData, sizeof (EFI_SCSI_SENSE_DATA));
   FreeAlignedBuffer (InquiryData, sizeof (EFI_SCSI_INQUIRY_DATA));
 
   return ScsiDeviceFound;
