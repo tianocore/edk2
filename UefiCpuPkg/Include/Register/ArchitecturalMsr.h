@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -4534,6 +4534,83 @@ typedef union {
   UINT64  Uint64;
 } MSR_IA32_RTIT_OUTPUT_MASK_PTRS_REGISTER;
 
+/**
+  Format of ToPA table entries.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] END. See Section 35.2.6.2, "Table of Physical Addresses (ToPA)".
+    ///
+    UINT32  END:1;
+    UINT32  Reserved1:1;
+    ///
+    /// [Bit 2] INT. See Section 35.2.6.2, "Table of Physical Addresses (ToPA)".
+    ///
+    UINT32  INT:1;
+    UINT32  Reserved2:1;
+    ///
+    /// [Bit 4] STOP. See Section 35.2.6.2, "Table of Physical Addresses (ToPA)".
+    ///
+    UINT32  STOP:1;
+    UINT32  Reserved3:1;
+    ///
+    /// [Bit 6:9] Indicates the size of the associated output region. See Section
+    /// 35.2.6.2, "Table of Physical Addresses (ToPA)".
+    ///
+    UINT32  Size:4;
+    UINT32  Reserved4:2;
+    ///
+    /// [Bit 12:31] Output Region Base Physical Address low part.
+    /// [Bit 12:31] Output Region Base Physical Address [12:63] value to match.
+    /// ATTENTION: The size of the address field is determined by the processor's
+    /// physical-address width (MAXPHYADDR) in bits, as reported in
+    /// CPUID.80000008H:EAX[7:0]. the above part of address reserved.
+    /// True address field is [12:MAXPHYADDR-1], [MAXPHYADDR:63] is reserved part.
+    /// Detail see Section 35.2.6.2, "Table of Physical Addresses (ToPA)".
+    ///
+    UINT32  Base:20;
+    ///
+    /// [Bit 32:63] Output Region Base Physical Address high part.
+    /// [Bit 32:63] Output Region Base Physical Address [12:63] value to match.
+    /// ATTENTION: The size of the address field is determined by the processor's
+    /// physical-address width (MAXPHYADDR) in bits, as reported in
+    /// CPUID.80000008H:EAX[7:0]. the above part of address reserved.
+    /// True address field is [12:MAXPHYADDR-1], [MAXPHYADDR:63] is reserved part.
+    /// Detail see Section 35.2.6.2, "Table of Physical Addresses (ToPA)".
+    ///
+    UINT32  BaseHi:32;
+  } Bits;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} RTIT_TOPA_TABLE_ENTRY;
+
+///
+/// The size of the associated output region usd by Topa.
+///
+typedef enum {
+  RtitTopaMemorySize4K = 0,
+  RtitTopaMemorySize8K,
+  RtitTopaMemorySize16K,
+  RtitTopaMemorySize32K,
+  RtitTopaMemorySize64K,
+  RtitTopaMemorySize128K,
+  RtitTopaMemorySize256K,
+  RtitTopaMemorySize512K,
+  RtitTopaMemorySize1M,
+  RtitTopaMemorySize2M,
+  RtitTopaMemorySize4M,
+  RtitTopaMemorySize8M,
+  RtitTopaMemorySize16M,
+  RtitTopaMemorySize32M,
+  RtitTopaMemorySize64M,
+  RtitTopaMemorySize128M
+} RTIT_TOPA_MEMORY_SIZE;
 
 /**
   Trace Control Register (R/W). If (CPUID.(EAX=07H, ECX=0):EBX[25] = 1).
