@@ -1333,9 +1333,10 @@ DiscoverScsiDevice (
               );
     if (!EFI_ERROR (Status)) {
       break;
-    } else if ((Status == EFI_BAD_BUFFER_SIZE) || 
-               (Status == EFI_INVALID_PARAMETER) ||
-               (Status == EFI_UNSUPPORTED)) {
+    }
+    if ((Status == EFI_BAD_BUFFER_SIZE) ||
+        (Status == EFI_INVALID_PARAMETER) ||
+        (Status == EFI_UNSUPPORTED)) {
       ScsiDeviceFound = FALSE;
       goto Done;
     }
