@@ -54,6 +54,17 @@ ASM_PFX(FspApiCommonContinue):
   ret
 
 ;----------------------------------------------------------------------------
+; TempRamInit API
+;
+; Empty function for WHOLEARCHIVE build option
+;
+;----------------------------------------------------------------------------
+global ASM_PFX(TempRamInitApi)
+ASM_PFX(TempRamInitApi):
+  jmp $
+  ret
+
+;----------------------------------------------------------------------------
 ; Module Entrypoint API
 ;----------------------------------------------------------------------------
 global ASM_PFX(_ModuleEntryPoint)
