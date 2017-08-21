@@ -926,6 +926,9 @@ CalculateTimeout (
   OUT UINT64  *CurrentTime
   )
 {
+  UINT64 TimeoutInSeconds;
+  UINT64 TimestampCounterFreq;
+
   //
   // Read the current value of the performance counter
   //
@@ -941,16 +944,36 @@ CalculateTimeout (
 
   //
   // GetPerformanceCounterProperties () returns the timestamp counter's frequency
-  // in Hz. So multiply the return value with TimeoutInMicroseconds and then divide
-  // it by 1,000,000, to get the number of ticks for the timeout value.
+  // in Hz. 
   //
-  return DivU64x32 (
-           MultU64x64 (
-             GetPerformanceCounterProperties (NULL, NULL),
-             TimeoutInMicroseconds
-             ),
-           1000000
-           );
+  TimestampCounterFreq = GetPerformanceCounterProperties (NULL, NULL);
+
+  //
+  // Check the potential overflow before calculate the number of ticks for the timeout value.
+  //
+  if (DivU64x64Remainder (MAX_UINT64, TimeoutInMicroseconds, NULL) < TimestampCounterFreq) {
+    //
+    // Convert microseconds into seconds if direct multiplication overflows
+    //
+    TimeoutInSeconds = DivU64x32 (TimeoutInMicroseconds, 1000000);
+    //
+    // Assertion if the final tick count exceeds MAX_UINT64
+    //
+    ASSERT (DivU64x64Remainder (MAX_UINT64, TimeoutInSeconds, NULL) >= TimestampCounterFreq);
+    return MultU64x64 (TimestampCounterFreq, TimeoutInSeconds);
+  } else {
+    //
+    // No overflow case, multiply the return value with TimeoutInMicroseconds and then divide
+    // it by 1,000,000, to get the number of ticks for the timeout value.
+    //
+    return DivU64x32 (
+             MultU64x64 (
+               TimestampCounterFreq,
+               TimeoutInMicroseconds
+               ),
+             1000000
+             );
+  }
 }
 
 /**
