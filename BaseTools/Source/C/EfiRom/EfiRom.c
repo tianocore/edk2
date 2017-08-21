@@ -144,7 +144,7 @@ Returns:
         VerboseMsg("Processing EFI file    %s\n", FList->FileName);
       }
 
-      Status = ProcessEfiFile (FptrOut, FList, mOptions.VendId, mOptions.DevId, &Size);
+      Status = ProcessEfiFile (FptrOut, FList, mOptions.VendId, mOptions.DevIdList[0], &Size);
     } else if ((FList->FileFlags & FILE_FLAG_BINARY) !=0 ) {
       if (mOptions.Verbose) {
         VerboseMsg("Processing binary file %s\n", FList->FileName);
@@ -184,8 +184,14 @@ BailOut:
       free (mOptions.FileList);
       mOptions.FileList = FList;
     }
-  }
 
+    //
+    // Clean up device ID list
+    //
+    if (mOptions.DevIdList != NULL) {
+      free (mOptions.DevIdList);
+    }
+  }
   if (FptrOut != NULL) {
     fclose (FptrOut);
   }
@@ -451,6 +457,7 @@ Returns:
   UINT32                        HeaderPadBytes;
   UINT32                        PadBytesBeforeImage;
   UINT32                        PadBytesAfterImage;
+  UINT32                        DevIdListSize;
 
   //
   // Try to open the input file
@@ -494,7 +501,16 @@ Returns:
   if (mOptions.Pci23 == 1) {
     HeaderSize = sizeof (PCI_DATA_STRUCTURE) + HeaderPadBytes + sizeof (EFI_PCI_EXPANSION_ROM_HEADER);
   } else {
-    HeaderSize = sizeof (PCI_3_0_DATA_STRUCTURE) + HeaderPadBytes + sizeof (EFI_PCI_EXPANSION_ROM_HEADER);
+    if (mOptions.DevIdCount > 1) {
+      //
+      // Write device ID list when more than one device ID is specified.
+      // Leave space for list plus terminator.
+      //
+      DevIdListSize = (mOptions.DevIdCount + 1) * sizeof (UINT16);
+    } else {
+      DevIdListSize = 0;
+    }
+    HeaderSize = sizeof (PCI_3_0_DATA_STRUCTURE) + HeaderPadBytes + DevIdListSize + sizeof (EFI_PCI_EXPANSION_ROM_HEADER);
   }
 
   if (mOptions.Verbose) {
@@ -631,7 +647,14 @@ Returns:
     PciDs30.Signature = PCI_DATA_STRUCTURE_SIGNATURE;
     PciDs30.VendorId  = VendId;
     PciDs30.DeviceId  = DevId;
-    PciDs30.DeviceListOffset = 0; // to be fixed
+    if (mOptions.DevIdCount > 1) {
+      //
+      // Place device list immediately after PCI structure
+      //
+      PciDs30.DeviceListOffset = (UINT16) sizeof (PCI_3_0_DATA_STRUCTURE);
+    } else {
+      PciDs30.DeviceListOffset = 0;
+    }
     PciDs30.Length    = (UINT16) sizeof (PCI_3_0_DATA_STRUCTURE);
     PciDs30.Revision  = 0x3;
     //
@@ -700,6 +723,26 @@ Returns:
       goto BailOut;
     } 
   }
+
+  //
+  // Write the Device ID list to the output file
+  //
+  if (mOptions.DevIdCount > 1) {
+    if (fwrite (mOptions.DevIdList, sizeof (UINT16), mOptions.DevIdCount, OutFptr) != mOptions.DevIdCount) {
+      Error (NULL, 0, 0002, "Failed to write PCI device list to output file!", NULL);
+      Status = STATUS_ERROR;
+      goto BailOut;
+    }
+    //
+    // Write two-byte terminating 0 at the end of the device list
+    //
+    if (putc (0, OutFptr) == EOF || putc (0, OutFptr) == EOF) {
+      Error (NULL, 0, 0002, "Failed to write PCI device list to output file!", NULL);
+      Status = STATUS_ERROR;
+      goto BailOut;
+    }
+  }
+
 
   //
   // Pad head to make it a multiple of 512 bytes
@@ -887,6 +930,8 @@ Returns:
   INTN       ReturnStatus;
   BOOLEAN    EfiRomFlag;
   UINT64     TempValue;
+  char       *OptionName;
+  UINT16     *DevIdList;
 
   ReturnStatus = 0;
   FileFlags = 0;
@@ -901,6 +946,9 @@ Returns:
   // To avoid compile warnings
   //
   FileList                = PrevFileList = NULL;
+
+  Options->DevIdList      = NULL;
+  Options->DevIdCount     = 0;
 
   ClassCode               = 0;
   CodeRevision            = 0;
@@ -957,26 +1005,53 @@ Returns:
         Argv++;
         Argc--;
       } else if (stricmp (Argv[0], "-i") == 0) {
-        //
-        // Device ID specified with -i
-        // Make sure there's another parameter
-        //
-        Status = AsciiStringToUint64(Argv[1], FALSE, &TempValue);
-        if (EFI_ERROR (Status)) {
-          Error (NULL, 0, 2000, "Invalid option value", "%s = %s", Argv[0], Argv[1]);
-          ReturnStatus = 1;
-          goto Done;
-        }
-        if (TempValue >= 0x10000) {
-          Error (NULL, 0, 2000, "Invalid option value", "Device Id %s out of range!", Argv[1]);
-          ReturnStatus = 1;
-          goto Done;
-        }
-        Options->DevId      = (UINT16) TempValue;
-        Options->DevIdValid = 1;
 
-        Argv++;
-        Argc--;
+        OptionName = Argv[0];
+
+        //
+        // Device IDs specified with -i
+        // Make sure there's at least one more parameter
+        //
+        if (Argc < 1) {
+          Error (NULL, 0, 2000, "Invalid parameter", "Missing Device Id with %s option!", OptionName);
+          ReturnStatus = 1;
+          goto Done;
+        }
+
+        //
+        // Process until another dash-argument parameter or the end of the list
+        //
+        while (Argc > 1 && Argv[1][0] != '-') {
+          Status = AsciiStringToUint64(Argv[1], FALSE, &TempValue);
+          if (EFI_ERROR (Status)) {
+            Error (NULL, 0, 2000, "Invalid option value", "%s = %s", OptionName, Argv[1]);
+            ReturnStatus = 1;
+            goto Done;
+          }
+          //
+          // Don't allow device IDs greater than 16 bits
+          // Don't allow 0, since it is used as a list terminator
+          //
+          if (TempValue >= 0x10000 || TempValue == 0) {
+            Error (NULL, 0, 2000, "Invalid option value", "Device Id %s out of range!", Argv[1]);
+            ReturnStatus = 1;
+            goto Done;
+          }
+
+          DevIdList = (UINT16*) realloc (Options->DevIdList, (Options->DevIdCount + 1) * sizeof (UINT16));
+          if (DevIdList == NULL) {
+            Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!", NULL);
+            ReturnStatus = 1;
+            goto Done;
+          }
+          Options->DevIdList = DevIdList;
+
+          Options->DevIdList[Options->DevIdCount++] = (UINT16) TempValue;
+
+          Argv++;
+          Argc--;
+        }
+
       } else if ((stricmp (Argv[0], "-o") == 0) || (stricmp (Argv[0], "--output") == 0)) {
         //
         // Output filename specified with -o
@@ -1057,7 +1132,7 @@ Returns:
         Options->DumpOption   = 1;
 
         Options->VendIdValid  = 1;
-        Options->DevIdValid   = 1;
+        Options->DevIdCount   = 1;
         FileFlags             = FILE_FLAG_BINARY;
       } else if ((stricmp (Argv[0], "-l") == 0) || (stricmp (Argv[0], "--class-code") == 0)) {
         //
@@ -1191,12 +1266,18 @@ Returns:
       goto Done;
     }
   
-    if (!Options->DevIdValid) {
+    if (!Options->DevIdCount) {
       Error (NULL, 0, 2000, "Missing Device ID in command line", NULL);
       ReturnStatus = STATUS_ERROR;
       goto Done;
     }
   }
+
+   if (Options->DevIdCount > 1 && Options->Pci23) {
+     Error (NULL, 0, 2000, "Invalid parameter", "PCI 3.0 is required when specifying multiple Device IDs");
+     ReturnStatus = STATUS_ERROR;
+     goto Done;
+   }
 
 Done:
   if (ReturnStatus != 0) {
@@ -1283,7 +1364,7 @@ Returns:
   fprintf (stdout, "  -f VendorId\n\
             Hex PCI Vendor ID for the device OpROM, must be specified\n");
   fprintf (stdout, "  -i DeviceId\n\
-            Hex PCI Device ID for the device OpROM, must be specified\n");
+            One or more hex PCI Device IDs for the device OpROM, must be specified\n");
   fprintf (stdout, "  -p, --pci23\n\
             Default layout meets PCI 3.0 specifications\n\
             specifying this flag will for a PCI 2.3 layout.\n");
@@ -1328,6 +1409,7 @@ Returns:
   EFI_PCI_EXPANSION_ROM_HEADER  EfiRomHdr;
   PCI_DATA_STRUCTURE            PciDs23;
   PCI_3_0_DATA_STRUCTURE        PciDs30;
+  UINT16                        DevId;
 
   //
   // Open the input file
@@ -1426,6 +1508,30 @@ Returns:
     fprintf (stdout, "    Length                  0x%04X\n", PciDs30.Length);
     fprintf (stdout, "    Revision                0x%04X\n", PciDs30.Revision);
     fprintf (stdout, "    DeviceListOffset        0x%02X\n", PciDs30.DeviceListOffset);    
+    if (PciDs30.DeviceListOffset) {
+      //
+      // Print device ID list
+      //
+      fprintf (stdout, "    Device list contents\n");
+      if (fseek (InFptr, ImageStart + PciRomHdr.PcirOffset + PciDs30.DeviceListOffset, SEEK_SET)) {
+        Error (NULL, 0, 3001, "Not supported", "Failed to seek to PCI device ID list!");
+        goto BailOut;
+      }
+
+      //
+      // Loop until terminating 0
+      //
+      do {
+        if (fread (&DevId, sizeof (DevId), 1, InFptr) != 1) {
+          Error (NULL, 0, 3001, "Not supported", "Failed to read PCI device ID list from file %s!", InFile->FileName);
+          goto BailOut;
+        }
+        if (DevId) {
+          fprintf (stdout, "      0x%04X\n", DevId);
+        }
+      } while (DevId);
+
+    }
     fprintf (
       stdout,
       "    Class Code              0x%06X\n",

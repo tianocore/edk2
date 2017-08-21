@@ -1,7 +1,7 @@
 /** @file
 This file contains the relevant declarations required to generate Option Rom File
 
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
 distribution.  The full text of the license may be found at
@@ -83,9 +83,9 @@ typedef struct {
   UINT16    ClassCode;
   UINT16    PciRevision;
   UINT16    VendId;
-  UINT16    DevId;
+  UINT16    *DevIdList;
+  UINT32    DevIdCount;
   UINT8     VendIdValid;
-  UINT8     DevIdValid;
   INT8      Verbose;
   INT8      Quiet;
   INT8      Debug;
