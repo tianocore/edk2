@@ -1100,6 +1100,9 @@ DriverCallback (
   CHAR16                          *TmpStr;
   UINTN                           Index;
   UINT64                          BufferValue;
+  EFI_HII_POPUP_SELECTION         UserSelection;
+
+  UserSelection = 0xFF;
 
   if (((Value == NULL) && (Action != EFI_BROWSER_ACTION_FORM_OPEN) && (Action != EFI_BROWSER_ACTION_FORM_CLOSE))||
     (ActionRequest == NULL)) {
@@ -1619,6 +1622,22 @@ DriverCallback (
         }
         break;
 
+      case 0x1330:
+        Status = mPrivateData->HiiPopup->CreatePopup (
+          mPrivateData->HiiPopup,
+          EfiHiiPopupStyleInfo,
+          EfiHiiPopupTypeYesNo,
+          mPrivateData->HiiHandle[0],
+          STRING_TOKEN (STR_POPUP_STRING),
+          &UserSelection
+          );
+        if (!EFI_ERROR (Status)) {
+          if (UserSelection == EfiHiiPopupSelectionYes) {
+            *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
+          }
+        }
+        break;
+
       default:
       break;
     }
@@ -1678,6 +1697,7 @@ DriverSampleInit (
   EFI_FORM_BROWSER2_PROTOCOL      *FormBrowser2;
   EFI_HII_CONFIG_ROUTING_PROTOCOL *HiiConfigRouting;
   EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *HiiKeywordHandler;
+  EFI_HII_POPUP_PROTOCOL              *PopupHandler;
   CHAR16                          *NewString;
   UINTN                           BufferSize;
   DRIVER_SAMPLE_CONFIGURATION     *Configuration;
@@ -1762,6 +1782,15 @@ DriverSampleInit (
     return Status;
   }
   mPrivateData->HiiKeywordHandler = HiiKeywordHandler;
+
+  //
+  // Locate HiiPopup protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiHiiPopupProtocolGuid, NULL, (VOID **) &PopupHandler);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  mPrivateData->HiiPopup = PopupHandler;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &DriverHandle[0],

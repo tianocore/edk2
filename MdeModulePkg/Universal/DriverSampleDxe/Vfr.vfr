@@ -2,7 +2,7 @@
 //
 //    Sample Setup formset.
 //
-//  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -476,7 +476,13 @@ formset
             maximum = 255,
             default = 18,
     endnumeric;
-    
+
+    text
+      help  = STRING_TOKEN(STR_POPUP_TEST_HELP),
+      text  = STRING_TOKEN(STR_POPUP_TEST_PROMPT),
+      flags = INTERACTIVE,
+      key   = 0x1330;
+
     goto 2,
       prompt = STRING_TOKEN(STR_GOTO_FORM2), //SecondSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);

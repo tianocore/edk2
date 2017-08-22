@@ -1,6 +1,6 @@
 // *++
 	//
-// Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials                          
 // are licensed and made available under the terms and conditions of the BSD License         
 // which accompanies this distribution.  The full text of the license may be found at        
@@ -267,6 +267,12 @@
                                                      #language fr-FR "Submitted callback test"
 #string STR_SUBMITTED_CALLBACK_TEST_HELP             #language en-US "Change the value and press F10 to submmit will pop up a dialogue to show SUBMITTED Callback has been triggered"
                                                      #language fr-FR "Change the value and press F10 to submmit will pop up a dialogue to show SUBMITTED Callback has been triggered"
+#string STR_POPUP_TEST_PROMPT                        #language en-US "Select it to invoke Hii Popup Protocol"
+                                                     #language fr-FR "Select it to invoke Hii Popup Protocol"
+#string STR_POPUP_TEST_HELP                          #language en-US "Select this question will pop up a message box, then user can decide whether exit curret form or not"
+                                                     #language fr-FR "Select this question will pop up a message box, then user can decide whether exit curret form or not"
+#string STR_POPUP_STRING                             #language en-US "Are you sure to exit current form?"
+                                                     #language fr-FR "Are you sure to exit current form?"
 // Boot Order
 #string STR_BOOT_TITLE                 #language en-US "Boot"
 #string STR_BOOT_OPTIONS               #language en-US "Boot Order"
