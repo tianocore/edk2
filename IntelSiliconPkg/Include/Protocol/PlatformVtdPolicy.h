@@ -16,6 +16,7 @@
 #define __PLATFORM_VTD_POLICY_PROTOCOL_H__
 
 #include <IndustryStandard/Vtd.h>
+#include <IndustryStandard/DmaRemappingReportingTable.h>
 
 #define EDKII_PLATFORM_VTD_POLICY_PROTOCOL_GUID \
     { \
@@ -66,6 +67,53 @@ EFI_STATUS
   OUT EDKII_PLATFORM_VTD_DEVICE_INFO           *DeviceInfo
   );
 
+#pragma pack(1)
+
+typedef struct {
+  //
+  // The segment number of the device
+  //
+  UINT16                                          SegmentNumber;
+  //
+  // Device scope definition in DMAR table
+  //
+  EFI_ACPI_DMAR_DEVICE_SCOPE_STRUCTURE_HEADER     DeviceScope;
+  //
+  // Pci path definition in DMAR table
+  //
+//EFI_ACPI_DMAR_PCI_PATH                          PciPath[];
+} EDKII_PLATFORM_VTD_DEVICE_SCOPE;
+
+typedef struct {
+  UINT16                                   VendorId;
+  UINT16                                   DeviceId;
+  UINT8                                    RevisionId;
+  UINT16                                   SubsystemVendorId;
+  UINT16                                   SubsystemDeviceId;
+} EDKII_PLATFORM_VTD_PCI_DEVICE_ID;
+
+#define EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_END           0
+#define EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_DEVICE_SCOPE  1
+#define EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_PCI_DEVICE_ID 2
+
+typedef struct {
+  //
+  // EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_xxx defined above.
+  //
+  UINT8             Type;
+  //
+  // The length of the full data structure including EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO and Data.
+  //
+  UINT8             Length;
+  //
+  // Data can be EDKII_PLATFORM_VTD_DEVICE_SCOPE or EDKII_PLATFORM_VTD_PCI_DEVICE_ID
+  //
+//UINT8             Data[Length - sizeof(EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO)];
+} EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO;
+
+#pragma pack()
+
+
 /**
   Get a list of the exception devices.
 
@@ -74,6 +122,7 @@ EFI_STATUS
   @param[in]  This                  The protocol instance pointer.
   @param[out] DeviceInfoCount       The count of the list of DeviceInfo.
   @param[out] DeviceInfo            A callee allocated buffer to hold a list of DeviceInfo.
+                                    Each DeviceInfo pointer points to EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO.
 
   @retval EFI_SUCCESS           The DeviceInfoCount and DeviceInfo are returned.
   @retval EFI_INVALID_PARAMETER DeviceInfoCount is NULL, or DeviceInfo is NULL.
@@ -85,7 +134,7 @@ EFI_STATUS
 (EFIAPI *EDKII_PLATFORM_VTD_POLICY_GET_EXCEPTION_DEVICE_LIST) (
   IN  EDKII_PLATFORM_VTD_POLICY_PROTOCOL       *This,
   OUT UINTN                                    *DeviceInfoCount,
-  OUT EDKII_PLATFORM_VTD_DEVICE_INFO           **DeviceInfo
+  OUT VOID                                     **DeviceInfo
   );
 
 struct _EDKII_PLATFORM_VTD_POLICY_PROTOCOL {
