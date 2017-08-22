@@ -2903,13 +2903,7 @@ Returns:
       }
       if (DebugEntry->Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
         RsdsEntry = (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY *) (FileBuffer + DebugEntry->FileOffset);
-        if (RsdsEntry->Signature == CODEVIEW_SIGNATURE_RSDS) {
-          RsdsEntry->Unknown  = 0;
-          RsdsEntry->Unknown2 = 0;
-          RsdsEntry->Unknown3 = 0;
-          RsdsEntry->Unknown4 = 0;
-          RsdsEntry->Unknown5 = 0;
-        } else if (RsdsEntry->Signature == CODEVIEW_SIGNATURE_MTOC) {
+        if (RsdsEntry->Signature == CODEVIEW_SIGNATURE_MTOC) {
           // MTOC sets DebugDirectoryEntrySize to size of the .debug section, so fix it.
           if (!ZeroDebugFlag) {
             if (Optional32Hdr->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
