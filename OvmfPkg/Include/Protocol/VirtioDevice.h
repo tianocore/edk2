@@ -5,6 +5,7 @@
   and should not be used outside of the EDK II tree.
 
   Copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -32,6 +33,25 @@
   }
 
 typedef struct _VIRTIO_DEVICE_PROTOCOL  VIRTIO_DEVICE_PROTOCOL;
+
+//
+// VIRTIO Operation for VIRTIO_MAP_SHARED
+//
+typedef enum {
+  //
+  // A read operation from system memory by a bus master
+  //
+  VirtioOperationBusMasterRead,
+  //
+  // A write operation to system memory by a bus master
+  //
+  VirtioOperationBusMasterWrite,
+  //
+  // Provides both read and write access to system memory by both the
+  // processor and a bus master
+  //
+  VirtioOperationBusMasterCommonBuffer,
+} VIRTIO_MAP_OPERATION;
 
 /**
 
@@ -321,6 +341,121 @@ EFI_STATUS
   IN UINT8                   DeviceStatus
   );
 
+/**
+
+  Allocates pages that are suitable for an VirtioOperationBusMasterCommonBuffer
+  mapping. This means that the buffer allocated by this function supports
+  simultaneous access by both the processor and the bus master. The device
+  address that the bus master uses to access the buffer must be retrieved with
+  a call to VIRTIO_MAP_SHARED.
+
+  @param[in]      This              The protocol instance pointer.
+
+  @param[in]      Pages             The number of pages to allocate.
+
+  @param[in,out]  HostAddress       A pointer to store the system memory base
+                                    address of the allocated range.
+
+  @retval EFI_SUCCESS               The requested memory pages were allocated.
+  @retval EFI_OUT_OF_RESOURCES      The memory pages could not be allocated.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *VIRTIO_ALLOCATE_SHARED)(
+  IN     VIRTIO_DEVICE_PROTOCOL                   *This,
+  IN     UINTN                                    Pages,
+  IN OUT VOID                                     **HostAddress
+  );
+
+/**
+  Frees memory that was allocated with VIRTIO_ALLOCATE_SHARED.
+
+  @param[in]  This           The protocol instance pointer.
+
+  @param[in]  Pages          The number of pages to free.
+
+  @param[in]  HostAddress    The system memory base address of the allocated
+                             range.
+
+**/
+typedef
+VOID
+(EFIAPI *VIRTIO_FREE_SHARED)(
+  IN  VIRTIO_DEVICE_PROTOCOL                   *This,
+  IN  UINTN                                    Pages,
+  IN  VOID                                     *HostAddress
+  );
+
+/**
+  Provides the virtio device address required to access system memory from a
+  DMA bus master.
+
+  The interface follows the same usage pattern as defined in UEFI spec 2.6
+  (Section 13.2 PCI Root Bridge I/O Protocol)
+
+  @param[in]     This             The protocol instance pointer.
+
+  @param[in]     Operation        Indicates if the bus master is going to
+                                  read or write to system memory.
+
+  @param[in]     HostAddress      The system memory address to map to shared
+                                  buffer address.
+
+  @param[in,out] NumberOfBytes    On input the number of bytes to map.
+                                  On output the number of bytes that were
+                                  mapped.
+
+  @param[out]    DeviceAddress    The resulting shared map address for the
+                                  bus master to access the hosts HostAddress.
+
+  @param[out]    Mapping          A resulting token to pass to
+                                  VIRTIO_UNMAP_SHARED.
+
+  @retval EFI_SUCCESS             The range was mapped for the returned
+                                  NumberOfBytes.
+  @retval EFI_UNSUPPORTED         The HostAddress cannot be mapped as a
+                                  common buffer.
+  @retval EFI_INVALID_PARAMETER   One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES    The request could not be completed due to
+                                  a lack of resources.
+  @retval EFI_DEVICE_ERROR        The system hardware could not map the
+                                  requested address.
+**/
+
+typedef
+EFI_STATUS
+(EFIAPI *VIRTIO_MAP_SHARED) (
+  IN     VIRTIO_DEVICE_PROTOCOL       *This,
+  IN     VIRTIO_MAP_OPERATION         Operation,
+  IN     VOID                         *HostAddress,
+  IN OUT UINTN                        *NumberOfBytes,
+  OUT    EFI_PHYSICAL_ADDRESS         *DeviceAddress,
+  OUT    VOID                         **Mapping
+  );
+
+/**
+  Completes the VIRTIO_MAP_SHARED operation and releases any corresponding
+  resources.
+
+  @param[in]  This               The protocol instance pointer.
+
+  @param[in]  Mapping            The mapping token returned from
+                                 VIRTIO_MAP_SHARED.
+
+  @retval EFI_SUCCESS            The range was unmapped.
+  @retval EFI_INVALID_PARAMETER  Mapping is not a value that was returned by
+                                 VIRTIO_MAP_SHARED. Passing an invalid Mapping
+                                 token can cause undefined behavior.
+  @retval EFI_DEVICE_ERROR       The data was not committed to the target
+                                 system memory.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *VIRTIO_UNMAP_SHARED)(
+  IN  VIRTIO_DEVICE_PROTOCOL    *This,
+  IN  VOID                      *Mapping
+  );
 
 ///
 ///  This protocol provides an abstraction over the VirtIo transport layer
@@ -361,6 +496,14 @@ struct _VIRTIO_DEVICE_PROTOCOL {
   //
   VIRTIO_DEVICE_WRITE         WriteDevice;
   VIRTIO_DEVICE_READ          ReadDevice;
+
+  //
+  // Functions to allocate, free, map and unmap shared buffer
+  //
+  VIRTIO_ALLOCATE_SHARED      AllocateSharedPages;
+  VIRTIO_FREE_SHARED          FreeSharedPages;
+  VIRTIO_MAP_SHARED           MapSharedBuffer;
+  VIRTIO_UNMAP_SHARED         UnmapSharedBuffer;
 };
 
 extern EFI_GUID gVirtioDeviceProtocolGuid;
