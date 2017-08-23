@@ -293,3 +293,60 @@ VirtioMmioDeviceRead (
 
   return EFI_SUCCESS;
 }
+
+EFI_STATUS
+EFIAPI
+VirtioMmioAllocateSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL  *This,
+  IN  UINTN                   NumPages,
+  OUT VOID                    **HostAddress
+  )
+{
+  VOID        *Buffer;
+
+  Buffer = AllocatePages (NumPages);
+  if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  *HostAddress = Buffer;
+  return EFI_SUCCESS;
+}
+
+VOID
+EFIAPI
+VirtioMmioFreeSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL  *This,
+  IN  UINTN                   NumPages,
+  IN  VOID                    *HostAddress
+  )
+{
+  FreePages (HostAddress, NumPages);
+}
+
+EFI_STATUS
+EFIAPI
+VirtioMmioMapSharedBuffer (
+  IN      VIRTIO_DEVICE_PROTOCOL  *This,
+  IN      VIRTIO_MAP_OPERATION    Operation,
+  IN      VOID                    *HostAddress,
+  IN OUT  UINTN                   *NumberOfBytes,
+  OUT     EFI_PHYSICAL_ADDRESS    *DeviceAddress,
+  OUT     VOID                    **Mapping
+  )
+{
+  *DeviceAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
+  *Mapping = NULL;
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+VirtioMmioUnmapSharedBuffer (
+  IN VIRTIO_DEVICE_PROTOCOL    *This,
+  IN VOID                      *Mapping
+  )
+{
+  return EFI_SUCCESS;
+}

@@ -3,6 +3,7 @@
   This driver produces Virtio Device Protocol instances for Virtio Mmio devices.
 
   Copyright (C) 2013, ARM Ltd.
+  Copyright (C) 2017, AMD Inc. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -15,7 +16,6 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include "VirtioMmioDevice.h"
@@ -35,7 +35,11 @@ static VIRTIO_DEVICE_PROTOCOL mMmioDeviceProtocolTemplate = {
     VirtioMmioGetDeviceStatus,             // GetDeviceStatus
     VirtioMmioSetDeviceStatus,             // SetDeviceStatus
     VirtioMmioDeviceWrite,                 // WriteDevice
-    VirtioMmioDeviceRead                   // ReadDevice
+    VirtioMmioDeviceRead,                  // ReadDevice
+    VirtioMmioAllocateSharedPages,         // AllocateSharedPages
+    VirtioMmioFreeSharedPages,             // FreeSharedPages
+    VirtioMmioMapSharedBuffer,             // MapSharedBuffer
+    VirtioMmioUnmapSharedBuffer            // UnmapSharedBuffer
 };
 
 /**
