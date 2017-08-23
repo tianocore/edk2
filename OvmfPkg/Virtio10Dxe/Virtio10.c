@@ -2,6 +2,7 @@
   A non-transitional driver for VirtIo 1.0 PCI devices.
 
   Copyright (C) 2016, Red Hat, Inc.
+  Copyright (C) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -15,6 +16,7 @@
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Virtio.h>
 #include <Protocol/PciIo.h>
+#include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/VirtioDevice.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -772,6 +774,117 @@ Virtio10ReadDevice (
   return Status;
 }
 
+STATIC
+EFI_STATUS
+EFIAPI
+Virtio10AllocateSharedPages (
+  IN     VIRTIO_DEVICE_PROTOCOL  *This,
+  IN     UINTN                   Pages,
+  IN OUT VOID                    **HostAddress
+  )
+{
+  VIRTIO_1_0_DEV *Dev;
+  EFI_STATUS     Status;
+
+  Dev = VIRTIO_1_0_FROM_VIRTIO_DEVICE (This);
+
+  Status = Dev->PciIo->AllocateBuffer (
+                         Dev->PciIo,
+                         AllocateAnyPages,
+                         EfiBootServicesData,
+                         Pages,
+                         HostAddress,
+                         EFI_PCI_ATTRIBUTE_MEMORY_CACHED
+                         );
+  return Status;
+}
+
+STATIC
+VOID
+EFIAPI
+Virtio10FreeSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL  *This,
+  IN  UINTN                   Pages,
+  IN  VOID                    *HostAddress
+  )
+{
+  VIRTIO_1_0_DEV *Dev;
+
+  Dev = VIRTIO_1_0_FROM_VIRTIO_DEVICE (This);
+
+  Dev->PciIo->FreeBuffer (
+                Dev->PciIo,
+                Pages,
+                HostAddress
+                );
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+Virtio10MapSharedBuffer (
+  IN     VIRTIO_DEVICE_PROTOCOL  *This,
+  IN     VIRTIO_MAP_OPERATION    Operation,
+  IN     VOID                    *HostAddress,
+  IN OUT UINTN                   *NumberOfBytes,
+  OUT    EFI_PHYSICAL_ADDRESS    *DeviceAddress,
+  OUT    VOID                    **Mapping
+  )
+{
+  EFI_STATUS                    Status;
+  VIRTIO_1_0_DEV                *Dev;
+  EFI_PCI_IO_PROTOCOL_OPERATION PciIoOperation;
+
+  Dev = VIRTIO_1_0_FROM_VIRTIO_DEVICE (This);
+
+  //
+  // Map VIRTIO_MAP_OPERATION to EFI_PCI_IO_PROTOCOL_OPERATION
+  //
+  switch (Operation) {
+  case VirtioOperationBusMasterRead:
+    PciIoOperation = EfiPciIoOperationBusMasterRead;
+    break;
+  case VirtioOperationBusMasterWrite:
+    PciIoOperation = EfiPciIoOperationBusMasterWrite;
+    break;
+  case VirtioOperationBusMasterCommonBuffer:
+    PciIoOperation = EfiPciIoOperationBusMasterCommonBuffer;
+    break;
+  default:
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = Dev->PciIo->Map (
+                         Dev->PciIo,
+                         PciIoOperation,
+                         HostAddress,
+                         NumberOfBytes,
+                         DeviceAddress,
+                         Mapping
+                         );
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+Virtio10UnmapSharedBuffer (
+  IN  VIRTIO_DEVICE_PROTOCOL  *This,
+  IN  VOID                    *Mapping
+  )
+{
+  EFI_STATUS      Status;
+  VIRTIO_1_0_DEV  *Dev;
+
+  Dev = VIRTIO_1_0_FROM_VIRTIO_DEVICE (This);
+
+  Status = Dev->PciIo->Unmap (
+                         Dev->PciIo,
+                         Mapping
+                         );
+
+  return Status;
+}
 
 STATIC CONST VIRTIO_DEVICE_PROTOCOL mVirtIoTemplate = {
   VIRTIO_SPEC_REVISION (1, 0, 0),
@@ -788,7 +901,11 @@ STATIC CONST VIRTIO_DEVICE_PROTOCOL mVirtIoTemplate = {
   Virtio10GetDeviceStatus,
   Virtio10SetDeviceStatus,
   Virtio10WriteDevice,
-  Virtio10ReadDevice
+  Virtio10ReadDevice,
+  Virtio10AllocateSharedPages,
+  Virtio10FreeSharedPages,
+  Virtio10MapSharedBuffer,
+  Virtio10UnmapSharedBuffer
 };
 
 
@@ -906,7 +1023,8 @@ Virtio10BindingStart (
     goto ClosePciIo;
   }
 
-  SetAttributes = EFI_PCI_IO_ATTRIBUTE_BUS_MASTER;
+  SetAttributes = (EFI_PCI_IO_ATTRIBUTE_BUS_MASTER |
+                   EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
   UpdateAttributes (&Device->CommonConfig, &SetAttributes);
   UpdateAttributes (&Device->NotifyConfig, &SetAttributes);
   UpdateAttributes (&Device->SpecificConfig, &SetAttributes);
