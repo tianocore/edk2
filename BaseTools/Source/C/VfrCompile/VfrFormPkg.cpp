@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -829,6 +829,9 @@ CFormPkg::DeclarePendingQuestion (
   UINT32         ShrinkSize = 0;
   EFI_VFR_RETURN_CODE  ReturnCode;
   EFI_VFR_VARSTORE_TYPE VarStoreType  = EFI_VFR_VARSTORE_INVALID;
+  UINT8    LFlags;
+  UINT32   MaxValue;
+  CIfrGuid *GuidObj = NULL;
 
   //
   // Declare all questions as Numeric in DisableIf True
@@ -844,14 +847,8 @@ CFormPkg::DeclarePendingQuestion (
   // Declare Numeric qeustion for each undefined question.
   for (pNode = PendingAssignList; pNode != NULL; pNode = pNode->mNext) {
     if (pNode->mFlag == PENDING) {
-      CIfrNumeric CNObj;
       EFI_VARSTORE_INFO Info; 
       EFI_QUESTION_ID   QId   = EFI_QUESTION_ID_INVALID;
-
-      CNObj.SetLineNo (LineNo);
-      CNObj.SetPrompt (0x0);
-      CNObj.SetHelp (0x0);
-
       //
       // Register this question, assume it is normal question, not date or time question
       //
@@ -888,7 +885,7 @@ CFormPkg::DeclarePendingQuestion (
       } else {
         if (VarStoreType == EFI_VFR_VARSTORE_EFI) {
           ReturnCode = lCVfrDataStorage.GetEfiVarStoreInfo (&Info);
-        } else if (VarStoreType == EFI_VFR_VARSTORE_BUFFER) {
+        } else if (VarStoreType == EFI_VFR_VARSTORE_BUFFER || VarStoreType == EFI_VFR_VARSTORE_BUFFER_BITS) {
           VarStr = pNode->mKey;
           //convert VarStr with store name to VarStr with structure name
           ReturnCode = lCVfrDataStorage.GetBufferVarStoreDataTypeName (Info.mVarStoreId, &SName);
@@ -897,7 +894,7 @@ CFormPkg::DeclarePendingQuestion (
             NewStr[0] = '\0';
             strcpy (NewStr, SName);
             strcat (NewStr, VarStr + strlen (FName));
-            ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize);
+            ReturnCode = lCVfrVarDataTypeDB.GetDataFieldInfo (NewStr, Info.mInfo.mVarOffset, Info.mVarType, Info.mVarTotalSize, Info.mIsBitVar);
             delete[] NewStr;
           }
         } else {
@@ -908,39 +905,63 @@ CFormPkg::DeclarePendingQuestion (
         gCVfrErrorHandle.HandleError (ReturnCode, pNode->mLineNo, pNode->mKey);
         return ReturnCode;
       }
+      //
+      // If the storage is bit fields, create Guid opcode to wrap the numeric opcode.
+      //
+      if (Info.mIsBitVar) {
+        GuidObj = new CIfrGuid(0);
+        GuidObj->SetGuid (&gEdkiiIfrBitVarGuid);
+        GuidObj->SetLineNo(LineNo);
+      }
 
+      CIfrNumeric CNObj;
+      CNObj.SetLineNo (LineNo);
+      CNObj.SetPrompt (0x0);
+      CNObj.SetHelp (0x0);
       CNObj.SetQuestionId (QId);
       CNObj.SetVarStoreInfo (&Info);
+
       //
-      // Numeric doesn't support BOOLEAN data type. 
-      // BOOLEAN type has the same data size to UINT8. 
+      // Set Min/Max/Step Data and flags for the question with bit fields.Min/Max/Step Data are saved as UINT32 type for bit question.
       //
-      if (Info.mVarType == EFI_IFR_TYPE_BOOLEAN) {
-        Info.mVarType = EFI_IFR_TYPE_NUM_SIZE_8;
-      }
-      CNObj.SetFlags (0, Info.mVarType);
-      //
-      // Use maximum value not to limit the vaild value for the undefined question.
-      //
-      switch (Info.mVarType) {
-      case EFI_IFR_TYPE_NUM_SIZE_64:
-        CNObj.SetMinMaxStepData ((UINT64) 0, (UINT64) -1 , (UINT64) 0);
-        ShrinkSize = 0;
-        break;
-      case EFI_IFR_TYPE_NUM_SIZE_32:
-        CNObj.SetMinMaxStepData ((UINT32) 0, (UINT32) -1 , (UINT32) 0);
+      if (Info.mIsBitVar) {
+        MaxValue = (1 << Info.mVarTotalSize) -1;
+        CNObj.SetMinMaxStepData ((UINT32) 0, MaxValue, (UINT32) 0);
         ShrinkSize = 12;
-        break;
-      case EFI_IFR_TYPE_NUM_SIZE_16:
-        CNObj.SetMinMaxStepData ((UINT16) 0, (UINT16) -1 , (UINT16) 0);
-        ShrinkSize = 18;
-        break;
-      case EFI_IFR_TYPE_NUM_SIZE_8:
-        CNObj.SetMinMaxStepData ((UINT8) 0, (UINT8) -1 , (UINT8) 0);
-        ShrinkSize = 21;
-        break;
-      default:
-        break;
+        LFlags = (EDKII_IFR_NUMERIC_SIZE_BIT & Info.mVarTotalSize);
+        CNObj.SetFlagsForBitField (0, LFlags);
+      } else {
+        //
+        // Numeric doesn't support BOOLEAN data type.
+        // BOOLEAN type has the same data size to UINT8.
+        //
+        if (Info.mVarType == EFI_IFR_TYPE_BOOLEAN) {
+          Info.mVarType = EFI_IFR_TYPE_NUM_SIZE_8;
+        }
+        CNObj.SetFlags (0, Info.mVarType);
+        //
+        // Use maximum value not to limit the vaild value for the undefined question.
+        //
+        switch (Info.mVarType) {
+        case EFI_IFR_TYPE_NUM_SIZE_64:
+          CNObj.SetMinMaxStepData ((UINT64) 0, (UINT64) -1 , (UINT64) 0);
+          ShrinkSize = 0;
+          break;
+        case EFI_IFR_TYPE_NUM_SIZE_32:
+          CNObj.SetMinMaxStepData ((UINT32) 0, (UINT32) -1 , (UINT32) 0);
+          ShrinkSize = 12;
+          break;
+        case EFI_IFR_TYPE_NUM_SIZE_16:
+          CNObj.SetMinMaxStepData ((UINT16) 0, (UINT16) -1 , (UINT16) 0);
+          ShrinkSize = 18;
+          break;
+        case EFI_IFR_TYPE_NUM_SIZE_8:
+          CNObj.SetMinMaxStepData ((UINT8) 0, (UINT8) -1 , (UINT8) 0);
+          ShrinkSize = 21;
+          break;
+        default:
+          break;
+        }
       }
       CNObj.ShrinkBinSize (ShrinkSize);
 
@@ -956,8 +977,18 @@ CFormPkg::DeclarePendingQuestion (
       //
       // End for Numeric
       //
-      CIfrEnd CEObj; 
+      CIfrEnd CEObj;
       CEObj.SetLineNo (LineNo);
+      //
+      // End for Guided opcode
+      //
+      if (GuidObj != NULL) {
+        CIfrEnd CEObjGuid;
+        CEObjGuid.SetLineNo (LineNo);
+        GuidObj->SetScope(1);
+        delete GuidObj;
+        GuidObj = NULL;
+      }
     }
   }
 
