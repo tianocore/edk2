@@ -27,6 +27,7 @@
 
   Copyright (C) 2012, Red Hat, Inc.
   Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -832,7 +833,7 @@ VirtioScsiInit (
     goto Failed;
   }
 
-  Status = VirtioRingInit (QueueSize, &Dev->Ring);
+  Status = VirtioRingInit (Dev->VirtIo, QueueSize, &Dev->Ring);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -926,7 +927,7 @@ VirtioScsiInit (
   return EFI_SUCCESS;
 
 ReleaseQueue:
-  VirtioRingUninit (&Dev->Ring);
+  VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
 
 Failed:
   //
@@ -964,7 +965,7 @@ VirtioScsiUninit (
   Dev->MaxLun         = 0;
   Dev->MaxSectors     = 0;
 
-  VirtioRingUninit (&Dev->Ring);
+  VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
 
   SetMem (&Dev->PassThru,     sizeof Dev->PassThru,     0x00);
   SetMem (&Dev->PassThruMode, sizeof Dev->PassThruMode, 0x00);

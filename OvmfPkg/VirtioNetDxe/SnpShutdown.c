@@ -4,6 +4,7 @@
 
   Copyright (C) 2013, Red Hat, Inc.
   Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -66,8 +67,8 @@ VirtioNetShutdown (
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
   VirtioNetShutdownRx (Dev);
   VirtioNetShutdownTx (Dev);
-  VirtioRingUninit (&Dev->TxRing);
-  VirtioRingUninit (&Dev->RxRing);
+  VirtioRingUninit (Dev->VirtIo, &Dev->TxRing);
+  VirtioRingUninit (Dev->VirtIo, &Dev->RxRing);
 
   Dev->Snm.State = EfiSimpleNetworkStarted;
   Status = EFI_SUCCESS;

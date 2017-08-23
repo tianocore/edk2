@@ -35,6 +35,8 @@
   - 1.1 Virtqueues,
   - 2.3 Virtqueue Configuration.
 
+  @param[in]  VirtIo            The virtio device which will use the ring.
+
   @param[in]                    The number of descriptors to allocate for the
                                 virtio ring, as requested by the host.
 
@@ -52,8 +54,9 @@
 EFI_STATUS
 EFIAPI
 VirtioRingInit (
-  IN  UINT16 QueueSize,
-  OUT VRING  *Ring
+  IN  VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN  UINT16                 QueueSize,
+  OUT VRING                  *Ring
   );
 
 
@@ -65,13 +68,16 @@ VirtioRingInit (
   invoking this function: the VSTAT_DRIVER_OK bit must be clear in
   VhdrDeviceStatus.
 
-  @param[out] Ring  The virtio ring to clean up.
+  @param[in]  VirtIo  The virtio device which was using the ring.
+
+  @param[out] Ring    The virtio ring to clean up.
 
 **/
 VOID
 EFIAPI
 VirtioRingUninit (
-  IN OUT VRING *Ring
+  IN     VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN OUT VRING                  *Ring
   );
 
 
