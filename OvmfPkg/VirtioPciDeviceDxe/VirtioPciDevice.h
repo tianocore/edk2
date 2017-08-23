@@ -3,6 +3,7 @@
   Internal definitions for the VirtIo PCI Device driver
 
   Copyright (C) 2013, ARM Ltd
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -156,4 +157,37 @@ VirtioPciSetDeviceStatus (
   IN  UINT8                          DeviceStatus
   );
 
+EFI_STATUS
+EFIAPI
+VirtioPciAllocateSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL        *This,
+  IN  UINTN                         NumPages,
+  OUT VOID                          **HostAddress
+  );
+
+VOID
+EFIAPI
+VirtioPciFreeSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL        *This,
+  IN  UINTN                         NumPages,
+  IN  VOID                          *HostAddress
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioPciMapSharedBuffer (
+  IN      VIRTIO_DEVICE_PROTOCOL        *This,
+  IN      VIRTIO_MAP_OPERATION          Operation,
+  IN      VOID                          *HostAddress,
+  IN OUT  UINTN                         *NumberOfBytes,
+  OUT     EFI_PHYSICAL_ADDRESS          *DeviceAddress,
+  OUT     VOID                          **Mapping
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioPciUnmapSharedBuffer (
+  IN  VIRTIO_DEVICE_PROTOCOL        *This,
+  IN  VOID                          *Mapping
+  );
 #endif // _VIRTIO_PCI_DEVICE_DXE_H_

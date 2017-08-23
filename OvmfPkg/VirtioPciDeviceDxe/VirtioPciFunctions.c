@@ -5,6 +5,7 @@
   Copyright (C) 2012, Red Hat, Inc.
   Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
   Copyright (C) 2013, ARM Ltd.
+  Copyright (C) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -270,4 +271,61 @@ VirtioPciSetDeviceStatus (
 
   return VirtioPciIoWrite (Dev, VIRTIO_PCI_OFFSET_QUEUE_DEVICE_STATUS,
       sizeof (UINT8), DeviceStatus);
+}
+
+EFI_STATUS
+EFIAPI
+VirtioPciAllocateSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL  *This,
+  IN  UINTN                   NumPages,
+  OUT VOID                    **HostAddress
+  )
+{
+  VOID        *Buffer;
+
+  Buffer = AllocatePages (NumPages);
+  if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  *HostAddress = Buffer;
+  return EFI_SUCCESS;
+}
+
+VOID
+EFIAPI
+VirtioPciFreeSharedPages (
+  IN  VIRTIO_DEVICE_PROTOCOL  *This,
+  IN  UINTN                   NumPages,
+  IN  VOID                    *HostAddress
+  )
+{
+  FreePages (HostAddress, NumPages);
+}
+
+EFI_STATUS
+EFIAPI
+VirtioPciMapSharedBuffer (
+  IN      VIRTIO_DEVICE_PROTOCOL  *This,
+  IN      VIRTIO_MAP_OPERATION    Operation,
+  IN      VOID                    *HostAddress,
+  IN OUT  UINTN                   *NumberOfBytes,
+  OUT     EFI_PHYSICAL_ADDRESS    *DeviceAddress,
+  OUT     VOID                    **Mapping
+  )
+{
+  *DeviceAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
+  *Mapping = NULL;
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+VirtioPciUnmapSharedBuffer (
+  IN VIRTIO_DEVICE_PROTOCOL    *This,
+  IN VOID                      *Mapping
+  )
+{
+  return EFI_SUCCESS;
 }
