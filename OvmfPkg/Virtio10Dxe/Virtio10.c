@@ -498,11 +498,10 @@ Virtio10SetQueueAddress (
   UINT64         Address;
   UINT16         Enable;
 
-  ASSERT (RingBaseShift == 0);
-
   Dev = VIRTIO_1_0_FROM_VIRTIO_DEVICE (This);
 
   Address = (UINTN)Ring->Desc;
+  Address += RingBaseShift;
   Status = Virtio10Transfer (Dev->PciIo, &Dev->CommonConfig, TRUE,
              OFFSET_OF (VIRTIO_PCI_COMMON_CFG, QueueDesc),
              sizeof Address, &Address);
@@ -511,6 +510,7 @@ Virtio10SetQueueAddress (
   }
 
   Address = (UINTN)Ring->Avail.Flags;
+  Address += RingBaseShift;
   Status = Virtio10Transfer (Dev->PciIo, &Dev->CommonConfig, TRUE,
              OFFSET_OF (VIRTIO_PCI_COMMON_CFG, QueueAvail),
              sizeof Address, &Address);
@@ -519,6 +519,7 @@ Virtio10SetQueueAddress (
   }
 
   Address = (UINTN)Ring->Used.Flags;
+  Address += RingBaseShift;
   Status = Virtio10Transfer (Dev->PciIo, &Dev->CommonConfig, TRUE,
              OFFSET_OF (VIRTIO_PCI_COMMON_CFG, QueueUsed),
              sizeof Address, &Address);
