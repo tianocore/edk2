@@ -969,6 +969,7 @@ def GetUniFileName(FilePath, FileName):
         pass
 
     LargestIndex = -1
+    IndexNotFound = True
     for File in Files:
         if File.upper().startswith(FileName.upper()) and File.upper().endswith('.UNI'):
             Index = File.upper().replace(FileName.upper(), '').replace('.UNI', '')
@@ -978,11 +979,12 @@ def GetUniFileName(FilePath, FileName):
                 except Exception:
                     Index = -1
             else:
+                IndexNotFound = False
                 Index = 0
             if Index > LargestIndex:
                 LargestIndex = Index + 1
 
-    if LargestIndex > -1:
+    if LargestIndex > -1 and not IndexNotFound:
         return os.path.normpath(os.path.join(FilePath, FileName + str(LargestIndex) + '.uni'))
     else:
         return os.path.normpath(os.path.join(FilePath, FileName + '.uni'))

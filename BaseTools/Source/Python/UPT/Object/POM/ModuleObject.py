@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define a class object to describe a module
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -105,6 +105,7 @@ class ModuleHeaderObject(IdentificationObject, CommonHeaderObject, BinaryHeaderO
         self.PiSpecificationVersion = ''
         self.UefiSpecificationVersion = ''
         self.UNIFlag = False
+        self.ModuleUniFile = ''
         #
         # SpecObject
         #
@@ -208,6 +209,11 @@ class ModuleHeaderObject(IdentificationObject, CommonHeaderObject, BinaryHeaderO
     def GetSupArchList(self):
         return self.SupArchList
 
+    def SetModuleUniFile(self, ModuleUniFile):
+        self.ModuleUniFile = ModuleUniFile
+
+    def GetModuleUniFile(self):
+        return self.ModuleUniFile
 ##
 # SourceFileObject
 #

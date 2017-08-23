@@ -140,7 +140,9 @@ def ModuleToInf(ModuleObject, PackageObject=None, DistHeader=None):
     #
     FileHeader = GenHeaderCommentSection(ModuleAbstract, ModuleDescription, ModuleCopyright, ModuleLicense, False, \
                                          DT.TAB_COMMENT_EDK1_SPLIT)
-    GenModuleUNIEncodeFile(ModuleObject, FileHeader)
+    ModuleUniFile = GenModuleUNIEncodeFile(ModuleObject, FileHeader)
+    if ModuleUniFile:
+        ModuleObject.SetModuleUniFile(os.path.basename(ModuleUniFile))
 
     #
     # Judge whether the INF file is an AsBuild INF.
@@ -310,7 +312,7 @@ def GenDefines(ModuleObject):
     # TAB_INF_DEFINES_VERSION_STRING
     if ModuleObject.UNIFlag:
         Statement = (u'%s ' % DT.TAB_INF_DEFINES_MODULE_UNI_FILE).ljust(LeftOffset) + \
-                    u'= %s' % ModuleObject.GetBaseName() + '.uni'
+                    u'= %s' % ModuleObject.GetModuleUniFile()
         SpecialStatementList.append(Statement)
 
     # TAB_INF_DEFINES_MODULE_TYPE

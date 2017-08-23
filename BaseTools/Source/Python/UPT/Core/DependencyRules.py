@@ -55,6 +55,8 @@ class DependencyRules(object):
         self.PkgsToBeDepend.extend(self.GenToBeInstalledPkgList(ToBeInstalledPkgList))
         
     def GenToBeInstalledPkgList(self, ToBeInstalledPkgList):
+        if not ToBeInstalledPkgList:
+            return []
         RtnList = []
         for Dist in ToBeInstalledPkgList:
             for Package in Dist.PackageSurfaceArea:
