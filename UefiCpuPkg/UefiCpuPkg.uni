@@ -197,8 +197,10 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceMemSize_PROMPT  #language en-US "Memory size used by Processor Trace feature."
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceMemSize_HELP  #language en-US "User input the memory size can be used by processor trace feature.<BR><BR>\n"
-                                                                                   "Default value is 0x10 which disables the processor memory trace.<BR>\n"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceMemSize_HELP  #language en-US "User input the size of memory required when CPU processor trace is enabled.<BR><BR>\n"
+                                                                                   "Processor trace is enabled through set BIT44(CPU_FEATURE_PROC_TRACE) in PcdCpuFeaturesSetting.<BR><BR>\n"
+                                                                                   "This PCD is ignored if CPU processor trace is disabled.<BR><BR>\n"
+                                                                                   "Default value is 0x00 which means 4KB of memory is allocated if CPU processor trace is enabled.<BR>\n"
                                                                                    "0x0  -  4K.<BR>\n"
                                                                                    "0x1  -  8K.<BR>\n"
                                                                                    "0x2  -  16K.<BR>\n"
@@ -215,12 +217,12 @@
                                                                                    "0xD  -  32M.<BR>\n"
                                                                                    "0xE  -  64M.<BR>\n"
                                                                                    "0xF  -  128M.<BR>\n"
-                                                                                   "0x10 -  ProcTraceMemDisable.<BR>\n"
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceOutputScheme_PROMPT  #language en-US "Processor Trace output scheme type."
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceOutputScheme_HELP  #language en-US "User input the processor trace output scheme type.<BR><BR>\n"
-                                                                                        "Default value is 2 which disables the processor memory trace.<BR>\n"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuProcTraceOutputScheme_HELP  #language en-US "User input the processor trace output scheme when CPU processor trace is enabled.<BR><BR>\n"
+                                                                                        "Processor trace is enabled through set BIT44(CPU_FEATURE_PROC_TRACE) in PcdCpuFeaturesSetting.<BR><BR>\n"
+                                                                                        "This PCD is ignored if CPU processor trace is disabled.<BR><BR>\n"
+                                                                                        "Default value is 0 which means single range output scheme will be used if CPU processor trace is enabled.<BR>\n"
                                                                                         "0 - Single Range output scheme.<BR>\n"
                                                                                         "1 - ToPA(Table of physical address) scheme.<BR>\n"
-                                                                                        "2 - Invalid scheme.<BR>\n"
