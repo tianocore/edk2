@@ -42,9 +42,8 @@
 
   @param[out] Ring              The virtio ring to set up.
 
-  @retval EFI_OUT_OF_RESOURCES  AllocatePages() failed to allocate contiguous
-                                pages for the requested QueueSize. Fields of
-                                Ring have indeterminate value.
+  @return                       Status codes propagated from
+                                VirtIo->AllocateSharedPages().
 
   @retval EFI_SUCCESS           Allocation and setup successful. Ring->Base
                                 (and nothing else) is responsible for

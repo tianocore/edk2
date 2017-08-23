@@ -19,7 +19,6 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Library/VirtioLib.h>
@@ -44,9 +43,8 @@
 
   @param[out] Ring              The virtio ring to set up.
 
-  @retval EFI_OUT_OF_RESOURCES  AllocatePages() failed to allocate contiguous
-                                pages for the requested QueueSize. Fields of
-                                Ring have indeterminate value.
+  @return                       Status codes propagated from
+                                VirtIo->AllocateSharedPages().
 
   @retval EFI_SUCCESS           Allocation and setup successful. Ring->Base
                                 (and nothing else) is responsible for
@@ -61,6 +59,7 @@ VirtioRingInit (
   OUT VRING                  *Ring
   )
 {
+  EFI_STATUS     Status;
   UINTN          RingSize;
   volatile UINT8 *RingPagesPtr;
 
@@ -79,10 +78,17 @@ VirtioRingInit (
                 sizeof *Ring->Used.AvailEvent,
                 EFI_PAGE_SIZE);
 
+  //
+  // Allocate a shared ring buffer
+  //
   Ring->NumPages = EFI_SIZE_TO_PAGES (RingSize);
-  Ring->Base = AllocatePages (Ring->NumPages);
-  if (Ring->Base == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+  Status = VirtIo->AllocateSharedPages (
+                     VirtIo,
+                     Ring->NumPages,
+                     &Ring->Base
+                     );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
   SetMem (Ring->Base, RingSize, 0x00);
   RingPagesPtr = Ring->Base;
@@ -143,7 +149,7 @@ VirtioRingUninit (
   IN OUT VRING                  *Ring
   )
 {
-  FreePages (Ring->Base, Ring->NumPages);
+  VirtIo->FreeSharedPages (VirtIo, Ring->NumPages, Ring->Base);
   SetMem (Ring, sizeof *Ring, 0x00);
 }
 

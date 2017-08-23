@@ -32,5 +32,4 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  MemoryAllocationLib
   UefiBootServicesTableLib
