@@ -4,6 +4,7 @@
 
   Copyright (C) 2012-2016, Red Hat, Inc.
   Portion of Copyright (C) 2013, ARM Ltd.
+  Copyright (C) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -413,4 +414,88 @@ Virtio10WriteFeatures (
   }
 
   return Status;
+}
+
+/**
+  Provides the virtio device address required to access system memory from a
+  DMA bus master.
+
+  The interface follows the same usage pattern as defined in UEFI spec 2.6
+  (Section 13.2 PCI Root Bridge I/O Protocol)
+
+  The VirtioMapAllBytesInSharedBuffer() is similar to VIRTIO_MAP_SHARED
+  with exception that NumberOfBytes is IN-only parameter. The function
+  maps all the bytes specified in NumberOfBytes param in one consecutive
+  range.
+
+  @param[in]     VirtIo           The virtio device for which the mapping is
+                                  requested.
+
+  @param[in]     Operation        Indicates if the bus master is going to
+                                  read or write to system memory.
+
+  @param[in]     HostAddress      The system memory address to map to shared
+                                  buffer address.
+
+  @param[in]     NumberOfBytes    Number of bytes to map.
+
+  @param[out]    DeviceAddress    The resulting shared map address for the
+                                  bus master to access the hosts HostAddress.
+
+  @param[out]    Mapping          A resulting token to pass to
+                                  VIRTIO_UNMAP_SHARED.
+
+
+  @retval EFI_SUCCESS             The NumberOfBytes is succesfully mapped.
+  @retval EFI_UNSUPPORTED         The HostAddress cannot be mapped as a
+                                  common buffer.
+  @retval EFI_INVALID_PARAMETER   One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES    The request could not be completed due to
+                                  a lack of resources. This includes the case
+                                  when NumberOfBytes bytes cannot be mapped
+                                  in one consecutive range.
+  @retval EFI_DEVICE_ERROR        The system hardware could not map the
+                                  requested address.
+**/
+EFI_STATUS
+EFIAPI
+VirtioMapAllBytesInSharedBuffer (
+  IN  VIRTIO_DEVICE_PROTOCOL  *VirtIo,
+  IN  VIRTIO_MAP_OPERATION    Operation,
+  IN  VOID                    *HostAddress,
+  IN  UINTN                   NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS    *DeviceAddress,
+  OUT VOID                    **Mapping
+  )
+{
+  EFI_STATUS            Status;
+  VOID                  *MapInfo;
+  UINTN                 Size;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+
+  Size = NumberOfBytes;
+  Status = VirtIo->MapSharedBuffer (
+                     VirtIo,
+                     Operation,
+                     HostAddress,
+                     &Size,
+                     &PhysicalAddress,
+                     &MapInfo
+                     );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (Size < NumberOfBytes) {
+    goto Failed;
+  }
+
+  *Mapping = MapInfo;
+  *DeviceAddress = PhysicalAddress;
+
+  return EFI_SUCCESS;
+
+Failed:
+  VirtIo->UnmapSharedBuffer (VirtIo, MapInfo);
+  return EFI_OUT_OF_RESOURCES;
 }
