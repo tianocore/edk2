@@ -30,10 +30,9 @@
 /// Processor trace output scheme selection.
 ///
 typedef enum {
-  OutputSchemeSingleRange = 0,
-  OutputSchemeToPA,
-  OutputSchemeInvalid
-} PROC_TRACE_OUTPUT_SCHEME;
+  RtitOutputSchemeSingleRange = 0,
+  RtitOutputSchemeToPA
+} RTIT_OUTPUT_SCHEME;
 
 typedef struct  {
   BOOLEAN  ProcTraceSupported;
@@ -122,7 +121,7 @@ ProcTraceSupport (
   //
   ProcTraceData = (PROC_TRACE_DATA *) ConfigData;
   if ((ProcTraceData->ProcTraceMemSize > RtitTopaMemorySize128M) ||
-      (ProcTraceData->ProcTraceOutputScheme > ProcTraceOutputSchemeToPA)) {
+      (ProcTraceData->ProcTraceOutputScheme > RtitOutputSchemeToPA)) {
     return FALSE;
   }
 
@@ -138,8 +137,8 @@ ProcTraceSupport (
   AsmCpuidEx (CPUID_INTEL_PROCESSOR_TRACE, CPUID_INTEL_PROCESSOR_TRACE_MAIN_LEAF, NULL, NULL, &Ecx.Uint32, NULL);
   ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported = (BOOLEAN) (Ecx.Bits.RTIT == 1);
   ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported = (BOOLEAN) (Ecx.Bits.SingleRangeOutput == 1);
-  if (ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported || 
-      ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported) {
+  if ((ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported && (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeToPA)) ||
+      (ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported && (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeSingleRange))) {
     return TRUE;
   }
 
@@ -291,7 +290,7 @@ ProcTraceInitialize (
   //  Single Range output scheme
   //
   if (ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported && 
-      (ProcTraceData->ProcTraceOutputScheme == OutputSchemeSingleRange)) {
+      (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeSingleRange)) {
     if (FirstIn) {
       DEBUG ((DEBUG_INFO, "ProcTrace: Enabling Single Range Output scheme \n"));
     }
@@ -337,7 +336,7 @@ ProcTraceInitialize (
   //  ToPA(Table of physical address) scheme
   //
   if (ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported && 
-      (ProcTraceData->ProcTraceOutputScheme == OutputSchemeToPA)) {
+      (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeToPA)) {
     //
     //  Create ToPA structure aligned at 4KB for each logical thread
     //  with at least 2 entries by 8 bytes size each. The first entry
