@@ -38,6 +38,7 @@ typedef struct {
   EFI_EVENT                 ExitBoot;       // DriverBindingStart   0
   VRING                     Ring;           // VirtioRingInit       2
   EFI_RNG_PROTOCOL          Rng;            // VirtioRngInit        1
+  VOID                      *RingMap;       // VirtioRingMap        2
 } VIRTIO_RNG_DEV;
 
 #define VIRTIO_ENTROPY_SOURCE_FROM_RNG(RngPointer) \

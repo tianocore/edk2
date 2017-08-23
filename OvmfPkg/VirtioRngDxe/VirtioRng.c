@@ -140,6 +140,8 @@ VirtioRngGetRNG (
   UINT32                    Len;
   UINT32                    BufferSize;
   EFI_STATUS                Status;
+  EFI_PHYSICAL_ADDRESS      DeviceAddress;
+  VOID                      *Mapping;
 
   if (This == NULL || RNGValueLength == 0 || RNGValue == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -159,6 +161,21 @@ VirtioRngGetRNG (
   }
 
   Dev = VIRTIO_ENTROPY_SOURCE_FROM_RNG (This);
+  //
+  // Map Buffer's system phyiscal address to device address
+  //
+  Status = VirtioMapAllBytesInSharedBuffer (
+             Dev->VirtIo,
+             VirtioOperationBusMasterWrite,
+             (VOID *)Buffer,
+             RNGValueLength,
+             &DeviceAddress,
+             &Mapping
+             );
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto FreeBuffer;
+  }
 
   //
   // The Virtio RNG device may return less data than we asked it to, and can
@@ -170,7 +187,7 @@ VirtioRngGetRNG (
 
     VirtioPrepare (&Dev->Ring, &Indices);
     VirtioAppendDesc (&Dev->Ring,
-      (UINTN)Buffer + Index,
+      DeviceAddress + Index,
       BufferSize,
       VRING_DESC_F_WRITE,
       &Indices);
@@ -178,16 +195,34 @@ VirtioRngGetRNG (
     if (VirtioFlush (Dev->VirtIo, 0, &Dev->Ring, &Indices, &Len) !=
         EFI_SUCCESS) {
       Status = EFI_DEVICE_ERROR;
-      goto FreeBuffer;
+      goto UnmapBuffer;
     }
     ASSERT (Len > 0);
     ASSERT (Len <= BufferSize);
+  }
+
+  //
+  // Unmap the device buffer before accessing it.
+  //
+  Status = Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Mapping);
+  if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+    goto FreeBuffer;
   }
 
   for (Index = 0; Index < RNGValueLength; Index++) {
     RNGValue[Index] = Buffer[Index];
   }
   Status = EFI_SUCCESS;
+
+UnmapBuffer:
+  //
+  // If we are reached here due to the error then unmap the buffer otherwise
+  // the buffer is already unmapped after VirtioFlush().
+  //
+  if (EFI_ERROR (Status)) {
+    Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Mapping);
+  }
 
 FreeBuffer:
   FreePool ((VOID *)Buffer);
@@ -205,6 +240,7 @@ VirtioRngInit (
   EFI_STATUS Status;
   UINT16     QueueSize;
   UINT64     Features;
+  UINT64     RingBaseShift;
 
   //
   // Execute virtio-0.9.5, 2.2.1 Device Initialization Sequence.
@@ -282,25 +318,42 @@ VirtioRngInit (
   }
 
   //
-  // Additional steps for MMIO: align the queue appropriately, and set the
-  // size. If anything fails from here on, we must release the ring resources.
+  // If anything fails from here on, we must release the ring resources.
   //
-  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
+  Status = VirtioRingMap (
+             Dev->VirtIo,
+             &Dev->Ring,
+             &RingBaseShift,
+             &Dev->RingMap
+             );
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
 
+  //
+  // Additional steps for MMIO: align the queue appropriately, and set the
+  // size. If anything fails from here on, we must unmap the ring resources.
+  //
+  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
+  if (EFI_ERROR (Status)) {
+    goto UnmapQueue;
+  }
+
   Status = Dev->VirtIo->SetQueueAlign (Dev->VirtIo, EFI_PAGE_SIZE);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
   // step 4c -- Report GPFN (guest-physical frame number) of queue.
   //
-  Status = Dev->VirtIo->SetQueueAddress (Dev->VirtIo, &Dev->Ring, 0);
+  Status = Dev->VirtIo->SetQueueAddress (
+                          Dev->VirtIo,
+                          &Dev->Ring,
+                          RingBaseShift
+                          );
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
@@ -310,7 +363,7 @@ VirtioRngInit (
     Features &= ~(UINT64)VIRTIO_F_VERSION_1;
     Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
     if (EFI_ERROR (Status)) {
-      goto ReleaseQueue;
+      goto UnmapQueue;
     }
   }
 
@@ -320,7 +373,7 @@ VirtioRngInit (
   NextDevStat |= VSTAT_DRIVER_OK;
   Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
@@ -330,6 +383,9 @@ VirtioRngInit (
   Dev->Rng.GetRNG     = VirtioRngGetRNG;
 
   return EFI_SUCCESS;
+
+UnmapQueue:
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
 
 ReleaseQueue:
   VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
@@ -359,6 +415,9 @@ VirtioRngUninit (
   // the old comms area.
   //
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
+
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
+
   VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
 }
 
@@ -385,6 +444,12 @@ VirtioRngExitBoot (
   //
   Dev = Context;
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
+
+  //
+  // Unmap the ring buffer so that hypervisor will not be able to get readable
+  // data after device reset.
+  //
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
 }
 
 
