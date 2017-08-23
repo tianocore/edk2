@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1013,15 +1013,18 @@ EFI_VFR_RETURN_CODE
 CVfrVarDataTypeDB::DataTypeAddField (
   IN CHAR8   *FieldName,
   IN CHAR8   *TypeName,
-  IN UINT32 ArrayNum
+  IN UINT32 ArrayNum,
+  IN BOOLEAN FieldInUnion
   )
 {
   SVfrDataField       *pNewField  = NULL;
   SVfrDataType        *pFieldType = NULL;
   SVfrDataField       *pTmp;
   UINT32              Align;
+  UINT32              MaxDataTypeSize;
 
   CHECK_ERROR_RETURN (GetDataType (TypeName, &pFieldType), VFR_RETURN_SUCCESS);
+  MaxDataTypeSize = mNewDataType->mTotalSize;
 
   if (strlen (FieldName) >= MAX_NAME_LEN) {
    return VFR_RETURN_INVALID_PARAMETER;
@@ -1057,7 +1060,15 @@ CVfrVarDataTypeDB::DataTypeAddField (
   }
 
   mNewDataType->mAlign     = MIN (mPackAlign, MAX (pFieldType->mAlign, mNewDataType->mAlign));
-  mNewDataType->mTotalSize = pNewField->mOffset + (pNewField->mFieldType->mTotalSize) * ((ArrayNum == 0) ? 1 : ArrayNum);
+
+  if (FieldInUnion) {
+    if (MaxDataTypeSize < pNewField->mFieldType->mTotalSize) {
+      mNewDataType->mTotalSize = pNewField->mFieldType->mTotalSize;
+    }
+    pNewField->mOffset = 0;
+  } else {
+    mNewDataType->mTotalSize = pNewField->mOffset + (pNewField->mFieldType->mTotalSize) * ((ArrayNum == 0) ? 1 : ArrayNum);
+  }
 
   return VFR_RETURN_SUCCESS;
 }

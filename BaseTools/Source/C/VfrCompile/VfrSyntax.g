@@ -157,6 +157,7 @@ VfrParserStart (
 #token Inventory("inventory")                   "inventory"
 #token NonNvDataMap("_NON_NV_DATA_MAP")         "_NON_NV_DATA_MAP"
 #token Struct("struct")                         "struct"
+#token Union("union")                           "union"
 #token Boolean("BOOLEAN")                       "BOOLEAN"
 #token Uint64("UINT64")                         "UINT64"
 #token Uint32("UINT32")                         "UINT32"
@@ -272,6 +273,7 @@ vfrProgram > [UINT8 Return] :
   (
       vfrPragmaPackDefinition
     | vfrDataStructDefinition
+    | vfrDataUnionDefinition
   )*
   vfrFormSetDefinition
   << $Return = mParserStatus; >>
@@ -320,6 +322,21 @@ vfrPragmaPackDefinition :
   "\)"
   ;
 
+  vfrDataUnionDefinition :
+  { TypeDef } Union                                << gCVfrVarDataTypeDB.DeclareDataTypeBegin (); >>
+  { NonNvDataMap }
+  {
+    N1:StringIdentifier                             << _PCATCH(gCVfrVarDataTypeDB.SetNewTypeName (N1->getText()), N1); >>
+  }
+  OpenBrace
+    vfrDataStructFields[TRUE]
+  CloseBrace
+  {
+    N2:StringIdentifier                             << _PCATCH(gCVfrVarDataTypeDB.SetNewTypeName (N2->getText()), N2); >>
+  }
+  ";"                                               << gCVfrVarDataTypeDB.DeclareDataTypeEnd ();>>
+  ;
+
 vfrDataStructDefinition :
   { TypeDef } Struct                                << gCVfrVarDataTypeDB.DeclareDataTypeBegin (); >>
   { NonNvDataMap }
@@ -327,7 +344,7 @@ vfrDataStructDefinition :
     N1:StringIdentifier                             << _PCATCH(gCVfrVarDataTypeDB.SetNewTypeName (N1->getText()), N1); >>
   }
   OpenBrace
-    vfrDataStructFields
+    vfrDataStructFields[FALSE]
   CloseBrace
   {
     N2:StringIdentifier                             << _PCATCH(gCVfrVarDataTypeDB.SetNewTypeName (N2->getText()), N2); >>
@@ -335,42 +352,42 @@ vfrDataStructDefinition :
   ";"                                               << gCVfrVarDataTypeDB.DeclareDataTypeEnd (); >>
   ;
 
-vfrDataStructFields :
+vfrDataStructFields [BOOLEAN  FieldInUnion]:
   (
-     dataStructField64     |
-     dataStructField32     |
-     dataStructField16     |
-     dataStructField8      |
-     dataStructFieldBool   |
-     dataStructFieldString |
-     dataStructFieldDate   |
-     dataStructFieldTime   |
-     dataStructFieldRef    |
-     dataStructFieldUser
+     dataStructField64 [FieldInUnion]    |
+     dataStructField32 [FieldInUnion]    |
+     dataStructField16 [FieldInUnion]    |
+     dataStructField8  [FieldInUnion]    |
+     dataStructFieldBool [FieldInUnion]  |
+     dataStructFieldString [FieldInUnion]|
+     dataStructFieldDate  [FieldInUnion] |
+     dataStructFieldTime  [FieldInUnion] |
+     dataStructFieldRef   [FieldInUnion] |
+     dataStructFieldUser [FieldInUnion]
   )*
   ;
 
-dataStructField64 :
+dataStructField64 [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"UINT64"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructField32 :
+dataStructField32 [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"UINT32"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructField16 :
+dataStructField16 [BOOLEAN  FieldInUnion]:
   << 
     UINT32 ArrayNum = 0; 
   >>
@@ -379,77 +396,77 @@ dataStructField16 :
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), (CHAR8 *) "UINT16", ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), (CHAR8 *) "UINT16", ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructField8 :
+dataStructField8 [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"UINT8"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructFieldBool :
+dataStructFieldBool [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"BOOLEAN"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructFieldString :
+dataStructFieldString [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"EFI_STRING_ID"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructFieldDate :
+dataStructFieldDate [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"EFI_HII_DATE"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructFieldTime :
+dataStructFieldTime [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"EFI_HII_TIME"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructFieldRef :
+dataStructFieldRef [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   D:"EFI_HII_REF"
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum), N); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), D->getText(), ArrayNum, FieldInUnion), N); >>
   ;
 
-dataStructFieldUser :
+dataStructFieldUser [BOOLEAN  FieldInUnion]:
   << UINT32 ArrayNum = 0; >>
   T:StringIdentifier
   N:StringIdentifier
   {
     OpenBracket I:Number CloseBracket               << ArrayNum = _STOU32(I->getText(), I->getLine()); >>
   }
-  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), T->getText(), ArrayNum), T); >>
+  ";"                                               << _PCATCH(gCVfrVarDataTypeDB.DataTypeAddField (N->getText(), T->getText(), ArrayNum, FieldInUnion), T); >>
   ;
 
 //*****************************************************************************

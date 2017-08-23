@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -205,7 +205,7 @@ public:
 
   VOID                DeclareDataTypeBegin (VOID);
   EFI_VFR_RETURN_CODE SetNewTypeName (IN CHAR8 *);
-  EFI_VFR_RETURN_CODE DataTypeAddField (IN CHAR8 *, IN CHAR8 *, IN UINT32);
+  EFI_VFR_RETURN_CODE DataTypeAddField (IN CHAR8 *, IN CHAR8 *, IN UINT32, IN BOOLEAN);
   VOID                DeclareDataTypeEnd (VOID);
 
   EFI_VFR_RETURN_CODE GetDataType (IN CHAR8 *, OUT SVfrDataType **);
