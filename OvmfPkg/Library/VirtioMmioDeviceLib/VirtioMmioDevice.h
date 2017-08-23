@@ -115,7 +115,8 @@ VirtioMmioSetQueueSel (
 EFI_STATUS
 VirtioMmioSetQueueAddress (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN VRING                   *Ring
+  IN VRING                   *Ring,
+  IN UINT64                  RingBaseShift
   );
 
 EFI_STATUS

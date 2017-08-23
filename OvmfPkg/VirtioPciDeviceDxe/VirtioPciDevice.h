@@ -126,7 +126,8 @@ EFI_STATUS
 EFIAPI
 VirtioPciSetQueueAddress (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN VRING                   *Ring
+  IN VRING                   *Ring,
+  IN UINT64                  RingBaseShift
   );
 
 EFI_STATUS

@@ -181,10 +181,13 @@ VirtioMmioSetQueueSel (
 EFI_STATUS
 VirtioMmioSetQueueAddress (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN VRING                   *Ring
+  IN VRING                   *Ring,
+  IN UINT64                  RingBaseShift
   )
 {
   VIRTIO_MMIO_DEVICE *Device;
+
+  ASSERT (RingBaseShift == 0);
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 

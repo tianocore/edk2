@@ -489,13 +489,16 @@ EFI_STATUS
 EFIAPI
 Virtio10SetQueueAddress (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN VRING                   *Ring
+  IN VRING                   *Ring,
+  IN UINT64                  RingBaseShift
   )
 {
   VIRTIO_1_0_DEV *Dev;
   EFI_STATUS     Status;
   UINT64         Address;
   UINT16         Enable;
+
+  ASSERT (RingBaseShift == 0);
 
   Dev = VIRTIO_1_0_FROM_VIRTIO_DEVICE (This);
 

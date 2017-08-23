@@ -132,7 +132,11 @@ VirtioGpuInit (
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
-  Status = VgpuDev->VirtIo->SetQueueAddress (VgpuDev->VirtIo, &VgpuDev->Ring);
+  Status = VgpuDev->VirtIo->SetQueueAddress (
+                              VgpuDev->VirtIo,
+                              &VgpuDev->Ring,
+                              0
+                              );
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }

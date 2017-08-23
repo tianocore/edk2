@@ -156,7 +156,21 @@ EFI_STATUS
   @param[in] This             This instance of VIRTIO_DEVICE_PROTOCOL
 
   @param[in] Ring             The initialized VRING object to take the
-                              addresses from.
+                              addresses from. The caller is responsible for
+                              ensuring that on input, all Ring->NumPages pages,
+                              starting at Ring->Base, have been successfully
+                              mapped with a single call to
+                              This->MapSharedBuffer() for CommonBuffer bus
+                              master operation.
+
+  @param[in] RingBaseShift    Adding this value using UINT64 arithmetic to the
+                              addresses found in Ring translates them from
+                              system memory to bus addresses. The caller shall
+                              calculate RingBaseShift as
+                              (DeviceAddress - (UINT64)(UINTN)HostAddress),
+                              where DeviceAddress and HostAddress (i.e.,
+                              Ring->Base) were output and input parameters of
+                              This->MapSharedBuffer(), respectively.
 
   @retval EFI_SUCCESS         The data was written successfully.
   @retval EFI_UNSUPPORTED     The underlying IO device doesn't support the
@@ -166,7 +180,8 @@ typedef
 EFI_STATUS
 (EFIAPI *VIRTIO_SET_QUEUE_ADDRESS) (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN VRING                   *Ring
+  IN VRING                   *Ring,
+  IN UINT64                  RingBaseShift
   );
 
 /**

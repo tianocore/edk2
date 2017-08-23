@@ -183,10 +183,13 @@ EFI_STATUS
 EFIAPI
 VirtioPciSetQueueAddress (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
-  IN VRING                   *Ring
+  IN VRING                   *Ring,
+  IN UINT64                  RingBaseShift
   )
 {
   VIRTIO_PCI_DEVICE *Dev;
+
+  ASSERT (RingBaseShift == 0);
 
   Dev = VIRTIO_PCI_DEVICE_FROM_VIRTIO_DEVICE (This);
 
