@@ -505,3 +505,48 @@ Failed:
   VirtIo->UnmapSharedBuffer (VirtIo, MapInfo);
   return EFI_OUT_OF_RESOURCES;
 }
+
+/**
+
+  Map the ring buffer so that it can be accessed equally by both guest
+  and hypervisor.
+
+  @param[in]      VirtIo          The virtio device instance.
+
+  @param[in]      Ring            The virtio ring to map.
+
+  @param[out]     RingBaseShift   A resulting translation offset, to be
+                                  passed to VirtIo->SetQueueAddress().
+
+  @param[out]     Mapping         A resulting token to pass to
+                                  VirtIo->UnmapSharedBuffer().
+
+  @return         Status code from VirtIo->MapSharedBuffer()
+**/
+EFI_STATUS
+EFIAPI
+VirtioRingMap (
+  IN  VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN  VRING                  *Ring,
+  OUT UINT64                 *RingBaseShift,
+  OUT VOID                   **Mapping
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  DeviceAddress;
+
+  Status = VirtioMapAllBytesInSharedBuffer (
+             VirtIo,
+             VirtioOperationBusMasterCommonBuffer,
+             Ring->Base,
+             EFI_PAGES_TO_SIZE (Ring->NumPages),
+             &DeviceAddress,
+             Mapping
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *RingBaseShift = DeviceAddress - (UINT64)(UINTN)Ring->Base;
+  return EFI_SUCCESS;
+}

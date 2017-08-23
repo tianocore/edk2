@@ -62,6 +62,32 @@ VirtioRingInit (
 
 /**
 
+  Map the ring buffer so that it can be accessed equally by both guest
+  and hypervisor.
+
+  @param[in]      VirtIo          The virtio device instance.
+
+  @param[in]      Ring            The virtio ring to map.
+
+  @param[out]     RingBaseShift   A resulting translation offset, to be
+                                  passed to VirtIo->SetQueueAddress().
+
+  @param[out]     Mapping         A resulting token to pass to
+                                  VirtIo->UnmapSharedBuffer().
+
+  @return         Status code from VirtIo->MapSharedBuffer()
+**/
+EFI_STATUS
+EFIAPI
+VirtioRingMap (
+  IN  VIRTIO_DEVICE_PROTOCOL *VirtIo,
+  IN  VRING                  *Ring,
+  OUT UINT64                 *RingBaseShift,
+  OUT VOID                   **Mapping
+  );
+
+/**
+
   Tear down the internal resources of a configured virtio ring.
 
   The caller is responsible to stop the host from using this ring before
