@@ -259,8 +259,11 @@ XhcCreateTransferTrb (
   } else {
     EPType  = (UINT8) ((DEVICE_CONTEXT_64 *)OutputContext)->EP[Dci-1].EPType;
   }
-  
-  if (Urb->Data != NULL) {
+
+  //
+  // No need to remap.
+  //
+  if ((Urb->Data != NULL) && (Urb->DataMap == NULL)) {
     if (((UINT8) (Urb->Ep.Direction)) == EfiUsbDataIn) {
       MapOp = EfiPciIoOperationBusMasterWrite;
     } else {
