@@ -26,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
 #  DRIVER_BINDING                =  gQemuVideoDriverBinding
 #  COMPONENT_NAME                =  gQemuVideoComponentName
@@ -45,7 +45,7 @@
   UnalignedIoMsc.c    | MSFT
   UnalignedIoIcc.c    | INTEL
 
-[Sources.IPF, Sources.EBC, Sources.ARM, Sources.AARCH64]
+[Sources.IPF, Sources.EBC]
   UnalignedIoUnsupported.c
 
 [Packages]
