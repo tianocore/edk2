@@ -62,7 +62,6 @@
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
 
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
-  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
@@ -117,7 +116,6 @@
   ArmPkg/Library/SemiHostingDebugLib/SemiHostingDebugLib.inf
   ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
   ArmPkg/Library/SemihostLib/SemihostLib.inf
-  ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
   ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
   ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
   ArmPkg/Library/ArmExceptionLib/ArmRelocateExceptionLib.inf
