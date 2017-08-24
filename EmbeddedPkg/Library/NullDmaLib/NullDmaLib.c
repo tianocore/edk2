@@ -100,23 +100,61 @@ DmaAllocateBuffer (
   OUT VOID                         **HostAddress
   )
 {
-  if (HostAddress == NULL) {
+  return DmaAllocateAlignedBuffer (MemoryType, Pages, 0, HostAddress);
+}
+
+
+/**
+  Allocates pages that are suitable for an DmaMap() of type
+  MapOperationBusMasterCommonBuffer mapping, at the requested alignment.
+
+  @param  MemoryType            The type of memory to allocate, EfiBootServicesData or
+                                EfiRuntimeServicesData.
+  @param  Pages                 The number of pages to allocate.
+  @param  Alignment             Alignment in bytes of the base of the returned
+                                buffer (must be a power of 2)
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+DmaAllocateAlignedBuffer (
+  IN  EFI_MEMORY_TYPE              MemoryType,
+  IN  UINTN                        Pages,
+  IN  UINTN                        Alignment,
+  OUT VOID                         **HostAddress
+  )
+{
+  if (Alignment == 0) {
+    Alignment = EFI_PAGE_SIZE;
+  }
+
+  if (HostAddress == NULL ||
+      (Alignment & (Alignment - 1)) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // The only valid memory types are EfiBootServicesData and EfiRuntimeServicesData
   //
-  // We used uncached memory to keep coherency
-  //
   if (MemoryType == EfiBootServicesData) {
-    *HostAddress = AllocatePages (Pages);
+    *HostAddress = AllocateAlignedPages (Pages, Alignment);
   } else if (MemoryType != EfiRuntimeServicesData) {
-    *HostAddress = AllocateRuntimePages (Pages);
+    *HostAddress = AllocateAlignedRuntimePages (Pages, Alignment);
   } else {
     return EFI_INVALID_PARAMETER;
   }
 
+  if (*HostAddress == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
   return EFI_SUCCESS;
 }
 

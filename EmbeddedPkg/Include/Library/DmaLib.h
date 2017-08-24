@@ -155,5 +155,33 @@ DmaFreeBuffer (
   );
 
 
-#endif
+/**
+  Allocates pages that are suitable for an DmaMap() of type
+  MapOperationBusMasterCommonBuffer mapping, at the requested alignment.
 
+  @param  MemoryType            The type of memory to allocate, EfiBootServicesData or
+                                EfiRuntimeServicesData.
+  @param  Pages                 The number of pages to allocate.
+  @param  Alignment             Alignment in bytes of the base of the returned
+                                buffer (must be a power of 2)
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+DmaAllocateAlignedBuffer (
+  IN  EFI_MEMORY_TYPE              MemoryType,
+  IN  UINTN                        Pages,
+  IN  UINTN                        Alignment,
+  OUT VOID                         **HostAddress
+  );
+
+
+#endif
