@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -380,6 +380,7 @@ ConvertMemoryPageAttributes (
   PAGE_ATTRIBUTE                    SplitAttribute;
   RETURN_STATUS                     Status;
   BOOLEAN                           IsEntryModified;
+  EFI_PHYSICAL_ADDRESS              MaximumSupportMemAddress;
 
   ASSERT (Attributes != 0);
   ASSERT ((Attributes & ~(EFI_MEMORY_RP | EFI_MEMORY_RO | EFI_MEMORY_XP)) == 0);
@@ -389,6 +390,17 @@ ConvertMemoryPageAttributes (
 
   if (Length == 0) {
     return RETURN_INVALID_PARAMETER;
+  }
+
+  MaximumSupportMemAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)(LShiftU64 (1, mPhysicalAddressBits) - 1);
+  if (BaseAddress > MaximumSupportMemAddress) {
+    return RETURN_UNSUPPORTED;
+  }
+  if (Length > MaximumSupportMemAddress) {
+    return RETURN_UNSUPPORTED;
+  }
+  if ((Length != 0) && (BaseAddress > MaximumSupportMemAddress - (Length - 1))) {
+    return RETURN_UNSUPPORTED;
   }
 
 //  DEBUG ((DEBUG_ERROR, "ConvertMemoryPageAttributes(%x) - %016lx, %016lx, %02lx\n", IsSet, BaseAddress, Length, Attributes));
@@ -1037,6 +1049,7 @@ SetUefiMemMapAttributes (
   VOID
   )
 {
+  EFI_STATUS            Status;
   EFI_MEMORY_DESCRIPTOR *MemoryMap;
   UINTN                 MemoryMapEntryCount;
   UINTN                 Index;
@@ -1052,12 +1065,18 @@ SetUefiMemMapAttributes (
   MemoryMap = mUefiMemoryMap;
   for (Index = 0; Index < MemoryMapEntryCount; Index++) {
     if (IsUefiPageNotPresent(MemoryMap)) {
-      DEBUG ((DEBUG_INFO, "UefiMemory protection: 0x%lx - 0x%lx\n", MemoryMap->PhysicalStart, MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages)));
-      SmmSetMemoryAttributes (
+      Status = SmmSetMemoryAttributes (
+                 MemoryMap->PhysicalStart,
+                 EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages),
+                 EFI_MEMORY_RP
+                 );
+      DEBUG ((
+        DEBUG_INFO,
+        "UefiMemory protection: 0x%lx - 0x%lx %r\n",
         MemoryMap->PhysicalStart,
-        EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages),
-        EFI_MEMORY_RP
-        );
+        MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE((UINTN)MemoryMap->NumberOfPages),
+        Status
+        ));
     }
     MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, mUefiDescriptorSize);
   }

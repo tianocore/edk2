@@ -419,6 +419,7 @@ extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
 extern SPIN_LOCK                           *mMemoryMappedLock;
 extern EFI_SMRAM_DESCRIPTOR                *mSmmCpuSmramRanges;
 extern UINTN                               mSmmCpuSmramRangeCount;
+extern UINT8                               mPhysicalAddressBits;
 
 //
 // Copy of the PcdPteMemoryEncryptionAddressOrMask
