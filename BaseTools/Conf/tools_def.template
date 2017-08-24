@@ -575,7 +575,7 @@ DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G
 #                               Intel(r) ACPI Compiler (iasl.exe) from
 #                               https://acpica.org/downloads
 #   VS2015x86   -win64-  Requires:
-#                             Microsoft Visual Studio 2015 (x86) Professional Edition
+#                             Microsoft Visual Studio 2015 (x86) Update 2 or above
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
@@ -3605,6 +3605,7 @@ NOOPT_VS2013x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT
 *_VS2015_*_APP_FLAGS              = /nologo /E /TC
 *_VS2015_*_PP_FLAGS               = /nologo /E /TC /FIAutoGen.h
 *_VS2015_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2015_*_DLINK2_FLAGS           =
 
 *_VS2015_*_ASM16_PATH             = DEF(VS2015_BIN)\ml.exe
 
@@ -3723,6 +3724,7 @@ NOOPT_VS2015_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2015xASL_*_APP_FLAGS       = /nologo /E /TC
 *_VS2015xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
 *_VS2015xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2015xASL_*_DLINK2_FLAGS    =
 
 *_VS2015xASL_*_ASM16_PATH      = DEF(VS2015_BIN)\ml.exe
 
@@ -3839,6 +3841,7 @@ NOOPT_VS2015xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 *_VS2015x86_*_APP_FLAGS       = /nologo /E /TC
 *_VS2015x86_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
 *_VS2015x86_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2015x86_*_DLINK2_FLAGS    =
 
 *_VS2015x86_*_ASM16_PATH      = DEF(VS2015x86_BIN)\ml.exe
 
@@ -3954,6 +3957,7 @@ NOOPT_VS2015x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2015x86xASL_*_APP_FLAGS       = /nologo /E /TC
 *_VS2015x86xASL_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
 *_VS2015x86xASL_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2015x86xASL_*_DLINK2_FLAGS    =
 
 *_VS2015x86xASL_*_ASM16_PATH      = DEF(VS2015x86_BIN)\ml.exe
 
