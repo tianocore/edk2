@@ -3,7 +3,7 @@
   The EFI Adapter Information Protocol is used to dynamically and quickly discover
   or set device information for an adapter.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -46,6 +46,12 @@
     0x4bd56be3, 0x4975, 0x4d8a, {0xa0, 0xad, 0xc4, 0x91, 0x20, 0x4b, 0x5d, 0x4d} \
   }
 
+#define EFI_ADAPTER_INFO_MEDIA_TYPE_GUID \
+  { \
+    0x8484472f, 0x71ec, 0x411a, { 0xb3, 0x9c, 0x62, 0xcd, 0x94, 0xd9, 0x91, 0x6e } \
+  }
+
+
 typedef struct _EFI_ADAPTER_INFORMATION_PROTOCOL EFI_ADAPTER_INFORMATION_PROTOCOL;
 
 ///
@@ -60,6 +66,19 @@ typedef struct {
   ///
   EFI_STATUS                    MediaState;
 } EFI_ADAPTER_INFO_MEDIA_STATE;
+
+///
+/// EFI_ADAPTER_INFO_MEDIA_TYPE
+///
+typedef struct {
+  ///
+  /// Indicates the current media type. MediaType can have any of the following values:
+  /// 1: Ethernet Network Adapter
+  /// 2: Ethernet Wireless Network Adapter
+  /// 3~255: Reserved
+  ///
+  UINT8 MediaType;
+} EFI_ADAPTER_INFO_MEDIA_TYPE;
 
 ///
 /// EFI_ADAPTER_INFO_NETWORK_BOOT
