@@ -95,6 +95,7 @@
   gEfiAcpiTableProtocolGuid                          ## NOTIFY
   gEfiMpServiceProtocolGuid                          ## SOMETIMES_CONSUMES
   gEfiVariableWriteArchProtocolGuid                  ## NOTIFY
+  gEfiResetNotificationProtocolGuid                  ## CONSUMES
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass                         ## SOMETIMES_CONSUMES

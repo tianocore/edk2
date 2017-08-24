@@ -31,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Tcg2Protocol.h>
 #include <Protocol/TrEEProtocol.h>
+#include <Protocol/ResetNotification.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -2413,6 +2414,68 @@ OnExitBootServicesFailed (
 }
 
 /**
+  This routine is called to properly shutdown the TPM before system reset.
+  It follow chapter "12.2.3 Startup State" in Trusted Platform Module Library
+  Part 1: Architecture, Revision 01.16.
+
+  @param[in]  ResetType         The type of reset to perform.
+  @param[in]  ResetStatus       The status code for the reset.
+  @param[in]  DataSize          The size, in bytes, of ResetData.
+  @param[in]  ResetData         For a ResetType of EfiResetCold, EfiResetWarm, or
+                                EfiResetShutdown the data buffer starts with a Null-terminated
+                                string, optionally followed by additional binary data.
+                                The string is a description that the caller may use to further
+                                indicate the reason for the system reset. ResetData is only
+                                valid if ResetStatus is something other than EFI_SUCCESS
+                                unless the ResetType is EfiResetPlatformSpecific
+                                where a minimum amount of ResetData is always required.
+                                For a ResetType of EfiResetPlatformSpecific the data buffer
+                                also starts with a Null-terminated string that is followed
+                                by an EFI_GUID that describes the specific type of reset to perform.
+**/
+VOID
+EFIAPI
+ShutdownTpmOnReset (
+  IN EFI_RESET_TYPE           ResetType,
+  IN EFI_STATUS               ResetStatus,
+  IN UINTN                    DataSize,
+  IN VOID                     *ResetData OPTIONAL
+  )
+{
+  EFI_STATUS                  Status;
+  Status = Tpm2Shutdown (TPM_SU_CLEAR);
+  DEBUG ((DEBUG_VERBOSE, "Tpm2Shutdown (SU_CLEAR) - %r\n", Status));
+}
+
+/**
+  Hook the system reset to properly shutdown TPM.
+  It follow chapter "12.2.3 Startup State" in Trusted Platform Module Library
+  Part 1: Architecture, Revision 01.16.
+
+  @param[in]  Event     Event whose notification function is being invoked
+  @param[in]  Context   Pointer to the notification function's context
+**/
+VOID
+EFIAPI
+OnResetNotificationInstall (
+  IN EFI_EVENT                      Event,
+  IN VOID                           *Context
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_RESET_NOTIFICATION_PROTOCOL   *ResetNotify;
+
+  Status = gBS->LocateProtocol (&gEfiResetNotificationProtocolGuid, NULL, (VOID **) &ResetNotify);
+  if (!EFI_ERROR (Status)) {
+    Status = ResetNotify->RegisterResetNotify (ResetNotify, ShutdownTpmOnReset);
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((DEBUG_VERBOSE, "TCG2: Hook system reset to properly shutdown TPM.\n"));
+
+    gBS->CloseEvent (Event);
+  }
+}
+
+/**
   The function install Tcg2 protocol.
   
   @retval EFI_SUCCESS     Tcg2 protocol is installed.
@@ -2609,6 +2672,11 @@ DriverEntry (
     // may update SecureBoot value based on last setting.
     //
     EfiCreateProtocolNotifyEvent (&gEfiVariableWriteArchProtocolGuid, TPL_CALLBACK, MeasureSecureBootPolicy, NULL, &Registration);
+
+    //
+    // Hook the system reset to properly shutdown TPM.
+    //
+    EfiCreateProtocolNotifyEvent (&gEfiResetNotificationProtocolGuid, TPL_CALLBACK, OnResetNotificationInstall, NULL, &Registration);
   }
 
   //
