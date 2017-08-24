@@ -15,12 +15,12 @@
 **/
 
 #include <PiDxe.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DmaLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UncachedMemoryAllocationLib.h>
 #include <Library/IoLib.h>
 #include <Library/BaseMemoryLib.h>
 
@@ -35,16 +35,23 @@ typedef struct {
 } MAP_INFO_INSTANCE;
 
 
+typedef struct {
+  LIST_ENTRY          Link;
+  VOID                *HostAddress;
+  UINTN               NumPages;
+  UINT64              Attributes;
+} UNCACHED_ALLOCATION;
 
 STATIC EFI_CPU_ARCH_PROTOCOL      *mCpu;
+STATIC LIST_ENTRY                 UncachedAllocationList;
 
 STATIC
 PHYSICAL_ADDRESS
 HostToDeviceAddress (
-  IN  PHYSICAL_ADDRESS  HostAddress
+  IN  VOID      *Address
   )
 {
-  return HostAddress + PcdGet64 (PcdArmDmaDeviceOffset);
+  return (PHYSICAL_ADDRESS)(UINTN)Address + PcdGet64 (PcdArmDmaDeviceOffset);
 }
 
 /**
@@ -91,14 +98,7 @@ DmaMap (
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // The debug implementation of UncachedMemoryAllocationLib in ArmPkg returns
-  // a virtual uncached alias, and unmaps the cached ID mapping of the buffer,
-  // in order to catch inadvertent references to the cached mapping.
-  // Since HostToDeviceAddress () expects ID mapped input addresses, convert
-  // the host address to an ID mapped address first.
-  //
-  *DeviceAddress = HostToDeviceAddress (ConvertToPhysicalAddress (HostAddress));
+  *DeviceAddress = HostToDeviceAddress (HostAddress);
 
   // Remember range so we can flush on the other side
   Map = AllocatePool (sizeof (MAP_INFO_INSTANCE));
@@ -148,7 +148,7 @@ DmaMap (
       }
 
       Buffer = ALIGN_POINTER (Map->BufferAddress, mCpu->DmaBufferAlignment);
-      *DeviceAddress = HostToDeviceAddress (ConvertToPhysicalAddress (Buffer));
+      *DeviceAddress = HostToDeviceAddress (Buffer);
 
       //
       // Get rid of any dirty cachelines covering the double buffer. This
@@ -270,7 +270,7 @@ DmaUnmap (
   @param  HostAddress           A pointer to store the base system memory address of the
                                 allocated range.
 
-                                @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
   @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
                                 MEMORY_WRITE_COMBINE and MEMORY_CACHED.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
@@ -285,21 +285,20 @@ DmaAllocateBuffer (
   OUT VOID                         **HostAddress
   )
 {
-  VOID    *Allocation;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR   GcdDescriptor;
+  VOID                              *Allocation;
+  UINT64                            MemType;
+  UNCACHED_ALLOCATION               *Alloc;
+  EFI_STATUS                        Status;
 
   if (HostAddress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // The only valid memory types are EfiBootServicesData and EfiRuntimeServicesData
-  //
-  // We used uncached memory to keep coherency
-  //
   if (MemoryType == EfiBootServicesData) {
-    Allocation = UncachedAllocatePages (Pages);
+    Allocation = AllocatePages (Pages);
   } else if (MemoryType == EfiRuntimeServicesData) {
-    Allocation = UncachedAllocateRuntimePages (Pages);
+    Allocation = AllocateRuntimePages (Pages);
   } else {
     return EFI_INVALID_PARAMETER;
   }
@@ -308,9 +307,60 @@ DmaAllocateBuffer (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  // Get the cacheability of the region
+  Status = gDS->GetMemorySpaceDescriptor ((UINTN)Allocation, &GcdDescriptor);
+  if (EFI_ERROR(Status)) {
+    goto FreeBuffer;
+  }
+
+  // Choose a suitable uncached memory type that is supported by the region
+  if (GcdDescriptor.Capabilities & EFI_MEMORY_WC) {
+    MemType = EFI_MEMORY_WC;
+  } else if (GcdDescriptor.Capabilities & EFI_MEMORY_UC) {
+    MemType = EFI_MEMORY_UC;
+  } else {
+    Status = EFI_UNSUPPORTED;
+    goto FreeBuffer;
+  }
+
+  Alloc = AllocatePool (sizeof *Alloc);
+  if (Alloc == NULL) {
+    goto FreeBuffer;
+  }
+
+  Alloc->HostAddress = Allocation;
+  Alloc->NumPages = Pages;
+  Alloc->Attributes = GcdDescriptor.Attributes;
+
+  InsertHeadList (&UncachedAllocationList, &Alloc->Link);
+
+  // Remap the region with the new attributes
+  Status = gDS->SetMemorySpaceAttributes ((PHYSICAL_ADDRESS)(UINTN)Allocation,
+                                          EFI_PAGES_TO_SIZE (Pages),
+                                          MemType);
+  if (EFI_ERROR (Status)) {
+    goto FreeAlloc;
+  }
+
+  Status = mCpu->FlushDataCache (mCpu,
+                                 (PHYSICAL_ADDRESS)(UINTN)Allocation,
+                                 EFI_PAGES_TO_SIZE (Pages),
+                                 EfiCpuFlushTypeInvalidate);
+  if (EFI_ERROR (Status)) {
+    goto FreeAlloc;
+  }
+
   *HostAddress = Allocation;
 
   return EFI_SUCCESS;
+
+FreeAlloc:
+  RemoveEntryList (&Alloc->Link);
+  FreePool (Alloc);
+
+FreeBuffer:
+  FreePages (Allocation, Pages);
+  return Status;
 }
 
 
@@ -332,12 +382,49 @@ DmaFreeBuffer (
   IN  VOID                         *HostAddress
   )
 {
+  LIST_ENTRY                       *Link;
+  UNCACHED_ALLOCATION              *Alloc;
+  BOOLEAN                          Found;
+  EFI_STATUS                       Status;
+
   if (HostAddress == NULL) {
      return EFI_INVALID_PARAMETER;
   }
 
-  UncachedFreePages (HostAddress, Pages);
-  return EFI_SUCCESS;
+  for (Link = GetFirstNode (&UncachedAllocationList), Found = FALSE;
+       !IsNull (&UncachedAllocationList, Link);
+       Link = GetNextNode (&UncachedAllocationList, Link)) {
+
+    Alloc = BASE_CR (Link, UNCACHED_ALLOCATION, Link);
+    if (Alloc->HostAddress == HostAddress && Alloc->NumPages == Pages) {
+      Found = TRUE;
+      break;
+    }
+  }
+
+  if (!Found) {
+    ASSERT (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RemoveEntryList (&Alloc->Link);
+
+  Status = gDS->SetMemorySpaceAttributes ((PHYSICAL_ADDRESS)(UINTN)HostAddress,
+                                          EFI_PAGES_TO_SIZE (Pages),
+                                          Alloc->Attributes);
+  if (EFI_ERROR (Status)) {
+    goto FreeAlloc;
+  }
+
+  //
+  // If we fail to restore the original attributes, it is better to leak the
+  // memory than to return it to the heap
+  //
+  FreePages (HostAddress, Pages);
+
+FreeAlloc:
+  FreePool (Alloc);
+  return Status;
 }
 
 
@@ -348,12 +435,8 @@ ArmDmaLibConstructor (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  InitializeListHead (&UncachedAllocationList);
 
   // Get the Cpu protocol for later use
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
-  ASSERT_EFI_ERROR(Status);
-
-  return Status;
+  return gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
 }
-

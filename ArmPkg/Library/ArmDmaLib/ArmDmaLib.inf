@@ -34,7 +34,6 @@
   DxeServicesTableLib
   UefiBootServicesTableLib
   MemoryAllocationLib
-  UncachedMemoryAllocationLib
   IoLib
   BaseMemoryLib
 
