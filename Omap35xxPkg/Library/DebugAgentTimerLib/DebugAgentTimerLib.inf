@@ -44,3 +44,4 @@
 [Pcd]
   gOmap35xxTokenSpaceGuid.PcdOmap35xxDebugAgentTimer
   gOmap35xxTokenSpaceGuid.PcdDebugAgentTimerFreqNanoSeconds
+  gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress

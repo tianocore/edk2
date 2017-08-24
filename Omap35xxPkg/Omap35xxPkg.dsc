@@ -72,8 +72,6 @@
 
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
-  UncachedMemoryAllocationLib|ArmPkg/Library/UncachedMemoryAllocationLib/UncachedMemoryAllocationLib.inf
-
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
 
 
