@@ -285,20 +285,56 @@ DmaAllocateBuffer (
   OUT VOID                         **HostAddress
   )
 {
+  return DmaAllocateAlignedBuffer (MemoryType, Pages, 0, HostAddress);
+}
+
+/**
+  Allocates pages that are suitable for an DmaMap() of type
+  MapOperationBusMasterCommonBuffer mapping, at the requested alignment.
+
+  @param  MemoryType            The type of memory to allocate, EfiBootServicesData or
+                                EfiRuntimeServicesData.
+  @param  Pages                 The number of pages to allocate.
+  @param  Alignment             Alignment in bytes of the base of the returned
+                                buffer (must be a power of 2)
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+DmaAllocateAlignedBuffer (
+  IN  EFI_MEMORY_TYPE              MemoryType,
+  IN  UINTN                        Pages,
+  IN  UINTN                        Alignment,
+  OUT VOID                         **HostAddress
+  )
+{
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR   GcdDescriptor;
   VOID                              *Allocation;
   UINT64                            MemType;
   UNCACHED_ALLOCATION               *Alloc;
   EFI_STATUS                        Status;
 
-  if (HostAddress == NULL) {
+  if (Alignment == 0) {
+    Alignment = EFI_PAGE_SIZE;
+  }
+
+  if (HostAddress == NULL ||
+      (Alignment & (Alignment - 1)) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
   if (MemoryType == EfiBootServicesData) {
-    Allocation = AllocatePages (Pages);
+    Allocation = AllocateAlignedPages (Pages, Alignment);
   } else if (MemoryType == EfiRuntimeServicesData) {
-    Allocation = AllocateRuntimePages (Pages);
+    Allocation = AllocateAlignedRuntimePages (Pages, Alignment);
   } else {
     return EFI_INVALID_PARAMETER;
   }
