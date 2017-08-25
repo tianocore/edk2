@@ -118,16 +118,13 @@ if /I "%1"=="/?" goto Usage
 :set_PATH
   if defined WORKSPACE_TOOLS_PATH goto check_PATH
   if not defined EDK_TOOLS_BIN (
-    if exist %EDK_TOOLS_PATH%\Bin\Win32 (
-      set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
-    ) else (
-      set "PATH=%EDK_TOOLS_PATH%\Bin\Win32;%PATH%"
+    set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
+    if not exist %EDK_TOOLS_PATH%\Bin\Win32 (
       echo.
       echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
       echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
       echo. 
-      goto check_build_environment
     )
   )
   set PATH=%EDK_TOOLS_BIN%;%PATH%
@@ -137,16 +134,13 @@ if /I "%1"=="/?" goto Usage
 :check_PATH
   if "%EDK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto PATH_ok
   if not defined EDK_TOOLS_BIN (
-    if exist %EDK_TOOLS_PATH%\Bin\Win32 (
-      set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
-    ) else (
-      set "PATH=%EDK_TOOLS_PATH%\Bin\Win32;%PATH%"
+    set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
+    if not exist %EDK_TOOLS_PATH%\Bin\Win32 (
       echo.
       echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
       echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
       echo. 
-      goto check_build_environment
     )
   )
   set PATH=%EDK_TOOLS_BIN%;%PATH%
@@ -260,6 +254,7 @@ echo.
 if defined FORCE_REBUILD goto check_build_environment
 if defined REBUILD goto check_build_environment
 if not exist "%EDK_TOOLS_PATH%" goto check_build_environment
+if not exist "%EDK_TOOLS_BIN%"  goto check_build_environment
 
 IF NOT EXIST "%EDK_TOOLS_BIN%\BootSectImage.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\EfiLdrImage.exe" goto check_c_tools
