@@ -152,6 +152,132 @@ ReturnUefiMemoryMap (
 }
 
 /**
+  The scan bus callback function to always enable page attribute.
+
+  @param[in]  Context               The context of the callback.
+  @param[in]  Segment               The segment of the source.
+  @param[in]  Bus                   The bus of the source.
+  @param[in]  Device                The device of the source.
+  @param[in]  Function              The function of the source.
+
+  @retval EFI_SUCCESS           The VTd entry is updated to always enable all DMA access for the specific device.
+**/
+EFI_STATUS
+EFIAPI
+ScanBusCallbackAlwaysEnablePageAttribute (
+  IN VOID           *Context,
+  IN UINT16         Segment,
+  IN UINT8          Bus,
+  IN UINT8          Device,
+  IN UINT8          Function
+  )
+{
+  VTD_SOURCE_ID           SourceId;
+  EFI_STATUS              Status;
+
+  SourceId.Bits.Bus = Bus;
+  SourceId.Bits.Device = Device;
+  SourceId.Bits.Function = Function;
+  Status = AlwaysEnablePageAttribute (Segment, SourceId);
+  return Status;
+}
+
+/**
+  Always enable the VTd page attribute for the device in the DeviceScope.
+
+  @param[in]  DeviceScope  the input device scope data structure
+
+  @retval EFI_SUCCESS           The VTd entry is updated to always enable all DMA access for the specific device in the device scope.
+**/
+EFI_STATUS
+AlwaysEnablePageAttributeDeviceScope (
+  IN  EDKII_PLATFORM_VTD_DEVICE_SCOPE   *DeviceScope
+  )
+{
+  UINT8                             Bus;
+  UINT8                             Device;
+  UINT8                             Function;
+  VTD_SOURCE_ID                     SourceId;
+  UINT8                             SecondaryBusNumber;
+  EFI_STATUS                        Status;
+
+  Status = GetPciBusDeviceFunction (DeviceScope->SegmentNumber, &DeviceScope->DeviceScope, &Bus, &Device, &Function);
+
+  if (DeviceScope->DeviceScope.Type == EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_BRIDGE) {
+    //
+    // Need scan the bridge and add all devices.
+    //
+    SecondaryBusNumber = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(DeviceScope->SegmentNumber, Bus, Device, Function, PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET));
+    Status = ScanPciBus (NULL, DeviceScope->SegmentNumber, SecondaryBusNumber, ScanBusCallbackAlwaysEnablePageAttribute);
+    return Status;
+  } else {
+    SourceId.Bits.Bus      = Bus;
+    SourceId.Bits.Device   = Device;
+    SourceId.Bits.Function = Function;
+    Status = AlwaysEnablePageAttribute (DeviceScope->SegmentNumber, SourceId);
+    return Status;
+  }
+}
+
+/**
+  Always enable the VTd page attribute for the device matching DeviceId.
+
+  @param[in]  PciDeviceId  the input PCI device ID
+
+  @retval EFI_SUCCESS           The VTd entry is updated to always enable all DMA access for the specific device matching DeviceId.
+**/
+EFI_STATUS
+AlwaysEnablePageAttributePciDeviceId (
+  IN  EDKII_PLATFORM_VTD_PCI_DEVICE_ID   *PciDeviceId
+  )
+{
+  UINTN            VtdIndex;
+  UINTN            PciIndex;
+  PCI_DEVICE_DATA  *PciDeviceData;
+  EFI_STATUS       Status;
+
+  for (VtdIndex = 0; VtdIndex < mVtdUnitNumber; VtdIndex++) {
+    for (PciIndex = 0; PciIndex < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceDataNumber; PciIndex++) {
+      PciDeviceData = &mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[PciIndex];
+
+      if (((PciDeviceId->VendorId == 0xFFFF) || (PciDeviceId->VendorId == PciDeviceData->PciDeviceId.VendorId)) &&
+          ((PciDeviceId->DeviceId == 0xFFFF) || (PciDeviceId->DeviceId == PciDeviceData->PciDeviceId.DeviceId)) &&
+          ((PciDeviceId->RevisionId == 0xFF) || (PciDeviceId->RevisionId == PciDeviceData->PciDeviceId.RevisionId)) &&
+          ((PciDeviceId->SubsystemVendorId == 0xFFFF) || (PciDeviceId->SubsystemVendorId == PciDeviceData->PciDeviceId.SubsystemVendorId)) &&
+          ((PciDeviceId->SubsystemDeviceId == 0xFFFF) || (PciDeviceId->SubsystemDeviceId == PciDeviceData->PciDeviceId.SubsystemDeviceId)) ) {
+        Status = AlwaysEnablePageAttribute (mVtdUnitInformation[VtdIndex].Segment, PciDeviceData->PciSourceId);
+        if (EFI_ERROR(Status)) {
+          continue;
+        }
+      }
+    }
+  }
+  return EFI_SUCCESS;
+}
+
+/**
+  Always enable the VTd page attribute for the device.
+
+  @param[in]  DeviceInfo  the exception device information
+
+  @retval EFI_SUCCESS           The VTd entry is updated to always enable all DMA access for the specific device in the device info.
+**/
+EFI_STATUS
+AlwaysEnablePageAttributeExceptionDeviceInfo (
+  IN  EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO   *DeviceInfo
+  )
+{
+  switch (DeviceInfo->Type) {
+  case EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_DEVICE_SCOPE:
+    return AlwaysEnablePageAttributeDeviceScope ((VOID *)(DeviceInfo + 1));
+  case EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_PCI_DEVICE_ID:
+    return AlwaysEnablePageAttributePciDeviceId ((VOID *)(DeviceInfo + 1));
+  default:
+    return EFI_UNSUPPORTED;
+  }
+}
+
+/**
   Initialize platform VTd policy.
 **/
 VOID
@@ -159,10 +285,11 @@ InitializePlatformVTdPolicy (
   VOID
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             DeviceInfoCount;
-  EDKII_PLATFORM_VTD_DEVICE_INFO    *DeviceInfo;
-  UINTN                             Index;
+  EFI_STATUS                               Status;
+  UINTN                                    DeviceInfoCount;
+  VOID                                     *DeviceInfo;
+  EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO *ThisDeviceInfo;
+  UINTN                                    Index;
 
   //
   // It is optional.
@@ -173,10 +300,16 @@ InitializePlatformVTdPolicy (
                   (VOID **)&mPlatformVTdPolicy
                   );
   if (!EFI_ERROR(Status)) {
+    DEBUG ((DEBUG_INFO, "InitializePlatformVTdPolicy\n"));
     Status = mPlatformVTdPolicy->GetExceptionDeviceList (mPlatformVTdPolicy, &DeviceInfoCount, &DeviceInfo);
     if (!EFI_ERROR(Status)) {
+      ThisDeviceInfo = DeviceInfo;
       for (Index = 0; Index < DeviceInfoCount; Index++) {
-        AlwaysEnablePageAttribute (DeviceInfo[Index].Segment, DeviceInfo[Index].SourceId);
+        if (ThisDeviceInfo->Type == EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_END) {
+          break;
+        }
+        AlwaysEnablePageAttributeExceptionDeviceInfo (ThisDeviceInfo);
+        ThisDeviceInfo = (VOID *)((UINTN)ThisDeviceInfo + ThisDeviceInfo->Length);
       }
       FreePool (DeviceInfo);
     }

@@ -86,16 +86,16 @@ CreateContextEntry (
   VTD_ROOT_ENTRY         *RootEntry;
   VTD_CONTEXT_ENTRY      *ContextEntryTable;
   VTD_CONTEXT_ENTRY      *ContextEntry;
-  VTD_SOURCE_ID          *PciDescriptor;
+  VTD_SOURCE_ID          *PciSourceId;
   VTD_SOURCE_ID          SourceId;
   UINTN                  MaxBusNumber;
   UINTN                  EntryTablePages;
 
   MaxBusNumber = 0;
-  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptorNumber; Index++) {
-    PciDescriptor = &mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index];
-    if (PciDescriptor->Bits.Bus > MaxBusNumber) {
-      MaxBusNumber = PciDescriptor->Bits.Bus;
+  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceDataNumber; Index++) {
+    PciSourceId = &mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[Index].PciSourceId;
+    if (PciSourceId->Bits.Bus > MaxBusNumber) {
+      MaxBusNumber = PciSourceId->Bits.Bus;
     }
   }
   DEBUG ((DEBUG_INFO,"  MaxBusNumber - 0x%x\n", MaxBusNumber));
@@ -111,12 +111,12 @@ CreateContextEntry (
   mVtdUnitInformation[VtdIndex].RootEntryTable = (VTD_ROOT_ENTRY *)Buffer;
   Buffer = (UINT8 *)Buffer + EFI_PAGES_TO_SIZE (RootPages);
 
-  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptorNumber; Index++) {
-    PciDescriptor = &mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index];
+  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceDataNumber; Index++) {
+    PciSourceId = &mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[Index].PciSourceId;
 
-    SourceId.Bits.Bus = PciDescriptor->Bits.Bus;
-    SourceId.Bits.Device = PciDescriptor->Bits.Device;
-    SourceId.Bits.Function = PciDescriptor->Bits.Function;
+    SourceId.Bits.Bus = PciSourceId->Bits.Bus;
+    SourceId.Bits.Device = PciSourceId->Bits.Device;
+    SourceId.Bits.Function = PciSourceId->Bits.Function;
 
     RootEntry = &mVtdUnitInformation[VtdIndex].RootEntryTable[SourceId.Index.RootIndex];
     if (RootEntry->Bits.Present == 0) {
@@ -886,7 +886,7 @@ SetAccessAttribute (
   VTD_CONTEXT_ENTRY             *ContextEntry;
   VTD_SECOND_LEVEL_PAGING_ENTRY *SecondLevelPagingEntry;
   UINT64                        Pt;
-  UINTN                         PciDescriptorIndex;
+  UINTN                         PciDataIndex;
   UINT16                        DomainIdentifier;
 
   SecondLevelPagingEntry = NULL;
@@ -899,12 +899,12 @@ SetAccessAttribute (
     return EFI_DEVICE_ERROR;
   }
 
-  PciDescriptorIndex = GetPciDescriptor (VtdIndex, Segment, SourceId);
-  mVtdUnitInformation[VtdIndex].PciDeviceInfo.AccessCount[PciDescriptorIndex]++;
+  PciDataIndex = GetPciDataIndex (VtdIndex, Segment, SourceId);
+  mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[PciDataIndex].AccessCount++;
   //
   // DomainId should not be 0.
   //
-  DomainIdentifier = (UINT16)(PciDescriptorIndex + 1);
+  DomainIdentifier = (UINT16)(PciDataIndex + 1);
 
   if (ExtContextEntry != NULL) {
     if (ExtContextEntry->Bits.Present == 0) {

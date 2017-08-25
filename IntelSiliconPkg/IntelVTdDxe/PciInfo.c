@@ -14,32 +14,34 @@
 #include "DmaProtection.h"
 
 /**
-  Return the index of PCI descriptor.
+  Return the index of PCI data.
 
   @param[in]  VtdIndex          The index used to identify a VTd engine.
   @param[in]  Segment           The Segment used to identify a VTd engine.
   @param[in]  SourceId          The SourceId used to identify a VTd engine and table entry.
 
-  @return The index of the PCI descriptor.
-  @retval (UINTN)-1  The PCI descriptor is not found.
+  @return The index of the PCI data.
+  @retval (UINTN)-1  The PCI data is not found.
 **/
 UINTN
-GetPciDescriptor (
+GetPciDataIndex (
   IN UINTN          VtdIndex,
   IN UINT16         Segment,
   IN VTD_SOURCE_ID  SourceId
   )
 {
-  UINTN  Index;
+  UINTN          Index;
+  VTD_SOURCE_ID  *PciSourceId;
 
   if (Segment != mVtdUnitInformation[VtdIndex].Segment) {
     return (UINTN)-1;
   }
 
-  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptorNumber; Index++) {
-    if ((mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index].Bits.Bus == SourceId.Bits.Bus) &&
-        (mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index].Bits.Device == SourceId.Bits.Device) &&
-        (mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index].Bits.Function == SourceId.Bits.Function) ) {
+  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceDataNumber; Index++) {
+    PciSourceId = &mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[Index].PciSourceId;
+    if ((PciSourceId->Bits.Bus == SourceId.Bits.Bus) &&
+        (PciSourceId->Bits.Device == SourceId.Bits.Device) &&
+        (PciSourceId->Bits.Function == SourceId.Bits.Function) ) {
       return Index;
     }
   }
@@ -48,13 +50,12 @@ GetPciDescriptor (
 }
 
 /**
-  Register PCI device to VTd engine as PCI descriptor.
+  Register PCI device to VTd engine.
 
   @param[in]  VtdIndex              The index of VTd engine.
   @param[in]  Segment               The segment of the source.
   @param[in]  SourceId              The SourceId of the source.
-  @param[in]  IsRealPciDevice       TRUE: It is a real PCI device.
-                                    FALSE: It is not a real PCI device.
+  @param[in]  DeviceType            The DMAR device scope type.
   @param[in]  CheckExist            TRUE: ERROR will be returned if the PCI device is already registered.
                                     FALSE: SUCCESS will be returned if the PCI device is registered.
 
@@ -67,17 +68,16 @@ RegisterPciDevice (
   IN UINTN          VtdIndex,
   IN UINT16         Segment,
   IN VTD_SOURCE_ID  SourceId,
-  IN BOOLEAN        IsRealPciDevice,
+  IN UINT8          DeviceType,
   IN BOOLEAN        CheckExist
   )
 {
-  PCI_DEVICE_INFORMATION  *PciDeviceInfo;
-  VTD_SOURCE_ID           *PciDescriptor;
-  UINTN                   PciDescriptorIndex;
-  UINTN                   Index;
-  BOOLEAN                 *NewIsRealPciDevice;
-  VTD_SOURCE_ID           *NewPciDescriptors;
-  UINTN                   *NewAccessCount;
+  PCI_DEVICE_INFORMATION           *PciDeviceInfo;
+  VTD_SOURCE_ID                    *PciSourceId;
+  UINTN                            PciDataIndex;
+  UINTN                            Index;
+  PCI_DEVICE_DATA                  *NewPciDeviceData;
+  EDKII_PLATFORM_VTD_PCI_DEVICE_ID *PciDeviceId;
 
   PciDeviceInfo = &mVtdUnitInformation[VtdIndex].PciDeviceInfo;
 
@@ -86,72 +86,71 @@ RegisterPciDevice (
     // Do not register device in other VTD Unit
     //
     for (Index = 0; Index < VtdIndex; Index++) {
-      PciDescriptorIndex = GetPciDescriptor (Index, Segment, SourceId);
-      if (PciDescriptorIndex != (UINTN)-1) {
+      PciDataIndex = GetPciDataIndex (Index, Segment, SourceId);
+      if (PciDataIndex != (UINTN)-1) {
         DEBUG ((DEBUG_INFO, "  RegisterPciDevice: PCI S%04x B%02x D%02x F%02x already registered by Other Vtd(%d)\n", Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function, Index));
         return EFI_SUCCESS;
       }
     }
   }
 
-  PciDescriptorIndex = GetPciDescriptor (VtdIndex, Segment, SourceId);
-  if (PciDescriptorIndex == (UINTN)-1) {
+  PciDataIndex = GetPciDataIndex (VtdIndex, Segment, SourceId);
+  if (PciDataIndex == (UINTN)-1) {
     //
     // Register new
     //
 
-    if (PciDeviceInfo->PciDescriptorNumber >= PciDeviceInfo->PciDescriptorMaxNumber) {
+    if (PciDeviceInfo->PciDeviceDataNumber >= PciDeviceInfo->PciDeviceDataMaxNumber) {
       //
       // Reallocate
       //
-      NewIsRealPciDevice = AllocateZeroPool (sizeof(*NewIsRealPciDevice) * (PciDeviceInfo->PciDescriptorMaxNumber + MAX_PCI_DESCRIPTORS));
-      if (NewIsRealPciDevice == NULL) {
+      NewPciDeviceData = AllocateZeroPool (sizeof(*NewPciDeviceData) * (PciDeviceInfo->PciDeviceDataMaxNumber + MAX_VTD_PCI_DATA_NUMBER));
+      if (NewPciDeviceData == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      NewPciDescriptors = AllocateZeroPool (sizeof(*NewPciDescriptors) * (PciDeviceInfo->PciDescriptorMaxNumber + MAX_PCI_DESCRIPTORS));
-      if (NewPciDescriptors == NULL) {
-        FreePool (NewIsRealPciDevice);
-        return EFI_OUT_OF_RESOURCES;
+      PciDeviceInfo->PciDeviceDataMaxNumber += MAX_VTD_PCI_DATA_NUMBER;
+      if (PciDeviceInfo->PciDeviceData != NULL) {
+        CopyMem (NewPciDeviceData, PciDeviceInfo->PciDeviceData, sizeof(*NewPciDeviceData) * PciDeviceInfo->PciDeviceDataNumber);
+        FreePool (PciDeviceInfo->PciDeviceData);
       }
-      NewAccessCount = AllocateZeroPool (sizeof(*NewAccessCount) * (PciDeviceInfo->PciDescriptorMaxNumber + MAX_PCI_DESCRIPTORS));
-      if (NewAccessCount == NULL) {
-        FreePool (NewIsRealPciDevice);
-        FreePool (NewPciDescriptors);
-        return EFI_OUT_OF_RESOURCES;
-      }
-      PciDeviceInfo->PciDescriptorMaxNumber += MAX_PCI_DESCRIPTORS;
-      if (PciDeviceInfo->IsRealPciDevice != NULL) {
-        CopyMem (NewIsRealPciDevice, PciDeviceInfo->IsRealPciDevice, sizeof(*NewIsRealPciDevice) * PciDeviceInfo->PciDescriptorNumber);
-        FreePool (PciDeviceInfo->IsRealPciDevice);
-      }
-      PciDeviceInfo->IsRealPciDevice = NewIsRealPciDevice;
-      if (PciDeviceInfo->PciDescriptors != NULL) {
-        CopyMem (NewPciDescriptors, PciDeviceInfo->PciDescriptors, sizeof(*NewPciDescriptors) * PciDeviceInfo->PciDescriptorNumber);
-        FreePool (PciDeviceInfo->PciDescriptors);
-      }
-      PciDeviceInfo->PciDescriptors = NewPciDescriptors;
-      if (PciDeviceInfo->AccessCount != NULL) {
-        CopyMem (NewAccessCount, PciDeviceInfo->AccessCount, sizeof(*NewAccessCount) * PciDeviceInfo->PciDescriptorNumber);
-        FreePool (PciDeviceInfo->AccessCount);
-      }
-      PciDeviceInfo->AccessCount = NewAccessCount;
+      PciDeviceInfo->PciDeviceData = NewPciDeviceData;
     }
 
-    ASSERT (PciDeviceInfo->PciDescriptorNumber < PciDeviceInfo->PciDescriptorMaxNumber);
+    ASSERT (PciDeviceInfo->PciDeviceDataNumber < PciDeviceInfo->PciDeviceDataMaxNumber);
 
-    PciDescriptor = &PciDeviceInfo->PciDescriptors[PciDeviceInfo->PciDescriptorNumber];
-    PciDescriptor->Bits.Bus = SourceId.Bits.Bus;
-    PciDescriptor->Bits.Device = SourceId.Bits.Device;
-    PciDescriptor->Bits.Function = SourceId.Bits.Function;
-    PciDeviceInfo->IsRealPciDevice[PciDeviceInfo->PciDescriptorNumber] = IsRealPciDevice;
-
-    PciDeviceInfo->PciDescriptorNumber++;
+    PciSourceId = &PciDeviceInfo->PciDeviceData[PciDeviceInfo->PciDeviceDataNumber].PciSourceId;
+    PciSourceId->Bits.Bus = SourceId.Bits.Bus;
+    PciSourceId->Bits.Device = SourceId.Bits.Device;
+    PciSourceId->Bits.Function = SourceId.Bits.Function;
 
     DEBUG ((DEBUG_INFO, "  RegisterPciDevice: PCI S%04x B%02x D%02x F%02x", Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
-    if (!IsRealPciDevice) {
+
+    PciDeviceId = &PciDeviceInfo->PciDeviceData[PciDeviceInfo->PciDeviceDataNumber].PciDeviceId;
+    if ((DeviceType == EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_ENDPOINT) ||
+        (DeviceType == EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_BRIDGE)) {
+      PciDeviceId->VendorId   = PciSegmentRead16 (PCI_SEGMENT_LIB_ADDRESS(Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function, PCI_VENDOR_ID_OFFSET));
+      PciDeviceId->DeviceId   = PciSegmentRead16 (PCI_SEGMENT_LIB_ADDRESS(Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function, PCI_DEVICE_ID_OFFSET));
+      PciDeviceId->RevisionId = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function, PCI_REVISION_ID_OFFSET));
+
+      DEBUG ((DEBUG_INFO, " (%04x:%04x:%02x", PciDeviceId->VendorId, PciDeviceId->DeviceId, PciDeviceId->RevisionId));
+
+      if (DeviceType == EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_ENDPOINT) {
+        PciDeviceId->SubsystemVendorId = PciSegmentRead16 (PCI_SEGMENT_LIB_ADDRESS(Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function, PCI_SUBSYSTEM_VENDOR_ID_OFFSET));
+        PciDeviceId->SubsystemDeviceId = PciSegmentRead16 (PCI_SEGMENT_LIB_ADDRESS(Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function, PCI_SUBSYSTEM_ID_OFFSET));
+        DEBUG ((DEBUG_INFO, ":%04x:%04x", PciDeviceId->SubsystemVendorId, PciDeviceId->SubsystemDeviceId));
+      }
+      DEBUG ((DEBUG_INFO, ")"));
+    }
+
+    PciDeviceInfo->PciDeviceData[PciDeviceInfo->PciDeviceDataNumber].DeviceType = DeviceType;
+
+    if ((DeviceType != EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_ENDPOINT) &&
+        (DeviceType != EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_BRIDGE)) {
       DEBUG ((DEBUG_INFO, " (*)"));
     }
     DEBUG ((DEBUG_INFO, "\n"));
+
+    PciDeviceInfo->PciDeviceDataNumber++;
   } else {
     if (CheckExist) {
       DEBUG ((DEBUG_INFO, "  RegisterPciDevice: PCI S%04x B%02x D%02x F%02x already registered\n", Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
@@ -163,20 +162,67 @@ RegisterPciDevice (
 }
 
 /**
-  Scan PCI bus and register PCI devices under the bus.
+  The scan bus callback function to register PCI device.
 
-  @param[in]  VtdIndex              The index of VTd engine.
+  @param[in]  Context               The context of the callback.
   @param[in]  Segment               The segment of the source.
   @param[in]  Bus                   The bus of the source.
+  @param[in]  Device                The device of the source.
+  @param[in]  Function              The function of the source.
 
-  @retval EFI_SUCCESS           The PCI devices under the bus are registered.
-  @retval EFI_OUT_OF_RESOURCES  No enough resource to register a new PCI device.
+  @retval EFI_SUCCESS           The PCI device is registered.
+**/
+EFI_STATUS
+EFIAPI
+ScanBusCallbackRegisterPciDevice (
+  IN VOID           *Context,
+  IN UINT16         Segment,
+  IN UINT8          Bus,
+  IN UINT8          Device,
+  IN UINT8          Function
+  )
+{
+  VTD_SOURCE_ID           SourceId;
+  UINTN                   VtdIndex;
+  UINT8                   BaseClass;
+  UINT8                   SubClass;
+  UINT8                   DeviceType;
+  EFI_STATUS              Status;
+
+  VtdIndex = (UINTN)Context;
+  SourceId.Bits.Bus = Bus;
+  SourceId.Bits.Device = Device;
+  SourceId.Bits.Function = Function;
+
+  DeviceType = EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_ENDPOINT;
+  BaseClass = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, Function, PCI_CLASSCODE_OFFSET + 2));
+  if (BaseClass == PCI_CLASS_BRIDGE) {
+    SubClass = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, Function, PCI_CLASSCODE_OFFSET + 1));
+    if (SubClass == PCI_CLASS_BRIDGE_P2P) {
+      DeviceType = EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_BRIDGE;
+    }
+  }
+
+  Status = RegisterPciDevice (VtdIndex, Segment, SourceId, DeviceType, FALSE);
+  return Status;
+}
+
+/**
+  Scan PCI bus and invoke callback function for each PCI devices under the bus.
+
+  @param[in]  Context               The context of the callback function.
+  @param[in]  Segment               The segment of the source.
+  @param[in]  Bus                   The bus of the source.
+  @param[in]  Callback              The callback function in PCI scan.
+
+  @retval EFI_SUCCESS           The PCI devices under the bus are scaned.
 **/
 EFI_STATUS
 ScanPciBus (
-  IN UINTN          VtdIndex,
-  IN UINT16         Segment,
-  IN UINT8          Bus
+  IN VOID                         *Context,
+  IN UINT16                       Segment,
+  IN UINT8                        Bus,
+  IN SCAN_BUS_FUNC_CALLBACK_FUNC  Callback
   )
 {
   UINT8                   Device;
@@ -189,7 +235,6 @@ ScanPciBus (
   UINT16                  VendorID;
   UINT16                  DeviceID;
   EFI_STATUS              Status;
-  VTD_SOURCE_ID           SourceId;
 
   // Scan the PCI bus for devices
   for (Device = 0; Device < PCI_MAX_DEVICE + 1; Device++) {
@@ -205,10 +250,7 @@ ScanPciBus (
         continue;
       }
 
-      SourceId.Bits.Bus = Bus;
-      SourceId.Bits.Device = Device;
-      SourceId.Bits.Function = Function;
-      Status = RegisterPciDevice (VtdIndex, Segment, SourceId, TRUE, FALSE);
+      Status = Callback (Context, Segment, Bus, Device, Function);
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -220,7 +262,7 @@ ScanPciBus (
           SecondaryBusNumber = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, Function, PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET));
           DEBUG ((DEBUG_INFO,"  ScanPciBus: PCI bridge S%04x B%02x D%02x F%02x (SecondBus:%02x)\n", Segment, Bus, Device, Function, SecondaryBusNumber));
           if (SecondaryBusNumber != 0) {
-            Status = ScanPciBus (VtdIndex, Segment, SecondaryBusNumber);
+            Status = ScanPciBus (Context, Segment, SecondaryBusNumber, Callback);
             if (EFI_ERROR (Status)) {
               return Status;
             }
@@ -246,15 +288,15 @@ DumpPciDeviceInfo (
   UINTN  Index;
 
   DEBUG ((DEBUG_INFO,"PCI Device Information (Number 0x%x, IncludeAll - %d):\n",
-    mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptorNumber,
+    mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceDataNumber,
     mVtdUnitInformation[VtdIndex].PciDeviceInfo.IncludeAllFlag
     ));
-  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptorNumber; Index++) {
+  for (Index = 0; Index < mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceDataNumber; Index++) {
     DEBUG ((DEBUG_INFO,"  S%04x B%02x D%02x F%02x\n",
       mVtdUnitInformation[VtdIndex].Segment,
-      mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index].Bits.Bus,
-      mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index].Bits.Device,
-      mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDescriptors[Index].Bits.Function
+      mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[Index].PciSourceId.Bits.Bus,
+      mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[Index].PciSourceId.Bits.Device,
+      mVtdUnitInformation[VtdIndex].PciDeviceInfo.PciDeviceData[Index].PciSourceId.Bits.Function
       ));
   }
 }
@@ -267,8 +309,8 @@ DumpPciDeviceInfo (
   @param[out] ExtContextEntry       The ExtContextEntry of the source.
   @param[out] ContextEntry          The ContextEntry of the source.
 
-  @return The index of the PCI descriptor.
-  @retval (UINTN)-1  The PCI descriptor is not found.
+  @return The index of the VTd engine.
+  @retval (UINTN)-1  The VTd engine is not found.
 **/
 UINTN
 FindVtdIndexByPciDevice (
@@ -285,15 +327,15 @@ FindVtdIndexByPciDevice (
   VTD_EXT_ROOT_ENTRY      *ExtRootEntry;
   VTD_EXT_CONTEXT_ENTRY   *ExtContextEntryTable;
   VTD_EXT_CONTEXT_ENTRY   *ThisExtContextEntry;
-  UINTN                   PciDescriptorIndex;
+  UINTN                   PciDataIndex;
 
   for (VtdIndex = 0; VtdIndex < mVtdUnitNumber; VtdIndex++) {
     if (Segment != mVtdUnitInformation[VtdIndex].Segment) {
       continue;
     }
 
-    PciDescriptorIndex = GetPciDescriptor (VtdIndex, Segment, SourceId);
-    if (PciDescriptorIndex == (UINTN)-1) {
+    PciDataIndex = GetPciDataIndex (VtdIndex, Segment, SourceId);
+    if (PciDataIndex == (UINTN)-1) {
       continue;
     }
 
