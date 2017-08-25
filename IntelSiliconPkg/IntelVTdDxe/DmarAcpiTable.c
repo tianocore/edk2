@@ -49,7 +49,11 @@ DumpDmarDeviceScopeEntry (
 
   DEBUG ((DEBUG_INFO,
     "    *************************************************************************\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "    *       DMA-Remapping Device Scope Entry Structure                      *\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "    *************************************************************************\n"
     ));
   DEBUG ((DEBUG_INFO,
@@ -140,7 +144,11 @@ DumpDmarAndd (
 
   DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  *       ACPI Name-space Device Declaration Structure                      *\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
     ));
   DEBUG ((DEBUG_INFO,
@@ -189,7 +197,11 @@ DumpDmarRhsa (
 
   DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  *       Remapping Hardware Status Affinity Structure                      *\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
     ));
   DEBUG ((DEBUG_INFO,
@@ -241,7 +253,11 @@ DumpDmarAtsr (
 
   DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  *       Root Port ATS Capability Reporting Structure                      *\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
     ));
   DEBUG ((DEBUG_INFO,
@@ -305,7 +321,11 @@ DumpDmarRmrr (
 
   DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  *       Reserved Memory Region Reporting Structure                        *\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
     ));
   DEBUG ((DEBUG_INFO,
@@ -369,7 +389,11 @@ DumpDmarDrhd (
 
   DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  *       DMA-Remapping Hardware Definition Structure                       *\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "  ***************************************************************************\n"
     ));
   DEBUG ((DEBUG_INFO,
@@ -440,7 +464,11 @@ DumpAcpiDMAR (
   //
   DEBUG ((DEBUG_INFO,
     "*****************************************************************************\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "*         DMAR Table                                                        *\n"
+    ));
+  DEBUG ((DEBUG_INFO,
     "*****************************************************************************\n"
     ));
 
@@ -548,11 +576,11 @@ GetPciBusDeviceFunction (
   switch (DmarDevScopeEntry->Type) {
   case EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_ENDPOINT:
   case EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_BRIDGE:
-    while ((UINTN)DmarPciPath < (UINTN)DmarDevScopeEntry + DmarDevScopeEntry->Length) {
+    while ((UINTN)DmarPciPath + sizeof(EFI_ACPI_DMAR_PCI_PATH) < (UINTN)DmarDevScopeEntry + DmarDevScopeEntry->Length) {
       MyBus = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(Segment, MyBus, MyDevice, MyFunction, PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET));
+      DmarPciPath ++;
       MyDevice = DmarPciPath->Device;
       MyFunction = DmarPciPath->Function;
-      DmarPciPath ++;
     }
     break;
   case EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_IOAPIC:
@@ -589,7 +617,6 @@ ProcessDhrd (
   UINT8                                             SecondaryBusNumber;
   EFI_STATUS                                        Status;
   VTD_SOURCE_ID                                     SourceId;
-  BOOLEAN                                           IsRealPciDevice;
 
   mVtdUnitInformation[VtdIndex].VtdUnitBaseAddress = (UINTN)DmarDrhd->RegisterBaseAddress;
   DEBUG ((DEBUG_INFO,"  VTD (%d) BaseAddress -  0x%016lx\n", VtdIndex, DmarDrhd->RegisterBaseAddress));
@@ -600,7 +627,7 @@ ProcessDhrd (
     mVtdUnitInformation[VtdIndex].PciDeviceInfo.IncludeAllFlag = TRUE;
     DEBUG ((DEBUG_INFO,"  ProcessDhrd: with INCLUDE ALL\n"));
 
-    Status = ScanPciBus(VtdIndex, DmarDrhd->SegmentNumber, 0);
+    Status = ScanPciBus((VOID *)VtdIndex, DmarDrhd->SegmentNumber, 0, ScanBusCallbackRegisterPciDevice);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -615,15 +642,6 @@ ProcessDhrd (
     Status = GetPciBusDeviceFunction (DmarDrhd->SegmentNumber, DmarDevScopeEntry, &Bus, &Device, &Function);
     if (EFI_ERROR (Status)) {
       return Status;
-    }
-    switch (DmarDevScopeEntry->Type) {
-    case EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_ENDPOINT:
-    case EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_BRIDGE:
-      IsRealPciDevice = TRUE;
-      break;
-    default:
-      IsRealPciDevice = FALSE;
-      break;
     }
 
     DEBUG ((DEBUG_INFO,"  ProcessDhrd: "));
@@ -650,7 +668,7 @@ ProcessDhrd (
     SourceId.Bits.Device = Device;
     SourceId.Bits.Function = Function;
 
-    Status = RegisterPciDevice (VtdIndex, DmarDrhd->SegmentNumber, SourceId, IsRealPciDevice, TRUE);
+    Status = RegisterPciDevice (VtdIndex, DmarDrhd->SegmentNumber, SourceId, DmarDevScopeEntry->Type, TRUE);
     if (EFI_ERROR (Status)) {
       //
       // There might be duplication for special device other than standard PCI device.
@@ -665,7 +683,7 @@ ProcessDhrd (
     switch (DmarDevScopeEntry->Type) {
     case EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_BRIDGE:
       SecondaryBusNumber = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(DmarDrhd->SegmentNumber, Bus, Device, Function, PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET));
-      Status = ScanPciBus (VtdIndex, DmarDrhd->SegmentNumber, SecondaryBusNumber);
+      Status = ScanPciBus ((VOID *)VtdIndex, DmarDrhd->SegmentNumber, SecondaryBusNumber, ScanBusCallbackRegisterPciDevice);
       if (EFI_ERROR (Status)) {
         return Status;
       }

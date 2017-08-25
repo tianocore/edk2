@@ -187,8 +187,8 @@ PrepareVtdConfig (
     }
 
     DomainNumber = (UINTN)1 << (UINT8)((UINTN)mVtdUnitInformation[Index].CapReg.Bits.ND * 2 + 4);
-    if (mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptorNumber >= DomainNumber) {
-      DEBUG((DEBUG_ERROR, "!!!! Pci device Number(0x%x) >= DomainNumber(0x%x) !!!!\n", mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptorNumber, DomainNumber));
+    if (mVtdUnitInformation[Index].PciDeviceInfo.PciDeviceDataNumber >= DomainNumber) {
+      DEBUG((DEBUG_ERROR, "!!!! Pci device Number(0x%x) >= DomainNumber(0x%x) !!!!\n", mVtdUnitInformation[Index].PciDeviceInfo.PciDeviceDataNumber, DomainNumber));
       return ;
     }
   }
@@ -305,13 +305,13 @@ DisableDmar (
 
   for (Index = 0; Index < mVtdUnitNumber; Index++) {
     DEBUG((DEBUG_INFO, "engine [%d] access\n", Index));
-    for (SubIndex = 0; SubIndex < mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptorNumber; SubIndex++) {
+    for (SubIndex = 0; SubIndex < mVtdUnitInformation[Index].PciDeviceInfo.PciDeviceDataNumber; SubIndex++) {
       DEBUG ((DEBUG_INFO, "  PCI S%04X B%02x D%02x F%02x - %d\n",
         mVtdUnitInformation[Index].Segment,
-        mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptors[SubIndex].Bits.Bus,
-        mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptors[SubIndex].Bits.Device,
-        mVtdUnitInformation[Index].PciDeviceInfo.PciDescriptors[SubIndex].Bits.Function,
-        mVtdUnitInformation[Index].PciDeviceInfo.AccessCount[SubIndex]
+        mVtdUnitInformation[Index].PciDeviceInfo.PciDeviceData[Index].PciSourceId.Bits.Bus,
+        mVtdUnitInformation[Index].PciDeviceInfo.PciDeviceData[Index].PciSourceId.Bits.Device,
+        mVtdUnitInformation[Index].PciDeviceInfo.PciDeviceData[Index].PciSourceId.Bits.Function,
+        mVtdUnitInformation[Index].PciDeviceInfo.PciDeviceData[Index].AccessCount
         ));
     }
   }

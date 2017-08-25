@@ -50,19 +50,24 @@
 #define ALIGN_VALUE_LOW(Value, Alignment) ((Value) & (~((Alignment) - 1)))
 
 //
-// This is the initial max PCI descriptor.
+// This is the initial max PCI DATA number.
 // The number may be enlarged later.
 //
-#define MAX_PCI_DESCRIPTORS             0x100
+#define MAX_VTD_PCI_DATA_NUMBER             0x100
 
 typedef struct {
-  BOOLEAN                IncludeAllFlag;
-  UINTN                  PciDescriptorNumber;
-  UINTN                  PciDescriptorMaxNumber;
-  BOOLEAN                *IsRealPciDevice;
-  VTD_SOURCE_ID          *PciDescriptors;
+  UINT8                            DeviceType;
+  VTD_SOURCE_ID                    PciSourceId;
+  EDKII_PLATFORM_VTD_PCI_DEVICE_ID PciDeviceId;
   // for statistic analysis
-  UINTN                  *AccessCount;
+  UINTN                            AccessCount;
+} PCI_DEVICE_DATA;
+
+typedef struct {
+  BOOLEAN                          IncludeAllFlag;
+  UINTN                            PciDeviceDataNumber;
+  UINTN                            PciDeviceDataMaxNumber;
+  PCI_DEVICE_DATA                  *PciDeviceData;
 } PCI_DEVICE_INFORMATION;
 
 typedef struct {
@@ -77,6 +82,29 @@ typedef struct {
   BOOLEAN                          HasDirtyPages;
   PCI_DEVICE_INFORMATION           PciDeviceInfo;
 } VTD_UNIT_INFORMATION;
+
+/**
+  The scan bus callback function.
+
+  It is called in PCI bus scan for each PCI device under the bus.
+
+  @param[in]  Context               The context of the callback.
+  @param[in]  Segment               The segment of the source.
+  @param[in]  Bus                   The bus of the source.
+  @param[in]  Device                The device of the source.
+  @param[in]  Function              The function of the source.
+
+  @retval EFI_SUCCESS           The specific PCI device is processed in the callback.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *SCAN_BUS_FUNC_CALLBACK_FUNC) (
+  IN VOID           *Context,
+  IN UINT16         Segment,
+  IN UINT8          Bus,
+  IN UINT8          Device,
+  IN UINT8          Function
+  );
 
 extern EFI_ACPI_DMAR_HEADER  *mAcpiDmarTable;
 
@@ -182,13 +210,12 @@ DumpVtdECapRegs (
   );
 
 /**
-  Register PCI device to VTd engine as PCI descriptor.
+  Register PCI device to VTd engine.
 
   @param[in]  VtdIndex              The index of VTd engine.
   @param[in]  Segment               The segment of the source.
   @param[in]  SourceId              The SourceId of the source.
-  @param[in]  IsRealPciDevice       TRUE: It is a real PCI device.
-                                    FALSE: It is not a real PCI device.
+  @param[in]  DeviceType            The DMAR device scope type.
   @param[in]  CheckExist            TRUE: ERROR will be returned if the PCI device is already registered.
                                     FALSE: SUCCESS will be returned if the PCI device is registered.
 
@@ -201,25 +228,47 @@ RegisterPciDevice (
   IN UINTN          VtdIndex,
   IN UINT16         Segment,
   IN VTD_SOURCE_ID  SourceId,
-  IN BOOLEAN        IsRealPciDevice,
+  IN UINT8          DeviceType,
   IN BOOLEAN        CheckExist
   );
 
 /**
-  Scan PCI bus and register PCI devices under the bus.
+  The scan bus callback function to always enable page attribute.
 
-  @param[in]  VtdIndex              The index of VTd engine.
+  @param[in]  Context               The context of the callback.
   @param[in]  Segment               The segment of the source.
   @param[in]  Bus                   The bus of the source.
+  @param[in]  Device                The device of the source.
+  @param[in]  Function              The function of the source.
 
-  @retval EFI_SUCCESS           The PCI devices under the bus are registered.
-  @retval EFI_OUT_OF_RESOURCES  No enough resource to register a new PCI device.
+  @retval EFI_SUCCESS           The VTd entry is updated to always enable all DMA access for the specific device.
+**/
+EFI_STATUS
+EFIAPI
+ScanBusCallbackRegisterPciDevice (
+  IN VOID           *Context,
+  IN UINT16         Segment,
+  IN UINT8          Bus,
+  IN UINT8          Device,
+  IN UINT8          Function
+  );
+
+/**
+  Scan PCI bus and invoke callback function for each PCI devices under the bus.
+
+  @param[in]  Context               The context of the callback function.
+  @param[in]  Segment               The segment of the source.
+  @param[in]  Bus                   The bus of the source.
+  @param[in]  Callback              The callback function in PCI scan.
+
+  @retval EFI_SUCCESS           The PCI devices under the bus are scaned.
 **/
 EFI_STATUS
 ScanPciBus (
-  IN UINTN          VtdIndex,
-  IN UINT16         Segment,
-  IN UINT8          Bus
+  IN VOID                         *Context,
+  IN UINT16                       Segment,
+  IN UINT8                        Bus,
+  IN SCAN_BUS_FUNC_CALLBACK_FUNC  Callback
   );
 
 /**
@@ -240,8 +289,8 @@ DumpPciDeviceInfo (
   @param[out] ExtContextEntry       The ExtContextEntry of the source.
   @param[out] ContextEntry          The ContextEntry of the source.
 
-  @return The index of the PCI descriptor.
-  @retval (UINTN)-1  The PCI descriptor is not found.
+  @return The index of the VTd engine.
+  @retval (UINTN)-1  The VTd engine is not found.
 **/
 UINTN
 FindVtdIndexByPciDevice (
@@ -371,17 +420,17 @@ SetAccessAttribute (
   );
 
 /**
-  Return the index of PCI descriptor.
+  Return the index of PCI data.
 
   @param[in]  VtdIndex          The index used to identify a VTd engine.
   @param[in]  Segment           The Segment used to identify a VTd engine.
   @param[in]  SourceId          The SourceId used to identify a VTd engine and table entry.
 
-  @return The index of the PCI descriptor.
-  @retval (UINTN)-1  The PCI descriptor is not found.
+  @return The index of the PCI data.
+  @retval (UINTN)-1  The PCI data is not found.
 **/
 UINTN
-GetPciDescriptor (
+GetPciDataIndex (
   IN UINTN          VtdIndex,
   IN UINT16         Segment,
   IN VTD_SOURCE_ID  SourceId
@@ -488,6 +537,26 @@ FlushPageTableMemory (
   IN UINTN  VtdIndex,
   IN UINTN  Base,
   IN UINTN  Size
+  );
+
+/**
+  Get PCI device information from DMAR DevScopeEntry.
+
+  @param[in]  Segment               The segment number.
+  @param[in]  DmarDevScopeEntry     DMAR DevScopeEntry
+  @param[out] Bus                   The bus number.
+  @param[out] Device                The device number.
+  @param[out] Function              The function number.
+
+  @retval EFI_SUCCESS  The PCI device information is returned.
+**/
+EFI_STATUS
+GetPciBusDeviceFunction (
+  IN  UINT16                                      Segment,
+  IN  EFI_ACPI_DMAR_DEVICE_SCOPE_STRUCTURE_HEADER *DmarDevScopeEntry,
+  OUT UINT8                                       *Bus,
+  OUT UINT8                                       *Device,
+  OUT UINT8                                       *Function
   );
 
 #endif
