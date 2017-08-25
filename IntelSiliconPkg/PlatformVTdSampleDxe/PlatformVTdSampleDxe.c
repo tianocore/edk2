@@ -27,6 +27,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 
+#include <IndustryStandard/DmaRemappingReportingTable.h>
+
 typedef struct {
   ACPI_EXTENDED_HID_DEVICE_PATH      I2cController;
   UINT8                              HidStr[8];
@@ -137,10 +139,57 @@ PLATFORM_PCI_BRIDGE_DEVICE_PATH mPlatformPciBridgeDevicePath = {
   PLATFORM_END_ENTIRE
 };
 
-EDKII_PLATFORM_VTD_DEVICE_INFO  mExceptionDeviceList[] = {
+#pragma pack(1)
+
+typedef struct {
+  EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO     ExceptionDeviceInfo;
+  EDKII_PLATFORM_VTD_DEVICE_SCOPE              DeviceScope;
+  EFI_ACPI_DMAR_PCI_PATH                       PciBridge;
+  EFI_ACPI_DMAR_PCI_PATH                       PciDevice;
+} PLATFORM_EXCEPTION_DEVICE_SCOPE_STRUCT;
+
+typedef struct {
+  EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO     ExceptionDeviceInfo;
+  EDKII_PLATFORM_VTD_PCI_DEVICE_ID             PciDeviceId;
+} PLATFORM_EXCEPTION_PCI_DEVICE_ID_STRUCT;
+
+#pragma pack()
+
+PLATFORM_EXCEPTION_DEVICE_SCOPE_STRUCT  mExceptionDeviceScopeList[] = {
   {
-    0x0,                 // Segment
-    {{0x00, 0x00, 0x02}} // Function, Device, Bus
+    {
+      EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_DEVICE_SCOPE,
+      sizeof(PLATFORM_EXCEPTION_DEVICE_SCOPE_STRUCT)
+    },  // ExceptionDeviceInfo
+    {
+      0,                                                    // SegmentNumber
+      {
+        EFI_ACPI_DEVICE_SCOPE_ENTRY_TYPE_PCI_ENDPOINT,      // Type
+        sizeof(EFI_ACPI_DMAR_DEVICE_SCOPE_STRUCTURE_HEADER) +
+          2 * sizeof(EFI_ACPI_DMAR_PCI_PATH),               // Length
+        0,                                                  // Reserved2
+        0,                                                  // EnumerationId
+        0,                                                  // StartBusNumber
+      },
+    },                                                      // DeviceScope
+    { 0x1C, 1 },                                            // PciBridge
+    { 0x0,  0 },                                            // PciDevice
+  },
+};
+
+PLATFORM_EXCEPTION_PCI_DEVICE_ID_STRUCT  mExceptionPciDeviceIdList[] = {
+  {
+    {
+      EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO_TYPE_PCI_DEVICE_ID,
+      sizeof(PLATFORM_EXCEPTION_PCI_DEVICE_ID_STRUCT)
+    },  // ExceptionDeviceInfo
+    {
+      0x8086,                                               // VendorId
+      0x9D2F,                                               // DeviceId
+      0x21,                                                 // RevisionId
+      0x8086,                                               // SubsystemVendorId
+      0x7270,                                               // SubsystemDeviceId
+    },
   },
 };
 
@@ -269,6 +318,7 @@ PlatformVTdGetDeviceId (
   @param[in]  This                  The protocol instance pointer.
   @param[out] DeviceInfoCount       The count of the list of DeviceInfo.
   @param[out] DeviceInfo            A callee allocated buffer to hold a list of DeviceInfo.
+                                    Each DeviceInfo pointer points to EDKII_PLATFORM_VTD_EXCEPTION_DEVICE_INFO.
 
   @retval EFI_SUCCESS           The DeviceInfoCount and DeviceInfo are returned.
   @retval EFI_INVALID_PARAMETER DeviceInfoCount is NULL, or DeviceInfo is NULL.
@@ -280,7 +330,7 @@ EFIAPI
 PlatformVTdGetExceptionDeviceList (
   IN  EDKII_PLATFORM_VTD_POLICY_PROTOCOL       *This,
   OUT UINTN                                    *DeviceInfoCount,
-  OUT EDKII_PLATFORM_VTD_DEVICE_INFO           **DeviceInfo
+  OUT VOID                                     **DeviceInfo
   )
 {
   DEBUG ((DEBUG_VERBOSE, "PlatformVTdGetExceptionDeviceList\n"));
@@ -289,13 +339,23 @@ PlatformVTdGetExceptionDeviceList (
     return EFI_INVALID_PARAMETER;
   }
 
-  *DeviceInfo = AllocateZeroPool (sizeof(mExceptionDeviceList));
-  if (*DeviceInfo == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  CopyMem (*DeviceInfo, mExceptionDeviceList, sizeof(mExceptionDeviceList));
+  if (0) {
+    *DeviceInfo = AllocateZeroPool (sizeof(mExceptionDeviceScopeList));
+    if (*DeviceInfo == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    CopyMem (*DeviceInfo, mExceptionDeviceScopeList, sizeof(mExceptionDeviceScopeList));
 
-  *DeviceInfoCount = ARRAY_SIZE(mExceptionDeviceList);
+    *DeviceInfoCount = ARRAY_SIZE(mExceptionDeviceScopeList);
+  } else {
+    *DeviceInfo = AllocateZeroPool (sizeof(mExceptionPciDeviceIdList));
+    if (*DeviceInfo == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    CopyMem (*DeviceInfo, mExceptionPciDeviceIdList, sizeof(mExceptionPciDeviceIdList));
+
+    *DeviceInfoCount = ARRAY_SIZE(mExceptionPciDeviceIdList);
+  }
 
   return EFI_SUCCESS;
 }
