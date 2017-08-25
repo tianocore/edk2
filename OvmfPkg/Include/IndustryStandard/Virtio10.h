@@ -2,6 +2,7 @@
   Definitions from the VirtIo 1.0 specification (csprd05).
 
   Copyright (C) 2016, Red Hat, Inc.
+  Copyright (C) 2017, AMD, Inc.
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -81,6 +82,7 @@ typedef struct {
 //
 // VirtIo 1.0 reserved (device-independent) feature bits
 //
-#define VIRTIO_F_VERSION_1 BIT32
+#define VIRTIO_F_VERSION_1      BIT32
+#define VIRTIO_F_IOMMU_PLATFORM BIT33
 
 #endif // _VIRTIO_1_0_H_
