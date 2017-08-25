@@ -279,7 +279,7 @@ VirtioRngInit (
     goto Failed;
   }
 
-  Features &= VIRTIO_F_VERSION_1;
+  Features &= VIRTIO_F_VERSION_1 | VIRTIO_F_IOMMU_PLATFORM;
 
   //
   // In virtio-1.0, feature negotiation is expected to complete before queue
@@ -360,7 +360,7 @@ VirtioRngInit (
   // step 5 -- Report understood features and guest-tuneables.
   //
   if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
-    Features &= ~(UINT64)VIRTIO_F_VERSION_1;
+    Features &= ~(UINT64)(VIRTIO_F_VERSION_1 | VIRTIO_F_IOMMU_PLATFORM);
     Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
     if (EFI_ERROR (Status)) {
       goto UnmapQueue;
