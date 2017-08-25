@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "LegacyBootMaintUi.h"
 
-LEGACY_BOOT_OPTION_CALLBACK_DATA  *mLegacyBootOptionPrivate;
+LEGACY_BOOT_OPTION_CALLBACK_DATA  *mLegacyBootOptionPrivate = NULL;
 EFI_GUID  mLegacyBootOptionGuid     = LEGACY_BOOT_OPTION_FORMSET_GUID;
 CHAR16    mLegacyBootStorageName[]  = L"LegacyBootData";
 BBS_TYPE  mBbsType[] = {BBS_FLOPPY, BBS_HARDDISK, BBS_CDROM, BBS_EMBED_NETWORK, BBS_BEV_DEVICE, BBS_UNKNOWN};
@@ -1486,7 +1486,7 @@ LegacyBootMaintUiLibDestructor (
 {
   EFI_STATUS    Status;
 
-  if (mLegacyBootOptionPrivate->DriverHandle != NULL) {
+  if (mLegacyBootOptionPrivate != NULL && mLegacyBootOptionPrivate->DriverHandle != NULL) {
     Status = gBS->UninstallMultipleProtocolInterfaces (
                     mLegacyBootOptionPrivate->DriverHandle,
                     &gEfiDevicePathProtocolGuid,
