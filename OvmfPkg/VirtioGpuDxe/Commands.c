@@ -90,7 +90,7 @@ VirtioGpuInit (
   //
   // We only want the most basic 2D features.
   //
-  Features &= VIRTIO_F_VERSION_1;
+  Features &= VIRTIO_F_VERSION_1 | VIRTIO_F_IOMMU_PLATFORM;
 
   //
   // ... and write the subset of feature bits understood by the [...] driver to
