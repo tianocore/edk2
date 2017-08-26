@@ -496,10 +496,10 @@ VirtioGpuResourceUnref (
 
 EFI_STATUS
 VirtioGpuResourceAttachBacking (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   ResourceId,
-  IN     VOID     *FirstBackingPage,
-  IN     UINTN    NumberOfPages
+  IN OUT VGPU_DEV             *VgpuDev,
+  IN     UINT32               ResourceId,
+  IN     EFI_PHYSICAL_ADDRESS BackingStoreDeviceAddress,
+  IN     UINTN                NumberOfPages
   )
 {
   volatile VIRTIO_GPU_RESOURCE_ATTACH_BACKING Request;
@@ -510,7 +510,7 @@ VirtioGpuResourceAttachBacking (
 
   Request.ResourceId    = ResourceId;
   Request.NrEntries     = 1;
-  Request.Entry.Addr    = (UINTN)FirstBackingPage;
+  Request.Entry.Addr    = BackingStoreDeviceAddress;
   Request.Entry.Length  = (UINT32)EFI_PAGES_TO_SIZE (NumberOfPages);
   Request.Entry.Padding = 0;
 

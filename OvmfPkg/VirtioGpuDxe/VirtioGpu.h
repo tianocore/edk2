@@ -252,10 +252,10 @@ VirtioGpuResourceUnref (
 
 EFI_STATUS
 VirtioGpuResourceAttachBacking (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   ResourceId,
-  IN     VOID     *FirstBackingPage,
-  IN     UINTN    NumberOfPages
+  IN OUT VGPU_DEV             *VgpuDev,
+  IN     UINT32               ResourceId,
+  IN     EFI_PHYSICAL_ADDRESS BackingStoreDeviceAddress,
+  IN     UINTN                NumberOfPages
   );
 
 EFI_STATUS

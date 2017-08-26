@@ -313,10 +313,10 @@ GopSetMode (
   // Attach backing store to the host resource.
   //
   Status = VirtioGpuResourceAttachBacking (
-             VgpuGop->ParentBus, // VgpuDev
-             NewResourceId,      // ResourceId
-             NewBackingStore,    // FirstBackingPage
-             NewNumberOfPages    // NumberOfPages
+             VgpuGop->ParentBus,           // VgpuDev
+             NewResourceId,                // ResourceId
+             (UINTN)NewBackingStore,       // BackingStoreDeviceAddress
+             NewNumberOfPages              // NumberOfPages
              );
   if (EFI_ERROR (Status)) {
     goto FreeBackingStore;
