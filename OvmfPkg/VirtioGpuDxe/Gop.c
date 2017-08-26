@@ -14,7 +14,6 @@
 
 **/
 
-#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 #include "VirtioGpu.h"
