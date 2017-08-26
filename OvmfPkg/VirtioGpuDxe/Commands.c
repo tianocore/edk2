@@ -278,7 +278,8 @@ VirtioGpuExitBoot (
                                  code has been logged on the EFI_D_ERROR level.
 
   @return                        Codes for unexpected errors in VirtIo
-                                 messaging.
+                                 messaging, or request/response
+                                 mapping/unmapping.
 **/
 STATIC
 EFI_STATUS
@@ -294,6 +295,10 @@ VirtioGpuSendCommand (
   volatile VIRTIO_GPU_CONTROL_HEADER Response;
   EFI_STATUS                         Status;
   UINT32                             ResponseSize;
+  EFI_PHYSICAL_ADDRESS               RequestDeviceAddress;
+  VOID                               *RequestMap;
+  EFI_PHYSICAL_ADDRESS               ResponseDeviceAddress;
+  VOID                               *ResponseMap;
 
   //
   // Initialize Header.
@@ -313,13 +318,49 @@ VirtioGpuSendCommand (
   ASSERT (RequestSize <= MAX_UINT32);
 
   //
+  // Map request and response to bus master device addresses.
+  //
+  Status = VirtioMapAllBytesInSharedBuffer (
+             VgpuDev->VirtIo,
+             VirtioOperationBusMasterRead,
+             (VOID *)Header,
+             RequestSize,
+             &RequestDeviceAddress,
+             &RequestMap
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = VirtioMapAllBytesInSharedBuffer (
+             VgpuDev->VirtIo,
+             VirtioOperationBusMasterWrite,
+             (VOID *)&Response,
+             sizeof Response,
+             &ResponseDeviceAddress,
+             &ResponseMap
+             );
+  if (EFI_ERROR (Status)) {
+    goto UnmapRequest;
+  }
+
+  //
   // Compose the descriptor chain.
   //
   VirtioPrepare (&VgpuDev->Ring, &Indices);
-  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)Header, (UINT32)RequestSize,
-    VRING_DESC_F_NEXT, &Indices);
-  VirtioAppendDesc (&VgpuDev->Ring, (UINTN)&Response, sizeof Response,
-    VRING_DESC_F_WRITE, &Indices);
+  VirtioAppendDesc (
+    &VgpuDev->Ring,
+    RequestDeviceAddress,
+    (UINT32)RequestSize,
+    VRING_DESC_F_NEXT,
+    &Indices
+    );
+  VirtioAppendDesc (
+    &VgpuDev->Ring,
+    ResponseDeviceAddress,
+    (UINT32)sizeof Response,
+    VRING_DESC_F_WRITE,
+    &Indices
+    );
 
   //
   // Send the command.
@@ -327,18 +368,36 @@ VirtioGpuSendCommand (
   Status = VirtioFlush (VgpuDev->VirtIo, VIRTIO_GPU_CONTROL_QUEUE,
              &VgpuDev->Ring, &Indices, &ResponseSize);
   if (EFI_ERROR (Status)) {
+    goto UnmapResponse;
+  }
+
+  //
+  // Verify response size.
+  //
+  if (ResponseSize != sizeof Response) {
+    DEBUG ((EFI_D_ERROR, "%a: malformed response to Request=0x%x\n",
+      __FUNCTION__, (UINT32)RequestType));
+    Status = EFI_PROTOCOL_ERROR;
+    goto UnmapResponse;
+  }
+
+  //
+  // Unmap response and request, in reverse order of mapping. On error, the
+  // respective mapping is invalidated anyway, only the data may not have been
+  // committed to system memory (in case of VirtioOperationBusMasterWrite).
+  //
+  Status = VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, ResponseMap);
+  if (EFI_ERROR (Status)) {
+    goto UnmapRequest;
+  }
+  Status = VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, RequestMap);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
   //
   // Parse the response.
   //
-  if (ResponseSize != sizeof Response) {
-    DEBUG ((EFI_D_ERROR, "%a: malformed response to Request=0x%x\n",
-      __FUNCTION__, (UINT32)RequestType));
-    return EFI_PROTOCOL_ERROR;
-  }
-
   if (Response.Type == VirtioGpuRespOkNodata) {
     return EFI_SUCCESS;
   }
@@ -346,6 +405,14 @@ VirtioGpuSendCommand (
   DEBUG ((EFI_D_ERROR, "%a: Request=0x%x Response=0x%x\n", __FUNCTION__,
     (UINT32)RequestType, Response.Type));
   return EFI_DEVICE_ERROR;
+
+UnmapResponse:
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, ResponseMap);
+
+UnmapRequest:
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, RequestMap);
+
+  return Status;
 }
 
 /**
