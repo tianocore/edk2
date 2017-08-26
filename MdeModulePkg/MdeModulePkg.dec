@@ -867,6 +867,19 @@
   # @ValidList  0x80000006 | 0x03058002
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable|0x03058002|UINT32|0x30001040
 
+  ## Mask to control the NULL address detection in code for different phases.
+  #  If enabled, accessing NULL address in UEFI or SMM code can be caught.<BR><BR>
+  #    BIT0    - Enable NULL pointer detection for UEFI.<BR>
+  #    BIT1    - Enable NULL pointer detection for SMM.<BR>
+  #    BIT2..6 - Reserved for future uses.<BR>
+  #    BIT7    - Disable NULL pointer detection just after EndOfDxe. <BR>
+  #              This is a workaround for those unsolvable NULL access issues in
+  #              OptionROM, boot loader, etc. It can also help to avoid unnecessary
+  #              exception caused by legacy memory (0-4095) access after EndOfDxe,
+  #              such as Windows 7 boot on Qemu.<BR>
+  # @Prompt Enable NULL address detection.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask|0x0|UINT8|0x30001050
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function

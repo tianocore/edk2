@@ -1127,3 +1127,16 @@
                                                                                                      "enabled on AMD processors supporting the Secure Encrypted Virtualization (SEV) feature.\n"
                                                                                                      "This mask should be applied when creating 1:1 virtual to physical mapping tables."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNullPointerDetectionPropertyMask_PROMPT  #language en-US "Enable NULL pointer detection"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNullPointerDetectionPropertyMask_HELP    #language en-US "Mask to control the NULL address detection in code for different phases.\n"
+                                                                                                       " If enabled, accessing NULL address in UEFI or SMM code can be caught.\n\n"
+                                                                                                       "   BIT0    - Enable NULL pointer detection for UEFI.\n"
+                                                                                                       "   BIT1    - Enable NULL pointer detection for SMM.\n"
+                                                                                                       "   BIT2..6 - Reserved for future uses.\n"
+                                                                                                       "   BIT7    - Disable NULL pointer detection just after EndOfDxe."
+                                                                                                       " This is a workaround for those unsolvable NULL access issues in"
+                                                                                                       " OptionROM, boot loader, etc. It can also help to avoid unnecessary"
+                                                                                                       " exception caused by legacy memory (0-4095) access after EndOfDxe,"
+                                                                                                       " such as Windows 7 boot on Qemu.\n"
+
