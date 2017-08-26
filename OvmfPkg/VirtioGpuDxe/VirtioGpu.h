@@ -150,6 +150,13 @@ struct VGPU_GOP_STRUCT {
   //
   UINT32                               *BackingStore;
   UINTN                                NumberOfPages;
+
+  //
+  // Token associated with BackingStore's mapping for bus master common
+  // buffer operation. BackingStoreMap is valid if, and only if,
+  // BackingStore is non-NULL.
+  //
+  VOID                                 *BackingStoreMap;
 };
 
 //
