@@ -44,6 +44,7 @@ VirtioGpuInit (
   EFI_STATUS Status;
   UINT64     Features;
   UINT16     QueueSize;
+  UINT64     RingBaseShift;
 
   //
   // Execute virtio-v1.0-cs04, 3.1.1 Driver Requirements: Device
@@ -132,13 +133,28 @@ VirtioGpuInit (
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
+  //
+  // If anything fails from here on, we have to release the ring.
+  //
+  Status = VirtioRingMap (
+             VgpuDev->VirtIo,
+             &VgpuDev->Ring,
+             &RingBaseShift,
+             &VgpuDev->RingMap
+             );
+  if (EFI_ERROR (Status)) {
+    goto ReleaseQueue;
+  }
+  //
+  // If anything fails from here on, we have to unmap the ring.
+  //
   Status = VgpuDev->VirtIo->SetQueueAddress (
                               VgpuDev->VirtIo,
                               &VgpuDev->Ring,
-                              0
+                              RingBaseShift
                               );
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
@@ -147,10 +163,13 @@ VirtioGpuInit (
   NextDevStat |= VSTAT_DRIVER_OK;
   Status = VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   return EFI_SUCCESS;
+
+UnmapQueue:
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, VgpuDev->RingMap);
 
 ReleaseQueue:
   VirtioRingUninit (VgpuDev->VirtIo, &VgpuDev->Ring);
@@ -188,6 +207,7 @@ VirtioGpuUninit (
   // configuration.
   //
   VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, 0);
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, VgpuDev->RingMap);
   VirtioRingUninit (VgpuDev->VirtIo, &VgpuDev->Ring);
 }
 
@@ -215,6 +235,7 @@ VirtioGpuExitBoot (
 
   VgpuDev = Context;
   VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, 0);
+  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, VgpuDev->RingMap);
 }
 
 /**

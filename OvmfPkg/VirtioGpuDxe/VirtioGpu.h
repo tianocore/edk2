@@ -56,6 +56,12 @@ typedef struct {
   VRING                    Ring;
 
   //
+  // Token associated with Ring's mapping for bus master common buffer
+  // operation, from VirtioRingMap().
+  //
+  VOID                     *RingMap;
+
+  //
   // Event to be signaled at ExitBootServices().
   //
   EFI_EVENT                ExitBoot;
