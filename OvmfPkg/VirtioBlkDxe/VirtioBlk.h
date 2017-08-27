@@ -41,6 +41,7 @@ typedef struct {
   VRING                  Ring;                 // VirtioRingInit      2
   EFI_BLOCK_IO_PROTOCOL  BlockIo;              // VirtioBlkInit       1
   EFI_BLOCK_IO_MEDIA     BlockIoMedia;         // VirtioBlkInit       1
+  VOID                   *RingMap;             // VirtioRingMap       2
 } VBLK_DEV;
 
 #define VIRTIO_BLK_FROM_BLOCK_IO(BlockIoPointer) \

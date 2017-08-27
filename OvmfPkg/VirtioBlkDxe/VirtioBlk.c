@@ -580,7 +580,8 @@ VirtioBlkDriverBindingSupported (
                            virtio-blk attributes the host provides.
 
   @return                  Error codes from VirtioRingInit() or
-                           VIRTIO_CFG_READ() / VIRTIO_CFG_WRITE().
+                           VIRTIO_CFG_READ() / VIRTIO_CFG_WRITE or
+                           VirtioRingMap().
 
 **/
 
@@ -601,6 +602,7 @@ VirtioBlkInit (
   UINT8      AlignmentOffset;
   UINT32     OptIoSize;
   UINT16     QueueSize;
+  UINT64     RingBaseShift;
 
   PhysicalBlockExp = 0;
   AlignmentOffset = 0;
@@ -729,25 +731,42 @@ VirtioBlkInit (
   }
 
   //
-  // Additional steps for MMIO: align the queue appropriately, and set the
-  // size. If anything fails from here on, we must release the ring resources.
+  // If anything fails from here on, we must release the ring resources
   //
-  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
+  Status = VirtioRingMap (
+             Dev->VirtIo,
+             &Dev->Ring,
+             &RingBaseShift,
+             &Dev->RingMap
+             );
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
 
+  //
+  // Additional steps for MMIO: align the queue appropriately, and set the
+  // size. If anything fails from here on, we must unmap the ring resources.
+  //
+  Status = Dev->VirtIo->SetQueueNum (Dev->VirtIo, QueueSize);
+  if (EFI_ERROR (Status)) {
+    goto UnmapQueue;
+  }
+
   Status = Dev->VirtIo->SetQueueAlign (Dev->VirtIo, EFI_PAGE_SIZE);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
   // step 4c -- Report GPFN (guest-physical frame number) of queue.
   //
-  Status = Dev->VirtIo->SetQueueAddress (Dev->VirtIo, &Dev->Ring, 0);
+  Status = Dev->VirtIo->SetQueueAddress (
+                          Dev->VirtIo,
+                          &Dev->Ring,
+                          RingBaseShift
+                          );
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
 
@@ -758,7 +777,7 @@ VirtioBlkInit (
     Features &= ~(UINT64)VIRTIO_F_VERSION_1;
     Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
     if (EFI_ERROR (Status)) {
-      goto ReleaseQueue;
+      goto UnmapQueue;
     }
   }
 
@@ -768,7 +787,7 @@ VirtioBlkInit (
   NextDevStat |= VSTAT_DRIVER_OK;
   Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
-    goto ReleaseQueue;
+    goto UnmapQueue;
   }
 
   //
@@ -811,6 +830,9 @@ VirtioBlkInit (
   }
   return EFI_SUCCESS;
 
+UnmapQueue:
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
+
 ReleaseQueue:
   VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
 
@@ -849,6 +871,7 @@ VirtioBlkUninit (
   //
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
   VirtioRingUninit (Dev->VirtIo, &Dev->Ring);
 
   SetMem (&Dev->BlockIo,      sizeof Dev->BlockIo,      0x00);
@@ -885,6 +908,12 @@ VirtioBlkExitBoot (
   //
   Dev = Context;
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
+
+  //
+  // Unmap the ring buffer so that hypervisor will not be able to get
+  // readable data after device is reset.
+  //
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
 }
 
 /**
