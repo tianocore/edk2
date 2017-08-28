@@ -1814,7 +1814,7 @@ EnableDisableApWorker (
   if (!EnableAP) {
     SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateDisabled);
   } else {
-    SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+    ResetProcessorToIdleState (ProcessorNumber);
   }
 
   if (HealthFlag != NULL) {
