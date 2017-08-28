@@ -3079,10 +3079,10 @@ EfiShellSetCurDir(
       // make that the current file system mapping
       //
       if (MapListItem != NULL) {
-        gShellCurDir = MapListItem;
+        gShellCurMapping = MapListItem;
       }
     } else {
-      MapListItem = gShellCurDir;
+      MapListItem = gShellCurMapping;
     }
 
     if (MapListItem == NULL) {
@@ -3131,7 +3131,7 @@ EfiShellSetCurDir(
       FreePool (DirectoryName);
       return (EFI_INVALID_PARAMETER);
     }
-//    gShellCurDir = MapListItem;
+//    gShellCurMapping = MapListItem;
     if (DirectoryName != NULL) {
       //
       // change current dir on that file system
@@ -3157,7 +3157,7 @@ EfiShellSetCurDir(
   //
   // if updated the current directory then update the environment variable
   //
-  if (MapListItem == gShellCurDir) {
+  if (MapListItem == gShellCurMapping) {
     Size = 0;
     ASSERT((TempString == NULL && Size == 0) || (TempString != NULL));
     StrnCatGrow(&TempString, &Size, MapListItem->MapName, 0);

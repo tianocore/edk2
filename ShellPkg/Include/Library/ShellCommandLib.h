@@ -4,7 +4,7 @@
   This library is for use ONLY by shell commands linked into the shell application.
   This library will not function if it is used for UEFI Shell 2.0 Applications.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
@@ -48,7 +48,7 @@ typedef struct {
 /// List of Mappings - DeviceName and Drive Letter(ism).
 extern        SHELL_MAP_LIST                      gShellMapList;
 /// Pointer to node of current directory in the mMapList.
-extern        SHELL_MAP_LIST                      *gShellCurDir;
+extern        SHELL_MAP_LIST                      *gShellCurMapping;
 
 /**
   Returns the help MAN fileName for a given shell command.

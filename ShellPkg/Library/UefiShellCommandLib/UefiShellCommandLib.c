@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
@@ -53,7 +53,7 @@ STATIC CONST CHAR8 Hex[] = {
 // global variables required by library class.
 EFI_UNICODE_COLLATION_PROTOCOL    *gUnicodeCollation            = NULL;
 SHELL_MAP_LIST                    gShellMapList;
-SHELL_MAP_LIST                    *gShellCurDir                 = NULL;
+SHELL_MAP_LIST                    *gShellCurMapping             = NULL;
 
 CONST CHAR16* SupportLevel[] = {
   L"Minimal",
@@ -229,7 +229,7 @@ ShellCommandLibDestructor (
   }
 
   gUnicodeCollation            = NULL;
-  gShellCurDir                 = NULL;
+  gShellCurMapping             = NULL;
 
   return (RETURN_SUCCESS);
 }
