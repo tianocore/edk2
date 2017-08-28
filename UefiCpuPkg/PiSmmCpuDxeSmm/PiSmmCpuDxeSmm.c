@@ -114,6 +114,8 @@ SPIN_LOCK                *mConfigSmmCodeAccessCheckLock = NULL;
 EFI_SMRAM_DESCRIPTOR     *mSmmCpuSmramRanges;
 UINTN                    mSmmCpuSmramRangeCount;
 
+UINT8                    mPhysicalAddressBits;
+
 /**
   Initialize IDT to setup exception handlers for SMM.
 

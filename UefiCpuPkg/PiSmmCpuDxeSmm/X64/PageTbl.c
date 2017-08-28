@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 LIST_ENTRY                          mPagePool = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                             m1GPageTableSupport = FALSE;
-UINT8                               mPhysicalAddressBits;
 BOOLEAN                             mCpuSmmStaticPageTable;
 
 /**
