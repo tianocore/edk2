@@ -4,7 +4,7 @@
 
   This protocol provides the parent dispatch service for the periodical timer SMI source generator.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,11 +22,9 @@
 #define _SMM_PERIODIC_TIMER_DISPATCH2_H_
 
 #include <Pi/PiSmmCis.h>
+#include <Protocol/MmPeriodicTimerDispatch.h>
 
-#define EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL_GUID \
-  { \
-    0x4cec368e, 0x8e8e, 0x4d71, {0x8b, 0xe1, 0x95, 0x8c, 0x45, 0xfc, 0x8a, 0x53 } \
-  }
+#define EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL_GUID EFI_MM_PERIODIC_TIMER_DISPATCH_PROTOCOL_GUID
 
 ///
 /// Example: A chipset supports periodic SMIs on every 64ms or 2 seconds.
@@ -66,13 +64,7 @@ typedef struct {
 /// Register() in RegisterContext and with CommBuffer pointing to an instance of 
 /// EFI_SMM_PERIODIC_TIMER_CONTEXT and CommBufferSize pointing to its size.
 ///
-typedef struct {
-  ///
-  /// ElapsedTime is the actual time in 100 nanosecond units elapsed since last called, a
-  /// value of 0 indicates an unknown amount of time.
-  ///
-  UINT64  ElapsedTime;
-} EFI_SMM_PERIODIC_TIMER_CONTEXT;
+typedef EFI_MM_PERIODIC_TIMER_CONTEXT EFI_SMM_PERIODIC_TIMER_CONTEXT;
 
 typedef struct _EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL  EFI_SMM_PERIODIC_TIMER_DISPATCH2_PROTOCOL;
 

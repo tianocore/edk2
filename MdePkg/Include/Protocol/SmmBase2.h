@@ -4,7 +4,7 @@
   This protocol is utilized by all SMM drivers to locate the SMM infrastructure services and determine
   whether the driver is being invoked inside SMRAM or outside of SMRAM.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,11 +19,9 @@
 #define _SMM_BASE2_H_
 
 #include <Pi/PiSmmCis.h>
+#include <Protocol/MmBase.h>
 
-#define EFI_SMM_BASE2_PROTOCOL_GUID \
-  { \
-    0xf4ccbfb7, 0xf6e0, 0x47fd, {0x9d, 0xd4, 0x10, 0xa8, 0xf1, 0x50, 0xc1, 0x91 }  \
-  }
+#define EFI_SMM_BASE2_PROTOCOL_GUID  EFI_MM_BASE_PROTOCOL_GUID
 
 typedef struct _EFI_SMM_BASE2_PROTOCOL  EFI_SMM_BASE2_PROTOCOL;
 

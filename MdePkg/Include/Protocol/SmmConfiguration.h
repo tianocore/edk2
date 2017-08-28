@@ -6,7 +6,7 @@
   2) register the SMM Foundation entry point with the processor code. The entry
      point will be invoked by the SMM processor entry code.
   
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -20,12 +20,10 @@
 #ifndef _SMM_CONFIGURATION_H_
 #define _SMM_CONFIGURATION_H_
 
+#include <Protocol/MmConfiguration.h>
 #include <Pi/PiSmmCis.h>
 
-#define EFI_SMM_CONFIGURATION_PROTOCOL_GUID \
-  { \
-    0x26eeb3de, 0xb689, 0x492e, {0x80, 0xf0, 0xbe, 0x8b, 0xd7, 0xda, 0x4b, 0xa7 }  \
-  }
+#define EFI_SMM_CONFIGURATION_PROTOCOL_GUID EFI_MM_CONFIGURATION_PROTOCOL_GUID
 
 ///
 /// Structure describing a SMRAM region which cannot be used for the SMRAM heap.

@@ -25,10 +25,9 @@
 #ifndef _SMM_READY_TO_LOCK_H_
 #define _SMM_READY_TO_LOCK_H_
 
-#define EFI_SMM_READY_TO_LOCK_PROTOCOL_GUID \
-  { \
-    0x47b7fa8c, 0xf4bd, 0x4af6, { 0x82, 0x00, 0x33, 0x30, 0x86, 0xf0, 0xd2, 0xc8 } \
-  }
+#include <Protocol/MmReadyToLock.h>
+
+#define EFI_SMM_READY_TO_LOCK_PROTOCOL_GUID EFI_MM_READY_TO_LOCK_PROTOCOL_GUID
 
 extern EFI_GUID gEfiSmmReadyToLockProtocolGuid;
 

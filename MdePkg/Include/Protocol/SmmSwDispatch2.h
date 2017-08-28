@@ -4,7 +4,7 @@
 
   This protocol provides the parent dispatch service for a given SMI source generator.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,12 +18,10 @@
 #ifndef _SMM_SW_DISPATCH2_H_
 #define _SMM_SW_DISPATCH2_H_
 
+#include <Protocol/MmSwDispatch.h>
 #include <Pi/PiSmmCis.h>
 
-#define EFI_SMM_SW_DISPATCH2_PROTOCOL_GUID \
-  { \
-    0x18a3c6dc, 0x5eea, 0x48c8, {0xa1, 0xc1, 0xb5, 0x33, 0x89, 0xf9, 0x89, 0x99 } \
-  }
+#define EFI_SMM_SW_DISPATCH2_PROTOCOL_GUID EFI_MM_SW_DISPATCH_PROTOCOL_GUID
 
 ///
 /// A particular chipset may not support all possible software SMI input values.
