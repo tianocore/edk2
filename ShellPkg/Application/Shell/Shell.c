@@ -2614,6 +2614,7 @@ RunShellCommand(
   CHAR16                    *FirstParameter;
   CHAR16                    *TempWalker;
   SHELL_OPERATION_TYPES     Type;
+  CONST CHAR16              *CurDir;
 
   ASSERT(CmdLine != NULL);
   if (StrLen(CmdLine) == 0) {
@@ -2705,7 +2706,22 @@ RunShellCommand(
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
     SetLastError(SHELL_NOT_FOUND);
   }
- 
+  //
+  // Check whether the current file system still exists. If not exist, we need update "cwd" and gShellCurMapping.
+  //
+  CurDir = EfiShellGetCurDir (NULL);
+  if (CurDir != NULL) {
+    if (EFI_ERROR(ShellFileExists (CurDir))) {
+      //
+      // EfiShellSetCurDir() cannot set current directory to NULL.
+      // EfiShellSetEnv() is not allowed to set the "cwd" variable.
+      // Only InternalEfiShellSetEnv () is allowed setting the "cwd" variable.
+      //
+      InternalEfiShellSetEnv (L"cwd", NULL, TRUE);
+      gShellCurMapping = NULL;
+    }
+  }
+
   SHELL_FREE_NON_NULL(CleanOriginal);
   SHELL_FREE_NON_NULL(FirstParameter);
 
