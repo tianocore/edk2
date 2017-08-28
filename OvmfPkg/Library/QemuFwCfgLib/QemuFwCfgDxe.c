@@ -20,6 +20,7 @@
 #include <Protocol/IoMmu.h>
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
@@ -187,6 +188,12 @@ AllocFwCfgDmaAccessBuffer (
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
+
+  //
+  // Avoid exposing stale data even temporarily: zero the area before mapping
+  // it.
+  //
+  ZeroMem (HostAddress, Size);
 
   //
   // Map the host buffer with BusMasterCommonBuffer64
