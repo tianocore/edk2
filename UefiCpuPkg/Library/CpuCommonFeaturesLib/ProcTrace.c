@@ -323,7 +323,7 @@ ProcTraceInitialize (
     // Program the Mask bits for the Memory Region to MSR IA32_RTIT_OUTPUT_MASK_PTRS (561h)
     //
     OutputMaskPtrsReg.Bits.MaskOrTableOffset = ((MemRegionSize - 1) >> 7) & 0x01FFFFFF;
-    OutputMaskPtrsReg.Bits.OutputOffset = RShiftU64 ((UINT64) (MemRegionSize - 1), 32) & 0xFFFFFFFF;
+    OutputMaskPtrsReg.Bits.OutputOffset = RShiftU64 (MemRegionSize - 1, 32) & 0xFFFFFFFF;
     CPU_REGISTER_TABLE_WRITE64 (
       ProcessorNumber,
       Msr,
