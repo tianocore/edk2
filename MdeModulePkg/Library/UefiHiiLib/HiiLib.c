@@ -1607,7 +1607,7 @@ ValidateQuestionFromVfr (
             break;
           }
           //
-          // Get Width by OneOf Flags
+          // Get the Max size of the string.
           //
           Width  = (UINT16) (IfrString->MaxSize * sizeof (UINT16));
           if (NameValueType) {
@@ -1621,6 +1621,10 @@ ValidateQuestionFromVfr (
               //
               break;
             }
+            //
+            // Skip the VarName.
+            //
+            StringPtr += StrLen (QuestionName);
 
             //
             // Skip the "=".
@@ -1629,8 +1633,13 @@ ValidateQuestionFromVfr (
             
             //
             // Check current string length is less than maxsize
+            // e.g Config String: "0041004200430044", Unicode String: "ABCD". Unicode String length = Config String length / 4.
+            // Config string format in UEFI spec.
+            // <NvConfig> ::= <Label>'='<String>
+            // <String> ::= [<Char>]+
+            // <Char> ::= <HexCh>4
             //
-            if (StrSize (StringPtr) > Width) {
+            if (StrLen (StringPtr) / 4 > IfrString->MaxSize) {
               return EFI_INVALID_PARAMETER;
             }
           } else {
@@ -1660,7 +1669,7 @@ ValidateQuestionFromVfr (
             //
             // Check current string length is less than maxsize
             //
-            if (StrSize ((CHAR16 *) (VarBuffer + Offset)) > Width) {
+            if (StrLen ((CHAR16 *) (VarBuffer + Offset)) > IfrString->MaxSize) {
               return EFI_INVALID_PARAMETER;
             }
           }
