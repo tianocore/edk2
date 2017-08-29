@@ -238,6 +238,20 @@
         # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
         "$(ASM)" $(ASM_FLAGS) -o ${dst} ${d_path}(+)${s_base}.iii
 
+[Device-Tree-Source-File]
+    <InputFile>
+        ?.dts
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dtb
+
+    <Command.GCC>
+        "$(PP)" $(DTCPP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        "$(DTC)" -I dts -O dtb -o ${dst} ${d_path}(+)${s_base}.i
+
 [Visual-Form-Representation-File]
     <InputFile>
         ?.vfr
