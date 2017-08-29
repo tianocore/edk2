@@ -339,23 +339,33 @@ PlatformVTdGetExceptionDeviceList (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (0) {
-    *DeviceInfo = AllocateZeroPool (sizeof(mExceptionDeviceScopeList));
-    if (*DeviceInfo == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    CopyMem (*DeviceInfo, mExceptionDeviceScopeList, sizeof(mExceptionDeviceScopeList));
-
-    *DeviceInfoCount = ARRAY_SIZE(mExceptionDeviceScopeList);
-  } else {
-    *DeviceInfo = AllocateZeroPool (sizeof(mExceptionPciDeviceIdList));
-    if (*DeviceInfo == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    CopyMem (*DeviceInfo, mExceptionPciDeviceIdList, sizeof(mExceptionPciDeviceIdList));
-
-    *DeviceInfoCount = ARRAY_SIZE(mExceptionPciDeviceIdList);
+  //
+  // Sample codes for device scope based exception list.
+  // Uncomment to take affect and comment the sample codes for PCI vendor id
+  // based exception list.
+  //
+  /*
+  *DeviceInfo = AllocateZeroPool (sizeof(mExceptionDeviceScopeList));
+  if (*DeviceInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
+  CopyMem (*DeviceInfo, mExceptionDeviceScopeList, sizeof(mExceptionDeviceScopeList));
+
+  *DeviceInfoCount = ARRAY_SIZE(mExceptionDeviceScopeList);
+  */
+
+  //
+  // Sample codes for PCI vendor id based exception list.
+  // Uncomment to take affect and comment the sample codes for device scope
+  // based exception list.
+  //
+  *DeviceInfo = AllocateZeroPool (sizeof(mExceptionPciDeviceIdList));
+  if (*DeviceInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  CopyMem (*DeviceInfo, mExceptionPciDeviceIdList, sizeof(mExceptionPciDeviceIdList));
+
+  *DeviceInfoCount = ARRAY_SIZE(mExceptionPciDeviceIdList);
 
   return EFI_SUCCESS;
 }
