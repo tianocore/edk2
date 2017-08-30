@@ -611,6 +611,14 @@ IoMmuFreeBuffer (
   UINTN                CommonBufferPages;
   COMMON_BUFFER_HEADER *CommonBufferHeader;
 
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Host=0x%p Pages=0x%Lx\n",
+    __FUNCTION__,
+    HostAddress,
+    (UINT64)Pages
+    ));
+
   CommonBufferPages = Pages + 1;
   CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
                          (UINTN)HostAddress - EFI_PAGE_SIZE
@@ -629,14 +637,6 @@ IoMmuFreeBuffer (
   // zero it.
   //
   FreePages (CommonBufferHeader->StashBuffer, Pages);
-
-  DEBUG ((
-    DEBUG_VERBOSE,
-    "%a Address 0x%Lx Pages 0x%Lx\n",
-    __FUNCTION__,
-    (UINT64)(UINTN)HostAddress,
-    (UINT64)Pages
-    ));
 
   //
   // Release the common buffer itself. Unmap() has re-encrypted it in-place, so
