@@ -31,3 +31,6 @@
 [LibraryClasses]
   DebugLib
   MemoryAllocationLib
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset

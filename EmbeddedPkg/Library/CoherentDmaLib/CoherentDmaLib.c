@@ -19,6 +19,14 @@
 #include <Library/MemoryAllocationLib.h>
 
 
+STATIC
+PHYSICAL_ADDRESS
+HostToDeviceAddress (
+  IN  VOID      *Address
+  )
+{
+  return (PHYSICAL_ADDRESS)(UINTN)Address + PcdGet64 (PcdDmaDeviceOffset);
+}
 
 /**
   Provides the DMA controller-specific addresses needed to access system memory.
@@ -50,7 +58,7 @@ DmaMap (
   OUT    VOID                           **Mapping
   )
 {
-  *DeviceAddress = (PHYSICAL_ADDRESS)(UINTN)HostAddress;
+  *DeviceAddress = HostToDeviceAddress (HostAddress);
   *Mapping = NULL;
   return EFI_SUCCESS;
 }
