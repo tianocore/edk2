@@ -239,6 +239,18 @@ SetMemoryEncDec (
   UINT64                         PgTableMask;
   UINT64                         AddressEncMask;
 
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u\n",
+    gEfiCallerBaseName,
+    __FUNCTION__,
+    Cr3BaseAddress,
+    PhysicalAddress,
+    (UINT64)Length,
+    (Mode == SetCBit) ? "Encrypt" : "Decrypt",
+    (UINT32)CacheFlush
+    ));
+
   //
   // Check if we have a valid memory encryption mask
   //
@@ -399,10 +411,6 @@ InternalMemEncryptSevSetMemoryDecrypted (
   )
 {
 
-  DEBUG ((DEBUG_VERBOSE,
-    "%a:%a Clear C-bit Cr3 %Lx Base %Lx Length %Lx flush %d\n",
-    gEfiCallerBaseName, __FUNCTION__, Cr3BaseAddress, PhysicalAddress, Length,
-    Flush));
   return SetMemoryEncDec (Cr3BaseAddress, PhysicalAddress, Length, ClearCBit, Flush);
 }
 
@@ -431,9 +439,5 @@ InternalMemEncryptSevSetMemoryEncrypted (
   IN  BOOLEAN                 Flush
   )
 {
-  DEBUG ((DEBUG_VERBOSE,
-    "%a:%a Set C-bit Cr3 %Lx Base %Lx Length %Lx flush %d\n",
-    gEfiCallerBaseName, __FUNCTION__, Cr3BaseAddress, PhysicalAddress, Length,
-    Flush));
   return SetMemoryEncDec (Cr3BaseAddress, PhysicalAddress, Length, SetCBit, Flush);
 }
