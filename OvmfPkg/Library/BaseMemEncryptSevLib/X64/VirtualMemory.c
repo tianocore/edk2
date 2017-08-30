@@ -287,8 +287,8 @@ SetMemoryEncDec (
     PageMapLevel4Entry += PML4_OFFSET(PhysicalAddress);
     if (!PageMapLevel4Entry->Bits.Present) {
       DEBUG ((
-        DEBUG_WARN,
-        "%a:%a: ERROR bad PML4 for Physical=0x%Lx\n",
+        DEBUG_ERROR,
+        "%a:%a: bad PML4 for Physical=0x%Lx\n",
         gEfiCallerBaseName,
         __FUNCTION__,
         PhysicalAddress
@@ -300,8 +300,8 @@ SetMemoryEncDec (
     PageDirectory1GEntry += PDP_OFFSET(PhysicalAddress);
     if (!PageDirectory1GEntry->Bits.Present) {
       DEBUG ((
-        DEBUG_WARN,
-        "%a:%a: ERROR bad PDPE for Physical=0x%Lx\n",
+        DEBUG_ERROR,
+        "%a:%a: bad PDPE for Physical=0x%Lx\n",
         gEfiCallerBaseName,
         __FUNCTION__,
         PhysicalAddress
@@ -351,8 +351,8 @@ SetMemoryEncDec (
       PageDirectory2MEntry += PDE_OFFSET(PhysicalAddress);
       if (!PageDirectory2MEntry->Bits.Present) {
         DEBUG ((
-          DEBUG_WARN,
-          "%a:%a: ERROR bad PDE for Physical=0x%Lx\n",
+          DEBUG_ERROR,
+          "%a:%a: bad PDE for Physical=0x%Lx\n",
           gEfiCallerBaseName,
           __FUNCTION__,
           PhysicalAddress
@@ -391,8 +391,8 @@ SetMemoryEncDec (
         PageTableEntry += PTE_OFFSET(PhysicalAddress);
         if (!PageTableEntry->Bits.Present) {
           DEBUG ((
-            DEBUG_WARN,
-            "%a:%a: ERROR bad PTE for Physical=0x%Lx\n",
+            DEBUG_ERROR,
+            "%a:%a: bad PTE for Physical=0x%Lx\n",
             gEfiCallerBaseName,
             __FUNCTION__,
             PhysicalAddress
