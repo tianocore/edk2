@@ -38,7 +38,6 @@
   NetLib
   UefiDriverEntryPoint
   BaseMemoryLib
-  ArmLib
   IoLib
   DevicePathLib
 
