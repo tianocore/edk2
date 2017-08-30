@@ -321,7 +321,7 @@ SetMemoryEncDec (
         SetOrClearCBit(&PageDirectory1GEntry->Uint64, Mode);
         DEBUG ((
           DEBUG_VERBOSE,
-          "%a:%a: Updated 1GB entry for Physical=0x%Lx\n",
+          "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
           gEfiCallerBaseName,
           __FUNCTION__,
           PhysicalAddress
@@ -334,7 +334,7 @@ SetMemoryEncDec (
         //
         DEBUG ((
           DEBUG_VERBOSE,
-          "%a:%a: Spliting 1GB page for Physical=0x%Lx\n",
+          "%a:%a: spliting 1GB page for Physical=0x%Lx\n",
           gEfiCallerBaseName,
           __FUNCTION__,
           PhysicalAddress
@@ -377,7 +377,7 @@ SetMemoryEncDec (
           //
           DEBUG ((
             DEBUG_VERBOSE,
-            "%a:%a: Spliting 2MB page for Physical=0x%Lx\n",
+            "%a:%a: spliting 2MB page for Physical=0x%Lx\n",
             gEfiCallerBaseName,
             __FUNCTION__,
             PhysicalAddress
