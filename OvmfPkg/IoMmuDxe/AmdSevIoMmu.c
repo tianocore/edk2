@@ -45,6 +45,19 @@ STATIC LIST_ENTRY mRecycledMapInfos = INITIALIZE_LIST_HEAD_VARIABLE (
 #define COMMON_BUFFER_SIG SIGNATURE_64 ('C', 'M', 'N', 'B', 'U', 'F', 'F', 'R')
 
 //
+// ASCII names for EDKII_IOMMU_OPERATION constants, for debug logging.
+//
+STATIC CONST CHAR8 * CONST
+mBusMasterOperationName[EdkiiIoMmuOperationMaximum] = {
+  "Read",
+  "Write",
+  "CommonBuffer",
+  "Read64",
+  "Write64",
+  "CommonBuffer64"
+};
+
+//
 // The following structure enables Map() and Unmap() to perform in-place
 // decryption and encryption, respectively, for BusMasterCommonBuffer[64]
 // operations, without dynamic memory allocation or release.
@@ -115,6 +128,18 @@ IoMmuMap (
   EFI_ALLOCATE_TYPE                                 AllocateType;
   COMMON_BUFFER_HEADER                              *CommonBufferHeader;
   VOID                                              *DecryptionSource;
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Operation=%a Host=0x%p Bytes=0x%Lx\n",
+    __FUNCTION__,
+    ((Operation >= 0 &&
+      Operation < ARRAY_SIZE (mBusMasterOperationName)) ?
+     mBusMasterOperationName[Operation] :
+     "Invalid"),
+    HostAddress,
+    (UINT64)((NumberOfBytes == NULL) ? 0 : *NumberOfBytes)
+    ));
 
   if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL ||
       Mapping == NULL) {
@@ -281,12 +306,12 @@ IoMmuMap (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a PlainText 0x%Lx Crypted 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
+    "%a: Mapping=0x%p Device(PlainText)=0x%Lx Crypted=0x%Lx Pages=0x%Lx\n",
     __FUNCTION__,
+    MapInfo,
     MapInfo->PlainTextAddress,
     MapInfo->CryptedAddress,
-    (UINT64)MapInfo->NumberOfPages,
-    (UINT64)MapInfo->NumberOfBytes
+    (UINT64)MapInfo->NumberOfPages
     ));
 
   return EFI_SUCCESS;
