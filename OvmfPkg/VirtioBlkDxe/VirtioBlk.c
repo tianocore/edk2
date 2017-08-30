@@ -260,6 +260,7 @@ SynchronousRequest (
   EFI_PHYSICAL_ADDRESS    HostStatusDeviceAddress;
   EFI_PHYSICAL_ADDRESS    RequestDeviceAddress;
   EFI_STATUS              Status;
+  EFI_STATUS              UnmapStatus;
 
   BlockSize = Dev->BlockIoMedia.BlockSize;
 
@@ -430,7 +431,13 @@ SynchronousRequest (
 
 UnmapDataBuffer:
   if (BufferSize > 0) {
-    Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, BufferMapping);
+    UnmapStatus = Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, BufferMapping);
+    if (EFI_ERROR (UnmapStatus) && !RequestIsWrite && !EFI_ERROR (Status)) {
+      //
+      // Data from the bus master may not reach the caller; fail the request.
+      //
+      Status = EFI_DEVICE_ERROR;
+    }
   }
 
 UnmapRequestBuffer:
