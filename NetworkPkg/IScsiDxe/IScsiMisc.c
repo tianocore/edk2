@@ -1009,7 +1009,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP4_MIN_SIZE,
-      IP4_MAX_SIZE,
+      IP4_STR_MAX_SIZE,
       NULL
       );
 
@@ -1035,7 +1035,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP4_MIN_SIZE,
-      IP4_MAX_SIZE,
+      IP4_STR_MAX_SIZE,
       NULL
       );
 
@@ -1061,7 +1061,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP4_MIN_SIZE,
-      IP4_MAX_SIZE,
+      IP4_STR_MAX_SIZE,
       NULL
       );
 
@@ -1167,7 +1167,7 @@ IScsiCreateKeywords (
       0,
       0,
       IP_MIN_SIZE,
-      IP_MAX_SIZE,
+      IP_STR_MAX_SIZE,
       NULL
       );
 
