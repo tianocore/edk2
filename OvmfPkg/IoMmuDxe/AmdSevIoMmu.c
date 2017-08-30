@@ -490,6 +490,15 @@ IoMmuAllocateBuffer (
   UINTN                     CommonBufferPages;
   COMMON_BUFFER_HEADER      *CommonBufferHeader;
 
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: MemoryType=%u Pages=0x%Lx Attributes=0x%Lx\n",
+    __FUNCTION__,
+    (UINT32)MemoryType,
+    (UINT64)Pages,
+    Attributes
+    ));
+
   //
   // Validate Attributes
   //
@@ -566,10 +575,10 @@ IoMmuAllocateBuffer (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a Address 0x%Lx Pages 0x%Lx\n",
+    "%a: Host=0x%Lx Stash=0x%p\n",
     __FUNCTION__,
     PhysicalAddress,
-    (UINT64)Pages
+    StashBuffer
     ));
   return EFI_SUCCESS;
 
