@@ -288,7 +288,7 @@ SetMemoryEncDec (
     if (!PageMapLevel4Entry->Bits.Present) {
       DEBUG ((
         DEBUG_WARN,
-        "%a:%a ERROR bad PML4 for %lx\n",
+        "%a:%a: ERROR bad PML4 for %lx\n",
         gEfiCallerBaseName,
         __FUNCTION__,
         PhysicalAddress
@@ -301,7 +301,7 @@ SetMemoryEncDec (
     if (!PageDirectory1GEntry->Bits.Present) {
       DEBUG ((
         DEBUG_WARN,
-        "%a:%a ERROR bad PDPE for %lx\n",
+        "%a:%a: ERROR bad PDPE for %lx\n",
         gEfiCallerBaseName,
         __FUNCTION__,
         PhysicalAddress
@@ -321,7 +321,7 @@ SetMemoryEncDec (
         SetOrClearCBit(&PageDirectory1GEntry->Uint64, Mode);
         DEBUG ((
           DEBUG_VERBOSE,
-          "%a:%a Updated 1GB entry for %lx\n",
+          "%a:%a: Updated 1GB entry for %lx\n",
           gEfiCallerBaseName,
           __FUNCTION__,
           PhysicalAddress
@@ -334,7 +334,7 @@ SetMemoryEncDec (
         //
         DEBUG ((
           DEBUG_VERBOSE,
-          "%a:%a Spliting 1GB page\n",
+          "%a:%a: Spliting 1GB page\n",
           gEfiCallerBaseName,
           __FUNCTION__
           ));
@@ -351,7 +351,7 @@ SetMemoryEncDec (
       if (!PageDirectory2MEntry->Bits.Present) {
         DEBUG ((
           DEBUG_WARN,
-          "%a:%a ERROR bad PDE for %lx\n",
+          "%a:%a: ERROR bad PDE for %lx\n",
           gEfiCallerBaseName,
           __FUNCTION__,
           PhysicalAddress
@@ -376,7 +376,7 @@ SetMemoryEncDec (
           //
           DEBUG ((
             DEBUG_VERBOSE,
-            "%a:%a Spliting 2MB page at %lx\n",
+            "%a:%a: Spliting 2MB page at %lx\n",
             gEfiCallerBaseName,
             __FUNCTION__,
             PhysicalAddress
@@ -391,7 +391,7 @@ SetMemoryEncDec (
         if (!PageTableEntry->Bits.Present) {
           DEBUG ((
             DEBUG_WARN,
-            "%a:%a ERROR bad PTE for %lx\n",
+            "%a:%a: ERROR bad PTE for %lx\n",
             gEfiCallerBaseName,
             __FUNCTION__,
             PhysicalAddress
