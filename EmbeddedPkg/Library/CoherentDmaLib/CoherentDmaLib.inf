@@ -1,6 +1,8 @@
 #/** @file
 #
 #  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -12,15 +14,15 @@
 #**/
 
 [Defines]
-  INF_VERSION                    = 0x00010005
-  BASE_NAME                      = NullDmaLib
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = CoherentDmaLib
   FILE_GUID                      = 0F2A0816-D319-4ee7-A6B8-D58524E4428F
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DmaLib
 
-[Sources.common]
-  NullDmaLib.c
+[Sources]
+  CoherentDmaLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -29,13 +31,3 @@
 [LibraryClasses]
   DebugLib
   MemoryAllocationLib
-
-
-[Protocols]
-
-[Guids]
-
-[Pcd]
-
-[Depex]
-  TRUE
