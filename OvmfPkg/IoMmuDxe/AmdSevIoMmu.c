@@ -348,6 +348,8 @@ IoMmuUnmap (
   COMMON_BUFFER_HEADER     *CommonBufferHeader;
   VOID                     *EncryptionTarget;
 
+  DEBUG ((DEBUG_VERBOSE, "%a: Mapping=0x%p\n", __FUNCTION__, Mapping));
+
   if (Mapping == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -398,16 +400,6 @@ IoMmuUnmap (
     //
     break;
   }
-
-  DEBUG ((
-    DEBUG_VERBOSE,
-    "%a PlainText 0x%Lx Crypted 0x%Lx Pages 0x%Lx Bytes 0x%Lx\n",
-    __FUNCTION__,
-    MapInfo->PlainTextAddress,
-    MapInfo->CryptedAddress,
-    (UINT64)MapInfo->NumberOfPages,
-    (UINT64)MapInfo->NumberOfBytes
-    ));
 
   //
   // Restore the memory encryption mask on the area we used to hold the
