@@ -60,6 +60,7 @@ typedef struct {
   VRING                           Ring;           // VirtioRingInit      2
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;       // VirtioScsiInit      1
   EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;   // VirtioScsiInit      1
+  VOID                            *RingMap;       // VirtioRingMap       2
 } VSCSI_DEV;
 
 #define VIRTIO_SCSI_FROM_PASS_THRU(PassThruPointer) \
