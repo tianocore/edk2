@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@
 
 #include <PiPei.h>
 #include <Library/PeiServicesLib.h>
+#include <Ppi/MemoryDiscovered.h>
 #include "DebugCommunicationLibUsb3Internal.h"
 
 /**
@@ -32,13 +33,24 @@ AllocateAlignBuffer (
   VOID                     *Buf;
   EFI_PHYSICAL_ADDRESS     Address;
   EFI_STATUS               Status;
-  
-  Buf = NULL;  
-  Status = PeiServicesAllocatePages (EfiACPIMemoryNVS, EFI_SIZE_TO_PAGES (BufferSize), &Address);
-  if (EFI_ERROR (Status)) {
-    Buf = NULL;
-  } else {
-    Buf = (VOID *)(UINTN) Address;
+  VOID                     *MemoryDiscoveredPpi;
+
+  Buf = NULL;
+
+  //
+  // Make sure the allocated memory is physical memory.
+  //
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiMemoryDiscoveredPpiGuid,
+             0,
+             NULL,
+             (VOID **) &MemoryDiscoveredPpi
+             );
+  if (!EFI_ERROR (Status)) {
+    Status = PeiServicesAllocatePages (EfiACPIMemoryNVS, EFI_SIZE_TO_PAGES (BufferSize), &Address);
+    if (!EFI_ERROR (Status)) {
+      Buf = (VOID *)(UINTN) Address;
+    }
   }
   return Buf;
 }
