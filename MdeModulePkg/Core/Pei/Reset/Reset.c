@@ -35,16 +35,21 @@ PeiResetSystem (
   EFI_STATUS        Status;
   EFI_PEI_RESET_PPI *ResetPpi;
 
-  Status = PeiServicesLocatePpi (
-             &gEfiPeiResetPpiGuid,         
-             0,                         
-             NULL,                      
-             (VOID **)&ResetPpi                  
-             );
+  //
+  // Attempt to use newer ResetSystem2().  If this returns, then ResetSystem2()
+  // is not available.
+  //
+  PeiResetSystem2 (EfiResetCold, EFI_SUCCESS, 0, NULL);
 
   //
-  // LocatePpi returns EFI_NOT_FOUND on error
+  // Look for PEI Reset System PPI
   //
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiResetPpiGuid,
+             0,
+             NULL,
+             (VOID **)&ResetPpi
+             );
   if (!EFI_ERROR (Status)) {
     return ResetPpi->ResetSystem (PeiServices);
   } 
@@ -55,6 +60,10 @@ PeiResetSystem (
     EFI_ERROR_CODE | EFI_ERROR_MINOR,
     (EFI_SOFTWARE_PEI_CORE | EFI_SW_PS_EC_RESET_NOT_AVAILABLE)
     );
+
+  //
+  // No reset PPIs are available yet.
+  //
   return  EFI_NOT_AVAILABLE_YET;
 }
 
@@ -85,6 +94,9 @@ PeiResetSystem2 (
   EFI_STATUS            Status;
   EFI_PEI_RESET2_PPI    *Reset2Ppi;
 
+  //
+  // Look for PEI Reset System 2 PPI
+  //
   Status = PeiServicesLocatePpi (
              &gEfiPeiReset2PpiGuid,
              0,
