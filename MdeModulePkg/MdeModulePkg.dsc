@@ -281,13 +281,16 @@
   MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
+  MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
   MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   MdeModulePkg/Library/DxePrintLibPrint2Protocol/DxePrintLibPrint2Protocol.inf
   MdeModulePkg/Library/PeiCrc32GuidedSectionExtractLib/PeiCrc32GuidedSectionExtractLib.inf
   MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   MdeModulePkg/Library/PeiRecoveryLibNull/PeiRecoveryLibNull.inf
+  MdeModulePkg/Library/PeiResetSystemLib/PeiResetSystemLib.inf
   MdeModulePkg/Library/PeiS3LibNull/PeiS3LibNull.inf
   MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  MdeModulePkg/Library/ResetUtilityLib/ResetUtilityLib.inf
   MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
   MdeModulePkg/Library/DxeSecurityManagementLib/DxeSecurityManagementLib.inf
   MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
