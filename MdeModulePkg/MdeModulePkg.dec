@@ -54,6 +54,9 @@
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
 
+  ##  @libraryclass  Defines a set of helper functions for resetting the system.
+  ResetUtilityLib|Include/Library/ResetUtilityLib.h
+
   ##  @libraryclass  Defines a set of methods related do S3 mode.
   #   This library class is no longer used and modules using this library should
   #   directly locate EFI_PEI_S3_RESUME_PPI defined in PI 1.2 specification.
