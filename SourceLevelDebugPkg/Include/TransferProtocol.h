@@ -2,7 +2,7 @@
   Transfer protocol defintions used by debug agent and host. It is only
   intended to be used by Debug related module implementation.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,6 @@
 //
 #define DEBUG_AGENT_REVISION_03         ((0 << 16) | 03)
 #define DEBUG_AGENT_REVISION_04         ((0 << 16) | 04)
-#define DEBUG_AGENT_REVISION            DEBUG_AGENT_REVISION_04
 #define DEBUG_AGENT_CAPABILITIES        0
 
 //

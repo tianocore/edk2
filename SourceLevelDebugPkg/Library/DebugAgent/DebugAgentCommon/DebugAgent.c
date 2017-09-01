@@ -1564,7 +1564,7 @@ ReadMemoryAndSendResponsePacket (
     // Compression/decompression support was added since revision 0.4.
     // Revision 0.3 shouldn't compress the packet.
     //
-    if (DEBUG_AGENT_REVISION >= DEBUG_AGENT_REVISION_04) {
+    if (PcdGet32(PcdTransferProtocolRevision) >= DEBUG_AGENT_REVISION_04) {
       //
       // Get the compressed data size without modifying the packet.
       //
@@ -1711,7 +1711,7 @@ AttachHost (
   }
   if (IncompatibilityFlag) {
     //
-    // If the incompatible Debug Packet received, the HOST should be running transfer protocol before DEBUG_AGENT_REVISION.
+    // If the incompatible Debug Packet received, the HOST should be running transfer protocol before PcdTransferProtocolRevision.
     // It could be UDK Debugger for Windows v1.1/v1.2 or for Linux v0.8/v1.2.
     //
     DebugPortWriteBuffer (Handle, (UINT8 *) mErrorMsgVersionAlert, AsciiStrLen (mErrorMsgVersionAlert));
@@ -2192,7 +2192,7 @@ CommandCommunication (
       break;
 
     case DEBUG_COMMAND_GET_REVISION:
-      DebugAgentRevision.Revision = DEBUG_AGENT_REVISION;
+      DebugAgentRevision.Revision = PcdGet32(PcdTransferProtocolRevision);
       DebugAgentRevision.Capabilities = DEBUG_AGENT_CAPABILITIES;
       Status = SendDataResponsePacket ((UINT8 *) &DebugAgentRevision, (UINT16) sizeof (DEBUG_DATA_RESPONSE_GET_REVISION), DebugHeader);
       break;

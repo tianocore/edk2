@@ -8,7 +8,7 @@
 // and host, PeCoffExtraActionLib instance to report symbol path information,
 // etc.
 //
-// Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License that accompanies this distribution.
@@ -90,4 +90,11 @@
 
 #string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciDebugDetectTimeout_HELP  #language en-US "Per XHCI spec, software shall impose a timeout between the detection of the Debug Host\n"
                                                                                                      "connection and the DbC Run transition to 1. This PCD specifies the timeout value in microsecond."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdTransferProtocolRevision_PROMPT  #language en-US "Default revision of the debug agent transfer protocol."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdTransferProtocolRevision_HELP  #language en-US "The upper 16 bits indicate the major revision and the lower 16 bits indicate\n"
+                                                                                                    "the minor revision.\n"
+                                                                                                    "For example, a value of 0x00000004 stands for revision 0.4.\n"
+                                                                                                    "Debug packet compression and decompression is supported since revision 0.4."
 
