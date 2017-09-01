@@ -20,6 +20,8 @@
 
 #include <Protocol/Reset.h>
 #include <Protocol/ResetNotification.h>
+#include <Protocol/PlatformSpecificResetFilter.h>
+#include <Protocol/PlatformSpecificResetHandler.h>
 #include <Guid/CapsuleVendor.h>
 
 #include <Library/BaseLib.h>
@@ -33,6 +35,11 @@
 #include <Library/ResetSystemLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/MemoryAllocationLib.h>
+
+//
+// The maximum recurstion depth to ResetSystem() by reset notification handlers
+//
+#define MAX_RESET_NOTIFY_DEPTH 10
 
 typedef struct {
   UINT32                   Signature;
