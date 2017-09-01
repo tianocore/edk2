@@ -15,6 +15,11 @@
 
 #include "ResetSystem.h"
 
+//
+// The current ResetSystem() notification recursion depth
+//
+UINTN  mResetNotifyDepth = 0;
+
 /**
   Register a notification function to be called when ResetSystem() is called.
 
@@ -130,6 +135,24 @@ RESET_NOTIFICATION_INSTANCE mResetNotification = {
   INITIALIZE_LIST_HEAD_VARIABLE (mResetNotification.ResetNotifies)
 };
 
+RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetFilter = {
+  RESET_NOTIFICATION_INSTANCE_SIGNATURE,
+  {
+    RegisterResetNotify,
+    UnregisterResetNotify
+  },
+  INITIALIZE_LIST_HEAD_VARIABLE (mPlatformSpecificResetFilter.ResetNotifies)
+};
+
+RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetHandler = {
+  RESET_NOTIFICATION_INSTANCE_SIGNATURE,
+  {
+    RegisterResetNotify,
+    UnregisterResetNotify
+  },
+  INITIALIZE_LIST_HEAD_VARIABLE (mPlatformSpecificResetHandler.ResetNotifies)
+};
+
 /**
   The driver's entry point.
 
@@ -170,6 +193,8 @@ InitializeResetSystem (
                   &Handle,
                   &gEfiResetArchProtocolGuid,         NULL,
                   &gEfiResetNotificationProtocolGuid, &mResetNotification.ResetNotification,
+                  &gEdkiiPlatformSpecificResetFilterProtocolGuid, &mPlatformSpecificResetFilter.ResetNotification,
+                  &gEdkiiPlatformSpecificResetHandlerProtocolGuid, &mPlatformSpecificResetHandler.ResetNotification,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -225,16 +250,58 @@ ResetSystem (
   UINTN               CapsuleDataPtr;
   LIST_ENTRY          *Link;
   RESET_NOTIFY_ENTRY  *Entry;
-  
-  //
-  // Indicate reset system runtime service is called.
-  //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_RESET_SYSTEM));
 
-  if (!EfiAtRuntime ()) {
+  //
+  // Above the maximum recursion depth, so do the smallest amount of
+  // work to perform a cold reset.
+  //
+  if (mResetNotifyDepth >= MAX_RESET_NOTIFY_DEPTH) {
+    ResetCold ();
+    ASSERT (FALSE);
+    return;
+  }
+
+  //
+  // Only do REPORT_STATUS_CODE() on first call to ResetSystem()
+  //
+  if (mResetNotifyDepth == 0) {
+    //
+    // Indicate reset system runtime service is called.
+    //
+    REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_RESET_SYSTEM));
+  }
+
+  mResetNotifyDepth++;
+  if (!EfiAtRuntime () && mResetNotifyDepth < MAX_RESET_NOTIFY_DEPTH) {
+    //
+    // Call reset notification functions registered through the
+    // EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL.
+    //
+    for ( Link = GetFirstNode (&mPlatformSpecificResetFilter.ResetNotifies)
+        ; !IsNull (&mPlatformSpecificResetFilter.ResetNotifies, Link)
+        ; Link = GetNextNode (&mPlatformSpecificResetFilter.ResetNotifies, Link)
+        ) {
+      Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+      Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
+    }
+    //
+    // Call reset notification functions registered through the
+    // EFI_RESET_NOTIFICATION_PROTOCOL.
+    //
     for ( Link = GetFirstNode (&mResetNotification.ResetNotifies)
         ; !IsNull (&mResetNotification.ResetNotifies, Link)
         ; Link = GetNextNode (&mResetNotification.ResetNotifies, Link)
+        ) {
+      Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+      Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
+    }
+    //
+    // call reset notification functions registered through the 
+    // EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PROTOCOL.
+    //
+    for ( Link = GetFirstNode (&mPlatformSpecificResetHandler.ResetNotifies)
+        ; !IsNull (&mPlatformSpecificResetHandler.ResetNotifies, Link)
+        ; Link = GetNextNode (&mPlatformSpecificResetHandler.ResetNotifies, Link)
         ) {
       Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
       Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
