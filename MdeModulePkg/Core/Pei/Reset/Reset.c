@@ -1,14 +1,14 @@
 /** @file
   Pei Core Reset System Support
-  
+
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -29,11 +29,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_STATUS
 EFIAPI
 PeiResetSystem (
-  IN CONST EFI_PEI_SERVICES         **PeiServices
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS        Status;
-  EFI_PEI_RESET_PPI *ResetPpi;
+  EFI_STATUS         Status;
+  EFI_PEI_RESET_PPI  *ResetPpi;
 
   //
   // Attempt to use newer ResetSystem2().  If this returns, then ResetSystem2()
@@ -52,9 +52,10 @@ PeiResetSystem (
              );
   if (!EFI_ERROR (Status)) {
     return ResetPpi->ResetSystem (PeiServices);
-  } 
+  }
+
   //
-  // Report Status Code that Reset PPI is not available
+  // Report Status Code that Reset PPI is not available.
   //
   REPORT_STATUS_CODE (
     EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -85,14 +86,14 @@ PeiResetSystem (
 VOID
 EFIAPI
 PeiResetSystem2 (
-  IN EFI_RESET_TYPE     ResetType,
-  IN EFI_STATUS         ResetStatus,
-  IN UINTN              DataSize,
-  IN VOID               *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  EFI_PEI_RESET2_PPI    *Reset2Ppi;
+  EFI_STATUS          Status;
+  EFI_PEI_RESET2_PPI  *Reset2Ppi;
 
   //
   // Look for PEI Reset System 2 PPI
@@ -103,7 +104,6 @@ PeiResetSystem2 (
              NULL,
              (VOID **)&Reset2Ppi
              );
-
   if (!EFI_ERROR (Status)) {
     Reset2Ppi->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
     return;
@@ -117,4 +117,3 @@ PeiResetSystem2 (
     (EFI_SOFTWARE_PEI_CORE | EFI_SW_PS_EC_RESET_NOT_AVAILABLE)
     );
 }
-
