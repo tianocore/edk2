@@ -104,7 +104,8 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
   {                   // NonBlocking TaskList
     NULL,
     NULL
-  }
+  },
+  NULL,               // ExitBootEvent
 };
 
 ATAPI_DEVICE_PATH    mAtapiDevicePathTemplate = {
@@ -479,6 +480,38 @@ InitializeAtaAtapiPassThru (
 }
 
 /**
+  Disable the device (especially Bus Master DMA) when exiting the boot
+  services.
+
+  @param[in] Event    Event for which this notification function is being
+                      called.
+  @param[in] Context  Pointer to the ATA_ATAPI_PASS_THRU_INSTANCE that
+                      represents the HBA.
+**/
+VOID
+EFIAPI
+AtaPassThruExitBootServices (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  ATA_ATAPI_PASS_THRU_INSTANCE *Instance;
+  EFI_PCI_IO_PROTOCOL          *PciIo;
+
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+
+  Instance = Context;
+  PciIo = Instance->PciIo;
+
+  PciIo->Attributes (
+           PciIo,
+           EfiPciIoAttributeOperationDisable,
+           Instance->EnabledPciAttributes,
+           NULL
+           );
+}
+
+/**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
@@ -757,6 +790,17 @@ AtaAtapiPassThruStart (
   InitializeListHead(&Instance->DeviceList);
   InitializeListHead(&Instance->NonBlockingTaskList);
 
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
+                  AtaPassThruExitBootServices,
+                  Instance,
+                  &Instance->ExitBootEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
+
   Instance->TimerEvent = NULL;
 
   Status = gBS->CreateEvent (
@@ -808,6 +852,10 @@ ErrorExit:
 
   if ((Instance != NULL) && (Instance->TimerEvent != NULL)) {
     gBS->CloseEvent (Instance->TimerEvent);
+  }
+
+  if ((Instance != NULL) && (Instance->ExitBootEvent != NULL)) {
+    gBS->CloseEvent (Instance->ExitBootEvent);
   }
 
   //
@@ -908,6 +956,15 @@ AtaAtapiPassThruStop (
     Instance->TimerEvent = NULL;
   }
   DestroyAsynTaskList (Instance, FALSE);
+
+  //
+  // Close event signaled at gBS->ExitBootServices().
+  //
+  if (Instance->ExitBootEvent != NULL) {
+    gBS->CloseEvent (Instance->ExitBootEvent);
+    Instance->ExitBootEvent = NULL;
+  }
+
   //
   // Free allocated resource
   //
