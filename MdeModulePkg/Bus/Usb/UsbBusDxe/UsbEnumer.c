@@ -440,7 +440,11 @@ UsbSelectConfig (
     Status = UsbConnectDriver (UsbIf);
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbSelectConfig: failed to connect driver %r, ignored\n", Status));
+      DEBUG ((
+        DEBUG_WARN,
+        "UsbSelectConfig: failed to connect driver %r, ignored\n",
+        Status
+        ));
     }
   }
 
