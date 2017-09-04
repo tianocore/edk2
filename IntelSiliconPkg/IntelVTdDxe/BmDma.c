@@ -77,13 +77,13 @@ IoMmuMap (
   EFI_PHYSICAL_ADDRESS                              DmaMemoryTop;
   BOOLEAN                                           NeedRemap;
 
-  DEBUG ((DEBUG_VERBOSE, "IoMmuMap: ==> 0x%08x - 0x%08x (%x)\n", HostAddress, NumberOfBytes, Operation));
-
-  if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL ||
+  if (NumberOfBytes == NULL || DeviceAddress == NULL ||
       Mapping == NULL) {
     DEBUG ((DEBUG_ERROR, "IoMmuMap: %r\n", EFI_INVALID_PARAMETER));
     return EFI_INVALID_PARAMETER;
   }
+
+  DEBUG ((DEBUG_VERBOSE, "IoMmuMap: ==> 0x%08x - 0x%08x (%x)\n", HostAddress, *NumberOfBytes, Operation));
 
   //
   // Make sure that Operation is valid
@@ -135,7 +135,7 @@ IoMmuMap (
     if (NeedRemap) {
       //
       // Common Buffer operations can not be remapped.  If the common buffer
-      // if above 4GB, then it is not possible to generate a mapping, so return
+      // is above 4GB, then it is not possible to generate a mapping, so return
       // an error.
       //
       DEBUG ((DEBUG_ERROR, "IoMmuMap: %r\n", EFI_UNSUPPORTED));
