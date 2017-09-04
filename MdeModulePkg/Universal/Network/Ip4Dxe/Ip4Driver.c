@@ -41,12 +41,20 @@ IpSec2InstalledCallback (
   IN VOID       *Context
   )
 {
+  EFI_STATUS    Status;
   //
-  // Close the event so it does not get called again.
+  // Test if protocol was even found.
+  // Notification function will be called at least once.
   //
-  gBS->CloseEvent (Event);
+  Status = gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, &mIpSec);
+  if (Status == EFI_SUCCESS && mIpSec != NULL) {
+    //
+    // Close the event so it does not get called again.
+    //
+    gBS->CloseEvent (Event);
 
-  mIpSec2Installed = TRUE;
+    mIpSec2Installed = TRUE;
+  }
 }
 
 /**
