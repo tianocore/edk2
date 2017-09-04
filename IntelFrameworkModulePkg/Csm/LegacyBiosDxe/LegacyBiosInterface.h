@@ -47,6 +47,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/SerialIo.h>
 #include <Protocol/SuperIo.h>
+#include <Protocol/IoMmu.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

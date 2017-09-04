@@ -41,7 +41,7 @@ BOOLEAN                             mIgnoreBbsUpdateFlag;
 BOOLEAN                             mVgaInstallationInProgress  = FALSE;
 UINT32                              mRomCount                   = 0x00;
 ROM_INSTANCE_ENTRY                  mRomEntry[ROM_MAX_ENTRIES];
-
+EDKII_IOMMU_PROTOCOL                *mIoMmu;
 
 /**
   Query shadowed legacy ROM parameters registered by RomShadow() previously.
@@ -2697,6 +2697,61 @@ Done:
 }
 
 /**
+  Let IOMMU grant DMA access for the PCI device.
+
+  @param  PciHandle             The EFI handle for the PCI device.
+  @param  HostAddress           The system memory address to map to the PCI controller.
+  @param  NumberOfBytes         The number of bytes to map.
+
+  @retval EFI_SUCCESS  The DMA access is granted.
+**/
+EFI_STATUS
+IoMmuGrantAccess (
+  IN  EFI_HANDLE                        PciHandle,
+  IN  EFI_PHYSICAL_ADDRESS              HostAddress,
+  IN  UINTN                             NumberOfBytes
+  )
+{
+  EFI_PHYSICAL_ADDRESS            DeviceAddress;
+  VOID                            *Mapping;
+  EFI_STATUS                      Status;
+
+  if (PciHandle == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = EFI_SUCCESS;
+  if (mIoMmu == NULL) {
+    gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL, (VOID **)&mIoMmu);
+  }
+  if (mIoMmu != NULL) {
+    Status = mIoMmu->Map (
+                       mIoMmu,
+                       EdkiiIoMmuOperationBusMasterCommonBuffer,
+                       (VOID *)(UINTN)HostAddress,
+                       &NumberOfBytes,
+                       &DeviceAddress,
+                       &Mapping
+                       );
+    if (EFI_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "LegacyPci - IoMmuMap - %r\n", Status));
+    } else {
+      ASSERT (DeviceAddress == HostAddress);
+      Status = mIoMmu->SetAttribute (
+                         mIoMmu,
+                         PciHandle,
+                         Mapping,
+                         EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE
+                         );
+      if (EFI_ERROR(Status)) {
+        DEBUG ((DEBUG_ERROR, "LegacyPci - IoMmuSetAttribute - %r\n", Status));
+      }
+    }
+  }
+  return Status;
+}
+
+/**
   Load a legacy PC-AT OPROM on the PciHandle device. Return information
   about how many disks were added by the OPROM and the shadow address and
   size. DiskStart & DiskEnd are INT 13h drive letters. Thus 0x80 is C:
@@ -2978,6 +3033,21 @@ LegacyBiosInstallPciRom (
       RuntimeImageLength = Pcir->MaxRuntimeImageLength * 512;
     }
   }
+
+  //
+  // Grant access for below 1M
+  // BDA/EBDA/LowPMM and scratch memory for OPROM.
+  //
+  IoMmuGrantAccess (PciHandle, 0, SIZE_1MB);
+  //
+  // Grant access for HiPmm
+  //
+  IoMmuGrantAccess (
+    PciHandle,
+    Private->IntThunk->EfiToLegacy16InitTable.HiPmmMemory,
+    Private->IntThunk->EfiToLegacy16InitTable.HiPmmMemorySizeInBytes
+    );
+
   //
   // Shadow and initialize the OpROM.
   //
