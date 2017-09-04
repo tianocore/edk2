@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP6 driver.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
@@ -41,14 +41,20 @@ IpSec2InstalledCallback (
   IN VOID       *Context
   )
 {
+  EFI_STATUS    Status;
   //
-  // Close the event so it does not get called again.
+  // Test if protocol was even found.
+  // Notification function will be called at least once.
   //
-  gBS->CloseEvent (Event);
+  Status = gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, &mIpSec);
+  if (Status == EFI_SUCCESS && mIpSec != NULL) {
+    //
+    // Close the event so it does not get called again.
+    //
+    gBS->CloseEvent (Event);
 
-  mIpSec2Installed = TRUE;
-
-  return;
+    mIpSec2Installed = TRUE;
+  }
 }
 
 /**

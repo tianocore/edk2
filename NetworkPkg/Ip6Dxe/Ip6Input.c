@@ -1,7 +1,7 @@
 /** @file
   IP6 internal functions to process the incoming packets.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
@@ -530,6 +530,7 @@ Ip6IpSecProcessPacket (
   if (!mIpSec2Installed) {
     goto ON_EXIT;
   }
+  ASSERT (mIpSec != NULL);
   
   Packet        = *Netbuf;
   RecycleEvent  = NULL;
@@ -540,17 +541,6 @@ Ip6IpSecProcessPacket (
   TxWrap        = (IP6_TXTOKEN_WRAP *) Context;
   FragmentCount = Packet->BlockOpNum;
   ZeroMem (&ZeroHead, sizeof (EFI_IP6_HEADER));
-
-  if (mIpSec == NULL) {
-    gBS->LocateProtocol (&gEfiIpSec2ProtocolGuid, NULL, (VOID **) &mIpSec);
-
-    //
-    // Check whether the ipsec protocol is available.
-    //
-    if (mIpSec == NULL) {
-      goto ON_EXIT;
-    }
-  }
 
   //
   // Check whether the ipsec enable variable is set.
