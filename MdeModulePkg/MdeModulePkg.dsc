@@ -356,6 +356,10 @@
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
+    <LibraryClasses>
+      ResetSystemLib|MdeModulePkg/Library/BaseResetSystemLibNull/BaseResetSystemLibNull.inf
+  }
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf

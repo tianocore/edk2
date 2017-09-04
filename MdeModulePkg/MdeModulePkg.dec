@@ -1431,6 +1431,10 @@
   # @Prompt String FPDT Record Enable Only
   gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly|FALSE|BOOLEAN|0x00000109
 
+  ## Indicates the allowable maximum number of Reset Filters or Reset Handlers in PEI phase.
+  # @Prompt Maximum Number of PEI Reset Filters or Reset Handlers.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -1730,7 +1734,7 @@
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for
   #  the extension FPDT boot records received after ReadyToBoot and before ExitBootService.
   # @Prompt Pad size for extension FPDT boot records.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x20000|UINT32|0x0001005F
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x0|UINT32|0x0001005F
 
   ## Indicates if ConIn device are connected on demand.<BR><BR>
   #   TRUE  - ConIn device are not connected during BDS and ReadKeyStroke/ReadKeyStrokeEx produced
