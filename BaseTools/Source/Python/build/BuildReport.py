@@ -971,10 +971,10 @@ class PcdReport(object):
                     #
                     # Report PCD item according to their override relationship
                     #
-                    if BuildOptionMatch:
-                        FileWrite(File, ' *B %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
-                    elif DecMatch and InfMatch:
+                    if DecMatch and InfMatch:
                         FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                    elif BuildOptionMatch:
+                        FileWrite(File, ' *B %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
                     else:
                         if DscMatch:
                             if (Pcd.TokenCName, Key) in self.FdfPcdSet:
