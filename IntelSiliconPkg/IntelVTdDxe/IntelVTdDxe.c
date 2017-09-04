@@ -352,6 +352,10 @@ IntelVTdInitialize (
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
 
+  if ((PcdGet8(PcdVTdPolicyPropertyMask) & BIT0) == 0) {
+    return EFI_UNSUPPORTED;
+  }
+
   InitializeDmaProtection ();
 
   Handle = NULL;

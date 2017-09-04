@@ -437,8 +437,11 @@ OnExitBootServices (
 {
   DEBUG ((DEBUG_INFO, "Vtd OnExitBootServices\n"));
   DumpVtdRegsAll ();
-  DisableDmar ();
-  DumpVtdRegsAll ();
+
+  if ((PcdGet8(PcdVTdPolicyPropertyMask) & BIT1) == 0) {
+    DisableDmar ();
+    DumpVtdRegsAll ();
+  }
 }
 
 /**
