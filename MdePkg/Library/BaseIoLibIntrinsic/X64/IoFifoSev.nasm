@@ -205,7 +205,7 @@ ASM_PFX(IoWriteFifo8):
     jrcxz   @IoWriteFifo8_Done
 
 @IoWriteFifo8_Loop:
-    mov     byte [rsi], al
+    mov     al, byte [rsi]
     out     dx, al
     inc     rsi
     loop    @IoWriteFifo8_Loop
@@ -241,7 +241,7 @@ ASM_PFX(IoWriteFifo16):
     jrcxz   @IoWriteFifo16_Done
 
 @IoWriteFifo16_Loop:
-    mov     word [rsi], ax
+    mov     ax, word [rsi]
     out     dx, ax
     add     rsi, 2
     loop    @IoWriteFifo16_Loop
@@ -277,7 +277,7 @@ ASM_PFX(IoWriteFifo32):
     jrcxz   @IoWriteFifo32_Done
 
 @IoWriteFifo32_Loop:
-    mov     dword [rsi], eax
+    mov     eax, dword [rsi]
     out     dx, eax
     add     rsi, 4
     loop    @IoWriteFifo32_Loop

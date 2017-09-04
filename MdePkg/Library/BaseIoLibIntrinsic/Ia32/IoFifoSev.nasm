@@ -212,7 +212,7 @@ ASM_PFX(IoWriteFifo8):
     jecxz   @IoWriteFifo8_Done
 
 @IoWriteFifo8_Loop:
-    mov     byte [esi], al
+    mov     al, byte [esi]
     out     dx, al
     inc     esi
     loop    @IoWriteFifo8_Loop
@@ -250,7 +250,7 @@ ASM_PFX(IoWriteFifo16):
     jecxz   @IoWriteFifo16_Done
 
 @IoWriteFifo16_Loop:
-    mov     word [esi], ax
+    mov     ax, word [esi]
     out     dx, ax
     add     esi, 2
     loop    @IoWriteFifo16_Loop
@@ -288,7 +288,7 @@ ASM_PFX(IoWriteFifo32):
     jecxz   @IoWriteFifo32_Done
 
 @IoWriteFifo32_Loop:
-    mov     dword [esi], eax
+    mov     eax, dword [esi]
     out     dx, eax
     add     esi, 4
     loop    @IoWriteFifo32_Loop
