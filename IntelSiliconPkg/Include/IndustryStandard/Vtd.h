@@ -247,6 +247,12 @@ typedef union {
 
 #define R_FRCD_REG       0x00 // + FRO
 
+#define R_PMEN_ENABLE_REG         0x64
+#define R_PMEN_LOW_BASE_REG       0x68
+#define R_PMEN_LOW_LIMITE_REG     0x6C
+#define R_PMEN_HIGH_BASE_REG      0x70
+#define R_PMEN_HIGH_LIMITE_REG    0x78
+
 typedef union {
   struct {
     UINT8         ND:3; // Number of domains supported
