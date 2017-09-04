@@ -155,6 +155,7 @@ BmGetDescriptionFromDiskInfo (
   CONST UINTN                  SerialNumberLength = 20;
   CHAR8                        *StrPtr;
   UINT8                        Temp;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
 
   Description  = NULL;
 
@@ -229,6 +230,28 @@ BmGetDescriptionFromDiskInfo (
 
       BmEliminateExtraSpaces (Description);
     }
+  } else if (CompareGuid (&DiskInfo->Interface, &gEfiDiskInfoSdMmcInterfaceGuid)) {
+    DevicePath = DevicePathFromHandle (Handle);
+    if (DevicePath == NULL) {
+      return NULL;
+    }
+
+    while (!IsDevicePathEnd (DevicePath) && (DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH)) {
+      DevicePath = NextDevicePathNode (DevicePath);
+    }
+    if (IsDevicePathEnd (DevicePath)) {
+      return NULL;
+    }
+
+    if (DevicePathSubType (DevicePath) == MSG_SD_DP) {
+      Description = L"SD Device";
+    } else if (DevicePathSubType (DevicePath) == MSG_EMMC_DP) {
+      Description = L"eMMC Device";
+    } else {
+      return NULL;
+    }
+
+    Description = AllocateCopyPool (StrSize (Description), Description);
   }
 
   return Description;
