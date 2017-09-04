@@ -388,6 +388,7 @@ SataControllerStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
+  UINTN                             BailLogMask;
   EFI_STATUS                        Status;
   EFI_PCI_IO_PROTOCOL               *PciIo;
   UINT64                            OriginalPciAttributes;
@@ -398,6 +399,7 @@ SataControllerStart (
 
   DEBUG ((EFI_D_INFO, "SataControllerStart START\n"));
 
+  BailLogMask = DEBUG_ERROR;
   SataPrivateData = NULL;
 
   //
@@ -412,6 +414,14 @@ SataControllerStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
+    if (Status == EFI_ALREADY_STARTED) {
+      //
+      // This is an expected condition for OpenProtocol() / BY_DRIVER, in a
+      // DriverBindingStart() member function; degrade the log mask to
+      // DEBUG_INFO.
+      //
+      BailLogMask = DEBUG_INFO;
+    }
     goto Bail;
   }
 
@@ -542,7 +552,8 @@ ClosePciIo:
          );
 
 Bail:
-  DEBUG ((EFI_D_ERROR, "SataControllerStart error return status = %r\n", Status));
+  DEBUG ((BailLogMask, "SataControllerStart error return status = %r\n",
+    Status));
   return Status;
 }
 
