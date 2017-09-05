@@ -5,7 +5,7 @@
 #  EVT_SIGNAL_EXIT_BOOT_SERVICES event, to provide runtime services.
 # This instance also supports SAL drivers for better performance.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -24,7 +24,7 @@
   FILE_GUID                      = b1ee6c28-54aa-4d17-b705-3e28ccb27b2e
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiRuntimeLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER
+  LIBRARY_CLASS                  = UefiRuntimeLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_CORE DXE_DRIVER DXE_SMM_DRIVER 
 
   CONSTRUCTOR                    = RuntimeDriverLibConstruct
   DESTRUCTOR                     = RuntimeDriverLibDeconstruct
