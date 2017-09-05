@@ -348,11 +348,7 @@
   ##
   #  SEC Phase modules
   ##
-  Nt32Pkg/Sec/SecMain.inf {
-  <BuildOptions>
-    # Add override here, because default X64_CC_FLAGS is already overriden in DSC
-    MSFT:*_*_X64_CC_FLAGS == /nologo /W4 /WX /Gy /c /D UNICODE /Od /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
-  }
+  Nt32Pkg/Sec/SecMain.inf
 
   ##
   #  PEI Phase modules
