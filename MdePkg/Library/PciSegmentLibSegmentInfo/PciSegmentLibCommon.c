@@ -381,7 +381,7 @@ PciSegmentBitFieldAnd8 (
   PCI_SEGMENT_INFO             *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
-  return MmioBitFieldOr8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
+  return MmioBitFieldAnd8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
 }
 
 /**
@@ -752,7 +752,7 @@ PciSegmentBitFieldAnd16 (
   PCI_SEGMENT_INFO             *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
-  return MmioBitFieldOr16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
+  return MmioBitFieldAnd16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
 }
 
 /**
@@ -1119,7 +1119,7 @@ PciSegmentBitFieldAnd32 (
   PCI_SEGMENT_INFO             *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
-  return MmioBitFieldOr32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
+  return MmioBitFieldAnd32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
 }
 
 /**
