@@ -3109,7 +3109,7 @@ determine whether database file is out of date!\n")
     def GetPackageList(self, Platform, Arch, TargetName, ToolChainTag):
         self.Platform = Platform
         PackageList = []
-        Pa = self.BuildObject[self.Platform, 'COMMON']
+        Pa = self.BuildObject[self.Platform, Arch]
         #
         # Get Package related to Modules
         #
