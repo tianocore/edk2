@@ -82,6 +82,7 @@
   IntelSiliconPkg/IntelVTdDxe/IntelVTdDxe.inf
   IntelSiliconPkg/IntelVTdPmrPei/IntelVTdPmrPei.inf
   IntelSiliconPkg/PlatformVTdSampleDxe/PlatformVTdSampleDxe.inf
+  IntelSiliconPkg/PlatformVTdInfoSamplePei/PlatformVTdInfoSamplePei.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
