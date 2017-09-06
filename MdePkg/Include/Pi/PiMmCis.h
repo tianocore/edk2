@@ -16,6 +16,7 @@
 #ifndef _PI_MMCIS_H_
 #define _PI_MMCIS_H_
 
+#include <Pi/PiMultiPhase.h>
 #include <Protocol/MmCpuIo.h>
 
 typedef struct _EFI_MM_SYSTEM_TABLE  EFI_MM_SYSTEM_TABLE;
