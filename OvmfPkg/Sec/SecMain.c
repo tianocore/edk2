@@ -931,9 +931,11 @@ TemporaryRamMigration (
   if (SetJump (&JumpBuffer) == 0) {
 #if defined (MDE_CPU_IA32)
     JumpBuffer.Esp = JumpBuffer.Esp + DebugAgentContext.StackMigrateOffset;
+    JumpBuffer.Ebp = JumpBuffer.Ebp + DebugAgentContext.StackMigrateOffset;
 #endif    
 #if defined (MDE_CPU_X64)
     JumpBuffer.Rsp = JumpBuffer.Rsp + DebugAgentContext.StackMigrateOffset;
+    JumpBuffer.Rbp = JumpBuffer.Rbp + DebugAgentContext.StackMigrateOffset;
 #endif    
     LongJump (&JumpBuffer, (UINTN)-1);
   }
