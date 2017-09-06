@@ -508,9 +508,9 @@ DumpVtdIfError (
     }
 
     if (HasError) {
-      DEBUG((DEBUG_INFO, "#### ERROR ####\n"));
+      DEBUG((DEBUG_INFO, "\n#### ERROR ####\n"));
       DumpVtdRegs (Num);
-      DEBUG((DEBUG_INFO, "#### ERROR ####\n"));
+      DEBUG((DEBUG_INFO, "#### ERROR ####\n\n"));
     }
   }
 }
