@@ -54,6 +54,7 @@ typedef char *(Sim_strtok) (char *strToken, const char *strDelimit);
 typedef long (Sim_ftell) (FILE *stream );
 typedef size_t (Sim_fread_s) (void *buffer, size_t bufferSize, size_t elementSize, size_t count, FILE *stream);
 typedef int (Sim_puts) (const char * str);
+typedef int (Sim_fputs) (const char * str, FILE *stream);
 typedef unsigned int (Sim_sleep) (unsigned int seconds);
 
 //
@@ -89,6 +90,7 @@ Sim_strtok *g_strtok_func = NULL;
 Sim_ftell *g_ftell_func = NULL;
 Sim_fread_s *g_fread_s_func = NULL;
 Sim_puts *g_puts_func = NULL;
+Sim_fputs *g_fputs_func = NULL;
 Sim_sleep *g_sleep_func = NULL;
 
 //
@@ -521,6 +523,20 @@ puts (
 } // puts
 
 int
+fputs (
+  const char * str,
+  FILE *stream
+  )
+{
+  int result;
+
+  result = (*g_fputs_func)(str, stream);
+
+  return result;
+
+} // fputs
+
+int
 sleep (
   unsigned int seconds
   )
@@ -646,6 +662,9 @@ InitSimLib (
 
   g_puts_func = DynamicLoadPpi->Dlsym (LibraryHandle, "puts");
   CHECK_NULL_RETURN_OR_ASSERT (g_puts_func, EFI_NOT_FOUND, "puts == NULL\n");
+
+  g_fputs_func = DynamicLoadPpi->Dlsym (LibraryHandle, "fputs");
+  CHECK_NULL_RETURN_OR_ASSERT (g_fputs_func, EFI_NOT_FOUND, "fputs == NULL\n");
 
   g_sleep_func = DynamicLoadPpi->Dlsym (LibraryHandle, "sleep");
   CHECK_NULL_RETURN_OR_ASSERT (g_sleep_func, EFI_NOT_FOUND, "sleep == NULL\n");
