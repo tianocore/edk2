@@ -33,14 +33,11 @@ typedef struct {
 } MAP_INFO;
 
 //
-// List of MAP_INFO structures recycled by Unmap().
+// List of the MAP_INFO structures that have been set up by IoMmuMap() and not
+// yet torn down by IoMmuUnmap(). The list represents the full set of mappings
+// currently in effect.
 //
-// Recycled MAP_INFO structures are equally good for future recycling and
-// freeing.
-//
-STATIC LIST_ENTRY mRecycledMapInfos = INITIALIZE_LIST_HEAD_VARIABLE (
-                                        mRecycledMapInfos
-                                        );
+STATIC LIST_ENTRY mMapInfos = INITIALIZE_LIST_HEAD_VARIABLE (mMapInfos);
 
 #define COMMON_BUFFER_SIG SIGNATURE_64 ('C', 'M', 'N', 'B', 'U', 'F', 'F', 'R')
 
@@ -123,7 +120,6 @@ IoMmuMap (
   )
 {
   EFI_STATUS                                        Status;
-  LIST_ENTRY                                        *RecycledMapInfo;
   MAP_INFO                                          *MapInfo;
   EFI_ALLOCATE_TYPE                                 AllocateType;
   COMMON_BUFFER_HEADER                              *CommonBufferHeader;
@@ -150,19 +146,10 @@ IoMmuMap (
   // Allocate a MAP_INFO structure to remember the mapping when Unmap() is
   // called later.
   //
-  RecycledMapInfo = GetFirstNode (&mRecycledMapInfos);
-  if (RecycledMapInfo == &mRecycledMapInfos) {
-    //
-    // No recycled MAP_INFO structure, allocate a new one.
-    //
-    MapInfo = AllocatePool (sizeof (MAP_INFO));
-    if (MapInfo == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Failed;
-    }
-  } else {
-    MapInfo = CR (RecycledMapInfo, MAP_INFO, Link, MAP_INFO_SIG);
-    RemoveEntryList (RecycledMapInfo);
+  MapInfo = AllocatePool (sizeof (MAP_INFO));
+  if (MapInfo == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Failed;
   }
 
   //
@@ -299,6 +286,10 @@ IoMmuMap (
   }
 
   //
+  // Track all MAP_INFO structures.
+  //
+  InsertHeadList (&mMapInfos, &MapInfo->Link);
+  //
   // Populate output parameters.
   //
   *DeviceAddress = MapInfo->PlainTextAddress;
@@ -430,23 +421,19 @@ IoMmuUnmap (
       CommonBufferHeader->StashBuffer,
       MapInfo->NumberOfBytes
       );
-
-    //
-    // Recycle the MAP_INFO structure.
-    //
-    InsertTailList (&mRecycledMapInfos, &MapInfo->Link);
   } else {
     ZeroMem (
       (VOID *)(UINTN)MapInfo->PlainTextAddress,
       EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages)
       );
     gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
-
-    //
-    // Free the MAP_INFO structure.
-    //
-    FreePool (MapInfo);
   }
+
+  //
+  // Forget and free the MAP_INFO structure.
+  //
+  RemoveEntryList (&MapInfo->Link);
+  FreePool (MapInfo);
 
   return EFI_SUCCESS;
 }
