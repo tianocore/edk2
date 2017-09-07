@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -287,7 +287,7 @@ XhcPeiClearOpRegBit (
   @param  Offset        The offset of the operational register.
   @param  Bit           The bit of the register to wait for.
   @param  WaitToSet     Wait the bit to set or clear.
-  @param  Timeout       The time to wait before abort (in microsecond, us).
+  @param  Timeout       The time to wait before abort (in millisecond, ms).
 
   @retval EFI_SUCCESS   The bit successfully changed by host controller.
   @retval EFI_TIMEOUT   The time out occurred.
