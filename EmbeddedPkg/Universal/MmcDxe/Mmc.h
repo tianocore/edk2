@@ -64,6 +64,14 @@
 #define EMMC_CMD6_ARG_VALUE(x)              (((x) & 0xFF) << 8)
 #define EMMC_CMD6_ARG_CMD_SET(x)            (((x) & 0x7) << 0)
 
+#define SWITCH_CMD_DATA_LENGTH              64
+#define SD_HIGH_SPEED_SUPPORTED             0x20000
+#define SD_DEFAULT_SPEED                    25000000
+#define SD_HIGH_SPEED                       50000000
+#define SWITCH_CMD_SUCCESS_MASK             0x0f000000
+
+#define BUSWIDTH_4                          4
+
 typedef enum {
   UNKNOWN_CARD,
   MMC_CARD,              //MMC card
