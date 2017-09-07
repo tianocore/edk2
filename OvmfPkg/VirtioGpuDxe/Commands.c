@@ -353,30 +353,9 @@ VirtioGpuExitBoot (
 {
   VGPU_DEV *VgpuDev;
 
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
   VgpuDev = Context;
   VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, 0);
-
-  //
-  // If VirtioGpuDriverBindingStart() and VirtioGpuDriverBindingStop() have
-  // been called thus far in such a sequence that right now our (sole) child
-  // handle exists -- with the GOP on it standing for head (scanout) #0 --,
-  // then we have to unmap the current video mode's backing store.
-  //
-  if (VgpuDev->Child != NULL) {
-    //
-    // The current video mode is guaranteed to have a valid and mapped backing
-    // store, due to the first Gop.SetMode() call, made internally in
-    // InitVgpuGop().
-    //
-    ASSERT (VgpuDev->Child->BackingStore != NULL);
-
-    VgpuDev->VirtIo->UnmapSharedBuffer (
-                       VgpuDev->VirtIo,
-                       VgpuDev->Child->BackingStoreMap
-                       );
-  }
-
-  VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, VgpuDev->RingMap);
 }
 
 /**
