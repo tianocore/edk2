@@ -318,8 +318,14 @@ Failed:
 /**
   Completes the Map() operation and releases any corresponding resources.
 
+  This is an internal worker function that only extends the Map() API with
+  the MemoryMapLocked parameter.
+
   @param  This                  The protocol instance pointer.
   @param  Mapping               The mapping value returned from Map().
+  @param  MemoryMapLocked       The function is executing on the stack of
+                                gBS->ExitBootServices(); changes to the UEFI
+                                memory map are forbidden.
 
   @retval EFI_SUCCESS           The range was unmapped.
   @retval EFI_INVALID_PARAMETER Mapping is not a value that was returned by
@@ -327,11 +333,13 @@ Failed:
   @retval EFI_DEVICE_ERROR      The data was not committed to the target system
                                 memory.
 **/
+STATIC
 EFI_STATUS
 EFIAPI
-IoMmuUnmap (
+IoMmuUnmapWorker (
   IN  EDKII_IOMMU_PROTOCOL                     *This,
-  IN  VOID                                     *Mapping
+  IN  VOID                                     *Mapping,
+  IN  BOOLEAN                                  MemoryMapLocked
   )
 {
   MAP_INFO                 *MapInfo;
@@ -339,7 +347,13 @@ IoMmuUnmap (
   COMMON_BUFFER_HEADER     *CommonBufferHeader;
   VOID                     *EncryptionTarget;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Mapping=0x%p\n", __FUNCTION__, Mapping));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Mapping=0x%p MemoryMapLocked=%d\n",
+    __FUNCTION__,
+    Mapping,
+    MemoryMapLocked
+    ));
 
   if (Mapping == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -412,7 +426,8 @@ IoMmuUnmap (
   // original (now encrypted) location.
   //
   // For all other operations, fill the late bounce buffer (which existed as
-  // plaintext at some point) with zeros, and then release it.
+  // plaintext at some point) with zeros, and then release it (unless the UEFI
+  // memory map is locked).
   //
   if (MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
       MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
@@ -426,16 +441,47 @@ IoMmuUnmap (
       (VOID *)(UINTN)MapInfo->PlainTextAddress,
       EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages)
       );
-    gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
+    if (!MemoryMapLocked) {
+      gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
+    }
   }
 
   //
-  // Forget and free the MAP_INFO structure.
+  // Forget the MAP_INFO structure, then free it (unless the UEFI memory map is
+  // locked).
   //
   RemoveEntryList (&MapInfo->Link);
-  FreePool (MapInfo);
+  if (!MemoryMapLocked) {
+    FreePool (MapInfo);
+  }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Completes the Map() operation and releases any corresponding resources.
+
+  @param  This                  The protocol instance pointer.
+  @param  Mapping               The mapping value returned from Map().
+
+  @retval EFI_SUCCESS           The range was unmapped.
+  @retval EFI_INVALID_PARAMETER Mapping is not a value that was returned by
+                                Map().
+  @retval EFI_DEVICE_ERROR      The data was not committed to the target system
+                                memory.
+**/
+EFI_STATUS
+EFIAPI
+IoMmuUnmap (
+  IN  EDKII_IOMMU_PROTOCOL                     *This,
+  IN  VOID                                     *Mapping
+  )
+{
+  return IoMmuUnmapWorker (
+           This,
+           Mapping,
+           FALSE    // MemoryMapLocked
+           );
 }
 
 /**
