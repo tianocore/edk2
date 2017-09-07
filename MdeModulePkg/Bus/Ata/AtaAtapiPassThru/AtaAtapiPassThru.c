@@ -913,12 +913,22 @@ AtaAtapiPassThruStop (
   //
   DestroyDeviceInfoList (Instance);
 
+  PciIo = Instance->PciIo;
+
+  //
+  // Disable this ATA host controller.
+  //
+  PciIo->Attributes (
+           PciIo,
+           EfiPciIoAttributeOperationDisable,
+           Instance->EnabledPciAttributes,
+           NULL
+           );
+
   //
   // If the current working mode is AHCI mode, then pre-allocated resource
   // for AHCI initialization should be released.
   //
-  PciIo = Instance->PciIo;
-
   if (Instance->Mode == EfiAtaAhciMode) {
     AhciRegisters = &Instance->AhciRegisters;
     PciIo->Unmap (
@@ -949,16 +959,6 @@ AtaAtapiPassThruStop (
              AhciRegisters->AhciRFis
              );
   }
-
-  //
-  // Disable this ATA host controller.
-  //
-  PciIo->Attributes (
-           PciIo,
-           EfiPciIoAttributeOperationDisable,
-           Instance->EnabledPciAttributes,
-           NULL
-           );
 
   //
   // Restore original PCI attributes
