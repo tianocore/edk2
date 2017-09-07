@@ -662,7 +662,8 @@ XhcPeiControlTransfer (
     if (EFI_ERROR(RecoveryStatus)) {
       DEBUG((EFI_D_ERROR, "XhcPeiControlTransfer: XhcPeiDequeueTrbFromEndpoint failed\n"));
     }
-    goto FREE_URB;
+    XhcPeiFreeUrb (Xhc, Urb);
+    goto ON_EXIT;
   } else {
     if (*TransferResult == EFI_USB_NOERROR) {
       Status = EFI_SUCCESS;
@@ -672,11 +673,17 @@ XhcPeiControlTransfer (
         DEBUG ((EFI_D_ERROR, "XhcPeiControlTransfer: XhcPeiRecoverHaltedEndpoint failed\n"));
       }
       Status = EFI_DEVICE_ERROR;
-      goto FREE_URB;
+      XhcPeiFreeUrb (Xhc, Urb);
+      goto ON_EXIT;
     } else {
-      goto FREE_URB;
+      XhcPeiFreeUrb (Xhc, Urb);
+      goto ON_EXIT;
     }
   }
+  //
+  // Unmap data before consume.
+  //
+  XhcPeiFreeUrb (Xhc, Urb);
 
   //
   // Hook Get_Descriptor request from UsbBus as we need evaluate context and configure endpoint.
@@ -704,7 +711,7 @@ XhcPeiControlTransfer (
       Xhc->UsbDevContext[SlotId].ConfDesc = AllocateZeroPool (Xhc->UsbDevContext[SlotId].DevDesc.NumConfigurations * sizeof (EFI_USB_CONFIG_DESCRIPTOR *));
       if (Xhc->UsbDevContext[SlotId].ConfDesc == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
-        goto FREE_URB;
+        goto ON_EXIT;
       }
       if (Xhc->HcCParams.Data.Csz == 0) {
         Status = XhcPeiEvaluateContext (Xhc, SlotId, MaxPacket0);
@@ -722,7 +729,7 @@ XhcPeiControlTransfer (
         Xhc->UsbDevContext[SlotId].ConfDesc[Index] = AllocateZeroPool (*DataLength);
         if (Xhc->UsbDevContext[SlotId].ConfDesc[Index] == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
-          goto FREE_URB;
+          goto ON_EXIT;
         }
         CopyMem (Xhc->UsbDevContext[SlotId].ConfDesc[Index], Data, *DataLength);
       }
@@ -843,9 +850,6 @@ XhcPeiControlTransfer (
 
     *(UINT32 *) Data = *(UINT32 *) &PortStatus;
   }
-
-FREE_URB:
-  XhcPeiFreeUrb (Xhc, Urb);
 
 ON_EXIT:
 
@@ -1399,6 +1403,34 @@ XhcPeiGetRootHubPortStatus (
 }
 
 /**
+  One notified function to stop the Host Controller at the end of PEI
+
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification event that
+                                 caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
+
+  @retval     EFI_SUCCESS  The function completes successfully
+  @retval     others
+**/
+EFI_STATUS
+EFIAPI
+XhcEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  PEI_XHC_DEV    *Xhc;
+
+  Xhc = PEI_RECOVERY_USB_XHC_DEV_FROM_THIS_NOTIFY(NotifyDescriptor);
+
+  XhcPeiHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
+
+  return EFI_SUCCESS;
+}
+
+/**
   @param FileHandle     Handle of the file being invoked.
   @param PeiServices    Describes the list of possible PEI Services.
 
@@ -1428,6 +1460,8 @@ XhcPeimEntry (
   if (!EFI_ERROR (PeiServicesRegisterForShadow (FileHandle))) {
     return EFI_SUCCESS;
   }
+
+  IoMmuInit ();
 
   Status = PeiServicesLocatePpi (
              &gPeiUsbControllerPpiGuid,
@@ -1530,7 +1564,12 @@ XhcPeimEntry (
     XhcDev->PpiDescriptor.Guid = &gPeiUsb2HostControllerPpiGuid;
     XhcDev->PpiDescriptor.Ppi = &XhcDev->Usb2HostControllerPpi;
 
+    XhcDev->EndOfPeiNotifyList.Flags = (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST);
+    XhcDev->EndOfPeiNotifyList.Guid = &gEfiEndOfPeiSignalPpiGuid;
+    XhcDev->EndOfPeiNotifyList.Notify = XhcEndOfPei;
+
     PeiServicesInstallPpi (&XhcDev->PpiDescriptor);
+    PeiServicesNotifyPpi (&XhcDev->EndOfPeiNotifyList);
 
     Index++;
   }

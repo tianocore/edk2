@@ -200,6 +200,8 @@ XhcPeiFreeUrb (
     return;
   }
 
+  IoMmuUnmap (Urb->DataMap);
+
   FreePool (Urb);
 }
 
@@ -227,6 +229,10 @@ XhcPeiCreateTransferTrb (
   UINTN                         TotalLen;
   UINTN                         Len;
   UINTN                         TrbNum;
+  EDKII_IOMMU_OPERATION         MapOp;
+  EFI_PHYSICAL_ADDRESS          PhyAddr;
+  VOID                          *Map;
+  EFI_STATUS                    Status;
 
   SlotId = XhcPeiBusDevAddrToSlotId (Xhc, Urb->Ep.BusAddr);
   if (SlotId == 0) {
@@ -249,7 +255,27 @@ XhcPeiCreateTransferTrb (
     EPType  = (UINT8) ((DEVICE_CONTEXT_64 *)OutputContext)->EP[Dci-1].EPType;
   }
 
-  Urb->DataPhy = Urb->Data;
+  //
+  // No need to remap.
+  //
+  if ((Urb->Data != NULL) && (Urb->DataMap == NULL)) {
+    if (((UINT8) (Urb->Ep.Direction)) == EfiUsbDataIn) {
+      MapOp = EdkiiIoMmuOperationBusMasterWrite;
+    } else {
+      MapOp = EdkiiIoMmuOperationBusMasterRead;
+    }
+
+    Len = Urb->DataLen;
+    Status = IoMmuMap (MapOp, Urb->Data, &Len, &PhyAddr, &Map);
+
+    if (EFI_ERROR (Status) || (Len != Urb->DataLen)) {
+      DEBUG ((DEBUG_ERROR, "XhcCreateTransferTrb: Fail to map Urb->Data.\n"));
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Urb->DataPhy  = (VOID *) ((UINTN) PhyAddr);
+    Urb->DataMap  = Map;
+  }
 
   //
   // Construct the TRB
@@ -2812,6 +2838,7 @@ XhcPeiInitSched (
   UINT64                *ScratchEntry;
   EFI_PHYSICAL_ADDRESS  ScratchEntryPhy;
   UINT32                Index;
+  UINTN                 *ScratchEntryMap;
   EFI_STATUS            Status;
 
   //
@@ -2848,6 +2875,13 @@ XhcPeiInitSched (
   ASSERT (MaxScratchpadBufs <= 1023);
   if (MaxScratchpadBufs != 0) {
     //
+    // Allocate the buffer to record the Mapping for each scratch buffer in order to Unmap them
+    //
+    ScratchEntryMap = AllocateZeroPool (sizeof (UINTN) * MaxScratchpadBufs);
+    ASSERT (ScratchEntryMap != NULL);
+    Xhc->ScratchEntryMap = ScratchEntryMap;
+
+    //
     // Allocate the buffer to record the host address for each entry
     //
     ScratchEntry = AllocateZeroPool (sizeof (UINT64) * MaxScratchpadBufs);
@@ -2859,7 +2893,8 @@ XhcPeiInitSched (
                EFI_SIZE_TO_PAGES (MaxScratchpadBufs * sizeof (UINT64)),
                Xhc->PageSize,
                (VOID **) &ScratchBuf,
-               &ScratchPhy
+               &ScratchPhy,
+               &Xhc->ScratchMap
                );
     ASSERT_EFI_ERROR (Status);
 
@@ -2875,7 +2910,8 @@ XhcPeiInitSched (
                  EFI_SIZE_TO_PAGES (Xhc->PageSize),
                  Xhc->PageSize,
                  (VOID **) &ScratchEntry[Index],
-                 &ScratchEntryPhy
+                 &ScratchEntryPhy,
+                 (VOID **) &ScratchEntryMap[Index]
                  );
       ASSERT_EFI_ERROR (Status);
       ZeroMem ((VOID *) (UINTN) ScratchEntry[Index], Xhc->PageSize);
@@ -2967,12 +3003,13 @@ XhcPeiFreeSched (
       //
       // Free Scratchpad Buffers
       //
-      UsbHcFreeAlignedPages ((VOID*) (UINTN) ScratchEntry[Index], EFI_SIZE_TO_PAGES (Xhc->PageSize));
+      UsbHcFreeAlignedPages ((VOID*) (UINTN) ScratchEntry[Index], EFI_SIZE_TO_PAGES (Xhc->PageSize), (VOID *) Xhc->ScratchEntryMap[Index]);
     }
     //
     // Free Scratchpad Buffer Array
     //
-    UsbHcFreeAlignedPages (Xhc->ScratchBuf, EFI_SIZE_TO_PAGES (Xhc->MaxScratchpadBufs * sizeof (UINT64)));
+    UsbHcFreeAlignedPages (Xhc->ScratchBuf, EFI_SIZE_TO_PAGES (Xhc->MaxScratchpadBufs * sizeof (UINT64)), Xhc->ScratchMap);
+    FreePool (Xhc->ScratchEntryMap);
     FreePool (Xhc->ScratchEntry);
   }
 

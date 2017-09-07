@@ -170,6 +170,7 @@ typedef struct _URB {
   VOID                              *Data;
   UINTN                             DataLen;
   VOID                              *DataPhy;
+  VOID                              *DataMap;
   EFI_ASYNC_USB_TRANSFER_CALLBACK   Callback;
   VOID                              *Context;
   //
