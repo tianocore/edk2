@@ -749,6 +749,107 @@ EDKII_IOMMU_PROTOCOL  mAmdSev = {
 };
 
 /**
+  Notification function that is queued when gBS->ExitBootServices() signals the
+  EFI_EVENT_GROUP_EXIT_BOOT_SERVICES event group. This function signals another
+  event, received as Context, and returns.
+
+  Signaling an event in this context is safe. The UEFI spec allows
+  gBS->SignalEvent() to return EFI_SUCCESS only; EFI_OUT_OF_RESOURCES is not
+  listed, hence memory is not allocated. The edk2 implementation also does not
+  release memory (and we only have to care about the edk2 implementation
+  because EDKII_IOMMU_PROTOCOL is edk2-specific anyway).
+
+  @param[in] Event          Event whose notification function is being invoked.
+                            Event is permitted to request the queueing of this
+                            function at TPL_CALLBACK or TPL_NOTIFY task
+                            priority level.
+
+  @param[in] EventToSignal  Identifies the EFI_EVENT to signal. EventToSignal
+                            is permitted to request the queueing of its
+                            notification function only at TPL_CALLBACK level.
+**/
+STATIC
+VOID
+EFIAPI
+AmdSevExitBoot (
+  IN EFI_EVENT Event,
+  IN VOID      *EventToSignal
+  )
+{
+  //
+  // (1) The NotifyFunctions of all the events in
+  //     EFI_EVENT_GROUP_EXIT_BOOT_SERVICES will have been queued before
+  //     AmdSevExitBoot() is entered.
+  //
+  // (2) AmdSevExitBoot() is executing minimally at TPL_CALLBACK.
+  //
+  // (3) AmdSevExitBoot() has been queued in unspecified order relative to the
+  //     NotifyFunctions of all the other events in
+  //     EFI_EVENT_GROUP_EXIT_BOOT_SERVICES whose NotifyTpl is the same as
+  //     Event's.
+  //
+  // Consequences:
+  //
+  // - If Event's NotifyTpl is TPL_CALLBACK, then some other NotifyFunctions
+  //   queued at TPL_CALLBACK may be invoked after AmdSevExitBoot() returns.
+  //
+  // - If Event's NotifyTpl is TPL_NOTIFY, then some other NotifyFunctions
+  //   queued at TPL_NOTIFY may be invoked after AmdSevExitBoot() returns; plus
+  //   *all* NotifyFunctions queued at TPL_CALLBACK will be invoked strictly
+  //   after all NotifyFunctions queued at TPL_NOTIFY, including
+  //   AmdSevExitBoot(), have been invoked.
+  //
+  // - By signaling EventToSignal here, whose NotifyTpl is TPL_CALLBACK, we
+  //   queue EventToSignal's NotifyFunction after the NotifyFunctions of *all*
+  //   events in EFI_EVENT_GROUP_EXIT_BOOT_SERVICES.
+  //
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
+  gBS->SignalEvent (EventToSignal);
+}
+
+/**
+  Notification function that is queued after the notification functions of all
+  events in the EFI_EVENT_GROUP_EXIT_BOOT_SERVICES event group. The same memory
+  map restrictions apply.
+
+  This function unmaps all currently existing IOMMU mappings.
+
+  @param[in] Event    Event whose notification function is being invoked. Event
+                      is permitted to request the queueing of this function
+                      only at TPL_CALLBACK task priority level.
+
+  @param[in] Context  Ignored.
+**/
+STATIC
+VOID
+EFIAPI
+AmdSevUnmapAllMappings (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  LIST_ENTRY *Node;
+  LIST_ENTRY *NextNode;
+  MAP_INFO   *MapInfo;
+
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
+
+  //
+  // All drivers that had set up IOMMU mappings have halted their respective
+  // controllers by now; tear down the mappings.
+  //
+  for (Node = GetFirstNode (&mMapInfos); Node != &mMapInfos; Node = NextNode) {
+    NextNode = GetNextNode (&mMapInfos, Node);
+    MapInfo = CR (Node, MAP_INFO, Link, MAP_INFO_SIG);
+    IoMmuUnmapWorker (
+      &mAmdSev, // This
+      MapInfo,  // Mapping
+      TRUE      // MemoryMapLocked
+      );
+  }
+}
+
+/**
   Initialize Iommu Protocol.
 
 **/
@@ -759,7 +860,39 @@ AmdSevInstallIoMmuProtocol (
   )
 {
   EFI_STATUS  Status;
+  EFI_EVENT   UnmapAllMappingsEvent;
+  EFI_EVENT   ExitBootEvent;
   EFI_HANDLE  Handle;
+
+  //
+  // Create the "late" event whose notification function will tear down all
+  // left-over IOMMU mappings.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,      // Type
+                  TPL_CALLBACK,           // NotifyTpl
+                  AmdSevUnmapAllMappings, // NotifyFunction
+                  NULL,                   // NotifyContext
+                  &UnmapAllMappingsEvent  // Event
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Create the event whose notification function will be queued by
+  // gBS->ExitBootServices() and will signal the event created above.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES, // Type
+                  TPL_CALLBACK,                  // NotifyTpl
+                  AmdSevExitBoot,                // NotifyFunction
+                  UnmapAllMappingsEvent,         // NotifyContext
+                  &ExitBootEvent                 // Event
+                  );
+  if (EFI_ERROR (Status)) {
+    goto CloseUnmapAllMappingsEvent;
+  }
 
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
@@ -767,5 +900,17 @@ AmdSevInstallIoMmuProtocol (
                   &gEdkiiIoMmuProtocolGuid, &mAmdSev,
                   NULL
                   );
+  if (EFI_ERROR (Status)) {
+    goto CloseExitBootEvent;
+  }
+
+  return EFI_SUCCESS;
+
+CloseExitBootEvent:
+  gBS->CloseEvent (ExitBootEvent);
+
+CloseUnmapAllMappingsEvent:
+  gBS->CloseEvent (UnmapAllMappingsEvent);
+
   return Status;
 }
