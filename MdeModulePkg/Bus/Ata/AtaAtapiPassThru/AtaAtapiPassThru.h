@@ -100,6 +100,7 @@ typedef struct {
   // The attached device list
   //
   LIST_ENTRY                        DeviceList;
+  UINT64                            EnabledPciAttributes;
   UINT64                            OriginalPciAttributes;
 
   //
