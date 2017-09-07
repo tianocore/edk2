@@ -37,6 +37,7 @@
   XhcPeim.h
   XhciSched.c
   UsbHcMem.c
+  DmaMem.c
   XhciReg.h
   XhciSched.h
   UsbHcMem.h
@@ -56,6 +57,8 @@
 [Ppis]
   gPeiUsb2HostControllerPpiGuid                 ## PRODUCES
   gPeiUsbControllerPpiGuid                      ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid
