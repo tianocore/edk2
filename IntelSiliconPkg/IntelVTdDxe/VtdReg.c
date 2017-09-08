@@ -196,6 +196,39 @@ PrepareVtdConfig (
 }
 
 /**
+  Disable PMR in all VTd engine.
+**/
+VOID
+DisablePmr (
+  VOID
+  )
+{
+  UINT32        Reg32;
+  VTD_CAP_REG   CapReg;
+  UINTN         Index;
+
+  DEBUG ((DEBUG_INFO,"DisablePmr\n"));
+  for (Index = 0; Index < mVtdUnitNumber; Index++) {
+    CapReg.Uint64 = MmioRead64 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_CAP_REG);
+    if (CapReg.Bits.PLMR == 0 || CapReg.Bits.PHMR == 0) {
+      continue ;
+    }
+
+    Reg32 = MmioRead32 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_PMEN_ENABLE_REG);
+    if ((Reg32 & BIT0) != 0) {
+      MmioWrite32 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_PMEN_ENABLE_REG, 0x0);
+      do {
+        Reg32 = MmioRead32 (mVtdUnitInformation[Index].VtdUnitBaseAddress + R_PMEN_ENABLE_REG);
+      } while((Reg32 & BIT0) != 0);
+      DEBUG ((DEBUG_INFO,"Pmr(%d) disabled\n", Index));
+    } else {
+      DEBUG ((DEBUG_INFO,"Pmr(%d) not enabled\n", Index));
+    }
+  }
+  return ;
+}
+
+/**
   Enable DMAR translation.
 
   @retval EFI_SUCCESS           DMAR translation is enabled.
@@ -258,6 +291,11 @@ EnableDmar (
 
     DEBUG ((DEBUG_INFO,"VTD (%d) enabled!<<<<<<\n",Index));
   }
+
+  //
+  // Need disable PMR, since we already setup translation table.
+  //
+  DisablePmr ();
 
   mVtdEnabled = TRUE;
 
@@ -502,7 +540,7 @@ DumpVtdIfError (
     for (Index = 0; Index < (UINTN)CapReg.Bits.NFR + 1; Index++) {
       FrcdReg.Uint64[0] = MmioRead64 (mVtdUnitInformation[Num].VtdUnitBaseAddress + ((CapReg.Bits.FRO * 16) + (Index * 16) + R_FRCD_REG));
       FrcdReg.Uint64[1] = MmioRead64 (mVtdUnitInformation[Num].VtdUnitBaseAddress + ((CapReg.Bits.FRO * 16) + (Index * 16) + R_FRCD_REG + sizeof(UINT64)));
-      if ((FrcdReg.Uint64[0] != 0) || (FrcdReg.Uint64[1] != 0)) {
+      if (FrcdReg.Bits.F != 0) {
         HasError = TRUE;
       }
     }
@@ -511,6 +549,17 @@ DumpVtdIfError (
       DEBUG((DEBUG_INFO, "\n#### ERROR ####\n"));
       DumpVtdRegs (Num);
       DEBUG((DEBUG_INFO, "#### ERROR ####\n\n"));
+      //
+      // Clear
+      //
+      for (Index = 0; Index < (UINTN)CapReg.Bits.NFR + 1; Index++) {
+        FrcdReg.Uint64[1] = MmioRead64 (mVtdUnitInformation[Num].VtdUnitBaseAddress + ((CapReg.Bits.FRO * 16) + (Index * 16) + R_FRCD_REG + sizeof(UINT64)));
+        if (FrcdReg.Bits.F != 0) {
+          FrcdReg.Bits.F = 0;
+          MmioWrite64 (mVtdUnitInformation[Num].VtdUnitBaseAddress + ((CapReg.Bits.FRO * 16) + (Index * 16) + R_FRCD_REG + sizeof(UINT64)), FrcdReg.Uint64[1]);
+        }
+        MmioWrite32 (mVtdUnitInformation[Num].VtdUnitBaseAddress + R_FSTS_REG, MmioRead32 (mVtdUnitInformation[Num].VtdUnitBaseAddress + R_FSTS_REG));
+      }
     }
   }
 }
