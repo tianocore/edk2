@@ -5,7 +5,7 @@
 #  ExtractGuidedSectionLib service to register CRC32 guided section handler
 #  that parses CRC32 encapsulation section and extracts raw data.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -43,6 +43,7 @@
   ExtractGuidedSectionLib
   DebugLib
   BaseMemoryLib
+  BaseLib
 
 [Guids]
   gEfiCrc32GuidedSectionExtractionGuid             ## PRODUCES ## UNDEFINED
