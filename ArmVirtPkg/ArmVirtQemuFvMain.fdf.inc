@@ -83,12 +83,13 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   #
-  # FAT filesystem + GPT/MBR partitioning
+  # FAT filesystem + GPT/MBR partitioning + UDF filesystem
   #
   INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   INF FatPkg/EnhancedFatDxe/Fat.inf
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
   #
   # Platform Driver
