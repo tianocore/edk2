@@ -4829,6 +4829,25 @@ CalculateCheckSum64 (
   IN      UINTN                     Length
   );
 
+/**
+  Computes and returns a 32-bit CRC for a data buffer.
+  CRC32 value bases on ITU-T V.42.
+
+  If Buffer is NULL, then ASSERT().
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
+
+  @param[in]  Buffer       A pointer to the buffer on which the 32-bit CRC is to be computed.
+  @param[in]  Length       The number of bytes in the buffer Data.
+
+  @retval Crc32            The 32-bit CRC was computed for the data buffer.
+
+**/
+UINT32
+EFIAPI
+CalculateCrc32(
+  IN  VOID                         *Buffer,
+  IN  UINTN                        Length
+  );
 
 //
 // Base Library CPU Functions
