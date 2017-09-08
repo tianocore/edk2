@@ -295,6 +295,7 @@ INF  EdkShellBinPkg/FullShell/FullShell.inf
 !endif
 
 INF FatPkg/EnhancedFatDxe/Fat.inf
+INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
 INF MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
