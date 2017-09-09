@@ -261,8 +261,7 @@ PartitionInstallUdfChildHandles (
     Media->BlockSize,          // Divisor
     &RemainderByMediaBlockSize // Remainder
     );
-  if (RemainderByMediaBlockSize != 0 ||
-      Media->BlockSize > UDF_LOGICAL_SECTOR_SIZE) {
+  if (RemainderByMediaBlockSize != 0) {
     return EFI_NOT_FOUND;
   }
 
