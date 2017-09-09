@@ -176,11 +176,12 @@ UdfOpen (
   EFI_STATUS                  Status;
   PRIVATE_UDF_FILE_DATA       *PrivFileData;
   PRIVATE_UDF_SIMPLE_FS_DATA  *PrivFsData;
-  CHAR16                      FilePath[UDF_PATH_LENGTH] = { 0 };
+  CHAR16                      FilePath[UDF_PATH_LENGTH];
   UDF_FILE_INFO               File;
   PRIVATE_UDF_FILE_DATA       *NewPrivFileData;
   CHAR16                      *TempFileName;
 
+  ZeroMem (FilePath, sizeof FilePath);
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (This == NULL || NewHandle == NULL || FileName == NULL) {
@@ -324,10 +325,11 @@ UdfRead (
   UDF_FILE_INFO                   FoundFile;
   UDF_FILE_IDENTIFIER_DESCRIPTOR  *NewFileIdentifierDesc;
   VOID                            *NewFileEntryData;
-  CHAR16                          FileName[UDF_FILENAME_LENGTH] = { 0 };
+  CHAR16                          FileName[UDF_FILENAME_LENGTH];
   UINT64                          FileSize;
   UINT64                          BufferSizeUint64;
 
+  ZeroMem (FileName, sizeof FileName);
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (This == NULL || BufferSize == NULL || (*BufferSize != 0 &&
