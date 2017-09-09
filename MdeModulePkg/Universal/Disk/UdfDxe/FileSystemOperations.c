@@ -962,6 +962,9 @@ ReadFile (
         );
 
       ReadFileInfo->FilePosition += ReadFileInfo->FileDataSize;
+    } else {
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
     }
 
     break;
