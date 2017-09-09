@@ -967,7 +967,9 @@ ReadFile (
       return EFI_INVALID_PARAMETER;
     }
 
+    Status = EFI_SUCCESS;
     break;
+
   case LONG_ADS_SEQUENCE:
   case SHORT_ADS_SEQUENCE:
     //
