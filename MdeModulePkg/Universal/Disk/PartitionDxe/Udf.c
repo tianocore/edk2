@@ -243,6 +243,7 @@ PartitionInstallUdfChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
+  UINT32                       RemainderByMediaBlockSize;
   EFI_STATUS                   Status;
   EFI_BLOCK_IO_MEDIA           *Media;
   EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode;
@@ -255,7 +256,12 @@ PartitionInstallUdfChildHandles (
   //
   // Check if UDF logical block size is multiple of underlying device block size
   //
-  if ((UDF_LOGICAL_SECTOR_SIZE % Media->BlockSize) != 0 ||
+  DivU64x32Remainder (
+    UDF_LOGICAL_SECTOR_SIZE,   // Dividend
+    Media->BlockSize,          // Divisor
+    &RemainderByMediaBlockSize // Remainder
+    );
+  if (RemainderByMediaBlockSize != 0 ||
       Media->BlockSize > UDF_LOGICAL_SECTOR_SIZE) {
     return EFI_NOT_FOUND;
   }
