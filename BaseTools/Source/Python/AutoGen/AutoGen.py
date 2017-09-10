@@ -2335,8 +2335,18 @@ class PlatformAutoGen(AutoGen):
         if Module in self.Platform.Modules:
             PlatformModule = self.Platform.Modules[str(Module)]
             for Key  in PlatformModule.Pcds:
+                Flag = False
                 if Key in Pcds:
-                    self._OverridePcd(Pcds[Key], PlatformModule.Pcds[Key], Module)
+                    ToPcd = Pcds[Key]
+                    Flag = True
+                elif Key in GlobalData.MixedPcd:
+                    for PcdItem in GlobalData.MixedPcd[Key]:
+                        if PcdItem in Pcds:
+                            ToPcd = Pcds[PcdItem]
+                            Flag = True
+                            break
+                if Flag:
+                    self._OverridePcd(ToPcd, PlatformModule.Pcds[Key], Module)
         return Pcds.values()
 
     ## Resolve library names to library modules
