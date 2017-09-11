@@ -185,6 +185,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
   # TianoCore logo (splash screen)
