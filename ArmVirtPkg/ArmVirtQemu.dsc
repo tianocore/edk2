@@ -34,6 +34,7 @@
   # -D FLAG=VALUE
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
+  DEFINE HTTP_BOOT_ENABLE        = FALSE
 
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
@@ -62,6 +63,10 @@
   PciPcdProducerLib|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|ArmVirtPkg/Library/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
+
+!if $(HTTP_BOOT_ENABLE) == TRUE
+  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
+!endif
 
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -123,6 +128,10 @@
   # ARM Virtual Architectural Timer -- fetch frequency from QEMU (TCG) or KVM
   #
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
+
+!if $(HTTP_BOOT_ENABLE) == TRUE
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
+!endif
 
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
@@ -338,6 +347,12 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+!if $(HTTP_BOOT_ENABLE) == TRUE
+  NetworkPkg/DnsDxe/DnsDxe.inf
+  NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
+  NetworkPkg/HttpDxe/HttpDxe.inf
+  NetworkPkg/HttpBootDxe/HttpBootDxe.inf
+!endif
 
   #
   # SCSI Bus and Disk Driver

@@ -128,6 +128,12 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+!if $(HTTP_BOOT_ENABLE) == TRUE
+  INF NetworkPkg/DnsDxe/DnsDxe.inf
+  INF NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
+  INF NetworkPkg/HttpDxe/HttpDxe.inf
+  INF NetworkPkg/HttpBootDxe/HttpBootDxe.inf
+!endif
 
   #
   # SCSI Bus and Disk Driver
