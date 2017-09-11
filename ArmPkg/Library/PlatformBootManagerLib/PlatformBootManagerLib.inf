@@ -43,9 +43,11 @@
   BaseLib
   BaseMemoryLib
   BootLogoLib
+  CapsuleLib
   DebugLib
   DevicePathLib
   DxeServicesLib
+  HobLib
   MemoryAllocationLib
   PcdLib
   PrintLib

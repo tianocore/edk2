@@ -18,7 +18,9 @@
 
 #include <IndustryStandard/Pci22.h>
 #include <Library/BootLogoLib.h>
+#include <Library/CapsuleLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiLib.h>
@@ -447,6 +449,14 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
+  EFI_STATUS    Status;
+
+  if (GetBootModeHob() == BOOT_ON_FLASH_UPDATE) {
+    DEBUG ((DEBUG_INFO, "ProcessCapsules Before EndOfDxe ......\n"));
+    Status = ProcessCapsules ();
+    DEBUG ((DEBUG_INFO, "ProcessCapsules returned %r\n", Status));
+  }
+
   //
   // Signal EndOfDxe PI Event
   //
@@ -527,6 +537,12 @@ PlatformBootManagerAfterConsole (
   // Connect the rest of the devices.
   //
   EfiBootManagerConnectAll ();
+
+  if (GetBootModeHob() == BOOT_ON_FLASH_UPDATE) {
+    DEBUG((DEBUG_INFO, "ProcessCapsules After EndOfDxe ......\n"));
+    Status = ProcessCapsules ();
+    DEBUG((DEBUG_INFO, "ProcessCapsules returned %r\n", Status));
+  }
 
   //
   // Enumerate all possible boot options.
