@@ -2695,6 +2695,7 @@ class ModuleAutoGen(AutoGen):
 
         self.BuildDatabase = self.Workspace.BuildDatabase
         self.BuildRuleOrder = None
+        self.BuildTime      = 0
 
         self._Module          = None
         self._Name            = None

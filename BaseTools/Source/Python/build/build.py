@@ -257,6 +257,7 @@ def ReadMessage(From, To, ExitFlag):
 # @param  WorkingDir            The directory in which the program will be running
 #
 def LaunchCommand(Command, WorkingDir):
+    BeginTime = time.time()
     # if working directory doesn't exist, Popen() will raise an exception
     if not os.path.isdir(WorkingDir):
         EdkLogger.error("build", FILE_NOT_FOUND, ExtraData=WorkingDir)
@@ -321,6 +322,7 @@ def LaunchCommand(Command, WorkingDir):
             EdkLogger.info(RespContent)
 
         EdkLogger.error("build", COMMAND_FAILURE, ExtraData="%s [%s]" % (Command, WorkingDir))
+    return "%dms" % (int(round((time.time() - BeginTime) * 1000)))
 
 ## The smallest unit that can be built in multi-thread build mode
 #
@@ -665,7 +667,7 @@ class BuildTask:
     #
     def _CommandThread(self, Command, WorkingDir):
         try:
-            LaunchCommand(Command, WorkingDir)
+            self.BuildItem.BuildObject.BuildTime = LaunchCommand(Command, WorkingDir)
             self.CompleteFlag = True
         except:
             #
@@ -763,6 +765,9 @@ class Build():
         self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType)
         self.TargetTxt      = TargetTxtClassObject()
         self.ToolDef        = ToolDefClassObject()
+        self.AutoGenTime    = 0
+        self.MakeTime       = 0
+        self.GenFdsTime     = 0
         GlobalData.BuildOptionPcd     = BuildOptions.OptionPcd
         #Set global flag for build mode
         GlobalData.gIgnoreSource = BuildOptions.IgnoreSources
@@ -1339,7 +1344,7 @@ class Build():
         if BuildModule:
             if Target != 'fds':
                 BuildCommand = BuildCommand + [Target]
-            LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
+            AutoGenObject.BuildTime = LaunchCommand(BuildCommand, AutoGenObject.MakeFileDir)
             self.CreateAsBuiltInf()
             return True
 
@@ -1760,6 +1765,7 @@ class Build():
             GlobalData.gGlobalDefines['TARGET'] = BuildTarget
             index = 0
             for ToolChain in self.ToolChainList:
+                WorkspaceAutoGenTime = time.time()
                 GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
                 GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
                 GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[index]
@@ -1791,7 +1797,11 @@ class Build():
                 Wa.CreateMakeFile(False)
                 self.Progress.Stop("done!")
                 MaList = []
+                ExitFlag = threading.Event()
+                ExitFlag.clear()
+                self.AutoGenTime += int(round((time.time() - WorkspaceAutoGenTime)))
                 for Arch in Wa.ArchList:
+                    AutoGenStart = time.time()
                     GlobalData.gGlobalDefines['ARCH'] = Arch
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
                     for Module in Pa.Platform.Modules:
@@ -1800,8 +1810,35 @@ class Build():
                             if Ma == None: continue
                             MaList.append(Ma)
                             self.BuildModules.append(Ma)
-                            if not Ma.IsBinaryModule:
-                                self._Build(self.Target, Ma, BuildModule=True)
+                    self.AutoGenTime += int(round((time.time() - AutoGenStart)))
+                    MakeStart = time.time()
+                    for Ma in self.BuildModules:
+                        if not Ma.IsBinaryModule:
+                            Bt = BuildTask.New(ModuleMakeUnit(Ma, self.Target))
+                        # Break build if any build thread has error
+                        if BuildTask.HasError():
+                            # we need a full version of makefile for platform
+                            ExitFlag.set()
+                            BuildTask.WaitForComplete()
+                            Pa.CreateMakeFile(False)
+                            EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
+                        # Start task scheduler
+                        if not BuildTask.IsOnGoing():
+                            BuildTask.StartScheduler(self.ThreadNumber, ExitFlag)
+
+                    # in case there's an interruption. we need a full version of makefile for platform
+                    Pa.CreateMakeFile(False)
+                    if BuildTask.HasError():
+                        EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
+                    self.MakeTime += int(round((time.time() - MakeStart)))
+
+                MakeContiue = time.time()
+                ExitFlag.set()
+                BuildTask.WaitForComplete()
+                self.CreateAsBuiltInf()
+                self.MakeTime += int(round((time.time() - MakeContiue)))
+                if BuildTask.HasError():
+                    EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
 
                 self.BuildReport.AddPlatformReport(Wa, MaList)
                 if MaList == []:
@@ -1842,7 +1879,9 @@ class Build():
                     #
                     # create FDS again for the updated EFI image
                     #
+                    GenFdsStart = time.time()
                     self._Build("fds", Wa)
+                    self.GenFdsTime += int(round((time.time() - GenFdsStart)))
                     #
                     # Create MAP file for all platform FVs after GenFds.
                     #
@@ -1860,6 +1899,7 @@ class Build():
             GlobalData.gGlobalDefines['TARGET'] = BuildTarget
             index = 0
             for ToolChain in self.ToolChainList:
+                WorkspaceAutoGenTime = time.time()
                 GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
                 GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
                 GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[index]
@@ -1889,7 +1929,9 @@ class Build():
                 # multi-thread exit flag
                 ExitFlag = threading.Event()
                 ExitFlag.clear()
+                self.AutoGenTime += int(round((time.time() - WorkspaceAutoGenTime)))
                 for Arch in Wa.ArchList:
+                    AutoGenStart = time.time()
                     GlobalData.gGlobalDefines['ARCH'] = Arch
                     Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Arch)
                     if Pa == None:
@@ -1924,7 +1966,8 @@ class Build():
                                 continue
                         self.BuildModules.append(Ma)
                     self.Progress.Stop("done!")
-
+                    self.AutoGenTime += int(round((time.time() - AutoGenStart)))
+                    MakeStart = time.time()
                     for Ma in self.BuildModules:
                         # Generate build task for the module
                         if not Ma.IsBinaryModule:
@@ -1944,7 +1987,9 @@ class Build():
                     Pa.CreateMakeFile(False)
                     if BuildTask.HasError():
                         EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
+                    self.MakeTime += int(round((time.time() - MakeStart)))
 
+                MakeContiue = time.time()
                 #
                 # Save temp tables to a TmpTableDict.
                 #
@@ -1960,7 +2005,7 @@ class Build():
                 ExitFlag.set()
                 BuildTask.WaitForComplete()
                 self.CreateAsBuiltInf()
-
+                self.MakeTime += int(round((time.time() - MakeContiue)))
                 #
                 # Check for build error, and raise exception if one
                 # has been signaled.
@@ -1997,12 +2042,14 @@ class Build():
                         #
                         # Generate FD image if there's a FDF file found
                         #
+                        GenFdsStart = time.time()
                         LaunchCommand(Wa.GenFdsCommand, os.getcwd())
 
                         #
                         # Create MAP file for all platform FVs after GenFds.
                         #
                         self._CollectFvMapBuffer(MapBuffer, Wa, ModuleList)
+                        self.GenFdsTime += int(round((time.time() - GenFdsStart)))
                     #
                     # Save MAP buffer into MAP file.
                     #
@@ -2150,6 +2197,18 @@ def SingleCheckCallback(option, opt_str, value, parser):
         gParamCheck.append(option)
     else:
         parser.error("Option %s only allows one instance in command line!" % option)
+
+def LogBuildTime(Time):
+    if Time:
+        TimeDurStr = ''
+        TimeDur = time.gmtime(Time)
+        if TimeDur.tm_yday > 1:
+            TimeDurStr = time.strftime("%H:%M:%S", TimeDur) + ", %d day(s)" % (TimeDur.tm_yday - 1)
+        else:
+            TimeDurStr = time.strftime("%H:%M:%S", TimeDur)
+        return TimeDurStr
+    else:
+        return None
 
 ## Parse command line options
 #
@@ -2407,7 +2466,7 @@ def Main():
         BuildDurationStr = time.strftime("%H:%M:%S", BuildDuration)
     if MyBuild != None:
         if not BuildError:
-            MyBuild.BuildReport.GenerateReport(BuildDurationStr)
+            MyBuild.BuildReport.GenerateReport(BuildDurationStr, LogBuildTime(MyBuild.AutoGenTime), LogBuildTime(MyBuild.MakeTime), LogBuildTime(MyBuild.GenFdsTime))
         MyBuild.Db.Close()
     EdkLogger.SetLevel(EdkLogger.QUIET)
     EdkLogger.quiet("\n- %s -" % Conclusion)

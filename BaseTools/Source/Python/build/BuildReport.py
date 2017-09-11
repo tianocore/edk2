@@ -307,7 +307,11 @@ class LibraryReport(object):
             LibConstructorList = Lib.ConstructorList
             LibDesstructorList = Lib.DestructorList
             LibDepexList = Lib.DepexExpression[M.Arch, M.ModuleType]
-            self.LibraryList.append((LibInfPath, LibClassList, LibConstructorList, LibDesstructorList, LibDepexList))
+            for LibAutoGen in M.LibraryAutoGenList:
+                if LibInfPath == LibAutoGen.MetaFile.Path:
+                    LibTime = LibAutoGen.BuildTime
+                    break
+            self.LibraryList.append((LibInfPath, LibClassList, LibConstructorList, LibDesstructorList, LibDepexList, LibTime))
 
     ##
     # Generate report for module library information
@@ -344,6 +348,8 @@ class LibraryReport(object):
                     LibDepex = " ".join(LibraryItem[4])
                     if LibDepex:
                         EdkIILibInfo += " Depex = " + LibDepex
+                    if LibraryItem[5]:
+                        EdkIILibInfo += " Time = " + LibraryItem[5]
                     if EdkIILibInfo:
                         FileWrite(File, "{%s: %s}" % (LibClass, EdkIILibInfo))
                     else:
@@ -553,6 +559,7 @@ class ModuleReport(object):
         self.PciDeviceId = M.Module.Defines.get("PCI_DEVICE_ID", "")
         self.PciVendorId = M.Module.Defines.get("PCI_VENDOR_ID", "")
         self.PciClassCode = M.Module.Defines.get("PCI_CLASS_CODE", "")
+        self.BuildTime = M.BuildTime
 
         self._BuildDir = M.BuildDir
         self.ModulePcdSet = {}
@@ -648,6 +655,8 @@ class ModuleReport(object):
             FileWrite(File, "SHA1 HASH:            %s *%s" % (self.Hash, self.ModuleName + ".efi"))
         if self.BuildTimeStamp:
             FileWrite(File, "Build Time Stamp:     %s" % self.BuildTimeStamp)
+        if self.BuildTime:
+            FileWrite(File, "Module Build Time:    %s" % self.BuildTime)
         if self.DriverType:
             FileWrite(File, "Driver Type:          %s" % self.DriverType)
         if self.UefiSpecVersion:
@@ -1696,9 +1705,12 @@ class PlatformReport(object):
     # @param self            The object pointer
     # @param File            The file object for report
     # @param BuildDuration   The total time to build the modules
+    # @param AutoGenTime     The total time of AutoGen Phase
+    # @param MakeTime        The total time of Make Phase
+    # @param GenFdsTime      The total time of GenFds Phase
     # @param ReportType      The kind of report items in the final report file
     #
-    def GenerateReport(self, File, BuildDuration, ReportType):
+    def GenerateReport(self, File, BuildDuration, AutoGenTime, MakeTime, GenFdsTime, ReportType):
         FileWrite(File, "Platform Summary")
         FileWrite(File, "Platform Name:        %s" % self.PlatformName)
         FileWrite(File, "Platform DSC Path:    %s" % self.PlatformDscPath)
@@ -1708,6 +1720,12 @@ class PlatformReport(object):
         FileWrite(File, "Output Path:          %s" % self.OutputPath)
         FileWrite(File, "Build Environment:    %s" % self.BuildEnvironment)
         FileWrite(File, "Build Duration:       %s" % BuildDuration)
+        if AutoGenTime:
+            FileWrite(File, "AutoGen Duration:     %s" % AutoGenTime)
+        if MakeTime:
+            FileWrite(File, "Make Duration:        %s" % MakeTime)
+        if GenFdsTime:
+            FileWrite(File, "GenFds Duration:      %s" % GenFdsTime)
         FileWrite(File, "Report Content:       %s" % ", ".join(ReportType))
 
         if GlobalData.MixedPcd:
@@ -1782,13 +1800,16 @@ class BuildReport(object):
     #
     # @param self            The object pointer
     # @param BuildDuration   The total time to build the modules
+    # @param AutoGenTime     The total time of AutoGen phase
+    # @param MakeTime        The total time of Make phase
+    # @param GenFdsTime      The total time of GenFds phase
     #
-    def GenerateReport(self, BuildDuration):
+    def GenerateReport(self, BuildDuration, AutoGenTime, MakeTime, GenFdsTime):
         if self.ReportFile:
             try:
                 File = StringIO('')
                 for (Wa, MaList) in self.ReportList:
-                    PlatformReport(Wa, MaList, self.ReportType).GenerateReport(File, BuildDuration, self.ReportType)
+                    PlatformReport(Wa, MaList, self.ReportType).GenerateReport(File, BuildDuration, AutoGenTime, MakeTime, GenFdsTime, self.ReportType)
                 Content = FileLinesSplit(File.getvalue(), gLineMaxLength)
                 SaveFileOnChange(self.ReportFile, Content, True)
                 EdkLogger.quiet("Build report can be found at %s" % os.path.abspath(self.ReportFile))
