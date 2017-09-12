@@ -1530,6 +1530,85 @@ AuthServiceInternalCompareTimeStamp (
 }
 
 /**
+  Calculate SHA256 digest of SignerCert CommonName + ToplevelCert tbsCertificate
+  SignerCert and ToplevelCert are inside the signer certificate chain.
+
+  @param[in]  SignerCert          A pointer to SignerCert data.
+  @param[in]  SignerCertSize      Length of SignerCert data.
+  @param[in]  TopLevelCert        A pointer to TopLevelCert data.
+  @param[in]  TopLevelCertSize    Length of TopLevelCert data.
+  @param[out] Sha256Digest       Sha256 digest calculated.
+
+  @return EFI_ABORTED          Digest process failed.
+  @return EFI_SUCCESS          SHA256 Digest is succesfully calculated.
+
+**/
+EFI_STATUS
+CalculatePrivAuthVarSignChainSHA256Digest(
+  IN     UINT8            *SignerCert,
+  IN     UINTN            SignerCertSize,
+  IN     UINT8            *TopLevelCert,
+  IN     UINTN            TopLevelCertSize,
+  OUT    UINT8            *Sha256Digest
+  )
+{
+  UINT8                   *TbsCert;
+  UINTN                   TbsCertSize;
+  UINT8                   CertCommonName[128];
+  UINTN                   CertCommonNameSize;
+  BOOLEAN                 CryptoStatus;
+  EFI_STATUS              Status;
+
+  CertCommonNameSize = sizeof(CertCommonName);
+
+  //
+  // Get SignerCert CommonName
+  //
+  Status = X509GetCommonName(SignerCert, SignerCertSize, CertCommonName, &CertCommonNameSize);
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "%a Get SignerCert CommonName failed with status %x\n", __FUNCTION__, Status));
+    return EFI_ABORTED;
+  }
+
+  //
+  // Get TopLevelCert tbsCertificate
+  //
+  if (!X509GetTBSCert(TopLevelCert, TopLevelCertSize, &TbsCert, &TbsCertSize)) {
+    DEBUG((DEBUG_INFO, "%a Get Top-level Cert tbsCertificate failed!\n", __FUNCTION__));
+    return EFI_ABORTED;
+  }
+
+  //
+  // Digest SignerCert CN + TopLevelCert tbsCertificate
+  //
+  ZeroMem (Sha256Digest, SHA256_DIGEST_SIZE);
+  CryptoStatus = Sha256Init (mHashCtx);
+  if (!CryptoStatus) {
+    return EFI_ABORTED;
+  }
+
+  //
+  // '\0' is forced in CertCommonName. No overflow issue
+  //
+  CryptoStatus = Sha256Update (mHashCtx, CertCommonName, AsciiStrLen((CHAR8 *)CertCommonName));
+  if (!CryptoStatus) {
+    return EFI_ABORTED;
+  }
+
+  CryptoStatus = Sha256Update (mHashCtx, TbsCert, TbsCertSize);
+  if (!CryptoStatus) {
+    return EFI_ABORTED;
+  }
+
+  CryptoStatus  = Sha256Final (mHashCtx, Sha256Digest);
+  if (!CryptoStatus) {
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Find matching signer's certificates for common authenticated variable
   by corresponding VariableName and VendorGuid from "certdb" or "certdbv".
 
@@ -1872,13 +1951,16 @@ DeleteCertsFromDb (
 /**
   Insert signer's certificates for common authenticated variable with VariableName
   and VendorGuid in AUTH_CERT_DB_DATA to "certdb" or "certdbv" according to
-  time based authenticated variable attributes.
+  time based authenticated variable attributes. CertData is the SHA256 digest of
+  SignerCert CommonName + TopLevelCert tbsCertificate.
 
-  @param[in]  VariableName   Name of authenticated Variable.
-  @param[in]  VendorGuid     Vendor GUID of authenticated Variable.
-  @param[in]  Attributes     Attributes of authenticated variable.
-  @param[in]  CertData       Pointer to signer's certificates.
-  @param[in]  CertDataSize   Length of CertData in bytes.
+  @param[in]  VariableName      Name of authenticated Variable.
+  @param[in]  VendorGuid        Vendor GUID of authenticated Variable.
+  @param[in]  Attributes        Attributes of authenticated variable.
+  @param[in]  SignerCert        Signer certificate data.
+  @param[in]  SignerCertSize    Length of signer certificate.
+  @param[in]  TopLevelCert      Top-level certificate data.
+  @param[in]  TopLevelCertSize  Length of top-level certificate.
 
   @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
   @retval  EFI_ACCESS_DENIED     An AUTH_CERT_DB_DATA entry with same VariableName
@@ -1892,8 +1974,10 @@ InsertCertsToDb (
   IN     CHAR16           *VariableName,
   IN     EFI_GUID         *VendorGuid,
   IN     UINT32           Attributes,
-  IN     UINT8            *CertData,
-  IN     UINTN            CertDataSize
+  IN     UINT8            *SignerCert,
+  IN     UINTN            SignerCertSize,
+  IN     UINT8            *TopLevelCert,
+  IN     UINTN            TopLevelCertSize
   )
 {
   EFI_STATUS              Status;
@@ -1904,10 +1988,12 @@ InsertCertsToDb (
   UINT32                  NewCertDbSize;
   UINT32                  CertNodeSize;
   UINT32                  NameSize;
+  UINT32                  CertDataSize;
   AUTH_CERT_DB_DATA       *Ptr;
   CHAR16                  *DbName;
+  UINT8                   Sha256Digest[SHA256_DIGEST_SIZE];
 
-  if ((VariableName == NULL) || (VendorGuid == NULL) || (CertData == NULL)) {
+  if ((VariableName == NULL) || (VendorGuid == NULL) || (SignerCert == NULL) ||(TopLevelCert == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1967,11 +2053,24 @@ InsertCertsToDb (
   // Construct new data content of variable "certdb" or "certdbv".
   //
   NameSize      = (UINT32) StrLen (VariableName);
+  CertDataSize  = sizeof(Sha256Digest);
   CertNodeSize  = sizeof (AUTH_CERT_DB_DATA) + (UINT32) CertDataSize + NameSize * sizeof (CHAR16);
   NewCertDbSize = (UINT32) DataSize + CertNodeSize;
   if (NewCertDbSize > mMaxCertDbSize) {
     return EFI_OUT_OF_RESOURCES;
   }
+
+  Status = CalculatePrivAuthVarSignChainSHA256Digest(
+             SignerCert,
+             SignerCertSize,
+             TopLevelCert,
+             TopLevelCertSize,
+             Sha256Digest
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   NewCertDb     = (UINT8*) mCertDbStore;
 
   //
@@ -1999,7 +2098,7 @@ InsertCertsToDb (
 
   CopyMem (
     (UINT8 *) Ptr +  sizeof (AUTH_CERT_DB_DATA) + NameSize * sizeof (CHAR16),
-    CertData,
+    Sha256Digest,
     CertDataSize
     );
 
@@ -2181,19 +2280,27 @@ VerifyTimeBasedPayload (
   UINTN                            NewDataSize;
   UINT8                            *Buffer;
   UINTN                            Length;
-  UINT8                            *RootCert;
-  UINTN                            RootCertSize;
+  UINT8                            *TopLevelCert;
+  UINTN                            TopLevelCertSize;
+  UINT8                            *TrustedCert;
+  UINTN                            TrustedCertSize;
   UINT8                            *SignerCerts;
   UINTN                            CertStackSize;
   UINT8                            *CertsInCertDb;
   UINT32                           CertsSizeinDb;
+  UINT8                            Sha256Digest[SHA256_DIGEST_SIZE];
 
+  //
+  // 1. TopLevelCert is the top-level issuer certificate in signature Signer Cert Chain
+  // 2. TrustedCert is the certificate which firmware trusts. It could be saved in protected
+  //     storage or PK payload on PK init
+  //
   VerifyStatus           = FALSE;
   CertData               = NULL;
   NewData                = NULL;
   Attr                   = Attributes;
   SignerCerts            = NULL;
-  RootCert               = NULL;
+  TopLevelCert           = NULL;
   CertsInCertDb          = NULL;
 
   //
@@ -2325,8 +2432,8 @@ VerifyTimeBasedPayload (
                      SigDataSize,
                      &SignerCerts,
                      &CertStackSize,
-                     &RootCert,
-                     &RootCertSize
+                     &TopLevelCert,
+                     &TopLevelCertSize
                      );
     if (!VerifyStatus) {
       goto Exit;
@@ -2348,8 +2455,8 @@ VerifyTimeBasedPayload (
     }
     CertList = (EFI_SIGNATURE_LIST *) Data;
     Cert     = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
-    if ((RootCertSize != (CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1))) ||
-        (CompareMem (Cert->SignatureData, RootCert, RootCertSize) != 0)) {
+    if ((TopLevelCertSize != (CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1))) ||
+        (CompareMem (Cert->SignatureData, TopLevelCert, TopLevelCertSize) != 0)) {
       VerifyStatus = FALSE;
       goto Exit;
     }
@@ -2360,8 +2467,8 @@ VerifyTimeBasedPayload (
     VerifyStatus = Pkcs7Verify (
                      SigData,
                      SigDataSize,
-                     RootCert,
-                     RootCertSize,
+                     TopLevelCert,
+                     TopLevelCertSize,
                      NewData,
                      NewDataSize
                      );
@@ -2394,8 +2501,8 @@ VerifyTimeBasedPayload (
           //
           // Iterate each Signature Data Node within this CertList for a verify
           //
-          RootCert      = Cert->SignatureData;
-          RootCertSize  = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
+          TrustedCert      = Cert->SignatureData;
+          TrustedCertSize  = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
 
           //
           // Verify Pkcs7 SignedData via Pkcs7Verify library.
@@ -2403,8 +2510,8 @@ VerifyTimeBasedPayload (
           VerifyStatus = Pkcs7Verify (
                            SigData,
                            SigDataSize,
-                           RootCert,
-                           RootCertSize,
+                           TrustedCert,
+                           TrustedCertSize,
                            NewData,
                            NewDataSize
                            );
@@ -2428,8 +2535,8 @@ VerifyTimeBasedPayload (
                      SigDataSize,
                      &SignerCerts,
                      &CertStackSize,
-                     &RootCert,
-                     &RootCertSize
+                     &TopLevelCert,
+                     &TopLevelCertSize
                      );
     if (!VerifyStatus) {
       goto Exit;
@@ -2448,17 +2555,36 @@ VerifyTimeBasedPayload (
         goto Exit;
       }
 
-      if ((CertStackSize != CertsSizeinDb) ||
-          (CompareMem (SignerCerts, CertsInCertDb, CertsSizeinDb) != 0)) {
-        goto Exit;
+      if (CertsSizeinDb == SHA256_DIGEST_SIZE) {
+        //
+        // Check hash of signer cert CommonName + Top-level issuer tbsCertificate against data in CertDb
+        //
+        Status = CalculatePrivAuthVarSignChainSHA256Digest(
+                   SignerCerts + sizeof(UINT8) + sizeof(UINT32),
+                   ReadUnaligned32 ((UINT32 *)(SignerCerts + sizeof(UINT8))),
+                   TopLevelCert,
+                   TopLevelCertSize,
+                   Sha256Digest
+                   );
+        if (EFI_ERROR(Status) || CompareMem (Sha256Digest, CertsInCertDb, CertsSizeinDb) != 0){
+          goto Exit;
+        }
+      } else {
+         //
+         // Keep backward compatible with previous solution which saves whole signer certs stack in CertDb
+         //
+         if ((CertStackSize != CertsSizeinDb) ||
+             (CompareMem (SignerCerts, CertsInCertDb, CertsSizeinDb) != 0)) {
+              goto Exit;
+         }
       }
     }
 
     VerifyStatus = Pkcs7Verify (
                      SigData,
                      SigDataSize,
-                     RootCert,
-                     RootCertSize,
+                     TopLevelCert,
+                     TopLevelCertSize,
                      NewData,
                      NewDataSize
                      );
@@ -2468,9 +2594,17 @@ VerifyTimeBasedPayload (
 
     if ((OrgTimeStamp == NULL) && (PayloadSize != 0)) {
       //
-      // Insert signer's certificates when adding a new common authenticated variable.
+      // When adding a new common authenticated variable, always save Hash of cn of signer cert + tbsCertificate of Top-level issuer
       //
-      Status = InsertCertsToDb (VariableName, VendorGuid, Attributes, SignerCerts, CertStackSize);
+      Status = InsertCertsToDb (
+                 VariableName,
+                 VendorGuid,
+                 Attributes,
+                 SignerCerts + sizeof(UINT8) + sizeof(UINT32),
+                 ReadUnaligned32 ((UINT32 *)(SignerCerts + sizeof(UINT8))),
+                 TopLevelCert,
+                 TopLevelCertSize
+                 );
       if (EFI_ERROR (Status)) {
         VerifyStatus = FALSE;
         goto Exit;
@@ -2479,16 +2613,16 @@ VerifyTimeBasedPayload (
   } else if (AuthVarType == AuthVarTypePayload) {
     CertList = (EFI_SIGNATURE_LIST *) PayloadPtr;
     Cert     = (EFI_SIGNATURE_DATA *) ((UINT8 *) CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
-    RootCert      = Cert->SignatureData;
-    RootCertSize  = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
+    TrustedCert     = Cert->SignatureData;
+    TrustedCertSize = CertList->SignatureSize - (sizeof (EFI_SIGNATURE_DATA) - 1);
     //
     // Verify Pkcs7 SignedData via Pkcs7Verify library.
     //
     VerifyStatus = Pkcs7Verify (
                      SigData,
                      SigDataSize,
-                     RootCert,
-                     RootCertSize,
+                     TrustedCert,
+                     TrustedCertSize,
                      NewData,
                      NewDataSize
                      );
@@ -2499,7 +2633,7 @@ VerifyTimeBasedPayload (
 Exit:
 
   if (AuthVarType == AuthVarTypePk || AuthVarType == AuthVarTypePriv) {
-    Pkcs7FreeSigners (RootCert);
+    Pkcs7FreeSigners (TopLevelCert);
     Pkcs7FreeSigners (SignerCerts);
   }
 
