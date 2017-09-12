@@ -48,10 +48,17 @@ FindAnchorVolumeDescriptorPointer (
   )
 {
   EFI_STATUS  Status;
-  UINT32      BlockSize = BlockIo->Media->BlockSize;
-  EFI_LBA     EndLBA = BlockIo->Media->LastBlock;
-  EFI_LBA     DescriptorLBAs[] = { 256, EndLBA - 256, EndLBA, 512 };
+  UINT32      BlockSize;
+  EFI_LBA     EndLBA;
+  EFI_LBA     DescriptorLBAs[4];
   UINTN       Index;
+
+  BlockSize = BlockIo->Media->BlockSize;
+  EndLBA = BlockIo->Media->LastBlock;
+  DescriptorLBAs[0] = 256;
+  DescriptorLBAs[1] = EndLBA - 256;
+  DescriptorLBAs[2] = EndLBA;
+  DescriptorLBAs[3] = 512;
 
   for (Index = 0; Index < ARRAY_SIZE (DescriptorLBAs); Index++) {
     Status = DiskIo->ReadDisk (
