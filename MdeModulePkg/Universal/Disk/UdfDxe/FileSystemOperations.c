@@ -472,7 +472,7 @@ DuplicateFid (
 {
   *NewFileIdentifierDesc =
     (UDF_FILE_IDENTIFIER_DESCRIPTOR *)AllocateCopyPool (
-      GetFidDescriptorLength (FileIdentifierDesc), FileIdentifierDesc);
+      (UINTN) GetFidDescriptorLength (FileIdentifierDesc), FileIdentifierDesc);
 }
 
 //
@@ -809,7 +809,7 @@ GetAedAdsData (
   //
   // Allocate buffer to read in AED's data.
   //
-  *Data = AllocatePool (*Length);
+  *Data = AllocatePool ((UINTN) (*Length));
   if (*Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -818,7 +818,7 @@ GetAedAdsData (
     DiskIo,
     BlockIo->Media->MediaId,
     Offset,
-    *Length,
+    (UINTN) (*Length),
     *Data
     );
 }
@@ -844,7 +844,7 @@ GrowUpBufferToNextAd (
       return EFI_OUT_OF_RESOURCES;
     }
   } else {
-    *Buffer = ReallocatePool (Length, Length + ExtentLength, *Buffer);
+    *Buffer = ReallocatePool ((UINTN) Length, (UINTN) (Length + ExtentLength), *Buffer);
     if (*Buffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -933,7 +933,7 @@ ReadFile (
       //
       // Allocate buffer for starting read data.
       //
-      ReadFileInfo->FileData = AllocatePool (Length);
+      ReadFileInfo->FileData = AllocatePool ((UINTN) Length);
       if (ReadFileInfo->FileData == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
@@ -941,7 +941,7 @@ ReadFile (
       //
       // Read all inline data into ReadFileInfo->FileData
       //
-      CopyMem (ReadFileInfo->FileData, Data, Length);
+      CopyMem (ReadFileInfo->FileData, Data, (UINTN) Length);
       ReadFileInfo->ReadLength = Length;
     } else if (ReadFileInfo->Flags == READ_FILE_SEEK_AND_READ) {
       //
@@ -951,7 +951,7 @@ ReadFile (
       CopyMem (
         ReadFileInfo->FileData,
         (VOID *)((UINT8 *)Data + ReadFileInfo->FilePosition),
-        ReadFileInfo->FileDataSize
+        (UINTN) ReadFileInfo->FileDataSize
         );
 
       ReadFileInfo->FilePosition += ReadFileInfo->FileDataSize;
@@ -1099,7 +1099,7 @@ ReadFile (
           DiskIo,
           BlockIo->Media->MediaId,
           Offset + MultU64x32 (Lsn, LogicalBlockSize),
-          DataLength,
+          (UINTN) DataLength,
           (VOID *)((UINT8 *)ReadFileInfo->FileData +
                    DataOffset)
           );
