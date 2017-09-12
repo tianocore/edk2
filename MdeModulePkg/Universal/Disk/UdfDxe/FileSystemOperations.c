@@ -1147,6 +1147,14 @@ ReadFile (
     ASSERT (FALSE);
     Status = EFI_UNSUPPORTED;
     break;
+
+  default:
+    //
+    // A flag value reserved by the ECMA-167 standard (3rd Edition - June
+    // 1997); 14.6 ICB Tag; 14.6.8 Flags (RBP 18); was found.
+    //
+    Status = EFI_UNSUPPORTED;
+    break;
   }
 
 Done:
