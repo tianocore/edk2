@@ -893,6 +893,11 @@ ReadFile (
   LogicalBlockSize  = LV_BLOCK_SIZE (Volume, UDF_DEFAULT_LV_NUM);
   DoFreeAed         = FALSE;
 
+  //
+  // set BytesLeft to suppress incorrect compiler/analyzer warnings
+  //
+  BytesLeft = 0;
+
   switch (ReadFileInfo->Flags) {
   case READ_FILE_GET_FILESIZE:
   case READ_FILE_ALLOCATE_AND_READ:
