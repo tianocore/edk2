@@ -692,7 +692,8 @@ UdfSetPosition (
 
   PrivFileData = PRIVATE_UDF_FILE_DATA_FROM_THIS (This);
 
-  FileIdentifierDesc = PrivFileData->File.FileIdentifierDesc;
+  FileIdentifierDesc = _FILE (PrivFileData)->FileIdentifierDesc;
+  ASSERT (FileIdentifierDesc != NULL);
   if (IS_FID_DIRECTORY_FILE (FileIdentifierDesc)) {
     //
     // If the file handle is a directory, the _only_ position that may be set is
