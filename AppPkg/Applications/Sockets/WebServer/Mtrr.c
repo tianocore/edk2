@@ -146,12 +146,12 @@ MemoryTypeRegistersPage (
 {
   UINT64 Addr;
   BOOLEAN bValid;
-  UINT64 Capabilities;
+  MSR_IA32_MTRRCAP_REGISTER Capabilities;
   UINTN Count;
-  UINT64 DefType;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER DefType;
   UINTN Index;
   UINT64 Mask;
-  UINT64 MaxMtrrs;
+
   CONST UINT64 mFixedAddresses [( 8 * MTRR_NUMBER_OF_FIXED_MTRR ) + 1 ] = {
            0ULL,
      0x10000ULL,
@@ -302,8 +302,8 @@ MemoryTypeRegistersPage (
       //
       //  Get the capabilities
       //
-      Capabilities = AsmReadMsr64 ( MTRR_LIB_IA32_MTRR_CAP );
-      DefType =  AsmReadMsr64 ( MTRR_LIB_IA32_MTRR_DEF_TYPE );
+      Capabilities.Uint64 = AsmReadMsr64 ( MSR_IA32_MTRRCAP );
+      DefType.Uint64 =  AsmReadMsr64 ( MSR_IA32_MTRR_DEF_TYPE );
 
       //
       //  Display the capabilities
@@ -316,7 +316,7 @@ MemoryTypeRegistersPage (
       }
       Status = HttpSendHexValue ( SocketFD,
                                   pPort,
-                                  Capabilities );
+                                  Capabilities.Uint64 );
       if ( EFI_ERROR ( Status )) {
         break;
       }
@@ -338,7 +338,7 @@ MemoryTypeRegistersPage (
       }
       Status = HttpSendHexValue ( SocketFD,
                                   pPort,
-                                  DefType );
+                                  DefType.Uint64);
       if ( EFI_ERROR ( Status )) {
         break;
       }
@@ -350,7 +350,7 @@ MemoryTypeRegistersPage (
       }
       Status = HttpSendAnsiString ( SocketFD,
                                     pPort,
-                                    ( 0 != ( DefType & MTRR_LIB_CACHE_MTRR_ENABLED ))
+                                    ( 0 != DefType.Bits.E )
                                     ? "Enabled"
                                     : "Disabled" );
       if ( EFI_ERROR ( Status )) {
@@ -364,7 +364,7 @@ MemoryTypeRegistersPage (
       }
       Status = HttpSendAnsiString ( SocketFD,
                                     pPort,
-                                    ( 0 != ( DefType & MTRR_LIB_CACHE_FIXED_MTRR_ENABLED ))
+                                    ( 0 != DefType.Bits.FE )
                                     ? "Enabled"
                                     : "Disabled" );
       if ( EFI_ERROR ( Status )) {
@@ -376,7 +376,7 @@ MemoryTypeRegistersPage (
       if ( EFI_ERROR ( Status )) {
         break;
       }
-      Type = DefType & 0xff;
+      Type = DefType.Uint64 & 0xff;
       Status = HttpSendAnsiString ( SocketFD,
                                     pPort,
                                     ( DIM ( mMemoryType ) > Type )
@@ -395,7 +395,7 @@ MemoryTypeRegistersPage (
       //
       //  Determine if MTRRs are enabled
       //
-      if ( 0 == ( DefType & MTRR_LIB_CACHE_MTRR_ENABLED )) {
+      if ( 0 == DefType.Bits.E ) {
         Status = HttpSendAnsiString ( SocketFD,
                                       pPort,
                                       "<p>All memory is uncached!</p>\r\n" );
@@ -412,8 +412,8 @@ MemoryTypeRegistersPage (
         //
         //  Determine if the fixed MTRRs are supported
         //
-        if (( 0 != ( Capabilities & 0x100 ))
-          && ( 0 != ( DefType & MTRR_LIB_CACHE_FIXED_MTRR_ENABLED ))) {
+        if (( 0 != Capabilities.Bits.FIX )
+          && ( 0 != DefType.Bits.FE)) {
 
           //
           //  Beginning of table
@@ -615,8 +615,7 @@ MemoryTypeRegistersPage (
         //
         //  Determine if the variable MTRRs are supported
         //
-        MaxMtrrs = Capabilities & MTRR_LIB_IA32_MTRR_CAP_VCNT_MASK;
-        if ( 0 < MaxMtrrs ) {
+        if ( 0 < Capabilities.Bits.VCNT ) {
           //
           //  Beginning of table
           //
@@ -632,7 +631,7 @@ MemoryTypeRegistersPage (
           //
           //  Display the variable MTRRs
           //
-          for ( Count = 0; MaxMtrrs > Count; Count++ ) {
+          for ( Count = 0; Capabilities.Bits.VCNT > Count; Count++ ) {
             //
             //  Start the row
             //
