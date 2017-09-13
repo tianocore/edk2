@@ -1082,9 +1082,6 @@ ReadFile (
 
         if (FilePosition + ExtentLength > ReadFileInfo->FilePosition) {
           Offset = ReadFileInfo->FilePosition - FilePosition;
-          if (Offset < 0) {
-            Offset = -(Offset);
-          }
         } else {
           Offset = 0;
         }
