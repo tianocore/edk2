@@ -147,7 +147,8 @@ ReleaseQueue:
                            EfiSimpleNetworkInitialized state.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate the stack to track the heads
-                                of free descriptor chains.
+                                of free descriptor chains or failed to init
+                                TxBufCollection.
   @return                       Status codes from VIRTIO_DEVICE_PROTOCOL.
                                 AllocateSharedPages() or
                                 VirtioMapAllBytesInSharedBuffer()
@@ -176,6 +177,15 @@ VirtioNetInitTx (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  Dev->TxBufCollection = OrderedCollectionInit (
+                           VirtioNetTxBufMapInfoCompare,
+                           VirtioNetTxBufDeviceAddressCompare
+                           );
+  if (Dev->TxBufCollection == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeTxFreeStack;
+  }
+
   //
   // Allocate TxSharedReq header and map with BusMasterCommonBuffer so that it
   // can be accessed equally by both processor and device.
@@ -186,7 +196,7 @@ VirtioNetInitTx (
                           &TxSharedReqBuffer
                           );
   if (EFI_ERROR (Status)) {
-    goto FreeTxFreeStack;
+    goto UninitTxBufCollection;
   }
 
   ZeroMem (TxSharedReqBuffer, sizeof *Dev->TxSharedReq);
@@ -267,6 +277,10 @@ FreeTxSharedReqBuffer:
                  EFI_SIZE_TO_PAGES (sizeof *(Dev->TxSharedReq)),
                  TxSharedReqBuffer
                  );
+
+UninitTxBufCollection:
+  OrderedCollectionUninit (Dev->TxBufCollection);
+
 FreeTxFreeStack:
   FreePool (Dev->TxFreeStack);
 
