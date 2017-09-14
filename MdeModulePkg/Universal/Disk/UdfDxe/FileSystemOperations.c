@@ -297,6 +297,8 @@ GetShortAdLsn (
   IN UDF_SHORT_ALLOCATION_DESCRIPTOR  *ShortAd
   )
 {
+  ASSERT (PartitionDesc != NULL);
+
   return (UINT64)PartitionDesc->PartitionStartingLocation +
     ShortAd->ExtentPosition;
 }
@@ -480,6 +482,8 @@ DuplicateFid (
   *NewFileIdentifierDesc =
     (UDF_FILE_IDENTIFIER_DESCRIPTOR *)AllocateCopyPool (
       (UINTN) GetFidDescriptorLength (FileIdentifierDesc), FileIdentifierDesc);
+
+  ASSERT (*NewFileIdentifierDesc != NULL);
 }
 
 //
@@ -494,6 +498,8 @@ DuplicateFe (
   )
 {
   *NewFileEntry = AllocateCopyPool (Volume->FileEntrySize, FileEntry);
+
+  ASSERT (*NewFileEntry != NULL);
 }
 
 //
@@ -1028,6 +1034,7 @@ ReadFile (
         if (EFI_ERROR (Status)) {
           goto Error_Get_Aed;
         }
+        ASSERT (Data != NULL);
 
         AdOffset = 0;
         continue;
@@ -1209,6 +1216,13 @@ InternalFindFile (
   VOID                            *CompareFileEntry;
 
   //
+  // Check if both Parent->FileIdentifierDesc and Icb are NULL.
+  //
+  if ((Parent->FileIdentifierDesc == NULL) && (Icb == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // Check if parent file is really directory.
   //
   if (!IS_FE_DIRECTORY (Parent->FileEntry)) {
@@ -1220,6 +1234,10 @@ InternalFindFile (
   // FE/EFE and FID descriptors.
   //
   if (StrCmp (FileName, L".") == 0) {
+    if (Parent->FileIdentifierDesc == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     DuplicateFe (BlockIo, Volume, Parent->FileEntry, &File->FileEntry);
     DuplicateFid (Parent->FileIdentifierDesc, &File->FileIdentifierDesc);
 

@@ -427,6 +427,7 @@ UdfRead (
     if (EFI_ERROR (Status)) {
       goto Error_Find_Fe;
     }
+    ASSERT (NewFileEntryData != NULL);
 
     if (IS_FE_SYMLINK (NewFileEntryData)) {
       Status = ResolveSymlink (
