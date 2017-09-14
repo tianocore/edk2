@@ -861,7 +861,7 @@ UdfGetInfo (
 /**
   Set information about a file.
 
-  @param  File            Protocol instance pointer.
+  @param  This            Protocol instance pointer.
   @param  InformationType Type of information in Buffer.
   @param  BufferSize      Size of buffer.
   @param  Buffer          The data to write.

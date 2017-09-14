@@ -14,6 +14,18 @@
 
 #include "Udf.h"
 
+/**
+  Find the anchor volume descriptor pointer.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[out] AnchorPoint         Anchor volume descriptor pointer.
+
+  @retval EFI_SUCCESS             Anchor volume descriptor pointer found.
+  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
+  @retval other                   Anchor volume descriptor pointer not found.
+
+**/
 EFI_STATUS
 FindAnchorVolumeDescriptorPointer (
   IN   EFI_BLOCK_IO_PROTOCOL                 *BlockIo,
@@ -58,6 +70,22 @@ FindAnchorVolumeDescriptorPointer (
   return EFI_VOLUME_CORRUPTED;
 }
 
+/**
+  Save the content of Logical Volume Descriptors and Partitions Descriptors in
+  memory.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[in]  AnchorPoint         Anchor volume descriptor pointer.
+  @param[out] Volume              UDF volume information structure.
+
+  @retval EFI_SUCCESS             The descriptors were saved.
+  @retval EFI_OUT_OF_RESOURCES    The descriptors were not saved due to lack of
+                                  resources.
+  @retval other                   The descriptors were not saved due to
+                                  ReadDisk error.
+
+**/
 EFI_STATUS
 StartMainVolumeDescriptorSequence (
   IN   EFI_BLOCK_IO_PROTOCOL                 *BlockIo,
@@ -211,11 +239,17 @@ Error_Alloc_Pds:
   return Status;
 }
 
-//
-// Return a Partition Descriptor given a Long Allocation Descriptor. This is
-// necessary to calculate the right extent (LongAd) offset which is added up
-// with partition's starting location.
-//
+/**
+  Return a Partition Descriptor given a Long Allocation Descriptor. This is
+  necessary to calculate the right extent (LongAd) offset which is added up
+  with partition's starting location.
+
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  LongAd              Long Allocation Descriptor pointer.
+
+  @return A pointer to a Partition Descriptor.
+
+**/
 UDF_PARTITION_DESCRIPTOR *
 GetPdFromLongAd (
   IN UDF_VOLUME_INFO                 *Volume,
@@ -270,9 +304,15 @@ GetPdFromLongAd (
   return NULL;
 }
 
-//
-// Return logical sector number of a given Long Allocation Descriptor.
-//
+/**
+  Return logical sector number of a given Long Allocation Descriptor.
+
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  LongAd              Long Allocation Descriptor pointer.
+
+  @return The logical sector number of a given Long Allocation Descriptor.
+
+**/
 UINT64
 GetLongAdLsn (
   IN UDF_VOLUME_INFO                 *Volume,
@@ -288,9 +328,15 @@ GetLongAdLsn (
                  LongAd->ExtentLocation.LogicalBlockNumber;
 }
 
-//
-// Return logical sector number of a given Short Allocation Descriptor.
-//
+/**
+  Return logical sector number of a given Short Allocation Descriptor.
+
+  @param[in]  PartitionDesc       Partition Descriptor pointer.
+  @param[in]  ShortAd             Short Allocation Descriptor pointer.
+
+  @return The logical sector number of a given Short Allocation Descriptor.
+
+**/
 UINT64
 GetShortAdLsn (
   IN UDF_PARTITION_DESCRIPTOR         *PartitionDesc,
@@ -303,12 +349,23 @@ GetShortAdLsn (
     ShortAd->ExtentPosition;
 }
 
-//
-// Find File Set Descriptor of a given Logical Volume Descriptor.
-//
-// The found FSD will contain the extent (LogicalVolumeContentsUse) where our
-// root directory is.
-//
+/**
+  Find File Set Descriptor of a given Logical Volume Descriptor.
+
+  The found FSD will contain the extent (LogicalVolumeContentsUse) where our
+  root directory is.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  LogicalVolDescNum   Index of Logical Volume Descriptor
+  @param[out] FileSetDesc         File Set Descriptor pointer.
+
+  @retval EFI_SUCCESS             File Set Descriptor pointer found.
+  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
+  @retval other                   File Set Descriptor pointer not found.
+
+**/
 EFI_STATUS
 FindFileSetDescriptor (
   IN   EFI_BLOCK_IO_PROTOCOL    *BlockIo,
@@ -349,9 +406,20 @@ FindFileSetDescriptor (
   return EFI_SUCCESS;
 }
 
-//
-// Get all File Set Descriptors for each Logical Volume Descriptor.
-//
+/**
+  Get all File Set Descriptors for each Logical Volume Descriptor.
+
+  @param[in]      BlockIo         BlockIo interface.
+  @param[in]      DiskIo          DiskIo interface.
+  @param[in, out] Volume          Volume information pointer.
+
+  @retval EFI_SUCCESS             File Set Descriptors were got.
+  @retval EFI_OUT_OF_RESOURCES    File Set Descriptors were not got due to lack
+                                  of resources.
+  @retval other                   Error occured when finding File Set
+                                  Descriptor in Logical Volume Descriptor.
+
+**/
 EFI_STATUS
 GetFileSetDescriptors (
   IN      EFI_BLOCK_IO_PROTOCOL  *BlockIo,
@@ -414,9 +482,17 @@ Error_Alloc_Fsd:
   return Status;
 }
 
-//
-// Read Volume and File Structure on an UDF file system.
-//
+/**
+  Read Volume and File Structure on an UDF file system.
+
+  @param[in]   BlockIo            BlockIo interface.
+  @param[in]   DiskIo             DiskIo interface.
+  @param[out]  Volume             Volume information pointer.
+
+  @retval EFI_SUCCESS             Volume and File Structure were read.
+  @retval other                   Volume and File Structure were not read.
+
+**/
 EFI_STATUS
 ReadVolumeFileStructure (
   IN   EFI_BLOCK_IO_PROTOCOL  *BlockIo,
@@ -455,9 +531,14 @@ ReadVolumeFileStructure (
   return Status;
 }
 
-//
-// Calculate length of a given File Identifier Descriptor.
-//
+/**
+  Calculate length of a given File Identifier Descriptor.
+
+  @param[in]  FileIdentifierDesc  File Identifier Descriptor pointer.
+
+  @return The length of a given File Identifier Descriptor.
+
+**/
 UINT64
 GetFidDescriptorLength (
   IN UDF_FILE_IDENTIFIER_DESCRIPTOR  *FileIdentifierDesc
@@ -470,9 +551,13 @@ GetFidDescriptorLength (
              );
 }
 
-//
-// Duplicate a given File Identifier Descriptor.
-//
+/**
+  Duplicate a given File Identifier Descriptor.
+
+  @param[in]  FileIdentifierDesc     File Identifier Descriptor pointer.
+  @param[out] NewFileIdentifierDesc  The duplicated File Identifier Descriptor.
+
+**/
 VOID
 DuplicateFid (
   IN   UDF_FILE_IDENTIFIER_DESCRIPTOR  *FileIdentifierDesc,
@@ -486,9 +571,15 @@ DuplicateFid (
   ASSERT (*NewFileIdentifierDesc != NULL);
 }
 
-//
-// Duplicate either a given File Entry or a given Extended File Entry.
-//
+/**
+  Duplicate either a given File Entry or a given Extended File Entry.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  FileEntry           (Extended) File Entry pointer.
+  @param[out] NewFileEntry        The duplicated (Extended) File Entry.
+
+**/
 VOID
 DuplicateFe (
   IN   EFI_BLOCK_IO_PROTOCOL  *BlockIo,
@@ -502,15 +593,21 @@ DuplicateFe (
   ASSERT (*NewFileEntry != NULL);
 }
 
-//
-// Get raw data + length of a given File Entry or Extended File Entry.
-//
-// The file's recorded data can contain either real file content (inline) or
-// a sequence of extents (or Allocation Descriptors) which tells where file's
-// content is stored in.
-//
-// NOTE: The FE/EFE can be thought it was an inode.
-//
+/**
+  Get raw data + length of a given File Entry or Extended File Entry.
+
+  The file's recorded data can contain either real file content (inline) or
+  a sequence of extents (or Allocation Descriptors) which tells where file's
+  content is stored in.
+
+  NOTE: The FE/EFE can be thought it was an inode.
+
+  @param[in]  FileEntryData       (Extended) File Entry pointer.
+  @param[out] Data                Buffer contains the raw data of a given
+                                  (Extended) File Entry.
+  @param[out] Length              Length of the data in Buffer.
+
+**/
 VOID
 GetFileEntryData (
   IN   VOID    *FileEntryData,
@@ -536,9 +633,15 @@ GetFileEntryData (
   }
 }
 
-//
-// Get Allocation Descriptors' data information from a given FE/EFE.
-//
+/**
+  Get Allocation Descriptors' data information from a given FE/EFE.
+
+  @param[in]  FileEntryData       (Extended) File Entry pointer.
+  @param[out] AdsData             Buffer contains the Allocation Descriptors'
+                                  data from a given FE/EFE.
+  @param[out] Length              Length of the data in AdsData.
+
+**/
 VOID
 GetAdsInformation (
   IN   VOID    *FileEntryData,
@@ -564,9 +667,18 @@ GetAdsInformation (
   }
 }
 
-//
-// Read next Long Allocation Descriptor from a given file's data.
-//
+/**
+  Read next Long Allocation Descriptor from a given file's data.
+
+  @param[in]     Data             File's data pointer.
+  @param[in,out] Offset           Starting offset of the File's data to read.
+  @param[in]     Length           Length of the data to read.
+  @param[out]    FoundLongAd      Long Allocation Descriptor pointer.
+
+  @retval EFI_SUCCESS             A Long Allocation Descriptor was found.
+  @retval EFI_DEVICE_ERROR        No more Long Allocation Descriptors.
+
+**/
 EFI_STATUS
 GetLongAdFromAds (
   IN      VOID                            *Data,
@@ -611,9 +723,18 @@ GetLongAdFromAds (
   return EFI_SUCCESS;
 }
 
-//
-// Read next Short Allocation Descriptor from a given file's data.
-//
+/**
+  Read next Short Allocation Descriptor from a given file's data.
+
+  @param[in]     Data             File's data pointer.
+  @param[in,out] Offset           Starting offset of the File's data to read.
+  @param[in]     Length           Length of the data to read.
+  @param[out]    FoundShortAd     Short Allocation Descriptor pointer.
+
+  @retval EFI_SUCCESS             A Short Allocation Descriptor was found.
+  @retval EFI_DEVICE_ERROR        No more Short Allocation Descriptors.
+
+**/
 EFI_STATUS
 GetShortAdFromAds (
   IN      VOID                             *Data,
@@ -658,10 +779,21 @@ GetShortAdFromAds (
   return EFI_SUCCESS;
 }
 
-//
-// Get either a Short Allocation Descriptor or a Long Allocation Descriptor from
-// file's data.
-//
+/**
+  Get either a Short Allocation Descriptor or a Long Allocation Descriptor from
+  file's data.
+
+  @param[in]     RecordingFlags   Flag to indicate the type of descriptor.
+  @param[in]     Data             File's data pointer.
+  @param[in,out] Offset           Starting offset of the File's data to read.
+  @param[in]     Length           Length of the data to read.
+  @param[out]    FoundAd          Allocation Descriptor pointer.
+
+  @retval EFI_SUCCESS             A Short Allocation Descriptor was found.
+  @retval EFI_DEVICE_ERROR        No more Allocation Descriptors.
+                                  Invalid type of descriptor was given.
+
+**/
 EFI_STATUS
 GetAllocationDescriptor (
   IN      UDF_FE_RECORDING_FLAGS  RecordingFlags,
@@ -690,9 +822,17 @@ GetAllocationDescriptor (
   return EFI_DEVICE_ERROR;
 }
 
-//
-// Return logical sector number of either Short or Long Allocation Descriptor.
-//
+/**
+  Return logical sector number of either Short or Long Allocation Descriptor.
+
+  @param[in]  RecordingFlags      Flag to indicate the type of descriptor.
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  ParentIcb           Long Allocation Descriptor pointer.
+  @param[in]  Ad                  Allocation Descriptor pointer.
+
+  @return The logical sector number of the given Allocation Descriptor.
+
+**/
 UINT64
 GetAllocationDescriptorLsn (
   IN UDF_FE_RECORDING_FLAGS          RecordingFlags,
@@ -713,9 +853,27 @@ GetAllocationDescriptorLsn (
   return 0;
 }
 
-//
-// Return offset + length of a given indirect Allocation Descriptor (AED).
-//
+/**
+  Return offset + length of a given indirect Allocation Descriptor (AED).
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  ParentIcb           Long Allocation Descriptor pointer.
+  @param[in]  RecordingFlags      Flag to indicate the type of descriptor.
+  @param[in]  Ad                  Allocation Descriptor pointer.
+  @param[out] Offset              Offset of a given indirect Allocation
+                                  Descriptor.
+  @param[out] Length              Length of a given indirect Allocation
+                                  Descriptor.
+
+  @retval EFI_SUCCESS             The offset and length were returned.
+  @retval EFI_OUT_OF_RESOURCES    The offset and length were not returned due
+                                  to lack of resources.
+  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
+  @retval other                   The offset and length were not returned.
+
+**/
 EFI_STATUS
 GetAedAdsOffset (
   IN   EFI_BLOCK_IO_PROTOCOL           *BlockIo,
@@ -784,9 +942,25 @@ Exit:
   return Status;
 }
 
-//
-// Read Allocation Extent Descriptor into memory.
-//
+/**
+  Read Allocation Extent Descriptor into memory.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  ParentIcb           Long Allocation Descriptor pointer.
+  @param[in]  RecordingFlags      Flag to indicate the type of descriptor.
+  @param[in]  Ad                  Allocation Descriptor pointer.
+  @param[out] Data                Buffer that contains the Allocation Extent
+                                  Descriptor.
+  @param[out] Length              Length of Data.
+
+  @retval EFI_SUCCESS             The Allocation Extent Descriptor was read.
+  @retval EFI_OUT_OF_RESOURCES    The Allocation Extent Descriptor was not read
+                                  due to lack of resources.
+  @retval other                   Fail to read the disk.
+
+**/
 EFI_STATUS
 GetAedAdsData (
   IN   EFI_BLOCK_IO_PROTOCOL           *BlockIo,
@@ -836,9 +1010,19 @@ GetAedAdsData (
     );
 }
 
-//
-// Function used to serialise reads of Allocation Descriptors.
-//
+/**
+  Function used to serialise reads of Allocation Descriptors.
+
+  @param[in]      RecordingFlags  Flag to indicate the type of descriptor.
+  @param[in]      Ad              Allocation Descriptor pointer.
+  @param[in, out] Buffer          Buffer to hold the next Allocation Descriptor.
+  @param[in]      Length          Length of Buffer.
+
+  @retval EFI_SUCCESS             Buffer was grown to hold the next Allocation
+                                  Descriptor.
+  @retval EFI_OUT_OF_RESOURCES    Buffer was not grown due to lack of resources.
+
+**/
 EFI_STATUS
 GrowUpBufferToNextAd (
   IN      UDF_FE_RECORDING_FLAGS  RecordingFlags,
@@ -866,9 +1050,26 @@ GrowUpBufferToNextAd (
   return EFI_SUCCESS;
 }
 
-//
-// Read data or size of either a File Entry or an Extended File Entry.
-//
+/**
+  Read data or size of either a File Entry or an Extended File Entry.
+
+  @param[in]      BlockIo         BlockIo interface.
+  @param[in]      DiskIo          DiskIo interface.
+  @param[in]      Volume          Volume information pointer.
+  @param[in]      ParentIcb       Long Allocation Descriptor pointer.
+  @param[in]      FileEntryData   FE/EFE structure pointer.
+  @param[in, out] ReadFileInfo    Read file information pointer.
+
+  @retval EFI_SUCCESS             Data or size of a FE/EFE was read.
+  @retval EFI_OUT_OF_RESOURCES    Data or size of a FE/EFE was not read due to
+                                  lack of resources.
+  @retval EFI_INVALID_PARAMETER   The read file flag given in ReadFileInfo is
+                                  invalid.
+  @retval EFI_UNSUPPORTED         The FE recording flag given in FileEntryData
+                                  is not supported.
+  @retval other                   Data or size of a FE/EFE was not read.
+
+**/
 EFI_STATUS
 ReadFile (
   IN      EFI_BLOCK_IO_PROTOCOL           *BlockIo,
@@ -1194,9 +1395,22 @@ Error_Get_Aed:
   return Status;
 }
 
-//
-// Find a file by its filename from a given Parent file.
-//
+/**
+  Find a file by its filename from a given Parent file.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[in]  Volume              Volume information pointer.
+  @param[in]  FileName            File name string.
+  @param[in]  Parent              Parent directory file.
+  @param[in]  Icb                 Long Allocation Descriptor pointer.
+  @param[out] File                Found file.
+
+  @retval EFI_SUCCESS             The file was found.
+  @retval EFI_INVALID_PARAMETER   One or more input parameters are invalid.
+  @retval EFI_NOT_FOUND           The file was not found.
+
+**/
 EFI_STATUS
 InternalFindFile (
   IN   EFI_BLOCK_IO_PROTOCOL           *BlockIo,
@@ -1531,13 +1745,14 @@ Error_Read_Disk_Blk:
   @param[in]   FilePath  File's absolute path.
   @param[in]   Root      Root directory file.
   @param[in]   Parent    Parent directory file.
+  @param[in]   Icb       ICB of Parent.
   @param[out]  File      Found file.
 
-  @retval EFI_SUCCESS          @p FilePath was found.
+  @retval EFI_SUCCESS          FilePath was found.
   @retval EFI_NO_MEDIA         The device has no media.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_OUT_OF_RESOURCES The @p FilePath file was not found due to lack of
+  @retval EFI_OUT_OF_RESOURCES The FilePath file was not found due to lack of
                                resources.
 
 **/
@@ -1658,7 +1873,7 @@ FindFile (
   @param[in]      Volume         UDF volume information structure.
   @param[in]      ParentIcb      ICB of the parent file.
   @param[in]      FileEntryData  FE/EFE of the parent file.
-  @param[in out]  ReadDirInfo    Next read directory listing structure
+  @param[in, out] ReadDirInfo    Next read directory listing structure
                                  information.
   @param[out]     FoundFid       File Identifier Descriptor pointer.
 
@@ -2043,7 +2258,7 @@ CleanupFileInformation (
   @param[in]   File     File information structure.
   @param[out]  Size     Size of the file.
 
-  @retval EFI_SUCCESS          File size calculated and set in @p Size.
+  @retval EFI_SUCCESS          File size calculated and set in Size.
   @retval EFI_UNSUPPORTED      Extended Allocation Descriptors not supported.
   @retval EFI_NO_MEDIA         The device has no media.
   @retval EFI_DEVICE_ERROR     The device reported an error.
@@ -2089,7 +2304,7 @@ GetFileSize (
   @param[in]      File        File pointer.
   @param[in]      FileSize    Size of the file.
   @param[in]      FileName    Filename of the file.
-  @param[in out]  BufferSize  Size of the returned file infomation.
+  @param[in, out] BufferSize  Size of the returned file infomation.
   @param[out]     Buffer      Data of the returned file information.
 
   @retval EFI_SUCCESS          File information set.
@@ -2362,9 +2577,9 @@ GetVolumeSize (
   @param[in]      Volume        UDF volume information structure.
   @param[in]      File          File information structure.
   @param[in]      FileSize      Size of the file.
-  @param[in out]  FilePosition  File position.
-  @param[in out]  Buffer        File data.
-  @param[in out]  BufferSize    Read size.
+  @param[in, out] FilePosition  File position.
+  @param[in, out] Buffer        File data.
+  @param[in, out] BufferSize    Read size.
 
   @retval EFI_SUCCESS          File seeked and read.
   @retval EFI_UNSUPPORTED      Extended Allocation Descriptors not supported.

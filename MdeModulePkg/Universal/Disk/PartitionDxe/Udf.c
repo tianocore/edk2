@@ -40,6 +40,18 @@ UDF_DEVICE_PATH gUdfDevicePath = {
   }
 };
 
+/**
+  Find the anchor volume descriptor pointer.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[out] AnchorPoint         Anchor volume descriptor pointer.
+
+  @retval EFI_SUCCESS             Anchor volume descriptor pointer found.
+  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
+  @retval other                   Anchor volume descriptor pointer not found.
+
+**/
 EFI_STATUS
 FindAnchorVolumeDescriptorPointer (
   IN   EFI_BLOCK_IO_PROTOCOL                 *BlockIo,

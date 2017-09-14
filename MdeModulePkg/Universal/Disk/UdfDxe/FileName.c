@@ -14,6 +14,14 @@
 
 #include "Udf.h"
 
+/**
+  Trim the leading and trailing spaces for a give Unicode string.
+
+  @param[in]  String              The Unicode string to trim.
+
+  @return  A pointer to the trimmed string.
+
+**/
 CHAR16 *
 TrimString (
   IN CHAR16    *String
@@ -35,6 +43,14 @@ TrimString (
   return String;
 }
 
+/**
+  Replace the content of a Unicode string with the content of another Unicode
+  string.
+
+  @param[in]  Destination         A pointer to a Unicode string.
+  @param[in]  Source              A pointer to a Unicode string.
+
+**/
 VOID
 ReplaceLeft (
   IN CHAR16         *Destination,
@@ -49,6 +65,15 @@ ReplaceLeft (
   }
 }
 
+/**
+  Remove one or more consecutive backslashes starting from the second character
+  of a given Unicode string.
+
+  @param[in]  String              A pointer to a Unicode string.
+
+  @return  A pointer to the modified string.
+
+**/
 CHAR16 *
 ExcludeTrailingBackslashes (
   IN CHAR16                    *String
@@ -85,7 +110,7 @@ Exit:
 
   @param[in] FileName Filename.
 
-  @retval @p FileName Filename mangled.
+  @retval The mangled Filename.
 
 **/
 CHAR16 *

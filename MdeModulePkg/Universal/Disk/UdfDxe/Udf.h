@@ -659,7 +659,7 @@ UdfGetInfo (
 /**
   Set information about a file.
 
-  @param  File            Protocol instance pointer.
+  @param  This            Protocol instance pointer.
   @param  InformationType Type of information in Buffer.
   @param  BufferSize      Size of buffer.
   @param  Buffer          The data to write.
@@ -783,13 +783,14 @@ FindFileEntry (
   @param[in]   FilePath  File's absolute path.
   @param[in]   Root      Root directory file.
   @param[in]   Parent    Parent directory file.
+  @param[in]   Icb       ICB of Parent.
   @param[out]  File      Found file.
 
-  @retval EFI_SUCCESS          @p FilePath was found.
+  @retval EFI_SUCCESS          FilePath was found.
   @retval EFI_NO_MEDIA         The device has no media.
   @retval EFI_DEVICE_ERROR     The device reported an error.
   @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_OUT_OF_RESOURCES The @p FilePath file was not found due to lack of
+  @retval EFI_OUT_OF_RESOURCES The FilePath file was not found due to lack of
                                resources.
 
 **/
@@ -813,7 +814,7 @@ FindFile (
   @param[in]      Volume         UDF volume information structure.
   @param[in]      ParentIcb      ICB of the parent file.
   @param[in]      FileEntryData  FE/EFE of the parent file.
-  @param[in out]  ReadDirInfo    Next read directory listing structure
+  @param[in, out] ReadDirInfo    Next read directory listing structure
                                  information.
   @param[out]     FoundFid       File Identifier Descriptor pointer.
 
@@ -913,7 +914,7 @@ CleanupFileInformation (
   @param[in]   File     File information structure.
   @param[out]  Size     Size of the file.
 
-  @retval EFI_SUCCESS          File size calculated and set in @p Size.
+  @retval EFI_SUCCESS          File size calculated and set in Size.
   @retval EFI_UNSUPPORTED      Extended Allocation Descriptors not supported.
   @retval EFI_NO_MEDIA         The device has no media.
   @retval EFI_DEVICE_ERROR     The device reported an error.
@@ -937,7 +938,7 @@ GetFileSize (
   @param[in]      File        File pointer.
   @param[in]      FileSize    Size of the file.
   @param[in]      FileName    Filename of the file.
-  @param[in out]  BufferSize  Size of the returned file infomation.
+  @param[in, out] BufferSize  Size of the returned file infomation.
   @param[out]     Buffer      Data of the returned file information.
 
   @retval EFI_SUCCESS          File information set.
@@ -991,9 +992,9 @@ GetVolumeSize (
   @param[in]      Volume        UDF volume information structure.
   @param[in]      File          File information structure.
   @param[in]      FileSize      Size of the file.
-  @param[in out]  FilePosition  File position.
-  @param[in out]  Buffer        File data.
-  @param[in out]  BufferSize    Read size.
+  @param[in, out] FilePosition  File position.
+  @param[in, out] Buffer        File data.
+  @param[in, out] BufferSize    Read size.
 
   @retval EFI_SUCCESS          File seeked and read.
   @retval EFI_UNSUPPORTED      Extended Allocation Descriptors not supported.
@@ -1037,7 +1038,7 @@ SupportUdfFileSystem (
 
   @param[in] FileName Filename.
 
-  @retval @p FileName Filename mangled.
+  @retval The mangled Filename.
 
 **/
 CHAR16 *
