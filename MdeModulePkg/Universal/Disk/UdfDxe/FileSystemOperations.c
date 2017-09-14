@@ -1782,7 +1782,7 @@ GetFileNameFromFid (
     }
 
     if (Index < Length) {
-      *FileName |= OstaCompressed[Index];
+      *FileName |= (CHAR16)(OstaCompressed[Index]);
     }
 
     FileName++;
@@ -1918,7 +1918,7 @@ ResolveSymlink (
         }
 
         if (Index < Length) {
-          *C |= *(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier + Index);
+          *C |= (CHAR16)(*(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier + Index));
         }
 
         C++;

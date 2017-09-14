@@ -806,7 +806,7 @@ UdfGetInfo (
       }
 
       if (Index < 128) {
-        *String |= *(UINT8 *)(OstaCompressed + Index);
+        *String |= (CHAR16)(*(UINT8 *)(OstaCompressed + Index));
       }
 
       //
