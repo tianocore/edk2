@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #
 # Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2017, ARM Limited. All rights reserved.
 # Copyright (c) 2016, Linaro Limited. All rights reserved.
 #
 # This program and the accompanying materials
@@ -403,9 +403,11 @@ ASM_FUNC(ArmEnableVFP)
   mov   x1, x30                 // Save LR
   bl    ArmReadIdPfr0           // Read EL1 Processor Feature Register (PFR0)
   mov   x30, x1                 // Restore LR
-  ands  x0, x0, #AARCH64_PFR0_FP// Extract bits indicating VFP implementation
-  cmp   x0, #0                  // VFP is implemented if '0'.
-  b.ne  4f                      // Exit if VFP not implemented.
+  ubfx  x0, x0, #16, #4         // Extract the FP bits 16:19
+  cmp   x0, #0xF                // Check if FP bits are '1111b',
+                                // i.e. Floating Point not implemented
+  b.eq  4f                      // Exit when VFP is not implemented.
+
   // FVP is implemented.
   // Make sure VFP exceptions are not trapped (to any exception level).
   mrs   x0, cpacr_el1           // Read EL1 Coprocessor Access Control Register (CPACR)
