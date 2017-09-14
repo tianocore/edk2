@@ -247,7 +247,7 @@ In VirtioNetInitRx, the guest allocates the fixed size Receive Destination
 Area, which accommodates all packets delivered asynchronously by the host. To
 each packet, a slice of this area is dedicated; each slice is further
 subdivided into virtio-net request header and network packet data. The
-(guest-physical) addresses of these sub-slices are denoted with A2, A3, A4 and
+(device-physical) addresses of these sub-slices are denoted with A2, A3, A4 and
 so on. Importantly, an even-subscript "A" always belongs to a virtio-net
 request header, while an odd-subscript "A" always belongs to a packet
 sub-slice.

@@ -39,7 +39,12 @@ VirtioNetShutdownRx (
   IN OUT VNET_DEV *Dev
   )
 {
-  FreePool (Dev->RxBuf);
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RxBufMap);
+  Dev->VirtIo->FreeSharedPages (
+                 Dev->VirtIo,
+                 Dev->RxBufNrPages,
+                 Dev->RxBuf
+                 );
 }
 
 

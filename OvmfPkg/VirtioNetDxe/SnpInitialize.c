@@ -242,8 +242,9 @@ VirtioNetInitTx (
   @param[in,out] Dev       The VNET_DEV driver instance about to enter the
                            EfiSimpleNetworkInitialized state.
 
-  @retval EFI_OUT_OF_RESOURCES  Failed to allocate RX destination area.
-  @return                       Status codes from VIRTIO_CFG_WRITE().
+  @return                       Status codes from VIRTIO_CFG_WRITE() or
+                                VIRTIO_DEVICE_PROTOCOL.AllocateSharedPages or
+                                VirtioMapAllBytesInSharedBuffer().
   @retval EFI_SUCCESS           RX setup successful. The device is live and may
                                 already be writing to the receive area.
 */
@@ -255,13 +256,15 @@ VirtioNetInitRx (
   IN OUT VNET_DEV *Dev
   )
 {
-  EFI_STATUS Status;
-  UINTN      VirtioNetReqSize;
-  UINTN      RxBufSize;
-  UINT16     RxAlwaysPending;
-  UINTN      PktIdx;
-  UINT16     DescIdx;
-  UINT8      *RxPtr;
+  EFI_STATUS            Status;
+  UINTN                 VirtioNetReqSize;
+  UINTN                 RxBufSize;
+  UINT16                RxAlwaysPending;
+  UINTN                 PktIdx;
+  UINT16                DescIdx;
+  UINTN                 NumBytes;
+  EFI_PHYSICAL_ADDRESS  RxBufDeviceAddress;
+  VOID                  *RxBuffer;
 
   //
   // In VirtIo 1.0, the NumBuffers field is mandatory. In 0.9.5, it depends on
@@ -286,10 +289,38 @@ VirtioNetInitRx (
   //
   RxAlwaysPending = (UINT16) MIN (Dev->RxRing.QueueSize / 2, VNET_MAX_PENDING);
 
-  Dev->RxBuf = AllocatePool (RxAlwaysPending * RxBufSize);
-  if (Dev->RxBuf == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+  //
+  // The RxBuf is shared between guest and hypervisor, use
+  // AllocateSharedPages() to allocate this memory region and map it with
+  // BusMasterCommonBuffer so that it can be accessed by both guest and
+  // hypervisor.
+  //
+  NumBytes = RxAlwaysPending * RxBufSize;
+  Dev->RxBufNrPages = EFI_SIZE_TO_PAGES (NumBytes);
+  Status = Dev->VirtIo->AllocateSharedPages (
+                          Dev->VirtIo,
+                          Dev->RxBufNrPages,
+                          &RxBuffer
+                          );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
+
+  ZeroMem (RxBuffer, NumBytes);
+
+  Status = VirtioMapAllBytesInSharedBuffer (
+             Dev->VirtIo,
+             VirtioOperationBusMasterCommonBuffer,
+             RxBuffer,
+             NumBytes,
+             &Dev->RxBufDeviceBase,
+             &Dev->RxBufMap
+             );
+  if (EFI_ERROR (Status)) {
+    goto FreeSharedBuffer;
+  }
+
+  Dev->RxBuf = RxBuffer;
 
   //
   // virtio-0.9.5, 2.4.2 Receiving Used Buffers From the Device
@@ -310,7 +341,7 @@ VirtioNetInitRx (
   // link each chain into (from) the available ring as well
   //
   DescIdx = 0;
-  RxPtr = Dev->RxBuf;
+  RxBufDeviceAddress = Dev->RxBufDeviceBase;
   for (PktIdx = 0; PktIdx < RxAlwaysPending; ++PktIdx) {
     //
     // virtio-0.9.5, 2.4.1.2 Updating the Available Ring
@@ -321,16 +352,16 @@ VirtioNetInitRx (
     //
     // virtio-0.9.5, 2.4.1.1 Placing Buffers into the Descriptor Table
     //
-    Dev->RxRing.Desc[DescIdx].Addr  = (UINTN) RxPtr;
+    Dev->RxRing.Desc[DescIdx].Addr  = RxBufDeviceAddress;
     Dev->RxRing.Desc[DescIdx].Len   = (UINT32) VirtioNetReqSize;
     Dev->RxRing.Desc[DescIdx].Flags = VRING_DESC_F_WRITE | VRING_DESC_F_NEXT;
     Dev->RxRing.Desc[DescIdx].Next  = (UINT16) (DescIdx + 1);
-    RxPtr += Dev->RxRing.Desc[DescIdx++].Len;
+    RxBufDeviceAddress += Dev->RxRing.Desc[DescIdx++].Len;
 
-    Dev->RxRing.Desc[DescIdx].Addr  = (UINTN) RxPtr;
+    Dev->RxRing.Desc[DescIdx].Addr  = RxBufDeviceAddress;
     Dev->RxRing.Desc[DescIdx].Len   = (UINT32) (RxBufSize - VirtioNetReqSize);
     Dev->RxRing.Desc[DescIdx].Flags = VRING_DESC_F_WRITE;
-    RxPtr += Dev->RxRing.Desc[DescIdx++].Len;
+    RxBufDeviceAddress += Dev->RxRing.Desc[DescIdx++].Len;
   }
 
   //
@@ -351,9 +382,20 @@ VirtioNetInitRx (
   Status = Dev->VirtIo->SetQueueNotify (Dev->VirtIo, VIRTIO_NET_Q_RX);
   if (EFI_ERROR (Status)) {
     Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
-    FreePool (Dev->RxBuf);
+    goto UnmapSharedBuffer;
   }
 
+  return Status;
+
+UnmapSharedBuffer:
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RxBufMap);
+
+FreeSharedBuffer:
+  Dev->VirtIo->FreeSharedPages (
+                 Dev->VirtIo,
+                 Dev->RxBufNrPages,
+                 RxBuffer
+                 );
   return Status;
 }
 
