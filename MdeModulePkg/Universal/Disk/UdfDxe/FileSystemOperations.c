@@ -1255,7 +1255,7 @@ InternalFindFile (
       BlockIo,
       DiskIo,
       Volume,
-      Parent->FileIdentifierDesc ?
+      (Parent->FileIdentifierDesc != NULL) ?
       &Parent->FileIdentifierDesc->Icb :
       Icb,
       Parent->FileEntry,
@@ -2117,7 +2117,7 @@ SetFileInfo (
   //
   // Calculate the needed size for the EFI_FILE_INFO structure.
   //
-  FileInfoLength = sizeof (EFI_FILE_INFO) + (FileName ?
+  FileInfoLength = sizeof (EFI_FILE_INFO) + ((FileName != NULL) ?
                                              StrSize (FileName) :
                                              sizeof (CHAR16));
   if (*BufferSize < FileInfoLength) {
