@@ -263,6 +263,13 @@ VirtioNetShutdownTx (
   IN OUT VNET_DEV *Dev
   );
 
+VOID
+EFIAPI
+VirtioNetUninitRing (
+  IN OUT VNET_DEV *Dev,
+  IN OUT VRING    *Ring
+  );
+
 //
 // event callbacks
 //

@@ -51,3 +51,19 @@ VirtioNetShutdownTx (
 {
   FreePool (Dev->TxFreeStack);
 }
+
+/**
+  Release TX and RX VRING resources.
+
+  @param[in,out] Dev   The VNET_DEV driver instance which was using the ring.
+  @param[in,out] Ring  The virtio ring to clean up.
+*/
+VOID
+EFIAPI
+VirtioNetUninitRing (
+  IN OUT VNET_DEV *Dev,
+  IN OUT VRING    *Ring
+  )
+{
+  VirtioRingUninit (Dev->VirtIo, Ring);
+}

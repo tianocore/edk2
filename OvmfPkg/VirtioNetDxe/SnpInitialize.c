@@ -510,10 +510,10 @@ AbortDevice:
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 
 ReleaseTxRing:
-  VirtioRingUninit (Dev->VirtIo, &Dev->TxRing);
+  VirtioNetUninitRing (Dev, &Dev->TxRing);
 
 ReleaseRxRing:
-  VirtioRingUninit (Dev->VirtIo, &Dev->RxRing);
+  VirtioNetUninitRing (Dev, &Dev->RxRing);
 
 DeviceFailed:
   //
