@@ -82,10 +82,14 @@ typedef struct {
   EFI_HANDLE                  MacHandle;         // VirtioNetDriverBindingStart
 
   VRING                       RxRing;            // VirtioNetInitRing
+  VOID                        *RxRingMap;        // VirtioRingMap and
+                                                 // VirtioNetInitRing
   UINT8                       *RxBuf;            // VirtioNetInitRx
   UINT16                      RxLastUsed;        // VirtioNetInitRx
 
   VRING                       TxRing;            // VirtioNetInitRing
+  VOID                        *TxRingMap;        // VirtioRingMap and
+                                                 // VirtioNetInitRing
   UINT16                      TxMaxPending;      // VirtioNetInitTx
   UINT16                      TxCurPending;      // VirtioNetInitTx
   UINT16                      *TxFreeStack;      // VirtioNetInitTx
@@ -267,7 +271,8 @@ VOID
 EFIAPI
 VirtioNetUninitRing (
   IN OUT VNET_DEV *Dev,
-  IN OUT VRING    *Ring
+  IN OUT VRING    *Ring,
+  IN     VOID     *RingMap
   );
 
 //

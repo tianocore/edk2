@@ -55,15 +55,19 @@ VirtioNetShutdownTx (
 /**
   Release TX and RX VRING resources.
 
-  @param[in,out] Dev   The VNET_DEV driver instance which was using the ring.
-  @param[in,out] Ring  The virtio ring to clean up.
+  @param[in,out] Dev       The VNET_DEV driver instance which was using
+                           the ring.
+  @param[in,out] Ring      The virtio ring to clean up.
+  @param[in]     RingMap   A token return from the VirtioRingMap()
 */
 VOID
 EFIAPI
 VirtioNetUninitRing (
   IN OUT VNET_DEV *Dev,
-  IN OUT VRING    *Ring
+  IN OUT VRING    *Ring,
+  IN     VOID     *RingMap
   )
 {
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, RingMap);
   VirtioRingUninit (Dev->VirtIo, Ring);
 }

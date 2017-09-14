@@ -70,8 +70,9 @@ faithfully indented) that implement the transition.
   VirtioNetInitialize          |  | VirtioNetShutdown
     VirtioNetInitRing {Rx, Tx} |  |   VirtioNetShutdownRx [SnpSharedHelpers.c]
       VirtioRingInit           |  |   VirtioNetShutdownTx [SnpSharedHelpers.c]
-    VirtioNetInitTx            |  |   VirtioNetUninitRing [SnpSharedHelpers.c]
-    VirtioNetInitRx            |  |                       {Tx, Rx}
+      VirtioRingMap            |  |   VirtioNetUninitRing [SnpSharedHelpers.c]
+    VirtioNetInitTx            |  |                       {Tx, Rx}
+    VirtioNetInitRx            |  |     VirtIo->UnmapSharedBuffer
                                |  |     VirtioRingUninit
                                v  |
                   +-----------------------------+
