@@ -1,7 +1,7 @@
 /** @file
   This driver measures SMBIOS table to TPM.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -277,30 +277,38 @@ FilterSmbiosEntry (
   DEBUG ((EFI_D_INFO, "Smbios Table (Type - %d):\n", ((SMBIOS_STRUCTURE *)TableEntry)->Type));
   DEBUG_CODE (InternalDumpHex (TableEntry, TableEntrySize););
 
-  FilterStruct = GetFilterStructByType (((SMBIOS_STRUCTURE *)TableEntry)->Type);
-  if (FilterStruct != NULL) {
-    if (FilterStruct->Filter == NULL || FilterStruct->FilterCount == 0) {
-      // zero all table entries, except header
-      ZeroMem ((UINT8 *)TableEntry + sizeof(SMBIOS_STRUCTURE), TableEntrySize - sizeof(SMBIOS_STRUCTURE));
-    } else {
-      Filter = FilterStruct->Filter;
-      for (Index = 0; Index < FilterStruct->FilterCount; Index++) {
-        if (((SMBIOS_STRUCTURE *) TableEntry)->Length >= (Filter[Index].Offset + Filter[Index].Size)) {
-          //
-          // The field is present in the SMBIOS entry.
-          //
-          if ((Filter[Index].Flags & SMBIOS_FILTER_TABLE_FLAG_IS_STRING) != 0) {
-            CopyMem (&StringId, (UINT8 *)TableEntry + Filter[Index].Offset, sizeof(StringId));
-            if (StringId != 0) {
-              // set ' ' for string field
-              String = GetSmbiosStringById (TableEntry, StringId, &StringLen);
-              ASSERT (String != NULL);
-              //DEBUG ((EFI_D_INFO,"StrId(0x%x)-%a(%d)\n", StringId, String, StringLen));
-              SetMem (String, StringLen, ' ');
+  //
+  // Skip measurement for OEM types.
+  //
+  if (((SMBIOS_STRUCTURE *)TableEntry)->Type >= SMBIOS_OEM_BEGIN) {
+    // zero all table fields, except header
+    ZeroMem ((UINT8 *)TableEntry + sizeof(SMBIOS_STRUCTURE), TableEntrySize - sizeof(SMBIOS_STRUCTURE));
+  } else {
+    FilterStruct = GetFilterStructByType (((SMBIOS_STRUCTURE *)TableEntry)->Type);
+    if (FilterStruct != NULL) {
+      if (FilterStruct->Filter == NULL || FilterStruct->FilterCount == 0) {
+        // zero all table fields, except header
+        ZeroMem ((UINT8 *)TableEntry + sizeof(SMBIOS_STRUCTURE), TableEntrySize - sizeof(SMBIOS_STRUCTURE));
+      } else {
+        Filter = FilterStruct->Filter;
+        for (Index = 0; Index < FilterStruct->FilterCount; Index++) {
+          if (((SMBIOS_STRUCTURE *) TableEntry)->Length >= (Filter[Index].Offset + Filter[Index].Size)) {
+            //
+            // The field is present in the SMBIOS entry.
+            //
+            if ((Filter[Index].Flags & SMBIOS_FILTER_TABLE_FLAG_IS_STRING) != 0) {
+              CopyMem (&StringId, (UINT8 *)TableEntry + Filter[Index].Offset, sizeof(StringId));
+              if (StringId != 0) {
+                // set ' ' for string field
+                String = GetSmbiosStringById (TableEntry, StringId, &StringLen);
+                ASSERT (String != NULL);
+                //DEBUG ((EFI_D_INFO,"StrId(0x%x)-%a(%d)\n", StringId, String, StringLen));
+                SetMem (String, StringLen, ' ');
+              }
             }
+            // zero non-string field
+            ZeroMem ((UINT8 *)TableEntry + Filter[Index].Offset, Filter[Index].Size);
           }
-          // zero non-string field
-          ZeroMem ((UINT8 *)TableEntry + Filter[Index].Offset, Filter[Index].Size);
         }
       }
     }
