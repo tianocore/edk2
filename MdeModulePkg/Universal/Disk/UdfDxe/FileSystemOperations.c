@@ -2045,7 +2045,7 @@ ResolveSymlink (
   UDF_PATH_COMPONENT  *PathComp;
   UINT8               PathCompLength;
   CHAR16              FileName[UDF_FILENAME_LENGTH];
-  CHAR16              *C;
+  CHAR16              *Char;
   UINTN               Index;
   UINT8               CompressionId;
   UDF_FILE_INFO       PreviousFile;
@@ -2122,24 +2122,24 @@ ResolveSymlink (
         return EFI_VOLUME_CORRUPTED;
       }
 
-      C = FileName;
+      Char = FileName;
       for (Index = 1; Index < PathCompLength; Index++) {
         if (CompressionId == 16) {
-          *C = *(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier +
+          *Char = *(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier +
                           Index) << 8;
           Index++;
         } else {
-          *C = 0;
+          *Char = 0;
         }
 
         if (Index < Length) {
-          *C |= (CHAR16)(*(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier + Index));
+          *Char |= (CHAR16)(*(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier + Index));
         }
 
-        C++;
+        Char++;
       }
 
-      *C = L'\0';
+      *Char = L'\0';
       break;
     }
 
