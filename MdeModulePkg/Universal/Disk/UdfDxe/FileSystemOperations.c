@@ -897,6 +897,10 @@ ReadFile (
   // set BytesLeft to suppress incorrect compiler/analyzer warnings
   //
   BytesLeft = 0;
+  DataOffset = 0;
+  FilePosition = 0;
+  FinishedSeeking = FALSE;
+  Data = NULL;
 
   switch (ReadFileInfo->Flags) {
   case READ_FILE_GET_FILESIZE:
