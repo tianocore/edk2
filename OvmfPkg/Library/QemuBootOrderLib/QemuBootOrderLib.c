@@ -986,6 +986,50 @@ TranslatePciOfwNodes (
       Eui64[7], Eui64[6], Eui64[5], Eui64[4],
       Eui64[3], Eui64[2], Eui64[1], Eui64[0]
       );
+  } else if (NumNodes >= FirstNonBridge + 2 &&
+             SubstringEq (OfwNode[FirstNonBridge + 0].DriverName, "usb") &&
+             SubstringEq (OfwNode[FirstNonBridge + 1].DriverName, "storage")) {
+    //
+    // OpenFirmware device path (usb-storage device in XHCI port):
+    //
+    //   /pci@i0cf8/usb@3[,1]/storage@2/channel@0/disk@0,0
+    //        ^         ^  ^          ^         ^      ^ ^
+    //        |         |  |          |         fixed  fixed
+    //        |         |  |          XHCI port number, 1-based
+    //        |         |  PCI function corresponding to XHCI (optional)
+    //        |         PCI slot holding XHCI
+    //        PCI root at system bus port, PIO
+    //
+    // UEFI device path prefix:
+    //
+    //   PciRoot(0x0)/Pci(0x3,0x1)/USB(0x1,0x0)
+    //                        ^        ^
+    //                        |        XHCI port number in 0-based notation
+    //                        0x0 if PCI function is 0, or absent from OFW
+    //
+    RETURN_STATUS ParseStatus;
+    UINT64        OneBasedXhciPort;
+
+    NumEntries = 1;
+    ParseStatus = ParseUnitAddressHexList (
+                    OfwNode[FirstNonBridge + 1].UnitAddress,
+                    &OneBasedXhciPort,
+                    &NumEntries
+                    );
+    if (RETURN_ERROR (ParseStatus) || OneBasedXhciPort == 0) {
+      return RETURN_UNSUPPORTED;
+    }
+
+    Written = UnicodeSPrintAsciiFormat (
+                Translated,
+                *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
+                "PciRoot(0x%x)%s/Pci(0x%Lx,0x%Lx)/USB(0x%Lx,0x0)",
+                PciRoot,
+                Bridges,
+                PciDevFun[0],
+                PciDevFun[1],
+                OneBasedXhciPort - 1
+                );
   } else {
     //
     // Generic OpenFirmware device path for PCI devices:
