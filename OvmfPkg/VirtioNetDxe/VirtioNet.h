@@ -97,7 +97,8 @@ typedef struct {
   UINT16                      TxMaxPending;      // VirtioNetInitTx
   UINT16                      TxCurPending;      // VirtioNetInitTx
   UINT16                      *TxFreeStack;      // VirtioNetInitTx
-  VIRTIO_1_0_NET_REQ          TxSharedReq;       // VirtioNetInitTx
+  VIRTIO_1_0_NET_REQ          *TxSharedReq;      // VirtioNetInitTx
+  VOID                        *TxSharedReqMap;   // VirtioNetInitTx
   UINT16                      TxLastUsed;        // VirtioNetInitTx
 } VNET_DEV;
 

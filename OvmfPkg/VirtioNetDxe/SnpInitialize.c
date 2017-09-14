@@ -18,6 +18,7 @@
 **/
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -147,6 +148,9 @@ ReleaseQueue:
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate the stack to track the heads
                                 of free descriptor chains.
+  @return                       Status codes from VIRTIO_DEVICE_PROTOCOL.
+                                AllocateSharedPages() or
+                                VirtioMapAllBytesInSharedBuffer()
   @retval EFI_SUCCESS           TX setup successful.
 */
 
@@ -157,8 +161,11 @@ VirtioNetInitTx (
   IN OUT VNET_DEV *Dev
   )
 {
-  UINTN TxSharedReqSize;
-  UINTN PktIdx;
+  UINTN                 TxSharedReqSize;
+  UINTN                 PktIdx;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  DeviceAddress;
+  VOID                  *TxSharedReqBuffer;
 
   Dev->TxMaxPending = (UINT16) MIN (Dev->TxRing.QueueSize / 2,
                                  VNET_MAX_PENDING);
@@ -170,12 +177,42 @@ VirtioNetInitTx (
   }
 
   //
+  // Allocate TxSharedReq header and map with BusMasterCommonBuffer so that it
+  // can be accessed equally by both processor and device.
+  //
+  Status = Dev->VirtIo->AllocateSharedPages (
+                          Dev->VirtIo,
+                          EFI_SIZE_TO_PAGES (sizeof *Dev->TxSharedReq),
+                          &TxSharedReqBuffer
+                          );
+  if (EFI_ERROR (Status)) {
+    goto FreeTxFreeStack;
+  }
+
+  ZeroMem (TxSharedReqBuffer, sizeof *Dev->TxSharedReq);
+
+  Status = VirtioMapAllBytesInSharedBuffer (
+             Dev->VirtIo,
+             VirtioOperationBusMasterCommonBuffer,
+             TxSharedReqBuffer,
+             sizeof *(Dev->TxSharedReq),
+             &DeviceAddress,
+             &Dev->TxSharedReqMap
+             );
+  if (EFI_ERROR (Status)) {
+    goto FreeTxSharedReqBuffer;
+  }
+
+  Dev->TxSharedReq = TxSharedReqBuffer;
+
+
+  //
   // In VirtIo 1.0, the NumBuffers field is mandatory. In 0.9.5, it depends on
   // VIRTIO_NET_F_MRG_RXBUF, which we never negotiate.
   //
   TxSharedReqSize = (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) ?
-                    sizeof Dev->TxSharedReq.V0_9_5 :
-                    sizeof Dev->TxSharedReq;
+                    sizeof (Dev->TxSharedReq->V0_9_5) :
+                    sizeof *Dev->TxSharedReq;
 
   for (PktIdx = 0; PktIdx < Dev->TxMaxPending; ++PktIdx) {
     UINT16 DescIdx;
@@ -187,7 +224,7 @@ VirtioNetInitTx (
     // For each possibly pending packet, lay out the descriptor for the common
     // (unmodified by the host) virtio-net request header.
     //
-    Dev->TxRing.Desc[DescIdx].Addr  = (UINTN) &Dev->TxSharedReq;
+    Dev->TxRing.Desc[DescIdx].Addr  = DeviceAddress;
     Dev->TxRing.Desc[DescIdx].Len   = (UINT32) TxSharedReqSize;
     Dev->TxRing.Desc[DescIdx].Flags = VRING_DESC_F_NEXT;
     Dev->TxRing.Desc[DescIdx].Next  = (UINT16) (DescIdx + 1);
@@ -202,13 +239,13 @@ VirtioNetInitTx (
   //
   // virtio-0.9.5, Appendix C, Packet Transmission
   //
-  Dev->TxSharedReq.V0_9_5.Flags   = 0;
-  Dev->TxSharedReq.V0_9_5.GsoType = VIRTIO_NET_HDR_GSO_NONE;
+  Dev->TxSharedReq->V0_9_5.Flags   = 0;
+  Dev->TxSharedReq->V0_9_5.GsoType = VIRTIO_NET_HDR_GSO_NONE;
 
   //
   // For VirtIo 1.0 only -- the field exists, but it is unused
   //
-  Dev->TxSharedReq.NumBuffers = 0;
+  Dev->TxSharedReq->NumBuffers = 0;
 
   //
   // virtio-0.9.5, 2.4.2 Receiving Used Buffers From the Device
@@ -223,6 +260,17 @@ VirtioNetInitTx (
   *Dev->TxRing.Avail.Flags = (UINT16) VRING_AVAIL_F_NO_INTERRUPT;
 
   return EFI_SUCCESS;
+
+FreeTxSharedReqBuffer:
+  Dev->VirtIo->FreeSharedPages (
+                 Dev->VirtIo,
+                 EFI_SIZE_TO_PAGES (sizeof *(Dev->TxSharedReq)),
+                 TxSharedReqBuffer
+                 );
+FreeTxFreeStack:
+  FreePool (Dev->TxFreeStack);
+
+  return Status;
 }
 
 

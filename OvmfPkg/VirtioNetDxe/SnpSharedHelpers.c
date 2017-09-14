@@ -54,6 +54,13 @@ VirtioNetShutdownTx (
   IN OUT VNET_DEV *Dev
   )
 {
+  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->TxSharedReqMap);
+  Dev->VirtIo->FreeSharedPages (
+                 Dev->VirtIo,
+                 EFI_SIZE_TO_PAGES (sizeof *(Dev->TxSharedReq)),
+                 Dev->TxSharedReq
+                 );
+
   FreePool (Dev->TxFreeStack);
 }
 
