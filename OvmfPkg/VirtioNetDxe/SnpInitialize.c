@@ -562,7 +562,8 @@ VirtioNetInitialize (
   ASSERT (Dev->Snm.MediaPresentSupported ==
     !!(Features & VIRTIO_NET_F_STATUS));
 
-  Features &= VIRTIO_NET_F_MAC | VIRTIO_NET_F_STATUS | VIRTIO_F_VERSION_1;
+  Features &= VIRTIO_NET_F_MAC | VIRTIO_NET_F_STATUS | VIRTIO_F_VERSION_1 |
+              VIRTIO_F_IOMMU_PLATFORM;
 
   //
   // In virtio-1.0, feature negotiation is expected to complete before queue
@@ -602,7 +603,7 @@ VirtioNetInitialize (
   // step 5 -- keep only the features we want
   //
   if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
-    Features &= ~(UINT64)VIRTIO_F_VERSION_1;
+    Features &= ~(UINT64)(VIRTIO_F_VERSION_1 | VIRTIO_F_IOMMU_PLATFORM);
     Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
     if (EFI_ERROR (Status)) {
       goto ReleaseTxRing;
