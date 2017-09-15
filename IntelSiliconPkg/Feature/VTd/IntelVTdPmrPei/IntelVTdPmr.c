@@ -22,7 +22,7 @@
 
 #include "IntelVTdPmrPei.h"
 
-extern EDKII_VTD_INFO_PPI                *mVTdInfoPpi;
+extern VTD_INFO                *mVTdInfo;
 
 /**
   Get protected low memory alignment.
@@ -60,7 +60,7 @@ GetPhmrAlignment (
   UINT64        Data64;
   UINT8         HostAddressWidth;
 
-  HostAddressWidth = mVTdInfoPpi->HostAddressWidth;
+  HostAddressWidth = mVTdInfo->HostAddressWidth;
 
   MmioWrite64 (VtdUnitBaseAddress + R_PMEN_HIGH_BASE_REG, 0xFFFFFFFFFFFFFFFF);
   Data64 = MmioRead64 (VtdUnitBaseAddress + R_PMEN_HIGH_BASE_REG);
@@ -73,11 +73,13 @@ GetPhmrAlignment (
 /**
   Get protected low memory alignment.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
+
   @return protected low memory alignment.
 **/
 UINT32
 GetLowMemoryAlignment (
-  VOID
+  IN UINT64        EngineMask
   )
 {
   UINTN         Index;
@@ -85,8 +87,11 @@ GetLowMemoryAlignment (
   UINT32        FinalAlignment;
 
   FinalAlignment = 0;
-  for (Index = 0; Index < mVTdInfoPpi->VTdEngineCount; Index++) {
-    Alignment = GetPlmrAlignment ((UINTN)mVTdInfoPpi->VTdEngineAddress[Index]);
+  for (Index = 0; Index < mVTdInfo->VTdEngineCount; Index++) {
+    if ((EngineMask & LShiftU64(1, Index)) == 0) {
+      continue;
+    }
+    Alignment = GetPlmrAlignment ((UINTN)mVTdInfo->VTdEngineAddress[Index]);
     if (FinalAlignment < Alignment) {
       FinalAlignment = Alignment;
     }
@@ -97,11 +102,13 @@ GetLowMemoryAlignment (
 /**
   Get protected high memory alignment.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
+
   @return protected high memory alignment.
 **/
 UINT64
 GetHighMemoryAlignment (
-  VOID
+  IN UINT64        EngineMask
   )
 {
   UINTN         Index;
@@ -109,8 +116,11 @@ GetHighMemoryAlignment (
   UINT64        FinalAlignment;
 
   FinalAlignment = 0;
-  for (Index = 0; Index < mVTdInfoPpi->VTdEngineCount; Index++) {
-    Alignment = GetPhmrAlignment ((UINTN)mVTdInfoPpi->VTdEngineAddress[Index]);
+  for (Index = 0; Index < mVTdInfo->VTdEngineCount; Index++) {
+    if ((EngineMask & LShiftU64(1, Index)) == 0) {
+      continue;
+    }
+    Alignment = GetPhmrAlignment ((UINTN)mVTdInfo->VTdEngineAddress[Index]);
     if (FinalAlignment < Alignment) {
       FinalAlignment = Alignment;
     }
@@ -246,6 +256,7 @@ SetPmrRegion (
 /**
   Set DMA protected region.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
   @param LowMemoryBase      The protected low memory region base.
   @param LowMemoryLength    The protected low memory region length.
   @param HighMemoryBase     The protected high memory region base.
@@ -256,6 +267,7 @@ SetPmrRegion (
 **/
 EFI_STATUS
 SetDmaProtectedRange (
+  IN UINT64        EngineMask,
   IN UINT32        LowMemoryBase,
   IN UINT32        LowMemoryLength,
   IN UINT64        HighMemoryBase,
@@ -265,12 +277,15 @@ SetDmaProtectedRange (
   UINTN       Index;
   EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "SetDmaProtectedRange - [0x%x, 0x%x] [0x%lx, 0x%lx]\n", LowMemoryBase, LowMemoryLength, HighMemoryBase, HighMemoryLength));
+  DEBUG ((DEBUG_INFO, "SetDmaProtectedRange(0x%lx) - [0x%x, 0x%x] [0x%lx, 0x%lx]\n", EngineMask, LowMemoryBase, LowMemoryLength, HighMemoryBase, HighMemoryLength));
 
-  for (Index = 0; Index < mVTdInfoPpi->VTdEngineCount; Index++) {
-    DisablePmr ((UINTN)mVTdInfoPpi->VTdEngineAddress[Index]);
+  for (Index = 0; Index < mVTdInfo->VTdEngineCount; Index++) {
+    if ((EngineMask & LShiftU64(1, Index)) == 0) {
+      continue;
+    }
+    DisablePmr ((UINTN)mVTdInfo->VTdEngineAddress[Index]);
     Status = SetPmrRegion (
-               (UINTN)mVTdInfoPpi->VTdEngineAddress[Index],
+               (UINTN)mVTdInfo->VTdEngineAddress[Index],
                LowMemoryBase,
                LowMemoryLength,
                HighMemoryBase,
@@ -279,7 +294,7 @@ SetDmaProtectedRange (
     if (EFI_ERROR(Status)) {
       return Status;
     }
-    Status = EnablePmr ((UINTN)mVTdInfoPpi->VTdEngineAddress[Index]);
+    Status = EnablePmr ((UINTN)mVTdInfo->VTdEngineAddress[Index]);
     if (EFI_ERROR(Status)) {
       return Status;
     }
@@ -291,11 +306,13 @@ SetDmaProtectedRange (
 /**
   Diable DMA protection.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
+
   @retval DMA protection is disabled.
 **/
 EFI_STATUS
 DisableDmaProtection (
-  VOID
+  IN UINT64        EngineMask
   )
 {
   UINTN       Index;
@@ -303,8 +320,11 @@ DisableDmaProtection (
 
   DEBUG ((DEBUG_INFO, "DisableDmaProtection\n"));
 
-  for (Index = 0; Index < mVTdInfoPpi->VTdEngineCount; Index++) {
-    Status = DisablePmr ((UINTN)mVTdInfoPpi->VTdEngineAddress[Index]);
+  for (Index = 0; Index < mVTdInfo->VTdEngineCount; Index++) {
+    if ((EngineMask & LShiftU64(1, Index)) == 0) {
+      continue;
+    }
+    Status = DisablePmr ((UINTN)mVTdInfo->VTdEngineAddress[Index]);
     if (EFI_ERROR(Status)) {
       return Status;
     }
