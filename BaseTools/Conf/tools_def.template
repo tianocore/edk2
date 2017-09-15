@@ -4990,7 +4990,7 @@ RELEASE_GCC47_ARM_CC_FLAGS       = DEF(GCC47_ARM_CC_FLAGS) -Wno-unused-but-set-v
 *_GCC47_AARCH64_CC_XIPFLAGS      = DEF(GCC47_AARCH64_CC_XIPFLAGS)
 
   DEBUG_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -O0
-RELEASE_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable -fomit-frame-pointer
+RELEASE_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable
   NOOPT_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -O0
 
 ####################################################################################
@@ -5130,7 +5130,7 @@ RELEASE_GCC48_ARM_CC_FLAGS       = DEF(GCC48_ARM_CC_FLAGS) -Wno-unused-but-set-v
 *_GCC48_AARCH64_CC_XIPFLAGS      = DEF(GCC48_AARCH64_CC_XIPFLAGS)
 
   DEBUG_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -O0
-RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable -fomit-frame-pointer
+RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable
   NOOPT_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -O0
 
 ####################################################################################
@@ -5272,7 +5272,7 @@ RELEASE_GCC49_ARM_CC_FLAGS       = DEF(GCC49_ARM_CC_FLAGS) -Wno-unused-but-set-v
   DEBUG_GCC49_AARCH64_DLINK_FLAGS  = DEF(GCC49_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000
   DEBUG_GCC49_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
-RELEASE_GCC49_AARCH64_CC_FLAGS     = DEF(GCC49_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable -mcmodel=tiny -fomit-frame-pointer
+RELEASE_GCC49_AARCH64_CC_FLAGS     = DEF(GCC49_AARCH64_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable -mcmodel=tiny
 RELEASE_GCC49_AARCH64_DLINK_FLAGS  = DEF(GCC49_AARCH64_DLINK_FLAGS)
 
   NOOPT_GCC49_AARCH64_CC_FLAGS     = DEF(GCC49_AARCH64_CC_FLAGS) -O0 -mcmodel=small
@@ -5428,7 +5428,7 @@ RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKS
   DEBUG_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000
   DEBUG_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
-RELEASE_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable -mcmodel=tiny -fomit-frame-pointer
+RELEASE_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable -mcmodel=tiny
 RELEASE_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
 
   NOOPT_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0 -mcmodel=small
@@ -5513,7 +5513,7 @@ RELEASE_CLANG35_ARM_CC_FLAGS     = DEF(CLANG35_ARM_CC_FLAGS) $(ARCHCC_FLAGS) $(P
 *_CLANG35_AARCH64_CC_XIPFLAGS    = DEF(GCC_AARCH64_CC_XIPFLAGS)
 
   DEBUG_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -O0
-RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -Oz -fomit-frame-pointer
+RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -Oz
 
 ####################################################################################
 #
