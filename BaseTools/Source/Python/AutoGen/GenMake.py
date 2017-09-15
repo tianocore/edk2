@@ -789,8 +789,15 @@ cleanlib:
             if File.Ext == '.h':
                 ForceIncludedFile.append(File)
         SourceFileList = []
+        OutPutFileList = []
         for Target in self._AutoGenObject.IntroTargetList:
             SourceFileList.extend(Target.Inputs)
+            OutPutFileList.extend(Target.Outputs)
+
+        if OutPutFileList:
+            for Item in OutPutFileList:
+                if Item in SourceFileList:
+                    SourceFileList.remove(Item)
 
         self.FileDependency = self.GetFileDependency(
                                     SourceFileList,
