@@ -15,9 +15,16 @@
 #ifndef __DMA_ACCESS_LIB_H__
 #define __DMA_ACCESS_LIB_H__
 
+typedef struct {
+  UINT8                                   HostAddressWidth;
+  UINTN                                   VTdEngineCount;
+  UINT64                                  VTdEngineAddress[1];
+} VTD_INFO;
+
 /**
   Set DMA protected region.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
   @param LowMemoryBase      The protected low memory region base.
   @param LowMemoryLength    The protected low memory region length.
   @param HighMemoryBase     The protected high memory region base.
@@ -28,6 +35,7 @@
 **/
 EFI_STATUS
 SetDmaProtectedRange (
+  IN UINT64        EngineMask,
   IN UINT32        LowMemoryBase,
   IN UINT32        LowMemoryLength,
   IN UINT64        HighMemoryBase,
@@ -37,31 +45,37 @@ SetDmaProtectedRange (
 /**
   Diable DMA protection.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
+
   @retval DMA protection is disabled.
 **/
 EFI_STATUS
 DisableDmaProtection (
-  VOID
+  IN UINT64        EngineMask
   );
 
 /**
   Get protected low memory alignment.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
+
   @return protected low memory alignment.
 **/
 UINT32
 GetLowMemoryAlignment (
-  VOID
+  IN UINT64        EngineMask
   );
 
 /**
   Get protected high memory alignment.
 
+  @param EngineMask         The mask of the VTd engine to be accessed.
+
   @return protected high memory alignment.
 **/
 UINT64
 GetHighMemoryAlignment (
-  VOID
+  IN UINT64        EngineMask
   );
 
 #endif
