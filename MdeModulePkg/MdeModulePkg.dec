@@ -559,6 +559,9 @@
   ## Include/Protocol/SmmEndofS3Resume.h
   gEdkiiSmmEndOfS3ResumeProtocolGuid = { 0x96f5296d, 0x05f7, 0x4f3c, {0x84, 0x67, 0xe4, 0x56, 0x89, 0x0e, 0x0c, 0xb5 } }
 
+  ## Include/Protocol/SmmMemoryAttribute.h
+  gEdkiiSmmMemoryAttributeProtocolGuid = { 0x69b792ea, 0x39ce, 0x402d, { 0xa2, 0xa6, 0xf7, 0x21, 0xde, 0x35, 0x1d, 0xfe } }
+
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
@@ -888,6 +891,63 @@
   # this value in the temp stack to know how many stack has been used.
   # @Prompt Init Value in Temp Stack
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack|0x5AA55AA5|UINT32|0x30001051
+
+  ## Indicates which type allocation need guard page.
+  # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
+  #  EfiReservedMemoryType             0x0000000000000001<BR>
+  #  EfiLoaderCode                     0x0000000000000002<BR>
+  #  EfiLoaderData                     0x0000000000000004<BR>
+  #  EfiBootServicesCode               0x0000000000000008<BR>
+  #  EfiBootServicesData               0x0000000000000010<BR>
+  #  EfiRuntimeServicesCode            0x0000000000000020<BR>
+  #  EfiRuntimeServicesData            0x0000000000000040<BR>
+  #  EfiConventionalMemory             0x0000000000000080<BR>
+  #  EfiUnusableMemory                 0x0000000000000100<BR>
+  #  EfiACPIReclaimMemory              0x0000000000000200<BR>
+  #  EfiACPIMemoryNVS                  0x0000000000000400<BR>
+  #  EfiMemoryMappedIO                 0x0000000000000800<BR>
+  #  EfiMemoryMappedIOPortSpace        0x0000000000001000<BR>
+  #  EfiPalCode                        0x0000000000002000<BR>
+  #  EfiPersistentMemory               0x0000000000004000<BR>
+  #  OEM Reserved                      0x4000000000000000<BR>
+  #  OS Reserved                       0x8000000000000000<BR>
+  # e.g. LoaderCode+LoaderData+BootServicesCode+BootServicesData are needed, 0x1E should be used.<BR>
+  # @Prompt The memory type mask for Page Guard.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType|0x0|UINT64|0x30001052
+
+  ## Indicates which type allocation need guard page.
+  # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
+  #  EfiReservedMemoryType             0x0000000000000001<BR>
+  #  EfiLoaderCode                     0x0000000000000002<BR>
+  #  EfiLoaderData                     0x0000000000000004<BR>
+  #  EfiBootServicesCode               0x0000000000000008<BR>
+  #  EfiBootServicesData               0x0000000000000010<BR>
+  #  EfiRuntimeServicesCode            0x0000000000000020<BR>
+  #  EfiRuntimeServicesData            0x0000000000000040<BR>
+  #  EfiConventionalMemory             0x0000000000000080<BR>
+  #  EfiUnusableMemory                 0x0000000000000100<BR>
+  #  EfiACPIReclaimMemory              0x0000000000000200<BR>
+  #  EfiACPIMemoryNVS                  0x0000000000000400<BR>
+  #  EfiMemoryMappedIO                 0x0000000000000800<BR>
+  #  EfiMemoryMappedIOPortSpace        0x0000000000001000<BR>
+  #  EfiPalCode                        0x0000000000002000<BR>
+  #  EfiPersistentMemory               0x0000000000004000<BR>
+  #  OEM Reserved                      0x4000000000000000<BR>
+  #  OS Reserved                       0x8000000000000000<BR>
+  # e.g. LoaderCode+LoaderData+BootServicesCode+BootServicesData are needed, 0x1E should be used.<BR>
+  # @Prompt The memory type mask for Pool Guard.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType|0x0|UINT64|0x30001053
+
+  ## This mask is to control Heap Guard behavior.
+  #   BIT0 - Enable UEFI page guard.<BR>
+  #   BIT1 - Enable UEFI pool guard.<BR>
+  #   BIT2 - Enable SMM page guard.<BR>
+  #   BIT3 - Enable SMM pool guard.<BR>
+  #   BIT7 - The direction of Guard Page for Pool Guard.
+  #          0 - The returned pool is adjacent to the bottom guard page.<BR>
+  #          1 - The returned pool is adjacent to the top guard page.<BR>
+  # @Prompt The Heap Guard feature mask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask|0x0|UINT8|0x30001054
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
