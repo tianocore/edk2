@@ -710,9 +710,9 @@ GetLongAdFromAds (
     // If it's either an indirect AD (Extended Alllocation Descriptor) or an
     // allocated AD, then return it.
     //
-    ExtentFlags = GET_EXTENT_FLAGS (LONG_ADS_SEQUENCE, LongAd);
-    if (ExtentFlags == EXTENT_IS_NEXT_EXTENT ||
-        ExtentFlags == EXTENT_RECORDED_AND_ALLOCATED) {
+    ExtentFlags = GET_EXTENT_FLAGS (LongAdsSequence, LongAd);
+    if (ExtentFlags == ExtentIsNextExtent ||
+        ExtentFlags == ExtentRecordedAndAllocated) {
       break;
     }
 
@@ -720,7 +720,7 @@ GetLongAdFromAds (
     // This AD is either not recorded but allocated, or not recorded and not
     // allocated. Skip it.
     //
-    *Offset += AD_LENGTH (LONG_ADS_SEQUENCE);
+    *Offset += AD_LENGTH (LongAdsSequence);
   }
 
   *FoundLongAd = LongAd;
@@ -766,9 +766,9 @@ GetShortAdFromAds (
     // If it's either an indirect AD (Extended Alllocation Descriptor) or an
     // allocated AD, then return it.
     //
-    ExtentFlags = GET_EXTENT_FLAGS (SHORT_ADS_SEQUENCE, ShortAd);
-    if (ExtentFlags == EXTENT_IS_NEXT_EXTENT ||
-        ExtentFlags == EXTENT_RECORDED_AND_ALLOCATED) {
+    ExtentFlags = GET_EXTENT_FLAGS (ShortAdsSequence, ShortAd);
+    if (ExtentFlags == ExtentIsNextExtent ||
+        ExtentFlags == ExtentRecordedAndAllocated) {
       break;
     }
 
@@ -776,7 +776,7 @@ GetShortAdFromAds (
     // This AD is either not recorded but allocated, or not recorded and not
     // allocated. Skip it.
     //
-    *Offset += AD_LENGTH (SHORT_ADS_SEQUENCE);
+    *Offset += AD_LENGTH (ShortAdsSequence);
   }
 
   *FoundShortAd = ShortAd;
@@ -808,14 +808,14 @@ GetAllocationDescriptor (
   OUT     VOID                    **FoundAd
   )
 {
-  if (RecordingFlags == LONG_ADS_SEQUENCE) {
+  if (RecordingFlags == LongAdsSequence) {
     return GetLongAdFromAds (
       Data,
       Offset,
       Length,
       (UDF_LONG_ALLOCATION_DESCRIPTOR **)FoundAd
       );
-  } else if (RecordingFlags == SHORT_ADS_SEQUENCE) {
+  } else if (RecordingFlags == ShortAdsSequence) {
     return GetShortAdFromAds (
       Data,
       Offset,
@@ -846,9 +846,9 @@ GetAllocationDescriptorLsn (
   IN VOID                            *Ad
   )
 {
-  if (RecordingFlags == LONG_ADS_SEQUENCE) {
+  if (RecordingFlags == LongAdsSequence) {
     return GetLongAdLsn (Volume, (UDF_LONG_ALLOCATION_DESCRIPTOR *)Ad);
-  } else if (RecordingFlags == SHORT_ADS_SEQUENCE) {
+  } else if (RecordingFlags == ShortAdsSequence) {
     return GetShortAdLsn (
       GetPdFromLongAd (Volume, ParentIcb),
       (UDF_SHORT_ALLOCATION_DESCRIPTOR *)Ad
@@ -1115,8 +1115,8 @@ ReadFile (
   Data = NULL;
 
   switch (ReadFileInfo->Flags) {
-  case READ_FILE_GET_FILESIZE:
-  case READ_FILE_ALLOCATE_AND_READ:
+  case ReadFileGetFileSize:
+  case ReadFileAllocateAndRead:
     //
     // Initialise ReadFileInfo structure for either getting file size, or
     // reading file's recorded data.
@@ -1124,7 +1124,7 @@ ReadFile (
     ReadFileInfo->ReadLength = 0;
     ReadFileInfo->FileData = NULL;
     break;
-  case READ_FILE_SEEK_AND_READ:
+  case ReadFileSeekAndRead:
     //
     // About to seek a file and/or read its data.
     //
@@ -1149,15 +1149,15 @@ ReadFile (
 
   RecordingFlags = GET_FE_RECORDING_FLAGS (FileEntryData);
   switch (RecordingFlags) {
-  case INLINE_DATA:
+  case InlineData:
     //
     // There are no extents for this FE/EFE. All data is inline.
     //
     GetFileEntryData (FileEntryData, &Data, &Length);
 
-    if (ReadFileInfo->Flags == READ_FILE_GET_FILESIZE) {
+    if (ReadFileInfo->Flags == ReadFileGetFileSize) {
       ReadFileInfo->ReadLength = Length;
-    } else if (ReadFileInfo->Flags == READ_FILE_ALLOCATE_AND_READ) {
+    } else if (ReadFileInfo->Flags == ReadFileAllocateAndRead) {
       //
       // Allocate buffer for starting read data.
       //
@@ -1171,7 +1171,7 @@ ReadFile (
       //
       CopyMem (ReadFileInfo->FileData, Data, (UINTN) Length);
       ReadFileInfo->ReadLength = Length;
-    } else if (ReadFileInfo->Flags == READ_FILE_SEEK_AND_READ) {
+    } else if (ReadFileInfo->Flags == ReadFileSeekAndRead) {
       //
       // If FilePosition is non-zero, seek file to FilePosition, read
       // FileDataSize bytes and then updates FilePosition.
@@ -1191,8 +1191,8 @@ ReadFile (
     Status = EFI_SUCCESS;
     break;
 
-  case LONG_ADS_SEQUENCE:
-  case SHORT_ADS_SEQUENCE:
+  case LongAdsSequence:
+  case ShortAdsSequence:
     //
     // This FE/EFE contains a run of Allocation Descriptors. Get data + size
     // for start reading them out.
@@ -1220,7 +1220,7 @@ ReadFile (
       // Check if AD is an indirect AD. If so, read Allocation Extent
       // Descriptor and its extents (ADs).
       //
-      if (GET_EXTENT_FLAGS (RecordingFlags, Ad) == EXTENT_IS_NEXT_EXTENT) {
+      if (GET_EXTENT_FLAGS (RecordingFlags, Ad) == ExtentIsNextExtent) {
         if (!DoFreeAed) {
           DoFreeAed = TRUE;
         } else {
@@ -1254,10 +1254,10 @@ ReadFile (
                                         Ad);
 
       switch (ReadFileInfo->Flags) {
-      case READ_FILE_GET_FILESIZE:
+      case ReadFileGetFileSize:
         ReadFileInfo->ReadLength += ExtentLength;
         break;
-      case READ_FILE_ALLOCATE_AND_READ:
+      case ReadFileAllocateAndRead:
         //
         // Increase FileData (if necessary) to read next extent.
         //
@@ -1288,7 +1288,7 @@ ReadFile (
 
         ReadFileInfo->ReadLength += ExtentLength;
         break;
-      case READ_FILE_SEEK_AND_READ:
+      case ReadFileSeekAndRead:
         //
         // Seek file first before reading in its data.
         //
@@ -1364,7 +1364,7 @@ ReadFile (
     }
 
     break;
-  case EXTENDED_ADS_SEQUENCE:
+  case ExtendedAdsSequence:
      // FIXME: Not supported. Got no volume with it, yet.
     ASSERT (FALSE);
     Status = EFI_UNSUPPORTED;
@@ -1388,7 +1388,7 @@ Done:
 
 Error_Read_Disk_Blk:
 Error_Alloc_Buffer_To_Next_Ad:
-  if (ReadFileInfo->Flags != READ_FILE_SEEK_AND_READ) {
+  if (ReadFileInfo->Flags != ReadFileSeekAndRead) {
     FreePool (ReadFileInfo->FileData);
   }
 
@@ -1911,7 +1911,7 @@ ReadDirectoryEntry (
     // The directory's recorded data has not been read yet. So let's cache it
     // into memory and the next calls won't need to read it again.
     //
-    ReadFileInfo.Flags = READ_FILE_ALLOCATE_AND_READ;
+    ReadFileInfo.Flags = ReadFileAllocateAndRead;
 
     Status = ReadFile (
       BlockIo,
@@ -2061,7 +2061,7 @@ ResolveSymlink (
   // all its data here -- usually the data will be inline with the FE/EFE for
   // lower filenames.
   //
-  ReadFileInfo.Flags = READ_FILE_ALLOCATE_AND_READ;
+  ReadFileInfo.Flags = ReadFileAllocateAndRead;
 
   Status = ReadFile (
     BlockIo,
@@ -2284,7 +2284,7 @@ GetFileSize (
   EFI_STATUS          Status;
   UDF_READ_FILE_INFO  ReadFileInfo;
 
-  ReadFileInfo.Flags = READ_FILE_GET_FILESIZE;
+  ReadFileInfo.Flags = ReadFileGetFileSize;
 
   Status = ReadFile (
     BlockIo,
@@ -2610,7 +2610,7 @@ ReadFileData (
   EFI_STATUS          Status;
   UDF_READ_FILE_INFO  ReadFileInfo;
 
-  ReadFileInfo.Flags         = READ_FILE_SEEK_AND_READ;
+  ReadFileInfo.Flags         = ReadFileSeekAndRead;
   ReadFileInfo.FilePosition  = *FilePosition;
   ReadFileInfo.FileData      = Buffer;
   ReadFileInfo.FileDataSize  = *BufferSize;

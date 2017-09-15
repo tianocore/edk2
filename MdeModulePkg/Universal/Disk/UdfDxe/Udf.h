@@ -106,10 +106,10 @@
          !IS_FID_PARENT_FILE (_Pointer)))
 
 typedef enum {
-  SHORT_ADS_SEQUENCE,
-  LONG_ADS_SEQUENCE,
-  EXTENDED_ADS_SEQUENCE,
-  INLINE_DATA
+  ShortAdsSequence,
+  LongAdsSequence,
+  ExtendedAdsSequence,
+  InlineData
 } UDF_FE_RECORDING_FLAGS;
 
 #define GET_FE_RECORDING_FLAGS(_Fe) \
@@ -118,26 +118,26 @@ typedef enum {
                   sizeof (UDF_DESCRIPTOR_TAG)))->Flags & 0x07)
 
 typedef enum {
-  EXTENT_RECORDED_AND_ALLOCATED,
-  EXTENT_NOT_RECORDED_BUT_ALLOCATED,
-  EXTENT_NOT_RECORDED_NOT_ALLOCATED,
-  EXTENT_IS_NEXT_EXTENT,
+  ExtentRecordedAndAllocated,
+  ExtentNotRecordedButAllocated,
+  ExtentNotRecordedNotAllocated,
+  ExtentIsNextExtent,
 } UDF_EXTENT_FLAGS;
 
 #define AD_LENGTH(_RecFlags) \
-  ((_RecFlags) == SHORT_ADS_SEQUENCE ? \
+  ((_RecFlags) == ShortAdsSequence ? \
    ((UINT64)(sizeof (UDF_SHORT_ALLOCATION_DESCRIPTOR))) : \
    ((UINT64)(sizeof (UDF_LONG_ALLOCATION_DESCRIPTOR))))
 
 #define GET_EXTENT_FLAGS(_RecFlags, _Ad) \
-  ((_RecFlags) == SHORT_ADS_SEQUENCE ? \
+  ((_RecFlags) == ShortAdsSequence ? \
    ((UDF_EXTENT_FLAGS)((((UDF_SHORT_ALLOCATION_DESCRIPTOR *)(_Ad))->ExtentLength >> \
             30) & 0x3)) : \
    ((UDF_EXTENT_FLAGS)((((UDF_LONG_ALLOCATION_DESCRIPTOR *)(_Ad))->ExtentLength >> \
             30) & 0x3)))
 
 #define GET_EXTENT_LENGTH(_RecFlags, _Ad) \
-  ((_RecFlags) == SHORT_ADS_SEQUENCE ? \
+  ((_RecFlags) == ShortAdsSequence ? \
    ((UINT32)((((UDF_SHORT_ALLOCATION_DESCRIPTOR *)(_Ad))->ExtentLength & \
           ~0xC0000000UL))) : \
    ((UINT32)((((UDF_LONG_ALLOCATION_DESCRIPTOR *)(_Ad))->ExtentLength & \
@@ -169,9 +169,9 @@ typedef struct {
 #pragma pack()
 
 typedef enum {
-  READ_FILE_GET_FILESIZE,
-  READ_FILE_ALLOCATE_AND_READ,
-  READ_FILE_SEEK_AND_READ,
+  ReadFileGetFileSize,
+  ReadFileAllocateAndRead,
+  ReadFileSeekAndRead,
 } UDF_READ_FILE_FLAGS;
 
 typedef struct {
