@@ -39,6 +39,9 @@
 [LibraryClasses]
   PeimEntryPoint
   PeiServicesLib
+  DebugLib
+  PciLib
+  IoLib
 
 [Ppis]
   gEdkiiVTdInfoPpiGuid         ## PRODUCES
