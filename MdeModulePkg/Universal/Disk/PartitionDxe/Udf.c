@@ -28,6 +28,11 @@ typedef struct {
 } UDF_DEVICE_PATH;
 
 //
+// Vendor-Defined Device Path GUID for UDF file system
+//
+EFI_GUID gUdfDevPathGuid = EFI_UDF_DEVICE_PATH_GUID;
+
+//
 // Vendor-Defined Media Device Path for UDF file system
 //
 UDF_DEVICE_PATH gUdfDevicePath = {
@@ -260,7 +265,6 @@ PartitionInstallUdfChildHandles (
   EFI_BLOCK_IO_MEDIA           *Media;
   EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode;
   EFI_GUID                     *VendorDefinedGuid;
-  EFI_GUID                     UdfDevPathGuid = EFI_UDF_DEVICE_PATH_GUID;
   EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   Media = BlockIo->Media;
@@ -291,7 +295,7 @@ PartitionInstallUdfChildHandles (
       if (DevicePathSubType (DevicePathNode) == MEDIA_VENDOR_DP) {
         VendorDefinedGuid = (EFI_GUID *)((UINTN)DevicePathNode +
                                          OFFSET_OF (VENDOR_DEVICE_PATH, Guid));
-        if (CompareGuid (VendorDefinedGuid, &UdfDevPathGuid)) {
+        if (CompareGuid (VendorDefinedGuid, &gUdfDevPathGuid)) {
           return EFI_NOT_FOUND;
         }
       }

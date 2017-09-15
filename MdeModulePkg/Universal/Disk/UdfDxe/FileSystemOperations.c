@@ -14,6 +14,11 @@
 
 #include "Udf.h"
 
+//
+// Vendor-Defined Device Path GUID for UDF file system
+//
+EFI_GUID gUdfDevPathGuid = EFI_UDF_DEVICE_PATH_GUID;
+
 /**
   Find the anchor volume descriptor pointer.
 
@@ -2650,7 +2655,6 @@ SupportUdfFileSystem (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL  *LastDevicePathNode;
   EFI_GUID                  *VendorDefinedGuid;
-  EFI_GUID                  UdfDevPathGuid = EFI_UDF_DEVICE_PATH_GUID;
 
   //
   // Open Device Path protocol on ControllerHandle
@@ -2687,7 +2691,7 @@ SupportUdfFileSystem (
       DevicePathSubType (LastDevicePathNode) == MEDIA_VENDOR_DP) {
     VendorDefinedGuid = (EFI_GUID *)((UINTN)LastDevicePathNode +
                                      OFFSET_OF (VENDOR_DEVICE_PATH, Guid));
-    if (CompareGuid (VendorDefinedGuid, &UdfDevPathGuid)) {
+    if (CompareGuid (VendorDefinedGuid, &gUdfDevPathGuid)) {
       Status = EFI_SUCCESS;
     }
   }
