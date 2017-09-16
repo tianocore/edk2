@@ -79,7 +79,7 @@
 
 [Components]
   IntelSiliconPkg/Library/DxeSmbiosDataHobLib/DxeSmbiosDataHobLib.inf
-  IntelSiliconPkg/IntelVTdDxe/IntelVTdDxe.inf
+  IntelSiliconPkg/Feature/VTd/IntelVTdDxe/IntelVTdDxe.inf
   IntelSiliconPkg/IntelVTdPmrPei/IntelVTdPmrPei.inf
   IntelSiliconPkg/PlatformVTdSampleDxe/PlatformVTdSampleDxe.inf
   IntelSiliconPkg/PlatformVTdInfoSamplePei/PlatformVTdInfoSamplePei.inf
