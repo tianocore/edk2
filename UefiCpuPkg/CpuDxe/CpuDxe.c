@@ -863,6 +863,11 @@ RefreshGcdMemoryAttributes (
     FreePool (MemorySpaceMap);
   }
 
+  //
+  // Update page attributes
+  //
+  RefreshGcdMemoryAttributesFromPaging();
+
   mIsFlushingGCD = FALSE;
 }
 

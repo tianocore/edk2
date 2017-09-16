@@ -52,6 +52,10 @@
                                        EFI_MEMORY_UCE   \
                                        )
 
+#define EFI_MEMORY_PAGETYPE_MASK      (EFI_MEMORY_RP  | \
+                                       EFI_MEMORY_XP  | \
+                                       EFI_MEMORY_RO    \
+                                       )
 
 /**
   Flush CPU data cache. If the instruction cache is fully coherent
@@ -259,6 +263,11 @@ VOID
 EFIAPI
 SetDataSelectors (
   UINT16 Selector
+  );
+
+VOID
+RefreshGcdMemoryAttributesFromPaging (
+  VOID
   );
 
 #endif
