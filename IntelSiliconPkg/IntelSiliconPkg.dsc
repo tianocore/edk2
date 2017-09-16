@@ -81,7 +81,7 @@
   IntelSiliconPkg/Library/DxeSmbiosDataHobLib/DxeSmbiosDataHobLib.inf
   IntelSiliconPkg/Feature/VTd/IntelVTdDxe/IntelVTdDxe.inf
   IntelSiliconPkg/IntelVTdPmrPei/IntelVTdPmrPei.inf
-  IntelSiliconPkg/PlatformVTdSampleDxe/PlatformVTdSampleDxe.inf
+  IntelSiliconPkg/Feature/VTd/PlatformVTdSampleDxe/PlatformVTdSampleDxe.inf
   IntelSiliconPkg/PlatformVTdInfoSamplePei/PlatformVTdInfoSamplePei.inf
 
 [BuildOptions]
