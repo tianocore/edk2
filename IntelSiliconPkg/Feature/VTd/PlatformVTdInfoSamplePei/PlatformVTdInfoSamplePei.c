@@ -14,7 +14,7 @@
 
 #include <PiPei.h>
 
-#include <Ppi/VTdInfo.h>
+#include <Ppi/VtdInfo.h>
 
 #include <Library/PeiServicesLib.h>
 #include <Library/DebugLib.h>
