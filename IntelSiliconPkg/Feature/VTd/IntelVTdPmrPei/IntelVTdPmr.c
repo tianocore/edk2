@@ -18,7 +18,7 @@
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <IndustryStandard/Vtd.h>
-#include <Ppi/VTdInfo.h>
+#include <Ppi/VtdInfo.h>
 
 #include "IntelVTdPmrPei.h"
 

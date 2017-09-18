@@ -23,7 +23,7 @@
 #include <Library/HobLib.h>
 #include <IndustryStandard/Vtd.h>
 #include <Ppi/IoMmu.h>
-#include <Ppi/VTdInfo.h>
+#include <Ppi/VtdInfo.h>
 
 #include "IntelVTdPmrPei.h"
 
