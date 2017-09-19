@@ -766,8 +766,10 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
 
       *(IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr)) = L'/';
     }
-    if (StrLen (IfrNvData->ISCSIMacAddr) != 0) {
-      *(IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr) - 1) = L'\0';
+
+    StringLen = StrLen (IfrNvData->ISCSIMacAddr);
+    if (StringLen > 0) {
+      *(IfrNvData->ISCSIMacAddr + StringLen - 1) = L'\0';
     }
   }
 }
