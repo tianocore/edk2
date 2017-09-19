@@ -63,7 +63,7 @@ InstallVbeShim (
   EFI_PHYSICAL_ADDRESS Segment0, SegmentC, SegmentF;
   UINTN                Segment0Pages;
   IVT_ENTRY            *Int0x10;
-  EFI_STATUS           Status;
+  EFI_STATUS           Segment0AllocationStatus;
   UINTN                Pam1Address;
   UINT8                Pam1;
   UINTN                SegmentCPages;
@@ -87,10 +87,14 @@ InstallVbeShim (
   //
   Segment0Pages = 1;
   Int0x10       = (IVT_ENTRY *)(UINTN)Segment0 + 0x10;
-  Status = gBS->AllocatePages (AllocateAddress, EfiBootServicesCode,
-                  Segment0Pages, &Segment0);
+  Segment0AllocationStatus = gBS->AllocatePages (
+                                    AllocateAddress,
+                                    EfiBootServicesCode,
+                                    Segment0Pages,
+                                    &Segment0
+                                    );
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Segment0AllocationStatus)) {
     EFI_PHYSICAL_ADDRESS Handler;
 
     //
@@ -109,8 +113,12 @@ InstallVbeShim (
     // Otherwise we'll overwrite the Int10h vector, even though we may not own
     // the page at zero.
     //
-    DEBUG ((EFI_D_INFO, "%a: failed to allocate page at zero: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: failed to allocate page at zero: %r\n",
+      __FUNCTION__,
+      Segment0AllocationStatus
+      ));
   } else {
     //
     // We managed to allocate the page at zero. SVN r14218 guarantees that it
