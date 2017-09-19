@@ -43,6 +43,7 @@ from Workspace.MetaFileCommentParser import UsageList
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import InfSectionParser
 import datetime
+import hashlib
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -265,6 +266,10 @@ class WorkspaceAutoGen(AutoGen):
         self.FvTargetList   = Fvs
         self.CapTargetList  = Caps
         self.AutoGenObjectList = []
+        self._BuildDir      = None
+        self._FvDir         = None
+        self._MakeFileDir   = None
+        self._BuildCommand  = None
 
         # there's many relative directory operations, so ...
         os.chdir(self.WorkspaceDir)
@@ -644,6 +649,14 @@ class WorkspaceAutoGen(AutoGen):
             Pa.CollectFixedAtBuildPcds()
             self.AutoGenObjectList.append(Pa)
 
+            #
+            # Generate Package level hash value
+            #
+            GlobalData.gPackageHash[Arch] = {}
+            if GlobalData.gUseHashCache:
+                for Pkg in Pkgs:
+                    self._GenPkgLevelHash(Pkg)
+
         #
         # Check PCDs token value conflict in each DEC file.
         #
@@ -656,11 +669,6 @@ class WorkspaceAutoGen(AutoGen):
 
 #         if self.FdfFile:
 #             self._CheckDuplicateInFV(Fdf)
-
-        self._BuildDir = None
-        self._FvDir = None
-        self._MakeFileDir = None
-        self._BuildCommand = None
 
         #
         # Create BuildOptions Macro & PCD metafile, also add the Active Platform and FDF file.
@@ -677,6 +685,10 @@ class WorkspaceAutoGen(AutoGen):
         if self.FdfFile:
             content += 'Flash Image Definition: '
             content += str(self.FdfFile)
+            content += os.linesep
+        if GlobalData.gBinCacheDest:
+            content += 'Cache of .efi location: '
+            content += str(GlobalData.gBinCacheDest)
         SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
 
         #
@@ -706,6 +718,18 @@ class WorkspaceAutoGen(AutoGen):
                 SrcTimeStamp = os.stat(f)[8]
         self._SrcTimeStamp = SrcTimeStamp
 
+        if GlobalData.gUseHashCache:
+            m = hashlib.md5()
+            for files in AllWorkSpaceMetaFiles:
+                if files.endswith('.dec'):
+                    continue
+                f = open(files, 'r')
+                Content = f.read()
+                f.close()
+                m.update(Content)
+            SaveFileOnChange(os.path.join(self.BuildDir, 'AutoGen.hash'), m.hexdigest(), True)
+            GlobalData.gPlatformHash = m.hexdigest()
+
         #
         # Write metafile list to build directory
         #
@@ -719,6 +743,29 @@ class WorkspaceAutoGen(AutoGen):
                 print >> file, f
         return True
 
+    def _GenPkgLevelHash(self, Pkg):
+        PkgDir = os.path.join(self.BuildDir, Pkg.Arch, Pkg.PackageName)
+        CreateDirectory(PkgDir)
+        HashFile = os.path.join(PkgDir, Pkg.PackageName + '.hash')
+        m = hashlib.md5()
+        # Get .dec file's hash value
+        f = open(Pkg.MetaFile.Path, 'r')
+        Content = f.read()
+        f.close()
+        m.update(Content)
+        # Get include files hash value
+        if Pkg.Includes:
+            for inc in Pkg.Includes:
+                for Root, Dirs, Files in os.walk(str(inc)):
+                    for File in Files:
+                        File_Path = os.path.join(Root, File)
+                        f = open(File_Path, 'r')
+                        Content = f.read()
+                        f.close()
+                        m.update(Content)
+        SaveFileOnChange(HashFile, m.hexdigest(), True)
+        if Pkg.PackageName not in GlobalData.gPackageHash[Pkg.Arch]:
+            GlobalData.gPackageHash[Pkg.Arch][Pkg.PackageName] = m.hexdigest()
 
     def _GetMetaFiles(self, Target, Toolchain, Arch):
         AllWorkSpaceMetaFiles = set()
@@ -956,7 +1003,8 @@ class WorkspaceAutoGen(AutoGen):
 
     ## Return the directory to store all intermediate and final files built
     def _GetBuildDir(self):
-        return self.AutoGenObjectList[0].BuildDir
+        if self._BuildDir == None:
+            return self.AutoGenObjectList[0].BuildDir
 
     ## Return the build output directory platform specifies
     def _GetOutputDir(self):
@@ -3911,9 +3959,11 @@ class ModuleAutoGen(AutoGen):
             AsBuiltInfDict['module_pi_specification_version'] += [self.Specification['PI_SPECIFICATION_VERSION']]
 
         OutputDir = self.OutputDir.replace('\\', '/').strip('/')
-
+        self.OutputFile = []
         for Item in self.CodaTargetList:
             File = Item.Target.Path.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
+            if File not in self.OutputFile:
+                self.OutputFile.append(File)
             if Item.Target.Ext.lower() == '.aml':
                 AsBuiltInfDict['binary_item'] += ['ASL|' + File]
             elif Item.Target.Ext.lower() == '.acpi':
@@ -3923,6 +3973,8 @@ class ModuleAutoGen(AutoGen):
             else:
                 AsBuiltInfDict['binary_item'] += ['BIN|' + File]
         if self.DepexGenerated:
+            if self.Name + '.depex' not in self.OutputFile:
+                self.OutputFile.append(self.Name + '.depex')
             if self.ModuleType in ['PEIM']:
                 AsBuiltInfDict['binary_item'] += ['PEI_DEPEX|' + self.Name + '.depex']
             if self.ModuleType in ['DXE_DRIVER', 'DXE_RUNTIME_DRIVER', 'DXE_SAL_DRIVER', 'UEFI_DRIVER']:
@@ -3933,11 +3985,15 @@ class ModuleAutoGen(AutoGen):
         Bin = self._GenOffsetBin()
         if Bin:
             AsBuiltInfDict['binary_item'] += ['BIN|%s' % Bin]
+            if Bin not in self.OutputFile:
+                self.OutputFile.append(Bin)
 
         for Root, Dirs, Files in os.walk(OutputDir):
             for File in Files:
                 if File.lower().endswith('.pdb'):
                     AsBuiltInfDict['binary_item'] += ['DISPOSABLE|' + File]
+                    if File not in self.OutputFile:
+                        self.OutputFile.append(File)
         HeaderComments = self.Module.HeaderComments
         StartPos = 0
         for Index in range(len(HeaderComments)):
@@ -4118,7 +4174,48 @@ class ModuleAutoGen(AutoGen):
         SaveFileOnChange(os.path.join(self.OutputDir, self.Name + '.inf'), str(AsBuiltInf), False)
         
         self.IsAsBuiltInfCreated = True
-        
+        if GlobalData.gBinCacheDest:
+            self.CopyModuleToCache()
+
+    def CopyModuleToCache(self):
+        FileDir = path.join(GlobalData.gBinCacheDest, self.Arch, self.SourceDir, self.MetaFile.BaseName)
+        CreateDirectory (FileDir)
+        HashFile = path.join(self.BuildDir, self.Name + '.hash')
+        ModuleFile = path.join(self.OutputDir, self.Name + '.inf')
+        if os.path.exists(HashFile):
+            shutil.copy2(HashFile, FileDir)
+        if os.path.exists(ModuleFile):
+            shutil.copy2(ModuleFile, FileDir)
+        if self.OutputFile:
+            for File in self.OutputFile:
+                if not os.path.isabs(File):
+                    File = os.path.join(self.OutputDir, File)
+                if os.path.exists(File):
+                    shutil.copy2(File, FileDir)
+
+    def AttemptModuleCacheCopy(self):
+        if self.IsBinaryModule:
+            return False
+        FileDir = path.join(GlobalData.gBinCacheSource, self.Arch, self.SourceDir, self.MetaFile.BaseName)
+        HashFile = path.join(FileDir, self.Name + '.hash')
+        if os.path.exists(HashFile):
+            f = open(HashFile, 'r')
+            CacheHash = f.read()
+            f.close()
+            if GlobalData.gModuleHash[self.Arch][self.Name]:
+                if CacheHash == GlobalData.gModuleHash[self.Arch][self.Name]:
+                    for root, dir, files in os.walk(FileDir):
+                        for f in files:
+                            if self.Name + '.hash' in f:
+                                shutil.copy2(HashFile, self.BuildDir)
+                            else:
+                                File = path.join(root, f)
+                                shutil.copy2(File, self.OutputDir)
+                    if self.Name == "PcdPeim" or self.Name == "PcdDxe":
+                        CreatePcdDatabaseCode(self, TemplateString(), TemplateString())
+                    return True
+        return False
+
     ## Create makefile for the module and its dependent libraries
     #
     #   @param      CreateLibraryMakeFile   Flag indicating if or not the makefiles of
@@ -4246,8 +4343,54 @@ class ModuleAutoGen(AutoGen):
                         self._ApplyBuildRule(Lib.Target, TAB_UNKNOWN_FILE)
         return self._LibraryAutoGenList
 
+    def GenModuleHash(self):
+        if self.Arch not in GlobalData.gModuleHash:
+            GlobalData.gModuleHash[self.Arch] = {}
+        m = hashlib.md5()
+        # Add Platform level hash
+        m.update(GlobalData.gPlatformHash)
+        # Add Package level hash
+        if self.DependentPackageList:
+            for Pkg in self.DependentPackageList:
+                if Pkg.PackageName in GlobalData.gPackageHash[self.Arch]:
+                    m.update(GlobalData.gPackageHash[self.Arch][Pkg.PackageName])
+
+        # Add Library hash
+        if self.LibraryAutoGenList:
+            for Lib in self.LibraryAutoGenList:
+                if Lib.Name not in GlobalData.gModuleHash[self.Arch]:
+                    Lib.GenModuleHash()
+                m.update(GlobalData.gModuleHash[self.Arch][Lib.Name])
+
+        # Add Module self
+        f = open(str(self.MetaFile), 'r')
+        Content = f.read()
+        f.close()
+        m.update(Content)
+        # Add Module's source files
+        if self.SourceFileList:
+            for File in self.SourceFileList:
+                f = open(str(File), 'r')
+                Content = f.read()
+                f.close()
+                m.update(Content)
+
+        ModuleHashFile = path.join(self.BuildDir, self.Name + ".hash")
+        if self.Name not in GlobalData.gModuleHash[self.Arch]:
+            GlobalData.gModuleHash[self.Arch][self.Name] = m.hexdigest()
+        if GlobalData.gBinCacheSource:
+            CacheValid = self.AttemptModuleCacheCopy()
+            if CacheValid:
+                return False
+        return SaveFileOnChange(ModuleHashFile, m.hexdigest(), True)
+
     ## Decide whether we can skip the ModuleAutoGen process
-    #  If any source file is newer than the modeule than we cannot skip
+    def CanSkipbyHash(self):
+        if GlobalData.gUseHashCache:
+            return not self.GenModuleHash()
+
+    ## Decide whether we can skip the ModuleAutoGen process
+    #  If any source file is newer than the module than we cannot skip
     #
     def CanSkip(self):
         if not os.path.exists(self.GetTimeStampPath()):

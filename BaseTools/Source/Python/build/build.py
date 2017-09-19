@@ -771,6 +771,30 @@ class Build():
         GlobalData.BuildOptionPcd     = BuildOptions.OptionPcd
         #Set global flag for build mode
         GlobalData.gIgnoreSource = BuildOptions.IgnoreSources
+        GlobalData.gUseHashCache = BuildOptions.UseHashCache
+        GlobalData.gBinCacheDest   = BuildOptions.BinCacheDest
+        GlobalData.gBinCacheSource = BuildOptions.BinCacheSource
+
+        if GlobalData.gBinCacheDest and not GlobalData.gUseHashCache:
+            EdkLogger.error("build", OPTION_NOT_SUPPORTED, ExtraData="--binary-destination must be used together with --hash.")
+
+        if GlobalData.gBinCacheSource and not GlobalData.gUseHashCache:
+            EdkLogger.error("build", OPTION_NOT_SUPPORTED, ExtraData="--binary-source must be used together with --hash.")
+
+        if GlobalData.gBinCacheDest and GlobalData.gBinCacheSource:
+            EdkLogger.error("build", OPTION_NOT_SUPPORTED, ExtraData="--binary-destination can not be used together with --binary-source.")
+
+        if GlobalData.gBinCacheSource:
+            BinCacheSource = os.path.normpath(GlobalData.gBinCacheSource)
+            if not os.path.isabs(BinCacheSource):
+                BinCacheSource = mws.join(self.WorkspaceDir, BinCacheSource)
+            GlobalData.gBinCacheSource = BinCacheSource
+
+        if GlobalData.gBinCacheDest:
+            BinCacheDest = os.path.normpath(GlobalData.gBinCacheDest)
+            if not os.path.isabs(BinCacheDest):
+                BinCacheDest = mws.join(self.WorkspaceDir, BinCacheDest)
+            GlobalData.gBinCacheDest = BinCacheDest
 
         if self.ConfDirectory:
             # Get alternate Conf location, if it is absolute, then just use the absolute directory name
@@ -1952,6 +1976,9 @@ class Build():
                         
                         if Ma == None:
                             continue
+                        if Ma.CanSkipbyHash():
+                            continue
+
                         # Not to auto-gen for targets 'clean', 'cleanlib', 'cleanall', 'run', 'fds'
                         if self.Target not in ['clean', 'cleanlib', 'cleanall', 'run', 'fds']:
                             # for target which must generate AutoGen code and makefile
@@ -2274,6 +2301,9 @@ def MyOptionParser():
     Parser.add_option("--ignore-sources", action="store_true", dest="IgnoreSources", default=False, help="Focus to a binary build and ignore all source files")
     Parser.add_option("--pcd", action="append", dest="OptionPcd", help="Set PCD value by command line. Format: \"PcdName=Value\" ")
     Parser.add_option("-l", "--cmd-len", action="store", type="int", dest="CommandLength", help="Specify the maximum line length of build command. Default is 4096.")
+    Parser.add_option("--hash", action="store_true", dest="UseHashCache", default=False, help="Enable hash-based caching during build process.")
+    Parser.add_option("--binary-destination", action="store", type="string", dest="BinCacheDest", help="Generate a cache of binary files in the specified directory.")
+    Parser.add_option("--binary-source", action="store", type="string", dest="BinCacheSource", help="Consume a cache of binary files from the specified directory.")
 
     (Opt, Args) = Parser.parse_args()
     return (Opt, Args)
