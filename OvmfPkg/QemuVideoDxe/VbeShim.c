@@ -25,6 +25,7 @@
 #include <Library/DebugLib.h>
 #include <Library/PciLib.h>
 #include <Library/PrintLib.h>
+#include <OvmfPlatforms.h>
 
 #include "Qemu.h"
 #include "VbeShim.h"
@@ -64,6 +65,7 @@ InstallVbeShim (
   UINTN                Segment0Pages;
   IVT_ENTRY            *Int0x10;
   EFI_STATUS           Segment0AllocationStatus;
+  UINT16               HostBridgeDevId;
   UINTN                Pam1Address;
   UINT8                Pam1;
   UINTN                SegmentCPages;
@@ -131,7 +133,30 @@ InstallVbeShim (
   //
   // Put the shim in place first.
   //
-  Pam1Address = PCI_LIB_ADDRESS (0, 0, 0, 0x5A);
+  // Start by determining the address of the PAM1 register.
+  //
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  switch (HostBridgeDevId) {
+  case INTEL_82441_DEVICE_ID:
+    Pam1Address = PMC_REGISTER_PIIX4 (PIIX4_PAM1);
+    break;
+  case INTEL_Q35_MCH_DEVICE_ID:
+    Pam1Address = DRAMC_REGISTER_Q35 (MCH_PAM1);
+    break;
+  default:
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: unknown host bridge device ID: 0x%04x\n",
+      __FUNCTION__,
+      HostBridgeDevId
+      ));
+    ASSERT (FALSE);
+
+    if (!EFI_ERROR (Segment0AllocationStatus)) {
+      gBS->FreePages (Segment0, Segment0Pages);
+    }
+    return;
+  }
   //
   // low nibble covers 0xC0000 to 0xC3FFF
   // high nibble covers 0xC4000 to 0xC7FFF

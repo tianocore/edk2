@@ -60,6 +60,7 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PcdLib
   PciLib
   PrintLib
   TimerLib
@@ -75,4 +76,4 @@
 
 [Pcd]
   gOptionRomPkgTokenSpaceGuid.PcdDriverSupportedEfiVersion
-
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
