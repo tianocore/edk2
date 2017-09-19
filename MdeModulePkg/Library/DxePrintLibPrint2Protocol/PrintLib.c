@@ -2108,7 +2108,7 @@ InternalPrintLibSPrintMarker (
     // Copy the string into the output buffer performing the required type conversions
     //
     while (Index < Count) {
-      ArgumentCharacter = ((*ArgumentString & 0xff) | (*(ArgumentString + 1) << 8)) & ArgumentMask;
+      ArgumentCharacter = ((*ArgumentString & 0xff) | (((UINT8)*(ArgumentString + 1)) << 8)) & ArgumentMask;
 
       LengthToReturn += (1 * BytesPerOutputCharacter);
       if ((Flags & COUNT_ONLY_NO_PRINT) == 0 && Buffer != NULL) {
