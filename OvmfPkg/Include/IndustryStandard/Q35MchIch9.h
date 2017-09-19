@@ -47,6 +47,14 @@
 #define MCH_PCIEXBAR_HIGH     0x64
 #define MCH_PCIEXBAR_HIGHMASK   0xFFFFFFF0
 
+#define MCH_PAM0              0x90
+#define MCH_PAM1              0x91
+#define MCH_PAM2              0x92
+#define MCH_PAM3              0x93
+#define MCH_PAM4              0x94
+#define MCH_PAM5              0x95
+#define MCH_PAM6              0x96
+
 #define MCH_SMRAM             0x9D
 #define MCH_SMRAM_D_LCK         BIT4
 #define MCH_SMRAM_G_SMRAME      BIT3
