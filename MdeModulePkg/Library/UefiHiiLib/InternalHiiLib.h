@@ -1,7 +1,7 @@
 /** @file
   Internal include file for the HII Library instance.
 
-  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -19,6 +19,8 @@
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/FormBrowser2.h>
+
+#include <Guid/MdeModuleHii.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
