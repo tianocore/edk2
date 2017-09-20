@@ -52,7 +52,11 @@ typedef enum {
   /// A memory region that is visible to the boot processor. 
   /// This memory supports byte-addressable non-volatility. 
   ///
-  EfiGcdMemoryTypePersistentMemory,
+  EfiGcdMemoryTypePersistent,
+  //
+  // Keep original one for the compatibility.
+  //
+  EfiGcdMemoryTypePersistentMemory = EfiGcdMemoryTypePersistent,
   ///
   /// A memory region that provides higher reliability relative to other memory in the
   /// system. If all memory has the same reliability, then this bit is not used.
