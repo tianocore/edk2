@@ -1,0 +1,31 @@
+#/** @file
+#
+#  Copyright (c) 2016 - 2017, ARM Ltd. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmSvcLib
+  FILE_GUID                      = 8e3618d7-f01d-4d65-b32b-4c70aacc8e49
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmSvcLib
+
+[Sources.ARM]
+  Arm/ArmSvc.asm    | RVCT
+  Arm/ArmSvc.S      | GCC
+
+[Sources.AARCH64]
+  AArch64/ArmSvc.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
