@@ -23,6 +23,8 @@
 #ifndef _DMA_REMAPPING_REPORTING_TABLE_H_
 #define _DMA_REMAPPING_REPORTING_TABLE_H_
 
+#include <IndustryStandard/Acpi.h>
+
 #pragma pack(1)
 
 ///
