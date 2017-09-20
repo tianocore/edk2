@@ -115,7 +115,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdMemoryTypeNames[] = {
   "Reserved ",  // EfiGcdMemoryTypeReserved
   "SystemMem",  // EfiGcdMemoryTypeSystemMemory
   "MMIO     ",  // EfiGcdMemoryTypeMemoryMappedIo
-  "PersisMem",  // EfiGcdMemoryTypePersistentMemory
+  "PersisMem",  // EfiGcdMemoryTypePersistent
   "MoreRelia",  // EfiGcdMemoryTypeMoreReliable
   "Unknown  "   // EfiGcdMemoryTypeMaximum
 };
@@ -2416,7 +2416,7 @@ CoreInitializeGcdServices (
           GcdMemoryType = EfiGcdMemoryTypeReserved;
         }
         if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
-          GcdMemoryType = EfiGcdMemoryTypePersistentMemory;
+          GcdMemoryType = EfiGcdMemoryTypePersistent;
         }
         break;
       case EFI_RESOURCE_MEMORY_MAPPED_IO:

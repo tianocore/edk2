@@ -1635,7 +1635,7 @@ CoreGetMemoryMap (
   NumberOfEntries = 0;
   for (Link = mGcdMemorySpaceMap.ForwardLink; Link != &mGcdMemorySpaceMap; Link = Link->ForwardLink) {
     GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
-    if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistentMemory) || 
+    if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistent) || 
         (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
         ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
         ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME))) {
@@ -1783,7 +1783,7 @@ CoreGetMemoryMap (
       MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
     }
     
-    if (MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypePersistentMemory) {
+    if (MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypePersistent) {
       //
       // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR, 
       // it will be recorded as page PhysicalStart and NumberOfPages. 
