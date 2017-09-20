@@ -85,6 +85,8 @@ typedef struct {
   EFI_HII_HANDLE                   HiiHandle[2];
   DRIVER_SAMPLE_CONFIGURATION      Configuration;
   MY_EFI_VARSTORE_DATA             VarStoreConfig;
+  MY_EFI_BITS_VARSTORE_DATA        BitsVarStoreConfig;
+  MY_EFI_UNION_DATA                UnionConfig;
 
   //
   // Name/Value storage Name list

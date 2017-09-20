@@ -20,6 +20,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 CHAR16     VariableName[] = L"MyIfrNVData";
 CHAR16     MyEfiVar[] = L"MyEfiVar";
+CHAR16     MyEfiBitVar[] = L"MyEfiBitVar";
+CHAR16     MyEfiUnionVar[] = L"MyEfiUnionVar";
+
 EFI_HANDLE                      DriverHandle[2] = {NULL, NULL};
 DRIVER_SAMPLE_PRIVATE_DATA      *mPrivateData = NULL;
 EFI_EVENT                       mEvent;
@@ -664,6 +667,13 @@ ExtractConfig (
     if (HiiIsConfigHdrMatch(Request, &gDriverSampleFormSetGuid, MyEfiVar)) {
       return EFI_UNSUPPORTED;
     }
+    if (HiiIsConfigHdrMatch(Request, &gDriverSampleFormSetGuid, MyEfiBitVar)) {
+      return EFI_UNSUPPORTED;
+    }
+    if (HiiIsConfigHdrMatch(Request, &gDriverSampleFormSetGuid, MyEfiUnionVar)) {
+      return EFI_UNSUPPORTED;
+    }
+
     //
     // Set Request to the unified request string.
     //
@@ -883,6 +893,12 @@ RouteConfig (
   // through hii database, not support in this path.
   //
   if (HiiIsConfigHdrMatch(Configuration, &gDriverSampleFormSetGuid, MyEfiVar)) {
+    return EFI_UNSUPPORTED;
+  }
+  if (HiiIsConfigHdrMatch(Configuration, &gDriverSampleFormSetGuid, MyEfiBitVar)) {
+    return EFI_UNSUPPORTED;
+  }
+  if (HiiIsConfigHdrMatch(Configuration, &gDriverSampleFormSetGuid, MyEfiUnionVar)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1297,6 +1313,10 @@ DriverCallback (
         }
       break;
 
+      case 0x6666:
+        Value->u8 = 12;
+        break;
+
       default:
         Status = EFI_UNSUPPORTED;
       break;
@@ -1310,6 +1330,10 @@ DriverCallback (
       case 0x1240:
         Value->u8 = DEFAULT_CLASS_MANUFACTURING_VALUE;
       break;
+
+     case 0x6666:
+        Value->u8 = 13;
+        break;
 
       default:
         Status = EFI_UNSUPPORTED;      
@@ -1705,6 +1729,8 @@ DriverSampleInit (
   EFI_STRING                      ConfigRequestHdr;
   EFI_STRING                      NameRequestHdr;
   MY_EFI_VARSTORE_DATA            *VarStoreConfig;
+  MY_EFI_BITS_VARSTORE_DATA       *BitsVarStoreConfig;
+  MY_EFI_UNION_DATA               *UnionConfig;
   EFI_INPUT_KEY                   HotKey;
   EDKII_FORM_BROWSER_EXTENSION_PROTOCOL *FormBrowserEx;
 
@@ -1967,6 +1993,100 @@ DriverSampleInit (
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
                     sizeof (MY_EFI_VARSTORE_DATA),
                     VarStoreConfig
+                    );
+    if (EFI_ERROR (Status)) {
+      DriverSampleUnload (ImageHandle);
+      return Status;
+    }
+    //
+    // EFI variable for NV config doesn't exit, we should build this variable
+    // based on default values stored in IFR
+    //
+    ActionFlag = HiiSetToDefaults (ConfigRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
+    if (!ActionFlag) {
+      DriverSampleUnload (ImageHandle);
+      return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    //
+    // EFI variable does exist and Validate Current Setting
+    //
+    ActionFlag = HiiValidateSettings (ConfigRequestHdr);
+    if (!ActionFlag) {
+      DriverSampleUnload (ImageHandle);
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+  FreePool (ConfigRequestHdr);
+
+  //
+  // Initialize Bits efi varstore configuration data
+  //
+  BitsVarStoreConfig = &mPrivateData->BitsVarStoreConfig;
+  ZeroMem (BitsVarStoreConfig, sizeof (MY_EFI_BITS_VARSTORE_DATA));
+
+  ConfigRequestHdr = HiiConstructConfigHdr (&gDriverSampleFormSetGuid, MyEfiBitVar, DriverHandle[0]);
+  ASSERT (ConfigRequestHdr != NULL);
+
+  BufferSize = sizeof (MY_EFI_BITS_VARSTORE_DATA);
+  Status = gRT->GetVariable (MyEfiBitVar, &gDriverSampleFormSetGuid, NULL, &BufferSize, BitsVarStoreConfig);
+  if (EFI_ERROR (Status)) {
+    //
+    // Store zero data to EFI variable Storage.
+    //
+    Status = gRT->SetVariable(
+                    MyEfiBitVar,
+                    &gDriverSampleFormSetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (MY_EFI_BITS_VARSTORE_DATA),
+                    BitsVarStoreConfig
+                    );
+    if (EFI_ERROR (Status)) {
+      DriverSampleUnload (ImageHandle);
+      return Status;
+    }
+    //
+    // EFI variable for NV config doesn't exit, we should build this variable
+    // based on default values stored in IFR
+    //
+    ActionFlag = HiiSetToDefaults (ConfigRequestHdr, EFI_HII_DEFAULT_CLASS_STANDARD);
+    if (!ActionFlag) {
+      DriverSampleUnload (ImageHandle);
+      return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    //
+    // EFI variable does exist and Validate Current Setting
+    //
+    ActionFlag = HiiValidateSettings (ConfigRequestHdr);
+    if (!ActionFlag) {
+      DriverSampleUnload (ImageHandle);
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+  FreePool (ConfigRequestHdr);
+
+   //
+  // Initialize Union efi varstore configuration data
+  //
+  UnionConfig = &mPrivateData->UnionConfig;
+  ZeroMem (UnionConfig, sizeof (MY_EFI_UNION_DATA));
+
+  ConfigRequestHdr = HiiConstructConfigHdr (&gDriverSampleFormSetGuid, MyEfiUnionVar, DriverHandle[0]);
+  ASSERT (ConfigRequestHdr != NULL);
+
+  BufferSize = sizeof (MY_EFI_UNION_DATA);
+  Status = gRT->GetVariable (MyEfiUnionVar, &gDriverSampleFormSetGuid, NULL, &BufferSize, UnionConfig);
+  if (EFI_ERROR (Status)) {
+    //
+    // Store zero data to EFI variable Storage.
+    //
+    Status = gRT->SetVariable(
+                    MyEfiUnionVar,
+                    &gDriverSampleFormSetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (MY_EFI_UNION_DATA),
+                    UnionConfig
                     );
     if (EFI_ERROR (Status)) {
       DriverSampleUnload (ImageHandle);
