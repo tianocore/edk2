@@ -196,9 +196,12 @@ class FV (FvClassObject):
             FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
             # FvAlignmentValue is larger than or equal to 1K
             if FvAlignmentValue >= 0x400:
-                if FvAlignmentValue >= 0x10000:
-                    #The max alignment supported by FFS is 64K.
-                    self.FvAlignment = "64K"
+                if FvAlignmentValue >= 0x100000:
+                    #The max alignment supported by FFS is 16M.
+                    if FvAlignmentValue >= 0x1000000:
+                        self.FvAlignment = "16M"
+                    else:
+                        self.FvAlignment = str(FvAlignmentValue / 0x100000) + "M"
                 else:
                     self.FvAlignment = str (FvAlignmentValue / 0x400) + "K"
             else:

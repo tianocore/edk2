@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from INF statement
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2014-2016 Hewlett-Packard Development Company, L.P.<BR>
 #
 #  This program and the accompanying materials
@@ -731,8 +731,10 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     ImageObj = PeImageClass (File)
                     if ImageObj.SectionAlignment < 0x400:
                         self.Alignment = str (ImageObj.SectionAlignment)
-                    else:
+                    elif ImageObj.SectionAlignment < 0x100000:
                         self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
+                    else:
+                        self.Alignment = str (ImageObj.SectionAlignment / 0x100000) + 'M'
 
                 if not NoStrip:
                     FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')
@@ -770,8 +772,10 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 ImageObj = PeImageClass (GenSecInputFile)
                 if ImageObj.SectionAlignment < 0x400:
                     self.Alignment = str (ImageObj.SectionAlignment)
-                else:
+                elif ImageObj.SectionAlignment < 0x100000:
                     self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
+                else:
+                    self.Alignment = str (ImageObj.SectionAlignment / 0x100000) + 'M'
 
             if not NoStrip:
                 FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')
