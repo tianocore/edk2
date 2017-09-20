@@ -1,7 +1,7 @@
 /** @file
 This file contains the internal functions required to generate a Firmware Volume.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2016 HP Development Company, L.P.<BR>
 This program and the accompanying materials                          
@@ -464,57 +464,97 @@ Returns:
   case 0:
     //
     // 1 byte alignment
+    //if bit 1 have set, 128K byte alignmnet
     //
-    *Alignment = 0;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 17;
+    } else {
+      *Alignment = 0;
+    }
     break;
 
   case 1:
     //
     // 16 byte alignment
+    //if bit 1 have set, 256K byte alignment
     //
-    *Alignment = 4;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 18;
+    } else {
+      *Alignment = 4;
+    }
     break;
 
   case 2:
     //
     // 128 byte alignment
+    //if bit 1 have set, 512K byte alignment
     //
-    *Alignment = 7;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 19;
+    } else {
+      *Alignment = 7;
+    }
     break;
 
   case 3:
     //
     // 512 byte alignment
+    //if bit 1 have set, 1M byte alignment
     //
-    *Alignment = 9;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 20;
+    } else {
+      *Alignment = 9;
+    }
     break;
 
   case 4:
     //
     // 1K byte alignment
+    //if bit 1 have set, 2M byte alignment
     //
-    *Alignment = 10;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 21;
+    } else {
+      *Alignment = 10;
+    }
     break;
 
   case 5:
     //
     // 4K byte alignment
+    //if bit 1 have set, 4M byte alignment
     //
-    *Alignment = 12;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 22;
+    } else {
+      *Alignment = 12;
+    }
     break;
 
   case 6:
     //
     // 32K byte alignment
+    //if bit 1 have set , 8M byte alignment
     //
-    *Alignment = 15;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 23;
+    } else {
+      *Alignment = 15;
+    }
     break;
 
   case 7:
     //
     // 64K byte alignment
+    //if bit 1 have set, 16M alignment
     //
-    *Alignment = 16;
+    if (FfsFile->Attributes & FFS_ATTRIB_DATA_ALIGNMENT2) {
+      *Alignment = 24;
+    } else {
+      *Alignment = 16;
+    }
     break;
 
   default:
@@ -1060,7 +1100,7 @@ Returns:
   // Clear the alignment bits: these have become meaningless now that we have
   // adjusted the padding section.
   //
-  FfsFile->Attributes &= ~FFS_ATTRIB_DATA_ALIGNMENT;
+  FfsFile->Attributes &= ~(FFS_ATTRIB_DATA_ALIGNMENT | FFS_ATTRIB_DATA_ALIGNMENT2);
 
   //
   // Recalculate the FFS header checksum. Instead of setting Header and State

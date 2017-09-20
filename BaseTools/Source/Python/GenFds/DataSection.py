@@ -1,7 +1,7 @@
 ## @file
 # process data section generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -79,8 +79,10 @@ class DataSection (DataSectionClassObject):
             ImageObj = PeImageClass (Filename)
             if ImageObj.SectionAlignment < 0x400:
                 self.Alignment = str (ImageObj.SectionAlignment)
-            else:
+            elif ImageObj.SectionAlignment < 0x100000:
                 self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
+            else:
+                self.Alignment = str (ImageObj.SectionAlignment / 0x100000) + 'M'
 
         NoStrip = True
         if self.SecType in ('TE', 'PE32'):
