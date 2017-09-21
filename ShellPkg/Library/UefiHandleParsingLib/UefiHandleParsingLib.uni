@@ -348,7 +348,16 @@
 #string STR_PCIRB_DUMP_IO         #language en-US "      IO  : "
 #string STR_PCIRB_DUMP_TITLE      #language en-US "      Type  Flag  Base              Limit             Gran\r\n"
                                                   "      ====  ====  ================  ================  ====\r\n"
-
+#string STR_PCIIO_DUMP_MAIN       #language en-US "     Segment #.....: %02x\r\n"
+                                                  "     Bus #.........: %02x\r\n"
+                                                  "     Device #......: %02x\r\n"
+                                                  "     Function #....: %02x\r\n"
+                                                  "     ROM Size......: %lx\r\n"
+                                                  "     ROM Location..: %08x\r\n"
+                                                  "     Vendor ID.....: %04x\r\n"
+                                                  "     Device ID.....: %04x\r\n"
+                                                  "     Class Code....: %02x %02x %02x\r\n"
+                                                  "     Configuration Header :"
 
 
 #string STR_LI_DUMP_NAME          #language en-US "     Name..........: %%H%s%%N\r\n"

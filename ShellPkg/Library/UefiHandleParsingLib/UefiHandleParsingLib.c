@@ -16,6 +16,7 @@
 
 #include "UefiHandleParsingLib.h"
 #include "IndustryStandard/Acpi10.h"
+#include "IndustryStandard/Pci.h"
 #include <PiDxe.h>
 #include <Protocol/FirmwareVolume2.h>
 
@@ -1160,6 +1161,90 @@ DebugSupportProtocolDumpInformation (
 }
 
 /**
+  Function to dump information about PciIoProtocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has PciRootBridgeIo installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+PciIoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PCI_IO_PROTOCOL     *PciIo;
+  PCI_TYPE00              Pci;
+  UINTN                   Segment;
+  UINTN                   Bus;
+  UINTN                   Device;
+  UINTN                   Function;
+  UINTN                   Index;
+  CHAR16                  *GetString;
+  CHAR16                  *TempRetVal;
+  CHAR16                  *RetVal;
+
+  if (!Verbose) {
+    return (NULL);
+  }
+  RetVal = NULL;
+  GetString   = NULL;
+  TempRetVal  = NULL;
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID**)&PciIo,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR(Status)) {
+    return NULL;
+  }
+  PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0, sizeof (Pci), &Pci);
+  PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Function);
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIIO_DUMP_MAIN), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  RetVal = CatSPrint (
+            NULL,
+            GetString,
+            Segment,
+            Bus,
+            Device,
+            Function,
+            PciIo->RomSize,
+            PciIo->RomImage,
+            Pci.Hdr.VendorId,
+            Pci.Hdr.DeviceId,
+            Pci.Hdr.ClassCode[0],
+            Pci.Hdr.ClassCode[1],
+            Pci.Hdr.ClassCode[2]
+            );
+  for (Index = 0; Index < sizeof (Pci); Index ++) {
+    if ((Index % 0x10) == 0) {
+      TempRetVal = CatSPrint (RetVal, L"\r\n       %02x", *((UINT8 *) (&Pci) + Index));
+    } else {
+      TempRetVal = CatSPrint (RetVal, L"%02x", *((UINT8 *) (&Pci) + Index));
+    }
+    FreePool (RetVal);
+    RetVal = TempRetVal;
+    TempRetVal = NULL;
+  }
+
+  FreePool(GetString);
+  return RetVal;
+}
+
+/**
   Function to dump information about EfiAdapterInformation Protocol.
 
   @param[in] TheHandle      The handle that has the protocol installed.
@@ -1874,7 +1959,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_UC),                    &gEfiUnicodeCollationProtocolGuid,                NULL},
   {STRING_TOKEN(STR_UC2),                   &gEfiUnicodeCollation2ProtocolGuid,               NULL},
   {STRING_TOKEN(STR_PCIRB_IO),              &gEfiPciRootBridgeIoProtocolGuid,                 PciRootBridgeIoDumpInformation},
-  {STRING_TOKEN(STR_PCI_IO),                &gEfiPciIoProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_PCI_IO),                &gEfiPciIoProtocolGuid,                           PciIoProtocolDumpInformation},
   {STRING_TOKEN(STR_SCSI_PT),               &gEfiScsiPassThruProtocolGuid,                    NULL},
   {STRING_TOKEN(STR_SCSI_IO),               &gEfiScsiIoProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_SCSI_PT_EXT),           &gEfiExtScsiPassThruProtocolGuid,                 NULL},
