@@ -1095,6 +1095,71 @@ BlockIoProtocolDumpInformation (
 }
 
 /**
+  Function to dump information about DebugSupport Protocol.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+DebugSupportProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_DEBUG_SUPPORT_PROTOCOL  *DebugSupport;
+  CHAR16                      *GetString;
+  CHAR16                      *RetVal;
+
+  if (!Verbose) {
+    return NULL;
+  }
+  GetString = NULL;
+  RetVal = NULL;
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiDebugSupportProtocolGuid,
+                (VOID**)&DebugSupport,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_DEBUGSUPPORT_INFO), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  //
+  // Dump Debug support info
+  //
+  switch (DebugSupport->Isa) {
+  case (IsaIa32):
+    RetVal = CatSPrint (RetVal, GetString, L"IA-32");
+    break;
+  case (IsaIpf):
+    RetVal = CatSPrint (RetVal, GetString, L"IPF");
+    break;
+  case (IsaEbc):
+    RetVal = CatSPrint (RetVal, GetString, L"EBC");
+    break;
+  default:
+    SHELL_FREE_NON_NULL (GetString);
+    GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_DEBUGSUPPORT_UNKNOWN), NULL);
+    RetVal = GetString != NULL ? CatSPrint (RetVal, GetString, DebugSupport->Isa) : NULL;
+    break;
+  }
+
+  SHELL_FREE_NON_NULL (GetString);
+  return RetVal;
+}
+
+/**
   Function to dump information about EfiAdapterInformation Protocol.
 
   @param[in] TheHandle      The handle that has the protocol installed.
@@ -1817,7 +1882,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_USB_IO),                &gEfiUsbIoProtocolGuid,                           NULL},
   {STRING_TOKEN(STR_USB_HC),                &gEfiUsbHcProtocolGuid,                           NULL},
   {STRING_TOKEN(STR_USB_HC2),               &gEfiUsb2HcProtocolGuid,                          NULL},
-  {STRING_TOKEN(STR_DEBUG_SUPPORT),         &gEfiDebugSupportProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_DEBUG_SUPPORT),         &gEfiDebugSupportProtocolGuid,                    DebugSupportProtocolDumpInformation},
   {STRING_TOKEN(STR_DEBUG_PORT),            &gEfiDebugPortProtocolGuid,                       NULL},
   {STRING_TOKEN(STR_DECOMPRESS),            &gEfiDecompressProtocolGuid,                      NULL},
   {STRING_TOKEN(STR_ACPI_TABLE),            &gEfiAcpiTableProtocolGuid,                       NULL},

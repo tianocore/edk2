@@ -336,6 +336,8 @@
 #string STR_IDE_CONT_INIT         #language en-US "IdeControllerInit"
 #string STR_DISK_INFO             #language en-US "DiskInfo"
 #string STR_BLOCKIO_INFO          #language en-US "  %s%sMId:%%H%x%%N bsize %%H%x%%N, lblock %lx (%,ld), %s %s %s"
+#string STR_DEBUGSUPPORT_INFO     #language en-US "  Isa = %s"
+#string STR_DEBUGSUPPORT_UNKNOWN  #language en-US "  Unknown (%%H%s%%N)"
 
 #string STR_PCIRB_DUMP_PH         #language en-US "     ParentHandle..: %H%x%N\r\n"
 #string STR_PCIRB_DUMP_SEG        #language en-US "     Segment #.....: %H%x%N\r\n"
