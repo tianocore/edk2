@@ -48,8 +48,8 @@
   gIntelSiliconPkgTokenSpaceGuid.PcdIntelGraphicsVbtFileGuid|{ 0xa9, 0x2d, 0x75, 0x56, 0x6b, 0xde, 0x95, 0x48, 0x88, 0x19, 0x19, 0x45, 0xb6, 0xb7, 0x6c, 0x22 }|VOID*|0x00000001
 
   ## The mask is used to control VTd behavior.<BR><BR>
-  #  BIT0: Enable IOMMU during boot.
-  #  BIT1: Enable IOMMU on exit boot service.
+  #  BIT0: Enable IOMMU during boot (If DMAR table is installed in DXE. If VTD_INFO_PPI is installed in PEI.)
+  #  BIT1: Enable IOMMU when transfer control to OS (ExitBootService in normal boot. EndOfPEI in S3)
   # @Prompt The policy for VTd driver behavior.
   gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask|1|UINT8|0x00000002
 
