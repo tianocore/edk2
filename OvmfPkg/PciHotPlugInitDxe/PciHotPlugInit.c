@@ -15,6 +15,7 @@
 
 #include <IndustryStandard/Acpi10.h>
 
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -42,81 +43,59 @@ STATIC EFI_PCI_HOT_PLUG_INIT_PROTOCOL mPciHotPlugInit;
 // This structure is interpreted by the ApplyResourcePadding() function in the
 // edk2 PCI Bus UEFI_DRIVER.
 //
+// We can request padding for at most four resource types, each of which is
+// optional, independently of the others:
+// (a) bus numbers,
+// (b) IO space,
+// (c) non-prefetchable MMIO space (32-bit only),
+// (d) prefetchable MMIO space (either 32-bit or 64-bit, never both).
+//
 #pragma pack (1)
 typedef struct {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR MmioPadding;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR IoPadding;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR Padding[4];
   EFI_ACPI_END_TAG_DESCRIPTOR       EndDesc;
 } RESOURCE_PADDING;
 #pragma pack ()
 
-STATIC CONST RESOURCE_PADDING mPadding = {
-  //
-  // MmioPadding
-  //
-  {
-    ACPI_ADDRESS_SPACE_DESCRIPTOR,                 // Desc
-    (UINT16)(                                      // Len
-      sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
-      OFFSET_OF (
-        EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
-        ResType
-        )
-      ),
-    ACPI_ADDRESS_SPACE_TYPE_MEM, // ResType
-    0,                           // GenFlag:
-                                 //   ignored
-    0,                           // SpecificFlag:
-                                 //   non-prefetchable
-    32,                          // AddrSpaceGranularity:
-                                 //   reserve 32-bit aperture
-    0,                           // AddrRangeMin:
-                                 //   ignored
-    SIZE_2MB - 1,                // AddrRangeMax:
-                                 //   align at 2MB
-    0,                           // AddrTranslationOffset:
-                                 //   ignored
-    SIZE_2MB                     // AddrLen:
-                                 //   2MB padding
-  },
+
+/**
+  Initialize a RESOURCE_PADDING object.
+
+  @param[out] ResourcePadding  The caller-allocated RESOURCE_PADDING object to
+                               initialize.
+**/
+STATIC
+VOID
+InitializeResourcePadding (
+  OUT RESOURCE_PADDING *ResourcePadding
+  )
+{
+  UINTN Index;
+
+  ZeroMem (ResourcePadding, sizeof *ResourcePadding);
 
   //
-  // IoPadding
+  // Fill in the Padding fields that don't vary across resource types.
   //
-  {
-    ACPI_ADDRESS_SPACE_DESCRIPTOR,                 // Desc
-    (UINT16)(                                      // Len
-      sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
-      OFFSET_OF (
-        EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
-        ResType
-        )
-      ),
-    ACPI_ADDRESS_SPACE_TYPE_IO,// ResType
-    0,                          // GenFlag:
-                                //   ignored
-    0,                          // SpecificFlag:
-                                //   ignored
-    0,                          // AddrSpaceGranularity:
-                                //   ignored
-    0,                          // AddrRangeMin:
-                                //   ignored
-    512 - 1,                    // AddrRangeMax:
-                                //   align at 512 IO ports
-    0,                          // AddrTranslationOffset:
-                                //   ignored
-    512                         // AddrLen:
-                                //   512 IO ports
-  },
+  for (Index = 0; Index < ARRAY_SIZE (ResourcePadding->Padding); ++Index) {
+    EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
 
-  //
-  // EndDesc
-  //
-  {
-    ACPI_END_TAG_DESCRIPTOR, // Desc
-    0                        // Checksum: to be ignored
+    Descriptor       = ResourcePadding->Padding + Index;
+    Descriptor->Desc = ACPI_ADDRESS_SPACE_DESCRIPTOR;
+    Descriptor->Len  = (UINT16)(
+                         sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
+                         OFFSET_OF (
+                           EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
+                           ResType
+                           )
+                         );
   }
-};
+
+  //
+  // Fill in the End Tag.
+  //
+  ResourcePadding->EndDesc.Desc = ACPI_END_TAG_DESCRIPTOR;
+}
 
 
 /**
@@ -275,6 +254,11 @@ GetResourcePadding (
   OUT EFI_HPC_PADDING_ATTRIBUTES     *Attributes
   )
 {
+  BOOLEAN                                         DefaultIo;
+  BOOLEAN                                         DefaultMmio;
+  RESOURCE_PADDING                                ReservationRequest;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR               *FirstResource;
+
   DEBUG_CODE (
     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS *Address;
     CHAR16                                      *DevicePathString;
@@ -295,7 +279,56 @@ GetResourcePadding (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Padding = AllocateCopyPool (sizeof mPadding, &mPadding);
+  DefaultIo = TRUE;
+  DefaultMmio = TRUE;
+
+  //
+  // Init ReservationRequest, and point FirstResource one past the last
+  // descriptor entry. We're going to build the entries backwards from
+  // ReservationRequest.EndDesc.
+  //
+  InitializeResourcePadding (&ReservationRequest);
+  FirstResource = ReservationRequest.Padding +
+                  ARRAY_SIZE (ReservationRequest.Padding);
+
+  //
+  // (b) Reserve IO space.
+  //
+  if (DefaultIo) {
+    //
+    // Request defaults.
+    //
+    --FirstResource;
+    FirstResource->ResType      = ACPI_ADDRESS_SPACE_TYPE_IO;
+    FirstResource->AddrRangeMax = 512 - 1; // align at 512 IO ports
+    FirstResource->AddrLen      = 512;     // 512 IO ports
+  }
+
+  //
+  // (c) Reserve non-prefetchable MMIO space (32-bit only).
+  //
+  if (DefaultMmio) {
+    //
+    // Request defaults.
+    //
+    --FirstResource;
+    FirstResource->ResType              = ACPI_ADDRESS_SPACE_TYPE_MEM;
+    FirstResource->SpecificFlag         = 0;            // non-prefetchable
+    FirstResource->AddrSpaceGranularity = 32;           // 32-bit aperture
+    FirstResource->AddrRangeMax         = SIZE_2MB - 1; // align at 2MB
+    FirstResource->AddrLen              = SIZE_2MB;     // 2MB padding
+  }
+
+  //
+  // Output a copy of ReservationRequest from the lowest-address populated
+  // entry until the end of the structure (including
+  // ReservationRequest.EndDesc). If no reservations are necessary, we'll only
+  // output the End Tag.
+  //
+  *Padding = AllocateCopyPool (
+               (UINT8 *)(&ReservationRequest + 1) - (UINT8 *)FirstResource,
+               FirstResource
+               );
   if (*Padding == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
