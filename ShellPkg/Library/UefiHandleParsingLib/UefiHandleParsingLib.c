@@ -1017,6 +1017,84 @@ BusSpecificDriverOverrideProtocolDumpInformation (
 }
 
 /**
+  Function to dump information about BlockIo protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+BlockIoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS            Status;
+  EFI_BLOCK_IO_PROTOCOL *BlockIo;
+  EFI_BLOCK_IO_MEDIA    *BlockMedia;
+  CHAR16                *GetString;
+  CHAR16                *RetVal;
+
+  if (!Verbose) {
+    return NULL;
+  }
+  GetString   = NULL;
+  RetVal = NULL;
+
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiBlockIoProtocolGuid,
+                (VOID**)&BlockIo,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  BlockMedia = BlockIo->Media;
+  //
+  // Per spec:
+  //   The function (ReadBlocks) must return EFI_NO_MEDIA or
+  //   EFI_MEDIA_CHANGED even if LBA, BufferSize, or Buffer are invalid so the caller can probe
+  //   for changes in media state.
+  //
+  BlockIo->ReadBlocks (
+             BlockIo,
+             BlockIo->Media->MediaId,
+             0,
+             0,
+             NULL
+             );
+
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_BLOCKIO_INFO), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  RetVal = CatSPrint (
+            RetVal,
+            GetString,
+            BlockMedia->RemovableMedia ? L"Removable " : L"Fixed ",
+            BlockMedia->MediaPresent ? L"" : L"not-present ",
+            BlockMedia->MediaId,
+            BlockMedia->BlockSize,
+            BlockMedia->LastBlock,
+            MultU64x32 (BlockMedia->LastBlock + 1, BlockMedia->BlockSize),
+            BlockMedia->LogicalPartition ? L"partition" : L"raw",
+            BlockMedia->ReadOnly ? L"ro" : L"rw",
+            BlockMedia->WriteCaching ? L"cached" : L"!cached"
+            );
+
+  SHELL_FREE_NON_NULL (GetString);
+  return RetVal;
+}
+
+/**
   Function to dump information about EfiAdapterInformation Protocol.
 
   @param[in] TheHandle      The handle that has the protocol installed.
@@ -1727,7 +1805,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_SIMPLE_FILE_SYS),       &gEfiSimpleFileSystemProtocolGuid,                NULL},
   {STRING_TOKEN(STR_TAPE_IO),               &gEfiTapeIoProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_DISK_IO),               &gEfiDiskIoProtocolGuid,                          NULL},
-  {STRING_TOKEN(STR_BLK_IO),                &gEfiBlockIoProtocolGuid,                         NULL},
+  {STRING_TOKEN(STR_BLK_IO),                &gEfiBlockIoProtocolGuid,                         BlockIoProtocolDumpInformation},
   {STRING_TOKEN(STR_UC),                    &gEfiUnicodeCollationProtocolGuid,                NULL},
   {STRING_TOKEN(STR_UC2),                   &gEfiUnicodeCollation2ProtocolGuid,               NULL},
   {STRING_TOKEN(STR_PCIRB_IO),              &gEfiPciRootBridgeIoProtocolGuid,                 PciRootBridgeIoDumpInformation},
