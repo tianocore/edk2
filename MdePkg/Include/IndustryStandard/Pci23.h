@@ -92,6 +92,7 @@
 /// PCI Capability List IDs and records.
 ///
 #define EFI_PCI_CAPABILITY_ID_PCIX    0x07
+#define EFI_PCI_CAPABILITY_ID_VENDOR  0x09
 
 #pragma pack(1)
 ///
@@ -115,6 +116,15 @@ typedef struct {
   UINT32                  SplitTransCtrlRegUp;
   UINT32                  SplitTransCtrlRegDn;
 } EFI_PCI_CAPABILITY_PCIX_BRDG;
+
+///
+/// Vendor Specific Capability Header
+/// Table H-1: Capability IDs, PCI Local Bus Specification, 2.3
+///
+typedef struct {
+  EFI_PCI_CAPABILITY_HDR  Hdr;
+  UINT8                   Length;
+} EFI_PCI_CAPABILITY_VENDOR_HDR;
 
 #pragma pack()
 
