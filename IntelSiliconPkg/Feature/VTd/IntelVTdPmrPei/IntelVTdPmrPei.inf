@@ -46,12 +46,14 @@
 [Ppis]
   gEdkiiIoMmuPpiGuid            ## PRODUCES
   gEdkiiVTdInfoPpiGuid          ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid     ## CONSUMES
 
 [Pcd]
   gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask   ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND
+  gEfiPeiMasterBootModePpiGuid AND
   gEdkiiVTdInfoPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]

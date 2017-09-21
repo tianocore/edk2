@@ -24,16 +24,18 @@
 #include <IndustryStandard/Vtd.h>
 #include <Ppi/IoMmu.h>
 #include <Ppi/VtdInfo.h>
+#include <Ppi/EndOfPeiPhase.h>
 
 #include "IntelVTdPmrPei.h"
 
 #define  TOTAL_DMA_BUFFER_SIZE    SIZE_4MB
+#define  TOTAL_DMA_BUFFER_SIZE_S3 SIZE_1MB
 
 EFI_ACPI_DMAR_HEADER              *mAcpiDmarTable;
 VTD_INFO                          *mVTdInfo;
 UINT64                            mEngineMask;
 UINTN                             mDmaBufferBase;
-UINTN                             mDmaBufferSize = TOTAL_DMA_BUFFER_SIZE;
+UINTN                             mDmaBufferSize;
 UINTN                             mDmaBufferCurrentTop;
 UINTN                             mDmaBufferCurrentBottom;
 
@@ -544,6 +546,7 @@ InitDmaProtection (
   }
   ASSERT (DmaBufferSize == ALIGN_VALUE(DmaBufferSize, MemoryAlignment));
   *DmaBufferBase = (UINTN)AllocateAlignedPages (EFI_SIZE_TO_PAGES(DmaBufferSize), MemoryAlignment);
+  ASSERT (*DmaBufferBase != 0);
   if (*DmaBufferBase == 0) {
     DEBUG ((DEBUG_INFO, " InitDmaProtection : OutOfResource\n"));
     return EFI_OUT_OF_RESOURCES;
@@ -1105,6 +1108,41 @@ ParseDmarAcpiTableRmrr (
 }
 
 /**
+  This function handles S3 resume task at the end of PEI
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+S3EndOfPeiNotify(
+  IN EFI_PEI_SERVICES          **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR *NotifyDesc,
+  IN VOID                      *Ppi
+  )
+{
+  UINT64                      EngineMask;
+
+  DEBUG((DEBUG_INFO, "VTdPmr S3EndOfPeiNotify\n"));
+
+  if ((PcdGet8(PcdVTdPolicyPropertyMask) & BIT1) == 0) {
+    EngineMask = LShiftU64 (1, mVTdInfo->VTdEngineCount) - 1;
+    DisableDmaProtection (EngineMask);
+  }
+  return EFI_SUCCESS;
+}
+
+EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiEndOfPeiSignalPpiGuid,
+  S3EndOfPeiNotify
+};
+
+/**
   Initializes the Intel VTd PMR PEIM.
 
   @param  FileHandle  Handle of the file being invoked.
@@ -1122,10 +1160,13 @@ IntelVTdPmrInitialize (
   )
 {
   EFI_STATUS                  Status;
+  EFI_BOOT_MODE               BootMode;
 
   if ((PcdGet8(PcdVTdPolicyPropertyMask) & BIT0) == 0) {
     return EFI_UNSUPPORTED;
   }
+
+  PeiServicesGetBootMode (&BootMode);
 
   Status = PeiServicesLocatePpi (
              &gEdkiiVTdInfoPpiGuid,
@@ -1150,6 +1191,13 @@ IntelVTdPmrInitialize (
   //
   ParseDmarAcpiTableRmrr ();
 
+  if (BootMode == BOOT_ON_S3_RESUME) {
+    mDmaBufferSize = TOTAL_DMA_BUFFER_SIZE_S3;
+  } else {
+    mDmaBufferSize = TOTAL_DMA_BUFFER_SIZE;
+  }
+  DEBUG ((DEBUG_INFO, " DmaBufferSize : 0x%x\n", mDmaBufferSize));
+
   //
   // Find a pre-memory in resource hob as DMA buffer
   // Mark PEI memory to be DMA protected.
@@ -1160,7 +1208,6 @@ IntelVTdPmrInitialize (
   }
 
   DEBUG ((DEBUG_INFO, " DmaBufferBase : 0x%x\n", mDmaBufferBase));
-  DEBUG ((DEBUG_INFO, " DmaBufferSize : 0x%x\n", mDmaBufferSize));
 
   mDmaBufferCurrentTop = mDmaBufferBase + mDmaBufferSize;
   mDmaBufferCurrentBottom = mDmaBufferBase;
@@ -1170,6 +1217,14 @@ IntelVTdPmrInitialize (
   //
   Status = PeiServicesInstallPpi (&mIoMmuPpiList);
   ASSERT_EFI_ERROR(Status);
+
+  //
+  // Register EndOfPei Notify for S3 to run FSP NotifyPhase
+  //
+  if (BootMode == BOOT_ON_S3_RESUME) {
+    Status = PeiServicesNotifyPpi (&mS3EndOfPeiNotifyDesc);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return Status;
 }
