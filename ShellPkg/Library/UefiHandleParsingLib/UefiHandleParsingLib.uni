@@ -179,8 +179,8 @@
 #string STR_HII                   #language en-US "HII"
 #string STR_HII_FORM_CALLBACK     #language en-US "HIICallback"
 
-#string STR_TXT_OUT_DUMP_HEADER   #language en-US "  Address: %%H%X%%N Attrib %02x\r\n"
-#string STR_TXT_OUT_DUMP_LINE     #language en-US "  %c  mode %d: Col %d Row %d\r\n"
+#string STR_TXT_OUT_DUMP_HEADER   #language en-US "  Address: %%H%X%%N Attrib %02x"
+#string STR_TXT_OUT_DUMP_LINE     #language en-US "\r\n  %c  mode %d: Col %d Row %d"
 
 #string STR_DRIVER_FAM_OVERRIDE   #language en-US "DriverFamilyOverride"
 #string STR_PCD                   #language en-US "Pcd"
