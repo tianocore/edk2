@@ -47,7 +47,7 @@
   gEdkiiVTdInfoPpiGuid         ## PRODUCES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid
+  gEfiPeiMasterBootModePpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PlatformVTdInfoSamplePeiExtra.uni
