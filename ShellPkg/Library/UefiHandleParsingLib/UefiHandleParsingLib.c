@@ -232,13 +232,10 @@ LoadedImageProtocolDumpInformation(
   CHAR16                            *RetVal;
   CHAR16                            *Temp;
   CHAR16                            *FileName;
+  CHAR8                             *PdbFileName;
   CHAR16                            *FilePath;
   CHAR16                            *CodeType;
   CHAR16                            *DataType;
-
-  if (!Verbose) {
-    return (CatSPrint(NULL, L"LoadedImage"));
-  }
 
   Status = gBS->OpenProtocol (
                 TheHandle,
@@ -253,10 +250,20 @@ LoadedImageProtocolDumpInformation(
     return NULL;
   }
 
-  HandleParsingHiiInit();
-
   FileName = FindLoadedImageFileName(LoadedImage);
+  FilePath = ConvertDevicePathToText(LoadedImage->FilePath, TRUE, TRUE);
+  if (!Verbose) {
+    if (FileName == NULL) {
+      FileName = FilePath;
+    } else {
+      SHELL_FREE_NON_NULL(FilePath);
+    }
+    RetVal = CatSPrint(NULL, FileName);
+    SHELL_FREE_NON_NULL(FileName);
+    return RetVal;
+  }
 
+  HandleParsingHiiInit();
   RetVal = NULL;
   if (FileName != NULL) {
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_LI_DUMP_NAME), NULL);
@@ -273,9 +280,7 @@ LoadedImageProtocolDumpInformation(
   if (Temp == NULL) {
     return NULL;
   }
-
-  FilePath = ConvertDevicePathToText(LoadedImage->FilePath, TRUE, TRUE);
-
+  PdbFileName = PeCoffLoaderGetPdbPointer (LoadedImage->ImageBase);
   DataType = ConvertMemoryType(LoadedImage->ImageDataType);
   CodeType = ConvertMemoryType(LoadedImage->ImageCodeType);
 
@@ -287,6 +292,7 @@ LoadedImageProtocolDumpInformation(
              LoadedImage->SystemTable,
              LoadedImage->DeviceHandle,
              FilePath,
+             PdbFileName,
              LoadedImage->LoadOptionsSize,
              LoadedImage->LoadOptions,
              LoadedImage->ImageBase,
