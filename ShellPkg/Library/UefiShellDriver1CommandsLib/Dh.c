@@ -286,6 +286,8 @@ GetProtocolInfoString(
   UINTN                     Size;
   CHAR16                    *Temp;
   CHAR16                    GuidStr[40];
+  VOID                      *instance;
+  CHAR16                    InstanceStr[17];
 
   ProtocolGuidArray = NULL;
   RetVal            = NULL;
@@ -312,6 +314,17 @@ GetProtocolInfoString(
         FreePool(Temp);
       }
       StrnCatGrow(&RetVal, &Size, L"%N", 0);
+
+      if(Verbose) {
+        Status = gBS->HandleProtocol (TheHandle, ProtocolGuidArray[ProtocolIndex], &instance);
+        if (!EFI_ERROR (Status)) {
+          StrnCatGrow (&RetVal, &Size, L"(%H", 0);
+          UnicodeSPrint (InstanceStr, sizeof (InstanceStr), L"%x", instance);
+          StrnCatGrow (&RetVal, &Size, InstanceStr, 0);
+          StrnCatGrow (&RetVal, &Size, L"%N)", 0);
+        }
+      }
+
       if (ExtraInfo) {
         Temp = GetProtocolInformationDump(TheHandle, ProtocolGuidArray[ProtocolIndex], Verbose);
         if (Temp != NULL) {
