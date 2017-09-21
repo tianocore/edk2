@@ -29,6 +29,7 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
   DevicePathLib

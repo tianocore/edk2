@@ -15,6 +15,7 @@
 
 #include <IndustryStandard/Acpi10.h>
 
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
@@ -95,6 +96,153 @@ InitializeResourcePadding (
   // Fill in the End Tag.
   //
   ResourcePadding->EndDesc.Desc = ACPI_END_TAG_DESCRIPTOR;
+}
+
+
+/**
+  Set up a descriptor entry for reserving IO space.
+
+  @param[in,out] Descriptor  The descriptor to configure. The caller shall have
+                             initialized Descriptor earlier, with
+                             InitializeResourcePadding().
+
+  @param[in] SizeExponent    The size and natural alignment of the reservation
+                             are determined by raising two to this power.
+**/
+STATIC
+VOID
+SetIoPadding (
+  IN OUT EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor,
+  IN     UINTN                             SizeExponent
+  )
+{
+  Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
+  Descriptor->AddrLen = LShiftU64 (1, SizeExponent);
+  Descriptor->AddrRangeMax = Descriptor->AddrLen - 1;
+}
+
+
+/**
+  Set up a descriptor entry for reserving MMIO space.
+
+  @param[in,out] Descriptor    The descriptor to configure. The caller shall
+                               have initialized Descriptor earlier, with
+                               InitializeResourcePadding().
+
+  @param[in] Prefetchable      TRUE if the descriptor should reserve
+                               prefetchable MMIO space. Pass FALSE for
+                               reserving non-prefetchable MMIO space.
+
+  @param[in] ThirtyTwoBitOnly  TRUE if the reservation should be limited to
+                               32-bit address space. FALSE if the reservation
+                               can be satisfied from 64-bit address space.
+                               ThirtyTwoBitOnly is ignored if Prefetchable is
+                               FALSE; in that case ThirtyTwoBitOnly is always
+                               considered TRUE.
+
+  @param[in] SizeExponent      The size and natural alignment of the
+                               reservation are determined by raising two to
+                               this power.
+**/
+STATIC
+VOID
+SetMmioPadding (
+  IN OUT EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor,
+  IN     BOOLEAN                           Prefetchable,
+  IN     BOOLEAN                           ThirtyTwoBitOnly,
+  IN     UINTN                             SizeExponent
+  )
+{
+  Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+  if (Prefetchable) {
+    Descriptor->SpecificFlag =
+      EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
+    Descriptor->AddrSpaceGranularity = ThirtyTwoBitOnly ? 32 : 64;
+  } else {
+    Descriptor->SpecificFlag =
+      EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_NON_CACHEABLE;
+    Descriptor->AddrSpaceGranularity = 32;
+  }
+  Descriptor->AddrLen = LShiftU64 (1, SizeExponent);
+  Descriptor->AddrRangeMax = Descriptor->AddrLen - 1;
+}
+
+
+/**
+  Round up a positive 32-bit value to the next whole power of two, and return
+  the bit position of the highest bit set in the result. Equivalent to
+  ceil(log2(x)).
+
+  @param[in] Operand  The 32-bit operand to evaluate.
+
+  @retval -1     Operand is zero.
+
+  @retval -1     Operand is positive, not a whole power of two, and rounding it
+                 up to the next power of two does not fit into 32 bits.
+
+  @retval 0..31  Otherwise, return ceil(log2(Value)).
+**/
+STATIC
+INTN
+HighBitSetRoundUp32 (
+  IN UINT32 Operand
+  )
+{
+  INTN HighBit;
+
+  HighBit = HighBitSet32 (Operand);
+  if (HighBit == -1) {
+    //
+    // Operand is zero.
+    //
+    return HighBit;
+  }
+  if ((Operand & (Operand - 1)) != 0) {
+    //
+    // Operand is not a whole power of two.
+    //
+    ++HighBit;
+  }
+  return (HighBit < 32) ? HighBit : -1;
+}
+
+
+/**
+  Round up a positive 64-bit value to the next whole power of two, and return
+  the bit position of the highest bit set in the result. Equivalent to
+  ceil(log2(x)).
+
+  @param[in] Operand  The 64-bit operand to evaluate.
+
+  @retval -1     Operand is zero.
+
+  @retval -1     Operand is positive, not a whole power of two, and rounding it
+                 up to the next power of two does not fit into 64 bits.
+
+  @retval 0..63  Otherwise, return ceil(log2(Value)).
+**/
+STATIC
+INTN
+HighBitSetRoundUp64 (
+  IN UINT64 Operand
+  )
+{
+  INTN HighBit;
+
+  HighBit = HighBitSet64 (Operand);
+  if (HighBit == -1) {
+    //
+    // Operand is zero.
+    //
+    return HighBit;
+  }
+  if ((Operand & (Operand - 1)) != 0) {
+    //
+    // Operand is not a whole power of two.
+    //
+    ++HighBit;
+  }
+  return (HighBit < 64) ? HighBit : -1;
 }
 
 
@@ -298,10 +446,7 @@ GetResourcePadding (
     //
     // Request defaults.
     //
-    --FirstResource;
-    FirstResource->ResType      = ACPI_ADDRESS_SPACE_TYPE_IO;
-    FirstResource->AddrRangeMax = 512 - 1; // align at 512 IO ports
-    FirstResource->AddrLen      = 512;     // 512 IO ports
+    SetIoPadding (--FirstResource, (UINTN)HighBitSetRoundUp64 (512));
   }
 
   //
@@ -311,12 +456,12 @@ GetResourcePadding (
     //
     // Request defaults.
     //
-    --FirstResource;
-    FirstResource->ResType              = ACPI_ADDRESS_SPACE_TYPE_MEM;
-    FirstResource->SpecificFlag         = 0;            // non-prefetchable
-    FirstResource->AddrSpaceGranularity = 32;           // 32-bit aperture
-    FirstResource->AddrRangeMax         = SIZE_2MB - 1; // align at 2MB
-    FirstResource->AddrLen              = SIZE_2MB;     // 2MB padding
+    SetMmioPadding (
+      --FirstResource,
+      FALSE,
+      TRUE,
+      (UINTN)HighBitSetRoundUp32 (SIZE_2MB)
+      );
   }
 
   //
