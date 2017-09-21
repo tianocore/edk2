@@ -68,8 +68,8 @@ STATIC CONST RESOURCE_PADDING mPadding = {
                                  //   ignored
     0,                           // SpecificFlag:
                                  //   non-prefetchable
-    64,                          // AddrSpaceGranularity:
-                                 //   reserve 64-bit aperture
+    32,                          // AddrSpaceGranularity:
+                                 //   reserve 32-bit aperture
     0,                           // AddrRangeMin:
                                  //   ignored
     SIZE_2MB - 1,                // AddrRangeMax:
