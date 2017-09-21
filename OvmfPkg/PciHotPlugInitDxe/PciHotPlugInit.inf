@@ -36,7 +36,7 @@
   UefiDriverEntryPoint
 
 [Protocols]
-  gEfiPciHotPlugInitProtocolGuid ## SOMETIMES_PRODUCES
+  gEfiPciHotPlugInitProtocolGuid ## ALWAYS_PRODUCES
 
 [Depex]
   TRUE
