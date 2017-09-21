@@ -121,6 +121,7 @@
 #string STR_DH_OUTPUT_DRIVER5B    #language en-US "     Parent[%H%02x%N]       : %H%s%N\r\n"
 #string STR_DH_OUTPUT_DRIVER6     #language en-US "   Child Controllers  : %H%s%N\r\n"
 #string STR_DH_OUTPUT_DRIVER6B    #language en-US "     Child[%H%02x%N]        : %H%s%N\r\n"
+#string STR_DH_OUTPUT_DRIVER6C    #language en-US "       Child[%H%02x%N]      : %H%s%N\r\n"
 #string STR_DH_OUTPUT_DRIVER7     #language en-US "   Driver Name [%H%02x%N]   : %H%s%N\r\n"
 #string STR_DH_OUTPUT_DRIVER7B    #language en-US "   Driver Image Name  : %H%s%N\r\n"
 #string STR_DH_OUTPUT_DRIVER8     #language en-US "   Driver Version     : %H%08x%N\r\n"

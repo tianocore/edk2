@@ -705,7 +705,7 @@ DisplayDriverModelHandle (
         -1, 
         -1, 
         NULL, 
-        STRING_TOKEN (STR_DH_OUTPUT_DRIVER6), 
+        STRING_TOKEN (STR_DH_OUTPUT_DRIVER9),
         gShellDriver1HiiHandle, 
         L"None"
         );
@@ -714,7 +714,7 @@ DisplayDriverModelHandle (
       -1, 
       -1, 
       NULL, 
-      STRING_TOKEN (STR_DH_OUTPUT_DRIVER6), 
+      STRING_TOKEN (STR_DH_OUTPUT_DRIVER9),
       gShellDriver1HiiHandle, 
       L""
       );
@@ -746,7 +746,7 @@ DisplayDriverModelHandle (
             -1, 
             -1, 
             NULL, 
-            STRING_TOKEN (STR_DH_OUTPUT_DRIVER6B),
+            STRING_TOKEN (STR_DH_OUTPUT_DRIVER6C),
             gShellDriver1HiiHandle,
             ConvertHandleToHandleIndex(ChildControllerHandleBuffer[ChildIndex]),
             TempStringPointer!=NULL?TempStringPointer:L"<Unknown>"
