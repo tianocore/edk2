@@ -384,7 +384,7 @@
 #string STR_GOP_RES_LIST_ENTRY    #language en-US "       Resolution[%%H%d%%N]:\r\n"
                                                   "         Res Hor.........: %%H0x%08x%%N\r\n"
                                                   "         Res Ver.........: %%H0x%08x%%N\r\n"
-
+#string STR_BSDO_DUMP_MAIN        #language en-US "     Drv[%02x] File:%%H%s%%N"
 #string STR_EDID_DISCOVERED_MAIN  #language en-US "     EDID Discovered Size : %%H0x%08x%%N\r\n"
 #string STR_EDID_DISCOVERED_DATA  #language en-US "     EDID Discovered Data :\r\n"
 #string STR_EDID_ACTIVE_MAIN      #language en-US "     EDID Active Size : %%H0x%08x%%N\r\n"

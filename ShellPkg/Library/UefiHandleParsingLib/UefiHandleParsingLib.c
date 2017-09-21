@@ -938,6 +938,85 @@ LoadedImageDevicePathProtocolDumpInformation(
 }
 
 /**
+  Function to dump information about BusSpecificDriverOverride protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+BusSpecificDriverOverrideProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                                Status;
+  CHAR16                                    *GetString;
+  CHAR16                                    *RetVal;
+  CHAR16                                    *TempRetVal;
+  EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL *BusSpecificDriverOverride;
+  EFI_LOADED_IMAGE_PROTOCOL                 *LoadedImage;
+  EFI_HANDLE                                ImageHandle;
+  UINTN                                     Size;
+
+  if (!Verbose) {
+    return NULL;
+  }
+  Size        = 0;
+  GetString   = NULL;
+  RetVal      = NULL;
+  TempRetVal  = NULL;
+  ImageHandle = 0;
+
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiBusSpecificDriverOverrideProtocolGuid,
+                  (VOID**)&BusSpecificDriverOverride,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_BSDO_DUMP_MAIN), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  do {
+    Status = BusSpecificDriverOverride->GetDriver (
+                                          BusSpecificDriverOverride,
+                                          &ImageHandle
+                                          );
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (
+                      ImageHandle,
+                      &gEfiLoadedImageProtocolGuid,
+                      (VOID **) &LoadedImage
+                      );
+      if(!EFI_ERROR (Status)) {
+        TempRetVal = CatSPrint (
+                       TempRetVal,
+                       GetString,
+                       ConvertHandleToHandleIndex (ImageHandle),
+                       ConvertDevicePathToText (LoadedImage->FilePath, TRUE, TRUE)
+                       );
+        StrnCatGrow (&RetVal, &Size, TempRetVal, 0);
+        SHELL_FREE_NON_NULL (TempRetVal);
+      }
+    }
+  } while (!EFI_ERROR (Status));
+
+  SHELL_FREE_NON_NULL (GetString);
+  return RetVal;
+}
+
+/**
   Function to dump information about EfiAdapterInformation Protocol.
 
   @param[in] TheHandle      The handle that has the protocol installed.
@@ -1623,7 +1702,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_DEVICE_PATH_VTUTF8),    &gEfiVTUTF8Guid,                                  NULL},
   {STRING_TOKEN(STR_DRIVER_BINDING),        &gEfiDriverBindingProtocolGuid,                   NULL},
   {STRING_TOKEN(STR_PLATFORM_OVERRIDE),     &gEfiPlatformDriverOverrideProtocolGuid,          NULL},
-  {STRING_TOKEN(STR_BUS_OVERRIDE),          &gEfiBusSpecificDriverOverrideProtocolGuid,       NULL},
+  {STRING_TOKEN(STR_BUS_OVERRIDE),          &gEfiBusSpecificDriverOverrideProtocolGuid,       BusSpecificDriverOverrideProtocolDumpInformation},
   {STRING_TOKEN(STR_DRIVER_DIAG),           &gEfiDriverDiagnosticsProtocolGuid,               NULL},
   {STRING_TOKEN(STR_DRIVER_DIAG2),          &gEfiDriverDiagnostics2ProtocolGuid,              NULL},
   {STRING_TOKEN(STR_DRIVER_CN),             &gEfiComponentNameProtocolGuid,                   NULL},
