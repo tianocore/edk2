@@ -106,6 +106,7 @@
 #string STR_DH_OUTPUT_ALL_HEADER  #language en-US "Handle dump\r\n"
 #string STR_DH_OUTPUT_GUID_HEADER #language en-US "Handle dump by protocol '%g'\r\n"
 #string STR_DH_OUTPUT_NAME_HEADER #language en-US "Handle dump by protocol '%s'\r\n"
+#string STR_DH_OUTPUT_SINGLE_D    #language en-US "%H%02x%N: %s\r\n"
 #string STR_DH_OUTPUT_SINGLE      #language en-US "%H%02x%N: %x\r\n%s"
 #string STR_DH_OUTPUT_SFO         #language en-US "%s, %s, %s, %H%02x%N, %s, %s\r\n"
 #string STR_DH_OUTPUT_DRIVER1     #language en-US "   Controller Name    : %B%s%N\r\n"

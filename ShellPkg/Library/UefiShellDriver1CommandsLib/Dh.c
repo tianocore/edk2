@@ -319,7 +319,7 @@ GetProtocolInfoString(
           if (!Verbose) {
             StrnCatGrow(&RetVal, &Size, L"(", 0);
             StrnCatGrow(&RetVal, &Size, Temp, 0);
-            StrnCatGrow(&RetVal, &Size, L")\r\n", 0);
+            StrnCatGrow(&RetVal, &Size, L")", 0);
           } else {
             StrnCatGrow(&RetVal, &Size, Separator, 0);
             StrnCatGrow(&RetVal, &Size, Temp, 0);
@@ -802,17 +802,29 @@ DoDhByHandle(
         ProtocolInfoString==NULL?L"":ProtocolInfoString
       );
     } else {
-      ProtocolInfoString = GetProtocolInfoString(TheHandle, Language, L"\r\n", Verbose, TRUE);
-      ShellPrintHiiEx(
-        -1,
-        -1,
-        NULL,
-        STRING_TOKEN (STR_DH_OUTPUT_SINGLE),
-        gShellDriver1HiiHandle,
-        ConvertHandleToHandleIndex(TheHandle),
-        TheHandle,
-        ProtocolInfoString==NULL?L"":ProtocolInfoString
-      );
+      ProtocolInfoString = GetProtocolInfoString(TheHandle, Language, Verbose ? L"\r\n" : L" ", Verbose, TRUE);
+      if (Verbose) {
+        ShellPrintHiiEx(
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_DH_OUTPUT_SINGLE),
+          gShellDriver1HiiHandle,
+          ConvertHandleToHandleIndex(TheHandle),
+          TheHandle,
+          ProtocolInfoString==NULL?L"":ProtocolInfoString
+        );
+      } else {
+        ShellPrintHiiEx(
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_DH_OUTPUT_SINGLE_D),
+          gShellDriver1HiiHandle,
+          ConvertHandleToHandleIndex(TheHandle),
+          ProtocolInfoString==NULL?L"":ProtocolInfoString
+        );
+      }
     }
 
     if (DriverInfo) {
