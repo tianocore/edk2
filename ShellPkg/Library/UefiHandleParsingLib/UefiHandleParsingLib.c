@@ -848,6 +848,50 @@ ConvertDevicePathToShortText(
 }
 
 /**
+  Function to dump protocol information.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+  @param[in] Protocol       The protocol is needed to dump.
+
+  @retval A pointer to a string containing the information.
+**/
+STATIC CHAR16*
+EFIAPI
+DevicePathProtocolDumpInformationEx (
+  IN CONST EFI_HANDLE   TheHandle,
+  IN CONST BOOLEAN      Verbose,
+  IN       EFI_GUID     *Protocol
+)
+{
+  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
+  CHAR16                            *DevPathStr;
+  CHAR16                            *DevPathStrTemp;
+  UINTN                             Size;
+  EFI_STATUS                        Status;
+  DevPathStr     = NULL;
+  DevPathStrTemp = NULL;
+  Status = gBS->OpenProtocol(TheHandle, Protocol, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (!EFI_ERROR(Status)) {
+    DevPathStr = ConvertDevicePathToShortText (DevPath, Verbose, 30);
+    if (Verbose) {
+      Size = StrSize(DevPathStr) + sizeof(CHAR16) * 2;
+      DevPathStrTemp = AllocateZeroPool (Size);
+      if (DevPathStrTemp != NULL) {
+        StrnCatS (DevPathStrTemp, Size/sizeof(CHAR16), L"  ", 2);
+        StrnCatS (DevPathStrTemp, Size/sizeof(CHAR16), DevPathStr, StrLen (DevPathStr));
+      }
+      FreePool (DevPathStr);
+      DevPathStr = DevPathStrTemp;
+    }
+    gBS->CloseProtocol(TheHandle, Protocol, gImageHandle, NULL);
+  }
+  return DevPathStr;
+}
+
+/**
   Function to dump information about DevicePath protocol.
 
   This will allocate the return buffer from boot services pool.
@@ -864,17 +908,7 @@ DevicePathProtocolDumpInformation(
   IN CONST BOOLEAN    Verbose
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
-  CHAR16                            *Temp;
-  EFI_STATUS                        Status;
-  Temp = NULL;
-
-  Status = gBS->OpenProtocol(TheHandle, &gEfiDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (!EFI_ERROR(Status)) {
-    Temp = ConvertDevicePathToShortText (DevPath, Verbose, 30);
-    gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
-  }
-  return (Temp);
+  return DevicePathProtocolDumpInformationEx (TheHandle, Verbose, &gEfiDevicePathProtocolGuid);
 }
 
 /**
@@ -894,17 +928,7 @@ LoadedImageDevicePathProtocolDumpInformation(
   IN CONST BOOLEAN    Verbose
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
-  CHAR16                            *Temp;
-  EFI_STATUS                        Status;
-  Temp = NULL;
-
-  Status = gBS->OpenProtocol(TheHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (!EFI_ERROR(Status)) {
-    Temp = ConvertDevicePathToShortText (DevPath, Verbose, 30);
-    gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
-  }
-  return (Temp);
+  return DevicePathProtocolDumpInformationEx (TheHandle, Verbose, &gEfiLoadedImageDevicePathProtocolGuid);
 }
 
 /**
