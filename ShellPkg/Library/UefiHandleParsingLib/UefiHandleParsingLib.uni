@@ -358,7 +358,10 @@
                                                   "     Device ID.....: %04x\r\n"
                                                   "     Class Code....: %02x %02x %02x\r\n"
                                                   "     Configuration Header :"
-
+#string STR_USBIO_DUMP_MAIN       #language en-US "     Interface Number #.....: %02x\r\n"
+                                                  "     Interface Class #......: %02x\r\n"
+                                                  "     Interface Subclass #...: %02x\r\n"
+                                                  "     Interface Protocol #...: %02x"
 
 #string STR_LI_DUMP_NAME          #language en-US "     Name..........: %%H%s%%N\r\n"
 

@@ -1245,6 +1245,65 @@ PciIoProtocolDumpInformation (
 }
 
 /**
+  Function to dump information about UsbIoProtocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has PciRootBridgeIo installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+UsbIoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_USB_IO_PROTOCOL           *UsbIo;
+  EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDesc;
+  CHAR16                        *GetString;
+  CHAR16                        *RetVal;
+
+  if (!Verbose) {
+    return (NULL);
+  }
+  RetVal = NULL;
+  GetString = NULL;
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiUsbIoProtocolGuid,
+                  (VOID**)&UsbIo,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR(Status)) {
+    return NULL;
+  }
+  UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDesc);
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_USBIO_DUMP_MAIN), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  RetVal = CatSPrint (
+            NULL,
+            GetString,
+            InterfaceDesc.InterfaceNumber,
+            InterfaceDesc.InterfaceClass,
+            InterfaceDesc.InterfaceSubClass,
+            InterfaceDesc.InterfaceProtocol
+            );
+
+  FreePool (GetString);
+  return RetVal;
+}
+
+/**
   Function to dump information about EfiAdapterInformation Protocol.
 
   @param[in] TheHandle      The handle that has the protocol installed.
@@ -1964,7 +2023,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_SCSI_IO),               &gEfiScsiIoProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_SCSI_PT_EXT),           &gEfiExtScsiPassThruProtocolGuid,                 NULL},
   {STRING_TOKEN(STR_ISCSI),                 &gEfiIScsiInitiatorNameProtocolGuid,              NULL},
-  {STRING_TOKEN(STR_USB_IO),                &gEfiUsbIoProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_USB_IO),                &gEfiUsbIoProtocolGuid,                           UsbIoProtocolDumpInformation},
   {STRING_TOKEN(STR_USB_HC),                &gEfiUsbHcProtocolGuid,                           NULL},
   {STRING_TOKEN(STR_USB_HC2),               &gEfiUsb2HcProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_DEBUG_SUPPORT),         &gEfiDebugSupportProtocolGuid,                    DebugSupportProtocolDumpInformation},
