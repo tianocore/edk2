@@ -1486,7 +1486,9 @@ BufferToValue (
     //
     if (Question->QuestionReferToBitField) {
       Buffer = (UINT8 *)AllocateZeroPool (Question->StorageWidth);
-      ASSERT (Buffer != NULL);
+      if (Buffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
       Dst = Buffer;
     } else {
       Dst = (UINT8 *) &Question->HiiValue.Value;
@@ -1548,11 +1550,9 @@ BufferToValue (
 
   *StringPtr = TempChar;
 
-  if (Question->QuestionReferToBitField) {
+  if (Buffer != NULL && Question->QuestionReferToBitField) {
     GetBitsQuestionValue (Question, Buffer);
-    if (Buffer != NULL) {
-      FreePool (Buffer);
-    }
+    FreePool (Buffer);
   }
 
   return Status;
