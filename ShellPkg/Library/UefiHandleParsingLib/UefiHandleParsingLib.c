@@ -497,7 +497,7 @@ EdidDiscoveredProtocolDumpInformation (
     SHELL_FREE_NON_NULL (RetVal);
     RetVal = TempRetVal;
 
-    TempRetVal = CatSDumpHex (RetVal, 7, 0, EdidDiscovered->SizeOfEdid, EdidDiscovered->Edid);
+    TempRetVal = CatSDumpHex (RetVal, 4, 0, EdidDiscovered->SizeOfEdid, EdidDiscovered->Edid);
     RetVal = TempRetVal;
   }
   return RetVal;
@@ -561,7 +561,7 @@ EdidActiveProtocolDumpInformation (
     SHELL_FREE_NON_NULL (RetVal);
     RetVal = TempRetVal;
 
-    TempRetVal = CatSDumpHex (RetVal, 7, 0, EdidActive->SizeOfEdid, EdidActive->Edid);
+    TempRetVal = CatSDumpHex (RetVal, 4, 0, EdidActive->SizeOfEdid, EdidActive->Edid);
     RetVal = TempRetVal;
   }
   return RetVal;
@@ -614,7 +614,7 @@ PciRootBridgeIoDumpInformation(
   if (Temp == NULL) {
     return NULL;
   }
-  Temp2 = CatSPrint(L"\r\n", Temp, PciRootBridgeIo->ParentHandle);
+  Temp2 = CatSPrint(NULL, Temp, PciRootBridgeIo->ParentHandle);
   FreePool(Temp);
   RetVal = Temp2;
   Temp2 = NULL;
@@ -692,7 +692,7 @@ PciRootBridgeIoDumpInformation(
       }
 
       Temp2 = CatSPrint(RetVal,
-        L"%H%02x    %016lx  %016lx  %02x%N\r\n",
+        L"\r\n%%H%02x    %016lx  %016lx  %02x%%N",
         Configuration->SpecificFlag,
         Configuration->AddrRangeMin,
         Configuration->AddrRangeMax,
