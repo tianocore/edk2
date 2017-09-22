@@ -276,13 +276,6 @@ UdfDriverBindingStop (
       NULL
       );
 
-    //
-    // Check if there's any open file. If so, clean them up.
-    //
-    if (PrivFsData->OpenFiles > 0) {
-      CleanupVolumeInformation (&PrivFsData->Volume);
-    }
-
     FreePool ((VOID *)PrivFsData);
   }
 

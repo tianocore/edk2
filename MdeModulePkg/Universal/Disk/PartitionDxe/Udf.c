@@ -64,11 +64,12 @@ FindAnchorVolumeDescriptorPointer (
   OUT  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPoint
   )
 {
-  EFI_STATUS  Status;
-  UINT32      BlockSize;
-  EFI_LBA     EndLBA;
-  EFI_LBA     DescriptorLBAs[4];
-  UINTN       Index;
+  EFI_STATUS          Status;
+  UINT32              BlockSize;
+  EFI_LBA             EndLBA;
+  EFI_LBA             DescriptorLBAs[4];
+  UINTN               Index;
+  UDF_DESCRIPTOR_TAG  *DescriptorTag;
 
   BlockSize = BlockIo->Media->BlockSize;
   EndLBA = BlockIo->Media->LastBlock;
@@ -88,10 +89,13 @@ FindAnchorVolumeDescriptorPointer (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
+    DescriptorTag = &AnchorPoint->DescriptorTag;
+
     //
     // Check if read LBA has a valid AVDP descriptor.
     //
-    if (IS_AVDP (AnchorPoint)) {
+    if (DescriptorTag->TagIdentifier == UdfAnchorVolumeDescriptorPointer) {
       return EFI_SUCCESS;
     }
   }
@@ -102,23 +106,18 @@ FindAnchorVolumeDescriptorPointer (
 }
 
 /**
-  Check if block device supports a valid UDF file system as specified by OSTA
-  Universal Disk Format Specification 2.60.
+  Find UDF volume identifiers in a Volume Recognition Sequence.
 
-  @param[in]   BlockIo  BlockIo interface.
-  @param[in]   DiskIo   DiskIo interface.
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
 
-  @retval EFI_SUCCESS          UDF file system found.
-  @retval EFI_UNSUPPORTED      UDF file system not found.
-  @retval EFI_NO_MEDIA         The device has no media.
-  @retval EFI_DEVICE_ERROR     The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
-  @retval EFI_OUT_OF_RESOURCES The scan was not successful due to lack of
-                               resources.
+  @retval EFI_SUCCESS             UDF volume identifiers were found.
+  @retval EFI_NOT_FOUND           UDF volume identifiers were not found.
+  @retval other                   Failed to perform disk I/O.
 
 **/
 EFI_STATUS
-SupportUdfFileSystem (
+FindUdfVolumeIdentifiers (
   IN EFI_BLOCK_IO_PROTOCOL  *BlockIo,
   IN EFI_DISK_IO_PROTOCOL   *DiskIo
   )
@@ -128,7 +127,6 @@ SupportUdfFileSystem (
   UINT64                                EndDiskOffset;
   CDROM_VOLUME_DESCRIPTOR               VolDescriptor;
   CDROM_VOLUME_DESCRIPTOR               TerminatingVolDescriptor;
-  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  AnchorPoint;
 
   ZeroMem ((VOID *)&TerminatingVolDescriptor, sizeof (CDROM_VOLUME_DESCRIPTOR));
 
@@ -167,7 +165,7 @@ SupportUdfFileSystem (
         (CompareMem ((VOID *)&VolDescriptor,
                      (VOID *)&TerminatingVolDescriptor,
                      sizeof (CDROM_VOLUME_DESCRIPTOR)) == 0)) {
-      return EFI_UNSUPPORTED;
+      return EFI_NOT_FOUND;
     }
   }
 
@@ -176,7 +174,7 @@ SupportUdfFileSystem (
   //
   Offset += UDF_LOGICAL_SECTOR_SIZE;
   if (Offset >= EndDiskOffset) {
-    return EFI_UNSUPPORTED;
+    return EFI_NOT_FOUND;
   }
 
   Status = DiskIo->ReadDisk (
@@ -196,7 +194,7 @@ SupportUdfFileSystem (
       (CompareMem ((VOID *)VolDescriptor.Unknown.Id,
                    (VOID *)UDF_NSR3_IDENTIFIER,
                    sizeof (VolDescriptor.Unknown.Id)) != 0)) {
-    return EFI_UNSUPPORTED;
+    return EFI_NOT_FOUND;
   }
 
   //
@@ -204,7 +202,7 @@ SupportUdfFileSystem (
   //
   Offset += UDF_LOGICAL_SECTOR_SIZE;
   if (Offset >= EndDiskOffset) {
-    return EFI_UNSUPPORTED;
+    return EFI_NOT_FOUND;
   }
 
   Status = DiskIo->ReadDisk (
@@ -221,15 +219,291 @@ SupportUdfFileSystem (
   if (CompareMem ((VOID *)VolDescriptor.Unknown.Id,
                   (VOID *)UDF_TEA_IDENTIFIER,
                   sizeof (VolDescriptor.Unknown.Id)) != 0) {
-    return EFI_UNSUPPORTED;
-  }
-
-  Status = FindAnchorVolumeDescriptorPointer (BlockIo, DiskIo, &AnchorPoint);
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+    return EFI_NOT_FOUND;
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Check if Logical Volume Descriptor is supported by current EDK2 UDF file
+  system implementation.
+
+  @param[in]  LogicalVolDesc  Logical Volume Descriptor pointer.
+
+  @retval TRUE                Logical Volume Descriptor is supported.
+  @retval FALSE               Logical Volume Descriptor is not supported.
+
+**/
+BOOLEAN
+IsLogicalVolumeDescriptorSupported (
+  UDF_LOGICAL_VOLUME_DESCRIPTOR *LogicalVolDesc
+  )
+{
+  //
+  // Check for a valid UDF revision range
+  //
+  switch (LogicalVolDesc->DomainIdentifier.Suffix.Domain.UdfRevision) {
+  case 0x0102:
+  case 0x0150:
+  case 0x0200:
+  case 0x0201:
+  case 0x0250:
+  case 0x0260:
+    break;
+  default:
+    return FALSE;
+  }
+
+  //
+  // Check for a single Partition Map
+  //
+  if (LogicalVolDesc->NumberOfPartitionMaps > 1) {
+    return FALSE;
+  }
+  //
+  // UDF 1.02 revision supports only Type 1 (Physical) partitions, but
+  // let's check it any way.
+  //
+  // PartitionMap[0] -> type
+  // PartitionMap[1] -> length (in bytes)
+  //
+  if (LogicalVolDesc->PartitionMaps[0] != 1 ||
+      LogicalVolDesc->PartitionMaps[1] != 6) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Find UDF logical volume location and whether it is supported by current EDK2
+  UDF file system implementation.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[in]  AnchorPoint         Anchor volume descriptor pointer.
+  @param[out] MainVdsStartBlock   Main VDS starting block number.
+  @param[out] MainVdsEndBlock     Main VDS ending block number.
+
+  @retval EFI_SUCCESS             UDF logical volume was found.
+  @retval EFI_VOLUME_CORRUPTED    UDF file system structures are corrupted.
+  @retval EFI_UNSUPPORTED         UDF logical volume is not supported.
+  @retval other                   Failed to perform disk I/O.
+
+**/
+EFI_STATUS
+FindLogicalVolumeLocation (
+  IN   EFI_BLOCK_IO_PROTOCOL                 *BlockIo,
+  IN   EFI_DISK_IO_PROTOCOL                  *DiskIo,
+  IN   UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPoint,
+  OUT  UINT64                                *MainVdsStartBlock,
+  OUT  UINT64                                *MainVdsEndBlock
+  )
+{
+  EFI_STATUS                     Status;
+  UINT32                         BlockSize;
+  EFI_LBA                        LastBlock;
+  UDF_EXTENT_AD                  *ExtentAd;
+  UINT64                         SeqBlocksNum;
+  UINT64                         SeqStartBlock;
+  UINT64                         GuardMainVdsStartBlock;
+  VOID                           *Buffer;
+  UINT64                         SeqEndBlock;
+  BOOLEAN                        StopSequence;
+  UINTN                          LvdsCount;
+  UDF_LOGICAL_VOLUME_DESCRIPTOR  *LogicalVolDesc;
+  UDF_DESCRIPTOR_TAG             *DescriptorTag;
+
+  BlockSize = BlockIo->Media->BlockSize;
+  LastBlock = BlockIo->Media->LastBlock;
+  ExtentAd = &AnchorPoint->MainVolumeDescriptorSequenceExtent;
+
+  //
+  // UDF 2.60, 2.2.3.1 struct MainVolumeDescriptorSequenceExtent
+  //
+  // The Main Volume Descriptor Sequence Extent shall have a minimum length of
+  // 16 logical sectors.
+  //
+  // Also make sure it does not exceed maximum number of blocks in the disk.
+  //
+  SeqBlocksNum = DivU64x32 ((UINT64)ExtentAd->ExtentLength, BlockSize);
+  if (SeqBlocksNum < 16 || (EFI_LBA)SeqBlocksNum > LastBlock + 1) {
+    return EFI_VOLUME_CORRUPTED;
+  }
+
+  //
+  // Check for valid Volume Descriptor Sequence starting block number
+  //
+  SeqStartBlock = (UINT64)ExtentAd->ExtentLocation;
+  if (SeqStartBlock > LastBlock ||
+      SeqStartBlock + SeqBlocksNum - 1 > LastBlock) {
+    return EFI_VOLUME_CORRUPTED;
+  }
+
+  GuardMainVdsStartBlock = SeqStartBlock;
+
+  //
+  // Allocate buffer for reading disk blocks
+  //
+  Buffer = AllocateZeroPool ((UINTN)BlockSize);
+  if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  SeqEndBlock = SeqStartBlock + SeqBlocksNum;
+  StopSequence = FALSE;
+  LvdsCount = 0;
+  Status = EFI_VOLUME_CORRUPTED;
+  //
+  // Start Main Volume Descriptor Sequence
+  //
+  for (; SeqStartBlock < SeqEndBlock && !StopSequence; SeqStartBlock++) {
+    //
+    // Read disk block
+    //
+    Status = BlockIo->ReadBlocks (
+      BlockIo,
+      BlockIo->Media->MediaId,
+      SeqStartBlock,
+      BlockSize,
+      Buffer
+      );
+    if (EFI_ERROR (Status)) {
+      goto Out_Free;
+    }
+
+    DescriptorTag = Buffer;
+
+    //
+    // ECMA 167, 8.4.1 Contents of a Volume Descriptor Sequence
+    //
+    // - A Volume Descriptor Sequence shall contain one or more Primary Volume
+    //   Descriptors.
+    // - A Volume Descriptor Sequence shall contain zero or more Implementation
+    //   Use Volume Descriptors.
+    // - A Volume Descriptor Sequence shall contain zero or more Partition
+    //   Descriptors.
+    // - A Volume Descriptor Sequence shall contain zero or more Logical Volume
+    //   Descriptors.
+    // - A Volume Descriptor Sequence shall contain zero or more Unallocated
+    //   Space Descriptors.
+    //
+    switch (DescriptorTag->TagIdentifier) {
+    case UdfPrimaryVolumeDescriptor:
+    case UdfImplemenationUseVolumeDescriptor:
+    case UdfPartitionDescriptor:
+    case UdfUnallocatedSpaceDescriptor:
+      break;
+
+    case UdfLogicalVolumeDescriptor:
+      LogicalVolDesc = Buffer;
+
+      //
+      // Check for existence of a single LVD and whether it is supported by
+      // current EDK2 UDF file system implementation.
+      //
+      if (++LvdsCount > 1 ||
+          !IsLogicalVolumeDescriptorSupported (LogicalVolDesc)) {
+        Status = EFI_UNSUPPORTED;
+        StopSequence = TRUE;
+      }
+
+      break;
+
+    case UdfTerminatingDescriptor:
+      //
+      // Stop the sequence when we find a Terminating Descriptor
+      // (aka Unallocated Sector), se we don't have to walk all the unallocated
+      // area unnecessarily.
+      //
+      StopSequence = TRUE;
+      break;
+
+    default:
+      //
+      // An invalid Volume Descriptor has been found in the sequece. Volume is
+      // corrupted.
+      //
+      Status = EFI_VOLUME_CORRUPTED;
+      goto Out_Free;
+    }
+  }
+
+  //
+  // Check if LVD was found
+  //
+  if (!EFI_ERROR (Status) && LvdsCount == 1) {
+    *MainVdsStartBlock = GuardMainVdsStartBlock;
+    //
+    // We do not need to read either LVD or PD descriptors to know the last
+    // valid block in the found UDF file system. It's already LastBlock.
+    //
+    *MainVdsEndBlock = LastBlock;
+
+    Status = EFI_SUCCESS;
+  }
+
+Out_Free:
+  //
+  // Free block read buffer
+  //
+  FreePool (Buffer);
+
+  return Status;
+}
+
+/**
+  Find a supported UDF file system in block device.
+
+  @param[in]  BlockIo             BlockIo interface.
+  @param[in]  DiskIo              DiskIo interface.
+  @param[out] StartingLBA         UDF file system starting LBA.
+  @param[out] EndingLBA           UDF file system starting LBA.
+
+  @retval EFI_SUCCESS             UDF file system was found.
+  @retval other                   UDF file system was not found.
+
+**/
+EFI_STATUS
+FindUdfFileSystem (
+  IN EFI_BLOCK_IO_PROTOCOL  *BlockIo,
+  IN EFI_DISK_IO_PROTOCOL   *DiskIo,
+  OUT EFI_LBA               *StartingLBA,
+  OUT EFI_LBA               *EndingLBA
+  )
+{
+  EFI_STATUS Status;
+  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  AnchorPoint;
+
+  //
+  // Find UDF volume identifiers
+  //
+  Status = FindUdfVolumeIdentifiers (BlockIo, DiskIo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Find Anchor Volume Descriptor Pointer
+  //
+  Status = FindAnchorVolumeDescriptorPointer (BlockIo, DiskIo, &AnchorPoint);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Find Logical Volume location
+  //
+  Status = FindLogicalVolumeLocation (
+    BlockIo,
+    DiskIo,
+    &AnchorPoint,
+    (UINT64 *)StartingLBA,
+    (UINT64 *)EndingLBA
+    );
+
+  return Status;
 }
 
 /**
@@ -263,9 +537,9 @@ PartitionInstallUdfChildHandles (
   UINT32                       RemainderByMediaBlockSize;
   EFI_STATUS                   Status;
   EFI_BLOCK_IO_MEDIA           *Media;
-  EFI_DEVICE_PATH_PROTOCOL     *DevicePathNode;
-  EFI_GUID                     *VendorDefinedGuid;
   EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
+  EFI_LBA                      StartingLBA;
+  EFI_LBA                      EndingLBA;
 
   Media = BlockIo->Media;
 
@@ -281,35 +555,10 @@ PartitionInstallUdfChildHandles (
     return EFI_NOT_FOUND;
   }
 
-  DevicePathNode = DevicePath;
-  while (!IsDevicePathEnd (DevicePathNode)) {
-    //
-    // Do not allow checking for UDF file systems in CDROM "El Torito"
-    // partitions, and skip duplicate installation of UDF file system child
-    // nodes.
-    //
-    if (DevicePathType (DevicePathNode) == MEDIA_DEVICE_PATH) {
-      if (DevicePathSubType (DevicePathNode) == MEDIA_CDROM_DP) {
-        return EFI_NOT_FOUND;
-      }
-      if (DevicePathSubType (DevicePathNode) == MEDIA_VENDOR_DP) {
-        VendorDefinedGuid = (EFI_GUID *)((UINTN)DevicePathNode +
-                                         OFFSET_OF (VENDOR_DEVICE_PATH, Guid));
-        if (CompareGuid (VendorDefinedGuid, &gUdfDevPathGuid)) {
-          return EFI_NOT_FOUND;
-        }
-      }
-    }
-    //
-    // Try next device path node
-    //
-    DevicePathNode = NextDevicePathNode (DevicePathNode);
-  }
-
   //
-  // Check if block device supports an UDF file system
+  // Search for an UDF file system on block device
   //
-  Status = SupportUdfFileSystem (BlockIo, DiskIo);
+  Status = FindUdfFileSystem (BlockIo, DiskIo, &StartingLBA, &EndingLBA);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
@@ -334,13 +583,10 @@ PartitionInstallUdfChildHandles (
     DevicePath,
     (EFI_DEVICE_PATH_PROTOCOL *)&gUdfDevicePath,
     &PartitionInfo,
-    0,
-    Media->LastBlock,
+    StartingLBA,
+    EndingLBA,
     Media->BlockSize
     );
-  if (!EFI_ERROR (Status)) {
-    Status = EFI_NOT_FOUND;
-  }
 
   return Status;
 }

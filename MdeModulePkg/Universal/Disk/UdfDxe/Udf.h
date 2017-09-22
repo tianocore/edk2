@@ -49,61 +49,34 @@
     { 0x89, 0x56, 0x73, 0xCD, 0xA3, 0x26, 0xCD, 0x0A }  \
   }
 
-#define UDF_DEFAULT_LV_NUM 0
+#define FE_ICB_FILE_TYPE(_Ptr)                                      \
+  (UDF_FILE_ENTRY_TYPE)(                                            \
+    ((UDF_DESCRIPTOR_TAG *)(_Ptr))->TagIdentifier == UdfFileEntry ? \
+    ((UDF_FILE_ENTRY *)(_Ptr))->IcbTag.FileType :                   \
+    ((UDF_EXTENDED_FILE_ENTRY *)(_Ptr))->IcbTag.FileType)
 
-#define IS_PVD(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 1))
-#define IS_PD(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 5))
-#define IS_LVD(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 6))
-#define IS_TD(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 8))
-#define IS_FSD(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 256))
-#define IS_FE(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 261))
-#define IS_EFE(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 266))
-#define IS_FID(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 257))
-#define IS_AED(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 258))
-#define IS_LVID(_Pointer) \
-  ((BOOLEAN)(_GET_TAG_ID (_Pointer) == 9))
-
-#define _GET_FILETYPE(_Pointer) \
-  (IS_FE (_Pointer) ? \
-   (((UDF_FILE_ENTRY *)(_Pointer))->IcbTag.FileType) \
-   : \
-   (((UDF_EXTENDED_FILE_ENTRY *)(_Pointer))->IcbTag.FileType))
-
-#define IS_FE_DIRECTORY(_Pointer) \
-  ((BOOLEAN)(_GET_FILETYPE (_Pointer) == 4))
-#define IS_FE_STANDARD_FILE(_Pointer) \
-  ((BOOLEAN)(_GET_FILETYPE (_Pointer) == 5))
-#define IS_FE_SYMLINK(_Pointer) \
-  ((BOOLEAN)(_GET_FILETYPE (_Pointer) == 12))
+typedef enum {
+  UdfFileEntryDirectory = 4,
+  UdfFileEntryStandardFile = 5,
+  UdfFileEntrySymlink = 12,
+} UDF_FILE_ENTRY_TYPE;
 
 #define HIDDEN_FILE     (1 << 0)
 #define DIRECTORY_FILE  (1 << 1)
 #define DELETED_FILE    (1 << 2)
 #define PARENT_FILE     (1 << 3)
 
-#define _GET_FILE_CHARS(_Pointer) \
-  (((UDF_FILE_IDENTIFIER_DESCRIPTOR *)(_Pointer))->FileCharacteristics)
-
-#define IS_FID_HIDDEN_FILE(_Pointer) \
-  ((BOOLEAN)(_GET_FILE_CHARS (_Pointer) & HIDDEN_FILE))
-#define IS_FID_DIRECTORY_FILE(_Pointer) \
-  ((BOOLEAN)(_GET_FILE_CHARS (_Pointer) & DIRECTORY_FILE))
-#define IS_FID_DELETED_FILE(_Pointer) \
-  ((BOOLEAN)(_GET_FILE_CHARS (_Pointer) & DELETED_FILE))
-#define IS_FID_PARENT_FILE(_Pointer) \
-  ((BOOLEAN)(_GET_FILE_CHARS (_Pointer) & PARENT_FILE))
-#define IS_FID_NORMAL_FILE(_Pointer) \
-  ((BOOLEAN)(!IS_FID_DIRECTORY_FILE (_Pointer) && \
-         !IS_FID_PARENT_FILE (_Pointer)))
+#define IS_FID_HIDDEN_FILE(_Fid) \
+  (BOOLEAN)((_Fid)->FileCharacteristics & HIDDEN_FILE)
+#define IS_FID_DIRECTORY_FILE(_Fid) \
+  (BOOLEAN)((_Fid)->FileCharacteristics & DIRECTORY_FILE)
+#define IS_FID_DELETED_FILE(_Fid) \
+  (BOOLEAN)((_Fid)->FileCharacteristics & DELETED_FILE)
+#define IS_FID_PARENT_FILE(_Fid) \
+  (BOOLEAN)((_Fid)->FileCharacteristics & PARENT_FILE)
+#define IS_FID_NORMAL_FILE(_Fid) \
+  (BOOLEAN)(!IS_FID_DIRECTORY_FILE (_Fid) && \
+            !IS_FID_PARENT_FILE (_Fid))
 
 typedef enum {
   ShortAdsSequence,
@@ -152,13 +125,7 @@ typedef enum {
 #define IS_VALID_COMPRESSION_ID(_CompId) \
   ((BOOLEAN)((_CompId) == 8 || (_CompId) == 16))
 
-#define LV_BLOCK_SIZE(_Vol, _LvNum) \
-  (_Vol)->LogicalVolDescs[(_LvNum)]->LogicalBlockSize
-
 #define UDF_STANDARD_IDENTIFIER_LENGTH   5
-
-#define LV_UDF_REVISION(_Lv) \
-  *(UINT16 *)(UINTN)(_Lv)->DomainIdentifier.IdentifierSuffix
 
 #pragma pack(1)
 
@@ -186,17 +153,6 @@ typedef struct {
 #pragma pack(1)
 
 typedef struct {
-  UINT8           CharacterSetType;
-  UINT8           CharacterSetInfo[63];
-} UDF_CHAR_SPEC;
-
-typedef struct {
-  UINT8           Flags;
-  UINT8           Identifier[23];
-  UINT8           IdentifierSuffix[8];
-} UDF_ENTITY_ID;
-
-typedef struct {
   UINT16          TypeAndTimezone;
   INT16           Year;
   UINT8           Month;
@@ -208,17 +164,6 @@ typedef struct {
   UINT8           HundredsOfMicroseconds;
   UINT8           Microseconds;
 } UDF_TIMESTAMP;
-
-typedef struct {
-  UINT32        LogicalBlockNumber;
-  UINT16        PartitionReferenceNumber;
-} UDF_LB_ADDR;
-
-typedef struct {
-  UINT32                           ExtentLength;
-  UDF_LB_ADDR                      ExtentLocation;
-  UINT8                            ImplementationUse[6];
-} UDF_LONG_ALLOCATION_DESCRIPTOR;
 
 typedef struct {
   UDF_DESCRIPTOR_TAG                 DescriptorTag;
@@ -235,6 +180,17 @@ typedef struct {
 } UDF_VOLUME_DESCRIPTOR;
 
 typedef struct {
+  UDF_DESCRIPTOR_TAG             DescriptorTag;
+  UDF_TIMESTAMP                  RecordingDateTime;
+  UINT32                         IntegrityType;
+  UDF_EXTENT_AD                  NextIntegrityExtent;
+  UINT8                          LogicalVolumeContentsUse[32];
+  UINT32                         NumberOfPartitions;
+  UINT32                         LengthOfImplementationUse;
+  UINT8                          Data[0];
+} UDF_LOGICAL_VOLUME_INTEGRITY;
+
+typedef struct {
   UDF_DESCRIPTOR_TAG         DescriptorTag;
   UINT32                     VolumeDescriptorSequenceNumber;
   UINT16                     PartitionFlags;
@@ -248,33 +204,6 @@ typedef struct {
   UINT8                      ImplementationUse[128];
   UINT8                      Reserved[156];
 } UDF_PARTITION_DESCRIPTOR;
-
-typedef struct {
-  UDF_DESCRIPTOR_TAG              DescriptorTag;
-  UINT32                          VolumeDescriptorSequenceNumber;
-  UDF_CHAR_SPEC                   DescriptorCharacterSet;
-  UINT8                           LogicalVolumeIdentifier[128];
-  UINT32                          LogicalBlockSize;
-  UDF_ENTITY_ID                   DomainIdentifier;
-  UDF_LONG_ALLOCATION_DESCRIPTOR  LogicalVolumeContentsUse;
-  UINT32                          MapTableLength;
-  UINT32                          NumberOfPartitionMaps;
-  UDF_ENTITY_ID                   ImplementationIdentifier;
-  UINT8                           ImplementationUse[128];
-  UDF_EXTENT_AD                   IntegritySequenceExtent;
-  UINT8                           PartitionMaps[6];
-} UDF_LOGICAL_VOLUME_DESCRIPTOR;
-
-typedef struct {
-  UDF_DESCRIPTOR_TAG             DescriptorTag;
-  UDF_TIMESTAMP                  RecordingDateTime;
-  UINT32                         IntegrityType;
-  UDF_EXTENT_AD                  NextIntegrityExtent;
-  UINT8                          LogicalVolumeContentsUse[32];
-  UINT32                         NumberOfPartitions;
-  UINT32                         LengthOfImplementationUse;
-  UINT8                          Data[0];
-} UDF_LOGICAL_VOLUME_INTEGRITY;
 
 typedef struct {
   UDF_DESCRIPTOR_TAG              DescriptorTag;
@@ -389,12 +318,10 @@ typedef struct {
 // UDF filesystem driver's private data
 //
 typedef struct {
-  UDF_LOGICAL_VOLUME_DESCRIPTOR  **LogicalVolDescs;
-  UINTN                          LogicalVolDescsNo;
-  UDF_PARTITION_DESCRIPTOR       **PartitionDescs;
-  UINTN                          PartitionDescsNo;
-  UDF_FILE_SET_DESCRIPTOR        **FileSetDescs;
-  UINTN                          FileSetDescsNo;
+  UINT64                         MainVdsStartLocation;
+  UDF_LOGICAL_VOLUME_DESCRIPTOR  LogicalVolDesc;
+  UDF_PARTITION_DESCRIPTOR       PartitionDesc;
+  UDF_FILE_SET_DESCRIPTOR        FileSetDesc;
   UINTN                          FileEntrySize;
 } UDF_VOLUME_INFO;
 
@@ -881,17 +808,6 @@ ResolveSymlink (
   IN   UDF_FILE_INFO          *Parent,
   IN   VOID                   *FileEntryData,
   OUT  UDF_FILE_INFO          *File
-  );
-
-/**
-  Clean up in-memory UDF volume information.
-
-  @param[in] Volume Volume information pointer.
-
-**/
-VOID
-CleanupVolumeInformation (
-  IN UDF_VOLUME_INFO *Volume
   );
 
 /**

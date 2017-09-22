@@ -38,11 +38,12 @@ FindAnchorVolumeDescriptorPointer (
   OUT  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPoint
   )
 {
-  EFI_STATUS  Status;
-  UINT32      BlockSize;
-  EFI_LBA     EndLBA;
-  EFI_LBA     DescriptorLBAs[4];
-  UINTN       Index;
+  EFI_STATUS          Status;
+  UINT32              BlockSize;
+  EFI_LBA             EndLBA;
+  EFI_LBA             DescriptorLBAs[4];
+  UINTN               Index;
+  UDF_DESCRIPTOR_TAG  *DescriptorTag;
 
   BlockSize = BlockIo->Media->BlockSize;
   EndLBA = BlockIo->Media->LastBlock;
@@ -62,10 +63,13 @@ FindAnchorVolumeDescriptorPointer (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
+    DescriptorTag = &AnchorPoint->DescriptorTag;
+
     //
     // Check if read LBA has a valid AVDP descriptor.
     //
-    if (IS_AVDP (AnchorPoint)) {
+    if (DescriptorTag->TagIdentifier == UdfAnchorVolumeDescriptorPointer) {
       return EFI_SUCCESS;
     }
   }
@@ -99,147 +103,97 @@ StartMainVolumeDescriptorSequence (
   OUT  UDF_VOLUME_INFO                       *Volume
   )
 {
-  EFI_STATUS                     Status;
-  UINT32                         BlockSize;
-  UDF_EXTENT_AD                  *ExtentAd;
-  UINT64                         StartingLsn;
-  UINT64                         EndingLsn;
-  VOID                           *Buffer;
-  UDF_LOGICAL_VOLUME_DESCRIPTOR  *LogicalVolDesc;
-  UDF_PARTITION_DESCRIPTOR       *PartitionDesc;
-  UINTN                          Index;
-  UINT32                         LogicalBlockSize;
+  EFI_STATUS            Status;
+  UINT32                BlockSize;
+  UDF_EXTENT_AD         *ExtentAd;
+  EFI_LBA               SeqStartBlock;
+  EFI_LBA               SeqEndBlock;
+  BOOLEAN               StopSequence;
+  VOID                  *Buffer;
+  UDF_DESCRIPTOR_TAG    *DescriptorTag;
+  UINT32                LogicalBlockSize;
+
+  BlockSize = BlockIo->Media->BlockSize;
+  ExtentAd = &AnchorPoint->MainVolumeDescriptorSequenceExtent;
 
   //
-  // We've already found an ADVP on the volume. It contains the extent
-  // (MainVolumeDescriptorSequenceExtent) where the Main Volume Descriptor
-  // Sequence starts. Therefore, we'll look for Logical Volume Descriptors and
-  // Partitions Descriptors and save them in memory, accordingly.
+  // Allocate buffer for reading disk blocks
   //
-  // Note also that each descriptor will be aligned on a block size (BlockSize)
-  // boundary, so we need to read one block at a time.
-  //
-  BlockSize    = BlockIo->Media->BlockSize;
-  ExtentAd     = &AnchorPoint->MainVolumeDescriptorSequenceExtent;
-  StartingLsn  = (UINT64)ExtentAd->ExtentLocation;
-  EndingLsn    = StartingLsn + DivU64x32 (
-                                     (UINT64)ExtentAd->ExtentLength,
-                                     BlockSize
-                                     );
-
-  Volume->LogicalVolDescs =
-    (UDF_LOGICAL_VOLUME_DESCRIPTOR **)AllocateZeroPool (ExtentAd->ExtentLength);
-  if (Volume->LogicalVolDescs == NULL) {
+  Buffer = AllocateZeroPool ((UINTN)BlockSize);
+  if (Buffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Volume->PartitionDescs =
-    (UDF_PARTITION_DESCRIPTOR **)AllocateZeroPool (ExtentAd->ExtentLength);
-  if (Volume->PartitionDescs == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Error_Alloc_Pds;
-  }
-
-  Buffer = AllocateZeroPool (BlockSize);
-  if (Buffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Error_Alloc_Buf;
-  }
-
-  Volume->LogicalVolDescsNo  = 0;
-  Volume->PartitionDescsNo   = 0;
-
-  while (StartingLsn <= EndingLsn) {
-    Status = DiskIo->ReadDisk (
-      DiskIo,
+  //
+  // The logical partition created by Partition driver is relative to the main
+  // VDS extent location, so we start the Main Volume Descriptor Sequence at
+  // LBA 0.
+  //
+  // We don't need to check again if we have valid Volume Descriptors here since
+  // Partition driver already did.
+  //
+  SeqStartBlock = 0;
+  SeqEndBlock = SeqStartBlock + DivU64x32 ((UINT64)ExtentAd->ExtentLength,
+                                           BlockSize);
+  StopSequence = FALSE;
+  for (; SeqStartBlock < SeqEndBlock && !StopSequence; SeqStartBlock++) {
+    //
+    // Read disk block
+    //
+    Status = BlockIo->ReadBlocks (
+      BlockIo,
       BlockIo->Media->MediaId,
-      MultU64x32 (StartingLsn, BlockSize),
+      SeqStartBlock,
       BlockSize,
       Buffer
       );
     if (EFI_ERROR (Status)) {
-      goto Error_Read_Disk_Blk;
+      goto Out_Free;
     }
 
-    if (IS_TD (Buffer)) {
+    DescriptorTag = Buffer;
+
+    switch (DescriptorTag->TagIdentifier) {
+    case UdfPartitionDescriptor:
       //
-      // Found a Terminating Descriptor. Stop the sequence then.
+      // Save Partition Descriptor
       //
+      CopyMem (&Volume->PartitionDesc, Buffer, sizeof (Volume->PartitionDesc));
       break;
+
+    case UdfLogicalVolumeDescriptor:
+      //
+      // Save Logical Volume Descriptor
+      //
+      CopyMem (&Volume->LogicalVolDesc, Buffer, sizeof (Volume->LogicalVolDesc));
+      break;
+
+    case UdfTerminatingDescriptor:
+      StopSequence = TRUE;
+      break;
+
+    default:
+      ;
     }
-
-    if (IS_LVD (Buffer)) {
-      //
-      // Found a Logical Volume Descriptor.
-      //
-      LogicalVolDesc =
-        (UDF_LOGICAL_VOLUME_DESCRIPTOR *)
-        AllocateZeroPool (sizeof (UDF_LOGICAL_VOLUME_DESCRIPTOR));
-      if (LogicalVolDesc == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Error_Alloc_Lvd;
-      }
-
-      CopyMem ((VOID *)LogicalVolDesc, Buffer,
-               sizeof (UDF_LOGICAL_VOLUME_DESCRIPTOR));
-      Volume->LogicalVolDescs[Volume->LogicalVolDescsNo++] = LogicalVolDesc;
-    } else if (IS_PD (Buffer)) {
-      //
-      // Found a Partition Descriptor.
-      //
-      PartitionDesc =
-        (UDF_PARTITION_DESCRIPTOR *)
-        AllocateZeroPool (sizeof (UDF_PARTITION_DESCRIPTOR));
-      if (PartitionDesc == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Error_Alloc_Pd;
-      }
-
-      CopyMem ((VOID *)PartitionDesc, Buffer,
-               sizeof (UDF_PARTITION_DESCRIPTOR));
-      Volume->PartitionDescs[Volume->PartitionDescsNo++] = PartitionDesc;
-    }
-
-    StartingLsn++;
   }
 
   //
-  // When an UDF volume (revision 2.00 or higher) contains a File Entry rather
-  // than an Extended File Entry (which is not recommended as per spec), we need
-  // to make sure the size of a FE will be _at least_ 2048
-  // (UDF_LOGICAL_SECTOR_SIZE) bytes long to keep backward compatibility.
+  // Determine FE (File Entry) size
   //
-  LogicalBlockSize = LV_BLOCK_SIZE (Volume, UDF_DEFAULT_LV_NUM);
+  LogicalBlockSize = Volume->LogicalVolDesc.LogicalBlockSize;
   if (LogicalBlockSize >= UDF_LOGICAL_SECTOR_SIZE) {
-    Volume->FileEntrySize = LogicalBlockSize;
+    Volume->FileEntrySize = (UINTN)LogicalBlockSize;
   } else {
     Volume->FileEntrySize = UDF_LOGICAL_SECTOR_SIZE;
   }
 
+  Status = EFI_SUCCESS;
+
+Out_Free:
+  //
+  // Free block read buffer
+  //
   FreePool (Buffer);
-
-  return EFI_SUCCESS;
-
-Error_Alloc_Pd:
-Error_Alloc_Lvd:
-  for (Index = 0; Index < Volume->PartitionDescsNo; Index++) {
-    FreePool ((VOID *)Volume->PartitionDescs[Index]);
-  }
-
-  for (Index = 0; Index < Volume->LogicalVolDescsNo; Index++) {
-    FreePool ((VOID *)Volume->LogicalVolDescs[Index]);
-  }
-
-Error_Read_Disk_Blk:
-  FreePool (Buffer);
-
-Error_Alloc_Buf:
-  FreePool ((VOID *)Volume->PartitionDescs);
-  Volume->PartitionDescs = NULL;
-
-Error_Alloc_Pds:
-  FreePool ((VOID *)Volume->LogicalVolDescs);
-  Volume->LogicalVolDescs = NULL;
 
   return Status;
 }
@@ -262,48 +216,53 @@ GetPdFromLongAd (
   )
 {
   UDF_LOGICAL_VOLUME_DESCRIPTOR  *LogicalVolDesc;
-  UINTN                          Index;
-  UDF_PARTITION_DESCRIPTOR       *PartitionDesc;
   UINT16                         PartitionNum;
 
-  LogicalVolDesc = Volume->LogicalVolDescs[UDF_DEFAULT_LV_NUM];
+  LogicalVolDesc = &Volume->LogicalVolDesc;
 
-  switch (LV_UDF_REVISION (LogicalVolDesc)) {
+  switch (LogicalVolDesc->DomainIdentifier.Suffix.Domain.UdfRevision) {
   case 0x0102:
+  case 0x0150:
+  case 0x0200:
+  case 0x0201:
+  case 0x0250:
+  case 0x0260:
     //
-    // As per UDF 1.02 specification:
+    // UDF 1.02 specification:
     //
     // There shall be exactly one prevailing Logical Volume Descriptor recorded
     // per Volume Set. The Partition Maps field shall contain only Type 1
     // Partition Maps.
     //
+    // UDF 1.50 through 2.60 specs say:
+    //
+    // For the purpose of interchange partition maps shall be limited to
+    // Partition Map type 1, except type 2 maps as described in the document.
+    //
+    // NOTE: Only one Type 1 (Physical) Partition is supported. It has been
+    // checked already in Partition driver for existence of a single Type 1
+    // Partition map, so we don't have to double check here.
+    //
+    // Partition reference number can also be retrieved from
+    // LongAd->ExtentLocation.PartitionReferenceNumber, however the spec says
+    // it may be 0, so let's not rely on it.
+    //
     PartitionNum = *(UINT16 *)((UINTN)&LogicalVolDesc->PartitionMaps[4]);
     break;
-  case 0x0150:
-    //
-    // Ensure Type 1 Partition map. Other types aren't supported in this
-    // implementation.
-    //
-    if (LogicalVolDesc->PartitionMaps[0] != 1 ||
-        LogicalVolDesc->PartitionMaps[1] != 6) {
-      return NULL;
-    }
-    PartitionNum = *(UINT16 *)((UINTN)&LogicalVolDesc->PartitionMaps[4]);
-    break;
-  case 0x0260:
-    //
-    // Fall through.
-    //
+
   default:
-    PartitionNum = LongAd->ExtentLocation.PartitionReferenceNumber;
-    break;
+    //
+    // Unsupported UDF revision
+    //
+    return NULL;
   }
 
-  for (Index = 0; Index < Volume->PartitionDescsNo; Index++) {
-    PartitionDesc = Volume->PartitionDescs[Index];
-    if (PartitionDesc->PartitionNumber == PartitionNum) {
-      return PartitionDesc;
-    }
+  //
+  // Check if partition number matches Partition Descriptor found in Main Volume
+  // Descriptor Sequence.
+  //
+  if (Volume->PartitionDesc.PartitionNumber == PartitionNum) {
+    return &Volume->PartitionDesc;
   }
 
   return NULL;
@@ -329,13 +288,15 @@ GetLongAdLsn (
   PartitionDesc = GetPdFromLongAd (Volume, LongAd);
   ASSERT (PartitionDesc != NULL);
 
-  return (UINT64)PartitionDesc->PartitionStartingLocation +
-                 LongAd->ExtentLocation.LogicalBlockNumber;
+  return (UINT64)PartitionDesc->PartitionStartingLocation -
+    Volume->MainVdsStartLocation +
+    LongAd->ExtentLocation.LogicalBlockNumber;
 }
 
 /**
   Return logical sector number of a given Short Allocation Descriptor.
 
+  @param[in]  Volume              Volume pointer.
   @param[in]  PartitionDesc       Partition Descriptor pointer.
   @param[in]  ShortAd             Short Allocation Descriptor pointer.
 
@@ -344,14 +305,13 @@ GetLongAdLsn (
 **/
 UINT64
 GetShortAdLsn (
+  IN UDF_VOLUME_INFO                  *Volume,
   IN UDF_PARTITION_DESCRIPTOR         *PartitionDesc,
   IN UDF_SHORT_ALLOCATION_DESCRIPTOR  *ShortAd
   )
 {
-  ASSERT (PartitionDesc != NULL);
-
-  return (UINT64)PartitionDesc->PartitionStartingLocation +
-    ShortAd->ExtentPosition;
+  return (UINT64)PartitionDesc->PartitionStartingLocation -
+    Volume->MainVdsStartLocation + ShortAd->ExtentPosition;
 }
 
 /**
@@ -363,8 +323,6 @@ GetShortAdLsn (
   @param[in]  BlockIo             BlockIo interface.
   @param[in]  DiskIo              DiskIo interface.
   @param[in]  Volume              Volume information pointer.
-  @param[in]  LogicalVolDescNum   Index of Logical Volume Descriptor
-  @param[out] FileSetDesc         File Set Descriptor pointer.
 
   @retval EFI_SUCCESS             File Set Descriptor pointer found.
   @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
@@ -375,116 +333,46 @@ EFI_STATUS
 FindFileSetDescriptor (
   IN   EFI_BLOCK_IO_PROTOCOL    *BlockIo,
   IN   EFI_DISK_IO_PROTOCOL     *DiskIo,
-  IN   UDF_VOLUME_INFO          *Volume,
-  IN   UINTN                    LogicalVolDescNum,
-  OUT  UDF_FILE_SET_DESCRIPTOR  *FileSetDesc
+  IN   UDF_VOLUME_INFO          *Volume
   )
 {
   EFI_STATUS                     Status;
   UINT64                         Lsn;
   UDF_LOGICAL_VOLUME_DESCRIPTOR  *LogicalVolDesc;
+  UDF_DESCRIPTOR_TAG             *DescriptorTag;
 
-  LogicalVolDesc = Volume->LogicalVolDescs[LogicalVolDescNum];
+  LogicalVolDesc = &Volume->LogicalVolDesc;
   Lsn = GetLongAdLsn (Volume, &LogicalVolDesc->LogicalVolumeContentsUse);
 
   //
-  // Read extent (Long Ad).
+  // As per UDF 2.60 specification:
+  //
+  // There shall be exactly one File Set Descriptor recorded per Logical
+  // Volume.
+  //
+  // Read disk block
   //
   Status = DiskIo->ReadDisk (
     DiskIo,
     BlockIo->Media->MediaId,
     MultU64x32 (Lsn, LogicalVolDesc->LogicalBlockSize),
-    sizeof (UDF_FILE_SET_DESCRIPTOR),
-    (VOID *)FileSetDesc
+    sizeof (Volume->FileSetDesc),
+    &Volume->FileSetDesc
     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
+  DescriptorTag = &Volume->FileSetDesc.DescriptorTag;
+
   //
-  // Check if the read extent contains a valid FSD's tag identifier.
+  // Check if read block is a File Set Descriptor
   //
-  if (!IS_FSD (FileSetDesc)) {
+  if (DescriptorTag->TagIdentifier != UdfFileSetDescriptor) {
     return EFI_VOLUME_CORRUPTED;
   }
 
   return EFI_SUCCESS;
-}
-
-/**
-  Get all File Set Descriptors for each Logical Volume Descriptor.
-
-  @param[in]      BlockIo         BlockIo interface.
-  @param[in]      DiskIo          DiskIo interface.
-  @param[in, out] Volume          Volume information pointer.
-
-  @retval EFI_SUCCESS             File Set Descriptors were got.
-  @retval EFI_OUT_OF_RESOURCES    File Set Descriptors were not got due to lack
-                                  of resources.
-  @retval other                   Error occured when finding File Set
-                                  Descriptor in Logical Volume Descriptor.
-
-**/
-EFI_STATUS
-GetFileSetDescriptors (
-  IN      EFI_BLOCK_IO_PROTOCOL  *BlockIo,
-  IN      EFI_DISK_IO_PROTOCOL   *DiskIo,
-  IN OUT  UDF_VOLUME_INFO        *Volume
-  )
-{
-  EFI_STATUS               Status;
-  UINTN                    Index;
-  UDF_FILE_SET_DESCRIPTOR  *FileSetDesc;
-  UINTN                    Count;
-
-  Volume->FileSetDescs =
-    (UDF_FILE_SET_DESCRIPTOR **)AllocateZeroPool (
-      Volume->LogicalVolDescsNo * sizeof (UDF_FILE_SET_DESCRIPTOR));
-  if (Volume->FileSetDescs == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  for (Index = 0; Index < Volume->LogicalVolDescsNo; Index++) {
-    FileSetDesc = AllocateZeroPool (sizeof (UDF_FILE_SET_DESCRIPTOR));
-    if (FileSetDesc == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Error_Alloc_Fsd;
-    }
-
-    //
-    // Find a FSD for this LVD.
-    //
-    Status = FindFileSetDescriptor (
-      BlockIo,
-      DiskIo,
-      Volume,
-      Index,
-      FileSetDesc
-      );
-    if (EFI_ERROR (Status)) {
-      goto Error_Find_Fsd;
-    }
-
-    //
-    // Got one. Save it.
-    //
-    Volume->FileSetDescs[Index] = FileSetDesc;
-  }
-
-  Volume->FileSetDescsNo = Volume->LogicalVolDescsNo;
-  return EFI_SUCCESS;
-
-Error_Find_Fsd:
-  Count = Index + 1;
-  for (Index = 0; Index < Count; Index++) {
-    FreePool ((VOID *)Volume->FileSetDescs[Index]);
-  }
-
-  FreePool ((VOID *)Volume->FileSetDescs);
-  Volume->FileSetDescs = NULL;
-
-Error_Alloc_Fsd:
-  return Status;
 }
 
 /**
@@ -507,9 +395,10 @@ ReadVolumeFileStructure (
 {
   EFI_STATUS                            Status;
   UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  AnchorPoint;
+  UDF_EXTENT_AD                         *ExtentAd;
 
   //
-  // Find an AVDP.
+  // Find Anchor Volume Descriptor Pointer
   //
   Status = FindAnchorVolumeDescriptorPointer (
     BlockIo,
@@ -521,7 +410,14 @@ ReadVolumeFileStructure (
   }
 
   //
-  // AVDP has been found. Start MVDS.
+  // Save Main VDS start block number
+  //
+  ExtentAd = &AnchorPoint.MainVolumeDescriptorSequenceExtent;
+
+  Volume->MainVdsStartLocation = (UINT64)ExtentAd->ExtentLocation;
+
+  //
+  // Start Main Volume Descriptor Sequence.
   //
   Status = StartMainVolumeDescriptorSequence (
     BlockIo,
@@ -620,16 +516,19 @@ GetFileEntryData (
   OUT  UINT64  *Length
   )
 {
+  UDF_DESCRIPTOR_TAG       *DescriptorTag;
   UDF_EXTENDED_FILE_ENTRY  *ExtendedFileEntry;
   UDF_FILE_ENTRY           *FileEntry;
 
-  if (IS_EFE (FileEntryData)) {
+  DescriptorTag = FileEntryData;
+
+  if (DescriptorTag->TagIdentifier == UdfExtendedFileEntry) {
     ExtendedFileEntry = (UDF_EXTENDED_FILE_ENTRY *)FileEntryData;
 
     *Length  = ExtendedFileEntry->InformationLength;
     *Data    = (VOID *)((UINT8 *)ExtendedFileEntry->Data +
                         ExtendedFileEntry->LengthOfExtendedAttributes);
-  } else if (IS_FE (FileEntryData)) {
+  } else if (DescriptorTag->TagIdentifier == UdfFileEntry) {
     FileEntry = (UDF_FILE_ENTRY *)FileEntryData;
 
     *Length  = FileEntry->InformationLength;
@@ -654,16 +553,19 @@ GetAdsInformation (
   OUT  UINT64  *Length
   )
 {
+  UDF_DESCRIPTOR_TAG       *DescriptorTag;
   UDF_EXTENDED_FILE_ENTRY  *ExtendedFileEntry;
   UDF_FILE_ENTRY           *FileEntry;
 
-  if (IS_EFE (FileEntryData)) {
+  DescriptorTag = FileEntryData;
+
+  if (DescriptorTag->TagIdentifier == UdfExtendedFileEntry) {
     ExtendedFileEntry = (UDF_EXTENDED_FILE_ENTRY *)FileEntryData;
 
     *Length = ExtendedFileEntry->LengthOfAllocationDescriptors;
     *AdsData = (VOID *)((UINT8 *)ExtendedFileEntry->Data +
                         ExtendedFileEntry->LengthOfExtendedAttributes);
-  } else if (IS_FE (FileEntryData)) {
+  } else if (DescriptorTag->TagIdentifier == UdfFileEntry) {
     FileEntry = (UDF_FILE_ENTRY *)FileEntryData;
 
     *Length = FileEntry->LengthOfAllocationDescriptors;
@@ -850,6 +752,7 @@ GetAllocationDescriptorLsn (
     return GetLongAdLsn (Volume, (UDF_LONG_ALLOCATION_DESCRIPTOR *)Ad);
   } else if (RecordingFlags == ShortAdsSequence) {
     return GetShortAdLsn (
+      Volume,
       GetPdFromLongAd (Volume, ParentIcb),
       (UDF_SHORT_ALLOCATION_DESCRIPTOR *)Ad
       );
@@ -897,6 +800,7 @@ GetAedAdsOffset (
   VOID                              *Data;
   UINT32                            LogicalBlockSize;
   UDF_ALLOCATION_EXTENT_DESCRIPTOR  *AllocExtDesc;
+  UDF_DESCRIPTOR_TAG                *DescriptorTag;
 
   ExtentLength  = GET_EXTENT_LENGTH (RecordingFlags, Ad);
   Lsn           = GetAllocationDescriptorLsn (RecordingFlags,
@@ -909,7 +813,7 @@ GetAedAdsOffset (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  LogicalBlockSize = LV_BLOCK_SIZE (Volume, UDF_DEFAULT_LV_NUM);
+  LogicalBlockSize = Volume->LogicalVolDesc.LogicalBlockSize;
 
   //
   // Read extent.
@@ -925,11 +829,14 @@ GetAedAdsOffset (
     goto Exit;
   }
 
+  AllocExtDesc = (UDF_ALLOCATION_EXTENT_DESCRIPTOR *)Data;
+
+  DescriptorTag = &AllocExtDesc->DescriptorTag;
+
   //
   // Check if read extent contains a valid tag identifier for AED.
   //
-  AllocExtDesc = (UDF_ALLOCATION_EXTENT_DESCRIPTOR *)Data;
-  if (!IS_AED (AllocExtDesc)) {
+  if (DescriptorTag->TagIdentifier != UdfAllocationExtentDescriptor) {
     Status = EFI_VOLUME_CORRUPTED;
     goto Exit;
   }
@@ -1102,7 +1009,7 @@ ReadFile (
   UINT32                  ExtentLength;
   UDF_FE_RECORDING_FLAGS  RecordingFlags;
 
-  LogicalBlockSize  = LV_BLOCK_SIZE (Volume, UDF_DEFAULT_LV_NUM);
+  LogicalBlockSize  = Volume->LogicalVolDesc.LogicalBlockSize;
   DoFreeAed         = FALSE;
 
   //
@@ -1444,7 +1351,7 @@ InternalFindFile (
   //
   // Check if parent file is really directory.
   //
-  if (!IS_FE_DIRECTORY (Parent->FileEntry)) {
+  if (FE_ICB_FILE_TYPE (Parent->FileEntry) != UdfFileEntryDirectory) {
     return EFI_NOT_FOUND;
   }
 
@@ -1489,7 +1396,7 @@ InternalFindFile (
       break;
     }
 
-    if (IS_FID_PARENT_FILE (FileIdentifierDesc)) {
+    if (FileIdentifierDesc->FileCharacteristics & PARENT_FILE) {
       //
       // This FID contains the location (FE/EFE) of the parent directory of this
       // directory (Parent), and if FileName is either ".." or "\\", then it's
@@ -1592,6 +1499,9 @@ ReadUdfVolumeInformation (
 {
   EFI_STATUS Status;
 
+  //
+  // Read all necessary UDF volume information and keep it private to the driver
+  //
   Status = ReadVolumeFileStructure (
     BlockIo,
     DiskIo,
@@ -1601,13 +1511,12 @@ ReadUdfVolumeInformation (
     return Status;
   }
 
-  Status = GetFileSetDescriptors (
-    BlockIo,
-    DiskIo,
-    Volume
-    );
+  //
+  // Find File Set Descriptor
+  //
+  Status = FindFileSetDescriptor (BlockIo, DiskIo, Volume);
   if (EFI_ERROR (Status)) {
-    CleanupVolumeInformation (Volume);
+    return Status;
   }
 
   return Status;
@@ -1644,7 +1553,7 @@ FindRootDirectory (
     BlockIo,
     DiskIo,
     Volume,
-    &Volume->FileSetDescs[0]->RootDirectoryIcb,
+    &Volume->FileSetDesc.RootDirectoryIcb,
     &File->FileEntry
     );
   if (EFI_ERROR (Status)) {
@@ -1661,7 +1570,7 @@ FindRootDirectory (
     L"\\",
     NULL,
     &Parent,
-    &Volume->FileSetDescs[0]->RootDirectoryIcb,
+    &Volume->FileSetDesc.RootDirectoryIcb,
     File
     );
   if (EFI_ERROR (Status)) {
@@ -1697,12 +1606,13 @@ FindFileEntry (
   OUT  VOID                            **FileEntry
   )
 {
-  EFI_STATUS  Status;
-  UINT64      Lsn;
-  UINT32      LogicalBlockSize;
+  EFI_STATUS          Status;
+  UINT64              Lsn;
+  UINT32              LogicalBlockSize;
+  UDF_DESCRIPTOR_TAG  *DescriptorTag;
 
   Lsn               = GetLongAdLsn (Volume, Icb);
-  LogicalBlockSize  = LV_BLOCK_SIZE (Volume, UDF_DEFAULT_LV_NUM);
+  LogicalBlockSize  = Volume->LogicalVolDesc.LogicalBlockSize;
 
   *FileEntry = AllocateZeroPool (Volume->FileEntrySize);
   if (*FileEntry == NULL) {
@@ -1723,11 +1633,14 @@ FindFileEntry (
     goto Error_Read_Disk_Blk;
   }
 
+  DescriptorTag = *FileEntry;
+
   //
   // Check if the read extent contains a valid Tag Identifier for the expected
   // FE/EFE.
   //
-  if (!IS_FE (*FileEntry) && !IS_EFE (*FileEntry)) {
+  if (DescriptorTag->TagIdentifier != UdfFileEntry &&
+      DescriptorTag->TagIdentifier != UdfExtendedFileEntry) {
     Status = EFI_VOLUME_CORRUPTED;
     goto Error_Invalid_Fe;
   }
@@ -1837,7 +1750,7 @@ FindFile (
     // If the found file is a symlink, then find its respective FE/EFE and
     // FID descriptors.
     //
-    if (IS_FE_SYMLINK (File->FileEntry)) {
+    if (FE_ICB_FILE_TYPE (File->FileEntry) == UdfFileEntrySymlink) {
       FreePool ((VOID *)File->FileIdentifierDesc);
 
       FileEntry = File->FileEntry;
@@ -1951,7 +1864,7 @@ ReadDirectoryEntry (
     // Update FidOffset to point to next FID.
     //
     ReadDirInfo->FidOffset += GetFidDescriptorLength (FileIdentifierDesc);
-  } while (IS_FID_DELETED_FILE (FileIdentifierDesc));
+  } while (FileIdentifierDesc->FileCharacteristics & DELETED_FILE);
 
   DuplicateFid (FileIdentifierDesc, FoundFid);
 
@@ -2197,43 +2110,6 @@ Error_Find_File:
 }
 
 /**
-  Clean up in-memory UDF volume information.
-
-  @param[in] Volume Volume information pointer.
-
-**/
-VOID
-CleanupVolumeInformation (
-  IN UDF_VOLUME_INFO *Volume
-  )
-{
-  UINTN Index;
-
-  if (Volume->LogicalVolDescs != NULL) {
-    for (Index = 0; Index < Volume->LogicalVolDescsNo; Index++) {
-      FreePool ((VOID *)Volume->LogicalVolDescs[Index]);
-    }
-    FreePool ((VOID *)Volume->LogicalVolDescs);
-  }
-
-  if (Volume->PartitionDescs != NULL) {
-    for (Index = 0; Index < Volume->PartitionDescsNo; Index++) {
-      FreePool ((VOID *)Volume->PartitionDescs[Index]);
-    }
-    FreePool ((VOID *)Volume->PartitionDescs);
-  }
-
-  if (Volume->FileSetDescs != NULL) {
-    for (Index = 0; Index < Volume->FileSetDescsNo; Index++) {
-      FreePool ((VOID *)Volume->FileSetDescs[Index]);
-    }
-    FreePool ((VOID *)Volume->FileSetDescs);
-  }
-
-  ZeroMem ((VOID *)Volume, sizeof (UDF_VOLUME_INFO));
-}
-
-/**
   Clean up in-memory UDF file information.
 
   @param[in] File File information pointer.
@@ -2333,6 +2209,7 @@ SetFileInfo (
   EFI_FILE_INFO            *FileInfo;
   UDF_FILE_ENTRY           *FileEntry;
   UDF_EXTENDED_FILE_ENTRY  *ExtendedFileEntry;
+  UDF_DESCRIPTOR_TAG       *DescriptorTag;
 
   //
   // Calculate the needed size for the EFI_FILE_INFO structure.
@@ -2367,7 +2244,9 @@ SetFileInfo (
     FileInfo->Attribute |= EFI_FILE_HIDDEN;
   }
 
-  if (IS_FE (File->FileEntry)) {
+  DescriptorTag = File->FileEntry;
+
+  if (DescriptorTag->TagIdentifier == UdfFileEntry) {
     FileEntry = (UDF_FILE_ENTRY *)File->FileEntry;
 
     //
@@ -2403,7 +2282,7 @@ SetFileInfo (
                                    FileEntry->AccessTime.Second;
     FileInfo->LastAccessTime.Nanosecond  =
                                    FileEntry->AccessTime.HundredsOfMicroseconds;
-  } else if (IS_EFE (File->FileEntry)) {
+  } else if (DescriptorTag->TagIdentifier == UdfExtendedFileEntry) {
     ExtendedFileEntry = (UDF_EXTENDED_FILE_ENTRY *)File->FileEntry;
 
     //
@@ -2487,91 +2366,103 @@ GetVolumeSize (
   OUT  UINT64                 *FreeSpaceSize
   )
 {
-  UDF_EXTENT_AD                 ExtentAd;
-  UINT32                        LogicalBlockSize;
-  UINT64                        Lsn;
-  EFI_STATUS                    Status;
-  UDF_LOGICAL_VOLUME_INTEGRITY  *LogicalVolInt;
-  UINTN                         Index;
-  UINTN                         Length;
-  UINT32                        LsnsNo;
+  EFI_STATUS                     Status;
+  UDF_LOGICAL_VOLUME_DESCRIPTOR  *LogicalVolDesc;
+  UDF_EXTENT_AD                  *ExtentAd;
+  UINT64                         Lsn;
+  UINT32                         LogicalBlockSize;
+  UDF_LOGICAL_VOLUME_INTEGRITY   *LogicalVolInt;
+  UDF_DESCRIPTOR_TAG             *DescriptorTag;
+  UINTN                          Index;
+  UINTN                          Length;
+  UINT32                         LsnsNo;
 
-  *VolumeSize     = 0;
-  *FreeSpaceSize  = 0;
+  LogicalVolDesc = &Volume->LogicalVolDesc;
 
-  for (Index = 0; Index < Volume->LogicalVolDescsNo; Index++) {
-    CopyMem ((VOID *)&ExtentAd,
-             (VOID *)&Volume->LogicalVolDescs[Index]->IntegritySequenceExtent,
-             sizeof (UDF_EXTENT_AD));
-    if (ExtentAd.ExtentLength == 0) {
-      continue;
-    }
+  ExtentAd = &LogicalVolDesc->IntegritySequenceExtent;
 
-    LogicalBlockSize = LV_BLOCK_SIZE (Volume, Index);
-
-  Read_Next_Sequence:
-    LogicalVolInt = (UDF_LOGICAL_VOLUME_INTEGRITY *)
-      AllocatePool (ExtentAd.ExtentLength);
-    if (LogicalVolInt == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Lsn = (UINT64)ExtentAd.ExtentLocation;
-
-    Status = DiskIo->ReadDisk (
-      DiskIo,
-      BlockIo->Media->MediaId,
-      MultU64x32 (Lsn, LogicalBlockSize),
-      ExtentAd.ExtentLength,
-      (VOID *)LogicalVolInt
-      );
-    if (EFI_ERROR (Status)) {
-      FreePool ((VOID *)LogicalVolInt);
-      return Status;
-    }
-
-    if (!IS_LVID (LogicalVolInt)) {
-      FreePool ((VOID *)LogicalVolInt);
-      return EFI_VOLUME_CORRUPTED;
-    }
-
-    Length = LogicalVolInt->NumberOfPartitions;
-    for (Index = 0; Index < Length; Index += sizeof (UINT32)) {
-      LsnsNo = *(UINT32 *)((UINT8 *)LogicalVolInt->Data + Index);
-      if (LsnsNo == 0xFFFFFFFFUL) {
-        //
-        // Size not specified.
-        //
-        continue;
-      }
-
-      *FreeSpaceSize += MultU64x32 ((UINT64)LsnsNo, LogicalBlockSize);
-    }
-
-    Length = (LogicalVolInt->NumberOfPartitions * sizeof (UINT32)) << 1;
-    for (; Index < Length; Index += sizeof (UINT32)) {
-      LsnsNo = *(UINT32 *)((UINT8 *)LogicalVolInt->Data + Index);
-      if (LsnsNo == 0xFFFFFFFFUL) {
-        //
-        // Size not specified.
-        //
-        continue;
-      }
-
-      *VolumeSize += MultU64x32 ((UINT64)LsnsNo, LogicalBlockSize);
-    }
-
-    CopyMem ((VOID *)&ExtentAd,(VOID *)&LogicalVolInt->NextIntegrityExtent,
-             sizeof (UDF_EXTENT_AD));
-    if (ExtentAd.ExtentLength > 0) {
-      FreePool ((VOID *)LogicalVolInt);
-      goto Read_Next_Sequence;
-    }
-
-    FreePool ((VOID *)LogicalVolInt);
+  if (ExtentAd->ExtentLength == 0) {
+    return EFI_VOLUME_CORRUPTED;
   }
 
-  return EFI_SUCCESS;
+  LogicalVolInt = AllocatePool (ExtentAd->ExtentLength);
+  if (LogicalVolInt == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Get location of Logical Volume Integrity Descriptor
+  //
+  Lsn = (UINT64)ExtentAd->ExtentLocation - Volume->MainVdsStartLocation;
+
+  LogicalBlockSize = LogicalVolDesc->LogicalBlockSize;
+
+  //
+  // Read disk block
+  //
+  Status = DiskIo->ReadDisk (
+    DiskIo,
+    BlockIo->Media->MediaId,
+    MultU64x32 (Lsn, LogicalBlockSize),
+    ExtentAd->ExtentLength,
+    LogicalVolInt
+    );
+  if (EFI_ERROR (Status)) {
+    goto Out_Free;
+  }
+
+  DescriptorTag = &LogicalVolInt->DescriptorTag;
+
+  //
+  // Check if read block is a Logical Volume Integrity Descriptor
+  //
+  if (DescriptorTag->TagIdentifier != UdfLogicalVolumeIntegrityDescriptor) {
+    Status = EFI_VOLUME_CORRUPTED;
+    goto Out_Free;
+  }
+
+  *VolumeSize = 0;
+  *FreeSpaceSize = 0;
+
+  Length = LogicalVolInt->NumberOfPartitions;
+  for (Index = 0; Index < Length; Index += sizeof (UINT32)) {
+    LsnsNo = *(UINT32 *)((UINT8 *)LogicalVolInt->Data + Index);
+    //
+    // Check if size is not specified
+    //
+    if (LsnsNo == 0xFFFFFFFFUL) {
+      continue;
+    }
+    //
+    // Accumulate free space size
+    //
+    *FreeSpaceSize += MultU64x32 ((UINT64)LsnsNo, LogicalBlockSize);
+  }
+
+  Length = LogicalVolInt->NumberOfPartitions * sizeof (UINT32) * 2;
+  for (; Index < Length; Index += sizeof (UINT32)) {
+    LsnsNo = *(UINT32 *)((UINT8 *)LogicalVolInt->Data + Index);
+    //
+    // Check if size is not specified
+    //
+    if (LsnsNo == 0xFFFFFFFFUL) {
+      continue;
+    }
+    //
+    // Accumulate used volume space
+    //
+    *VolumeSize += MultU64x32 ((UINT64)LsnsNo, LogicalBlockSize);
+  }
+
+  Status = EFI_SUCCESS;
+
+Out_Free:
+  //
+  // Free Logical Volume Integrity Descriptor
+  //
+  FreePool (LogicalVolInt);
+
+  return Status;
 }
 
 /**
