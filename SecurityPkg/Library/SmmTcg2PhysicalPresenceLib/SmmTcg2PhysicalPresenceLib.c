@@ -10,7 +10,7 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -291,6 +291,7 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
       }
       break;
 
+    case TCG2_PHYSICAL_PRESENCE_NO_ACTION:
     case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_CLEAR_TRUE:
       RequestConfirmed = TRUE;
       break;
@@ -336,12 +337,11 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
       break;
 
     default:
-      if (OperationRequest <= TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
-        RequestConfirmed = TRUE;
-      } else {
-        if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-          return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
-        }
+      if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+        //
+        // TCG PP spec defined operations that are reserved or un-implemented
+        //
+        return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
       }
       break;
   }
