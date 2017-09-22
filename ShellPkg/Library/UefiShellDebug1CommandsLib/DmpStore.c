@@ -424,7 +424,7 @@ CascadeProcessVariables (
   CHAR16                    *AttrString;
   CHAR16                    *HexString;
   EFI_STATUS                SetStatus;
-  CHAR16                    *GuidName;
+  CONST CHAR16              *GuidName;
 
   if (ShellGetExecutionBreakFlag()) {
     return (SHELL_ABORTED);
