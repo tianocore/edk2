@@ -802,8 +802,12 @@ RefreshGcdMemoryAttributesFromPaging (
 
   GetCurrentPagingContext (&PagingContext);
 
-  BaseAddress = 0;
-  PageLength  = 0;
+  DoUpdate      = FALSE;
+  Capabilities  = 0;
+  Attributes    = 0;
+  BaseAddress   = 0;
+  PageLength    = 0;
+
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
       continue;
