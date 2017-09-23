@@ -33,6 +33,8 @@
   IntelVTdPmrPei.c
   IntelVTdPmrPei.h
   IntelVTdPmr.c
+  DmarTable.c
+  VtdReg.c
 
 [LibraryClasses]
   DebugLib
@@ -42,17 +44,18 @@
   PeiServicesLib
   HobLib
   IoLib
+  CacheMaintenanceLib
 
 [Ppis]
-  gEdkiiIoMmuPpiGuid            ## PRODUCES
-  gEdkiiVTdInfoPpiGuid          ## CONSUMES
-  gEfiEndOfPeiSignalPpiGuid     ## CONSUMES
+  gEdkiiIoMmuPpiGuid                  ## PRODUCES
+  gEdkiiVTdInfoPpiGuid                ## CONSUMES
+  gEfiPeiMemoryDiscoveredPpiGuid      ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid           ## CONSUMES
 
 [Pcd]
   gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask   ## CONSUMES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND
   gEfiPeiMasterBootModePpiGuid AND
   gEdkiiVTdInfoPpiGuid
 
