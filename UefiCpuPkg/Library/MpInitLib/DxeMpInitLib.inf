@@ -63,7 +63,7 @@
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
-  gEfiEventLegacyBootGuid                       ## CONSUMES  ## Event
+  gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES
