@@ -51,7 +51,7 @@
   HobLib
 
 [Guids]
-  ## CONSUMES   ## GUID
+  ## SOMETIMES_CONSUMES   ## GUID
   gZeroGuid
 
 [Pcd]
