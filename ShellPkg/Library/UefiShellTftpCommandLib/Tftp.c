@@ -284,6 +284,7 @@ ShellCommandRunTftp (
   EFI_HANDLE              Mtftp4ChildHandle;
   EFI_MTFTP4_PROTOCOL     *Mtftp4;
   UINTN                   FileSize;
+  UINTN                   DataSize;
   VOID                    *Data;
   SHELL_FILE_HANDLE       FileHandle;
   UINT16                  BlockSize;
@@ -294,6 +295,7 @@ ShellCommandRunTftp (
   AsciiRemoteFilePath = NULL;
   Handles             = NULL;
   FileSize            = 0;
+  DataSize            = 0;
   BlockSize           = MTFTP_DEFAULT_BLKSIZE;
 
   //
@@ -537,6 +539,7 @@ ShellCommandRunTftp (
       goto NextHandle;
     }
 
+    DataSize = FileSize;
     Status = ShellWriteFile (FileHandle, &FileSize, Data);
     if (!EFI_ERROR (Status)) {
       ShellStatus = SHELL_SUCCESS;
@@ -551,7 +554,7 @@ ShellCommandRunTftp (
     NextHandle:
 
     if (Data != NULL) {
-      gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Data, EFI_SIZE_TO_PAGES (FileSize));
+      gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Data, EFI_SIZE_TO_PAGES (DataSize));
     }
 
     CloseProtocolAndDestroyServiceChild (
