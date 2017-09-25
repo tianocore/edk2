@@ -58,7 +58,7 @@
 [Protocols]
   gEfiFirmwareManagementProtocolGuid      ## SOMETIMES_CONSUMES
   gEsrtManagementProtocolGuid             ## PRODUCES
-  gEdkiiVariableLockProtocolGuid          ## CONSUMES
+  gEdkiiVariableLockProtocolGuid          ## SOMETIMES_CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxFmpEsrtCacheNum                  ## CONSUMES

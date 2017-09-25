@@ -77,7 +77,7 @@
   ## NOTIFY
   gEdkiiFormDisplayEngineProtocolGuid
   gEdkiiFormBrowserExProtocolGuid               ## PRODUCES
-  gEfiRegularExpressionProtocolGuid             ## CONSUMES
+  gEfiRegularExpressionProtocolGuid             ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES

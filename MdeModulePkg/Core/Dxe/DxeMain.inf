@@ -107,7 +107,7 @@
   ## CONSUMES   ## Event
   ## PRODUCES   ## Event
   gEfiEventExitBootServicesGuid
-  gEfiHobMemoryAllocModuleGuid                  ## CONSUMES             ## HOB
+  gEfiHobMemoryAllocModuleGuid                  ## SOMETIMES_CONSUMES   ## HOB
   gEfiFirmwareFileSystem2Guid                   ## CONSUMES             ## GUID # Used to compare with FV's file system guid and get the FV's file system format
   gEfiFirmwareFileSystem3Guid                   ## CONSUMES             ## GUID # Used to compare with FV's file system guid and get the FV's file system format
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File

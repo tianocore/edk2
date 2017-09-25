@@ -109,7 +109,7 @@
   gEdkiiMemoryProfileGuid
   ## SOMETIMES_PRODUCES   ## GUID # Install protocol
   gEdkiiSmmMemoryProfileGuid
-  gEdkiiPiSmmMemoryAttributesTableGuid          ## SOMETIMES_PRODUCES   ## SystemTable
+  gEdkiiPiSmmMemoryAttributesTableGuid          ## PRODUCES   ## SystemTable
   ## SOMETIMES_CONSUMES   ## SystemTable
   gLoadFixedAddressConfigurationTableGuid
   ## SOMETIMES_PRODUCES   ## GUID # Install protocol

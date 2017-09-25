@@ -42,6 +42,6 @@
   DevicePathLib
 
 [Protocols]
-  gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid                       ## SOMETIMES_CONSUMES
   gEfiDevicePathProtocolGuid                              ## CONSUMES
 

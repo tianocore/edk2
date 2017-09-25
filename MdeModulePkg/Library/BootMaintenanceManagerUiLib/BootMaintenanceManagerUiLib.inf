@@ -79,9 +79,7 @@
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
-  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
-  gEfiFileInfoGuid                              ## CONSUMES ## GUID (Indicate the information type is file)
-  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
+  gEfiIfrTianoGuid                              ## SOMETIMES_CONSUMES ## GUID (Extended IFR Guid Opcode)
   gEfiIfrFrontPageGuid                          ## CONSUMES ## GUID
   gEfiIfrBootMaintenanceGuid                    ## CONSUMES ## GUID
  

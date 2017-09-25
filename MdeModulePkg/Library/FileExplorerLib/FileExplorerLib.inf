@@ -50,14 +50,14 @@
   UefiHiiServicesLib
 
 [Guids]
-  gEfiFileSystemVolumeLabelInfoIdGuid           ## CONSUMES ## GUID (Indicate the information type is volume)
-  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## SOMETIMES_CONSUMES ## GUID (Indicate the information type is volume)
+  gEfiIfrTianoGuid                              ## SOMETIMES_CONSUMES ## GUID (Extended IFR Guid Opcode)
  
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
-  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
-  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## PRODUCES
 
 [Depex.common.DXE_DRIVER]
   gEfiFormBrowser2ProtocolGuid AND gEfiHiiDatabaseProtocolGuid
