@@ -73,7 +73,7 @@
   gEfiTlsConfigurationProtocolGuid                 ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEfiTlsCaCertificateGuid                         ## CONSUMES  ## GUID
+  gEfiTlsCaCertificateGuid                         ## SOMETIMES_CONSUMES  ## Variable:L"TlsCaCertificate"
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES  

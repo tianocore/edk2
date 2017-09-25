@@ -115,7 +115,7 @@
   gEfiIScsiInitiatorNameProtocolGuid
   ## PRODUCES       
   gEfiAuthenticationInfoProtocolGuid
-  ## CONSUMES
+  ## SOMETIMES_CONSUMES
   gEfiAdapterInformationProtocolGuid
 
 [Guids]
