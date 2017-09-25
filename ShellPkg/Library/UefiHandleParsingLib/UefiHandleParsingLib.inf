@@ -335,7 +335,7 @@
 
 [Guids]
   gEfiFileInfoGuid                                        ## UNDEFINED
-  gEfiShellEnvironment2ExtGuid                            ## CONSUMES ## GUID
+  gEfiShellEnvironment2ExtGuid                            ## SOMETIMES_CONSUMES ## GUID
   gEfiPcAnsiGuid                                          ## UNDEFINED
   gEfiVT100Guid                                           ## UNDEFINED
   gEfiVT100PlusGuid                                       ## UNDEFINED
