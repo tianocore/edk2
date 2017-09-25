@@ -265,6 +265,9 @@ SetDataSelectors (
   UINT16 Selector
   );
 
+/**
+  Update GCD memory space attributes according to current page table setup.
+**/
 VOID
 RefreshGcdMemoryAttributesFromPaging (
   VOID
