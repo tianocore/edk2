@@ -1,7 +1,7 @@
 ## @file
 #  Instance of BaseCache.
 #
-#  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -12,7 +12,7 @@
 #
 ##
 
-[defines]
+[Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = BaseCacheLib
   FILE_GUID                      = 8EF3A653-DA8B-4FFA-BB85-FF47406DB9F0
@@ -20,7 +20,7 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = CacheLib
 
-[sources.IA32]
+[Sources.IA32]
   CacheLib.c
   CacheLibInternal.h
 
