@@ -1178,6 +1178,7 @@ Done:
       // EFI_ALREADY_STARTED is not an error for bus driver.
       // Return the corresponding protocol interface.
       //
+      ASSERT (Prot != NULL);
       *Interface = Prot->Interface;
     } else if (Status == EFI_UNSUPPORTED) {
       //
