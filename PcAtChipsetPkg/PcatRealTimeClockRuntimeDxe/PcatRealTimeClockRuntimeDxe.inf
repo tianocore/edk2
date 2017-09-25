@@ -58,8 +58,13 @@
   gEfiRealTimeClockArchProtocolGuid             ## PRODUCES
 
 [Guids]
-  gEfiAcpi10TableGuid                           ## CONSUMES ## Event
-  gEfiAcpiTableGuid                             ## CONSUMES ## Event
+  ## SOMETIMES_CONSUMES ## Event
+  ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi10TableGuid
+
+  ## SOMETIMES_CONSUMES ## Event
+  ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpiTableGuid
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
