@@ -3,7 +3,7 @@
 #
 # This driver will register two callbacks to call fsp's notifies.
 #
-#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -53,10 +53,10 @@
 
 [Protocols]
   gEfiPciEnumerationCompleteProtocolGuid            ## CONSUMES
-  gAddPerfRecordProtocolGuid                        ## CONSUMES
+  gAddPerfRecordProtocolGuid                        ## SOMETIMES_CONSUMES
 
 [Guids]
-  gFspApiPerformanceGuid                            ## CONSUMES ## GUID
+  gFspApiPerformanceGuid                            ## SOMETIMES_CONSUMES ## GUID
   gEfiEventExitBootServicesGuid                     ## CONSUMES ## Event
   gFspHobGuid                                       ## CONSUMES ## HOB
 
