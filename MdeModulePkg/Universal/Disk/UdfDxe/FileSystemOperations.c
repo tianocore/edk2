@@ -748,12 +748,17 @@ GetAllocationDescriptorLsn (
   IN VOID                            *Ad
   )
 {
+  UDF_PARTITION_DESCRIPTOR *PartitionDesc;
+
   if (RecordingFlags == LongAdsSequence) {
     return GetLongAdLsn (Volume, (UDF_LONG_ALLOCATION_DESCRIPTOR *)Ad);
   } else if (RecordingFlags == ShortAdsSequence) {
+    PartitionDesc = GetPdFromLongAd (Volume, ParentIcb);
+    ASSERT (PartitionDesc != NULL);
+
     return GetShortAdLsn (
       Volume,
-      GetPdFromLongAd (Volume, ParentIcb),
+      PartitionDesc,
       (UDF_SHORT_ALLOCATION_DESCRIPTOR *)Ad
       );
   }
