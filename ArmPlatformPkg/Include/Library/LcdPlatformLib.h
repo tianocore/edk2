@@ -153,6 +153,14 @@ typedef enum {
   LCD_BITS_PER_PIXEL_12_444
 } LCD_BPP;
 
+// Display timing settings.
+typedef struct {
+  UINT32                      Resolution;
+  UINT32                      Sync;
+  UINT32                      BackPorch;
+  UINT32                      FrontPorch;
+} SCAN_TIMINGS;
+
 /** Platform related initialization function.
 
   @param[in] Handle              Handle to the LCD device instance.
@@ -228,14 +236,11 @@ LcdPlatformQueryMode (
 
   @param[in]  ModeNumber          Mode Number.
 
-  @param[out] HRes                Pointer to horizontal resolution.
-  @param[out] HSync               Pointer to horizontal sync width.
-  @param[out] HBackPorch          Pointer to horizontal back porch.
-  @param[out] HFrontPorch         Pointer to horizontal front porch.
-  @param[out] VRes                Pointer to vertical resolution.
-  @param[out] VSync               Pointer to vertical sync width.
-  @param[out] VBackPorch          Pointer to vertical back porch.
-  @param[out] VFrontPorch         Pointer to vertical front porch.
+  @param[out] Horizontal          Pointer to horizontal timing parameters.
+                                  (Resolution, Sync, Back porch, Front porch)
+  @param[out] Vertical            Pointer to vertical timing parameters.
+                                  (Resolution, Sync, Back porch, Front porch)
+
 
   @retval EFI_SUCCESS             Display timing information for the requested
                                   mode returned successfully.
@@ -244,14 +249,8 @@ LcdPlatformQueryMode (
 EFI_STATUS
 LcdPlatformGetTimings (
   IN  UINT32                              ModeNumber,
-  OUT UINT32*                             HRes,
-  OUT UINT32*                             HSync,
-  OUT UINT32*                             HBackPorch,
-  OUT UINT32*                             HFrontPorch,
-  OUT UINT32*                             VRes,
-  OUT UINT32*                             VSync,
-  OUT UINT32*                             VBackPorch,
-  OUT UINT32*                             VFrontPorch
+  OUT SCAN_TIMINGS                        **Horizontal,
+  OUT SCAN_TIMINGS                        **Vertical
   );
 
 /** Return bits per pixel information for a mode number.

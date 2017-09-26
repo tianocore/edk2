@@ -84,33 +84,24 @@ LcdSetMode (
   )
 {
   EFI_STATUS        Status;
-  UINT32            HRes;
-  UINT32            HSync;
-  UINT32            HBackPorch;
-  UINT32            HFrontPorch;
-  UINT32            VRes;
-  UINT32            VSync;
-  UINT32            VBackPorch;
-  UINT32            VFrontPorch;
+  SCAN_TIMINGS      *Horizontal;
+  SCAN_TIMINGS      *Vertical;
   UINT32            LcdControl;
   LCD_BPP           LcdBpp;
 
   // Set the video mode timings and other relevant information
   Status = LcdPlatformGetTimings (
              ModeNumber,
-             &HRes,
-             &HSync,
-             &HBackPorch,
-             &HFrontPorch,
-             &VRes,
-             &VSync,
-             &VBackPorch,
-             &VFrontPorch
+             &Horizontal,
+             &Vertical
              );
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
+
+  ASSERT (Horizontal != NULL);
+  ASSERT (Vertical != NULL);
 
   Status = LcdPlatformGetBpp (ModeNumber, &LcdBpp);
   if (EFI_ERROR (Status)) {
@@ -124,15 +115,29 @@ LcdSetMode (
   // Set Timings
   MmioWrite32 (
     PL111_REG_LCD_TIMING_0,
-    HOR_AXIS_PANEL (HBackPorch, HFrontPorch, HSync, HRes)
+    HOR_AXIS_PANEL (
+      Horizontal->BackPorch,
+      Horizontal->FrontPorch,
+      Horizontal->Sync,
+      Horizontal->Resolution
+      )
     );
 
   MmioWrite32 (
     PL111_REG_LCD_TIMING_1,
-    VER_AXIS_PANEL (VBackPorch, VFrontPorch, VSync, VRes)
+    VER_AXIS_PANEL (
+      Vertical->BackPorch,
+      Vertical->FrontPorch,
+      Vertical->Sync,
+      Vertical->Resolution
+      )
     );
 
-  MmioWrite32 (PL111_REG_LCD_TIMING_2, CLK_SIG_POLARITY (HRes));
+  MmioWrite32 (
+    PL111_REG_LCD_TIMING_2,
+    CLK_SIG_POLARITY (Horizontal->Resolution)
+    );
+
   MmioWrite32 (PL111_REG_LCD_TIMING_3, 0);
 
   // PL111_REG_LCD_CONTROL

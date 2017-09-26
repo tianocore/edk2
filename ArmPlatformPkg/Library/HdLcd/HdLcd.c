@@ -98,33 +98,24 @@ LcdSetMode (
   )
 {
   EFI_STATUS        Status;
-  UINT32            HRes;
-  UINT32            HSync;
-  UINT32            HBackPorch;
-  UINT32            HFrontPorch;
-  UINT32            VRes;
-  UINT32            VSync;
-  UINT32            VBackPorch;
-  UINT32            VFrontPorch;
+  SCAN_TIMINGS      *Horizontal;
+  SCAN_TIMINGS      *Vertical;
   UINT32            BytesPerPixel;
   LCD_BPP           LcdBpp;
 
   // Set the video mode timings and other relevant information
   Status = LcdPlatformGetTimings (
              ModeNumber,
-             &HRes,
-             &HSync,
-             &HBackPorch,
-             &HFrontPorch,
-             &VRes,
-             &VSync,
-             &VBackPorch,
-             &VFrontPorch
+             &Horizontal,
+             &Vertical
              );
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
+
+  ASSERT (Horizontal != NULL);
+  ASSERT (Vertical != NULL);
 
   Status = LcdPlatformGetBpp (ModeNumber, &LcdBpp);
   if (EFI_ERROR (Status)) {
@@ -138,21 +129,26 @@ LcdSetMode (
   MmioWrite32 (HDLCD_REG_COMMAND, HDLCD_DISABLE);
 
   // Update the frame buffer information with the new settings
-  MmioWrite32 (HDLCD_REG_FB_LINE_LENGTH, HRes * BytesPerPixel);
-  MmioWrite32 (HDLCD_REG_FB_LINE_PITCH,  HRes * BytesPerPixel);
-  MmioWrite32 (HDLCD_REG_FB_LINE_COUNT,  VRes - 1);
+  MmioWrite32 (
+    HDLCD_REG_FB_LINE_LENGTH,
+    Horizontal->Resolution * BytesPerPixel
+    );
+
+  MmioWrite32 (HDLCD_REG_FB_LINE_PITCH, Horizontal->Resolution * BytesPerPixel);
+
+  MmioWrite32 (HDLCD_REG_FB_LINE_COUNT, Vertical->Resolution - 1);
 
   // Set the vertical timing information
-  MmioWrite32 (HDLCD_REG_V_SYNC,         VSync);
-  MmioWrite32 (HDLCD_REG_V_BACK_PORCH,   VBackPorch);
-  MmioWrite32 (HDLCD_REG_V_DATA,         VRes - 1);
-  MmioWrite32 (HDLCD_REG_V_FRONT_PORCH,  VFrontPorch);
+  MmioWrite32 (HDLCD_REG_V_SYNC,        Vertical->Sync);
+  MmioWrite32 (HDLCD_REG_V_BACK_PORCH,  Vertical->BackPorch);
+  MmioWrite32 (HDLCD_REG_V_DATA,        Vertical->Resolution - 1);
+  MmioWrite32 (HDLCD_REG_V_FRONT_PORCH, Vertical->FrontPorch);
 
   // Set the horizontal timing information
-  MmioWrite32 (HDLCD_REG_H_SYNC,         HSync);
-  MmioWrite32 (HDLCD_REG_H_BACK_PORCH,   HBackPorch);
-  MmioWrite32 (HDLCD_REG_H_DATA,         HRes - 1);
-  MmioWrite32 (HDLCD_REG_H_FRONT_PORCH,  HFrontPorch);
+  MmioWrite32 (HDLCD_REG_H_SYNC,        Horizontal->Sync);
+  MmioWrite32 (HDLCD_REG_H_BACK_PORCH,  Horizontal->BackPorch);
+  MmioWrite32 (HDLCD_REG_H_DATA,        Horizontal->Resolution - 1);
+  MmioWrite32 (HDLCD_REG_H_FRONT_PORCH, Horizontal->FrontPorch);
 
   // Enable the controller
   MmioWrite32 (HDLCD_REG_COMMAND, HDLCD_ENABLE);

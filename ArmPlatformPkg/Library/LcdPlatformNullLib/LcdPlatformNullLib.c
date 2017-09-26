@@ -123,14 +123,8 @@ LcdPlatformQueryMode (
 EFI_STATUS
 LcdPlatformGetTimings (
   IN  UINT32                              ModeNumber,
-  OUT UINT32*                             HRes,
-  OUT UINT32*                             HSync,
-  OUT UINT32*                             HBackPorch,
-  OUT UINT32*                             HFrontPorch,
-  OUT UINT32*                             VRes,
-  OUT UINT32*                             VSync,
-  OUT UINT32*                             VBackPorch,
-  OUT UINT32*                             VFrontPorch
+  OUT SCAN_TIMINGS                        **Horizontal,
+  OUT SCAN_TIMINGS                        **Vertical
   )
 {
   ASSERT (FALSE);
