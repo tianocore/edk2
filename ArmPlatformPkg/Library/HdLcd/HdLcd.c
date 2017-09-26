@@ -73,6 +73,8 @@ LcdSetMode (
   SCAN_TIMINGS      *Horizontal;
   SCAN_TIMINGS      *Vertical;
 
+  EFI_GRAPHICS_PIXEL_FORMAT  PixelFormat;
+
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  ModeInfo;
 
   // Set the video mode timings and other relevant information
@@ -96,7 +98,14 @@ LcdSetMode (
     return Status;
   }
 
-  if (ModeInfo.PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
+  // By default PcdArmHdLcdSwapBlueRedSelect is set to false
+  // However on the Juno platform HW lines for BLUE and RED are swapped
+  // Therefore PcdArmHdLcdSwapBlueRedSelect is set to TRUE for the Juno platform
+  PixelFormat = FixedPcdGetBool (PcdArmHdLcdSwapBlueRedSelect)
+                ? PixelRedGreenBlueReserved8BitPerColor
+                : PixelBlueGreenRedReserved8BitPerColor;
+
+  if (ModeInfo.PixelFormat == PixelFormat) {
     MmioWrite32 (HDLCD_REG_RED_SELECT,  (8 << 8) | 16);
     MmioWrite32 (HDLCD_REG_BLUE_SELECT, (8 << 8) | 0);
   } else {

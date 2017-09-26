@@ -100,6 +100,9 @@
   # Default is set to UEFI console font format PixelBlueGreenRedReserved8BitPerColor
   gArmPlatformTokenSpaceGuid.PcdGopPixelFormat|0x00000001|UINT32|0x00000040
 
+  ## If set, this will swap settings for HDLCD RED_SELECT and BLUE_SELECT registers
+  gArmPlatformTokenSpaceGuid.PcdArmHdLcdSwapBlueRedSelect|FALSE|BOOLEAN|0x00000045
+
 [PcdsFixedAtBuild.common,PcdsDynamic.common]
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0|UINT32|0x00000024
