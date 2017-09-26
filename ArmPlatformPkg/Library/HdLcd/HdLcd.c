@@ -175,11 +175,17 @@ LcdShutdown (
 
   @retval EFI_SUCCESS            Returns success if platform implements a HDLCD
                                  controller.
+  @retval EFI_NOT_FOUND          HDLCD display controller not found on the
+                                 platform.
 **/
 EFI_STATUS
 LcdIdentify (
   VOID
   )
 {
-  return EFI_SUCCESS;
+  if ((MmioRead32 (HDLCD_REG_VERSION) >> 16) == HDLCD_PRODUCT_ID) {
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
 }
