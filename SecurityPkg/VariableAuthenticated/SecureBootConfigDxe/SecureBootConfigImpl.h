@@ -112,6 +112,23 @@ typedef struct {
   UINT8                             FileType;
 } SECUREBOOT_FILE_CONTEXT;
 
+#define SECUREBOOT_FREE_NON_NULL(Pointer)   \
+  do {                                      \
+    if ((Pointer) != NULL) {                \
+      FreePool((Pointer));                  \
+      (Pointer) = NULL;                     \
+    }                                       \
+  } while (FALSE)
+
+#define SECUREBOOT_FREE_NON_OPCODE(Handle)  \
+  do{                                       \
+    if ((Handle) != NULL) {                 \
+      HiiFreeOpCodeHandle((Handle));        \
+    }                                       \
+  } while (FALSE)
+
+#define SIGNATURE_DATA_COUNTS(List)         \
+  (((List)->SignatureListSize - sizeof(EFI_SIGNATURE_LIST) - (List)->SignatureHeaderSize) / (List)->SignatureSize)
 
 //
 // We define another format of 5th directory entry: security directory
@@ -134,6 +151,19 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL          End;
 } HII_VENDOR_DEVICE_PATH;
 
+typedef enum {
+  VARIABLE_DB,
+  VARIABLE_DBX,
+  VARIABLE_DBT,
+  VARIABLE_MAX
+} CURRENT_VARIABLE_NAME;
+
+typedef enum {
+  DELETE_SIGNATURE_LIST_ALL,
+  DELETE_SIGNATURE_LIST_ONE,
+  DELETE_SIGNATURE_DATA
+}SIGNATURE_DELETE_TYPE;
+
 typedef struct {
   UINTN                             Signature;
 
@@ -144,6 +174,11 @@ typedef struct {
   SECUREBOOT_FILE_CONTEXT           *FileContext;
 
   EFI_GUID                          *SignatureGUID;
+
+  CURRENT_VARIABLE_NAME             VariableName;     // The variable name we are processing.
+  UINT32                            ListCount;        // Record current variable has how many signature list.
+  UINTN                             ListIndex;        // Record which signature list is processing.
+  BOOLEAN                           *CheckArray;      // Record whcih siganture data checked.
 } SECUREBOOT_CONFIG_PRIVATE_DATA;
 
 extern SECUREBOOT_CONFIG_PRIVATE_DATA      mSecureBootConfigPrivateDateTemplate;
