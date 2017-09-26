@@ -75,8 +75,8 @@ LcdInitialize (
   @param[in] ModeNumbe           Display mode number.
 
   @retval EFI_SUCCESS            Display mode set successfuly.
-  @retval EFI_DEVICE_ERROR       It returns an error if display timing
-                                 information is not available.
+  @retval !(EFI_SUCCESS)         Other errors.
+
 **/
 EFI_STATUS
 LcdSetMode (
@@ -107,15 +107,15 @@ LcdSetMode (
              &VBackPorch,
              &VFrontPorch
              );
-  ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   Status = LcdPlatformGetBpp (ModeNumber, &LcdBpp);
-  ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   // Disable the CLCD_LcdEn bit

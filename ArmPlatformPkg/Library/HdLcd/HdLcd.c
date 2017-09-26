@@ -90,8 +90,7 @@ LcdInitialize (
   @param[in] ModeNumber          Display mode number.
 
   @retval EFI_SUCCESS            Display mode set successfully.
-  @retval EFI_DEVICE_ERROR       Reurns an error if display timing
-                                 information is not available.
+  @retval !(EFI_SUCCESS)         Other errors.
 **/
 EFI_STATUS
 LcdSetMode (
@@ -122,15 +121,15 @@ LcdSetMode (
              &VBackPorch,
              &VFrontPorch
              );
-  ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   Status = LcdPlatformGetBpp (ModeNumber, &LcdBpp);
-  ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   BytesPerPixel = GetBytesPerPixel (LcdBpp);
