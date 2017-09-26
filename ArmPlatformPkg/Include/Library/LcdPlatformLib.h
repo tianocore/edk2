@@ -1,6 +1,6 @@
 /** @file
 
- Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2018, ARM Ltd. All rights reserved.<BR>
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
@@ -11,8 +11,8 @@
 
  **/
 
-#ifndef __LCDPLATFORMLIB_H
-#define __LCDPLATFORMLIB_H
+#ifndef LCD_PLATFORM_LIB_H_
+#define LCD_PLATFORM_LIB_H_
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -158,8 +158,9 @@
 #define LCD_12BPP_444_BLUE_MASK         0x0000000F
 #define LCD_12BPP_444_RESERVED_MASK     0x0000F000
 
-
-// The enumeration indexes maps the PL111 LcdBpp values used in the LCD Control Register
+/** The enumeration indexes maps the PL111 LcdBpp values used in the LCD Control
+  Register
+**/
 typedef enum {
   LCD_BITS_PER_PIXEL_1 = 0,
   LCD_BITS_PER_PIXEL_2,
@@ -170,7 +171,6 @@ typedef enum {
   LCD_BITS_PER_PIXEL_16_565,
   LCD_BITS_PER_PIXEL_12_444
 } LCD_BPP;
-
 
 EFI_STATUS
 LcdPlatformInitializeDisplay (
@@ -218,4 +218,4 @@ LcdPlatformGetBpp (
   OUT LCD_BPP*                              Bpp
   );
 
-#endif
+#endif /* LCD_PLATFORM_LIB_H_ */

@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011-2018, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,9 +11,8 @@
 
 **/
 
-#ifndef __ARM_VE_GRAPHICS_DXE_H__
-#define __ARM_VE_GRAPHICS_DXE_H__
-
+#ifndef LCD_GRAPHICS_OUTPUT_DXE_H_
+#define LCD_GRAPHICS_OUTPUT_DXE_H_
 
 #include <Base.h>
 
@@ -24,7 +23,6 @@
 #include <Library/UefiLib.h>
 
 #include <Protocol/DevicePath.h>
-
 
 //
 // Device structures
@@ -106,4 +104,4 @@ InitializeDisplay (
   IN LCD_INSTANCE* Instance
 );
 
-#endif /* __ARM_VE_GRAPHICS_DXE_H__ */
+#endif /* LCD_GRAPHICS_OUTPUT_DXE_H_ */
