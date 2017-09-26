@@ -26,6 +26,11 @@
 #define WSXGA                             4
 #define UXGA                              5
 #define HD                                6
+#define WVGA                              7
+#define QHD                               8
+#define WSVGA                             9
+#define HD720                             10
+#define WXGA                              11
 
 // VGA Mode: 640 x 480
 #define VGA_H_RES_PIXELS                  640
@@ -117,6 +122,61 @@
 #define HD_V_SYNC                         (  5 - 1)
 #define HD_V_FRONT_PORCH                  (  3 - 1)
 #define HD_V_BACK_PORCH                   ( 32 - 1)
+
+// WVGA Mode: 800 x 480
+#define WVGA_H_RES_PIXELS                 800
+#define WVGA_V_RES_PIXELS                 480
+#define WVGA_OSC_FREQUENCY                29500000   /* 0x01C22260 */
+#define WVGA_H_SYNC                       ( 72 - 1)
+#define WVGA_H_FRONT_PORCH                ( 24 - 1)
+#define WVGA_H_BACK_PORCH                 ( 96 - 1)
+#define WVGA_V_SYNC                       (  7 - 1)
+#define WVGA_V_FRONT_PORCH                (  3 - 1)
+#define WVGA_V_BACK_PORCH                 ( 10 - 1)
+
+// QHD Mode: 960 x 540
+#define QHD_H_RES_PIXELS                  960
+#define QHD_V_RES_PIXELS                  540
+#define QHD_OSC_FREQUENCY                 40750000   /* 0x026DCBB0 */
+#define QHD_H_SYNC                        ( 96 - 1)
+#define QHD_H_FRONT_PORCH                 ( 32 - 1)
+#define QHD_H_BACK_PORCH                  (128 - 1)
+#define QHD_V_SYNC                        (  5 - 1)
+#define QHD_V_FRONT_PORCH                 (  3 - 1)
+#define QHD_V_BACK_PORCH                  ( 14 - 1)
+
+// WSVGA Mode: 1024 x 600
+#define WSVGA_H_RES_PIXELS                1024
+#define WSVGA_V_RES_PIXELS                600
+#define WSVGA_OSC_FREQUENCY               49000000   /* 0x02EBAE40 */
+#define WSVGA_H_SYNC                      (104 - 1)
+#define WSVGA_H_FRONT_PORCH               ( 40 - 1)
+#define WSVGA_H_BACK_PORCH                (144 - 1)
+#define WSVGA_V_SYNC                      ( 10 - 1)
+#define WSVGA_V_FRONT_PORCH               (  3 - 1)
+#define WSVGA_V_BACK_PORCH                ( 11 - 1)
+
+// HD720 Mode: 1280 x 720
+#define HD720_H_RES_PIXELS                 1280
+#define HD720_V_RES_PIXELS                 720
+#define HD720_OSC_FREQUENCY                74500000   /* 0x0470C7A0 */
+#define HD720_H_SYNC                       (128 - 1)
+#define HD720_H_FRONT_PORCH                ( 64 - 1)
+#define HD720_H_BACK_PORCH                 (192 - 1)
+#define HD720_V_SYNC                       (  5 - 1)
+#define HD720_V_FRONT_PORCH                (  3 - 1)
+#define HD720_V_BACK_PORCH                 ( 20 - 1)
+
+// WXGA Mode: 1280 x 800
+#define WXGA_H_RES_PIXELS                  1280
+#define WXGA_V_RES_PIXELS                  800
+#define WXGA_OSC_FREQUENCY                 83500000  /* 0x04FA1BE0 */
+#define WXGA_H_SYNC                        (128 - 1)
+#define WXGA_H_FRONT_PORCH                 ( 72 - 1)
+#define WXGA_H_BACK_PORCH                  (200 - 1)
+#define WXGA_V_SYNC                        (  6 - 1)
+#define WXGA_V_FRONT_PORCH                 (  3 - 1)
+#define WXGA_V_BACK_PORCH                  ( 22 - 1)
 
 // Colour Masks
 #define LCD_24BPP_RED_MASK              0x00FF0000
