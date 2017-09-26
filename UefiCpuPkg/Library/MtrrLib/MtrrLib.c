@@ -449,10 +449,13 @@ MtrrGetVariableMtrrWorker (
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
     if (MtrrSetting == NULL) {
-      VariableSettings->Mtrr[Index].Base =
-        AsmReadMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1));
-      VariableSettings->Mtrr[Index].Mask =
-        AsmReadMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1));
+      VariableSettings->Mtrr[Index].Mask = AsmReadMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1));
+      //
+      // Skip to read the Base MSR when the Mask.V is not set.
+      //
+      if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *)&VariableSettings->Mtrr[Index].Mask)->Bits.V != 0) {
+        VariableSettings->Mtrr[Index].Base = AsmReadMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1));
+      }
     } else {
       VariableSettings->Mtrr[Index].Base = MtrrSetting->Variables.Mtrr[Index].Base;
       VariableSettings->Mtrr[Index].Mask = MtrrSetting->Variables.Mtrr[Index].Mask;
@@ -2540,14 +2543,14 @@ MtrrSetVariableMtrrWorker (
   ASSERT (VariableMtrrCount <= ARRAY_SIZE (VariableSettings->Mtrr));
 
   for (Index = 0; Index < VariableMtrrCount; Index++) {
-    AsmWriteMsr64 (
-      MSR_IA32_MTRR_PHYSBASE0 + (Index << 1),
-      VariableSettings->Mtrr[Index].Base
-      );
-    AsmWriteMsr64 (
-      MSR_IA32_MTRR_PHYSMASK0 + (Index << 1),
-      VariableSettings->Mtrr[Index].Mask
-      );
+    //
+    // Mask MSR is always updated since caller might need to invalidate the MSR pair.
+    // Base MSR is skipped when Mask.V is not set.
+    //
+    AsmWriteMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1), VariableSettings->Mtrr[Index].Mask);
+    if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *)&VariableSettings->Mtrr[Index].Mask)->Bits.V != 0) {
+      AsmWriteMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1), VariableSettings->Mtrr[Index].Base);
+    }
   }
 }
 
@@ -2800,7 +2803,7 @@ MtrrDebugPrintAllMtrrsWorker (
     }
 
     for (Index = 0; Index < ARRAY_SIZE (Mtrrs->Variables.Mtrr); Index++) {
-      if ((Mtrrs->Variables.Mtrr[Index].Mask & BIT11) == 0) {
+      if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *)&Mtrrs->Variables.Mtrr[Index].Mask)->Bits.V == 0) {
         //
         // If mask is not valid, then do not display range
         //
