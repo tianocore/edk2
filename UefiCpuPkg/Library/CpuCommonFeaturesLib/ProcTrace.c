@@ -120,6 +120,7 @@ ProcTraceSupport (
   // Check if ProcTraceMemorySize option is enabled (0xFF means disable by user)
   //
   ProcTraceData = (PROC_TRACE_DATA *) ConfigData;
+  ASSERT (ProcTraceData != NULL);
   if ((ProcTraceData->ProcTraceMemSize > RtitTopaMemorySize128M) ||
       (ProcTraceData->ProcTraceOutputScheme > RtitOutputSchemeToPA)) {
     return FALSE;
@@ -191,6 +192,7 @@ ProcTraceInitialize (
   RTIT_TOPA_TABLE_ENTRY                *TopaEntryPtr;
 
   ProcTraceData = (PROC_TRACE_DATA *) ConfigData;
+  ASSERT (ProcTraceData != NULL);
 
   MemRegionBaseAddr = 0;
   FirstIn = FALSE;
