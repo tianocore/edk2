@@ -119,8 +119,7 @@ LcdSetMode (
   }
 
   // Disable the CLCD_LcdEn bit
-  LcdControl = MmioRead32 (PL111_REG_LCD_CONTROL);
-  MmioWrite32 (PL111_REG_LCD_CONTROL, LcdControl & ~1);
+  MmioAnd32 (PL111_REG_LCD_CONTROL, ~PL111_CTRL_LCD_EN);
 
   // Set Timings
   MmioWrite32 (
