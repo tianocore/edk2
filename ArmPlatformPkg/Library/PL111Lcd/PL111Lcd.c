@@ -76,7 +76,6 @@ LcdInitialize (
 
   @retval EFI_SUCCESS            Display mode set successfuly.
   @retval !(EFI_SUCCESS)         Other errors.
-
 **/
 EFI_STATUS
 LcdSetMode (
@@ -88,6 +87,8 @@ LcdSetMode (
   SCAN_TIMINGS      *Vertical;
   UINT32            LcdControl;
   LCD_BPP           LcdBpp;
+
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  ModeInfo;
 
   // Set the video mode timings and other relevant information
   Status = LcdPlatformGetTimings (
@@ -104,6 +105,13 @@ LcdSetMode (
   ASSERT (Vertical != NULL);
 
   Status = LcdPlatformGetBpp (ModeNumber, &LcdBpp);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  // Get the pixel format information
+  Status = LcdPlatformQueryMode (ModeNumber, &ModeInfo);
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     return Status;
@@ -142,7 +150,10 @@ LcdSetMode (
 
   // PL111_REG_LCD_CONTROL
   LcdControl = PL111_CTRL_LCD_EN | PL111_CTRL_LCD_BPP (LcdBpp) |
-               PL111_CTRL_LCD_TFT | PL111_CTRL_LCD_PWR | PL111_CTRL_BGR;
+               PL111_CTRL_LCD_TFT | PL111_CTRL_LCD_PWR;
+  if (ModeInfo.PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
+    LcdControl |= PL111_CTRL_BGR;
+  }
   MmioWrite32 (PL111_REG_LCD_CONTROL, LcdControl);
 
   return EFI_SUCCESS;

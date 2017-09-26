@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
+#  Copyright (c) 2011-2018, ARM Limited. All rights reserved.
 #  Copyright (c) 2015, Intel Corporation. All rights reserved.
 #
 #  This program and the accompanying materials
@@ -92,6 +92,13 @@
   ## PL180 MCI
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000028
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x00000029
+
+  # Graphics Output Pixel format
+  # 0 : PixelRedGreenBlueReserved8BitPerColor
+  # 1 : PixelBlueGreenRedReserved8BitPerColor
+  # 2 : PixelBitMask
+  # Default is set to UEFI console font format PixelBlueGreenRedReserved8BitPerColor
+  gArmPlatformTokenSpaceGuid.PcdGopPixelFormat|0x00000001|UINT32|0x00000040
 
 [PcdsFixedAtBuild.common,PcdsDynamic.common]
   ## PL031 RealTimeClock
