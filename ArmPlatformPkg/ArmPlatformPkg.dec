@@ -94,6 +94,10 @@
   ## If set, framebuffer memory will be reserved and mapped in the system RAM
   gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferBase|0x0|UINT64|0x00000044
 
+  ## ARM Mali Display Processor DP500/DP550/DP650
+  gArmPlatformTokenSpaceGuid.PcdArmMaliDpBase|0x0|UINT64|0x00000050
+  gArmPlatformTokenSpaceGuid.PcdArmMaliDpMemoryRegionLength|0x0|UINT32|0x00000051
+
   ## PL180 MCI
   gArmPlatformTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000028
   gArmPlatformTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x00000029

@@ -2,7 +2,7 @@
 # ARM platform package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, ARM Ltd. All rights reserved.<BR>
 # Copyright (c) 2016 - 2017, Linaro Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -120,3 +120,5 @@
 
   ArmPlatformPkg/PrePi/PeiMPCore.inf
   ArmPlatformPkg/PrePi/PeiUniCore.inf
+
+  ArmPlatformPkg/Library/ArmMaliDp/ArmMaliDp.inf
