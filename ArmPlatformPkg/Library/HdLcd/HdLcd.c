@@ -1,4 +1,5 @@
 /** @file
+  This file contains the platform independent parts of HdLcd
 
   Copyright (c) 2011-2018, ARM Ltd. All rights reserved.<BR>
 
@@ -20,10 +21,6 @@
 #include <Library/PcdLib.h>
 
 #include "HdLcd.h"
-
-/** This file contains all the bits of the Lcd that are
-  platform independent.
-**/
 
 STATIC
 UINTN
@@ -51,6 +48,12 @@ GetBytesPerPixel (
   }
 }
 
+/** Initialize display.
+
+  @param[in]  VramBaseAddress    Address of the framebuffer.
+
+  @retval EFI_SUCCESS            Display initialization successful.
+**/
 EFI_STATUS
 LcdInitialize (
   IN EFI_PHYSICAL_ADDRESS   VramBaseAddress
@@ -82,6 +85,14 @@ LcdInitialize (
   return EFI_SUCCESS;
 }
 
+/** Set requested mode of the display.
+
+  @param[in] ModeNumber          Display mode number.
+
+  @retval EFI_SUCCESS            Display mode set successfully.
+  @retval EFI_DEVICE_ERROR       Reurns an error if display timing
+                                 information is not available.
+**/
 EFI_STATUS
 LcdSetMode (
   IN UINT32  ModeNumber
@@ -150,6 +161,8 @@ LcdSetMode (
   return EFI_SUCCESS;
 }
 
+/** De-initializes the display.
+**/
 VOID
 LcdShutdown (
   VOID
@@ -159,6 +172,11 @@ LcdShutdown (
   MmioWrite32 (HDLCD_REG_COMMAND, HDLCD_DISABLE);
 }
 
+/** Check for presence of HDLCD.
+
+  @retval EFI_SUCCESS            Returns success if platform implements a HDLCD
+                                 controller.
+**/
 EFI_STATUS
 LcdIdentify (
   VOID

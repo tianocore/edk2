@@ -1,4 +1,5 @@
 /** @file
+  This file contains the platform independent parts of PL111Lcd
 
   Copyright (c) 2011-2018, ARM Ltd. All rights reserved.<BR>
 
@@ -19,9 +20,12 @@
 
 #include "PL111Lcd.h"
 
-/** This file contains all the bits of the PL111 that are
-  platform independent.
+/** Check for presence of PL111.
 
+  @retval EFI_SUCCESS          Returns success if platform implements a
+                               PL111 controller.
+
+  @retval EFI_NOT_FOUND        PL111 display controller not found the plaform.
 **/
 EFI_STATUS
 LcdIdentify (
@@ -45,6 +49,12 @@ LcdIdentify (
   return EFI_NOT_FOUND;
 }
 
+/** Initialize display.
+
+  @param[in]  VramBaseAddress    Address of the framebuffer.
+
+  @retval EFI_SUCCESS            Initialization of display successful.
+**/
 EFI_STATUS
 LcdInitialize (
   IN EFI_PHYSICAL_ADDRESS   VramBaseAddress
@@ -60,6 +70,14 @@ LcdInitialize (
   return EFI_SUCCESS;
 }
 
+/** Set requested mode of the display.
+
+  @param[in] ModeNumbe           Display mode number.
+
+  @retval EFI_SUCCESS            Display mode set successfuly.
+  @retval EFI_DEVICE_ERROR       It returns an error if display timing
+                                 information is not available.
+**/
 EFI_STATUS
 LcdSetMode (
   IN UINT32  ModeNumber
@@ -130,6 +148,8 @@ LcdSetMode (
   return EFI_SUCCESS;
 }
 
+/** De-initializes the display.
+*/
 VOID
 LcdShutdown (
   VOID
