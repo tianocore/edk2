@@ -466,10 +466,10 @@ MtrrGetVariableMtrr (
   @param[in]      Type             The memory type to set.
   @param[in, out] Base             The base address of memory range.
   @param[in, out] Length           The length of memory range.
-  @param[in, out] LastMsrNum       On input, the last index of the fixed MTRR MSR to program.
+  @param[in, out] LastMsrIndex     On input, the last index of the fixed MTRR MSR to program.
                                    On return, the current index of the fixed MTRR MSR to program.
-  @param[out]     ReturnClearMask  The bits to clear in the fixed MTRR MSR.
-  @param[out]     ReturnOrMask     The bits to set in the fixed MTRR MSR.
+  @param[out]     ClearMask        The bits to clear in the fixed MTRR MSR.
+  @param[out]     OrMask           The bits to set in the fixed MTRR MSR.
 
   @retval RETURN_SUCCESS      The cache type was updated successfully
   @retval RETURN_UNSUPPORTED  The requested range or cache type was invalid
@@ -481,27 +481,25 @@ MtrrLibProgramFixedMtrr (
   IN     MTRR_MEMORY_CACHE_TYPE  Type,
   IN OUT UINT64                  *Base,
   IN OUT UINT64                  *Length,
-  IN OUT UINT32                  *LastMsrNum,
-  OUT    UINT64                  *ReturnClearMask,
-  OUT    UINT64                  *ReturnOrMask
+  IN OUT UINT32                  *LastMsrIndex,
+  OUT    UINT64                  *ClearMask,
+  OUT    UINT64                  *OrMask
   )
 {
-  UINT32  MsrNum;
+  UINT32  MsrIndex;
   UINT32  LeftByteShift;
   UINT32  RightByteShift;
-  UINT64  OrMask;
-  UINT64  ClearMask;
   UINT64  SubLength;
 
   //
   // Find the fixed MTRR index to be programmed
   //
-  for (MsrNum = *LastMsrNum + 1; MsrNum < MTRR_NUMBER_OF_FIXED_MTRR; MsrNum++) {
-    if ((*Base >= mMtrrLibFixedMtrrTable[MsrNum].BaseAddress) &&
+  for (MsrIndex = *LastMsrIndex + 1; MsrIndex < ARRAY_SIZE (mMtrrLibFixedMtrrTable); MsrIndex++) {
+    if ((*Base >= mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress) &&
         (*Base <
             (
-              mMtrrLibFixedMtrrTable[MsrNum].BaseAddress +
-              (8 * mMtrrLibFixedMtrrTable[MsrNum].Length)
+              mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress +
+              (8 * mMtrrLibFixedMtrrTable[MsrIndex].Length)
             )
           )
         ) {
@@ -509,65 +507,63 @@ MtrrLibProgramFixedMtrr (
     }
   }
 
-  if (MsrNum == MTRR_NUMBER_OF_FIXED_MTRR) {
-    return RETURN_UNSUPPORTED;
-  }
+  ASSERT (MsrIndex != ARRAY_SIZE (mMtrrLibFixedMtrrTable));
 
   //
   // Find the begin offset in fixed MTRR and calculate byte offset of left shift
   //
-  LeftByteShift = ((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrNum].BaseAddress)
-               / mMtrrLibFixedMtrrTable[MsrNum].Length;
-
-  if (LeftByteShift >= 8) {
+  if ((((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress) % mMtrrLibFixedMtrrTable[MsrIndex].Length) != 0) {
+    //
+    // Base address should be aligned to the begin of a certain Fixed MTRR range.
+    //
     return RETURN_UNSUPPORTED;
   }
+  LeftByteShift = ((UINT32)*Base - mMtrrLibFixedMtrrTable[MsrIndex].BaseAddress) / mMtrrLibFixedMtrrTable[MsrIndex].Length;
+  ASSERT (LeftByteShift < 8);
 
   //
   // Find the end offset in fixed MTRR and calculate byte offset of right shift
   //
-  SubLength = mMtrrLibFixedMtrrTable[MsrNum].Length * (8 - LeftByteShift);
+  SubLength = mMtrrLibFixedMtrrTable[MsrIndex].Length * (8 - LeftByteShift);
   if (*Length >= SubLength) {
     RightByteShift = 0;
   } else {
-    RightByteShift = 8 - LeftByteShift -
-                (UINT32)(*Length) / mMtrrLibFixedMtrrTable[MsrNum].Length;
-    if ((LeftByteShift >= 8) ||
-        (((UINT32)(*Length) % mMtrrLibFixedMtrrTable[MsrNum].Length) != 0)
-        ) {
+    if (((UINT32)(*Length) % mMtrrLibFixedMtrrTable[MsrIndex].Length) != 0) {
+      //
+      // Length should be aligned to the end of a certain Fixed MTRR range.
+      //
       return RETURN_UNSUPPORTED;
     }
+    RightByteShift = 8 - LeftByteShift - (UINT32)(*Length) / mMtrrLibFixedMtrrTable[MsrIndex].Length;
     //
     // Update SubLength by actual length
     //
     SubLength = *Length;
   }
 
-  ClearMask = CLEAR_SEED;
-  OrMask    = MultU64x32 (OR_SEED, (UINT32) Type);
+  *ClearMask = CLEAR_SEED;
+  *OrMask    = MultU64x32 (OR_SEED, (UINT32) Type);
 
   if (LeftByteShift != 0) {
     //
     // Clear the low bits by LeftByteShift
     //
-    ClearMask &= LShiftU64 (ClearMask, LeftByteShift * 8);
-    OrMask    &= LShiftU64 (OrMask, LeftByteShift * 8);
+    *ClearMask &= LShiftU64 (*ClearMask, LeftByteShift * 8);
+    *OrMask    &= LShiftU64 (*OrMask,    LeftByteShift * 8);
   }
 
   if (RightByteShift != 0) {
     //
     // Clear the high bits by RightByteShift
     //
-    ClearMask &= RShiftU64 (ClearMask, RightByteShift * 8);
-    OrMask    &= RShiftU64 (OrMask, RightByteShift * 8);
+    *ClearMask &= RShiftU64 (*ClearMask, RightByteShift * 8);
+    *OrMask    &= RShiftU64 (*OrMask,    RightByteShift * 8);
   }
 
   *Length -= SubLength;
   *Base   += SubLength;
 
-  *LastMsrNum      = MsrNum;
-  *ReturnClearMask = ClearMask;
-  *ReturnOrMask    = OrMask;
+  *LastMsrIndex    = MsrIndex;
 
   return RETURN_SUCCESS;
 }
