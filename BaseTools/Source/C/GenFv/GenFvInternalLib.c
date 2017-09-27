@@ -44,6 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 BOOLEAN mArm = FALSE;
 STATIC UINT32   MaxFfsAlignment = 0;
+BOOLEAN VtfFileFlag = FALSE;
 
 EFI_GUID  mEfiFirmwareVolumeTopFileGuid       = EFI_FFS_VOLUME_TOP_FILE_GUID;
 EFI_GUID  mFileGuidArray [MAX_NUMBER_OF_FILES_IN_FV];
@@ -600,7 +601,9 @@ Returns:
   UINTN               PadFileSize;
   UINT32              NextFfsHeaderSize;
   UINT32              CurFfsHeaderSize;
+  UINT32              Index;
 
+  Index = 0;
   CurFfsHeaderSize = sizeof (EFI_FFS_FILE_HEADER);
   //
   // Verify input parameters.
@@ -705,6 +708,19 @@ Returns:
     //
     // Copy Fv Extension Header and Set Fv Extension header offset
     //
+    if (ExtHeader->ExtHeaderSize > sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER)) {
+      for (Index = sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER); Index < ExtHeader->ExtHeaderSize;) {
+        if (((EFI_FIRMWARE_VOLUME_EXT_ENTRY *)((UINT8 *)ExtHeader + Index))-> ExtEntryType == EFI_FV_EXT_TYPE_USED_SIZE_TYPE) {
+          if (VtfFileFlag) {
+            ((EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE *)((UINT8 *)ExtHeader + Index))->UsedSize = mFvTotalSize;
+          } else {
+            ((EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE *)((UINT8 *)ExtHeader + Index))->UsedSize = mFvTakenSize;
+          }
+          break;
+        }
+        Index += ((EFI_FIRMWARE_VOLUME_EXT_ENTRY *)((UINT8 *)ExtHeader + Index))-> ExtEntrySize;
+      }
+    }
     memcpy ((UINT8 *)PadFile + CurFfsHeaderSize, ExtHeader, ExtHeader->ExtHeaderSize);
     ((EFI_FIRMWARE_VOLUME_HEADER *) FvImage->FileImage)->ExtHeaderOffset = (UINT16) ((UINTN) ((UINT8 *)PadFile + CurFfsHeaderSize) - (UINTN) FvImage->FileImage);
 	  //
@@ -3059,12 +3075,10 @@ Returns:
   UINT32              FfsAlignment;
   UINT32              FfsHeaderSize;
   EFI_FFS_FILE_HEADER FfsHeader;
-  BOOLEAN             VtfFileFlag;
   UINTN               VtfFileSize;
   
   FvExtendHeaderSize = 0;
   VtfFileSize = 0;
-  VtfFileFlag = FALSE;
   fpin  = NULL;
   Index = 0;
 

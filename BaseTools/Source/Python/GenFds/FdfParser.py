@@ -2311,7 +2311,7 @@ class FdfParser:
                            "WRITE_DISABLED_CAP", "WRITE_STATUS", "READ_ENABLED_CAP", \
                            "READ_DISABLED_CAP", "READ_STATUS", "READ_LOCK_CAP", \
                            "READ_LOCK_STATUS", "WRITE_LOCK_CAP", "WRITE_LOCK_STATUS", \
-                           "WRITE_POLICY_RELIABLE", "WEAK_ALIGNMENT"):
+                           "WRITE_POLICY_RELIABLE", "WEAK_ALIGNMENT", "FvUsedSizeEnable"):
                 self.__UndoToken()
                 return False
 
