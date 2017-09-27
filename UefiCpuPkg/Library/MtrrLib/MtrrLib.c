@@ -656,7 +656,8 @@ MtrrGetMemoryAttributeInVariableMtrr (
 }
 
 /**
-  Return the least alignment of address.
+  Return the biggest alignment (lowest set bit) of address.
+  The function is equivalent to: 1 << LowBitSet64 (Address).
 
   @param Address    The address to return the alignment.
   @param Alignment0 The alignment to return when Address is 0.
@@ -664,7 +665,7 @@ MtrrGetMemoryAttributeInVariableMtrr (
   @return The least alignment of the Address.
 **/
 UINT64
-MtrrLibLeastAlignment (
+MtrrLibBiggestAlignment (
   UINT64    Address,
   UINT64    Alignment0
 )
@@ -673,7 +674,7 @@ MtrrLibLeastAlignment (
     return Alignment0;
   }
 
-  return LShiftU64 (1, (UINTN) LowBitSet64 (Address));
+  return Address & ((~Address) + 1);
 }
 
 /**
@@ -705,12 +706,12 @@ MtrrLibGetPositiveMtrrNumber (
   //
   for (MtrrNumber = 0; Length != 0; MtrrNumber++) {
     if (UseLeastAlignment) {
-      SubLength = MtrrLibLeastAlignment (BaseAddress, Alignment0);
+      SubLength = MtrrLibBiggestAlignment (BaseAddress, Alignment0);
 
       if (SubLength > Length) {
         //
         // Set a flag when remaining length is too small
-        //  so that MtrrLibLeastAlignment() is not called in following loops.
+        //  so that MtrrLibBiggestAlignment() is not called in following loops.
         //
         UseLeastAlignment = FALSE;
       }
@@ -873,7 +874,7 @@ MtrrLibGetMtrrNumber (
     // Left subtraction bit by bit, to find the optimal left subtraction solution.
     //
     for (SubtractiveMtrrNumber = 0, SubtractiveCount = 1; BaseAddress != 0; SubtractiveCount++) {
-      Alignment = MtrrLibLeastAlignment (BaseAddress, Alignment0);
+      Alignment = MtrrLibBiggestAlignment (BaseAddress, Alignment0);
 
       //
       // Check whether the memory type of [BaseAddress - Alignment, BaseAddress) can override Type.
@@ -928,7 +929,7 @@ MtrrLibGetMtrrNumber (
   //
   MiddleMtrrNumber = 0;
   while (Length != 0) {
-    BaseAlignment = MtrrLibLeastAlignment (BaseAddress, Alignment0);
+    BaseAlignment = MtrrLibBiggestAlignment (BaseAddress, Alignment0);
     if (BaseAlignment > Length) {
       break;
     }
@@ -953,7 +954,7 @@ MtrrLibGetMtrrNumber (
   LeastRightMtrrNumber = MtrrLibGetPositiveMtrrNumber (BaseAddress, Length, Alignment0);
 
   for (SubtractiveCount = 1; Length < BaseAlignment; SubtractiveCount++) {
-    Alignment = MtrrLibLeastAlignment (BaseAddress + Length, Alignment0);
+    Alignment = MtrrLibBiggestAlignment (BaseAddress + Length, Alignment0);
     if (!MtrrLibSubstractable (Ranges, RangeCount, Type, BaseAddress + Length, Alignment)) {
       break;
     }
@@ -1644,7 +1645,7 @@ MtrrLibSetMemoryAttributeInVariableMtrr (
   }
 
   while (SubtractiveLeft-- != 0) {
-    Alignment = MtrrLibLeastAlignment (BaseAddress, Alignment0);
+    Alignment = MtrrLibBiggestAlignment (BaseAddress, Alignment0);
     ASSERT (Alignment <= Length);
 
     MtrrLibAddVariableMtrr (Ranges, RangeCount, VariableMtrr, VariableMtrrCapacity, VariableMtrrCount,
@@ -1654,7 +1655,7 @@ MtrrLibSetMemoryAttributeInVariableMtrr (
   }
 
   while (Length != 0) {
-    Alignment = MtrrLibLeastAlignment (BaseAddress, Alignment0);
+    Alignment = MtrrLibBiggestAlignment (BaseAddress, Alignment0);
     if (Alignment > Length) {
       break;
     }
@@ -1665,7 +1666,7 @@ MtrrLibSetMemoryAttributeInVariableMtrr (
   }
 
   while (SubtractiveRight-- != 0) {
-    Alignment = MtrrLibLeastAlignment (BaseAddress + Length, Alignment0);
+    Alignment = MtrrLibBiggestAlignment (BaseAddress + Length, Alignment0);
     MtrrLibAddVariableMtrr (Ranges, RangeCount, VariableMtrr, VariableMtrrCapacity, VariableMtrrCount,
                             BaseAddress + Length, Alignment, CacheInvalid, Alignment0);
     Length += Alignment;
@@ -1674,7 +1675,7 @@ MtrrLibSetMemoryAttributeInVariableMtrr (
   UseLeastAlignment = TRUE;
   while (Length != 0) {
     if (UseLeastAlignment) {
-      Alignment = MtrrLibLeastAlignment (BaseAddress, Alignment0);
+      Alignment = MtrrLibBiggestAlignment (BaseAddress, Alignment0);
       if (Alignment > Length) {
         UseLeastAlignment = FALSE;
       }
