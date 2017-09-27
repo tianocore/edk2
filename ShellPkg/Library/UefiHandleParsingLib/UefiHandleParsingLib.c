@@ -2229,7 +2229,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_S_COMM),                &gEfiSmmCommunicationProtocolGuid,                NULL},
   {STRING_TOKEN(STR_S_STAT),                &gEfiSmmStatusCodeProtocolGuid,                   NULL},
   {STRING_TOKEN(STR_S_CPU),                 &gEfiSmmCpuProtocolGuid,                          NULL},
-  {STRING_TOKEN(STR_S_PCIRBIO),             &gEfiPciRootBridgeIoProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_S_PCIRBIO),             &gEfiSmmPciRootBridgeIoProtocolGuid,              NULL},
   {STRING_TOKEN(STR_S_SWD),                 &gEfiSmmSwDispatch2ProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_S_SXD),                 &gEfiSmmSxDispatch2ProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_S_PTD2),                &gEfiSmmPeriodicTimerDispatch2ProtocolGuid,       NULL},
