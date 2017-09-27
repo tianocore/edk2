@@ -1832,6 +1832,18 @@ class Build():
                         if self.ModuleFile.Dir == Module.Dir and self.ModuleFile.File == Module.File:
                             Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
                             if Ma == None: continue
+                            # Not to auto-gen for targets 'clean', 'cleanlib', 'cleanall', 'run', 'fds'
+                            if self.Target not in ['clean', 'cleanlib', 'cleanall', 'run', 'fds']:
+                                # for target which must generate AutoGen code and makefile
+                                if not self.SkipAutoGen or self.Target == 'genc':
+                                    Ma.CreateCodeFile(True)
+                                if self.Target == "genc":
+                                    continue
+
+                                if not self.SkipAutoGen or self.Target == 'genmake':
+                                    Ma.CreateMakeFile(True)
+                                if self.Target == "genmake":
+                                    continue
                             MaList.append(Ma)
                             self.BuildModules.append(Ma)
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
