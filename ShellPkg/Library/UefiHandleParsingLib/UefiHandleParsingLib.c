@@ -2147,6 +2147,37 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_ADAPTER_INFO),          &gEfiAdapterInformationProtocolGuid,              AdapterInformationDumpInformation},
 
 //
+// UEFI2.5
+//
+  {STRING_TOKEN(STR_TLS_SB),                &gEfiTlsServiceBindingProtocolGuid,              NULL},
+  {STRING_TOKEN(STR_TLS),                   &gEfiTlsProtocolGuid,                            NULL},
+  {STRING_TOKEN(STR_TLS_CONFIG),            &gEfiTlsConfigurationProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_SUPPLICANT_SB),         &gEfiSupplicantServiceBindingProtocolGuid,       NULL},
+  {STRING_TOKEN(STR_SUPPLICANT),            &gEfiSupplicantProtocolGuid,                     NULL},
+
+//
+// UEFI2.6
+//
+  {STRING_TOKEN(STR_WIFI2),                 &gEfiWiFi2ProtocolGuid,                          NULL},
+  {STRING_TOKEN(STR_RAMDISK),               &gEfiRamDiskProtocolGuid,                        NULL},
+  {STRING_TOKEN(STR_HII_ID),                &gEfiHiiImageDecoderProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_HII_IE),                &gEfiHiiImageExProtocolGuid,                     NULL},
+  {STRING_TOKEN(STR_SD_MPT),                &gEfiSdMmcPassThruProtocolGuid,                  NULL},
+  {STRING_TOKEN(STR_ERASE_BLOCK),           &gEfiEraseBlockProtocolGuid,                     NULL},
+
+//
+// UEFI2.7
+//
+  {STRING_TOKEN(STR_BLUETOOTH_ATTR),        &gEfiBluetoothAttributeProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_BLUETOOTH_ATTR_SB),     &gEfiBluetoothAttributeServiceBindingProtocolGuid, NULL},
+  {STRING_TOKEN(STR_BLUETOOTH_LE_CONFIG),   &gEfiBluetoothLeConfigProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_UFS_DEV_CONFIG),        &gEfiUfsDeviceConfigProtocolGuid,                  NULL},
+  {STRING_TOKEN(STR_HTTP_BOOT_CALL),        &gEfiHttpBootCallbackProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_RESET_NOTI),            &gEfiResetNotificationProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_PARTITION_INFO),        &gEfiPartitionInfoProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_HII_POPUP),             &gEfiHiiPopupProtocolGuid,                         NULL},
+
+//
 // PI Spec ones
 //
   {STRING_TOKEN(STR_IDE_CONT_INIT),         &gEfiIdeControllerInitProtocolGuid,               NULL},
@@ -2269,6 +2300,31 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_NET_HTTP),              &gEfiHttpProtocolGuid,                            NULL},
   {STRING_TOKEN(STR_NET_HTTP_U),            &gEfiHttpUtilitiesProtocolGuid,                   NULL},
   {STRING_TOKEN(STR_REST),                  &gEfiRestProtocolGuid,                            NULL},
+
+//
+// PI 1.5
+//
+  {STRING_TOKEN(STR_MM_EOD),                &gEfiMmEndOfDxeProtocolGuid,                      NULL},
+  {STRING_TOKEN(STR_MM_ITD),                &gEfiMmIoTrapDispatchProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_MM_PBD),                &gEfiMmPowerButtonDispatchProtocolGuid,           NULL},
+  {STRING_TOKEN(STR_MM_SBD),                &gEfiMmStandbyButtonDispatchProtocolGuid,         NULL},
+  {STRING_TOKEN(STR_MM_GD),                 &gEfiMmGpiDispatchProtocolGuid,                   NULL},
+  {STRING_TOKEN(STR_MM_UD),                 &gEfiMmUsbDispatchProtocolGuid,                   NULL},
+  {STRING_TOKEN(STR_MM_PTD),                &gEfiMmPeriodicTimerDispatchProtocolGuid,         NULL},
+  {STRING_TOKEN(STR_MM_SXD),                &gEfiMmSxDispatchProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_MM_SWD),                &gEfiMmSwDispatchProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_MM_PRBI),               &gEfiMmPciRootBridgeIoProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_MM_CPU),                &gEfiMmCpuProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_MM_STACODE),            &gEfiMmStatusCodeProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_DXEMM_RTL),             &gEfiDxeMmReadyToLockProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_MM_CONFIG),             &gEfiMmConfigurationProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_MM_RTL),                &gEfiMmReadyToLockProtocolGuid,                   NULL},
+  {STRING_TOKEN(STR_MM_CONTROL),            &gEfiMmControlProtocolGuid,                       NULL},
+  {STRING_TOKEN(STR_MM_ACCESS),             &gEfiMmAccessProtocolGuid,                        NULL},
+  {STRING_TOKEN(STR_MM_BASE),               &gEfiMmBaseProtocolGuid,                          NULL},
+  {STRING_TOKEN(STR_MM_CPUIO),              &gEfiMmCpuIoProtocolGuid,                         NULL},
+  {STRING_TOKEN(STR_MM_RH),                 &gEfiMmRscHandlerProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_MM_COM),                &gEfiMmCommunicationProtocolGuid,                 NULL},
 
 //
 // UEFI Shell Spec 2.0
