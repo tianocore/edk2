@@ -138,6 +138,7 @@
 #include <Protocol/AdapterInformation.h>
 #include <Protocol/ShellDynamicCommand.h>
 #include <Protocol/DiskInfo.h>
+#include <Protocol/PartitionInfo.h>
 
 #include <Library/HandleParsingLib.h>
 #include <Library/UefiBootServicesTableLib.h>

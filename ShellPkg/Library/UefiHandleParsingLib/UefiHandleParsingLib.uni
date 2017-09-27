@@ -522,3 +522,9 @@
                                                                         "    AttributesSetting           : %%H%s%%N\r\n"
                                                                         "    Compatibilities             : %%H0x%L016x%%N\r\n"
                                                                         "    LowestSupportedImageVersion : %%H0x%08x%%N\r\n"
+
+#string STR_PARTINFO_DUMP_TYPE_OTHER        #language en-US "  Partition Type       : Other"
+#string STR_PARTINFO_DUMP_TYPE_MBR          #language en-US "  Partition Type       : MBR"
+#string STR_PARTINFO_DUMP_TYPE_GPT          #language en-US "  Partition Type       : GPT"
+#string STR_PARTINFO_DUMP_EFI_SYS_PART      #language en-US "  EFI System Partition : Yes"
+#string STR_PARTINFO_DUMP_NOT_EFI_SYS_PART  #language en-US "  EFI System Partition : No"

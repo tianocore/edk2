@@ -1933,6 +1933,87 @@ ERROR_EXIT:
   return NULL;
 }
 
+/**
+  Function to dump information about Partition Information protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+PartitionInfoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_PARTITION_INFO_PROTOCOL     *PartitionInfo;
+  CHAR16                          *PartitionType;
+  CHAR16                          *EfiSystemPartition;
+  CHAR16                          *RetVal;
+
+  if (!Verbose) {
+    return NULL;
+  }
+
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiPartitionInfoProtocolGuid,
+                (VOID**)&PartitionInfo,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  HandleParsingHiiInit ();
+
+  switch (PartitionInfo->Type) {
+  case PARTITION_TYPE_OTHER:
+    PartitionType = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_TYPE_OTHER), NULL);
+    break;
+  case PARTITION_TYPE_MBR:
+    PartitionType = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_TYPE_MBR), NULL);
+    break;
+  case PARTITION_TYPE_GPT:
+    PartitionType = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_TYPE_GPT), NULL);
+    break;
+  default:
+    PartitionType = NULL;
+    break;
+  }
+  if (PartitionType == NULL) {
+    return NULL;
+  }
+
+  if (PartitionInfo->System == 1) {
+    EfiSystemPartition = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_EFI_SYS_PART), NULL);
+  } else {
+    EfiSystemPartition = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_NOT_EFI_SYS_PART), NULL);
+  }
+  if (EfiSystemPartition == NULL) {
+    SHELL_FREE_NON_NULL (PartitionType);
+    return NULL;
+  }
+
+  RetVal = CatSPrint (
+             NULL,
+             L"%s\r\n%s",
+             PartitionType,
+             EfiSystemPartition
+             );
+
+  SHELL_FREE_NON_NULL (EfiSystemPartition);
+  SHELL_FREE_NON_NULL (PartitionType);
+  return RetVal;
+}
+
 //
 // Put the information on the NT32 protocol GUIDs here so we are not dependant on the Nt32Pkg
 //
@@ -2174,7 +2255,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_UFS_DEV_CONFIG),        &gEfiUfsDeviceConfigProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_HTTP_BOOT_CALL),        &gEfiHttpBootCallbackProtocolGuid,                 NULL},
   {STRING_TOKEN(STR_RESET_NOTI),            &gEfiResetNotificationProtocolGuid,                NULL},
-  {STRING_TOKEN(STR_PARTITION_INFO),        &gEfiPartitionInfoProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_PARTITION_INFO),        &gEfiPartitionInfoProtocolGuid,                    PartitionInfoProtocolDumpInformation},
   {STRING_TOKEN(STR_HII_POPUP),             &gEfiHiiPopupProtocolGuid,                         NULL},
 
 //
