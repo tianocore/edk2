@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2012-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2012-2017, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -39,6 +39,24 @@
  */
 #define ARM_SMC_STD_REVISION_MAJOR    0x0
 #define ARM_SMC_STD_REVISION_MINOR    0x1
+
+/*
+ * Management Mode (MM) calls cover a subset of the Standard Service Call range.
+ * The list below is not exhaustive.
+ */
+#define ARM_SMC_ID_MM_VERSION_AARCH32              0x84000040
+#define ARM_SMC_ID_MM_VERSION_AARCH64              0xC4000040
+
+// Request service from secure standalone MM environment
+#define ARM_SMC_ID_MM_COMMUNICATE_AARCH32          0x84000041
+#define ARM_SMC_ID_MM_COMMUNICATE_AARCH64          0xC4000041
+
+/* MM return error codes */
+#define ARM_SMC_MM_RET_SUCCESS              0
+#define ARM_SMC_MM_RET_NOT_SUPPORTED       -1
+#define ARM_SMC_MM_RET_INVALID_PARAMS      -2
+#define ARM_SMC_MM_RET_DENIED              -3
+#define ARM_SMC_MM_RET_NO_MEMORY           -4
 
 /*
  * Power State Coordination Interface (PSCI) calls cover a subset of the
