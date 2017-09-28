@@ -308,7 +308,7 @@
 ".SH SYNOPSIS\r\n"
 " \r\n"
 "DISCONNECT DeviceHandle [DriverHandle [ChildHandle]] \r\n"
-"DISCONNECT [-r] [-nc] \r\n"
+"DISCONNECT -r [-nc] \r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
 "NOTES:\r\n"
