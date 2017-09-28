@@ -39,6 +39,11 @@ typedef struct {
 //
 SPIN_LOCK                *mMemoryMappedLock = NULL;
 
+//
+// Signal that SMM BASE relocation is complete.
+//
+volatile BOOLEAN         mInitApsAfterSmmBaseReloc;
+
 /**
   Get starting address and size of the rendezvous entry for APs.
   Information for fixing a jump instruction in the code is also returned.
@@ -342,17 +347,21 @@ SetProcessorRegister (
   }
 }
 
+
+
 /**
-  AP initialization before SMBASE relocation in the S3 boot path.
+  AP initialization before then after SMBASE relocation in the S3 boot path.
 **/
 VOID
-EarlyMPRendezvousProcedure (
+MPRendezvousProcedure (
   VOID
   )
 {
   CPU_REGISTER_TABLE         *RegisterTableList;
   UINT32                     InitApicId;
   UINTN                      Index;
+  UINTN                      TopOfStack;
+  UINT8                      Stack[128];
 
   LoadMtrrData (mAcpiCpuData.MtrrTable);
 
@@ -368,25 +377,18 @@ EarlyMPRendezvousProcedure (
     }
   }
 
+
   //
   // Count down the number with lock mechanism.
   //
   InterlockedDecrement (&mNumberToFinish);
-}
 
-/**
-  AP initialization after SMBASE relocation in the S3 boot path.
-**/
-VOID
-MPRendezvousProcedure (
-  VOID
-  )
-{
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
-  UINTN                      TopOfStack;
-  UINT8                      Stack[128];
+  //
+  // Wait for BSP to signal SMM Base relocation done.
+  //
+  while (!mInitApsAfterSmmBaseReloc) {
+    CpuPause ();
+  }
 
   ProgramVirtualWireMode ();
   DisableLvtInterrupts ();
@@ -500,7 +502,12 @@ EarlyInitializeCpu (
   PrepareApStartupVector (mAcpiCpuData.StartupVector);
 
   mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
-  mExchangeInfo->ApFunction  = (VOID *) (UINTN) EarlyMPRendezvousProcedure;
+  mExchangeInfo->ApFunction  = (VOID *) (UINTN) MPRendezvousProcedure;
+
+  //
+  // Execute code for before SmmBaseReloc. Note: This flag is maintained across S3 boots.
+  //
+  mInitApsAfterSmmBaseReloc = FALSE;
 
   //
   // Send INIT IPI - SIPI to all APs
@@ -538,17 +545,11 @@ InitializeCpu (
   }
 
   mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
-  //
-  // StackStart was updated when APs were waken up in EarlyInitializeCpu.
-  // Re-initialize StackAddress to original beginning address.
-  //
-  mExchangeInfo->StackStart  = (VOID *) (UINTN) mAcpiCpuData.StackAddress;
-  mExchangeInfo->ApFunction  = (VOID *) (UINTN) MPRendezvousProcedure;
 
   //
-  // Send INIT IPI - SIPI to all APs
+  // Signal that SMM base relocation is complete and to continue initialization.
   //
-  SendInitSipiSipiAllExcludingSelf ((UINT32)mAcpiCpuData.StartupVector);
+  mInitApsAfterSmmBaseReloc = TRUE;
 
   while (mNumberToFinish > 0) {
     CpuPause ();
