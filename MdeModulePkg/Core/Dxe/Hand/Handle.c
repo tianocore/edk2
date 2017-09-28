@@ -1175,10 +1175,18 @@ Done:
     //
     if (!EFI_ERROR (Status) || Status == EFI_ALREADY_STARTED) {
       //
+      // According to above logic, if 'Prot' is NULL, then the 'Status' must be
+      // EFI_UNSUPPORTED. Here the 'Status' is not EFI_UNSUPPORTED, so 'Prot'
+      // must be not NULL.
+      //
+      // The ASSERT here is for addressing a false positive NULL pointer
+      // dereference issue raised from static analysis.
+      //
+      ASSERT (Prot != NULL);
+      //
       // EFI_ALREADY_STARTED is not an error for bus driver.
       // Return the corresponding protocol interface.
       //
-      ASSERT (Prot != NULL);
       *Interface = Prot->Interface;
     } else if (Status == EFI_UNSUPPORTED) {
       //
