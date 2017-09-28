@@ -1,7 +1,7 @@
 /** @file
   The header files of implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>  
 
   This program and the accompanying materials
@@ -33,16 +33,18 @@
 
   @param[in]  This                Pointer to EFI_HTTP_PROTOCOL instance.
   @param[out] HttpConfigData      Point to buffer for operational parameters of this
-                                  HTTP instance.
+                                  HTTP instance. It is the responsibility of the caller 
+                                  to allocate the memory for HttpConfigData and 
+                                  HttpConfigData->AccessPoint.IPv6Node/IPv4Node. In fact, 
+                                  it is recommended to allocate sufficient memory to record 
+                                  IPv6Node since it is big enough for all possibilities.
 
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
                                   HttpConfigData is NULL.
-                                  HttpInstance->LocalAddressIsIPv6 is FALSE and
-                                  HttpConfigData->IPv4Node is NULL.
-                                  HttpInstance->LocalAddressIsIPv6 is TRUE and
-                                  HttpConfigData->IPv6Node is NULL.
+                                  HttpConfigData->AccessPoint.IPv4Node or 
+                                  HttpConfigData->AccessPoint.IPv6Node is NULL.
   @retval EFI_NOT_STARTED         This EFI HTTP Protocol instance has not been started.
 
 **/
@@ -73,9 +75,9 @@ EfiHttpGetModeData (
   @retval EFI_INVALID_PARAMETER   One or more of the following conditions is TRUE:
                                   This is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is FALSE and
-                                  HttpConfigData->IPv4Node is NULL.
+                                  HttpConfigData->AccessPoint.IPv4Node is NULL.
                                   HttpConfigData->LocalAddressIsIPv6 is TRUE and
-                                  HttpConfigData->IPv6Node is NULL.
+                                  HttpConfigData->AccessPoint.IPv6Node is NULL.
   @retval EFI_ALREADY_STARTED     Reinitialize this HTTP instance without calling
                                   Configure() with NULL to reset it.
   @retval EFI_DEVICE_ERROR        An unexpected system or network error occurred.
