@@ -1,7 +1,7 @@
 ## @file
 # Trim files preprocessed by compiler
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,7 @@
 import Common.LongFilePathOs as os
 import sys
 import re
+import StringIO
 
 from optparse import OptionParser
 from optparse import make_option
@@ -29,7 +30,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 # Version and Copyright
 __version_number__ = ("0.10" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + __version_number__
-__copyright__ = "Copyright (c) 2007-2016, Intel Corporation. All rights reserved."
+__copyright__ = "Copyright (c) 2007-2017, Intel Corporation. All rights reserved."
 
 ## Regular expression for matching Line Control directive like "#line xxx"
 gLineControlDirective = re.compile('^\s*#(?:line)?\s+([0-9]+)\s+"*([^"]*)"')
@@ -430,6 +431,68 @@ def TrimAslFile(Source, Target, IncludePathFile):
     f.writelines(Lines)
     f.close()
 
+def GenerateVfrBinSec(ModuleName, DebugDir, OutputFile):
+    VfrNameList = []
+    if os.path.isdir(DebugDir):
+        for CurrentDir, Dirs, Files in os.walk(DebugDir):
+            for FileName in Files:
+                Name, Ext = os.path.splitext(FileName)
+                if Ext == '.lst':
+                    VfrNameList.append (Name + 'Bin')
+
+    VfrNameList.append (ModuleName + 'Strings')
+
+    EfiFileName = os.path.join(DebugDir, ModuleName + '.efi')
+    MapFileName = os.path.join(DebugDir, ModuleName + '.map')
+    VfrUniOffsetList = GetVariableOffset(MapFileName, EfiFileName, VfrNameList)
+
+    if not VfrUniOffsetList:
+        return
+
+    try:
+        fInputfile = open(OutputFile, "wb+", 0)
+    except:
+        EdkLogger.error("Trim", FILE_OPEN_FAILURE, "File open failed for %s" %OutputFile, None)
+
+    # Use a instance of StringIO to cache data
+    fStringIO = StringIO.StringIO('')
+
+    for Item in VfrUniOffsetList:
+        if (Item[0].find("Strings") != -1):
+            #
+            # UNI offset in image.
+            # GUID + Offset
+            # { 0x8913c5e0, 0x33f6, 0x4d86, { 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66 } }
+            #
+            UniGuid = [0xe0, 0xc5, 0x13, 0x89, 0xf6, 0x33, 0x86, 0x4d, 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66]
+            UniGuid = [chr(ItemGuid) for ItemGuid in UniGuid]
+            fStringIO.write(''.join(UniGuid))
+            UniValue = pack ('Q', int (Item[1], 16))
+            fStringIO.write (UniValue)
+        else:
+            #
+            # VFR binary offset in image.
+            # GUID + Offset
+            # { 0xd0bc7cb4, 0x6a47, 0x495f, { 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2 } };
+            #
+            VfrGuid = [0xb4, 0x7c, 0xbc, 0xd0, 0x47, 0x6a, 0x5f, 0x49, 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2]
+            VfrGuid = [chr(ItemGuid) for ItemGuid in VfrGuid]
+            fStringIO.write(''.join(VfrGuid))
+            type (Item[1])
+            VfrValue = pack ('Q', int (Item[1], 16))
+            fStringIO.write (VfrValue)
+
+    #
+    # write data into file.
+    #
+    try :
+        fInputfile.write (fStringIO.getvalue())
+    except:
+        EdkLogger.error("Trim", FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the file been locked or using by other applications." %OutputFile, None)
+
+    fStringIO.close ()
+    fInputfile.close ()
+
 ## Trim EDK source code file(s)
 #
 #
@@ -535,6 +598,8 @@ def Options():
                           help="The input file is preprocessed source code, including C or assembly code"),
         make_option("-r", "--vfr-file", dest="FileType", const="Vfr", action="store_const",
                           help="The input file is preprocessed VFR file"),
+        make_option("--Vfr-Uni-Offset", dest="FileType", const="VfrOffsetBin", action="store_const",
+                          help="The input file is EFI image"),
         make_option("-a", "--asl-file", dest="FileType", const="Asl", action="store_const",
                           help="The input file is ASL file"),
         make_option("-8", "--Edk-source-code", dest="FileType", const="EdkSourceCode", action="store_const",
@@ -549,6 +614,9 @@ def Options():
                           help="The input file is include path list to search for ASL include file"),
         make_option("-o", "--output", dest="OutputFile",
                           help="File to store the trimmed content"),
+        make_option("--ModuleName", dest="ModuleName", help="The module's BASE_NAME"),
+        make_option("--DebugDir", dest="DebugDir",
+                          help="Debug Output directory to store the output files"),
         make_option("-v", "--verbose", dest="LogLevel", action="store_const", const=EdkLogger.VERBOSE,
                           help="Run verbosely"),
         make_option("-d", "--debug", dest="LogLevel", type="int",
@@ -559,7 +627,7 @@ def Options():
     ]
 
     # use clearer usage to override default usage message
-    UsageString = "%prog [-s|-r|-a] [-c] [-v|-d <debug_level>|-q] [-i <include_path_file>] [-o <output_file>] <input_file>"
+    UsageString = "%prog [-s|-r|-a|--Vfr-Uni-Offset] [-c] [-v|-d <debug_level>|-q] [-i <include_path_file>] [-o <output_file>] [--ModuleName <ModuleName>] [--DebugDir <DebugDir>] [<input_file>]"
 
     Parser = OptionParser(description=__copyright__, version=__version__, option_list=OptionList, usage=UsageString)
     Parser.set_defaults(FileType="Vfr")
@@ -569,6 +637,11 @@ def Options():
     Options, Args = Parser.parse_args()
 
     # error check
+    if Options.FileType == 'VfrOffsetBin':
+        if len(Args) == 0:
+            return Options, ''
+        elif len(Args) > 1:
+            EdkLogger.error("Trim", OPTION_NOT_SUPPORTED, ExtraData=Parser.get_usage())
     if len(Args) == 0:
         EdkLogger.error("Trim", OPTION_MISSING, ExtraData=Parser.get_usage())
     if len(Args) > 1:
@@ -608,6 +681,8 @@ def Main():
             TrimAslFile(InputFile, CommandOptions.OutputFile, CommandOptions.IncludePathFile)
         elif CommandOptions.FileType == "EdkSourceCode":
             TrimEdkSources(InputFile, CommandOptions.OutputFile)
+        elif CommandOptions.FileType == "VfrOffsetBin":
+            GenerateVfrBinSec(CommandOptions.ModuleName, CommandOptions.DebugDir, CommandOptions.OutputFile)
         else :
             if CommandOptions.OutputFile == None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
