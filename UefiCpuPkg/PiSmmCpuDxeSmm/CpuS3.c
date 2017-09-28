@@ -208,18 +208,30 @@ Returns:
 
   This function programs registers for the calling processor.
 
-  @param  RegisterTable Pointer to register table of the running processor.
+  @param  RegisterTables        Pointer to register table of the running processor.
+  @param  RegisterTableCount    Register table count.
 
 **/
 VOID
 SetProcessorRegister (
-  IN CPU_REGISTER_TABLE        *RegisterTable
+  IN CPU_REGISTER_TABLE        *RegisterTables,
+  IN UINTN                     RegisterTableCount
   )
 {
   CPU_REGISTER_TABLE_ENTRY  *RegisterTableEntry;
   UINTN                     Index;
   UINTN                     Value;
   SPIN_LOCK                 *MsrSpinLock;
+  UINT32                    InitApicId;
+  CPU_REGISTER_TABLE        *RegisterTable;
+
+  InitApicId = GetInitialApicId ();
+  for (Index = 0; Index < RegisterTableCount; Index++) {
+    if (RegisterTables[Index].InitialApicId == InitApicId) {
+      RegisterTable =  &RegisterTables[Index];
+      break;
+    }
+  }
 
   //
   // Traverse Register Table of this logical processor
@@ -347,36 +359,20 @@ SetProcessorRegister (
   }
 }
 
-
-
 /**
   AP initialization before then after SMBASE relocation in the S3 boot path.
 **/
 VOID
-MPRendezvousProcedure (
+InitializeAp (
   VOID
   )
 {
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
   UINTN                      TopOfStack;
   UINT8                      Stack[128];
 
   LoadMtrrData (mAcpiCpuData.MtrrTable);
 
-  //
-  // Find processor number for this CPU.
-  //
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.PreSmmInitRegisterTable;
-  InitApicId = GetInitialApicId ();
-  for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
-      break;
-    }
-  }
-
+  SetProcessorRegister ((CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.PreSmmInitRegisterTable, mAcpiCpuData.NumberOfCpus);
 
   //
   // Count down the number with lock mechanism.
@@ -393,14 +389,7 @@ MPRendezvousProcedure (
   ProgramVirtualWireMode ();
   DisableLvtInterrupts ();
 
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.RegisterTable;
-  InitApicId = GetInitialApicId ();
-  for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
-      break;
-    }
-  }
+  SetProcessorRegister ((CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.RegisterTable, mAcpiCpuData.NumberOfCpus);
 
   //
   // Place AP into the safe code, count down the number with lock mechanism in the safe code.
@@ -475,34 +464,20 @@ PrepareApStartupVector (
 
 **/
 VOID
-EarlyInitializeCpu (
+InitializeCpuBeforeRebase (
   VOID
   )
 {
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
-
   LoadMtrrData (mAcpiCpuData.MtrrTable);
 
-  //
-  // Find processor number for this CPU.
-  //
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.PreSmmInitRegisterTable;
-  InitApicId = GetInitialApicId ();
-  for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
-      break;
-    }
-  }
+  SetProcessorRegister ((CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.PreSmmInitRegisterTable, mAcpiCpuData.NumberOfCpus);
 
   ProgramVirtualWireMode ();
 
   PrepareApStartupVector (mAcpiCpuData.StartupVector);
 
   mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
-  mExchangeInfo->ApFunction  = (VOID *) (UINTN) MPRendezvousProcedure;
+  mExchangeInfo->ApFunction  = (VOID *) (UINTN) InitializeAp;
 
   //
   // Execute code for before SmmBaseReloc. Note: This flag is maintained across S3 boots.
@@ -527,22 +502,11 @@ EarlyInitializeCpu (
 
 **/
 VOID
-InitializeCpu (
+InitializeCpuAfterRebase (
   VOID
   )
 {
-  CPU_REGISTER_TABLE         *RegisterTableList;
-  UINT32                     InitApicId;
-  UINTN                      Index;
-
-  RegisterTableList = (CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.RegisterTable;
-  InitApicId = GetInitialApicId ();
-  for (Index = 0; Index < mAcpiCpuData.NumberOfCpus; Index++) {
-    if (RegisterTableList[Index].InitialApicId == InitApicId) {
-      SetProcessorRegister (&RegisterTableList[Index]);
-      break;
-    }
-  }
+  SetProcessorRegister ((CPU_REGISTER_TABLE *) (UINTN) mAcpiCpuData.RegisterTable, mAcpiCpuData.NumberOfCpus);
 
   mNumberToFinish = mAcpiCpuData.NumberOfCpus - 1;
 
@@ -660,7 +624,7 @@ SmmRestoreCpu (
     //
     // First time microcode load and restore MTRRs
     //
-    EarlyInitializeCpu ();
+    InitializeCpuBeforeRebase ();
   }
 
   //
@@ -675,7 +639,7 @@ SmmRestoreCpu (
     //
     // Restore MSRs for BSP and all APs
     //
-    InitializeCpu ();
+    InitializeCpuAfterRebase ();
   }
 
   //
