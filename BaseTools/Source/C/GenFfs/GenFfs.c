@@ -12,6 +12,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#ifndef __GNUC__
+#include <windows.h>
+#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,6 +31,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "CommonLib.h"
 #include "ParseInf.h"
 #include "EfiUtilityMsgs.h"
+#include "FvLib.h"
+#include "PeCoffLib.h"
 
 #define UTILITY_NAME            "GenFfs"
 #define UTILITY_MAJOR_VERSION   0
@@ -153,8 +162,10 @@ Returns:
                         Section file will be contained in this FFS file.\n");
   fprintf (stdout, "  -n SectionAlign, --sectionalign SectionAlign\n\
                         SectionAlign points to section alignment, which support\n\
-                        the alignment scope 1~16M. It is specified together\n\
-                        with sectionfile to point its alignment in FFS file.\n");
+                        the alignment scope 0~16M. If SectionAlign is specified\n\
+                        as 0, tool get alignment value from SectionFile. It is\n\
+                        specified together with sectionfile to point its\n\
+                        alignment in FFS file.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -457,6 +468,102 @@ Returns:
   }
 }
 
+EFI_STATUS
+FfsRebaseImageRead (
+    IN      VOID    *FileHandle,
+    IN      UINTN   FileOffset,
+    IN OUT  UINT32  *ReadSize,
+    OUT     VOID    *Buffer
+    )
+  /*++
+
+    Routine Description:
+
+    Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
+
+    Arguments:
+
+   FileHandle - The handle to the PE/COFF file
+
+   FileOffset - The offset, in bytes, into the file to read
+
+   ReadSize   - The number of bytes to read from the file starting at FileOffset
+
+   Buffer     - A pointer to the buffer to read the data into.
+
+   Returns:
+
+   EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
+
+   --*/
+{
+  CHAR8   *Destination8;
+  CHAR8   *Source8;
+  UINT32  Length;
+
+  Destination8  = Buffer;
+  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  Length        = *ReadSize;
+  while (Length--) {
+    *(Destination8++) = *(Source8++);
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+GetAlignmentFromFile(char *InFile, UINT32 *Alignment)
+  /*++
+    InFile is input file for getting alignment
+    return the alignment
+    --*/
+{
+  FILE                           *InFileHandle;
+  UINT8                          *PeFileBuffer;
+  UINTN                          PeFileSize;
+  UINT32                         CurSecHdrSize;
+  PE_COFF_LOADER_IMAGE_CONTEXT   ImageContext;
+  EFI_COMMON_SECTION_HEADER      *CommonHeader;
+  EFI_STATUS                     Status;
+
+  InFileHandle        = NULL;
+  PeFileBuffer        = NULL;
+
+  memset (&ImageContext, 0, sizeof (ImageContext));
+
+  InFileHandle = fopen(LongFilePath(InFile), "rb");
+  if (InFileHandle == NULL){
+    Error (NULL, 0, 0001, "Error opening file", InFile);
+    return EFI_ABORTED;
+  }
+  PeFileSize = _filelength (fileno(InFileHandle));
+  PeFileBuffer = (UINT8 *) malloc (PeFileSize);
+  if (PeFileBuffer == NULL) {
+    fclose (InFileHandle);
+    Error(NULL, 0, 4001, "Resource", "memory cannot be allocated  of %s", InFileHandle);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  fread (PeFileBuffer, sizeof (UINT8), PeFileSize, InFileHandle);
+  fclose (InFileHandle);
+  CommonHeader = (EFI_COMMON_SECTION_HEADER *) PeFileBuffer;
+  CurSecHdrSize = GetSectionHeaderLength(CommonHeader);
+  ImageContext.Handle = (VOID *) ((UINTN)PeFileBuffer + CurSecHdrSize);
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE)FfsRebaseImageRead;
+  Status               = PeCoffLoaderGetImageInfo(&ImageContext);
+  if (EFI_ERROR (Status)) {
+    Error (NULL, 0, 3000, "Invalid PeImage", "The input file is %s and return status is %x", InFile, (int) Status);
+    return Status;
+   }
+  *Alignment = ImageContext.SectionAlignment;
+  // Free the allocated memory resource
+  if (PeFileBuffer != NULL) {
+    free (PeFileBuffer);
+    PeFileBuffer = NULL;
+  }
+  return EFI_SUCCESS;
+}
+
 int
 main (
   int   argc,
@@ -497,6 +604,8 @@ Returns:
   UINT64                  LogLevel;
   UINT8                   PeSectionNum;
   UINT32                  HeaderSize;
+  UINT32                  Alignment;
+  CHAR8                   AlignmentBuffer[8];
   
   //
   // Init local variables
@@ -690,7 +799,27 @@ Returns:
       // Section File alignment requirement
       //
       if ((stricmp (argv[0], "-n") == 0) || (stricmp (argv[0], "--sectionalign") == 0)) {
-        Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileNum]));
+        if ((argv[1] != NULL) && (stricmp("0", argv[1]) == 0)) {
+          Status = GetAlignmentFromFile(InputFileName[InputFileNum], &Alignment);
+          if (EFI_ERROR(Status)) {
+            Error (NULL, 0, 1003, "Fail to get Alignment from %s", InputFileName[InputFileNum]);
+            goto Finish;
+          }
+          if (Alignment < 0x400){
+            sprintf (AlignmentBuffer, "%d", Alignment);
+          }
+          else if (Alignment >= 0x400) {
+            if (Alignment >= 0x100000) {
+              sprintf (AlignmentBuffer, "%dM", Alignment/0x100000);
+            } else {
+              sprintf (AlignmentBuffer, "%dK", Alignment/0x400);
+            }
+          }
+          Status = StringtoAlignment (AlignmentBuffer, &(InputFileAlign[InputFileNum]));
+        }
+        else {
+          Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileNum]));
+        }
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
           goto Finish;
