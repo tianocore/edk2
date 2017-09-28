@@ -1,7 +1,7 @@
 /** @file
   Support functions implementation for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -424,7 +424,7 @@ PxeBcIcmp6ErrorDpcHandle (
 
   if (Type != ICMP_V6_DEST_UNREACHABLE &&
       Type != ICMP_V6_PACKET_TOO_BIG &&
-      Type != ICMP_V6_PACKET_TOO_BIG &&
+      Type != ICMP_V6_TIME_EXCEEDED &&
       Type != ICMP_V6_PARAMETER_PROBLEM) {
     //
     // The type of the receveid packet should be an ICMP6 error message.
