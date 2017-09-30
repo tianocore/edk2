@@ -169,7 +169,10 @@ SetVariableCheckHandlerMorLock (
   // Basic Check
   //
   if (Attributes == 0 || DataSize == 0 || Data == NULL) {
-    return EFI_WRITE_PROTECTED;
+    //
+    // Permit deletion for passthru request, deny it otherwise.
+    //
+    return mMorLockPassThru ? EFI_SUCCESS : EFI_WRITE_PROTECTED;
   }
 
   if ((Attributes != (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)) ||
