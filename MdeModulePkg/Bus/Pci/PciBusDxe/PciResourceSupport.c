@@ -1,7 +1,7 @@
 /** @file
   PCI resouces support functions implemntation for PCI Bus module.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -343,14 +343,9 @@ CalculateResourceAperture (
   IN PCI_RESOURCE_NODE    *Bridge
   )
 {
-  UINT64            Aperture;
+  UINT64            Aperture[2];
   LIST_ENTRY        *CurrentLink;
   PCI_RESOURCE_NODE *Node;
-  UINT64            PaddingAperture;
-  UINT64            Offset;
-
-  Aperture        = 0;
-  PaddingAperture = 0;
 
   if (Bridge == NULL) {
     return ;
@@ -362,6 +357,8 @@ CalculateResourceAperture (
     return ;
   }
 
+  Aperture[PciResUsageTypical] = 0;
+  Aperture[PciResUsagePadding] = 0;
   //
   // Assume the bridge is aligned
   //
@@ -369,58 +366,30 @@ CalculateResourceAperture (
       ; !IsNull (&Bridge->ChildList, CurrentLink)
       ; CurrentLink = GetNextNode (&Bridge->ChildList, CurrentLink)
       ) {
-
     Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
-    if (Node->ResourceUsage == PciResUsagePadding) {
-      ASSERT (PaddingAperture == 0);
-      PaddingAperture = Node->Length;
-      continue;
-    }
 
     //
-    // Apply padding resource if available
+    // It's possible for a bridge to contain multiple padding resource
+    // nodes due to DegradeResource().
     //
-    Offset = Aperture & (Node->Alignment);
-
-    if (Offset != 0) {
-
-      Aperture = Aperture + (Node->Alignment + 1) - Offset;
-
-    }
-
+    ASSERT ((Node->ResourceUsage == PciResUsageTypical) ||
+            (Node->ResourceUsage == PciResUsagePadding));
+    ASSERT (Node->ResourceUsage < ARRAY_SIZE (Aperture));
     //
     // Recode current aperture as a offset
-    // this offset will be used in future real allocation
+    // Apply padding resource to meet alignment requirement
+    // Node offset will be used in future real allocation
     //
-    Node->Offset = Aperture;
+    Node->Offset = ALIGN_VALUE (Aperture[Node->ResourceUsage], Node->Alignment + 1);
 
     //
-    // Increment aperture by the length of node
+    // Record the total aperture.
     //
-    Aperture += Node->Length;
+    Aperture[Node->ResourceUsage] = Node->Offset + Node->Length;
   }
 
   //
-  // At last, adjust the aperture with the bridge's
-  // alignment
-  //
-  Offset = Aperture & (Bridge->Alignment);
-  if (Offset != 0) {
-    Aperture = Aperture + (Bridge->Alignment + 1) - Offset;
-  }
-
-  //
-  // If the bridge has already padded the resource and the
-  // amount of padded resource is larger, then keep the
-  // padded resource
-  //
-  if (Bridge->Length < Aperture) {
-    Bridge->Length = Aperture;
-  }
-
-  //
-  // Adjust the bridge's alignment to the first child's alignment
-  // if the bridge has at least one child
+  // Adjust the bridge's alignment to the MAX (first) alignment of all children.
   //
   CurrentLink = Bridge->ChildList.ForwardLink;
   if (CurrentLink != &Bridge->ChildList) {
@@ -431,10 +400,16 @@ CalculateResourceAperture (
   }
 
   //
+  // At last, adjust the aperture with the bridge's alignment
+  //
+  Aperture[PciResUsageTypical] = ALIGN_VALUE (Aperture[PciResUsageTypical], Bridge->Alignment + 1);
+  Aperture[PciResUsagePadding] = ALIGN_VALUE (Aperture[PciResUsagePadding], Bridge->Alignment + 1);
+
+  //
   // Hotplug controller needs padding resources.
   // Use the larger one between the padding resource and actual occupied resource.
   //
-  Bridge->Length = MAX (Bridge->Length, PaddingAperture);
+  Bridge->Length = MAX (Aperture[PciResUsageTypical], Aperture[PciResUsagePadding]);
 }
 
 /**
