@@ -394,3 +394,18 @@ MorLockInit (
   //
   return SetMorLockVariable (0);
 }
+
+/**
+  Delayed initialization for MOR Control Lock at EndOfDxe.
+
+  This function performs any operations queued by MorLockInit().
+**/
+VOID
+MorLockInitAtEndOfDxe (
+  VOID
+  )
+{
+  //
+  // Do nothing.
+  //
+}

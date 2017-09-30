@@ -291,6 +291,7 @@ OnReadyToBoot (
   )
 {
   if (!mEndOfDxe) {
+    MorLockInitAtEndOfDxe ();
     //
     // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
     //
@@ -330,6 +331,7 @@ OnEndOfDxe (
   )
 {
   DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
+  MorLockInitAtEndOfDxe ();
   mEndOfDxe = TRUE;
   mVarCheckAddressPointer = VarCheckLibInitializeAtEndOfDxe (&mVarCheckAddressPointerCount);
   //

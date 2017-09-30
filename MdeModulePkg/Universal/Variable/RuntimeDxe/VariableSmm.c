@@ -679,6 +679,7 @@ SmmVariableHandler (
         break;
       }
       if (!mEndOfDxe) {
+        MorLockInitAtEndOfDxe ();
         mEndOfDxe = TRUE;
         VarCheckLibInitializeAtEndOfDxe (NULL);
         //
@@ -811,6 +812,7 @@ SmmEndOfDxeCallback (
   )
 {
   DEBUG ((EFI_D_INFO, "[Variable]SMM_END_OF_DXE is signaled\n"));
+  MorLockInitAtEndOfDxe ();
   mEndOfDxe = TRUE;
   VarCheckLibInitializeAtEndOfDxe (NULL);
   //

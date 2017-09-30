@@ -47,6 +47,16 @@ MorLockInit (
   );
 
 /**
+  Delayed initialization for MOR Control Lock at EndOfDxe.
+
+  This function performs any operations queued by MorLockInit().
+**/
+VOID
+MorLockInitAtEndOfDxe (
+  VOID
+  );
+
+/**
   This service is an MOR/MorLock checker handler for the SetVariable().
 
   @param[in]  VariableName the name of the vendor's variable, as a
