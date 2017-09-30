@@ -98,43 +98,6 @@ AUTH_VAR_LIB_CONTEXT_IN mAuthContextIn = {
 AUTH_VAR_LIB_CONTEXT_OUT mAuthContextOut;
 
 /**
-  Initialization for MOR Lock Control.
-
-  @retval EFI_SUCEESS     MorLock initialization success.
-  @return Others          Some error occurs.
-**/
-EFI_STATUS
-MorLockInit (
-  VOID
-  );
-
-/**
-  This service is an MOR/MorLock checker handler for the SetVariable().
-
-  @param  VariableName the name of the vendor's variable, as a
-                       Null-Terminated Unicode String
-  @param  VendorGuid   Unify identifier for vendor.
-  @param  Attributes   Point to memory location to return the attributes of variable. If the point
-                       is NULL, the parameter would be ignored.
-  @param  DataSize     The size in bytes of Data-Buffer.
-  @param  Data         Point to the content of the variable.
-
-  @retval  EFI_SUCCESS            The MOR/MorLock check pass, and Variable driver can store the variable data.
-  @retval  EFI_INVALID_PARAMETER  The MOR/MorLock data or data size or attributes is not allowed for MOR variable.
-  @retval  EFI_ACCESS_DENIED      The MOR/MorLock is locked.
-  @retval  EFI_ALREADY_STARTED    The MorLock variable is handled inside this function.
-                                  Variable driver can just return EFI_SUCCESS.
-**/
-EFI_STATUS
-SetVariableCheckHandlerMor (
-  IN CHAR16     *VariableName,
-  IN EFI_GUID   *VendorGuid,
-  IN UINT32     Attributes,
-  IN UINTN      DataSize,
-  IN VOID       *Data
-  );
-
-/**
   Routine used to track statistical information about variable usage.
   The data is stored in the EFI system table so it can be accessed later.
   VariableInfo.efi can dump out the table. Only Boot Services variable
