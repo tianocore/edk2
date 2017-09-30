@@ -51,6 +51,7 @@
   VariableSmm.c
   VarCheck.c
   Variable.h
+  PrivilegePolymorphic.h
   VariableExLib.c
   TcgMorLockSmm.c
 

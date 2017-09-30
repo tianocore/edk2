@@ -98,20 +98,6 @@ AUTH_VAR_LIB_CONTEXT_IN mAuthContextIn = {
 AUTH_VAR_LIB_CONTEXT_OUT mAuthContextOut;
 
 /**
-
-  SecureBoot Hook for auth variable update.
-
-  @param[in] VariableName                 Name of Variable to be found.
-  @param[in] VendorGuid                   Variable vendor GUID.
-**/
-VOID
-EFIAPI
-SecureBootHook (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
-  );
-
-/**
   Initialization for MOR Lock Control.
 
   @retval EFI_SUCEESS     MorLock initialization success.

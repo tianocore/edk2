@@ -44,6 +44,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 #include <Guid/SmmVariableCommon.h>
 
+#include "PrivilegePolymorphic.h"
+
 EFI_HANDLE                       mHandle                    = NULL;
 EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable               = NULL;
 EFI_EVENT                        mVirtualAddressChangeEvent = NULL;
@@ -55,20 +57,6 @@ UINTN                            mVariableBufferPayloadSize;
 EFI_LOCK                         mVariableServicesLock;
 EDKII_VARIABLE_LOCK_PROTOCOL     mVariableLock;
 EDKII_VAR_CHECK_PROTOCOL         mVarCheck;
-
-/**
-  SecureBoot Hook for SetVariable.
-
-  @param[in] VariableName                 Name of Variable to be found.
-  @param[in] VendorGuid                   Variable vendor GUID.
-
-**/
-VOID
-EFIAPI
-SecureBootHook (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
-  );
 
 /**
   Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).

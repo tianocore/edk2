@@ -41,6 +41,7 @@
   Variable.c
   VariableDxe.c
   Variable.h
+  PrivilegePolymorphic.h
   Measurement.c
   TcgMorLockDxe.c
   VarCheck.c
