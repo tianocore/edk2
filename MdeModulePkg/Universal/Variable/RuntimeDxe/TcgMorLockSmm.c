@@ -45,6 +45,7 @@ typedef enum {
   MorLockStateLocked = 1,
 } MOR_LOCK_STATE;
 
+BOOLEAN         mMorLockInitializationRequired = FALSE;
 UINT8           mMorLockKey[MOR_LOCK_V2_KEY_SIZE];
 BOOLEAN         mMorLockKeyEmpty = TRUE;
 BOOLEAN         mMorLockPassThru = FALSE;
@@ -392,10 +393,8 @@ MorLockInit (
   VOID
   )
 {
-  //
-  // Set variable to report capability to OS
-  //
-  return SetMorLockVariable (0);
+  mMorLockInitializationRequired = TRUE;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -408,7 +407,61 @@ MorLockInitAtEndOfDxe (
   VOID
   )
 {
+  UINTN      MorSize;
+  EFI_STATUS MorStatus;
+
+  if (!mMorLockInitializationRequired) {
+    //
+    // The EFI_SMM_FAULT_TOLERANT_WRITE_PROTOCOL has never been installed, thus
+    // the variable write service is unavailable. This should never happen.
+    //
+    ASSERT (FALSE);
+    return;
+  }
+
   //
-  // Do nothing.
+  // Check if the MOR variable exists.
   //
+  MorSize = 0;
+  MorStatus = VariableServiceGetVariable (
+                MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+                &gEfiMemoryOverwriteControlDataGuid,
+                NULL,                                   // Attributes
+                &MorSize,
+                NULL                                    // Data
+                );
+  //
+  // We provided a zero-sized buffer, so the above call can never succeed.
+  //
+  ASSERT (EFI_ERROR (MorStatus));
+
+  if (MorStatus == EFI_BUFFER_TOO_SMALL) {
+    //
+    // The MOR variable exists; set the MOR Control Lock variable to report the
+    // capability to the OS.
+    //
+    SetMorLockVariable (0);
+    return;
+  }
+
+  //
+  // The platform does not support the MOR variable. Delete the MOR Control
+  // Lock variable (should it exists for some reason) and prevent other modules
+  // from creating it.
+  //
+  mMorLockPassThru = TRUE;
+  VariableServiceSetVariable (
+    MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
+    &gEfiMemoryOverwriteRequestControlLockGuid,
+    0,                                          // Attributes
+    0,                                          // DataSize
+    NULL                                        // Data
+    );
+  mMorLockPassThru = FALSE;
+
+  VariableLockRequestToLock (
+    NULL,                                       // This
+    MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
+    &gEfiMemoryOverwriteRequestControlLockGuid
+    );
 }
