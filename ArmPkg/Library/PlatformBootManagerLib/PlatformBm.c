@@ -25,6 +25,7 @@
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiLib.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/EsrtManagement.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciIo.h>
@@ -449,12 +450,23 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS                    Status;
+  ESRT_MANAGEMENT_PROTOCOL      *EsrtManagement;
 
   if (GetBootModeHob() == BOOT_ON_FLASH_UPDATE) {
     DEBUG ((DEBUG_INFO, "ProcessCapsules Before EndOfDxe ......\n"));
     Status = ProcessCapsules ();
     DEBUG ((DEBUG_INFO, "ProcessCapsules returned %r\n", Status));
+  } else {
+    if (EsrtManagement != NULL) {
+      EsrtManagement->SyncEsrtFmp ();
+    }
+  }
+
+  Status = gBS->LocateProtocol (&gEsrtManagementProtocolGuid, NULL,
+                  (VOID **)&EsrtManagement);
+  if (EFI_ERROR (Status)) {
+    EsrtManagement = NULL;
   }
 
   //
@@ -524,7 +536,8 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
-  EFI_STATUS      Status;
+  ESRT_MANAGEMENT_PROTOCOL      *EsrtManagement;
+  EFI_STATUS                    Status;
 
   //
   // Show the splash screen.
@@ -537,6 +550,12 @@ PlatformBootManagerAfterConsole (
   // Connect the rest of the devices.
   //
   EfiBootManagerConnectAll ();
+
+  Status = gBS->LocateProtocol (&gEsrtManagementProtocolGuid, NULL,
+                  (VOID **)&EsrtManagement);
+  if (!EFI_ERROR (Status)) {
+    EsrtManagement->SyncEsrtFmp ();
+  }
 
   if (GetBootModeHob() == BOOT_ON_FLASH_UPDATE) {
     DEBUG((DEBUG_INFO, "ProcessCapsules After EndOfDxe ......\n"));
