@@ -466,6 +466,40 @@ BuildFv2Hob (
   ASSERT (FALSE);
 }
 
+/**
+  Builds a EFI_HOB_TYPE_FV3 HOB.
+
+  This function builds a EFI_HOB_TYPE_FV3 HOB.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+
+  If there is no additional space for HOB creation, then ASSERT().
+  If the FvImage buffer is not at its required alignment, then ASSERT().
+
+  @param BaseAddress            The base address of the Firmware Volume.
+  @param Length                 The size of the Firmware Volume in bytes.
+  @param AuthenticationStatus   The authentication status.
+  @param ExtractedFv            TRUE if the FV was extracted as a file within
+                                another firmware volume. FALSE otherwise.
+  @param FvName                 The name of the Firmware Volume.
+                                Valid only if IsExtractedFv is TRUE.
+  @param FileName               The name of the file.
+                                Valid only if IsExtractedFv is TRUE.
+
+**/
+VOID
+EFIAPI
+BuildFv3Hob (
+  IN          EFI_PHYSICAL_ADDRESS        BaseAddress,
+  IN          UINT64                      Length,
+  IN          UINT32                      AuthenticationStatus,
+  IN          BOOLEAN                     ExtractedFv,
+  IN CONST    EFI_GUID                    *FvName, OPTIONAL
+  IN CONST    EFI_GUID                    *FileName OPTIONAL
+  )
+{
+  ASSERT (FALSE);
+}
 
 /**
   Builds a Capsule Volume HOB.
