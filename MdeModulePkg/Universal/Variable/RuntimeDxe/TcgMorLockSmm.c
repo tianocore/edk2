@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include "Variable.h"
 
 typedef struct {
@@ -32,6 +33,8 @@ VARIABLE_TYPE  mMorVariableType[] = {
   {MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,      &gEfiMemoryOverwriteControlDataGuid},
   {MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,  &gEfiMemoryOverwriteRequestControlLockGuid},
 };
+
+BOOLEAN         mMorPassThru = FALSE;
 
 #define MOR_LOCK_DATA_UNLOCKED           0x0
 #define MOR_LOCK_DATA_LOCKED_WITHOUT_KEY 0x1
@@ -363,6 +366,13 @@ SetVariableCheckHandlerMor (
   //
 
   //
+  // Permit deletion for passthru request.
+  //
+  if (((Attributes == 0) || (DataSize == 0)) && mMorPassThru) {
+    return EFI_SUCCESS;
+  }
+
+  //
   // Basic Check
   //
   if ((Attributes != (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)) ||
@@ -409,6 +419,8 @@ MorLockInitAtEndOfDxe (
 {
   UINTN      MorSize;
   EFI_STATUS MorStatus;
+  EFI_STATUS TcgStatus;
+  VOID       *TcgInterface;
 
   if (!mMorLockInitializationRequired) {
     //
@@ -437,17 +449,72 @@ MorLockInitAtEndOfDxe (
 
   if (MorStatus == EFI_BUFFER_TOO_SMALL) {
     //
-    // The MOR variable exists; set the MOR Control Lock variable to report the
-    // capability to the OS.
+    // The MOR variable exists.
     //
-    SetMorLockVariable (0);
-    return;
+    // Some OSes don't follow the TCG's Platform Reset Attack Mitigation spec
+    // in that the OS should never create the MOR variable, only read and write
+    // it -- these OSes (unintentionally) create MOR if the platform firmware
+    // does not produce it. Whether this is the case (from the last OS boot)
+    // can be deduced from the absence of the TCG / TCG2 protocols, as edk2's
+    // MOR implementation depends on (one of) those protocols.
+    //
+    TcgStatus = gBS->LocateProtocol (
+                       &gEfiTcgProtocolGuid,
+                       NULL,                 // Registration
+                       &TcgInterface
+                       );
+    if (EFI_ERROR (TcgStatus)) {
+      TcgStatus = gBS->LocateProtocol (
+                         &gEfiTcg2ProtocolGuid,
+                         NULL,                  // Registration
+                         &TcgInterface
+                         );
+    }
+
+    if (!EFI_ERROR (TcgStatus)) {
+      //
+      // The MOR variable originates from the platform firmware; set the MOR
+      // Control Lock variable to report the locking capability to the OS.
+      //
+      SetMorLockVariable (0);
+      return;
+    }
+
+    //
+    // The MOR variable's origin is inexplicable; delete it.
+    //
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: deleting unexpected / unsupported variable %g:%s\n",
+      __FUNCTION__,
+      &gEfiMemoryOverwriteControlDataGuid,
+      MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME
+      ));
+
+    mMorPassThru = TRUE;
+    VariableServiceSetVariable (
+      MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+      &gEfiMemoryOverwriteControlDataGuid,
+      0,                                      // Attributes
+      0,                                      // DataSize
+      NULL                                    // Data
+      );
+    mMorPassThru = FALSE;
   }
 
   //
-  // The platform does not support the MOR variable. Delete the MOR Control
-  // Lock variable (should it exists for some reason) and prevent other modules
-  // from creating it.
+  // The MOR variable is absent; the platform firmware does not support it.
+  // Lock the variable so that no other module may create it.
+  //
+  VariableLockRequestToLock (
+    NULL,                                   // This
+    MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+    &gEfiMemoryOverwriteControlDataGuid
+    );
+
+  //
+  // Delete the MOR Control Lock variable too (should it exists for some
+  // reason) and prevent other modules from creating it.
   //
   mMorLockPassThru = TRUE;
   VariableServiceSetVariable (

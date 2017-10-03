@@ -74,6 +74,7 @@
   SmmMemLib
   AuthVariableLib
   VarCheckLib
+  UefiBootServicesTableLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
@@ -85,6 +86,8 @@
   gEfiSmmVariableProtocolGuid
   gEfiSmmEndOfDxeProtocolGuid                   ## NOTIFY
   gEdkiiSmmVarCheckProtocolGuid                 ## PRODUCES
+  gEfiTcgProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid                          ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
