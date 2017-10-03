@@ -3,7 +3,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -711,13 +711,10 @@ NotifyFwVolBlock (
       FvDevice->FwVolHeader     = FwVolHeader;
       FvDevice->IsFfs3Fv        = CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid);
       FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
-
-      if (Fvb->ParentHandle != NULL) {
-        //
-        // Inherit the authentication status from FVB.
-        //
-        FvDevice->AuthenticationStatus = GetFvbAuthenticationStatus (Fvb);
-      }
+      //
+      // Inherit the authentication status from FVB.
+      //
+      FvDevice->AuthenticationStatus = GetFvbAuthenticationStatus (Fvb);
       
       if (!EFI_ERROR (FvCheck (FvDevice))) {
         //

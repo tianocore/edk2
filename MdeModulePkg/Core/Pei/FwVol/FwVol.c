@@ -1452,6 +1452,18 @@ ProcessFvFile (
     &FileInfo.FileName
     );
 
+  //
+  // Build FV3 HOB with authentication status to be propagated to DXE.
+  //
+  BuildFv3Hob (
+    (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+    FvHeader->FvLength,
+    AuthenticationStatus,
+    TRUE,
+    &ParentFvImageInfo.FvName,
+    &FileInfo.FileName
+    );
+
   return EFI_SUCCESS;
 }
 
