@@ -1,7 +1,7 @@
 /** @file
   Common defines and definitions for a FwVolDxe driver.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -33,6 +33,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/HobLib.h>
 
 #define FV_DEVICE_SIGNATURE           SIGNATURE_32 ('_', 'F', 'V', '_')
 
