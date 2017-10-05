@@ -234,18 +234,6 @@
 #
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
-  ## Image verification policy for OptionRom. Only following values are valid:<BR><BR>
-  #  NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>
-  #  0x00000000      Always trust the image.<BR>
-  #  0x00000001      Never trust the image.<BR>
-  #  0x00000002      Allow execution when there is security violation.<BR>
-  #  0x00000003      Defer execution when there is security violation.<BR>
-  #  0x00000004      Deny execution when there is security violation.<BR>
-  #  0x00000005      Query user when there is security violation.<BR>
-  # @Prompt Set policy for the image from OptionRom.
-  # @ValidRange 0x80000001 | 0x00000000 - 0x00000005
-  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04|UINT32|0x00000001
-
   ## Image verification policy for removable media which includes CD-ROM, Floppy, USB and network.
   #  Only following values are valid:<BR><BR>
   #  NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>
@@ -308,6 +296,18 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice|0x010D0000|UINT32|0x00000007
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## Image verification policy for OptionRom. Only following values are valid:<BR><BR>
+  #  NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>
+  #  0x00000000      Always trust the image.<BR>
+  #  0x00000001      Never trust the image.<BR>
+  #  0x00000002      Allow execution when there is security violation.<BR>
+  #  0x00000003      Defer execution when there is security violation.<BR>
+  #  0x00000004      Deny execution when there is security violation.<BR>
+  #  0x00000005      Query user when there is security violation.<BR>
+  # @Prompt Set policy for the image from OptionRom.
+  # @ValidRange 0x80000001 | 0x00000000 - 0x00000005
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04|UINT32|0x00000001
+
   ## Indicates the presence or absence of the platform operator during firmware booting.
   #  If platform operator is not physical presence during boot. TPM will be locked and the TPM commands 
   #  that required operator physical presence can not run.<BR><BR>
