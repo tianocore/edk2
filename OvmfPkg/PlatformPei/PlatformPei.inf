@@ -41,6 +41,7 @@
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
   OvmfPkg/OvmfPkg.dec
 
@@ -96,6 +97,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPropertiesTableEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
   gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds

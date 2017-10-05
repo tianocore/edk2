@@ -59,4 +59,11 @@ AmdSevInitialize (
   ASSERT_RETURN_ERROR (PcdStatus);
 
   DEBUG ((DEBUG_INFO, "SEV is enabled (mask 0x%lx)\n", EncryptionMask));
+
+  //
+  // Set Pcd to Deny the execution of option ROM when security
+  // violation.
+  //
+  PcdStatus = PcdSet32S (PcdOptionRomImageVerificationPolicy, 0x4);
+  ASSERT_RETURN_ERROR (PcdStatus);
 }
