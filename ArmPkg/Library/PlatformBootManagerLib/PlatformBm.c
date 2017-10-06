@@ -458,15 +458,11 @@ PlatformBootManagerBeforeConsole (
     Status = ProcessCapsules ();
     DEBUG ((DEBUG_INFO, "ProcessCapsules returned %r\n", Status));
   } else {
-    if (EsrtManagement != NULL) {
+    Status = gBS->LocateProtocol (&gEsrtManagementProtocolGuid, NULL,
+                    (VOID **)&EsrtManagement);
+    if (!EFI_ERROR (Status)) {
       EsrtManagement->SyncEsrtFmp ();
     }
-  }
-
-  Status = gBS->LocateProtocol (&gEsrtManagementProtocolGuid, NULL,
-                  (VOID **)&EsrtManagement);
-  if (EFI_ERROR (Status)) {
-    EsrtManagement = NULL;
   }
 
   //
