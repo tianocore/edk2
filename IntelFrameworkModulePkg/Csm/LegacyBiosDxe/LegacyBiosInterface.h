@@ -509,6 +509,8 @@ extern BBS_TABLE           *mBbsTable;
 
 extern EFI_GENERIC_MEMORY_TEST_PROTOCOL *gGenMemoryTest;
 
+extern BOOLEAN mEndOfDxe;
+
 #define PORT_70 0x70
 #define PORT_71 0x71
 
@@ -1540,6 +1542,22 @@ InternalLegacyBiosFarCall (
 EFI_STATUS
 LegacyBiosInstallVgaRom (
   IN  LEGACY_BIOS_INSTANCE            *Private
+  );
+
+/**
+   Enable NULL pointer detection
+*/
+VOID
+EnableNullDetection (
+  VOID
+  );
+
+/**
+   Disable NULL pointer detection
+*/
+VOID
+DisableNullDetection (
+  VOID
   );
 
 #endif
