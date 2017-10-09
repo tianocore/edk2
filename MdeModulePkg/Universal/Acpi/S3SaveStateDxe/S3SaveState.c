@@ -1,7 +1,7 @@
 /** @file
   Implementation for S3 Boot Script Saver state driver.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -210,10 +210,10 @@ BootScriptWritePciCfg2Write (
   UINT16                Segment;
 
   Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Segment     = VA_ARG (Marker, UINT16);
   Address     = VA_ARG (Marker, UINT64);
   Count       = VA_ARG (Marker, UINTN);
   Buffer      = VA_ARG (Marker, UINT8 *);
-  Segment     = VA_ARG (Marker, UINT16);
 
   return S3BootScriptSavePciCfg2Write (Width, Segment, Address, Count, Buffer);
 }
@@ -240,8 +240,8 @@ BootScriptWritePciCfg2ReadWrite (
   UINT8                 *DataMask;
  
   Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Address     = VA_ARG (Marker, UINT64);
   Segment     = VA_ARG (Marker, UINT16);
+  Address     = VA_ARG (Marker, UINT64);
   Data        = VA_ARG (Marker, UINT8 *);
   DataMask    = VA_ARG (Marker, UINT8 *);
  
