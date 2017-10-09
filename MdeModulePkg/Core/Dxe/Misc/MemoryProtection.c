@@ -996,6 +996,53 @@ MemoryProtectionExitBootServicesCallback (
 }
 
 /**
+  Disable NULL pointer detection after EndOfDxe. This is a workaround resort in
+  order to skip unfixable NULL pointer access issues detected in OptionROM or
+  boot loaders.
+
+  @param[in]  Event     The Event this notify function registered to.
+  @param[in]  Context   Pointer to the context data registered to the Event.
+**/
+VOID
+EFIAPI
+DisableNullDetectionAtTheEndOfDxe (
+  EFI_EVENT                               Event,
+  VOID                                    *Context
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR   Desc;
+
+  DEBUG ((DEBUG_INFO, "DisableNullDetectionAtTheEndOfDxe(): start\r\n"));
+  //
+  // Disable NULL pointer detection by enabling first 4K page
+  //
+  Status = CoreGetMemorySpaceDescriptor (0, &Desc);
+  ASSERT_EFI_ERROR (Status);
+
+  if ((Desc.Capabilities & EFI_MEMORY_RP) == 0) {
+    Status = CoreSetMemorySpaceCapabilities (
+              0,
+              EFI_PAGE_SIZE,
+              Desc.Capabilities | EFI_MEMORY_RP
+              );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Status = CoreSetMemorySpaceAttributes (
+            0,
+            EFI_PAGE_SIZE,
+            Desc.Attributes & ~EFI_MEMORY_RP
+            );
+  ASSERT_EFI_ERROR (Status);
+
+  CoreCloseEvent (Event);
+  DEBUG ((DEBUG_INFO, "DisableNullDetectionAtTheEndOfDxe(): end\r\n"));
+
+  return;
+}
+
+/**
   Initialize Memory Protection support.
 **/
 VOID
@@ -1006,6 +1053,7 @@ CoreInitializeMemoryProtection (
 {
   EFI_STATUS  Status;
   EFI_EVENT   Event;
+  EFI_EVENT   EndOfDxeEvent;
   VOID        *Registration;
 
   mImageProtectionPolicy = PcdGet32(PcdImageProtectionPolicy);
@@ -1044,6 +1092,23 @@ CoreInitializeMemoryProtection (
                );
     ASSERT_EFI_ERROR(Status);
   }
+
+  //
+  // Register a callback to disable NULL pointer detection at EndOfDxe
+  //
+  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7))
+       == (BIT0|BIT7)) {
+    Status = CoreCreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_NOTIFY,
+                    DisableNullDetectionAtTheEndOfDxe,
+                    NULL,
+                    &gEfiEndOfDxeEventGroupGuid,
+                    &EndOfDxeEvent
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
   return ;
 }
 
