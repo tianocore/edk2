@@ -191,9 +191,10 @@ formset
     endcheckbox;
     endif;
 
-    suppressif ideqval ISCSI_CONFIG_IFR_NVDATA.InitiatorInfoFromDhcp == 0x01 OR
-               ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_IP6 OR 
+    suppressif ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_IP6 OR 
                ideqval ISCSI_CONFIG_IFR_NVDATA.IpMode == IP_MODE_AUTOCONFIG;
+               
+    grayoutif ideqval ISCSI_CONFIG_IFR_NVDATA.InitiatorInfoFromDhcp == 0x01;
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.LocalIp,
             prompt  = STRING_TOKEN(STR_ISCSI_LOCAL_IP_ADDRESS),
             help    = STRING_TOKEN(STR_ISCSI_IP_ADDRESS_HELP),
@@ -220,6 +221,7 @@ formset
             minsize = IP4_MIN_SIZE,
             maxsize = IP4_MAX_SIZE,
     endstring;
+    endif;
     
     endif;
 
