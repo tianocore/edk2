@@ -123,7 +123,9 @@ Create4GPageTablesIa32Pae (
     PageDirectoryPointerEntry->Bits.Present = 1;
 
     for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress += SIZE_2MB) {
-      if ((PhysicalAddress < StackBase + StackSize) && ((PhysicalAddress + SIZE_2MB) > StackBase)) {
+      if ((IsNullDetectionEnabled () && PhysicalAddress == 0)
+          || ((PhysicalAddress < StackBase + StackSize)
+              && ((PhysicalAddress + SIZE_2MB) > StackBase))) {
         //
         // Need to split this 2M page that covers stack range.
         //
@@ -239,6 +241,10 @@ HandOffToDxeCore (
   EFI_VECTOR_HANDOFF_INFO   *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
   BOOLEAN                   BuildPageTablesIa32Pae;
+
+  if (IsNullDetectionEnabled ()) {
+    ClearFirst4KPage (HobList.Raw);
+  }
 
   Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (STACK_SIZE), &BaseOfStack);
   ASSERT_EFI_ERROR (Status);
@@ -379,10 +385,15 @@ HandOffToDxeCore (
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
     PageTables = 0;
-    BuildPageTablesIa32Pae = (BOOLEAN) (PcdGetBool (PcdSetNxForStack) && IsIa32PaeSupport () && IsExecuteDisableBitAvailable ());
+    BuildPageTablesIa32Pae = (BOOLEAN) (IsIa32PaeSupport () &&
+                                        (IsNullDetectionEnabled () ||
+                                         (PcdGetBool (PcdSetNxForStack) &&
+                                          IsExecuteDisableBitAvailable ())));
     if (BuildPageTablesIa32Pae) {
       PageTables = Create4GPageTablesIa32Pae (BaseOfStack, STACK_SIZE);
-      EnableExecuteDisableBit ();
+      if (IsExecuteDisableBitAvailable ()) {
+        EnableExecuteDisableBit();
+      }
     }
 
     //

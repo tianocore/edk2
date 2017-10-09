@@ -825,3 +825,4 @@ UpdateStackHob (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 }
+

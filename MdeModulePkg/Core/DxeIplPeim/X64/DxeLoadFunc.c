@@ -42,6 +42,10 @@ HandOffToDxeCore (
   EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
 
+  if (IsNullDetectionEnabled ()) {
+    ClearFirst4KPage (HobList.Raw);
+  }
+
   //
   // Get Vector Hand-off Info PPI and build Guided HOB
   //
