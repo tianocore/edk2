@@ -159,6 +159,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStaticPageTable               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
 
 [Depex]
   gEfiMpServiceProtocolGuid

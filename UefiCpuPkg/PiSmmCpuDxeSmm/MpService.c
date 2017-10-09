@@ -855,10 +855,10 @@ Gen4GPageTable (
     Pte[Index] = (Index << 21) | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
   }
 
+  Pdpte = (UINT64*)PageTable;
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     Pages = (UINTN)PageTable + EFI_PAGES_TO_SIZE (5);
     GuardPage = mSmmStackArrayBase + EFI_PAGE_SIZE;
-    Pdpte = (UINT64*)PageTable;
     for (PageIndex = Low2MBoundary; PageIndex <= High2MBoundary; PageIndex += SIZE_2MB) {
       Pte = (UINT64*)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
       Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
@@ -883,6 +883,29 @@ Gen4GPageTable (
         PageAddress+= EFI_PAGE_SIZE;
       }
       Pages += EFI_PAGE_SIZE;
+    }
+  }
+
+  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
+    Pte = (UINT64*)(UINTN)(Pdpte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
+    if ((Pte[0] & IA32_PG_PS) == 0) {
+      // 4K-page entries are already mapped. Just hide the first one anyway.
+      Pte = (UINT64*)(UINTN)(Pte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
+      Pte[0] &= ~IA32_PG_P; // Hide page 0
+    } else {
+      // Create 4K-page entries
+      Pages = (UINTN)AllocatePageTableMemory (1);
+      ASSERT (Pages != 0);
+
+      Pte[0] = (UINT64)(Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
+
+      Pte = (UINT64*)Pages;
+      PageAddress = 0;
+      Pte[0] = PageAddress | mAddressEncMask; // Hide page 0 but present left
+      for (Index = 1; Index < EFI_PAGE_SIZE / sizeof (*Pte); Index++) {
+        PageAddress += EFI_PAGE_SIZE;
+        Pte[Index] = PageAddress | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+      }
     }
   }
 
