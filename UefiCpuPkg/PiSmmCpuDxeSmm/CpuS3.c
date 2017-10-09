@@ -226,12 +226,14 @@ SetProcessorRegister (
   CPU_REGISTER_TABLE        *RegisterTable;
 
   InitApicId = GetInitialApicId ();
+  RegisterTable = NULL;
   for (Index = 0; Index < RegisterTableCount; Index++) {
     if (RegisterTables[Index].InitialApicId == InitApicId) {
       RegisterTable =  &RegisterTables[Index];
       break;
     }
   }
+  ASSERT (RegisterTable != NULL);
 
   //
   // Traverse Register Table of this logical processor
