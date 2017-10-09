@@ -833,7 +833,7 @@ class PcdReport(object):
         for Arch in Wa.ArchList:
             Platform = Wa.BuildDatabase[Wa.MetaFile, Arch, Wa.BuildTarget, Wa.ToolChain]
             for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
-                DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
+                DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DscDefaultValue
                 if DscDefaultValue:
                     self.DscPcdDefault[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
@@ -914,6 +914,7 @@ class PcdReport(object):
                     #
                     DecDefaultValue = self.DecPcdDefault.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, DecType))
                     DscDefaultValue = self.DscPcdDefault.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
+                    DscDefaultValBak= DscDefaultValue
                     DscDefaultValue = self.FdfPcdSet.get((Pcd.TokenCName, Key), DscDefaultValue)
                     InfDefaultValue = None
                     
@@ -1000,8 +1001,8 @@ class PcdReport(object):
                             else:
                                 FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
                                
-                    if not DscMatch and DscDefaultValue != None:
-                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', DscDefaultValue.strip()))
+                    if not DscMatch and DscDefaultValBak != None:
+                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', DscDefaultValBak.strip()))
 
                     if not InfMatch and InfDefaultValue != None:
                         FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', InfDefaultValue.strip()))

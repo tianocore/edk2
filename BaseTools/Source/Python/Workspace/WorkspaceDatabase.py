@@ -885,8 +885,8 @@ class DscBuildData(PlatformBuildClassObject):
                                                 MaxDatumSize,
                                                 {},
                                                 False,
-                                                None
-                                                )
+                                                None,
+                                                IsDsc=True)
         return Pcds
 
     ## Retrieve dynamic PCD settings
@@ -950,9 +950,9 @@ class DscBuildData(PlatformBuildClassObject):
                                                     MaxDatumSize,
                                                     {SkuName : SkuInfo},
                                                     False,
-                                                    None
-                                                    )
-        
+                                                    None,
+                                                    IsDsc=True)
+
         for pcd in Pcds.values():
             pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
             if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():                
@@ -1069,9 +1069,8 @@ class DscBuildData(PlatformBuildClassObject):
                                                 None,
                                                 pcdDecObject.validateranges,
                                                 pcdDecObject.validlists,
-                                                pcdDecObject.expressions
-                                                )
-                
+                                                pcdDecObject.expressions,
+                                                IsDsc=True)
 
         for pcd in Pcds.values():
             SkuInfoObj = pcd.SkuInfoList.values()[0]
@@ -1179,8 +1178,8 @@ class DscBuildData(PlatformBuildClassObject):
                                                 MaxDatumSize,
                                                 {SkuName : SkuInfo},
                                                 False,
-                                                None
-                                                )
+                                                None,
+                                                IsDsc=True)
         for pcd in Pcds.values():
             SkuInfoObj = pcd.SkuInfoList.values()[0]
             pcdDecObject = self._DecPcds[pcd.TokenCName,pcd.TokenSpaceGuidCName]
