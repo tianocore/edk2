@@ -75,6 +75,20 @@ InstallVbeShim (
   UINTN                Printed;
   VBE_MODE_INFO        *VbeModeInfo;
 
+  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: page 0 protected, not installing VBE shim\n",
+      __FUNCTION__
+      ));
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: page 0 protection prevents Windows 7 from booting anyway\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
   Segment0 = 0x00000;
   SegmentC = 0xC0000;
   SegmentF = 0xF0000;
