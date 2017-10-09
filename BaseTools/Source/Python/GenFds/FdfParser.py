@@ -2365,7 +2365,7 @@ class FdfParser:
 
     def __GetFvExtEntryStatement(self, FvObj):
 
-        if not self.__IsKeyword( "FV_EXT_ENTRY"):
+        if not (self.__IsKeyword( "FV_EXT_ENTRY") or self.__IsKeyword( "FV_EXT_ENTRY_TYPE")):
             return False
 
         if not self.__IsKeyword ("TYPE"):
