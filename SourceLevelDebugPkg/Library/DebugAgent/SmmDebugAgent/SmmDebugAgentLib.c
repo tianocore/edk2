@@ -20,6 +20,11 @@ UINTN                       mSavedDebugRegisters[6];
 IA32_IDT_GATE_DESCRIPTOR    mIdtEntryTable[33];
 BOOLEAN                     mSkipBreakpoint = FALSE;
 BOOLEAN                     mSmmDebugIdtInitFlag = FALSE;
+BOOLEAN                     mApicTimerRestore = FALSE;
+BOOLEAN                     mPeriodicMode;
+UINT32                      mTimerCycle;
+UINTN                       mApicTimerDivisor;
+UINT8                       mVector;
 
 CHAR8 mWarningMsgIgnoreSmmEntryBreak[] = "Ignore smmentrybreak setting for SMI issued during DXE debugging!\r\n";
 
@@ -191,8 +196,6 @@ InitializeDebugAgent (
   DEBUG_AGENT_MAILBOX           *Mailbox;
   UINT64                        *MailboxLocation;
   UINT32                        DebugTimerFrequency;
-  BOOLEAN                       PeriodicMode;
-  UINTN                         TimerCycle;
 
   switch (InitFlag) {
   case DEBUG_AGENT_INIT_SMM:
@@ -289,9 +292,10 @@ InitializeDebugAgent (
     // Check if CPU APIC Timer is working, otherwise initialize it.
     //
     InitializeLocalApicSoftwareEnable (TRUE);
-    GetApicTimerState (NULL, &PeriodicMode, NULL);
-    TimerCycle = GetApicTimerInitCount ();
-    if (!PeriodicMode || TimerCycle == 0) {
+    GetApicTimerState (&mApicTimerDivisor, &mPeriodicMode, &mVector);
+    mTimerCycle = GetApicTimerInitCount ();
+    if (!mPeriodicMode || mTimerCycle == 0) {
+      mApicTimerRestore = TRUE;
       InitializeDebugTimer (NULL, FALSE);
     }
     Mailbox = GetMailboxPointer ();
@@ -327,6 +331,13 @@ InitializeDebugAgent (
     //
     mSkipBreakpoint = FALSE;
     RestoreDebugRegister ();
+    //
+    // Restore APIC Timer
+    //
+    if (mApicTimerRestore) {
+      InitializeApicTimer (mApicTimerDivisor, mTimerCycle, mPeriodicMode, mVector);
+      mApicTimerRestore = FALSE;
+    }
     break;
 
   case DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64:
