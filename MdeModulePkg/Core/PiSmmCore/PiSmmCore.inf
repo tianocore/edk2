@@ -79,6 +79,7 @@
   gEdkiiSmmExitBootServicesProtocolGuid         ## SOMETIMES_PRODUCES
   gEdkiiSmmLegacyBootProtocolGuid               ## SOMETIMES_PRODUCES
   gEdkiiSmmReadyToBootProtocolGuid              ## PRODUCES
+  gEdkiiSmmEndOfS3ResumeProtocolGuid            ## SOMETIMES_PRODUCES
 
   gEfiSmmSwDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiSmmSxDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES

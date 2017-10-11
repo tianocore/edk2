@@ -75,13 +75,14 @@ BOOLEAN  mInLegacyBoot = FALSE;
 // Table of SMI Handlers that are registered by the SMM Core when it is initialized
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
-  { SmmDriverDispatchHandler,   &gEfiEventDxeDispatchGuid,          NULL, TRUE  },
-  { SmmReadyToLockHandler,      &gEfiDxeSmmReadyToLockProtocolGuid, NULL, TRUE }, 
-  { SmmLegacyBootHandler,       &gEfiEventLegacyBootGuid,           NULL, FALSE },
-  { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,     NULL, FALSE },
-  { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,          NULL, FALSE },
-  { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,        NULL, TRUE },
-  { NULL,                       NULL,                               NULL, FALSE }
+  { SmmDriverDispatchHandler,   &gEfiEventDxeDispatchGuid,           NULL, TRUE  },
+  { SmmReadyToLockHandler,      &gEfiDxeSmmReadyToLockProtocolGuid,  NULL, TRUE }, 
+  { SmmLegacyBootHandler,       &gEfiEventLegacyBootGuid,            NULL, FALSE },
+  { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,      NULL, FALSE },
+  { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,           NULL, FALSE },
+  { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,         NULL, TRUE },
+  { SmmEndOfS3ResumeHandler,    &gEdkiiSmmEndOfS3ResumeProtocolGuid, NULL, FALSE },
+  { NULL,                       NULL,                                NULL, FALSE }
 };
 
 UINTN                           mFullSmramRangeCount;
@@ -379,6 +380,60 @@ SmmEndOfDxeHandler (
              EFI_NATIVE_INTERFACE,
              NULL
              );
+  return Status;
+}
+
+/**
+  Software SMI handler that is called when the EndOfS3Resume event is trigged.
+  This function installs the SMM EndOfS3Resume Protocol so SMM Drivers are informed that
+  S3 resume has finished.
+
+  @param  DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param  Context         Points to an optional handler context which was specified when the handler was registered.
+  @param  CommBuffer      A pointer to a collection of data in memory that will
+                          be conveyed from a non-SMM environment into an SMM environment.
+  @param  CommBufferSize  The size of the CommBuffer.
+
+  @return Status Code
+
+**/
+EFI_STATUS
+EFIAPI
+SmmEndOfS3ResumeHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context,        OPTIONAL
+  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  SmmHandle;
+
+  DEBUG ((EFI_D_INFO, "SmmEndOfS3ResumeHandler\n"));
+
+  //
+  // Install SMM EndOfS3Resume protocol
+  //
+  SmmHandle = NULL;
+  Status = SmmInstallProtocolInterface (
+             &SmmHandle,
+             &gEdkiiSmmEndOfS3ResumeProtocolGuid,
+             EFI_NATIVE_INTERFACE,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Uninstall the protocol here because the comsume just hook the
+  // installation event.
+  //
+  Status = SmmUninstallProtocolInterface (
+           SmmHandle,
+           &gEdkiiSmmEndOfS3ResumeProtocolGuid,
+           NULL
+           );
+  ASSERT_EFI_ERROR (Status);
+
   return Status;
 }
 
