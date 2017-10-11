@@ -28,6 +28,9 @@
 #include <Ppi/SmmAccess.h>
 #include <Ppi/PostBootScriptTable.h>
 #include <Ppi/EndOfPeiPhase.h>
+#include <Ppi/SmmCommunication.h>
+
+#include <Protocol/SmmEndOfS3Resume.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
@@ -150,6 +153,22 @@ typedef union {
   } Bits;
   UINT64    Uint64;
 } PAGE_TABLE_1G_ENTRY;
+
+//
+// Define two type of smm communicate headers.
+// One for 32 bits  PEI + 64 bits DXE, the other for 32 bits PEI + 32 bits DXE case.
+//
+typedef struct {
+  EFI_GUID  HeaderGuid;
+  UINT32    MessageLength;
+  UINT8     Data[1];
+} SMM_COMMUNICATE_HEADER_32;
+
+typedef struct {
+  EFI_GUID  HeaderGuid;
+  UINT64    MessageLength;
+  UINT8     Data[1];
+} SMM_COMMUNICATE_HEADER_64;
 
 #pragma pack()
 
@@ -430,6 +449,68 @@ IsLongModeWakingVector (
 }
 
 /**
+  Send EndOfS3Resume event to SmmCore through communication buffer way.
+
+  @retval  EFI_SUCCESS                 Return send the event success.
+**/
+EFI_STATUS
+SignalEndOfS3Resume (
+  VOID
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_PEI_SMM_COMMUNICATION_PPI      *SmmCommunicationPpi;
+  UINTN                              CommSize;
+  SMM_COMMUNICATE_HEADER_32          Header32;
+  SMM_COMMUNICATE_HEADER_64          Header64;
+  VOID                               *CommBuffer;
+
+  DEBUG ((EFI_D_INFO, "SignalEndOfS3Resume - Enter\n"));
+
+  //
+  // This buffer consumed in DXE phase, so base on DXE mode to prepare communicate buffer.
+  // Detect whether DXE is 64 bits mode.
+  // if (sizeof(UINTN) == sizeof(UINT64), PEI already 64 bits, assume DXE also 64 bits.
+  // or (FeaturePcdGet (PcdDxeIplSwitchToLongMode)), Dxe will switch to 64 bits.
+  //
+  if ((sizeof(UINTN) == sizeof(UINT64)) || (FeaturePcdGet (PcdDxeIplSwitchToLongMode))) {
+    CommBuffer = &Header64;
+    Header64.MessageLength = 0;
+    CommSize = OFFSET_OF (SMM_COMMUNICATE_HEADER_64, Data);
+  } else {
+    CommBuffer = &Header32;
+    Header32.MessageLength = 0;
+    CommSize = OFFSET_OF (SMM_COMMUNICATE_HEADER_32, Data);
+  }
+  CopyGuid (CommBuffer, &gEdkiiSmmEndOfS3ResumeProtocolGuid);
+
+  //
+  // Get needed resource
+  //
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiSmmCommunicationPpiGuid,
+             0,
+             NULL,
+             (VOID **)&SmmCommunicationPpi
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Send command
+  //
+  Status = SmmCommunicationPpi->Communicate (
+                                  SmmCommunicationPpi,
+                                  (VOID *)CommBuffer,
+                                  &CommSize
+                                  );
+  ASSERT_EFI_ERROR (Status);
+
+  DEBUG ((EFI_D_INFO, "SignalEndOfS3Resume - Exit (%r)\n", Status));
+
+  return Status;
+}
+
+/**
   Jump to OS waking vector.
   The function will install boot script done PPI, report S3 resume status code, and then jump to OS waking vector.
 
@@ -501,6 +582,12 @@ S3ResumeBootOs (
   // Install EndOfPeiPpi
   //
   Status = PeiServicesInstallPpi (&mPpiListEndOfPeiTable);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Signal EndOfS3Resume event.
+  //
+  Status = SignalEndOfS3Resume ();
   ASSERT_EFI_ERROR (Status);
 
   //
