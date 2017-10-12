@@ -59,9 +59,6 @@ LegacyBiosInt86 (
 {
   UINT16                Segment;
   UINT16                Offset;
-  LEGACY_BIOS_INSTANCE  *Private;
-
-  Private = LEGACY_BIOS_INSTANCE_FROM_THIS (This);
 
   Regs->X.Flags.Reserved1 = 1;
   Regs->X.Flags.Reserved2 = 0;
