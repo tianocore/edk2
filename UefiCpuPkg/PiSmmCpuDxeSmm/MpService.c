@@ -891,7 +891,7 @@ Gen4GPageTable (
     if ((Pte[0] & IA32_PG_PS) == 0) {
       // 4K-page entries are already mapped. Just hide the first one anyway.
       Pte = (UINT64*)(UINTN)(Pte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
-      Pte[0] &= ~IA32_PG_P; // Hide page 0
+      Pte[0] &= ~(UINT64)IA32_PG_P; // Hide page 0
     } else {
       // Create 4K-page entries
       Pages = (UINTN)AllocatePageTableMemory (1);
