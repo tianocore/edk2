@@ -1204,3 +1204,10 @@
                                                                                             "          0 - The returned pool is adjacent to the bottom guard page.<BR>\n"
                                                                                             "          1 - The returned pool is adjacent to the top guard page.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCpuStackGuard_PROMPT  #language en-US "Enable UEFI Stack Guard"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCpuStackGuard_HELP    #language en-US "Indicates if UEFI Stack Guard will be enabled.\n"
+                                                                                    "  If enabled, stack overflow in UEFI can be caught, preventing chaotic consequences.<BR><BR>\n"
+                                                                                    "   TRUE  - UEFI Stack Guard will be enabled.<BR>\n"
+                                                                                    "   FALSE - UEFI Stack Guard will be disabled.<BR>"
+

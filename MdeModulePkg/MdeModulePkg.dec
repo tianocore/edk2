@@ -949,6 +949,13 @@
   # @Prompt The Heap Guard feature mask
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask|0x0|UINT8|0x30001054
 
+  ## Indicates if UEFI Stack Guard will be enabled.
+  #  If enabled, stack overflow in UEFI can be caught, preventing chaotic consequences.<BR><BR>
+  #   TRUE  - UEFI Stack Guard will be enabled.<BR>
+  #   FALSE - UEFI Stack Guard will be disabled.<BR>
+  # @Prompt Enable UEFI Stack Guard.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|FALSE|BOOLEAN|0x30001055
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
