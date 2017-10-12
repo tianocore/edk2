@@ -1321,6 +1321,14 @@ _Exit:
   verifies the signature of the content is valid and signing certificate was not revoked
   and is contained within a list of trusted signers.
 
+  Note: because this function uses hashes and the specification contains a variety of
+        hash choices, you should be aware that the check against the RevokedDb list
+        will improperly succeed if the signature is revoked using a different hash
+        algorithm.  For this reason, you should either cycle through all UEFI supported
+        hashes to see if one is forbidden, or rely on a single hash choice only if the
+        UEFI signature authority only signs and revokes with a single hash (at time
+        of writing, this hash choice is SHA256).
+
   @param[in]     This                 Pointer to EFI_PKCS7_VERIFY_PROTOCOL instance.
   @param[in]     Signature            Points to buffer containing ASN.1 DER-encoded PKCS
                                       detached signature.
