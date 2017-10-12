@@ -42,6 +42,10 @@ RuntimeDriverCalculateCrc32 (
   OUT UINT32  *CrcOut
   )
 {
+  if (Data == NULL || DataSize == 0 || CrcOut == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   *CrcOut = CalculateCrc32 (Data, DataSize);
   return EFI_SUCCESS;
 }
