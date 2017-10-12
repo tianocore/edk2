@@ -465,7 +465,7 @@ SignalEndOfS3Resume (
   SMM_COMMUNICATE_HEADER_64          Header64;
   VOID                               *CommBuffer;
 
-  DEBUG ((EFI_D_INFO, "SignalEndOfS3Resume - Enter\n"));
+  DEBUG ((DEBUG_INFO, "SignalEndOfS3Resume - Enter\n"));
 
   //
   // This buffer consumed in DXE phase, so base on DXE mode to prepare communicate buffer.
@@ -484,29 +484,27 @@ SignalEndOfS3Resume (
   }
   CopyGuid (CommBuffer, &gEdkiiSmmEndOfS3ResumeProtocolGuid);
 
-  //
-  // Get needed resource
-  //
   Status = PeiServicesLocatePpi (
              &gEfiPeiSmmCommunicationPpiGuid,
              0,
              NULL,
              (VOID **)&SmmCommunicationPpi
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Locate Smm Communicate Ppi failed (%r)!\n", Status));
+    return Status;
+  }
 
-  //
-  // Send command
-  //
   Status = SmmCommunicationPpi->Communicate (
                                   SmmCommunicationPpi,
                                   (VOID *)CommBuffer,
                                   &CommSize
                                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SmmCommunicationPpi->Communicate return failure (%r)!\n", Status));
+  }
 
-  DEBUG ((EFI_D_INFO, "SignalEndOfS3Resume - Exit (%r)\n", Status));
-
+  DEBUG ((DEBUG_INFO, "SignalEndOfS3Resume - Exit (%r)\n", Status));
   return Status;
 }
 
@@ -587,8 +585,7 @@ S3ResumeBootOs (
   //
   // Signal EndOfS3Resume event.
   //
-  Status = SignalEndOfS3Resume ();
-  ASSERT_EFI_ERROR (Status);
+  SignalEndOfS3Resume ();
 
   //
   // report status code on S3 resume
