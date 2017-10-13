@@ -18,6 +18,37 @@
 #include <Library/ShellLib.h>
 
 /**
+  Print out single alias registered with the Shell.
+
+  @param[in]  Alias             Points to the NULL-terminated shell alias.
+                                If this parameter is NULL, then all
+                                aliases will be returned in ReturnedData.
+  @retval     SHELL_SUCCESS     the printout was sucessful
+**/
+SHELL_STATUS
+PrintSingleShellAlias(
+  IN  CONST CHAR16 *Alias
+  )
+{
+  CONST CHAR16        *ConstAliasVal;
+  SHELL_STATUS        ShellStatus;
+  BOOLEAN             Volatile;
+
+  ShellStatus = SHELL_SUCCESS;
+  ConstAliasVal = gEfiShellProtocol->GetAlias (Alias, &Volatile);
+  if (ConstAliasVal == NULL) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"alias", Alias);
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else {
+    if (ShellCommandIsOnAliasList (Alias)) {
+      Volatile = FALSE;
+    }
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_ALIAS_OUTPUT), gShellLevel3HiiHandle, !Volatile ? L' ' : L'*', Alias, ConstAliasVal);
+  }
+  return ShellStatus;
+}
+
+/**
   Print out each alias registered with the Shell.
 
   @retval STATUS_SUCCESS  the printout was sucessful
@@ -30,11 +61,7 @@ PrintAllShellAlias(
 {
   CONST CHAR16      *ConstAllAliasList;
   CHAR16            *Alias;
-  CONST CHAR16      *Command;
   CHAR16            *Walker;
-  BOOLEAN           Volatile;
-
-  Volatile = FALSE;
 
   ConstAllAliasList = gEfiShellProtocol->GetAlias(NULL, NULL);
   if (ConstAllAliasList == NULL) {
@@ -53,11 +80,7 @@ PrintAllShellAlias(
       Walker[0] = CHAR_NULL;
       Walker = Walker + 1;
     }
-    Command = gEfiShellProtocol->GetAlias(Alias, &Volatile);
-    if (ShellCommandIsOnAliasList(Alias)) {
-      Volatile = FALSE;
-    }
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_ALIAS_OUTPUT), gShellLevel3HiiHandle, !Volatile?L' ':L'*', Alias, Command);
+    PrintSingleShellAlias(Alias);
   } while (Walker != NULL && Walker[0] != CHAR_NULL);
 
   FreePool(Alias);
@@ -65,9 +88,58 @@ PrintAllShellAlias(
   return (SHELL_SUCCESS);
 }
 
+/**
+  Changes a shell command alias.
+
+  This function creates an alias for a shell command or if Alias is NULL it will delete an existing alias.
+
+
+  @param[in] Command            Points to the NULL-terminated shell command or existing alias.
+  @param[in] Alias              Points to the NULL-terminated alias for the shell command. If this is NULL, and
+                                Command refers to an alias, that alias will be deleted.
+  @param[in] Replace            If TRUE and the alias already exists, then the existing alias will be replaced. If
+                                FALSE and the alias already exists, then the existing alias is unchanged and
+                                EFI_ACCESS_DENIED is returned.
+  @param[in] Volatile           if TRUE the Alias being set will be stored in a volatile fashion.  if FALSE the
+                                Alias being set will be stored in a non-volatile fashion.
+
+  @retval SHELL_SUCCESS        Alias created or deleted successfully.
+  @retval SHELL_NOT_FOUND       the Alias intended to be deleted was not found
+  @retval SHELL_ACCESS_DENIED   The alias is a built-in alias or already existed and Replace was set to
+                                FALSE.
+  @retval SHELL_DEVICE_ERROR    Command is null or the empty string.
+**/
+SHELL_STATUS
+ShellLevel3CommandsLibSetAlias(
+  IN CONST CHAR16 *Command,
+  IN CONST CHAR16 *Alias,
+  IN BOOLEAN Replace,
+  IN BOOLEAN Volatile
+  )
+{
+  SHELL_STATUS        ShellStatus;
+  EFI_STATUS          Status;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status = gEfiShellProtocol->SetAlias (Command, Alias, Replace, Volatile);
+  if (EFI_ERROR(Status)) {
+    if (Status == EFI_ACCESS_DENIED) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");
+      ShellStatus = SHELL_ACCESS_DENIED;
+    } else if (Status == EFI_NOT_FOUND) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_NOT_FOUND), gShellLevel3HiiHandle, L"alias", Command);
+      ShellStatus = SHELL_NOT_FOUND;
+    } else {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);
+      ShellStatus = SHELL_DEVICE_ERROR;
+    }
+  }
+  return ShellStatus;
+}
+
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-v", TypeFlag},
-  {L"-d", TypeFlag},
+  {L"-d", TypeValue},
   {NULL, TypeMax}
   };
 
@@ -90,9 +162,10 @@ ShellCommandRunAlias (
   SHELL_STATUS        ShellStatus;
   CONST CHAR16        *Param1;
   CONST CHAR16        *Param2;
+  CONST CHAR16        *ParamStrD;
   CHAR16              *CleanParam2;
-  CONST CHAR16        *ConstAliasVal;
-  BOOLEAN             Volatile;
+  BOOLEAN             DeleteFlag;
+  BOOLEAN             VolatileFlag;
 
   ProblemParam        = NULL;
   ShellStatus         = SHELL_SUCCESS;
@@ -123,9 +196,13 @@ ShellCommandRunAlias (
     Param1 = ShellCommandLineGetRawValue(Package, 1);
     Param2 = ShellCommandLineGetRawValue(Package, 2);
 
+    DeleteFlag   = ShellCommandLineGetFlag (Package, L"-d");
+    VolatileFlag = ShellCommandLineGetFlag (Package, L"-v");
+
     if (Param2 != NULL) {
       CleanParam2 = AllocateCopyPool (StrSize(Param2), Param2);
       if (CleanParam2 == NULL) {
+        ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 
@@ -135,65 +212,68 @@ ShellCommandRunAlias (
       }
     }
 
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag(Package, L"-?")) {
-      ASSERT(FALSE);
-    }
-    if (ShellCommandLineGetCount(Package) == 1) {
-      //
-      // print out alias'
-      //
-      Status = PrintAllShellAlias();
-    } else if (ShellCommandLineGetFlag(Package, L"-d")) {
-      //
-      // delete an alias
-      //
-      Status = gEfiShellProtocol->SetAlias(Param1, NULL, TRUE, FALSE);
-      if (EFI_ERROR(Status)) {
-        if (Status == EFI_ACCESS_DENIED) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");
-          ShellStatus = SHELL_ACCESS_DENIED;
-        } else if (Status == EFI_NOT_FOUND) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_NOT_FOUND), gShellLevel3HiiHandle, L"alias", Param1);
-          ShellStatus = SHELL_NOT_FOUND;
-        } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);
-          ShellStatus = SHELL_DEVICE_ERROR;
-        }
+    if (!DeleteFlag && !VolatileFlag) {
+      switch (ShellCommandLineGetCount (Package)) {
+        case 1:
+          //
+          // "alias"
+          //
+          ShellStatus = PrintAllShellAlias ();
+          break;
+        case 2:
+          //
+          // "alias Param1"
+          //
+          ShellStatus = PrintSingleShellAlias (Param1);
+          break;
+        case 3:
+          //
+          // "alias Param1 CleanParam2"
+          //
+          ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
+          break;
+        default:
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
+          ShellStatus = SHELL_INVALID_PARAMETER;
       }
-    } else if (ShellCommandLineGetCount(Package) == 3) {
-      //
-      // must be adding an alias
-      //
-      Status = gEfiShellProtocol->SetAlias(CleanParam2, Param1, FALSE, ShellCommandLineGetFlag(Package, L"-v"));
-      if (EFI_ERROR(Status)) {
-        if (Status == EFI_ACCESS_DENIED) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");  
-          ShellStatus = SHELL_ACCESS_DENIED;
-        } else {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);  
-          ShellStatus = SHELL_DEVICE_ERROR;
-        }
-      }
-    } else if (ShellCommandLineGetCount(Package) == 2) {
-      //
-      // print out a single alias
-      //
-      ConstAliasVal = gEfiShellProtocol->GetAlias(Param1, &Volatile);
-      if (ConstAliasVal == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"alias", Param1);
+    } else if (DeleteFlag) {
+      if (VolatileFlag || ShellCommandLineGetCount (Package) > 1) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        if (ShellCommandIsOnAliasList(Param1)) {
-          Volatile = FALSE;
+        ParamStrD = ShellCommandLineGetValue (Package, L"-d");
+        if (ParamStrD == NULL) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          //
+          // Delete an alias: "alias -d ParamStrD"
+          //
+          ShellStatus = ShellLevel3CommandsLibSetAlias (ParamStrD, NULL, TRUE, FALSE);
         }
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_ALIAS_OUTPUT), gShellLevel3HiiHandle, !Volatile?L' ':L'*', Param1, ConstAliasVal);
-      }      
+      }
     } else {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");  
-      ShellStatus = SHELL_INVALID_PARAMETER;
+      //
+      // Set volatile alias.
+      //
+      ASSERT (VolatileFlag);
+      ASSERT (!DeleteFlag); 
+      switch (ShellCommandLineGetCount (Package)) {
+        case 1:
+        case 2:
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          break;
+        case 3:
+          //
+          // "alias -v Param1 CleanParam2"
+          //
+          ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
+          break;
+        default:
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+      }
     }
     //
     // free the command line package
