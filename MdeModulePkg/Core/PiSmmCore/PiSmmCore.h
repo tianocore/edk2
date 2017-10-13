@@ -32,6 +32,7 @@
 #include <Protocol/SmmExitBootServices.h>
 #include <Protocol/SmmLegacyBoot.h>
 #include <Protocol/SmmReadyToBoot.h>
+#include <Protocol/SmmEndOfS3Resume.h>
 
 #include <Guid/Apriori.h>
 #include <Guid/EventGroup.h>
@@ -799,6 +800,29 @@ SmmReadyToBootHandler (
   IN     CONST VOID               *Context,        OPTIONAL
   IN OUT VOID                     *CommBuffer,     OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  );
+
+/**
+  Software SMI handler that is called when the EndOfS3Resume event is trigged.
+  This function installs the SMM EndOfS3Resume Protocol so SMM Drivers are informed that
+  S3 resume has finished.
+
+  @param  DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param  Context         Points to an optional handler context which was specified when the handler was registered.
+  @param  CommBuffer      A pointer to a collection of data in memory that will
+                          be conveyed from a non-SMM environment into an SMM environment.
+  @param  CommBufferSize  The size of the CommBuffer.
+
+  @return Status Code
+
+**/
+EFI_STATUS
+EFIAPI
+SmmEndOfS3ResumeHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context,        OPTIONAL
+  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
 /**

@@ -20,6 +20,7 @@
 
 #include <Guid/EventGroup.h>
 
+#include <Register/Msr.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>

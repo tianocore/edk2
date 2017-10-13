@@ -424,6 +424,7 @@ CascadeProcessVariables (
   CHAR16                    *AttrString;
   CHAR16                    *HexString;
   EFI_STATUS                SetStatus;
+  CONST CHAR16              *GuidName;
 
   if (ShellGetExecutionBreakFlag()) {
     return (SHELL_ABORTED);
@@ -521,10 +522,18 @@ CascadeProcessVariables (
             Status = EFI_OUT_OF_RESOURCES;
           }
         } else {
-          ShellPrintHiiEx (
-            -1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_HEADER_LINE), gShellDebug1HiiHandle,
-            AttrString, &FoundVarGuid, FoundVarName, DataSize
-            );
+          Status = gEfiShellProtocol->GetGuidName(&FoundVarGuid, &GuidName);
+          if (EFI_ERROR (Status)) {
+            ShellPrintHiiEx (
+              -1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_HEADER_LINE), gShellDebug1HiiHandle,
+              AttrString, &FoundVarGuid, FoundVarName, DataSize
+              );
+          } else {
+            ShellPrintHiiEx (
+              -1, -1, NULL, STRING_TOKEN (STR_DMPSTORE_HEADER_LINE2), gShellDebug1HiiHandle,
+              AttrString, GuidName, FoundVarName, DataSize
+              );
+          }
           DumpHex (2, 0, DataSize, DataBuffer);
         }
         SHELL_FREE_NON_NULL (AttrString);

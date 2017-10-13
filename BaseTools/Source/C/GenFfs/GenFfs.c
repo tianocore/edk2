@@ -50,14 +50,17 @@ STATIC CHAR8 *mFfsFileType[] = {
 
 STATIC CHAR8 *mAlignName[] = {
   "1", "2", "4", "8", "16", "32", "64", "128", "256", "512",
-  "1K", "2K", "4K", "8K", "16K", "32K", "64K"
+  "1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K",
+  "512K", "1M", "2M", "4M", "8M", "16M"
  };
 
 STATIC CHAR8 *mFfsValidAlignName[] = {
-  "8", "16", "128", "512", "1K", "4K", "32K", "64K"
+  "8", "16", "128", "512", "1K", "4K", "32K", "64K", "128K","256K",
+  "512K", "1M", "2M", "4M", "8M", "16M"
  };
 
-STATIC UINT32 mFfsValidAlign[] = {0, 8, 16, 128, 512, 1024, 4096, 32768, 65536};
+STATIC UINT32 mFfsValidAlign[] = {0, 8, 16, 128, 512, 1024, 4096, 32768, 65536, 131072, 262144,
+                                  524288, 1048576, 2097152, 4194304, 8388608, 16777216};
 
 STATIC EFI_GUID mZeroGuid = {0};
 
@@ -144,12 +147,13 @@ Returns:
   fprintf (stdout, "  -s, --checksum        Indicates to calculate file checksum.\n");
   fprintf (stdout, "  -a FileAlign, --align FileAlign\n\
                         FileAlign points to file alignment, which only support\n\
-                        the following align: 1,2,4,8,16,128,512,1K,4K,32K,64K\n");
+                        the following align: 1,2,4,8,16,128,512,1K,4K,32K,64K\n\
+                        128K,256K,512K,1M,2M,4M,8M,16M\n");
   fprintf (stdout, "  -i SectionFile, --sectionfile SectionFile\n\
                         Section file will be contained in this FFS file.\n");
   fprintf (stdout, "  -n SectionAlign, --sectionalign SectionAlign\n\
                         SectionAlign points to section alignment, which support\n\
-                        the alignment scope 1~64K. It is specified together\n\
+                        the alignment scope 1~16M. It is specified together\n\
                         with sectionfile to point its alignment in FFS file.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
@@ -168,7 +172,7 @@ StringtoAlignment (
 
 Routine Description:
 
-  Converts Align String to align value (1~64K). 
+  Converts Align String to align value (1~16M).
 
 Arguments:
 
@@ -893,7 +897,12 @@ Returns:
   }
   VerboseMsg ("the size of the generated FFS file is %u bytes", (unsigned) FileSize);
 
-  FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | (FfsAlign << 3));
+  //FfsAlign larger than 7, set FFS_ATTRIB_DATA_ALIGNMENT2
+  if (FfsAlign < 8) {
+    FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | (FfsAlign << 3));
+  } else {
+    FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | ((FfsAlign & 0x7) << 3) | FFS_ATTRIB_DATA_ALIGNMENT2);
+  }
 
   //
   // Fill in checksums and state, these must be zero for checksumming

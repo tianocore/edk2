@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -86,7 +86,7 @@ ASM_PFX(OnException):
     add  rsp, 0x28
     mov  ebx, eax
     mov  eax, 4
-    DB  0x0f, 0x01, 0x0c1 ; VMCALL
+    vmcall
     jmp $
 
 global ASM_PFX(OnStmSetup)
@@ -176,4 +176,3 @@ ASM_PFX(OnStmTeardown):
 
 .12:
   rsm
-

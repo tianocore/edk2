@@ -155,6 +155,18 @@ SmiPFHandler (
     }
   }
 
+  //
+  // If NULL pointer was just accessed
+  //
+  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0 &&
+      (PFAddress < EFI_PAGE_SIZE)) {
+    DEBUG ((DEBUG_ERROR, "!!! NULL pointer access !!!\n"));
+    DEBUG_CODE (
+      DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
+    );
+    CpuDeadLoop ();
+  }
+
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     SmmProfilePFHandler (
       SystemContext.SystemContextIa32->Eip,

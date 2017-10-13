@@ -401,11 +401,6 @@ RuntimeDriverInitialize (
   mMyImageBase = MyLoadedImage->ImageBase;
 
   //
-  // Initialize the table used to compute 32-bit CRCs
-  //
-  RuntimeDriverInitializeCrc32Table ();
-
-  //
   // Fill in the entries of the EFI Boot Services and EFI Runtime Services Tables
   //
   gBS->CalculateCrc32       = RuntimeDriverCalculateCrc32;

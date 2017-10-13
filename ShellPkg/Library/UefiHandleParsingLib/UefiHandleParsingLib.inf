@@ -1,6 +1,6 @@
 ##  @file
 #  Provides interface to advanced shell functionality for parsing both handle and protocol database.
-#  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+#  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
 #  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
 #  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 #
@@ -50,6 +50,7 @@
   UefiLib
   HiiLib
   SortLib
+  PeCoffGetEntryPointLib
 
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
@@ -291,10 +292,50 @@
   gEfiHttpProtocolGuid                                    ## UNDEFINED
   gEfiHttpUtilitiesProtocolGuid                           ## UNDEFINED
   gEfiRestProtocolGuid                                    ## UNDEFINED
+  gEfiMmEndOfDxeProtocolGuid                              ## UNDEFINED
+  gEfiMmIoTrapDispatchProtocolGuid                        ## UNDEFINED
+  gEfiMmPowerButtonDispatchProtocolGuid                   ## UNDEFINED
+  gEfiMmStandbyButtonDispatchProtocolGuid                 ## UNDEFINED
+  gEfiMmGpiDispatchProtocolGuid                           ## UNDEFINED
+  gEfiMmUsbDispatchProtocolGuid                           ## UNDEFINED
+  gEfiMmPeriodicTimerDispatchProtocolGuid                 ## UNDEFINED
+  gEfiMmSxDispatchProtocolGuid                            ## UNDEFINED
+  gEfiMmSwDispatchProtocolGuid                            ## UNDEFINED
+  gEfiMmPciRootBridgeIoProtocolGuid                       ## UNDEFINED
+  gEfiMmCpuProtocolGuid                                   ## UNDEFINED
+  gEfiMmStatusCodeProtocolGuid                            ## UNDEFINED
+  gEfiDxeMmReadyToLockProtocolGuid                        ## UNDEFINED
+  gEfiMmConfigurationProtocolGuid                         ## UNDEFINED
+  gEfiMmReadyToLockProtocolGuid                           ## UNDEFINED
+  gEfiMmControlProtocolGuid                               ## UNDEFINED
+  gEfiMmAccessProtocolGuid                                ## UNDEFINED
+  gEfiMmBaseProtocolGuid                                  ## UNDEFINED
+  gEfiMmCpuIoProtocolGuid                                 ## UNDEFINED
+  gEfiMmRscHandlerProtocolGuid                            ## UNDEFINED
+  gEfiMmCommunicationProtocolGuid                         ## UNDEFINED
+  gEfiTlsServiceBindingProtocolGuid                       ## UNDEFINED
+  gEfiTlsProtocolGuid                                     ## UNDEFINED
+  gEfiTlsConfigurationProtocolGuid                        ## UNDEFINED
+  gEfiSupplicantServiceBindingProtocolGuid                ## UNDEFINED
+  gEfiSupplicantProtocolGuid                              ## UNDEFINED
+  gEfiWiFi2ProtocolGuid                                   ## UNDEFINED
+  gEfiRamDiskProtocolGuid                                 ## UNDEFINED
+  gEfiHiiImageDecoderProtocolGuid                         ## UNDEFINED
+  gEfiHiiImageExProtocolGuid                              ## UNDEFINED
+  gEfiSdMmcPassThruProtocolGuid                           ## UNDEFINED
+  gEfiEraseBlockProtocolGuid                              ## UNDEFINED
+  gEfiBluetoothAttributeProtocolGuid                      ## UNDEFINED
+  gEfiBluetoothAttributeServiceBindingProtocolGuid        ## UNDEFINED
+  gEfiBluetoothLeConfigProtocolGuid                       ## UNDEFINED
+  gEfiUfsDeviceConfigProtocolGuid                         ## UNDEFINED
+  gEfiHttpBootCallbackProtocolGuid                        ## UNDEFINED
+  gEfiResetNotificationProtocolGuid                       ## UNDEFINED
+  gEfiPartitionInfoProtocolGuid                           ## UNDEFINED
+  gEfiHiiPopupProtocolGuid                                ## UNDEFINED
 
 [Guids]
   gEfiFileInfoGuid                                        ## UNDEFINED
-  gEfiShellEnvironment2ExtGuid                            ## CONSUMES ## GUID
+  gEfiShellEnvironment2ExtGuid                            ## SOMETIMES_CONSUMES ## GUID
   gEfiPcAnsiGuid                                          ## UNDEFINED
   gEfiVT100Guid                                           ## UNDEFINED
   gEfiVT100PlusGuid                                       ## UNDEFINED

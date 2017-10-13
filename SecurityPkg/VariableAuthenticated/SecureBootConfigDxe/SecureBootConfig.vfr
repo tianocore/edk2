@@ -316,11 +316,11 @@ formset
 
     subtitle text = STRING_TOKEN(STR_NULL);
 
-    goto SECUREBOOT_DELETE_SIGNATURE_FROM_DBX,
+    goto SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
     prompt = STRING_TOKEN (STR_SECURE_BOOT_DELETE_SIGNATURE),
     help   = STRING_TOKEN (STR_SECURE_BOOT_DELETE_SIGNATURE),
     flags  = INTERACTIVE,
-    key    = SECUREBOOT_DELETE_SIGNATURE_FROM_DBX;
+    key    = KEY_VALUE_FROM_DBX_TO_LIST_FORM;
 
   endform;
 
@@ -360,16 +360,57 @@ formset
   endform;
 
   //
-  // Form: 'Delete Signature' for DBX Options.
+  // Form: Display Signature List.
   //
-  form formid = SECUREBOOT_DELETE_SIGNATURE_FROM_DBX,
-    title  = STRING_TOKEN(STR_SECURE_BOOT_DELETE_SIGNATURE);
+  form formid = SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
+    title  = STRING_TOKEN(STR_SECURE_BOOT_DELETE_LIST_FORM);
 
-    label LABEL_DBX_DELETE;
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    grayoutif ideqval SECUREBOOT_CONFIGURATION.ListCount == 0;
+      label LABEL_DELETE_ALL_LIST_BUTTON;
+      //
+      // Will create a goto button dynamically here.
+      //
+      label LABEL_END;
+   endif;
+
+   subtitle text = STRING_TOKEN(STR_NULL);
+   label LABEL_SIGNATURE_LIST_START;
+   label LABEL_END;
+   subtitle text = STRING_TOKEN(STR_NULL);
+
+  endform;
+
+  //
+  // Form: Display Signature Data.
+  //
+  form formid = SECUREBOOT_DELETE_SIGNATURE_DATA_FORM,
+    title = STRING_TOKEN(STR_SECURE_BOOT_DELETE_DATA_FORM);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    goto SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
+      prompt = STRING_TOKEN(STR_SECURE_BOOT_DELETE_ALL_DATA),
+      help   = STRING_TOKEN(STR_SECURE_BOOT_DELETE_ALL_DATA_HELP),
+      flags  = INTERACTIVE,
+      key    = KEY_SECURE_BOOT_DELETE_ALL_DATA;
+
+    grayoutif ideqval SECUREBOOT_CONFIGURATION.CheckedDataCount == 0;
+      goto SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
+        prompt = STRING_TOKEN(STR_SECURE_BOOT_DELETE_CHECK_DATA),
+        help   = STRING_TOKEN(STR_SECURE_BOOT_DELETE_CHECK_DATA_HELP),
+        flags  = INTERACTIVE,
+        key    = KEY_SECURE_BOOT_DELETE_CHECK_DATA;
+    endif;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+    label LABEL_SIGNATURE_DATA_START;
     label LABEL_END;
     subtitle text = STRING_TOKEN(STR_NULL);
 
   endform;
+
 
   //
   // Form: 'Delete Signature' for DBT Options.

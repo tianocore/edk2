@@ -85,6 +85,10 @@
   gPeiSmmAccessPpiGuid                          ## SOMETIMES_CONSUMES
   gPeiPostScriptTablePpiGuid                    ## SOMETIMES_PRODUCES
   gEfiEndOfPeiSignalPpiGuid                     ## SOMETIMES_PRODUCES
+  gEfiPeiSmmCommunicationPpiGuid                ## SOMETIMES_CONSUMES
+
+[Protocols]
+  gEdkiiSmmEndOfS3ResumeProtocolGuid            ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES

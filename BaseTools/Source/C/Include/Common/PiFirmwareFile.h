@@ -4,7 +4,7 @@
   @par Revision Reference:
   Version 1.4.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -65,6 +65,7 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 // FFS File Attributes.
 // 
 #define FFS_ATTRIB_LARGE_FILE         0x01
+#define FFS_ATTRIB_DATA_ALIGNMENT2    0x02
 #define FFS_ATTRIB_FIXED              0x04
 #define FFS_ATTRIB_DATA_ALIGNMENT     0x38
 #define FFS_ATTRIB_CHECKSUM           0x40

@@ -1,7 +1,7 @@
 ## @file
 # Global variables for GenFds
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -420,8 +420,10 @@ class GenFdsGlobalVariable:
     def GetAlignment (AlignString):
         if AlignString == None:
             return 0
-        if AlignString in ("1K", "2K", "4K", "8K", "16K", "32K", "64K"):
+        if AlignString in ("1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K"):
             return int (AlignString.rstrip('K')) * 1024
+        elif AlignString in ("1M", "2M", "4M", "8M", "16M"):
+            return int (AlignString.rstrip('M')) * 1024 * 1024
         else:
             return int (AlignString)
 
@@ -429,7 +431,7 @@ class GenFdsGlobalVariable:
     def GenerateFfs(Output, Input, Type, Guid, Fixed=False, CheckSum=False, Align=None,
                     SectionAlign=None):
         Cmd = ["GenFfs", "-t", Type, "-g", Guid]
-        mFfsValidAlign = ["0", "8", "16", "128", "512", "1K", "4K", "32K", "64K"]
+        mFfsValidAlign = ["0", "8", "16", "128", "512", "1K", "4K", "32K", "64K", "128K", "256K", "512K", "1M", "2M", "4M", "8M", "16M"]
         if Fixed == True:
             Cmd += ["-x"]
         if CheckSum:

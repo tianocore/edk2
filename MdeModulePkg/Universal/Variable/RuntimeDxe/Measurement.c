@@ -24,6 +24,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/TpmMeasurementLib.h>
 
+#include "PrivilegePolymorphic.h"
+
 typedef struct {
   CHAR16                                 *VariableName;
   EFI_GUID                               *VendorGuid;

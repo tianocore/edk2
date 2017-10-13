@@ -3,7 +3,7 @@
 #
 #  EDKII System Capsule library instance for DXE/PEI post memory phase.
 #
-#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -53,9 +53,9 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer                            ## CONSUMES
 
 [Guids]
-  gEdkiiSystemFirmwareImageDescriptorFileGuid          ## CONSUMES   ## GUID
-  gEdkiiSystemFmpCapsuleConfigFileGuid                 ## CONSUMES   ## GUID
-  gEdkiiSystemFmpCapsuleDriverFvFileGuid               ## CONSUMES   ## GUID
-  gEfiCertPkcs7Guid                                    ## CONSUMES   ## GUID
-  gEfiCertTypeRsa2048Sha256Guid                        ## CONSUMES   ## GUID
+  gEdkiiSystemFirmwareImageDescriptorFileGuid          ## SOMETIMES_CONSUMES   ## GUID
+  gEdkiiSystemFmpCapsuleConfigFileGuid                 ## SOMETIMES_CONSUMES   ## GUID
+  gEdkiiSystemFmpCapsuleDriverFvFileGuid               ## SOMETIMES_CONSUMES   ## GUID
+  gEfiCertPkcs7Guid                                    ## SOMETIMES_CONSUMES   ## GUID
+  gEfiCertTypeRsa2048Sha256Guid                        ## SOMETIMES_CONSUMES   ## GUID
 

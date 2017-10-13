@@ -872,7 +872,7 @@ NetRandomInitSeed (
   UINT64                    MonotonicCount;
 
   gRT->GetTime (&Time, NULL);
-  Seed = (~Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
+  Seed = (Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
   Seed ^= Time.Nanosecond;
   Seed ^= Time.Year << 7;
 

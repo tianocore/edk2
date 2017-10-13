@@ -1,7 +1,7 @@
 /** @file
   Network library functions providing net buffer operation support.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1174,6 +1174,10 @@ NetbufTrim (
   UINT32                    Trimmed;
 
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
+
+  if (Len == 0 || Nbuf->TotalSize == 0) {
+    return 0;
+  }
 
   if (Len > Nbuf->TotalSize) {
     Len = Nbuf->TotalSize;

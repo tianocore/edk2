@@ -204,13 +204,17 @@ ValidateCryptRsa2 (
   VOID
   )
 {
-  BOOLEAN  Status;
-  VOID     *RsaPrivKey;
-  VOID     *RsaPubKey;
-  UINT8    *Signature;
-  UINTN    SigSize;
-  UINT8    *Subject;
-  UINTN    SubjectSize;
+  BOOLEAN        Status;
+  VOID           *RsaPrivKey;
+  VOID           *RsaPubKey;
+  UINT8          *Signature;
+  UINTN          SigSize;
+  UINT8          *Subject;
+  UINTN          SubjectSize;
+  RETURN_STATUS  ReturnStatus;
+  CHAR8          CommonName[64];
+  CHAR16         CommonNameUnicode[64];
+  UINTN          CommonNameSize;
 
   Print (L"\nUEFI-OpenSSL RSA Key Retrieving Testing: ");
 
@@ -284,6 +288,20 @@ ValidateCryptRsa2 (
     return EFI_ABORTED;
   } else {
     Print (L"[Pass]");
+  }
+
+  //
+  // Get CommonName from X509 Certificate Subject
+  //
+  CommonNameSize = 64;
+  ZeroMem (CommonName, CommonNameSize);
+  ReturnStatus = X509GetCommonName (TestCert, sizeof (TestCert), CommonName, &CommonNameSize);
+  if (RETURN_ERROR (ReturnStatus)) {
+    Print (L"\n  - Retrieving Common Name - [Fail]");
+    return EFI_ABORTED;
+  } else {
+    AsciiStrToUnicodeStrS (CommonName, CommonNameUnicode, CommonNameSize);
+    Print (L"\n  - Retrieving Common Name = \"%s\" (Size = %d)", CommonNameUnicode, CommonNameSize);
   }
 
   //

@@ -4,6 +4,7 @@
   Protocol instances for virtio-net devices.
 
   Copyright (C) 2013, Red Hat, Inc.
+  Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -25,6 +26,7 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/SimpleNetwork.h>
+#include <Library/OrderedCollectionLib.h>
 
 #define VNET_SIG SIGNATURE_32 ('V', 'N', 'E', 'T')
 
@@ -82,15 +84,24 @@ typedef struct {
   EFI_HANDLE                  MacHandle;         // VirtioNetDriverBindingStart
 
   VRING                       RxRing;            // VirtioNetInitRing
+  VOID                        *RxRingMap;        // VirtioRingMap and
+                                                 // VirtioNetInitRing
   UINT8                       *RxBuf;            // VirtioNetInitRx
   UINT16                      RxLastUsed;        // VirtioNetInitRx
+  UINTN                       RxBufNrPages;      // VirtioNetInitRx
+  EFI_PHYSICAL_ADDRESS        RxBufDeviceBase;   // VirtioNetInitRx
+  VOID                        *RxBufMap;         // VirtioNetInitRx
 
   VRING                       TxRing;            // VirtioNetInitRing
+  VOID                        *TxRingMap;        // VirtioRingMap and
+                                                 // VirtioNetInitRing
   UINT16                      TxMaxPending;      // VirtioNetInitTx
   UINT16                      TxCurPending;      // VirtioNetInitTx
   UINT16                      *TxFreeStack;      // VirtioNetInitTx
-  VIRTIO_1_0_NET_REQ          TxSharedReq;       // VirtioNetInitTx
+  VIRTIO_1_0_NET_REQ          *TxSharedReq;      // VirtioNetInitTx
+  VOID                        *TxSharedReqMap;   // VirtioNetInitTx
   UINT16                      TxLastUsed;        // VirtioNetInitTx
+  ORDERED_COLLECTION          *TxBufCollection;  // VirtioNetInitTx
 } VNET_DEV;
 
 
@@ -262,6 +273,50 @@ EFIAPI
 VirtioNetShutdownTx (
   IN OUT VNET_DEV *Dev
   );
+
+VOID
+EFIAPI
+VirtioNetUninitRing (
+  IN OUT VNET_DEV *Dev,
+  IN OUT VRING    *Ring,
+  IN     VOID     *RingMap
+  );
+
+//
+// utility functions to map caller-supplied Tx buffer system physical address
+// to a device address and vice versa
+//
+EFI_STATUS
+EFIAPI
+VirtioNetMapTxBuf (
+  IN  VNET_DEV              *Dev,
+  IN  VOID                  *Buffer,
+  IN  UINTN                 NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress
+  );
+
+EFI_STATUS
+EFIAPI
+VirtioNetUnmapTxBuf (
+  IN  VNET_DEV              *Dev,
+  OUT VOID                  **Buffer,
+  IN  EFI_PHYSICAL_ADDRESS  DeviceAddress
+  );
+
+INTN
+EFIAPI
+VirtioNetTxBufMapInfoCompare (
+  IN CONST VOID *UserStruct1,
+  IN CONST VOID *UserStruct2
+  );
+
+INTN
+EFIAPI
+VirtioNetTxBufDeviceAddressCompare (
+  IN CONST VOID *StandaloneKey,
+  IN CONST VOID *UserStruct
+  );
+
 
 //
 // event callbacks

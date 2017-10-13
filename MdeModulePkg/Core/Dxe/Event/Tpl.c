@@ -1,7 +1,7 @@
 /** @file
   Task priority (TPL) functions.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -103,6 +103,7 @@ CoreRestoreTpl (
   )
 {
   EFI_TPL     OldTpl;
+  EFI_TPL     PendingTpl;
 
   OldTpl = gEfiCurrentTpl;
   if (NewTpl > OldTpl) {
@@ -123,8 +124,13 @@ CoreRestoreTpl (
   //
   // Dispatch any pending events
   //
-  while (((-2 << NewTpl) & gEventPending) != 0) {
-    gEfiCurrentTpl = (UINTN) HighBitSet64 (gEventPending);
+  while (gEventPending != 0) {
+    PendingTpl = (UINTN) HighBitSet64 (gEventPending);
+    if (PendingTpl <= NewTpl) {
+      break;
+    }
+
+    gEfiCurrentTpl = PendingTpl;
     if (gEfiCurrentTpl < TPL_HIGH_LEVEL) {
       CoreSetInterruptState (TRUE);
     }

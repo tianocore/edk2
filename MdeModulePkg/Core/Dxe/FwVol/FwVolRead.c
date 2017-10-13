@@ -1,7 +1,7 @@
 /** @file
   Implements functions to read firmware file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,18 +16,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "FwVolDriver.h"
 
 /**
-Required Alignment             Alignment Value in FFS         Alignment Value in
-(bytes)                        Attributes Field               Firmware Volume Interfaces
-1                                    0                                     0
-16                                   1                                     4
-128                                  2                                     7
-512                                  3                                     9
-1 KB                                 4                                     10
-4 KB                                 5                                     12
-32 KB                                6                                     15
-64 KB                                7                                     16
+Required Alignment   Alignment Value in FFS   FFS_ATTRIB_DATA_ALIGNMENT2   Alignment Value in
+(bytes)              Attributes Field         in FFS Attributes Field      Firmware Volume Interfaces
+1                               0                          0                            0
+16                              1                          0                            4
+128                             2                          0                            7
+512                             3                          0                            9
+1 KB                            4                          0                            10
+4 KB                            5                          0                            12
+32 KB                           6                          0                            15
+64 KB                           7                          0                            16
+128 KB                          0                          1                            17
+256 KB                          1                          1                            18
+512 KB                          2                          1                            19
+1 MB                            3                          1                            20
+2 MB                            4                          1                            21
+4 MB                            5                          1                            22
+8 MB                            6                          1                            23
+16 MB                           7                          1                            24
 **/
 UINT8 mFvAttributes[] = {0, 4, 7, 9, 10, 12, 15, 16};
+UINT8 mFvAttributes2[] = {17, 18, 19, 20, 21, 22, 23, 24};
 
 /**
   Convert the FFS File Attributes to FV File Attributes
@@ -48,7 +57,11 @@ FfsAttributes2FvFileAttributes (
   DataAlignment = (UINT8) ((FfsAttributes & FFS_ATTRIB_DATA_ALIGNMENT) >> 3);
   ASSERT (DataAlignment < 8);
 
-  FileAttribute = (EFI_FV_FILE_ATTRIBUTES) mFvAttributes[DataAlignment];
+  if ((FfsAttributes & FFS_ATTRIB_DATA_ALIGNMENT_2) != 0) {
+    FileAttribute = (EFI_FV_FILE_ATTRIBUTES) mFvAttributes2[DataAlignment];
+  } else {
+    FileAttribute = (EFI_FV_FILE_ATTRIBUTES) mFvAttributes[DataAlignment];
+  }
 
   if ((FfsAttributes & FFS_ATTRIB_FIXED) == FFS_ATTRIB_FIXED) {
     FileAttribute |= EFI_FV_FILE_ATTRIB_FIXED;

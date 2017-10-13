@@ -749,14 +749,15 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
     }
     CopyMem(IfrNvData->ISCSIDisplayAttemptList, AttemptNameList, ATTEMPT_NAME_LIST_SIZE);
 
+    ZeroMem (IfrNvData->ISCSIMacAddr, sizeof (IfrNvData->ISCSIMacAddr));
     NET_LIST_FOR_EACH (Entry, &mPrivate->NicInfoList) {
       NicInfo = NET_LIST_USER_STRUCT (Entry, ISCSI_NIC_INFO, Link);
       IScsiMacAddrToStr (
-      &NicInfo->PermanentAddress,
-      NicInfo->HwAddressSize,
-      NicInfo->VlanId,
-      MacString
-      );
+        &NicInfo->PermanentAddress,
+        NicInfo->HwAddressSize,
+        NicInfo->VlanId,
+        MacString
+        );
       CopyMem (
         IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr),
         MacString,
@@ -764,7 +765,12 @@ IScsiConvertAttemptConfigDataToIfrNvDataByKeyword (
         );
 
       *(IfrNvData->ISCSIMacAddr + StrLen (IfrNvData->ISCSIMacAddr)) = L'/';
-     } 
+    }
+
+    StringLen = StrLen (IfrNvData->ISCSIMacAddr);
+    if (StringLen > 0) {
+      *(IfrNvData->ISCSIMacAddr + StringLen - 1) = L'\0';
+    }
   }
 }
 

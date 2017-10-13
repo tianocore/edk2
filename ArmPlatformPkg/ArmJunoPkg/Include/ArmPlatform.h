@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2013-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2013-2017, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -108,7 +108,6 @@
   JunoRevision = ARM_VE_BOARD_SYS_ID_REV( SysId );                     \
 }
 
-#define JUNO_WATCHDOG_COUNT  2
 
 // Define if the exported ACPI Tables are based on ACPI 5.0 spec or latest
 //#define ARM_JUNO_ACPI_5_0

@@ -420,7 +420,6 @@ BmCharToUint (
     return (Char - L'A' + 0xA);
   }
 
-  ASSERT (FALSE);
   return (UINTN) -1;
 }
 

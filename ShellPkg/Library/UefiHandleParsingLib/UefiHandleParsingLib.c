@@ -16,6 +16,7 @@
 
 #include "UefiHandleParsingLib.h"
 #include "IndustryStandard/Acpi10.h"
+#include "IndustryStandard/Pci.h"
 #include <PiDxe.h>
 #include <Protocol/FirmwareVolume2.h>
 
@@ -232,13 +233,10 @@ LoadedImageProtocolDumpInformation(
   CHAR16                            *RetVal;
   CHAR16                            *Temp;
   CHAR16                            *FileName;
+  CHAR8                             *PdbFileName;
   CHAR16                            *FilePath;
   CHAR16                            *CodeType;
   CHAR16                            *DataType;
-
-  if (!Verbose) {
-    return (CatSPrint(NULL, L"LoadedImage"));
-  }
 
   Status = gBS->OpenProtocol (
                 TheHandle,
@@ -253,10 +251,20 @@ LoadedImageProtocolDumpInformation(
     return NULL;
   }
 
-  HandleParsingHiiInit();
-
   FileName = FindLoadedImageFileName(LoadedImage);
+  FilePath = ConvertDevicePathToText(LoadedImage->FilePath, TRUE, TRUE);
+  if (!Verbose) {
+    if (FileName == NULL) {
+      FileName = FilePath;
+    } else {
+      SHELL_FREE_NON_NULL(FilePath);
+    }
+    RetVal = CatSPrint(NULL, FileName);
+    SHELL_FREE_NON_NULL(FileName);
+    return RetVal;
+  }
 
+  HandleParsingHiiInit();
   RetVal = NULL;
   if (FileName != NULL) {
     Temp = HiiGetString(mHandleParsingHiiHandle, STRING_TOKEN(STR_LI_DUMP_NAME), NULL);
@@ -273,9 +281,7 @@ LoadedImageProtocolDumpInformation(
   if (Temp == NULL) {
     return NULL;
   }
-
-  FilePath = ConvertDevicePathToText(LoadedImage->FilePath, TRUE, TRUE);
-
+  PdbFileName = PeCoffLoaderGetPdbPointer (LoadedImage->ImageBase);
   DataType = ConvertMemoryType(LoadedImage->ImageDataType);
   CodeType = ConvertMemoryType(LoadedImage->ImageCodeType);
 
@@ -287,6 +293,7 @@ LoadedImageProtocolDumpInformation(
              LoadedImage->SystemTable,
              LoadedImage->DeviceHandle,
              FilePath,
+             PdbFileName,
              LoadedImage->LoadOptionsSize,
              LoadedImage->LoadOptions,
              LoadedImage->ImageBase,
@@ -490,7 +497,7 @@ EdidDiscoveredProtocolDumpInformation (
     SHELL_FREE_NON_NULL (RetVal);
     RetVal = TempRetVal;
 
-    TempRetVal = CatSDumpHex (RetVal, 7, 0, EdidDiscovered->SizeOfEdid, EdidDiscovered->Edid);
+    TempRetVal = CatSDumpHex (RetVal, 4, 0, EdidDiscovered->SizeOfEdid, EdidDiscovered->Edid);
     RetVal = TempRetVal;
   }
   return RetVal;
@@ -554,7 +561,7 @@ EdidActiveProtocolDumpInformation (
     SHELL_FREE_NON_NULL (RetVal);
     RetVal = TempRetVal;
 
-    TempRetVal = CatSDumpHex (RetVal, 7, 0, EdidActive->SizeOfEdid, EdidActive->Edid);
+    TempRetVal = CatSDumpHex (RetVal, 4, 0, EdidActive->SizeOfEdid, EdidActive->Edid);
     RetVal = TempRetVal;
   }
   return RetVal;
@@ -607,7 +614,7 @@ PciRootBridgeIoDumpInformation(
   if (Temp == NULL) {
     return NULL;
   }
-  Temp2 = CatSPrint(L"\r\n", Temp, PciRootBridgeIo->ParentHandle);
+  Temp2 = CatSPrint(NULL, Temp, PciRootBridgeIo->ParentHandle);
   FreePool(Temp);
   RetVal = Temp2;
   Temp2 = NULL;
@@ -685,7 +692,7 @@ PciRootBridgeIoDumpInformation(
       }
 
       Temp2 = CatSPrint(RetVal,
-        L"%H%02x    %016lx  %016lx  %02x%N\r\n",
+        L"\r\n%%H%02x    %016lx  %016lx  %02x%%N",
         Configuration->SpecificFlag,
         Configuration->AddrRangeMin,
         Configuration->AddrRangeMax,
@@ -848,6 +855,50 @@ ConvertDevicePathToShortText(
 }
 
 /**
+  Function to dump protocol information.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+  @param[in] Protocol       The protocol is needed to dump.
+
+  @retval A pointer to a string containing the information.
+**/
+STATIC CHAR16*
+EFIAPI
+DevicePathProtocolDumpInformationEx (
+  IN CONST EFI_HANDLE   TheHandle,
+  IN CONST BOOLEAN      Verbose,
+  IN       EFI_GUID     *Protocol
+)
+{
+  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
+  CHAR16                            *DevPathStr;
+  CHAR16                            *DevPathStrTemp;
+  UINTN                             Size;
+  EFI_STATUS                        Status;
+  DevPathStr     = NULL;
+  DevPathStrTemp = NULL;
+  Status = gBS->OpenProtocol(TheHandle, Protocol, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (!EFI_ERROR(Status)) {
+    DevPathStr = ConvertDevicePathToShortText (DevPath, Verbose, 30);
+    if (Verbose) {
+      Size = StrSize(DevPathStr) + sizeof(CHAR16) * 2;
+      DevPathStrTemp = AllocateZeroPool (Size);
+      if (DevPathStrTemp != NULL) {
+        StrnCatS (DevPathStrTemp, Size/sizeof(CHAR16), L"  ", 2);
+        StrnCatS (DevPathStrTemp, Size/sizeof(CHAR16), DevPathStr, StrLen (DevPathStr));
+      }
+      FreePool (DevPathStr);
+      DevPathStr = DevPathStrTemp;
+    }
+    gBS->CloseProtocol(TheHandle, Protocol, gImageHandle, NULL);
+  }
+  return DevPathStr;
+}
+
+/**
   Function to dump information about DevicePath protocol.
 
   This will allocate the return buffer from boot services pool.
@@ -864,17 +915,7 @@ DevicePathProtocolDumpInformation(
   IN CONST BOOLEAN    Verbose
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
-  CHAR16                            *Temp;
-  EFI_STATUS                        Status;
-  Temp = NULL;
-
-  Status = gBS->OpenProtocol(TheHandle, &gEfiDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (!EFI_ERROR(Status)) {
-    Temp = ConvertDevicePathToShortText (DevPath, Verbose, 30);
-    gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
-  }
-  return (Temp);
+  return DevicePathProtocolDumpInformationEx (TheHandle, Verbose, &gEfiDevicePathProtocolGuid);
 }
 
 /**
@@ -894,17 +935,372 @@ LoadedImageDevicePathProtocolDumpInformation(
   IN CONST BOOLEAN    Verbose
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL          *DevPath;
-  CHAR16                            *Temp;
-  EFI_STATUS                        Status;
-  Temp = NULL;
+  return DevicePathProtocolDumpInformationEx (TheHandle, Verbose, &gEfiLoadedImageDevicePathProtocolGuid);
+}
 
-  Status = gBS->OpenProtocol(TheHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID**)&DevPath, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (!EFI_ERROR(Status)) {
-    Temp = ConvertDevicePathToShortText (DevPath, Verbose, 30);
-    gBS->CloseProtocol(TheHandle, &gEfiDevicePathProtocolGuid, gImageHandle, NULL);
+/**
+  Function to dump information about BusSpecificDriverOverride protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+BusSpecificDriverOverrideProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                                Status;
+  CHAR16                                    *GetString;
+  CHAR16                                    *RetVal;
+  CHAR16                                    *TempRetVal;
+  EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL *BusSpecificDriverOverride;
+  EFI_LOADED_IMAGE_PROTOCOL                 *LoadedImage;
+  EFI_HANDLE                                ImageHandle;
+  UINTN                                     Size;
+
+  if (!Verbose) {
+    return NULL;
   }
-  return (Temp);
+  Size        = 0;
+  GetString   = NULL;
+  RetVal      = NULL;
+  TempRetVal  = NULL;
+  ImageHandle = 0;
+
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiBusSpecificDriverOverrideProtocolGuid,
+                  (VOID**)&BusSpecificDriverOverride,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_BSDO_DUMP_MAIN), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  do {
+    Status = BusSpecificDriverOverride->GetDriver (
+                                          BusSpecificDriverOverride,
+                                          &ImageHandle
+                                          );
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (
+                      ImageHandle,
+                      &gEfiLoadedImageProtocolGuid,
+                      (VOID **) &LoadedImage
+                      );
+      if(!EFI_ERROR (Status)) {
+        TempRetVal = CatSPrint (
+                       TempRetVal,
+                       GetString,
+                       ConvertHandleToHandleIndex (ImageHandle),
+                       ConvertDevicePathToText (LoadedImage->FilePath, TRUE, TRUE)
+                       );
+        StrnCatGrow (&RetVal, &Size, TempRetVal, 0);
+        SHELL_FREE_NON_NULL (TempRetVal);
+      }
+    }
+  } while (!EFI_ERROR (Status));
+
+  SHELL_FREE_NON_NULL (GetString);
+  return RetVal;
+}
+
+/**
+  Function to dump information about BlockIo protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+BlockIoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS            Status;
+  EFI_BLOCK_IO_PROTOCOL *BlockIo;
+  EFI_BLOCK_IO_MEDIA    *BlockMedia;
+  CHAR16                *GetString;
+  CHAR16                *RetVal;
+
+  if (!Verbose) {
+    return NULL;
+  }
+  GetString   = NULL;
+  RetVal = NULL;
+
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiBlockIoProtocolGuid,
+                (VOID**)&BlockIo,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  BlockMedia = BlockIo->Media;
+  //
+  // Per spec:
+  //   The function (ReadBlocks) must return EFI_NO_MEDIA or
+  //   EFI_MEDIA_CHANGED even if LBA, BufferSize, or Buffer are invalid so the caller can probe
+  //   for changes in media state.
+  //
+  BlockIo->ReadBlocks (
+             BlockIo,
+             BlockIo->Media->MediaId,
+             0,
+             0,
+             NULL
+             );
+
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_BLOCKIO_INFO), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  RetVal = CatSPrint (
+            RetVal,
+            GetString,
+            BlockMedia->RemovableMedia ? L"Removable " : L"Fixed ",
+            BlockMedia->MediaPresent ? L"" : L"not-present ",
+            BlockMedia->MediaId,
+            BlockMedia->BlockSize,
+            BlockMedia->LastBlock,
+            MultU64x32 (BlockMedia->LastBlock + 1, BlockMedia->BlockSize),
+            BlockMedia->LogicalPartition ? L"partition" : L"raw",
+            BlockMedia->ReadOnly ? L"ro" : L"rw",
+            BlockMedia->WriteCaching ? L"cached" : L"!cached"
+            );
+
+  SHELL_FREE_NON_NULL (GetString);
+  return RetVal;
+}
+
+/**
+  Function to dump information about DebugSupport Protocol.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+DebugSupportProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_DEBUG_SUPPORT_PROTOCOL  *DebugSupport;
+  CHAR16                      *GetString;
+  CHAR16                      *RetVal;
+
+  if (!Verbose) {
+    return NULL;
+  }
+  GetString = NULL;
+  RetVal = NULL;
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiDebugSupportProtocolGuid,
+                (VOID**)&DebugSupport,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_DEBUGSUPPORT_INFO), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  //
+  // Dump Debug support info
+  //
+  switch (DebugSupport->Isa) {
+  case (IsaIa32):
+    RetVal = CatSPrint (RetVal, GetString, L"IA-32");
+    break;
+  case (IsaIpf):
+    RetVal = CatSPrint (RetVal, GetString, L"IPF");
+    break;
+  case (IsaEbc):
+    RetVal = CatSPrint (RetVal, GetString, L"EBC");
+    break;
+  default:
+    SHELL_FREE_NON_NULL (GetString);
+    GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_DEBUGSUPPORT_UNKNOWN), NULL);
+    RetVal = GetString != NULL ? CatSPrint (RetVal, GetString, DebugSupport->Isa) : NULL;
+    break;
+  }
+
+  SHELL_FREE_NON_NULL (GetString);
+  return RetVal;
+}
+
+/**
+  Function to dump information about PciIoProtocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has PciRootBridgeIo installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+PciIoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PCI_IO_PROTOCOL     *PciIo;
+  PCI_TYPE00              Pci;
+  UINTN                   Segment;
+  UINTN                   Bus;
+  UINTN                   Device;
+  UINTN                   Function;
+  UINTN                   Index;
+  CHAR16                  *GetString;
+  CHAR16                  *TempRetVal;
+  CHAR16                  *RetVal;
+
+  if (!Verbose) {
+    return (NULL);
+  }
+  RetVal = NULL;
+  GetString   = NULL;
+  TempRetVal  = NULL;
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID**)&PciIo,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR(Status)) {
+    return NULL;
+  }
+  PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0, sizeof (Pci), &Pci);
+  PciIo->GetLocation (PciIo, &Segment, &Bus, &Device, &Function);
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PCIIO_DUMP_MAIN), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  RetVal = CatSPrint (
+            NULL,
+            GetString,
+            Segment,
+            Bus,
+            Device,
+            Function,
+            PciIo->RomSize,
+            PciIo->RomImage,
+            Pci.Hdr.VendorId,
+            Pci.Hdr.DeviceId,
+            Pci.Hdr.ClassCode[0],
+            Pci.Hdr.ClassCode[1],
+            Pci.Hdr.ClassCode[2]
+            );
+  for (Index = 0; Index < sizeof (Pci); Index ++) {
+    if ((Index % 0x10) == 0) {
+      TempRetVal = CatSPrint (RetVal, L"\r\n       %02x", *((UINT8 *) (&Pci) + Index));
+    } else {
+      TempRetVal = CatSPrint (RetVal, L"%02x", *((UINT8 *) (&Pci) + Index));
+    }
+    FreePool (RetVal);
+    RetVal = TempRetVal;
+    TempRetVal = NULL;
+  }
+
+  FreePool(GetString);
+  return RetVal;
+}
+
+/**
+  Function to dump information about UsbIoProtocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has PciRootBridgeIo installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A poitner to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+UsbIoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_USB_IO_PROTOCOL           *UsbIo;
+  EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDesc;
+  CHAR16                        *GetString;
+  CHAR16                        *RetVal;
+
+  if (!Verbose) {
+    return (NULL);
+  }
+  RetVal = NULL;
+  GetString = NULL;
+  Status = gBS->OpenProtocol (
+                  TheHandle,
+                  &gEfiUsbIoProtocolGuid,
+                  (VOID**)&UsbIo,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (EFI_ERROR(Status)) {
+    return NULL;
+  }
+  UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDesc);
+  HandleParsingHiiInit ();
+  GetString = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_USBIO_DUMP_MAIN), NULL);
+  if (GetString == NULL) {
+    return NULL;
+  }
+  RetVal = CatSPrint (
+            NULL,
+            GetString,
+            InterfaceDesc.InterfaceNumber,
+            InterfaceDesc.InterfaceClass,
+            InterfaceDesc.InterfaceSubClass,
+            InterfaceDesc.InterfaceProtocol
+            );
+
+  FreePool (GetString);
+  return RetVal;
 }
 
 /**
@@ -1537,6 +1933,87 @@ ERROR_EXIT:
   return NULL;
 }
 
+/**
+  Function to dump information about Partition Information protocol.
+
+  This will allocate the return buffer from boot services pool.
+
+  @param[in] TheHandle      The handle that has the protocol installed.
+  @param[in] Verbose        TRUE for additional information, FALSE otherwise.
+
+  @retval A pointer to a string containing the information.
+**/
+CHAR16*
+EFIAPI
+PartitionInfoProtocolDumpInformation (
+  IN CONST EFI_HANDLE TheHandle,
+  IN CONST BOOLEAN    Verbose
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_PARTITION_INFO_PROTOCOL     *PartitionInfo;
+  CHAR16                          *PartitionType;
+  CHAR16                          *EfiSystemPartition;
+  CHAR16                          *RetVal;
+
+  if (!Verbose) {
+    return NULL;
+  }
+
+  Status = gBS->OpenProtocol (
+                TheHandle,
+                &gEfiPartitionInfoProtocolGuid,
+                (VOID**)&PartitionInfo,
+                gImageHandle,
+                NULL,
+                EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  HandleParsingHiiInit ();
+
+  switch (PartitionInfo->Type) {
+  case PARTITION_TYPE_OTHER:
+    PartitionType = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_TYPE_OTHER), NULL);
+    break;
+  case PARTITION_TYPE_MBR:
+    PartitionType = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_TYPE_MBR), NULL);
+    break;
+  case PARTITION_TYPE_GPT:
+    PartitionType = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_TYPE_GPT), NULL);
+    break;
+  default:
+    PartitionType = NULL;
+    break;
+  }
+  if (PartitionType == NULL) {
+    return NULL;
+  }
+
+  if (PartitionInfo->System == 1) {
+    EfiSystemPartition = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_EFI_SYS_PART), NULL);
+  } else {
+    EfiSystemPartition = HiiGetString (mHandleParsingHiiHandle, STRING_TOKEN(STR_PARTINFO_DUMP_NOT_EFI_SYS_PART), NULL);
+  }
+  if (EfiSystemPartition == NULL) {
+    SHELL_FREE_NON_NULL (PartitionType);
+    return NULL;
+  }
+
+  RetVal = CatSPrint (
+             NULL,
+             L"%s\r\n%s",
+             PartitionType,
+             EfiSystemPartition
+             );
+
+  SHELL_FREE_NON_NULL (EfiSystemPartition);
+  SHELL_FREE_NON_NULL (PartitionType);
+  return RetVal;
+}
+
 //
 // Put the information on the NT32 protocol GUIDs here so we are not dependant on the Nt32Pkg
 //
@@ -1593,7 +2070,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_DEVICE_PATH_VTUTF8),    &gEfiVTUTF8Guid,                                  NULL},
   {STRING_TOKEN(STR_DRIVER_BINDING),        &gEfiDriverBindingProtocolGuid,                   NULL},
   {STRING_TOKEN(STR_PLATFORM_OVERRIDE),     &gEfiPlatformDriverOverrideProtocolGuid,          NULL},
-  {STRING_TOKEN(STR_BUS_OVERRIDE),          &gEfiBusSpecificDriverOverrideProtocolGuid,       NULL},
+  {STRING_TOKEN(STR_BUS_OVERRIDE),          &gEfiBusSpecificDriverOverrideProtocolGuid,       BusSpecificDriverOverrideProtocolDumpInformation},
   {STRING_TOKEN(STR_DRIVER_DIAG),           &gEfiDriverDiagnosticsProtocolGuid,               NULL},
   {STRING_TOKEN(STR_DRIVER_DIAG2),          &gEfiDriverDiagnostics2ProtocolGuid,              NULL},
   {STRING_TOKEN(STR_DRIVER_CN),             &gEfiComponentNameProtocolGuid,                   NULL},
@@ -1618,19 +2095,19 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_SIMPLE_FILE_SYS),       &gEfiSimpleFileSystemProtocolGuid,                NULL},
   {STRING_TOKEN(STR_TAPE_IO),               &gEfiTapeIoProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_DISK_IO),               &gEfiDiskIoProtocolGuid,                          NULL},
-  {STRING_TOKEN(STR_BLK_IO),                &gEfiBlockIoProtocolGuid,                         NULL},
+  {STRING_TOKEN(STR_BLK_IO),                &gEfiBlockIoProtocolGuid,                         BlockIoProtocolDumpInformation},
   {STRING_TOKEN(STR_UC),                    &gEfiUnicodeCollationProtocolGuid,                NULL},
   {STRING_TOKEN(STR_UC2),                   &gEfiUnicodeCollation2ProtocolGuid,               NULL},
   {STRING_TOKEN(STR_PCIRB_IO),              &gEfiPciRootBridgeIoProtocolGuid,                 PciRootBridgeIoDumpInformation},
-  {STRING_TOKEN(STR_PCI_IO),                &gEfiPciIoProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_PCI_IO),                &gEfiPciIoProtocolGuid,                           PciIoProtocolDumpInformation},
   {STRING_TOKEN(STR_SCSI_PT),               &gEfiScsiPassThruProtocolGuid,                    NULL},
   {STRING_TOKEN(STR_SCSI_IO),               &gEfiScsiIoProtocolGuid,                          NULL},
   {STRING_TOKEN(STR_SCSI_PT_EXT),           &gEfiExtScsiPassThruProtocolGuid,                 NULL},
   {STRING_TOKEN(STR_ISCSI),                 &gEfiIScsiInitiatorNameProtocolGuid,              NULL},
-  {STRING_TOKEN(STR_USB_IO),                &gEfiUsbIoProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_USB_IO),                &gEfiUsbIoProtocolGuid,                           UsbIoProtocolDumpInformation},
   {STRING_TOKEN(STR_USB_HC),                &gEfiUsbHcProtocolGuid,                           NULL},
   {STRING_TOKEN(STR_USB_HC2),               &gEfiUsb2HcProtocolGuid,                          NULL},
-  {STRING_TOKEN(STR_DEBUG_SUPPORT),         &gEfiDebugSupportProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_DEBUG_SUPPORT),         &gEfiDebugSupportProtocolGuid,                    DebugSupportProtocolDumpInformation},
   {STRING_TOKEN(STR_DEBUG_PORT),            &gEfiDebugPortProtocolGuid,                       NULL},
   {STRING_TOKEN(STR_DECOMPRESS),            &gEfiDecompressProtocolGuid,                      NULL},
   {STRING_TOKEN(STR_ACPI_TABLE),            &gEfiAcpiTableProtocolGuid,                       NULL},
@@ -1751,6 +2228,37 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_ADAPTER_INFO),          &gEfiAdapterInformationProtocolGuid,              AdapterInformationDumpInformation},
 
 //
+// UEFI2.5
+//
+  {STRING_TOKEN(STR_TLS_SB),                &gEfiTlsServiceBindingProtocolGuid,              NULL},
+  {STRING_TOKEN(STR_TLS),                   &gEfiTlsProtocolGuid,                            NULL},
+  {STRING_TOKEN(STR_TLS_CONFIG),            &gEfiTlsConfigurationProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_SUPPLICANT_SB),         &gEfiSupplicantServiceBindingProtocolGuid,       NULL},
+  {STRING_TOKEN(STR_SUPPLICANT),            &gEfiSupplicantProtocolGuid,                     NULL},
+
+//
+// UEFI2.6
+//
+  {STRING_TOKEN(STR_WIFI2),                 &gEfiWiFi2ProtocolGuid,                          NULL},
+  {STRING_TOKEN(STR_RAMDISK),               &gEfiRamDiskProtocolGuid,                        NULL},
+  {STRING_TOKEN(STR_HII_ID),                &gEfiHiiImageDecoderProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_HII_IE),                &gEfiHiiImageExProtocolGuid,                     NULL},
+  {STRING_TOKEN(STR_SD_MPT),                &gEfiSdMmcPassThruProtocolGuid,                  NULL},
+  {STRING_TOKEN(STR_ERASE_BLOCK),           &gEfiEraseBlockProtocolGuid,                     NULL},
+
+//
+// UEFI2.7
+//
+  {STRING_TOKEN(STR_BLUETOOTH_ATTR),        &gEfiBluetoothAttributeProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_BLUETOOTH_ATTR_SB),     &gEfiBluetoothAttributeServiceBindingProtocolGuid, NULL},
+  {STRING_TOKEN(STR_BLUETOOTH_LE_CONFIG),   &gEfiBluetoothLeConfigProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_UFS_DEV_CONFIG),        &gEfiUfsDeviceConfigProtocolGuid,                  NULL},
+  {STRING_TOKEN(STR_HTTP_BOOT_CALL),        &gEfiHttpBootCallbackProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_RESET_NOTI),            &gEfiResetNotificationProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_PARTITION_INFO),        &gEfiPartitionInfoProtocolGuid,                    PartitionInfoProtocolDumpInformation},
+  {STRING_TOKEN(STR_HII_POPUP),             &gEfiHiiPopupProtocolGuid,                         NULL},
+
+//
 // PI Spec ones
 //
   {STRING_TOKEN(STR_IDE_CONT_INIT),         &gEfiIdeControllerInitProtocolGuid,               NULL},
@@ -1802,7 +2310,7 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_S_COMM),                &gEfiSmmCommunicationProtocolGuid,                NULL},
   {STRING_TOKEN(STR_S_STAT),                &gEfiSmmStatusCodeProtocolGuid,                   NULL},
   {STRING_TOKEN(STR_S_CPU),                 &gEfiSmmCpuProtocolGuid,                          NULL},
-  {STRING_TOKEN(STR_S_PCIRBIO),             &gEfiPciRootBridgeIoProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_S_PCIRBIO),             &gEfiSmmPciRootBridgeIoProtocolGuid,              NULL},
   {STRING_TOKEN(STR_S_SWD),                 &gEfiSmmSwDispatch2ProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_S_SXD),                 &gEfiSmmSxDispatch2ProtocolGuid,                  NULL},
   {STRING_TOKEN(STR_S_PTD2),                &gEfiSmmPeriodicTimerDispatch2ProtocolGuid,       NULL},
@@ -1873,6 +2381,31 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_NET_HTTP),              &gEfiHttpProtocolGuid,                            NULL},
   {STRING_TOKEN(STR_NET_HTTP_U),            &gEfiHttpUtilitiesProtocolGuid,                   NULL},
   {STRING_TOKEN(STR_REST),                  &gEfiRestProtocolGuid,                            NULL},
+
+//
+// PI 1.5
+//
+  {STRING_TOKEN(STR_MM_EOD),                &gEfiMmEndOfDxeProtocolGuid,                      NULL},
+  {STRING_TOKEN(STR_MM_ITD),                &gEfiMmIoTrapDispatchProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_MM_PBD),                &gEfiMmPowerButtonDispatchProtocolGuid,           NULL},
+  {STRING_TOKEN(STR_MM_SBD),                &gEfiMmStandbyButtonDispatchProtocolGuid,         NULL},
+  {STRING_TOKEN(STR_MM_GD),                 &gEfiMmGpiDispatchProtocolGuid,                   NULL},
+  {STRING_TOKEN(STR_MM_UD),                 &gEfiMmUsbDispatchProtocolGuid,                   NULL},
+  {STRING_TOKEN(STR_MM_PTD),                &gEfiMmPeriodicTimerDispatchProtocolGuid,         NULL},
+  {STRING_TOKEN(STR_MM_SXD),                &gEfiMmSxDispatchProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_MM_SWD),                &gEfiMmSwDispatchProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_MM_PRBI),               &gEfiMmPciRootBridgeIoProtocolGuid,               NULL},
+  {STRING_TOKEN(STR_MM_CPU),                &gEfiMmCpuProtocolGuid,                           NULL},
+  {STRING_TOKEN(STR_MM_STACODE),            &gEfiMmStatusCodeProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_DXEMM_RTL),             &gEfiDxeMmReadyToLockProtocolGuid,                NULL},
+  {STRING_TOKEN(STR_MM_CONFIG),             &gEfiMmConfigurationProtocolGuid,                 NULL},
+  {STRING_TOKEN(STR_MM_RTL),                &gEfiMmReadyToLockProtocolGuid,                   NULL},
+  {STRING_TOKEN(STR_MM_CONTROL),            &gEfiMmControlProtocolGuid,                       NULL},
+  {STRING_TOKEN(STR_MM_ACCESS),             &gEfiMmAccessProtocolGuid,                        NULL},
+  {STRING_TOKEN(STR_MM_BASE),               &gEfiMmBaseProtocolGuid,                          NULL},
+  {STRING_TOKEN(STR_MM_CPUIO),              &gEfiMmCpuIoProtocolGuid,                         NULL},
+  {STRING_TOKEN(STR_MM_RH),                 &gEfiMmRscHandlerProtocolGuid,                    NULL},
+  {STRING_TOKEN(STR_MM_COM),                &gEfiMmCommunicationProtocolGuid,                 NULL},
 
 //
 // UEFI Shell Spec 2.0

@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -24,6 +24,7 @@
 
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/ArmMpCoreInfo.h>
+#include <Ppi/SecPerformance.h>
 #include <Guid/LzmaDecompress.h>
 
 #include "PrePi.h"
@@ -86,6 +87,7 @@ PrePiMain (
   CHAR8                         Buffer[100];
   UINTN                         CharCount;
   UINTN                         StacksSize;
+  FIRMWARE_SEC_PERFORMANCE      Performance;
 
   // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
   ASSERT (IS_XIP() ||
@@ -145,6 +147,12 @@ PrePiMain (
       BuildGuidDataHob (&gArmMpCoreInfoGuid, ArmCoreInfoTable, sizeof (ARM_CORE_INFO) * ArmCoreCount);
     }
   }
+
+  // Store timer value logged at the beginning of firmware image execution
+  Performance.ResetEnd = GetTimeInNanoSecond (StartTimeStamp);
+
+  // Build SEC Performance Data Hob
+  BuildGuidDataHob (&gEfiFirmwarePerformanceGuid, &Performance, sizeof (Performance));
 
   // Set the Boot Mode
   SetBootMode (ArmPlatformGetBootMode ());

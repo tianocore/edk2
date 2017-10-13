@@ -40,6 +40,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define PRESENT_MEMORY_ATTRIBUTES     (EFI_RESOURCE_ATTRIBUTE_PRESENT)
 
+#define EXCLUSIVE_MEMORY_ATTRIBUTES   (EFI_MEMORY_UC | EFI_MEMORY_WC | \
+                                       EFI_MEMORY_WT | EFI_MEMORY_WB | \
+                                       EFI_MEMORY_WP | EFI_MEMORY_UCE)
+
+#define NONEXCLUSIVE_MEMORY_ATTRIBUTES (EFI_MEMORY_XP | EFI_MEMORY_RP | \
+                                        EFI_MEMORY_RO)
+
 #define INVALID_CPU_ARCH_ATTRIBUTES   0xffffffff
 
 //
@@ -108,7 +115,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdMemoryTypeNames[] = {
   "Reserved ",  // EfiGcdMemoryTypeReserved
   "SystemMem",  // EfiGcdMemoryTypeSystemMemory
   "MMIO     ",  // EfiGcdMemoryTypeMemoryMappedIo
-  "PersisMem",  // EfiGcdMemoryTypePersistentMemory
+  "PersisMem",  // EfiGcdMemoryTypePersistent
   "MoreRelia",  // EfiGcdMemoryTypeMoreReliable
   "Unknown  "   // EfiGcdMemoryTypeMaximum
 };
@@ -654,28 +661,30 @@ ConverToCpuArchAttributes (
   UINT64 Attributes
   )
 {
+  UINT64      CpuArchAttributes;
+
+  if ((Attributes & ~(EXCLUSIVE_MEMORY_ATTRIBUTES |
+                      NONEXCLUSIVE_MEMORY_ATTRIBUTES)) != 0) {
+    return INVALID_CPU_ARCH_ATTRIBUTES;
+  }
+
+  CpuArchAttributes = Attributes & NONEXCLUSIVE_MEMORY_ATTRIBUTES;
+
   if ( (Attributes & EFI_MEMORY_UC) == EFI_MEMORY_UC) {
-    return EFI_MEMORY_UC;
+    CpuArchAttributes |= EFI_MEMORY_UC;
+  } else if ( (Attributes & EFI_MEMORY_WC ) == EFI_MEMORY_WC) {
+    CpuArchAttributes |= EFI_MEMORY_WC;
+  } else if ( (Attributes & EFI_MEMORY_WT ) == EFI_MEMORY_WT) {
+    CpuArchAttributes |= EFI_MEMORY_WT;
+  } else if ( (Attributes & EFI_MEMORY_WB) == EFI_MEMORY_WB) {
+    CpuArchAttributes |= EFI_MEMORY_WB;
+  } else if ( (Attributes & EFI_MEMORY_UCE) == EFI_MEMORY_UCE) {
+    CpuArchAttributes |= EFI_MEMORY_UCE;
+  } else if ( (Attributes & EFI_MEMORY_WP) == EFI_MEMORY_WP) {
+    CpuArchAttributes |= EFI_MEMORY_WP;
   }
 
-  if ( (Attributes & EFI_MEMORY_WC ) == EFI_MEMORY_WC) {
-    return EFI_MEMORY_WC;
-  }
-
-  if ( (Attributes & EFI_MEMORY_WT ) == EFI_MEMORY_WT) {
-    return EFI_MEMORY_WT;
-  }
-
-  if ( (Attributes & EFI_MEMORY_WB) == EFI_MEMORY_WB) {
-    return EFI_MEMORY_WB;
-  }
-
-  if ( (Attributes & EFI_MEMORY_WP) == EFI_MEMORY_WP) {
-    return EFI_MEMORY_WP;
-  }
-
-  return INVALID_CPU_ARCH_ATTRIBUTES;
-
+  return CpuArchAttributes;
 }
 
 
@@ -2407,7 +2416,7 @@ CoreInitializeGcdServices (
           GcdMemoryType = EfiGcdMemoryTypeReserved;
         }
         if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
-          GcdMemoryType = EfiGcdMemoryTypePersistentMemory;
+          GcdMemoryType = EfiGcdMemoryTypePersistent;
         }
         break;
       case EFI_RESOURCE_MEMORY_MAPPED_IO:

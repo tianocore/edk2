@@ -3,7 +3,7 @@
 #
 # It also produces FormBrowserEx(2) protocol to let user register the different Hot key service. 
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -62,6 +62,7 @@
   gEfiHiiPlatformSetupFormsetGuid               ## SOMETIMES_CONSUMES  ## GUID
   gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES  ## GUID
   gZeroGuid                                     ## SOMETIMES_CONSUMES  ## GUID
+  gEdkiiIfrBitVarstoreGuid                      ## SOMETIMES_CONSUMES  ## GUID
 
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_CONSUMES
@@ -76,7 +77,7 @@
   ## NOTIFY
   gEdkiiFormDisplayEngineProtocolGuid
   gEdkiiFormBrowserExProtocolGuid               ## PRODUCES
-  gEfiRegularExpressionProtocolGuid             ## CONSUMES
+  gEfiRegularExpressionProtocolGuid             ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFrameworkCompatibilitySupport          ## CONSUMES

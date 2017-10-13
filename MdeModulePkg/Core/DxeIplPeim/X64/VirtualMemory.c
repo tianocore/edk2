@@ -31,6 +31,68 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
+/**
+   Clear legacy memory located at the first 4K-page, if available.
+
+   This function traverses the whole HOB list to check if memory from 0 to 4095
+   exists and has not been allocated, and then clear it if so.
+
+   @param HoStart                   The start of HobList passed to DxeCore.
+
+**/
+VOID
+ClearFirst4KPage (
+  IN  VOID *HobStart
+  )
+{
+  EFI_PEI_HOB_POINTERS          RscHob;
+  EFI_PEI_HOB_POINTERS          MemHob;
+  BOOLEAN                       DoClear;
+
+  RscHob.Raw = HobStart;
+  MemHob.Raw = HobStart;
+  DoClear = FALSE;
+
+  //
+  // Check if page 0 exists and free
+  //
+  while ((RscHob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,
+                                   RscHob.Raw)) != NULL) {
+    if (RscHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY &&
+        RscHob.ResourceDescriptor->PhysicalStart == 0) {
+      DoClear = TRUE;
+      //
+      // Make sure memory at 0-4095 has not been allocated.
+      //
+      while ((MemHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION,
+                                       MemHob.Raw)) != NULL) {
+        if (MemHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress
+            < EFI_PAGE_SIZE) {
+          DoClear = FALSE;
+          break;
+        }
+        MemHob.Raw = GET_NEXT_HOB (MemHob);
+      }
+      break;
+    }
+    RscHob.Raw = GET_NEXT_HOB (RscHob);
+  }
+
+  if (DoClear) {
+    DEBUG ((DEBUG_INFO, "Clearing first 4K-page!\r\n"));
+    SetMem (NULL, EFI_PAGE_SIZE, 0);
+  }
+
+  return;
+}
+
+BOOLEAN
+IsNullDetectionEnabled (
+  VOID
+  )
+{
+  return ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0);
+}
 
 /**
   Enable Execute Disable Bit.
@@ -90,8 +152,16 @@ Split2MPageTo4K (
     //
     PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K | AddressEncMask;
     PageTableEntry->Bits.ReadWrite = 1;
-    PageTableEntry->Bits.Present = 1;
-    if ((PhysicalAddress4K >= StackBase) && (PhysicalAddress4K < StackBase + StackSize)) {
+
+    if (IsNullDetectionEnabled () && PhysicalAddress4K == 0) {
+      PageTableEntry->Bits.Present = 0;
+    } else {
+      PageTableEntry->Bits.Present = 1;
+    }
+
+    if (PcdGetBool (PcdSetNxForStack)
+        && (PhysicalAddress4K >= StackBase)
+        && (PhysicalAddress4K < StackBase + StackSize)) {
       //
       // Set Nx bit for stack.
       //
@@ -137,9 +207,12 @@ Split1GPageTo2M (
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
-    if ((PhysicalAddress2M < StackBase + StackSize) && ((PhysicalAddress2M + SIZE_2MB) > StackBase)) {
+    if ((IsNullDetectionEnabled () && PhysicalAddress2M == 0)
+        || (PcdGetBool (PcdSetNxForStack)
+            && (PhysicalAddress2M < StackBase + StackSize)
+            && ((PhysicalAddress2M + SIZE_2MB) > StackBase))) {
       //
-      // Need to split this 2M page that covers stack range.
+      // Need to split this 2M page that covers NULL or stack range.
       //
       Split2MPageTo4K (PhysicalAddress2M, (UINT64 *) PageDirectoryEntry, StackBase, StackSize);
     } else {
@@ -279,7 +352,10 @@ CreateIdentityMappingPageTables (
       PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
     
       for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-        if (PcdGetBool (PcdSetNxForStack) && (PageAddress < StackBase + StackSize) && ((PageAddress + SIZE_1GB) > StackBase)) {
+        if ((IsNullDetectionEnabled () && PageAddress == 0)
+            || (PcdGetBool (PcdSetNxForStack)
+                && (PageAddress < StackBase + StackSize)
+                && ((PageAddress + SIZE_1GB) > StackBase))) {
           Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize);
         } else {
           //
@@ -308,9 +384,12 @@ CreateIdentityMappingPageTables (
         PageDirectoryPointerEntry->Bits.Present = 1;
 
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-          if (PcdGetBool (PcdSetNxForStack) && (PageAddress < StackBase + StackSize) && ((PageAddress + SIZE_2MB) > StackBase)) {
+          if ((IsNullDetectionEnabled () && PageAddress == 0)
+              || (PcdGetBool (PcdSetNxForStack)
+                  && (PageAddress < StackBase + StackSize)
+                  && ((PageAddress + SIZE_2MB) > StackBase))) {
             //
-            // Need to split this 2M page that covers stack range.
+            // Need to split this 2M page that covers NULL or stack range.
             //
             Split2MPageTo4K (PageAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize);
           } else {

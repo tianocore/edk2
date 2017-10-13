@@ -94,6 +94,7 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
     NULL,
     NULL
   },
+  0,                  // EnabledPciAttributes
   0,                  // OriginalAttributes
   0,                  // PreviousPort
   0,                  // PreviousPortMultiplier
@@ -103,7 +104,8 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
   {                   // NonBlocking TaskList
     NULL,
     NULL
-  }
+  },
+  NULL,               // ExitBootEvent
 };
 
 ATAPI_DEVICE_PATH    mAtapiDevicePathTemplate = {
@@ -478,6 +480,38 @@ InitializeAtaAtapiPassThru (
 }
 
 /**
+  Disable the device (especially Bus Master DMA) when exiting the boot
+  services.
+
+  @param[in] Event    Event for which this notification function is being
+                      called.
+  @param[in] Context  Pointer to the ATA_ATAPI_PASS_THRU_INSTANCE that
+                      represents the HBA.
+**/
+VOID
+EFIAPI
+AtaPassThruExitBootServices (
+  IN EFI_EVENT Event,
+  IN VOID      *Context
+  )
+{
+  ATA_ATAPI_PASS_THRU_INSTANCE *Instance;
+  EFI_PCI_IO_PROTOCOL          *PciIo;
+
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+
+  Instance = Context;
+  PciIo = Instance->PciIo;
+
+  PciIo->Attributes (
+           PciIo,
+           EfiPciIoAttributeOperationDisable,
+           Instance->EnabledPciAttributes,
+           NULL
+           );
+}
+
+/**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
@@ -670,7 +704,7 @@ AtaAtapiPassThruStart (
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeControllerInit;
   ATA_ATAPI_PASS_THRU_INSTANCE      *Instance;
   EFI_PCI_IO_PROTOCOL               *PciIo;
-  UINT64                            Supports;
+  UINT64                            EnabledPciAttributes;
   UINT64                            OriginalPciAttributes;
 
   Status                = EFI_SUCCESS;
@@ -722,14 +756,14 @@ AtaAtapiPassThruStart (
                     PciIo,
                     EfiPciIoAttributeOperationSupported,
                     0,
-                    &Supports
+                    &EnabledPciAttributes
                     );
   if (!EFI_ERROR (Status)) {
-    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+    EnabledPciAttributes &= (UINT64)EFI_PCI_DEVICE_ENABLE;
     Status = PciIo->Attributes (
                       PciIo,
                       EfiPciIoAttributeOperationEnable,
-                      Supports,
+                      EnabledPciAttributes,
                       NULL
                       );
   }
@@ -749,11 +783,23 @@ AtaAtapiPassThruStart (
   Instance->ControllerHandle      = Controller;
   Instance->IdeControllerInit     = IdeControllerInit;
   Instance->PciIo                 = PciIo;
+  Instance->EnabledPciAttributes  = EnabledPciAttributes;
   Instance->OriginalPciAttributes = OriginalPciAttributes;
   Instance->AtaPassThru.Mode      = &Instance->AtaPassThruMode;
   Instance->ExtScsiPassThru.Mode  = &Instance->ExtScsiPassThruMode;
   InitializeListHead(&Instance->DeviceList);
   InitializeListHead(&Instance->NonBlockingTaskList);
+
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
+                  AtaPassThruExitBootServices,
+                  Instance,
+                  &Instance->ExitBootEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    goto ErrorExit;
+  }
 
   Instance->TimerEvent = NULL;
 
@@ -808,6 +854,10 @@ ErrorExit:
     gBS->CloseEvent (Instance->TimerEvent);
   }
 
+  if ((Instance != NULL) && (Instance->ExitBootEvent != NULL)) {
+    gBS->CloseEvent (Instance->ExitBootEvent);
+  }
+
   //
   // Remove all inserted ATA devices.
   //
@@ -859,7 +909,6 @@ AtaAtapiPassThruStop (
   EFI_ATA_PASS_THRU_PROTOCOL        *AtaPassThru;
   EFI_PCI_IO_PROTOCOL               *PciIo;
   EFI_AHCI_REGISTERS                *AhciRegisters;
-  UINT64                            Supports;
 
   DEBUG ((EFI_D_INFO, "==AtaAtapiPassThru Stop== Controller = %x\n", Controller));
 
@@ -907,17 +956,36 @@ AtaAtapiPassThruStop (
     Instance->TimerEvent = NULL;
   }
   DestroyAsynTaskList (Instance, FALSE);
+
+  //
+  // Close event signaled at gBS->ExitBootServices().
+  //
+  if (Instance->ExitBootEvent != NULL) {
+    gBS->CloseEvent (Instance->ExitBootEvent);
+    Instance->ExitBootEvent = NULL;
+  }
+
   //
   // Free allocated resource
   //
   DestroyDeviceInfoList (Instance);
 
+  PciIo = Instance->PciIo;
+
+  //
+  // Disable this ATA host controller.
+  //
+  PciIo->Attributes (
+           PciIo,
+           EfiPciIoAttributeOperationDisable,
+           Instance->EnabledPciAttributes,
+           NULL
+           );
+
   //
   // If the current working mode is AHCI mode, then pre-allocated resource
   // for AHCI initialization should be released.
   //
-  PciIo = Instance->PciIo;
-
   if (Instance->Mode == EfiAtaAhciMode) {
     AhciRegisters = &Instance->AhciRegisters;
     PciIo->Unmap (
@@ -946,25 +1014,6 @@ AtaAtapiPassThruStop (
              PciIo,
              EFI_SIZE_TO_PAGES ((UINTN) AhciRegisters->MaxReceiveFisSize),
              AhciRegisters->AhciRFis
-             );
-  }
-
-  //
-  // Disable this ATA host controller.
-  //
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSupported,
-                    0,
-                    &Supports
-                    );
-  if (!EFI_ERROR (Status)) {
-    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
-    PciIo->Attributes (
-             PciIo,
-             EfiPciIoAttributeOperationDisable,
-             Supports,
-             NULL
              );
   }
 

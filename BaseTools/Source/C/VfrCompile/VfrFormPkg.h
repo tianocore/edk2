@@ -2,7 +2,7 @@
   
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -567,8 +567,12 @@ public:
     mMinMaxStepData->u8.Step = Step;
   }
 
-  UINT64 GetMinData (UINT8 VarType) {
+  UINT64 GetMinData (UINT8 VarType, BOOLEAN IsBitVar) {
     UINT64 MinValue = 0;
+    if (IsBitVar) {
+      MinValue = mMinMaxStepData->u32.MinValue;
+      return MinValue;
+    }
     switch (VarType) {
     case EFI_IFR_TYPE_NUM_SIZE_64:
       MinValue = mMinMaxStepData->u64.MinValue;
@@ -588,8 +592,12 @@ public:
     return MinValue;
   }
 
-  UINT64 GetMaxData (UINT8 VarType) {
+  UINT64 GetMaxData (UINT8 VarType, BOOLEAN IsBitVar) {
     UINT64 MaxValue = 0;
+    if (IsBitVar) {
+      MaxValue = mMinMaxStepData->u32.MaxValue;
+      return MaxValue;
+    }
     switch (VarType) {
     case EFI_IFR_TYPE_NUM_SIZE_64:
       MaxValue = mMinMaxStepData->u64.MaxValue;
@@ -609,8 +617,12 @@ public:
     return MaxValue;
   }
 
-  UINT64 GetStepData (UINT8 VarType) {
+  UINT64 GetStepData (UINT8 VarType, BOOLEAN IsBitVar) {
     UINT64 MaxValue = 0;
+    if (IsBitVar) {
+      MaxValue = mMinMaxStepData->u32.Step;
+      return MaxValue;
+    }
     switch (VarType) {
     case EFI_IFR_TYPE_NUM_SIZE_64:
       MaxValue = mMinMaxStepData->u64.Step;
@@ -1407,6 +1419,22 @@ public:
     return VFR_RETURN_SUCCESS;
   }
 
+  EFI_VFR_RETURN_CODE SetFlagsForBitField (IN UINT8 HFlags, IN UINT8 LFlags, BOOLEAN DisplaySettingsSpecified = FALSE) {
+    EFI_VFR_RETURN_CODE Ret;
+
+    Ret = CIfrQuestionHeader::SetFlags (HFlags);
+    if (Ret != VFR_RETURN_SUCCESS) {
+      return Ret;
+    }
+
+    if (DisplaySettingsSpecified == FALSE) {
+      mNumeric->Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT;
+    } else {
+      mNumeric->Flags = LFlags;
+    }
+    return VFR_RETURN_SUCCESS;
+  }
+
   UINT8 GetNumericFlags () {
     return mNumeric->Flags;
   }
@@ -1443,6 +1471,22 @@ public:
       mOneOf->Flags = LFlags;
     } else {
       mOneOf->Flags = LFlags | EFI_IFR_DISPLAY_UINT_DEC;
+    }
+    return VFR_RETURN_SUCCESS;
+  }
+
+  EFI_VFR_RETURN_CODE SetFlagsForBitField (IN UINT8 HFlags, IN UINT8 LFlags) {
+    EFI_VFR_RETURN_CODE Ret;
+
+    Ret = CIfrQuestionHeader::SetFlags (HFlags);
+    if (Ret != VFR_RETURN_SUCCESS) {
+      return Ret;
+    }
+
+    if (LFlags & EFI_IFR_DISPLAY) {
+      mOneOf->Flags = LFlags;
+    } else {
+      mOneOf->Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT;
     }
     return VFR_RETURN_SUCCESS;
   }

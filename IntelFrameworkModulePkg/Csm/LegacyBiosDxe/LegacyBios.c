@@ -40,6 +40,7 @@ VOID                  *mRuntimeSmbiosEntryPoint = NULL;
 EFI_PHYSICAL_ADDRESS  mReserveSmbiosEntryPoint = 0;
 EFI_PHYSICAL_ADDRESS  mStructureTableAddress   = 0;
 UINTN                 mStructureTablePages     = 0;
+BOOLEAN               mEndOfDxe                = FALSE;
 
 /**
   Do an AllocatePages () of type AllocateMaxAddress for EfiBootServicesCode
@@ -766,6 +767,135 @@ InstallSmbiosEventCallback (
 }
 
 /**
+  Callback function to toggle EndOfDxe status. NULL pointer detection needs
+  this status to decide if it's necessary to change attributes of page 0.
+
+  @param  Event            Event whose notification function is being invoked.
+  @param  Context          The pointer to the notification function's context,
+                           which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+ToggleEndOfDxeStatus (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  mEndOfDxe = TRUE;
+  return;
+}
+
+//
+// Legacy BIOS needs to access memory between 0-4095, which will cause page
+// fault exception if NULL pointer detection mechanism is enabled. Following
+// functions can be used to disable/enable NULL pointer detection before/after
+// accessing those memory.
+//
+
+/**
+   Enable NULL pointer detection
+*/
+VOID
+EnableNullDetection (
+  VOID
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR       Desc;
+
+  if (((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0)
+      ||
+      ((mEndOfDxe == TRUE)  &&
+       ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT7|BIT0))
+        == (BIT7|BIT0)))
+     ) {
+    return;
+  }
+
+  //
+  // Check current capabilities and attributes
+  //
+  Status = gDS->GetMemorySpaceDescriptor (0, &Desc);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Try to add EFI_MEMORY_RP support if necessary
+  //
+  if ((Desc.Capabilities & EFI_MEMORY_RP) == 0) {
+    Desc.Capabilities |= EFI_MEMORY_RP;
+    Status = gDS->SetMemorySpaceCapabilities (0, EFI_PAGES_TO_SIZE(1),
+                                              Desc.Capabilities);
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+  }
+
+  //
+  // Don't bother if EFI_MEMORY_RP is already set.
+  //
+  if ((Desc.Attributes & EFI_MEMORY_RP) == 0) {
+    Desc.Attributes |= EFI_MEMORY_RP;
+    Status = gDS->SetMemorySpaceAttributes (0, EFI_PAGES_TO_SIZE(1),
+                                            Desc.Attributes);
+    ASSERT_EFI_ERROR (Status);
+  }
+}
+
+/**
+   Disable NULL pointer detection
+*/
+VOID
+DisableNullDetection (
+  VOID
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR       Desc;
+
+  if (((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0)
+      ||
+      ((mEndOfDxe == TRUE)  &&
+       ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT7|BIT0))
+        == (BIT7|BIT0)))
+     ) {
+    return;
+  }
+
+  //
+  // Check current capabilities and attributes
+  //
+  Status = gDS->GetMemorySpaceDescriptor (0, &Desc);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Try to add EFI_MEMORY_RP support if necessary
+  //
+  if ((Desc.Capabilities & EFI_MEMORY_RP) == 0) {
+    Desc.Capabilities |= EFI_MEMORY_RP;
+    Status = gDS->SetMemorySpaceCapabilities (0, EFI_PAGES_TO_SIZE(1),
+                                              Desc.Capabilities);
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+  }
+
+  //
+  // Don't bother if EFI_MEMORY_RP is already cleared.
+  //
+  if ((Desc.Attributes & EFI_MEMORY_RP) != 0) {
+    Desc.Attributes &= ~EFI_MEMORY_RP;
+    Status = gDS->SetMemorySpaceAttributes (0, EFI_PAGES_TO_SIZE(1),
+                                            Desc.Attributes);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    DEBUG ((DEBUG_WARN, "!!! Page 0 is supposed to be disabled !!!\r\n"));
+  }
+}
+
+/**
   Install Driver to produce Legacy BIOS protocol.
 
   @param  ImageHandle  Handle of driver image.
@@ -802,6 +932,7 @@ LegacyBiosInstall (
   UINT64                             Length;
   UINT8                              *SecureBoot;
   EFI_EVENT                          InstallSmbiosEvent;
+  EFI_EVENT                          EndOfDxeEvent;
 
   //
   // Load this driver's image to memory
@@ -964,8 +1095,10 @@ LegacyBiosInstall (
   // Initialize region from 0x0000 to 4k. This initializes interrupt vector
   // range.
   //
+  DisableNullDetection ();
   gBS->SetMem ((VOID *) ClearPtr, 0x400, INITIAL_VALUE_BELOW_1K);
   ZeroMem ((VOID *) ((UINTN)ClearPtr + 0x400), 0xC00);
+  EnableNullDetection ();
 
   //
   // Allocate pages for OPROM usage
@@ -1104,12 +1237,17 @@ LegacyBiosInstall (
   //
   // Save Unexpected interrupt vector so can restore it just prior to boot
   //
+  DisableNullDetection ();
+
   BaseVectorMaster = (UINT32 *) (sizeof (UINT32) * PROTECTED_MODE_BASE_VECTOR_MASTER);
   Private->BiosUnexpectedInt = BaseVectorMaster[0];
   IntRedirCode = (UINT32) (UINTN) Private->IntThunk->InterruptRedirectionCode;
   for (Index = 0; Index < 8; Index++) {
     BaseVectorMaster[Index] = (EFI_SEGMENT (IntRedirCode + Index * 4) << 16) | EFI_OFFSET (IntRedirCode + Index * 4);
   }
+
+  EnableNullDetection ();
+
   //
   // Save EFI value
   //
@@ -1132,6 +1270,20 @@ LegacyBiosInstall (
                   &InstallSmbiosEvent
                   );
   ASSERT_EFI_ERROR (Status);  
+
+  //
+  // Create callback to update status of EndOfDxe, which is needed by NULL
+  // pointer detection
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  ToggleEndOfDxeStatus,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Make a new handle and install the protocol

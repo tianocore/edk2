@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -17,9 +17,7 @@
 
 #include <Library/ArmGicArchLib.h>
 
-//
 // GIC Distributor
-//
 #define ARM_GIC_ICDDCR          0x000 // Distributor Control Register
 #define ARM_GIC_ICDICTR         0x004 // Interrupt Controller Type Register
 #define ARM_GIC_ICDIIDR         0x008 // Implementer Identification Register
@@ -51,10 +49,17 @@
 #define ARM_GIC_ICDDCR_ARE      (1 << 4) // Affinity Routing Enable (ARE)
 #define ARM_GIC_ICDDCR_DS       (1 << 6) // Disable Security (DS)
 
-//
-// GIC Redistributor
-//
+// GICD_ICDICFR bits
+#define ARM_GIC_ICDICFR_WIDTH            32   // ICDICFR is a 32 bit register
+#define ARM_GIC_ICDICFR_BYTES            (ARM_GIC_ICDICFR_WIDTH / 8)
+#define ARM_GIC_ICDICFR_F_WIDTH          2    // Each F field is 2 bits
+#define ARM_GIC_ICDICFR_F_STRIDE         16   // (32/2) F fields per register
+#define ARM_GIC_ICDICFR_F_CONFIG1_BIT    1    // Bit number within F field
+#define ARM_GIC_ICDICFR_LEVEL_TRIGGERED  0x0  // Level triggered interrupt
+#define ARM_GIC_ICDICFR_EDGE_TRIGGERED   0x1  // Edge triggered interrupt
 
+
+// GIC Redistributor
 #define ARM_GICR_CTLR_FRAME_SIZE    SIZE_64KB
 #define ARM_GICR_SGI_PPI_FRAME_SIZE SIZE_64KB
 
@@ -65,9 +70,7 @@
 #define ARM_GICR_ISENABLER      0x0100  // Interrupt Set-Enable Registers
 #define ARM_GICR_ICENABLER      0x0180  // Interrupt Clear-Enable Registers
 
-//
 // GIC Cpu interface
-//
 #define ARM_GIC_ICCICR          0x00  // CPU Interface Control Register
 #define ARM_GIC_ICCPMR          0x04  // Interrupt Priority Mask Register
 #define ARM_GIC_ICCBPR          0x08  // Binary Point Register
@@ -104,9 +107,7 @@ ArmGicGetInterfaceIdentification (
   IN  INTN          GicInterruptInterfaceBase
   );
 
-//
 // GIC Secure interfaces
-//
 VOID
 EFIAPI
 ArmGicSetupNonSecure (
@@ -170,7 +171,8 @@ ArmGicSendSgiTo (
  * in the GICv3 the register value is only the InterruptId.
  *
  * @param GicInterruptInterfaceBase   Base Address of the GIC CPU Interface
- * @param InterruptId                 InterruptId read from the Interrupt Acknowledge Register
+ * @param InterruptId                 InterruptId read from the Interrupt
+ *                                    Acknowledge Register
  *
  * @retval value returned by the Interrupt Acknowledge Register
  *
@@ -220,12 +222,12 @@ ArmGicIsInterruptEnabled (
   IN UINTN                  Source
   );
 
-//
 // GIC revision 2 specific declarations
-//
 
-// Interrupts from 1020 to 1023 are considered as special interrupts (eg: spurious interrupts)
-#define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) (((Interrupt) >= 1020) && ((Interrupt) <= 1023))
+// Interrupts from 1020 to 1023 are considered as special interrupts
+// (eg: spurious interrupts)
+#define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) \
+          (((Interrupt) >= 1020) && ((Interrupt) <= 1023))
 
 VOID
 EFIAPI
@@ -260,9 +262,7 @@ ArmGicV2EndOfInterrupt (
   IN UINTN                  Source
   );
 
-//
 // GIC revision 3 specific declarations
-//
 
 #define ICC_SRE_EL2_SRE         (1 << 0)
 

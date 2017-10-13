@@ -51,6 +51,7 @@ class FV (FvClassObject):
         self.FvBaseAddress = None
         self.FvForceRebase = None
         self.FvRegionInFD = None
+        self.UsedSizeEnable = False
         
     ## AddToBuffer()
     #
@@ -196,9 +197,12 @@ class FV (FvClassObject):
             FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
             # FvAlignmentValue is larger than or equal to 1K
             if FvAlignmentValue >= 0x400:
-                if FvAlignmentValue >= 0x10000:
-                    #The max alignment supported by FFS is 64K.
-                    self.FvAlignment = "64K"
+                if FvAlignmentValue >= 0x100000:
+                    #The max alignment supported by FFS is 16M.
+                    if FvAlignmentValue >= 0x1000000:
+                        self.FvAlignment = "16M"
+                    else:
+                        self.FvAlignment = str(FvAlignmentValue / 0x100000) + "M"
                 else:
                     self.FvAlignment = str (FvAlignmentValue / 0x400) + "K"
             else:
@@ -304,6 +308,10 @@ class FV (FvClassObject):
                                           T_CHAR_LF)
         if not (self.FvAttributeDict == None):
             for FvAttribute in self.FvAttributeDict.keys() :
+                if FvAttribute == "FvUsedSizeEnable":
+                    if self.FvAttributeDict[FvAttribute].upper() in ('TRUE', '1') :
+                        self.UsedSizeEnable = True
+                    continue
                 self.FvInfFile.writelines("EFI_"            + \
                                           FvAttribute       + \
                                           ' = '             + \
@@ -319,12 +327,22 @@ class FV (FvClassObject):
         # Generate FV extension header file
         #
         if self.FvNameGuid == None or self.FvNameGuid == '':
-            if len(self.FvExtEntryType) > 0:
+            if len(self.FvExtEntryType) > 0 or self.UsedSizeEnable:
                 GenFdsGlobalVariable.ErrorLogger("FV Extension Header Entries declared for %s with no FvNameGuid declaration." % (self.UiFvName))
         
         if self.FvNameGuid <> None and self.FvNameGuid <> '':
             TotalSize = 16 + 4
             Buffer = ''
+            if self.UsedSizeEnable:
+                TotalSize += (4 + 4)
+                ## define EFI_FV_EXT_TYPE_USED_SIZE_TYPE 0x03
+                #typedef  struct
+                # {
+                #    EFI_FIRMWARE_VOLUME_EXT_ENTRY Hdr;
+                #    UINT32 UsedSize;
+                # } EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE;
+                Buffer += pack('HHL', 8, 3, 0)
+
             if self.FvNameString == 'TRUE':
                 #
                 # Create EXT entry for FV UI name

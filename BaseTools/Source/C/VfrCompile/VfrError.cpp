@@ -2,7 +2,7 @@
   
   VfrCompiler error handler.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -46,6 +46,7 @@ static SVFR_ERROR_HANDLE VFR_ERROR_HANDLE_TABLE [] = {
   { VFR_RETURN_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
   { VFR_RETURN_CONSTANT_ONLY, ": only constant is allowed in the expression"},
   { VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR, ": Varstore name is defined by more than one varstores, it can't be referred as varstore, only varstore strucure name could be used."},
+  { VFR_RETURN_BIT_WIDTH_ERROR, ": bit width must be <= sizeof (type) * 8 and the max width can not > 32" },
   { VFR_RETURN_CODEUNDEFINED, ": undefined Error Code" }
 };
 

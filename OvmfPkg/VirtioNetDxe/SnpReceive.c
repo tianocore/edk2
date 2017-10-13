@@ -82,6 +82,7 @@ VirtioNetReceive (
   UINT8      *RxPtr;
   UINT16     AvailIdx;
   EFI_STATUS NotifyStatus;
+  UINTN      RxBufOffset;
 
   if (This == NULL || BufferSize == NULL || Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -143,7 +144,9 @@ VirtioNetReceive (
     *HeaderSize = Dev->Snm.MediaHeaderSize;
   }
 
-  RxPtr = (UINT8 *)(UINTN) Dev->RxRing.Desc[DescIdx + 1].Addr;
+  RxBufOffset = (UINTN)(Dev->RxRing.Desc[DescIdx + 1].Addr -
+                        Dev->RxBufDeviceBase);
+  RxPtr = Dev->RxBuf + RxBufOffset;
   CopyMem (Buffer, RxPtr, RxLen);
 
   if (DestAddr != NULL) {

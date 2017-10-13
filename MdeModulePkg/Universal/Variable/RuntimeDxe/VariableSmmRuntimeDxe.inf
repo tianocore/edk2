@@ -42,6 +42,7 @@
 
 [Sources]
   VariableSmmRuntimeDxe.c
+  PrivilegePolymorphic.h
   Measurement.c
 
 [Packages]

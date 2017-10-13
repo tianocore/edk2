@@ -68,6 +68,7 @@ AesniSupport (
       IS_XEON_E7_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_XEON_PHI_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
     MsrFeatureConfig = (MSR_SANDY_BRIDGE_FEATURE_CONFIG_REGISTER *) ConfigData;
+    ASSERT (MsrFeatureConfig != NULL);
     MsrFeatureConfig[ProcessorNumber].Uint64 = AsmReadMsr64 (MSR_SANDY_BRIDGE_FEATURE_CONFIG);
     return (CpuInfo->CpuIdVersionInfoEcx.Bits.AESNI == 1);
   }
@@ -112,6 +113,7 @@ AesniInitialize (
   //
   if (CpuInfo->ProcessorInfo.Location.Thread == 0) {
     MsrFeatureConfig = (MSR_SANDY_BRIDGE_FEATURE_CONFIG_REGISTER *) ConfigData;
+    ASSERT (MsrFeatureConfig != NULL);
     if ((MsrFeatureConfig[ProcessorNumber].Bits.AESConfiguration & BIT0) == 0) {
       CPU_REGISTER_TABLE_WRITE_FIELD (
         ProcessorNumber,

@@ -87,3 +87,10 @@ MixedPcd = {}
 
 # Pcd name for the Pcd which used in the Conditional directives
 gConditionalPcds = []
+
+gUseHashCache = None
+gBinCacheDest = None
+gBinCacheSource = None
+gPlatformHash = None
+gPackageHash = {}
+gModuleHash = {}

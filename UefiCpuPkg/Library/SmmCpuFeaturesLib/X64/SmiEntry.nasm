@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -61,6 +61,11 @@ global ASM_PFX(gcStmSmiHandlerTemplate)
 global ASM_PFX(gcStmSmiHandlerSize)
 global ASM_PFX(gcStmSmiHandlerOffset)
 
+ASM_PFX(gStmSmbase)      EQU StmSmbasePatch - 4
+ASM_PFX(gStmSmiStack)    EQU StmSmiStackPatch - 4
+ASM_PFX(gStmSmiCr3)      EQU StmSmiCr3Patch - 4
+ASM_PFX(gStmXdSupported) EQU StmXdSupportedPatch - 1
+
     DEFAULT REL
     SECTION .text
 
@@ -76,8 +81,8 @@ _StmSmiEntryPoint:
 o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
     mov     ax, PROTECT_MODE_CS
     mov     [cs:bx-0x2],ax
-    DB      0x66, 0xbf                   ; mov edi, SMBASE
-ASM_PFX(gStmSmbase): DD 0
+o32 mov     edi, strict dword 0
+StmSmbasePatch:
     lea     eax, [edi + (@ProtectedMode - _StmSmiEntryPoint) + 0x8000]
     mov     [cs:bx-0x6],eax
     mov     ebx, cr0
@@ -97,14 +102,14 @@ o16 mov     es, ax
 o16 mov     fs, ax
 o16 mov     gs, ax
 o16 mov     ss, ax
-    DB      0xbc                   ; mov esp, imm32
-ASM_PFX(gStmSmiStack): DD 0
+    mov     esp, strict dword 0
+StmSmiStackPatch:
     jmp     ProtFlatMode
 
 BITS 64
 ProtFlatMode:
-    DB      0xb8                        ; mov eax, offset gStmSmiCr3
-ASM_PFX(gStmSmiCr3): DD 0
+    mov     eax, strict dword 0
+StmSmiCr3Patch:
     mov     cr3, rax
     mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
     mov     cr4, rax                    ; in PreModifyMtrrs() to flush TLB.
@@ -119,8 +124,8 @@ ASM_PFX(gStmSmiCr3): DD 0
     ltr     ax
 
 ; enable NXE if supported
-    DB      0xb0                        ; mov al, imm8
-ASM_PFX(gStmXdSupported):     DB      1
+    mov al, strict byte 1
+StmXdSupportedPatch:
     cmp     al, 0
     jz      @SkipXd
 ;
@@ -178,8 +183,7 @@ CommonHandler:
     ; Save FP registers
     ;
     sub     rsp, 0x200
-    DB      0x48                         ; FXSAVE64
-    fxsave  [rsp]
+    fxsave64 [rsp]
 
     add     rsp, -0x20
 
@@ -200,8 +204,7 @@ CommonHandler:
     ;
     ; Restore FP registers
     ;
-    DB      0x48                         ; FXRSTOR64
-    fxrstor [rsp]
+    fxrstor64 [rsp]
 
     add     rsp, 0x200
 

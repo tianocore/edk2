@@ -329,7 +329,10 @@ struct _FORM_BROWSER_STATEMENT{
   BROWSER_STORAGE       *Storage;
   VAR_STORE_INFO        VarStoreInfo;
   UINT16                StorageWidth;
+  UINT16                BitStorageWidth;
+  UINT16                BitVarOffset;
   UINT8                 QuestionFlags;
+  BOOLEAN               QuestionReferToBitField;// Whether the question is stored in a bit field.
   CHAR16                *VariableName;    // Name/Value or EFI Variable name
   CHAR16                *BlockName;       // Buffer storage block name: "OFFSET=...WIDTH=..."
 

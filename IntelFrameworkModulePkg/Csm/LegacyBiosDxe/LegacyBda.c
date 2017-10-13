@@ -34,6 +34,8 @@ LegacyBiosInitBda (
   BDA_STRUC *Bda;
   UINT8     *Ebda;
 
+  DisableNullDetection ();
+
   Bda   = (BDA_STRUC *) ((UINTN) 0x400);
   Ebda  = (UINT8 *) ((UINTN) 0x9fc00);
 
@@ -61,6 +63,8 @@ LegacyBiosInitBda (
   Bda->Lpt3_4Timeout  = 0x1400;
 
   *Ebda               = 0x01;
+
+  EnableNullDetection ();
 
   return EFI_SUCCESS;
 }

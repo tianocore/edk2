@@ -128,6 +128,38 @@ X509GetSubjectName (
 }
 
 /**
+  Retrieve the common name (CN) string from one X.509 certificate.
+
+  Return RETURN_UNSUPPORTED to indicate this interface is not supported.
+
+  @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
+  @param[in]      CertSize         Size of the X509 certificate in bytes.
+  @param[out]     CommonName       Buffer to contain the retrieved certificate common
+                                   name string. At most CommonNameSize bytes will be
+                                   written and the string will be null terminated. May be
+                                   NULL in order to determine the size buffer needed.
+  @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
+                                   and the size of buffer returned CommonName on output.
+                                   If CommonName is NULL then the amount of space needed
+                                   in buffer (including the final null) is returned.
+
+  @retval RETURN_UNSUPPORTED       The operation is not supported.
+
+**/
+RETURN_STATUS
+EFIAPI
+X509GetCommonName (
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     CHAR8        *CommonName,  OPTIONAL
+  IN OUT  UINTN        *CommonNameSize
+  )
+{
+  ASSERT (FALSE);
+  return RETURN_UNSUPPORTED;
+}
+
+/**
   Retrieve the RSA Public Key from one DER-encoded X509 certificate.
 
   Return FALSE to indicate this interface is not supported.

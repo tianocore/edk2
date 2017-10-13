@@ -683,7 +683,7 @@ SetGcdMemorySpaceAttributes (
 
 **/
 VOID
-RefreshGcdMemoryAttributes (
+RefreshMemoryAttributesFromMtrr (
   VOID
   )
 {
@@ -704,14 +704,9 @@ RefreshGcdMemoryAttributes (
   UINT32                              FirmwareVariableMtrrCount;
   UINT8                               DefaultMemoryType;
 
-  if (!IsMtrrSupported ()) {
-    return;
-  }
-
   FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
   ASSERT (FirmwareVariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
 
-  mIsFlushingGCD = TRUE;
   MemorySpaceMap = NULL;
 
   //
@@ -861,6 +856,46 @@ RefreshGcdMemoryAttributes (
   //
   if (MemorySpaceMap != NULL) {
     FreePool (MemorySpaceMap);
+  }
+}
+
+/**
+ Check if paging is enabled or not.
+**/
+BOOLEAN
+IsPagingAndPageAddressExtensionsEnabled (
+  VOID
+  )
+{
+  IA32_CR0  Cr0;
+  IA32_CR4  Cr4;
+
+  Cr0.UintN = AsmReadCr0 ();
+  Cr4.UintN = AsmReadCr4 ();
+
+  return ((Cr0.Bits.PG != 0) && (Cr4.Bits.PAE != 0));
+}
+
+/**
+  Refreshes the GCD Memory Space attributes according to MTRRs and Paging.
+
+  This function refreshes the GCD Memory Space attributes according to MTRRs
+  and page tables.
+
+**/
+VOID
+RefreshGcdMemoryAttributes (
+  VOID
+  )
+{
+  mIsFlushingGCD = TRUE;
+
+  if (IsMtrrSupported ()) {
+    RefreshMemoryAttributesFromMtrr ();
+  }
+
+  if (IsPagingAndPageAddressExtensionsEnabled ()) {
+    RefreshGcdMemoryAttributesFromPaging ();
   }
 
   mIsFlushingGCD = FALSE;

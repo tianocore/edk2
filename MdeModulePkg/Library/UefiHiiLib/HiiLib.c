@@ -1169,6 +1169,13 @@ ValidateQuestionFromVfr (
   UINTN                        Index;
   CHAR16                       *QuestionName;
   CHAR16                       *StringPtr;
+  UINT16                       BitOffset;
+  UINT16                       BitWidth;
+  UINT16                       TotalBits;
+  UINTN                        StartBit;
+  UINTN                        EndBit;
+  BOOLEAN                      QuestionReferBitField;
+  UINT32                       BufferValue;
 
   //
   // Initialize the local variables.
@@ -1182,6 +1189,9 @@ ValidateQuestionFromVfr (
   IfrEfiVarStore    = NULL;
   ZeroMem (&VarStoreData, sizeof (IFR_VARSTORAGE_DATA));
   ZeroMem (&VarBlockData, sizeof (VarBlockData));
+  BitOffset = 0;
+  BitWidth = 0;
+  QuestionReferBitField = FALSE;
 
   //
   // Check IFR value is in block data, then Validate Value
@@ -1345,8 +1355,19 @@ ValidateQuestionFromVfr (
             //
             // Get Offset by Question header and Width by DataType Flags
             //
-            Offset = IfrOneOf->Question.VarStoreInfo.VarOffset;
-            Width  = (UINT16) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
+            if (QuestionReferBitField) {
+              //
+              // Get the byte offset/width for bit field.
+              //
+              BitOffset = IfrOneOf->Question.VarStoreInfo.VarOffset;
+              BitWidth = IfrOneOf->Flags & EDKII_IFR_NUMERIC_SIZE_BIT;
+              Offset = BitOffset / 8;
+              TotalBits = BitOffset % 8 + BitWidth;
+              Width = (TotalBits % 8 == 0 ? TotalBits / 8: TotalBits / 8 + 1);
+            } else {
+              Offset = IfrOneOf->Question.VarStoreInfo.VarOffset;
+              Width  = (UINT16) (1 << (IfrOneOf->Flags & EFI_IFR_NUMERIC_SIZE));
+            }
             //
             // Check whether this question is in current block array.
             //
@@ -1370,7 +1391,17 @@ ValidateQuestionFromVfr (
             // Get the current value for oneof opcode
             //
             VarValue = 0;
-            CopyMem (&VarValue, VarBuffer +  Offset, Width);
+            if (QuestionReferBitField) {
+              //
+              // Get the value in bit fields.
+              //
+              StartBit = BitOffset % 8;
+              EndBit = StartBit + BitWidth - 1;
+              CopyMem ((UINT8 *) &BufferValue, VarBuffer + Offset, Width);
+              VarValue = BitFieldRead32 (BufferValue, StartBit, EndBit);
+            } else {
+              CopyMem (&VarValue, VarBuffer +  Offset, Width);
+            }
           }
           //
           // Set Block Data, to be checked in the following Oneof option opcode.
@@ -1416,8 +1447,19 @@ ValidateQuestionFromVfr (
             //
             // Get Offset by Question header and Width by DataType Flags
             //
-            Offset = IfrNumeric->Question.VarStoreInfo.VarOffset;
-            Width  = (UINT16) (1 << (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE));
+            if (QuestionReferBitField) {
+              //
+              // Get the byte offset/width for bit field.
+              //
+              BitOffset = IfrNumeric->Question.VarStoreInfo.VarOffset;
+              BitWidth = IfrNumeric->Flags & EDKII_IFR_NUMERIC_SIZE_BIT;
+              Offset = BitOffset / 8;
+              TotalBits = BitOffset % 8 + BitWidth;
+              Width  = (TotalBits % 8 == 0 ? TotalBits / 8: TotalBits / 8 + 1);
+            } else {
+              Offset = IfrNumeric->Question.VarStoreInfo.VarOffset;
+              Width  = (UINT16) (1 << (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE));
+            }
             //
             // Check whether this question is in current block array.
             //
@@ -1441,77 +1483,108 @@ ValidateQuestionFromVfr (
             // Check the current value is in the numeric range.
             //
             VarValue = 0;
-            CopyMem (&VarValue, VarBuffer +  Offset, Width);
-          }
-          if ((IfrNumeric->Flags & EFI_IFR_DISPLAY) == 0) {
-            switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
-            case EFI_IFR_NUMERIC_SIZE_1:
-              if ((INT8) VarValue < (INT8) IfrNumeric->data.u8.MinValue || (INT8) VarValue > (INT8) IfrNumeric->data.u8.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
-              }
-              break;
-            case EFI_IFR_NUMERIC_SIZE_2:
-              if ((INT16) VarValue < (INT16) IfrNumeric->data.u16.MinValue || (INT16) VarValue > (INT16) IfrNumeric->data.u16.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
-              }
-              break;
-            case EFI_IFR_NUMERIC_SIZE_4:
-              if ((INT32) VarValue < (INT32) IfrNumeric->data.u32.MinValue || (INT32) VarValue > (INT32) IfrNumeric->data.u32.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
-              }
-              break;
-            case EFI_IFR_NUMERIC_SIZE_8:
-              if ((INT64) VarValue < (INT64) IfrNumeric->data.u64.MinValue || (INT64) VarValue > (INT64) IfrNumeric->data.u64.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
-              }
-              break;
+            if (QuestionReferBitField) {
+              //
+              // Get the value in the bit fields.
+              //
+              StartBit = BitOffset % 8;
+              EndBit = StartBit + BitWidth - 1;
+              CopyMem ((UINT8 *) &BufferValue, VarBuffer + Offset, Width);
+              VarValue = BitFieldRead32 (BufferValue, StartBit, EndBit);
+            } else {
+              CopyMem (&VarValue, VarBuffer +  Offset, Width);
             }
+          }
+          if ( QuestionReferBitField) {
+             //
+             // Value in bit fields was stored as UINt32 type.
+             //
+             if ((IfrNumeric->Flags & EDKII_IFR_DISPLAY_BIT) == 0) {
+               if ((INT32) VarValue < (INT32) IfrNumeric->data.u32.MinValue || (INT32) VarValue > (INT32) IfrNumeric->data.u32.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+             } else {
+               if (VarValue < IfrNumeric->data.u32.MinValue || VarValue > IfrNumeric->data.u32.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+             }
           } else {
-            switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
-            case EFI_IFR_NUMERIC_SIZE_1:
-              if ((UINT8) VarValue < IfrNumeric->data.u8.MinValue || (UINT8) VarValue > IfrNumeric->data.u8.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
+            if ((IfrNumeric->Flags & EFI_IFR_DISPLAY) == 0) {
+              switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
+              case EFI_IFR_NUMERIC_SIZE_1:
+                if ((INT8) VarValue < (INT8) IfrNumeric->data.u8.MinValue || (INT8) VarValue > (INT8) IfrNumeric->data.u8.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
+              case EFI_IFR_NUMERIC_SIZE_2:
+                if ((INT16) VarValue < (INT16) IfrNumeric->data.u16.MinValue || (INT16) VarValue > (INT16) IfrNumeric->data.u16.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
+              case EFI_IFR_NUMERIC_SIZE_4:
+                if ((INT32) VarValue < (INT32) IfrNumeric->data.u32.MinValue || (INT32) VarValue > (INT32) IfrNumeric->data.u32.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
+              case EFI_IFR_NUMERIC_SIZE_8:
+                if ((INT64) VarValue < (INT64) IfrNumeric->data.u64.MinValue || (INT64) VarValue > (INT64) IfrNumeric->data.u64.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
               }
-              break;
-            case EFI_IFR_NUMERIC_SIZE_2:
-              if ((UINT16) VarValue < IfrNumeric->data.u16.MinValue || (UINT16) VarValue > IfrNumeric->data.u16.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
+            } else {
+              switch (IfrNumeric->Flags & EFI_IFR_NUMERIC_SIZE) {
+              case EFI_IFR_NUMERIC_SIZE_1:
+                if ((UINT8) VarValue < IfrNumeric->data.u8.MinValue || (UINT8) VarValue > IfrNumeric->data.u8.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
+              case EFI_IFR_NUMERIC_SIZE_2:
+                if ((UINT16) VarValue < IfrNumeric->data.u16.MinValue || (UINT16) VarValue > IfrNumeric->data.u16.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
+              case EFI_IFR_NUMERIC_SIZE_4:
+                if ((UINT32) VarValue < IfrNumeric->data.u32.MinValue || (UINT32) VarValue > IfrNumeric->data.u32.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
+              case EFI_IFR_NUMERIC_SIZE_8:
+                if ((UINT64) VarValue < IfrNumeric->data.u64.MinValue || (UINT64) VarValue > IfrNumeric->data.u64.MaxValue) {
+                  //
+                  // Not in the valid range.
+                  //
+                  return EFI_INVALID_PARAMETER;
+                }
+                break;
               }
-              break;
-            case EFI_IFR_NUMERIC_SIZE_4:
-              if ((UINT32) VarValue < IfrNumeric->data.u32.MinValue || (UINT32) VarValue > IfrNumeric->data.u32.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
-              }
-              break;
-            case EFI_IFR_NUMERIC_SIZE_8:
-              if ((UINT64) VarValue < IfrNumeric->data.u64.MinValue || (UINT64) VarValue > IfrNumeric->data.u64.MaxValue) {
-                //
-                // Not in the valid range.
-                //
-                return EFI_INVALID_PARAMETER;
-              }
-              break;
             }
           }
           break;
@@ -1554,8 +1627,19 @@ ValidateQuestionFromVfr (
             //
             // Get Offset by Question header
             //
-            Offset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
-            Width  = (UINT16) sizeof (BOOLEAN);
+           if (QuestionReferBitField) {
+              //
+              // Get the byte offset/width for bit field.
+              //
+              BitOffset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
+              BitWidth = 1;
+              Offset = BitOffset / 8;
+              TotalBits = BitOffset % 8 + BitWidth;
+              Width = (TotalBits % 8 == 0 ? TotalBits / 8: TotalBits / 8 + 1);
+            } else {
+              Offset = IfrCheckBox->Question.VarStoreInfo.VarOffset;
+              Width  = (UINT16) sizeof (BOOLEAN);
+            }
             //
             // Check whether this question is in current block array.
             //
@@ -1578,7 +1662,17 @@ ValidateQuestionFromVfr (
             // Check the current value is in the numeric range.
             //
             VarValue = 0;
-            CopyMem (&VarValue, VarBuffer +  Offset, Width);
+            if (QuestionReferBitField) {
+              //
+              // Get the value in bit fields.
+              //
+              StartBit = BitOffset % 8;
+              EndBit = StartBit + BitWidth - 1;
+              CopyMem ((UINT8 *) &BufferValue, VarBuffer + Offset, Width);
+              VarValue = BitFieldRead32 (BufferValue, StartBit, EndBit);
+            } else {
+              CopyMem (&VarValue, VarBuffer +  Offset, Width);
+            }
           }
           //
           // Boolean type, only 1 and 0 is valid.
@@ -1703,6 +1797,7 @@ ValidateQuestionFromVfr (
           }
           break;
         case EFI_IFR_END_OP:
+          QuestionReferBitField = FALSE;
           //
           // Decrease opcode scope for the validated opcode
           //
@@ -1715,6 +1810,11 @@ ValidateQuestionFromVfr (
           //
           if ((VarBlockData.Scope == 0) && (VarBlockData.OpCode == EFI_IFR_ONE_OF_OP)) {
             return EFI_INVALID_PARAMETER;
+          }
+          break;
+        case EFI_IFR_GUID_OP:
+          if (CompareGuid ((EFI_GUID *)((UINT8*)IfrOpHdr + sizeof (EFI_IFR_OP_HEADER)), &gEdkiiIfrBitVarstoreGuid)) {
+            QuestionReferBitField = TRUE;
           }
           break;
         default:

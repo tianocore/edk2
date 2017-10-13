@@ -124,7 +124,6 @@ CreateContextEntry (
       RootEntry->Bits.ContextTablePointerHi  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 32);
       RootEntry->Bits.Present = 1;
       Buffer = (UINT8 *)Buffer + EFI_PAGES_TO_SIZE (ContextPages);
-      FlushPageTableMemory (VtdIndex, (UINTN)RootEntry, sizeof(*RootEntry));
     }
 
     ContextEntryTable = (VTD_CONTEXT_ENTRY *)(UINTN)VTD_64BITS_ADDRESS(RootEntry->Bits.ContextTablePointerLo, RootEntry->Bits.ContextTablePointerHi) ;
@@ -143,8 +142,9 @@ CreateContextEntry (
       ContextEntry->Bits.AddressWidth = 0x2;
       break;
     }
-    FlushPageTableMemory (VtdIndex, (UINTN)ContextEntry, sizeof(*ContextEntry));
   }
+
+  FlushPageTableMemory (VtdIndex, (UINTN)mVtdUnitInformation[VtdIndex].RootEntryTable, EFI_PAGES_TO_SIZE(EntryTablePages));
 
   return EFI_SUCCESS;
 }
@@ -196,6 +196,7 @@ CreateSecondLevelPagingEntryTable (
       DEBUG ((DEBUG_ERROR,"Could not Alloc LVL4 PT. \n"));
       return NULL;
     }
+    FlushPageTableMemory (VtdIndex, (UINTN)SecondLevelPagingEntry, EFI_PAGES_TO_SIZE(1));
   }
 
   //
@@ -219,6 +220,7 @@ CreateSecondLevelPagingEntryTable (
         ASSERT(FALSE);
         return NULL;
       }
+      FlushPageTableMemory (VtdIndex, (UINTN)Lvl4PtEntry[Index4].Uint64, SIZE_4KB);
       SetSecondLevelPagingEntryAttribute (&Lvl4PtEntry[Index4], EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
     }
 
@@ -239,6 +241,7 @@ CreateSecondLevelPagingEntryTable (
           ASSERT(FALSE);
           return NULL;
         }
+        FlushPageTableMemory (VtdIndex, (UINTN)Lvl3PtEntry[Index3].Uint64, SIZE_4KB);
         SetSecondLevelPagingEntryAttribute (&Lvl3PtEntry[Index3], EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
       }
 
@@ -542,6 +545,7 @@ GetSecondLevelPageTableEntry (
       *PageAttribute = PageNone;
       return NULL;
     }
+    FlushPageTableMemory (VtdIndex, (UINTN)L4PageTable[Index4], SIZE_4KB);
     SetSecondLevelPagingEntryAttribute ((VTD_SECOND_LEVEL_PAGING_ENTRY *)&L4PageTable[Index4], EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
     FlushPageTableMemory (VtdIndex, (UINTN)&L4PageTable[Index4], sizeof(L4PageTable[Index4]));
   }
@@ -555,6 +559,7 @@ GetSecondLevelPageTableEntry (
       *PageAttribute = PageNone;
       return NULL;
     }
+    FlushPageTableMemory (VtdIndex, (UINTN)L3PageTable[Index3], SIZE_4KB);
     SetSecondLevelPagingEntryAttribute ((VTD_SECOND_LEVEL_PAGING_ENTRY *)&L3PageTable[Index3], EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE);
     FlushPageTableMemory (VtdIndex, (UINTN)&L3PageTable[Index3], sizeof(L3PageTable[Index3]));
   }

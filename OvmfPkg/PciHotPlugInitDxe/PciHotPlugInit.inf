@@ -27,16 +27,20 @@
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
+  BaseMemoryLib
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PciLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Protocols]
-  gEfiPciHotPlugInitProtocolGuid ## SOMETIMES_PRODUCES
+  gEfiPciHotPlugInitProtocolGuid ## ALWAYS_PRODUCES
 
 [Depex]
   TRUE

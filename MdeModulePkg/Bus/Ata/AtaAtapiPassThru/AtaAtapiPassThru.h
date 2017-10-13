@@ -100,6 +100,7 @@ typedef struct {
   // The attached device list
   //
   LIST_ENTRY                        DeviceList;
+  UINT64                            EnabledPciAttributes;
   UINT64                            OriginalPciAttributes;
 
   //
@@ -120,6 +121,12 @@ typedef struct {
   //
   EFI_EVENT                         TimerEvent;
   LIST_ENTRY                        NonBlockingTaskList;
+
+  //
+  // For disabling the device (especially Bus Master DMA) at
+  // ExitBootServices().
+  //
+  EFI_EVENT                         ExitBootEvent;
 } ATA_ATAPI_PASS_THRU_INSTANCE;
 
 //

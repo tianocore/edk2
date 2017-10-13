@@ -1,7 +1,7 @@
 /** @file
   Provides interface to advanced shell functionality for parsing both handle and protocol database.
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2016 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
@@ -138,6 +138,7 @@
 #include <Protocol/AdapterInformation.h>
 #include <Protocol/ShellDynamicCommand.h>
 #include <Protocol/DiskInfo.h>
+#include <Protocol/PartitionInfo.h>
 
 #include <Library/HandleParsingLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -153,6 +154,7 @@
 #include <Library/ShellLib.h>
 #include <Library/SortLib.h>
 #include <Library/ShellCommandLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 
 #define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V1   1
 #define   EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION_V2   2

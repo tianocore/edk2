@@ -21,6 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include "Variable.h"
 
 typedef struct {
@@ -32,6 +33,8 @@ VARIABLE_TYPE  mMorVariableType[] = {
   {MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,      &gEfiMemoryOverwriteControlDataGuid},
   {MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,  &gEfiMemoryOverwriteRequestControlLockGuid},
 };
+
+BOOLEAN         mMorPassThru = FALSE;
 
 #define MOR_LOCK_DATA_UNLOCKED           0x0
 #define MOR_LOCK_DATA_LOCKED_WITHOUT_KEY 0x1
@@ -45,6 +48,7 @@ typedef enum {
   MorLockStateLocked = 1,
 } MOR_LOCK_STATE;
 
+BOOLEAN         mMorLockInitializationRequired = FALSE;
 UINT8           mMorLockKey[MOR_LOCK_V2_KEY_SIZE];
 BOOLEAN         mMorLockKeyEmpty = TRUE;
 BOOLEAN         mMorLockPassThru = FALSE;
@@ -169,7 +173,10 @@ SetVariableCheckHandlerMorLock (
   // Basic Check
   //
   if (Attributes == 0 || DataSize == 0 || Data == NULL) {
-    return EFI_WRITE_PROTECTED;
+    //
+    // Permit deletion for passthru request, deny it otherwise.
+    //
+    return mMorLockPassThru ? EFI_SUCCESS : EFI_WRITE_PROTECTED;
   }
 
   if ((Attributes != (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)) ||
@@ -309,19 +316,21 @@ SetVariableCheckHandlerMorLock (
 /**
   This service is an MOR/MorLock checker handler for the SetVariable().
 
-  @param  VariableName the name of the vendor's variable, as a
-                       Null-Terminated Unicode String
-  @param  VendorGuid   Unify identifier for vendor.
-  @param  Attributes   Point to memory location to return the attributes of variable. If the point
-                       is NULL, the parameter would be ignored.
-  @param  DataSize     The size in bytes of Data-Buffer.
-  @param  Data         Point to the content of the variable.
+  @param[in]  VariableName the name of the vendor's variable, as a
+                           Null-Terminated Unicode String
+  @param[in]  VendorGuid   Unify identifier for vendor.
+  @param[in]  Attributes   Attributes bitmask to set for the variable.
+  @param[in]  DataSize     The size in bytes of Data-Buffer.
+  @param[in]  Data         Point to the content of the variable.
 
-  @retval  EFI_SUCCESS            The MOR/MorLock check pass, and Variable driver can store the variable data.
-  @retval  EFI_INVALID_PARAMETER  The MOR/MorLock data or data size or attributes is not allowed for MOR variable.
+  @retval  EFI_SUCCESS            The MOR/MorLock check pass, and Variable
+                                  driver can store the variable data.
+  @retval  EFI_INVALID_PARAMETER  The MOR/MorLock data or data size or
+                                  attributes is not allowed for MOR variable.
   @retval  EFI_ACCESS_DENIED      The MOR/MorLock is locked.
-  @retval  EFI_ALREADY_STARTED    The MorLock variable is handled inside this function.
-                                  Variable driver can just return EFI_SUCCESS.
+  @retval  EFI_ALREADY_STARTED    The MorLock variable is handled inside this
+                                  function. Variable driver can just return
+                                  EFI_SUCCESS.
 **/
 EFI_STATUS
 SetVariableCheckHandlerMor (
@@ -357,6 +366,13 @@ SetVariableCheckHandlerMor (
   //
 
   //
+  // Permit deletion for passthru request.
+  //
+  if (((Attributes == 0) || (DataSize == 0)) && mMorPassThru) {
+    return EFI_SUCCESS;
+  }
+
+  //
   // Basic Check
   //
   if ((Attributes != (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)) ||
@@ -377,9 +393,9 @@ SetVariableCheckHandlerMor (
 }
 
 /**
-  Initialization for MOR Lock Control.
+  Initialization for MOR Control Lock.
 
-  @retval EFI_SUCEESS     MorLock initialization success.
+  @retval EFI_SUCCESS     MorLock initialization success.
   @return Others          Some error occurs.
 **/
 EFI_STATUS
@@ -387,8 +403,132 @@ MorLockInit (
   VOID
   )
 {
+  mMorLockInitializationRequired = TRUE;
+  return EFI_SUCCESS;
+}
+
+/**
+  Delayed initialization for MOR Control Lock at EndOfDxe.
+
+  This function performs any operations queued by MorLockInit().
+**/
+VOID
+MorLockInitAtEndOfDxe (
+  VOID
+  )
+{
+  UINTN      MorSize;
+  EFI_STATUS MorStatus;
+  EFI_STATUS TcgStatus;
+  VOID       *TcgInterface;
+
+  if (!mMorLockInitializationRequired) {
+    //
+    // The EFI_SMM_FAULT_TOLERANT_WRITE_PROTOCOL has never been installed, thus
+    // the variable write service is unavailable. This should never happen.
+    //
+    ASSERT (FALSE);
+    return;
+  }
+
   //
-  // Set variable to report capability to OS
+  // Check if the MOR variable exists.
   //
-  return SetMorLockVariable (0);
+  MorSize = 0;
+  MorStatus = VariableServiceGetVariable (
+                MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+                &gEfiMemoryOverwriteControlDataGuid,
+                NULL,                                   // Attributes
+                &MorSize,
+                NULL                                    // Data
+                );
+  //
+  // We provided a zero-sized buffer, so the above call can never succeed.
+  //
+  ASSERT (EFI_ERROR (MorStatus));
+
+  if (MorStatus == EFI_BUFFER_TOO_SMALL) {
+    //
+    // The MOR variable exists.
+    //
+    // Some OSes don't follow the TCG's Platform Reset Attack Mitigation spec
+    // in that the OS should never create the MOR variable, only read and write
+    // it -- these OSes (unintentionally) create MOR if the platform firmware
+    // does not produce it. Whether this is the case (from the last OS boot)
+    // can be deduced from the absence of the TCG / TCG2 protocols, as edk2's
+    // MOR implementation depends on (one of) those protocols.
+    //
+    TcgStatus = gBS->LocateProtocol (
+                       &gEfiTcgProtocolGuid,
+                       NULL,                 // Registration
+                       &TcgInterface
+                       );
+    if (EFI_ERROR (TcgStatus)) {
+      TcgStatus = gBS->LocateProtocol (
+                         &gEfiTcg2ProtocolGuid,
+                         NULL,                  // Registration
+                         &TcgInterface
+                         );
+    }
+
+    if (!EFI_ERROR (TcgStatus)) {
+      //
+      // The MOR variable originates from the platform firmware; set the MOR
+      // Control Lock variable to report the locking capability to the OS.
+      //
+      SetMorLockVariable (0);
+      return;
+    }
+
+    //
+    // The MOR variable's origin is inexplicable; delete it.
+    //
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: deleting unexpected / unsupported variable %g:%s\n",
+      __FUNCTION__,
+      &gEfiMemoryOverwriteControlDataGuid,
+      MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME
+      ));
+
+    mMorPassThru = TRUE;
+    VariableServiceSetVariable (
+      MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+      &gEfiMemoryOverwriteControlDataGuid,
+      0,                                      // Attributes
+      0,                                      // DataSize
+      NULL                                    // Data
+      );
+    mMorPassThru = FALSE;
+  }
+
+  //
+  // The MOR variable is absent; the platform firmware does not support it.
+  // Lock the variable so that no other module may create it.
+  //
+  VariableLockRequestToLock (
+    NULL,                                   // This
+    MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+    &gEfiMemoryOverwriteControlDataGuid
+    );
+
+  //
+  // Delete the MOR Control Lock variable too (should it exists for some
+  // reason) and prevent other modules from creating it.
+  //
+  mMorLockPassThru = TRUE;
+  VariableServiceSetVariable (
+    MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
+    &gEfiMemoryOverwriteRequestControlLockGuid,
+    0,                                          // Attributes
+    0,                                          // DataSize
+    NULL                                        // Data
+    );
+  mMorLockPassThru = FALSE;
+
+  VariableLockRequestToLock (
+    NULL,                                       // This
+    MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
+    &gEfiMemoryOverwriteRequestControlLockGuid
+    );
 }

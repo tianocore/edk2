@@ -1223,6 +1223,7 @@ VirtioScsiExitBoot (
 {
   VSCSI_DEV *Dev;
 
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
   //
   // Reset the device. This causes the hypervisor to forget about the virtio
   // ring.
@@ -1232,12 +1233,6 @@ VirtioScsiExitBoot (
   //
   Dev = Context;
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
-
-  //
-  // Unmap the ring buffer so that hypervisor will not be able to get
-  // readable data after device reset.
-  //
-  Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, Dev->RingMap);
 }
 
 

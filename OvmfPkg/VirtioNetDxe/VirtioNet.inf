@@ -49,6 +49,7 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  OrderedCollectionLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib

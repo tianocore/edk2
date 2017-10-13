@@ -1369,6 +1369,71 @@ ConfigRespToStorage (
 }
 
 /**
+  Get bit field value from the buffer and then set the value for the question.
+  Note: Data type UINT32 can cover all the bit field value.
+
+  @param  Question        The question refer to bit field.
+  @param  Buffer          Point to the buffer which the question value get from.
+
+**/
+VOID
+GetBitsQuestionValue (
+  IN  FORM_BROWSER_STATEMENT *Question,
+  IN  UINT8                  *Buffer
+  )
+{
+  UINTN    StartBit;
+  UINTN    EndBit;
+  UINT32   RetVal;
+  UINT32   BufferValue;
+
+  StartBit = Question->BitVarOffset % 8;
+  EndBit = StartBit + Question->BitStorageWidth - 1;
+
+  CopyMem ((UINT8 *) &BufferValue, Buffer, Question->StorageWidth);
+
+  RetVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
+
+  //
+  // Set question value.
+  // Note: Since Question with BufferValue (orderedlist, password, string)are not supported to refer bit field.
+  // Only oneof/checkbox/oneof can support bit field.So we can copy the value to the Hiivalue of Question directly.
+  //
+  CopyMem ((UINT8 *) &Question->HiiValue.Value, (UINT8 *) &RetVal, Question->StorageWidth);
+}
+
+/**
+  Set bit field value to the buffer.
+  Note: Data type UINT32 can cover all the bit field value.
+
+  @param  Question        The question refer to bit field.
+  @param  Buffer          Point to the buffer which the question value set to.
+  @param  Value           The bit field value need to set.
+
+**/
+VOID
+SetBitsQuestionValue (
+  IN     FORM_BROWSER_STATEMENT *Question,
+  IN OUT UINT8                  *Buffer,
+  IN     UINT32                 Value
+  )
+{
+  UINT32   Operand;
+  UINTN    StartBit;
+  UINTN    EndBit;
+  UINT32   RetVal;
+
+  StartBit = Question->BitVarOffset % 8;
+  EndBit = StartBit + Question->BitStorageWidth - 1;
+
+  CopyMem ((UINT8*) &Operand, Buffer, Question->StorageWidth);
+
+  RetVal = BitFieldWrite32 (Operand, StartBit, EndBit, Value);
+
+  CopyMem (Buffer, (UINT8*) &RetVal, Question->StorageWidth);
+}
+
+/**
   Convert the buffer value to HiiValue.
 
   @param  Question               The question.
@@ -1395,6 +1460,9 @@ BufferToValue (
   BOOLEAN                      IsString;
   UINTN                        Length;
   EFI_STATUS                   Status;
+  UINT8                        *Buffer;
+
+  Buffer = NULL;
 
   IsString = (BOOLEAN) ((Question->HiiValue.Type == EFI_IFR_TYPE_STRING) ?  TRUE : FALSE);
   if (Question->Storage->Type == EFI_HII_VARSTORE_BUFFER || 
@@ -1416,7 +1484,15 @@ BufferToValue (
     //
     // Other type of Questions
     //
-    Dst = (UINT8 *) &Question->HiiValue.Value;
+    if (Question->QuestionReferToBitField) {
+      Buffer = (UINT8 *)AllocateZeroPool (Question->StorageWidth);
+      if (Buffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      Dst = Buffer;
+    } else {
+      Dst = (UINT8 *) &Question->HiiValue.Value;
+    }
   }
 
   //
@@ -1473,6 +1549,11 @@ BufferToValue (
   }
 
   *StringPtr = TempChar;
+
+  if (Buffer != NULL && Question->QuestionReferToBitField) {
+    GetBitsQuestionValue (Question, Buffer);
+    FreePool (Buffer);
+  }
 
   return Status;
 }
@@ -1678,13 +1759,23 @@ GetQuestionValue (
       if (GetValueFrom == GetSetValueWithEditBuffer) {
         //
         // Copy from storage Edit buffer
+        // If the Question refer to bit filed, get the value in the related bit filed.
         //
-        CopyMem (Dst, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        if (Question->QuestionReferToBitField) {
+          GetBitsQuestionValue (Question, Storage->EditBuffer + Question->VarStoreInfo.VarOffset);
+        } else {
+          CopyMem (Dst, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        }
       } else {
         //
         // Copy from storage Edit buffer
+        // If the Question refer to bit filed, get the value in the related bit filed.
         //
-        CopyMem (Dst, Storage->Buffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        if (Question->QuestionReferToBitField) {
+          GetBitsQuestionValue (Question, Storage->Buffer + Question->VarStoreInfo.VarOffset);
+        } else {
+          CopyMem (Dst, Storage->Buffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        }
       }
     } else {
       Value = NULL;
@@ -1950,13 +2041,23 @@ SetQuestionValue (
       if (SetValueTo == GetSetValueWithEditBuffer) {
         //
         // Copy to storage edit buffer
-        //      
-        CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        // If the Question refer to bit filed, copy the value in related bit filed to storage edit buffer.
+        //
+        if (Question->QuestionReferToBitField) {
+          SetBitsQuestionValue (Question, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, (UINT32)(*Src));
+        } else {
+          CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        }
       } else if (SetValueTo == GetSetValueWithBuffer) {
         //
-        // Copy to storage edit buffer
-        //     
-        CopyMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        // Copy to storage buffer
+        // If the Question refer to bit filed, copy the value in related bit filed to storage buffer.
+        //
+        if (Question->QuestionReferToBitField) {
+          SetBitsQuestionValue (Question, Storage->Buffer + Question->VarStoreInfo.VarOffset, (UINT32)(*Src));
+        } else {
+          CopyMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        }
       }
     } else {
       if (IsString) {

@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2013-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2013-2017, ARM Limited. All rights reserved.
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -47,7 +47,7 @@
 
 [Protocols]
   gEfiWatchdogTimerArchProtocolGuid
-  gHardwareInterruptProtocolGuid
+  gHardwareInterrupt2ProtocolGuid
 
 [Depex]
-  gHardwareInterruptProtocolGuid
+  gHardwareInterrupt2ProtocolGuid

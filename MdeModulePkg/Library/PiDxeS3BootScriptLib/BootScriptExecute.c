@@ -57,7 +57,7 @@
 
 **/
 EFI_STATUS
-SmbusExecute (
+InternalSmbusExecute (
   IN     UINTN                    SmbusAddress,
   IN     EFI_SMBUS_OPERATION      Operation,
   IN OUT UINTN                    *Length,
@@ -1053,7 +1053,7 @@ BootScriptExecuteSmbusExecute (
 
   SmBusAddress = (UINTN)SmbusExecuteEntry.SmBusAddress;
   DataSize = (UINTN) SmbusExecuteEntry.DataSize;
-  return SmbusExecute (
+  return InternalSmbusExecute (
            SmBusAddress,
            (EFI_SMBUS_OPERATION) SmbusExecuteEntry.Operation,
            &DataSize,

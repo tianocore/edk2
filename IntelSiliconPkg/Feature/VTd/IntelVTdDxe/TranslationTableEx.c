@@ -73,7 +73,6 @@ CreateExtContextEntry (
       ExtRootEntry->Bits.UpperContextTablePointerLo  = (UINT32) RShiftU64 ((UINT64)(UINTN)Buffer, 12) + 1;
       ExtRootEntry->Bits.UpperContextTablePointerHi  = (UINT32) RShiftU64 (RShiftU64 ((UINT64)(UINTN)Buffer, 12) + 1, 20);
       ExtRootEntry->Bits.UpperPresent = 1;
-      FlushPageTableMemory (VtdIndex, (UINTN)ExtRootEntry, sizeof(*ExtRootEntry));
       Buffer = (UINT8 *)Buffer + EFI_PAGES_TO_SIZE (ContextPages);
     }
 
@@ -93,8 +92,9 @@ CreateExtContextEntry (
       ExtContextEntry->Bits.AddressWidth = 0x2;
       break;
     }
-    FlushPageTableMemory (VtdIndex, (UINTN)ExtContextEntry, sizeof(*ExtContextEntry));
   }
+
+  FlushPageTableMemory (VtdIndex, (UINTN)mVtdUnitInformation[VtdIndex].ExtRootEntryTable, EFI_PAGES_TO_SIZE(EntryTablePages));
 
   return EFI_SUCCESS;
 }

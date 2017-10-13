@@ -88,6 +88,19 @@ formset
     guid  = DRIVER_SAMPLE_FORMSET_GUID;
 
   //
+  // Define a Buffer Storage (EFI_IFR_VARSTORE)
+  //
+  efivarstore MY_EFI_BITS_VARSTORE_DATA,                                      // This is the data structure type
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
+    name  = MyEfiBitVar,                                                      // Define referenced name in vfr
+    guid  = DRIVER_SAMPLE_FORMSET_GUID;                                       // GUID of this buffer storage
+
+  efivarstore MY_EFI_UNION_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
+    name  = MyEfiUnionVar,
+    guid  = DRIVER_SAMPLE_FORMSET_GUID;
+
+  //
   // Define a Name/Value Storage (EFI_IFR_VARSTORE_NAME_VALUE)
   //
   namevaluevarstore MyNameValueVar,                // Define storage reference name in vfr
@@ -518,6 +531,9 @@ formset
         data.OrderedList[0] = 0x21,        
     endguidop;
 
+     goto 7,
+      prompt = STRING_TOKEN(STR_GOTO_FORM7),
+      help   = STRING_TOKEN(STR_GOTO_FORM7_HELP);
 
   endform;
 
@@ -777,6 +793,162 @@ formset
     // This is where we will insert dynamic created opcodes
     //
     label LABEL_END;
+
+  endform;
+
+
+  form formid = 7,                          // Form to show the question refer to union and bit Varstore
+    title = STRING_TOKEN(STR_FORM7_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NEST_BIT_EFI_VARSTORE);
+
+    checkbox varid   = MyEfiBitVar.BitsData.NestBitCheckbox,
+             prompt   = STRING_TOKEN(STR_BIT_NEST_CHECK_BOX_PROMPT),
+             help     = STRING_TOKEN(STR_BIT_NEST_CHECK_BOX_HELP),
+             flags    = CHECKBOX_DEFAULT,
+    endcheckbox;
+
+    oneof varid  = MyEfiBitVar.BitsData.NestBitOneof,
+      prompt      = STRING_TOKEN(STR_ONE_OF_BIT_NEST_PROMPT),
+      help        = STRING_TOKEN(STR_ONE_OF_BIT_NEST_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0, flags = MANUFACTURING;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 1, flags = DEFAULT;
+    endoneof;
+
+    numeric varid   = MyEfiBitVar.BitsData.NestBitNumeric,
+            questionid = 0x6666,
+            prompt  = STRING_TOKEN(STR_BIT_NEST_NUMERIC_PROMPT),
+            help    = STRING_TOKEN(STR_BIT_NEST_NUMERIC_DEFAULT_HELP),
+            flags   = DISPLAY_UINT_HEX | INTERACTIVE,
+            minimum = 2,
+            maximum = 15,
+            step    = 1,
+    endnumeric;
+
+    oneof varid  = MyEfiBitVar.BitsData.NestByteField,
+      prompt      = STRING_TOKEN(BYTE_QUESTION_NEST_BIT_PROMPT),
+      help        = STRING_TOKEN(BYTE_QUESTION_NEST_BIT_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0, flags = MANUFACTURING;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 1, flags = DEFAULT;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_SUBTITLE_TEXT2);
+    subtitle text = STRING_TOKEN(STR_BIT_EFI_VARSTORE);
+
+    checkbox varid   = MyEfiBitVar.EfiBitCheckbox,
+      prompt   = STRING_TOKEN(STR_BIT_CHECK_BOX_PROMPT),
+      help     = STRING_TOKEN(STR_BIT_CHECK_BOX_HELP),
+      flags    = CHECKBOX_DEFAULT,
+    endcheckbox;
+
+  grayoutif  ideqval MyEfiBitVar.EfiBitGrayoutTest == 0;
+    numeric varid   = MyEfiBitVar.EfiBitNumeric,
+            prompt  = STRING_TOKEN(STR_BIT_NUMERIC_PROMPT),
+            help    = STRING_TOKEN(STR_BIT_NUMERIC_HELP),
+            minimum = 0,
+            maximum = 7,
+            step    = 0,
+            default = 4, defaultstore = MyStandardDefault,
+            default = 5, defaultstore = MyManufactureDefault,
+    endnumeric;
+  endif;
+
+      oneof varid  = MyEfiBitVar.EfiBitOneof,
+      questionid = 0x9999,
+      prompt      = STRING_TOKEN(STR_ONE_OF_BIT_PROMPT),
+      help        = STRING_TOKEN(STR_ONE_OF_BIT_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0x0, flags = MANUFACTURING;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 0x1, flags = DEFAULT;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_SUBTITLE_TEXT2);
+    subtitle text = STRING_TOKEN(STR_NEST_BIT_VARSTORE);
+    checkbox varid   = MyIfrNVData.MyBitData.NestBitCheckbox,
+             prompt   = STRING_TOKEN(STR_BIT_NEST_CHECK_BOX_PROMPT),
+             help     = STRING_TOKEN(STR_BIT_NEST_CHECK_BOX_HELP),
+             flags    = CHECKBOX_DEFAULT,
+    endcheckbox;
+
+    oneof varid  = MyIfrNVData.MyBitData.NestBitOneof,
+      prompt      = STRING_TOKEN(STR_ONE_OF_BIT_NEST_PROMPT),
+      help        = STRING_TOKEN(STR_ONE_OF_BIT_NEST_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0, flags = MANUFACTURING;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 1, flags = DEFAULT;
+    endoneof;
+
+    numeric varid   = MyIfrNVData.MyBitData.NestBitNumeric,
+            prompt  = STRING_TOKEN(STR_BIT_NEST_NUMERIC_PROMPT),
+            help    = STRING_TOKEN(STR_BIT_NEST_NUMERIC_HELP),
+            minimum = 0,
+            maximum = 7,
+            step    = 0,
+            default = 6, defaultstore = MyStandardDefault,
+            default = 7, defaultstore = MyManufactureDefault,
+    endnumeric;
+
+    oneof varid  = MyIfrNVData.MyBitData.NestByteField,
+      prompt      = STRING_TOKEN(BYTE_QUESTION_NEST_BIT_PROMPT),
+      help        = STRING_TOKEN(BYTE_QUESTION_NEST_BIT_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0, flags = MANUFACTURING;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 1, flags = DEFAULT;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_SUBTITLE_TEXT2);
+    subtitle text = STRING_TOKEN(STR_BIT_VARSTORE);
+
+    oneof varid  = MyIfrNVData.BitOneof,
+      prompt      = STRING_TOKEN(STR_ONE_OF_BIT_PROMPT),
+      help        = STRING_TOKEN(STR_ONE_OF_BIT_HELP),
+      option text = STRING_TOKEN(STR_BOOT_ORDER1), value = 0, flags = MANUFACTURING;
+      option text = STRING_TOKEN(STR_BOOT_ORDER2), value = 1, flags = DEFAULT;
+    endoneof;
+
+    checkbox varid   = MyIfrNVData.BitCheckbox,
+             prompt   = STRING_TOKEN(STR_BIT_CHECK_BOX_PROMPT),
+             help     = STRING_TOKEN(STR_BIT_CHECK_BOX_HELP),
+             flags    = CHECKBOX_DEFAULT,
+    endcheckbox;
+
+    numeric varid   = MyIfrNVData.BitNumeric,
+            prompt  = STRING_TOKEN(STR_BIT_NUMERIC_PROMPT),
+            help    = STRING_TOKEN(STR_BUFFER_BIT_NUMERIC_HELP),
+            minimum = 0,
+            maximum = 20,
+            step    = 0,
+            default = 16, defaultstore = MyStandardDefault,
+            default = 17, defaultstore = MyManufactureDefault,
+    endnumeric;
+
+    subtitle text = STRING_TOKEN(STR_SUBTITLE_TEXT2);
+    subtitle text = STRING_TOKEN(STR_UNION_EFI_VARSTORE);
+
+    numeric varid   = MyEfiUnionVar.ByteField,
+            prompt  = STRING_TOKEN(STR_UNION_BYTE_NUMERIC_PROMPT),
+            help    = STRING_TOKEN(STR_UNION_BYTE_NUMERIC_HELP),
+            minimum = 0,
+            maximum = 20,
+            step    = 0,
+            default = 7, defaultstore = MyStandardDefault,
+            default = 8, defaultstore = MyManufactureDefault,
+    endnumeric;
+
+    numeric varid   = MyEfiUnionVar.BitField,
+            prompt  = STRING_TOKEN(STR_UNION_BIT_NUMERIC_PROMPT),
+            help    = STRING_TOKEN(STR_UNION_BIT_NUMERIC_HELP),
+            minimum = 0,
+            maximum = 20,
+            step    = 0,
+            default = 7, defaultstore = MyStandardDefault,
+            default = 8, defaultstore = MyManufactureDefault,
+    endnumeric;
+
+    guidop
+      guid = DRIVER_SAMPLE_FORMSET_GUID,
+      datatype = MY_EFI_BITS_VARSTORE_DATA,
+        data.EfiBitNumeric  = 1,
+        data.EfiBitOneof = 1,
+        data.EfiBitCheckbox = 1,
+    endguidop;
 
   endform;
 

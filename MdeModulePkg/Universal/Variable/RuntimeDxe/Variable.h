@@ -44,6 +44,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/FaultTolerantWrite.h>
 #include <Guid/VarErrorFlag.h>
 
+#include "PrivilegePolymorphic.h"
+
 #define EFI_VARIABLE_ATTRIBUTES_MASK (EFI_VARIABLE_NON_VOLATILE | \
                                       EFI_VARIABLE_BOOTSERVICE_ACCESS | \
                                       EFI_VARIABLE_RUNTIME_ACCESS | \

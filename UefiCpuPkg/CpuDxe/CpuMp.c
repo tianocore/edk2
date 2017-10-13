@@ -622,7 +622,7 @@ InitializeMpSupport (
 
   MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
   mNumberOfProcessors = NumberOfProcessors;
-  DEBUG ((DEBUG_ERROR, "Detect CPU count: %d\n", mNumberOfProcessors));
+  DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mNumberOfProcessors));
 
   //
   // Update CPU healthy information from Guided HOB

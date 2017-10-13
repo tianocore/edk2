@@ -67,8 +67,8 @@ VirtioNetShutdown (
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
   VirtioNetShutdownRx (Dev);
   VirtioNetShutdownTx (Dev);
-  VirtioRingUninit (Dev->VirtIo, &Dev->TxRing);
-  VirtioRingUninit (Dev->VirtIo, &Dev->RxRing);
+  VirtioNetUninitRing (Dev, &Dev->TxRing, Dev->TxRingMap);
+  VirtioNetUninitRing (Dev, &Dev->RxRing, Dev->RxRingMap);
 
   Dev->Snm.State = EfiSimpleNetworkStarted;
   Status = EFI_SUCCESS;

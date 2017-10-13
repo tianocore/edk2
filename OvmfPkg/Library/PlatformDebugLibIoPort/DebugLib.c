@@ -69,7 +69,7 @@ DebugPrint (
 {
   CHAR8    Buffer[MAX_DEBUG_MESSAGE_LENGTH];
   VA_LIST  Marker;
-  UINT8    *Ptr;
+  UINTN    Length;
 
   //
   // If Format is NULL, then ASSERT().
@@ -87,15 +87,13 @@ DebugPrint (
   // Convert the DEBUG() message to an ASCII String
   //
   VA_START (Marker, Format);
-  AsciiVSPrint (Buffer, sizeof (Buffer), Format, Marker);
+  Length = AsciiVSPrint (Buffer, sizeof (Buffer), Format, Marker);
   VA_END (Marker);
 
   //
   // Send the print string to the debug I/O port
   //
-  for (Ptr = (UINT8 *) Buffer; *Ptr; Ptr++) {
-    IoWrite8 (PcdGet16(PcdDebugIoPort), *Ptr);
-  }
+  IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
 }
 
 
@@ -129,20 +127,18 @@ DebugAssert (
   )
 {
   CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  UINT8 *Ptr;
+  UINTN  Length;
 
   //
   // Generate the ASSERT() message in Ascii format
   //
-  AsciiSPrint (Buffer, sizeof Buffer, "ASSERT %a(%Lu): %a\n", FileName,
-    (UINT64)LineNumber, Description);
+  Length = AsciiSPrint (Buffer, sizeof Buffer, "ASSERT %a(%Lu): %a\n",
+             FileName, (UINT64)LineNumber, Description);
 
   //
-  // Send the print string to the Console Output device
+  // Send the print string to the debug I/O port
   //
-  for (Ptr = (UINT8 *) Buffer; *Ptr; Ptr++) {
-    IoWrite8 (PcdGet16(PcdDebugIoPort), *Ptr);
-  }
+  IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings

@@ -1,7 +1,7 @@
 ## @file
 # process FV image section generation
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -80,9 +80,12 @@ class FvImageSection(FvImageSectionClassObject):
 
             # MaxFvAlignment is larger than or equal to 1K
             if MaxFvAlignment >= 0x400:
-                if MaxFvAlignment >= 0x10000:
-                    #The max alignment supported by FFS is 64K.
-                    self.Alignment = "64K"
+                if MaxFvAlignment >= 0x100000:
+                    #The max alignment supported by FFS is 16M.
+                    if MaxFvAlignment >=1000000:
+                        self.Alignment = "16M"
+                    else:
+                        self.Alignment = str(MaxFvAlignment / 0x100000) + "M"
                 else:
                     self.Alignment = str (MaxFvAlignment / 0x400) + "K"
             else:
@@ -117,9 +120,12 @@ class FvImageSection(FvImageSectionClassObject):
                         FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
                         # FvAlignmentValue is larger than or equal to 1K
                         if FvAlignmentValue >= 0x400:
-                            if FvAlignmentValue >= 0x10000:
-                                #The max alignment supported by FFS is 64K.
-                                self.Alignment = "64K"
+                            if FvAlignmentValue >= 0x100000:
+                                #The max alignment supported by FFS is 16M.
+                                if FvAlignmentValue >= 0x1000000:
+                                    self.Alignment = "16M"
+                                else:
+                                    self.Alignment = str(FvAlignmentValue / 0x100000) + "M"
                             else:
                                 self.Alignment = str (FvAlignmentValue / 0x400) + "K"
                         else:

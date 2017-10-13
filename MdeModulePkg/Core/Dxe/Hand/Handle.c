@@ -1004,12 +1004,8 @@ CoreOpenProtocol (
   //
   // Check for invalid Interface
   //
-  if (Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL) {
-    if (Interface == NULL) {
-      return EFI_INVALID_PARAMETER;
-    } else {
-      *Interface = NULL;
-    }
+  if ((Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL) && (Interface == NULL)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -1076,12 +1072,6 @@ CoreOpenProtocol (
     goto Done;
   }
 
-  //
-  // This is the protocol interface entry for this protocol
-  //
-  if (Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL) {
-    *Interface = Prot->Interface;
-  }
   Status = EFI_SUCCESS;
 
   ByDriver        = FALSE;
@@ -1177,8 +1167,37 @@ CoreOpenProtocol (
   }
 
 Done:
+
+  if (Attributes != EFI_OPEN_PROTOCOL_TEST_PROTOCOL) {
+    //
+    // Keep Interface unmodified in case of any Error
+    // except EFI_ALREADY_STARTED and EFI_UNSUPPORTED.
+    //
+    if (!EFI_ERROR (Status) || Status == EFI_ALREADY_STARTED) {
+      //
+      // According to above logic, if 'Prot' is NULL, then the 'Status' must be
+      // EFI_UNSUPPORTED. Here the 'Status' is not EFI_UNSUPPORTED, so 'Prot'
+      // must be not NULL.
+      //
+      // The ASSERT here is for addressing a false positive NULL pointer
+      // dereference issue raised from static analysis.
+      //
+      ASSERT (Prot != NULL);
+      //
+      // EFI_ALREADY_STARTED is not an error for bus driver.
+      // Return the corresponding protocol interface.
+      //
+      *Interface = Prot->Interface;
+    } else if (Status == EFI_UNSUPPORTED) {
+      //
+      // Return NULL Interface if Unsupported Protocol.
+      //
+      *Interface = NULL;
+    }
+  }
+
   //
-  // Done. Release the database lock are return
+  // Done. Release the database lock and return
   //
   CoreReleaseProtocolLock ();
   return Status;

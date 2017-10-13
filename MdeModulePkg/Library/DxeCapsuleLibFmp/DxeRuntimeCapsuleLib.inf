@@ -69,15 +69,17 @@
 
 [Protocols]
   gEsrtManagementProtocolGuid             ## CONSUMES
-  gEfiFirmwareManagementProtocolGuid      ## SOMETIMES_CONSUMES
+  gEfiFirmwareManagementProtocolGuid      ## CONSUMES
   gEdkiiVariableLockProtocolGuid          ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
   gWindowsUxCapsuleGuid                   ## SOMETIMES_CONSUMES ## GUID
   gEfiSystemResourceTableGuid             ## SOMETIMES_CONSUMES ## GUID
-  gEfiCapsuleReportGuid                   ## CONSUMES ## Variable
-  gEfiCapsuleVendorGuid                   ## CONSUMES ## Variable
+  ## SOMETIMES_CONSUMES ## Variable:L"CapsuleMax"
+  ## SOMETIMES_PRODUCES ## Variable:L"CapsuleMax"
+  gEfiCapsuleReportGuid
+  gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData"
   gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
   gEfiEventVirtualAddressChangeGuid       ## CONSUMES ## Event
 

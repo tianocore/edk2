@@ -75,6 +75,7 @@ ArmVirtPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+R: Julien Grall <julien.grall@linaro.org>
 
 BaseTools
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
@@ -194,6 +195,9 @@ OvmfPkg
 W: http://www.tianocore.org/ovmf/
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Laszlo Ersek <lersek@redhat.com>
+M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+R: Anthony Perard <anthony.perard@citrix.com>
+R: Julien Grall <julien.grall@linaro.org>
 S: Maintained
 
 PcAtChipsetPkg

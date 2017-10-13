@@ -31,6 +31,9 @@ UsbHcAllocMemBlock (
   )
 {
   USBHC_MEM_BLOCK       *Block;
+  VOID                  *BufHost;
+  VOID                  *Mapping;
+  EFI_PHYSICAL_ADDRESS  MappedAddr;
   EFI_STATUS            Status;
   UINTN                 PageNumber;
   EFI_PHYSICAL_ADDRESS  TempPtr;
@@ -71,18 +74,20 @@ UsbHcAllocMemBlock (
 
   Block->Bits = (UINT8 *) (UINTN) TempPtr;
 
-  Status = PeiServicesAllocatePages (
-             EfiBootServicesData,
+  Status = IoMmuAllocateBuffer (
              Pages,
-             &TempPtr
+             &BufHost,
+             &MappedAddr,
+             &Mapping
              );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
-  ZeroMem ((VOID *) (UINTN) TempPtr, EFI_PAGES_TO_SIZE (Pages));
+  ZeroMem ((VOID *) (UINTN) BufHost, EFI_PAGES_TO_SIZE (Pages));
 
-  Block->BufHost = (UINT8 *) (UINTN) TempPtr;;
-  Block->Buf = (UINT8 *) (UINTN) TempPtr;
+  Block->BufHost = (UINT8 *) (UINTN) BufHost;
+  Block->Buf = (UINT8 *) (UINTN) MappedAddr;
+  Block->Mapping  = Mapping;
   Block->Next = NULL;
 
   return Block;
@@ -102,6 +107,9 @@ UsbHcFreeMemBlock (
   )
 {
   ASSERT ((Pool != NULL) && (Block != NULL));
+
+  IoMmuFreeBuffer (EFI_SIZE_TO_PAGES (Block->BufLen), Block->BufHost, Block->Mapping);
+
   //
   // No free memory in PEI.
   //
@@ -567,6 +575,7 @@ UsbHcFreeMem (
   @param  HostAddress           The system memory address to map to the PCI controller.
   @param  DeviceAddress         The resulting map address for the bus master PCI controller to
                                 use to access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
 
   @retval EFI_SUCCESS           Success to allocate aligned pages.
   @retval EFI_INVALID_PARAMETER Pages or Alignment is not valid.
@@ -578,13 +587,16 @@ UsbHcAllocateAlignedPages (
   IN UINTN                      Pages,
   IN UINTN                      Alignment,
   OUT VOID                      **HostAddress,
-  OUT EFI_PHYSICAL_ADDRESS      *DeviceAddress
+  OUT EFI_PHYSICAL_ADDRESS      *DeviceAddress,
+  OUT VOID                      **Mapping
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Memory;
+  VOID                  *Memory;
   UINTN                 AlignedMemory;
   UINTN                 AlignmentMask;
+  EFI_PHYSICAL_ADDRESS  DeviceMemory;
+  UINTN                 AlignedDeviceMemory;
   UINTN                 RealPages;
 
   //
@@ -611,32 +623,36 @@ UsbHcAllocateAlignedPages (
     //
     ASSERT (RealPages > Pages);
 
-    Status = PeiServicesAllocatePages (
-               EfiBootServicesData,
+    Status = IoMmuAllocateBuffer (
                Pages,
-               &Memory
+               &Memory,
+               &DeviceMemory,
+               Mapping
                );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
     AlignedMemory = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
+    AlignedDeviceMemory = ((UINTN) DeviceMemory + AlignmentMask) & ~AlignmentMask;
   } else {
     //
     // Do not over-allocate pages in this case.
     //
-    Status = PeiServicesAllocatePages (
-               EfiBootServicesData,
+    Status = IoMmuAllocateBuffer (
                Pages,
-               &Memory
+               &Memory,
+               &DeviceMemory,
+               Mapping
                );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
     AlignedMemory = (UINTN) Memory;
+    AlignedDeviceMemory = (UINTN) DeviceMemory;
   }
 
   *HostAddress = (VOID *) AlignedMemory;
-  *DeviceAddress = (EFI_PHYSICAL_ADDRESS) AlignedMemory;
+  *DeviceAddress = (EFI_PHYSICAL_ADDRESS) AlignedDeviceMemory;
 
   return EFI_SUCCESS;
 }
@@ -646,17 +662,18 @@ UsbHcAllocateAlignedPages (
 
   @param  HostAddress           The system memory address to map to the PCI controller.
   @param  Pages                 The number of pages to free.
+  @param  Mapping               The mapping value returned from Map().
 
 **/
 VOID
 UsbHcFreeAlignedPages (
   IN VOID               *HostAddress,
-  IN UINTN              Pages
+  IN UINTN              Pages,
+  IN VOID               *Mapping
   )
 {
   ASSERT (Pages != 0);
-  //
-  // No free memory in PEI.
-  //
+
+  IoMmuFreeBuffer (Pages, HostAddress, Mapping);
 }
 

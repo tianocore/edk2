@@ -18,8 +18,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = BaseS3SegmentPciLib
-  MODULE_UNI_FILE                = BaseS3SegmentPciLib.uni
+  BASE_NAME                      = BaseS3PciSegmentLib
+  MODULE_UNI_FILE                = BaseS3PciSegmentLib.uni
   FILE_GUID                      = 17E2C90E-AD1F-443A-8C94-6E50C0E98607
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0

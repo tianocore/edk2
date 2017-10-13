@@ -627,7 +627,7 @@ InitializePlatform (
 {
   EFI_STATUS    Status;
 
-  DEBUG ((EFI_D_ERROR, "Platform PEIM Loaded\n"));
+  DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
 

@@ -1,7 +1,7 @@
 #/** @file
 #
 #  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-#  Copyright (c) 2012 - 2015, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2017, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -48,6 +48,7 @@
 
 [Protocols]
   gHardwareInterruptProtocolGuid
+  gHardwareInterrupt2ProtocolGuid
   gEfiCpuArchProtocolGuid
 
 [Pcd.common]

@@ -104,15 +104,6 @@ RuntimeDriverSetVirtualAddressMap (
   );
 
 /**
-  Initialize CRC32 table.
-
-**/
-VOID
-RuntimeDriverInitializeCrc32Table (
-  VOID
-  );
-
-/**
   Install Runtime AP. This code includes the EfiRuntimeLib, but it only
   functions at RT in physical mode.
 

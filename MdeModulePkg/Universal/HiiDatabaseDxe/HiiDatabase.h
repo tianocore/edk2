@@ -1,7 +1,7 @@
 /** @file
 Private structures definitions in HiiDatabase.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -31,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/HiiKeyBoardLayout.h>
 #include <Guid/GlobalVariable.h>
+#include <Guid/MdeModuleHii.h>
 
 
 #include <Library/DebugLib.h>
@@ -77,11 +78,14 @@ typedef struct {
   LIST_ENTRY          Entry;             // Link to Block array
   UINT16              Offset;
   UINT16              Width;
+  UINT16              BitOffset;
+  UINT16              BitWidth;
   EFI_QUESTION_ID     QuestionId;
   UINT8               OpCode;
   UINT8               Scope;
   LIST_ENTRY          DefaultValueEntry; // Link to its default value array
   CHAR16              *Name;
+  BOOLEAN             IsBitVar;
 } IFR_BLOCK_DATA;
 
 //

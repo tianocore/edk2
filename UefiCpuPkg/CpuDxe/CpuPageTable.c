@@ -23,6 +23,8 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/MpService.h>
+
+#include "CpuDxe.h"
 #include "CpuPageTable.h"
 
 ///
@@ -765,6 +767,107 @@ AssignMemoryPageAttributes (
   }
 
   return Status;
+}
+
+/**
+  Update GCD memory space attributes according to current page table setup.
+**/
+VOID
+RefreshGcdMemoryAttributesFromPaging (
+  VOID
+  )
+{
+  EFI_STATUS                          Status;
+  UINTN                               NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR     *MemorySpaceMap;
+  PAGE_TABLE_LIB_PAGING_CONTEXT       PagingContext;
+  PAGE_ATTRIBUTE                      PageAttribute;
+  UINT64                              *PageEntry;
+  UINT64                              PageLength;
+  UINT64                              MemorySpaceLength;
+  UINT64                              Length;
+  UINT64                              BaseAddress;
+  UINT64                              PageStartAddress;
+  UINT64                              Attributes;
+  UINT64                              Capabilities;
+  BOOLEAN                             DoUpdate;
+  UINTN                               Index;
+
+  //
+  // Assuming that memory space map returned is sorted already; otherwise sort
+  // them in the order of lowest address to highest address.
+  //
+  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
+  ASSERT_EFI_ERROR (Status);
+
+  GetCurrentPagingContext (&PagingContext);
+
+  DoUpdate      = FALSE;
+  Capabilities  = 0;
+  Attributes    = 0;
+  BaseAddress   = 0;
+  PageLength    = 0;
+
+  for (Index = 0; Index < NumberOfDescriptors; Index++) {
+    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
+      continue;
+    }
+
+    if (MemorySpaceMap[Index].BaseAddress >= (BaseAddress + PageLength)) {
+      //
+      // Current memory space starts at a new page. Resetting PageLength will
+      // trigger a retrieval of page attributes at new address.
+      //
+      PageLength = 0;
+    } else {
+      //
+      // In case current memory space is not adjacent to last one
+      //
+      PageLength -= (MemorySpaceMap[Index].BaseAddress - BaseAddress);
+    }
+
+    // Sync real page attributes to GCD
+    BaseAddress       = MemorySpaceMap[Index].BaseAddress;
+    MemorySpaceLength = MemorySpaceMap[Index].Length;
+    while (MemorySpaceLength > 0) {
+      if (PageLength == 0) {
+        PageEntry = GetPageTableEntry (&PagingContext, BaseAddress, &PageAttribute);
+        if (PageEntry == NULL) {
+          break;
+        }
+
+        //
+        // Note current memory space might start in the middle of a page
+        //
+        PageStartAddress  = (*PageEntry) & (UINT64)PageAttributeToMask(PageAttribute);
+        PageLength        = PageAttributeToLength (PageAttribute) - (BaseAddress - PageStartAddress);
+        Attributes        = GetAttributesFromPageEntry (PageEntry);
+
+        if (Attributes != (MemorySpaceMap[Index].Attributes & EFI_MEMORY_PAGETYPE_MASK)) {
+          DoUpdate = TRUE;
+          Attributes |= (MemorySpaceMap[Index].Attributes & ~EFI_MEMORY_PAGETYPE_MASK);
+          Capabilities = Attributes | MemorySpaceMap[Index].Capabilities;
+        } else {
+          DoUpdate = FALSE;
+        }
+      }
+
+      Length = MIN (PageLength, MemorySpaceLength);
+      if (DoUpdate) {
+        gDS->SetMemorySpaceCapabilities (BaseAddress, Length, Capabilities);
+        gDS->SetMemorySpaceAttributes (BaseAddress, Length, Attributes);
+        DEBUG ((DEBUG_INFO, "Update memory space attribute: [%02d] %016lx - %016lx (%08lx -> %08lx)\r\n",
+                             Index, BaseAddress, BaseAddress + Length - 1,
+                             MemorySpaceMap[Index].Attributes, Attributes));
+      }
+
+      PageLength        -= Length;
+      MemorySpaceLength -= Length;
+      BaseAddress       += Length;
+    }
+  }
+
+  FreePool (MemorySpaceMap);
 }
 
 /**

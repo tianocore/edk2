@@ -1440,7 +1440,7 @@ Routine Description:
   // Get current Boot Mode
   //
   BootMode = GetBootModeHob ();
-  DEBUG ((EFI_D_ERROR, "Boot Mode:%x\n", BootMode));
+  DEBUG ((DEBUG_INFO, "Boot Mode:%x\n", BootMode));
 
   //
   // Go the different platform policy with different boot mode

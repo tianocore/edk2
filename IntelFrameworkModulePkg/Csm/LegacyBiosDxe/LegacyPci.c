@@ -2279,6 +2279,7 @@ LegacyBiosInstallRom (
   UINTN                 Function;
   EFI_IA32_REGISTER_SET Regs;
   UINT8                 VideoMode;
+  UINT8                 OldVideoMode;
   EFI_TIME              BootTime;
   UINT32                *BdaPtr;
   UINT32                LocalTime;
@@ -2299,6 +2300,7 @@ LegacyBiosInstallRom (
   Device          = 0;
   Function        = 0;
   VideoMode       = 0;
+  OldVideoMode    = 0;
   PhysicalAddress = 0;
   MaxRomAddr      = PcdGet32 (PcdEndOpromShadowAddress);
 
@@ -2401,6 +2403,8 @@ LegacyBiosInstallRom (
   // 2. BBS compliants drives will not change 40:75 until boot time.
   // 3. Onboard IDE controllers will change 40:75
   //
+  DisableNullDetection ();
+
   LocalDiskStart = (UINT8) ((*(UINT8 *) ((UINTN) 0x475)) + 0x80);
   if ((Private->Disk4075 + 0x80) < LocalDiskStart) {
     //
@@ -2426,6 +2430,9 @@ LegacyBiosInstallRom (
     //
     VideoMode = *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE));
   }
+
+  EnableNullDetection ();
+
   //
   // Notify the platform that we are about to scan the ROM
   //
@@ -2466,9 +2473,11 @@ LegacyBiosInstallRom (
   // Multiply result by 18.2 for number of ticks since midnight.
   // Use 182/10 to avoid floating point math.
   //
+  DisableNullDetection ();
   LocalTime = (LocalTime * 182) / 10;
   BdaPtr    = (UINT32 *) ((UINTN) 0x46C);
   *BdaPtr   = LocalTime;
+  EnableNullDetection ();
   
   //
   // Pass in handoff data
@@ -2564,7 +2573,11 @@ LegacyBiosInstallRom (
     //
     // Set mode settings since PrepareToScanRom may change mode
     //
-    if (VideoMode != *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE))) {
+    DisableNullDetection ();
+    OldVideoMode = *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE));
+    EnableNullDetection ();
+
+    if (VideoMode != OldVideoMode) {
       //
       // The active video mode is changed, restore it to original mode.
       //
@@ -2604,7 +2617,9 @@ LegacyBiosInstallRom (
     }
   }
 
+  DisableNullDetection ();
   LocalDiskEnd = (UINT8) ((*(UINT8 *) ((UINTN) 0x475)) + 0x80);
+  EnableNullDetection ();
   
   //
   // Allow platform to perform any required actions after the

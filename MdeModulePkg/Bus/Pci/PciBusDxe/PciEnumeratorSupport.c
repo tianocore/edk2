@@ -1218,11 +1218,12 @@ DetermineDeviceAttribute (
       return Status;
     }
     //
-    // Assume the PCI Root Bridge supports DAC
+    // Assume the PCI Root Bridge supports DAC and Bus Master.
     //
     PciIoDevice->Supports |= (UINT64)(EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
                               EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM |
-                              EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
+                              EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE |
+                              EFI_PCI_IO_ATTRIBUTE_BUS_MASTER);
 
   } else {
 
@@ -1233,8 +1234,15 @@ DetermineDeviceAttribute (
     //
     Command = EFI_PCI_COMMAND_IO_SPACE     |
               EFI_PCI_COMMAND_MEMORY_SPACE |
-              EFI_PCI_COMMAND_BUS_MASTER   |
               EFI_PCI_COMMAND_VGA_PALETTE_SNOOP;
+
+    //
+    // Per PCI-to-PCI Bridge Architecture all PCI-to-PCI bridges are Bus Master capable.
+    // So only test the Bus Master capability for PCI devices.
+    //
+    if (!IS_PCI_BRIDGE(&PciIoDevice->Pci)) {
+      Command |= EFI_PCI_COMMAND_BUS_MASTER;
+    }
 
     BridgeControl = EFI_PCI_BRIDGE_CONTROL_ISA | EFI_PCI_BRIDGE_CONTROL_VGA | EFI_PCI_BRIDGE_CONTROL_VGA_16;
 
@@ -1245,7 +1253,11 @@ DetermineDeviceAttribute (
 
     //
     // Set the supported attributes for specified PCI device
+    // Per PCI-to-PCI Bridge Architecture all PCI-to-PCI bridges are Bus Master capable.
     //
+    if (IS_PCI_BRIDGE(&PciIoDevice->Pci)) {
+      Command |= EFI_PCI_COMMAND_BUS_MASTER;
+    }
     PciSetDeviceAttribute (PciIoDevice, Command, BridgeControl, EFI_SET_SUPPORTS);
 
     //

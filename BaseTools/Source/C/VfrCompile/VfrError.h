@@ -2,7 +2,7 @@
   
   VfrCompiler Error definition
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -44,6 +44,7 @@ typedef enum {
   VFR_RETURN_DEFAULT_VALUE_REDEFINED,
   VFR_RETURN_CONSTANT_ONLY,
   VFR_RETURN_VARSTORE_NAME_REDEFINED_ERROR,
+  VFR_RETURN_BIT_WIDTH_ERROR,
   VFR_RETURN_CODEUNDEFINED
 } EFI_VFR_RETURN_CODE;
 

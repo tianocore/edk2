@@ -1,0 +1,61 @@
+## @file
+# Component INF file for the Intel VTd PMR PEIM.
+#
+# This driver initializes VTd engine based upon EDKII_VTD_INFO_PPI
+# and provide DMA protection in PEI.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# This program and the accompanying materials
+# are licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = IntelVTdPmrPei
+  MODULE_UNI_FILE = IntelVTdPmrPei.uni
+  FILE_GUID       = F906769F-4AED-4A0D-8C7C-FF21B9D1051A
+  MODULE_TYPE     = PEIM
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = IntelVTdPmrInitialize
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  IntelVTdPmrPei.c
+  IntelVTdPmrPei.h
+  IntelVTdPmr.c
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  BaseLib
+  PeimEntryPoint
+  PeiServicesLib
+  HobLib
+  IoLib
+
+[Ppis]
+  gEdkiiIoMmuPpiGuid            ## PRODUCES
+  gEdkiiVTdInfoPpiGuid          ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid     ## CONSUMES
+
+[Pcd]
+  gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask   ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND
+  gEfiPeiMasterBootModePpiGuid AND
+  gEdkiiVTdInfoPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IntelVTdPmrPeiExtra.uni
+

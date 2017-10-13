@@ -108,6 +108,7 @@
   gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_CONSUMES ##GUID #Used in LegacyBiosBuildIdeData() to assure device is a disk
   gEfiSmbiosTableGuid                           ## SOMETIMES_CONSUMES ##SystemTable
   gEfiLegacyBiosGuid                            ## SOMETIMES_CONSUMES ##GUID #Used in LegacyBiosInstallVgaRom() to locate handle buffer
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES
 
 [Guids.IA32]
   gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ##SystemTable
@@ -147,6 +148,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize            ## CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase      ## CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask        ## CONSUMES
 
 [Depex]
   gEfiLegacyRegion2ProtocolGuid AND gEfiLegacyInterruptProtocolGuid AND gEfiLegacyBiosPlatformProtocolGuid AND gEfiLegacy8259ProtocolGuid AND gEfiGenericMemTestProtocolGuid AND gEfiCpuArchProtocolGuid AND gEfiTimerArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

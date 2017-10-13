@@ -385,6 +385,7 @@
 #string STR_DMPSTORE_LOAD_GEN_FAIL     #language en-US "%H%s%N: Failed to set variable %H%s%N: %r.\r\n"
 #string STR_DMPSTORE_LOAD_BAD_FILE     #language en-US "%H%s%N: Incorrect file format.\r\n"
 #string STR_DMPSTORE_HEADER_LINE       #language en-US "Variable %H%s%N '%H%g%N:%H%s%N' DataSize = 0x%02x\r\n"
+#string STR_DMPSTORE_HEADER_LINE2      #language en-US "Variable %H%s%N '%H%s%N:%H%s%N' DataSize = 0x%02x\r\n"
 #string STR_DMPSTORE_DELETE_LINE       #language en-US "Delete variable '%H%g%N:%H%s%N': %r\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND      #language en-US "%H%s%N: No matching variables found.\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND_SFO  #language en-US "VariableInfo,\"\",\"\",\"\",\"\",\"\"\r\n"

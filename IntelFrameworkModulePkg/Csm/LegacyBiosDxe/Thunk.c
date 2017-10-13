@@ -57,7 +57,8 @@ LegacyBiosInt86 (
   IN  EFI_IA32_REGISTER_SET         *Regs
   )
 {
-  UINT32  *VectorBase;
+  UINT16                Segment;
+  UINT16                Offset;
 
   Regs->X.Flags.Reserved1 = 1;
   Regs->X.Flags.Reserved2 = 0;
@@ -72,12 +73,15 @@ LegacyBiosInt86 (
   // The base address of legacy interrupt vector table is 0.
   // We use this base address to get the legacy interrupt handler.
   //
-  VectorBase              = 0;
+  DisableNullDetection ();
+  Segment               = (UINT16)(((UINT32 *)0)[BiosInt] >> 16);
+  Offset                = (UINT16)((UINT32 *)0)[BiosInt];
+  EnableNullDetection ();
   
   return InternalLegacyBiosFarCall (
            This,
-           (UINT16) ((VectorBase)[BiosInt] >> 16),
-           (UINT16) (VectorBase)[BiosInt],
+           Segment,
+           Offset,
            Regs,
            &Regs->X.Flags,
            sizeof (Regs->X.Flags)
@@ -293,9 +297,15 @@ InternalLegacyBiosFarCall (
       UINTN                 EbdaBaseAddress;
       UINTN                 ReservedEbdaBaseAddress;
 
-      EbdaBaseAddress = (*(UINT16 *) (UINTN) 0x40E) << 4;
-      ReservedEbdaBaseAddress = CONVENTIONAL_MEMORY_TOP - PcdGet32 (PcdEbdaReservedMemorySize);
-      ASSERT (ReservedEbdaBaseAddress <= EbdaBaseAddress);
+      //
+      // Skip this part of debug code if NULL pointer detection is enabled
+      //
+      if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0) {
+        EbdaBaseAddress = (*(UINT16 *) (UINTN) 0x40E) << 4;
+        ReservedEbdaBaseAddress = CONVENTIONAL_MEMORY_TOP
+                                  - PcdGet32 (PcdEbdaReservedMemorySize);
+        ASSERT (ReservedEbdaBaseAddress <= EbdaBaseAddress);
+      }
     }
   );
 
