@@ -311,7 +311,7 @@ def NormPath(Path, Defines={}):
         # To local path format
         #
         Path = os.path.normpath(Path)
-        if Path.startswith(GlobalData.gWorkspace) and not os.path.exists(Path):
+        if Path.startswith(GlobalData.gWorkspace) and not Path.startswith(GlobalData.gBuildDirectory) and not os.path.exists(Path):
             Path = Path[len (GlobalData.gWorkspace):]
             if Path[0] == os.path.sep:
                 Path = Path[1:]

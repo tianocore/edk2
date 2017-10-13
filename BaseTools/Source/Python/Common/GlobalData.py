@@ -56,6 +56,7 @@ gAutoGenPhase = False
 #
 gConfDirectory = ''
 
+gBuildDirectory = ''
 #
 # The relative default database file path
 #

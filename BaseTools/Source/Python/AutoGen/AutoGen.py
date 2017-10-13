@@ -1798,6 +1798,7 @@ class PlatformAutoGen(AutoGen):
                                             self.OutputDir,
                                             self.BuildTarget + "_" + self.ToolChain,
                                             )
+            GlobalData.gBuildDirectory = self._BuildDir
         return self._BuildDir
 
     ## Return directory of platform makefile
