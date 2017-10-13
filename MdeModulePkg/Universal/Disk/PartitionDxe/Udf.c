@@ -14,6 +14,8 @@
 
 #include "Partition.h"
 
+#define MAX_CORRECTION_BLOCKS_NUM 512u
+
 //
 // C5BD4D42-1A76-4996-8956-73CDA326CD0A
 //
@@ -48,61 +50,199 @@ UDF_DEVICE_PATH gUdfDevicePath = {
 /**
   Find the anchor volume descriptor pointer.
 
-  @param[in]  BlockIo             BlockIo interface.
-  @param[in]  DiskIo              DiskIo interface.
-  @param[out] AnchorPoint         Anchor volume descriptor pointer.
+  @param[in]  BlockIo               BlockIo interface.
+  @param[in]  DiskIo                DiskIo interface.
+  @param[out] AnchorPoint           Anchor volume descriptor pointer.
+  @param[out] LastRecordedBlock     Last recorded block.
 
-  @retval EFI_SUCCESS             Anchor volume descriptor pointer found.
-  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
-  @retval other                   Anchor volume descriptor pointer not found.
+  @retval EFI_SUCCESS               Anchor volume descriptor pointer found.
+  @retval EFI_VOLUME_CORRUPTED      The file system structures are corrupted.
+  @retval other                     Anchor volume descriptor pointer not found.
 
 **/
 EFI_STATUS
 FindAnchorVolumeDescriptorPointer (
   IN   EFI_BLOCK_IO_PROTOCOL                 *BlockIo,
   IN   EFI_DISK_IO_PROTOCOL                  *DiskIo,
-  OUT  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPoint
+  OUT  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPoint,
+  OUT  EFI_LBA                               *LastRecordedBlock
   )
 {
-  EFI_STATUS          Status;
-  UINT32              BlockSize;
-  EFI_LBA             EndLBA;
-  EFI_LBA             DescriptorLBAs[4];
-  UINTN               Index;
-  UDF_DESCRIPTOR_TAG  *DescriptorTag;
+  EFI_STATUS                            Status;
+  UINT32                                BlockSize;
+  EFI_LBA                               EndLBA;
+  UDF_DESCRIPTOR_TAG                    *DescriptorTag;
+  UINTN                                 AvdpsCount;
+  UINTN                                 Size;
+  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPoints;
+  INTN                                  Index;
+  UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPointPtr;
+  EFI_LBA                               LastAvdpBlockNum;
 
+  //
+  // UDF 2.60, 2.2.3 Anchor Volume Descriptor Pointer
+  //
+  // An Anchor Volume Descriptor Pointer structure shall be recorded in at
+  // least 2 of the following 3 locations on the media: Logical Sector 256,
+  // N - 256 or N, where N is the last *addressable* sector of a volume.
+  //
+  // To figure out what logical sector N is, the SCSI commands READ CAPACITY and
+  // READ TRACK INFORMATION are used, however many drives or medias report their
+  // "last recorded block" wrongly. Although, READ CAPACITY returns the last
+  // readable data block but there might be unwritten blocks, which are located
+  // outside any track and therefore AVDP will not be found at block N.
+  //
+  // That said, we define a magic number of 512 blocks to be used as correction
+  // when attempting to find AVDP and define last block number.
+  //
   BlockSize = BlockIo->Media->BlockSize;
   EndLBA = BlockIo->Media->LastBlock;
-  DescriptorLBAs[0] = 256;
-  DescriptorLBAs[1] = EndLBA - 256;
-  DescriptorLBAs[2] = EndLBA;
-  DescriptorLBAs[3] = 512;
+  *LastRecordedBlock = EndLBA;
+  AvdpsCount = 0;
 
-  for (Index = 0; Index < ARRAY_SIZE (DescriptorLBAs); Index++) {
-    Status = DiskIo->ReadDisk (
-      DiskIo,
-      BlockIo->Media->MediaId,
-      MultU64x32 (DescriptorLBAs[Index], BlockSize),
-      sizeof (UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER),
-      (VOID *)AnchorPoint
-      );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+  //
+  // Find AVDP at block 256
+  //
+  Status = DiskIo->ReadDisk (
+    DiskIo,
+    BlockIo->Media->MediaId,
+    MultU64x32 (256, BlockSize),
+    sizeof (*AnchorPoint),
+    AnchorPoint
+    );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-    DescriptorTag = &AnchorPoint->DescriptorTag;
+  DescriptorTag = &AnchorPoint->DescriptorTag;
+
+  //
+  // Check if read block is a valid AVDP descriptor
+  //
+  if (DescriptorTag->TagIdentifier == UdfAnchorVolumeDescriptorPointer) {
+    DEBUG ((DEBUG_INFO, "%a: found AVDP at block %d\n", __FUNCTION__, 256));
+    AvdpsCount++;
+  }
+
+  //
+  // Find AVDP at block N - 256
+  //
+  Status = DiskIo->ReadDisk (
+    DiskIo,
+    BlockIo->Media->MediaId,
+    MultU64x32 ((UINT64)EndLBA - 256, BlockSize),
+    sizeof (*AnchorPoint),
+    AnchorPoint
+    );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Check if read block is a valid AVDP descriptor
+  //
+  if (DescriptorTag->TagIdentifier == UdfAnchorVolumeDescriptorPointer &&
+      ++AvdpsCount == 2) {
+    DEBUG ((DEBUG_INFO, "%a: found AVDP at block %Ld\n", __FUNCTION__,
+            EndLBA - 256));
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Check if at least one AVDP was found in previous locations
+  //
+  if (AvdpsCount == 0) {
+    return EFI_VOLUME_CORRUPTED;
+  }
+
+  //
+  // Find AVDP at block N
+  //
+  Status = DiskIo->ReadDisk (
+    DiskIo,
+    BlockIo->Media->MediaId,
+    MultU64x32 ((UINT64)EndLBA, BlockSize),
+    sizeof (*AnchorPoint),
+    AnchorPoint
+    );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Check if read block is a valid AVDP descriptor
+  //
+  if (DescriptorTag->TagIdentifier == UdfAnchorVolumeDescriptorPointer) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // No AVDP found at block N. Possibly drive/media returned bad last recorded
+  // block, or it is part of unwritten data blocks and outside any track.
+  //
+  // Search backwards for an AVDP from block N-1 through
+  // N-MAX_CORRECTION_BLOCKS_NUM. If any AVDP is found, then correct last block
+  // number for the new UDF partition child handle.
+  //
+  Size = MAX_CORRECTION_BLOCKS_NUM * BlockSize;
+
+  AnchorPoints = AllocateZeroPool (Size);
+  if (AnchorPoints == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Read consecutive MAX_CORRECTION_BLOCKS_NUM disk blocks
+  //
+  Status = DiskIo->ReadDisk (
+    DiskIo,
+    BlockIo->Media->MediaId,
+    MultU64x32 ((UINT64)EndLBA - MAX_CORRECTION_BLOCKS_NUM, BlockSize),
+    Size,
+    AnchorPoints
+    );
+  if (EFI_ERROR (Status)) {
+    goto Out_Free;
+  }
+
+  Status = EFI_VOLUME_CORRUPTED;
+
+  //
+  // Search for AVDP from blocks N-1 through N-MAX_CORRECTION_BLOCKS_NUM
+  //
+  for (Index = MAX_CORRECTION_BLOCKS_NUM - 2; Index >= 0; Index--) {
+    AnchorPointPtr = (VOID *)((UINTN)AnchorPoints + Index * BlockSize);
+
+    DescriptorTag = &AnchorPointPtr->DescriptorTag;
 
     //
-    // Check if read LBA has a valid AVDP descriptor.
+    // Check if read block is a valid AVDP descriptor
     //
     if (DescriptorTag->TagIdentifier == UdfAnchorVolumeDescriptorPointer) {
-      return EFI_SUCCESS;
+      //
+      // Calculate last recorded block number
+      //
+      LastAvdpBlockNum = EndLBA - (MAX_CORRECTION_BLOCKS_NUM - Index);
+      DEBUG ((DEBUG_WARN, "%a: found AVDP at block %Ld\n", __FUNCTION__,
+              LastAvdpBlockNum));
+      DEBUG ((DEBUG_WARN, "%a: correcting last block from %Ld to %Ld\n",
+              __FUNCTION__, EndLBA, LastAvdpBlockNum));
+      //
+      // Save read AVDP from last block
+      //
+      CopyMem (AnchorPoint, AnchorPointPtr, sizeof (*AnchorPointPtr));
+      //
+      // Set last recorded block number
+      //
+      *LastRecordedBlock = LastAvdpBlockNum;
+      Status = EFI_SUCCESS;
+      break;
     }
   }
-  //
-  // No AVDP found.
-  //
-  return EFI_VOLUME_CORRUPTED;
+
+Out_Free:
+  FreePool (AnchorPoints);
+  return Status;
 }
 
 /**
@@ -280,16 +420,17 @@ IsLogicalVolumeDescriptorSupported (
   Find UDF logical volume location and whether it is supported by current EDK2
   UDF file system implementation.
 
-  @param[in]  BlockIo             BlockIo interface.
-  @param[in]  DiskIo              DiskIo interface.
-  @param[in]  AnchorPoint         Anchor volume descriptor pointer.
-  @param[out] MainVdsStartBlock   Main VDS starting block number.
-  @param[out] MainVdsEndBlock     Main VDS ending block number.
+  @param[in]  BlockIo               BlockIo interface.
+  @param[in]  DiskIo                DiskIo interface.
+  @param[in]  AnchorPoint           Anchor volume descriptor pointer.
+  @param[in]  LastRecordedBlock     Last recorded block in media.
+  @param[out] MainVdsStartBlock     Main VDS starting block number.
+  @param[out] MainVdsEndBlock       Main VDS ending block number.
 
-  @retval EFI_SUCCESS             UDF logical volume was found.
-  @retval EFI_VOLUME_CORRUPTED    UDF file system structures are corrupted.
-  @retval EFI_UNSUPPORTED         UDF logical volume is not supported.
-  @retval other                   Failed to perform disk I/O.
+  @retval EFI_SUCCESS               UDF logical volume was found.
+  @retval EFI_VOLUME_CORRUPTED      UDF file system structures are corrupted.
+  @retval EFI_UNSUPPORTED           UDF logical volume is not supported.
+  @retval other                     Failed to perform disk I/O.
 
 **/
 EFI_STATUS
@@ -297,13 +438,13 @@ FindLogicalVolumeLocation (
   IN   EFI_BLOCK_IO_PROTOCOL                 *BlockIo,
   IN   EFI_DISK_IO_PROTOCOL                  *DiskIo,
   IN   UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  *AnchorPoint,
+  IN   EFI_LBA                               LastRecordedBlock,
   OUT  UINT64                                *MainVdsStartBlock,
   OUT  UINT64                                *MainVdsEndBlock
   )
 {
   EFI_STATUS                     Status;
   UINT32                         BlockSize;
-  EFI_LBA                        LastBlock;
   UDF_EXTENT_AD                  *ExtentAd;
   UINT64                         SeqBlocksNum;
   UINT64                         SeqStartBlock;
@@ -316,7 +457,6 @@ FindLogicalVolumeLocation (
   UDF_DESCRIPTOR_TAG             *DescriptorTag;
 
   BlockSize = BlockIo->Media->BlockSize;
-  LastBlock = BlockIo->Media->LastBlock;
   ExtentAd = &AnchorPoint->MainVolumeDescriptorSequenceExtent;
 
   //
@@ -328,7 +468,7 @@ FindLogicalVolumeLocation (
   // Also make sure it does not exceed maximum number of blocks in the disk.
   //
   SeqBlocksNum = DivU64x32 ((UINT64)ExtentAd->ExtentLength, BlockSize);
-  if (SeqBlocksNum < 16 || (EFI_LBA)SeqBlocksNum > LastBlock + 1) {
+  if (SeqBlocksNum < 16 || (EFI_LBA)SeqBlocksNum > LastRecordedBlock + 1) {
     return EFI_VOLUME_CORRUPTED;
   }
 
@@ -336,8 +476,8 @@ FindLogicalVolumeLocation (
   // Check for valid Volume Descriptor Sequence starting block number
   //
   SeqStartBlock = (UINT64)ExtentAd->ExtentLocation;
-  if (SeqStartBlock > LastBlock ||
-      SeqStartBlock + SeqBlocksNum - 1 > LastBlock) {
+  if (SeqStartBlock > LastRecordedBlock ||
+      SeqStartBlock + SeqBlocksNum - 1 > LastRecordedBlock) {
     return EFI_VOLUME_CORRUPTED;
   }
 
@@ -437,9 +577,10 @@ FindLogicalVolumeLocation (
     *MainVdsStartBlock = GuardMainVdsStartBlock;
     //
     // We do not need to read either LVD or PD descriptors to know the last
-    // valid block in the found UDF file system. It's already LastBlock.
+    // valid block in the found UDF file system. It's already
+    // LastRecordedBlock.
     //
-    *MainVdsEndBlock = LastBlock;
+    *MainVdsEndBlock = LastRecordedBlock;
 
     Status = EFI_SUCCESS;
   }
@@ -473,8 +614,9 @@ FindUdfFileSystem (
   OUT EFI_LBA               *EndingLBA
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS                            Status;
   UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER  AnchorPoint;
+  EFI_LBA                               LastRecordedBlock;
 
   //
   // Find UDF volume identifiers
@@ -487,7 +629,12 @@ FindUdfFileSystem (
   //
   // Find Anchor Volume Descriptor Pointer
   //
-  Status = FindAnchorVolumeDescriptorPointer (BlockIo, DiskIo, &AnchorPoint);
+  Status = FindAnchorVolumeDescriptorPointer (
+    BlockIo,
+    DiskIo,
+    &AnchorPoint,
+    &LastRecordedBlock
+    );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -499,6 +646,7 @@ FindUdfFileSystem (
     BlockIo,
     DiskIo,
     &AnchorPoint,
+    LastRecordedBlock,
     (UINT64 *)StartingLBA,
     (UINT64 *)EndingLBA
     );
