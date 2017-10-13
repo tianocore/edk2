@@ -43,7 +43,6 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
 //
 PARTITION_DETECT_ROUTINE mPartitionDetectRoutineTable[] = {
   PartitionInstallGptChildHandles,
-  PartitionInstallElToritoChildHandles,
   PartitionInstallMbrChildHandles,
   PartitionInstallUdfChildHandles,
   NULL
@@ -306,9 +305,9 @@ PartitionDriverBindingStart (
   if (BlockIo->Media->MediaPresent ||
       (BlockIo->Media->RemovableMedia && !BlockIo->Media->LogicalPartition)) {
     //
-    // Try for GPT, then El Torito, then UDF, and then legacy MBR partition
-    // types. If the media supports a given partition type install child handles
-    // to represent the partitions described by the media.
+    // Try for GPT, then legacy MBR partition types, and then UDF and El Torito.
+    // If the media supports a given partition type install child handles to
+    // represent the partitions described by the media.
     //
     Routine = &mPartitionDetectRoutineTable[0];
     while (*Routine != NULL) {

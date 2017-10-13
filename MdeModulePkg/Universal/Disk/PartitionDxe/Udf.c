@@ -688,8 +688,10 @@ PartitionInstallUdfChildHandles (
   EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
   EFI_LBA                      StartingLBA;
   EFI_LBA                      EndingLBA;
+  BOOLEAN                      ChildCreated;
 
   Media = BlockIo->Media;
+  ChildCreated = FALSE;
 
   //
   // Check if UDF logical block size is multiple of underlying device block size
@@ -704,11 +706,29 @@ PartitionInstallUdfChildHandles (
   }
 
   //
+  // Detect El Torito feature first.
+  // And always continue to search for UDF.
+  //
+  Status = PartitionInstallElToritoChildHandles (
+             This,
+             Handle,
+             DiskIo,
+             DiskIo2,
+             BlockIo,
+             BlockIo2,
+             DevicePath
+             );
+  if (!EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "PartitionDxe: El Torito standard found on handle 0x%p.\n", Handle));
+    ChildCreated = TRUE;
+  }
+
+  //
   // Search for an UDF file system on block device
   //
   Status = FindUdfFileSystem (BlockIo, DiskIo, &StartingLBA, &EndingLBA);
   if (EFI_ERROR (Status)) {
-    return EFI_NOT_FOUND;
+    return (ChildCreated ? EFI_SUCCESS : EFI_NOT_FOUND);
   }
 
   //
@@ -735,6 +755,9 @@ PartitionInstallUdfChildHandles (
     EndingLBA,
     Media->BlockSize
     );
+  if (EFI_ERROR (Status)) {
+    return (ChildCreated ? EFI_SUCCESS : Status);
+  }
 
-  return Status;
+  return EFI_SUCCESS;
 }
