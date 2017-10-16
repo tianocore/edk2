@@ -1280,6 +1280,12 @@ ExtractConfig(
   )
 {
   EFI_STATUS                              Status;
+  EFI_STRING                              ConfigRequest;
+  EFI_STRING                              ConfigRequestHdr;
+  UINTN                                   BufferSize;
+  UINTN                                   Size;
+  BOOLEAN                                 AllocatedRequest;
+  EFI_HANDLE                              DriverHandle;
 
   //
   // Check for valid parameters
@@ -1294,17 +1300,55 @@ ExtractConfig(
     return EFI_NOT_FOUND;
   }
 
+  AllocatedRequest = FALSE;
+  BufferSize = sizeof (OPAL_HII_CONFIGURATION);
+  ConfigRequest = Request;
+  if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
+    //
+    // Request has no request element, construct full request string.
+    // Allocate and fill a buffer large enough to hold the <ConfigHdr> template
+    // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
+    //
+    DriverHandle = HiiGetDriverImageHandleCB();
+    ConfigRequestHdr = HiiConstructConfigHdr (&gHiiSetupVariableGuid, OpalPasswordStorageName, DriverHandle);
+    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+    AllocatedRequest = TRUE;
+    UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
+    FreePool (ConfigRequestHdr);
+  }
+
   //
   // Convert Buffer Data to <ConfigResp> by helper function BlockToConfig( )
   //
   Status = gHiiConfigRouting->BlockToConfig(
                gHiiConfigRouting,
-               Request,
+               ConfigRequest,
                (UINT8*)&gHiiConfiguration,
                sizeof(OPAL_HII_CONFIGURATION),
                Results,
                Progress
            );
+
+  //
+  // Free the allocated config request string.
+  //
+  if (AllocatedRequest) {
+    FreePool (ConfigRequest);
+    ConfigRequest = NULL;
+  }
+
+  //
+  // Set Progress string to the original request string.
+  //
+  if (Request == NULL) {
+    *Progress = NULL;
+  } else if (StrStr (Request, L"OFFSET") == NULL) {
+    *Progress = Request + StrLen (Request);
+  }
 
   return (Status);
 }
