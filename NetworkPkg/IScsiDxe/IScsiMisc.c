@@ -1994,9 +1994,12 @@ IScsiGetConfigData (
 
           continue;
         }
-      } else if (AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp && !AttemptTmp->ValidPath) {
+      } else if (AttemptTmp->SessionConfigData.InitiatorInfoFromDhcp && 
+                 !AttemptTmp->ValidPath && 
+                 AttemptTmp->NicIndex == mPrivate->CurrentNic) {
         //
-        // Get DHCP information for already added, but failed, attempt.
+        // If the attempt associates with the current NIC, we can 
+        // get DHCP information for already added, but failed, attempt.
         //
         AttemptTmp->DhcpSuccess = FALSE;
         if (!mPrivate->Ipv6Flag && (AttemptTmp->SessionConfigData.IpMode == IP_MODE_IP4)) {
