@@ -1554,7 +1554,7 @@ CalculatePrivAuthVarSignChainSHA256Digest(
 {
   UINT8                   *TbsCert;
   UINTN                   TbsCertSize;
-  UINT8                   CertCommonName[128];
+  CHAR8                   CertCommonName[128];
   UINTN                   CertCommonNameSize;
   BOOLEAN                 CryptoStatus;
   EFI_STATUS              Status;
@@ -1590,7 +1590,11 @@ CalculatePrivAuthVarSignChainSHA256Digest(
   //
   // '\0' is forced in CertCommonName. No overflow issue
   //
-  CryptoStatus = Sha256Update (mHashCtx, CertCommonName, AsciiStrLen((CHAR8 *)CertCommonName));
+  CryptoStatus = Sha256Update (
+                   mHashCtx,
+                   CertCommonName,
+                   AsciiStrLen (CertCommonName)
+                   );
   if (!CryptoStatus) {
     return EFI_ABORTED;
   }
