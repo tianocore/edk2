@@ -466,9 +466,114 @@ IScsiGenRandom (
 
 
 /**
+  Check whether UNDI protocol supports IPv6.
+
+  @param[in]   ControllerHandle    Controller handle.
+  @param[in]   Image               Handle of the image.
+  @param[out]  Ipv6Support         TRUE if UNDI supports IPv6.
+
+  @retval EFI_SUCCESS            Get the result whether UNDI supports IPv6 by NII or AIP protocol successfully.
+  @retval EFI_NOT_FOUND          Don't know whether UNDI supports IPv6 since NII or AIP is not available.
+
+**/
+EFI_STATUS
+IScsiCheckIpv6Support (
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   Image,
+  OUT BOOLEAN                      *Ipv6Support
+  )
+{
+  EFI_HANDLE                       Handle;
+  EFI_ADAPTER_INFORMATION_PROTOCOL *Aip;
+  EFI_STATUS                       Status;
+  EFI_GUID                         *InfoTypesBuffer;
+  UINTN                            InfoTypeBufferCount;
+  UINTN                            TypeIndex;
+  BOOLEAN                          Supported;
+  VOID                             *InfoBlock;
+  UINTN                            InfoBlockSize;
+  
+  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
+
+  ASSERT (Ipv6Support != NULL);
+
+  //
+  // Check whether the UNDI supports IPv6 by NII protocol.
+  //
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+                  (VOID **) &Nii,
+                  Image,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (Status == EFI_SUCCESS) {
+    *Ipv6Support = Nii->Ipv6Supported;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Get the NIC handle by SNP protocol.
+  //  
+  Handle = NetLibGetSnpHandle (ControllerHandle, NULL);
+  if (Handle == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  Aip    = NULL;
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiAdapterInformationProtocolGuid,
+                  (VOID *) &Aip
+                  );
+  if (EFI_ERROR (Status) || Aip == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  InfoTypesBuffer     = NULL;
+  InfoTypeBufferCount = 0;
+  Status = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
+  if (EFI_ERROR (Status) || InfoTypesBuffer == NULL) {
+    FreePool (InfoTypesBuffer);
+    return EFI_NOT_FOUND;
+  }
+
+  Supported = FALSE;
+  for (TypeIndex = 0; TypeIndex < InfoTypeBufferCount; TypeIndex++) {
+    if (CompareGuid (&InfoTypesBuffer[TypeIndex], &gEfiAdapterInfoUndiIpv6SupportGuid)) {
+      Supported = TRUE;
+      break;
+    }
+  }
+
+  FreePool (InfoTypesBuffer);
+  if (!Supported) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // We now have adapter information block.
+  //
+  InfoBlock     = NULL;
+  InfoBlockSize = 0;
+  Status = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
+  if (EFI_ERROR (Status) || InfoBlock == NULL) {
+    FreePool (InfoBlock);
+    return EFI_NOT_FOUND;
+  }  
+
+  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
+  FreePool (InfoBlock);
+  
+  return EFI_SUCCESS;
+}
+
+/**
   Record the NIC info in global structure.
 
   @param[in]  Controller         The handle of the controller.
+  @param[in]  Image              Handle of the image.
 
   @retval EFI_SUCCESS            The operation is completed.
   @retval EFI_OUT_OF_RESOURCES   Do not have sufficient resources to finish this
@@ -477,7 +582,8 @@ IScsiGenRandom (
 **/
 EFI_STATUS
 IScsiAddNic (
-  IN EFI_HANDLE  Controller
+  IN EFI_HANDLE  Controller,
+  IN EFI_HANDLE  Image
   )
 {
   EFI_STATUS                  Status;
@@ -509,6 +615,19 @@ IScsiAddNic (
         CompareMem (&NicInfo->PermanentAddress, MacAddr.Addr, HwAddressSize) == 0 &&
         NicInfo->VlanId == VlanId) {
       mPrivate->CurrentNic = NicInfo->NicIndex;
+	  
+	    //
+      // Set IPv6 available flag.
+      // 
+      Status = IScsiCheckIpv6Support (Controller, Image, &NicInfo->Ipv6Available);
+      if (EFI_ERROR (Status)) {
+        //
+        // Fail to get the data whether UNDI supports IPv6. 
+        // Set default value to TRUE.
+        //
+        NicInfo->Ipv6Available = TRUE;
+      }
+	  
       return EFI_SUCCESS;
     }
 
@@ -530,7 +649,19 @@ IScsiAddNic (
   NicInfo->VlanId         = VlanId;
   NicInfo->NicIndex       = (UINT8) (mPrivate->MaxNic + 1);
   mPrivate->MaxNic        = NicInfo->NicIndex;
-
+  
+  //
+  // Set IPv6 available flag.
+  // 
+  Status = IScsiCheckIpv6Support (Controller, Image, &NicInfo->Ipv6Available);
+  if (EFI_ERROR (Status)) {
+    //
+    // Fail to get the data whether UNDI supports IPv6. 
+    // Set default value to TRUE.
+    //
+    NicInfo->Ipv6Available = TRUE;
+  }
+  
   //
   // Get the PCI location.
   //

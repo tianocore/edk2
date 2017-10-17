@@ -217,6 +217,7 @@ IScsiGenRandom (
   Record the NIC information in a global structure.
 
   @param[in]  Controller         The handle of the controller.
+  @param[in]  Image              Handle of the image.
 
   @retval EFI_SUCCESS            The operation is completed.
   @retval EFI_OUT_OF_RESOURCES   Do not have sufficient resource to finish this
@@ -225,7 +226,8 @@ IScsiGenRandom (
 **/
 EFI_STATUS
 IScsiAddNic (
-  IN EFI_HANDLE  Controller
+  IN EFI_HANDLE  Controller,
+  IN EFI_HANDLE  Image
   );
 
 /**

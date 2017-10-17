@@ -117,6 +117,7 @@
   gEfiAuthenticationInfoProtocolGuid
   ## SOMETIMES_CONSUMES
   gEfiAdapterInformationProtocolGuid
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31 ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
@@ -125,6 +126,7 @@
   gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAdapterInfoNetworkBootGuid                ## SOMETIMES_CONSUMES ## UNDEFINED
+  gEfiAdapterInfoUndiIpv6SupportGuid            ## SOMETIMES_CONSUMES ## GUID
   
   ## SOMETIMES_PRODUCES ## Variable:L"AttemptOrder"
   ## SOMETIMES_CONSUMES ## Variable:L"AttemptOrder"

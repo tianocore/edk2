@@ -81,6 +81,7 @@ typedef struct {
   UINTN           BusNumber;
   UINTN           DeviceNumber;
   UINTN           FunctionNumber;
+  BOOLEAN         Ipv6Available;
 } ISCSI_NIC_INFO;
 
 typedef struct _ISCSI_PRIVATE_PROTOCOL {

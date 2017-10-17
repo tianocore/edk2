@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/IScsiInitiatorName.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/AdapterInformation.h>
+#include <Protocol/NetworkInterfaceIdentifier.h>
 
 #include <Library/HiiLib.h>
 #include <Library/UefiHiiServicesLib.h>

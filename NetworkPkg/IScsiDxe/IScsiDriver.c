@@ -440,7 +440,7 @@ IScsiStart (
   //
   // Record the incoming NIC info.
   //
-  Status = IScsiAddNic (ControllerHandle);
+  Status = IScsiAddNic (ControllerHandle, Image);
   if (EFI_ERROR (Status)) {
     return Status;
   }
