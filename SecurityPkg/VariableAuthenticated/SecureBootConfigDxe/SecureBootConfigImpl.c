@@ -3098,11 +3098,11 @@ DeleteSignatureEx (
     goto ON_EXIT;
   }
 
-  if (PrivateData->VariableName == VARIABLE_DB) {
+  if (PrivateData->VariableName == Variable_DB) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE);
-  } else if (PrivateData->VariableName == VARIABLE_DBX) {
+  } else if (PrivateData->VariableName == Variable_DBX) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE1);
-  } else if (PrivateData->VariableName == VARIABLE_DBT) {
+  } else if (PrivateData->VariableName == Variable_DBT) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE2);
   } else {
     goto ON_EXIT;
@@ -3149,7 +3149,7 @@ DeleteSignatureEx (
 
   RemainingSize = VariableDataSize;
   ListWalker = (EFI_SIGNATURE_LIST *)(VariableData);
-  if (DelType == DELETE_SIGNATURE_LIST_ALL) {
+  if (DelType == Delete_Signature_List_All) {
     VariableDataSize = 0;
   } else {
     while ((RemainingSize > 0) && (RemainingSize >= ListWalker->SignatureListSize) && ListIndex < PrivateData->ListIndex) {
@@ -3161,7 +3161,7 @@ DeleteSignatureEx (
       ListIndex++;
     }
 
-    if (CheckedCount == SIGNATURE_DATA_COUNTS (ListWalker) || DelType == DELETE_SIGNATURE_LIST_ONE) {
+    if (CheckedCount == SIGNATURE_DATA_COUNTS (ListWalker) || DelType == Delete_Signature_List_One) {
       RemainingSize -= ListWalker->SignatureListSize;
       ListWalker = (EFI_SIGNATURE_LIST *)((UINT8 *)ListWalker + ListWalker->SignatureListSize);
     } else {
@@ -3681,13 +3681,13 @@ LoadSignatureList (
     goto ON_EXIT;
   }
 
-  if (PrivateData->VariableName == VARIABLE_DB) {
+  if (PrivateData->VariableName == Variable_DB) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE);
     DstFormId = FORMID_SECURE_BOOT_DB_OPTION_FORM;
-  } else if (PrivateData->VariableName == VARIABLE_DBX) {
+  } else if (PrivateData->VariableName == Variable_DBX) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE1);
     DstFormId = FORMID_SECURE_BOOT_DBX_OPTION_FORM;
-  } else if (PrivateData->VariableName == VARIABLE_DBT) {
+  } else if (PrivateData->VariableName == Variable_DBT) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE2);
     DstFormId = FORMID_SECURE_BOOT_DBT_OPTION_FORM;
   } else {
@@ -4182,11 +4182,11 @@ LoadSignatureData (
     goto ON_EXIT;
   }
 
-  if (PrivateData->VariableName == VARIABLE_DB) {
+  if (PrivateData->VariableName == Variable_DB) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE);
-  } else if (PrivateData->VariableName == VARIABLE_DBX) {
+  } else if (PrivateData->VariableName == Variable_DBX) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE1);
-  } else if (PrivateData->VariableName == VARIABLE_DBT) {
+  } else if (PrivateData->VariableName == Variable_DBT) {
     UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE2);
   } else {
     goto ON_EXIT;
@@ -4584,7 +4584,7 @@ SecureBootCallback (
     // From DBX option to the level-1 form, display signature list.
     //
     case KEY_VALUE_FROM_DBX_TO_LIST_FORM:
-      Private->VariableName = VARIABLE_DBX;
+      Private->VariableName = Variable_DBX;
       LoadSignatureList (
         Private,
         LABEL_SIGNATURE_LIST_START,
@@ -4606,7 +4606,7 @@ SecureBootCallback (
       );
 
       if (Key.UnicodeChar == L'Y' || Key.UnicodeChar == L'y') {
-        DeleteSignatureEx (Private, DELETE_SIGNATURE_LIST_ALL, IfrNvData->CheckedDataCount);
+        DeleteSignatureEx (Private, Delete_Signature_List_All, IfrNvData->CheckedDataCount);
       }
 
       LoadSignatureList (
@@ -4630,7 +4630,7 @@ SecureBootCallback (
       );
 
       if (Key.UnicodeChar == L'Y' || Key.UnicodeChar == L'y') {
-        DeleteSignatureEx (Private, DELETE_SIGNATURE_LIST_ONE, IfrNvData->CheckedDataCount);
+        DeleteSignatureEx (Private, Delete_Signature_List_One, IfrNvData->CheckedDataCount);
       }
 
       LoadSignatureList (
@@ -4654,7 +4654,7 @@ SecureBootCallback (
       );
 
       if (Key.UnicodeChar == L'Y' || Key.UnicodeChar == L'y') {
-        DeleteSignatureEx (Private, DELETE_SIGNATURE_DATA, IfrNvData->CheckedDataCount);
+        DeleteSignatureEx (Private, Delete_Signature_Data, IfrNvData->CheckedDataCount);
       }
 
       LoadSignatureList (
