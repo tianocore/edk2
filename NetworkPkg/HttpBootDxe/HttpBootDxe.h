@@ -58,6 +58,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Ip4Config2.h>
 #include <Protocol/Ip6Config.h>
 #include <Protocol/RamDisk.h>
+#include <Protocol/AdapterInformation.h>
+
 //
 // Produced Protocols
 //

@@ -86,7 +86,8 @@
   gEfiRamDiskProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiHiiConfigAccessProtocolGuid                 ## BY_START
   gEfiHttpBootCallbackProtocolGuid                ## SOMETIMES_PRODUCES
-  
+  gEfiAdapterInformationProtocolGuid              ## SOMETIMES_CONSUMES
+
 [Guids]
   ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   mHttpBootConfigStorageName
   ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr mHttpBootConfigStorageName
@@ -95,6 +96,7 @@
   gHttpBootConfigGuid
   gEfiVirtualCdGuid            ## SOMETIMES_CONSUMES ## GUID
   gEfiVirtualDiskGuid          ## SOMETIMES_CONSUMES ## GUID
+  gEfiAdapterInfoUndiIpv6SupportGuid             ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES  

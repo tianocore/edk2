@@ -1,7 +1,7 @@
 /** @file
   Driver Binding functions implementation for UEFI HTTP boot.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -35,6 +35,100 @@ EFI_DRIVER_BINDING_PROTOCOL gHttpBootIp6DxeDriverBinding = {
   NULL
 };
 
+
+
+/**
+  Check whether UNDI protocol supports IPv6.
+
+  @param[in]   Private           Pointer to HTTP_BOOT_PRIVATE_DATA.
+  @param[out]  Ipv6Support       TRUE if UNDI supports IPv6.
+
+  @retval EFI_SUCCESS            Get the result whether UNDI supports IPv6 by NII or AIP protocol successfully.
+  @retval EFI_NOT_FOUND          Don't know whether UNDI supports IPv6 since NII or AIP is not available.
+
+**/
+EFI_STATUS
+HttpBootCheckIpv6Support (
+  IN  HTTP_BOOT_PRIVATE_DATA       *Private,
+  OUT BOOLEAN                      *Ipv6Support
+  )
+{
+  EFI_HANDLE                       Handle;
+  EFI_ADAPTER_INFORMATION_PROTOCOL *Aip;
+  EFI_STATUS                       Status;
+  EFI_GUID                         *InfoTypesBuffer;
+  UINTN                            InfoTypeBufferCount;
+  UINTN                            TypeIndex;
+  BOOLEAN                          Supported;
+  VOID                             *InfoBlock;
+  UINTN                            InfoBlockSize;
+
+  ASSERT (Private != NULL && Ipv6Support != NULL);
+
+  //
+  // Check whether the UNDI supports IPv6 by NII protocol.
+  //
+  if (Private->Nii != NULL) {
+    *Ipv6Support = Private->Nii->Ipv6Supported;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Get the NIC handle by SNP protocol.
+  //  
+  Handle = NetLibGetSnpHandle (Private->Controller, NULL);
+  if (Handle == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  Aip    = NULL;
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiAdapterInformationProtocolGuid,
+                  (VOID *) &Aip
+                  );
+  if (EFI_ERROR (Status) || Aip == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  InfoTypesBuffer     = NULL;
+  InfoTypeBufferCount = 0;
+  Status = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
+  if (EFI_ERROR (Status) || InfoTypesBuffer == NULL) {
+    FreePool (InfoTypesBuffer);
+    return EFI_NOT_FOUND;
+  }
+
+  Supported = FALSE;
+  for (TypeIndex = 0; TypeIndex < InfoTypeBufferCount; TypeIndex++) {
+    if (CompareGuid (&InfoTypesBuffer[TypeIndex], &gEfiAdapterInfoUndiIpv6SupportGuid)) {
+      Supported = TRUE;
+      break;
+    }
+  }
+
+  FreePool (InfoTypesBuffer);
+  if (!Supported) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // We now have adapter information block.
+  //
+  InfoBlock     = NULL;
+  InfoBlockSize = 0;
+  Status = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
+  if (EFI_ERROR (Status) || InfoBlock == NULL) {
+    FreePool (InfoBlock);
+    return EFI_NOT_FOUND;
+  }  
+
+  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
+  FreePool (InfoBlock);
+  
+  return EFI_SUCCESS;
+}
+
 /**
   Destroy the HTTP child based on IPv4 stack.
 
@@ -67,7 +161,7 @@ HttpBootDestroyIp4Children (
       );
   }
 
-  if (Private->HttpCreated) {
+  if (Private->Ip6Nic == NULL && Private->HttpCreated) {
     HttpIoDestroyIo (&Private->HttpIo);
     Private->HttpCreated = FALSE;
   }
@@ -143,7 +237,7 @@ HttpBootDestroyIp6Children (
       );
   }
 
-  if (Private->HttpCreated) {
+  if (Private->Ip4Nic == NULL && Private->HttpCreated) {
     HttpIoDestroyIo(&Private->HttpIo);
     Private->HttpCreated = FALSE;
   }
@@ -310,6 +404,9 @@ HttpBootIp4DxeDriverBindingStart (
   EFI_DEV_PATH               *Node;
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
   UINT32                     *Id;
+  BOOLEAN                    FirstStart;
+
+  FirstStart = FALSE;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -323,6 +420,8 @@ HttpBootIp4DxeDriverBindingStart (
   if (!EFI_ERROR (Status)) {
     Private = HTTP_BOOT_PRIVATE_DATA_FROM_ID(Id);
   } else {
+    FirstStart = TRUE;
+  
     //
     // Initialize the private data structure.
     //
@@ -396,7 +495,8 @@ HttpBootIp4DxeDriverBindingStart (
   
   Private->Ip4Nic = AllocateZeroPool (sizeof (HTTP_BOOT_VIRTUAL_NIC));
   if (Private->Ip4Nic == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
   Private->Ip4Nic->Private     = Private;
   Private->Ip4Nic->ImageHandle = This->DriverBindingHandle;
@@ -513,13 +613,22 @@ HttpBootIp4DxeDriverBindingStart (
   }
   
   return EFI_SUCCESS;
-
     
 ON_ERROR:
-
+  if (FirstStart) {
+    gBS->UninstallProtocolInterface (
+           ControllerHandle,
+           &gEfiCallerIdGuid,
+           &Private->Id
+           );
+  }
+  
   HttpBootDestroyIp4Children (This, Private);
   HttpBootConfigFormUnload (Private);
-  FreePool (Private);
+
+  if (FirstStart && Private != NULL) {
+    FreePool (Private);
+  }
 
   return Status;
 }
@@ -782,6 +891,10 @@ HttpBootIp6DxeDriverBindingStart (
   EFI_DEV_PATH               *Node;
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
   UINT32                     *Id;
+  BOOLEAN                    Ipv6Available;
+  BOOLEAN                    FirstStart;
+
+  FirstStart = FALSE;
   
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -795,6 +908,8 @@ HttpBootIp6DxeDriverBindingStart (
   if (!EFI_ERROR (Status)) {
     Private = HTTP_BOOT_PRIVATE_DATA_FROM_ID(Id);
   } else {
+    FirstStart = TRUE;
+    
     //
     // Initialize the private data structure.
     //
@@ -858,6 +973,23 @@ HttpBootIp6DxeDriverBindingStart (
     }
       
   }
+
+  //
+  // Set IPv6 available flag.
+  // 
+  Status = HttpBootCheckIpv6Support (Private, &Ipv6Available);
+  if (EFI_ERROR (Status)) {
+    //
+    // Fail to get the data whether UNDI supports IPv6. 
+    // Set default value to TRUE.
+    //
+    Ipv6Available = TRUE;
+  }
+
+  if (!Ipv6Available) {
+    Status = EFI_UNSUPPORTED;
+    goto ON_ERROR;
+  }
   
   if (Private->Ip6Nic != NULL) {
     //
@@ -868,7 +1000,8 @@ HttpBootIp6DxeDriverBindingStart (
   
   Private->Ip6Nic = AllocateZeroPool (sizeof (HTTP_BOOT_VIRTUAL_NIC));
   if (Private->Ip6Nic == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
   Private->Ip6Nic->Private     = Private;
   Private->Ip6Nic->ImageHandle = This->DriverBindingHandle;
@@ -1011,10 +1144,20 @@ HttpBootIp6DxeDriverBindingStart (
   return EFI_SUCCESS;
    
 ON_ERROR:
+  if (FirstStart) {
+    gBS->UninstallProtocolInterface (
+           ControllerHandle,
+           &gEfiCallerIdGuid,
+           &Private->Id
+           );
+  }
 
   HttpBootDestroyIp6Children(This, Private);
   HttpBootConfigFormUnload (Private);
-  FreePool (Private);
+
+  if (FirstStart && Private != NULL) {
+    FreePool (Private);
+  }
 
   return Status;
 }
