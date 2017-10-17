@@ -2776,6 +2776,7 @@ MtrrDebugPrintAllMtrrsWorker (
     UINTN             RangeCount;
     UINT64            MtrrValidBitsMask;
     UINT64            MtrrValidAddressMask;
+    UINT32            VariableMtrrCount;
     MTRR_MEMORY_RANGE Ranges[
       ARRAY_SIZE (mMtrrLibFixedMtrrTable) * sizeof (UINT64) + 2 * ARRAY_SIZE (Mtrrs->Variables.Mtrr) + 1
       ];
@@ -2784,6 +2785,8 @@ MtrrDebugPrintAllMtrrsWorker (
     if (!IsMtrrSupported ()) {
       return;
     }
+
+    VariableMtrrCount = GetVariableMtrrCountWorker ();
 
     if (MtrrSetting != NULL) {
       Mtrrs = MtrrSetting;
@@ -2802,7 +2805,7 @@ MtrrDebugPrintAllMtrrsWorker (
       DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, Mtrrs->Fixed.Mtrr[Index]));
     }
 
-    for (Index = 0; Index < ARRAY_SIZE (Mtrrs->Variables.Mtrr); Index++) {
+    for (Index = 0; Index < VariableMtrrCount; Index++) {
       if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *)&Mtrrs->Variables.Mtrr[Index].Mask)->Bits.V == 0) {
         //
         // If mask is not valid, then do not display range
@@ -2829,11 +2832,11 @@ MtrrDebugPrintAllMtrrsWorker (
     RangeCount = 1;
 
     MtrrLibGetRawVariableRanges (
-      &Mtrrs->Variables, ARRAY_SIZE (Mtrrs->Variables.Mtrr),
+      &Mtrrs->Variables, VariableMtrrCount,
       MtrrValidBitsMask, MtrrValidAddressMask, RawVariableRanges
       );
     MtrrLibApplyVariableMtrrs (
-      RawVariableRanges, ARRAY_SIZE (RawVariableRanges),
+      RawVariableRanges, VariableMtrrCount,
       Ranges, ARRAY_SIZE (Ranges), &RangeCount
       );
 
