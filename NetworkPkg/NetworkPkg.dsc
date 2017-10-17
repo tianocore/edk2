@@ -116,7 +116,6 @@
   NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
   NetworkPkg/HttpBootDxe/HttpBootDxe.inf
 
-  NetworkPkg/Application/IfConfig6/IfConfig6.inf
   NetworkPkg/Application/IpsecConfig/IpSecConfig.inf
   NetworkPkg/Application/VConfig/VConfig.inf
 
@@ -126,8 +125,6 @@
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
   NetworkPkg/TlsDxe/TlsDxe.inf
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
-  
-  NetworkPkg/Application/Ping6/Ping6.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
