@@ -3073,7 +3073,7 @@ DeleteSignatureEx (
   EFI_SIGNATURE_LIST  *ListWalker;
   EFI_SIGNATURE_LIST  *NewCertList;
   EFI_SIGNATURE_DATA  *DataWalker;
-  CHAR16              *VariableName;
+  CHAR16              VariableName[BUFFER_MAX_SIZE];
   UINT32              VariableAttr;
   UINTN               VariableDataSize;
   UINTN               RemainingSize;
@@ -3084,7 +3084,6 @@ DeleteSignatureEx (
   UINT8               *NewVariableData;
 
   Status              = EFI_SUCCESS;
-  VariableName        = NULL;
   VariableAttr        = 0;
   VariableDataSize    = 0;
   ListIndex           = 0;
@@ -3092,18 +3091,12 @@ DeleteSignatureEx (
   VariableData        = NULL;
   NewVariableData     = NULL;
 
-  VariableName = AllocateZeroPool (100);
-  if (VariableName == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
   if (PrivateData->VariableName == Variable_DB) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE);
   } else if (PrivateData->VariableName == Variable_DBX) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE1);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE1);
   } else if (PrivateData->VariableName == Variable_DBT) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE2);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE2);
   } else {
     goto ON_EXIT;
   }
@@ -3222,7 +3215,6 @@ DeleteSignatureEx (
   }
 
 ON_EXIT:
-  SECUREBOOT_FREE_NON_NULL (VariableName);
   SECUREBOOT_FREE_NON_NULL (VariableData);
   SECUREBOOT_FREE_NON_NULL (NewVariableData);
 
@@ -3594,9 +3586,9 @@ LoadSignatureList (
   UINTN                 RemainingSize;
   UINT16                Index;
   UINT8                 *VariableData;
-  CHAR16                *VariableName;
-  CHAR16                *NameBuffer;
-  CHAR16                *HelpBuffer;
+  CHAR16                VariableName[BUFFER_MAX_SIZE];
+  CHAR16                NameBuffer[BUFFER_MAX_SIZE];
+  CHAR16                HelpBuffer[BUFFER_MAX_SIZE];
 
   Status                = EFI_SUCCESS;
   StartOpCodeHandle     = NULL;
@@ -3605,9 +3597,6 @@ LoadSignatureList (
   EndGotoHandle         = NULL;
   Index                 = 0;
   VariableData          = NULL;
-  VariableName          = NULL;
-  NameBuffer            = NULL;
-  HelpBuffer            = NULL;
 
   //
   // Initialize the container for dynamic opcodes.
@@ -3675,20 +3664,14 @@ LoadSignatureList (
   EndGoto->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
   EndGoto->Number = LABEL_END;
 
-  VariableName = AllocateZeroPool (100);
-  if (VariableName == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
   if (PrivateData->VariableName == Variable_DB) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE);
     DstFormId = FORMID_SECURE_BOOT_DB_OPTION_FORM;
   } else if (PrivateData->VariableName == Variable_DBX) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE1);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE1);
     DstFormId = FORMID_SECURE_BOOT_DBX_OPTION_FORM;
   } else if (PrivateData->VariableName == Variable_DBT) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE2);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE2);
     DstFormId = FORMID_SECURE_BOOT_DBT_OPTION_FORM;
   } else {
     goto ON_EXIT;
@@ -3722,18 +3705,6 @@ LoadSignatureList (
     goto ON_EXIT;
   }
 
-  NameBuffer = AllocateZeroPool (100);
-  if (NameBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
-  HelpBuffer = AllocateZeroPool (100);
-  if (HelpBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
   RemainingSize = DataSize;
   ListWalker    = (EFI_SIGNATURE_LIST *)VariableData;
   while ((RemainingSize > 0) && (RemainingSize >= ListWalker->SignatureListSize)) {
@@ -3755,13 +3726,16 @@ LoadSignatureList (
       ListType = STRING_TOKEN (STR_LIST_TYPE_UNKNOWN);
     }
 
+    ZeroMem (NameBuffer, sizeof (NameBuffer));
     UnicodeSPrint (NameBuffer,
-      100,
+      sizeof (NameBuffer),
       HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_LIST_NAME_FORMAT), NULL),
       Index + 1
     );
+
+    ZeroMem (HelpBuffer, sizeof (HelpBuffer));
     UnicodeSPrint (HelpBuffer,
-      100,
+      sizeof (HelpBuffer),
       HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_LIST_HELP_FORMAT), NULL),
       HiiGetString (PrivateData->HiiHandle, ListType, NULL),
       SIGNATURE_DATA_COUNTS (ListWalker)
@@ -3775,9 +3749,6 @@ LoadSignatureList (
       EFI_IFR_FLAG_CALLBACK,
       QuestionIdBase + Index++
     );
-
-    ZeroMem (NameBuffer, 100);
-    ZeroMem (HelpBuffer, 100);
 
     RemainingSize -= ListWalker->SignatureListSize;
     ListWalker = (EFI_SIGNATURE_LIST *)((UINT8 *)ListWalker + ListWalker->SignatureListSize);
@@ -3805,10 +3776,7 @@ ON_EXIT:
   SECUREBOOT_FREE_NON_OPCODE (StartGotoHandle);
   SECUREBOOT_FREE_NON_OPCODE (EndGotoHandle);
 
-  SECUREBOOT_FREE_NON_NULL (VariableName);
   SECUREBOOT_FREE_NON_NULL (VariableData);
-  SECUREBOOT_FREE_NON_NULL (NameBuffer);
-  SECUREBOOT_FREE_NON_NULL (HelpBuffer);
 
   PrivateData->ListCount = Index;
 
@@ -3957,18 +3925,16 @@ FormatHelpInfo (
   UINTN           DataSize;
   UINTN           HelpInfoIndex;
   UINTN           TotalSize;
-  CHAR16          *GuidString;
+  CHAR16          GuidString[BUFFER_MAX_SIZE];
+  CHAR16          TimeString[BUFFER_MAX_SIZE];
   CHAR16          *DataString;
-  CHAR16          *TimeString;
   CHAR16          *HelpInfoString;
   BOOLEAN         IsCert;
 
   Status          = EFI_SUCCESS;
   Time            = NULL;
   HelpInfoIndex   = 0;
-  GuidString      = NULL;
   DataString      = NULL;
-  TimeString      = NULL;
   HelpInfoString  = NULL;
   IsCert          = FALSE;
 
@@ -4003,12 +3969,6 @@ FormatHelpInfo (
     goto ON_EXIT;
   }
 
-  GuidString = AllocateZeroPool (100);
-  if (GuidString == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
   TotalSize = 1024;
   HelpInfoString = AllocateZeroPool (TotalSize);
   if (HelpInfoString == NULL) {
@@ -4019,7 +3979,8 @@ FormatHelpInfo (
   //
   // Format GUID part.
   //
-  GuidToString(&DataEntry->SignatureOwner, GuidString, 100);
+  ZeroMem (GuidString, sizeof (GuidString));
+  GuidToString(&DataEntry->SignatureOwner, GuidString, BUFFER_MAX_SIZE);
   HelpInfoIndex += UnicodeSPrint (
                      &HelpInfoString[HelpInfoIndex],
                      TotalSize - sizeof(CHAR16) * HelpInfoIndex,
@@ -4059,15 +4020,10 @@ FormatHelpInfo (
   // Format revocation time part.
   //
   if (Time != NULL) {
-    TimeString = AllocateZeroPool(100);
-    if (TimeString == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto ON_EXIT;
-    }
-
+    ZeroMem (TimeString, sizeof (TimeString));
     UnicodeSPrint (
       TimeString,
-      100,
+      sizeof (TimeString),
       L"%d-%d-%d %d:%d:%d",
       Time->Year,
       Time->Month,
@@ -4086,11 +4042,8 @@ FormatHelpInfo (
   }
 
   *StringId = HiiSetString (PrivateData->HiiHandle, 0, HelpInfoString, NULL);
-
 ON_EXIT:
-  SECUREBOOT_FREE_NON_NULL (GuidString);
   SECUREBOOT_FREE_NON_NULL (DataString);
-  SECUREBOOT_FREE_NON_NULL (TimeString);
   SECUREBOOT_FREE_NON_NULL (HelpInfoString);
 
   return Status;
@@ -4129,16 +4082,14 @@ LoadSignatureData (
   UINTN                 RemainingSize;
   UINT16                Index;
   UINT8                 *VariableData;
-  CHAR16                *VariableName;
-  CHAR16                *NameBuffer;
+  CHAR16                VariableName[BUFFER_MAX_SIZE];
+  CHAR16                NameBuffer[BUFFER_MAX_SIZE];
 
   Status              = EFI_SUCCESS;
   StartOpCodeHandle   = NULL;
   EndOpCodeHandle     = NULL;
   Index               = 0;
   VariableData        = NULL;
-  VariableName        = NULL;
-  NameBuffer          = NULL;
 
   //
   // Initialize the container for dynamic opcodes.
@@ -4176,18 +4127,12 @@ LoadSignatureData (
   EndLabel->ExtendOpCode  = EFI_IFR_EXTEND_OP_LABEL;
   EndLabel->Number        = LABEL_END;
 
-  VariableName = AllocateZeroPool (100);
-  if (VariableName == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
   if (PrivateData->VariableName == Variable_DB) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE);
   } else if (PrivateData->VariableName == Variable_DBX) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE1);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE1);
   } else if (PrivateData->VariableName == Variable_DBT) {
-    UnicodeSPrint (VariableName, 100, EFI_IMAGE_SECURITY_DATABASE2);
+    UnicodeSPrint (VariableName, sizeof (VariableName), EFI_IMAGE_SECURITY_DATABASE2);
   } else {
     goto ON_EXIT;
   }
@@ -4211,12 +4156,6 @@ LoadSignatureData (
     goto ON_EXIT;
   }
 
-  NameBuffer = AllocateZeroPool (100);
-  if (NameBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
   RemainingSize = DataSize;
   ListWalker = (EFI_SIGNATURE_LIST *)VariableData;
 
@@ -4233,8 +4172,9 @@ LoadSignatureData (
     //
     // Format name buffer.
     //
+    ZeroMem (NameBuffer, sizeof (NameBuffer));
     UnicodeSPrint (NameBuffer,
-      100,
+      sizeof (NameBuffer),
       HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_NAME_FORMAT), NULL),
       Index + 1
     );
@@ -4268,7 +4208,6 @@ LoadSignatureData (
   // This memory buffer will be freed when exit from the SECUREBOOT_DELETE_SIGNATURE_DATA_FORM form.
   //
   PrivateData->CheckArray = AllocateZeroPool (SIGNATURE_DATA_COUNTS (ListWalker) * sizeof (BOOLEAN));
-
 ON_EXIT:
   HiiUpdateForm (
     PrivateData->HiiHandle,
@@ -4281,9 +4220,7 @@ ON_EXIT:
   SECUREBOOT_FREE_NON_OPCODE (StartOpCodeHandle);
   SECUREBOOT_FREE_NON_OPCODE (EndOpCodeHandle);
 
-  SECUREBOOT_FREE_NON_NULL (VariableName);
   SECUREBOOT_FREE_NON_NULL (VariableData);
-  SECUREBOOT_FREE_NON_NULL (NameBuffer);
 
   return Status;
 }

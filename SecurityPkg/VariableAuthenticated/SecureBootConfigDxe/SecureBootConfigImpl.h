@@ -67,7 +67,7 @@ extern  EFI_IFR_GUID_LABEL         *mEndLabel;
 
 #define MAX_CHAR              480
 #define TWO_BYTE_ENCODE       0x82
-
+#define BUFFER_MAX_SIZE       100
 
 //
 // SHA-256 digest size in bytes
