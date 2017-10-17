@@ -547,10 +547,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
 !endif
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
-!endif
-
 
 ################################################################################
 #
