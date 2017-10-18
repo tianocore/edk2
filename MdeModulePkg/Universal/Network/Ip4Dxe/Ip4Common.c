@@ -287,10 +287,6 @@ Ip4StationAddressValid (
   IN IP4_ADDR               Netmask
   )
 {
-  IP4_ADDR                  NetBrdcastMask;
-  INTN                      Len;
-  INTN                      Type;
-
   //
   // Only support the station address with 0.0.0.0/0 to enable DHCP client.
   //
@@ -301,29 +297,16 @@ Ip4StationAddressValid (
   //
   // Only support the continuous net masks
   //
-  if ((Len = NetGetMaskLength (Netmask)) == (IP4_MASK_MAX + 1)) {
+  if (NetGetMaskLength (Netmask) == (IP4_MASK_MAX + 1)) {
     return FALSE;
   }
 
   //
   // Station address can't be class D or class E address
   //
-  if ((Type = NetGetIpClass (Ip)) > IP4_ADDR_CLASSC) {
+  if (NetGetIpClass (Ip) > IP4_ADDR_CLASSC) {
     return FALSE;
   }
 
-  //
-  // Station address can't be subnet broadcast/net broadcast address
-  //
-  if ((Ip == (Ip & Netmask)) || (Ip == (Ip | ~Netmask))) {
-    return FALSE;
-  }
-
-  NetBrdcastMask = gIp4AllMasks[MIN (Len, Type << 3)];
-
-  if (Ip == (Ip | ~NetBrdcastMask)) {
-    return FALSE;
-  }
-
-  return TRUE;
+  return NetIp4IsUnicast (Ip, Netmask);
 }

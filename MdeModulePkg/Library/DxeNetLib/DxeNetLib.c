@@ -637,7 +637,9 @@ NetGetIpClass (
 
   ASSERT if NetMask is zero.
   
-  If all bits of the host address of IP are 0 or 1, IP is also not a valid unicast address.
+  If all bits of the host address of IP are 0 or 1, IP is also not a valid unicast address,
+  except when the originator is one of the endpoints of a point-to-point link with a 31-bit
+  mask (RFC3021).
 
   @param[in]  Ip                    The IP to check against.
   @param[in]  NetMask               The mask of the IP.
@@ -657,9 +659,13 @@ NetIp4IsUnicast (
   if (Ip == 0 || IP4_IS_LOCAL_BROADCAST (Ip)) {
     return FALSE;
   }
-  
-  if (((Ip &~NetMask) == ~NetMask) || ((Ip &~NetMask) == 0)) {
-    return FALSE;
+
+  if (NetGetMaskLength (NetMask) != 31) {
+    if (((Ip &~NetMask) == ~NetMask) || ((Ip &~NetMask) == 0)) {
+      return FALSE;
+    }
+  } else {
+    return TRUE;
   }
 
   return TRUE;
