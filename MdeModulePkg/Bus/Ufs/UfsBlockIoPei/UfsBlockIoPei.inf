@@ -1,7 +1,7 @@
 ## @file
 # Description file for the Universal Flash Storage (UFS) Peim driver.
 #
-# Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -36,6 +36,7 @@
   UfsHci.h
   UfsHcMem.c
   UfsHcMem.h
+  DmaMem.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,6 +54,8 @@
   gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
   gEfiPeiVirtualBlockIo2PpiGuid                 ## PRODUCES
   gEdkiiPeiUfsHostControllerPpiGuid             ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEdkiiPeiUfsHostControllerPpiGuid

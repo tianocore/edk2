@@ -107,13 +107,20 @@ UFS_PEIM_HC_PRIVATE_DATA   gUfsHcPeimTemplate = {
       0
     }
   },
+  {                               // EndOfPeiNotifyList
+    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiEndOfPeiSignalPpiGuid,
+    UfsEndOfPei
+  },
   0,                              // UfsHcBase
   0,                              // Capabilities
   0,                              // TaskTag
   0,                              // UtpTrlBase
   0,                              // Nutrs
+  NULL,                           // TrlMapping
   0,                              // UtpTmrlBase
   0,                              // Nutmrs
+  NULL,                           // TmrlMapping
   {                               // Luns
     {
       UFS_LUN_0,                      // Ufs Common Lun 0
@@ -1062,6 +1069,54 @@ UfsBlockIoPeimReadBlocks2 (
 }
 
 /**
+  One notified function to cleanup the allocated DMA buffers at the end of PEI.
+
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
+
+  @retval     EFI_SUCCESS  The function completes successfully
+
+**/
+EFI_STATUS
+EFIAPI
+UfsEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  UFS_PEIM_HC_PRIVATE_DATA    *Private;
+
+  Private = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
+
+  if ((Private->Pool != NULL) && (Private->Pool->Head != NULL)) {
+    UfsPeimFreeMemPool (Private->Pool);
+  }
+
+  if (Private->UtpTmrlBase != NULL) {
+    IoMmuFreeBuffer (
+      EFI_SIZE_TO_PAGES (Private->Nutmrs * sizeof (UTP_TMRD)),
+      Private->UtpTmrlBase,
+      Private->TmrlMapping
+      );
+  }
+
+  if (Private->UtpTrlBase != NULL) {
+    IoMmuFreeBuffer (
+      EFI_SIZE_TO_PAGES (Private->Nutrs * sizeof (UTP_TRD)),
+      Private->UtpTrlBase,
+      Private->TrlMapping
+      );
+  }
+
+  UfsControllerStop (Private);
+
+  return EFI_SUCCESS;
+}
+
+/**
   The user code starts with this function.
   
   @param  FileHandle             Handle of the file being invoked.
@@ -1105,6 +1160,8 @@ InitializeUfsBlockIoPeim (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
+
+  IoMmuInit ();
 
   Controller = 0;
   MmioBase   = 0;
@@ -1185,7 +1242,8 @@ InitializeUfsBlockIoPeim (
       }
     }
     
-    Status = PeiServicesInstallPpi (&Private->BlkIoPpiList);
+    PeiServicesInstallPpi (&Private->BlkIoPpiList);
+    PeiServicesNotifyPpi (&Private->EndOfPeiNotifyList);
     Controller++;
   }
 
