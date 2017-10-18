@@ -3572,6 +3572,9 @@ LoadSignatureList (
 {
   EFI_STATUS            Status;
   EFI_STRING_ID         ListType;
+  EFI_STRING            FormatNameString;
+  EFI_STRING            FormatHelpString;
+  EFI_STRING            FormatTypeString;
   EFI_SIGNATURE_LIST    *ListWalker;
   EFI_IFR_GUID_LABEL    *StartLabel;
   EFI_IFR_GUID_LABEL    *EndLabel;
@@ -3591,6 +3594,8 @@ LoadSignatureList (
   CHAR16                HelpBuffer[BUFFER_MAX_SIZE];
 
   Status                = EFI_SUCCESS;
+  FormatNameString      = NULL;
+  FormatHelpString      = NULL;
   StartOpCodeHandle     = NULL;
   EndOpCodeHandle       = NULL;
   StartGotoHandle       = NULL;
@@ -3705,6 +3710,12 @@ LoadSignatureList (
     goto ON_EXIT;
   }
 
+  FormatNameString = HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_LIST_NAME_FORMAT), NULL);
+  FormatHelpString = HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_LIST_HELP_FORMAT), NULL);
+  if (FormatNameString == NULL || FormatHelpString == NULL) {
+    goto ON_EXIT;
+  }
+
   RemainingSize = DataSize;
   ListWalker    = (EFI_SIGNATURE_LIST *)VariableData;
   while ((RemainingSize > 0) && (RemainingSize >= ListWalker->SignatureListSize)) {
@@ -3725,21 +3736,23 @@ LoadSignatureList (
     } else {
       ListType = STRING_TOKEN (STR_LIST_TYPE_UNKNOWN);
     }
+    FormatTypeString = HiiGetString (PrivateData->HiiHandle, ListType, NULL);
+    if (FormatTypeString == NULL) {
+      goto ON_EXIT;
+    }
 
     ZeroMem (NameBuffer, sizeof (NameBuffer));
-    UnicodeSPrint (NameBuffer,
-      sizeof (NameBuffer),
-      HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_LIST_NAME_FORMAT), NULL),
-      Index + 1
-    );
+    UnicodeSPrint (NameBuffer, sizeof (NameBuffer), FormatNameString, Index + 1);
 
     ZeroMem (HelpBuffer, sizeof (HelpBuffer));
     UnicodeSPrint (HelpBuffer,
       sizeof (HelpBuffer),
-      HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_LIST_HELP_FORMAT), NULL),
-      HiiGetString (PrivateData->HiiHandle, ListType, NULL),
+      FormatHelpString,
+      FormatTypeString,
       SIGNATURE_DATA_COUNTS (ListWalker)
     );
+    SECUREBOOT_FREE_NON_NULL (FormatTypeString);
+    FormatTypeString = NULL;
 
     HiiCreateGotoOpCode (
       StartOpCodeHandle,
@@ -3777,6 +3790,8 @@ ON_EXIT:
   SECUREBOOT_FREE_NON_OPCODE (EndGotoHandle);
 
   SECUREBOOT_FREE_NON_NULL (VariableData);
+  SECUREBOOT_FREE_NON_NULL (FormatNameString);
+  SECUREBOOT_FREE_NON_NULL (FormatHelpString);
 
   PrivateData->ListCount = Index;
 
@@ -3922,6 +3937,8 @@ FormatHelpInfo (
   EFI_STATUS      Status;
   EFI_TIME        *Time;
   EFI_STRING_ID   ListTypeId;
+  EFI_STRING      FormatHelpString;
+  EFI_STRING      FormatTypeString;
   UINTN           DataSize;
   UINTN           HelpInfoIndex;
   UINTN           TotalSize;
@@ -3931,12 +3948,13 @@ FormatHelpInfo (
   CHAR16          *HelpInfoString;
   BOOLEAN         IsCert;
 
-  Status          = EFI_SUCCESS;
-  Time            = NULL;
-  HelpInfoIndex   = 0;
-  DataString      = NULL;
-  HelpInfoString  = NULL;
-  IsCert          = FALSE;
+  Status            = EFI_SUCCESS;
+  Time              = NULL;
+  FormatTypeString  = NULL;
+  HelpInfoIndex     = 0;
+  DataString        = NULL;
+  HelpInfoString    = NULL;
+  IsCert            = FALSE;
 
   if (CompareGuid(&ListEntry->SignatureType, &gEfiCertRsa2048Guid)) {
     ListTypeId = STRING_TOKEN(STR_LIST_TYPE_RSA2048_SHA256);
@@ -3969,6 +3987,11 @@ FormatHelpInfo (
     goto ON_EXIT;
   }
 
+  FormatTypeString = HiiGetString (PrivateData->HiiHandle, ListTypeId, NULL);
+  if (FormatTypeString == NULL) {
+    goto ON_EXIT;
+  }
+
   TotalSize = 1024;
   HelpInfoString = AllocateZeroPool (TotalSize);
   if (HelpInfoString == NULL) {
@@ -3981,40 +4004,45 @@ FormatHelpInfo (
   //
   ZeroMem (GuidString, sizeof (GuidString));
   GuidToString(&DataEntry->SignatureOwner, GuidString, BUFFER_MAX_SIZE);
+  FormatHelpString = HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_GUID), NULL);
+  if (FormatHelpString == NULL) {
+    goto ON_EXIT;
+  }
   HelpInfoIndex += UnicodeSPrint (
                      &HelpInfoString[HelpInfoIndex],
                      TotalSize - sizeof(CHAR16) * HelpInfoIndex,
-                     HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_GUID), NULL),
+                     FormatHelpString,
                      GuidString
                    );
+  SECUREBOOT_FREE_NON_NULL (FormatHelpString);
+  FormatHelpString = NULL;
 
   //
   // Format content part, it depends on the type of signature list, hash value or CN.
   //
   if (IsCert) {
     GetCommonNameFromX509 (ListEntry, DataEntry, &DataString);
-    HelpInfoIndex += UnicodeSPrint(
-                       &HelpInfoString[HelpInfoIndex],
-                       TotalSize - sizeof(CHAR16) * HelpInfoIndex,
-                       HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_CN), NULL),
-                       HiiGetString (PrivateData->HiiHandle, ListTypeId, NULL),
-                       DataSize,
-                       DataString
-                     );
+    FormatHelpString = HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_CN), NULL);
   } else {
     //
     //  Format hash value for each signature data entry.
     //
     ParseHashValue (ListEntry, DataEntry, &DataString);
-    HelpInfoIndex += UnicodeSPrint (
-                       &HelpInfoString[HelpInfoIndex],
-                       TotalSize - sizeof(CHAR16) * HelpInfoIndex,
-                       HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_HASH), NULL),
-                       HiiGetString (PrivateData->HiiHandle, ListTypeId, NULL),
-                       DataSize,
-                       DataString
-                     );
+    FormatHelpString = HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_HASH), NULL);
   }
+  if (FormatHelpString == NULL) {
+    goto ON_EXIT;
+  }
+  HelpInfoIndex += UnicodeSPrint (
+                     &HelpInfoString[HelpInfoIndex],
+                     TotalSize - sizeof (CHAR16) * HelpInfoIndex,
+                     FormatHelpString,
+                     FormatTypeString,
+                     DataSize,
+                     DataString
+                   );
+  SECUREBOOT_FREE_NON_NULL (FormatHelpString);
+  FormatHelpString = NULL;
 
   //
   // Format revocation time part.
@@ -4032,19 +4060,26 @@ FormatHelpInfo (
       Time->Minute,
       Time->Second
     );
-
+    FormatHelpString = HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_TIME), NULL);
+    if (FormatHelpString == NULL) {
+      goto ON_EXIT;
+    }
     UnicodeSPrint (
       &HelpInfoString[HelpInfoIndex],
       TotalSize - sizeof (CHAR16) * HelpInfoIndex,
-      HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_HELP_FORMAT_TIME), NULL),
+      FormatHelpString,
       TimeString
     );
+    SECUREBOOT_FREE_NON_NULL (FormatHelpString);
+    FormatHelpString = NULL;
   }
 
   *StringId = HiiSetString (PrivateData->HiiHandle, 0, HelpInfoString, NULL);
 ON_EXIT:
   SECUREBOOT_FREE_NON_NULL (DataString);
   SECUREBOOT_FREE_NON_NULL (HelpInfoString);
+
+  SECUREBOOT_FREE_NON_NULL (FormatTypeString);
 
   return Status;
 }
@@ -4076,6 +4111,7 @@ LoadSignatureData (
   EFI_IFR_GUID_LABEL    *StartLabel;
   EFI_IFR_GUID_LABEL    *EndLabel;
   EFI_STRING_ID         HelpStringId;
+  EFI_STRING            FormatNameString;
   VOID                  *StartOpCodeHandle;
   VOID                  *EndOpCodeHandle;
   UINTN                 DataSize;
@@ -4086,6 +4122,7 @@ LoadSignatureData (
   CHAR16                NameBuffer[BUFFER_MAX_SIZE];
 
   Status              = EFI_SUCCESS;
+  FormatNameString    = NULL;
   StartOpCodeHandle   = NULL;
   EndOpCodeHandle     = NULL;
   Index               = 0;
@@ -4167,17 +4204,18 @@ LoadSignatureData (
     ListWalker = (EFI_SIGNATURE_LIST *)((UINT8 *)ListWalker + ListWalker->SignatureListSize);
   }
 
+  FormatNameString = HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_NAME_FORMAT), NULL);
+  if (FormatNameString == NULL) {
+    goto ON_EXIT;
+  }
+
   DataWalker = (EFI_SIGNATURE_DATA *)((UINT8 *)ListWalker + sizeof(EFI_SIGNATURE_LIST) + ListWalker->SignatureHeaderSize);
   for (Index = 0; Index < SIGNATURE_DATA_COUNTS(ListWalker); Index = Index + 1) {
     //
     // Format name buffer.
     //
     ZeroMem (NameBuffer, sizeof (NameBuffer));
-    UnicodeSPrint (NameBuffer,
-      sizeof (NameBuffer),
-      HiiGetString (PrivateData->HiiHandle, STRING_TOKEN (STR_SIGNATURE_DATA_NAME_FORMAT), NULL),
-      Index + 1
-    );
+    UnicodeSPrint (NameBuffer, sizeof (NameBuffer), FormatNameString, Index + 1);
 
     //
     // Format help info buffer.
@@ -4221,6 +4259,7 @@ ON_EXIT:
   SECUREBOOT_FREE_NON_OPCODE (EndOpCodeHandle);
 
   SECUREBOOT_FREE_NON_NULL (VariableData);
+  SECUREBOOT_FREE_NON_NULL (FormatNameString);
 
   return Status;
 }
