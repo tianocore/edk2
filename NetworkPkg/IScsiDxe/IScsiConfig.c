@@ -3592,9 +3592,16 @@ IScsiFormCallback (
       switch (Value->u8) {
       case IP_MODE_IP6:
       case IP_MODE_IP4:
+        ZeroMem (IfrNvData->LocalIp, sizeof (IfrNvData->LocalIp));
+        ZeroMem (IfrNvData->SubnetMask, sizeof (IfrNvData->SubnetMask));
+        ZeroMem (IfrNvData->Gateway, sizeof (IfrNvData->Gateway));
         ZeroMem (IfrNvData->TargetIp, sizeof (IfrNvData->TargetIp));
         Private->Current->AutoConfigureMode = 0;
-
+        ZeroMem (&Private->Current->SessionConfigData.LocalIp, sizeof (EFI_IP_ADDRESS));
+        ZeroMem (&Private->Current->SessionConfigData.SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+        ZeroMem (&Private->Current->SessionConfigData.Gateway, sizeof (EFI_IP_ADDRESS));
+        ZeroMem (&Private->Current->SessionConfigData.TargetIp, sizeof (EFI_IP_ADDRESS));
+        
         break;
       }
 
