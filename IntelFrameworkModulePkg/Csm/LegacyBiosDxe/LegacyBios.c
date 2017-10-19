@@ -794,8 +794,8 @@ ToggleEndOfDxeStatus (
 //
 
 /**
-   Enable NULL pointer detection
-*/
+   Enable NULL pointer detection.
+**/
 VOID
 EnableNullDetection (
   VOID
@@ -844,8 +844,8 @@ EnableNullDetection (
 }
 
 /**
-   Disable NULL pointer detection
-*/
+   Disable NULL pointer detection.
+**/
 VOID
 DisableNullDetection (
   VOID

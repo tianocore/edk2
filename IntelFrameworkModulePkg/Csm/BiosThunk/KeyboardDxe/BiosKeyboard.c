@@ -1733,8 +1733,8 @@ CheckKeyboardConnect (
 }
 
 /**
-   Disable NULL pointer detection
-*/
+  Disable NULL pointer detection.
+**/
 VOID
 DisableNullDetection (
   VOID
@@ -1780,8 +1780,8 @@ DisableNullDetection (
 }
 
 /**
-   Enable NULL pointer detection
-*/
+   Enable NULL pointer detection.
+**/
 VOID
 EnableNullDetection (
   VOID
