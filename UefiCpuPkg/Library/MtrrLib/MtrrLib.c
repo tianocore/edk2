@@ -2114,8 +2114,17 @@ MtrrLibSetBelow1MBMemoryAttribute (
   UINT64                    OrMask;
   UINT64                    ClearMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
   UINT64                    OrMasks[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
+  BOOLEAN                   LocalModified[ARRAY_SIZE (mMtrrLibFixedMtrrTable)];
 
   ASSERT (BaseAddress < BASE_1MB);
+
+  SetMem (LocalModified, sizeof (LocalModified), FALSE);
+
+  //
+  // (Value & ~0 | 0) still equals to (Value)
+  //
+  SetMem64 (ClearMasks, sizeof (ClearMasks), 0);
+  SetMem64 (OrMasks, sizeof (OrMasks), 0);
 
   MsrIndex = (UINT32)-1;
   while ((BaseAddress < BASE_1MB) && (Length != 0)) {
@@ -2123,13 +2132,14 @@ MtrrLibSetBelow1MBMemoryAttribute (
     if (RETURN_ERROR (Status)) {
       return Status;
     }
-    ClearMasks[MsrIndex] = ClearMask;
-    OrMasks[MsrIndex]    = OrMask;
-    Modified[MsrIndex]   = TRUE;
+    ClearMasks[MsrIndex]    = ClearMask;
+    OrMasks[MsrIndex]       = OrMask;
+    Modified[MsrIndex]      = TRUE;
+    LocalModified[MsrIndex] = TRUE;
   }
 
   for (MsrIndex = 0; MsrIndex < ARRAY_SIZE (mMtrrLibFixedMtrrTable); MsrIndex++) {
-    if (Modified[MsrIndex]) {
+    if (LocalModified[MsrIndex]) {
       FixedSettings->Mtrr[MsrIndex] = (FixedSettings->Mtrr[MsrIndex] & ~ClearMasks[MsrIndex]) | OrMasks[MsrIndex];
     }
   }
@@ -2354,6 +2364,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
   //
   // 3. Apply the below-1MB memory attribute settings.
   //
+  ZeroMem (WorkingFixedSettings.Mtrr, sizeof (WorkingFixedSettings.Mtrr));
   for (Index = 0; Index < RangeCount; Index++) {
     if (Ranges[Index].BaseAddress >= BASE_1MB) {
       continue;
