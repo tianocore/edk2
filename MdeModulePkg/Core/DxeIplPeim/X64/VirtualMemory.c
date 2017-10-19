@@ -32,12 +32,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "VirtualMemory.h"
 
 /**
-   Clear legacy memory located at the first 4K-page, if available.
+  Clear legacy memory located at the first 4K-page, if available.
 
-   This function traverses the whole HOB list to check if memory from 0 to 4095
-   exists and has not been allocated, and then clear it if so.
+  This function traverses the whole HOB list to check if memory from 0 to 4095
+  exists and has not been allocated, and then clear it if so.
 
-   @param HoStart                   The start of HobList passed to DxeCore.
+  @param HobStart                  The start of HobList passed to DxeCore.
 
 **/
 VOID
@@ -86,6 +86,13 @@ ClearFirst4KPage (
   return;
 }
 
+/**
+  Return configure status of NULL pointer detection feature.
+
+  @return TRUE   NULL pointer detection feature is enabled
+  @return FALSE  NULL pointer detection feature is disabled
+
+**/
 BOOLEAN
 IsNullDetectionEnabled (
   VOID
