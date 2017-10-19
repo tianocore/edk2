@@ -375,7 +375,7 @@ MtrrSetMemoryAttributeInMtrrSettings (
                                 When range overlap happens, the last one takes higher priority.
                                 When the function returns, either all the attributes are set successfully,
                                 or none of them is set.
-  @param[in]                    Count of MTRR_MEMORY_RANGE.
+  @param[in]      RangeCount    Count of MTRR_MEMORY_RANGE.
 
   @retval RETURN_SUCCESS            The attributes were set for all the memory ranges.
   @retval RETURN_INVALID_PARAMETER  Length in any range is zero.
