@@ -2,7 +2,7 @@
 
   Provides the basic interfaces to abstract a PCI Host Bridge Resource Allocation.
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -574,7 +574,8 @@ ResourceConflict (
       Descriptor->Len = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
       Descriptor->AddrRangeMin = ResAllocNode->Base;
       Descriptor->AddrRangeMax = ResAllocNode->Alignment;
-      Descriptor->AddrLen = ResAllocNode->Length;
+      Descriptor->AddrLen      = ResAllocNode->Length;
+      Descriptor->SpecificFlag = 0;
       switch (ResAllocNode->Type) {
 
       case TypeIo:
