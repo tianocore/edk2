@@ -259,9 +259,7 @@ LoadedImageProtocolDumpInformation(
     } else {
       SHELL_FREE_NON_NULL(FilePath);
     }
-    RetVal = CatSPrint(NULL, FileName);
-    SHELL_FREE_NON_NULL(FileName);
-    return RetVal;
+    return FileName;
   }
 
   HandleParsingHiiInit();
