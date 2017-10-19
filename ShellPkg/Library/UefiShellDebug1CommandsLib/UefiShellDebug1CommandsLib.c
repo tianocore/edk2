@@ -185,6 +185,7 @@ EditorClearLine (
   IN UINTN LastRow
   )
 {
+  UINTN  Col;
   CHAR16 Line[200];
 
   if (Row == 0) {
@@ -193,22 +194,28 @@ EditorClearLine (
 
   //
   // prepare a blank line
+  // If max column is larger, split to multiple prints.
   //
-  SetMem16(Line, LastCol*sizeof(CHAR16), L' ');
+  SetMem16 (Line, sizeof (Line), L' ');
+  Line[ARRAY_SIZE (Line) - 1] = CHAR_NULL;
 
-  if (Row == LastRow) {
+  for (Col = 1; Col <= LastCol; Col += ARRAY_SIZE (Line) - 1) {
+    if (Col + ARRAY_SIZE (Line) - 1 > LastCol) {
+      if (Row == LastRow) {
+        //
+        // if CHAR_NULL is still at position LastCol, it will cause first line error
+        //
+        Line[(LastCol % (ARRAY_SIZE (Line) - 1)) - 1] = CHAR_NULL;
+      } else {
+        Line[LastCol % (ARRAY_SIZE (Line) - 1)] = CHAR_NULL;
+      }
+    }
+ 
     //
-    // if CHAR_NULL is still at position 80, it will cause first line error
+    // print out the blank line
     //
-    Line[LastCol - 1] = CHAR_NULL;
-  } else {
-    Line[LastCol] = CHAR_NULL;
+    ShellPrintEx ((INT32) Col - 1, (INT32) Row - 1, Line);
   }
-
-  //
-  // print out the blank line
-  //
-  ShellPrintEx (0, ((INT32)Row) - 1, Line);
 }
 
 /**
