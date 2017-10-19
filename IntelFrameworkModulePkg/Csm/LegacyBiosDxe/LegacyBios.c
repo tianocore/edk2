@@ -806,7 +806,7 @@ EnableNullDetection (
 
   if (((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0)
       ||
-      ((mEndOfDxe == TRUE)  &&
+      ((mEndOfDxe)  &&
        ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT7|BIT0))
         == (BIT7|BIT0)))
      ) {
@@ -856,7 +856,7 @@ DisableNullDetection (
 
   if (((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0)
       ||
-      ((mEndOfDxe == TRUE)  &&
+      ((mEndOfDxe)  &&
        ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT7|BIT0))
         == (BIT7|BIT0)))
      ) {
