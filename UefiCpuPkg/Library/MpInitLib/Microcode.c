@@ -1,7 +1,7 @@
 /** @file
   Implementation of loading microcode on processors.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -42,8 +42,6 @@ MicrocodeDetect (
   IN CPU_MP_DATA             *CpuMpData
   )
 {
-  UINT64                                  MicrocodePatchAddress;
-  UINT64                                  MicrocodePatchRegionSize;
   UINT32                                  ExtendedTableLength;
   UINT32                                  ExtendedTableCount;
   CPU_MICROCODE_EXTENDED_TABLE            *ExtendedTable;
@@ -61,9 +59,7 @@ MicrocodeDetect (
   VOID                                    *MicrocodeData;
   MSR_IA32_PLATFORM_ID_REGISTER           PlatformIdMsr;
 
-  MicrocodePatchAddress    = PcdGet64 (PcdCpuMicrocodePatchAddress);
-  MicrocodePatchRegionSize = PcdGet64 (PcdCpuMicrocodePatchRegionSize);
-  if (MicrocodePatchRegionSize == 0) {
+  if (CpuMpData->MicrocodePatchRegionSize == 0) {
     //
     // There is no microcode patches
     //
@@ -93,8 +89,8 @@ MicrocodeDetect (
 
   LatestRevision = 0;
   MicrocodeData  = NULL;
-  MicrocodeEnd = (UINTN) (MicrocodePatchAddress + MicrocodePatchRegionSize);
-  MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (UINTN) MicrocodePatchAddress;
+  MicrocodeEnd = (UINTN) (CpuMpData->MicrocodePatchAddress + CpuMpData->MicrocodePatchRegionSize);
+  MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) (UINTN) CpuMpData->MicrocodePatchAddress;
   do {
     //
     // Check if the microcode is for the Cpu and the version is newer
