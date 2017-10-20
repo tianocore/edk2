@@ -65,6 +65,14 @@ _PrepareArguments:
 
 _SetupPrimaryCoreStack:
   mov   sp, r1
+  MOV32 (r8, FixedPcdGet64 (PcdCPUCoresStackBase))
+  MOV32 (r9, FixedPcdGet32 (PcdInitValueInTempStack))
+  mov   r10, r9
+  mov   r11, r9
+  mov   r12, r9
+0:stm   r8!, {r9-r12}
+  cmp   r8, r1
+  blt   0b
   b     _PrepareArguments
 
 _NeverReturn:

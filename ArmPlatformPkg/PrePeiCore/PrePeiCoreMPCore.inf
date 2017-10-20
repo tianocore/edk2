@@ -75,3 +75,5 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
   gArmTokenSpaceGuid.PcdGicSgiIntId
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
