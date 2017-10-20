@@ -596,8 +596,12 @@ Ip4ConfigProtocol (
   IP4_ADDR                  Ip;
   IP4_ADDR                  Netmask;
   EFI_ARP_PROTOCOL          *Arp;
+  EFI_IP4_CONFIG2_PROTOCOL  *Ip4Config2;
+  EFI_IP4_CONFIG2_POLICY    Policy;
 
   IpSb = IpInstance->Service;
+
+  Ip4Config2  = NULL;
 
   //
   // User is changing packet filters. It must be stopped
@@ -677,10 +681,23 @@ Ip4ConfigProtocol (
     // Use the default address. Check the state.
     //
     if (IpSb->State == IP4_SERVICE_UNSTARTED) {
-      Status = Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
-
-      if (EFI_ERROR (Status)) {
-        goto ON_ERROR;
+      //
+      // Trigger the EFI_IP4_CONFIG2_PROTOCOL to retrieve the 
+      // default IPv4 address if it is not available yet.
+      //
+      Policy = IpSb->Ip4Config2Instance.Policy;
+      if (Policy != Ip4Config2PolicyDhcp) {
+        Ip4Config2 = &IpSb->Ip4Config2Instance.Ip4Config2;
+        Policy = Ip4Config2PolicyDhcp;
+        Status= Ip4Config2->SetData (
+                              Ip4Config2,
+                              Ip4Config2DataTypePolicy,
+                              sizeof (EFI_IP4_CONFIG2_POLICY),
+                              &Policy
+                              );
+        if (EFI_ERROR (Status)) {
+          goto ON_ERROR;
+        }
       }
     }
 
