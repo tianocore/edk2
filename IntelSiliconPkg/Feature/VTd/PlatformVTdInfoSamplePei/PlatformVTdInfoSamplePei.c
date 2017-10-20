@@ -159,7 +159,7 @@ PatchDmar (
   /// Calculate GTT mem size
   ///
   GttMemSize = 0;
-  GttMode = PciRead16 (PCI_LIB_ADDRESS(0, 0, 0, R_SA_GGC) & B_SKL_SA_GGC_GGMS_MASK) >> N_SKL_SA_GGC_GGMS_OFFSET;
+  GttMode = (PciRead16 (PCI_LIB_ADDRESS(0, 0, 0, R_SA_GGC)) & B_SKL_SA_GGC_GGMS_MASK) >> N_SKL_SA_GGC_GGMS_OFFSET;
   if (GttMode <= V_SKL_SA_GGC_GGMS_8MB) {
     GttMemSize = (1 << GttMode) * (1024) * (1024);
   }
