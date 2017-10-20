@@ -389,18 +389,7 @@ CalculateResourceAperture (
   }
 
   //
-  // Adjust the bridge's alignment to the MAX (first) alignment of all children.
-  //
-  CurrentLink = Bridge->ChildList.ForwardLink;
-  if (CurrentLink != &Bridge->ChildList) {
-    Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
-    if (Node->Alignment > Bridge->Alignment) {
-      Bridge->Alignment = Node->Alignment;
-    }
-  }
-
-  //
-  // At last, adjust the aperture with the bridge's alignment
+  // Adjust the aperture with the bridge's alignment
   //
   Aperture[PciResUsageTypical] = ALIGN_VALUE (Aperture[PciResUsageTypical], Bridge->Alignment + 1);
   Aperture[PciResUsagePadding] = ALIGN_VALUE (Aperture[PciResUsagePadding], Bridge->Alignment + 1);
@@ -410,6 +399,17 @@ CalculateResourceAperture (
   // Use the larger one between the padding resource and actual occupied resource.
   //
   Bridge->Length = MAX (Aperture[PciResUsageTypical], Aperture[PciResUsagePadding]);
+
+  //
+  // Adjust the bridge's alignment to the MAX (first) alignment of all children.
+  //
+  CurrentLink = Bridge->ChildList.ForwardLink;
+  if (CurrentLink != &Bridge->ChildList) {
+    Node = RESOURCE_NODE_FROM_LINK (CurrentLink);
+    if (Node->Alignment > Bridge->Alignment) {
+      Bridge->Alignment = Node->Alignment;
+    }
+  }
 }
 
 /**
