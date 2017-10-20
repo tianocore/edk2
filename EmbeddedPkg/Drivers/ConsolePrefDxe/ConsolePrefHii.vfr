@@ -1,0 +1,51 @@
+/** @file
+*
+*  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+*
+*  This program and the accompanying materials are licensed and made available
+*  under the terms and conditions of the BSD License which accompanies this
+*  distribution.  The full text of the license may be found at
+*  http://opensource.org/licenses/bsd-license.php
+*
+*  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+*  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+*
+**/
+
+#include "ConsolePrefDxe.h"
+
+//
+// EFI Variable attributes
+//
+#define EFI_VARIABLE_NON_VOLATILE       0x00000001
+#define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
+#define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
+#define EFI_VARIABLE_READ_ONLY          0x00000008
+
+formset
+  guid      = CONSOLE_PREF_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  efivarstore CONSOLE_PREF_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attributes
+    name  = ConsolePref,
+    guid  = CONSOLE_PREF_FORMSET_GUID;
+
+  form formid = 0x1000,
+    title  = STRING_TOKEN(STR_MAIN_FORM_TITLE);
+
+    oneof varid = ConsolePref.Console,
+        prompt      = STRING_TOKEN(STR_CONSOLE_PREF_SELECT_PROMPT),
+        help        = STRING_TOKEN(STR_CONSOLE_PREF_SELECT_HELP),
+        flags       = NUMERIC_SIZE_1 | INTERACTIVE,
+        option text = STRING_TOKEN(STR_CONSOLE_PREF_GRAPHICAL), value = CONSOLE_PREF_GRAPHICAL, flags = DEFAULT;
+        option text = STRING_TOKEN(STR_CONSOLE_PREF_SERIAL), value = CONSOLE_PREF_SERIAL, flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+  endform;
+
+endformset;
