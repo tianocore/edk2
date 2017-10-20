@@ -612,7 +612,6 @@ Pkcs7GetCertificatesList (
 
   if (CtxChain != NULL) {
     BufferSize = sizeof (UINT8);
-    OldSize    = BufferSize;
     CertBuf    = NULL;
 
     for (Index = 0; ; Index++) {
@@ -656,7 +655,6 @@ Pkcs7GetCertificatesList (
 
   if (CtxUntrusted != NULL) {
     BufferSize = sizeof (UINT8);
-    OldSize    = BufferSize;
     CertBuf    = NULL;
 
     for (Index = 0; ; Index++) {
