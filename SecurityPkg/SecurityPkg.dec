@@ -99,6 +99,11 @@
   #
   PlatformPKProtectionLib|Include/Library/PlatformPKProtectionLib.h
 
+  ## @libraryclass  This library provides platform abstractions for prompting
+  #  a user with Physical Presence requests
+  #
+  Tcg2PhysicalPresencePromptLib|Include/Library/Tcg2PhysicalPresencePromptLib.h
+
   ##  @libraryclass Perform SPDM (following SPDM spec) and measure data to TPM (following TCG PFP spec).
   ##
   SpdmSecurityLib|Include/Library/SpdmSecurityLib.h

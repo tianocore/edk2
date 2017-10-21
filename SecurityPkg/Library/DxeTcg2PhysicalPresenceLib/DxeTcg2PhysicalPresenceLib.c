@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/Tcg2PhysicalPresenceData.h>
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+#include <Library/Tcg2PhysicalPresencePromptLib.h>
 #include <Library/Tcg2PpVendorLib.h>
 
 #define CONFIRM_BUFFER_SIZE  4096
@@ -249,50 +250,6 @@ Tcg2ExecutePhysicalPresence (
         return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
       }
   }
-}
-
-/**
-  Read the specified key for user confirmation.
-
-  @param[in]  CautionKey  If true,  F12 is used as confirm key;
-                          If false, F10 is used as confirm key.
-
-  @retval     TRUE        User confirmed the changes by input.
-  @retval     FALSE       User discarded the changes.
-**/
-BOOLEAN
-Tcg2ReadUserKey (
-  IN     BOOLEAN  CautionKey
-  )
-{
-  EFI_STATUS     Status;
-  EFI_INPUT_KEY  Key;
-  UINT16         InputKey;
-
-  InputKey = 0;
-  do {
-    Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
-    if (!EFI_ERROR (Status)) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (Key.ScanCode == SCAN_ESC) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F12) && CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-    }
-  } while (InputKey == 0);
-
-  if (InputKey != SCAN_ESC) {
-    return TRUE;
-  }
-
-  return FALSE;
 }
 
 /**
@@ -586,10 +543,6 @@ Tcg2UserConfirm (
   FreePool (TmpStr2);
   FreePool (ConfirmText);
   HiiRemovePackages (mTcg2PpStringPackHandle);
-
-  if (Tcg2ReadUserKey (CautionKey)) {
-    return TRUE;
-  }
 
   return FALSE;
 }
