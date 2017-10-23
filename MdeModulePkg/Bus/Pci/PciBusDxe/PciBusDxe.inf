@@ -2,7 +2,7 @@
 #  The PCI bus driver will probe all PCI devices and allocate MMIO and IO space for these devices.
 #  Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable hot plug supporting.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -96,6 +96,7 @@
   gEfiIncompatiblePciDeviceSupportProtocolGuid    ## SOMETIMES_CONSUMES
   gEfiLoadFile2ProtocolGuid                       ## SOMETIMES_PRODUCES
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid           ## CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport      ## CONSUMES

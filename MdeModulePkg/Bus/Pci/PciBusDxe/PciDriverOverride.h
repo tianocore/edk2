@@ -1,7 +1,7 @@
 /** @file
   Functions declaration for Bus Specific Driver Override protoocl.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,9 +22,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // PCI driver override driver image list
 //
 typedef struct {
-  UINT32          Signature;
-  LIST_ENTRY      Link;
-  EFI_HANDLE      DriverImageHandle;
+  UINT32                   Signature;
+  LIST_ENTRY               Link;
+  EFI_HANDLE               DriverImageHandle;
+  EFI_DEVICE_PATH_PROTOCOL *DriverImagePath;
 } PCI_DRIVER_OVERRIDE_LIST;
 
 
@@ -46,7 +47,8 @@ InitializePciDriverOverrideInstance (
   Add an overriding driver image.
 
   @param PciIoDevice        Instance of PciIo device.
-  @param DriverImageHandle  new added driver image.
+  @param DriverImageHandle  Image handle of newly added driver image.
+  @param DriverImagePath    Device path of newly added driver image.
 
   @retval EFI_SUCCESS          Successfully added driver.
   @retval EFI_OUT_OF_RESOURCES No memory resource for new driver instance.
@@ -55,8 +57,9 @@ InitializePciDriverOverrideInstance (
 **/
 EFI_STATUS
 AddDriver (
-  IN PCI_IO_DEVICE     *PciIoDevice,
-  IN EFI_HANDLE        DriverImageHandle
+  IN PCI_IO_DEVICE            *PciIoDevice,
+  IN EFI_HANDLE               DriverImageHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL *DriverImagePath
   );
 
 

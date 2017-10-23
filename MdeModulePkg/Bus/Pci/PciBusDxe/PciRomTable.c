@@ -129,7 +129,7 @@ PciRomGetImageMapping (
         mRomImageTable[Index].Func == PciIoDevice->FunctionNumber    ) {
 
       if (mRomImageTable[Index].ImageHandle != NULL) {
-        AddDriver (PciIoDevice, mRomImageTable[Index].ImageHandle);
+        AddDriver (PciIoDevice, mRomImageTable[Index].ImageHandle, NULL);
       }
       PciIoDevice->PciIo.RomImage = mRomImageTable[Index].RomImage;
       PciIoDevice->PciIo.RomSize  = mRomImageTable[Index].RomSize;

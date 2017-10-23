@@ -753,13 +753,19 @@ ProcessOpRomImage (
                     BufferSize,
                     &ImageHandle
                     );
-
-    FreePool (PciOptionRomImageDevicePath);
-
-    if (!EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
+      //
+      // Record the Option ROM Image device path when LoadImage fails.
+      // PciOverride.GetDriver() will try to look for the Image Handle using the device path later.
+      //
+      AddDriver (PciDevice, NULL, PciOptionRomImageDevicePath);
+    } else {
       Status = gBS->StartImage (ImageHandle, NULL, NULL);
       if (!EFI_ERROR (Status)) {
-        AddDriver (PciDevice, ImageHandle);
+        //
+        // Record the Option ROM Image Handle
+        //
+        AddDriver (PciDevice, ImageHandle, NULL);
         PciRomAddImageMapping (
           ImageHandle,
           PciDevice->PciRootBridgeIo->SegmentNumber,
@@ -772,6 +778,7 @@ ProcessOpRomImage (
         RetStatus = EFI_SUCCESS;
       }
     }
+    FreePool (PciOptionRomImageDevicePath);
 
 NextImage:
     RomBarOffset += ImageSize;
