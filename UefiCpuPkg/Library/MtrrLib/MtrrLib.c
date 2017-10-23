@@ -2123,8 +2123,8 @@ MtrrLibSetBelow1MBMemoryAttribute (
   //
   // (Value & ~0 | 0) still equals to (Value)
   //
-  SetMem64 (ClearMasks, sizeof (ClearMasks), 0);
-  SetMem64 (OrMasks, sizeof (OrMasks), 0);
+  SetMem (ClearMasks, sizeof (ClearMasks), 0);
+  SetMem (OrMasks, sizeof (OrMasks), 0);
 
   MsrIndex = (UINT32)-1;
   while ((BaseAddress < BASE_1MB) && (Length != 0)) {
