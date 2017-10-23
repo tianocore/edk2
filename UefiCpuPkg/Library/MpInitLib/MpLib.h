@@ -176,6 +176,7 @@ typedef struct {
   UINTN                 Cr3;
   UINTN                 InitFlag;
   CPU_INFO_IN_HOB       *CpuInfo;
+  UINTN                 NumApsExecuting;
   CPU_MP_DATA           *CpuMpData;
   UINTN                 InitializeFloatingPointUnitsAddress;
 } MP_CPU_EXCHANGE_INFO;

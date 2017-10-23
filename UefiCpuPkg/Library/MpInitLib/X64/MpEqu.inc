@@ -40,5 +40,6 @@ EnableExecuteDisableLocation  equ        LockLocation + 5Ch
 Cr3Location                   equ        LockLocation + 64h
 InitFlagLocation              equ        LockLocation + 6Ch
 CpuInfoLocation               equ        LockLocation + 74h
-InitializeFloatingPointUnitsAddress equ  LockLocation + 84h
+NumApsExecutingLocation       equ        LockLocation + 7Ch
+InitializeFloatingPointUnitsAddress equ  LockLocation + 8Ch
 

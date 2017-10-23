@@ -86,6 +86,12 @@ Flat32Start:                                   ; protected mode entry point
 
     mov        esi, ebx
 
+    ; Increment the number of APs executing here as early as possible
+    ; This is decremented in C code when AP is finished executing
+    mov        edi, esi
+    add        edi, NumApsExecutingLocation
+    lock inc   dword [edi]
+
     mov         edi, esi
     add         edi, EnableExecuteDisableLocation
     cmp         byte [edi], 0
