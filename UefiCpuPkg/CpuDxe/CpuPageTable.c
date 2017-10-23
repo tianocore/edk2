@@ -770,6 +770,20 @@ AssignMemoryPageAttributes (
 }
 
 /**
+ Check if Execute Disable feature is enabled or not.
+**/
+BOOLEAN
+IsExecuteDisableEnabled (
+  VOID
+  )
+{
+  MSR_CORE_IA32_EFER_REGISTER    MsrEfer;
+
+  MsrEfer.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
+  return (MsrEfer.Bits.NXE == 1);
+}
+
+/**
   Update GCD memory space attributes according to current page table setup.
 **/
 VOID
@@ -790,7 +804,7 @@ RefreshGcdMemoryAttributesFromPaging (
   UINT64                              PageStartAddress;
   UINT64                              Attributes;
   UINT64                              Capabilities;
-  BOOLEAN                             DoUpdate;
+  UINT64                              NewAttributes;
   UINTN                               Index;
 
   //
@@ -802,14 +816,47 @@ RefreshGcdMemoryAttributesFromPaging (
 
   GetCurrentPagingContext (&PagingContext);
 
-  DoUpdate      = FALSE;
-  Capabilities  = 0;
-  Attributes    = 0;
-  BaseAddress   = 0;
-  PageLength    = 0;
+  Attributes      = 0;
+  NewAttributes   = 0;
+  BaseAddress     = 0;
+  PageLength      = 0;
+
+  if (IsExecuteDisableEnabled ()) {
+    Capabilities = EFI_MEMORY_RO | EFI_MEMORY_RP | EFI_MEMORY_XP;
+  } else {
+    Capabilities = EFI_MEMORY_RO | EFI_MEMORY_RP;
+  }
 
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
+      continue;
+    }
+
+    //
+    // Sync the actual paging related capabilities back to GCD service first.
+    // As a side effect (good one), this can also help to avoid unnecessary
+    // memory map entries due to the different capabilities of the same type
+    // memory, such as multiple RT_CODE and RT_DATA entries in memory map,
+    // which could cause boot failure of some old Linux distro (before v4.3).
+    //
+    Status = gDS->SetMemorySpaceCapabilities (
+                    MemorySpaceMap[Index].BaseAddress,
+                    MemorySpaceMap[Index].Length,
+                    MemorySpaceMap[Index].Capabilities | Capabilities
+                    );
+    if (EFI_ERROR (Status)) {
+      //
+      // If we cannot udpate the capabilities, we cannot update its
+      // attributes either. So just simply skip current block of memory.
+      //
+      DEBUG ((
+        DEBUG_WARN,
+        "Failed to update capability: [%lu] %016lx - %016lx (%016lx -> %016lx)\r\n",
+        (UINT64)Index, MemorySpaceMap[Index].BaseAddress,
+        MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - 1,
+        MemorySpaceMap[Index].Capabilities,
+        MemorySpaceMap[Index].Capabilities | Capabilities
+        ));
       continue;
     }
 
@@ -826,7 +873,9 @@ RefreshGcdMemoryAttributesFromPaging (
       PageLength -= (MemorySpaceMap[Index].BaseAddress - BaseAddress);
     }
 
-    // Sync real page attributes to GCD
+    //
+    // Sync actual page attributes to GCD
+    //
     BaseAddress       = MemorySpaceMap[Index].BaseAddress;
     MemorySpaceLength = MemorySpaceMap[Index].Length;
     while (MemorySpaceLength > 0) {
@@ -842,23 +891,26 @@ RefreshGcdMemoryAttributesFromPaging (
         PageStartAddress  = (*PageEntry) & (UINT64)PageAttributeToMask(PageAttribute);
         PageLength        = PageAttributeToLength (PageAttribute) - (BaseAddress - PageStartAddress);
         Attributes        = GetAttributesFromPageEntry (PageEntry);
-
-        if (Attributes != (MemorySpaceMap[Index].Attributes & EFI_MEMORY_PAGETYPE_MASK)) {
-          DoUpdate = TRUE;
-          Attributes |= (MemorySpaceMap[Index].Attributes & ~EFI_MEMORY_PAGETYPE_MASK);
-          Capabilities = Attributes | MemorySpaceMap[Index].Capabilities;
-        } else {
-          DoUpdate = FALSE;
-        }
       }
 
       Length = MIN (PageLength, MemorySpaceLength);
-      if (DoUpdate) {
-        gDS->SetMemorySpaceCapabilities (BaseAddress, Length, Capabilities);
-        gDS->SetMemorySpaceAttributes (BaseAddress, Length, Attributes);
-        DEBUG ((DEBUG_INFO, "Update memory space attribute: [%02d] %016lx - %016lx (%08lx -> %08lx)\r\n",
-                             Index, BaseAddress, BaseAddress + Length - 1,
-                             MemorySpaceMap[Index].Attributes, Attributes));
+      if (Attributes != (MemorySpaceMap[Index].Attributes &
+                         EFI_MEMORY_PAGETYPE_MASK)) {
+        NewAttributes = (MemorySpaceMap[Index].Attributes &
+                         ~EFI_MEMORY_PAGETYPE_MASK) | Attributes;
+        Status = gDS->SetMemorySpaceAttributes (
+                        BaseAddress,
+                        Length,
+                        NewAttributes
+                        );
+        ASSERT_EFI_ERROR (Status);
+        DEBUG ((
+          DEBUG_INFO,
+          "Updated memory space attribute: [%lu] %016lx - %016lx (%016lx -> %016lx)\r\n",
+          (UINT64)Index, BaseAddress, BaseAddress + Length - 1,
+          MemorySpaceMap[Index].Attributes,
+          NewAttributes
+          ));
       }
 
       PageLength        -= Length;
