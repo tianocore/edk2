@@ -542,7 +542,7 @@ VOID
 EFIAPI
 ApWakeupFunction (
   IN MP_CPU_EXCHANGE_INFO      *ExchangeInfo,
-  IN UINTN                     NumApsExecuting
+  IN UINTN                     ApIndex
   )
 {
   CPU_MP_DATA                *CpuMpData;
@@ -574,7 +574,7 @@ ApWakeupFunction (
       // Add CPU number
       //
       InterlockedIncrement ((UINT32 *) &CpuMpData->CpuCount);
-      ProcessorNumber = NumApsExecuting;
+      ProcessorNumber = ApIndex;
       //
       // This is first time AP wakeup, get BIST information from AP stack
       //
@@ -764,7 +764,7 @@ FillExchangeInfoData (
   ExchangeInfo->Cr3             = AsmReadCr3 ();
 
   ExchangeInfo->CFunction       = (UINTN) ApWakeupFunction;
-  ExchangeInfo->NumApsExecuting = 0;
+  ExchangeInfo->ApIndex         = 0;
   ExchangeInfo->InitFlag        = (UINTN) CpuMpData->InitFlag;
   ExchangeInfo->CpuInfo         = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
   ExchangeInfo->CpuMpData       = CpuMpData;

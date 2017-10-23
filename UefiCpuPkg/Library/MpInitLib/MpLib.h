@@ -169,7 +169,7 @@ typedef struct {
   IA32_DESCRIPTOR       IdtrProfile;
   UINTN                 BufferStart;
   UINTN                 ModeOffset;
-  UINTN                 NumApsExecuting;
+  UINTN                 ApIndex;
   UINTN                 CodeSegment;
   UINTN                 DataSegment;
   UINTN                 EnableExecuteDisable;

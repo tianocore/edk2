@@ -33,7 +33,7 @@ GdtrLocation                  equ        LockLocation + 10h
 IdtrLocation                  equ        LockLocation + 16h
 BufferStartLocation           equ        LockLocation + 1Ch
 ModeOffsetLocation            equ        LockLocation + 20h
-NumApsExecutingLocation       equ        LockLocation + 24h
+ApIndexLocation               equ        LockLocation + 24h
 CodeSegmentLocation           equ        LockLocation + 28h
 DataSegmentLocation           equ        LockLocation + 2Ch
 EnableExecuteDisableLocation  equ        LockLocation + 30h

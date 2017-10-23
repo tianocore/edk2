@@ -130,7 +130,7 @@ TestLock:
     jz         TestLock
 
     mov        ecx, esi
-    add        ecx, NumApsExecutingLocation
+    add        ecx, ApIndexLocation
     inc        dword [ecx]
     mov        ebx, [ecx]
 
@@ -200,7 +200,7 @@ CProcedureInvoke:
     mov        eax, ASM_PFX(InitializeFloatingPointUnits)
     call       eax               ; Call assembly function to initialize FPU per UEFI spec
 
-    push       ebx               ; Push NumApsExecuting
+    push       ebx               ; Push ApIndex
     mov        eax, esi
     add        eax, LockLocation
     push       eax               ; push address of exchange info data buffer
