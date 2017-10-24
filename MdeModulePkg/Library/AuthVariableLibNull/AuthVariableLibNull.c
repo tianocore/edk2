@@ -1,7 +1,7 @@
 /** @file
   Implements NULL authenticated variable services.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ AuthVariableLibInitialize (
 }
 
 /**
-  Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
+  Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
 
   @param[in] VariableName           Name of the variable.
   @param[in] VendorGuid             Variable vendor GUID.
@@ -56,8 +56,7 @@ AuthVariableLibInitialize (
   @retval EFI_INVALID_PARAMETER     Invalid parameter.
   @retval EFI_WRITE_PROTECTED       Variable is write-protected.
   @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
-  @retval EFI_SECURITY_VIOLATION    The variable is with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
-                                    or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS
+  @retval EFI_SECURITY_VIOLATION    The variable is with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS
                                     set, but the AuthInfo does NOT pass the validation
                                     check carried out by the firmware.
   @retval EFI_UNSUPPORTED           Unsupported to process authenticated variable.

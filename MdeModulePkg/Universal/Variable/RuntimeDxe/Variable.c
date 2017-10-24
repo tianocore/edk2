@@ -3133,8 +3133,11 @@ VariableServiceSetVariable (
 
   //
   // Check for reserverd bit in variable attribute.
+  // EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS is deprecated but we still allow
+  // the delete operation of common authenticated variable at user physical presence.
+  // So leave EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS attribute check to AuthVariableLib
   //
-  if ((Attributes & (~EFI_VARIABLE_ATTRIBUTES_MASK)) != 0) {
+  if ((Attributes & (~(EFI_VARIABLE_ATTRIBUTES_MASK | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS))) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
