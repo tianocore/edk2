@@ -1,7 +1,7 @@
 /** @file
   This includes some definitions introduced in UEFI that will be used in both PEI and DXE phases.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -169,10 +169,12 @@ typedef struct {
 ///
 /// Attributes of Authenticated Variable
 ///
-#define EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS              0x00000010
 #define EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS   0x00000020
 #define EFI_VARIABLE_APPEND_WRITE                            0x00000040
-
+///
+/// NOTE: EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS is deprecated and should be considered reserved.
+///
+#define EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS              0x00000010
 
 ///
 /// AuthInfo is a WIN_CERTIFICATE using the wCertificateType
