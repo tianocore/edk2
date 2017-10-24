@@ -144,50 +144,6 @@ AuthServiceInternalUpdateVariable (
   @param[in] Data                   Data pointer.
   @param[in] DataSize               Size of Data.
   @param[in] Attributes             Attribute value of the variable.
-  @param[in] KeyIndex               Index of associated public key.
-  @param[in] MonotonicCount         Value of associated monotonic count.
-
-  @retval EFI_SUCCESS               The update operation is success.
-  @retval EFI_INVALID_PARAMETER     Invalid parameter.
-  @retval EFI_WRITE_PROTECTED       Variable is write-protected.
-  @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
-
-**/
-EFI_STATUS
-AuthServiceInternalUpdateVariableWithMonotonicCount (
-  IN CHAR16             *VariableName,
-  IN EFI_GUID           *VendorGuid,
-  IN VOID               *Data,
-  IN UINTN              DataSize,
-  IN UINT32             Attributes,
-  IN UINT32             KeyIndex,
-  IN UINT64             MonotonicCount
-  )
-{
-  AUTH_VARIABLE_INFO    AuthVariableInfo;
-
-  ZeroMem (&AuthVariableInfo, sizeof (AuthVariableInfo));
-  AuthVariableInfo.VariableName = VariableName;
-  AuthVariableInfo.VendorGuid = VendorGuid;
-  AuthVariableInfo.Data = Data;
-  AuthVariableInfo.DataSize = DataSize;
-  AuthVariableInfo.Attributes = Attributes;
-  AuthVariableInfo.PubKeyIndex = KeyIndex;
-  AuthVariableInfo.MonotonicCount = MonotonicCount;
-
-  return mAuthVarLibContextIn->UpdateVariable (
-           &AuthVariableInfo
-           );
-}
-
-/**
-  Update the variable region with Variable information.
-
-  @param[in] VariableName           Name of variable.
-  @param[in] VendorGuid             Guid of variable.
-  @param[in] Data                   Data pointer.
-  @param[in] DataSize               Size of Data.
-  @param[in] Attributes             Attribute value of the variable.
   @param[in] TimeStamp              Value of associated TimeStamp.
 
   @retval EFI_SUCCESS               The update operation is success.
@@ -297,306 +253,6 @@ InCustomMode (
   }
 
   return FALSE;
-}
-
-/**
-  Get available public key index.
-
-  @param[in] PubKey     Pointer to Public Key data.
-
-  @return Public key index, 0 if no any public key index available.
-
-**/
-UINT32
-GetAvailableKeyIndex (
-  IN  UINT8             *PubKey
-  )
-{
-  EFI_STATUS            Status;
-  UINT8                 *Data;
-  UINTN                 DataSize;
-  UINT8                 *Ptr;
-  UINT32                Index;
-  BOOLEAN               IsFound;
-  EFI_GUID              VendorGuid;
-  CHAR16                Name[1];
-  AUTH_VARIABLE_INFO    AuthVariableInfo;
-  UINT32                KeyIndex;
-
-  Status = AuthServiceInternalFindVariable (
-             AUTHVAR_KEYDB_NAME,
-             &gEfiAuthenticatedVariableGuid,
-             (VOID **) &Data,
-             &DataSize
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Get public key database variable failure, Status = %r\n", Status));
-    return 0;
-  }
-
-  if (mPubKeyNumber == mMaxKeyNumber) {
-    Name[0] = 0;
-    AuthVariableInfo.VariableName = Name;
-    ZeroMem (&VendorGuid, sizeof (VendorGuid));
-    AuthVariableInfo.VendorGuid = &VendorGuid;
-    mPubKeyNumber = 0;
-    //
-    // Collect valid key data.
-    //
-    do {
-      Status = mAuthVarLibContextIn->FindNextVariable (AuthVariableInfo.VariableName, AuthVariableInfo.VendorGuid, &AuthVariableInfo);
-      if (!EFI_ERROR (Status)) {
-        if (AuthVariableInfo.PubKeyIndex != 0) {
-          for (Ptr = Data; Ptr < (Data + DataSize); Ptr += sizeof (AUTHVAR_KEY_DB_DATA)) {
-            if (ReadUnaligned32 (&(((AUTHVAR_KEY_DB_DATA *) Ptr)->KeyIndex)) == AuthVariableInfo.PubKeyIndex) {
-              //
-              // Check if the key data has been collected.
-              //
-              for (Index = 0; Index < mPubKeyNumber; Index++) {
-                if (ReadUnaligned32 (&(((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + Index)->KeyIndex)) == AuthVariableInfo.PubKeyIndex) {
-                  break;
-                }
-              }
-              if (Index == mPubKeyNumber) {
-                //
-                // New key data.
-                //
-                CopyMem ((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + mPubKeyNumber, Ptr, sizeof (AUTHVAR_KEY_DB_DATA));
-                mPubKeyNumber++;
-              }
-              break;
-            }
-          }
-        }
-      }
-    } while (Status != EFI_NOT_FOUND);
-
-    //
-    // No available space to add new public key.
-    //
-    if (mPubKeyNumber == mMaxKeyNumber) {
-      return 0;
-    }
-  }
-
-  //
-  // Find available public key index.
-  //
-  for (KeyIndex = 1; KeyIndex <= mMaxKeyNumber; KeyIndex++) {
-    IsFound = FALSE;
-    for (Ptr = mPubKeyStore; Ptr < (mPubKeyStore + mPubKeyNumber * sizeof (AUTHVAR_KEY_DB_DATA)); Ptr += sizeof (AUTHVAR_KEY_DB_DATA)) {
-      if (ReadUnaligned32 (&(((AUTHVAR_KEY_DB_DATA *) Ptr)->KeyIndex)) == KeyIndex) {
-        IsFound = TRUE;
-        break;
-      }
-    }
-    if (!IsFound) {
-      break;
-    }
-  }
-
-  return KeyIndex;
-}
-
-/**
-  Add public key in store and return its index.
-
-  @param[in] PubKey             Input pointer to Public Key data.
-  @param[in] VariableDataEntry  The variable data entry.
-
-  @return Index of new added public key.
-
-**/
-UINT32
-AddPubKeyInStore (
-  IN  UINT8                        *PubKey,
-  IN  VARIABLE_ENTRY_CONSISTENCY   *VariableDataEntry
-  )
-{
-  EFI_STATUS                       Status;
-  UINT32                           Index;
-  VARIABLE_ENTRY_CONSISTENCY       PublicKeyEntry;
-  UINT32                           Attributes;
-  UINT32                           KeyIndex;
-
-  if (PubKey == NULL) {
-    return 0;
-  }
-
-  //
-  // Check whether the public key entry does exist.
-  //
-  for (Index = 0; Index < mPubKeyNumber; Index++) {
-    if (CompareMem (((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + Index)->KeyData, PubKey, EFI_CERT_TYPE_RSA2048_SIZE) == 0) {
-      return ReadUnaligned32 (&(((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + Index)->KeyIndex));
-    }
-  }
-
-  KeyIndex = GetAvailableKeyIndex (PubKey);
-  if (KeyIndex == 0) {
-    return 0;
-  }
-
-  //
-  // Check the variable space for both public key and variable data.
-  //
-  PublicKeyEntry.VariableSize = (mPubKeyNumber + 1) * sizeof (AUTHVAR_KEY_DB_DATA);
-  PublicKeyEntry.Guid         = &gEfiAuthenticatedVariableGuid;
-  PublicKeyEntry.Name         = AUTHVAR_KEYDB_NAME;
-  Attributes = VARIABLE_ATTRIBUTE_NV_BS_RT | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
-
-  if (!mAuthVarLibContextIn->CheckRemainingSpaceForConsistency (Attributes, &PublicKeyEntry, VariableDataEntry, NULL)) {
-    //
-    // No enough variable space.
-    //
-    return 0;
-  }
-
-  WriteUnaligned32 (&(((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + mPubKeyNumber)->KeyIndex), KeyIndex);
-  CopyMem (((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + mPubKeyNumber)->KeyData, PubKey, EFI_CERT_TYPE_RSA2048_SIZE);
-  mPubKeyNumber++;
-
-  //
-  // Update public key database variable.
-  //
-  Status = AuthServiceInternalUpdateVariable (
-             AUTHVAR_KEYDB_NAME,
-             &gEfiAuthenticatedVariableGuid,
-             mPubKeyStore,
-             mPubKeyNumber * sizeof (AUTHVAR_KEY_DB_DATA),
-             Attributes
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Update public key database variable failure, Status = %r\n", Status));
-    return 0;
-  }
-
-  return KeyIndex;
-}
-
-/**
-  Verify data payload with AuthInfo in EFI_CERT_TYPE_RSA2048_SHA256_GUID type.
-  Follow the steps in UEFI2.2.
-
-  Caution: This function may receive untrusted input.
-  This function may be invoked in SMM mode, and datasize and data are external input.
-  This function will do basic validation, before parse the data.
-  This function will parse the authentication carefully to avoid security issues, like
-  buffer overflow, integer overflow.
-
-  @param[in]      Data                    Pointer to data with AuthInfo.
-  @param[in]      DataSize                Size of Data.
-  @param[in]      PubKey                  Public key used for verification.
-
-  @retval EFI_INVALID_PARAMETER       Invalid parameter.
-  @retval EFI_SECURITY_VIOLATION      If authentication failed.
-  @retval EFI_SUCCESS                 Authentication successful.
-
-**/
-EFI_STATUS
-VerifyCounterBasedPayload (
-  IN     UINT8          *Data,
-  IN     UINTN          DataSize,
-  IN     UINT8          *PubKey
-  )
-{
-  BOOLEAN                         Status;
-  EFI_VARIABLE_AUTHENTICATION     *CertData;
-  EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
-  UINT8                           Digest[SHA256_DIGEST_SIZE];
-  VOID                            *Rsa;
-  UINTN                           PayloadSize;
-
-  PayloadSize = DataSize - AUTHINFO_SIZE;
-  Rsa         = NULL;
-  CertData    = NULL;
-  CertBlock   = NULL;
-
-  if (Data == NULL || PubKey == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  CertData  = (EFI_VARIABLE_AUTHENTICATION *) Data;
-  CertBlock = (EFI_CERT_BLOCK_RSA_2048_SHA256 *) (CertData->AuthInfo.CertData);
-
-  //
-  // wCertificateType should be WIN_CERT_TYPE_EFI_GUID.
-  // Cert type should be EFI_CERT_TYPE_RSA2048_SHA256_GUID.
-  //
-  if ((CertData->AuthInfo.Hdr.wCertificateType != WIN_CERT_TYPE_EFI_GUID) ||
-      !CompareGuid (&CertData->AuthInfo.CertType, &gEfiCertTypeRsa2048Sha256Guid)) {
-    //
-    // Invalid AuthInfo type, return EFI_SECURITY_VIOLATION.
-    //
-    return EFI_SECURITY_VIOLATION;
-  }
-  //
-  // Hash data payload with SHA256.
-  //
-  ZeroMem (Digest, SHA256_DIGEST_SIZE);
-  Status  = Sha256Init (mHashCtx);
-  if (!Status) {
-    goto Done;
-  }
-  Status  = Sha256Update (mHashCtx, Data + AUTHINFO_SIZE, PayloadSize);
-  if (!Status) {
-    goto Done;
-  }
-  //
-  // Hash Size.
-  //
-  Status  = Sha256Update (mHashCtx, &PayloadSize, sizeof (UINTN));
-  if (!Status) {
-    goto Done;
-  }
-  //
-  // Hash Monotonic Count.
-  //
-  Status  = Sha256Update (mHashCtx, &CertData->MonotonicCount, sizeof (UINT64));
-  if (!Status) {
-    goto Done;
-  }
-  Status  = Sha256Final (mHashCtx, Digest);
-  if (!Status) {
-    goto Done;
-  }
-  //
-  // Generate & Initialize RSA Context.
-  //
-  Rsa = RsaNew ();
-  ASSERT (Rsa != NULL);
-  //
-  // Set RSA Key Components.
-  // NOTE: Only N and E are needed to be set as RSA public key for signature verification.
-  //
-  Status = RsaSetKey (Rsa, RsaKeyN, PubKey, EFI_CERT_TYPE_RSA2048_SIZE);
-  if (!Status) {
-    goto Done;
-  }
-  Status = RsaSetKey (Rsa, RsaKeyE, mRsaE, sizeof (mRsaE));
-  if (!Status) {
-    goto Done;
-  }
-  //
-  // Verify the signature.
-  //
-  Status = RsaPkcs1Verify (
-             Rsa,
-             Digest,
-             SHA256_DIGEST_SIZE,
-             CertBlock->Signature,
-             EFI_CERT_TYPE_RSA2048_SHA256_SIZE
-             );
-
-Done:
-  if (Rsa != NULL) {
-    RsaFree (Rsa);
-  }
-  if (Status) {
-    return EFI_SUCCESS;
-  } else {
-    return EFI_SECURITY_VIOLATION;
-  }
 }
 
 /**
@@ -1146,7 +802,7 @@ IsDeleteAuthVariable (
 }
 
 /**
-  Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
+  Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
 
   Caution: This function may receive untrusted input.
   This function may be invoked in SMM mode, and datasize and data are external input.
@@ -1163,9 +819,9 @@ IsDeleteAuthVariable (
 
   @return EFI_INVALID_PARAMETER           Invalid parameter.
   @return EFI_WRITE_PROTECTED             Variable is write-protected and needs authentication with
-                                          EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
+                                          EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
   @return EFI_OUT_OF_RESOURCES            The Database to save the public key is full.
-  @return EFI_SECURITY_VIOLATION          The variable is with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
+  @return EFI_SECURITY_VIOLATION          The variable is with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS
                                           set, but the AuthInfo does NOT pass the validation
                                           check carried out by the firmware.
   @return EFI_SUCCESS                     Variable is not write-protected or pass validation successfully.
@@ -1181,22 +837,8 @@ ProcessVariable (
   )
 {
   EFI_STATUS                      Status;
-  BOOLEAN                         IsDeletion;
-  BOOLEAN                         IsFirstTime;
-  UINT8                           *PubKey;
-  EFI_VARIABLE_AUTHENTICATION     *CertData;
-  EFI_CERT_BLOCK_RSA_2048_SHA256  *CertBlock;
-  UINT32                          KeyIndex;
-  UINT64                          MonotonicCount;
-  VARIABLE_ENTRY_CONSISTENCY      VariableDataEntry;
-  UINT32                          Index;
   AUTH_VARIABLE_INFO              OrgVariableInfo;
 
-  KeyIndex    = 0;
-  CertData    = NULL;
-  CertBlock   = NULL;
-  PubKey      = NULL;
-  IsDeletion  = FALSE;
   Status      = EFI_SUCCESS;
 
   ZeroMem (&OrgVariableInfo, sizeof (OrgVariableInfo));
@@ -1208,7 +850,7 @@ ProcessVariable (
 
   if ((!EFI_ERROR (Status)) && IsDeleteAuthVariable (OrgVariableInfo.Attributes, Data, DataSize, Attributes) && UserPhysicalPresent()) {
     //
-    // Allow the delete operation of common authenticated variable at user physical presence.
+    // Allow the delete operation of common authenticated variable(AT or AW) at user physical presence.
     //
     Status = AuthServiceInternalUpdateVariable (
               VariableName,
@@ -1232,25 +874,15 @@ ProcessVariable (
   }
 
   //
-  // A time-based authenticated variable and a count-based authenticated variable
-  // can't be updated by each other.
-  //
-  if (OrgVariableInfo.Data != NULL) {
-    if (((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) &&
-        ((OrgVariableInfo.Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0)) {
-      return EFI_SECURITY_VIOLATION;
-    }
-
-    if (((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) &&
-        ((OrgVariableInfo.Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0)) {
-      return EFI_SECURITY_VIOLATION;
-    }
-  }
-
-  //
-  // Process Time-based Authenticated variable.
-  //
-  if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+  if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    //
+    // Reject Counter Based Auth Variable processing request.
+    //
+    return EFI_UNSUPPORTED;
+  } else if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    //
+    // Process Time-based Authenticated variable.
+    //
     return VerifyTimeBasedPayloadAndUpdate (
              VariableName,
              VendorGuid,
@@ -1262,117 +894,20 @@ ProcessVariable (
              );
   }
 
-  //
-  // Determine if first time SetVariable with the EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS.
-  //
-  if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    //
-    // Determine current operation type.
-    //
-    if (DataSize == AUTHINFO_SIZE) {
-      IsDeletion = TRUE;
-    }
-    //
-    // Determine whether this is the first time with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
-    //
-    if (OrgVariableInfo.Data == NULL) {
-      IsFirstTime = TRUE;
-    } else if ((OrgVariableInfo.Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == 0) {
-      IsFirstTime = TRUE;
-    } else {
-      KeyIndex   = OrgVariableInfo.PubKeyIndex;
-      IsFirstTime = FALSE;
-    }
-  } else if ((OrgVariableInfo.Data != NULL) &&
-             ((OrgVariableInfo.Attributes & (EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)) != 0)
-            ) {
+  if ((OrgVariableInfo.Data != NULL) &&
+     ((OrgVariableInfo.Attributes & (EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)) != 0)) {
     //
     // If the variable is already write-protected, it always needs authentication before update.
     //
     return EFI_WRITE_PROTECTED;
-  } else {
-    //
-    // If without EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, set and attributes collision.
-    // That means it is not authenticated variable, just update variable as usual.
-    //
-    Status = AuthServiceInternalUpdateVariable (VariableName, VendorGuid, Data, DataSize, Attributes);
-    return Status;
   }
 
   //
-  // Get PubKey and check Monotonic Count value corresponding to the variable.
+  // Not authenticated variable, just update variable as usual.
   //
-  CertData  = (EFI_VARIABLE_AUTHENTICATION *) Data;
-  CertBlock = (EFI_CERT_BLOCK_RSA_2048_SHA256 *) (CertData->AuthInfo.CertData);
-  PubKey    = CertBlock->PublicKey;
+  Status = AuthServiceInternalUpdateVariable (VariableName, VendorGuid, Data, DataSize, Attributes);
+  return Status;
 
-  //
-  // Update Monotonic Count value.
-  //
-  MonotonicCount = CertData->MonotonicCount;
-
-  if (!IsFirstTime) {
-    //
-    // 2 cases need to check here
-    //   1. Internal PubKey variable. PubKeyIndex is always 0
-    //   2. Other counter-based AuthVariable. Check input PubKey.
-    //
-    if (KeyIndex == 0) {
-      return EFI_SECURITY_VIOLATION;
-    }
-    for (Index = 0; Index < mPubKeyNumber; Index++) {
-      if (ReadUnaligned32 (&(((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + Index)->KeyIndex)) == KeyIndex) {
-        if (CompareMem (((AUTHVAR_KEY_DB_DATA *) mPubKeyStore + Index)->KeyData, PubKey, EFI_CERT_TYPE_RSA2048_SIZE) == 0) {
-          break;
-        } else {
-          return EFI_SECURITY_VIOLATION;
-        }
-      }
-    }
-    if (Index == mPubKeyNumber) {
-      return EFI_SECURITY_VIOLATION;
-    }
-
-    //
-    // Compare the current monotonic count and ensure that it is greater than the last SetVariable
-    // operation with the EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS attribute set.
-    //
-    if (MonotonicCount <= OrgVariableInfo.MonotonicCount) {
-      //
-      // Monotonic count check fail, suspicious replay attack, return EFI_SECURITY_VIOLATION.
-      //
-      return EFI_SECURITY_VIOLATION;
-    }
-  }
-  //
-  // Verify the certificate in Data payload.
-  //
-  Status = VerifyCounterBasedPayload (Data, DataSize, PubKey);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Now, the signature has been verified!
-  //
-  if (IsFirstTime && !IsDeletion) {
-    VariableDataEntry.VariableSize = DataSize - AUTHINFO_SIZE;
-    VariableDataEntry.Guid         = VendorGuid;
-    VariableDataEntry.Name         = VariableName;
-
-    //
-    // Update public key database variable if need.
-    //
-    KeyIndex = AddPubKeyInStore (PubKey, &VariableDataEntry);
-    if (KeyIndex == 0) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-  }
-
-  //
-  // Verification pass.
-  //
-  return AuthServiceInternalUpdateVariableWithMonotonicCount (VariableName, VendorGuid, (UINT8*)Data + AUTHINFO_SIZE, DataSize - AUTHINFO_SIZE, Attributes, KeyIndex, MonotonicCount);
 }
 
 /**

@@ -27,10 +27,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Global database array for scratch
 ///
-UINT8    *mPubKeyStore;
-UINT32   mPubKeyNumber;
-UINT32   mMaxKeyNumber;
-UINT32   mMaxKeyDbSize;
 UINT8    *mCertDbStore;
 UINT32   mMaxCertDbSize;
 UINT32   mPlatformMode;
@@ -78,17 +74,6 @@ VARIABLE_ENTRY_PROPERTY mAuthVarEntry[] = {
     }
   },
   {
-    &gEfiAuthenticatedVariableGuid,
-    AUTHVAR_KEYDB_NAME,
-    {
-      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
-      VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
-      VARIABLE_ATTRIBUTE_NV_BS_RT_AW,
-      sizeof (UINT8),
-      MAX_UINTN
-    }
-  },
-  {
     &gEfiCertDbGuid,
     EFI_CERT_DB_NAME,
     {
@@ -112,7 +97,7 @@ VARIABLE_ENTRY_PROPERTY mAuthVarEntry[] = {
   },
 };
 
-VOID **mAuthVarAddressPointer[10];
+VOID **mAuthVarAddressPointer[9];
 
 AUTH_VAR_LIB_CONTEXT_IN *mAuthVarLibContextIn = NULL;
 
@@ -138,7 +123,6 @@ AuthVariableLibInitialize (
   )
 {
   EFI_STATUS            Status;
-  UINT8                 VarValue;
   UINT32                VarAttr;
   UINT8                 *Data;
   UINTN                 DataSize;
@@ -164,16 +148,6 @@ AuthVariableLibInitialize (
   }
 
   //
-  // Reserve runtime buffer for public key database. The size excludes variable header and name size.
-  //
-  mMaxKeyDbSize = (UINT32) (mAuthVarLibContextIn->MaxAuthVariableSize - sizeof (AUTHVAR_KEYDB_NAME));
-  mMaxKeyNumber = mMaxKeyDbSize / sizeof (AUTHVAR_KEY_DB_DATA);
-  mPubKeyStore  = AllocateRuntimePool (mMaxKeyDbSize);
-  if (mPubKeyStore == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
   // Reserve runtime buffer for certificate database. The size excludes variable header and name size.
   // Use EFI_CERT_DB_VOLATILE_NAME size since it is longer.
   //
@@ -181,43 +155,6 @@ AuthVariableLibInitialize (
   mCertDbStore   = AllocateRuntimePool (mMaxCertDbSize);
   if (mCertDbStore == NULL) {
     return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Check "AuthVarKeyDatabase" variable's existence.
-  // If it doesn't exist, create a new one with initial value of 0 and EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
-  //
-  Status = AuthServiceInternalFindVariable (
-             AUTHVAR_KEYDB_NAME,
-             &gEfiAuthenticatedVariableGuid,
-             (VOID **) &Data,
-             &DataSize
-             );
-  if (EFI_ERROR (Status)) {
-    VarAttr       = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS;
-    VarValue      = 0;
-    mPubKeyNumber = 0;
-    Status        = AuthServiceInternalUpdateVariable (
-                      AUTHVAR_KEYDB_NAME,
-                      &gEfiAuthenticatedVariableGuid,
-                      &VarValue,
-                      sizeof(UINT8),
-                      VarAttr
-                      );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  } else {
-    //
-    // Load database in global variable for cache.
-    //
-    ASSERT ((DataSize != 0) && (Data != NULL));
-    //
-    // "AuthVarKeyDatabase" is an internal variable. Its DataSize is always ensured not to exceed mPubKeyStore buffer size(See definition before)
-    //  Therefore, there is no memory overflow in underlying CopyMem.
-    //
-    CopyMem (mPubKeyStore, (UINT8 *) Data, DataSize);
-    mPubKeyNumber = (UINT32) (DataSize / sizeof (AUTHVAR_KEY_DB_DATA));
   }
 
   Status = AuthServiceInternalFindVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
@@ -422,16 +359,15 @@ AuthVariableLibInitialize (
   AuthVarLibContextOut->StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_OUT);
   AuthVarLibContextOut->AuthVarEntry = mAuthVarEntry;
   AuthVarLibContextOut->AuthVarEntryCount = ARRAY_SIZE (mAuthVarEntry);
-  mAuthVarAddressPointer[0] = (VOID **) &mPubKeyStore;
-  mAuthVarAddressPointer[1] = (VOID **) &mCertDbStore;
-  mAuthVarAddressPointer[2] = (VOID **) &mHashCtx;
-  mAuthVarAddressPointer[3] = (VOID **) &mAuthVarLibContextIn;
-  mAuthVarAddressPointer[4] = (VOID **) &(mAuthVarLibContextIn->FindVariable),
-  mAuthVarAddressPointer[5] = (VOID **) &(mAuthVarLibContextIn->FindNextVariable),
-  mAuthVarAddressPointer[6] = (VOID **) &(mAuthVarLibContextIn->UpdateVariable),
-  mAuthVarAddressPointer[7] = (VOID **) &(mAuthVarLibContextIn->GetScratchBuffer),
-  mAuthVarAddressPointer[8] = (VOID **) &(mAuthVarLibContextIn->CheckRemainingSpaceForConsistency),
-  mAuthVarAddressPointer[9] = (VOID **) &(mAuthVarLibContextIn->AtRuntime),
+  mAuthVarAddressPointer[0] = (VOID **) &mCertDbStore;
+  mAuthVarAddressPointer[1] = (VOID **) &mHashCtx;
+  mAuthVarAddressPointer[2] = (VOID **) &mAuthVarLibContextIn;
+  mAuthVarAddressPointer[3] = (VOID **) &(mAuthVarLibContextIn->FindVariable),
+  mAuthVarAddressPointer[4] = (VOID **) &(mAuthVarLibContextIn->FindNextVariable),
+  mAuthVarAddressPointer[5] = (VOID **) &(mAuthVarLibContextIn->UpdateVariable),
+  mAuthVarAddressPointer[6] = (VOID **) &(mAuthVarLibContextIn->GetScratchBuffer),
+  mAuthVarAddressPointer[7] = (VOID **) &(mAuthVarLibContextIn->CheckRemainingSpaceForConsistency),
+  mAuthVarAddressPointer[8] = (VOID **) &(mAuthVarLibContextIn->AtRuntime),
   AuthVarLibContextOut->AddressPointer = mAuthVarAddressPointer;
   AuthVarLibContextOut->AddressPointerCount = ARRAY_SIZE (mAuthVarAddressPointer);
 
@@ -439,7 +375,7 @@ AuthVariableLibInitialize (
 }
 
 /**
-  Process variable with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS/EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
+  Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set.
 
   @param[in] VariableName           Name of the variable.
   @param[in] VendorGuid             Variable vendor GUID.
@@ -452,8 +388,7 @@ AuthVariableLibInitialize (
   @retval EFI_INVALID_PARAMETER     Invalid parameter.
   @retval EFI_WRITE_PROTECTED       Variable is write-protected.
   @retval EFI_OUT_OF_RESOURCES      There is not enough resource.
-  @retval EFI_SECURITY_VIOLATION    The variable is with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
-                                    or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS
+  @retval EFI_SECURITY_VIOLATION    The variable is with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS
                                     set, but the AuthInfo does NOT pass the validation
                                     check carried out by the firmware.
   @retval EFI_UNSUPPORTED           Unsupported to process authenticated variable.
