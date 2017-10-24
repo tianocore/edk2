@@ -541,6 +541,7 @@ IScsiConvertAttemptConfigDataToIfrNvData (
     IScsiIpToStr (&Ip, FALSE, IfrNvData->SubnetMask);
     CopyMem (&Ip.v4, &SessionConfigData->Gateway, sizeof (EFI_IPv4_ADDRESS));
     IScsiIpToStr (&Ip, FALSE, IfrNvData->Gateway);
+    ZeroMem (IfrNvData->TargetIp, sizeof (IfrNvData->TargetIp));
     if (SessionConfigData->TargetIp.v4.Addr[0] != '\0') {
       CopyMem (&Ip.v4, &SessionConfigData->TargetIp, sizeof (EFI_IPv4_ADDRESS));
       IScsiIpToStr (&Ip, FALSE, IfrNvData->TargetIp);
