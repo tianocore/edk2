@@ -205,7 +205,7 @@ EditorClearLine (
         //
         // if CHAR_NULL is still at position LastCol, it will cause first line error
         //
-        Line[(LastCol % (ARRAY_SIZE (Line) - 1)) - 1] = CHAR_NULL;
+        Line[(LastCol - 1) % (ARRAY_SIZE (Line) - 1)] = CHAR_NULL;
       } else {
         Line[LastCol % (ARRAY_SIZE (Line) - 1)] = CHAR_NULL;
       }
