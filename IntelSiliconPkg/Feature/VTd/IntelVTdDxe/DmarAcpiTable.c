@@ -996,7 +996,7 @@ GetDmarAcpiTable (
              );
   if (EFI_ERROR (Status)) {
     Status = EfiGetSystemConfigurationTable (
-               &gEfiAcpiTableGuid,
+               &gEfiAcpi10TableGuid,
                &AcpiTable
                );
   }

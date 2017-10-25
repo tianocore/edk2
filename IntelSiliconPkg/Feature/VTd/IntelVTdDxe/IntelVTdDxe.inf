@@ -64,7 +64,7 @@
 [Guids]
   gEfiEventExitBootServicesGuid   ## CONSUMES ## Event
   gEfiAcpi20TableGuid             ## CONSUMES ## SystemTable
-  gEfiAcpiTableGuid               ## CONSUMES ## SystemTable
+  gEfiAcpi10TableGuid             ## CONSUMES ## SystemTable
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                     ## PRODUCES
