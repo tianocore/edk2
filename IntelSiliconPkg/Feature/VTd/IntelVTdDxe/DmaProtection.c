@@ -13,7 +13,6 @@
 
 #include "DmaProtection.h"
 
-EFI_ACPI_SDT_PROTOCOL                   *mAcpiSdt;
 UINT64                                  mBelow4GMemoryLimit;
 UINT64                                  mAbove4GMemoryLimit;
 
@@ -350,11 +349,6 @@ SetupVtd (
   //
   // 1. setup
   //
-  DEBUG ((DEBUG_INFO, "GetDmarAcpiTable\n"));
-  Status = GetDmarAcpiTable ();
-  if (EFI_ERROR (Status)) {
-    return;
-  }
   DEBUG ((DEBUG_INFO, "ParseDmarAcpiTable\n"));
   Status = ParseDmarAcpiTableDrhd ();
   if (EFI_ERROR (Status)) {
@@ -399,27 +393,29 @@ SetupVtd (
 }
 
 /**
-  ACPI notification function.
+  Notification function of ACPI Table change.
 
-  @param[in] Table    A pointer to the ACPI table header.
-  @param[in] Version  The ACPI table's version.
-  @param[in] TableKey The table key for this ACPI table.
+  This is a notification function registered on ACPI Table change event.
 
-  @retval EFI_SUCCESS The notification function is executed.
+  @param  Event        Event whose notification function is being invoked.
+  @param  Context      Pointer to the notification function's context.
+
 **/
-EFI_STATUS
+VOID
 EFIAPI
 AcpiNotificationFunc (
-  IN EFI_ACPI_SDT_HEADER    *Table,
-  IN EFI_ACPI_TABLE_VERSION Version,
-  IN UINTN                  TableKey
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
   )
 {
-  if (Table->Signature == EFI_ACPI_4_0_DMA_REMAPPING_TABLE_SIGNATURE) {
-    DEBUG((DEBUG_INFO, "Vtd AcpiNotificationFunc\n"));
-    SetupVtd ();
+  EFI_STATUS          Status;
+
+  Status = GetDmarAcpiTable ();
+  if (EFI_ERROR (Status)) {
+    return;
   }
-  return EFI_SUCCESS;
+  SetupVtd ();
+  gBS->CloseEvent (Event);
 }
 
 /**
@@ -474,11 +470,26 @@ InitializeDmaProtection (
   EFI_STATUS  Status;
   EFI_EVENT   ExitBootServicesEvent;
   EFI_EVENT   LegacyBootEvent;
-
-  Status = gBS->LocateProtocol (&gEfiAcpiSdtProtocolGuid, NULL, (VOID **) &mAcpiSdt);
+  EFI_EVENT   Event;
+  
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  AcpiNotificationFunc,
+                  NULL,
+                  &gEfiAcpi10TableGuid,
+                  &Event
+                  );
   ASSERT_EFI_ERROR (Status);
 
-  Status = mAcpiSdt->RegisterNotify (TRUE, AcpiNotificationFunc);
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  AcpiNotificationFunc,
+                  NULL,
+                  &gEfiAcpi20TableGuid,
+                  &Event
+                  );
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->CreateEventEx (

@@ -989,6 +989,10 @@ GetDmarAcpiTable (
   VOID                              *AcpiTable;
   EFI_STATUS                        Status;
 
+  if (mAcpiDmarTable != NULL) {
+    return EFI_SUCCESS;
+  }
+
   AcpiTable = NULL;
   Status = EfiGetSystemConfigurationTable (
              &gEfiAcpi20TableGuid,
@@ -1006,10 +1010,10 @@ GetDmarAcpiTable (
                       (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)AcpiTable,
                       EFI_ACPI_4_0_DMA_REMAPPING_TABLE_SIGNATURE
                       );
-  DEBUG ((DEBUG_INFO,"DMAR Table - 0x%08x\n", mAcpiDmarTable));
   if (mAcpiDmarTable == NULL) {
-    return EFI_UNSUPPORTED;
+    return EFI_NOT_FOUND;
   }
+  DEBUG ((DEBUG_INFO,"DMAR Table - 0x%08x\n", mAcpiDmarTable));
   VtdDumpDmarTable();
 
   return EFI_SUCCESS;
