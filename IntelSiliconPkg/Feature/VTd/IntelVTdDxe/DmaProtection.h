@@ -36,7 +36,6 @@
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciEnumerationComplete.h>
-#include <Protocol/AcpiSystemDescriptionTable.h>
 #include <Protocol/PlatformVtdPolicy.h>
 #include <Protocol/IoMmu.h>
 

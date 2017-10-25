@@ -63,12 +63,15 @@
 
 [Guids]
   gEfiEventExitBootServicesGuid   ## CONSUMES ## Event
-  gEfiAcpi20TableGuid             ## CONSUMES ## SystemTable
-  gEfiAcpi10TableGuid             ## CONSUMES ## SystemTable
+  ## CONSUMES ## SystemTable
+  ## CONSUMES ## Event
+  gEfiAcpi20TableGuid
+  ## CONSUMES ## SystemTable
+  ## CONSUMES ## Event
+  gEfiAcpi10TableGuid
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                     ## PRODUCES
-  gEfiAcpiSdtProtocolGuid                     ## CONSUMES
   gEfiPciIoProtocolGuid                       ## CONSUMES
   gEfiPciEnumerationCompleteProtocolGuid      ## CONSUMES
   gEdkiiPlatformVTdPolicyProtocolGuid         ## SOMETIMES_CONSUMES
@@ -77,8 +80,7 @@
   gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask   ## CONSUMES
 
 [Depex]
-  gEfiPciRootBridgeIoProtocolGuid AND
-  gEfiAcpiSdtProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   IntelVTdDxeExtra.uni
