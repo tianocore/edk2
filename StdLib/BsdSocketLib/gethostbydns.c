@@ -129,8 +129,10 @@ u_int16_t _getshort(const u_char *src);
 #define	MAXALIASES	35
 #define	MAXADDRS	35
 
+#ifdef _ORG_FREEBSD_
 static const char AskedForGot[] =
 		"gethostby*.gethostanswer: asked for \"%s\", got \"%s\"";
+#endif
 
 static char *h_addr_ptrs[MAXADDRS + 1];
 

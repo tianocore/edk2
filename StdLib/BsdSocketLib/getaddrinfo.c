@@ -92,7 +92,6 @@ __RCSID("$NetBSD: getaddrinfo.c,v 1.91.6.1 2009/01/26 00:27:34 snj Exp $");
 #include <net/servent.h>
 
 #define endservent_r(svd)   endservent()
-#define nsdispatch(pResult,dtab,database,routine,files,hostname,pai)  NS_NOTFOUND
 #define res_nmkquery(state,op,dname,class,type,data,datalen,newrr_in,buf,buflen)  res_mkquery( op, dname, class, type, data, datalen, newrr_in, buf, buflen )
 #define res_nsend(state,buf,buflen,ans,anssiz)    res_send ( buf, buflen, ans, anssiz )
 
@@ -305,6 +304,12 @@ do { 								\
 	    (y) == PF_UNSPEC)))	
 #define MATCH(x, y, w) 							\
 	((x) == (y) || (/*CONSTCOND*/(w) && ((x) == ANY || (y) == ANY)))
+
+int nsdispatch(void *result, const ns_dtab dist_tab[], const char* database,
+               const char *method, const ns_src defaults[], ...)
+{
+  return NS_NOTFOUND;
+}
 
 const char *
 gai_strerror(int ecode)
@@ -1061,9 +1066,6 @@ ip6_str2scopeid(char *scope, struct sockaddr_in6 *sin6, u_int32_t *scopeid)
 #endif
 
 /* code duplicate with gethnamaddr.c */
-
-static const char AskedForGot[] =
-	"gethostby*.getanswer: asked for \"%s\", got \"%s\"";
 
 static struct addrinfo *
 getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
