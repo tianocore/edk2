@@ -480,8 +480,7 @@ InitializeAtaAtapiPassThru (
 }
 
 /**
-  Disable the device (especially Bus Master DMA) when exiting the boot
-  services.
+  Disable Bus Master DMA on the device when exiting the boot services.
 
   @param[in] Event    Event for which this notification function is being
                       called.
@@ -506,7 +505,7 @@ AtaPassThruExitBootServices (
   PciIo->Attributes (
            PciIo,
            EfiPciIoAttributeOperationDisable,
-           Instance->EnabledPciAttributes,
+           Instance->EnabledPciAttributes & EFI_PCI_IO_ATTRIBUTE_BUS_MASTER,
            NULL
            );
 }

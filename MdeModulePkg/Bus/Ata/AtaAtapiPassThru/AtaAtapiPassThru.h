@@ -123,8 +123,7 @@ typedef struct {
   LIST_ENTRY                        NonBlockingTaskList;
 
   //
-  // For disabling the device (especially Bus Master DMA) at
-  // ExitBootServices().
+  // For disabling Bus Master DMA on the device at ExitBootServices().
   //
   EFI_EVENT                         ExitBootEvent;
 } ATA_ATAPI_PASS_THRU_INSTANCE;
