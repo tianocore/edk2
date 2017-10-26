@@ -19,6 +19,7 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RegisterCpuFeaturesLib.h>
+#include <Library/HobLib.h>
 
 #include <Protocol/SmmConfiguration.h>
 #include <Guid/CpuFeaturesInitDone.h>
@@ -101,6 +102,25 @@ CpuFeaturesDxeInitialize (
   )
 {
   VOID        *Registration;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+
+  if (GetFirstGuidHob (&gEdkiiCpuFeaturesInitDoneGuid) != NULL) {
+    //
+    // Try to find HOB first. This HOB exist means CPU features have 
+    // been initialized by CpuFeaturesPei driver, just install 
+    // gEdkiiCpuFeaturesInitDoneGuid.
+    //
+    Handle = NULL;
+    Status = gBS->InstallProtocolInterface (
+                    &Handle,
+                    &gEdkiiCpuFeaturesInitDoneGuid,
+                    EFI_NATIVE_INTERFACE,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   if (PcdGetBool (PcdCpuFeaturesInitAfterSmmRelocation)) {
     //

@@ -33,6 +33,7 @@
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   RegisterCpuFeaturesLib
+  HobLib
 
 [Sources]
   CpuFeaturesDxe.c

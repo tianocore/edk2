@@ -18,6 +18,7 @@
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/RegisterCpuFeaturesLib.h>
+#include <Library/HobLib.h>
 
 #include <Guid/CpuFeaturesInitDone.h>
 
@@ -69,6 +70,11 @@ CpuFeaturesPeimInitialize (
   //
   Status = PeiServicesInstallPpi(&mPeiCpuFeaturesInitDonePpiDesc);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Build HOB to let CpuFeatureDxe driver skip the initialization process.
+  //
+  BuildGuidHob (&gEdkiiCpuFeaturesInitDoneGuid, 0);
 
   return EFI_SUCCESS;
 }
