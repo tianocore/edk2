@@ -182,18 +182,18 @@ typedef union {
 
 typedef union {
   struct {
-    UINT32 AttentionButtonPressed : 1;
-    UINT32 PowerFaultDetected : 1;
-    UINT32 MrlSensorChanged : 1;
-    UINT32 PresenceDetectChanged : 1;
-    UINT32 CommandCompletedInterrupt : 1;
-    UINT32 HotPlugInterrupt : 1;
-    UINT32 AttentionIndicator : 2;
-    UINT32 PowerIndicator : 2;
-    UINT32 PowerController : 1;
-    UINT32 ElectromechanicalInterlock : 1;
-    UINT32 DataLinkLayerStateChanged : 1;
-    UINT32 Reserved : 3;
+    UINT16 AttentionButtonPressed : 1;
+    UINT16 PowerFaultDetected : 1;
+    UINT16 MrlSensorChanged : 1;
+    UINT16 PresenceDetectChanged : 1;
+    UINT16 CommandCompletedInterrupt : 1;
+    UINT16 HotPlugInterrupt : 1;
+    UINT16 AttentionIndicator : 2;
+    UINT16 PowerIndicator : 2;
+    UINT16 PowerController : 1;
+    UINT16 ElectromechanicalInterlock : 1;
+    UINT16 DataLinkLayerStateChanged : 1;
+    UINT16 Reserved : 3;
   } Bits;
   UINT16   Uint16;
 } PCI_REG_PCIE_SLOT_CONTROL;
