@@ -4369,7 +4369,7 @@ DEFINE GCC_VFRPP_FLAGS             = -x c -E -P -DVFRCOMPILE --include $(DEST_DI
 DEFINE GCC_ASLPP_FLAGS             = -x c -E -include AutoGen.h
 DEFINE GCC_ASLCC_FLAGS             = -x c
 DEFINE GCC_WINDRES_FLAGS           = -J rc -O coff
-DEFINE GCC_DTCPP_FLAGS             = -E -x assembler-with-cpp -imacros $(DEST_DIR_DEBUG)/AutoGen.h -nostdinc
+DEFINE GCC_DTCPP_FLAGS             = -E -x assembler-with-cpp -imacros $(DEST_DIR_DEBUG)/AutoGen.h -nostdinc -undef
 DEFINE GCC_IA32_RC_FLAGS           = -I binary -O elf32-i386          -B i386    --rename-section .data=.hii
 DEFINE GCC_X64_RC_FLAGS            = -I binary -O elf64-x86-64        -B i386    --rename-section .data=.hii
 DEFINE GCC_IPF_RC_FLAGS            = -I binary -O elf64-ia64-little   -B ia64    --rename-section .data=.hii
