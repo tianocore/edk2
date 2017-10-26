@@ -483,7 +483,7 @@ InitializeDmaProtection (
 
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
+                  TPL_CALLBACK,
                   OnExitBootServices,
                   NULL,
                   &gEfiEventExitBootServicesGuid,
@@ -492,7 +492,7 @@ InitializeDmaProtection (
   ASSERT_EFI_ERROR (Status);
 
   Status = EfiCreateEventLegacyBootEx (
-             TPL_NOTIFY,
+             TPL_CALLBACK,
              OnLegacyBoot,
              NULL,
              &LegacyBootEvent
