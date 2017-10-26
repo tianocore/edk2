@@ -1,7 +1,7 @@
 /** @file
   Header files and data structures needed by PCI Bus module.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -238,11 +238,6 @@ struct _PCI_IO_DEVICE {
   // The OptionRom Size
   //
   UINT64                                    RomSize;
-
-  //
-  // The OptionRom Size
-  //
-  UINT64                                    RomBase;
 
   //
   // TRUE if all OpROM (in device or in platform specific position) have been processed

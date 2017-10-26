@@ -551,7 +551,7 @@ LoadOpRomImage (
     PciDevice->BusNumber,
     PciDevice->DeviceNumber,
     PciDevice->FunctionNumber,
-    (UINT64) (UINTN) PciDevice->PciIo.RomImage,
+    PciDevice->PciIo.RomImage,
     PciDevice->PciIo.RomSize
     );
 
@@ -766,7 +766,7 @@ ProcessOpRomImage (
           PciDevice->BusNumber,
           PciDevice->DeviceNumber,
           PciDevice->FunctionNumber,
-          (UINT64) (UINTN) PciDevice->PciIo.RomImage,
+          PciDevice->PciIo.RomImage,
           PciDevice->PciIo.RomSize
           );
         RetStatus = EFI_SUCCESS;

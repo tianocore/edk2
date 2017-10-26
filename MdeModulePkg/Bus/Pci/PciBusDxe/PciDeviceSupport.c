@@ -282,7 +282,7 @@ RegisterPciDevice (
           PciIoDevice->BusNumber,
           PciIoDevice->DeviceNumber,
           PciIoDevice->FunctionNumber,
-          (UINT64) (UINTN) PciIoDevice->PciIo.RomImage,
+          PciIoDevice->PciIo.RomImage,
           PciIoDevice->PciIo.RomSize
           );
       }
@@ -308,7 +308,7 @@ RegisterPciDevice (
           PciIoDevice->BusNumber,
           PciIoDevice->DeviceNumber,
           PciIoDevice->FunctionNumber,
-          (UINT64) (UINTN) PciIoDevice->PciIo.RomImage,
+          PciIoDevice->PciIo.RomImage,
           PciIoDevice->PciIo.RomSize
           );
       }   

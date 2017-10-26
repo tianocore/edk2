@@ -1,7 +1,7 @@
 /** @file
   Set up ROM Table for PCI Bus module.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,13 +23,13 @@ typedef struct {
   UINT8       Bus;
   UINT8       Dev;
   UINT8       Func;
-  UINT64      RomAddress;
-  UINT64      RomLength;
-} EFI_PCI_ROM_IMAGE_MAPPING;
+  VOID        *RomImage;
+  UINT64      RomSize;
+} PCI_ROM_IMAGE;
 
-UINTN                      mNumberOfPciRomImages     = 0;
-UINTN                      mMaxNumberOfPciRomImages  = 0;
-EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
+UINTN          mNumberOfPciRomImages     = 0;
+UINTN          mMaxNumberOfPciRomImages  = 0;
+PCI_ROM_IMAGE  *mRomImageTable           = NULL;
 
 /**
   Add the Rom Image to internal database for later PCI light enumeration.
@@ -39,9 +39,8 @@ EFI_PCI_ROM_IMAGE_MAPPING  *mRomImageTable           = NULL;
   @param Bus            Bus NO of PCI space.
   @param Dev            Dev NO of PCI space.
   @param Func           Func NO of PCI space.
-  @param RomAddress     Base address of OptionRom.
-  @param RomLength      Length of rom image.
-
+  @param RomImage       Option Rom buffer.
+  @param RomSize        Size of Option Rom buffer.
 **/
 VOID
 PciRomAddImageMapping (
@@ -50,29 +49,25 @@ PciRomAddImageMapping (
   IN  UINT8       Bus,
   IN  UINT8       Dev,
   IN  UINT8       Func,
-  IN  UINT64      RomAddress,
-  IN  UINT64      RomLength
+  IN  VOID        *RomImage,
+  IN  UINT64      RomSize
   )
 {
-  EFI_PCI_ROM_IMAGE_MAPPING *TempMapping;
+  PCI_ROM_IMAGE   *NewTable;
 
-  if (mNumberOfPciRomImages >= mMaxNumberOfPciRomImages) {
+  if (mNumberOfPciRomImages == mMaxNumberOfPciRomImages) {
 
-    mMaxNumberOfPciRomImages += 0x20;
-
-    TempMapping = NULL;
-    TempMapping = AllocatePool (mMaxNumberOfPciRomImages * sizeof (EFI_PCI_ROM_IMAGE_MAPPING));
-    if (TempMapping == NULL) {
+    NewTable = ReallocatePool (
+                 mMaxNumberOfPciRomImages * sizeof (PCI_ROM_IMAGE),
+                 (mMaxNumberOfPciRomImages + 0x20) * sizeof (PCI_ROM_IMAGE),
+                 mRomImageTable
+                 );
+    if (NewTable == NULL) {
       return ;
     }
 
-    CopyMem (TempMapping, mRomImageTable, mNumberOfPciRomImages * sizeof (EFI_PCI_ROM_IMAGE_MAPPING));
-
-    if (mRomImageTable != NULL) {
-      FreePool (mRomImageTable);
-    }
-
-    mRomImageTable = TempMapping;
+    mRomImageTable            = NewTable;
+    mMaxNumberOfPciRomImages += 0x20;
   }
 
   mRomImageTable[mNumberOfPciRomImages].ImageHandle = ImageHandle;
@@ -80,8 +75,8 @@ PciRomAddImageMapping (
   mRomImageTable[mNumberOfPciRomImages].Bus         = Bus;
   mRomImageTable[mNumberOfPciRomImages].Dev         = Dev;
   mRomImageTable[mNumberOfPciRomImages].Func        = Func;
-  mRomImageTable[mNumberOfPciRomImages].RomAddress  = RomAddress;
-  mRomImageTable[mNumberOfPciRomImages].RomLength   = RomLength;
+  mRomImageTable[mNumberOfPciRomImages].RomImage    = RomImage;
+  mRomImageTable[mNumberOfPciRomImages].RomSize     = RomSize;
   mNumberOfPciRomImages++;
 }
 
@@ -116,8 +111,8 @@ PciRomGetImageMapping (
       if (mRomImageTable[Index].ImageHandle != NULL) {
         AddDriver (PciIoDevice, mRomImageTable[Index].ImageHandle);
       } else {
-        PciIoDevice->PciIo.RomImage = (VOID *) (UINTN) mRomImageTable[Index].RomAddress;
-        PciIoDevice->PciIo.RomSize  = (UINTN) mRomImageTable[Index].RomLength;
+        PciIoDevice->PciIo.RomImage = mRomImageTable[Index].RomImage;
+        PciIoDevice->PciIo.RomSize  = mRomImageTable[Index].RomSize;
       }
     }
   }
