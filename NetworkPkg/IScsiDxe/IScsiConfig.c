@@ -3596,6 +3596,10 @@ IScsiFormCallback (
       switch (Value->u8) {
       case IP_MODE_IP6:
         NicInfo = IScsiGetNicInfoByIndex (Private->Current->NicIndex); 
+        if(NicInfo == NULL) {
+          break;
+        }
+
         if(!NicInfo->Ipv6Available) {			
   	      //
           // Current NIC doesn't Support IPv6, hence use IPv4.    
