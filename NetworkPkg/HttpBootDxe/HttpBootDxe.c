@@ -615,19 +615,21 @@ HttpBootIp4DxeDriverBindingStart (
   return EFI_SUCCESS;
     
 ON_ERROR:
-  if (FirstStart) {
-    gBS->UninstallProtocolInterface (
-           ControllerHandle,
-           &gEfiCallerIdGuid,
-           &Private->Id
-           );
-  }
-  
-  HttpBootDestroyIp4Children (This, Private);
-  HttpBootConfigFormUnload (Private);
+  if (Private != NULL) {
+    if (FirstStart) {
+      gBS->UninstallProtocolInterface (
+             ControllerHandle,
+             &gEfiCallerIdGuid,
+             &Private->Id
+             );
+    }
+    
+    HttpBootDestroyIp4Children (This, Private);
+    HttpBootConfigFormUnload (Private);
 
-  if (FirstStart && Private != NULL) {
-    FreePool (Private);
+    if (FirstStart) {
+      FreePool (Private);
+    }
   }
 
   return Status;
@@ -1144,19 +1146,21 @@ HttpBootIp6DxeDriverBindingStart (
   return EFI_SUCCESS;
    
 ON_ERROR:
-  if (FirstStart) {
-    gBS->UninstallProtocolInterface (
-           ControllerHandle,
-           &gEfiCallerIdGuid,
-           &Private->Id
-           );
-  }
+  if (Private != NULL) {
+    if (FirstStart) {
+      gBS->UninstallProtocolInterface (
+             ControllerHandle,
+             &gEfiCallerIdGuid,
+             &Private->Id
+             );
+    }
 
-  HttpBootDestroyIp6Children(This, Private);
-  HttpBootConfigFormUnload (Private);
+    HttpBootDestroyIp6Children(This, Private);
+    HttpBootConfigFormUnload (Private);
 
-  if (FirstStart && Private != NULL) {
-    FreePool (Private);
+    if (FirstStart) {
+      FreePool (Private);
+    }
   }
 
   return Status;
