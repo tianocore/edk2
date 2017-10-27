@@ -104,7 +104,7 @@ SiI3132AtaPassThruCommand (
     }
 
     Status = PciIo->Map (
-               PciIo, EfiPciIoOperationBusMasterRead,
+               PciIo, EfiPciIoOperationBusMasterWrite,
                Packet->InDataBuffer, &InDataBufferLength, &PhysInDataBuffer, &PciAllocMapping
                );
     if (EFI_ERROR (Status)) {
@@ -139,7 +139,7 @@ SiI3132AtaPassThruCommand (
     OutDataBufferLength = Packet->OutTransferLength * SataDevice->BlockSize;
 
     Status = PciIo->Map (
-               PciIo, EfiPciIoOperationBusMasterWrite,
+               PciIo, EfiPciIoOperationBusMasterRead,
                Packet->OutDataBuffer, &OutDataBufferLength, &PhysOutDataBuffer, &PciAllocMapping
                );
     if (EFI_ERROR (Status)) {
