@@ -280,12 +280,52 @@ SerialSetAttributes (
   IN EFI_STOP_BITS_TYPE     StopBits
   )
 {
-  EFI_STATUS    Status;
-  EFI_TPL       Tpl;
+  EFI_STATUS                Status;
+  EFI_TPL                   Tpl;
+  UINT64                    OriginalBaudRate;
+  UINT32                    OriginalReceiveFifoDepth;
+  UINT32                    OriginalTimeout;
+  EFI_PARITY_TYPE           OriginalParity;
+  UINT8                     OriginalDataBits;
+  EFI_STOP_BITS_TYPE        OriginalStopBits;
 
+  //
+  // Preserve the original input values in case
+  // SerialPortSetAttributes() updates the input/output
+  // parameters even on error.
+  //
+  OriginalBaudRate = BaudRate;
+  OriginalReceiveFifoDepth = ReceiveFifoDepth;
+  OriginalTimeout = Timeout;
+  OriginalParity = Parity;
+  OriginalDataBits = DataBits;
+  OriginalStopBits = StopBits;
   Status = SerialPortSetAttributes (&BaudRate, &ReceiveFifoDepth, &Timeout, &Parity, &DataBits, &StopBits);
   if (EFI_ERROR (Status)) {
-    return Status;
+    //
+    // If it is just to set Timeout value and unsupported is returned,
+    // do not return error.
+    //
+    if ((Status == EFI_UNSUPPORTED) &&
+        (This->Mode->Timeout          != OriginalTimeout) &&
+        (This->Mode->ReceiveFifoDepth == OriginalReceiveFifoDepth) &&
+        (This->Mode->BaudRate         == OriginalBaudRate) &&
+        (This->Mode->DataBits         == (UINT32) OriginalDataBits) &&
+        (This->Mode->Parity           == (UINT32) OriginalParity) &&
+        (This->Mode->StopBits         == (UINT32) OriginalStopBits)) {
+      //
+      // Restore to the original input values.
+      //
+      BaudRate = OriginalBaudRate;
+      ReceiveFifoDepth = OriginalReceiveFifoDepth;
+      Timeout = OriginalTimeout;
+      Parity = OriginalParity;
+      DataBits = OriginalDataBits;
+      StopBits = OriginalStopBits;
+      Status = EFI_SUCCESS;
+    } else {
+      return Status;
+    }
   }
 
   //
