@@ -1,7 +1,7 @@
 ## @file
 # Description file for the SD memory card Peim driver.
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -36,6 +36,7 @@
   SdHci.h
   SdHcMem.c
   SdHcMem.h
+  DmaMem.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,6 +54,8 @@
   gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
   gEfiPeiVirtualBlockIo2PpiGuid                 ## PRODUCES
   gEdkiiPeiSdMmcHostControllerPpiGuid           ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gEdkiiPeiSdMmcHostControllerPpiGuid

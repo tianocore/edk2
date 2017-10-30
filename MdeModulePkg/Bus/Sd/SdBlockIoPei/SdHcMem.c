@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -29,9 +29,11 @@ SdPeimAllocMemBlock (
   )
 {
   SD_PEIM_MEM_BLOCK            *Block;
+  VOID                         *BufHost;
+  VOID                         *Mapping;
+  EFI_PHYSICAL_ADDRESS         MappedAddr;
   EFI_STATUS                   Status;
   VOID                         *TempPtr;
-  EFI_PHYSICAL_ADDRESS         Address;
 
   TempPtr = NULL;
   Block   = NULL;
@@ -62,19 +64,22 @@ SdPeimAllocMemBlock (
 
   Block->Bits = (UINT8*)(UINTN)TempPtr;
 
-  Status = PeiServicesAllocatePages (
-             EfiBootServicesCode,
+  Status = IoMmuAllocateBuffer (
              Pages,
-             &Address
+             &BufHost,
+             &MappedAddr,
+             &Mapping
              );
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  ZeroMem ((VOID*)(UINTN)Address, EFI_PAGES_TO_SIZE (Pages));
+  ZeroMem ((VOID*)(UINTN)BufHost, EFI_PAGES_TO_SIZE (Pages));
 
-  Block->Buf  = (UINT8*)((UINTN)Address);
-  Block->Next = NULL;
+  Block->BufHost = (UINT8 *) (UINTN) BufHost;
+  Block->Buf     = (UINT8 *) (UINTN) MappedAddr;
+  Block->Mapping = Mapping;
+  Block->Next    = NULL;
 
   return Block;
 }
@@ -93,6 +98,8 @@ SdPeimFreeMemBlock (
   )
 {
   ASSERT ((Pool != NULL) && (Block != NULL));
+
+  IoMmuFreeBuffer (EFI_SIZE_TO_PAGES (Block->BufLen), Block->BufHost, Block->Mapping);
 }
 
 /**
