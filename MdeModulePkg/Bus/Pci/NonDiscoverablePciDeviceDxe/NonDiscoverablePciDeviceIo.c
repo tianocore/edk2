@@ -465,6 +465,11 @@ PciIoPciRead (
   Address = (UINT8 *)&Dev->ConfigSpace + Offset;
   Length = Count << ((UINTN)Width & 0x3);
 
+  if (Offset >= sizeof (Dev->ConfigSpace)) {
+    ZeroMem (Buffer, Length);
+    return EFI_SUCCESS;
+  }
+
   if (Offset + Length > sizeof (Dev->ConfigSpace)) {
     //
     // Read all zeroes for config space accesses beyond the first
