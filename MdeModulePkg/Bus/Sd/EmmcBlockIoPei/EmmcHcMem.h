@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -27,7 +27,9 @@ struct _EMMC_PEIM_MEM_BLOCK {
   UINT8                   *Bits;    // Bit array to record which unit is allocated
   UINTN                   BitsLen;
   UINT8                   *Buf;
+  UINT8                   *BufHost;
   UINTN                   BufLen;   // Memory size in bytes
+  VOID                    *Mapping;
   EMMC_PEIM_MEM_BLOCK     *Next;
 };
 

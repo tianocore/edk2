@@ -929,7 +929,7 @@ BuildAdmaDescTable (
   UINT64                    Remaining;
   UINT32                    Address;
 
-  Data    = (EFI_PHYSICAL_ADDRESS)(UINTN)Trb->Data;
+  Data    = Trb->DataPhy;
   DataLen = Trb->DataLen;
   //
   // Only support 32bit ADMA Descriptor Table
@@ -998,6 +998,8 @@ EmmcPeimCreateTrb (
   EMMC_TRB                      *Trb;
   EFI_STATUS                    Status;
   EMMC_HC_SLOT_CAP              Capability;
+  EDKII_IOMMU_OPERATION         MapOp;
+  UINTN                         MapLength;
 
   //
   // Calculate a divisor for SD clock frequency
@@ -1007,7 +1009,7 @@ EmmcPeimCreateTrb (
     return NULL;
   }
 
-  Trb = EmmcPeimAllocateMem (Slot->Private->Pool, sizeof (EMMC_TRB));
+  Trb = AllocateZeroPool (sizeof (EMMC_TRB));
   if (Trb == NULL) {
     return NULL;
   }
@@ -1039,6 +1041,22 @@ EmmcPeimCreateTrb (
   if (Packet->EmmcCmdBlk->CommandIndex == EMMC_SEND_TUNING_BLOCK) {
     Trb->Mode = EmmcPioMode;
   } else {
+    if (Trb->Read) {
+      MapOp = EdkiiIoMmuOperationBusMasterWrite;
+    } else {
+      MapOp = EdkiiIoMmuOperationBusMasterRead;
+    }
+
+    if (Trb->DataLen != 0) {
+      MapLength = Trb->DataLen;
+      Status = IoMmuMap (MapOp, Trb->Data, &MapLength, &Trb->DataPhy, &Trb->DataMap);
+
+      if (EFI_ERROR (Status) || (MapLength != Trb->DataLen)) {
+        DEBUG ((DEBUG_ERROR, "EmmcPeimCreateTrb: Fail to map data buffer.\n"));
+        goto Error;
+      }
+    }
+
     if (Trb->DataLen == 0) {
       Trb->Mode = EmmcNoData;
     } else if (Capability.Adma2 != 0) {
@@ -1071,12 +1089,16 @@ EmmcPeimFreeTrb (
   IN EMMC_TRB           *Trb
   )
 {
+  if ((Trb != NULL) && (Trb->DataMap != NULL)) {
+    IoMmuUnmap (Trb->DataMap);
+  }
+
   if ((Trb != NULL) && (Trb->AdmaDesc != NULL)) {
     EmmcPeimFreeMem (Trb->Slot->Private->Pool, Trb->AdmaDesc, Trb->AdmaDescSize);
   }
 
   if (Trb != NULL) {
-    EmmcPeimFreeMem (Trb->Slot->Private->Pool, Trb, sizeof (EMMC_TRB));
+    FreePool (Trb);
   }
   return;
 }
@@ -1241,11 +1263,11 @@ EmmcPeimExecTrb (
   EmmcPeimHcLedOnOff (Bar, TRUE);
 
   if (Trb->Mode == EmmcSdmaMode) {
-    if ((UINT64)(UINTN)Trb->Data >= 0x100000000ul) {
+    if ((UINT64)(UINTN)Trb->DataPhy >= 0x100000000ul) {
       return EFI_INVALID_PARAMETER;
     }
 
-    SdmaAddr = (UINT32)(UINTN)Trb->Data;
+    SdmaAddr = (UINT32)(UINTN)Trb->DataPhy;
     Status   = EmmcPeimHcRwMmio (Bar + EMMC_HC_SDMA_ADDR, FALSE, sizeof (SdmaAddr), &SdmaAddr);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -1480,7 +1502,7 @@ EmmcPeimCheckTrbResult (
     //
     // Update SDMA Address register.
     //
-    SdmaAddr = EMMC_SDMA_ROUND_UP ((UINT32)(UINTN)Trb->Data, EMMC_SDMA_BOUNDARY);
+    SdmaAddr = EMMC_SDMA_ROUND_UP ((UINT32)(UINTN)Trb->DataPhy, EMMC_SDMA_BOUNDARY);
     Status   = EmmcPeimHcRwMmio (
                  Bar + EMMC_HC_SDMA_ADDR,
                  FALSE,
@@ -1490,7 +1512,7 @@ EmmcPeimCheckTrbResult (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
-    Trb->Data = (VOID*)(UINTN)SdmaAddr;
+    Trb->DataPhy = (UINT32)(UINTN)SdmaAddr;
   }
 
   if ((Packet->EmmcCmdBlk->CommandType != EmmcCommandTypeAdtc) &&

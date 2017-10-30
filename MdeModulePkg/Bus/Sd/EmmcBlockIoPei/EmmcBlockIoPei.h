@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,8 @@
 #include <Ppi/SdMmcHostController.h>
 #include <Ppi/BlockIo.h>
 #include <Ppi/BlockIo2.h>
+#include <Ppi/IoMmu.h>
+#include <Ppi/EndOfPeiPhase.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
@@ -64,6 +66,12 @@ struct _EMMC_PEIM_HC_PRIVATE_DATA {
   EFI_PEI_RECOVERY_BLOCK_IO2_PPI    BlkIo2Ppi;
   EFI_PEI_PPI_DESCRIPTOR            BlkIoPpiList;
   EFI_PEI_PPI_DESCRIPTOR            BlkIo2PpiList;
+
+  //
+  // EndOfPei callback is used to do the cleanups before exit of PEI phase.
+  //
+  EFI_PEI_NOTIFY_DESCRIPTOR         EndOfPeiNotifyList;
+
   EMMC_PEIM_HC_SLOT                 Slot[EMMC_PEIM_MAX_SLOTS];
   UINT8                             SlotNum;
   UINT8                             TotalBlkIoDevices;
@@ -72,6 +80,7 @@ struct _EMMC_PEIM_HC_PRIVATE_DATA {
 #define EMMC_TIMEOUT                MultU64x32((UINT64)(3), 1000000)
 #define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS(a) CR (a, EMMC_PEIM_HC_PRIVATE_DATA, BlkIoPpi, EMMC_PEIM_SIG)
 #define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a) CR (a, EMMC_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, EMMC_PEIM_SIG)
+#define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a) CR (a, EMMC_PEIM_HC_PRIVATE_DATA, EndOfPeiNotifyList, EMMC_PEIM_SIG)
 
 struct _EMMC_TRB {
   EMMC_PEIM_HC_SLOT                   *Slot;
@@ -81,6 +90,8 @@ struct _EMMC_TRB {
   VOID                                *Data;
   UINT32                              DataLen;
   BOOLEAN                             Read;
+  EFI_PHYSICAL_ADDRESS                DataPhy;
+  VOID                                *DataMap;
   EMMC_HC_TRANSFER_MODE               Mode;
 
   UINT64                              Timeout;
@@ -348,6 +359,20 @@ EmmcPeimInitMemPool (
   );
 
 /**
+  Release the memory management pool.
+
+  @param  Pool                  The memory pool to free.
+
+  @retval EFI_DEVICE_ERROR      Fail to free the memory pool.
+  @retval EFI_SUCCESS           The memory pool is freed.
+
+**/
+EFI_STATUS
+EmmcPeimFreeMemPool (
+  IN EMMC_PEIM_MEM_POOL       *Pool
+  );
+
+/**
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
 
@@ -376,6 +401,120 @@ EmmcPeimFreeMem (
   IN EMMC_PEIM_MEM_POOL    *Pool,
   IN VOID                 *Mem,
   IN UINTN                Size
+  );
+
+/**
+  Initialize IOMMU.
+**/
+VOID
+IoMmuInit (
+  VOID
+  );
+
+/**
+  Provides the controller-specific addresses required to access system memory from a
+  DMA bus master.
+
+  @param  Operation             Indicates if the bus master is going to read or write to system memory.
+  @param  HostAddress           The system memory address to map to the PCI controller.
+  @param  NumberOfBytes         On input the number of bytes to map. On output the number of bytes
+                                that were mapped.
+  @param  DeviceAddress         The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
+  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+
+**/
+EFI_STATUS
+IoMmuMap (
+  IN  EDKII_IOMMU_OPERATION Operation,
+  IN  VOID                  *HostAddress,
+  IN  OUT UINTN             *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+/**
+  Completes the Map() operation and releases any corresponding resources.
+
+  @param  Mapping               The mapping value returned from Map().
+
+  @retval EFI_SUCCESS           The range was unmapped.
+  @retval EFI_INVALID_PARAMETER Mapping is not a value that was returned by Map().
+  @retval EFI_DEVICE_ERROR      The data was not committed to the target system memory.
+**/
+EFI_STATUS
+IoMmuUnmap (
+  IN VOID                  *Mapping
+  );
+
+/**
+  Allocates pages that are suitable for an OperationBusMasterCommonBuffer or
+  OperationBusMasterCommonBuffer64 mapping.
+
+  @param  Pages                 The number of pages to allocate.
+  @param  HostAddress           A pointer to store the base system memory address of the
+                                allocated range.
+  @param  DeviceAddress         The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param  Mapping               A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+IoMmuAllocateBuffer (
+  IN UINTN                  Pages,
+  OUT VOID                  **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+/**
+  Frees memory that was allocated with AllocateBuffer().
+
+  @param  Pages                 The number of pages to free.
+  @param  HostAddress           The base system memory address of the allocated range.
+  @param  Mapping               The mapping value returned from Map().
+
+  @retval EFI_SUCCESS           The requested memory pages were freed.
+  @retval EFI_INVALID_PARAMETER The memory range specified by HostAddress and Pages
+                                was not allocated with AllocateBuffer().
+
+**/
+EFI_STATUS
+IoMmuFreeBuffer (
+  IN UINTN                  Pages,
+  IN VOID                   *HostAddress,
+  IN VOID                   *Mapping
+  );
+
+/**
+  One notified function to cleanup the allocated DMA buffers at the end of PEI.
+
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
+
+  @retval     EFI_SUCCESS  The function completes successfully
+
+**/
+EFI_STATUS
+EFIAPI
+EmmcBlockIoPeimEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
   );
 
 #endif
