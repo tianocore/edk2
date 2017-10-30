@@ -2,7 +2,7 @@
   Definition of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -51,9 +51,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_BOOT_SENSE_VOLUME_OVERFLOW  0x0D ///< Partition overflow
 #define USB_BOOT_SENSE_MISCOMPARE       0x0E ///< Source data mis-match while verfying.
 
-#define USB_BOOT_ASC_NOT_READY          0x04
-#define USB_BOOT_ASC_NO_MEDIA           0x3A
-#define USB_BOOT_ASC_MEDIA_CHANGE       0x28
+#define USB_BOOT_ASC_NO_ADDITIONAL_SENSE_INFORMATION  0x00
+#define USB_BOOT_ASC_NOT_READY                        0x04
+#define USB_BOOT_ASC_NO_MEDIA                         0x3A
+#define USB_BOOT_ASC_MEDIA_CHANGE                     0x28
 
 //
 // Supported PDT codes, or Peripheral Device Type
