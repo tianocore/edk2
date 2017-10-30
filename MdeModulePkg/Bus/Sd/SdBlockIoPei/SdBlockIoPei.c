@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -63,6 +63,11 @@ SD_PEIM_HC_PRIVATE_DATA gSdHcPrivateTemplate = {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
     &gEfiPeiVirtualBlockIo2PpiGuid,
     NULL
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiEndOfPeiSignalPpiGuid,
+    SdBlockIoPeimEndOfPei
   },
   {                               // Slot
     {
@@ -466,6 +471,36 @@ SdBlockIoPeimReadBlocks2 (
 }
 
 /**
+  One notified function to cleanup the allocated DMA buffers at the end of PEI.
+
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
+
+  @retval     EFI_SUCCESS  The function completes successfully
+
+**/
+EFI_STATUS
+EFIAPI
+SdBlockIoPeimEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  SD_PEIM_HC_PRIVATE_DATA       *Private;
+
+  Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
+
+  if ((Private->Pool != NULL) && (Private->Pool->Head != NULL)) {
+    SdPeimFreeMemPool (Private->Pool);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   The user code starts with this function.
 
   @param  FileHandle             Handle of the file being invoked.
@@ -518,6 +553,8 @@ InitializeSdBlockIoPeim (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
+
+  IoMmuInit ();
 
   Controller = 0;
   MmioBase   = NULL;
@@ -610,6 +647,11 @@ InitializeSdBlockIoPeim (
     Controller++;
     if (!EFI_ERROR (Status)) {
       PeiServicesInstallPpi (&Private->BlkIoPpiList);
+      PeiServicesNotifyPpi (&Private->EndOfPeiNotifyList);
+    } else {
+      if (Private->Pool->Head != NULL) {
+        SdPeimFreeMemPool (Private->Pool);
+      }
     }
   }
 
