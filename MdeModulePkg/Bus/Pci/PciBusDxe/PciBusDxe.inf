@@ -80,6 +80,9 @@
   DebugLib
   PeCoffLib
 
+[Guids]
+  gEfiEventExitBootServicesGuid                   ## SOMETIMES_CONSUMES ## Event
+
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid               ## SOMETIMES_PRODUCES
   gEfiPciIoProtocolGuid                           ## BY_START
