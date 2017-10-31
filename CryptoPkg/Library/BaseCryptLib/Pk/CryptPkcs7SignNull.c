@@ -33,7 +33,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
                                include in the PKCS#7 signedData (e.g. any intermediate
                                CAs in the chain).
-  @param[out] SignedData       Pointer to output PKCS#7 signedData.
+  @param[out] SignedData       Pointer to output PKCS#7 signedData. It's caller's
+                               responsibility to free the buffer with FreePool().
   @param[out] SignedDataSize   Size of SignedData in bytes.
 
   @retval FALSE  This interface is not supported.

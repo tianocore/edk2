@@ -34,7 +34,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[in]  OtherCerts       Pointer to an optional additional set of certificates to
                                include in the PKCS#7 signedData (e.g. any intermediate
                                CAs in the chain).
-  @param[out] SignedData       Pointer to output PKCS#7 signedData.
+  @param[out] SignedData       Pointer to output PKCS#7 signedData. It's caller's
+                               responsibility to free the buffer with FreePool().
   @param[out] SignedDataSize   Size of SignedData in bytes.
 
   @retval     TRUE             PKCS#7 data signing succeeded.
@@ -167,7 +168,7 @@ Pkcs7Sign (
   // is totally 19 bytes.
   //
   *SignedDataSize = P7DataSize - 19;
-  *SignedData     = malloc (*SignedDataSize);
+  *SignedData     = AllocatePool (*SignedDataSize);
   if (*SignedData == NULL) {
     OPENSSL_free (P7Data);
     goto _Exit;
