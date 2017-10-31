@@ -2,7 +2,7 @@
   The implementation for the 'tftp' Shell command.
 
   Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved. <BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -14,9 +14,10 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
-#include "UefiShellTftpCommandLib.h"
+#include "Tftp.h"
 
 #define IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 32
+EFI_HANDLE   mTftpHiiHandle;
 
 /*
    Constant strings and definitions related to the message indicating the amount of
@@ -256,8 +257,7 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
 
 **/
 SHELL_STATUS
-EFIAPI
-ShellCommandRunTftp (
+RunTftp (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -315,7 +315,7 @@ ShellCommandRunTftp (
     if ((Status == EFI_VOLUME_CORRUPTED) &&
         (ProblemParam != NULL) ) {
       ShellPrintHiiEx (
-        -1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellTftpHiiHandle,
+        -1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), mTftpHiiHandle,
         L"tftp", ProblemParam
         );
       FreePool (ProblemParam);
@@ -332,14 +332,14 @@ ShellCommandRunTftp (
   if (ParamCount > 4) {
     ShellPrintHiiEx (
       -1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY),
-      gShellTftpHiiHandle, L"tftp"
+      mTftpHiiHandle, L"tftp"
       );
     goto Error;
   }
   if (ParamCount < 3) {
     ShellPrintHiiEx (
       -1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW),
-      gShellTftpHiiHandle, L"tftp"
+      mTftpHiiHandle, L"tftp"
       );
     goto Error;
   }
@@ -354,7 +354,7 @@ ShellCommandRunTftp (
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx (
       -1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV),
-      gShellTftpHiiHandle, L"tftp", ValueStr
+      mTftpHiiHandle, L"tftp", ValueStr
     );
     goto Error;
   }
@@ -416,7 +416,7 @@ ShellCommandRunTftp (
     if (Mtftp4ConfigData.TimeoutValue == 0) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV),
-        gShellTftpHiiHandle, L"tftp", ValueStr
+        mTftpHiiHandle, L"tftp", ValueStr
       );
       goto Error;
     }
@@ -430,7 +430,7 @@ ShellCommandRunTftp (
     if (BlockSize < MTFTP_MIN_BLKSIZE || BlockSize > MTFTP_MAX_BLKSIZE) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV),
-        gShellTftpHiiHandle, L"tftp", ValueStr
+        mTftpHiiHandle, L"tftp", ValueStr
       );
       goto Error;
     }
@@ -450,7 +450,7 @@ ShellCommandRunTftp (
   if (EFI_ERROR (Status) || (HandleCount == 0)) {
     ShellPrintHiiEx (
       -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_NO_NIC),
-      gShellTftpHiiHandle
+      mTftpHiiHandle
     );
     goto Error;
   }
@@ -465,7 +465,7 @@ ShellCommandRunTftp (
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_NIC_NAME),
-        gShellTftpHiiHandle, NicNumber, Status
+        mTftpHiiHandle, NicNumber, Status
       );
       continue;
     }
@@ -487,7 +487,7 @@ ShellCommandRunTftp (
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_OPEN_PROTOCOL),
-        gShellTftpHiiHandle, NicName, Status
+        mTftpHiiHandle, NicName, Status
       );
       continue;
     }
@@ -496,7 +496,7 @@ ShellCommandRunTftp (
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_CONFIGURE),
-        gShellTftpHiiHandle, NicName, Status
+        mTftpHiiHandle, NicName, Status
       );
       goto NextHandle;
     }
@@ -505,7 +505,7 @@ ShellCommandRunTftp (
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_FILE_SIZE),
-        gShellTftpHiiHandle, RemoteFilePath, NicName, Status
+        mTftpHiiHandle, RemoteFilePath, NicName, Status
       );
       goto NextHandle;
     }
@@ -514,7 +514,7 @@ ShellCommandRunTftp (
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_DOWNLOAD),
-        gShellTftpHiiHandle, RemoteFilePath, NicName, Status
+        mTftpHiiHandle, RemoteFilePath, NicName, Status
       );
       goto NextHandle;
     }
@@ -534,7 +534,7 @@ ShellCommandRunTftp (
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL),
-        gShellTftpHiiHandle, L"tftp", LocalFilePath
+        mTftpHiiHandle, L"tftp", LocalFilePath
       );
       goto NextHandle;
     }
@@ -546,7 +546,7 @@ ShellCommandRunTftp (
     } else {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_WRITE),
-        gShellTftpHiiHandle, LocalFilePath, Status
+        mTftpHiiHandle, LocalFilePath, Status
       );
     }
     ShellCloseFile (&FileHandle);
@@ -568,7 +568,7 @@ ShellCommandRunTftp (
   if ((UserNicName != NULL) && (!NicFound)) {
     ShellPrintHiiEx (
       -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_NIC_NOT_FOUND),
-      gShellTftpHiiHandle, UserNicName
+      mTftpHiiHandle, UserNicName
     );
   }
 
@@ -607,7 +607,7 @@ StringToUint16 (
   if (Val > MAX_UINT16) {
     ShellPrintHiiEx (
       -1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV),
-      gShellTftpHiiHandle, L"tftp", ValueStr
+      mTftpHiiHandle, L"tftp", ValueStr
     );
     return FALSE;
   }
@@ -948,13 +948,13 @@ DownloadFile (
 
   ShellPrintHiiEx (
     -1, -1, NULL, STRING_TOKEN (STR_TFTP_DOWNLOADING),
-    gShellTftpHiiHandle, FilePath
+    mTftpHiiHandle, FilePath
     );
 
   Status = Mtftp4->ReadFile (Mtftp4, &Mtftp4Token);
   ShellPrintHiiEx (
     -1, -1, NULL, STRING_TOKEN (STR_GEN_CRLF),
-    gShellTftpHiiHandle
+    mTftpHiiHandle
     );
 
 Error :
@@ -1051,4 +1051,52 @@ CheckPacket (
   ShellPrintEx (-1, -1, L"%s", Progress);
 
   return EFI_SUCCESS;
+}
+
+/**
+  Retrive HII package list from ImageHandle and publish to HII database.
+
+  @param ImageHandle            The image handle of the process.
+
+  @return HII handle.
+**/
+EFI_HANDLE
+InitializeHiiPackage (
+  EFI_HANDLE                  ImageHandle
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
+  EFI_HANDLE                  HiiHandle;
+
+  //
+  // Retrieve HII package list from ImageHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ImageHandle,
+                  &gEfiHiiPackageListProtocolGuid,
+                  (VOID **)&PackageList,
+                  ImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Publish HII package list to HII Database.
+  //
+  Status = gHiiDatabase->NewPackageList (
+                           gHiiDatabase,
+                           PackageList,
+                           NULL,
+                           &HiiHandle
+                           );
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  return HiiHandle;
 }

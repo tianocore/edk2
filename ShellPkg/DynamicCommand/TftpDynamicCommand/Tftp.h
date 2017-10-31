@@ -1,7 +1,7 @@
 /** @file
-  header file for NULL named library for 'tftp' Shell command functions.
+  Header file for 'tftp' command functions.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
   Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -14,13 +14,12 @@
 
 **/
 
-#ifndef _UEFI_SHELL_TFTP_COMMAND_LIB_H_
-#define _UEFI_SHELL_TFTP_COMMAND_LIB_H_
+#ifndef _TFTP_H_
+#define _TFTP_H_
 
 #include <Uefi.h>
 
-#include <Guid/ShellLibHiiGuid.h>
-
+#include <Protocol/HiiPackageList.h>
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/Mtftp4.h>
 
@@ -28,7 +27,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/ShellCommandLib.h>
 #include <Library/ShellLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -36,8 +34,9 @@
 #include <Library/HiiLib.h>
 #include <Library/NetLib.h>
 #include <Library/PrintLib.h>
+#include <Library/UefiHiiServicesLib.h>
 
-extern EFI_HANDLE gShellTftpHiiHandle;
+extern EFI_HANDLE mTftpHiiHandle;
 
 typedef struct {
   UINTN  FileSize;
@@ -48,14 +47,29 @@ typedef struct {
 /**
   Function for 'tftp' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in]  ImageHandle     The image handle.
+  @param[in]  SystemTable     The system table.
+
+  @retval SHELL_SUCCESS            Command completed successfully.
+  @retval SHELL_INVALID_PARAMETER  Command usage error.
+  @retval SHELL_ABORTED            The user aborts the operation.
+  @retval value                    Unknown error.
 **/
 SHELL_STATUS
-EFIAPI
-ShellCommandRunTftp (
+RunTftp (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
-#endif /* _UEFI_SHELL_TFTP_COMMAND_LIB_H_ */
+/**
+  Retrive HII package list from ImageHandle and publish to HII database.
+
+  @param ImageHandle            The image handle of the process.
+
+  @return HII handle.
+**/
+EFI_HANDLE
+InitializeHiiPackage (
+  EFI_HANDLE                  ImageHandle
+  );
+#endif // _TFTP_H_

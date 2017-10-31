@@ -1,0 +1,64 @@
+##  @file
+# Provides Shell 'tftp' dynamic command.
+#
+# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = tftpDynamicCommand
+  FILE_GUID                      = A487A478-51EF-48AA-8794-7BEE2A0562F1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TftpCommandInitialize
+  UNLOAD_IMAGE                   = TftpUnload
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+[Sources.common]
+  Tftp.uni
+  Tftp.h
+  Tftp.c
+  TftpDynamicCommand.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  HiiLib
+  FileHandleLib
+  NetLib
+
+[Protocols]
+  gEfiManagedNetworkServiceBindingProtocolGuid   ## CONSUMES
+  gEfiMtftp4ServiceBindingProtocolGuid           ## CONSUMES
+  gEfiMtftp4ProtocolGuid                         ## CONSUMES
+  gEfiHiiPackageListProtocolGuid                 ## CONSUMES
+  gEfiShellDynamicCommandProtocolGuid            ## PRODUCES
+
+[DEPEX]
+  TRUE

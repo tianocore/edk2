@@ -1,7 +1,7 @@
 ##  @file
-# Provides Shell 'tftp' command functions
+# Provides Shell 'tftp' standalone application.
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
 # Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -16,19 +16,21 @@
 
 [Defines]
   INF_VERSION                    = 0x00010006
-  BASE_NAME                      = UefiShellTftpCommandLib
-  FILE_GUID                      = D2B61A25-9835-4E5D-906A-15615E1FF668
+  BASE_NAME                      = tftp
+  FILE_GUID                      = 8DC58D0D-67F5-4B97-9DFC-E442BB9A5648
   MODULE_TYPE                    = UEFI_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
-  CONSTRUCTOR                    = ShellTftpCommandLibConstructor
-  DESTRUCTOR                     = ShellTftpCommandLibDestructor
+  ENTRY_POINT                    = TftpAppInitialize
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
 
 [Sources.common]
-  UefiShellTftpCommandLib.uni
-  UefiShellTftpCommandLib.c
-  UefiShellTftpCommandLib.h
+  Tftp.uni
+  Tftp.h
   Tftp.c
+  TftpApp.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,22 +42,18 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  ShellCommandLib
   ShellLib
   UefiLib
   UefiRuntimeServicesTableLib
   UefiBootServicesTableLib
-  PcdLib
+  UefiApplicationEntryPoint
+  UefiHiiServicesLib
   HiiLib
   FileHandleLib
   NetLib
 
-[Pcd]
-  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask ## CONSUMES
-
 [Protocols]
   gEfiManagedNetworkServiceBindingProtocolGuid   ## CONSUMES
   gEfiMtftp4ServiceBindingProtocolGuid           ## CONSUMES
-
-[Guids]
-  gShellTftpHiiGuid                              ## CONSUMES ## HII
+  gEfiMtftp4ProtocolGuid                         ## CONSUMES
+  gEfiHiiPackageListProtocolGuid                 ## CONSUMES
