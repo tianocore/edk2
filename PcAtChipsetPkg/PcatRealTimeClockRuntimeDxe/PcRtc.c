@@ -2,6 +2,8 @@
   RTC Architectural Protocol GUID as defined in DxeCis 0.96.
 
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -128,7 +130,7 @@ PcRtcInit (
   // Make sure Division Chain is properly configured,
   // or RTC clock won't "tick" -- time won't increment
   //
-  RegisterA.Data = RTC_INIT_REGISTER_A;
+  RegisterA.Data = FixedPcdGet8 (PcdInitialValueRtcRegisterA);
   RtcWrite (RTC_ADDRESS_REGISTER_A, RegisterA.Data);
 
   //
@@ -144,7 +146,7 @@ PcRtcInit (
   //
   // Clear RTC register D
   //
-  RegisterD.Data = RTC_INIT_REGISTER_D;
+  RegisterD.Data = FixedPcdGet8 (PcdInitialValueRtcRegisterD);
   RtcWrite (RTC_ADDRESS_REGISTER_D, RegisterD.Data);
 
   //
@@ -176,7 +178,7 @@ PcRtcInit (
   // Set RTC configuration after get original time
   // The value of bit AIE should be reserved.
   //
-  RegisterB.Data = RTC_INIT_REGISTER_B | (RegisterB.Data & BIT5);
+  RegisterB.Data = FixedPcdGet8 (PcdInitialValueRtcRegisterB) | (RegisterB.Data & BIT5);
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   //

@@ -5,6 +5,8 @@
 # It will install a tagging protocol with gEfiRealTimeClockArchProtocolGuid.
 #
 # Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+#
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -66,13 +68,18 @@
   ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpiTableGuid
 
-[Depex]
-  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
+[FixedPcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterA     ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterB     ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterD     ## CONSUMES
   
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout  ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear             ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear             ## CONSUMES
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PcRtcExtra.uni

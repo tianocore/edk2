@@ -2,6 +2,8 @@
   Header file for real time clock driver.
 
 Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -74,13 +76,6 @@ extern PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 #define RTC_INIT_HOUR   0
 #define RTC_INIT_DAY    1
 #define RTC_INIT_MONTH  1
-
-//
-// Register initial values
-//
-#define RTC_INIT_REGISTER_A 0x26
-#define RTC_INIT_REGISTER_B 0x02
-#define RTC_INIT_REGISTER_D 0x0
 
 #pragma pack(1)
 //
