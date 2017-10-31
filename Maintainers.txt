@@ -91,6 +91,7 @@ CorebootModulePkg, CorebootPayloadPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Coreboot_UEFI_payload
 M: Maurice Ma <maurice.ma@intel.com>
 M: Prince Agyeman <prince.agyeman@intel.com>
+M: Benjamin You <benjamin.you@intel.com>
 S: Maintained
 
 CryptoPkg
