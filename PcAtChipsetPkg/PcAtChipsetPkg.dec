@@ -5,6 +5,7 @@
 # PcAt defacto standard.
 #
 # Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -180,6 +181,18 @@
   ## 8bit Reset Control Register value for cold reset.
   # @Prompt Reset Control Register value for cold reset
   gPcAtChipsetPkgTokenSpaceGuid.PcdResetControlValueColdReset|0xFE|UINT8|0x0000001A
+
+  ## Specifies the initial value for Register_A in RTC.
+  # @Prompt Initial value for Register_A in RTC.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterA|0x26|UINT8|0x0000001B
+
+  ## Specifies the initial value for Register_B in RTC.
+  # @Prompt Initial value for Register_B in RTC.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterB|0x02|UINT8|0x0000001C
+
+  ## Specifies the initial value for Register_D in RTC.
+  # @Prompt Initial value for Register_D in RTC.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterD|0x00|UINT8|0x0000001D
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PcAtChipsetPkgExtra.uni
