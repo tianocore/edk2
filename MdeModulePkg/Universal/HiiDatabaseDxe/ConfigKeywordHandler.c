@@ -2543,12 +2543,15 @@ MergeToMultiKeywordResp (
 
   MultiKeywordRespLen = (StrLen (*MultiKeywordResp) + 1 + StrLen (*KeywordResp) + 1) * sizeof (CHAR16);
 
-  StringPtr = AllocateCopyPool (MultiKeywordRespLen, *MultiKeywordResp);
+  StringPtr = ReallocatePool (
+                StrSize (*MultiKeywordResp),
+                MultiKeywordRespLen,
+                *MultiKeywordResp
+                );
   if (StringPtr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
-  FreePool (*MultiKeywordResp);
+
   *MultiKeywordResp = StringPtr;
 
   StrCatS (StringPtr, MultiKeywordRespLen / sizeof (CHAR16), L"&");

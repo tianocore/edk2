@@ -562,7 +562,8 @@ FvSimpleFileSystemOpen (
       // No, there was no extension. So add one and search again for the file
       // NewFileNameLength = FileNameLength + 1 + 4 = (Number of non-null character) + (file extension) + (a null character)
       NewFileNameLength = FileNameLength + 1 + 4;
-      FileNameWithExtension = AllocateCopyPool (NewFileNameLength * 2, FileName);
+      FileNameWithExtension = AllocatePool (NewFileNameLength * 2);
+      StrCpyS (FileNameWithExtension, NewFileNameLength, FileName);
       StrCatS (FileNameWithExtension, NewFileNameLength, L".EFI");
 
       for (FvFileInfoLink = GetFirstNode (&Instance->FileInfoHead);

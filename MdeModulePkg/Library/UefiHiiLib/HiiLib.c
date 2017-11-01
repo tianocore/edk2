@@ -464,20 +464,24 @@ HiiGetFormSetFromHiiHandle(
       }
 
       if (FormSetBuffer != NULL){
-        TempBuffer = AllocateCopyPool (TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length, FormSetBuffer);
-        FreePool(FormSetBuffer);
-        FormSetBuffer = NULL;
+        TempBuffer = ReallocatePool (
+                       TempSize,
+                       TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length,
+                       FormSetBuffer
+                       );
         if (TempBuffer == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
         CopyMem (TempBuffer + TempSize,  OpCodeData, ((EFI_IFR_OP_HEADER *) OpCodeData)->Length);
+        FormSetBuffer = NULL;
       } else {
-        TempBuffer = AllocateCopyPool (TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length, OpCodeData);
+        TempBuffer = AllocatePool (TempSize + ((EFI_IFR_OP_HEADER *) OpCodeData)->Length);
         if (TempBuffer == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
+        CopyMem (TempBuffer, OpCodeData, ((EFI_IFR_OP_HEADER *) OpCodeData)->Length);
       }
       TempSize += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
       FormSetBuffer = TempBuffer;

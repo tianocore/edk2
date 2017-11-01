@@ -435,9 +435,13 @@ BmmListThirdPartyDrivers (
 
     Count++;
     if (Count >= CurrentSize) {
-      DriverListPtr = AllocateCopyPool ((Count + UI_HII_DRIVER_LIST_SIZE) * sizeof (UI_HII_DRIVER_INSTANCE), gHiiDriverList);
+      DriverListPtr = ReallocatePool (
+                        CurrentSize * sizeof (UI_HII_DRIVER_INSTANCE),
+                        (Count + UI_HII_DRIVER_LIST_SIZE)
+                        * sizeof (UI_HII_DRIVER_INSTANCE),
+                        gHiiDriverList
+                        );
       ASSERT (DriverListPtr != NULL);
-      FreePool (gHiiDriverList);
       gHiiDriverList = DriverListPtr;
       CurrentSize += UI_HII_DRIVER_LIST_SIZE;
     }
