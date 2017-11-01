@@ -43,6 +43,7 @@
   HobLib
   ArmPlatformLib
   PlatformPeiLib
+  PeiServicesLib
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
