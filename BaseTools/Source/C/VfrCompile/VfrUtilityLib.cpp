@@ -615,9 +615,13 @@ CVfrVarDataTypeDB::DataTypeHasBitField (
   SVfrDataField       *pTmp;
 
   GetDataType (TypeName, &pType);
+
+  if (pType == NULL){
+    return FALSE;
+  }
   for (pTmp = pType->mMembers; pTmp!= NULL; pTmp = pTmp->mNext) {
     if (pTmp->mIsBitField) {
-       return TRUE;
+      return TRUE;
     }
   }
   return FALSE;
@@ -648,7 +652,7 @@ CVfrVarDataTypeDB::IsThisBitField (
     CHECK_ERROR_RETURN(GetTypeField (FName, pType, pField), VFR_RETURN_SUCCESS);
     pType  = pField->mFieldType;
   }
-  if (pField->mIsBitField) {
+  if (pField != NULL && pField->mIsBitField) {
     return TRUE;
   } else {
     return FALSE;
