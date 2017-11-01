@@ -1,7 +1,7 @@
 /** @file
   Functions to deal with Mem buffer
   
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -27,8 +27,6 @@ extern HEFI_EDITOR_GLOBAL_EDITOR  HMainEditor;
 HEFI_EDITOR_MEM_IMAGE             HMemImage;
 HEFI_EDITOR_MEM_IMAGE             HMemImageBackupVar;
 
-EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   DummyPciRootBridgeIo;
-
 //
 // for basic initialization of HDiskImage
 //
@@ -37,54 +35,6 @@ HEFI_EDITOR_MEM_IMAGE             HMemImageConst = {
   0,
   0
 };
-
-/**
-  Empty function.  always returns the same.
-
-  @param[in] This        Ignored.
-  @param[in] Width       Ignored.
-  @param[in] Address     Ignored.
-  @param[in] Count       Ignored.
-  @param[in, out] Buffer Ignored.
-
-  @retval EFI_UNSUPPORTED.
-**/
-EFI_STATUS
-EFIAPI
-DummyMemRead (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL              * This,
-  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH    Width,
-  IN     UINT64                                   Address,
-  IN     UINTN                                    Count,
-  IN OUT VOID                                     *Buffer
-  )
-{
-  return EFI_UNSUPPORTED;
-}
-
-/**
-  Empty function.  always returns the same.
-
-  @param[in] This        Ignored.
-  @param[in] Width       Ignored.
-  @param[in] Address     Ignored.
-  @param[in] Count       Ignored.
-  @param[in, out] Buffer Ignored.
-
-  @retval EFI_UNSUPPORTED.
-**/
-EFI_STATUS
-EFIAPI
-DummyMemWrite (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL              * This,
-  IN     EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH    Width,
-  IN     UINT64                                   Address,
-  IN     UINTN                                    Count,
-  IN OUT VOID                                     *Buffer
-  )
-{
-  return EFI_UNSUPPORTED;
-}
 
 /**
   Initialization function for HDiskImage.
@@ -105,21 +55,10 @@ HMemImageInit (
   CopyMem (&HMemImage, &HMemImageConst, sizeof (HMemImage));
 
   Status = gBS->LocateProtocol (
-                &gEfiPciRootBridgeIoProtocolGuid,
+                &gEfiCpuIo2ProtocolGuid,
                 NULL,
                 (VOID**)&HMemImage.IoFncs
                 );
-  if (Status == EFI_NOT_FOUND) {
-    //
-    // For NT32, no EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL is available
-    // Use Dummy PciRootBridgeIo for memory access
-    //
-    ZeroMem (&DummyPciRootBridgeIo, sizeof (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL));
-    DummyPciRootBridgeIo.Mem.Read  = DummyMemRead;
-    DummyPciRootBridgeIo.Mem.Write = DummyMemWrite;
-    HMemImage.IoFncs = &DummyPciRootBridgeIo;
-    Status = EFI_SUCCESS;
-  }
   if (!EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   } else {
