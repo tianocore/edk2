@@ -536,7 +536,7 @@ InitializeApData (
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param[in] ExchangeInfo     Pointer to the MP exchange info buffer
-  @param[in] NumApsExecuting  Number of current executing AP
+  @param[in] ApIndex          Number of current executing AP
 **/
 VOID
 EFIAPI
