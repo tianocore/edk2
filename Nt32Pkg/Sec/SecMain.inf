@@ -65,6 +65,7 @@
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtMemorySizeForSecMain
   gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareVolume
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
 
 [BuildOptions]
   MSFT:*_*_IA32_DLINK_FLAGS == /out:"$(BIN_DIR)\SecMain.exe" /base:0x10000000 /pdb:"$(BIN_DIR)\SecMain.pdb" /LIBPATH:"$(VCINSTALLDIR)\Lib" /LIBPATH:"$(VCINSTALLDIR)\PlatformSdk\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib

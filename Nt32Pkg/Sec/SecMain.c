@@ -263,7 +263,7 @@ Returns:
   for (StackPointer = (UINTN*) (UINTN) InitialStackMemory;
        StackPointer < (UINTN*) ((UINTN)InitialStackMemory + (SIZE_T) InitialStackMemorySize);
        StackPointer ++) {
-    *StackPointer = 0x5AA55AA5;
+    *StackPointer = PcdGet32 (PcdInitValueInTempStack);
   }
   
   SecPrint ("  SEC passing in %d bytes of temp RAM to PEI\n", InitialStackMemorySize);
