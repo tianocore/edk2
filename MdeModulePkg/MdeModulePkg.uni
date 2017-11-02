@@ -1140,3 +1140,9 @@
                                                                                                        " exception caused by legacy memory (0-4095) access after EndOfDxe,"
                                                                                                        " such as Windows 7 boot on Qemu.\n"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdInitValueInTempStack_PROMPT  #language en-US "Init Value in Temp Stack"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdInitValueInTempStack_HELP    #language en-US "Init Value in Temp Stack to be shared between SEC and PEI_CORE\n"
+                                                                                           "SEC fills the full temp stack with this values. When switch stack, PeiCore can check\n"
+                                                                                           "this value in the temp stack to know how many stack has been used.\n"
+
