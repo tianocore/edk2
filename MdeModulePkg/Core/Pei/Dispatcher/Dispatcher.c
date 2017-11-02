@@ -15,11 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PeiMain.h"
 
-///
-/// temporary memory is filled with this initial value during SEC phase
-///
-#define INIT_CAR_VALUE 0x5AA55AA5
-
 /**
 
   Discover all Peims and optional Apriori file in one FV. There is at most one
@@ -680,7 +675,7 @@ PeiCheckAndSwitchStack (
 
       for (StackPointer = (UINT32*)SecCoreData->StackBase;
            (StackPointer < (UINT32*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
-           && (*StackPointer == INIT_CAR_VALUE);
+           && (*StackPointer == PcdGet32 (PcdInitValueInTempStack));
            StackPointer ++);
 
       DEBUG ((DEBUG_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
