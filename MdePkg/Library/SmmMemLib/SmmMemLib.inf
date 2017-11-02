@@ -43,6 +43,7 @@
 [LibraryClasses]
   SmmServicesTableLib
   UefiBootServicesTableLib
+  DxeServicesTableLib
   DebugLib
   BaseMemoryLib
   HobLib
