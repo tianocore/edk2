@@ -45,6 +45,7 @@
   EblNetworkLib|Include/Library/EblNetworkLib.h
   GdbSerialLib|Include/Library/GdbSerialLib.h
   DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
+  NorFlashInfoLib|Include/Library/NorFlashInfoLib.h
 
   DtPlatformDtbLoaderLib|Include/Library/DtPlatformDtbLoaderLib.h
 
