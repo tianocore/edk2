@@ -139,7 +139,7 @@ HMemImageRead (
 
   Status = HMemImage.IoFncs->Mem.Read (
                                   HMemImage.IoFncs,
-                                  EfiPciWidthUint8,
+                                  EfiCpuIoWidthUint8,
                                   Offset,
                                   Size,
                                   Buffer
@@ -262,7 +262,7 @@ HMemImageSave (
   //
   Status = HMemImage.IoFncs->Mem.Write (
                                   HMemImage.IoFncs,
-                                  EfiPciWidthUint8,
+                                  EfiCpuIoWidthUint8,
                                   Offset,
                                   Size,
                                   Buffer
