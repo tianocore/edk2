@@ -93,28 +93,61 @@ VarCheckHiiQuestion (
   UINT8    *Ptr;
   UINT8    Index;
   UINT8    MaxContainers;
+  UINT8    StartBit;
+  UINT8    EndBit;
+  UINT8    TotalBits;
+  UINT16   VarOffsetByteLevel;
+  UINT8    StorageWidthByteLevel;
 
-  if (((UINT32) HiiQuestion->VarOffset + HiiQuestion->StorageWidth) > DataSize) {
-    DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, DataSize));
+  if (HiiQuestion->BitFieldStore) {
+    VarOffsetByteLevel    = HiiQuestion->VarOffset / 8;
+    TotalBits             = HiiQuestion->VarOffset % 8 + HiiQuestion->StorageWidth;
+    StorageWidthByteLevel = (TotalBits % 8 == 0 ? TotalBits / 8: TotalBits / 8 + 1);
+  } else {
+    VarOffsetByteLevel    = HiiQuestion->VarOffset;
+    StorageWidthByteLevel = HiiQuestion->StorageWidth;
+  }
+
+  if (((UINT32) VarOffsetByteLevel + StorageWidthByteLevel) > DataSize) {
+    DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x)) > Size(0x%x)\n", VarOffsetByteLevel, StorageWidthByteLevel, DataSize));
     return FALSE;
   }
 
   OneData = 0;
-  CopyMem (&OneData, (UINT8 *) Data + HiiQuestion->VarOffset, HiiQuestion->StorageWidth);
+  CopyMem (&OneData, (UINT8 *) Data + VarOffsetByteLevel, StorageWidthByteLevel);
+  if (HiiQuestion->BitFieldStore) {
+    //
+    // Get the value from the bit field.
+    //
+    StartBit = HiiQuestion->VarOffset % 8;
+    EndBit   = StartBit + HiiQuestion->StorageWidth - 1;
+    OneData  = BitFieldRead64 (OneData, StartBit, EndBit);
+  }
 
   switch (HiiQuestion->OpCode) {
     case EFI_IFR_ONE_OF_OP:
       Ptr = (UINT8 *) ((VAR_CHECK_HII_QUESTION_ONEOF *) HiiQuestion + 1);
       while ((UINTN) Ptr < (UINTN) HiiQuestion + HiiQuestion->Length) {
         OneValue = 0;
-        CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
+        if (HiiQuestion->BitFieldStore) {
+          //
+          // For OneOf stored in bit field, the value of options are saved as UINT32 type.
+          //
+          CopyMem (&OneValue, Ptr, sizeof (UINT32));
+        } else {
+          CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
+        }
         if (OneData == OneValue) {
           //
           // Match
           //
           break;
         }
-        Ptr += HiiQuestion->StorageWidth;
+        if (HiiQuestion->BitFieldStore) {
+          Ptr += sizeof (UINT32);
+        } else {
+          Ptr += HiiQuestion->StorageWidth;
+        }
       }
       if ((UINTN) Ptr >= ((UINTN) HiiQuestion + HiiQuestion->Length)) {
         //
@@ -138,10 +171,20 @@ VarCheckHiiQuestion (
       Minimum = 0;
       Maximum = 0;
       Ptr = (UINT8 *) ((VAR_CHECK_HII_QUESTION_NUMERIC *) HiiQuestion + 1);
-      CopyMem (&Minimum, Ptr, HiiQuestion->StorageWidth);
-      Ptr += HiiQuestion->StorageWidth;
-      CopyMem (&Maximum, Ptr, HiiQuestion->StorageWidth);
-      Ptr += HiiQuestion->StorageWidth;
+      if (HiiQuestion->BitFieldStore) {
+        //
+        // For Numeric stored in bit field, the value of Maximum/Minimum are saved as UINT32 type.
+        //
+        CopyMem (&Minimum, Ptr, sizeof (UINT32));
+        Ptr += sizeof (UINT32);
+        CopyMem (&Maximum, Ptr, sizeof (UINT32));
+        Ptr += sizeof (UINT32);
+      } else {
+        CopyMem (&Minimum, Ptr, HiiQuestion->StorageWidth);
+        Ptr += HiiQuestion->StorageWidth;
+        CopyMem (&Maximum, Ptr, HiiQuestion->StorageWidth);
+        Ptr += HiiQuestion->StorageWidth;
+      }
 
       //
       // No need to check Step, because it is ONLY for UI.
@@ -344,35 +387,47 @@ DumpHiiQuestion (
   UINT8     *Ptr;
 
   DEBUG ((DEBUG_INFO, "  VAR_CHECK_HII_QUESTION_HEADER\n"));
-  DEBUG ((DEBUG_INFO, "    OpCode        - 0x%02x (%a)\n", HiiQuestion->OpCode, HiiOpCodeToStr (HiiQuestion->OpCode)));
+  DEBUG ((DEBUG_INFO, "    OpCode        - 0x%02x (%a) (%a)\n", HiiQuestion->OpCode, HiiOpCodeToStr (HiiQuestion->OpCode), (HiiQuestion->BitFieldStore? "bit level": "byte level")));
   DEBUG ((DEBUG_INFO, "    Length        - 0x%02x\n", HiiQuestion->Length));
-  DEBUG ((DEBUG_INFO, "    VarOffset     - 0x%04x\n", HiiQuestion->VarOffset));
-  DEBUG ((DEBUG_INFO, "    StorageWidth  - 0x%02x\n", HiiQuestion->StorageWidth));
+  DEBUG ((DEBUG_INFO, "    VarOffset     - 0x%04x (%a)\n", HiiQuestion->VarOffset, (HiiQuestion->BitFieldStore? "bit level": "byte level")));
+  DEBUG ((DEBUG_INFO, "    StorageWidth  - 0x%02x (%a)\n", HiiQuestion->StorageWidth, (HiiQuestion->BitFieldStore? "bit level": "byte level")));
 
   switch (HiiQuestion->OpCode) {
     case EFI_IFR_ONE_OF_OP:
       Ptr = (UINT8 *) ((VAR_CHECK_HII_QUESTION_ONEOF *) HiiQuestion + 1);
       while ((UINTN) Ptr < ((UINTN) HiiQuestion + HiiQuestion->Length)) {
         OneValue = 0;
-        CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
-        switch (HiiQuestion->StorageWidth) {
-          case sizeof (UINT8):
-            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%02x\n", OneValue));
-            break;
-          case sizeof (UINT16):
-            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%04x\n", OneValue));
-            break;
-          case sizeof (UINT32):
-            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%08x\n", OneValue));
-            break;
-          case sizeof (UINT64):
-            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%016lx\n", OneValue));
-            break;
-          default:
-            ASSERT (FALSE);
-            break;
+        if (HiiQuestion->BitFieldStore) {
+          //
+          // For OneOf stored in bit field, the value of options are saved as UINT32 type.
+          //
+          CopyMem (&OneValue, Ptr, sizeof (UINT32));
+          DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%08x\n", OneValue));
+        } else {
+          CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
+          switch (HiiQuestion->StorageWidth) {
+            case sizeof (UINT8):
+              DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%02x\n", OneValue));
+              break;
+            case sizeof (UINT16):
+              DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%04x\n", OneValue));
+              break;
+            case sizeof (UINT32):
+              DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%08x\n", OneValue));
+              break;
+            case sizeof (UINT64):
+              DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%016lx\n", OneValue));
+              break;
+            default:
+              ASSERT (FALSE);
+              break;
+          }
         }
-        Ptr += HiiQuestion->StorageWidth;
+        if (HiiQuestion->BitFieldStore) {
+          Ptr += sizeof (UINT32);
+        } else {
+          Ptr += HiiQuestion->StorageWidth;
+        }
       }
       break;
 
@@ -383,31 +438,44 @@ DumpHiiQuestion (
       Minimum = 0;
       Maximum = 0;
       Ptr = (UINT8 *) ((VAR_CHECK_HII_QUESTION_NUMERIC *) HiiQuestion + 1);
-      CopyMem (&Minimum, Ptr, HiiQuestion->StorageWidth);
-      Ptr += HiiQuestion->StorageWidth;
-      CopyMem (&Maximum, Ptr, HiiQuestion->StorageWidth);
-      Ptr += HiiQuestion->StorageWidth;
+      if(HiiQuestion->BitFieldStore) {
+        //
+        // For Numeric stored in bit field, the value of Maximum/Minimum are saved as UINT32 type.
+        //
+        CopyMem (&Minimum, Ptr, sizeof (UINT32));
+        Ptr += sizeof (UINT32);
+        CopyMem (&Maximum, Ptr, sizeof (UINT32));
+        Ptr += sizeof (UINT32);
 
-      switch (HiiQuestion->StorageWidth) {
-        case sizeof (UINT8):
-          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%02x\n", Minimum));
-          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%02x\n", Maximum));
-          break;
-        case sizeof (UINT16):
-          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%04x\n", Minimum));
-          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%04x\n", Maximum));
-          break;
-        case sizeof (UINT32):
-          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%08x\n", Minimum));
-          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%08x\n", Maximum));
-          break;
-        case sizeof (UINT64):
-          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%016lx\n", Minimum));
-          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%016lx\n", Maximum));
-          break;
-        default:
-          ASSERT (FALSE);
-          break;
+        DEBUG ((DEBUG_INFO, "    Minimum       - 0x%08x\n", Minimum));
+        DEBUG ((DEBUG_INFO, "    Maximum       - 0x%08x\n", Maximum));
+      } else {
+        CopyMem (&Minimum, Ptr, HiiQuestion->StorageWidth);
+        Ptr += HiiQuestion->StorageWidth;
+        CopyMem (&Maximum, Ptr, HiiQuestion->StorageWidth);
+        Ptr += HiiQuestion->StorageWidth;
+
+        switch (HiiQuestion->StorageWidth) {
+          case sizeof (UINT8):
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%02x\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%02x\n", Maximum));
+            break;
+          case sizeof (UINT16):
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%04x\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%04x\n", Maximum));
+            break;
+          case sizeof (UINT32):
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%08x\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%08x\n", Maximum));
+            break;
+          case sizeof (UINT64):
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%016lx\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%016lx\n", Maximum));
+            break;
+          default:
+            ASSERT (FALSE);
+            break;
+        }
       }
       break;
 

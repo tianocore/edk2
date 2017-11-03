@@ -1,7 +1,7 @@
 ## @file
 #  NULL class library to register var check HII handler.
 #
-#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions
@@ -45,6 +45,9 @@
   MemoryAllocationLib
   PcdLib
   VarCheckLib
+
+[Guids]
+  gEdkiiIfrBitVarstoreGuid                  ## SOMETIMES_CONSUMES  ## GUID
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid           ## SOMETIMES_CONSUMES
