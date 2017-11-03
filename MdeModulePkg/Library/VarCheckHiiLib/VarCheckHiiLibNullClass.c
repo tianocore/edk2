@@ -60,7 +60,7 @@ VarCheckHiiInternalDumpHex (
 
     Val[Index * 3]  = 0;
     Str[Index]      = 0;
-    DEBUG ((EFI_D_INFO, "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
+    DEBUG ((DEBUG_INFO , "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
 
     Data += Size;
     Offset += Size;
@@ -95,7 +95,7 @@ VarCheckHiiQuestion (
   UINT8    MaxContainers;
 
   if (((UINT32) HiiQuestion->VarOffset + HiiQuestion->StorageWidth) > DataSize) {
-    DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, DataSize));
+    DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, DataSize));
     return FALSE;
   }
 
@@ -120,7 +120,7 @@ VarCheckHiiQuestion (
         //
         // No match
         //
-        DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: OneOf mismatch (0x%lx)\n", OneData));
+        DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: OneOf mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *) HiiQuestion););
         return FALSE;
       }
@@ -128,7 +128,7 @@ VarCheckHiiQuestion (
 
     case EFI_IFR_CHECKBOX_OP:
       if ((OneData != 0) && (OneData != 1)) {
-        DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: CheckBox mismatch (0x%lx)\n", OneData));
+        DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: CheckBox mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *) HiiQuestion););
         return FALSE;
       }
@@ -147,7 +147,7 @@ VarCheckHiiQuestion (
       // No need to check Step, because it is ONLY for UI.
       //
       if ((OneData < Minimum) || (OneData > Maximum)) {
-        DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: Numeric mismatch (0x%lx)\n", OneData));
+        DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: Numeric mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *) HiiQuestion););
         return FALSE;
       }
@@ -156,7 +156,7 @@ VarCheckHiiQuestion (
     case EFI_IFR_ORDERED_LIST_OP:
       MaxContainers = ((VAR_CHECK_HII_QUESTION_ORDEREDLIST *) HiiQuestion)->MaxContainers;
       if (((UINT32) HiiQuestion->VarOffset + HiiQuestion->StorageWidth * MaxContainers) > DataSize) {
-        DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x) * MaxContainers(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, MaxContainers, DataSize));
+        DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x) * MaxContainers(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, MaxContainers, DataSize));
         return FALSE;
       }
       for (Index = 0; Index < MaxContainers; Index++) {
@@ -185,7 +185,7 @@ VarCheckHiiQuestion (
           //
           // No match
           //
-          DEBUG ((EFI_D_INFO, "VarCheckHiiQuestion fail: OrderedList mismatch\n"));
+          DEBUG ((DEBUG_INFO , "VarCheckHiiQuestion fail: OrderedList mismatch\n"));
           DEBUG_CODE (VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->StorageWidth * MaxContainers, (UINT8 *) Data + HiiQuestion->VarOffset););
           DEBUG_CODE (VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *) HiiQuestion););
           return FALSE;
@@ -251,19 +251,19 @@ SetVariableCheckHandlerHii (
       //
       // Found the Hii Variable that could be used to do check.
       //
-      DEBUG ((EFI_D_INFO, "VarCheckHiiVariable - %s:%g with Attributes = 0x%08x Size = 0x%x\n", VariableName, VendorGuid, Attributes, DataSize));
+      DEBUG ((DEBUG_INFO , "VarCheckHiiVariable - %s:%g with Attributes = 0x%08x Size = 0x%x\n", VariableName, VendorGuid, Attributes, DataSize));
       if (HiiVariable->Attributes != Attributes) {
-        DEBUG ((EFI_D_INFO, "VarCheckHiiVariable fail for Attributes - 0x%08x\n", HiiVariable->Attributes));
+        DEBUG ((DEBUG_INFO, "VarCheckHiiVariable fail for Attributes - 0x%08x\n", HiiVariable->Attributes));
         return EFI_SECURITY_VIOLATION;
       }
 
       if (DataSize == 0) {
-        DEBUG ((EFI_D_INFO, "VarCheckHiiVariable - CHECK PASS with DataSize == 0 !\n"));
+        DEBUG ((DEBUG_INFO, "VarCheckHiiVariable - CHECK PASS with DataSize == 0 !\n"));
         return EFI_SUCCESS;
       }
 
       if (HiiVariable->Size != DataSize) {
-        DEBUG ((EFI_D_INFO, "VarCheckHiiVariable fail for Size - 0x%x\n", HiiVariable->Size));
+        DEBUG ((DEBUG_INFO, "VarCheckHiiVariable fail for Size - 0x%x\n", HiiVariable->Size));
         return EFI_SECURITY_VIOLATION;
       }
 
@@ -282,7 +282,7 @@ SetVariableCheckHandlerHii (
         HiiQuestion = (VAR_CHECK_HII_QUESTION_HEADER *) HEADER_ALIGN (((UINTN) HiiQuestion + HiiQuestion->Length));
       }
 
-      DEBUG ((EFI_D_INFO, "VarCheckHiiVariable - ALL CHECK PASS!\n"));
+      DEBUG ((DEBUG_INFO, "VarCheckHiiVariable - ALL CHECK PASS!\n"));
       return EFI_SUCCESS;
     }
     //
@@ -343,11 +343,11 @@ DumpHiiQuestion (
   UINT64    OneValue;
   UINT8     *Ptr;
 
-  DEBUG ((EFI_D_INFO, "  VAR_CHECK_HII_QUESTION_HEADER\n"));
-  DEBUG ((EFI_D_INFO, "    OpCode        - 0x%02x (%a)\n", HiiQuestion->OpCode, HiiOpCodeToStr (HiiQuestion->OpCode)));
-  DEBUG ((EFI_D_INFO, "    Length        - 0x%02x\n", HiiQuestion->Length));
-  DEBUG ((EFI_D_INFO, "    VarOffset     - 0x%04x\n", HiiQuestion->VarOffset));
-  DEBUG ((EFI_D_INFO, "    StorageWidth  - 0x%02x\n", HiiQuestion->StorageWidth));
+  DEBUG ((DEBUG_INFO, "  VAR_CHECK_HII_QUESTION_HEADER\n"));
+  DEBUG ((DEBUG_INFO, "    OpCode        - 0x%02x (%a)\n", HiiQuestion->OpCode, HiiOpCodeToStr (HiiQuestion->OpCode)));
+  DEBUG ((DEBUG_INFO, "    Length        - 0x%02x\n", HiiQuestion->Length));
+  DEBUG ((DEBUG_INFO, "    VarOffset     - 0x%04x\n", HiiQuestion->VarOffset));
+  DEBUG ((DEBUG_INFO, "    StorageWidth  - 0x%02x\n", HiiQuestion->StorageWidth));
 
   switch (HiiQuestion->OpCode) {
     case EFI_IFR_ONE_OF_OP:
@@ -357,16 +357,16 @@ DumpHiiQuestion (
         CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
         switch (HiiQuestion->StorageWidth) {
           case sizeof (UINT8):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%02x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%02x\n", OneValue));
             break;
           case sizeof (UINT16):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%04x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%04x\n", OneValue));
             break;
           case sizeof (UINT32):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%08x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%08x\n", OneValue));
             break;
           case sizeof (UINT64):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%016lx\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%016lx\n", OneValue));
             break;
           default:
             ASSERT (FALSE);
@@ -390,20 +390,20 @@ DumpHiiQuestion (
 
       switch (HiiQuestion->StorageWidth) {
         case sizeof (UINT8):
-          DEBUG ((EFI_D_INFO, "    Minimum       - 0x%02x\n", Minimum));
-          DEBUG ((EFI_D_INFO, "    Maximum       - 0x%02x\n", Maximum));
+          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%02x\n", Minimum));
+          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%02x\n", Maximum));
           break;
         case sizeof (UINT16):
-          DEBUG ((EFI_D_INFO, "    Minimum       - 0x%04x\n", Minimum));
-          DEBUG ((EFI_D_INFO, "    Maximum       - 0x%04x\n", Maximum));
+          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%04x\n", Minimum));
+          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%04x\n", Maximum));
           break;
         case sizeof (UINT32):
-          DEBUG ((EFI_D_INFO, "    Minimum       - 0x%08x\n", Minimum));
-          DEBUG ((EFI_D_INFO, "    Maximum       - 0x%08x\n", Maximum));
+          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%08x\n", Minimum));
+          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%08x\n", Maximum));
           break;
         case sizeof (UINT64):
-          DEBUG ((EFI_D_INFO, "    Minimum       - 0x%016lx\n", Minimum));
-          DEBUG ((EFI_D_INFO, "    Maximum       - 0x%016lx\n", Maximum));
+          DEBUG ((DEBUG_INFO, "    Minimum       - 0x%016lx\n", Minimum));
+          DEBUG ((DEBUG_INFO, "    Maximum       - 0x%016lx\n", Maximum));
           break;
         default:
           ASSERT (FALSE);
@@ -412,23 +412,23 @@ DumpHiiQuestion (
       break;
 
     case EFI_IFR_ORDERED_LIST_OP:
-      DEBUG ((EFI_D_INFO, "    MaxContainers - 0x%02x\n", ((VAR_CHECK_HII_QUESTION_ORDEREDLIST *) HiiQuestion)->MaxContainers));
+      DEBUG ((DEBUG_INFO, "    MaxContainers - 0x%02x\n", ((VAR_CHECK_HII_QUESTION_ORDEREDLIST *) HiiQuestion)->MaxContainers));
       Ptr = (UINT8 *) ((VAR_CHECK_HII_QUESTION_ORDEREDLIST *) HiiQuestion + 1);
       while ((UINTN) Ptr < ((UINTN) HiiQuestion + HiiQuestion->Length)) {
         OneValue = 0;
         CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
         switch (HiiQuestion->StorageWidth) {
           case sizeof (UINT8):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%02x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%02x\n", OneValue));
             break;
           case sizeof (UINT16):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%04x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%04x\n", OneValue));
             break;
           case sizeof (UINT32):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%08x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%08x\n", OneValue));
             break;
           case sizeof (UINT64):
-            DEBUG ((EFI_D_INFO, "    OneOfOption   - 0x%016lx\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    OneOfOption   - 0x%016lx\n", OneValue));
             break;
           default:
             ASSERT (FALSE);
@@ -457,15 +457,15 @@ DumpHiiVariable (
 {
   VAR_CHECK_HII_QUESTION_HEADER *HiiQuestion;
 
-  DEBUG ((EFI_D_INFO, "VAR_CHECK_HII_VARIABLE_HEADER\n"));
-  DEBUG ((EFI_D_INFO, "  Revision        - 0x%04x\n", HiiVariable->Revision));
-  DEBUG ((EFI_D_INFO, "  HeaderLength    - 0x%04x\n", HiiVariable->HeaderLength));
-  DEBUG ((EFI_D_INFO, "  Length          - 0x%08x\n", HiiVariable->Length));
-  DEBUG ((EFI_D_INFO, "  OpCode          - 0x%02x (%a)\n", HiiVariable->OpCode, HiiOpCodeToStr (HiiVariable->OpCode)));
-  DEBUG ((EFI_D_INFO, "  Size            - 0x%04x\n", HiiVariable->Size));
-  DEBUG ((EFI_D_INFO, "  Attributes      - 0x%08x\n", HiiVariable->Attributes));
-  DEBUG ((EFI_D_INFO, "  Guid            - %g\n", &HiiVariable->Guid));
-  DEBUG ((EFI_D_INFO, "  Name            - %s\n", HiiVariable + 1));
+  DEBUG ((DEBUG_INFO, "VAR_CHECK_HII_VARIABLE_HEADER\n"));
+  DEBUG ((DEBUG_INFO, "  Revision        - 0x%04x\n", HiiVariable->Revision));
+  DEBUG ((DEBUG_INFO, "  HeaderLength    - 0x%04x\n", HiiVariable->HeaderLength));
+  DEBUG ((DEBUG_INFO, "  Length          - 0x%08x\n", HiiVariable->Length));
+  DEBUG ((DEBUG_INFO, "  OpCode          - 0x%02x (%a)\n", HiiVariable->OpCode, HiiOpCodeToStr (HiiVariable->OpCode)));
+  DEBUG ((DEBUG_INFO, "  Size            - 0x%04x\n", HiiVariable->Size));
+  DEBUG ((DEBUG_INFO, "  Attributes      - 0x%08x\n", HiiVariable->Attributes));
+  DEBUG ((DEBUG_INFO, "  Guid            - %g\n", &HiiVariable->Guid));
+  DEBUG ((DEBUG_INFO, "  Name            - %s\n", HiiVariable + 1));
 
   //
   // For Hii Question header align.
@@ -498,7 +498,7 @@ DumpVarCheckHii (
 {
   VAR_CHECK_HII_VARIABLE_HEADER     *HiiVariable;
 
-  DEBUG ((EFI_D_INFO, "DumpVarCheckHii\n"));
+  DEBUG ((DEBUG_INFO, "DumpVarCheckHii\n"));
 
   //
   // For Hii Variable header align.

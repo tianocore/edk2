@@ -58,7 +58,7 @@ VarCheckHiiGenFromHiiDatabase (
     Status = HiiDatabase->ExportPackageLists (HiiDatabase, 0, &BufferSize, Buffer);
     ASSERT_EFI_ERROR (Status);
 
-    DEBUG ((EFI_D_INFO, "VarCheckHiiGenDxeFromHii - HII Database exported at 0x%x, size = 0x%x\n", Buffer, BufferSize));
+    DEBUG ((DEBUG_INFO , "VarCheckHiiGenDxeFromHii - HII Database exported at 0x%x, size = 0x%x\n", Buffer, BufferSize));
 
 #ifdef DUMP_HII_DATA
     DEBUG_CODE (
