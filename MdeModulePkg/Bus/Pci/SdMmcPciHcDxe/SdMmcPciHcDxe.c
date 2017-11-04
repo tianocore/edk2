@@ -1008,13 +1008,7 @@ SdMmcPassThruPassThru (
   }
 
 Done:
-  if ((Trb != NULL) && (Trb->AdmaDesc != NULL)) {
-    FreePages (Trb->AdmaDesc, Trb->AdmaPages);
-  }
-
-  if (Trb != NULL) {
-    FreePool (Trb);
-  }
+  SdMmcFreeTrb (Trb);
 
   return Status;
 }
