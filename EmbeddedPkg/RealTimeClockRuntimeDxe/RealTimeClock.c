@@ -1,10 +1,8 @@
 /** @file
   Implement EFI RealTimeClock runtime services via RTC Lib.
 
-  Currently this driver does not support runtime virtual calling.
-
-
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,14 +15,116 @@
 **/
 
 #include <PiDxe.h>
+#include <Library/DebugLib.h>
+#include <Library/RealTimeClockLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/RealTimeClockLib.h>
+#include <Library/UefiRuntimeLib.h>
 #include <Protocol/RealTimeClock.h>
 
 EFI_HANDLE  mHandle = NULL;
 
+//
+// These values can be set by SetTime () and need to be returned by GetTime ()
+// but cannot usually be kept by the RTC hardware, so we store them in a UEFI
+// variable instead.
+//
+typedef struct {
+  INT16           TimeZone;
+  UINT8           Daylight;
+} NON_VOLATILE_TIME_SETTINGS;
 
+STATIC CONST CHAR16 mTimeSettingsVariableName[] = L"RtcTimeSettings";
+STATIC NON_VOLATILE_TIME_SETTINGS mTimeSettings;
+
+STATIC
+BOOLEAN
+IsValidTimeZone (
+  IN  INT16  TimeZone
+  )
+{
+  return TimeZone == EFI_UNSPECIFIED_TIMEZONE ||
+         (TimeZone >= -1440 && TimeZone <= 1440);
+}
+
+STATIC
+BOOLEAN
+IsValidDaylight (
+  IN  INT8  Daylight
+  )
+{
+  return Daylight == 0 ||
+         Daylight == EFI_TIME_ADJUST_DAYLIGHT ||
+         Daylight == (EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT);
+}
+
+STATIC
+BOOLEAN
+EFIAPI
+IsLeapYear (
+  IN EFI_TIME   *Time
+  )
+{
+  if (Time->Year % 4 == 0) {
+    if (Time->Year % 100 == 0) {
+      if (Time->Year % 400 == 0) {
+        return TRUE;
+      } else {
+        return FALSE;
+      }
+    } else {
+      return TRUE;
+    }
+  } else {
+    return FALSE;
+  }
+}
+
+STATIC CONST INTN mDayOfMonth[12] = {
+  31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+};
+
+STATIC
+BOOLEAN
+EFIAPI
+IsDayValid (
+  IN  EFI_TIME  *Time
+  )
+{
+  ASSERT (Time->Day >= 1);
+  ASSERT (Time->Day <= mDayOfMonth[Time->Month - 1]);
+  ASSERT (Time->Month != 2 || IsLeapYear (Time) || Time->Day <= 28);
+
+  if (Time->Day < 1 ||
+      Time->Day > mDayOfMonth[Time->Month - 1] ||
+      (Time->Month == 2 && !IsLeapYear (Time) && Time->Day > 28)) {
+    return FALSE;
+  }
+  return TRUE;
+}
+
+STATIC
+BOOLEAN
+EFIAPI
+IsTimeValid(
+  IN EFI_TIME *Time
+  )
+{
+  // Check the input parameters are within the range specified by UEFI
+  if (Time->Year   < 1900               ||
+      Time->Year   > 9999               ||
+      Time->Month  < 1                  ||
+      Time->Month  > 12                 ||
+      !IsDayValid (Time)                ||
+      Time->Hour   > 23                 ||
+      Time->Minute > 59                 ||
+      Time->Second > 59                 ||
+      !IsValidTimeZone (Time->TimeZone) ||
+      !IsValidDaylight (Time->Daylight)) {
+    return FALSE;
+  }
+  return TRUE;
+}
 
 /**
   Returns the current time and date information, and the time-keeping capabilities
@@ -43,9 +143,20 @@ EFI_STATUS
 EFIAPI
 GetTime (
   OUT EFI_TIME                *Time,
-  OUT  EFI_TIME_CAPABILITIES  *Capabilities
+  OUT EFI_TIME_CAPABILITIES   *Capabilities
   )
 {
+  if (Time == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Set these first so the RealTimeClockLib implementation
+  // can override them based on its own settings.
+  //
+  Time->TimeZone = mTimeSettings.TimeZone;
+  Time->Daylight = mTimeSettings.Daylight;
+
   return LibGetTime (Time, Capabilities);
 }
 
@@ -67,7 +178,41 @@ SetTime (
   IN EFI_TIME                *Time
   )
 {
-  return LibSetTime (Time);
+  EFI_STATUS        Status;
+  BOOLEAN           TimeSettingsChanged;
+
+  if (Time == NULL || !IsTimeValid (Time)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  TimeSettingsChanged = FALSE;
+  if (mTimeSettings.TimeZone != Time->TimeZone ||
+      mTimeSettings.Daylight != Time->Daylight) {
+
+    mTimeSettings.TimeZone = Time->TimeZone;
+    mTimeSettings.Daylight = Time->Daylight;
+    TimeSettingsChanged = TRUE;
+  }
+
+  Status = LibSetTime (Time);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (TimeSettingsChanged) {
+    Status = EfiSetVariable (
+               (CHAR16 *)mTimeSettingsVariableName,
+               &gEfiCallerIdGuid,
+               EFI_VARIABLE_NON_VOLATILE |
+               EFI_VARIABLE_BOOTSERVICE_ACCESS |
+               EFI_VARIABLE_RUNTIME_ACCESS,
+               sizeof (mTimeSettings),
+               (VOID *)&mTimeSettings);
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    }
+  }
+  return EFI_SUCCESS;
 }
 
 
@@ -138,10 +283,24 @@ InitializeRealTimeClock (
   )
 {
   EFI_STATUS  Status;
+  UINTN       Size;
 
   Status = LibRtcInitialize (ImageHandle, SystemTable);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  Size = sizeof (mTimeSettings);
+  Status = EfiGetVariable ((CHAR16 *)mTimeSettingsVariableName,
+             &gEfiCallerIdGuid, NULL, &Size, (VOID *)&mTimeSettings);
+  if (EFI_ERROR (Status) ||
+      !IsValidTimeZone (mTimeSettings.TimeZone) ||
+      !IsValidDaylight (mTimeSettings.Daylight)) {
+    DEBUG ((DEBUG_WARN, "%a: using default timezone/daylight settings\n",
+      __FUNCTION__));
+
+    mTimeSettings.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
+    mTimeSettings.Daylight = 0;
   }
 
   SystemTable->RuntimeServices->GetTime       = GetTime;

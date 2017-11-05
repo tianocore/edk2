@@ -1,8 +1,8 @@
 #/** @file
-# Reset Architectural Protocol Driver as defined in PI
+#  Real Time Clock Architectural Protocol Driver as defined in PI
 #
-# This Reset module simulates system reset by process exit on NT.
-# Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -31,10 +31,11 @@
   EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
-  UefiBootServicesTableLib
-  UefiDriverEntryPoint
   DebugLib
   RealTimeClockLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeLib
 
 [Protocols]
   gEfiRealTimeClockArchProtocolGuid
