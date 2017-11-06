@@ -147,8 +147,8 @@ DumpHiiPackage (
             IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpCodeHeader;
             if (IfrEfiVarStore->Header.Length >= sizeof (EFI_IFR_VARSTORE_EFI)) {
               DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
-              DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Length - 0x02%x\n", IfrOpCodeHeader->Length));
-              DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Scope  - 0x02%x\n", IfrOpCodeHeader->Scope));
+              DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Length - 0x%02x\n", IfrOpCodeHeader->Length));
+              DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
               DEBUG ((EFI_D_INFO, "      Guid       - %g\n", &IfrEfiVarStore->Guid));
               DEBUG ((EFI_D_INFO, "      VarStoreId - 0x%04x\n", IfrEfiVarStore->VarStoreId));
               DEBUG ((EFI_D_INFO, "      Size       - 0x%04x\n", IfrEfiVarStore->Size));
@@ -162,8 +162,8 @@ DumpHiiPackage (
           case EFI_IFR_NUMERIC_OP:
           case EFI_IFR_ORDERED_LIST_OP:
             DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->OpCode - 0x%02x (%a)\n", IfrOpCodeHeader->OpCode, IfrOpCodeToStr (IfrOpCodeHeader->OpCode)));
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Length - 0x02%x\n", IfrOpCodeHeader->Length));
-            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Scope  - 0x02%x\n", IfrOpCodeHeader->Scope));
+            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Length - 0x%02x\n", IfrOpCodeHeader->Length));
+            DEBUG ((EFI_D_INFO, "    IfrOpCodeHeader->Scope  - 0x%02x\n", IfrOpCodeHeader->Scope));
             DEBUG ((EFI_D_INFO, "      Prompt       - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.Header.Prompt));
             DEBUG ((EFI_D_INFO, "      Help         - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.Header.Help));
             DEBUG ((EFI_D_INFO, "      QuestionId   - 0x%04x\n", ((EFI_IFR_ONE_OF *) IfrOpCodeHeader)->Question.QuestionId));
