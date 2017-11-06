@@ -2,7 +2,7 @@
   Master header file for DxeIpl PEIM. All source files in this module should
   include this file for common definitions.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -238,31 +238,6 @@ Decompress (
   IN CONST  EFI_COMPRESSION_SECTION *CompressionSection,
   OUT       VOID                    **OutputBuffer,
   OUT       UINTN                   *OutputSize
-  );
-
-/**
-  Clear legacy memory located at the first 4K-page.
-
-  This function traverses the whole HOB list to check if memory from 0 to 4095
-  exists and has not been allocated, and then clear it if so.
-
-  @param HobStart         The start of HobList passed to DxeCore.
-
-**/
-VOID
-ClearFirst4KPage (
-  IN  VOID *HobStart
-  );
-
-/**
-  Return configure status of NULL pointer detection feature.
-
-  @return TRUE   NULL pointer detection feature is enabled
-  @return FALSE  NULL pointer detection feature is disabled
-**/
-BOOLEAN
-IsNullDetectionEnabled (
-  VOID
   );
 
 #endif

@@ -7,7 +7,7 @@
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
     4) AMD64 Architecture Programmer's Manual Volume 2: System Programming
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -227,5 +227,29 @@ AsmGetVectorTemplatInfo (
   OUT   VOID  **TemplateBase
   );
 
+/**
+  Clear legacy memory located at the first 4K-page.
+
+  This function traverses the whole HOB list to check if memory from 0 to 4095
+  exists and has not been allocated, and then clear it if so.
+
+  @param HobStart         The start of HobList passed to DxeCore.
+
+**/
+VOID
+ClearFirst4KPage (
+  IN  VOID *HobStart
+  );
+
+/**
+  Return configure status of NULL pointer detection feature.
+
+  @return TRUE   NULL pointer detection feature is enabled
+  @return FALSE  NULL pointer detection feature is disabled
+**/
+BOOLEAN
+IsNullDetectionEnabled (
+  VOID
+  );
 
 #endif 
