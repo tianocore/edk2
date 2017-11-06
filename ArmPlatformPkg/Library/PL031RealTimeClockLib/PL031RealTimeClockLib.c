@@ -164,12 +164,10 @@ LibGetTime (
   }
 
   // Adjust for the correct time zone
+  // The timezone setting also reflects the DST setting of the clock
   if (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
     EpochSeconds += Time->TimeZone * SEC_PER_MIN;
-  }
-
-  // Adjust for the correct period
-  if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
+  } else if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
     // Convert to adjusted time, i.e. spring forwards one hour
     EpochSeconds += SEC_PER_HOUR;
   }
@@ -229,12 +227,10 @@ LibSetTime (
   EpochSeconds = EfiTimeToEpoch (Time);
 
   // Adjust for the correct time zone, i.e. convert to UTC time zone
+  // The timezone setting also reflects the DST setting of the clock
   if (Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
     EpochSeconds -= Time->TimeZone * SEC_PER_MIN;
-  }
-
-  // Adjust for the correct period
-  if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
+  } else if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
     // Convert to un-adjusted time, i.e. fall back one hour
     EpochSeconds -= SEC_PER_HOUR;
   }
