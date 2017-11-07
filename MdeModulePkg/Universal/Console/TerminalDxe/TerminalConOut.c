@@ -66,15 +66,15 @@ UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
   { BLOCKELEMENT_FULL_BLOCK,            0xdb, L'*' },
   { BLOCKELEMENT_LIGHT_SHADE,           0xb0, L'+' },
 
-  { GEOMETRICSHAPE_UP_TRIANGLE,         0x1e, L'^' },
-  { GEOMETRICSHAPE_RIGHT_TRIANGLE,      0x10, L'>' },
-  { GEOMETRICSHAPE_DOWN_TRIANGLE,       0x1f, L'v' },
-  { GEOMETRICSHAPE_LEFT_TRIANGLE,       0x11, L'<' },
+  { GEOMETRICSHAPE_UP_TRIANGLE,         '^', L'^' },
+  { GEOMETRICSHAPE_RIGHT_TRIANGLE,      '>', L'>' },
+  { GEOMETRICSHAPE_DOWN_TRIANGLE,       'v', L'v' },
+  { GEOMETRICSHAPE_LEFT_TRIANGLE,       '<', L'<' },
 
-  { ARROW_LEFT,                         0x3c, L'<' },
-  { ARROW_UP,                           0x18, L'^' },
-  { ARROW_RIGHT,                        0x3e, L'>' },
-  { ARROW_DOWN,                         0x19, L'v' },
+  { ARROW_LEFT,                         '<', L'<' },
+  { ARROW_UP,                           '^', L'^' },
+  { ARROW_RIGHT,                        '>', L'>' },
+  { ARROW_DOWN,                         'v', L'v' },
 
   { 0x0000,                             0x00, L'\0' }
 };
