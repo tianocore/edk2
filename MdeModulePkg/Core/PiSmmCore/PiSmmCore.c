@@ -544,7 +544,7 @@ SmmEntryPoint (
         // return EFI_INVALID_PARAMETER
         //
         gSmmCorePrivate->CommunicationBuffer = NULL;
-        gSmmCorePrivate->ReturnStatus = EFI_INVALID_PARAMETER;
+        gSmmCorePrivate->ReturnStatus = EFI_ACCESS_DENIED;
       } else {
         CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;
         BufferSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
