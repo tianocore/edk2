@@ -2377,6 +2377,36 @@ Pkcs5HashPassword (
   );
 
 /**
+  The 3rd parameter of Pkcs7GetSigners will return all embedded
+  X.509 certificate in one given PKCS7 signature. The format is:
+  //
+  // UINT8  CertNumber;
+  // UINT32 Cert1Length;
+  // UINT8  Cert1[];
+  // UINT32 Cert2Length;
+  // UINT8  Cert2[];
+  // ...
+  // UINT32 CertnLength;
+  // UINT8  Certn[];
+  //
+
+  The two following C-structure are used for parsing CertStack more clearly.
+**/
+#pragma pack(1)
+
+typedef struct {
+  UINT32    CertDataLength;       // The length in bytes of X.509 certificate.
+  UINT8     CertDataBuffer[0];    // The X.509 certificate content (DER).
+} EFI_CERT_DATA;
+
+typedef struct {
+  UINT8             CertNumber;   // Number of X.509 certificate.
+  //EFI_CERT_DATA   CertArray[];  // An array of X.509 certificate.
+} EFI_CERT_STACK;
+
+#pragma pack()
+
+/**
   Get the signer's certificates from PKCS#7 signed data as described in "PKCS #7:
   Cryptographic Message Syntax Standard". The input signed data could be wrapped
   in a ContentInfo structure.
@@ -2390,6 +2420,7 @@ Pkcs5HashPassword (
   @param[out] CertStack    Pointer to Signer's certificates retrieved from P7Data.
                            It's caller's responsibility to free the buffer with
                            Pkcs7FreeSigners().
+                           This data structure is EFI_CERT_STACK type.
   @param[out] StackLength  Length of signer's certificates in bytes.
   @param[out] TrustedCert  Pointer to a trusted certificate from Signer's certificates.
                            It's caller's responsibility to free the buffer with
@@ -2437,9 +2468,11 @@ Pkcs7FreeSigners (
   @param[out] SignerChainCerts  Pointer to the certificates list chained to signer's
                                 certificate. It's caller's responsibility to free the buffer
                                 with Pkcs7FreeSigners().
+                                This data structure is EFI_CERT_STACK type.
   @param[out] ChainLength       Length of the chained certificates list buffer in bytes.
   @param[out] UnchainCerts      Pointer to the unchained certificates lists. It's caller's
                                 responsibility to free the buffer with Pkcs7FreeSigners().
+                                This data structure is EFI_CERT_STACK type.
   @param[out] UnchainLength     Length of the unchained certificates list buffer in bytes.
 
   @retval  TRUE         The operation is finished successfully.

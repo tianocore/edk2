@@ -27,6 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param[out] CertStack    Pointer to Signer's certificates retrieved from P7Data.
                            It's caller's responsibility to free the buffer with
                            Pkcs7FreeSigners().
+                           This data structure is EFI_CERT_STACK type.
   @param[out] StackLength  Length of signer's certificates in bytes.
   @param[out] TrustedCert  Pointer to a trusted certificate from Signer's certificates.
                            It's caller's responsibility to free the buffer with
@@ -79,9 +80,11 @@ Pkcs7FreeSigners (
   @param[out] SignerChainCerts  Pointer to the certificates list chained to signer's
                                 certificate. It's caller's responsibility to free the buffer
                                 with Pkcs7FreeSigners().
+                                This data structure is EFI_CERT_STACK type.
   @param[out] ChainLength       Length of the chained certificates list buffer in bytes.
   @param[out] UnchainCerts      Pointer to the unchained certificates lists. It's caller's
                                 responsibility to free the buffer with Pkcs7FreeSigners().
+                                This data structure is EFI_CERT_STACK type.
   @param[out] UnchainLength     Length of the unchained certificates list buffer in bytes.
 
   @retval  TRUE         The operation is finished successfully.
