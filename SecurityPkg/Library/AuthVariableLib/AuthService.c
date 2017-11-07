@@ -1828,6 +1828,7 @@ VerifyTimeBasedPayload (
   UINT8                            *CertsInCertDb;
   UINT32                           CertsSizeinDb;
   UINT8                            Sha256Digest[SHA256_DIGEST_SIZE];
+  EFI_CERT_DATA                    *CertDataPtr;
 
   //
   // 1. TopLevelCert is the top-level issuer certificate in signature Signer Cert Chain
@@ -1841,6 +1842,7 @@ VerifyTimeBasedPayload (
   SignerCerts            = NULL;
   TopLevelCert           = NULL;
   CertsInCertDb          = NULL;
+  CertDataPtr            = NULL;
 
   //
   // When the attribute EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS is
@@ -2098,9 +2100,10 @@ VerifyTimeBasedPayload (
         //
         // Check hash of signer cert CommonName + Top-level issuer tbsCertificate against data in CertDb
         //
+        CertDataPtr = (EFI_CERT_DATA *)(SignerCerts + 1);
         Status = CalculatePrivAuthVarSignChainSHA256Digest(
-                   SignerCerts + sizeof(UINT8) + sizeof(UINT32),
-                   ReadUnaligned32 ((UINT32 *)(SignerCerts + sizeof(UINT8))),
+                   CertDataPtr->CertDataBuffer,
+                   ReadUnaligned32 ((UINT32 *)&(CertDataPtr->CertDataLength)),
                    TopLevelCert,
                    TopLevelCertSize,
                    Sha256Digest
@@ -2135,12 +2138,13 @@ VerifyTimeBasedPayload (
       //
       // When adding a new common authenticated variable, always save Hash of cn of signer cert + tbsCertificate of Top-level issuer
       //
+      CertDataPtr = (EFI_CERT_DATA *)(SignerCerts + 1);
       Status = InsertCertsToDb (
                  VariableName,
                  VendorGuid,
                  Attributes,
-                 SignerCerts + sizeof(UINT8) + sizeof(UINT32),
-                 ReadUnaligned32 ((UINT32 *)(SignerCerts + sizeof(UINT8))),
+                 CertDataPtr->CertDataBuffer,
+                 ReadUnaligned32 ((UINT32 *)&(CertDataPtr->CertDataLength)),
                  TopLevelCert,
                  TopLevelCertSize
                  );
