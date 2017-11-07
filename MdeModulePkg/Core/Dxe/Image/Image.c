@@ -1703,9 +1703,17 @@ CoreStartImage (
   mCurrentImage = LastImage;
 
   //
-  // Go connect any handles that were created or modified while the image executed.
+  // UEFI Specification - StartImage() - EFI 1.10 Extension
+  // To maintain compatibility with UEFI drivers that are written to the EFI
+  // 1.02 Specification, StartImage() must monitor the handle database before
+  // and after each image is started. If any handles are created or modified
+  // when an image is started, then EFI_BOOT_SERVICES.ConnectController() must
+  // be called with the Recursive parameter set to TRUE for each of the newly
+  // created or modified handles before StartImage() returns.
   //
-  CoreConnectHandlesByKey (HandleDatabaseKey);
+  if (Image->Type != EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
+    CoreConnectHandlesByKey (HandleDatabaseKey);
+  }
 
   //
   // Handle the image's returned ExitData
