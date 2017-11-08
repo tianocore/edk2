@@ -480,7 +480,11 @@ AddIdToMacDeviceList (
   } else {
     mMacDeviceList.MaxListLen += MAX_MAC_ADDRESS_NODE_LIST_LEN;
     if (mMacDeviceList.CurListLen != 0) {
-      TempDeviceList = (MENU_INFO_ITEM *)AllocateCopyPool (sizeof (MENU_INFO_ITEM) * mMacDeviceList.MaxListLen, (VOID *)mMacDeviceList.NodeList);
+      TempDeviceList = ReallocatePool (
+                         sizeof (MENU_INFO_ITEM) * mMacDeviceList.CurListLen,
+                         sizeof (MENU_INFO_ITEM) * mMacDeviceList.MaxListLen,
+                         mMacDeviceList.NodeList
+                         );
     } else {
       TempDeviceList = (MENU_INFO_ITEM *)AllocatePool (sizeof (MENU_INFO_ITEM) * mMacDeviceList.MaxListLen);
     }
@@ -490,10 +494,6 @@ AddIdToMacDeviceList (
     }
     TempDeviceList[mMacDeviceList.CurListLen].PromptId = PromptId;  
     TempDeviceList[mMacDeviceList.CurListLen].QuestionId = (EFI_QUESTION_ID) (mMacDeviceList.CurListLen + NETWORK_DEVICE_LIST_KEY_OFFSET);
-    
-    if (mMacDeviceList.CurListLen > 0) {
-      FreePool(mMacDeviceList.NodeList);
-    }
     
     mMacDeviceList.NodeList = TempDeviceList;
   }
