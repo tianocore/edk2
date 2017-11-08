@@ -244,8 +244,7 @@ Enable UEFI Secure Boot features:
 
 Enable UEFI Secure Boot and Measured Boot using Atmel I2C TPM hardware device:
 
-```build -a IA32 -t VS2015x86 -p QuarkPlatformPkg/Quark.dsc -D UEFI_SECURE_BOOT
--D MEASURED_BOOT_ENABLE -D TPM_12_HARDWARE=ATMEL_I2C```
+```build -a IA32 -t VS2015x86 -p QuarkPlatformPkg/Quark.dsc -D UEFI_SECURE_BOOT -D MEASURED_BOOT_ENABLE -D TPM_12_HARDWARE=ATMEL_I2C```
 
 ## **FLASH Update using DediProg SF100**
 
