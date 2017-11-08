@@ -1646,7 +1646,7 @@ ShellConvertVariables (
   //
   // now do the replacements...
   //
-  NewCommandLine1 = AllocateCopyPool(NewSize, OriginalCommandLine);
+  NewCommandLine1 = AllocateZeroPool (NewSize);
   NewCommandLine2 = AllocateZeroPool(NewSize);
   ItemTemp        = AllocateZeroPool(ItemSize+(2*sizeof(CHAR16)));
   if (NewCommandLine1 == NULL || NewCommandLine2 == NULL || ItemTemp == NULL) {
@@ -1655,6 +1655,8 @@ ShellConvertVariables (
     SHELL_FREE_NON_NULL(ItemTemp);
     return (NULL);
   }
+  CopyMem (NewCommandLine1, OriginalCommandLine, StrSize (OriginalCommandLine));
+
   for (MasterEnvList = EfiShellGetEnv(NULL)
     ;  MasterEnvList != NULL && *MasterEnvList != CHAR_NULL
     ;  MasterEnvList += StrLen(MasterEnvList) + 1

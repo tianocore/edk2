@@ -143,10 +143,11 @@ UpdateOptionalData(
     OriginalOptionDataSize += (*(UINT16*)(OriginalData + sizeof(UINT32)));
     OriginalOptionDataSize -= OriginalSize;
     NewSize = OriginalSize - OriginalOptionDataSize + DataSize;
-    NewData = AllocateCopyPool(NewSize, OriginalData);
+    NewData = AllocatePool(NewSize);
     if (NewData == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
     } else {
+      CopyMem (NewData, OriginalData, OriginalSize - OriginalOptionDataSize);
       CopyMem(NewData + OriginalSize - OriginalOptionDataSize, Data, DataSize);
     }
   }
@@ -1120,11 +1121,13 @@ BcfgAddOpt(
         // Now we know how many EFI_INPUT_KEY structs we need to attach to the end of the EFI_KEY_OPTION struct.  
         // Re-allocate with the added information.
         //
-        KeyOptionBuffer = AllocateCopyPool(sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * NewKeyOption.KeyData.Options.InputKeyCount), &NewKeyOption);
+        KeyOptionBuffer = AllocatePool (sizeof(EFI_KEY_OPTION) + (sizeof(EFI_INPUT_KEY) * NewKeyOption.KeyData.Options.InputKeyCount));
         if (KeyOptionBuffer == NULL) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellBcfgHiiHandle, L"bcfg");  
           ShellStatus = SHELL_OUT_OF_RESOURCES;
+          return ShellStatus;
         }
+        CopyMem (KeyOptionBuffer, &NewKeyOption, sizeof(EFI_KEY_OPTION));
       }
       for (LoopCounter = 0 ; ShellStatus == SHELL_SUCCESS && LoopCounter < NewKeyOption.KeyData.Options.InputKeyCount; LoopCounter++) {
         //
