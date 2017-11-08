@@ -30,11 +30,32 @@ extern ASM_PFX(SecCoreStartupWithStack)
 ; @param[in]  RAX   Initial value of the EAX register (BIST: Built-in Self Test)
 ; @param[in]  DI    'BP': boot-strap processor, or 'AP': application processor
 ; @param[in]  RBP   Pointer to the start of the Boot Firmware Volume
+; @param[in]  DS    Selector allowing flat access to all addresses
+; @param[in]  ES    Selector allowing flat access to all addresses
+; @param[in]  FS    Selector allowing flat access to all addresses
+; @param[in]  GS    Selector allowing flat access to all addresses
+; @param[in]  SS    Selector allowing flat access to all addresses
 ;
 ; @return     None  This routine does not return
 ;
 global ASM_PFX(_ModuleEntryPoint)
 ASM_PFX(_ModuleEntryPoint):
+
+    ;
+    ; Fill the temporary RAM with the initial stack value.
+    ; The loop below will seed the heap as well, but that's harmless.
+    ;
+    mov     rax, (FixedPcdGet32 (                        \
+                    PcdInitValueInTempStack              \
+                    ) << 32) |                           \
+                 FixedPcdGet32 (PcdInitValueInTempStack)      ; qword to store
+    mov     rdi, FixedPcdGet32 (PcdOvmfSecPeiTempRamBase)     ; base address,
+                                                              ;   relative to
+                                                              ;   ES
+    mov     rcx, FixedPcdGet32 (PcdOvmfSecPeiTempRamSize) / 8 ; qword count
+    cld                                                       ; store from base
+                                                              ;   up
+    rep stosq
 
     ;
     ; Load temporary RAM stack based on PCDs
