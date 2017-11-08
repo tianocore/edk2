@@ -289,7 +289,6 @@ class CGenCfgOpt:
     def __init__(self):
         self.Debug          = False
         self.Error          = ''
-        self.ReleaseMode    = True
 
         self._GlobalDataDef = """
 GlobalDataDef
@@ -317,13 +316,6 @@ EndList
         self._DscFile     = ''
         self._FvDir       = ''
         self._MapVer      = 0
-
-    def ParseBuildMode (self, OutputStr):
-        if "RELEASE_" in OutputStr:
-            self.ReleaseMode = True
-        if "DEBUG_" in OutputStr:
-            self.ReleaseMode = False
-        return
 
     def ParseMacros (self, MacroDefStr):
         # ['-DABC=1', '-D', 'CFG_DEBUG=1', '-D', 'CFG_OUTDIR=Build']
@@ -815,9 +807,6 @@ EndList
                     TxtFd.write("%s.UnusedUpdSpace%d|%s0x%04X|0x%04X|{0}\n" % (Item['space'], SpaceIdx, Default, NextOffset - StartAddr, Offset - NextOffset))
                     SpaceIdx = SpaceIdx + 1
                 NextOffset = Offset + Item['length']
-                if Item['cname'] == 'PcdSerialIoUartDebugEnable':
-                    if self.ReleaseMode == False:
-                        Item['value'] = 0x01
                 TxtFd.write("%s.%s|%s0x%04X|%s|%s\n" % (Item['space'],Item['cname'],Default,Item['offset'] - StartAddr,Item['length'],Item['value']))
             TxtFd.close()
         return 0
@@ -1437,7 +1426,6 @@ def Main():
                     print "ERROR: Macro parsing failed !"
                     return 3
 
-        GenCfgOpt.ParseBuildMode(sys.argv[3])
         FvDir = sys.argv[3]
         if not os.path.exists(FvDir):
             os.makedirs(FvDir)
