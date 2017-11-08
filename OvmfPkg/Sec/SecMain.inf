@@ -71,6 +71,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
