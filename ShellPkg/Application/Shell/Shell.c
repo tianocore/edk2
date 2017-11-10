@@ -726,6 +726,7 @@ FreeResources:
 **/
 EFI_STATUS
 SetBuiltInAlias(
+  VOID
   )
 {
   EFI_STATUS          Status;

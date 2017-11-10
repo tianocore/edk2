@@ -369,6 +369,7 @@ ShellLibDestructor (
 EFI_STATUS
 EFIAPI
 ShellInitialize (
+  VOID
   )
 {
   EFI_STATUS Status;
