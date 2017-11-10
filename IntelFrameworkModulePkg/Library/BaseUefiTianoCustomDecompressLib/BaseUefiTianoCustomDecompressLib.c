@@ -1040,6 +1040,7 @@ TianoDecompress (
 RETURN_STATUS
 EFIAPI
 TianoDecompressLibConstructor (
+  VOID
 )
 {
   return ExtractGuidedSectionRegisterHandlers (
