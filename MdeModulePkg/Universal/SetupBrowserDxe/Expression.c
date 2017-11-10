@@ -751,6 +751,7 @@ PopExpression (
 **/
 UINTN
 SaveExpressionEvaluationStackOffset (
+  VOID
   )
 {
   UINTN TempStackOffset;

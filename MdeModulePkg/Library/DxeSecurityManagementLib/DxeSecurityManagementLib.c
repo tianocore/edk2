@@ -61,6 +61,7 @@ SECURITY2_INFO *mSecurity2Table      = NULL;
 RETURN_STATUS
 EFIAPI
 ReallocateSecurityHandlerTable (
+  VOID
   )
 {
   //
@@ -301,6 +302,7 @@ ExecuteSecurityHandlers (
 RETURN_STATUS
 EFIAPI
 ReallocateSecurity2HandlerTable (
+  VOID
   )
 {
   //

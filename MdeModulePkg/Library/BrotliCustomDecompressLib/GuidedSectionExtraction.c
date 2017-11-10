@@ -186,6 +186,7 @@ BrotliGuidedSectionExtraction (
 EFI_STATUS
 EFIAPI
 BrotliDecompressLibConstructor (
+  VOID
   )
 {
   return ExtractGuidedSectionRegisterHandlers (

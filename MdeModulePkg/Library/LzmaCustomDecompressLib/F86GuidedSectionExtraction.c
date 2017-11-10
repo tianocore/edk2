@@ -207,6 +207,7 @@ LzmaArchGuidedSectionExtraction (
 EFI_STATUS
 EFIAPI
 LzmaArchDecompressLibConstructor (
+  VOID
   )
 {
   return ExtractGuidedSectionRegisterHandlers (

@@ -1187,6 +1187,7 @@ Done:
 VAR_ERROR_FLAG
 EFIAPI
 GetLastBootVarErrorFlag (
+  VOID
   )
 {
   return mLastVarErrorFlag;
