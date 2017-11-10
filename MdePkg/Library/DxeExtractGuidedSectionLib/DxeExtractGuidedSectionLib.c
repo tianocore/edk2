@@ -38,6 +38,7 @@ EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER *mExtractGetInfoHandlerTable = NULL;
 RETURN_STATUS
 EFIAPI
 ReallocateExtractHandlerTable (
+  VOID
   )
 { 
   //
