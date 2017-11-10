@@ -87,6 +87,7 @@ IScsiIsDevicePathSupported (
 **/
 EFI_STATUS
 IScsiCheckAip (
+  VOID
   )
 {
   UINTN                            AipHandleCount;
