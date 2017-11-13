@@ -3267,13 +3267,13 @@ class ModuleAutoGen(AutoGen):
                     EdkLogger.debug(EdkLogger.DEBUG_9, "The toolchain [%s] for processing file [%s] is found, "
                                     "but [%s] is needed" % (F.TagName, str(F), self.ToolChain))
                     continue
-                # match tool chain family
-                if F.ToolChainFamily not in ("", "*", self.ToolChainFamily):
+                # match tool chain family or build rule family
+                if F.ToolChainFamily not in ("", "*", self.ToolChainFamily, self.BuildRuleFamily):
                     EdkLogger.debug(
                                 EdkLogger.DEBUG_0,
                                 "The file [%s] must be built by tools of [%s], " \
-                                "but current toolchain family is [%s]" \
-                                    % (str(F), F.ToolChainFamily, self.ToolChainFamily))
+                                "but current toolchain family is [%s], buildrule family is [%s]" \
+                                    % (str(F), F.ToolChainFamily, self.ToolChainFamily, self.BuildRuleFamily))
                     continue
 
                 # add the file path into search path list for file including
