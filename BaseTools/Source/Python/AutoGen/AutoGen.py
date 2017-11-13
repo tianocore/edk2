@@ -4229,12 +4229,13 @@ class ModuleAutoGen(AutoGen):
 
         if self.IsMakeFileCreated:
             return
-        if self.CanSkip():
-            return
 
         if not self.IsLibrary and CreateLibraryMakeFile:
             for LibraryAutoGen in self.LibraryAutoGenList:
                 LibraryAutoGen.CreateMakeFile()
+
+        if self.CanSkip():
+            return
 
         if len(self.CustomMakefile) == 0:
             Makefile = GenMake.ModuleMakefile(self)
@@ -4263,8 +4264,6 @@ class ModuleAutoGen(AutoGen):
     def CreateCodeFile(self, CreateLibraryCodeFile=True):
         if self.IsCodeFileCreated:
             return
-        if self.CanSkip():
-            return
 
         # Need to generate PcdDatabase even PcdDriver is binarymodule
         if self.IsBinaryModule and self.PcdIsDriver != '':
@@ -4278,6 +4277,9 @@ class ModuleAutoGen(AutoGen):
         if not self.IsLibrary and CreateLibraryCodeFile:
             for LibraryAutoGen in self.LibraryAutoGenList:
                 LibraryAutoGen.CreateCodeFile()
+
+        if self.CanSkip():
+            return
 
         AutoGenList = []
         IgoredAutoGenList = []
