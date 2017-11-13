@@ -523,6 +523,7 @@ EfiHttpRequest (
       
       FreePool (HostNameStr);
       if (EFI_ERROR (Status)) {
+        DEBUG ((EFI_D_ERROR, "Error: Could not retrieve the host address from DNS server.\n"));
         goto Error1;
       }
     }

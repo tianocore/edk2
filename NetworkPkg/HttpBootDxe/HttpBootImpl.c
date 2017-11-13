@@ -327,6 +327,7 @@ HttpBootLoadFile (
     //
     Status = HttpBootDiscoverBootInfo (Private);
     if (EFI_ERROR (Status)) {
+      AsciiPrint ("\n  Error: Could not discover the boot information for DHCP server.\n");
       goto ON_EXIT;
     }
   }
@@ -369,6 +370,7 @@ HttpBootLoadFile (
                  &Private->ImageType
                  );
       if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
+        AsciiPrint ("\n  Error: Could not retrieve NBP file size from HTTP server.\n");
         goto ON_EXIT;
       }
     }
@@ -394,6 +396,22 @@ HttpBootLoadFile (
   
 ON_EXIT:
   HttpBootUninstallCallback (Private);
+
+  if (Status == EFI_ACCESS_DENIED) {
+    AsciiPrint ("\n  Error: Could not establish connection with HTTP server.\n");
+  } else if (Status == EFI_BUFFER_TOO_SMALL && Buffer != NULL) {
+    AsciiPrint ("\n  Error: Buffer size is smaller than the requested file.\n");
+  } else if (Status == EFI_OUT_OF_RESOURCES) {
+    AsciiPrint ("\n  Error: Could not allocate I/O buffers.\n");
+  } else if (Status == EFI_DEVICE_ERROR) {
+    AsciiPrint ("\n  Error: Network device error.\n");
+  } else if (Status == EFI_TIMEOUT) {
+    AsciiPrint ("\n  Error: Server response timeout.\n");
+  } else if (Status == EFI_ABORTED) {
+    AsciiPrint ("\n  Error: Remote boot cancelled.\n");
+  } else if (Status != EFI_BUFFER_TOO_SMALL) {
+    AsciiPrint ("\n  Error: Unexpected network error.\n");
+  }
   return Status;
 }
 
@@ -555,6 +573,7 @@ HttpBootDxeLoadFile (
   MediaPresent = TRUE;
   NetLibDetectMedia (Private->Controller, &MediaPresent);
   if (!MediaPresent) {
+    AsciiPrint ("\n  Error: Could not detect network connection.\n");
     return EFI_NO_MEDIA;
   }
   
@@ -595,6 +614,8 @@ HttpBootDxeLoadFile (
     Status = HttpBootRegisterRamDisk (Private, *BufferSize, Buffer, ImageType);
     if (!EFI_ERROR (Status)) {
       Status = EFI_WARN_FILE_SYSTEM;
+    } else {
+      AsciiPrint ("\n  Error: Could not register RAM disk to the system.\n");
     }
   }
 
