@@ -35,30 +35,6 @@ ProcessLibraryConstructorList (
   VOID
   );
 
-EFI_STATUS
-GetPlatformPpi (
-  IN  EFI_GUID  *PpiGuid,
-  OUT VOID      **Ppi
-  )
-{
-  UINTN                   PpiListSize;
-  UINTN                   PpiListCount;
-  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
-  UINTN                   Index;
-
-  PpiListSize = 0;
-  ArmPlatformGetPlatformPpiList (&PpiListSize, &PpiList);
-  PpiListCount = PpiListSize / sizeof(EFI_PEI_PPI_DESCRIPTOR);
-  for (Index = 0; Index < PpiListCount; Index++, PpiList++) {
-    if (CompareGuid (PpiList->Guid, PpiGuid) == TRUE) {
-      *Ppi = PpiList->Ppi;
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
-
 VOID
 PrePiMain (
   IN  UINTN                     UefiMemoryBase,

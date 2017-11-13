@@ -61,12 +61,6 @@ BuildMemoryTypeInformationHob (
   VOID
   );
 
-EFI_STATUS
-GetPlatformPpi (
-  IN  EFI_GUID  *PpiGuid,
-  OUT VOID      **Ppi
-  );
-
 // Initialize the Architecture specific controllers
 VOID
 ArchInitialize (
