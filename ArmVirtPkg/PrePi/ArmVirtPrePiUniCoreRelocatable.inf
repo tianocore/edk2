@@ -54,7 +54,6 @@
   LzmaDecompressLib
   PeCoffGetEntryPointLib
   PrePiLib
-  ArmPlatformLib
   ArmPlatformStackLib
   MemoryAllocationLib
   HobLib
