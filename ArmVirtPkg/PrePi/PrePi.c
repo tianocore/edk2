@@ -29,15 +29,9 @@
 #include "PrePi.h"
 #include "LzmaDecompress.h"
 
-EFI_STATUS
+VOID
 EFIAPI
-ExtractGuidedSectionLibConstructor (
-  VOID
-  );
-
-EFI_STATUS
-EFIAPI
-LzmaDecompressLibConstructor (
+ProcessLibraryConstructorList (
   VOID
   );
 
@@ -125,8 +119,7 @@ PrePiMain (
   PERF_START (NULL, "PEI", NULL, StartTimeStamp);
 
   // SEC phase needs to run library constructors by hand.
-  ExtractGuidedSectionLibConstructor ();
-  LzmaDecompressLibConstructor ();
+  ProcessLibraryConstructorList ();
 
   // Build HOBs to pass up our version of stuff the DXE Core needs to save space
   BuildPeCoffLoaderHob ();
