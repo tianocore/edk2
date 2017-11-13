@@ -224,8 +224,8 @@
 [PcdsFixedAtBuild.common, PcdsDynamic.common, PcdsPatchableInModule.common]
 
   # System Memory (DRAM): These PCDs define the region of in-built system memory
-  # Some platforms can get DRAM extensions, these additional regions will be declared
-  # to UEFI by ArmPlatformLib
+  # Some platforms can get DRAM extensions, these additional regions may be
+  # declared to UEFI using separate resource descriptor HOBs
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
   gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
 

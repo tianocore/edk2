@@ -121,7 +121,6 @@
   ArmPkg/Drivers/CpuPei/CpuPei.inf
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPkg/Drivers/ArmGic/ArmGicLib.inf
-  ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
   ArmPkg/Drivers/GenericWatchdogDxe/GenericWatchdogDxe.inf
   ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
