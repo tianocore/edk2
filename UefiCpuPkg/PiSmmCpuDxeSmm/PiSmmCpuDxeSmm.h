@@ -25,6 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCpuService.h>
+#include <Protocol/SmmMemoryAttribute.h>
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/PiSmmMemoryAttributesTable.h>
@@ -1066,6 +1067,103 @@ TransferApToSafeState (
   IN UINTN  ApHltLoopCode,
   IN UINTN  TopOfStack,
   IN UINTN  NumberToFinishAddress
+  );
+
+/**
+  This function set given attributes of the memory region specified by
+  BaseAddress and Length.
+
+  @param  This              The EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL instance.
+  @param  BaseAddress       The physical address that is the start address of
+                            a memory region.
+  @param  Length            The size in bytes of the memory region.
+  @param  Attributes        The bit mask of attributes to set for the memory
+                            region.
+
+  @retval EFI_SUCCESS           The attributes were set for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes specified an illegal combination of
+                                attributes that cannot be set together.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more
+                                bytes of the memory resource range specified
+                                by BaseAddress and Length.
+                                The bit mask of attributes is not support for
+                                the memory resource range specified by
+                                BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+EdkiiSmmSetMemoryAttributes (
+  IN  EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL   *This,
+  IN  EFI_PHYSICAL_ADDRESS                  BaseAddress,
+  IN  UINT64                                Length,
+  IN  UINT64                                Attributes
+  );
+
+/**
+  This function clears given attributes of the memory region specified by
+  BaseAddress and Length.
+
+  @param  This              The EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL instance.
+  @param  BaseAddress       The physical address that is the start address of
+                            a memory region.
+  @param  Length            The size in bytes of the memory region.
+  @param  Attributes        The bit mask of attributes to set for the memory
+                            region.
+
+  @retval EFI_SUCCESS           The attributes were set for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes specified an illegal combination of
+                                attributes that cannot be set together.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more
+                                bytes of the memory resource range specified
+                                by BaseAddress and Length.
+                                The bit mask of attributes is not support for
+                                the memory resource range specified by
+                                BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+EdkiiSmmClearMemoryAttributes (
+  IN  EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL   *This,
+  IN  EFI_PHYSICAL_ADDRESS                  BaseAddress,
+  IN  UINT64                                Length,
+  IN  UINT64                                Attributes
+  );
+
+/**
+  This function retrieve the attributes of the memory region specified by
+  BaseAddress and Length. If different attributes are got from different part
+  of the memory region, EFI_NO_MAPPING will be returned.
+
+  @param  This              The EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL instance.
+  @param  BaseAddress       The physical address that is the start address of
+                            a memory region.
+  @param  Length            The size in bytes of the memory region.
+  @param  Attributes        Pointer to attributes returned.
+
+  @retval EFI_SUCCESS           The attributes got for the memory region.
+  @retval EFI_INVALID_PARAMETER Length is zero.
+                                Attributes is NULL.
+  @retval EFI_NO_MAPPING        Attributes are not consistent cross the memory
+                                region.
+  @retval EFI_UNSUPPORTED       The processor does not support one or more
+                                bytes of the memory resource range specified
+                                by BaseAddress and Length.
+                                The bit mask of attributes is not support for
+                                the memory resource range specified by
+                                BaseAddress and Length.
+
+**/
+EFI_STATUS
+EFIAPI
+EdkiiSmmGetMemoryAttributes (
+  IN  EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL   *This,
+  IN  EFI_PHYSICAL_ADDRESS                  BaseAddress,
+  IN  UINT64                                Length,
+  IN  UINT64                                *Attributes
   );
 
 #endif

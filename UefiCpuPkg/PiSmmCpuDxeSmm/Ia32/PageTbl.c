@@ -196,6 +196,16 @@ SetPageTableAttributes (
   BOOLEAN               IsSplitted;
   BOOLEAN               PageTableSplitted;
 
+  //
+  // Don't mark page table as read-only if heap guard is enabled.
+  //
+  //      BIT2: SMM page guard enabled
+  //      BIT3: SMM pool guard enabled
+  //
+  if ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) {
+    return ;
+  }
+
   DEBUG ((DEBUG_INFO, "SetPageTableAttributes\n"));
 
   //

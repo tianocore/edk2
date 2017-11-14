@@ -914,7 +914,20 @@ SetPageTableAttributes (
   BOOLEAN               IsSplitted;
   BOOLEAN               PageTableSplitted;
 
-  if (!mCpuSmmStaticPageTable) {
+  //
+  // Don't do this if
+  //  - no static page table; or
+  //  - SMM heap guard feature enabled
+  //      BIT2: SMM page guard enabled
+  //      BIT3: SMM pool guard enabled
+  //
+  if (!mCpuSmmStaticPageTable ||
+      (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) {
+    //
+    // Static paging and heap guard should not be enabled at the same time.
+    //
+    ASSERT (!(mCpuSmmStaticPageTable &&
+              (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0));
     return ;
   }
 

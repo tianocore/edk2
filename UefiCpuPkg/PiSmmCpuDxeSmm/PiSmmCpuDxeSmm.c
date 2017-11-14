@@ -76,6 +76,15 @@ EFI_SMM_CPU_PROTOCOL  mSmmCpu  = {
   SmmWriteSaveState
 };
 
+///
+/// SMM Memory Attribute Protocol instance
+///
+EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL  mSmmMemoryAttribute  = {
+  EdkiiSmmGetMemoryAttributes,
+  EdkiiSmmSetMemoryAttributes,
+  EdkiiSmmClearMemoryAttributes
+};
+
 EFI_CPU_INTERRUPT_HANDLER   mExternalVectorTable[EXCEPTION_VECTOR_NUMBER];
 
 //
@@ -890,6 +899,17 @@ PiCpuSmmEntry (
                     &gEfiSmmCpuProtocolGuid,
                     EFI_NATIVE_INTERFACE,
                     &mSmmCpu
+                    );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Install the SMM Memory Attribute Protocol into SMM protocol database
+  //
+  Status = gSmst->SmmInstallProtocolInterface (
+                    &mSmmCpuHandle,
+                    &gEdkiiSmmMemoryAttributeProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mSmmMemoryAttribute
                     );
   ASSERT_EFI_ERROR (Status);
 
