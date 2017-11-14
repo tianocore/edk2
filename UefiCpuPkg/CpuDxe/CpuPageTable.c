@@ -442,8 +442,8 @@ ConvertPageEntryAttribute (
   *PageEntry = NewPageEntry;
   if (CurrentPageEntry != NewPageEntry) {
     *IsModified = TRUE;
-    DEBUG ((DEBUG_INFO, "ConvertPageEntryAttribute 0x%lx", CurrentPageEntry));
-    DEBUG ((DEBUG_INFO, "->0x%lx\n", NewPageEntry));
+    DEBUG ((DEBUG_VERBOSE, "ConvertPageEntryAttribute 0x%lx", CurrentPageEntry));
+    DEBUG ((DEBUG_VERBOSE, "->0x%lx\n", NewPageEntry));
   } else {
     *IsModified = FALSE;
   }
