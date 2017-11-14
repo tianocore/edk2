@@ -827,7 +827,8 @@ EfiShellGetDeviceName(
   @retval EFI_NOT_FOUND         EFI_SIMPLE_FILE_SYSTEM could not be found or the root directory
                                 could not be opened.
   @retval EFI_VOLUME_CORRUPTED  The data structures in the volume were corrupted.
-  @retval EFI_DEVICE_ERROR      The device had an error
+  @retval EFI_DEVICE_ERROR      The device had an error.
+  @retval Others                Error status returned from EFI_SIMPLE_FILE_SYSTEM_PROTOCOL->OpenVolume().
 **/
 EFI_STATUS
 EFIAPI
@@ -867,8 +868,12 @@ EfiShellOpenRootByHandle(
   // Open the root volume now...
   //
   Status = SimpleFileSystem->OpenVolume(SimpleFileSystem, &RealFileHandle);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
   *FileHandle = ConvertEfiFileProtocolToShellHandle(RealFileHandle, EfiShellGetMapFromDevicePath(&DevPath));
-  return (Status);
+  return (EFI_SUCCESS);
 }
 
 /**
