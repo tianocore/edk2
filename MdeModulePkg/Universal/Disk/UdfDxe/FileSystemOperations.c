@@ -1615,12 +1615,13 @@ FindFileEntry (
   UINT64              Lsn;
   UINT32              LogicalBlockSize;
   UDF_DESCRIPTOR_TAG  *DescriptorTag;
+  VOID                *ReadBuffer;
 
   Lsn               = GetLongAdLsn (Volume, Icb);
   LogicalBlockSize  = Volume->LogicalVolDesc.LogicalBlockSize;
 
-  *FileEntry = AllocateZeroPool (Volume->FileEntrySize);
-  if (*FileEntry == NULL) {
+  ReadBuffer = AllocateZeroPool (Volume->FileEntrySize);
+  if (ReadBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1632,13 +1633,13 @@ FindFileEntry (
     BlockIo->Media->MediaId,
     MultU64x32 (Lsn, LogicalBlockSize),
     Volume->FileEntrySize,
-    *FileEntry
+    ReadBuffer
     );
   if (EFI_ERROR (Status)) {
     goto Error_Read_Disk_Blk;
   }
 
-  DescriptorTag = *FileEntry;
+  DescriptorTag = ReadBuffer;
 
   //
   // Check if the read extent contains a valid Tag Identifier for the expected
@@ -1650,11 +1651,12 @@ FindFileEntry (
     goto Error_Invalid_Fe;
   }
 
+  *FileEntry = ReadBuffer;
   return EFI_SUCCESS;
 
 Error_Invalid_Fe:
 Error_Read_Disk_Blk:
-  FreePool (*FileEntry);
+  FreePool (ReadBuffer);
 
   return Status;
 }
