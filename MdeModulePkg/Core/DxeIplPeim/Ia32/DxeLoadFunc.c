@@ -212,6 +212,37 @@ IsExecuteDisableBitAvailable (
 }
 
 /**
+  The function will check if page table should be setup or not.
+
+  @retval TRUE      Page table should be created.
+  @retval FALSE     Page table should not be created.
+
+**/
+BOOLEAN
+ToBuildPageTable (
+  VOID
+  )
+{
+  if (!IsIa32PaeSupport ()) {
+    return FALSE;
+  }
+
+  if (IsNullDetectionEnabled ()) {
+    return TRUE;
+  }
+
+  if (PcdGet8 (PcdHeapGuardPropertyMask) != 0) {
+    return TRUE;
+  }
+
+  if (PcdGetBool (PcdSetNxForStack) && IsExecuteDisableBitAvailable ()) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
    Transfers control to DxeCore.
 
    This function performs a CPU architecture specific operations to execute
@@ -385,10 +416,7 @@ HandOffToDxeCore (
     TopOfStack = (EFI_PHYSICAL_ADDRESS) (UINTN) ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
     PageTables = 0;
-    BuildPageTablesIa32Pae = (BOOLEAN) (IsIa32PaeSupport () &&
-                                        (IsNullDetectionEnabled () ||
-                                         (PcdGetBool (PcdSetNxForStack) &&
-                                          IsExecuteDisableBitAvailable ())));
+    BuildPageTablesIa32Pae = ToBuildPageTable ();
     if (BuildPageTablesIa32Pae) {
       PageTables = Create4GPageTablesIa32Pae (BaseOfStack, STACK_SIZE);
       if (IsExecuteDisableBitAvailable ()) {
