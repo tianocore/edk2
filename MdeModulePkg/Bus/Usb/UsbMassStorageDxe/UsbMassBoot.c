@@ -120,6 +120,10 @@ UsbBootRequestSense (
       Status = EFI_MEDIA_CHANGED;
       Media->ReadOnly = FALSE;
       Media->MediaId++;
+    } else if (SenseData.Asc == USB_BOOT_ASC_NOT_READY) {
+      Status = EFI_NOT_READY;
+    } else if (SenseData.Asc == USB_BOOT_ASC_NO_MEDIA) {
+      Status = EFI_NOT_READY;
     }
     break;
 
