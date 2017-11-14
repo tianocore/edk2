@@ -140,9 +140,6 @@ CbDxeEntryPoint (
   //
   // Report MMIO/IO Resources
   //
-  Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEE00000, SIZE_1MB, 0, SystemTable); // LAPIC
-  ASSERT_EFI_ERROR (Status);
-
   Status = CbReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEC00000, SIZE_4KB, 0, SystemTable); // IOAPIC
   ASSERT_EFI_ERROR (Status);
 
