@@ -144,7 +144,9 @@ InternalAllocPoolByIndex (
   Status = EFI_SUCCESS;
   Hdr = NULL;
   if (PoolIndex == MAX_POOL_INDEX) {
-    Status = SmmInternalAllocatePages (AllocateAnyPages, PoolType, EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1), &Address);
+    Status = SmmInternalAllocatePages (AllocateAnyPages, PoolType,
+                                       EFI_SIZE_TO_PAGES (MAX_POOL_SIZE << 1),
+                                       &Address, FALSE);
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -243,6 +245,9 @@ SmmInternalAllocatePool (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Address;
   UINTN                 PoolIndex;
+  BOOLEAN               HasPoolTail;
+  BOOLEAN               NeedGuard;
+  UINTN                 NoPages;
 
   Address = 0;
 
@@ -251,25 +256,47 @@ SmmInternalAllocatePool (
     return EFI_INVALID_PARAMETER;
   }
 
+  NeedGuard   = IsPoolTypeToGuard (PoolType);
+  HasPoolTail = !(NeedGuard &&
+                  ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+
   //
   // Adjust the size by the pool header & tail overhead
   //
   Size += POOL_OVERHEAD;
-  if (Size > MAX_POOL_SIZE) {
-    Size = EFI_SIZE_TO_PAGES (Size);
-    Status = SmmInternalAllocatePages (AllocateAnyPages, PoolType, Size, &Address);
+  if (Size > MAX_POOL_SIZE || NeedGuard) {
+    if (!HasPoolTail) {
+      Size -= sizeof (POOL_TAIL);
+    }
+
+    NoPages = EFI_SIZE_TO_PAGES (Size);
+    Status = SmmInternalAllocatePages (AllocateAnyPages, PoolType, NoPages,
+                                       &Address, NeedGuard);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
+    if (NeedGuard) {
+      ASSERT (VerifyMemoryGuard (Address, NoPages) == TRUE);
+      Address = (EFI_PHYSICAL_ADDRESS)(UINTN)AdjustPoolHeadA (
+                                               Address,
+                                               NoPages,
+                                               Size
+                                               );
+    }
+
     PoolHdr = (POOL_HEADER*)(UINTN)Address;
     PoolHdr->Signature = POOL_HEAD_SIGNATURE;
-    PoolHdr->Size = EFI_PAGES_TO_SIZE (Size);
+    PoolHdr->Size = Size;
     PoolHdr->Available = FALSE;
     PoolHdr->Type = PoolType;
-    PoolTail = HEAD_TO_TAIL(PoolHdr);
-    PoolTail->Signature = POOL_TAIL_SIGNATURE;
-    PoolTail->Size = PoolHdr->Size;
+
+    if (HasPoolTail) {
+      PoolTail = HEAD_TO_TAIL (PoolHdr);
+      PoolTail->Signature = POOL_TAIL_SIGNATURE;
+      PoolTail->Size = PoolHdr->Size;
+    }
+
     *Buffer = PoolHdr + 1;
     return Status;
   }
@@ -341,28 +368,47 @@ SmmInternalFreePool (
 {
   FREE_POOL_HEADER  *FreePoolHdr;
   POOL_TAIL         *PoolTail;
+  BOOLEAN           HasPoolTail;
+  BOOLEAN           MemoryGuarded;
 
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  MemoryGuarded = IsHeapGuardEnabled () &&
+                  IsMemoryGuarded ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer);
+  HasPoolTail   = !(MemoryGuarded &&
+                    ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+
   FreePoolHdr = (FREE_POOL_HEADER*)((POOL_HEADER*)Buffer - 1);
   ASSERT (FreePoolHdr->Header.Signature == POOL_HEAD_SIGNATURE);
   ASSERT (!FreePoolHdr->Header.Available);
-  PoolTail = HEAD_TO_TAIL(&FreePoolHdr->Header);
-  ASSERT (PoolTail->Signature == POOL_TAIL_SIGNATURE);
-  ASSERT (FreePoolHdr->Header.Size == PoolTail->Size);
-
   if (FreePoolHdr->Header.Signature != POOL_HEAD_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (PoolTail->Signature != POOL_TAIL_SIGNATURE) {
-    return EFI_INVALID_PARAMETER;
+  if (HasPoolTail) {
+    PoolTail = HEAD_TO_TAIL (&FreePoolHdr->Header);
+    ASSERT (PoolTail->Signature == POOL_TAIL_SIGNATURE);
+    ASSERT (FreePoolHdr->Header.Size == PoolTail->Size);
+    if (PoolTail->Signature != POOL_TAIL_SIGNATURE) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (FreePoolHdr->Header.Size != PoolTail->Size) {
+      return EFI_INVALID_PARAMETER;
+    }
+  } else {
+    PoolTail = NULL;
   }
 
-  if (FreePoolHdr->Header.Size != PoolTail->Size) {
-    return EFI_INVALID_PARAMETER;
+  if (MemoryGuarded) {
+    Buffer = AdjustPoolHeadF ((EFI_PHYSICAL_ADDRESS)(UINTN)FreePoolHdr);
+    return SmmInternalFreePages (
+             (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
+             EFI_SIZE_TO_PAGES (FreePoolHdr->Header.Size),
+             TRUE
+             );
   }
 
   if (FreePoolHdr->Header.Size > MAX_POOL_SIZE) {
@@ -370,7 +416,8 @@ SmmInternalFreePool (
     ASSERT ((FreePoolHdr->Header.Size & EFI_PAGE_MASK) == 0);
     return SmmInternalFreePages (
              (EFI_PHYSICAL_ADDRESS)(UINTN)FreePoolHdr,
-             EFI_SIZE_TO_PAGES (FreePoolHdr->Header.Size)
+             EFI_SIZE_TO_PAGES (FreePoolHdr->Header.Size),
+             FALSE
              );
   }
   return InternalFreePoolByIndex (FreePoolHdr, PoolTail);

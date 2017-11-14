@@ -507,6 +507,11 @@ SmmEntryPoint (
   PlatformHookBeforeSmmDispatch ();
 
   //
+  // Call memory management hook function
+  //
+  SmmEntryPointMemoryManagementHook ();
+
+  //
   // If a legacy boot has occured, then make sure gSmmCorePrivate is not accessed
   //
   InLegacyBoot = mInLegacyBoot;
@@ -699,7 +704,7 @@ SmmMain (
   //
   gSmmCorePrivate->Smst          = &gSmmCoreSmst;
   gSmmCorePrivate->SmmEntryPoint = SmmEntryPoint;
-  
+
   //
   // No need to initialize memory service.
   // It is done in constructor of PiSmmCoreMemoryAllocationLib(),

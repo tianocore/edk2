@@ -33,6 +33,7 @@
 #include <Protocol/SmmLegacyBoot.h>
 #include <Protocol/SmmReadyToBoot.h>
 #include <Protocol/SmmEndOfS3Resume.h>
+#include <Protocol/SmmMemoryAttribute.h>
 
 #include <Guid/Apriori.h>
 #include <Guid/EventGroup.h>
@@ -60,6 +61,7 @@
 #include <Library/SmmMemLib.h>
 
 #include "PiSmmCorePrivateData.h"
+#include "HeapGuard.h"
 
 //
 // Used to build a table of SMI Handlers that the SMM Core registers
@@ -318,6 +320,7 @@ SmmAllocatePages (
   @param  NumberOfPages          The number of pages to allocate
   @param  Memory                 A pointer to receive the base allocated memory
                                  address
+  @param  NeedGuard              Flag to indicate Guard page is needed or not
 
   @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
   @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
@@ -331,7 +334,8 @@ SmmInternalAllocatePages (
   IN      EFI_ALLOCATE_TYPE         Type,
   IN      EFI_MEMORY_TYPE           MemoryType,
   IN      UINTN                     NumberOfPages,
-  OUT     EFI_PHYSICAL_ADDRESS      *Memory
+  OUT     EFI_PHYSICAL_ADDRESS      *Memory,
+  IN      BOOLEAN                   NeedGuard
   );
 
 /**
@@ -357,6 +361,8 @@ SmmFreePages (
 
   @param  Memory                 Base address of memory being freed
   @param  NumberOfPages          The number of pages to free
+  @param  IsGuarded              Flag to indicate if the memory is guarded
+                                 or not
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range
   @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
@@ -367,7 +373,8 @@ EFI_STATUS
 EFIAPI
 SmmInternalFreePages (
   IN      EFI_PHYSICAL_ADDRESS      Memory,
-  IN      UINTN                     NumberOfPages
+  IN      UINTN                     NumberOfPages,
+  IN      BOOLEAN                   IsGuarded
   );
 
 /**
@@ -1254,5 +1261,75 @@ typedef enum {
 } SMM_POOL_TYPE;
 
 extern LIST_ENTRY  mSmmPoolLists[SmmPoolTypeMax][MAX_POOL_INDEX];
+
+/**
+  Internal Function. Allocate n pages from given free page node.
+
+  @param  Pages                  The free page node.
+  @param  NumberOfPages          Number of pages to be allocated.
+  @param  MaxAddress             Request to allocate memory below this address.
+
+  @return Memory address of allocated pages.
+
+**/
+UINTN
+InternalAllocPagesOnOneNode (
+  IN OUT FREE_PAGE_LIST   *Pages,
+  IN     UINTN            NumberOfPages,
+  IN     UINTN            MaxAddress
+  );
+
+/**
+  Update SMM memory map entry.
+
+  @param[in]  Type                   The type of allocation to perform.
+  @param[in]  Memory                 The base of memory address.
+  @param[in]  NumberOfPages          The number of pages to allocate.
+  @param[in]  AddRegion              If this memory is new added region.
+**/
+VOID
+ConvertSmmMemoryMapEntry (
+  IN EFI_MEMORY_TYPE       Type,
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages,
+  IN BOOLEAN               AddRegion
+  );
+
+/**
+  Internal function.  Moves any memory descriptors that are on the
+  temporary descriptor stack to heap.
+
+**/
+VOID
+CoreFreeMemoryMapStack (
+  VOID
+  );
+
+/**
+  Frees previous allocated pages.
+
+  @param[in]  Memory                 Base address of memory being freed.
+  @param[in]  NumberOfPages          The number of pages to free.
+  @param[in]  AddRegion              If this memory is new added region.
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range.
+  @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
+  @return EFI_SUCCESS            Pages successfully freed.
+
+**/
+EFI_STATUS
+SmmInternalFreePagesEx (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages,
+  IN BOOLEAN               AddRegion
+  );
+
+/**
+  Hook function used to set all Guard pages after entering SMM mode.
+**/
+VOID
+SmmEntryPointMemoryManagementHook (
+  VOID
+  );
 
 #endif
