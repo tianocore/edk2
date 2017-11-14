@@ -56,6 +56,7 @@
   Mem/MemData.c
   Mem/Imem.h
   Mem/MemoryProfileRecord.c
+  Mem/HeapGuard.c
   FwVolBlock/FwVolBlock.c
   FwVolBlock/FwVolBlock.h
   FwVol/FwVolWrite.c
@@ -193,6 +194,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy             ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask                   ## CONSUMES
 
 # [Hob]
 # RESOURCE_DESCRIPTOR   ## CONSUMES
