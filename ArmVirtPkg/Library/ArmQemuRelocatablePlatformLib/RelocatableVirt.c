@@ -18,7 +18,6 @@
 #include <Library/IoLib.h>
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
-#include <ArmPlatform.h>
 #include <Pi/PiBootMode.h>
 
 /**

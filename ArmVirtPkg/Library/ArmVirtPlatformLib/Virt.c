@@ -19,7 +19,6 @@
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <ArmPlatform.h>
 #include <libfdt.h>
 #include <Pi/PiBootMode.h>
 #include <Uefi/UefiBaseType.h>

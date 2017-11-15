@@ -12,8 +12,13 @@
 
  **/
 
-#include <ArmPlatform.h>
 #include <Library/NorFlashPlatformLib.h>
+
+#define QEMU_NOR_BLOCK_SIZE    SIZE_256KB
+#define QEMU_NOR0_BASE         0x0
+#define QEMU_NOR0_SIZE         SIZE_64MB
+#define QEMU_NOR1_BASE         0x04000000
+#define QEMU_NOR1_SIZE         SIZE_64MB
 
 EFI_STATUS
 NorFlashPlatformInitialization (
