@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -73,5 +73,21 @@ typedef struct _USBHC_MEM_POOL {
             }                 \
           } while (0)       
 
+
+/**
+  Calculate the corresponding pci bus address according to the Mem parameter.
+
+  @param  Pool           The memory pool of the host controller.
+  @param  Mem            The pointer to host memory.
+  @param  Size           The size of the memory region.
+
+  @return the pci memory address
+**/
+EFI_PHYSICAL_ADDRESS
+UsbHcGetPciAddressForHostMem (
+  IN USBHC_MEM_POOL       *Pool,
+  IN VOID                 *Mem,
+  IN UINTN                Size
+  );
 
 #endif

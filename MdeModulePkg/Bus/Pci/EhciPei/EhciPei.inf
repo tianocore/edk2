@@ -4,7 +4,7 @@
 # It produces gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 # which is used to enable recovery function from USB Drivers.
 #
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -43,6 +43,7 @@
   EhciSched.h
   EhciUrb.h
   UsbHcMem.h
+  DmaMem.c
 
 
 [Packages]
@@ -61,7 +62,8 @@
 [Ppis]
   gPeiUsb2HostControllerPpiGuid                 ## PRODUCES
   gPeiUsbControllerPpiGuid                      ## CONSUMES
-
+  gEdkiiIoMmuPpiGuid                            ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
 
 [Depex]
   gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid AND gEfiPeiBootInRecoveryModePpiGuid

@@ -2,7 +2,7 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -107,11 +107,13 @@ EhcInitSched (
   IN PEI_USB2_HC_DEV      *Ehc
   )
 {
+  VOID                  *Buf;
   EFI_PHYSICAL_ADDRESS  PhyAddr;
   VOID                  *Map;
   UINTN                 Index;
   UINT32                *Desc;
   EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  PciAddr;
 
   //
   // First initialize the periodical schedule data:
@@ -124,15 +126,19 @@ EhcInitSched (
   // The Frame List ocupies 4K bytes,
   // and must be aligned on 4-Kbyte boundaries.
   //
-  Status = PeiServicesAllocatePages (
-             EfiBootServicesCode,
+  Status = IoMmuAllocateBuffer (
+             Ehc->IoMmu,
              1,
-             &PhyAddr
+             &Buf,
+             &PhyAddr,
+             &Map
              );
 
-  Map = NULL;
-  Ehc->PeriodFrameHost  = (VOID *)(UINTN)PhyAddr;
-  Ehc->PeriodFrame      = (VOID *)(UINTN)PhyAddr;
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Ehc->PeriodFrame      = Buf;
   Ehc->PeriodFrameMap   = Map;
   Ehc->High32bitAddr    = EHC_HIGH_32BIT (PhyAddr);
 
@@ -161,19 +167,20 @@ EhcInitSched (
   // Initialize the frame list entries then set the registers
   //
   Desc = (UINT32 *) Ehc->PeriodFrame;
-
+  PciAddr  = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
   for (Index = 0; Index < EHC_FRAME_LEN; Index++) {
-    Desc[Index] = QH_LINK (Ehc->PeriodOne, EHC_TYPE_QH, FALSE);
+    Desc[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
   }
 
-  EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, EHC_LOW_32BIT (Ehc->PeriodFrame));
+  EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, EHC_LOW_32BIT (PhyAddr));
 
   //
   // Second initialize the asynchronous schedule:
   // Only need to set the AsynListAddr register to
   // the reclamation header
   //
-  EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (Ehc->ReclaimHead));
+  PciAddr  = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
+  EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (PciAddr));
   return EFI_SUCCESS;
 }
 
@@ -192,26 +199,27 @@ EhcFreeSched (
   EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, 0);
 
   if (Ehc->PeriodOne != NULL) {
-    UsbHcFreeMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
     Ehc->PeriodOne = NULL;
   }
 
   if (Ehc->ReclaimHead != NULL) {
-    UsbHcFreeMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
     Ehc->ReclaimHead = NULL;
   }
 
   if (Ehc->ShortReadStop != NULL) {
-    UsbHcFreeMem (Ehc->MemPool, Ehc->ShortReadStop, sizeof (PEI_EHC_QTD));
+    UsbHcFreeMem (Ehc, Ehc->MemPool, Ehc->ShortReadStop, sizeof (PEI_EHC_QTD));
     Ehc->ShortReadStop = NULL;
   }
 
   if (Ehc->MemPool != NULL) {
-    UsbHcFreeMemPool (Ehc->MemPool);
+    UsbHcFreeMemPool (Ehc, Ehc->MemPool);
     Ehc->MemPool = NULL;
   }
 
   if (Ehc->PeriodFrame != NULL) {
+    IoMmuFreeBuffer (Ehc->IoMmu, 1, Ehc->PeriodFrame, Ehc->PeriodFrameMap);
     Ehc->PeriodFrame = NULL;
   }
 }
