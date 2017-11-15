@@ -34,7 +34,6 @@
   UefiLib
   DebugLib
   PcdLib
-  ArmPlatformSysConfigLib
   DxeServicesTableLib
   TimeBaseLib
   UefiRuntimeLib

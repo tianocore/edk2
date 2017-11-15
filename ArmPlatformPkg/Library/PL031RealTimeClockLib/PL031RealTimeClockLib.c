@@ -23,7 +23,6 @@
 #include <Library/RealTimeClockLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Library/ArmPlatformSysConfigLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -37,8 +36,6 @@
 #include <Drivers/PL031RealTimeClock.h>
 
 #include <Library/TimeBaseLib.h>
-
-#include <ArmPlatform.h>
 
 STATIC BOOLEAN                mPL031Initialized = FALSE;
 STATIC EFI_EVENT              mRtcVirtualAddrChangeEvent;
@@ -133,6 +130,11 @@ LibGetTime (
   EFI_STATUS  Status = EFI_SUCCESS;
   UINT32      EpochSeconds;
 
+  // Ensure Time is a valid pointer
+  if (Time == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   // Initialize the hardware if not already done
   if (!mPL031Initialized) {
     Status = InitializePL031 ();
@@ -141,27 +143,7 @@ LibGetTime (
     }
   }
 
-  // Snapshot the time as early in the function call as possible
-  // On some platforms we may have access to a battery backed up hardware clock.
-  // If such RTC exists try to use it first.
-  Status = ArmPlatformSysConfigGet (SYS_CFG_RTC, &EpochSeconds);
-  if (Status == EFI_UNSUPPORTED) {
-    // Battery backed up hardware RTC does not exist, revert to PL031
-    EpochSeconds = MmioRead32 (mPL031RtcBase + PL031_RTC_DR_DATA_REGISTER);
-    Status = EFI_SUCCESS;
-  } else if (EFI_ERROR (Status)) {
-    // Battery backed up hardware RTC exists but could not be read due to error. Abort.
-    return Status;
-  } else {
-    // Battery backed up hardware RTC exists and we read the time correctly from it.
-    // Now sync the PL031 to the new time.
-    MmioWrite32 (mPL031RtcBase + PL031_RTC_LR_LOAD_REGISTER, EpochSeconds);
-  }
-
-  // Ensure Time is a valid pointer
-  if (Time == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  EpochSeconds = MmioRead32 (mPL031RtcBase + PL031_RTC_DR_DATA_REGISTER);
 
   // Adjust for the correct time zone
   // The timezone setting also reflects the DST setting of the clock
@@ -233,19 +215,6 @@ LibSetTime (
   } else if ((Time->Daylight & EFI_TIME_IN_DAYLIGHT) == EFI_TIME_IN_DAYLIGHT) {
     // Convert to un-adjusted time, i.e. fall back one hour
     EpochSeconds -= SEC_PER_HOUR;
-  }
-
-  // On some platforms we may have access to a battery backed up hardware clock.
-  //
-  // If such RTC exists then it must be updated first, before the PL031,
-  // to minimise any time drift. This is important because the battery backed-up
-  // RTC maintains the master time for the platform across reboots.
-  //
-  // If such RTC does not exist then the following function returns UNSUPPORTED.
-  Status = ArmPlatformSysConfigSet (SYS_CFG_RTC, EpochSeconds);
-  if ((EFI_ERROR (Status)) && (Status != EFI_UNSUPPORTED)){
-    // Any status message except SUCCESS and UNSUPPORTED indicates a hardware failure.
-    return Status;
   }
 
   // Set the PL031
