@@ -59,7 +59,6 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
-  EfiFileLib|EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
 
   ReportStatusCodeLib|MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
 
@@ -94,9 +93,6 @@
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
 
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  EblCmdLib|EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
-
-  EblNetworkLib|EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
 
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
@@ -241,9 +237,6 @@
 #
 ################################################################################
 [Components.common]
-  EmbeddedPkg/Library/EblAddExternalCommandLib/EblAddExternalCommandLib.inf
-  EmbeddedPkg/Library/EblCmdLibNull/EblCmdLibNull.inf
-  EmbeddedPkg/Library/EfiFileLib/EfiFileLib.inf
   EmbeddedPkg/Library/GdbSerialDebugPortLib/GdbSerialDebugPortLib.inf
   EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf
   EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
@@ -255,8 +248,6 @@
   EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
   EmbeddedPkg/Library/DxeDtPlatformDtbLoaderLibDefault/DxeDtPlatformDtbLoaderLibDefault.inf
 
-  EmbeddedPkg/Ebl/Ebl.inf
-####  EmbeddedPkg/EblExternCmd/EblExternCmd.inf
   EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
@@ -275,7 +266,6 @@
   EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
   EmbeddedPkg/Library/DxeHobPeCoffLib/DxeHobPeCoffLib.inf
-  EmbeddedPkg/Library/EblNetworkLib/EblNetworkLib.inf
   EmbeddedPkg/Library/FdtLib/FdtLib.inf
   EmbeddedPkg/Library/GdbDebugAgent/GdbDebugAgent.inf
   EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf

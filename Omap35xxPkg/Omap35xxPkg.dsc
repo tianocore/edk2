@@ -180,7 +180,6 @@
 
   Omap35xxPkg/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
   Omap35xxPkg/Library/DebugAgentTimerLib/DebugAgentTimerLib.inf
-  Omap35xxPkg/Library/EblCmdLib/EblCmdLib.inf
   Omap35xxPkg/Library/GdbSerialLib/GdbSerialLib.inf
   Omap35xxPkg/Library/RealTimeClockLib/RealTimeClockLib.inf
   Omap35xxPkg/Library/SerialPortLib/SerialPortLib.inf
