@@ -24,6 +24,11 @@ BITS    16
 ; @param[in,out]  DI       'BP': boot-strap processor, or
 ;                          'AP': application processor
 ; @param[out]     RBP/EBP  Address of Boot Firmware Volume (BFV)
+; @param[out]     DS       Selector allowing flat access to all addresses
+; @param[out]     ES       Selector allowing flat access to all addresses
+; @param[out]     FS       Selector allowing flat access to all addresses
+; @param[out]     GS       Selector allowing flat access to all addresses
+; @param[out]     SS       Selector allowing flat access to all addresses
 ;
 ; @return         None  This routine jumps to SEC and does not return
 ;

@@ -21,6 +21,12 @@ BITS    16
 ;
 ; Modified:  EAX, EBX
 ;
+; @param[out]     DS       Selector allowing flat access to all addresses
+; @param[out]     ES       Selector allowing flat access to all addresses
+; @param[out]     FS       Selector allowing flat access to all addresses
+; @param[out]     GS       Selector allowing flat access to all addresses
+; @param[out]     SS       Selector allowing flat access to all addresses
+;
 TransitionFromReal16To32BitFlat:
 
     debugShowPostCode POSTCODE_16BIT_MODE
