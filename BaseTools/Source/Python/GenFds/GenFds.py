@@ -42,6 +42,9 @@ from Common.Misc import CheckPcdDatum
 from Common.Misc import BuildOptionPcdValueFormat
 from Common.BuildVersion import gBUILD_VERSION
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+import FfsFileStatement
+import glob
+from struct import unpack
 
 ## Version and Copyright
 versionNumber = "1.0" + ' ' + gBUILD_VERSION
@@ -327,7 +330,7 @@ def main():
         GenFds.GenFd('', FdfParserObj, BuildWorkSpace, ArchList)
 
         """Generate GUID cross reference file"""
-        GenFds.GenerateGuidXRefFile(BuildWorkSpace, ArchList)
+        GenFds.GenerateGuidXRefFile(BuildWorkSpace, ArchList, FdfParserObj)
 
         """Display FV space info."""
         GenFds.DisplayFvSpaceInfo(FdfParserObj)
@@ -724,14 +727,20 @@ class GenFds :
             ModuleObj = BuildDb.BuildObject[Key, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             print ModuleObj.BaseName + ' ' + ModuleObj.ModuleType
 
-    def GenerateGuidXRefFile(BuildDb, ArchList):
+    def GenerateGuidXRefFile(BuildDb, ArchList, FdfParserObj):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
         GuidXRefFile = StringIO.StringIO('')
         GuidDict = {}
+        ModuleList = []
+        FileGuidList = []
         for Arch in ArchList:
             PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             for ModuleFile in PlatformDataBase.Modules:
                 Module = BuildDb.BuildObject[ModuleFile, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+                if Module in ModuleList:
+                    continue
+                else:
+                    ModuleList.append(Module)
                 GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
                 for key, item in Module.Protocols.items():
                     GuidDict[key] = item
@@ -739,6 +748,81 @@ class GenFds :
                     GuidDict[key] = item
                 for key, item in Module.Ppis.items():
                     GuidDict[key] = item
+            for FvName in FdfParserObj.Profile.FvDict:
+                for FfsObj in FdfParserObj.Profile.FvDict[FvName].FfsList:
+                    if not isinstance(FfsObj, FfsFileStatement.FileStatement):
+                        InfPath = PathClass(NormPath(mws.join(GenFdsGlobalVariable.WorkSpaceDir, FfsObj.InfFileName)))
+                        FdfModule = BuildDb.BuildObject[InfPath, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+                        if FdfModule in ModuleList:
+                            continue
+                        else:
+                            ModuleList.append(FdfModule)
+                        GuidXRefFile.write("%s %s\n" % (FdfModule.Guid, FdfModule.BaseName))
+                        for key, item in FdfModule.Protocols.items():
+                            GuidDict[key] = item
+                        for key, item in FdfModule.Guids.items():
+                            GuidDict[key] = item
+                        for key, item in FdfModule.Ppis.items():
+                            GuidDict[key] = item
+                    else:
+                        FileStatementGuid = FfsObj.NameGuid
+                        if FileStatementGuid in FileGuidList:
+                            continue
+                        else:
+                            FileGuidList.append(FileStatementGuid)
+                        Name = []
+                        FfsPath = os.path.join(GenFdsGlobalVariable.FvDir, 'Ffs')
+                        FfsPath = glob.glob(os.path.join(FfsPath, FileStatementGuid) + '*')
+                        if not FfsPath:
+                            continue
+                        if not os.path.exists(FfsPath[0]):
+                            continue
+                        MatchDict = {}
+                        ReFileEnds = re.compile('\S+(.ui)$|\S+(fv.sec.txt)$|\S+(.pe32.txt)$|\S+(.te.txt)$|\S+(.pic.txt)$|\S+(.raw.txt)$|\S+(.ffs.txt)$')
+                        FileList = os.listdir(FfsPath[0])
+                        for File in FileList:
+                            Match = ReFileEnds.search(File)
+                            if Match:
+                                for Index in range(1, 8):
+                                    if Match.group(Index) and Match.group(Index) in MatchDict:
+                                        MatchDict[Match.group(Index)].append(File)
+                                    elif Match.group(Index):
+                                        MatchDict[Match.group(Index)] = [File]
+                        if not MatchDict:
+                            continue
+                        if '.ui' in MatchDict:
+                            for File in MatchDict['.ui']:
+                                with open(os.path.join(FfsPath[0], File), 'rb') as F:
+                                    F.read()
+                                    length = F.tell()
+                                    F.seek(4)
+                                    TmpStr = unpack('%dh' % ((length - 4) / 2), F.read())
+                                    Name = ''.join([chr(c) for c in TmpStr[:-1]])
+                        else:
+                            FileList = []
+                            if 'fv.sec.txt' in MatchDict:
+                                FileList = MatchDict['fv.sec.txt']
+                            elif '.pe32.txt' in MatchDict:
+                                FileList = MatchDict['.pe32.txt']
+                            elif '.te.txt' in MatchDict:
+                                FileList = MatchDict['.te.txt']
+                            elif '.pic.txt' in MatchDict:
+                                FileList = MatchDict['.pic.txt']
+                            elif '.raw.txt' in MatchDict:
+                                FileList = MatchDict['.raw.txt']
+                            elif '.ffs.txt' in MatchDict:
+                                FileList = MatchDict['.ffs.txt']
+                            else:
+                                pass
+                            for File in FileList:
+                                with open(os.path.join(FfsPath[0], File), 'r') as F:
+                                    Name.append((F.read().split()[-1]))
+                        if not Name:
+                            continue
+
+                        Name = ' '.join(Name) if type(Name) == type([]) else Name
+                        GuidXRefFile.write("%s %s\n" %(FileStatementGuid, Name))
+
        # Append GUIDs, Protocols, and PPIs to the Xref file
         GuidXRefFile.write("\n")
         for key, item in GuidDict.items():
