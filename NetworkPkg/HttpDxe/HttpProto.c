@@ -1876,7 +1876,10 @@ HttpTcpReceiveHeader (
       //
       // Check whether we received end of HTTP headers.
       //
-      *EndofHeader = AsciiStrStr (*HttpHeaders, HTTP_END_OF_HDR_STR); 
+      *EndofHeader = AsciiStrStr (*HttpHeaders, HTTP_END_OF_HDR_STR);
+      if (*EndofHeader != NULL) {
+        *SizeofHeaders = *EndofHeader - *HttpHeaders;
+      }
     };
     
     //
@@ -1976,6 +1979,9 @@ HttpTcpReceiveHeader (
       // Check whether we received end of HTTP headers.
       //
       *EndofHeader = AsciiStrStr (*HttpHeaders, HTTP_END_OF_HDR_STR); 
+      if (*EndofHeader != NULL) {
+        *SizeofHeaders = *EndofHeader - *HttpHeaders;
+      }
     };
 
     //
