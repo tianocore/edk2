@@ -86,13 +86,6 @@
   # ARM Primecells
   #
 
-  ## SP804 DualTimer
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerFrequencyInMHz|1|UINT32|0x0000001D
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicInterruptNum|0|UINT32|0x0000001E
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPeriodicBase|0|UINT32|0x0000002A
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerPerformanceBase|0|UINT32|0x0000002B
-  gArmPlatformTokenSpaceGuid.PcdSP804TimerMetronomeBase|0|UINT32|0x0000002C
-
   ## SP805 Watchdog
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x0|UINT32|0x00000023
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz|32000|UINT32|0x00000021
