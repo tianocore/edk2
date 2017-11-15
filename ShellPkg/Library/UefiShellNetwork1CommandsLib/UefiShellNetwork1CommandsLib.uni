@@ -50,6 +50,7 @@
 #string STR_PING_CONFIG              #language en-US "Config %r\r\n"
 #string STR_PING_GETMODE             #language en-US "GetModeData %r\r\n"
 #string STR_PING_GETDATA             #language en-US "GetData %r\r\n"
+#string STR_PING_RECEIVE             #language en-US "Receive %r\r\n"
 #string STR_PING_SEND_REQUEST        #language en-US "Echo request sequence %d did not complete successfully.\r\n"
 #string STR_PING_NOSOURCE_INDO       #language en-US "There are no sources in %s's multicast domain.\r\n"
 #string STR_PING_NETWORK_ERROR       #language en-US "%H%s%N: Network function failed with %r\r\n"
