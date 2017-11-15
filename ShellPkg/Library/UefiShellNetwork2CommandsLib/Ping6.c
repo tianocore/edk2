@@ -1,7 +1,7 @@
 /** @file
   The implementation for Ping6 application.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -474,6 +474,7 @@ ON_EXIT:
     Status = Private->Ip6->Receive (Private->Ip6, RxToken);
 
     if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6_RECEIVE), gShellNetwork2HiiHandle, Status);
       Private->Status = EFI_ABORTED;
     }
   } else {
@@ -658,7 +659,11 @@ Ping6OnReceiveEchoReply (
 
   Private->RxToken.Status = EFI_NOT_READY;
 
-  return Private->Ip6->Receive (Private->Ip6, &Private->RxToken);
+  Status = Private->Ip6->Receive (Private->Ip6, &Private->RxToken);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PING6_IP6_RECEIVE), gShellNetwork2HiiHandle, Status);
+  }
+  return Status;
 }
 
 /**
