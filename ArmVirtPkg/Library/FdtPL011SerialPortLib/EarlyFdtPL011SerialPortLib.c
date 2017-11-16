@@ -19,10 +19,9 @@
 #include <Base.h>
 
 #include <Library/PcdLib.h>
+#include <Library/PL011UartLib.h>
 #include <Library/SerialPortLib.h>
 #include <libfdt.h>
-
-#include <Drivers/PL011Uart.h>
 
 RETURN_STATUS
 EFIAPI
