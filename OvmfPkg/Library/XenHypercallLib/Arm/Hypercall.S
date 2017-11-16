@@ -16,6 +16,8 @@
 #include <IndustryStandard/Xen/arch-arm/xen.h>
 
   .text
+  .arch_extension virt
+
 GCC_ASM_EXPORT(XenHypercall2)
 
 ASM_PFX(XenHypercall2):
