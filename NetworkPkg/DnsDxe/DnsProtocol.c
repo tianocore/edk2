@@ -256,7 +256,7 @@ Dns4Configure (
       goto ON_EXIT;
     }
 
-    if (DnsConfigData->DnsServerListCount == 0 || DnsConfigData->DnsServerList == NULL) {
+    if (DnsConfigData->DnsServerListCount == 0) {
       gBS->RestoreTPL (OldTpl); 
       
       //
@@ -1078,7 +1078,7 @@ Dns6Configure (
       goto ON_EXIT;
     }
 
-    if (DnsConfigData->DnsServerCount == 0 || DnsConfigData->DnsServerList == NULL) {
+    if (DnsConfigData->DnsServerCount == 0) {
       gBS->RestoreTPL (OldTpl);
 
       //
