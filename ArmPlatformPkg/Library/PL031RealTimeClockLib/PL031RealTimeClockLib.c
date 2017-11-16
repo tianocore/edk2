@@ -14,28 +14,27 @@
 
 **/
 
-#include <Uefi.h>
 #include <PiDxe.h>
+
+#include <Guid/EventGroup.h>
+#include <Guid/GlobalVariable.h>
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/UefiLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/IoLib.h>
-#include <Library/RealTimeClockLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Library/DxeServicesTableLib.h>
+#include <Library/RealTimeClockLib.h>
+#include <Library/TimeBaseLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 
 #include <Protocol/RealTimeClock.h>
 
-#include <Guid/GlobalVariable.h>
-#include <Guid/EventGroup.h>
-
-#include <Drivers/PL031RealTimeClock.h>
-
-#include <Library/TimeBaseLib.h>
+#include "PL031RealTimeClock.h"
 
 STATIC BOOLEAN                mPL031Initialized = FALSE;
 STATIC EFI_EVENT              mRtcVirtualAddrChangeEvent;
