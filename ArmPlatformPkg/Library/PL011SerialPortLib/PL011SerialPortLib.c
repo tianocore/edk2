@@ -19,9 +19,8 @@
 
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PL011UartLib.h>
 #include <Library/SerialPortLib.h>
-
-#include <Drivers/PL011Uart.h>
 
 /** Initialise the serial device hardware with default settings.
 
