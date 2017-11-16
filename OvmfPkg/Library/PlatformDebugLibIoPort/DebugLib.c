@@ -15,7 +15,6 @@
 **/
 
 #include <Base.h>
-#include <Uefi.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -32,7 +31,7 @@
 /**
   This constructor function does not have to do anything.
 
-  @retval EFI_SUCCESS   The constructor always returns RETURN_SUCCESS.
+  @retval RETURN_SUCCESS   The constructor always returns RETURN_SUCCESS.
 
 **/
 RETURN_STATUS
@@ -41,7 +40,7 @@ PlatformDebugLibIoPortConstructor (
   VOID
   )
 {
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
 /**
