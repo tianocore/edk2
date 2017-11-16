@@ -25,7 +25,8 @@
 #include <Library/UefiLib.h>
 
 #include <Protocol/WatchdogTimer.h>
-#include <Drivers/SP805Watchdog.h>
+
+#include "SP805Watchdog.h"
 
 EFI_EVENT                           EfiExitBootServicesEvent = (EFI_EVENT)NULL;
 
