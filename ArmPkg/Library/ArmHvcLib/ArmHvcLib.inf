@@ -30,3 +30,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
+
+[BuildOptions]
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A15

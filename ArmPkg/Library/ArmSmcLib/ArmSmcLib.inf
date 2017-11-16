@@ -29,3 +29,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   ArmPkg/ArmPkg.dec
+
+[BuildOptions]
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu 7-A.security
