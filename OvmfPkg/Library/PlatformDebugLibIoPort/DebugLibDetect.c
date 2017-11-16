@@ -1,6 +1,6 @@
 /** @file
-  Constructor code for QEMU debug port library.
-  Non-SEC instance.
+  Detection code for QEMU debug port.
+  Non-SEC instance, caches the result of detection.
 
   Copyright (c) 2017, Red Hat, Inc.<BR>
   This program and the accompanying materials
@@ -14,9 +14,16 @@
 **/
 
 #include <Base.h>
+#include "DebugLibDetect.h"
+
+//
+// Set to TRUE if the debug I/O port is enabled
+//
+STATIC BOOLEAN mDebugIoPortFound = FALSE;
 
 /**
-  This constructor function does not have anything to do.
+  This constructor function checks if the debug I/O port device is present,
+  caching the result for later use.
 
   @retval RETURN_SUCCESS   The constructor always returns RETURN_SUCCESS.
 
@@ -27,5 +34,22 @@ PlatformDebugLibIoPortConstructor (
   VOID
   )
 {
+  mDebugIoPortFound = PlatformDebugLibIoPortDetect();
   return RETURN_SUCCESS;
+}
+
+/**
+  Return the cached result of detecting the debug I/O port device.
+
+  @retval TRUE   if the debug I/O port device was detected.
+  @retval FALSE  otherwise
+
+**/
+BOOLEAN
+EFIAPI
+PlatformDebugLibIoPortFound (
+  VOID
+  )
+{
+  return mDebugIoPortFound;
 }

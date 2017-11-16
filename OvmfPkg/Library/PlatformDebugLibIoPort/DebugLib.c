@@ -22,6 +22,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
+#include "DebugLibDetect.h"
 
 //
 // Define the maximum debug and assert message length that this library supports
@@ -61,9 +62,10 @@ DebugPrint (
   ASSERT (Format != NULL);
 
   //
-  // Check driver debug mask value and global mask
+  // Check if the global mask disables this message or the device is inactive
   //
-  if ((ErrorLevel & GetDebugPrintErrorLevel ()) == 0) {
+  if ((ErrorLevel & GetDebugPrintErrorLevel ()) == 0 ||
+      !PlatformDebugLibIoPortFound ()) {
     return;
   }
 
@@ -120,9 +122,11 @@ DebugAssert (
              FileName, (UINT64)LineNumber, Description);
 
   //
-  // Send the print string to the debug I/O port
+  // Send the print string to the debug I/O port, if present
   //
-  IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  if (PlatformDebugLibIoPortFound ()) {
+    IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  }
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
@@ -264,4 +268,20 @@ DebugPrintLevelEnabled (
   )
 {
   return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
+}
+
+/**
+  Return the result of detecting the debug I/O port device.
+
+  @retval TRUE   if the debug I/O port device was detected.
+  @retval FALSE  otherwise
+
+**/
+BOOLEAN
+EFIAPI
+PlatformDebugLibIoPortDetect (
+  VOID
+  )
+{
+  return IoRead8 (PcdGet16 (PcdDebugIoPort)) == BOCHS_DEBUG_PORT_MAGIC;
 }
