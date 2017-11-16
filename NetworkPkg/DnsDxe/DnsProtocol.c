@@ -223,8 +223,6 @@ Dns4Configure (
       Dns4InstanceCancelToken(Instance, NULL);
     }
 
-    Instance->MaxRetry = 0;
-
     if (Instance->UdpIo != NULL){
       UdpIoCleanIo (Instance->UdpIo);
     }
@@ -377,24 +375,30 @@ Dns4HostNameToIp (
   
   ConfigData = &(Instance->Dns4CfgData);
   
-  Instance->MaxRetry = ConfigData->RetryCount;
-  
-  Token->Status = EFI_NOT_READY;
-  Token->RetryCount = 0;
-  Token->RetryInterval = ConfigData->RetryInterval;
-
   if (Instance->State != DNS_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
 
+  Token->Status = EFI_NOT_READY;
+
   //
-  // Check the MaxRetry and RetryInterval values.
+  // If zero, use the parameter configured through Dns.Configure() interface.
   //
-  if (Instance->MaxRetry == 0) {
-    Instance->MaxRetry = DNS_DEFAULT_RETRY;
+  if (Token->RetryCount == 0) {
+    Token->RetryCount = ConfigData->RetryCount;
   }
 
+  //
+  // If zero, use the parameter configured through Dns.Configure() interface.
+  //
+  if (Token->RetryInterval == 0) {
+    Token->RetryInterval = ConfigData->RetryInterval;
+  }
+  
+  //
+  // Minimum interval of retry is 2 second. If the retry interval is less than 2 second, then use the 2 second. 
+  //
   if (Token->RetryInterval < DNS_DEFAULT_TIMEOUT) {
     Token->RetryInterval = DNS_DEFAULT_TIMEOUT;
   }
@@ -620,25 +624,31 @@ Dns4GeneralLookUp (
   Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL4 (This);
   
   ConfigData = &(Instance->Dns4CfgData);
-  
-  Instance->MaxRetry = ConfigData->RetryCount;
-  
-  Token->Status = EFI_NOT_READY;
-  Token->RetryCount = 0;
-  Token->RetryInterval = ConfigData->RetryInterval;
 
   if (Instance->State != DNS_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
 
+  Token->Status = EFI_NOT_READY;
+  
   //
-  // Check the MaxRetry and RetryInterval values.
+  // If zero, use the parameter configured through Dns.Configure() interface.
   //
-  if (Instance->MaxRetry == 0) {
-    Instance->MaxRetry = DNS_DEFAULT_RETRY;
+  if (Token->RetryCount == 0) {
+    Token->RetryCount = ConfigData->RetryCount;
+  }
+  
+  //
+  // If zero, use the parameter configured through Dns.Configure() interface.
+  //
+  if (Token->RetryInterval == 0) {
+    Token->RetryInterval = ConfigData->RetryInterval;
   }
 
+  //
+  // Minimum interval of retry is 2 second. If the retry interval is less than 2 second, then use the 2 second. 
+  //
   if (Token->RetryInterval < DNS_DEFAULT_TIMEOUT) {
     Token->RetryInterval = DNS_DEFAULT_TIMEOUT;
   }
@@ -1052,8 +1062,6 @@ Dns6Configure (
       Dns6InstanceCancelToken(Instance, NULL);
     }
 
-    Instance->MaxRetry = 0;
-
     if (Instance->UdpIo != NULL){
       UdpIoCleanIo (Instance->UdpIo);
     }
@@ -1203,28 +1211,34 @@ Dns6HostNameToIp (
   Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL6 (This);
   
   ConfigData = &(Instance->Dns6CfgData);
-  
-  Instance->MaxRetry = ConfigData->RetryCount;
-
-  Token->Status = EFI_NOT_READY;
-  Token->RetryCount = 0;
-  Token->RetryInterval = ConfigData->RetryInterval;
 
   if (Instance->State != DNS_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
 
+  Token->Status = EFI_NOT_READY;
+
   //
-  // Check the MaxRetry and RetryInterval values.
+  // If zero, use the parameter configured through Dns.Configure() interface.
   //
-  if (Instance->MaxRetry == 0) {
-    Instance->MaxRetry = DNS_DEFAULT_RETRY;
+  if (Token->RetryCount == 0) {
+    Token->RetryCount = ConfigData->RetryCount;
   }
 
+  //
+  // If zero, use the parameter configured through Dns.Configure() interface.
+  //
+  if (Token->RetryInterval == 0) {
+    Token->RetryInterval = ConfigData->RetryInterval;
+  }
+  
+  //
+  // Minimum interval of retry is 2 second. If the retry interval is less than 2 second, then use the 2 second. 
+  //
   if (Token->RetryInterval < DNS_DEFAULT_TIMEOUT) {
     Token->RetryInterval = DNS_DEFAULT_TIMEOUT;
-  } 
+  }
 
   //
   // Check cache
@@ -1451,25 +1465,31 @@ Dns6GeneralLookUp (
   Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL6 (This);
   
   ConfigData = &(Instance->Dns6CfgData);
-  
-  Instance->MaxRetry = ConfigData->RetryCount;
-  
-  Token->Status = EFI_NOT_READY;
-  Token->RetryCount = 0;
-  Token->RetryInterval = ConfigData->RetryInterval;
 
   if (Instance->State != DNS_STATE_CONFIGED) {
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
 
+  Token->Status = EFI_NOT_READY;
+  
   //
-  // Check the MaxRetry and RetryInterval values.
+  // If zero, use the parameter configured through Dns.Configure() interface.
   //
-  if (Instance->MaxRetry == 0) {
-    Instance->MaxRetry = DNS_DEFAULT_RETRY;
+  if (Token->RetryCount == 0) {
+    Token->RetryCount = ConfigData->RetryCount;
+  }
+  
+  //
+  // If zero, use the parameter configured through Dns.Configure() interface.
+  //
+  if (Token->RetryInterval == 0) {
+    Token->RetryInterval = ConfigData->RetryInterval;
   }
 
+  //
+  // Minimum interval of retry is 2 second. If the retry interval is less than 2 second, then use the 2 second. 
+  //
   if (Token->RetryInterval < DNS_DEFAULT_TIMEOUT) {
     Token->RetryInterval = DNS_DEFAULT_TIMEOUT;
   }

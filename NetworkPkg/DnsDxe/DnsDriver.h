@@ -1,7 +1,7 @@
 /** @file
 The header files of the driver binding and service binding protocol for DnsDxe driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -88,8 +88,6 @@ struct _DNS_INSTANCE {
 
   NET_MAP                       Dns4TxTokens;
   NET_MAP                       Dns6TxTokens;
-
-  UINT32                        MaxRetry;
 
   UDP_IO                        *UdpIo;
 };

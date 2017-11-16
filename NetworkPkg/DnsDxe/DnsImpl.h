@@ -1,7 +1,7 @@
 /** @file
 DnsDxe support functions implementation.
    
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -86,7 +86,6 @@ extern EFI_DNS6_PROTOCOL             mDns6Protocol;
 #define DNS_STATE_DESTROY        2
 
 #define DNS_DEFAULT_TIMEOUT      2
-#define DNS_DEFAULT_RETRY        3
 
 #define DNS_TIME_TO_GETMAP       5
 
@@ -115,6 +114,7 @@ typedef struct {
 } DNS6_SERVER_IP;
 
 typedef struct {
+  UINT32                     RetryCounting;
   UINT32                     PacketToLive;
   CHAR16                     *QueryHostName;
   EFI_IPv4_ADDRESS           QueryIpAddress;
@@ -123,6 +123,7 @@ typedef struct {
 } DNS4_TOKEN_ENTRY;
 
 typedef struct {
+  UINT32                     RetryCounting;
   UINT32                     PacketToLive;
   CHAR16                     *QueryHostName;
   EFI_IPv6_ADDRESS           QueryIpAddress;

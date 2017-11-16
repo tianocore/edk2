@@ -1948,7 +1948,7 @@ DnsOnTimerRetransmit (
         // Retransmit the packet if haven't reach the maxmium retry count,
         // otherwise exit the transfer.
         //
-        if (++Dns4TokenEntry->Token->RetryCount < Instance->MaxRetry) {
+        if (++Dns4TokenEntry->RetryCounting <= Dns4TokenEntry->Token->RetryCount) {
           DnsRetransmit (Instance, (NET_BUF *)ItemNetMap->Value);
           EntryNetMap = EntryNetMap->ForwardLink;
         } else {
@@ -1992,7 +1992,7 @@ DnsOnTimerRetransmit (
         // Retransmit the packet if haven't reach the maxmium retry count,
         // otherwise exit the transfer.
         //
-        if (++Dns6TokenEntry->Token->RetryCount < Instance->MaxRetry) {
+        if (++Dns6TokenEntry->RetryCounting <= Dns6TokenEntry->Token->RetryCount) {
           DnsRetransmit (Instance, (NET_BUF *) ItemNetMap->Value);
           EntryNetMap = EntryNetMap->ForwardLink;
         } else {
