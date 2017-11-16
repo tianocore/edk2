@@ -3,7 +3,7 @@
 #  It uses Print Library to produce formatted output strings.
 #
 #  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
-#  Copyright (c) 2012, Red Hat, Inc.<BR>
+#  Copyright (c) 2017, Red Hat, Inc.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,12 +17,12 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PlatformDebugLibIoPort
-  FILE_GUID                      = DF934DA3-CD31-49FE-AF50-B3C87C79325F
+  BASE_NAME                      = PlatformRomDebugLibIoPort
+  FILE_GUID                      = CEB0D9D3-328F-4C24-8C02-28FA1986AE1B
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugLib|PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
-  CONSTRUCTOR                    = PlatformDebugLibIoPortConstructor
+  LIBRARY_CLASS                  = DebugLib|SEC
+  CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
@@ -30,7 +30,7 @@
 
 [Sources]
   DebugLib.c
-  DebugLibDetect.c
+  DebugLibDetectRom.c
 
 [Packages]
   MdePkg/MdePkg.dec

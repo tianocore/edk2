@@ -29,21 +29,6 @@
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
 /**
-  This constructor function does not have to do anything.
-
-  @retval RETURN_SUCCESS   The constructor always returns RETURN_SUCCESS.
-
-**/
-RETURN_STATUS
-EFIAPI
-PlatformDebugLibIoPortConstructor (
-  VOID
-  )
-{
-  return RETURN_SUCCESS;
-}
-
-/**
   Prints a debug message to the debug output device if the specified error level is enabled.
 
   If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
