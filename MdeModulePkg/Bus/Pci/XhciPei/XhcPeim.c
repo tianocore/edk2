@@ -1427,6 +1427,8 @@ XhcEndOfPei (
 
   XhcPeiHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
 
+  XhcPeiFreeSched (Xhc);
+
   return EFI_SUCCESS;
 }
 
@@ -1461,8 +1463,6 @@ XhcPeimEntry (
     return EFI_SUCCESS;
   }
 
-  IoMmuInit ();
-
   Status = PeiServicesLocatePpi (
              &gPeiUsbControllerPpiGuid,
              0,
@@ -1472,6 +1472,8 @@ XhcPeimEntry (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
+  IoMmuInit ();
 
   Index = 0;
   while (TRUE) {
