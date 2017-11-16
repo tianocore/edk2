@@ -27,7 +27,8 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/EmbeddedGpio.h>
-#include <Drivers/PL061Gpio.h>
+
+#include "PL061Gpio.h"
 
 PLATFORM_GPIO_CONTROLLER *mPL061PlatformGpio;
 
