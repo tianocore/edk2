@@ -32,6 +32,9 @@
   Include                        # Root include for the package
 
 [LibraryClasses]
+  ArmPlatformLib|Include/Library/ArmPlatformLib.h
+  LcdPlatformLib|Include/Library/LcdPlatformLib.h
+  NorFlashPlatformLib|Include/Library/NorFlashPlatformLib.h
   PL011UartLib|Include/Library/PL011UartLib.h
 
 [Guids.common]
