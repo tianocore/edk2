@@ -22,10 +22,6 @@
 // Number of Virtual Memory Map Descriptors
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          5
 
-// DDR attributes
-#define DDR_ATTRIBUTES_CACHED    ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
-#define DDR_ATTRIBUTES_UNCACHED  ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED
-
 EFI_PHYSICAL_ADDRESS
 ArmGetPhysAddrTop (
   VOID
@@ -48,7 +44,6 @@ ArmPlatformGetVirtualMemoryMap (
   IN ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
   )
 {
-  ARM_MEMORY_REGION_ATTRIBUTES  CacheAttributes;
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
 
   ASSERT (VirtualMemoryMap != NULL);
@@ -65,17 +60,11 @@ ArmPlatformGetVirtualMemoryMap (
     return;
   }
 
-  if (FeaturePcdGet (PcdCacheEnable) == TRUE) {
-    CacheAttributes = DDR_ATTRIBUTES_CACHED;
-  } else {
-    CacheAttributes = DDR_ATTRIBUTES_UNCACHED;
-  }
-
   // System DRAM
   VirtualMemoryTable[0].PhysicalBase = PcdGet64 (PcdSystemMemoryBase);
   VirtualMemoryTable[0].VirtualBase  = VirtualMemoryTable[0].PhysicalBase;
   VirtualMemoryTable[0].Length       = PcdGet64 (PcdSystemMemorySize);
-  VirtualMemoryTable[0].Attributes   = CacheAttributes;
+  VirtualMemoryTable[0].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
   DEBUG ((EFI_D_INFO, "%a: Dumping System DRAM Memory Map:\n"
       "\tPhysicalBase: 0x%lX\n"
@@ -104,7 +93,7 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[3].PhysicalBase = FixedPcdGet64 (PcdFdBaseAddress);
   VirtualMemoryTable[3].VirtualBase  = VirtualMemoryTable[3].PhysicalBase;
   VirtualMemoryTable[3].Length       = FixedPcdGet32 (PcdFdSize);
-  VirtualMemoryTable[3].Attributes   = CacheAttributes;
+  VirtualMemoryTable[3].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
   // End of Table
   ZeroMem (&VirtualMemoryTable[4], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
