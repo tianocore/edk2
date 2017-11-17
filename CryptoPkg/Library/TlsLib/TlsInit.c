@@ -22,26 +22,34 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   by SSL/TLS, and initializes the readable error messages.
   This function must be called before any other action takes places.
 
+  @retval TRUE   The OpenSSL library has been initialized.
+  @retval FALSE  Failed to initialize the OpenSSL library.
+
 **/
-VOID
+BOOLEAN
 EFIAPI
 TlsInitialize (
   VOID
   )
 {
+  INTN            Ret;
+
   //
   // Performs initialization of crypto and ssl library, and loads required
   // algorithms.
   //
-  OPENSSL_init_ssl (
-    OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS,
-    NULL
-    );
+  Ret = OPENSSL_init_ssl (
+          OPENSSL_INIT_LOAD_SSL_STRINGS | OPENSSL_INIT_LOAD_CRYPTO_STRINGS,
+          NULL
+          );
+  if (Ret != 1) {
+    return FALSE;
+  }
 
   //
   // Initialize the pseudorandom number generator.
   //
-  RandomSeed (NULL, 0);
+  return RandomSeed (NULL, 0);
 }
 
 /**
