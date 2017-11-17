@@ -23,6 +23,7 @@
 
 [Sources]
   PrePi.c
+  FdtParser.c
 
 [Sources.AArch64]
   AArch64/ArchPrePi.c
@@ -44,6 +45,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  FdtLib
   ArmLib
   IoLib
   TimerLib
