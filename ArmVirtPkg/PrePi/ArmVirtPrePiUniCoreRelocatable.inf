@@ -40,7 +40,6 @@
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   BaseLib
