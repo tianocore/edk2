@@ -136,13 +136,6 @@ _GetStackBase:
   MOV32 (r3, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
   bl    ASM_PFX(ArmPlatformStackSet)
 
-  // Is it the Primary Core ?
-  mov   r0, r10
-  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
-  cmp   r0, #1
-  bne   _PrepareArguments
-
-_PrepareArguments:
   mov   r0, r10
   mov   r1, r11
   mov   r2, r9
