@@ -44,6 +44,7 @@
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
 
   ArmPlatformLib|ArmVirtPkg/Library/ArmXenRelocatablePlatformLib/ArmXenRelocatablePlatformLib.inf
+  ArmVirtMemInfoLib|ArmVirtPkg/Library/XenVirtMemInfoLib/XenVirtMemInfoLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
 
