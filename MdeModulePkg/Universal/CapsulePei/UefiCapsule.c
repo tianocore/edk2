@@ -625,6 +625,82 @@ GetPhysicalAddressBits (
 #endif
 
 /**
+  Sort memory resource entries based upon PhysicalStart, from low to high.
+
+  @param[in, out] MemoryResource    A pointer to the memory resource entry buffer.
+
+**/
+VOID
+SortMemoryResourceDescriptor (
+  IN OUT MEMORY_RESOURCE_DESCRIPTOR *MemoryResource
+  )
+{
+  MEMORY_RESOURCE_DESCRIPTOR        *MemoryResourceEntry;
+  MEMORY_RESOURCE_DESCRIPTOR        *NextMemoryResourceEntry;
+  MEMORY_RESOURCE_DESCRIPTOR        TempMemoryResource;
+
+  MemoryResourceEntry = MemoryResource;
+  NextMemoryResourceEntry = MemoryResource + 1;
+  while (MemoryResourceEntry->ResourceLength != 0) {
+    while (NextMemoryResourceEntry->ResourceLength != 0) {
+      if (MemoryResourceEntry->PhysicalStart > NextMemoryResourceEntry->PhysicalStart) {
+        CopyMem (&TempMemoryResource, MemoryResourceEntry, sizeof (MEMORY_RESOURCE_DESCRIPTOR));
+        CopyMem (MemoryResourceEntry, NextMemoryResourceEntry, sizeof (MEMORY_RESOURCE_DESCRIPTOR));
+        CopyMem (NextMemoryResourceEntry, &TempMemoryResource, sizeof (MEMORY_RESOURCE_DESCRIPTOR));
+      }
+
+      NextMemoryResourceEntry = NextMemoryResourceEntry + 1;
+    }
+
+    MemoryResourceEntry     = MemoryResourceEntry + 1;
+    NextMemoryResourceEntry = MemoryResourceEntry + 1;
+  }
+}
+
+/**
+  Merge continous memory resource entries.
+
+  @param[in, out] MemoryResource    A pointer to the memory resource entry buffer.
+
+**/
+VOID
+MergeMemoryResourceDescriptor (
+  IN OUT MEMORY_RESOURCE_DESCRIPTOR *MemoryResource
+  )
+{
+  MEMORY_RESOURCE_DESCRIPTOR        *MemoryResourceEntry;
+  MEMORY_RESOURCE_DESCRIPTOR        *NewMemoryResourceEntry;
+  MEMORY_RESOURCE_DESCRIPTOR        *NextMemoryResourceEntry;
+  MEMORY_RESOURCE_DESCRIPTOR        *MemoryResourceEnd;
+
+  MemoryResourceEntry = MemoryResource;
+  NewMemoryResourceEntry = MemoryResource;
+  while (MemoryResourceEntry->ResourceLength != 0) {
+    CopyMem (NewMemoryResourceEntry, MemoryResourceEntry, sizeof (MEMORY_RESOURCE_DESCRIPTOR));
+    NextMemoryResourceEntry = MemoryResourceEntry + 1;
+
+    while ((NextMemoryResourceEntry->ResourceLength != 0) &&
+           (NextMemoryResourceEntry->PhysicalStart == (MemoryResourceEntry->PhysicalStart + MemoryResourceEntry->ResourceLength))) {
+      MemoryResourceEntry->ResourceLength += NextMemoryResourceEntry->ResourceLength;
+      if (NewMemoryResourceEntry != MemoryResourceEntry) {
+        NewMemoryResourceEntry->ResourceLength += NextMemoryResourceEntry->ResourceLength;
+      }
+ 
+      NextMemoryResourceEntry = NextMemoryResourceEntry + 1;
+    }
+
+    MemoryResourceEntry = NextMemoryResourceEntry;
+    NewMemoryResourceEntry = NewMemoryResourceEntry + 1;
+  }
+
+  //
+  // Set NULL terminate memory resource descriptor after merging.
+  //
+  MemoryResourceEnd = NewMemoryResourceEntry;
+  ZeroMem (MemoryResourceEnd, sizeof (MEMORY_RESOURCE_DESCRIPTOR));
+}
+
+/**
   Build memory resource descriptor from resource descriptor in HOB list.
 
   @return Pointer to the buffer of memory resource descriptor.
@@ -702,6 +778,20 @@ BuildMemoryResourceDescriptor (
     }
     Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  SortMemoryResourceDescriptor (MemoryResource);
+  MergeMemoryResourceDescriptor (MemoryResource);
+
+  DEBUG ((DEBUG_INFO, "Dump MemoryResource[] after sorted and merged\n"));
+  for (Index = 0; MemoryResource[Index].ResourceLength != 0; Index++) {
+    DEBUG ((
+      DEBUG_INFO,
+      "  MemoryResource[0x%x] - Start(0x%0lx) Length(0x%0lx)\n",
+      Index,
+      MemoryResource[Index].PhysicalStart,
+      MemoryResource[Index].ResourceLength
+      ));
   }
 
   return MemoryResource;
