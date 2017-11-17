@@ -16,7 +16,7 @@
 #include <PiPei.h>
 
 #include <Library/ArmMmuLib.h>
-#include <Library/ArmPlatformLib.h>
+#include <Library/ArmVirtMemInfoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -39,7 +39,7 @@ InitMmu (
   RETURN_STATUS                 Status;
 
   // Get Virtual Memory Map from the Platform Library
-  ArmPlatformGetVirtualMemoryMap (&MemoryTable);
+  ArmVirtGetMemoryMap (&MemoryTable);
 
   //Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table resides in
   //      DRAM (even at the top of DRAM as it is the first permanent memory allocation)
