@@ -1837,13 +1837,8 @@ class Build():
                                 # for target which must generate AutoGen code and makefile
                                 if not self.SkipAutoGen or self.Target == 'genc':
                                     Ma.CreateCodeFile(True)
-                                if self.Target == "genc":
-                                    continue
-
                                 if not self.SkipAutoGen or self.Target == 'genmake':
                                     Ma.CreateMakeFile(True)
-                                if self.Target == "genmake":
-                                    continue
                             MaList.append(Ma)
                             self.BuildModules.append(Ma)
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
