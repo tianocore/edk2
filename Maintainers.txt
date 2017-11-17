@@ -167,6 +167,7 @@ MdeModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
 M: Star Zeng <star.zeng@intel.com>
 M: Eric Dong <eric.dong@intel.com>
+M: NetworkPkg maintainers (Universal/Network)
 
 MdePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
