@@ -3,7 +3,7 @@
 #
 # This package provides common open source Intel silicon modules.
 #
-# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -23,6 +23,11 @@
 [Includes]
   Include
 
+[LibraryClasses.IA32, LibraryClasses.X64]
+  ## @libraryclass  Provides services to access Microcode region on flash device.
+  #
+  MicrocodeFlashAccessLib|Include/Library/MicrocodeFlashAccessLib.h
+
 [Guids]
   ## GUID for Package token space
   # {A9F8D54E-1107-4F0A-ADD0-4587E7A4A735}
@@ -32,6 +37,9 @@
   # HOB data format is same as SMBIOS records defined in SMBIOS spec or OEM defined types
   # Generic DXE Library / Driver can locate HOB(s) and add SMBIOS records into SMBIOS table
   gIntelSmbiosDataHobGuid         = { 0x798e722e, 0x15b2, 0x4e13, { 0x8a, 0xe9, 0x6b, 0xa3, 0x0f, 0xf7, 0xf1, 0x67 }}
+
+  ## Include/Guid/MicrocodeFmp.h
+  gMicrocodeFmpImageTypeIdGuid      = { 0x96d4fdcd, 0x1502, 0x424d, { 0x9d, 0x4c, 0x9b, 0x12, 0xd2, 0xdc, 0xae, 0x5c } }
 
 [Ppis]
   gEdkiiVTdInfoPpiGuid = { 0x8a59fcb3, 0xf191, 0x400c, { 0x97, 0x67, 0x67, 0xaf, 0x2b, 0x25, 0x68, 0x4a } }
