@@ -464,9 +464,15 @@ Dns4HostNameToIp (
   }
   
   TokenEntry->PacketToLive = Token->RetryInterval;
-  TokenEntry->QueryHostName = HostName;
   TokenEntry->Token = Token;
-
+  TokenEntry->QueryHostName = AllocateZeroPool (StrSize (HostName));
+  if (TokenEntry->QueryHostName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+  
+  CopyMem (TokenEntry->QueryHostName, HostName, StrSize (HostName));
+  
   //
   // Construct QName.
   //
@@ -480,11 +486,7 @@ Dns4HostNameToIp (
   // Construct DNS Query Packet.
   //
   Status = ConstructDNSQuery (Instance, QueryName, DNS_TYPE_A, DNS_CLASS_INET, &Packet);
-  if (EFI_ERROR (Status)) {
-    if (TokenEntry != NULL) {
-      FreePool (TokenEntry);
-    }
-    
+  if (EFI_ERROR (Status)) { 
     goto ON_EXIT;
   }
 
@@ -495,12 +497,6 @@ Dns4HostNameToIp (
   //
   Status = NetMapInsertTail (&Instance->Dns4TxTokens, TokenEntry, Packet);
   if (EFI_ERROR (Status)) {
-    if (TokenEntry != NULL) {
-      FreePool (TokenEntry);
-    }
-    
-    NetbufFree (Packet);
-    
     goto ON_EXIT;
   }
   
@@ -510,15 +506,24 @@ Dns4HostNameToIp (
   Status = DoDnsQuery (Instance, Packet);
   if (EFI_ERROR (Status)) {
     Dns4RemoveTokenEntry (&Instance->Dns4TxTokens, TokenEntry);
-
-    if (TokenEntry != NULL) {
-      FreePool (TokenEntry);
-    }
-    
-    NetbufFree (Packet);
   }
   
 ON_EXIT:
+
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      if (TokenEntry->QueryHostName != NULL) {
+        FreePool (TokenEntry->QueryHostName);
+      }
+      
+      FreePool (TokenEntry);
+    }
+    
+    if (Packet != NULL) {
+      NetbufFree (Packet);
+    }
+  }
+  
   if (QueryName != NULL) {
     FreePool (QueryName);
   }
@@ -1301,9 +1306,14 @@ Dns6HostNameToIp (
   }
   
   TokenEntry->PacketToLive = Token->RetryInterval;
-  TokenEntry->QueryHostName = HostName;
   TokenEntry->Token = Token;
-
+  TokenEntry->QueryHostName = AllocateZeroPool (StrSize (HostName));
+  if (TokenEntry->QueryHostName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+  
+  CopyMem (TokenEntry->QueryHostName, HostName, StrSize (HostName));
 
   //
   // Construct QName.
@@ -1319,10 +1329,6 @@ Dns6HostNameToIp (
   //
   Status = ConstructDNSQuery (Instance, QueryName, DNS_TYPE_AAAA, DNS_CLASS_INET, &Packet);
   if (EFI_ERROR (Status)) {
-    if (TokenEntry != NULL) {
-      FreePool (TokenEntry);
-    }
-    
     goto ON_EXIT;
   }
 
@@ -1333,12 +1339,6 @@ Dns6HostNameToIp (
   //
   Status = NetMapInsertTail (&Instance->Dns6TxTokens, TokenEntry, Packet);
   if (EFI_ERROR (Status)) {
-    if (TokenEntry != NULL) {
-      FreePool (TokenEntry);
-    }
-    
-    NetbufFree (Packet);
-    
     goto ON_EXIT;
   }
   
@@ -1348,15 +1348,24 @@ Dns6HostNameToIp (
   Status = DoDnsQuery (Instance, Packet);
   if (EFI_ERROR (Status)) {
     Dns6RemoveTokenEntry (&Instance->Dns6TxTokens, TokenEntry);
-    
-    if (TokenEntry != NULL) {
-      FreePool (TokenEntry);
-    }
-    
-    NetbufFree (Packet);
   }
   
 ON_EXIT:
+
+  if (EFI_ERROR (Status)) {
+    if (TokenEntry != NULL) {
+      if (TokenEntry->QueryHostName != NULL) {
+        FreePool (TokenEntry->QueryHostName);
+      }
+      
+      FreePool (TokenEntry);
+    }
+    
+    if (Packet != NULL) {
+      NetbufFree (Packet);
+    }
+  }
+  
   if (QueryName != NULL) {
     FreePool (QueryName);
   }
