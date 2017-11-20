@@ -287,7 +287,7 @@ SmmInternalAllocatePool (
 
     PoolHdr = (POOL_HEADER*)(UINTN)Address;
     PoolHdr->Signature = POOL_HEAD_SIGNATURE;
-    PoolHdr->Size = Size;
+    PoolHdr->Size = EFI_PAGES_TO_SIZE (NoPages);
     PoolHdr->Available = FALSE;
     PoolHdr->Type = PoolType;
 
