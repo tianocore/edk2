@@ -576,7 +576,12 @@ EhcCreateUrb (
   if (Urb->Qh == NULL) {
     goto ON_ERROR;
   }
-  
+
+  Urb->RequestPhy = NULL;
+  Urb->RequestMap = NULL;
+  Urb->DataPhy  = NULL;
+  Urb->DataMap  = NULL;
+
   //
   // Map the request and user data
   //
@@ -591,9 +596,6 @@ EhcCreateUrb (
 
     Urb->RequestPhy = (VOID *) ((UINTN) PhyAddr);
     Urb->RequestMap = Map;
-  } else {
-    Urb->RequestPhy = NULL;
-    Urb->RequestMap = NULL;
   }
 
   if (Data != NULL) {
@@ -613,9 +615,6 @@ EhcCreateUrb (
 
     Urb->DataPhy  = (VOID *) ((UINTN) PhyAddr);
     Urb->DataMap  = Map;
-  } else {
-    Urb->DataPhy  = NULL;
-    Urb->DataMap  = NULL;
   }
 
   Status = EhcCreateQtds (Ehc, Urb);

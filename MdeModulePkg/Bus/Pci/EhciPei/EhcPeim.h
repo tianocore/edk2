@@ -99,7 +99,7 @@ struct _PEI_USB2_HC_DEV {
   EDKII_IOMMU_PPI                     *IoMmu;
   EFI_PEI_PPI_DESCRIPTOR              PpiDescriptor;
   //
-  // EndOfPei callback is used to stop the XHC DMA operation
+  // EndOfPei callback is used to stop the EHC DMA operation
   // after exit PEI phase.
   //
   EFI_PEI_NOTIFY_DESCRIPTOR           EndOfPeiNotifyList;
