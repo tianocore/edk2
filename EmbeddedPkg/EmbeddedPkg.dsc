@@ -129,7 +129,6 @@
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
-  BdsLib|ArmPkg/Library/BdsLib/BdsLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 

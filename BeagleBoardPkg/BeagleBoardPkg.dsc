@@ -345,9 +345,6 @@
   # Size of the region used by UEFI in permanent memory (Reserved 16MB)
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x01000000
 
-  # Size of the region reserved for fixed address allocations (Reserved 32MB)
-  gArmTokenSpaceGuid.PcdArmLinuxKernelMaxOffset|0x02000000
-
   gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0x80008000
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x80008000
 
