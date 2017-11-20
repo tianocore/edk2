@@ -1348,8 +1348,7 @@ ModifyRootBridgeAttributes (
   //
   Attributes &= ~(UINT64)(EFI_PCI_IO_ATTRIBUTE_EMBEDDED_DEVICE |
                           EFI_PCI_IO_ATTRIBUTE_EMBEDDED_ROM |
-                          EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE |
-                          EFI_PCI_IO_ATTRIBUTE_BUS_MASTER);
+                          EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
 
   //
   // Record the new attribute of the Root Bridge
@@ -1727,11 +1726,12 @@ PciIoAttributes (
   }
   //
   // The upstream bridge should be also set to revelant attribute
-  // expect for IO and Mem
+  // expect for IO, Mem and BusMaster
   //
   UpStreamAttributes = Attributes &
                        (~(EFI_PCI_IO_ATTRIBUTE_IO     |
-                          EFI_PCI_IO_ATTRIBUTE_MEMORY
+                          EFI_PCI_IO_ATTRIBUTE_MEMORY |
+                          EFI_PCI_IO_ATTRIBUTE_BUS_MASTER
                           )
                         );
   UpStreamBridge = PciIoDevice->Parent;
