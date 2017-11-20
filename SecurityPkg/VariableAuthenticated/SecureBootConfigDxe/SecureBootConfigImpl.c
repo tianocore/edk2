@@ -3145,6 +3145,9 @@ DeleteSignatureEx (
   if (DelType == Delete_Signature_List_All) {
     VariableDataSize = 0;
   } else {
+    //
+    //  Traverse to target EFI_SIGNATURE_LIST but others will be skipped.
+    //
     while ((RemainingSize > 0) && (RemainingSize >= ListWalker->SignatureListSize) && ListIndex < PrivateData->ListIndex) {
       CopyMem ((UINT8 *)NewVariableData + Offset, ListWalker, ListWalker->SignatureListSize);
       Offset += ListWalker->SignatureListSize;
@@ -3154,15 +3157,17 @@ DeleteSignatureEx (
       ListIndex++;
     }
 
-    if (CheckedCount == SIGNATURE_DATA_COUNTS (ListWalker) || DelType == Delete_Signature_List_One) {
-      RemainingSize -= ListWalker->SignatureListSize;
-      ListWalker = (EFI_SIGNATURE_LIST *)((UINT8 *)ListWalker + ListWalker->SignatureListSize);
-    } else {
+    //
+    //  Handle the target EFI_SIGNATURE_LIST.
+    //  If CheckedCount == SIGNATURE_DATA_COUNTS (ListWalker) or DelType == Delete_Signature_List_One
+    //  it means delete the whole EFI_SIGNATURE_LIST, So we just skip this EFI_SIGNATURE_LIST.
+    //
+    if (CheckedCount < SIGNATURE_DATA_COUNTS (ListWalker) && DelType == Delete_Signature_Data) {
       NewCertList = (EFI_SIGNATURE_LIST *)(NewVariableData + Offset);
       //
       // Copy header.
       //
-      CopyMem ((UINT8 *)NewVariableData, ListWalker, sizeof (EFI_SIGNATURE_LIST) + ListWalker->SignatureHeaderSize);
+      CopyMem ((UINT8 *)NewVariableData + Offset, ListWalker, sizeof (EFI_SIGNATURE_LIST) + ListWalker->SignatureHeaderSize);
       Offset += sizeof (EFI_SIGNATURE_LIST) + ListWalker->SignatureHeaderSize;
 
       DataWalker = (EFI_SIGNATURE_DATA *)((UINT8 *)ListWalker + sizeof(EFI_SIGNATURE_LIST) + ListWalker->SignatureHeaderSize);
@@ -3181,9 +3186,10 @@ DeleteSignatureEx (
         }
         DataWalker = (EFI_SIGNATURE_DATA *)((UINT8 *)DataWalker + ListWalker->SignatureSize);
       }
-
-      RemainingSize -= ListWalker->SignatureListSize;
     }
+
+    RemainingSize -= ListWalker->SignatureListSize;
+    ListWalker = (EFI_SIGNATURE_LIST *)((UINT8 *)ListWalker + ListWalker->SignatureListSize);
 
     //
     // Copy remaining data, maybe 0.
