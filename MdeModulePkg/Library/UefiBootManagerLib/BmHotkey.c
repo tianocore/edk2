@@ -870,13 +870,13 @@ EfiBootManagerStartHotkeyService (
   EFI_EVENT                    Event;
   UINT32                       *BootOptionSupport;
 
-  Status = GetEfiGlobalVariable2 (EFI_BOOT_OPTION_SUPPORT_VARIABLE_NAME, (VOID **) &BootOptionSupport, NULL);
-  ASSERT (BootOptionSupport != NULL);
-
-  if ((*BootOptionSupport & EFI_BOOT_OPTION_SUPPORT_KEY)  != 0) {
-    mBmHotkeySupportCount = ((*BootOptionSupport & EFI_BOOT_OPTION_SUPPORT_COUNT) >> LowBitSet32 (EFI_BOOT_OPTION_SUPPORT_COUNT));
+  GetEfiGlobalVariable2 (EFI_BOOT_OPTION_SUPPORT_VARIABLE_NAME, (VOID **) &BootOptionSupport, NULL);
+  if (BootOptionSupport != NULL) {
+    if ((*BootOptionSupport & EFI_BOOT_OPTION_SUPPORT_KEY)  != 0) {
+      mBmHotkeySupportCount = ((*BootOptionSupport & EFI_BOOT_OPTION_SUPPORT_COUNT) >> LowBitSet32 (EFI_BOOT_OPTION_SUPPORT_COUNT));
+    }
+    FreePool (BootOptionSupport);
   }
-  FreePool (BootOptionSupport);
 
   if (mBmHotkeySupportCount == 0) {
     DEBUG ((EFI_D_INFO, "Bds: BootOptionSupport NV variable forbids starting the hotkey service.\n"));
