@@ -134,7 +134,7 @@ EhcInitSched (
              &Map
              );
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Buf == NULL)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
