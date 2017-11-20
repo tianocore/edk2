@@ -98,10 +98,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
-  # Enable the development specific features
-  gEmbeddedTokenSpaceGuid.PcdOverridePlatformFdt|TRUE|BOOLEAN|0x00000054
-  # Add 'dumpfdt' EFI Shell command
-  gEmbeddedTokenSpaceGuid.PcdDumpFdtShellCommand|TRUE|BOOLEAN|0x00000056
 
   gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeaturePMPSupport|FALSE|BOOLEAN|0x00000050
   gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeatureDirectCommandIssuing|FALSE|BOOLEAN|0x00000051
@@ -206,8 +202,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
-  gEmbeddedTokenSpaceGuid.PcdFdtDevicePaths|L""|VOID*|0x00000055
-
   #
   # Value to add to a host address to obtain a device address, using
   # unsigned 64-bit integer arithmetic. This means we can rely on

@@ -282,12 +282,5 @@
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
 
-  # FDT installation
-  EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf {
-    <LibraryClasses>
-      # It depends on BdsLib that depends on TimerLib
-      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-  }
-
 [Components.IA32, Components.X64, Components.IPF, Components.ARM]
   EmbeddedPkg/GdbStub/GdbStub.inf
