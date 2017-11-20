@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Ppi/UsbController.h>
 #include <Ppi/UsbHostController.h>
+#include <Ppi/IoMmu.h>
+#include <Ppi/EndOfPeiPhase.h>
 
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
@@ -177,7 +179,13 @@ struct _MEMORY_MANAGE_HEADER {
 typedef struct {
   UINTN                       Signature;
   PEI_USB_HOST_CONTROLLER_PPI UsbHostControllerPpi;
+  EDKII_IOMMU_PPI             *IoMmu;
   EFI_PEI_PPI_DESCRIPTOR      PpiDescriptor;
+  //
+  // EndOfPei callback is used to stop the UHC DMA operation
+  // after exit PEI phase.
+  //
+  EFI_PEI_NOTIFY_DESCRIPTOR   EndOfPeiNotifyList;
 
   UINT32                      UsbHostControllerBaseAddress;
   FRAMELIST_ENTRY             *FrameListEntry;
@@ -191,6 +199,7 @@ typedef struct {
 } USB_UHC_DEV;
 
 #define PEI_RECOVERY_USB_UHC_DEV_FROM_UHCI_THIS(a)  CR (a, USB_UHC_DEV, UsbHostControllerPpi, USB_UHC_DEV_SIGNATURE)
+#define PEI_RECOVERY_USB_UHC_DEV_FROM_THIS_NOTIFY(a) CR (a, USB_UHC_DEV, EndOfPeiNotifyList, USB_UHC_DEV_SIGNATURE)
 
 /**
   Submits control transfer to a target USB device.
@@ -654,7 +663,8 @@ CreateTD (
   @param  DevAddr      Device address.
   @param  Endpoint     Endpoint number.
   @param  DeviceSpeed  Device Speed.
-  @param  DevRequest   Device reuquest.
+  @param  DevRequest   CPU memory address of request structure buffer to transfer.
+  @param  RequestPhy   PCI memory address of request structure buffer to transfer.
   @param  RequestLen   Request length.
   @param  PtrTD        TD_STRUCT generated.
 
@@ -669,6 +679,7 @@ GenSetupStageTD (
   IN  UINT8           Endpoint,
   IN  UINT8           DeviceSpeed,
   IN  UINT8           *DevRequest,
+  IN  UINT8           *RequestPhy,
   IN  UINT8           RequestLen,
   OUT TD_STRUCT       **PtrTD
   );
@@ -679,7 +690,8 @@ GenSetupStageTD (
   @param  UhcDev       The UHCI device.
   @param  DevAddr      Device address.
   @param  Endpoint     Endpoint number.
-  @param  PtrData      Data buffer.
+  @param  PtrData      CPU memory address of user data buffer to transfer.
+  @param  DataPhy      PCI memory address of user data buffer to transfer.
   @param  Len          Data length.
   @param  PktID        PacketID.
   @param  Toggle       Data toggle value.
@@ -696,6 +708,7 @@ GenDataTD (
   IN  UINT8           DevAddr,
   IN  UINT8           Endpoint,
   IN  UINT8           *PtrData,
+  IN  UINT8           *DataPhy,
   IN  UINT8           Len,
   IN  UINT8           PktID,
   IN  UINT8           Toggle,
@@ -1328,6 +1341,151 @@ VOID
 DelinkMemoryBlock (
   IN MEMORY_MANAGE_HEADER    *FirstMemoryHeader,
   IN MEMORY_MANAGE_HEADER    *FreeMemoryHeader
+  );
+
+/**
+  Map address of request structure buffer.
+
+  @param  Uhc                The UHCI device.
+  @param  Request            The user request buffer.
+  @param  MappedAddr         Mapped address of request.
+  @param  Map                Identificaion of this mapping to return.
+
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user request.
+
+**/
+EFI_STATUS
+UhciMapUserRequest (
+  IN  USB_UHC_DEV         *Uhc,
+  IN  OUT VOID            *Request,
+  OUT UINT8               **MappedAddr,
+  OUT VOID                **Map
+  );
+
+/**
+  Map address of user data buffer.
+
+  @param  Uhc                The UHCI device.
+  @param  Direction          Direction of the data transfer.
+  @param  Data               The user data buffer.
+  @param  Len                Length of the user data.
+  @param  PktId              Packet identificaion.
+  @param  MappedAddr         Mapped address to return.
+  @param  Map                Identificaion of this mapping to return.
+
+  @return EFI_SUCCESS        Success.
+  @return EFI_DEVICE_ERROR   Fail to map the user data.
+
+**/
+EFI_STATUS
+UhciMapUserData (
+  IN  USB_UHC_DEV             *Uhc,
+  IN  EFI_USB_DATA_DIRECTION  Direction,
+  IN  VOID                    *Data,
+  IN  OUT UINTN               *Len,
+  OUT UINT8                   *PktId,
+  OUT UINT8                   **MappedAddr,
+  OUT VOID                    **Map
+  );
+
+/**
+  Provides the controller-specific addresses required to access system memory from a
+  DMA bus master.
+
+  @param IoMmu                  Pointer to IOMMU PPI.
+  @param Operation              Indicates if the bus master is going to read or write to system memory.
+  @param HostAddress            The system memory address to map to the PCI controller.
+  @param NumberOfBytes          On input the number of bytes to map. On output the number of bytes
+                                that were mapped.
+  @param DeviceAddress          The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param Mapping                A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
+  @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
+  @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+
+**/
+EFI_STATUS
+IoMmuMap (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN EDKII_IOMMU_OPERATION  Operation,
+  IN VOID                   *HostAddress,
+  IN OUT UINTN              *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+/**
+  Completes the Map() operation and releases any corresponding resources.
+
+  @param IoMmu              Pointer to IOMMU PPI.
+  @param Mapping            The mapping value returned from Map().
+
+**/
+VOID
+IoMmuUnmap (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN VOID                  *Mapping
+  );
+
+/**
+  Allocates pages that are suitable for an OperationBusMasterCommonBuffer or
+  OperationBusMasterCommonBuffer64 mapping.
+
+  @param IoMmu                  Pointer to IOMMU PPI.
+  @param Pages                  The number of pages to allocate.
+  @param HostAddress            A pointer to store the base system memory address of the
+                                allocated range.
+  @param DeviceAddress          The resulting map address for the bus master PCI controller to use to
+                                access the hosts HostAddress.
+  @param Mapping                A resulting value to pass to Unmap().
+
+  @retval EFI_SUCCESS           The requested memory pages were allocated.
+  @retval EFI_UNSUPPORTED       Attributes is unsupported. The only legal attribute bits are
+                                MEMORY_WRITE_COMBINE and MEMORY_CACHED.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+
+**/
+EFI_STATUS
+IoMmuAllocateBuffer (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN UINTN                  Pages,
+  OUT VOID                  **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
+  );
+
+/**
+  Frees memory that was allocated with AllocateBuffer().
+
+  @param IoMmu              Pointer to IOMMU PPI.
+  @param Pages              The number of pages to free.
+  @param HostAddress        The base system memory address of the allocated range.
+  @param Mapping            The mapping value returned from Map().
+
+**/
+VOID
+IoMmuFreeBuffer (
+  IN EDKII_IOMMU_PPI        *IoMmu,
+  IN UINTN                  Pages,
+  IN VOID                   *HostAddress,
+  IN VOID                   *Mapping
+  );
+
+/**
+  Initialize IOMMU.
+
+  @param IoMmu              Pointer to pointer to IOMMU PPI.
+
+**/
+VOID
+IoMmuInit (
+  OUT EDKII_IOMMU_PPI       **IoMmu
   );
 
 #endif
