@@ -1,7 +1,7 @@
 /** @file
   The firmware volume related definitions in PI.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -11,7 +11,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
-  PI Version 1.3
+  PI Version 1.6
 
 **/
 
@@ -230,5 +230,24 @@ typedef struct {
   /// UINT8                             Data[1];
   ///
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY_GUID_TYPE;
+
+#define EFI_FV_EXT_TYPE_USED_SIZE_TYPE 0x03
+
+///
+/// The EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE can be used to find
+/// out how many EFI_FVB2_ERASE_POLARITY bytes are at the end of the FV.
+///
+typedef struct {
+  ///
+  /// Standard extension entry, with the type EFI_FV_EXT_TYPE_USED_SIZE_TYPE.
+  ///
+  EFI_FIRMWARE_VOLUME_EXT_ENTRY     Hdr;
+  ///
+  /// The number of bytes of the FV that are in uses. The remaining
+  /// EFI_FIRMWARE_VOLUME_HEADER FvLength minus UsedSize bytes in
+  /// the FV must contain the value implied by EFI_FVB2_ERASE_POLARITY.
+  ///
+  UINT32                            UsedSize;
+} EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE;
 
 #endif
