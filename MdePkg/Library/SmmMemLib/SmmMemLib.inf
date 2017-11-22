@@ -48,11 +48,15 @@
   BaseMemoryLib
   HobLib
   MemoryAllocationLib
+  UefiLib
 
 [Protocols]
   gEfiSmmAccess2ProtocolGuid     ## CONSUMES
   gEfiSmmReadyToLockProtocolGuid ## CONSUMES
   gEfiSmmEndOfDxeProtocolGuid    ## CONSUMES
+
+[Guids]
+  gEfiMemoryAttributesTableGuid  ## CONSUMES ## SystemTable
 
 [Depex]
   gEfiSmmAccess2ProtocolGuid

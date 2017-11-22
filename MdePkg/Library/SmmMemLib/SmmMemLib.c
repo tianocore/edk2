@@ -27,10 +27,12 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/SmmServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmEndOfDxe.h>
+#include <Guid/MemoryAttributesTable.h>
 
 //
 // attributes for reserved memory before it is promoted to system memory
@@ -38,9 +40,6 @@
 #define EFI_MEMORY_PRESENT      0x0100000000000000ULL
 #define EFI_MEMORY_INITIALIZED  0x0200000000000000ULL
 #define EFI_MEMORY_TESTED       0x0400000000000000ULL
-
-#define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
-  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
 
 EFI_SMRAM_DESCRIPTOR *mSmmMemLibInternalSmramRanges;
 UINTN                mSmmMemLibInternalSmramCount;
@@ -56,6 +55,8 @@ UINTN                 mDescriptorSize;
 
 EFI_GCD_MEMORY_SPACE_DESCRIPTOR   *mSmmMemLibGcdMemSpace       = NULL;
 UINTN                             mSmmMemLibGcdMemNumberOfDesc = 0;
+
+EFI_MEMORY_ATTRIBUTES_TABLE  *mSmmMemLibMemoryAttributesTable = NULL;
 
 VOID                  *mRegistrationEndOfDxe;
 VOID                  *mRegistrationReadyToLock;
@@ -202,6 +203,32 @@ SmmIsBufferOutsideSmmValid (
           Length
           ));
         return FALSE;
+      }
+    }
+
+    //
+    // Check UEFI runtime memory with EFI_MEMORY_RO as invalid communication buffer.
+    //
+    if (mSmmMemLibMemoryAttributesTable != NULL) {
+      EFI_MEMORY_DESCRIPTOR *Entry;
+
+      Entry = (EFI_MEMORY_DESCRIPTOR *)(mSmmMemLibMemoryAttributesTable + 1);
+      for (Index = 0; Index < mSmmMemLibMemoryAttributesTable->NumberOfEntries; Index++) {
+        if (Entry->Type == EfiRuntimeServicesCode || Entry->Type == EfiRuntimeServicesData) {
+          if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
+            if (((Buffer >= Entry->PhysicalStart) && (Buffer < Entry->PhysicalStart + LShiftU64 (Entry->NumberOfPages, EFI_PAGE_SHIFT))) ||
+                ((Entry->PhysicalStart >= Buffer) && (Entry->PhysicalStart < Buffer + Length))) {
+              DEBUG ((
+                EFI_D_ERROR,
+                "SmmIsBufferOutsideSmmValid: In RuntimeCode Region: Buffer (0x%lx) - Length (0x%lx)\n",
+                Buffer,
+                Length
+                ));
+              return FALSE;
+            }
+          }
+        }
+        Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mSmmMemLibMemoryAttributesTable->DescriptorSize);
       }
     }
   }
@@ -400,6 +427,26 @@ SmmMemLibInternalGetGcdMemoryMap (
 }
 
 /**
+  Get UEFI MemoryAttributesTable.
+**/
+VOID
+SmmMemLibInternalGetUefiMemoryAttributesTable (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
+  UINTN                        MemoryAttributesTableSize;
+
+  Status = EfiGetSystemConfigurationTable (&gEfiMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
+  if (!EFI_ERROR (Status)) {
+    MemoryAttributesTableSize = sizeof(EFI_MEMORY_ATTRIBUTES_TABLE) + MemoryAttributesTable->DescriptorSize * MemoryAttributesTable->NumberOfEntries;
+    mSmmMemLibMemoryAttributesTable = AllocateCopyPool (MemoryAttributesTableSize, MemoryAttributesTable);
+    ASSERT (mSmmMemLibMemoryAttributesTable != NULL);
+  }
+}
+
+/**
   Notification for SMM EndOfDxe protocol.
 
   @param[in] Protocol   Points to the protocol's unique identifier.
@@ -501,6 +548,11 @@ SmmLibInternalEndOfDxeNotify (
   // Get additional information from GCD memory map.
   //
   SmmMemLibInternalGetGcdMemoryMap ();
+
+  //
+  // Get UEFI memory attributes table.
+  //
+  SmmMemLibInternalGetUefiMemoryAttributesTable ();
 
   return EFI_SUCCESS;
 }
