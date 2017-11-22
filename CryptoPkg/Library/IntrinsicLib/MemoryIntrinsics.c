@@ -24,7 +24,7 @@ typedef UINTN  size_t;
 int _fltused = 1;
 
 /* Sets buffers to a specified character */
-void * memset (void *dest, char ch, size_t count)
+void * memset (void *dest, int ch, size_t count)
 {
   //
   // NOTE: Here we use one base implementation for memset, instead of the direct
@@ -42,7 +42,7 @@ void * memset (void *dest, char ch, size_t count)
 
   Pointer = (UINT8 *)dest;
   while (count-- != 0) {
-    *(Pointer++) = ch;
+    *(Pointer++) = (UINT8)ch;
   }
   
   return dest;
