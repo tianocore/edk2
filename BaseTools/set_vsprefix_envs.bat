@@ -3,7 +3,7 @@
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2016-2017, Intel Corporation. All rights reserved.<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
 @REM under the terms and conditions of the BSD License which accompanies this
@@ -90,6 +90,37 @@ if defined VS140COMNTOOLS (
   )
 )
 
+@REM set VS2017
+if not defined VS150COMNTOOLS (
+  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    for /f "usebackq tokens=1* delims=: " %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"`) do (
+      if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+    )
+  ) else if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe" (
+    for /f "usebackq tokens=1* delims=: " %%i in (`"%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"`) do (
+      if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+    )
+  ) else (
+    goto SetWinDDK
+  )
+)
+
+if defined VCToolsInstallDir (
+  if not defined VS2017_PREFIX (
+    set "VS2017_PREFIX=%VCToolsInstallDir%"
+  )
+)
+if not defined WINSDK10_PREFIX (
+  if defined WindowsSdkVerBinPath (
+    set "WINSDK10_PREFIX=%WindowsSdkVerBinPath%"
+  ) else if exist "%ProgramFiles(x86)%\Windows Kits\10\bin" (
+    set "WINSDK10_PREFIX=%ProgramFiles(x86)%\Windows Kits\10\bin\"
+  ) else if exist "%ProgramFiles%\Windows Kits\10\bin" (
+    set "WINSDK10_PREFIX=%ProgramFiles%\Windows Kits\10\bin\"
+  )
+)
+
+:SetWinDDK
 if not defined WINDDK3790_PREFIX (
   set WINDDK3790_PREFIX=C:\WINDDK\3790.1830\bin\
 )
