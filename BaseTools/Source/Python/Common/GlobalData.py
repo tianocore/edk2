@@ -95,3 +95,4 @@ gBinCacheSource = None
 gPlatformHash = None
 gPackageHash = {}
 gModuleHash = {}
+gEnableGenfdsMultiThread = False

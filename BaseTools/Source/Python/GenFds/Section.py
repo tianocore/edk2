@@ -1,7 +1,7 @@
 ## @file
 # section base class
 #
-#  Copyright (c) 2007-2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -141,7 +141,7 @@ class Section (SectionClassObject):
                 else:
                     GenFdsGlobalVariable.InfLogger ("\nCurrent ARCH \'%s\' of File %s is not in the Support Arch Scope of %s specified by INF %s in FDF" %(FfsInf.CurrentArch, File.File, File.Arch, FfsInf.InfFileName))
 
-        if Suffix != None and os.path.exists(FfsInf.EfiOutputPath):
+        if Suffix != None:
             #
             # Get Makefile path and time stamp
             #

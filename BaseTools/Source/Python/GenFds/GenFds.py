@@ -99,6 +99,8 @@ def main():
                 GenFdsGlobalVariable.EdkSourceDir = os.path.normcase(os.environ['EDK_SOURCE'])
             if (Options.debug):
                 GenFdsGlobalVariable.VerboseLogger("Using Workspace:" + Workspace)
+            if Options.GenfdsMultiThread:
+                GenFdsGlobalVariable.EnableGenfdsMultiThread = True
         os.chdir(GenFdsGlobalVariable.WorkSpaceDir)
         
         # set multiple workspace
@@ -538,6 +540,7 @@ def myOptionParser():
     Parser.add_option("--conf", action="store", type="string", dest="ConfDirectory", help="Specify the customized Conf directory.")
     Parser.add_option("--ignore-sources", action="store_true", dest="IgnoreSources", default=False, help="Focus to a binary build and ignore all source files")
     Parser.add_option("--pcd", action="append", dest="OptionPcd", help="Set PCD value by command line. Format: \"PcdName=Value\" ")
+    Parser.add_option("--genfds-multi-thread", action="store_true", dest="GenfdsMultiThread", default=False, help="Enable GenFds multi thread to generate ffs file.")
 
     (Options, args) = Parser.parse_args()
     return Options
@@ -611,6 +614,23 @@ class GenFds :
                 for DriverName in GenFdsGlobalVariable.FdfParser.Profile.OptRomDict.keys():
                     OptRomObj = GenFdsGlobalVariable.FdfParser.Profile.OptRomDict[DriverName]
                     OptRomObj.AddToBuffer(None)
+    @staticmethod
+    def GenFfsMakefile(OutputDir, FdfParser, WorkSpace, ArchList, GlobalData):
+        GenFdsGlobalVariable.SetEnv(FdfParser, WorkSpace, ArchList, GlobalData)
+        for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
+            FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
+            FdObj.GenFd(Flag=True)
+
+        for FvName in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
+            FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[FvName]
+            FvObj.AddToBuffer(Buffer=None, Flag=True)
+
+        if GenFdsGlobalVariable.FdfParser.Profile.OptRomDict != {}:
+            for DriverName in GenFdsGlobalVariable.FdfParser.Profile.OptRomDict.keys():
+                OptRomObj = GenFdsGlobalVariable.FdfParser.Profile.OptRomDict[DriverName]
+                OptRomObj.AddToBuffer(Buffer=None, Flag=True)
+
+        return GenFdsGlobalVariable.FfsCmdDict
 
     ## GetFvBlockSize()
     #

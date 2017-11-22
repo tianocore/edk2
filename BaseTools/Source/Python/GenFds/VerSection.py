@@ -1,7 +1,7 @@
 ## @file
 # process Version section generation
 #
-#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -48,7 +48,7 @@ class VerSection (VerSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict={}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict={}, IsMakefile = False):
         #
         # Prepare the parameter of GenSection
         #
@@ -65,7 +65,7 @@ class VerSection (VerSectionClassObject):
         # Get String Data
         StringData = ''
         if self.StringData != None:
-             StringData = self.StringData
+            StringData = self.StringData
         elif self.FileName != None:
             FileNameStr = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)
             FileNameStr = GenFdsGlobalVariable.MacroExtend(FileNameStr, Dict)
@@ -75,9 +75,8 @@ class VerSection (VerSectionClassObject):
             FileObj.close()
         else:
             StringData = ''
-
         GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_VERSION',
-                                             Ver=StringData, BuildNumber=self.BuildNum)
+                                             Ver=StringData, BuildNumber=self.BuildNum, IsMakefile=IsMakefile)
         OutputFileList = []
         OutputFileList.append(OutputFile)
         return OutputFileList, self.Alignment

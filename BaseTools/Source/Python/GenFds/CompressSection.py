@@ -1,7 +1,7 @@
 ## @file
 # process compress section generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -53,7 +53,7 @@ class CompressSection (CompressSectionClassObject) :
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False):
 
         if FfsInf != None:
             self.CompType = FfsInf.__ExtendMacro__(self.CompType)
@@ -64,10 +64,10 @@ class CompressSection (CompressSectionClassObject) :
         for Sect in self.SectionList:
             Index = Index + 1
             SecIndex = '%s.%d' %(SecNum, Index)
-            ReturnSectList, AlignValue = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList, FfsInf, Dict)
+            ReturnSectList, AlignValue = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList, FfsInf, Dict, IsMakefile=IsMakefile)
             if ReturnSectList != []:
                 for FileData in ReturnSectList:
-                   SectFiles += (FileData,)
+                    SectFiles += (FileData,)
 
 
         OutputFile = OutputPath + \
@@ -79,7 +79,7 @@ class CompressSection (CompressSectionClassObject) :
         OutputFile = os.path.normpath(OutputFile)
 
         GenFdsGlobalVariable.GenerateSection(OutputFile, SectFiles, Section.Section.SectionType['COMPRESS'],
-                                             CompressionType=self.CompTypeDict[self.CompType])
+                                             CompressionType=self.CompTypeDict[self.CompType], IsMakefile=IsMakefile)
         OutputFileList = []
         OutputFileList.append(OutputFile)
         return OutputFileList, self.Alignment

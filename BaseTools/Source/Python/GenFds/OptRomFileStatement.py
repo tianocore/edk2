@@ -1,7 +1,7 @@
 ## @file
 # process OptionROM generation from FILE statement
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -39,7 +39,7 @@ class OptRomFileStatement:
     #   @param  Dict        dictionary contains macro and value pair
     #   @retval string      Generated FFS file name
     #
-    def GenFfs(self, Dict = {}):
+    def GenFfs(self, Dict = {}, IsMakefile=False):
         
         if self.FileName != None:
             self.FileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)

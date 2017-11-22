@@ -1,7 +1,7 @@
 ## @file
 # process depex section generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -76,7 +76,7 @@ class DepexSection (DepexSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name list, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, keyStringList, FfsFile = None, Dict = {}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, keyStringList, FfsFile = None, Dict = {}, IsMakefile = False):
         
         if self.ExpressionProcessed == False:
             self.Expression = self.Expression.replace("\n", " ").replace("\r", " ")
@@ -119,6 +119,6 @@ class DepexSection (DepexSectionClassObject):
         OutputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.dpx')
         OutputFile = os.path.normpath(OutputFile)
 
-        GenFdsGlobalVariable.GenerateSection(OutputFile, [InputFile], Section.Section.SectionType.get (SecType))
+        GenFdsGlobalVariable.GenerateSection(OutputFile, [InputFile], Section.Section.SectionType.get (SecType), IsMakefile=IsMakefile)
         FileList = [OutputFile]
         return FileList, self.Alignment

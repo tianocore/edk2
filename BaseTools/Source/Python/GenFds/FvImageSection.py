@@ -50,7 +50,7 @@ class FvImageSection(FvImageSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False):
 
         OutputFileList = []
         if self.FvFileType != None:
@@ -75,7 +75,7 @@ class FvImageSection(FvImageSectionClassObject):
                     MaxFvAlignment = FvAlignmentValue
 
                 OutputFile = os.path.join(OutputPath, ModuleName + 'SEC' + Num + Ffs.SectionSuffix.get("FV_IMAGE"))
-                GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE')
+                GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE', IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
             # MaxFvAlignment is larger than or equal to 1K
@@ -101,7 +101,7 @@ class FvImageSection(FvImageSectionClassObject):
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName)
             if Fv != None:
                 self.Fv = Fv
-                FvFileName = Fv.AddToBuffer(Buffer, self.FvAddr, MacroDict = Dict)
+                FvFileName = Fv.AddToBuffer(Buffer, self.FvAddr, MacroDict = Dict, Flag=IsMakefile)
                 if Fv.FvAlignment != None:
                     if self.Alignment == None:
                         self.Alignment = Fv.FvAlignment
@@ -139,7 +139,7 @@ class FvImageSection(FvImageSectionClassObject):
             # Prepare the parameter of GenSection
             #
             OutputFile = os.path.join(OutputPath, ModuleName + 'SEC' + SecNum + Ffs.SectionSuffix.get("FV_IMAGE"))
-            GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE')
+            GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE', IsMakefile=IsMakefile)
             OutputFileList.append(OutputFile)
 
             return OutputFileList, self.Alignment

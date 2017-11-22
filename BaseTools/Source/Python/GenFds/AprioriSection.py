@@ -1,7 +1,7 @@
 ## @file
 # process APRIORI file data and generate PEI/DXE APRIORI file
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -47,7 +47,7 @@ class AprioriSection (AprioriSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval string      Generated file name
     #
-    def GenFfs (self, FvName, Dict = {}):
+    def GenFfs (self, FvName, Dict = {}, IsMakefile = False):
         DXE_GUID = "FC510EE7-FFDC-11D4-BD41-0080C73C8881"
         PEI_GUID = "1B45CC0A-156A-428A-AF62-49864DA0E6E6"
         Buffer = StringIO.StringIO('')
@@ -66,6 +66,7 @@ class AprioriSection (AprioriSectionClassObject):
                                     AprioriFileGuid + FvName + '.Ffs')
 
         Dict.update(self.DefineVarDict)
+        InfFileName = None
         for FfsObj in self.FfsList :
             Guid = ""
             if isinstance(FfsObj, FfsFileStatement.FileStatement):
@@ -110,9 +111,14 @@ class AprioriSection (AprioriSectionClassObject):
 
         RawSectionFileName = os.path.join( OutputAprFilePath, \
                                        AprioriFileGuid + FvName + '.raw' )
-        GenFdsGlobalVariable.GenerateSection(RawSectionFileName, [OutputAprFileName], 'EFI_SECTION_RAW')
+        MakefilePath = None
+        if IsMakefile:
+            if not InfFileName:
+                return None
+            MakefilePath = InfFileName, Arch
+        GenFdsGlobalVariable.GenerateSection(RawSectionFileName, [OutputAprFileName], 'EFI_SECTION_RAW', IsMakefile=IsMakefile)
         GenFdsGlobalVariable.GenerateFfs(AprFfsFileName, [RawSectionFileName],
-                                         'EFI_FV_FILETYPE_FREEFORM', AprioriFileGuid)
+                                        'EFI_FV_FILETYPE_FREEFORM', AprioriFileGuid, MakefilePath=MakefilePath)
 
         return AprFfsFileName
 

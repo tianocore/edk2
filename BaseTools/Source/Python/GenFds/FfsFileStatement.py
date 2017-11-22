@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from FILE statement
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -57,7 +57,7 @@ class FileStatement (FileStatementClassObject) :
     #   @param  FvParentAddr Parent Fv base address
     #   @retval string       Generated FFS file name
     #
-    def GenFfs(self, Dict = {}, FvChildAddr=[], FvParentAddr=None):
+    def GenFfs(self, Dict = {}, FvChildAddr=[], FvParentAddr=None, IsMakefile=False):
         
         if self.NameGuid != None and self.NameGuid.startswith('PCD('):
             PcdValue = GenFdsGlobalVariable.GetPcdValue(self.NameGuid)

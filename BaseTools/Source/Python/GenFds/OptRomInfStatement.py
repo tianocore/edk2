@@ -1,7 +1,7 @@
 ## @file
 # process OptionROM generation from INF statement
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -81,7 +81,7 @@ class OptRomInfStatement (FfsInfStatement):
     #   @param  self        The object pointer
     #   @retval string      Generated .efi file name
     #
-    def GenFfs(self):
+    def GenFfs(self, IsMakefile=False):
         #
         # Parse Inf file get Module related information
         #
@@ -98,13 +98,13 @@ class OptRomInfStatement (FfsInfStatement):
         # For the rule only has simpleFile
         #
         if isinstance (Rule, RuleSimpleFile.RuleSimpleFile) :
-            EfiOutputList = self.__GenSimpleFileSection__(Rule)
+            EfiOutputList = self.__GenSimpleFileSection__(Rule, IsMakefile=IsMakefile)
             return EfiOutputList
         #
         # For Rule has ComplexFile
         #
         elif isinstance(Rule, RuleComplexFile.RuleComplexFile):
-            EfiOutputList = self.__GenComplexFileSection__(Rule)
+            EfiOutputList = self.__GenComplexFileSection__(Rule, IsMakefile=IsMakefile)
             return EfiOutputList
 
     ## __GenSimpleFileSection__() method
@@ -115,7 +115,7 @@ class OptRomInfStatement (FfsInfStatement):
     #   @param  Rule        The rule object used to generate section
     #   @retval string      File name of the generated section file
     #
-    def __GenSimpleFileSection__(self, Rule):
+    def __GenSimpleFileSection__(self, Rule, IsMakefile = False):
         #
         # Prepare the parameter of GenSection
         #
@@ -138,7 +138,7 @@ class OptRomInfStatement (FfsInfStatement):
     #   @param  Rule        The rule object used to generate section
     #   @retval string      File name of the generated section file
     #
-    def __GenComplexFileSection__(self, Rule):
+    def __GenComplexFileSection__(self, Rule, IsMakefile=False):
 
         OutputFileList = []
         for Sect in Rule.SectionList:

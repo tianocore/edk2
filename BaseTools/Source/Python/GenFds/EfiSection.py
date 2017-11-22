@@ -53,7 +53,7 @@ class EfiSection (EfiSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name list, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}) :
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False) :
         
         if self.FileName != None and self.FileName.startswith('PCD('):
             self.FileName = GenFdsGlobalVariable.GetPcdValue(self.FileName)
@@ -91,6 +91,8 @@ class EfiSection (EfiSectionClassObject):
                 FileList.append(Filename)
             elif os.path.exists(Filename):
                 FileList.append(Filename)
+            elif '.depex' in FfsInf.FinalTargetSuffixMap or FfsInf.Depex:
+                FileList.append(Filename)
         else:
             FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FileType, self.FileExtension, Dict)
             if IsSect :
@@ -119,8 +121,9 @@ class EfiSection (EfiSectionClassObject):
                 Num = SecNum
                 OutputFile = os.path.join( OutputPath, ModuleName + 'SEC' + str(Num) + Ffs.SectionSuffix.get(SectionType))
                 GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_VERSION',
-                                                     #Ui=StringData, 
-                                                     Ver=BuildNum)
+                                                    #Ui=StringData,
+                                                    Ver=BuildNum,
+                                                    IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
             elif FileList != []:
@@ -135,8 +138,9 @@ class EfiSection (EfiSectionClassObject):
                     if BuildNum != None and BuildNum != '':
                         BuildNumTuple = ('-j', BuildNum)
                     GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_VERSION',
-                                                         #Ui=VerString, 
-                                                         Ver=BuildNum)
+                                                        #Ui=VerString,
+                                                        Ver=BuildNum,
+                                                        IsMakefile=IsMakefile)
                     OutputFileList.append(OutputFile)
 
             else:
@@ -157,8 +161,9 @@ class EfiSection (EfiSectionClassObject):
                 Num = SecNum
                 OutputFile = os.path.join( OutputPath, ModuleName + 'SEC' + str(Num) + Ffs.SectionSuffix.get(SectionType))
                 GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_VERSION',
-                                                     #Ui=VerString, 
-                                                     Ver=BuildNum)
+                                                    #Ui=VerString,
+                                                    Ver=BuildNum,
+                                                    IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
         #
@@ -175,7 +180,7 @@ class EfiSection (EfiSectionClassObject):
                 Num = SecNum
                 OutputFile = os.path.join( OutputPath, ModuleName + 'SEC' + str(Num) + Ffs.SectionSuffix.get(SectionType))
                 GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_USER_INTERFACE',
-                                                     Ui=StringData)
+                                                     Ui=StringData, IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
             elif FileList != []:
@@ -187,7 +192,7 @@ class EfiSection (EfiSectionClassObject):
                     UiString = f.read()
                     f.close()
                     GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_USER_INTERFACE',
-                                                         Ui=UiString)
+                                                        Ui=UiString, IsMakefile=IsMakefile)
                     OutputFileList.append(OutputFile)
             else:
                 if StringData != None and len(StringData) > 0:
@@ -204,7 +209,7 @@ class EfiSection (EfiSectionClassObject):
                 Num = SecNum
                 OutputFile = os.path.join( OutputPath, ModuleName + 'SEC' + str(Num) + Ffs.SectionSuffix.get(SectionType))
                 GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_USER_INTERFACE',
-                                                     Ui=StringData)
+                                                     Ui=StringData, IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
 
@@ -238,23 +243,36 @@ class EfiSection (EfiSectionClassObject):
 
                     if File[(len(File)-4):] == '.efi':
                         MapFile = File.replace('.efi', '.map')
-                        if os.path.exists(MapFile):
-                            CopyMapFile = os.path.join(OutputPath, ModuleName + '.map')
-                            if not os.path.exists(CopyMapFile) or \
-                                   (os.path.getmtime(MapFile) > os.path.getmtime(CopyMapFile)):
-                                CopyLongFilePath(MapFile, CopyMapFile)
+                        CopyMapFile = os.path.join(OutputPath, ModuleName + '.map')
+                        if IsMakefile:
+                            if GenFdsGlobalVariable.CopyList == []:
+                                GenFdsGlobalVariable.CopyList = [(MapFile, CopyMapFile)]
+                            else:
+                                GenFdsGlobalVariable.CopyList.append((MapFile, CopyMapFile))
+                        else:
+                            if os.path.exists(MapFile):
+                                if not os.path.exists(CopyMapFile) or \
+                                       (os.path.getmtime(MapFile) > os.path.getmtime(CopyMapFile)):
+                                    CopyLongFilePath(MapFile, CopyMapFile)
 
                     if not NoStrip:
                         FileBeforeStrip = os.path.join(OutputPath, ModuleName + '.efi')
-                        if not os.path.exists(FileBeforeStrip) or \
-                            (os.path.getmtime(File) > os.path.getmtime(FileBeforeStrip)):
-                            CopyLongFilePath(File, FileBeforeStrip)
+                        if IsMakefile:
+                            if GenFdsGlobalVariable.CopyList == []:
+                                GenFdsGlobalVariable.CopyList = [(File, FileBeforeStrip)]
+                            else:
+                                GenFdsGlobalVariable.CopyList.append((File, FileBeforeStrip))
+                        else:
+                            if not os.path.exists(FileBeforeStrip) or \
+                                (os.path.getmtime(File) > os.path.getmtime(FileBeforeStrip)):
+                                CopyLongFilePath(File, FileBeforeStrip)
                         StrippedFile = os.path.join(OutputPath, ModuleName + '.stripped')
                         GenFdsGlobalVariable.GenerateFirmwareImage(
-                                                StrippedFile,
-                                                [File],
-                                                Strip=True
-                                                )
+                                StrippedFile,
+                                [File],
+                                Strip=True,
+                                IsMakefile = IsMakefile
+                            )
                         File = StrippedFile
                     
                     """For TE Section call GenFw to generate TE image"""
@@ -262,17 +280,19 @@ class EfiSection (EfiSectionClassObject):
                     if SectionType == 'TE':
                         TeFile = os.path.join( OutputPath, ModuleName + 'Te.raw')
                         GenFdsGlobalVariable.GenerateFirmwareImage(
-                                                TeFile,
-                                                [File],
-                                                Type='te'
-                                                )
+                                TeFile,
+                                [File],
+                                Type='te',
+                                IsMakefile = IsMakefile
+                            )
                         File = TeFile
 
                     """Call GenSection"""
                     GenFdsGlobalVariable.GenerateSection(OutputFile,
-                                                         [File],
-                                                         Section.Section.SectionType.get (SectionType)
-                                                         )
+                                                        [File],
+                                                        Section.Section.SectionType.get (SectionType),
+                                                        IsMakefile=IsMakefile
+                                                        )
                     OutputFileList.append(OutputFile)
 
         return OutputFileList, Align

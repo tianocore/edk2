@@ -48,7 +48,7 @@ class UiSection (UiSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict={}):
+    def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf=None, Dict={}, IsMakefile = False):
         #
         # Prepare the parameter of GenSection
         #
@@ -69,8 +69,7 @@ class UiSection (UiSectionClassObject):
             FileObj.close()
         else:
             NameString = ''
-
-        GenFdsGlobalVariable.GenerateSection(OutputFile, None, 'EFI_SECTION_USER_INTERFACE', Ui=NameString)
+        GenFdsGlobalVariable.GenerateSection(OutputFile, None, 'EFI_SECTION_USER_INTERFACE', Ui=NameString, IsMakefile=IsMakefile)
 
         OutputFileList = []
         OutputFileList.append(OutputFile)

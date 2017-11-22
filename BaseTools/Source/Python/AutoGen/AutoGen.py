@@ -1307,12 +1307,15 @@ class PlatformAutoGen(AutoGen):
     #   @param      CreateModuleMakeFile    Flag indicating if the makefile for
     #                                       modules will be created as well
     #
-    def CreateMakeFile(self, CreateModuleMakeFile=False):
+    def CreateMakeFile(self, CreateModuleMakeFile=False, FfsCommand = {}):
         if CreateModuleMakeFile:
             for ModuleFile in self.Platform.Modules:
                 Ma = ModuleAutoGen(self.Workspace, ModuleFile, self.BuildTarget,
                                    self.ToolChain, self.Arch, self.MetaFile)
-                Ma.CreateMakeFile(True)
+                if (ModuleFile.File, self.Arch) in FfsCommand:
+                    Ma.CreateMakeFile(True, FfsCommand[ModuleFile.File, self.Arch])
+                else:
+                    Ma.CreateMakeFile(True)
                 #Ma.CreateAsBuiltInf()
 
         # no need to create makefile for the platform more than once
@@ -2760,6 +2763,7 @@ class ModuleAutoGen(AutoGen):
 
         self._BuildDir        = None
         self._OutputDir       = None
+        self._FfsOutputDir    = None
         self._DebugDir        = None
         self._MakeFileDir     = None
 
@@ -2876,6 +2880,7 @@ class ModuleAutoGen(AutoGen):
             self._Macro["PLATFORM_RELATIVE_DIR" ] = self.PlatformInfo.SourceDir
             self._Macro["PLATFORM_DIR"          ] = mws.join(self.WorkspaceDir, self.PlatformInfo.SourceDir)
             self._Macro["PLATFORM_OUTPUT_DIR"   ] = self.PlatformInfo.OutputDir
+            self._Macro["FFS_OUTPUT_DIR"        ] = self.FfsOutputDir
         return self._Macro
 
     ## Return the module build data object
@@ -2965,6 +2970,15 @@ class ModuleAutoGen(AutoGen):
             self._OutputDir = path.join(self.BuildDir, "OUTPUT")
             CreateDirectory(self._OutputDir)
         return self._OutputDir
+
+    ## Return the directory to store ffs file
+    def _GetFfsOutputDir(self):
+        if self._FfsOutputDir == None:
+            if GlobalData.gFdfParser != None:
+                self._FfsOutputDir = path.join(self.PlatformInfo.BuildDir, "FV", "Ffs", self.Guid + self.Name)
+            else:
+                self._FfsOutputDir = ''
+        return self._FfsOutputDir
 
     ## Return the directory to store auto-gened source files of the mdoule
     def _GetDebugDir(self):
@@ -4222,14 +4236,14 @@ class ModuleAutoGen(AutoGen):
     #   @param      CreateLibraryMakeFile   Flag indicating if or not the makefiles of
     #                                       dependent libraries will be created
     #
-    def CreateMakeFile(self, CreateLibraryMakeFile=True):
+    def CreateMakeFile(self, CreateLibraryMakeFile=True, GenFfsList = []):
         # Ignore generating makefile when it is a binary module
         if self.IsBinaryModule:
             return
 
         if self.IsMakeFileCreated:
             return
-
+        self.GenFfsList = GenFfsList
         if not self.IsLibrary and CreateLibraryMakeFile:
             for LibraryAutoGen in self.LibraryAutoGenList:
                 LibraryAutoGen.CreateMakeFile()
@@ -4457,6 +4471,7 @@ class ModuleAutoGen(AutoGen):
     IsBinaryModule  = property(_IsBinaryModule)
     BuildDir        = property(_GetBuildDir)
     OutputDir       = property(_GetOutputDir)
+    FfsOutputDir    = property(_GetFfsOutputDir)
     DebugDir        = property(_GetDebugDir)
     MakeFileDir     = property(_GetMakeFileDir)
     CustomMakefile  = property(_GetCustomMakefile)

@@ -143,6 +143,11 @@ class BuildFile(object):
         "nmake" :   'if exist %(dir)s $(RD) %(dir)s',
         "gmake" :   "$(RD) %(dir)s"
     }
+    ## cp if exist
+    _CP_TEMPLATE_ = {
+        "nmake" :   'if exist %(Src)s $(CP) %(Src)s %(Dst)s',
+        "gmake" :   "test -f %(Src)s && $(CP) %(Src)s %(Dst)s"
+    }
 
     _CD_TEMPLATE_ = {
         "nmake" :   'if exist %(dir)s cd %(dir)s',
@@ -211,6 +216,8 @@ class BuildFile(object):
             for MacroName in MacroDefinitions:
                 MacroValue = MacroDefinitions[MacroName]
                 MacroValueLength = len(MacroValue)
+                if MacroValueLength == 0:
+                    continue
                 if MacroValueLength <= PathLength and Path.startswith(MacroValue):
                     Path = "$(%s)%s" % (MacroName, Path[MacroValueLength:])
                     break
@@ -250,6 +257,7 @@ BASE_NAME = $(MODULE_NAME)
 MODULE_RELATIVE_DIR = ${module_relative_directory}
 PACKAGE_RELATIVE_DIR = ${package_relative_directory}
 MODULE_DIR = ${module_dir}
+FFS_OUTPUT_DIR = ${ffs_output_directory}
 
 MODULE_ENTRY_POINT = ${module_entry_point}
 ARCH_ENTRY_POINT = ${arch_entry_point}
@@ -441,6 +449,10 @@ cleanlib:
         self.Macros["BIN_DIR"         ] = self._AutoGenObject.Macros["BIN_DIR"]
         self.Macros["BUILD_DIR"       ] = self._AutoGenObject.Macros["BUILD_DIR"]
         self.Macros["WORKSPACE"       ] = self._AutoGenObject.Macros["WORKSPACE"]
+        self.Macros["FFS_OUTPUT_DIR"  ] = self._AutoGenObject.Macros["FFS_OUTPUT_DIR"]
+        self.GenFfsList                 = ModuleAutoGen.GenFfsList
+        self.MacroList = ['FFS_OUTPUT_DIR', 'MODULE_GUID', 'OUTPUT_DIR']
+        self.FfsOutputFileList = []
 
     # Compose a dict object containing information used to do replacement in template
     def _CreateTemplateDict(self):
@@ -555,6 +567,7 @@ cleanlib:
                             ExtraData="[%s]" % str(self._AutoGenObject))
 
         self.ProcessBuildTargetList()
+        self.ParserGenerateFfsCmd()
 
         # Generate macros used to represent input files
         FileMacroList = [] # macro name = file list
@@ -627,6 +640,7 @@ cleanlib:
             "platform_version"          : self.PlatformInfo.Version,
             "platform_relative_directory": self.PlatformInfo.SourceDir,
             "platform_output_directory" : self.PlatformInfo.OutputDir,
+            "ffs_output_directory"      : self._AutoGenObject.Macros["FFS_OUTPUT_DIR"],
             "platform_dir"              : self._AutoGenObject.Macros["PLATFORM_DIR"],
 
             "module_name"               : self._AutoGenObject.Name,
@@ -672,6 +686,79 @@ cleanlib:
         }
 
         return MakefileTemplateDict
+
+    def ParserGenerateFfsCmd(self):
+        #Add Ffs cmd to self.BuildTargetList
+        OutputFile = ''
+        DepsFileList = []
+
+        for Cmd in self.GenFfsList:
+            if Cmd[2]:
+                for CopyCmd in Cmd[2]:
+                    Src, Dst = CopyCmd
+                    Src = self.ReplaceMacro(Src)
+                    Dst = self.ReplaceMacro(Dst)
+                    if Dst not in self.ResultFileList:
+                        self.ResultFileList.append('%s' % Dst)
+                    if '%s :' %(Dst) not in self.BuildTargetList:
+                        self.BuildTargetList.append("%s :" %(Dst))
+                        self.BuildTargetList.append('\t' + self._CP_TEMPLATE_[self._FileType] %{'Src': Src, 'Dst': Dst})
+
+            FfsCmdList = Cmd[0]
+            for index, Str in enumerate(FfsCmdList):
+                if '-o' == Str:
+                    OutputFile = FfsCmdList[index + 1]
+                if '-i' == Str:
+                    if DepsFileList == []:
+                        DepsFileList = [FfsCmdList[index + 1]]
+                    else:
+                        DepsFileList.append(FfsCmdList[index + 1])
+            DepsFileString = ' '.join(DepsFileList).strip()
+            if DepsFileString == '':
+                continue
+            OutputFile = self.ReplaceMacro(OutputFile)
+            self.ResultFileList.append('%s' % OutputFile)
+            DepsFileString = self.ReplaceMacro(DepsFileString)
+            self.BuildTargetList.append('%s : %s' % (OutputFile, DepsFileString))
+            CmdString = ' '.join(FfsCmdList).strip()
+            CmdString = self.ReplaceMacro(CmdString)
+            self.BuildTargetList.append('\t%s' % CmdString)
+
+            self.ParseSecCmd(DepsFileList, Cmd[1])
+            for SecOutputFile, SecDepsFile, SecCmd in self.FfsOutputFileList :
+                self.BuildTargetList.append('%s : %s' % (self.ReplaceMacro(SecOutputFile), self.ReplaceMacro(SecDepsFile)))
+                self.BuildTargetList.append('\t%s' % self.ReplaceMacro(SecCmd))
+            self.FfsOutputFileList = []
+
+    def ParseSecCmd(self, OutputFileList, CmdTuple):
+        for OutputFile in OutputFileList:
+            for SecCmdStr in CmdTuple:
+                SecDepsFileList = []
+                SecCmdList = SecCmdStr.split()
+                CmdName = SecCmdList[0]
+                for index, CmdItem in enumerate(SecCmdList):
+                    if '-o' == CmdItem and OutputFile == SecCmdList[index + 1]:
+                        index = index + 1
+                        while index + 1 < len(SecCmdList):
+                            if not SecCmdList[index+1].startswith('-'):
+                                SecDepsFileList.append(SecCmdList[index + 1])
+                            index = index + 1
+                        if CmdName == 'Trim':
+                            SecDepsFileList.append(os.path.join('$(DEBUG_DIR)', os.path.basename(OutputFile).replace('offset', 'efi')))
+                        if OutputFile.endswith('.ui') or OutputFile.endswith('.ver'):
+                            SecDepsFileList.append(os.path.join('$(MODULE_DIR)','$(MODULE_FILE)'))
+                        self.FfsOutputFileList.append((OutputFile, ' '.join(SecDepsFileList), SecCmdStr))
+                        if len(SecDepsFileList) > 0:
+                            self.ParseSecCmd(SecDepsFileList, CmdTuple)
+                        break
+                    else:
+                        continue
+
+    def ReplaceMacro(self, str):
+        for Macro in self.MacroList:
+            if self._AutoGenObject.Macros[Macro] and self._AutoGenObject.Macros[Macro] in str:
+                str = str.replace(self._AutoGenObject.Macros[Macro], '$(' + Macro + ')')
+        return str
 
     def CommandExceedLimit(self):
         FlagDict = {
@@ -1453,7 +1540,8 @@ class TopLevelMakefile(BuildFile):
 
         if GlobalData.gCaseInsensitive:
             ExtraOption += " -c"
-
+        if GlobalData.gEnableGenfdsMultiThread:
+            ExtraOption += " --genfds-multi-thread"
         if GlobalData.gIgnoreSource:
             ExtraOption += " --ignore-sources"
 
