@@ -178,6 +178,7 @@ PcatIsaAcpiDriverBindingStart (
   Enabled = FALSE;
   Supports = 0;
   PcatIsaAcpiDev = NULL;
+  OriginalAttributes = 0;
   //
   // Open the PCI I/O Protocol Interface
   //
