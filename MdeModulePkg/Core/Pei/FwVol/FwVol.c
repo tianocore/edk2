@@ -1295,6 +1295,68 @@ PeiFfsGetVolumeInfo (
 }
 
 /**
+  Find USED_SIZE FV_EXT_TYPE entry in FV extension header and get the FV used size.
+
+  @param[in]  FvHeader      Pointer to FV header.
+  @param[out] FvUsedSize    Pointer to FV used size returned,
+                            only valid if USED_SIZE FV_EXT_TYPE entry is found.
+  @param[out] EraseByte     Pointer to erase byte returned,
+                            only valid if USED_SIZE FV_EXT_TYPE entry is found.
+
+  @retval TRUE              USED_SIZE FV_EXT_TYPE entry is found,
+                            FV used size and erase byte are returned.
+  @retval FALSE             No USED_SIZE FV_EXT_TYPE entry found.
+
+**/
+BOOLEAN
+GetFvUsedSize (
+  IN EFI_FIRMWARE_VOLUME_HEADER     *FvHeader,
+  OUT UINT32                        *FvUsedSize,
+  OUT UINT8                         *EraseByte
+  )
+{
+  UINT16                                        ExtHeaderOffset;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER                *ExtHeader;
+  EFI_FIRMWARE_VOLUME_EXT_ENTRY                 *ExtEntryList;
+  EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE  *ExtEntryUsedSize;
+
+  ExtHeaderOffset = ReadUnaligned16 (&FvHeader->ExtHeaderOffset);
+  if (ExtHeaderOffset != 0) {
+    ExtHeader    = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) ((UINT8 *) FvHeader + ExtHeaderOffset);
+    ExtEntryList = (EFI_FIRMWARE_VOLUME_EXT_ENTRY *) (ExtHeader + 1);
+    while ((UINTN) ExtEntryList < ((UINTN) ExtHeader + ReadUnaligned32 (&ExtHeader->ExtHeaderSize))) {
+      if (ReadUnaligned16 (&ExtEntryList->ExtEntryType) == EFI_FV_EXT_TYPE_USED_SIZE_TYPE) {
+        //
+        // USED_SIZE FV_EXT_TYPE entry is found.
+        //
+        ExtEntryUsedSize = (EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE *) ExtEntryList;
+        *FvUsedSize = ReadUnaligned32 (&ExtEntryUsedSize->UsedSize);
+        if ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_ERASE_POLARITY) != 0) {
+          *EraseByte = 0xFF;
+        } else {
+          *EraseByte = 0;
+        }
+        DEBUG ((
+          DEBUG_INFO,
+          "FV at 0x%x has 0x%x used size, and erase byte is 0x%02x\n",
+          FvHeader,
+          *FvUsedSize,
+          *EraseByte
+          ));
+        return TRUE;
+      }
+      ExtEntryList = (EFI_FIRMWARE_VOLUME_EXT_ENTRY *)
+                     ((UINT8 *) ExtEntryList + ReadUnaligned16 (&ExtEntryList->ExtEntrySize));
+    }
+  }
+
+  //
+  // No USED_SIZE FV_EXT_TYPE entry found.
+  //
+  return FALSE;
+}
+
+/**
   Get Fv image from the FV type file, then install FV INFO(2) ppi, Build FV hob.
 
   @param PrivateData          PeiCore's private data structure
@@ -1326,7 +1388,9 @@ ProcessFvFile (
   EFI_FV_FILE_INFO              FileInfo;
   UINT64                        FvLength;
   UINT32                        AuthenticationStatus;
-  
+  UINT32                        FvUsedSize;
+  UINT8                         EraseByte;
+
   //
   // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
   // been extracted.
@@ -1391,8 +1455,16 @@ ProcessFvFile (
       FvAlignment = 8;
     }
 
+    DEBUG ((
+      DEBUG_INFO,
+      "%a() FV at 0x%x, FvAlignment required is 0x%x\n",
+      __FUNCTION__,
+      FvHeader,
+      FvAlignment
+      ));
+
     //
-    // Check FvImage
+    // Check FvImage alignment.
     //
     if ((UINTN) FvHeader % FvAlignment != 0) {
       FvLength    = ReadUnaligned64 (&FvHeader->FvLength);
@@ -1400,7 +1472,19 @@ ProcessFvFile (
       if (NewFvBuffer == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      CopyMem (NewFvBuffer, FvHeader, (UINTN) FvLength);
+      if (GetFvUsedSize (FvHeader, &FvUsedSize, &EraseByte)) {
+        //
+        // Copy the used bytes and fill the rest with the erase value.
+        //
+        CopyMem (NewFvBuffer, FvHeader, (UINTN) FvUsedSize);
+        SetMem (
+          (UINT8 *) NewFvBuffer + FvUsedSize,
+          (UINTN) (FvLength - FvUsedSize),
+          EraseByte
+          );
+      } else {
+        CopyMem (NewFvBuffer, FvHeader, (UINTN) FvLength);
+      }
       FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) NewFvBuffer;
     }
   }
