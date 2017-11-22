@@ -16,6 +16,12 @@
 @echo off
 goto  :main
 
+:set_vsvars
+for /f "usebackq tokens=1* delims=: " %%i in (`%*`) do (
+  if /i "%%i"=="installationPath" call "%%j\VC\Auxiliary\Build\vcvars32.bat"
+)
+goto :EOF
+
 :read_vsvars
 @rem Do nothing if already found, otherwise call vsvars32.bat if there
 if defined VCINSTALLDIR goto :EOF
@@ -33,6 +39,8 @@ REM       (Or invoke the relevant vsvars32 file beforehand).
 
 :main
 if defined VCINSTALLDIR goto :done
+  if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"  call :set_vsvars "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+  if exist "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"       call :set_vsvars "%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe"
   if defined VS140COMNTOOLS  call :read_vsvars  "%VS140COMNTOOLS%"
   if defined VS120COMNTOOLS  call :read_vsvars  "%VS120COMNTOOLS%"
   if defined VS110COMNTOOLS  call :read_vsvars  "%VS110COMNTOOLS%"
