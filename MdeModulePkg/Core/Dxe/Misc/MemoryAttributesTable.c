@@ -241,6 +241,23 @@ InstallMemoryAttributesTableOnReadyToBoot (
 }
 
 /**
+  Install initial MemoryAttributesTable on EndOfDxe.
+  Then SMM can consume this information.
+
+  @param[in] Event      The Event this notify function registered to.
+  @param[in] Context    Pointer to the context data registered to the Event.
+**/
+VOID
+EFIAPI
+InstallMemoryAttributesTableOnEndOfDxe (
+  IN EFI_EVENT          Event,
+  IN VOID               *Context
+  )
+{
+  InstallMemoryAttributesTable ();
+}
+
+/**
   Initialize MemoryAttrubutesTable support.
 **/
 VOID
@@ -251,17 +268,34 @@ CoreInitializeMemoryAttributesTable (
 {
   EFI_STATUS  Status;
   EFI_EVENT   ReadyToBootEvent;
+  EFI_EVENT   EndOfDxeEvent;
 
   //
   // Construct the table at ReadyToBoot.
   //
   Status = CoreCreateEventInternal (
              EVT_NOTIFY_SIGNAL,
-             TPL_CALLBACK - 1,
+             TPL_CALLBACK,
              InstallMemoryAttributesTableOnReadyToBoot,
              NULL,
              &gEfiEventReadyToBootGuid,
              &ReadyToBootEvent
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Construct the initial table at EndOfDxe,
+  // then SMM can consume this information.
+  // Use TPL_NOTIFY here, as such SMM code (TPL_CALLBACK)
+  // can run after it.
+  //
+  Status = CoreCreateEventInternal (
+             EVT_NOTIFY_SIGNAL,
+             TPL_NOTIFY,
+             InstallMemoryAttributesTableOnEndOfDxe,
+             NULL,
+             &gEfiEndOfDxeEventGroupGuid,
+             &EndOfDxeEvent
              );
   ASSERT_EFI_ERROR (Status);
   return ;
