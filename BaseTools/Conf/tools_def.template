@@ -74,6 +74,12 @@ DEFINE VS2015x86_BIN    = ENV(VS2015_PREFIX)Vc\bin
 DEFINE VS2015x86_DLL    = ENV(VS2015_PREFIX)Common7\IDE;DEF(VS2015x86_BIN)
 DEFINE VS2015x86_BINX64 = DEF(VS2015x86_BIN)\x86_amd64
 
+DEFINE VS2017_BIN         = ENV(VS2017_PREFIX)bin
+DEFINE VS2017_HOST        = x86
+DEFINE VS2017_BIN_HOST    = DEF(VS2017_BIN)\HostDEF(VS2017_HOST)\DEF(VS2017_HOST)
+DEFINE VS2017_BIN_IA32    = DEF(VS2017_BIN)\HostDEF(VS2017_HOST)\x86
+DEFINE VS2017_BIN_X64     = DEF(VS2017_BIN)\HostDEF(VS2017_HOST)\x64
+
 DEFINE WINSDK_BIN       = ENV(WINSDK_PREFIX)
 DEFINE WINSDKx86_BIN    = ENV(WINSDKx86_PREFIX)
 
@@ -92,6 +98,9 @@ DEFINE WINSDK8x86_BIN    = ENV(WINSDK8x86_PREFIX)x64
 # Microsoft Visual Studio 2015 Professional Edition
 DEFINE WINSDK81_BIN       = ENV(WINSDK81_PREFIX)x86\
 DEFINE WINSDK81x86_BIN    = ENV(WINSDK81x86_PREFIX)x64
+
+# Microsoft Visual Studio 2017 Professional Edition
+DEFINE WINSDK10_BIN       = ENV(WINSDK10_PREFIX)DEF(VS2017_HOST)
 
 # These defines are needed for certain Microsoft Visual Studio tools that
 # are used by other toolchains.  An example is that ICC on Windows normally
@@ -312,6 +321,14 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #   VS2015      -win32-  Requires:
 #                             Microsoft Visual Studio 2015 Professional Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                        Optional:
+#                             Required to build EBC drivers:
+#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
+#   VS2017      -win32-  Requires:
+#                             Microsoft Visual Studio 2017 version 15.2 or later
 #                        Optional:
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
@@ -4060,6 +4077,115 @@ NOOPT_VS2015x86xASL_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT
 *_VS2015x86xASL_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
 *_VS2015x86xASL_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
 
+
+####################################################################################
+#   VS2017       - Microsoft Visual Studio 2017 with Intel ASL
+#   ASL          - Intel ACPI Source Language Compiler (iasl.exe)
+####################################################################################
+#   VS2017           - Microsoft Visual Studio 2017 professional Edition with Intel ASL
+*_VS2017_*_*_FAMILY        = MSFT
+*_VS2017_*_*_DLL           = DEF(VS2017_BIN_HOST)
+
+*_VS2017_*_MAKE_PATH       = DEF(VS2017_BIN_HOST)\nmake.exe
+*_VS2017_*_MAKE_FLAG       = /nologo
+*_VS2017_*_RC_PATH         = DEF(WINSDK10_BIN)\rc.exe
+
+*_VS2017_*_MAKE_FLAGS      = /nologo
+*_VS2017_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2017_*_APP_FLAGS       = /nologo /E /TC
+*_VS2017_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2017_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2017_*_DLINK2_FLAGS    = /WHOLEARCHIVE
+*_VS2017_*_ASM16_PATH      = DEF(VS2017_BIN_IA32)\ml.exe
+
+##################
+# ASL definitions
+##################
+*_VS2017_*_ASL_PATH        = DEF(WIN_IASL_BIN)
+*_VS2017_*_ASL_FLAGS       = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2017_*_ASL_OUTFLAGS    = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2017_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2017_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2017_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2017_IA32_CC_PATH      = DEF(VS2017_BIN_IA32)\cl.exe
+*_VS2017_IA32_VFRPP_PATH   = DEF(VS2017_BIN_IA32)\cl.exe
+*_VS2017_IA32_ASLCC_PATH   = DEF(VS2017_BIN_IA32)\cl.exe
+*_VS2017_IA32_ASLPP_PATH   = DEF(VS2017_BIN_IA32)\cl.exe
+*_VS2017_IA32_SLINK_PATH   = DEF(VS2017_BIN_IA32)\lib.exe
+*_VS2017_IA32_DLINK_PATH   = DEF(VS2017_BIN_IA32)\link.exe
+*_VS2017_IA32_ASLDLINK_PATH= DEF(VS2017_BIN_IA32)\link.exe
+*_VS2017_IA32_APP_PATH     = DEF(VS2017_BIN_IA32)\cl.exe
+*_VS2017_IA32_PP_PATH      = DEF(VS2017_BIN_IA32)\cl.exe
+*_VS2017_IA32_ASM_PATH     = DEF(VS2017_BIN_IA32)\ml.exe
+
+      *_VS2017_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2017_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
+RELEASE_VS2017_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2017_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Od
+
+  DEBUG_VS2017_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2017_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2017_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2017_IA32_NASM_FLAGS  = -Ox -f win32 -g
+RELEASE_VS2017_IA32_NASM_FLAGS  = -Ox -f win32
+NOOPT_VS2017_IA32_NASM_FLAGS    = -O0 -f win32 -g
+
+  DEBUG_VS2017_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2017_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
+NOOPT_VS2017_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# X64 definitions
+##################
+*_VS2017_X64_CC_PATH       = DEF(VS2017_BIN_X64)\cl.exe
+*_VS2017_X64_PP_PATH       = DEF(VS2017_BIN_X64)\cl.exe
+*_VS2017_X64_APP_PATH      = DEF(VS2017_BIN_X64)\cl.exe
+*_VS2017_X64_VFRPP_PATH    = DEF(VS2017_BIN_X64)\cl.exe
+*_VS2017_X64_ASLCC_PATH    = DEF(VS2017_BIN_X64)\cl.exe
+*_VS2017_X64_ASLPP_PATH    = DEF(VS2017_BIN_X64)\cl.exe
+*_VS2017_X64_ASM_PATH      = DEF(VS2017_BIN_X64)\ml64.exe
+*_VS2017_X64_SLINK_PATH    = DEF(VS2017_BIN_X64)\lib.exe
+*_VS2017_X64_DLINK_PATH    = DEF(VS2017_BIN_X64)\link.exe
+*_VS2017_X64_ASLDLINK_PATH = DEF(VS2017_BIN_X64)\link.exe
+
+  DEBUG_VS2017_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+RELEASE_VS2017_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+NOOPT_VS2017_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
+
+  DEBUG_VS2017_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2017_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2017_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2017_X64_NASM_FLAGS   = -Ox -f win64 -g
+RELEASE_VS2017_X64_NASM_FLAGS   = -Ox -f win64
+NOOPT_VS2017_X64_NASM_FLAGS     = -O0 -f win64 -g
+
+  DEBUG_VS2017_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+RELEASE_VS2017_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
+NOOPT_VS2017_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+
+##################
+# EBC definitions
+##################
+*_VS2017_EBC_*_FAMILY            = INTEL
+
+*_VS2017_EBC_PP_PATH             = DEF(EBC_BINx86)\iec.exe
+*_VS2017_EBC_VFRPP_PATH          = DEF(EBC_BINx86)\iec.exe
+*_VS2017_EBC_CC_PATH             = DEF(EBC_BINx86)\iec.exe
+*_VS2017_EBC_SLINK_PATH          = DEF(VS2017_BIN_IA32)\link.exe
+*_VS2017_EBC_DLINK_PATH          = DEF(VS2017_BIN_IA32)\link.exe
+
+*_VS2017_EBC_MAKE_FLAGS          = /nologo
+*_VS2017_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
+*_VS2017_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
+*_VS2017_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2017_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
+*_VS2017_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
 
 ####################################################################################
 #
