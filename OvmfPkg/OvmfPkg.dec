@@ -45,6 +45,11 @@
   #                  access.
   PciCapPciSegmentLib|Include/Library/PciCapPciSegmentLib.h
 
+  ##  @libraryclass  Register a status code handler for printing the Boot
+  #                  Manager's LoadImage() and StartImage() preparations, and
+  #                  return codes, to the UEFI console.
+  PlatformBmPrintScLib|Include/Library/PlatformBmPrintScLib.h
+
   ##  @libraryclass  Access QEMU's firmware configuration interface
   #
   QemuFwCfgLib|Include/Library/QemuFwCfgLib.h
