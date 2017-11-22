@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SmmMemoryAttribute.h>
 
 #include <Guid/AcpiS3Context.h>
+#include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmMemoryAttributesTable.h>
 
 #include <Library/BaseLib.h>
@@ -45,6 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
+#include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/UefiCpuLib.h>

@@ -20,9 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EFI_MEMORY_INITIALIZED  0x0200000000000000ULL
 #define EFI_MEMORY_TESTED       0x0400000000000000ULL
 
-#define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
-  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
-
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
 
@@ -32,6 +29,8 @@ UINTN                 mUefiDescriptorSize;
 
 EFI_GCD_MEMORY_SPACE_DESCRIPTOR   *mGcdMemSpace       = NULL;
 UINTN                             mGcdMemNumberOfDesc = 0;
+
+EFI_MEMORY_ATTRIBUTES_TABLE  *mUefiMemoryAttributesTable = NULL;
 
 PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
   {Page4K,  SIZE_4KB, PAGING_4K_ADDRESS_MASK_64},
@@ -1087,6 +1086,26 @@ GetGcdMemoryMap (
 }
 
 /**
+  Get UEFI MemoryAttributesTable.
+**/
+VOID
+GetUefiMemoryAttributesTable (
+  VOID
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
+  UINTN                        MemoryAttributesTableSize;
+
+  Status = EfiGetSystemConfigurationTable (&gEfiMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
+  if (!EFI_ERROR (Status)) {
+    MemoryAttributesTableSize = sizeof(EFI_MEMORY_ATTRIBUTES_TABLE) + MemoryAttributesTable->DescriptorSize * MemoryAttributesTable->NumberOfEntries;
+    mUefiMemoryAttributesTable = AllocateCopyPool (MemoryAttributesTableSize, MemoryAttributesTable);
+    ASSERT (mUefiMemoryAttributesTable != NULL);
+  }
+}
+
+/**
   This function caches the UEFI memory map information.
 **/
 VOID
@@ -1150,6 +1169,11 @@ GetUefiMemoryMap (
   // Get additional information from GCD memory map.
   //
   GetGcdMemoryMap ();
+
+  //
+  // Get UEFI memory attributes table.
+  //
+  GetUefiMemoryAttributesTable ();
 }
 
 /**
@@ -1168,6 +1192,7 @@ SetUefiMemMapAttributes (
   EFI_MEMORY_DESCRIPTOR *MemoryMap;
   UINTN                 MemoryMapEntryCount;
   UINTN                 Index;
+  EFI_MEMORY_DESCRIPTOR *Entry;
 
   DEBUG ((DEBUG_INFO, "SetUefiMemMapAttributes\n"));
 
@@ -1218,6 +1243,35 @@ SetUefiMemMapAttributes (
   //
   // Do not free mGcdMemSpace, it will be checked in IsSmmCommBufferForbiddenAddress().
   //
+
+  //
+  // Set UEFI runtime memory with EFI_MEMORY_RO as not present.
+  //
+  if (mUefiMemoryAttributesTable != NULL) {
+    Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
+    for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
+      if (Entry->Type == EfiRuntimeServicesCode || Entry->Type == EfiRuntimeServicesData) {
+        if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
+          Status = SmmSetMemoryAttributes (
+                     Entry->PhysicalStart,
+                     EFI_PAGES_TO_SIZE((UINTN)Entry->NumberOfPages),
+                     EFI_MEMORY_RP
+                     );
+          DEBUG ((
+            DEBUG_INFO,
+            "UefiMemoryAttribute protection: 0x%lx - 0x%lx %r\n",
+            Entry->PhysicalStart,
+            Entry->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE((UINTN)Entry->NumberOfPages),
+            Status
+            ));
+        }
+      }
+      Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
+    }
+  }
+  //
+  // Do not free mUefiMemoryAttributesTable, it will be checked in IsSmmCommBufferForbiddenAddress().
+  //
 }
 
 /**
@@ -1236,6 +1290,7 @@ IsSmmCommBufferForbiddenAddress (
   EFI_MEMORY_DESCRIPTOR *MemoryMap;
   UINTN                 MemoryMapEntryCount;
   UINTN                 Index;
+  EFI_MEMORY_DESCRIPTOR *Entry;
 
   if (mUefiMemoryMap != NULL) {
     MemoryMap = mUefiMemoryMap;
@@ -1260,6 +1315,20 @@ IsSmmCommBufferForbiddenAddress (
     }
   }
 
+  if (mUefiMemoryAttributesTable != NULL) {
+    Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
+    for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
+      if (Entry->Type == EfiRuntimeServicesCode || Entry->Type == EfiRuntimeServicesData) {
+        if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
+          if ((Address >= Entry->PhysicalStart) &&
+              (Address < Entry->PhysicalStart + LShiftU64 (Entry->NumberOfPages, EFI_PAGE_SHIFT))) {
+            return TRUE;
+          }
+          Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
+        }
+      }
+    }
+  }
   return FALSE;
 }
 

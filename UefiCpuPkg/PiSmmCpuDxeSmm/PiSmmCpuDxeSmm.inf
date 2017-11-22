@@ -117,6 +117,7 @@
   gEfiAcpi20TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
   gEdkiiPiSmmMemoryAttributesTableGuid     ## CONSUMES ## SystemTable
+  gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
