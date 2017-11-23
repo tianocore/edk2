@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -44,14 +44,14 @@ extern EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc;
 extern EFI_GUID                  gFspHobGuid;
 
 /**
-This function handles S3 resume task at the end of PEI
+  This function handles S3 resume task at the end of PEI
 
-@param[in] PeiServices    Pointer to PEI Services Table.
-@param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
-caused this function to execute.
-@param[in] Ppi            Pointer to the PPI data associated with this function.
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
 
-@retval EFI_STATUS        Always return EFI_SUCCESS
+  @retval EFI_STATUS        Always return EFI_SUCCESS
 **/
 EFI_STATUS
 EFIAPI
@@ -68,14 +68,14 @@ EFI_PEI_NOTIFY_DESCRIPTOR mS3EndOfPeiNotifyDesc = {
 };
 
 /**
-This function handles S3 resume task at the end of PEI
+  This function handles S3 resume task at the end of PEI
 
-@param[in] PeiServices    Pointer to PEI Services Table.
-@param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
-caused this function to execute.
-@param[in] Ppi            Pointer to the PPI data associated with this function.
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
 
-@retval EFI_STATUS        Always return EFI_SUCCESS
+  @retval EFI_STATUS        Always return EFI_SUCCESS
 **/
 EFI_STATUS
 EFIAPI
@@ -130,13 +130,13 @@ S3EndOfPeiNotify(
 }
 
 /**
-Return Hob list produced by FSP.
+  Return Hob list produced by FSP.
 
-@param[in]  PeiServices  The pointer to the PEI Services Table.
-@param[in]  This         The pointer to this instance of this PPI.
-@param[out] FspHobList   The pointer to Hob list produced by FSP.
+  @param[in]  PeiServices  The pointer to the PEI Services Table.
+  @param[in]  This         The pointer to this instance of this PPI.
+  @param[out] FspHobList   The pointer to Hob list produced by FSP.
 
-@return EFI_SUCCESS FReturn Hob list produced by FSP successfully.
+  @return EFI_SUCCESS FReturn Hob list produced by FSP successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -157,13 +157,13 @@ EFI_PEI_PPI_DESCRIPTOR            mPeiFspSiliconInitDonePpi = {
 };
 
 /**
-Return Hob list produced by FSP.
+  Return Hob list produced by FSP.
 
-@param[in]  PeiServices  The pointer to the PEI Services Table.
-@param[in]  This         The pointer to this instance of this PPI.
-@param[out] FspHobList   The pointer to Hob list produced by FSP.
+  @param[in]  PeiServices  The pointer to the PEI Services Table.
+  @param[in]  This         The pointer to this instance of this PPI.
+  @param[out] FspHobList   The pointer to Hob list produced by FSP.
 
-@return EFI_SUCCESS FReturn Hob list produced by FSP successfully.
+  @return EFI_SUCCESS FReturn Hob list produced by FSP successfully.
 **/
 EFI_STATUS
 EFIAPI
@@ -209,14 +209,14 @@ EFI_PEI_NOTIFY_DESCRIPTOR mPeiMemoryDiscoveredNotifyDesc = {
 };
 
 /**
-This function is called after PEI core discover memory and finish migration.
+  This function is called after PEI core discover memory and finish migration.
 
-@param[in] PeiServices    Pointer to PEI Services Table.
-@param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
-caused this function to execute.
-@param[in] Ppi            Pointer to the PPI data associated with this function.
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
 
-@retval EFI_STATUS        Always return EFI_SUCCESS
+  @retval EFI_STATUS        Always return EFI_SUCCESS
 **/
 EFI_STATUS
 EFIAPI
@@ -234,22 +234,27 @@ PeiMemoryDiscoveredNotify (
   FSPS_UPD_COMMON           *FspsUpdDataPtr;
   UINTN                     *SourceData;
 
-  
   DEBUG ((DEBUG_INFO, "PeiMemoryDiscoveredNotify enter\n"));
-  
-  //
-  // Copy default FSP-S UPD data from Flash
-  //
+  FspsUpdDataPtr = NULL;
+
   FspsHeaderPtr = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspsBaseAddress));
   DEBUG ((DEBUG_INFO, "FspsHeaderPtr - 0x%x\n", FspsHeaderPtr));
   if (FspsHeaderPtr == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
-  FspsUpdDataPtr = (FSPS_UPD_COMMON *)AllocateZeroPool ((UINTN)FspsHeaderPtr->CfgRegionSize);
-  ASSERT (FspsUpdDataPtr != NULL);
-  SourceData = (UINTN *)((UINTN)FspsHeaderPtr->ImageBase + (UINTN)FspsHeaderPtr->CfgRegionOffset);
-  CopyMem (FspsUpdDataPtr, SourceData, (UINTN)FspsHeaderPtr->CfgRegionSize);
+  if (PcdGet32 (PcdFspsUpdDataAddress) == 0 && (FspsHeaderPtr->CfgRegionSize != 0) && (FspsHeaderPtr->CfgRegionOffset != 0)) {
+    //
+    // Copy default FSP-S UPD data from Flash
+    //
+    FspsUpdDataPtr = (FSPS_UPD_COMMON *)AllocateZeroPool ((UINTN)FspsHeaderPtr->CfgRegionSize);
+    ASSERT (FspsUpdDataPtr != NULL);
+    SourceData = (UINTN *)((UINTN)FspsHeaderPtr->ImageBase + (UINTN)FspsHeaderPtr->CfgRegionOffset);
+    CopyMem (FspsUpdDataPtr, SourceData, (UINTN)FspsHeaderPtr->CfgRegionSize);
+  } else {
+    FspsUpdDataPtr = (FSPS_UPD_COMMON *)PcdGet32 (PcdFspsUpdDataAddress);
+    ASSERT (FspsUpdDataPtr != NULL);
+  }
 
   UpdateFspsUpdData ((VOID *)FspsUpdDataPtr);
 
@@ -314,7 +319,7 @@ FspsWrapperInit (
   //
   Status = PeiServicesNotifyPpi (&mPeiMemoryDiscoveredNotifyDesc);
   ASSERT_EFI_ERROR (Status);
-      
+
   //
   // Register EndOfPei Notify for S3 to run FSP NotifyPhase
   //
@@ -342,7 +347,6 @@ FspsWrapperPeimEntryPoint (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-
   DEBUG ((DEBUG_INFO, "FspsWrapperPeimEntryPoint\n"));
 
   FspsWrapperInit ();

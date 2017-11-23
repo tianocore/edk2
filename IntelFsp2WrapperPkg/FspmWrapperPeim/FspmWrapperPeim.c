@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -63,20 +63,29 @@ PeiFspMemoryInit (
   DEBUG ((DEBUG_INFO, "PeiFspMemoryInit enter\n"));
 
   FspHobListPtr = NULL;
+  FspmUpdDataPtr = NULL;
 
-  //
-  // Copy default FSP-M UPD data from Flash
-  //
   FspmHeaderPtr = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspmBaseAddress));
   DEBUG ((DEBUG_INFO, "FspmHeaderPtr - 0x%x\n", FspmHeaderPtr));
   if (FspmHeaderPtr == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
-  FspmUpdDataPtr = (FSPM_UPD_COMMON *)AllocateZeroPool ((UINTN)FspmHeaderPtr->CfgRegionSize);
-  ASSERT (FspmUpdDataPtr != NULL);
-  SourceData = (UINTN *)((UINTN)FspmHeaderPtr->ImageBase + (UINTN)FspmHeaderPtr->CfgRegionOffset);
-  CopyMem (FspmUpdDataPtr, SourceData, (UINTN)FspmHeaderPtr->CfgRegionSize);
+  if (PcdGet32 (PcdFspmUpdDataAddress) == 0 && (FspmHeaderPtr->CfgRegionSize != 0) && (FspmHeaderPtr->CfgRegionOffset != 0)) {
+    //
+    // Copy default FSP-M UPD data from Flash
+    //
+    FspmUpdDataPtr = (FSPM_UPD_COMMON *)AllocateZeroPool ((UINTN)FspmHeaderPtr->CfgRegionSize);
+    ASSERT (FspmUpdDataPtr != NULL);
+    SourceData = (UINTN *)((UINTN)FspmHeaderPtr->ImageBase + (UINTN)FspmHeaderPtr->CfgRegionOffset);
+    CopyMem (FspmUpdDataPtr, SourceData, (UINTN)FspmHeaderPtr->CfgRegionSize);
+  } else {
+    //
+    // External UPD is ready, get the buffer from PCD pointer.
+    //
+    FspmUpdDataPtr = (FSPM_UPD_COMMON *)PcdGet32 (PcdFspmUpdDataAddress);
+    ASSERT (FspmUpdDataPtr != NULL);
+  }
 
   DEBUG ((DEBUG_INFO, "UpdateFspmUpdData enter\n"));
   UpdateFspmUpdData ((VOID *)FspmUpdDataPtr);

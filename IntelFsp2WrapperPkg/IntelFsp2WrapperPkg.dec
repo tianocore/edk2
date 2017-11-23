@@ -1,7 +1,7 @@
 ## @file
 # Provides drivers and definitions to support fsp in EDKII bios.
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -95,4 +95,13 @@
 
 [PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
-  
+  #
+  # To provide flexibility for platform to pre-allocate FSP UPD buffer
+  #
+  # The PCDs define the pre-allocated FSPM and FSPS UPD Data Buffer Address.
+  # 0x00000000 - Platform will not pre-allocate UPD buffer before FspWrapper module
+  # non-zero   - Platform will pre-allocate UPD buffer and patch this value to
+  #              buffer address before FspWrapper module executing.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress|0x00000000|UINT32|0x50000000
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress|0x00000000|UINT32|0x50000001

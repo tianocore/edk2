@@ -59,7 +59,8 @@
   IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
 
 [Pcd]
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress     ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress  ## CONSUMES
 
 [Sources]
   FspmWrapperPeim.c
