@@ -1687,6 +1687,7 @@ CoreGetMemoryMap (
   EFI_GCD_MAP_ENTRY                 MergeGcdMapEntry;
   EFI_MEMORY_TYPE                   Type;
   EFI_MEMORY_DESCRIPTOR             *MemoryMapStart;
+  EFI_MEMORY_DESCRIPTOR             *MemoryMapEnd;
 
   //
   // Make sure the parameters are valid
@@ -1895,6 +1896,25 @@ CoreGetMemoryMap (
   // Compute the size of the buffer actually used after all memory map descriptor merge operations
   //
   BufferSize = ((UINT8 *)MemoryMap - (UINT8 *)MemoryMapStart);
+
+  //
+  // Note: Some OSs will treat EFI_MEMORY_DESCRIPTOR.Attribute as really
+  //       set attributes and change memory paging attribute accordingly.
+  //       But current EFI_MEMORY_DESCRIPTOR.Attribute is assigned by
+  //       value from Capabilities in GCD memory map. This might cause
+  //       boot problems. Clearing all paging related capabilities can
+  //       workaround it. Following code is supposed to be removed once
+  //       the usage of EFI_MEMORY_DESCRIPTOR.Attribute is clarified in
+  //       UEFI spec and adopted by both EDK-II Core and all supported
+  //       OSs.
+  //
+  MemoryMapEnd = MemoryMap;
+  MemoryMap = MemoryMapStart;
+  while (MemoryMap < MemoryMapEnd) {
+    MemoryMap->Attribute &= ~(UINT64)(EFI_MEMORY_RP | EFI_MEMORY_RO |
+                                      EFI_MEMORY_XP);
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, Size);
+  }
 
   Status = EFI_SUCCESS;
 
