@@ -41,6 +41,7 @@
   MemoryAttributesTable.c
   SmiHandlerProfile.c
   HeapGuard.c
+  HeapGuard.h
 
 [Packages]
   MdePkg/MdePkg.dec

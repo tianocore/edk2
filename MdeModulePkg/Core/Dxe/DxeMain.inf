@@ -57,6 +57,7 @@
   Mem/Imem.h
   Mem/MemoryProfileRecord.c
   Mem/HeapGuard.c
+  Mem/HeapGuard.h
   FwVolBlock/FwVolBlock.c
   FwVolBlock/FwVolBlock.h
   FwVol/FwVolWrite.c
