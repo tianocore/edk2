@@ -182,7 +182,6 @@ SortMemoryMap (
                                  it is the size of new memory map after merge.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
-STATIC
 VOID
 MergeMemoryMap (
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,

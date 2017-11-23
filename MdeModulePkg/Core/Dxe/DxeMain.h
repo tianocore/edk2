@@ -2948,4 +2948,22 @@ ApplyMemoryProtectionPolicy (
   IN  UINT64                Length
   );
 
+/**
+  Merge continous memory map entries whose have same attributes.
+
+  @param  MemoryMap       A pointer to the buffer in which firmware places
+                          the current memory map.
+  @param  MemoryMapSize   A pointer to the size, in bytes, of the
+                          MemoryMap buffer. On input, this is the size of
+                          the current memory map.  On output,
+                          it is the size of new memory map after merge.
+  @param  DescriptorSize  Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+**/
+VOID
+MergeMemoryMap (
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  IN OUT UINTN                  *MemoryMapSize,
+  IN UINTN                      DescriptorSize
+  );
+
 #endif

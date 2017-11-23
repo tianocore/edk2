@@ -1915,6 +1915,8 @@ CoreGetMemoryMap (
                                       EFI_MEMORY_XP);
     MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, Size);
   }
+  MergeMemoryMap (MemoryMapStart, &BufferSize, Size);
+  MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMapStart + BufferSize);
 
   Status = EFI_SUCCESS;
 
