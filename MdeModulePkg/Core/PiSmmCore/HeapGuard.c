@@ -1170,7 +1170,9 @@ SetAllGuardPages (
   UINTN     Index;
   BOOLEAN   OnGuarding;
 
-  if (mGuardedMemoryMap == 0) {
+  if (mGuardedMemoryMap == 0 ||
+      mMapLevel == 0 ||
+      mMapLevel > GUARDED_HEAP_MAP_TABLE_DEPTH) {
     return;
   }
 
@@ -1329,7 +1331,9 @@ DumpGuardedMemoryBitmap (
   CHAR8     *Ruler1;
   CHAR8     *Ruler2;
 
-  if (mGuardedMemoryMap == 0) {
+  if (mGuardedMemoryMap == 0 ||
+      mMapLevel == 0 ||
+      mMapLevel > GUARDED_HEAP_MAP_TABLE_DEPTH) {
     return;
   }
 
