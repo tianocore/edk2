@@ -34,7 +34,8 @@ OBJECTS = \
   PeCoffLoaderEx.obj \
   SimpleFileParsing.obj \
   StringFuncs.obj \
-  TianoCompress.obj
+  TianoCompress.obj \
+  PcdValueCommon.obj
 
 !INCLUDE ..\Makefiles\ms.lib
 

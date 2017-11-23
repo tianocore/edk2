@@ -35,6 +35,7 @@ OBJECTS = \
   PeCoffLoaderEx.o \
   SimpleFileParsing.o \
   StringFuncs.o \
-  TianoCompress.o
+  TianoCompress.o \
+  PcdValueCommon.o
 
 include $(MAKEROOT)/Makefiles/lib.makefile
