@@ -19,7 +19,7 @@ $(APPLICATION) : $(OBJECTS)
 	-@if not exist $(BIN_PATH) mkdir $(BIN_PATH)
 	$(LD) /nologo /debug /OPT:REF /OPT:ICF=10 /incremental:no /nodefaultlib:libc.lib /out:$@ $(LIBS) $**
 
-$(OBJECTS) : ..\Include\Common\BuildVersion.h
+$(OBJECTS) : $(SOURCE_PATH)\Include\Common\BuildVersion.h
 
 .PHONY:clean
 .PHONY:cleanall
@@ -30,5 +30,5 @@ clean:
 cleanall:
 	del /f /q $(OBJECTS) $(APPLICATION) *.pdb $(BIN_PATH)\$(APPNAME).pdb > nul
 
-!INCLUDE ..\Makefiles\ms.rule
+!INCLUDE $(SOURCE_PATH)\Makefiles\ms.rule
 
