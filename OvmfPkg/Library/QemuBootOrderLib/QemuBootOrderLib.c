@@ -1875,7 +1875,6 @@ SetBootOrderFromQemu (
           if (Status != RETURN_SUCCESS) {
             goto ErrorFreeExtraPciRoots;
           }
-          break;
         }
       } // scanned all active boot options
     }   // translation successful
