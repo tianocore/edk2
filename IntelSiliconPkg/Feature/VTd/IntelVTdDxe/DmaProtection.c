@@ -412,6 +412,9 @@ AcpiNotificationFunc (
 
   Status = GetDmarAcpiTable ();
   if (EFI_ERROR (Status)) {
+    if (Status == EFI_ALREADY_STARTED) {
+      gBS->CloseEvent (Event);
+    }
     return;
   }
   SetupVtd ();
