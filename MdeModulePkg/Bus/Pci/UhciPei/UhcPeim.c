@@ -2863,8 +2863,8 @@ CreateMemoryBlock (
              &MappedAddr,
              &Mapping
              );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (EFI_ERROR (Status) || (TempPtr == NULL)) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Ptr = TempPtr;
