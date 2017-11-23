@@ -978,8 +978,9 @@ FindAcpiPtr (
 /**
   Get the DMAR ACPI table.
 
-  @retval EFI_SUCCESS    The DMAR ACPI table is got.
-  @retval EFI_NOT_FOUND  The DMAR ACPI table is not found.
+  @retval EFI_SUCCESS           The DMAR ACPI table is got.
+  @retval EFI_ALREADY_STARTED   The DMAR ACPI table has been got previously.
+  @retval EFI_NOT_FOUND         The DMAR ACPI table is not found.
 **/
 EFI_STATUS
 GetDmarAcpiTable (
@@ -990,7 +991,7 @@ GetDmarAcpiTable (
   EFI_STATUS                        Status;
 
   if (mAcpiDmarTable != NULL) {
-    return EFI_SUCCESS;
+    return EFI_ALREADY_STARTED;
   }
 
   AcpiTable = NULL;
