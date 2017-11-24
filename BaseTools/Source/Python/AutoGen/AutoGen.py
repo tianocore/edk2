@@ -44,6 +44,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 import InfSectionParser
 import datetime
 import hashlib
+from GenVar import Variable,var_info
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -1352,6 +1353,26 @@ class PlatformAutoGen(AutoGen):
                 if key in ShareFixedAtBuildPcdsSameValue and ShareFixedAtBuildPcdsSameValue[key]:                    
                     LibAuto.ConstPcd[key] = Pcd.DefaultValue
 
+    def CollectVariables(self, DynamicPcdSet):
+        VariableInfo = Variable()
+        Index = 0
+        for Pcd in DynamicPcdSet:
+            if not hasattr(Pcd,"DefaultStoreName"):
+                Pcd.DefaultStoreName = ['0']
+            for StorageName in Pcd.DefaultStoreName:
+                pcdname = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))
+                for SkuName in Pcd.SkuInfoList:
+                    Sku = Pcd.SkuInfoList[SkuName]
+                    SkuId = Sku.SkuId
+                    if SkuId == None or SkuId == '':
+                        continue
+                    if len(Sku.VariableName) > 0:
+                        VariableGuidStructure = Sku.VariableGuidValue
+                        VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
+                        if Pcd.Phase == "DXE":
+                            VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuId, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableAttribute , Pcd.DefaultValue,Sku.HiiDefaultValue,Pcd.DatumType))
+            Index += 1
+        return VariableInfo
     ## Collect dynamic PCDs
     #
     #  Gather dynamic PCDs list from each module and their settings from platform
@@ -1581,6 +1602,17 @@ class PlatformAutoGen(AutoGen):
                     OtherPcdArray.append(Pcd)
                 if Pcd.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
                     VpdPcdDict[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)] = Pcd
+
+            #Collect DynamicHii PCD values and assign it to DynamicExVpd PCD gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer
+            PcdNvStoreDfBuffer = VpdPcdDict.get(("PcdNvStoreDefaultValueBuffer","gEfiMdeModulePkgTokenSpaceGuid"))
+            if PcdNvStoreDfBuffer:
+                var_info = self.CollectVariables(self._DynamicPcdList)
+                default_skuobj = PcdNvStoreDfBuffer.SkuInfoList.get("DEFAULT")
+                default_skuobj.DefaultValue = var_info.dump()
+                if default_skuobj:
+                    PcdNvStoreDfBuffer.SkuInfoList.clear()
+                    PcdNvStoreDfBuffer.SkuInfoList['DEFAULT'] = default_skuobj
+                    PcdNvStoreDfBuffer.MaxDatumSize = len(default_skuobj.DefaultValue.split(","))
 
             PlatformPcds = self._PlatformPcds.keys()
             PlatformPcds.sort()

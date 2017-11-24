@@ -628,31 +628,6 @@ def GetMatchedIndex(Key1, List1, Key2, List2):
     return -1
 
 
-##  Get the integer value from string like "14U" or integer like 2
-#
-#   @param      Input   The object that may be either a integer value or a string 
-#  
-#   @retval     Value    The integer value that the input represents
-#
-def GetIntegerValue(Input):
-    if type(Input) in (int, long):
-        return Input
-    String = Input
-    if String.endswith("U"):
-        String = String[:-1]
-    if String.endswith("ULL"):
-        String = String[:-3]
-    if String.endswith("LL"):
-        String = String[:-2]
-    
-    if String.startswith("0x") or String.startswith("0X"):
-        return int(String, 16)
-    elif String == '':
-        return 0
-    else:
-        return int(String)
-
-
 ## convert StringArray like {0x36, 0x00, 0x34, 0x00, 0x21, 0x00, 0x36, 0x00, 0x34, 0x00, 0x00, 0x00}
 # to List like [0x36, 0x00, 0x34, 0x00, 0x21, 0x00, 0x36, 0x00, 0x34, 0x00, 0x00, 0x00]
 #

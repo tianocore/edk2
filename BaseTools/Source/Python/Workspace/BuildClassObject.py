@@ -122,12 +122,16 @@ class StructurePcd(PcdClassObject):
         return self.TypeName
 
     def AddDefaultValue (self, FieldName, Value, FileName="", LineNo=0):
+        if FieldName in self.DefaultValues:
+            del self.DefaultValues[FieldName]
         self.DefaultValues[FieldName] = [Value.strip(), FileName, LineNo]
         return self.DefaultValues[FieldName]
 
     def AddOverrideValue (self, FieldName, Value, SkuName, FileName="", LineNo=0):
         if SkuName not in self.SkuOverrideValues:
             self.SkuOverrideValues[SkuName] = collections.OrderedDict({})
+        if FieldName in self.SkuOverrideValues[SkuName]:
+            del self.SkuOverrideValues[SkuName][FieldName]
         self.SkuOverrideValues[SkuName][FieldName] = [Value.strip(), FileName, LineNo]
         return self.SkuOverrideValues[SkuName][FieldName]
 
