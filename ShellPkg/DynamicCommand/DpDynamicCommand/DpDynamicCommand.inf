@@ -1,0 +1,78 @@
+##  @file
+# Provides Shell 'dp' dynamic command.
+#
+# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = dpDynamicCommand
+  FILE_GUID                      = 0253F9FA-129A-4A8D-B12E-7DC2B6376302
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DpCommandInitialize
+  UNLOAD_IMAGE                   = DpUnload
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+[Sources.common]
+  PerformanceTokens.h
+  Dp.uni
+  Dp.c
+  Dp.h
+  Literals.h
+  Literals.c
+  DpInternal.h
+  DpUtilities.c
+  DpTrace.c
+  DpProfile.c
+  DpDynamicCommand.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  SortLib
+  PrintLib
+  DevicePathLib
+  PerformanceLib
+  DxeServicesLib
+  PeCoffGetEntryPointLib
+
+[Guids]
+  gPerformanceProtocolGuid                                ## CONSUMES ## SystemTable
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiDriverBindingProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiComponentName2ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiHiiPackageListProtocolGuid                          ## CONSUMES
+  gEfiShellDynamicCommandProtocolGuid                     ## PRODUCES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize   ## CONSUMES
+
+[DEPEX]
+  TRUE

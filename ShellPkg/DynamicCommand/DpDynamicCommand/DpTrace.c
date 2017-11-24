@@ -29,17 +29,17 @@
 #include "Literals.h"
 #include "DpInternal.h"
 
-/** 
+/**
   Collect verbose statistics about the logged performance measurements.
-  
+
   General Summary information for all Trace measurements is gathered and
   stored within the SummaryData structure.  This information is both
   used internally by subsequent reporting functions, and displayed
   at the end of verbose reports.
-  
+
   @pre  The SummaryData and CumData structures must be initialized
         prior to calling this function.
-  
+
   @post The SummaryData and CumData structures contain statistics for the
         current performance logs.
 
@@ -118,23 +118,23 @@ GatherStatistics(
   }
 }
 
-/** 
+/**
   Gather and print ALL Trace Records.
-  
+
   Displays all "interesting" Trace measurements in order.<BR>
   The number of records displayed is controlled by:
      - records with a duration less than mInterestThreshold microseconds are not displayed.
      - No more than Limit records are displayed.  A Limit of zero will not limit the output.
      - If the ExcludeFlag is TRUE, records matching entries in the CumData array are not
        displayed.
-  
+
   @pre    The mInterestThreshold global variable is set to the shortest duration to be printed.
            The mGaugeString and mUnicodeToken global arrays are used for temporary string storage.
            They must not be in use by a calling function.
-  
+
   @param[in]    Limit       The number of records to print.  Zero is ALL.
   @param[in]    ExcludeFlag TRUE to exclude individual Cumulative items from display.
-  
+
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_ABORTED           The user aborts the operation.
   @return Others                from a call to gBS->LocateHandleBuffer().
@@ -159,9 +159,9 @@ DumpAllTrace(
   EFI_STATUS                Status;
   EFI_STRING                StringPtrUnknown;
 
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
-  IncFlag = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_ALL), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  IncFlag = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_ALL), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (IncFlag == NULL) ? StringPtrUnknown : IncFlag);
   FreePool (StringPtrUnknown);
 
@@ -169,7 +169,7 @@ DumpAllTrace(
   //
   Status  = gBS->LocateHandleBuffer (AllHandles, NULL, NULL, &HandleCount, &HandleBuffer);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLES_ERROR), gDpHiiHandle, Status);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLES_ERROR), mDpHiiHandle, Status);
   }
   else {
     // We have successfully populated the HandleBuffer
@@ -179,11 +179,11 @@ DumpAllTrace(
     //    Display driver names in Module field for records with Handles.
     //
     if (mShowId) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_HEADR2), gDpHiiHandle);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_DASHES2), gDpHiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_HEADR2), mDpHiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_DASHES2), mDpHiiHandle);
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_HEADR), gDpHiiHandle);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), gDpHiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_HEADR), mDpHiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), mDpHiiHandle);
     }
 
     LogEntryKey = 0;
@@ -206,10 +206,10 @@ DumpAllTrace(
       if (Measurement.EndTimeStamp != 0) {
         Duration = GetDuration (&Measurement);
         ElapsedTime = DurationInMicroSeconds ( Duration );
-        IncFlag = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_COMPLETE), NULL);
+        IncFlag = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_COMPLETE), NULL);
       }
       else {
-        IncFlag = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_INCOMPLETE), NULL);  // Mark incomplete records
+        IncFlag = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_INCOMPLETE), NULL);  // Mark incomplete records
       }
       if (((Measurement.EndTimeStamp != 0) && (ElapsedTime < mInterestThreshold)) ||
           ((ExcludeFlag) && (GetCumulativeItem(&Measurement) >= 0))
@@ -240,7 +240,7 @@ DumpAllTrace(
       mUnicodeToken[13] = 0;
 
       if (mShowId) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_VARS2), gDpHiiHandle,
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_VARS2), mDpHiiHandle,
           Index,      // 1 based, Which measurement record is being printed
           IncFlag,
           Measurement.Handle,
@@ -250,7 +250,7 @@ DumpAllTrace(
           Measurement.Identifier
         );
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_VARS), gDpHiiHandle,
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_ALL_VARS), mDpHiiHandle,
           Index,      // 1 based, Which measurement record is being printed
           IncFlag,
           Measurement.Handle,
@@ -273,20 +273,20 @@ DumpAllTrace(
   return Status;
 }
 
-/** 
+/**
   Gather and print Raw Trace Records.
-  
+
   All Trace measurements with a duration greater than or equal to
   mInterestThreshold are printed without interpretation.
-  
+
   The number of records displayed is controlled by:
      - records with a duration less than mInterestThreshold microseconds are not displayed.
      - No more than Limit records are displayed.  A Limit of zero will not limit the output.
      - If the ExcludeFlag is TRUE, records matching entries in the CumData array are not
        displayed.
-  
+
   @pre    The mInterestThreshold global variable is set to the shortest duration to be printed.
-  
+
   @param[in]    Limit       The number of records to print.  Zero is ALL.
   @param[in]    ExcludeFlag TRUE to exclude individual Cumulative items from display.
 
@@ -312,19 +312,19 @@ DumpRawTrace(
 
   Status = EFI_SUCCESS;
 
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
-  StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_RAWTRACE), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  StringPtr = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_RAWTRACE), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
   if (mShowId) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_HEADR2), gDpHiiHandle);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_DASHES2), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_HEADR2), mDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_DASHES2), mDpHiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_HEADR), gDpHiiHandle);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_DASHES), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_HEADR), mDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_DASHES), mDpHiiHandle);
   }
 
   LogEntryKey = 0;
@@ -355,7 +355,7 @@ DumpRawTrace(
     ++Count;    // Count the number of records printed
 
     if (mShowId) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_VARS2), gDpHiiHandle,
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_VARS2), mDpHiiHandle,
         Index,      // 1 based, Which measurement record is being printed
         Measurement.Handle,
         Measurement.StartTimeStamp,
@@ -365,7 +365,7 @@ DumpRawTrace(
         Measurement.Identifier
       );
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_VARS), gDpHiiHandle,
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_RAW_VARS), mDpHiiHandle,
         Index,      // 1 based, Which measurement record is being printed
         Measurement.Handle,
         Measurement.StartTimeStamp,
@@ -382,9 +382,9 @@ DumpRawTrace(
   return Status;
 }
 
-/** 
+/**
   Gather and print Major Phase metrics.
-  
+
 **/
 VOID
 ProcessPhases(
@@ -412,9 +412,9 @@ ProcessPhases(
   //
   // Get Execution Phase Statistics
   //
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);   
-  StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_PHASES), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  StringPtr = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_PHASES), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
@@ -456,7 +456,7 @@ ProcessPhases(
   if (SecTime > 0) {
     ElapsedTime = DurationInMicroSeconds ( SecTime );     // Calculate elapsed time in microseconds
     Total += DivU64x32 (ElapsedTime, 1000);   // Accumulate time in milliseconds
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SEC_PHASE), gDpHiiHandle, ElapsedTime);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SEC_PHASE), mDpHiiHandle, ElapsedTime);
   }
 
   // print PEI phase duration time
@@ -467,7 +467,7 @@ ProcessPhases(
                     (UINT32)TimerInfo.Frequency
                     );
     Total += ElapsedTime;
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), gDpHiiHandle, ALit_PEI, ElapsedTime);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), mDpHiiHandle, ALit_PEI, ElapsedTime);
   }
 
   // print DXE phase duration time
@@ -478,7 +478,7 @@ ProcessPhases(
                     (UINT32)TimerInfo.Frequency
                     );
     Total += ElapsedTime;
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), gDpHiiHandle, ALit_DXE, ElapsedTime);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), mDpHiiHandle, ALit_DXE, ElapsedTime);
   }
 
   // print BDS phase duration time
@@ -489,7 +489,7 @@ ProcessPhases(
                     (UINT32)TimerInfo.Frequency
                     );
     Total += ElapsedTime;
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), gDpHiiHandle, ALit_BDS, ElapsedTime);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), mDpHiiHandle, ALit_BDS, ElapsedTime);
   }
 
   if (BdsTimeoutValue > 0) {
@@ -497,17 +497,17 @@ ProcessPhases(
                     BdsTimeoutValue,
                     (UINT32)TimerInfo.Frequency
                     );
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_BDSTO), gDpHiiHandle, ALit_BdsTO, ElapsedTime);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_BDSTO), mDpHiiHandle, ALit_BdsTO, ElapsedTime);
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TOTAL_DURATION), gDpHiiHandle, Total);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TOTAL_DURATION), mDpHiiHandle, Total);
 }
 
-/** 
+/**
   Gather and print Handle data.
-  
+
   @param[in]    ExcludeFlag   TRUE to exclude individual Cumulative items from display.
-  
+
   @retval EFI_SUCCESS             The operation was successful.
   @retval EFI_ABORTED             The user aborts the operation.
   @return Others                  from a call to gBS->LocateHandleBuffer().
@@ -529,16 +529,16 @@ ProcessHandles(
   EFI_STATUS                Status;
   EFI_STRING                StringPtrUnknown;
 
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
-  StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_DRIVERS), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  StringPtr = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_DRIVERS), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
   Status = gBS->LocateHandleBuffer (AllHandles, NULL, NULL, &HandleCount, &HandleBuffer);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLES_ERROR), gDpHiiHandle, Status);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLES_ERROR), mDpHiiHandle, Status);
   }
   else {
 #if DP_DEBUG == 2
@@ -546,11 +546,11 @@ ProcessHandles(
 #endif
 
     if (mShowId) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_SECTION2), gDpHiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_SECTION2), mDpHiiHandle);
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_SECTION), gDpHiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_SECTION), mDpHiiHandle);
     }
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), mDpHiiHandle);
 
     LogEntryKey = 0;
     Count   = 0;
@@ -588,7 +588,7 @@ ProcessHandles(
       if (mGaugeString[0] != 0) {
         // Display the record if it has a valid handle.
         if (mShowId) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_VARS2), gDpHiiHandle,
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_VARS2), mDpHiiHandle,
             Count,      // 1 based, Which measurement record is being printed
             Index + 1,  // 1 based, Which handle is being printed
             mGaugeString,
@@ -597,7 +597,7 @@ ProcessHandles(
             Measurement.Identifier
           );
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_VARS), gDpHiiHandle,
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_HANDLE_VARS), mDpHiiHandle,
             Count,      // 1 based, Which measurement record is being printed
             Index + 1,  // 1 based, Which handle is being printed
             mGaugeString,
@@ -618,11 +618,11 @@ ProcessHandles(
   return Status;
 }
 
-/** 
+/**
   Gather and print PEIM data.
-  
+
   Only prints complete PEIM records
-  
+
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_ABORTED           The user aborts the operation.
 **/
@@ -642,19 +642,19 @@ ProcessPeims(
 
   Status = EFI_SUCCESS;
 
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
-  StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_PEIMS), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  StringPtr = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_PEIMS), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
   if (mShowId) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_SECTION2), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_SECTION2), mDpHiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_SECTION), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_SECTION), mDpHiiHandle);
   }
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), gDpHiiHandle);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), mDpHiiHandle);
   TIndex  = 0;
   LogEntryKey = 0;
   while ((LogEntryKey = GetPerformanceMeasurementEx (
@@ -678,7 +678,7 @@ ProcessPeims(
     if (ElapsedTime >= mInterestThreshold) {
       // PEIM FILE Handle is the start address of its FFS file that contains its file guid.
       if (mShowId) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_VARS2), gDpHiiHandle,
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_VARS2), mDpHiiHandle,
               TIndex,   // 1 based, Which measurement record is being printed
               Measurement.Handle,  // base address
               Measurement.Handle,  // file guid
@@ -686,7 +686,7 @@ ProcessPeims(
               Measurement.Identifier
         );
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_VARS), gDpHiiHandle,
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_VARS), mDpHiiHandle,
               TIndex,   // 1 based, Which measurement record is being printed
               Measurement.Handle,  // base address
               Measurement.Handle,  // file guid
@@ -702,14 +702,14 @@ ProcessPeims(
   return Status;
 }
 
-/** 
+/**
   Gather and print global data.
-  
+
   Strips out incomplete or "Execution Phase" records
   Only prints records where Handle is NULL
   Increment TIndex for every record, even skipped ones, so that we have an
   indication of every measurement record taken.
-  
+
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_ABORTED           The user aborts the operation.
 **/
@@ -729,19 +729,19 @@ ProcessGlobal(
 
   Status = EFI_SUCCESS;
 
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
-  StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_GENERAL), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  StringPtr = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_GENERAL), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (StringPtr == NULL) ? StringPtrUnknown: StringPtr);
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
   if (mShowId) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_SECTION2), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_SECTION2), mDpHiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_SECTION), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_SECTION), mDpHiiHandle);
   }
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), gDpHiiHandle);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), mDpHiiHandle);
 
   Index = 1;
   LogEntryKey = 0;
@@ -768,7 +768,7 @@ ProcessGlobal(
       ElapsedTime = DurationInMicroSeconds ( Duration );
       if (ElapsedTime >= mInterestThreshold) {
         if (mShowId) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_VARS2), gDpHiiHandle,
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_VARS2), mDpHiiHandle,
             Index,
             mGaugeString,
             mUnicodeToken,
@@ -776,7 +776,7 @@ ProcessGlobal(
             Measurement.Identifier
             );
         } else {
-           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_VARS), gDpHiiHandle,
+           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GLOBAL_VARS), mDpHiiHandle,
             Index,
             mGaugeString,
             mUnicodeToken,
@@ -794,9 +794,9 @@ ProcessGlobal(
   return Status;
 }
 
-/** 
+/**
   Gather and print cumulative data.
-  
+
   Traverse the measurement records and:<BR>
   For each record with a Token listed in the CumData array:<BR>
      - Update the instance count and the total, minimum, and maximum durations.
@@ -818,16 +818,16 @@ ProcessCumulative(
   UINTN                     TIndex;
   EFI_STRING                StringPtrUnknown;
 
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);  
-  StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_CUMULATIVE), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  StringPtr = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_CUMULATIVE), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (StringPtr == NULL) ? StringPtrUnknown: StringPtr);
   FreePool (StringPtr);
   FreePool (StringPtrUnknown);
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_SECT_1), gDpHiiHandle);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_SECT_2), gDpHiiHandle);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), gDpHiiHandle);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_SECT_1), mDpHiiHandle);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_SECT_2), mDpHiiHandle);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), mDpHiiHandle);
 
   for ( TIndex = 0; TIndex < NumCum; ++TIndex) {
     if (CumData[TIndex].Count != 0) {
@@ -836,8 +836,8 @@ ProcessCumulative(
       Dur    = DurationInMicroSeconds(CumData[TIndex].Duration);
       MaxDur = DurationInMicroSeconds(CumData[TIndex].MaxDur);
       MinDur = DurationInMicroSeconds(CumData[TIndex].MinDur);
-    
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_STATS), gDpHiiHandle,
+
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_STATS), mDpHiiHandle,
                   CumData[TIndex].Name,
                   CumData[TIndex].Count,
                   Dur,
@@ -864,7 +864,7 @@ ProcessCumulative(
       MaxDur = 0;
       MinDur = 0;
     }
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_STATS), gDpHiiHandle,
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_CUMULATIVE_STATS), mDpHiiHandle,
                 CustomCumulativeData->Name,
                 CustomCumulativeData->Count,
                 Dur,

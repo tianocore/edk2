@@ -196,18 +196,19 @@ DpGetNameFromHandle (
   IN EFI_HANDLE   Handle
   )
 {
-  EFI_STATUS                  Status;
-  EFI_LOADED_IMAGE_PROTOCOL   *Image;
-  CHAR8                       *PdbFileName;
-  EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
-  EFI_STRING                  StringPtr;
-  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
-  EFI_GUID                    *NameGuid;
-  CHAR16                      *NameString;
-  UINTN                       StringSize;
-  CHAR8                       *PlatformLanguage;
-  EFI_COMPONENT_NAME2_PROTOCOL      *ComponentName2;
+  EFI_STATUS                   Status;
+  EFI_LOADED_IMAGE_PROTOCOL    *Image;
+  CHAR8                        *PdbFileName;
+  EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding;
+  EFI_STRING                   StringPtr;
+  EFI_DEVICE_PATH_PROTOCOL     *LoadedImageDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
+  EFI_GUID                     *NameGuid;
+  CHAR16                       *NameString;
+  UINTN                        StringSize;
+  CHAR8                        *PlatformLanguage;
+  CHAR8                        *BestLanguage;
+  EFI_COMPONENT_NAME2_PROTOCOL *ComponentName2;
 
   Image = NULL;
   LoadedImageDevicePath = NULL;
@@ -259,16 +260,25 @@ DpGetNameFromHandle (
                   );
   if (!EFI_ERROR (Status)) {
     //
-    // Get the current platform language setting
+    // Firstly use platform language setting, secondly use driver's first supported language.
     //
-    PlatformLanguage = GetBestLanguageForDriver(ComponentName2->SupportedLanguages, NULL, FALSE);
+    GetVariable2 (L"PlatformLang", &gEfiGlobalVariableGuid, (VOID**)&PlatformLanguage, NULL);
+    BestLanguage = GetBestLanguage(
+                     ComponentName2->SupportedLanguages,
+                     FALSE,
+                     (PlatformLanguage != NULL) ? PlatformLanguage : "",
+                     ComponentName2->SupportedLanguages,
+                     NULL
+                     );
+    SHELL_FREE_NON_NULL (PlatformLanguage);
+
     Status = ComponentName2->GetDriverName (
                                ComponentName2,
-                               PlatformLanguage != NULL ? PlatformLanguage : "en-US",
+                               BestLanguage != NULL ? BestLanguage : "en-US",
                                &StringPtr
                                );
     if (!EFI_ERROR (Status)) {
-      SHELL_FREE_NON_NULL (PlatformLanguage);
+      SHELL_FREE_NON_NULL (BestLanguage);
       StrnCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, StringPtr, DP_GAUGE_STRING_LENGTH);
       mGaugeString[DP_GAUGE_STRING_LENGTH] = 0;
       return;
@@ -344,7 +354,7 @@ DpGetNameFromHandle (
   //
   // Method 6: Unknown Driver Name
   //
-  StringPtr = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_ERROR_NAME), NULL);
+  StringPtr = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_ERROR_NAME), NULL);
   ASSERT (StringPtr != NULL);
   StrnCpyS (mGaugeString, DP_GAUGE_STRING_LENGTH + 1, StringPtr, DP_GAUGE_STRING_LENGTH);
   FreePool (StringPtr);

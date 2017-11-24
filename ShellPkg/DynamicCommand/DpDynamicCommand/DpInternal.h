@@ -24,7 +24,7 @@
 //
 /// Module-Global Variables
 ///@{
-extern EFI_HII_HANDLE     gDpHiiHandle;
+extern EFI_HII_HANDLE     mDpHiiHandle;
 extern CHAR16             mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
 extern CHAR16             mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
 extern UINT64             mInterestThreshold;

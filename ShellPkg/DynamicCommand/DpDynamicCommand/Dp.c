@@ -24,19 +24,12 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
-#include "UefiDpLib.h"
-#include <Library/ShellLib.h>
-#include <Library/BaseLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/DebugLib.h>
-#include <Library/UefiLib.h>
-
-#include <Guid/Performance.h>
-
 #include "PerformanceTokens.h"
 #include "Dp.h"
 #include "Literals.h"
 #include "DpInternal.h"
+
+EFI_HANDLE   mDpHiiHandle;
 
 //
 /// Module-Global Variables
@@ -89,18 +82,18 @@ DumpStatistics( void )
 {
   EFI_STRING                StringPtr;
   EFI_STRING                StringPtrUnknown;
-  StringPtr        = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_STATISTICS), NULL);
-  StringPtrUnknown = HiiGetString (gDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), gDpHiiHandle,
+  StringPtr        = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_STATISTICS), NULL);
+  StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
               (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMTRACE), gDpHiiHandle,      SummaryData.NumTrace);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMINCOMPLETE), gDpHiiHandle, SummaryData.NumIncomplete);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPHASES), gDpHiiHandle,     SummaryData.NumSummary);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMHANDLES), gDpHiiHandle,    SummaryData.NumHandles, SummaryData.NumTrace - SummaryData.NumHandles);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPEIMS), gDpHiiHandle,      SummaryData.NumPEIMs);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMGLOBALS), gDpHiiHandle,    SummaryData.NumGlobal);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMTRACE), mDpHiiHandle,      SummaryData.NumTrace);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMINCOMPLETE), mDpHiiHandle, SummaryData.NumIncomplete);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPHASES), mDpHiiHandle,     SummaryData.NumSummary);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMHANDLES), mDpHiiHandle,    SummaryData.NumHandles, SummaryData.NumTrace - SummaryData.NumHandles);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPEIMS), mDpHiiHandle,      SummaryData.NumPEIMs);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMGLOBALS), mDpHiiHandle,    SummaryData.NumGlobal);
 #if PROFILING_IMPLEMENTED
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPROFILE), gDpHiiHandle,    SummaryData.NumProfile);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPROFILE), mDpHiiHandle,    SummaryData.NumProfile);
 #endif // PROFILING_IMPLEMENTED
   SHELL_FREE_NON_NULL (StringPtr);
   SHELL_FREE_NON_NULL (StringPtrUnknown);
@@ -137,8 +130,7 @@ InitCumulativeData (
   @retval value                    Unknown error.
 **/
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDp (
+RunDp (
   IN EFI_HANDLE               ImageHandle,
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
@@ -182,15 +174,12 @@ ShellCommandRunDp (
   Status = ShellInitialize();
   ASSERT_EFI_ERROR(Status);
 
-  Status = CommandInit();
-  ASSERT_EFI_ERROR(Status);
-
   //
   // Process Command Line arguments
   //
   Status = ShellCommandLineParse (ParamList, &ParamPackage, NULL, TRUE);
   if (EFI_ERROR(Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_INVALID_ARG), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_INVALID_ARG), mDpHiiHandle);
     return SHELL_INVALID_PARAMETER;
   }
 
@@ -273,7 +262,7 @@ ShellCommandRunDp (
   //
   Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
   if (EFI_ERROR (Status) || (PerformanceProperty == NULL)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PERF_PROPERTY_NOT_FOUND), gDpHiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PERF_PROPERTY_NOT_FOUND), mDpHiiHandle);
     goto Done;
   }
 
@@ -288,22 +277,22 @@ ShellCommandRunDp (
   // Print header
   //
   // print DP's build version
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_BUILD_REVISION), gDpHiiHandle, DP_MAJOR_VERSION, DP_MINOR_VERSION);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_BUILD_REVISION), mDpHiiHandle, DP_MAJOR_VERSION, DP_MINOR_VERSION);
 
   // print performance timer characteristics
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_KHZ), gDpHiiHandle, TimerInfo.Frequency);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_KHZ), mDpHiiHandle, TimerInfo.Frequency);
 
   if (VerboseMode && !RawMode) {
-    StringPtr = HiiGetString (gDpHiiHandle,
+    StringPtr = HiiGetString (mDpHiiHandle,
                   (EFI_STRING_ID) (TimerInfo.CountUp ? STRING_TOKEN (STR_DP_UP) : STRING_TOKEN (STR_DP_DOWN)), NULL);
     ASSERT (StringPtr != NULL);
     // Print Timer count range and direction
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TIMER_PROPERTIES), gDpHiiHandle,
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TIMER_PROPERTIES), mDpHiiHandle,
                 StringPtr,
                 TimerInfo.StartCount,
                 TimerInfo.EndCount
                 );
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_VERBOSE_THRESHOLD), gDpHiiHandle, mInterestThreshold);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_VERBOSE_THRESHOLD), mDpHiiHandle, mInterestThreshold);
   }
 
 /****************************************************************************
@@ -397,4 +386,53 @@ Done:
   SHELL_FREE_NON_NULL (CustomCumulativeData);
 
   return ShellStatus;
+}
+
+
+/**
+  Retrive HII package list from ImageHandle and publish to HII database.
+
+  @param ImageHandle            The image handle of the process.
+
+  @return HII handle.
+**/
+EFI_HANDLE
+InitializeHiiPackage (
+  EFI_HANDLE                  ImageHandle
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
+  EFI_HANDLE                  HiiHandle;
+
+  //
+  // Retrieve HII package list from ImageHandle
+  //
+  Status = gBS->OpenProtocol (
+                  ImageHandle,
+                  &gEfiHiiPackageListProtocolGuid,
+                  (VOID **)&PackageList,
+                  ImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Publish HII package list to HII Database.
+  //
+  Status = gHiiDatabase->NewPackageList (
+                           gHiiDatabase,
+                           PackageList,
+                           NULL,
+                           &HiiHandle
+                           );
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+  return HiiHandle;
 }

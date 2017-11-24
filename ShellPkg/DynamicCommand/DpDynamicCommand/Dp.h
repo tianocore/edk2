@@ -1,7 +1,7 @@
 /** @file
-  Common declarations for the Dp Performance Reporting Utility.
+  Header file for 'dp' command functions.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -9,12 +9,37 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
 **/
 
-#ifndef _EFI_APP_DP_H_
-#define _EFI_APP_DP_H_
+#ifndef _DP_H_
+#define _DP_H_
 
+
+#include <Uefi.h>
+
+#include <Guid/Performance.h>
+
+#include <Protocol/HiiPackageList.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/UnicodeCollation.h>
+
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/ShellLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/PcdLib.h>
+#include <Library/SortLib.h>
+#include <Library/HiiLib.h>
+#include <Library/FileHandleLib.h>
+#include <Library/UefiHiiServicesLib.h>
+
+extern EFI_HANDLE mDpHiiHandle;
 
 #define DP_MAJOR_VERSION        2
 #define DP_MINOR_VERSION        4
@@ -94,4 +119,32 @@ typedef struct {
   UINT32                Count;            ///< Number of measurements accumulated.
 } PROFILE_RECORD;
 
-#endif  // _EFI_APP_DP_H_
+/**
+  Dump performance data.
+
+  @param[in]  ImageHandle     The image handle.
+  @param[in]  SystemTable     The system table.
+
+  @retval SHELL_SUCCESS            Command completed successfully.
+  @retval SHELL_INVALID_PARAMETER  Command usage error.
+  @retval SHELL_ABORTED            The user aborts the operation.
+  @retval value                    Unknown error.
+**/
+SHELL_STATUS
+RunDp (
+  IN EFI_HANDLE               ImageHandle,
+  IN EFI_SYSTEM_TABLE         *SystemTable
+  );
+
+/**
+  Retrive HII package list from ImageHandle and publish to HII database.
+
+  @param ImageHandle            The image handle of the process.
+
+  @return HII handle.
+**/
+EFI_HANDLE
+InitializeHiiPackage (
+  EFI_HANDLE                  ImageHandle
+  );
+#endif  // _DP_H_
