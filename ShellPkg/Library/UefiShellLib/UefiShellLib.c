@@ -215,7 +215,7 @@ ShellLibConstructorWorker (
     gEfiShellParametersProtocol = NULL;
   }
 
-  if (gEfiShellParametersProtocol == NULL || gEfiShellProtocol == NULL) {
+  if (gEfiShellProtocol == NULL) {
     //
     // Moved to seperate function due to complexity
     //
@@ -238,10 +238,14 @@ ShellLibConstructorWorker (
   }
 
   //
-  // only success getting 2 of either the old or new, but no 1/2 and 1/2
+  // Getting either EDK Shell's ShellEnvironment2 and ShellInterface protocol
+  //  or UEFI Shell's Shell protocol.
+  // When ShellLib is linked to a driver producing DynamicCommand protocol,
+  //  ShellParameters protocol is set by DynamicCommand.Handler().
   //
-  if ((mEfiShellEnvironment2 != NULL && mEfiShellInterface          != NULL) ||
-      (gEfiShellProtocol     != NULL && gEfiShellParametersProtocol != NULL)   ) {
+  if ((mEfiShellEnvironment2 != NULL && mEfiShellInterface != NULL) ||
+      (gEfiShellProtocol     != NULL)
+      ) {
     if (gEfiShellProtocol != NULL) {
       FileFunctionMap.GetFileInfo     = gEfiShellProtocol->GetFileInfo;
       FileFunctionMap.SetFileInfo     = gEfiShellProtocol->SetFileInfo;
