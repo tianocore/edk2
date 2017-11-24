@@ -62,6 +62,8 @@ EFI_LOCK           mPropertiesTableLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTI
 
 BOOLEAN            mPropertiesTableEnable;
 
+BOOLEAN            mPropertiesTableEndOfDxe = FALSE;
+
 //
 // Below functions are for MemoryMap
 //
@@ -1080,6 +1082,11 @@ InsertImageRecord (
   DEBUG ((EFI_D_VERBOSE, "InsertImageRecord - 0x%x\n", RuntimeImage));
   DEBUG ((EFI_D_VERBOSE, "InsertImageRecord - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase, RuntimeImage->ImageSize));
 
+  if (mPropertiesTableEndOfDxe) {
+    DEBUG ((DEBUG_INFO, "Do not insert runtime image record after EndOfDxe\n"));
+    return ;
+  }
+
   ImageRecord = AllocatePool (sizeof(*ImageRecord));
   if (ImageRecord == NULL) {
     return ;
@@ -1297,6 +1304,11 @@ RemoveImageRecord (
   DEBUG ((EFI_D_VERBOSE, "RemoveImageRecord - 0x%x\n", RuntimeImage));
   DEBUG ((EFI_D_VERBOSE, "RemoveImageRecord - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase, RuntimeImage->ImageSize));
 
+  if (mPropertiesTableEndOfDxe) {
+    DEBUG ((DEBUG_INFO, "Do not remove runtime image record after EndOfDxe\n"));
+    return ;
+  }
+
   ImageRecord = FindImageRecord ((EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase, RuntimeImage->ImageSize);
   if (ImageRecord == NULL) {
     DEBUG ((EFI_D_ERROR, "!!!!!!!! ImageRecord not found !!!!!!!!\n"));
@@ -1334,6 +1346,7 @@ InstallPropertiesTable (
   VOID                                    *Context
   )
 {
+  mPropertiesTableEndOfDxe = TRUE;
   if (PcdGetBool (PcdPropertiesTableEnable)) {
     EFI_STATUS  Status;
 
