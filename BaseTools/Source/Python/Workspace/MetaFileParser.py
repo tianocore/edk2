@@ -19,6 +19,7 @@ import Common.LongFilePathOs as os
 import re
 import time
 import copy
+import md5
 
 import Common.EdkLogger as EdkLogger
 import Common.GlobalData as GlobalData
@@ -1116,6 +1117,11 @@ class DscParser(MetaFileParser):
     def _PcdParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)
         self._ValueList[0:1] = GetSplitValueList(TokenList[0], TAB_SPLIT)
+        PcdNameTockens = GetSplitValueList(TokenList[0], TAB_SPLIT)
+        if len(PcdNameTockens) == 2:
+            self._ValueList[0], self._ValueList[1] = PcdNameTockens[0], PcdNameTockens[1]
+        elif len(PcdNameTockens) == 3:
+            self._ValueList[0], self._ValueList[1] = ".".join((PcdNameTockens[0], PcdNameTockens[1])), PcdNameTockens[2]
         if len(TokenList) == 2:
             self._ValueList[2] = TokenList[1]
         if self._ValueList[0] == '' or self._ValueList[1] == '':
@@ -1134,7 +1140,7 @@ class DscParser(MetaFileParser):
 
         # Validate the datum type of Dynamic Defaul PCD and DynamicEx Default PCD
         ValueList = GetSplitValueList(self._ValueList[2])
-        if len(ValueList) > 1 and ValueList[1] != TAB_VOID \
+        if len(ValueList) > 1 and ValueList[1] in [TAB_UINT8 , TAB_UINT16, TAB_UINT32 , TAB_UINT64] \
                               and self._ItemType in [MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT]:
             EdkLogger.error('Parser', FORMAT_INVALID, "The datum type '%s' of PCD is wrong" % ValueList[1],
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
@@ -1560,7 +1566,7 @@ class DscParser(MetaFileParser):
             EdkLogger.error('build', FORMAT_INVALID, "Pcd format incorrect.", File=self._FileWithError, Line=self._LineIndex + 1,
                             ExtraData="%s.%s|%s" % (self._ValueList[0], self._ValueList[1], self._ValueList[2]))
         PcdValue = ValList[Index]
-        if PcdValue:
+        if PcdValue and "." not in self._ValueList[0]:
             try:
                 ValList[Index] = ValueExpression(PcdValue, self._Macros)(True)
             except WrnExpression, Value:
@@ -1574,7 +1580,10 @@ class DscParser(MetaFileParser):
         if (not self._DirectiveEvalStack) or (False not in self._DirectiveEvalStack):
             GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
             self._Symbols[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
-        self._ValueList[2] = '|'.join(ValList)
+        try:
+            self._ValueList[2] = '|'.join(ValList)
+        except Exception:
+            print ValList
 
     def __ProcessComponent(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
@@ -1654,6 +1663,10 @@ class DecParser(MetaFileParser):
         self._Version = 0x00010005  # Only EDK2 dec file is supported
         self._AllPCDs = [] # Only for check duplicate PCD
         self._AllPcdDict = {}
+
+        self._CurrentStructurePcdName = ""
+        self._include_flag = False
+        self._package_flag = False
 
     ## Parser starter
     def Start(self):
@@ -1847,105 +1860,143 @@ class DecParser(MetaFileParser):
     #
     @ParseMacro
     def _PcdParser(self):
-        TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)
-        self._ValueList[0:1] = GetSplitValueList(TokenList[0], TAB_SPLIT)
-        ValueRe = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*')
-        # check PCD information
-        if self._ValueList[0] == '' or self._ValueList[1] == '':
-            EdkLogger.error('Parser', FORMAT_INVALID, "No token space GUID or PCD name specified",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
-        # check format of token space GUID CName
-        if not ValueRe.match(self._ValueList[0]):
-            EdkLogger.error('Parser', FORMAT_INVALID, "The format of the token space GUID CName is invalid. The correct format is '(a-zA-Z_)[a-zA-Z0-9_]*'",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
-        # check format of PCD CName
-        if not ValueRe.match(self._ValueList[1]):
-            EdkLogger.error('Parser', FORMAT_INVALID, "The format of the PCD CName is invalid. The correct format is '(a-zA-Z_)[a-zA-Z0-9_]*'",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
-        # check PCD datum information
-        if len(TokenList) < 2 or TokenList[1] == '':
-            EdkLogger.error('Parser', FORMAT_INVALID, "No PCD Datum information given",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
+        if self._CurrentStructurePcdName:
+            self._ValueList[0] = self._CurrentStructurePcdName
+
+            if "|" not in self._CurrentLine:
+                if "<HeaderFiles>" == self._CurrentLine:
+                    self._include_flag = True
+                    self._ValueList = None
+                    return
+                if "<Packages>" == self._CurrentLine:
+                    self._package_flag = True
+                    self._ValueList = None
+                    return
+
+                if self._include_flag:
+                    self._ValueList[1] = "<HeaderFiles>_" + md5.new(self._CurrentLine).hexdigest()
+                    self._ValueList[2] = self._CurrentLine
+                    self._include_flag = False
+                if self._package_flag and "}" != self._CurrentLine:
+                    self._ValueList[1] = "<Packages>_" + md5.new(self._CurrentLine).hexdigest()
+                    self._ValueList[2] = self._CurrentLine
+                if self._CurrentLine == "}":
+                    self._package_flag = False
+                    self._ValueList = None
+                    return
+            else:
+                PcdTockens = self._CurrentLine.split(TAB_VALUE_SPLIT)
+                PcdNames = PcdTockens[0].split(TAB_SPLIT)
+                if len(PcdNames) == 2:
+                    self._CurrentStructurePcdName = ""
+                else:
+                    self._ValueList[1] = PcdNames[2]
+                    self._ValueList[2] = PcdTockens[1]
+        if not self._CurrentStructurePcdName:
+            TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)
+            self._ValueList[0:1] = GetSplitValueList(TokenList[0], TAB_SPLIT)
+            ValueRe = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*')
+            # check PCD information
+            if self._ValueList[0] == '' or self._ValueList[1] == '':
+                EdkLogger.error('Parser', FORMAT_INVALID, "No token space GUID or PCD name specified",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
+            # check format of token space GUID CName
+            if not ValueRe.match(self._ValueList[0]):
+                EdkLogger.error('Parser', FORMAT_INVALID, "The format of the token space GUID CName is invalid. The correct format is '(a-zA-Z_)[a-zA-Z0-9_]*'",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
+            # check format of PCD CName
+            if not ValueRe.match(self._ValueList[1]):
+                EdkLogger.error('Parser', FORMAT_INVALID, "The format of the PCD CName is invalid. The correct format is '(a-zA-Z_)[a-zA-Z0-9_]*'",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
+            # check PCD datum information
+            if len(TokenList) < 2 or TokenList[1] == '':
+                EdkLogger.error('Parser', FORMAT_INVALID, "No PCD Datum information given",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
 
 
-        ValueRe = re.compile(r'^\s*L?\".*\|.*\"')
-        PtrValue = ValueRe.findall(TokenList[1])
+            ValueRe = re.compile(r'^\s*L?\".*\|.*\"')
+            PtrValue = ValueRe.findall(TokenList[1])
 
-        # Has VOID* type string, may contain "|" character in the string. 
-        if len(PtrValue) != 0:
-            ptrValueList = re.sub(ValueRe, '', TokenList[1])
-            ValueList = AnalyzePcdExpression(ptrValueList)
-            ValueList[0] = PtrValue[0]
-        else:
-            ValueList = AnalyzePcdExpression(TokenList[1])
+            # Has VOID* type string, may contain "|" character in the string.
+            if len(PtrValue) != 0:
+                ptrValueList = re.sub(ValueRe, '', TokenList[1])
+                ValueList = AnalyzePcdExpression(ptrValueList)
+                ValueList[0] = PtrValue[0]
+            else:
+                ValueList = AnalyzePcdExpression(TokenList[1])
 
 
-        # check if there's enough datum information given
-        if len(ValueList) != 3:
-            EdkLogger.error('Parser', FORMAT_INVALID, "Invalid PCD Datum information given",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
-        # check default value
-        if ValueList[0] == '':
-            EdkLogger.error('Parser', FORMAT_INVALID, "Missing DefaultValue in PCD Datum information",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
-        # check datum type
-        if ValueList[1] == '':
-            EdkLogger.error('Parser', FORMAT_INVALID, "Missing DatumType in PCD Datum information",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
-        # check token of the PCD
-        if ValueList[2] == '':
-            EdkLogger.error('Parser', FORMAT_INVALID, "Missing Token in PCD Datum information",
-                            ExtraData=self._CurrentLine + \
-                                      " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
-                            File=self.MetaFile, Line=self._LineIndex + 1)
+            # check if there's enough datum information given
+            if len(ValueList) != 3:
+                EdkLogger.error('Parser', FORMAT_INVALID, "Invalid PCD Datum information given",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
+            # check default value
+            if ValueList[0] == '':
+                EdkLogger.error('Parser', FORMAT_INVALID, "Missing DefaultValue in PCD Datum information",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
+            # check datum type
+            if ValueList[1] == '':
+                EdkLogger.error('Parser', FORMAT_INVALID, "Missing DatumType in PCD Datum information",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
+            # check token of the PCD
+            if ValueList[2] == '':
+                EdkLogger.error('Parser', FORMAT_INVALID, "Missing Token in PCD Datum information",
+                                ExtraData=self._CurrentLine + \
+                                          " (<TokenSpaceGuidCName>.<PcdCName>|<DefaultValue>|<DatumType>|<Token>)",
+                                File=self.MetaFile, Line=self._LineIndex + 1)
 
-        PcdValue = ValueList[0]
-        if PcdValue:
-            try:
-                ValueList[0] = ValueExpression(PcdValue, self._AllPcdDict)(True)
-            except WrnExpression, Value:
-                ValueList[0] = Value.result
+            PcdValue = ValueList[0]
+            if PcdValue:
+                try:
+                    ValueList[0] = ValueExpression(PcdValue, self._AllPcdDict)(True)
+                except WrnExpression, Value:
+                    ValueList[0] = Value.result
 
-        if ValueList[0] == 'True':
-            ValueList[0] = '1'
-        if ValueList[0] == 'False':
-            ValueList[0] = '0'
+            if ValueList[0] == 'True':
+                ValueList[0] = '1'
+            if ValueList[0] == 'False':
+                ValueList[0] = '0'
 
-        # check format of default value against the datum type
-        IsValid, Cause = CheckPcdDatum(ValueList[1], ValueList[0])
-        if not IsValid:
-            EdkLogger.error('Parser', FORMAT_INVALID, Cause, ExtraData=self._CurrentLine,
-                            File=self.MetaFile, Line=self._LineIndex + 1)
+            # check format of default value against the datum type
+            IsValid, Cause = CheckPcdDatum(ValueList[1], ValueList[0])
+            if not IsValid:
+                EdkLogger.error('Parser', FORMAT_INVALID, Cause, ExtraData=self._CurrentLine,
+                                File=self.MetaFile, Line=self._LineIndex + 1)
 
-        if ValueList[0] in ['True', 'true', 'TRUE']:
-            ValueList[0] = '1'
-        elif ValueList[0] in ['False', 'false', 'FALSE']:
-            ValueList[0] = '0'
+            if Cause == "StructurePcd":
+                self._CurrentStructurePcdName = TAB_SPLIT.join(self._ValueList[0:2])
+                self._ValueList[0] = self._CurrentStructurePcdName
+                self._ValueList[1] = ValueList[1].strip()
 
-        # check for duplicate PCD definition
-        if (self._Scope[0], self._ValueList[0], self._ValueList[1]) in self._AllPCDs:
-            EdkLogger.error('Parser', FORMAT_INVALID,
-                            "The same PCD name and GUID have been already defined",
-                            ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
-        else:
-            self._AllPCDs.append((self._Scope[0], self._ValueList[0], self._ValueList[1]))
-            self._AllPcdDict[TAB_SPLIT.join(self._ValueList[0:2])] = ValueList[0]
+            if ValueList[0] in ['True', 'true', 'TRUE']:
+                ValueList[0] = '1'
+            elif ValueList[0] in ['False', 'false', 'FALSE']:
+                ValueList[0] = '0'
 
-        self._ValueList[2] = ValueList[0].strip() + '|' + ValueList[1].strip() + '|' + ValueList[2].strip()
+            # check for duplicate PCD definition
+            if (self._Scope[0], self._ValueList[0], self._ValueList[1]) in self._AllPCDs:
+                EdkLogger.error('Parser', FORMAT_INVALID,
+                                "The same PCD name and GUID have been already defined",
+                                ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
+            else:
+                self._AllPCDs.append((self._Scope[0], self._ValueList[0], self._ValueList[1]))
+                self._AllPcdDict[TAB_SPLIT.join(self._ValueList[0:2])] = ValueList[0]
+
+            self._ValueList[2] = ValueList[0].strip() + '|' + ValueList[1].strip() + '|' + ValueList[2].strip()
 
     _SectionParser = {
         MODEL_META_DATA_HEADER          :   MetaFileParser._DefineParser,

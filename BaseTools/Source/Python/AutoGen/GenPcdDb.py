@@ -1158,6 +1158,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     VarCheckTab = VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER()
     i = 0
     ReorderedDynPcdList = GetOrderedDynamicPcdList(Platform.DynamicPcdList, Platform.PcdTokenNumber)
+    for item in ReorderedDynPcdList:
+        if item.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
+            item.DatumType = "VOID*"
     for Pcd in ReorderedDynPcdList:
         VoidStarTypeCurrSize = []
         i += 1

@@ -36,6 +36,7 @@ from CommonDataClass.DataClass import *
 from Parsing import GetSplitValueList
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+import uuid
 
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
@@ -1471,6 +1472,100 @@ def AnalyzePcdExpression(Setting):
 
     return FieldList
 
+def ParseFieldValue (Value):
+  if type(Value) == type(0):
+    return Value, (Value.bit_length() + 7) / 8
+  if type(Value) <> type(''):
+    raise ValueError
+  Value = Value.strip()
+  if Value.startswith('UINT8') and Value.endswith(')'):
+    Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+    if Size > 1:
+      raise ValueError
+    return Value, 1
+  if Value.startswith('UINT16') and Value.endswith(')'):
+    Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+    if Size > 2:
+      raise ValueError
+    return Value, 2
+  if Value.startswith('UINT32') and Value.endswith(')'):
+    Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+    if Size > 4:
+      raise ValueError
+    return Value, 4
+  if Value.startswith('UINT64') and Value.endswith(')'):
+    Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
+    if Size > 8:
+      raise ValueError
+    return Value, 8
+  if Value.startswith('GUID') and Value.endswith(')'):
+    Value = Value.split('(', 1)[1][:-1].strip()
+    if Value[0] == '{' and Value[-1] == '}':
+      Value = Value[1:-1].strip()
+      Value = Value.split('{', 1)
+      Value = [Item.strip()[2:] for Item in (Value[0] + Value[1][:-1]).split(',')]
+      Value = '-'.join(Value[0:3]) + '-' + ''.join(Value[3:5]) + '-' + ''.join(Value[5:11])
+    if Value[0] == '"' and Value[-1] == '"':
+      Value = Value[1:-1]
+    Value = "'" + uuid.UUID(Value).get_bytes_le() + "'"
+    Value, Size = ParseFieldValue(Value)
+    return Value, 16
+  if Value.startswith('L"') and Value.endswith('"'):
+    # Unicode String
+    List = list(Value[2:-1])
+    List.reverse()
+    Value = 0
+    for Char in List:
+      Value = (Value << 16) | ord(Char)
+    return Value, (len(List) + 1) * 2
+  if Value.startswith('"') and Value.endswith('"'):
+    # ASCII String
+    List = list(Value[1:-1])
+    List.reverse()
+    Value = 0
+    for Char in List:
+      Value = (Value << 8) | ord(Char)
+    return Value, len(List) + 1
+  if Value.startswith("L'") and Value.endswith("'"):
+    # Unicode Character Constant
+    List = list(Value[2:-1])
+    List.reverse()
+    Value = 0
+    for Char in List:
+      Value = (Value << 16) | ord(Char)
+    return Value, len(List) * 2
+  if Value.startswith("'") and Value.endswith("'"):
+    # Character constant
+    List = list(Value[1:-1])
+    List.reverse()
+    Value = 0
+    for Char in List:
+      Value = (Value << 8) | ord(Char)
+    return Value, len(List)
+  if Value.startswith('{') and Value.endswith('}'):
+    # Byte array
+    Value = Value[1:-1]
+    List = [Item.strip() for Item in Value.split(',')]
+    List.reverse()
+    Value = 0
+    for Item in List:
+      ItemValue, Size = ParseFieldValue(Item)
+      if Size > 1:
+        raise ValueError
+      Value = (Value << 8) | ItemValue
+    return Value, len(List)
+  if Value.lower().startswith('0x'):
+    Value = int(Value, 16)
+    return Value, (Value.bit_length() + 7) / 8
+  if Value[0].isdigit():
+    Value = int(Value, 10)
+    return Value, (Value.bit_length() + 7) / 8
+  if Value.lower() == 'true':
+    return 1, 1
+  if Value.lower() == 'false':
+    return 0, 1
+  return Value, 1
+
 ## AnalyzeDscPcd
 #
 #  Analyze DSC PCD value, since there is no data type info in DSC
@@ -1504,19 +1599,19 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
         Value = FieldList[0]
         Size = ''
         if len(FieldList) > 1:
-            Type = FieldList[1]
-            # Fix the PCD type when no DataType input
-            if Type == 'VOID*':
-                DataType = 'VOID*'
-            else:
+            if FieldList[1].upper().startswith("0X") or FieldList[1].isdigit():
                 Size = FieldList[1]
+            else:
+                DataType = FieldList[1]
+
         if len(FieldList) > 2:
             Size = FieldList[2]
-        if DataType == 'VOID*':
-            IsValid = (len(FieldList) <= 3)
-        else:
+        if DataType == "":
             IsValid = (len(FieldList) <= 1)
-        return [Value, '', Size], IsValid, 0
+        else:
+            IsValid = (len(FieldList) <= 3)
+#         Value, Size = ParseFieldValue(Value)
+        return [str(Value), '', str(Size)], IsValid, 0
     elif PcdType in (MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
         Value = FieldList[0]
         Size = Type = ''
@@ -1534,10 +1629,10 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
                     Size = str(len(Value.split(",")))
                 else:
                     Size = str(len(Value) -2 + 1 )
-        if DataType == 'VOID*':
-            IsValid = (len(FieldList) <= 3)
-        else:
+        if DataType == "":
             IsValid = (len(FieldList) <= 1)
+        else:
+            IsValid = (len(FieldList) <= 3)
         return [Value, Type, Size], IsValid, 0
     elif PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
         VpdOffset = FieldList[0]
@@ -1550,10 +1645,11 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
                 Size = FieldList[1]
             if len(FieldList) > 2:
                 Value = FieldList[2]
-        if DataType == 'VOID*':
-            IsValid = (len(FieldList) <= 3)
+        if DataType == "":
+            IsValid = (len(FieldList) <= 1)
         else:
-            IsValid = (len(FieldList) <= 2)
+            IsValid = (len(FieldList) <= 3)
+
         return [VpdOffset, Size, Value], IsValid, 2
     elif PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
         HiiString = FieldList[0]
@@ -1682,7 +1778,7 @@ def CheckPcdDatum(Type, Value):
             return False, "Invalid value [%s] of type [%s];"\
                           " must be a hexadecimal, decimal or octal in C language format." % (Value, Type)
     else:
-        return False, "Invalid type [%s]; must be one of VOID*, BOOLEAN, UINT8, UINT16, UINT32, UINT64." % (Type)
+        return True, "StructurePcd"
 
     return True, ""
 
