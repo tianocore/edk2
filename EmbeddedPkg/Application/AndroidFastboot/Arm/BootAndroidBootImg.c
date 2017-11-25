@@ -17,7 +17,6 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 
-#include <Library/BdsLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>

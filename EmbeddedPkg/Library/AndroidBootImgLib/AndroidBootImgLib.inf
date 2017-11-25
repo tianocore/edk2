@@ -43,6 +43,7 @@
 
 [Protocols]
   gAndroidBootImgProtocolGuid
+  gEfiLoadedImageProtocolGuid
 
 [Guids]
   gFdtTableGuid

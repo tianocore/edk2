@@ -15,7 +15,6 @@
 
 #include <Library/AndroidBootImgLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/BdsLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -35,7 +34,8 @@ ValidateAndroidMediaDevicePath (
   NextNode = DevicePath;
   while (NextNode != NULL) {
     Node = NextNode;
-    if (IS_DEVICE_PATH_NODE (Node, MEDIA_DEVICE_PATH, MEDIA_HARDDRIVE_DP)) {
+    if (Node->Type == MEDIA_DEVICE_PATH &&
+        Node->SubType == MEDIA_HARDDRIVE_DP) {
       return EFI_SUCCESS;
     }
     NextNode = NextDevicePathNode (Node);

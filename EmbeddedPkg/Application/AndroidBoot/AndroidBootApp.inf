@@ -28,7 +28,6 @@
   AndroidBootImgLib
   BaseLib
   BaseMemoryLib
-  BdsLib
   DebugLib
   DevicePathLib
   DxeServicesTableLib

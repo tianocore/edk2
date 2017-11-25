@@ -288,11 +288,7 @@
 
 [Components.ARM, Components.AARCH64]
   EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
-  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf {
-    <LibraryClasses>
-      # It depends on BdsLib that depends on TimerLib
-      TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
-  }
+  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
 
