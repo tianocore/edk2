@@ -167,7 +167,8 @@ MdeModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
 M: Star Zeng <star.zeng@intel.com>
 M: Eric Dong <eric.dong@intel.com>
-M: NetworkPkg maintainers (Universal/Network)
+M: NetworkPkg maintainers
+  (Universal/Network and related libraries, header files)
 R: Ruiyu Ni <ruiyu.ni@intel.com>
   (especially for Bus, Universal/Console, Universal/Disk,
    Universal/BdsDxe and related libraries, header files)
