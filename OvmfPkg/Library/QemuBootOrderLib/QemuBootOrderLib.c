@@ -1861,7 +1861,8 @@ SetBootOrderFromQemu (
       // match translated OpenFirmware path against all active boot options
       //
       for (Idx = 0; Idx < ActiveCount; ++Idx) {
-        if (Match (
+        if (!ActiveOption[Idx].Appended &&
+            Match (
               Translated,
               TranslatedSize, // contains length, not size, in CHAR16's here
               ActiveOption[Idx].BootOption->FilePath
