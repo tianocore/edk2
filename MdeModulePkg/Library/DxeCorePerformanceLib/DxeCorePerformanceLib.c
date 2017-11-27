@@ -63,6 +63,11 @@ PERFORMANCE_EX_PROTOCOL mPerformanceExInterface = {
 
 PERFORMANCE_PROPERTY  mPerformanceProperty;
 
+//
+//  Gauge record lock to avoid data corruption or even memory overflow
+//
+STATIC EFI_LOCK mPerfRecordLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+
 /**
   Searches in the gauge array with keyword Handle, Token, Module and Identifier.
 
@@ -162,6 +167,12 @@ StartGaugeEx (
   UINTN                     OldGaugeDataSize;
   GAUGE_DATA_HEADER         *OldGaugeData;
   UINT32                    Index;
+  EFI_STATUS                Status;
+
+  Status = EfiAcquireLockOrFail (&mPerfRecordLock);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   Index = mGaugeData->NumberOfEntries;
   if (Index >= mMaxGaugeRecords) {
@@ -175,6 +186,7 @@ StartGaugeEx (
 
     NewGaugeData = AllocateZeroPool (GaugeDataSize);
     if (NewGaugeData == NULL) {
+      EfiReleaseLock (&mPerfRecordLock);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -208,6 +220,8 @@ StartGaugeEx (
   GaugeEntryExArray[Index].StartTimeStamp = TimeStamp;
 
   mGaugeData->NumberOfEntries++;
+
+  EfiReleaseLock (&mPerfRecordLock);
 
   return EFI_SUCCESS;
 }
@@ -250,6 +264,12 @@ EndGaugeEx (
 {
   GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
   UINT32              Index;
+  EFI_STATUS          Status;
+
+  Status = EfiAcquireLockOrFail (&mPerfRecordLock);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (TimeStamp == 0) {
     TimeStamp = GetPerformanceCounter ();
@@ -257,10 +277,62 @@ EndGaugeEx (
 
   Index = InternalSearchForGaugeEntry (Handle, Token, Module, Identifier);
   if (Index >= mGaugeData->NumberOfEntries) {
+    EfiReleaseLock (&mPerfRecordLock);
     return EFI_NOT_FOUND;
   }
   GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
   GaugeEntryExArray[Index].EndTimeStamp = TimeStamp;
+
+  EfiReleaseLock (&mPerfRecordLock);
+  return EFI_SUCCESS;
+}
+
+/**
+  Retrieves a previously logged performance measurement.
+  It can also retrieve the log created by StartGauge and EndGauge of PERFORMANCE_PROTOCOL,
+  and then assign the Identifier with 0.
+
+  Retrieves the performance log entry from the performance log specified by LogEntryKey.
+  If it stands for a valid entry, then EFI_SUCCESS is returned and
+  GaugeDataEntryEx stores the pointer to that entry.
+
+  This internal function is added to avoid releasing lock before each return statement.
+
+  @param  LogEntryKey             The key for the previous performance measurement log entry.
+                                  If 0, then the first performance measurement log entry is retrieved.
+  @param  GaugeDataEntryEx        The indirect pointer to the extended gauge data entry specified by LogEntryKey
+                                  if the retrieval is successful.
+
+  @retval EFI_SUCCESS             The GuageDataEntryEx is successfully found based on LogEntryKey.
+  @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
+  @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
+  @retval EFI_INVALIDE_PARAMETER  GaugeDataEntryEx is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+InternalGetGaugeEx (
+  IN  UINTN                 LogEntryKey,
+  OUT GAUGE_DATA_ENTRY_EX   **GaugeDataEntryEx
+  )
+{
+  UINTN               NumberOfEntries;
+  GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
+
+  NumberOfEntries = (UINTN) (mGaugeData->NumberOfEntries);
+  if (LogEntryKey > NumberOfEntries) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (LogEntryKey == NumberOfEntries) {
+    return EFI_NOT_FOUND;
+  }
+
+  GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
+
+  if (GaugeDataEntryEx == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *GaugeDataEntryEx = &GaugeEntryExArray[LogEntryKey];
 
   return EFI_SUCCESS;
 }
@@ -292,25 +364,18 @@ GetGaugeEx (
   OUT GAUGE_DATA_ENTRY_EX   **GaugeDataEntryEx
   )
 {
-  UINTN               NumberOfEntries;
-  GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
+  EFI_STATUS                Status;
 
-  NumberOfEntries = (UINTN) (mGaugeData->NumberOfEntries);
-  if (LogEntryKey > NumberOfEntries) {
-    return EFI_INVALID_PARAMETER;
-  }
-  if (LogEntryKey == NumberOfEntries) {
-    return EFI_NOT_FOUND;
+  Status = EfiAcquireLockOrFail (&mPerfRecordLock);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-  GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
+  Status = InternalGetGaugeEx (LogEntryKey, GaugeDataEntryEx);
 
-  if (GaugeDataEntryEx == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-  *GaugeDataEntryEx = &GaugeEntryExArray[LogEntryKey];
+  EfiReleaseLock (&mPerfRecordLock);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
