@@ -148,10 +148,36 @@ typedef union {
 
 #pragma pack()
 
+#define CR0_WP                      BIT16
+
 #define IA32_PG_P                   BIT0
 #define IA32_PG_RW                  BIT1
+#define IA32_PG_PS                  BIT7
 
+#define PAGING_PAE_INDEX_MASK       0x1FF
+
+#define PAGING_4K_ADDRESS_MASK_64   0x000FFFFFFFFFF000ull
+#define PAGING_2M_ADDRESS_MASK_64   0x000FFFFFFFE00000ull
 #define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
+
+#define PAGING_L1_ADDRESS_SHIFT     12
+#define PAGING_L2_ADDRESS_SHIFT     21
+#define PAGING_L3_ADDRESS_SHIFT     30
+#define PAGING_L4_ADDRESS_SHIFT     39
+
+#define PAGING_PML4E_NUMBER         4
+
+#define PAGE_TABLE_POOL_ALIGNMENT   BASE_2MB
+#define PAGE_TABLE_POOL_UNIT_SIZE   SIZE_2MB
+#define PAGE_TABLE_POOL_UNIT_PAGES  EFI_SIZE_TO_PAGES (PAGE_TABLE_POOL_UNIT_SIZE)
+#define PAGE_TABLE_POOL_ALIGN_MASK  \
+  (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
+
+typedef struct {
+  VOID            *NextPool;
+  UINTN           Offset;
+  UINTN           FreePages;
+} PAGE_TABLE_POOL;
 
 /**
   Enable Execute Disable Bit.
@@ -250,6 +276,41 @@ ClearFirst4KPage (
 BOOLEAN
 IsNullDetectionEnabled (
   VOID
+  );
+
+/**
+  Prevent the memory pages used for page table from been overwritten.
+
+  @param[in] PageTableBase    Base address of page table (CR3).
+  @param[in] Level4Paging     Level 4 paging flag.
+
+**/
+VOID
+EnablePageTableProtection (
+  IN  UINTN     PageTableBase,
+  IN  BOOLEAN   Level4Paging
+  );
+
+/**
+  This API provides a way to allocate memory for page table.
+
+  This API can be called more than once to allocate memory for page tables.
+
+  Allocates the number of 4KB pages and returns a pointer to the allocated
+  buffer. The buffer returned is aligned on a 4KB boundary.
+
+  If Pages is 0, then NULL is returned.
+  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
+
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+AllocatePageTableMemory (
+  IN UINTN           Pages
   );
 
 #endif 

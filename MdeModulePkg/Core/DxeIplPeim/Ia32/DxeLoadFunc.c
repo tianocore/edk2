@@ -99,7 +99,7 @@ Create4GPageTablesIa32Pae (
   NumberOfPdpEntriesNeeded = (UINT32) LShiftU64 (1, (PhysicalAddressBits - 30));
 
   TotalPagesNum = NumberOfPdpEntriesNeeded + 1;
-  PageAddress = (UINTN) AllocatePages (TotalPagesNum);
+  PageAddress = (UINTN) AllocatePageTableMemory (TotalPagesNum);
   ASSERT (PageAddress != 0);
 
   PageMap = (VOID *) PageAddress;
@@ -148,6 +148,12 @@ Create4GPageTablesIa32Pae (
       sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
       );
   }
+
+  //
+  // Protect the page table by marking the memory used for page table to be
+  // read-only.
+  //
+  EnablePageTableProtection ((UINTN)PageMap, FALSE);
 
   return (UINTN) PageMap;
 }

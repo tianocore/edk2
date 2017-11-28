@@ -31,6 +31,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
+//
+// Global variable to keep track current available memory used as page table.
+//
+PAGE_TABLE_POOL   *mPageTablePool = NULL;
+
 /**
   Clear legacy memory located at the first 4K-page, if available.
 
@@ -151,6 +156,110 @@ ToSplitPageTable (
   return FALSE;
 }
 /**
+  Initialize a buffer pool for page table use only.
+
+  To reduce the potential split operation on page table, the pages reserved for
+  page table should be allocated in the times of PAGE_TABLE_POOL_UNIT_PAGES and
+  at the boundary of PAGE_TABLE_POOL_ALIGNMENT. So the page pool is always
+  initialized with number of pages greater than or equal to the given PoolPages.
+
+  Once the pages in the pool are used up, this method should be called again to
+  reserve at least another PAGE_TABLE_POOL_UNIT_PAGES. But usually this won't
+  happen in practice.
+
+  @param PoolPages  The least page number of the pool to be created.
+
+  @retval TRUE    The pool is initialized successfully.
+  @retval FALSE   The memory is out of resource.
+**/
+BOOLEAN
+InitializePageTablePool (
+  IN UINTN           PoolPages
+  )
+{
+  VOID          *Buffer;
+
+  //
+  // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
+  // header.
+  //
+  PoolPages += 1;   // Add one page for header.
+  PoolPages = ((PoolPages - 1) / PAGE_TABLE_POOL_UNIT_PAGES + 1) *
+              PAGE_TABLE_POOL_UNIT_PAGES;
+  Buffer = AllocateAlignedPages (PoolPages, PAGE_TABLE_POOL_ALIGNMENT);
+  if (Buffer == NULL) {
+    DEBUG ((DEBUG_ERROR, "ERROR: Out of aligned pages\r\n"));
+    return FALSE;
+  }
+
+  //
+  // Link all pools into a list for easier track later.
+  //
+  if (mPageTablePool == NULL) {
+    mPageTablePool = Buffer;
+    mPageTablePool->NextPool = mPageTablePool;
+  } else {
+    ((PAGE_TABLE_POOL *)Buffer)->NextPool = mPageTablePool->NextPool;
+    mPageTablePool->NextPool = Buffer;
+    mPageTablePool = Buffer;
+  }
+
+  //
+  // Reserve one page for pool header.
+  //
+  mPageTablePool->FreePages  = PoolPages - 1;
+  mPageTablePool->Offset = EFI_PAGES_TO_SIZE (1);
+
+  return TRUE;
+}
+
+/**
+  This API provides a way to allocate memory for page table.
+
+  This API can be called more than once to allocate memory for page tables.
+
+  Allocates the number of 4KB pages and returns a pointer to the allocated
+  buffer. The buffer returned is aligned on a 4KB boundary.
+
+  If Pages is 0, then NULL is returned.
+  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
+
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+AllocatePageTableMemory (
+  IN UINTN           Pages
+  )
+{
+  VOID          *Buffer;
+
+  if (Pages == 0) {
+    return NULL;
+  }
+
+  //
+  // Renew the pool if necessary.
+  //
+  if (mPageTablePool == NULL ||
+      Pages > mPageTablePool->FreePages) {
+    if (!InitializePageTablePool (Pages)) {
+      return NULL;
+    }
+  }
+
+  Buffer = (UINT8 *)mPageTablePool + mPageTablePool->Offset;
+
+  mPageTablePool->Offset     += EFI_PAGES_TO_SIZE (Pages);
+  mPageTablePool->FreePages  -= Pages;
+
+  return Buffer;
+}
+
+/**
   Split 2M page to 4K.
 
   @param[in]      PhysicalAddress       Start physical address the 2M page covered.
@@ -177,7 +286,7 @@ Split2MPageTo4K (
   //
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
-  PageTableEntry = AllocatePages (1);
+  PageTableEntry = AllocatePageTableMemory (1);
   ASSERT (PageTableEntry != NULL);
 
   //
@@ -238,7 +347,7 @@ Split1GPageTo2M (
   //
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
-  PageDirectoryEntry = AllocatePages (1);
+  PageDirectoryEntry = AllocatePageTableMemory (1);
   ASSERT (PageDirectoryEntry != NULL);
 
   //
@@ -263,6 +372,184 @@ Split1GPageTo2M (
       PageDirectoryEntry->Bits.MustBe1 = 1;
     }
   }
+}
+
+/**
+  Set one page of page table pool memory to be read-only.
+
+  @param[in] PageTableBase    Base address of page table (CR3).
+  @param[in] Address          Start address of a page to be set as read-only.
+  @param[in] Level4Paging     Level 4 paging flag.
+
+**/
+VOID
+SetPageTablePoolReadOnly (
+  IN  UINTN                             PageTableBase,
+  IN  EFI_PHYSICAL_ADDRESS              Address,
+  IN  BOOLEAN                           Level4Paging
+  )
+{
+  UINTN                 Index;
+  UINTN                 EntryIndex;
+  UINT64                AddressEncMask;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+  UINT64                *PageTable;
+  UINT64                *NewPageTable;
+  UINT64                PageAttr;
+  UINT64                LevelSize[5];
+  UINT64                LevelMask[5];
+  UINTN                 LevelShift[5];
+  UINTN                 Level;
+  UINT64                PoolUnitSize;
+
+  ASSERT (PageTableBase != 0);
+
+  //
+  // Since the page table is always from page table pool, which is always
+  // located at the boundary of PcdPageTablePoolAlignment, we just need to
+  // set the whole pool unit to be read-only.
+  //
+  Address = Address & PAGE_TABLE_POOL_ALIGN_MASK;
+
+  LevelShift[1] = PAGING_L1_ADDRESS_SHIFT;
+  LevelShift[2] = PAGING_L2_ADDRESS_SHIFT;
+  LevelShift[3] = PAGING_L3_ADDRESS_SHIFT;
+  LevelShift[4] = PAGING_L4_ADDRESS_SHIFT;
+
+  LevelMask[1] = PAGING_4K_ADDRESS_MASK_64;
+  LevelMask[2] = PAGING_2M_ADDRESS_MASK_64;
+  LevelMask[3] = PAGING_1G_ADDRESS_MASK_64;
+  LevelMask[4] = PAGING_1G_ADDRESS_MASK_64;
+
+  LevelSize[1] = SIZE_4KB;
+  LevelSize[2] = SIZE_2MB;
+  LevelSize[3] = SIZE_1GB;
+  LevelSize[4] = SIZE_512GB;
+
+  AddressEncMask  = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
+                    PAGING_1G_ADDRESS_MASK_64;
+  PageTable       = (UINT64 *)(UINTN)PageTableBase;
+  PoolUnitSize    = PAGE_TABLE_POOL_UNIT_SIZE;
+
+  for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
+    Index = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
+    Index &= PAGING_PAE_INDEX_MASK;
+
+    PageAttr = PageTable[Index];
+    if ((PageAttr & IA32_PG_PS) == 0) {
+      //
+      // Go to next level of table.
+      //
+      PageTable = (UINT64 *)(UINTN)(PageAttr & ~AddressEncMask &
+                                    PAGING_4K_ADDRESS_MASK_64);
+      continue;
+    }
+
+    if (PoolUnitSize >= LevelSize[Level]) {
+      //
+      // Clear R/W bit if current page granularity is not larger than pool unit
+      // size.
+      //
+      if ((PageAttr & IA32_PG_RW) != 0) {
+        while (PoolUnitSize > 0) {
+          //
+          // PAGE_TABLE_POOL_UNIT_SIZE and PAGE_TABLE_POOL_ALIGNMENT are fit in
+          // one page (2MB). Then we don't need to update attributes for pages
+          // crossing page directory. ASSERT below is for that purpose.
+          //
+          ASSERT (Index < EFI_PAGE_SIZE/sizeof (UINT64));
+
+          PageTable[Index] &= ~(UINT64)IA32_PG_RW;
+          PoolUnitSize    -= LevelSize[Level];
+
+          ++Index;
+        }
+      }
+
+      break;
+
+    } else {
+      //
+      // The smaller granularity of page must be needed.
+      //
+      NewPageTable = AllocatePageTableMemory (1);
+      ASSERT (NewPageTable != NULL);
+
+      PhysicalAddress = PageAttr & LevelMask[Level];
+      for (EntryIndex = 0;
+            EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
+            ++EntryIndex) {
+        NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
+                                   IA32_PG_P | IA32_PG_RW;
+        if (Level > 1) {
+          NewPageTable[EntryIndex] |= IA32_PG_PS;
+        }
+        PhysicalAddress += LevelSize[Level];
+      }
+
+      PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
+                                        IA32_PG_P | IA32_PG_RW;
+      PageTable = NewPageTable;
+    }
+  }
+}
+
+/**
+  Prevent the memory pages used for page table from been overwritten.
+
+  @param[in] PageTableBase    Base address of page table (CR3).
+  @param[in] Level4Paging     Level 4 paging flag.
+
+**/
+VOID
+EnablePageTableProtection (
+  IN  UINTN     PageTableBase,
+  IN  BOOLEAN   Level4Paging
+  )
+{
+  PAGE_TABLE_POOL         *HeadPool;
+  PAGE_TABLE_POOL         *Pool;
+  UINT64                  PoolSize;
+  EFI_PHYSICAL_ADDRESS    Address;
+
+  if (mPageTablePool == NULL) {
+    return;
+  }
+
+  //
+  // Disable write protection, because we need to mark page table to be write
+  // protected.
+  //
+  AsmWriteCr0 (AsmReadCr0() & ~CR0_WP);
+
+  //
+  // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
+  // remember original one in advance.
+  //
+  HeadPool = mPageTablePool;
+  Pool = HeadPool;
+  do {
+    Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
+    PoolSize = Pool->Offset + EFI_PAGES_TO_SIZE (Pool->FreePages);
+
+    //
+    // The size of one pool must be multiple of PAGE_TABLE_POOL_UNIT_SIZE, which
+    // is one of page size of the processor (2MB by default). Let's apply the
+    // protection to them one by one.
+    //
+    while (PoolSize > 0) {
+      SetPageTablePoolReadOnly(PageTableBase, Address, Level4Paging);
+      Address   += PAGE_TABLE_POOL_UNIT_SIZE;
+      PoolSize  -= PAGE_TABLE_POOL_UNIT_SIZE;
+    }
+
+    Pool = Pool->NextPool;
+  } while (Pool != HeadPool);
+
+  //
+  // Enable write protection, after page table attribute updated.
+  //
+  AsmWriteCr0 (AsmReadCr0() | CR0_WP);
 }
 
 /**
@@ -360,7 +647,7 @@ CreateIdentityMappingPageTables (
   } else {
     TotalPagesNum = NumberOfPml4EntriesNeeded + 1;
   }
-  BigPageAddress = (UINTN) AllocatePages (TotalPagesNum);
+  BigPageAddress = (UINTN) AllocatePageTableMemory (TotalPagesNum);
   ASSERT (BigPageAddress != 0);
 
   //
@@ -454,6 +741,12 @@ CreateIdentityMappingPageTables (
       sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
       );
   }
+
+  //
+  // Protect the page table by marking the memory used for page table to be
+  // read-only.
+  //
+  EnablePageTableProtection ((UINTN)PageMap, TRUE);
 
   if (PcdGetBool (PcdSetNxForStack)) {
     EnableExecuteDisableBit ();
