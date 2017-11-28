@@ -51,9 +51,10 @@ LIBRARIES = Common
 VFRAUTOGEN = VfrCompile/VfrLexer.h
 # NON_BUILDABLE_APPLICATIONS = GenBootSector BootSectImage
 APPLICATIONS = \
+  BrotliCompress \
+  VfrCompile \
   GnuGenBootSector \
   BootSectImage \
-  BrotliCompress \
   EfiLdrImage \
   EfiRom \
   GenFfs \
@@ -66,8 +67,7 @@ APPLICATIONS = \
   LzmaCompress \
   Split \
   TianoCompress \
-  VolInfo \
-  VfrCompile
+  VolInfo
 
 SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
