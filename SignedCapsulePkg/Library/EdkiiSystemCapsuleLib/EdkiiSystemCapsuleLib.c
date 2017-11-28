@@ -29,6 +29,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/EdkiiSystemCapsuleLib.h>
 #include <Library/FmpAuthenticationLib.h>
@@ -600,6 +601,10 @@ CapsuleAuthenticateSystemFirmware (
   // NOTE: This function need run in an isolated environment.
   // Do not touch FMP protocol and its private structure.
   //
+  if (mImageFmpInfo == NULL) {
+    DEBUG((DEBUG_INFO, "ImageFmpInfo is not set\n"));
+    return EFI_SECURITY_VIOLATION;
+  }
 
   Result = ExtractAuthenticatedImage((VOID *)Image, ImageSize, LastAttemptStatus, AuthenticatedImage, AuthenticatedImageSize);
   if (!Result) {
@@ -655,6 +660,53 @@ CapsuleAuthenticateSystemFirmware (
 }
 
 /**
+  PcdCallBack gets the real set PCD value
+
+  @param[in]      CallBackGuid    The PCD token GUID being set.
+  @param[in]      CallBackToken   The PCD token number being set.
+  @param[in, out] TokenData       A pointer to the token data being set.
+  @param[in]      TokenDataSize   The size, in bytes, of the data being set.
+
+**/
+VOID
+EFIAPI
+EdkiiSystemCapsuleLibPcdCallBack (
+  IN        CONST GUID        *CallBackGuid, OPTIONAL
+  IN        UINTN             CallBackToken,
+  IN  OUT   VOID              *TokenData,
+  IN        UINTN             TokenDataSize
+  )
+{
+  if (CompareGuid (CallBackGuid, &gEfiSignedCapsulePkgTokenSpaceGuid) &&
+      CallBackToken == PcdToken (PcdEdkiiSystemFirmwareImageDescriptor)) {
+    mImageFmpInfoSize = TokenDataSize;
+    mImageFmpInfo = AllocateCopyPool (mImageFmpInfoSize, TokenData);
+    ASSERT(mImageFmpInfo != NULL);
+    //
+    // Cancel Callback after get the real set value
+    //
+    LibPcdCancelCallback (
+      &gEfiSignedCapsulePkgTokenSpaceGuid,
+      PcdToken (PcdEdkiiSystemFirmwareImageDescriptor),
+      EdkiiSystemCapsuleLibPcdCallBack
+      );
+  }
+
+  if (CompareGuid (CallBackGuid, &gEfiSignedCapsulePkgTokenSpaceGuid) &&
+      CallBackToken == PcdToken (PcdEdkiiSystemFirmwareFileGuid)) {
+    CopyGuid(&mEdkiiSystemFirmwareFileGuid, TokenData);
+    //
+    // Cancel Callback after get the real set value
+    //
+    LibPcdCancelCallback (
+      &gEfiSignedCapsulePkgTokenSpaceGuid,
+      PcdToken (PcdEdkiiSystemFirmwareFileGuid),
+      EdkiiSystemCapsuleLibPcdCallBack
+      );
+  }
+}
+
+/**
   The constructor function.
 
   @retval EFI_SUCCESS   The constructor successfully .
@@ -666,8 +718,38 @@ EdkiiSystemCapsuleLibConstructor (
   )
 {
   mImageFmpInfoSize = PcdGetSize(PcdEdkiiSystemFirmwareImageDescriptor);
-  mImageFmpInfo = AllocateCopyPool (mImageFmpInfoSize, PcdGetPtr(PcdEdkiiSystemFirmwareImageDescriptor));
-  ASSERT(mImageFmpInfo != NULL);
+  mImageFmpInfo     = PcdGetPtr(PcdEdkiiSystemFirmwareImageDescriptor);
+  //
+  // Verify Firmware Image Descriptor first
+  //
+  if (mImageFmpInfoSize < sizeof (EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR) ||
+      mImageFmpInfo->Signature != EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR_SIGNATURE) {
+    //
+    // SystemFirmwareImageDescriptor is not set.
+    // Register PCD set callback to hook PCD value set.
+    //
+    mImageFmpInfo     = NULL;
+    mImageFmpInfoSize = 0;
+    LibPcdCallbackOnSet (
+      &gEfiSignedCapsulePkgTokenSpaceGuid,
+      PcdToken (PcdEdkiiSystemFirmwareImageDescriptor),
+      EdkiiSystemCapsuleLibPcdCallBack
+      );
+  } else {
+    mImageFmpInfo = AllocateCopyPool (mImageFmpInfoSize, mImageFmpInfo);
+    ASSERT(mImageFmpInfo != NULL);
+  }
+
   CopyGuid(&mEdkiiSystemFirmwareFileGuid, PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid));
+  //
+  // Verify GUID value first
+  //
+  if (CompareGuid (&mEdkiiSystemFirmwareFileGuid, &gZeroGuid)) {
+    LibPcdCallbackOnSet (
+      &gEfiSignedCapsulePkgTokenSpaceGuid,
+      PcdToken (PcdEdkiiSystemFirmwareFileGuid),
+      EdkiiSystemCapsuleLibPcdCallBack
+      );
+  }
   return EFI_SUCCESS;
 }

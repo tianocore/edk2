@@ -43,6 +43,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  PcdLib
   MemoryAllocationLib
   FmpAuthenticationLib
 
@@ -58,4 +59,6 @@
   gEdkiiSystemFmpCapsuleDriverFvFileGuid               ## SOMETIMES_CONSUMES   ## GUID
   gEfiCertPkcs7Guid                                    ## SOMETIMES_CONSUMES   ## GUID
   gEfiCertTypeRsa2048Sha256Guid                        ## SOMETIMES_CONSUMES   ## GUID
+  gEfiSignedCapsulePkgTokenSpaceGuid                   ## SOMETIMES_CONSUMES   ## GUID
+  gZeroGuid                                            ## SOMETIMES_CONSUMES   ## GUID
 
