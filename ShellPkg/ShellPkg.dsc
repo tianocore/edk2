@@ -120,9 +120,14 @@
 !endif #$(NO_SHELL_PROFILES)
   }
 
-  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
+    <PcdsFixedAtBuild>
+      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+  }
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpApp.inf
   ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf {
+    <PcdsFixedAtBuild>
+      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
     <LibraryClasses>
       PerformanceLib|MdeModulePkg/Library/DxeSmmPerformanceLib/DxeSmmPerformanceLib.inf
   }

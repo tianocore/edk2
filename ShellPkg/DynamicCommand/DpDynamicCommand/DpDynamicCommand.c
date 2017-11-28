@@ -38,6 +38,7 @@ DpCommandHandler (
   )
 {
   gEfiShellParametersProtocol = ShellParameters;
+  gEfiShellProtocol           = Shell;
   return RunDp (gImageHandle, SystemTable);
 }
 

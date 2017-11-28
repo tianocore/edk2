@@ -39,6 +39,7 @@ TftpCommandHandler (
   )
 {
   gEfiShellParametersProtocol = ShellParameters;
+  gEfiShellProtocol           = Shell;
   return RunTftp (gImageHandle, SystemTable);
 }
 
