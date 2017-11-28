@@ -1,7 +1,7 @@
 ## @file
 #  GNU/Linux makefile for C tools build.
 #
-#  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -44,10 +44,11 @@ MAKEROOT = .
 
 include Makefiles/header.makefile
 
-all: makerootdir subdirs $(MAKEROOT)/libs
+all: makerootdir subdirs
 	@echo Finished building BaseTools C Tools with HOST_ARCH=$(HOST_ARCH)
 
 LIBRARIES = Common
+VFRAUTOGEN = VfrCompile/VfrLexer.h
 # NON_BUILDABLE_APPLICATIONS = GenBootSector BootSectImage
 APPLICATIONS = \
   GnuGenBootSector \
@@ -70,6 +71,9 @@ APPLICATIONS = \
 
 SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
+$(LIBRARIES): $(MAKEROOT)/libs
+$(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin $(VFRAUTOGEN)
+
 .PHONY: outputdirs
 makerootdir:
 	-mkdir -p $(MAKEROOT)
@@ -82,6 +86,9 @@ $(SUBDIRS):
 .PHONY: $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
 	-$(MAKE) -C $(@:-clean=) clean
+
+$(VFRAUTOGEN): VfrCompile/VfrSyntax.g 
+	$(MAKE) -C VfrCompile VfrLexer.h
 
 clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 

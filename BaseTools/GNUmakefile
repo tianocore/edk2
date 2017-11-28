@@ -1,7 +1,7 @@
 ## @file
 # GNU/Linux makefile for Base Tools project build.
 #
-# Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -24,12 +24,10 @@ subdirs: $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@
 
+Tests: $(SOURCE_SUBDIRS)
+
 .PHONY: $(CLEAN_SUBDIRS)
 $(CLEAN_SUBDIRS):
 	-$(MAKE) -C $(@:-clean=) clean
 
 clean:  $(CLEAN_SUBDIRS)
-
-test:
-	@$(MAKE) -C Tests
-
