@@ -156,3 +156,12 @@
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlValueColdReset_HELP
 #language en-US
 "8bit Reset Control Register value for cold reset."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterA_PROMPT  #language en-US "Initial value for Register_A in RTC."
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterA_HELP    #language en-US "Specifies the initial value for Register_A in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterB_PROMPT  #language en-US "Initial value for Register_B in RTC."
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterB_HELP    #language en-US "Specifies the initial value for Register_B in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterD_PROMPT  #language en-US "Initial value for Register_D in RTC."
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterD_HELP    #language en-US "Specifies the initial value for Register_D in RTC."
