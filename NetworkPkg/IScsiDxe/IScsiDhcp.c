@@ -266,7 +266,7 @@ IScsiDhcpSelectOffer (
     break;
   }
 
-  if ((Index == OptionCount)) {
+  if (Index == OptionCount) {
     Status = EFI_NOT_READY;
   }
 
