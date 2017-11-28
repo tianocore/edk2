@@ -13,12 +13,12 @@
 
 DEPFILES = $(OBJECTS:%.o=%.d)
 
-$(MAKEROOT)/libs-$(ARCH):
-	mkdir -p $(MAKEROOT)/libs-$(ARCH)
+$(MAKEROOT)/libs-$(HOST_ARCH):
+	mkdir -p $(MAKEROOT)/libs-$(HOST_ARCH)
 
 .PHONY: install
-install: $(MAKEROOT)/libs-$(ARCH) $(LIBRARY)
-	cp $(LIBRARY) $(MAKEROOT)/libs-$(ARCH)
+install: $(MAKEROOT)/libs-$(HOST_ARCH) $(LIBRARY)
+	cp $(LIBRARY) $(MAKEROOT)/libs-$(HOST_ARCH)
 
 $(LIBRARY): $(OBJECTS) 
 	$(BUILD_AR) crs $@ $^

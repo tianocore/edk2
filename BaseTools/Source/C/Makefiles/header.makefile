@@ -1,10 +1,10 @@
 ## @file
 #
 # The makefile can be invoked with
-# ARCH = x86_64 or x64 for EM64T build
-# ARCH = ia32 or IA32 for IA32 build
-# ARCH = ia64 or IA64 for IA64 build
-# ARCH = Arm or ARM for ARM build
+# HOST_ARCH = x86_64 or x64 for EM64T build
+# HOST_ARCH = ia32 or IA32 for IA32 build
+# HOST_ARCH = ia64 or IA64 for IA64 build
+# HOST_ARCH = Arm or ARM for ARM build
 #
 # Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
@@ -15,7 +15,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-ARCH ?= IA32
+HOST_ARCH ?= IA32
 
 CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
 LINUX:=$(findstring Linux, $(shell uname -s))
@@ -27,19 +27,19 @@ BUILD_AS ?= gcc
 BUILD_AR ?= ar
 BUILD_LD ?= ld
 LINKER ?= $(BUILD_CC)
-ifeq ($(ARCH), IA32)
+ifeq ($(HOST_ARCH), IA32)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/Ia32/
 endif
 
-ifeq ($(ARCH), X64)
+ifeq ($(HOST_ARCH), X64)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/X64/
 endif
 
-ifeq ($(ARCH), ARM)
+ifeq ($(HOST_ARCH), ARM)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/Arm/
 endif
 
-ifeq ($(ARCH), AARCH64)
+ifeq ($(HOST_ARCH), AARCH64)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/AArch64/
 endif
 
@@ -54,7 +54,7 @@ endif
 BUILD_LFLAGS =
 BUILD_CXXFLAGS = -Wno-unused-result
 
-ifeq ($(ARCH), IA32)
+ifeq ($(HOST_ARCH), IA32)
 #
 # Snow Leopard  is a 32-bit and 64-bit environment. uname -m returns i386, but gcc defaults 
 #  to x86_64. So make sure tools match uname -m. You can manual have a 64-bit kernal on Snow Leopard
