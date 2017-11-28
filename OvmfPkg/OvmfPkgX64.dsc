@@ -803,7 +803,6 @@
 !if $(NETWORK_IP6_ENABLE) == TRUE
       NULL|ShellPkg/Library/UefiShellNetwork2CommandsLib/UefiShellNetwork2CommandsLib.inf
 !endif
-      NULL|ShellPkg/Library/UefiShellTftpCommandLib/UefiShellTftpCommandLib.inf
       HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
       ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
       FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
