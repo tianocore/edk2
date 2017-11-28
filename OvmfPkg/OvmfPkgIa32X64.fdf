@@ -1,7 +1,7 @@
 ## @file
 #  Open Virtual Machine Firmware: FDF
 #
-#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials
@@ -286,6 +286,7 @@ INF  FatPkg/EnhancedFatDxe/Fat.inf
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
 !ifndef $(USE_OLD_SHELL)
+INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
 !else
 INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
