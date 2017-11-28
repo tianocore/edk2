@@ -1,7 +1,7 @@
 ## @file
 # This is Emulator FDF file with UEFI HII features enabled
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2009 - 2011, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -206,6 +206,7 @@ INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
 !ifndef $(USE_OLD_SHELL)
+INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
 !else
 INF  RuleOverride = BINARY EdkShellBinPkg/FullShell/FullShell.inf
