@@ -938,7 +938,67 @@ FvFoundInHobFv2 (
   return FALSE;
 }
 
+/**
+  Find USED_SIZE FV_EXT_TYPE entry in FV extension header and get the FV used size.
 
+  @param[in]  FvHeader      Pointer to FV header.
+  @param[out] FvUsedSize    Pointer to FV used size returned,
+                            only valid if USED_SIZE FV_EXT_TYPE entry is found.
+  @param[out] EraseByte     Pointer to erase byte returned,
+                            only valid if USED_SIZE FV_EXT_TYPE entry is found.
+
+  @retval TRUE              USED_SIZE FV_EXT_TYPE entry is found,
+                            FV used size and erase byte are returned.
+  @retval FALSE             No USED_SIZE FV_EXT_TYPE entry found.
+
+**/
+BOOLEAN
+GetFvUsedSize (
+  IN EFI_FIRMWARE_VOLUME_HEADER     *FvHeader,
+  OUT UINT32                        *FvUsedSize,
+  OUT UINT8                         *EraseByte
+  )
+{
+  UINT16                                        ExtHeaderOffset;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER                *ExtHeader;
+  EFI_FIRMWARE_VOLUME_EXT_ENTRY                 *ExtEntryList;
+  EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE  *ExtEntryUsedSize;
+
+  ExtHeaderOffset = ReadUnaligned16 (&FvHeader->ExtHeaderOffset);
+  if (ExtHeaderOffset != 0) {
+    ExtHeader    = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) ((UINT8 *) FvHeader + ExtHeaderOffset);
+    ExtEntryList = (EFI_FIRMWARE_VOLUME_EXT_ENTRY *) (ExtHeader + 1);
+    while ((UINTN) ExtEntryList < ((UINTN) ExtHeader + ReadUnaligned32 (&ExtHeader->ExtHeaderSize))) {
+      if (ReadUnaligned16 (&ExtEntryList->ExtEntryType) == EFI_FV_EXT_TYPE_USED_SIZE_TYPE) {
+        //
+        // USED_SIZE FV_EXT_TYPE entry is found.
+        //
+        ExtEntryUsedSize = (EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE *) ExtEntryList;
+        *FvUsedSize = ReadUnaligned32 (&ExtEntryUsedSize->UsedSize);
+        if ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_ERASE_POLARITY) != 0) {
+          *EraseByte = 0xFF;
+        } else {
+          *EraseByte = 0;
+        }
+        DEBUG ((
+          DEBUG_INFO,
+          "FV at 0x%x has 0x%x used size, and erase byte is 0x%02x\n",
+          FvHeader,
+          *FvUsedSize,
+          *EraseByte
+          ));
+        return TRUE;
+      }
+      ExtEntryList = (EFI_FIRMWARE_VOLUME_EXT_ENTRY *)
+                     ((UINT8 *) ExtEntryList + ReadUnaligned16 (&ExtEntryList->ExtEntrySize));
+    }
+  }
+
+  //
+  // No USED_SIZE FV_EXT_TYPE entry found.
+  //
+  return FALSE;
+}
 
 /**
   Get the driver from the FV through driver name, and produce a FVB protocol on FvHandle.
@@ -968,6 +1028,8 @@ CoreProcessFvImageFile (
   EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
   UINT32                              FvAlignment;
   EFI_DEVICE_PATH_PROTOCOL            *FvFileDevicePath;
+  UINT32                              FvUsedSize;
+  UINT8                               EraseByte;
 
   //
   // Read the first (and only the first) firmware volume section
@@ -1035,6 +1097,14 @@ CoreProcessFvImageFile (
         FvAlignment = 8;
       }
 
+      DEBUG ((
+        DEBUG_INFO,
+        "%a() FV at 0x%x, FvAlignment required is 0x%x\n",
+        __FUNCTION__,
+        FvHeader,
+        FvAlignment
+        ));
+
       //
       // Check FvImage alignment.
       //
@@ -1050,7 +1120,19 @@ CoreProcessFvImageFile (
           //
           // Move FvImage into the aligned buffer and release the original buffer.
           //
-          CopyMem (AlignedBuffer, Buffer, BufferSize);
+          if (GetFvUsedSize (FvHeader, &FvUsedSize, &EraseByte)) {
+            //
+            // Copy the used bytes and fill the rest with the erase value.
+            //
+            CopyMem (AlignedBuffer, FvHeader, (UINTN) FvUsedSize);
+            SetMem (
+              (UINT8 *) AlignedBuffer + FvUsedSize,
+              (UINTN) (BufferSize - FvUsedSize),
+              EraseByte
+              );
+          } else {
+            CopyMem (AlignedBuffer, Buffer, BufferSize);
+          }
           FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) AlignedBuffer;
           CoreFreePool (Buffer);
           Buffer = NULL;
