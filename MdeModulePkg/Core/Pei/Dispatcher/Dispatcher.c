@@ -676,7 +676,8 @@ PeiCheckAndSwitchStack (
       for (StackPointer = (UINT32*)SecCoreData->StackBase;
            (StackPointer < (UINT32*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
            && (*StackPointer == PcdGet32 (PcdInitValueInTempStack));
-           StackPointer ++);
+           StackPointer ++) {
+      }
 
       DEBUG ((DEBUG_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
       DEBUG ((DEBUG_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", SecCoreData->PeiTemporaryRamBase, (UINT32)SecCoreData->PeiTemporaryRamSize));
