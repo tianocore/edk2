@@ -187,6 +187,9 @@ Returns:
                         SectionAlign points to section alignment, which support\n\
                         the alignment scope 1~16M. It is specified in same\n\
                         order that the section file is input.\n");
+  fprintf (stdout, "  --dummy dummyfile\n\
+                        compare dummpyfile with input_file to decide whether\n\
+                        need to set PROCESSING_REQUIRED attribute.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -1028,6 +1031,13 @@ Returns:
   UINT32                    *InputFileAlign;
   UINT32                    InputFileAlignNum;
   EFI_COMMON_SECTION_HEADER *SectionHeader;
+  CHAR8                     *DummyFileName;
+  FILE                      *DummyFile;
+  UINTN                     DummyFileSize;
+  UINT8                     *DummyFileBuffer;
+  FILE                      *InFile;
+  UINT8                     *InFileBuffer;
+  UINTN                     InFileSize;
 
   InputFileAlign        = NULL;
   InputFileAlignNum     = 0;
@@ -1049,6 +1059,13 @@ Returns:
   SectGuidHeaderLength  = 0;
   VersionSect           = NULL;
   UiSect                = NULL;
+  DummyFileSize         = 0;
+  DummyFileName         = NULL;
+  DummyFile             = NULL;
+  DummyFileBuffer       = NULL;
+  InFile                = NULL;
+  InFileSize            = 0;
+  InFileBuffer          = NULL;
   
   SetUtilityName (UTILITY_NAME);
   
@@ -1113,6 +1130,16 @@ Returns:
       Status = StringToGuid (argv[1], &VendorGuid);
       if (EFI_ERROR (Status)) {
         Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
+        goto Finish;
+      }
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+    if (stricmp (argv[0], "--dummy") == 0) {
+      DummyFileName = argv[1];
+      if (DummyFileName == NULL) {
+        Error (NULL, 0, 1003, "Invalid option value", "Dummy file can't be NULL");
         goto Finish;
       }
       argc -= 2;
@@ -1291,6 +1318,53 @@ Returns:
   }
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
+
+  if (DummyFileName != NULL) {
+      //
+      // Open file and read contents
+      //
+      DummyFile = fopen (LongFilePath (DummyFileName), "rb");
+      if (DummyFile == NULL) {
+        Error (NULL, 0, 0001, "Error opening file", DummyFileName);
+        return EFI_ABORTED;
+      }
+
+      fseek (DummyFile, 0, SEEK_END);
+      DummyFileSize = ftell (DummyFile);
+      fseek (DummyFile, 0, SEEK_SET);
+      DummyFileBuffer = (UINT8 *) malloc (DummyFileSize);
+      fread(DummyFileBuffer, 1, DummyFileSize, DummyFile);
+      fclose(DummyFile);
+      DebugMsg (NULL, 0, 9, "Dummy files", "the dummy file name is %s and the size is %u bytes", DummyFileName, (unsigned) DummyFileSize);
+
+      InFile = fopen(LongFilePath(InputFileName[0]), "rb");
+      if (InFile == NULL) {
+        Error (NULL, 0, 0001, "Error opening file", InputFileName[0]);
+        return EFI_ABORTED;
+      }
+
+      fseek (InFile, 0, SEEK_END);
+      InFileSize = ftell (InFile);
+      fseek (InFile, 0, SEEK_SET);
+      InFileBuffer = (UINT8 *) malloc (InFileSize);
+      fread(InFileBuffer, 1, InFileSize, InFile);
+      fclose(InFile);
+      DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %u bytes", InputFileName[0], (unsigned) InFileSize);
+      if (InFileSize > DummyFileSize){
+        if (stricmp(DummyFileBuffer, InFileBuffer + (InFileSize - DummyFileSize)) == 0){
+          SectGuidHeaderLength = InFileSize - DummyFileSize;
+        }
+      }
+      if (SectGuidHeaderLength == 0) {
+        SectGuidAttribute |= EFI_GUIDED_SECTION_PROCESSING_REQUIRED;
+      }
+      if (DummyFileBuffer != NULL) {
+        free (DummyFileBuffer);
+      }
+      if (InFileBuffer != NULL) {
+        free (InFileBuffer);
+      }
+    }
 
   //
   // Parse all command line parameters to get the corresponding section type.
