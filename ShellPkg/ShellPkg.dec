@@ -81,6 +81,7 @@
 [PcdsFixedAtBuild]
   ## This flag is used to control initialization of the shell library
   #  This should be FALSE for compiling the shell application itself only.
+  #  This should be FALSE for compiling the dynamic command drivers.
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|TRUE|BOOLEAN|0x00000005
 
   ## This is the max buffer for ShellLib and internal Shell printings.
