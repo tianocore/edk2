@@ -67,7 +67,7 @@ SerialReset (
                            stop bits.
 
   @retval EFI_SUCCESS      The device was reset.
-  @retval EFI_DEVICE_ERROR The serial device could not be reset.
+  @retval EFI_DEVICE_ERROR The serial device is not functioning correctly.
 
 **/
 EFI_STATUS
@@ -265,7 +265,7 @@ SerialReset (
                            stop bits.
 
   @retval EFI_SUCCESS      The device was reset.
-  @retval EFI_DEVICE_ERROR The serial device could not be reset.
+  @retval EFI_DEVICE_ERROR The serial device is not functioning correctly.
 
 **/
 EFI_STATUS

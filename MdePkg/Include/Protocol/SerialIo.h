@@ -126,7 +126,7 @@ EFI_STATUS
                            stop bits.
 
   @retval EFI_SUCCESS      The device was reset.
-  @retval EFI_DEVICE_ERROR The serial device could not be reset.
+  @retval EFI_DEVICE_ERROR The serial device is not functioning correctly.
 
 **/
 typedef
