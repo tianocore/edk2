@@ -240,6 +240,15 @@ SerialReset (
                    (EFI_STOP_BITS_TYPE) This->Mode->StopBits
                    );
 
+  //
+  // The serial device may not support some of the attributes. To prevent
+  // later failure, always return EFI_SUCCESS when SetAttributes is returning
+  // EFI_INVALID_PARAMETER.
+  //
+  if (Status == EFI_INVALID_PARAMETER) {
+    return EFI_SUCCESS;
+  }
+
   return Status;
 }
 
