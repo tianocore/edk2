@@ -1,7 +1,7 @@
 # FLASH layout file for Beagle board.
 #
 # Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -178,6 +178,7 @@ FvNameGuid         = d0dd3e90-343d-4cb3-8f69-772214989282
   # UEFI application (Shell Embedded Boot Loader)
   #
   INF ShellPkg/Application/Shell/Shell.inf
+  INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 
   #
   # Bds
