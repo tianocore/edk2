@@ -1,7 +1,7 @@
 #/** @file
 # Platform description.
 #
-# Copyright (c) 2012  - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012  - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
@@ -1267,13 +1267,17 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 
   IntelFrameworkModulePkg/Universal/LegacyRegionDxe/LegacyRegionDxe.inf
 
-  PerformancePkg/Dp_App/Dp.inf {
-  <LibraryClasses>
-  !if $(PERFORMANCE_ENABLE) == TRUE
-    PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
-    TimerLib|$(PLATFORM_PACKAGE)/Library/IntelPchAcpiTimerLib/IntelPchAcpiTimerLib.inf
-  !endif
+  #
+  # Performance Application; Set PERFORMANCE_ENABLE=TRUE for normal boot performance and smm performance data
+  #
+!if $(PERFORMANCE_ENABLE) == TRUE
+  ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf {
+    <PcdsFixedAtBuild>
+      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+    <LibraryClasses>
+      PerformanceLib|MdeModulePkg/Library/DxeSmmPerformanceLib/DxeSmmPerformanceLib.inf
   }
+!endif
 
   Vlv2TbltDevicePkg/VlvPlatformInitDxe/VlvPlatformInitDxe.inf{
     <LibraryClasses>
