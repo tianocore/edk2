@@ -2,7 +2,7 @@
 # FDF file of Clanton Peak CRB platform with 32-bit DXE
 #
 # This package provides QuarkNcSocId platform specific modules.
-# Copyright (c) 2013 - 2016 Intel Corporation.
+# Copyright (c) 2013 - 2017 Intel Corporation.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -575,11 +575,17 @@ INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 # File System Modules
 #
 !if $(PERFORMANCE_ENABLE)
-INF  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
 !else
 INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
 INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
 INF  FatPkg/EnhancedFatDxe/Fat.inf
+!endif
+
+#
+# Performance Application
+#
+!if $(PERFORMANCE_ENABLE)
+INF  ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 !endif
 
 #
@@ -677,9 +683,6 @@ READ_LOCK_STATUS   = TRUE
 # Shell and Applications
 #
 INF  RuleOverride = TIANOCOMPRESSED ShellPkg/Application/Shell/Shell.inf
-!if $(PERFORMANCE_ENABLE)
-INF  RuleOverride = TIANOCOMPRESSED PerformancePkg/Dp_App/Dp.inf
-!endif
 
 !if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
 
