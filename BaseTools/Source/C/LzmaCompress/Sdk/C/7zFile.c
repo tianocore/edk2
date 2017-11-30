@@ -213,7 +213,7 @@ WRes File_GetLength(CSzFile *p, UInt64 *length)
 {
   #ifdef USE_WINDOWS_FILE
   
-  DWORD sizeHigh;
+  DWORD sizeHigh = 0;
   DWORD sizeLow = GetFileSize(p->handle, &sizeHigh);
   if (sizeLow == 0xFFFFFFFF)
   {
