@@ -177,7 +177,8 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
-  INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+  INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  INF MdeModulePkg/Application/UiApp/UiApp.inf
 
   INF OvmfPkg/XenBusDxe/XenBusDxe.inf
   INF OvmfPkg/XenPvBlkDxe/XenPvBlkDxe.inf
