@@ -37,18 +37,6 @@ UINT64 mSystemMemoryEnd = FixedPcdGet64(PcdSystemMemoryBase) +
                           FixedPcdGet64(PcdSystemMemorySize) - 1;
 
 EFI_STATUS
-EFIAPI
-ExtractGuidedSectionLibConstructor (
-  VOID
-  );
-
-EFI_STATUS
-EFIAPI
-LzmaDecompressLibConstructor (
-  VOID
-  );
-
-EFI_STATUS
 GetPlatformPpi (
   IN  EFI_GUID  *PpiGuid,
   OUT VOID      **Ppi
@@ -165,8 +153,7 @@ PrePiMain (
   PERF_START (NULL, "PEI", NULL, StartTimeStamp);
 
   // SEC phase needs to run library constructors by hand.
-  ExtractGuidedSectionLibConstructor ();
-  LzmaDecompressLibConstructor ();
+  ProcessLibraryConstructorList ();
 
   // Build HOBs to pass up our version of stuff the DXE Core needs to save space
   BuildPeCoffLoaderHob ();

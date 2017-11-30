@@ -87,4 +87,10 @@ ArchInitialize (
   VOID
   );
 
+VOID
+EFIAPI
+ProcessLibraryConstructorList (
+  VOID
+  );
+
 #endif /* _PREPI_H_ */
