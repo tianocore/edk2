@@ -49,7 +49,6 @@
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress

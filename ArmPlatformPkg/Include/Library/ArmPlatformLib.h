@@ -112,17 +112,6 @@ ArmPlatformInitialize (
   );
 
 /**
-  Initialize the system (or sometimes called permanent) memory
-
-  This memory is generally represented by the DRAM.
-
-**/
-VOID
-ArmPlatformInitializeSystemMemory (
-  VOID
-  );
-
-/**
   Return the Virtual Memory Map of your platform
 
   This Virtual Memory Map is used by MemoryInitPei Module to initialize the MMU on your platform.

@@ -48,7 +48,6 @@
   gArmPlatformTokenSpaceGuid.PcdNorFlashRemapping|FALSE|BOOLEAN|0x00000012
 
   gArmPlatformTokenSpaceGuid.PcdStandalone|TRUE|BOOLEAN|0x00000001
-  gArmPlatformTokenSpaceGuid.PcdSystemMemoryInitializeInSec|FALSE|BOOLEAN|0x00000002
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores|FALSE|BOOLEAN|0x00000004
 
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked|FALSE|BOOLEAN|0x0000003C

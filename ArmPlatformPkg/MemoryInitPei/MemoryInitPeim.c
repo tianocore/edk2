@@ -103,14 +103,6 @@ InitializeMemory (
 
   DEBUG ((EFI_D_LOAD | EFI_D_INFO, "Memory Init PEIM Loaded\n"));
 
-  //
-  // Initialize the System Memory (DRAM)
-  //
-  if (!FeaturePcdGet (PcdSystemMemoryInitializeInSec)) {
-    // In case the DRAM has not been initialized by the secure firmware
-    ArmPlatformInitializeSystemMemory ();
-  }
-
   // Ensure PcdSystemMemorySize has been set
   ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
   ASSERT (PcdGet64 (PcdSystemMemoryBase) < (UINT64)MAX_ADDRESS);
