@@ -4,7 +4,7 @@
   can be found in the Tiano Firmware Volume Generation Utility 
   Specification, review draft.
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -607,23 +607,25 @@ Returns:
         return STATUS_ERROR;
       }
     }
-    fprintf (FpFile, "Capsule %s Image Header Information\n", InfFileName);
-    fprintf (FpFile, "  GUID                  %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n", 
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data1,
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data2,
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data3,
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[0],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[1],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[2],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[3],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[4],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[5],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[6],
-                    (unsigned) CapsuleHeader->CapsuleGuid.Data4[7]);
-    fprintf (FpFile, "  Header size           0x%08X\n", (unsigned) CapsuleHeader->HeaderSize);
-    fprintf (FpFile, "  Flags                 0x%08X\n", (unsigned) CapsuleHeader->Flags);
-    fprintf (FpFile, "  Capsule image size    0x%08X\n", (unsigned) CapsuleHeader->CapsuleImageSize);
-    fclose (FpFile);
+    if (FpFile != NULL) {
+      fprintf (FpFile, "Capsule %s Image Header Information\n", InfFileName);
+      fprintf (FpFile, "  GUID                  %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X\n",
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data1,
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data2,
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data3,
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[0],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[1],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[2],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[3],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[4],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[5],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[6],
+                      (unsigned) CapsuleHeader->CapsuleGuid.Data4[7]);
+      fprintf (FpFile, "  Header size           0x%08X\n", (unsigned) CapsuleHeader->HeaderSize);
+      fprintf (FpFile, "  Flags                 0x%08X\n", (unsigned) CapsuleHeader->Flags);
+      fprintf (FpFile, "  Capsule image size    0x%08X\n", (unsigned) CapsuleHeader->CapsuleImageSize);
+      fclose (FpFile);
+    }
   } else if (CapsuleFlag) {
     VerboseMsg ("Create capsule image");
     //
