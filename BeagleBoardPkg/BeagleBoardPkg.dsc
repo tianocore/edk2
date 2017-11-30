@@ -142,7 +142,6 @@
   ReportStatusCodeLib|MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
-  LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
 
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
 
@@ -377,7 +376,10 @@
   #
   # SEC
   #
-  ArmPlatformPkg/PrePi/PeiUniCore.inf
+  BeagleBoardPkg/PrePi/PeiUniCore.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  }
 
   #
   # DXE
