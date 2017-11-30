@@ -2,7 +2,7 @@
 
   Functions to get info and load PE/COFF image.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
@@ -1080,12 +1080,10 @@ Returns:
                                                                 PeHdr->Pe32.OptionalHeader.AddressOfEntryPoint
                                                                 );
   } else {
-    ImageContext->EntryPoint =  (PHYSICAL_ADDRESS) (
-                       (UINTN)ImageContext->ImageAddress +
-                       (UINTN)TeHdr->AddressOfEntryPoint +
-                       (UINTN)sizeof(EFI_TE_IMAGE_HEADER) -
-          (UINTN) TeHdr->StrippedSize
-      );
+    ImageContext->EntryPoint = (UINTN)ImageContext->ImageAddress +
+                               (UINTN)TeHdr->AddressOfEntryPoint +
+                               (UINTN)sizeof(EFI_TE_IMAGE_HEADER) -
+                               (UINTN) TeHdr->StrippedSize;
   }
 
   //
