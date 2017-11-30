@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -184,15 +184,15 @@ _SmiHandler:
     add     rsp, -0x20
 
     mov     rcx, rbx
-    mov     rax, CpuSmmDebugEntry
+    mov     rax, ASM_PFX(CpuSmmDebugEntry)
     call    rax
 
     mov     rcx, rbx
-    mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
+    mov     rax, ASM_PFX(SmiRendezvous)  ; rax <- absolute addr of SmiRedezvous
     call    rax
 
     mov     rcx, rbx
-    mov     rax, CpuSmmDebugExit
+    mov     rax, ASM_PFX(CpuSmmDebugExit)
     call    rax
 
     add     rsp, 0x20
@@ -220,5 +220,5 @@ _SmiHandler:
 .1:
     rsm
 
-gcSmiHandlerSize    DW      $ - _SmiEntryPoint
+ASM_PFX(gcSmiHandlerSize)    DW      $ - _SmiEntryPoint
 
