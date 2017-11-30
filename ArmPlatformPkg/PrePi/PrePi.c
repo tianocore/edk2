@@ -17,7 +17,6 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PrintLib.h>
-#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PerformanceLib.h>
@@ -25,10 +24,8 @@
 #include <Ppi/GuidedSectionExtraction.h>
 #include <Ppi/ArmMpCoreInfo.h>
 #include <Ppi/SecPerformance.h>
-#include <Guid/LzmaDecompress.h>
 
 #include "PrePi.h"
-#include "LzmaDecompress.h"
 
 #define IS_XIP() (((UINT64)FixedPcdGet64 (PcdFdBaseAddress) > mSystemMemoryEnd) || \
                   ((FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) < FixedPcdGet64 (PcdSystemMemoryBase)))
@@ -154,14 +151,6 @@ PrePiMain (
 
   // SEC phase needs to run library constructors by hand.
   ProcessLibraryConstructorList ();
-
-  // Build HOBs to pass up our version of stuff the DXE Core needs to save space
-  BuildPeCoffLoaderHob ();
-  BuildExtractSectionHob (
-    &gLzmaCustomDecompressGuid,
-    LzmaGuidedSectionGetInfo,
-    LzmaGuidedSectionExtraction
-    );
 
   // Assume the FV that contains the SEC (our code) also contains a compressed FV.
   Status = DecompressFirstFv ();

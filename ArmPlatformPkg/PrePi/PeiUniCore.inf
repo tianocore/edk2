@@ -51,7 +51,6 @@
   SerialPortLib
   ExtractGuidedSectionLib
   LzmaDecompressLib
-  PeCoffGetEntryPointLib
   DebugAgentLib
   PrePiLib
   ArmPlatformLib
