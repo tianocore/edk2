@@ -39,7 +39,6 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   BaseLib
