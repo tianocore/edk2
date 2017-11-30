@@ -30,7 +30,6 @@
   SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = EmbeddedPkg/EmbeddedPkg.fdf
 
 
 ################################################################################
