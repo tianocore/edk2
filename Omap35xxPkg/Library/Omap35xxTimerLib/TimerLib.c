@@ -131,3 +131,27 @@ GetPerformanceCounterProperties (
 
   return PcdGet64(PcdEmbeddedPerformanceCounterFrequencyInHz);
 }
+
+/**
+  Converts elapsed ticks of performance counter to time in nanoseconds.
+
+  This function converts the elapsed ticks of running performance counter to
+  time value in unit of nanoseconds.
+
+  @param  Ticks     The number of elapsed ticks of running performance counter.
+
+  @return The elapsed time in nanoseconds.
+
+**/
+UINT64
+EFIAPI
+GetTimeInNanoSecond (
+  IN      UINT64                     Ticks
+  )
+{
+  UINT32 Period;
+
+  Period = PcdGet32 (PcdEmbeddedPerformanceCounterPeriodInNanoseconds);
+
+  return (Ticks * Period);
+}
