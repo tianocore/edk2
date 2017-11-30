@@ -101,11 +101,13 @@ Returns:
       // Find the last . on the line and replace the filename extension with
       // the default
       //
-      for (Ext = mOptions.OutFileName + strlen (mOptions.OutFileName) - 1;
-           (Ext >= mOptions.OutFileName) && (*Ext != '.') && (*Ext != '\\');
-           Ext--
-          )
-        ;
+      Ext = mOptions.OutFileName + strlen (mOptions.OutFileName) - 1;
+      while (Ext >= mOptions.OutFileName) {
+        if ((*Ext == '.') || (*Ext == '\\')) {
+          break;
+        }
+        Ext--;
+      }
       //
       // If dot here, then insert extension here, otherwise append
       //
