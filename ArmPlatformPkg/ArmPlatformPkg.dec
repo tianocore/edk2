@@ -33,6 +33,7 @@
 
 [LibraryClasses]
   ArmPlatformLib|Include/Library/ArmPlatformLib.h
+  LcdHwLib|Include/Library/LcdHwLib.h
   LcdPlatformLib|Include/Library/LcdPlatformLib.h
   NorFlashPlatformLib|Include/Library/NorFlashPlatformLib.h
   PL011UartLib|Include/Library/PL011UartLib.h

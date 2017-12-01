@@ -101,6 +101,7 @@
 
   ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
   ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
+  ArmPlatformPkg/Library/LcdHwNullLib/LcdHwNullLib.inf
   ArmPlatformPkg/Library/LcdPlatformNullLib/LcdPlatformNullLib.inf
   ArmPlatformPkg/Library/NorFlashPlatformNullLib/NorFlashPlatformNullLib.inf
   ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
