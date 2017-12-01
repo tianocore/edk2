@@ -1014,7 +1014,7 @@ class PcdReport(object):
                         Pcd.DatumType = Pcd.StructName
                         if TypeName in ('DYNVPD', 'DEXVPD'):
                             Pcd.SkuInfoList = SkuInfoList
-                        if Pcd.OverrideValues:
+                        if Pcd.SkuOverrideValues:
                             DscMatch = True
                             DecMatch = False
                     #
@@ -1107,7 +1107,7 @@ class PcdReport(object):
             else:
                 FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
             if IsStructure:
-                OverrideValues = Pcd.OverrideValues
+                OverrideValues = Pcd.SkuOverrideValues
                 if OverrideValues:
                     Keys = OverrideValues.keys()
                     Data = OverrideValues[Keys[0]]
@@ -1142,7 +1142,7 @@ class PcdReport(object):
                                     FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', Value))
                             FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))
                             if IsStructure:
-                                OverrideValues = Pcd.OverrideValues[Sku]
+                                OverrideValues = Pcd.SkuOverrideValues[Sku]
                                 Struct = OverrideValues[DefaultStore]
                                 self.PrintStructureInfo(File, Struct)
                             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
@@ -1166,7 +1166,7 @@ class PcdReport(object):
                             FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
                     FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
                     if IsStructure:
-                        OverrideValues = Pcd.OverrideValues[Sku]
+                        OverrideValues = Pcd.SkuOverrideValues[Sku]
                         if OverrideValues:
                             Keys = OverrideValues.keys()
                             Struct = OverrideValues[Keys[0]]
@@ -1191,7 +1191,7 @@ class PcdReport(object):
                         else:
                             FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
                     if IsStructure:
-                        OverrideValues = Pcd.OverrideValues[Sku]
+                        OverrideValues = Pcd.SkuOverrideValues[Sku]
                         if OverrideValues:
                             Keys = OverrideValues.keys()
                             Struct = OverrideValues[Keys[0]]

@@ -1842,7 +1842,8 @@ class PlatformAutoGen(AutoGen):
                 for (SkuName,SkuId) in allskuset:
                     if type(SkuId) in (str,unicode) and eval(SkuId) == 0 or SkuId == 0:
                         continue
-                    pcd.SkuInfoList[SkuName] = pcd.SkuInfoList['DEFAULT']
+                    pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList['DEFAULT'])
+                    pcd.SkuInfoList[SkuName].SkuId = SkuId
         self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
 
     def FixVpdOffset(self,VpdFile ):

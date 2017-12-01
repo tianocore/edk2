@@ -168,7 +168,7 @@ class StructurePcd(PcdClassObject):
             self.DefaultValues = PcdObject.DefaultValues if PcdObject.DefaultValues else self.DefaultValues
             self.PcdMode = PcdObject.PcdMode if PcdObject.PcdMode else self.PcdMode
             self.DefaultFromDSC=None
-            self.OverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
+            self.SkuOverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
             self.FlexibleFieldName = PcdObject.FlexibleFieldName if PcdObject.FlexibleFieldName else self.FlexibleFieldName
             self.StructName = PcdObject.DatumType if PcdObject.DatumType else self.StructName
 
