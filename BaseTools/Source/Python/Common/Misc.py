@@ -1611,6 +1611,12 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
         else:
             IsValid = (len(FieldList) <= 3)
 #         Value, Size = ParseFieldValue(Value)
+        if Size:
+            try:
+                int(Size,16) if Size.upper().startswith("0X") else int(Size)
+            except:
+                IsValid = False
+                Size = -1
         return [str(Value), '', str(Size)], IsValid, 0
     elif PcdType in (MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
         Value = FieldList[0]
@@ -1633,7 +1639,14 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             IsValid = (len(FieldList) <= 1)
         else:
             IsValid = (len(FieldList) <= 3)
-        return [Value, Type, Size], IsValid, 0
+
+        if Size:
+            try:
+                int(Size,16) if Size.upper().startswith("0X") else int(Size)
+            except:
+                IsValid = False
+                Size = -1
+        return [Value, Type, str(Size)], IsValid, 0
     elif PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
         VpdOffset = FieldList[0]
         Value = Size = ''
@@ -1649,8 +1662,13 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             IsValid = (len(FieldList) <= 1)
         else:
             IsValid = (len(FieldList) <= 3)
-
-        return [VpdOffset, Size, Value], IsValid, 2
+        if Size:
+            try:
+                int(Size,16) if Size.upper().startswith("0X") else int(Size)
+            except:
+                IsValid = False
+                Size = -1
+        return [VpdOffset, str(Size), Value], IsValid, 2
     elif PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
         HiiString = FieldList[0]
         Guid = Offset = Value = Attribute = ''
