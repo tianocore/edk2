@@ -1,0 +1,40 @@
+#/** @file PL111Lcd.inf
+#
+#  Component description file for PL111Lcd module
+#
+#  Copyright (c) 2011-2017, ARM Ltd. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PL111Lcd
+  FILE_GUID                      = 407B4008-BF5B-11DF-9547-CF16E0D72085
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LcdHwLib
+
+[Sources.common]
+  PL111Lcd.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  DebugLib
+  IoLib
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdPL111LcdBase
