@@ -18,6 +18,7 @@
 #include <Base.h>
 
 #include <Library/DebugLib.h>
+#include <Library/LcdHwLib.h>
 #include <Library/LcdPlatformLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
@@ -103,26 +104,6 @@ GraphicsOutputDxeInitialize (
 EFI_STATUS
 InitializeDisplay (
   IN LCD_INSTANCE* Instance
-);
-
-EFI_STATUS
-LcdIdentify (
-  VOID
-);
-
-EFI_STATUS
-LcdInitialize (
-  EFI_PHYSICAL_ADDRESS  VramBaseAddress
-);
-
-EFI_STATUS
-LcdSetMode (
-  IN UINT32  ModeNumber
-);
-
-VOID
-LcdShutdown (
-  VOID
 );
 
 #endif /* __ARM_VE_GRAPHICS_DXE_H__ */
