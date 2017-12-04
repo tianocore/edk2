@@ -958,6 +958,8 @@ cleanlib:
                 # Use file list macro as dependency
                 if T.GenFileListMacro:
                     Deps.append("$(%s)" % T.FileListMacro)
+                    if Type in [TAB_OBJECT_FILE, TAB_STATIC_LIBRARY]:
+                        Deps.append("$(%s)" % T.ListFileMacro)
 
                 TargetDict = {
                     "target"    :   self.PlaceMacro(T.Target.Path, self.Macros),
