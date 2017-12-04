@@ -453,6 +453,7 @@ NvmExpressPassThru (
 {
   NVME_CONTROLLER_PRIVATE_DATA   *Private;
   EFI_STATUS                     Status;
+  EFI_STATUS                     PreviousStatus;
   EFI_PCI_IO_PROTOCOL            *PciIo;
   NVME_SQ                        *Sq;
   NVME_CQ                        *Cq;
@@ -831,6 +832,7 @@ NvmExpressPassThru (
   }
 
   Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
+  PreviousStatus = Status;
   Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
@@ -839,6 +841,9 @@ NvmExpressPassThru (
                1,
                &Data
                );
+  // The return status of PciIo->Mem.Write should not override
+  // previous status if previous status contains error.
+  Status = EFI_ERROR (PreviousStatus) ? PreviousStatus : Status;
 
   //
   // For now, the code does not support the non-blocking feature for admin queue.
