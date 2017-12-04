@@ -31,7 +31,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ArmPkg/ArmPkg.dec
-  ArmPlatformPkg/ArmVExpressPkg/ArmVExpressPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [LibraryClasses]
