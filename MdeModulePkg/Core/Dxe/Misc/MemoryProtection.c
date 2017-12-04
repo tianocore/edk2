@@ -831,8 +831,11 @@ InitializeDxeNxMemoryProtectionPolicy (
   } while (Status == EFI_BUFFER_TOO_SMALL);
   ASSERT_EFI_ERROR (Status);
 
-  DEBUG((DEBUG_ERROR, "%a: applying strict permissions to active memory regions\n",
-    __FUNCTION__));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: applying strict permissions to active memory regions\n",
+    __FUNCTION__
+    ));
 
   MergeMemoryMapForProtectionPolicy (MemoryMap, &MemoryMapSize, DescriptorSize);
 
@@ -856,9 +859,11 @@ InitializeDxeNxMemoryProtectionPolicy (
   // accessible, but have not been added to the UEFI memory map (yet).
   //
   if (GetPermissionAttributeForMemoryType (EfiConventionalMemory) != 0) {
-    DEBUG((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_INFO,
       "%a: applying strict permissions to inactive memory regions\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
 
     CoreAcquireGcdMemoryLock ();
 
