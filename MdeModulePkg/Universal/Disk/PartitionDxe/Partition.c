@@ -1212,7 +1212,7 @@ PartitionInstallChildHandle (
   //
   CopyMem (&Private->PartitionInfo, PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
 
-  if ((PartitionInfo->System == 1)) {
+  if (PartitionInfo->System == 1) {
     Private->EspGuid = &gEfiPartTypeSystemPartGuid;
   } else {
     //
