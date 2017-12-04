@@ -15,9 +15,8 @@
 #include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-#include <Drivers/PL111Lcd.h>
-
 #include "LcdGraphicsOutputDxe.h"
+#include "PL111Lcd.h"
 
 /**********************************************************************
  *

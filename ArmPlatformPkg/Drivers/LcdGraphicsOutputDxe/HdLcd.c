@@ -18,8 +18,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 
-#include <Drivers/HdLcd.h>
-
+#include "HdLcd.h"
 #include "LcdGraphicsOutputDxe.h"
 
 /**********************************************************************
