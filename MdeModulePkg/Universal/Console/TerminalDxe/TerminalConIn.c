@@ -1336,6 +1336,10 @@ UnicodeToEfiKey (
   UINT16              UnicodeChar;
   EFI_INPUT_KEY       Key;
   BOOLEAN             SetDefaultResetState;
+#ifdef PC_HOOK
+  BOOLEAN             ConsoleKeyFlag;
+  UINT16              ScanCodeBuffer=0;
+#endif
 
   TimerStatus = gBS->CheckEvent (TerminalDevice->TwoSecondTimeOut);
 
@@ -1493,6 +1497,10 @@ UnicodeToEfiKey (
 
       if (TerminalDevice->TerminalType == TerminalTypeVt100) {
         switch (UnicodeChar) {
+#ifdef PC_HOOK
+// IPMIUtil tool has some different definitions for these Escape function keys,
+// So, Enhanced these special function keys scope for IPMIUtil.
+#endif
         case 'P':
           Key.ScanCode = SCAN_F1;
           break;
@@ -1500,27 +1508,51 @@ UnicodeToEfiKey (
           Key.ScanCode = SCAN_F2;
           break;
         case 'w':
+#ifdef PC_HOOK
+        case 'R':
+#endif
           Key.ScanCode = SCAN_F3;
           break;
         case 'x':
+#ifdef PC_HOOK
+        case 'S':
+#endif
           Key.ScanCode = SCAN_F4;
           break;
         case 't':
+#ifdef PC_HOOK
+        case 'T':
+#endif
           Key.ScanCode = SCAN_F5;
           break;
         case 'u':
+#ifdef PC_HOOK
+        case 'U':
+#endif
           Key.ScanCode = SCAN_F6;
           break;
         case 'q':
+#ifdef PC_HOOK
+        case 'V':
+#endif
           Key.ScanCode = SCAN_F7;
           break;
         case 'r':
+#ifdef PC_HOOK
+        case 'W':
+#endif
           Key.ScanCode = SCAN_F8;
           break;
         case 'p':
+#ifdef PC_HOOK
+        case 'X':
+#endif
           Key.ScanCode = SCAN_F9;
           break;
         case 'M':
+#ifdef PC_HOOK
+        case 'Y':
+#endif
           Key.ScanCode = SCAN_F10;
           break;
         default :
@@ -1563,6 +1595,17 @@ UnicodeToEfiKey (
       break;
 
     case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET:
+#ifdef PC_HOOK
+      if (UnicodeChar == '1' || UnicodeChar == '[') {
+        TerminalDevice->InputState |= INPUT_STATE_4;
+        TerminalDevice->ResetState = RESET_STATE_DEFAULT;
+        continue;
+       } else if (UnicodeChar == '2') {
+        TerminalDevice->InputState |= INPUT_STATE_8;
+        TerminalDevice->ResetState = RESET_STATE_DEFAULT;
+        continue;
+       }
+#endif
 
       TerminalDevice->ResetState = RESET_STATE_DEFAULT;
 
@@ -1788,6 +1831,197 @@ UnicodeToEfiKey (
 
       UnicodeToEfiKeyFlushState (TerminalDevice);
       break;
+
+#ifdef PC_HOOK
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_4:
+
+      Key.ScanCode = SCAN_NULL;
+
+      ConsoleKeyFlag = FALSE;
+
+      if (TerminalDevice->TerminalType == TerminalTypeVt100 ||
+        TerminalDevice->TerminalType == TerminalTypeVt100Plus){
+        switch (UnicodeChar) {
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '7':
+        case '8':
+        case '9':
+          ScanCodeBuffer = UnicodeChar;
+          ConsoleKeyFlag = TRUE;
+          break;
+        case 'A':
+          Key.ScanCode = SCAN_F1;
+          break;
+        case 'B':
+          Key.ScanCode = SCAN_F2;
+          break;
+        case 'C':
+          Key.ScanCode = SCAN_F3;
+          break;
+        case 'D':
+          Key.ScanCode = SCAN_F4;
+          break;
+        case 'E':
+          Key.ScanCode = SCAN_F5;
+          break;
+        default :
+          break;
+        }
+      }
+
+      if (ConsoleKeyFlag) {
+        TerminalDevice->InputState |= INPUT_STATE_16;
+        TerminalDevice->ResetState = RESET_STATE_DEFAULT;
+        continue;
+      }
+
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = 0;
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
+        TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+        UnicodeToEfiKeyFlushState (TerminalDevice);
+        continue;
+      }
+       
+      UnicodeToEfiKeyFlushState (TerminalDevice);
+
+      break;
+
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_8:
+
+      Key.ScanCode = SCAN_NULL;
+
+      ConsoleKeyFlag = FALSE;
+
+      if (TerminalDevice->TerminalType == TerminalTypeVt100 ||
+        TerminalDevice->TerminalType == TerminalTypeVt100Plus){
+        switch (UnicodeChar) {
+        case '0':
+        case '1':
+        case '3':
+        case '4':
+          ScanCodeBuffer = UnicodeChar;
+          ConsoleKeyFlag = TRUE;
+          break;
+        default :
+          break;
+        }
+      }
+
+      if (ConsoleKeyFlag) {
+        TerminalDevice->InputState |= INPUT_STATE_16;
+        TerminalDevice->ResetState = RESET_STATE_DEFAULT;
+        continue;
+      }
+
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = 0;
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
+        TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+        UnicodeToEfiKeyFlushState (TerminalDevice);
+        continue;
+      }
+   
+      UnicodeToEfiKeyFlushState (TerminalDevice);
+
+      break;
+
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_4 | INPUT_STATE_16:
+
+      TerminalDevice->ResetState = RESET_STATE_DEFAULT;
+
+      Key.ScanCode = SCAN_NULL;
+
+      if (TerminalDevice->TerminalType == TerminalTypeVt100 ||
+        TerminalDevice->TerminalType == TerminalTypeVt100Plus) {
+        if (UnicodeChar == 0x7E) {
+           switch (ScanCodeBuffer) {
+           case '1':
+             Key.ScanCode = SCAN_F1;
+             break;
+           case '2':
+             Key.ScanCode = SCAN_F2;
+             break;
+           case '3':
+             Key.ScanCode = SCAN_F3;
+             break;
+           case '4':
+             Key.ScanCode = SCAN_F4;
+             break;
+           case '5':
+             Key.ScanCode = SCAN_F5;
+             break;
+           case '7':
+             Key.ScanCode = SCAN_F6;
+             break;
+           case '8':
+             Key.ScanCode = SCAN_F7;
+             break;
+           case '9':
+             Key.ScanCode = SCAN_F8;
+             break;
+           default :
+             break;
+           }
+        }
+      }
+
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = 0;
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
+        TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+        UnicodeToEfiKeyFlushState (TerminalDevice);
+        continue;
+      }
+ 
+      UnicodeToEfiKeyFlushState (TerminalDevice);
+
+      break;
+
+    case INPUT_STATE_ESC | INPUT_STATE_LEFTOPENBRACKET | INPUT_STATE_8 | INPUT_STATE_16:
+
+      TerminalDevice->ResetState = RESET_STATE_DEFAULT;
+
+      Key.ScanCode = SCAN_NULL;
+
+      if (TerminalDevice->TerminalType == TerminalTypeVt100 ||
+        TerminalDevice->TerminalType == TerminalTypeVt100Plus) {
+        if (UnicodeChar == 0x7E) {
+           switch (ScanCodeBuffer) {
+           case '0':
+             Key.ScanCode = SCAN_F9;
+             break;
+           case '1':
+             Key.ScanCode = SCAN_F10;
+             break;
+           case '3':
+             Key.ScanCode = SCAN_F11;
+             break;
+           case '4':
+             Key.ScanCode = SCAN_F12;
+             break;
+           default :
+             break;
+           }
+        }
+      }
+
+      if (Key.ScanCode != SCAN_NULL) {
+        Key.UnicodeChar = 0;
+        EfiKeyFiFoInsertOneKey (TerminalDevice, &Key);
+        TerminalDevice->InputState = INPUT_STATE_DEFAULT;
+        UnicodeToEfiKeyFlushState (TerminalDevice);
+        continue;
+      }
+        
+      UnicodeToEfiKeyFlushState (TerminalDevice);
+
+      break;
+#endif
 
     default:
       //
