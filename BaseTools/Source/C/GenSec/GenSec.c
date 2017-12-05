@@ -1326,7 +1326,7 @@ Returns:
       DummyFile = fopen (LongFilePath (DummyFileName), "rb");
       if (DummyFile == NULL) {
         Error (NULL, 0, 0001, "Error opening file", DummyFileName);
-        return EFI_ABORTED;
+        goto Finish;
       }
 
       fseek (DummyFile, 0, SEEK_END);
@@ -1340,7 +1340,7 @@ Returns:
       InFile = fopen(LongFilePath(InputFileName[0]), "rb");
       if (InFile == NULL) {
         Error (NULL, 0, 0001, "Error opening file", InputFileName[0]);
-        return EFI_ABORTED;
+        goto Finish;
       }
 
       fseek (InFile, 0, SEEK_END);
@@ -1351,7 +1351,7 @@ Returns:
       fclose(InFile);
       DebugMsg (NULL, 0, 9, "Input files", "the input file name is %s and the size is %u bytes", InputFileName[0], (unsigned) InFileSize);
       if (InFileSize > DummyFileSize){
-        if (stricmp(DummyFileBuffer, InFileBuffer + (InFileSize - DummyFileSize)) == 0){
+        if (stricmp((CHAR8 *)DummyFileBuffer, (CHAR8 *)(InFileBuffer + (InFileSize - DummyFileSize))) == 0){
           SectGuidHeaderLength = InFileSize - DummyFileSize;
         }
       }
