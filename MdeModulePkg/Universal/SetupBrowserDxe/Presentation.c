@@ -8,7 +8,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "Setup.h"
+#ifdef PC_HOOK
+#include <ItkSupport.h>
 
+BOOLEAN gLoadDefault = FALSE;
+#endif //PC_HOOK
 BOOLEAN            mHiiPackageListUpdated;
 UI_MENU_SELECTION  *gCurrentSelection;
 EFI_HII_HANDLE     mCurrentHiiHandle = NULL;
@@ -998,6 +1002,9 @@ ProcessAction (
   IN UINT16        DefaultId
   )
 {
+#ifdef PC_HOOK
+  BOOLEAN ApplyItkBOSettings = FALSE;
+#endif //PC_HOOK
   //
   // This is caused by use press ESC, and it should not combine with other action type.
   //
@@ -1019,6 +1026,18 @@ ProcessAction (
   }
 
   if ((Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
+#ifdef PC_HOOK
+    if (gLoadDefault) {
+      ApplyItkBOSettings = TRUE;
+      gRT->SetVariable (
+            L"ApplyItkBootorderCustomizedSettings",
+            &gEfiGenericVariableGuid,
+            EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+            sizeof (ApplyItkBOSettings),
+            &ApplyItkBOSettings
+            );
+    }
+#endif //PC_HOOK
     SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
   }
 
