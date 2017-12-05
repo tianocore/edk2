@@ -529,6 +529,7 @@ GetAlignmentFromFile(char *InFile, UINT32 *Alignment)
 
   InFileHandle        = NULL;
   PeFileBuffer        = NULL;
+  *Alignment          = 0;
 
   memset (&ImageContext, 0, sizeof (ImageContext));
 

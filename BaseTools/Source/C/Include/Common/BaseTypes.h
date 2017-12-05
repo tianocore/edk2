@@ -170,15 +170,15 @@
 // EFI Error Codes common to all execution phases
 //
 
-typedef INTN RETURN_STATUS;
+typedef UINTN RETURN_STATUS;
 
 ///
 /// Set the upper bit to indicate EFI Error.
 ///
-#define ENCODE_ERROR(a)              (MAX_BIT | (a))
+#define ENCODE_ERROR(a)              ((RETURN_STATUS)(MAX_BIT | (a)))
 
-#define ENCODE_WARNING(a)            (a)
-#define RETURN_ERROR(a)              ((a) < 0)
+#define ENCODE_WARNING(a)            ((RETURN_STATUS)(a))
+#define RETURN_ERROR(a)              (((INTN)(RETURN_STATUS)(a)) < 0)
 
 #define RETURN_SUCCESS               0
 #define RETURN_LOAD_ERROR            ENCODE_ERROR (1)
