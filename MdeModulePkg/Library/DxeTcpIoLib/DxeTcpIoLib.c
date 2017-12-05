@@ -585,6 +585,11 @@ TcpIoConnect (
   }
 
   if (!TcpIo->IsConnDone) {
+    if (TcpIo->TcpVersion == TCP_VERSION_4) {
+      Tcp4->Cancel (Tcp4, &TcpIo->ConnToken.Tcp4Token.CompletionToken);
+    } else {
+      Tcp6->Cancel (Tcp6, &TcpIo->ConnToken.Tcp6Token.CompletionToken);
+    }
     Status = EFI_TIMEOUT;
   } else {
     Status = TcpIo->ConnToken.Tcp4Token.CompletionToken.Status;
@@ -655,6 +660,11 @@ TcpIoAccept (
   }
 
   if (!TcpIo->IsListenDone) {
+    if (TcpIo->TcpVersion == TCP_VERSION_4) {
+      Tcp4->Cancel (Tcp4, &TcpIo->ListenToken.Tcp4Token.CompletionToken);
+    } else {
+      Tcp6->Cancel (Tcp6, &TcpIo->ListenToken.Tcp6Token.CompletionToken);
+    }
     Status = EFI_TIMEOUT;
   } else {
     Status = TcpIo->ListenToken.Tcp4Token.CompletionToken.Status;
