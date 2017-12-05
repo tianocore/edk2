@@ -7,6 +7,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "Setup.h"
+#ifdef PC_HOOK
+
+#include <ItkSupport.h>
+#endif //PC_HOOK
+
+extern BOOLEAN gLoadDefault;
 
 SETUP_DRIVER_PRIVATE_DATA  mPrivateData = {
   SETUP_DRIVER_SIGNATURE,
@@ -4278,7 +4284,11 @@ ReGetDefault:
 
         FreePool (NewString);
       }
+      #ifdef PC_HOOK
+      goto Done;
+      #else
       return Status;
+      #endif //PC_HOOK
     }
   }
 
@@ -4288,7 +4298,11 @@ ReGetDefault:
   if (ConfigAccess != NULL) {
     Status = GetDefaultValueFromAltCfg(FormSet, Form, Question);
     if (!EFI_ERROR (Status)) {
+        #ifdef PC_HOOK
+        goto Done;
+        #else
         return Status;
+        #endif //PC_HOOK
     }
   }
 
@@ -4307,7 +4321,11 @@ ReGetDefault:
           //
           Status = EvaluateExpression (FormSet, Form, Default->ValueExpression);
           if (EFI_ERROR (Status)) {
+            #ifdef PC_HOOK
+            goto Done;
+            #else
             return Status;
+            #endif //PC_HOOK
           }
 
           if (Default->ValueExpression->Result.Type == EFI_IFR_TYPE_BUFFER) {
@@ -4338,7 +4356,11 @@ ReGetDefault:
         if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
           StrValue = HiiGetString (FormSet->HiiHandle, HiiValue->Value.string, NULL);
           if (StrValue == NULL) {
+            #ifdef PC_HOOK
+            goto Done;
+            #else
             return EFI_NOT_FOUND;
+            #endif //PC_HOOK
           }
           if (Question->StorageWidth > StrSize (StrValue)) {
             ZeroMem (Question->BufferValue, Question->StorageWidth);
@@ -4348,7 +4370,11 @@ ReGetDefault:
           }
         }
 
+        #ifdef PC_HOOK
+        goto Done;
+        #else
         return EFI_SUCCESS;
+        #endif //PC_HOOK
       }
 
       Link = GetNextNode (&Question->DefaultListHead, Link);
@@ -4378,7 +4404,11 @@ ReGetDefault:
            ) {
           CopyMem (HiiValue, &Option->Value, sizeof (EFI_HII_VALUE));
 
+          #ifdef PC_HOOK
+          goto Done;
+          #else
           return EFI_SUCCESS;
+          #endif //PC_HOOK
         }
       }
     }
@@ -4397,8 +4427,11 @@ ReGetDefault:
          ) {
         HiiValue->Value.b = TRUE;
       }
-
+      #ifdef PC_HOOK
+      goto Done;
+      #else
       return EFI_SUCCESS;
+      #endif //PC_HOOK
     }
   }
 
@@ -4522,7 +4555,19 @@ ReGetDefault:
     break;
   }
 
+#ifdef PC_HOOK
+Done:
+  //
+  // Load the override default value from ITK
+  //
+  if (GetDefaultValueFromITK (FormSet, Question, DefaultId) == EFI_SUCCESS) {
+    return EFI_SUCCESS;
+  } else {
+    return Status;
+  }
+#else
   return Status;
+#endif //PC_HOOK
 }
 
 /**
