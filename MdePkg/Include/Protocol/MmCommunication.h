@@ -55,18 +55,28 @@ typedef struct _EFI_MM_COMMUNICATION_PROTOCOL  EFI_MM_COMMUNICATION_PROTOCOL;
 
   @param[in] This                The EFI_MM_COMMUNICATION_PROTOCOL instance.
   @param[in] CommBuffer          A pointer to the buffer to convey into MMRAM.
-  @param[in] CommSize            The size of the data buffer being passed in.On exit, the size of data
+  @param[in] CommSize            The size of the data buffer being passed in. On exit, the size of data
                                  being returned. Zero if the handler does not wish to reply with any data.
+                                 This parameter is optional and may be NULL.
 
   @retval EFI_SUCCESS            The message was successfully posted.
   @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+  @retval EFI_BAD_BUFFER_SIZE    The buffer is too large for the MM implementation.
+                                 If this error is returned, the MessageLength field
+                                 in the CommBuffer header or the integer pointed by
+                                 CommSize, are updated to reflect the maximum payload
+                                 size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED      The CommunicateBuffer parameter or CommSize parameter,
+                                 if not omitted, are in address range that cannot be
+                                 accessed by the MM environment.
+
 **/
 typedef
 EFI_STATUS
 (EFIAPI *EFI_MM_COMMUNICATE)(
   IN CONST EFI_MM_COMMUNICATION_PROTOCOL   *This,
   IN OUT VOID                              *CommBuffer,
-  IN OUT UINTN                             *CommSize
+  IN OUT UINTN                             *CommSize OPTIONAL
   );
 
 ///
