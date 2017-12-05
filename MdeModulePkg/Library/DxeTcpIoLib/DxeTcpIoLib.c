@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access TCP service.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -530,7 +530,7 @@ TcpIoDestroySocket (
   Connect to the other endpoint of the TCP socket.
 
   @param[in, out]  TcpIo     The TcpIo wrapping the TCP socket.
-  @param[in]       Timeout   The time to wait for connection done.
+  @param[in]       Timeout   The time to wait for connection done. Set to NULL for infinite wait.
   
   @retval EFI_SUCCESS            Connect to the other endpoint of the TCP socket
                                  successfully.
@@ -546,7 +546,7 @@ EFI_STATUS
 EFIAPI
 TcpIoConnect (
   IN OUT TCP_IO             *TcpIo,
-  IN     EFI_EVENT          Timeout
+  IN     EFI_EVENT          Timeout        OPTIONAL
   )
 {
   EFI_TCP4_PROTOCOL         *Tcp4;
@@ -576,7 +576,7 @@ TcpIoConnect (
     return Status;
   }
 
-  while (!TcpIo->IsConnDone && EFI_ERROR (gBS->CheckEvent (Timeout))) {
+  while (!TcpIo->IsConnDone && ((Timeout == NULL) || EFI_ERROR (gBS->CheckEvent (Timeout)))) {
     if (TcpIo->TcpVersion == TCP_VERSION_4) {
       Tcp4->Poll (Tcp4);
     } else {
@@ -597,7 +597,7 @@ TcpIoConnect (
   Accept the incomding request from the other endpoint of the TCP socket.
 
   @param[in, out]  TcpIo     The TcpIo wrapping the TCP socket.
-  @param[in]       Timeout   The time to wait for connection done.
+  @param[in]       Timeout   The time to wait for connection done. Set to NULL for infinite wait.
 
   
   @retval EFI_SUCCESS            Connect to the other endpoint of the TCP socket
@@ -607,7 +607,7 @@ TcpIoConnect (
                                  supported in the implementation.
 
   @retval EFI_TIMEOUT            Failed to connect to the other endpoint of the
-                                 TCP socket in the specified time period.                      
+                                 TCP socket in the specified time period.
   @retval Others                 Other errors as indicated.
 
 **/
@@ -615,7 +615,7 @@ EFI_STATUS
 EFIAPI
 TcpIoAccept (
   IN OUT TCP_IO             *TcpIo,
-  IN     EFI_EVENT          Timeout
+  IN     EFI_EVENT          Timeout        OPTIONAL
   )
 {
   EFI_STATUS                Status;
@@ -646,7 +646,7 @@ TcpIoAccept (
     return Status;
   }
 
-  while (!TcpIo->IsListenDone && EFI_ERROR (gBS->CheckEvent (Timeout))) {
+  while (!TcpIo->IsListenDone && ((Timeout == NULL) || EFI_ERROR (gBS->CheckEvent (Timeout)))) {
     if (TcpIo->TcpVersion == TCP_VERSION_4) {
       Tcp4->Poll (Tcp4);
     } else {
@@ -860,7 +860,7 @@ ON_EXIT:
   @param[in]       Packet      The buffer to hold the data copy from the socket rx buffer.
   @param[in]       AsyncMode   Is this receive asyncronous or not.
   @param[in]       Timeout     The time to wait for receiving the amount of data the Packet
-                               can hold.
+                               can hold. Set to NULL for infinite wait.
 
   @retval EFI_SUCCESS            The required amount of data is received from the socket.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
@@ -877,7 +877,7 @@ TcpIoReceive (
   IN OUT TCP_IO             *TcpIo,
   IN     NET_BUF            *Packet,
   IN     BOOLEAN            AsyncMode,
-  IN     EFI_EVENT          Timeout
+  IN     EFI_EVENT          Timeout       OPTIONAL
   )
 {
   EFI_TCP4_PROTOCOL         *Tcp4;
