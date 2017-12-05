@@ -917,7 +917,6 @@ Ip4StartAutoConfig (
   IP4_CONFIG2_DHCP4_OPTION       ParaList;
   EFI_STATUS                     Status;
  
-
   IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
   if (IpSb->State > IP4_SERVICE_UNSTARTED) {
@@ -970,8 +969,18 @@ Ip4StartAutoConfig (
                   IpSb->Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    NetLibDestroyServiceChild (
+      IpSb->Controller,
+      IpSb->Image,
+      &gEfiDhcp4ServiceBindingProtocolGuid,
+      Instance->Dhcp4Handle
+      );
 
+    Instance->Dhcp4Handle = NULL;
+    
+    return Status;
+  }
 
   //
   // Check the current DHCP status, if the DHCP process has
@@ -979,11 +988,10 @@ Ip4StartAutoConfig (
   //
   Dhcp4  = Instance->Dhcp4;
   Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4Mode);
-
   if (Dhcp4Mode.State == Dhcp4Bound) {
     Ip4Config2OnDhcp4Complete (NULL, Instance);
+    
     return EFI_SUCCESS;
-
   }
 
   //
@@ -1001,8 +1009,25 @@ Ip4StartAutoConfig (
   Dhcp4Mode.ConfigData.OptionList  = OptionList;
 
   Status = Dhcp4->Configure (Dhcp4, &Dhcp4Mode.ConfigData);
-
   if (EFI_ERROR (Status)) {
+    gBS->CloseProtocol (
+           Instance->Dhcp4Handle,
+           &gEfiDhcp4ProtocolGuid,
+           IpSb->Image,
+           IpSb->Controller
+           );
+
+    NetLibDestroyServiceChild (
+      IpSb->Controller,
+      IpSb->Image,
+      &gEfiDhcp4ServiceBindingProtocolGuid,
+      Instance->Dhcp4Handle
+      );
+    
+    Instance->Dhcp4 = NULL;
+    
+    Instance->Dhcp4Handle = NULL;
+    
     return Status;
   }
   
@@ -1016,21 +1041,24 @@ Ip4StartAutoConfig (
                   Instance,
                   &Instance->Dhcp4Event
                   );
-
   if (EFI_ERROR (Status)) {
+    Ip4Config2DestroyDhcp4 (Instance);
     return Status;
   }
 
   Status = Dhcp4->Start (Dhcp4, Instance->Dhcp4Event);
-
   if (EFI_ERROR (Status)) {
+    Ip4Config2DestroyDhcp4 (Instance);
+    gBS->CloseEvent (Instance->Dhcp4Event);
+    Instance->Dhcp4Event = NULL;
+    
     return Status;
   }
  
-  IpSb->State     = IP4_SERVICE_STARTED;
+  IpSb->State = IP4_SERVICE_STARTED;
   DispatchDpc ();
+  
   return EFI_SUCCESS;
-
 }
 
 
