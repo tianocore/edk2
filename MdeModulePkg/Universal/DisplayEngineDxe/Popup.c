@@ -686,7 +686,7 @@ CreatePopup (
   }
 
   gMessageString = HiiGetString (HiiHandle, Message, NULL);
-  if((gMessageString == NULL)) {
+  if(gMessageString == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
