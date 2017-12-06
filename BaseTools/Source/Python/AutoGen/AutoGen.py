@@ -686,9 +686,6 @@ class WorkspaceAutoGen(AutoGen):
             content += 'Flash Image Definition: '
             content += str(self.FdfFile)
             content += os.linesep
-        if GlobalData.gBinCacheDest:
-            content += 'Cache of .efi location: '
-            content += str(GlobalData.gBinCacheDest)
         SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
 
         #
