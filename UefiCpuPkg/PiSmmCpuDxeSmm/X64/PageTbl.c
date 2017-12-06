@@ -851,12 +851,12 @@ SmiPFHandler (
   }
 
   //
-  // If a page fault occurs in SMM range
+  // If a page fault occurs in non-SMRAM range.
   //
   if ((PFAddress < mCpuHotPlugData.SmrrBase) ||
       (PFAddress >= mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize)) {
-    DumpCpuContext (InterruptType, SystemContext);
     if ((SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0) {
+      DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Code executed on IP(0x%lx) out of SMM range after SMM is locked!\n", PFAddress));
       DEBUG_CODE (
         DumpModuleInfoByIp (*(UINTN *)(UINTN)SystemContext.SystemContextX64->Rsp);
@@ -864,6 +864,7 @@ SmiPFHandler (
       CpuDeadLoop ();
     }
     if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
+      DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
       DEBUG_CODE (
         DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
@@ -877,6 +878,7 @@ SmiPFHandler (
   //
   if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0 &&
       (PFAddress < EFI_PAGE_SIZE)) {
+    DumpCpuContext (InterruptType, SystemContext);
     DEBUG ((DEBUG_ERROR, "!!! NULL pointer access !!!\n"));
     DEBUG_CODE (
       DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
