@@ -35,6 +35,38 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_SMM_VARIABLE_PROTOCOL  *mTcg2PpSmmVariable;
 
 /**
+  Return TPM2 ManagementFlags set by PP interface.
+
+  @retval    ManagementFlags    TPM2 Management Flags.
+**/
+UINT32
+EFIAPI
+Tcg2PhysicalPresenceLibGetManagementFlags (
+  VOID
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
+  UINTN                             DataSize;
+
+  DEBUG ((EFI_D_INFO, "[TPM2] GetManagementFlags\n"));
+
+  DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE_FLAGS);
+  Status = mTcg2PpSmmVariable->SmmGetVariable (
+                  TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+                  &gEfiTcg2PhysicalPresenceGuid,
+                  NULL,
+                  &DataSize,
+                  &PpiFlags
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "[TPM2] Get PP flags variable failure! Status = %r\n", Status));
+    PpiFlags.PPFlags = TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT;
+  }
+  return PpiFlags.PPFlags;
+}
+
+/**
   The handler for TPM physical presence function:
   Return TPM Operation Response to OS Environment.
 
