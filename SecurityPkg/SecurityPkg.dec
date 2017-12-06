@@ -202,10 +202,6 @@
   #  Include/Guid/TrEEConfigHii.h
   gTrEEConfigFormSetGuid              = {0xc54b425f, 0xaa79, 0x48b4, { 0x98, 0x1f, 0x99, 0x8b, 0x3c, 0x4b, 0x64, 0x1c }}
 
-  ## Include/OpalPasswordExtraInfoVariable.h
-  gOpalExtraInfoVariableGuid =  {0x44a2ad5d, 0x612c, 0x47b3, {0xb0, 0x6e, 0xc8, 0xf5, 0x0b, 0xfb, 0xf0, 0x7d}}
-
-
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
   # Include/Ppi/LockPhysicalPresence.h
